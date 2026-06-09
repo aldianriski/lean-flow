@@ -1,0 +1,30 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: Sprint completed and changes reflected in docs
+status: current
+---
+
+# [Project Name] — Changelog
+
+<!-- Prepend new sprints — newest first. Append-only; never edit past sprint blocks. -->
+<!-- The active sprint's changelog lives in TODO.md. Move it here once the sprint closes. -->
+
+---
+
+## Sprint 1 — [Sprint Name] [CUSTOMIZE] (YYYY-MM-DD)
+
+| File | Change | ADR |
+|:-----|:-------|:----|
+| _(no entries yet)_ | — | — |
+
+---
+
+<!-- Example (filled in) — what a completed sprint block looks like: -->
+
+## Sprint 0 — Foundation (2026-01-10)
+
+| File | Change | ADR |
+|:-----|:-------|:----|
+| `docs/ARCHITECTURE.md` | Initial architecture documented — layered service pattern | — |
+| `docs/DECISIONS.md` | ADR-000: PostgreSQL over MongoDB | ADR-000 |

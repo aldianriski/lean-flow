@@ -1,0 +1,71 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: [what triggers an update to this file]
+status: current
+---
+
+# [Project Name] — AI Context
+
+## Project Overview
+- **Name**: [Project Name]
+- **Type**: [Web app / API / Library / Mobile / CLI / Starter]
+- **Stack**: [Framework + Language + Key libraries]
+- **Architecture**: [One line — e.g. "Layered service", "Clean Architecture + DDD"]
+
+## Session Workflow
+The lean-flow loop for any AI-driven session:
+1. `/prime` — load ordered context + health check
+2. `/lean-doc-generator` — align docs to the current code state (WHY/WHERE only)
+3. `/orchestrator` — execute the next task through the G1/G2 gates
+4. Repeat.
+
+## File Structure [CUSTOMIZE]
+```
+/[source-root]/    # [layers / modules — one line each]
+/[tests-root]/
+```
+
+## Naming Conventions [CUSTOMIZE]
+- Files: [kebab-case / snake_case / PascalCase per stack]
+
+## Anti-Patterns (Avoid) [CUSTOMIZE]
+❌ [Business logic in the wrong layer]
+❌ [Framework leaking into core logic]
+❌ Skipping the G1 Scope / G2 Design gates
+
+## Commands [CUSTOMIZE]
+```bash
+[install-command]
+[run-command]
+[test-command]
+```
+
+## Definition of Done [CUSTOMIZE]
+- [ ] Typecheck passes
+- [ ] Lint passes
+- [ ] Tests pass
+- [ ] Self-review: 0 blocking issues
+- [ ] DECISIONS.md updated if an architectural decision was made
+- [ ] Acceptance criteria verified by a human at G2
+
+## Behavioral Guidelines
+### Think Before Coding
+Surface assumptions; ask on ambiguous requirements; never fabricate. If multiple interpretations
+exist, **present them — don't pick silently**. If a simpler approach exists, say so; push back when warranted.
+### Simplicity First
+Minimum code that satisfies the acceptance criteria; nothing speculative — no single-use abstractions,
+no unrequested config, no error handling for impossible cases. If 200 lines could be 50, rewrite it.
+Ask: "would a senior engineer call this overcomplicated?"
+### Surgical Changes
+Touch only what the task requires; match adjacent style. Don't refactor or "improve" code that isn't
+broken. **Clean up only your own mess** — remove imports/vars/functions *your* change orphaned; **do
+not delete pre-existing dead code** — *mention* it instead. Every changed line should trace to the request.
+### Goal-Driven Execution
+Restate the task as a verifiable goal before implementing; for multi-step work, state a brief plan
+with a check per step (`step → verify: check`) and loop until verified. Strong success criteria let
+you work independently; weak ones ("make it work") force constant clarification.
+### Concise Reporting
+Report results telegraphically by default — status, verification, and lists get terse fragments;
+drop filler, never connectives. Keep a full sentence only where a caveat or tradeoff is load-bearing
+(because / unless / only-if) — concision must not cost disambiguation.

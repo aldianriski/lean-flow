@@ -1,0 +1,50 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: Stack changes, new domain concept introduced, or glossary updated
+status: current
+---
+
+# [Project Name] — Context [CUSTOMIZE]
+
+> The project's vocabulary + conventions for the AI: stack · patterns · **domain glossary**. A project
+> that runs the lean-flow loop also records its gates / modes / roster here (this file is the SSOT).
+
+## Stack [CUSTOMIZE]
+- **Language**: [e.g. TypeScript 5]
+- **Runtime**: [e.g. Node.js 20]
+- **Framework**: [e.g. Express 4]
+- **Database**: [e.g. PostgreSQL 15 via Prisma]
+- **Test runner**: [e.g. Vitest]
+
+## Architecture [CUSTOMIZE]
+[2–3 sentences on high-level structure. e.g. "Layered service: HTTP layer delegates to the service
+layer which delegates to the repository. No business logic in controllers."]
+
+## Patterns in Use [CUSTOMIZE]
+- **[Pattern name]**: [where/how used — one line]
+- **[Pattern name]**: [where/how used — one line]
+
+## Anti-Patterns to Avoid [CUSTOMIZE]
+❌ [e.g. No SQL queries in controllers]
+❌ [Anti-pattern 2]
+
+## Domain Glossary [CUSTOMIZE]
+<!-- Only terms specific to THIS project's domain. General programming concepts (timeout, retry,
+     DTO, cache) do NOT belong, even if used heavily. Be opinionated: when several words mean the
+     same thing, pick the canonical one and list the rest under _Avoid_. One or two sentences max —
+     define what it IS, not what it does. -->
+
+**[Term]**:
+[One- or two-sentence definition of what it is.]
+_Avoid_: [synonyms not to use]
+
+<!-- Example (filled in): -->
+
+**Workspace**:
+The top-level tenant; maps to one customer account.
+_Avoid_: Org, Account, Tenant
+
+**Member**:
+A user belonging to one or more Workspaces.
+_Avoid_: User, Seat

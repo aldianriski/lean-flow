@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "name": "lean-flow",
+  "owner": {
+    "name": "Aldian Rizki",
+    "email": "aldian.mar@gmail.com",
+    "url": "https://aldianrizki.com/"
+  },
+  "plugins": [
+    {
+      "name": "lean-flow",
+      "description": "Lean agentic dev loop for Claude Code: prime → lean-doc → orchestrate → repeat. Eleven standalone skills + an opt-in /flow conductor + a /council decision aid.",
+      "version": "0.1.0",
+      "source": {
+        "source": "github",
+        "repo": "aldianriski/lean-flow"
+      }
+    }
+  ]
+}

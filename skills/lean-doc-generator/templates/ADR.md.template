@@ -1,0 +1,35 @@
+<!-- One ADR per file: docs/adr/ADR-NNN-<slug>.md · append-only (never edit a decided ADR — mark it
+     deprecated/superseded) · WHY only, never HOW. Offer one only when the decision is hard-to-reverse
+     AND surprising AND a real trade-off (DOCS_Guide §4). Worked example → references/ADR-example.md. -->
+
+# ADR-NNN — [Short decision title] [CUSTOMIZE]
+
+- **Status:** proposed | accepted (YYYY-MM-DD) | deprecated | superseded by ADR-NNN
+- **Deciders:** [role — not a personal name]
+- **Context driver:** [the one constraint or goal forcing this — e.g. cost target, scale, deadline]
+
+## Context
+
+[Why is this decision needed? The problem, the constraints, and what makes *now* the right time.
+WHY only — never HOW. Where the call hinges on scope, include a **measured blast radius**
+("N call sites across M files", row counts, etc.) so the decision rests on evidence, not a guess.]
+
+## Decision
+
+[What was decided — one clear statement, no hedging — and the rationale: why this over the alternatives.]
+
+<!-- Optional, for migrations / multi-step changes — delete if not needed:
+## Strategy
+1. [ordered step] → [how its safety is verified]
+-->
+
+## Consequences
+
+**Positive:** [what becomes easier / the benefit the driver wanted]
+**Negative (trade-offs accepted):** [the cost or risk taken on — **at least one**; no decision is free]
+
+## Alternatives considered
+
+| Option | Why rejected |
+|---|---|
+| [alternative] | [reason it wasn't chosen] |

@@ -1,0 +1,43 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: Layer added, dependency rule changed, or major refactor
+status: current
+---
+
+# [Project Name] — Architecture
+
+> [One-line statement of the architectural style — e.g. "Layered service", "Clean Architecture +
+> DDD", "Hexagonal", "Modular monolith".] [CUSTOMIZE]
+
+## Dependency Rule [CUSTOMIZE]
+
+[State which direction dependencies are allowed to point, in one line. Example:]
+
+`interface → application → domain ← infrastructure`
+
+- [Layer]: [its single responsibility + what it may depend on]
+- [Layer]: [its single responsibility + what it may depend on]
+- [Layer]: [its single responsibility + what it may depend on]
+
+## Directory Structure [CUSTOMIZE]
+
+```
+/[source-root]/
+  /[layer-1]/   # [purpose — one line]
+  /[layer-2]/   # [purpose — one line]
+  /[layer-3]/   # [purpose — one line]
+/[tests-root]/
+```
+
+## Key Integration Points [CUSTOMIZE]
+
+External systems, APIs, or services this project integrates with.
+
+| System | Purpose | Location in code |
+|:-------|:--------|:-----------------|
+| [System name] | [what it does] | `[path/to/integration]` |
+
+## Decision Records
+
+See [`DECISIONS.md`](DECISIONS.md) (the ADR index) → `docs/adr/` for the decisions behind this structure.

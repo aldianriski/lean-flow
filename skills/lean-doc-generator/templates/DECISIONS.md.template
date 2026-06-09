@@ -1,0 +1,20 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: A new ADR is added under docs/adr/
+status: current
+---
+
+# [Project Name] — Decision Index
+
+Index of Architecture Decision Records. Each ADR is its own append-only file in `docs/adr/`
+(`templates/ADR.md.template`). This page only *lists* them — newest first; never duplicate ADR
+content here. Add a row when a new `docs/adr/ADR-NNN-<slug>.md` is written.
+
+| ADR | Title | Status | Date |
+|---|---|---|---|
+| [ADR-001](docs/adr/ADR-001-[slug].md) | [short title] | accepted | YYYY-MM-DD |
+
+<!-- Example row (filled):
+| [ADR-000](docs/adr/ADR-000-postgres-write-model.md) | Postgres for the write model | accepted | 2026-01-15 |
+-->

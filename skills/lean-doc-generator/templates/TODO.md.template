@@ -1,0 +1,92 @@
+---
+owner: [role — e.g. "Tech Lead", "Dev Lead"] [CUSTOMIZE]
+last_updated: YYYY-MM-DD
+update_trigger: Sprint completed, task added, or task status changed
+status: current
+---
+
+# [Project Name] — Development Tracker [CUSTOMIZE]
+
+> **How to use this file**
+> - **Session start** — read this first; understand the Active Sprint before touching code (`/prime`).
+> - **`/orchestrator`** — parses the first incomplete `[ ]` task in the Active Sprint.
+> - **Sprint promote/close** — handled by `/lean-doc-generator promote` and `/lean-doc-generator close`.
+> - **Sprint completed** — move the closed sprint block to `docs/CHANGELOG.md` (prepend, newest first), then delete it from here.
+
+> **Sprint sizing**
+> - 2–5 tasks per sprint. Never plan a sprint with a single task.
+> - Order by dependency first, then importance + urgency.
+> - Promote from Backlog in priority order (P0 → P3); remove promoted tasks from Backlog immediately.
+
+---
+
+## Active Sprint
+
+> **→ active:** `docs/sprint/SPRINT-NNN-<slug>.md`   ·   or **— none —** between sprints.
+>
+> The active sprint is its own working doc (`templates/SPRINT.md.template`). `/lean-doc-generator
+> promote` creates it from the Backlog; `/orchestrator sprint-bulk` loops its Plan DoD; `/lean-doc-generator
+> close` writes its Retro. This section is only the pointer — task detail lives in the sprint file.
+
+---
+
+## Backlog
+
+<!-- Groomed by /triage: re-ranked across P0–P3, each task stated ready | needs-info | blocked,
+     duplicates/conflicts flagged, rejected work routed to .out-of-scope/<slug>.md. Only `ready`
+     tasks are promotable. -->
+
+### P0 — Critical / Blocking
+<!-- Tasks that block the project from moving forward -->
+
+### P1 — Next Phase Required [CUSTOMIZE]
+<!-- Required before the next milestone -->
+
+- [ ] **TASK-001 — [verb-first title, ≤60 chars]** [size: M] [risk: med] [HITL] [CUSTOMIZE]
+      done-when: [one measurable, human-verifiable outcome]
+      touches: [files / layers]
+      assumes: [key assumptions, or "none"]
+      tracker: [ticket URL, or "none — justification"]
+      state: ready   [ready | needs-info | blocked; set/groomed by /triage]
+
+### P2 — Quality / Polish
+<!-- Non-blocking improvements -->
+
+### P3 — Long-term [CUSTOMIZE]
+<!-- Future work, stretch goals -->
+
+---
+
+## Tech Debt
+
+<!-- IDs use the TD-NNN namespace (separate from TASK-NNN). Rows are never deleted — when resolved,
+     mark status: resolved → TASK-NNN for the audit trail. Filed automatically by the Sprint Close
+     Retro. Aging (checked at Sprint Promote): unaddressed ≥ 3 sprints → re-review; severity: high
+     → auto-escalate to Backlog P1. severity ∈ trivial · minor · medium · high. -->
+
+- **TD-001** severity: medium | status: open | created: Sprint-001 [CUSTOMIZE: example — replace or remove]
+  - Summary: [one-line description of the debt]
+  - done-when: [observable outcome when resolved]
+
+---
+
+## Changelog (current sprint only)
+
+> Once changes are reflected in docs, MOVE this block to `docs/CHANGELOG.md`, then delete it here.
+
+### Sprint 1 — [Sprint Name] [CUSTOMIZE] (YYYY-MM-DD)
+
+| File | Change | ADR |
+|:-----|:-------|:----|
+| _(no entries yet)_ | — | — |
+
+---
+
+## Quick Rules [CUSTOMIZE]
+> Key conventions for contributors and AI agents — no need to open full docs for these.
+
+```
+[- Auth: all routes require a token except /health and /auth/*]
+[- Files: kebab-case for all filenames]
+[- Add patterns here that would prevent repeated mistakes]
+```

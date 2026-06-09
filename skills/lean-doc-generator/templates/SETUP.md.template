@@ -1,0 +1,42 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: Install steps, environment variables, or dev tooling changed
+status: current
+---
+
+# [Project Name] — Setup [CUSTOMIZE]
+
+## Prerequisites [CUSTOMIZE]
+
+<!-- Example (filled in): -->
+- Node.js ≥18 — https://nodejs.org
+- [Other toolchain / service the project needs]
+
+## Install [CUSTOMIZE]
+
+```bash
+git clone https://github.com/[org]/[repo]
+cd [repo]
+[install command]
+cp .env.example .env
+```
+
+## Run [CUSTOMIZE]
+
+```bash
+[run command]        # production
+[dev command]        # development (watch mode)
+```
+
+## Test [CUSTOMIZE]
+
+```bash
+[test command]       # full suite
+```
+
+## Environment Variables [CUSTOMIZE]
+
+| Variable | Required | Description |
+|:---------|:---------|:------------|
+| `[VAR_NAME]` | [yes/no] | [description] |

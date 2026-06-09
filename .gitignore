@@ -1,0 +1,11 @@
+# dependencies
+node_modules/
+
+# local Claude Code settings (per-machine)
+.claude/settings.local.json
+.claude/.lean-doc-cache.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp

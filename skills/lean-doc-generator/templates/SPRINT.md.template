@@ -1,0 +1,77 @@
+---
+sprint: NNN
+slug: [kebab-slug]
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+status: planned | active | closed
+plan_commit: [sha — set at promote]
+close_commit: [sha — set at close]
+update_trigger: sprint execute/close events
+---
+
+# SPRINT-NNN — [Sprint Name] [CUSTOMIZE]
+
+> **Theme:** [One–three sentences. What this sprint is really about and why it comes
+> before other work. Foundations before features — don't build on sand.]
+
+## Scope
+
+**In:** [the 2–5 things this sprint will deliver]
+**Out (deferred):** [explicitly named non-goals — what looks related but is NOT in this sprint]
+
+## Plan
+
+<!-- One block per task. Pull these from TODO.md Backlog at promote (dependency order). The DoD
+     checkboxes are what /orchestrator sprint-bulk loops over and what /prime counts. -->
+
+### T1 — [verb-first title] `[size: M · risk: med]` [CUSTOMIZE]
+Layers: [files / modules this touches]
+[1–3 sentences of WHY + the approach — never step-by-step HOW.]
+
+**Acceptance:** [one observable, human-verifiable outcome — "done when …"]
+
+**DoD:**
+- [ ] [concrete, checkable step]
+- [ ] [concrete, checkable step]
+
+### T2 — [verb-first title] `[size: S · risk: low]` [CUSTOMIZE]
+…
+
+## Owner-action checklist
+<!-- Non-dev actions a human must do (secrets, env, external dashboards). Not dev tasks. Omit if none. -->
+- [ ] [e.g. rotate the exposed credential / set PROD env var]
+
+## Decisions (pre-locked)
+<!-- Hard-to-reverse + surprising + a real trade-off → also record as an ADR (DECISIONS.md / docs/adr/). -->
+- **D1** — [what was decided + why, one line]. **→ ADR-NNN** (if it qualifies).
+
+## Assumptions
+<!-- Each with how/where it gets confirmed. -->
+- **A1** — [assumption]. *Confirm: [source].*
+
+## Execution Log
+<!-- Append-only, dated. Surprises, scope additions, completions. Log here rather than editing § Plan —
+     the plan is frozen at promote. -->
+
+### YYYY-MM-DD | [event] | [one-line summary]
+[detail — what changed and why it matters.]
+
+## Files Changed
+<!-- Filled during execution; feeds CHANGELOG at close. -->
+
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+| `path/to/file` | T1 | [why it changed] | Low | [how verified] |
+
+## Retro
+<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
+     shipped → CHANGELOG · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → LEARNINGS.md. -->
+
+**Worked**
+- [what to keep doing]
+
+**Friction**
+- [what slowed us down]
+
+**Pattern candidate** (surface to user → `LEARNINGS.md`)
+- [a confirmed learning worth promoting if it recurs — count ≥ 2 → durable rule]

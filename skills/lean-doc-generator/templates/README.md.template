@@ -1,0 +1,51 @@
+<a id="readme-top"></a>
+
+<!-- README ownership is a footer line, not top frontmatter (DOCS_Guide §3 README exception) so the
+     rendered top leads with the project, not a metadata table. -->
+
+# [Project Name] [CUSTOMIZE]
+
+> [One-sentence description of what this project does.] [CUSTOMIZE]
+
+## What It Is [CUSTOMIZE]
+- [Key capability 1]
+- [Key capability 2]
+- [Key capability 3]
+
+## What It Is Not [CUSTOMIZE]
+- [Out-of-scope item 1]
+- [Out-of-scope item 2]
+
+## Requirements [CUSTOMIZE]
+- [Runtime + version — e.g. Node.js ≥18]
+- [Other prerequisite — service, account, tool]
+
+## Adopt [CUSTOMIZE]
+
+```bash
+git clone https://github.com/[org]/[repo]
+cd [repo]
+[install command]
+[run command]
+```
+
+Full setup: [`docs/SETUP.md`](docs/SETUP.md)
+
+## Usage [CUSTOMIZE]
+How you actually use this day-to-day — the main entry points, not every command.
+
+| Command / entry point | When |
+|---|---|
+| `[command]` | [what it does] |
+| `[command]` | [what it does] |
+
+## Links [CUSTOMIZE]
+- [Architecture](docs/ARCHITECTURE.md)
+- [Decisions](docs/DECISIONS.md)
+- [Changelog](docs/CHANGELOG.md)
+
+## License
+[MIT — see [LICENSE](LICENSE).] [CUSTOMIZE]
+
+<sub>Doc owner: [role] · last updated: YYYY-MM-DD · status: current</sub>  <!-- ownership footer, not top frontmatter -->
+
