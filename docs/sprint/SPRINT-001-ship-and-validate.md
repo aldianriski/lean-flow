@@ -4,7 +4,7 @@ slug: ship-and-validate
 owner: Maintainer
 last_updated: 2026-06-09
 status: active
-plan_commit: pending (T1)
+plan_commit: d8b09c0
 close_commit: pending
 update_trigger: sprint execute/close events
 ---
@@ -26,9 +26,9 @@ update_trigger: sprint execute/close events
 Lock the whole build in (40 files, zero history) before anything else can drift it.
 **Acceptance:** repo committed and pushed; GitHub slug confirmed in `plugin.json` + `marketplace.json`.
 **DoD:**
-- [ ] GitHub slug confirmed (`aldianriski/lean-flow`?) and correct in both manifests
-- [ ] Initial commit created (conventional message)
-- [ ] Pushed to the remote
+- [x] GitHub slug confirmed (`aldianriski/lean-flow`) and correct in both manifests
+- [x] Initial commit created (`d8b09c0` — conventional message)
+- [x] Pushed to the remote → https://github.com/aldianriski/lean-flow (main)
 
 ### T2 — Dogfood the full loop on one real feature `[size: M · risk: med]` — from TASK-002
 Run lean-flow end-to-end on a real change in another repo (umkm-indo) — the only way real gaps surface.
@@ -68,8 +68,12 @@ itself). Governance review: no `LEARNINGS.md` yet; tech debt all `build-0`, none
 
 ### 2026-06-09 | T3 complete | ADRs backfilled (AFK)
 Wrote ADR-001…005 (rich per-file) + the `DECISIONS.md` index — first real exercise of the ADR
-generation flow (partially burns down **TD-001**: ADR path was spec-only). **T1 + T2 halted** —
-owner-action (GitHub slug + `git push`; a target repo to dogfood). Sprint stays `active` until T1/T2.
+generation flow (partially burns down **TD-001**: ADR path was spec-only).
+
+### 2026-06-09 | T1 complete | shipped to GitHub
+Initial commit `d8b09c0` (50 files) pushed to https://github.com/aldianriski/lean-flow (`main`).
+Repo confirmed PUBLIC; slug verified across both manifests + README. **T2 (dogfood) remains** — needs
+a target repo + a real feature; sprint stays `active` until then.
 
 ## Files Changed
 
