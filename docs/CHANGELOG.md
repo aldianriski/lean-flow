@@ -11,6 +11,16 @@ status: current
 
 ---
 
+## v0.2.0 — Dogfood fixes (2026-06-11)
+
+MINOR release — the first feedback-driven iteration. Ships the four Sprint-002 changes (detailed in
+the sprint block below): canonical doc placement (DOCS_Guide §2 Place column) · the grill at intake ·
+optional parallel streams · §11 retention + doc-aging. Manifests bumped in lockstep
+(`plugin.json` + `marketplace.json` → 0.2.0); skill versions: prime · task-decomposer · orchestrator ·
+flow → 0.2.0, lean-doc-generator → 0.4.0.
+
+---
+
 ## Sprint 002 — Dogfood Fixes (closed 2026-06-11)
 
 The four dogfood frictions (L-001…004) fixed in the standard and its consuming skills:
