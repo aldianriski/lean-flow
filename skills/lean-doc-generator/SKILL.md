@@ -63,12 +63,14 @@ pre-existing content, never touch out-of-scope artifacts. Full mapping + procedu
 
 The active sprint is its own file — `docs/sprint/SPRINT-NNN-<slug>.md` from `templates/SPRINT.md.template`.
 `TODO.md` is the Backlog **pool**; the sprint file is the **active** plan + Execution Log + Retro.
+Optional **streams**: a multi-stream repo runs one active sprint *per stream* (`stream:` frontmatter ·
+one pointer per stream in TODO § Active Sprint); single-stream repos omit it — unchanged.
 
 | User says… | Do |
 |---|---|
-| "promote" / "start sprint" | **Governance review first** (below) → pull chosen Backlog tasks (TODO.md, dependency order) into a new `docs/sprint/SPRINT-NNN-<slug>.md` rendered from `templates/SPRINT.md.template` (each task → a Plan `Tn` with DoD checkboxes); set `status: active` + `plan_commit`; point TODO.md § Active Sprint at the file; commit `sprint(N): plan locked` |
+| "promote" / "start sprint" | **Governance review first** (below) → pull chosen Backlog tasks (TODO.md, dependency order) into a new `docs/sprint/SPRINT-NNN-<slug>.md` rendered from `templates/SPRINT.md.template` (each task → a Plan `Tn` with DoD checkboxes); set `status: active` + `plan_commit`; point the stream's pointer in TODO.md § Active Sprint at the file (single-stream: the lone pointer); commit `sprint(N): plan locked` |
 | executing during a sprint | Tick DoD `[x]` as each passes; **append to the Execution Log, never edit § Plan** (the plan is frozen); keep Files Changed current |
-| "close" / "sprint done" | Verify all DoD `[x]`; write the **Retro** + route its buckets (§10); set `status: closed` + `close_commit`; clear TODO § Active Sprint; squash-commit `sprint(N): <summary>`; prompt `/release-patch` |
+| "close" / "sprint done" | Verify all DoD `[x]`; write the **Retro** + route its buckets (§10); set `status: closed` + `close_commit`; clear that stream's pointer in TODO § Active Sprint; squash-commit `sprint(N): <summary>`; prompt `/release-patch` |
 
 **Retro at close** — sort the sprint into four buckets and **route each to its durable home** (DOCS_Guide §10):
 Shipped → `docs/CHANGELOG.md` · Tech debt → `TD-NNN` in TODO § Tech Debt · Follow-ups → `TASK-NNN` in TODO § Backlog · Learnings → `L-NNN` in `docs/LEARNINGS.md`. **Auto-file all four** (per `templates/LEARNINGS.md.template`); show the user what was filed.

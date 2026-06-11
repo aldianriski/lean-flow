@@ -69,13 +69,13 @@ only what is still open — one question at a time, recommend an answer each tim
 ### mvp
 1. **Parse** → 2. **G1** → 3. **Grill** (if requirements unclear) → 4. **G2 Design**
 → 5. **Implement** micro-tasks in order, marking each done as its check passes
-→ 6. **Self-review** → 7. **Commit**. (Step 3's Grill is the *residual* one — detail lives in `/task-decomposer`.)
+→ 6. **Self-review** → 7. **Commit**.
 
 ### sprint-bulk
 Operates on the active sprint file `docs/sprint/SPRINT-NNN-<slug>.md` (its Plan + DoD).
-0. **Guard** — verify an active sprint file with open Plan DoD `[ ]` exists. None → halt, redirect to `/lean-doc-generator promote`.
+0. **Guard** — verify an active sprint file with open Plan DoD `[ ]` exists. None → halt, redirect to `/lean-doc-generator promote`. More than one active (parallel streams) → ask which sprint to run.
 1. **Batch G1** — one combined scope pass over the Plan.
-2. **Batch G2** — one design pass; note cross-task file overlaps; **grill individually any task with an unconfirmed `assumes:`** — a batch sign-off never waves an open assumption through.
+2. **Batch G2** — one design pass; note cross-task file overlaps — and **cross-stream** ones: files shared with another stream's active sprint → coordinate or sequence, never parallel-build; **grill individually any task with an unconfirmed `assumes:`** — a batch sign-off never waves an open assumption through.
 3. **Sequence** — tasks (Tn) with overlapping files run sequentially; **disjoint tasks at scale → `/batch`** (decompose → one worktree subagent per unit → PR each; `/workflows` watches it).
 4. **Loop** — per Plan task: Implement → Self-review → Commit → tick its DoD `[x]`; **append to the sprint Execution Log** (don't edit § Plan — it's frozen). `/loop` can pace the iteration.
 5. **First-blocker halt** — stop on any blocker or human `block`; log it and wait.

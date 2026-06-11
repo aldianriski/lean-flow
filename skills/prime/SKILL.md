@@ -32,9 +32,11 @@ locations second. Adapt the globs to the host project's layout.
 | 5 | `TODO.md`, `docs/sprint/SPRINT-*.md` | Active task list — frontmatter + open `- [ ]` items only |
 | 6 | `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` | Module map / where-things-live (the durable map) |
 
-**Resolution**: read `TODO.md` (the Backlog pool); follow its § Active Sprint pointer to the active
-`docs/sprint/SPRINT-NNN-<slug>.md` and read only its frontmatter + Plan (~50 lines). Count open
-**DoD `[ ]`** in the sprint Plan as the open tasks; if no sprint is active, fall back to the Backlog.
+**Resolution**: read `TODO.md` (the Backlog pool); follow its § Active Sprint pointer — a
+multi-stream repo lists one pointer per stream — to each active `docs/sprint/SPRINT-NNN-<slug>.md`
+and read only its frontmatter + Plan (~50 lines). Count open **DoD `[ ]`** across all active
+sprints (report per stream when more than one, e.g. `Tasks: 5 open (main: 3 · payments: 2)`); if
+no sprint is active, fall back to the Backlog.
 **Resuming from a `/handoff`?** Also read the handoff doc at the temp path it printed.
 **Graph available?** If `graphify-out/graph.json` exists, you may use it for orientation — optional enrichment, never required (lean-flow has no graph dependency).
 

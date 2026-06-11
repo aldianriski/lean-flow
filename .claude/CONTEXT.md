@@ -92,7 +92,8 @@ Humans approve gates — the skill never self-approves. Review is a self-review 
 
 - **`TODO.md`** = the **Backlog pool** (P0–P3) + Tech Debt; `/triage` grooms it. Its § Active Sprint is just a pointer.
 - **`docs/sprint/SPRINT-NNN-<slug>.md`** = the **active sprint** working doc (`templates/SPRINT.md.template`): Theme · Scope · Plan (Tn + **DoD `[ ]`**) · Owner-action · Decisions→ADR · Assumptions · **Execution Log** (append-only; plan frozen at promote) · Files Changed · **Retro** (routed per §10).
-- Flow: `promote` renders the sprint file from the Backlog (sets `plan_commit`) → `sprint-bulk` loops its Plan DoD → execute appends to the Log → `close` writes the Retro, routes the buckets, sets `close_commit`. `/prime` counts open DoD in the active sprint file.
+- Flow: `promote` renders the sprint file from the Backlog (sets `plan_commit`) → `sprint-bulk` loops its Plan DoD → execute appends to the Log → `close` writes the Retro, routes the buckets, sets `close_commit`. `/prime` counts open DoD across all active sprint files.
+- **Streams** (optional) — parallel work streams run one active sprint *each* (`stream:` frontmatter · one pointer per stream in TODO § Active Sprint); cross-stream file overlap → coordinate, never parallel-build. Single-stream repos omit `stream:` — unchanged.
 
 ## Doc standard
 

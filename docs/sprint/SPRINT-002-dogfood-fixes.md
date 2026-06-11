@@ -41,10 +41,10 @@ Ambiguity is cheapest to kill at intake; the conducted path currently grills now
 **Acceptance:** a `/flow` run on ambiguous intent triggers the detailed grill at decompose; orchestrator G2 still catches residual open assumptions; cold `quick`/`mvp` keeps a grill path (standalone contract).
 
 **DoD:**
-- [ ] Grill moves (glossary · sharpen · edge-cases · code cross-ref · prototype/council routing) live in task-decomposer Clarify; escape hatch tightened to zero-open-assumptions
-- [ ] Orchestrator G2 thinned to a residual grill check
-- [ ] sprint-bulk batch-G2 grills any task with unconfirmed `assumes:`
-- [ ] `/flow` + CONTEXT.md + README aligned
+- [x] Grill moves (glossary · sharpen · edge-cases · code cross-ref · prototype/council routing) live in task-decomposer Clarify; escape hatch tightened to zero-open-assumptions
+- [x] Orchestrator G2 thinned to a residual grill check
+- [x] sprint-bulk batch-G2 grills any task with unconfirmed `assumes:`
+- [x] `/flow` + CONTEXT.md + README aligned
 
 ### T3 — Support parallel work streams — one sprint per stream `[size: M · risk: med]` — from TASK-011
 Layers: `templates/SPRINT.md.template` · `templates/TODO.md.template` · `skills/flow` · `skills/prime` · `skills/orchestrator` · `skills/lean-doc-generator` · `.claude/CONTEXT.md`
@@ -96,7 +96,13 @@ ARCHITECTURE/README/CONTEXT + template relative-link fix). Friction: PowerShell 
 round-trip mangled UTF-8 em-dashes in DECISIONS.md — caught by self-review, rewritten via Write.
 Versions: prime → 0.2.0, lean-doc-generator → 0.3.0.
 
-## Files Changed
+### 2026-06-11 | T2 complete | grill relocated to intake (`cc79d82`)
+Full moves now in task-decomposer Clarify (+ a new move: a design-that-must-be-felt / high-stakes
+fork gets *flagged* on `assumes:` for G2's `/prototype`//`/council` routing, not resolved at intake —
+preserves stage separation). Orchestrator G2 → residual grill; open `assumes:`/`needs-info` BLOCKS.
+Side benefit: orchestrator 111 → 108 lines (TD-003 pressure eased). Observation for retro:
+`.claude/CONTEXT.md` was already over its own 100-line cap (137, now 136) — pre-existing, untouched.
+Versions: task-decomposer · orchestrator · flow → 0.2.0.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|

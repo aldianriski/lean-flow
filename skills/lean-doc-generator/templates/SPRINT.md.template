@@ -1,6 +1,7 @@
 ---
 sprint: NNN
 slug: [kebab-slug]
+stream: [stream name — omit entirely on a single-stream repo]
 owner: [role — not personal name]
 last_updated: YYYY-MM-DD
 status: planned | active | closed

@@ -24,9 +24,15 @@ status: current
 
 > **→ active:** `docs/sprint/SPRINT-NNN-<slug>.md`   ·   or **— none —** between sprints.
 >
+> **Parallel streams?** (optional) — a repo running two work streams holds one active sprint EACH:
+> one pointer line per stream, prefixed with the stream name (matching the sprint's `stream:`
+> frontmatter). Single-stream repos keep the one unprefixed pointer above — nothing changes.
+> **→ [stream-a]:** `docs/sprint/SPRINT-NNN-<slug>.md`
+> **→ [stream-b]:** `docs/sprint/SPRINT-MMM-<slug>.md`
+>
 > The active sprint is its own working doc (`templates/SPRINT.md.template`). `/lean-doc-generator
 > promote` creates it from the Backlog; `/orchestrator sprint-bulk` loops its Plan DoD; `/lean-doc-generator
-> close` writes its Retro. This section is only the pointer — task detail lives in the sprint file.
+> close` writes its Retro. This section is only the pointer(s) — task detail lives in the sprint file.
 
 ---
 

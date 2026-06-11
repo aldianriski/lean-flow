@@ -35,7 +35,7 @@ behind "conduct the loop".
 
 - **Never self-approve a gate.** G1 Scope and G2 Design still need explicit human sign-off — `/flow` pauses at each; it does not wave them through.
 - **Halt on first blocker** (BLOCKED / CRITICAL / human `block`) — report and wait.
-- **One sprint at a time** — don't open a new sprint while one is active.
+- **One sprint per stream** — never a second sprint in a stream that already has one; parallel streams (sprint `stream:` frontmatter) each run their own. Single-stream repos: exactly one active sprint, as before.
 - The conducted path produces the **same artifacts** as à la carte — it only guarantees the sequence and that the Close governance actually runs.
 
 ## Red flags
