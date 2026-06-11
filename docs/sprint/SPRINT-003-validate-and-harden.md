@@ -77,10 +77,10 @@ The validation half of the friction→fix cycle: confirm the four Sprint-002 fix
 **Acceptance:** full loop run on the published v0.2.0; the original four frictions verifiably gone.
 
 **DoD:**
-- [ ] Full loop (prime → decompose → promote → orchestrate → close) on a real feature
-- [ ] Grill verifiably fires at intake; generated docs land per §2 placement
-- [ ] L-001…004 confirmed fixed (or count-bumped + re-filed)
-- [ ] Any new friction filed (L-NNN / TD-NNN / TASK-NNN)
+- [x] Full loop on a real feature — umkm-indo form validation: prime → decompose → promote → sprint-bulk (TDD red→green, live `/run`-style verification) → close (`f5c554c…d44a3d4`)
+- [x] Grill verifiably fired at intake (3-question grill with recommendations *before* any task existed); docs landed per §2 (TODO root · docs/sprint/ · docs/CHANGELOG.md)
+- [x] L-001…004 confirmed fixed: placement ✓ (docs/ throughout) · grill-at-intake ✓ · streams ✓ (T3) · retention ✓ (§11 close-time ran in both repos)
+- [x] New frictions filed → TASK-019 (spec-polish bundle) + L-006 at this close
 
 ## Owner-action checklist
 - [ ] `git push origin main` (13 commits — the skills never push)
@@ -161,11 +161,23 @@ human readers · orchestrator quick's step 4 vs Review section ordering · TDD r
 owner-declined-tests escape hatch · `/goal` referenced but unverifiable by a fresh agent.
 (8th finding was the test scaffold's own bug, not lean-flow's.)
 
+### 2026-06-11 | T5 complete | re-dogfood start-to-close in umkm-indo (`d44a3d4` there)
+Real feature (generator-form validation, Bahasa errors) built through the full v0.2.0 loop:
+git init + baseline → prime (graceful on half-empty repo) → **grill at intake** (approach/TDD/approve,
+one dialog, recommendations attached — L-002's fix observed working) → promote (TASK-002/003 filed
+`blocked` with real dependencies) → batch G1/G2 → /tdd red (18 cases) → green (18/18) → wired both
+pages → typecheck → **live verification** against `next dev` (invalid → 307 with all `err_*` + values;
+valid → 200; render + preservation) → close: retro routed, docs/CHANGELOG.md created at canonical
+placement, sprint archived per §11 + INDEX. New frictions: the "never plan a single-task sprint" rule
+collides with one-feature dogfoods (quick mode can't satisfy promote/close validation); plus
+Node type-stripping needs `allowImportingTsExtensions` (repo-local, noted there).
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `%TEMP%\migrate-test-dev-flow\*` (external) | T1 | migrate plan applied by sonnet executor; verified | Low | inventory diff + hashes |
+| `D:\Project\umkm-indo\*` (external) | T5 | full dogfood loop artifacts + the real feature | Low | 18 tests + live curl |
 | `docs/adr/ADR-006-skill-cap-executable-artifacts.md` | T2 | NEW — cap-rule amendment, council-pressure-tested | Low | §4 template |
 | `docs/DECISIONS.md` | T2 | ADR-006 row | Low | link check |
 | `TODO.md` | T1+T2 | TD-001 resolved · TASK-005 re-scoped ready | Low | self |
