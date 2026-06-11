@@ -53,10 +53,10 @@ T3 of Sprint-002 has never seen a second stream; validate before v1 claims it.
 **Acceptance:** two active sprints with distinct `stream:` coexist and the tooling behaves per spec; single-stream path regression-free.
 
 **DoD:**
-- [ ] Test repo with two streams, one active sprint each (per-stream TODO pointers)
-- [ ] `/prime` reports open DoD per stream; `sprint-bulk` asks which sprint
-- [ ] Cross-stream file overlap flagged at batch-G2 when files are shared
-- [ ] Single-stream repo re-checked: zero behavioral change
+- [x] Test repo with two streams, one active sprint each (per-stream TODO pointers)
+- [x] `/prime` reports open DoD per stream; `sprint-bulk` asks which sprint
+- [x] Cross-stream file overlap flagged at batch-G2 when files are shared
+- [x] Single-stream repo re-checked: zero behavioral change
 
 ### T4 — Fresh-install test from the marketplace `[size: S · risk: med]` — from TASK-016
 Layers: clean test repo · plugin cache
@@ -103,6 +103,21 @@ local-first (T1 migrate · T2 council · T3 streams), push-gated last (T4 instal
 Governance review: L-001…005 all count 1 — none promotable; TD aging — none ≥ 3 sprints, no high;
 **first §11 doc-aging run: proposed + owner-approved archiving SPRINT-001 → `docs/sprint/archive/`
 (`c777fec`) — the propose-before-act behavior verified live.** Plan frozen.
+
+### 2026-06-11 | T1 deferred | owner call — token budget
+G1+G2 approved (T1–T3 sequence, dev-flow copy, council on TASK-005, push after T1–T3). T1 recon +
+copy + per-file migrate plan completed and approved-pending, but the **apply** step (~3k lines read /
+~1.5k rewritten: CLAUDE/CONTEXT/TODO reformats, 15-ADR split, codemap fold, 46-sprint archive) is
+token-heavy; owner deferred it to prioritize improvement-per-token. Copy retained at
+`%TEMP%\migrate-test-dev-flow`; the plan in this session's log is reusable verbatim. T1 DoD stays open.
+
+### 2026-06-11 | T3 complete | streams exercised — 4/4 checks pass
+Throwaway repo (`%TEMP%\streams-test-repo`): two streams (`checkout` · `reporting`), one active
+sprint each, planted overlap on `src/shared/api-client.ts`. Results: per-stream prime count
+(`4 open (checkout: 3 · reporting: 1)`) ✓ · sprint-bulk guard asks-which on >1 active ✓ ·
+cross-stream overlap detected from Layers lines alone ✓ · single-stream zero-diff (this repo is the
+control — pointer format byte-identical) ✓. Caveat logged: spec followed by its own author;
+fresh-context validation lands with T4/T5.
 
 ## Files Changed
 
