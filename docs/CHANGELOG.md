@@ -11,6 +11,21 @@ status: current
 
 ---
 
+## Sprint 003 — Validate & Harden (closed 2026-06-11)
+
+Every shipped component exercised once on real input — TD-001 (spec-only debt) fully resolved.
+Docs-only diff in lean-flow itself; **no version bump** (v0.2.0 stands).
+
+| Validated | Evidence |
+|---|---|
+| `migrate` | full apply on a dev-flow copy via a sonnet executor — 15-ADR split · 44 sprints archived · zero deletions (diff + hash verified) |
+| `/council` | first live run (5 advisors + 5 peer reviews + chairman) on the TASK-005 question → **ADR-006** (cap counts procedure only; executable artifacts in references/) |
+| streams | two-stream test repo: per-stream prime count · asks-which guard · overlap flag · single-stream zero-diff |
+| fresh install | cache 0.1.0→0.2.0; cold agent ran prime→decompose→quick→commit from cached specs; 7 spec frictions logged → TASK-019 |
+| full loop | umkm-indo form-validation feature start-to-close on v0.2.0 — grill at intake, §2 placement, §11 archive all observed working |
+
+---
+
 ## v0.2.0 — Dogfood fixes (2026-06-11)
 
 MINOR release — the first feedback-driven iteration. Ships the four Sprint-002 changes (detailed in

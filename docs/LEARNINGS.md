@@ -15,6 +15,13 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
+## L-006: Cold-context agents surface spec gaps the author cannot see (7 in one fresh-install run) — make a fresh-eyes cold run part of every release validation → fix: TASK-019
+- seen: Sprint-003
+- count: 1
+- promoted: no
+
+---
+
 ## L-005: PowerShell `Get-Content`→`Set-Content` round-trips corrupt UTF-8 markdown (em-dashes → mojibake) — edit files with the Write/Edit tools, never shell text pipelines
 - seen: Sprint-002
 - count: 1

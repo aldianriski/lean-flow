@@ -3,9 +3,9 @@ sprint: 003
 slug: validate-and-harden
 owner: Maintainer
 last_updated: 2026-06-11
-status: active
+status: closed
 plan_commit: c777fec
-close_commit: pending
+close_commit: 40bf188
 update_trigger: sprint execute/close events
 ---
 
@@ -186,4 +186,18 @@ Node type-stripping needs `allowImportingTsExtensions` (repo-local, noted there)
 |------|------|--------------|------|------|
 
 ## Retro
-_(written at close)_
+
+**Worked**
+- Every never-run path is now exercised on real input: migrate (full apply, zero deletions) · council (verdict → ADR-006, the feed worked first try) · streams (4/4) · fresh install (cold agent ran the loop from the cache) · the full loop on a real feature. TD-001 closed.
+- **Tier routing proved itself before TASK-018 ships**: sonnet executed migrate (~96k tokens) and 10/11 council calls; the session model kept gates, audits, synthesis. The deferred-then-resumed pattern (owner controls spend) worked cleanly.
+- Cold-agent validation was the highest-value spend of the sprint — 7 spec gaps no author-read had found.
+
+**Friction**
+- "Never plan a single-task sprint" collides with one-feature dogfoods — quick mode can't satisfy promote/close validation; the rule needs a stated exception or the loop needs a light path (→ TASK-019).
+- The push permission boundary: owner reservation ("I'll push after T1–T3") correctly blocked the agent until explicitly re-granted — friction, but the *right* friction.
+- Plugin update CLI requires the marketplace-qualified id (`lean-flow@lean-flow`); bare name fails (→ TASK-019, README install note).
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- L-006: cold-context agents surface spec gaps the author cannot see — make a fresh-eyes run part of every release validation.
+
+**Bucket routing (§10):** Shipped → `docs/CHANGELOG.md` (Sprint 003 block; docs-only diff in lean-flow itself → **no version bump**, v0.2.0 stands) · Tech debt → none new (TD-005 stands; TD-002/004 close via TASK-005) · Follow-ups → **TASK-019** (spec-polish bundle: 7 fresh-install frictions + single-task-sprint rule + plugin-id install note + migrate-brief link-fixing) · Learnings → **L-006**. **Close-time retention (§11):** Backlog tombstone deleted · this file → `docs/sprint/archive/` + INDEX line.
