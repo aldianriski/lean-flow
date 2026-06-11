@@ -4,7 +4,7 @@ description: Use when converting a freeform feature request, ticket URL, PRD, or
 argument-hint: "[freeform intent | TICKET-ID | --prd file.md | --epic \"Name\"]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 user-invocable: true
-version: "0.1.0"
+version: "0.2.0"
 ---
 
 # Task Decomposer
@@ -25,7 +25,14 @@ For a ticket, fetch the description first (ask the user to paste if credentials 
 
 ## Procedure
 
-1. **Clarify** *(freeform / ticket only)* — ask ambiguous questions ONE at a time, each with a recommended default. For mature / unfamiliar code, **recon first via the `Explore` agent** (existing impl + tests + deps → a tight brief, in its own context) before asking — it sharpens scope and keeps this context lean. Stop when the goal is unambiguous. **If the conversation already holds the spec (a design discussion just happened), synthesize from context — don't re-interview**; clarify only genuine gaps.
+1. **Clarify — the grill** *(freeform / ticket only)* — ambiguity is cheapest to kill at intake. Ask ONE question at a time, each with a recommended answer; explore the codebase before asking. For mature / unfamiliar code, **recon first via the `Explore` agent** (existing impl + tests + deps → a tight brief, in its own context). Moves:
+   - **Challenge the glossary** — a term conflicts with `CONTEXT.md`? Surface it: "your glossary says X, you seem to mean Y — which?"
+   - **Sharpen fuzzy language** — replace an overloaded word ("account", "user") with a precise canonical term; feed a newly-pinned term straight to `/lean-doc-generator` (glossary), don't batch.
+   - **Invent edge-case scenarios** — concrete cases that force the boundaries between concepts to be made explicit.
+   - **Cross-reference code** — a claim contradicts the code? Surface the contradiction.
+   - **A design that must be *felt*, or a high-stakes fork** — don't resolve it here: record it on the task (`assumes:`) so G2 routes to `/prototype` / `/council`.
+
+   Stop when the goal is unambiguous. **Synthesize from context instead of re-interviewing ONLY when step 2's registry comes back with zero open assumptions** (a design discussion just happened and nothing is open); otherwise grill the open ones.
 2. **Assumption registry** — list every assumption that affects behavior (auth model, data shape, third-party limits). Confirm the risky ones explicitly.
 3. **Decompose into tracer-bullet vertical slices** — each task is a thin path through *every* layer end-to-end (schema → API → UI → tests), independently demoable. Prefer many thin slices over few thick ones; record `depends-on`. Horizontal layers ("write all the models", "all the tests") are NOT valid tasks.
 4. **Risk score** — per task, rate impact × likelihood (low / med / high); note the blast radius (files / layers touched).

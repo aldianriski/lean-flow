@@ -29,10 +29,10 @@ The standard contradicts its own repo (root vs `docs/`); a Placement column make
 **Acceptance:** generated docs land per the placement table; `/prime` finds them first-try; `migrate` relocates legacy layouts.
 
 **DoD:**
-- [ ] DOCS_Guide §2 gains a Placement column — root: `README` · `TODO` — `.claude/`: `CLAUDE` · `CONTEXT` — `docs/`: the rest
-- [ ] `/prime` read order lists the `docs/` paths first (first-match-wins)
-- [ ] migration-map gains relocate rules to the new layout
-- [ ] lean-doc-generator SKILL + templates reference the canonical paths
+- [x] DOCS_Guide §2 gains a Placement column — root: `README` · `TODO` — `.claude/`: `CLAUDE` · `CONTEXT` — `docs/`: the rest
+- [x] `/prime` read order lists the `docs/` paths first (first-match-wins)
+- [x] migration-map gains relocate rules to the new layout
+- [x] lean-doc-generator SKILL + templates reference the canonical paths
 
 ### T2 — Move the full grill to task-decomposer intake `[size: M · risk: med]` — from TASK-010
 Layers: `skills/task-decomposer/SKILL.md` · `skills/orchestrator/SKILL.md` · `skills/flow/SKILL.md` · `.claude/CONTEXT.md` · `README.md`
@@ -87,10 +87,27 @@ Promoted TASK-009…012 (the dogfood-feedback fixes) in dependency order (T4 dep
 Governance review: `LEARNINGS.md` holds L-001…004, all `count: 1` — none promotable; tech-debt
 aging — all rows `build-0`, one sprint old, none aged. Plan frozen.
 
+### 2026-06-11 | T1 complete | canonical placement shipped (`9edab1d`)
+G1+G2 approved (owner, incl. A2 confirm + self-apply scope add). Surprise: templates **already**
+linked `docs/` paths (`docs/DECISIONS.md`, `docs/CHANGELOG.md`) — only §2 contradicted them, so the
+fix was narrower than planned. Scope adds (approved): `release-patch` CHANGELOG detection gets the
+canonical path; self-applied to this repo (`git mv DECISIONS.md docs/` + inbound links in
+ARCHITECTURE/README/CONTEXT + template relative-link fix). Friction: PowerShell `Get-Content`
+round-trip mangled UTF-8 em-dashes in DECISIONS.md — caught by self-review, rewritten via Write.
+Versions: prime → 0.2.0, lean-doc-generator → 0.3.0.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §2 Place column + canonical-placement rule; §10 routes pathed | Low | grep |
+| `skills/prime/SKILL.md` | T1 | read order: canonical paths first | Low | self |
+| `skills/lean-doc-generator/references/migration-map.md` | T1 | relocate table for legacy layouts | Low | self |
+| `skills/lean-doc-generator/SKILL.md` | T1 | Golden Rule + Write step + retro routing pathed | Low | grep |
+| `skills/release-patch/SKILL.md` | T1 | detect `docs/CHANGELOG.md` first | Low | self |
+| `docs/DECISIONS.md` (moved from root) | T1 | self-apply placement; relative links fixed | Low | grep |
+| `templates/DECISIONS.md.template` | T1 | links relative to docs/ placement | Low | self |
+| `docs/ARCHITECTURE.md` · `README.md` · `.claude/CONTEXT.md` | T1 | inbound refs → canonical paths | Low | grep |
 
 ## Retro
 _(written at close)_

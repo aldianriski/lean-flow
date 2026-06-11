@@ -50,9 +50,10 @@
 Coding agents fail in recognizable ways. Each skill is the fix for one of them.
 
 **1 · It built the wrong thing.** You assumed it understood you; it didn't.
-→ **G1 Scope** restates the task as one verifiable sentence; **G2** grills ambiguous requirements one
-question at a time (presents interpretations, never picks silently); **`/task-decomposer`**'s assumption
-registry surfaces what it's guessing. Align *before* building.
+→ **`/task-decomposer`** grills ambiguous intent *at intake* — one question at a time, presents
+interpretations, never picks silently — and its assumption registry surfaces what it's guessing;
+**G1 Scope** restates the task as one verifiable sentence; **G2** re-grills anything still open
+(an unconfirmed assumption blocks the gate). Align *before* building.
 
 **2 · We keep reworking it.** Scope and design problems surface only after the code exists.
 → The gates run **before any commit**; **`/task-decomposer`** cuts work into tracer-bullet vertical
@@ -179,7 +180,7 @@ security → `/security-review`. `/council` is the one skill that orchestrates s
 
 **Gates** — humans approve; the skill never self-approves:
 - **G1 Scope** (all modes) — goal restated as one verifiable sentence · size S/M/L (an **L splits**) · files / blast-radius · out-of-scope named · assumptions confirmed.
-- **G2 Design** (`mvp` · `sprint-bulk`) — approach + one-line WHY · verifiable micro-tasks · an ADR only if the decision is hard-to-reverse **and** surprising **and** a real trade-off · grill ambiguous requirements until the goal is unambiguous.
+- **G2 Design** (`mvp` · `sprint-bulk`) — approach + one-line WHY · verifiable micro-tasks · an ADR only if the decision is hard-to-reverse **and** surprising **and** a real trade-off · residual grill until the goal is unambiguous (the detailed grill already ran at intake, in `/task-decomposer`).
 
 **Modes** (`/orchestrator <mode>`):
 

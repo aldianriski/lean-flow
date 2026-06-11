@@ -30,7 +30,7 @@ Every skill is independently usable; the loop is just the order they reward most
 | `/prime` | entry | ordered context load + health check (read-only) |
 | `/lean-doc-generator` | plan | WHY/WHERE docs · ADRs · sprint promote/close · **migrate** existing docs to the standard — bundles its templates + standard |
 | `/orchestrator` | build | gate-driven execution — `quick` · `mvp` · `sprint-bulk` |
-| `/task-decomposer` | feed | intent / ticket / PRD → `TASK-NNN` backlog entries |
+| `/task-decomposer` | feed | intent / ticket / PRD → `TASK-NNN` backlog entries — **the detailed grill lives here** (intake) |
 | `/triage` | groom | re-prioritise + state the Backlog; flag stale/dupe/conflict; route rejects to `.out-of-scope/` |
 | `/prototype` | explore | throwaway code to answer one design question (logic TUI / web UI variants); capture → ADR/PRD, delete |
 | `/tdd` | test-first | build NEW behaviour test-first — vertical-slice red-green-refactor |
@@ -40,7 +40,7 @@ Every skill is independently usable; the loop is just the order they reward most
 | `/handoff` | continuity | compact the conversation → temp-dir doc for the next session |
 | `/council` | decide | **opt-in, agent-using** — pressure-test a hard/ambiguous call via 5 advisors + peer review → `verdict-<slug>.md` → feed an ADR |
 
-`/prototype` feeds the design stage: when `/orchestrator`'s Grill can't resolve a design on paper, prototype → fold the verdict into G2 + an ADR. `/council` feeds the decision stage: a hard-to-reverse / ambiguous call → pressure-test → `verdict-<slug>.md` → record as an ADR (§4).
+`/prototype` feeds the design stage: when G2's residual grill can't resolve a design on paper, prototype → fold the verdict into G2 + an ADR. `/council` feeds the decision stage: a hard-to-reverse / ambiguous call → pressure-test → `verdict-<slug>.md` → record as an ADR (§4). **Grill placement:** the detailed moves run at intake (`/task-decomposer` Clarify); G2 re-grills residuals only — an unconfirmed assumption blocks G2.
 
 **Implement routing** (from `/orchestrator`): new testable behaviour → `/tdd` · bug / failing test → `/diagnose` · hard-to-change code → `/refactor-advisor` · docs/config/spike → direct.
 
@@ -76,7 +76,7 @@ must clear the same bar first; never bulk-import from a reference.
 | Gate | Name | Where | Checks |
 |---|---|---|---|
 | G1 | Scope | all `/orchestrator` modes | goal restated · size S/M/L (L splits) · files/blast-radius · out-of-scope named · assumptions confirmed |
-| G2 | Design | `mvp` · `sprint-bulk` | approach + WHY · verifiable micro-tasks · ADR if hard-to-reverse · grill until unambiguous |
+| G2 | Design | `mvp` · `sprint-bulk` | approach + WHY · verifiable micro-tasks · ADR if hard-to-reverse · residual grill until unambiguous |
 
 Humans approve gates — the skill never self-approves. Review is a self-review checklist (no review agent).
 

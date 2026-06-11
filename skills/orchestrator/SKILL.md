@@ -4,7 +4,7 @@ description: Use when starting, resuming, or completing any development task or 
 argument-hint: "[quick | mvp | sprint-bulk] [task-or-description]"
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 user-invocable: true
-version: "0.1.0"
+version: "0.2.0"
 ---
 
 # orchestrator
@@ -40,16 +40,14 @@ Before implementing, draft the design in **`/plan`** (plan mode) and get human s
 - [ ] Approach chosen over alternatives, with a one-line WHY
 - [ ] Micro-task list, each independently verifiable
 - [ ] Hard-to-reverse decision? → record it (prompt `/lean-doc-generator <adr> <subject>`)
-- [ ] Grill ambiguous requirements (moves below) until the goal is unambiguous
+- [ ] Residual ambiguity grilled (below) until the goal is unambiguous
 
-**Grill moves** — one question at a time, recommend an answer each time, explore the codebase before asking:
-- **Challenge the glossary** — a term that conflicts with `CONTEXT.md`? Surface it: "your glossary says X, you seem to mean Y — which?"
-- **Sharpen fuzzy language** — replace an overloaded word ("account", "user") with a precise canonical term.
-- **Invent edge-case scenarios** — concrete cases that force the boundaries between concepts to be made explicit.
-- **Cross-reference code** — if a claim contradicts the code, surface the contradiction.
-- **Capture resolved terms inline** — feed a newly-pinned term straight to `/lean-doc-generator` (glossary); don't batch.
-- **Can't resolve a design on paper?** (a state machine / data model / UI that needs to be *felt*) → `/prototype` to answer the question, then fold the verdict back into G2 (and an ADR if it's load-bearing).
-- **A hard-to-reverse / ambiguous decision with real stakes?** → `/council` to pressure-test it from 5 angles (`verdict-<slug>.md`), then record the call as an ADR. Reserve for genuinely expensive-to-get-wrong forks — it uses sub-agents.
+**Residual grill** — the detailed grill runs at intake (`/task-decomposer` Clarify); here, re-grill
+only what is still open — one question at a time, recommend an answer each time. An unconfirmed
+`assumes:` or a `needs-info` task **BLOCKS G2** until resolved. A design that must be *felt* →
+`/prototype`, fold the verdict back into G2; a high-stakes hard-to-reverse fork → `/council`
+(`verdict-<slug>.md`) → ADR. (Freeform input with no tracked task already routed through
+`/task-decomposer` at Mode dispatch — that's where its grill ran.)
 
 ## Phases
 
@@ -71,13 +69,13 @@ Before implementing, draft the design in **`/plan`** (plan mode) and get human s
 ### mvp
 1. **Parse** → 2. **G1** → 3. **Grill** (if requirements unclear) → 4. **G2 Design**
 → 5. **Implement** micro-tasks in order, marking each done as its check passes
-→ 6. **Self-review** → 7. **Commit**.
+→ 6. **Self-review** → 7. **Commit**. (Step 3's Grill is the *residual* one — detail lives in `/task-decomposer`.)
 
 ### sprint-bulk
 Operates on the active sprint file `docs/sprint/SPRINT-NNN-<slug>.md` (its Plan + DoD).
 0. **Guard** — verify an active sprint file with open Plan DoD `[ ]` exists. None → halt, redirect to `/lean-doc-generator promote`.
 1. **Batch G1** — one combined scope pass over the Plan.
-2. **Batch G2** — one design pass; note cross-task file overlaps.
+2. **Batch G2** — one design pass; note cross-task file overlaps; **grill individually any task with an unconfirmed `assumes:`** — a batch sign-off never waves an open assumption through.
 3. **Sequence** — tasks (Tn) with overlapping files run sequentially; **disjoint tasks at scale → `/batch`** (decompose → one worktree subagent per unit → PR each; `/workflows` watches it).
 4. **Loop** — per Plan task: Implement → Self-review → Commit → tick its DoD `[x]`; **append to the sprint Execution Log** (don't edit § Plan — it's frozen). `/loop` can pace the iteration.
 5. **First-blocker halt** — stop on any blocker or human `block`; log it and wait.

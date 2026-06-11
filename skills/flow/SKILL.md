@@ -4,7 +4,7 @@ description: Conduct the full lean-flow loop end-to-end — assess context, ensu
 argument-hint: "[intent, or blank to continue from current state]"
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 user-invocable: true
-version: "0.1.0"
+version: "0.2.0"
 ---
 
 # flow
@@ -21,7 +21,7 @@ conducted path.** It sequences; it never bypasses a gate.
 Assess the current state first, then run only the stages whose precondition is unmet — state which you're running and why you're skipping the rest:
 
 1. **Orient** — context missing/stale → `/prime`. Resuming from a handoff? read it first.
-2. **Feed** — no open work → `/task-decomposer "<intent>"`; backlog drifted / noisy → `/triage`.
+2. **Feed** — no open work → `/task-decomposer "<intent>"` — **the detailed grill fires here, at intake** (the build gates re-grill only residuals); backlog drifted / noisy → `/triage`.
 3. **Plan** — no active sprint but a `ready` backlog exists → `/lean-doc-generator promote` (the governance review fires here).
 4. **Build** — `/orchestrator sprint-bulk` through G1 / G2. Route each task by type: new behaviour → `/tdd` · bug → `/diagnose` · hard-to-change → `/refactor-advisor` · a design that must be *felt* → `/prototype` first.
 5. **Close** — all DoD ticked → `/lean-doc-generator close` (Retro → §10 buckets), then prompt `/release-patch`.
