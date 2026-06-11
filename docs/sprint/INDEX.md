@@ -10,3 +10,4 @@ status: current
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
 - SPRINT-002 — Dogfood Fixes — closed 2026-06-11 · 007869e
+- SPRINT-001 — Ship & Validate — closed 2026-06-11 · b0f2695
