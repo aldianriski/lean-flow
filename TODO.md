@@ -41,6 +41,12 @@ _(TASK-003 · TASK-013…016 promoted → SPRINT-003 T1…T5)_
       depends-on: TASK-003 · TASK-005 · TASK-013…016
       state: blocked   (waiting on depends-on)
 
+- [ ] **TASK-018 — Model-tier routing: decide on the session model, execute via cheap-tier subagents** [size: M] [risk: med] [HITL]
+      done-when: orchestrator Implement + council + task-decomposer carry explicit tier-dispatch guidance (gates · grill · design · synthesis stay on the session model; advisors / bounded mechanical work → fresh `sonnet`/`opus` subagents via the Agent-tool `model:` override); the dispatch contract is **spawn-with-brief, never a mid-session model switch** — context isn't portable, so each dispatch carries a self-contained brief (spec · files · acceptance, per the AFK durable-spec rule); tier mapping recorded in CONTEXT.md; exercised once on real work (T1 migrate apply or T2 council advisors — the deferred tasks are the proving ground)
+      touches: `skills/orchestrator/SKILL.md` · `skills/council/SKILL.md` · `skills/task-decomposer/SKILL.md` · `.claude/CONTEXT.md`
+      assumes: Agent-tool model override available in the host; G1/G2 + the review pass guard cheap-executor quality
+      state: ready   (owner request 2026-06-11 — token management)
+
 ### P2 — Quality / Polish
 
 - [ ] **TASK-005 — Decide council size: slim or formalise the exception** [size: S] [risk: low] [HITL]
