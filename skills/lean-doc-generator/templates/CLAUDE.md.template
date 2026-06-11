@@ -46,7 +46,7 @@ The lean-flow loop for any AI-driven session:
 - [ ] Lint passes
 - [ ] Tests pass
 - [ ] Self-review: 0 blocking issues
-- [ ] DECISIONS.md updated if an architectural decision was made
+- [ ] docs/DECISIONS.md updated if an architectural decision was made
 - [ ] Acceptance criteria verified by a human at G2
 
 ## Behavioral Guidelines

@@ -216,7 +216,7 @@ The skills write durable, human-readable state into your repo — plain markdown
 
 | Artifact | Written by | Holds |
 |---|---|---|
-| `TODO.md` | `/task-decomposer` · `/triage` | backlog (P0–P3) · tech debt · learnings index |
+| `TODO.md` | `/task-decomposer` · `/triage` | backlog (P0–P3) · tech debt · active-sprint pointer(s) |
 | `docs/sprint/SPRINT-NNN-*.md` | `/lean-doc-generator` | active sprint plan · execution log · retro |
 | `docs/DECISIONS.md` / `docs/adr/` | `/lean-doc-generator` | ADRs — the WHY behind hard-to-reverse choices |
 | `docs/CHANGELOG.md` | `/release-patch` · sprint close | what shipped, per release |

@@ -68,7 +68,7 @@ one pointer per stream in TODO § Active Sprint); single-stream repos omit it �
 
 | User says… | Do |
 |---|---|
-| "promote" / "start sprint" | **Governance review first** (below) → pull chosen Backlog tasks (TODO.md, dependency order) into a new `docs/sprint/SPRINT-NNN-<slug>.md` rendered from `templates/SPRINT.md.template` (each task → a Plan `Tn` with DoD checkboxes); set `status: active` + `plan_commit`; point the stream's pointer in TODO.md § Active Sprint at the file (single-stream: the lone pointer); commit `sprint(N): plan locked` |
+| "promote" / "start sprint" | **Governance review first** (below) → pull chosen Backlog tasks (TODO.md, dependency order) into a new `docs/sprint/SPRINT-NNN-<slug>.md` rendered from `templates/SPRINT.md.template` (each task → a Plan `Tn` with DoD checkboxes); set `status: active` + `plan_commit`; point the stream's pointer in TODO.md § Active Sprint at the file (single-stream: the lone pointer; **multi-stream: confirm which stream this sprint belongs to before writing `stream:`**); commit `sprint(N): plan locked` |
 | executing during a sprint | Tick DoD `[x]` as each passes; **append to the Execution Log, never edit § Plan** (the plan is frozen); keep Files Changed current |
 | "close" / "sprint done" | Verify all DoD `[x]`; write the **Retro** + route its buckets (§10); set `status: closed` + `close_commit`; clear that stream's pointer in TODO § Active Sprint; **close-time retention (§11)**: delete Backlog tombstones · move the closed sprint → `docs/sprint/archive/` + a line in `docs/sprint/INDEX.md`; squash-commit `sprint(N): <summary>`; prompt `/release-patch` |
 

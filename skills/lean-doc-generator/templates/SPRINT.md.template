@@ -43,7 +43,7 @@ Layers: [files / modules this touches]
 - [ ] [e.g. rotate the exposed credential / set PROD env var]
 
 ## Decisions (pre-locked)
-<!-- Hard-to-reverse + surprising + a real trade-off → also record as an ADR (DECISIONS.md / docs/adr/). -->
+<!-- Hard-to-reverse + surprising + a real trade-off → also record as an ADR (docs/DECISIONS.md / docs/adr/). -->
 - **D1** — [what was decided + why, one line]. **→ ADR-NNN** (if it qualifies).
 
 ## Assumptions
@@ -66,7 +66,7 @@ Layers: [files / modules this touches]
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
-     shipped → CHANGELOG · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → LEARNINGS.md.
+     shipped → docs/CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
 **Worked**
@@ -75,5 +75,5 @@ Layers: [files / modules this touches]
 **Friction**
 - [what slowed us down]
 
-**Pattern candidate** (surface to user → `LEARNINGS.md`)
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
 - [a confirmed learning worth promoting if it recurs — count ≥ 2 → durable rule]

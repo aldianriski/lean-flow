@@ -212,7 +212,7 @@ them**. Append-only is preserved *inside* each archive file.
 | `TODO.md` whole file | > ~150 lines at promote | flag in the governance review; prune with the user |
 | `docs/CHANGELOG.md` | a new MINOR version lands | keep current + previous minor inline; older blocks move verbatim → `docs/changelog/CHANGELOG-<version>.md` + one link line |
 | `docs/LEARNINGS.md` | an entry reaches `promoted: yes` | collapse it to a pointer line — `L-NNN → promoted: <where>`; the durable rule is the record now |
-| `docs/sprint/SPRINT-NNN-<slug>.md` | sprint closed | move → `docs/sprint/archive/`; one-line entry in `docs/sprint/INDEX.md` |
+| `docs/sprint/SPRINT-NNN-<slug>.md` | sprint closed | move → `docs/sprint/archive/`; add to `docs/sprint/INDEX.md` (created lazily) one line: `- SPRINT-NNN — <theme> — closed YYYY-MM-DD · <close_commit>` |
 
 **When it runs** — close-time triggers (tombstones · sprint archive) execute during `close`;
 scan-based triggers (TD collapse · rotation · LEARNINGS collapse · the soft cap) run at **Promote**

@@ -46,8 +46,7 @@ Before implementing, draft the design in **`/plan`** (plan mode) and get human s
 only what is still open — one question at a time, recommend an answer each time. An unconfirmed
 `assumes:` or a `needs-info` task **BLOCKS G2** until resolved. A design that must be *felt* →
 `/prototype`, fold the verdict back into G2; a high-stakes hard-to-reverse fork → `/council`
-(`verdict-<slug>.md`) → ADR. (Freeform input with no tracked task already routed through
-`/task-decomposer` at Mode dispatch — that's where its grill ran.)
+(`verdict-<slug>.md`) → ADR.
 
 ## Phases
 
