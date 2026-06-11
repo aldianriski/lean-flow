@@ -113,8 +113,8 @@ orientation — **optional, never a dependency**. No MCP / no external tool is r
 ## Continuous learning governance
 
 Every iteration feeds the next (DOCS_Guide §10). At **Sprint Close**, the Retro auto-files four buckets:
-Shipped → `CHANGELOG.md` · Tech debt → `TD-NNN` (TODO § Tech Debt) · Follow-ups → `TASK-NNN` (Backlog) ·
-Learnings → `L-NNN` (`LEARNINGS.md`). At **Sprint Promote** (governance checkpoint):
+Shipped → `docs/CHANGELOG.md` · Tech debt → `TD-NNN` (TODO § Tech Debt) · Follow-ups → `TASK-NNN` (Backlog) ·
+Learnings → `L-NNN` (`docs/LEARNINGS.md`). At **Sprint Promote** (governance checkpoint):
 
 - **Promote learnings** — any `L-NNN` with `count ≥ 2, promoted: no` → write it into a durable rule
   (a CLAUDE.md anti-pattern · a CONTEXT.md rule · a skill red-flag); mark `promoted: yes → <where>`.

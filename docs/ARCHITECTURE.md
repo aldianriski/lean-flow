@@ -28,8 +28,8 @@ skills/           13 skills (auto-discovered at root)
   <skill>/references/   on-demand depth (DOCS_Guide, testability, feedback-loops, deepening, …)
   lean-doc-generator/templates/   11 canonical doc templates
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
-docs/             ARCHITECTURE.md · CHANGELOG.md · adr/ · sprint/
-TODO.md · DECISIONS.md · README.md
+docs/             ARCHITECTURE.md · CHANGELOG.md · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
+TODO.md · README.md
 ```
 
 ## The loop
@@ -55,5 +55,5 @@ ADLC artifacts. Adopting an existing repo's docs is handled by `/lean-doc-genera
 
 ## Decision records
 
-See [`DECISIONS.md`](../DECISIONS.md) (the index) → [`docs/adr/`](adr/) for the decisions behind this
+See [`DECISIONS.md`](DECISIONS.md) (the index) → [`docs/adr/`](adr/) for the decisions behind this
 structure (ADR-001…005).

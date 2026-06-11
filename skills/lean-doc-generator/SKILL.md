@@ -4,7 +4,7 @@ description: Use when creating, updating, or reviewing technical documentation, 
 argument-hint: "[ | type subject | promote | close]"
 allowed-tools: Read, Write, Edit, Bash(git *), Glob, Grep
 user-invocable: true
-version: "0.2.0"
+version: "0.3.0"
 ---
 
 # Lean Documentation Generator
@@ -19,9 +19,9 @@ template ship inside this skill under `${CLAUDE_SKILL_DIR}/`.
 | Explains… | Goes in… |
 |---|---|
 | HOW it works | code (comments, types, tests) |
-| WHY decided | a rich ADR — one file at `docs/adr/ADR-NNN-<slug>.md` (`templates/ADR.md.template`); add a row to the `DECISIONS.md` index. Offer one only when hard-to-reverse **and** surprising **and** a real trade-off (DOCS_Guide §4) |
-| WHERE things live | `ARCHITECTURE.md` or `README.md` |
-| WHAT changed | `CHANGELOG.md` |
+| WHY decided | a rich ADR — one file at `docs/adr/ADR-NNN-<slug>.md` (`templates/ADR.md.template`); add a row to the `docs/DECISIONS.md` index. Offer one only when hard-to-reverse **and** surprising **and** a real trade-off (DOCS_Guide §4) |
+| WHERE things live | `docs/ARCHITECTURE.md` or `README.md` |
+| WHAT changed | `docs/CHANGELOG.md` |
 | Unsure | code |
 
 ## Bundled assets (load these — do not free-generate)
@@ -56,7 +56,7 @@ pre-existing content, never touch out-of-scope artifacts. Full mapping + procedu
 4. **Read manifests** — `package.json` / `pyproject.toml` / `go.mod` etc. + existing docs. If inaccessible, ask the user to paste the file tree + manifest.
 5. **HOW filter** — discard anything that explains implementation; keep WHY / WHERE / WHAT only.
 6. **Template-load protocol** *(this is the step that, when skipped, produces wrong docs)* — for each core file, **Read `${CLAUDE_SKILL_DIR}/templates/<X>.md.template` BEFORE writing**. Match its frontmatter order, section order, and placeholders; replace `[CUSTOMIZE]` / `[bracket]` tokens with real content. If the template is missing, WARN and fall back to `DOCS_Guide.md §2` — never hard-stop. Template wins on any divergence; note the correction inline.
-7. **Write** — enforce the line cap and the ownership header on every file touched.
+7. **Write** — target the canonical placement (DOCS_Guide §2: root for README/TODO · `.claude/` for AI-context · `docs/` for the rest); enforce the line cap and the ownership header on every file touched.
 8. **Close** — list docs delivered + headers to verify + recommended follow-ups.
 
 ## Sprint lifecycle
@@ -71,9 +71,9 @@ The active sprint is its own file — `docs/sprint/SPRINT-NNN-<slug>.md` from `t
 | "close" / "sprint done" | Verify all DoD `[x]`; write the **Retro** + route its buckets (§10); set `status: closed` + `close_commit`; clear TODO § Active Sprint; squash-commit `sprint(N): <summary>`; prompt `/release-patch` |
 
 **Retro at close** — sort the sprint into four buckets and **route each to its durable home** (DOCS_Guide §10):
-Shipped → `CHANGELOG.md` · Tech debt → `TD-NNN` in TODO § Tech Debt · Follow-ups → `TASK-NNN` in TODO § Backlog · Learnings → `L-NNN` in `LEARNINGS.md`. **Auto-file all four** (per `templates/LEARNINGS.md.template`); show the user what was filed.
+Shipped → `docs/CHANGELOG.md` · Tech debt → `TD-NNN` in TODO § Tech Debt · Follow-ups → `TASK-NNN` in TODO § Backlog · Learnings → `L-NNN` in `docs/LEARNINGS.md`. **Auto-file all four** (per `templates/LEARNINGS.md.template`); show the user what was filed.
 
-**Governance review at promote** — before planning: scan `LEARNINGS.md` for any `count ≥ 2, promoted: no` → promote it into a durable rule (CLAUDE.md anti-pattern / CONTEXT.md rule / skill red-flag) and mark `promoted: yes → <where>`. Then age tech debt: any `TD-NNN` unaddressed ≥ 3 sprints → re-review prompt; `severity: high` → auto-escalate to Backlog P1.
+**Governance review at promote** — before planning: scan `docs/LEARNINGS.md` for any `count ≥ 2, promoted: no` → promote it into a durable rule (CLAUDE.md anti-pattern / CONTEXT.md rule / skill red-flag) and mark `promoted: yes → <where>`. Then age tech debt: any `TD-NNN` unaddressed ≥ 3 sprints → re-review prompt; `severity: high` → auto-escalate to Backlog P1.
 
 ## Red flags
 

@@ -13,8 +13,8 @@ content here. Add a row when a new `docs/adr/ADR-NNN-<slug>.md` is written.
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
-| [ADR-001](docs/adr/ADR-001-[slug].md) | [short title] | accepted | YYYY-MM-DD |
+| [ADR-001](adr/ADR-001-[slug].md) | [short title] | accepted | YYYY-MM-DD |
 
-<!-- Example row (filled):
-| [ADR-000](docs/adr/ADR-000-postgres-write-model.md) | Postgres for the write model | accepted | 2026-01-15 |
+<!-- Links are relative to this file's canonical place, docs/ (DOCS_Guide §2). Example row (filled):
+| [ADR-000](adr/ADR-000-postgres-write-model.md) | Postgres for the write model | accepted | 2026-01-15 |
 -->

@@ -217,9 +217,9 @@ The skills write durable, human-readable state into your repo — plain markdown
 |---|---|---|
 | `TODO.md` | `/task-decomposer` · `/triage` | backlog (P0–P3) · tech debt · learnings index |
 | `docs/sprint/SPRINT-NNN-*.md` | `/lean-doc-generator` | active sprint plan · execution log · retro |
-| `DECISIONS.md` / `docs/adr/` | `/lean-doc-generator` | ADRs — the WHY behind hard-to-reverse choices |
-| `CHANGELOG.md` | `/release-patch` · sprint close | what shipped, per release |
-| `LEARNINGS.md` | sprint close | confirmed learnings; recurring → durable rules |
+| `docs/DECISIONS.md` / `docs/adr/` | `/lean-doc-generator` | ADRs — the WHY behind hard-to-reverse choices |
+| `docs/CHANGELOG.md` | `/release-patch` · sprint close | what shipped, per release |
+| `docs/LEARNINGS.md` | sprint close | confirmed learnings; recurring → durable rules |
 | `.out-of-scope/` | `/triage` | rejected ideas, so they aren't re-litigated |
 | `CLAUDE.md` · `CONTEXT.md` · `ARCHITECTURE.md` | `/lean-doc-generator` | project shape · vocab · where-things-live |
 
@@ -233,7 +233,8 @@ Commit them, and your team — and their agents — start from the same map.
 
 Skills auto-discover at the repo root after install. There is **nothing to scaffold** — the skills
 read whatever context files your project already has (`CLAUDE.md`, `README.md`, `TODO.md`,
-`CHANGELOG.md`, `ARCHITECTURE.md`) and degrade gracefully when one is missing. `/prime` aborts on
+`docs/CHANGELOG.md`, `docs/ARCHITECTURE.md` — legacy root locations still matched) and degrade
+gracefully when one is missing. `/prime` aborts on
 nothing. No code-graph dependency — if you happen to run [graphify](https://github.com/safishamsi/graphify)
 (`graphify-out/`), `/prime` will use it for orientation, but it's never required.
 
@@ -283,8 +284,8 @@ skills/           13 skills — /flow conductor + 11 stages + /council (auto-dis
   prototype/references/       logic.md · ui.md
   council/                    opt-in agent decision aid
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · roster — SSOT)
-docs/             ARCHITECTURE.md · CHANGELOG.md · adr/ · sprint/
-TODO.md · DECISIONS.md · README.md
+docs/             ARCHITECTURE.md · CHANGELOG.md · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
+TODO.md · README.md
 ```
 
 </details>

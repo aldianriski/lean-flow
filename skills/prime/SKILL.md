@@ -4,7 +4,7 @@ description: Use when starting a new session and want to load project context in
 argument-hint: ""
 allowed-tools: Read, Glob, Grep
 user-invocable: true
-version: "0.1.0"
+version: "0.2.0"
 ---
 
 # prime
@@ -20,7 +20,8 @@ Ordered context loader + health check. One-shot session priming. Read-only — n
 ## Read order
 
 Read each that exists, in order. Mark `[OK]` / `[MISSING]` per item. All are optional —
-absence is reported, never fatal. Adapt the globs to the host project's layout.
+absence is reported, never fatal. Canonical placement (DOCS_Guide §2) is listed first; legacy
+locations second. Adapt the globs to the host project's layout.
 
 | # | Path (first match wins) | Purpose |
 |---|---|---|
@@ -29,7 +30,7 @@ absence is reported, never fatal. Adapt the globs to the host project's layout.
 | 3 | `README.md` | Project overview, how-to-adopt, entry points |
 | 4 | MEMORY index (harness-resolved) | Sprint state, feedback, references |
 | 5 | `TODO.md`, `docs/sprint/SPRINT-*.md` | Active task list — frontmatter + open `- [ ]` items only |
-| 6 | `ARCHITECTURE.md`, `docs/ARCHITECTURE.md` | Module map / where-things-live (the durable map) |
+| 6 | `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` | Module map / where-things-live (the durable map) |
 
 **Resolution**: read `TODO.md` (the Backlog pool); follow its § Active Sprint pointer to the active
 `docs/sprint/SPRINT-NNN-<slug>.md` and read only its frontmatter + Plan (~50 lines). Count open

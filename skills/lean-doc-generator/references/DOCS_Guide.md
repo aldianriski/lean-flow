@@ -19,21 +19,26 @@
 
 ## §2 — Core Files
 
-| File | Reader | Max lines | Update trigger | Template |
-|---|---|---|---|---|
-| `README.md` | Anyone | no hard cap¹ | Project scope changes | `templates/README.md.template` |
-| `ARCHITECTURE.md` | Tech lead | 150 | Major structural change | `templates/ARCHITECTURE.md.template` |
-| `docs/adr/ADR-NNN-<slug>.md` | Team | per file, append-only | Each significant decision (one ADR per file) | `templates/ADR.md.template` |
-| `DECISIONS.md` | Team | thin index | A new ADR is added under `docs/adr/` | `templates/DECISIONS.md.template` |
-| `SETUP.md` | New dev / CI | 100 | Setup process changes | `templates/SETUP.md.template` |
-| `CONTEXT.md` | AI assistant | 100 | Vocabulary / patterns / conventions change | `templates/CONTEXT.md.template` |
-| `CLAUDE.md` | AI assistant | 80 | Project shape / workflow / anti-patterns change | `templates/CLAUDE.md.template` |
-| `TODO.md` | Dev / AI | unlimited | Backlog change · sprint promote/close | `templates/TODO.md.template` |
-| `CHANGELOG.md` | Reviewer | unlimited (append-only) | Sprint closed | `templates/CHANGELOG.md.template` |
-| `LEARNINGS.md` | Team / AI | unlimited (append-only) | A learning confirmed at close, or promoted | `templates/LEARNINGS.md.template` |
-| `docs/sprint/SPRINT-NNN-<slug>.md` | AI mid-sprint | 400 hard cap | Append during sprint; retro at close | `templates/SPRINT.md.template` |
+| File | Place | Reader | Max lines | Update trigger | Template |
+|---|---|---|---|---|---|
+| `README.md` | root | Anyone | no hard cap¹ | Project scope changes | `templates/README.md.template` |
+| `TODO.md` | root | Dev / AI | unlimited | Backlog change · sprint promote/close | `templates/TODO.md.template` |
+| `CLAUDE.md` | `.claude/` | AI assistant | 80 | Project shape / workflow / anti-patterns change | `templates/CLAUDE.md.template` |
+| `CONTEXT.md` | `.claude/` | AI assistant | 100 | Vocabulary / patterns / conventions change | `templates/CONTEXT.md.template` |
+| `ARCHITECTURE.md` | `docs/` | Tech lead | 150 | Major structural change | `templates/ARCHITECTURE.md.template` |
+| `SETUP.md` | `docs/` | New dev / CI | 100 | Setup process changes | `templates/SETUP.md.template` |
+| `DECISIONS.md` | `docs/` | Team | thin index | A new ADR is added under `docs/adr/` | `templates/DECISIONS.md.template` |
+| `ADR-NNN-<slug>.md` | `docs/adr/` | Team | per file, append-only | Each significant decision (one ADR per file) | `templates/ADR.md.template` |
+| `CHANGELOG.md` | `docs/` | Reviewer | unlimited (append-only) | Sprint closed | `templates/CHANGELOG.md.template` |
+| `LEARNINGS.md` | `docs/` | Team / AI | unlimited (append-only) | A learning confirmed at close, or promoted | `templates/LEARNINGS.md.template` |
+| `SPRINT-NNN-<slug>.md` | `docs/sprint/` | AI mid-sprint | 400 hard cap | Append during sprint; retro at close | `templates/SPRINT.md.template` |
 
 Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`. Paths above are relative to that dir.
+
+**Placement is canonical.** Root keeps only the daily working files (`README.md` front-door ·
+`TODO.md`); AI-context lives in `.claude/`; everything else lives in `docs/`. Generation targets
+these paths; `/prime` searches them first (legacy root locations still matched, second); `migrate`
+relocates a legacy layout (`git mv` + inbound-link fixes — content untouched).
 
 ¹ **README is the full front-door** — the complete overview of the repo. Don't truncate it to hit a
 line count; deep detail belongs in `CLAUDE.md` (project shape) and `CONTEXT.md` (vocabulary) and
@@ -174,10 +179,10 @@ Every iteration feeds the next. At **Sprint Close**, the Retro sorts work into f
 
 | Bucket | Routes to |
 |---|---|
-| Shipped | `CHANGELOG.md` |
+| Shipped | `docs/CHANGELOG.md` |
 | Tech debt | `TD-NNN` row in `TODO.md` § Tech Debt (`severity` + `created: Sprint-NNN`) |
 | Follow-ups | `TASK-NNN` entry in `TODO.md` § Backlog (re-enters the loop) |
-| Learnings | `L-NNN` entry in `LEARNINGS.md` |
+| Learnings | `L-NNN` entry in `docs/LEARNINGS.md` |
 
 **Promotion rule** — a learning that recurs (**count ≥ 2** — a second sprint hits the same friction)
 is promoted from a ledger line into a *durable* rule: a `CLAUDE.md` anti-pattern, a `CONTEXT.md`
@@ -188,5 +193,5 @@ they're context, not law. Don't promote on a single occurrence; don't let a 2nd 
 re-review prompt; `severity: high` auto-escalates to Backlog P1. Rows are never deleted — resolved
 debt is marked `status: resolved → TASK-NNN` for the audit trail.
 
-**Promote review (the governance checkpoint)** — before planning a sprint, scan `LEARNINGS.md` for any
+**Promote review (the governance checkpoint)** — before planning a sprint, scan `docs/LEARNINGS.md` for any
 `count ≥ 2, promoted: no`, and run tech-debt aging. This is what stops learning and debt from rotting.

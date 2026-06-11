@@ -23,6 +23,21 @@ own ad-hoc docs. Goal: you don't hand-reconcile, and you're not lost in your own
 - **Out-of-scope artifacts stay untouched + noted** — anything lean-flow doesn't own (adlc-flow's ADLC artifacts, app-specific docs, generated files). Don't "tidy" them.
 - One doc at a time; show the before→after shape for each.
 
+## Placement — relocate to the canonical layout (DOCS_Guide §2)
+
+Applies to **any** source pattern. A relocation is a `git mv` + inbound-link fixes (grep the
+filename) — content untouched. Propose these in the per-file plan like any other action:
+
+| Found at | Relocate to |
+|---|---|
+| `CHANGELOG.md` (root) | `docs/CHANGELOG.md` |
+| `LEARNINGS.md` (root) | `docs/LEARNINGS.md` |
+| `DECISIONS.md` (root) | `docs/DECISIONS.md` (stays the thin index; ADRs already `docs/adr/`) |
+| `ARCHITECTURE.md` (root) | `docs/ARCHITECTURE.md` |
+| `SETUP.md` (root) | `docs/SETUP.md` |
+| `CONTEXT.md` / `CLAUDE.md` (root) | `.claude/CONTEXT.md` / `.claude/CLAUDE.md` |
+| `README.md` · `TODO.md` | stay at root (front-door · daily working file) — never relocate |
+
 ## Known mappings — dev-flow / adlc-flow → lean-flow
 
 | Existing | Action | lean-flow target |
