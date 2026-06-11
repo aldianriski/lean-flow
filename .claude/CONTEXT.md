@@ -120,6 +120,7 @@ Learnings → `L-NNN` (`docs/LEARNINGS.md`). At **Sprint Promote** (governance c
 - **Promote learnings** — any `L-NNN` with `count ≥ 2, promoted: no` → write it into a durable rule
   (a CLAUDE.md anti-pattern · a CONTEXT.md rule · a skill red-flag); mark `promoted: yes → <where>`.
 - **Age tech debt** — any `TD-NNN` unaddressed ≥ 3 sprints → re-review; `severity: high` → auto P1.
+- **Doc-aging** (DOCS_Guide §11) — compress any ledger past its retention trigger: Backlog tombstones (at close) · resolved-TD collapse · CHANGELOG rotation · LEARNINGS pointer-collapse · closed sprint → `docs/sprint/archive/`. Propose → approve, never silent.
 
 ## Task entry shape
 

@@ -66,7 +66,8 @@ Layers: [files / modules this touches]
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
-     shipped → CHANGELOG · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → LEARNINGS.md. -->
+     shipped → CHANGELOG · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → LEARNINGS.md.
+     After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
 **Worked**
 - [what to keep doing]

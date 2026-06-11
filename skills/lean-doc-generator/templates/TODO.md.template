@@ -16,7 +16,9 @@ status: current
 > **Sprint sizing**
 > - 2–5 tasks per sprint. Never plan a sprint with a single task.
 > - Order by dependency first, then importance + urgency.
-> - Promote from Backlog in priority order (P0 → P3); remove promoted tasks from Backlog immediately.
+> - Promote from Backlog in priority order (P0 → P3); remove promoted tasks from Backlog immediately
+>   (a `promoted → SPRINT-NNN` tombstone may remain; it is deleted at the next sprint close — §11).
+> - Keep this file ≤ ~150 lines — past that, the promote governance review proposes pruning (§11).
 
 ---
 
@@ -66,9 +68,10 @@ status: current
 ## Tech Debt
 
 <!-- IDs use the TD-NNN namespace (separate from TASK-NNN). Rows are never deleted — when resolved,
-     mark status: resolved → TASK-NNN for the audit trail. Filed automatically by the Sprint Close
-     Retro. Aging (checked at Sprint Promote): unaddressed ≥ 3 sprints → re-review; severity: high
-     → auto-escalate to Backlog P1. severity ∈ trivial · minor · medium · high. -->
+     mark status: resolved → TASK-NNN for the audit trail; a row resolved ≥ 3 sprints ago collapses
+     to one line (§11). Filed automatically by the Sprint Close Retro. Aging (checked at Sprint
+     Promote): unaddressed ≥ 3 sprints → re-review; severity: high → auto-escalate to Backlog P1.
+     severity ∈ trivial · minor · medium · high. -->
 
 - **TD-001** severity: medium | status: open | created: Sprint-001 [CUSTOMIZE: example — replace or remove]
   - Summary: [one-line description of the debt]

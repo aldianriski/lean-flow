@@ -9,6 +9,8 @@ status: current
 
 <!-- Prepend new sprints — newest first. Append-only; never edit past sprint blocks. -->
 <!-- The active sprint's changelog lives in TODO.md. Move it here once the sprint closes. -->
+<!-- Rotation (§11): when a new MINOR version lands, keep current + previous minor inline;
+     older blocks move verbatim → docs/changelog/CHANGELOG-<version>.md + one link line here. -->
 
 ---
 

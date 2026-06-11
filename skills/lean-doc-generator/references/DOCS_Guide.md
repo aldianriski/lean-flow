@@ -22,15 +22,15 @@
 | File | Place | Reader | Max lines | Update trigger | Template |
 |---|---|---|---|---|---|
 | `README.md` | root | Anyone | no hard cap¹ | Project scope changes | `templates/README.md.template` |
-| `TODO.md` | root | Dev / AI | unlimited | Backlog change · sprint promote/close | `templates/TODO.md.template` |
+| `TODO.md` | root | Dev / AI | ~150 soft (§11) | Backlog change · sprint promote/close | `templates/TODO.md.template` |
 | `CLAUDE.md` | `.claude/` | AI assistant | 80 | Project shape / workflow / anti-patterns change | `templates/CLAUDE.md.template` |
 | `CONTEXT.md` | `.claude/` | AI assistant | 100 | Vocabulary / patterns / conventions change | `templates/CONTEXT.md.template` |
 | `ARCHITECTURE.md` | `docs/` | Tech lead | 150 | Major structural change | `templates/ARCHITECTURE.md.template` |
 | `SETUP.md` | `docs/` | New dev / CI | 100 | Setup process changes | `templates/SETUP.md.template` |
 | `DECISIONS.md` | `docs/` | Team | thin index | A new ADR is added under `docs/adr/` | `templates/DECISIONS.md.template` |
 | `ADR-NNN-<slug>.md` | `docs/adr/` | Team | per file, append-only | Each significant decision (one ADR per file) | `templates/ADR.md.template` |
-| `CHANGELOG.md` | `docs/` | Reviewer | unlimited (append-only) | Sprint closed | `templates/CHANGELOG.md.template` |
-| `LEARNINGS.md` | `docs/` | Team / AI | unlimited (append-only) | A learning confirmed at close, or promoted | `templates/LEARNINGS.md.template` |
+| `CHANGELOG.md` | `docs/` | Reviewer | append-only · rotated (§11) | Sprint closed | `templates/CHANGELOG.md.template` |
+| `LEARNINGS.md` | `docs/` | Team / AI | append-only · pruned (§11) | A learning confirmed at close, or promoted | `templates/LEARNINGS.md.template` |
 | `SPRINT-NNN-<slug>.md` | `docs/sprint/` | AI mid-sprint | 400 hard cap | Append during sprint; retro at close | `templates/SPRINT.md.template` |
 
 Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`. Paths above are relative to that dir.
@@ -146,6 +146,7 @@ Discard log: `"Skipped: '[detail]' explains HOW → add as a comment in [file]."
 | Sprint file > 400 lines | Block — split the sprint |
 | Stale doc used as source | Run the staleness scan first |
 | File outside the core set | Redirect to code or an existing core file |
+| Ledger past a §11 retention trigger | Compress / rotate / archive at the next promote |
 
 ---
 
@@ -195,3 +196,25 @@ debt is marked `status: resolved → TASK-NNN` for the audit trail.
 
 **Promote review (the governance checkpoint)** — before planning a sprint, scan `docs/LEARNINGS.md` for any
 `count ≥ 2, promoted: no`, and run tech-debt aging. This is what stops learning and debt from rotting.
+
+---
+
+## §11 — Retention (LAW 3's archive leg)
+
+The single-file ledgers grow forever in an agentic loop. Compression keeps them lean without losing
+history: **git is the full audit trail — archives and collapses move or shrink blocks, never rewrite
+them**. Append-only is preserved *inside* each archive file.
+
+| Ledger | Trigger | Action |
+|---|---|---|
+| `TODO.md` Backlog tombstones (`TASK-NNN promoted → …`) | sprint close | delete — history lives in the sprint file + git |
+| `TODO.md` § Tech Debt | `resolved` ≥ 3 sprints ago | collapse the row to one line: `TD-NNN resolved → TASK-NNN (Sprint-NNN)` |
+| `TODO.md` whole file | > ~150 lines at promote | flag in the governance review; prune with the user |
+| `docs/CHANGELOG.md` | a new MINOR version lands | keep current + previous minor inline; older blocks move verbatim → `docs/changelog/CHANGELOG-<version>.md` + one link line |
+| `docs/LEARNINGS.md` | an entry reaches `promoted: yes` | collapse it to a pointer line — `L-NNN → promoted: <where>`; the durable rule is the record now |
+| `docs/sprint/SPRINT-NNN-<slug>.md` | sprint closed | move → `docs/sprint/archive/`; one-line entry in `docs/sprint/INDEX.md` |
+
+**When it runs** — close-time triggers (tombstones · sprint archive) execute during `close`;
+scan-based triggers (TD collapse · rotation · LEARNINGS collapse · the soft cap) run at **Promote**
+as **doc-aging**, alongside tech-debt aging in the governance review. Always propose → approve →
+apply; never compress silently.

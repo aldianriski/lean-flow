@@ -53,11 +53,11 @@ Two work streams in one repo currently collide by design (single Active Sprint p
 **Acceptance:** two active sprints with distinct `stream:` coexist; `/prime` reports per stream; a single-stream repo sees zero change.
 
 **DoD:**
-- [ ] SPRINT frontmatter gains `stream:`; TODO § Active Sprint becomes a per-stream table
-- [ ] `/flow` rule becomes one-sprint-per-stream; sprint-bulk asks which sprint when >1 active
-- [ ] `/prime` counts open DoD across all active sprints, reported per stream
-- [ ] batch-G2 flags cross-stream file overlap (same files → sequence, don't parallel-build)
-- [ ] Single-stream path verified unchanged
+- [x] SPRINT frontmatter gains `stream:`; TODO § Active Sprint becomes a per-stream table
+- [x] `/flow` rule becomes one-sprint-per-stream; sprint-bulk asks which sprint when >1 active
+- [x] `/prime` counts open DoD across all active sprints, reported per stream
+- [x] batch-G2 flags cross-stream file overlap (same files → sequence, don't parallel-build)
+- [x] Single-stream path verified unchanged
 
 ### T4 — Add §11 Retention and wire doc-aging into promote `[size: M · risk: med]` — from TASK-012 · depends-on T1
 Layers: `skills/lean-doc-generator/references/DOCS_Guide.md` · `skills/lean-doc-generator/SKILL.md` · templates (TODO · CHANGELOG · LEARNINGS · SPRINT)
@@ -66,10 +66,10 @@ LAW 3 promises archive triggers that nowhere exist; the single-file ledgers (TOD
 **Acceptance:** §11 defines the retention rules; promote governance runs doc-aging next to tech-debt aging.
 
 **DoD:**
-- [ ] §11: TODO pruning — promoted-task tombstones deleted at close · resolved TD rows collapsed after 3 sprints · ~150-line soft cap, flagged at promote
-- [ ] §11: CHANGELOG rotation — current + previous minor inline; older blocks → `docs/changelog/`
-- [ ] §11: LEARNINGS collapse-on-promote · closed sprints → `docs/sprint/archive/` + one-line index
-- [ ] Promote governance runs doc-aging; templates updated
+- [x] §11: TODO pruning — promoted-task tombstones deleted at close · resolved TD rows collapsed after 3 sprints · ~150-line soft cap, flagged at promote
+- [x] §11: CHANGELOG rotation — current + previous minor inline; older blocks → `docs/changelog/`
+- [x] §11: LEARNINGS collapse-on-promote · closed sprints → `docs/sprint/archive/` + one-line index
+- [x] Promote governance runs doc-aging; templates updated
 
 ## Decisions (pre-locked)
 - **D1** — Grill canonically at *intake* (decomposer), residual at G2 — chosen over patching batch-G2, which fires after tasks are already written. Reversible; no ADR unless implementation surfaces a real trade-off.
@@ -104,6 +104,23 @@ Side benefit: orchestrator 111 → 108 lines (TD-003 pressure eased). Observatio
 `.claude/CONTEXT.md` was already over its own 100-line cap (137, now 136) — pre-existing, untouched.
 Versions: task-decomposer · orchestrator · flow → 0.2.0.
 
+### 2026-06-11 | T3 complete | parallel streams shipped (`bfaaa97`)
+Implemented as per-stream pointer *lines* in TODO § Active Sprint (not a markdown table — pointer
+lines match the existing single-stream shape, so the zero-diff guarantee is structural: no `stream:`
+field + one unprefixed pointer = exactly today's format). Verified: SPRINT-001/002 + this repo's TODO
+parse unchanged. Cross-stream overlap guard lives in batch-G2; sprint selection in the sprint-bulk
+guard. Orchestrator stayed at 108 lines (trimmed the T2 mvp footnote to make room).
+
+### 2026-06-11 | T4 complete | §11 Retention shipped
+Retention split by when it runs: close-time triggers (tombstone delete · sprint → archive/ + INDEX)
+execute in `close`; scan-based triggers (TD collapse · CHANGELOG rotation · LEARNINGS collapse ·
+TODO ~150 soft cap) run as **doc-aging** at promote, beside TD aging. Always propose → approve.
+§2 ledger rows re-labelled (`append-only · rotated/pruned (§11)`), §7 anti-pattern row added,
+4 templates annotated, CONTEXT governance gains the doc-aging line (SSOT). lean-doc-generator →
+0.4.0. Per Scope, the first archive run on this repo happens at the *next* promote — not now.
+
+## Files Changed
+
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §2 Place column + canonical-placement rule; §10 routes pathed | Low | grep |
@@ -114,6 +131,15 @@ Versions: task-decomposer · orchestrator · flow → 0.2.0.
 | `docs/DECISIONS.md` (moved from root) | T1 | self-apply placement; relative links fixed | Low | grep |
 | `templates/DECISIONS.md.template` | T1 | links relative to docs/ placement | Low | self |
 | `docs/ARCHITECTURE.md` · `README.md` · `.claude/CONTEXT.md` | T1 | inbound refs → canonical paths | Low | grep |
+| `skills/task-decomposer/SKILL.md` | T2 | Clarify = the full grill (5 moves + tightened escape hatch) | Med | self |
+| `skills/orchestrator/SKILL.md` | T2+T3 | G2 → residual grill; batch-G2 grills open `assumes:` + cross-stream overlap; multi-sprint guard | Med | cap check |
+| `skills/flow/SKILL.md` | T2+T3 | grill-at-intake note; one-sprint-per-stream rule | Low | self |
+| `.claude/CONTEXT.md` · `README.md` | T2+T4 | grill placement + doc-aging (SSOT) | Low | grep |
+| `templates/SPRINT.md.template` · `templates/TODO.md.template` | T3+T4 | `stream:` field · per-stream pointers · retention comments | Low | zero-diff check |
+| `skills/prime/SKILL.md` | T3 | count DoD across active sprints, per stream | Low | self |
+| `skills/lean-doc-generator/SKILL.md` | T3+T4 | per-stream promote/close · close-time retention · doc-aging | Med | self |
+| `references/DOCS_Guide.md` | T4 | §11 Retention; §2 ledger labels; §7 row | Med | self |
+| `templates/CHANGELOG.md.template` · `templates/LEARNINGS.md.template` | T4 | rotation / collapse annotations | Low | self |
 
 ## Retro
 _(written at close)_
