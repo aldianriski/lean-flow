@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-09
+last_updated: 2026-06-11
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -8,6 +8,15 @@ status: current
 # lean-flow — Changelog
 
 <!-- Prepend new sprints — newest first. Append-only; never edit past blocks. -->
+
+---
+
+## Sprint 001 — Ship & Validate (closed 2026-06-11)
+
+Shipped v0.1.0 to GitHub (`aldianriski/lean-flow`, public) · backfilled ADR-001…005 + the
+`DECISIONS.md` index · dogfooded the loop on a real project — four frictions surfaced and routed
+per §10 (L-001…004 → TASK-009…012: doc placement · grill-at-intake · parallel streams · retention).
+First full promote → execute → close lifecycle run.
 
 ---
 

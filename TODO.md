@@ -18,9 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **→ active:** [`docs/sprint/SPRINT-001-ship-and-validate.md`](docs/sprint/SPRINT-001-ship-and-validate.md)
-> — *Ship & Validate* (T1 commit+push · T2 dogfood · T3 backfill ADRs). Build it with
-> `/orchestrator sprint-bulk`; close with `/lean-doc-generator close`.
+> _(no active sprint — SPRINT-001 closed 2026-06-11; promote next from `ready` Backlog tasks)_
 
 ---
 

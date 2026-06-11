@@ -3,9 +3,9 @@ sprint: 001
 slug: ship-and-validate
 owner: Maintainer
 last_updated: 2026-06-11
-status: active
+status: closed
 plan_commit: d8b09c0
-close_commit: pending
+close_commit: b0f2695
 update_trigger: sprint execute/close events
 ---
 
@@ -93,4 +93,18 @@ created in `docs/` per the agreed placement direction) + **TASK-009…012** in t
 | `TODO.md` | T2 | TASK-009…012 added to Backlog P1 (fixes for the frictions) | Low | — |
 
 ## Retro
-_(written at close)_
+
+**Worked**
+- The loop's own governance caught its gaps: the dogfood (T2) produced four concrete frictions, all routed per §10 the day they were reported (L-001…004 → TASK-009…012).
+- First full lifecycle run (promote → execute → close) completed; the ADR backfill (T3) exercised the rich per-file format on real decisions.
+
+**Friction**
+- Doc placement: the standard generates everything at root and contradicts this very repo → L-001 / TASK-009.
+- The detailed grill never fires on the conducted path (intake escape hatch + batch-G2) → L-002 / TASK-010.
+- Sprint model is single-stream by design; parallel work collides on TODO/ledgers → L-003 / TASK-011.
+- Append-forever ledgers have no archive trigger — LAW 3 unfulfilled → L-004 / TASK-012.
+
+**Pattern candidate** (→ `LEARNINGS.md`)
+- Spec-only components fail on first contact (TD-001 partially confirmed: every first real run surfaced gaps). Candidate rule if it recurs: exercise a new component on real input in the same sprint that ships it.
+
+**Bucket routing (§10):** Shipped → `docs/CHANGELOG.md` (Sprint 001 block) · Tech debt → none new (TD-001 partially burned: ADR flow + promote/close now exercised; `migrate` + `/council` still untested → TASK-003/TD-001 stay open) · Follow-ups → TASK-009…012 (filed 2026-06-11) · Learnings → L-001…004 (filed 2026-06-11).
