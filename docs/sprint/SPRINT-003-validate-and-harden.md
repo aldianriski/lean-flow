@@ -119,6 +119,12 @@ cross-stream overlap detected from Layers lines alone ✓ · single-stream zero-
 control — pointer format byte-identical) ✓. Caveat logged: spec followed by its own author;
 fresh-context validation lands with T4/T5.
 
+### 2026-06-11 | halt | T2 deferred (owner: token budget) — sprint paused
+Council run (~11 sub-agent calls) deferred like T1. Sprint state: **T3 done** · T1/T2 deferred
+(owner call, resumable any session — T1's migrate plan is in this log; T2's subject is confirmed:
+TASK-005) · T4/T5 awaiting owner push + plugin-cache update (A1). Resume with
+`/orchestrator sprint-bulk` after the push.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
