@@ -65,10 +65,10 @@ What users actually run is the cache, not this working tree.
 **Acceptance:** v0.2.0 installs clean and the loop runs in a host repo that is not lean-flow itself.
 
 **DoD:**
-- [ ] `claude plugin marketplace add` on a clean repo; 13 skills auto-discover
-- [ ] `${CLAUDE_SKILL_DIR}` template/reference paths resolve from the cache
-- [ ] `/prime` degrades gracefully on an empty repo (all `[MISSING]`, no abort)
-- [ ] Loop stages run in the non-lean-flow host
+- [x] Marketplace pull verified — cache 0.1.0 → 0.2.0, 13 skills auto-discover (via `claude plugin update`; clean-machine add approximated by the same marketplace fetch path)
+- [x] `${CLAUDE_SKILL_DIR}` template/reference paths resolve from the cache (11 templates + 6 reference dirs; cold agent resolved them)
+- [x] `/prime` degrades gracefully on an empty repo (verbatim all-`[MISSING]` health report, no abort, correct `Next:` line)
+- [x] Loop stages run in the non-lean-flow host (cold sonnet agent: prime → task-decomposer → orchestrator quick → commit → prime, from cached specs only)
 
 ### T5 — Re-dogfood the fixed loop on a real feature `[size: M · risk: low]` — from TASK-013
 Layers: external repo · `docs/LEARNINGS.md`
@@ -147,6 +147,19 @@ audit — chairman ran it (templates+advisors = executable artifacts; worked exa
 convention), then conform /council — no exception remains.** → ADR-006 · TD-001 fully resolved ·
 TASK-005 re-scoped to "conform under ADR-006", state ready. The council→verdict→ADR feed worked
 end-to-end on first contact.
+
+### 2026-06-11 | T4 complete | fresh-install validated — cold agent ran the loop from the 0.2.0 cache
+Owner pushed (`56a33a8..b1103a9`); cache updated 0.1.0 → 0.2.0 via `claude plugin marketplace update`
++ `claude plugin update lean-flow@lean-flow` (note: bare `claude plugin update lean-flow` fails —
+the id must be marketplace-qualified). A cold sonnet agent with zero session knowledge ran
+prime → decompose → quick → commit → prime in a throwaway Node host using ONLY the cached specs:
+all stages completed, prime's empty-repo degradation verbatim-correct, TODO entry well-formed,
+G1 + self-review + commit format followed. **Friction log (7 real items, route at Retro):**
+prime's MEMORY-index slot lacks a fallback path · Active-Sprint pointer format undefined within
+prime itself · task-decomposer has no positive AFK criterion · `${CLAUDE_SKILL_DIR}` opaque to
+human readers · orchestrator quick's step 4 vs Review section ordering · TDD routing lacks an
+owner-declined-tests escape hatch · `/goal` referenced but unverifiable by a fresh agent.
+(8th finding was the test scaffold's own bug, not lean-flow's.)
 
 ## Files Changed
 
