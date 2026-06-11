@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-006](adr/ADR-006-skill-cap-executable-artifacts.md) | SKILL cap counts procedure only; executable artifacts in references/ | accepted | 2026-06-11 |
 | [ADR-005](adr/ADR-005-flow-conductor-standalone-contract.md) | `/flow` opt-in conductor + the standalone contract | accepted | 2026-06-09 |
 | [ADR-004](adr/ADR-004-council-opt-in-agent-aid.md) | Admit `/council` as an opt-in agent decision aid | accepted | 2026-06-09 |
 | [ADR-003](adr/ADR-003-rich-per-file-adrs.md) | Rich, one-file-per-ADR + a DECISIONS index | accepted | 2026-06-09 |

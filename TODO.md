@@ -49,10 +49,10 @@ _(TASK-003 · TASK-013…016 promoted → SPRINT-003 T1…T5)_
 
 ### P2 — Quality / Polish
 
-- [ ] **TASK-005 — Decide council size: slim or formalise the exception** [size: S] [risk: low] [HITL]
-      done-when: `/council` either trimmed toward the cap, or its over-cap status documented as an accepted exception in CLAUDE.md
-      touches: `skills/council/SKILL.md` · `.claude/CLAUDE.md`
-      state: needs-info
+- [ ] **TASK-005 — Conform `/council` under the amended cap rule (ADR-006)** [size: S] [risk: low] [HITL]
+      done-when: advisor definitions + prompt templates + worked example → `skills/council/references/`; SKILL.md ≤ ~110 (when-to-use · 6-step outline · red flags · per-step read pointers); the amended cap rule written into CLAUDE.md/CONTEXT.md/DOCS_Guide §2 (resolves TD-002 + TD-004)
+      touches: `skills/council/` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `skills/lean-doc-generator/references/DOCS_Guide.md`
+      state: ready   (decision input: ADR-006, council-pressure-tested 2026-06-11)
 
 ### P3 — Long-term
 
@@ -74,9 +74,9 @@ _(TASK-003 · TASK-013…016 promoted → SPRINT-003 T1…T5)_
      Filed by Sprint Close Retro. Aging at Promote: ≥3 sprints → re-review; high → auto P1.
      severity ∈ trivial · minor · medium · high. -->
 
-- **TD-001** severity: medium | status: open | created: build-0
-  - Summary: `migrate`, `/council`, and the council→`verdict-<slug>.md`→ADR feed are **spec-only** — defined but never executed against a real repo. *(migrate leg burned 2026-06-11 — SPRINT-003 T1, dev-flow copy, full apply verified; council legs remain)*
-  - done-when: each exercised once on real input; behaviour confirmed.
+- **TD-001** severity: medium | status: resolved → SPRINT-003 T1+T2 (2026-06-11)
+  - Summary: `migrate`, `/council`, and the council→`verdict-<slug>.md`→ADR feed were **spec-only**. All three legs exercised on real input: migrate on the dev-flow copy (T1, full apply verified) · council 5-advisor + peer-review run (T2) · verdict → ADR-006 (the feed).
+  - done-when: each exercised once on real input; behaviour confirmed. ✓
 - **TD-002** severity: minor | status: open | created: build-0
   - Summary: `skills/council/SKILL.md` is ~331 lines, far over the ~110 SKILL cap (faithful multi-agent method). Tracked under TASK-005.
 - **TD-003** severity: minor | status: open | created: build-0

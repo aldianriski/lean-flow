@@ -41,10 +41,10 @@ The council has never executed (TD-001). Suggestion: use TASK-005's open questio
 **Acceptance:** `verdict-<slug>.md` produced by the full 5-advisor + peer-review path; the call recorded as an ADR.
 
 **DoD:**
-- [ ] Real decision selected (owner confirms the subject)
-- [ ] Council run end-to-end → `verdict-<slug>.md`
-- [ ] Verdict folded into a recorded ADR + `docs/DECISIONS.md` row
-- [ ] TD-001 council leg recorded as burned
+- [x] Real decision selected (owner confirmed: TASK-005's question)
+- [x] Council run end-to-end → `verdict-skill-cap-executable-artifacts.md` (temp dir)
+- [x] Verdict folded into a recorded ADR (ADR-006) + `docs/DECISIONS.md` row
+- [x] TD-001 council leg recorded as burned (TD-001 now fully resolved — all three legs)
 
 ### T3 — Exercise streams: two parallel sprints in a test repo `[size: M · risk: med]` — from TASK-015
 Layers: throwaway test repo
@@ -137,7 +137,25 @@ brief should make per-move link-fixing explicit) and the over-cap flag placed *a
 decoding only — files clean UTF-8; no L-005 recurrence. Executor flags all legitimate (incl. a real
 ADR-017/018 numbering gap in dev-flow's own history).
 
+### 2026-06-11 | T2 complete | first live /council run → ADR-006
+Full method executed: 5 advisors (sonnet, parallel) → 5 anonymized peer reviews (sonnet) → chairman
+synthesis inline on the session model (TASK-018 tiering: ~10 of 11 calls on the cheap tier).
+Genuine 3-way advisor split (slim / exception / fix-the-rule); peer review converged 5/5 on
+First-Principles' reframe, and 4/5 reviewers independently demanded the missing access-pattern
+audit — chairman ran it (templates+advisors = executable artifacts; worked example = separable).
+**Verdict: amend the cap rule (procedure-only count; executable artifacts in references/ by
+convention), then conform /council — no exception remains.** → ADR-006 · TD-001 fully resolved ·
+TASK-005 re-scoped to "conform under ADR-006", state ready. The council→verdict→ADR feed worked
+end-to-end on first contact.
+
 ## Files Changed
+
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+| `%TEMP%\migrate-test-dev-flow\*` (external) | T1 | migrate plan applied by sonnet executor; verified | Low | inventory diff + hashes |
+| `docs/adr/ADR-006-skill-cap-executable-artifacts.md` | T2 | NEW — cap-rule amendment, council-pressure-tested | Low | §4 template |
+| `docs/DECISIONS.md` | T2 | ADR-006 row | Low | link check |
+| `TODO.md` | T1+T2 | TD-001 resolved · TASK-005 re-scoped ready | Low | self |
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
