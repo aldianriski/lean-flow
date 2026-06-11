@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-09
+last_updated: 2026-06-11
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -38,6 +38,31 @@ _(TASK-001 promoted → SPRINT-001 T1)_
       done-when: migrate run against a real dev-flow / adlc-flow repo; plan→approve→apply verified to not delete content
       touches: `skills/lean-doc-generator/references/migration-map.md`
       state: ready
+
+- [ ] **TASK-009 — Define canonical doc placement (root vs docs/) and align prime + migrate** [size: M] [risk: low] [HITL]
+      done-when: DOCS_Guide §2 has a Placement column (root: README · TODO — `.claude/`: CLAUDE · CONTEXT — `docs/`: the rest); `/prime` read-order lists the `docs/` paths first; migration-map gains relocate rules; generation targets the new paths
+      touches: `skills/lean-doc-generator/references/DOCS_Guide.md` · `skills/prime/SKILL.md` · `skills/lean-doc-generator/references/migration-map.md` · `skills/lean-doc-generator/SKILL.md`
+      assumes: README + TODO stay at root (daily working files); CLAUDE/CONTEXT stay in `.claude/`
+      state: ready   (from L-001, dogfood feedback)
+
+- [ ] **TASK-010 — Move the full grill to task-decomposer intake; thin orchestrator G2 to a residual check** [size: M] [risk: med] [HITL]
+      done-when: grill moves (glossary challenge · sharpen fuzzy terms · edge-case invention · code cross-reference · prototype/council routing) live in `/task-decomposer` Clarify; the "don't re-interview" escape hatch tightened to zero-open-assumptions; orchestrator G2 keeps a residual grill check; sprint-bulk batch-G2 grills any task with unconfirmed `assumes:`; `/flow` text aligned
+      touches: `skills/task-decomposer/SKILL.md` · `skills/orchestrator/SKILL.md` · `skills/flow/SKILL.md` · `.claude/CONTEXT.md` · `README.md`
+      assumes: orchestrator keeps a thin grill for cold `quick`/`mvp` invocations (standalone contract)
+      state: ready   (from L-002, dogfood feedback)
+
+- [ ] **TASK-011 — Support parallel work streams — one sprint per stream** [size: M] [risk: med] [HITL]
+      done-when: sprint frontmatter gains `stream:`; TODO § Active Sprint becomes a per-stream table; `/flow` rule becomes one-sprint-per-stream; `/prime` counts open DoD across all active sprints (reported per stream); batch-G2 flags cross-stream file overlap; single-stream repos see zero change
+      touches: `templates/SPRINT.md.template` · `templates/TODO.md.template` · `skills/flow/SKILL.md` · `skills/prime/SKILL.md` · `skills/orchestrator/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `.claude/CONTEXT.md`
+      assumes: streams are optional — the single-stream path stays the default and unchanged
+      state: ready   (from L-003, dogfood feedback)
+
+- [ ] **TASK-012 — Add DOCS_Guide §11 Retention (compress + archive) and wire doc-aging into promote governance** [size: M] [risk: med] [HITL]
+      done-when: §11 defines TODO pruning (promoted-task tombstones deleted at close · resolved TD rows collapsed after 3 sprints · ~150-line soft cap) · CHANGELOG rotation (current + previous minor inline, older → `docs/changelog/`) · LEARNINGS collapse-on-promote · closed sprints → `docs/sprint/archive/` + one-line index; promote governance runs doc-aging next to TD aging
+      touches: `skills/lean-doc-generator/references/DOCS_Guide.md` · `skills/lean-doc-generator/SKILL.md` · `templates/` (TODO · CHANGELOG · LEARNINGS · SPRINT)
+      assumes: git history is the full audit trail — archives compress, never rewrite it
+      depends-on: TASK-009 (archive paths assume the new placement)
+      state: ready   (from L-004, dogfood feedback — promote after TASK-009, same-sprint ordering ok)
 
 _(TASK-002 → SPRINT-001 T2 · TASK-004 → SPRINT-001 T3)_
 

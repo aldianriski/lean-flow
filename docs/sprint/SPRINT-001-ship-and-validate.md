@@ -2,7 +2,7 @@
 sprint: 001
 slug: ship-and-validate
 owner: Maintainer
-last_updated: 2026-06-09
+last_updated: 2026-06-11
 status: active
 plan_commit: d8b09c0
 close_commit: pending
@@ -34,9 +34,9 @@ Lock the whole build in (40 files, zero history) before anything else can drift 
 Run lean-flow end-to-end on a real change in another repo (umkm-indo) — the only way real gaps surface.
 **Acceptance:** `/prime → /task-decomposer → promote → /orchestrator → close` run on a real change; every gap/friction captured to `LEARNINGS.md` (this seeds the §10 governance).
 **DoD:**
-- [ ] Loop run start-to-close on a real task
-- [ ] Friction + gaps recorded in `LEARNINGS.md`
-- [ ] Any confirmed bug filed (`TD-NNN` or `/diagnose`)
+- [x] Loop run start-to-close on a real task (owner dogfood, confirmed in the 2026-06-11 feedback session)
+- [x] Friction + gaps recorded in `LEARNINGS.md` (L-001…004, 2026-06-11)
+- [x] Any confirmed bug filed (`TD-NNN` or `/diagnose`) — none rose to bug; all four findings were design frictions → L-001…004
 
 ### T3 — Backfill ADRs for the build's decisions `[size: M · risk: low]` — from TASK-004
 Capture the WHY behind the hard-to-reverse calls made during the build, in the rich per-file format.
@@ -50,8 +50,8 @@ Capture the WHY behind the hard-to-reverse calls made during the build, in the r
 - [x] `DECISIONS.md` index lists all five
 
 ## Owner-action checklist
-- [ ] Confirm the GitHub slug (`aldianriski/lean-flow` or correct it)
-- [ ] Run `git push` (the skill never pushes)
+- [x] Confirm the GitHub slug (`aldianriski/lean-flow` or correct it) — verified in both manifests (T1)
+- [x] Run `git push` (the skill never pushes) — pushed, recorded in `56a33a8`
 
 ## Decisions (pre-locked)
 - **D1** — The first sprint is **ship + validate**, not feature work: a curated tool earns its next additions from *real usage*, not speculation. → qualifies as ADR (T3).
@@ -75,12 +75,22 @@ Initial commit `d8b09c0` (50 files) pushed to https://github.com/aldianriski/lea
 Repo confirmed PUBLIC; slug verified across both manifests + README. **T2 (dogfood) remains** — needs
 a target repo + a real feature; sprint stays `active` until then.
 
+### 2026-06-11 | T2 progress | dogfood feedback filed
+Owner dogfooded the loop and reported four frictions: doc placement (all root), grill absent on the
+conducted path, no parallel-stream support, ledger bloat (TODO/CHANGELOG append-forever, LAW 3
+archive triggers undefined). Filed as **L-001…L-004** in `docs/LEARNINGS.md` (first real entry —
+created in `docs/` per the agreed placement direction) + **TASK-009…012** in the Backlog (P1,
+`ready`; TASK-012 depends-on TASK-009). T2 DoD "friction recorded" ticked; "loop start-to-close" and
+"bug filed" remain open pending owner confirmation of the dogfood run's completion.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `docs/adr/ADR-001…005-*.md` | T3 | NEW — capture the build's hard-to-reverse decisions (rich format) | Low | self |
 | `DECISIONS.md` | T3 | NEW — ADR index | Low | — |
+| `docs/LEARNINGS.md` | T2 | NEW — dogfood frictions L-001…004 (seeds §10 governance) | Low | — |
+| `TODO.md` | T2 | TASK-009…012 added to Backlog P1 (fixes for the frictions) | Low | — |
 
 ## Retro
 _(written at close)_
