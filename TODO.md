@@ -75,7 +75,7 @@ _(TASK-003 · TASK-013…016 promoted → SPRINT-003 T1…T5)_
      severity ∈ trivial · minor · medium · high. -->
 
 - **TD-001** severity: medium | status: open | created: build-0
-  - Summary: `migrate`, `/council`, and the council→`verdict-<slug>.md`→ADR feed are **spec-only** — defined but never executed against a real repo.
+  - Summary: `migrate`, `/council`, and the council→`verdict-<slug>.md`→ADR feed are **spec-only** — defined but never executed against a real repo. *(migrate leg burned 2026-06-11 — SPRINT-003 T1, dev-flow copy, full apply verified; council legs remain)*
   - done-when: each exercised once on real input; behaviour confirmed.
 - **TD-002** severity: minor | status: open | created: build-0
   - Summary: `skills/council/SKILL.md` is ~331 lines, far over the ~110 SKILL cap (faithful multi-agent method). Tracked under TASK-005.

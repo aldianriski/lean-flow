@@ -29,10 +29,10 @@ The last medium-severity spec-only path (TD-001). Detect → plan → approve �
 **Acceptance:** migrate run end-to-end on a real repo; content provably intact; `/prime` reads the result cleanly.
 
 **DoD:**
-- [ ] Target legacy repo selected and migrate run: detect → per-file plan → approval → apply
-- [ ] No pre-existing content deleted (diff-verified); placement + wiring per §2
-- [ ] `/prime` reads the migrated repo cleanly (no dangling refs, ADR index resolves)
-- [ ] TD-001 migrate leg recorded as burned in the TD row
+- [x] Target legacy repo selected and migrate run: detect → per-file plan → approval → apply (dev-flow copy)
+- [x] No pre-existing content deleted (diff-verified: 669 → 685 = exactly the 16 created files; CHANGELOG/blueprint hash-identical)
+- [x] `/prime` reads the migrated repo cleanly (canonical placement throughout; 35-link ADR index resolves; README cross-ref fixed)
+- [x] TD-001 migrate leg recorded as burned in the TD row
 
 ### T2 — Run `/council` once on a real high-stakes decision `[size: S · risk: low]` — from TASK-014
 Layers: `docs/adr/` · `docs/DECISIONS.md`
@@ -124,6 +124,18 @@ Council run (~11 sub-agent calls) deferred like T1. Sprint state: **T3 done** ·
 (owner call, resumable any session — T1's migrate plan is in this log; T2's subject is confirmed:
 TASK-005) · T4/T5 awaiting owner push + plugin-cache update (A1). Resume with
 `/orchestrator sprint-bulk` after the push.
+
+### 2026-06-11 | T1 complete | migrate validated on dev-flow copy — via a sonnet executor
+Resumed after owner reset the token budget. The approved plan's **apply was delegated to a fresh
+`sonnet` subagent with a self-contained brief (TASK-018's spawn-with-brief pattern, validated live
+pre-implementation: ~96k tokens spent on the cheap tier).** Result: R1–R8 all done — 15 ADRs split
+from the 381-line log → thin 43-line index · TODO reformatted + refined-task-list folded · 44 sprints
+archived + INDEX · codemap folded → ARCHITECTURE, original archived · leave-list verified untouched
+(hash checks). Strong-model verify pass caught two nits: stale README→CODEMAP link (fixed — the
+brief should make per-move link-fixing explicit) and the over-cap flag placed *above* frontmatter
+(fixed — flag must go below the header or it breaks parsing). Mojibake scare was PS5.1 console
+decoding only — files clean UTF-8; no L-005 recurrence. Executor flags all legitimate (incl. a real
+ADR-017/018 numbering gap in dev-flow's own history).
 
 ## Files Changed
 
