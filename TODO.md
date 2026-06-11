@@ -18,10 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **→ active:** [`docs/sprint/SPRINT-002-dogfood-fixes.md`](docs/sprint/SPRINT-002-dogfood-fixes.md)
-> — *Dogfood Fixes* (T1 placement · T2 grill-at-intake · T3 streams · T4 retention §11). Build it
-> with `/orchestrator sprint-bulk`; close with `/lean-doc-generator close`.
-> _(SPRINT-001 — Ship & Validate — closed 2026-06-11.)_
+> _(no active sprint — SPRINT-002 closed 2026-06-11, archived per §11; promote next from `ready` Backlog tasks)_
 
 ---
 
@@ -31,16 +28,12 @@ status: current
 
 ### P0 — Critical / Blocking
 
-_(TASK-001 promoted → SPRINT-001 T1)_
-
 ### P1 — Next Phase Required
 
 - [ ] **TASK-003 — Test `/lean-doc-generator migrate`** [size: M] [risk: med] [HITL]
       done-when: migrate run against a real dev-flow / adlc-flow repo; plan→approve→apply verified to not delete content
       touches: `skills/lean-doc-generator/references/migration-map.md`
       state: ready
-
-_(TASK-002 → SPRINT-001 T2 · TASK-004 → SPRINT-001 T3 · TASK-009…012 promoted → SPRINT-002 T1…T4)_
 
 ### P2 — Quality / Polish
 
@@ -78,6 +71,9 @@ _(TASK-002 → SPRINT-001 T2 · TASK-004 → SPRINT-001 T3 · TASK-009…012 pro
   - Summary: `skills/orchestrator/SKILL.md` is at the ~110 cap — further wiring risks overflow; may need to push detail into a reference.
 - **TD-004** severity: trivial | status: open | created: build-0
   - Summary: CLAUDE.md states a ~110 SKILL cap that `/council` violates — cap-rule vs reality inconsistency (council is the documented exception, but the rule reads absolute).
+- **TD-005** severity: minor | status: open | created: Sprint-002
+  - Summary: `.claude/CONTEXT.md` is ~137 lines against its own 100-line cap (pre-existing; +4 this sprint) — the SSOT violates the standard it anchors. Surfaced by the Sprint-002 review pass.
+  - done-when: CONTEXT.md ≤ 100 lines via content diet (move detail to skill references), or the cap is formally revised in DOCS_Guide §2.
 
 ---
 
@@ -85,7 +81,7 @@ _(TASK-002 → SPRINT-001 T2 · TASK-004 → SPRINT-001 T3 · TASK-009…012 pro
 
 > Move to `docs/CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — the initial build is recorded in [`docs/CHANGELOG.md`](docs/CHANGELOG.md) (v0.1.0).
+_(no active sprint)_ — Sprints 001–002 are recorded in [`docs/CHANGELOG.md`](docs/CHANGELOG.md).
 
 ---
 

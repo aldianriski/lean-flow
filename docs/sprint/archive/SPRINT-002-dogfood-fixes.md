@@ -3,9 +3,9 @@ sprint: 002
 slug: dogfood-fixes
 owner: Maintainer
 last_updated: 2026-06-11
-status: active
+status: closed
 plan_commit: 5024bab
-close_commit: pending
+close_commit: 007869e
 update_trigger: sprint execute/close events
 ---
 
@@ -119,6 +119,14 @@ TODO ~150 soft cap) run as **doc-aging** at promote, beside TD aging. Always pro
 4 templates annotated, CONTEXT governance gains the doc-aging line (SSOT). lean-doc-generator →
 0.4.0. Per Scope, the first archive run on this repo happens at the *next* promote — not now.
 
+### 2026-06-11 | review + fixes | 7-finder /code-review pass (`007869e`)
+Per the G2 review plan: 7 parallel finder agents over the cumulative diff → 6 confirmed findings,
+all fixed — §11 INDEX.md line format defined · promote gains the multi-stream which-stream guard ·
+README's stale "learnings index in TODO" claim corrected · template path prefixes (`docs/`) on
+DECISIONS/LEARNINGS mentions · orchestrator residual-grill parenthetical trimmed (108 → 107 lines).
+Notable refuted candidates: ARCHITECTURE template link (resolves correctly from `docs/`), prime's
+sprint glob (doesn't descend into `archive/`). CONTEXT.md over-cap → TD-005 at close.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -142,4 +150,18 @@ TODO ~150 soft cap) run as **doc-aging** at promote, beside TD aging. Always pro
 | `templates/CHANGELOG.md.template` · `templates/LEARNINGS.md.template` | T4 | rotation / collapse annotations | Low | self |
 
 ## Retro
-_(written at close)_
+
+**Worked**
+- Sequential T1→T4 with per-task commit + log entry; the heavy file overlap made the no-`/batch` call right.
+- The end-of-sprint `/code-review` pass earned its keep: 7 finders → 6 real fixes, including two spec gaps (INDEX format, promote stream guard) no single pass had caught.
+- Self-applying the standard (T1) surfaced that the templates *already* encoded `docs/` placement — the standard was the outlier, exactly the L-001 thesis.
+
+**Friction**
+- PowerShell `Get-Content`→`Set-Content` round-trip corrupted UTF-8 em-dashes in DECISIONS.md → **L-005**.
+- An Edit on this sprint file swallowed the `## Files Changed` heading (old_string didn't preserve what it replaced) — caught one edit later.
+- `.claude/CONTEXT.md` stands at ~137 lines against its own 100 cap (pre-existing, +4 this sprint) → **TD-005**.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- Shell text pipelines are unsafe for UTF-8 markdown edits; use Write/Edit tools (L-005, count 1).
+
+**Bucket routing (§10):** Shipped → `docs/CHANGELOG.md` (Sprint 002 block) · Tech debt → **TD-005** (CONTEXT over cap) · Follow-ups → none new (TASK-003 · 005–008 already tracked) · Learnings → **L-005**. **Close-time retention (§11, first run):** Backlog tombstones deleted · this file → `docs/sprint/archive/` + `docs/sprint/INDEX.md` line. SPRINT-001 archives at the next promote's doc-aging.

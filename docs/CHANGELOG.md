@@ -11,6 +11,22 @@ status: current
 
 ---
 
+## Sprint 002 — Dogfood Fixes (closed 2026-06-11)
+
+The four dogfood frictions (L-001…004) fixed in the standard and its consuming skills:
+
+| Area | What |
+|---|---|
+| Placement (T1) | DOCS_Guide §2 gains a **Place** column — root: README · TODO / `.claude/`: CLAUDE · CONTEXT / `docs/`: the rest; `/prime` · `migrate` · `/release-patch` aligned; self-applied (`DECISIONS.md` → `docs/`) |
+| Grill (T2) | the detailed grill moved to `/task-decomposer` intake (escape hatch tightened); orchestrator G2 = residual check; an open assumption **blocks** G2 |
+| Streams (T3) | optional `stream:` frontmatter — one active sprint per stream, per-stream TODO pointers, cross-stream overlap guard; single-stream repos unchanged |
+| Retention (T4) | DOCS_Guide **§11** — ledger retention triggers; doc-aging at promote beside TD aging; close-time tombstone-prune + sprint archive → `docs/sprint/archive/` + `INDEX.md` |
+
+Versions: prime · task-decomposer · orchestrator · flow → 0.2.0; lean-doc-generator → 0.4.0.
+End-of-sprint `/code-review` (7 finders): 6 findings fixed (`007869e`).
+
+---
+
 ## Sprint 001 — Ship & Validate (closed 2026-06-11)
 
 Shipped v0.1.0 to GitHub (`aldianriski/lean-flow`, public) · backfilled ADR-001…005 + the
