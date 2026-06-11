@@ -1,0 +1,113 @@
+---
+sprint: 003
+slug: validate-and-harden
+owner: Maintainer
+last_updated: 2026-06-11
+status: active
+plan_commit: c777fec
+close_commit: pending
+update_trigger: sprint execute/close events
+---
+
+# SPRINT-003 — Validate & Harden
+
+> **Theme:** Earn v1.0 the curated way — every shipped component exercised once on real input.
+> Sprint-002 fixed the dogfood frictions; this sprint proves the fixes and the never-run paths
+> (`migrate` · `/council` · streams · fresh install) before TASK-017 unblocks the 1.0.0 bump.
+
+## Scope
+
+**In:** `migrate` on a real legacy repo · one real `/council` run → ADR · two-stream exercise in a test repo · fresh marketplace install · re-dogfood the full loop on the published v0.2.0.
+**Out (deferred):** TASK-005 council-size decision (`needs-info` — though T2 may *produce* its answer, the slimming itself stays out) · TD-005 CONTEXT diet (TASK-017's DoD) · hooks / recon / insights (TASK-006–008) · the 1.0.0 bump itself (TASK-017, after close).
+
+## Plan
+
+### T1 — Test `/lean-doc-generator migrate` on a real legacy repo `[size: M · risk: med]` — from TASK-003
+Layers: external legacy repo (dev-flow / adlc-flow / ad-hoc) · `references/migration-map.md`
+The last medium-severity spec-only path (TD-001). Detect → plan → approve → apply, surgically.
+
+**Acceptance:** migrate run end-to-end on a real repo; content provably intact; `/prime` reads the result cleanly.
+
+**DoD:**
+- [ ] Target legacy repo selected and migrate run: detect → per-file plan → approval → apply
+- [ ] No pre-existing content deleted (diff-verified); placement + wiring per §2
+- [ ] `/prime` reads the migrated repo cleanly (no dangling refs, ADR index resolves)
+- [ ] TD-001 migrate leg recorded as burned in the TD row
+
+### T2 — Run `/council` once on a real high-stakes decision `[size: S · risk: low]` — from TASK-014
+Layers: `docs/adr/` · `docs/DECISIONS.md`
+The council has never executed (TD-001). Suggestion: use TASK-005's open question — "slim `/council` toward the cap vs formalise the exception" — as the subject; one run then both exercises the skill and produces the TASK-005 decision input.
+
+**Acceptance:** `verdict-<slug>.md` produced by the full 5-advisor + peer-review path; the call recorded as an ADR.
+
+**DoD:**
+- [ ] Real decision selected (owner confirms the subject)
+- [ ] Council run end-to-end → `verdict-<slug>.md`
+- [ ] Verdict folded into a recorded ADR + `docs/DECISIONS.md` row
+- [ ] TD-001 council leg recorded as burned
+
+### T3 — Exercise streams: two parallel sprints in a test repo `[size: M · risk: med]` — from TASK-015
+Layers: throwaway test repo
+T3 of Sprint-002 has never seen a second stream; validate before v1 claims it.
+
+**Acceptance:** two active sprints with distinct `stream:` coexist and the tooling behaves per spec; single-stream path regression-free.
+
+**DoD:**
+- [ ] Test repo with two streams, one active sprint each (per-stream TODO pointers)
+- [ ] `/prime` reports open DoD per stream; `sprint-bulk` asks which sprint
+- [ ] Cross-stream file overlap flagged at batch-G2 when files are shared
+- [ ] Single-stream repo re-checked: zero behavioral change
+
+### T4 — Fresh-install test from the marketplace `[size: S · risk: med]` — from TASK-016
+Layers: clean test repo · plugin cache
+What users actually run is the cache, not this working tree.
+
+**Acceptance:** v0.2.0 installs clean and the loop runs in a host repo that is not lean-flow itself.
+
+**DoD:**
+- [ ] `claude plugin marketplace add` on a clean repo; 13 skills auto-discover
+- [ ] `${CLAUDE_SKILL_DIR}` template/reference paths resolve from the cache
+- [ ] `/prime` degrades gracefully on an empty repo (all `[MISSING]`, no abort)
+- [ ] Loop stages run in the non-lean-flow host
+
+### T5 — Re-dogfood the fixed loop on a real feature `[size: M · risk: low]` — from TASK-013
+Layers: external repo · `docs/LEARNINGS.md`
+The validation half of the friction→fix cycle: confirm the four Sprint-002 fixes from the user side.
+
+**Acceptance:** full loop run on the published v0.2.0; the original four frictions verifiably gone.
+
+**DoD:**
+- [ ] Full loop (prime → decompose → promote → orchestrate → close) on a real feature
+- [ ] Grill verifiably fires at intake; generated docs land per §2 placement
+- [ ] L-001…004 confirmed fixed (or count-bumped + re-filed)
+- [ ] Any new friction filed (L-NNN / TD-NNN / TASK-NNN)
+
+## Owner-action checklist
+- [ ] `git push origin main` (13 commits — the skills never push)
+- [ ] Update/reinstall the plugin so the cache serves v0.2.0 (T4/T5 precondition)
+- [ ] Pick the council subject for T2 (TASK-005's question recommended)
+
+## Decisions (pre-locked)
+- **D1** — T4/T5 run against the *published* v0.2.0, not the working tree — what users run is the cache; testing the tree validates nothing about distribution.
+- **D2** — T2 may use TASK-005's question as its subject, but TASK-005 itself stays in the Backlog until its decision is recorded — task scopes don't merge.
+
+## Assumptions
+- **A1** — v0.2.0 is pushed and the plugin cache updated *before* T4/T5 execute (T1–T3 don't need it). *Confirm: owner (checklist above).*
+- **A2** — A real legacy repo (dev-flow / adlc-flow / ad-hoc docs) is available for T1. *Confirm: owner.*
+
+## Execution Log
+
+### 2026-06-11 | promote | sprint planned
+Promoted TASK-003 + TASK-013…016 (all `ready`; TASK-005 stays — `needs-info`). Dependency order:
+local-first (T1 migrate · T2 council · T3 streams), push-gated last (T4 install · T5 re-dogfood).
+Governance review: L-001…005 all count 1 — none promotable; TD aging — none ≥ 3 sprints, no high;
+**first §11 doc-aging run: proposed + owner-approved archiving SPRINT-001 → `docs/sprint/archive/`
+(`c777fec`) — the propose-before-act behavior verified live.** Plan frozen.
+
+## Files Changed
+
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+
+## Retro
+_(written at close)_

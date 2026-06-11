@@ -18,7 +18,10 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-002 closed 2026-06-11, archived per §11; promote next from `ready` Backlog tasks)_
+> **→ active:** [`docs/sprint/SPRINT-003-validate-and-harden.md`](docs/sprint/SPRINT-003-validate-and-harden.md)
+> — *Validate & Harden* (T1 migrate-test · T2 council-run · T3 streams-test · T4 fresh-install ·
+> T5 re-dogfood). Build with `/orchestrator sprint-bulk`; close with `/lean-doc-generator close` —
+> then TASK-017 unblocks the v1.0 bump.
 
 ---
 
@@ -30,31 +33,7 @@ status: current
 
 ### P1 — Next Phase Required
 
-- [ ] **TASK-003 — Test `/lean-doc-generator migrate`** [size: M] [risk: med] [HITL]
-      done-when: migrate run against a real dev-flow / adlc-flow repo; plan→approve→apply verified to not delete content
-      touches: `skills/lean-doc-generator/references/migration-map.md`
-      state: ready
-
-- [ ] **TASK-013 — Re-dogfood the fixed loop on a real feature (v0.2.0)** [size: M] [risk: low] [HITL]
-      done-when: full loop run in another repo on the published v0.2.0; grill verifiably fires at intake; generated docs land per §2 placement; L-001…004 confirmed fixed or count-bumped
-      touches: external repo · `docs/LEARNINGS.md`
-      assumes: v0.2.0 is pushed + the plugin cache updated before the run
-      state: ready
-
-- [ ] **TASK-014 — Run `/council` once on a real high-stakes decision** [size: S] [risk: low] [HITL]
-      done-when: council run end-to-end → `verdict-<slug>.md` → recorded as an ADR; the council leg of TD-001 burned down
-      touches: `docs/adr/` · `docs/DECISIONS.md`
-      state: ready
-
-- [ ] **TASK-015 — Exercise streams: two parallel sprints in a test repo** [size: M] [risk: med] [HITL]
-      done-when: two active sprints with distinct `stream:` coexist; `/prime` reports per stream; `sprint-bulk` asks which; cross-stream overlap flagged; single-stream path regression-free
-      touches: test repo (throwaway)
-      state: ready
-
-- [ ] **TASK-016 — Fresh-install test from the marketplace in a clean repo** [size: S] [risk: med] [HITL]
-      done-when: plugin installs clean; 13 skills auto-discover; `${CLAUDE_SKILL_DIR}` template paths resolve from the cache; `/prime` degrades gracefully on an empty repo; the loop runs in a non-lean-flow host
-      touches: clean test repo
-      state: ready
+_(TASK-003 · TASK-013…016 promoted → SPRINT-003 T1…T5)_
 
 - [ ] **TASK-017 — v1.0 release checklist (umbrella)** [size: S] [risk: low] [HITL]
       done-when: TASK-003 · 005 · 013–016 closed; TD-005 resolved (CONTEXT ≤ cap or cap revised); final link/path consistency grep clean; manifests bumped 1.0.0 lockstep
