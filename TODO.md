@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-11
+last_updated: 2026-06-12
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -18,8 +18,9 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-003 closed 2026-06-11, archived per §11; TASK-017's v1 gate now waits
-> only on TASK-005 + TD-005)_
+> **SPRINT-004 — Token & Doc Hardening** · status: active · 5 tasks (TASK-018·019·020·021·022)
+> → [`docs/sprint/SPRINT-004-token-and-doc-hardening.md`](docs/sprint/SPRINT-004-token-and-doc-hardening.md)
+> _(TASK-017's v1 gate still waits on TASK-005 + TD-005)_
 
 ---
 
@@ -37,24 +38,20 @@ status: current
       depends-on: TASK-005 (TASK-003 · 013…016 closed via SPRINT-003)
       state: blocked   (waiting on TASK-005 + TD-005)
 
-- [ ] **TASK-018 — Model-tier routing: decide on the session model, execute via cheap-tier subagents** [size: M] [risk: med] [HITL]
-      done-when: orchestrator Implement + council + task-decomposer carry explicit tier-dispatch guidance (gates · grill · design · synthesis stay on the session model; advisors / bounded mechanical work → fresh `sonnet`/`opus` subagents via the Agent-tool `model:` override); the dispatch contract is **spawn-with-brief, never a mid-session model switch** — context isn't portable, so each dispatch carries a self-contained brief (spec · files · acceptance, per the AFK durable-spec rule); tier mapping recorded in CONTEXT.md; exercised once on real work (T1 migrate apply or T2 council advisors — the deferred tasks are the proving ground)
-      touches: `skills/orchestrator/SKILL.md` · `skills/council/SKILL.md` · `skills/task-decomposer/SKILL.md` · `.claude/CONTEXT.md`
-      assumes: Agent-tool model override available in the host; G1/G2 + the review pass guard cheap-executor quality
-      state: ready   (owner request 2026-06-11 — token management)
+- TASK-018 — Cut token cost: tier-routing + diff-scoped review → promoted to SPRINT-004 (T1)
 
 ### P2 — Quality / Polish
 
-- [ ] **TASK-019 — Spec-polish bundle from SPRINT-003 validation frictions** [size: S] [risk: low] [HITL]
-      done-when: the 9 frictions fixed — prime: MEMORY-index fallback path + Active-Sprint pointer format stated inline · task-decomposer: positive AFK criterion · orchestrator: owner-declined-tests escape hatch on TDD routing + quick-mode/Review ordering note · `${CLAUDE_SKILL_DIR}` reader note · single-task-sprint exception for dogfood/validation runs · README: install/update uses the marketplace-qualified id (`lean-flow@lean-flow`) · migration-map: per-move inbound-link fixing made an explicit apply step
-      touches: `skills/prime` · `skills/task-decomposer` · `skills/orchestrator` · `skills/lean-doc-generator/references/migration-map.md` · `templates/TODO.md.template` · `README.md`
-      assumes: none — all items are observed frictions with known fixes
-      state: ready   (from T4 cold-agent friction log + T5/T1 observations)
+- TASK-019 — Spec-polish bundle (9 SPRINT-003 frictions) → promoted to SPRINT-004 (T2)
 
 - [ ] **TASK-005 — Conform `/council` under the amended cap rule (ADR-006)** [size: S] [risk: low] [HITL]
       done-when: advisor definitions + prompt templates + worked example → `skills/council/references/`; SKILL.md ≤ ~110 (when-to-use · 6-step outline · red flags · per-step read pointers); the amended cap rule written into CLAUDE.md/CONTEXT.md/DOCS_Guide §2 (resolves TD-002 + TD-004)
       touches: `skills/council/` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `skills/lean-doc-generator/references/DOCS_Guide.md`
       state: ready   (decision input: ADR-006, council-pressure-tested 2026-06-11)
+
+- TASK-020 — release-patch auto-handoff + changelog-only fallback → promoted to SPRINT-004 (T3)
+- TASK-021 — Optional frontend-only DESIGN.md template → promoted to SPRINT-004 (T4)
+- TASK-022 — migrate consolidation sweep (adopt + clean) → promoted to SPRINT-004 (T5)
 
 ### P3 — Long-term
 
