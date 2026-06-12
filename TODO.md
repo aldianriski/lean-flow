@@ -18,8 +18,9 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-005 closed 2026-06-12, archived per §11; TASK-017's v1 gate now waits
-> only on TD-005)_
+> **SPRINT-006 — Review Depth & Context Diet** · status: active · 2 tasks (TASK-026·027)
+> → [`docs/sprint/SPRINT-006-review-depth-and-context-diet.md`](docs/sprint/SPRINT-006-review-depth-and-context-diet.md)
+> _(TASK-017 v1.0 gate: TASK-027 here resolves the last blocker TD-005)_
 
 ---
 
@@ -37,19 +38,11 @@ status: current
       depends-on: TD-005 (TASK-005 closed via SPRINT-005; TASK-003 · 013…016 via SPRINT-003)
       state: blocked   (waiting on TD-005 only — TASK-027 addresses it)
 
-- [ ] **TASK-027 — CONTEXT.md diet to ≤100 (or formally revise the cap) — resolves TD-005** [size: M] [risk: med] [HITL]
-      done-when: `.claude/CONTEXT.md` ≤ 100 lines via content diet (move detail to skill references / trim) **OR** the 100-line cap formally revised in DOCS_Guide §2 with rationale; no information lost (moved, not deleted); SSOT still reads coherently; TD-005 marked resolved
-      touches: `.claude/CONTEXT.md` · `skills/lean-doc-generator/references/DOCS_Guide.md` (if cap revised) · skill `references/` (if detail relocated)
-      assumes: diet-vs-revise is a G2 design call; the tier-map + roster detail can live in references without losing the SSOT's value
-      state: ready   (v1.0 blocker — from TD-005 aging at SPRINT-006 promote)
+- TASK-027 — CONTEXT.md diet / resolve TD-005 → promoted to SPRINT-006 (T2)
 
 ### P2 — Quality / Polish
 
-- [ ] **TASK-026 — Scale review depth: single scoped reviewer for small/medium; reserve `/code-review` fan-out for large/high-risk** [size: S] [risk: low] [HITL]
-      done-when: orchestrator Review + `review-scoping.md` state a depth rule — small/medium diff → **one** scoped cheap-tier (`sonnet`) reviewer with the diff + blast-radius brief; `/code-review`'s multi-finder fan-out reserved for **large / high-risk** diffs; the imprecise "fold into one `/code-review`; don't fan out" skip-table row corrected; orchestrator stays ≤ ~110
-      touches: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/review-scoping.md`
-      assumes: none — built on the observed `/code-review` finder fan-out cost (4 finders × 20–64k tokens)
-      state: ready   (from the v0.3.1 review-fanout gap)
+- TASK-026 — Scale review depth (single scoped reviewer; `/code-review` for large/high-risk) → promoted to SPRINT-006 (T1)
 
 ### P3 — Long-term
 
