@@ -1,0 +1,194 @@
+<!-- OPTIONAL · frontend-only · NOT a core lean-flow doc — a design-system / token contract (spec artifact). -->
+---
+version: [e.g. 0.1.0]
+name: [Design System Name]
+description: [One-line description of the system's voice and personality.]
+colors:
+  primary: "[#hex]"
+  secondary: "[#hex]"
+  tertiary: "[#hex]"
+  neutral: "[#hex]"
+  surface: "[#hex]"
+  on-surface: "[#hex]"
+  border: "[#hex]"
+  muted: "[#hex]"
+  error: "[#hex]"
+typography:
+  headline-display:
+    fontFamily: "[Display Font]"
+    fontSize: "[CUSTOMIZE]"
+    fontWeight: 700
+    lineHeight: "[CUSTOMIZE]"
+    letterSpacing: "0px"
+  headline-lg:
+    fontFamily: "[Display Font]"
+    fontSize: "[CUSTOMIZE]"
+    fontWeight: 400
+    lineHeight: "[CUSTOMIZE]"
+    letterSpacing: "0px"
+  headline-md:
+    fontFamily: "[Display Font]"
+    fontSize: "[CUSTOMIZE]"
+    fontWeight: 400
+    lineHeight: "[CUSTOMIZE]"
+    letterSpacing: "0px"
+  headline-sm:
+    fontFamily: "[Display Font]"
+    fontSize: "[CUSTOMIZE]"
+    fontWeight: 400
+    lineHeight: "[CUSTOMIZE]"
+    letterSpacing: "0px"
+  body-lg:
+    fontFamily: "[Body Font]"
+    fontSize: "18px"
+    fontWeight: 400
+    lineHeight: "28px"
+    letterSpacing: "0px"
+  body-md:
+    fontFamily: "[Body Font]"
+    fontSize: "16px"
+    fontWeight: 400
+    lineHeight: "24px"
+    letterSpacing: "0px"
+  body-sm:
+    fontFamily: "[Body Font]"
+    fontSize: "14px"
+    fontWeight: 400
+    lineHeight: "20px"
+    letterSpacing: "0px"
+  label-lg:
+    fontFamily: "[UI Font]"
+    fontSize: "16px"
+    fontWeight: 500
+    lineHeight: "20px"
+    letterSpacing: "0px"
+  label-md:
+    fontFamily: "[UI Font]"
+    fontSize: "14px"
+    fontWeight: 500
+    lineHeight: "18px"
+    letterSpacing: "0px"
+  label-sm:
+    fontFamily: "[UI Font]"
+    fontSize: "12px"
+    fontWeight: 500
+    lineHeight: "16px"
+    letterSpacing: "0.04em"
+  overline:
+    fontFamily: "[UI Font]"
+    fontSize: "12px"
+    fontWeight: 700
+    lineHeight: "14px"
+    letterSpacing: "0.08em"
+  caption:
+    fontFamily: "[Body Font]"
+    fontSize: "12px"
+    fontWeight: 400
+    lineHeight: "16px"
+    letterSpacing: "0px"
+rounded:
+  none: 0px
+  sm: 4px
+  md: 8px
+  lg: 12px
+  xl: 16px
+  full: 9999px
+spacing:
+  xs: 8px
+  sm: 16px
+  md: 24px
+  lg: 40px
+  xl: 96px
+  gutter: "[CUSTOMIZE — primary column gutter]"
+  margin: "[CUSTOMIZE — outer page margin]"
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.neutral}"
+    typography: "{typography.label-lg}"
+    rounded: "{rounded.sm}"
+    padding: "8px 16px"
+    height: "40px"
+  button-primary-hover:
+    backgroundColor: "{colors.secondary}"
+    textColor: "{colors.neutral}"
+    typography: "{typography.label-lg}"
+    rounded: "{rounded.sm}"
+    padding: "8px 16px"
+    height: "40px"
+  button-secondary:
+    backgroundColor: "transparent"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.label-lg}"
+    rounded: "{rounded.sm}"
+    padding: "8px 16px"
+    height: "40px"
+  button-link:
+    backgroundColor: "transparent"
+    textColor: "{colors.primary}"
+    typography: "{typography.label-lg}"
+    rounded: "{rounded.none}"
+    padding: "0px"
+  card:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface}"
+    rounded: "{rounded.md}"
+    padding: "16px"
+  input:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.body-md}"
+    rounded: "{rounded.sm}"
+    padding: "8px 12px"
+    height: "40px"
+  chip:
+    backgroundColor: "{colors.muted}"
+    textColor: "{colors.on-surface}"
+    typography: "{typography.label-sm}"
+    rounded: "{rounded.full}"
+    padding: "4px 10px"
+  divider:
+    backgroundColor: "{colors.border}"
+    height: "1px"
+  badge:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.neutral}"
+    typography: "{typography.label-sm}"
+    rounded: "{rounded.full}"
+    padding: "2px 8px"
+
+## Overview
+[One paragraph: the system's design personality, target audience, and core visual principle. What feeling does it produce? What does it prioritize — density, warmth, authority, playfulness?]
+
+## Colors
+- **Primary ([#hex]):** [Role and usage intent — where this color appears and what it signals.]
+- **Secondary ([#hex]):** [Role and usage intent.]
+- **Tertiary ([#hex]):** [Role — supporting tone, metadata, subdued copy.]
+- **Surface ([#hex]):** [The primary canvas or card background.]
+- **On-surface ([#hex]):** [Default readable text on the surface color.]
+- **Border ([#hex]):** [Dividers, card edges, rule separators.]
+- **Muted ([#hex]):** [Low-emphasis backgrounds — chips, secondary panels.]
+- **Error ([#hex]):** [Alerts, error states, critical messaging.]
+
+## Typography
+[Describe the typographic voice: which font(s) carry display vs. body weight, why, and how the scale creates hierarchy. Note any letter-spacing conventions and the intended reading density.]
+
+## Layout
+[Describe the grid approach: column count, gutter, margin, and max-width strategy. Explain the spacing rhythm and how vertical whitespace is used. Note whether the system is fluid, fixed, or hybrid.]
+
+## Elevation & Depth
+[Describe the shadow / depth strategy: flat, subtle, layered? How is hierarchy established if not through elevation — typography, borders, spacing, color?]
+
+## Shapes
+[Describe the corner-radius language: which radii are used for which components, and what overall shape personality this creates — rectilinear, softly rounded, pill-heavy?]
+
+## Components
+[Describe the key interaction patterns: button hierarchy and states, card content structure, input appearance and focus behavior, chip/badge usage conventions, divider use. Reference tokens rather than hard values.]
+
+## Do's and Don'ts
+- Do [CUSTOMIZE — key usage rule aligned with the system's core principle]
+- Do [CUSTOMIZE]
+- Do [CUSTOMIZE]
+- Don't [CUSTOMIZE — pattern that violates the system's voice]
+- Don't [CUSTOMIZE]
+- Don't [CUSTOMIZE]

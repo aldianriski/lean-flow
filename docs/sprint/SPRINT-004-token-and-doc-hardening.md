@@ -84,10 +84,10 @@ outside the core doc set, never auto-created (it's stack-specific + part-HOW, a 
 DOCS_Guide notes it + a one-line WHY/WHERE carve-out.
 
 **DoD:**
-- [ ] `DESIGN.MD.template` renamed → `DESIGN.md.template` (casing)
-- [ ] NYT-specific values genericized to `[CUSTOMIZE]`/`[bracket]` placeholders per template convention
-- [ ] registered in lean-doc-generator as **OPTIONAL, non-core, frontend-only** (offered only for UI projects, never auto-created)
-- [ ] DOCS_Guide notes it as a tier/optional doc **outside the core set**, with its create trigger + a one-line carve-out from the WHY/WHERE rule (spec/contract artifact)
+- [x] `DESIGN.MD.template` renamed → `DESIGN.md.template` (casing — forced via temp on Windows)
+- [x] NYT-specific values genericized to `[CUSTOMIZE]`/`[bracket]` placeholders per template convention (full skeleton + section order kept)
+- [x] registered in lean-doc-generator as **OPTIONAL, non-core, frontend-only** (offered only for UI projects, never auto-created)
+- [x] DOCS_Guide notes it as a tier/optional doc **outside the core set**, with its create trigger + a one-line carve-out from the WHY/WHERE rule (spec/contract artifact)
 
 ### T5 — migrate: consolidation sweep (adopt + clean) `[size: M · risk: med]`
 Layers: `skills/lean-doc-generator/references/migration-map.md` · `skills/lean-doc-generator/SKILL.md`
@@ -146,6 +146,15 @@ Session model (release-flow sensitivity). Close now **invokes** `/release-patch`
 step 1) + worked examples (flat `VERSION` · changelog-only). Not merged — stays standalone.
 release-patch 79 → 94 ≤ 110.
 
+### 2026-06-12 | T4 | optional frontend-only DESIGN.md template via sonnet dispatch (4/4 DoD)
+Case-rename `DESIGN.MD`→`DESIGN.md.template` done session-side (Windows case trick). Dispatched
+genericization + wiring to a `sonnet` subagent: NYT specifics stripped to bracket placeholders while
+the full token skeleton + 8 body sections are preserved; registered in lean-doc SKILL (88 ≤ 110) as
+OPTIONAL · non-core · frontend-only · never auto-created; DOCS_Guide carve-out added (outside §2 core,
+create trigger, WHY/WHERE exemption as a spec/contract artifact). Reviewed: clean. *Minor:* SKILL red
+flag "a new file outside the core set" reads absolute — DESIGN is sanctioned via its registration; left
+as-is (red flag targets ad-hoc files).
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -162,6 +171,9 @@ release-patch 79 → 94 ≤ 110.
 | `skills/release-patch/SKILL.md` | T3 | changelog-only mode + flat/changelog examples; desc updated | Low | 94 ≤ 110 |
 | `skills/lean-doc-generator/SKILL.md` | T3 | close row: prompt → **invoke** `/release-patch` | Low | reads cleanly |
 | `skills/flow/SKILL.md` | T3 | close step: prompt → **invoke** `/release-patch` | Low | reads cleanly |
+| `skills/lean-doc-generator/templates/DESIGN.md.template` | T4 | renamed + genericized (NYT → placeholders); new optional template | Low | skeleton intact |
+| `skills/lean-doc-generator/SKILL.md` | T3·T4 | close invoke; +DESIGN optional/non-core registration | Low | 88 ≤ 110 |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T4 | DESIGN.md carve-out (outside core set + WHY/WHERE exemption) | Low | reads cleanly |
 
 ## Retro
 <!-- Written at close. Route the buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·

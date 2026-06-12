@@ -61,6 +61,14 @@ Before creating any new file → ask "can this live in a code comment?" If yes �
 **Create lazily.** Only create a doc when you have something concrete to write — an empty scaffold is
 not a doc. Don't pre-create `DECISIONS.md` / `docs/adr/` / a glossary until the first real entry exists.
 
+**DESIGN.md — optional, frontend-only, outside the core set.**
+`docs/DESIGN.md` (or the repo's design dir) · template `templates/DESIGN.md.template`.
+Create trigger: a frontend/UI project wants a shared design-system / token contract.
+WHY/WHERE carve-out: exempt from the "never document HOW" golden rule because it is a **spec/contract
+artifact** — it defines agreed tokens and components (as SPRINT captures WHAT/WHEN). It carries its
+own design-token frontmatter instead of the §3 ownership header. Never auto-create; never add to the
+core doc generation loop; never listed in the §2 table.
+
 ---
 
 ## §3 — Ownership header (mandatory on every doc)
