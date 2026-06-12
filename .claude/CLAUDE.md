@@ -46,6 +46,7 @@ resumes it. Every skill is also usable standalone. See `.claude/CONTEXT.md` for 
 ❌ HOW content in a doc — move it to a code comment.
 ❌ Skill count or the loop changing without updating `.claude/CONTEXT.md` + README.
 ❌ `git push` inside `release-patch` — it stops at the gate, always.
+❌ Shipping a new behaviour **spec-only** — a new capability's final DoD must be *exercised once on real input* (the spec-only-debt trap: TD-001 · SPRINT-004 T3/T5 → L-007).
 
 ## Naming Conventions — files: kebab-case
 

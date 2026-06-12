@@ -18,8 +18,9 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-004 closed 2026-06-12, archived per §11; TASK-017's v1 gate still waits
-> on TASK-005 + TD-005)_
+> **SPRINT-005 — Conform & Validate** · status: active · 4 tasks (TASK-005·023·024·025)
+> → [`docs/sprint/SPRINT-005-conform-and-validate.md`](docs/sprint/SPRINT-005-conform-and-validate.md)
+> _(TASK-017's v1 gate still waits on TASK-005 + TD-005)_
 
 ---
 
@@ -39,26 +40,10 @@ status: current
 
 ### P2 — Quality / Polish
 
-- [ ] **TASK-005 — Conform `/council` under the amended cap rule (ADR-006)** [size: S] [risk: low] [HITL]
-      done-when: advisor definitions + prompt templates + worked example → `skills/council/references/`; SKILL.md ≤ ~110 (when-to-use · 6-step outline · red flags · per-step read pointers); the amended cap rule written into CLAUDE.md/CONTEXT.md/DOCS_Guide §2 (resolves TD-002 + TD-004)
-      touches: `skills/council/` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `skills/lean-doc-generator/references/DOCS_Guide.md`
-      state: ready   (decision input: ADR-006, council-pressure-tested 2026-06-11)
-
-- [ ] **TASK-023 — Exercise the migrate consolidation sweep on a real repo** [size: S] [risk: low] [HITL]
-      done-when: `/lean-doc-generator migrate` run on a real repo with known duplicate/orphan/stale docs; consolidate + retire proposed, approved per-item, applied; archive-default + gated hard-delete confirmed; zero un-approved deletions (diff verified)
-      assumes: a repo with cleanup candidates is available (a dev-flow copy served prior migrate validation)
-      state: ready   (from SPRINT-004 T5 — spec shipped, unexercised; L-007)
-
-- [ ] **TASK-024 — Exercise changelog-only release-patch + diff-scoped review on real code** [size: S] [risk: low] [HITL]
-      done-when: on a manifestless repo, release-patch emits a changelog-only entry (no bump); on a real code diff, the diff-scoped review skip table fires correctly (security surface → `/security-review` · behaviour unchanged → skip `/verify` · already-read → skip `Explore`); both confirmed on real input
-      assumes: none
-      state: ready   (from SPRINT-004 T3 + T1b — spec/doc-exercised only; L-007)
-
-- [ ] **TASK-025 — Fix close→release-patch handoff for sprint scope (multi-commit + MINOR)** [size: S] [risk: med] [HITL]
-      done-when: release-patch (or the close step) scans the sprint range `plan_commit..HEAD`, not `HEAD~1..HEAD` (else the docs-only close commit makes it wrongly skip); a feature sprint (MINOR) is routed to a by-hand MINOR path instead of a PATCH bump / skip; documented in release-patch + the close step
-      touches: `skills/release-patch/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/orchestrator/SKILL.md`
-      assumes: none — discovered at SPRINT-004 close (T3 auto-handoff is wired but mis-scopes for a feature/multi-commit sprint)
-      state: ready   (from SPRINT-004 close)
+- TASK-005 — Conform `/council` under ADR-006 → promoted to SPRINT-005 (T1)
+- TASK-023 — Exercise migrate consolidation on a real repo → promoted to SPRINT-005 (T3)
+- TASK-024 — Exercise changelog-only + diff-scoped review on real code → promoted to SPRINT-005 (T4)
+- TASK-025 — Fix close→release-patch handoff (multi-commit + MINOR) → promoted to SPRINT-005 (T2)
 
 ### P3 — Long-term
 

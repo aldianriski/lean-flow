@@ -15,10 +15,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-007: New skill behaviour ships **spec-only** and goes unexercised until a later validation sprint — the last DoD of a new behaviour should be "exercised once on real input" (T1 did this deliberately; T3/T5 did not) → fix: TASK-023 · TASK-024
-- seen: Sprint-003 (TD-001 — migrate/council/verdict spec-only), Sprint-004 (T3 changelog-only, T5 consolidation)
-- count: 2
-- promoted: no   (promotion-eligible at next promote → a durable DoD rule)
+## L-007 → promoted: yes → CLAUDE.md anti-pattern ("a new behaviour's final DoD must be exercised once on real input"). Spec-only-debt trap; seen Sprint-003 (TD-001) + Sprint-004 (T3/T5); validation follow-ups TASK-023 · TASK-024.
 
 ---
 
