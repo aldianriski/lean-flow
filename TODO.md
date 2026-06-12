@@ -40,14 +40,15 @@ _(empty — TASK-026 shipped in SPRINT-006)_
 ### P3 — Long-term
 
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
-      done-when: decision recorded (ADR) on whether enforced gates are worth a hook — *after* learning hooks
-      state: blocked   (depends-on: learning Claude Code hooks)
-- [ ] **TASK-007 — Evaluate a tuned `recon` agent vs built-in `Explore`** [size: S] [risk: low] [HITL]
-      done-when: decision recorded — only if Explore's brief proves insufficient in real use
-      state: needs-info
-- [ ] **TASK-008 — Wire `/insights` → `LEARNINGS` governance feed** [size: S] [risk: low] [AFK]
-      done-when: friction from `/insights` flows into the §10 learnings review
-      state: needs-info
+      done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
+      next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
+      state: blocked   (deferred — research hooks next session)
+- [ ] **TASK-008 — Define `/insights`, then wire it → `LEARNINGS` §10 feed** [size: S] [risk: low] [HITL]
+      done-when: `/insights` is defined (what it produces) AND its friction output flows into the §10 learnings review
+      next: **define `/insights` first** — it's a planned idea, not built; a non-existent source can't be wired
+      state: needs-info   (clarify/define the source before building)
+
+> TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).
 
 ---
 
