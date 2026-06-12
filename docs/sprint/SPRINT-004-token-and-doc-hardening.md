@@ -38,11 +38,11 @@ diff-scoped review guidance; tier map in CONTEXT.md; exercised once on real work
 stays ≤ cap (detail lives in a reference — resolves the TD-003 overflow risk).
 
 **DoD:**
-- [ ] Tier-dispatch guidance added (session model for gates · grill · design · synthesis; `sonnet`/`opus` subagents via the Agent-tool `model:` override for advisors + bounded mechanical work; **spawn-with-brief, never a mid-session switch**)
-- [ ] Tier mapping recorded in `.claude/CONTEXT.md`
-- [ ] Diff-scoped review discipline added to orchestrator Review (each pass scoped to `git diff` + changed files + direct callers; skip table — docs/config/trivial → self-review · no security surface → skip `/security-review` · behaviour unchanged → skip `/verify` · already-read → skip `Explore`; small diffs folded; security separate only with a real surface)
-- [ ] Review-discipline detail pushed to a reference so `orchestrator/SKILL.md` stays ≤ ~110 (closes the TD-003 risk)
-- [ ] Exercised once on real work (a live review pass or subagent dispatch) and confirmed
+- [x] Tier-dispatch guidance added (session model for gates · grill · design · synthesis; `sonnet`/`opus` subagents via the Agent-tool `model:` override for advisors + bounded mechanical work; **spawn-with-brief, never a mid-session switch**)
+- [x] Tier mapping recorded in `.claude/CONTEXT.md`
+- [x] Diff-scoped review discipline added to orchestrator Review (each pass scoped to `git diff` + changed files + direct callers; skip table — docs/config/trivial → self-review · no security surface → skip `/security-review` · behaviour unchanged → skip `/verify` · already-read → skip `Explore`; small diffs folded; security separate only with a real surface)
+- [x] Review-discipline detail pushed to a reference so `orchestrator/SKILL.md` stays ≤ ~110 (closes the TD-003 risk — now 107)
+- [ ] Exercised once on real work (a live review pass or subagent dispatch) and confirmed — *pending T2's sonnet dispatch*
 
 ### T2 — Spec-polish bundle: 9 SPRINT-003 cold-run frictions `[size: S · risk: low]`
 Layers: `skills/prime` · `skills/task-decomposer` · `skills/orchestrator` · `skills/lean-doc-generator/references/migration-map.md` · `templates/TODO.md.template` · `README.md`
@@ -124,11 +124,23 @@ SPRINT-004 rendered from the Backlog (TASK-018·019·020·021·022) via `/lean-d
 Governance: no learnings at count ≥ 2 (no promotions); TD-002/003/004 flagged overdue (≥3 sprints) —
 TD-003 folded into T1's DoD, TD-002/004 deferred with TASK-005; no doc-aging due. Plan frozen.
 
+### 2026-06-12 | T1 (a+b) | tier-routing + diff-scoped review landed (4/5 DoD)
+Two-pass execution per A2. **T1a**: tier map → CONTEXT.md (new "Model tiers" section); terse pointers
+in orchestrator (Phases), council (step 2 note: advisors/reviewers/research → `sonnet`, chairman →
+session), task-decomposer (recon → cheap-tier). **T1b**: diff-scoped review + skip table; detail moved
+to `skills/orchestrator/references/review-scoping.md`, Review section trimmed → `orchestrator/SKILL.md`
+**107 ≤ 110** (TD-003 risk closed). DoD-5 "exercised once" deferred to T2's live sonnet dispatch.
+**Debt note:** CONTEXT.md 137 → 151 (TD-005 cap-overrun worsened, deliberate — deferred with TASK-005).
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `.claude/CONTEXT.md` | T1a | new "Model tiers" tier map (token discipline SSOT) | Low | line-count + pointers resolve |
+| `skills/orchestrator/SKILL.md` | T1a/b | tier-dispatch bullet + diff-scoped Review summary | Low | 107 ≤ 110 cap |
+| `skills/orchestrator/references/review-scoping.md` | T1b | new — diff-scoping + skip table + self-review (TD-003 detail offload) | Low | created; SKILL points to it |
+| `skills/council/SKILL.md` | T1a | step-2 tier note (advisors/reviewers cheap, chairman session) | Low | reads cleanly |
+| `skills/task-decomposer/SKILL.md` | T1a | recon → cheap-tier note | Low | reads cleanly |
 
 ## Retro
 <!-- Written at close. Route the buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·

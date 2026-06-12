@@ -57,6 +57,10 @@ only what is still open — one question at a time, recommend an answer each tim
 >
 > **Drive with `/goal`** — set a `/goal` equal to the task's done-when / acceptance so execution keeps
 > working across turns until it's verifiably met (Goal-Driven Execution, native), then clear it.
+>
+> **Dispatch by tier** — gates · grill · design · synthesis stay on the session model; send recon and
+> *well-specced mechanical* implement work to a cheap-tier `sonnet` subagent (Agent-tool `model:`
+> override) with a self-contained brief. Tier map → `.claude/CONTEXT.md`.
 
 ### quick
 1. **Parse** — restate the task as a verifiable goal; confirm in one line.
@@ -82,21 +86,17 @@ Operates on the active sprint file `docs/sprint/SPRINT-NNN-<slug>.md` (its Plan 
 
 ## Review
 
-Run the checks in a **fresh, isolated context** (a subagent / separate pass), not inline — a reviewer
-that didn't write the code catches more, and the heavy work stays out of the main loop:
-- **Non-trivial diff → `/code-review`** (independent context beats self-review).
-- **Real behaviour change → `/run`** to drive the app + **`/verify`** it does what the goal stated.
-- **Cleanup pass → `/simplify`** (reuse / simplification / efficiency; pairs with `/refactor-advisor`).
-- **Auth / input / secrets / data exposure → `/security-review` as its own uncontaminated pass** (security in the same session = context contamination — keep it separate).
+Run checks in a **fresh, isolated context** (subagent / separate pass), not inline — a reviewer that
+didn't write the code catches more, and the heavy work stays out of the main loop. **Scope every pass
+to the diff + its blast radius** (`git diff` + changed files + direct callers) — never survey the whole
+repo (the fan-out re-scan is the biggest token sink). A **skip table** decides which passes fire:
+docs/trivial → self-review only · no security surface → skip `/security-review` · unchanged behaviour →
+skip `/verify` · already-read → skip `Explore`; small diffs fold into one pass.
 
-For **doc-only / delete-only / trivial** diffs the self-review checklist below is enough. A bug suspected → `/diagnose`.
+- **Non-trivial diff → `/code-review`** · **behaviour change → `/run` + `/verify`** · **cleanup → `/simplify`** · **auth/input/secrets → `/security-review` as its own uncontaminated pass** · **bug → `/diagnose`**.
+- **Doc-only / delete-only / trivial** → the self-review checklist is the floor.
 
-**Self-review checklist** (the trivial-diff floor):
-- [ ] Does the diff do exactly what the goal stated — nothing more?
-- [ ] Edge cases / error paths handled?
-- [ ] No secret, debug print, or commented-out block left behind?
-- [ ] Tests or a manual check confirm the behavior?
-- [ ] Adjacent files left consistent (no half-renamed symbols)?
+Full routing · skip table · self-review checklist → `references/review-scoping.md`.
 
 ## Red flags
 

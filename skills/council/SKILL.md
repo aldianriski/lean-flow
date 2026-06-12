@@ -123,6 +123,8 @@ Save the framed question for the transcript.
 
 ### step 2: convene the council (5 sub-agents in parallel)
 
+> **Tier:** the dispatched roles — advisors (step 2), peer reviewers (step 3), the research pass (step 1C) — run on **cheap-tier `sonnet`** sub-agents (Agent-tool `model:` override); only the **chairman synthesis (step 4) stays on the session model** (the high-judgment step). Tier map → `.claude/CONTEXT.md`.
+
 Spawn all 5 advisors simultaneously as sub-agents. Each gets:
 
 1. Their advisor identity and thinking style (from the descriptions above)

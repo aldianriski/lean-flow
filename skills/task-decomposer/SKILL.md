@@ -25,7 +25,7 @@ For a ticket, fetch the description first (ask the user to paste if credentials 
 
 ## Procedure
 
-1. **Clarify — the grill** *(freeform / ticket only)* — ambiguity is cheapest to kill at intake. Ask ONE question at a time, each with a recommended answer; explore the codebase before asking. For mature / unfamiliar code, **recon first via the `Explore` agent** (existing impl + tests + deps → a tight brief, in its own context). Moves:
+1. **Clarify — the grill** *(freeform / ticket only)* — ambiguity is cheapest to kill at intake. Ask ONE question at a time, each with a recommended answer; explore the codebase before asking. For mature / unfamiliar code, **recon first via the `Explore` agent** (existing impl + tests + deps → a tight brief, in its own context — a cheap-tier `sonnet` pass; the grill itself stays on the session model. Tier map → `CONTEXT.md`). Moves:
    - **Challenge the glossary** — a term conflicts with `CONTEXT.md`? Surface it: "your glossary says X, you seem to mean Y — which?"
    - **Sharpen fuzzy language** — replace an overloaded word ("account", "user") with a precise canonical term; feed a newly-pinned term straight to `/lean-doc-generator` (glossary), don't batch.
    - **Invent edge-case scenarios** — concrete cases that force the boundaries between concepts to be made explicit.

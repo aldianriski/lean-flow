@@ -88,6 +88,19 @@ Humans approve gates — the skill never self-approves. Review is a self-review 
 | `mvp` | G1 + G2 | feature work, medium+, multi-step |
 | `sprint-bulk` | G1+G2 once | auto-loop the Active Sprint task list |
 
+## Model tiers (token discipline)
+
+Decide on the **session model**; dispatch bounded work to cheap-tier subagents — never switch models mid-session.
+
+| Work | Tier |
+|---|---|
+| Gates (G1/G2) · grill · design · synthesis · review *judgment* | **session model** (main loop) |
+| Council advisors + peer review · recon (`Explore`) · well-specced *mechanical* edits (doc/spec/boilerplate) | **cheap-tier subagent** — `sonnet` (`opus` if reasoning-heavy) via the Agent-tool `model:` override |
+
+**Contract — spawn-with-brief, never a mid-session switch.** Context isn't portable, so each dispatch
+carries a self-contained brief (spec · files · acceptance — the AFK durable-spec rule). G1/G2 + the
+review pass guard cheap-executor quality.
+
 ## Sprint model
 
 - **`TODO.md`** = the **Backlog pool** (P0–P3) + Tech Debt; `/triage` grooms it. Its § Active Sprint is just a pointer.
