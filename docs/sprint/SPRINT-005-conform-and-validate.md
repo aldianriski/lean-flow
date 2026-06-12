@@ -49,9 +49,9 @@ mis-bumped. Close the gap. (TASK-025)
 **Acceptance:** the close→release path handles a multi-commit sprint and routes MINOR by hand correctly.
 
 **DoD:**
-- [ ] release-patch (or the close step) scans the sprint range `plan_commit..HEAD`, not `HEAD~1..HEAD`
-- [ ] a feature sprint (MINOR) routes to a documented by-hand MINOR path, not a PATCH bump / skip
-- [ ] documented in release-patch + the close step (lean-doc / orchestrator); caps held
+- [x] release-patch scans the sprint range `plan_commit..HEAD` at close (default `HEAD~1..HEAD` kept for standalone hotfix — A3)
+- [x] feature sprint (MINOR) routes to a documented by-hand path at all 3 close callsites (orchestrator · lean-doc · flow), not a PATCH bump / skip
+- [x] documented in release-patch (step 1 + when-to-invoke) + the close steps; caps held (orchestrator 107)
 
 ### T3 — Exercise the migrate consolidation sweep on a real repo `[size: S · risk: low]`
 Layers: validation run (exercises `migration-map.md`; fixes only if a bug surfaces)
@@ -104,6 +104,13 @@ amended in CLAUDE.md (×2) + DOCS_Guide §2 to ADR-006 wording (artifacts in `re
 council-exception dropped — it now conforms. **TD-002 + TD-004 resolved** (route at close). CONTEXT.md
 intentionally untouched (cap rule wasn't there; A2 — don't worsen TD-005).
 
+### 2026-06-12 | T2 | close→release-patch handoff fixed (3/3 DoD)
+Session model. release-patch step 1 now scans `plan_commit..HEAD` at sprint close (default
+`HEAD~1..HEAD` kept for standalone hotfix — A3); when-to-invoke notes the close routing. The 3 close
+callsites (orchestrator step 6 · lean-doc close row · flow close) route **fixes-only → `/release-patch`
+(PATCH) · feature sprint → MINOR by hand**. Caps held (orchestrator 107 · release-patch 97). This is
+the exact gap hit at SPRINT-004 close.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -114,6 +121,10 @@ intentionally untouched (cap rule wasn't there; A2 — don't worsen TD-005).
 | `skills/council/references/example.md` | T1 | new — worked example (artifact) | Low | SKILL points to it |
 | `.claude/CLAUDE.md` | T1 | cap rule amended (procedure + scaffolding; artifacts → references/, ADR-006); council exception dropped | Low | 64 ≤ 80 |
 | `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §2 SKILL cap statement (ADR-006) added | Low | reads cleanly |
+| `skills/release-patch/SKILL.md` | T2 | sprint-range scan (`plan_commit..HEAD`) + close-routing note | Med | 97 ≤ 110 |
+| `skills/orchestrator/SKILL.md` | T2 | step 6: PATCH-vs-MINOR close routing | Low | 107 ≤ 110 |
+| `skills/lean-doc-generator/SKILL.md` | T2 | close row: PATCH-vs-MINOR routing | Low | 89 ≤ 110 |
+| `skills/flow/SKILL.md` | T2 | close step: PATCH-vs-MINOR routing | Low | 47 ≤ 110 |
 
 ## Retro
 <!-- Written at close. Route the buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·

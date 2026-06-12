@@ -19,6 +19,9 @@ step is a hard human gate before push — this skill never pushes.
 Do **not** use for MINOR (new feature/skill) or MAJOR (breaking) bumps — those are governance
 decisions; bump those manifests by hand with an explicit changelog entry.
 
+At **sprint close** the close step routes here **only for a fixes-only sprint** (PATCH); a sprint that
+shipped new capabilities is a **MINOR by-hand** bump (it scans `plan_commit..HEAD` to tell — see step 1).
+
 ## Mode-detection cascade
 
 First match wins. Priority: plugin > npm > python > cargo > go > flat.
@@ -35,7 +38,7 @@ First match wins. Priority: plugin > npm > python > cargo > go > flat.
 
 ## Steps
 
-1. **Diff scan** — `git diff --name-only HEAD~1 HEAD` (or `HEAD` if uncommitted). If every changed path is under `docs/`, abort: `[skip] docs-only diff — no version bump`. Exit.
+1. **Diff scan** — `git diff --name-only HEAD~1 HEAD` (or `HEAD` if uncommitted). **At sprint close → scan the whole sprint range `plan_commit..HEAD`** (read `plan_commit` from the just-closed sprint frontmatter) — else a multi-commit sprint is misjudged by its docs-only close commit. If every changed path is under `docs/`, abort: `[skip] docs-only diff — no version bump`. Exit.
 2. **Mode detect** — run the cascade; save the mode + manifest path(s). No manifest → **changelog-only mode** (below); do not exit.
 3. **PATCH bump** — increment the patch digit per mode. Plugin: verify both files are equal, then bump both. Single-manifest modes: read → bump → write. Go: prompt for the tag string.
 4. **CHANGELOG entry** — detect `docs/CHANGELOG.md` (canonical placement, DOCS_Guide §2), else `CHANGELOG.md` / `CHANGES.md` / `HISTORY.md` at the repo root (default `docs/CHANGELOG.md`). Prepend a new block matching the file's existing entry shape; if empty/missing, use Keep-a-Changelog format.
