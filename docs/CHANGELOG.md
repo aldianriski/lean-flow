@@ -11,6 +11,16 @@ status: current
 
 ---
 
+## v0.3.0 — Token & Doc Hardening (2026-06-12)
+
+MINOR release — new capabilities, so not a PATCH; bumped **by hand** (`release-patch` is PATCH-only).
+Ships SPRINT-004 (block below): model-tier routing + diff-scoped review (token discipline) · 9
+spec-polish frictions · release-patch changelog-only mode + close auto-handoff · optional
+frontend-only DESIGN.md template · migrate "adopt + clean" consolidation. Manifests bumped in lockstep
+(`plugin.json` + `marketplace.json` → 0.3.0). Skill `version:` frontmatter left untouched (owner call).
+
+---
+
 ## Sprint 004 — Token & Doc Hardening (closed 2026-06-12)
 
 Cut the post-change token cost and hardened the doc/flow specs from the owner's improvement list.

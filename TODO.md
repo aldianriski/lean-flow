@@ -54,6 +54,12 @@ status: current
       assumes: none
       state: ready   (from SPRINT-004 T3 + T1b — spec/doc-exercised only; L-007)
 
+- [ ] **TASK-025 — Fix close→release-patch handoff for sprint scope (multi-commit + MINOR)** [size: S] [risk: med] [HITL]
+      done-when: release-patch (or the close step) scans the sprint range `plan_commit..HEAD`, not `HEAD~1..HEAD` (else the docs-only close commit makes it wrongly skip); a feature sprint (MINOR) is routed to a by-hand MINOR path instead of a PATCH bump / skip; documented in release-patch + the close step
+      touches: `skills/release-patch/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/orchestrator/SKILL.md`
+      assumes: none — discovered at SPRINT-004 close (T3 auto-handoff is wired but mis-scopes for a feature/multi-commit sprint)
+      state: ready   (from SPRINT-004 close)
+
 ### P3 — Long-term
 
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
