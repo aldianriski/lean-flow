@@ -98,10 +98,10 @@ so adoption also cleans house — gated, never silent, never deleting content wi
 proposal HITL.
 
 **DoD:**
-- [ ] migrate consolidation phase added: detect duplicates (same content 2+ places), orphans (no inbound links), stale/superseded (contradicts code / very old)
-- [ ] migration-map.md gains **consolidate** (merge dupes) + **retire** (archive by default; hard-delete only on explicit per-item approval)
-- [ ] every proposal HITL, never silent, never deletes content without approval
-- [ ] SKILL.md migrate blurb updated to "adopt + clean"
+- [x] migrate consolidation phase added: detect duplicates (same content 2+ places), orphans (no inbound links), stale/superseded (contradicts code / very old) — heuristic, proposes only
+- [x] migration-map.md gains **consolidate** (merge dupes) + **retire** (archive by default; hard-delete only on explicit per-item approval)
+- [x] every proposal HITL, never silent, never deletes content without approval (surgical rule reconciled)
+- [x] SKILL.md migrate blurb updated to "adopt + clean"
 
 ## Owner-action checklist
 - [ ] None — all tasks are dev/spec work.
@@ -155,6 +155,13 @@ create trigger, WHY/WHERE exemption as a spec/contract artifact). Reviewed: clea
 flag "a new file outside the core set" reads absolute — DESIGN is sanctioned via its registration; left
 as-is (red flag targets ad-hoc files).
 
+### 2026-06-12 | T5 | migrate consolidation sweep — adopt + clean (4/4 DoD)
+Session model (deletion-safety). migration-map: step-1 clean-sweep scan (dupes · orphans ·
+stale/superseded, heuristic) + two new plan actions — **consolidate** (merge dupes, fix inbound links)
+and **retire** (archive default; hard-delete only on explicit per-item approval). Surgical "never
+delete" rule reconciled with the one gated deletion exception. lean-doc SKILL migrate blurb + heading
+→ "adopt + clean" (89 ≤ 110). **All five tasks complete.**
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -174,6 +181,8 @@ as-is (red flag targets ad-hoc files).
 | `skills/lean-doc-generator/templates/DESIGN.md.template` | T4 | renamed + genericized (NYT → placeholders); new optional template | Low | skeleton intact |
 | `skills/lean-doc-generator/SKILL.md` | T3·T4 | close invoke; +DESIGN optional/non-core registration | Low | 88 ≤ 110 |
 | `skills/lean-doc-generator/references/DOCS_Guide.md` | T4 | DESIGN.md carve-out (outside core set + WHY/WHERE exemption) | Low | reads cleanly |
+| `skills/lean-doc-generator/references/migration-map.md` | T2·T5 | inbound-link step (T2); clean-sweep scan + consolidate/retire actions (T5) | Med | rule reconciled |
+| `skills/lean-doc-generator/SKILL.md` | T3·T4·T5 | close invoke; DESIGN registration; migrate "adopt + clean" blurb | Low | 89 ≤ 110 |
 
 ## Retro
 <!-- Written at close. Route the buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·

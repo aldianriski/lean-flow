@@ -2,15 +2,21 @@
 
 Used by `/lean-doc-generator migrate`. Brings an existing repo's documentation into lean-flow's
 **placement · format · wiring** — whether the repo ran **dev-flow**, **adlc-flow**, or just has its
-own ad-hoc docs. Goal: you don't hand-reconcile, and you're not lost in your own existing code.
+own ad-hoc docs — **and cleans house**: consolidates duplicates and retires dead docs. Goal: you
+don't hand-reconcile, and you're not lost in your own existing code.
 
 ## Procedure (HITL · surgical)
 
 1. **Detect** — scan for docs and identify the source pattern: dev-flow / adlc-flow footprint (known
    mappings below) or **generic** (any other layout). List what was found.
+   - **Clean-sweep scan** — also flag **duplicates** (same content in two+ places), **orphans** (no
+     inbound links from any doc/code), and **stale/superseded** (contradicts current code, or
+     `last_updated` long past §3's 60-day flag). Heuristic only — flags for human judgment, never an
+     auto-verdict.
 2. **Plan** — for *each* existing doc, propose one action: **keep · reformat · relocate · split ·
-   index · archive · leave (out of scope)** — with its lean-flow target and a one-line why. Present
-   the whole plan; **wait for approval**. Never start rewriting before the human signs off.
+   index · archive · consolidate · retire · leave (out of scope)** — with its lean-flow target and a
+   one-line why. Present the whole plan; **wait for approval**. Never start rewriting before the human
+   signs off.
 3. **Apply incrementally** — preserve **content**; change only format / placement / wiring. Update
    cross-references so the loop works (`DECISIONS` index ↔ `docs/adr/`, TODO § Active Sprint pointer,
    `/prime` read-order). Flag anything ambiguous instead of guessing.
@@ -19,10 +25,24 @@ own ad-hoc docs. Goal: you don't hand-reconcile, and you're not lost in your own
 
 ## Surgical rules
 
-- **Never delete pre-existing content** — reformat/relocate it, or surface it and ask. Content is the user's; format is ours.
+- **Never delete pre-existing content silently** — reformat/relocate/archive it, or surface it and ask. Content is the user's; format is ours. The **only** sanctioned deletion is `retire`-by-hard-delete, and only on **explicit per-item approval** (below) — never a batch "delete all".
 - WHY/WHERE only — if a migrated doc explains HOW, that line moves to a code comment (DOCS_Guide §5).
 - **Out-of-scope artifacts stay untouched + noted** — anything lean-flow doesn't own (adlc-flow's ADLC artifacts, app-specific docs, generated files). Don't "tidy" them.
 - One doc at a time; show the before→after shape for each.
+
+## Consolidate & retire (the clean sweep)
+
+Adoption isn't only alignment — a long-lived repo accrues dead and duplicated docs. Two actions clean
+that up, both **HITL and per-item** (never silent, never batched):
+
+- **consolidate** — two+ docs cover the same ground → merge into one canonical file, fold in any unique
+  content, fix inbound links to point at the survivor. Nothing is lost; the duplicates collapse.
+- **retire** — a doc is dead (orphaned · superseded · contradicted by current code). Default is
+  **archive** (move → `docs/archive/`, content intact). **Hard-delete is offered only when the user
+  explicitly approves that item** — the one sanctioned deletion; git keeps the history regardless.
+
+Detection (step 1) is heuristic — duplicate-content match · inbound-link graph · `last_updated` age ·
+code contradiction — and only ever **proposes**; the human decides consolidate vs retire vs keep.
 
 ## Placement — relocate to the canonical layout (DOCS_Guide §2)
 

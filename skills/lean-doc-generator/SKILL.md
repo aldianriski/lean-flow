@@ -38,16 +38,17 @@ template ship inside this skill under `${CLAUDE_SKILL_DIR}/`.
 | `/lean-doc-generator <type> <subject>` | Create/update one core file |
 | `/lean-doc-generator promote` | Sprint Promote (below) |
 | `/lean-doc-generator close` | Sprint Close (below) |
-| `/lean-doc-generator migrate` | **Adopt** existing docs (dev-flow · adlc-flow · any layout) into the lean-flow standard — placement, format, wiring. Plan → approve → apply. |
+| `/lean-doc-generator migrate` | **Adopt + clean** existing docs (dev-flow · adlc-flow · any layout) — align placement/format/wiring, **consolidate dupes, retire dead docs**. Plan → approve → apply. |
 
-## Migrate (adopt existing docs)
+## Migrate (adopt + clean existing docs)
 
 For a repo that already has documentation — ran dev-flow / adlc-flow, or has its own ad-hoc docs —
-align it to lean-flow's **placement · format · wiring** so you don't hand-reconcile or get lost in
-existing code. **HITL + surgical**: detect → propose a per-file plan (keep / reformat / relocate /
-split / index / archive / leave) → **wait for approval** → apply incrementally; never delete
-pre-existing content, never touch out-of-scope artifacts. Full mapping + procedure →
-`${CLAUDE_SKILL_DIR}/references/migration-map.md`.
+align it to lean-flow's **placement · format · wiring**, and **clean house** (consolidate duplicates,
+retire dead docs), so you don't hand-reconcile or get lost in existing code. **HITL + surgical**:
+detect (incl. dupes / orphans / stale) → propose a per-file plan (keep / reformat / relocate / split /
+index / archive / consolidate / retire / leave) → **wait for approval** → apply incrementally; never
+delete content without explicit per-item approval, never touch out-of-scope artifacts. Full mapping +
+procedure → `${CLAUDE_SKILL_DIR}/references/migration-map.md`.
 
 ## Execution flow
 
