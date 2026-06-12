@@ -31,11 +31,7 @@ status: current
 
 ### P1 — Next Phase Required
 
-- [ ] **TASK-017 — v1.0 release checklist (umbrella)** [size: S] [risk: low] [HITL]
-      done-when: TASK-003 · 005 · 013–016 closed; TD-005 resolved (CONTEXT ≤ cap or cap revised); final link/path consistency grep clean; manifests bumped 1.0.0 lockstep
-      touches: `.claude-plugin/` · `docs/CHANGELOG.md`
-      depends-on: none — all blockers cleared (TASK-005 + TD-005 via SPRINT-005/006; TASK-003 · 013…016 via SPRINT-003)
-      state: ready   (v1.0 — all gates clear; final link/path grep + 1.0.0 lockstep bump remain)
+- TASK-017 — v1.0 release checklist → **shipped in v1.0.0** (2026-06-12): consistency grep clean · manifests 1.0.0 lockstep
 
 ### P2 — Quality / Polish
 

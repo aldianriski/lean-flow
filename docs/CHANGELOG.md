@@ -11,6 +11,24 @@ status: current
 
 ---
 
+## v1.0.0 — First stable (2026-06-12)
+
+MAJOR milestone — lean-flow is production-ready. TASK-017 (v1.0 checklist) closed: every prior TD
+resolved (TD-001…005), the doc/skill set consistency-checked (all ADRs indexed, every skill
+`references/` pointer resolves), manifests bumped **1.0.0 lockstep**. Rolls up v0.3.0–v0.3.2:
+
+| Area | State at 1.0 |
+|---|---|
+| Token discipline | model-tier routing + diff-scoped review + review-depth scaling (single reviewer for small/med, `/code-review` fan-out for large/high-risk) |
+| Skills | 13 (11 stages + `/flow` + `/council`); `/council` conformed under ADR-006; all caps honoured |
+| Docs standard | DOCS_Guide + 12 templates (incl. optional DESIGN.md); CONTEXT SSOT deduped (ADR-007) |
+| Lifecycle | promote → sprint-bulk → close → release, with §10 governance + §11 retention; close routes PATCH vs MINOR |
+| migrate | adopt + clean (consolidate / retire, gated) — validated on real input |
+
+7 ADRs · learnings L-001…L-008 · no open tech debt. P3 backlog (hooks / recon / insights) parked.
+
+---
+
 ## v0.3.2 — Review Depth & Context Diet (2026-06-12)
 
 PATCH — fixes/refactor. Ships SPRINT-006 (block below): review depth scaled to diff size (single scoped

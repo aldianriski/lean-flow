@@ -1,6 +1,6 @@
 {
   "name": "lean-flow",
-  "version": "0.3.2",
+  "version": "1.0.0",
   "description": "Lean agentic dev loop for Claude Code: prime → lean-doc → orchestrate → repeat. Eleven standalone skills + an opt-in /flow conductor + a /council decision aid. No hooks, agent-free core — drop in and adapt.",
   "author": {
     "name": "Aldian Rizki",
