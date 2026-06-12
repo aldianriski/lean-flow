@@ -47,9 +47,9 @@ with rationale. (TASK-027)
 **Acceptance:** `CONTEXT.md` ≤ 100 **or** the cap is formally revised; no information lost; TD-005 resolved.
 
 **DoD:**
-- [ ] `.claude/CONTEXT.md` ≤ 100 via content diet (detail → references / trim) **OR** the cap formally revised in `DOCS_Guide §2` with rationale (→ ADR if it's a standard change)
-- [ ] no information lost (moved, not deleted); the SSOT still reads coherently
-- [ ] **TD-005 resolved** (mark in TODO at close)
+- [x] hybrid: **diet 151 → 127** (removed prose duplicating CLAUDE.md/README → pointers) **+ cap revised 100 → 130** in `DOCS_Guide §2`, recorded as **ADR-007**
+- [x] no information lost — dedup only; every unique fact kept (streams · task-states · tracker · tier contract · governance); SSOT reads coherently (127 ≤ 130)
+- [x] **TD-005 resolved** (marked in TODO at close)
 
 ## Owner-action checklist
 - [ ] None — both tasks are dev/spec work.
@@ -81,6 +81,17 @@ internal fan-out — the lever is reserving it for diffs that justify the cost.
 |------|------|--------------|------|------|
 | `skills/orchestrator/references/review-scoping.md` | T1 | "Scale depth to diff size" section + fixed skip-table row | Low | 66 lines |
 | `skills/orchestrator/SKILL.md` | T1 | Review section reflects the depth rule | Low | 107 ≤ 110 |
+| `.claude/CONTEXT.md` | T2 | dedup diet 151 → 127 (duplicated prose → pointers) | Med | 127 ≤ 130 |
+| `docs/adr/ADR-007-context-cap-ssot-density.md` | T2 | new — cap 100 → 130 rationale | Low | indexed |
+| `docs/DECISIONS.md` | T2 | ADR-007 index row | Low | resolves |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T2 | §2 CONTEXT cap 100 → 130 (ADR-007) | Low | reads cleanly |
+
+### 2026-06-12 | T2 | CONTEXT diet + cap revise (3/3 DoD) — TD-005 resolved
+Session model (SSOT, risk med). Hybrid per the G2 call: **dedup diet 151 → 127** (the loop diagram,
+curated-not-copied rationale, built-in-command detail, graphify orientation all duplicated CLAUDE.md/
+README → replaced with pointers; no unique fact lost) **+ modest cap revise 100 → 130** recorded as
+**ADR-007** (same logic as ADR-006 — a cap miscalibrated for a special doc-kind). DOCS_Guide §2 + DECISIONS
+index updated. TD-005 resolved.
 
 ## Retro
 <!-- Written at close. Route the buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·

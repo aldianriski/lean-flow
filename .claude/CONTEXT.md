@@ -1,75 +1,60 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-09
-update_trigger: Skill roster, the loop, gates, or modes changed
+last_updated: 2026-06-12
+update_trigger: Skill roster, the loop, gates, modes, or tiers changed
 status: current
 ---
 
 # lean-flow — CONTEXT
 
-Single source of truth for vocabulary, the loop, gates, and modes. README and CLAUDE.md defer here.
+Single source of truth for the loop, roster, gates, modes, tiers, and sprint model. README and
+CLAUDE.md defer here; this file points to their prose rather than duplicating it (cap: ADR-007).
 
 ## The loop
 
-```
-  /prime ──▶ /lean-doc-generator ──▶ /orchestrator ──┐
-   load           plan & document        build, gated │
-     ▲                                                 │
-     └──────────────── repeat ◀────────────────────────┘
-
-  session end → /handoff  (temp-dir doc)  → next session /prime reads it
-```
-
-Every skill is independently usable; the loop is just the order they reward most together.
+`/prime → /lean-doc-generator → /orchestrator → repeat` · session end → `/handoff` (temp-dir doc) →
+next `/prime` reads it. Every skill is independently usable; the loop is just the order they reward
+most together. (Diagram: README.)
 
 ## Skill roster (13 — 11 stage-skills · 1 conductor · 1 decision aid)
 
 | Skill | Role | One-line purpose |
 |---|---|---|
-| `/flow` | **conductor** | opt-in — drives the whole loop, calling the stage-skills in sequence; enforces gates + governance, never auto-approves |
+| `/flow` | **conductor** | opt-in — drives the whole loop, calling stage-skills in sequence; enforces gates + governance, never auto-approves |
 | `/prime` | entry | ordered context load + health check (read-only) |
-| `/lean-doc-generator` | plan | WHY/WHERE docs · ADRs · sprint promote/close · **migrate** existing docs to the standard — bundles its templates + standard |
+| `/lean-doc-generator` | plan | WHY/WHERE docs · ADRs · sprint promote/close · **migrate** (adopt + clean) — bundles templates + standard |
 | `/orchestrator` | build | gate-driven execution — `quick` · `mvp` · `sprint-bulk` |
-| `/task-decomposer` | feed | intent / ticket / PRD → `TASK-NNN` backlog entries — **the detailed grill lives here** (intake) |
+| `/task-decomposer` | feed | intent / ticket / PRD → `TASK-NNN` entries — **the detailed grill lives here** (intake) |
 | `/triage` | groom | re-prioritise + state the Backlog; flag stale/dupe/conflict; route rejects to `.out-of-scope/` |
-| `/prototype` | explore | throwaway code to answer one design question (logic TUI / web UI variants); capture → ADR/PRD, delete |
+| `/prototype` | explore | throwaway code to answer one design question; capture → ADR/PRD, delete |
 | `/tdd` | test-first | build NEW behaviour test-first — vertical-slice red-green-refactor |
 | `/diagnose` | fix | 6-phase systematic debugging with a regression test |
 | `/refactor-advisor` | deepen | find shallow→deep refactors (seams, deletion test); design the deepening |
 | `/release-patch` | ship | manifest-detect PATCH bump + changelog; stops before push |
 | `/handoff` | continuity | compact the conversation → temp-dir doc for the next session |
-| `/council` | decide | **opt-in, agent-using** — pressure-test a hard/ambiguous call via 5 advisors + peer review → `verdict-<slug>.md` → feed an ADR |
+| `/council` | decide | **opt-in, agent-using** — pressure-test a hard call via 5 advisors + peer review → `verdict-<slug>.md` → ADR |
 
-`/prototype` feeds the design stage: when G2's residual grill can't resolve a design on paper, prototype → fold the verdict into G2 + an ADR. `/council` feeds the decision stage: a hard-to-reverse / ambiguous call → pressure-test → `verdict-<slug>.md` → record as an ADR (§4). **Grill placement:** the detailed moves run at intake (`/task-decomposer` Clarify); G2 re-grills residuals only — an unconfirmed assumption blocks G2.
+**Grill placement:** detailed grill at intake (`/task-decomposer`); G2 re-grills residuals only (an
+unconfirmed assumption blocks G2). **Implement routing** (`/orchestrator`): new testable behaviour →
+`/tdd` · bug → `/diagnose` · hard-to-change → `/refactor-advisor` · docs/config/spike → direct.
+`/prototype` feeds design (G2 can't resolve on paper → prototype → fold into G2 + ADR); `/council`
+feeds decisions (hard/ambiguous fork → verdict → ADR §4).
 
-**Implement routing** (from `/orchestrator`): new testable behaviour → `/tdd` · bug / failing test → `/diagnose` · hard-to-change code → `/refactor-advisor` · docs/config/spike → direct.
+## Built-in leverage
 
-**Built-in leverage** — lean-flow ships **no agent definitions**; it leans on Claude Code's built-in agents *and* commands, so it duplicates nothing.
+lean-flow ships **no agents/hooks**; it leans on Claude Code's built-ins, dispatched in **isolated
+passes** (fresh context, lean main loop):
+- *Agents:* recon → `Explore` · review → `/code-review` (large/high-risk; small/med → one scoped `sonnet` reviewer) · behaviour → `/verify` · security → `/security-review` (own uncontaminated pass). `/council` orchestrates sub-agents internally.
+- *Commands:* `/goal` (drive-to-DoD at execution + `/flow`) · `/plan` (G2) · `/batch` (large disjoint `sprint-bulk` → worktree-per-unit; `/workflows` watches) · `/loop` (iteration + periodic governance) · `/run`+`/verify` (Review) · `/simplify` (cleanup) · `/fork`/`/background` (the isolated-pass mechanism).
+- Out of lean scope (too heavy): custom `/workflows`, `/ultracode`, `/ultraplan` / `/ultrareview` (cloud, billed).
 
-*Built-in agents* (dispatched in an **isolated pass**, not inline — fresh context + lean main loop): recon (mature/unfamiliar code) → `Explore` · review (non-trivial diff) → `/code-review` · verify behaviour → `/verify` · security (auth/input/secrets) → `/security-review` **as its own uncontaminated pass**. (`/council` is the one skill that orchestrates sub-agents *internally*.)
+**Standalone contract** — stage-skill cross-refs are routing *suggestions* (`→ /X`), never requirements;
+each completes its job invoked cold. Only inherent ordering: the sprint lifecycle. **`/flow` is the sole
+exception** — it *sequences* the stages, never re-implements one. **Feed pipeline:** `/task-decomposer`
+→ `/triage` → `/lean-doc-generator promote` → `/orchestrator`.
 
-*Built-in commands* wired at loop points:
-- `/goal <condition>` — drive across turns until met → set it to the DoD/acceptance at `/orchestrator` execution + `/flow` (Goal-Driven Execution, native).
-- `/plan` — plan mode at the **G2 Design** gate.
-- `/batch <instruction>` — parallel worktree execution for **large, disjoint `sprint-bulk`** runs (decompose → unit-per-subagent → PR each). The native parallel engine; `/workflows` watches it.
-- `/loop [interval]` — `sprint-bulk` iteration + **periodic governance** (drift / learnings review; `.claude/loop.md`).
-- `/run` + `/verify` — drive + confirm the app at **Review**.
-- `/simplify` — cleanup-only pass alongside `/refactor-advisor`.
-- `/fork` / `/background` — the mechanism for the isolated recon/review passes above.
-
-Out of lean scope (too heavy): authoring full custom `/workflows`, `/ultracode` auto-orchestration, `/ultraplan` / `/ultrareview` (cloud, billed).
-
-**Standalone contract** — every cross-reference between the **stage-skills** is a routing/handoff *suggestion* (`→ /X`), never a requirement; each completes its own job when invoked cold. The pipeline + routing are the optimal composition, not a dependency graph. Only inherent ordering: the sprint lifecycle (`promote` → execute → `close`). Keep it this way — a *stage-skill* that needs another to function breaks the contract. **`/flow` is the sole exception**: as the conductor it depends on the stages by design — but it only *sequences* them (calls each standalone skill), never re-implements a stage. So: à la carte (any skill alone) **or** conducted (`/flow` runs the lot).
-
-**Feed pipeline**: `/task-decomposer` (intake) → `/triage` (groom + re-prioritise) → `/lean-doc-generator promote` (form sprint) → `/orchestrator` (build).
-
-**Curated, not copied** — lean-flow's discipline is *review*, not a feature ban. dev-flow was brutal
-copy-everything-from-every-reference → doc/skill bloat. Here, every component was reviewed against
-"genuinely useful **and** important **and** actually used", and approved before adding. The bar is the
-review, not a rule against agents or hooks. So: the core loop is agent-free and there are no hooks —
-**because none earned their place yet**, not because they're forbidden. `/council` is in *because it
-cleared the bar* (a reviewed, opt-in agent skill). Anything new — including a hook or another agent —
-must clear the same bar first; never bulk-import from a reference.
+**Curated, not copied** — the discipline is *review*, not a feature ban; every component cleared
+"useful **and** important **and** actually used" before adding. Full rationale: CLAUDE.md · ADR-001.
 
 ## Gates
 
@@ -90,50 +75,42 @@ Humans approve gates — the skill never self-approves. Review is a self-review 
 
 ## Model tiers (token discipline)
 
-Decide on the **session model**; dispatch bounded work to cheap-tier subagents — never switch models mid-session.
+Decide on the **session model**; dispatch bounded work to cheap-tier subagents — never switch mid-session.
 
 | Work | Tier |
 |---|---|
 | Gates (G1/G2) · grill · design · synthesis · review *judgment* | **session model** (main loop) |
-| Council advisors + peer review · recon (`Explore`) · well-specced *mechanical* edits (doc/spec/boilerplate) | **cheap-tier subagent** — `sonnet` (`opus` if reasoning-heavy) via the Agent-tool `model:` override |
+| Council advisors + peer review · recon (`Explore`) · well-specced *mechanical* edits | **cheap-tier** — `sonnet` (`opus` if reasoning-heavy) via Agent-tool `model:` |
 
-**Contract — spawn-with-brief, never a mid-session switch.** Context isn't portable, so each dispatch
-carries a self-contained brief (spec · files · acceptance — the AFK durable-spec rule). G1/G2 + the
-review pass guard cheap-executor quality.
+**Contract — spawn-with-brief, never a mid-session switch.** Each dispatch carries a self-contained
+brief (spec · files · acceptance — the AFK durable-spec rule); G1/G2 + the review pass guard quality.
 
 ## Sprint model
 
-- **`TODO.md`** = the **Backlog pool** (P0–P3) + Tech Debt; `/triage` grooms it. Its § Active Sprint is just a pointer.
-- **`docs/sprint/SPRINT-NNN-<slug>.md`** = the **active sprint** working doc (`templates/SPRINT.md.template`): Theme · Scope · Plan (Tn + **DoD `[ ]`**) · Owner-action · Decisions→ADR · Assumptions · **Execution Log** (append-only; plan frozen at promote) · Files Changed · **Retro** (routed per §10).
-- Flow: `promote` renders the sprint file from the Backlog (sets `plan_commit`) → `sprint-bulk` loops its Plan DoD → execute appends to the Log → `close` writes the Retro, routes the buckets, sets `close_commit`. `/prime` counts open DoD across all active sprint files.
-- **Streams** (optional) — parallel work streams run one active sprint *each* (`stream:` frontmatter · one pointer per stream in TODO § Active Sprint); cross-stream file overlap → coordinate, never parallel-build. Single-stream repos omit `stream:` — unchanged.
+- **`TODO.md`** = Backlog pool (P0–P3) + Tech Debt; `/triage` grooms it; § Active Sprint is a pointer.
+- **`docs/sprint/SPRINT-NNN-<slug>.md`** = the active sprint (`SPRINT.md.template`): Theme · Scope · Plan (Tn + **DoD `[ ]`**) · Owner-action · Decisions→ADR · Assumptions · **Execution Log** (append-only; plan frozen at promote) · Files Changed · **Retro** (§10).
+- Flow: `promote` renders the sprint (sets `plan_commit`) → `sprint-bulk` loops the DoD → execute appends to the Log → `close` writes the Retro, routes buckets, sets `close_commit`. `/prime` counts open DoD.
+- **Streams** (optional) — parallel streams run one active sprint *each* (`stream:` frontmatter · one pointer per stream); cross-stream file overlap → coordinate, never parallel-build. Single-stream omits `stream:`.
 
 ## Doc standard
 
-The LEAN DOCUMENTATION STANDARD (WHY/WHERE, never HOW) lives in
-`skills/lean-doc-generator/references/DOCS_Guide.md`; canonical templates in
-`skills/lean-doc-generator/templates/`. The domain glossary lives in **`CONTEXT.md`** (this kind of file — opinionated canonical
-term + `_Avoid_:` synonyms). ADRs are offered only when a decision is hard-to-reverse **and**
-surprising **and** a real trade-off.
+LEAN DOCUMENTATION STANDARD (WHY/WHERE, never HOW) → `skills/lean-doc-generator/references/DOCS_Guide.md`;
+templates → `…/templates/`. The domain glossary lives **here** (canonical term + `_Avoid_:` synonyms).
+ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
 
-## Orientation / code mapping
+## Orientation
 
-Where-things-live = **`ARCHITECTURE.md`** (the durable, high-level map). lean-flow ships **no
-hand-maintained codemap** — a granular manual map rots without a refresh hook (LAW 3). A granular,
-queryable graph is **generated on demand, never hand-written**: if `graphify-out/graph.json` exists
-(the user runs [graphify](https://github.com/safishamsi/graphify)), `/prime` may use it for
-orientation — **optional, never a dependency**. No MCP / no external tool is required to run lean-flow.
+Where-things-live = **`ARCHITECTURE.md`**. lean-flow ships **no hand-maintained codemap** (it rots —
+LAW 3); a queryable graph is generated on demand — if `graphify-out/graph.json` exists, `/prime` may
+use it (optional, never a dependency). No MCP / external tool is required.
 
 ## Continuous learning governance
 
-Every iteration feeds the next (DOCS_Guide §10). At **Sprint Close**, the Retro auto-files four buckets:
-Shipped → `docs/CHANGELOG.md` · Tech debt → `TD-NNN` (TODO § Tech Debt) · Follow-ups → `TASK-NNN` (Backlog) ·
-Learnings → `L-NNN` (`docs/LEARNINGS.md`). At **Sprint Promote** (governance checkpoint):
-
-- **Promote learnings** — any `L-NNN` with `count ≥ 2, promoted: no` → write it into a durable rule
-  (a CLAUDE.md anti-pattern · a CONTEXT.md rule · a skill red-flag); mark `promoted: yes → <where>`.
-- **Age tech debt** — any `TD-NNN` unaddressed ≥ 3 sprints → re-review; `severity: high` → auto P1.
-- **Doc-aging** (DOCS_Guide §11) — compress any ledger past its retention trigger: Backlog tombstones (at close) · resolved-TD collapse · CHANGELOG rotation · LEARNINGS pointer-collapse · closed sprint → `docs/sprint/archive/`. Propose → approve, never silent.
+Every iteration feeds the next (DOCS_Guide §10). **Sprint Close** Retro auto-files four buckets:
+Shipped → `docs/CHANGELOG.md` · Tech debt → `TD-NNN` · Follow-ups → `TASK-NNN` · Learnings → `L-NNN`.
+**Sprint Promote** checkpoint: promote any `L-NNN` (`count ≥ 2, promoted: no`) into a durable rule
+(CLAUDE.md anti-pattern · CONTEXT rule · skill red-flag); age tech debt (≥3 sprints → re-review; `high`
+→ auto P1); doc-aging (§11) — compress ledgers past a retention trigger. Propose → approve, never silent.
 
 ## Task entry shape
 
@@ -143,9 +120,8 @@ Learnings → `L-NNN` (`docs/LEARNINGS.md`). At **Sprint Promote** (governance c
       touches:   <files / layers>
       assumes:   <key assumptions, or none>
       tracker:   <ticket URL, or none — justification>
-      state:     ready | needs-info | blocked   (Backlog only; set/groomed by /triage)
+      state:     ready | needs-info | blocked   (Backlog only; set by /triage)
 ```
 
-**Task states** (Backlog) — `ready` (promotable) · `needs-info` (open questions) · `blocked`
-(waiting on `depends-on`). Orthogonal to `HITL`/`AFK` (who acts). Rejected work leaves the backlog →
-`.out-of-scope/<slug>.md` (negative-space knowledge base, created lazily by `/triage`).
+**States** — `ready` (promotable) · `needs-info` (open questions) · `blocked` (`depends-on`). Orthogonal
+to `HITL`/`AFK` (who acts). Rejected work → `.out-of-scope/<slug>.md` (lazily created by `/triage`).

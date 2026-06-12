@@ -24,7 +24,7 @@
 | `README.md` | root | Anyone | no hard cap¹ | Project scope changes | `templates/README.md.template` |
 | `TODO.md` | root | Dev / AI | ~150 soft (§11) | Backlog change · sprint promote/close | `templates/TODO.md.template` |
 | `CLAUDE.md` | `.claude/` | AI assistant | 80 | Project shape / workflow / anti-patterns change | `templates/CLAUDE.md.template` |
-| `CONTEXT.md` | `.claude/` | AI assistant | 100 | Vocabulary / patterns / conventions change | `templates/CONTEXT.md.template` |
+| `CONTEXT.md` | `.claude/` | AI assistant | 130 (ADR-007 — dense SSOT) | Vocabulary / patterns / conventions change | `templates/CONTEXT.md.template` |
 | `ARCHITECTURE.md` | `docs/` | Tech lead | 150 | Major structural change | `templates/ARCHITECTURE.md.template` |
 | `SETUP.md` | `docs/` | New dev / CI | 100 | Setup process changes | `templates/SETUP.md.template` |
 | `DECISIONS.md` | `docs/` | Team | thin index | A new ADR is added under `docs/adr/` | `templates/DECISIONS.md.template` |
