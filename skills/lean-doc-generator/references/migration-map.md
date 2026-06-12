@@ -11,8 +11,10 @@ don't hand-reconcile, and you're not lost in your own existing code.
    mappings below) or **generic** (any other layout). List what was found.
    - **Clean-sweep scan** — also flag **duplicates** (same content in two+ places), **orphans** (no
      inbound links from any doc/code), and **stale/superseded** (contradicts current code, or
-     `last_updated` long past §3's 60-day flag). Heuristic only — flags for human judgment, never an
-     auto-verdict.
+     `last_updated` long past §3's 60-day flag). **Apply the out-of-scope filter first** — never flag an
+     out-of-scope artifact (adlc-flow's, app-specific, generated) as a dupe/consolidate candidate; two
+     *frameworks'* same-named files (e.g. a lean-flow `CONTEXT.md` beside an adlc-flow one) are
+     coexistence, not a dupe. Heuristic only — flags for human judgment, never an auto-verdict.
 2. **Plan** — for *each* existing doc, propose one action: **keep · reformat · relocate · split ·
    index · archive · consolidate · retire · leave (out of scope)** — with its lean-flow target and a
    one-line why. Present the whole plan; **wait for approval**. Never start rewriting before the human
