@@ -24,16 +24,30 @@ Don't fire every pass on every change. Decide per diff:
 | no auth / input / secret / data-exposure surface touched | skip `/security-review` |
 | behaviour unchanged (rename / pure refactor / comment) | skip `/verify` |
 | files already read this session | skip `Explore` recon — context is already loaded |
-| small single-file diff, tests green | fold into one `/code-review`; don't fan out |
+| small / medium diff | **one** scoped `sonnet` reviewer — not `/code-review`'s fan-out (§ Scale depth) |
 
 Keep `/security-review` a **separate uncontaminated pass** — but only when there *is* a security
 surface. Folding it into a general review when there's no surface just burns tokens; running it in the
 same session as the code review when there *is* one contaminates the context. The skip table picks the
 right one.
 
+## Scale depth to diff size
+
+The built-in `/code-review` fans out into several finder sub-agents (line-by-line · cross-file · reuse ·
+efficiency), each tens of thousands of tokens — thorough, but heavy. Match depth to the diff:
+
+| Diff | Review |
+|---|---|
+| **small / medium** (bounded change, clear blast radius) | **one** scoped `sonnet` reviewer with the diff + blast-radius brief — *not* the fan-out |
+| **large or high-risk** (broad blast radius · security/data surface · core abstraction) | the full **`/code-review`** fan-out earns its cost |
+
+On a borderline medium diff, start with the single reviewer; escalate to `/code-review` only if it
+surfaces something needing the wider sweep. (lean-flow chooses *when* to call `/code-review`; it can't
+shrink the built-in command's internal fan-out — so the lever is reserving it for diffs that justify it.)
+
 ## When a pass does fire
 
-- **Non-trivial diff → `/code-review`** — independent context beats self-review.
+- **Code review** — small/medium → one scoped `sonnet` reviewer · large/high-risk → **`/code-review`** (fan-out).
 - **Real behaviour change → `/run`** to drive the app + **`/verify`** it does what the goal stated.
 - **Cleanup → `/simplify`** — reuse / simplification / efficiency (pairs with `/refactor-advisor`).
 - **Auth / input / secrets / data exposure → `/security-review`** as its own pass.

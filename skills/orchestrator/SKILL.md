@@ -91,9 +91,9 @@ didn't write the code catches more, and the heavy work stays out of the main loo
 to the diff + its blast radius** (`git diff` + changed files + direct callers) — never survey the whole
 repo (the fan-out re-scan is the biggest token sink). A **skip table** decides which passes fire:
 docs/trivial → self-review only · no security surface → skip `/security-review` · unchanged behaviour →
-skip `/verify` · already-read → skip `Explore`; small diffs fold into one pass.
+skip `/verify` · already-read → skip `Explore`. **Scale depth:** small/medium → **one** scoped `sonnet` reviewer; `/code-review`'s finder fan-out only for **large / high-risk** diffs.
 
-- **Non-trivial diff → `/code-review`** · **behaviour change → `/run` + `/verify`** · **cleanup → `/simplify`** · **auth/input/secrets → `/security-review` as its own uncontaminated pass** · **bug → `/diagnose`**.
+- **Code review** — small/med → one scoped `sonnet` reviewer · large/high-risk → **`/code-review`** · **behaviour change → `/run` + `/verify`** · **cleanup → `/simplify`** · **auth/input/secrets → `/security-review`** · **bug → `/diagnose`**.
 - **Doc-only / delete-only / trivial** → the self-review checklist is the floor.
 
 Full routing · skip table · self-review checklist → `references/review-scoping.md`.

@@ -34,9 +34,9 @@ full `/code-review` fan-out for **large / high-risk** diffs. (TASK-026)
 **Acceptance:** the review-depth rule is stated and the imprecise skip-table row is fixed; orchestrator ≤ ~110.
 
 **DoD:**
-- [ ] orchestrator Review + `review-scoping.md` state the depth rule — small/medium → **one** scoped cheap-tier (`sonnet`) reviewer (diff + blast-radius brief); `/code-review` fan-out reserved for **large / high-risk**
-- [ ] the imprecise skip-table row ("fold into one `/code-review`; don't fan out") corrected to reflect this
-- [ ] `orchestrator/SKILL.md` ≤ ~110 (detail in the reference)
+- [x] orchestrator Review + `review-scoping.md` state the depth rule — small/medium → **one** scoped cheap-tier (`sonnet`) reviewer (diff + blast-radius brief); `/code-review` fan-out reserved for **large / high-risk** (new "Scale depth to diff size" section + table)
+- [x] the imprecise skip-table row corrected → "small / medium diff → one scoped `sonnet` reviewer — not `/code-review`'s fan-out"
+- [x] `orchestrator/SKILL.md` ≤ ~110 (107; detail in the reference)
 
 ### T2 — CONTEXT.md diet (resolve TD-005) `[size: M · risk: med]`
 Layers: `.claude/CONTEXT.md` · `skills/lean-doc-generator/references/DOCS_Guide.md` (if cap revised)
@@ -68,11 +68,19 @@ SPRINT-006 rendered from the Backlog (TASK-026 · TASK-027) via `/lean-doc-gener
 Governance: no learnings at count ≥ 2 (L-007 already promoted); TD-005 overdue (≥3 sprints) → routed
 into T2; CHANGELOG rotation deferred (0.3.1 was PATCH). Plan frozen.
 
+### 2026-06-12 | T1 | review depth scaled to diff size (3/3 DoD)
+Session model. review-scoping.md gains a "Scale depth to diff size" section + table (small/medium → one
+scoped `sonnet` reviewer; `/code-review` fan-out reserved for large/high-risk) and the imprecise
+skip-table row is fixed. orchestrator Review reflects it inline (107 ≤ 110). Closes the v0.3.1 gap the
+owner's screenshot showed (4-finder fan-out on small diffs). Note: lean-flow can't shrink `/code-review`'s
+internal fan-out — the lever is reserving it for diffs that justify the cost.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `skills/orchestrator/references/review-scoping.md` | T1 | "Scale depth to diff size" section + fixed skip-table row | Low | 66 lines |
+| `skills/orchestrator/SKILL.md` | T1 | Review section reflects the depth rule | Low | 107 ≤ 110 |
 
 ## Retro
 <!-- Written at close. Route the buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·
