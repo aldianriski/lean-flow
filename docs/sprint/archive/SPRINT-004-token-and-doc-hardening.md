@@ -3,9 +3,9 @@ sprint: 004
 slug: token-and-doc-hardening
 owner: Maintainer
 last_updated: 2026-06-12
-status: active
+status: closed
 plan_commit: 5d7db71
-close_commit: TBD
+close_commit: dc839b1
 update_trigger: sprint execute/close events
 ---
 
@@ -189,10 +189,14 @@ delete" rule reconciled with the one gated deletion exception. lean-doc SKILL mi
      follow-ups → TASK-NNN · learnings → LEARNINGS. Then archive (§11). -->
 
 **Worked**
--
+- **Hybrid tier-routing held** — 2/5 tasks (T2, T4) ran on `sonnet` subagents under self-contained briefs; clean, in-style output, main loop stayed lean. Dogfooded T1's own contract (satisfied T1 DoD-5).
+- **Diff-scoped self-review as the floor** for doc diffs — fast, no wasted review fan-out (the exact behaviour T1b introduced).
+- **Two-pass execution of the L-sized T1** (a/b) honoured the "L splits" rule without editing the frozen § Plan.
 
 **Friction**
--
+- **CONTEXT.md cap pressure** — recording the tier map worsened TD-005 (137 → 151); the SSOT keeps absorbing cross-cutting rules it has no room for.
+- **Spec-only shipments** — T3 (changelog-only) + T5 (consolidation) shipped unexercised, same shape as TD-001. → follow-ups F1/F2 (TASK-023/024).
+- **Unfiled minor** (noted, not tracked): lean-doc red flag "new file outside core set" vs the DESIGN.md exception · no generation path for DESIGN.md · no `.gitattributes` → LF/CRLF churn on every commit.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- New skill behaviour ships **spec-only** and isn't exercised until a later validation sprint (TD-001 in Sprint-003 → again T3/T5 here). → **L-007**, promotion-eligible next promote (count 2).

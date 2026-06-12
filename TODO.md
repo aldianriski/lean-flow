@@ -18,9 +18,8 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-004 — Token & Doc Hardening** · status: active · 5 tasks (TASK-018·019·020·021·022)
-> → [`docs/sprint/SPRINT-004-token-and-doc-hardening.md`](docs/sprint/SPRINT-004-token-and-doc-hardening.md)
-> _(TASK-017's v1 gate still waits on TASK-005 + TD-005)_
+> _(no active sprint — SPRINT-004 closed 2026-06-12, archived per §11; TASK-017's v1 gate still waits
+> on TASK-005 + TD-005)_
 
 ---
 
@@ -38,20 +37,22 @@ status: current
       depends-on: TASK-005 (TASK-003 · 013…016 closed via SPRINT-003)
       state: blocked   (waiting on TASK-005 + TD-005)
 
-- TASK-018 — Cut token cost: tier-routing + diff-scoped review → promoted to SPRINT-004 (T1)
-
 ### P2 — Quality / Polish
-
-- TASK-019 — Spec-polish bundle (9 SPRINT-003 frictions) → promoted to SPRINT-004 (T2)
 
 - [ ] **TASK-005 — Conform `/council` under the amended cap rule (ADR-006)** [size: S] [risk: low] [HITL]
       done-when: advisor definitions + prompt templates + worked example → `skills/council/references/`; SKILL.md ≤ ~110 (when-to-use · 6-step outline · red flags · per-step read pointers); the amended cap rule written into CLAUDE.md/CONTEXT.md/DOCS_Guide §2 (resolves TD-002 + TD-004)
       touches: `skills/council/` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `skills/lean-doc-generator/references/DOCS_Guide.md`
       state: ready   (decision input: ADR-006, council-pressure-tested 2026-06-11)
 
-- TASK-020 — release-patch auto-handoff + changelog-only fallback → promoted to SPRINT-004 (T3)
-- TASK-021 — Optional frontend-only DESIGN.md template → promoted to SPRINT-004 (T4)
-- TASK-022 — migrate consolidation sweep (adopt + clean) → promoted to SPRINT-004 (T5)
+- [ ] **TASK-023 — Exercise the migrate consolidation sweep on a real repo** [size: S] [risk: low] [HITL]
+      done-when: `/lean-doc-generator migrate` run on a real repo with known duplicate/orphan/stale docs; consolidate + retire proposed, approved per-item, applied; archive-default + gated hard-delete confirmed; zero un-approved deletions (diff verified)
+      assumes: a repo with cleanup candidates is available (a dev-flow copy served prior migrate validation)
+      state: ready   (from SPRINT-004 T5 — spec shipped, unexercised; L-007)
+
+- [ ] **TASK-024 — Exercise changelog-only release-patch + diff-scoped review on real code** [size: S] [risk: low] [HITL]
+      done-when: on a manifestless repo, release-patch emits a changelog-only entry (no bump); on a real code diff, the diff-scoped review skip table fires correctly (security surface → `/security-review` · behaviour unchanged → skip `/verify` · already-read → skip `Explore`); both confirmed on real input
+      assumes: none
+      state: ready   (from SPRINT-004 T3 + T1b — spec/doc-exercised only; L-007)
 
 ### P3 — Long-term
 
@@ -78,12 +79,12 @@ status: current
   - done-when: each exercised once on real input; behaviour confirmed. ✓
 - **TD-002** severity: minor | status: open | created: build-0
   - Summary: `skills/council/SKILL.md` is ~331 lines, far over the ~110 SKILL cap (faithful multi-agent method). Tracked under TASK-005.
-- **TD-003** severity: minor | status: open | created: build-0
-  - Summary: `skills/orchestrator/SKILL.md` is at the ~110 cap — further wiring risks overflow; may need to push detail into a reference.
+- **TD-003** severity: minor | status: resolved → SPRINT-004 T1 (2026-06-12)
+  - Summary: `skills/orchestrator/SKILL.md` was at the ~110 cap. Resolved by offloading the Review detail to `skills/orchestrator/references/review-scoping.md`; SKILL trimmed to 107 ≤ 110.
 - **TD-004** severity: trivial | status: open | created: build-0
   - Summary: CLAUDE.md states a ~110 SKILL cap that `/council` violates — cap-rule vs reality inconsistency (council is the documented exception, but the rule reads absolute).
-- **TD-005** severity: minor | status: open | created: Sprint-002
-  - Summary: `.claude/CONTEXT.md` is ~137 lines against its own 100-line cap (pre-existing; +4 this sprint) — the SSOT violates the standard it anchors. Surfaced by the Sprint-002 review pass.
+- **TD-005** severity: medium | status: open | created: Sprint-002 (worsened SPRINT-004: 137 → 151)
+  - Summary: `.claude/CONTEXT.md` is **151 lines** against its own 100-line cap — the SSOT violates the standard it anchors. Bumped minor → medium at SPRINT-004 close (the tier-map section pushed it ~50% over). Surfaced by the Sprint-002 review pass.
   - done-when: CONTEXT.md ≤ 100 lines via content diet (move detail to skill references), or the cap is formally revised in DOCS_Guide §2.
 
 ---

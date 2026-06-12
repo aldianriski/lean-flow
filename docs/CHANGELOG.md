@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-11
+last_updated: 2026-06-12
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -8,6 +8,25 @@ status: current
 # lean-flow — Changelog
 
 <!-- Prepend new sprints — newest first. Append-only; never edit past blocks. -->
+
+---
+
+## Sprint 004 — Token & Doc Hardening (closed 2026-06-12)
+
+Cut the post-change token cost and hardened the doc/flow specs from the owner's improvement list.
+Five tasks; two (T2 spec-polish, T4 DESIGN template) ran on `sonnet` subagents — the hybrid
+tier-routing, which also dogfooded T1's own contract.
+
+| Shipped | What |
+|---|---|
+| Token discipline | model-tier map (`CONTEXT.md`) + diff-scoped review & skip table (`orchestrator/references/review-scoping.md`); orchestrator 107 ≤ 110 — **TD-003 resolved** |
+| Spec-polish | 9 cold-run frictions across prime · task-decomposer · orchestrator · README · TODO template · migration-map |
+| release-patch | close now **invokes** it; **changelog-only mode** for manifestless repos + worked examples |
+| DESIGN.md | optional, frontend-only design-system / token template (genericized) + DOCS_Guide carve-out |
+| migrate | **adopt + clean** — consolidation sweep (dupes / orphans / stale → consolidate · retire, gated) |
+
+Follow-ups filed: TASK-023 (exercise migrate consolidation) · TASK-024 (exercise changelog-only +
+diff-scoped review on real code). Learning L-007 (spec-only shipments). TD-005 bumped to medium.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-11
+last_updated: 2026-06-12
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -12,6 +12,13 @@ Append-only record of confirmed corrections and patterns surfaced at Sprint Clos
 rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promote** before planning.
 
 <!-- Newest first. Never edit a past entry except to bump `seen` / `count` or set `promoted`. -->
+
+---
+
+## L-007: New skill behaviour ships **spec-only** and goes unexercised until a later validation sprint — the last DoD of a new behaviour should be "exercised once on real input" (T1 did this deliberately; T3/T5 did not) → fix: TASK-023 · TASK-024
+- seen: Sprint-003 (TD-001 — migrate/council/verdict spec-only), Sprint-004 (T3 changelog-only, T5 consolidation)
+- count: 2
+- promoted: no   (promotion-eligible at next promote → a durable DoD rule)
 
 ---
 
