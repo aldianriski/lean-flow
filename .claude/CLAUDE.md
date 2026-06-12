@@ -35,7 +35,7 @@ resumes it. Every skill is also usable standalone. See `.claude/CONTEXT.md` for 
 
 ## Design Principles
 - **Curated, not copied** — the core discipline. Every component was reviewed ("genuinely useful + important + actually used?") and approved before adding. The opposite of dev-flow, which bulk-imported from every reference and bloated. The bar is review — not a ban on any component type.
-- **Lean** — each SKILL.md ≤ ~110 lines; no shared reference trees outside a skill. (`/council` is the deliberate exception — a faithful multi-agent method.)
+- **Lean** — each SKILL.md ≤ ~110 lines of **procedure + scaffolding**; executable artifacts (prompt templates, persona/advisor definitions, schemas) live in the skill's own `references/` and don't count (ADR-006). No shared reference trees *across* skills.
 - **Self-contained** — gates/checklists inlined; `lean-doc-generator` bundles its own templates + standard.
 - **Adaptable** — skills read whatever context the host repo has and degrade gracefully when a file is missing.
 - **Human-gated** — G1 Scope + G2 Design need explicit sign-off; `release-patch` never pushes.
@@ -54,7 +54,7 @@ resumes it. Every skill is also usable standalone. See `.claude/CONTEXT.md` for 
 - [ ] Acceptance criteria met
 - [ ] `.claude/CONTEXT.md` + README updated if the skill roster or the loop changed
 - [ ] plugin.json + marketplace.json versions stay equal (lockstep)
-- [ ] Line caps respected: SKILL.md ≤ ~110 · CLAUDE.md ≤ 80
+- [ ] Line caps respected: SKILL.md ≤ ~110 (procedure + scaffolding; artifacts → `references/`, uncounted — ADR-006) · CLAUDE.md ≤ 80
 
 ## Behavioral Guidelines
 - **Think before acting** — surface assumptions; ask on ambiguous requirements; never fabricate. Multiple interpretations? Present them — don't pick silently. Push back when a simpler approach exists.

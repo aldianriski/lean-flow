@@ -69,6 +69,11 @@ artifact** — it defines agreed tokens and components (as SPRINT captures WHAT/
 own design-token frontmatter instead of the §3 ownership header. Never auto-create; never add to the
 core doc generation loop; never listed in the §2 table.
 
+**SKILL.md cap (ADR-006).** A skill's `SKILL.md` stays ≤ ~110 lines of **procedure + scaffolding**;
+**executable artifacts** (prompt templates, persona/advisor definitions, schemas) live in the skill's
+own `references/` and **don't count** toward the cap. "Executable artifact" must not stretch to cover
+ordinary prose — police it honestly.
+
 ---
 
 ## §3 — Ownership header (mandatory on every doc)

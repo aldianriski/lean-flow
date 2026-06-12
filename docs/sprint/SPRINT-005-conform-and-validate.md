@@ -35,10 +35,10 @@ artifacts move to `references/`. Restructure accordingly. (TASK-005)
 **Acceptance:** council SKILL ≤ ~110 with artifacts in `references/`; amended cap rule recorded; TD-002 + TD-004 resolved.
 
 **DoD:**
-- [ ] advisor definitions + prompt templates + worked example → `skills/council/references/`
-- [ ] `council/SKILL.md` trimmed to ≤ ~110 (when-to-use · 6-step outline · red flags · per-step read pointers) — resolves **TD-002**
-- [ ] amended cap rule written into `CLAUDE.md` / `CONTEXT.md` / `DOCS_Guide §2` — resolves **TD-004**
-- [ ] ADR-006 / DECISIONS linkage intact; no broken pointers
+- [x] advisor definitions + prompt templates + worked example → `skills/council/references/` (advisors.md · prompts.md · example.md)
+- [x] `council/SKILL.md` trimmed to **60** ≤ ~110 (when-to-use · 6-step outline · red flags · per-step read pointers) — resolves **TD-002**
+- [x] amended cap rule written into `CLAUDE.md` (×2) + `DOCS_Guide §2` — resolves **TD-004**. *(CONTEXT.md skipped: the cap rule was never stated there — grep-confirmed — and A2 says don't worsen TD-005.)*
+- [x] ADR-006 / DECISIONS linkage intact; SKILL cap-note cites ADR-006; no broken pointers
 
 ### T2 — Fix close→release-patch handoff for sprint scope `[size: S · risk: med]`
 Layers: `skills/release-patch/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/orchestrator/SKILL.md`
@@ -97,11 +97,23 @@ Governance: **L-007 promoted** → CLAUDE.md anti-pattern (spec-only behaviour m
 collapsed to a pointer; TD-002/004 covered by T1, TD-005 re-review (medium, not in scope — T1 must not
 worsen); CHANGELOG rotation triggered but deferred (small). Plan frozen.
 
+### 2026-06-12 | T1 | council conformed under ADR-006 (4/4 DoD)
+Session model. Extracted the executable artifacts to `skills/council/references/` (advisors · prompts ·
+example); `council/SKILL.md` trimmed **341 → 60** (procedure outline + per-step pointers). Cap rule
+amended in CLAUDE.md (×2) + DOCS_Guide §2 to ADR-006 wording (artifacts in `references/` don't count);
+council-exception dropped — it now conforms. **TD-002 + TD-004 resolved** (route at close). CONTEXT.md
+intentionally untouched (cap rule wasn't there; A2 — don't worsen TD-005).
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `skills/council/SKILL.md` | T1 | trimmed 341 → 60 (procedure-only per ADR-006) | Low | 60 ≤ 110 |
+| `skills/council/references/advisors.md` | T1 | new — the 5 advisor definitions (artifact) | Low | SKILL points to it |
+| `skills/council/references/prompts.md` | T1 | new — 4 sub-agent templates + verdict structure (artifact) | Low | SKILL points to it |
+| `skills/council/references/example.md` | T1 | new — worked example (artifact) | Low | SKILL points to it |
+| `.claude/CLAUDE.md` | T1 | cap rule amended (procedure + scaffolding; artifacts → references/, ADR-006); council exception dropped | Low | 64 ≤ 80 |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §2 SKILL cap statement (ADR-006) added | Low | reads cleanly |
 
 ## Retro
 <!-- Written at close. Route the buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·
