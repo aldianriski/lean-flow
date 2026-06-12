@@ -3,9 +3,9 @@ sprint: 005
 slug: conform-and-validate
 owner: Maintainer
 last_updated: 2026-06-12
-status: active
+status: closed
 plan_commit: 45c6200
-close_commit: TBD
+close_commit: 185b749
 update_trigger: sprint execute/close events
 ---
 
@@ -151,10 +151,13 @@ self-review). Validates T3/T1b spec on real input (L-007 honoured).
      follow-ups → TASK-NNN · learnings → LEARNINGS. Then archive (§11). -->
 
 **Worked**
--
+- **ADR-006 made T1 mechanical** — a clear prior decision turned the council restructure into a clean extraction (341 → 60).
+- **Real-repo validation earned its keep** — T3 on umkm-indo caught a false positive a synthetic test wouldn't have (an adlc-flow `CONTEXT.md` masquerading as a consolidate target); the gate + out-of-scope rule blocked it and the fix was applied on the spot.
+- **Throwaway fixture** exercised both apply-paths (consolidate/retire + changelog-only) with zero risk to the real repo, then was deleted.
 
 **Friction**
--
+- umkm-indo had **no safe consolidate/retire target** (well-maintained; the one overlap was cross-framework) — so the consolidation *apply-path* on genuine real-repo dupes is still unexercised (fixture stood in).
+- T4's changelog-only couldn't use the provided repo (`package.json` present) — the fixture filled the manifestless gap.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- Real-repo validation surfaces false positives that synthetic/spec review misses — reinforces L-006 (cold-run) + L-007 (exercise-on-real-input). Keep a real repo as the validation target, not only fixtures. *(Not filed as new L — reinforces existing; promote if it recurs.)*

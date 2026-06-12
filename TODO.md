@@ -18,9 +18,8 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-005 — Conform & Validate** · status: active · 4 tasks (TASK-005·023·024·025)
-> → [`docs/sprint/SPRINT-005-conform-and-validate.md`](docs/sprint/SPRINT-005-conform-and-validate.md)
-> _(TASK-017's v1 gate still waits on TASK-005 + TD-005)_
+> _(no active sprint — SPRINT-005 closed 2026-06-12, archived per §11; TASK-017's v1 gate now waits
+> only on TD-005)_
 
 ---
 
@@ -35,15 +34,12 @@ status: current
 - [ ] **TASK-017 — v1.0 release checklist (umbrella)** [size: S] [risk: low] [HITL]
       done-when: TASK-003 · 005 · 013–016 closed; TD-005 resolved (CONTEXT ≤ cap or cap revised); final link/path consistency grep clean; manifests bumped 1.0.0 lockstep
       touches: `.claude-plugin/` · `docs/CHANGELOG.md`
-      depends-on: TASK-005 (TASK-003 · 013…016 closed via SPRINT-003)
-      state: blocked   (waiting on TASK-005 + TD-005)
+      depends-on: TD-005 (TASK-005 closed via SPRINT-005; TASK-003 · 013…016 via SPRINT-003)
+      state: blocked   (waiting on TD-005 only)
 
 ### P2 — Quality / Polish
 
-- TASK-005 — Conform `/council` under ADR-006 → promoted to SPRINT-005 (T1)
-- TASK-023 — Exercise migrate consolidation on a real repo → promoted to SPRINT-005 (T3)
-- TASK-024 — Exercise changelog-only + diff-scoped review on real code → promoted to SPRINT-005 (T4)
-- TASK-025 — Fix close→release-patch handoff (multi-commit + MINOR) → promoted to SPRINT-005 (T2)
+_(empty — TASK-005·023·024·025 shipped in SPRINT-005)_
 
 ### P3 — Long-term
 
@@ -68,12 +64,12 @@ status: current
 - **TD-001** severity: medium | status: resolved → SPRINT-003 T1+T2 (2026-06-11)
   - Summary: `migrate`, `/council`, and the council→`verdict-<slug>.md`→ADR feed were **spec-only**. All three legs exercised on real input: migrate on the dev-flow copy (T1, full apply verified) · council 5-advisor + peer-review run (T2) · verdict → ADR-006 (the feed).
   - done-when: each exercised once on real input; behaviour confirmed. ✓
-- **TD-002** severity: minor | status: open | created: build-0
-  - Summary: `skills/council/SKILL.md` is ~331 lines, far over the ~110 SKILL cap (faithful multi-agent method). Tracked under TASK-005.
+- **TD-002** severity: minor | status: resolved → SPRINT-005 T1 (2026-06-12)
+  - Summary: `skills/council/SKILL.md` was ~341 lines. Resolved per ADR-006: executable artifacts (advisors · prompts · example) → `council/references/`; SKILL trimmed to 60.
 - **TD-003** severity: minor | status: resolved → SPRINT-004 T1 (2026-06-12)
   - Summary: `skills/orchestrator/SKILL.md` was at the ~110 cap. Resolved by offloading the Review detail to `skills/orchestrator/references/review-scoping.md`; SKILL trimmed to 107 ≤ 110.
-- **TD-004** severity: trivial | status: open | created: build-0
-  - Summary: CLAUDE.md states a ~110 SKILL cap that `/council` violates — cap-rule vs reality inconsistency (council is the documented exception, but the rule reads absolute).
+- **TD-004** severity: trivial | status: resolved → SPRINT-005 T1 (2026-06-12)
+  - Summary: cap-rule vs reality inconsistency. Resolved: cap rule amended (ADR-006 wording — artifacts in `references/` don't count) in CLAUDE.md + DOCS_Guide §2; council now conforms, so no exception remains.
 - **TD-005** severity: medium | status: open | created: Sprint-002 (worsened SPRINT-004: 137 → 151)
   - Summary: `.claude/CONTEXT.md` is **151 lines** against its own 100-line cap — the SSOT violates the standard it anchors. Bumped minor → medium at SPRINT-004 close (the tier-map section pushed it ~50% over). Surfaced by the Sprint-002 review pass.
   - done-when: CONTEXT.md ≤ 100 lines via content diet (move detail to skill references), or the cap is formally revised in DOCS_Guide §2.

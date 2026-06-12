@@ -11,6 +11,29 @@ status: current
 
 ---
 
+## v0.3.1 — Conform & Validate (2026-06-12)
+
+PATCH — fixes/refactor sprint (no new capability), bumped by hand per the close routing T2 added.
+Ships SPRINT-005 (block below): `/council` conformed under ADR-006 (TD-002 + TD-004 resolved) ·
+close→release-patch handoff fixed (sprint-range scan + PATCH/MINOR routing) · migrate consolidation +
+changelog-only + diff-scoped review exercised on real input (+ an out-of-scope-filter refinement).
+Manifests → 0.3.1 lockstep.
+
+---
+
+## Sprint 005 — Conform & Validate (closed 2026-06-12)
+
+| Shipped | What |
+|---|---|
+| `/council` conform | artifacts → `council/references/`; SKILL 341 → 60; cap rule amended (ADR-006) — **TD-002 + TD-004 resolved** |
+| close→release-patch | scans `plan_commit..HEAD` at close; routes fixes→PATCH / features→MINOR by hand (the gap hit at SPRINT-004 close) |
+| migrate (validated) | detect on umkm-indo caught an adlc-flow false positive (gate held); apply-path on a fixture (consolidate/retire/archive/gated hard-delete, zero un-approved deletions); + out-of-scope-filter refinement |
+| release (validated) | changelog-only (no bump) + diff-scoped review skip-table confirmed on a manifestless fixture |
+
+L-007 promoted at this sprint's promote → CLAUDE.md anti-pattern. TD-005 (CONTEXT cap) still open.
+
+---
+
 ## v0.3.0 — Token & Doc Hardening (2026-06-12)
 
 MINOR release — new capabilities, so not a PATCH; bumped **by hand** (`release-patch` is PATCH-only).
