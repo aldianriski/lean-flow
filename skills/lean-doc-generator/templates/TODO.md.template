@@ -14,7 +14,7 @@ status: current
 > - **Sprint completed** — move the closed sprint block to `docs/CHANGELOG.md` (prepend, newest first), then delete it from here.
 
 > **Sprint sizing**
-> - 2–5 tasks per sprint. Never plan a sprint with a single task.
+> - 2–5 tasks per sprint. **Single-task sprints are valid** for dogfood / validation runs — a sprint need not bundle multiple tasks.
 > - Order by dependency first, then importance + urgency.
 > - Promote from Backlog in priority order (P0 → P3); remove promoted tasks from Backlog immediately
 >   (a `promoted → SPRINT-NNN` tombstone may remain; it is deleted at the next sprint close — §11).

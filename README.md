@@ -84,6 +84,12 @@ context in a fixed order; **`/handoff`** carries the live thread to the next ses
 Install (Claude Code):
 
 ```bash
+claude plugin install lean-flow@lean-flow
+```
+
+Or via marketplace URL:
+
+```bash
 claude plugin marketplace add https://github.com/aldianriski/lean-flow
 ```
 

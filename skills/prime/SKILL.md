@@ -28,11 +28,11 @@ locations second. Adapt the globs to the host project's layout.
 | 1 | `.claude/CLAUDE.md`, `CLAUDE.md` | Project instructions, anti-patterns, conventions |
 | 2 | `.claude/CONTEXT.md`, `CONTEXT.md` | Vocabulary · gates · modes (if the project uses one) |
 | 3 | `README.md` | Project overview, how-to-adopt, entry points |
-| 4 | MEMORY index (harness-resolved) | Sprint state, feedback, references |
+| 4 | MEMORY index (harness-resolved; fallback: `memory/MEMORY.md`, `.claude/memory/MEMORY.md`) | Sprint state, feedback, references |
 | 5 | `TODO.md`, `docs/sprint/SPRINT-*.md` | Active task list — frontmatter + open `- [ ]` items only |
 | 6 | `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` | Module map / where-things-live (the durable map) |
 
-**Resolution**: read `TODO.md` (the Backlog pool); follow its § Active Sprint pointer — a
+**Resolution**: read `TODO.md` (the Backlog pool); follow its § Active Sprint pointer (format: `> **SPRINT-NNN — <name>** → docs/sprint/SPRINT-NNN-<slug>.md`) — a
 multi-stream repo lists one pointer per stream — to each active `docs/sprint/SPRINT-NNN-<slug>.md`
 and read only its frontmatter + Plan (~50 lines). Count open **DoD `[ ]`** across all active
 sprints (report per stream when more than one, e.g. `Tasks: 5 open (main: 3 · payments: 2)`); if

@@ -42,7 +42,7 @@ stays ≤ cap (detail lives in a reference — resolves the TD-003 overflow risk
 - [x] Tier mapping recorded in `.claude/CONTEXT.md`
 - [x] Diff-scoped review discipline added to orchestrator Review (each pass scoped to `git diff` + changed files + direct callers; skip table — docs/config/trivial → self-review · no security surface → skip `/security-review` · behaviour unchanged → skip `/verify` · already-read → skip `Explore`; small diffs folded; security separate only with a real surface)
 - [x] Review-discipline detail pushed to a reference so `orchestrator/SKILL.md` stays ≤ ~110 (closes the TD-003 risk — now 107)
-- [ ] Exercised once on real work (a live review pass or subagent dispatch) and confirmed — *pending T2's sonnet dispatch*
+- [x] Exercised once on real work — T2 dispatched to a `sonnet` subagent via the Agent-tool `model:` override (38.6k tok, 19 tool-uses), result reviewed via the diff-scoped discipline ✓
 
 ### T2 — Spec-polish bundle: 9 SPRINT-003 cold-run frictions `[size: S · risk: low]`
 Layers: `skills/prime` · `skills/task-decomposer` · `skills/orchestrator` · `skills/lean-doc-generator/references/migration-map.md` · `templates/TODO.md.template` · `README.md`
@@ -52,13 +52,13 @@ cold agent doesn't trip on the same edges. (TASK-019)
 **Acceptance:** all 9 frictions fixed.
 
 **DoD:**
-- [ ] prime: MEMORY-index fallback path + Active-Sprint pointer format stated inline
-- [ ] task-decomposer: positive AFK criterion added
-- [ ] orchestrator: owner-declined-tests escape hatch on TDD routing + quick-mode/Review ordering note
-- [ ] `${CLAUDE_SKILL_DIR}` reader note added where skills reference it
-- [ ] single-task-sprint exception documented for dogfood/validation runs
-- [ ] README: install/update uses the marketplace-qualified id (`lean-flow@lean-flow`)
-- [ ] migration-map: per-move inbound-link fixing made an explicit apply step
+- [x] prime: MEMORY-index fallback path + Active-Sprint pointer format stated inline
+- [x] task-decomposer: positive AFK criterion added
+- [x] orchestrator: owner-declined-tests escape hatch on TDD routing + quick-mode/Review ordering note
+- [x] `${CLAUDE_SKILL_DIR}` reader note added where skills reference it (task-decomposer first use)
+- [x] single-task-sprint exception documented for dogfood/validation runs (TODO.md.template)
+- [x] README: install/update uses the marketplace-qualified id (`lean-flow@lean-flow`)
+- [x] migration-map: per-move inbound-link fixing made an explicit apply step
 
 ### T3 — release-patch: auto-handoff + changelog-only fallback `[size: S · risk: low]`
 Layers: `skills/release-patch/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/orchestrator/SKILL.md`
@@ -132,15 +132,26 @@ to `skills/orchestrator/references/review-scoping.md`, Review section trimmed �
 **107 ≤ 110** (TD-003 risk closed). DoD-5 "exercised once" deferred to T2's live sonnet dispatch.
 **Debt note:** CONTEXT.md 137 → 151 (TD-005 cap-overrun worsened, deliberate — deferred with TASK-005).
 
+### 2026-06-12 | T2 | 9 spec-polish frictions fixed via sonnet dispatch (7/7 DoD)
+Dispatched to a `sonnet` subagent with a self-contained brief (the hybrid plan + T1's tier contract).
+All 9 frictions landed surgically across 6 files (prime ×2 · task-decomposer ×2 · orchestrator ×2 ·
+TODO.md.template · README · migration-map); +14/−7 lines. Caps held (prime 74 · task-decomposer 76 ·
+orchestrator 107). Diff-scoped self-review passed. Note: orchestrator fixes folded inline (no new
+lines); TODO.md.template's "never single-task sprint" rule reversed → single-task valid for dogfood.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `.claude/CONTEXT.md` | T1a | new "Model tiers" tier map (token discipline SSOT) | Low | line-count + pointers resolve |
-| `skills/orchestrator/SKILL.md` | T1a/b | tier-dispatch bullet + diff-scoped Review summary | Low | 107 ≤ 110 cap |
+| `skills/orchestrator/SKILL.md` | T1a/b·T2 | tier-dispatch bullet + diff-scoped Review summary; +tdd escape-hatch + quick-mode review-floor note | Low | 107 ≤ 110 cap |
 | `skills/orchestrator/references/review-scoping.md` | T1b | new — diff-scoping + skip table + self-review (TD-003 detail offload) | Low | created; SKILL points to it |
 | `skills/council/SKILL.md` | T1a | step-2 tier note (advisors/reviewers cheap, chairman session) | Low | reads cleanly |
-| `skills/task-decomposer/SKILL.md` | T1a | recon → cheap-tier note | Low | reads cleanly |
+| `skills/task-decomposer/SKILL.md` | T1a·T2 | recon→cheap-tier note; +AFK positive criterion; `${CLAUDE_SKILL_DIR}` reader note | Low | 76 ≤ 110 |
+| `skills/prime/SKILL.md` | T2 | MEMORY-index fallback path + Active-Sprint pointer format inline | Low | 74 ≤ 110 |
+| `skills/lean-doc-generator/templates/TODO.md.template` | T2 | single-task sprints now valid (dogfood/validation) | Low | reads cleanly |
+| `README.md` | T2 | install uses marketplace-qualified id `lean-flow@lean-flow` | Low | reads cleanly |
+| `skills/lean-doc-generator/references/migration-map.md` | T2 | inbound-link fixing made an explicit apply sub-step | Low | reads cleanly |
 
 ## Retro
 <!-- Written at close. Route the buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·

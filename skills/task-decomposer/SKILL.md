@@ -36,7 +36,7 @@ For a ticket, fetch the description first (ask the user to paste if credentials 
 2. **Assumption registry** — list every assumption that affects behavior (auth model, data shape, third-party limits). Confirm the risky ones explicitly.
 3. **Decompose into tracer-bullet vertical slices** — each task is a thin path through *every* layer end-to-end (schema → API → UI → tests), independently demoable. Prefer many thin slices over few thick ones; record `depends-on`. Horizontal layers ("write all the models", "all the tests") are NOT valid tasks.
 4. **Risk score** — per task, rate impact × likelihood (low / med / high); note the blast radius (files / layers touched).
-5. **Classify HITL / AFK** — `HITL` = a human must review the output before proceeding; `AFK` = autonomous completion is safe. Default to `HITL` when uncertain. **For `AFK` tasks, spec durably** — an AFK task may sit in the backlog for weeks before an agent picks it up: write behavioral contracts (name the types / interfaces / config shapes to change) + testable acceptance + explicit out-of-scope; **never reference file paths or line numbers** — they go stale.
+5. **Classify HITL / AFK** — `HITL` = a human must review the output before proceeding; `AFK` = autonomous completion is safe (acceptance is mechanically checkable · no irreversible side effects · no product/UX judgment call · spec is durable). Default to `HITL` when uncertain. **For `AFK` tasks, spec durably** — an AFK task may sit in the backlog for weeks before an agent picks it up: write behavioral contracts (name the types / interfaces / config shapes to change) + testable acceptance + explicit out-of-scope; **never reference file paths or line numbers** — they go stale.
 6. **Validate** — every task has an observable acceptance criterion ("done when …"); no two tasks share identical criteria (merge or differentiate). For multi-slice breakdowns, run the **breakdown quiz** (reference) — confirm granularity, dependencies, merge/split, HITL/AFK — before Write.
 7. **Write** — only after the human types `approve`, append entries to `TODO.md` **Backlog** in dependency order (blockers first). Touch no other file. Sprint formation happens later via `/lean-doc-generator promote`.
 
@@ -55,7 +55,7 @@ re-stating, and pruning the backlog later is `/triage`'s job — don't re-rank e
 
 **Large features / `--prd`**: synthesize a PRD first (Problem · Solution · exhaustive User Stories ·
 Implementation + Testing Decisions · Out-of-scope · seams), get approval, then decompose. Full PRD
-template + seams + the breakdown quiz → `${CLAUDE_SKILL_DIR}/references/prd-and-slices.md`. Output is
+template + seams + the breakdown quiz → `${CLAUDE_SKILL_DIR}/references/prd-and-slices.md` (`${CLAUDE_SKILL_DIR}` resolves to this skill's install directory at load time). Output is
 local (TODO.md Backlog) — no external issue tracker.
 
 ## Hard rules

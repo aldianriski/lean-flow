@@ -14,6 +14,7 @@ own ad-hoc docs. Goal: you don't hand-reconcile, and you're not lost in your own
 3. **Apply incrementally** — preserve **content**; change only format / placement / wiring. Update
    cross-references so the loop works (`DECISIONS` index ↔ `docs/adr/`, TODO § Active Sprint pointer,
    `/prime` read-order). Flag anything ambiguous instead of guessing.
+   - **After each relocate/rename**: `grep` the old filename/path across the repo and fix every inbound link before moving to the next file.
 4. **Verify** — `/prime` reads cleanly, no dangling references, ADR index resolves, sprint pointer valid.
 
 ## Surgical rules

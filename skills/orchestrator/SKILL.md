@@ -51,7 +51,7 @@ only what is still open — one question at a time, recommend an answer each tim
 ## Phases
 
 > **Implement routing** — at any Implement step: building *new testable behaviour* → work test-first
-> via `/tdd` (red-green-refactor in vertical slices); chasing a *bug or failing test* → `/diagnose`;
+> via `/tdd` (red-green-refactor in vertical slices; if owner declines tests or no harness exists → implement directly + note a manual verification step); chasing a *bug or failing test* → `/diagnose`;
 > *code that's hard to change* (shallow modules, leaky seams) → `/refactor-advisor`. Docs / config /
 > spikes implement directly.
 >
@@ -66,7 +66,7 @@ only what is still open — one question at a time, recommend an answer each tim
 1. **Parse** — restate the task as a verifiable goal; confirm in one line.
 2. **G1** — run the checklist; BLOCK on any fail.
 3. **Implement** — execute; flag scope creep the moment it appears.
-4. **Self-review** — run the review checklist (below).
+4. **Self-review** — run the review checklist (below) as the floor; heavier isolated `/code-review` / `/verify` passes apply to non-trivial diffs and mvp+sprint-bulk, not quick low-risk tasks.
 5. **Commit** — structured message: `type(scope): summary`.
 
 ### mvp
