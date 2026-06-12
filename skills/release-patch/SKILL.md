@@ -1,6 +1,6 @@
 ---
 name: release-patch
-description: Use when releasing a patch on any project — auto-detects the manifest (plugin / npm / python / cargo / go / flat), bumps the PATCH version, prepends a CHANGELOG entry, then HARD STOPS before push. Skips the bump entirely if only docs changed. Never runs git push; emits a ready-to-push message and exits. Self-contained.
+description: Use when releasing a patch on any project — auto-detects the manifest (plugin / npm / python / cargo / go / flat), or falls back to a changelog-only entry when no manifest exists; bumps the PATCH version, prepends a CHANGELOG entry, then HARD STOPS before push. Skips the bump entirely if only docs changed. Never runs git push; emits a ready-to-push message and exits. Self-contained.
 argument-hint: ""
 allowed-tools: Read, Write, Edit, Bash(git diff *), Bash(git log *), Bash(git tag *), Glob, Grep
 user-invocable: true
@@ -31,12 +31,12 @@ First match wins. Priority: plugin > npm > python > cargo > go > flat.
 | `Cargo.toml` | cargo | `[package] version` |
 | `go.mod` | go | tag-based — prompt the user for the tag string |
 | `VERSION` (flat file) | flat | overwrite with the new semver |
-| none of the above | n/a | emit `[skip] no version manifest detected`, exit |
+| none of the above | changelog-only | no manifest — prepend a dated CHANGELOG entry, **no** version bump (see below) |
 
 ## Steps
 
 1. **Diff scan** — `git diff --name-only HEAD~1 HEAD` (or `HEAD` if uncommitted). If every changed path is under `docs/`, abort: `[skip] docs-only diff — no version bump`. Exit.
-2. **Mode detect** — run the cascade; save the mode + manifest path(s). None → `[skip] no version manifest detected`. Exit.
+2. **Mode detect** — run the cascade; save the mode + manifest path(s). No manifest → **changelog-only mode** (below); do not exit.
 3. **PATCH bump** — increment the patch digit per mode. Plugin: verify both files are equal, then bump both. Single-manifest modes: read → bump → write. Go: prompt for the tag string.
 4. **CHANGELOG entry** — detect `docs/CHANGELOG.md` (canonical placement, DOCS_Guide §2), else `CHANGELOG.md` / `CHANGES.md` / `HISTORY.md` at the repo root (default `docs/CHANGELOG.md`). Prepend a new block matching the file's existing entry shape; if empty/missing, use Keep-a-Changelog format.
 5. **Stale-doc clear** — any doc with `last_updated:` frontmatter that appears in the diff → bump it to today (`yyyy-MM-dd`).
@@ -62,6 +62,22 @@ Run manually: git push origin <branch>
 [push]      HARD STOP — manual git push required
 ======================
 ```
+
+## Changelog-only mode (no manifest)
+
+When the cascade finds **no version manifest**, there is nothing to bump — but a code change still
+deserves a CHANGELOG line. So instead of skipping outright:
+
+1. The step-1 **docs-only abort still wins** — a docs-only diff exits there (nothing to log).
+2. For a code diff: prepend a dated entry to `docs/CHANGELOG.md` (Keep-a-Changelog; a `[YYYY-MM-DD]` or `Unreleased` block), **no version line, no bump**.
+3. Emit the push gate with `Version: n/a (changelog-only)` and exit. Still never pushes.
+
+Gives manifestless repos (no `package.json` / `VERSION` / etc.) the changelog value without inventing a version scheme they don't use.
+
+## Examples
+
+- **Flat `VERSION`** — `cat VERSION` → `1.4.2`; bump → write `1.4.3`; prepend the `v1.4.3` block to `docs/CHANGELOG.md`; emit the push gate (`Version: 1.4.2 → 1.4.3`).
+- **Changelog-only** (no manifest, code diff) — cascade finds nothing; prepend a dated `docs/CHANGELOG.md` entry summarising the change; emit the push gate (`Version: n/a (changelog-only)`).
 
 ## Constraints
 

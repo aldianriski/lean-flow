@@ -70,10 +70,10 @@ stays a separate, standalone skill. (TASK-020)
 entry; worked examples for flat `VERSION` + changelog-only; release-patch unmerged.
 
 **DoD:**
-- [ ] `lean-doc-generator close` + `sprint-bulk` close **invoke** `/release-patch` (not just prompt)
-- [ ] no-manifest fallback prepends a dated `docs/CHANGELOG.md` entry, no version bump (docs-only-diff abort still wins — A1)
-- [ ] worked example added for the flat `VERSION` case **and** the changelog-only case
-- [ ] release-patch remains a separate skill (NOT merged into lean-doc-generator)
+- [x] `lean-doc-generator close` + `sprint-bulk` close **invoke** `/release-patch` (orchestrator step 6 · lean-doc close row · flow close — all flipped from "prompt")
+- [x] no-manifest fallback prepends a dated `docs/CHANGELOG.md` entry, no version bump (docs-only-diff abort still wins — A1 confirmed)
+- [x] worked example added for the flat `VERSION` case **and** the changelog-only case
+- [x] release-patch remains a separate skill (NOT merged into lean-doc-generator)
 
 ### T4 — Optional frontend-only DESIGN.md (design-system / tokens) template `[size: S · risk: low]`
 Layers: `skills/lean-doc-generator/templates/DESIGN.md.template` · `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/DOCS_Guide.md`
@@ -139,6 +139,13 @@ TODO.md.template · README · migration-map); +14/−7 lines. Caps held (prime 7
 orchestrator 107). Diff-scoped self-review passed. Note: orchestrator fixes folded inline (no new
 lines); TODO.md.template's "never single-task sprint" rule reversed → single-task valid for dogfood.
 
+### 2026-06-12 | T3 | release-patch auto-handoff + changelog-only fallback (4/4 DoD)
+Session model (release-flow sensitivity). Close now **invokes** `/release-patch` in all three paths
+(orchestrator step 6 · lean-doc close row · flow close). release-patch gains **changelog-only mode**
+(no manifest → dated `docs/CHANGELOG.md` entry, no bump; A1 confirmed: docs-only diff still aborts at
+step 1) + worked examples (flat `VERSION` · changelog-only). Not merged — stays standalone.
+release-patch 79 → 94 ≤ 110.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -152,6 +159,9 @@ lines); TODO.md.template's "never single-task sprint" rule reversed → single-t
 | `skills/lean-doc-generator/templates/TODO.md.template` | T2 | single-task sprints now valid (dogfood/validation) | Low | reads cleanly |
 | `README.md` | T2 | install uses marketplace-qualified id `lean-flow@lean-flow` | Low | reads cleanly |
 | `skills/lean-doc-generator/references/migration-map.md` | T2 | inbound-link fixing made an explicit apply sub-step | Low | reads cleanly |
+| `skills/release-patch/SKILL.md` | T3 | changelog-only mode + flat/changelog examples; desc updated | Low | 94 ≤ 110 |
+| `skills/lean-doc-generator/SKILL.md` | T3 | close row: prompt → **invoke** `/release-patch` | Low | reads cleanly |
+| `skills/flow/SKILL.md` | T3 | close step: prompt → **invoke** `/release-patch` | Low | reads cleanly |
 
 ## Retro
 <!-- Written at close. Route the buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·

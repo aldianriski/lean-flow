@@ -82,7 +82,7 @@ Operates on the active sprint file `docs/sprint/SPRINT-NNN-<slug>.md` (its Plan 
 3. **Sequence** — tasks (Tn) with overlapping files run sequentially; **disjoint tasks at scale → `/batch`** (decompose → one worktree subagent per unit → PR each; `/workflows` watches it).
 4. **Loop** — per Plan task: Implement → Self-review → Commit → tick its DoD `[x]`; **append to the sprint Execution Log** (don't edit § Plan — it's frozen). `/loop` can pace the iteration.
 5. **First-blocker halt** — stop on any blocker or human `block`; log it and wait.
-6. **Close** — all DoD `[x]` → run `/lean-doc-generator close`, then prompt `/release-patch`.
+6. **Close** — all DoD `[x]` → run `/lean-doc-generator close`, then **invoke** `/release-patch`.
 
 ## Review
 
