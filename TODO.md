@@ -35,11 +35,21 @@ status: current
       done-when: TASK-003 · 005 · 013–016 closed; TD-005 resolved (CONTEXT ≤ cap or cap revised); final link/path consistency grep clean; manifests bumped 1.0.0 lockstep
       touches: `.claude-plugin/` · `docs/CHANGELOG.md`
       depends-on: TD-005 (TASK-005 closed via SPRINT-005; TASK-003 · 013…016 via SPRINT-003)
-      state: blocked   (waiting on TD-005 only)
+      state: blocked   (waiting on TD-005 only — TASK-027 addresses it)
+
+- [ ] **TASK-027 — CONTEXT.md diet to ≤100 (or formally revise the cap) — resolves TD-005** [size: M] [risk: med] [HITL]
+      done-when: `.claude/CONTEXT.md` ≤ 100 lines via content diet (move detail to skill references / trim) **OR** the 100-line cap formally revised in DOCS_Guide §2 with rationale; no information lost (moved, not deleted); SSOT still reads coherently; TD-005 marked resolved
+      touches: `.claude/CONTEXT.md` · `skills/lean-doc-generator/references/DOCS_Guide.md` (if cap revised) · skill `references/` (if detail relocated)
+      assumes: diet-vs-revise is a G2 design call; the tier-map + roster detail can live in references without losing the SSOT's value
+      state: ready   (v1.0 blocker — from TD-005 aging at SPRINT-006 promote)
 
 ### P2 — Quality / Polish
 
-_(empty — TASK-005·023·024·025 shipped in SPRINT-005)_
+- [ ] **TASK-026 — Scale review depth: single scoped reviewer for small/medium; reserve `/code-review` fan-out for large/high-risk** [size: S] [risk: low] [HITL]
+      done-when: orchestrator Review + `review-scoping.md` state a depth rule — small/medium diff → **one** scoped cheap-tier (`sonnet`) reviewer with the diff + blast-radius brief; `/code-review`'s multi-finder fan-out reserved for **large / high-risk** diffs; the imprecise "fold into one `/code-review`; don't fan out" skip-table row corrected; orchestrator stays ≤ ~110
+      touches: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/review-scoping.md`
+      assumes: none — built on the observed `/code-review` finder fan-out cost (4 finders × 20–64k tokens)
+      state: ready   (from the v0.3.1 review-fanout gap)
 
 ### P3 — Long-term
 
