@@ -15,6 +15,13 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
+## L-008: SSOT docs silently accumulate duplication of their satellite docs — `.claude/CONTEXT.md` had drifted to 151 lines re-stating CLAUDE.md/README prose (loop diagram, curated-not-copied, built-in detail). §11 doc-aging covers ledgers, not this. Fix: a periodic SSOT-dedup pass (→ pointers).
+- seen: Sprint-006
+- count: 1
+- promoted: no   (if it recurs → promote to a §11 doc-aging trigger for the SSOT)
+
+---
+
 ## L-007 → promoted: yes → CLAUDE.md anti-pattern ("a new behaviour's final DoD must be exercised once on real input"). Spec-only-debt trap; seen Sprint-003 (TD-001) + Sprint-004 (T3/T5); validation follow-ups TASK-023 · TASK-024.
 
 ---

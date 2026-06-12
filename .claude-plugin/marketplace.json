@@ -10,7 +10,7 @@
     {
       "name": "lean-flow",
       "description": "Lean agentic dev loop for Claude Code: prime → lean-doc → orchestrate → repeat. Eleven standalone skills + an opt-in /flow conductor + a /council decision aid.",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "source": {
         "source": "github",
         "repo": "aldianriski/lean-flow"

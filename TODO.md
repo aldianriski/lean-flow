@@ -18,9 +18,8 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-006 — Review Depth & Context Diet** · status: active · 2 tasks (TASK-026·027)
-> → [`docs/sprint/SPRINT-006-review-depth-and-context-diet.md`](docs/sprint/SPRINT-006-review-depth-and-context-diet.md)
-> _(TASK-017 v1.0 gate: TASK-027 here resolves the last blocker TD-005)_
+> _(no active sprint — SPRINT-006 closed 2026-06-12, archived per §11; **TASK-017 (v1.0) now fully
+> unblocked** — TASK-005 + TD-005 both resolved)_
 
 ---
 
@@ -35,14 +34,12 @@ status: current
 - [ ] **TASK-017 — v1.0 release checklist (umbrella)** [size: S] [risk: low] [HITL]
       done-when: TASK-003 · 005 · 013–016 closed; TD-005 resolved (CONTEXT ≤ cap or cap revised); final link/path consistency grep clean; manifests bumped 1.0.0 lockstep
       touches: `.claude-plugin/` · `docs/CHANGELOG.md`
-      depends-on: TD-005 (TASK-005 closed via SPRINT-005; TASK-003 · 013…016 via SPRINT-003)
-      state: blocked   (waiting on TD-005 only — TASK-027 addresses it)
-
-- TASK-027 — CONTEXT.md diet / resolve TD-005 → promoted to SPRINT-006 (T2)
+      depends-on: none — all blockers cleared (TASK-005 + TD-005 via SPRINT-005/006; TASK-003 · 013…016 via SPRINT-003)
+      state: ready   (v1.0 — all gates clear; final link/path grep + 1.0.0 lockstep bump remain)
 
 ### P2 — Quality / Polish
 
-- TASK-026 — Scale review depth (single scoped reviewer; `/code-review` for large/high-risk) → promoted to SPRINT-006 (T1)
+_(empty — TASK-026 shipped in SPRINT-006)_
 
 ### P3 — Long-term
 
@@ -73,9 +70,8 @@ status: current
   - Summary: `skills/orchestrator/SKILL.md` was at the ~110 cap. Resolved by offloading the Review detail to `skills/orchestrator/references/review-scoping.md`; SKILL trimmed to 107 ≤ 110.
 - **TD-004** severity: trivial | status: resolved → SPRINT-005 T1 (2026-06-12)
   - Summary: cap-rule vs reality inconsistency. Resolved: cap rule amended (ADR-006 wording — artifacts in `references/` don't count) in CLAUDE.md + DOCS_Guide §2; council now conforms, so no exception remains.
-- **TD-005** severity: medium | status: open | created: Sprint-002 (worsened SPRINT-004: 137 → 151)
-  - Summary: `.claude/CONTEXT.md` is **151 lines** against its own 100-line cap — the SSOT violates the standard it anchors. Bumped minor → medium at SPRINT-004 close (the tier-map section pushed it ~50% over). Surfaced by the Sprint-002 review pass.
-  - done-when: CONTEXT.md ≤ 100 lines via content diet (move detail to skill references), or the cap is formally revised in DOCS_Guide §2.
+- **TD-005** severity: medium | status: resolved → SPRINT-006 T2 (2026-06-12)
+  - Summary: `.claude/CONTEXT.md` was 151 vs its 100-line cap. Resolved via hybrid (ADR-007): dedup diet 151 → 127 (prose duplicating CLAUDE.md/README → pointers, no info lost) + cap revised 100 → 130 in DOCS_Guide §2.
 
 ---
 

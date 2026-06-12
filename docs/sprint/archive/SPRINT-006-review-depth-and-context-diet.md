@@ -3,9 +3,9 @@ sprint: 006
 slug: review-depth-and-context-diet
 owner: Maintainer
 last_updated: 2026-06-12
-status: active
+status: closed
 plan_commit: 5f16897
-close_commit: TBD
+close_commit: 656ac3c
 update_trigger: sprint execute/close events
 ---
 
@@ -52,7 +52,7 @@ with rationale. (TASK-027)
 - [x] **TD-005 resolved** (marked in TODO at close)
 
 ## Owner-action checklist
-- [ ] None — both tasks are dev/spec work.
+- [x] None — both tasks are dev/spec work.
 
 ## Decisions (pre-locked)
 - **D1** — TASK-027 fork (diet vs revise-cap) is a **G2 design call**. Lean default: **diet** (relocate detail, keep the 100 cap credible). If instead the cap is revised, that's a standard-credibility change → record an **ADR** (like ADR-006 did for the SKILL cap).
@@ -98,10 +98,11 @@ index updated. TD-005 resolved.
      follow-ups → TASK-NNN · learnings → LEARNINGS. Then archive (§11). -->
 
 **Worked**
--
+- The owner's screenshot turned a vague "review wastes tokens" into a **precise** lever (reserve `/code-review` fan-out for large/high-risk; single scoped reviewer otherwise) — concrete evidence > abstract spec review.
+- **Dedup-first** diet resolved TD-005 with zero info loss — CONTEXT was carrying *duplication*, not just length; ADR-007 then made the cap honest (the ADR-006 pattern reused cleanly).
 
 **Friction**
--
+- CONTEXT.md had drifted into duplicating CLAUDE.md/README prose over six sprints — the SSOT silently accretes copies of its satellite docs unless actively deduped.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- **SSOT docs silently accumulate duplication of their satellite docs** (CONTEXT ↔ CLAUDE/README) — §11 doc-aging covers ledgers but not this. → **L-008** (count 1); if it recurs, promote to a periodic SSOT-dedup trigger.

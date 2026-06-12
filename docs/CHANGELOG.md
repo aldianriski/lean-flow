@@ -11,6 +11,26 @@ status: current
 
 ---
 
+## v0.3.2 — Review Depth & Context Diet (2026-06-12)
+
+PATCH — fixes/refactor. Ships SPRINT-006 (block below): review depth scaled to diff size (single scoped
+`sonnet` reviewer for small/medium; `/code-review` finder fan-out reserved for large/high-risk — closes
+the v0.3.1 token-waste gap) · `.claude/CONTEXT.md` dedup diet 151 → 127 + cap raised 100 → 130
+(**ADR-007**), resolving TD-005. Manifests → 0.3.2 lockstep.
+
+---
+
+## Sprint 006 — Review Depth & Context Diet (closed 2026-06-12)
+
+| Shipped | What |
+|---|---|
+| Review depth | `review-scoping.md` "Scale depth to diff size" — small/med → one scoped `sonnet` reviewer; `/code-review` fan-out only for large/high-risk; fixed the imprecise skip-table row |
+| CONTEXT diet | dedup 151 → 127 (prose duplicating CLAUDE.md/README → pointers; no info lost) + cap 100 → 130 (**ADR-007**) — **TD-005 resolved** |
+
+L-008 logged (SSOT dedup hygiene). **TASK-017 (v1.0) is now fully unblocked** — TASK-005 + TD-005 both done.
+
+---
+
 ## v0.3.1 — Conform & Validate (2026-06-12)
 
 PATCH — fixes/refactor sprint (no new capability), bumped by hand per the close routing T2 added.
