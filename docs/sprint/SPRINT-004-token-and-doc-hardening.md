@@ -104,7 +104,7 @@ proposal HITL.
 - [x] SKILL.md migrate blurb updated to "adopt + clean"
 
 ## Owner-action checklist
-- [ ] None — all tasks are dev/spec work.
+- [x] None — all tasks are dev/spec work.
 
 ## Decisions (pre-locked)
 - **D1** — DESIGN.md ships as an OPTIONAL, frontend-only template, **not** a core doc (stack-specific + part-HOW; a spec/contract artifact). **→ no ADR** (easily reversible).
