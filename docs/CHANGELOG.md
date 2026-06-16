@@ -11,6 +11,26 @@ status: current
 
 ---
 
+## v1.1.0 — Extend & Harden (2026-06-16)
+
+MINOR — SPRINT-007. Two new doc-type templates (**RESEARCH** → `docs/research/`, **DEPLOY** →
+`docs/DEPLOY.md`); stream/commit-contamination hardening (L-042/L-037) across CLAUDE + CONTEXT + the
+shipped orchestrator G2 / SPRINT template; three skill red-flags (L-024 orchestrator · L-017
+task-decomposer · L-016 tdd); optional `related:` cross-link in the LEARNINGS template; graphify
+integration removed (kept as an on-demand pointer — verdict `docs/research/graphify-daily-value.md`);
+adopter transition path via `migrate`. Manifests → 1.1.0 lockstep.
+
+### Upgrade notes (existing users)
+- **New doc types are opt-in** — nothing changes until you generate a `docs/research/<slug>.md` or
+  `docs/DEPLOY.md` (or run `/lean-doc-generator migrate`, which now offers both).
+- **LEARNINGS `related:` is additive** — existing ledgers stay valid; the field is optional and never
+  backfilled. No action needed.
+- **graphify is now on-demand only** — `/prime` no longer reads `graphify-out/`. If you relied on it,
+  run graphify yourself when onboarding an unfamiliar repo or before a refactor; `migrate` flags an
+  existing `graphify-out/` and leaves it (never deletes).
+
+---
+
 ## v1.0.0 — First stable (2026-06-12)
 
 MAJOR milestone — lean-flow is production-ready. TASK-017 (v1.0 checklist) closed: every prior TD

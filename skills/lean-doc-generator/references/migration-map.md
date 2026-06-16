@@ -58,6 +58,7 @@ filename) — content untouched. Propose these in the per-file plan like any oth
 | `DECISIONS.md` (root) | `docs/DECISIONS.md` (stays the thin index; ADRs already `docs/adr/`) |
 | `ARCHITECTURE.md` (root) | `docs/ARCHITECTURE.md` |
 | `SETUP.md` (root) | `docs/SETUP.md` |
+| `DEPLOY.md` / `deploy/` (root) | `docs/DEPLOY.md` (align to `DEPLOY.md.template`) |
 | `CONTEXT.md` / `CLAUDE.md` (root) | `.claude/CONTEXT.md` / `.claude/CLAUDE.md` |
 | `README.md` · `TODO.md` | stay at root (front-door · daily working file) — never relocate |
 
@@ -72,6 +73,10 @@ filename) — content untouched. Propose these in the per-file plan like any oth
 | sprint files | reformat | `SPRINT.md.template` (Retro → §10 routing) |
 | `TODO.md` | reformat | Backlog-pool (P0–P3) + Tech Debt + Active-Sprint **pointer** |
 | `CHANGELOG.md` | keep / align | Keep-a-Changelog; sprint-close feeds it |
+| ad-hoc deploy doc · `deploy/` · `RELEASE.md` | reformat + relocate | `docs/DEPLOY.md` via `DEPLOY.md.template` (operational runbook; code-HOW → comments) |
+| research · spike · decision write-ups · `notes/` | reformat | `docs/research/<slug>.md` via `RESEARCH.md.template` (desk synthesis → feeds an ADR) |
+| `graphify-out/` + graphify mentions | **flag, don't delete** | lean-flow no longer integrates graphify (on-demand only) — note it's inert under the loop; leave the artifact, offer to clean the mentions, **never auto-delete** |
+| existing `LEARNINGS.md` lacking `related:` | keep as-is | the `related:` field is **optional + additive** — never backfill; entries without it stay conforming |
 | `agents/`, `hooks/` | **flag, don't delete** | lean-flow ships none — the loop dispatches built-ins; tell the user these are now inert under lean-flow |
 | adlc-flow `HYPOTHESIS.md` · `EVAL-SUITE/` · `GOLDEN-DATASET/` · `OBSERVABILITY.md` … | **leave untouched + note** | out of lean-flow scope (those are adlc-flow's domain) |
 
@@ -79,6 +84,8 @@ filename) — content untouched. Propose these in the per-file plan like any oth
 
 - Existing `README` → align to `README.md.template` sections; keep the content.
 - Existing architecture / design doc → `ARCHITECTURE.md` format.
+- Existing deploy / release runbook → `docs/DEPLOY.md` (`DEPLOY.md.template`); keep the steps, move code-HOW to comments.
+- Existing research / spike / decision write-up → `docs/research/<slug>.md` (`RESEARCH.md.template`).
 - Existing decision notes / ADRs (any shape) → rich `docs/adr/ADR-NNN-<slug>.md` + `DECISIONS.md` index.
 - Existing changelog → keep; align to Keep-a-Changelog if it diverges.
 - Existing backlog / issues file → `TODO.md` Backlog-pool + sprint pointer.

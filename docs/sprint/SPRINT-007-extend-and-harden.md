@@ -115,11 +115,11 @@ no new contention.
 **Acceptance:** a dry-run `migrate` on a repo with an ad-hoc DEPLOY note + a `graphify-out/` + a pre-`related` LEARNINGS.md produces a correct, **non-destructive** plan; CHANGELOG carries an upgrade-notes block.
 
 **DoD:**
-- [ ] `migration-map.md` gains rows: existing ad-hoc deploy doc / `deploy/` → `docs/DEPLOY.md` via template · research/spike notes → `docs/research/` via template (Placement + Known/Generic sections)
-- [ ] LEARNINGS `related:` documented as **optional + additive** — migrate does NOT backfill existing ledgers; entries without it stay conforming (backward-compat)
-- [ ] migrate detect/plan recognizes a user's `graphify-out/` + graphify mentions → notes lean-flow no longer integrates it (on-demand now); offers leave/clean, **never auto-deletes** user content
-- [ ] `docs/CHANGELOG.md` v1.1.0 entry carries an **"Upgrade notes (existing users)"** block: new opt-in doc types · LEARNINGS field additive · graphify now on-demand
-- [ ] dry-run migrate on the synthetic repo yields a correct non-destructive plan (exercise-on-real-input)
+- [x] `migration-map.md` gains rows: deploy doc/`deploy/`/`RELEASE.md` → `docs/DEPLOY.md` · research/spike notes → `docs/research/` (Placement + Known + Generic sections)
+- [x] LEARNINGS `related:` documented as **optional + additive** — migrate does NOT backfill existing ledgers; entries without it stay conforming (new Known-mapping row)
+- [x] migrate detect/plan recognizes `graphify-out/` + graphify mentions → notes lean-flow no longer integrates it (on-demand); offers leave/clean, **never auto-deletes** (new row)
+- [x] `docs/CHANGELOG.md` v1.1.0 entry carries an **"Upgrade notes (existing users)"** block (opt-in doc types · LEARNINGS additive · graphify on-demand)
+- [x] dry-run migrate on a synthetic repo (deploy/RELEASE.md + graphify-out/ + pre-`related` LEARNINGS.md) → **0 deletions, non-destructive**, all 3 new rows fired
 
 ## Owner-action checklist
 - [ ] At close: MINOR version bump `plugin.json` + `marketplace.json` `1.0.0 → 1.1.0` (lockstep) — by hand (release-patch is PATCH-only).
@@ -142,6 +142,9 @@ Seven tasks: TASK-031/028/029/032/030/033 pulled from Backlog (dependency order)
 
 ### 2026-06-16 | T1 done | Stream/commit hardening
 Commit-phase rule (L-042) + overlap-ownership map (L-037) landed in 4 surfaces: CLAUDE anti-pattern, CONTEXT § Streams + § Gates/G2, and the **shipped** surfaces orchestrator Batch-G2 step + SPRINT.md.template Plan note. All inline extensions — caps unmoved (CLAUDE 65, CONTEXT 127, orchestrator 107).
+
+### 2026-06-16 | T7 done | Adopter transition path
+migration-map gained deploy + research rows (Placement/Known/Generic) + a graphify-out flag-don't-delete row + a LEARNINGS-no-backfill row. CHANGELOG v1.1.0 block with "Upgrade notes (existing users)". Exercised via a dry-run migrate on a synthetic adopter repo (deploy/RELEASE.md + graphify-out/ + pre-`related` LEARNINGS.md): plan was non-destructive (0 deletions), all 3 new rows fired. Fixture cleaned up.
 
 ### 2026-06-16 | T6 done | Graphify removal
 Stripped the 4 live wiring sites (CONTEXT Orientation · README · ARCHITECTURE integration row · prime read-order line); kept ONE honest on-demand pointer in CONTEXT + README, citing the research verdict. **Deviation:** ADR-007's graphify mention left intact — it's a historical record of the SPRINT-006 dedup, and ADRs are append-only (§4); editing it would break the standard we ship. CONTEXT 127≤130.
