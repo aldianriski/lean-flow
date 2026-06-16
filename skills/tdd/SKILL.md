@@ -77,3 +77,4 @@ tests after each refactor step.
 ❌ **Refactoring while RED** — get to GREEN first; one change at a time.
 ❌ **Writing more code than the current test needs** — speculative code has no test driving it.
 ❌ **Using this to fix a bug** — that's `/diagnose` (test-first regression, then fix).
+❌ **Gating the commit on filtered test output** — `… | grep -E '^(OK|FAIL)'` can swallow `FAILED` and let a red suite through; gate on the runner's **exit code** (L-016).

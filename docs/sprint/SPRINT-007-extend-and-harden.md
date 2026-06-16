@@ -76,10 +76,10 @@ Promote three generalizable Kalasuara learnings into skill red-flags.
 **Acceptance:** each red-flag present in the matching SKILL, ≤2 lines, caps respected.
 
 **DoD:**
-- [ ] orchestrator red-flag (L-024: don't silently flip an encoded safeguard/doctrine under autonomy/sprint-bulk — gate default-OFF + surface the conflict for owner decision)
-- [ ] task-decomposer red-flag (L-017: pin a domain term with a concrete example, not a multiple-choice option — MCQ captures preference, not definition)
-- [ ] tdd|diagnose red-flag (L-016: gate the commit on the test-runner exit code, not grep-filtered output)
-- [ ] each ≤2 lines; SKILL caps respected
+- [x] orchestrator red-flag (L-024: don't silently flip an encoded safeguard/doctrine under autonomy/sprint-bulk — gate default-OFF + surface the conflict for owner decision)
+- [x] task-decomposer red-flag (L-017: pin a domain term with a concrete example, not a multiple-choice option — MCQ captures preference, not definition)
+- [x] tdd red-flag (L-016: gate the commit on the test-runner exit code, not grep-filtered output) — placed in `tdd` (the test-writing skill)
+- [x] each ≤2 lines; SKILL caps respected (orchestrator 108, task-decomposer 77, tdd 80 ≤110)
 
 ### T5 — Upgrade LEARNINGS template: add `related:` cross-link field `[size: S · risk: low]`
 Layers: `skills/lean-doc-generator/templates/LEARNINGS.md.template`.
@@ -142,6 +142,9 @@ Seven tasks: TASK-031/028/029/032/030/033 pulled from Backlog (dependency order)
 
 ### 2026-06-16 | T1 done | Stream/commit hardening
 Commit-phase rule (L-042) + overlap-ownership map (L-037) landed in 4 surfaces: CLAUDE anti-pattern, CONTEXT § Streams + § Gates/G2, and the **shipped** surfaces orchestrator Batch-G2 step + SPRINT.md.template Plan note. All inline extensions — caps unmoved (CLAUDE 65, CONTEXT 127, orchestrator 107).
+
+### 2026-06-16 | T4 done | Three skill red-flags
+L-024 → orchestrator (doctrine-flip under autonomy), L-017 → task-decomposer (pin a term with an example, not an MCQ), L-016 → tdd (gate on exit code, not filtered output). Each one line; caps held (108/77/80).
 
 ### 2026-06-16 | T3 done | DEPLOY doc type
 DEPLOY.md.template (snapshot-reconcile L-010 · verify-real-signal L-013 · exit-code gate L-016 · ops traps L-030) + DOCS_Guide §2 row + lean-doc SKILL routing + release-patch push-gate pointer (still hard-stops) + README row. Exercised on lean-flow's own `docs/DEPLOY.md` (lockstep-drift is the real footgun; server/LLM traps marked N/A here). Same CONTEXT-pointer refinement as T2.

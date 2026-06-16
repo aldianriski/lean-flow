@@ -74,3 +74,4 @@ local (TODO.md Backlog) — no external issue tracker.
 | "Four questions at once is faster" | stacked questions get vague answers — one at a time forces precision |
 | "These two are related, I'll merge them" | related ≠ same concern — verify the criteria are truly identical |
 | "I'll slice it by layer" | horizontal layers aren't demoable — slice vertically |
+| "A multiple-choice question pins the term" | an MCQ captures a *preference*, not a *definition* — pin a domain term with a concrete example, then confirm (L-017) |

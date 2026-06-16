@@ -105,3 +105,4 @@ Full routing · skip table · self-review checklist → `references/review-scopi
 ❌ **Self-implementing past the goal** — coordinate the task, do not expand it.
 ❌ **Grill skipped on ambiguous requirements** — builds the wrong thing.
 ❌ **Committing through a failing check** — surface the failure, don't bury it.
+❌ **Flipping an encoded safeguard/doctrine under autonomy** — `sprint-bulk` / "go autonomous" is momentum, not a licence to silently reverse a safety/policy default; keep it default-OFF + surface the conflict for an owner decision (L-024).
