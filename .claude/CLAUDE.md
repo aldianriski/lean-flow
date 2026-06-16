@@ -11,10 +11,10 @@
 .claude-plugin/
   plugin.json        # plugin manifest (lockstep version with marketplace.json)
   marketplace.json
-skills/              # 13 SKILL.md files (plugin auto-discovers)
+skills/              # 14 SKILL.md files (plugin auto-discovers)
   flow/    prime/   lean-doc-generator/  orchestrator/  task-decomposer/  triage/
-  prototype/  tdd/  diagnose/  refactor-advisor/  release-patch/  handoff/  council/
-  #  flow = opt-in conductor · 11 standalone stage-skills · council = opt-in agent-using decision aid
+  prototype/  tdd/  diagnose/  refactor-advisor/  release-patch/  handoff/  insights/  council/
+  #  flow = opt-in conductor · 12 standalone stage-skills · council = opt-in agent-using decision aid
   lean-doc-generator/
     references/DOCS_Guide.md      # the LEAN DOCUMENTATION STANDARD
     templates/*.md.template       # 13 canonical doc templates (core, incl. SPRINT · ADR · RESEARCH · DEPLOY)

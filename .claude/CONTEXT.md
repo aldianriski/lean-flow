@@ -16,7 +16,7 @@ CLAUDE.md defer here; this file points to their prose rather than duplicating it
 next `/prime` reads it. Every skill is independently usable; the loop is just the order they reward
 most together. (Diagram: README.)
 
-## Skill roster (13 — 11 stage-skills · 1 conductor · 1 decision aid)
+## Skill roster (14 — 12 stage-skills · 1 conductor · 1 decision aid)
 
 | Skill | Role | One-line purpose |
 |---|---|---|
@@ -32,6 +32,7 @@ most together. (Diagram: README.)
 | `/refactor-advisor` | deepen | find shallow→deep refactors (seams, deletion test); design the deepening |
 | `/release-patch` | ship | manifest-detect PATCH bump + changelog; stops before push |
 | `/handoff` | continuity | compact the conversation → temp-dir doc for the next session |
+| `/insights` | learn | anytime — a friction → an `L-NNN` candidate in `LEARNINGS` (or bump a match's `count`); complements the Sprint-Close Retro |
 | `/council` | decide | **opt-in, agent-using** — pressure-test a hard call via 5 advisors + peer review → `verdict-<slug>.md` → ADR |
 
 **Grill placement:** detailed grill at intake (`/task-decomposer`); G2 re-grills residuals only (an

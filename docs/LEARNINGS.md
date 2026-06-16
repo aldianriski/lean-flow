@@ -15,6 +15,14 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
+## L-010: When editing a plugin that is ALSO installed, the edit target is the REPO SOURCE (e.g. `D:\Project\lean-flow\skills\…`), never the install CACHE (`~/.claude/plugins/cache/lean-flow/…`) — and a Read of the cache copy (a skill loaded into context, or read in a prior step) does NOT satisfy the per-path read-before-edit requirement, so the first edit errors ("not read yet") or risks touching a read-only copy. Pattern: before editing any plugin file, Read its repo path explicitly; treat the cache tree as read-only output of `claude plugin install`.
+- seen: Sprint-007
+- count: 1
+- promoted: no
+- related: L-005 (use the Write/Edit tools on the right file, not a shell pipeline — both are edit-mechanism discipline)
+
+---
+
 ## L-009: A row-deletion Edit on a markdown TABLE can silently FUSE adjacent rows — removing the graphify row in `ARCHITECTURE.md` matched the wrong newline and merged the built-in-commands + Hooks rows (the Hooks row vanished from the render); grep and line-caps stayed clean, so it was caught ONLY by the fresh-context review. Pattern: after deleting a table row, re-read the table (diff the rendered rows) — don't trust the edit; and a reviewer who didn't write the edit catches author-blind structural defects.
 - seen: Sprint-007
 - count: 1

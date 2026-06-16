@@ -5,7 +5,7 @@
 
 # lean-flow
 
-**A lean agentic dev loop for Claude Code** — eleven standalone skills, a one-command conductor, and an opt-in decision council.
+**A lean agentic dev loop for Claude Code** — twelve standalone skills, a one-command conductor, and an opt-in decision council.
 <br />**No hooks · no scaffold · agent-free core.** Drop it into any repo and adapt.
 
 [![MIT License][license-shield]][license-url]
@@ -144,7 +144,7 @@ by hand) — same artifacts either way.
 
 ## The skills
 
-One conductor + eleven standalone stages + an opt-in decision council. `/flow` conducts; the eleven
+One conductor + twelve standalone stages + an opt-in decision council. `/flow` conducts; the twelve
 stage-skills each also run **standalone** (none require another); `/council` is for hard forks.
 
 | Stage | Skill | Use it for |
@@ -161,6 +161,7 @@ stage-skills each also run **standalone** (none require another); `/council` is 
 | | `/refactor-advisor` | find shallow→deep refactors (seams · deletion test) and design them |
 | **ship** | `/release-patch` | manifest-detect PATCH bump + changelog; stops before push |
 | **continuity** | `/handoff` | compact the conversation → temp-dir doc for the next session |
+| **learn** | `/insights` | capture a friction → an `L-NNN` learning candidate anytime; bumps a match toward promotion |
 | **decide** | `/council` | opt-in — pressure-test a hard/ambiguous call via 5 advisors → `verdict-<slug>.md` → feed an ADR (uses sub-agents) |
 
 The feed side is a pipeline: `/task-decomposer` (intake) → `/triage` (groom) → `/lean-doc-generator
@@ -283,7 +284,7 @@ Full map — composition rule, the loop, integration points, boundaries →
 
 ```
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
-skills/           13 skills — /flow conductor + 11 stages + /council (auto-discovered)
+skills/           14 skills — /flow conductor + 12 stages + /council (auto-discovered)
   lean-doc-generator/
     references/   DOCS_Guide.md · migration-map.md · ADR-example.md
     templates/    13 canonical doc templates (incl. SPRINT · ADR · RESEARCH · DEPLOY)
@@ -307,7 +308,7 @@ TODO.md · README.md
 ## Design principles
 
 - **Curated, not copied** — the core discipline. Every component was reviewed against "genuinely useful · important · actually used" and approved before adding — the opposite of bulk-importing from every reference. The bar is review, not a feature ban.
-- **Standalone, conducted when you want** — the eleven stage-skills each run alone (none require another); the opt-in `/flow` conductor sequences them through the full loop without bypassing a gate.
+- **Standalone, conducted when you want** — the twelve stage-skills each run alone (none require another); the opt-in `/flow` conductor sequences them through the full loop without bypassing a gate.
 - **Ships no agents; leverages the built-in ones** — no agent definitions of its own; the loop dispatches Claude's built-in agents (`Explore` · `/code-review` · `/verify` · `/security-review`) in isolated passes. `/council` is the one skill that orchestrates sub-agents internally.
 - **Lean** — most SKILL.md ≤ ~110 lines; the one skill that needs a canonical format (`lean-doc-generator`) bundles its own templates + standard and stays self-contained.
 - **Adaptable** — no required scaffold; skills detect the host project's layout and degrade gracefully.
@@ -350,7 +351,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 [license-url]: LICENSE
 [claude-shield]: https://img.shields.io/badge/Claude_Code-plugin-8A63D2?style=for-the-badge
 [claude-url]: https://claude.com/claude-code
-[skills-shield]: https://img.shields.io/badge/skills-13-blue?style=for-the-badge
+[skills-shield]: https://img.shields.io/badge/skills-14-blue?style=for-the-badge
 [skills-url]: #the-skills
 [website-shield]: https://img.shields.io/badge/website-aldianrizki.com-orange?style=for-the-badge
 [website-url]: https://aldianrizki.com/

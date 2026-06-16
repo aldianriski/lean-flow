@@ -20,10 +20,10 @@ status: current
 
 ```
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
-skills/           13 skills (auto-discovered at root)
+skills/           14 skills (auto-discovered at root)
   flow/                                                  opt-in conductor
   prime/ lean-doc-generator/ orchestrator/ task-decomposer/ triage/
-  prototype/ tdd/ diagnose/ refactor-advisor/ release-patch/ handoff/   11 stage-skills
+  prototype/ tdd/ diagnose/ refactor-advisor/ release-patch/ handoff/ insights/   12 stage-skills
   council/                                               opt-in agent decision aid
   <skill>/references/   on-demand depth (DOCS_Guide, testability, feedback-loops, deepening, …)
   lean-doc-generator/templates/   13 canonical doc templates (+ DESIGN, non-core)
