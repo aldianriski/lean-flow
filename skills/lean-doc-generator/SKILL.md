@@ -30,6 +30,7 @@ template ship inside this skill under `${CLAUDE_SKILL_DIR}/`.
 - `${CLAUDE_SKILL_DIR}/templates/*.md.template` — the canonical format per doc type. **The template IS the format** — read the matching one before writing any core doc.
 - `templates/DESIGN.md.template` — **OPTIONAL · frontend-only · non-core.** Offer only for UI/frontend repos wanting a shared design-system / token contract (`docs/DESIGN.md` or repo's design dir). Never auto-create; never include in core doc generation.
 - `templates/RESEARCH.md.template` — **occasional · create-lazily.** A decision-driving question → options · evidence · recommendation that **feeds an ADR** (desk synthesis; distinct from `/prototype` = design you must *feel*, and `/council` = a hard fork). → `docs/research/<slug>.md`.
+- `templates/DEPLOY.md.template` — **occasional · create-lazily.** The standard-release runbook (snapshot-reconcile · verify-by-real-signal · rollback · ops traps — operational, like SETUP). `/release-patch` bumps + stops before push; this owns the push/deploy steps. → `docs/DEPLOY.md`.
 
 ## Modes
 

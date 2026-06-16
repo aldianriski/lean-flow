@@ -32,6 +32,7 @@
 | `CHANGELOG.md` | `docs/` | Reviewer | append-only · rotated (§11) | Sprint closed | `templates/CHANGELOG.md.template` |
 | `LEARNINGS.md` | `docs/` | Team / AI | append-only · pruned (§11) | A learning confirmed at close, or promoted | `templates/LEARNINGS.md.template` |
 | `research/<slug>.md` | `docs/research/` | Team / AI | 120 soft · create-lazily | Question revisited, or a new source changes the verdict | `templates/RESEARCH.md.template` |
+| `DEPLOY.md` | `docs/` | Dev / ops | 100 soft · create-lazily | Release process / rollback changes | `templates/DEPLOY.md.template` |
 | `SPRINT-NNN-<slug>.md` | `docs/sprint/` | AI mid-sprint | 400 hard cap | Append during sprint; retro at close | `templates/SPRINT.md.template` |
 
 Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`. Paths above are relative to that dir.

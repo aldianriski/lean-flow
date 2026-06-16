@@ -43,13 +43,14 @@ First match wins. Priority: plugin > npm > python > cargo > go > flat.
 3. **PATCH bump** — increment the patch digit per mode. Plugin: verify both files are equal, then bump both. Single-manifest modes: read → bump → write. Go: prompt for the tag string.
 4. **CHANGELOG entry** — detect `docs/CHANGELOG.md` (canonical placement, DOCS_Guide §2), else `CHANGELOG.md` / `CHANGES.md` / `HISTORY.md` at the repo root (default `docs/CHANGELOG.md`). Prepend a new block matching the file's existing entry shape; if empty/missing, use Keep-a-Changelog format.
 5. **Stale-doc clear** — any doc with `last_updated:` frontmatter that appears in the diff → bump it to today (`yyyy-MM-dd`).
-6. **HARD STOP — push gate** — emit the message below and exit. **This skill never invokes `git push`.**
+6. **HARD STOP — push gate** — emit the message below and exit (if `docs/DEPLOY.md` exists, point to it for the push / deploy / verify / rollback steps). **This skill never invokes `git push`.**
 
 ```
 === READY TO PUSH ===
 Mode:    <plugin|npm|python|cargo|go|flat>
 Version: <old> → <new>
 Run manually: git push origin <branch>
+Deploy steps: docs/DEPLOY.md (push · verify · rollback — owned there, if present)
 =====================
 ```
 

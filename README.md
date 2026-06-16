@@ -228,6 +228,7 @@ The skills write durable, human-readable state into your repo — plain markdown
 | `docs/CHANGELOG.md` | `/release-patch` · sprint close | what shipped, per release |
 | `docs/LEARNINGS.md` | sprint close | confirmed learnings; recurring → durable rules |
 | `docs/research/<slug>.md` | `/lean-doc-generator` | a research question → options · evidence · recommendation (feeds an ADR) |
+| `docs/DEPLOY.md` | `/lean-doc-generator` | the standard-release runbook (push · verify · rollback) |
 | `.out-of-scope/` | `/triage` | rejected ideas, so they aren't re-litigated |
 | `CLAUDE.md` · `CONTEXT.md` · `ARCHITECTURE.md` | `/lean-doc-generator` | project shape · vocab · where-things-live |
 

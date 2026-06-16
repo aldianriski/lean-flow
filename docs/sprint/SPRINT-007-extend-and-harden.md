@@ -63,11 +63,11 @@ points to it but still hard-stops before push. Shares files with T2 → after T2
 **Acceptance:** DEPLOY.md.template exists; DOCS_Guide §2 placement; release-patch stop-message points to it; **rendered once on a real release**; release-patch still never pushes.
 
 **DoD:**
-- [ ] DEPLOY.md.template added (snapshot-reconcile · ops traps · rollback · verify-by-real-signal)
-- [ ] DOCS_Guide §2 row + `docs/` placement
-- [ ] `/release-patch` SKILL stop-message points to DEPLOY.md; still hard-stops before push
-- [ ] CONTEXT + README updated
-- [ ] rendered once on a real release
+- [x] DEPLOY.md.template added (snapshot-reconcile · ops traps · rollback · verify-by-real-signal — folds L-010/L-030/L-016/L-013)
+- [x] DOCS_Guide §2 row + `docs/` placement
+- [x] `/release-patch` SKILL stop-message points to DEPLOY.md; still hard-stops before push
+- [x] README updated; CONTEXT § Doc standard points to DOCS_Guide §2 (registry) → no CONTEXT edit needed (as T2)
+- [x] rendered once on a real release — lean-flow's own `docs/DEPLOY.md` (lockstep-drift runbook)
 
 ### T4 — Three targeted skill red-flags from the mine `[size: S · risk: low]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/task-decomposer/SKILL.md` · `skills/tdd` or `diagnose/SKILL.md`.
@@ -142,6 +142,9 @@ Seven tasks: TASK-031/028/029/032/030/033 pulled from Backlog (dependency order)
 
 ### 2026-06-16 | T1 done | Stream/commit hardening
 Commit-phase rule (L-042) + overlap-ownership map (L-037) landed in 4 surfaces: CLAUDE anti-pattern, CONTEXT § Streams + § Gates/G2, and the **shipped** surfaces orchestrator Batch-G2 step + SPRINT.md.template Plan note. All inline extensions — caps unmoved (CLAUDE 65, CONTEXT 127, orchestrator 107).
+
+### 2026-06-16 | T3 done | DEPLOY doc type
+DEPLOY.md.template (snapshot-reconcile L-010 · verify-real-signal L-013 · exit-code gate L-016 · ops traps L-030) + DOCS_Guide §2 row + lean-doc SKILL routing + release-patch push-gate pointer (still hard-stops) + README row. Exercised on lean-flow's own `docs/DEPLOY.md` (lockstep-drift is the real footgun; server/LLM traps marked N/A here). Same CONTEXT-pointer refinement as T2.
 
 ### 2026-06-16 | T2 done | RESEARCH doc type
 RESEARCH.md.template + `docs/research/` placement (DOCS_Guide §2 row) + lean-doc-generator SKILL routing (boundary vs /prototype + /council) + README artifacts row. Exercised on a real question — `docs/research/graphify-daily-value.md` (the graphify verdict), which also serves as T6/D2's WHY-trail. Refinement: CONTEXT § Doc standard is a pointer to DOCS_Guide §2, so the doc-type registry edit there is sufficient — no CONTEXT line spent (keeps cap headroom for T3/T6).
