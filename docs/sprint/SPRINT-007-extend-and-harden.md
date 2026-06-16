@@ -4,7 +4,7 @@ slug: extend-and-harden
 owner: Maintainer
 last_updated: 2026-06-16
 status: active
-plan_commit: pending
+plan_commit: a56cfb4
 close_commit: pending
 update_trigger: sprint execute/close events
 ---
