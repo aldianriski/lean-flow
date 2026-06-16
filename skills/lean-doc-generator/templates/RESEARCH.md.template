@@ -1,0 +1,35 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: Question revisited, or a new option/source changes the recommendation
+status: current | superseded
+---
+
+# Research — [the question, phrased as a question] [CUSTOMIZE]
+
+> **Question.** [The one decision-driving question this answers. If you can't end it with a
+> recommendation, it isn't a research doc — it's a `/prototype` (design to *feel*) or a `/council`
+> (a hard fork).]
+> **Verdict.** [One-line recommendation, decided — fill this last; it's why the doc exists.]
+
+## Why this matters
+[1–3 sentences — what depends on the answer, and the cost of guessing wrong. WHY, never HOW.]
+
+## Options considered
+<!-- One bullet per real option — what it is, not how to build it. -->
+- **A — [name]** — [one line]. *Trade-off:* [headline pro/con].
+- **B — [name]** — …
+
+## Findings
+<!-- The evidence that moves the verdict. Cite sources. Facts, never implementation detail. -->
+- [finding → the option it favours]. *Source:* [link / title].
+
+## Recommendation
+[The verdict, stated not hedged, + the one-line WHY. Hard-to-reverse **and** surprising **and** a real
+trade-off → promote to an ADR (`docs/adr/`) and link it; this doc becomes that ADR's Context.]
+
+## Out of scope / open questions
+- [what this did NOT settle → a follow-up TASK, a `/prototype`, or `/council`]
+
+<!-- Lives in docs/research/<slug>.md (≤120 soft). Feeds an ADR or a G2 design call, then remains the
+     WHY-trail. Once a decision is built on it, mark status: superseded rather than editing it. -->

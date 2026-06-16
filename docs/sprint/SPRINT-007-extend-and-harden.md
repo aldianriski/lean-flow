@@ -48,11 +48,11 @@ deep-research built-in conducts; the template captures).
 **Acceptance:** RESEARCH.md.template exists; DOCS_Guide §2 lists it + `docs/research/` placement; SKILL routes to it; **rendered once on a real research question.**
 
 **DoD:**
-- [ ] RESEARCH.md.template added (question · sources · findings · recommendation · feeds-ADR), WHY/WHERE only
-- [ ] DOCS_Guide §2 row + `docs/research/` placement added
-- [ ] lean-doc-generator SKILL.md routes to it (when to use; boundary vs `/prototype` + `/council`)
-- [ ] CONTEXT doc-standard + README artifacts table updated
-- [ ] rendered once on a real research question (anti spec-only-debt)
+- [x] RESEARCH.md.template added (question · sources · findings · recommendation · feeds-ADR), WHY/WHERE only
+- [x] DOCS_Guide §2 row + `docs/research/` placement added
+- [x] lean-doc-generator SKILL.md routes to it (when to use; boundary vs `/prototype` + `/council`)
+- [x] README artifacts table updated; CONTEXT § Doc standard already points to DOCS_Guide §2 (the doc-type registry) → no CONTEXT edit needed
+- [x] rendered once on a real research question — `docs/research/graphify-daily-value.md` (also the WHY-trail for T6/D2)
 
 ### T3 — Add DEPLOY doc type: template + `/release-patch` pointer `[size: M · risk: low]`
 Layers: `templates/DEPLOY.md.template` · `references/DOCS_Guide.md` (§2) · `skills/release-patch/SKILL.md` · `.claude/CONTEXT.md` · `README.md`.
@@ -142,6 +142,9 @@ Seven tasks: TASK-031/028/029/032/030/033 pulled from Backlog (dependency order)
 
 ### 2026-06-16 | T1 done | Stream/commit hardening
 Commit-phase rule (L-042) + overlap-ownership map (L-037) landed in 4 surfaces: CLAUDE anti-pattern, CONTEXT § Streams + § Gates/G2, and the **shipped** surfaces orchestrator Batch-G2 step + SPRINT.md.template Plan note. All inline extensions — caps unmoved (CLAUDE 65, CONTEXT 127, orchestrator 107).
+
+### 2026-06-16 | T2 done | RESEARCH doc type
+RESEARCH.md.template + `docs/research/` placement (DOCS_Guide §2 row) + lean-doc-generator SKILL routing (boundary vs /prototype + /council) + README artifacts row. Exercised on a real question — `docs/research/graphify-daily-value.md` (the graphify verdict), which also serves as T6/D2's WHY-trail. Refinement: CONTEXT § Doc standard is a pointer to DOCS_Guide §2, so the doc-type registry edit there is sufficient — no CONTEXT line spent (keeps cap headroom for T3/T6).
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->

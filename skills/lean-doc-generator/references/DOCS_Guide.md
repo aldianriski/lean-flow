@@ -31,6 +31,7 @@
 | `ADR-NNN-<slug>.md` | `docs/adr/` | Team | per file, append-only | Each significant decision (one ADR per file) | `templates/ADR.md.template` |
 | `CHANGELOG.md` | `docs/` | Reviewer | append-only · rotated (§11) | Sprint closed | `templates/CHANGELOG.md.template` |
 | `LEARNINGS.md` | `docs/` | Team / AI | append-only · pruned (§11) | A learning confirmed at close, or promoted | `templates/LEARNINGS.md.template` |
+| `research/<slug>.md` | `docs/research/` | Team / AI | 120 soft · create-lazily | Question revisited, or a new source changes the verdict | `templates/RESEARCH.md.template` |
 | `SPRINT-NNN-<slug>.md` | `docs/sprint/` | AI mid-sprint | 400 hard cap | Append during sprint; retro at close | `templates/SPRINT.md.template` |
 
 Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`. Paths above are relative to that dir.

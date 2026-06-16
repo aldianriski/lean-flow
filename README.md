@@ -227,6 +227,7 @@ The skills write durable, human-readable state into your repo — plain markdown
 | `docs/DECISIONS.md` / `docs/adr/` | `/lean-doc-generator` | ADRs — the WHY behind hard-to-reverse choices |
 | `docs/CHANGELOG.md` | `/release-patch` · sprint close | what shipped, per release |
 | `docs/LEARNINGS.md` | sprint close | confirmed learnings; recurring → durable rules |
+| `docs/research/<slug>.md` | `/lean-doc-generator` | a research question → options · evidence · recommendation (feeds an ADR) |
 | `.out-of-scope/` | `/triage` | rejected ideas, so they aren't re-litigated |
 | `CLAUDE.md` · `CONTEXT.md` · `ARCHITECTURE.md` | `/lean-doc-generator` | project shape · vocab · where-things-live |
 
