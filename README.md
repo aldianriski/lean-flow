@@ -286,7 +286,7 @@ Full map — composition rule, the loop, integration points, boundaries →
 skills/           13 skills — /flow conductor + 11 stages + /council (auto-discovered)
   lean-doc-generator/
     references/   DOCS_Guide.md · migration-map.md · ADR-example.md
-    templates/    11 canonical doc templates (incl. SPRINT · ADR · CONTEXT)
+    templates/    13 canonical doc templates (incl. SPRINT · ADR · RESEARCH · DEPLOY)
   tdd/references/             testability.md
   diagnose/references/        feedback-loops.md
   task-decomposer/references/ prd-and-slices.md

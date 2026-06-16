@@ -26,7 +26,7 @@ skills/           13 skills (auto-discovered at root)
   prototype/ tdd/ diagnose/ refactor-advisor/ release-patch/ handoff/   11 stage-skills
   council/                                               opt-in agent decision aid
   <skill>/references/   on-demand depth (DOCS_Guide, testability, feedback-loops, deepening, …)
-  lean-doc-generator/templates/   11 canonical doc templates
+  lean-doc-generator/templates/   13 canonical doc templates (+ DESIGN, non-core)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
 docs/             ARCHITECTURE.md · CHANGELOG.md · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
 TODO.md · README.md
@@ -43,7 +43,8 @@ human-approved) and **§10 governance** (Sprint-Close Retro routes to CHANGELOG 
 | System | How | Where |
 |---|---|---|
 | **Claude built-in agents** | dispatched in an **isolated pass** (no shipped agent files) — recon→`Explore` · review→`/code-review` · verify→`/verify` · security→`/security-review` | `CONTEXT.md` § Built-in leverage · `orchestrator` (ADR-002) |
-| **Claude built-in commands** | wired at loop points — `/goal` · `/plan` · `/batch` · `/loop` · `/run` · `/simplify` | `orchestrator` · `flow` || **Hooks** | none — deliberately (the loop is suggestion + gates, not enforcement) | — |
+| **Claude built-in commands** | wired at loop points — `/goal` · `/plan` · `/batch` · `/loop` · `/run` · `/simplify` | `orchestrator` · `flow` |
+| **Hooks** | none — deliberately (the loop is suggestion + gates, not enforcement) | — |
 | **`/council` sub-agents** | the one skill that orchestrates sub-agents *internally* (opt-in, high-stakes only) | `council` (ADR-004) |
 
 ## Boundaries (what lean-flow does NOT own)
