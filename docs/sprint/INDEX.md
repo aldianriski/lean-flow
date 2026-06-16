@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-12
+last_updated: 2026-06-16
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-007 — Extend & Harden — closed 2026-06-16 · pending
 - SPRINT-006 — Review Depth & Context Diet — closed 2026-06-12 · 656ac3c
 - SPRINT-005 — Conform & Validate — closed 2026-06-12 · 185b749
 - SPRINT-004 — Token & Doc Hardening — closed 2026-06-12 · dc839b1

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-12
+last_updated: 2026-06-16
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -12,6 +12,14 @@ Append-only record of confirmed corrections and patterns surfaced at Sprint Clos
 rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promote** before planning.
 
 <!-- Newest first. Never edit a past entry except to bump `seen` / `count` or set `promoted`. -->
+
+---
+
+## L-009: A row-deletion Edit on a markdown TABLE can silently FUSE adjacent rows — removing the graphify row in `ARCHITECTURE.md` matched the wrong newline and merged the built-in-commands + Hooks rows (the Hooks row vanished from the render); grep and line-caps stayed clean, so it was caught ONLY by the fresh-context review. Pattern: after deleting a table row, re-read the table (diff the rendered rows) — don't trust the edit; and a reviewer who didn't write the edit catches author-blind structural defects.
+- seen: Sprint-007
+- count: 1
+- promoted: no
+- related: L-006 (fresh/cold eyes catch author-blind issues — this is a 2nd occurrence of that pattern)
 
 ---
 
@@ -27,9 +35,10 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 ---
 
 ## L-006: Cold-context agents surface spec gaps the author cannot see (7 in one fresh-install run) — make a fresh-eyes cold run part of every release validation → fix: TASK-019
-- seen: Sprint-003
-- count: 1
-- promoted: no
+- seen: Sprint-003, Sprint-007
+- count: 2
+- promoted: no   (count ≥ 2 → promote at next promote — the fresh-context Review pass, already encoded in orchestrator § Review)
+- related: L-009 (table-row deletion fused neighbors; caught only by the fresh-context review)
 
 ---
 

@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-007 — extend-and-harden** → docs/sprint/SPRINT-007-extend-and-harden.md
+> _(no active sprint — SPRINT-007 closed 2026-06-16 → shipped in v1.1.0; archived per §11)_
 
 ---
 
@@ -30,19 +30,11 @@ status: current
 
 ### P1 — Next Phase Required
 
-- TASK-031 — promoted → SPRINT-007 T1 (2026-06-16)
-- TASK-017 — v1.0 release checklist → **shipped in v1.0.0** (2026-06-12): consistency grep clean · manifests 1.0.0 lockstep
+_(empty)_
 
 ### P2 — Quality / Polish
 
-<!-- TASK-026 shipped in SPRINT-006. The 2026-06-16 plugin-improvement batch promoted → SPRINT-007. -->
-
-- TASK-028 — promoted → SPRINT-007 T2 (2026-06-16)
-- TASK-029 — promoted → SPRINT-007 T3 (2026-06-16)
-- TASK-032 — promoted → SPRINT-007 T4 (2026-06-16)
-- TASK-030 — promoted → SPRINT-007 T5 (2026-06-16)
-- TASK-033 — promoted → SPRINT-007 T6 (2026-06-16)
-- TASK-034 — promoted → SPRINT-007 T7 (2026-06-16; born at promote — adopter transition path)
+_(empty — SPRINT-007 batch shipped in v1.1.0, 2026-06-16)_
 
 ### P3 — Long-term
 

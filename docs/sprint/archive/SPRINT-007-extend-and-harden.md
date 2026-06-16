@@ -3,7 +3,7 @@ sprint: 007
 slug: extend-and-harden
 owner: Maintainer
 last_updated: 2026-06-16
-status: active
+status: closed
 plan_commit: a56cfb4
 close_commit: pending
 update_trigger: sprint execute/close events
@@ -166,16 +166,29 @@ RESEARCH.md.template + `docs/research/` placement (DOCS_Guide §2 row) + lean-do
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `.claude/CLAUDE.md` · `.claude/CONTEXT.md` | T1 | commit-phase contamination rule + G2 overlap-ownership map | Low | caps re-counted |
+| `skills/orchestrator/SKILL.md` · `templates/SPRINT.md.template` | T1 | shipped surfaces for the stream/commit rule | Low | cap 108≤110 |
+| `templates/RESEARCH.md.template` · `docs/research/graphify-daily-value.md` | T2 | new doc type + rendered exercise | Low | rendered on real Q |
+| `templates/DEPLOY.md.template` · `docs/DEPLOY.md` | T3 | new doc type + rendered exercise | Low | rendered on real release |
+| `references/DOCS_Guide.md` · `lean-doc-generator/SKILL.md` · `README.md` | T2/T3 | §2 registry rows + routing + artifacts | Low | refs resolve (review) |
+| `skills/release-patch/SKILL.md` | T3 | push-gate → DEPLOY.md pointer (still hard-stops) | Low | review |
+| `skills/{orchestrator,task-decomposer,tdd}/SKILL.md` | T4 | three red-flags (L-024/017/016) | Low | caps held |
+| `templates/LEARNINGS.md.template` | T5 | optional `related:` field | Low | example shown |
+| `skills/prime/SKILL.md` · `docs/ARCHITECTURE.md` | T6 | graphify wiring stripped | Med | review (table fix) |
+| `references/migration-map.md` · `docs/CHANGELOG.md` | T7 | adopter transition rows + v1.1.0 upgrade notes | Low | dry-run migrate |
 
 ## Retro
 <!-- Written at close. Route buckets per DOCS_Guide §10. -->
 
 **Worked**
-- _(at close)_
+- Authoring stayed on the session model (judgment-dense rules/templates) with surgical inline edits to respect caps — CONTEXT never breached 130 despite 4 tasks touching it.
+- Reusing real session artifacts for the "render-once" exercises (graphify verdict → research doc; lean-flow's own release → DEPLOY.md) satisfied anti-spec-only-debt without inventing fixtures.
+- D1 shared-file serialization held — one serial actor edited CONTEXT/README across T1/T2/T3/T6 with zero contention.
+- The fresh-context review caught a CRITICAL the author couldn't see (fused ARCHITECTURE table) — the Review step paid for itself.
 
 **Friction**
-- _(at close)_
+- A row-deletion Edit on a markdown table fused adjacent rows (matched the wrong newline), silently dropping the Hooks row — invisible until review. → L-009.
+- Plugin-cache vs repo path: several first-attempt edits hit the read-only cache copy (read during promote ≠ repo-file read); had to re-read the repo file. Minor tax, no durable lesson.
 
-**Pattern candidate**
-- _(at close)_
+**Pattern candidate** (surface → `docs/LEARNINGS.md`)
+- **L-009** — a table-row deletion can fuse neighbors; re-read the table after, and lean on the fresh-context review. **2nd occurrence of L-006** (fresh eyes catch author-blind defects) → bump L-006 to count 2 (promote at next promote).
