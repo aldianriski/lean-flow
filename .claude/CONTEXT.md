@@ -61,7 +61,7 @@ exception** — it *sequences* the stages, never re-implements one. **Feed pipel
 | Gate | Name | Where | Checks |
 |---|---|---|---|
 | G1 | Scope | all `/orchestrator` modes | goal restated · size S/M/L (L splits) · files/blast-radius · out-of-scope named · assumptions confirmed |
-| G2 | Design | `mvp` · `sprint-bulk` | approach + WHY · verifiable micro-tasks · ADR if hard-to-reverse · residual grill until unambiguous |
+| G2 | Design | `mvp` · `sprint-bulk` | approach + WHY · verifiable micro-tasks · ADR if hard-to-reverse · **overlap-ownership map** (shared files → single owner + commit order, before first task) · residual grill until unambiguous |
 
 Humans approve gates — the skill never self-approves. Review is a self-review checklist (no review agent).
 
@@ -90,7 +90,7 @@ brief (spec · files · acceptance — the AFK durable-spec rule); G1/G2 + the r
 - **`TODO.md`** = Backlog pool (P0–P3) + Tech Debt; `/triage` grooms it; § Active Sprint is a pointer.
 - **`docs/sprint/SPRINT-NNN-<slug>.md`** = the active sprint (`SPRINT.md.template`): Theme · Scope · Plan (Tn + **DoD `[ ]`**) · Owner-action · Decisions→ADR · Assumptions · **Execution Log** (append-only; plan frozen at promote) · Files Changed · **Retro** (§10).
 - Flow: `promote` renders the sprint (sets `plan_commit`) → `sprint-bulk` loops the DoD → execute appends to the Log → `close` writes the Retro, routes buckets, sets `close_commit`. `/prime` counts open DoD.
-- **Streams** (optional) — parallel streams run one active sprint *each* (`stream:` frontmatter · one pointer per stream); cross-stream file overlap → coordinate, never parallel-build. Single-stream omits `stream:`.
+- **Streams** (optional) — parallel streams run one active sprint *each* (`stream:` frontmatter · one pointer per stream); cross-stream file overlap → coordinate, never parallel-build — and **at commit** stage shared files per-hunk (`git add -p` + verify `git diff --cached`), never a plain `git add <shared>` over another stream's WIP (contaminates at the commit phase, not just merge — L-042). Single-stream omits `stream:`.
 
 ## Doc standard
 

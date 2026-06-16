@@ -23,7 +23,9 @@ update_trigger: sprint execute/close events
 ## Plan
 
 <!-- One block per task. Pull these from TODO.md Backlog at promote (dependency order). The DoD
-     checkboxes are what /orchestrator sprint-bulk loops over and what /prime counts. -->
+     checkboxes are what /orchestrator sprint-bulk loops over and what /prime counts.
+     Tasks sharing a file: fix single-owner + commit order in § Decisions (a D-row); at commit stage
+     shared files per-hunk, never a plain `git add` over another task/stream's WIP (L-042/L-037). -->
 
 ### T1 — [verb-first title] `[size: M · risk: med]` [CUSTOMIZE]
 Layers: [files / modules this touches]

@@ -33,11 +33,11 @@ establishes the rule the rest of this sprint must follow on shared files (D1).
 **Acceptance:** CLAUDE.md carries the commit-contamination anti-pattern; CONTEXT § Streams + § Gates(G2) carry the commit-phase rule + overlap-ownership-mapping; caps respected.
 
 **DoD:**
-- [ ] CLAUDE.md anti-pattern: shared-file commits contaminate at the COMMIT phase, not just merge → serialize the stream, or `git add -p <shared>` + verify `git diff --cached` before commit; never plain `git add <shared>` while another stream has WIP in it
-- [ ] CONTEXT § Sprint model/Streams gains the commit-phase rule (extends "coordinate, never parallel-build")
-- [ ] CONTEXT § Gates/G2 gains an overlap-ownership-mapping step (map DoD + cross-task file overlap → single owner + order, before first task)
-- [ ] **rule also lands in a SHIPPED surface** — orchestrator SKILL G2 step + `SPRINT.md.template` stream note — so adopters get it, not only lean-flow's internal CLAUDE/CONTEXT
-- [ ] cross-checked vs L-003; CLAUDE.md ≤80, CONTEXT ≤130 caps respected
+- [x] CLAUDE.md anti-pattern: shared-file commits contaminate at the COMMIT phase, not just merge → serialize the stream, or `git add -p <shared>` + verify `git diff --cached` before commit; never plain `git add <shared>` while another stream has WIP in it
+- [x] CONTEXT § Sprint model/Streams gains the commit-phase rule (extends "coordinate, never parallel-build")
+- [x] CONTEXT § Gates/G2 gains an overlap-ownership-mapping step (map DoD + cross-task file overlap → single owner + order, before first task)
+- [x] **rule also lands in a SHIPPED surface** — orchestrator SKILL Batch-G2 step + `SPRINT.md.template` Plan note — so adopters get it, not only lean-flow's internal CLAUDE/CONTEXT
+- [x] cross-checked vs L-003; CLAUDE.md 65≤80, CONTEXT 127≤130 caps respected
 
 ### T2 — Add RESEARCH doc type: template + `docs/research/` convention `[size: M · risk: low]`
 Layers: `skills/lean-doc-generator/templates/RESEARCH.md.template` · `references/DOCS_Guide.md` (§2) · `lean-doc-generator/SKILL.md` · `.claude/CONTEXT.md` (doc standard) · `README.md` (artifacts).
@@ -139,6 +139,9 @@ no new contention.
 
 ### 2026-06-16 | promote | Plan locked
 Seven tasks: TASK-031/028/029/032/030/033 pulled from Backlog (dependency order) + **TASK-034 (T7) added at promote** — adopter transition path, surfaced when planning revealed lean-flow's own CLAUDE/CONTEXT aren't shipped to users. Governance review clean (no learning at count≥2, no aged/high TD). Single-stream.
+
+### 2026-06-16 | T1 done | Stream/commit hardening
+Commit-phase rule (L-042) + overlap-ownership map (L-037) landed in 4 surfaces: CLAUDE anti-pattern, CONTEXT § Streams + § Gates/G2, and the **shipped** surfaces orchestrator Batch-G2 step + SPRINT.md.template Plan note. All inline extensions — caps unmoved (CLAUDE 65, CONTEXT 127, orchestrator 107).
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
