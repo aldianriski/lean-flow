@@ -11,7 +11,9 @@ Append-only record of confirmed corrections and patterns surfaced at Sprint Clos
 **recurs (count ≥ 2)** is promoted into a *durable* rule — a `CLAUDE.md` anti-pattern, a `CONTEXT.md`
 rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promote** before planning.
 
-<!-- Newest first. Never edit a past entry except to bump `seen` / `count` or set `promoted`.
+<!-- Newest first. Never edit a past entry except to bump `seen` / `count`, set `promoted`, or
+     add/extend `related:` — an optional cross-link to sibling learnings (`L-NNN (one-line why)`)
+     that sharpens recall and surfaces recurring clusters, but is never required.
      Once an entry reaches promoted: yes, collapse it to a pointer line at the next promote (§11):
      "L-NNN → promoted: <where>" — the durable rule is the record from then on. -->
 
@@ -21,6 +23,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 - seen: Sprint-001
 - count: 1
 - promoted: no   <!-- once count ≥ 2: "yes → <CLAUDE.md anti-pattern | CONTEXT.md rule | skill red-flag>" -->
+- related: —   <!-- optional: sibling learnings, e.g. L-007 (one-line why each); or — if none -->
 
 ---
 
@@ -30,3 +33,4 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 - seen: Sprint-003, Sprint-005
 - count: 2
 - promoted: yes → CLAUDE.md anti-pattern + task-decomposer assumption registry
+- related: L-001 (the intake grill that surfaces the assumption before it regresses)

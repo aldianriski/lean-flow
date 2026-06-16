@@ -89,8 +89,8 @@ the template.
 **Acceptance:** template carries `related:` + guidance + an updated example.
 
 **DoD:**
-- [ ] `related:` line + one-line guidance added
-- [ ] filled example entry shows it
+- [x] `related:` line + one-line guidance added (header comment marks it optional + additive)
+- [x] filled example entry (L-000) shows it; blank L-001 entry shows the `related: —` default
 
 ### T6 — Remove graphify integration; leave one on-demand pointer `[size: S · risk: low]`
 Layers: `skills/prime/SKILL.md` · `README.md` · `docs/ARCHITECTURE.md` · `.claude/CONTEXT.md` (Orientation) · `docs/adr/ADR-007` (cross-ref only).
@@ -142,6 +142,9 @@ Seven tasks: TASK-031/028/029/032/030/033 pulled from Backlog (dependency order)
 
 ### 2026-06-16 | T1 done | Stream/commit hardening
 Commit-phase rule (L-042) + overlap-ownership map (L-037) landed in 4 surfaces: CLAUDE anti-pattern, CONTEXT § Streams + § Gates/G2, and the **shipped** surfaces orchestrator Batch-G2 step + SPRINT.md.template Plan note. All inline extensions — caps unmoved (CLAUDE 65, CONTEXT 127, orchestrator 107).
+
+### 2026-06-16 | T5 done | LEARNINGS related: field
+Added optional `related:` cross-link to LEARNINGS.md.template (both the blank L-001 and the filled L-000 example) + header-comment guidance marking it optional/additive. Backward-compatible — T7 documents that existing ledgers without it stay conforming.
 
 ### 2026-06-16 | T4 done | Three skill red-flags
 L-024 → orchestrator (doctrine-flip under autonomy), L-017 → task-decomposer (pin a term with an example, not an MCQ), L-016 → tdd (gate on exit code, not filtered output). Each one line; caps held (108/77/80).
