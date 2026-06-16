@@ -38,7 +38,6 @@ and read only its frontmatter + Plan (~50 lines). Count open **DoD `[ ]`** acros
 sprints (report per stream when more than one, e.g. `Tasks: 5 open (main: 3 · payments: 2)`); if
 no sprint is active, fall back to the Backlog.
 **Resuming from a `/handoff`?** Also read the handoff doc at the temp path it printed.
-**Graph available?** If `graphify-out/graph.json` exists, you may use it for orientation — optional enrichment, never required (lean-flow has no graph dependency).
 
 ## Steps
 

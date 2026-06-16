@@ -244,8 +244,9 @@ Skills auto-discover at the repo root after install. There is **nothing to scaff
 read whatever context files your project already has (`CLAUDE.md`, `README.md`, `TODO.md`,
 `docs/CHANGELOG.md`, `docs/ARCHITECTURE.md` — legacy root locations still matched) and degrade
 gracefully when one is missing. `/prime` aborts on
-nothing. No code-graph dependency — if you happen to run [graphify](https://github.com/safishamsi/graphify)
-(`graphify-out/`), `/prime` will use it for orientation, but it's never required.
+nothing. No code-graph dependency — lean-flow neither integrates nor depends on
+[graphify](https://github.com/safishamsi/graphify); it's a fine on-demand tool if you're onboarding an
+unfamiliar repo or doing a pre-refactor audit.
 
 **Already have docs (or ran dev-flow / adlc-flow)?** `/lean-doc-generator migrate` aligns them to
 lean-flow's placement · format · wiring — plan → approve → apply, surgically (never deletes your

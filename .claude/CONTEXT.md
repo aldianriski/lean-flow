@@ -101,8 +101,8 @@ ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4)
 ## Orientation
 
 Where-things-live = **`ARCHITECTURE.md`**. lean-flow ships **no hand-maintained codemap** (it rots —
-LAW 3); a queryable graph is generated on demand — if `graphify-out/graph.json` exists, `/prime` may
-use it (optional, never a dependency). No MCP / external tool is required.
+LAW 3) and **neither integrates nor depends on graphify** — a fine on-demand tool for onboarding an
+unfamiliar repo or a pre-refactor audit (verdict: `docs/research/graphify-daily-value.md`). No MCP required.
 
 ## Continuous learning governance
 

@@ -101,9 +101,9 @@ CONTEXT + README → last among the shared-file tasks (D1).
 **Acceptance:** the 6 mention sites cleaned to a single CONTEXT pointer; archived SPRINT-006 untouched.
 
 **DoD:**
-- [ ] graphify wiring stripped from prime/SKILL.md · README · ARCHITECTURE.md · CONTEXT Orientation · ADR-007 cross-ref
-- [ ] single CONTEXT pointer added: *"graphify is a fine on-demand tool for onboarding an unfamiliar repo or a pre-refactor audit — lean-flow neither integrates nor depends on it"*
-- [ ] archived SPRINT-006 left untouched (history)
+- [x] graphify wiring stripped from prime/SKILL.md · README · ARCHITECTURE.md (integration row removed) · CONTEXT Orientation. **ADR-007 left intact** — its mention is historical (append-only ADR; DOCS_Guide §4 never-edit-a-decided-ADR), logged
+- [x] single on-demand pointer kept in CONTEXT Orientation + README (cites `docs/research/graphify-daily-value.md`)
+- [x] archived SPRINT-006 left untouched (history)
 
 ### T7 — Smooth upgrade path for existing adopters (TASK-034) `[size: M · risk: low]`
 Layers: `skills/lean-doc-generator/references/migration-map.md` · `skills/lean-doc-generator/templates/LEARNINGS.md.template` (optional-field note) · `docs/CHANGELOG.md` (upgrade notes).
@@ -142,6 +142,9 @@ Seven tasks: TASK-031/028/029/032/030/033 pulled from Backlog (dependency order)
 
 ### 2026-06-16 | T1 done | Stream/commit hardening
 Commit-phase rule (L-042) + overlap-ownership map (L-037) landed in 4 surfaces: CLAUDE anti-pattern, CONTEXT § Streams + § Gates/G2, and the **shipped** surfaces orchestrator Batch-G2 step + SPRINT.md.template Plan note. All inline extensions — caps unmoved (CLAUDE 65, CONTEXT 127, orchestrator 107).
+
+### 2026-06-16 | T6 done | Graphify removal
+Stripped the 4 live wiring sites (CONTEXT Orientation · README · ARCHITECTURE integration row · prime read-order line); kept ONE honest on-demand pointer in CONTEXT + README, citing the research verdict. **Deviation:** ADR-007's graphify mention left intact — it's a historical record of the SPRINT-006 dedup, and ADRs are append-only (§4); editing it would break the standard we ship. CONTEXT 127≤130.
 
 ### 2026-06-16 | T5 done | LEARNINGS related: field
 Added optional `related:` cross-link to LEARNINGS.md.template (both the blank L-001 and the filled L-000 example) + header-comment guidance marking it optional/additive. Backward-compatible — T7 documents that existing ledgers without it stay conforming.
