@@ -5,7 +5,7 @@ owner: Maintainer
 last_updated: 2026-06-16
 status: closed
 plan_commit: a56cfb4
-close_commit: pending
+close_commit: d6025af
 update_trigger: sprint execute/close events
 ---
 
