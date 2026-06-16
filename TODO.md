@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-12
+last_updated: 2026-06-16
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -18,8 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-006 closed 2026-06-12, archived per §11; **TASK-017 (v1.0) now fully
-> unblocked** — TASK-005 + TD-005 both resolved)_
+> **SPRINT-007 — extend-and-harden** → docs/sprint/SPRINT-007-extend-and-harden.md
 
 ---
 
@@ -31,11 +30,19 @@ status: current
 
 ### P1 — Next Phase Required
 
+- TASK-031 — promoted → SPRINT-007 T1 (2026-06-16)
 - TASK-017 — v1.0 release checklist → **shipped in v1.0.0** (2026-06-12): consistency grep clean · manifests 1.0.0 lockstep
 
 ### P2 — Quality / Polish
 
-_(empty — TASK-026 shipped in SPRINT-006)_
+<!-- TASK-026 shipped in SPRINT-006. The 2026-06-16 plugin-improvement batch promoted → SPRINT-007. -->
+
+- TASK-028 — promoted → SPRINT-007 T2 (2026-06-16)
+- TASK-029 — promoted → SPRINT-007 T3 (2026-06-16)
+- TASK-032 — promoted → SPRINT-007 T4 (2026-06-16)
+- TASK-030 — promoted → SPRINT-007 T5 (2026-06-16)
+- TASK-033 — promoted → SPRINT-007 T6 (2026-06-16)
+- TASK-034 — promoted → SPRINT-007 T7 (2026-06-16; born at promote — adopter transition path)
 
 ### P3 — Long-term
 
