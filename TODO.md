@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-009 — External face + SSOT diet** → docs/sprint/SPRINT-009-external-face-ssot-diet.md
+> _(no active sprint — SPRINT-009 closed 2026-06-21; archived per §11. Unreleased — bundles into the next version.)_
 
 ---
 
@@ -79,9 +79,8 @@ _(empty — SPRINT-008 shipped TASK-009 · 013 · 017 · 010; archived 2026-06-2
 - **TD-003** resolved → SPRINT-004 T1 (orchestrator SKILL → 107 ≤110; Review → references/)
 - **TD-004** resolved → SPRINT-005 T1 (cap-rule wording fixed — artifacts in references/ don't count; ADR-006)
 - **TD-005** resolved → SPRINT-006 T2 (CONTEXT 151→127 + cap 100→130, ADR-007)
-- **TD-006** severity: medium | status: in SPRINT-009 (T1) | created: Sprint-008
-  - Summary: `.claude/CONTEXT.md` is effectively full (129/130 after the bug-intake line). The SSOT keeps accreting (L-008, now count 2). Needs a dedup pass (prose duplicating CLAUDE.md/README → pointers) before any further vocab/routing addition — else the next CONTEXT edit breaches the cap.
-  - done-when: CONTEXT.md back under ~120 with no info lost; L-008 promoted.
+- **TD-006** severity: medium | status: resolved → SPRINT-009 T1 (2026-06-21)
+  - Summary: CONTEXT.md deduped 130 → 122 (built-in detail → ARCHITECTURE pointer; curated/loop/governance compressed); 8 lines recovered, no info lost. L-008 promoted at SPRINT-009 promote.
 
 ---
 

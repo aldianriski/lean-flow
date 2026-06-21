@@ -3,9 +3,9 @@ sprint: 009
 slug: external-face-ssot-diet
 owner: Maintainer
 last_updated: 2026-06-21
-status: active
+status: closed
 plan_commit: ea03a54
-close_commit: [unset]
+close_commit: [pending]
 update_trigger: sprint execute/close events
 ---
 
@@ -105,16 +105,24 @@ Implement-routing line — no new line, stays 108/110). qa-check clean. All SPRI
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `.claude/CONTEXT.md` | T1/T2 | SSOT dedup 130→122 (TD-006) + optional `qa:` note | Med | qa-check + diff |
+| `skills/orchestrator/references/review-scoping.md` | T2 | QA-suggestion subsection (non-gate) | Low | review |
+| `skills/lean-doc-generator/templates/SPRINT.md.template` | T2 | soft QA prompt comment | Low | review |
+| `skills/tdd/references/test-strategy.md` (NEW) | T3 | per-task test-type guidance | Low | review |
+| `skills/tdd/SKILL.md` · `skills/orchestrator/SKILL.md` | T3 | pointers to test-strategy.md | Low | qa-check (caps) |
 
 ## Retro
-<!-- Written at close. Route buckets per §10; then archive → docs/sprint/archive/ + INDEX.md line (§11). -->
 
 **Worked**
-- _(at close)_
+- T1's dedup recovered 8 lines with zero info loss (compression → pointers), and the qa-check cap rule made the win measurable + safe.
+- Sequencing T1 (make room) before T2 (which edits CONTEXT) was the right call — no cap breach, no L-042 contention.
+- The external face landed lean: 3 soft touch-points + 1 reference, **no new skills** — the dev-flow bloat trap avoided as designed.
 
 **Friction**
-- _(at close)_
+- **L-010 recurred** — I edited the SPRINT template in the install *cache* path before the repo source; caught by habit, not tooling. 2nd occurrence → promote.
+- CONTEXT, even post-diet, is only at 123/130 — the SSOT runs structurally dense; future vocab additions will keep pressuring it (TD-006 bought headroom, didn't end the tension).
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
-- _(at close)_
+**Pattern candidate**
+- L-010 bumped to count 2 (Sprint-007 + Sprint-009) → promote at next promote (a skill red-flag / CLAUDE.md anti-pattern: edit the repo source, never the install cache).
+
+Buckets routed (§10): Shipped → CHANGELOG · Tech debt → **TD-006 resolved** → SPRINT-009 T1 · Learnings → L-010 bump · Follow-ups → none.

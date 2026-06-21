@@ -11,6 +11,20 @@ status: current
 
 ---
 
+## Sprint 009 — External face + SSOT diet (closed 2026-06-21)
+
+Unreleased (bundles into the next version). Delivered the QA discipline's external (advisory) face + paid down SSOT debt:
+
+| Shipped | What |
+|---|---|
+| SSOT diet | `.claude/CONTEXT.md` deduped 130 → 122 (built-in detail → ARCHITECTURE pointer; curated/loop/governance compressed) — **TD-006 resolved**; L-008's fix applied |
+| Soft QA prompts | non-blocking "tests? lint? security-review? perf?" suggestions in `review-scoping.md` + SPRINT template + the CONTEXT task-entry shape (suggestions, never gates) |
+| Test strategy | `skills/tdd/references/test-strategy.md` — per-task guide to choosing unit/integ/e2e/perf/load for the user's real code; `tdd` + `orchestrator` point to it (no new skills) |
+
+L-010 bumped to count 2 (cache-vs-repo-source edit trap recurred) → promote next.
+
+---
+
 ## Sprint 008 — QA discipline (closed 2026-06-21)
 
 Unreleased (bundles into the next version). Made the plugin's QA discipline real + exercised:
