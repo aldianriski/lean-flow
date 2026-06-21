@@ -3,9 +3,9 @@ sprint: 008
 slug: qa-discipline
 owner: Maintainer
 last_updated: 2026-06-21
-status: active
+status: closed
 plan_commit: 8602ce3
-close_commit: [unset]
+close_commit: [pending]
 update_trigger: sprint execute/close events
 ---
 
@@ -131,16 +131,27 @@ qa-check) in `docs/qa/`. Close→release gets exercised at this sprint's own clo
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `scripts/qa-check.sh` | T1/T3 | first executable code — mechanical QA check (ADR-008) | Med | self (42/0) |
+| `docs/QA.md` | T1 | judgment-rule release checklist | Low | review |
+| `docs/adr/ADR-008-*` · `docs/DECISIONS.md` | T1 | record the first-code departure | Low | review |
+| `.gitattributes` | T1 | pin `*.sh` LF so the shebang survives Windows checkout | Low | index LF verified |
+| `templates/BUG.md.template` · `.claude/CONTEXT.md` · `.claude/CLAUDE.md` · `docs/ARCHITECTURE.md` | T2 | bug template + intake routing + count 13→14 | Low | qa-check |
+| `templates/QA-TESTCASE.md.template` · `docs/qa/` | T3 | non-core test-case template + folder convention | Low | qa-check |
+| `docs/qa/QA-001..003` | T4 | golden-path cases (exercised) | Low | exercised |
 
 ## Retro
-<!-- Written at close. Route buckets per §10; then archive → docs/sprint/archive/ + INDEX.md line (§11). -->
 
 **Worked**
-- _(at close)_
+- The hybrid QA check (T1) paid off immediately — stayed 42/0 green and guarded T2's 13→14 and T3's non-core count change in real time, exactly its purpose.
+- Claims-vs-disk count design made the task order robust: no hardcoded number to break as templates were added.
+- Building the discipline *then* exercising it on the real loop this session (decompose→triage→promote→orchestrate→close) was stronger evidence than a synthetic fixture.
 
 **Friction**
-- _(at close)_
+- Committed `.sh` would have shipped CRLF and broken its own shebang on Windows checkout — caught only by git's warning, not a test; fixed mid-sprint with `.gitattributes`. → **L-011**.
+- `CONTEXT.md` hit 129/130 adding one routing line — the SSOT is effectively full; a dedup pass is overdue (L-008's underlying issue, 2nd brush). → **TD-006** + **L-008 bump**.
+- The non-core template count needed a manual script edit (`noncore` 1→2) when QA-TESTCASE landed — anticipated in ADR-008; acceptable maintenance tax.
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
-- _(at close)_
+**Pattern candidate**
+- L-011 (sh/eol) filed. L-008 bumped to count 2 → promote at next promote.
+
+Buckets routed (§10): Shipped → CHANGELOG · Tech debt → TD-006 · Learnings → L-011 + L-008 bump · Follow-ups → none (TD-006 carries the action).

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-12
+last_updated: 2026-06-21
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -8,6 +8,21 @@ status: current
 # lean-flow — Changelog
 
 <!-- Prepend new sprints — newest first. Append-only; never edit past blocks. -->
+
+---
+
+## Sprint 008 — QA discipline (closed 2026-06-21)
+
+Unreleased (bundles into the next version). Made the plugin's QA discipline real + exercised:
+
+| Shipped | What |
+|---|---|
+| Structural QA check | `scripts/qa-check.sh` — **first executable code** (**ADR-008**); line caps · claims-vs-disk skill/template counts · frontmatter; first run 42 pass / 0 fail. `docs/QA.md` = judgment-rule checklist. `.gitattributes` pins `*.sh` LF (broken-shebang gap → L-011) |
+| Bug intake | `BUG.md.template` (canonical core) + a one-line bug-intake rule in CONTEXT.md (bug → `/triage` → `TASK` · `/diagnose` · `TD-NNN`) |
+| QA test cases | `QA-TESTCASE.md.template` (canonical, **non-core** like DESIGN) + `docs/qa/` (one-file-per-case convention) + golden-path cases QA-001/002/003 |
+| Templates | files 14 → 16 (core 13 → 14 with BUG; QA-TESTCASE added non-core); counts consistent across CLAUDE/CONTEXT/ARCHITECTURE |
+
+L-011 (sh/eol) logged; L-008 bumped (CONTEXT SSOT near-cap, count 2 → promote next). TD-006 opened (CONTEXT dedup).
 
 ---
 

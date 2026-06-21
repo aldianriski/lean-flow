@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-008 — QA discipline** → docs/sprint/SPRINT-008-qa-discipline.md
+> _(no active sprint — SPRINT-008 closed 2026-06-21; archived per §11. Unreleased — bundles into the next version.)_
 
 ---
 
@@ -30,14 +30,11 @@ status: current
 
 ### P1 — Next Phase Required
 
-<!-- Promoted to SPRINT-008 (2026-06-21). Tombstones — cleared at sprint close (§11). -->
-- TASK-009 promoted → SPRINT-008 (T1)
-- TASK-013 promoted → SPRINT-008 (T2)
-- TASK-017 promoted → SPRINT-008 (T3)
+_(empty — SPRINT-008 shipped TASK-009 · 013 · 017 · 010; archived 2026-06-21)_
 
 ### P2 — Quality / Polish
 
-<!-- Re-ranked by /triage 2026-06-21. TASK-010 promoted to SPRINT-008 (T4); remaining held for SPRINT-009. -->
+<!-- SPRINT-009 candidates — deferred from SPRINT-008 (the rest of the QA discipline + the loop audit). -->
 
 - [ ] **TASK-011 — Audit allowed-tools least-privilege across 14 skills** [size: S] [risk: low] [HITL]
       done-when: a report lists each skill's allowed-tools vs what it actually needs; over-grants flagged as follow-up fixes; no-unsafe-instruction check passes
@@ -48,7 +45,6 @@ status: current
       touches:   skills/*/SKILL.md descriptions (read), eval output
       assumes:   skill-creator eval tooling available in this environment (confirm-or-fallback to manual review at G1)
       state:     ready
-- TASK-010 promoted → SPRINT-008 (T4)
 - [ ] **TASK-014 — Add soft test/QA prompts to SPRINT + task templates + Review** [size: S] [risk: low] [HITL]
       done-when: SPRINT + task templates and the orchestrator Review step RAISE "tests? lint? security-review? perf budget?" as SUGGESTIONS; wording confirmed non-blocking (not a gate)
       touches:   templates/SPRINT.md.template, task-entry shape, orchestrator/references/review-scoping.md
@@ -91,6 +87,9 @@ status: current
 - **TD-004** resolved → SPRINT-005 T1 (cap-rule wording fixed — artifacts in references/ don't count; ADR-006)
 - **TD-005** severity: medium | status: resolved → SPRINT-006 T2 (2026-06-12)
   - Summary: `.claude/CONTEXT.md` was 151 vs its 100-line cap. Resolved via hybrid (ADR-007): dedup diet 151 → 127 (prose duplicating CLAUDE.md/README → pointers, no info lost) + cap revised 100 → 130 in DOCS_Guide §2.
+- **TD-006** severity: medium | status: open | created: Sprint-008
+  - Summary: `.claude/CONTEXT.md` is effectively full (129/130 after the bug-intake line). The SSOT keeps accreting (L-008, now count 2). Needs a dedup pass (prose duplicating CLAUDE.md/README → pointers) before any further vocab/routing addition — else the next CONTEXT edit breaches the cap.
+  - done-when: CONTEXT.md back under ~120 with no info lost; L-008 promoted.
 
 ---
 

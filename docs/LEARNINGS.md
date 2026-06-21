@@ -15,6 +15,14 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
+## L-011: A committed shell script must be pinned to LF (`*.sh eol=lf` in `.gitattributes`). On a Windows checkout with `autocrlf`, git rewrites the file to CRLF and the `#!/usr/bin/env sh` shebang gains a trailing `\r` — the interpreter becomes `sh\r` and the script fails to run. Caught only by git's "LF will be replaced by CRLF" warning, not by any test. Pattern: when a markdown/config repo gains its first executable script, add the `eol=lf` attribute in the same change.
+- seen: Sprint-008
+- count: 1
+- promoted: no
+- related: L-005 (edit-mechanism discipline — text round-trips corrupt files)
+
+---
+
 ## L-010: When editing a plugin that is ALSO installed, the edit target is the REPO SOURCE (e.g. `D:\Project\lean-flow\skills\…`), never the install CACHE (`~/.claude/plugins/cache/lean-flow/…`) — and a Read of the cache copy (a skill loaded into context, or read in a prior step) does NOT satisfy the per-path read-before-edit requirement, so the first edit errors ("not read yet") or risks touching a read-only copy. Pattern: before editing any plugin file, Read its repo path explicitly; treat the cache tree as read-only output of `claude plugin install`.
 - seen: Sprint-007
 - count: 1
@@ -32,9 +40,10 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 ---
 
 ## L-008: SSOT docs silently accumulate duplication of their satellite docs — `.claude/CONTEXT.md` had drifted to 151 lines re-stating CLAUDE.md/README prose (loop diagram, curated-not-copied, built-in detail). §11 doc-aging covers ledgers, not this. Fix: a periodic SSOT-dedup pass (→ pointers).
-- seen: Sprint-006
-- count: 1
-- promoted: no   (if it recurs → promote to a §11 doc-aging trigger for the SSOT)
+- seen: Sprint-006, Sprint-008
+- count: 2
+- promoted: no   (count ≥ 2 → promote at next promote: a §11 doc-aging trigger for the SSOT; CONTEXT hit 129/130 in Sprint-008)
+- related: TD-006 (CONTEXT.md effectively full — the dedup this calls for)
 
 ---
 
