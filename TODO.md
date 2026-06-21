@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-16
+last_updated: 2026-06-21
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-007 closed 2026-06-16 → shipped in v1.1.0; archived per §11)_
+> **SPRINT-008 — QA discipline** → docs/sprint/SPRINT-008-qa-discipline.md
 
 ---
 
@@ -30,13 +30,43 @@ status: current
 
 ### P1 — Next Phase Required
 
-_(empty)_
+<!-- Promoted to SPRINT-008 (2026-06-21). Tombstones — cleared at sprint close (§11). -->
+- TASK-009 promoted → SPRINT-008 (T1)
+- TASK-013 promoted → SPRINT-008 (T2)
+- TASK-017 promoted → SPRINT-008 (T3)
 
 ### P2 — Quality / Polish
 
-_(empty — SPRINT-007 batch shipped in v1.1.0, 2026-06-16)_
+<!-- Re-ranked by /triage 2026-06-21. TASK-010 promoted to SPRINT-008 (T4); remaining held for SPRINT-009. -->
+
+- [ ] **TASK-011 — Audit allowed-tools least-privilege across 14 skills** [size: S] [risk: low] [HITL]
+      done-when: a report lists each skill's allowed-tools vs what it actually needs; over-grants flagged as follow-up fixes; no-unsafe-instruction check passes
+      touches:   skills/*/SKILL.md (read), audit report
+      state:     ready
+- [ ] **TASK-012 — Audit description-trigger accuracy (skill-creator eval)** [size: M] [risk: low] [HITL]
+      done-when: skill-creator eval tooling run over skill descriptions; mis-trigger / under-trigger cases reported with proposed wording fixes (proposals only, not applied)
+      touches:   skills/*/SKILL.md descriptions (read), eval output
+      assumes:   skill-creator eval tooling available in this environment (confirm-or-fallback to manual review at G1)
+      state:     ready
+- TASK-010 promoted → SPRINT-008 (T4)
+- [ ] **TASK-014 — Add soft test/QA prompts to SPRINT + task templates + Review** [size: S] [risk: low] [HITL]
+      done-when: SPRINT + task templates and the orchestrator Review step RAISE "tests? lint? security-review? perf budget?" as SUGGESTIONS; wording confirmed non-blocking (not a gate)
+      touches:   templates/SPRINT.md.template, task-entry shape, orchestrator/references/review-scoping.md
+      state:     ready
+- [ ] **TASK-015 — Write a test-strategy reference (choose test TYPE per task)** [size: M] [risk: low] [HITL]
+      done-when: a reference sibling to tdd/references/testability.md guides choosing unit/integ/e2e/perf/load per task FOR THE USER'S CODE; tdd + orchestrator point to it; NO new skills added
+      touches:   skills/tdd/references/test-strategy.md (NEW), pointers from tdd + orchestrator
+      assumes:   hard constraint — guidance only, never per-test-type skills (dev-flow bloat trap)
+      state:     ready
 
 ### P3 — Long-term
+
+- [ ] **TASK-016 — Audit session/loop mechanics → findings + proposals** [size: M] [risk: low] [HITL]
+      done-when: an audit doc reports prime read-order necessity, handoff→prime redundancy, CLAUDE/CONTEXT/README load overlap (ADR-007 dedup claim verified), gate re-grill cost, each with a proposed optimization for approval; NO source edits this task (proposals only)
+      touches:   audit/research doc only
+      assumes:   approved proposals spawn follow-up tasks; this slice is investigate-then-propose
+      state:     ready
+
 
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
@@ -54,15 +84,11 @@ _(empty — SPRINT-007 batch shipped in v1.1.0, 2026-06-16)_
      Filed by Sprint Close Retro. Aging at Promote: ≥3 sprints → re-review; high → auto P1.
      severity ∈ trivial · minor · medium · high. -->
 
-- **TD-001** severity: medium | status: resolved → SPRINT-003 T1+T2 (2026-06-11)
-  - Summary: `migrate`, `/council`, and the council→`verdict-<slug>.md`→ADR feed were **spec-only**. All three legs exercised on real input: migrate on the dev-flow copy (T1, full apply verified) · council 5-advisor + peer-review run (T2) · verdict → ADR-006 (the feed).
-  - done-when: each exercised once on real input; behaviour confirmed. ✓
-- **TD-002** severity: minor | status: resolved → SPRINT-005 T1 (2026-06-12)
-  - Summary: `skills/council/SKILL.md` was ~341 lines. Resolved per ADR-006: executable artifacts (advisors · prompts · example) → `council/references/`; SKILL trimmed to 60.
-- **TD-003** severity: minor | status: resolved → SPRINT-004 T1 (2026-06-12)
-  - Summary: `skills/orchestrator/SKILL.md` was at the ~110 cap. Resolved by offloading the Review detail to `skills/orchestrator/references/review-scoping.md`; SKILL trimmed to 107 ≤ 110.
-- **TD-004** severity: trivial | status: resolved → SPRINT-005 T1 (2026-06-12)
-  - Summary: cap-rule vs reality inconsistency. Resolved: cap rule amended (ADR-006 wording — artifacts in `references/` don't count) in CLAUDE.md + DOCS_Guide §2; council now conforms, so no exception remains.
+<!-- TD-001…004 collapsed at SPRINT-008 promote (resolved ≥3 sprints ago, §11) — full history in git + sprint files. -->
+- **TD-001** resolved → SPRINT-003 T1+T2 (migrate · council · verdict→ADR-006 feed — all exercised on real input)
+- **TD-002** resolved → SPRINT-005 T1 (council SKILL 341→60; artifacts → references/, ADR-006)
+- **TD-003** resolved → SPRINT-004 T1 (orchestrator SKILL → 107 ≤110; Review → references/)
+- **TD-004** resolved → SPRINT-005 T1 (cap-rule wording fixed — artifacts in references/ don't count; ADR-006)
 - **TD-005** severity: medium | status: resolved → SPRINT-006 T2 (2026-06-12)
   - Summary: `.claude/CONTEXT.md` was 151 vs its 100-line cap. Resolved via hybrid (ADR-007): dedup diet 151 → 127 (prose duplicating CLAUDE.md/README → pointers, no info lost) + cap revised 100 → 130 in DOCS_Guide §2.
 

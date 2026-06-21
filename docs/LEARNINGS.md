@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-16
+last_updated: 2026-06-21
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -42,11 +42,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-006: Cold-context agents surface spec gaps the author cannot see (7 in one fresh-install run) — make a fresh-eyes cold run part of every release validation → fix: TASK-019
-- seen: Sprint-003, Sprint-007
-- count: 2
-- promoted: no   (count ≥ 2 → promote at next promote — the fresh-context Review pass, already encoded in orchestrator § Review)
-- related: L-009 (table-row deletion fused neighbors; caught only by the fresh-context review)
+## L-006 → promoted: yes → orchestrator § Review (the fresh-context Review pass). Cold-context agents surface author-blind spec gaps (7 in one fresh-install run); seen Sprint-003 + Sprint-007 (count 2). Related: L-009 (table-row deletion fused neighbors — caught only by that review).
 
 ---
 

@@ -1,0 +1,117 @@
+---
+sprint: 008
+slug: qa-discipline
+owner: Maintainer
+last_updated: 2026-06-21
+status: active
+plan_commit: 8e47404
+close_commit: [unset]
+update_trigger: sprint execute/close events
+---
+
+# SPRINT-008 — QA discipline
+
+> **Theme:** Make lean-flow's QA discipline *real and exercised* — a structural QA check, a
+> maintainable test-case home + template, and the bug-intake template — all proven once via the
+> golden-path loop. The harness practices what it preaches before the rest of the QA backlog.
+
+## Scope
+
+**In:** the hybrid structural QA check + `docs/QA.md` · the BUG report template + bug-routing rule ·
+a maintainable QA test-case folder + standard test-case template · one golden-path loop exercise that
+populates that template end-to-end.
+**Out (deferred → SPRINT-009):** allowed-tools least-privilege audit (TASK-011) · description-trigger
+audit (TASK-012) · soft test/QA DoD prompts (TASK-014) · test-strategy reference (TASK-015) · loop
+mechanics audit (TASK-016).
+
+## Plan
+
+### T1 — Build hybrid structural QA check + docs/QA.md  `[size: M · risk: med]`  (TASK-009)
+Layers: `scripts/` (NEW — first executable code), `docs/QA.md` (NEW), `docs/adr/ADR-008`
+A runnable check makes consistency drift visible instead of trusting eyeballs; hybrid = a script for
+the mechanical/countable rules, a checklist for the judgment ones. First code in a markdown-only
+plugin → recorded as a departure ADR.
+
+**Acceptance:** the script reports pass/fail for caps · skill/template counts · frontmatter presence on the current repo, `docs/QA.md` documents the full checklist, and the first run flags ≥1 real inconsistency or confirms clean.
+
+**DoD:**
+- [ ] QA check script runs; reports pass/fail for line caps · skill count (14) · template count · frontmatter presence
+- [ ] `docs/QA.md` documents the full checklist incl. judgment rules (no-HOW · cross-ref sanity · description quality)
+- [ ] first run on the repo flags ≥1 real inconsistency or confirms clean
+- [ ] ADR-008 records the no-code→hybrid-script departure (status: accepted) + a row in DECISIONS.md
+
+### T2 — Add BUG template + bug-routing rule + fix template counts  `[size: S · risk: low]`  (TASK-013)
+Layers: `skills/lean-doc-generator/templates/BUG.md.template` (NEW), `CONTEXT.md`, `CLAUDE.md`, `ARCHITECTURE.md`
+Bug intake is the one missing artifact — a lean report template + a routing rule into the existing
+trackers (no new skill). Adding the template bumps the canonical count, which T1's check then guards.
+
+**Acceptance:** the BUG template exists, CONTEXT states the bug→/triage routing, and every "13 templates" reference reads 14 consistently.
+
+**DoD:**
+- [ ] `BUG.md.template` created (repro · expected/actual · severity · blast-radius · suspected area)
+- [ ] CONTEXT.md states bug→/triage routing (trivial=TASK · investigation=/diagnose · architectural=TD-NNN)
+- [ ] every "13 templates" ref updated to 14 across CLAUDE.md · ARCHITECTURE.md · CONTEXT.md
+- [ ] T1's count check passes against the new total
+
+### T3 — Establish QA test-case folder structure + standard template  `[size: S · risk: low]`  (TASK-017)
+Layers: `docs/qa/` (NEW folder + README), QA-TESTCASE template (location decided at G2 — see D2)
+The maintainable home + format for QA test cases, so the golden-path (T4) and future scenarios have a
+durable place and a consistent shape rather than ad-hoc run-logs.
+
+**Acceptance:** `docs/qa/` exists with a documented layout/naming convention and a standard test-case template carrying all the required fields.
+
+**DoD:**
+- [ ] `docs/qa/` folder created with a README documenting layout + naming convention
+- [ ] standard test-case template created (id · skill/area-under-test · preconditions/fixture · steps · expected artifact/outcome · pass-fail · last-run)
+- [ ] template location decided at G2 (canonical `templates/` vs `docs/qa/`); if canonical, count impact handled + T1 check updated
+
+### T4 — Exercise the golden-path loop on a throwaway fixture  `[size: M · risk: low]`  (TASK-010)
+Layers: throwaway scratch fixture (temp), QA test-case artifacts under T3's folder
+The e2e analog: run the whole loop once on a real (throwaway) input, recording each step as a test
+case via T3's template. This is what makes the discipline *exercised*, not spec-only (L-007).
+
+**Acceptance:** the loop is run end-to-end on a scratch fixture, each step recorded via T3's template, gaps captured as findings, and the fixture deleted afterward.
+
+**DoD:**
+- [ ] golden-path run end-to-end on a throwaway fixture (prime→decompose→triage→promote→orchestrate→tdd/diagnose→close→release)
+- [ ] each step's outcome recorded as a test case using T3's template
+- [ ] gaps/breaks captured as findings (routed → TASK/TD as needed)
+- [ ] fixture deleted after; exercise-once rule (L-007) satisfied
+
+## Owner-action checklist
+- [ ] none — no secrets, env, or external dashboards this sprint
+
+## Decisions (pre-locked)
+- **D1** — TASK-009 introduces the first executable code into a markdown-only plugin; chose a **hybrid** (script for mechanical checks + checklist for judgment) over a pure agent-run checklist. **→ ADR-008** (departure; qualifies on all three §4 tests).
+- **D2** — TASK-017 test-case template location (canonical `skills/lean-doc-generator/templates/` vs local `docs/qa/`) — **decided at G2 (T3)**; canonical placement bumps the template count (T1's lint tracks it). Reversible (`git mv`) → D-row, not an ADR unless it hardens.
+
+## Assumptions
+- **A1** — the hybrid QA-check form is locked. *Confirm: this session's decision (2026-06-21).*
+- **A2** — T3's template location is resolved at G2 before T3 writes. *Confirm: G2 on T3.*
+- **A3** — skill-creator eval tooling is NOT needed this sprint (TASK-012 deferred). *Confirm: scope-out above.*
+
+## Execution Log
+<!-- Append-only, dated. Surprises, scope additions, completions. Log here rather than editing § Plan. -->
+
+### 2026-06-21 | promote | SPRINT-008 plan locked
+Promoted TASK-009 · 013 · 017 · 010 from Backlog (P1 + the coupled golden-path T4). L-006 promoted to
+`orchestrator § Review` at this checkpoint; TD-001…TD-004 collapsed (§11). Plan frozen; execution appends below.
+
+## Files Changed
+<!-- Filled during execution; feeds CHANGELOG at close. -->
+
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+| _(filled during execution)_ | | | | |
+
+## Retro
+<!-- Written at close. Route buckets per §10; then archive → docs/sprint/archive/ + INDEX.md line (§11). -->
+
+**Worked**
+- _(at close)_
+
+**Friction**
+- _(at close)_
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- _(at close)_
