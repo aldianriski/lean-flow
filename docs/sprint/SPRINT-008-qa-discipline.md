@@ -4,7 +4,7 @@ slug: qa-discipline
 owner: Maintainer
 last_updated: 2026-06-21
 status: active
-plan_commit: 8e47404
+plan_commit: 8602ce3
 close_commit: [unset]
 update_trigger: sprint execute/close events
 ---
