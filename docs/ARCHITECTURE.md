@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-09
+last_updated: 2026-06-21
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -26,7 +26,7 @@ skills/           14 skills (auto-discovered at root)
   prototype/ tdd/ diagnose/ refactor-advisor/ release-patch/ handoff/ insights/   12 stage-skills
   council/                                               opt-in agent decision aid
   <skill>/references/   on-demand depth (DOCS_Guide, testability, feedback-loops, deepening, …)
-  lean-doc-generator/templates/   13 canonical doc templates (+ DESIGN, non-core)
+  lean-doc-generator/templates/   14 canonical doc templates (+ DESIGN, non-core)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
 docs/             ARCHITECTURE.md · CHANGELOG.md · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
 TODO.md · README.md

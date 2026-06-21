@@ -1,0 +1,23 @@
+<!-- BUG report — capture a defect at intake, then route it (CONTEXT.md § the bug-intake rule):
+     trivial known cause → a TASK-NNN · needs investigation → /diagnose · architectural → TD-NNN.
+     Lean: repro + expected/actual is the core; drop a field that is genuinely N/A. WHY/WHERE, never HOW. -->
+
+# BUG — [short symptom title] [CUSTOMIZE]
+
+- **Severity:** trivial | minor | medium | high | critical
+- **Blast radius:** [who/what is affected — users · a command · a skill · data]
+- **Suspected area:** [skill / file / layer, or "unknown"]
+- **Reported:** YYYY-MM-DD by [role — not a personal name]
+
+## Repro
+1. [step]
+2. [step]
+
+## Expected
+[what should happen]
+
+## Actual
+[what happens instead — the exact error / wrong output / timing]
+
+## Notes
+[logs · environment · when first seen · anything that narrows the cause — optional]

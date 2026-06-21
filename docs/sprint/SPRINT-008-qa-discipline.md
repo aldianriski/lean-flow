@@ -48,10 +48,10 @@ trackers (no new skill). Adding the template bumps the canonical count, which T1
 **Acceptance:** the BUG template exists, CONTEXT states the bug→/triage routing, and every "13 templates" reference reads 14 consistently.
 
 **DoD:**
-- [ ] `BUG.md.template` created (repro · expected/actual · severity · blast-radius · suspected area)
-- [ ] CONTEXT.md states bug→/triage routing (trivial=TASK · investigation=/diagnose · architectural=TD-NNN)
-- [ ] every "13 templates" ref updated to 14 across CLAUDE.md · ARCHITECTURE.md · CONTEXT.md
-- [ ] T1's count check passes against the new total
+- [x] `BUG.md.template` created (repro · expected/actual · severity · blast-radius · suspected area)
+- [x] CONTEXT.md states bug→/triage routing (trivial=TASK · investigation=/diagnose · architectural=TD-NNN)
+- [x] every "13 templates" ref updated to 14 — CLAUDE.md + ARCHITECTURE.md (CONTEXT.md carries no numeric template claim)
+- [x] T1's count check passes against the new total — **42 pass / 0 fail**
 
 ### T3 — Establish QA test-case folder structure + standard template  `[size: S · risk: low]`  (TASK-017)
 Layers: `docs/qa/` (NEW folder + README), QA-TESTCASE template (location decided at G2 — see D2)
@@ -102,6 +102,12 @@ Promoted TASK-009 · 013 · 017 · 010 from Backlog (P1 + the coupled golden-pat
 counts (skills + core templates, DESIGN excluded as non-core), and frontmatter presence. First run on the
 repo: **42 pass / 0 fail — clean**. Near-cap watch surfaced: `orchestrator/SKILL.md` 108/110 · `CONTEXT.md`
 128/130. `docs/QA.md` carries the judgment rules; ADR-008 records the no-code→hybrid departure (G2 decision D1).
+Also added `.gitattributes` (`*.sh eol=lf`) so the script's shebang survives checkout on Windows.
+
+### 2026-06-21 | T2 done | BUG template + bug-intake routing + counts
+`templates/BUG.md.template` (canonical → core templates 13→14); one-line bug-intake rule in CONTEXT.md
+(bug → `/triage` → TASK · `/diagnose` · TD-NNN); count claims bumped in CLAUDE.md + ARCHITECTURE.md.
+qa-check: 42 pass / 0 fail. **Watch:** CONTEXT.md now 129/130 — effectively full; T3 must not add to it (it won't — T3 touches templates/ + ARCHITECTURE only), and a CONTEXT dedup (L-008) is overdue.
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
