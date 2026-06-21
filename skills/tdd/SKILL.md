@@ -28,7 +28,8 @@ is for *new* behaviour.
 
 When a test is hard to write, or you're unsure **what to mock** / how to shape an interface for
 testability → `${CLAUDE_SKILL_DIR}/references/testability.md` (mock-at-boundaries · DI · good/bad
-examples · refactor candidates).
+examples · refactor candidates). Unsure **which kind of test** (unit/integ/e2e/perf/load) fits the
+task → `${CLAUDE_SKILL_DIR}/references/test-strategy.md`.
 
 ## Anti-pattern: horizontal slicing
 

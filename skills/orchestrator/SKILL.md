@@ -51,7 +51,7 @@ only what is still open — one question at a time, recommend an answer each tim
 ## Phases
 
 > **Implement routing** — at any Implement step: building *new testable behaviour* → work test-first
-> via `/tdd` (red-green-refactor in vertical slices; if owner declines tests or no harness exists → implement directly + note a manual verification step); chasing a *bug or failing test* → `/diagnose`;
+> via `/tdd` (red-green-refactor in vertical slices; test type → `tdd/references/test-strategy.md`; if owner declines tests or no harness exists → implement directly + note a manual verification step); chasing a *bug or failing test* → `/diagnose`;
 > *code that's hard to change* (shallow modules, leaky seams) → `/refactor-advisor`. Docs / config /
 > spikes implement directly.
 >

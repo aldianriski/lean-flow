@@ -58,9 +58,9 @@ A reference (sibling to `testability.md`) that helps pick the right test *type* 
 **Acceptance:** the reference exists and guides test-type choice per task; `tdd` + `orchestrator` point to it; no new skills added.
 
 **DoD:**
-- [ ] `skills/tdd/references/test-strategy.md` written — when to reach for unit/integ/e2e/perf/load
-- [ ] `tdd` + `orchestrator` SKILLs point to it (routing suggestion, not requirement)
-- [ ] no new skills / no per-test-type skills added; `qa-check` stays green
+- [x] `skills/tdd/references/test-strategy.md` written — per-task test-type guide (unit/integ/e2e/perf/load) for the user's code
+- [x] `tdd` (81 ≤110) + `orchestrator` (108 ≤110, pointer folded into the routing line) point to it
+- [x] no new skills / no per-test-type skills added; `qa-check` clean
 
 ## Owner-action checklist
 - [ ] none — no secrets, env, or external dashboards this sprint
@@ -93,6 +93,12 @@ suggestions, never gates (D1): `review-scoping.md` § "QA suggestion (raise, nev
 (HTML comment after DoD); CONTEXT task-entry shape (optional `qa:` note). CONTEXT 122→123 (still 7 under cap).
 **L-010 near-miss:** first applied the SPRINT-template edit to the install *cache* path, not the repo source —
 caught immediately, re-applied to `D:\…\skills\…`. 2nd occurrence of L-010 → bump at close (count → 2, promote).
+
+### 2026-06-21 | T3 done | test-strategy reference
+`skills/tdd/references/test-strategy.md` — a per-task guide to choosing the test TYPE (unit/integ/e2e/
+perf/load) for the host project's real code, as guidance (the taxonomy from the original ask, NOT new
+skills). Pointers: `tdd/SKILL.md` (alongside testability.md) + `orchestrator/SKILL.md` (folded into the
+Implement-routing line — no new line, stays 108/110). qa-check clean. All SPRINT-009 DoD met.
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
