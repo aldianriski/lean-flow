@@ -34,9 +34,9 @@ lost** — and unblocks T2, which must edit the task-entry shape that lives here
 **Acceptance:** `CONTEXT.md` back to ~120 or below, no information lost (every dropped line's content still reachable via its pointer), `qa-check` cap passes with margin.
 
 **DoD:**
-- [ ] `CONTEXT.md` <= ~120 lines; each removed block replaced by a pointer to its canonical home (CLAUDE.md / README / DOCS_Guide)
-- [ ] no information lost — spot-check the SSOT still answers loop/gates/modes/tiers/glossary
-- [ ] `sh scripts/qa-check.sh` cap check passes with margin; TD-006 marked resolved at close
+- [x] `CONTEXT.md` 130 → **122** (8 under cap); built-in detail relocated to ARCHITECTURE § Key integration points, curated/loop/governance compressed to pointers
+- [x] no information lost — all sections intact (roster · gates · modes · tiers · sprint model · glossary · task-shape); compression only, verified by diff
+- [x] `sh scripts/qa-check.sh` cap passes with margin (122/130); TD-006 to be marked resolved at close
 
 ### T2 — Soft test/QA prompts in templates + Review (TASK-014)  `[size: S · risk: low]`
 Layers: `templates/SPRINT.md.template`, the task-entry shape (`CONTEXT.md`), `orchestrator/references/review-scoping.md`
@@ -80,6 +80,12 @@ A reference (sibling to `testability.md`) that helps pick the right test *type* 
 Promoted TD-006 (T1) + TASK-014 (T2) + TASK-015 (T3). Governance: L-008 promoted → CLAUDE.md
 anti-pattern (periodic SSOT dedup) + collapsed; TD-005 collapsed (§11). T1 unblocks T2 (both touch
 CONTEXT.md). Plan frozen; execution appends below.
+
+### 2026-06-21 | T1 done | CONTEXT.md dedup (TD-006)
+`.claude/CONTEXT.md` 130 → 122 (8 under cap). Compression only — built-in-leverage per-command detail
+relocated to ARCHITECTURE § Key integration points (the pointer); curated-not-copied, the loop, doc
+standard, orientation, and governance reworded to pointers/denser form. No section removed, no unique
+fact lost (verified by diff). qa-check clean. Unblocks T2 (which edits the task-entry shape here).
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->

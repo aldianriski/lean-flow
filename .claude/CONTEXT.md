@@ -12,9 +12,8 @@ CLAUDE.md defer here; this file points to their prose rather than duplicating it
 
 ## The loop
 
-`/prime → /lean-doc-generator → /orchestrator → repeat` · session end → `/handoff` (temp-dir doc) →
-next `/prime` reads it. Every skill is independently usable; the loop is just the order they reward
-most together. (Diagram: README.)
+`/prime → /lean-doc-generator → /orchestrator → repeat` · session end → `/handoff` (temp-dir doc) → next `/prime` reads it.
+Every skill works standalone; the loop is just the order they reward most together. (Diagram → README.)
 
 ## Skill roster (14 — 12 stage-skills · 1 conductor · 1 decision aid)
 
@@ -35,19 +34,17 @@ most together. (Diagram: README.)
 | `/insights` | learn | anytime — a friction → an `L-NNN` candidate in `LEARNINGS` (or bump a match's `count`); complements the Sprint-Close Retro |
 | `/council` | decide | **opt-in, agent-using** — pressure-test a hard call via 5 advisors + peer review → `verdict-<slug>.md` → ADR |
 
-**Grill placement:** detailed grill at intake (`/task-decomposer`); G2 re-grills residuals only (an
-unconfirmed assumption blocks G2). **Implement routing** (`/orchestrator`): new testable behaviour →
-`/tdd` · bug → `/diagnose` · hard-to-change → `/refactor-advisor` · docs/config/spike → direct.
-`/prototype` feeds design (G2 can't resolve on paper → prototype → fold into G2 + ADR); `/council`
-feeds decisions (hard/ambiguous fork → verdict → ADR §4).
+**Grill** at intake (`/task-decomposer`); G2 re-grills residuals (an unconfirmed assumption blocks G2).
+**Implement routing** (`/orchestrator`): new behaviour→`/tdd` · bug→`/diagnose` · hard-to-change→`/refactor-advisor` · docs/spike→direct.
+`/prototype` feeds design (can't resolve on paper → fold into G2 + ADR); `/council` feeds a hard fork → verdict → ADR §4.
 
 ## Built-in leverage
 
-lean-flow ships **no agents/hooks**; it leans on Claude Code's built-ins, dispatched in **isolated
-passes** (fresh context, lean main loop):
-- *Agents:* recon → `Explore` · review → `/code-review` (large/high-risk; small/med → one scoped `sonnet` reviewer) · behaviour → `/verify` · security → `/security-review` (own uncontaminated pass). `/council` orchestrates sub-agents internally.
-- *Commands:* `/goal` (drive-to-DoD at execution + `/flow`) · `/plan` (G2) · `/batch` (large disjoint `sprint-bulk` → worktree-per-unit; `/workflows` watches) · `/loop` (iteration + periodic governance) · `/run`+`/verify` (Review) · `/simplify` (cleanup) · `/fork`/`/background` (the isolated-pass mechanism).
-- Out of lean scope (too heavy): custom `/workflows`, `/ultracode`, `/ultraplan` / `/ultrareview` (cloud, billed).
+lean-flow ships **no agents/hooks** — it dispatches Claude's built-ins in **isolated passes** (fresh
+context): recon→`Explore` · `/code-review` (small/med → one scoped `sonnet`) · `/verify` ·
+`/security-review` · `/council` (internal sub-agents); commands `/goal /plan /batch /loop /run /simplify
+/fork`. Full wiring + cloud tools out of lean scope (`/workflows` · `/ultracode` · `/ultraplan` /
+`/ultrareview`) → ARCHITECTURE.md § Key integration points.
 
 **Standalone contract** — stage-skill cross-refs are routing *suggestions* (`→ /X`), never requirements;
 each completes its job invoked cold. Only inherent ordering: the sprint lifecycle. **`/flow` is the sole
@@ -55,8 +52,7 @@ exception** — it *sequences* the stages, never re-implements one. **Feed pipel
 → `/triage` → `/lean-doc-generator promote` → `/orchestrator`.
 **Bug intake:** a bug (`BUG.md.template`) enters at `/triage` → trivial known cause = `TASK` · needs investigation = `/diagnose` · architectural = `TD-NNN`.
 
-**Curated, not copied** — the discipline is *review*, not a feature ban; every component cleared
-"useful **and** important **and** actually used" before adding. Full rationale: CLAUDE.md · ADR-001.
+**Curated, not copied** — review, not a feature ban; cleared "useful **and** important **and** actually used" (full rationale → CLAUDE.md · ADR-001).
 
 ## Gates
 
@@ -84,8 +80,7 @@ Decide on the **session model**; dispatch bounded work to cheap-tier subagents �
 | Gates (G1/G2) · grill · design · synthesis · review *judgment* | **session model** (main loop) |
 | Council advisors + peer review · recon (`Explore`) · well-specced *mechanical* edits | **cheap-tier** — `sonnet` (`opus` if reasoning-heavy) via Agent-tool `model:` |
 
-**Contract — spawn-with-brief, never a mid-session switch.** Each dispatch carries a self-contained
-brief (spec · files · acceptance — the AFK durable-spec rule); G1/G2 + the review pass guard quality.
+**Contract** — spawn-with-brief (spec · files · acceptance, the AFK durable-spec rule), never a mid-session switch; G1/G2 + review guard quality.
 
 ## Sprint model
 
@@ -96,23 +91,21 @@ brief (spec · files · acceptance — the AFK durable-spec rule); G1/G2 + the r
 
 ## Doc standard
 
-LEAN DOCUMENTATION STANDARD (WHY/WHERE, never HOW) → `skills/lean-doc-generator/references/DOCS_Guide.md`;
-templates → `…/templates/`. The domain glossary lives **here** (canonical term + `_Avoid_:` synonyms).
-ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
+LEAN DOCUMENTATION STANDARD (WHY/WHERE, never HOW) → `skills/lean-doc-generator/references/DOCS_Guide.md`; templates → `…/templates/`.
+Domain glossary lives **here** (canonical term + `_Avoid_:` synonyms). ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
 
 ## Orientation
 
-Where-things-live = **`ARCHITECTURE.md`**. lean-flow ships **no hand-maintained codemap** (it rots —
-LAW 3) and **neither integrates nor depends on graphify** — a fine on-demand tool for onboarding an
-unfamiliar repo or a pre-refactor audit (verdict: `docs/research/graphify-daily-value.md`). No MCP required.
+Where-things-live = **`ARCHITECTURE.md`**; no hand-maintained codemap (it rots — LAW 3). graphify: not
+integrated/depended-on — an on-demand option for onboarding or a pre-refactor audit (verdict →
+`docs/research/graphify-daily-value.md`). No MCP required.
 
 ## Continuous learning governance
 
-Every iteration feeds the next (DOCS_Guide §10). **Sprint Close** Retro auto-files four buckets:
-Shipped → `docs/CHANGELOG.md` · Tech debt → `TD-NNN` · Follow-ups → `TASK-NNN` · Learnings → `L-NNN`.
-**Sprint Promote** checkpoint: promote any `L-NNN` (`count ≥ 2, promoted: no`) into a durable rule
-(CLAUDE.md anti-pattern · CONTEXT rule · skill red-flag); age tech debt (≥3 sprints → re-review; `high`
-→ auto P1); doc-aging (§11) — compress ledgers past a retention trigger. Propose → approve, never silent.
+Every iteration feeds the next (DOCS_Guide §10). **Close** Retro auto-files four buckets: Shipped→CHANGELOG ·
+Tech debt→`TD-NNN` · Follow-ups→`TASK-NNN` · Learnings→`L-NNN`. **Promote** checkpoint: promote any `L-NNN`
+(`count ≥ 2, promoted: no`) → durable rule (CLAUDE anti-pattern · CONTEXT rule · skill red-flag); age TD
+(≥3 sprints → re-review; `high`→P1); doc-aging §11. Propose → approve, never silent.
 
 ## Task entry shape
 
