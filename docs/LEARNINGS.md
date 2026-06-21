@@ -23,11 +23,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-010: When editing a plugin that is ALSO installed, the edit target is the REPO SOURCE (e.g. `D:\Project\lean-flow\skills\…`), never the install CACHE (`~/.claude/plugins/cache/lean-flow/…`) — and a Read of the cache copy (a skill loaded into context, or read in a prior step) does NOT satisfy the per-path read-before-edit requirement, so the first edit errors ("not read yet") or risks touching a read-only copy. Pattern: before editing any plugin file, Read its repo path explicitly; treat the cache tree as read-only output of `claude plugin install`.
-- seen: Sprint-007, Sprint-009
-- count: 2
-- promoted: no   (count ≥ 2 → promote at next promote: a skill red-flag / CLAUDE.md anti-pattern — edit the repo source, never the install cache)
-- related: L-005 (use the Write/Edit tools on the right file, not a shell pipeline — both are edit-mechanism discipline)
+## L-010 → promoted: yes → CLAUDE.md anti-pattern (edit the repo source, never the install cache). When editing an installed plugin the target is the REPO SOURCE (`skills/…`), not the cache (`~/.claude/plugins/cache/…`); a cache Read doesn't satisfy read-before-edit. Seen Sprint-007 + Sprint-009 (count 2). Related: L-005.
 
 ---
 

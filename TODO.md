@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-009 closed 2026-06-21; archived per §11. Unreleased — bundles into the next version.)_
+> **SPRINT-010 — Audits** → docs/sprint/SPRINT-010-audits.md
 
 ---
 
@@ -34,29 +34,13 @@ _(empty — SPRINT-008 shipped TASK-009 · 013 · 017 · 010; archived 2026-06-2
 
 ### P2 — Quality / Polish
 
-<!-- SPRINT-009 candidates — deferred from SPRINT-008 (the rest of the QA discipline + the loop audit). -->
-
-- [ ] **TASK-011 — Audit allowed-tools least-privilege across 14 skills** [size: S] [risk: low] [HITL]
-      done-when: a report lists each skill's allowed-tools vs what it actually needs; over-grants flagged as follow-up fixes; no-unsafe-instruction check passes
-      touches:   skills/*/SKILL.md (read), audit report
-      state:     ready
-- [ ] **TASK-012 — Audit description-trigger accuracy (skill-creator eval)** [size: M] [risk: low] [HITL]
-      done-when: skill-creator eval tooling run over skill descriptions; mis-trigger / under-trigger cases reported with proposed wording fixes (proposals only, not applied)
-      touches:   skills/*/SKILL.md descriptions (read), eval output
-      assumes:   skill-creator eval tooling available in this environment (confirm-or-fallback to manual review at G1)
-      state:     ready
-- TASK-014 promoted → SPRINT-009 (T2)
-- TASK-015 promoted → SPRINT-009 (T3)
+<!-- Promoted to SPRINT-010 (2026-06-21); tombstones cleared at its close (§11). -->
+- TASK-011 promoted → SPRINT-010 (T1)
+- TASK-012 promoted → SPRINT-010 (T2)
 
 ### P3 — Long-term
 
-- [ ] **TASK-016 — Audit session/loop mechanics → findings + proposals** [size: M] [risk: low] [HITL]
-      done-when: an audit doc reports prime read-order necessity, handoff→prime redundancy, CLAUDE/CONTEXT/README load overlap (ADR-007 dedup claim verified), gate re-grill cost, each with a proposed optimization for approval; NO source edits this task (proposals only)
-      touches:   audit/research doc only
-      assumes:   approved proposals spawn follow-up tasks; this slice is investigate-then-propose
-      state:     ready
-
-
+- TASK-016 promoted → SPRINT-010 (T3)
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)

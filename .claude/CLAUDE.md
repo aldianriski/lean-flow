@@ -49,6 +49,7 @@ resumes it. Every skill is also usable standalone. See `.claude/CONTEXT.md` for 
 ❌ Shipping a new behaviour **spec-only** — a new capability's final DoD must be *exercised once on real input* (the spec-only-debt trap: TD-001 · SPRINT-004 T3/T5 → L-007).
 ❌ `git add <shared-file>` while another stream/task has WIP in it — stages their uncommitted work into your commit (contaminates at the **commit** phase, not just merge → mis-attributed, hard-to-reverse history). Serialize the stream, or `git add -p <shared>` + verify `git diff --cached` first (L-042 · cf. L-037: overlap locked at G2).
 ❌ Letting an SSOT doc (`CONTEXT.md`) accrete duplication of its satellites until it nears its cap — run a periodic dedup pass (prose duplicating CLAUDE.md/README → pointers) at promote doc-aging (L-008 · TD-006).
+❌ Editing the plugin **install cache** (`~/.claude/plugins/cache/…`) instead of the repo source (`skills/…`) — the cache is read-only output of `plugin install`; edits there don't ship, and a cache Read doesn't satisfy read-before-edit (L-010).
 
 ## Naming Conventions — files: kebab-case
 
