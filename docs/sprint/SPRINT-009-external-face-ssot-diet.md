@@ -4,7 +4,7 @@ slug: external-face-ssot-diet
 owner: Maintainer
 last_updated: 2026-06-21
 status: active
-plan_commit: [pending]
+plan_commit: ea03a54
 close_commit: [unset]
 update_trigger: sprint execute/close events
 ---
