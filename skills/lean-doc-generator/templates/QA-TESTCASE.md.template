@@ -1,0 +1,19 @@
+<!-- QA test-case — a repeatable check of ONE lean-flow skill/behaviour. NON-CORE template (like DESIGN):
+     outside the core doc-generation loop. Filled instances live in docs/qa/ (see its README).
+     One file per case; keep it small + agent-runnable. WHY/WHERE + observable outcome, never HOW. -->
+
+# QA-[NNN] — [short case title] [CUSTOMIZE]
+
+- **Area under test:** [one skill / command / behaviour — e.g. `/task-decomposer` intake]
+- **Preconditions / fixture:** [the throwaway repo state or input the case needs]
+- **Last run:** YYYY-MM-DD — [pass | fail] [CUSTOMIZE]
+
+## Steps
+1. [action — what to invoke / do]
+2. [action]
+
+## Expected
+[the observable artifact or outcome — e.g. "a SPRINT-NNN file with N DoD boxes", "TODO gains TASK-NNN carrying `assumes:`"]
+
+## Result
+[pass | fail + what actually happened; on fail, link the `BUG` report / `TASK` / finding it routed to]

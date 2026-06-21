@@ -36,7 +36,8 @@ num() { grep -oE "$2" "$1" 2>/dev/null | grep -oE '[0-9]+' | head -n1; }
 
 skills_actual=$(ls -d skills/*/SKILL.md 2>/dev/null | wc -l | tr -d ' ')
 tmpl_files=$(ls skills/lean-doc-generator/templates/*.md.template 2>/dev/null | wc -l | tr -d ' ')
-tmpl_core=$((tmpl_files - 1))   # DESIGN is the single documented non-core template
+noncore=2   # canonical-but-non-core templates (outside the doc-generation loop): DESIGN, QA-TESTCASE
+tmpl_core=$((tmpl_files - noncore))
 
 check_claim() { # <label> <actual> <file> <pattern>
   lbl=$1; act=$2; file=$3; pat=$4
@@ -53,7 +54,7 @@ check_claim "skills"    "$skills_actual" docs/ARCHITECTURE.md  '([0-9]+) skills'
 check_claim "skills"    "$skills_actual" .claude/CLAUDE.md     '([0-9]+) SKILL\.md'
 check_claim "tmpl-core" "$tmpl_core"     .claude/CLAUDE.md     '([0-9]+) canonical doc templates'
 check_claim "tmpl-core" "$tmpl_core"     docs/ARCHITECTURE.md  '([0-9]+) canonical doc templates'
-note "templates: $tmpl_files files = $tmpl_core core + 1 non-core (DESIGN)"
+note "templates: $tmpl_files files = $tmpl_core core + $noncore non-core (DESIGN, QA-TESTCASE)"
 
 # --- 3. Frontmatter / ownership presence ------------------------------------
 has_field() { grep -qE "^$2:" "$1"; }

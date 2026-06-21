@@ -61,9 +61,9 @@ durable place and a consistent shape rather than ad-hoc run-logs.
 **Acceptance:** `docs/qa/` exists with a documented layout/naming convention and a standard test-case template carrying all the required fields.
 
 **DoD:**
-- [ ] `docs/qa/` folder created with a README documenting layout + naming convention
-- [ ] standard test-case template created (id · skill/area-under-test · preconditions/fixture · steps · expected artifact/outcome · pass-fail · last-run)
-- [ ] template location decided at G2 (canonical `templates/` vs `docs/qa/`); if canonical, count impact handled + T1 check updated
+- [x] `docs/qa/` folder created with a README documenting layout + naming convention
+- [x] standard test-case template created (id · skill/area-under-test · preconditions/fixture · steps · expected artifact/outcome · pass-fail · last-run)
+- [x] template location decided at G2 — **canonical `templates/`, classified non-core**; count impact handled (script `noncore=2` + ARCHITECTURE carve-out), T1 check passes 42/0
 
 ### T4 — Exercise the golden-path loop on a throwaway fixture  `[size: M · risk: low]`  (TASK-010)
 Layers: throwaway scratch fixture (temp), QA test-case artifacts under T3's folder
@@ -108,6 +108,13 @@ Also added `.gitattributes` (`*.sh eol=lf`) so the script's shebang survives che
 `templates/BUG.md.template` (canonical → core templates 13→14); one-line bug-intake rule in CONTEXT.md
 (bug → `/triage` → TASK · `/diagnose` · TD-NNN); count claims bumped in CLAUDE.md + ARCHITECTURE.md.
 qa-check: 42 pass / 0 fail. **Watch:** CONTEXT.md now 129/130 — effectively full; T3 must not add to it (it won't — T3 touches templates/ + ARCHITECTURE only), and a CONTEXT dedup (L-008) is overdue.
+
+### 2026-06-21 | T3 done | QA test-case template + docs/qa/ folder
+`templates/QA-TESTCASE.md.template` (canonical, **non-core** — classified like DESIGN per G2/D2); `docs/qa/`
++ README (one-file-per-case convention, `QA-NNN-<slug>.md`, updated-in-place). Count impact handled:
+qa-check `noncore=2` (DESIGN + QA-TESTCASE), ARCHITECTURE carve-out updated; 16 files = 14 core + 2 non-core,
+claims hold 14. qa-check: 42 pass / 0 fail. The non-core list growing is the ADR-008 negative consequence,
+as predicted.
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
