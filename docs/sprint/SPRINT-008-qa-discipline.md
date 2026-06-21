@@ -35,10 +35,10 @@ plugin → recorded as a departure ADR.
 **Acceptance:** the script reports pass/fail for caps · skill/template counts · frontmatter presence on the current repo, `docs/QA.md` documents the full checklist, and the first run flags ≥1 real inconsistency or confirms clean.
 
 **DoD:**
-- [ ] QA check script runs; reports pass/fail for line caps · skill count (14) · template count · frontmatter presence
-- [ ] `docs/QA.md` documents the full checklist incl. judgment rules (no-HOW · cross-ref sanity · description quality)
-- [ ] first run on the repo flags ≥1 real inconsistency or confirms clean
-- [ ] ADR-008 records the no-code→hybrid-script departure (status: accepted) + a row in DECISIONS.md
+- [x] QA check script runs; reports pass/fail for line caps · skill count (14) · template count · frontmatter presence
+- [x] `docs/QA.md` documents the full checklist incl. judgment rules (no-HOW · cross-ref sanity · description quality)
+- [x] first run on the repo flags ≥1 real inconsistency or confirms clean — **confirmed clean (42 pass / 0 fail)**
+- [x] ADR-008 records the no-code→hybrid-script departure (status: accepted) + a row in DECISIONS.md
 
 ### T2 — Add BUG template + bug-routing rule + fix template counts  `[size: S · risk: low]`  (TASK-013)
 Layers: `skills/lean-doc-generator/templates/BUG.md.template` (NEW), `CONTEXT.md`, `CLAUDE.md`, `ARCHITECTURE.md`
@@ -96,6 +96,12 @@ case via T3's template. This is what makes the discipline *exercised*, not spec-
 ### 2026-06-21 | promote | SPRINT-008 plan locked
 Promoted TASK-009 · 013 · 017 · 010 from Backlog (P1 + the coupled golden-path T4). L-006 promoted to
 `orchestrator § Review` at this checkpoint; TD-001…TD-004 collapsed (§11). Plan frozen; execution appends below.
+
+### 2026-06-21 | T1 done | hybrid QA check + QA.md + ADR-008
+`scripts/qa-check.sh` (first executable code; POSIX sh, dependency-free) checks line caps, claims-vs-disk
+counts (skills + core templates, DESIGN excluded as non-core), and frontmatter presence. First run on the
+repo: **42 pass / 0 fail — clean**. Near-cap watch surfaced: `orchestrator/SKILL.md` 108/110 · `CONTEXT.md`
+128/130. `docs/QA.md` carries the judgment rules; ADR-008 records the no-code→hybrid departure (G2 decision D1).
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
