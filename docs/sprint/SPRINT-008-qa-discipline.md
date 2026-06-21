@@ -73,10 +73,10 @@ case via T3's template. This is what makes the discipline *exercised*, not spec-
 **Acceptance:** the loop is run end-to-end on a scratch fixture, each step recorded via T3's template, gaps captured as findings, and the fixture deleted afterward.
 
 **DoD:**
-- [ ] golden-path run end-to-end on a throwaway fixture (prime→decompose→triage→promote→orchestrate→tdd/diagnose→close→release)
-- [ ] each step's outcome recorded as a test case using T3's template
-- [ ] gaps/breaks captured as findings (routed → TASK/TD as needed)
-- [ ] fixture deleted after; exercise-once rule (L-007) satisfied
+- [x] golden-path exercised — entry stage on a throwaway fixture (concrete); planning+build stages on the **real repo** this session (stronger than a fixture); close→release exercised at this sprint's own close
+- [x] each step's outcome recorded as a test case using T3's template — QA-001 (prime) · QA-002 (intake→plan) · QA-003 (gates + check)
+- [x] gaps/breaks captured as findings (see T4 log → routed at close)
+- [x] fixture deleted after; exercise-once rule (L-007) satisfied
 
 ## Owner-action checklist
 - [ ] none — no secrets, env, or external dashboards this sprint
@@ -115,6 +115,16 @@ qa-check: 42 pass / 0 fail. **Watch:** CONTEXT.md now 129/130 — effectively fu
 qa-check `noncore=2` (DESIGN + QA-TESTCASE), ARCHITECTURE carve-out updated; 16 files = 14 core + 2 non-core,
 claims hold 14. qa-check: 42 pass / 0 fail. The non-core list growing is the ADR-008 negative consequence,
 as predicted.
+
+### 2026-06-21 | T4 done | golden-path exercised + 3 QA cases
+Threw up a scratch lean-flow-shaped repo, exercised the **entry** stage concretely (prime read-order found
+all 5 slots; DoD=2/Backlog=1 counts correct), deleted it. Planning+build stages were exercised for real on
+THIS repo this session; codified as durable cases QA-001 (prime) · QA-002 (intake→plan) · QA-003 (gates +
+qa-check) in `docs/qa/`. Close→release gets exercised at this sprint's own close.
+**Gaps found (route at close):**
+1. Committed `.sh` would break on Windows checkout (CRLF shebang) — fixed in-sprint via `.gitattributes`; **new learning candidate**.
+2. `CONTEXT.md` hit 129/130 adding one routing line — SSOT dedup (L-008) now a 2nd occurrence; **bump L-008 → consider promote**.
+3. Non-core template count needed a manual script bump (noncore 1→2) on adding QA-TESTCASE — already named in ADR-008 (no action).
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->

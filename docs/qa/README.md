@@ -20,5 +20,7 @@ sprint close / release alongside `scripts/qa-check.sh` (mechanical) and `docs/QA
 
 ## Index
 
-<!-- One line per case; newest first. First cases land via SPRINT-008 T4 (golden-path exercise). -->
-_(none yet — first cases land via SPRINT-008 T4)_
+<!-- One line per case; newest first. -->
+- [QA-003](QA-003-orchestrator-gates-and-check.md) — orchestrator gates + `qa-check` green · last run 2026-06-21 pass
+- [QA-002](QA-002-intake-to-plan-pipeline.md) — decompose→triage→promote yields a sprint · last run 2026-06-21 pass
+- [QA-001](QA-001-prime-entry-detection.md) — prime detects context slots on a fresh repo · last run 2026-06-21 pass
