@@ -39,11 +39,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-008: SSOT docs silently accumulate duplication of their satellite docs — `.claude/CONTEXT.md` had drifted to 151 lines re-stating CLAUDE.md/README prose (loop diagram, curated-not-copied, built-in detail). §11 doc-aging covers ledgers, not this. Fix: a periodic SSOT-dedup pass (→ pointers).
-- seen: Sprint-006, Sprint-008
-- count: 2
-- promoted: no   (count ≥ 2 → promote at next promote: a §11 doc-aging trigger for the SSOT; CONTEXT hit 129/130 in Sprint-008)
-- related: TD-006 (CONTEXT.md effectively full — the dedup this calls for)
+## L-008 → promoted: yes → CLAUDE.md anti-pattern (periodic SSOT dedup at promote) + TD-006. SSOT docs accrete duplication of their satellites until they near the cap; seen Sprint-006 + Sprint-008 (count 2 — CONTEXT hit 129/130).
 
 ---
 

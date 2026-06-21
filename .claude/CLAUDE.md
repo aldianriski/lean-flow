@@ -48,6 +48,7 @@ resumes it. Every skill is also usable standalone. See `.claude/CONTEXT.md` for 
 ❌ `git push` inside `release-patch` — it stops at the gate, always.
 ❌ Shipping a new behaviour **spec-only** — a new capability's final DoD must be *exercised once on real input* (the spec-only-debt trap: TD-001 · SPRINT-004 T3/T5 → L-007).
 ❌ `git add <shared-file>` while another stream/task has WIP in it — stages their uncommitted work into your commit (contaminates at the **commit** phase, not just merge → mis-attributed, hard-to-reverse history). Serialize the stream, or `git add -p <shared>` + verify `git diff --cached` first (L-042 · cf. L-037: overlap locked at G2).
+❌ Letting an SSOT doc (`CONTEXT.md`) accrete duplication of its satellites until it nears its cap — run a periodic dedup pass (prose duplicating CLAUDE.md/README → pointers) at promote doc-aging (L-008 · TD-006).
 
 ## Naming Conventions — files: kebab-case
 
