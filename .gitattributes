@@ -1,0 +1,2 @@
+# Shell scripts must stay LF on every platform, or the shebang breaks under sh (CRLF -> `\r`).
+*.sh text eol=lf
