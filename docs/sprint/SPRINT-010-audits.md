@@ -4,7 +4,7 @@ slug: audits
 owner: Maintainer
 last_updated: 2026-06-21
 status: active
-plan_commit: [pending]
+plan_commit: 7b3728e
 close_commit: [unset]
 update_trigger: sprint execute/close events
 ---
