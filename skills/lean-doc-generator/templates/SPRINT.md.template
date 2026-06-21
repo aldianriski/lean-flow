@@ -36,6 +36,8 @@ Layers: [files / modules this touches]
 **DoD:**
 - [ ] [concrete, checkable step]
 - [ ] [concrete, checkable step]
+<!-- QA (suggestion, never a gate): does this task want tests (type → tdd/references/test-strategy.md),
+     a lint / security-review pass, or a perf budget? Note it here; the Review step raises the same prompt. -->
 
 ### T2 — [verb-first title] `[size: S · risk: low]` [CUSTOMIZE]
 …

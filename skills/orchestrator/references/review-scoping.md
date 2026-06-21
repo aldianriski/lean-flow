@@ -56,6 +56,13 @@ shrink the built-in command's internal fan-out — so the lever is reserving it 
 Dispatch the mechanical passes on a cheap tier (`sonnet`) per the tier map (`.claude/CONTEXT.md`); the
 *judgment* on the findings stays on the session model.
 
+## QA suggestion (raise, never gate)
+
+Beyond the passes above, **surface** — as a suggestion, not a blocker — whether the change wants:
+**tests** (which type → `skills/tdd/references/test-strategy.md`) · **lint / format** · **`/security-review`**
+(if it touched a security surface) · a **perf budget** (if it's a hot path). lean-flow *suggests* these;
+it never runs the user's CI or blocks on them (the no-enforcement spine). The owner decides.
+
 ## Self-review checklist (the trivial-diff floor)
 
 For doc-only / delete-only / trivial diffs this is enough — no agent pass:

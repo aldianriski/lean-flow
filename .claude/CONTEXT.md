@@ -120,3 +120,4 @@ Tech debt→`TD-NNN` · Follow-ups→`TASK-NNN` · Learnings→`L-NNN`. **Promot
 
 **States** — `ready` (promotable) · `needs-info` (open questions) · `blocked` (`depends-on`). Orthogonal
 to `HITL`/`AFK` (who acts). Rejected work → `.out-of-scope/<slug>.md` (lazily created by `/triage`).
+**QA (optional, never a gate)** — a task may note a `qa:` hint (tests/lint/security/perf to suggest at Review) — a suggestion for the owner, not a requirement.

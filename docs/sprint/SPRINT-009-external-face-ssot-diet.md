@@ -46,9 +46,9 @@ This is lean-flow advising a user's project, consistent with the suggestion-not-
 **Acceptance:** the SPRINT + task templates and the Review step surface the QA prompts as clearly-optional suggestions; wording verified non-blocking (no new gate introduced).
 
 **DoD:**
-- [ ] SPRINT + task templates carry a soft "QA check?" prompt (tests · lint · security-review · perf)
-- [ ] orchestrator Review references the same soft prompt
-- [ ] wording reviewed: suggestion only, never a gate (hard constraint)
+- [x] SPRINT template carries a soft "QA check?" prompt (HTML comment after DoD) + the task-entry shape (CONTEXT) gains an optional `qa:` note
+- [x] orchestrator Review (`review-scoping.md`) adds a "QA suggestion (raise, never gate)" subsection
+- [x] wording reviewed: suggestion only, never a gate — all three are comments/optional notes, no new `[ ]` checkbox
 
 ### T3 — Test-strategy reference (TASK-015)  `[size: M · risk: low]`
 Layers: `skills/tdd/references/test-strategy.md` (NEW), pointers from `tdd` + `orchestrator`
@@ -86,6 +86,13 @@ CONTEXT.md). Plan frozen; execution appends below.
 relocated to ARCHITECTURE § Key integration points (the pointer); curated-not-copied, the loop, doc
 standard, orientation, and governance reworded to pointers/denser form. No section removed, no unique
 fact lost (verified by diff). qa-check clean. Unblocks T2 (which edits the task-entry shape here).
+
+### 2026-06-21 | T2 done | soft QA prompts (3 touch-points, non-blocking)
+Added a soft, optional "QA check? (tests · lint · security-review · perf)" prompt in three places — all
+suggestions, never gates (D1): `review-scoping.md` § "QA suggestion (raise, never gate)"; SPRINT template
+(HTML comment after DoD); CONTEXT task-entry shape (optional `qa:` note). CONTEXT 122→123 (still 7 under cap).
+**L-010 near-miss:** first applied the SPRINT-template edit to the install *cache* path, not the repo source —
+caught immediately, re-applied to `D:\…\skills\…`. 2nd occurrence of L-010 → bump at close (count → 2, promote).
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
