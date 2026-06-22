@@ -42,7 +42,7 @@ _(empty — SPRINT-008…011 batches shipped; see docs/CHANGELOG.md)_
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
       state: blocked   (deferred — research hooks next session)
-- TASK-008 — Define `/insights` → **built** 2026-06-16: anytime friction → `L-NNN` candidate (bumps a match's `count`) into `docs/LEARNINGS.md` (the §10 feed); exercised → L-010. _(unreleased — bundle into the next MINOR)_
+- TASK-008 — Define `/insights` → **built** 2026-06-16, **shipped in v1.2.0** (2026-06-22): anytime friction → `L-NNN` candidate (bumps a match's `count`) into `docs/LEARNINGS.md` (the §10 feed).
 
 > TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).
 

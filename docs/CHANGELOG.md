@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-21
+last_updated: 2026-06-22
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -8,6 +8,28 @@ status: current
 # lean-flow — Changelog
 
 <!-- Prepend new sprints — newest first. Append-only; never edit past blocks. -->
+
+---
+
+## v1.2.0 — QA Discipline & Audits (2026-06-22)
+
+MINOR — bundles SPRINT-008…011 + `/insights` (built in the v1.1.0 cycle, shipped now). Manifests → 1.2.0 lockstep. Skill roster **13 → 14**.
+
+**New capability**
+- **`/insights`** — anytime friction → an `L-NNN` candidate (or bump a match's `count`) in `docs/LEARNINGS.md`; complements the Sprint-Close Retro.
+- **QA discipline** — `scripts/qa-check.sh`, the plugin's **first executable code** (**ADR-008**): line caps · claims-vs-disk skill/template counts · frontmatter; `docs/QA.md` judgment checklist; a `docs/qa/` test-case folder + golden-path cases.
+- **Bug intake** — `BUG.md.template` + a bug-routing rule (bug → `/triage` → `TASK` · `/diagnose` · `TD-NNN`).
+- **Test-strategy guidance** — `tdd/references/test-strategy.md` (pick unit/integ/e2e/perf/load for *your* code) + soft, non-blocking QA prompts in templates + the Review step. New templates: **BUG** + **QA-TESTCASE**.
+
+**Hardening**
+- CONTEXT.md SSOT dedup (130 → 122); README **deferred** at prime (token win); `allowed-tools` tightened (diagnose +`Write` · council −`Bash` · flow −`Write`/`Edit`) with sub-agent dispatch confirmed **un-gated**; handoff red-flag vs restating prime-re-read state.
+- Three audits → `docs/research/` (allowed-tools · trigger accuracy · loop mechanics).
+
+### Upgrade notes
+- **`/insights` is additive** — a new skill; nothing changes until you invoke it.
+- **`scripts/qa-check.sh` is maintainer tooling** for this repo (run at release/close); it is **not** wired into your project's CI (lean-flow doesn't own CI/CD).
+- **New templates (BUG · QA-TESTCASE) are opt-in** — existing docs unaffected.
+- **prime now defers README** — it reads README fully only when CLAUDE.md/CONTEXT.md is missing; the health check still reports README presence. No action needed.
 
 ---
 

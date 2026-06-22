@@ -9,8 +9,8 @@
   "plugins": [
     {
       "name": "lean-flow",
-      "description": "Lean agentic dev loop for Claude Code: prime → lean-doc → orchestrate → repeat. Eleven standalone skills + an opt-in /flow conductor + a /council decision aid.",
-      "version": "1.1.0",
+      "description": "Lean agentic dev loop for Claude Code: prime → lean-doc → orchestrate → repeat. Twelve standalone skills + an opt-in /flow conductor + a /council decision aid.",
+      "version": "1.2.0",
       "source": {
         "source": "github",
         "repo": "aldianriski/lean-flow"
