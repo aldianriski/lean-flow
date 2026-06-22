@@ -58,8 +58,8 @@ cost prime pays re-reading it. Add a red-flag making the reference-not-restate d
 **Acceptance:** the handoff SKILL carries a red-flag that handoff docs reference durable state (TODO/sprint) rather than restating it.
 
 **DoD:**
-- [ ] `/handoff` SKILL gains the red-flag (reference durable state, don't restate)
-- [ ] handoff SKILL stays ≤110; qa-check green
+- [x] `/handoff` SKILL gains a *specific* red-flag — don't restate the live TODO/sprint task state prime re-reads (handoff already had general reference-don't-copy rules; this targets the prime-overlap)
+- [x] handoff SKILL 65 ≤110; qa-check green
 
 ## Owner-action checklist
 - [ ] none
@@ -88,6 +88,11 @@ trim out of this task's scope). Recorded in `docs/research/allowed-tools-audit.m
 `prime/SKILL.md` read-order: README is now a **fallback** — full read only when CLAUDE.md *or* CONTEXT.md
 is missing; otherwise presence-checked for the health line. Saves the README read every normal session
 (it overlaps CLAUDE+CONTEXT+ARCHITECTURE). Graceful degradation preserved; prime 73→78 ≤110. qa-check 42/0.
+
+### 2026-06-22 | T3 done | handoff red-flag (prime-overlap)
+handoff already carried general "reference, don't copy" rules; added a **specific** red-flag against
+restating the live TODO/sprint task state that `/prime` re-reads next session (the handoff→prime double-read
+the loop audit flagged). handoff ≤110; qa-check 42/0. All SPRINT-011 DoD met.
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->

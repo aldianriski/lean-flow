@@ -62,3 +62,4 @@ Next:  open a fresh session → /prime → read the handoff path above → resum
 ❌ **Duplicating a PRD / ADR / diff** — reference it by path; don't restate it.
 ❌ **Leaking a secret** — redact every credential and PII before saving.
 ❌ **Using this for durable state** — sprint records and decisions go through `/lean-doc-generator`, not here.
+❌ **Restating the live TODO / sprint task state** (open DoD, current task list) — `/prime` re-reads it next session, so restating it is paid twice; capture only the *ephemeral* (in-flight reasoning · the immediate next action) and point to TODO/sprint for the durable task state.
