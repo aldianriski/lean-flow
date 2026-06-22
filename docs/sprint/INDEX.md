@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-010 — Audits — closed 2026-06-22 · [close_commit pending]
 - SPRINT-009 — External face + SSOT diet — closed 2026-06-21 · 74fa6f6
 - SPRINT-008 — QA discipline — closed 2026-06-21 · 7f27438
 - SPRINT-007 — Extend & Harden — closed 2026-06-16 · d6025af

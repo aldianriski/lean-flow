@@ -11,6 +11,20 @@ status: current
 
 ---
 
+## Sprint 010 — Audits (closed 2026-06-22)
+
+Docs-only (no version bump). Three read-only audits → `docs/research/`, each producing follow-up tasks (no fixes applied — audit sprint):
+
+| Audited | Finding | Report |
+|---|---|---|
+| allowed-tools (14 skills) | 9 clean; diagnose under-grants `Write`, council/flow over-grant; sub-agent-dispatch gating = open semantics Q; no unsafe instructions | `allowed-tools-audit.md` |
+| description triggers | healthy — 13/14 explicit-invoke (low-stakes), `/council` the well-built implicit one | `trigger-accuracy-audit.md` |
+| session/loop mechanics | defer README at prime (the token win); gate re-grill already optimized | `loop-mechanics-audit.md` |
+
+Follow-ups filed: TASK-018 (allowed-tools fixes + semantics) · TASK-019 (prime README defer) · TASK-020 (handoff red-flag).
+
+---
+
 ## Sprint 009 — External face + SSOT diet (closed 2026-06-21)
 
 Unreleased (bundles into the next version). Delivered the QA discipline's external (advisory) face + paid down SSOT debt:

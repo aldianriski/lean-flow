@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-010 — Audits** → docs/sprint/SPRINT-010-audits.md
+> _(no active sprint — SPRINT-010 closed 2026-06-22; archived per §11)_
 
 ---
 
@@ -34,13 +34,25 @@ _(empty — SPRINT-008 shipped TASK-009 · 013 · 017 · 010; archived 2026-06-2
 
 ### P2 — Quality / Polish
 
-<!-- Promoted to SPRINT-010 (2026-06-21); tombstones cleared at its close (§11). -->
-- TASK-011 promoted → SPRINT-010 (T1)
-- TASK-012 promoted → SPRINT-010 (T2)
+<!-- Follow-ups from SPRINT-010 audits (docs/research/). -->
+- [ ] **TASK-018 — Fix skill allowed-tools + verify sub-agent-dispatch gating** [size: M] [risk: low] [HITL]
+      done-when: gating semantics verified (does `allowed-tools` block sub-agent dispatch?); diagnose gains `Write`, council drops `Bash`, flow `Write`/`Edit` dropped if confirmed unused; if gating confirmed → add `Task`/`Agent` to council/task-decomposer/orchestrator; qa-check green
+      touches:   skills/{diagnose,council,flow,task-decomposer,orchestrator}/SKILL.md frontmatter
+      assumes:   from docs/research/allowed-tools-audit.md (SPRINT-010 T1)
+      state:     ready
+- [ ] **TASK-019 — Defer README at prime (lazy/fallback read)** [size: S] [risk: low] [HITL]
+      done-when: prime reads README only as a fallback when CLAUDE.md/CONTEXT.md missing; still health-checks its presence; degrades gracefully; saves the README read every session
+      touches:   skills/prime/SKILL.md
+      assumes:   from docs/research/loop-mechanics-audit.md (SPRINT-010 T3)
+      state:     ready
 
 ### P3 — Long-term
 
-- TASK-016 promoted → SPRINT-010 (T3)
+- [ ] **TASK-020 — /handoff red-flag: reference durable state, don't restate** [size: S] [risk: low] [HITL]
+      done-when: handoff SKILL gains a red-flag — handoff docs reference TODO/sprint state rather than restating it (avoids the handoff→prime double-read)
+      touches:   skills/handoff/SKILL.md
+      assumes:   from docs/research/loop-mechanics-audit.md (SPRINT-010 T3)
+      state:     ready
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)

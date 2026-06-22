@@ -3,9 +3,9 @@ sprint: 010
 slug: audits
 owner: Maintainer
 last_updated: 2026-06-21
-status: active
+status: closed
 plan_commit: 7b3728e
-close_commit: [unset]
+close_commit: [pending]
 update_trigger: sprint execute/close events
 ---
 
@@ -108,16 +108,22 @@ residual-only G2 + batch-once) — no action. All SPRINT-010 DoD met; proposals 
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `docs/research/allowed-tools-audit.md` (NEW) | T1 | least-privilege findings | Low | self-review |
+| `docs/research/trigger-accuracy-audit.md` (NEW) | T2 | trigger findings | Low | self-review |
+| `docs/research/loop-mechanics-audit.md` (NEW) | T3 | loop-cost findings | Low | self-review |
 
 ## Retro
-<!-- Written at close. Route buckets per §10; then archive → docs/sprint/archive/ + INDEX.md line (§11). -->
 
 **Worked**
-- _(at close)_
+- Tier-routing paid off: T1's mechanical extraction ran on a `sonnet` subagent, freeing the session model for synthesis + the adversarial calibration that caught the false "Agent under-grant" cluster.
+- The audit-sprint discipline (D1: findings → follow-ups, no in-sprint fixes) kept a read-only sprint from churning all 14 skills on un-reviewed proposals.
+- Real signal surfaced: a confirmed `diagnose` under-grant, the README-at-prime token win, and a genuine open question (sub-agent-dispatch gating) worth verifying.
 
 **Friction**
-- _(at close)_
+- The recon agent over-claimed under-grants (the `Agent` cluster) — a reminder that subagent output is raw data to verify, not a verdict to ship. Session-model judgment was load-bearing.
+- "Audit → report doc" leans on the RESEARCH template, which fits findings→recommendation only loosely; acceptable, but a dedicated audit shape could be cleaner if audits recur.
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
-- _(at close)_
+**Pattern candidate**
+- *Adversarially verify a recon subagent's claims before acting* — the `Agent`-cluster over-claim. One occurrence; watch for recurrence (would promote to a tier-dispatch red-flag). Not filed as a learning yet (count 1).
+
+Buckets routed (§10): Shipped → CHANGELOG · Follow-ups → TASK-018 · 019 · 020 · Tech debt → none · Learnings → none (the verify-recon pattern is count 1, watched).
