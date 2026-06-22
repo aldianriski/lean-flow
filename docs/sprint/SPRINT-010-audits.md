@@ -34,9 +34,9 @@ no-unsafe-instruction check (no skill telling an agent to do something destructi
 **Acceptance:** a report lists every skill's declared vs needed tools, flags over-grants as follow-up fixes, and records the no-unsafe-instruction pass.
 
 **DoD:**
-- [ ] per-skill table: declared `allowed-tools` vs needed; over-grants flagged
-- [ ] no-unsafe-instruction check recorded (pass, or specific findings)
-- [ ] over-grants → follow-up `TASK-NNN` (fixes are NOT applied this sprint)
+- [x] per-skill table: declared vs needed → `docs/research/allowed-tools-audit.md`; 9 clean, issues on diagnose/council/flow + a sub-agent-dispatch semantics question
+- [x] no-unsafe-instruction check recorded — **PASS** (no destructive instruction in any skill)
+- [x] over-grants → follow-up tasks proposed in the report; filed to Backlog at close
 
 ### T2 — Audit description-trigger accuracy (TASK-012)  `[size: M · risk: low]`
 Layers: `skills/*/SKILL.md` descriptions (read), eval output
@@ -78,6 +78,15 @@ Investigate friction + token cost in the loop's mechanics; output proposals for 
 ### 2026-06-21 | promote | SPRINT-010 plan locked
 Promoted TASK-011 (T1) + TASK-012 (T2) + TASK-016 (T3) — the deferred audits. Governance: L-010 promoted
 → CLAUDE.md anti-pattern (edit repo source, never install cache) + collapsed; all TD resolved. Plan frozen.
+
+### 2026-06-22 | T1 done | allowed-tools least-privilege audit
+Recon via a `sonnet` subagent (declared vs needed across 14 skills); synthesized on the session model →
+`docs/research/allowed-tools-audit.md`. 9 skills clean. Findings: **diagnose** under-grants `Write`
+(Phase 5 writes a new regression test) [high] · **council** over-grants `Bash` (no shell) · **flow**
+likely over-grants `Write`/`Edit` (it only sequences) [verify]. **Semantics question:** council ran 11
+sub-agents in SPRINT-003 with no `Agent` declared → `allowed-tools` likely does NOT gate sub-agent
+dispatch; verify before touching council/task-decomposer/orchestrator. No-unsafe-instruction check: PASS.
+Fixes → follow-up tasks at close (D1).
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
