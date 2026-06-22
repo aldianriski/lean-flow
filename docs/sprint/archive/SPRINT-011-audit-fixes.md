@@ -3,9 +3,9 @@ sprint: 011
 slug: audit-fixes
 owner: Maintainer
 last_updated: 2026-06-22
-status: active
+status: closed
 plan_commit: 9129876
-close_commit: [unset]
+close_commit: [pending]
 update_trigger: sprint execute/close events
 ---
 
@@ -99,16 +99,25 @@ the loop audit flagged). handoff ≤110; qa-check 42/0. All SPRINT-011 DoD met.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `skills/diagnose/SKILL.md` | T1 | +`Write` (writes regression test) | Low | qa-check |
+| `skills/council/SKILL.md` | T1 | −`Bash` (no shell) | Low | qa-check |
+| `skills/flow/SKILL.md` | T1 | −`Write`/`Edit` (conducts only) | Low | qa-check |
+| `docs/research/allowed-tools-audit.md` | T1 | record dispatch-not-gated resolution | Low | review |
+| `skills/prime/SKILL.md` | T2 | README → fallback read (token win) | Low | qa-check + logic review |
+| `skills/handoff/SKILL.md` | T3 | red-flag vs restating prime-re-read state | Low | review |
 
 ## Retro
-<!-- Written at close. Route buckets per §10; then archive → docs/sprint/archive/ + INDEX.md line (§11). -->
 
 **Worked**
-- _(at close)_
+- Resolving the dispatch-gating question *from existing evidence* (council's SPRINT-003 run) avoided both a risky empirical test and an over-grant — the right call was to add *nothing*.
+- Disjoint skill files made the 3 fixes contention-free; each committed cleanly with the audit doc as its WHY-trail.
+- The audit→fix pipeline (SPRINT-010 → 011) worked as intended: investigate without churn, then apply with the findings as the spec.
 
 **Friction**
-- _(at close)_
+- handoff already had the general discipline T3 wanted — the new red-flag is a *sharpening*, not a gap-fill; a reminder that an audit's "missing rule" may already exist in weaker form.
+- `flow` `Bash` left in place (out of T1's frozen scope) — a known small residual, noted in the audit doc.
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
-- _(at close)_
+**Pattern candidate**
+- *Resolve a "needs-verify" finding from existing evidence before reaching for a live test* — cheaper and lower-risk when the history already answers it. One occurrence; not filed (count 1).
+
+Buckets routed (§10): Shipped → CHANGELOG · Follow-ups → none filed (flow-`Bash` trim left noted in the audit doc) · TD → none · Learnings → none.

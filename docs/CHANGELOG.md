@@ -11,6 +11,20 @@ status: current
 
 ---
 
+## Sprint 011 — Audit fixes (closed 2026-06-22)
+
+Applied the SPRINT-010 audit findings (small, surgical skill edits):
+
+| Shipped | What |
+|---|---|
+| allowed-tools | `diagnose` +`Write` (writes its regression test); `council` −`Bash`; `flow` −`Write`/`Edit` (conducts only). **Resolved:** sub-agent dispatch is *not* gated by `allowed-tools` (council ran without `Agent`) → no `Task`/`Agent` added |
+| prime | README is now a **fallback** read — full content only when CLAUDE.md/CONTEXT.md is missing; else presence-checked (saves the README read every session) |
+| handoff | red-flag against restating the live TODO/sprint state `/prime` re-reads (the handoff→prime double-read) |
+
+Noted (not applied): `flow` may also not need `Bash` — a candidate trim in `docs/research/allowed-tools-audit.md`.
+
+---
+
 ## Sprint 010 — Audits (closed 2026-06-22)
 
 Docs-only (no version bump). Three read-only audits → `docs/research/`, each producing follow-up tasks (no fixes applied — audit sprint):

@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-011 — Audit fixes** → docs/sprint/SPRINT-011-audit-fixes.md
+> _(no active sprint — SPRINT-011 closed 2026-06-22; archived per §11)_
 
 ---
 
@@ -34,13 +34,10 @@ _(empty — SPRINT-008 shipped TASK-009 · 013 · 017 · 010; archived 2026-06-2
 
 ### P2 — Quality / Polish
 
-<!-- Promoted to SPRINT-011 (2026-06-22); tombstones cleared at its close (§11). -->
-- TASK-018 promoted → SPRINT-011 (T1)
-- TASK-019 promoted → SPRINT-011 (T2)
+_(empty — SPRINT-008…011 batches shipped; see docs/CHANGELOG.md)_
 
 ### P3 — Long-term
 
-- TASK-020 promoted → SPRINT-011 (T3)
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
