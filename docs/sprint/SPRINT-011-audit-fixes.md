@@ -4,7 +4,7 @@ slug: audit-fixes
 owner: Maintainer
 last_updated: 2026-06-22
 status: active
-plan_commit: [pending]
+plan_commit: 9129876
 close_commit: [unset]
 update_trigger: sprint execute/close events
 ---
