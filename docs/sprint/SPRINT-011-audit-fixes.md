@@ -46,9 +46,9 @@ CLAUDE+CONTEXT+ARCHITECTURE). Make its full read a fallback; still health-check 
 **Acceptance:** prime reads README's full content only when CLAUDE.md or CONTEXT.md is missing; otherwise it reports README presence but skips the read; the missing-file path still degrades gracefully.
 
 **DoD:**
-- [ ] prime read-order makes README a fallback (read only if CLAUDE.md/CONTEXT.md absent)
-- [ ] README presence still appears in the health report (`[OK]`/`[MISSING]`)
-- [ ] graceful degradation preserved (no abort); prime SKILL stays ≤110
+- [x] prime read-order makes README a *fallback* (full read only if CLAUDE.md/CONTEXT.md absent) + a note explaining why
+- [x] README presence still appears in the health report (`[OK]`/`[MISSING]` — presence-check kept)
+- [x] graceful degradation preserved (no abort); prime SKILL 78 ≤110; qa-check green
 
 ### T3 — Handoff red-flag: reference, don't restate (TASK-020)  `[size: S · risk: low]`
 Layers: `skills/handoff/SKILL.md`
@@ -83,6 +83,11 @@ Resolved D1 from council's SPRINT-003 evidence: sub-agent dispatch is **not gate
 → added no `Task`/`Agent` (would be an over-grant). Applied: `diagnose` +`Write`; `council` −`Bash`;
 `flow` −`Write`/`Edit` (it conducts, never writes directly — `Bash` kept, flagged as a possible further
 trim out of this task's scope). Recorded in `docs/research/allowed-tools-audit.md` § Resolution. qa-check 42/0.
+
+### 2026-06-22 | T2 done | defer README at prime
+`prime/SKILL.md` read-order: README is now a **fallback** — full read only when CLAUDE.md *or* CONTEXT.md
+is missing; otherwise presence-checked for the health line. Saves the README read every normal session
+(it overlaps CLAUDE+CONTEXT+ARCHITECTURE). Graceful degradation preserved; prime 73→78 ≤110. qa-check 42/0.
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->

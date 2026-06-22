@@ -27,10 +27,15 @@ locations second. Adapt the globs to the host project's layout.
 |---|---|---|
 | 1 | `.claude/CLAUDE.md`, `CLAUDE.md` | Project instructions, anti-patterns, conventions |
 | 2 | `.claude/CONTEXT.md`, `CONTEXT.md` | Vocabulary · gates · modes (if the project uses one) |
-| 3 | `README.md` | Project overview, how-to-adopt, entry points |
+| 3 | `README.md` — *presence-check by default* | Front-door (humans); overlaps 1·2·6 → **full read deferred** (note below) |
 | 4 | MEMORY index (harness-resolved; fallback: `memory/MEMORY.md`, `.claude/memory/MEMORY.md`) | Sprint state, feedback, references |
 | 5 | `TODO.md`, `docs/sprint/SPRINT-*.md` | Active task list — frontmatter + open `- [ ]` items only |
 | 6 | `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` | Module map / where-things-live (the durable map) |
+
+**README is a fallback (token discipline).** It is the human front-door and overlaps CLAUDE.md (1) +
+CONTEXT.md (2) + ARCHITECTURE.md (6). Stat its presence for the health line, but **read its full
+content only when CLAUDE.md *or* CONTEXT.md is MISSING** (then it is the best available overview).
+Why → `docs/research/loop-mechanics-audit.md`.
 
 **Resolution**: read `TODO.md` (the Backlog pool); follow its § Active Sprint pointer (format: `> **SPRINT-NNN — <name>** → docs/sprint/SPRINT-NNN-<slug>.md`) — a
 multi-stream repo lists one pointer per stream — to each active `docs/sprint/SPRINT-NNN-<slug>.md`
