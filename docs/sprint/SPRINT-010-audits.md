@@ -57,9 +57,9 @@ Investigate friction + token cost in the loop's mechanics; output proposals for 
 **Acceptance:** an audit doc reports prime read-order necessity, handoff→prime redundancy, CLAUDE/CONTEXT/README load overlap (ADR-007 dedup claim verified), and gate re-grill cost — each with a proposed optimization.
 
 **DoD:**
-- [ ] prime read-order (6 slots — all needed every start?) assessed
-- [ ] handoff→prime round-trip redundancy + CLAUDE/CONTEXT/README load overlap assessed (ADR-007 claim verified)
-- [ ] gate re-grill cost assessed; each finding carries a proposed optimization → follow-up `TASK-NNN`; NO source edits this sprint
+- [x] prime read-order assessed → `docs/research/loop-mechanics-audit.md`; **README is the lowest-value slot** (defer it)
+- [x] handoff→prime redundancy (low by design; usage risk) + CLAUDE/CONTEXT/README overlap (ADR-007 dedup now holds CONTEXT→satellite after SPRINT-009; reverse-direction unguaranteed) assessed
+- [x] gate re-grill cost assessed — **already optimized** (intake-grill L-002 + residual-only G2 + batch-once); proposals → follow-up tasks; NO source edits
 
 ## Owner-action checklist
 - [ ] none — no secrets, env, or external dashboards this sprint
@@ -95,6 +95,13 @@ descriptions already carry strong "Do not use … use /X" boundaries. `/council`
 skill and is well-engineered (MANDATORY/STRONG triggers + a negative guard). `/insights` ("anytime") will
 under-fire implicitly by nature. No critical defect; minor overlap-polish is optional follow-up. Deeper
 skill-creator eval reserved for `/council` if implicit accuracy ever matters.
+
+### 2026-06-22 | T3 done | session/loop mechanics audit
+Analysis → `docs/research/loop-mechanics-audit.md`. The loop is mostly tight. **Clearest win: defer
+README at prime** — it's the human front-door, overlapping CLAUDE+CONTEXT+ARCHITECTURE; read it only as a
+fallback when those are missing. Minor hardening: a handoff red-flag (reference durable state, don't
+restate) + a reverse-direction SSOT check. Gate re-grill is already optimized (intake-grill L-002 +
+residual-only G2 + batch-once) — no action. All SPRINT-010 DoD met; proposals → follow-up tasks at close.
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
