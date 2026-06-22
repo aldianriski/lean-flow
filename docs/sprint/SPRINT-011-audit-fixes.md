@@ -33,10 +33,10 @@ semantics question first (it decides whether 3 skills need `Task`/`Agent` added 
 **Acceptance:** the dispatch-gating question is answered + recorded; `diagnose` gains `Write`, `council` drops `Bash`, `flow` is confirmed and trimmed if it never writes; qa-check stays green.
 
 **DoD:**
-- [ ] dispatch-gating question answered + recorded (CONTEXT/ADR or the audit doc) — does `allowed-tools` block sub-agent dispatch?
-- [ ] `diagnose` +`Write` (confirmed under-grant); `council` −`Bash` (over-grant)
-- [ ] `flow` checked — drop `Write`/`Edit` if it never writes directly; `task-decomposer`/`orchestrator`/`council` get `Task`/`Agent` ONLY if gating is confirmed
-- [ ] `sh scripts/qa-check.sh` green (frontmatter intact)
+- [x] dispatch-gating answered + recorded (`allowed-tools-audit.md` § Resolution) — **NOT gated** (council ran sub-agents without `Agent`)
+- [x] `diagnose` +`Write`; `council` −`Bash`
+- [x] `flow` −`Write`/`Edit` (conducts only); **no `Task`/`Agent` added** (un-gated → would be an over-grant)
+- [x] `sh scripts/qa-check.sh` green (42/0)
 
 ### T2 — Defer README at prime (TASK-019)  `[size: S · risk: low]`
 Layers: `skills/prime/SKILL.md`
@@ -77,6 +77,12 @@ cost prime pays re-reading it. Add a red-flag making the reference-not-restate d
 ### 2026-06-22 | promote | SPRINT-011 plan locked
 Promoted TASK-018 (T1) · 019 (T2) · 020 (T3) — the SPRINT-010 audit follow-ups. Governance clean
 (nothing to promote/age). Plan frozen.
+
+### 2026-06-22 | T1 done | allowed-tools fixes + dispatch-gating resolved
+Resolved D1 from council's SPRINT-003 evidence: sub-agent dispatch is **not gated** by `allowed-tools`
+→ added no `Task`/`Agent` (would be an over-grant). Applied: `diagnose` +`Write`; `council` −`Bash`;
+`flow` −`Write`/`Edit` (it conducts, never writes directly — `Bash` kept, flagged as a possible further
+trim out of this task's scope). Recorded in `docs/research/allowed-tools-audit.md` § Resolution. qa-check 42/0.
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->

@@ -37,7 +37,8 @@ Issues:
 
 Not hard-to-reverse → no ADR (unless the semantics finding reshapes the agent-dispatch model).
 
-## Out of scope / open questions
+## Resolution (SPRINT-011 T1, 2026-06-22)
 
-- Fixes are **not applied** this sprint (D1) → follow-up `TASK`s filed at close.
-- The sub-agent-dispatch gating question is the highest-value open item — it affects 3 skills and the whole tier-dispatch architecture.
+- **Sub-agent-dispatch gating: NOT gated.** `/council` ran 11 sub-agents in SPRINT-003 with no `Agent`/`Task` declared and succeeded (→ ADR-006); had `allowed-tools` gated dispatch, it would have failed. So **no `Task`/`Agent` added** to council/task-decomposer/orchestrator (adding them would be an over-grant for an un-gated capability). Deeper empirical verification reserved only if it ever matters.
+- **Applied:** `diagnose` +`Write`; `council` −`Bash`; `flow` −`Write`/`Edit` (it conducts, never writes directly).
+- **Noted (not applied — out of T1 scope):** `flow` may also not need `Bash` directly (the conducted skills carry their own) — a candidate further trim if confirmed.

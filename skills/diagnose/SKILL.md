@@ -2,7 +2,7 @@
 name: diagnose
 description: Use when debugging a defect, unexpected behaviour, failing test, or performance regression. Runs a disciplined 6-phase loop — build a feedback loop, reproduce, hypothesise, instrument, fix with regression test, cleanup + post-mortem. Do not use for architectural analysis or planning — use /orchestrator mvp instead.
 argument-hint: "[bug description | failing test | performance regression]"
-allowed-tools: Read, Edit, Bash, Glob, Grep
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 user-invocable: true
 version: "0.2.0"
 ---
