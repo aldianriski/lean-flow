@@ -46,9 +46,9 @@ under-triggers (misses the right one), using `skill-creator` eval tooling where 
 **Acceptance:** a report of mis/under-trigger cases with proposed wording fixes (proposals only, not applied).
 
 **DoD:**
-- [ ] trigger audit run (skill-creator eval, or documented manual fallback — see A1)
-- [ ] mis/under-trigger cases reported with proposed `description:` wording fixes
-- [ ] proposals only — no description edited this sprint (→ follow-up `TASK-NNN`)
+- [x] trigger audit run — **analytical/manual** (A1 fallback; skill-creator eval = deeper follow-up) → `docs/research/trigger-accuracy-audit.md`
+- [x] findings reported — set is healthy; key insight: 13/14 are explicit-invoke (low-stakes), `/council` is the implicit-trigger one (well-built); minor overlap-polish noted
+- [x] proposals only — no description edited (→ follow-up `TASK` if the polish is wanted)
 
 ### T3 — Audit session/loop mechanics (TASK-016)  `[size: M · risk: low]`
 Layers: an audit/research doc only
@@ -87,6 +87,14 @@ likely over-grants `Write`/`Edit` (it only sequences) [verify]. **Semantics ques
 sub-agents in SPRINT-003 with no `Agent` declared → `allowed-tools` likely does NOT gate sub-agent
 dispatch; verify before touching council/task-decomposer/orchestrator. No-unsafe-instruction check: PASS.
 Fixes → follow-up tasks at close (D1).
+
+### 2026-06-22 | T2 done | description-trigger accuracy audit
+Analytical review (A1 manual fallback) → `docs/research/trigger-accuracy-audit.md`. Key insight: 13/14
+skills are **explicit-invoke** (you type the name), so trigger-accuracy is low-stakes for them — their
+descriptions already carry strong "Do not use … use /X" boundaries. `/council` is the one implicit-trigger
+skill and is well-engineered (MANDATORY/STRONG triggers + a negative guard). `/insights` ("anytime") will
+under-fire implicitly by nature. No critical defect; minor overlap-polish is optional follow-up. Deeper
+skill-creator eval reserved for `/council` if implicit accuracy ever matters.
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
