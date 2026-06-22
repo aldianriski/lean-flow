@@ -2,10 +2,10 @@
 sprint: 010
 slug: audits
 owner: Maintainer
-last_updated: 2026-06-21
+last_updated: 2026-06-22
 status: closed
 plan_commit: 7b3728e
-close_commit: [pending]
+close_commit: bf8bd5b
 update_trigger: sprint execute/close events
 ---
 
