@@ -3,9 +3,9 @@ sprint: 013
 slug: knowledge-metadata
 owner: Maintainer
 last_updated: 2026-07-02
-status: active
+status: closed
 plan_commit: fb73a65
-close_commit: [sha — set at close]
+close_commit: [pending — set at close]
 update_trigger: sprint execute/close events
 ---
 
@@ -102,11 +102,15 @@ Migrated 13 LEARNINGS headings to `[tags][status]` (bodies untouched); new `scri
 ## Retro
 <!-- Written at close. Route buckets to durable homes (DOCS_Guide §10). -->
 
+**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint? **No miss.** (T2's own new check, applied.)
+
 **Worked**
--
+- References-first + G2-first design held on a code-bearing task — caps intact (CONTEXT 124/130), every addition placed deliberately.
+- The loop dogfooded itself: SPRINT-012 T1's guardrail surfaced the design forks as questions; T5's assume-guilty self-review caught the convention-only-enforcement gap; T4's scope-discipline kept the completeness lint in-scope (integrity), not creep.
+- Validated the new machinery by using it — filing L-013 at close exercised the schema + `gen-learnings-index.sh` + lints end-to-end.
 
 **Friction**
--
+- LEARNINGS is one-file-many-entries, so ADR-009's "per-doc frontmatter" had to become "per-entry heading metadata" — a reconciliation the ADR didn't spell out. ADRs/research (genuinely per-file) still don't carry it. **→ TASK-044.**
 
 **Pattern candidate** (surface → `docs/LEARNINGS.md`)
--
+- "Convention isn't enforcement" — a field/rule called *required* only is if a check enforces it; prose in a template/skill silently rots. **→ L-013.**

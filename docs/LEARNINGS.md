@@ -23,11 +23,19 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 - **process** — L-007 · L-006 · L-002
 - **docs** — L-012 · L-008 · L-001
-- **tooling** — L-011 · L-010
+- **tooling** — L-013 · L-011 · L-010
 - **edit-safety** — L-009 · L-005
 - **sprint-model** — L-004 · L-003
 
 <!-- INDEX:END -->
+
+---
+
+## L-013 [tags: tooling] [status: active]: Convention isn't enforcement — a field/rule called "required" is only required if a check enforces it. SPRINT-013 T1's `[tags][status]` schema was "required" only via template + skill prose until an assume-guilty self-review flagged it; a `qa-check.sh` metadata-completeness lint made it real (a missing/typo'd tag now FAILs, instead of silently dropping from the generated index). Pattern: back any "required" field with a lint, or it silently rots.
+- seen: Sprint-013
+- count: 1
+- promoted: no
+- related: L-007 (spec/convention isn't trusted until exercised on real input)
 
 ---
 

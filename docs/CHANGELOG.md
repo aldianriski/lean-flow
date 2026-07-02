@@ -11,6 +11,19 @@ status: current
 
 ---
 
+## Sprint 013 — Knowledge Metadata (closed 2026-07-02)
+
+Realizes **ADR-009**. Post-v1.3.0 — bundles into the next MINOR (v1.4.0).
+
+| Shipped | What |
+|---|---|
+| Metadata SSOT + generated index (T1) | LEARNINGS headings carry `[tags][status]`; `scripts/gen-learnings-index.sh` generates the by-tag index in-file (idempotent, `--check`); `qa-check.sh` gains index-freshness + dangling-ref + metadata-completeness lints |
+| Retrieval-miss signal (T2) | close-time Retro + `/insights` check — "did we fail to find / contradict a prior L-NNN/ADR?" — the observed trigger for the deferred TASK-040 |
+
+Filed at close: **TASK-044** (extend schema/index to ADRs + research) · **L-013** (convention isn't enforcement).
+
+---
+
 ## v1.3.0 — Process Hardening (2026-07-02)
 
 MINOR — bundles **SPRINT-012** (detail below). Skill/doc hardening from usage feedback + the

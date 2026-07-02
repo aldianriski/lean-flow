@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-013 — Knowledge Metadata** → [docs/sprint/SPRINT-013-knowledge-metadata.md](docs/sprint/SPRINT-013-knowledge-metadata.md)
+> _(no active sprint — SPRINT-013 closed 2026-07-02; archived per §11.)_
 
 ---
 
@@ -38,7 +38,7 @@ _(empty)_
 
 <!-- (SPRINT-008…011 batches shipped; see docs/CHANGELOG.md) -->
 
-- TASK-036 — promoted → SPRINT-013 (T1)
+_(empty)_
 
 ### P3 — Long-term
 
@@ -47,13 +47,18 @@ _(empty)_
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
       state: blocked   (deferred — research hooks next session)
 - TASK-039 — Scan bmad-method → **done** 2026-07-02: [docs/research/bmad-adaptation.md](docs/research/bmad-adaptation.md) — 5 keepers, rest rejected (agent/config machinery + duplicates of leaner lean-flow equivalents). Keepers folded into TASK-037 (risk-tier + regression gate) · TASK-042 (mid-sprint scope-change) · TASK-043 (anti-sycophancy Review) · TASK-035 (halt-contract wording).
-- TASK-041 — promoted → SPRINT-013 (T2)
 - [ ] **TASK-040 — Derived, on-demand graph VIEW over the metadata (relational comprehension)**  [size: L] [risk: med] [HITL]
       done-when: a graph view is GENERATED from TASK-036's frontmatter (transitive supersedes lineage · cross-sprint domain clusters · orphan/dangling detection) — a disposable build artifact, never hand-edited, regenerated from the SSOT. Guardrails (ALL mandatory, or don't build): (i) regeneration wired to lean-doc-generator's write step; (ii) read-time staleness check — the view carries a source checksum/mtime and fails LOUD if the frontmatter is newer (a stale CACHE, not a stale fact); (iii) integrity lint (shared with TASK-036). graphify serves this ad-hoc until it's worth automating.
       touches:   docs/ (corpus-wide) · a generation script/skill · graphify (on-demand)
       decision:  (2026-07-02, council-2) REJECT (c) a separately-maintained graph — UNANIMOUS: second source of truth, silent drift, unbuildable agent-free (= the banned codemap rule). This is priority #4 (relational comprehension) — below 036's freshness/precision/context-load. Reject the Expansionist's "gate /prime citations off the graph" — agent-free scope creep; keep the view passive.
       tracker:   verdict (temp) verdict-knowledge-library.md · refs docs/research/graphify-daily-value.md · https://github.com/Egonex-AI/Understand-Anything
       state:     blocked   (build on the TASK-041 signal + only with all 3 guardrails; lower priority than 036)
+- [ ] **TASK-044 — Extend the metadata SSOT + index to ADRs & research docs**  [size: M] [risk: low] [HITL]
+      done-when: ADRs (docs/adr/) + research (docs/research/) carry per-file frontmatter (id · tags · domain · status · supersedes/superseded-by · related) per ADR-009; the generated index (or a sibling) covers them; qa-check's dangling-ref + completeness lints extend to them.
+      touches:   docs/adr/*.md · docs/research/*.md · scripts/gen-learnings-index.sh (or a generalized gen-index) · scripts/qa-check.sh
+      assumes:   ADR-009's "over time" extension; the per-entry LEARNINGS half shipped in SPRINT-013. none blocking.
+      tracker:   SPRINT-013 Retro friction (docs/sprint/archive/SPRINT-013-knowledge-metadata.md)
+      state:     ready
 - TASK-008 — Define `/insights` → **built** 2026-06-16, **shipped in v1.2.0** (2026-06-22): anytime friction → `L-NNN` candidate (bumps a match's `count`) into `docs/LEARNINGS.md` (the §10 feed).
 
 > TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).
