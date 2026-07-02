@@ -4,7 +4,7 @@ slug: metadata-extend
 owner: Maintainer
 last_updated: 2026-07-02
 status: active
-plan_commit: TBD
+plan_commit: cfc84a2
 close_commit: TBD
 update_trigger: sprint execute/close events
 ---
