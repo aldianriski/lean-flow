@@ -51,9 +51,9 @@ One line so the trigger for building TASK-040's derived graph view is *observed*
 **Acceptance:** the Sprint-Close Retro + /insights carry the retrieval-miss question; SPRINT template §10 reflects it.
 
 **DoD:**
-- [ ] DOCS_Guide §10 Retro gains: "did we fail to find, or contradict, a prior L-NNN / ADR this sprint?"
-- [ ] /insights notes the same signal (a retrieval miss is a fileable friction)
-- [ ] SPRINT.md.template §10 reflects it (if the Retro checklist is inlined there)
+- [x] DOCS_Guide §10 Retro gains: "did we fail to find, or contradict, a prior L-NNN / ADR this sprint?"
+- [x] /insights notes the same signal (a retrieval miss is a fileable friction)
+- [x] SPRINT.md.template §10 reflects it (Retro "Retrieval check" line)
 
 ## Owner-action checklist
 <!-- None — all dev/doc edits. -->
@@ -75,12 +75,17 @@ Formed from Backlog ready tasks TASK-036 + TASK-041 (ADR-009 realization). Gover
 ### 2026-07-02 | design (provisional) | A2 index-generation mechanism
 Recommended default while owner AFK: a **deterministic script** regenerates the index from frontmatter (alongside `scripts/qa-check.sh`), and the dangling-reference lint **extends `qa-check.sh`** — deterministic + testable, faithful to ADR-009 ("derived, regenerated, not hand-kept") and the ADR-008 code precedent. **Confirm at execution G2** before building (this is the T1 fork). Not locked; recorded here so it isn't parked.
 
+### 2026-07-02 | T2 done | Retrieval-miss signal
+Landed at 3 homes: DOCS_Guide §10 (close-time retrieval-miss check → Learnings bucket + TASK-040 signal), /insights when-to-invoke (a miss is fileable), SPRINT.md.template Retro ("Retrieval check" line). Doc-only. T1 (036) remains — presenting its G2 design fork next.
+
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(none yet — planned)_ | | | | |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T2 | §10: retrieval-miss check at close (feeds TASK-040 signal) | Low | self-review |
+| `skills/insights/SKILL.md` | T2 | when-to-invoke: a retrieval miss is fileable | Low | self-review; 58 lines |
+| `skills/lean-doc-generator/templates/SPRINT.md.template` | T2 | Retro "Retrieval check" line | Low | self-review |
 
 ## Retro
 <!-- Written at close. Route buckets to durable homes (DOCS_Guide §10). -->

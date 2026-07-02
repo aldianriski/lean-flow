@@ -200,6 +200,11 @@ Every iteration feeds the next. At **Sprint Close**, the Retro sorts work into f
 | Follow-ups | `TASK-NNN` entry in `TODO.md` § Backlog (re-enters the loop) |
 | Learnings | `L-NNN` entry in `docs/LEARNINGS.md` |
 
+**Retrieval-miss check** (at close) — also ask: *did we fail to find, or contradict, a prior
+`L-NNN`/ADR this sprint?* A yes is a fileable friction (→ Learnings bucket) **and** the observed signal
+for investing in a derived knowledge-graph view (TASK-040) — track the miss rather than guessing on
+corpus size.
+
 **Promotion rule** — a learning that recurs (**count ≥ 2** — a second sprint hits the same friction)
 is promoted from a ledger line into a *durable* rule: a `CLAUDE.md` anti-pattern, a `CONTEXT.md`
 rule, or a skill red-flag. Mark `promoted: yes → <where>` on the entry. One-offs stay ledger lines —
