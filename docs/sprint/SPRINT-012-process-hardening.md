@@ -78,9 +78,9 @@ bmad keeper K4 (correct-course), slimmed to a convention, not a new skill.
 **Acceptance:** orchestrator carries the scope-change log format + a red-flag; CONTEXT notes it if the log format is documented there.
 
 **DoD:**
-- [ ] orchestrator: scope-change Execution-Log entry format (what broke · impact · re-confirm G2)
-- [ ] rule: log the scope change BEFORE editing the frozen § Plan
-- [ ] red-flag added (silently absorbing a mid-sprint scope change)
+- [x] orchestrator: scope-change Execution-Log entry format (what broke · impact · re-confirm G2) — in SPRINT.md.template + orchestrator red-flag
+- [x] rule: log the scope change BEFORE editing the frozen § Plan
+- [x] red-flag added (silently absorbing a mid-sprint scope change)
 <!-- QA: doc edits → self-review. -->
 
 ### T5 — Anti-sycophancy Review: 0-findings → re-run assume-guilty `[size: S · risk: low]`
@@ -132,6 +132,9 @@ New `tdd/references/test-standard.md` (12-pt checklist + 70/20/10 pyramid + bmad
 ### 2026-07-02 | T3 done | Ponytail simplicity ladder
 Folded into CLAUDE "Simplicity first" (global doctrine) + light cross-refs in tdd + refactor-advisor. **Scope note (surfaced, not parked — cf. T1):** the DoD listed orchestrator too, but it's 108/110 with no cap room; orchestrator inherits the ladder via CLAUDE + already flags scope creep, so no redundant line was jammed in (adding it would itself violate the ladder). Skill count stays 14.
 
+### 2026-07-02 | T4 done | Mid-sprint scope-change convention
+Scope-change entry format added to SPRINT.md.template's Execution-Log comment (what broke · impact · re-confirm G2, before editing the frozen Plan) + an orchestrator red-flag + a CONTEXT sprint-model clause. orchestrator now 109/110 — T5's detail must stay in review-scoping.md (planned).
+
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
 
@@ -147,6 +150,9 @@ Folded into CLAUDE "Simplicity first" (global doctrine) + light cross-refs in td
 | `.claude/CLAUDE.md` | T3 | fold the laziness ladder into "Simplicity first" | Low | self-review; 68/80 |
 | `skills/tdd/SKILL.md` | T3 | cross-ref ladder in the "more code than needed" red-flag | Low | self-review; 82/110 |
 | `skills/refactor-advisor/SKILL.md` | T3 | tie deletion-test to the ladder's delete > add | Low | self-review; 59/110 |
+| `skills/lean-doc-generator/templates/SPRINT.md.template` | T4 | scope-change entry format in the Execution Log comment | Low | self-review |
+| `skills/orchestrator/SKILL.md` | T4 | red-flag: never silently absorb a scope change | Low | self-review; 109/110 |
+| `.claude/CONTEXT.md` | T4 | sprint-model: scope-change logged before editing the Plan | Low | self-review; 123/130 |
 
 ## Retro
 <!-- Written at close. Route buckets to durable homes (DOCS_Guide §10). -->
