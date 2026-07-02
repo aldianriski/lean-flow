@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-21
+last_updated: 2026-07-02
 update_trigger: A new ADR is added under docs/adr/
 status: current
 ---
@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-009](adr/ADR-009-knowledge-metadata-ssot.md) | Knowledge corpus: write-time metadata SSOT + a derived, on-demand graph view | accepted | 2026-07-02 |
 | [ADR-008](adr/ADR-008-first-code-qa-check.md) | Admit the first executable code: a hybrid QA check (script + checklist) | accepted | 2026-06-21 |
 | [ADR-007](adr/ADR-007-context-cap-ssot-density.md) | CONTEXT.md cap raised 100 → 130 (the SSOT is a denser doc-kind) | accepted | 2026-06-12 |
 | [ADR-006](adr/ADR-006-skill-cap-executable-artifacts.md) | SKILL cap counts procedure only; executable artifacts in references/ | accepted | 2026-06-11 |
