@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git mv:*)",
+      "Bash(sh scripts/qa-check.sh:*)",
+      "Bash(sh scripts/gen-index.sh:*)"
+    ]
+  }
+}
