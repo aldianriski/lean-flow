@@ -57,13 +57,13 @@ spots — so unanimity is weaker evidence than it looks. The near-free bundle cl
 **Acceptance:** a real council run yields a verdict carrying calibrated confidence + dissent + named single-model ceiling, with the pre-mortem and dialectical Contrarian reflected. `SKILL.md` ≤110.
 
 **DoD:**
-- [ ] Chairman synthesis adds a pre-mortem ("assume this failed in 6 months — what killed it?")
-- [ ] Contrarian reframed to attack the *emerging consensus* (dialectical), not just an opposite position
-- [ ] Verdict carries calibrated confidence (recommendation *before* the score) + a dissent/divergence summary
-- [ ] Each lens emits its top 1–2 decision-critical *questions* before its verdict
-- [ ] Verdict names the single-model ceiling (reduces *framing*, not *knowledge*, blind spots)
-- [ ] Judge-bias hardening: reviewer-order rotation · rubric-scored review · persona length cap
-- [ ] Exercised once on a real decision (L-007); `SKILL.md` ≤110
+- [x] Chairman synthesis adds a pre-mortem ("assume this failed in 6 months — what killed it?")
+- [x] Contrarian reframed to attack the *emerging consensus* (dialectical), not just an opposite position
+- [x] Verdict carries calibrated confidence (recommendation *before* the score) + a dissent/divergence summary
+- [x] Each lens emits its top 1–2 decision-critical *questions* before its verdict
+- [x] Verdict names the single-model ceiling (reduces *framing*, not *knowledge*, blind spots)
+- [x] Judge-bias hardening: reviewer-order rotation · rubric-scored review · persona length cap
+- [x] Exercised once on a real decision (L-007); `SKILL.md` ≤110 (62 lines)
 
 ### T3 — Council gated passes: adversarial fact-verify + unknown-unknowns moderator `[size: M · risk: med]`
 Layers: `skills/council/SKILL.md` (2 conditional steps) · `skills/council/references/prompts.md` — **depends-on T2** (shared file, serialize — see D3)
@@ -117,6 +117,12 @@ D2 → one shared `gen-index.sh` + generated `docs/knowledge-index.md` (LEARNING
 | `docs/research/*.md` (6) | T1 | +ADR-009 frontmatter | Low | completeness lint green |
 | `docs/LEARNINGS.md` | T1 | in-file index → pointer to knowledge-index | Low | index still generated |
 | `.claude/CONTEXT.md` · `skills/insights/SKILL.md` · `skills/lean-doc-generator/{SKILL.md,templates/LEARNINGS.md.template}` | T1 | live gen-script refs renamed; write-step regen wired | Low | qa-check caps green |
+| `skills/council/SKILL.md` | T2 | steps 2–5 + red flags: questions-first · rubric review · pre-mortem · confidence · ceiling | Low | 62/110; exercised |
+| `skills/council/references/{advisors,prompts}.md` | T2 | dialectical Contrarian; advisor/reviewer/chairman/verdict templates updated | Low | real council run |
+| `TODO.md` (TASK-047) | T2 | verdict fed forward — measurement-first gating | Low | n/a |
+
+### 2026-07-02 | T2 done | council adopt-now hardening bundle + real exercise
+Landed pre-mortem · dialectical Contrarian · calibrated confidence+dissent (rec before score) · questions-first advisors · single-model ceiling · judge-bias hardening (per-reviewer A–E rotation · rubric · length cap). All in `references/` per L-012; SKILL 60→62. **L-007 exercise:** ran a full real council (5 advisors + 3 rubric reviewers + chairman) on the TASK-047 multi-model question — every new mechanism fired; verdict (temp `verdict-council-multimodel.md`) fed forward into TASK-047's gating. Emergent finding: the council flagged it cannot certify its own diversity (the unmeasured-premise blind spot).
 
 ## Retro
 <!-- Written at close. -->

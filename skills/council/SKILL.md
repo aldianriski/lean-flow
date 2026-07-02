@@ -43,10 +43,10 @@ Dispatched roles — advisors (step 2), peer reviewers (step 3), the research pa
 All sub-agent prompt templates are in **`references/prompts.md`** — read it before spawning.
 
 1. **Frame (+ context & research).** Scan the workspace for context (CLAUDE.md · `memory/` · referenced files — ≤30s). Decide if the call turns on *external current facts*; if so, run **one shared** research pass (template in prompts.md) and carry an evidence brief — say so in one line if you skip it. Reframe the raw question into one neutral prompt every advisor receives. Too vague → ask **one** clarifying question, then proceed.
-2. **Convene (5 advisors, parallel).** Spawn all 5 as sub-agents (identities → advisors.md; template → prompts.md), 150–300 words each, leaning fully into their lens. **Exception:** the Outsider does NOT get the evidence brief — keep it naive (that's the curse-of-knowledge detector).
-3. **Peer review (5, parallel).** Anonymize the responses as A–E (randomize). Each reviewer answers: strongest? biggest blind spot? what did ALL miss? (template → prompts.md). Anonymize so reviewers judge on merit, not style.
-4. **Chairman synthesis (session model).** One agent gets the question + de-anonymized responses + all 5 reviews → the verdict (template → prompts.md): agree · clash · blind spots caught · the recommendation · the one thing to do first. The chairman MAY side with a lone dissenter if the reasoning is strongest.
-5. **Write the verdict (lean).** Present in chat AND write **only the verdict** (5 sections; structure in prompts.md) to `verdict-<slug>.md` — use the slug the ADR will use. Default to the OS temp dir; repo only if asked. Never dump the full transcript.
+2. **Convene (5 advisors, parallel).** Spawn all 5 as sub-agents (identities → advisors.md; template → prompts.md), 150–300 words each, leaning fully into their lens. Each **first emits its 1–2 decision-critical questions**, then its analysis (a question no advisor resolves becomes a chairman blind-spot). **Exception:** the Outsider does NOT get the evidence brief — keep it naive (that's the curse-of-knowledge detector).
+3. **Peer review (5, parallel).** Anonymize the responses as A–E, **randomizing the mapping independently per reviewer** (not once). Each reviewer scores on a **rubric — reasoning · evidence · coverage, NOT length/fluency** — then answers: strongest? biggest blind spot? what did ALL miss? (template → prompts.md).
+4. **Chairman synthesis (session model).** One agent gets the question + de-anonymized responses + all 5 reviews + the advisor questions → the verdict (template → prompts.md): agree · clash · blind spots · **recommendation (written before the score)** · **pre-mortem** · **calibrated confidence + dissent** · one-thing-first · the **single-model ceiling** caveat. The chairman MAY side with a lone dissenter if the reasoning is strongest.
+5. **Write the verdict (lean).** Present in chat AND write **only the verdict** (sections per prompts.md) to `verdict-<slug>.md` — use the slug the ADR will use. Default to the OS temp dir; repo only if asked. Never dump the full transcript.
 6. **Feed forward.** The verdict is a decision *input*, not a record. Hard-to-reverse + surprising + a real trade-off → fold the recommendation + alternatives into an **ADR** (`docs/adr/`, DOCS_Guide §4), then the verdict file can be deleted. Don't accumulate stale verdicts.
 
 Worked example → `references/example.md`.
@@ -57,4 +57,6 @@ Worked example → `references/example.md`.
 ❌ **Skipping anonymization** for peer review — reviewers defer to thinking styles instead of judging merit.
 ❌ **Forcing the chairman to the majority** — it may side with the strongest reasoning, even a lone dissenter.
 ❌ **Counciling a trivial question** — one right answer → just answer it; the council is for genuine uncertainty.
-❌ **Dumping the full transcript** into the verdict file — write only the 5-section verdict; the sprawl is what makes it un-lean.
+❌ **Dumping the full transcript** into the verdict file — write only the verdict sections; the sprawl is what makes it un-lean.
+❌ **Laundering disagreement into false consensus** — low advisor agreement is reported with a *lowered* confidence, never smoothed into a confident verdict.
+❌ **Over-trusting unanimity** — 5 personas on one model share its knowledge gaps; the verdict says so (the ceiling caveat), so agreement isn't read as independent proof.

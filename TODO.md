@@ -69,8 +69,9 @@ _(empty)_
       done-when: ≥2 personas route to a different provider/model to recover architectural (uncorrelated-error) diversity — the only fix for shared-weights blind spots (5 personas on one model share its priors).
       touches:   skills/council/SKILL.md · skills/council/references/{advisors,prompts}.md · a provider-routing seam
       assumes:   requires a prior call on whether lean-flow takes a provider dependency at all (likely /council-worthy itself).
-      tracker:   docs/research/council-improvements.md (Option C, deferred)
-      state:     blocked   (deferred — revisit only if a shared-prior council is observably wrong)
+      next:      **gate behind cheaper steps, in order** (council verdict, SPRINT-014 T2 exercise): (1) MEASURE — run today's single-model council 3× on one real decision, check if the 5 personas actually diverge (if they already converge, "5 personas" is theater; if they diverge, the ceiling may be overstated); (2) exhaust cheap levers — per-persona temperature/seed/adversarial framing before any dependency; (3) if built, fix the SYNTHESIS BOTTLENECK too — multi-model advisors still funnel through one chairman, so a naive backend is a no-op. Build the provider dependency LAST.
+      tracker:   docs/research/council-improvements.md (Option C, deferred) · verdict-council-multimodel.md (temp)
+      state:     blocked   (deferred — revisit only after step (1) measurement shows the ceiling is a real crack)
 - [ ] **TASK-044 — Extend the metadata SSOT + index to ADRs & research docs**  [size: M] [risk: low] [HITL]
       done-when: ADRs (docs/adr/) + research (docs/research/) carry per-file frontmatter (id · tags · domain · status · supersedes/superseded-by · related) per ADR-009; the generated index (or a sibling) covers them; qa-check's dangling-ref + completeness lints extend to them.
       touches:   docs/adr/*.md · docs/research/*.md · scripts/gen-learnings-index.sh (or a generalized gen-index) · scripts/qa-check.sh

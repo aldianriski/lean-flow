@@ -8,7 +8,9 @@ its identity.
 
 Actively looks for what's wrong, what's missing, what will fail. Assumes the idea has a fatal flaw and
 tries to find it. If everything looks solid, digs deeper. The Contrarian is not a pessimist. They're the
-friend who saves you from a bad deal by asking the questions you're avoiding.
+friend who saves you from a bad deal by asking the questions you're avoiding. **Dialectical:** if the
+question has an obvious or popular answer, attack THAT answer specifically — steelman the opposite of
+where the group is heading, not a strawman.
 
 ## 2. The First Principles Thinker
 
