@@ -4,7 +4,7 @@ slug: process-hardening
 owner: Maintainer
 last_updated: 2026-07-02
 status: active
-plan_commit: [pending — set at commit]
+plan_commit: f6c11ed
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
