@@ -86,17 +86,13 @@ Operates on the active sprint file `docs/sprint/SPRINT-NNN-<slug>.md` (its Plan 
 
 ## Review
 
-Run checks in a **fresh, isolated context** (subagent / separate pass), not inline — a reviewer that
-didn't write the code catches more, and the heavy work stays out of the main loop. **Scope every pass
-to the diff + its blast radius** (`git diff` + changed files + direct callers) — never survey the whole
-repo (the fan-out re-scan is the biggest token sink). A **skip table** decides which passes fire:
-docs/trivial → self-review only · no security surface → skip `/security-review` · unchanged behaviour →
-skip `/verify` · already-read → skip `Explore`. **Scale depth:** small/medium → **one** scoped `sonnet` reviewer; `/code-review`'s finder fan-out only for **large / high-risk** diffs.
+Run checks in a **fresh, isolated context** (a reviewer who didn't write the code catches more) and
+**scope every pass to the diff + its blast radius** — never the whole repo (the fan-out re-scan is the
+biggest token sink). A **skip table** + **scale-depth** rule decide what fires: docs/trivial → self-review
+only · small/med → one scoped `sonnet` reviewer · large/high-risk → `/code-review` · behaviour change →
+`/run` + `/verify` · auth/input/secrets → `/security-review` · bug → `/diagnose`.
 
-- **Code review** — small/med → one scoped `sonnet` reviewer · large/high-risk → **`/code-review`** · **behaviour change → `/run` + `/verify`** · **cleanup → `/simplify`** · **auth/input/secrets → `/security-review`** · **bug → `/diagnose`**.
-- **Doc-only / delete-only / trivial** → the self-review checklist is the floor.
-
-Full routing · skip table · self-review checklist → `references/review-scoping.md`.
+Full routing · skip table · adversarial floor · self-review checklist → `references/review-scoping.md`.
 
 ## Red flags
 

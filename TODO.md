@@ -88,8 +88,8 @@ _(empty)_
 - **TD-005** resolved → SPRINT-006 T2 (CONTEXT 151→127 + cap 100→130, ADR-007)
 - **TD-006** severity: medium | status: resolved → SPRINT-009 T1 (2026-06-21)
   - Summary: CONTEXT.md deduped 130 → 122 (built-in detail → ARCHITECTURE pointer; curated/loop/governance compressed); 8 lines recovered, no info lost. L-008 promoted at SPRINT-009 promote.
-- **TD-007** severity: medium | status: open | created: Sprint-012
-  - Summary: `skills/orchestrator/SKILL.md` is at 109/110 — the next addition can't fit in the body. Do a references extraction (move a section → `references/`) or a compression pass before the next orchestrator change. Surfaced at SPRINT-012 close (Friction · L-012).
+- **TD-007** severity: medium | status: resolved (2026-07-02) | created: Sprint-012
+  - Summary: `skills/orchestrator/SKILL.md` was at 109/110. **Resolved** — compressed the § Review block (skip-table/scale-depth/routing detail already lived in `references/review-scoping.md`, a pure L-008 dedup) to a lean summary + pointer; recovered ~5 lines. Now well under cap.
 
 ---
 
