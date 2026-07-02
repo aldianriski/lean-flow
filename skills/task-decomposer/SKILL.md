@@ -64,6 +64,7 @@ local (TODO.md Backlog) — no external issue tracker.
 - After `approve`: Backlog only; never write directly into an Active Sprint.
 - Identical acceptance criteria on two tasks → merge or differentiate first.
 - A task with no observable acceptance criterion fails validation — rewrite it.
+- A question that BLOCKS scope/design is asked here (one at a time) or recorded as an explicit `needs-info`/`blocked` with its unblock condition — never parked as a silent `assumes:` or a passive doc note that stalls dev.
 
 ## Red flags
 

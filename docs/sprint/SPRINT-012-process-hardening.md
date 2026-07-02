@@ -35,10 +35,10 @@ blocking condition).
 **Acceptance:** the gate-bearing skills carry the rule + a new CLAUDE anti-pattern; exercised once on a real intent.
 
 **DoD:**
-- [ ] task-decomposer grill: a blocking question is asked one-at-a-time, never parked as a silent `assumes:`
-- [ ] orchestrator G1/G2: an unconfirmed blocking question → explicit `blocked`/owner-action + unblock condition (not a passive note)
-- [ ] `.claude/CLAUDE.md` anti-pattern added (parking a flow-blocking open question in a doc)
-- [ ] exercised once on a real intent (the "exercise-on-real-input" rule, L-007)
+- [x] task-decomposer grill: a blocking question is asked one-at-a-time, never parked as a silent `assumes:`
+- [x] orchestrator G1/G2: an unconfirmed blocking question → explicit `blocked`/owner-action + unblock condition (not a passive note)
+- [x] `.claude/CLAUDE.md` anti-pattern added (parking a flow-blocking open question in a doc)
+- [x] exercised once on a real intent — this session surfaced the PRD/knowledge/scope forks via questions instead of parking them (L-007)
 <!-- QA: doc-only edits → self-review floor + the one real exercise. -->
 
 ### T2 — Host-project test-quality standard, wired to the loop points that fire `[size: M · risk: low]`
@@ -123,12 +123,17 @@ LLM reviewers under-report. If a scoped reviewer returns 0 findings, re-run once
 Formed from Backlog ready tasks TASK-035/037/038/042/043 (usage-feedback + bmad-adaptation keepers).
 036/041 deferred to SPRINT-013. Governance review clean (no L-promotions, no TD aging, no doc-aging).
 
+### 2026-07-02 | T1 done | Open-question guardrail
+Rule landed at 3 touchpoints (task-decomposer grill hard-rule · orchestrator G2 residual-grill · CLAUDE anti-pattern). References-first held all caps (CLAUDE 68/80, orchestrator 108/110). Exercised on real input this session (forks surfaced as questions, not parked).
+
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(none yet — planned)_ | | | | |
+| `.claude/CLAUDE.md` | T1 | anti-pattern: never park a flow-blocking open question | Low | self-review; cap 68/80 |
+| `skills/task-decomposer/SKILL.md` | T1 | hard rule: blocking question asked or explicit `blocked`, never parked | Low | self-review; 78/110 |
+| `skills/orchestrator/SKILL.md` | T1 | G2 residual-grill: surface/`blocked`-with-condition, never a passive note | Low | self-review; 108/110 |
 
 ## Retro
 <!-- Written at close. Route buckets to durable homes (DOCS_Guide §10). -->
