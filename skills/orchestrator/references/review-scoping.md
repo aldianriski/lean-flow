@@ -63,6 +63,10 @@ Beyond the passes above, **surface** — as a suggestion, not a blocker — whet
 (if it touched a security surface) · a **perf budget** (if it's a hot path). lean-flow *suggests* these;
 it never runs the user's CI or blocks on them (the no-enforcement spine). The owner decides.
 
+When the diff **touches tests**, the test-quality standard (`skills/tdd/references/test-standard.md`) is
+the floor to raise — the 12-point checklist + the 70/20/10 pyramid — plus a **regression gate**: the
+tests match the task's risk tier and ALL existing tests still pass (zero regressions) before it ticks done.
+
 ## Self-review checklist (the trivial-diff floor)
 
 For doc-only / delete-only / trivial diffs this is enough — no agent pass:

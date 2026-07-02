@@ -50,11 +50,11 @@ Testing Decisions + orchestrator Review.
 **Acceptance:** `test-standard.md` exists (12-pt checklist + 70/20/10 pyramid + risk-tier→depth + regression gate) and is cited from decompose + Review; never a lean-flow gate.
 
 **DoD:**
-- [ ] `test-standard.md`: 12-point checklist + 70/20/10 pyramid (unit-API-integ / component-UI / E2E)
-- [ ] risk-tier P0–P3 → pyramid-depth mapping (bmad K2) in the standard
-- [ ] task-decomposer "Testing Decisions" cites it (pick the mix per pyramid + risk tier)
-- [ ] orchestrator Review cites the 12-pt checklist + regression gate (K3: tests match tier + zero regressions) via the `qa:` hint
-- [ ] framed as HOST-project guidance, never a lean-flow gate
+- [x] `test-standard.md`: 12-point checklist + 70/20/10 pyramid (unit-API-integ / component-UI / E2E)
+- [x] risk-tier P0–P3 → pyramid-depth mapping (bmad K2) in the standard
+- [x] task-decomposer "Testing Decisions" cites it (pick the mix per pyramid + risk tier)
+- [x] orchestrator Review cites the 12-pt checklist + regression gate (K3: tests match tier + zero regressions) via the `qa:` hint
+- [x] framed as HOST-project guidance, never a lean-flow gate
 <!-- QA: reference doc → self-review. -->
 
 ### T3 — Fold the Ponytail simplicity ladder into behavioral principles `[size: S · risk: low]`
@@ -126,6 +126,9 @@ Formed from Backlog ready tasks TASK-035/037/038/042/043 (usage-feedback + bmad-
 ### 2026-07-02 | T1 done | Open-question guardrail
 Rule landed at 3 touchpoints (task-decomposer grill hard-rule · orchestrator G2 residual-grill · CLAUDE anti-pattern). References-first held all caps (CLAUDE 68/80, orchestrator 108/110). Exercised on real input this session (forks surfaced as questions, not parked).
 
+### 2026-07-02 | T2 done | Test-quality standard
+New `tdd/references/test-standard.md` (12-pt checklist + 70/20/10 pyramid + bmad K2 risk-tier→depth). Cited from the loop points that fire — decompose Testing Decisions + Review QA-suggestion (incl. K3 regression gate) — not buried in /tdd. Host-project guidance, never a lean-flow gate. All in references/ → no SKILL cap pressure (tdd 82/110).
+
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
 
@@ -134,6 +137,10 @@ Rule landed at 3 touchpoints (task-decomposer grill hard-rule · orchestrator G2
 | `.claude/CLAUDE.md` | T1 | anti-pattern: never park a flow-blocking open question | Low | self-review; cap 68/80 |
 | `skills/task-decomposer/SKILL.md` | T1 | hard rule: blocking question asked or explicit `blocked`, never parked | Low | self-review; 78/110 |
 | `skills/orchestrator/SKILL.md` | T1 | G2 residual-grill: surface/`blocked`-with-condition, never a passive note | Low | self-review; 108/110 |
+| `skills/tdd/references/test-standard.md` | T2 | NEW — 12-pt quality checklist + 70/20/10 pyramid + risk-tier→depth (host guidance) | Low | self-review; 48 lines |
+| `skills/task-decomposer/references/prd-and-slices.md` | T2 | Testing Decisions cites the standard + risk-tier mix | Low | self-review |
+| `skills/orchestrator/references/review-scoping.md` | T2 | QA suggestion: test-standard floor + regression gate | Low | self-review |
+| `skills/tdd/SKILL.md` | T2 | cross-ref to test-standard.md | Low | self-review; 82/110 |
 
 ## Retro
 <!-- Written at close. Route buckets to durable homes (DOCS_Guide §10). -->

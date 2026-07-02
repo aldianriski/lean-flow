@@ -29,7 +29,8 @@ is for *new* behaviour.
 When a test is hard to write, or you're unsure **what to mock** / how to shape an interface for
 testability → `${CLAUDE_SKILL_DIR}/references/testability.md` (mock-at-boundaries · DI · good/bad
 examples · refactor candidates). Unsure **which kind of test** (unit/integ/e2e/perf/load) fits the
-task → `${CLAUDE_SKILL_DIR}/references/test-strategy.md`.
+task → `${CLAUDE_SKILL_DIR}/references/test-strategy.md`. What makes a test *good* — the quality
+checklist + the 70/20/10 pyramid + risk-tier→depth, as **host-project** guidance → `${CLAUDE_SKILL_DIR}/references/test-standard.md`.
 
 ## Anti-pattern: horizontal slicing
 

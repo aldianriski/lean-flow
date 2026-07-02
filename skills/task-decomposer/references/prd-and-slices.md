@@ -35,6 +35,8 @@ came from a prototype.
 ## Testing Decisions
 What makes a good test here (external behaviour, not implementation — see /tdd) · which modules
 get tested · prior art (similar tests already in the codebase) · the seams you'll test at.
+Pick the test **mix** per the pyramid + risk tier (`/tdd` `references/test-standard.md`): tag each
+testable slice P0–P3 → depth (P0-P1 → E2E+unit · P2 → unit/integ · P3 → unit or skip).
 
 ## Out of Scope
 What this PRD does NOT cover.
