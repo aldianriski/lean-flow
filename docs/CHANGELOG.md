@@ -11,6 +11,14 @@ status: current
 
 ---
 
+## v1.3.0 — Process Hardening (2026-07-02)
+
+MINOR — bundles **SPRINT-012** (detail below). Skill/doc hardening from usage feedback + the
+bmad-method adaptation scan (TASK-039); manifests → 1.3.0 lockstep; skill roster unchanged (14).
+Additive only — no skill added or removed, no behaviour changed for existing users; nothing to migrate.
+
+---
+
 ## Sprint 012 — Process Hardening (closed 2026-07-02)
 
 Skill/doc hardening from usage feedback + the bmad-method adaptation scan (TASK-039). Skill roster unchanged (14). Bundles into **v1.3.0** (MINOR, by hand).
