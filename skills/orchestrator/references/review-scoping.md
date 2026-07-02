@@ -56,6 +56,13 @@ shrink the built-in command's internal fan-out — so the lever is reserving it 
 Dispatch the mechanical passes on a cheap tier (`sonnet`) per the tier map (`.claude/CONTEXT.md`); the
 *judgment* on the findings stays on the session model.
 
+## Adversarial floor — 0 findings ⇒ re-run
+
+If a scoped reviewer returns **0 findings**, re-run it once with an assume-guilty framing —
+*"a flaw exists in this diff; find it"* — before accepting a clean pass. LLM reviewers under-report;
+a forced second look catches what a sycophantic first pass waves through. On a **test-touching** diff,
+add a branch/boundary enumeration lens (list the untested branches / boundary cases). (bmad-method K5.)
+
 ## QA suggestion (raise, never gate)
 
 Beyond the passes above, **surface** — as a suggestion, not a blocker — whether the change wants:

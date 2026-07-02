@@ -92,9 +92,9 @@ LLM reviewers under-report. If a scoped reviewer returns 0 findings, re-run once
 **Acceptance:** Review scoping carries the 0-findings → assume-guilty re-run rule; the edge-case-lens placement is decided at G2.
 
 **DoD:**
-- [ ] review-scoping: 0 findings from a scoped reviewer → re-run once with an assume-guilty framing before accepting
-- [ ] orchestrator Review references the rule
-- [ ] G2 decision recorded: Review-only vs also a `/tdd` branch/boundary enumeration lens
+- [x] review-scoping: 0 findings from a scoped reviewer → re-run once with an assume-guilty framing before accepting
+- [x] orchestrator Review references the rule — Review section already points to `references/review-scoping.md`; no SKILL edit (109/110 cap)
+- [x] G2 decision recorded: Review-only (A3) — edge-case enumeration lens lives in review-scoping.md, NOT /tdd
 <!-- QA: doc edits → self-review. -->
 
 ## Owner-action checklist
@@ -135,6 +135,9 @@ Folded into CLAUDE "Simplicity first" (global doctrine) + light cross-refs in td
 ### 2026-07-02 | T4 done | Mid-sprint scope-change convention
 Scope-change entry format added to SPRINT.md.template's Execution-Log comment (what broke · impact · re-confirm G2, before editing the frozen Plan) + an orchestrator red-flag + a CONTEXT sprint-model clause. orchestrator now 109/110 — T5's detail must stay in review-scoping.md (planned).
 
+### 2026-07-02 | T5 done | Anti-sycophancy Review
+Adversarial-floor section added to review-scoping.md: a 0-findings scoped review re-runs once with an assume-guilty framing before acceptance; test-touching diffs get a branch/boundary enumeration lens (A3 = Review-only, not /tdd). All in the reference — orchestrator SKILL untouched (109/110). All 18 DoD now [x] → ready to close.
+
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
 
@@ -153,6 +156,7 @@ Scope-change entry format added to SPRINT.md.template's Execution-Log comment (w
 | `skills/lean-doc-generator/templates/SPRINT.md.template` | T4 | scope-change entry format in the Execution Log comment | Low | self-review |
 | `skills/orchestrator/SKILL.md` | T4 | red-flag: never silently absorb a scope change | Low | self-review; 109/110 |
 | `.claude/CONTEXT.md` | T4 | sprint-model: scope-change logged before editing the Plan | Low | self-review; 123/130 |
+| `skills/orchestrator/references/review-scoping.md` | T5 | adversarial floor: 0 findings → re-run assume-guilty + edge-case lens | Low | self-review |
 
 ## Retro
 <!-- Written at close. Route buckets to durable homes (DOCS_Guide §10). -->
