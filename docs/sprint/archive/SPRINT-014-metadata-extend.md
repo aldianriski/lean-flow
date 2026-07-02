@@ -3,7 +3,7 @@ sprint: 014
 slug: metadata-extend
 owner: Maintainer
 last_updated: 2026-07-02
-status: active
+status: closed
 plan_commit: cfc84a2
 close_commit: TBD
 update_trigger: sprint execute/close events
@@ -131,4 +131,16 @@ Added two conditional, off-by-default passes (templates → prompts.md; SKILL 62
 Landed pre-mortem · dialectical Contrarian · calibrated confidence+dissent (rec before score) · questions-first advisors · single-model ceiling · judge-bias hardening (per-reviewer A–E rotation · rubric · length cap). All in `references/` per L-012; SKILL 60→62. **L-007 exercise:** ran a full real council (5 advisors + 3 rubric reviewers + chairman) on the TASK-047 multi-model question — every new mechanism fired; verdict (temp `verdict-council-multimodel.md`) fed forward into TASK-047's gating. Emergent finding: the council flagged it cannot certify its own diversity (the unmeasured-premise blind spot).
 
 ## Retro
-<!-- Written at close. -->
+
+**Worked**
+- **Exercise-on-real-input paid double** — running `/council` on a genuinely open decision (TASK-047) satisfied L-007 *and* produced a usable verdict that sharpened the backlog task (measurement-first gating). The gated fact-verify pass then caught a real misattribution I'd earlier mis-dismissed.
+- **Tier-routing** — mechanical frontmatter (15 files) went to a sonnet subagent while the session model built the generator in parallel; clean split, no rework.
+- **Shared vocab origin** — sourcing tags/domains from `gen-index.sh` in both the generator and the qa-check lint kept a single source of truth (no drift, per L-013's lesson).
+
+**Friction**
+- **Rename ripple** — `gen-learnings-index.sh` → `gen-index.sh` touched 10 files; had to separate *live* refs (update) from *historical* ones (CHANGELOG · archived SPRINT-013 · L-013 — leave intact). A rename is never just the file.
+- **Mixed-theme sprint** — batching council-hardening into a metadata sprint (owner choice) made the Retro span two unrelated streams; noted for next time — theme-coherent sprints read cleaner at close.
+- **Council exercise cost** — ran 3 reviewers (not 5) to bound tokens; the mechanism was validated but it's a deliberate reduction worth flagging.
+
+**Pattern candidate** (surface → `docs/LEARNINGS.md`)
+- **Adversarial fact-verify catches misattribution that reasoning-review — and author judgment — miss.** T3's pass found `arXiv:2604.03173` is a *real* paper whose cited figures were fabricated; I had earlier dismissed the ID itself as fake. Reasoning-only review can't catch a claim whose *source exists but doesn't say what's claimed*. → filed **L-014**.

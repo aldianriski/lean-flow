@@ -11,6 +11,20 @@ status: current
 
 ---
 
+## Sprint 014 — Knowledge Corpus + Council Hardening (closed 2026-07-02)
+
+Post-v1.4.0 — bundles into the next MINOR (v1.5.0).
+
+| Shipped | What |
+|---|---|
+| Metadata SSOT → whole corpus (T1) | 9 ADRs + 6 research docs carry ADR-009 frontmatter (reused tags + new `domain` axis); `gen-learnings-index.sh` generalized → `gen-index.sh` producing one `docs/knowledge-index.md` (by-tag across LEARNINGS+ADR+research, by-domain for ADR+research); `qa-check.sh` gains corpus dangling-ref + completeness lints; LEARNINGS in-file index → pointer |
+| `/council` adopt-now bundle (T2) | questions-first advisors · dialectical Contrarian · rubric-scored, per-reviewer-randomized review · chairman verdict adds pre-mortem + calibrated confidence/dissent (rec before score) + single-model ceiling |
+| `/council` gated passes (T3) | conditional, off-by-default Moderator (unknown-unknowns) + adversarial Fact-verify (fires only when the verdict rests on external facts) |
+
+Filed at close: **TASK-048** (measure council persona divergence) · **L-014** (fact-verify catches misattribution reasoning-review misses). TASK-044/045/046 shipped; TASK-047 stays deferred (measurement-gated).
+
+---
+
 ## v1.4.0 — Knowledge Metadata (2026-07-02)
 
 MINOR — bundles **SPRINT-013** (detail below). Realizes **ADR-009**: write-time `[tags][status]`
