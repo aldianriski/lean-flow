@@ -9,7 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
-- SPRINT-014 — Knowledge Corpus + Council Hardening — closed 2026-07-02 · <close_commit>
+- SPRINT-014 — Knowledge Corpus + Council Hardening — closed 2026-07-02 · c02dbf1
 - SPRINT-013 — Knowledge Metadata — closed 2026-07-02 · 6051bf6
 - SPRINT-012 — Process Hardening — closed 2026-07-02 · bb39c7f
 - SPRINT-011 — Audit fixes — closed 2026-06-22 · 8029677
