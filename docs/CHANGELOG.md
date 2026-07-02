@@ -11,6 +11,25 @@ status: current
 
 ---
 
+## v1.5.0 — Knowledge Corpus + Council Hardening (2026-07-02)
+
+MINOR — bundles **SPRINT-014** (detail below).
+
+**What changed for you (`/council` users):** verdicts are sharper — each now carries a **pre-mortem**, a
+**calibrated confidence + dissent** summary (the recommendation is stated *before* the score), and a
+**single-model-ceiling** caveat; advisors lead with decision-critical questions and peer review is
+rubric-scored. Two **opt-in gated passes** are available — an unknown-unknowns **Moderator** and an
+adversarial **Fact-verify** (fires only when a verdict rests on external facts). *No action needed — the
+changes apply automatically the next time you run `/council`.*
+
+**Maintainer-side only (no consumer action):** ADR-009 metadata now spans ADRs + research, indexed by
+`scripts/gen-index.sh` (renamed from `gen-learnings-index.sh`) into a single `docs/knowledge-index.md`;
+`qa-check.sh` gains corpus dangling-ref + completeness lints.
+
+Manifests → 1.5.0 lockstep; skill roster unchanged (14). Additive — nothing to migrate.
+
+---
+
 ## Sprint 014 — Knowledge Corpus + Council Hardening (closed 2026-07-02)
 
 Post-v1.4.0 — bundles into the next MINOR (v1.5.0).
