@@ -162,7 +162,7 @@ stage-skills each also run **standalone** (none require another); `/council` is 
 | **ship** | `/release-patch` | manifest-detect PATCH bump + changelog; stops before push |
 | **continuity** | `/handoff` | compact the conversation → temp-dir doc for the next session |
 | **learn** | `/insights` | capture a friction → an `L-NNN` learning candidate anytime; bumps a match toward promotion |
-| **decide** | `/council` | opt-in — pressure-test a hard/ambiguous call via 5 advisors → `verdict-<slug>.md` → feed an ADR (uses sub-agents) |
+| **decide** | `/council` | opt-in — pressure-test a hard/ambiguous call via 5 advisors → a calibrated `verdict-<slug>.md` (pre-mortem · confidence+dissent · optional gated fact-verify) → feed an ADR (uses sub-agents) |
 
 The feed side is a pipeline: `/task-decomposer` (intake) → `/triage` (groom) → `/lean-doc-generator
 promote` (form sprint) → `/orchestrator` (build). Canonical roster · gates · modes →
@@ -344,7 +344,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-06-16 · status: current · v1.1.0</sub>
+<sub>Doc owner: Maintainer · last updated 2026-07-02 · status: current · v1.5.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge

@@ -25,4 +25,10 @@ synthesizing.
 
 *Recommendation:* Don't build the course yet. Validate with a lower-commitment offer first. But reframe entirely: sell the outcome (automate your business, get 10 hours back per week), not the tool.
 
+*Pre-mortem:* Assume this failed in 6 months. Likely killers: the $97 workshop drew freebie-seekers who never upgrade; "automate your business" over-promised and refunds spiked; or the non-technical audience needed so much hand-holding that support ate the margin.
+
+*Confidence & dissent:* Medium. The "validate before building" move is robust either way; the reframe-away-from-the-tool bet rests largely on the Outsider's single (strong) signal, and the Expansionist's premium-pricing path is a real unexplored upside — so this isn't high-confidence.
+
 *One thing to do first:* Run a $97 live workshop called "How to automate your first business task with AI" to 50 people. Don't mention Claude Code in the title.
+
+> *Ceiling:* 5 personas on one model — reduces framing blind spots, not shared market-knowledge gaps; treat the convergence as a strong hypothesis, not field consensus.

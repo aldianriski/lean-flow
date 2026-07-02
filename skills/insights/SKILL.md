@@ -36,7 +36,7 @@ full sprint retro (→ `/lean-doc-generator close`).
 4. **New → draft the entry** — per `templates/LEARNINGS.md.template`: the one-line learning · `seen:`
    (sprint or date) · `count: 1` · `promoted: no` · optional `related:` cross-links; the heading carries `[tags: <tag>] [status: active]` (schema → template). Newest first.
 5. **Confirm, then write** — show the draft (or the bump) and get a `y` — it is a durable, append-only
-   ledger write. Then append/edit `docs/LEARNINGS.md`, bump its `last_updated`, and regenerate the index (`sh scripts/gen-index.sh`).
+   ledger write. Then append/edit `docs/LEARNINGS.md`, bump its `last_updated`, and regenerate the derived index if the project has one (lean-flow: `sh scripts/gen-index.sh`).
 
 ## Output
 

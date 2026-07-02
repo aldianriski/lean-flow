@@ -22,6 +22,10 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
+## L-015 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern + DoD item ("consumer-facing surface checked"). Evaluate every lean-flow change against the CONSUMER who installs the plugin, not only lean-flow's own dogfooding: generic skills/templates stay self-contained + adaptable (no leaked `scripts/…` / `docs/knowledge-index.md` path), and README/CHANGELOG reflect user-visible changes. Recurred — SPRINT-013 leaked gen-index refs into generic skills; SPRINT-014 extended the leak, shipped a stale README (v1.1.0 at v1.5.0) + an out-of-date `/council` worked example — the maintainer flagged it as a persistent skip, so promoted on first explicit surfacing. Related: L-007 · L-001.
+
+---
+
 ## L-014 [tags: process] [status: active]: Adversarial fact-verify catches misattribution that reasoning-review — and author judgment — miss. SPRINT-014 T3's new `/council` fact-verify pass found `arXiv:2604.03173` is a REAL paper whose *cited figures* were fabricated; the sprint author had earlier dismissed the ID itself as fake — wrong on both counts. A reasoning-only critique cannot catch a claim whose source EXISTS but doesn't say what's claimed; only fetching the primary source does. Pattern: when a decision/doc rests on external citations, verify the source *says the thing*, not merely that a source exists.
 - seen: Sprint-014
 - count: 1
