@@ -70,6 +70,41 @@ for d in TODO.md .claude/CONTEXT.md docs/ARCHITECTURE.md docs/LEARNINGS.md docs/
   then ok "ownership $d"; else bad "ownership $d (need owner/last_updated/status)"; fi
 done
 
+# --- 4. Knowledge metadata: index freshness + dangling refs (ADR-009) -------
+if [ -f scripts/gen-learnings-index.sh ]; then
+  if sh scripts/gen-learnings-index.sh --check >/dev/null 2>&1
+  then ok "learnings index current"
+  else bad "learnings index STALE (run: sh scripts/gen-learnings-index.sh)"; fi
+fi
+
+if [ -f docs/LEARNINGS.md ]; then
+  lids=$(grep -oE '^## L-[0-9]+' docs/LEARNINGS.md | grep -oE 'L-[0-9]+' | sort -u)
+  adrs=$(ls docs/adr/ADR-*.md 2>/dev/null | grep -oE 'ADR-[0-9]+' | sort -u)
+  refs=$(grep -iE '^- (related|supersedes|superseded-by):' docs/LEARNINGS.md | grep -oE '(L|ADR)-[0-9]+' | sort -u)
+  dangling=""
+  for r in $refs; do
+    case "$r" in
+      L-*)   printf '%s\n' "$lids" | grep -qx "$r" || dangling="$dangling $r" ;;
+      ADR-*) printf '%s\n' "$adrs" | grep -qx "$r" || dangling="$dangling $r" ;;
+    esac
+  done
+  if [ -z "$dangling" ]; then ok "learnings refs resolve (no dangling related/supersedes)"
+  else bad "learnings dangling refs:$dangling"; fi
+
+  # every entry carries [tags: <known>] + [status: ...]; vocab sourced from the gen script (no dup)
+  KNOWN=$(grep -E '^TAGS=' scripts/gen-learnings-index.sh 2>/dev/null | sed -E 's/^TAGS="?([^"]*)"?/\1/')
+  badmeta=""
+  for id in $(grep -oE '^## L-[0-9]+' docs/LEARNINGS.md | grep -oE 'L-[0-9]+'); do
+    hl=$(grep -E "^## $id[ []" docs/LEARNINGS.md | head -n1)
+    if ! printf '%s' "$hl" | grep -qE '\[tags: [^]]+\] \[status: (active|promoted|superseded)\]'
+    then badmeta="$badmeta $id(shape)"; continue; fi
+    t=$(printf '%s' "$hl" | sed -E 's/.*\[tags: ([^]]*)\].*/\1/')
+    for one in $t; do printf '%s' "$KNOWN" | grep -qw "$one" || badmeta="$badmeta $id(tag:$one)"; done
+  done
+  if [ -z "$badmeta" ]; then ok "learnings metadata complete (tags+status, known vocab)"
+  else bad "learnings metadata:$badmeta"; fi
+fi
+
 # --- Summary ----------------------------------------------------------------
 printf '\n----------------------------------------\n'
 printf 'QA-CHECK: %s pass, %s fail\n' "$pass" "$fail"

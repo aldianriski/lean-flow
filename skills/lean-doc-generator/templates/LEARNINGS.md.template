@@ -17,9 +17,16 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
      Once an entry reaches promoted: yes, collapse it to a pointer line at the next promote (§11):
      "L-NNN → promoted: <where>" — the durable rule is the record from then on. -->
 
+<!-- Per-entry metadata (schema, ADR-009): the heading carries `[tags: <tag>] [status: active|promoted|superseded]`
+     (tags from the project's vocabulary). The index below is GENERATED —
+     `sh scripts/gen-learnings-index.sh` rewrites only between the markers; never hand-edit the block. -->
+
+<!-- INDEX:START (generated — do not edit by hand) -->
+<!-- INDEX:END -->
+
 ---
 
-## L-001: [one line — what we got wrong or confirmed, and the fix] [CUSTOMIZE]
+## L-001 [tags: <tag>] [status: active]: [one line — what we got wrong or confirmed, and the fix] [CUSTOMIZE]
 - seen: Sprint-001
 - count: 1
 - promoted: no   <!-- once count ≥ 2: "yes → <CLAUDE.md anti-pattern | CONTEXT.md rule | skill red-flag>" -->
@@ -29,7 +36,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 <!-- Example (filled in) — a promoted learning: -->
 
-## L-000: Unconfirmed auth assumptions cause regressions — confirm the auth model at G1
+## L-000 [tags: process] [status: promoted]: Unconfirmed auth assumptions cause regressions — confirm the auth model at G1
 - seen: Sprint-003, Sprint-005
 - count: 2
 - promoted: yes → CLAUDE.md anti-pattern + task-decomposer assumption registry

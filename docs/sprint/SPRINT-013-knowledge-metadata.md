@@ -35,13 +35,13 @@ the SSOT; the index is *generated* from it, never hand-kept. **Reconcile with th
 **Acceptance:** the 13 LEARNINGS entries carry the schema; the index regenerates from frontmatter; the dangling-reference lint passes; caps hold.
 
 **DoD:**
-- [ ] Frontmatter schema defined + reconciled with existing `seen/count/promoted/related` (extend, no duplication)
-- [ ] Applied to the 13 existing LEARNINGS entries by hand; `LEARNINGS.md.template` updated to carry it
-- [ ] `lean-doc-generator` requires the fields at doc creation (the SSOT enforcement point)
-- [ ] A categorized index is **generated** from the frontmatter (not hand-maintained)
-- [ ] Dangling-reference integrity lint (`supersedes`/`related` → missing/renamed doc) — home decided at G2
-- [ ] `CONTEXT.md` § continuous-learning notes the metadata/index (within 130 cap)
-- [ ] Exercised once on real input — the generator + lint run over the real 13 entries (L-007)
+- [x] Schema defined + reconciled — heading `[tags][status]` extends the existing `seen/count/promoted/related` (no duplication); vocab: process·docs·tooling·edit-safety·sprint-model
+- [x] Applied to all 13 LEARNINGS entries; `LEARNINGS.md.template` updated (schema + markers + examples)
+- [x] Fields required at creation — `/insights` step 4/5 + the template; **enforced** by qa-check's metadata-completeness lint (not just convention)
+- [x] Index **generated** from the headings — `scripts/gen-learnings-index.sh` (in-file, between markers; idempotent + `--check`)
+- [x] Dangling-reference lint — **home: `qa-check.sh`** (decided G2); + metadata-completeness (tags/status present, known vocab). Both negative-tested (caught L-999 ref + bogus tag)
+- [x] `CONTEXT.md` § continuous-learning notes the metadata/index (124/130)
+- [x] Exercised on real input — generator + all 3 lints ran over the real 13 (positive) + negative tests; qa-check 45/0
 <!-- QA: has code (generation + lint) → run it + qa-check.sh at Review; not docs-only. -->
 
 ### T2 — Retrieval-miss signal in the Sprint-Close Retro + /insights `[size: S · risk: low]`
@@ -78,13 +78,25 @@ Recommended default while owner AFK: a **deterministic script** regenerates the 
 ### 2026-07-02 | T2 done | Retrieval-miss signal
 Landed at 3 homes: DOCS_Guide §10 (close-time retrieval-miss check → Learnings bucket + TASK-040 signal), /insights when-to-invoke (a miss is fileable), SPRINT.md.template Retro ("Retrieval check" line). Doc-only. T1 (036) remains — presenting its G2 design fork next.
 
+### 2026-07-02 | G2 | T1 forks approved
+Owner approved (a) index-gen = deterministic script, (b) schema = lean subset (tags+status, extend existing fields), (c) index = in-file regenerated section. Built on those.
+
+### 2026-07-02 | T1 done | Metadata SSOT + generated index + lints
+Migrated 13 LEARNINGS headings to `[tags][status]` (bodies untouched); new `scripts/gen-learnings-index.sh` generates the by-tag index in-file (idempotent, `--check`); `qa-check.sh` gained 3 checks (index freshness · dangling refs · metadata completeness). Self-review (assume-guilty) caught that the schema was only convention-enforced → added the completeness lint so a missing/typo'd tag FAILs rather than silently dropping from the index; negative-tested both lints (L-999 ref, bogus tag). qa-check 45/0; caps held (CONTEXT 124/130); UTF-8 integrity verified after a sed round-trip. **Known limitation (follow-up candidate):** ADRs/research don't yet carry the frontmatter (ADR-009 "over time") — this sprint scoped to LEARNINGS.
+
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/LEARNINGS.md` | T1 | migrate 13 headings → `[tags][status]` + generated index block | Med | qa-check 45/0; UTF-8 integrity verified |
+| `scripts/gen-learnings-index.sh` | T1 | NEW — regenerate the by-tag index (idempotent · `--check`) | Med | ran + `--check` PASS |
+| `scripts/qa-check.sh` | T1 | +index-freshness, +dangling-ref, +metadata-completeness lints | Med | positive + negative tested |
+| `skills/lean-doc-generator/templates/LEARNINGS.md.template` | T1 | schema + INDEX markers + examples | Low | self-review |
+| `skills/insights/SKILL.md` | T1 | require `[tags][status]` on new entries + regenerate index | Low | self-review; 57/110 |
+| `.claude/CONTEXT.md` | T1 | §continuous-learning: metadata/index note | Low | 124/130 |
 | `skills/lean-doc-generator/references/DOCS_Guide.md` | T2 | §10: retrieval-miss check at close (feeds TASK-040 signal) | Low | self-review |
-| `skills/insights/SKILL.md` | T2 | when-to-invoke: a retrieval miss is fileable | Low | self-review; 58 lines |
+| `skills/insights/SKILL.md` | T2 | when-to-invoke: a retrieval miss is fileable | Low | self-review |
 | `skills/lean-doc-generator/templates/SPRINT.md.template` | T2 | Retro "Retrieval check" line | Low | self-review |
 
 ## Retro

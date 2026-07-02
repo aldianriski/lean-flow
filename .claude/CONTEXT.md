@@ -106,6 +106,7 @@ Every iteration feeds the next (DOCS_Guide §10). **Close** Retro auto-files fou
 Tech debt→`TD-NNN` · Follow-ups→`TASK-NNN` · Learnings→`L-NNN`. **Promote** checkpoint: promote any `L-NNN`
 (`count ≥ 2, promoted: no`) → durable rule (CLAUDE anti-pattern · CONTEXT rule · skill red-flag); age TD
 (≥3 sprints → re-review; `high`→P1); doc-aging §11. Propose → approve, never silent.
+Learnings carry `[tags][status]` metadata (ADR-009); the by-tag index is **generated** (`scripts/gen-learnings-index.sh`), lint-checked by `qa-check.sh`.
 
 ## Task entry shape
 
