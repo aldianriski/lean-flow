@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-013 closed 2026-07-02; archived per §11.)_
+> **SPRINT-014 — Metadata SSOT extends to ADRs & Research** → docs/sprint/SPRINT-014-metadata-extend.md
 
 ---
 
@@ -58,7 +58,7 @@ _(empty)_
       touches:   docs/adr/*.md · docs/research/*.md · scripts/gen-learnings-index.sh (or a generalized gen-index) · scripts/qa-check.sh
       assumes:   ADR-009's "over time" extension; the per-entry LEARNINGS half shipped in SPRINT-013. none blocking.
       tracker:   SPRINT-013 Retro friction (docs/sprint/archive/SPRINT-013-knowledge-metadata.md)
-      state:     ready
+      state:     ready → promoted to SPRINT-014 (2026-07-02)
 - TASK-008 — Define `/insights` → **built** 2026-06-16, **shipped in v1.2.0** (2026-06-22): anytime friction → `L-NNN` candidate (bumps a match's `count`) into `docs/LEARNINGS.md` (the §10 feed).
 
 > TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).
