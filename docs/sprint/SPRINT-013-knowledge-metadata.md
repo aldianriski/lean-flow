@@ -72,6 +72,9 @@ One line so the trigger for building TASK-040's derived graph view is *observed*
 ### 2026-07-02 | promote | Sprint planned + locked
 Formed from Backlog ready tasks TASK-036 + TASK-041 (ADR-009 realization). Governance clean (no L-promotions; TD-007 new, not aging; TODO 107/150). CHANGELOG §11 rotation proposed separately.
 
+### 2026-07-02 | design (provisional) | A2 index-generation mechanism
+Recommended default while owner AFK: a **deterministic script** regenerates the index from frontmatter (alongside `scripts/qa-check.sh`), and the dangling-reference lint **extends `qa-check.sh`** — deterministic + testable, faithful to ADR-009 ("derived, regenerated, not hand-kept") and the ADR-008 code precedent. **Confirm at execution G2** before building (this is the T1 fork). Not locked; recorded here so it isn't parked.
+
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
 
