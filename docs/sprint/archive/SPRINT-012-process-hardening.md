@@ -3,9 +3,9 @@ sprint: 012
 slug: process-hardening
 owner: Maintainer
 last_updated: 2026-07-02
-status: active
+status: closed
 plan_commit: f6c11ed
-close_commit: [sha — set at close]
+close_commit: [pending — set at close]
 update_trigger: sprint execute/close events
 ---
 
@@ -162,10 +162,12 @@ Adversarial-floor section added to review-scoping.md: a 0-findings scoped review
 <!-- Written at close. Route buckets to durable homes (DOCS_Guide §10). -->
 
 **Worked**
--
+- **References-first** kept every SKILL/doc under cap while adding 5 behaviours — orchestrator held at 109/110, all detail pushed to `references/` (T2, T5) or reworded in place (T1, T4).
+- **Per-task commits + the D1 order** — the 4 multi-task files (CLAUDE, orchestrator SKILL, review-scoping, CONTEXT) never contaminated each other; each commit carried only its task's hunk.
+- **Dogfooding** — T1's guardrail was exercised live (forks surfaced as questions, not parked); the T3 orchestrator-cap adjustment was logged as a surfaced scope note (T4's own discipline).
 
 **Friction**
--
+- `orchestrator/SKILL.md` hit **109/110** — the cap forced T1/T4 into terse rewrites and pushed T3's cross-ref out (inherited via CLAUDE instead). The next orchestrator addition can't fit in the body → a references extraction is now due. **→ TD-007.**
 
 **Pattern candidate** (surface → `docs/LEARNINGS.md`)
--
+- **References-first under a SKILL cap** — add behaviour via `references/` (uncounted, ADR-006) + reword existing lines, rather than append, when a SKILL is near its ≤110 cap. Held across all 5 tasks. **→ L-012** (count 1).

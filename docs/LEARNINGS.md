@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-21
+last_updated: 2026-07-02
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -12,6 +12,14 @@ Append-only record of confirmed corrections and patterns surfaced at Sprint Clos
 rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promote** before planning.
 
 <!-- Newest first. Never edit a past entry except to bump `seen` / `count` or set `promoted`. -->
+
+---
+
+## L-012: References-first under a SKILL cap — when a skill is near its ≤110 cap, add behaviour via `references/` (uncounted, ADR-006) or reword existing lines in place, rather than append a section. SPRINT-012 landed 5 behaviours with `orchestrator/SKILL.md` held at 109/110; a naive "append per task" would have busted the cap. Pattern: at G2, choose the landing spot (references vs body) before editing a near-cap skill.
+- seen: Sprint-012
+- count: 1
+- promoted: no
+- related: L-008 (SSOT dedup near cap) · ADR-006 (references uncounted)
 
 ---
 

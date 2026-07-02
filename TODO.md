@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-012 — Process Hardening** → [docs/sprint/SPRINT-012-process-hardening.md](docs/sprint/SPRINT-012-process-hardening.md)
+> _(no active sprint — SPRINT-012 closed 2026-07-02; archived per §11. Next: SPRINT-013 = TASK-036 + 041.)_
 
 ---
 
@@ -30,9 +30,9 @@ status: current
 
 ### P1 — Next Phase Required
 
-<!-- (prior P1 batch — TASK-009 · 013 · 017 · 010 — shipped in SPRINT-008, archived 2026-06-21; see docs/CHANGELOG.md) -->
+<!-- (prior P1 batch — TASK-009 · 013 · 017 · 010 — shipped in SPRINT-008; TASK-035 shipped in SPRINT-012; see docs/CHANGELOG.md) -->
 
-- TASK-035 — promoted → SPRINT-012 (T1)
+_(empty)_
 
 ### P2 — Quality / Polish
 
@@ -44,10 +44,6 @@ status: current
       decision:  (2026-07-02, council-2 quality-first) The MAIN quality lever — freshness/trust (status/supersedes answers "is this current?" at read time), precision, and context-load (selective loading, not re-reading a growing file every session) all live HERE, at any scale. Metadata IS the graph, stored inline where it can't drift. Reject flat-grep (can't express "superseded") + any separately-maintained index/graph (drifts silently). One-thing-first: schema on the 13 entries by hand, then require it at doc creation.
       tracker:   none — maintainer usage feedback (session 2026-07-02)
       state:     ready
-- TASK-037 — promoted → SPRINT-012 (T2)
-- TASK-038 — promoted → SPRINT-012 (T3)
-- TASK-042 — promoted → SPRINT-012 (T4)
-- TASK-043 — promoted → SPRINT-012 (T5)
 
 ### P3 — Long-term
 
@@ -88,6 +84,8 @@ status: current
 - **TD-005** resolved → SPRINT-006 T2 (CONTEXT 151→127 + cap 100→130, ADR-007)
 - **TD-006** severity: medium | status: resolved → SPRINT-009 T1 (2026-06-21)
   - Summary: CONTEXT.md deduped 130 → 122 (built-in detail → ARCHITECTURE pointer; curated/loop/governance compressed); 8 lines recovered, no info lost. L-008 promoted at SPRINT-009 promote.
+- **TD-007** severity: medium | status: open | created: Sprint-012
+  - Summary: `skills/orchestrator/SKILL.md` is at 109/110 — the next addition can't fit in the body. Do a references extraction (move a section → `references/`) or a compression pass before the next orchestrator change. Surfaced at SPRINT-012 close (Friction · L-012).
 
 ---
 

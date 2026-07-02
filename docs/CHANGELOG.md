@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-22
+last_updated: 2026-07-02
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -8,6 +8,22 @@ status: current
 # lean-flow — Changelog
 
 <!-- Prepend new sprints — newest first. Append-only; never edit past blocks. -->
+
+---
+
+## Sprint 012 — Process Hardening (closed 2026-07-02)
+
+Skill/doc hardening from usage feedback + the bmad-method adaptation scan (TASK-039). Skill roster unchanged (14). Bundles into **v1.3.0** (MINOR, by hand).
+
+| Shipped | What |
+|---|---|
+| Open-question guardrail (T1) | a flow-blocking question is asked or made an explicit `blocked` with an unblock condition — never parked as a silent `assumes:`/TBD (task-decomposer grill · orchestrator G2 · CLAUDE anti-pattern) |
+| Test-quality standard (T2) | `tdd/references/test-standard.md` — 12-pt checklist + 70/20/10 pyramid + risk-tier→depth; cited from decompose Testing Decisions + Review (host-project guidance, never a gate) |
+| Ponytail simplicity ladder (T3) | folded into CLAUDE "Simplicity first" (YAGNI→…→minimal; delete > add) + tdd/refactor cross-refs; no new skill |
+| Mid-sprint scope-change convention (T4) | a `scope-change` Execution-Log entry (what broke · impact · re-confirm G2) before editing the frozen Plan |
+| Anti-sycophancy Review (T5) | a 0-findings scoped review re-runs once assume-guilty; branch/boundary lens (review-scoping.md) |
+
+Research: `docs/research/bmad-adaptation.md` (5 keepers, rest rejected as agent/config machinery or duplicates). Filed at close: **TD-007** (orchestrator SKILL near cap) · **L-012** (references-first under a cap).
 
 ---
 
