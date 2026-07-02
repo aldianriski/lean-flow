@@ -1,3 +1,11 @@
+---
+id: ADR-007
+tags: [docs]
+domain: doc-standard
+status: accepted
+related: [ADR-006]
+---
+
 <!-- One ADR per file · append-only · WHY only. -->
 
 # ADR-007 — CONTEXT.md cap raised 100 → 130 (the SSOT is a denser doc-kind)

@@ -40,12 +40,12 @@ LEARNINGS. Extend the same three mechanisms to the ADR + research corpus so fres
 generated index covering ADRs + research, and dangling-ref + completeness lints green over them.
 
 **DoD:**
-- [ ] All 9 `docs/adr/*.md` carry per-file frontmatter (`id · tags · domain · status · supersedes/superseded-by · related`) per ADR-009
-- [ ] All 5 `docs/research/*.md` carry the same frontmatter
-- [ ] A generated index (extend `gen-learnings-index.sh` or a sibling `gen-index`) covers ADRs + research, regenerated from the SSOT (INDEX markers, idempotent, `--check`)
-- [ ] `qa-check.sh` dangling-ref lint extends to ADR/research `related`/`supersedes` refs
-- [ ] `qa-check.sh` metadata-completeness lint (tags+status, known vocab) extends to ADRs + research
-- [ ] `lean-doc-generator` write step regenerates the extended index (wiring parity with LEARNINGS)
+- [x] All 9 `docs/adr/*.md` carry per-file frontmatter (`id · tags · domain · status · supersedes/superseded-by · related`) per ADR-009
+- [x] All `docs/research/*.md` carry the same frontmatter (6 — council-improvements.md added this sprint)
+- [x] A generated index (`gen-index.sh` → `docs/knowledge-index.md`) covers ADRs + research, regenerated from the SSOT (INDEX markers, idempotent, `--check`)
+- [x] `qa-check.sh` dangling-ref lint extends to ADR/research `related`/`supersedes` refs
+- [x] `qa-check.sh` metadata-completeness lint (id+tags+domain+status, known vocab) extends to ADRs + research
+- [x] `lean-doc-generator` write step regenerates the extended index (Step 7 wiring; parity with LEARNINGS via /insights)
 <!-- QA: run `sh scripts/qa-check.sh` green as the exercised-on-real-input check (L-007). -->
 
 ### T2 — Council adopt-now hardening bundle `[size: M · risk: low]`
@@ -83,11 +83,11 @@ sources does. Both passes are *conditional* to stay token-disciplined (WHY → r
 
 ## Decisions (pre-locked)
 - **D1** — Follow ADR-009's existing schema verbatim (`id · tags · domain · status · supersedes/superseded-by · related`); no new fields. This is a rollout of an accepted ADR, not a new decision — no ADR needed.
-- **D2** — Prefer generalizing the existing `gen-learnings-index.sh` into a shared `gen-index` over a second script (avoid a duplicate generator / second SSOT). Confirm the shared-vs-sibling call at G2 by reading the current script's coupling to LEARNINGS.
+- **D2** *(resolved at G2, 2026-07-02)* — **One shared generator.** `gen-learnings-index.sh` → `gen-index.sh` that indexes the whole corpus (LEARNINGS `## L-NNN` headings + ADR/research frontmatter) into a single generated **`docs/knowledge-index.md`**; the in-`LEARNINGS.md` index block becomes a pointer to it. No second generator / second SSOT.
 - **D3** *(overlap map)* — **T2 and T3 both edit `skills/council/SKILL.md` + `skills/council/references/prompts.md`.** Single owner, serialized: **T2 commits first, then T3** (T3 depends-on T2). At the T3 commit, stage the shared files per-hunk (`git add -p` + verify `git diff --cached`) — never a plain `git add` over T2's lines (L-042). T1 touches a disjoint fileset (docs/ + scripts/) — no overlap with T2/T3.
 
 ## Assumptions
-- **A1** — ADR-009's tag vocabulary (`process · docs · tooling · edit-safety · sprint-model`, sourced in the gen script) is reusable for ADRs/research, possibly with a domain axis. *Confirm: at G2, decide whether ADR/research need their own tag/domain vocab or share the LEARNINGS set.*
+- **A1** *(confirmed at G2, 2026-07-02)* — **Reuse** the 5 LEARNINGS tags (`process · docs · tooling · edit-safety · sprint-model`) for `tags`; **add a lean `domain` axis** (`skills · doc-standard · governance · knowledge · sprint-model`). Both vocabularies sourced in `gen-index.sh` (single origin) and enforced by the qa-check completeness lint.
 - **A2** — The per-entry LEARNINGS half shipped in SPRINT-013; this extends the same pattern with no schema change. *Confirm: SPRINT-013 archive + ADR-009.*
 
 ## Execution Log
@@ -100,10 +100,23 @@ Single `ready` Backlog task (TASK-044) promoted. Governance review clean (no `co
 **Impact:** theme broadened from "Metadata SSOT" to "Knowledge Corpus + Council Hardening" (off-theme to T1, batched by owner choice over a separate SPRINT-015); Scope In/Out updated; overlap map D3 added (T2/T3 share `council/SKILL.md` + `references/prompts.md` → serialize, T2 before T3). TASK-047 (multi-model) stays deferred in Backlog.
 **G2 re-confirm:** approach + WHY per the research doc; T2/T3 DoD are verifiable micro-tasks; no ADR (refines an existing skill, not a reversible decision); overlap owned via D3; no open blocking assumptions. Re-confirmed.
 
+### 2026-07-02 | G2 | batch design signed off; T1 forks resolved
+D2 → one shared `gen-index.sh` + generated `docs/knowledge-index.md` (LEARNINGS block → pointer). A1 → reuse 5 tags + add `domain` axis (skills·doc-standard·governance·knowledge·sprint-model). T2/T3 landing-spot per L-012 (prompts → references). Sequence: T1 (disjoint) → T2 → T3.
+
+### 2026-07-02 | T1 done | metadata SSOT + shared generator + corpus lints
+9 ADRs + 6 research docs carry ADR-009 frontmatter (reused 5 tags + new `domain` axis). `gen-learnings-index.sh` generalized → `gen-index.sh` producing `docs/knowledge-index.md` (by-tag across LEARNINGS+ADR+research; by-domain for ADR+research); LEARNINGS in-file index → pointer. `qa-check.sh` gained corpus dangling-ref + completeness lints (48 pass, 0 fail — L-007 exercise). Live refs renamed (CONTEXT · insights · LEARNINGS template); historical mentions (CHANGELOG · archived SPRINT-013 · L-013) left intact. lean-doc-gen Step 7 wired to regen.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/gen-index.sh` | T1 | renamed from gen-learnings-index.sh + generalized to whole corpus | Med | ran + `--check` PASS |
+| `docs/knowledge-index.md` | T1 | NEW — generated by-tag/-domain corpus index | Low | regenerated, idempotent |
+| `scripts/qa-check.sh` | T1 | +corpus dangling-ref + completeness lints; renamed gen call | Med | 48 pass / 0 fail |
+| `docs/adr/*.md` (9) | T1 | +ADR-009 frontmatter | Low | completeness lint green |
+| `docs/research/*.md` (6) | T1 | +ADR-009 frontmatter | Low | completeness lint green |
+| `docs/LEARNINGS.md` | T1 | in-file index → pointer to knowledge-index | Low | index still generated |
+| `.claude/CONTEXT.md` · `skills/insights/SKILL.md` · `skills/lean-doc-generator/{SKILL.md,templates/LEARNINGS.md.template}` | T1 | live gen-script refs renamed; write-step regen wired | Low | qa-check caps green |
 
 ## Retro
 <!-- Written at close. -->

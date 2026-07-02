@@ -3,6 +3,10 @@ owner: Maintainer
 last_updated: 2026-07-02
 update_trigger: A new deliberation technique or source changes the recommended council changes
 status: current
+id: council-improvements
+tags: [process, tooling]
+domain: skills
+related: [ADR-004]
 ---
 
 # Research — What should `/council` borrow from STORM and multi-agent-deliberation prior art?
@@ -67,4 +71,4 @@ passes + all prompt templates land in `council/references/` — not new SKILL bo
 - **This is decide-only.** The build is a follow-up **TASK** (proposed: "Harden `/council` — pre-mortem · dialectical Contrarian · calibrated verdict · gated fact-verify · unknown-unknowns moderator") — decompose + G2 before editing the skill.
 - **Multi-model backend (C)** — deferred; needs a separate call on whether lean-flow takes a provider dependency at all.
 - **Verification integrity note.** The source sweep surfaced 3 future-dated arXiv IDs (`2604.*`, `2606.*`, `2508.*`) for citation-accuracy stats; dropped as unverifiable rather than cited — the exact discipline the gated fact-verify pass would enforce.
-- **ADR-009 frontmatter** (id · tags · domain · related) will be added to this doc by SPRINT-014/TASK-044 once the ADR/research tag vocab is fixed at G2 — deliberately not guessed here.
+- **ADR-009 frontmatter** — applied to this doc in SPRINT-014/T1 (tags reused + the `domain` axis fixed at G2); it now appears in the generated `docs/knowledge-index.md`.

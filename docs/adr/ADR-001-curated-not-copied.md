@@ -1,3 +1,11 @@
+---
+id: ADR-001
+tags: [process]
+domain: governance
+status: accepted
+related: [ADR-002]
+---
+
 # ADR-001 — Curated, not copied
 
 - **Status:** accepted (2026-06-09)

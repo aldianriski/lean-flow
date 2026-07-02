@@ -1,3 +1,11 @@
+---
+id: ADR-009
+tags: [docs, tooling]
+domain: knowledge
+status: accepted
+related: [ADR-008]
+---
+
 # ADR-009 — Knowledge corpus: write-time metadata SSOT + a derived, on-demand graph view
 
 - **Status:** accepted (2026-07-02)

@@ -1,3 +1,11 @@
+---
+id: ADR-005
+tags: [process]
+domain: skills
+status: accepted
+related: [ADR-004]
+---
+
 # ADR-005 — /flow opt-in conductor + the standalone contract
 
 - **Status:** accepted (2026-06-09)

@@ -3,6 +3,10 @@ owner: Maintainer
 last_updated: 2026-06-22
 update_trigger: A skill description changes, or implicit triggering becomes a design goal
 status: current
+id: trigger-accuracy-audit
+tags: [docs]
+domain: skills
+related: []
 ---
 
 # Research — Do the skill `description:` fields trigger accurately? (SPRINT-010 T2)

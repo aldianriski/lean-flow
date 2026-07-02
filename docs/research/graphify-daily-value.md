@@ -3,6 +3,10 @@ owner: Maintainer
 last_updated: 2026-06-16
 update_trigger: Question revisited, or a new option/source changes the recommendation
 status: current
+id: graphify-daily-value
+tags: [tooling]
+domain: knowledge
+related: [ADR-009]
 ---
 
 # Research — Is generated `graphify-out/` useful for daily lean-flow work, or is the curated doc set enough?

@@ -60,7 +60,7 @@ procedure → `${CLAUDE_SKILL_DIR}/references/migration-map.md`.
 4. **Read manifests** — `package.json` / `pyproject.toml` / `go.mod` etc. + existing docs. If inaccessible, ask the user to paste the file tree + manifest.
 5. **HOW filter** — discard anything that explains implementation; keep WHY / WHERE / WHAT only.
 6. **Template-load protocol** *(this is the step that, when skipped, produces wrong docs)* — for each core file, **Read `${CLAUDE_SKILL_DIR}/templates/<X>.md.template` BEFORE writing**. Match its frontmatter order, section order, and placeholders; replace `[CUSTOMIZE]` / `[bracket]` tokens with real content. If the template is missing, WARN and fall back to `DOCS_Guide.md §2` — never hard-stop. Template wins on any divergence; note the correction inline.
-7. **Write** — target the canonical placement (DOCS_Guide §2: root for README/TODO · `.claude/` for AI-context · `docs/` for the rest); enforce the line cap and the ownership header on every file touched.
+7. **Write** — target the canonical placement (DOCS_Guide §2: root for README/TODO · `.claude/` for AI-context · `docs/` for the rest); enforce the line cap and the ownership header on every file touched. **When the file carries ADR-009 frontmatter (LEARNINGS · ADR · research), regenerate the derived index after writing — `sh scripts/gen-index.sh`** (a derived view; never hand-edit `docs/knowledge-index.md`).
 8. **Close** — list docs delivered + headers to verify + recommended follow-ups.
 
 ## Sprint lifecycle

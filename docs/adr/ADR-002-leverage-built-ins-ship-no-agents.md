@@ -1,3 +1,11 @@
+---
+id: ADR-002
+tags: [process, tooling]
+domain: skills
+status: accepted
+related: [ADR-001, ADR-004]
+---
+
 # ADR-002 — Leverage Claude built-ins; ship no agent definitions
 
 - **Status:** accepted (2026-06-09)

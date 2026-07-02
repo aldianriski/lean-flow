@@ -1,3 +1,11 @@
+---
+id: ADR-004
+tags: [process]
+domain: skills
+status: accepted
+related: [ADR-002, ADR-005]
+---
+
 # ADR-004 — Admit /council as an opt-in agent decision aid
 
 - **Status:** accepted (2026-06-09)

@@ -1,3 +1,11 @@
+---
+id: ADR-008
+tags: [tooling]
+domain: governance
+status: accepted
+related: [ADR-009]
+---
+
 <!-- One ADR per file · append-only (never edit a decided ADR — mark it deprecated/superseded) · WHY only. -->
 
 # ADR-008 — Admit the first executable code: a hybrid QA check

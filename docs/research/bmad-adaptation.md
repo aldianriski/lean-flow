@@ -2,6 +2,10 @@
 owner: Maintainer
 last_updated: 2026-07-02
 status: current
+id: bmad-adaptation
+tags: [process]
+domain: governance
+related: []
 ---
 
 # BMAD-METHOD — adaptation scan (TASK-039)

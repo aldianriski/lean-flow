@@ -3,6 +3,10 @@ owner: Maintainer
 last_updated: 2026-06-22
 update_trigger: A skill's allowed-tools changes, or the enforcement semantics are verified
 status: current
+id: allowed-tools-audit
+tags: [tooling, docs]
+domain: skills
+related: []
 ---
 
 # Research — Are the 14 skills' `allowed-tools` least-privilege? (SPRINT-010 T1)

@@ -1,3 +1,11 @@
+---
+id: ADR-003
+tags: [docs]
+domain: doc-standard
+status: accepted
+related: [ADR-006, ADR-007]
+---
+
 # ADR-003 — Rich, one-file-per-ADR in docs/adr/ + a DECISIONS index
 
 - **Status:** accepted (2026-06-09)

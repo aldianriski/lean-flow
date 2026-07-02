@@ -3,6 +3,10 @@ owner: Maintainer
 last_updated: 2026-06-22
 update_trigger: prime/handoff read-order changes, or a loop-mechanics optimization lands
 status: current
+id: loop-mechanics-audit
+tags: [process]
+domain: skills
+related: []
 ---
 
 # Research — Where is token/friction cost hiding in the loop's mechanics? (SPRINT-010 T3)

@@ -64,35 +64,40 @@ for s in skills/*/SKILL.md; do
   then ok "frontmatter $s"; else bad "frontmatter $s (need ---/name/description)"; fi
 done
 
-for d in TODO.md .claude/CONTEXT.md docs/ARCHITECTURE.md docs/LEARNINGS.md docs/DECISIONS.md docs/CHANGELOG.md; do
+for d in TODO.md .claude/CONTEXT.md docs/ARCHITECTURE.md docs/LEARNINGS.md docs/DECISIONS.md docs/CHANGELOG.md docs/knowledge-index.md; do
   [ -f "$d" ] || { note "skip (missing): $d"; continue; }
   if has_field "$d" owner && has_field "$d" last_updated && has_field "$d" status
   then ok "ownership $d"; else bad "ownership $d (need owner/last_updated/status)"; fi
 done
 
-# --- 4. Knowledge metadata: index freshness + dangling refs (ADR-009) -------
-if [ -f scripts/gen-learnings-index.sh ]; then
-  if sh scripts/gen-learnings-index.sh --check >/dev/null 2>&1
-  then ok "learnings index current"
-  else bad "learnings index STALE (run: sh scripts/gen-learnings-index.sh)"; fi
+# --- 4. Knowledge metadata: index freshness + dangling refs + completeness (ADR-009) --
+# Covers the whole corpus: LEARNINGS (in-file `## L-NNN` entries) + per-file frontmatter on
+# docs/adr/*.md and docs/research/*.md. Vocab (tags/domains) sourced from gen-index.sh (single origin).
+
+# frontmatter field extractor (first match in the leading --- block)
+fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
+
+if [ -f scripts/gen-index.sh ]; then
+  if sh scripts/gen-index.sh --check >/dev/null 2>&1
+  then ok "knowledge index current"
+  else bad "knowledge index STALE (run: sh scripts/gen-index.sh)"; fi
 fi
 
+# id universe (everything a related/supersedes ref may point at)
+lids=$(grep -oE '^## L-[0-9]+' docs/LEARNINGS.md 2>/dev/null | grep -oE 'L-[0-9]+' | sort -u)
+adrids=$(ls docs/adr/ADR-*.md 2>/dev/null | grep -oE 'ADR-[0-9]+' | sort -u)
+resids=$(for f in docs/research/*.md; do [ -f "$f" ] && fmv "$f" id; done | sort -u)
+allids=$(printf '%s\n%s\n%s\n' "$lids" "$adrids" "$resids" | sort -u | grep -v '^$')
+
+# 4a. LEARNINGS in-file refs + metadata shape (unchanged rules)
 if [ -f docs/LEARNINGS.md ]; then
-  lids=$(grep -oE '^## L-[0-9]+' docs/LEARNINGS.md | grep -oE 'L-[0-9]+' | sort -u)
-  adrs=$(ls docs/adr/ADR-*.md 2>/dev/null | grep -oE 'ADR-[0-9]+' | sort -u)
   refs=$(grep -iE '^- (related|supersedes|superseded-by):' docs/LEARNINGS.md | grep -oE '(L|ADR)-[0-9]+' | sort -u)
   dangling=""
-  for r in $refs; do
-    case "$r" in
-      L-*)   printf '%s\n' "$lids" | grep -qx "$r" || dangling="$dangling $r" ;;
-      ADR-*) printf '%s\n' "$adrs" | grep -qx "$r" || dangling="$dangling $r" ;;
-    esac
-  done
+  for r in $refs; do printf '%s\n' "$allids" | grep -qx "$r" || dangling="$dangling $r"; done
   if [ -z "$dangling" ]; then ok "learnings refs resolve (no dangling related/supersedes)"
   else bad "learnings dangling refs:$dangling"; fi
 
-  # every entry carries [tags: <known>] + [status: ...]; vocab sourced from the gen script (no dup)
-  KNOWN=$(grep -E '^TAGS=' scripts/gen-learnings-index.sh 2>/dev/null | sed -E 's/^TAGS="?([^"]*)"?/\1/')
+  KNOWN=$(grep -E '^TAGS=' scripts/gen-index.sh 2>/dev/null | sed -E 's/^TAGS="?([^"]*)"?/\1/')
   badmeta=""
   for id in $(grep -oE '^## L-[0-9]+' docs/LEARNINGS.md | grep -oE 'L-[0-9]+'); do
     hl=$(grep -E "^## $id[ []" docs/LEARNINGS.md | head -n1)
@@ -104,6 +109,30 @@ if [ -f docs/LEARNINGS.md ]; then
   if [ -z "$badmeta" ]; then ok "learnings metadata complete (tags+status, known vocab)"
   else bad "learnings metadata:$badmeta"; fi
 fi
+
+# 4b. ADR + research frontmatter: dangling refs + completeness
+KNOWN_TAGS=$(grep -E '^TAGS=' scripts/gen-index.sh 2>/dev/null | sed -E 's/^TAGS="?([^"]*)"?/\1/')
+KNOWN_DOMAINS=$(grep -E '^DOMAINS=' scripts/gen-index.sh 2>/dev/null | sed -E 's/^DOMAINS="?([^"]*)"?/\1/')
+KNOWN_STATUS="accepted current superseded deprecated"
+cdang=""; cmeta=""
+for f in docs/adr/ADR-*.md docs/research/*.md; do
+  [ -f "$f" ] || continue
+  b=$(basename "$f")
+  reftoks=$(awk 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} /^(related|supersedes|superseded-by):/{print}' "$f" \
+            | grep -oE '\[[^]]*\]' | tr -d '[]' | tr ',' ' ')
+  for r in $reftoks; do [ -n "$r" ] && { printf '%s\n' "$allids" | grep -qx "$r" || cdang="$cdang $b:$r"; }; done
+  id=$(fmv "$f" id);     [ -n "$id" ]  || cmeta="$cmeta $b(id)"
+  dom=$(fmv "$f" domain); [ -n "$dom" ] || cmeta="$cmeta $b(domain)"
+  st=$(fmv "$f" status);  [ -n "$st" ]  || cmeta="$cmeta $b(status)"
+  tags=$(fmv "$f" tags | tr -d '[],'); [ -n "$tags" ] || cmeta="$cmeta $b(tags)"
+  for one in $tags; do printf '%s' "$KNOWN_TAGS" | grep -qw "$one" || cmeta="$cmeta $b(tag:$one)"; done
+  [ -z "$dom" ] || printf '%s' "$KNOWN_DOMAINS" | grep -qw "$dom" || cmeta="$cmeta $b(domain:$dom)"
+  [ -z "$st" ]  || printf '%s' "$KNOWN_STATUS"  | grep -qw "$st"  || cmeta="$cmeta $b(status:$st)"
+done
+if [ -z "$cdang" ]; then ok "corpus refs resolve (ADR/research related/supersedes)"
+else bad "corpus dangling refs:$cdang"; fi
+if [ -z "$cmeta" ]; then ok "corpus metadata complete (id+tags+domain+status, known vocab)"
+else bad "corpus metadata:$cmeta"; fi
 
 # --- Summary ----------------------------------------------------------------
 printf '\n----------------------------------------\n'

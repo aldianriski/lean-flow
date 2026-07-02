@@ -1,3 +1,11 @@
+---
+id: ADR-006
+tags: [docs]
+domain: doc-standard
+status: accepted
+related: [ADR-007, ADR-003]
+---
+
 <!-- One ADR per file · append-only · WHY only. Decision pressure-tested by /council (first live run,
      SPRINT-003 T2) — verdict-skill-cap-executable-artifacts.md, 5 advisors + 5 peer reviews. -->
 
