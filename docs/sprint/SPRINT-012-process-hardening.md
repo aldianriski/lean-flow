@@ -64,9 +64,9 @@ Fold the anti-over-engineering ladder into existing principles — no new skill 
 **Acceptance:** the ladder is a CLAUDE behavioral guideline + referenced where build skills act; skill count stays 14.
 
 **DoD:**
-- [ ] CLAUDE.md Behavioral Guidelines: the ladder (YAGNI → reuse existing → stdlib → native → installed dep → one line → minimal code; stop at first working rung; delete > add; root-cause > symptom)
-- [ ] light cross-ref from orchestrator / tdd / refactor-advisor where build skills act
-- [ ] skill count stays 14 (no new skill)
+- [x] CLAUDE.md Behavioral Guidelines: the ladder (YAGNI → reuse existing → stdlib → native → installed dep → one line → minimal code; stop at first working rung; delete > add; root-cause > symptom)
+- [x] light cross-ref from build skills — tdd + refactor-advisor cross-reffed; orchestrator inherits via CLAUDE (108/110, no cap room — logged)
+- [x] skill count stays 14 (no new skill)
 <!-- QA: doc edits → self-review. -->
 
 ### T4 — Mid-sprint scope-change convention in the Execution Log `[size: S · risk: low]`
@@ -129,6 +129,9 @@ Rule landed at 3 touchpoints (task-decomposer grill hard-rule · orchestrator G2
 ### 2026-07-02 | T2 done | Test-quality standard
 New `tdd/references/test-standard.md` (12-pt checklist + 70/20/10 pyramid + bmad K2 risk-tier→depth). Cited from the loop points that fire — decompose Testing Decisions + Review QA-suggestion (incl. K3 regression gate) — not buried in /tdd. Host-project guidance, never a lean-flow gate. All in references/ → no SKILL cap pressure (tdd 82/110).
 
+### 2026-07-02 | T3 done | Ponytail simplicity ladder
+Folded into CLAUDE "Simplicity first" (global doctrine) + light cross-refs in tdd + refactor-advisor. **Scope note (surfaced, not parked — cf. T1):** the DoD listed orchestrator too, but it's 108/110 with no cap room; orchestrator inherits the ladder via CLAUDE + already flags scope creep, so no redundant line was jammed in (adding it would itself violate the ladder). Skill count stays 14.
+
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
 
@@ -141,6 +144,9 @@ New `tdd/references/test-standard.md` (12-pt checklist + 70/20/10 pyramid + bmad
 | `skills/task-decomposer/references/prd-and-slices.md` | T2 | Testing Decisions cites the standard + risk-tier mix | Low | self-review |
 | `skills/orchestrator/references/review-scoping.md` | T2 | QA suggestion: test-standard floor + regression gate | Low | self-review |
 | `skills/tdd/SKILL.md` | T2 | cross-ref to test-standard.md | Low | self-review; 82/110 |
+| `.claude/CLAUDE.md` | T3 | fold the laziness ladder into "Simplicity first" | Low | self-review; 68/80 |
+| `skills/tdd/SKILL.md` | T3 | cross-ref ladder in the "more code than needed" red-flag | Low | self-review; 82/110 |
+| `skills/refactor-advisor/SKILL.md` | T3 | tie deletion-test to the ladder's delete > add | Low | self-review; 59/110 |
 
 ## Retro
 <!-- Written at close. Route buckets to durable homes (DOCS_Guide §10). -->

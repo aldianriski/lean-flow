@@ -24,7 +24,7 @@ lockdown") and `/tdd`'s "shallow module → deepen" candidates.
 - **Adapter** — a concrete thing satisfying an interface at a seam. **Leverage** = what callers get; **locality** = what maintainers get.
 
 Three rules that do most of the work:
-- **Deletion test** — imagine deleting the module. Complexity vanishes → it was a pass-through. Complexity reappears across N callers → it earned its keep.
+- **Deletion test** — imagine deleting the module. Complexity vanishes → it was a pass-through. Complexity reappears across N callers → it earned its keep. (The simplicity ladder's *delete > add* — favour removing over adding.)
 - **The interface is the test surface** — callers and tests cross the same seam. Needing to test *past* the interface = wrong shape.
 - **One adapter = a hypothetical seam; two = a real one.** Don't add a port unless something actually varies across it.
 

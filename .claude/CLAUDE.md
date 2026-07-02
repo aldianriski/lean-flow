@@ -62,7 +62,7 @@ resumes it. Every skill is also usable standalone. See `.claude/CONTEXT.md` for 
 
 ## Behavioral Guidelines
 - **Think before acting** — surface assumptions; ask on ambiguous requirements; never fabricate. Multiple interpretations? Present them — don't pick silently. Push back when a simpler approach exists.
-- **Simplicity first** — minimum content that satisfies the goal; no speculative sections. If it reads overcomplicated, rewrite it shorter.
+- **Simplicity first** — minimum content that satisfies the goal; no speculative sections. Climb the *laziness ladder*: YAGNI → reuse existing → stdlib → native → installed dep → one line → minimal code — **stop at the first working rung**. Delete > add; root-cause > symptom. If it reads overcomplicated, rewrite it shorter.
 - **Surgical changes** — touch only what the task requires; match adjacent style. Clean up only your own mess — **don't delete pre-existing content/sections you didn't touch; mention them instead**. Every changed line traces to the request.
 - **Goal-driven** — restate the task as a verifiable goal before acting; for multi-step work, a brief plan with a check per step, loop until verified.
 - **Concise reporting** — terse by default (status/verify/lists); full sentences only where a caveat or tradeoff is load-bearing; drop filler, never connectives.

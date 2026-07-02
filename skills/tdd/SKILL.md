@@ -77,6 +77,6 @@ tests after each refactor step.
 ❌ **Writing all tests up front** — horizontal slicing; produces tests insensitive to real change.
 ❌ **Testing private methods / mocking internal collaborators** — couples tests to implementation.
 ❌ **Refactoring while RED** — get to GREEN first; one change at a time.
-❌ **Writing more code than the current test needs** — speculative code has no test driving it.
+❌ **Writing more code than the current test needs** — speculative code has no test driving it; the simplicity ladder says stop at the first working rung (CLAUDE).
 ❌ **Using this to fix a bug** — that's `/diagnose` (test-first regression, then fix).
 ❌ **Gating the commit on filtered test output** — `… | grep -E '^(OK|FAIL)'` can swallow `FAILED` and let a red suite through; gate on the runner's **exit code** (L-016).
