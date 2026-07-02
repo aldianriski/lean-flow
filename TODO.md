@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-014 — Metadata SSOT extends to ADRs & Research** → docs/sprint/SPRINT-014-metadata-extend.md
+> **SPRINT-014 — Knowledge Corpus + Council Hardening** → docs/sprint/SPRINT-014-metadata-extend.md
 
 ---
 
@@ -38,7 +38,19 @@ _(empty)_
 
 <!-- (SPRINT-008…011 batches shipped; see docs/CHANGELOG.md) -->
 
-_(empty)_
+- [ ] **TASK-045 — Council adopt-now hardening bundle**  [size: M] [risk: low] [HITL]
+      done-when: a real council run produces a verdict carrying calibrated confidence + dissent summary + named single-model ceiling, with the pre-mortem and dialectical Contrarian (attack the emerging consensus) reflected and perspective-guided questions emitted before verdicts; judge-bias hardening in place (reviewer-order rotation · rubric-scored · persona length cap). Exercised once on a real decision (L-007). SKILL.md stays ≤110.
+      touches:   skills/council/SKILL.md · skills/council/references/{advisors,prompts}.md
+      assumes:   near-free items are reworded existing-step lines; bulk → references/ (L-012). none blocking.
+      tracker:   docs/research/council-improvements.md (Option A)
+      state:     ready → promoted to SPRINT-014 (2026-07-02)
+- [ ] **TASK-046 — Council gated passes: adversarial fact-verify + unknown-unknowns moderator**  [size: M] [risk: med] [HITL]
+      done-when: on a fact-dependent decision, council runs a refuter that extracts load-bearing claims + verifies cited URLs and flags/corrects an unsupported one; on a pure-judgment decision both passes skip (correctly gated); the unknown-unknowns moderator surfaces one consideration no lens raised. Exercised once each way.
+      touches:   skills/council/SKILL.md (2 conditional steps) · skills/council/references/prompts.md
+      assumes:   the two conditional passes ship as one cohesive task; both fire only when warranted (token discipline).
+      depends-on: TASK-045 (shared file — serialize per L-042)
+      tracker:   docs/research/council-improvements.md (Option B)
+      state:     ready → promoted to SPRINT-014 (2026-07-02)
 
 ### P3 — Long-term
 
@@ -53,6 +65,12 @@ _(empty)_
       decision:  (2026-07-02, council-2) REJECT (c) a separately-maintained graph — UNANIMOUS: second source of truth, silent drift, unbuildable agent-free (= the banned codemap rule). This is priority #4 (relational comprehension) — below 036's freshness/precision/context-load. Reject the Expansionist's "gate /prime citations off the graph" — agent-free scope creep; keep the view passive.
       tracker:   verdict (temp) verdict-knowledge-library.md · refs docs/research/graphify-daily-value.md · https://github.com/Egonex-AI/Understand-Anything
       state:     blocked   (build on the TASK-041 signal + only with all 3 guardrails; lower priority than 036)
+- [ ] **TASK-047 — Council multi-model diversity backend**  [size: L] [risk: high] [HITL]
+      done-when: ≥2 personas route to a different provider/model to recover architectural (uncorrelated-error) diversity — the only fix for shared-weights blind spots (5 personas on one model share its priors).
+      touches:   skills/council/SKILL.md · skills/council/references/{advisors,prompts}.md · a provider-routing seam
+      assumes:   requires a prior call on whether lean-flow takes a provider dependency at all (likely /council-worthy itself).
+      tracker:   docs/research/council-improvements.md (Option C, deferred)
+      state:     blocked   (deferred — revisit only if a shared-prior council is observably wrong)
 - [ ] **TASK-044 — Extend the metadata SSOT + index to ADRs & research docs**  [size: M] [risk: low] [HITL]
       done-when: ADRs (docs/adr/) + research (docs/research/) carry per-file frontmatter (id · tags · domain · status · supersedes/superseded-by · related) per ADR-009; the generated index (or a sibling) covers them; qa-check's dangling-ref + completeness lints extend to them.
       touches:   docs/adr/*.md · docs/research/*.md · scripts/gen-learnings-index.sh (or a generalized gen-index) · scripts/qa-check.sh
