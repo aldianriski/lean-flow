@@ -1,8 +1,10 @@
 # Sub-agent prompt templates
 
-Read before spawning any sub-agent. The four templates below are invocation-critical — use them
+Read before spawning any sub-agent. The templates below are invocation-critical — use them
 verbatim, filling the `[bracketed]` slots. Order of use: research (step 1C, optional) → advisor
-(step 2) → reviewer (step 3) → chairman (step 4). The verdict structure (step 5) is last.
+(step 2) → moderator (conditional, after 3) → reviewer (step 3) → fact-verify (conditional, after 4)
+→ chairman (step 4). The verdict structure (step 5) is last. The two **conditional passes** (Moderator ·
+Fact-verify) fire only when warranted — see § Conditional-pass templates below (token discipline).
 
 ## Research pass (step 1C — only if the decision turns on external current facts)
 
@@ -175,3 +177,37 @@ Be direct. Don't hedge. The whole point of the council is to give the user clari
 ```
 
 Keep it scannable — bullets, no preamble.
+
+## Conditional-pass templates (gated — fire only when warranted)
+
+Both are cheap-tier `sonnet`. **Skip them by default;** they exist for two specific risks. Say in one line whether each fired or was skipped.
+
+### Moderator — unknown-unknowns (after step 3, before the chairman; fires when the panel converges fast / groupthink risk)
+
+One sub-agent that does NOT answer the question — it surfaces what the fixed lenses missed, then feeds the chairman as an extra blind spot.
+
+```
+You are the Moderator of an LLM Council. Do NOT answer the question, and do NOT repeat any angle already covered. Your only job: surface the ONE most important consideration the panel has NOT raised.
+
+The question:
+---
+[framed question]
+---
+Angles the advisors already covered: [one line per advisor — their core angle]
+
+Return the single most important MISSING consideration — an overlooked stakeholder, second-order effect, base rate, failure mode, or false premise — in 2-4 sentences, plus why it changes the decision if true. ONE consideration, not a list. Under 120 words.
+```
+
+### Fact-verify — adversarial (after step 4; ONLY if the verdict rests on external facts / citations / benchmarks)
+
+Skip entirely for pure judgment/tradeoff forks (the common council case). When the recommendation leans on factual claims, spawn one refuter per claim cluster (~1-4):
+
+```
+You are a fact-checker on an LLM Council. Be adversarial: try to REFUTE, not confirm.
+
+CLAIM (load-bearing in the council's verdict): [claim + any cited figure/source]
+
+Find the PRIMARY source. Verify or correct: the real figure/finding, and whether any cited URL/source actually exists and says this. For a contested claim, find the strongest counter-source. A claim whose citation resolves to no real source is FALSE — say so. Return: VERDICT = CONFIRMED / PARTLY / UNVERIFIED / FALSE, the corrected one-line claim, and the primary URL. Under 200 words.
+```
+
+The chairman corrects or demotes any UNVERIFIED/FALSE claim before finalizing the verdict, and notes the check in **Confidence & Dissent**.

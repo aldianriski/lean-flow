@@ -49,6 +49,13 @@ All sub-agent prompt templates are in **`references/prompts.md`** — read it be
 5. **Write the verdict (lean).** Present in chat AND write **only the verdict** (sections per prompts.md) to `verdict-<slug>.md` — use the slug the ADR will use. Default to the OS temp dir; repo only if asked. Never dump the full transcript.
 6. **Feed forward.** The verdict is a decision *input*, not a record. Hard-to-reverse + surprising + a real trade-off → fold the recommendation + alternatives into an **ADR** (`docs/adr/`, DOCS_Guide §4), then the verdict file can be deleted. Don't accumulate stale verdicts.
 
+## Conditional passes (gated — off by default)
+
+Two optional passes fire **only when warranted**, keeping the base run at ~11 calls (templates → prompts.md). Say in one line whether each fired or was skipped.
+
+- **Moderator (unknown-unknowns)** — *after step 3, before the chairman.* Fires when the panel converges fast (groupthink risk). One cheap sub-agent surfaces the most important consideration no advisor/reviewer raised → feeds the chairman as an extra blind spot. +1 call.
+- **Fact-verify (adversarial)** — *after step 4.* Fires **only when the verdict rests on external facts / citations / benchmarks** — skip for pure judgment forks (the common case). One refuter per claim cluster (~1–4) extracts load-bearing claims + verifies cited sources (a citation resolving to no real source = FALSE); the chairman corrects/demotes before finalizing and notes it in Confidence & Dissent. +1–4 calls.
+
 Worked example → `references/example.md`.
 
 ## Red flags
@@ -60,3 +67,4 @@ Worked example → `references/example.md`.
 ❌ **Dumping the full transcript** into the verdict file — write only the verdict sections; the sprawl is what makes it un-lean.
 ❌ **Laundering disagreement into false consensus** — low advisor agreement is reported with a *lowered* confidence, never smoothed into a confident verdict.
 ❌ **Over-trusting unanimity** — 5 personas on one model share its knowledge gaps; the verdict says so (the ceiling caveat), so agreement isn't read as independent proof.
+❌ **Running the gated passes on a pure-judgment fork** — fact-verify fires only when the verdict rests on external facts; the moderator only when groupthink risk is real. Default off; never a reflex.

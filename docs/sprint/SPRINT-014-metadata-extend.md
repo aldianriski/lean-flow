@@ -73,10 +73,10 @@ sources does. Both passes are *conditional* to stay token-disciplined (WHY → r
 **Acceptance:** on a fact-dependent decision the verify pass flags/corrects an unsupported claim; on a pure-judgment decision both passes correctly skip.
 
 **DoD:**
-- [ ] Adversarial fact-verify pass: extracts load-bearing factual claims + verifies cited URLs/sources; fires only when the verdict rests on external facts
-- [ ] Unknown-unknowns moderator: one cheap pass surfaces a consideration no lens raised
-- [ ] Both passes gated (skip on pure-judgment forks); prompt templates in `references/prompts.md`
-- [ ] Exercised once each way — fact-dependent (fires) and pure-judgment (skips) — (L-007); `SKILL.md` ≤110
+- [x] Adversarial fact-verify pass: extracts load-bearing factual claims + verifies cited URLs/sources; fires only when the verdict rests on external facts
+- [x] Unknown-unknowns moderator: one cheap pass surfaces a consideration no lens raised
+- [x] Both passes gated (skip on pure-judgment forks); prompt templates in `references/prompts.md`
+- [x] Exercised once each way — fact-dependent (fired, caught a misattribution) + pure-judgment T2 council (correctly did not fire) — (L-007); `SKILL.md` ≤110 (70 lines)
 
 ## Owner-action checklist
 <!-- none -->
@@ -120,6 +120,12 @@ D2 → one shared `gen-index.sh` + generated `docs/knowledge-index.md` (LEARNING
 | `skills/council/SKILL.md` | T2 | steps 2–5 + red flags: questions-first · rubric review · pre-mortem · confidence · ceiling | Low | 62/110; exercised |
 | `skills/council/references/{advisors,prompts}.md` | T2 | dialectical Contrarian; advisor/reviewer/chairman/verdict templates updated | Low | real council run |
 | `TODO.md` (TASK-047) | T2 | verdict fed forward — measurement-first gating | Low | n/a |
+| `skills/council/SKILL.md` | T3 | +Conditional passes section + red flag | Low | 70/110; exercised |
+| `skills/council/references/prompts.md` | T3 | +Moderator + Fact-verify templates; intro updated | Low | both passes ran |
+| `docs/research/council-improvements.md` | T3 | integrity note corrected (fact-verify finding) | Low | n/a |
+
+### 2026-07-02 | T3 done | council gated passes (fact-verify + unknown-unknowns moderator)
+Added two conditional, off-by-default passes (templates → prompts.md; SKILL 62→70): **Moderator** (surfaces an angle no lens raised, +1 call, when groupthink risk) and **Fact-verify** (adversarial refuter, +1–4 calls, only when the verdict rests on external facts). **L-007 exercised both ways:** fact-verify FIRED on a fact-dependent claim cluster and caught a **misattribution** (`arXiv:2604.03173` is real but the cited figures were wrong → PARTLY; Du et al. `2305.14325` → CONFIRMED) — a defect reasoning-review misses; the pure-judgment T2 council correctly did NOT fire it (the skip path). Moderator surfaced a new data-governance/trust-boundary angle. Corrected the now-inaccurate integrity note in council-improvements.md.
 
 ### 2026-07-02 | T2 done | council adopt-now hardening bundle + real exercise
 Landed pre-mortem · dialectical Contrarian · calibrated confidence+dissent (rec before score) · questions-first advisors · single-model ceiling · judge-bias hardening (per-reviewer A–E rotation · rubric · length cap). All in `references/` per L-012; SKILL 60→62. **L-007 exercise:** ran a full real council (5 advisors + 3 rubric reviewers + chairman) on the TASK-047 multi-model question — every new mechanism fired; verdict (temp `verdict-council-multimodel.md`) fed forward into TASK-047's gating. Emergent finding: the council flagged it cannot certify its own diversity (the unmeasured-premise blind spot).
