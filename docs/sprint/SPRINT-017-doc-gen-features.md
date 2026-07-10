@@ -37,9 +37,9 @@ and follow-ups, so nothing said mid-sprint is lost at close.
 beyond items already recorded; exercised once (a mid-sprint aside becomes a filed item at close).
 
 **DoD:**
-- [ ] close (SKILL + DOCS_Guide §10) instructs the full-session TD/follow-up sweep
-- [ ] exercised once on real input — a surfaced-but-unfiled item is captured at a close (L-007)
-- [ ] `lean-doc-generator/SKILL.md` ≤ 110 (depth → `references/DOCS_Guide.md`, uncounted — L-012)
+- [x] close (SKILL + DOCS_Guide §10) instructs the full-session TD/follow-up sweep
+- [x] exercised once on real input — the sweep caught the qa-check-vs-stray-file item → **TASK-060** (L-007)
+- [x] `lean-doc-generator/SKILL.md` ≤ 110 (held at 91; in-place)
 
 ### T2 — Make `migrate` re-runnable as a plugin-update sync `[size: M · risk: med]`  *(TASK-052)*
 Layers: `skills/lean-doc-generator/SKILL.md` (migrate) · `references/DOCS_Guide.md`
@@ -96,6 +96,13 @@ optional docs the user selects; writes no settings.json; exercised once on a rea
 Formed after SPRINT-016 close (user chose the lean-doc-generator feature batch). Governance: promoted
 **L-017 → CLAUDE.md anti-pattern** (count 2) before planning. Shared-file overlap on
 `lean-doc-generator/SKILL.md` locked serial in D1 (T1→T2→T3).
+
+### 2026-07-10 | T1 done | close sweeps the full session
+Added a full-session sweep to close: SKILL close row + Retro-at-close paragraph + DOCS_Guide §10 now
+instruct sweeping the Execution Log AND mid-run surfaced-but-unfiled items for TD/follow-ups *before*
+routing the four buckets. All in-place (SKILL 91/110). **L-007 exercise:** ran the sweep over this very
+session → caught the qa-check-vs-stray-untracked-file observation (the mattpocock friction, never filed
+in SPRINT-016) → filed **TASK-060**. The mechanism demonstrably recovers a real dropped item.
 
 ## Files Changed
 

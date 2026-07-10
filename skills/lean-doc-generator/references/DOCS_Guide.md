@@ -190,8 +190,9 @@ Plan (Tn + size·risk + Acceptance + **DoD checkboxes** — what `/orchestrator 
 
 ## §10 — Continuous learning governance
 
-Every iteration feeds the next. At **Sprint Close**, the Retro sorts work into four buckets, each
-**routed to a durable home** (don't leave them in the sprint file):
+Every iteration feeds the next. At **Sprint Close**, first **sweep the full session** — the Execution
+Log AND any tech-debt / follow-up surfaced mid-run but never written down — then the Retro sorts work
+into four buckets, each **routed to a durable home** (don't leave them in the sprint file):
 
 | Bucket | Routes to |
 |---|---|

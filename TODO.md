@@ -54,6 +54,11 @@ _(empty)_
       touches:   skills/orchestrator/SKILL.md · .claude/CLAUDE.md
       tracker:   docs/research/brainstorming-adaptation.md (TASK-050 verdict)
       state:     ready
+- [ ] **TASK-060 — qa-check: scope the corpus lint to TRACKED files (ignore stray untracked .md)**  [size: S] [risk: low] [HITL]
+      done-when: scripts/qa-check.sh's corpus metadata lint checks only git-tracked docs/ files, so a stray/untracked working-tree .md (e.g. a WIP research file) no longer fails the gate
+      touches:   scripts/qa-check.sh
+      tracker:   surfaced by SPRINT-017 T1 close-sweep (the mattpocock.md friction, SPRINT-016)
+      state:     ready
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
