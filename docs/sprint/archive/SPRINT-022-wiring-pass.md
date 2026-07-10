@@ -3,9 +3,9 @@ sprint: 022
 slug: wiring-pass
 owner: Maintainer
 last_updated: 2026-07-10
-status: active
+status: closed
 plan_commit: 81b5dff
-close_commit:
+close_commit: [pending]
 update_trigger: sprint execute/close events
 ---
 
@@ -106,12 +106,24 @@ an entry from the conductor and the build loop, not just self-trigger inside tas
 | `.claude/CONTEXT.md` | T3 | feed-pipeline acknowledges fog-map | Low | cap 127/130 |
 
 ## Retro
-<!-- Written at close. Route buckets (§10). Then archive (§11). PATCH → /release-patch. -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no miss. Dogfooded **L-020** immediately (the rule we wrote this session), plus
+L-042/L-037 (disjoint-hunk overlap on orchestrator + CONTEXT, sequenced T1→T2→T3), L-012 (caps). No prior L/ADR contradicted.
 
 **Worked**
+- The independent wiring audit (`Explore`) pinpointed each gap at file:line — author-blind self-review would have missed them (L-006 pattern). Once pinpointed, the fixes were one-liners.
+- Landing the review-split in the *brief* (not just the reference prose) is the difference between documented and firing — the core lesson of the whole pass.
 
 **Friction**
+- The gaps existed at all because v1.9.0/v1.10.0 shipped features without a wiring check — now codified (L-020 → CLAUDE.md anti-pattern + DoD "Wiring check"), so future additions won't repeat it.
 
 **Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **L-020** — already filed *and* promoted this session (owner-directed): shipping ≠ wiring; wire a new capability into every job that triggers/chains it and verify it fires.
+
+---
+
+### Retro buckets filed (§10)
+- **Shipped** → `docs/CHANGELOG.md` v1.10.1 (written by `/release-patch`, next step).
+- **Tech debt** → none new (TD-008 stays open).
+- **Follow-ups** → none — the wiring gaps are fully closed.
+- **Learnings** → L-020 (filed + promoted earlier this session).
