@@ -43,7 +43,12 @@ _(empty)_
 - [ ] **TASK-052 — Make `migrate` re-runnable as a plugin-update sync**  [size: M] [risk: med] [HITL]
       done-when: re-running migrate on an already-adopted repo pulls forward new standard/template changes from a plugin update — idempotent, reports what changed, never clobbers user edits
       touches:   skills/lean-doc-generator/SKILL.md (migrate) · references/DOCS_Guide.md
-      assumes:   overlaps TASK-051 (init) — coordinate the migrate/init split before either builds
+      assumes:   init/migrate split DECIDED (docs/research/init-vs-migrate.md) — migrate stays adopt-existing; greenfield → TASK-059. No overlap.
+      state:     ready
+- [ ] **TASK-059 — Add `/lean-doc-generator init` mode (scope-interactive greenfield scaffold)**  [size: M] [risk: med] [HITL]
+      done-when: `/lean-doc-generator init` scaffolds a fresh repo's docs — always the core set, and INTERACTIVELY scopes which optional docs (DESIGN/RESEARCH/DEPLOY/…) to include by repo type; docs-only (never writes .claude/settings.json). Distinct from migrate (adopt-existing).
+      touches:   skills/lean-doc-generator/SKILL.md · references/DOCS_Guide.md · templates/
+      tracker:   docs/research/init-vs-migrate.md (TASK-051 decision)
       state:     ready
 - [ ] **TASK-055 — close: sweep the full session for TD + follow-ups**  [size: M] [risk: med] [HITL]
       done-when: /lean-doc close's §10 Retro routing captures ALL tech-debt + follow-up items surfaced during the session into TD-NNN / TASK-NNN — not only items already written down

@@ -66,9 +66,9 @@ a real trade-off) and pin the init↔migrate boundary so TASK-052 can proceed un
 its boundary vs `migrate`; TASK-052's scope is unblocked either way.
 
 **DoD:**
-- [ ] decision recorded (ADR-NNN or `docs/research/init-vs-migrate.md`), with the WHY
-- [ ] init↔migrate boundary pinned; TASK-052 updated (`assumes`/`state`) to reflect it
-- [ ] do NOT build settings.json scaffolding — decision only (within-task guard)
+- [x] decision recorded (`docs/research/init-vs-migrate.md`), with the WHY
+- [x] init↔migrate boundary pinned; TASK-052 updated (`assumes` — overlap resolved); TASK-059 filed
+- [x] do NOT build settings.json scaffolding — decision only (within-task guard)
 
 ## Owner-action checklist
 - (none — but T1/T2 may need the user to paste repo/page content if external fetch is unavailable)
@@ -106,6 +106,13 @@ Kept K1 ("too simple to need design" anti-pattern) + K2 (section-by-section appr
 filed. Rejected the visual-companion browser server as scaffold. `docs/research/brainstorming-adaptation.md`.
 **qa note:** doc + regenerated index are clean; the 47/1 lint FAIL is the owner's pre-existing empty
 `docs/research/mattpocock.md` (untracked, left untouched per owner instruction — not this sprint's).
+
+### 2026-07-10 | T3 done | init decision → ADD (scoped mode, docs-only)
+Owner call (popup): **add `init` as a scope-interactive `/lean-doc-generator` mode** (not a new skill) —
+because lean-flow ships many optional docs, init asks *which* to scaffold at first initiate; **docs-only,
+never settings.json**. Recorded in `docs/research/init-vs-migrate.md` with options + the init↔migrate
+boundary (disjoint preconditions → no overlap). Filed **TASK-059** (build init); **TASK-052 unblocked**
+(migrate stays adopt-existing). Not an ADR — adding a mode isn't hard-to-reverse (graduate at build if it proves so).
 
 ## Files Changed
 
