@@ -81,3 +81,25 @@ heavier per run, no agent-free gain over C.
 pays a one-time skill-load cost; and it must be `general-purpose`, not `Explore`/`Plan` (those skip
 CLAUDE.md, losing project context). Exercised once on real input (SPRINT-020 T1); the `/tdd`-specific
 path is a **consumer-path** claim — lean-flow is markdown-only and cannot dogfood it (L-016).
+
+## Amendment (2026-07-10) — dispatch-by-classification + parallel/sequential
+
+**Status:** accepted · operationalizes Decision §1–2 (role tiers → actual dispatch). **Source:** SPRINT-023
+(dispatch wasn't firing in practice — the orchestrator did execution inline and made no parallel/sequential decision).
+
+**Decision.**
+1. `/orchestrator` is the `decision`-tier **coordinator** — it plans / gates / grills / merges, it does **not**
+   execute inline. Execution is **dispatched by each task's classification** (`execution`→Sonnet ·
+   `mechanical-ingest`→Haiku — route by nature not size, [model-purpose.md](../research/model-purpose.md)),
+   handed its procedure skill; a `decision`-nature/trivial step stays inline **only with a stated reason**
+   (default-spawn, *not* always-spawn).
+2. **Parallel vs sequential** is decided from the G2 overlap map: disjoint (no shared file, no `depends-on`)
+   → **parallel** (multiple Agent calls in one message); shared/dependent → **sequential** (ownership order).
+3. The dispatching skills (`orchestrator` · `council` · `flow`) list `Agent, Task` in `allowed-tools` so
+   dispatch **auto-approves** (no per-spawn permission prompt). Full operational detail →
+   `skills/orchestrator/references/dispatch.md`.
+
+**Consequence (negative).** This is a **prompt-driven nudge, not a guarantee** — a skill can't force the
+model to spawn or parallelize; the deterministic path for large fan-out stays `/batch`·`/workflows` (kept out
+of core, ADR-002). The classification→dispatch indirection also assumes tasks are correctly classified at
+decompose/G1 — a mis-classification mis-routes.

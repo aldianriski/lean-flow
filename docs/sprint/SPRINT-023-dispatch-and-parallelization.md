@@ -74,8 +74,8 @@ deterministic fan-out → `/batch`·`/workflows`).
 **Acceptance:** ADR-010 carries the amendment; CONTEXT reflects any wording change.
 
 **DoD:**
-- [ ] ADR-010 amendment (append-only, §4) records (a) dispatch-by-classification, (b) parallel/sequential rule, (c) the ceiling
-- [ ] CONTEXT tier note updated iff wording changed; caps hold
+- [x] ADR-010 amendment (append-only, §4) records (a) dispatch-by-classification, (b) parallel/sequential rule, (c) the ceiling
+- [x] CONTEXT tier note updated (pointer to references/dispatch.md); caps hold (127/130)
 
 ## Owner-action checklist
 - [ ] none
@@ -115,6 +115,11 @@ PARALLEL (multiple Agent calls in one message) · shared/dependent → SEQUENTIA
 § Parallel vs sequential carries the batches-separated-by-barriers rule + /batch·/workflows escalation.
 Answers the "doesn't decide parallel or sequential" gap.
 
+### 2026-07-10 | T4 done | ADR-010 amendment
+Second ADR-010 amendment (append-only): dispatch-by-classification (coordinator ≠ worker) · parallel/
+sequential from the overlap map · Agent in allowed-tools · the prompt-driven ceiling (nudge not guarantee;
+/batch·/workflows for determinism). CONTEXT tier contract points to references/dispatch.md. All DoD [x].
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -124,6 +129,8 @@ Answers the "doesn't decide parallel or sequential" gap.
 | `skills/orchestrator/SKILL.md` | T2 | "Dispatch by role" note → classification-driven default + ref pointer | Low | cap 108/110 |
 | `skills/orchestrator/references/dispatch.md` | T3 | § Parallel vs sequential — decision from overlap map + mechanism | Low | reference |
 | `skills/orchestrator/SKILL.md` | T3 | sprint-bulk Sequence → parallel/sequential decision | Low | cap 108/110 |
+| `docs/adr/ADR-010-*.md` | T4 | amendment: dispatch-by-classification + parallel/sequential + ceiling | Low | doc |
+| `.claude/CONTEXT.md` | T4 | tier contract points to references/dispatch.md | Low | cap 127/130 |
 
 ## Retro
 <!-- Written at close. Route buckets (§10). Then archive (§11). -->
