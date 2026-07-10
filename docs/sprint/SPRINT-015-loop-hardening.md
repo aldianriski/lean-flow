@@ -40,10 +40,10 @@ direct to `/lean-doc-generator promote` first — with an explicit override for 
 execute build work and route to promote; the override path is documented.
 
 **DoD:**
-- [ ] orchestrator gates its build modes on an active-sprint check, with an explicit override
-- [ ] `/flow` enforces the same at its build step
-- [ ] exercised once on real input — a mock "decompose then build" run is actually stopped (L-007)
-- [ ] `orchestrator/SKILL.md` ≤ 110 (land detail in `references/` if near cap — L-012)
+- [x] orchestrator gates its build modes on an active-sprint check, with an explicit override
+- [x] `/flow` enforces the same at its build step
+- [x] exercised once on real input — a mock "decompose then build" run is actually stopped (L-007)
+- [x] `orchestrator/SKILL.md` ≤ 110 (land detail in `references/` if near cap — L-012)
 
 ### T2 — Make `/tdd` the standard implement path `[size: M · risk: med]`  *(depends-on T1)*
 Layers: `skills/orchestrator/SKILL.md` · `.claude/CONTEXT.md` · `skills/flow/SKILL.md`
@@ -100,6 +100,14 @@ every point covered, with none left as passive inline prose.
 Formed from the P1 backlog (TASK-053 · 057 · 054) after `/triage`. Shared-file overlap locked in D1
 (single owner, commit order T1→T2→T3). TASK-056 held out of scope to keep `orchestrator/SKILL.md`
 single-owned.
+
+### 2026-07-10 | T1 done | gate build behind a recorded sprint
+A2 resolved via popup → **soft gate**: a Backlog task not in any active sprint no longer auto-builds;
+orchestrator's freeform dispatch surfaces promote-vs-one-off as a popup, `/quick` stays as an explicit
+override. Edited `orchestrator/SKILL.md` (dispatch bullet + red-flag; 105→107/110) + `flow/SKILL.md`
+(build step guard). **L-007 exercise caught a bug**: the first draft keyed the gate on sprint
+*existence* ("no active sprint") — a Backlog task requested during an active sprint would slip through;
+re-keyed on sprint *membership* before commit.
 
 ## Files Changed
 

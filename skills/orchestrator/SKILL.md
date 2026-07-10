@@ -23,7 +23,8 @@ and review is a structured self-pass.
 
 Freeform input with no mode keyword:
 - No tracked task → run `/task-decomposer` first, then return here.
-- A task exists → default to `quick`.
+- Task is in an **active sprint** → default to the sprint mode (or `quick` for a single one).
+- Task is only in the **Backlog** (not in any active sprint) → **don't silently build**: surface the choice as a popup — `/lean-doc-generator promote` it into a sprint, or proceed as an explicit `quick` one-off (never slide decompose → build unrecorded).
 
 ## G1 — Scope gate (all modes)
 
@@ -103,3 +104,4 @@ Full routing · skip table · adversarial floor · self-review checklist → `re
 ❌ **Committing through a failing check** — surface the failure, don't bury it.
 ❌ **Silently absorbing a mid-sprint scope change** — a pivot that shifts scope is logged (`scope-change`: what broke · impact · re-confirm G2) in the Execution Log *before* editing the frozen § Plan (SPRINT-012 T4).
 ❌ **Flipping an encoded safeguard/doctrine under autonomy** — `sprint-bulk` / "go autonomous" is momentum, not a licence to silently reverse a safety/policy default; keep it default-OFF + surface the conflict for an owner decision (L-024).
+❌ **Sliding decompose → build with no sprint recorded** — a Backlog task not in an active sprint never auto-builds; surface promote-vs-one-off as a popup, never silent (SPRINT-015 T1).
