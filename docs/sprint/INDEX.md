@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-018 — Cleanup — closed 2026-07-10 · pending
 - SPRINT-017 — Doc-Gen Features — closed 2026-07-10 · 984b9eb
 - SPRINT-016 — Research Spikes — closed 2026-07-10 · 548cc6f
 - SPRINT-015 — Loop Hardening — closed 2026-07-10 · bce0087

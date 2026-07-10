@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-018 — Cleanup** → docs/sprint/SPRINT-018-cleanup.md  (active · 2 tasks: T1 brainstorming-fold · T2 qa-check-scope)
+> _(no active sprint — SPRINT-018 closed 2026-07-10 → v1.7.1; archived per §11.)_
 
 ---
 
@@ -49,7 +49,7 @@ _(empty)_
 ### P3 — Long-term
 
 <!-- (TASK-049 · 050 · 051 promoted → SPRINT-016 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-016-research-spikes.md) -->
-<!-- (TASK-058 · 060 promoted → SPRINT-018 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-018-cleanup.md) -->
+<!-- (TASK-058 · 060 shipped in SPRINT-018 → v1.7.1; see docs/CHANGELOG.md) -->
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)

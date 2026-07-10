@@ -3,7 +3,7 @@ sprint: 018
 slug: cleanup
 owner: Maintainer
 last_updated: 2026-07-10
-status: active
+status: closed
 plan_commit: 7a1cb9d
 close_commit: pending
 update_trigger: sprint execute/close events
@@ -94,19 +94,25 @@ disk; corpus_files resolves to all 9 ADR + 9 research docs (mattpocock excluded)
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `.claude/CLAUDE.md` | T1 | K1 "too simple" anti-pattern | Low | read |
+| `skills/orchestrator/SKILL.md` | T1 | K2 section-by-section G2 note | Low | read |
+| `scripts/qa-check.sh` | T2 | corpus lint → git-tracked scope | Low | qa-check 48/0 |
 
 ## Retro
 <!-- Written at close. Route buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·
      follow-ups → TASK-NNN · learnings → LEARNINGS. Then archive → docs/sprint/archive/ + INDEX line. -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no miss/contradiction. Used L-012 (orchestrator near-cap → K2 in-place), L-007
+(exercise on real input), and the brainstorming-adaptation verdict (K1/K2 source).
 
 **Worked**
--
+- **T2 exercised clean** — qa-check 46/1 → 48/0 with the untracked stray still on disk; the two-close-long
+  false-fail friction is gone and the guard is provably intact (all 18 tracked docs still linted).
+- **Disjoint tasks** (D1) — no ownership dance; two small commits.
+- **The close-sweep (SPRINT-017 T1) is now routine** — ran it at this close, found nothing new unfiled.
 
 **Friction**
--
+- None notable — a genuinely small cleanup sprint.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- None new worth promoting.

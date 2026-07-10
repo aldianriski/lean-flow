@@ -11,6 +11,21 @@ status: current
 
 ---
 
+## v1.7.1 — Cleanup (2026-07-10)
+
+PATCH — bundles **SPRINT-018**.
+
+**What changed for you:** `/orchestrator`'s G2 gate now suggests approving a large (**L**) design
+section-by-section rather than in one monolith, and CLAUDE guidance names the "too simple to need a
+design" rationalization as an anti-pattern (both distilled from the obra brainstorming-skill scan).
+
+**Maintainer-side only:** `qa-check.sh`'s corpus metadata lint is now scoped to git-tracked files, so a
+stray untracked working-tree `.md` no longer fails the gate.
+
+Manifests → 1.7.1 lockstep; skill roster unchanged (14).
+
+---
+
 ## v1.7.0 — Doc-Gen Features (2026-07-10)
 
 MINOR — bundles **SPRINT-017** (detail below).
