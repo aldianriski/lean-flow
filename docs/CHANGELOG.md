@@ -11,6 +11,22 @@ status: current
 
 ---
 
+## v1.8.0 — Model Tiers (2026-07-10)
+
+MINOR — bundles **SPRINT-019** (implements ADR-010).
+
+**What changed for you:** the model-tier doctrine (`.claude/CONTEXT.md`) is now **role-based and
+remappable**, routed by task *nature* not size ("ambiguity & consequence up, volume & repetition down"):
+`decision`→Opus · `execution`→Sonnet · `mechanical-ingest`→Haiku. It governs the models lean-flow
+**dispatches** (the session model stays your choice — advisory only); an **undefined role falls back to
+the next-strongest defined role**, so a repo without a given model still runs. The strongest model is a
+**manual** escalation (no auto-ladder — that's agent behaviour lean-flow won't own). Rationale +
+alternatives → **ADR-010**.
+
+Manifests → 1.8.0 lockstep; skill roster unchanged (14). Additive — nothing to migrate.
+
+---
+
 ## v1.7.1 — Cleanup (2026-07-10)
 
 PATCH — bundles **SPRINT-018**.

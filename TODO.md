@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-019 — Model Tiers** → docs/sprint/SPRINT-019-model-tiers.md  (active · 1 task: T1 implement ADR-010 role-based tiers)
+> _(no active sprint — SPRINT-019 closed 2026-07-10 → v1.8.0; archived per §11.)_
 
 ---
 
@@ -40,7 +40,7 @@ _(empty)_
 <!-- (SPRINT-008…011 batches + TASK-045 · 046 [SPRINT-014 council hardening] shipped; see docs/CHANGELOG.md) -->
 
 <!-- (TASK-055 · 052 · 059 shipped in SPRINT-017 → v1.7.0; see docs/CHANGELOG.md) -->
-<!-- (TASK-056 promoted → SPRINT-019 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-019-model-tiers.md) -->
+<!-- (TASK-056 shipped in SPRINT-019 → v1.8.0 · ADR-010; see docs/CHANGELOG.md) -->
 
 ### P3 — Long-term
 

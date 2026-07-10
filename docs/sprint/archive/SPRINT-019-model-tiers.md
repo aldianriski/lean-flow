@@ -3,7 +3,7 @@ sprint: 019
 slug: model-tiers
 owner: Maintainer
 last_updated: 2026-07-10
-status: active
+status: closed
 plan_commit: 8c3fb0f
 close_commit: pending
 update_trigger: sprint execute/close events
@@ -76,19 +76,28 @@ inert prose. All per ADR-010; no re-litigation (D1).
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `.claude/CONTEXT.md` | T1 | Model-tiers → role-based remappable map (124→127) | Med | exercise (session dispatches) |
+| `skills/orchestrator/SKILL.md` | T1 | "Dispatch by role" note | Low | consistency |
+| `skills/council/SKILL.md` | T1 | Tier note → role vocabulary | Low | consistency |
 
 ## Retro
 <!-- Written at close. Route buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·
      follow-ups → TASK-NNN · learnings → LEARNINGS. Then archive → docs/sprint/archive/ + INDEX line. -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no miss/contradiction. Used ADR-010 (the spec), L-012 (cap-aware), L-015 (consumer
+adaptability), L-007 (exercise). Datapoint for TASK-048: this `/council` run *genuinely diverged* — the
+Expansionist dissented and the moderator added the decisive enforceable/advisory split — so the panel
+isn't pure theater on at least this decision.
 
 **Worked**
--
+- **Councilling before building paid off** — the verdict shrank TASK-056 from "4-tier + auto-ladder" to a
+  slim role map, averting an agent-shaped over-build the no-hooks ethos couldn't honestly ship. ADR-as-spec
+  made the build a clean mechanical translation (D1 — zero re-litigation).
+- **The map isn't inert** — it classifies real dispatches this very session performed (L-007).
 
 **Friction**
--
+- **CONTEXT hit 127/130** — tight. The next tier/vocab addition triggers the periodic SSOT dedup (L-008 /
+  the TD-006 pattern), not a new TD.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- None new worth promoting.
