@@ -65,8 +65,8 @@ in batches → remove the old form.
 **Acceptance:** `/refactor-advisor` references expand–contract for wide refactors.
 
 **DoD:**
-- [ ] expand–contract named for wide refactors (add-new → migrate-batches → remove-old)
-- [ ] One line in SKILL.md or `references/deepening.md` (cap-safe)
+- [x] expand–contract named for wide refactors (add-new → migrate-batches → remove-old)
+- [x] One line in SKILL.md or `references/deepening.md` (cap-safe)
 
 ### T4 — Measure whether `/council`'s 5 personas diverge `[size: S · risk: low]`
 Layers: `/council` (exercise only) · `docs/research/council-improvements.md` (findings)
@@ -118,6 +118,10 @@ Added § Two axes to `review-scoping.md` (uncounted reference) — Standards (co
 vs Spec (builds the right thing), reported separately, never merged/re-ranked. SKILL.md L96 pointer +2
 words (still 107/110).
 
+### 2026-07-10 | T3 done | expand–contract
+Added § Wide refactors: expand–contract to `deepening.md` (add-new → migrate-batches → remove-old, each
+its own task) + a one-line pointer in refactor-advisor SKILL.md Process (60/110).
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -127,6 +131,8 @@ words (still 107/110).
 | `.claude/CONTEXT.md` | T1 | dispatch contract line reflects skill-powered dispatch | Low | cap 127/130 |
 | `skills/orchestrator/references/review-scoping.md` | T2 | new § Two axes — Standards vs Spec, reported separately | Low | reference (uncounted) |
 | `skills/orchestrator/SKILL.md` | T2 | L96 pointer adds "Standards-vs-Spec axes" | Low | cap 107/110 |
+| `skills/refactor-advisor/references/deepening.md` | T3 | new § Wide refactors: expand–contract | Low | reference (uncounted) |
+| `skills/refactor-advisor/SKILL.md` | T3 | Process bullet points to expand–contract | Low | cap 60/110 |
 
 ## Retro
 <!-- Written at close. Route buckets (DOCS_Guide §10): shipped→CHANGELOG · debt→TD-NNN · follow-ups→TASK-NNN · learnings→L-NNN. Then archive (§11). -->

@@ -47,6 +47,7 @@ Walk the design tree with the user — constraints, dependency category, the sha
 - New concept named? → add the term to the glossary (`CONTEXT.md`), opinionated canonical + `_Avoid_`.
 - Load-bearing rejection? → offer an ADR — *only* if a future explorer would otherwise re-suggest it (skip ephemeral/self-evident reasons).
 - Want alternative interfaces? → **design it twice**, inline: sketch 2–3 *radically different* interfaces (minimal / flexible / common-case-trivial), compare by depth · locality · seam placement, then recommend one (or a hybrid). Be opinionated.
+- Wide blast radius (many call sites)? → roll it out as **expand–contract** (add-new alongside old → migrate in batches → remove old), each phase its own task — see reference.
 
 Actionable refactors become `TASK-NNN` (via `/task-decomposer`) or a `TD-NNN` tech-debt entry — never a silent in-place rewrite.
 

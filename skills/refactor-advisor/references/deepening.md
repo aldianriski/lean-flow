@@ -37,6 +37,19 @@ don't drift into "component / service / API / boundary". Consistent language is 
 - Write new tests at the deepened module's interface; assert on observable outcomes, not internal state.
 - A test that must change when the implementation changes is testing past the interface — rewrite it.
 
+## Wide refactors: expand–contract (roll out without a big-bang)
+
+A deepening that touches many call sites can't land in one edit without breaking everything mid-flight.
+Roll it out as **expand → contract**:
+
+1. **Expand** — add the new (deep) form *alongside* the old; both satisfy the interface. Nothing breaks yet.
+2. **Migrate** — move callers to the new form in independent batches, each a demoable, revertible step.
+3. **Contract** — once no caller references the old form, delete it.
+
+Each phase is its own task/commit (`/task-decomposer` → `/orchestrator`); the migration batches
+parallelise across call sites. Prefer this over one sweeping rewrite whenever the blast radius spans more
+call sites than a single review can hold. (mattpocock/skills → to-tickets.)
+
 ## Design it twice (inline — no agent fan-out)
 
 Your first interface idea is rarely the best (Ousterhout). For a chosen candidate, sketch **2–3
