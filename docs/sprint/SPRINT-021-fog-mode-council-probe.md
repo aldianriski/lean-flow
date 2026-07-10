@@ -4,7 +4,7 @@ slug: fog-mode-council-probe
 owner: Maintainer
 last_updated: 2026-07-10
 status: active
-plan_commit: [pending]
+plan_commit: 4ee5b5a
 close_commit:
 update_trigger: sprint execute/close events
 ---
