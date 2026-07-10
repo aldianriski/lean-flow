@@ -11,6 +11,23 @@ status: current
 
 ---
 
+## v1.10.2 — Dispatch & Parallelization (2026-07-10)
+
+PATCH — bundles **SPRINT-023** (makes the dispatch doctrine actually operate).
+
+**What changed for you:** `/orchestrator` now genuinely *dispatches* and *parallelizes* execution instead of doing it all inline —
+- it acts as the `decision`-tier **coordinator** and **dispatches** `execution`→Sonnet / `mechanical`→Haiku work to sub-agents **by each task's classification** (route by *nature*, not size), each handed its procedure skill;
+- `sprint-bulk` now **decides parallel vs sequential** from the overlap map — independent tasks (no shared file, no `depends-on`) fan out in parallel; shared/dependent run sequentially;
+- the dispatching skills (`orchestrator`·`council`·`flow`) list `Agent, Task` in `allowed-tools`, so dispatch **auto-approves** instead of stalling on a per-spawn permission prompt.
+
+Full rules → `skills/orchestrator/references/dispatch.md`; doctrine → **ADR-010** (2nd amendment). It's a strong *default*, not a guarantee (prompt-driven ceiling) — for deterministic large fan-out use `/batch`·`/workflows`.
+
+**Note:** if a prior version seemed to "not spawn," your session was likely running a **stale cached skill** — restart Claude Code so it loads the current version (L-021).
+
+Manifests → 1.10.2 lockstep; skill roster unchanged (14). Additive — nothing to migrate.
+
+---
+
 ## v1.10.1 — Wiring Pass (2026-07-10)
 
 PATCH — bundles **SPRINT-022** (wiring fixes; no new capability).
