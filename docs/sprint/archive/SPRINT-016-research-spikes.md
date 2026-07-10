@@ -3,7 +3,7 @@ sprint: 016
 slug: research-spikes
 owner: Maintainer
 last_updated: 2026-07-10
-status: active
+status: closed
 plan_commit: 2f69b7b
 close_commit: pending
 update_trigger: sprint execute/close events
@@ -118,19 +118,35 @@ boundary (disjoint preconditions → no overlap). Filed **TASK-059** (build init
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `docs/research/structarmed-adaptation.md` | T1 | scan → 0 keepers (domain mismatch) | Low | qa-check |
+| `docs/research/brainstorming-adaptation.md` | T2 | eval → reject-skill, K1/K2 keepers | Low | qa-check |
+| `docs/research/init-vs-migrate.md` | T3 | init decision + boundary | Low | qa-check |
+| `TODO.md` | T2·T3 | filed TASK-058·059; unblocked TASK-052 | Low | — |
+| `docs/knowledge-index.md` | T1·T2·T3 | regenerated (derived) | Low | qa-check |
 
 ## Retro
 <!-- Written at close. Route buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·
      follow-ups → TASK-NNN · learnings → LEARNINGS. Then archive → docs/sprint/archive/ + INDEX line. -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no miss/contradiction. Leaned on ADR-001 (curated-not-copied), L-015, TASK-006
+(gate-as-code already owns structarmed's one idea), and the bmad scan (TASK-039) as the method precedent.
+The mattpocock lint trip was a foreign-file surprise, not a retrieval failure.
 
 **Worked**
--
+- **Tier discipline paid off** — two parallel cheap-tier (`sonnet`) `Explore` agents did the
+  fetch+extract; the curated-not-copied *judgment* stayed on the session model. Cheap where mechanical,
+  session-model where it's a real call.
+- **Delta-over-existing mapping** made the brainstorming verdict obvious — once each technique was mapped
+  to what lean-flow already has, "reject the standalone skill, keep 2 micro-ideas" fell out cleanly.
+- **Null results are cheap and valuable** — structarmed was a fast, honest 0-keeper (domain mismatch),
+  no forcing.
 
 **Friction**
--
+- **A foreign untracked empty file (`mattpocock.md`) tripped the corpus lint mid-sprint** — surfaced to
+  owner, left untouched. The lint can't distinguish this sprint's output from a stray working-tree file;
+  the regenerated index correctly excludes it, so only the completeness check is affected.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- **L-017** — an adoption scan judges the **delta over existing surface**, not the tool's standalone
+  merit: map each candidate technique to what lean-flow already has *first*; only the unmatched remainder
+  is a real keeper. Seen across the bmad (TASK-039), structarmed, and brainstorming scans.

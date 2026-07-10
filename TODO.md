@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-016 — Research Spikes** → docs/sprint/SPRINT-016-research-spikes.md  (active · 3 tasks: T1 structarmed · T2 brainstorming · T3 init-decision)
+> _(no active sprint — SPRINT-016 closed 2026-07-10; docs-only research, no version bump; archived per §11.)_
 
 ---
 

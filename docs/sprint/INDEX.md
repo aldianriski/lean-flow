@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-016 — Research Spikes — closed 2026-07-10 · pending
 - SPRINT-015 — Loop Hardening — closed 2026-07-10 · bce0087
 - SPRINT-014 — Knowledge Corpus + Council Hardening — closed 2026-07-02 · c02dbf1
 - SPRINT-013 — Knowledge Metadata — closed 2026-07-02 · 6051bf6

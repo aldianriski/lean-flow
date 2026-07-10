@@ -22,6 +22,14 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
+## L-017 [tags: process] [status: active]: An adoption scan judges the DELTA over existing surface, not the tool's standalone merit. When evaluating an external repo/skill for adoption (curated-not-copied), map each candidate technique to **what lean-flow already has FIRST** — only the unmatched remainder is a real keeper. brainstorming (TASK-050) looked adoptable but was ~90% owned surface (G2 · decomposer grill+popups · /prototype · /council · YAGNI) → reject-the-skill, keep 2 micro-ideas; structarmed (TASK-049) was a domain mismatch (0 keepers); bmad (TASK-039) distilled 5 keepers the same way. Pattern: the keeper test is the gap over existing, so build the "already have" map before judging merit — it turns most scans into fast, honest rejects.
+- seen: Sprint-014 (bmad) · Sprint-016 (structarmed + brainstorming)
+- count: 2
+- promoted: no
+- related: ADR-001 (curated-not-copied) · L-015 (consumer-facing surface)
+
+---
+
 ## L-016 [tags: process] [status: active]: A skill/tool repo can't dogfood a feature whose substrate it lacks — judge it on the CONSUMER path. lean-flow is markdown-only, so `/tdd` *correctly* never fires in its own loop (Implement-routing → implement-directly, no harness); SPRINT-015 T2 confirmed the "TDD never invoked" gap (item #8) is real only for **consumer repos with testable code**, by tracing the consumer path rather than the dogfood path. Pattern: when a change targets consumer behaviour the host repo can't itself exercise, verify by tracing the consumer scenario — don't read "didn't fire in our repo" as either "broken" or "fine".
 - seen: Sprint-015
 - count: 1
