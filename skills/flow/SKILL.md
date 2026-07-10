@@ -45,3 +45,4 @@ behind "conduct the loop".
 ❌ **Re-running a stage whose output already exists** — assess first; skip with a stated reason.
 ❌ **Conducting when one skill was wanted** — `/flow` is opt-in; a single `/tdd` is not a reason to drive the whole loop.
 ❌ **Re-implementing a stage inline** — always call the standalone skill, never inline its logic.
+❌ **Surfacing a blocking G1/G2/grill question inline instead of as an AskUserQuestion popup** — the human must be *asked*, not shown prose (SPRINT-015 T3).

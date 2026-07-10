@@ -70,10 +70,10 @@ question" anti-pattern). Audit every blocking-question point and instruct popup 
 every point covered, with none left as passive inline prose.
 
 **DoD:**
-- [ ] orchestrator G1/G2 blocking questions → popup
-- [ ] task-decomposer grill blocking questions → popup
-- [ ] flow + council blocking questions → popup
-- [ ] audit note enumerates all points; caps respected
+- [x] orchestrator G1/G2 blocking questions → popup
+- [x] task-decomposer grill blocking questions → popup
+- [x] flow + council blocking questions → popup
+- [x] audit note enumerates all points; caps respected
 
 ## Owner-action checklist
 - (none)
@@ -117,6 +117,16 @@ default. All in-place; orchestrator held at 107/110. **Insight worth surfacing:*
 repo `/tdd` *correctly* never fires — it's all markdown skill prose with no harness (routing →
 "implement directly"); the gap item #8 flags is real for CONSUMER repos with testable code. The fix
 makes the default loud there while degrading gracefully here (L-015).
+
+### 2026-07-10 | T3 done | blocking questions → AskUserQuestion popups
+**Audit — every blocking-question point, all now instruct a popup (not inline prose):**
+1. `orchestrator` G2 **Residual grill** — "one question at a time (as an AskUserQuestion popup)…"
+2. `task-decomposer` step 1 **Clarify/grill** — "Ask ONE question at a time (surface it as an AskUserQuestion popup, never inline prose)…"
+3. `council` step 1 **Frame** — "Too vague → ask one clarifying question (as an AskUserQuestion popup)…"
+4. `flow` — new **red-flag** enforcing the rule on the conducted path (the human must be *asked*).
+All in-place (orchestrator held 107/110; flow 47→48; decomposer 78; council 70). **L-007 exercise =
+this session**: the A2 gate fork + the three intake questions (#1/#8/#9) were surfaced as real popups.
+Closes the recurring "surfaced inline instead of actually asking" miss (L-002 · SPRINT-012 anti-pattern).
 
 ## Files Changed
 
