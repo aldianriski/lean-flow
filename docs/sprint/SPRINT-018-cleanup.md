@@ -37,9 +37,9 @@ designs. Land K1 as a CLAUDE.md anti-pattern (has headroom); K2 as a one-line no
 offers chunked approval for L designs. Nothing else from the obra skill is built.
 
 **DoD:**
-- [ ] K1 "too simple to need a design" → CLAUDE.md anti-pattern
-- [ ] K2 section-by-section approval noted in orchestrator G2 (for L designs)
-- [ ] caps respected (orchestrator ≤ 110 — it's at 107, keep the edit to ~1 line; CLAUDE ≤ 80)
+- [x] K1 "too simple to need a design" → CLAUDE.md anti-pattern
+- [x] K2 section-by-section approval noted in orchestrator G2 (for L designs)
+- [x] caps respected — CLAUDE 71→72/80; orchestrator held 107/110 (K2 in-place, no new line)
 
 ### T2 — Scope qa-check's corpus lint to tracked files `[size: S · risk: low]`  *(TASK-060)*
 Layers: `scripts/qa-check.sh`
@@ -76,6 +76,12 @@ corpus doc missing metadata still fails. Exercised on the real working tree (mat
 ### 2026-07-10 | promote | plan locked
 Formed after SPRINT-017 close (user chose the P3 cleanup batch). Governance: nothing to promote/age.
 No shared-file overlap (D1).
+
+### 2026-07-10 | T1 done | brainstorming keepers folded into the gate
+K1 → new CLAUDE.md anti-pattern ("too simple to need a design" — the rationalization behind wasted
+work); K2 → orchestrator G2 note (present + approve an **L** design section-by-section, in-place, no
+new line). Caps: CLAUDE 71→72/80; orchestrator held 107/110. Guidance-only (no runtime); closes
+TASK-058 and drains the last brainstorming-scan keeper.
 
 ## Files Changed
 

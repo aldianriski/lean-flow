@@ -39,7 +39,7 @@ Confirm before touching code. BLOCK if any answer is "unknown":
 
 Before implementing, draft the design in **`/plan`** (plan mode) and get human sign-off:
 - [ ] Approach chosen over alternatives, with a one-line WHY
-- [ ] Micro-task list, each independently verifiable
+- [ ] Micro-task list, each independently verifiable (for an **L** design, present + approve it section-by-section, not one monolith)
 - [ ] Hard-to-reverse decision? → record it (prompt `/lean-doc-generator <adr> <subject>`)
 - [ ] Residual ambiguity grilled (below) until the goal is unambiguous
 
