@@ -22,6 +22,14 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
+## L-020 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern + DoD (wire new capability into all related jobs). Shipping a capability ≠ wiring it. A new behaviour must be connected into **every related job/flow that should TRIGGER or CHAIN it** — entry routing · the dispatch/reviewer brief · the `/flow` conductor · the `CONTEXT.md` SSOT — not just written in its own file. The v1.9.0/v1.10.0 wiring audit (SPRINT-022) found 3 features shipped but half-connected: skill-powered dispatch orphaned from the Implement steps · Standards-vs-Spec never injected into the reviewer brief · foggy intent not routed to fog-mode. Pattern: at G2 for any new capability, enumerate its trigger points + downstream consumers and wire each; verify it FIRES end-to-end, don't stop at "the file exists." Owner-directed promote (base knowledge for future improvements). Related: L-007 (exercise on real input) · L-015 (consumer surface).
+- seen: Sprint-022
+- count: 1
+- promoted: yes → CLAUDE.md anti-pattern + DoD (2026-07-10, owner-directed)
+- related: L-007 · L-015
+
+---
+
 ## L-019 [tags: process] [status: active]: Same-provider model tiers don't decorrelate *factual* errors — cross-tier ≠ cross-provider. Probe (TASK-065, SPRINT-021 T2): one factual claim with knowable ground truth run across Haiku/Sonnet/Opus/Fable — the base dispatch tier (Sonnet) was already correct, so Opus/Fable *confirmed* rather than corrected, and Haiku honestly abstained (no hallucination). No divergence → no shared crack exposed to decorrelate. Pattern: model-diversity that shares a training lineage buys confirmation, not error-correction; genuine factual decorrelation needs a *cross-provider* model — the exact dependency that gates the multi-model backend (TASK-047). A cheap probe can only fail to find a crack, never prove absence (N=1, can't manufacture a shared-blind-spot case).
 - seen: Sprint-021
 - count: 1
