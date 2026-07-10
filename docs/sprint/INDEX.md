@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-021 — Fog-Mode + Council Decorrelation Probe — closed 2026-07-10 · 8209c4d
 - SPRINT-020 — Workflow Hardening — closed 2026-07-10 · 905be34
 - SPRINT-019 — Model Tiers — closed 2026-07-10 · 8a20d1a
 - SPRINT-018 — Cleanup — closed 2026-07-10 · 719d0fa
