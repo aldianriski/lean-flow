@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-016 closed 2026-07-10; docs-only research, no version bump; archived per §11.)_
+> **SPRINT-017 — Doc-Gen Features** → docs/sprint/SPRINT-017-doc-gen-features.md  (active · 3 tasks: T1 close-sweep · T2 migrate-sync · T3 init-mode)
 
 ---
 
@@ -39,21 +39,7 @@ _(empty)_
 
 <!-- (SPRINT-008…011 batches + TASK-045 · 046 [SPRINT-014 council hardening] shipped; see docs/CHANGELOG.md) -->
 
-<!-- P2 batch (from 2026-07-10 decompose) — sequence AFTER the P1 loop-hardening sprint; 056 shares orchestrator/SKILL.md so it must not parallel-build with the P1 set (L-042). -->
-- [ ] **TASK-052 — Make `migrate` re-runnable as a plugin-update sync**  [size: M] [risk: med] [HITL]
-      done-when: re-running migrate on an already-adopted repo pulls forward new standard/template changes from a plugin update — idempotent, reports what changed, never clobbers user edits
-      touches:   skills/lean-doc-generator/SKILL.md (migrate) · references/DOCS_Guide.md
-      assumes:   init/migrate split DECIDED (docs/research/init-vs-migrate.md) — migrate stays adopt-existing; greenfield → TASK-059. No overlap.
-      state:     ready
-- [ ] **TASK-059 — Add `/lean-doc-generator init` mode (scope-interactive greenfield scaffold)**  [size: M] [risk: med] [HITL]
-      done-when: `/lean-doc-generator init` scaffolds a fresh repo's docs — always the core set, and INTERACTIVELY scopes which optional docs (DESIGN/RESEARCH/DEPLOY/…) to include by repo type; docs-only (never writes .claude/settings.json). Distinct from migrate (adopt-existing).
-      touches:   skills/lean-doc-generator/SKILL.md · references/DOCS_Guide.md · templates/
-      tracker:   docs/research/init-vs-migrate.md (TASK-051 decision)
-      state:     ready
-- [ ] **TASK-055 — close: sweep the full session for TD + follow-ups**  [size: M] [risk: med] [HITL]
-      done-when: /lean-doc close's §10 Retro routing captures ALL tech-debt + follow-up items surfaced during the session into TD-NNN / TASK-NNN — not only items already written down
-      touches:   skills/lean-doc-generator/SKILL.md (close) · references/DOCS_Guide.md §10
-      state:     ready
+<!-- (TASK-055 · 052 · 059 promoted → SPRINT-017 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-017-doc-gen-features.md) -->
 - [ ] **TASK-056 — Wire recon-delegation + per-phase model tiers into orchestrator**  [size: M] [risk: med] [HITL]
       done-when: orchestrator's procedure explicitly triggers a read-only recon (Explore, cheap tier) before implementing on mature/unfamiliar code, AND assigns model tiers per phase (plan=session/large · build=cheap/small · recon+ingest=fast) so tiering actually fires — not just documented. Mirrors kalasuara L-026.
       touches:   skills/orchestrator/SKILL.md · .claude/CONTEXT.md (Model tiers)

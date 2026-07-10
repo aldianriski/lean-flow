@@ -52,6 +52,7 @@ resumes it. Every skill is also usable standalone. See `.claude/CONTEXT.md` for 
 ❌ Editing the plugin **install cache** (`~/.claude/plugins/cache/…`) instead of the repo source (`skills/…`) — the cache is read-only output of `plugin install`; edits there don't ship, and a cache Read doesn't satisfy read-before-edit (L-010).
 ❌ Parking a **flow-blocking open question** in a doc (a `TBD` / silent `assumes:`) instead of surfacing it — a question that blocks scope/design is asked (one at a time) or made an explicit `blocked`/owner-action with an unblock condition; never a passive placeholder that stalls dev (SPRINT-012 T1).
 ❌ Evaluating a change only against lean-flow's **own dogfooding**, never the **consumer who installs it** — every change checks its consumer-facing surface (skills self-contained **and** adaptable · README/CHANGELOG reflect user-visible changes · no repo-specific path — `scripts/…`, `docs/knowledge-index.md` — leaked into a generic skill/template). We repeatedly shipped maintainer-correct-but-consumer-leaky changes (SPRINT-014 → L-015).
+❌ Judging an external tool/skill for adoption on its **standalone merit** instead of the **delta over lean-flow's existing surface** — map each candidate technique to what we already have *first*; only the unmatched remainder is a keeper (most scans → fast rejects). Seen across the bmad · structarmed · brainstorming scans (L-017).
 
 ## Naming Conventions — files: kebab-case
 
