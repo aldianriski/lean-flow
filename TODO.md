@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-023 — Dispatch & Parallelization** → docs/sprint/SPRINT-023-dispatch-and-parallelization.md
+> _(no active sprint — SPRINT-023 closed 2026-07-10 → v1.10.2; archived per §11.)_
 
 ---
 
@@ -33,7 +33,7 @@ status: current
 <!-- (prior P1 batch — TASK-009 · 013 · 017 · 010 — shipped in SPRINT-008; TASK-035 shipped in SPRINT-012; see docs/CHANGELOG.md) -->
 
 <!-- (TASK-053 · 057 · 054 shipped in SPRINT-015 → v1.6.0; see docs/CHANGELOG.md) -->
-<!-- (TASK-069 · 070 · 071 · 072 promoted → SPRINT-023 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-023-dispatch-and-parallelization.md) -->
+<!-- (TASK-069 · 070 · 071 · 072 shipped in SPRINT-023 → v1.10.2; see docs/CHANGELOG.md) -->
 
 ### P2 — Quality / Polish
 

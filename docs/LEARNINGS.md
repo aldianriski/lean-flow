@@ -22,6 +22,14 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
+## L-021 [tags: tooling] [status: active]: After a plugin update, the RUNNING session keeps the OLD cached skill version — verify the loaded skill's base-dir version, not just `/plugin`'s report. SPRINT-023: `/plugin` said 1.10.1, but the live session loaded `/orchestrator` from the stale `…/cache/…/1.5.0/…` dir (pre-improvement content), so none of the shipped dispatch improvements fired — the "orchestrator doesn't spawn after update" complaint was a **stale-session / leftover-cache-dir** issue, not a code gap. Fix: restart the session to load the current version; remove stale cache version dirs (keep only the latest). Pattern: when a plugin change "doesn't take effect," check the skill's base-dir version in the invocation header BEFORE debugging the code.
+- seen: Sprint-023
+- count: 1
+- promoted: no
+- related: L-010 (edit the repo source, never the install cache)
+
+---
+
 ## L-020 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern + DoD (wire new capability into all related jobs). Shipping a capability ≠ wiring it. A new behaviour must be connected into **every related job/flow that should TRIGGER or CHAIN it** — entry routing · the dispatch/reviewer brief · the `/flow` conductor · the `CONTEXT.md` SSOT — not just written in its own file. The v1.9.0/v1.10.0 wiring audit (SPRINT-022) found 3 features shipped but half-connected: skill-powered dispatch orphaned from the Implement steps · Standards-vs-Spec never injected into the reviewer brief · foggy intent not routed to fog-mode. Pattern: at G2 for any new capability, enumerate its trigger points + downstream consumers and wire each; verify it FIRES end-to-end, don't stop at "the file exists." Owner-directed promote (base knowledge for future improvements). Related: L-007 (exercise on real input) · L-015 (consumer surface).
 - seen: Sprint-022
 - count: 1

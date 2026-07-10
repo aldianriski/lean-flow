@@ -3,9 +3,9 @@ sprint: 023
 slug: dispatch-and-parallelization
 owner: Maintainer
 last_updated: 2026-07-10
-status: active
+status: closed
 plan_commit: 834cc7e
-close_commit:
+close_commit: [pending]
 update_trigger: sprint execute/close events
 ---
 
@@ -133,12 +133,24 @@ sequential from the overlap map · Agent in allowed-tools · the prompt-driven c
 | `.claude/CONTEXT.md` | T4 | tier contract points to references/dispatch.md | Low | cap 127/130 |
 
 ## Retro
-<!-- Written at close. Route buckets (§10). Then archive (§11). -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no miss. Applied model-purpose.md (nature-not-size, the owner's steer), ADR-010,
+L-012 (references-first under the 108/110 cap), L-042 (T2/T3 overlap sequenced), L-010 (cache vs source). No prior L/ADR contradicted.
 
 **Worked**
+- Grounding "default-spawn strength" in `model-purpose.md` (coordinator ≠ worker; route by classification) turned a fuzzy design fork into a principled default — the owner's steer was the unlock.
+- Landing all detail in a new `references/dispatch.md` kept orchestrator at 108/110 through four tasks (L-012).
 
 **Friction**
+- The user's actual blocker wasn't a code gap at all — the running session was serving a **stale cached skill version** (1.5.0) after a 1.10.1 update, so none of the shipped improvements fired. Diagnosed mid-sprint; cache cleaned + captured as L-021.
 
 **Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **L-021** — after a plugin update, the *running session* keeps the old cached skill version; verify the loaded skill's base-dir version before debugging code.
+
+---
+
+### Retro buckets filed (§10)
+- **Shipped** → `docs/CHANGELOG.md` v1.10.2 (via `/release-patch`, next step).
+- **Tech debt** → none new (TD-008 stays open).
+- **Follow-ups** → none.
+- **Learnings** → **L-021** (new — stale-session cache after update).
