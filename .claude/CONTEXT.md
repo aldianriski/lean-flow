@@ -48,7 +48,7 @@ context): recon→`Explore` · `/code-review` (small/med → one scoped `sonnet`
 
 **Standalone contract** — stage-skill cross-refs are routing *suggestions* (`→ /X`), never requirements;
 each completes its job invoked cold. Only inherent ordering: the sprint lifecycle. **`/flow` is the sole
-exception** — it *sequences* the stages, never re-implements one. **Feed pipeline:** `/task-decomposer`
+exception** — it *sequences* the stages, never re-implements one. **Feed pipeline:** `/task-decomposer` (or its **fog-map** for foggy work too big to plan)
 → `/triage` → `/lean-doc-generator promote` → `/orchestrator`.
 **Bug intake:** a bug (`BUG.md.template`) enters at `/triage` → trivial known cause = `TASK` · needs investigation = `/diagnose` · architectural = `TD-NNN`.
 

@@ -58,10 +58,10 @@ Neither upstream router points foggy intent at fog-mode; the `/flow` conductor i
 **Acceptance:** a foggy intent is routed toward fog-mode from both the conductor and the build loop.
 
 **DoD:**
-- [ ] orchestrator freeform routing mentions foggy / un-sliceable → `/task-decomposer` fog-mode
-- [ ] `/flow` Feed step (step 2) offers fog-mode for foggy intent
-- [ ] CONTEXT feed-pipeline line acknowledges fog-map
-- [ ] caps: orchestrator ≤110 · flow ≤110 · CONTEXT ≤130; qa skills 14=14
+- [x] orchestrator freeform routing mentions foggy / un-sliceable → `/task-decomposer` fog-mode
+- [x] `/flow` Feed step (step 2) offers fog-mode for foggy intent
+- [x] CONTEXT feed-pipeline line acknowledges fog-map
+- [x] caps: orchestrator 108 · flow 48 · CONTEXT 127; qa 48/0 (skills 14=14)
 
 ## Owner-action checklist
 - [ ] none
@@ -89,6 +89,11 @@ Two-axis instruction now IN the reviewer's brief-injection line (review-scoping.
 reviewer is told to report Standards vs Spec separately, never merged. Recorded in CONTEXT § Built-in
 leverage. The principle now fires, not just documents.
 
+### 2026-07-10 | T3 done | foggy → fog-mode routed
+Entry wiring added: orchestrator freeform routing + `/flow` step-2 Feed both route *foggy* intent to
+`/task-decomposer` fog-mode (`--fog`); CONTEXT feed-pipeline acknowledges the fog-map. Fog-mode now has
+an entry from the conductor and the build loop, not just self-trigger inside task-decomposer.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -96,6 +101,9 @@ leverage. The principle now fires, not just documents.
 | `skills/orchestrator/SKILL.md` | T1 | dispatch note scoped to Implement steps + routing note links to it | Low | cap 107/110 |
 | `skills/orchestrator/references/review-scoping.md` | T2 | two-axis instruction injected into the reviewer brief | Low | reference |
 | `.claude/CONTEXT.md` | T2 | § Built-in leverage records Standards-vs-Spec split | Low | cap 127/130 |
+| `skills/orchestrator/SKILL.md` | T3 | freeform routing: foggy → fog-mode | Low | cap 108/110 |
+| `skills/flow/SKILL.md` | T3 | step-2 Feed offers fog-mode for foggy intent | Low | cap 48/110 |
+| `.claude/CONTEXT.md` | T3 | feed-pipeline acknowledges fog-map | Low | cap 127/130 |
 
 ## Retro
 <!-- Written at close. Route buckets (§10). Then archive (§11). PATCH → /release-patch. -->

@@ -23,6 +23,7 @@ and review is a structured self-pass.
 
 Freeform input with no mode keyword:
 - No tracked task → run `/task-decomposer` first, then return here.
+- Intent too **foggy to slice** (decisions unknown — no acceptance criteria writable yet) → `/task-decomposer` **fog-mode** (`--fog`): map the decisions before forcing tasks.
 - Task is in an **active sprint** → default to the sprint mode (or `quick` for a single one).
 - Task is only in the **Backlog** (not in any active sprint) → **don't silently build**: surface the choice as a popup — `/lean-doc-generator promote` it into a sprint, or proceed as an explicit `quick` one-off (never slide decompose → build unrecorded).
 
