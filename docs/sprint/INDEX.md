@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-023 — Dispatch & Parallelization — closed 2026-07-10 · 3d28333
 - SPRINT-022 — Wiring Pass — closed 2026-07-10 · 5e827b2
 - SPRINT-021 — Fog-Mode + Council Decorrelation Probe — closed 2026-07-10 · 8209c4d
 - SPRINT-020 — Workflow Hardening — closed 2026-07-10 · 905be34
