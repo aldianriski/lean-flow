@@ -35,7 +35,7 @@ Every skill works standalone; the loop is just the order they reward most togeth
 | `/council` | decide | **opt-in, agent-using** — pressure-test a hard call via 5 advisors + peer review → `verdict-<slug>.md` → ADR |
 
 **Grill** at intake (`/task-decomposer`); G2 re-grills residuals (an unconfirmed assumption blocks G2).
-**Implement routing** (`/orchestrator`): new behaviour→`/tdd` · bug→`/diagnose` · hard-to-change→`/refactor-advisor` · docs/spike→direct.
+**Implement routing** (`/orchestrator`): new behaviour→`/tdd` **(default, test-first)** · bug→`/diagnose` · hard-to-change→`/refactor-advisor` · docs/spike→direct.
 `/prototype` feeds design (can't resolve on paper → fold into G2 + ADR); `/council` feeds a hard fork → verdict → ADR §4.
 
 ## Built-in leverage

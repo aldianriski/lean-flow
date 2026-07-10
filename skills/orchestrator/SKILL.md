@@ -51,8 +51,8 @@ only what is still open — one question at a time, recommend an answer each tim
 
 ## Phases
 
-> **Implement routing** — at any Implement step: building *new testable behaviour* → work test-first
-> via `/tdd` (red-green-refactor in vertical slices; test type → `tdd/references/test-strategy.md`; if owner declines tests or no harness exists → implement directly + note a manual verification step); chasing a *bug or failing test* → `/diagnose`;
+> **Implement routing** — at any Implement step: *new testable behaviour* is built **test-first via
+> `/tdd` by default** (red-green-refactor in vertical slices; test type → `tdd/references/test-strategy.md`; decline only with a stated reason — owner opts out or no harness → implement directly + note a manual verification step); chasing a *bug or failing test* → `/diagnose`;
 > *code that's hard to change* (shallow modules, leaky seams) → `/refactor-advisor`. Docs / config /
 > spikes implement directly.
 >
@@ -66,13 +66,13 @@ only what is still open — one question at a time, recommend an answer each tim
 ### quick
 1. **Parse** — restate the task as a verifiable goal; confirm in one line.
 2. **G1** — run the checklist; BLOCK on any fail.
-3. **Implement** — execute; flag scope creep the moment it appears.
+3. **Implement** — execute per Implement routing (new behaviour → `/tdd` by default); flag scope creep the moment it appears.
 4. **Self-review** — run the review checklist (below) as the floor; heavier isolated `/code-review` / `/verify` passes apply to non-trivial diffs and mvp+sprint-bulk, not quick low-risk tasks.
 5. **Commit** — structured message: `type(scope): summary`.
 
 ### mvp
 1. **Parse** → 2. **G1** → 3. **Grill** (if requirements unclear) → 4. **G2 Design**
-→ 5. **Implement** micro-tasks in order, marking each done as its check passes
+→ 5. **Implement** micro-tasks in order (route by type — new behaviour → `/tdd`), ticking each as its check passes
 → 6. **Self-review** → 7. **Commit**.
 
 ### sprint-bulk
@@ -81,7 +81,7 @@ Operates on the active sprint file `docs/sprint/SPRINT-NNN-<slug>.md` (its Plan 
 1. **Batch G1** — one combined scope pass over the Plan.
 2. **Batch G2** — one design pass; **map shared-file ownership** (every file touched by >1 task → single owner + commit order, before the first task) and note cross-task file overlaps — and **cross-stream** ones: files shared with another stream's active sprint → coordinate or sequence, never parallel-build; at commit, stage shared files per-hunk (`git add -p` + verify `git diff --cached`) — a plain `git add <shared>` stages another task/stream's WIP into your commit (contaminates at the commit phase, not just merge — L-042/L-037); **grill individually any task with an unconfirmed `assumes:`** — a batch sign-off never waves an open assumption through.
 3. **Sequence** — tasks (Tn) with overlapping files run sequentially; **disjoint tasks at scale → `/batch`** (decompose → one worktree subagent per unit → PR each; `/workflows` watches it).
-4. **Loop** — per Plan task: Implement → Self-review → Commit → tick its DoD `[x]`; **append to the sprint Execution Log** (don't edit § Plan — it's frozen). `/loop` can pace the iteration.
+4. **Loop** — per Plan task: Implement (route by type — new behaviour → `/tdd`) → Self-review → Commit → tick its DoD `[x]`; **append to the sprint Execution Log** (don't edit § Plan — it's frozen). `/loop` can pace the iteration.
 5. **First-blocker halt** — stop on any blocker or human `block`; log it and wait.
 6. **Close** — all DoD `[x]` → run `/lean-doc-generator close`; then **fixes-only sprint → `/release-patch` (PATCH); feature sprint → MINOR by hand** (release-patch is PATCH-only, scans `plan_commit..HEAD`).
 

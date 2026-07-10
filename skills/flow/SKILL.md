@@ -23,7 +23,7 @@ Assess the current state first, then run only the stages whose precondition is u
 1. **Orient** — context missing/stale → `/prime`. Resuming from a handoff? read it first.
 2. **Feed** — no open work → `/task-decomposer "<intent>"` — **the detailed grill fires here, at intake** (the build gates re-grill only residuals); backlog drifted / noisy → `/triage`.
 3. **Plan** — no active sprint but a `ready` backlog exists → `/lean-doc-generator promote` (the governance review fires here).
-4. **Build** — `/orchestrator sprint-bulk` through G1 / G2 (never an unpromoted Backlog task — step 3 promotes first). Route each task by type: new behaviour → `/tdd` · bug → `/diagnose` · hard-to-change → `/refactor-advisor` · a design that must be *felt* → `/prototype` first.
+4. **Build** — `/orchestrator sprint-bulk` through G1 / G2 (never an unpromoted Backlog task — step 3 promotes first). Route each task by type: new behaviour → `/tdd` (test-first, default) · bug → `/diagnose` · hard-to-change → `/refactor-advisor` · a design that must be *felt* → `/prototype` first.
 5. **Close** — all DoD ticked → `/lean-doc-generator close` (Retro → §10 buckets), then **`/release-patch` (PATCH) for a fixes-only sprint · MINOR by hand for a feature sprint**.
 6. **Continuity** — stopping mid-loop or context budget low → `/handoff`, so the next `/flow` resumes cleanly.
 

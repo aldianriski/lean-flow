@@ -55,10 +55,10 @@ the implement phase *actively* route a new-behaviour task through test-first, no
 `/tdd` or embeds the red-green step); exercised once on a real task.
 
 **DoD:**
-- [ ] orchestrator implement phase actively routes new-behaviour → test-first (not a bare suggestion)
-- [ ] CONTEXT.md implement-routing reflects the now-active behavior
-- [ ] exercised once on real input — L-007
-- [ ] caps respected (references/ landing if near cap)
+- [x] orchestrator implement phase actively routes new-behaviour → test-first (not a bare suggestion)
+- [x] CONTEXT.md implement-routing reflects the now-active behavior
+- [x] exercised once on real input — L-007
+- [x] caps respected (references/ landing if near cap)
 
 ### T3 — Surface all G1/G2 + grill questions as AskUserQuestion popups `[size: M · risk: med]`
 Layers: `skills/{orchestrator,task-decomposer,flow,council}/SKILL.md`
@@ -108,6 +108,15 @@ override. Edited `orchestrator/SKILL.md` (dispatch bullet + red-flag; 105→107/
 (build step guard). **L-007 exercise caught a bug**: the first draft keyed the gate on sprint
 *existence* ("no active sprint") — a Backlog task requested during an active sprint would slip through;
 re-keyed on sprint *membership* before commit.
+
+### 2026-07-10 | T2 done | /tdd is the default implement path
+Reworded orchestrator's Implement-routing blockquote from a passive suggestion to **test-first via
+`/tdd` by default**, and wired each mode's Implement step (quick/mvp/sprint-bulk) to point at it —
+the routing existed but no step referenced it, so it never fired. CONTEXT.md + `flow` mirror the
+default. All in-place; orchestrator held at 107/110. **Insight worth surfacing:** in lean-flow's own
+repo `/tdd` *correctly* never fires — it's all markdown skill prose with no harness (routing →
+"implement directly"); the gap item #8 flags is real for CONSUMER repos with testable code. The fix
+makes the default loud there while degrading gracefully here (L-015).
 
 ## Files Changed
 
