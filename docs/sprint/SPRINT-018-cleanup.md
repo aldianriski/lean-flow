@@ -4,7 +4,7 @@ slug: cleanup
 owner: Maintainer
 last_updated: 2026-07-10
 status: active
-plan_commit: pending
+plan_commit: 7a1cb9d
 close_commit: pending
 update_trigger: sprint execute/close events
 ---
