@@ -37,10 +37,7 @@ _(empty)_
 
 ### P2 — Quality / Polish
 
-<!-- (SPRINT-008…011 batches shipped; see docs/CHANGELOG.md) -->
-
-- TASK-045 — Council adopt-now hardening bundle → **done** 2026-07-02 (SPRINT-014 T2): pre-mortem · dialectical Contrarian · calibrated verdict · questions-first · ceiling · judge-bias hardening. See CHANGELOG.
-- TASK-046 — Council gated passes (fact-verify + unknown-unknowns moderator) → **done** 2026-07-02 (SPRINT-014 T3). See CHANGELOG.
+<!-- (SPRINT-008…011 batches + TASK-045 · 046 [SPRINT-014 council hardening] shipped; see docs/CHANGELOG.md) -->
 
 <!-- P2 batch (from 2026-07-10 decompose) — sequence AFTER the P1 loop-hardening sprint; 056 shares orchestrator/SKILL.md so it must not parallel-build with the P1 set (L-042). -->
 - [ ] **TASK-052 — Make `migrate` re-runnable as a plugin-update sync**  [size: M] [risk: med] [HITL]
@@ -80,7 +77,7 @@ _(empty)_
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
       state: blocked   (deferred — research hooks next session)
-- TASK-039 — Scan bmad-method → **done** 2026-07-02: [docs/research/bmad-adaptation.md](docs/research/bmad-adaptation.md) — 5 keepers, rest rejected (agent/config machinery + duplicates of leaner lean-flow equivalents). Keepers folded into TASK-037 (risk-tier + regression gate) · TASK-042 (mid-sprint scope-change) · TASK-043 (anti-sycophancy Review) · TASK-035 (halt-contract wording).
+<!-- TASK-039 done 2026-07-02 → docs/research/bmad-adaptation.md (5 keepers folded into TASK-037/042/043/035, rest rejected); see CHANGELOG. -->
 - [ ] **TASK-040 — Derived, on-demand graph VIEW over the metadata (relational comprehension)**  [size: L] [risk: med] [HITL]
       done-when: a graph view is GENERATED from TASK-036's frontmatter (transitive supersedes lineage · cross-sprint domain clusters · orphan/dangling detection) — a disposable build artifact, never hand-edited, regenerated from the SSOT. Guardrails (ALL mandatory, or don't build): (i) regeneration wired to lean-doc-generator's write step; (ii) read-time staleness check — the view carries a source checksum/mtime and fails LOUD if the frontmatter is newer (a stale CACHE, not a stale fact); (iii) integrity lint (shared with TASK-036). graphify serves this ad-hoc until it's worth automating.
       touches:   docs/ (corpus-wide) · a generation script/skill · graphify (on-demand)
@@ -95,13 +92,13 @@ _(empty)_
       also:      **data-governance blocker** (moderator, SPRINT-014 T3): a 2nd-provider backend widens the trust boundary — routes repo content to a vendor the host-repo owner never consented to, exposure peaking on exactly the rare high-stakes runs. Weigh (likely a consent/config gate) before any build.
       tracker:   docs/research/council-improvements.md (Option C, deferred) · verdict-council-multimodel.md (temp) · gated by TASK-048
       state:     blocked   (deferred — revisit only after TASK-048 measurement shows the ceiling is a real crack)
-- TASK-044 — Extend metadata SSOT + index to ADRs & research → **done** 2026-07-02 (SPRINT-014 T1): 9 ADR + 6 research carry ADR-009 frontmatter; `gen-index.sh` → `docs/knowledge-index.md`; qa-check corpus lints. See CHANGELOG.
+<!-- TASK-044 done (SPRINT-014 T1) → metadata SSOT + index extended to ADR/research; see CHANGELOG. -->
 - [ ] **TASK-048 — Measure whether /council's 5 personas actually diverge**  [size: S] [risk: low] [HITL]
       done-when: run today's single-model /council 3× on one real past decision; record whether the 5 personas substantively DISAGREE or just converge — the datapoint that says if the single-model ceiling is a real crack (→ unblocks or kills TASK-047) or a footnote.
       touches:   /council (exercise only) · a short findings note in docs/research/council-improvements.md
       tracker:   verdict-council-multimodel.md (the verdict's "one thing to do first") · gates TASK-047
       state:     ready
-- TASK-008 — Define `/insights` → **built** 2026-06-16, **shipped in v1.2.0** (2026-06-22): anytime friction → `L-NNN` candidate (bumps a match's `count`) into `docs/LEARNINGS.md` (the §10 feed).
+<!-- TASK-008 done → /insights shipped v1.2.0 (friction → L-NNN candidate); see CHANGELOG. -->
 
 > TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).
 
@@ -113,16 +110,8 @@ _(empty)_
      Filed by Sprint Close Retro. Aging at Promote: ≥3 sprints → re-review; high → auto P1.
      severity ∈ trivial · minor · medium · high. -->
 
-<!-- TD-001…004 collapsed at SPRINT-008 promote (resolved ≥3 sprints ago, §11) — full history in git + sprint files. -->
-- **TD-001** resolved → SPRINT-003 T1+T2 (migrate · council · verdict→ADR-006 feed — all exercised on real input)
-- **TD-002** resolved → SPRINT-005 T1 (council SKILL 341→60; artifacts → references/, ADR-006)
-- **TD-003** resolved → SPRINT-004 T1 (orchestrator SKILL → 107 ≤110; Review → references/)
-- **TD-004** resolved → SPRINT-005 T1 (cap-rule wording fixed — artifacts in references/ don't count; ADR-006)
-- **TD-005** resolved → SPRINT-006 T2 (CONTEXT 151→127 + cap 100→130, ADR-007)
-- **TD-006** severity: medium | status: resolved → SPRINT-009 T1 (2026-06-21)
-  - Summary: CONTEXT.md deduped 130 → 122 (built-in detail → ARCHITECTURE pointer; curated/loop/governance compressed); 8 lines recovered, no info lost. L-008 promoted at SPRINT-009 promote.
-- **TD-007** severity: medium | status: resolved (2026-07-02) | created: Sprint-012
-  - Summary: `skills/orchestrator/SKILL.md` was at 109/110. **Resolved** — compressed the § Review block (skip-table/scale-depth/routing detail already lived in `references/review-scoping.md`, a pure L-008 dedup) to a lean summary + pointer; recovered ~5 lines. Now well under cap.
+<!-- TD-001…007 all resolved (§11 collapse — per-TD summaries live in their sprint files + git). -->
+_(no open tech debt)_ — resolved: **TD-001**→SPRINT-003 · **TD-002/004**→SPRINT-005 · **TD-003**→SPRINT-004 · **TD-005**→SPRINT-006 · **TD-006**→SPRINT-009 · **TD-007**→SPRINT-012 (closed 2026-07-02).
 
 ---
 
