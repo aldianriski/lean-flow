@@ -3,9 +3,9 @@ sprint: 021
 slug: fog-mode-council-probe
 owner: Maintainer
 last_updated: 2026-07-10
-status: active
+status: closed
 plan_commit: 4ee5b5a
-close_commit:
+close_commit: [pending]
 update_trigger: sprint execute/close events
 ---
 
@@ -101,12 +101,26 @@ different tiers confirmed, didn't correct → no shared blind spot exposed. Cave
 | `docs/research/council-improvements.md` | T2 | § Factual decorrelation probe — cross-tier result | Low | doc |
 
 ## Retro
-<!-- Written at close. Route buckets (§10): shipped→CHANGELOG · debt→TD-NNN · follow-ups→TASK-NNN · learnings→L-NNN. Then archive (§11). -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no miss. Applied L-012 (references-first under cap), L-015 (consumer surface —
+README/CONTEXT + CHANGELOG), L-007 (exercise on real input), ADR-006 (references uncounted), A2 (cross-tier
+proxy limit). No prior L/ADR contradicted.
 
 **Worked**
+- Fog-mode was designed-by-example first (the graph+OKF map in-session), so T1 landed with its L-007 exercise already in hand — spec + real artifact in one.
+- Routing the fog-mode to *existing* skills (not reimplementing `/prototype`·grill) kept it a mode, roster 14 — the L-017 delta discipline applied to our own feature.
+- T2 stayed cheap (4 calls) and honest about its limits rather than overclaiming.
 
 **Friction**
+- T2 can't be conclusive by construction: you can't honestly manufacture a shared-blind-spot case, and cross-provider (the only real test) is exactly the dependency TASK-047 is gated on — the probe can fail to find a crack, never prove absence.
 
 **Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **L-019** — same-provider model tiers don't decorrelate *factual* errors: on a real factual claim the base dispatch tier was already correct, so Opus/Fable confirmed rather than corrected and Haiku honestly abstained. Cross-tier is a weak proxy; genuine error-decorrelation needs cross-*provider* — the exact cost that gates the multi-model backend.
+
+---
+
+### Retro buckets filed (§10)
+- **Shipped** → `docs/CHANGELOG.md` v1.10.0 (fog-map mode; T2 maintainer-side probe).
+- **Tech debt** → none new (TD-008 stays open).
+- **Follow-ups** → **TASK-047** note updated (bar raised: a cross-provider test must show a *corrected* error before build). No new TASK — 047 is more deferred than ever.
+- **Learnings** → **L-019** (new).

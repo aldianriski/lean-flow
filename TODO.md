@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-021 — Fog-Mode + Council Decorrelation Probe** → docs/sprint/SPRINT-021-fog-mode-council-probe.md
+> _(no active sprint — SPRINT-021 closed 2026-07-10 → v1.10.0; archived per §11.)_
 
 ---
 
@@ -66,10 +66,10 @@ _(empty)_
       next:      **gate behind cheaper steps, in order** (council verdict, SPRINT-014 T2 exercise): (1) MEASURE — run today's single-model council 3× on one real decision, check if the 5 personas actually diverge (if they already converge, "5 personas" is theater; if they diverge, the ceiling may be overstated); (2) exhaust cheap levers — per-persona temperature/seed/adversarial framing before any dependency; (3) if built, fix the SYNTHESIS BOTTLENECK too — multi-model advisors still funnel through one chairman, so a naive backend is a no-op. Build the provider dependency LAST.
       also:      **data-governance blocker** (moderator, SPRINT-014 T3): a 2nd-provider backend widens the trust boundary — routes repo content to a vendor the host-repo owner never consented to, exposure peaking on exactly the rare high-stakes runs. Weigh (likely a consent/config gate) before any build.
       reframe:   (2026-07-10, TASK-048 1× probe → SPRINT-020 T4) if ever built, the ONLY axiom-consistent shape is a **BYO-provider, opt-in, disabled-by-default** seam — the installer supplies + consents to their own 2nd provider; lean-flow ships an integration seam, never the trust boundary. Prerequisite is now **TASK-065** (measure error-decorrelation on a *factual* decision) — the judgment-fork probe couldn't test shared factual priors.
-      tracker:   docs/research/council-improvements.md § Divergence measurement · verdict-council-multimodel.md (temp) · gated by TASK-065
-      state:     blocked   (deferred — gated by TASK-065; the 1× probe found framing-divergence real but did not expose a factual-priors crack)
+      tracker:   docs/research/council-improvements.md §§ Divergence measurement · Factual decorrelation probe · verdict-council-multimodel.md (temp)
+      state:     blocked   (deferred, bar RAISED — TASK-048 (judgment) + TASK-065 (cross-tier factual) both found NO exposed crack; before any build, a cross-PROVIDER test must show a real shared factual error that a different provider corrects)
 <!-- TASK-044 done (SPRINT-014 T1) → metadata SSOT + index extended to ADR/research; see CHANGELOG. -->
-<!-- (TASK-064 · 065 promoted → SPRINT-021 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-021-fog-mode-council-probe.md) -->
+<!-- (TASK-064 · 065 shipped in SPRINT-021 → v1.10.0; see docs/CHANGELOG.md) -->
 <!-- TASK-008 done → /insights shipped v1.2.0 (friction → L-NNN candidate); see CHANGELOG. -->
 
 > TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).

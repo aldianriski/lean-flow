@@ -11,6 +11,28 @@ status: current
 
 ---
 
+## v1.10.0 — Fog-Mode (2026-07-10)
+
+MINOR — bundles **SPRINT-021**.
+
+**What changed for you:**
+- **`/task-decomposer` gains a fog-map mode** (`--fog`, or offered when the intake grill reveals the
+  frontier is unknowable) — for work *too foggy/large to plan up front*, where you can't write acceptance
+  criteria because the decisions aren't known yet. It produces a living **fog-map** (Destination ·
+  Decisions-so-far · Not-yet-specified · Out-of-scope) of **decision-tickets** (research / prototype /
+  grilling / task) that **route to existing skills** (`/prototype`, grill, research-spike) and **graduate
+  into `TASK-NNN`** as the fog clears — then you decompose normally. It sequences what lean-flow already
+  has; it doesn't add a skill (roster stays 14). Detail → `task-decomposer/references/fog-map.md`.
+
+**Maintainer-side only:** a cross-tier factual-decorrelation probe (TASK-065) found no divergence — the
+base dispatch tier was already correct, so different Anthropic tiers confirmed rather than corrected;
+combined with TASK-048 it raises the bar on the deferred multi-model backend (TASK-047), which now needs a
+*cross-provider* test showing a corrected error before any build. Recorded in `council-improvements.md`.
+
+Manifests → 1.10.0 lockstep; skill roster unchanged (14 — fog-map is a mode). Additive — nothing to migrate.
+
+---
+
 ## v1.9.0 — Workflow Hardening (2026-07-10)
 
 MINOR — bundles **SPRINT-020** (mattpocock-scan keepers + a `/council` divergence probe).
