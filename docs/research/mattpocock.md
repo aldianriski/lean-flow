@@ -3,7 +3,7 @@ owner: Maintainer
 last_updated: 2026-07-10
 status: current
 id: mattpocock-adaptation
-tags: [process, architecture]
+tags: [process, tooling]
 domain: governance
 related: [model-purpose]
 ---

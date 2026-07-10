@@ -22,13 +22,21 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
+## L-018 [tags: process] [status: active]: A single-model `/council` diverges on *framing* but not (testably) on shared *factual* priors — so "5 personas = theater" is false for framing. Measured (TASK-048, SPRINT-020 T4): on a judgment fork the 5 personas surfaced 5 *distinct* decision dimensions (First Principles strongest 3/5; the lone build-lens flagged biggest blind-spot 5/5) — genuine framing divergence, matching council-improvements finding #4 (single-model reduces framing blind spots). But a judgment fork has no external-facts surface, so it CANNOT test shared knowledge/factual gaps — the real ceiling. Pattern: measure council divergence on the axis you actually doubt; framing divergence is demonstrable and real, the shared-factual-priors crack needs a FACTUAL decision to expose (→ TASK-065).
+- seen: Sprint-020
+- count: 1
+- promoted: no
+- related: L-014 (adversarial fact-verify catches shared-prior misattribution) · council-improvements.md finding #4
+
+---
+
 ## L-017 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern (adoption = delta over existing surface). An adoption scan judges the DELTA over lean-flow's existing surface, not the tool's standalone merit — map each candidate to what we already have FIRST; only the unmatched remainder is a keeper. Seen Sprint-014 (bmad → 5 keepers) + Sprint-016 (structarmed → 0 · brainstorming → ~90% owned) (count 2). Related: ADR-001 · L-015.
 
 ---
 
 ## L-016 [tags: process] [status: active]: A skill/tool repo can't dogfood a feature whose substrate it lacks — judge it on the CONSUMER path. lean-flow is markdown-only, so `/tdd` *correctly* never fires in its own loop (Implement-routing → implement-directly, no harness); SPRINT-015 T2 confirmed the "TDD never invoked" gap (item #8) is real only for **consumer repos with testable code**, by tracing the consumer path rather than the dogfood path. Pattern: when a change targets consumer behaviour the host repo can't itself exercise, verify by tracing the consumer scenario — don't read "didn't fire in our repo" as either "broken" or "fine".
-- seen: Sprint-015
-- count: 1
+- seen: Sprint-015 · Sprint-020 (T1 skill-powered-dispatch `/tdd` path — exercised the mechanism, marked `/tdd` claim consumer-path)
+- count: 2
 - promoted: no
 - related: L-015 (consumer-facing surface) · L-007 (exercise on real input) · L-002 (grill firing)
 

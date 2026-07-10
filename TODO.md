@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-020 — Workflow Hardening** → docs/sprint/SPRINT-020-workflow-hardening.md
+> _(no active sprint — SPRINT-020 closed 2026-07-10 → v1.9.0; archived per §11.)_
 
 ---
 
@@ -41,6 +41,7 @@ _(empty)_
 
 <!-- (TASK-055 · 052 · 059 shipped in SPRINT-017 → v1.7.0; see docs/CHANGELOG.md) -->
 <!-- (TASK-056 shipped in SPRINT-019 → v1.8.0 · ADR-010; see docs/CHANGELOG.md) -->
+<!-- (TASK-062 · 061 · 063 · 048 shipped in SPRINT-020 → v1.9.0; see docs/CHANGELOG.md) -->
 
 ### P3 — Long-term
 
@@ -63,10 +64,16 @@ _(empty)_
       assumes:   requires a prior call on whether lean-flow takes a provider dependency at all (likely /council-worthy itself).
       next:      **gate behind cheaper steps, in order** (council verdict, SPRINT-014 T2 exercise): (1) MEASURE — run today's single-model council 3× on one real decision, check if the 5 personas actually diverge (if they already converge, "5 personas" is theater; if they diverge, the ceiling may be overstated); (2) exhaust cheap levers — per-persona temperature/seed/adversarial framing before any dependency; (3) if built, fix the SYNTHESIS BOTTLENECK too — multi-model advisors still funnel through one chairman, so a naive backend is a no-op. Build the provider dependency LAST.
       also:      **data-governance blocker** (moderator, SPRINT-014 T3): a 2nd-provider backend widens the trust boundary — routes repo content to a vendor the host-repo owner never consented to, exposure peaking on exactly the rare high-stakes runs. Weigh (likely a consent/config gate) before any build.
-      tracker:   docs/research/council-improvements.md (Option C, deferred) · verdict-council-multimodel.md (temp) · gated by TASK-048
-      state:     blocked   (deferred — revisit only after TASK-048 measurement shows the ceiling is a real crack)
+      reframe:   (2026-07-10, TASK-048 1× probe → SPRINT-020 T4) if ever built, the ONLY axiom-consistent shape is a **BYO-provider, opt-in, disabled-by-default** seam — the installer supplies + consents to their own 2nd provider; lean-flow ships an integration seam, never the trust boundary. Prerequisite is now **TASK-065** (measure error-decorrelation on a *factual* decision) — the judgment-fork probe couldn't test shared factual priors.
+      tracker:   docs/research/council-improvements.md § Divergence measurement · verdict-council-multimodel.md (temp) · gated by TASK-065
+      state:     blocked   (deferred — gated by TASK-065; the 1× probe found framing-divergence real but did not expose a factual-priors crack)
 <!-- TASK-044 done (SPRINT-014 T1) → metadata SSOT + index extended to ADR/research; see CHANGELOG. -->
-<!-- (TASK-062 · 061 · 063 · 048 promoted → SPRINT-020 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-020-workflow-hardening.md) -->
+- [ ] **TASK-065 — Measure cross-model error-decorrelation on a factual decision**  [size: S] [risk: low] [HITL]
+      done-when: run a council-style comparison on a real decision that turns on EXTERNAL FACTS (not a pure judgment fork), recording whether a genuinely different model catches factual errors the single-model council's personas all share — the datapoint the TASK-048 judgment probe structurally could not produce. Result gates TASK-047.
+      touches:   /council (exercise only) · docs/research/council-improvements.md § Divergence measurement
+      assumes:   the crack (if any) is in shared FACTUAL priors, not framing (TASK-048 showed framing-divergence is already real).
+      tracker:   docs/research/council-improvements.md · gates TASK-047
+      state:     ready
 - [ ] **TASK-064 — Design spike: wayfinder-style fog-mode for /task-decomposer**  [size: M] [risk: med] [HITL]
       done-when: decision recorded on whether foggy work too big to slice needs a pre-decomposition "fog map" mode (decision-resolving tickets + fog-graduation) in /task-decomposer, or whether /prototype + research-spike already cover it. Needs a real foggy problem to test against.
       touches:   skills/task-decomposer/ (design only) · docs/research/mattpocock.md (findings)

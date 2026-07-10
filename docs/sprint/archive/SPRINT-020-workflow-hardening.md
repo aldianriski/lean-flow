@@ -3,9 +3,9 @@ sprint: 020
 slug: workflow-hardening
 owner: Maintainer
 last_updated: 2026-07-10
-status: active
+status: closed
 plan_commit: d2b8fde
-close_commit:
+close_commit: [pending]
 update_trigger: sprint execute/close events
 ---
 
@@ -151,12 +151,26 @@ BYO-provider opt-in-disabled-by-default reframe as the only axiom-consistent pat
 | `docs/research/council-improvements.md` | T4 | § Divergence measurement — 1× probe result | Low | doc |
 
 ## Retro
-<!-- Written at close. Route buckets (DOCS_Guide §10): shipped→CHANGELOG · debt→TD-NNN · follow-ups→TASK-NNN · learnings→L-NNN. Then archive (§11). -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no miss. Correctly applied L-016 (dogfood-vs-consumer), L-042/L-037 (shared-file
+overlap → T1-before-T2, per-hunk), L-012 (near-cap → `references/` + reword-in-place), L-007 (exercise on
+real input), ADR-002 (agent-free) + ADR-010 (dispatch). No prior L/ADR contradicted.
 
 **Worked**
+- Recon-first G1/G2 caught the two real constraints up front (108/110 cap · T1∩T2 overlap) so the loop never stalled.
+- Landing behaviour in `references/` (uncounted, ADR-006) kept both near-cap SKILLs safe (L-012).
+- The T4 probe was self-targeting (councilled TASK-047 itself) — one run yielded both the divergence datapoint AND a usable verdict + reframe for the gated task.
 
 **Friction**
+- L-016 bit again: T1's `/tdd`-dispatch path can't be dogfooded in a markdown repo — had to exercise the mechanism (a dispatched subagent invokes a plugin skill) and mark the `/tdd` claim consumer-path. 2nd occurrence → L-016 bumped to count 2.
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **L-018** — a single-model `/council` diverges on *framing* (measured T4: 5 distinct dimensions, First Principles strongest 3/5, lone build-lens blind-spot 5/5) but a judgment fork can't test shared *factual* priors; so "5 personas = theater" is false for framing — the real ceiling is shared knowledge, testable only on a factual decision.
+
+---
+
+### Retro buckets filed (§10)
+- **Shipped** → `docs/CHANGELOG.md` v1.9.0 (T1–T4).
+- **Tech debt** → none new (TD-008 stays open — re-review flagged at promote; not touched this sprint).
+- **Follow-ups** → **TASK-065** (measure cross-model error-decorrelation on a *factual* decision — the real gate for TASK-047); **TASK-047** note updated (BYO-provider opt-in-disabled-by-default reframe). 3× cross-run council check NOT filed (probe wasn't borderline).
+- **Learnings** → **L-018** (new); **L-016** bumped to count 2 (→ promotion candidate at next promote).
