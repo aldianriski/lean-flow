@@ -53,9 +53,9 @@ Separate two independent review axes — **Standards** (obeys repo conventions?)
 **Acceptance:** the review guidance names both axes and states they are reported separately.
 
 **DoD:**
-- [ ] Review guidance separates Standards vs Spec as two independent axes
-- [ ] Axes reported without merging / re-ranking (the separation principle stated)
-- [ ] Landed cap-safe in `orchestrator/SKILL.md` (reword-in-place / `references/`; ≤110)
+- [x] Review guidance separates Standards vs Spec as two independent axes
+- [x] Axes reported without merging / re-ranking (the separation principle stated)
+- [x] Landed cap-safe in `orchestrator/SKILL.md` (reword-in-place / `references/`; ≤110)
 
 ### T3 — Name expand–contract in `/refactor-advisor` `[size: S · risk: low]`
 Layers: `skills/refactor-advisor/SKILL.md` or `references/deepening.md`
@@ -113,6 +113,11 @@ a real `general-purpose` sonnet sub-agent that invoked the `lean-flow:prime` plu
 health block — mechanism C confirmed end-to-end. `/tdd`-path claim is consumer-path (L-016). G2 gate T4
 scoped to a 1× probe by owner (3× cross-run → conditional follow-up).
 
+### 2026-07-10 | T2 done | Standards-vs-Spec review split
+Added § Two axes to `review-scoping.md` (uncounted reference) — Standards (conventions + smell baseline)
+vs Spec (builds the right thing), reported separately, never merged/re-ranked. SKILL.md L96 pointer +2
+words (still 107/110).
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -120,6 +125,8 @@ scoped to a 1× probe by owner (3× cross-run → conditional follow-up).
 | `docs/adr/ADR-010-*.md` | T1 | amendment: skill-powered execution dispatch (mech C) | Low | doc |
 | `skills/orchestrator/SKILL.md` | T1 | dispatch note → hand subagent its procedure skill | Low | cap 107/110 |
 | `.claude/CONTEXT.md` | T1 | dispatch contract line reflects skill-powered dispatch | Low | cap 127/130 |
+| `skills/orchestrator/references/review-scoping.md` | T2 | new § Two axes — Standards vs Spec, reported separately | Low | reference (uncounted) |
+| `skills/orchestrator/SKILL.md` | T2 | L96 pointer adds "Standards-vs-Spec axes" | Low | cap 107/110 |
 
 ## Retro
 <!-- Written at close. Route buckets (DOCS_Guide §10): shipped→CHANGELOG · debt→TD-NNN · follow-ups→TASK-NNN · learnings→L-NNN. Then archive (§11). -->

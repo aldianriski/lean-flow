@@ -14,6 +14,19 @@ Hand each review pass a brief, not the repo:
 Tell the pass explicitly: *"Review the diff and its blast radius. Do not survey the rest of the repo."*
 A reviewer with a bounded brief is both cheaper and sharper.
 
+## Two axes — Standards vs Spec (report separately)
+
+A review answers two independent questions, and a change can pass one while failing the other:
+
+- **Standards** — does the code obey the repo's conventions? (naming, structure, and the smell baseline —
+  duplicated code, feature envy, mysterious names, data clumps; documented repo standards override the baseline.)
+- **Spec** — does it build the *right thing*? (correctness against the task's `done-when` / acceptance.)
+
+Report the two axes **separately — never merge or re-rank them into one list**. Perfect code that builds
+the wrong feature, and the right feature that violates every convention, are *different* failures; folding
+them into a single ranking lets a strong showing on one axis mask a defect on the other. Close with the
+single worst finding **per axis**, kept apart. (mattpocock/skills → code-review, the separation principle.)
+
 ## Skip table — which passes actually fire
 
 Don't fire every pass on every change. Decide per diff:

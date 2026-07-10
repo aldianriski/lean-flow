@@ -93,7 +93,7 @@ biggest token sink). A **skip table** + **scale-depth** rule decide what fires: 
 only · small/med → one scoped `sonnet` reviewer · large/high-risk → `/code-review` · behaviour change →
 `/run` + `/verify` · auth/input/secrets → `/security-review` · bug → `/diagnose`.
 
-Full routing · skip table · adversarial floor · self-review checklist → `references/review-scoping.md`.
+Full routing · skip table · the Standards-vs-Spec axes · adversarial floor · self-review checklist → `references/review-scoping.md`.
 
 ## Red flags
 
