@@ -22,11 +22,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-017 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern (adoption = delta over existing surface). An adoption scan judges the DELTA over existing surface, not the tool's standalone merit. When evaluating an external repo/skill for adoption (curated-not-copied), map each candidate technique to **what lean-flow already has FIRST** — only the unmatched remainder is a real keeper. brainstorming (TASK-050) looked adoptable but was ~90% owned surface (G2 · decomposer grill+popups · /prototype · /council · YAGNI) → reject-the-skill, keep 2 micro-ideas; structarmed (TASK-049) was a domain mismatch (0 keepers); bmad (TASK-039) distilled 5 keepers the same way. Pattern: the keeper test is the gap over existing, so build the "already have" map before judging merit — it turns most scans into fast, honest rejects.
-- seen: Sprint-014 (bmad) · Sprint-016 (structarmed + brainstorming)
-- count: 2
-- promoted: yes → CLAUDE.md anti-pattern (2026-07-10)
-- related: ADR-001 (curated-not-copied) · L-015 (consumer-facing surface)
+## L-017 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern (adoption = delta over existing surface). An adoption scan judges the DELTA over lean-flow's existing surface, not the tool's standalone merit — map each candidate to what we already have FIRST; only the unmatched remainder is a keeper. Seen Sprint-014 (bmad → 5 keepers) + Sprint-016 (structarmed → 0 · brainstorming → ~90% owned) (count 2). Related: ADR-001 · L-015.
 
 ---
 

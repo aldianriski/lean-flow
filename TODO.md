@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-019 closed 2026-07-10 → v1.8.0; archived per §11.)_
+> **SPRINT-020 — Workflow Hardening** → docs/sprint/SPRINT-020-workflow-hardening.md
 
 ---
 
@@ -66,11 +66,13 @@ _(empty)_
       tracker:   docs/research/council-improvements.md (Option C, deferred) · verdict-council-multimodel.md (temp) · gated by TASK-048
       state:     blocked   (deferred — revisit only after TASK-048 measurement shows the ceiling is a real crack)
 <!-- TASK-044 done (SPRINT-014 T1) → metadata SSOT + index extended to ADR/research; see CHANGELOG. -->
-- [ ] **TASK-048 — Measure whether /council's 5 personas actually diverge**  [size: S] [risk: low] [HITL]
-      done-when: run today's single-model /council 3× on one real past decision; record whether the 5 personas substantively DISAGREE or just converge — the datapoint that says if the single-model ceiling is a real crack (→ unblocks or kills TASK-047) or a footnote.
-      touches:   /council (exercise only) · a short findings note in docs/research/council-improvements.md
-      tracker:   verdict-council-multimodel.md (the verdict's "one thing to do first") · gates TASK-047
-      state:     ready
+<!-- (TASK-062 · 061 · 063 · 048 promoted → SPRINT-020 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-020-workflow-hardening.md) -->
+- [ ] **TASK-064 — Design spike: wayfinder-style fog-mode for /task-decomposer**  [size: M] [risk: med] [HITL]
+      done-when: decision recorded on whether foggy work too big to slice needs a pre-decomposition "fog map" mode (decision-resolving tickets + fog-graduation) in /task-decomposer, or whether /prototype + research-spike already cover it. Needs a real foggy problem to test against.
+      touches:   skills/task-decomposer/ (design only) · docs/research/mattpocock.md (findings)
+      assumes:   fold into /task-decomposer as a mode, NOT a new skill (roster stays 14)
+      tracker:   docs/research/mattpocock.md § Out of scope (wayfinder fog-mode)
+      state:     needs-info   (worth building vs already covered — settle at next promote)
 <!-- TASK-008 done → /insights shipped v1.2.0 (friction → L-NNN candidate); see CHANGELOG. -->
 
 > TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).
