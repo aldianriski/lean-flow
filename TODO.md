@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-015 closed 2026-07-10 → v1.6.0; archived per §11.)_
+> **SPRINT-016 — Research Spikes** → docs/sprint/SPRINT-016-research-spikes.md  (active · 3 tasks: T1 structarmed · T2 brainstorming · T3 init-decision)
 
 ---
 
@@ -57,22 +57,7 @@ _(empty)_
 
 ### P3 — Long-term
 
-<!-- Research / decide-first batch (from 2026-07-10 decompose) — independent, docs-only, fully parallel. -->
-- [ ] **TASK-049 — Scan structarmed repo for adaptable patterns**  [size: S] [risk: low] [HITL]
-      done-when: docs/research/structarmed-adaptation.md lists keepers vs rejects (curated-not-copied bar), mirroring the bmad scan (TASK-039)
-      touches:   docs/research/
-      tracker:   https://github.com/boundwize/structarmed
-      state:     ready
-- [ ] **TASK-050 — Evaluate obra 'brainstorming' skill (spike, don't build)**  [size: S] [risk: low] [HITL]
-      done-when: docs/research/brainstorming-adaptation.md — keepers/rejects; a follow-up build task filed ONLY for what clears the useful+important+used bar
-      touches:   docs/research/
-      tracker:   https://crossaitools.com/skills/obra/superpowers/brainstorming
-      state:     ready
-- [ ] **TASK-051 — Decide whether lean-flow needs an `init` (new-repo adaptation)**  [size: M] [risk: med] [HITL]
-      done-when: recorded decision (ADR or note) on whether to add an init/onboarding command that scaffolds a fresh repo's context docs (+ optional .claude/settings.json safe-command allowlist) — the greenfield twin of migrate
-      touches:   skills/lean-doc-generator/ or /prime · docs/adr/ (if adopted)
-      assumes:   overlaps TASK-052 (migrate); decide the split before either builds
-      state:     ready   (decide-first; do NOT build settings.json scaffolding until approved)
+<!-- (TASK-049 · 050 · 051 promoted → SPRINT-016 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-016-research-spikes.md) -->
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
