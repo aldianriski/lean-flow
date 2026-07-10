@@ -47,9 +47,9 @@ gates/review prose (currently absent from the SSOT).
 **Acceptance:** a dispatched reviewer is instructed to report Standards vs Spec separately; CONTEXT records it.
 
 **DoD:**
-- [ ] reviewer brief instructs: report Standards vs Spec separately, never merged (review-scoping.md dispatch/brief section)
-- [ ] CONTEXT.md gates/review note records the two-axis split
-- [ ] `CONTEXT.md` ≤130
+- [x] reviewer brief instructs: report Standards vs Spec separately, never merged (review-scoping.md "Scope every pass" brief)
+- [x] CONTEXT.md records the two-axis split (§ Built-in leverage, `/code-review` mention)
+- [x] `CONTEXT.md` ≤130 (127)
 
 ### T3 — Route foggy intent to fog-mode (orchestrator + flow + CONTEXT) `[size: S · risk: low]`
 Layers: `skills/orchestrator/SKILL.md` (freeform routing) · `skills/flow/SKILL.md` (Feed) · `.claude/CONTEXT.md` (feed-pipeline)
@@ -84,11 +84,18 @@ deferred (file lean). Plan frozen.
 Scoped "Dispatch by role" with "fires at every Implement step" + Implement-routing note now points to it
 — the dispatch-with-skill mechanism is no longer orphaned from the steps that trigger it.
 
+### 2026-07-10 | T2 done | Standards-vs-Spec injected
+Two-axis instruction now IN the reviewer's brief-injection line (review-scoping.md) — a dispatched
+reviewer is told to report Standards vs Spec separately, never merged. Recorded in CONTEXT § Built-in
+leverage. The principle now fires, not just documents.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `skills/orchestrator/SKILL.md` | T1 | dispatch note scoped to Implement steps + routing note links to it | Low | cap 107/110 |
+| `skills/orchestrator/references/review-scoping.md` | T2 | two-axis instruction injected into the reviewer brief | Low | reference |
+| `.claude/CONTEXT.md` | T2 | § Built-in leverage records Standards-vs-Spec split | Low | cap 127/130 |
 
 ## Retro
 <!-- Written at close. Route buckets (§10). Then archive (§11). PATCH → /release-patch. -->

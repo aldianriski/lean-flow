@@ -41,7 +41,7 @@ Every skill works standalone; the loop is just the order they reward most togeth
 ## Built-in leverage
 
 lean-flow ships **no agents/hooks** — it dispatches Claude's built-ins in **isolated passes** (fresh
-context): recon→`Explore` · `/code-review` (small/med → one scoped `sonnet`) · `/verify` ·
+context): recon→`Explore` · `/code-review` (small/med → one scoped `sonnet`; reports **Standards vs Spec** separately) · `/verify` ·
 `/security-review` · `/council` (internal sub-agents); commands `/goal /plan /batch /loop /run /simplify
 /fork`. Full wiring + cloud tools out of lean scope (`/workflows` · `/ultracode` · `/ultraplan` /
 `/ultrareview`) → ARCHITECTURE.md § Key integration points.

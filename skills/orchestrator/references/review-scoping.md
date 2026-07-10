@@ -11,8 +11,10 @@ Hand each review pass a brief, not the repo:
 - the changed files, and
 - their **direct callers / dependents** (the blast radius — one hop, not the transitive closure).
 
-Tell the pass explicitly: *"Review the diff and its blast radius. Do not survey the rest of the repo."*
-A reviewer with a bounded brief is both cheaper and sharper.
+Tell the pass explicitly: *"Review the diff and its blast radius. Do not survey the rest of the repo.
+Report two independent axes — **Standards** (repo conventions) and **Spec** (builds the right thing) —
+separately, never merged or re-ranked."* A reviewer with a bounded brief is both cheaper and sharper.
+(The two axes are defined below; injecting them here is what makes the split actually fire.)
 
 ## Two axes — Standards vs Spec (report separately)
 
