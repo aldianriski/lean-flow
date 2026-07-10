@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-02
+last_updated: 2026-07-10
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-014 closed 2026-07-02; archived per §11.)_
+> **SPRINT-015 — Loop Hardening** → docs/sprint/SPRINT-015-loop-hardening.md  (active · 3 tasks: T1 gate-build · T2 tdd-standard · T3 popup-audit)
 
 ---
 
@@ -32,6 +32,7 @@ status: current
 
 <!-- (prior P1 batch — TASK-009 · 013 · 017 · 010 — shipped in SPRINT-008; TASK-035 shipped in SPRINT-012; see docs/CHANGELOG.md) -->
 
+<!-- TASK-053 · 057 · 054 promoted → SPRINT-015 (active) 2026-07-10; live plan + DoD in docs/sprint/SPRINT-015-loop-hardening.md. -->
 _(empty)_
 
 ### P2 — Quality / Polish
@@ -41,8 +42,40 @@ _(empty)_
 - TASK-045 — Council adopt-now hardening bundle → **done** 2026-07-02 (SPRINT-014 T2): pre-mortem · dialectical Contrarian · calibrated verdict · questions-first · ceiling · judge-bias hardening. See CHANGELOG.
 - TASK-046 — Council gated passes (fact-verify + unknown-unknowns moderator) → **done** 2026-07-02 (SPRINT-014 T3). See CHANGELOG.
 
+<!-- P2 batch (from 2026-07-10 decompose) — sequence AFTER the P1 loop-hardening sprint; 056 shares orchestrator/SKILL.md so it must not parallel-build with the P1 set (L-042). -->
+- [ ] **TASK-052 — Make `migrate` re-runnable as a plugin-update sync**  [size: M] [risk: med] [HITL]
+      done-when: re-running migrate on an already-adopted repo pulls forward new standard/template changes from a plugin update — idempotent, reports what changed, never clobbers user edits
+      touches:   skills/lean-doc-generator/SKILL.md (migrate) · references/DOCS_Guide.md
+      assumes:   overlaps TASK-051 (init) — coordinate the migrate/init split before either builds
+      state:     ready
+- [ ] **TASK-055 — close: sweep the full session for TD + follow-ups**  [size: M] [risk: med] [HITL]
+      done-when: /lean-doc close's §10 Retro routing captures ALL tech-debt + follow-up items surfaced during the session into TD-NNN / TASK-NNN — not only items already written down
+      touches:   skills/lean-doc-generator/SKILL.md (close) · references/DOCS_Guide.md §10
+      state:     ready
+- [ ] **TASK-056 — Wire recon-delegation + per-phase model tiers into orchestrator**  [size: M] [risk: med] [HITL]
+      done-when: orchestrator's procedure explicitly triggers a read-only recon (Explore, cheap tier) before implementing on mature/unfamiliar code, AND assigns model tiers per phase (plan=session/large · build=cheap/small · recon+ingest=fast) so tiering actually fires — not just documented. Mirrors kalasuara L-026.
+      touches:   skills/orchestrator/SKILL.md · .claude/CONTEXT.md (Model tiers)
+      assumes:   builds on the existing tier table (TASK-018); likely /council (changes the loop); shares orchestrator/SKILL.md with the P1 set — serialize
+      state:     ready
+
 ### P3 — Long-term
 
+<!-- Research / decide-first batch (from 2026-07-10 decompose) — independent, docs-only, fully parallel. -->
+- [ ] **TASK-049 — Scan structarmed repo for adaptable patterns**  [size: S] [risk: low] [HITL]
+      done-when: docs/research/structarmed-adaptation.md lists keepers vs rejects (curated-not-copied bar), mirroring the bmad scan (TASK-039)
+      touches:   docs/research/
+      tracker:   https://github.com/boundwize/structarmed
+      state:     ready
+- [ ] **TASK-050 — Evaluate obra 'brainstorming' skill (spike, don't build)**  [size: S] [risk: low] [HITL]
+      done-when: docs/research/brainstorming-adaptation.md — keepers/rejects; a follow-up build task filed ONLY for what clears the useful+important+used bar
+      touches:   docs/research/
+      tracker:   https://crossaitools.com/skills/obra/superpowers/brainstorming
+      state:     ready
+- [ ] **TASK-051 — Decide whether lean-flow needs an `init` (new-repo adaptation)**  [size: M] [risk: med] [HITL]
+      done-when: recorded decision (ADR or note) on whether to add an init/onboarding command that scaffolds a fresh repo's context docs (+ optional .claude/settings.json safe-command allowlist) — the greenfield twin of migrate
+      touches:   skills/lean-doc-generator/ or /prime · docs/adr/ (if adopted)
+      assumes:   overlaps TASK-052 (migrate); decide the split before either builds
+      state:     ready   (decide-first; do NOT build settings.json scaffolding until approved)
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
