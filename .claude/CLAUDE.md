@@ -65,7 +65,7 @@ resumes it. Every skill is also usable standalone. See `.claude/CONTEXT.md` for 
 - [ ] **Consumer-facing surface checked** — generic skills/templates stay self-contained + adaptable (no leaked `scripts/…` path); README + CHANGELOG reflect any user-visible change (L-015)
 
 ## Behavioral Guidelines
-- **Think before acting** — surface assumptions; ask on ambiguous requirements; never fabricate. Multiple interpretations? Present them — don't pick silently. Push back when a simpler approach exists.
+- **Think before acting** — surface assumptions; ask on ambiguous requirements; never fabricate. Multiple interpretations? Present them — don't pick silently. **A blocking/clarifying question is *asked* — surface it as an AskUserQuestion popup, never buried in inline prose; everywhere, not only inside skill flows (L-002 · SPRINT-015 T3 scoped it to skills; this globalizes it).** Push back when a simpler approach exists.
 - **Simplicity first** — minimum content that satisfies the goal; no speculative sections. Climb the *laziness ladder*: YAGNI → reuse existing → stdlib → native → installed dep → one line → minimal code — **stop at the first working rung**. Delete > add; root-cause > symptom. If it reads overcomplicated, rewrite it shorter.
 - **Surgical changes** — touch only what the task requires; match adjacent style. Clean up only your own mess — **don't delete pre-existing content/sections you didn't touch; mention them instead**. Every changed line traces to the request.
 - **Goal-driven** — restate the task as a verifiable goal before acting; for multi-step work, a brief plan with a check per step, loop until verified.
