@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-017 closed 2026-07-10 → v1.7.0; archived per §11.)_
+> **SPRINT-018 — Cleanup** → docs/sprint/SPRINT-018-cleanup.md  (active · 2 tasks: T1 brainstorming-fold · T2 qa-check-scope)
 
 ---
 
@@ -49,16 +49,7 @@ _(empty)_
 ### P3 — Long-term
 
 <!-- (TASK-049 · 050 · 051 promoted → SPRINT-016 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-016-research-spikes.md) -->
-- [ ] **TASK-058 — Fold brainstorming keepers (K1/K2) into G2 / anti-patterns**  [size: S] [risk: low] [HITL]
-      done-when: /orchestrator G2 (and/or CLAUDE.md anti-patterns) names the "too simple to need a design" rationalization as a red-flag (K1); optionally K2 — offer section-by-section approval for L designs. Nothing else from the obra brainstorming skill is built.
-      touches:   skills/orchestrator/SKILL.md · .claude/CLAUDE.md
-      tracker:   docs/research/brainstorming-adaptation.md (TASK-050 verdict)
-      state:     ready
-- [ ] **TASK-060 — qa-check: scope the corpus lint to TRACKED files (ignore stray untracked .md)**  [size: S] [risk: low] [HITL]
-      done-when: scripts/qa-check.sh's corpus metadata lint checks only git-tracked docs/ files, so a stray/untracked working-tree .md (e.g. a WIP research file) no longer fails the gate
-      touches:   scripts/qa-check.sh
-      tracker:   surfaced by SPRINT-017 T1 close-sweep (the mattpocock.md friction, SPRINT-016)
-      state:     ready
+<!-- (TASK-058 · 060 promoted → SPRINT-018 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-018-cleanup.md) -->
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
