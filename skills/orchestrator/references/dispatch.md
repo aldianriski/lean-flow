@@ -26,7 +26,18 @@ context) with the relevant **procedure skill** invoked at runtime via the Skill 
 paraphrased brief drifts from it (ADR-010 skill-dispatch amendment, mechanism C).
 
 ## Parallel vs sequential
-<!-- Filled by SPRINT-023 T3. -->
+
+Decide from the **G2 overlap-ownership map** — the same map that assigns shared-file single-owner + order:
+
+- **Parallel** — a task with **no shared file AND no `depends-on`** is independent. Dispatch independent
+  tasks concurrently by issuing **multiple Agent calls in a single assistant message** (they run as
+  background sub-agents). This is the speed win of `sprint-bulk`.
+- **Sequential** — a task that **shares a file** (per the overlap map) or has a `depends-on` runs after its
+  predecessor, in the ownership/commit order; stage shared files per-hunk (`git add -p`) — L-042/L-037.
+
+Group the Plan into **parallel batches separated by sequential barriers**: fan out each batch of independent
+tasks in one message, await it, then the next. For large disjoint fan-out where you want determinism +
+worktree isolation, escalate to `/batch` (one worktree sub-agent per unit → PR each; `/workflows` watches).
 
 ## Escalation
 

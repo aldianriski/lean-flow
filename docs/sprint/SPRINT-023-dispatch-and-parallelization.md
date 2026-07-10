@@ -61,9 +61,9 @@ or with a dependency run **sequential**. The overlap map (D2) is the input.
 **Acceptance:** sprint-bulk states the parallel/sequential rule + the concrete mechanism (parallel = one message, multiple calls).
 
 **DoD:**
-- [ ] sprint-bulk Sequence step decides parallel (disjoint + no depends-on) vs sequential (shared/dependent) from the overlap map
-- [ ] the mechanism is concrete (parallel = multiple Agent calls in one assistant message)
-- [ ] `/batch`·`/workflows` named as the deterministic escalation for large disjoint fan-out (the ceiling)
+- [x] sprint-bulk Sequence step decides parallel (disjoint + no depends-on) vs sequential (shared/dependent) from the overlap map
+- [x] the mechanism is concrete (parallel = multiple Agent calls in one assistant message)
+- [x] `/batch`·`/workflows` named as the deterministic escalation for large disjoint fan-out (the ceiling)
 
 ### T4 — ADR-010 amendment `[size: S · risk: low]`
 Layers: `docs/adr/ADR-010` · `.claude/CONTEXT.md` (iff wording)
@@ -109,6 +109,12 @@ classification (execution→Sonnet · mechanical→Haiku by default; decision/tr
 nature not size (model-purpose.md), hand the sub-agent its procedure skill. SKILL "Dispatch by role" note
 reworded in place (108/110). Fixes the observed "orchestrator does everything inline" behavior.
 
+### 2026-07-10 | T3 done | parallel/sequential decision
+sprint-bulk Sequence step now decides from the overlap map: disjoint (no shared file, no depends-on) →
+PARALLEL (multiple Agent calls in one message) · shared/dependent → SEQUENTIAL. references/dispatch.md
+§ Parallel vs sequential carries the batches-separated-by-barriers rule + /batch·/workflows escalation.
+Answers the "doesn't decide parallel or sequential" gap.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -116,6 +122,8 @@ reworded in place (108/110). Fixes the observed "orchestrator does everything in
 | `skills/orchestrator/SKILL.md` · `council/SKILL.md` · `flow/SKILL.md` | T1 | `allowed-tools` += `Agent, Task` (auto-approve dispatch) | Low | qa frontmatter |
 | `skills/orchestrator/references/dispatch.md` | T2 | new — classification-driven dispatch doctrine (uncounted) | Low | reference |
 | `skills/orchestrator/SKILL.md` | T2 | "Dispatch by role" note → classification-driven default + ref pointer | Low | cap 108/110 |
+| `skills/orchestrator/references/dispatch.md` | T3 | § Parallel vs sequential — decision from overlap map + mechanism | Low | reference |
+| `skills/orchestrator/SKILL.md` | T3 | sprint-bulk Sequence → parallel/sequential decision | Low | cap 108/110 |
 
 ## Retro
 <!-- Written at close. Route buckets (§10). Then archive (§11). -->
