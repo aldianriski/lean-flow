@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-020 closed 2026-07-10 → v1.9.0; archived per §11.)_
+> **SPRINT-021 — Fog-Mode + Council Decorrelation Probe** → docs/sprint/SPRINT-021-fog-mode-council-probe.md
 
 ---
 
@@ -69,19 +69,7 @@ _(empty)_
       tracker:   docs/research/council-improvements.md § Divergence measurement · verdict-council-multimodel.md (temp) · gated by TASK-065
       state:     blocked   (deferred — gated by TASK-065; the 1× probe found framing-divergence real but did not expose a factual-priors crack)
 <!-- TASK-044 done (SPRINT-014 T1) → metadata SSOT + index extended to ADR/research; see CHANGELOG. -->
-- [ ] **TASK-065 — Measure cross-model error-decorrelation on a factual decision**  [size: S] [risk: low] [HITL]
-      done-when: run a council-style comparison on a real decision that turns on EXTERNAL FACTS (not a pure judgment fork), recording whether a genuinely different model catches factual errors the single-model council's personas all share — the datapoint the TASK-048 judgment probe structurally could not produce. Result gates TASK-047.
-      touches:   /council (exercise only) · docs/research/council-improvements.md § Divergence measurement
-      assumes:   the crack (if any) is in shared FACTUAL priors, not framing (TASK-048 showed framing-divergence is already real).
-      tracker:   docs/research/council-improvements.md · gates TASK-047
-      state:     ready
-- [ ] **TASK-064 — Build wayfinder-style fog-mode in /task-decomposer**  [size: M] [risk: med] [HITL]
-      done-when: /task-decomposer gains an optional pre-decomposition **fog-map** mode — decision-tickets (research/prototype/grilling/task · AFK/HITL) tracked in a map (Destination · Decisions-so-far · Not-yet-specified · Out-of-scope) that ROUTE to existing skills and GRADUATE into TASK-NNN as the fog clears. Exercised once on a real foggy problem.
-      decision:  (2026-07-10, owner-confirmed) BUILD, as a mode — the unmatched gap over /prototype·/council·decomposer is *foggy work too big to plan up front*. Designed-by-example: the "graph view over the knowledge corpus + OKF" problem was fog-mapped live (routed to research-spike · /prototype · grill; OUT = separately-maintained graph, council-rejected).
-      touches:   skills/task-decomposer/SKILL.md + references/ (mode detail uncounted, L-012)
-      assumes:   fold into /task-decomposer as a mode, NOT a new skill (roster stays 14)
-      tracker:   docs/research/mattpocock.md § Keepers (wayfinder)
-      state:     ready
+<!-- (TASK-064 · 065 promoted → SPRINT-021 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-021-fog-mode-council-probe.md) -->
 <!-- TASK-008 done → /insights shipped v1.2.0 (friction → L-NNN candidate); see CHANGELOG. -->
 
 > TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).

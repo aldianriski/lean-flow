@@ -34,11 +34,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-016 [tags: process] [status: active]: A skill/tool repo can't dogfood a feature whose substrate it lacks — judge it on the CONSUMER path. lean-flow is markdown-only, so `/tdd` *correctly* never fires in its own loop (Implement-routing → implement-directly, no harness); SPRINT-015 T2 confirmed the "TDD never invoked" gap (item #8) is real only for **consumer repos with testable code**, by tracing the consumer path rather than the dogfood path. Pattern: when a change targets consumer behaviour the host repo can't itself exercise, verify by tracing the consumer scenario — don't read "didn't fire in our repo" as either "broken" or "fine".
-- seen: Sprint-015 · Sprint-020 (T1 skill-powered-dispatch `/tdd` path — exercised the mechanism, marked `/tdd` claim consumer-path)
-- count: 2
-- promoted: no
-- related: L-015 (consumer-facing surface) · L-007 (exercise on real input) · L-002 (grill firing)
+## L-016 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern (L-015 extension: when the repo can't dogfood a feature, verify on the consumer path). A skill/tool repo can't dogfood a feature whose substrate it lacks — markdown-only lean-flow has no testable code, so `/tdd` never fires and skill-powered-dispatch's `/tdd` path can't be exercised → trace the consumer scenario / exercise the mechanism, don't read "didn't fire here" as broken OR fine. Seen Sprint-015 + Sprint-020 (count 2). Related: L-015 · L-007.
 
 ---
 
