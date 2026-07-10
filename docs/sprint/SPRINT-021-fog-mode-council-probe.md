@@ -52,10 +52,10 @@ produce. Result gates TASK-047.
 **Acceptance:** a findings note records whether a different model catches shared factual errors, on a real factual decision.
 
 **DoD:**
-- [ ] pick a real decision resting on external facts with a knowable ground truth
-- [ ] run single-model personas + ≥1 genuinely different model on it
-- [ ] record whether the different model catches factual errors the single-model set shares
-- [ ] findings → `council-improvements.md`; result gates TASK-047
+- [x] pick a real decision resting on external facts with a knowable ground truth (arXiv-MAD claim; truth NO)
+- [x] run single-model personas + ≥1 genuinely different model on it (Haiku/Sonnet/Opus/Fable)
+- [x] record whether the different model catches factual errors the single-model set shares (no divergence — base tier already correct)
+- [x] findings → `council-improvements.md § Factual decorrelation probe`; result gates TASK-047 (bar raised)
 
 ## Owner-action checklist
 - [ ] none
@@ -83,6 +83,13 @@ decision-ticket types routing to existing skills · chart→work→graduate loop
 graph-view + OKF fog-map is embedded as the reference's worked example — a real foggy problem mapped with
 the mode's structure (routes to research-spike/`/prototype`/grill; one ticket already graduated → okf-adoption.md).
 
+### 2026-07-10 | T2 done | factual decorrelation probe (cross-tier)
+Ran the arXiv-MAD claim (truth NO) across Haiku/Sonnet/Opus/Fable (4 calls). **No divergence:** Sonnet·Opus·Fable
+all correct (NO); Haiku honestly abstained (UNKNOWN, no hallucination). Base dispatch tier already correct →
+different tiers confirmed, didn't correct → no shared blind spot exposed. Caveats: N=1, cross-tier ≠ cross-provider
+(A2), can't manufacture a shared-crack case. Net: hypothesized factual crack didn't manifest → TASK-047 bar raised
+(needs a cross-provider test showing a real corrected error before any build). Findings → council-improvements.md.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -91,6 +98,7 @@ the mode's structure (routes to research-spike/`/prototype`/grill; one ticket al
 | `skills/task-decomposer/SKILL.md` | T1 | fog-map mode section + `--fog` arg | Low | cap 89/110 |
 | `.claude/CONTEXT.md` | T1 | roster note: fog-map for foggy work (net-0) | Low | cap 127/130 |
 | `README.md` | T1 | skill-line + references listing (consumer surface, L-015) | Low | no cap |
+| `docs/research/council-improvements.md` | T2 | § Factual decorrelation probe — cross-tier result | Low | doc |
 
 ## Retro
 <!-- Written at close. Route buckets (§10): shipped→CHANGELOG · debt→TD-NNN · follow-ups→TASK-NNN · learnings→L-NNN. Then archive (§11). -->

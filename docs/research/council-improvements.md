@@ -89,6 +89,24 @@ on verdict:**
 - **3× cross-run check:** not run (G2 owner scoped to 1×). File as a follow-up only if a future probe on a
   factual decision looks borderline.
 
+## Factual decorrelation probe (TASK-065 · 2026-07-10, cross-tier)
+
+Ran one factual claim with knowable ground truth — *"does arXiv:2311.17371 (Smit et al., 'Should we be
+going MAD?') conclude MAD reliably beats self-consistency?"* (truth: **NO**) — across 4 Anthropic tiers
+(Haiku · Sonnet · Opus · Fable), honest-abstention allowed.
+
+- **Result:** Sonnet · Opus · Fable → **NO** (correct); Haiku → **UNKNOWN** (honest abstention — lacked the
+  knowledge, did *not* hallucinate).
+- **No factual divergence.** The base dispatch tier (Sonnet) was already correct, so the different tiers
+  added *confirmation, not correction* — no shared blind spot was exposed to decorrelate.
+- **Limits:** N=1; a shared-blind-spot case (base tier *confidently wrong*) can't be manufactured honestly
+  and wasn't sampled; and cross-tier is **Anthropic-only** (shared training lineage → facts likely correlate
+  anyway). True decorrelation needs **cross-provider** — exactly TASK-047's dependency cost.
+- **Effect on TASK-047:** the hypothesized factual crack did **not** manifest on this cheap probe → the bar
+  rises. Before building, a rigorous test must first demonstrate a real shared factual error that a
+  *cross-provider* model corrects (not a cross-tier proxy). Combined with TASK-048 (framing divergence real,
+  factual untestable on a judgment fork), the accumulated signal leans **against** the multi-model backend.
+
 ## Out of scope / open questions
 
 - **This is decide-only.** The build is a follow-up **TASK** (proposed: "Harden `/council` — pre-mortem · dialectical Contrarian · calibrated verdict · gated fact-verify · unknown-unknowns moderator") — decompose + G2 before editing the skill.
