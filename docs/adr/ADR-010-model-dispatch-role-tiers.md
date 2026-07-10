@@ -60,3 +60,24 @@ on a real dispatch (L-007); the enforceable/advisory split is subtle and can be 
 | Keep the 2-tier scheme unchanged | the confirmed misroute justifies capability-fit routing; 2-tier conflates "cheap" with "right model for the nature of the task" |
 | Publish a standalone `MODEL-DOCTRINE.md` (Expansionist) | over-reach; the role map belongs in the CONTEXT SSOT, not a new artifact other repos would fork out of context |
 | Hard-pin model names (Fable/Opus/Sonnet/Haiku) in the dispatch points | names go stale (this session's own lineup rename proves it); breaks consumer adaptability (L-015) |
+
+## Amendment (2026-07-10) — skill-powered execution dispatch
+
+**Status:** accepted · extends Decision §2 (dispatch tiers). **Source:** [mattpocock.md](../research/mattpocock.md) § Skill-powered tier dispatch.
+
+**Decision.** When `/orchestrator` dispatches `execution` work to a sub-agent, equip it with the relevant
+**procedure skill** — `/tdd` · `/diagnose` · `/refactor-advisor`, invoked at runtime via the Skill tool —
+rather than a prose brief that re-describes the procedure. The skill is the single maintained source of
+that procedure; a paraphrased brief drifts from it over time. Mechanism **C only**: runtime Skill
+invocation on a `general-purpose` dispatch sub-agent. Plugin skills are globally discoverable inside a
+sub-agent, so this needs **no agent definition** and stays agent-free (ADR-002 intact).
+
+**Rejected here:** mechanism **A** — an `.claude/agents/*.md` definition with a `skills:` preload list —
+introduces an agent definition, crossing the agent-free line; revisit only via `/council`/ADR, like a
+provider dependency (cf. TASK-047). Mechanism **B** — a skill self-forking via `context: fork` — deferred:
+heavier per run, no agent-free gain over C.
+
+**Consequence (negative).** The dispatch sub-agent must carry the `Skill` tool (default: inherit) and
+pays a one-time skill-load cost; and it must be `general-purpose`, not `Explore`/`Plan` (those skip
+CLAUDE.md, losing project context). Exercised once on real input (SPRINT-020 T1); the `/tdd`-specific
+path is a **consumer-path** claim — lean-flow is markdown-only and cannot dogfood it (L-016).

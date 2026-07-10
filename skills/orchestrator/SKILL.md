@@ -60,8 +60,8 @@ only what is still open — one question at a time (as an **AskUserQuestion popu
 > working across turns until it's verifiably met (Goal-Driven Execution, native), then clear it.
 >
 > **Dispatch by role** — `decision` work (gates · grill · design · synthesis) stays on the session model
-> (advisory); dispatch `execution` (implement · recon) → Sonnet and `mechanical-ingest` → Haiku with a
-> self-contained brief; escalate manually to Fable / `/council` for an ADR-grade fork. Role map → `.claude/CONTEXT.md` (ADR-010).
+> (advisory); dispatch `execution` (implement · recon) → Sonnet · `mechanical-ingest` → Haiku — hand the subagent the relevant **procedure skill** (`/tdd`·`/diagnose`·`/refactor-advisor` via runtime Skill invocation, on a `general-purpose` agent), not a re-described brief;
+> escalate manually to Fable / `/council` for an ADR-grade fork. Role map → `.claude/CONTEXT.md` · ADR-010 (+ skill-dispatch amendment).
 
 ### quick
 1. **Parse** — restate the task as a verifiable goal; confirm in one line.

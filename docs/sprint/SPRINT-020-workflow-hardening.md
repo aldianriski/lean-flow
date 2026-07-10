@@ -38,11 +38,11 @@ dispatch agent) — no agent definition, stays agent-free-core.
 skill-powered sub-agent once, on real input.
 
 **DoD:**
-- [ ] ADR-010 amended append-only (dated amendment / consequence — never edit the decided body; §4)
-- [ ] `/orchestrator` execution dispatch spec'd to hand the tiered sub-agent a procedure skill (runtime `Skill` invocation), not just a prose brief
-- [ ] CONTEXT.md tier/dispatch wording updated iff it changed
-- [ ] **Exercised once on real input** — a dispatch actually invokes a skill on a real task (L-007)
-- [ ] `orchestrator/SKILL.md` stays ≤110 (land via reword-in-place / `references/` — L-012)
+- [x] ADR-010 amended append-only (dated amendment / consequence — never edit the decided body; §4)
+- [x] `/orchestrator` execution dispatch spec'd to hand the tiered sub-agent a procedure skill (runtime `Skill` invocation), not just a prose brief
+- [x] CONTEXT.md tier/dispatch wording updated iff it changed
+- [x] **Exercised once on real input** — a dispatch actually invokes a skill on a real task (L-007)
+- [x] `orchestrator/SKILL.md` stays ≤110 (land via reword-in-place / `references/` — L-012)
 <!-- QA: T1 wants the L-007 exercise as its verify signal; no automated test surface. -->
 
 ### T2 — Fold the Standards-vs-Spec review split into review guidance `[size: S · risk: low]`
@@ -106,10 +106,20 @@ real crack (→ unblocks/kills TASK-047) or a footnote.
 Rendered from TASK-062 · 061 · 063 · 048 (governance review clean — no unpromoted count≥2 learnings;
 TD-008 re-review flagged, minor, not in scope; L-017 collapsed to a §11 pointer). Plan frozen.
 
+### 2026-07-10 | T1 done | skill-powered dispatch
+ADR-010 amendment (skill-powered execution dispatch, mechanism C) + orchestrator dispatch note reworded
+in place (SKILL.md 108→107, cap-safe) + CONTEXT.md dispatch contract line. **L-007 exercise:** dispatched
+a real `general-purpose` sonnet sub-agent that invoked the `lean-flow:prime` plugin skill and returned its
+health block — mechanism C confirmed end-to-end. `/tdd`-path claim is consumer-path (L-016). G2 gate T4
+scoped to a 1× probe by owner (3× cross-run → conditional follow-up).
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/adr/ADR-010-*.md` | T1 | amendment: skill-powered execution dispatch (mech C) | Low | doc |
+| `skills/orchestrator/SKILL.md` | T1 | dispatch note → hand subagent its procedure skill | Low | cap 107/110 |
+| `.claude/CONTEXT.md` | T1 | dispatch contract line reflects skill-powered dispatch | Low | cap 127/130 |
 
 ## Retro
 <!-- Written at close. Route buckets (DOCS_Guide §10): shipped→CHANGELOG · debt→TD-NNN · follow-ups→TASK-NNN · learnings→L-NNN. Then archive (§11). -->
