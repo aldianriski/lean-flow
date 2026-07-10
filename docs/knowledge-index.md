@@ -18,7 +18,7 @@ and research docs, grouped by tag and by domain. Freshness/relations live in eac
 
 ### By tag
 
-- **process** — [L-016](LEARNINGS.md) · [L-015](LEARNINGS.md) · [L-014](LEARNINGS.md) · [L-007](LEARNINGS.md) · [L-006](LEARNINGS.md) · [L-002](LEARNINGS.md) · [ADR-001](adr/ADR-001-curated-not-copied.md) · [ADR-002](adr/ADR-002-leverage-built-ins-ship-no-agents.md) · [ADR-004](adr/ADR-004-council-opt-in-agent-aid.md) · [ADR-005](adr/ADR-005-flow-conductor-standalone-contract.md) · [bmad-adaptation](research/bmad-adaptation.md) · [council-improvements](research/council-improvements.md) · [loop-mechanics-audit](research/loop-mechanics-audit.md)
+- **process** — [L-016](LEARNINGS.md) · [L-015](LEARNINGS.md) · [L-014](LEARNINGS.md) · [L-007](LEARNINGS.md) · [L-006](LEARNINGS.md) · [L-002](LEARNINGS.md) · [ADR-001](adr/ADR-001-curated-not-copied.md) · [ADR-002](adr/ADR-002-leverage-built-ins-ship-no-agents.md) · [ADR-004](adr/ADR-004-council-opt-in-agent-aid.md) · [ADR-005](adr/ADR-005-flow-conductor-standalone-contract.md) · [bmad-adaptation](research/bmad-adaptation.md) · [council-improvements](research/council-improvements.md) · [loop-mechanics-audit](research/loop-mechanics-audit.md) · [structarmed-adaptation](research/structarmed-adaptation.md)
 - **docs** — [L-012](LEARNINGS.md) · [L-008](LEARNINGS.md) · [L-001](LEARNINGS.md) · [ADR-003](adr/ADR-003-rich-per-file-adrs.md) · [ADR-006](adr/ADR-006-skill-cap-executable-artifacts.md) · [ADR-007](adr/ADR-007-context-cap-ssot-density.md) · [ADR-009](adr/ADR-009-knowledge-metadata-ssot.md) · [allowed-tools-audit](research/allowed-tools-audit.md) · [trigger-accuracy-audit](research/trigger-accuracy-audit.md)
 - **tooling** — [L-013](LEARNINGS.md) · [L-011](LEARNINGS.md) · [L-010](LEARNINGS.md) · [ADR-002](adr/ADR-002-leverage-built-ins-ship-no-agents.md) · [ADR-008](adr/ADR-008-first-code-qa-check.md) · [ADR-009](adr/ADR-009-knowledge-metadata-ssot.md) · [allowed-tools-audit](research/allowed-tools-audit.md) · [council-improvements](research/council-improvements.md) · [graphify-daily-value](research/graphify-daily-value.md)
 - **edit-safety** — [L-009](LEARNINGS.md) · [L-005](LEARNINGS.md)
@@ -28,7 +28,7 @@ and research docs, grouped by tag and by domain. Freshness/relations live in eac
 
 - **skills** — [ADR-002](adr/ADR-002-leverage-built-ins-ship-no-agents.md) · [ADR-004](adr/ADR-004-council-opt-in-agent-aid.md) · [ADR-005](adr/ADR-005-flow-conductor-standalone-contract.md) · [allowed-tools-audit](research/allowed-tools-audit.md) · [council-improvements](research/council-improvements.md) · [loop-mechanics-audit](research/loop-mechanics-audit.md) · [trigger-accuracy-audit](research/trigger-accuracy-audit.md)
 - **doc-standard** — [ADR-003](adr/ADR-003-rich-per-file-adrs.md) · [ADR-006](adr/ADR-006-skill-cap-executable-artifacts.md) · [ADR-007](adr/ADR-007-context-cap-ssot-density.md)
-- **governance** — [ADR-001](adr/ADR-001-curated-not-copied.md) · [ADR-008](adr/ADR-008-first-code-qa-check.md) · [bmad-adaptation](research/bmad-adaptation.md)
+- **governance** — [ADR-001](adr/ADR-001-curated-not-copied.md) · [ADR-008](adr/ADR-008-first-code-qa-check.md) · [bmad-adaptation](research/bmad-adaptation.md) · [structarmed-adaptation](research/structarmed-adaptation.md)
 - **knowledge** — [ADR-009](adr/ADR-009-knowledge-metadata-ssot.md) · [graphify-daily-value](research/graphify-daily-value.md)
 
 <!-- INDEX:END -->

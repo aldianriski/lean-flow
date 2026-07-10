@@ -37,9 +37,9 @@ Evaluate github.com/boundwize/structarmed against the curated-not-copied bar (us
 rationale each; any keeper becomes a filed follow-up `TASK-NNN`, nothing built inline.
 
 **DoD:**
-- [ ] research doc written (ADR-009 frontmatter: id/tags/domain/status) — keepers vs rejects
-- [ ] each keeper → a filed follow-up TASK (or "no keepers" stated explicitly)
-- [ ] knowledge-index regenerated (`sh scripts/gen-index.sh`); qa-check passes
+- [x] research doc written (ADR-009 frontmatter: id/tags/domain/status) — keepers vs rejects
+- [x] each keeper → a filed follow-up TASK (**no keepers** — domain mismatch, stated explicitly)
+- [x] knowledge-index regenerated (`sh scripts/gen-index.sh`); qa-check passes
 
 ### T2 — Evaluate the obra `brainstorming` skill `[size: S · risk: low]`  *(TASK-050)*
 Layers: `docs/research/brainstorming-adaptation.md`
@@ -91,6 +91,12 @@ its boundary vs `migrate`; TASK-052's scope is unblocked either way.
 ### 2026-07-10 | promote | plan locked
 Formed after SPRINT-015 close + the TODO doc-aging pass. Chosen over the P2 batch because T3 (init
 decision) unblocks TASK-052 and TASK-056 still needs a `/council` call. No shared-file overlap (D1).
+
+### 2026-07-10 | T1 done | structarmed scan → 0 keepers
+Recon (cheap-tier Explore) found structarmed is a **PHP architecture-enforcement linter**
+(Deptrac-class), not an AI-workflow framework — domain mismatch. `docs/research/structarmed-adaptation.md`
+records the reject rationale; the one adjacent idea (gate-as-code enforcement) is already TASK-006. No
+follow-up filed. qa-check 48/0.
 
 ## Files Changed
 
