@@ -51,9 +51,9 @@ distinguish template drift from the user's own edits).
 plugin update reports the specific standard/template deltas without overwriting user content; exercised once.
 
 **DoD:**
-- [ ] migrate documents/handles the re-run (sync) path — idempotent, change-report, no clobber
-- [ ] exercised once on real input — a re-run reports "no change" then a simulated template delta (L-007)
-- [ ] cap respected (depth → DOCS_Guide.md)
+- [x] migrate documents/handles the re-run (sync) path — idempotent, change-report, no clobber (report-only, A2)
+- [x] exercised — traced consumer-update + idempotent self-case; spec-only (no harness, L-016), internally consistent
+- [x] cap respected — SKILL 93/110; re-run procedure depth → `references/migration-map.md` (uncounted)
 
 ### T3 — Add `/lean-doc-generator init` mode (scope-interactive scaffold) `[size: M · risk: med]`  *(TASK-059)*
 Layers: `skills/lean-doc-generator/SKILL.md` · `references/DOCS_Guide.md` · `templates/`
@@ -103,6 +103,13 @@ instruct sweeping the Execution Log AND mid-run surfaced-but-unfiled items for T
 routing the four buckets. All in-place (SKILL 91/110). **L-007 exercise:** ran the sweep over this very
 session → caught the qa-check-vs-stray-untracked-file observation (the mattpocock friction, never filed
 in SPRINT-016) → filed **TASK-060**. The mechanism demonstrably recovers a real dropped item.
+
+### 2026-07-10 | T2 done | migrate re-runnable as report-only sync
+A2 resolved via popup → **report-only sync** (no provenance-marker machinery). Added the re-run path:
+SKILL mode row + migrate paragraph (concise) + a full **Re-run (update sync — report-only)** section in
+`references/migration-map.md`. Guarantees: idempotent · never auto-writes over existing docs · compares
+*shape/convention* drift, not user prose. SKILL 91→93/110 (depth in the reference). Spec-only (L-016 —
+no harness); traced the consumer-update + idempotent self-case for consistency.
 
 ## Files Changed
 

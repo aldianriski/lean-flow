@@ -25,6 +25,21 @@ don't hand-reconcile, and you're not lost in your own existing code.
    - **After each relocate/rename**: `grep` the old filename/path across the repo and fix every inbound link before moving to the next file.
 4. **Verify** — `/prime` reads cleanly, no dangling references, ADR index resolves, sprint pointer valid.
 
+## Re-run (update sync — report-only)
+
+migrate is **re-runnable**. On a repo already adopted, re-running it (e.g. after a plugin update)
+switches from adopt to **sync**: detect what changed in the lean-flow *standard / templates* since
+adoption and **report the deltas** — new template sections, changed doc shape, new conventions/wiring —
+as a per-item plan, exactly like first adoption. Guarantees:
+
+- **Idempotent** — nothing changed upstream → a no-op ("already current"); no churn, no diff.
+- **Report-only, never clobber** — the sync **never auto-writes over an existing doc**; it surfaces
+  each delta for the user to apply or skip under the same plan → approve → apply gate. A user's edits to
+  their own docs are never overwritten — their content is theirs; only *their* approval applies a change.
+- **What it compares** — the current plugin's standard/templates against the repo's docs' current
+  *shape/convention* (a doc missing a new template section, an outdated wiring pointer), **not** the
+  user's prose. Structure drift is flagged; wording is left alone.
+
 ## Surgical rules
 
 - **Never delete pre-existing content silently** — reformat/relocate/archive it, or surface it and ask. Content is the user's; format is ours. The **only** sanctioned deletion is `retire`-by-hard-delete, and only on **explicit per-item approval** (below) — never a batch "delete all".
