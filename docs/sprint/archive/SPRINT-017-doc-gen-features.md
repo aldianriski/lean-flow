@@ -3,7 +3,7 @@ sprint: 017
 slug: doc-gen-features
 owner: Maintainer
 last_updated: 2026-07-10
-status: active
+status: closed
 plan_commit: 1cb8fee
 close_commit: pending
 update_trigger: sprint execute/close events
@@ -124,19 +124,33 @@ Distinct from migrate per D3 / init-vs-migrate.md.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `skills/lean-doc-generator/SKILL.md` | T1·T2·T3 | close-sweep · migrate re-run · init mode (91→104/110) | Med | trace + scratch-dir exercise |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §10 full-session sweep | Low | trace |
+| `skills/lean-doc-generator/references/migration-map.md` | T2 | Re-run (report-only sync) section | Low | trace |
+| `.claude/CONTEXT.md` | T3 | `init` in the mode-row | Low | read-back |
+| `docs/ARCHITECTURE.md` | T3 | `init` boundary note | Low | read-back |
+| `TODO.md` | T1 | filed TASK-060 (from the sweep) | Low | — |
 
 ## Retro
 <!-- Written at close. Route buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·
      follow-ups → TASK-NNN · learnings → LEARNINGS. Then archive → docs/sprint/archive/ + INDEX line. -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no miss/contradiction. Used L-016 (spec-only exercise where no harness), L-012
+(reference depth for migrate re-run + kept init lean), L-042 (serial shared-file), L-015 (consumer
+surface — CONTEXT/ARCHITECTURE updated).
 
 **Worked**
--
+- **T1 paid off immediately** — the new close-sweep, dogfooded at *this* close, caught the SKILL near-cap
+  item (→ TD-008) that would otherwise have gone unfiled. The feature validated itself.
+- **Report-only design (A2)** dodged all the provenance-marker machinery — the leanest no-clobber is to
+  never write, only report.
+- **Serial single-owner on `SKILL.md`** (D1) — three additions, three clean commits, no WIP contamination.
+- **init exercised for real** — scaffolded the core set into a scratch greenfield dir; docs-only held.
 
 **Friction**
--
+- **`lean-doc-generator/SKILL.md` climbed 91→104/110** across three additions — the init section is the
+  tightest fit. Near-cap watch → **TD-008** (relocate init depth to a reference if the next feature needs
+  headroom, per L-012).
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- None new worth promoting — the sprint applied existing rules (L-016 · L-012 · L-042 · L-015).

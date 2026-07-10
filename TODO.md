@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-017 — Doc-Gen Features** → docs/sprint/SPRINT-017-doc-gen-features.md  (active · 3 tasks: T1 close-sweep · T2 migrate-sync · T3 init-mode)
+> _(no active sprint — SPRINT-017 closed 2026-07-10 → v1.7.0; archived per §11.)_
 
 ---
 
@@ -39,7 +39,7 @@ _(empty)_
 
 <!-- (SPRINT-008…011 batches + TASK-045 · 046 [SPRINT-014 council hardening] shipped; see docs/CHANGELOG.md) -->
 
-<!-- (TASK-055 · 052 · 059 promoted → SPRINT-017 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-017-doc-gen-features.md) -->
+<!-- (TASK-055 · 052 · 059 shipped in SPRINT-017 → v1.7.0; see docs/CHANGELOG.md) -->
 - [ ] **TASK-056 — Wire recon-delegation + per-phase model tiers into orchestrator**  [size: M] [risk: med] [HITL]
       done-when: orchestrator's procedure explicitly triggers a read-only recon (Explore, cheap tier) before implementing on mature/unfamiliar code, AND assigns model tiers per phase (plan=session/large · build=cheap/small · recon+ingest=fast) so tiering actually fires — not just documented. Mirrors kalasuara L-026.
       touches:   skills/orchestrator/SKILL.md · .claude/CONTEXT.md (Model tiers)
@@ -96,8 +96,11 @@ _(empty)_
      Filed by Sprint Close Retro. Aging at Promote: ≥3 sprints → re-review; high → auto P1.
      severity ∈ trivial · minor · medium · high. -->
 
+- **TD-008** severity: minor | status: open | created: Sprint-017
+  - Summary: `skills/lean-doc-generator/SKILL.md` at 104/110 after the init + migrate-sync + close-sweep adds. Under cap, but the init section is the tightest fit — if the next lean-doc feature needs headroom, relocate init's 4-step procedure to a reference (L-012, as migrate's detail lives in `migration-map.md`). Watch at promote aging.
+
 <!-- TD-001…007 all resolved (§11 collapse — per-TD summaries live in their sprint files + git). -->
-_(no open tech debt)_ — resolved: **TD-001**→SPRINT-003 · **TD-002/004**→SPRINT-005 · **TD-003**→SPRINT-004 · **TD-005**→SPRINT-006 · **TD-006**→SPRINT-009 · **TD-007**→SPRINT-012 (closed 2026-07-02).
+- resolved: **TD-001**→SPRINT-003 · **TD-002/004**→SPRINT-005 · **TD-003**→SPRINT-004 · **TD-005**→SPRINT-006 · **TD-006**→SPRINT-009 · **TD-007**→SPRINT-012 (closed 2026-07-02).
 
 ---
 

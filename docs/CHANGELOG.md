@@ -11,6 +11,24 @@ status: current
 
 ---
 
+## v1.7.0 — Doc-Gen Features (2026-07-10)
+
+MINOR — bundles **SPRINT-017** (detail below).
+
+**What changed for you (`/lean-doc-generator`):**
+- **New `init` mode** — `/lean-doc-generator init` scaffolds a fresh (greenfield) repo's docs: the core
+  set always, plus optional docs (DESIGN/DEPLOY/RESEARCH) you pick by repo type. **Docs-only** — it never
+  writes `.claude/settings.json`. The greenfield twin of `migrate`.
+- **`migrate` is re-runnable as an update sync** — re-run it after a plugin update and it **reports** what
+  changed in the standard/templates (idempotent, report-only, **never clobbers your edits**).
+- **close captures more** — the sprint-close sweep now scans the full session (not just what's already
+  written) for tech-debt + follow-ups, so nothing raised mid-sprint is lost.
+
+Manifests → 1.7.0 lockstep; skill roster unchanged (14 — `init` is a mode, not a skill). Additive —
+nothing to migrate.
+
+---
+
 ## v1.6.0 — Loop Hardening (2026-07-10)
 
 MINOR — bundles **SPRINT-015** (detail below).
