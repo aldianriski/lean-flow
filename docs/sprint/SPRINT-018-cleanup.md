@@ -51,9 +51,9 @@ working-tree cruft is ignored — a tracked corpus doc missing metadata must sti
 corpus doc missing metadata still fails. Exercised on the real working tree (mattpocock.md present).
 
 **DoD:**
-- [ ] corpus metadata lint scoped to git-tracked files
-- [ ] exercised — qa-check passes with the untracked `mattpocock.md` present (L-007)
-- [ ] no regression — a tracked corpus doc missing metadata still FAILS (guard not weakened)
+- [x] corpus metadata lint scoped to git-tracked files (`git ls-files`, glob fallback outside git)
+- [x] exercised — qa-check **48/0** (was 46/1) with the untracked `mattpocock.md` present (L-007)
+- [x] no regression — all 18 tracked corpus docs still linted (guard intact; only untracked strays excluded)
 
 ## Owner-action checklist
 - (none)
@@ -82,6 +82,13 @@ K1 → new CLAUDE.md anti-pattern ("too simple to need a design" — the rationa
 work); K2 → orchestrator G2 note (present + approve an **L** design section-by-section, in-place, no
 new line). Caps: CLAUDE 71→72/80; orchestrator held 107/110. Guidance-only (no runtime); closes
 TASK-058 and drains the last brainstorming-scan keeper.
+
+### 2026-07-10 | T2 done | qa-check corpus lint scoped to tracked files
+Defined `corpus_files` once via `git ls-files -- docs/adr docs/research` (glob fallback outside git) and
+reused it in the id-universe + completeness loop. Stray untracked working-tree `.md` are now ignored.
+**L-007 exercise:** qa-check went **46/1 → 48/0** with the owner's untracked `mattpocock.md` still on
+disk; corpus_files resolves to all 9 ADR + 9 research docs (mattpocock excluded), so the guard is intact
+— a *tracked* doc missing metadata still fails. Closes TASK-060; the two-close-long stray-file friction is gone.
 
 ## Files Changed
 

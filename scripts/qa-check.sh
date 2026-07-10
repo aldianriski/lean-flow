@@ -83,10 +83,15 @@ if [ -f scripts/gen-index.sh ]; then
   else bad "knowledge index STALE (run: sh scripts/gen-index.sh)"; fi
 fi
 
+# Corpus = git-tracked ADR + research .md; stray untracked working-tree files are ignored so a WIP
+# research doc never fails the gate. Glob fallback outside a git work tree. (TASK-060)
+corpus_files=$(git ls-files -- docs/adr docs/research 2>/dev/null | grep -E '^docs/adr/ADR-[0-9]+.*\.md$|^docs/research/[^/]+\.md$')
+[ -n "$corpus_files" ] || corpus_files=$(ls docs/adr/ADR-*.md docs/research/*.md 2>/dev/null)
+
 # id universe (everything a related/supersedes ref may point at)
 lids=$(grep -oE '^## L-[0-9]+' docs/LEARNINGS.md 2>/dev/null | grep -oE 'L-[0-9]+' | sort -u)
-adrids=$(ls docs/adr/ADR-*.md 2>/dev/null | grep -oE 'ADR-[0-9]+' | sort -u)
-resids=$(for f in docs/research/*.md; do [ -f "$f" ] && fmv "$f" id; done | sort -u)
+adrids=$(printf '%s\n' $corpus_files | grep '/adr/' | grep -oE 'ADR-[0-9]+' | sort -u)
+resids=$(for f in $corpus_files; do case "$f" in */research/*) [ -f "$f" ] && fmv "$f" id;; esac; done | sort -u)
 allids=$(printf '%s\n%s\n%s\n' "$lids" "$adrids" "$resids" | sort -u | grep -v '^$')
 
 # 4a. LEARNINGS in-file refs + metadata shape (unchanged rules)
@@ -115,7 +120,7 @@ KNOWN_TAGS=$(grep -E '^TAGS=' scripts/gen-index.sh 2>/dev/null | sed -E 's/^TAGS
 KNOWN_DOMAINS=$(grep -E '^DOMAINS=' scripts/gen-index.sh 2>/dev/null | sed -E 's/^DOMAINS="?([^"]*)"?/\1/')
 KNOWN_STATUS="accepted current superseded deprecated"
 cdang=""; cmeta=""
-for f in docs/adr/ADR-*.md docs/research/*.md; do
+for f in $corpus_files; do
   [ -f "$f" ] || continue
   b=$(basename "$f")
   reftoks=$(awk 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} /^(related|supersedes|superseded-by):/{print}' "$f" \
