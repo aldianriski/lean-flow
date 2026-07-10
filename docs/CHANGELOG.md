@@ -11,6 +11,21 @@ status: current
 
 ---
 
+## v1.10.1 — Wiring Pass (2026-07-10)
+
+PATCH — bundles **SPRINT-022** (wiring fixes; no new capability).
+
+**What changed for you:** the v1.9.0/v1.10.0 additions now actually *fire* across the loop —
+- execution dispatch **hands the sub-agent its procedure skill** (the "Dispatch by role" note is now wired into every Implement step, not orphaned from it);
+- a dispatched code reviewer is **told to report Standards vs Spec separately** (the two-axis split is injected into the reviewer's brief, not just documented);
+- **foggy intent routes to the fog-map mode** from both `/orchestrator` and the `/flow` conductor (previously it self-triggered only inside `/task-decomposer`).
+
+**Maintainer-side only:** new discipline codified — a CLAUDE.md anti-pattern + a DoD "Wiring check" (**L-020**): shipping a capability ≠ wiring it; a new behaviour must be connected into every job that triggers/chains it and verified to fire.
+
+Manifests → 1.10.1 lockstep; skill roster unchanged (14). No behaviour change beyond the wiring — nothing to migrate.
+
+---
+
 ## v1.10.0 — Fog-Mode (2026-07-10)
 
 MINOR — bundles **SPRINT-021**.
