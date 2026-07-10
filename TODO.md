@@ -40,10 +40,10 @@ _(empty)_
 <!-- (SPRINT-008…011 batches + TASK-045 · 046 [SPRINT-014 council hardening] shipped; see docs/CHANGELOG.md) -->
 
 <!-- (TASK-055 · 052 · 059 shipped in SPRINT-017 → v1.7.0; see docs/CHANGELOG.md) -->
-- [ ] **TASK-056 — Wire recon-delegation + per-phase model tiers into orchestrator**  [size: M] [risk: med] [HITL]
-      done-when: orchestrator's procedure explicitly triggers a read-only recon (Explore, cheap tier) before implementing on mature/unfamiliar code, AND assigns model tiers per phase (plan=session/large · build=cheap/small · recon+ingest=fast) so tiering actually fires — not just documented. Mirrors kalasuara L-026.
-      touches:   skills/orchestrator/SKILL.md · .claude/CONTEXT.md (Model tiers)
-      assumes:   builds on the existing tier table (TASK-018); likely /council (changes the loop); shares orchestrator/SKILL.md with the P1 set — serialize
+- [ ] **TASK-056 — Implement ADR-010: role-based, remappable, dispatch-only tier map**  [size: M] [risk: med] [HITL]
+      done-when: per ADR-010 — CONTEXT.md tier table refactored to ROLE-named tiers (decision→Opus · execution→Sonnet · mechanical/ingest→Haiku) as a remappable default map (undefined role → next-strongest); dispatch tiers wired into the real dispatch points (council advisors, orchestrator recon/build); Fable = a one-line MANUAL-escalation clause (NO dispatch row); NO automated ladder; session-tier = one advisory line. Keep "route by ambiguity & consequence, not size". Exercised once on a real dispatch (L-007).
+      touches:   .claude/CONTEXT.md (Model tiers) · skills/orchestrator/SKILL.md · skills/council/SKILL.md
+      decision:  ADR-010 (council verdict 2026-07-10) — adopt slimmed; rejected the raw 4-tier import + auto-ladder (agent behaviour, ADR-002). Source: docs/research/model-purpose.md.
       state:     ready
 
 ### P3 — Long-term
