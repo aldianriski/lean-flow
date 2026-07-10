@@ -51,9 +51,9 @@ page can't be fetched, ask the user to paste.
 filed ONLY for what clears the useful+important+used bar.
 
 **DoD:**
-- [ ] research doc written (ADR-009 frontmatter) — keepers vs rejects vs "adapt as X"
-- [ ] follow-up build TASK filed only for cleared keepers (or "none" stated)
-- [ ] knowledge-index regenerated; qa-check passes
+- [x] research doc written (ADR-009 frontmatter) — keepers vs rejects vs "adapt as X"
+- [x] follow-up build TASK filed only for cleared keepers (**TASK-058** — K1/K2 fold)
+- [x] knowledge-index regenerated; qa-check passes *(doc + index clean; the lone 47/1 FAIL is a pre-existing empty untracked `docs/research/mattpocock.md` — owner's file, left untouched per instruction)*
 
 ### T3 — Decide whether lean-flow needs an `init` `[size: M · risk: med]`  *(TASK-051)*
 Layers: `docs/adr/` (if adopted) or a research note · resolves the split with TASK-052
@@ -97,6 +97,15 @@ Recon (cheap-tier Explore) found structarmed is a **PHP architecture-enforcement
 (Deptrac-class), not an AI-workflow framework — domain mismatch. `docs/research/structarmed-adaptation.md`
 records the reject rationale; the one adjacent idea (gate-as-code enforcement) is already TASK-006. No
 follow-up filed. qa-check 48/0.
+
+### 2026-07-10 | T2 done | brainstorming eval → reject-the-skill, 2 micro-keepers
+Recon (cheap-tier Explore) pulled the real `obra/superpowers` SKILL.md. Curated-not-copied judgment:
+~90% of its discipline already lives in lean-flow (G2 gate · decomposer grill + popups · /prototype ·
+/council · YAGNI · self-review) → **no standalone skill** (would be a 15th skill on owned ground).
+Kept K1 ("too simple to need design" anti-pattern) + K2 (section-by-section approval) → **TASK-058**
+filed. Rejected the visual-companion browser server as scaffold. `docs/research/brainstorming-adaptation.md`.
+**qa note:** doc + regenerated index are clean; the 47/1 lint FAIL is the owner's pre-existing empty
+`docs/research/mattpocock.md` (untracked, left untouched per owner instruction — not this sprint's).
 
 ## Files Changed
 

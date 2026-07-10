@@ -58,6 +58,11 @@ _(empty)_
 ### P3 — Long-term
 
 <!-- (TASK-049 · 050 · 051 promoted → SPRINT-016 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-016-research-spikes.md) -->
+- [ ] **TASK-058 — Fold brainstorming keepers (K1/K2) into G2 / anti-patterns**  [size: S] [risk: low] [HITL]
+      done-when: /orchestrator G2 (and/or CLAUDE.md anti-patterns) names the "too simple to need a design" rationalization as a red-flag (K1); optionally K2 — offer section-by-section approval for L designs. Nothing else from the obra brainstorming skill is built.
+      touches:   skills/orchestrator/SKILL.md · .claude/CLAUDE.md
+      tracker:   docs/research/brainstorming-adaptation.md (TASK-050 verdict)
+      state:     ready
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
