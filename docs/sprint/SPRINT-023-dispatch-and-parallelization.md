@@ -48,9 +48,9 @@ rule is nature-not-size (`model-purpose.md`).
 **Acceptance:** reading the Implement path, execution/mechanical work is dispatched by classification, not done inline by default.
 
 **DoD:**
-- [ ] dispatch reworded to classification-driven default (orchestrator coordinates; execution/mechanical → sub-agent; decision/trivial inline w/ reason)
-- [ ] the routing basis cites `model-purpose.md` (nature-not-size) + ADR-010
-- [ ] detail lands in `references/` (orchestrator SKILL ≤110, L-012)
+- [x] dispatch reworded to classification-driven default (orchestrator coordinates; execution/mechanical → sub-agent; decision/trivial inline w/ reason)
+- [x] the routing basis cites `model-purpose.md` (nature-not-size) + ADR-010
+- [x] detail lands in `references/dispatch.md` (orchestrator SKILL 108/110, L-012)
 
 ### T3 — Parallel/sequential decision wired to the overlap map `[size: M · risk: med]`
 Layers: `skills/orchestrator/SKILL.md` (sprint-bulk Sequence) + `references/`
@@ -103,11 +103,19 @@ learnings (L-016·L-020 promoted this session); TD-008 re-review flagged (minor)
 Added `Agent, Task` to `allowed-tools` of orchestrator · council · flow so dispatch auto-approves (kills
 the per-spawn permission prompt that stalled dispatch). Only the three dispatching skills; others untouched.
 
+### 2026-07-10 | T2 done | classification-driven dispatch
+New `references/dispatch.md` — orchestrator = `decision` coordinator (never a worker); dispatch by task
+classification (execution→Sonnet · mechanical→Haiku by default; decision/trivial inline w/ reason), route by
+nature not size (model-purpose.md), hand the sub-agent its procedure skill. SKILL "Dispatch by role" note
+reworded in place (108/110). Fixes the observed "orchestrator does everything inline" behavior.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `skills/orchestrator/SKILL.md` · `council/SKILL.md` · `flow/SKILL.md` | T1 | `allowed-tools` += `Agent, Task` (auto-approve dispatch) | Low | qa frontmatter |
+| `skills/orchestrator/references/dispatch.md` | T2 | new — classification-driven dispatch doctrine (uncounted) | Low | reference |
+| `skills/orchestrator/SKILL.md` | T2 | "Dispatch by role" note → classification-driven default + ref pointer | Low | cap 108/110 |
 
 ## Retro
 <!-- Written at close. Route buckets (§10). Then archive (§11). -->

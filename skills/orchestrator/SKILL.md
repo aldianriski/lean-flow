@@ -60,9 +60,9 @@ only what is still open — one question at a time (as an **AskUserQuestion popu
 > **Drive with `/goal`** — set a `/goal` equal to the task's done-when / acceptance so execution keeps
 > working across turns until it's verifiably met (Goal-Driven Execution, native), then clear it.
 >
-> **Dispatch by role** *(fires at every Implement step)* — `decision` work (gates · grill · design · synthesis) stays on the session model
-> (advisory); dispatch `execution` (implement · recon) → Sonnet · `mechanical-ingest` → Haiku — hand the subagent the relevant **procedure skill** (`/tdd`·`/diagnose`·`/refactor-advisor` via runtime Skill invocation, on a `general-purpose` agent), not a re-described brief;
-> escalate manually to Fable / `/council` for an ADR-grade fork. Role map → `.claude/CONTEXT.md` · ADR-010 (+ skill-dispatch amendment).
+> **Dispatch by role** *(fires at every Implement step)* — the orchestrator is the `decision` tier: it **coordinates** (gates · grill · design · synthesis · merge), never executes inline. Dispatch is **classification-driven** (nature not size — `model-purpose.md`):
+> `execution`→Sonnet · `mechanical-ingest`→Haiku dispatched **by default** to a `general-purpose` sub-agent handed its **procedure skill** (`/tdd`·`/diagnose`·`/refactor-advisor` via runtime Skill invocation); a `decision`/trivial step inline only with a stated reason;
+> escalate manually to Fable / `/council` for an ADR-grade fork. **Full dispatch + parallel/sequential rules → `references/dispatch.md`**; role map → `.claude/CONTEXT.md` · ADR-010.
 
 ### quick
 1. **Parse** — restate the task as a verifiable goal; confirm in one line.
