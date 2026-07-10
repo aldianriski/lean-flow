@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-022 closed 2026-07-10 → v1.10.1; archived per §11.)_
+> **SPRINT-023 — Dispatch & Parallelization** → docs/sprint/SPRINT-023-dispatch-and-parallelization.md
 
 ---
 
@@ -33,29 +33,7 @@ status: current
 <!-- (prior P1 batch — TASK-009 · 013 · 017 · 010 — shipped in SPRINT-008; TASK-035 shipped in SPRINT-012; see docs/CHANGELOG.md) -->
 
 <!-- (TASK-053 · 057 · 054 shipped in SPRINT-015 → v1.6.0; see docs/CHANGELOG.md) -->
-- [ ] **TASK-069 — Add Agent/Task to allowed-tools (orchestrator · council · flow)**  [size: S] [risk: low] [HITL]
-      done-when: `Agent, Task` listed in the `allowed-tools` frontmatter of orchestrator · council · flow so sub-agent dispatch **auto-approves** (no per-spawn permission prompt); other skills unchanged; qa frontmatter passes.
-      touches:   skills/{orchestrator,council,flow}/SKILL.md (frontmatter)
-      assumes:   dispatching built-in agents is agent-free-consistent (ADR-002 — lean-flow defines no agents, dispatches built-ins). `allowed-tools` grants auto-approval, does NOT restrict (verified, claude-code-guide).
-      tracker:   session dispatch diagnosis · docs/adr/ADR-010
-      state:     ready
-- [ ] **TASK-070 — Classification-driven default dispatch in /orchestrator**  [size: M] [risk: med] [HITL]
-      done-when: the orchestrator (decision/Opus tier) COORDINATES and does not execute inline; a task classified `execution`→Sonnet / `mechanical-ingest`→Haiku is dispatched to a sub-agent handed its procedure skill (ADR-010 mech C) BY its classification; `decision`-nature/trivial inline only with a stated reason. Grounded in model-purpose.md (route by nature not size). Detail → references/ (SKILL ≤110, L-012).
-      touches:   skills/orchestrator/SKILL.md + skills/orchestrator/references/ (dispatch detail)
-      assumes:   dispatch follows the task's G1/decompose classification — the baseline (model-purpose.md · ADR-010).
-      tracker:   docs/research/model-purpose.md · docs/adr/ADR-010
-      state:     ready
-- [ ] **TASK-071 — Wire the parallel/sequential dispatch decision to the overlap map**  [size: M] [risk: med] [HITL]
-      done-when: /orchestrator sprint-bulk decides from the G2 overlap-ownership map — tasks with NO shared file AND no `depends-on` dispatch in **parallel** (multiple Agent calls in one message); tasks sharing a file or with a dependency run **sequential**. Mechanism concrete.
-      touches:   skills/orchestrator/SKILL.md (sprint-bulk Sequence) + references/
-      assumes:   parallel = multiple Agent calls in one assistant message (verified Claude Code mechanism); no config knob.
-      depends-on: TASK-070 (shares the dispatch references + orchestrator dispatch section — sequence 070→071, per-hunk L-042)
-      state:     ready
-- [ ] **TASK-072 — ADR-010 amendment: dispatch-by-classification + parallelization + prompt-driven ceiling**  [size: S] [risk: low] [HITL]
-      done-when: ADR-010 gains an append-only amendment recording (a) dispatch is classification-driven default (orchestrator coordinates, never executes inline), (b) the parallel/sequential rule from the overlap map, (c) the ceiling — a prose skill nudges but can't guarantee; deterministic fan-out → `/batch`·`/workflows`. CONTEXT tier note updated iff wording changes.
-      touches:   docs/adr/ADR-010 · .claude/CONTEXT.md (iff wording)
-      depends-on: TASK-070 · TASK-071
-      state:     ready
+<!-- (TASK-069 · 070 · 071 · 072 promoted → SPRINT-023 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-023-dispatch-and-parallelization.md) -->
 
 ### P2 — Quality / Polish
 
