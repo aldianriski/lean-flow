@@ -3,7 +3,7 @@ sprint: 015
 slug: loop-hardening
 owner: Maintainer
 last_updated: 2026-07-10
-status: active
+status: closed
 plan_commit: f5d646f
 close_commit: pending
 update_trigger: sprint execute/close events
@@ -132,19 +132,36 @@ Closes the recurring "surfaced inline instead of actually asking" miss (L-002 ·
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `skills/orchestrator/SKILL.md` | T1·T2·T3 | sprint-gate on freeform dispatch · tdd-default routing · G2 grill → popup | Med | trace + L-007 exercise (caught membership bug) |
+| `skills/flow/SKILL.md` | T1·T2·T3 | build-step guard · tdd-default · popup red-flag | Low | trace |
+| `.claude/CONTEXT.md` | T2 | Implement-routing = tdd default | Low | read-back |
+| `skills/task-decomposer/SKILL.md` | T3 | intake grill → popup | Low | this session (dogfooded) |
+| `skills/council/SKILL.md` | T3 | clarifying question → popup | Low | trace |
 
 ## Retro
 <!-- Written at close. Route buckets (DOCS_Guide §10): shipped → CHANGELOG · tech debt → TD-NNN ·
      follow-ups → TASK-NNN · learnings → LEARNINGS. Then archive → docs/sprint/archive/ + INDEX line. -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no failure to find or contradict a prior `L-NNN`/ADR. Actively used L-007
+(exercise on real input), L-042/L-037 (shared-file serial ownership), L-012 (near-cap → reword in
+place), L-002 + L-015 (the misses T3 fixes). No dangling retrieval.
 
 **Worked**
--
+- **L-007 paid off pre-commit** — tracing T1 on a real scenario ("build a Backlog task during an
+  active sprint") caught that the gate was keyed on sprint *existence*, not *membership*; fixed before
+  the commit, not after.
+- **Serial single-owner on the shared file** (D1) — three tasks all editing `orchestrator/SKILL.md`,
+  committed T1→T2→T3 with a full commit between each, so `git add <file>` never staged another task's
+  WIP. No `add -p` gymnastics needed because there was no concurrent WIP.
+- **In-place rewording held the 110 cap** — orchestrator absorbed all three tasks at 105→107.
 
 **Friction**
--
+- **Near-cap tax** — orchestrator's ~3 lines of headroom forced every change to be a reword rather than
+  an addition; a genuinely additive behaviour would have had to go to `references/`. The cap is doing
+  its job but the ceiling is close.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- **L-016** — a skill repo can't dogfood a feature whose substrate it lacks: lean-flow is markdown-only,
+  so `/tdd` *correctly* never fires here (routing → implement-directly). Item #8's "TDD never invoked"
+  is a **consumer-repo** gap, confirmed by tracing the consumer path, not the dogfood path. Distinguish
+  "not exercised in our repo" from "broken for consumers" (L-015 family).

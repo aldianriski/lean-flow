@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-02
+last_updated: 2026-07-10
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -19,6 +19,14 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 > **By-tag index** → [`docs/knowledge-index.md`](knowledge-index.md) — generated corpus-wide by
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
+
+---
+
+## L-016 [tags: process] [status: active]: A skill/tool repo can't dogfood a feature whose substrate it lacks — judge it on the CONSUMER path. lean-flow is markdown-only, so `/tdd` *correctly* never fires in its own loop (Implement-routing → implement-directly, no harness); SPRINT-015 T2 confirmed the "TDD never invoked" gap (item #8) is real only for **consumer repos with testable code**, by tracing the consumer path rather than the dogfood path. Pattern: when a change targets consumer behaviour the host repo can't itself exercise, verify by tracing the consumer scenario — don't read "didn't fire in our repo" as either "broken" or "fine".
+- seen: Sprint-015
+- count: 1
+- promoted: no
+- related: L-015 (consumer-facing surface) · L-007 (exercise on real input) · L-002 (grill firing)
 
 ---
 

@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-015 — Loop Hardening** → docs/sprint/SPRINT-015-loop-hardening.md  (active · 3 tasks: T1 gate-build · T2 tdd-standard · T3 popup-audit)
+> _(no active sprint — SPRINT-015 closed 2026-07-10 → v1.6.0; archived per §11.)_
 
 ---
 
@@ -32,7 +32,7 @@ status: current
 
 <!-- (prior P1 batch — TASK-009 · 013 · 017 · 010 — shipped in SPRINT-008; TASK-035 shipped in SPRINT-012; see docs/CHANGELOG.md) -->
 
-<!-- TASK-053 · 057 · 054 promoted → SPRINT-015 (active) 2026-07-10; live plan + DoD in docs/sprint/SPRINT-015-loop-hardening.md. -->
+<!-- (TASK-053 · 057 · 054 shipped in SPRINT-015 → v1.6.0; see docs/CHANGELOG.md) -->
 _(empty)_
 
 ### P2 — Quality / Polish

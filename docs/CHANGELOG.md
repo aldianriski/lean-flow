@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-02
+last_updated: 2026-07-10
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -8,6 +8,27 @@ status: current
 # lean-flow — Changelog
 
 <!-- Prepend new sprints — newest first. Append-only; never edit past blocks. -->
+
+---
+
+## v1.6.0 — Loop Hardening (2026-07-10)
+
+MINOR — bundles **SPRINT-015** (detail below).
+
+**What changed for you:** three refinements to how the loop drives work.
+- **Build is gated behind a recorded sprint.** `/orchestrator` no longer silently defaults a
+  Backlog task to a quick build — a task that isn't in an active sprint surfaces a choice (promote it
+  into a sprint, or proceed as an explicit `quick` one-off). `/quick` still works for genuine
+  single tasks; it's just no longer the silent path from decompose → build.
+- **`/tdd` is the default implement path.** New testable behaviour is now built test-first by
+  default (decline only with a stated reason — or no test harness → implement directly + a manual
+  verification note). Previously this routing existed but was easy to skip.
+- **Gate & grill questions are asked, not narrated.** G1/G2 residual grill (`/orchestrator`),
+  intake grill (`/task-decomposer`), and `/council`'s clarifying question now surface as
+  AskUserQuestion popups instead of inline prose. *No action needed — applies the next time you run
+  these skills.*
+
+Manifests → 1.6.0 lockstep; skill roster unchanged (14). Additive — nothing to migrate.
 
 ---
 

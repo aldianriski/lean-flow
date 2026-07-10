@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-02
+last_updated: 2026-07-10
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-015 — Loop Hardening — closed 2026-07-10 · pending
 - SPRINT-014 — Knowledge Corpus + Council Hardening — closed 2026-07-02 · c02dbf1
 - SPRINT-013 — Knowledge Metadata — closed 2026-07-02 · 6051bf6
 - SPRINT-012 — Process Hardening — closed 2026-07-02 · bb39c7f
