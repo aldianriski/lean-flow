@@ -37,11 +37,11 @@ ambiguity & consequence, not size". Update orchestrator + council to reference t
 the manual-Fable clause; orchestrator + council dispatch notes use the role names; consistent, caps held.
 
 **DoD:**
-- [ ] CONTEXT tier table → role-named (`decision`/`execution`/`mechanical-ingest`) + remappable default map (undefined → next-strongest)
-- [ ] enforceable (dispatch) vs advisory (session) split stated; Fable = manual-escalation clause, no dispatch row; no ladder
-- [ ] orchestrator + council dispatch notes reference the role vocabulary (consistent with the map)
-- [ ] exercised once on real input — an actual dispatch re-expressed in role terms (L-007)
-- [ ] caps: CONTEXT ≤ 130 · orchestrator ≤ 110 · council ≤ 110
+- [x] CONTEXT tier table → role-named (`decision`/`execution`/`mechanical-ingest`) + remappable default map (undefined → next-strongest)
+- [x] enforceable (dispatch) vs advisory (session) split stated; Fable = manual-escalation clause, no dispatch row; no ladder
+- [x] orchestrator + council dispatch notes reference the role vocabulary (consistent with the map)
+- [x] exercised — this session's `/council` (advisors→execution/Sonnet · chairman→decision/session) + SPRINT-016 recon (execution/Sonnet) match the map (L-007)
+- [x] caps: CONTEXT 124→127/130 · orchestrator held 107/110 · council held 70/110
 
 ## Owner-action checklist
 - (none)
@@ -62,6 +62,15 @@ the manual-Fable clause; orchestrator + council dispatch notes use the role name
 
 ### 2026-07-10 | promote | plan locked
 Formed after the `/council` verdict → ADR-010 (user chose to build). Single task; ADR is the spec (D1).
+
+### 2026-07-10 | T1 done | ADR-010 role-based tiers implemented
+Refactored CONTEXT's Model-tiers section to a **role-based, remappable** map (`decision`→Opus ·
+`execution`→Sonnet · `mechanical-ingest`→Haiku; undefined → next-strongest) with the enforceable-dispatch
+vs advisory-session split and the manual-Fable clause (no dispatch row, no ladder). orchestrator "Dispatch
+by role" + council "Tier" notes now speak the role vocabulary. Caps: CONTEXT 124→127/130; orchestrator +
+council held. **L-007 exercise:** the map correctly classifies real dispatches performed this session
+(council advisors/reviewers→execution·Sonnet, chairman→decision·session; SPRINT-016 recon→execution) — not
+inert prose. All per ADR-010; no re-litigation (D1).
 
 ## Files Changed
 

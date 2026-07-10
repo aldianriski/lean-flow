@@ -71,16 +71,19 @@ Humans approve gates — the skill never self-approves. Review is a self-review 
 | `mvp` | G1 + G2 | feature work, medium+, multi-step |
 | `sprint-bulk` | G1+G2 once | auto-loop the Active Sprint task list |
 
-## Model tiers (token discipline)
+## Model tiers (dispatch discipline · ADR-010)
 
-Decide on the **session model**; dispatch bounded work to cheap-tier subagents — never switch mid-session.
+Route by **nature, not size — ambiguity & consequence up, volume & repetition down**. lean-flow controls
+only the models it **dispatches** on (Agent-tool `model:`); the session model is advisory (the installer's).
+**Role-based + remappable** — undefined role → next-strongest defined (a repo lacking a model still runs).
 
-| Work | Tier |
+| Role (default) | Fires on |
 |---|---|
-| Gates (G1/G2) · grill · design · synthesis · review *judgment* | **session model** (main loop) |
-| Council advisors + peer review · recon (`Explore`) · well-specced *mechanical* edits | **cheap-tier** — `sonnet` (`opus` if reasoning-heavy) via Agent-tool `model:` |
+| `decision` → **Opus** *(session · advisory)* | gates · grill · design · synthesis · review judgment · council chairman |
+| `execution` → **Sonnet** *(dispatched)* | implement · recon (`Explore`) · council advisors + review · research |
+| `mechanical-ingest` → **Haiku** *(dispatched)* | bulk extraction · validation · triage · high-volume reads |
 
-**Contract** — spawn-with-brief (spec · files · acceptance, the AFK durable-spec rule), never a mid-session switch; G1/G2 + review guard quality.
+**Fable = manual escalation, no dispatch row** — invoke by hand when execution fails twice or a fork is ADR-grade (opt. `/council`); **no automated ladder** (a fail point may dispatch a built-in — never a hook). Contract: spawn-with-brief; G1/G2 + review guard quality. Full doctrine → ADR-010.
 
 ## Sprint model
 

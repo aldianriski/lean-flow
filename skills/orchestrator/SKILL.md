@@ -59,9 +59,9 @@ only what is still open — one question at a time (as an **AskUserQuestion popu
 > **Drive with `/goal`** — set a `/goal` equal to the task's done-when / acceptance so execution keeps
 > working across turns until it's verifiably met (Goal-Driven Execution, native), then clear it.
 >
-> **Dispatch by tier** — gates · grill · design · synthesis stay on the session model; send recon and
-> *well-specced mechanical* implement work to a cheap-tier `sonnet` subagent (Agent-tool `model:`
-> override) with a self-contained brief. Tier map → `.claude/CONTEXT.md`.
+> **Dispatch by role** — `decision` work (gates · grill · design · synthesis) stays on the session model
+> (advisory); dispatch `execution` (implement · recon) → Sonnet and `mechanical-ingest` → Haiku with a
+> self-contained brief; escalate manually to Fable / `/council` for an ADR-grade fork. Role map → `.claude/CONTEXT.md` (ADR-010).
 
 ### quick
 1. **Parse** — restate the task as a verifiable goal; confirm in one line.

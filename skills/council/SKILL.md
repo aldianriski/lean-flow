@@ -34,9 +34,9 @@ honest. **Full definitions → `references/advisors.md`** (read before step 2).
 
 ## Tier
 
-Dispatched roles — advisors (step 2), peer reviewers (step 3), the research pass (step 1C) — run on
-**cheap-tier `sonnet`** sub-agents (Agent-tool `model:` override); only the **chairman synthesis
-(step 4) stays on the session model** (the high-judgment step). Tier map → `.claude/CONTEXT.md`.
+Dispatched roles — advisors (step 2), peer reviewers (step 3), the research pass (step 1C) — run on the
+**`execution` role** (`sonnet` default); only the **chairman synthesis (step 4) runs on the `decision`
+role** (session model — the high-judgment step). Role map → `.claude/CONTEXT.md` (ADR-010).
 
 ## The 6 steps
 
