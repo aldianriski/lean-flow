@@ -66,6 +66,29 @@ doc is the WHY-trail for the build task. **Landing-spot discipline (L-012):** `c
 capped (ADR-006); the near-free items are reworded lines in the existing 6 steps, and the two conditional
 passes + all prompt templates land in `council/references/` — not new SKILL body sections.
 
+## Divergence measurement (TASK-048 · 2026-07-10, 1× probe)
+
+Ran the single-model `/council` once on a real contestable fork (TASK-047 itself — build the multi-model
+backend?) and recorded whether the 5 personas substantively diverge. **They diverge on framing, converge
+on verdict:**
+
+- **Framing divergence — real.** The 5 advisors surfaced 5 *distinct* decision dimensions (unverifiable-
+  diversity → false confidence · axiom violation + human-gate redundancy · product/moat upside · consent/
+  data-governance · build-path infeasibility), not five rewordings of one take. Peer review de-anonymized
+  cleanly: First Principles won strongest **3/5**; the lone "build" lens (Expansionist) was flagged biggest
+  blind spot **5/5**.
+- **Verdict convergence — 4–1** (don't build / build).
+- **Interpretation:** matches finding #4 — single-model personas reduce *framing* blind spots (confirmed:
+  genuine dimensional spread), but this run **cannot** test shared *knowledge/factual* gaps (a pure judgment
+  fork, no external-facts surface). So the ceiling is **not** "5 personas are theater" — divergence is real
+  on framing; the untested crack is specifically shared *factual priors*.
+- **Effect on TASK-047:** the ceiling did not manifest as a visible crack here; peer review independently
+  surfaced the decisive reframe — a **BYO-provider, opt-in, disabled-by-default** shape (installer owns the
+  trust boundary), the only axiom-consistent path if 047 is revisited. Prerequisite now: **measure whether
+  cross-model actually decorrelates errors on a *factual* decision** (which this judgment probe could not) before any build.
+- **3× cross-run check:** not run (G2 owner scoped to 1×). File as a follow-up only if a future probe on a
+  factual decision looks borderline.
+
 ## Out of scope / open questions
 
 - **This is decide-only.** The build is a follow-up **TASK** (proposed: "Harden `/council` — pre-mortem · dialectical Contrarian · calibrated verdict · gated fact-verify · unknown-unknowns moderator") — decompose + G2 before editing the skill.

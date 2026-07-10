@@ -77,9 +77,9 @@ real crack (→ unblocks/kills TASK-047) or a footnote.
 **Acceptance:** a findings note records the divergence verdict against a real decision.
 
 **DoD:**
-- [ ] Ran single-model `/council` 3× on one real past decision
-- [ ] Recorded whether the 5 personas substantively diverge or converge
-- [ ] Findings appended to `docs/research/council-improvements.md` → gates TASK-047
+- [x] Ran single-model `/council` **1×** on one real past decision *(G2 owner scope: 3×→1× probe; 3× cross-run → conditional follow-up)*
+- [x] Recorded whether the 5 personas substantively diverge or converge
+- [x] Findings appended to `docs/research/council-improvements.md` → gates TASK-047
 
 ## Owner-action checklist
 - [ ] none
@@ -118,9 +118,24 @@ Added § Two axes to `review-scoping.md` (uncounted reference) — Standards (co
 vs Spec (builds the right thing), reported separately, never merged/re-ranked. SKILL.md L96 pointer +2
 words (still 107/110).
 
+### 2026-07-10 | scope-change (G2) | T4 3×→1×
+Owner scoped T4 to a **1× probe** at the G2 gate (≈11 calls vs ≈33). *What broke:* none — decided before
+the loop, not a mid-sprint pivot. *Impact:* single-run divergence datapoint; the 3× cross-run check becomes
+a conditional follow-up TASK only if the single run is borderline. *G2 re-confirm:* target = TASK-047
+(provider-dependency fork) — real, contestable, and the exact decision TASK-048 informs.
+
 ### 2026-07-10 | T3 done | expand–contract
 Added § Wide refactors: expand–contract to `deepening.md` (add-new → migrate-batches → remove-old, each
 its own task) + a one-line pointer in refactor-advisor SKILL.md Process (60/110).
+
+### 2026-07-10 | T4 done | council divergence probe (1×)
+Ran `/council` 1× on the TASK-047 fork (11 dispatched sonnet calls: 5 advisors + 5 reviewers + chairman on
+session model; both gated passes skipped — pure judgment fork, no fast-groupthink blind spot left after
+peer review). **Result:** personas diverge on *framing* (5 distinct dimensions; First Principles strongest
+3/5, Expansionist blind-spot 5/5) but converge on verdict 4–1. Confirms finding #4 (framing diversity real;
+shared *factual* priors untested by a judgment fork). Findings → council-improvements.md § Divergence
+measurement; lean verdict → scratchpad `verdict-council-multimodel.md`. Bonus: peer review surfaced a
+BYO-provider opt-in-disabled-by-default reframe as the only axiom-consistent path for TASK-047.
 
 ## Files Changed
 
@@ -133,6 +148,7 @@ its own task) + a one-line pointer in refactor-advisor SKILL.md Process (60/110)
 | `skills/orchestrator/SKILL.md` | T2 | L96 pointer adds "Standards-vs-Spec axes" | Low | cap 107/110 |
 | `skills/refactor-advisor/references/deepening.md` | T3 | new § Wide refactors: expand–contract | Low | reference (uncounted) |
 | `skills/refactor-advisor/SKILL.md` | T3 | Process bullet points to expand–contract | Low | cap 60/110 |
+| `docs/research/council-improvements.md` | T4 | § Divergence measurement — 1× probe result | Low | doc |
 
 ## Retro
 <!-- Written at close. Route buckets (DOCS_Guide §10): shipped→CHANGELOG · debt→TD-NNN · follow-ups→TASK-NNN · learnings→L-NNN. Then archive (§11). -->
