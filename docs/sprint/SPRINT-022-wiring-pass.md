@@ -34,9 +34,9 @@ step" hook (parallel to the routing note) and/or link the steps to it, so dispat
 **Acceptance:** reading any Implement step leads to "dispatch execution to a sub-agent handed its procedure skill."
 
 **DoD:**
-- [ ] "Dispatch by role" note carries an "at any Implement step" hook (parallel to the Implement-routing note)
-- [ ] at least one explicit link from the Implement steps / routing note to dispatch-with-skill
-- [ ] `orchestrator/SKILL.md` ≤110
+- [x] "Dispatch by role" note carries an "at any Implement step" hook (*"fires at every Implement step"*)
+- [x] explicit link from the Implement-routing note to dispatch-with-skill (*"the routed skill is what the dispatched sub-agent runs — see Dispatch by role"*)
+- [x] `orchestrator/SKILL.md` ≤110 (107)
 
 ### T2 — Inject Standards-vs-Spec into the reviewer brief + record in CONTEXT `[size: S · risk: low]`
 Layers: `skills/orchestrator/references/review-scoping.md` · `.claude/CONTEXT.md`
@@ -80,10 +80,15 @@ Rendered from the wiring audit (3 tasks, audit-derived). Governance: no unpromot
 (L-016 promoted earlier this session); TD-008 re-review flagged (minor); CHANGELOG v1.8.0-block rotation
 deferred (file lean). Plan frozen.
 
+### 2026-07-10 | T1 done | dispatch ↔ Implement wired
+Scoped "Dispatch by role" with "fires at every Implement step" + Implement-routing note now points to it
+— the dispatch-with-skill mechanism is no longer orphaned from the steps that trigger it.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/SKILL.md` | T1 | dispatch note scoped to Implement steps + routing note links to it | Low | cap 107/110 |
 
 ## Retro
 <!-- Written at close. Route buckets (§10). Then archive (§11). PATCH → /release-patch. -->
