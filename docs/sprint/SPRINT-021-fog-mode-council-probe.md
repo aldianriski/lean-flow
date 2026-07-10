@@ -35,12 +35,12 @@ grilling / task · AFK|HITL) that **route to existing skills** (`/prototype`, gr
 **Acceptance:** `/task-decomposer` has a fog-map mode, exercised once on a real foggy problem.
 
 **DoD:**
-- [ ] fog-map mode added (SKILL.md mode entry + `references/fog-map.md` detail)
-- [ ] fog-map artifact defined: Destination · Decisions-so-far · Not-yet-specified · Out-of-scope + decision-ticket types (research/prototype/grilling/task · AFK|HITL) routing to existing skills
-- [ ] graduation defined: a resolved decision-ticket → `TASK-NNN` (feeds the normal decompose pipeline)
-- [ ] roster stays 14 (a mode, not a skill); CONTEXT.md/README touched only if wording needs it; qa 14=14
-- [ ] `task-decomposer/SKILL.md` ≤110 (detail in `references/`, L-012)
-- [ ] **exercised once on a real foggy problem** (L-007) — the graph-view + OKF fog-map from this session is the candidate
+- [x] fog-map mode added (SKILL.md mode entry + `references/fog-map.md` detail)
+- [x] fog-map artifact defined: Destination · Decisions-so-far · Not-yet-specified · Out-of-scope + decision-ticket types (research/prototype/grilling/task · AFK|HITL) routing to existing skills
+- [x] graduation defined: a resolved decision-ticket → `TASK-NNN` (feeds the normal decompose pipeline)
+- [x] roster stays 14 (a mode, not a skill); CONTEXT.md + README updated (roster note + references listing); qa 14=14
+- [x] `task-decomposer/SKILL.md` ≤110 (89; detail in `references/`, L-012)
+- [x] **exercised once on a real foggy problem** (L-007) — graph-view + OKF fog-map, embedded as the worked example in `references/fog-map.md`
 
 ### T2 — Probe cross-model factual decorrelation `[size: S · risk: low]`
 Layers: `/council` (exercise only) · `docs/research/council-improvements.md` (findings)
@@ -76,10 +76,21 @@ Rendered from TASK-064 + TASK-065. Governance at promote: **L-016 promoted** (co
 anti-pattern extension) + collapsed to pointer; **CHANGELOG rotated** (§11 — v1.7.1 & older → `docs/changelog/CHANGELOG-1.7.1.md`,
 main 447→53 lines); TD-008 re-review flagged (minor, out of scope). Plan frozen.
 
+### 2026-07-10 | T1 done | fog-map mode
+Added fog-map mode to `/task-decomposer` (SKILL 79→89, cap-safe) + `references/fog-map.md` (artifact ·
+decision-ticket types routing to existing skills · chart→work→graduate loop · worked example). Roster 14
+(a mode). CONTEXT roster note + README skill-line/references updated (L-015). **L-007 exercise:** the
+graph-view + OKF fog-map is embedded as the reference's worked example — a real foggy problem mapped with
+the mode's structure (routes to research-spike/`/prototype`/grill; one ticket already graduated → okf-adoption.md).
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/task-decomposer/references/fog-map.md` | T1 | new — fog-map artifact + loop + worked example (uncounted) | Low | reference |
+| `skills/task-decomposer/SKILL.md` | T1 | fog-map mode section + `--fog` arg | Low | cap 89/110 |
+| `.claude/CONTEXT.md` | T1 | roster note: fog-map for foggy work (net-0) | Low | cap 127/130 |
+| `README.md` | T1 | skill-line + references listing (consumer surface, L-015) | Low | no cap |
 
 ## Retro
 <!-- Written at close. Route buckets (§10): shipped→CHANGELOG · debt→TD-NNN · follow-ups→TASK-NNN · learnings→L-NNN. Then archive (§11). -->

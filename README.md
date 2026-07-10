@@ -152,7 +152,7 @@ stage-skills each also run **standalone** (none require another); `/council` is 
 | **conduct** | `/flow` | opt-in — run the whole loop in order; enforces gates + governance, never auto-approves |
 | **orient** | `/prime` | session start — ordered context load + health check |
 | **plan** | `/lean-doc-generator` | docs / ADRs / sprint promote + close (WHY & WHERE only) — **ships its own templates + standard** |
-| | `/task-decomposer` | intent / ticket / PRD → `TASK-NNN` backlog entries (tracer-bullet slices) |
+| | `/task-decomposer` | intent / ticket / PRD → `TASK-NNN` backlog entries (tracer-bullet slices; or a **fog-map** for foggy work too big to plan) |
 | | `/triage` | re-prioritise + state the backlog; route rejects to `.out-of-scope/` |
 | **build** | `/orchestrator` | gate-driven execution — `quick` · `mvp` · `sprint-bulk` |
 | | `/prototype` | throwaway code to answer one design question (logic TUI / web UI variants) |
@@ -290,7 +290,7 @@ skills/           14 skills — /flow conductor + 12 stages + /council (auto-dis
     templates/    13 canonical doc templates (incl. SPRINT · ADR · RESEARCH · DEPLOY)
   tdd/references/             testability.md
   diagnose/references/        feedback-loops.md
-  task-decomposer/references/ prd-and-slices.md
+  task-decomposer/references/ prd-and-slices.md · fog-map.md
   refactor-advisor/references/ deepening.md
   prototype/references/       logic.md · ui.md
   council/                    opt-in agent decision aid

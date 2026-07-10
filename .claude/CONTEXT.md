@@ -23,7 +23,7 @@ Every skill works standalone; the loop is just the order they reward most togeth
 | `/prime` | entry | ordered context load + health check (read-only) |
 | `/lean-doc-generator` | plan | WHY/WHERE docs · ADRs · sprint promote/close · **migrate** (adopt + clean) · **init** (scaffold fresh) — bundles templates + standard |
 | `/orchestrator` | build | gate-driven execution — `quick` · `mvp` · `sprint-bulk` |
-| `/task-decomposer` | feed | intent / ticket / PRD → `TASK-NNN` entries — **the detailed grill lives here** (intake) |
+| `/task-decomposer` | feed | intent / ticket / PRD → `TASK-NNN` (or a **fog-map** when work's too foggy to plan) — **the detailed grill lives here** (intake) |
 | `/triage` | groom | re-prioritise + state the Backlog; flag stale/dupe/conflict; route rejects to `.out-of-scope/` |
 | `/prototype` | explore | throwaway code to answer one design question; capture → ADR/PRD, delete |
 | `/tdd` | test-first | build NEW behaviour test-first — vertical-slice red-green-refactor |

@@ -1,7 +1,7 @@
 ---
 name: task-decomposer
 description: Use when converting a freeform feature request, ticket URL, PRD, or epic into structured TASK-NNN entries in TODO.md. Enforces an assumption registry, risk scoring, vertical-slice granularity, and validation before writing. Self-contained, no specialist agents. Do not use when a task already exists and is ready to build — use /orchestrator instead.
-argument-hint: "[freeform intent | TICKET-ID | --prd file.md | --epic \"Name\"]"
+argument-hint: "[freeform intent | TICKET-ID | --prd file.md | --epic \"Name\" | --fog \"foggy goal\"]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 user-invocable: true
 version: "0.2.0"
@@ -39,6 +39,17 @@ For a ticket, fetch the description first (ask the user to paste if credentials 
 5. **Classify HITL / AFK** — `HITL` = a human must review the output before proceeding; `AFK` = autonomous completion is safe (acceptance is mechanically checkable · no irreversible side effects · no product/UX judgment call · spec is durable). Default to `HITL` when uncertain. **For `AFK` tasks, spec durably** — an AFK task may sit in the backlog for weeks before an agent picks it up: write behavioral contracts (name the types / interfaces / config shapes to change) + testable acceptance + explicit out-of-scope; **never reference file paths or line numbers** — they go stale.
 6. **Validate** — every task has an observable acceptance criterion ("done when …"); no two tasks share identical criteria (merge or differentiate). For multi-slice breakdowns, run the **breakdown quiz** (reference) — confirm granularity, dependencies, merge/split, HITL/AFK — before Write.
 7. **Write** — only after the human types `approve`, append entries to `TODO.md` **Backlog** in dependency order (blockers first). Touch no other file. Sprint formation happens later via `/lean-doc-generator promote`.
+
+## Fog-map mode (foggy work too big to plan up front)
+
+When the work is too large/foggy to slice — you can't write acceptance criteria because the *decisions
+aren't known* — don't force premature `TASK-NNN`. Run a **pre-decomposition fog-map** (`--fog`, or offer
+it when the grill reveals the frontier is unknowable): a living map — **Destination · Decisions-so-far ·
+Not-yet-specified (fog) · Out-of-scope** — of **decision-tickets** that resolve *decisions, not
+deliverables* (Research·AFK / Prototype·HITL / Grilling·HITL / Task). Each ticket **routes to an existing
+skill** (research-spike/`Explore` · `/prototype` · the intake grill · normal decompose) and **graduates
+into `TASK-NNN`** once resolved. Loop until no decision is uncertain, then decompose the now-clear work
+normally. Full artifact + loop → `${CLAUDE_SKILL_DIR}/references/fog-map.md`.
 
 ## Task entry shape
 
