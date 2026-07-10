@@ -2,7 +2,7 @@
 name: flow
 description: Conduct the full lean-flow loop end-to-end — assess context, ensure a backlog and sprint exist, build through the gates with the right per-task technique, then close with governance. The opt-in conductor: it sequences the standalone skills as stages and enforces the gates/governance, but never auto-approves a human gate. Use when you want the disciplined workflow run for you; use the individual skills for à la carte work.
 argument-hint: "[intent, or blank to continue from current state]"
-allowed-tools: Read, Bash, Glob, Grep
+allowed-tools: Read, Bash, Glob, Grep, Agent, Task
 user-invocable: true
 version: "0.2.0"
 ---

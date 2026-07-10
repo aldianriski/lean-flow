@@ -34,8 +34,8 @@ per-spawn permission prompt that currently stalls dispatch.
 **Acceptance:** the three skills list `Agent, Task`; qa frontmatter passes; dispatch no longer prompts.
 
 **DoD:**
-- [ ] `Agent, Task` added to `allowed-tools` of orchestrator · council · flow (only these — they dispatch)
-- [ ] other skills unchanged; `qa-check.sh` frontmatter check passes
+- [x] `Agent, Task` added to `allowed-tools` of orchestrator · council · flow (only these — they dispatch)
+- [x] other skills unchanged; `qa-check.sh` frontmatter check passes
 
 ### T2 — Classification-driven default dispatch `[size: M · risk: med]`
 Layers: `skills/orchestrator/SKILL.md` + `skills/orchestrator/references/` (dispatch detail, uncounted L-012)
@@ -99,10 +99,15 @@ Rendered from TASK-069·070·071·072 (dispatch diagnosis → decompose). Govern
 learnings (L-016·L-020 promoted this session); TD-008 re-review flagged (minor); CHANGELOG rotation deferred
 (PATCH landed, not a minor trigger). Plan frozen.
 
+### 2026-07-10 | T1 done | allowed-tools +Agent/Task
+Added `Agent, Task` to `allowed-tools` of orchestrator · council · flow so dispatch auto-approves (kills
+the per-spawn permission prompt that stalled dispatch). Only the three dispatching skills; others untouched.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/SKILL.md` · `council/SKILL.md` · `flow/SKILL.md` | T1 | `allowed-tools` += `Agent, Task` (auto-approve dispatch) | Low | qa frontmatter |
 
 ## Retro
 <!-- Written at close. Route buckets (§10). Then archive (§11). -->

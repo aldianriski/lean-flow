@@ -1,7 +1,7 @@
 ---
 name: council
 description: "Run a high-stakes, hard-to-reverse, or ambiguous decision through a council of 5 AI advisors who independently analyze it, peer-review each other anonymously, and synthesize a final verdict to a lean verdict-<slug>.md. The opt-in decision aid for genuinely hard forks — the pressure-test before an ADR (DOCS_Guide §4) or a G2 design call. Based on Karpathy's LLM Council. Uses sub-agents (≈11 model calls/run) — reserve for decisions where being wrong is expensive, NOT every choice. MANDATORY TRIGGERS: 'council this', 'run the council', 'war room this', 'pressure-test this', 'stress-test this', 'debate this'. STRONG TRIGGERS (with a real decision/tradeoff): 'should I X or Y', 'which option', 'what would you do', 'is this the right move', 'validate this', 'get multiple perspectives', 'I can't decide', 'I'm torn between'. Do NOT trigger on simple yes/no questions, factual lookups, or casual 'should I' without a meaningful tradeoff."
-allowed-tools: Read, Write, Glob, Grep
+allowed-tools: Read, Write, Glob, Grep, Agent, Task
 user-invocable: true
 version: "1.0.0"
 ---

@@ -2,7 +2,7 @@
 name: orchestrator
 description: Use when starting, resuming, or completing any development task or sprint. Drives a gate-driven loop — quick, mvp, and sprint-bulk modes — with a G1 Scope gate and a G2 Design gate before any commit. Self-contained, no specialist agents. Do not use for debugging — use /diagnose; or for converting raw intent into tasks — use /task-decomposer.
 argument-hint: "[quick | mvp | sprint-bulk] [task-or-description]"
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep
+allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Agent, Task
 user-invocable: true
 version: "0.2.0"
 ---
