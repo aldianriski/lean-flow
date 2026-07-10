@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-021 closed 2026-07-10 → v1.10.0; archived per §11.)_
+> **SPRINT-022 — Wiring Pass** → docs/sprint/SPRINT-022-wiring-pass.md
 
 ---
 
@@ -70,6 +70,7 @@ _(empty)_
       state:     blocked   (deferred, bar RAISED — TASK-048 (judgment) + TASK-065 (cross-tier factual) both found NO exposed crack; before any build, a cross-PROVIDER test must show a real shared factual error that a different provider corrects)
 <!-- TASK-044 done (SPRINT-014 T1) → metadata SSOT + index extended to ADR/research; see CHANGELOG. -->
 <!-- (TASK-064 · 065 shipped in SPRINT-021 → v1.10.0; see docs/CHANGELOG.md) -->
+<!-- (TASK-066 · 067 · 068 created from the wiring audit → SPRINT-022 active 2026-07-10; plan in docs/sprint/SPRINT-022-wiring-pass.md) -->
 <!-- TASK-008 done → /insights shipped v1.2.0 (friction → L-NNN candidate); see CHANGELOG. -->
 
 > TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).
