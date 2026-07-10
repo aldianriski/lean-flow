@@ -75,12 +75,13 @@ _(empty)_
       assumes:   the crack (if any) is in shared FACTUAL priors, not framing (TASK-048 showed framing-divergence is already real).
       tracker:   docs/research/council-improvements.md · gates TASK-047
       state:     ready
-- [ ] **TASK-064 — Design spike: wayfinder-style fog-mode for /task-decomposer**  [size: M] [risk: med] [HITL]
-      done-when: decision recorded on whether foggy work too big to slice needs a pre-decomposition "fog map" mode (decision-resolving tickets + fog-graduation) in /task-decomposer, or whether /prototype + research-spike already cover it. Needs a real foggy problem to test against.
-      touches:   skills/task-decomposer/ (design only) · docs/research/mattpocock.md (findings)
+- [ ] **TASK-064 — Build wayfinder-style fog-mode in /task-decomposer**  [size: M] [risk: med] [HITL]
+      done-when: /task-decomposer gains an optional pre-decomposition **fog-map** mode — decision-tickets (research/prototype/grilling/task · AFK/HITL) tracked in a map (Destination · Decisions-so-far · Not-yet-specified · Out-of-scope) that ROUTE to existing skills and GRADUATE into TASK-NNN as the fog clears. Exercised once on a real foggy problem.
+      decision:  (2026-07-10, owner-confirmed) BUILD, as a mode — the unmatched gap over /prototype·/council·decomposer is *foggy work too big to plan up front*. Designed-by-example: the "graph view over the knowledge corpus + OKF" problem was fog-mapped live (routed to research-spike · /prototype · grill; OUT = separately-maintained graph, council-rejected).
+      touches:   skills/task-decomposer/SKILL.md + references/ (mode detail uncounted, L-012)
       assumes:   fold into /task-decomposer as a mode, NOT a new skill (roster stays 14)
-      tracker:   docs/research/mattpocock.md § Out of scope (wayfinder fog-mode)
-      state:     needs-info   (worth building vs already covered — settle at next promote)
+      tracker:   docs/research/mattpocock.md § Keepers (wayfinder)
+      state:     ready
 <!-- TASK-008 done → /insights shipped v1.2.0 (friction → L-NNN candidate); see CHANGELOG. -->
 
 > TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).
