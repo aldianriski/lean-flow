@@ -41,6 +41,7 @@ template ship inside this skill under `${CLAUDE_SKILL_DIR}/`.
 | `/lean-doc-generator promote` | Sprint Promote (below) |
 | `/lean-doc-generator close` | Sprint Close (below) |
 | `/lean-doc-generator migrate` | **Adopt + clean** existing docs (dev-flow · adlc-flow · any layout) — align placement/format/wiring, **consolidate dupes, retire dead docs**. Plan → approve → apply. **Re-runnable as an update sync** (report standard/template deltas, never clobber). |
+| `/lean-doc-generator init` | **Scaffold a fresh repo** (greenfield) — scope-interactive: core docs always + optional docs by repo type; **docs-only** (never settings.json). The twin of migrate. |
 
 ## Migrate (adopt + clean existing docs)
 
@@ -53,6 +54,16 @@ delete content without explicit per-item approval, never touch out-of-scope arti
 as an update sync** — on an already-adopted repo, migrate detects standard/template deltas since
 adoption and **reports** them (idempotent · report-only · never clobbers user edits). Full mapping +
 re-run procedure → `${CLAUDE_SKILL_DIR}/references/migration-map.md`.
+
+## Init (scaffold a fresh repo)
+
+For a **greenfield** repo with no lean-flow docs yet — the twin of migrate (decision:
+`docs/research/init-vs-migrate.md`). **Scope-interactive + docs-only:**
+
+1. **Core set (always)** — `CLAUDE.md` · `CONTEXT.md` · `README.md` · `TODO.md` · `ARCHITECTURE.md`, each via the §6 template-load protocol.
+2. **Optional docs** — offer DESIGN (frontend) · DEPLOY (service/release) · RESEARCH via an **AskUserQuestion popup**, defaulting by repo type (manifest/stack); scaffold only what's chosen.
+3. **Docs-only** — `init` **never** writes `.claude/settings.json` or any non-doc file; the safe-command allowlist stays a documented opt-in, not an init side effect.
+4. **Verify** — `/prime` reads cleanly; ownership headers + placement per DOCS_Guide §2/§3.
 
 ## Execution flow
 

@@ -65,10 +65,10 @@ which optional docs (DESIGN/RESEARCH/DEPLOY/…) to include by repo type. **Docs
 optional docs the user selects; writes no settings.json; exercised once on a real empty dir.
 
 **DoD:**
-- [ ] `init` mode added (SKILL mode table + procedure); scope-interactive optional-doc selection
-- [ ] docs-only guarantee stated (no settings.json)
-- [ ] exercised once on real input — init on a scratch dir produces the scoped doc set (L-007)
-- [ ] cap respected (depth → DOCS_Guide.md); CONTEXT.md + README updated if the mode roster is user-visible
+- [x] `init` mode added (SKILL mode table row + 4-step procedure); scope-interactive optional-doc selection via popup
+- [x] docs-only guarantee stated (no settings.json) — and verified in the exercise
+- [x] exercised on real input — scaffolded the 5 core docs at correct placement into a scratch greenfield dir; **no settings.json** confirmed (L-007)
+- [x] cap respected (SKILL 104/110); CONTEXT.md mode-row + ARCHITECTURE boundary updated (L-015); README enumerates no modes → no change
 
 ## Owner-action checklist
 - (none)
@@ -110,6 +110,15 @@ SKILL mode row + migrate paragraph (concise) + a full **Re-run (update sync — 
 `references/migration-map.md`. Guarantees: idempotent · never auto-writes over existing docs · compares
 *shape/convention* drift, not user prose. SKILL 91→93/110 (depth in the reference). Spec-only (L-016 —
 no harness); traced the consumer-update + idempotent self-case for consistency.
+
+### 2026-07-10 | T3 done | `/lean-doc-generator init` mode added
+Added `init` — a scope-interactive greenfield scaffold (mode row + 4-step SKILL section): core docs
+always, optional docs (DESIGN/DEPLOY/RESEARCH) offered by repo type via an **AskUserQuestion popup**,
+**docs-only** (never settings.json). SKILL 93→104/110 (fits). CONTEXT mode-row + ARCHITECTURE boundary
+updated (L-015); README enumerates no modes → no change. **L-007 exercise:** scaffolded the 5 core docs
+at canonical placement (.claude/ for CLAUDE+CONTEXT, root for the rest) into a scratch greenfield dir —
+files landed, **no settings.json** confirmed. Token-fill + popup are per-repo (popup dogfooded all session).
+Distinct from migrate per D3 / init-vs-migrate.md.
 
 ## Files Changed
 

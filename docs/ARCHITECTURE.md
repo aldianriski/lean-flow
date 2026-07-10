@@ -50,7 +50,8 @@ human-approved) and **§10 governance** (Sprint-Close Retro routes to CHANGELOG 
 ## Boundaries (what lean-flow does NOT own)
 
 App-code generation · CI/CD · coverage tooling · telemetry · agent/hook scaffolding · adlc-flow's
-ADLC artifacts. Adopting an existing repo's docs is handled by `/lean-doc-generator migrate`.
+ADLC artifacts. Adopting an existing repo's docs is handled by `/lean-doc-generator migrate`;
+scaffolding a fresh repo by `/lean-doc-generator init`.
 
 ## Decision records
 
