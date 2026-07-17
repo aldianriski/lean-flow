@@ -64,11 +64,20 @@ for s in skills/*/SKILL.md; do
   then ok "frontmatter $s"; else bad "frontmatter $s (need ---/name/description)"; fi
 done
 
-for d in TODO.md .claude/CONTEXT.md docs/ARCHITECTURE.md docs/LEARNINGS.md docs/DECISIONS.md docs/CHANGELOG.md docs/knowledge-index.md; do
+for d in TODO.md .claude/CLAUDE.md .claude/CONTEXT.md docs/ARCHITECTURE.md docs/LEARNINGS.md docs/DECISIONS.md docs/CHANGELOG.md docs/knowledge-index.md; do
   [ -f "$d" ] || { note "skip (missing): $d"; continue; }
   if has_field "$d" owner && has_field "$d" last_updated && has_field "$d" status
   then ok "ownership $d"; else bad "ownership $d (need owner/last_updated/status)"; fi
 done
+
+# README.md carries ownership as a FOOTER LINE, not YAML frontmatter (DOCS_Guide exception).
+if [ -f README.md ]; then
+  if grep -qE '^<sub>.*Doc owner:.*last updated.*status:.*</sub>$' README.md
+  then ok "ownership README.md (footer line)"
+  else bad "ownership README.md (footer line needs Doc owner:/last updated/status:)"; fi
+else
+  note "skip (missing): README.md"
+fi
 
 # --- 4. Knowledge metadata: index freshness + dangling refs + completeness (ADR-009) --
 # Covers the whole corpus: LEARNINGS (in-file `## L-NNN` entries) + per-file frontmatter on
@@ -148,6 +157,68 @@ if [ -f TODO.md ]; then
   else bad "TODO.md hygiene: breadcrumb comment(s) found — $(printf '%s' "$crumbs" | tr '\n' ';')"; fi
 else
   note "skip (missing): TODO.md"
+fi
+
+# --- 6. README footer version lint (footer vX.Y.Z == plugin.json version) --
+if [ -f README.md ] && [ -f .claude-plugin/plugin.json ]; then
+  footer=$(grep -E '^<sub>.*status:.*v[0-9]+\.[0-9]+\.[0-9]+</sub>$' README.md | tail -n1)
+  rv=$(printf '%s' "$footer" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -n1 | tr -d 'v')
+  pv=$(grep -oE '"version": *"[0-9]+\.[0-9]+\.[0-9]+"' .claude-plugin/plugin.json | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+  if [ -n "$rv" ] && [ -n "$pv" ] && [ "$rv" = "$pv" ]
+  then ok "README footer version ($rv = plugin.json $pv)"
+  else bad "README footer version (footer=$rv, plugin.json=$pv)"; fi
+else
+  note "skip (missing): README.md or .claude-plugin/plugin.json"
+fi
+
+# --- 7. TD aging: open TD >=3 sprints behind Active Sprint, no re-review ----
+if [ -f TODO.md ]; then
+  active=$(awk '/^## Active Sprint/{f=1;next} /^## /{f=0} f' TODO.md)
+  cur_raw=$(printf '%s' "$active" | grep -oE 'SPRINT-[0-9]+' | head -n1 | grep -oE '[0-9]+')
+  if [ -z "$cur_raw" ]; then
+    note "TD aging: no Active Sprint pointer found — skipping (no reference point)"
+  else
+    cur=$((10#$cur_raw))
+    tdbad=$(grep -E '^- \*\*TD-[0-9]+\*\* severity:.*status: open' TODO.md | while IFS= read -r tl; do
+      id=$(printf '%s' "$tl" | grep -oE 'TD-[0-9]+' | head -n1)
+      craw=$(printf '%s' "$tl" | grep -oiE 'created: *Sprint-[0-9]+' | grep -oE '[0-9]+')
+      [ -n "$craw" ] || continue
+      created=$((10#$craw))
+      age=$((cur - created))
+      if [ "$age" -ge 3 ] && ! printf '%s' "$tl" | grep -q 're-reviewed:'
+      then printf '%s ' "$id"; fi
+    done)
+    if [ -z "$tdbad" ]; then ok "TD aging (no stale open TD missing re-review)"
+    else bad "TD aging: stale >=3 sprints behind, no re-review: $tdbad"; fi
+  fi
+else
+  note "skip (missing): TODO.md"
+fi
+
+# --- 8. Temp-tracker lint: TODO.md tracker: lines ---------------------------
+if [ -f TODO.md ]; then
+  trkbad=$(grep -E '^ *tracker:' TODO.md | while IFS= read -r tl; do
+    reason=""
+    printf '%s' "$tl" | grep -q '(temp)' && reason="temp"
+    stripped=$(printf '%s' "$tl" | sed -E 's#docs/[A-Za-z0-9_./-]*verdict-[A-Za-z0-9_-]+\.md##g')
+    printf '%s' "$stripped" | grep -qE 'verdict-[A-Za-z0-9_-]+\.md' && reason="${reason:+$reason+}bare-verdict"
+    [ -n "$reason" ] && printf '[%s:%s] ' "$(printf '%s' "$tl" | sed -E 's/^ *tracker: *//' | cut -c1-30)" "$reason"
+  done)
+  if [ -z "$trkbad" ]; then ok "TODO.md trackers (no (temp) or bare verdict-*.md refs)"
+  else bad "TODO.md trackers: $trkbad"; fi
+else
+  note "skip (missing): TODO.md"
+fi
+
+# --- 9. QA.md hygiene: no hand-written live cap snapshot --------------------
+# Checked over a sliding 2-line window so a prose-wrapped "currently ... NN/MM" (the
+# clause split across a line break) is still caught, not just a same-line match.
+if [ -f docs/QA.md ]; then
+  if awk 'NR>1{print prev $0} {prev=$0}' docs/QA.md | grep -qE 'currently.*[0-9]+/[0-9]+'
+  then bad "QA.md hand-written cap snapshot found (drift risk — use qa-check output instead)"
+  else ok "QA.md hygiene (no hand-written cap snapshot)"; fi
+else
+  note "skip (missing): docs/QA.md"
 fi
 
 # --- Summary ----------------------------------------------------------------

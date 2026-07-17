@@ -65,7 +65,9 @@ gen() {
 }
 
 tmp=$(mktemp)
-sed -n '1,/<!-- INDEX:START/p' "$OUT" >> "$tmp"
+today=$(date +%F)
+sed -n '1,/<!-- INDEX:START/p' "$OUT" \
+  | awk -v d="$today" '{ if ($0 ~ /^last_updated:/) print "last_updated: " d; else print }' >> "$tmp"
 gen >> "$tmp"
 sed -n '/<!-- INDEX:END/,$p' "$OUT" >> "$tmp"
 rm -f "$entries"
