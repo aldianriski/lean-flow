@@ -33,10 +33,21 @@ full sprint retro (→ `/lean-doc-generator close`).
 3. **Recurrence → bump, don't duplicate** — a concept-match means it recurred: add the current sprint
    or date to its `seen`, increment `count`, and surface it: *"L-NNN now count N — promotable at the
    next promote (≥ 2)."* Bumping is the promotion signal; it beats a second near-duplicate entry.
-4. **New → draft the entry** — per `templates/LEARNINGS.md.template`: the one-line learning · `seen:`
-   (sprint or date) · `count: 1` · `promoted: no` · optional `related:` cross-links; the heading carries `[tags: <tag>] [status: active]` (schema → template). Newest first.
+4. **New → draft the entry** — self-contained shape (if the host repo bundles `lean-doc-generator`, its
+   `templates/LEARNINGS.md.template` wins on divergence):
+
+   ```
+   ## L-NNN — <one-line: what was got wrong or confirmed, and the fix>
+   - seen: <sprint or date>
+   - count: 1
+   - promoted: no   <!-- once count >= 2: yes -> <where it was promoted> -->
+   - tags: <tag>   [status: active]
+   ```
+
+   Newest first.
 5. **Confirm, then write** — show the draft (or the bump) and get a `y` — it is a durable, append-only
-   ledger write. Then append/edit `docs/LEARNINGS.md`, bump its `last_updated`, and regenerate the derived index if the project has one (lean-flow: `sh scripts/gen-index.sh`).
+   ledger write. Then append/edit `docs/LEARNINGS.md`, bump its `last_updated`, and regenerate the
+   project's derived index if it maintains one (a derived view, never hand-edited).
 
 ## Output
 

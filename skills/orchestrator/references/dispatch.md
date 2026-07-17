@@ -2,7 +2,8 @@
 
 Loaded by `/orchestrator` at any Implement step. The orchestrator is the `decision` tier: it **coordinates**
 (plan · gate · grill · design · synthesis · merge results) — it does **not** do execution work inline. Work
-is dispatched to sub-agents **by each task's classification**. (Doctrine: `docs/research/model-purpose.md` · ADR-010.)
+is dispatched to sub-agents **by each task's classification**. (Doctrine: route by NATURE, not size —
+ambiguity/consequence up, volume/repetition down; ADR-010.)
 
 ## Route by classification (nature, not size)
 

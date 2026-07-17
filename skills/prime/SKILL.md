@@ -35,7 +35,8 @@ locations second. Adapt the globs to the host project's layout.
 **README is a fallback (token discipline).** It is the human front-door and overlaps CLAUDE.md (1) +
 CONTEXT.md (2) + ARCHITECTURE.md (6). Stat its presence for the health line, but **read its full
 content only when CLAUDE.md *or* CONTEXT.md is MISSING** (then it is the best available overview).
-Why → `docs/research/loop-mechanics-audit.md`.
+Why: the README duplicates CLAUDE.md/CONTEXT.md/ARCHITECTURE.md content, so reading it in full doubles
+the priming token cost for near-zero new signal.
 
 **Resolution**: read `TODO.md` (the Backlog pool); follow its § Active Sprint pointer (format: `> **SPRINT-NNN — <name>** → docs/sprint/SPRINT-NNN-<slug>.md`) — a
 multi-stream repo lists one pointer per stream — to each active `docs/sprint/SPRINT-NNN-<slug>.md`
