@@ -20,6 +20,7 @@ Pipeline: `/task-decomposer` (intake) → **`/triage`** (groom + re-prioritise) 
 - The backlog has grown and priorities have drifted from reality.
 - Before a Sprint Promote, to surface what is genuinely ready.
 - A specific task needs a state or priority decision.
+- A bug report (`BUG.md.template`-shaped) needs intake routing.
 
 ## Task states (light)
 
@@ -39,11 +40,15 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
 
 1. **Scan `.out-of-scope/` first** — if a backlog task resembles a prior rejection, surface it and ask before keeping it.
 2. **Load** — read `TODO.md` § Backlog (+ § Tech Debt). Ignore the Active Sprint.
-3. **Re-rank** — re-evaluate each task's P0–P3 tier; propose moves with a one-line reason each. Order within a tier by dependency, then impact × urgency.
-4. **Flag** — surface **stale** (no movement / superseded), **duplicate** (same concern → merge or differentiate), **conflict** (acceptance criteria that contradict another task).
-5. **State** — set `ready` / `needs-info` / `blocked`; for `needs-info` list the specific questions; for `blocked` name the blocker.
-6. **Route rejects** — for work that will not be done, write an `.out-of-scope/` entry, then remove the task from the backlog with a pointer.
-7. **Output** — the groomed backlog + a **ready-to-promote shortlist** (P-order, `ready` only). Apply changes only after human `y`.
+3. **Bug intake** — a BUG.md-shaped item (or bug-flavored backlog entry) is routed, not ranked like a feature:
+   - known cause + trivial fix → convert to `TASK-NNN` (`state: ready`)
+   - unknown cause / needs investigation → record as a task, `next: /diagnose`
+   - systemic / architectural → file as `TD-NNN` in § Tech Debt
+4. **Re-rank** — re-evaluate each task's P0–P3 tier; propose moves with a one-line reason each. Order within a tier by dependency, then impact × urgency.
+5. **Flag** — surface **stale** (no movement / superseded), **duplicate** (same concern → merge or differentiate), **conflict** (acceptance criteria that contradict another task).
+6. **State** — set `ready` / `needs-info` / `blocked`; for `needs-info` list the specific questions; for `blocked` name the blocker.
+7. **Route rejects** — for work that will not be done, write an `.out-of-scope/` entry, then remove the task from the backlog with a pointer.
+8. **Output** — the groomed backlog + a **ready-to-promote shortlist** (P-order, `ready` only). Apply changes only after human `y`.
 
 ## `.out-of-scope/` knowledge base
 
