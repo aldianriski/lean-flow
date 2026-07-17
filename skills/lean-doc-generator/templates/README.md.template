@@ -1,51 +1,115 @@
 <a id="readme-top"></a>
 
-<!-- README ownership is a footer line, not top frontmatter (DOCS_Guide §3 README exception) so the
-     rendered top leads with the project, not a metadata table. -->
+<!--
+  README GUIDE — not a gate. Models a showcase-grade front-door; adapt freely — reorder,
+  merge, drop, or add sections to fit the repo. Structure is a suggestion; two invariants
+  only: the anti-SSOT rule below, and the footer ownership line at the bottom.
 
-# [Project Name] [CUSTOMIZE]
+  Audience split: this file is the HUMAN showcase — the complete, readable, informative
+  front-door a person lands on (promotion is legitimate here). Agent-facing context (project
+  shape, vocabulary, anti-patterns) lives in CLAUDE.md / CONTEXT.md instead, not here.
 
-> [One-sentence description of what this project does.] [CUSTOMIZE]
+  No hard line cap (DOCS_Guide §2 footnote) — this is the full front-door; keep every line
+  signal-dense (LAW 4), not short for its own sake.
 
-## What It Is [CUSTOMIZE]
-- [Key capability 1]
-- [Key capability 2]
-- [Key capability 3]
+  ANTI-SSOT RULE: this README PRESENTS (prose, diagrams, summaries, links) — it never
+  byte-duplicates a volatile table/list that already lives in CONTEXT.md or another SSOT doc.
+  Summarize + link instead (ADR-007 pattern) if a section below tempts a table that will drift.
 
-## What It Is Not [CUSTOMIZE]
-- [Out-of-scope item 1]
-- [Out-of-scope item 2]
+  Ownership stays a footer line, not top YAML frontmatter (DOCS_Guide §3 README exception),
+  so the rendered page leads with the project, not a metadata block.
+-->
 
-## Requirements [CUSTOMIZE]
-- [Runtime + version — e.g. Node.js ≥18]
-- [Other prerequisite — service, account, tool]
+<!-- HERO -->
+<div align="center">
 
-## Adopt [CUSTOMIZE]
+# [Project Name] <!-- CUSTOMIZE -->
 
+**[One-sentence pitch — what it is + who it's for.]** <!-- CUSTOMIZE -->
+
+<!-- Badges are optional — drop the row entirely if there's nothing worth signaling yet.
+     Use shields.io (or your CI's own badge) inline — no reference-link footer needed. -->
+[![License](https://img.shields.io/badge/license-[MIT]-green)](LICENSE) [![Version](https://img.shields.io/badge/version-[X.Y.Z]-blue)](docs/CHANGELOG.md)
+
+<!-- Optional logo/banner slot — delete if unused. -->
+<!-- <img src="docs/assets/banner.png" alt="[Project Name] banner" width="600"> -->
+
+[Quick start](#quick-start) · [Features](#features) · [Docs](#docs-map)
+
+</div>
+
+---
+
+## Why [Project Name] <!-- CUSTOMIZE -->
+
+<!-- 2-4 bullets on what makes this worth using. Promotion is legitimate here — this is the
+     one section allowed to sell. -->
+- [Reason 1 — the problem it solves]
+- [Reason 2 — what makes the approach different]
+- [Reason 3 — optional]
+
+---
+
+## Quick start
+
+<!-- Copy-pasteable: install → first command. If there's a longer setup, link out — don't
+     inline it here. -->
 ```bash
-git clone https://github.com/[org]/[repo]
-cd [repo]
 [install command]
-[run command]
+[first command that produces visible output]
 ```
 
 Full setup: [`docs/SETUP.md`](docs/SETUP.md)
 
-## Usage [CUSTOMIZE]
-How you actually use this day-to-day — the main entry points, not every command.
+---
 
-| Command / entry point | When |
+## Features
+
+<!-- Table or bullets — whichever reads better for this repo. Don't duplicate a living
+     roster (e.g. a skill/module list already tracked in CONTEXT.md) — summarize + link. -->
+| Feature | What it gives you |
 |---|---|
-| `[command]` | [what it does] |
-| `[command]` | [what it does] |
+| [Feature 1] | [one-line benefit] |
+| [Feature 2] | [one-line benefit] |
 
-## Links [CUSTOMIZE]
-- [Architecture](docs/ARCHITECTURE.md)
-- [Decisions](docs/DECISIONS.md)
-- [Changelog](docs/CHANGELOG.md)
+---
+
+## Architecture at a glance
+
+<!-- Optional. A short diagram earns its place if the shape isn't obvious from Quick start.
+     Delete this section if there's nothing worth diagramming yet. -->
+```mermaid
+graph LR
+  A[Input] --> B[Core]
+  B --> C[Output]
+```
+
+Full map: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+
+---
+
+## Usage
+
+<!-- The one workflow a new user runs first — not every command. -->
+```bash
+[the day-one workflow, step by step]
+```
+
+---
+
+## Docs map
+
+<!-- Links only — this section presents, never duplicates. -->
+- [Architecture](docs/ARCHITECTURE.md) — structure, boundaries
+- [Changelog](docs/CHANGELOG.md) — what shipped, per release
+- [Decisions](docs/DECISIONS.md) — the WHY behind hard-to-reverse choices
+- [Contributing](CONTRIBUTING.md) <!-- CUSTOMIZE — delete if not applicable -->
+
+---
 
 ## License
-[MIT — see [LICENSE](LICENSE).] [CUSTOMIZE]
+[MIT — see [LICENSE](LICENSE).] <!-- CUSTOMIZE -->
 
-<sub>Doc owner: [role] · last updated: YYYY-MM-DD · status: current</sub>  <!-- ownership footer, not top frontmatter -->
-
+<sub>Doc owner: [role] · last updated: YYYY-MM-DD · status: current · v[X.Y.Z]</sub>
+<!-- footer ownership — not top frontmatter (DOCS_Guide §3 README exception); the one
+     other invariant besides anti-SSOT above -->

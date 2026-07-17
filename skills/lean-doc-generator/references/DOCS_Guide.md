@@ -48,6 +48,8 @@ relocates a legacy layout (`git mv` + inbound-link fixes — content untouched).
 ¹ **README is the full front-door** — the complete overview of the repo. Don't truncate it to hit a
 line count; deep detail belongs in `CLAUDE.md` (project shape) and `CONTEXT.md` (vocabulary) and
 `ARCHITECTURE.md` (structure), which the README links to. Keep it signal-dense (LAW 4), not short.
+The bundled template models a human-showcase front-door (hero · why · quick start · features ·
+docs map) — adapt freely, structure is a suggestion; only invariants are the anti-SSOT rule and the footer ownership line.
 
 **Template-as-canonical-format rule**: when a template exists for a doc type, the template IS the
 canonical format — NOT this guide's inline examples. Consult the template before generating to
