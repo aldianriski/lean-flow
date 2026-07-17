@@ -94,11 +94,6 @@ status: current
       tracker:   docs/research/loop-hygiene-prd.md §W4
       state:     ready
 
-<!-- (prior P1 batch — TASK-009 · 013 · 017 · 010 — shipped in SPRINT-008; TASK-035 shipped in SPRINT-012; see docs/CHANGELOG.md) -->
-
-<!-- (TASK-053 · 057 · 054 shipped in SPRINT-015 → v1.6.0; see docs/CHANGELOG.md) -->
-<!-- (TASK-069 · 070 · 071 · 072 shipped in SPRINT-023 → v1.10.2; see docs/CHANGELOG.md) -->
-
 ### P2 — Quality / Polish
 
 - [ ] **TASK-083 — Sweep consumer-surface leaks from generic skills (W5)**  [size: S] [risk: low] [AFK]
@@ -134,21 +129,12 @@ status: current
       tracker:   owner request 2026-07-17 · docs/research/loop-hygiene-prd.md §W6
       state:     ready
 
-<!-- (SPRINT-008…011 batches + TASK-045 · 046 [SPRINT-014 council hardening] shipped; see docs/CHANGELOG.md) -->
-
-<!-- (TASK-055 · 052 · 059 shipped in SPRINT-017 → v1.7.0; see docs/CHANGELOG.md) -->
-<!-- (TASK-056 shipped in SPRINT-019 → v1.8.0 · ADR-010; see docs/CHANGELOG.md) -->
-<!-- (TASK-062 · 061 · 063 · 048 shipped in SPRINT-020 → v1.9.0; see docs/CHANGELOG.md) -->
-
 ### P3 — Long-term
 
-<!-- (TASK-049 · 050 · 051 promoted → SPRINT-016 active 2026-07-10; live plan + DoD in docs/sprint/SPRINT-016-research-spikes.md) -->
-<!-- (TASK-058 · 060 shipped in SPRINT-018 → v1.7.1; see docs/CHANGELOG.md) -->
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
       state: blocked   (deferred — research hooks next session)
-<!-- TASK-039 done 2026-07-02 → docs/research/bmad-adaptation.md (5 keepers folded into TASK-037/042/043/035, rest rejected); see CHANGELOG. -->
 - [ ] **TASK-040 — Derived, on-demand graph VIEW over the metadata (relational comprehension)**  [size: L] [risk: med] [HITL]
       done-when: a graph view is GENERATED from TASK-036's frontmatter (transitive supersedes lineage · cross-sprint domain clusters · orphan/dangling detection) — a disposable build artifact, never hand-edited, regenerated from the SSOT. Guardrails (ALL mandatory, or don't build): (i) regeneration wired to lean-doc-generator's write step; (ii) read-time staleness check — the view carries a source checksum/mtime and fails LOUD if the frontmatter is newer (a stale CACHE, not a stale fact); (iii) integrity lint (shared with TASK-036). graphify serves this ad-hoc until it's worth automating.
       touches:   docs/ (corpus-wide) · a generation script/skill · graphify (on-demand)
@@ -165,10 +151,6 @@ status: current
       reframe:   (2026-07-10, TASK-048 1× probe → SPRINT-020 T4) if ever built, the ONLY axiom-consistent shape is a **BYO-provider, opt-in, disabled-by-default** seam — the installer supplies + consents to their own 2nd provider; lean-flow ships an integration seam, never the trust boundary. Prerequisite is now **TASK-065** (measure error-decorrelation on a *factual* decision) — the judgment-fork probe couldn't test shared factual priors.
       tracker:   docs/research/council-improvements.md §§ Divergence measurement · Factual decorrelation probe · verdict-council-multimodel.md (temp)
       state:     blocked   (deferred, bar RAISED — TASK-048 (judgment) + TASK-065 (cross-tier factual) both found NO exposed crack; before any build, a cross-PROVIDER test must show a real shared factual error that a different provider corrects)
-<!-- TASK-044 done (SPRINT-014 T1) → metadata SSOT + index extended to ADR/research; see CHANGELOG. -->
-<!-- (TASK-064 · 065 shipped in SPRINT-021 → v1.10.0; see docs/CHANGELOG.md) -->
-<!-- (TASK-066 · 067 · 068 shipped in SPRINT-022 → v1.10.1; see docs/CHANGELOG.md) -->
-<!-- TASK-008 done → /insights shipped v1.2.0 (friction → L-NNN candidate); see CHANGELOG. -->
 
 > TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).
 
@@ -193,7 +175,7 @@ status: current
 
 > Move to `docs/CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — Sprints 001–002 are recorded in [`docs/CHANGELOG.md`](docs/CHANGELOG.md).
+_(SPRINT-024 in progress — nothing accumulated yet)_ — Sprint history → [`docs/CHANGELOG.md`](docs/CHANGELOG.md) (rotated archives → `docs/changelog/`).
 
 ---
 

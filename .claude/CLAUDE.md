@@ -1,3 +1,10 @@
+---
+owner: Maintainer
+last_updated: 2026-07-17
+update_trigger: Project shape, anti-patterns, or conventions changed
+status: current
+---
+
 # lean-flow — AI Context
 
 ## Project Overview
@@ -42,8 +49,7 @@ resumes it. Every skill is also usable standalone. See `.claude/CONTEXT.md` for 
 
 ## Anti-Patterns
 ❌ Adding *anything* unreviewed — copied wholesale from a reference, or added "just in case" (the dev-flow mistake that bloated its docs). Every addition clears the bar first: genuinely useful **and** important **and** actually used. Agents/hooks aren't banned — they're held to that same bar (`/council` cleared it; nothing's been bulk-imported).
-❌ A core doc generated without reading its template (`lean-doc-generator` Step 6 is mandatory).
-❌ HOW content in a doc — move it to a code comment.
+❌ A core doc generated without reading its template (`lean-doc-generator` Step 6 is mandatory); HOW content in a doc — move it to a code comment instead.
 ❌ Skill count or the loop changing without updating `.claude/CONTEXT.md` + README.
 ❌ `git push` inside `release-patch` — it stops at the gate, always.
 ❌ Shipping a new behaviour **spec-only** — a new capability's final DoD must be *exercised once on real input* (the spec-only-debt trap: TD-001 · SPRINT-004 T3/T5 → L-007).
