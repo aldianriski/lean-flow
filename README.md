@@ -189,13 +189,9 @@ security → `/security-review`. `/council` is the one skill that orchestrates s
 - **G1 Scope** (all modes) — goal restated as one verifiable sentence · size S/M/L (an **L splits**) · files / blast-radius · out-of-scope named · assumptions confirmed.
 - **G2 Design** (`mvp` · `sprint-bulk`) — approach + one-line WHY · verifiable micro-tasks · an ADR only if the decision is hard-to-reverse **and** surprising **and** a real trade-off · residual grill until the goal is unambiguous (the detailed grill already ran at intake, in `/task-decomposer`).
 
-**Modes** (`/orchestrator <mode>`):
-
-| Mode | Gates | Use when |
-|---|---|---|
-| `quick` | G1 | single small low-risk task |
-| `mvp` | G1 + G2 | feature work, medium+, multi-step |
-| `sprint-bulk` | G1+G2 once | auto-loop the Active Sprint task list |
+**Modes** (`/orchestrator <mode>`) — three: `quick` (single small low-risk task, G1 only) · `mvp`
+(feature work, medium+, G1+G2) · `sprint-bulk` (auto-loop the Active Sprint task list, G1+G2 once) —
+full mode/gate contract → [`.claude/CONTEXT.md`](.claude/CONTEXT.md) (SSOT).
 
 **Implement routing** — at the build step, orchestrator routes by work type: new testable
 behaviour → `/tdd` · a bug or failing test → `/diagnose` · hard-to-change code → `/refactor-advisor`
