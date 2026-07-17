@@ -32,6 +32,13 @@ status: current
 
 ### P2 — Quality / Polish
 
+- [ ] **TASK-088 — Add a design-time threat prompt to G2 for risk:high tasks**  [size: S] [risk: low] [HITL]
+      done-when: a `risk: high` task touching auth/input/secrets/data-exposure gets a one-line abuse-case sketch prompted at G2 before Implement (not a STRIDE checklist); wired so it fires (G2 checklist or review-scoping.md), exercised once on a sample high-risk task
+      touches:   skills/orchestrator/SKILL.md (at 110/110 — displace/merge a line) or references/review-scoping.md (uncapped) — placement is the G2 call
+      assumes:   G2-time prompt complements, never replaces, the Review-time /security-review skip-table row
+      tracker:   docs/research/architecture-baselines.md (sole keeper of the 13-candidate delta-scan)
+      state:     ready
+
 ### P3 — Long-term
 
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
