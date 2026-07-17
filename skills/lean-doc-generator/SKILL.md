@@ -92,7 +92,9 @@ one pointer per stream in TODO § Active Sprint); single-stream repos omit it �
 **Retro at close** — first **sweep the full session** (the Execution Log + any TD/follow-up surfaced mid-run but not yet filed), then sort the sprint into four buckets and **route each to its durable home** (DOCS_Guide §10):
 Shipped → `docs/CHANGELOG.md` · Tech debt → `TD-NNN` in TODO § Tech Debt · Follow-ups → `TASK-NNN` in TODO § Backlog · Learnings → `L-NNN` in `docs/LEARNINGS.md`. **Auto-file all four** (per `templates/LEARNINGS.md.template`); show the user what was filed.
 
-**Governance review at promote** — before planning: scan `docs/LEARNINGS.md` for any `count ≥ 2, promoted: no` → promote it into a durable rule (CLAUDE.md anti-pattern / CONTEXT.md rule / skill red-flag) and mark `promoted: yes → <where>`. Then age tech debt: any `TD-NNN` unaddressed ≥ 3 sprints → re-review prompt; `severity: high` → auto-escalate to Backlog P1. Then **doc-aging (§11)**: any ledger past a retention trigger (TD collapse · CHANGELOG rotation · LEARNINGS pointer-collapse · TODO ~150-line soft cap) → propose the compression, apply on approval — never silently.
+**Governance review at promote** — before planning, run the scan and **emit it as a checklist the owner signs off on**, never silent prose:
+`☐ L-promotion (count≥2, promoted:no): <findings|none>` · `☐ TD aging (≥3 sprints unaddressed): <findings|none>` · `☐ doc-aging §11 (TD collapse · CHANGELOG rotation · LEARNINGS pointer-collapse · TODO ~150-line cap): <findings|none>`.
+Resolve each ☑ line before sign-off: promote flagged learnings into a durable rule (CLAUDE.md anti-pattern / CONTEXT.md rule / skill red-flag) and mark `promoted: yes → <where>`; aged TD → re-review prompt, `severity: high` → auto-escalate Backlog P1; doc-aging → propose compression, apply on approval. **Explicit owner sign-off on the checklist is required before rendering the sprint file or committing `plan locked`.**
 
 ## Red flags
 

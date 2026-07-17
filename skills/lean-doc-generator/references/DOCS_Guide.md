@@ -215,8 +215,12 @@ they're context, not law. Don't promote on a single occurrence; don't let a 2nd 
 re-review prompt; `severity: high` auto-escalates to Backlog P1. Rows are never deleted — resolved
 debt is marked `status: resolved → TASK-NNN` for the audit trail.
 
-**Promote review (the governance checkpoint)** — before planning a sprint, scan `docs/LEARNINGS.md` for any
-`count ≥ 2, promoted: no`, and run tech-debt aging. This is what stops learning and debt from rotting.
+**Promote review (the governance checkpoint)** — before planning a sprint, run the L-promotion scan, TD
+aging, and doc-aging (§11) triggers, then **emit the result as an explicit checklist** rather than silent
+prose — `☐ L-promotion (count≥2, promoted:no): <findings|none>` · `☐ TD aging (≥3 sprints unaddressed):
+<findings|none>` · `☐ doc-aging §11: <findings|none>`. **Explicit owner sign-off on the checklist is
+required before rendering the sprint file or committing `plan locked`.** This is what stops learning and
+debt from rotting — and stops the review itself from being skipped unnoticed.
 
 ---
 
