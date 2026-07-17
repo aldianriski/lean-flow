@@ -47,6 +47,8 @@ All sub-agent prompt templates are in **`references/prompts.md`** — read it be
 3. **Peer review (5, parallel).** Anonymize the responses as A–E, **randomizing the mapping independently per reviewer** (not once). Each reviewer scores on a **rubric — reasoning · evidence · coverage, NOT length/fluency** — then answers: strongest? biggest blind spot? what did ALL miss? (template → prompts.md).
 4. **Chairman synthesis (session model).** One agent gets the question + de-anonymized responses + all 5 reviews + the advisor questions → the verdict (template → prompts.md): agree · clash · blind spots · **recommendation (written before the score)** · **pre-mortem** · **calibrated confidence + dissent** · one-thing-first · the **single-model ceiling** caveat. The chairman MAY side with a lone dissenter if the reasoning is strongest.
 5. **Write the verdict (lean).** Present in chat AND write **only the verdict** (sections per prompts.md) to `verdict-<slug>.md` — use the slug the ADR will use. Default to the OS temp dir; repo only if asked. Never dump the full transcript.
+   If the verdict will be **referenced by a durable doc** (ADR, TODO tracker, sprint file), copy it to
+   `docs/research/verdict-<slug>.md` first and reference *that* path — a temp-dir path never lands in a durable doc.
 6. **Feed forward.** The verdict is a decision *input*, not a record. Hard-to-reverse + surprising + a real trade-off → fold the recommendation + alternatives into an **ADR** (`docs/adr/`, DOCS_Guide §4), then the verdict file can be deleted. Don't accumulate stale verdicts.
 
 ## Conditional passes (gated — off by default)

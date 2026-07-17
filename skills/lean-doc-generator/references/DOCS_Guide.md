@@ -42,6 +42,8 @@ Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`. Paths above are relati
 these paths; `/prime` searches them first (legacy root locations still matched, second); `migrate`
 relocates a legacy layout (`git mv` + inbound-link fixes — content untouched).
 
+**Temp-dir artifacts** (council verdicts, handoff docs) are never referenced from durable docs — copy to `docs/research/` (verdicts) before citing.
+
 ¹ **README is the full front-door** — the complete overview of the repo. Don't truncate it to hit a
 line count; deep detail belongs in `CLAUDE.md` (project shape) and `CONTEXT.md` (vocabulary) and
 `ARCHITECTURE.md` (structure), which the README links to. Keep it signal-dense (LAW 4), not short.
