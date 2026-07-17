@@ -10,7 +10,8 @@ version: "0.2.0"
 # Task Decomposer
 
 Translate any form of human intent into fully-formed `TASK-NNN` entries. The approved output
-serves as the scope gate — no separate gate runs after approval.
+serves as the scope gate — `/orchestrator` G1 then runs as a fast-path confirm (scope unchanged?),
+not a re-grill.
 
 ## Input types
 

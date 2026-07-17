@@ -27,7 +27,7 @@ Freeform input with no mode keyword:
 - Task is in an **active sprint** → default to the sprint mode (or `quick` for a single one).
 - Task is only in the **Backlog** (not in any active sprint) → **don't silently build**: surface the choice as a popup — `/lean-doc-generator promote` it into a sprint, or proceed as an explicit `quick` one-off (never slide decompose → build unrecorded).
 
-## G1 — Scope gate (all modes)
+## G1 — Scope gate (all modes, always runs)
 
 Confirm before touching code. BLOCK if any answer is "unknown":
 - [ ] Goal restated as one verifiable sentence ("done when …")
@@ -35,6 +35,8 @@ Confirm before touching code. BLOCK if any answer is "unknown":
 - [ ] Files likely touched listed; blast radius understood — for unfamiliar / mature code, **recon via the `Explore` agent** (read existing impl + tests + deps in its own context; keeps this loop lean)
 - [ ] Out-of-scope explicitly named (what this task will NOT do)
 - [ ] Assumptions surfaced and confirmed where they affect behavior
+
+**Fast-path:** task arrived via `/task-decomposer` `approve` → G1 = one confirm ("scope unchanged since approval?"); changed/unsure → full checklist above.
 
 ## G2 — Design gate (mvp + sprint-bulk)
 
