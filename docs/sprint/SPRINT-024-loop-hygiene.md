@@ -39,9 +39,9 @@ Start from green-and-true so T3's new lints verify FAIL→PASS against real fixt
 **Acceptance:** TODO.md has zero tombstones/stale pointers; README footer == plugin.json version; CLAUDE.md carries ownership frontmatter; orphan image.png gone; qa-check still green.
 
 **DoD:**
-- [ ] 13 tombstone comment lines + TODO:48 (SPRINT-016) + TODO:98 (rotated CHANGELOG link) removed
-- [ ] README footer → v1.10.2 + real date · CLAUDE.md ownership header added · docs/research/image.png deleted
-- [ ] `sh scripts/qa-check.sh` green
+- [x] 14 tombstone comment lines + TODO:48 (SPRINT-016) + TODO:98 (rotated CHANGELOG link) removed
+- [x] README footer → v1.10.2 + real date · CLAUDE.md ownership header added (80/80 — two adjacent bullets merged verbatim) · docs/research/image.png deleted
+- [x] `sh scripts/qa-check.sh` green (49/0)
 
 ### T2 — Standardize the tombstone + wire close's hygiene sweep (TASK-074) `[size: M · risk: med · HITL]`
 Layers: skills/lean-doc-generator/SKILL.md · references/DOCS_Guide.md §11 · scripts/qa-check.sh
@@ -50,9 +50,9 @@ The format close writes and the format §11 deletes must be the same string; the
 **Acceptance:** close's procedure writes/deletes ONE canonical tombstone format, sweeps refs to the just-closed sprint + rotation links, gated by explicit approval; tombstone lint added; exercised once on a real close (this sprint's own close is the exercise).
 
 **DoD:**
-- [ ] Canonical tombstone string defined in DOCS_Guide §11 + close row writes/deletes it (D1: immediate)
-- [ ] Close sweep (tombstones · just-closed-sprint refs · rotation links) behind propose→approve
-- [ ] qa-check tombstone-format lint added · SPRINT-024's own close fires the sweep end-to-end
+- [x] Canonical rule defined in DOCS_Guide §11 + close row (D1 sharpened: no breadcrumbs ever — removal outright)
+- [x] Close sweep (Backlog removal · just-closed-sprint refs · rotation links) behind propose→approve
+- [ ] qa-check tombstone lint added `[x]` · SPRINT-024's own close fires the sweep end-to-end (pending close)
 
 ### T3 — Extend qa-check coverage to the blind drift classes (TASK-075) `[size: M · risk: med · AFK · depends: T1]`
 Layers: scripts/qa-check.sh · scripts/gen-index.sh · docs/QA.md
@@ -82,8 +82,8 @@ CONTEXT.md:53 claims routing triage never implements (A4: implement, don't delet
 **Acceptance:** triage Flow contains the BUG step (trivial known cause → TASK · needs investigation → /diagnose · architectural → TD-NNN), exercised once on a sample BUG doc.
 
 **DoD:**
-- [ ] BUG routing step in triage Flow matching CONTEXT.md's claim
-- [ ] Exercised once end-to-end on a sample BUG (spec-only-debt guard)
+- [x] BUG routing step in triage Flow matching CONTEXT.md's claim
+- [x] Exercised once end-to-end on a sample BUG (spec-only-debt guard)
 
 ### T6 — Wire the feed pipeline's missing handoffs (TASK-078) `[size: S · risk: low · AFK]`
 Layers: skills/lean-doc-generator/SKILL.md · skills/prime/SKILL.md
@@ -102,7 +102,7 @@ The SSOT advertises only what fires (A2: /fork dropped).
 **Acceptance:** built-in list has no /fork, points /simplify at its real home; loop headline carries the feed pipeline in the same sentence.
 
 **DoD:**
-- [ ] /fork dropped · /simplify pointer fixed · loop headline + feed pipeline joined
+- [x] /fork dropped · /simplify pointer fixed · loop headline + feed pipeline joined
 
 ### T8 — Resolve G1 ownership between decomposer and orchestrator (TASK-080) `[size: S · risk: med · HITL]`
 Layers: skills/orchestrator/SKILL.md · skills/task-decomposer/SKILL.md
@@ -111,7 +111,7 @@ Two files disagree on who owns the scope gate.
 **Acceptance:** orchestrator states the rule — decomposer-approved task → G1 fast-path ("scope unchanged since approval? y/n"), else full G1 — and decomposer's "approve is the gate" line agrees.
 
 **DoD:**
-- [ ] Fast-path rule in orchestrator G1 · decomposer line reconciled · no contradiction remains
+- [x] Fast-path rule in orchestrator G1 · decomposer line reconciled · no contradiction remains (CONTEXT G1 row updated too)
 
 ### T9 — Make L-NNN ids monotonic + fix broken citations (TASK-081) `[size: M · risk: med · HITL]`
 Layers: docs/LEARNINGS.md · references/DOCS_Guide.md §11 · skills/{tdd,task-decomposer,orchestrator} · scripts/qa-check.sh
@@ -203,10 +203,39 @@ TD-008 re-reviewed (open · minor · mitigation in-plan: relocate lean-doc-gener
 reference if T2/T4/T6 threaten the ~110 cap); TODO.md 206 lines > soft cap — transient, no
 compression (T1 deletes 13 lines; close drains the batch).
 
+### 2026-07-17 | G1+G2 signed | batch gates approved; A1/A2/A4 confirmed
+Owner approved batch G1+G2 and the D2 wave plan. A1 → **immediate delete** (sharpens D1: close
+writes no tombstone comments at all — shipped entries removed outright; the T2 lint bans the
+pattern). A2 → /fork dropped. A4 → bug-intake implemented in triage. Waves: W1 T1·T2·T5·T7·T8 →
+W2 T3·T4 → W3 T9 → W4 T10·T11 → W5 T13 → W6 T12·T14 → W7 T15.
+
+### 2026-07-17 | wave 1 done | T2·T5·T7·T8 committed; qa-check 49/0 (two new lints live)
+T5 29e2825 · T7(+T8 residual G1 row) 9296671 · T8 a83137a · T2 dd18144. Side-fix: the new corpus
+lint caught the sprint's own PRD (unregistered tags) + a stale knowledge index → fixed/regenerated
+(5c377e1) — first real catch by the mechanism being built. **Incident:** T2's agent ran `git stash`
+to diff the pre-T2 tree while T8's uncommitted edits were in flight — the stash window made T8's
+work look destroyed (restored on pop; nothing lost). Learning candidate for Retro: parallel-wave
+subagent briefs must forbid tree-wide git state ops (stash/checkout/restore); compare via
+`git show REF:file` instead. W2+ briefs updated accordingly. T1 still running.
+
+### 2026-07-17 | wave-map fix + boundary shuffle | T6 assigned to W3; temp-tracker repoint moves T10→T3
+The promote-time wave map omitted T6 — it joins W3 beside T9 (disjoint files; lean-doc SKILL chain
+stays T2→T4→T6). And T3's new `(temp)`-tracker lint would sit red until W4, so the two TODO tracker
+repoints (TASK-040/047) move from T10 into T3; T10 keeps only the council/DOCS_Guide archival policy.
+Same sprint scope, task-boundary shift only.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/triage/SKILL.md` | T5 | bug-intake routing (CONTEXT claim now fires) | Low | sample-BUG trace · cap 85/110 |
+| `skills/lean-doc-generator/SKILL.md` | T2 | close row → propose→approve sweep, no breadcrumbs | Low | qa-check · cap 104/110 |
+| `…/references/DOCS_Guide.md` | T2 | §11 TODO rule = removal outright | Low | qa-check |
+| `scripts/qa-check.sh` | T2 | breadcrumb-comment lint (comment-scoped) | Low | FAIL/PASS fixture-verified |
+| `.claude/CONTEXT.md` | T7/T8 | /fork out · /simplify wired · feed-stage headline · G1 fast-path row | Low | cap 127/130 |
+| `skills/orchestrator/SKILL.md` | T8 | G1 fast-path for decomposer-approved tasks | Low | cap 110/110 |
+| `skills/task-decomposer/SKILL.md` | T8 | "approve is the gate" line reconciled | Low | cap 90/110 |
+| `docs/research/loop-hygiene-prd.md` + `docs/knowledge-index.md` | — | registered tags · index regen | Low | corpus lint PASS |
 
 ## Retro
 
