@@ -12,7 +12,7 @@ CLAUDE.md defer here; this file points to their prose rather than duplicating it
 
 ## The loop
 
-`/prime → /lean-doc-generator → /orchestrator → repeat` · session end → `/handoff` (temp-dir doc) → next `/prime` reads it.
+`/prime → (/task-decomposer → /triage →) /lean-doc-generator promote → /orchestrator → repeat` · session end → `/handoff` (temp-dir doc) → next `/prime` reads it.
 Every skill works standalone; the loop is just the order they reward most together. (Diagram → README.)
 
 ## Skill roster (14 — 12 stage-skills · 1 conductor · 1 decision aid)
@@ -42,14 +42,14 @@ Every skill works standalone; the loop is just the order they reward most togeth
 
 lean-flow ships **no agents/hooks** — it dispatches Claude's built-ins in **isolated passes** (fresh
 context): recon→`Explore` · `/code-review` (small/med → one scoped `sonnet`; reports **Standards vs Spec** separately) · `/verify` ·
-`/security-review` · `/council` (internal sub-agents); commands `/goal /plan /batch /loop /run /simplify
-/fork`. Full wiring + cloud tools out of lean scope (`/workflows` · `/ultracode` · `/ultraplan` /
-`/ultrareview`) → ARCHITECTURE.md § Key integration points.
+`/security-review` · `/council` (internal sub-agents); commands `/goal /plan /batch /loop /run` ·
+`/simplify` (review pass → orchestrator's review-scoping). Full wiring + cloud tools out of lean scope
+(`/workflows` · `/ultracode` · `/ultraplan` / `/ultrareview`) → ARCHITECTURE.md § Key integration points.
 
 **Standalone contract** — stage-skill cross-refs are routing *suggestions* (`→ /X`), never requirements;
 each completes its job invoked cold. Only inherent ordering: the sprint lifecycle. **`/flow` is the sole
-exception** — it *sequences* the stages, never re-implements one. **Feed pipeline:** `/task-decomposer` (or its **fog-map** for foggy work too big to plan)
-→ `/triage` → `/lean-doc-generator promote` → `/orchestrator`.
+exception** — it *sequences* the stages, never re-implements one. **Feed pipeline** (order set in
+The loop, above): `/task-decomposer` also emits a **fog-map** for foggy work too big to plan.
 **Bug intake:** a bug (`BUG.md.template`) enters at `/triage` → trivial known cause = `TASK` · needs investigation = `/diagnose` · architectural = `TD-NNN`.
 
 **Curated, not copied** — review, not a feature ban; cleared "useful **and** important **and** actually used" (full rationale → CLAUDE.md · ADR-001).
@@ -58,7 +58,7 @@ exception** — it *sequences* the stages, never re-implements one. **Feed pipel
 
 | Gate | Name | Where | Checks |
 |---|---|---|---|
-| G1 | Scope | all `/orchestrator` modes | goal restated · size S/M/L (L splits) · files/blast-radius · out-of-scope named · assumptions confirmed |
+| G1 | Scope | all `/orchestrator` modes | goal restated · size S/M/L (L splits) · files/blast-radius · out-of-scope named · assumptions confirmed · decomposer-approved task → fast-path confirm (scope unchanged?) |
 | G2 | Design | `mvp` · `sprint-bulk` | approach + WHY · verifiable micro-tasks · ADR if hard-to-reverse · **overlap-ownership map** (shared files → single owner + commit order, before first task) · residual grill until unambiguous |
 
 Humans approve gates — the skill never self-approves. Review is a self-review checklist (no review agent).
