@@ -3,7 +3,7 @@ owner: Maintainer
 last_updated: 2026-07-17
 status: current
 id: loop-hygiene-prd
-tags: [process, governance, hygiene, wiring]
+tags: [process, docs, tooling]
 domain: governance
 related: [loop-mechanics-audit, trigger-accuracy-audit, okf-adoption]
 ---
