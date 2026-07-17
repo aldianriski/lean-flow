@@ -79,6 +79,20 @@ core doc generation loop; never listed in the §2 table.
 own `references/` and **don't count** toward the cap. "Executable artifact" must not stretch to cover
 ordinary prose — police it honestly.
 
+**SKILL.md skeleton (canonical structure).** Frontmatter: exactly 6 fields, in order — `name` ·
+`description` (trigger surface: what it does + a `Do not use for X → /Y` redirect where a confusable
+sibling exists) · `argument-hint` (may be `""`) · `allowed-tools` · `user-invocable` · `version`.
+**Bash scoping**: scope `Bash` to subcommands where the set is enumerable (the `release-patch`
+pattern — `Bash(git diff *)` etc.); leave `Bash` unscoped only where arbitrary commands are inherent
+to the job (test runners / build tools — `tdd` · `diagnose` · `prototype` · `orchestrator`), and that
+rationale is the documented default, not silence. **Section order**: `## When to invoke` (optional;
+canonical name — never "When to run") → one procedure section (name free — Steps/Flow/Procedure/
+Workflow/Phases) → `## Output format` (required only for deterministic-output skills; canonical
+name — never bare "Output") → `## Hard rules` (optional) → `## Red flags` (required, ❌-bullets).
+**References**: internal pointers use `${CLAUDE_SKILL_DIR}/references/...`; a skill never points into
+ANOTHER skill's `references/`/`templates/`. **Caps**: `SKILL.md` ≤ ~110 lines procedure+scaffolding
+(ADR-006); `references/` uncapped.
+
 ---
 
 ## §3 — Ownership header (mandatory on every doc)

@@ -64,7 +64,7 @@ only what is still open — one question at a time (as an **AskUserQuestion popu
 >
 > **Dispatch by role** *(fires at every Implement step)* — the orchestrator is the `decision` tier: it **coordinates** (gates · grill · design · synthesis · merge), never executes inline. Dispatch is **classification-driven** (nature not size — `model-purpose.md`):
 > `execution`→Sonnet · `mechanical-ingest`→Haiku dispatched **by default** to a `general-purpose` sub-agent handed its **procedure skill** (`/tdd`·`/diagnose`·`/refactor-advisor` via runtime Skill invocation); a `decision`/trivial step inline only with a stated reason;
-> escalate manually to Fable / `/council` for an ADR-grade fork. **Full dispatch + parallel/sequential rules → `references/dispatch.md`**; role map → `.claude/CONTEXT.md` · ADR-010.
+> escalate manually to Fable / `/council` for an ADR-grade fork. **Full dispatch + parallel/sequential rules → `${CLAUDE_SKILL_DIR}/references/dispatch.md`**; role map → `.claude/CONTEXT.md` · ADR-010.
 
 ### quick
 1. **Parse** — restate the task as a verifiable goal; confirm in one line.
@@ -83,7 +83,7 @@ Operates on the active sprint file `docs/sprint/SPRINT-NNN-<slug>.md` (its Plan 
 0. **Guard** — verify an active sprint file with open Plan DoD `[ ]` exists. None → halt, redirect to `/lean-doc-generator promote`. More than one active (parallel streams) → ask which sprint to run.
 1. **Batch G1** — one combined scope pass over the Plan.
 2. **Batch G2** — one design pass; **map shared-file ownership** (every file touched by >1 task → single owner + commit order, before the first task) and note cross-task file overlaps — and **cross-stream** ones: files shared with another stream's active sprint → coordinate or sequence, never parallel-build; at commit, stage shared files per-hunk (`git add -p` + verify `git diff --cached`) — a plain `git add <shared>` stages another task/stream's WIP into your commit (contaminates at the commit phase, not just merge — promoted rule); **grill individually any task with an unconfirmed `assumes:`** — a batch sign-off never waves an open assumption through.
-3. **Sequence** — from the G2 overlap map decide per task: **disjoint (no shared file, no `depends-on`) → dispatch in PARALLEL** (multiple Agent calls in one message) · **shared/dependent → SEQUENTIAL** (ownership order); large disjoint fan-out → `/batch` · `/workflows`. Rules → `references/dispatch.md`.
+3. **Sequence** — from the G2 overlap map decide per task: **disjoint (no shared file, no `depends-on`) → dispatch in PARALLEL** (multiple Agent calls in one message) · **shared/dependent → SEQUENTIAL** (ownership order); large disjoint fan-out → `/batch` · `/workflows`. Rules → `${CLAUDE_SKILL_DIR}/references/dispatch.md`.
 4. **Loop** — per Plan task: Implement (route by type — new behaviour → `/tdd`) → Self-review → Commit → tick its DoD `[x]`; **append to the sprint Execution Log** (don't edit § Plan — it's frozen). `/loop` can pace the iteration.
 5. **First-blocker halt** — stop on any blocker or human `block`; log it and wait.
 6. **Close** — all DoD `[x]` → run `/lean-doc-generator close`; then **fixes-only sprint → `/release-patch` (PATCH); feature sprint → MINOR by hand** (release-patch is PATCH-only, scans `plan_commit..HEAD`).
@@ -96,7 +96,7 @@ biggest token sink). A **skip table** + **scale-depth** rule decide what fires: 
 only · small/med → one scoped `sonnet` reviewer · large/high-risk → `/code-review` · behaviour change →
 `/run` + `/verify` · auth/input/secrets → `/security-review` · bug → `/diagnose`.
 
-Full routing · skip table · the Standards-vs-Spec axes · adversarial floor · self-review checklist → `references/review-scoping.md`.
+Full routing · skip table · the Standards-vs-Spec axes · adversarial floor · self-review checklist → `${CLAUDE_SKILL_DIR}/references/review-scoping.md`.
 
 ## Red flags
 

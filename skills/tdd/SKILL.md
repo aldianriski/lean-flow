@@ -60,7 +60,7 @@ pass). One test at a time. Only enough code to pass the current test. Don't anti
 
 ### 4. Refactor
 Only once GREEN — **never refactor while RED**. Extract duplication, move complexity behind simple
-interfaces, apply patterns where natural (candidate list → `references/testability.md`). Run the
+interfaces, apply patterns where natural (candidate list → `${CLAUDE_SKILL_DIR}/references/testability.md`). Run the
 tests after each refactor step.
 
 ## Per-cycle checklist

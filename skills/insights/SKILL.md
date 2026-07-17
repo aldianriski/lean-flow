@@ -49,7 +49,7 @@ full sprint retro (→ `/lean-doc-generator close`).
    ledger write. Then append/edit `docs/LEARNINGS.md`, bump its `last_updated`, and regenerate the
    project's derived index if it maintains one (a derived view, never hand-edited).
 
-## Output
+## Output format
 
 ```
 === INSIGHT ===

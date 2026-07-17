@@ -1,6 +1,7 @@
 ---
 name: council
 description: "Run a high-stakes, hard-to-reverse, or ambiguous decision through a council of 5 AI advisors who independently analyze it, peer-review each other anonymously, and synthesize a final verdict to a lean verdict-<slug>.md. The opt-in decision aid for genuinely hard forks — the pressure-test before an ADR (DOCS_Guide §4) or a G2 design call. Based on Karpathy's LLM Council. Uses sub-agents (≈11 model calls/run) — reserve for decisions where being wrong is expensive, NOT every choice. MANDATORY TRIGGERS: 'council this', 'run the council', 'war room this', 'pressure-test this', 'stress-test this', 'debate this'. STRONG TRIGGERS (with a real decision/tradeoff): 'should I X or Y', 'which option', 'what would you do', 'is this the right move', 'validate this', 'get multiple perspectives', 'I can't decide', 'I'm torn between'. Do NOT trigger on simple yes/no questions, factual lookups, or casual 'should I' without a meaningful tradeoff."
+argument-hint: "[the decision to pressure-test]"
 allowed-tools: Read, Write, Glob, Grep, Agent, Task
 user-invocable: true
 version: "1.0.0"
@@ -18,7 +19,7 @@ Karpathy's LLM Council, run inside Claude via sub-agents with different lenses i
 > definitions, prompt templates, the worked example — live in `references/` and are read on demand,
 > so they don't count toward the ~110-line cap.
 
-## When to run
+## When to invoke
 
 For decisions where **being wrong is expensive** and there's genuine uncertainty — pricing,
 positioning, pivots, hard architectural / scope forks, "am I crazy to do X?". NOT for one-right-answer
@@ -30,7 +31,7 @@ Triggers are in the description; reserve it (~11 model calls/run).
 
 Five thinking styles chosen for the tensions they create — Contrarian ↔ Expansionist (downside ↔
 upside), First Principles ↔ Executor (rethink ↔ ship), with the Outsider in the middle keeping everyone
-honest. **Full definitions → `references/advisors.md`** (read before step 2).
+honest. **Full definitions → `${CLAUDE_SKILL_DIR}/references/advisors.md`** (read before step 2).
 
 ## Tier
 
@@ -40,7 +41,7 @@ role** (session model — the high-judgment step). Role map → `.claude/CONTEXT
 
 ## The 6 steps
 
-All sub-agent prompt templates are in **`references/prompts.md`** — read it before spawning.
+All sub-agent prompt templates are in **`${CLAUDE_SKILL_DIR}/references/prompts.md`** — read it before spawning.
 
 1. **Frame (+ context & research).** Scan the workspace for context (CLAUDE.md · `memory/` · referenced files — ≤30s). Decide if the call turns on *external current facts*; if so, run **one shared** research pass (template in prompts.md) and carry an evidence brief — say so in one line if you skip it. Reframe the raw question into one neutral prompt every advisor receives. Too vague → ask **one** clarifying question (as an **AskUserQuestion popup**), then proceed.
 2. **Convene (5 advisors, parallel).** Spawn all 5 as sub-agents (identities → advisors.md; template → prompts.md), 150–300 words each, leaning fully into their lens. Each **first emits its 1–2 decision-critical questions**, then its analysis (a question no advisor resolves becomes a chairman blind-spot). **Exception:** the Outsider does NOT get the evidence brief — keep it naive (that's the curse-of-knowledge detector).
@@ -58,7 +59,7 @@ Two optional passes fire **only when warranted**, keeping the base run at ~11 ca
 - **Moderator (unknown-unknowns)** — *after step 3, before the chairman.* Fires when the panel converges fast (groupthink risk). One cheap sub-agent surfaces the most important consideration no advisor/reviewer raised → feeds the chairman as an extra blind spot. +1 call.
 - **Fact-verify (adversarial)** — *after step 4.* Fires **only when the verdict rests on external facts / citations / benchmarks** — skip for pure judgment forks (the common case). One refuter per claim cluster (~1–4) extracts load-bearing claims + verifies cited sources (a citation resolving to no real source = FALSE); the chairman corrects/demotes before finalizing and notes it in Confidence & Dissent. +1–4 calls.
 
-Worked example → `references/example.md`.
+Worked example → `${CLAUDE_SKILL_DIR}/references/example.md`.
 
 ## Red flags
 
