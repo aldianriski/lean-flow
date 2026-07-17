@@ -4,7 +4,7 @@ slug: loop-hygiene
 owner: Maintainer
 last_updated: 2026-07-17
 status: active
-plan_commit: pending
+plan_commit: c0b0ff8
 close_commit: pending
 update_trigger: sprint execute/close events
 ---
