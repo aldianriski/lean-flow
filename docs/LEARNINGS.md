@@ -33,7 +33,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 - seen: Sprint-024
 - count: 1
 - promoted: no
-- related: L-010 (repo source vs cache) · the L-042 staging rule (retired → CLAUDE.md anti-pattern)
+- related: L-010 (repo source vs cache) · the retired per-hunk-staging rule (now a CLAUDE.md anti-pattern)
 
 ---
 
