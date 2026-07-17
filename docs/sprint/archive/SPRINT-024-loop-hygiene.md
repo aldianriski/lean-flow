@@ -3,7 +3,7 @@ sprint: 024
 slug: loop-hygiene
 owner: Maintainer
 last_updated: 2026-07-17
-status: active
+status: closed
 plan_commit: c0b0ff8
 close_commit: pending
 update_trigger: sprint execute/close events
@@ -52,7 +52,7 @@ The format close writes and the format §11 deletes must be the same string; the
 **DoD:**
 - [x] Canonical rule defined in DOCS_Guide §11 + close row (D1 sharpened: no breadcrumbs ever — removal outright)
 - [x] Close sweep (Backlog removal · just-closed-sprint refs · rotation links) behind propose→approve
-- [ ] qa-check tombstone lint added `[x]` · SPRINT-024's own close fires the sweep end-to-end (pending close)
+- [x] qa-check tombstone lint added · SPRINT-024's own close fired the sweep end-to-end (owner-approved, applied at close)
 
 ### T3 — Extend qa-check coverage to the blind drift classes (TASK-075) `[size: M · risk: med · AFK · depends: T1]`
 Layers: scripts/qa-check.sh · scripts/gen-index.sh · docs/QA.md
@@ -131,8 +131,8 @@ Durable docs must never point at temp-dir artifacts.
 **Acceptance:** policy stated (verdict referenced by a durable doc → copy to docs/research/verdict-<slug>.md); TASK-040/047 trackers point only at existing files.
 
 **DoD:**
-- [ ] Archival policy line in council SKILL + DOCS_Guide
-- [ ] TASK-040/047 trackers repointed to surviving research docs
+- [x] Archival policy line in council SKILL + DOCS_Guide (council 72/110)
+- [x] TASK-040/047 trackers repointed to surviving research docs (done in T3 — boundary shift)
 
 ### T11 — Sweep consumer-surface leaks from generic skills (TASK-083) `[size: S · risk: low · AFK · depends: T9]`
 Layers: skills/insights · skills/prime · skills/orchestrator/references/dispatch.md
@@ -140,8 +140,8 @@ Layers: skills/insights · skills/prime · skills/orchestrator/references/dispat
 **Acceptance:** insights carries its own inline LEARNINGS entry shape + no scripts/ path; prime + dispatch.md inline rationale instead of docs/research/ pointers; cold consumer read resolves every reference.
 
 **DoD:**
-- [ ] insights: gen-index parenthetical dropped · inline entry shape replaces cross-skill template ref
-- [ ] prime:38 + dispatch.md:5 rationale inlined · cold-read trace clean
+- [x] insights: gen-index parenthetical dropped · inline entry shape replaces cross-skill template ref (68/110)
+- [x] prime:38 + dispatch.md:5 rationale inlined · cold-read trace clean (zero unlabeled lean-flow-only refs)
 
 ### T12 — Document + apply the canonical SKILL.md skeleton (TASK-084) `[size: M · risk: low · HITL · depends: T9, T11]`
 Layers: references/DOCS_Guide.md (style note) · several skills/*/SKILL.md
@@ -149,8 +149,8 @@ Layers: references/DOCS_Guide.md (style note) · several skills/*/SKILL.md
 **Acceptance:** skeleton (section names · order · optionality) documented once; 14/14 skills conform or carry a noted deviation.
 
 **DoD:**
-- [ ] Skeleton documented (frontmatter 6 fields → When to invoke → procedure → Output format? → Hard rules? → Red flags)
-- [ ] council argument-hint + ${CLAUDE_SKILL_DIR} · insights/council heading names normalized · allowed-tools scoping rationale recorded
+- [x] Skeleton documented (frontmatter 6 fields → When to invoke → procedure → Output format? → Hard rules? → Red flags)
+- [x] council argument-hint + ${CLAUDE_SKILL_DIR} · insights/council headings normalized · scoping rationale recorded · orchestrator/tdd bare pointers prefixed at review · 14-skill conformance matrix (4 legit deviations noted)
 
 ### T13 — Bring templates up to ADR-009 + reconcile counts (TASK-085) `[size: S · risk: low · AFK]`
 Layers: skills/lean-doc-generator/templates · references/DOCS_Guide.md §2 · README.md · docs/ARCHITECTURE.md
@@ -158,8 +158,8 @@ Layers: skills/lean-doc-generator/templates · references/DOCS_Guide.md §2 · R
 **Acceptance:** ADR + RESEARCH templates carry id/tags/domain/status/related; BUG is core row 14 in §2 (A3); README/CLAUDE/ARCHITECTURE agree on "14 core (+2 non-core = 16)".
 
 **DoD:**
-- [ ] ADR-009 metadata block in both templates · template-generated doc passes the index lint
-- [ ] BUG row added to §2 · counts reconciled across the four docs
+- [x] ADR-009 metadata block in both templates · render-test passes the corpus lint rules
+- [x] BUG row added to §2 (14 rows) · counts reconciled ("14 core +2 non-core = 16") across README/CLAUDE/ARCHITECTURE
 
 ### T14 — Deduplicate README's modes table to a pointer (TASK-086) `[size: S · risk: low · AFK]`
 Layers: README.md
@@ -168,7 +168,7 @@ Byte-identical volatile tables drift (ADR-007); showcase prose/diagrams stay (co
 **Acceptance:** README references CONTEXT.md's modes table instead of reproducing it verbatim.
 
 **DoD:**
-- [ ] Modes table → pointer (or clearly-marked rendered summary that T2's close sweep would catch drifting)
+- [x] Modes table → showcase-toned prose + CONTEXT pointer; no other byte-identical tables found
 
 ### T15 — Upgrade README.md.template to a showcase-grade front-door (TASK-087) `[size: M · risk: low · HITL]`
 Layers: skills/lean-doc-generator/templates/README.md.template · references/DOCS_Guide.md §2
@@ -177,8 +177,8 @@ Owner call 2026-07-17: README = human showcase (promotional, design-forward); AI
 **Acceptance:** template models a professional showcase (hero/pitch · badges · quick start · feature table · architecture diagram · doc links) as guide-not-gate; anti-SSOT rule inside; audience division stated once.
 
 **DoD:**
-- [ ] Showcase template rewritten (explicitly adaptable, no strict section list) · §2 stance restated in header
-- [ ] Anti-SSOT rule (present, don't byte-duplicate volatile CONTEXT tables) + README=human/CLAUDE+CONTEXT=agent division stated
+- [x] Showcase template rewritten (115 lines, guide-not-gate; badge-link footgun fixed) · §2 footnote extended
+- [x] Anti-SSOT rule + README=human/CLAUDE+CONTEXT=agent division stated in the template header
 
 ## Owner-action checklist
 - [ ] Confirm D1 (tombstone lifetime: immediate delete at close) at G2 — the one open design residual.
@@ -237,6 +237,31 @@ Same sprint scope, task-boundary shift only.
 | `skills/task-decomposer/SKILL.md` | T8 | "approve is the gate" line reconciled | Low | cap 90/110 |
 | `docs/research/loop-hygiene-prd.md` + `docs/knowledge-index.md` | — | registered tags · index regen | Low | corpus lint PASS |
 
+### 2026-07-17 | waves 2–7 done | all 15 tasks complete; qa-check 49→56 checks, 0 fail
+W2 T3 f1e51ea · T4 656e0c2 — W3 T6 14ecacb (branch-2 reachability fixed at review) · T9 60ec8fb —
+W4 T10 59f182c · T11 05bebd2 — W5 T13 fded6f8 — W6 T14 d85b097 · T12 9779cda (+ orchestrator/tdd bare
+pointers prefixed at review) — W7 T15 9f2d73f. Close = T2's final DoD exercise (sweep fires below).
+
+### 2026-07-17 | close | sweep approved + applied (T2's end-to-end exercise ✓)
+Owner approved the propose→approve close sweep: 15 shipped Backlog entries removed outright (no
+breadcrumbs — D1), pointer cleared, rotation links verified, L-043 filed + L-020 bumped, archive +
+INDEX, MINOR → v1.11.0. First live firing of the mechanism this sprint built.
+
 ## Retro
 
-*(written at close)*
+**Retrieval check** — no prior L-NNN/ADR contradicted; the audit *found* two broken L-cites (L-016/L-017 reuse), which is itself the TASK-040 relational-integrity signal — addressed structurally by T9's monotonic-id policy rather than a graph.
+
+**Worked**
+- The audit→PRD→decompose→promote→sprint-bulk pipeline end-to-end in one session; per-task commits + D2 wave map kept 15 tasks and 7 waves conflict-free.
+- "Every rule ships with its matcher" held: qa-check grew 49→56 checks, each FAIL/PASS fixture-verified; the new corpus lint caught this sprint's own PRD (unregistered tags) mid-flight — first real catch.
+- Propose→approve verbs now guard promote (checklist emitted) and close (sweep below) — no new gate needed, as decided (D3).
+
+**Friction**
+- A parallel execution agent ran `git stash` to diff a baseline, making a sibling task's uncommitted work vanish for two turns (restored on pop; nothing lost). Tree-wide git state ops in parallel waves are a real race — banned in W2+ briefs, filed as L-043.
+- The promote-time wave map omitted T6, and T3/T10 had a boundary overlap (temp-tracker repoints) — both caught and logged as shuffles, not scope changes.
+
+**Pattern candidate** (→ docs/LEARNINGS.md)
+- L-043 (new, first id under the monotonic policy): parallel-dispatched subagents must never run tree-wide git state ops (stash/checkout/restore/reset); fixture-test via scratchpad copies or inject-and-revert. count: 1.
+- L-020 count bump (→2, already promoted): "shipped ≠ wired" recurred as this sprint's founding thesis — a prose rule with no lint/checklist matcher is unwired by definition.
+
+**Accepted deviations (noted, not debt):** release-patch (§ order, `Constraints` naming) and handoff (Hard-rules-before-Output-format, unscoped Bash) diverge from the new skeleton within its "optional/name-free" allowances; revisit only if they cause real confusion.

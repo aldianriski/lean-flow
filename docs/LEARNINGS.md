@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-10
+last_updated: 2026-07-17
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -21,11 +21,19 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-042**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-043**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-043 [tags: edit-safety] [status: active]: Parallel-dispatched subagents must NEVER run tree-wide git state ops (`stash` / `checkout` / `restore` / `reset`) — one agent's `git stash` mid-wave swept a sibling task's uncommitted edits into the stash (SPRINT-024 W1: T8's work looked destroyed for two turns; restored on `pop` — pure luck the window didn't interleave with a write). Fixture-test lints via scratchpad copies or inject-and-immediately-revert with an editing tool; compare baselines via `git show REF:file`, never by mutating the shared tree. Ban stated verbatim in every parallel-wave dispatch brief from W2 on.
+- seen: Sprint-024
+- count: 1
+- promoted: no
+- related: L-010 (repo source vs cache) · the L-042 staging rule (retired → CLAUDE.md anti-pattern)
 
 ---
 
@@ -38,8 +46,8 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 ---
 
 ## L-020 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern + DoD (wire new capability into all related jobs). Shipping a capability ≠ wiring it. A new behaviour must be connected into **every related job/flow that should TRIGGER or CHAIN it** — entry routing · the dispatch/reviewer brief · the `/flow` conductor · the `CONTEXT.md` SSOT — not just written in its own file. The v1.9.0/v1.10.0 wiring audit (SPRINT-022) found 3 features shipped but half-connected: skill-powered dispatch orphaned from the Implement steps · Standards-vs-Spec never injected into the reviewer brief · foggy intent not routed to fog-mode. Pattern: at G2 for any new capability, enumerate its trigger points + downstream consumers and wire each; verify it FIRES end-to-end, don't stop at "the file exists." Owner-directed promote (base knowledge for future improvements). Related: L-007 (exercise on real input) · L-015 (consumer surface).
-- seen: Sprint-022
-- count: 1
+- seen: Sprint-022 · Sprint-024 (the loop-hygiene audit's founding thesis — a prose rule with no lint/checklist matcher is unwired by definition)
+- count: 2
 - promoted: yes → CLAUDE.md anti-pattern + DoD (2026-07-10, owner-directed)
 - related: L-007 · L-015
 
