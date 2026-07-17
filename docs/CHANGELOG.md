@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-10
+last_updated: 2026-07-17
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -8,6 +8,21 @@ status: current
 # lean-flow — Changelog
 
 <!-- Prepend new sprints — newest first. Append-only; never edit past blocks. -->
+
+---
+
+## v1.11.0 — Loop Hygiene & Wiring (2026-07-17)
+
+MINOR — bundles **SPRINT-024** (every hygiene rule gets a matcher; the claimed loop wirings actually fire).
+
+**What changed for you:**
+- **Hygiene is now enforced, not remembered** — `qa-check.sh` grew 49→56 checks (README-footer-vs-manifest version · ownership headers incl. CLAUDE.md + README's footer line · TD aging past 3 sprints · temp-dir tracker refs · hand-written cap snapshots · TODO breadcrumb comments · unresolvable L-NNN citations); `gen-index.sh` now stamps its own `last_updated`.
+- **Close + promote gained propose→approve sweeps** — close removes shipped Backlog entries outright (no breadcrumb comments ever; history = CHANGELOG + sprint archive) and scrubs stale sprint refs; promote emits its §10 governance review as an owner-signed checklist before rendering.
+- **Feed pipeline wired end-to-end** — `/triage` implements bug-intake (BUG → TASK · `/diagnose` · TD); promote pulls `state: ready` only; `/prime` routes an ungroomed backlog to `/triage`; G1 gets a fast-path for decomposer-approved tasks (rule stated in orchestrator + decomposer + CONTEXT); `/fork` dropped from the built-ins list.
+- **Knowledge integrity** — `L-NNN` ids are monotonic and never reused (retired-ids ledger; next id continues from highest-ever); broken/dangling citations in shipped skills corrected; council verdicts referenced by durable docs must be archived to `docs/research/verdict-*.md`.
+- **Format standard** — canonical SKILL.md skeleton documented (DOCS_Guide) and all 14 skills conform; ADR/RESEARCH templates carry ADR-009 metadata; BUG is core template row 14 (14 core +2 non-core = 16, counts reconciled); README modes table deduplicated to a CONTEXT pointer (ADR-007); **README.md.template rewritten as a showcase-grade front-door** (guide-not-gate: hero · why · quick start · features · docs map; anti-SSOT rule; README=human · CLAUDE/CONTEXT=agent).
+
+Audit + rationale → `docs/research/loop-hygiene-prd.md`. Manifests → 1.11.0 lockstep; skill roster unchanged (14). Additive — nothing to migrate.
 
 ---
 
