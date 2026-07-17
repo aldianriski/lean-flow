@@ -1,6 +1,17 @@
+---
+id: [ADR-NNN — matches the filename number]
+tags: [pick from: process docs tooling edit-safety sprint-model]
+domain: [one of: skills doc-standard governance knowledge sprint-model]
+status: proposed | accepted | deprecated | superseded
+related: [ADR-NNN]
+---
+
 <!-- One ADR per file: docs/adr/ADR-NNN-<slug>.md · append-only (never edit a decided ADR — mark it
      deprecated/superseded) · WHY only, never HOW. Offer one only when the decision is hard-to-reverse
-     AND surprising AND a real trade-off (DOCS_Guide §4). Worked example → references/ADR-example.md. -->
+     AND surprising AND a real trade-off (DOCS_Guide §4). Worked example → references/ADR-example.md.
+     Frontmatter is the ADR-009 knowledge metadata SSOT — tags/domain vocab sourced from
+     scripts/gen-index.sh TAGS/DOMAINS (single origin); qa-check.sh lints id/tags/domain/status
+     against it, so keep values inside the listed vocab. -->
 
 # ADR-NNN — [Short decision title] [CUSTOMIZE]
 
