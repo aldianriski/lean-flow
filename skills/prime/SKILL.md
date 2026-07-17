@@ -51,7 +51,8 @@ no sprint is active, fall back to the Backlog.
 3. Emit the health report (below) — health check ONLY, no inline file summaries.
 4. Emit one `Next:` line:
    - open tasks exist → `/orchestrator` to continue
-   - no open tasks but a backlog exists → `/lean-doc-generator` to promote / close
+   - no open tasks but the backlog has `state: ready` tasks → `/lean-doc-generator` to promote / close
+   - backlog exists but nothing is `state: ready` (blocked/needs-info/ungroomed) → `/triage` to groom
    - nothing tracked yet → `/task-decomposer "<intent>"`
 
 ## Output format
