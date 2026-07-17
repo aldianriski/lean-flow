@@ -33,7 +33,7 @@ Decide from the **G2 overlap-ownership map** — the same map that assigns share
   tasks concurrently by issuing **multiple Agent calls in a single assistant message** (they run as
   background sub-agents). This is the speed win of `sprint-bulk`.
 - **Sequential** — a task that **shares a file** (per the overlap map) or has a `depends-on` runs after its
-  predecessor, in the ownership/commit order; stage shared files per-hunk (`git add -p`) — L-042/L-037.
+  predecessor, in the ownership/commit order; stage shared files per-hunk (`git add -p`) — promoted rule.
 
 Group the Plan into **parallel batches separated by sequential barriers**: fan out each batch of independent
 tasks in one message, await it, then the next. For large disjoint fan-out where you want determinism +

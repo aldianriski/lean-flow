@@ -20,6 +20,13 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > **By-tag index** → [`docs/knowledge-index.md`](knowledge-index.md) — generated corpus-wide by
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
+> **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
+> new id continues from the highest id **ever issued** (currently **L-042**), not the highest visible.
+> `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
+> **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
+> skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
+> 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
 ---
 
 ## L-021 [tags: tooling] [status: active]: After a plugin update, the RUNNING session keeps the OLD cached skill version — verify the loaded skill's base-dir version, not just `/plugin`'s report. SPRINT-023: `/plugin` said 1.10.1, but the live session loaded `/orchestrator` from the stale `…/cache/…/1.5.0/…` dir (pre-improvement content), so none of the shipped dispatch improvements fired — the "orchestrator doesn't spawn after update" complaint was a **stale-session / leftover-cache-dir** issue, not a code gap. Fix: restart the session to load the current version; remove stale cache version dirs (keep only the latest). Pattern: when a plugin change "doesn't take effect," check the skill's base-dir version in the invocation header BEFORE debugging the code.

@@ -221,6 +221,31 @@ else
   note "skip (missing): docs/QA.md"
 fi
 
+# --- 10. L-NNN citation lint: skills/ cites must resolve or be labeled -----
+# Every L-0[0-9][0-9] cited under skills/ must (a) exist as a docs/LEARNINGS.md entry heading,
+# (b) fall inside the LEARNINGS.md Retired-ids ledger range, or (c) have "promoted" on the
+# citing line — guards id-reuse collisions after pruning (SPRINT-024 T9).
+if [ -f docs/LEARNINGS.md ]; then
+  lheadids=$(grep -oE '^## L-[0-9]+' docs/LEARNINGS.md | grep -oE 'L-[0-9]+' | sort -u)
+  retline=$(grep -E '\*\*Retired ids:\*\*' docs/LEARNINGS.md | head -n1)
+  rlo=$(printf '%s' "$retline" | grep -oE 'L-[0-9]+' | sed -n '1p' | grep -oE '[0-9]+' | sed 's/^0*//')
+  rhi=$(printf '%s' "$retline" | grep -oE 'L-[0-9]+' | sed -n '2p' | grep -oE '[0-9]+' | sed 's/^0*//')
+  [ -n "$rlo" ] || rlo=0
+  [ -n "$rhi" ] || rhi=0
+  citebad=$(grep -rnoE 'L-[0-9]{3}' skills/ 2>/dev/null | while IFS=: read -r cf cl cid; do
+    line=$(sed -n "${cl}p" "$cf")
+    printf '%s' "$line" | grep -qi 'promoted' && continue
+    printf '%s\n' "$lheadids" | grep -qx "$cid" && continue
+    n=$(printf '%s' "$cid" | grep -oE '[0-9]+' | sed 's/^0*//'); [ -n "$n" ] || n=0
+    [ "$n" -ge "$rlo" ] && [ "$n" -le "$rhi" ] && continue
+    printf '%s:%s(%s) ' "$cf" "$cl" "$cid"
+  done)
+  if [ -z "$citebad" ]; then ok "L-NNN citations under skills/ resolve or are labeled"
+  else bad "L-NNN citation unresolved: $citebad"; fi
+else
+  note "skip (missing): docs/LEARNINGS.md"
+fi
+
 # --- Summary ----------------------------------------------------------------
 printf '\n----------------------------------------\n'
 printf 'QA-CHECK: %s pass, %s fail\n' "$pass" "$fail"

@@ -61,9 +61,9 @@ The checker must fail exactly where the audit found green-while-drifted.
 **Acceptance:** new lints — README-footer-vs-plugin.json · ownership on CLAUDE/README · TD ≥3-sprint aging · `(temp)` trackers in TODO · hand-written cap snapshots — each verified FAIL on pre-T1 tree, PASS after; gen-index stamps its own `last_updated`.
 
 **DoD:**
-- [ ] 5 new lints in qa-check.sh, each FAIL/PASS-verified against the pre/post-T1 fixture
-- [ ] gen-index.sh rewrites `last_updated` on every run · QA.md hand-written snapshot removed
-- [ ] Full suite green post-T1
+- [x] 5 new lints in qa-check.sh, each FAIL/PASS-verified via fixtures (no tree-wide git ops)
+- [x] gen-index.sh rewrites `last_updated` on every run · QA.md hand-written snapshot removed
+- [x] Full suite green (55 pass / 0 fail) · TASK-040/047 trackers repointed (shift from T10)
 
 ### T4 — Emit the §10 promote checklist + sign-off (TASK-076) `[size: S · risk: med · HITL]`
 Layers: skills/lean-doc-generator/SKILL.md · references/DOCS_Guide.md §10
@@ -72,8 +72,8 @@ Promote's aging scan becomes emitted checkboxes + an explicit human sign-off bef
 **Acceptance:** promote outputs explicit checkbox lines (TD aging · L-promotion · dedup-near-cap) and requires sign-off before rendering the sprint file.
 
 **DoD:**
-- [ ] Promote row emits the checklist + sign-off verb before render/commit
-- [ ] DOCS_Guide §10 promote text matches
+- [x] Promote row emits the checklist + sign-off verb before render/commit (SKILL 106/110, no TD-008 relocation needed)
+- [x] DOCS_Guide §10 promote text matches
 
 ### T5 — Implement bug-intake routing in triage (TASK-077) `[size: S · risk: med · HITL]`
 Layers: skills/triage/SKILL.md
@@ -92,8 +92,8 @@ Promote must consume triage's contract; prime must route to the pipeline's first
 **Acceptance:** promote intake explicitly pulls `state: ready` only; prime Next: offers /triage when a backlog exists with nothing ready; both traced on the consumer path.
 
 **DoD:**
-- [ ] Promote row filters `state: ready` explicitly
-- [ ] Prime Next: gains the /triage branch · consumer-path trace of both
+- [x] Promote row filters `state: ready` explicitly (in-line, 106/110 held)
+- [x] Prime Next: gains the /triage branch · consumer-path trace of both (branch 2 tightened for reachability at review)
 
 ### T7 — Reconcile CONTEXT built-ins + loop statement (TASK-079) `[size: S · risk: low · AFK]`
 Layers: .claude/CONTEXT.md
@@ -120,9 +120,9 @@ Pruning frees ids for reuse today — citations written before the reuse silentl
 **Acceptance:** never-reuse + retired-id stubs documented; L-016/L-017 collisions + dangling L-024/037/042 cites corrected; lint: every L-NNN cited under skills/ resolves or is labeled promoted.
 
 **DoD:**
-- [ ] Never-reuse policy + retired-id stub format in LEARNINGS.md/§11
-- [ ] tdd:82 + task-decomposer:89 collisions fixed · orchestrator/dispatch dangling cites relabeled
-- [ ] qa-check L-citation lint added and green
+- [x] Never-reuse policy + retired-id stub format in LEARNINGS.md/§11 (highest-ever L-042)
+- [x] tdd:82 + task-decomposer:89 collisions fixed · orchestrator/dispatch dangling cites relabeled
+- [x] qa-check L-citation lint added and green (56 pass / 0 fail; FAIL/PASS fixture-verified)
 
 ### T10 — Archive referenced verdicts durably + repoint trackers (TASK-082) `[size: S · risk: low · AFK]`
 Layers: skills/council/SKILL.md · references/DOCS_Guide.md · TODO.md trackers
