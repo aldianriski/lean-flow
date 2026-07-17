@@ -139,6 +139,17 @@ else bad "corpus dangling refs:$cdang"; fi
 if [ -z "$cmeta" ]; then ok "corpus metadata complete (id+tags+domain+status, known vocab)"
 else bad "corpus metadata:$cmeta"; fi
 
+# --- 5. TODO.md hygiene: no shipped-task breadcrumb comments (D1, SPRINT-024) ----------
+# Scoped to HTML comment lines only — live task prose (done-when/decision fields) legitimately
+# references sprint/changelog numbers and must never false-positive.
+if [ -f TODO.md ]; then
+  crumbs=$(grep -E '<!--' TODO.md | grep -iE 'shipped in SPRINT-|done .*(→|->).*(SPRINT|CHANGELOG)|promoted (→|->) SPRINT')
+  if [ -z "$crumbs" ]; then ok "TODO.md hygiene (no shipped-task breadcrumb comments)"
+  else bad "TODO.md hygiene: breadcrumb comment(s) found — $(printf '%s' "$crumbs" | tr '\n' ';')"; fi
+else
+  note "skip (missing): TODO.md"
+fi
+
 # --- Summary ----------------------------------------------------------------
 printf '\n----------------------------------------\n'
 printf 'QA-CHECK: %s pass, %s fail\n' "$pass" "$fail"
