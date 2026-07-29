@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-033 closed 2026-07-29 → v1.17.0 Unattended-Run Contract; archived per §11.)_
+> **SPRINT-034 — Night-Run Entry Path** → [`docs/sprint/SPRINT-034-night-run-entry-path.md`](docs/sprint/SPRINT-034-night-run-entry-path.md)
 
 ---
 
@@ -29,6 +29,38 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-107 — Clear SSOT headroom in both capped files (resolves TD-009)  [size: M] [risk: med] [HITL]
+      done-when: .claude/CONTEXT.md and skills/orchestrator/SKILL.md each sit ≥10 lines under their
+                 qa-check hard caps (130 / 110) with zero rules lost — prose duplicating CLAUDE.md/README
+                 collapsed to pointers, procedure depth relocated into references/ per the L-012 pattern;
+                 `sh scripts/qa-check.sh` green including its roster/claim checks; TECH-DEBT.md TD-009 →
+                 status: resolved → TASK-107
+      touches:   .claude/CONTEXT.md · skills/orchestrator/SKILL.md · skills/orchestrator/references/ · TECH-DEBT.md
+      assumes:   every deletion is propose→approve, never silent (CLAUDE.md: don't delete content you
+                 didn't touch); relocation target for orchestrator depth is an existing references/ file,
+                 not a new one — confirm at G2
+      tracker:   none — TD-009, the L-008/TD-006 accretion signal firing a second time
+      state:     ready
+
+- [ ] TASK-108 — Wire the night-run interactive launcher: prepare before spawn  [size: M] [risk: med] [HITL]
+      done-when: given "run a night run for <un-promoted intent>" the interactive session runs
+                 feed → plan → pre-flight (decompose → triage → promote → G1/G2 pre-sign) BEFORE any
+                 background spawn, and refuses to fire the Part 2 trigger while pre-flight is red; the
+                 rule is present and fires at all four wiring sites — orchestrator mode dispatch (a mode
+                 keyword never bypasses the feed pipeline) · a named red flag (never spawn an unattended
+                 run on an unpromoted Plan) · night-run.md Part 1a Entry path · CONTEXT.md § Unattended ·
+                 /flow stage-4 entry clause — and the whole path is exercised once end-to-end on real
+                 input (L-007), not spec-only
+      touches:   skills/orchestrator/SKILL.md · skills/orchestrator/references/night-run.md ·
+                 skills/flow/SKILL.md · .claude/CONTEXT.md
+      assumes:   A4 — /flow needs an entry clause, not a stage-4 restructure (:38 already parks the
+                 conducted headless case correctly); A5 — the rule is general ("a mode keyword never
+                 bypasses the feed pipeline") with the unattended launcher as its sharp case, overlapping
+                 but not replacing sprint-bulk step 0's guard. Both resolve at G2.
+      depends-on: TASK-107 (both target files are at hard cap today)
+      tracker:   none — L-020 "shipped ≠ wired" on the entry side of the SPRINT-033 contract
+      state:     ready
 
 ### P2 — Quality / Polish
 
