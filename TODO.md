@@ -53,7 +53,12 @@ status: current
 
 ### P3 — Long-term
 
-- [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook** [size: M] [risk: med] [HITL]
+- [ ] **TASK-099 — Add the N×substrate dispatch-cost note to ADR-010 / dispatch.md**  [size: S] [risk: low] [AFK]
+      done-when: one-line cost-awareness note landed in ADR-010 and/or `orchestrator/references/dispatch.md` (and/or /council's cost line): parallel sub-agent dispatch re-pays the full base substrate (CLAUDE.md + tool context) per branch — cost scales with branch-count × substrate-size, not call-count alone
+      touches:   docs/adr/ADR-010-*.md · skills/orchestrator/references/dispatch.md · skills/council/SKILL.md
+      assumes:   none — doc-only addendum
+      tracker:   docs/research/adhd-adaptation.md (the scan's single micro-keeper)
+      state:     ready
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
       state: blocked   (deferred — research hooks next session)

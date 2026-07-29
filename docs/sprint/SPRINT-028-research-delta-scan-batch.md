@@ -55,8 +55,8 @@ Popularity alone is not a keep signal; the L-017 base rate says most candidates 
 **Acceptance:** a delta-scan doc; keepers filed as proposals or a clean reject recorded.
 
 **DoD:**
-- [ ] Scan doc written; per-candidate delta mapping against the existing surface
-- [ ] Keepers filed as Backlog proposals OR a clean reject recorded with per-candidate rationale
+- [x] Scan doc written; per-candidate delta mapping against the existing surface
+- [x] Keepers filed as Backlog proposals OR a clean reject recorded with per-candidate rationale
 
 ## Decisions (pre-locked)
 - **D1** — Overlap map: T1 edits an existing doc; T2/T3 each create a new file — fully disjoint,
@@ -93,10 +93,22 @@ caveat:** openai.com 403'd (bot-blocked); scanned from an attributed gist mirror
 Fetch status. **Review catch (L-009 class):** agent inserted the fog-map cross-ref blockquote
 MID-TABLE, splitting the ticket table — relocated below the table, rows re-verified contiguous.
 
+### 2026-07-29 | T3 done | adhd repo: 1 micro-keeper (doc addendum) / 8 rejects
+Core mechanism (isolated parallel frames → separate critic) duplicates `/council`'s architecture;
+ideation use-case already ruled out by `brainstorming-adaptation.md` (~90% owned). Sole unmatched
+remainder — the N×substrate dispatch-cost multiplier (absent from ADR-010 + dispatch.md) — filed as
+**TASK-099** (P3 · S · ready). Popularity explicitly not weighed (L-017).
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/research/graphify-daily-value.md` | T1 | dated re-verdict appended — stance re-affirmed | Low | per-claim fetched evidence · self-review · qa-check |
+| `docs/research/harness-engineering-adaptation.md` | T2 | new delta-scan doc (clean reject 0/12) | Low | self-review · qa-check |
+| `docs/research/fog-fleet-orchestration.md` | T2 | fleet cross-ref note (repositioned below ticket table) | Low | table rows re-read contiguous (L-009) |
+| `docs/research/adhd-adaptation.md` | T3 | new delta-scan doc (1 micro-keeper / 8 rejects) | Low | self-review · qa-check |
+| `TODO.md` | T3 | TASK-099 filed (the keeper) | Low | qa-check |
+| `docs/knowledge-index.md` | all | regenerated over the 3 new/updated research docs | Low | gen-index.sh · qa-check "index current" |
 
 ## Retro
 
