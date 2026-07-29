@@ -20,11 +20,12 @@ self-approve. No specialist agents: gates are inline checklists and review is a 
 | `mvp` | G1 + G2 | feature work, medium+, multi-step |
 | `sprint-bulk` | G1+G2 once | auto-loop the Active Sprint task list |
 
-Freeform input with no mode keyword:
+**Intake routing — a mode keyword selects the mode, it never bypasses the feed pipeline.** Run these on every invocation, named mode or not:
 - No tracked task → run `/task-decomposer` first, then return here.
 - Intent too **foggy to slice** (decisions unknown — no acceptance criteria writable yet) → `/task-decomposer` **fog-mode** (`--fog`): map the decisions before forcing tasks.
 - Task is in an **active sprint** → default to the sprint mode (or `quick` for a single one).
 - Task is only in the **Backlog** (not in any active sprint) → **don't silently build**: surface the choice as a popup — `/lean-doc-generator promote` it into a sprint, or proceed as an explicit `quick` one-off (never slide decompose → build unrecorded).
+- Asked to **start a night run** on anything that isn't already a promoted Plan → you are the *interactive launcher*, not the run: do feed → promote → pre-flight here, gates and all, and fire the trigger only once pre-flight is green. Never spawn first (→ `${CLAUDE_SKILL_DIR}/references/night-run.md` Part 1a).
 
 ## G1 — Scope gate (all modes, always runs)
 
@@ -96,3 +97,4 @@ Full routing · skip table · the Standards-vs-Spec axes · adversarial floor ·
 ❌ **Silently absorbing a mid-sprint scope change** — a pivot that shifts scope is logged (`scope-change`: what broke · impact · re-confirm G2) in the Execution Log *before* editing the frozen § Plan (SPRINT-012 T4).
 ❌ **Treating autonomy as authority** — `sprint-bulk` / "go autonomous" is momentum, not a licence to silently reverse a safety/policy default (keep it default-OFF + surface the conflict for an owner decision — promoted rule), nor to read an **unanswerable question as approval**: headless has no ask channel at all (`AskUserQuestion` unregistered; `dontAsk` auto-denies) — a missing channel, a denial, or no human is a **BLOCK**, so park it. Never "proceed with the recommended option", never self-approve, never reshape a task to dodge the gate (dodging is scope-changing → itself HITL) (SPRINT-033).
 ❌ **Sliding decompose → build with no sprint recorded** — a Backlog task not in an active sprint never auto-builds; surface promote-vs-one-off as a popup, never silent (SPRINT-015 T1).
+❌ **Spawning an unattended run before its Plan is promoted and pre-flight is green** — step 0's guard runs *inside* the spawned process, where there is no ask channel to halt into; the check that matters is the interactive one, before the spawn. "Run a night run for `<intent>`" is a compound instruction — prepare, then launch — never launch alone (SPRINT-034).

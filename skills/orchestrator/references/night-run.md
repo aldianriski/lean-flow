@@ -67,6 +67,36 @@ not decide what the Plan should be, and it does not dispose of what the Plan pro
 5. **Never work around the park** — rewriting, splitting, or narrowing a task so it dodges the gate is
    itself scope-changing, and therefore HITL. Park it as-is.
 
+## Part 1a — Entry path (you were asked to *start* a night run)
+
+Everything from Part 1 on assumes a promoted Plan already exists. This part covers the case where it
+doesn't — the request arrives as intent, a PRD, or a backlog item rather than an active sprint.
+
+**"Run a night run for `<X>`" is a compound instruction — prepare *and* execute.** The interactive
+session is the *launcher*, not the run. It does the preparing; the headless run only executes. Collapsing
+that to the launch half is the failure this part exists to stop: a background run is spawned against no
+approved Plan, and the guard that would catch it (`sprint-bulk` step 0) lives *inside* the spawned
+process, where there is no ask channel to halt into.
+
+**Ordered entry path** — do these interactively, in order, before any spawn:
+
+| # | If… | Then run | Gate |
+|---|---|---|---|
+| 1 | `<X>` is raw intent / a PRD / a ticket | `/task-decomposer` → `TASK-NNN` in the Backlog | human `approve` |
+| 2 | the Backlog is ungroomed, or nothing is `state: ready` | `/triage` | human sign-off |
+| 3 | no active sprint holds the work | `/lean-doc-generator promote` | governance checklist sign-off |
+| 4 | a sprint exists but G1/G2 are unsigned | `sprint-bulk` steps 1–2, interactively | human G1 + G2 |
+| 5 | all of the above are green | Part 1 pre-flight → Part 2 trigger | — |
+
+A step whose gate the human declines **stops the launch**. Report what's outstanding and let them
+decide; do not narrow, re-slice, or defer the work to get past it (that's scope-changing → HITL, and
+the same dodge Part 0 forbids the run itself from making).
+
+**Mode note.** Preparing is *not* an unattended activity — it is the interactive work that makes an
+unattended run legitimate. Steps 1–4 are exactly the items Part 0's boundary table marks ⛔ park, and
+they are legal here precisely *because* a human is present. That is the whole asymmetry: prepare with
+a human, execute without one.
+
 ## Part 1 — Pre-flight pass (run interactively, the evening before)
 
 All items must pass or the night-run does not fire:
@@ -90,6 +120,12 @@ All items must pass or the night-run does not fire:
       default stays OFF; flipping it is an owner decision, not a night-run convenience.
 
 ## Part 2 — Trigger recipe (consumer-generic)
+
+> **Precondition — do not fire this until Part 1a's entry path and Part 1's pre-flight are both green.**
+> The command below is the *last* step, never the first. An agent handed "run a night run" reaches this
+> section with the trigger already copy-pasteable; that convenience is exactly how the prepare half gets
+> skipped. If any pre-flight item is unchecked, the correct action is to go do it interactively — or to
+> report what's blocking — not to fire and let the run discover the problem with no way to ask.
 
 The one-liner, fired by an OS-level scheduler (outside lean-flow's own surface — it ships no hooks):
 

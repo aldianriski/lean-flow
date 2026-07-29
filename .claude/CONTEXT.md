@@ -59,6 +59,7 @@ Humans approve gates — the skill never self-approves. Review is a self-review 
 
 **Unattended** (headless night-run) — charter **execute-only**: run a promoted Plan, decide nothing. **Declared** at trigger (`sprint-bulk unattended`), never inferred. **Absence ≠ consent**: headless has *no ask channel* (`AskUserQuestion` unregistered; `dontAsk` auto-denies) — missing channel/denial/timeout = BLOCK, never a default-yes, and never reason the answer out yourself.
 A HITL step is **parked** (record → continue disjoint AFK → clean halt via `/handoff`), never asked, decided, or worked around; boundary derives from **AFK-safe = additive + reversible + already-approved-in-scope**; a gate is pre-signable only if its subject is frozen at pre-flight. Table + protocol → `orchestrator/references/night-run.md` Part 0.
+**Prepare, then launch** — "run a night run for `<X>`" is compound: the *interactive* session runs feed → promote → pre-flight (gates and all) and fires the trigger only once pre-flight is green. A mode keyword never bypasses the feed pipeline, and the run is never spawned against an unpromoted Plan — step 0's guard sits inside the spawned process, too late to ask (Part 1a).
 
 ## Modes (`/orchestrator`)
 
