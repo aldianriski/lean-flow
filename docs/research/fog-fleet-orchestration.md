@@ -4,7 +4,7 @@ last_updated: 2026-07-29
 update_trigger: A ticket resolves/graduates, new fog appears, or the destination shifts
 status: current
 id: fog-fleet-orchestration
-tags: [process, orchestration]
+tags: [process, tooling]
 domain: skills
 related: [council-improvements, architecture-baselines]
 ---
