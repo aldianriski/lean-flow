@@ -34,8 +34,8 @@ moved since. Test the token-cost / popularity claims against the CURRENT feature
 integration task filed with evidence.
 
 **DoD:**
-- [ ] `graphify-daily-value.md` re-verdict dated 2026-07-29+, claims tested against the current repo feature set (delta over existing surface, not standalone merit)
-- [ ] Outcome routed: stance re-affirmed in place, or an evidenced `TASK-NNN` integration proposal filed (TASK-040 guardrails cited)
+- [x] `graphify-daily-value.md` re-verdict dated 2026-07-29+, claims tested against the current repo feature set (delta over existing surface, not standalone merit)
+- [x] Outcome routed: stance re-affirmed in place, or an evidenced `TASK-NNN` integration proposal filed (TASK-040 guardrails cited)
 
 ### T2 — Scan: OpenAI harness-engineering adaptation `[size: S · risk: low · AFK]` <!-- TASK-094 -->
 Layers: `docs/research/` (new scan doc)
@@ -73,6 +73,18 @@ Popularity alone is not a keep signal; the L-017 base rate says most candidates 
 Governance review signed off (TD-008 re-reviewed + stamped · CHANGELOG v1.10.0–v1.12.0 rotated to
 `docs/changelog/CHANGELOG-1.12.0.md` with the lost v1.12/v1.11 headings restored · no L-promotion due).
 Three ready P2 scans pulled; disjoint per D1.
+
+### 2026-07-29 | dispatch | T1+T2+T3 fanned out in parallel
+Batch G1 (fast-path) + G2 owner-approved. 3 Sonnet `general-purpose` agents, shared tree (worktrees
+rejected: unpushed base → L-046 hazard); L-043 git-ban + L-014 fetch-to-cite briefed verbatim.
+T2's cross-ref target resolved during G1: the fog-map = `fog-fleet-orchestration.md`, harness-inventory
+ticket already resolved + pre-linked to TASK-094. Coordinator owns knowledge-index regen + commits.
+
+### 2026-07-29 | T1 done | graphify re-verdict: RE-AFFIRMED (Option C holds)
+Commit-pinned README diff (be3dcfca → HEAD) + CHANGELOG 0.9.25–0.9.29, all fetched. Delta: rebrand +
+benchmarks (marketing, RAG-corpus-shaped) + opt-in `--strict` mode (the exact enforced-gate shape
+council rejected for TASK-040 — corroborates the TASK-006 tension, doesn't flip the stance). Token-cost
+claim (0 LLM credits, local AST) unchanged. No integration task. Doc 101/120 lines, append-only kept.
 
 ## Files Changed
 
