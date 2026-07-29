@@ -9,7 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
-- SPRINT-027 — Night-Run Watchdog & Housekeeping — closed 2026-07-29 · (recorded in file)
+- SPRINT-027 — Night-Run Watchdog & Housekeeping — closed 2026-07-29 · 36721a4
 - SPRINT-026 — Fleet & Night-Run Build — closed 2026-07-29 · 601e2e6
 - SPRINT-025 — Fleet & Night-Run Foundations — closed 2026-07-29 · 2eb9bd5
 - SPRINT-024 — Loop Hygiene & Wiring — closed 2026-07-17 · 296c01b
