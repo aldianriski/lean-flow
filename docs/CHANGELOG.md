@@ -11,6 +11,19 @@ status: current
 
 ---
 
+## v1.14.2 — Consumer-Leak Cleanup (2026-07-29)
+
+PATCH — consumer-fit audit (L-015 sweep, triage-driven).
+
+**What changed for you:**
+- **Repo-specific leaks removed from shipped surfaces** — the ADR/RESEARCH templates no longer
+  hardcode lean-flow's own tag/domain vocab or assert a `scripts/gen-index.sh` / `qa-check.sh`
+  pipeline your repo doesn't have (now conditionally framed, matching the LEARNINGS template);
+  `/insights` dropped a lean-flow backlog reference; `night-run.md` / `dispatch.md` research
+  pointers are labeled as lean-flow-repo decision records, not required reading.
+
+---
+
 ## v1.14.1 — Dispatch-Cost Awareness (2026-07-29)
 
 PATCH — **SPRINT-029**, the adhd scan's single keeper (TASK-099).
