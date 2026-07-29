@@ -80,10 +80,10 @@ close §11 retention) plus triage's apply-after-`y`, which under `dontAsk` waits
 **Acceptance:** each HITL approval point names its unattended behaviour inline.
 
 **DoD:**
-- [ ] promote governance sign-off states the unattended park
-- [ ] close §11 retention + doc-freshness state the unattended park (four-bucket auto-file stays AFK-safe — additive)
-- [ ] `/triage` apply states the park
-- [ ] Line caps hold
+- [x] promote governance sign-off states the unattended park
+- [x] close §11 retention + doc-freshness state the unattended park (four-bucket auto-file stays AFK-safe — additive)
+- [x] `/triage` apply states the park
+- [x] Line caps hold — lean-doc-generator 106/110 · triage 85/110
 
 ### T5 — Surface night-run + the contract on the consumer face `[size: S · risk: low]`
 Layers: `README.md` · `docs/CHANGELOG.md` · `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json`
@@ -156,6 +156,13 @@ unanswerable question as approval"). `/flow` states only stage 4 conducts unatte
 and merging it into the adjacent autonomy red flag would bury the very rule this sprint adds, so it
 stands. Second cap-pressure signal this sprint (with T2's 130/130) → one TD at close, not two.
 
+### 2026-07-29 | T4 | Wired /lean-doc-generator + /triage
+The two collision points from the owner's real run now state their own unattended behaviour inline —
+promote parks whole (it *forms* the Plan, so nothing in it is pre-approvable), close **splits** exactly
+on the derivation rule: Retro + four buckets + `close_commit` + pointer-clear run (additive), §11
+retention + doc-freshness park (lossy / approval-bound). `/triage` gets the sharpest phrasing of the
+invariant: *a missing `y` is a no, never a yes.*
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -164,6 +171,8 @@ stands. Second cap-pressure signal this sprint (with T2's 130/130) → one TD at
 | `.claude/CONTEXT.md` | T2 | gate readers must see that unattended runs never self-approve | Low | cap check 130/130 |
 | `skills/orchestrator/SKILL.md` | T3 | the loop that *runs* unattended must park, not wait | Med | T6 real headless run |
 | `skills/flow/SKILL.md` | T3 | the conductor must not promote a sprint nobody approved | Low | read-through |
+| `skills/lean-doc-generator/SKILL.md` | T4 | promote/close own the two HITL steps the real run hit | Med | T6 real headless run |
+| `skills/triage/SKILL.md` | T4 | its apply-after-`y` waits on a `y` that cannot arrive | Low | read-through |
 
 ## Retro
 

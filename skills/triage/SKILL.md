@@ -72,7 +72,7 @@ requests for the same thing accumulate under one file's `prior-requests` list.
 ## Hard rules
 
 - **Backlog only** — never re-order or re-state the Active Sprint (a sprint in flight is locked).
-- **HITL** — propose re-ranks, state changes, merges, and rejections; apply only after `y`.
+- **HITL** — propose re-ranks, state changes, merges, and rejections; apply only after `y`. **Unattended** (headless): the `y` can never arrive — under `dontAsk` the ask is auto-*denied*, not answered. Emit the proposal and **park** it (`night-run.md` Part 0); a missing `y` is a no, never a yes.
 - **Never silently delete** — a removed task goes to `.out-of-scope/` with a pointer, or is merged with a note. No task vanishes without a trail.
 - **Don't re-decompose** — triage grooms existing tasks; new tasks come from `/task-decomposer`.
 

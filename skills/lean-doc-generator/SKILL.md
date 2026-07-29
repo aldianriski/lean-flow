@@ -89,10 +89,12 @@ one pointer per stream in TODO § Active Sprint); single-stream repos omit it �
 
 **Retro at close** — first **sweep the full session** (the Execution Log + any TD/follow-up surfaced mid-run but not yet filed), then sort the sprint into four buckets and **route each to its durable home** (DOCS_Guide §10):
 Shipped → `CHANGELOG.md` (root; legacy `docs/`) · Tech debt → `TD-NNN` in root `TECH-DEBT.md` · Follow-ups → `TASK-NNN` in TODO § Backlog · Learnings → `L-NNN` in `docs/LEARNINGS.md`. **Auto-file all four** (per `templates/LEARNINGS.md.template`); show the user what was filed.
+**Unattended** — close splits: the Retro, the four-bucket auto-file, `close_commit`, and clearing the stream pointer are **additive → they run**; §11 retention (archive · move · prune · compact) and the doc-freshness propose→approve are **lossy or approval-bound → they park** for the morning. Never approve your own retention pass to "finish the close".
 
 **Governance review at promote** — before planning, run the scan and **emit it as a checklist the owner signs off on**, never silent prose:
 `☐ L-promotion (count≥2, promoted:no): <findings|none>` · `☐ TD aging (≥3 sprints unaddressed): <findings|none>` · `☐ doc-aging §11 (TD collapse · CHANGELOG rotation · LEARNINGS pointer-collapse · TODO ~150-line cap): <findings|none>`.
 Resolve each ☑ line before sign-off: promote flagged learnings into a durable rule (CLAUDE.md anti-pattern / CONTEXT.md rule / skill red-flag) and mark `promoted: yes → <where>`; aged TD → re-review prompt, `severity: high` → auto-escalate Backlog P1; doc-aging → propose compression, apply on approval. **Explicit owner sign-off on the checklist is required before rendering the sprint file or committing `plan locked`.**
+**Unattended** — promote is HITL end-to-end (it *forms* the Plan, so nothing here is pre-approvable): a headless run **parks** at the scan and exits; it never signs its own checklist, and never renders a sprint to get on with the night. Same for `migrate`/`init` per-item approvals. Contract → `orchestrator/references/night-run.md` Part 0.
 
 ## Red flags
 
