@@ -45,10 +45,10 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-044 [tags: tooling] [status: active]: Windows holds a handle-lock on a git worktree any shell has `cd`'d into — `git worktree remove` fails with Permission denied until a fresh shell runs it; partial failure leaves the admin entry deleted but the directory on disk (needs manual `rm -rf` + `git worktree prune`). Coordinator cleanup procedure: leave the worktree dir *before* removing it, retry from a fresh shell, verify with `git worktree list`. Feed into TASK-096's merge-back/cleanup step.
+## L-044 [tags: tooling] [status: promoted] → promoted: yes → dispatch.md § Merge-back queue (cleanup step encodes the full procedure). Windows holds a handle-lock on a git worktree any shell has `cd`'d into — `git worktree remove` fails with Permission denied until a fresh shell runs it; partial failure leaves the admin entry deleted but the directory on disk (needs manual `rm -rf` + `git worktree prune`). Coordinator cleanup procedure: leave the worktree dir *before* removing it, retry from a fresh shell, verify with `git worktree list`. Feed into TASK-096's merge-back/cleanup step.
 - seen: Sprint-025 · Sprint-026 (recurred live on the int-026 integration worktree — documented recovery worked)
 - count: 2
-- promoted: no — **promotion due at next promote** (count ≥ 2)
+- promoted: yes → dispatch.md § Merge-back queue (SPRINT-027 promote governance)
 - related: L-043 (coordinator-only worktree cleanup) · docs/research/fog-fleet-orchestration.md (prototype friction) · dispatch.md § Merge-back queue (procedure encodes it)
 
 ---

@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-026 closed 2026-07-29 → v1.13.0; archived per §11.)_
+> **SPRINT-027 — Night-Run Watchdog & Housekeeping** → docs/sprint/SPRINT-027-watchdog-housekeeping.md
 
 ---
 
