@@ -3,9 +3,9 @@ sprint: 026
 slug: fleet-build
 owner: Maintainer
 last_updated: 2026-07-29
-status: active
+status: closed
 plan_commit: f75064f
-close_commit: —
+close_commit: pending
 update_trigger: sprint execute/close events
 ---
 
@@ -97,4 +97,25 @@ guard correctly refused an unattended run (HITL tasks in sprint) — negative pa
 
 ## Retro
 
-_(written at close)_
+**Retrieval check** — no prior L/ADR contradicted; L-042's narrowing (decided SPRINT-025) is now
+durably encoded (CONTEXT §Streams + dispatch.md), closing that loop.
+
+**Worked**
+- The wave exercised the protocol it was building — dispatch, merge queue, smoke check, L-044
+  recovery, all validated on the sprint's own real work. Zero synthetic exercise needed.
+- Pre-locked design made gates near-instant: no residual grill, no new decisions, build-only.
+- The pre-flight dry-run's *negative* path fired on real state (HITL tasks → guard refused) —
+  stronger evidence than a contrived pass.
+
+**Friction**
+- L-044 recurred exactly as documented (int-026 handle-lock) — count → 2, promotion due next promote.
+- New: agent worktrees fork from the remote default branch — unpushed commits invisible (→ L-046,
+  encoded in dispatch.md same-day).
+- T1's agent flagged the stale escalation framing in dispatch.md's older sections — caught because
+  the brief asked for a conflict check; reworded in the coordinator pass.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- L-046 filed (count 1) · L-044 bumped to count 2.
+
+**Buckets routed** — Shipped → CHANGELOG v1.13.0 · Tech debt → none new · Follow-ups → TASK-098
+flips `blocked → ready` (097 shipped) · Learnings → L-044 bump + L-046.

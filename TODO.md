@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-026 — Fleet & Night-Run Build** → docs/sprint/SPRINT-026-fleet-build.md
+> _(no active sprint — SPRINT-026 closed 2026-07-29 → v1.13.0; archived per §11.)_
 
 ---
 
@@ -30,24 +30,12 @@ status: current
 
 ### P1 — Next Phase Required
 
-- [ ] **TASK-096 — Wire worktree fleet dispatch + merge-back into sprint-bulk**  [size: M] [risk: med] [HITL]
-      done-when: dispatch.md carries the worktree protocol (disjoint Tn → parallel Agent(isolation:"worktree") · soft cap 3–5 · per-task branch) AND the coordinator merge-queue procedure (G2-order --no-ff per task · expected-vs-surprise conflict paths · two-tier verify · cleanup incl. the Windows handle-lock note · stale-branch guardrail #51596); SKILL.md Sequence line + CONTEXT §Streams updated (L-042 narrowed to intra-tree); exercised once on a real sprint wave (L-007)
-      touches:   skills/orchestrator/references/dispatch.md · skills/orchestrator/SKILL.md (110-cap: reword in place) · .claude/CONTEXT.md
-      assumes:   Claude-only v1 (external agents out-of-scope per fog-map grill)
-      tracker:   docs/research/fog-fleet-orchestration.md
-      state:     ready
-- [ ] **TASK-097 — Night-run core: pre-flight pass + trigger recipe**  [size: S] [risk: low] [HITL]
-      done-when: pre-flight checklist (plan frozen · no open assumes · scoped allowlist built) + a consumer-generic `claude -p` trigger recipe live in orchestrator references; dry-run exercised once
-      touches:   skills/orchestrator/references/ · possibly handoff refs
-      assumes:   dontAsk + scoped allowlist, never bypassPermissions (night-run.md verdict)
-      tracker:   docs/research/night-run.md
-      state:     ready
 - [ ] **TASK-098 — Night-run resilience: watchdog + morning rollup**  [size: S] [risk: low] [HITL]
       done-when: handoff-on-stall watchdog pattern + "Blocked/needs-human" morning rollup documented and wired into the sprint-bulk/handoff references; exercised on a simulated stall
-      touches:   skills/orchestrator/references/ · skills/handoff/SKILL.md
-      assumes:   depends-on TASK-097 (trigger recipe exists first)
+      touches:   skills/orchestrator/references/night-run.md · skills/handoff/SKILL.md
+      assumes:   none — TASK-097 shipped (v1.13.0), dependency cleared
       tracker:   docs/research/night-run.md
-      state:     blocked   (depends-on: TASK-097)
+      state:     ready
 
 ### P2 — Quality / Polish
 
