@@ -43,7 +43,9 @@ placement-wins · AGENTS-pointer · CHANGELOG always-core · init non-doc loosen
 
 **DoD:**
 - [ ] §2 table rewritten — TemiDev mandatory minimum core, per-file caps + owners, legacy paths second
-- [ ] §6 tier model replaced by base / backend-integration / medium-complex gating
+- [ ] Per-doc lifecycle contract (LAW 3) on every §2 row — create trigger · update trigger (the event, e.g. schema.md ← migration lands) · archive/retention trigger
+- [ ] §6 tier model: base / backend-integration / medium-complex gating + **multi-service top tier retained** (service registry · dependency map · global decisions)
+- [ ] Cap-hit growth rule stated — a core file at its cap **splits into its tree** (overview → siblings), never compresses signal away
 - [ ] LAW-1 reinterpretation stated (mandatory minimum scaffolded at init; non-mandatory create-lazily)
 - [ ] ADR-012 written per template + `docs/DECISIONS.md` row; supersession of prior placement noted
 
@@ -60,6 +62,7 @@ release-patch prepends root CHANGELOG.md with legacy fallback.
 - [ ] Four templates renamed/split to new canonical paths (DEPLOY splits into deployment+rollback)
 - [ ] /prime read-order slots updated (canonical first, legacy second)
 - [ ] release-patch prepend target + §11 rotation paths updated (archives stay `docs/changelog/`)
+- [ ] Close-time doc-freshness check wired — sprint close maps Files Changed → §2 update triggers and prompts affected-doc refresh (propose→approve, never silent)
 - [ ] /prime traced on a legacy-layout fixture AND a new-layout fixture — both read cleanly
 
 ### T3 — Add root-file templates: CONTRIBUTING · SECURITY · AGENTS-pointer · .env.example/.gitignore/LICENSE `[size: M · risk: med]`
@@ -147,6 +150,15 @@ the new standard; migrate re-run on a legacy layout proposes relocation, never c
 
 ## Execution Log
 <!-- Append-only, dated. Plan frozen at promote. -->
+
+### 2026-07-29 | scope-change | Complete-standard amendment (pre-execution)
+**What broke:** owner review caught the plan adopting TemiDev *structure* without the *lifecycle
+contract* — 3 gaps vs the "complete, big-repo-ready" goal: (1) T1 required caps+owners but not
+per-doc create/update/archive triggers (LAW 3) for the ~15 new types; (2) the old §6 Tier 3+
+(multi-service) was silently dropped and no cap-hit→split-into-tree growth rule existed — lean-only,
+no growth path; (3) nothing wires sprint close's Files Changed to doc freshness (docs would rely on
+the 60-day scan alone). **Impact:** T1 + T2 DoD extended (no new tasks, no size change — T1 M→M
+holds, denser). **G2 re-confirmed:** owner approved all 3 amendments 2026-07-29.
 
 ### 2026-07-29 | promote | Plan locked
 7 Backlog tasks (TASK-067…073) pulled in dependency order; governance checklist signed off
