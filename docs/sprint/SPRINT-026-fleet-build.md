@@ -4,7 +4,7 @@ slug: fleet-build
 owner: Maintainer
 last_updated: 2026-07-29
 status: active
-plan_commit: pending
+plan_commit: f75064f
 close_commit: —
 update_trigger: sprint execute/close events
 ---
