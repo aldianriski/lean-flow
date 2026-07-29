@@ -42,7 +42,8 @@ bounded by the safe-scaffold allowlist (ADR-012).
    **`docs/api/` placement rule** — `api/openapi.yaml` is project-generated; init **never**
    generates its content (no template). When an API is detected, init creates `docs/api/` and
    (write-if-absent) `docs/api/README.md`, a 3-liner: *"Commit the OpenAPI source (`openapi.yaml`)
-   here; generated HTML docs need not be committed."*
+   here; generated HTML docs need not be committed."* — carrying a `<sub>` footer ownership line
+   (§3 pointer-file exception, like AGENTS.md; a doc without an owner is an orphan, §7).
 4. **Safe-scaffold allowlist (ADR-012)** — the only non-doc files init writes. See below.
 5. **Write** — target canonical placement (DOCS_Guide §2: root for README/CONTRIBUTING/SECURITY/
    AGENTS/CHANGELOG/LICENSE/TODO/TECH-DEBT · `.claude/` for AI-context · `docs/` for the rest);

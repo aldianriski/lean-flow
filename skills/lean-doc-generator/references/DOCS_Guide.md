@@ -56,7 +56,7 @@ gating → §6.
 | `architecture/data-flow.md` | backend, or overview cap-split | Dev | 120 | a non-trivial data path exists | that flow changes |
 | `architecture/authentication.md` | auth exists | Dev | 120 | auth is introduced | authn/authz architecture changes |
 | `architecture/integrations.md` | backend/integration | Dev | 120 | first external integration | an integration is added / changed |
-| `adr/ADR-NNN-<slug>.md` + `DECISIONS.md` index | medium+ | Team | per file, append-only | a qualifying decision (§4) | new ADR → index row |
+| `adr/ADR-NNN-<slug>.md` + `DECISIONS.md` index (both under `docs/`) | medium+ | Team | per file, append-only | a qualifying decision (§4) | new ADR → index row |
 | `database/erd.md` (Mermaid) | DB exists | Dev | 120 | the schema's first entities land | a migration changes entities / relations |
 | `database/schema.md` | DB exists | Dev | 150 | with erd | a migration lands |
 | `database/migration-guide.md` | DB exists | Dev | 100 | first migration | migration / seed process changes |

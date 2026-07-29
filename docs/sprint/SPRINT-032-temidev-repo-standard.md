@@ -127,9 +127,9 @@ fixtures, /prime reads each cleanly; legacy-lean repos get a relocation proposal
 the new standard; migrate re-run on a legacy layout proposes relocation, never clobbers.
 
 **DoD:**
-- [ ] migration-map legacy-lean → new-canonical mapping added (re-run sync proposes, never clobbers)
-- [ ] init exercised at base / backend / medium-complex tiers — /prime reads each cleanly
-- [ ] README + CHANGELOG + CONTEXT.md §Doc standard updated (consumer-facing surface, L-015)
+- [x] migration-map legacy-lean → new-canonical mapping added (re-run sync proposes, never clobbers)
+- [x] init exercised at base / backend / medium-complex tiers — /prime reads each cleanly
+- [x] README + CHANGELOG + CONTEXT.md §Doc standard updated (consumer-facing surface, L-015)
 
 ## Owner-action checklist
 - [ ] None — all-dev sprint.
@@ -150,6 +150,17 @@ the new standard; migrate re-run on a legacy layout proposes relocation, never c
 
 ## Execution Log
 <!-- Append-only, dated. Plan frozen at promote. -->
+
+### 2026-07-29 | T7 complete | Migration map + 3-tier consumer verify + own surface (fresh-context Sonnet + coordinator)
+migration-map retargeted to ADR-012 canonical (CHANGELOG direction reversed) + Legacy-lean
+relocation block (propose→approve, never clobber). Three-tier verify: base 21 files / backend 34 /
+complex 37 — every /prime slot resolves (canonical-first confirmed; MISSING only where legit),
+headers present. Own surface: README count claim 15→30/32 + feature paragraph; CHANGELOG Unreleased
+block; CONTEXT §Doc standard → TemiDev core + tiers + §12 (127/130). **Fresh-context review caught
+2 shipped defects, both fixed by coordinator:** (1) docs/api/README.md scaffold lacked ownership —
+init.md now gives it the §3 footer exception; (2) DECISIONS.md path ambiguous in §2 — pinned "under
+docs/". Fixture tier-boundary blur (login-flow in backend fixture) noted as fixture-reuse artifact,
+not a skill defect. qa-check 56/0.
 
 ### 2026-07-29 | T6 complete | §12 Git boundary + init/migrate wiring (Sonnet dispatch + coordinator review)
 DOCS_Guide gains §12 (47 lines): decision rule table · never-commit table with proper-home routing ·
@@ -253,6 +264,10 @@ intake grill (full adoption · placement wins · AGENTS pointer · CHANGELOG dev
 | `.claude/CLAUDE.md` · `docs/ARCHITECTURE.md` | T5 | count claims 25→30 core (32 total) | Low | qa-check tmpl-core 30=30 |
 | `references/DOCS_Guide.md` §12 | T6 | the Git boundary: decision rule · never-commit routing · excludes · 5-home separation | Med | fixture boundary-scan trace |
 | `references/init.md` · `references/migration-map.md` | T6 | .gitignore ← §12c · migrate detect + boundary scan (report-only, rotation owner-action) | Med | fixture trace (.env + dump.sql flagged, DDL not) |
+| `references/migration-map.md` | T7 | relocation targets → ADR-012 canonical + Legacy-lean block (never clobber) | Med | qa-check · review |
+| `README.md` · `docs/CHANGELOG.md` | T7 | count claim 30/32 + feature paragraph · Unreleased block (own paths unchanged — A1) | Low | qa-check footer-version |
+| `.claude/CONTEXT.md` | T7 | §Doc standard → TemiDev core + tiers + §12 (coordinator edit) | Med | 127/130 · qa-check |
+| `references/{init,DOCS_Guide}.md` | T7 | defect fixes from fresh-context verify (api/README ownership footer · DECISIONS.md path pinned) | Low | qa-check |
 
 ## Retro
 <!-- Written at close. -->

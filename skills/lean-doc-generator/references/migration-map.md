@@ -68,35 +68,54 @@ that up, both **HITL and per-item** (never silent, never batched):
 Detection (step 1) is heuristic — duplicate-content match · inbound-link graph · `last_updated` age ·
 code contradiction — and only ever **proposes**; the human decides consolidate vs retire vs keep.
 
-## Placement — relocate to the canonical layout (DOCS_Guide §2)
+## Placement — relocate to the canonical layout (DOCS_Guide §2, ADR-012)
 
 Applies to **any** source pattern. A relocation is a `git mv` + inbound-link fixes (grep the
 filename) — content untouched. Propose these in the per-file plan like any other action:
 
 | Found at | Relocate to |
 |---|---|
-| `CHANGELOG.md` (root) | `docs/CHANGELOG.md` |
+| `docs/CHANGELOG.md` (pre-ADR-012 lean placement — now legacy) | `CHANGELOG.md` (root — **direction reversed from before ADR-012**: root is now canonical, always-core; `docs/CHANGELOG.md` is the legacy source `/prime` still matches second) |
 | `LEARNINGS.md` (root) | `docs/LEARNINGS.md` |
 | `DECISIONS.md` (root) | `docs/DECISIONS.md` (stays the thin index; ADRs already `docs/adr/`) |
-| `ARCHITECTURE.md` (root) | `docs/ARCHITECTURE.md` |
-| `SETUP.md` (root) | `docs/SETUP.md` |
-| `DEPLOY.md` / `deploy/` (root) | `docs/DEPLOY.md` (align to `DEPLOY.md.template`) |
+| `ARCHITECTURE.md` (root) or `docs/ARCHITECTURE.md` (pre-ADR-012 lean placement) | `docs/architecture/overview.md` |
+| `SETUP.md` (root) or `docs/SETUP.md` (pre-ADR-012 lean placement) | `docs/development/setup.md` |
+| `DEPLOY.md` / `deploy/` (root) or `docs/DEPLOY.md` (pre-ADR-012 lean placement) | `docs/deployment/deployment-guide.md` — **split out** any rollback-specific content into `docs/deployment/rollback-guide.md` (present source) rather than folding it into the guide |
 | `CONTEXT.md` / `CLAUDE.md` (root) | `.claude/CONTEXT.md` / `.claude/CLAUDE.md` |
 | `README.md` · `TODO.md` · `TECH-DEBT.md` | stay at root (front-door · daily working files) — never relocate |
+
+## Legacy-lean layout → TemiDev layout (ADR-012 re-run)
+
+A repo already adopted under the **pre-ADR-012 lean standard** — `docs/ARCHITECTURE.md` ·
+`docs/SETUP.md` · `docs/DEPLOY.md` · `docs/CHANGELOG.md` — is not stale or wrong; `/prime` still
+matches all four (legacy, second). It gets a **relocation proposal on its next `migrate` re-run**,
+exactly like any other re-run delta (see "Re-run" above): report-only until approved, never
+auto-applied.
+
+| Legacy-lean file | Proposed relocation | Note |
+|---|---|---|
+| `docs/ARCHITECTURE.md` | `docs/architecture/overview.md` | content untouched; split into siblings only if already past the 150-line cap |
+| `docs/SETUP.md` | `docs/development/setup.md` | content untouched |
+| `docs/DEPLOY.md` | `docs/deployment/deployment-guide.md` | split out rollback content → `docs/deployment/rollback-guide.md` if present |
+| `docs/CHANGELOG.md` | `CHANGELOG.md` (root) | **direction reversed** — root is now canonical; propose moving *up*, not down |
+
+Same guarantees as any sync re-run: **propose → approve → apply**, never clobber an existing
+canonical file, and `git mv` + inbound-link fixes only — content is never rewritten by the move
+itself.
 
 ## Known mappings — dev-flow / adlc-flow → lean-flow
 
 | Existing | Action | lean-flow target |
 |---|---|---|
-| `DECISIONS.md` (single ADR log) | split + index | one rich ADR per file `docs/adr/ADR-NNN-<slug>.md` + `DECISIONS.md` as the index |
-| `docs/codemap/CODEMAP.md` (3-tier) | fold + drop | structure into `ARCHITECTURE.md`; lean-flow has no codemap |
+| `DECISIONS.md` (single ADR log) | split + index | one rich ADR per file `docs/adr/ADR-NNN-<slug>.md` + `docs/DECISIONS.md` as the index |
+| `docs/codemap/CODEMAP.md` (3-tier) | fold + drop | structure into `docs/architecture/overview.md`; lean-flow has no codemap |
 | `.claude/CONTEXT.md` (dev-flow vocab · gates · agent roster) | reformat | lean-flow `CONTEXT.md` (loop · gates · modes · roster) |
 | `.claude/CLAUDE.md` | reformat | `CLAUDE.md.template` shape (Behavioral Guidelines incl. concise-reporting) |
 | sprint files | reformat | `SPRINT.md.template` (Retro → §10 routing) |
 | `TODO.md` | reformat | Backlog-pool (P0–P3) + Active-Sprint **pointer**; a § Tech Debt inside it **splits out** (next row) |
 | tech debt inside `TODO.md` (or an ad-hoc debt list) | split + relocate | root `TECH-DEBT.md` via `TECH-DEBT.md.template` — `TD-NNN` rows move verbatim; `TODO.md` keeps a pointer line |
 | `CHANGELOG.md` | keep / align | Keep-a-Changelog; sprint-close feeds it |
-| ad-hoc deploy doc · `deploy/` · `RELEASE.md` | reformat + relocate | `docs/DEPLOY.md` via `DEPLOY.md.template` (operational runbook; code-HOW → comments) |
+| ad-hoc deploy doc · `deploy/` · `RELEASE.md` | reformat + relocate | `docs/deployment/deployment-guide.md` via `deployment-guide.md.template` (operational runbook; code-HOW → comments); split rollback steps → `docs/deployment/rollback-guide.md` via `deployment-rollback.md.template` |
 | research · spike · decision write-ups · `notes/` | reformat | `docs/research/<slug>.md` via `RESEARCH.md.template` (desk synthesis → feeds an ADR) |
 | `graphify-out/` + graphify mentions | **flag, don't delete** | lean-flow no longer integrates graphify (on-demand only) — note it's inert under the loop; leave the artifact, offer to clean the mentions, **never auto-delete** |
 | existing `LEARNINGS.md` lacking `related:` | keep as-is | the `related:` field is **optional + additive** — never backfill; entries without it stay conforming |
@@ -106,8 +125,8 @@ filename) — content untouched. Propose these in the per-file plan like any oth
 ## Generic existing docs (no dev-flow/adlc-flow)
 
 - Existing `README` → align to `README.md.template` sections; keep the content.
-- Existing architecture / design doc → `ARCHITECTURE.md` format.
-- Existing deploy / release runbook → `docs/DEPLOY.md` (`DEPLOY.md.template`); keep the steps, move code-HOW to comments.
+- Existing architecture / design doc → `docs/architecture/overview.md` format (`architecture-overview.md.template`).
+- Existing deploy / release runbook → `docs/deployment/deployment-guide.md` (`deployment-guide.md.template`) + `docs/deployment/rollback-guide.md` (`deployment-rollback.md.template`) if rollback content exists; keep the steps, move code-HOW to comments.
 - Existing research / spike / decision write-up → `docs/research/<slug>.md` (`RESEARCH.md.template`).
 - Existing decision notes / ADRs (any shape) → rich `docs/adr/ADR-NNN-<slug>.md` + `DECISIONS.md` index.
 - Existing changelog → keep; align to Keep-a-Changelog if it diverges.

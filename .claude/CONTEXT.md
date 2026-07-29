@@ -94,7 +94,7 @@ only the models it **dispatches** on (Agent-tool `model:`); the session model is
 
 ## Doc standard
 
-LEAN DOCUMENTATION STANDARD (WHY/WHERE, never HOW) → `skills/lean-doc-generator/references/DOCS_Guide.md`; templates → `…/templates/`.
+LEAN standard on the **TemiDev repo-structure core** (ADR-012; WHY/WHERE, never HOW) → `skills/lean-doc-generator/references/DOCS_Guide.md`: §2 lifecycle-bound core (create/update/archive per doc) · §6 four-tier scaffold (base → backend → medium/complex → multi-service; cap-hit → split into tree) · §12 Git boundary; templates → `…/templates/` (30 core + 2 non-core).
 Domain glossary lives **here** (canonical term + `_Avoid_:` synonyms). ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
 
 ## Orientation

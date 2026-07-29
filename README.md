@@ -199,8 +199,13 @@ behaviour → `/tdd` · a bug or failing test → `/diagnose` · hard-to-change 
 (drive-until-DoD) · `/plan` (G2) · `/batch` (parallel sprint) · `/run` + `/verify` (Review).
 
 **Documentation discipline** — `/lean-doc-generator` follows the LEAN DOCUMENTATION STANDARD: WHY
-and WHERE only, never HOW. It bundles its own canonical templates and reads the matching one *before*
-generating any core doc, so output matches a fixed format instead of free-improvising. Standard →
+and WHERE only, never HOW. Its core is the TemiDev repo-structure standard (ADR-012) — a tiered
+scaffold (base → backend/integration → medium/complex → multi-service) where every doc carries a
+full create/update/archive lifecycle trigger, gated by a §12 Git-boundary rule (what belongs in the
+repo vs a secret manager / document store) that `migrate` also scans for on adoption. It bundles its
+own canonical templates and reads the matching one *before* generating any core doc, so output
+matches a fixed format instead of free-improvising; `init`'s only non-doc writes are a safe-scaffold
+allowlist (`.env.example` · `.gitignore` · `LICENSE`, write-if-absent, never overwritten). Standard →
 [`skills/lean-doc-generator/references/DOCS_Guide.md`](skills/lean-doc-generator/references/DOCS_Guide.md).
 
 **Continuous learning** — every iteration feeds the next. At **Sprint Close** the Retro auto-files
@@ -284,8 +289,9 @@ Full map — composition rule, the loop, integration points, boundaries →
 skills/           14 skills — /flow conductor + 12 stages + /council (auto-discovered)
   lean-doc-generator/
     references/   DOCS_Guide.md · migration-map.md · ADR-example.md
-    templates/    15 canonical doc templates (core, incl. SPRINT · ADR · RESEARCH · DEPLOY · BUG ·
-                  TECH-DEBT; +2 non-core: DESIGN · QA-TESTCASE = 17 total)
+    templates/    30 canonical doc templates (core, incl. SPRINT · ADR · RESEARCH · DEPLOYMENT ·
+                  ROLLBACK · BUG · TECH-DEBT · CONTRIBUTING · SECURITY · AGENTS; +2 non-core:
+                  DESIGN · QA-TESTCASE = 32 total)
   tdd/references/             testability.md
   diagnose/references/        feedback-loops.md
   task-decomposer/references/ prd-and-slices.md · fog-map.md

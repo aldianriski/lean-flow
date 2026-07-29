@@ -11,6 +11,40 @@ status: current
 
 ---
 
+## Unreleased
+
+SPRINT-032 (TASK-067…073) — TemiDev repo-structure standard adoption (ADR-012).
+
+**What changed for you:**
+- **New consumer-core standard** — lean-doc-generator's §2 core set adopts the TemiDev repo-structure
+  standard as its baseline: a mandatory minimum scaffolded at init (root set + AI context +
+  `docs/product|architecture|development|testing|deployment`), conditional substrate rows
+  (database/auth), and a full create/update/archive lifecycle contract on every doc.
+- **15 new/relocated templates** — root governance (`CONTRIBUTING` · `SECURITY` · `AGENTS`),
+  product (`requirements` · `acceptance-criteria`), architecture siblings (`data-flow` ·
+  `authentication` · `integrations`), database (`erd` · `schema` · `migration-guide`),
+  development/testing (`setup` · `coding-standards` · `testing-guide`), and deployment split into
+  `deployment-guide` + `rollback-guide` (was single-file `DEPLOY.md`).
+- **4-tier init scaffold** — base (every repo) → backend/integration (API/external integrations) →
+  medium/complex (`adr/` + `DECISIONS.md` + `flows/`) → multi-service, each tier's docs created by
+  event (first API, second dev, second service), never by ceremony.
+- **Init safe-scaffold allowlist** — the only non-doc files `init` writes: `.env.example` (names
+  only, never values) · `.gitignore` (from the §12 boundary rule) · `LICENSE` — write-if-absent,
+  never overwritten, every write/skip listed in the init report.
+- **§12 Git boundary + migrate boundary scan** — a new DOCS_Guide section states what never belongs
+  in the repo (secrets, credentials, PII, commercial/legal material) regardless of format; `migrate`
+  now scans the tracked tree for §12b violations and reports them (report-only, never auto-remediates).
+- **Close-time doc-freshness check** — sprint close now checks touched docs' `last_updated` /
+  `status` against the session's changes, flagging anything stale instead of leaving it to the next
+  60-day scan.
+- **Per-doc lifecycle contract** — every §2 row now states its create/update/archive triggers
+  explicitly (mirrored in the doc's `update_trigger` header field), replacing the old
+  create-lazily-only rule for the mandatory minimum.
+
+See ADR-012 for the full decision record and blast radius.
+
+---
+
 ## v1.15.0 — Tech-Debt Split (2026-07-29)
 
 MINOR — SPRINT-031 (TASK-066).
