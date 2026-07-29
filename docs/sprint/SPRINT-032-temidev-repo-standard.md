@@ -74,10 +74,10 @@ Folds in **TD-008**: relocate init's procedure detail to `references/` before gr
 files; SKILL.md stays ≤110 with init detail relocated to a reference.
 
 **DoD:**
-- [ ] CONTRIBUTING + SECURITY + AGENTS templates exist with §2 rows + caps + ownership headers
-- [ ] init offers .env.example/.gitignore/LICENSE per G2-settled non-doc rule (never-overwrite)
-- [ ] TD-008 fold-in: init detail → `references/`; SKILL.md ≤110 verified
-- [ ] Scratch-repo init exercised — six files land, existing files untouched
+- [x] CONTRIBUTING + SECURITY + AGENTS templates exist with §2 rows + caps + ownership headers
+- [x] init offers .env.example/.gitignore/LICENSE per G2-settled non-doc rule (never-overwrite)
+- [x] TD-008 fold-in: init detail → `references/`; SKILL.md ≤110 verified
+- [x] Scratch-repo init exercised — six files land, existing files untouched
 
 ### T4 — Add backend/integration doc-tree templates: database/ · api/ · architecture siblings `[size: M · risk: med]`
 Layers: `skills/lean-doc-generator/templates/` · DOCS_Guide §2 · `skills/lean-doc-generator/SKILL.md` (init)
@@ -151,6 +151,17 @@ the new standard; migrate re-run on a legacy layout proposes relocation, never c
 ## Execution Log
 <!-- Append-only, dated. Plan frozen at promote. -->
 
+### 2026-07-29 | T3 complete | Root-file templates + init rework, TD-008 folded (Sonnet dispatch + coordinator review)
+CONTRIBUTING (53) · SECURITY (47) · AGENTS (9, footer-ownership — §3 README-exception extended by
+one sentence) templates landed, leak-scan clean (paths + ID namespaces). Init procedure relocated
+SKILL.md → references/init.md and extended there: base-tier scaffold table per §2/§6, tier popup
+defaulting from manifest, D5 safe-scaffold allowlist (3 files, write-if-absent, reported), verify
+step. SKILL.md 106→104/110 (TD-008 mitigation executed — mark TD-008 resolved at close). Count
+claims 16→19 core (21 total). Exercised on fixture-init (Express stub): 18 base docs + 3 scaffolds
+landed; pre-existing .gitignore custom line intact (skip+report verified). qa-check 56/0.
+**Carry-forward for T7:** migration-map.md placement table still targets pre-ADR-012 legacy paths —
+already in T7 scope, agent re-confirmed.
+
 ### 2026-07-29 | T2 complete | Templates relocated + readers rewired (Sonnet dispatch + coordinator review)
 git-mv renames (ARCHITECTURE→architecture-overview · SETUP→development-setup · DEPLOY→split
 deployment-guide + deployment-rollback); prime slot 6, release-patch changelog target (root-first,
@@ -200,6 +211,11 @@ intake grill (full adoption · placement wins · AGENTS pointer · CHANGELOG dev
 | `skills/lean-doc-generator/SKILL.md` | T2 | placement rewiring + close-time doc-freshness check (in-place, no net lines) | High | cap 106/110 · qa-check |
 | `skills/lean-doc-generator/references/DOCS_Guide.md` | T2 | §10/§11 + template-name example → canonical paths | Med | qa-check |
 | `.claude/CLAUDE.md` · `docs/ARCHITECTURE.md` | T2 | template-count claims 15→16 core (18 total) | Low | qa-check tmpl-core |
+| `templates/{CONTRIBUTING,SECURITY,AGENTS}.md.template` | T3 | TemiDev root-file set (AGENTS = thin pointer, footer ownership) | Med | leak-scan + fixture-init exercise |
+| `skills/lean-doc-generator/references/init.md` | T3 | init procedure relocated + extended (tiers · safe-scaffold allowlist · verify) — TD-008 fold-in | Med | fixture-init exercise |
+| `skills/lean-doc-generator/SKILL.md` | T3 | init section → 7-line summary + pointer; 104/110 | High | qa-check cap |
+| `references/DOCS_Guide.md` §3 | T3 | AGENTS footer-ownership exception sentence | Low | qa-check |
+| `.claude/CLAUDE.md` · `docs/ARCHITECTURE.md` | T3 | count claims 16→19 core (21 total) | Low | qa-check tmpl-core 19=19 |
 
 ## Retro
 <!-- Written at close. -->

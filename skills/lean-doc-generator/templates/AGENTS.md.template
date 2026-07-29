@@ -1,0 +1,9 @@
+# AI Agents
+
+Read [`.claude/CLAUDE.md`](.claude/CLAUDE.md) (project shape + anti-patterns) and
+[`.claude/CONTEXT.md`](.claude/CONTEXT.md) (vocabulary + conventions) before working here.
+
+Commands + validation: see [`docs/development/setup.md`](docs/development/setup.md).
+
+<sub>Doc owner: [role] · last updated: YYYY-MM-DD · status: current</sub>
+<!-- footer ownership, not top YAML — DOCS_Guide §3 README-exception, extended here -->

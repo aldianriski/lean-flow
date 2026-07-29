@@ -164,6 +164,10 @@ table. So the README carries its ownership as a small **footer line** instead
 (`<sub>Doc owner: … · last updated: … · status: …</sub>`), and leads with the project hero. The
 ownership is still tracked — just at the foot, not the top.
 
+**AGENTS.md exception** — same rationale, extended: `AGENTS.md` is a ~10-line thin pointer file, and
+a 6-line YAML block would defeat that budget — so it too carries ownership as a footer `<sub>` line
+instead of a top header (`AGENTS.md.template`).
+
 ---
 
 ## §4 — ADR format + when to offer one

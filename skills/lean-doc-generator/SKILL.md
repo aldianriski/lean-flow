@@ -41,7 +41,7 @@ template ship inside this skill under `${CLAUDE_SKILL_DIR}/`.
 | `/lean-doc-generator promote` | Sprint Promote (below) |
 | `/lean-doc-generator close` | Sprint Close (below) |
 | `/lean-doc-generator migrate` | **Adopt + clean** existing docs (dev-flow · adlc-flow · any layout) — align placement/format/wiring, **consolidate dupes, retire dead docs**. Plan → approve → apply. **Re-runnable as an update sync** (report standard/template deltas, never clobber). |
-| `/lean-doc-generator init` | **Scaffold a fresh repo** (greenfield) — scope-interactive: core docs always + optional docs by repo type; **docs-only** (never settings.json). The twin of migrate. |
+| `/lean-doc-generator init` | **Scaffold a fresh repo** (greenfield) — scope-interactive: base tier always + higher tiers by repo type; docs + the 3-file safe-scaffold allowlist only (never `settings.json`). The twin of migrate. |
 
 ## Migrate (adopt + clean existing docs)
 
@@ -57,13 +57,11 @@ re-run procedure → `${CLAUDE_SKILL_DIR}/references/migration-map.md`.
 
 ## Init (scaffold a fresh repo)
 
-For a **greenfield** repo with no lean-flow docs yet — the twin of migrate (decision:
-`docs/research/init-vs-migrate.md`). **Scope-interactive + docs-only:**
-
-1. **Core set (always)** — `CLAUDE.md` · `CONTEXT.md` · `README.md` · `TODO.md` · `TECH-DEBT.md` · `ARCHITECTURE.md`, each via the §6 template-load protocol.
-2. **Optional docs** — offer DESIGN (frontend) · DEPLOY (service/release) · RESEARCH via an **AskUserQuestion popup**, defaulting by repo type (manifest/stack); scaffold only what's chosen.
-3. **Docs-only** — `init` **never** writes `.claude/settings.json` or any non-doc file; the safe-command allowlist stays a documented opt-in, not an init side effect.
-4. **Verify** — `/prime` reads cleanly; ownership headers + placement per DOCS_Guide §2/§3.
+For a **greenfield** repo with no lean-flow docs yet — the twin of migrate. **Scope-interactive +
+docs-only** — the base-tier mandatory minimum always, higher tiers offered via an AskUserQuestion
+popup; writes docs plus exactly the three-file safe-scaffold allowlist (`.env.example` ·
+`.gitignore` · `LICENSE`, write-if-absent), never `settings.json` or any other non-doc file. Full
+procedure, base-tier table, and the safe-scaffold allowlist → `${CLAUDE_SKILL_DIR}/references/init.md`.
 
 ## Execution flow
 

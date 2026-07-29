@@ -1,0 +1,47 @@
+---
+owner: [role — e.g. "Security Lead", "Tech Lead"] [CUSTOMIZE]
+last_updated: YYYY-MM-DD
+update_trigger: Auth model, secret policy, or vulnerability-reporting process changed
+status: current
+---
+
+# [Project Name] — Security [CUSTOMIZE]
+
+<!-- Never document exploitable production details here — live infra topology, real
+     credentials/keys, unpatched-vulnerability specifics, internal hostnames/IPs. This file
+     states POLICY (where the real detail lives, who owns it); the detail itself stays in an
+     access-controlled system, not this doc. -->
+
+## Authentication & authorization
+
+See [`docs/architecture/authentication.md`](docs/architecture/authentication.md) for the model.
+
+## Secret handling
+
+- Secrets are **never committed** — not in code, config, or `.env` (only `.env.example` with
+  variable names, never values).
+- Source of truth: [secret manager — e.g. Vault / AWS Secrets Manager / 1Password] [CUSTOMIZE]
+- [Rotation policy, if any] [CUSTOMIZE]
+
+## Secure coding [CUSTOMIZE]
+
+- [Input validation / output encoding rules]
+- [Principle of least privilege for services and credentials]
+
+## Dependency management [CUSTOMIZE]
+
+- [Update cadence — e.g. "patch releases reviewed weekly"]
+- [Vulnerability scanning tool, if any]
+
+## Logging restrictions [CUSTOMIZE]
+
+- Never log: secrets, tokens, full PII, [other sensitive fields].
+- [Where logs live / who can access them]
+
+## PII handling [CUSTOMIZE]
+
+- [What PII the system touches, and its handling rule]
+
+## Reporting a vulnerability [CUSTOMIZE]
+
+[How to report privately — e.g. "email [security@project.example]; do not open a public issue."]

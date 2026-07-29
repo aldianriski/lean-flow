@@ -1,0 +1,53 @@
+---
+owner: [role — e.g. "Tech Lead", "Dev Lead"] [CUSTOMIZE]
+last_updated: YYYY-MM-DD
+update_trigger: Branching, commit, review, or DoD convention changed
+status: current
+---
+
+# [Project Name] — Contributing [CUSTOMIZE]
+
+## Branching [CUSTOMIZE]
+
+- Strategy: [trunk-based / GitFlow / other]
+- Branch naming: `[type]/[short-description]` — e.g. `feat/add-login`, `fix/null-check`
+- [Any branch-protection rule worth stating]
+
+## Commits [CUSTOMIZE]
+
+- Convention: [Conventional Commits / other] — `[type](scope): summary`
+- [One filled-in example]
+
+## Pull requests [CUSTOMIZE]
+
+1. [Open against branch X]
+2. [Fill the PR template / link the issue or task]
+3. [CI must pass before review is requested]
+4. [Merge policy — squash / rebase / merge commit]
+
+## Code review [CUSTOMIZE]
+
+- Required approvals: [N]
+- [Who can review — a role, not a name]
+- [What a reviewer checks — correctness, tests, docs, scope]
+
+## Coding standards
+
+See [`docs/development/coding-standards.md`](docs/development/coding-standards.md).
+
+## Testing
+
+See [`docs/testing/testing-guide.md`](docs/testing/testing-guide.md). [State the bar — e.g. "a PR
+without a passing test suite is not mergeable."] [CUSTOMIZE]
+
+## Definition of Done [CUSTOMIZE]
+
+- [ ] Acceptance criteria met
+- [ ] Tests added/updated and passing
+- [ ] Docs updated where behavior changed
+- [ ] Reviewed and approved
+
+## Reporting bugs [CUSTOMIZE]
+
+[Where to file a bug — e.g. "a `BUG-<slug>.md` per the doc standard, or the issue tracker:
+[link]"]
