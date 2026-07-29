@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-030 — Gate-Guard Decision** → docs/sprint/SPRINT-030-gate-guard-decision.md
+> _(no active sprint — SPRINT-030 closed 2026-07-29 → docs-only, no release (stays v1.14.2); archived per §11.)_
 
 ---
 
@@ -34,11 +34,6 @@ status: current
 
 ### P3 — Long-term
 
-- [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook**  [size: M] [risk: med] [HITL]
-      done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
-      next: research DONE (2026-07-29 — feasible + fail-open, but **no per-hook opt-in ⇒ in-core = mandatory**, ruling out an in-plugin hook) → /council the A-vs-C fork (status quo vs opt-in sibling plugin) → ADR
-      tracker:   docs/research/pretooluse-gate-guard.md
-      state:     ready   (in SPRINT-030)
 - [ ] **TASK-040 — Derived, on-demand graph VIEW over the metadata (relational comprehension)**  [size: L] [risk: med] [HITL]
       done-when: a graph view is GENERATED from TASK-036's frontmatter (transitive supersedes lineage · cross-sprint domain clusters · orphan/dangling detection) — a disposable build artifact, never hand-edited, regenerated from the SSOT. Guardrails (ALL mandatory, or don't build): (i) regeneration wired to lean-doc-generator's write step; (ii) read-time staleness check — the view carries a source checksum/mtime and fails LOUD if the frontmatter is newer (a stale CACHE, not a stale fact); (iii) integrity lint (shared with TASK-036). graphify serves this ad-hoc until it's worth automating.
       touches:   docs/ (corpus-wide) · a generation script/skill · graphify (on-demand)
@@ -56,6 +51,7 @@ status: current
       tracker:   docs/research/council-improvements.md §§ Divergence measurement · Factual decorrelation probe
       state:     blocked   (deferred, bar RAISED — TASK-048 (judgment) + TASK-065 (cross-tier factual) both found NO exposed crack; before any build, a cross-PROVIDER test must show a real shared factual error that a different provider corrects)
 
+> TASK-006 (gate-guard hook) → decided 2026-07-29, SPRINT-030 — **ADR-011: no gate enforcement** (in-core hook killed by platform fact; sibling plugin YAGNI) · trail: `.out-of-scope/gate-guard-hook.md` (revisit-if recorded) · facts: `docs/research/pretooluse-gate-guard.md`.
 > TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).
 
 ---
@@ -79,7 +75,7 @@ status: current
 
 > Move to `docs/CHANGELOG.md` once reflected in docs, then delete here.
 
-_(SPRINT-030 in flight — entries land at close.)_ — Sprint history → [`docs/CHANGELOG.md`](docs/CHANGELOG.md) (rotated archives → `docs/changelog/`).
+_(no active sprint)_ — Sprint history → [`docs/CHANGELOG.md`](docs/CHANGELOG.md) (rotated archives → `docs/changelog/`).
 
 ---
 

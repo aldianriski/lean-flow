@@ -11,6 +11,17 @@ status: current
 
 ---
 
+## 2026-07-29 — SPRINT-030 Gate-Guard Decision (docs-only · no release, stays v1.14.2)
+
+TASK-006 decided after a same-day PreToolUse feasibility sweep (`docs/research/pretooluse-gate-guard.md`):
+**ADR-011 — no gate enforcement**; G1/G2 stay human discipline. The in-core hook died on platform
+fact (plugin hooks auto-activate, no per-hook disable ⇒ mandatory for every consumer); the opt-in
+sibling plugin was rejected on YAGNI. Concept filed to `.out-of-scope/gate-guard-hook.md` with a
+revisit trigger. Council run waived at the gate (logged scope-change — owner decision). +L-048
+(release-patch misses non-manifest version echoes).
+
+---
+
 ## v1.14.2 — Consumer-Leak Cleanup (2026-07-29)
 
 PATCH — consumer-fit audit (L-015 sweep, triage-driven).
