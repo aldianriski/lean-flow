@@ -3,7 +3,7 @@ sprint: 029
 slug: dispatch-cost-note
 owner: Maintainer
 last_updated: 2026-07-29
-status: active
+status: closed
 plan_commit: c1ef89a
 close_commit: —
 update_trigger: sprint execute/close events
@@ -68,13 +68,19 @@ no decided text edited).
 
 ## Retro
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no miss: prior learnings/ADRs (L-009 · L-010 · L-015 · L-045 · L-047) were
+found and applied where relevant; nothing contradicted.
 
 **Worked**
--
+- Promote governance caught a real defect (TASK-006's fused TODO heading) and converted it into
+  L-009's promotion evidence (count 3) in the same pass — the checklist earning its keep.
+- Inline implementation with a stated reason — the cost note itself justified not dispatching.
 
 **Friction**
--
+- None material — smallest sprint to date (one S doc task; gates scaled down cleanly).
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- None new — the session's one candidate was folded into L-009 at promote.
+
+**Buckets routed:** Shipped → CHANGELOG via the v1.14.1 release entry · Tech debt → none new ·
+Follow-ups → none · Learnings → none new (L-009 promotion handled at promote).
