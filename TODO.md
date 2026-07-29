@@ -34,23 +34,8 @@ status: current
 
 ### P3 — Long-term
 
-- [ ] **TASK-040 — Derived, on-demand graph VIEW over the metadata (relational comprehension)**  [size: L] [risk: med] [HITL]
-      done-when: a graph view is GENERATED from TASK-036's frontmatter (transitive supersedes lineage · cross-sprint domain clusters · orphan/dangling detection) — a disposable build artifact, never hand-edited, regenerated from the SSOT. Guardrails (ALL mandatory, or don't build): (i) regeneration wired to lean-doc-generator's write step; (ii) read-time staleness check — the view carries a source checksum/mtime and fails LOUD if the frontmatter is newer (a stale CACHE, not a stale fact); (iii) integrity lint (shared with TASK-036). graphify serves this ad-hoc until it's worth automating.
-      touches:   docs/ (corpus-wide) · a generation script/skill · graphify (on-demand)
-      decision:  (2026-07-02, council-2) REJECT (c) a separately-maintained graph — UNANIMOUS: second source of truth, silent drift, unbuildable agent-free (= the banned codemap rule). This is priority #4 (relational comprehension) — below 036's freshness/precision/context-load. Reject the Expansionist's "gate /prime citations off the graph" — agent-free scope creep; keep the view passive.
-      okf:       (2026-07-10, docs/research/okf-adoption.md) an OKF-conformant **export** could be the portable/agent-interop sibling of this graph view — same derived-view/one-SSOT shape; build only if portability becomes a real need (YAGNI). Do NOT adopt OKF as the authoring format (loses typed relations + guts the strict lint).
-      tracker:   docs/research/graphify-daily-value.md · docs/research/okf-adoption.md · https://github.com/Egonex-AI/Understand-Anything
-      state:     blocked   (build on the TASK-041 signal + only with all 3 guardrails; lower priority than 036)
-- [ ] **TASK-047 — Council multi-model diversity backend**  [size: L] [risk: high] [HITL]
-      done-when: ≥2 personas route to a different provider/model to recover architectural (uncorrelated-error) diversity — the only fix for shared-weights blind spots (5 personas on one model share its priors).
-      touches:   skills/council/SKILL.md · skills/council/references/{advisors,prompts}.md · a provider-routing seam
-      assumes:   requires a prior call on whether lean-flow takes a provider dependency at all (likely /council-worthy itself).
-      next:      **gate behind cheaper steps, in order** (council verdict, SPRINT-014 T2 exercise): (1) MEASURE — run today's single-model council 3× on one real decision, check if the 5 personas actually diverge (if they already converge, "5 personas" is theater; if they diverge, the ceiling may be overstated); (2) exhaust cheap levers — per-persona temperature/seed/adversarial framing before any dependency; (3) if built, fix the SYNTHESIS BOTTLENECK too — multi-model advisors still funnel through one chairman, so a naive backend is a no-op. Build the provider dependency LAST.
-      also:      **data-governance blocker** (moderator, SPRINT-014 T3): a 2nd-provider backend widens the trust boundary — routes repo content to a vendor the host-repo owner never consented to, exposure peaking on exactly the rare high-stakes runs. Weigh (likely a consent/config gate) before any build.
-      reframe:   (2026-07-10, TASK-048 1× probe → SPRINT-020 T4) if ever built, the ONLY axiom-consistent shape is a **BYO-provider, opt-in, disabled-by-default** seam — the installer supplies + consents to their own 2nd provider; lean-flow ships an integration seam, never the trust boundary. Prerequisite is now **TASK-065** (measure error-decorrelation on a *factual* decision) — the judgment-fork probe couldn't test shared factual priors.
-      tracker:   docs/research/council-improvements.md §§ Divergence measurement · Factual decorrelation probe
-      state:     blocked   (deferred, bar RAISED — TASK-048 (judgment) + TASK-065 (cross-tier factual) both found NO exposed crack; before any build, a cross-PROVIDER test must show a real shared factual error that a different provider corrects)
-
+> TASK-040 (derived graph view) → routed to `.out-of-scope/derived-graph-view.md` (2026-07-29) — council-2 gate held; the TASK-041 retrieval-miss signal never fired; graphify serves the need ad-hoc (revisit-if + 3 guardrails recorded).
+> TASK-047 (council multi-model backend) → routed to `.out-of-scope/council-multi-model-backend.md` (2026-07-29) — TASK-048 + TASK-065 probes found no exposed crack; revisit-if: a cross-provider test shows a real shared factual error (BYO-provider seam only).
 > TASK-006 (gate-guard hook) → decided 2026-07-29, SPRINT-030 — **ADR-011: no gate enforcement** (in-core hook killed by platform fact; sibling plugin YAGNI) · trail: `.out-of-scope/gate-guard-hook.md` (revisit-if recorded) · facts: `docs/research/pretooluse-gate-guard.md`.
 > TASK-007 (tuned recon agent) → routed to `.out-of-scope/tuned-recon-agent.md` (2026-06-12) — `Explore` is the universal recon agent and sufficient; the lever is *optimal usage* (already wired: tier-routing + scoped recon brief; ADR-002).
 
