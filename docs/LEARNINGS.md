@@ -45,11 +45,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-044 [tags: tooling] [status: promoted] → promoted: yes → dispatch.md § Merge-back queue (cleanup step encodes the full procedure). Windows holds a handle-lock on a git worktree any shell has `cd`'d into — `git worktree remove` fails with Permission denied until a fresh shell runs it; partial failure leaves the admin entry deleted but the directory on disk (needs manual `rm -rf` + `git worktree prune`). Coordinator cleanup procedure: leave the worktree dir *before* removing it, retry from a fresh shell, verify with `git worktree list`. Feed into TASK-096's merge-back/cleanup step.
-- seen: Sprint-025 · Sprint-026 (recurred live on the int-026 integration worktree — documented recovery worked)
-- count: 2
-- promoted: yes → dispatch.md § Merge-back queue (SPRINT-027 promote governance)
-- related: L-043 (coordinator-only worktree cleanup) · docs/research/fog-fleet-orchestration.md (prototype friction) · dispatch.md § Merge-back queue (procedure encodes it)
+## L-044 [tags: tooling] [status: promoted] → promoted: yes → dispatch.md § Merge-back queue (leave the worktree dir before removing it; retry from a fresh shell — the Windows handle-lock caveat). Seen Sprint-025 + Sprint-026 (count 2). Related: L-043 · docs/research/fog-fleet-orchestration.md.
 
 ---
 
@@ -69,11 +65,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-020 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern + DoD (wire new capability into all related jobs). Shipping a capability ≠ wiring it. A new behaviour must be connected into **every related job/flow that should TRIGGER or CHAIN it** — entry routing · the dispatch/reviewer brief · the `/flow` conductor · the `CONTEXT.md` SSOT — not just written in its own file. The v1.9.0/v1.10.0 wiring audit (SPRINT-022) found 3 features shipped but half-connected: skill-powered dispatch orphaned from the Implement steps · Standards-vs-Spec never injected into the reviewer brief · foggy intent not routed to fog-mode. Pattern: at G2 for any new capability, enumerate its trigger points + downstream consumers and wire each; verify it FIRES end-to-end, don't stop at "the file exists." Owner-directed promote (base knowledge for future improvements). Related: L-007 (exercise on real input) · L-015 (consumer surface).
-- seen: Sprint-022 · Sprint-024 (the loop-hygiene audit's founding thesis — a prose rule with no lint/checklist matcher is unwired by definition)
-- count: 2
-- promoted: yes → CLAUDE.md anti-pattern + DoD (2026-07-10, owner-directed)
-- related: L-007 · L-015
+## L-020 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern + DoD (wire a new capability into every triggering/chaining job; verify it fires end-to-end). Seen Sprint-022 + Sprint-024 (count 2). Related: L-007 · L-015.
 
 ---
 
