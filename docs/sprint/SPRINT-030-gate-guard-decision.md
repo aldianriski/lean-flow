@@ -4,7 +4,7 @@ slug: gate-guard-decision
 owner: Maintainer
 last_updated: 2026-07-29
 status: active
-plan_commit: [set at promote]
+plan_commit: 5d52450
 close_commit: [set at close]
 update_trigger: sprint execute/close events
 ---
