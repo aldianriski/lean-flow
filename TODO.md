@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-033 — Unattended-Run Contract** → [docs/sprint/SPRINT-033-unattended-run-contract.md](docs/sprint/SPRINT-033-unattended-run-contract.md)
+> _(no active sprint — SPRINT-033 closed 2026-07-29 → v1.17.0 Unattended-Run Contract; §11 retention pending owner approval.)_
 
 ---
 
@@ -73,6 +73,13 @@ status: current
       state:   ready
 
 ### P2 — Quality / Polish
+
+- [ ] TASK-106 — Verify the unattended contract from the installed plugin, not repo source  [size: S] [risk: low] [HITL]
+      done-when: with v1.17.0 installed to the plugin cache, a headless `claude -p "/lean-flow:orchestrator sprint-bulk unattended" --permission-mode dontAsk` run meets a HITL step and parks — proving the contract ships, not just that it exists in the repo
+      touches: (verification — no source change)
+      assumes: SPRINT-033 T6 verified against repo source only; the cache held 1.16.1 at test time, so packaged behaviour is unverified (L-016: verify on the consumer path)
+      tracker: none — closes the last unverified edge of SPRINT-033
+      state:   ready
 
 ### P3 — Long-term
 

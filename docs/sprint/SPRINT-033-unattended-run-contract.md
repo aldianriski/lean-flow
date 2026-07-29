@@ -3,7 +3,7 @@ sprint: 033
 slug: unattended-run-contract
 owner: Maintainer
 last_updated: 2026-07-29
-status: active
+status: closed
 plan_commit: 350fa4d
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -228,9 +228,30 @@ qa-check after the sweep: **56 pass, 0 fail**; caps held (orchestrator 110 · CO
 ## Retro
 
 **Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+No retrieval miss. `docs/research/night-run.md` was found and treated as settled (mechanism not
+re-decided), L-007 drove T6's existence, L-015 drove T5, L-020 drove T3/T4, L-008 explains T2's cap
+hit, L-009 prompted a structure re-read after every table edit. One prior claim was *contradicted* —
+but by reality, not by a lookup failure: the research doc's `dontAsk` reading was correct about tool
+calls and silently wrong about `AskUserQuestion`, which never reaches the permission layer at all.
 
 **Worked**
+- **Deriving the boundary instead of listing it.** `AFK-safe = additive + reversible +
+  already-approved-in-scope` decided `close`'s split (Retro + buckets run · §11 parks) without a
+  judgement call, and a cold agent re-derived it unprompted in T6.
+- **Testing the capability rather than reading it.** T6 falsified the sprint's own load-bearing
+  assumption in the first run. A read-through would have shipped the wrong mechanism.
+- **The pre-contract worktree control.** Cheap (`git worktree add … a5e6bda`) and it overturned the
+  claim this sprint was about to make about itself.
 
 **Friction**
+- **The first control was confounded** — an open DoD gave both arms an independent reason to stop, so
+  the run proved nothing until re-scoped to isolate the approval.
+- **The install cache can't serve the change under test.** `~/.claude/plugins/cache/…` holds 1.16.1,
+  so a headless run invoking `/lean-flow:orchestrator` would load the *old* skill; T6 had to point at
+  repo source. Packaged behaviour stays unverified until 1.17.0 is installed → follow-up filed.
+- **Two SSOT surfaces hit exactly zero headroom** (CONTEXT 130/130 · orchestrator 110/110) → TD filed.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- Filed **L-052** (a spec's wrong mechanism becomes agent reasoning verbatim — verify platform facts by
+  running them) and **L-053** (a capability's value may be the protocol *after* the decision, not the
+  decision; and a control sharing an independent stop-reason discriminates nothing).
