@@ -11,6 +11,21 @@ status: current
 
 ---
 
+## v1.14.1 — Dispatch-Cost Awareness (2026-07-29)
+
+PATCH — **SPRINT-029**, the adhd scan's single keeper (TASK-099).
+
+**What changed for you:**
+- **Dispatch cost term** — parallel fan-out cost scales with **branch-count × substrate-size, not
+  call-count**: every dispatched branch re-pays the full base substrate (CLAUDE.md + tool context)
+  before doing any work. Landed as an ADR-010 addendum, a cost-term note in
+  `orchestrator/references/dispatch.md` (Parallel vs sequential), and `/council`'s cost line
+  (~11 calls ≈ 11 × context, not 11 small calls).
+- Housekeeping at promote: L-009 promoted → CLAUDE.md edit-safety anti-pattern (structure-adjacent
+  edits silently fuse neighbors, count 3) · TASK-006's fused TODO.md heading restored.
+
+---
+
 ## 2026-07-29 — SPRINT-028 Research Delta-Scan Batch (docs-only · no release, stays v1.14.0)
 
 Three L-017 delta-scans, all research docs: **graphify** re-verdict — on-demand stance re-affirmed
