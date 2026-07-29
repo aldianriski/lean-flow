@@ -77,9 +77,9 @@ at G2 — complements, never replaces, the Review-time /security-review row.
 spec-only (L-007).
 
 **DoD:**
-- [ ] placement decided — SKILL body displace/merge vs review-scoping.md (references-first, L-012)
-- [ ] prompt wired so it fires at G2
-- [ ] exercised once on a sample high-risk task
+- [x] placement decided — SKILL body displace/merge vs review-scoping.md (references-first, L-012)
+- [x] prompt wired so it fires at G2
+- [x] exercised once on a sample high-risk task
 
 ## Decisions (pre-locked)
 - **D1** — Cut adjusted at promote: TASK-093 pulled in as T1 because T2's graduation depends on
@@ -96,10 +96,17 @@ spec-only (L-007).
 Governance checklist signed off (no L-promotions due · no aged TD · §11 clean). TD-008 relevance
 note stays with pooled TASK-091. Cut approved as P1 pair + 088, then adjusted per D1.
 
+### 2026-07-29 | execute | batch G1+G2 approved · wave 1 dispatched · T4 done
+Owner approved batch gates + T4 placement (merge into the G2 hard-to-reverse bullet, no line
+growth). Wave 1 in flight: T1 scan · T3 research · T2's two research tickets, parallel sonnet
+sub-agents per the disjoint map. T4 wired inline and exercised on TASK-047 (abuse-case sketch
+produced at design time) — all three DoD ticked.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/SKILL.md` | T4 | G2 hard-to-reverse bullet now carries the risk:high abuse-case prompt (owner chose merge-in-place over reference) | Low | line count held at 110; prompt exercised on TASK-047 (sketch produced) |
 
 ## Retro
 
