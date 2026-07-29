@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-025 closed 2026-07-29 → v1.12.0; archived per §11.)_
+> **SPRINT-026 — Fleet & Night-Run Build** → docs/sprint/SPRINT-026-fleet-build.md
 
 ---
 
