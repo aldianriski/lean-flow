@@ -42,12 +42,12 @@ replaces §6, LAW-1 reinterpretation stated. ADR-012 records the full-adoption d
 placement-wins · AGENTS-pointer · CHANGELOG always-core · init non-doc loosening) with DECISIONS row.
 
 **DoD:**
-- [ ] §2 table rewritten — TemiDev mandatory minimum core, per-file caps + owners, legacy paths second
-- [ ] Per-doc lifecycle contract (LAW 3) on every §2 row — create trigger · update trigger (the event, e.g. schema.md ← migration lands) · archive/retention trigger
-- [ ] §6 tier model: base / backend-integration / medium-complex gating + **multi-service top tier retained** (service registry · dependency map · global decisions)
-- [ ] Cap-hit growth rule stated — a core file at its cap **splits into its tree** (overview → siblings), never compresses signal away
-- [ ] LAW-1 reinterpretation stated (mandatory minimum scaffolded at init; non-mandatory create-lazily)
-- [ ] ADR-012 written per template + `docs/DECISIONS.md` row; supersession of prior placement noted
+- [x] §2 table rewritten — TemiDev mandatory minimum core, per-file caps + owners, legacy paths second
+- [x] Per-doc lifecycle contract (LAW 3) on every §2 row — create trigger · update trigger (the event, e.g. schema.md ← migration lands) · archive/retention trigger
+- [x] §6 tier model: base / backend-integration / medium-complex gating + **multi-service top tier retained** (service registry · dependency map · global decisions)
+- [x] Cap-hit growth rule stated — a core file at its cap **splits into its tree** (overview → siblings), never compresses signal away
+- [x] LAW-1 reinterpretation stated (mandatory minimum scaffolded at init; non-mandatory create-lazily)
+- [x] ADR-012 written per template + `docs/DECISIONS.md` row; supersession of prior placement noted
 
 ### T2 — Relocate colliding core templates to TemiDev placement + rewire readers `[size: M · risk: high]`
 Layers: `skills/lean-doc-generator/templates/` · `skills/prime/SKILL.md` · `skills/release-patch/SKILL.md` · `skills/lean-doc-generator/SKILL.md`
@@ -151,6 +151,15 @@ the new standard; migrate re-run on a legacy layout proposes relocation, never c
 ## Execution Log
 <!-- Append-only, dated. Plan frozen at promote. -->
 
+### 2026-07-29 | T1 complete | DOCS_Guide TemiDev core + ADR-012 (inline, decision-tier)
+G1/G2 batch-passed (D5 grilled → safe-scaffold allowlist). §2 rewritten as three lifecycle tables
+(root · .claude/ · docs/ tree) with Create←/Update←/Archive per row; §6 = 4-tier event-gated model
+(base · backend/integration · medium/complex · multi-service); growth rule (cap-hit → split into
+tree) + LAW-1 reinterpretation added; ADR-012 accepted + DECISIONS row; knowledge index regenerated;
+qa-check 56/0. **Note for T6:** §2 forward-references the boundary rule as "§12" — T6 must number
+its new section §12. **Note for T2:** §11 table + template filenames still show legacy paths — T2's
+scope.
+
 ### 2026-07-29 | scope-change | Complete-standard amendment (pre-execution)
 **What broke:** owner review caught the plan adopting TemiDev *structure* without the *lifecycle
 contract* — 3 gaps vs the "complete, big-repo-ready" goal: (1) T1 required caps+owners but not
@@ -169,6 +178,10 @@ intake grill (full adoption · placement wins · AGENTS pointer · CHANGELOG dev
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §2/§6 rewritten to TemiDev core + lifecycle contract + growth rules (the SSOT for T2–T6) | High | qa-check 56/0 · structure re-read (L-009) |
+| `docs/adr/ADR-012-temidev-repo-structure-standard.md` | T1 | records full adoption + deviations (D1–D5) | Low | template-conformant · index regenerated |
+| `docs/DECISIONS.md` | T1 | ADR-012 index row | Low | qa-check corpus refs |
+| `docs/knowledge-index.md` | T1 | regenerated (derived) | Low | qa-check "knowledge index current" |
 
 ## Retro
 <!-- Written at close. -->

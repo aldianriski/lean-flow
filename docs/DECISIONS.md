@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-012](adr/ADR-012-temidev-repo-structure-standard.md) | Adopt the TemiDev repo-structure standard as the consumer core (placement wins · lifecycle contract · tiered growth) | accepted | 2026-07-29 |
 | [ADR-011](adr/ADR-011-no-gate-enforcement.md) | No gate enforcement: G1/G2 stay human discipline (no hook, no sibling plugin) | accepted | 2026-07-29 |
 | [ADR-010](adr/ADR-010-model-dispatch-role-tiers.md) | Role-based model-dispatch tiers (slimmed adoption; no auto-ladder) | accepted | 2026-07-10 |
 | [ADR-009](adr/ADR-009-knowledge-metadata-ssot.md) | Knowledge corpus: write-time metadata SSOT + a derived, on-demand graph view | accepted | 2026-07-02 |

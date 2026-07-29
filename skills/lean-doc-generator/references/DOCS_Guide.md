@@ -17,38 +17,86 @@
 
 ---
 
-## §2 — Core Files
+## §2 — Core Files (TemiDev repo-structure standard — ADR-012)
 
-| File | Place | Reader | Max lines | Update trigger | Template |
+Every row carries its **full lifecycle contract** (LAW 3): *create* ← the event that brings it into
+existence · *update* ← the event that refreshes it (mirrored in its ownership header's
+`update_trigger`) · *archive* ← its retention leg (§11; `—` = lives as long as the repo). Tier
+gating → §6.
+
+**Root files:**
+
+| File | Reader | Cap | Create ← | Update ← | Archive |
 |---|---|---|---|---|---|
-| `README.md` | root | Anyone | no hard cap¹ | Project scope changes | `templates/README.md.template` |
-| `TODO.md` | root | Dev / AI | ~150 soft (§11) | Backlog change · sprint promote/close | `templates/TODO.md.template` |
-| `TECH-DEBT.md` | root | Dev / AI | collapsed rows (§11) | Sprint close files TD · promote ages it · debt resolved | `templates/TECH-DEBT.md.template` |
-| `CLAUDE.md` | `.claude/` | AI assistant | 80 | Project shape / workflow / anti-patterns change | `templates/CLAUDE.md.template` |
-| `CONTEXT.md` | `.claude/` | AI assistant | 130 (ADR-007 — dense SSOT) | Vocabulary / patterns / conventions change | `templates/CONTEXT.md.template` |
-| `ARCHITECTURE.md` | `docs/` | Tech lead | 150 | Major structural change | `templates/ARCHITECTURE.md.template` |
-| `SETUP.md` | `docs/` | New dev / CI | 100 | Setup process changes | `templates/SETUP.md.template` |
-| `DECISIONS.md` | `docs/` | Team | thin index | A new ADR is added under `docs/adr/` | `templates/DECISIONS.md.template` |
-| `ADR-NNN-<slug>.md` | `docs/adr/` | Team | per file, append-only | Each significant decision (one ADR per file) | `templates/ADR.md.template` |
-| `CHANGELOG.md` | `docs/` | Reviewer | append-only · rotated (§11) | Sprint closed | `templates/CHANGELOG.md.template` |
-| `LEARNINGS.md` | `docs/` | Team / AI | append-only · pruned (§11) | A learning confirmed at close, or promoted | `templates/LEARNINGS.md.template` |
-| `research/<slug>.md` | `docs/research/` | Team / AI | 120 soft · create-lazily | Question revisited, or a new source changes the verdict | `templates/RESEARCH.md.template` |
-| `DEPLOY.md` | `docs/` | Dev / ops | 100 soft · create-lazily | Release process / rollback changes | `templates/DEPLOY.md.template` |
-| `BUG-<slug>.md` | wherever raised (ephemeral — routed away at `/triage`, no durable directory) | Anyone | lean · create-lazily per bug | A defect is reported | `templates/BUG.md.template` |
-| `SPRINT-NNN-<slug>.md` | `docs/sprint/` | AI mid-sprint | 400 hard cap | Append during sprint; retro at close | `templates/SPRINT.md.template` |
+| `README.md` | Anyone | no hard cap¹ | init (always) | project scope changes | — |
+| `CONTRIBUTING.md` | Contributor | ~100 | init (team ≥ 2, or on request) | branching / commit / review / DoD convention changes | — |
+| `SECURITY.md` | Anyone | ~80 | init (always) | auth model · secret policy · vulnerability-reporting change | — |
+| `CHANGELOG.md` | Reviewer | append-only | first release or sprint close (always-core — ADR-012 deviation) | sprint close · release | rotate at new MINOR → `docs/changelog/` (§11) |
+| `LICENSE` | Anyone | — | init (license chosen; private → proprietary notice) | license change (rare) | — |
+| `AGENTS.md` | AI tools | ~10 | init (always) — **thin pointer to `.claude/CLAUDE.md`, never duplicated instructions** | pointer targets move | — |
+| `.env.example` | Dev | — | init **safe-scaffold** (write-if-absent; names only, never values) | a new env var is introduced | — |
+| `.gitignore` | git | — | init **safe-scaffold** (write-if-absent; from the §12 boundary rule) | a new generated-artifact class appears | — |
+| `TODO.md` | Dev / AI | ~150 soft | init (always) | backlog change · sprint promote/close | §11 prune |
+| `TECH-DEBT.md` | Dev / AI | collapsed rows | first TD filed | close files TD · promote ages · debt resolved | §11 collapse |
 
-Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`. Paths above are relative to that dir.
+**AI context (`.claude/`):**
 
-**Placement is canonical.** Root keeps only the daily working files (`README.md` front-door ·
-`TODO.md` · `TECH-DEBT.md`); AI-context lives in `.claude/`; everything else lives in `docs/`. Generation targets
-these paths; `/prime` searches them first (legacy root locations still matched, second); `migrate`
+| File | Reader | Cap | Create ← | Update ← | Archive |
+|---|---|---|---|---|---|
+| `CLAUDE.md` | AI assistant | 80 | init (always) | project shape / workflow / anti-patterns change | — |
+| `CONTEXT.md` | AI assistant | 130 (ADR-007) | init (always) | vocabulary / patterns / conventions change | — |
+
+**`docs/` tree** (tier column per §6; legacy lean paths in parentheses stay matched second):
+
+| File | Tier | Reader | Cap | Create ← | Update ← |
+|---|---|---|---|---|---|
+| `product/requirements.md` | base | Dev / PM | 150 soft | init, or first sanitized PRD lands | a requirement is approved / changed (via PR) |
+| `product/acceptance-criteria.md` | base | Dev / QA | 120 soft | with requirements | acceptance criteria change |
+| `architecture/overview.md` *(was `docs/ARCHITECTURE.md`)* | base | Tech lead | 150 | init (always) | major structural change |
+| `architecture/data-flow.md` | backend, or overview cap-split | Dev | 120 | a non-trivial data path exists | that flow changes |
+| `architecture/authentication.md` | auth exists | Dev | 120 | auth is introduced | authn/authz architecture changes |
+| `architecture/integrations.md` | backend/integration | Dev | 120 | first external integration | an integration is added / changed |
+| `adr/ADR-NNN-<slug>.md` + `DECISIONS.md` index | medium+ | Team | per file, append-only | a qualifying decision (§4) | new ADR → index row |
+| `database/erd.md` (Mermaid) | DB exists | Dev | 120 | the schema's first entities land | a migration changes entities / relations |
+| `database/schema.md` | DB exists | Dev | 150 | with erd | a migration lands |
+| `database/migration-guide.md` | DB exists | Dev | 100 | first migration | migration / seed process changes |
+| `api/openapi.yaml` | API exists | API consumer | — (spec is project-generated; **placement rule only, no template**) | first endpoint ships | an endpoint / contract changes |
+| `development/setup.md` *(was `docs/SETUP.md`)* | base | New dev / CI | 100 | init (always) | setup process changes |
+| `development/coding-standards.md` | base | Dev | 120 | init | a convention is adopted / changed (mirror what config enforces — `.editorconfig` etc. — don't duplicate it) |
+| `testing/testing-guide.md` | base | Dev | 100 | a test harness exists | strategy · harness · coverage rule changes |
+| `deployment/deployment-guide.md` *(was `docs/DEPLOY.md`)* | base | Dev / ops | 100 | a deploy target exists | deploy flow · environment matrix changes |
+| `deployment/rollback-guide.md` | base | Dev / ops | 80 | with deployment-guide | rollback process changes |
+| `flows/<slug>.md` (Mermaid) | medium+ | Dev | 100 each | a flow needs shared understanding | that flow changes |
+| `sprint/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | 400 hard | promote | append during sprint; retro at close → §11 archive |
+| `LEARNINGS.md` | lean loop | Team / AI | append-only | first confirmed learning | close confirms · promote collapses (§11) |
+| `research/<slug>.md` | as needed | Team / AI | 120 soft | a decision-driving question | question revisited · verdict changes |
+| `BUG-<slug>.md` | ephemeral | Anyone | lean | a defect is reported | routed away at `/triage` |
+
+Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`; tree docs use a flattened name
+(`architecture-overview.md.template` · `database-erd.md.template` · …).
+
+**Placement is canonical.** Root keeps the daily working files + the TemiDev root set above;
+AI-context lives in `.claude/`; everything else lives under the `docs/` tree. Generation targets
+these paths; `/prime` searches them first (**legacy locations — `docs/ARCHITECTURE.md` ·
+`docs/SETUP.md` · `docs/DEPLOY.md` · `docs/CHANGELOG.md` — still matched, second**); `migrate`
 relocates a legacy layout (`git mv` + inbound-link fixes — content untouched).
+
+**Growth rule (cap-hit → split, never squeeze).** A core file at its cap **splits into its canonical
+tree**: `architecture/overview.md` spawns `data-flow.md` / `authentication.md` / `integrations.md`
+(overview keeps the map + links); `development/setup.md` can spawn per-platform pages;
+`deployment-guide.md` spawns the environment matrix. Move whole sections; never compress signal away
+to stay under a cap, and never raise the cap (§7). Ledgers (§11) compress; **knowledge docs split**.
+
+**LAW 1, reinterpreted (ADR-012).** The mandatory minimum above is scaffolded at **init** — with
+real content prompts, never empty shells; beyond the minimum, create-lazily still governs (no doc
+until its absence causes repeated interruptions). Minimal stays the floor *per doc* (LAW 4), not a
+ceiling on the doc *set*.
 
 **Temp-dir artifacts** (council verdicts, handoff docs) are never referenced from durable docs — copy to `docs/research/` (verdicts) before citing.
 
 ¹ **README is the full front-door** — the complete overview of the repo. Don't truncate it to hit a
 line count; deep detail belongs in `CLAUDE.md` (project shape) and `CONTEXT.md` (vocabulary) and
-`ARCHITECTURE.md` (structure), which the README links to. Keep it signal-dense (LAW 4), not short.
+`architecture/overview.md` (structure), which the README links to. Keep it signal-dense (LAW 4), not short.
 The bundled template models a human-showcase front-door (hero · why · quick start · features ·
 docs map) — adapt freely, structure is a suggestion; only invariants are the anti-SSOT rule and the footer ownership line.
 
@@ -160,13 +208,18 @@ Discard log: `"Skipped: '[detail]' explains HOW → add as a comment in [file]."
 
 ---
 
-## §6 — Tiered scale model
+## §6 — Tiered scale model (gates the §2 tier column; detected from manifest/stack at init, confirmed by popup)
 
-| Tier | Team | Files |
+| Tier | Trigger | Doc set |
 |---|---|---|
-| 1 | Solo | README · SETUP · CONTEXT |
-| 2 | Small team | + ARCHITECTURE · DECISIONS · TODO · CHANGELOG · sprint/ |
-| 3+ | Multi-service | + service registry · dependency map · global decisions |
+| **Base** | every dev repo | the TemiDev mandatory minimum: root set (§2) · `product/{requirements,acceptance-criteria}` · `architecture/overview` · `development/{setup,coding-standards}` · `testing/testing-guide` · `deployment/{deployment,rollback}-guide` — conditional rows (`database/` · `authentication`) fire on substrate (DB / auth exists) |
+| **Backend / integration** | repo exposes an API or external integrations | + `api/openapi.yaml` (placement rule) · `architecture/integrations.md` |
+| **Medium / complex** | multi-dev, sustained, or architecturally forked | + `adr/` + `DECISIONS.md` · `flows/` (CHANGELOG is already always-core — ADR-012) |
+| **Multi-service** | several deployable services / repos | + service registry · cross-service dependency map · global decisions index — per-service repos each carry their own Base+ set; the umbrella repo owns the cross-cutting three |
+
+A repo **moves up a tier by event, not by ceremony** — the trigger appearing (first API, second dev,
+second service) is the create-event for that tier's docs. Moving down never deletes: docs stay until
+their §11 leg retires them.
 
 ---
 
