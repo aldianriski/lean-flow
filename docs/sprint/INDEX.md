@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-030 — Gate-Guard Decision — closed 2026-07-29 · 76ea8f3 (docs-only, no release)
 - SPRINT-029 — Dispatch-Cost Note — closed 2026-07-29 · d886f61 (PATCH v1.14.1)
 - SPRINT-028 — Research Delta-Scan Batch — closed 2026-07-29 · fc520e3 (docs-only, no release)
 - SPRINT-027 — Night-Run Watchdog & Housekeeping — closed 2026-07-29 · 36721a4
