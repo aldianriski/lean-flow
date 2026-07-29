@@ -63,7 +63,10 @@ Base-ref caveat (observed on the first real wave): agent worktrees fork from the
 branch**, not local HEAD (unless `worktree.baseRef: "head"` is set) — unpushed local commits are
 invisible in an agent's tree. Brief agents to read newer docs via `git show main:<path>` (read-only,
 L-043-safe); the three-way merge reconciles the old base cleanly as long as only the task's own
-files changed on its branch.
+files changed on its branch. **Corollary: a task EDITING a file that exists only in unpushed
+commits must not be worktree-dispatched** — the merge becomes add/add on that file. Fall back to
+shared-tree parallel dispatch (disjoint files, agents run no git writes, coordinator commits
+sequentially), or push / set `baseRef: "head"` first.
 
 ## Merge-back queue (coordinator-only)
 
