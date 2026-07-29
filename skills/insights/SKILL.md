@@ -19,7 +19,7 @@ Retro feeds, so the §10 promotion machinery (`count ≥ 2` → durable rule) st
 - A friction, surprise, or "I'll remember this" moment lands mid-task — capture it before it fades.
 - Standalone / `quick`-mode work surfaced a lesson but won't reach a Sprint-Close Retro.
 - You spot a recurrence of something already in the ledger — bump it toward promotion.
-- A **retrieval miss** — you couldn't find, or you contradicted, a prior `L-NNN`/ADR — file it; it's the observed signal that knowledge retrieval is degrading (feeds the TASK-040 decision).
+- A **retrieval miss** — you couldn't find, or you contradicted, a prior `L-NNN`/ADR — file it; it's the observed signal that knowledge retrieval is degrading.
 
 Not for: durable project state (→ a commit / sprint record) · ending a session (→ `/handoff`) · the
 full sprint retro (→ `/lean-doc-generator close`).

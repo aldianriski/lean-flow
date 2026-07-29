@@ -50,7 +50,7 @@ out many trivial steps (ADR-010 addendum 2026-07-29).
 Fires at **sprint-bulk** when the G2 overlap map marks a batch's tasks disjoint (no shared file,
 no `depends-on`): dispatch one `Agent(isolation: "worktree")` call per disjoint task, all in a
 **single message**. Soft cap **3–5 concurrent** — no first-party concurrency limit is published
-(folklore only); revisit if one ships. Rationale/decisions: `docs/research/fog-fleet-orchestration.md`.
+(folklore only); revisit if one ships. Rationale/decisions: the lean-flow repo's `docs/research/fog-fleet-orchestration.md`.
 
 Each agent gets its own branch + working tree; it commits only its own files there and **never**
 runs a tree-wide git state op (`stash` / `checkout` / `restore` / `reset`) — a state op on a shared

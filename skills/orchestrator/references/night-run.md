@@ -1,9 +1,9 @@
 # Night-run — pre-flight + trigger recipe for unattended `sprint-bulk`
 
-Read before firing `sprint-bulk` unattended overnight. The mechanism is already decided in
-`docs/research/night-run.md` (TASK-090) — headless `claude -p`, OS-scheduled, `--permission-mode
-dontAsk` + a pre-built scoped allowlist, never `--dangerously-skip-permissions`. This file is the
-operational procedure, not a re-decision.
+Read before firing `sprint-bulk` unattended overnight. The mechanism is already decided — headless
+`claude -p`, OS-scheduled, `--permission-mode dontAsk` + a pre-built scoped allowlist, never
+`--dangerously-skip-permissions` (decision record: the lean-flow repo's `docs/research/night-run.md`).
+This file is the operational procedure, not a re-decision.
 
 ## Part 1 — Pre-flight pass (run interactively, the evening before)
 

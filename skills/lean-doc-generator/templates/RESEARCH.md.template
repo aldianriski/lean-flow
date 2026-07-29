@@ -4,13 +4,14 @@ last_updated: YYYY-MM-DD
 update_trigger: Question revisited, or a new option/source changes the recommendation
 status: current | superseded
 id: [kebab-slug]
-tags: [pick from: process docs tooling edit-safety sprint-model]
-domain: [one of: skills doc-standard governance knowledge sprint-model]
+tags: [pick from the project's tag vocab — keep it small and consistent]
+domain: [one project domain]
 related: [other-doc-id-or-ADR-NNN]
 ---
-<!-- Frontmatter is the ADR-009 knowledge metadata SSOT — tags/domain vocab sourced from
-     scripts/gen-index.sh TAGS/DOMAINS (single origin); qa-check.sh lints id/tags/domain/status
-     against it, so keep values inside the listed vocab. -->
+<!-- Frontmatter is the ADR-009 knowledge metadata SSOT — if the project maintains a generated
+     knowledge index, source tags/domain vocab from its single origin and lint against it
+     (lean-flow itself: scripts/gen-index.sh TAGS/DOMAINS · qa-check.sh); otherwise keep a small,
+     consistent vocab. -->
 
 # Research — [the question, phrased as a question] [CUSTOMIZE]
 
