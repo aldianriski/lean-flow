@@ -3,9 +3,9 @@ sprint: 032
 slug: temidev-repo-standard
 owner: Maintainer
 last_updated: 2026-07-29
-status: active
+status: closed
 plan_commit: ba30a52
-close_commit: [sha — set at close]
+close_commit: [recorded post-close-commit]
 update_trigger: sprint execute/close events
 ---
 
@@ -270,15 +270,29 @@ intake grill (full adoption · placement wins · AGENTS pointer · CHANGELOG dev
 | `references/{init,DOCS_Guide}.md` | T7 | defect fixes from fresh-context verify (api/README ownership footer · DECISIONS.md path pinned) | Low | qa-check |
 
 ## Retro
-<!-- Written at close. -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no misses: L-017 (delta-map), L-015/L-016 (consumer path), L-006 (fresh-context
+verify), L-012 (references-first under cap), L-009 (structure re-reads), L-045 (unpiped gates) were
+all found and actively applied; no prior L/ADR was contradicted.
 
 **Worked**
--
+- Sequential briefed-Sonnet dispatch with a coordinator review pass per task — every agent returned
+  under caps with 56/0 gates, and the review pass caught residual stale refs each time (the
+  file-list boundary works as a containment, coordinator sweeps the seam).
+- Pre-execution owner amendment (scope-change before T1) — the lifecycle-contract + growth-path gaps
+  were caught while amendment was still cheap; the whole sprint then built on the corrected spec.
+- Fixture-driven exercise at every task (L-007) — the T7 cold-context three-tier verify caught 2
+  real shipped defects (api/README ownership · DECISIONS.md path) that five task-level reviews missed.
 
 **Friction**
--
+- CLAUDE.md pinned at exactly 80/80 forced zero-net rewording for every template-count bump (4×) —
+  a recurring squeeze, but held.
+- Fixture reuse across tasks blurred tier boundaries (login-flow.md present in the backend fixture) —
+  next multi-tier verify: fresh fixture per tier from the start.
 
-**Pattern candidate**
--
+**Pattern candidate** (filed)
+- L-051 — a placement-standard row without a full explicit path invites mis-scaffold; cold-context
+  agents execute the standard literally (→ docs/LEARNINGS.md, count 1).
+
+**Buckets routed**: Shipped → CHANGELOG v1.16.0 · Tech debt → TD-008 resolved (TASK-069), none new ·
+Follow-ups → TASK-074 (own-repo migration, P3) · Learnings → L-051.

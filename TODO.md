@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-032 — TemiDev Repo-Structure Standard** → docs/sprint/SPRINT-032-temidev-repo-standard.md
+> _(no active sprint — SPRINT-032 closed 2026-07-29 → v1.16.0 TemiDev Repo-Structure Standard; archived per §11.)_
 
 ---
 
@@ -30,58 +30,16 @@ status: current
 
 ### P1 — Next Phase Required
 
-- [ ] TASK-067 — Rewrite DOCS_Guide core set to the TemiDev structure + record ADR-012  [size: M] [risk: high] [HITL]
-      done-when: §2 table lists the TemiDev mandatory minimum as core (new placements canonical, legacy second), tier gating (base/backend/complex) replaces §6, LAW-1 reinterpretation stated, and docs/adr/ADR-012 records full-adoption + placement-wins + AGENTS-pointer + deviations (CHANGELOG always-core · init non-doc loosening)
-      touches: skills/lean-doc-generator/references/DOCS_Guide.md · docs/adr/
-      assumes: tier gating = mandatory always · backend adds api/integrations · medium/complex adds adr+flows; CHANGELOG stays always-core (lean sprint close depends on it); lean discipline (headers · WHY/WHERE · caps) persists on the new set
-      tracker: none — internal standard change
-      state: ready
-- [ ] TASK-068 — Relocate colliding core templates to TemiDev placement + rewire readers  [size: M] [risk: high] [HITL]
-      depends-on: TASK-067
-      done-when: ARCHITECTURE→docs/architecture/overview.md · SETUP→docs/development/setup.md · DEPLOY→docs/deployment/{deployment-guide,rollback-guide}.md · CHANGELOG→root; /prime slots, release-patch prepend target, §11 rotation, and sprint promote/close refs point at new canonical paths with legacy matched second — verified by /prime passing on both layouts
-      touches: lean-doc-generator templates/ · prime SKILL.md · release-patch SKILL.md · lean-doc-generator SKILL.md
-      assumes: rotation archives stay docs/changelog/
-      tracker: none — internal standard change
-      state: ready
-- [ ] TASK-069 — Add root-file templates: CONTRIBUTING · SECURITY · AGENTS-pointer · .env.example/.gitignore/LICENSE  [size: M] [risk: med] [HITL]
-      depends-on: TASK-067
-      done-when: CONTRIBUTING.md.template + SECURITY.md.template + AGENTS.md.template (~10-line pointer to .claude/CLAUDE.md) exist with §2 rows + caps; init offers all six per repo type and scaffolds them on a scratch repo without overwriting existing files
-      touches: lean-doc-generator templates/ · DOCS_Guide §2 · lean-doc-generator SKILL.md (init)
-      assumes: init docs-only rule loosened for exactly .env.example/.gitignore/LICENSE (never-overwrite) — settle at G2, record in ADR-012
-      tracker: none — internal standard change
-      state: ready
-- [ ] TASK-070 — Add backend/integration doc-tree templates: database/ · api/ · architecture siblings  [size: M] [risk: med] [HITL]
-      depends-on: TASK-067
-      done-when: erd (Mermaid) · schema · migration-guide · architecture/{data-flow,authentication,integrations} templates exist with §2 rows; openapi.yaml placement rule recorded (no template — spec is project-generated); init backend/integration gate scaffolds exactly this set
-      touches: lean-doc-generator templates/ · DOCS_Guide §2 · lean-doc-generator SKILL.md (init)
-      assumes: ERD uses Mermaid; no API-spec generation in scope
-      tracker: none — internal standard change
-      state: ready
-- [ ] TASK-071 — Add product/flows/testing/coding-standards templates (medium/complex gate)  [size: M] [risk: med] [HITL]
-      depends-on: TASK-067
-      done-when: product/{requirements,acceptance-criteria} · flows/ (Mermaid) · testing/testing-guide · development/coding-standards templates exist with §2 rows; medium/complex init gate scaffolds them; task-decomposer PRD output notes docs/product/requirements.md as its durable home
-      touches: lean-doc-generator templates/ · DOCS_Guide §2 · lean-doc-generator SKILL.md · task-decomposer SKILL.md
-      assumes: none
-      tracker: none — internal standard change
-      state: ready
-- [ ] TASK-072 — Add "what belongs in Git" boundary section + wire into init/migrate  [size: S] [risk: med] [HITL]
-      depends-on: TASK-067
-      done-when: DOCS_Guide gains the decision rule + never-commit lists (secrets/contracts/PII/backups/design sources/meeting notes → proper homes); init scaffolds .gitignore from it; migrate adoption scan flags committed violations (report-only)
-      touches: DOCS_Guide.md · lean-doc-generator SKILL.md · references/migration-map.md
-      assumes: none
-      tracker: none — internal standard change
-      state: ready
-- [ ] TASK-073 — Update migration map for legacy-lean → TemiDev layout + end-to-end consumer verify  [size: M] [risk: med] [HITL]
-      depends-on: TASK-068, TASK-069, TASK-070, TASK-071, TASK-072
-      done-when: migration-map.md maps legacy lean placements → new canonical (re-run sync proposes relocation, never clobbers); init exercised on a scratch fixture repo at all three tiers and /prime reads each cleanly (L-016 consumer-path proof); lean-flow README + CHANGELOG + CONTEXT.md §Doc standard reflect the new standard
-      touches: references/migration-map.md · README.md · .claude/CONTEXT.md · docs/CHANGELOG.md
-      assumes: lean-flow's own repo does NOT migrate now (later migrate re-run flags it)
-      tracker: none — internal standard change
-      state: ready
-
 ### P2 — Quality / Polish
 
 ### P3 — Long-term
+
+- [ ] TASK-074 — Migrate lean-flow's own repo to the ADR-012 canonical layout  [size: S] [risk: low] [HITL]
+      done-when: /lean-doc-generator migrate re-run relocates this repo's legacy-lean docs (docs/ARCHITECTURE.md → docs/architecture/overview.md · docs/CHANGELOG.md → root · + inbound-link fixes) via the Legacy-lean mapping block, propose→approve; /prime + qa-check pass on the new layout
+      touches: docs/ · README.md · .claude/CONTEXT.md · scripts/qa-check.sh (path expectations)
+      assumes: deferred from SPRINT-032 (A1 — consumer surface shipped first); dogfoods the Legacy-lean relocation path
+      tracker: none — internal housekeeping
+      state: ready
 
 > TASK-040 (derived graph view) → routed to `.out-of-scope/derived-graph-view.md` (2026-07-29) — council-2 gate held; the TASK-041 retrieval-miss signal never fired; graphify serves the need ad-hoc (revisit-if + 3 guardrails recorded).
 > TASK-047 (council multi-model backend) → routed to `.out-of-scope/council-multi-model-backend.md` (2026-07-29) — TASK-048 + TASK-065 probes found no exposed crack; revisit-if: a cross-provider test shows a real shared factual error (BYO-provider seam only).

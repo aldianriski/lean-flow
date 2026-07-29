@@ -16,9 +16,9 @@ status: current
 
 ## Tech Debt
 
-- **TD-008** severity: minor | status: open | created: Sprint-017 | re-reviewed: 2026-07-29 (SPRINT-028 promote)
-  - Summary: `skills/lean-doc-generator/SKILL.md` at 106/110 after the §11 close-pass adds. Under cap, but the init section is the tightest fit — if the next lean-doc feature needs headroom, relocate init's 4-step procedure to a reference (L-012, as migrate's detail lives in `migration-map.md`). Watch at promote aging.
-  - Re-review: kept open — 104→106 over sprints 025–027 (slow creep, no breach); mitigation unchanged (relocate init detail to a reference if the cap is threatened).
+- **TD-008** severity: minor | status: resolved → TASK-069 (Sprint-032) | created: Sprint-017
+  - Summary: `skills/lean-doc-generator/SKILL.md` at 106/110, init section the tightest fit.
+  - Resolution: the planned mitigation executed — init's procedure relocated to `references/init.md` (L-012 pattern) during the TemiDev-standard sprint; SKILL.md now 104/110 with the init section a 7-line summary + pointer.
 
 ---
 
