@@ -141,11 +141,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-009 [tags: edit-safety] [status: active]: A row-deletion Edit on a markdown TABLE can silently FUSE adjacent rows — removing the graphify row in `ARCHITECTURE.md` matched the wrong newline and merged the built-in-commands + Hooks rows (the Hooks row vanished from the render); grep and line-caps stayed clean, so it was caught ONLY by the fresh-context review. Pattern: after deleting a table row, re-read the table (diff the rendered rows) — don't trust the edit; and a reviewer who didn't write the edit catches author-blind structural defects. 2nd occurrence (Sprint-028): a dispatched agent INSERTED a blockquote mid-table, splitting the ticket table in `fog-fleet-orchestration.md` — same family (any table-adjacent edit can silently corrupt structure), caught only by coordinator review. Promotion due at next promote.
-- seen: Sprint-007 · Sprint-028
-- count: 2
-- promoted: no
-- related: L-006 (fresh/cold eyes catch author-blind issues — this is a 2nd occurrence of that pattern)
+## L-009 [tags: edit-safety] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern (structure-adjacent edits — table rows / list entries — silently fuse or corrupt neighbors; re-read the structure after the edit; fresh-context review catches author-blind corruption). Seen Sprint-007 + Sprint-028, + a 3rd found at 029 promote (TASK-006's TODO.md heading fused into TASK-099's block) (count 3). Related: L-006.
 
 ---
 

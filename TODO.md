@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-028 closed 2026-07-29, docs-only, no release; archived per §11.)_
+> **SPRINT-029 — Dispatch-Cost Note** → docs/sprint/SPRINT-029-dispatch-cost-note.md
 
 ---
 
@@ -40,6 +40,7 @@ status: current
       assumes:   none — doc-only addendum
       tracker:   docs/research/adhd-adaptation.md (the scan's single micro-keeper)
       state:     ready
+- [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook**  [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
       next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
       state: blocked   (deferred — research hooks next session)
