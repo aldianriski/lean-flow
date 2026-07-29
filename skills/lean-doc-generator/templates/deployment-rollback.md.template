@@ -1,0 +1,24 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: Rollback process changes
+status: current
+---
+
+<!-- Lives at docs/deployment/rollback-guide.md (DOCS_Guide §2, ADR-012). Operational, not
+     code-HOW. Companion to deployment-guide.md.template, which owns the forward deploy flow. -->
+
+# [Project] — Rollback Guide [CUSTOMIZE]
+
+> The standard rollback procedure — the one reliable way back when a release goes bad. WHAT to
+> run · WHERE · WHY; never duplicate code logic.
+
+## Rollback process
+- [the one reliable way back — previous tag / artifact; what state is safe to revert, what isn't]
+1. [ordered, copy-pasteable steps — halt traffic · restore prior artifact/tag · restore data if needed · resume]
+2. …
+
+## Rollback verification — by a real signal, not a proxy
+- [ ] Confirm the prior version is *actually* live again — check the deployed artifact's version /
+  build-id / PID, **not** an HTTP 200 or "looks fine"; a stale process can still answer healthy. [L-013]
+- [ ] Confirm no data/state was left in a half-migrated condition by the aborted release.

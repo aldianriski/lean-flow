@@ -1,16 +1,19 @@
 ---
 owner: [role — not personal name]
 last_updated: YYYY-MM-DD
-update_trigger: Release process, environment, or rollback procedure changes
+update_trigger: Deploy flow, environment matrix, or release verification changes
 status: current
 ---
 
-# [Project] — Deploy / Release Runbook [CUSTOMIZE]
+<!-- Lives at docs/deployment/deployment-guide.md (DOCS_Guide §2, ADR-012). Operational, not
+     code-HOW. Rollback owns its own file — see deployment-rollback.md.template. -->
 
-> The standard release procedure. An operational runbook (like `SETUP.md`) — the steps that aren't
-> codified anywhere else. WHAT to run · WHERE · WHY each gate exists; never duplicate code logic.
-> `/release-patch` bumps the version + CHANGELOG and **stops before push** — this runbook owns the
-> push / deploy / verify / rollback steps from there.
+# [Project] — Deployment Guide [CUSTOMIZE]
+
+> The standard release procedure. An operational runbook (like `development/setup.md`) — the
+> steps that aren't codified anywhere else. WHAT to run · WHERE · WHY each gate exists; never
+> duplicate code logic. `/release-patch` bumps the version + CHANGELOG and **stops before push** —
+> this runbook owns the push / deploy / verify steps from there.
 
 ## Pre-flight (before you touch prod)
 - [ ] **Reconcile the live snapshot first** — diff what's *actually* deployed against `main` before
@@ -18,16 +21,26 @@ status: current
 - [ ] Version bumped · lockstep manifests agree (if the project has more than one) · CHANGELOG written.
 - [ ] Tests / build green from a clean checkout — gate on the **exit code**, not filtered output. [L-016]
 
-## Release steps
+## Deploy flow
 1. [ordered, copy-pasteable steps — bump · tag · publish/push · propagate]
 2. …
+
+## Environment differences / matrix
+[table or list of what differs per environment — config, secrets, scaling, feature flags]
+
+| Environment | Differs from prod by |
+|:------------|:----------------------|
+| [staging] | [what's different] |
+
+## Migration order
+[the order deploy artifacts / DB migrations / dependent services must land in, and why — WHY, not the migration code itself]
+
+## Health checks
+[what a real "it's up" signal is for this project — endpoint, process, dashboard]
 
 ## Verify — by a real signal, not a proxy
 - [ ] Confirm the new version is *actually* live — check the deployed artifact's version / build-id / PID,
   **not** an HTTP 200 or "looks fine"; a stale process can still answer healthy. [L-013]
-
-## Rollback
-- [the one reliable way back — previous tag / artifact; what state is safe to revert, what isn't]
 
 ## Ops traps (this project's known footguns)
 <!-- Keep only the ones that apply; delete the rest. These are the generalizable ones. -->
@@ -38,4 +51,4 @@ status: current
   bursts; make the script idempotent + retry spaced across passes, run at idle. [L-030]
 - [project-specific others]
 
-<!-- Lives at docs/DEPLOY.md (≤100 soft, like SETUP). Operational, not code-HOW. -->
+Rollback process → `deployment-rollback.md.template` (`docs/deployment/rollback-guide.md`).

@@ -7,6 +7,7 @@ status: current
 
 # [Project Name] — Changelog
 
+<!-- Lives at root CHANGELOG.md (canonical, ADR-012; legacy docs/CHANGELOG.md still matched second). -->
 <!-- Prepend new sprints — newest first. Append-only; never edit past sprint blocks. -->
 <!-- The active sprint's changelog lives in TODO.md. Move it here once the sprint closes. -->
 <!-- Rotation (§11): when a new MINOR version lands, keep current + previous minor inline;
@@ -28,5 +29,5 @@ status: current
 
 | File | Change | ADR |
 |:-----|:-------|:----|
-| `docs/ARCHITECTURE.md` | Initial architecture documented — layered service pattern | — |
+| `docs/architecture/overview.md` | Initial architecture documented — layered service pattern | — |
 | `docs/DECISIONS.md` | ADR-000: PostgreSQL over MongoDB | ADR-000 |

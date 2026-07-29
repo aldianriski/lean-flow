@@ -110,7 +110,7 @@ guide diverge → **template wins**; note the divergence so the user can reconci
 
 1. **Read** `${CLAUDE_SKILL_DIR}/templates/<X>.md.template` BEFORE writing the doc. Verify (a) frontmatter field order, (b) section order, (c) placeholder tokens preserved or replaced consistently.
 2. **Missing template** → WARN: `"Template <X> not found — proceeding with §2 inline format as fallback; raised as a friction note."` Do NOT hard-stop; degraded output beats no output.
-3. **Divergence** → template wins. Surface a one-line note (e.g. `"Section order corrected per ARCHITECTURE.md.template"`). Never silently rewrite — the user must see the divergence.
+3. **Divergence** → template wins. Surface a one-line note (e.g. `"Section order corrected per architecture-overview.md.template"`). Never silently rewrite — the user must see the divergence.
 
 Before creating any new file → ask "can this live in a code comment?" If yes → code.
 
@@ -269,7 +269,7 @@ into four buckets, each **routed to a durable home** (don't leave them in the sp
 
 | Bucket | Routes to |
 |---|---|
-| Shipped | `docs/CHANGELOG.md` |
+| Shipped | `CHANGELOG.md` (root) |
 | Tech debt | `TD-NNN` row in root `TECH-DEBT.md` (`severity` + `created: Sprint-NNN`) |
 | Follow-ups | `TASK-NNN` entry in `TODO.md` § Backlog (re-enters the loop) |
 | Learnings | `L-NNN` entry in `docs/LEARNINGS.md` |
@@ -304,10 +304,10 @@ them**. Append-only is preserved *inside* each archive file.
 
 | Ledger | Trigger | Action |
 |---|---|---|
-| `TODO.md` Backlog entries (shipped/promoted) | sprint close | **remove outright** (propose→approve) — no shipped-in-SPRINT breadcrumb comments left in TODO.md; history's durable homes are `docs/CHANGELOG.md` + `docs/sprint/archive/` |
+| `TODO.md` Backlog entries (shipped/promoted) | sprint close | **remove outright** (propose→approve) — no shipped-in-SPRINT breadcrumb comments left in TODO.md; history's durable homes are root `CHANGELOG.md` + `docs/sprint/archive/` |
 | `TECH-DEBT.md` | `resolved` ≥ 3 sprints ago | collapse the row to one line in § Resolved: `TD-NNN resolved → TASK-NNN (Sprint-NNN)` |
 | `TODO.md` whole file | > ~150 lines at promote | flag in the governance review; prune with the user |
-| `docs/CHANGELOG.md` | a new MINOR version lands | keep current + previous minor inline; older blocks move verbatim → `docs/changelog/CHANGELOG-<version>.md` + one link line |
+| `CHANGELOG.md` (root) | a new MINOR version lands | keep current + previous minor inline; older blocks move verbatim → `docs/changelog/CHANGELOG-<version>.md` + one link line |
 | `docs/LEARNINGS.md` | an entry reaches `promoted: yes` | collapse it to a pointer line — `L-NNN → promoted: <where>`; the durable rule is the record now. **Ids are monotonic, never reused** — pruning removes the body, never frees the id; the next new id = highest-ever + 1 |
 | `docs/sprint/SPRINT-NNN-<slug>.md` | sprint closed | move → `docs/sprint/archive/`; add to `docs/sprint/INDEX.md` (created lazily) one line: `- SPRINT-NNN — <theme> — closed YYYY-MM-DD · <close_commit>` |
 

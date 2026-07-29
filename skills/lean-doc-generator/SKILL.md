@@ -20,8 +20,8 @@ template ship inside this skill under `${CLAUDE_SKILL_DIR}/`.
 |---|---|
 | HOW it works | code (comments, types, tests) |
 | WHY decided | a rich ADR — one file at `docs/adr/ADR-NNN-<slug>.md` (`templates/ADR.md.template`); add a row to the `docs/DECISIONS.md` index. Offer one only when hard-to-reverse **and** surprising **and** a real trade-off (DOCS_Guide §4) |
-| WHERE things live | `docs/ARCHITECTURE.md` or `README.md` |
-| WHAT changed | `docs/CHANGELOG.md` |
+| WHERE things live | `docs/architecture/overview.md` or `README.md` |
+| WHAT changed | `CHANGELOG.md` (root) |
 | Unsure | code |
 
 ## Bundled assets (load these — do not free-generate)
@@ -30,7 +30,7 @@ template ship inside this skill under `${CLAUDE_SKILL_DIR}/`.
 - `${CLAUDE_SKILL_DIR}/templates/*.md.template` — the canonical format per doc type. **The template IS the format** — read the matching one before writing any core doc.
 - `templates/DESIGN.md.template` — **OPTIONAL · frontend-only · non-core.** Offer only for UI/frontend repos wanting a shared design-system / token contract (`docs/DESIGN.md` or repo's design dir). Never auto-create; never include in core doc generation.
 - `templates/RESEARCH.md.template` — **occasional · create-lazily.** A decision-driving question → options · evidence · recommendation that **feeds an ADR** (desk synthesis; distinct from `/prototype` = design you must *feel*, and `/council` = a hard fork). → `docs/research/<slug>.md`.
-- `templates/DEPLOY.md.template` — **occasional · create-lazily.** The standard-release runbook (snapshot-reconcile · verify-by-real-signal · rollback · ops traps — operational, like SETUP). `/release-patch` bumps + stops before push; this owns the push/deploy steps. → `docs/DEPLOY.md`.
+- `templates/deployment-guide.md.template` + `templates/deployment-rollback.md.template` — **occasional · create-lazily.** Deploy flow, env matrix, migration order, health checks, release verification (guide) + rollback process + verification (rollback) — operational, like setup. `/release-patch` bumps + stops before push; these own the push/deploy/rollback steps. → `docs/deployment/deployment-guide.md` / `docs/deployment/rollback-guide.md`.
 
 ## Modes
 
@@ -87,10 +87,10 @@ one pointer per stream in TODO § Active Sprint); single-stream repos omit it �
 |---|---|
 | "promote" / "start sprint" | **Governance review first** (below) → pull chosen `state: ready` Backlog tasks (TODO.md, dependency order) into a new `docs/sprint/SPRINT-NNN-<slug>.md` rendered from `templates/SPRINT.md.template` (each task → a Plan `Tn` with DoD checkboxes); set `status: active` + `plan_commit`; point the stream's pointer in TODO.md § Active Sprint at the file (single-stream: the lone pointer; **multi-stream: confirm which stream this sprint belongs to before writing `stream:`**); commit `sprint(N): plan locked` |
 | executing during a sprint | Tick DoD `[x]` as each passes; **append to the Execution Log, never edit § Plan** (the plan is frozen); keep Files Changed current |
-| "close" / "sprint done" | Verify all DoD `[x]`; **sweep the full session** (Execution Log + any TD/follow-up surfaced mid-run but not yet filed) for the buckets; write the **Retro** + route its buckets (§10); set `status: closed` + `close_commit`; clear that stream's pointer in TODO § Active Sprint; **run §11 retention as one propose→approve pass** — apply only on owner approval: **archival pass** (move closed sprint → `docs/sprint/archive/` + a line in `docs/sprint/INDEX.md` · remove shipped tasks' Backlog entries outright, no shipped-in comments · scrub remaining TODO.md refs to the closed SPRINT-NNN outside § Active Sprint · verify CHANGELOG rotation links resolve) + **compaction sweep** (periodic, same gate: promoted `L-NNN` bodies → one-line pointers; superseded/duplicated research → supersede note or archive; measured line delta reported); squash-commit `sprint(N): <summary>`; then **fixes-only → `/release-patch` (PATCH) · feature sprint → MINOR by hand** (release-patch is PATCH-only) |
+| "close" / "sprint done" | Verify all DoD `[x]`; **sweep the full session** (Execution Log + any TD/follow-up surfaced mid-run but not yet filed) for the buckets; write the **Retro** + route its buckets (§10); set `status: closed` + `close_commit`; clear that stream's pointer in TODO § Active Sprint; **run §11 retention as one propose→approve pass** — apply only on owner approval: **archival pass** (move closed sprint → `docs/sprint/archive/` + a line in `docs/sprint/INDEX.md` · remove shipped tasks' Backlog entries outright, no shipped-in comments · scrub remaining TODO.md refs to the closed SPRINT-NNN outside § Active Sprint · verify CHANGELOG rotation links resolve) + **compaction sweep** (periodic, same gate: promoted `L-NNN` bodies → one-line pointers; superseded/duplicated research → supersede note or archive; measured line delta reported); **doc-freshness check** — map Files Changed against §2 update triggers and propose refreshes for affected docs (propose→approve, never silent); squash-commit `sprint(N): <summary>`; then **fixes-only → `/release-patch` (PATCH) · feature sprint → MINOR by hand** (release-patch is PATCH-only) |
 
 **Retro at close** — first **sweep the full session** (the Execution Log + any TD/follow-up surfaced mid-run but not yet filed), then sort the sprint into four buckets and **route each to its durable home** (DOCS_Guide §10):
-Shipped → `docs/CHANGELOG.md` · Tech debt → `TD-NNN` in root `TECH-DEBT.md` · Follow-ups → `TASK-NNN` in TODO § Backlog · Learnings → `L-NNN` in `docs/LEARNINGS.md`. **Auto-file all four** (per `templates/LEARNINGS.md.template`); show the user what was filed.
+Shipped → `CHANGELOG.md` (root; legacy `docs/`) · Tech debt → `TD-NNN` in root `TECH-DEBT.md` · Follow-ups → `TASK-NNN` in TODO § Backlog · Learnings → `L-NNN` in `docs/LEARNINGS.md`. **Auto-file all four** (per `templates/LEARNINGS.md.template`); show the user what was filed.
 
 **Governance review at promote** — before planning, run the scan and **emit it as a checklist the owner signs off on**, never silent prose:
 `☐ L-promotion (count≥2, promoted:no): <findings|none>` · `☐ TD aging (≥3 sprints unaddressed): <findings|none>` · `☐ doc-aging §11 (TD collapse · CHANGELOG rotation · LEARNINGS pointer-collapse · TODO ~150-line cap): <findings|none>`.

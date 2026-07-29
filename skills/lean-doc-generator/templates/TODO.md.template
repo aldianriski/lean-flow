@@ -11,7 +11,7 @@ status: current
 > - **Session start** — read this first; understand the Active Sprint before touching code (`/prime`).
 > - **`/orchestrator`** — parses the first incomplete `[ ]` task in the Active Sprint.
 > - **Sprint promote/close** — handled by `/lean-doc-generator promote` and `/lean-doc-generator close`.
-> - **Sprint completed** — move the closed sprint block to `docs/CHANGELOG.md` (prepend, newest first), then delete it from here.
+> - **Sprint completed** — move the closed sprint block to root `CHANGELOG.md` (prepend, newest first; legacy `docs/CHANGELOG.md`), then delete it from here.
 
 > **Sprint sizing**
 > - 2–5 tasks per sprint. **Single-task sprints are valid** for dogfood / validation runs — a sprint need not bundle multiple tasks.
@@ -74,7 +74,7 @@ status: current
 
 ## Changelog (current sprint only)
 
-> Once changes are reflected in docs, MOVE this block to `docs/CHANGELOG.md`, then delete it here.
+> Once changes are reflected in docs, MOVE this block to root `CHANGELOG.md`, then delete it here.
 
 ### Sprint 1 — [Sprint Name] [CUSTOMIZE] (YYYY-MM-DD)
 

@@ -29,7 +29,7 @@
 
 <!-- Badges are optional — drop the row entirely if there's nothing worth signaling yet.
      Use shields.io (or your CI's own badge) inline — no reference-link footer needed. -->
-[![License](https://img.shields.io/badge/license-[MIT]-green)](LICENSE) [![Version](https://img.shields.io/badge/version-[X.Y.Z]-blue)](docs/CHANGELOG.md)
+[![License](https://img.shields.io/badge/license-[MIT]-green)](LICENSE) [![Version](https://img.shields.io/badge/version-[X.Y.Z]-blue)](CHANGELOG.md)
 
 <!-- Optional logo/banner slot — delete if unused. -->
 <!-- <img src="docs/assets/banner.png" alt="[Project Name] banner" width="600"> -->
@@ -59,7 +59,7 @@
 [first command that produces visible output]
 ```
 
-Full setup: [`docs/SETUP.md`](docs/SETUP.md)
+Full setup: [`docs/development/setup.md`](docs/development/setup.md)
 
 ---
 
@@ -84,7 +84,7 @@ graph LR
   B --> C[Output]
 ```
 
-Full map: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+Full map: [`docs/architecture/overview.md`](docs/architecture/overview.md)
 
 ---
 
@@ -100,8 +100,8 @@ Full map: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 ## Docs map
 
 <!-- Links only — this section presents, never duplicates. -->
-- [Architecture](docs/ARCHITECTURE.md) — structure, boundaries
-- [Changelog](docs/CHANGELOG.md) — what shipped, per release
+- [Architecture](docs/architecture/overview.md) — structure, boundaries
+- [Changelog](CHANGELOG.md) — what shipped, per release
 - [Decisions](docs/DECISIONS.md) — the WHY behind hard-to-reverse choices
 - [Contributing](CONTRIBUTING.md) <!-- CUSTOMIZE — delete if not applicable -->
 

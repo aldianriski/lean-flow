@@ -71,7 +71,7 @@ Layers: [files / modules this touches]
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
-     shipped → docs/CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
+     shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
 **Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint? (yes → a Learnings-bucket friction + the retrieval-miss signal, DOCS_Guide §10)

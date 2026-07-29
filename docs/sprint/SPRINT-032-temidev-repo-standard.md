@@ -59,11 +59,11 @@ DEPLOY→`docs/deployment/{deployment-guide,rollback-guide}.md` · CHANGELOG→r
 release-patch prepends root CHANGELOG.md with legacy fallback.
 
 **DoD:**
-- [ ] Four templates renamed/split to new canonical paths (DEPLOY splits into deployment+rollback)
-- [ ] /prime read-order slots updated (canonical first, legacy second)
-- [ ] release-patch prepend target + §11 rotation paths updated (archives stay `docs/changelog/`)
-- [ ] Close-time doc-freshness check wired — sprint close maps Files Changed → §2 update triggers and prompts affected-doc refresh (propose→approve, never silent)
-- [ ] /prime traced on a legacy-layout fixture AND a new-layout fixture — both read cleanly
+- [x] Four templates renamed/split to new canonical paths (DEPLOY splits into deployment+rollback)
+- [x] /prime read-order slots updated (canonical first, legacy second)
+- [x] release-patch prepend target + §11 rotation paths updated (archives stay `docs/changelog/`)
+- [x] Close-time doc-freshness check wired — sprint close maps Files Changed → §2 update triggers and prompts affected-doc refresh (propose→approve, never silent)
+- [x] /prime traced on a legacy-layout fixture AND a new-layout fixture — both read cleanly
 
 ### T3 — Add root-file templates: CONTRIBUTING · SECURITY · AGENTS-pointer · .env.example/.gitignore/LICENSE `[size: M · risk: med]`
 Layers: `skills/lean-doc-generator/templates/` · DOCS_Guide §2 · `skills/lean-doc-generator/SKILL.md` (init)
@@ -151,6 +151,17 @@ the new standard; migrate re-run on a legacy layout proposes relocation, never c
 ## Execution Log
 <!-- Append-only, dated. Plan frozen at promote. -->
 
+### 2026-07-29 | T2 complete | Templates relocated + readers rewired (Sonnet dispatch + coordinator review)
+git-mv renames (ARCHITECTURE→architecture-overview · SETUP→development-setup · DEPLOY→split
+deployment-guide + deployment-rollback); prime slot 6, release-patch changelog target (root-first,
+legacy fallback), DOCS_Guide §10/§11, SKILL Golden-Rule/bundled-assets/close-row all
+canonical-first; close-time doc-freshness check woven into the close row (no net lines — SKILL.md
+held 106/110, CLAUDE.md 80/80). Template count claims 15→16 core (18 total) — qa-check tmpl-core
+passes. Fixture trace: legacy resolves via 2nd candidate, new via 1st, no dead ends. Coordinator
+review pass fixed 8 residual stale canonical refs the agent's file-list excluded (§2 example
+template name · SKILL Retro bucket · README/TODO/SPRINT template links). Remaining stale refs are
+T7's files (migration-map.md · lean-flow's own README). qa-check 56/0.
+
 ### 2026-07-29 | T1 complete | DOCS_Guide TemiDev core + ADR-012 (inline, decision-tier)
 G1/G2 batch-passed (D5 grilled → safe-scaffold allowlist). §2 rewritten as three lifecycle tables
 (root · .claude/ · docs/ tree) with Create←/Update←/Archive per row; §6 = 4-tier event-gated model
@@ -182,6 +193,13 @@ intake grill (full adoption · placement wins · AGENTS pointer · CHANGELOG dev
 | `docs/adr/ADR-012-temidev-repo-structure-standard.md` | T1 | records full adoption + deviations (D1–D5) | Low | template-conformant · index regenerated |
 | `docs/DECISIONS.md` | T1 | ADR-012 index row | Low | qa-check corpus refs |
 | `docs/knowledge-index.md` | T1 | regenerated (derived) | Low | qa-check "knowledge index current" |
+| `templates/{architecture-overview,development-setup,deployment-guide,deployment-rollback}.md.template` | T2 | git-mv renames + DEPLOY split to TemiDev placements | Med | qa-check tmpl-core 16=16 |
+| `templates/{CHANGELOG,README,TODO,SPRINT}.md.template` | T2 | internal links → new canonical paths (consumer scaffolds emit correct pointers) | Low | grep sweep clean |
+| `skills/prime/SKILL.md` | T2 | slot 6 canonical-first (`docs/architecture/overview.md`), legacy second | Med | fixture trace both layouts |
+| `skills/release-patch/SKILL.md` | T2 | changelog target root-first + deploy-guide pointer split | Med | cap 98/110 · self-review |
+| `skills/lean-doc-generator/SKILL.md` | T2 | placement rewiring + close-time doc-freshness check (in-place, no net lines) | High | cap 106/110 · qa-check |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T2 | §10/§11 + template-name example → canonical paths | Med | qa-check |
+| `.claude/CLAUDE.md` · `docs/ARCHITECTURE.md` | T2 | template-count claims 15→16 core (18 total) | Low | qa-check tmpl-core |
 
 ## Retro
 <!-- Written at close. -->
