@@ -25,7 +25,8 @@ For decisions where **being wrong is expensive** and there's genuine uncertainty
 positioning, pivots, hard architectural / scope forks, "am I crazy to do X?". NOT for one-right-answer
 questions, creation tasks, or processing/summarizing tasks. If you already know the answer and just
 want validation, expect the council to tell you things you don't want to hear — that's the point.
-Triggers are in the description; reserve it (~11 model calls/run).
+Triggers are in the description; reserve it (~11 model calls/run — each spawn re-pays the full base
+substrate, so cost ≈ 11 × context, not 11 small calls; ADR-010 cost term).
 
 ## The five advisors
 

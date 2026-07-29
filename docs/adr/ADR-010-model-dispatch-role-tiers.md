@@ -103,3 +103,14 @@ path is a **consumer-path** claim — lean-flow is markdown-only and cannot dogf
 model to spawn or parallelize; the deterministic path for large fan-out stays `/batch`·`/workflows` (kept out
 of core, ADR-002). The classification→dispatch indirection also assumes tasks are correctly classified at
 decompose/G1 — a mis-classification mis-routes.
+
+## Amendment (2026-07-29) — dispatch-cost awareness (N × substrate)
+
+**Status:** accepted · qualifies Decision §5 (route by nature) with a cost term. **Source:**
+[adhd-adaptation.md](../research/adhd-adaptation.md) (the scan's single keeper · TASK-099, SPRINT-029).
+
+**Decision.** Weigh parallel fan-out cost as **branch-count × substrate-size, not call-count**: every
+dispatched branch re-pays the full base substrate (CLAUDE.md + tool/skill context) before doing any work,
+so cheap-tier branches are cheap per *token*, not per *spawn* — a wide fan-out of trivial steps can cost
+more than doing them inline or sequentially. This sharpens, not weakens, default-spawn: the stated-reason
+clause for staying inline may cite this cost term.

@@ -34,9 +34,9 @@ ADR-010 is decided/append-only, so the note lands as an addendum, never a rewrit
 (no repo-specific path leaked); `/council`'s cost line extended only if it fits.
 
 **DoD:**
-- [ ] Cost-awareness note landed in ADR-010 (addendum) and/or `orchestrator/references/dispatch.md`
-- [ ] `/council` cost line checked — extended if it fits, else the skip noted in the Execution Log
-- [ ] Consumer-surface check (L-015) + line caps respected (SKILL.md ≤ ~110)
+- [x] Cost-awareness note landed in ADR-010 (addendum) and/or `orchestrator/references/dispatch.md`
+- [x] `/council` cost line checked — extended if it fits, else the skip noted in the Execution Log
+- [x] Consumer-surface check (L-015) + line caps respected (SKILL.md ≤ ~110)
 
 ## Decisions (pre-locked)
 - **D1** — Doc-only addendum; no dispatch behaviour change (scan verdict: micro-keeper). ADR-010 is
@@ -52,10 +52,19 @@ Governance at promote: L-009 promoted → CLAUDE.md anti-pattern (edit-safety bu
 80/80 by merging with L-042's bullet) · TASK-006's fused TODO.md heading restored (the promotion's
 3rd family occurrence) · TD-008 unchanged (re-reviewed at 028) · no §11 rotation due.
 
+### 2026-07-29 | T1 complete | N×substrate cost note landed in all three targets
+Batch G1+G2 approved (single task, no overlap map needed). Implemented inline — stated reason: three
+trivial doc edits; an execution dispatch would itself re-pay the substrate the note warns about.
+`/council`'s cost line fit and was extended (73→74/110). ADR-010 append-only respected (amendment,
+no decided text edited).
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/adr/ADR-010-model-dispatch-role-tiers.md` | T1 | appended cost-term amendment (N×substrate) | Low | qa-check corpus lint |
+| `skills/orchestrator/references/dispatch.md` | T1 | cost-term line in Parallel vs sequential | Low | qa-check + self-review |
+| `skills/council/SKILL.md` | T1 | cost line extended (spawn ≈ full substrate) | Low | qa-check cap 74/110 |
 
 ## Retro
 

@@ -41,6 +41,10 @@ tasks in one message, await it, then the next. Worktree isolation for a parallel
 the protocol below**; `/batch` (one worktree sub-agent per unit → PR each; `/workflows` watches) remains the
 escalation for very large fan-out where scripted determinism matters.
 
+**Cost term** — fan-out cost scales with **branch-count × substrate-size, not call-count**: every branch
+re-pays the full base substrate (CLAUDE.md + tool context) before doing any work; weigh it before fanning
+out many trivial steps (ADR-010 addendum 2026-07-29).
+
 ## Worktree dispatch protocol (parallel fleet)
 
 Fires at **sprint-bulk** when the G2 overlap map marks a batch's tasks disjoint (no shared file,
