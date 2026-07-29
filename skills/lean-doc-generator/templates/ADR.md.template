@@ -10,9 +10,8 @@ related: [ADR-NNN]
      deprecated/superseded) · WHY only, never HOW. Offer one only when the decision is hard-to-reverse
      AND surprising AND a real trade-off (DOCS_Guide §4). Worked example → references/ADR-example.md.
      Frontmatter is the ADR-009 knowledge metadata SSOT — if the project maintains a generated
-     knowledge index, source tags/domain vocab from its single origin and lint against it
-     (lean-flow itself: scripts/gen-index.sh TAGS/DOMAINS · qa-check.sh); otherwise keep a small,
-     consistent vocab. -->
+     knowledge index, source tags/domain vocab from its single origin and lint against it;
+     otherwise keep a small, consistent vocab. -->
 
 # ADR-NNN — [Short decision title] [CUSTOMIZE]
 

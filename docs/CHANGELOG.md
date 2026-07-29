@@ -11,6 +11,24 @@ status: current
 
 ---
 
+## v1.16.1 — Template De-leak + PRD Mapping (2026-07-29)
+
+PATCH — post-SPRINT-032 template audit (duplicate + consumer-leak sweep, all 32 templates).
+
+**What changed for you:**
+- **De-leak (L-015 class)** — four shipped templates dropped lean-flow-repo-specific references:
+  `QA-TESTCASE` ("lean-flow skill" wording + a pointer to an unshipped `docs/qa/README` genericized) ·
+  `ADR` + `RESEARCH` (removed the `scripts/gen-index.sh · qa-check.sh` parenthetical) · `LEARNINGS`
+  (removed `scripts/gen-index.sh` / `docs/knowledge-index.md` references).
+- **PRD durable-home mapping** — `task-decomposer/references/prd-and-slices.md` now states how an
+  approved PRD folds into `docs/product/requirements.md` + `acceptance-criteria.md` (user stories →
+  `R-n` requirements · testing decisions → acceptance-criteria blocks · sanitize first).
+- Audit verdict recorded: no duplicate templates — QA-TESTCASE vs testing-guide and PRD vs
+  product-requirements are deliberate splits (case-instance vs strategy · intake artifact vs
+  sanitized durable spec).
+
+---
+
 ## v1.16.0 — TemiDev Repo-Structure Standard (2026-07-29)
 
 MINOR — SPRINT-032 (TASK-067…073) — TemiDev repo-structure standard adoption (ADR-012).

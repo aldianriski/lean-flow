@@ -9,9 +9,8 @@ domain: [one project domain]
 related: [other-doc-id-or-ADR-NNN]
 ---
 <!-- Frontmatter is the ADR-009 knowledge metadata SSOT — if the project maintains a generated
-     knowledge index, source tags/domain vocab from its single origin and lint against it
-     (lean-flow itself: scripts/gen-index.sh TAGS/DOMAINS · qa-check.sh); otherwise keep a small,
-     consistent vocab. -->
+     knowledge index, source tags/domain vocab from its single origin and lint against it;
+     otherwise keep a small, consistent vocab. -->
 
 # Research — [the question, phrased as a question] [CUSTOMIZE]
 

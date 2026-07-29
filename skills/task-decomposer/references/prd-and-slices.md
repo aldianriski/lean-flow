@@ -45,6 +45,11 @@ What this PRD does NOT cover.
 Anything else worth recording.
 ```
 
+**Durable home mapping** — after approval, fold the PRD into `docs/product/requirements.md` +
+`acceptance-criteria.md` (DOCS_Guide §2): Problem/Solution/User Stories → numbered `R-n` functional
+requirements · Testing Decisions → acceptance-criteria blocks keyed to those `R-n`. Sanitize first
+(no client-confidential content). The raw PRD is intake working material — no durable file of its own.
+
 ## Seams (the testing skeleton)
 
 Before decomposing, sketch the seams you'll test the feature at. **Prefer existing seams; use the

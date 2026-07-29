@@ -19,9 +19,9 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 <!-- Per-entry metadata (schema, ADR-009): the heading carries `[tags: <tag>] [status: active|promoted|superseded]`
      (tags from the project's vocabulary). If the project generates a by-tag index, this file is the SSOT
-     and the index is derived — regenerate after edits (lean-flow: `sh scripts/gen-index.sh`). -->
+     and the index is derived — regenerate after edits. -->
 
-> **By-tag index** → generated from these entries if the project maintains one (lean-flow: `docs/knowledge-index.md` via `scripts/gen-index.sh`).
+> **By-tag index** → generated from these entries if the project maintains one.
 
 ---
 
