@@ -94,27 +94,4 @@ Manifests → 1.14.0 lockstep; skill roster unchanged (14). Additive — nothing
 
 ---
 
-## v1.13.0 — Fleet & Night-Run Build (2026-07-29)
-
-MINOR — bundles **SPRINT-026** (the build sprint for v1.12.0's decisions).
-
-**What changed for you:**
-- **Parallel worktree dispatch is first-class in `sprint-bulk`** — disjoint sprint tasks now
-  dispatch as worktree-isolated agents (one `Agent(isolation:"worktree")` per task, soft cap 3–5)
-  with a coordinator-only **merge-back queue** (G2-order `--no-ff` per task, two-tier review,
-  conflict + failure + cleanup paths incl. the Windows handle-lock and remote-base caveats) —
-  `orchestrator/references/dispatch.md`, wired from the SKILL Sequence line and CONTEXT §Streams
-  (L-042's per-hunk rule now binds intra-tree only).
-- **Night-run is operational** — `orchestrator/references/night-run.md` ships the pre-flight
-  checklist (all-AFK guard · zero open assumes · scoped `--allowedTools` build · `bypassPermissions`
-  never) + the OS-scheduled headless trigger recipe (cron / Task Scheduler). Wired from the
-  sprint-bulk Loop line. Watchdog + morning rollup land as TASK-098.
-- Both capabilities were **exercised on the sprint's own wave** — the protocol dispatched and
-  merged the very tasks that built it; the pre-flight guard correctly *refused* to arm an
-  unattended run over HITL tasks.
-
-Manifests → 1.13.0 lockstep; skill roster unchanged (14). Additive — nothing to migrate.
-
----
-
-_Older releases (**v1.12.0** and earlier) → [`docs/changelog/CHANGELOG-1.12.0.md`](changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](changelog/CHANGELOG-1.7.1.md)._
+_Older releases (**v1.13.0** and earlier) → [`docs/changelog/CHANGELOG-1.13.0.md`](changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](changelog/CHANGELOG-1.7.1.md)._

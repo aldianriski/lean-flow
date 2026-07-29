@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-031 — Tech-Debt Split** → docs/sprint/SPRINT-031-tech-debt-split.md
+> _(no active sprint — SPRINT-031 closed 2026-07-29 → v1.15.0 Tech-Debt split; archived per §11.)_
 
 ---
 
@@ -43,7 +43,7 @@ status: current
 
 ## Tech Debt
 
-> Moved → **`TECH-DEBT.md`** (root) — split 2026-07-29, SPRINT-031. Filed at Sprint Close, aged at Sprint Promote.
+> Moved → **`TECH-DEBT.md`** (root) — split 2026-07-29. Filed at Sprint Close, aged at Sprint Promote.
 
 ---
 

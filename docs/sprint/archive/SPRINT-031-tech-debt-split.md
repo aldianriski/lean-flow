@@ -3,7 +3,7 @@ sprint: 031
 slug: tech-debt-split
 owner: Maintainer
 last_updated: 2026-07-29
-status: active
+status: closed
 plan_commit: 44ae111
 close_commit: [set at close]
 update_trigger: sprint execute/close events
@@ -83,4 +83,24 @@ map built grep-first). New: L-050 filed — shipped SPRINT template + DOCS_Guide
 | `.claude-plugin/*.json` · `docs/CHANGELOG.md` · `docs/LEARNINGS.md` + index | T1 | v1.15.0 lockstep · MINOR entry · L-050 + regen | Low | qa-check lockstep + index green |
 
 ## Retro
-<!-- Written at close. -->
+
+**Retrieval check** — no miss; two priors applied *preemptively*: L-048 (grep the old version string
+before commit — caught the README footer pre-release, not post) · L-020 (wiring map built grep-first).
+
+**Worked**
+- grep-map + qa-check as a two-layer net: grep found every textual ref; the lint caught the one
+  non-greppable surface (ARCHITECTURE.md's template-count *claim*).
+- Three-question popup up front (fate of 040/047 · TD file placement) + combined G1/G2 popup —
+  all direction calls resolved in two rounds, zero mid-execution stalls.
+
+**Friction**
+- Consumer-leak sweeps pattern-match repo-specific *paths*, not *ID namespaces* — a repo-local
+  `TASK-040` ref shipped inside SPRINT.md.template for ~17 sprints, surfacing only when its target
+  was archived and the pointer dangled.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- Filed as **L-050** (count 1): leak sweeps over `templates/` + `references/` must also match
+  `TASK-`/`TD-`/`L-`/`ADR-` + repo names, not just paths.
+
+**Buckets routed** — Shipped → CHANGELOG v1.15.0 ✓ · Tech debt → none · Follow-ups → none ·
+Learnings → L-050 ✓ (index regenerated).
