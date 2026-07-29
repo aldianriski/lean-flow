@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-17
+last_updated: 2026-07-29
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -21,11 +21,27 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-043**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-045**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-045 [tags: process] [status: active]: A piped quality gate masks its exit code — `qa-check.sh | tail` returns *tail's* status, so a FAIL sailed into a `&&`-chained commit unseen (SPRINT-025: vocab-tag lint failure committed, caught only by reading the output after). Chain the commit on the *lint's own* exit (`sh qa-check.sh && git commit …`, no pipe), or read the full output before committing — never pipe a gate into a formatter inside the same chain that commits.
+- seen: Sprint-025
+- count: 1
+- promoted: no
+- related: L-013 (a "required" rule is only real if a check enforces it — and a check is only real if its exit code is read)
+
+---
+
+## L-044 [tags: tooling] [status: active]: Windows holds a handle-lock on a git worktree any shell has `cd`'d into — `git worktree remove` fails with Permission denied until a fresh shell runs it; partial failure leaves the admin entry deleted but the directory on disk (needs manual `rm -rf` + `git worktree prune`). Coordinator cleanup procedure: leave the worktree dir *before* removing it, retry from a fresh shell, verify with `git worktree list`. Feed into TASK-096's merge-back/cleanup step.
+- seen: Sprint-025
+- count: 1
+- promoted: no
+- related: L-043 (coordinator-only worktree cleanup) · docs/research/fog-fleet-orchestration.md (prototype friction)
 
 ---
 

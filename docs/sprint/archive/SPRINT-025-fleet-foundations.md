@@ -3,9 +3,9 @@ sprint: 025
 slug: fleet-foundations
 owner: Maintainer
 last_updated: 2026-07-29
-status: active
+status: closed
 plan_commit: 3a90916
-close_commit: —
+close_commit: pending
 update_trigger: sprint execute/close events
 ---
 
@@ -120,4 +120,27 @@ produced at design time) — all three DoD ticked.
 
 ## Retro
 
-_(written at close)_
+**Retrieval check** — no prior L/ADR contradicted. L-042's doctrine was *refined*, not broken
+(worktree isolation obsoletes the cross-tree hazard; intra-tree it still binds) — the durable-rule
+update rides TASK-096, not this sprint.
+
+**Worked**
+- Fog-map mode carried an epic from chart to full graduation inside one sprint — 2 research
+  tickets, 2 grills, 1 prototype, 3 graduated build tasks; no premature TASK ever forced.
+- 4-agent parallel wave-1 dispatch (disjoint per G2 map) — zero collisions, all four landed.
+- The prototype was cheap and decisive (2 worktree agents + a temp integration branch, minutes)
+  and surfaced a real Windows friction no desk research had (L-044).
+- T4's abuse-case prompt was dogfooded the same day it shipped — it fired on the consent-gate
+  grill (TASK-047 sample + fleet seam).
+
+**Friction**
+- A piped qa-check masked a FAIL into a commit (fix-commit needed) → L-045.
+- Windows handle-lock on worktree removal → L-044.
+- The promote cut needed a mid-gate adjustment (TASK-093 pulled in, D1) — the fog-map's
+  Task-ticket dependency was visible at decompose but not priced into the cut proposal.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- L-044 (worktree handle-lock cleanup) · L-045 (piped-gate exit masking) — both filed, count 1.
+
+**Buckets routed** — Shipped → CHANGELOG v1.12.0 · Tech debt → none new (TD-008 untouched) ·
+Follow-ups → TASK-096/097/098 (filed at graduation) · Learnings → L-044 · L-045.

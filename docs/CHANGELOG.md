@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-17
+last_updated: 2026-07-29
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,7 +11,27 @@ status: current
 
 ---
 
-## v1.11.0 — Loop Hygiene & Wiring (2026-07-17)
+## v1.12.0 — Fleet & Night-Run Foundations (2026-07-29)
+
+MINOR — bundles **SPRINT-025** (decide-before-build for two capability epics + a G2 security prompt).
+
+**What changed for you:**
+- **G2 now prompts a design-time abuse case** — a `risk: high` task touching auth / input /
+  secrets / data-exposure gets a one-line abuse-case sketch at the Design gate (merged into the
+  hard-to-reverse bullet, `orchestrator/SKILL.md`); complements — never replaces — the Review-time
+  `/security-review` row. Exercised on a real high-risk task the day it shipped.
+- **Fleet orchestration decided (not yet built)** — parallel worktree execution is fully
+  de-fogged: dispatch unit = the sprint task, sequential merge queue in G2-ownership order,
+  two-tier review, Claude-only v1; the merge path was prototyped end-to-end on Windows. Build
+  lands as TASK-096. Decision record → `docs/research/fog-fleet-orchestration.md`.
+- **Night-run mechanism chosen** — unattended overnight `sprint-bulk` via OS-scheduled headless
+  `claude -p` with `dontAsk` + a scoped allowlist (never `bypassPermissions`); gates front-loaded,
+  zero mid-run prompts. Build lands as TASK-097/098. → `docs/research/night-run.md`.
+- **AGENTS.md verdict** — no hand-authored template (dupe/drift); a *generated* stub + AGENTS.md
+  as the non-Claude brief carrier are parked until the fleet seam has a real consumer.
+  → `docs/research/agents-md-adoption.md`.
+
+Manifests → 1.12.0 lockstep; skill roster unchanged (14). Additive — nothing to migrate.
 
 MINOR — bundles **SPRINT-024** (every hygiene rule gets a matcher; the claimed loop wirings actually fire).
 

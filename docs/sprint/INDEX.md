@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-17
+last_updated: 2026-07-29
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-025 — Fleet & Night-Run Foundations — closed 2026-07-29 · (close commit recorded in file)
 - SPRINT-024 — Loop Hygiene & Wiring — closed 2026-07-17 · 296c01b
 - SPRINT-023 — Dispatch & Parallelization — closed 2026-07-10 · 3d28333
 - SPRINT-022 — Wiring Pass — closed 2026-07-10 · 5e827b2

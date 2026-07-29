@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-025 — Fleet & Night-Run Foundations** → docs/sprint/SPRINT-025-fleet-foundations.md
+> _(no active sprint — SPRINT-025 closed 2026-07-29 → v1.12.0; archived per §11.)_
 
 ---
 
@@ -30,18 +30,6 @@ status: current
 
 ### P1 — Next Phase Required
 
-- [ ] **TASK-089 — Drive the fleet-orchestration fog-map to graduation**  [size: L] [risk: med] [HITL]
-      done-when: all tickets in docs/research/fog-fleet-orchestration.md resolved & recorded in DECISIONS SO FAR (NOT-YET-SPECIFIED empty); cleared buildable work graduated into TASK-NNN; hard forks routed /council → ADR
-      touches:   docs/research/fog-fleet-orchestration.md · TODO.md (graduated tasks)
-      assumes:   external agents only via a BYO, opt-in, disabled-by-default seam (TASK-047 axiom); no shipped agent files/hooks
-      tracker:   docs/research/fog-fleet-orchestration.md (the fog-map is the tracker)
-      state:     ready
-- [ ] **TASK-090 — Research night-run: unattended overnight sprint-bulk**  [size: M] [risk: low] [AFK]
-      done-when: docs/research/night-run.md recommends a mechanism covering front-loaded gates (all G1/G2 + open questions + permission grants resolved pre-trigger) · checkpoint/recovery (handoff on stall) · per-task quality loop (self-review/verify) · a morning report format; build tasks filed as proposals, not applied
-      touches:   docs/research/
-      assumes:   gates are never bypassed — they fire before the run; zero mid-run confirmations is a design constraint, not a gate skip
-      tracker:   none — local research; first consumer is sprint-bulk AFK with larger/longer tasks
-      state:     ready
 - [ ] **TASK-096 — Wire worktree fleet dispatch + merge-back into sprint-bulk**  [size: M] [risk: med] [HITL]
       done-when: dispatch.md carries the worktree protocol (disjoint Tn → parallel Agent(isolation:"worktree") · soft cap 3–5 · per-task branch) AND the coordinator merge-queue procedure (G2-order --no-ff per task · expected-vs-surprise conflict paths · two-tier verify · cleanup incl. the Windows handle-lock note · stale-branch guardrail #51596); SKILL.md Sequence line + CONTEXT §Streams updated (L-042 narrowed to intra-tree); exercised once on a real sprint wave (L-007)
       touches:   skills/orchestrator/references/dispatch.md · skills/orchestrator/SKILL.md (110-cap: reword in place) · .claude/CONTEXT.md
@@ -63,13 +51,6 @@ status: current
 
 ### P2 — Quality / Polish
 
-- [ ] **TASK-088 — Add a design-time threat prompt to G2 for risk:high tasks**  [size: S] [risk: low] [HITL]
-      done-when: a `risk: high` task touching auth/input/secrets/data-exposure gets a one-line abuse-case sketch prompted at G2 before Implement (not a STRIDE checklist); wired so it fires (G2 checklist or review-scoping.md), exercised once on a sample high-risk task
-      touches:   skills/orchestrator/SKILL.md (at 110/110 — displace/merge a line) or references/review-scoping.md (uncapped) — placement is the G2 call
-      assumes:   G2-time prompt complements, never replaces, the Review-time /security-review skip-table row
-      tracker:   docs/research/architecture-baselines.md (sole keeper of the 13-candidate delta-scan)
-      state:     ready
-
 - [ ] **TASK-091 — Streamline housekeeping: archival, rotation, doc growth**  [size: M] [risk: low] [HITL]
       done-when: sprint-file + changelog archival/rotation is one documented repeatable pass (scripted only where trivial); a growth-compaction pass defined AND exercised once on the current corpus (docs/research/ · LEARNINGS) with a measured line delta — not spec-only (L-007); compaction proposes deletions, human approves
       touches:   docs/ · lean-doc-generator close/§11 wiring
@@ -81,12 +62,6 @@ status: current
       touches:   docs/research/graphify-daily-value.md
       assumes:   prior verdict (on-demand only, no integration) is the delta base; TASK-040 guardrails still bind any integration
       tracker:   https://github.com/Graphify-Labs/graphify
-      state:     ready
-- [ ] **TASK-093 — Scan: AGENTS.md standard adoption (agents.md)**  [size: S] [risk: low] [AFK]
-      done-when: delta-scan doc with a verdict on (a) lean-doc-generator emitting an AGENTS.md template for consumer repos, (b) AGENTS.md as the brief carrier for non-Claude agents — feeds the fog-map ticket in docs/research/fog-fleet-orchestration.md; keepers filed as proposals
-      touches:   docs/research/
-      assumes:   AGENTS.md complements, never replaces, CLAUDE.md/CONTEXT.md as lean-flow's own AI context
-      tracker:   https://agents.md/
       state:     ready
 - [ ] **TASK-094 — Scan: OpenAI harness-engineering adaptation**  [size: S] [risk: low] [AFK]
       done-when: delta-scan doc maps each technique to the existing surface first (L-017); only the unmatched remainder kept; fleet-relevant findings cross-referenced into the fog-map's harness-inventory ticket

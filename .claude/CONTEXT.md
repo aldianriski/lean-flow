@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-21
+last_updated: 2026-07-29
 update_trigger: Skill roster, the loop, gates, modes, or tiers changed
 status: current
 ---
@@ -59,7 +59,7 @@ The loop, above): `/task-decomposer` also emits a **fog-map** for foggy work too
 | Gate | Name | Where | Checks |
 |---|---|---|---|
 | G1 | Scope | all `/orchestrator` modes | goal restated · size S/M/L (L splits) · files/blast-radius · out-of-scope named · assumptions confirmed · decomposer-approved task → fast-path confirm (scope unchanged?) |
-| G2 | Design | `mvp` · `sprint-bulk` | approach + WHY · verifiable micro-tasks · ADR if hard-to-reverse · **overlap-ownership map** (shared files → single owner + commit order, before first task) · residual grill until unambiguous |
+| G2 | Design | `mvp` · `sprint-bulk` | approach + WHY · verifiable micro-tasks · ADR if hard-to-reverse · `risk:high` on auth/input/secrets/data → one-line abuse-case sketch · **overlap-ownership map** (shared files → single owner + commit order, before first task) · residual grill until unambiguous |
 
 Humans approve gates — the skill never self-approves. Review is a self-review checklist (no review agent).
 
