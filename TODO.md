@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-029 closed 2026-07-29 → v1.14.1 (PATCH); archived per §11.)_
+> **SPRINT-030 — Gate-Guard Decision** → docs/sprint/SPRINT-030-gate-guard-decision.md
 
 ---
 
@@ -36,8 +36,9 @@ status: current
 
 - [ ] **TASK-006 — Evaluate an opt-in PreToolUse gate-guard hook**  [size: M] [risk: med] [HITL]
       done-when: decision recorded (ADR/council) on whether enforced gates are worth a hook
-      next: **gather data first** — research Claude Code PreToolUse hooks (can a hook block a tool call on gate state? capabilities/limits) → draft a proposed ADR → decide (it touches the agent-free-core principle, so likely /council before the ADR)
-      state: blocked   (deferred — research hooks next session)
+      next: research DONE (2026-07-29 — feasible + fail-open, but **no per-hook opt-in ⇒ in-core = mandatory**, ruling out an in-plugin hook) → /council the A-vs-C fork (status quo vs opt-in sibling plugin) → ADR
+      tracker:   docs/research/pretooluse-gate-guard.md
+      state:     ready   (in SPRINT-030)
 - [ ] **TASK-040 — Derived, on-demand graph VIEW over the metadata (relational comprehension)**  [size: L] [risk: med] [HITL]
       done-when: a graph view is GENERATED from TASK-036's frontmatter (transitive supersedes lineage · cross-sprint domain clusters · orphan/dangling detection) — a disposable build artifact, never hand-edited, regenerated from the SSOT. Guardrails (ALL mandatory, or don't build): (i) regeneration wired to lean-doc-generator's write step; (ii) read-time staleness check — the view carries a source checksum/mtime and fails LOUD if the frontmatter is newer (a stale CACHE, not a stale fact); (iii) integrity lint (shared with TASK-036). graphify serves this ad-hoc until it's worth automating.
       touches:   docs/ (corpus-wide) · a generation script/skill · graphify (on-demand)
@@ -78,7 +79,7 @@ status: current
 
 > Move to `docs/CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — Sprint history → [`docs/CHANGELOG.md`](docs/CHANGELOG.md) (rotated archives → `docs/changelog/`).
+_(SPRINT-030 in flight — entries land at close.)_ — Sprint history → [`docs/CHANGELOG.md`](docs/CHANGELOG.md) (rotated archives → `docs/changelog/`).
 
 ---
 
