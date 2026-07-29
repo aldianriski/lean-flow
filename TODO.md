@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-030 closed 2026-07-29 → docs-only, no release (stays v1.14.2); archived per §11.)_
+> **SPRINT-031 — Tech-Debt Split** → docs/sprint/SPRINT-031-tech-debt-split.md
 
 ---
 
