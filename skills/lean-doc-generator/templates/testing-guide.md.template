@@ -1,0 +1,40 @@
+---
+owner: Dev
+last_updated: YYYY-MM-DD
+update_trigger: Strategy, harness, or coverage rule changes
+status: current
+---
+
+<!-- Lives at docs/testing/testing-guide.md (DOCS_Guide §2, ADR-012). Base-tier — created once a
+     test harness exists. Strategy + conventions, never a line-by-line HOW of individual tests. -->
+
+# [Project Name] — Testing Guide [CUSTOMIZE]
+
+## Strategy [CUSTOMIZE]
+[Which layers get which kind of test, and why — e.g. "business logic gets unit tests, API
+surface gets integration tests, critical user paths get a thin end-to-end layer."]
+
+## Test types
+
+| Type | Scope | Runner command |
+|:-----|:------|:----------------|
+| Unit | [single function/module, no external deps] | `[command placeholder]` |
+| Integration | [multiple modules, real or in-process deps] | `[command placeholder]` |
+| End-to-end | [full path through the running system] | `[command placeholder]` |
+
+## Test data [CUSTOMIZE]
+- Fixtures are **sanitized, synthetic data only** — never real customer/production data, even
+  redacted. See [`SECURITY.md`](../../SECURITY.md) for the PII handling rules this must comply
+  with.
+- [Where fixtures live / how they're generated]
+
+## Mocking strategy [CUSTOMIZE]
+- **Mock**: [external services, network calls, non-deterministic sources — time, randomness]
+- **Never mock**: [the system under test itself; domain logic being verified]
+
+## Coverage expectation [CUSTOMIZE]
+[Target — e.g. "N% line coverage on core logic", or "no hard threshold, reviewed per-PR."]
+
+## Running tests
+- Locally: `[command placeholder]`
+- CI: [where it runs, what gates a merge — e.g. "required check on PR"]

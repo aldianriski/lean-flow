@@ -21,7 +21,11 @@ bounded by the safe-scaffold allowlist (ADR-012).
      `architecture/data-flow.md` · `architecture/integrations.md` · `docs/api/` (below) ·
      `architecture/authentication.md` if not already fired by the DB/auth substrate check above.
    - **Medium/complex tier** (multi-dev, sustained, or architecturally forked) — `docs/adr/` +
-     `DECISIONS.md` · `docs/flows/`.
+     `DECISIONS.md` (create-lazily — DOCS_Guide §2 rule: never pre-created empty; scaffold
+     `DECISIONS.md` only once the first qualifying decision (§4) exists, and write the ADR
+     itself alongside it, not before) · `docs/flows/` (offer, via the same popup, creating the
+     FIRST flow doc from `flows.md.template` for the project's main business flow — e.g. the
+     primary user journey the app exists to support; skip if the user has no flow in mind yet).
    - Scaffold only what's chosen. Full tier table → DOCS_Guide §6.
 
    | Doc | Fires on | Template |
@@ -32,6 +36,8 @@ bounded by the safe-scaffold allowlist (ADR-012).
    | `docs/architecture/data-flow.md` | backend/integration tier | `architecture-data-flow.md.template` |
    | `docs/architecture/authentication.md` | auth exists | `architecture-authentication.md.template` |
    | `docs/architecture/integrations.md` | backend/integration tier | `architecture-integrations.md.template` |
+   | `docs/adr/ADR-NNN-<slug>.md` + `DECISIONS.md` | medium/complex tier, first qualifying decision | `ADR.md.template` + `DECISIONS.md.template` |
+   | `docs/flows/<slug>.md` | medium/complex tier, offered for the main flow | `flows.md.template` |
 
    **`docs/api/` placement rule** — `api/openapi.yaml` is project-generated; init **never**
    generates its content (no template). When an API is detected, init creates `docs/api/` and
@@ -59,12 +65,12 @@ bounded by the safe-scaffold allowlist (ADR-012).
 | `TECH-DEBT.md` | `TECH-DEBT.md.template` |
 | `.claude/CLAUDE.md` | `CLAUDE.md.template` |
 | `.claude/CONTEXT.md` | `CONTEXT.md.template` |
-| `docs/product/requirements.md` | inline format (DOCS_Guide §2; no template yet) |
-| `docs/product/acceptance-criteria.md` | inline format (DOCS_Guide §2; no template yet) |
+| `docs/product/requirements.md` | `product-requirements.md.template` |
+| `docs/product/acceptance-criteria.md` | `product-acceptance-criteria.md.template` |
 | `docs/architecture/overview.md` | `architecture-overview.md.template` |
 | `docs/development/setup.md` | `development-setup.md.template` |
-| `docs/development/coding-standards.md` | inline format (DOCS_Guide §2; no template yet) |
-| `docs/testing/testing-guide.md` | inline format (DOCS_Guide §2; no template yet) |
+| `docs/development/coding-standards.md` | `development-coding-standards.md.template` |
+| `docs/testing/testing-guide.md` | `testing-guide.md.template` |
 | `docs/deployment/deployment-guide.md` | `deployment-guide.md.template` |
 | `docs/deployment/rollback-guide.md` | `deployment-rollback.md.template` |
 

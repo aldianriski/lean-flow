@@ -1,0 +1,48 @@
+---
+owner: PM
+last_updated: YYYY-MM-DD
+update_trigger: A requirement is approved or changed (via PR)
+status: current
+---
+
+<!-- Lives at docs/product/requirements.md (DOCS_Guide §2, ADR-012). Base-tier — scaffolded at
+     init with real content, or the moment the first sanitized PRD lands. This is the
+     developer-facing SPEC derived from an approved PRD, not the PRD itself — never paste the
+     original PRD verbatim if it carries client-confidential or commercial content (pricing,
+     contract terms, competitor names); extract only what a developer needs to build correctly. -->
+
+# [Project Name] — Requirements [CUSTOMIZE]
+
+## Problem [CUSTOMIZE]
+[The problem this product/feature solves, in 2-4 sentences. WHY it exists, not HOW it's built.]
+
+## Users [CUSTOMIZE]
+- **[Primary user role]** — [what they need from this]
+- **[Secondary user role]** — [what they need from this]
+
+## Solution scope [CUSTOMIZE]
+
+**In scope:**
+- [what this solution covers]
+
+**Out of scope:**
+- [what it deliberately does not cover, and why]
+
+## Functional requirements [CUSTOMIZE]
+<!-- Each requirement: one line, testable, numbered — acceptance-criteria.md keys off these
+     R-numbers, so numbering is stable once assigned; never renumber, only append or deprecate. -->
+
+- **R1**: [the system does X, observable and testable]
+- **R2**: [the system does Y, observable and testable]
+
+## Non-functional requirements [CUSTOMIZE]
+
+| Category | Requirement |
+|:---------|:------------|
+| Performance | [e.g. p95 response time under N ms] |
+| Availability | [e.g. uptime target] |
+| Security | [e.g. auth model constraint — see `docs/architecture/authentication.md`] |
+| Scalability | [e.g. expected load / growth assumption] |
+
+## Open questions [CUSTOMIZE]
+- [a requirement question not yet resolved — routes to `/prototype` or the intake grill, never left as a silent assumption]

@@ -1,0 +1,49 @@
+---
+owner: Dev
+last_updated: YYYY-MM-DD
+update_trigger: A convention is adopted or changed (mirror what config enforces — don't duplicate it)
+status: current
+---
+
+<!-- Lives at docs/development/coding-standards.md (DOCS_Guide §2, ADR-012). Base-tier — created
+     at init. Records only what config CANNOT express: the WHY behind a convention and the
+     patterns config can't enforce. Never re-list a rule already enforced by .editorconfig /
+     .eslintrc / .prettierrc / commitlint — see the closing note. -->
+
+# [Project Name] — Coding Standards [CUSTOMIZE]
+
+## Naming conventions [CUSTOMIZE]
+- Files: [kebab-case / snake_case / PascalCase — per file type if it varies]
+- [Variables / functions / classes — convention + one filled example]
+
+## Folder structure
+See [`docs/architecture/overview.md`](../architecture/overview.md) for the directory layout and
+dependency rule — not duplicated here.
+
+## Error handling [CUSTOMIZE]
+[The project's pattern — e.g. "domain errors are typed and thrown; the outer layer maps them to
+a response shape." WHY this pattern, not a line-by-line how-to.]
+
+## Logging [CUSTOMIZE]
+- [What gets logged, at what level, and why]
+- Restrictions: see [`SECURITY.md`](../../SECURITY.md) § Logging restrictions — never log
+  secrets, tokens, or full PII.
+
+## Validation [CUSTOMIZE]
+[Where input validation happens — e.g. "at the API boundary only" — and the rule for what makes
+a value invalid.]
+
+## API response shape [CUSTOMIZE — delete this section if the project has no API]
+[The standard success/error envelope shape, and why it's consistent across endpoints.]
+
+## Frontend component & state rules [CUSTOMIZE — delete this section if the project has no frontend]
+- [Component structure convention — e.g. "one component per file, colocated styles"]
+- [State management pattern — what's local vs shared, and why]
+
+## Testing conventions
+See [`docs/testing/testing-guide.md`](../testing/testing-guide.md) for test types, mocking, and
+coverage — not duplicated here.
+
+<!-- Closing note: a standard enforceable by config (.editorconfig, .eslintrc, .prettierrc,
+     commitlint) belongs IN that config file, not here. This doc records only what config cannot
+     express — the reasoning and patterns behind a convention. -->

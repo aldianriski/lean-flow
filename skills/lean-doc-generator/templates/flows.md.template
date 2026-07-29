@@ -1,0 +1,45 @@
+---
+owner: Dev
+last_updated: YYYY-MM-DD
+update_trigger: This flow changes
+status: current
+---
+
+<!-- Lives at docs/flows/<slug>.md (DOCS_Guide §2, ADR-012) — medium/complex tier. ONE FILE PER
+     FLOW, kebab-case slug named after the flow itself (e.g. authentication-flow.md,
+     checkout-flow.md) — never a single shared flows.md. Created when a flow needs shared
+     understanding across more than one person; WHY/WHERE-level steps, never a line-by-line
+     code trace. -->
+
+# [Flow Name] Flow [CUSTOMIZE]
+
+> [One-line statement of what this flow accomplishes and who/what triggers it.]
+
+## Preconditions [CUSTOMIZE]
+- [state that must hold before this flow starts]
+
+```mermaid
+flowchart TD
+    A[Start: trigger] --> B{Precondition met?}
+    B -- No --> Z[Reject / early exit]
+    B -- Yes --> C[Step]
+    C --> D[Step]
+    D --> E{Decision point}
+    E -- branch 1 --> F[Outcome]
+    E -- branch 2 --> G[Failure / edge case]
+    F --> H[End: success]
+```
+
+## Steps that matter [CUSTOMIZE]
+1. [step — WHY it happens, not the implementation]
+2. [step]
+
+## Failure / edge branches [CUSTOMIZE]
+
+| Branch | Trigger | Outcome |
+|:-------|:--------|:--------|
+| [name] | [what causes it] | [what happens — retry, reject, fallback] |
+
+## Related architecture
+See [`docs/architecture/overview.md`](../architecture/overview.md) [+ `data-flow.md` /
+`authentication.md` / `integrations.md` if this flow touches them] [CUSTOMIZE].

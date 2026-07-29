@@ -1,0 +1,32 @@
+---
+owner: QA
+last_updated: YYYY-MM-DD
+update_trigger: Acceptance criteria change
+status: current
+---
+
+<!-- Lives at docs/product/acceptance-criteria.md (DOCS_Guide §2, ADR-012). Base-tier — created
+     alongside requirements.md. Keyed to the R-numbers in requirements.md, one block per
+     requirement. Teams that already track acceptance criteria in an issue tracker may keep the
+     criteria there instead of duplicating them here — in that case this file INDEXES/LINKS to
+     the tracker item per requirement rather than restating the criteria. -->
+
+# [Project Name] — Acceptance Criteria [CUSTOMIZE]
+
+## R1 — [short requirement title] [CUSTOMIZE]
+<!-- Given/When/Then style: -->
+- Given [context/precondition], when [action], then [observable outcome].
+- Given [context/precondition], when [action], then [observable outcome].
+
+<!-- Or checklist style — pick one per requirement, don't mix within a block:
+- [ ] [observable, testable condition]
+- [ ] [observable, testable condition]
+-->
+
+## R2 — [short requirement title] [CUSTOMIZE]
+- Given [context/precondition], when [action], then [observable outcome].
+
+<!-- Issue-tracker-indexed row, if criteria live externally:
+## R3 — [short requirement title]
+Tracked in [tracker] → [TICKET-ID]([link]) — criteria live there, not duplicated here.
+-->

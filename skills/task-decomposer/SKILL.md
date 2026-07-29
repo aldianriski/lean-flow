@@ -67,8 +67,10 @@ re-stating, and pruning the backlog later is `/triage`'s job — don't re-rank e
 
 **Large features / `--prd`**: synthesize a PRD first (Problem · Solution · exhaustive User Stories ·
 Implementation + Testing Decisions · Out-of-scope · seams), get approval, then decompose. Full PRD
-template + seams + the breakdown quiz → `${CLAUDE_SKILL_DIR}/references/prd-and-slices.md` (`${CLAUDE_SKILL_DIR}` resolves to this skill's install directory at load time). Output is
-local (TODO.md Backlog) — no external issue tracker.
+template + seams + the breakdown quiz → `${CLAUDE_SKILL_DIR}/references/prd-and-slices.md` (`${CLAUDE_SKILL_DIR}` resolves to this skill's install directory at load time). The approved PRD's
+durable home is `docs/product/requirements.md` (+ acceptance criteria →
+`docs/product/acceptance-criteria.md`), per DOCS_Guide §2 — sanitize before saving, never the
+conversation alone. Task output stays local (TODO.md Backlog) — no external issue tracker.
 
 ## Hard rules
 

@@ -101,9 +101,9 @@ development/coding-standards. task-decomposer's PRD output gains its durable hom
 `docs/product/requirements.md` as its durable home.
 
 **DoD:**
-- [ ] product/{requirements,acceptance-criteria} + flows + testing-guide + coding-standards templates with §2 rows
-- [ ] task-decomposer PRD output wired to `docs/product/requirements.md`
-- [ ] Medium/complex-gate init exercised on a scratch repo — exact set scaffolds
+- [x] product/{requirements,acceptance-criteria} + flows + testing-guide + coding-standards templates with §2 rows
+- [x] task-decomposer PRD output wired to `docs/product/requirements.md`
+- [x] Medium/complex-gate init exercised on a scratch repo — exact set scaffolds
 
 ### T6 — Add "what belongs in Git" boundary section + wire into init/migrate `[size: S · risk: med]`
 Layers: DOCS_Guide.md · `skills/lean-doc-generator/SKILL.md` · `references/migration-map.md`
@@ -150,6 +150,15 @@ the new standard; migrate re-run on a legacy layout proposes relocation, never c
 
 ## Execution Log
 <!-- Append-only, dated. Plan frozen at promote. -->
+
+### 2026-07-29 | T5 complete | Product/flows/testing/coding-standards templates + PRD durable home (Sonnet dispatch + coordinator review)
+5 templates (requirements 48 · acceptance-criteria 32 · flows 45 · testing-guide 40 ·
+coding-standards 49 — all under caps), leak-scan clean; sanitize-PRD comment + config-vs-doc
+boundary (standards config can express live in config) encoded. init.md base rows point at real
+template names; medium/complex tier adds adr/ create-lazily + first-flow offer. task-decomposer
+--prd now names docs/product/{requirements,acceptance-criteria}.md as the approved PRD's durable
+home (92/110). Counts 25→30 core (32 total); CLAUDE.md 80/80 zero-net. Fixture: 4 re-renders +
+flows/login-flow.md land coherently. qa-check 56/0.
 
 ### 2026-07-29 | T4 complete | Backend/integration doc-tree templates (Sonnet dispatch + coordinator review)
 6 templates landed (erd 44 · schema 45 · migration-guide 37 · data-flow 43 · authentication 44 ·
@@ -230,6 +239,10 @@ intake grill (full adoption · placement wins · AGENTS pointer · CHANGELOG dev
 | `templates/architecture-{data-flow,authentication,integrations}.md.template` | T4 | architecture siblings for the backend tier | Med | fixture exercise + leak-scan |
 | `skills/lean-doc-generator/references/init.md` | T4 | backend tier gating + openapi placement rule (api/README 3-liner) | Med | fixture exercise |
 | `.claude/CLAUDE.md` · `docs/ARCHITECTURE.md` | T4 | count claims 19→25 core (27 total) | Low | qa-check tmpl-core 25=25 |
+| `templates/{product-requirements,product-acceptance-criteria,flows,testing-guide,development-coding-standards}.md.template` | T5 | product/flows/testing/standards set (sanitize-PRD + config-vs-doc boundary encoded) | Med | fixture render + leak-scan |
+| `skills/lean-doc-generator/references/init.md` | T5 | base rows → real template names · medium/complex tier (adr create-lazily · first-flow offer) | Med | fixture exercise |
+| `skills/task-decomposer/SKILL.md` | T5 | --prd durable home → docs/product/ (92/110) | Low | diff review · qa-check cap |
+| `.claude/CLAUDE.md` · `docs/ARCHITECTURE.md` | T5 | count claims 25→30 core (32 total) | Low | qa-check tmpl-core 30=30 |
 
 ## Retro
 <!-- Written at close. -->
