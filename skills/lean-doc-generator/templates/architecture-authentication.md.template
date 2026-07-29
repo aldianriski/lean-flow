@@ -1,0 +1,44 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: Authn/authz architecture changes
+status: current
+---
+
+<!-- Lives at docs/architecture/authentication.md (DOCS_Guide §2, ADR-012). Auth-exists
+     substrate-conditional row. Architecture-level model only — the policy (who's allowed to do
+     what, secret handling, vuln reporting) lives in SECURITY.md; never duplicate it here. -->
+
+# [Project Name] — Authentication & Authorization [CUSTOMIZE]
+
+> The identity model this system uses, and how access is decided — concept level, not
+> implementation. Policy → `SECURITY.md`.
+
+## Authentication model [CUSTOMIZE]
+- Who verifies identity: [e.g. an identity provider, this service's own auth module]
+- Credential type: [e.g. password + [MFA method], SSO, API key]
+- Session/token shape: [e.g. short-lived JWT + refresh token; opaque session id] — concept only,
+  never the signing secret or implementation.
+
+## Authorization model [CUSTOMIZE]
+
+| Role | Can do | Cannot do |
+|:-----|:-------|:-----------|
+| `[role_one]` | [permission summary] | [explicit boundary] |
+| `[role_two]` | [permission summary] | [explicit boundary] |
+
+## Token / session lifecycle [CUSTOMIZE — optional]
+
+```mermaid
+sequenceDiagram
+    participant [Client]
+    participant [Auth Service]
+    participant [Resource Service]
+    [Client]->>[Auth Service]: [credential exchange]
+    [Auth Service]-->>[Client]: [token/session issued]
+    [Client]->>[Resource Service]: [request + token]
+    [Resource Service]-->>[Client]: [response, after verification]
+```
+
+Secret handling, rotation, and vulnerability-reporting policy → `SECURITY.md` (never duplicated
+here).

@@ -16,12 +16,27 @@ bounded by the safe-scaffold allowlist (ADR-012).
    detection in step 1, let the user confirm/override:
    - **Substrate-conditional rows** fire automatically when detected (confirmed, not asked):
      `database/erd.md` + `database/schema.md` + `database/migration-guide.md` (DB exists) ·
-     `architecture/authentication.md` (auth exists).
-   - **Backend/integration tier** (API or external integrations detected) — `api/openapi.yaml`
-     (placement rule, project-generated, no template) · `architecture/integrations.md`.
+     `architecture/authentication.md` (auth exists). Templates → table below.
+   - **Backend/integration tier** (API or external integrations detected) — scaffolds
+     `architecture/data-flow.md` · `architecture/integrations.md` · `docs/api/` (below) ·
+     `architecture/authentication.md` if not already fired by the DB/auth substrate check above.
    - **Medium/complex tier** (multi-dev, sustained, or architecturally forked) — `docs/adr/` +
      `DECISIONS.md` · `docs/flows/`.
    - Scaffold only what's chosen. Full tier table → DOCS_Guide §6.
+
+   | Doc | Fires on | Template |
+   |---|---|---|
+   | `docs/database/erd.md` | DB exists | `database-erd.md.template` |
+   | `docs/database/schema.md` | DB exists | `database-schema.md.template` |
+   | `docs/database/migration-guide.md` | DB exists | `database-migration-guide.md.template` |
+   | `docs/architecture/data-flow.md` | backend/integration tier | `architecture-data-flow.md.template` |
+   | `docs/architecture/authentication.md` | auth exists | `architecture-authentication.md.template` |
+   | `docs/architecture/integrations.md` | backend/integration tier | `architecture-integrations.md.template` |
+
+   **`docs/api/` placement rule** — `api/openapi.yaml` is project-generated; init **never**
+   generates its content (no template). When an API is detected, init creates `docs/api/` and
+   (write-if-absent) `docs/api/README.md`, a 3-liner: *"Commit the OpenAPI source (`openapi.yaml`)
+   here; generated HTML docs need not be committed."*
 4. **Safe-scaffold allowlist (ADR-012)** — the only non-doc files init writes. See below.
 5. **Write** — target canonical placement (DOCS_Guide §2: root for README/CONTRIBUTING/SECURITY/
    AGENTS/CHANGELOG/LICENSE/TODO/TECH-DEBT · `.claude/` for AI-context · `docs/` for the rest);

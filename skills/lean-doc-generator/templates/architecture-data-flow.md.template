@@ -1,0 +1,43 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: A documented data path changes
+status: current
+---
+
+<!-- Lives at docs/architecture/data-flow.md (DOCS_Guide §2, ADR-012). Fires once a non-trivial
+     data path exists (backend/integration tier, or spawned off architecture-overview.md at its
+     cap-hit per the §2 growth rule). Companion to architecture-overview.md.template. -->
+
+# [Project Name] — Data Flow [CUSTOMIZE]
+
+> The core paths data takes through the system — orientation for tracing a request, not a
+> line-by-line trace of the code.
+
+## [Core path one, e.g. "Request → Response"] [CUSTOMIZE]
+
+```mermaid
+flowchart LR
+    [Client] --> [Entry Component]
+    [Entry Component] --> [Processing Component]
+    [Processing Component] --> [Persistence]
+    [Processing Component] --> [Client]
+```
+
+## [Core path two, e.g. "Async / event path"] [CUSTOMIZE]
+
+```mermaid
+flowchart LR
+    [Producer] --> [Queue/Bus]
+    [Queue/Bus] --> [Consumer]
+    [Consumer] --> [Persistence]
+```
+
+## Path → components → persistence [CUSTOMIZE]
+
+| Path | Components touched | Persistence |
+|:-----|:--------------------|:-------------|
+| [path name] | [component list] | [store touched, or "none"] |
+| [path name] | [component list] | [store touched, or "none"] |
+
+Full component map → `architecture/overview.md`.

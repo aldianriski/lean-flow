@@ -87,10 +87,10 @@ openapi.yaml gets a placement rule only — spec content is project-generated, n
 **Acceptance:** init's backend/integration gate scaffolds exactly this set; §2 rows present.
 
 **DoD:**
-- [ ] database/{erd,schema,migration-guide} templates (ERD in Mermaid) with §2 rows
-- [ ] architecture/{data-flow,authentication,integrations} templates with §2 rows
-- [ ] openapi.yaml placement rule recorded (no template)
-- [ ] Backend-gate init exercised on a scratch repo — exact set scaffolds
+- [x] database/{erd,schema,migration-guide} templates (ERD in Mermaid) with §2 rows
+- [x] architecture/{data-flow,authentication,integrations} templates with §2 rows
+- [x] openapi.yaml placement rule recorded (no template)
+- [x] Backend-gate init exercised on a scratch repo — exact set scaffolds
 
 ### T5 — Add product/flows/testing/coding-standards templates (medium/complex gate) `[size: M · risk: med]`
 Layers: `skills/lean-doc-generator/templates/` · DOCS_Guide §2 · `skills/lean-doc-generator/SKILL.md` · `skills/task-decomposer/SKILL.md`
@@ -150,6 +150,16 @@ the new standard; migrate re-run on a legacy layout proposes relocation, never c
 
 ## Execution Log
 <!-- Append-only, dated. Plan frozen at promote. -->
+
+### 2026-07-29 | T4 complete | Backend/integration doc-tree templates (Sonnet dispatch + coordinator review)
+6 templates landed (erd 44 · schema 45 · migration-guide 37 · data-flow 43 · authentication 44 ·
+integrations 30 — all well under §2 caps), Mermaid skeletons, migration-files-are-SSOT stance,
+leak-scan clean. openapi placement rule in init.md (docs/api/README 3-liner, no template — spec is
+project-generated). Backend tier gating extended in init.md (DB/auth/API substrate-conditional).
+Counts 19→25 core (27 total); CLAUDE.md exactly 80/80. Fixture exercised with migrations+routes
+stubs: all 7 artifacts land, T3 files untouched. qa-check 56/0. **Carry-forward for T7:** lean-flow's
+own README.md:287 claims "15 canonical doc templates" — stale (pre-dates this sprint), qa-check
+doesn't lint README counts; fix in T7's README pass.
 
 ### 2026-07-29 | T3 complete | Root-file templates + init rework, TD-008 folded (Sonnet dispatch + coordinator review)
 CONTRIBUTING (53) · SECURITY (47) · AGENTS (9, footer-ownership — §3 README-exception extended by
@@ -216,6 +226,10 @@ intake grill (full adoption · placement wins · AGENTS pointer · CHANGELOG dev
 | `skills/lean-doc-generator/SKILL.md` | T3 | init section → 7-line summary + pointer; 104/110 | High | qa-check cap |
 | `references/DOCS_Guide.md` §3 | T3 | AGENTS footer-ownership exception sentence | Low | qa-check |
 | `.claude/CLAUDE.md` · `docs/ARCHITECTURE.md` | T3 | count claims 16→19 core (21 total) | Low | qa-check tmpl-core 19=19 |
+| `templates/database-{erd,schema,migration-guide}.md.template` | T4 | DB doc set (Mermaid ERD · conventions · migration policy; migrations stay SSOT) | Med | fixture exercise + leak-scan |
+| `templates/architecture-{data-flow,authentication,integrations}.md.template` | T4 | architecture siblings for the backend tier | Med | fixture exercise + leak-scan |
+| `skills/lean-doc-generator/references/init.md` | T4 | backend tier gating + openapi placement rule (api/README 3-liner) | Med | fixture exercise |
+| `.claude/CLAUDE.md` · `docs/ARCHITECTURE.md` | T4 | count claims 19→25 core (27 total) | Low | qa-check tmpl-core 25=25 |
 
 ## Retro
 <!-- Written at close. -->

@@ -1,0 +1,37 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: Migration or seed process changes
+status: current
+---
+
+<!-- Lives at docs/database/migration-guide.md (DOCS_Guide §2, ADR-012). DB-exists
+     substrate-conditional row. Policy level only — WHAT to run and WHY, never the migration
+     tool's internal HOW. Companion: database-erd.md.template · database-schema.md.template. -->
+
+# [Project Name] — Migration Guide [CUSTOMIZE]
+
+> How migrations are run, ordered, and rolled back — the operational runbook, not a tutorial on
+> the migration tool itself.
+
+## Running migrations [CUSTOMIZE]
+```bash
+[command to apply pending migrations]
+[command to check migration status]
+```
+
+## Ordering & rollback policy [CUSTOMIZE]
+- Migrations apply in [ordering rule, e.g. filename/timestamp order] and are never reordered
+  after merge.
+- Rollback: [the policy — e.g. "forward-fix only past staging" / "one-step-back via `[command]`"].
+
+## Seed data [CUSTOMIZE]
+- Seed fixtures live at `[path/to/seeds]` and contain **sanitized data only** — never a
+  production export or real user data.
+- Apply with: `[seed command]`
+
+## Migration DO / DON'T
+- DO keep each migration reversible where practical.
+- DO review a migration's blast radius before it touches a table with production data.
+- DON'T edit a migration that already shipped — write a new one.
+- DON'T seed with production data, even scrubbed-looking — sanitize from a fixture, not a dump.

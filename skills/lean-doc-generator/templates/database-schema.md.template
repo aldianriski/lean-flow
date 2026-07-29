@@ -1,0 +1,45 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: A migration lands
+status: current
+---
+
+<!-- Lives at docs/database/schema.md (DOCS_Guide §2, ADR-012). DB-exists substrate-conditional row.
+     States WHY/conventions only — the migration files are the schema SSOT; never duplicate DDL
+     here. Companion: database-erd.md.template (map) · database-migration-guide.md.template
+     (process). -->
+
+# [Project Name] — Schema Conventions [CUSTOMIZE]
+
+> The rules new tables/columns follow, and why — not a copy of the DDL. For the actual columns
+> and types, read the migration files at `[path/to/migrations]`; this doc never duplicates them.
+
+## Naming conventions [CUSTOMIZE]
+- Tables: [convention, e.g. snake_case, plural]
+- Columns: [convention, e.g. snake_case, singular]
+- Foreign keys: [convention, e.g. `<singular_table>_id`]
+- Indexes/constraints: [naming pattern]
+
+## Soft-delete rule [CUSTOMIZE]
+[State whether rows are ever hard-deleted, and the condition under which soft-delete applies —
+e.g. "user-owned records are soft-deleted via `deleted_at`; system/log tables are hard-deleted."]
+
+## Audit fields [CUSTOMIZE]
+Every [table category] carries:
+
+| Field | Type | Rule |
+|:------|:-----|:-----|
+| `created_at` | [type] | [set-once rule] |
+| `updated_at` | [type] | [refresh rule — trigger / app-layer] |
+| `deleted_at` | [type, nullable] | [null = active; set = soft-deleted] |
+
+## Important indexes [CUSTOMIZE]
+
+| Index | Table | Why |
+|:------|:------|:----|
+| `[index_name]` | `[table]` | [query pattern it serves] |
+
+## Schema SSOT
+The migration files at `[path/to/migrations]` are the schema source of truth. This doc records
+WHY (conventions, rationale) — never the DDL itself. If they diverge, fix this doc, not the code.

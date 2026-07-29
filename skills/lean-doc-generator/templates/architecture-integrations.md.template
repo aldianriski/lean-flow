@@ -1,0 +1,30 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: An integration is added or changed
+status: current
+---
+
+<!-- Lives at docs/architecture/integrations.md (DOCS_Guide §2, ADR-012). Backend/integration
+     tier row — fires on the first external integration. Companion to architecture-overview.md;
+     API contract itself lives at api/openapi.yaml (placement rule, no template). -->
+
+# [Project Name] — Integrations [CUSTOMIZE]
+
+> Every external system this service talks to, and how — orientation for "what breaks if X is
+> down," not the request/response schema (that's `api/openapi.yaml`).
+
+## Integrations [CUSTOMIZE]
+
+| Service | Purpose | Direction | Auth method | Failure mode |
+|:--------|:--------|:----------|:-------------|:--------------|
+| `[service name]` | [why this system depends on it] | [inbound/outbound/both] | [e.g. API key, OAuth, mTLS] | [what happens when it's unreachable — retry, degrade, hard-fail] |
+
+## Webhook / event conventions [CUSTOMIZE]
+- Inbound webhooks: [verification method, e.g. signature header] — endpoint(s) at `[path]`.
+- Outbound events: [what triggers one, delivery guarantee — at-least-once/exactly-once].
+- Retry/backoff policy: [summary, e.g. exponential, capped at N attempts].
+
+## API contract
+This service's own API surface is defined at `api/openapi.yaml` — this file covers *outbound*
+dependencies and inbound webhook conventions, not the contract this service exposes.

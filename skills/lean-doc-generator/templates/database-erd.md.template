@@ -1,0 +1,44 @@
+---
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+update_trigger: A migration changes entities or relations
+status: current
+---
+
+<!-- Lives at docs/database/erd.md (DOCS_Guide §2, ADR-012). DB-exists substrate-conditional row.
+     Companion: database-schema.md.template (conventions) · database-migration-guide.md.template
+     (process). The migration files remain the schema SSOT — this doc is a navigable map, not DDL. -->
+
+# [Project Name] — Entity Relationship Diagram [CUSTOMIZE]
+
+> A map of the core entities and how they relate — orientation for a new reader, not the schema
+> source of truth. The actual migration files are canonical; if this diagram and a migration
+> disagree, the migration wins and this doc is stale.
+
+## Diagram [CUSTOMIZE]
+
+```mermaid
+erDiagram
+    [ENTITY_ONE] ||--o{ [ENTITY_TWO] : "[relationship, e.g. has many]"
+    [ENTITY_TWO] }o--|| [ENTITY_THREE] : "[relationship, e.g. belongs to]"
+
+    [ENTITY_ONE] {
+        [type] [field_name] PK
+        [type] [field_name]
+    }
+    [ENTITY_TWO] {
+        [type] [field_name] PK
+        [type] [field_name] FK
+    }
+```
+
+## Main entities [CUSTOMIZE]
+
+| Entity | Responsibility | Key relations |
+|:-------|:----------------|:---------------|
+| `[ENTITY_ONE]` | [what this entity represents] | [related entity + cardinality] |
+| `[ENTITY_TWO]` | [what this entity represents] | [related entity + cardinality] |
+| `[ENTITY_THREE]` | [what this entity represents] | [related entity + cardinality] |
+
+Conventions (naming, soft-delete, audit fields) → `database/schema.md`. How migrations run/roll
+back → `database/migration-guide.md`.
