@@ -69,21 +69,39 @@ Claude-native first, generalizable to any CLI agent (codex / kimi / glm) via a B
 | Harness worktree inventory — what `EnterWorktree` / Agent `isolation: worktree` / workflows already give vs what lean-flow must add | Research · AFK | research-spike (↔ TASK-094 harness-engineering scan) | **resolved** → DECISIONS |
 | Merge-back strategy — N worktrees → one branch; conflict/failure path; relation to the G2 overlap-ownership map | Research · AFK | research-spike | **resolved** → DECISIONS |
 | Dispatch unit — what parallelizes: sprint Tn · streams · review passes? | Grilling · HITL | intake grill (AskUserQuestion) | **resolved** → DECISIONS |
-| External-agent consent gate — does the BYO seam extend to CLI agents; what config/consent shape? | Grilling · HITL | intake grill (likely /council if it forks hard) | open |
+| External-agent consent gate — does the BYO seam extend to CLI agents; what config/consent shape? | Grilling · HITL | intake grill (likely /council if it forks hard) | **resolved** → DECISIONS |
 | AGENTS.md as the brief carrier for non-Claude agents | Task | → TASK-093 scan | **resolved** → DECISIONS |
-| Feel the merge — run one real task pair in parallel worktrees end-to-end | Prototype · HITL | /prototype | open (after inventory + merge-back) |
+| Feel the merge — run one real task pair in parallel worktrees end-to-end | Prototype · HITL | /prototype | **resolved** → DECISIONS |
 
 Dependencies: *prototype* waits on *inventory* + *merge-back*; the two grilling tickets are
 unblocked; *AGENTS.md* resolves via TASK-093.
 
+- **Prototype: felt the merge** (2026-07-29, 2-task pair on this Windows host): end-to-end
+  **works** — `Agent(isolation:"worktree")` gave true sibling-invisible isolation (B could not see
+  A's file); per-task commit on own branch; coordinator ran the sequential merge queue (`--no-ff`,
+  one merge commit per task) on a *separate integration worktree* while the main tree stayed dirty
+  and untouched; clean graph; artifacts fully deleted after capture. **Friction for the build
+  task**: Windows holds a handle-lock on a worktree the shell has `cd`'d into — removal needs a
+  fresh shell + manual `rm`; bake into the cleanup procedure.
+- **Parallel review gating** (2026-07-29): resolved by the merge-back design — two-tier (full
+  review pre-merge inside each worktree · interaction-only smoke check post-merge per wave).
+- **Night-run composition** (2026-07-29): v1 keeps fleet (parallel width, interactive) and
+  night-run (sequential AFK length, headless) **separate** — composing them multiplies unattended
+  risk; revisit on a real signal after both ship.
+- **Concurrency cap** (2026-07-29): no first-party number exists — adopt the practical 3–5
+  guidance as a soft cap in the dispatch protocol, revisit if a first-party limit is published.
+
 ## NOT YET SPECIFIED (fog)
 
-- Parallel review/quality gating — who reviews N concurrent outputs, and when.
-- Night-run interaction (TASK-090) — can fleet width and unattended length compose in v1?
-- Concurrency caps / resource limits per host.
+_(empty — all fog resolved 2026-07-29. **GRADUATED**: TASK-096 (fleet dispatch + merge-back) ·
+TASK-097/098 (night-run core + resilience, via `night-run.md`). This map is now a decision
+record; reopen only if a graduated build task surfaces new fog.)_
 
 ## OUT OF SCOPE
 
+- **External CLI agents (codex/kimi/glm) — v1 is Claude-only** (owner grill, 2026-07-29): the seam
+  question returns only on a real consumer signal; when it does, the pre-decided shape stands —
+  BYO opt-in disabled-by-default (TASK-047 axiom) + AGENTS.md as brief carrier (TASK-093 verdict).
 - Shipping agent definitions or hooks in the plugin (agent-free core stands).
 - lean-flow owning provider credentials — BYO only.
 - Auto-approving G1/G2 — gates stay human-approved regardless of parallelism.

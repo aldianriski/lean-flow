@@ -50,10 +50,10 @@ graduated TASK-NNN entries in the Backlog.
 - [x] Research: harness worktree inventory resolved (what exists vs what lean-flow must add)
 - [x] Research: merge-back strategy resolved (N worktrees → one branch · conflict path · G2 overlap-map relation)
 - [x] Grill: dispatch unit pinned (popup)
-- [ ] Grill: external-agent consent gate pinned (/council if it forks hard)
+- [x] Grill: external-agent consent gate pinned (/council if it forks hard)
 - [x] AGENTS.md brief-carrier ticket resolved (← T1)
-- [ ] Prototype: one real task pair run end-to-end in parallel worktrees; answer captured, artifact deleted
-- [ ] Cleared work graduated → TASK-NNN; NOT-YET-SPECIFIED empty
+- [x] Prototype: one real task pair run end-to-end in parallel worktrees; answer captured, artifact deleted
+- [x] Cleared work graduated → TASK-NNN; NOT-YET-SPECIFIED empty
 
 ### T3 — Research night-run: unattended overnight sprint-bulk (TASK-090) `[size: M · risk: low]` [AFK]
 Layers: docs/research/
@@ -96,6 +96,12 @@ spec-only (L-007).
 Governance checklist signed off (no L-promotions due · no aged TD · §11 clean). TD-008 relevance
 note stays with pooled TASK-091. Cut approved as P1 pair + 088, then adjusted per D1.
 
+### 2026-07-29 | execute | T2 complete — fog-map graduated (096–098 filed)
+Wave-1 research folded (inventory · merge-queue); grills pinned dispatch-unit=Tn and
+**Claude-only fleet v1** (external agents → out-of-scope until real signal); prototype felt the
+merge end-to-end on Windows (works; handle-lock friction captured); owner approved graduating
+TASK-096/097/098 to Backlog P1. All 13 sprint DoD ticked.
+
 ### 2026-07-29 | execute | batch G1+G2 approved · wave 1 dispatched · T4 done
 Owner approved batch gates + T4 placement (merge into the G2 hard-to-reverse bullet, no line
 growth). Wave 1 in flight: T1 scan · T3 research · T2's two research tickets, parallel sonnet
@@ -107,6 +113,10 @@ produced at design time) — all three DoD ticked.
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `skills/orchestrator/SKILL.md` | T4 | G2 hard-to-reverse bullet now carries the risk:high abuse-case prompt (owner chose merge-in-place over reference) | Low | line count held at 110; prompt exercised on TASK-047 (sketch produced) |
+| `docs/research/agents-md-adoption.md` | T1 | new — AGENTS.md delta-scan verdicts (a) no / (b) yes-conditional | Low | self-review vs RESEARCH template; qa-check lint |
+| `docs/research/night-run.md` | T3 | new — night-run mechanism verdict (headless `claude -p` · dontAsk + allowlist) | Low | self-review; claims traced to official docs |
+| `docs/research/fog-fleet-orchestration.md` | T2 | chart → all 6 tickets resolved → graduated (decision record) | Low | prototype exercised the merge path for real |
+| `TODO.md` | T2 | TASK-096/097/098 graduated to Backlog P1 (owner-approved) | Low | entries match approved draft |
 
 ## Retro
 
