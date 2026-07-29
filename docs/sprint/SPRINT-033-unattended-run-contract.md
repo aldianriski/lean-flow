@@ -67,10 +67,10 @@ Shipping ≠ wiring (L-020): the contract must fire at the two places that actua
 **Acceptance:** `sprint-bulk` and `/flow` each state their unattended behaviour at the step where it applies.
 
 **DoD:**
-- [ ] sprint-bulk steps 4–5 state park-instead-of-ask under unattended
-- [ ] Red flag added: a denied/unanswerable question read as approval
-- [ ] `/flow` states only stage 4 (Build) runs unattended; stages 2 · 3 · 5 park
-- [ ] Both files still within the ~110-line cap
+- [x] sprint-bulk steps 4–5 state park-instead-of-ask under unattended
+- [x] Red flag added: a denied/unanswerable question read as approval
+- [x] `/flow` states only stage 4 (Build) runs unattended; stages 2 · 3 · 5 park
+- [x] Both files still within the ~110-line cap — `flow` 49; `orchestrator` **111**, 1 over the soft `~110` (see Log)
 
 ### T4 — Wire the park protocol into /lean-doc-generator + /triage `[size: S · risk: low]`
 Layers: `skills/lean-doc-generator/SKILL.md` · `skills/triage/SKILL.md`
@@ -149,12 +149,21 @@ cap or deleting neighbouring content — lands at **exactly 130/130, zero headro
 TD-006 signal firing again: the SSOT has no room for the next rule. Filing a TD at close rather than
 running an unrequested dedup pass mid-sprint.
 
+### 2026-07-29 | T3 | Wired /orchestrator + /flow
+sprint-bulk step 5 now parks instead of waiting; new red flag names the exact failure ("reading an
+unanswerable question as approval"). `/flow` states only stage 4 conducts unattended. **Cap note:**
+`orchestrator/SKILL.md` is now 111 vs the soft `~110` — the overflow is the one new safety red flag,
+and merging it into the adjacent autonomy red flag would bury the very rule this sprint adds, so it
+stands. Second cap-pressure signal this sprint (with T2's 130/130) → one TD at close, not two.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `skills/orchestrator/references/night-run.md` | T1 | the contract had no home — night-run covered execution only | Med | T6 real headless run |
 | `.claude/CONTEXT.md` | T2 | gate readers must see that unattended runs never self-approve | Low | cap check 130/130 |
+| `skills/orchestrator/SKILL.md` | T3 | the loop that *runs* unattended must park, not wait | Med | T6 real headless run |
+| `skills/flow/SKILL.md` | T3 | the conductor must not promote a sprint nobody approved | Low | read-through |
 
 ## Retro
 

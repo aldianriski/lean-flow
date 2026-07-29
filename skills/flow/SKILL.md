@@ -35,6 +35,7 @@ behind "conduct the loop".
 
 - **Never self-approve a gate.** G1 Scope and G2 Design still need explicit human sign-off — `/flow` pauses at each; it does not wave them through.
 - **Halt on first blocker** (BLOCKED / CRITICAL / human `block`) — report and wait.
+- **Unattended, only stage 4 conducts.** A headless run (declared at trigger, never inferred) executes a promoted Plan and decides nothing: stage 2 (Feed — the grill), stage 3 (Plan — promote's governance sign-off) and stage 5's `close` §11 retention all **park**; stage 6 `/handoff` is how it ends. If stage 3's precondition is unmet, the conducted run parks there rather than promoting a sprint nobody approved. Contract → `orchestrator/references/night-run.md` Part 0.
 - **One sprint per stream** — never a second sprint in a stream that already has one; parallel streams (sprint `stream:` frontmatter) each run their own. Single-stream repos: exactly one active sprint, as before.
 - The conducted path produces the **same artifacts** as à la carte — it only guarantees the sequence and that the Close governance actually runs.
 
