@@ -9,7 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
-- SPRINT-028 — Research Delta-Scan Batch — closed 2026-07-29 · docs-only, no release
+- SPRINT-028 — Research Delta-Scan Batch — closed 2026-07-29 · fc520e3 (docs-only, no release)
 - SPRINT-027 — Night-Run Watchdog & Housekeeping — closed 2026-07-29 · 36721a4
 - SPRINT-026 — Fleet & Night-Run Build — closed 2026-07-29 · 601e2e6
 - SPRINT-025 — Fleet & Night-Run Foundations — closed 2026-07-29 · 2eb9bd5
