@@ -45,8 +45,8 @@ equivalents count as "already covered"; only the provider-agnostic unmatched rem
 **Acceptance:** a delta-scan doc mapping each technique → existing surface, keepers isolated.
 
 **DoD:**
-- [ ] Scan doc maps every technique to the existing surface first (L-017); only the unmatched remainder kept
-- [ ] Fleet-relevant findings cross-referenced into the fog-map's harness-inventory ticket
+- [x] Scan doc maps every technique to the existing surface first (L-017); only the unmatched remainder kept
+- [x] Fleet-relevant findings cross-referenced into the fog-map's harness-inventory ticket
 
 ### T3 — Scan: uditakhourii/adhd skill repo `[size: S · risk: low · AFK]` <!-- TASK-095 -->
 Layers: `docs/research/` (new scan doc)
@@ -85,6 +85,13 @@ Commit-pinned README diff (be3dcfca → HEAD) + CHANGELOG 0.9.25–0.9.29, all f
 benchmarks (marketing, RAG-corpus-shaped) + opt-in `--strict` mode (the exact enforced-gate shape
 council rejected for TASK-040 — corroborates the TASK-006 tension, doesn't flip the stance). Token-cost
 claim (0 LLM credits, local AST) unchanged. No integration task. Doc 101/120 lines, append-only kept.
+
+### 2026-07-29 | T2 done | harness-engineering: CLEAN REJECT (0 keepers / 12 techniques)
+All 12 mapped to existing surface, the tracked TASK-006 tension, or host-infra out-of-scope. The one
+philosophical divergence (autonomous merge vs coordinator-owned) is a considered reject. **Source
+caveat:** openai.com 403'd (bot-blocked); scanned from an attributed gist mirror — noted in the doc's
+Fetch status. **Review catch (L-009 class):** agent inserted the fog-map cross-ref blockquote
+MID-TABLE, splitting the ticket table — relocated below the table, rows re-verified contiguous.
 
 ## Files Changed
 

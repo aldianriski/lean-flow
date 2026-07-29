@@ -76,6 +76,11 @@ Claude-native first, generalizable to any CLI agent (codex / kimi / glm) via a B
 Dependencies: *prototype* waits on *inventory* + *merge-back*; the two grilling tickets are
 unblocked; *AGENTS.md* resolves via TASK-093.
 
+> **TASK-094 cross-ref** (2026-07-29): scanned OpenAI's "harness engineering" article for a fleet
+> delta — 0 keepers, full scan → `docs/research/harness-engineering-adaptation.md`. Its one real
+> divergence (fully autonomous agent merge) is a considered reject, not a gap: this map's
+> merge-back queue stays coordinator-owned by design.
+
 - **Prototype: felt the merge** (2026-07-29, 2-task pair on this Windows host): end-to-end
   **works** — `Agent(isolation:"worktree")` gave true sibling-invisible isolation (B could not see
   A's file); per-task commit on own branch; coordinator ran the sequential merge queue (`--no-ff`,
