@@ -15,6 +15,13 @@ don't hand-reconcile, and you're not lost in your own existing code.
      out-of-scope artifact (adlc-flow's, app-specific, generated) as a dupe/consolidate candidate; two
      *frameworks'* same-named files (e.g. a lean-flow `CONTEXT.md` beside an adlc-flow one) are
      coexistence, not a dupe. Heuristic only — flags for human judgment, never an auto-verdict.
+   - **Boundary scan (§12)** — also scan the tracked tree for **DOCS_Guide §12b** violations: committed
+     secrets/dumps/backups by pattern (`.env`, `*.pem`, `id_rsa*`, `*.sql` dumps, `service-account*.json`)
+     plus obvious PII fixtures. **Report-only** — list each hit with its §12 proper-home routing in the
+     migrate plan; never auto-delete, never auto-rewrite git history. A committed secret additionally
+     needs **rotation** (removing the file from the tree doesn't un-leak it) — surface that as an
+     owner-action, not something migrate does. Purging the secret from git history is out of scope; point
+     the user to the host's security process.
 2. **Plan** — for *each* existing doc, propose one action: **keep · reformat · relocate · split ·
    index · archive · consolidate · retire · leave (out of scope)** — with its lean-flow target and a
    one-line why. Present the whole plan; **wait for approval**. Never start rewriting before the human

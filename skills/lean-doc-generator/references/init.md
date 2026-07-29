@@ -85,7 +85,7 @@ reported:
 | File | Content rule |
 |---|---|
 | `.env.example` | Variable **names only**, detected from the codebase (env-var reads, config loaders) — **never values**. |
-| `.gitignore` | Standard generated-artifact classes for the detected stack (build output, dependency dirs, editor/OS cruft, local env files). Full content rule lands as the **§12 boundary rule** in DOCS_Guide — this is a forward pointer, not the final spec. |
+| `.gitignore` | DOCS_Guide **§12c** classes (build output, dependency dirs, editor/OS cruft, local env files) as the standard baseline, plus stack-detected additions on top (e.g. a Python repo adds `__pycache__/`, a Node repo adds `node_modules/`). |
 | `LICENSE` | User chooses a license; a private repo gets a proprietary notice instead. |
 
 Every write (or skip-because-exists) is listed in the init report. `settings.json` and every other

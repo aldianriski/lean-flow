@@ -114,9 +114,9 @@ meeting notes → proper homes: secret manager · document storage · PM tool ·
 committed violations report-only.
 
 **DoD:**
-- [ ] Boundary section in DOCS_Guide (decision rule + never-commit lists + proper-home table)
-- [ ] init .gitignore scaffold derives from it
-- [ ] migrate adoption scan flags violations (report-only) — traced on a fixture with a planted `.env`
+- [x] Boundary section in DOCS_Guide (decision rule + never-commit lists + proper-home table)
+- [x] init .gitignore scaffold derives from it
+- [x] migrate adoption scan flags violations (report-only) — traced on a fixture with a planted `.env`
 
 ### T7 — Update migration map for legacy-lean → TemiDev layout + end-to-end consumer verify `[size: M · risk: med]`
 Layers: `references/migration-map.md` · README.md · `.claude/CONTEXT.md` · CHANGELOG
@@ -150,6 +150,14 @@ the new standard; migrate re-run on a legacy layout proposes relocation, never c
 
 ## Execution Log
 <!-- Append-only, dated. Plan frozen at promote. -->
+
+### 2026-07-29 | T6 complete | §12 Git boundary + init/migrate wiring (Sonnet dispatch + coordinator review)
+DOCS_Guide gains §12 (47 lines): decision rule table · never-commit table with proper-home routing ·
+generated-excludes classes · the 5-home clean separation · "private repo = potentially exposed".
+§2's .gitignore forward-ref now resolves. init .gitignore derives from §12c; migrate detect gains a
+Boundary scan (§12b, report-only + rotation owner-action — removal doesn't un-leak history; purge →
+host security process). Fixture trace: planted .env + dump.sql both flagged with routing;
+migrations/001_init.sql correctly NOT flagged (DDL ≠ dump). qa-check 56/0.
 
 ### 2026-07-29 | T5 complete | Product/flows/testing/coding-standards templates + PRD durable home (Sonnet dispatch + coordinator review)
 5 templates (requirements 48 · acceptance-criteria 32 · flows 45 · testing-guide 40 ·
@@ -243,6 +251,8 @@ intake grill (full adoption · placement wins · AGENTS pointer · CHANGELOG dev
 | `skills/lean-doc-generator/references/init.md` | T5 | base rows → real template names · medium/complex tier (adr create-lazily · first-flow offer) | Med | fixture exercise |
 | `skills/task-decomposer/SKILL.md` | T5 | --prd durable home → docs/product/ (92/110) | Low | diff review · qa-check cap |
 | `.claude/CLAUDE.md` · `docs/ARCHITECTURE.md` | T5 | count claims 25→30 core (32 total) | Low | qa-check tmpl-core 30=30 |
+| `references/DOCS_Guide.md` §12 | T6 | the Git boundary: decision rule · never-commit routing · excludes · 5-home separation | Med | fixture boundary-scan trace |
+| `references/init.md` · `references/migration-map.md` | T6 | .gitignore ← §12c · migrate detect + boundary scan (report-only, rotation owner-action) | Med | fixture trace (.env + dump.sql flagged, DDL not) |
 
 ## Retro
 <!-- Written at close. -->

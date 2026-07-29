@@ -319,3 +319,53 @@ them**. Append-only is preserved *inside* each archive file.
 scan-based triggers (TD collapse · rotation · LEARNINGS collapse · the soft cap) run at **Promote**
 as **doc-aging**, alongside tech-debt aging in the governance review. Always propose → approve →
 apply; never compress silently.
+
+---
+
+## §12 — The Git boundary (what belongs in the repo, what never does)
+
+Placement (§2) says *where in the repo*; this section says *whether the repo at all*. A doc/file
+clears the boundary on content, not format — a well-formatted secret is still a secret.
+
+**a. The decision rule.** Commit it when it:
+
+| Commit when it… | Keep it out when it is… |
+|---|---|
+| must change together with code | commercial / legal / HR / financial / client-management material |
+| is required to understand the code | confidential or personal data |
+| is needed to run / test / deploy / maintain | a large editable design source |
+| benefits from version history + code review | temporary, or reproducible by a command |
+| contains no secrets / personal / commercial data | capable of exposing production infrastructure or credentials |
+
+**b. Never-commit table** — category → examples → proper home instead:
+
+| Category | Examples | Proper home |
+|---|---|---|
+| Secrets & credentials | `.env`, `*.pem`, `id_rsa`, `service-account.json`, API keys, tokens | secret manager |
+| Client contracts / NDAs / legal | signed agreements, legal correspondence | controlled document storage |
+| Pricing / financial | proposals, invoices, salaries | document storage |
+| Personal & customer data | real records, PII, medical, payment, production DB exports | production systems only — sanitized fixtures in-repo, e.g. `{"name":"Example User","email":"user@example.test"}` |
+| Raw production logs | app/server logs pulled from prod | logging / monitoring platform |
+| Database backups | `backup.sql`, `production-dump.sql` | backup storage (small FAKE seed files are fine in-repo) |
+| Original design sources | large Figma exports, `.ai` / `.psd`, video mockups | design tool / asset storage — only assets the app actually uses go in `public/` or `src/assets/` |
+| Meeting notes | raw notes from any meeting | convert outcomes into requirements / ADRs / issues; never commit the raw notes |
+| Draft proposals / pitch decks | unshipped commercial drafts | document storage |
+
+**c. Generated/temporary excludes.** The standard `.gitignore` classes: `node_modules/`, `dist/`,
+`build/`, `coverage/`, `.cache/`, `*.log`, `.DS_Store`, `Thumbs.db`, IDE dirs (`.idea/` + personal
+`.vscode/settings.json` — shared `.vscode/extensions.json` MAY be committed). Rule: **anything
+reproducible by a command stays out**; the only exceptions are artifacts a deployment/distribution
+process actually requires.
+
+**d. The clean separation:**
+
+- **Git** = source + technical truth
+- **PM tool** = tasks / progress
+- **Document storage** = contracts / BRD / commercial
+- **Design tool** = UI/UX sources
+- **Secret manager** = credentials
+
+Even a private repo is treated as potentially exposed.
+
+**Wiring.** `init`'s `.gitignore` safe-scaffold derives its content from **§12c** (write-if-absent);
+`migrate`'s adoption scan checks the tree against **§12b** (report-only — never auto-remediates).
