@@ -4,7 +4,7 @@ slug: temidev-repo-standard
 owner: Maintainer
 last_updated: 2026-07-29
 status: active
-plan_commit: [set after plan-locked commit]
+plan_commit: ba30a52
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
