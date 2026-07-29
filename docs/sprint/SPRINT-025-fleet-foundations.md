@@ -65,8 +65,8 @@ checkpoint/recovery (handoff on stall) · per-task quality loop (self-review/ver
 report format.
 
 **DoD:**
-- [ ] `docs/research/night-run.md` written (RESEARCH template) covering all four areas
-- [ ] build tasks filed as proposals, not applied
+- [x] `docs/research/night-run.md` written (RESEARCH template) covering all four areas
+- [x] build tasks filed as proposals, not applied
 
 ### T4 — Add G2 design-time threat prompt for risk:high (TASK-088) `[size: S · risk: low]` [HITL]
 Layers: skills/orchestrator/SKILL.md (at 110/110) or references/review-scoping.md
