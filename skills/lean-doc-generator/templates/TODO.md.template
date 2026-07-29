@@ -67,15 +67,8 @@ status: current
 
 ## Tech Debt
 
-<!-- IDs use the TD-NNN namespace (separate from TASK-NNN). Rows are never deleted — when resolved,
-     mark status: resolved → TASK-NNN for the audit trail; a row resolved ≥ 3 sprints ago collapses
-     to one line (§11). Filed automatically by the Sprint Close Retro. Aging (checked at Sprint
-     Promote): unaddressed ≥ 3 sprints → re-review; severity: high → auto-escalate to Backlog P1.
-     severity ∈ trivial · minor · medium · high. -->
-
-- **TD-001** severity: medium | status: open | created: Sprint-001 [CUSTOMIZE: example — replace or remove]
-  - Summary: [one-line description of the debt]
-  - done-when: [observable outcome when resolved]
+> Lives in its own root ledger → **`TECH-DEBT.md`** (`templates/TECH-DEBT.md.template`) — filed by
+> the Sprint Close Retro, aged at Sprint Promote (`severity: high` auto-escalates to Backlog P1 here).
 
 ---
 

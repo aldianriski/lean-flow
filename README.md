@@ -204,7 +204,7 @@ generating any core doc, so output matches a fixed format instead of free-improv
 [`skills/lean-doc-generator/references/DOCS_Guide.md`](skills/lean-doc-generator/references/DOCS_Guide.md).
 
 **Continuous learning** — every iteration feeds the next. At **Sprint Close** the Retro auto-files
-four buckets to durable homes — *shipped* → CHANGELOG, *tech debt* → `TD-NNN`, *follow-ups* →
+four buckets to durable homes — *shipped* → CHANGELOG, *tech debt* → `TD-NNN` (root `TECH-DEBT.md`), *follow-ups* →
 `TASK-NNN` backlog, *learnings* → `LEARNINGS.md`. At **Sprint Promote** a governance checkpoint
 promotes any learning that recurs (**count ≥ 2**) into a durable rule and ages tech debt. Learning
 and debt can't silently rot. Governance → DOCS_Guide §10.
@@ -219,7 +219,8 @@ The skills write durable, human-readable state into your repo — plain markdown
 
 | Artifact | Written by | Holds |
 |---|---|---|
-| `TODO.md` | `/task-decomposer` · `/triage` | backlog (P0–P3) · tech debt · active-sprint pointer(s) |
+| `TODO.md` | `/task-decomposer` · `/triage` | backlog (P0–P3) · active-sprint pointer(s) |
+| `TECH-DEBT.md` | sprint close · `/triage` | tech-debt ledger (`TD-NNN` — filed at close, aged at promote) |
 | `docs/sprint/SPRINT-NNN-*.md` | `/lean-doc-generator` | active sprint plan · execution log · retro |
 | `docs/DECISIONS.md` / `docs/adr/` | `/lean-doc-generator` | ADRs — the WHY behind hard-to-reverse choices |
 | `docs/CHANGELOG.md` | `/release-patch` · sprint close | what shipped, per release |
@@ -283,8 +284,8 @@ Full map — composition rule, the loop, integration points, boundaries →
 skills/           14 skills — /flow conductor + 12 stages + /council (auto-discovered)
   lean-doc-generator/
     references/   DOCS_Guide.md · migration-map.md · ADR-example.md
-    templates/    14 canonical doc templates (core, incl. SPRINT · ADR · RESEARCH · DEPLOY · BUG;
-                  +2 non-core: DESIGN · QA-TESTCASE = 16 total)
+    templates/    15 canonical doc templates (core, incl. SPRINT · ADR · RESEARCH · DEPLOY · BUG ·
+                  TECH-DEBT; +2 non-core: DESIGN · QA-TESTCASE = 17 total)
   tdd/references/             testability.md
   diagnose/references/        feedback-loops.md
   task-decomposer/references/ prd-and-slices.md · fog-map.md
@@ -293,7 +294,7 @@ skills/           14 skills — /flow conductor + 12 stages + /council (auto-dis
   council/                    opt-in agent decision aid
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · roster — SSOT)
 docs/             ARCHITECTURE.md · CHANGELOG.md · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
-TODO.md · README.md
+TODO.md · TECH-DEBT.md · README.md
 ```
 
 </details>
@@ -341,7 +342,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-07-29 · status: current · v1.14.2</sub>
+<sub>Doc owner: Maintainer · last updated 2026-07-29 · status: current · v1.15.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge

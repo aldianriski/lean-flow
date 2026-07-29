@@ -75,7 +75,7 @@ filename) — content untouched. Propose these in the per-file plan like any oth
 | `SETUP.md` (root) | `docs/SETUP.md` |
 | `DEPLOY.md` / `deploy/` (root) | `docs/DEPLOY.md` (align to `DEPLOY.md.template`) |
 | `CONTEXT.md` / `CLAUDE.md` (root) | `.claude/CONTEXT.md` / `.claude/CLAUDE.md` |
-| `README.md` · `TODO.md` | stay at root (front-door · daily working file) — never relocate |
+| `README.md` · `TODO.md` · `TECH-DEBT.md` | stay at root (front-door · daily working files) — never relocate |
 
 ## Known mappings — dev-flow / adlc-flow → lean-flow
 
@@ -86,7 +86,8 @@ filename) — content untouched. Propose these in the per-file plan like any oth
 | `.claude/CONTEXT.md` (dev-flow vocab · gates · agent roster) | reformat | lean-flow `CONTEXT.md` (loop · gates · modes · roster) |
 | `.claude/CLAUDE.md` | reformat | `CLAUDE.md.template` shape (Behavioral Guidelines incl. concise-reporting) |
 | sprint files | reformat | `SPRINT.md.template` (Retro → §10 routing) |
-| `TODO.md` | reformat | Backlog-pool (P0–P3) + Tech Debt + Active-Sprint **pointer** |
+| `TODO.md` | reformat | Backlog-pool (P0–P3) + Active-Sprint **pointer**; a § Tech Debt inside it **splits out** (next row) |
+| tech debt inside `TODO.md` (or an ad-hoc debt list) | split + relocate | root `TECH-DEBT.md` via `TECH-DEBT.md.template` — `TD-NNN` rows move verbatim; `TODO.md` keeps a pointer line |
 | `CHANGELOG.md` | keep / align | Keep-a-Changelog; sprint-close feeds it |
 | ad-hoc deploy doc · `deploy/` · `RELEASE.md` | reformat + relocate | `docs/DEPLOY.md` via `DEPLOY.md.template` (operational runbook; code-HOW → comments) |
 | research · spike · decision write-ups · `notes/` | reformat | `docs/research/<slug>.md` via `RESEARCH.md.template` (desk synthesis → feeds an ADR) |

@@ -11,6 +11,19 @@ status: current
 
 ---
 
+## v1.15.0 — Tech-Debt Split (2026-07-29)
+
+MINOR — SPRINT-031 (TASK-066).
+
+**What changed for you:**
+- **Tech Debt gets its own root ledger** — new core template `TECH-DEBT.md.template` renders root `TECH-DEBT.md`; `TODO.md` keeps the Backlog + active-sprint pointer only (a pointer line replaces § Tech Debt). Two big queues no longer crowd one file.
+- **Fully wired** — Sprint Close files `TD-NNN` there · Promote ages it · `/triage` grooms it (legacy in-TODO § still read) · `/prime` slot 5 reads it · DOCS_Guide §2/§10/§11 + migration-map updated; adopted repos: `migrate` now splits an in-TODO § Tech Debt out verbatim.
+- **De-leak** — repo-specific `TASK-040` pointer removed from the shipped SPRINT template + DOCS_Guide retrieval-miss note (L-015 class).
+
+Repo housekeeping (same day, pre-sprint): TASK-040 + TASK-047 routed to `.out-of-scope/` with revisit conditions — Backlog now empty.
+
+---
+
 ## 2026-07-29 — SPRINT-030 Gate-Guard Decision (docs-only · no release, stays v1.14.2)
 
 TASK-006 decided after a same-day PreToolUse feasibility sweep (`docs/research/pretooluse-gate-guard.md`):

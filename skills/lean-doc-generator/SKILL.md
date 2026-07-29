@@ -60,7 +60,7 @@ re-run procedure → `${CLAUDE_SKILL_DIR}/references/migration-map.md`.
 For a **greenfield** repo with no lean-flow docs yet — the twin of migrate (decision:
 `docs/research/init-vs-migrate.md`). **Scope-interactive + docs-only:**
 
-1. **Core set (always)** — `CLAUDE.md` · `CONTEXT.md` · `README.md` · `TODO.md` · `ARCHITECTURE.md`, each via the §6 template-load protocol.
+1. **Core set (always)** — `CLAUDE.md` · `CONTEXT.md` · `README.md` · `TODO.md` · `TECH-DEBT.md` · `ARCHITECTURE.md`, each via the §6 template-load protocol.
 2. **Optional docs** — offer DESIGN (frontend) · DEPLOY (service/release) · RESEARCH via an **AskUserQuestion popup**, defaulting by repo type (manifest/stack); scaffold only what's chosen.
 3. **Docs-only** — `init` **never** writes `.claude/settings.json` or any non-doc file; the safe-command allowlist stays a documented opt-in, not an init side effect.
 4. **Verify** — `/prime` reads cleanly; ownership headers + placement per DOCS_Guide §2/§3.
@@ -90,7 +90,7 @@ one pointer per stream in TODO § Active Sprint); single-stream repos omit it �
 | "close" / "sprint done" | Verify all DoD `[x]`; **sweep the full session** (Execution Log + any TD/follow-up surfaced mid-run but not yet filed) for the buckets; write the **Retro** + route its buckets (§10); set `status: closed` + `close_commit`; clear that stream's pointer in TODO § Active Sprint; **run §11 retention as one propose→approve pass** — apply only on owner approval: **archival pass** (move closed sprint → `docs/sprint/archive/` + a line in `docs/sprint/INDEX.md` · remove shipped tasks' Backlog entries outright, no shipped-in comments · scrub remaining TODO.md refs to the closed SPRINT-NNN outside § Active Sprint · verify CHANGELOG rotation links resolve) + **compaction sweep** (periodic, same gate: promoted `L-NNN` bodies → one-line pointers; superseded/duplicated research → supersede note or archive; measured line delta reported); squash-commit `sprint(N): <summary>`; then **fixes-only → `/release-patch` (PATCH) · feature sprint → MINOR by hand** (release-patch is PATCH-only) |
 
 **Retro at close** — first **sweep the full session** (the Execution Log + any TD/follow-up surfaced mid-run but not yet filed), then sort the sprint into four buckets and **route each to its durable home** (DOCS_Guide §10):
-Shipped → `docs/CHANGELOG.md` · Tech debt → `TD-NNN` in TODO § Tech Debt · Follow-ups → `TASK-NNN` in TODO § Backlog · Learnings → `L-NNN` in `docs/LEARNINGS.md`. **Auto-file all four** (per `templates/LEARNINGS.md.template`); show the user what was filed.
+Shipped → `docs/CHANGELOG.md` · Tech debt → `TD-NNN` in root `TECH-DEBT.md` · Follow-ups → `TASK-NNN` in TODO § Backlog · Learnings → `L-NNN` in `docs/LEARNINGS.md`. **Auto-file all four** (per `templates/LEARNINGS.md.template`); show the user what was filed.
 
 **Governance review at promote** — before planning, run the scan and **emit it as a checklist the owner signs off on**, never silent prose:
 `☐ L-promotion (count≥2, promoted:no): <findings|none>` · `☐ TD aging (≥3 sprints unaddressed): <findings|none>` · `☐ doc-aging §11 (TD collapse · CHANGELOG rotation · LEARNINGS pointer-collapse · TODO ~150-line cap): <findings|none>`.

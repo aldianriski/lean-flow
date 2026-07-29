@@ -1,0 +1,32 @@
+---
+owner: [role — e.g. "Tech Lead", "Dev Lead"] [CUSTOMIZE]
+last_updated: YYYY-MM-DD
+update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
+status: current
+---
+
+# [Project Name] — Tech Debt Ledger [CUSTOMIZE]
+
+> **How to use this file**
+> - **Filed automatically** — the Sprint Close Retro routes its tech-debt bucket here as `TD-NNN` rows.
+> - **Aged at Sprint Promote** — unaddressed ≥ 3 sprints → re-review prompt; `severity: high` →
+>   auto-escalate to `TODO.md` Backlog P1.
+> - **Never deleted** — resolved debt is marked `status: resolved → TASK-NNN` for the audit trail;
+>   a row resolved ≥ 3 sprints ago collapses to one line in § Resolved (§11).
+> - IDs use the `TD-NNN` namespace (separate from `TASK-NNN`); ids are monotonic, never reused.
+> - `severity` ∈ trivial · minor · medium · high
+
+---
+
+## Tech Debt
+
+- **TD-001** severity: medium | status: open | created: Sprint-001 [CUSTOMIZE: example — replace or remove]
+  - Summary: [one-line description of the debt]
+  - done-when: [observable outcome when resolved]
+
+---
+
+## Resolved (collapsed)
+
+<!-- A row resolved ≥ 3 sprints ago collapses to one line here (§11); git holds the full history. -->
+- resolved: **TD-000** → SPRINT-000 [CUSTOMIZE: example — replace or remove]

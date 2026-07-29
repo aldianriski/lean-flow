@@ -23,6 +23,7 @@
 |---|---|---|---|---|---|
 | `README.md` | root | Anyone | no hard cap¹ | Project scope changes | `templates/README.md.template` |
 | `TODO.md` | root | Dev / AI | ~150 soft (§11) | Backlog change · sprint promote/close | `templates/TODO.md.template` |
+| `TECH-DEBT.md` | root | Dev / AI | collapsed rows (§11) | Sprint close files TD · promote ages it · debt resolved | `templates/TECH-DEBT.md.template` |
 | `CLAUDE.md` | `.claude/` | AI assistant | 80 | Project shape / workflow / anti-patterns change | `templates/CLAUDE.md.template` |
 | `CONTEXT.md` | `.claude/` | AI assistant | 130 (ADR-007 — dense SSOT) | Vocabulary / patterns / conventions change | `templates/CONTEXT.md.template` |
 | `ARCHITECTURE.md` | `docs/` | Tech lead | 150 | Major structural change | `templates/ARCHITECTURE.md.template` |
@@ -39,7 +40,7 @@
 Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`. Paths above are relative to that dir.
 
 **Placement is canonical.** Root keeps only the daily working files (`README.md` front-door ·
-`TODO.md`); AI-context lives in `.claude/`; everything else lives in `docs/`. Generation targets
+`TODO.md` · `TECH-DEBT.md`); AI-context lives in `.claude/`; everything else lives in `docs/`. Generation targets
 these paths; `/prime` searches them first (legacy root locations still matched, second); `migrate`
 relocates a legacy layout (`git mv` + inbound-link fixes — content untouched).
 
@@ -216,14 +217,13 @@ into four buckets, each **routed to a durable home** (don't leave them in the sp
 | Bucket | Routes to |
 |---|---|
 | Shipped | `docs/CHANGELOG.md` |
-| Tech debt | `TD-NNN` row in `TODO.md` § Tech Debt (`severity` + `created: Sprint-NNN`) |
+| Tech debt | `TD-NNN` row in root `TECH-DEBT.md` (`severity` + `created: Sprint-NNN`) |
 | Follow-ups | `TASK-NNN` entry in `TODO.md` § Backlog (re-enters the loop) |
 | Learnings | `L-NNN` entry in `docs/LEARNINGS.md` |
 
 **Retrieval-miss check** (at close) — also ask: *did we fail to find, or contradict, a prior
 `L-NNN`/ADR this sprint?* A yes is a fileable friction (→ Learnings bucket) **and** the observed signal
-for investing in a derived knowledge-graph view (TASK-040) — track the miss rather than guessing on
-corpus size.
+for investing in a derived knowledge-graph view — track the miss rather than guessing on corpus size.
 
 **Promotion rule** — a learning that recurs (**count ≥ 2** — a second sprint hits the same friction)
 is promoted from a ledger line into a *durable* rule: a `CLAUDE.md` anti-pattern, a `CONTEXT.md`
@@ -252,7 +252,7 @@ them**. Append-only is preserved *inside* each archive file.
 | Ledger | Trigger | Action |
 |---|---|---|
 | `TODO.md` Backlog entries (shipped/promoted) | sprint close | **remove outright** (propose→approve) — no shipped-in-SPRINT breadcrumb comments left in TODO.md; history's durable homes are `docs/CHANGELOG.md` + `docs/sprint/archive/` |
-| `TODO.md` § Tech Debt | `resolved` ≥ 3 sprints ago | collapse the row to one line: `TD-NNN resolved → TASK-NNN (Sprint-NNN)` |
+| `TECH-DEBT.md` | `resolved` ≥ 3 sprints ago | collapse the row to one line in § Resolved: `TD-NNN resolved → TASK-NNN (Sprint-NNN)` |
 | `TODO.md` whole file | > ~150 lines at promote | flag in the governance review; prune with the user |
 | `docs/CHANGELOG.md` | a new MINOR version lands | keep current + previous minor inline; older blocks move verbatim → `docs/changelog/CHANGELOG-<version>.md` + one link line |
 | `docs/LEARNINGS.md` | an entry reaches `promoted: yes` | collapse it to a pointer line — `L-NNN → promoted: <where>`; the durable rule is the record now. **Ids are monotonic, never reused** — pruning removes the body, never frees the id; the next new id = highest-ever + 1 |

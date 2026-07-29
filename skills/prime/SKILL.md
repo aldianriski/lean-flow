@@ -29,7 +29,7 @@ locations second. Adapt the globs to the host project's layout.
 | 2 | `.claude/CONTEXT.md`, `CONTEXT.md` | Vocabulary · gates · modes (if the project uses one) |
 | 3 | `README.md` — *presence-check by default* | Front-door (humans); overlaps 1·2·6 → **full read deferred** (note below) |
 | 4 | MEMORY index (harness-resolved; fallback: `memory/MEMORY.md`, `.claude/memory/MEMORY.md`) | Sprint state, feedback, references |
-| 5 | `TODO.md`, `docs/sprint/SPRINT-*.md` | Active task list — frontmatter + open `- [ ]` items only |
+| 5 | `TODO.md`, `TECH-DEBT.md`, `docs/sprint/SPRINT-*.md` | Active task list + debt ledger — frontmatter + open `- [ ]` items only |
 | 6 | `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` | Module map / where-things-live (the durable map) |
 
 **README is a fallback (token discipline).** It is the human front-door and overlaps CLAUDE.md (1) +

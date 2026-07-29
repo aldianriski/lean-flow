@@ -87,7 +87,7 @@ only the models it **dispatches** on (Agent-tool `model:`); the session model is
 
 ## Sprint model
 
-- **`TODO.md`** = Backlog pool (P0–P3) + Tech Debt; `/triage` grooms it; § Active Sprint is a pointer.
+- **`TODO.md`** = Backlog pool (P0–P3); § Active Sprint is a pointer. **`TECH-DEBT.md`** (root) = the `TD-NNN` ledger — filed at close, aged at promote. `/triage` grooms both.
 - **`docs/sprint/SPRINT-NNN-<slug>.md`** = the active sprint (`SPRINT.md.template`): Theme · Scope · Plan (Tn + **DoD `[ ]`**) · Owner-action · Decisions→ADR · Assumptions · **Execution Log** (append-only; plan frozen at promote — a mid-sprint scope shift logs a `scope-change`: what broke · impact · re-confirm G2, before editing the Plan) · Files Changed · **Retro** (§10).
 - Flow: `promote` renders the sprint (sets `plan_commit`) → `sprint-bulk` loops the DoD → execute appends to the Log → `close` writes the Retro, routes buckets, sets `close_commit`. `/prime` counts open DoD.
 - **Streams** (optional) — parallel streams run one active sprint *each* (`stream:` frontmatter · one pointer per stream); cross-stream file overlap → coordinate, never parallel-build. **Disjoint tasks may parallel-build in isolated worktrees** (one `Agent(isolation:"worktree")` per task + coordinator merge-back queue → `orchestrator/references/dispatch.md`); L-042's per-hunk staging rule (`git add -p` + verify `git diff --cached`, never a plain `git add <shared>` over another's WIP) binds **intra-tree** — one shared working tree, or the coordinator staging merge resolutions. Single-stream omits `stream:`.
