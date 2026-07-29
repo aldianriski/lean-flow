@@ -197,9 +197,10 @@ full mode/gate contract → [`.claude/CONTEXT.md`](.claude/CONTEXT.md) (SSOT).
 `claude -p "/orchestrator sprint-bulk unattended" --permission-mode dontAsk --allowedTools "<scoped list>"`,
 fired by cron / Task Scheduler. The charter is **execute-only** — the run executes a Plan a human already
 approved and decides nothing new. Two rules make that safe. **Unattended is declared, never inferred**
-(no signal → it behaves interactively). And **absence ≠ consent**: under `dontAsk` a gate question comes
-back *denied, not answered*, so a denial, a timeout, or a missing human is a **BLOCK** — never a
-default-yes, never self-approval. Anything needing a human (a gate, a grill, `promote`'s governance
+(no signal → it behaves interactively). And **absence ≠ consent**: a headless session has *no ask
+channel at all* — `AskUserQuestion` isn't registered there and `dontAsk` auto-denies anything that would
+prompt — so a missing channel, a denial, or a missing human is a **BLOCK**, never a default-yes and
+never an invitation to reason the answer out and carry on. Anything needing a human (a gate, a grill, `promote`'s governance
 sign-off, `close`'s §11 retention, a `/triage` apply) is **parked** — recorded with its unblock condition
 — while disjoint AFK work carries on; the run then halts cleanly through `/handoff`, and morning `/prime`
 reads it back. It never reshapes a task to dodge a gate. `bypassPermissions` is never the fallback.

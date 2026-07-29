@@ -63,7 +63,7 @@ The loop, above): `/task-decomposer` also emits a **fog-map** for foggy work too
 
 Humans approve gates — the skill never self-approves. Review is a self-review checklist (no review agent).
 
-**Unattended** (headless night-run) — charter **execute-only**: run a promoted Plan, decide nothing. **Declared** at trigger (`sprint-bulk unattended`), never inferred. **Absence ≠ consent**: under `dontAsk` a gate question returns *denied, not answered* — denial/timeout/no-human = BLOCK, never a default-yes.
+**Unattended** (headless night-run) — charter **execute-only**: run a promoted Plan, decide nothing. **Declared** at trigger (`sprint-bulk unattended`), never inferred. **Absence ≠ consent**: headless has *no ask channel* (`AskUserQuestion` unregistered; `dontAsk` auto-denies) — missing channel/denial/timeout = BLOCK, never a default-yes, and never reason the answer out yourself.
 A HITL step is **parked** (record → continue disjoint AFK → clean halt via `/handoff`), never asked, decided, or worked around; boundary derives from **AFK-safe = additive + reversible + already-approved-in-scope**; a gate is pre-signable only if its subject is frozen at pre-flight. Table + protocol → `orchestrator/references/night-run.md` Part 0.
 
 ## Modes (`/orchestrator`)

@@ -16,11 +16,14 @@ interactive. There is no reliable in-session test for "is a human watching", and
 unsafe in *both* directions — a false AFK self-approves, a false HITL stalls — so it is an explicit
 input, never a deduction.
 
-**Absence ≠ consent.** Under `dontAsk` every prompting tool call is auto-denied and the session never
-waits — so an `AskUserQuestion` raised at a gate comes back **denied, not answered**. A denial, a
-timeout, or a missing human is a **BLOCK**. Never a default-yes, never "proceed with the recommended
-option", never self-approval. This is the invariant the rest of this file exists to protect: if
-anything here appears to conflict with it, this wins.
+**Absence ≠ consent.** A headless session has **no ask channel at all** — `AskUserQuestion` is not even
+registered there (verified: `ToolSearch select:AskUserQuestion` → *"No matching deferred tools found"*,
+session flagged non-interactive), and under `dontAsk` any tool call that would prompt is auto-denied
+without waiting. So a gate question cannot be asked, let alone answered. **A missing channel, a denial,
+or a timeout is a BLOCK.** Never a default-yes, never "proceed with the recommended option", never
+self-approval. Note the real pressure this creates: unable to ask, an agent's natural next move is to
+*reason out the answer itself and carry on* — that is the failure this contract exists to stop. It is
+the invariant the rest of this file protects; if anything here appears to conflict with it, this wins.
 
 **The derivation rule** — the boundary is *derived*, not memorized, so a step that never made the
 table below still resolves:
@@ -54,7 +57,7 @@ not decide what the Plan should be, and it does not dispose of what the Plan pro
 
 **Park protocol.** On reaching a ⛔ step:
 
-1. **Don't ask** (the answer would be a denial) and **don't decide**.
+1. **Don't ask** (there is no channel) and — the harder half — **don't decide**.
 2. **Write the park record** — one rollup line (Part 4) in the sprint Execution Log. No sprint file to
    write into (e.g. parked at `promote`) → the record goes in the `/handoff` doc instead.
 3. **Continue disjoint AFK work** — anything with no shared file and no `depends-on` against the

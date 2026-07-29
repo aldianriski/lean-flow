@@ -17,10 +17,11 @@ MINOR — SPRINT-033. Night-run shipped the execution half; this ships the part 
 unattended run does when it *reaches* a step only a human may take.
 
 **What changed for you:**
-- **Absence ≠ consent** — under `--permission-mode dontAsk` a gate `AskUserQuestion` comes back
-  *denied, not answered*. A denial, a timeout, or a missing human is now explicitly a **BLOCK** —
-  never a default-yes, never self-approval. Previously nothing said so, so a gate could be passed
-  by nobody.
+- **Absence ≠ consent** — a headless session has **no ask channel at all**: `AskUserQuestion` isn't
+  registered there, and `--permission-mode dontAsk` auto-denies anything that would prompt. A missing
+  channel, a denial, or a missing human is now explicitly a **BLOCK** — never a default-yes, never
+  self-approval, and never a licence to reason the answer out and carry on. Previously nothing said
+  so, so a gate could be passed by nobody.
 - **Execute-only charter** — an unattended run executes a Plan a human already approved and decides
   nothing new. A gate is pre-signable only if its subject **exists and is frozen** at pre-flight, so
   `promote` (which *forms* the Plan) is never pre-approvable.
