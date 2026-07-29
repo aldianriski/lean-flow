@@ -3,9 +3,9 @@ sprint: 028
 slug: research-delta-scan-batch
 owner: Maintainer
 last_updated: 2026-07-29
-status: active
+status: closed
 plan_commit: 558fb1d
-close_commit: —
+close_commit: pending
 update_trigger: sprint execute/close events
 ---
 
@@ -112,13 +112,22 @@ remainder — the N×substrate dispatch-cost multiplier (absent from ADR-010 + d
 
 ## Retro
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint? (yes → a Learnings-bucket friction + the TASK-040 signal)
+**Retrieval check** — none: L-009 · L-014 · L-017 · L-043 · L-046 were all found and actively
+applied (no miss, no contradiction; no TASK-040 signal).
 
 **Worked**
-- _(at close)_
+- 3-wide shared-tree parallel dispatch: zero collisions, git-ban held, both new-file agents and the
+  edit-in-place agent stayed inside their assigned files. Worktrees correctly rejected at G2 (L-046).
+- Fetch-to-cite briefs (L-014) produced commit-pinned evidence (T1 diffed the README at the prior
+  verdict's date) — the re-verdict is checkable, not vibes.
+- Scoped per-task commits off one settled wave; qa-check gated on its own exit (L-045 applied).
 
 **Friction**
-- _(at close)_
+- gen-index run mid-wave → stale-index QA FAIL; had to regenerate after the wave settled (→ L-047).
+- T2's cross-ref landed mid-table, splitting the ticket table — L-009's second occurrence, caught
+  only by coordinator review (→ L-009 count 2, promotion due next promote).
+- openai.com bot-blocked (403 ×2); T2 scanned an attributed gist mirror — provenance caveat recorded
+  in the doc's Fetch status, not ledger-worthy.
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
-- _(at close)_
+**Buckets routed** — Shipped → CHANGELOG (docs-only dated note, no release) · Tech debt → none ·
+Follow-ups → TASK-099 (filed mid-run) · Learnings → L-009 bump + L-047 (docs/LEARNINGS.md).

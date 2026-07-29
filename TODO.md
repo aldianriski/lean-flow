@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-028 — Research Delta-Scan Batch** → docs/sprint/SPRINT-028-research-delta-scan-batch.md
+> _(no active sprint — SPRINT-028 closed 2026-07-29, docs-only, no release; archived per §11.)_
 
 ---
 
@@ -31,25 +31,6 @@ status: current
 ### P1 — Next Phase Required
 
 ### P2 — Quality / Polish
-
-- [ ] **TASK-092 — Delta re-scan: Graphify-Labs/graphify vs prior verdict**  [size: S] [risk: low] [AFK]
-      done-when: docs/research/graphify-daily-value.md carries a dated re-verdict — the token-cost / popularity claims tested against the current repo feature set per L-017 (delta over existing surface, not standalone merit); on-demand stance re-affirmed OR an integration task filed with evidence
-      touches:   docs/research/graphify-daily-value.md
-      assumes:   prior verdict (on-demand only, no integration) is the delta base; TASK-040 guardrails still bind any integration
-      tracker:   https://github.com/Graphify-Labs/graphify
-      state:     ready
-- [ ] **TASK-094 — Scan: OpenAI harness-engineering adaptation**  [size: S] [risk: low] [AFK]
-      done-when: delta-scan doc maps each technique to the existing surface first (L-017); only the unmatched remainder kept; fleet-relevant findings cross-referenced into the fog-map's harness-inventory ticket
-      touches:   docs/research/
-      assumes:   article is provider-agnostic enough to adapt; Claude-harness equivalents count as "already covered"
-      tracker:   https://openai.com/index/harness-engineering/
-      state:     ready
-- [ ] **TASK-095 — Scan: uditakhourii/adhd skill repo**  [size: S] [risk: low] [AFK]
-      done-when: delta-scan doc; keepers filed as proposals or a clean reject recorded with per-candidate rationale
-      touches:   docs/research/
-      assumes:   most candidates reject (L-017 base rate); popularity alone is not a keep signal
-      tracker:   https://github.com/uditakhourii/adhd
-      state:     ready
 
 ### P3 — Long-term
 

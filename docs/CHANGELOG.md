@@ -11,6 +11,15 @@ status: current
 
 ---
 
+## 2026-07-29 — SPRINT-028 Research Delta-Scan Batch (docs-only · no release, stays v1.14.0)
+
+Three L-017 delta-scans, all research docs: **graphify** re-verdict — on-demand stance re-affirmed
+against the current feature set · **OpenAI harness-engineering** — clean reject, 0/12 techniques
+unmatched · **uditakhourii/adhd** — 1 micro-keeper (the N×substrate dispatch-cost note → TASK-099),
+8 rejects. No skill/template/manifest change.
+
+---
+
 ## v1.14.0 — Night-Run Complete & Housekeeping (2026-07-29)
 
 MINOR — bundles **SPRINT-027** (night-run resilience + the §11 housekeeping pass).
