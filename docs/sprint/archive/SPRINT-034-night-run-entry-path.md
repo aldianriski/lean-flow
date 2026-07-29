@@ -2,8 +2,8 @@
 sprint: 034
 slug: night-run-entry-path
 owner: Maintainer
-last_updated: 2026-07-29
-status: active
+last_updated: 2026-07-30
+status: closed
 plan_commit: 0583cfe
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -147,10 +147,34 @@ path in shipped skill text. Predates this sprint; flagged for the close Retro ra
      shipped → CHANGELOG · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Routed buckets** — Shipped → `docs/CHANGELOG.md` v1.18.0 · Tech debt → **TD-010** · Follow-ups →
+**TASK-109** · Learnings → **L-054**.
+
+**Retrieval check** — **no miss.** Prior learnings were found and applied throughout (L-007 exercise-on-real-input,
+L-008/TD-006 dedup, L-009 re-read after structure-adjacent edits — which caught nothing this time but was run
+three times, L-012 relocation pattern, L-015 consumer scan, L-016 consumer-path caveat, L-042 staging rule).
+The sharper finding is the inverse: L-020 was already a promoted durable rule *and* a DoD line, and the defect
+shipped anyway — because its wiring check enumerates a capability's trigger points and downstream consumers,
+and nobody read "the entry path into the capability" as one of them. Recorded in L-054.
 
 **Worked**
+- Refusing to guess the PRD. Three rounds of clarification cost tokens but avoided building against
+  `loop-hygiene-prd.md`, which was already fully consumed by SPRINT-024 — a plausible wrong answer.
+- Sequencing headroom before the rule (D1). T2 needed 3 lines across two files that had zero; had they
+  run in parallel, T2 would have hit a hard cap mid-edit and invited exactly the compress-to-fit move
+  that created TD-009.
+- Auditing the dedup against its own claim. "Zero rules lost" was false on first pass — the cut dropped
+  the named out-of-scope cloud tools while the pointer target didn't list them. Checking the claim rather
+  than asserting it turned a silent deletion into a relocation.
 
 **Friction**
+- The bug was reported as an observation about another repo's run, in three fragments across three turns.
+  Most of this sprint's cost was in establishing *what happened* before any work could start.
+- `qa-check` went red once on a stale knowledge index after edits that touched no metadata-carrying doc —
+  the regen trigger is broader than DOCS_Guide §7 implies ("after writing a metadata-carrying doc").
+- The L-006 fresh-context leg could not run (AgentTool disabled by owner policy), so the L-007 exercise is
+  an author-run text trace. Deferred to TASK-109 rather than claimed as done.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- **L-054 filed** — a guard that runs inside the process it protects cannot stop the decision to start that
+  process; ask which side of a boundary the check runs on. Count 1; promote if a second sprint hits it.

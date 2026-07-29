@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-29
+last_updated: 2026-07-30
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -8,6 +8,34 @@ status: current
 # lean-flow — Changelog
 
 <!-- Prepend new sprints — newest first. Append-only; never edit past blocks. -->
+
+---
+
+## v1.18.0 — Night-Run Entry Path (2026-07-30)
+
+MINOR — SPRINT-034. v1.17.0 shipped the contract for what an unattended run may *do* once running.
+This ships the part that says how one is *started* — the half that was missing, found by a real run.
+
+**What changed for you:**
+- **"Run a night run for `<X>`" now prepares before it launches.** The request is a compound
+  instruction — prepare *and* execute — and only the execute half was wired. Naming a mode keyword
+  (`sprint-bulk unattended`) skipped the feed pipeline entirely, so the request collapsed into a
+  background spawn against a Plan nobody had approved.
+- **A mode keyword no longer bypasses intake.** `/orchestrator`'s routing checks now run on every
+  invocation, named mode or not, with a launcher branch: handed un-promoted intent, the interactive
+  session runs decompose → triage → promote → G1/G2 → pre-flight itself, gates and all, and fires the
+  trigger only once pre-flight is green.
+- **`night-run.md` gains Part 1a — Entry path**, an ordered 5-row table placed *before* the pre-flight
+  pass, plus a Part 2 precondition: the trigger command is the last step, never the first.
+- **Why the old guard didn't catch it** — `sprint-bulk` step 0 asked the right question on the wrong
+  side of the boundary. It runs *inside* the spawned headless process, where there is no ask channel:
+  it can halt, never prevent. The check that matters is the interactive one, before the spawn.
+- **`/flow` gains the conductor-side rule** — asked to start a night run, it conducts stages 1–3
+  interactively first. The stages that park *inside* an unattended run are exactly the ones that must
+  complete *before* one.
+- Housekeeping: both capped SSOT files regained headroom (`CONTEXT.md` 130→117,
+  `orchestrator/SKILL.md` 110→100) by collapsing duplicated prose to pointers and relocating dispatch
+  depth into `references/dispatch.md` — no rule removed. Resolves TD-009.
 
 ---
 
@@ -41,69 +69,4 @@ unattended run does when it *reaches* a step only a human may take.
 
 ---
 
-## v1.16.1 — Template De-leak + PRD Mapping (2026-07-29)
-
-PATCH — post-SPRINT-032 template audit (duplicate + consumer-leak sweep, all 32 templates).
-
-**What changed for you:**
-- **De-leak (L-015 class)** — four shipped templates dropped lean-flow-repo-specific references:
-  `QA-TESTCASE` ("lean-flow skill" wording + a pointer to an unshipped `docs/qa/README` genericized) ·
-  `ADR` + `RESEARCH` (removed the `scripts/gen-index.sh · qa-check.sh` parenthetical) · `LEARNINGS`
-  (removed `scripts/gen-index.sh` / `docs/knowledge-index.md` references).
-- **PRD durable-home mapping** — `task-decomposer/references/prd-and-slices.md` now states how an
-  approved PRD folds into `docs/product/requirements.md` + `acceptance-criteria.md` (user stories →
-  `R-n` requirements · testing decisions → acceptance-criteria blocks · sanitize first).
-- Audit verdict recorded: no duplicate templates — QA-TESTCASE vs testing-guide and PRD vs
-  product-requirements are deliberate splits (case-instance vs strategy · intake artifact vs
-  sanitized durable spec).
-
----
-
-## v1.16.0 — TemiDev Repo-Structure Standard (2026-07-29)
-
-MINOR — SPRINT-032 (TASK-067…073) — TemiDev repo-structure standard adoption (ADR-012).
-
-**What changed for you:**
-- **New consumer-core standard** — lean-doc-generator's §2 core set adopts the TemiDev repo-structure
-  standard as its baseline: a mandatory minimum scaffolded at init (root set + AI context +
-  `docs/product|architecture|development|testing|deployment`), conditional substrate rows
-  (database/auth), and a full create/update/archive lifecycle contract on every doc.
-- **15 new/relocated templates** — root governance (`CONTRIBUTING` · `SECURITY` · `AGENTS`),
-  product (`requirements` · `acceptance-criteria`), architecture siblings (`data-flow` ·
-  `authentication` · `integrations`), database (`erd` · `schema` · `migration-guide`),
-  development/testing (`setup` · `coding-standards` · `testing-guide`), and deployment split into
-  `deployment-guide` + `rollback-guide` (was single-file `DEPLOY.md`).
-- **4-tier init scaffold** — base (every repo) → backend/integration (API/external integrations) →
-  medium/complex (`adr/` + `DECISIONS.md` + `flows/`) → multi-service, each tier's docs created by
-  event (first API, second dev, second service), never by ceremony.
-- **Init safe-scaffold allowlist** — the only non-doc files `init` writes: `.env.example` (names
-  only, never values) · `.gitignore` (from the §12 boundary rule) · `LICENSE` — write-if-absent,
-  never overwritten, every write/skip listed in the init report.
-- **§12 Git boundary + migrate boundary scan** — a new DOCS_Guide section states what never belongs
-  in the repo (secrets, credentials, PII, commercial/legal material) regardless of format; `migrate`
-  now scans the tracked tree for §12b violations and reports them (report-only, never auto-remediates).
-- **Close-time doc-freshness check** — sprint close now checks touched docs' `last_updated` /
-  `status` against the session's changes, flagging anything stale instead of leaving it to the next
-  60-day scan.
-- **Per-doc lifecycle contract** — every §2 row now states its create/update/archive triggers
-  explicitly (mirrored in the doc's `update_trigger` header field), replacing the old
-  create-lazily-only rule for the mandatory minimum.
-
-See ADR-012 for the full decision record and blast radius.
-
----
-
-## v1.15.0 — Tech-Debt Split (2026-07-29)
-
-MINOR — SPRINT-031 (TASK-066).
-
-**What changed for you:**
-- **Tech Debt gets its own root ledger** — new core template `TECH-DEBT.md.template` renders root `TECH-DEBT.md`; `TODO.md` keeps the Backlog + active-sprint pointer only (a pointer line replaces § Tech Debt). Two big queues no longer crowd one file.
-- **Fully wired** — Sprint Close files `TD-NNN` there · Promote ages it · `/triage` grooms it (legacy in-TODO § still read) · `/prime` slot 5 reads it · DOCS_Guide §2/§10/§11 + migration-map updated; adopted repos: `migrate` now splits an in-TODO § Tech Debt out verbatim.
-- **De-leak** — repo-specific `TASK-040` pointer removed from the shipped SPRINT template + DOCS_Guide retrieval-miss note (L-015 class).
-
-Repo housekeeping (same day, pre-sprint): TASK-040 + TASK-047 routed to `.out-of-scope/` with revisit conditions — Backlog now empty.
-
----
-
-_Older releases (**v1.14.2** and earlier) → [`docs/changelog/CHANGELOG-1.14.2.md`](changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](changelog/CHANGELOG-1.7.1.md)._
+_Older releases (**v1.16.1** and earlier) → [`docs/changelog/CHANGELOG-1.16.1.md`](changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](changelog/CHANGELOG-1.7.1.md)._

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-29
+last_updated: 2026-07-30
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -15,6 +15,17 @@ status: current
 ---
 
 ## Tech Debt
+
+- **TD-010** severity: minor | status: open | created: Sprint-034
+  - Summary: `skills/orchestrator/references/night-run.md` cites a **repo-local path** in shipped
+    skill text — lines 5 and 158 point at `docs/research/night-run.md`, which does not exist in a
+    consumer's repo. Predates Sprint-034; surfaced by that sprint's consumer-surface scan and left
+    untouched (clean up your own mess, not adjacent content).
+  - Impact: a consumer reading the night-run procedure cold hits two unresolvable references — the
+    exact L-015 consumer-leak class the DoD check exists to catch, in a file the check passed
+    because the leak was pre-existing rather than newly added.
+  - Mitigation (not yet done): inline the one-line rationale at both sites and drop the pointer, per
+    the W5 treatment already applied to `prime` and `dispatch.md`; sweep on the next touch of this file.
 
 - **TD-009** severity: minor | status: resolved → TASK-107 (Sprint-034) | created: Sprint-033
   - Summary: two SSOT surfaces were at **exactly zero headroom** — `.claude/CONTEXT.md` 130/130
