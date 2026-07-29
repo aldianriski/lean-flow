@@ -21,11 +21,19 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-047**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-049**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-049 [tags: process] [status: active]: In a parallel fan-out, the durable per-unit output FILE is the success signal, not the agent's in-band reply — a graphify extraction subagent was killed mid-run by a session limit AFTER writing valid chunk JSON; the reply channel reported failure, but the file-on-disk protocol recovered the work with zero re-extraction (graphify reference run, 2026-07-29). Design dispatches so each unit writes its result to a known path and the coordinator verifies the artifact, never the reply.
+- seen: 2026-07-29 (graphify reference run, non-sprint)
+- count: 1
+- promoted: no
+- related: L-046 (worktree dispatch resilience) · dispatch.md § Merge-back queue (per-task commit as checkpoint) · night-run.md (per-task commit + Execution Log — same durable-artifact checkpoint principle)
 
 ---
 

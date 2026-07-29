@@ -242,8 +242,8 @@ read whatever context files your project already has (`CLAUDE.md`, `README.md`, 
 `docs/CHANGELOG.md`, `docs/ARCHITECTURE.md` — legacy root locations still matched) and degrade
 gracefully when one is missing. `/prime` aborts on
 nothing. No code-graph dependency — lean-flow neither integrates nor depends on
-[graphify](https://github.com/safishamsi/graphify); it's a fine on-demand tool if you're onboarding an
-unfamiliar repo or doing a pre-refactor audit.
+[graphify](https://github.com/Graphify-Labs/graphify); it's a fine on-demand tool if you're onboarding an
+unfamiliar repo or doing a pre-refactor audit (usage + maintenance recipe: `docs/research/graphify-daily-value.md` § Consumer path — a lean-flow-repo decision record, not required reading).
 
 **Already have docs (or ran dev-flow / adlc-flow)?** `/lean-doc-generator migrate` aligns them to
 lean-flow's placement · format · wiring — plan → approve → apply, surgically (never deletes your

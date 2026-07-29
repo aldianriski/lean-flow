@@ -1,6 +1,9 @@
 # dependencies
 node_modules/
 
+# graphify build artifact (disposable derived view — regenerate on demand, never commit)
+graphify-out/
+
 # local Claude Code settings (per-machine)
 .claude/settings.local.json
 .claude/.lean-doc-cache.json
