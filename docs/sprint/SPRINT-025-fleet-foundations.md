@@ -4,7 +4,7 @@ slug: fleet-foundations
 owner: Maintainer
 last_updated: 2026-07-29
 status: active
-plan_commit: pending
+plan_commit: 3a90916
 close_commit: —
 update_trigger: sprint execute/close events
 ---
