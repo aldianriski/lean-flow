@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-027 — Night-Run Watchdog & Housekeeping** → docs/sprint/SPRINT-027-watchdog-housekeeping.md
+> _(no active sprint — SPRINT-027 closed 2026-07-29 → v1.14.0; archived per §11.)_
 
 ---
 
@@ -30,21 +30,8 @@ status: current
 
 ### P1 — Next Phase Required
 
-- [ ] **TASK-098 — Night-run resilience: watchdog + morning rollup**  [size: S] [risk: low] [HITL]
-      done-when: handoff-on-stall watchdog pattern + "Blocked/needs-human" morning rollup documented and wired into the sprint-bulk/handoff references; exercised on a simulated stall
-      touches:   skills/orchestrator/references/night-run.md · skills/handoff/SKILL.md
-      assumes:   none — TASK-097 shipped (v1.13.0), dependency cleared
-      tracker:   docs/research/night-run.md
-      state:     ready
-
 ### P2 — Quality / Polish
 
-- [ ] **TASK-091 — Streamline housekeeping: archival, rotation, doc growth**  [size: M] [risk: low] [HITL]
-      done-when: sprint-file + changelog archival/rotation is one documented repeatable pass (scripted only where trivial); a growth-compaction pass defined AND exercised once on the current corpus (docs/research/ · LEARNINGS) with a measured line delta — not spec-only (L-007); compaction proposes deletions, human approves
-      touches:   docs/ · lean-doc-generator close/§11 wiring
-      assumes:   no new SSOT; improves the existing §11 aging + close-sweep, doesn't replace them
-      tracker:   none — friction named by maintainer (archival · rotation · doc growth)
-      state:     ready
 - [ ] **TASK-092 — Delta re-scan: Graphify-Labs/graphify vs prior verdict**  [size: S] [risk: low] [AFK]
       done-when: docs/research/graphify-daily-value.md carries a dated re-verdict — the token-cost / popularity claims tested against the current repo feature set per L-017 (delta over existing surface, not standalone merit); on-demand stance re-affirmed OR an integration task filed with evidence
       touches:   docs/research/graphify-daily-value.md

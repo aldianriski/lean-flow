@@ -11,6 +11,28 @@ status: current
 
 ---
 
+## v1.14.0 — Night-Run Complete & Housekeeping (2026-07-29)
+
+MINOR — bundles **SPRINT-027** (night-run resilience + the §11 housekeeping pass).
+
+**What changed for you:**
+- **Night-run is complete** — `night-run.md` gained Part 3 (OS-level watchdog pattern: stall
+  detection → SIGTERM → `claude -p --resume <sid> "/handoff"` → morning `/prime` resume) and
+  Part 4 (the "Blocked / needs-human" morning rollup: `Tn · state · unblock condition`, riding the
+  Execution Log). The whole chain was exercised for real: a headless run killed mid-flight exited
+  143 as documented, and the recovery command produced a working handoff doc.
+- **§11 retention is now one named propose→approve pass** — archival (sprint archive · INDEX ·
+  shipped-entry removal · rotation-link check) + a **compaction sweep** (promoted `L-NNN` bodies →
+  pointers · superseded research → archive · measured delta), in `lean-doc-generator`'s close row.
+  Exercised on the real corpus: −47 lines from hot files, content archived not deleted.
+- **Fleet dispatch hardening** — dispatch.md's base-ref caveat gained the add/add corollary: never
+  worktree-dispatch an edit to a file that exists only in unpushed commits; fall back to
+  shared-tree parallel dispatch.
+
+Manifests → 1.14.0 lockstep; skill roster unchanged (14). Additive — nothing to migrate.
+
+---
+
 ## v1.13.0 — Fleet & Night-Run Build (2026-07-29)
 
 MINOR — bundles **SPRINT-026** (the build sprint for v1.12.0's decisions).
