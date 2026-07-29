@@ -32,17 +32,45 @@ Claude-native first, generalizable to any CLI agent (codex / kimi / glm) via a B
 
 ## DECISIONS SO FAR
 
-_(none yet — chart phase, 2026-07-29)_
+- **Harness worktree inventory** (2026-07-29, research ticket): the harness already provides
+  nearly all mechanics free — `--worktree` sessions, mid-session `EnterWorktree`/`ExitWorktree`,
+  per-agent `Agent(isolation: "worktree")` with auto-cleanup/locking, `.worktreeinclude` secret
+  propagation, project-scope plugins + saved bash approvals shared into worktrees (v2.1.200+/211+).
+  **lean-flow must add only procedure**: a dispatch instruction (disjoint → one worktree-isolated
+  Agent call per task), a documented merge-back step (→ merge-back ticket), guardrail notes
+  (stale-branch-reuse bug #51596 · min-version v2.1.2xx · Windows long-path prereq). Structural
+  gap: with no shipped `.claude/agents/`, `isolation: worktree` is only ever an ad-hoc Agent-call
+  instruction, never a permanent agent property. Concurrency caps are folklore (no first-party
+  number found); practical sweet spot 3–5 parallel — matches sprint scale. Token cost ≈ linear × N.
+- **AGENTS.md brief carrier** (2026-07-29, TASK-093 scan → `agents-md-adoption.md`): **yes,
+  conditionally** — AGENTS.md is the brief format for non-Claude CLI agents *if/when* the fleet
+  seam graduates (codex ✓ · kimi ✓ ships one itself · GLM = unverified, check before any build).
+  No hand-authored template for consumers (dupe/drift); at most a *generated* stub at init/migrate,
+  deferred until a real non-Claude consumer exists. Both keepers parked as proposals in the doc.
+- **Dispatch unit** (2026-07-29, grill): **the sprint task Tn** — one worktree per disjoint Plan
+  task; G2 map fixes merge order; streams stay the coarse human layer; review rides pre-merge
+  inside each task's worktree. Matches the 3–5-parallel sweet spot and per-task revert/halt.
+- **Merge-back strategy** (2026-07-29, research ticket): **sequential merge queue in G2-ownership
+  order, one merge commit per task** — the only strategy that reuses the G2 overlap map as-is and
+  keeps per-task revertability. Conflict path: expected (map-named) → re-dispatch "rebase onto new
+  tip"; surprise → halt that task only, kick back to G2 (map was incomplete). Resolution is
+  coordinator-owned (decision tier), never a blind sub-agent. First-blocker-halt becomes
+  **per-task**, whole-wave only on transitive dependency. G2 map's role narrows to fixing merge
+  ORDER (isolation already makes disjoint parallel safe). **L-042 verdict: obsoleted at the
+  cross-worktree boundary, still binds inside one tree** (sequential sub-tasks · coordinator
+  staging conflict resolutions). Failure path: broken worktree never merges — task back to
+  backlog, salvage doc/research artifacts, drop code, coordinator-only cleanup (L-043). Verify
+  two-tier: full review pre-merge in-worktree · interaction-only smoke check post-merge per wave.
 
 ## DECISION TICKETS
 
 | Ticket | Type / Mode | Resolves via | Status |
 |---|---|---|---|
-| Harness worktree inventory — what `EnterWorktree` / Agent `isolation: worktree` / workflows already give vs what lean-flow must add | Research · AFK | research-spike (↔ TASK-094 harness-engineering scan) | open |
-| Merge-back strategy — N worktrees → one branch; conflict/failure path; relation to the G2 overlap-ownership map | Research · AFK | research-spike | open |
-| Dispatch unit — what parallelizes: sprint Tn · streams · review passes? | Grilling · HITL | intake grill (AskUserQuestion) | open |
+| Harness worktree inventory — what `EnterWorktree` / Agent `isolation: worktree` / workflows already give vs what lean-flow must add | Research · AFK | research-spike (↔ TASK-094 harness-engineering scan) | **resolved** → DECISIONS |
+| Merge-back strategy — N worktrees → one branch; conflict/failure path; relation to the G2 overlap-ownership map | Research · AFK | research-spike | **resolved** → DECISIONS |
+| Dispatch unit — what parallelizes: sprint Tn · streams · review passes? | Grilling · HITL | intake grill (AskUserQuestion) | **resolved** → DECISIONS |
 | External-agent consent gate — does the BYO seam extend to CLI agents; what config/consent shape? | Grilling · HITL | intake grill (likely /council if it forks hard) | open |
-| AGENTS.md as the brief carrier for non-Claude agents | Task | → TASK-093 scan | open |
+| AGENTS.md as the brief carrier for non-Claude agents | Task | → TASK-093 scan | **resolved** → DECISIONS |
 | Feel the merge — run one real task pair in parallel worktrees end-to-end | Prototype · HITL | /prototype | open (after inventory + merge-back) |
 
 Dependencies: *prototype* waits on *inventory* + *merge-back*; the two grilling tickets are

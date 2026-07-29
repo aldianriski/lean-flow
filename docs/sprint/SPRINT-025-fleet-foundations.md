@@ -34,9 +34,9 @@ template for consumer repos. Delta over existing surface (L-017), keepers as pro
 non-Claude-agent brief carrier; keepers filed as proposals.
 
 **DoD:**
-- [ ] `docs/research/agents-md-adoption.md` written (RESEARCH template) with per-candidate delta mapping
-- [ ] verdicts (a) + (b) recorded; keepers filed as proposals, not applied
-- [ ] fog-map AGENTS.md ticket closed → DECISIONS SO FAR updated
+- [x] `docs/research/agents-md-adoption.md` written (RESEARCH template) with per-candidate delta mapping
+- [x] verdicts (a) + (b) recorded; keepers filed as proposals, not applied
+- [x] fog-map AGENTS.md ticket closed → DECISIONS SO FAR updated
 
 ### T2 — Drive the fleet-orchestration fog-map to graduation (TASK-089) `[size: L · risk: med]` [HITL]
 Layers: docs/research/fog-fleet-orchestration.md · TODO.md
@@ -47,11 +47,11 @@ cleared buildable work into TASK-NNN. Hard forks route /council → ADR.
 graduated TASK-NNN entries in the Backlog.
 
 **DoD:**
-- [ ] Research: harness worktree inventory resolved (what exists vs what lean-flow must add)
-- [ ] Research: merge-back strategy resolved (N worktrees → one branch · conflict path · G2 overlap-map relation)
-- [ ] Grill: dispatch unit pinned (popup)
+- [x] Research: harness worktree inventory resolved (what exists vs what lean-flow must add)
+- [x] Research: merge-back strategy resolved (N worktrees → one branch · conflict path · G2 overlap-map relation)
+- [x] Grill: dispatch unit pinned (popup)
 - [ ] Grill: external-agent consent gate pinned (/council if it forks hard)
-- [ ] AGENTS.md brief-carrier ticket resolved (← T1)
+- [x] AGENTS.md brief-carrier ticket resolved (← T1)
 - [ ] Prototype: one real task pair run end-to-end in parallel worktrees; answer captured, artifact deleted
 - [ ] Cleared work graduated → TASK-NNN; NOT-YET-SPECIFIED empty
 
