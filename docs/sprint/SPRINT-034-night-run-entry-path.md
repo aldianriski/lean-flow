@@ -4,7 +4,7 @@ slug: night-run-entry-path
 owner: Maintainer
 last_updated: 2026-07-29
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: 0583cfe
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
