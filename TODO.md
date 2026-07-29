@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-033 closed 2026-07-29 → v1.17.0 Unattended-Run Contract; §11 retention pending owner approval.)_
+> _(no active sprint — SPRINT-033 closed 2026-07-29 → v1.17.0 Unattended-Run Contract; archived per §11.)_
 
 ---
 
@@ -29,48 +29,6 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
-
-- [ ] TASK-100 — Encode the unattended-run contract (AFK/HITL boundary + park protocol)  [size: M] [risk: med] [HITL]
-      done-when: night-run.md states the mode signal (unattended is declared, never inferred), the derivation rule (AFK-safe = additive + reversible + already-approved-in-scope; HITL = approval · judgement · lossy · scope-changing), the HITL boundary table, absence≠consent, and the park protocol (park record → continue disjoint AFK → clean halt)
-      touches: skills/orchestrator/references/night-run.md
-      assumes: charter = execute-only + park (owner call, this session); mechanism unchanged from docs/research/night-run.md
-      tracker: none — safety fix found in a real overnight run
-      state:   ready
-
-- [ ] TASK-101 — Add the unattended contract to the CONTEXT.md SSOT  [size: S] [risk: low] [AFK]
-      done-when: .claude/CONTEXT.md carries the charter + absence≠consent + park in ≤8 lines, pointing to night-run.md for the operational detail; no duplication of the table
-      touches: .claude/CONTEXT.md
-      assumes: CONTEXT stays under its cap (ADR-007)
-      tracker: none
-      state:   ready
-
-- [ ] TASK-102 — Wire the park protocol into /orchestrator + /flow  [size: S] [risk: low] [AFK]
-      done-when: sprint-bulk steps 4–5 park instead of asking under unattended; a red flag forbids reading a denied/unanswerable question as approval; /flow states that only stage 4 (Build) runs unattended — stages 2·3·5 park
-      touches: skills/orchestrator/SKILL.md · skills/flow/SKILL.md
-      assumes: line caps hold (≤110 procedure+scaffolding)
-      tracker: none
-      state:   ready
-
-- [ ] TASK-103 — Wire the park protocol into /lean-doc-generator + /triage  [size: S] [risk: low] [AFK]
-      done-when: promote's governance sign-off and close's §11 retention/doc-freshness each state the unattended park; /triage's HITL apply parks rather than waiting on a `y` that never comes
-      touches: skills/lean-doc-generator/SKILL.md · skills/triage/SKILL.md
-      assumes: these are the two steps the real overnight run actually hit
-      tracker: none
-      state:   ready
-
-- [ ] TASK-104 — Surface night-run + the unattended contract on the consumer face  [size: S] [risk: low] [AFK]
-      done-when: README documents the unattended path and its charter (today it says nothing about night-run); CHANGELOG entry + plugin.json/marketplace.json MINOR bump in lockstep
-      touches: README.md · docs/CHANGELOG.md · .claude-plugin/plugin.json · .claude-plugin/marketplace.json
-      assumes: feature sprint → MINOR by hand (release-patch is PATCH-only)
-      tracker: none
-      state:   ready
-
-- [ ] TASK-105 — Exercise the park protocol on a real headless run  [size: S] [risk: med] [HITL]
-      done-when: a real `claude -p --permission-mode dontAsk` run is fired at a HITL step and observed to park (log line + clean exit) rather than self-approve or stall; the transcript is recorded in the sprint Execution Log
-      touches: (no source change — verification run)
-      assumes: closes the spec-only-debt trap (L-007) — the contract must fire once on real input
-      tracker: none
-      state:   ready
 
 ### P2 — Quality / Polish
 
