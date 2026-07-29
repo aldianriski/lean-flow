@@ -4,7 +4,7 @@ slug: unattended-run-contract
 owner: Maintainer
 last_updated: 2026-07-29
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: 350fa4d
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
@@ -40,13 +40,13 @@ that decides for it. Hence one derivation rule first, the table second as its wo
 steps it may not run, what it does instead, and what the human reads in the morning.
 
 **DoD:**
-- [ ] Mode signal stated — unattended is **declared** at trigger, never inferred; absent signal → interactive
-- [ ] Derivation rule stated — AFK-safe = additive + reversible + already-approved-in-scope; HITL = approval · judgement · lossy/destructive · scope-changing
-- [ ] HITL boundary table lists every known step (gates · grill · promote governance · close §11 · triage apply · migrate/init per-item · scope-change)
-- [ ] **Absence ≠ consent** — a denied/unanswerable question is a BLOCK, never a default-yes, never self-approval
-- [ ] Park protocol: park record → continue disjoint AFK work → clean halt when no AFK work remains
-- [ ] Pre-authorization rule: a gate is pre-signable only if its subject **exists and is frozen** at pre-flight
-- [ ] Part 4 rollup vocabulary gains `parked-hitl`
+- [x] Mode signal stated — unattended is **declared** at trigger, never inferred; absent signal → interactive
+- [x] Derivation rule stated — AFK-safe = additive + reversible + already-approved-in-scope; HITL = approval · judgement · lossy/destructive · scope-changing
+- [x] HITL boundary table lists every known step (gates · grill · promote governance · close §11 · triage apply · migrate/init per-item · scope-change)
+- [x] **Absence ≠ consent** — a denied/unanswerable question is a BLOCK, never a default-yes, never self-approval
+- [x] Park protocol: park record → continue disjoint AFK work → clean halt when no AFK work remains
+- [x] Pre-authorization rule: a gate is pre-signable only if its subject **exists and is frozen** at pre-flight
+- [x] Part 4 rollup vocabulary gains `parked-hitl`
 
 ### T2 — Add the unattended contract to the CONTEXT.md SSOT `[size: S · risk: low]`
 Layers: `.claude/CONTEXT.md`
@@ -136,10 +136,18 @@ consumer surface → real-input exercise. Governance review ran clean (no L-prom
 TD, no §11 doc-aging due). Trigger: a real overnight run improvised a HITL split instead of following a
 specified behaviour.
 
+### 2026-07-29 | T1 | Contract encoded — night-run.md Part 0
+Derivation rule first, table as its worked output. Two findings while writing it: (a) `close` is not
+all-or-nothing — Retro + four-bucket auto-file + `close_commit` are additive and stay AFK-safe, only
+§11 retention and doc-freshness park, which keeps most of close's value overnight; (b) added an
+explicit "never work around the park" clause — rewriting a task to dodge a gate is itself
+scope-changing, and that is exactly the improvisation this sprint exists to remove.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/references/night-run.md` | T1 | the contract had no home — night-run covered execution only | Med | T6 real headless run |
 
 ## Retro
 
