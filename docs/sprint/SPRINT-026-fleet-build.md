@@ -37,11 +37,11 @@ procedure; SKILL.md Sequence line + CONTEXT §Streams updated (L-042 narrowed to
 exercised once on a real sprint wave (L-007).
 
 **DoD:**
-- [ ] dispatch.md: worktree protocol (disjoint Tn → parallel `Agent(isolation:"worktree")` · soft cap 3–5 · per-task branch)
-- [ ] dispatch.md: merge-queue procedure (G2-order `--no-ff` per task · expected-vs-surprise conflict paths · two-tier verify · cleanup incl. Windows handle-lock (L-044) · stale-branch guardrail #51596)
-- [ ] SKILL.md Sequence line routes to the worktree protocol (reword in place, cap held)
-- [ ] CONTEXT §Streams updated — L-042 narrowed to intra-tree; worktree path noted
-- [ ] exercised once on a real wave: ≥2 disjoint tasks dispatched via worktrees and merged by the queue
+- [x] dispatch.md: worktree protocol (disjoint Tn → parallel `Agent(isolation:"worktree")` · soft cap 3–5 · per-task branch)
+- [x] dispatch.md: merge-queue procedure (G2-order `--no-ff` per task · expected-vs-surprise conflict paths · two-tier verify · cleanup incl. Windows handle-lock (L-044) · stale-branch guardrail #51596)
+- [x] SKILL.md Sequence line routes to the worktree protocol (reword in place, cap held)
+- [x] CONTEXT §Streams updated — L-042 narrowed to intra-tree; worktree path noted
+- [x] exercised once on a real wave: ≥2 disjoint tasks dispatched via worktrees and merged by the queue
 
 ### T2 — Night-run core: pre-flight pass + trigger recipe (TASK-097) `[size: S · risk: low]` [HITL]
 Layers: skills/orchestrator/references/ (new night-run reference)
@@ -52,9 +52,9 @@ Mechanism pre-locked in `docs/research/night-run.md` — headless `claude -p`, O
 + a consumer-generic trigger recipe live in orchestrator references; dry-run exercised once.
 
 **DoD:**
-- [ ] night-run reference written: pre-flight checklist + `claude -p` trigger recipe (cron / Task Scheduler variants)
-- [ ] wired: sprint-bulk names the night-run path (reword in place if SKILL.md needed)
-- [ ] dry-run exercised once (pre-flight run on a real backlog state; trigger command validated)
+- [x] night-run reference written: pre-flight checklist + `claude -p` trigger recipe (cron / Task Scheduler variants)
+- [x] wired: sprint-bulk names the night-run path (reword in place if SKILL.md needed)
+- [x] dry-run exercised once (pre-flight run on a real backlog state; trigger command validated)
 
 ## Owner-action checklist
 - [ ] (post-sprint, optional) create the OS scheduler entry on this machine when a real night-run is wanted — lean-flow ships the recipe, never writes the scheduler.
@@ -79,6 +79,21 @@ Cut: build sprint per owner choice — turn SPRINT-025 decisions into capability
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/references/dispatch.md` | T1 | +worktree protocol & merge-queue sections; escalation framing reworded (worktree now first-class); base-ref caveat added | Med | wave itself exercised the protocol; qa-check green |
+| `skills/orchestrator/references/night-run.md` | T2 | new — pre-flight checklist + trigger recipe (consumer-generic) | Low | dry-run on real state: guard correctly refused (HITL tasks); flags validated |
+| `skills/orchestrator/SKILL.md` | T1+T2 | Sequence line → worktree protocol; Loop line → night-run path (coordinator-owned shared file) | Low | cap held 110/110 |
+| `.claude/CONTEXT.md` | T1 | §Streams: worktree parallel-build path; L-042 narrowed to intra-tree | Low | 127 lines; qa-check green |
+
+## Execution Log (wave)
+
+### 2026-07-29 | execute | wave dispatched via the protocol it built — merged, wired, exercised
+T1+T2 ran as worktree-isolated parallel agents; coordinator merge queue (G2 order, `--no-ff` each,
+integration worktree) landed both; post-merge smoke caught a stale index (regenerated). **L-044
+recurred live** (handle-lock on int-026 removal — recovery procedure worked as documented; count
+1→2, promotion candidate at next promote). **New finding**: agent worktrees fork from the remote
+default branch — unpushed main commits invisible in-tree; agents fell back to `git show
+main:<path>` correctly; caveat now encoded in dispatch.md. T2 pre-flight dry-run on real state:
+guard correctly refused an unattended run (HITL tasks in sprint) — negative path proven. All 8 DoD ticked.
 
 ## Retro
 

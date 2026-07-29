@@ -37,8 +37,9 @@ Decide from the **G2 overlap-ownership map** — the same map that assigns share
   predecessor, in the ownership/commit order; stage shared files per-hunk (`git add -p`) — promoted rule.
 
 Group the Plan into **parallel batches separated by sequential barriers**: fan out each batch of independent
-tasks in one message, await it, then the next. For large disjoint fan-out where you want determinism +
-worktree isolation, escalate to `/batch` (one worktree sub-agent per unit → PR each; `/workflows` watches).
+tasks in one message, await it, then the next. Worktree isolation for a parallel batch is **first-class —
+the protocol below**; `/batch` (one worktree sub-agent per unit → PR each; `/workflows` watches) remains the
+escalation for very large fan-out where scripted determinism matters.
 
 ## Worktree dispatch protocol (parallel fleet)
 
@@ -57,6 +58,12 @@ pre-decided shape (BYO opt-in + AGENTS.md brief carrier) is parked, not built.
 
 Guardrail: stale-branch reuse on agent-id collision is an open harness issue (#51596). Before
 dispatch, `git worktree list` should show no leftover agent worktrees — clean any first.
+
+Base-ref caveat (observed on the first real wave): agent worktrees fork from the **remote default
+branch**, not local HEAD (unless `worktree.baseRef: "head"` is set) — unpushed local commits are
+invisible in an agent's tree. Brief agents to read newer docs via `git show main:<path>` (read-only,
+L-043-safe); the three-way merge reconciles the old base cleanly as long as only the task's own
+files changed on its branch.
 
 ## Merge-back queue (coordinator-only)
 
