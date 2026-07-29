@@ -56,9 +56,9 @@ or it will be missed by anyone reading the gates section. Pointer, not a copy (A
 **Acceptance:** a reader of § Gates learns unattended runs exist and never self-approve, in ≤8 lines.
 
 **DoD:**
-- [ ] Charter + absence≠consent + park recorded, ≤8 lines, pointing at night-run.md for detail
-- [ ] No duplication of the boundary table
-- [ ] File still under its cap
+- [x] Charter + absence≠consent + park recorded, ≤8 lines, pointing at night-run.md for detail
+- [x] No duplication of the boundary table
+- [x] File still under its cap
 
 ### T3 — Wire the park protocol into /orchestrator + /flow `[size: S · risk: low]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/flow/SKILL.md`
@@ -143,11 +143,18 @@ all-or-nothing — Retro + four-bucket auto-file + `close_commit` are additive a
 explicit "never work around the park" clause — rewriting a task to dodge a gate is itself
 scope-changing, and that is exactly the improvisation this sprint exists to remove.
 
+### 2026-07-29 | T2 | SSOT entry added — CONTEXT.md § Gates
+First draft ran the file to 134/130 (ADR-007 cap). Compressed to two dense lines rather than raising the
+cap or deleting neighbouring content — lands at **exactly 130/130, zero headroom**. That is the L-008 /
+TD-006 signal firing again: the SSOT has no room for the next rule. Filing a TD at close rather than
+running an unrequested dedup pass mid-sprint.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `skills/orchestrator/references/night-run.md` | T1 | the contract had no home — night-run covered execution only | Med | T6 real headless run |
+| `.claude/CONTEXT.md` | T2 | gate readers must see that unattended runs never self-approve | Low | cap check 130/130 |
 
 ## Retro
 
