@@ -16,16 +16,19 @@ status: current
 
 ## Tech Debt
 
-- **TD-009** severity: minor | status: open | created: Sprint-033
-  - Summary: two SSOT surfaces are at **exactly zero headroom** — `.claude/CONTEXT.md` 130/130
+- **TD-009** severity: minor | status: resolved → TASK-107 (Sprint-034) | created: Sprint-033
+  - Summary: two SSOT surfaces were at **exactly zero headroom** — `.claude/CONTEXT.md` 130/130
     (ADR-007) and `skills/orchestrator/SKILL.md` 110/110 (`qa-check.sh` enforces both as hard caps,
     not the soft `~110` CLAUDE.md implies). SPRINT-033's contract fit only by compressing its own
     entry to two dense lines and merging a new red flag into an adjacent one.
-  - Impact: the next rule touching either file cannot land without first displacing something. This
-    is the L-008 / TD-006 accretion signal firing a second time on CONTEXT.md.
-  - Mitigation (not yet done): a dedup pass over CONTEXT.md — prose duplicating CLAUDE.md/README
-    → pointers — at the next promote doc-aging checkpoint; or split per DOCS_Guide §6 (cap-hit →
-    split into a tree).
+  - Impact: the next rule touching either file could not land without first displacing something —
+    the L-008 / TD-006 accretion signal firing a second time on CONTEXT.md.
+  - Resolution: the planned mitigation executed. CONTEXT.md 130 → **116** by collapsing prose that
+    duplicated CLAUDE.md / README / ARCHITECTURE / DOCS_Guide into pointers; orchestrator/SKILL.md
+    110 → **98** by relocating the Implement-routing + dispatch blockquote into its existing
+    `references/dispatch.md` (the L-012 pattern that resolved TD-008). No rule lost — the one
+    genuine deletion candidate (the named out-of-scope cloud tools) was relocated to
+    `docs/ARCHITECTURE.md` § Key integration points rather than dropped.
 
 - **TD-008** severity: minor | status: resolved → TASK-069 (Sprint-032) | created: Sprint-017
   - Summary: `skills/lean-doc-generator/SKILL.md` at 106/110, init section the tightest fit.

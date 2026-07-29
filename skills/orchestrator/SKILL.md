@@ -9,9 +9,8 @@ version: "0.2.0"
 
 # orchestrator
 
-Gate-driven execution loop. Coordinate the work; restate intent as a verifiable goal first.
-Humans approve gates — never self-approve. No specialist agents: gates are inline checklists
-and review is a structured self-pass.
+Gate-driven execution loop. Coordinate the work; restate intent as a verifiable goal first. Humans approve gates — never
+self-approve. No specialist agents: gates are inline checklists and review is a structured self-pass.
 
 ## Mode dispatch
 
@@ -46,25 +45,16 @@ Before implementing, draft the design in **`/plan`** (plan mode) and get human s
 - [ ] Hard-to-reverse decision? → record it (prompt `/lean-doc-generator <adr> <subject>`); a `risk: high` task touching auth / input / secrets / data-exposure → sketch its one-line abuse case here at design time (complements the Review-time `/security-review` row — never replaces it)
 - [ ] Residual ambiguity grilled (below) until the goal is unambiguous
 
-**Residual grill** — the detailed grill runs at intake (`/task-decomposer` Clarify); here, re-grill
-only what is still open — one question at a time (as an **AskUserQuestion popup**, not inline prose), recommend an answer each time. An unconfirmed
-`assumes:` or a `needs-info` task **BLOCKS G2** until resolved — surface it or mark it `blocked` with an unblock condition, never park it as a passive note. A design that must be *felt* →
-`/prototype`, fold the verdict back into G2; a high-stakes hard-to-reverse fork → `/council`
-(`verdict-<slug>.md`) → ADR.
+**Residual grill** — the detailed grill runs at intake (`/task-decomposer` Clarify); here, re-grill only what is still open —
+one question at a time (as an **AskUserQuestion popup**, not inline prose), recommending an answer each time. An unconfirmed
+`assumes:` or a `needs-info` task **BLOCKS G2** until resolved — surface it or mark it `blocked` with an unblock condition, never
+park it as a passive note. A design that must be *felt* → `/prototype`, fold the verdict back into G2; a high-stakes hard-to-reverse fork → `/council` (`verdict-<slug>.md`) → ADR.
 
 ## Phases
 
-> **Implement routing** — at any Implement step: *new testable behaviour* is built **test-first via
-> `/tdd` by default** (red-green-refactor in vertical slices; test type → `tdd/references/test-strategy.md`; decline only with a stated reason — owner opts out or no harness → implement directly + note a manual verification step); chasing a *bug or failing test* → `/diagnose`;
-> *code that's hard to change* (shallow modules, leaky seams) → `/refactor-advisor`. Docs / config /
-> spikes implement directly. **The routed skill is what the dispatched sub-agent runs — see Dispatch by role.**
+> **Every Implement step dispatches.** The orchestrator is the `decision` tier — it **coordinates** (gates · grill · design · synthesis · merge) and does not execute inline: `execution`→Sonnet · `mechanical-ingest`→Haiku go **by default** to a `general-purpose` sub-agent handed its **procedure skill** (new behaviour→`/tdd` test-first · bug→`/diagnose` · hard-to-change→`/refactor-advisor` · docs/config/spikes→direct); a `decision`/trivial step stays inline only with a stated reason. Drive the task with `/goal` (its done-when), clear it at the end. Escalate by hand to Fable / `/council` for an ADR-grade fork.
 >
-> **Drive with `/goal`** — set a `/goal` equal to the task's done-when / acceptance so execution keeps
-> working across turns until it's verifiably met (Goal-Driven Execution, native), then clear it.
->
-> **Dispatch by role** *(fires at every Implement step)* — the orchestrator is the `decision` tier: it **coordinates** (gates · grill · design · synthesis · merge), never executes inline. Dispatch is **classification-driven** (nature not size — `model-purpose.md`):
-> `execution`→Sonnet · `mechanical-ingest`→Haiku dispatched **by default** to a `general-purpose` sub-agent handed its **procedure skill** (`/tdd`·`/diagnose`·`/refactor-advisor` via runtime Skill invocation); a `decision`/trivial step inline only with a stated reason;
-> escalate manually to Fable / `/council` for an ADR-grade fork. **Full dispatch + parallel/sequential rules → `${CLAUDE_SKILL_DIR}/references/dispatch.md`**; role map → `.claude/CONTEXT.md` · ADR-010.
+> **Routing table · `/goal` · dispatch + parallel/sequential rules → `${CLAUDE_SKILL_DIR}/references/dispatch.md`**; role map → `.claude/CONTEXT.md` · ADR-010.
 
 ### quick
 1. **Parse** — restate the task as a verifiable goal; confirm in one line.
@@ -90,11 +80,9 @@ Operates on the active sprint file `docs/sprint/SPRINT-NNN-<slug>.md` (its Plan 
 
 ## Review
 
-Run checks in a **fresh, isolated context** (a reviewer who didn't write the code catches more) and
-**scope every pass to the diff + its blast radius** — never the whole repo (the fan-out re-scan is the
-biggest token sink). A **skip table** + **scale-depth** rule decide what fires: docs/trivial → self-review
-only · small/med → one scoped `sonnet` reviewer · large/high-risk → `/code-review` · behaviour change →
-`/run` + `/verify` · auth/input/secrets → `/security-review` · bug → `/diagnose`.
+Run checks in a **fresh, isolated context** (a reviewer who didn't write the code catches more) and **scope every pass to
+the diff + its blast radius** — never the whole repo (the fan-out re-scan is the biggest token sink). A **skip table** +
+**scale-depth** rule decide what fires: docs/trivial → self-review only · small/med → one scoped `sonnet` reviewer · large/high-risk → `/code-review` · behaviour change → `/run` + `/verify` · auth/input/secrets → `/security-review` · bug → `/diagnose`.
 
 Full routing · skip table · the Standards-vs-Spec axes · adversarial floor · self-review checklist → `${CLAUDE_SKILL_DIR}/references/review-scoping.md`.
 

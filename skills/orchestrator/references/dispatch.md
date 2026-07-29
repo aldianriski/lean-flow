@@ -26,6 +26,23 @@ context) with the relevant **procedure skill** invoked at runtime via the Skill 
 `/tdd` · bug → `/diagnose` · hard-to-change → `/refactor-advisor`. The skill is the maintained procedure; a
 paraphrased brief drifts from it (ADR-010 skill-dispatch amendment, mechanism C).
 
+## Implement routing (which procedure the dispatched agent runs)
+
+Pick the routed skill from the **work type**, then hand that skill to the sub-agent (above):
+
+| Work type | Routes to |
+|---|---|
+| NEW testable behaviour | `/tdd` — **the default**, test-first red-green-refactor in vertical slices; test type → `tdd/references/test-strategy.md` |
+| a bug / failing test | `/diagnose` — it already writes the regression test first |
+| code that's hard to change (shallow modules, leaky seams) | `/refactor-advisor` |
+| docs · config · spikes | implement directly, no routed skill |
+
+**Declining `/tdd` needs a stated reason** — the owner opts out, or the repo has no harness. Either way,
+note a manual verification step in its place; a silent skip is how spec-only debt enters (L-007).
+
+**Drive with `/goal`.** Set a `/goal` equal to the task's done-when / acceptance so execution keeps working
+across turns until it is verifiably met (Goal-Driven Execution, native), then clear it at task end.
+
 ## Parallel vs sequential
 
 Decide from the **G2 overlap-ownership map** — the same map that assigns shared-file single-owner + order:

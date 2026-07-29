@@ -46,12 +46,12 @@ compressing signal away to fit (DOCS_Guide §2 growth rule).
 **Acceptance:** both files sit ≥10 lines under their caps with zero rules lost, `qa-check.sh` green.
 
 **DoD:**
-- [ ] Dedup candidates for both files proposed to the owner as an explicit list — approved before any deletion
-- [ ] `.claude/CONTEXT.md` ≤ 120 lines (≥10 under its 130 cap), every removed line either duplicated elsewhere or relocated
-- [ ] `skills/orchestrator/SKILL.md` ≤ 100 lines (≥10 under its 110 cap), relocated depth landed in an existing `references/` file
-- [ ] No rule lost — a before/after rule inventory shows every behavioural rule still reachable from its SSOT
-- [ ] `sh scripts/qa-check.sh` green, including its roster/claim-count checks
-- [ ] `TECH-DEBT.md` TD-009 → `status: resolved → TASK-107`
+- [x] Dedup candidates for both files proposed to the owner as an explicit list — approved before any deletion
+- [x] `.claude/CONTEXT.md` ≤ 120 lines (≥10 under its 130 cap), every removed line either duplicated elsewhere or relocated — **116**
+- [x] `skills/orchestrator/SKILL.md` ≤ 100 lines (≥10 under its 110 cap), relocated depth landed in an existing `references/` file — **98**
+- [x] No rule lost — a before/after rule inventory shows every behavioural rule still reachable from its SSOT
+- [x] `sh scripts/qa-check.sh` green, including its roster/claim-count checks — 56 pass, 0 fail
+- [x] `TECH-DEBT.md` TD-009 → `status: resolved → TASK-107`
 <!-- QA: no test harness (markdown repo) — qa-check.sh is the mechanical gate; pair it with a
      fresh-context read of both files to catch author-blind fusion (L-009 · L-006). -->
 
@@ -103,11 +103,24 @@ Governance review clean on L-promotion and TD aging; one doc-aging finding (v1.1
 rotation) routed to § Owner-action. Composition held to the dependency pair — TASK-106 deferred
 because it verifies from the plugin cache, which cannot contain this fix until after close+release.
 
+### 2026-07-30 | T1 done | SSOT headroom cleared; TD-009 resolved
+CONTEXT.md 130 → 116 (pointer-collapse of prose duplicating CLAUDE.md / README / ARCHITECTURE /
+DOCS_Guide). orchestrator/SKILL.md 110 → 98 by relocating the Implement-routing + dispatch
+blockquote into `references/dispatch.md` (A4 held — existing file, no new one). One audit catch:
+the cut removed the *named* out-of-scope cloud tools while the pointer target didn't list them —
+relocated to `ARCHITECTURE.md` § Key integration points rather than dropped, so "zero rules lost"
+is true and not merely asserted. qa-check 56/0. Fresh re-read of both files found no L-009 fusion.
+
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `.claude/CONTEXT.md` | T1 | dedup to pointers — free headroom for the T2 clause | Low | `qa-check.sh` cap 116≤130 |
+| `skills/orchestrator/SKILL.md` | T1 | relocate dispatch depth to its reference — free headroom | Low | `qa-check.sh` cap 98≤110 |
+| `skills/orchestrator/references/dispatch.md` | T1 | receive the relocated Implement-routing table + `/goal` | Low | fresh re-read |
+| `docs/ARCHITECTURE.md` | T1 | receive the relocated cloud-tools scope row (no rule lost) | Low | fresh re-read |
+| `TECH-DEBT.md` | T1 | TD-009 → resolved → TASK-107 | Low | `qa-check.sh` TD aging |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):

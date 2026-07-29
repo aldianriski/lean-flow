@@ -45,6 +45,7 @@ human-approved) and **§10 governance** (Sprint-Close Retro routes to CHANGELOG 
 | **Claude built-in agents** | dispatched in an **isolated pass** (no shipped agent files) — recon→`Explore` · review→`/code-review` · verify→`/verify` · security→`/security-review` | `CONTEXT.md` § Built-in leverage · `orchestrator` (ADR-002) |
 | **Claude built-in commands** | wired at loop points — `/goal` · `/plan` · `/batch` · `/loop` · `/run` · `/simplify` | `orchestrator` · `flow` |
 | **Hooks** | none — deliberately (the loop is suggestion + gates, not enforcement) | — |
+| **Cloud / fan-out tools** | **out of lean scope** — `/workflows` · `/ultracode` · `/ultraplan` · `/ultrareview` are user-triggered and billed; lean-flow never launches one | — |
 | **`/council` sub-agents** | the one skill that orchestrates sub-agents *internally* (opt-in, high-stakes only) | `council` (ADR-004) |
 
 ## Boundaries (what lean-flow does NOT own)

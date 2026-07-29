@@ -7,8 +7,7 @@ status: current
 
 # lean-flow — CONTEXT
 
-Single source of truth for the loop, roster, gates, modes, tiers, and sprint model. README and
-CLAUDE.md defer here; this file points to their prose rather than duplicating it (cap: ADR-007).
+SSOT for the loop, roster, gates, modes, tiers, and sprint model. README and CLAUDE.md defer here; this file points to their prose rather than duplicating it (cap: ADR-007).
 
 ## The loop
 
@@ -34,23 +33,18 @@ Every skill works standalone; the loop is just the order they reward most togeth
 | `/insights` | learn | anytime — a friction → an `L-NNN` candidate in `LEARNINGS` (or bump a match's `count`); complements the Sprint-Close Retro |
 | `/council` | decide | **opt-in, agent-using** — pressure-test a hard call via 5 advisors + peer review → `verdict-<slug>.md` → ADR |
 
-**Grill** at intake (`/task-decomposer`); G2 re-grills residuals (an unconfirmed assumption blocks G2).
-**Implement routing** (`/orchestrator`): new behaviour→`/tdd` **(default, test-first)** · bug→`/diagnose` · hard-to-change→`/refactor-advisor` · docs/spike→direct.
-`/prototype` feeds design (can't resolve on paper → fold into G2 + ADR); `/council` feeds a hard fork → verdict → ADR §4.
+**Grill** at intake (`/task-decomposer`); G2 re-grills residuals (an unconfirmed assumption blocks G2). **Implement routing** (`/orchestrator`):
+new behaviour→`/tdd` **(default, test-first)** · bug→`/diagnose` · hard-to-change→`/refactor-advisor` · docs/spike→direct. `/prototype` feeds design (can't resolve on paper → fold into G2 + ADR); `/council` feeds a hard fork → verdict → ADR §4.
 
 ## Built-in leverage
 
-lean-flow ships **no agents/hooks** — it dispatches Claude's built-ins in **isolated passes** (fresh
-context): recon→`Explore` · `/code-review` (small/med → one scoped `sonnet`; reports **Standards vs Spec** separately) · `/verify` ·
-`/security-review` · `/council` (internal sub-agents); commands `/goal /plan /batch /loop /run` ·
-`/simplify` (review pass → orchestrator's review-scoping). Full wiring + cloud tools out of lean scope
-(`/workflows` · `/ultracode` · `/ultraplan` / `/ultrareview`) → ARCHITECTURE.md § Key integration points.
+lean-flow ships **no agents/hooks** — it dispatches Claude's built-ins in **isolated passes** (fresh context): recon→`Explore` ·
+`/code-review` (small/med → one scoped `sonnet`; **Standards vs Spec** reported separately) · `/verify` · `/security-review` ·
+`/council` (internal sub-agents); commands `/goal /plan /batch /loop /run /simplify`. Wiring → ARCHITECTURE.md § Key integration points.
 
-**Standalone contract** — stage-skill cross-refs are routing *suggestions* (`→ /X`), never requirements;
-each completes its job invoked cold. Only inherent ordering: the sprint lifecycle. **`/flow` is the sole
-exception** — it *sequences* the stages, never re-implements one. **Feed pipeline** (order set in
-The loop, above): `/task-decomposer` also emits a **fog-map** for foggy work too big to plan.
-**Bug intake:** a bug (`BUG.md.template`) enters at `/triage` → trivial known cause = `TASK` · needs investigation = `/diagnose` · architectural = `TD-NNN`.
+**Standalone contract** — stage-skill cross-refs are routing *suggestions* (`→ /X`), never requirements; each completes its job
+invoked cold. Only inherent ordering: the sprint lifecycle. **`/flow` is the sole exception** — it *sequences* the stages, never
+re-implements one. **Bug intake** — a bug (`BUG.md.template`) enters at `/triage` → trivial known cause = `TASK` · needs investigation = `/diagnose` · architectural = `TD-NNN`.
 
 **Curated, not copied** — review, not a feature ban; cleared "useful **and** important **and** actually used" (full rationale → CLAUDE.md · ADR-001).
 
@@ -76,9 +70,7 @@ A HITL step is **parked** (record → continue disjoint AFK → clean halt via `
 
 ## Model tiers (dispatch discipline · ADR-010)
 
-Route by **nature, not size — ambiguity & consequence up, volume & repetition down**. lean-flow controls
-only the models it **dispatches** on (Agent-tool `model:`); the session model is advisory (the installer's).
-**Role-based + remappable** — undefined role → next-strongest defined (a repo lacking a model still runs).
+Route by **nature, not size — ambiguity & consequence up, volume & repetition down**. lean-flow controls only the models it **dispatches** (Agent-tool `model:`); the session model is advisory. **Role-based + remappable** — undefined role → next-strongest defined.
 
 | Role (default) | Fires on |
 |---|---|
@@ -97,22 +89,17 @@ only the models it **dispatches** on (Agent-tool `model:`); the session model is
 
 ## Doc standard
 
-LEAN standard on the **TemiDev repo-structure core** (ADR-012; WHY/WHERE, never HOW) → `skills/lean-doc-generator/references/DOCS_Guide.md`: §2 lifecycle-bound core (create/update/archive per doc) · §6 four-tier scaffold (base → backend → medium/complex → multi-service; cap-hit → split into tree) · §12 Git boundary; templates → `…/templates/` (30 core + 2 non-core).
-Domain glossary lives **here** (canonical term + `_Avoid_:` synonyms). ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
+LEAN standard on the **TemiDev repo-structure core** (ADR-012; WHY/WHERE, never HOW) → `skills/lean-doc-generator/references/DOCS_Guide.md`: §2 lifecycle-bound core · §6 four-tier scaffold (cap-hit → split into tree) · §12 Git boundary; templates → `…/templates/` (30 core + 2 non-core). Domain glossary lives **here** (canonical term + `_Avoid_:` synonyms). ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
 
 ## Orientation
 
-Where-things-live = **`ARCHITECTURE.md`**; no hand-maintained codemap (it rots — LAW 3). graphify: not
-integrated/depended-on — an on-demand option for onboarding or a pre-refactor audit (verdict →
-`docs/research/graphify-daily-value.md`). No MCP required.
+Where-things-live = **`ARCHITECTURE.md`**; no hand-maintained codemap (it rots — LAW 3). graphify: not integrated — on-demand only, for onboarding or a pre-refactor audit (verdict → `docs/research/graphify-daily-value.md`).
 
 ## Continuous learning governance
 
-Every iteration feeds the next (DOCS_Guide §10). **Close** Retro auto-files four buckets: Shipped→CHANGELOG ·
-Tech debt→`TD-NNN` · Follow-ups→`TASK-NNN` · Learnings→`L-NNN`. **Promote** checkpoint: promote any `L-NNN`
-(`count ≥ 2, promoted: no`) → durable rule (CLAUDE anti-pattern · CONTEXT rule · skill red-flag); age TD
-(≥3 sprints → re-review; `high`→P1); doc-aging §11. Propose → approve, never silent.
-Learnings + ADRs + research carry ADR-009 metadata; the by-tag/-domain index is **generated** corpus-wide into `docs/knowledge-index.md` (`scripts/gen-index.sh`), lint-checked by `qa-check.sh`.
+Every iteration feeds the next (full rules → DOCS_Guide §10/§11). **Close** Retro auto-files four buckets: Shipped→CHANGELOG · Tech debt→`TD-NNN` ·
+Follow-ups→`TASK-NNN` · Learnings→`L-NNN`. **Promote** checkpoint: promote any `L-NNN` (`count ≥ 2, promoted: no`) → durable rule (CLAUDE anti-pattern ·
+CONTEXT rule · skill red-flag); age TD; doc-aging. Propose → approve, never silent. Learnings + ADRs + research carry ADR-009 metadata; the by-tag/-domain index is **generated** into `docs/knowledge-index.md`, lint-checked by `qa-check.sh`.
 
 ## Task entry shape
 
@@ -125,6 +112,5 @@ Learnings + ADRs + research carry ADR-009 metadata; the by-tag/-domain index is 
       state:     ready | needs-info | blocked   (Backlog only; set by /triage)
 ```
 
-**States** — `ready` (promotable) · `needs-info` (open questions) · `blocked` (`depends-on`). Orthogonal
-to `HITL`/`AFK` (who acts). Rejected work → `.out-of-scope/<slug>.md` (lazily created by `/triage`).
+**States** — `ready` (promotable) · `needs-info` (open questions) · `blocked` (`depends-on`). Orthogonal to `HITL`/`AFK` (who acts). Rejected work → `.out-of-scope/<slug>.md` (lazily created by `/triage`).
 **QA (optional, never a gate)** — a task may note a `qa:` hint (tests/lint/security/perf to suggest at Review) — a suggestion for the owner, not a requirement.
