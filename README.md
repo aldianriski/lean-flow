@@ -193,6 +193,18 @@ security → `/security-review`. `/council` is the one skill that orchestrates s
 (feature work, medium+, G1+G2) · `sprint-bulk` (auto-loop the Active Sprint task list, G1+G2 once) —
 full mode/gate contract → [`.claude/CONTEXT.md`](.claude/CONTEXT.md) (SSOT).
 
+**Unattended runs (night-run)** — a promoted sprint can be executed headless while you sleep:
+`claude -p "/orchestrator sprint-bulk unattended" --permission-mode dontAsk --allowedTools "<scoped list>"`,
+fired by cron / Task Scheduler. The charter is **execute-only** — the run executes a Plan a human already
+approved and decides nothing new. Two rules make that safe. **Unattended is declared, never inferred**
+(no signal → it behaves interactively). And **absence ≠ consent**: under `dontAsk` a gate question comes
+back *denied, not answered*, so a denial, a timeout, or a missing human is a **BLOCK** — never a
+default-yes, never self-approval. Anything needing a human (a gate, a grill, `promote`'s governance
+sign-off, `close`'s §11 retention, a `/triage` apply) is **parked** — recorded with its unblock condition
+— while disjoint AFK work carries on; the run then halts cleanly through `/handoff`, and morning `/prime`
+reads it back. It never reshapes a task to dodge a gate. `bypassPermissions` is never the fallback.
+Pre-flight + contract → [`skills/orchestrator/references/night-run.md`](skills/orchestrator/references/night-run.md).
+
 **Implement routing** — at the build step, orchestrator routes by work type: new testable
 behaviour → `/tdd` · a bug or failing test → `/diagnose` · hard-to-change code → `/refactor-advisor`
 · docs / config / spikes implement directly. It also wires Claude's built-in commands — `/goal`
@@ -348,7 +360,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-07-29 · status: current · v1.16.1</sub>
+<sub>Doc owner: Maintainer · last updated 2026-07-29 · status: current · v1.17.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge

@@ -11,6 +11,35 @@ status: current
 
 ---
 
+## v1.17.0 — Unattended-Run Contract (2026-07-29)
+
+MINOR — SPRINT-033. Night-run shipped the execution half; this ships the part that says what an
+unattended run does when it *reaches* a step only a human may take.
+
+**What changed for you:**
+- **Absence ≠ consent** — under `--permission-mode dontAsk` a gate `AskUserQuestion` comes back
+  *denied, not answered*. A denial, a timeout, or a missing human is now explicitly a **BLOCK** —
+  never a default-yes, never self-approval. Previously nothing said so, so a gate could be passed
+  by nobody.
+- **Execute-only charter** — an unattended run executes a Plan a human already approved and decides
+  nothing new. A gate is pre-signable only if its subject **exists and is frozen** at pre-flight, so
+  `promote` (which *forms* the Plan) is never pre-approvable.
+- **Park protocol** — a HITL step is parked with its unblock condition, disjoint AFK work continues,
+  and the run halts cleanly through `/handoff`. It never asks, never decides, and never reshapes a
+  task to dodge a gate (dodging is scope-changing → itself HITL).
+- **Derivation rule, not a list** — AFK-safe = *additive + reversible + already-approved-in-scope*;
+  HITL = *approval · judgement · lossy/destructive · scope-changing*. A step that isn't in the table
+  still resolves. Notably `close` **splits**: Retro + four-bucket auto-file + `close_commit` run;
+  §11 retention and doc-freshness park.
+- **Mode signal** — unattended is **declared** at the trigger (`sprint-bulk unattended`), never
+  inferred; without it the run behaves interactively.
+- **Wired, not just written** — `/orchestrator` (step 5 + a new red flag) · `/flow` (only stage 4
+  conducts unattended) · `/lean-doc-generator` (promote parks whole, close splits) · `/triage`
+  (a missing `y` is a no) · `.claude/CONTEXT.md` SSOT · README (the unattended path was previously
+  undocumented for consumers).
+
+---
+
 ## v1.16.1 — Template De-leak + PRD Mapping (2026-07-29)
 
 PATCH — post-SPRINT-032 template audit (duplicate + consumer-leak sweep, all 32 templates).

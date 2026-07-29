@@ -70,7 +70,7 @@ Shipping ≠ wiring (L-020): the contract must fire at the two places that actua
 - [x] sprint-bulk steps 4–5 state park-instead-of-ask under unattended
 - [x] Red flag added: a denied/unanswerable question read as approval
 - [x] `/flow` states only stage 4 (Build) runs unattended; stages 2 · 3 · 5 park
-- [x] Both files still within the ~110-line cap — `flow` 49; `orchestrator` **111**, 1 over the soft `~110` (see Log)
+- [x] Both files still within the ~110-line cap — `flow` 49 · `orchestrator` 110 (was 111; resolved at T5, see Log)
 
 ### T4 — Wire the park protocol into /lean-doc-generator + /triage `[size: S · risk: low]`
 Layers: `skills/lean-doc-generator/SKILL.md` · `skills/triage/SKILL.md`
@@ -93,9 +93,9 @@ consumer who installs the plugin. Feature sprint → MINOR by hand.
 **Acceptance:** a consumer reading README learns the unattended path exists and what it will and will not do.
 
 **DoD:**
-- [ ] README documents the unattended run + its execute-only charter
-- [ ] CHANGELOG entry written
-- [ ] plugin.json + marketplace.json bumped to the same MINOR version (lockstep)
+- [x] README documents the unattended run + its execute-only charter
+- [x] CHANGELOG entry written
+- [x] plugin.json + marketplace.json bumped to the same MINOR version (lockstep)
 
 ### T6 — Exercise the park protocol on a real headless run `[size: S · risk: med]`
 Layers: (verification — no source change)
@@ -163,6 +163,18 @@ on the derivation rule: Retro + four buckets + `close_commit` + pointer-clear ru
 retention + doc-freshness park (lossy / approval-bound). `/triage` gets the sharpest phrasing of the
 invariant: *a missing `y` is a no, never a yes.*
 
+### 2026-07-29 | T5 | Consumer surface + v1.17.0 — and the T3 cap call was wrong
+README had **zero** mention of the unattended path before this (L-015: a shipped capability invisible
+to whoever installs the plugin). Added it under § How it works, CHANGELOG v1.17.0, lockstep bump.
+
+**Correction to T3's log entry:** `qa-check.sh` enforces the SKILL.md cap as a **hard 110**, not the
+soft `~110` CLAUDE.md implies — `FAIL cap skills/orchestrator/SKILL.md (111 > 110)`. T3's reasoning
+("111 stands, merging would bury the rule") was therefore not mine to make. Resolved by merging the
+new red flag into the adjacent autonomy one under a single heading — *"Treating autonomy as
+authority"* — which covers both failure modes (flipping a safeguard · reading absence as approval)
+without losing either. Back to 110/110. Second finding: the qa-check also caught the README footer
+version, which a hand bump misses every time. Full suite green: **56 pass, 0 fail**.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
@@ -173,6 +185,9 @@ invariant: *a missing `y` is a no, never a yes.*
 | `skills/flow/SKILL.md` | T3 | the conductor must not promote a sprint nobody approved | Low | read-through |
 | `skills/lean-doc-generator/SKILL.md` | T4 | promote/close own the two HITL steps the real run hit | Med | T6 real headless run |
 | `skills/triage/SKILL.md` | T4 | its apply-after-`y` waits on a `y` that cannot arrive | Low | read-through |
+| `README.md` | T5 | the unattended path was undocumented for consumers (L-015) | Low | qa-check 56/0 |
+| `docs/CHANGELOG.md` | T5 | user-visible behaviour change needs a release entry | Low | qa-check 56/0 |
+| `.claude-plugin/{plugin,marketplace}.json` | T5 | feature sprint → MINOR, lockstep | Low | qa-check 56/0 |
 
 ## Retro
 
