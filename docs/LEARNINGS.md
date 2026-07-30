@@ -53,19 +53,11 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-060 [tags: tooling] [status: active]: In a session exposing two shells side by side (a PowerShell tool and a Bash tool), shell-specific multi-line string syntax fails **silently** across the boundary. A PowerShell here-string (`@'…'@`) handed to the Bash tool committed a literal `@` as the commit subject and demoted the real subject into the body — bash read `@` as an ordinary token and concatenated the quoted string onto it. Git accepted it without complaint, the tool reported success, and `git log --oneline` was the only thing that revealed it. Match the quoting form to the tool actually executing (Bash → heredoc `<<'EOF'`), and when a command's whole job is to *record text*, inspect the stored artifact rather than the exit code.
-- seen: Sprint-037
-- count: 1
-- promoted: no
-- related: L-057 · L-059 (same family: the tool succeeded, the artifact was wrong)
+## L-060 [tags: tooling] [status: promoted] → promoted: yes → `.claude/CLAUDE.md` Edit-safety trap **(c)** (verify the artifact, not the command's self-report). Shell-specific multi-line string syntax fails silently across a two-shell session — a PowerShell here-string (`@'…'@`) handed to the Bash tool committed a literal `@` as the subject and demoted the real one into the body; git accepted it, the tool reported success, `git log --oneline` was the only tell. Match the quoting form to the tool actually executing, and when a command's job is to *record text*, inspect the stored text. Seen Sprint-037 · promoted as part of the 5-entry cluster (L-045 · L-049 · L-057 · L-059 · L-060, 4 sprints). Related: L-057 · L-059.
 
 ---
 
-## L-059 [tags: tooling] [status: active]: A gate's reported exit status can come from the **plumbing** rather than the gate. Running `sh scripts/qa-check.sh > "$TMPDIR/qa.txt"` in a session where `$TMPDIR` was unset made the *redirect* fail — the shell reported `EXIT=1` and qa-check never ran at all. Believed, it sends the reader debugging a check that is actually green, or blocks a clean commit on a phantom failure. Same family as L-057 one layer earlier: there the status came from a formatter at the end of a pipeline, here from a failed redirect before the gate started. The tell is structural — a non-zero status with **no report behind it** is not a verdict. Check that the gate produced its own output before trusting its number.
-- seen: Sprint-037
-- count: 1
-- promoted: no
-- related: L-057 (status from the wrong command) · L-058 (a gate that lies quietly)
+## L-059 [tags: tooling] [status: promoted] → promoted: yes → `.claude/CLAUDE.md` Edit-safety trap **(c)**. A gate's exit status can come from the **plumbing** rather than the gate — `sh scripts/qa-check.sh > "$TMPDIR/qa.txt"` with `$TMPDIR` unset made the *redirect* fail, reporting `EXIT=1` while qa-check never ran. The tell is structural: a non-zero status with **no report behind it** is not a verdict. Seen Sprint-037 · promoted as part of the 5-entry cluster (4 sprints). Related: L-057 (status from the wrong command) · L-058 (a gate that lies quietly).
 
 ---
 
@@ -76,11 +68,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-057 [tags: tooling] [status: active]: A gate command piped into a formatter stops gating — `check | tail && commit` commits on the FORMATTER's exit code, not the check's. Twice at SPRINT-035 close, `sh scripts/qa-check.sh 2>&1 | tail -3 && git add … && git commit` committed through a genuine FAIL (missing corpus metadata; stale README footer version): POSIX sh pipeline status is the LAST command's, and `tail` always exits 0, so the `&&` chain read red as green both times. The failing line was even printed — but the chain, not the reader, made the decision. Run the gate bare (`qa-check && commit`) or gate on its captured status; pipe to a formatter only AFTER the exit code has done its job.
-- seen: Sprint-035 (×2, same close)
-- count: 1
-- promoted: no
-- related: L-007 (the check existed and ran — the wiring made it decorative) · ADR-008
+## L-057 [tags: tooling] [status: promoted] → promoted: yes → `.claude/CLAUDE.md` Edit-safety trap **(c)**. A gate piped into a formatter stops gating — `check | tail && commit` commits on the FORMATTER's exit code; twice at SPRINT-035 close a genuine FAIL (missing corpus metadata; stale README footer version) was committed through, because POSIX pipeline status is the last command's and `tail` always exits 0. The failing line was printed — the chain, not the reader, made the decision. Run the gate bare, or gate on its captured status. Seen Sprint-035 (×2, same close) · promoted as part of the 5-entry cluster (4 sprints). Related: L-045 (the same friction, filed as a separate entry instead of a `count` bump — which is why the `count ≥ 2` trigger never fired) · L-007 · ADR-008.
 
 ---
 
@@ -140,11 +128,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-049 [tags: process] [status: active]: In a parallel fan-out, the durable per-unit output FILE is the success signal, not the agent's in-band reply — a graphify extraction subagent was killed mid-run by a session limit AFTER writing valid chunk JSON; the reply channel reported failure, but the file-on-disk protocol recovered the work with zero re-extraction (graphify reference run, 2026-07-29). Design dispatches so each unit writes its result to a known path and the coordinator verifies the artifact, never the reply.
-- seen: 2026-07-29 (graphify reference run, non-sprint)
-- count: 1
-- promoted: no
-- related: L-046 (worktree dispatch resilience) · dispatch.md § Merge-back queue (per-task commit as checkpoint) · night-run.md (per-task commit + Execution Log — same durable-artifact checkpoint principle)
+## L-049 [tags: process] [status: promoted] → promoted: yes → `.claude/CLAUDE.md` Edit-safety trap **(c)** (the fan-out leg: the per-unit output FILE is the success signal, not the agent's reply). A graphify extraction subagent was killed mid-run by a session limit AFTER writing valid chunk JSON — the reply channel reported failure, the file-on-disk protocol recovered the work with zero re-extraction. Design dispatches so each unit writes to a known path and the coordinator verifies the artifact. Seen 2026-07-29 (graphify reference run, non-sprint) · promoted as part of the 5-entry cluster (4 sprints). Related: L-046 · dispatch.md § Merge-back queue · night-run.md (per-task commit as durable checkpoint).
 
 ---
 
@@ -172,11 +156,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-045 [tags: process] [status: active]: A piped quality gate masks its exit code — `qa-check.sh | tail` returns *tail's* status, so a FAIL sailed into a `&&`-chained commit unseen (SPRINT-025: vocab-tag lint failure committed, caught only by reading the output after). Chain the commit on the *lint's own* exit (`sh qa-check.sh && git commit …`, no pipe), or read the full output before committing — never pipe a gate into a formatter inside the same chain that commits.
-- seen: Sprint-025
-- count: 1
-- promoted: no
-- related: L-013 (a "required" rule is only real if a check enforces it — and a check is only real if its exit code is read)
+## L-045 [tags: process] [status: promoted] → promoted: yes → `.claude/CLAUDE.md` Edit-safety trap **(c)**. A piped quality gate masks its exit code — `qa-check.sh | tail` returns *tail's* status, so a vocab-tag lint FAIL sailed into an `&&`-chained commit unseen (SPRINT-025). **First occurrence of the class, and the promotion miss itself is the lesson**: the recurrence ten sprints later was filed as a *new* entry (L-057) rather than a `count` bump here, so `count` stayed at 1 on both and the `count ≥ 2` promotion trigger never fired — at close, check whether a "new" learning is an existing entry's second sighting. Seen Sprint-025 · promoted as part of the 5-entry cluster (4 sprints). Related: L-013 · L-057.
 
 ---
 
