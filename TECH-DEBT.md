@@ -121,6 +121,12 @@ status: current
     to fire an unattended run. A cold reader must scroll two code blocks to reach Part 2's trigger.
   - Mitigation (not yet done): split the capability checks into their own `references/` sibling if a
     third snippet lands. Not urgent at two; the trigger is the third.
+  - **Re-reviewed 2026-07-30 (SPRINT-041 promote, 3 sprints open — kept open).** The trigger is
+    unchanged and still unfired: night-run.md carries the same two embedded snippets it did at
+    SPRINT-038. SPRINT-040 added no snippet there, and TD-019's planned fix lands a leg in
+    `qa-check.sh`, not a third block in this file. Splitting now would cost a reader one more hop for
+    no reduction in what they must read. Next re-review at SPRINT-044 promote, or immediately if a
+    third snippet lands.
 
 - **TD-013** severity: minor | status: resolved → SPRINT-039 T3 | created: Sprint-038
   - Summary: `evals/run-dispatch-preflight-fixtures.sh` guards the `dispatch.md` preflight snippet but
@@ -139,37 +145,15 @@ status: current
     manual/gated boundary is stated in `docs/QA.md`: the behavioural real-run fixtures (API cost, not
     deterministic) stay opt-in, by design, not by the gap this TD named.
 
-- **TD-012** severity: resolved → SPRINT-038 T2a (retained-guard leg; wiring → TD-013) | created: Sprint-037
-  - Summary: the pre-dispatch preflight snippet now shipped in
-    `skills/orchestrator/references/dispatch.md` was negative-tested by three must-FAIL fixtures that
-    lived in a scratch dir and were **deleted** with the prototype. The shipped sh/awk block therefore
-    has no retained regression guard, and `qa-check.sh` does not read it.
-  - Impact: a future edit to the snippet — or a change to the sprint-schema tokens it parses — can
-    silently reintroduce the exact silent-false-negative class L-058 names. Proven reachable, not
-    theoretical: stripping one guard clause during T1 made it pass a real overlap at exit 0. A gate
-    that degrades quietly is the worst shape for a gate, which is the whole point of L-058.
-  - Mitigation (not yet done): retain the three fixtures plus a runner. Natural carrier is the eval
-    harness TASK-124 will build — its fixture-skeleton + assertion-script shape is the same one, so
-    this likely costs a row rather than a new mechanism. Alternative: a `qa-check.sh` leg that runs
-    the snippet against retained fixtures.
-
-- **TD-011** severity: minor | status: resolved → SPRINT-038 T4 | created: Sprint-035
-  - Summary: `docs/adr/ADR-010-model-dispatch-role-tiers.md`'s 2026-07-10 amendment wording ("a
-    mis-classification mis-routes") predates ADR-013/T5's advisory-default framing — read cold it
-    can imply intake classification is binding, contradicting the now-canonical "persisted `class:`
-    is an advisory default; dispatch-time classification stays authoritative."
-  - Impact: a cold reader reconciling ADR-010 with CONTEXT.md § Task entry shape may resolve the
-    ambiguity the wrong way. Not contradicted in substance — wording only.
-  - Resolution: appended a dated amendment note to ADR-010 (2026-07-30) pointing at ADR-013's
-    advisory-default clause and CONTEXT.md § Model tiers; the 2026-07-10 amendment's prior text is
-    untouched (ADRs are append-only) — the note reconciles the framing without rewriting it.
-
 ---
 
 ## Resolved (collapsed)
 
 <!-- TD-001…007 all resolved (§11 collapse — per-TD summaries live in their sprint files + git). -->
 - resolved: **TD-001**→SPRINT-003 · **TD-002/004**→SPRINT-005 · **TD-003**→SPRINT-004 · **TD-005**→SPRINT-006 · **TD-006**→SPRINT-009 · **TD-007**→SPRINT-012 (closed 2026-07-02).
+
+<!-- TD-011…012 collapsed at SPRINT-041 promote (3 sprints after resolution — per-TD summaries live in their sprint files + git). -->
+- resolved: **TD-011**→SPRINT-038 T4 (ADR-010 amendment-note reconciliation) · **TD-012**→SPRINT-038 T2a (preflight fixtures retained; wiring → TD-013) (collapsed 2026-07-30).
 
 <!-- TD-008…010 all resolved (§11 collapse — per-TD summaries live in their sprint files + git). -->
 - resolved: **TD-008**→SPRINT-032 · **TD-009**→SPRINT-034 · **TD-010**→SPRINT-035 (collapsed 2026-07-30, SPRINT-038 T4).

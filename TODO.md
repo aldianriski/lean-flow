@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-_(none active)_ — SPRINT-040 closed 2026-07-30 (v1.23.0). Next: `/lean-doc-generator promote` from the Backlog below.
+> **SPRINT-041 — Debt Guards** → docs/sprint/SPRINT-041-debt-guards.md
 
 ---
 
@@ -32,6 +32,31 @@ _(none active)_ — SPRINT-040 closed 2026-07-30 (v1.23.0). Next: `/lean-doc-gen
 
 ### P2 — Quality / Polish
 
+- [ ] TASK-129 — Guard the headless park-record cue in qa-check  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  qa-check gains a leg asserting both the migrate and init procedures still carry
+                  (a) a headless *detection* cue and (b) a park-record instruction naming the handoff
+                  doc; the leg is negative-tested against a scratch copy with the cue stripped and
+                  FAILs there naming which procedure lost it — a guard that can only pass is the
+                  failure mode it exists to prevent (L-058)
+      touches:    the qa gate script · docs/QA.md leg inventory
+      depends-on: none
+      assumes:    grep-shaped presence check only — model compliance stays a paid opt-in fixture,
+                  per docs/QA.md's manual/gated boundary
+      tracker:    TD-019
+      state:      ready
+
+- [ ] TASK-130 — Fix the zero-match grep idiom in the boundary-park assertion  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  a genuine zero-match no longer emits "integer expression expected" on stderr; the
+                  FAIL no-park-record verdict is unchanged, and both the harness selftest and a real
+                  zero-match case are run to prove each direction still reports correctly
+      touches:    the boundary-park assertion script
+      depends-on: none
+      assumes:    fail-safe in both directions today (TD-018 verified it) — this is noise removal,
+                  not a correctness fix, so the verdict text must not change
+      tracker:    TD-018
+      state:      ready
 
 ### P3 — Long-term
 
