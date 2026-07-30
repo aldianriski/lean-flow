@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-039 — Eval Coverage and Release — closed 2026-07-30 · dfc60e4 (no release — maintainer-only)
 - SPRINT-038 — Probes, Evals, and Layout — closed 2026-07-30 · e4d132c (MINOR v1.22.0)
 - SPRINT-037 — Gates and Evals — closed 2026-07-30 · 08ca2a6 (MINOR v1.21.0)
 - SPRINT-036 — Preflight and Verify — closed 2026-07-30 · ba46936 (MINOR v1.20.0)

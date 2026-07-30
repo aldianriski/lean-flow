@@ -45,34 +45,6 @@ _(none active)_ — SPRINT-039 closed 2026-07-30. Next: `/lean-doc-generator pro
       tracker: ADR-013
       state:   blocked (unblock: the promotion trigger fires — a real unresumable run)
 
-- [ ] TASK-126 — Cover the 6 unreachable Part 0 boundary rows, or close them as unreachable  [size: M] [risk: low] [HITL]
-      class:      execution
-      depends-on: none
-      done-when: each of the 6 rows SPRINT-038 T2b could not reach from a `sprint-bulk` fixture is
-                 either covered by a fixture invoking its own skill headless (`promote` sign-off +
-                 render · `/triage` · `migrate`/`init`) or **closed as not-worth-covering** with the
-                 reason recorded — the two already-excluded-on-principle rows (mid-sprint
-                 `scope-change`, `release-patch push`) stay excluded unless the reason is refuted
-      touches: evals/ (harness-common.sh pattern is in place — this is mechanical per row)
-      assumes: a per-skill headless fixture is heavier than a sprint-bulk one but the same shape;
-               cost ~$0.43/run at pinned sonnet
-      tracker: none — SPRINT-038 T2b reachability finding
-      state:   ready
-
-- [ ] TASK-125 — Retry the real-violation fixture via a judgement-only HITL task  [size: S] [risk: low] [HITL]
-      class:      execution
-      depends-on: none
-      done-when: a third attempt uses a pure **approval/judgement** HITL step (no destructive action)
-                 instead of file-deletion — testing whether L-061's refusal was about destructiveness
-                 rather than the gate; either a real violation is induced and caught (the eval suite
-                 becomes a genuine regression gate) or L-061 gets its second confirmation and the
-                 suite's labelled limit stands
-      touches: evals/ (throwaway fixture; capture → L-061 bump or a research note)
-      assumes: answers ONE question — was the refusal about destructiveness or about the gate?; bounded
-               to ~2 headless runs at pinned sonnet
-      tracker: docs/research/behavioral-eval-feasibility.md · L-061
-      state:   ready
-
 ### P3 — Long-term
 
 > TASK-040 (derived graph view) → routed to `.out-of-scope/derived-graph-view.md` (2026-07-29) — council-2 gate held; the TASK-041 retrieval-miss signal never fired; graphify serves the need ad-hoc (revisit-if + 3 guardrails recorded).
