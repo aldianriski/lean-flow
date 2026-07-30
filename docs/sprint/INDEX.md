@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-035 — Contract Hardening — closed 2026-07-30 · 7469411 (MINOR v1.19.0)
 - SPRINT-034 — Night-Run Entry Path — closed 2026-07-30 · ce93d59 (MINOR v1.18.0)
 - SPRINT-033 — Unattended-Run Contract — closed 2026-07-29 · 7eca438 (MINOR v1.17.0)
 - SPRINT-032 — TemiDev Repo-Structure Standard — closed 2026-07-29 · 94da637 (MINOR v1.16.0)

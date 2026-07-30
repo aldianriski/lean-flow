@@ -11,6 +11,33 @@ status: current
 
 ---
 
+## v1.19.0 — Contract Hardening (2026-07-30)
+
+MINOR — SPRINT-035. An external review's strongest point — "turn prose conventions into
+machine-verifiable contracts" — curated down to what the evidence supports (L-017 delta map),
+plus four verified doc defects fixed.
+
+**What changed for you:**
+- **The task schema gains two formal fields.** `class:` (decision | execution | mechanical-ingest —
+  an *advisory default*: the dispatcher may override; ADR-010 stays authoritative) and
+  `depends-on:` are now part of the canonical entry shape (CONTEXT.md · `/task-decomposer` ·
+  `SPRINT.md.template`), read by `/orchestrator` dispatch (waves ← depends-on · tier ← class), and
+  lint-enforced: `qa-check.sh` fails an active-sprint task missing a mandatory field.
+- **QA now checks its own claims.** `docs/QA.md`'s template counts are linted against the script's
+  constants (the stale "+1 non-core" claim is fixed and can't silently drift again).
+- **Terminology is now honest.** One precise statement everywhere: gates are inline human-approved
+  checklists; review may dispatch built-in/ad-hoc isolated subagents; lean-flow ships **no custom
+  agent definitions** (the ambiguous "ships no agents" / "agent-free" phrasings are retired,
+  including the plugin manifest description).
+- **TD-010 resolved** — `night-run.md` no longer cites repo-local paths a consumer can't resolve.
+- **ADR-013 decides the machine-state fork** (council-pressure-tested, 11 calls): a conditioned
+  execution-graph *check* is adopted (base-ref verified at spawn AND every wave boundary; no-JSON
+  bash rung prototyped first) · checkpointed run-state is deferred behind a written graduation
+  contract with a 5-sprint expiry · a JSONL run-event log is rejected (the Execution Log already
+  is the event log). Trail: `docs/research/verdict-machine-state-artifacts.md`.
+
+---
+
 ## v1.18.0 — Night-Run Entry Path (2026-07-30)
 
 MINOR — SPRINT-034. v1.17.0 shipped the contract for what an unattended run may *do* once running.

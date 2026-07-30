@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-035 closed 2026-07-30 → v1.19.0 Contract Hardening; retention pass pending owner approval.)_
+> _(no active sprint — SPRINT-035 closed 2026-07-30 → v1.19.0 Contract Hardening; archived per §11.)_
 
 ---
 
@@ -29,34 +29,6 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
-
-- [ ] TASK-110 — Harden the task schema with formal depends-on and class fields  [size: M] [risk: med] [HITL]
-      done-when: the task entry shape (CONTEXT.md § Task entry shape · /task-decomposer · TODO.md
-                 header · SPRINT.md.template) carries `depends-on:` and `class:` (decision |
-                 execution | mechanical-ingest); /orchestrator dispatch reads both (parallel-wave
-                 check uses depends-on · tier routing reads class); qa-check.sh fails an active-
-                 sprint task missing a mandatory field (done-when · touches · state · class ·
-                 depends-on-or-none · HITL/AFK tag)
-      touches: .claude/CONTEXT.md · skills/task-decomposer · skills/orchestrator (+ references/dispatch.md) ·
-               skills/lean-doc-generator/templates/SPRINT.md.template · TODO.md header · scripts/qa-check.sh · docs/QA.md
-      assumes: [HITL|AFK] already covers autonomy — no new field, lint only; persisting class at
-               intake shifts classification earlier than ADR-010's dispatch-time model — reconcile
-               at G2; the review's YAML shape is illustrative — markdown shape stays; SKILL line
-               caps hold (overflow → references/ per ADR-006)
-      tracker: none — external review item 1 (schema/runtime mismatch)
-      state:   ready
-
-- [ ] TASK-111 — Decide the machine-state-artifact fork (execution graph · run-state · run events)  [size: M] [risk: med] [HITL]
-      done-when: a /council verdict + ADR records adopt/defer/reject for each of (a) compiled
-                 sprint DAG artifact, (b) checkpointed run-state file, (c) structured run-event
-                 log — with revisit-if conditions; accepted items graduate to TASK-NNN, rejected
-                 route to .out-of-scope/
-      touches: docs/adr/ · docs/ (verdict) — decision only, no runtime code
-      assumes: all three share one fork — first machine-readable state files in a markdown-first
-               plugin (same axis council-2 held on TASK-040); night-run + fleet recovery is the
-               strongest motivating use case
-      tracker: none — external review items 2·3·6, folded per delta map
-      state:   ready
 
 ### P2 — Quality / Polish
 
@@ -78,48 +50,6 @@ status: current
       tracker: none — closes the last unverified edge of SPRINT-033
       state:   ready
 
-- [ ] TASK-112 — Fix the QA template-count claim and lint QA.md against qa-check.sh  [size: S] [risk: low] [AFK]
-      done-when: docs/QA.md claims 2 non-core templates (DESIGN, QA-TESTCASE) matching
-                 qa-check.sh's noncore constant, and the script's claim-consistency checks
-                 include docs/QA.md's own counts (future drift fails the run); qa-check passes
-      touches: docs/QA.md · scripts/qa-check.sh
-      assumes: the script (noncore=2) is correct and QA.md is stale — verified 2026-07-30
-      tracker: none — external review, verified doc defect
-      state:   ready
-
-- [ ] TASK-113 — Align agent-review terminology across surfaces  [size: S] [risk: low] [HITL]
-      done-when: CONTEXT.md no longer both claims isolated /code-review passes and "no review
-                 agent" — replaced by one precise statement (gates = inline human-approved
-                 checklists · code review may dispatch built-in/ad-hoc isolated subagents · no
-                 custom agent definitions shipped); every "ships no agents" phrasing (CLAUDE.md ·
-                 CONTEXT.md · README · ARCHITECTURE.md) reads "no custom agent definitions";
-                 qa-check passes
-      touches: .claude/CONTEXT.md · .claude/CLAUDE.md · README.md · docs/ARCHITECTURE.md
-      assumes: merges two review items (review-agent contradiction + "ships no agents" wording) —
-               same wording sweep over the same four files
-      tracker: none — external review, verified doc defect
-      state:   ready
-
-- [ ] TASK-114 — Resolve TD-010: remove repo-local paths from the shipped night-run reference  [size: S] [risk: low] [HITL]
-      done-when: skills/orchestrator/references/night-run.md contains no repo-local docs/… path;
-                 both citations are replaced with consumer-legible self-contained wording; TD-010
-                 closed in TECH-DEBT.md
-      touches: skills/orchestrator/references/night-run.md · TECH-DEBT.md
-      assumes: none
-      tracker: TD-010
-      state:   ready
-
-- [ ] TASK-115 — Revise the harness-engineering verdict to name operational keepers  [size: S] [risk: low] [HITL]
-      done-when: docs/research/harness-engineering-adaptation.md's verdict reads "no new core
-                 stages, but operational keepers" (or equivalent), listing behavioral evals ·
-                 machine-readable scheduling/recovery state · maintenance recipe as keepers with
-                 pointers to TASK-111 / TASK-116
-      touches: docs/research/harness-engineering-adaptation.md
-      assumes: conceptual equivalence ≠ operational equivalence — the original "no keepers"
-               verdict conflated the two
-      tracker: none — external review, verified against the research doc
-      state:   ready
-
 - [ ] TASK-116 — Prototype one behavioral eval fixture end-to-end  [size: S] [risk: low] [HITL]
       done-when: one safety eval (unattended run parks HITL work) runs headless against the
                  installed plugin and asserts behavior (files written · state transitions · exit
@@ -136,8 +66,8 @@ status: current
       depends-on: none
       done-when: dispatch/night-run procedure states "every worktree branches from the current
                  wave's declared base commit, verified against live HEAD at spawn; mismatch halts
-                 dispatch", and the rule is traced once against SPRINT-035's stale-HEAD incident
-                 (would it have caught it?) — ADR-013's prose-cure leg
+                 dispatch", and the rule is traced once against the 2026-07-30 stale-HEAD incident
+                 (L-055 — would it have caught it?) — ADR-013's prose-cure leg
       touches: skills/orchestrator/references/dispatch.md · night-run.md
       assumes: the rule is the root-cause fix; any DAG artifact is enforcement only (ADR-013)
       tracker: ADR-013
