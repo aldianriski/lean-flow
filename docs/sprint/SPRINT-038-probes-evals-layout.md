@@ -103,9 +103,9 @@ of ADR-010" and which has now hit the 3-sprint aging threshold.
 as though intake classification is binding.
 
 **DoD:**
-- [ ] TD-008 · TD-009 · TD-010 collapsed to one-line entries in § Resolved (§11; bodies live in git)
-- [ ] TD-011 resolved — ADR-010 amendment note points at ADR-013's advisory-default clause
-- [ ] TD-011 marked `status: resolved → SPRINT-038 T4`; no row deleted (audit trail preserved)
+- [x] TD-008 · TD-009 · TD-010 collapsed to one-line entries in § Resolved (§11; bodies live in git)
+- [x] TD-011 resolved — ADR-010 amendment note points at ADR-013's advisory-default clause
+- [x] TD-011 marked `status: resolved → SPRINT-038 T4`; no row deleted (audit trail preserved)
 
 ## Decisions (pre-locked)
 
@@ -136,6 +136,50 @@ as though intake classification is binding.
   choosing a procedure step), it earns an ADR before it ships.*
 
 ## Execution Log
+
+### 2026-07-30 | T4 complete | three overdue TD rows collapsed · TD-011 resolved append-only
+Dispatched a tier above the Plan's `mechanical-ingest` on purpose — the ADR-010 leg is wording
+judgement, not extraction (dispatch-time classification is authoritative; the persisted `class:` is an
+advisory default, ADR-010/ADR-013).
+Agent judgement worth keeping: it appended a **second** collapse line rather than extending the
+existing TD-001…007 one, explicitly to avoid an L-009 fuse on a shared line. Right call — that exact
+failure has hit this repo three times.
+**ADR append-only verified by the coordinator, not taken on trust:** `git diff` on ADR-010 shows
+**11 insertions, 0 deletions**, so the 2026-07-10 amendment text is provably untouched and the
+reconciliation rides as a new dated note pointing at ADR-013's advisory-default clause + CONTEXT.md
+§ Model tiers. CONTEXT.md checked for contradiction and found consistent — nothing edited there (not
+T4's file this sprint).
+Ledger state: TD-012 open · TD-011 resolved-with-body-retained (audit trail) · TD-001…007 and
+TD-008…010 collapsed. No id deleted or reused. qa-check 61 pass / 0 fail.
+
+### 2026-07-30 | T1 | two dispatch failures on API 529 — nothing written, task re-split
+T1 died mid-run twice (server-side 529, not the brief). Verified read-only both times that **nothing
+was written** — no `evals/`, no implementation markers in `night-run.md` — so there was no partial WIP
+to reconcile and no commit to unwind. Diagnosis: T1 was the heaviest brief in the wave (read the cache
++ manifest + the dispatch.md precedent, then build four fixtures), so it simply had the most surface
+exposed to an overload; T4 launched and completed fine in the same window.
+Owner chose to **split T1 into two shorter dispatches** rather than resend it whole: T1a = the
+skill-freshness check (the leg that *blocks*) + its three fixtures; T1b = the two degrade-only rows.
+Not a scope change — T1's own `assumes:` already sanctioned shipping the version check alone, and the
+DoD is unchanged; it now lands across two commits instead of one.
+
+### 2026-07-30 | gates | batch G1+G2 signed off
+G1 fast-path (plan frozen at `add96ff`, tree clean, 0 unpushed — scope unchanged since promote). G2:
+D2/D3 re-verified by *running* T1-037's preflight against this Plan (waves T1=0 T4=0 T2=1 T3=2,
+single-owner clean). A3 confirms in-task via migrate's propose→approve; A2 and A4 carry pre-authorized
+fallbacks, so neither is a passive placeholder.
+**A1 resolved, and it changed what T1 builds.** Recon found `installed_plugins.json` records a usable
+`version`, but its `gitCommitSha` reads `56a33a8` — this repo's *initial* release commit, stale by the
+entire project history, so it cannot serve as a content check. That exposed a hole in T4-037's spec:
+comparing version *strings* cannot catch an unbumped skill edit, which is the likeliest form of the
+trap (mid-sprint edits don't bump versions). Owner chose a **content diff with the version string as a
+fast path, plus a SKIP leg when there is no local plugin repo** — so it catches the real trap and can
+never fire at an ordinary consumer. Within T1's DoD ("installed-vs-repo"), so a design decision, not a
+scope change.
+Also found at G2: the repo has **three** legacy-lean files — `docs/DEPLOY.md` as well as ARCHITECTURE
+and CHANGELOG — but TASK-074's `done-when` named only two. The migrate mapping covers DEPLOY
+(→ `docs/deployment/deployment-guide.md`, rollback content split out), so A3 holds; carried into T3's
+brief so it isn't silently dropped.
 
 ### 2026-07-30 | promote | plan locked
 Four tasks (TASK-123/124/074 → T1–T3; T4 is governance-filed, no Backlog id). Governance scan was

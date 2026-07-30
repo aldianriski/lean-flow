@@ -114,3 +114,14 @@ dispatched branch re-pays the full base substrate (CLAUDE.md + tool/skill contex
 so cheap-tier branches are cheap per *token*, not per *spawn* — a wide fan-out of trivial steps can cost
 more than doing them inline or sequentially. This sharpens, not weakens, default-spawn: the stated-reason
 clause for staying inline may cite this cost term.
+
+## Amendment (2026-07-30) — wording reconciliation with ADR-013 (TD-011)
+
+**Status:** accepted · clarifies the 2026-07-10 amendment's closing line, no substantive change.
+**Source:** ADR-013's advisory-default framing; filed as TD-011 (Sprint-035), resolved SPRINT-038 T4.
+
+**Note.** The 2026-07-10 amendment's "a mis-classification mis-routes" describes a dispatch-time
+outcome, not a rule that intake classification is binding. Per ADR-013 and `.claude/CONTEXT.md` §
+Model tiers, a task's persisted `class:` is an **advisory default** — dispatch-time classification
+stays authoritative and may override it. Read the 2026-07-10 text under that framing; nothing prior
+in this ADR is retracted or rewritten.

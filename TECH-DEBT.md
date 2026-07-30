@@ -30,44 +30,16 @@ status: current
     this likely costs a row rather than a new mechanism. Alternative: a `qa-check.sh` leg that runs
     the snippet against retained fixtures.
 
-- **TD-011** severity: minor | status: open | created: Sprint-035
+- **TD-011** severity: minor | status: resolved → SPRINT-038 T4 | created: Sprint-035
   - Summary: `docs/adr/ADR-010-model-dispatch-role-tiers.md`'s 2026-07-10 amendment wording ("a
     mis-classification mis-routes") predates ADR-013/T5's advisory-default framing — read cold it
     can imply intake classification is binding, contradicting the now-canonical "persisted `class:`
     is an advisory default; dispatch-time classification stays authoritative."
   - Impact: a cold reader reconciling ADR-010 with CONTEXT.md § Task entry shape may resolve the
     ambiguity the wrong way. Not contradicted in substance — wording only.
-  - Mitigation (not yet done): one-line amendment note on ADR-010 pointing at ADR-013's advisory-
-    default clause; sweep on the next touch of the file.
-
-- **TD-010** severity: minor | status: resolved → TASK-114 (Sprint-035) | created: Sprint-034
-  - Summary: `skills/orchestrator/references/night-run.md` cites a **repo-local path** in shipped
-    skill text — lines 5 and 158 point at `docs/research/night-run.md`, which does not exist in a
-    consumer's repo. Predates Sprint-034; surfaced by that sprint's consumer-surface scan and left
-    untouched (clean up your own mess, not adjacent content).
-  - Impact: a consumer reading the night-run procedure cold hits two unresolvable references — the
-    exact L-015 consumer-leak class the DoD check exists to catch, in a file the check passed
-    because the leak was pre-existing rather than newly added.
-  - Resolution: the W5 treatment applied at both sites — the one-line rationale inlined, the
-    repo-local pointer dropped; verified clean by grep.
-
-- **TD-009** severity: minor | status: resolved → TASK-107 (Sprint-034) | created: Sprint-033
-  - Summary: two SSOT surfaces were at **exactly zero headroom** — `.claude/CONTEXT.md` 130/130
-    (ADR-007) and `skills/orchestrator/SKILL.md` 110/110 (`qa-check.sh` enforces both as hard caps,
-    not the soft `~110` CLAUDE.md implies). SPRINT-033's contract fit only by compressing its own
-    entry to two dense lines and merging a new red flag into an adjacent one.
-  - Impact: the next rule touching either file could not land without first displacing something —
-    the L-008 / TD-006 accretion signal firing a second time on CONTEXT.md.
-  - Resolution: the planned mitigation executed. CONTEXT.md 130 → **116** by collapsing prose that
-    duplicated CLAUDE.md / README / ARCHITECTURE / DOCS_Guide into pointers; orchestrator/SKILL.md
-    110 → **98** by relocating the Implement-routing + dispatch blockquote into its existing
-    `references/dispatch.md` (the L-012 pattern that resolved TD-008). No rule lost — the one
-    genuine deletion candidate (the named out-of-scope cloud tools) was relocated to
-    `docs/ARCHITECTURE.md` § Key integration points rather than dropped.
-
-- **TD-008** severity: minor | status: resolved → TASK-069 (Sprint-032) | created: Sprint-017
-  - Summary: `skills/lean-doc-generator/SKILL.md` at 106/110, init section the tightest fit.
-  - Resolution: the planned mitigation executed — init's procedure relocated to `references/init.md` (L-012 pattern) during the TemiDev-standard sprint; SKILL.md now 104/110 with the init section a 7-line summary + pointer.
+  - Resolution: appended a dated amendment note to ADR-010 (2026-07-30) pointing at ADR-013's
+    advisory-default clause and CONTEXT.md § Model tiers; the 2026-07-10 amendment's prior text is
+    untouched (ADRs are append-only) — the note reconciles the framing without rewriting it.
 
 ---
 
@@ -75,3 +47,6 @@ status: current
 
 <!-- TD-001…007 all resolved (§11 collapse — per-TD summaries live in their sprint files + git). -->
 - resolved: **TD-001**→SPRINT-003 · **TD-002/004**→SPRINT-005 · **TD-003**→SPRINT-004 · **TD-005**→SPRINT-006 · **TD-006**→SPRINT-009 · **TD-007**→SPRINT-012 (closed 2026-07-02).
+
+<!-- TD-008…010 all resolved (§11 collapse — per-TD summaries live in their sprint files + git). -->
+- resolved: **TD-008**→SPRINT-032 · **TD-009**→SPRINT-034 · **TD-010**→SPRINT-035 (collapsed 2026-07-30, SPRINT-038 T4).
