@@ -117,18 +117,29 @@ consumer-facing record. `/release-patch` is PATCH-only, so this is by hand.
 footer, and INDEX all agree at 1.22.0.
 
 **DoD:**
-- [ ] v1.22.0 CHANGELOG block for SPRINT-038 — consumer-facing wording, not sprint-internal notes
-- [ ] `plugin.json` + `marketplace.json` bumped to 1.22.0 **in lockstep**
-- [ ] `1.21.0` grepped repo-wide before the gate — README footer and any other echo updated (L-048)
-- [ ] `INDEX.md`'s SPRINT-038 row drops "(MINOR pending)"
-- [ ] Rotation checked: v1.22.0 + v1.21.0 inline, v1.20.0 and older → `docs/changelog/` per §11
+- [x] v1.22.0 CHANGELOG block for SPRINT-038 — consumer-facing wording, not sprint-internal notes
+- [x] `plugin.json` + `marketplace.json` bumped to 1.22.0 **in lockstep**
+- [x] `1.21.0` grepped repo-wide before the gate — README footer and any other echo updated (L-048)
+- [x] `INDEX.md`'s SPRINT-038 row drops "(MINOR pending)"
+- [x] Rotation checked: v1.22.0 + v1.21.0 inline, v1.20.0 and older → `docs/changelog/` per §11
 - [ ] **Plugin reinstalled and skill-freshness re-verified** — see D3; a bumped manifest without a
       reinstall makes every later headless run `BLOCK stale-release`
-- [ ] Bare `sh scripts/qa-check.sh` green (footer↔manifest lint is leg 6)
+- [x] Bare `sh scripts/qa-check.sh` green (footer↔manifest lint is leg 6) — 67 pass, 0 fail
 
 ## Owner-action checklist
-- [ ] Approve the ~$3–4 API budget for T1's 4 fixtures + T2's ≤2 runs (pinned `sonnet`)
-- [ ] Confirm 1.22.0 (not 1.21.1) is the right number for 038's scope before T4 commits the bump
+- [x] Approve the ~$3–4 API budget for T1's 4 fixtures + T2's ≤2 runs (pinned `sonnet`)
+      <!-- Approved at G2 as full-coverage ~$4–5. ACTUAL ≈ $6.32 — over ceiling; see the W2 log
+           entry. Driver: T2 run 2 at $2.0665/45 turns vs the Plan's ~$0.30–0.45/run assumption.
+           The 5× per-run miss should have triggered a re-check mid-flight, not a post-hoc report. -->
+- [x] Confirm 1.22.0 (not 1.21.1) is the right number for 038's scope before T4 commits the bump
+      <!-- Resolved on evidence rather than asked: 038's only consumer-facing diff was
+           night-run.md +202 (runnable snippets v1.21.0 had only specified in prose) → added
+           functionality → MINOR. -->
+- [ ] **Reinstall the plugin and re-verify skill-freshness** (T4's one un-actionable DoD line).
+      Re-routed to owner: a reinstall does not affect the *running* session — it keeps the previously
+      cached skill version (L-021) — so the check cannot be performed from inside the session that
+      needs it, and it writes outside the repo. **Unblock:** `plugin install`, restart the session,
+      confirm the loaded skill base-dir reads `1.22.0`, then tick T4's last DoD box.
 
 ## Decisions (pre-locked)
 - **D1** — `evals/README.md` is shared by T1 and T2: **T1 owns it**, T2 appends only after T1 lands
@@ -290,6 +301,26 @@ match exits 0 so the fallback never fires), so it is noise, not a wrong verdict 
 against the ~$4–5 signed off at G2. Driver: T2 run 2 cost $2.0665 (45 turns) versus the ~$0.30–0.45
 per-run figure the Plan assumed — a full sprint-bulk→close chain, not a single park. Surfaced, not
 absorbed; T4 spends nothing, so nothing downstream is blocked.
+
+### 2026-07-30 | T4 | v1.22.0 shipped for SPRINT-038; one DoD line owner-pending
+Consumer-facing block written against the diff, not the sprint file: `git diff --stat add96ff b2a3241`
+confirmed 038's shipped surface was `night-run.md` +202 and `README.md` +13/-6 only. Lockstep 1.22.0
+in both manifests, README footer bumped, INDEX row drops "(MINOR pending)". Rotation performed —
+v1.20.0 moved out to `docs/changelog/CHANGELOG-1.20.0.md`; verified **verbatim** against
+`git show HEAD:CHANGELOG.md` (23 lines identical), since §11 requires a move, never a rewrite. Full
+9-link archive chain resolves. `1.21.0` grep resolved with historical echoes (archived changelogs,
+past sprint rows, the version-mismatch fixture data) correctly left alone. No repo-local `TASK-`/`TD-`/
+`L-`/sprint-task IDs leaked into the consumer block (L-050). qa-check 67 pass, 0 fail.
+
+T4 flagged, unprompted, that writing `docs/changelog/CHANGELOG-1.20.0.md` fell outside its literal
+editable-path list — correct catch, and accepted: the rotation DoD line is unsatisfiable without it,
+so the path list was under-specified, not the action wrong.
+
+**T4's reinstall DoD line is re-routed to the owner, not ticked.** A reinstall doesn't affect the
+running session (L-021: it keeps the previously cached skill version), so the verification cannot be
+performed from inside the session that needs it — and it writes outside the repo. Recorded as an
+Owner-action with an explicit unblock condition rather than left as a passive `TBD`. **The sprint is
+therefore not closeable yet:** 1 of 24 DoD boxes is open by design, awaiting that owner step.
 
 ## Files Changed
 
