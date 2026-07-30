@@ -65,3 +65,19 @@ single-digit-hour scale.
 | Adopt all three (external review / Expansionist) | Argues from a scale lean-flow isn't (multi-day fleets); named the blind spot by all 5 peer reviews; violates curated-not-copied ("actually used" ≠ imagination) |
 | Reject (b) outright (Contrarian) | Discards a costless spec'd graduation path; the 5-sprint expiry gives reject-by-default anyway if the trigger never fires |
 | JSON DAG immediately, skip the no-JSON rung | Laziness ladder: nobody verified markdown+script can't already do the checks; format decision stays honest only after the cheaper rung is tested |
+
+## Addendum — rung result: SUFFICIENT, JSON DAG rejected (2026-07-30 · SPRINT-036 T2 / TASK-119)
+
+The pre-locked rule resolved mechanically: a 163-line throwaway POSIX-sh preflight derived all
+three checks (cycle · shared-file single-owner · base-ref-vs-HEAD) **plus wave computation** from
+the three markup tokens qa-check.sh §11 already lints as mandatory (`### Tn` · `Layers:` ·
+`Depends-on:`) — positive on the real SPRINT-036 Plan, three negative fixtures each failing with
+the named finding. The drift surface a JSON schema would guard is already closed by the existing
+lint; a compiled DAG would add a second source of truth against a risk the plugin mechanically
+prevents today. **Artifact (a) is therefore a preflight *step*, not a file format** — productionize
+per condition (3) (follow-up task filed at SPRINT-036 close). The one defect found en route was a
+POSIX idiom (`while read` on an unterminated stream silently drops the last token — a gate
+degrading to silent false-negative), caught only by the negative fixtures. Revisit-if: the
+production preflight hits a real markdown-parsing limit in use — JSON re-enters as serialization
+of the already-proven checks, never as a new source of truth. Prototype deleted (scratch-dir only,
+never entered the repo).

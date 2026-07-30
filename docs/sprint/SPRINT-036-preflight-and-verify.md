@@ -53,9 +53,9 @@ directly from a real active sprint's markdown Plan; the captured answer decides 
 fate in an ADR-013 addendum; the prototype is then deleted.
 
 **DoD:**
-- [ ] preflight derives all three checks from the active sprint's markdown Plan (this sprint = the real input, L-007)
-- [ ] exercised once; output verified against the known structure (T2 depends-on T1 · disjoint T3/T4)
-- [ ] ADR-013 addendum records: JSON DAG admitted (rung insufficient) or rejected (sufficient); prototype deleted
+- [x] preflight derives all three checks from the active sprint's markdown Plan (this sprint = the real input, L-007) — plus wave computation (T1→w0, T2→w1, T3/T4→w0, matching the G2 sequence)
+- [x] exercised once; output verified against the known structure + 3 negative fixtures (cycle · multi-owner · wrong base) each FAILing with the named finding
+- [x] ADR-013 addendum records: **rung SUFFICIENT → JSON DAG rejected**; (a) becomes a preflight step; prototype scratch-only, deleted
 
 ### T3 — Cold-read SPRINT-034's shipped wording from a fresh context `[size: S · risk: low · class: execution · HITL]` (TASK-109)
 Layers: (review — correction only if the cold read finds a gap)
@@ -101,6 +101,15 @@ run meets a HITL step and parks — proving the contract ships.
 - **A3** — T3 finds at most S-sized wording gaps. *Confirm: anything larger logs a scope-change before edits.*
 
 ## Execution Log
+
+### 2026-07-30 | T2 complete | rung SUFFICIENT — JSON DAG rejected, ADR-013 addendum written
+Prototype (163-line POSIX sh, scratch-dir only): positive pass on the real Plan incl. wave
+computation; 3 negative fixtures each isolate their named finding. Strongest reason: the drift
+surface a JSON schema would guard is already closed by qa-check §11's mandatory-field lint.
+Real bug found en route: `while read` on unterminated stream silently drops the last Layers token
+— a gate failing silent-false-negative, caught ONLY by the negative fixtures (→ Retro learning
+candidate). Follow-up at close: productionize the preflight as the dispatch pre-step (ADR-013
+condition 3). All 12 DoD now ticked — sprint ready to close.
 
 ### 2026-07-30 | T4 confirmed | coordinator verified the probe result — TASK-106 closed
 Probe stdout matches the self-appended entry below; exit 0, clean halt. Contract proven on the
