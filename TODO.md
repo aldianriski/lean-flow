@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-035 closed 2026-07-30 → v1.19.0 Contract Hardening; archived per §11.)_
+> **SPRINT-036 — preflight-and-verify** → docs/sprint/SPRINT-036-preflight-and-verify.md
 
 ---
 
