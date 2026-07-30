@@ -26,7 +26,7 @@ status: current
   - Mitigation (not yet done): split the capability checks into their own `references/` sibling if a
     third snippet lands. Not urgent at two; the trigger is the third.
 
-- **TD-013** severity: minor | status: open | created: Sprint-038
+- **TD-013** severity: minor | status: resolved → SPRINT-039 T3 | created: Sprint-038
   - Summary: `evals/run-dispatch-preflight-fixtures.sh` guards the `dispatch.md` preflight snippet but
     is **not wired into `scripts/qa-check.sh`** — TD-012's stated alternative mitigation. The fixtures
     exist and pass; nothing runs them automatically.
@@ -34,9 +34,14 @@ status: current
     guard is opt-in — a maintainer editing the snippet gets no automatic signal. Strictly better than
     TD-012's original state, not equivalent to a wired gate (L-057's family: a check that exists but
     isn't reached).
-  - Mitigation (not yet done): add a qa-check leg that runs the eval fixture harnesses, or accept
-    opt-in and say so in `docs/QA.md`. Note the tension: qa-check is fast and always-on; the
-    behavioural harnesses cost money, so only the *snippet* harnesses belong there.
+  - Resolution: `qa-check.sh` gained a leg that runs all 5 zero-API harnesses (`run-skill-freshness-
+    fixtures.sh`, `run-worktree-usability-fixtures.sh`, `run-dispatch-preflight-fixtures.sh`,
+    `selftest-assert-boundary-park.sh`, `selftest-assert-noaction-park.sh`), gated on each harness's
+    own exit status (never a pipe/redirect), naming the failing harness plus its own FAIL line on a
+    red run. Negative-tested against a scratch copy with one guarded snippet deliberately broken —
+    bare `sh scripts/qa-check.sh` FAILed naming that harness, then the test edit was reverted. The
+    manual/gated boundary is stated in `docs/QA.md`: the behavioural real-run fixtures (API cost, not
+    deterministic) stay opt-in, by design, not by the gap this TD named.
 
 - **TD-012** severity: resolved → SPRINT-038 T2a (retained-guard leg; wiring → TD-013) | created: Sprint-037
   - Summary: the pre-dispatch preflight snippet now shipped in

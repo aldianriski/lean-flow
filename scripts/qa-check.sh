@@ -296,6 +296,32 @@ PLANEOF
   check_block
 done
 
+# --- 12. Zero-API eval harnesses wired into the gate (TD-013) ---------------
+# TD-012 retained fixtures + assertion scripts for shipped snippets/checks, but nothing ran them
+# automatically -- TD-013 named that gap. Only the zero-API harnesses belong here: qa-check is fast
+# and always-on, while the behavioural real-run fixtures (evals/README.md "Real-run fixtures") cost
+# API tokens and stay a manual `sh evals/run-...` step. Each harness's own exit status is captured
+# directly via command substitution -- never through a pipe or a redirect whose own failure (e.g. an
+# unset $TMPDIR) could masquerade as the harness's verdict (CLAUDE.md Edit-safety trap (c)). A
+# harness that can't even be found or that exits non-zero for any reason is its own named FAIL,
+# never a silent skip.
+eval_harnesses="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh"
+for h in $eval_harnesses; do
+  hp="evals/$h"
+  if [ ! -f "$hp" ]; then
+    bad "eval harness $h: script not found at $hp"
+    continue
+  fi
+  hout=$(sh "$hp" 2>&1); hcode=$?
+  if [ "$hcode" -eq 0 ]; then
+    ok "eval harness $h"
+  else
+    hfind=$(printf '%s\n' "$hout" | grep -E '^FAIL' | tr '\n' ';' | sed 's/;$//')
+    [ -n "$hfind" ] || hfind="no FAIL line in output -- harness exited $hcode without reporting one"
+    bad "eval harness $h (exit $hcode): $hfind"
+  fi
+done
+
 # --- Summary ----------------------------------------------------------------
 printf '\n----------------------------------------\n'
 printf 'QA-CHECK: %s pass, %s fail\n' "$pass" "$fail"

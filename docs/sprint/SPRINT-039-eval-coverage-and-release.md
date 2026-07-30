@@ -91,13 +91,17 @@ one outcome that isn't allowed.
 `sh scripts/qa-check.sh` FAIL with that harness's named finding.
 
 **DoD:**
-- [ ] A qa-check leg runs the zero-API harnesses (3 snippet runners + `selftest-assert-boundary-park.sh`
+- [x] A qa-check leg runs the zero-API harnesses (3 snippet runners + `selftest-assert-boundary-park.sh`
       + anything T1 adds in that class); real-run fixtures explicitly excluded
-- [ ] Leg gated on each harness's **own** exit status, never a pipeline's (the rule this sprint just
+- [x] Leg gated on each harness's **own** exit status, never a pipeline's (the rule this sprint just
       promoted — CLAUDE.md Edit-safety trap **(c)**)
 - [ ] Negative-tested: a deliberate snippet edit makes qa-check FAIL with the named finding, then reverted
-- [ ] `docs/QA.md` records the split (what the gate covers, what stays manual and why)
-- [ ] TD-013 → `status: resolved → SPRINT-039 T3`; the manual/gated boundary is stated, not implied
+      <!-- T3 did this and showed real FAIL output; box held until the coordinator reproduces it
+           independently (deferred: T2 is live in this tree and a mid-flight snippet edit would hand
+           it a spurious failure). T1's confirmed false-negative is why agent evidence alone
+           doesn't tick a must-FAIL box. -->
+- [x] `docs/QA.md` records the split (what the gate covers, what stays manual and why)
+- [x] TD-013 → `status: resolved → SPRINT-039 T3`; the manual/gated boundary is stated, not implied
 
 ### T4 — Ship SPRINT-038's pending MINOR as v1.22.0 `[size: S · risk: low · HITL]`
 Layers: `CHANGELOG.md`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `docs/sprint/INDEX.md`, `README.md`
@@ -215,6 +219,30 @@ heuristic adds brittleness for no gain.
 2. **L candidate** — on Windows/Git-Bash, `claude -p "/triage"` gets MSYS-path-mangled into a Windows
    path before reaching `claude.exe`; `MSYS_NO_PATHCONV=1` fixes it. Cost one run to find. Same family
    as L-060 (shell-boundary mangling that fails silently and reports success).
+
+### 2026-07-30 | T3 | TD-013 resolved — 5 zero-API harnesses gated; qa-check 61→66 pass, 44s→84s
+New leg 12 loops the 5 zero-API harnesses, capturing each one's status by **command substitution**
+(`hout=$(sh "$hp" 2>&1); hcode=$?`) — no pipe, no redirect in the verdict path, so the trap that
+burned L-059 (an unset `$TMPDIR` making the *redirect* fail and reporting the gate's status) cannot
+recur. A missing harness is its own named FAIL, never a skip; and a harness that exits non-zero
+without printing a `FAIL` line reports exactly that — L-059's "a non-zero status with no report
+behind it is not a verdict", encoded in the leg rather than left to the reader.
+
+**Runtime is the real cost, and it is not small: 44s → 84s (+80%).** The two selftests dominate
+(~26s combined) because each spins up many throwaway git repos. Flagged rather than absorbed. Note
+the tension is TD-013's own: an opt-in `--full` mode would restore the speed but reverts leg 12 to
+exactly what TD-013 called "strictly better than nothing, not equivalent to a wired gate". Three
+live options — accept 84s · split to `--full` (loses always-on) · gate only the **3 snippet runners**
+always-on (they guard *shipped* `skills/**` text) and move the 2 selftests (which guard maintainer-only
+assertion scripts) to opt-in. The third is the principled cut, but it narrows what T3's DoD explicitly
+specified, so it is **not** taken unilaterally → TD candidate at close, owner decides.
+
+T3's negative test was performed and produced real FAIL output (a renamed finding in the shipped
+snippet → `FAIL eval harness run-skill-freshness-fixtures.sh (exit 1): …finding missing…`, exit 1,
+green again after revert). Its DoD box is nonetheless **held** until the coordinator reproduces it
+independently — T1's confirmed false-negative established that a plausible agent report is not
+must-FAIL evidence. Deferred, not skipped: T2 is live in this tree and editing a guarded snippet
+mid-flight would hand it a spurious failure.
 
 ## Files Changed
 

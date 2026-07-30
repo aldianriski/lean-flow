@@ -20,9 +20,19 @@ Run both before cutting a release or closing a sprint.
 | Template count | `templates/*.md.template` files == claimed core + 2 non-core (DESIGN, QA-TESTCASE); claim in CLAUDE.md + docs/architecture/overview.md |
 | Frontmatter | every `SKILL.md` has `---`/`name`/`description`; every core ledger has `owner`/`last_updated`/`status` |
 | Task schema | active-sprint `### Tn` Plan blocks carry `class:` + an autonomy tag (HITL/AFK) in header meta, plus `Depends-on:`/`Layers:`/`**Acceptance:**` — else FAIL (TASK-110) |
+| Eval harnesses (TD-013) | the 5 zero-API harnesses under `evals/` (skill-freshness, worktree-usability, dispatch-preflight fixtures + the boundary-park/no-action-park selftests) each run bare, gated on **that harness's own exit status** — a FAIL names both the harness and the finding it reported |
 
 Non-zero exit = fix before release. Watch the near-cap files the run prints — one edit can breach
 them.
+
+**Eval-harness split (TD-013).** `evals/` also holds a fourth class of check — behavioural fixtures
+that drive a real headless `claude -p` run (`evals/README.md` § "Real-run fixtures"). Those cost real
+API tokens and are not deterministic enough to gate on, so they stay a manual `sh evals/run-...`
+step, never wired into this always-on script. Only the zero-API harnesses above — which extract the
+actual shipped snippet from its doc and assert against retained fixtures with zero network/API calls
+— belong in the gate. Editing a snippet one of those harnesses guards (e.g. `night-run.md`'s
+skill-freshness check) now fails `sh scripts/qa-check.sh` by name, closing the "check exists but
+nothing runs it" gap TD-013 described.
 
 ## Judgment — manual / agent pass (a script can't decide these)
 
