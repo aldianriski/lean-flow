@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-037 — gates-and-evals** → docs/sprint/SPRINT-037-gates-and-evals.md
+_(none active)_ — SPRINT-037 closed 2026-07-30. Next: `/lean-doc-generator promote` from the Backlog below.
 
 ---
 
@@ -91,6 +91,21 @@ status: current
                map the delta vs existing Part 0 checks before adding anything
       tracker: none — external review item 5
       state:   ready (needs-info resolved 2026-07-30: owner picked night-run Part 0)
+
+- [ ] TASK-124 — Decompose the behavioral eval suite (adopted by TASK-116)  [size: M] [risk: low] [HITL]
+      class:      execution
+      depends-on: none
+      done-when: fixtures exist one per night-run Part 0 boundary-table row, reusing the prototype's
+                 ~40-line fixture skeleton + ~40-line assertion script; a **real violating fixture**
+                 (not only a synthetic end-state) proves the suite gates rather than sanity-checks its
+                 own assertion logic; `--model` pinned so cost is measured at the tier it will actually
+                 run; harness home + fixture-maintenance ownership decided
+      touches: (harness home is the open G2 question — also the candidate carrier for TD-012's
+               orphaned preflight fixtures, same fixture shape)
+      assumes: the capture's numbers hold at a cheaper tier — $0.797/fixture is an Opus **upper
+               bound**, unpinned; ~11 boundary-table rows
+      tracker: docs/research/behavioral-eval-feasibility.md
+      state:   ready
 
 - [ ] TASK-123 — Implement the night-run capability probes (graduated from TASK-117's spec)  [size: S] [risk: low] [HITL]
       class:      execution

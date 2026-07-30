@@ -3,9 +3,9 @@ sprint: 037
 slug: gates-and-evals
 owner: Maintainer
 last_updated: 2026-07-30
-status: active
+status: closed
 plan_commit: 5e5bd95
-close_commit: [set at close]
+close_commit: [recorded in the follow-up commit]
 update_trigger: sprint execute/close events
 ---
 
@@ -197,18 +197,64 @@ promote (owner: Part 0 surface). TASK-120 expiry countdown: 3 sprints to SPRINT-
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/references/dispatch.md` | T1 | pre-dispatch preflight step + optional snippet — the wave-shape call becomes gated instead of assumed | low | 3 must-FAIL fixtures (each named finding) + fired on this Plan, re-fired at the wave boundary |
+| `skills/orchestrator/SKILL.md` | T1 | `sprint-bulk` step 3 runs the preflight *first* — wiring, so the gate fires rather than merely exists (L-020) | low | qa-check caps (100/110) |
+| `.claude/CONTEXT.md` | T1 | dispatch pointer names the preflight — SSOT discoverability | low | qa-check caps (119/130) |
+| `skills/orchestrator/references/night-run.md` | T2 · T4 | Part 1: `/handoff` **and** its temp-doc write allowlisted (the halt can't complete otherwise); new § Capability checks spec'd behaviour-first | low | checklist structure re-read (L-009); T2's full proof rides the next real headless run |
+| `docs/research/behavioral-eval-feasibility.md` | T3 | the adopt verdict + measured cost — sole survivor of the deleted prototype | low | n/a (research capture) |
+| `TODO.md` | T4 · close | TASK-123 (probe mechanism) + TASK-124 (eval suite) filed; Active Sprint pointer cleared | low | qa-check |
+| `TECH-DEBT.md` | close | TD-012 — the shipped snippet's fixtures were deleted with the prototype | low | qa-check |
+| `docs/LEARNINGS.md` | close | L-058 → count 2 (promotion candidate); L-059 + L-060 filed | low | qa-check index lint |
+| `docs/knowledge-index.md` | T3 · close | regenerated for the new research + learning entries (derived view, ADR-009) | low | qa-check index lint |
 
 ## Retro
 
 <!-- Written at close. -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no miss, and four retrieval **wins**, two of which changed the work rather than
+merely decorating it: **L-017** at T4 rejected one of four proposed checks as already-covered by Part 0
+(the delta map was run first, as the DoD demanded, and it *subtracted* scope); **L-055 / the declared-base
+rule** killed worktree isolation at G2 before a single agent spawned — and for a cause distinct from
+SPRINT-036's, since this sprint's own file lived only in unpushed commits; **L-058** drove the must-FAIL
+legs on both T1 and T3; **L-010** kept every read on repo source rather than the 1.18.0 cache actually
+serving this session. One prior-decision imprecision surfaced (not a contradiction): D1's "Part 0
+pre-flight" conflated Part 0 (the contract) with Part 1 (the pre-flight pass), resolved in-task.
 
 **Worked**
--
+- **The gate gated its own sprint.** T1's preflight was sequenced ahead of the wave it governs, then
+  fired on this Plan to authorize the T3 dispatch, and re-fired at the wave boundary after HEAD moved.
+  L-007's "exercised once on real input" came free from ordering rather than from a contrived demo.
+- **The best real input was the one we already had.** SPRINT-037's own Plan contained the hard case —
+  `night-run.md` in two tasks' `Layers:` — forcing the PASS-vs-FAIL distinction between an overlap
+  serialized by `Depends-on:` and an unowned one. A synthetic fixture would have tested the easy half.
+- **Negative testing paid twice, in different currencies.** T1 stripped its own guard and watched the
+  gate report `CLEAR` on a real overlap; T3 fed a violating end-state to its assertion script and watched
+  all four checks flip. Neither positive run could have produced that information.
+- **L-017 subtracting scope.** Three of four checks shipped, and the sprint is better for the fourth
+  not shipping. Mapping the delta *before* writing is what made the rejection cheap.
+- **Cost as a first-class verdict input.** T3 read $0.797 / 140s off the runner's own JSON instead of
+  building instrumentation — "feasible" and "cheap" were answered by the same run.
 
 **Friction**
--
+- **D1's Part 0 / Part 1 wording.** A promote-time decision named a surface imprecisely and the
+  ambiguity had to be resolved mid-task. Cheap here; the general lesson is that a pre-locked decision
+  should name the *section it edits*, not the part number it remembers.
+- **The eval's must-FAIL leg is synthetic.** Validated assertion logic, not a proven regression gate.
+  Recorded in the capture and carried into TASK-124 rather than smoothed over in the verdict.
+- **T1's negative fixtures were deleted with the prototype** — the shipped snippet now has no retained
+  regression guard (→ TD-012). Correct per `/prototype` discipline, wrong for a gate; the two
+  disciplines collided and nobody noticed until close.
+- **Two false reads of my own tooling**, both L-057-family: an unset `$TMPDIR` made a redirect fail and
+  report `EXIT=1` with qa-check never running (→ L-059), and a PowerShell here-string handed to the Bash
+  tool silently committed `@` as T1's subject line (→ L-060, amended).
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- **L-058 → count 2, promotion candidate at next promote.** Second sprint running, and this time the
+  silent false-negative was reproduced *deliberately* on production code. Candidate durable homes: a
+  CLAUDE.md anti-pattern, or a red-flag on whichever skill owns gate-shipping.
+- **L-059** (a gate's status can come from the plumbing, not the gate) — filed, count 1.
+- **L-060** (cross-shell string syntax fails silently in a dual-shell session) — filed, count 1.
+
+**Buckets routed:** Shipped → root `CHANGELOG.md` **at release** (feature sprint → MINOR by hand;
+`/release-patch` is PATCH-only) · Tech debt → **TD-012** · Follow-ups → **TASK-123** (capability probes,
+filed in-task at T4) + **TASK-124** (eval suite) · Learnings → **L-058 bumped**, **L-059**, **L-060**.

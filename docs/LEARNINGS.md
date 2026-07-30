@@ -21,7 +21,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-058**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-060**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
@@ -29,11 +29,28 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-058 [tags: tooling] [status: active]: A gate script's worst failure mode is the silent false-negative — and only a must-FAIL fixture exposes it. The T2 preflight prototype hit it live: POSIX `while read` over an unterminated stream silently dropped the last `Layers:` token (and single-file Layers entirely), so the multi-owner check would have PASSED a real overlap. The positive run looked perfect; the crafted-to-fail fixture caught the hole. Corollary to L-007: "exercised once on real input" is one-sided for GATES — a gate is also exercised once on input that must fail, one fixture per check, each failing with its named finding. Same family as L-057 (a gate that runs but doesn't gate).
-- seen: Sprint-036
+## L-060 [tags: tooling] [status: active]: In a session exposing two shells side by side (a PowerShell tool and a Bash tool), shell-specific multi-line string syntax fails **silently** across the boundary. A PowerShell here-string (`@'…'@`) handed to the Bash tool committed a literal `@` as the commit subject and demoted the real subject into the body — bash read `@` as an ordinary token and concatenated the quoted string onto it. Git accepted it without complaint, the tool reported success, and `git log --oneline` was the only thing that revealed it. Match the quoting form to the tool actually executing (Bash → heredoc `<<'EOF'`), and when a command's whole job is to *record text*, inspect the stored artifact rather than the exit code.
+- seen: Sprint-037
 - count: 1
 - promoted: no
-- related: L-007 · L-057
+- related: L-057 · L-059 (same family: the tool succeeded, the artifact was wrong)
+
+---
+
+## L-059 [tags: tooling] [status: active]: A gate's reported exit status can come from the **plumbing** rather than the gate. Running `sh scripts/qa-check.sh > "$TMPDIR/qa.txt"` in a session where `$TMPDIR` was unset made the *redirect* fail — the shell reported `EXIT=1` and qa-check never ran at all. Believed, it sends the reader debugging a check that is actually green, or blocks a clean commit on a phantom failure. Same family as L-057 one layer earlier: there the status came from a formatter at the end of a pipeline, here from a failed redirect before the gate started. The tell is structural — a non-zero status with **no report behind it** is not a verdict. Check that the gate produced its own output before trusting its number.
+- seen: Sprint-037
+- count: 1
+- promoted: no
+- related: L-057 (status from the wrong command) · L-058 (a gate that lies quietly)
+
+---
+
+## L-058 [tags: tooling] [status: active]: A gate script's worst failure mode is the silent false-negative — and only a must-FAIL fixture exposes it. The T2 preflight prototype hit it live: POSIX `while read` over an unterminated stream silently dropped the last `Layers:` token (and single-file Layers entirely), so the multi-owner check would have PASSED a real overlap. The positive run looked perfect; the crafted-to-fail fixture caught the hole. Corollary to L-007: "exercised once on real input" is one-sided for GATES — a gate is also exercised once on input that must fail, one fixture per check, each failing with its named finding. Same family as L-057 (a gate that runs but doesn't gate).
+- seen: Sprint-036 · Sprint-037 (the same silent false-negative reproduced deliberately: stripping the
+  parse guard from the productionized snippet made it exit `0/CLEAR` on a real shared-file overlap)
+- count: 2
+- promoted: no — **candidate at next promote** (count ≥ 2)
+- related: L-007 · L-057 · L-059
 
 ---
 

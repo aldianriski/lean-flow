@@ -16,6 +16,20 @@ status: current
 
 ## Tech Debt
 
+- **TD-012** severity: minor | status: open | created: Sprint-037
+  - Summary: the pre-dispatch preflight snippet now shipped in
+    `skills/orchestrator/references/dispatch.md` was negative-tested by three must-FAIL fixtures that
+    lived in a scratch dir and were **deleted** with the prototype. The shipped sh/awk block therefore
+    has no retained regression guard, and `qa-check.sh` does not read it.
+  - Impact: a future edit to the snippet — or a change to the sprint-schema tokens it parses — can
+    silently reintroduce the exact silent-false-negative class L-058 names. Proven reachable, not
+    theoretical: stripping one guard clause during T1 made it pass a real overlap at exit 0. A gate
+    that degrades quietly is the worst shape for a gate, which is the whole point of L-058.
+  - Mitigation (not yet done): retain the three fixtures plus a runner. Natural carrier is the eval
+    harness TASK-124 will build — its fixture-skeleton + assertion-script shape is the same one, so
+    this likely costs a row rather than a new mechanism. Alternative: a `qa-check.sh` leg that runs
+    the snippet against retained fixtures.
+
 - **TD-011** severity: minor | status: open | created: Sprint-035
   - Summary: `docs/adr/ADR-010-model-dispatch-role-tiers.md`'s 2026-07-10 amendment wording ("a
     mis-classification mis-routes") predates ADR-013/T5's advisory-default framing — read cold it
