@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "plugins": {
+    "lean-flow-fixture@fixture": [
+      {
+        "scope": "user",
+        "installPath": "__CACHE_DIR__",
+        "version": "1.21.0",
+        "installedAt": "2026-01-01T00:00:00.000Z",
+        "lastUpdated": "2026-01-01T00:00:00.000Z",
+        "gitCommitSha": "1111111111111111111111111111111111111111"
+      }
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "lean-flow-fixture",
+  "version": "1.21.0",
+  "description": "Fixture manifest for the skill-freshness cache-differs case.",
+  "license": "MIT"
+}

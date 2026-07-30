@@ -155,6 +155,131 @@ is most likely exactly when a maintainer is iterating on the procedure the run d
 is right rather than degrading: unlike the other rows there is no correct reduced shape, because the
 run would be executing a procedure nobody approved.
 
+**Skill-freshness check (implements the row above).** A version-string compare alone can't catch the
+trap: edit a skill, forget to bump the version, and installed == repo while the cache still serves
+the old content. So the check is content-first, in this decision order:
+
+1. **No local plugin repo** (no manifest to diff the install against — every ordinary consumer) →
+   **SKIP**. Consumer-safety leg: it must never fire on someone who only ran `plugin install`.
+2. **Installed version ≠ repo manifest version** → **BLOCK**, finding `stale-release`.
+3. **Installed cache's `skills/` differs from the repo's**, by content — not the `gitCommitSha`
+   field below — → **BLOCK**, finding `cache-differs`. This is the leg that catches the unbumped edit.
+4. Else → **PASS**.
+
+**`gitCommitSha` is not usable here.** The field an install manifest records per plugin is written
+at *registration* time, not re-synced on content change — it can sit on the commit from whenever
+that plugin key was first added, arbitrarily far behind the version paired with it. It answers "when
+was this key registered", never "does the cache match the repo now", so it plays no part above.
+
+Optional snippet, dependency-free POSIX sh (`diff`, `grep`, `sed`, `awk`, `git` — no `jq`). Run it
+bare — never piped into a formatter inside an `&&` chain; a pipeline's exit status is its last
+command's, so `check | tail && fire` would fire through a real BLOCK (L-057). Every exit path prints
+its named finding before returning a status, so a non-zero exit is never the probe's own plumbing —
+a missing file, an unset var, a failed parse — misread as a real finding (L-059):
+
+<!-- skill-freshness-check:start -->
+```sh
+#!/bin/sh
+# check-skill-freshness.sh -- is the *installed* skill the same content as the repo's?
+# Exit 0 = PASS or SKIP (run may proceed); exit 1 = BLOCK (do not fire the run).
+# Usage: sh check-skill-freshness.sh [repo-root] [installed_plugins.json]
+#   repo-root defaults to `git rev-parse --show-toplevel` (or cwd outside a repo)
+#   installed_plugins.json defaults to $HOME/.claude/plugins/installed_plugins.json
+set -u
+
+repo_root="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+installed_json="${2:-$HOME/.claude/plugins/installed_plugins.json}"
+plugin_json="$repo_root/.claude-plugin/plugin.json"
+
+# --- leg 1: no local plugin repo -> SKIP (an ordinary consumer has no checkout) ---
+[ -f "$plugin_json" ] || {
+  echo "SKIP no-local-repo: no $plugin_json (nothing to compare the install against)"
+  exit 0
+}
+
+name=$(grep -oE '"name": *"[^"]+"' "$plugin_json" | head -n1 | sed -E 's/.*"([^"]+)"$/\1/')
+repo_version=$(grep -oE '"version": *"[0-9]+\.[0-9]+\.[0-9]+"' "$plugin_json" | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+[ -n "$name" ] && [ -n "$repo_version" ] || {
+  echo "BLOCK unreadable-manifest: could not read name/version from $plugin_json"
+  exit 1
+}
+
+[ -f "$installed_json" ] || {
+  echo "SKIP no-local-install: no $installed_json ($name is not installed on this machine)"
+  exit 0
+}
+
+# grab the first array entry for this plugin's key ("<name>@<marketplace>": [ ... ]).
+block=$(awk -v pat="\"$name@" '
+  $0 ~ pat { grab=1 }
+  grab { print; if ($0 ~ /^ *\],?[[:space:]]*$/) exit }
+' "$installed_json")
+[ -n "$block" ] || {
+  echo "SKIP no-matching-install: no \"$name@*\" entry in $installed_json ($name is not installed on this machine)"
+  exit 0
+}
+
+installed_version=$(printf '%s\n' "$block" | grep -oE '"version": *"[^"]+"' | head -n1 | sed -E 's/.*"([^"]+)"$/\1/')
+install_path=$(printf '%s\n' "$block" | grep -oE '"installPath": *"[^"]+"' | head -n1 | sed -E 's/.*"([^"]+)"$/\1/' | sed 's/\\\\/\//g')
+[ -n "$installed_version" ] && [ -n "$install_path" ] || {
+  echo "BLOCK unreadable-install-entry: could not parse version/installPath for $name from $installed_json"
+  exit 1
+}
+
+# --- leg 2: installed version != repo manifest version -> BLOCK ------------------
+if [ "$installed_version" != "$repo_version" ]; then
+  echo "BLOCK stale-release: installed $installed_version != repo manifest $repo_version ($plugin_json)"
+  exit 1
+fi
+
+# --- leg 3: installed cache's skills/ differs from the repo's -> BLOCK -----------
+repo_skills="$repo_root/skills"
+cache_skills="$install_path/skills"
+[ -d "$repo_skills" ] || {
+  echo "BLOCK repo-skills-missing: $repo_skills not found"
+  exit 1
+}
+[ -d "$cache_skills" ] || {
+  echo "BLOCK cache-path-missing: $cache_skills not found (installPath may be stale)"
+  exit 1
+}
+
+# --strip-trailing-cr: a Windows plugin install can rewrite files CRLF while the repo checkout
+# stays LF -- that's a line-ending artifact, not stale content, and must not false-BLOCK (GNU
+# diff only; a BSD/busybox diff without this flag will over-report -- normalize line endings
+# before diffing as a fallback there).
+diffout=$(diff --strip-trailing-cr -rq "$repo_skills" "$cache_skills" 2>&1)
+diffstatus=$?
+case "$diffstatus" in
+  0) : ;;
+  1)
+    echo "BLOCK cache-differs: installed cache skills/ differs from the repo working tree"
+    printf '%s\n' "$diffout"
+    exit 1
+    ;;
+  *)
+    echo "BLOCK diff-tool-error: diff -rq exited $diffstatus comparing $repo_skills vs $cache_skills"
+    printf '%s\n' "$diffout"
+    exit 1
+    ;;
+esac
+
+echo "PASS skill-freshness: installed $installed_version == repo $repo_version; cache skills/ matches working tree"
+exit 0
+```
+<!-- skill-freshness-check:end -->
+
+Exit 0 covers both `SKIP` and `PASS` (the run may proceed either way); exit 1 is `BLOCK`. Two legs
+aren't spec'd above and are reported here rather than faked, each still exiting through its own named
+finding (never a bare status): an installed manifest entry that fails to parse
+(`unreadable-install-entry`, `unreadable-manifest`), and a local repo where the plugin simply isn't
+installed on this machine (`no-local-install` / `no-matching-install`) — both degrade to a SKIP or a
+conservative BLOCK, never a silent PASS. Cover the three spec'd legs with fixtures — one must-SKIP,
+two must-BLOCK, each asserting its own named finding — and **keep them**: deleting a gate's fixtures
+with the scaffolding that built them is what leaves the gate unguarded afterwards (L-058). Put yours
+wherever the repo keeps maintainer-only checks; lean-flow's own sit in its `evals/` directory, which
+is not part of the installed plugin.
+
 ## Part 2 — Trigger recipe (consumer-generic)
 
 > **Precondition — do not fire this until Part 1a's entry path and Part 1's pre-flight are both green.**

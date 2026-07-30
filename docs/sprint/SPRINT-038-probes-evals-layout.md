@@ -47,7 +47,7 @@ against a v1.20.0 repo). Ship it first; it stands alone if the other two prove n
 its named finding, and fired once on a real pre-flight before an unattended run.
 
 **DoD:**
-- [ ] version check probes installed-vs-repo and **blocks** unattended on mismatch, named finding
+- [x] version check probes installed-vs-repo and **blocks** unattended on mismatch, named finding
 - [ ] dispatch + worktree checks probe availability and **degrade** per their spec'd rules
 - [ ] negative-tested per L-058 — one must-FAIL fixture per check, each failing with its own finding
 - [ ] **fixtures retained**, not deleted with the scaffolding (the TD-012 mistake, now an anti-pattern)
@@ -136,6 +136,33 @@ as though intake classification is binding.
   choosing a procedure step), it earns an ADR before it ships.*
 
 ## Execution Log
+
+### 2026-07-30 | T1a complete | skill-freshness check ships — and caught its own author's drift
+The load-bearing leg (the one that *blocks*) is in: 4-leg decision order — SKIP no-local-repo → BLOCK
+`stale-release` → BLOCK `cache-differs` (content, not `gitCommitSha`) → PASS — as a procedure step plus
+a dependency-free POSIX-sh snippet, matching T1-037's shipped form. Three fixtures green, each asserting
+its own named finding, incl. the must-SKIP consumer leg.
+**The trap fired for real, unprompted.** After T1a edited `night-run.md`, the live check returns
+`BLOCK cache-differs` naming that very file: the repo changed, the plugin wasn't reinstalled, and the
+cache still serves the old procedure. T4-037 predicted this failure from reasoning; it is now caught by
+a mechanism, on genuine drift, produced by its own author. Strongest L-007 evidence this sprint.
+**Operational consequence, by design:** every skill edit now BLOCKs unattended runs until
+`claude plugin update lean-flow@lean-flow`. That is the spec'd behaviour (block, don't degrade —
+there is no correct reduced shape for executing an unapproved procedure), not a defect.
+Real bug the agent found and fixed en route: a naive `diff -rq` false-BLOCKed on dozens of files that
+differed only by **CRLF-vs-LF**, an artifact of how the Windows plugin cache is written. Fixed with
+`--strip-trailing-cr` and the GNU-diff-only caveat stated inline rather than silently assumed —
+a false-positive gate would have been as useless as a false-negative one.
+Design choice worth keeping: `evals/run-skill-freshness-fixtures.sh` **extracts the snippet from
+`night-run.md` between anchors** rather than testing a hand-copied duplicate, so the fixtures cannot
+drift from the shipped artifact. That is TD-012's root cause fixed structurally, not just re-mitigated.
+**Coordinator caught an L-015 regression in review** — the shipped doc cited `evals/fixtures/...` and
+`evals/README.md`, paths a consumer who installs the plugin does not have. Same defect shape as TD-010,
+resolved in v1.19.0 for exactly this. Rewritten to state the discipline and attribute lean-flow's own
+path as not-part-of-the-install (dispatch.md's convention). `evals/` confirmed absent from plugin.json.
+Left for **T1b**: DoD 2 (dispatch + worktree degrade rows), and DoD 3/4/5 stay open because each has an
+outstanding T1b component — fixtures *per check*, retention across both halves, and the consumer/L-007
+pass over what T1b adds. Only DoD 1 is ticked; the split does not license claiming the rest early.
 
 ### 2026-07-30 | T4 complete | three overdue TD rows collapsed · TD-011 resolved append-only
 Dispatched a tier above the Plan's `mechanical-ingest` on purpose — the ADR-010 leg is wording

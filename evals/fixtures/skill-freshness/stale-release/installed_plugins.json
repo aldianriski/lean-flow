@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "plugins": {
+    "lean-flow-fixture@fixture": [
+      {
+        "scope": "user",
+        "installPath": "/does/not/matter/for/this/case",
+        "version": "1.20.0",
+        "installedAt": "2026-01-01T00:00:00.000Z",
+        "lastUpdated": "2026-01-01T00:00:00.000Z",
+        "gitCommitSha": "0000000000000000000000000000000000000000"
+      }
+    ]
+  }
+}
