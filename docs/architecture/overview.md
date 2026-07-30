@@ -28,8 +28,8 @@ skills/           14 skills (auto-discovered at root)
   <skill>/references/   on-demand depth (DOCS_Guide, testability, feedback-loops, deepening, …)
   lean-doc-generator/templates/   30 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 32 total)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
-docs/             ARCHITECTURE.md · CHANGELOG.md · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
-TODO.md · TECH-DEBT.md · README.md
+docs/             architecture/ · deployment/ · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
+TODO.md · TECH-DEBT.md · README.md · CHANGELOG.md
 ```
 
 ## The loop

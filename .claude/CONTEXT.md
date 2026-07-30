@@ -40,7 +40,7 @@ new behaviour→`/tdd` **(default, test-first)** · bug→`/diagnose` · hard-to
 
 lean-flow ships **no custom agents/hooks** — it dispatches Claude's built-ins in **isolated passes** (fresh context): recon→`Explore` ·
 `/code-review` (small/med → one scoped `sonnet`; **Standards vs Spec** reported separately) · `/verify` · `/security-review` ·
-`/council` (internal sub-agents); commands `/goal /plan /batch /loop /run /simplify`. Wiring → ARCHITECTURE.md § Key integration points.
+`/council` (internal sub-agents); commands `/goal /plan /batch /loop /run /simplify`. Wiring → docs/architecture/overview.md § Key integration points.
 
 **Standalone contract** — stage-skill cross-refs are routing *suggestions* (`→ /X`), never requirements; each completes its job
 invoked cold. Only inherent ordering: the sprint lifecycle. **`/flow` is the sole exception** — it *sequences* the stages, never
@@ -94,7 +94,7 @@ LEAN standard on the **TemiDev repo-structure core** (ADR-012; WHY/WHERE, never 
 
 ## Orientation
 
-Where-things-live = **`ARCHITECTURE.md`**; no hand-maintained codemap (it rots — LAW 3). graphify: not integrated — on-demand only, for onboarding or a pre-refactor audit (verdict → `docs/research/graphify-daily-value.md`).
+Where-things-live = **`docs/architecture/overview.md`**; no hand-maintained codemap (it rots — LAW 3). graphify: not integrated — on-demand only, for onboarding or a pre-refactor audit (verdict → `docs/research/graphify-daily-value.md`).
 
 ## Continuous learning governance
 

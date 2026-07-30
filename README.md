@@ -246,12 +246,13 @@ The skills write durable, human-readable state into your repo — plain markdown
 | `TECH-DEBT.md` | sprint close · `/triage` | tech-debt ledger (`TD-NNN` — filed at close, aged at promote) |
 | `docs/sprint/SPRINT-NNN-*.md` | `/lean-doc-generator` | active sprint plan · execution log · retro |
 | `docs/DECISIONS.md` / `docs/adr/` | `/lean-doc-generator` | ADRs — the WHY behind hard-to-reverse choices |
-| `docs/CHANGELOG.md` | `/release-patch` · sprint close | what shipped, per release |
+| `CHANGELOG.md` | `/release-patch` · sprint close | what shipped, per release |
 | `docs/LEARNINGS.md` | sprint close | confirmed learnings; recurring → durable rules |
 | `docs/research/<slug>.md` | `/lean-doc-generator` | a research question → options · evidence · recommendation (feeds an ADR) |
-| `docs/DEPLOY.md` | `/lean-doc-generator` | the standard-release runbook (push · verify · rollback) |
+| `docs/deployment/deployment-guide.md` | `/lean-doc-generator` | the standard-release runbook (push · verify) |
+| `docs/deployment/rollback-guide.md` | `/lean-doc-generator` | the rollback procedure |
 | `.out-of-scope/` | `/triage` | rejected ideas, so they aren't re-litigated |
-| `CLAUDE.md` · `CONTEXT.md` · `ARCHITECTURE.md` | `/lean-doc-generator` | project shape · vocab · where-things-live |
+| `CLAUDE.md` · `CONTEXT.md` · `docs/architecture/overview.md` | `/lean-doc-generator` | project shape · vocab · where-things-live |
 
 Commit them, and your team — and their agents — start from the same map.
 
@@ -297,7 +298,7 @@ If you want the richer agent roster, gated init scaffold, and ADLC modes, use
 ## Architecture
 
 Full map — composition rule, the loop, integration points, boundaries →
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+[`docs/architecture/overview.md`](docs/architecture/overview.md).
 
 <details>
   <summary><b>Repo layout</b> — skills, references, manifests</summary>
@@ -317,8 +318,8 @@ skills/           14 skills — /flow conductor + 12 stages + /council (auto-dis
   prototype/references/       logic.md · ui.md
   council/                    opt-in agent decision aid
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · roster — SSOT)
-docs/             ARCHITECTURE.md · CHANGELOG.md · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
-TODO.md · TECH-DEBT.md · README.md
+docs/             architecture/ · deployment/ · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
+TODO.md · TECH-DEBT.md · README.md · CHANGELOG.md
 ```
 
 </details>

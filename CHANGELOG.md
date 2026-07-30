@@ -77,4 +77,4 @@ by running the machinery on itself.
 
 ---
 
-_Older releases (**v1.19.0** and earlier) → [`docs/changelog/CHANGELOG-1.19.0.md`](changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](changelog/CHANGELOG-1.7.1.md)._
+_Older releases (**v1.19.0** and earlier) → [`docs/changelog/CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._

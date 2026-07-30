@@ -99,9 +99,9 @@ status: current
 
 ## Changelog (current sprint only)
 
-> Move to `docs/CHANGELOG.md` once reflected in docs, then delete here.
+> Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — Sprint history → [`docs/CHANGELOG.md`](docs/CHANGELOG.md) (rotated archives → `docs/changelog/`).
+_(no active sprint)_ — Sprint history → [`CHANGELOG.md`](CHANGELOG.md) (rotated archives → `docs/changelog/`).
 
 ---
 

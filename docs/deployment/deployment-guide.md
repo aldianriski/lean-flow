@@ -1,7 +1,7 @@
 ---
 owner: Maintainer
-last_updated: 2026-06-16
-update_trigger: Release process, environment, or rollback procedure changes
+last_updated: 2026-07-30
+update_trigger: Release process or environment changes
 status: current
 ---
 
@@ -21,7 +21,7 @@ status: current
 
 ## Release steps
 1. **Version bump** — `/release-patch` for a PATCH (auto-detects the plugin manifest, bumps both files
-   lockstep, prepends `docs/CHANGELOG.md`) — *it stops before push*. For a MINOR/MAJOR (new skill or
+   lockstep, prepends `CHANGELOG.md`) — *it stops before push*. For a MINOR/MAJOR (new skill or
    breaking change), bump both manifests by hand with an explicit CHANGELOG entry.
 2. Commit the release: `release: vX.Y.Z`.
 3. Push `main` to the GitHub remote — **that repo is the marketplace source**.
@@ -32,9 +32,7 @@ status: current
   not "it pushed"). [L-013]
 - [ ] A fresh `claude plugin install` (or a cold `/prime` in a test repo) resolves the new version.
 
-## Rollback
-- Revert the `release:` commit (or re-point the marketplace entry to the prior tag). Markdown-only, so
-  rollback is a plain git revert — there is no data or runtime state to migrate.
+Rollback process → [`docs/deployment/rollback-guide.md`](rollback-guide.md).
 
 ## Ops traps
 - **The live trap is lockstep version drift** (pre-flight above) — the one footgun this project actually has.

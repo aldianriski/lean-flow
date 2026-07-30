@@ -85,11 +85,11 @@ path, which is itself the consumer-facing value (L-016: we verify migrate by bei
 Legacy-lean mapping block (propose→approve), and `/prime` + qa-check both pass on the new layout.
 
 **DoD:**
-- [ ] relocations applied via migrate's propose→approve path, not by hand
-- [ ] every inbound link fixed repo-wide — including links written earlier this sprint
-- [ ] `scripts/qa-check.sh` path expectations updated; qa-check green on the new layout
-- [ ] `/prime` reads the new layout cleanly (its read-order table resolves)
-- [ ] risk noted: this moves the CHANGELOG the v1.21.0 release just rotated — verify the archive chain
+- [x] relocations applied via migrate's propose→approve path, not by hand
+- [x] every inbound link fixed repo-wide — including links written earlier this sprint
+- [x] `scripts/qa-check.sh` path expectations updated; qa-check green on the new layout
+- [x] `/prime` reads the new layout cleanly (its read-order table resolves)
+- [x] risk noted: this moves the CHANGELOG the v1.21.0 release just rotated — verify the archive chain
       and rotation links still resolve from the new location
 
 ### T4 — Clear the overdue ledger housekeeping `[size: S · risk: low · class: mechanical-ingest · HITL]` (governance)
@@ -136,6 +136,36 @@ as though intake classification is binding.
   choosing a procedure step), it earns an ADR before it ships.*
 
 ## Execution Log
+
+### 2026-07-30 | T3 complete | ADR-012 layout adopted — and the naive version of this would have broken the standard
+Three relocations, all `git mv` so history follows: `docs/ARCHITECTURE.md` → `docs/architecture/overview.md`
+· `docs/CHANGELOG.md` → root · **`docs/DEPLOY.md` → `docs/deployment/deployment-guide.md`** — the third
+file TASK-074's `done-when` never named (found at G2; the mapping covered it, the task text didn't).
+Its `## Rollback` section split out to `docs/deployment/rollback-guide.md` per the mapping's split-don't-fold
+rule, template read first. Our rollback is ~3 lines of substance because the project is markdown-only with
+no runtime state — stated plainly rather than padded.
+**The trap, and why the obvious approach was wrong.** ~20 inbound references split into four classes, and
+a repo-wide find/replace on `docs/CHANGELOG.md` → `CHANGELOG.md` would have **corrupted the consumer-facing
+standard**: every mention inside `skills/**` is deliberate guidance about the *legacy* placement — the
+migration map's own source column (it maps *from* `docs/CHANGELOG.md`, so that path must stay named),
+DOCS_Guide's "still matched, second" note, `release-patch`'s legacy-detection fallback, and `prime`'s
+legacy read-order row. `docs/adr/**` is append-only, so ADR-008's reference to the old path is stale
+**by design** and was left. Asserted after the fact, not merely intended: `git status` confirms **zero
+files under `skills/` and zero under `docs/adr/`** changed.
+Left deliberately untouched as historical record: `docs/LEARNINGS.md` L-001 (describes the *past*
+contradiction), sprint archives, rotated changelogs. `README.md`'s "legacy root locations still matched"
+sentence stays — it describes the standard, not our layout. The dispatched agent **reported rather than
+edited** a real stale link in `TODO.md` (the "Sprint history →" pointer) because TODO.md was out of its
+bounds; coordinator fixed it. Exactly the right behaviour at an ownership boundary.
+**DoD 1 deviation, recorded.** "Applied via migrate's propose→approve path" — the propose→approve
+*discipline* was followed (coordinator produced the four-class proposal, owner approved it, only then was
+anything applied), and migrate's Legacy-lean mapping was the spec. But `/lean-doc-generator migrate` was
+not itself invoked: its approval step needs an owner decision a subagent cannot obtain, so a single agent
+doing both halves would have been self-approving. Same outcome, honest route.
+Verified on the new layout: qa-check **61 pass / 0 fail** · all **8 archive-chain links** resolve from
+root · `/prime`'s slot-6 canonical path exists · a final stale-link sweep over tracked files returns only
+the two legitimate mentions above · all four eval harnesses (incl. the new 10-leg self-test) still green.
+Sprint DoD now **18/18** except T2's DoD 2, the owner-ratified A2 gap.
 
 ### 2026-07-30 | T2b + T2c complete | boundary rows covered, then the fixtures actually retained
 **T2b covered 3 reachable rows** across 2 runs ($1.667 measured, `sonnet` pinned, no 529s): residual

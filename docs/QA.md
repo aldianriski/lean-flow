@@ -16,8 +16,8 @@ Run both before cutting a release or closing a sprint.
 | Rule | What it checks |
 |---|---|
 | Line caps | `SKILL.md` <=110 · `CLAUDE.md` <=80 · `CONTEXT.md` <=130 · active `SPRINT-*` <=400 |
-| Skill count | disk count of `skills/*/SKILL.md` == the number claimed in CLAUDE.md / CONTEXT.md / ARCHITECTURE.md |
-| Template count | `templates/*.md.template` files == claimed core + 2 non-core (DESIGN, QA-TESTCASE); claim in CLAUDE.md + ARCHITECTURE.md |
+| Skill count | disk count of `skills/*/SKILL.md` == the number claimed in CLAUDE.md / CONTEXT.md / docs/architecture/overview.md |
+| Template count | `templates/*.md.template` files == claimed core + 2 non-core (DESIGN, QA-TESTCASE); claim in CLAUDE.md + docs/architecture/overview.md |
 | Frontmatter | every `SKILL.md` has `---`/`name`/`description`; every core ledger has `owner`/`last_updated`/`status` |
 | Task schema | active-sprint `### Tn` Plan blocks carry `class:` + an autonomy tag (HITL/AFK) in header meta, plus `Depends-on:`/`Layers:`/`**Acceptance:**` — else FAIL (TASK-110) |
 

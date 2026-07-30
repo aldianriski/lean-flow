@@ -50,10 +50,10 @@ check_claim() { # <label> <actual> <file> <pattern>
 }
 
 check_claim "skills"    "$skills_actual" .claude/CONTEXT.md    'Skill roster \(([0-9]+)'
-check_claim "skills"    "$skills_actual" docs/ARCHITECTURE.md  '([0-9]+) skills'
+check_claim "skills"    "$skills_actual" docs/architecture/overview.md  '([0-9]+) skills'
 check_claim "skills"    "$skills_actual" .claude/CLAUDE.md     '([0-9]+) SKILL\.md'
 check_claim "tmpl-core" "$tmpl_core"     .claude/CLAUDE.md     '([0-9]+) canonical doc templates'
-check_claim "tmpl-core" "$tmpl_core"     docs/ARCHITECTURE.md  '([0-9]+) canonical doc templates'
+check_claim "tmpl-core" "$tmpl_core"     docs/architecture/overview.md  '([0-9]+) canonical doc templates'
 note "templates: $tmpl_files files = $tmpl_core core + $noncore non-core (DESIGN, QA-TESTCASE)"
 
 # doc-vs-script drift guard: docs/QA.md's stated non-core count must match $noncore above,
@@ -76,7 +76,7 @@ for s in skills/*/SKILL.md; do
   then ok "frontmatter $s"; else bad "frontmatter $s (need ---/name/description)"; fi
 done
 
-for d in TODO.md .claude/CLAUDE.md .claude/CONTEXT.md docs/ARCHITECTURE.md docs/LEARNINGS.md docs/DECISIONS.md docs/CHANGELOG.md docs/knowledge-index.md; do
+for d in TODO.md .claude/CLAUDE.md .claude/CONTEXT.md docs/architecture/overview.md docs/LEARNINGS.md docs/DECISIONS.md CHANGELOG.md docs/knowledge-index.md; do
   [ -f "$d" ] || { note "skip (missing): $d"; continue; }
   if has_field "$d" owner && has_field "$d" last_updated && has_field "$d" status
   then ok "ownership $d"; else bad "ownership $d (need owner/last_updated/status)"; fi
