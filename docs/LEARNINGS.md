@@ -21,11 +21,27 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-068**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-070**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-070 [tags: tooling] [status: active]: In a session holding **two shells** (PowerShell primary, Bash also available), the *tool* decides the syntax — and a here-string that is valid in one is inert text in the other. `git commit -m @'…'@` sent through the Bash tool stored a commit whose subject was a lone `@`, at **exit 0**: git received the literal `@` as the message's first line, so `git log --oneline` read `@ docs(triage): …`. Nothing failed; only the artifact was wrong. Fix that removes the class rather than the instance: **write any multi-line message to a file and pass `-F <file>`** — no quoting dialect, no shell-boundary transformation to get wrong. Caught because the commit's stored text was inspected (`git log --format=%B | cat -A`) rather than the command's exit code, which is CLAUDE.md's trap (c) working as intended.
+- seen: Sprint-040
+- count: 1
+- promoted: no
+- related: L-067 (MSYS path translation — same family: a shell boundary that succeeds loudly and produces the wrong artifact quietly) · L-045 · L-060 · CLAUDE.md Edit-safety trap (c)
+
+---
+
+## L-069 [tags: process] [status: active]: **A behavioural rule ships with its trigger, or it does not ship.** SPRINT-040 T2 wired "write a park record when headless" into `migrate`/`init` and it did not fire — twice, for two different reasons, each visible only on a real run. First attempt: the rule went into the § Sprint lifecycle paragraph, which a `migrate` run never reads (it routes `## Migrate` → `references/migration-map.md`) — L-020's shape, committed *while fixing a TD of that class*. Second attempt: correctly placed in `## Migrate`/`## Init`, it stated **what to do when headless** but never **how the run knows it is** — and since waiting in prose is correct when a human is watching, the clause was unreachable by construction. What made both entry points comply immediately was the **detection cue**: probe `ToolSearch select:AskUserQuestion`. That also explains the SPRINT-039 result nobody had explained — `promote` and `/triage` complied while `migrate`/`init` didn't, because their text *names the observable*, which prompts the probe. Generalisation: a conditional instruction needs its condition's **observable** shipped beside it; without one the branch is dead text that reads as complete. Cost of establishing this: 4 real headless runs, $2.10 — inspection passed both defects.
+- seen: Sprint-040
+- count: 1
+- promoted: no
+- related: L-020 (wire a capability into every triggering job — this is its sharper form: wiring the *trigger*, not just the location) · L-007 (spec-only debt) · L-016 (verify on the consumer path) · TD-017
 
 ---
 

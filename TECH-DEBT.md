@@ -16,6 +16,25 @@ status: current
 
 ## Tech Debt
 
+- **TD-019** severity: minor | status: open | created: Sprint-040
+  - Summary: the park-record behaviour SPRINT-040 T2 shipped has **no retained guard**. Its positive
+    half — that a headless `migrate`/`init` writes a `/handoff` park record — was verified by two real
+    runs whose artifacts land at machine-specific `%TEMP%` paths, so `assert-noaction-park.sh`
+    deliberately asserts only the in-repo negative half (nothing written without approval), exactly as
+    its header states. Nothing in `qa-check.sh` reads the shipped detection cue or the park-record
+    instruction.
+  - Impact: TD-012's shape, one layer up. Delete the `ToolSearch select:AskUserQuestion` probe from
+    either reference and every automated check still passes — the in-repo assertions would keep
+    passing *because withholding writes is what a prose decline already does*. The regression is
+    invisible precisely where the failure is silent, which is the property L-058 names. The behaviour
+    took 4 paid runs and two failed wirings to get right; nothing currently stops the next edit from
+    undoing it.
+  - Mitigation (not yet done): cheapest real option is a `qa-check.sh` text leg asserting that both
+    `migration-map.md` and `init.md` still contain a headless **detection** cue plus a park-record
+    instruction — a grep-shaped guard over shipped text, in the family of the existing snippet
+    runners, zero API cost. It guards the cue's *presence*, not the model's compliance; the
+    behavioural half stays a paid, opt-in fixture run by design (`docs/QA.md`'s manual/gated boundary).
+
 - **TD-018** severity: trivial | status: open | created: Sprint-039
   - Summary: `evals/assert-boundary-park.sh`'s `park_count=$(grep -cF … || echo 0)` yields the string
     `"0\n0"` on a genuine zero-match (grep prints `0` *and* exits 1, so the `|| echo 0` also fires),

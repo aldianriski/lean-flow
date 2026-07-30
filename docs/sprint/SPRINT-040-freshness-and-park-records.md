@@ -3,7 +3,7 @@ sprint: 040
 slug: freshness-and-park-records
 owner: Maintainer
 last_updated: 2026-07-30
-status: active
+status: closed
 plan_commit: d5d7b5b
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -55,8 +55,8 @@ all three observed, not reasoned about.
       that can only ever print `fresh` is exactly the silent false-negative L-058 names
 - [x] `n/a` branch demonstrated on a repo with no `.claude-plugin/plugin.json` (consumer path, L-015)
 - [x] `fresh` branch demonstrated on this repo as-is
-- [ ] README `/prime` blurb + CHANGELOG entry reflect the user-visible change (L-015)
-      — README done; CHANGELOG block lands with the MINOR release at close (see Log 2026-07-30 T1)
+- [x] README `/prime` blurb + CHANGELOG entry reflect the user-visible change (L-015)
+      — README at T1; CHANGELOG `v1.23.0` block written at close, as planned
 - [x] TD-015 marked `status: resolved → SPRINT-040 T1` with the accepted blind spot stated
 <!-- QA: no test substrate (markdown skill). Verification is the three demonstrated branches above. -->
 
@@ -185,4 +185,40 @@ planned — the overrun bought two findings that no amount of re-reading would h
 
 ## Retro
 
-<!-- Written at close. -->
+**Retrieval check** — no prior `L-NNN`/ADR was contradicted or missed. The opposite happened, and it
+is the sprint's main result: L-020 was *known, quoted in the DoD, and violated anyway* on the first
+attempt. Knowing a rule and being able to apply it to your own edit in the moment are different
+capabilities, and only the run caught the difference.
+
+**Worked**
+- **Paying for real runs.** Both defects were invisible to inspection — the text looked correct in the
+  diff both times. $2.10 and 4 runs bought two findings and a sharper rule (L-069); the alternative
+  was shipping wording that read fine and did nothing, which is what TD-017 was in the first place.
+- **Stopping to ask when the budget moved.** Two overruns, two popups, both approved with the evidence
+  visible. The first run's $0.41 was what justified the rest — a good argument for surfacing cost as
+  it lands rather than reporting it at the end.
+- **The freshness row demonstrated on must-differ input.** `fresh` alone would have proved nothing;
+  the `9.9.9` fixture is what shows the row can actually fire.
+- **Checking the artifact, not the exit code.** The mangled commit subject (L-070) and every run's
+  result were caught by reading the stored text and the written files, not by trusting exit 0.
+
+**Friction**
+- **Two failed wirings on a task whose entire subject was wiring.** Recorded honestly in the Execution
+  Log rather than smoothed over — the sequence *is* the finding.
+- **Cost estimate off by 2.5×** ($0.85 planned, $2.10 actual), because it assumed one run per fixture
+  and no iteration. A verification budget for behavioural work should assume at least one retry per
+  entry point.
+- **`lean-doc-generator/SKILL.md` finished at exactly 110/110.** Anything further there needs
+  `references/` (ADR-006). Not a problem today; it is a constraint the next editor inherits.
+
+**Pattern candidate** → filed as **L-069** (a behavioural rule ships with its trigger) and **L-070**
+(here-string syntax doesn't cross the PowerShell/Bash tool boundary — use `-F <file>`). L-069 is the
+one to watch: at count 2 it belongs in CLAUDE.md beside L-020, as its sharper form.
+
+**Buckets routed**
+| Bucket | Filed |
+|---|---|
+| Shipped | `CHANGELOG.md` — `v1.23.0` block (MINOR; feature sprint, so not `/release-patch`) |
+| Tech debt | `TD-019` — the shipped park-record cue has no retained guard (TD-012's shape, one layer up) |
+| Follow-ups | **none** — TD-019 carries the actionable work; no `TASK-NNN` would add anything. Standing: TD-016's a/b/c `qa-check` runtime decision is still open and still owner-only |
+| Learnings | `L-069` · `L-070` |
