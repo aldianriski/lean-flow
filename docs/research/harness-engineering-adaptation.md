@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-29
+last_updated: 2026-07-30
 update_trigger: A new OpenAI/harness-engineering follow-up publishes, or lean-flow's dispatch/doc surface changes enough to reopen a rejected row
 status: current
 id: harness-engineering-adaptation
@@ -18,8 +18,20 @@ related: [fog-fleet-orchestration, agents-md-adoption, structarmed-adaptation]
 > practices from a 5-month, ~1500-PR, zero-manually-written-code internal project. Does any named
 > technique add capability lean-flow doesn't already have (its own skills/gates, or a Claude Code
 > harness equivalent)?
-> **Verdict.** No keepers. Every technique maps onto an already-shipped lean-flow surface, an
-> already-tracked open question, or is out of scope (host-project infra, not a dev-loop concept).
+> **Verdict.** No new core stages, but operational keepers. Every technique maps onto an
+> already-shipped lean-flow surface, an already-tracked open question, or is out of scope
+> (host-project infra, not a dev-loop concept) — **conceptually**. That per-technique table (below)
+> answers "does lean-flow have this mechanism at all" and every row is correctly a `reject` on that
+> question. It doesn't answer "is the operational depth equivalent" — and on that separate axis
+> this scan surfaced three real gaps, now tracked rather than closed:
+> - **Behavioral evals** — structural lint (`gen-index.sh`/`qa-check.sh`) exists; behavioral eval
+>   coverage does not → **TASK-116** (Backlog: prototype one eval fixture).
+> - **Machine-readable scheduling/recovery state** — worktrees exist; machine-checkable scheduling
+>   and resumable run state do not → **TASK-111** (SPRINT-035 T6: council decision on the
+>   machine-state-artifact fork).
+> - **A standard maintenance/garbage-collection recipe** — composable today from
+>   `/refactor-advisor` + built-in `/schedule`/`/loop`, but not yet packaged as a repeatable recipe
+>   (see Out of scope / open questions below).
 
 ## Why this matters
 
@@ -59,15 +71,22 @@ techniques below are cited from that fetched text.
 
 ## Recommendation
 
-**Clean reject — file nothing new.** Every technique in the article either (a) is already the shape
-of an existing lean-flow mechanism, (b) restates a tension TASK-006 already tracks without adding
-new information, or (c) is host-project/app-code infrastructure outside a markdown skill library's
-scope. The one real philosophical divergence — OpenAI's fully autonomous merge vs lean-flow's
-coordinator-owned merge — is a considered design choice (Human-gated axiom), not an oversight; no
-ADR needed since nothing here is *new* information changing that call.
+**No new core stages; three operational keepers filed.** Conceptually, every technique in the
+article either (a) is already the shape of an existing lean-flow mechanism, (b) restates a tension
+TASK-006 already tracks without adding new information, or (c) is host-project/app-code
+infrastructure outside a markdown skill library's scope — the table's `reject` verdicts stand
+unchanged. Operationally, three gaps this scan surfaced are real and are now tracked rather than
+waved off by the conceptual mapping alone (behavioral evals → TASK-116, machine-readable
+scheduling/recovery state → TASK-111, a standard GC recipe → open question below). The one real
+philosophical divergence — OpenAI's fully autonomous merge vs lean-flow's coordinator-owned merge —
+is a considered design choice (Human-gated axiom), not an oversight; no ADR needed since nothing
+here is *new* information changing that call.
 
 ## Out of scope / open questions
 
 - If lean-flow ever reopens TASK-006 (enforced vs suggested gates), this doc's two enforcement-axis
   rows (taste-into-linters, Ralph Wiggum full-autonomy) are corroborating evidence to attach there —
   not a new question on their own.
+- The garbage-collection row's mechanism (`/refactor-advisor` + `/schedule`/`/loop`) is composable
+  today but not yet written up as a repeatable recipe — no TASK filed; revisit if entropy-scan
+  drift (TD-NNN aging) makes ad-hoc composition too costly to repeat by hand each time.
