@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-037 — Gates and Evals — closed 2026-07-30 · 08ca2a6
 - SPRINT-036 — Preflight and Verify — closed 2026-07-30 · ba46936 (MINOR v1.20.0)
 - SPRINT-035 — Contract Hardening — closed 2026-07-30 · 7469411 (MINOR v1.19.0)
 - SPRINT-034 — Night-Run Entry Path — closed 2026-07-30 · ce93d59 (MINOR v1.18.0)

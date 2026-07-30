@@ -32,17 +32,6 @@ _(none active)_ — SPRINT-037 closed 2026-07-30. Next: `/lean-doc-generator pro
 
 ### P2 — Quality / Polish
 
-- [ ] TASK-116 — Prototype one behavioral eval fixture end-to-end  [size: S] [risk: low] [HITL]
-      done-when: one safety eval (unattended run parks HITL work) runs headless against the
-                 installed plugin and asserts behavior (files written · state transitions · exit
-                 status), never prose; the captured answer (harness shape · cost · worth-it?)
-                 either decomposes the full eval suite or rejects it with a revisit-if
-      touches: evals/ (throwaway per /prototype discipline) · capture → docs/research/ or ADR
-      assumes: answers ONE question — is a behavioral eval harness feasible and cheap?; can share
-               TASK-106's headless fixture
-      tracker: none — external review item 4, tracer bullet before committing to a suite
-      state:   ready
-
 - [ ] TASK-120 — Build the checkpointed run-state file (deferred by ADR-013)  [size: M] [risk: med] [HITL]
       class:      execution
       depends-on: none
@@ -55,42 +44,6 @@ _(none active)_ — SPRINT-037 closed 2026-07-30. Next: `/lean-doc-generator pro
                note in LEARNINGS (ADR-013 kill-switch)
       tracker: ADR-013
       state:   blocked (unblock: the promotion trigger fires — a real unresumable run)
-
-- [ ] TASK-121 — Productionize the dispatch preflight (cycles · single-owner · base-ref · waves)  [size: S] [risk: low] [HITL]
-      class:      execution
-      depends-on: none
-      done-when: the pre-dispatch gate ships per the ADR-013 addendum — three checks + wave
-                 computation as a step in the dispatch procedure, negative-tested per L-058, and
-                 fired once on a real sprint before a parallel wave
-      touches: skills/orchestrator/references/dispatch.md · (script home decided at G2 — consumer
-               surface: shipped-in-plugin vs host-repo script is the open design question)
-      assumes: T2's prototype design is the spec (163-line POSIX sh proved all four derivations);
-               L-015/L-016 bind whatever ships
-      tracker: ADR-013 addendum
-      state:   ready
-
-- [ ] TASK-122 — Add /handoff to the night-run allowlist builder  [size: S] [risk: low] [HITL]
-      class:      execution
-      depends-on: none
-      done-when: night-run.md Part 1's allowlist builder includes the /handoff invocation so a
-                 headless run can complete its clean-halt protocol; verified when the next headless
-                 probe reaches /handoff without a denied-tool record
-      touches: skills/orchestrator/references/night-run.md
-      assumes: T4's probe denial is the trigger evidence; halt-via-Execution-Log stays the fallback
-      tracker: none — SPRINT-036 T4 probe finding
-      state:   ready
-
-- [ ] TASK-117 — Design the capability preflight  [size: S] [risk: low] [HITL]
-      done-when: the preflight surface is decided (extend /prime vs night-run Part 0) and its
-                 capability checks are specified behavior-first with degrade rules (no worktree →
-                 sequential · no ask channel → park HITL · plugin-cache mismatch → block
-                 unattended); graduates to an implementation TASK-NNN
-      touches: skills/orchestrator/references/night-run.md (Part 0 pre-flight — surface resolved
-               at SPRINT-037 promote: extend the existing pre-flight, no /prime flag)
-      assumes: TASK-106's probe answered the open question (checks work; the gap was the allowlist);
-               map the delta vs existing Part 0 checks before adding anything
-      tracker: none — external review item 5
-      state:   ready (needs-info resolved 2026-07-30: owner picked night-run Part 0)
 
 - [ ] TASK-124 — Decompose the behavioral eval suite (adopted by TASK-116)  [size: M] [risk: low] [HITL]
       class:      execution
