@@ -305,7 +305,10 @@ done
 # unset $TMPDIR) could masquerade as the harness's verdict (CLAUDE.md Edit-safety trap (c)). A
 # harness that can't even be found or that exits non-zero for any reason is its own named FAIL,
 # never a silent skip.
-eval_harnesses="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh"
+eval_harnesses="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh"
+# Harnesses deliberately NOT gated. Empty is a valid state -- but a paid/non-deterministic harness is
+# excluded by being NAMED here with a reason, never by being left out of the list above.
+eval_harnesses_excluded=""
 for h in $eval_harnesses; do
   hp="evals/$h"
   if [ ! -f "$hp" ]; then
@@ -320,6 +323,19 @@ for h in $eval_harnesses; do
     [ -n "$hfind" ] || hfind="no FAIL line in output -- harness exited $hcode without reporting one"
     bad "eval harness $h (exit $hcode): $hfind"
   fi
+done
+# Completeness: a harness added to evals/ but never listed above is silently un-gated -- TD-013's
+# exact shape, recreated. SPRINT-039 produced this live: W2 ran T2 and T3 in parallel, T2 landed a
+# 6th zero-API harness, and T3's list (written before it existed) could not know. So the list is
+# checked against disk rather than trusted. `assert-*.sh` are correctly outside this glob: they take
+# a completed run's directory as an argument and have nothing to check standalone.
+for hp in evals/run-*.sh evals/selftest-*.sh; do
+  [ -f "$hp" ] || continue
+  h=${hp##*/}
+  case " $eval_harnesses $eval_harnesses_excluded " in
+    *" $h "*) ;;
+    *) bad "eval harness $h: in evals/ but neither gated nor explicitly excluded -- add it to eval_harnesses, or to eval_harnesses_excluded with a reason" ;;
+  esac
 done
 
 # --- Summary ----------------------------------------------------------------

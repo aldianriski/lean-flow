@@ -1,0 +1,10 @@
+{
+  "name": "eval-judgement-fixture-plugin",
+  "version": "0.0.1",
+  "description": "Throwaway single-session plugin loaded via --plugin-dir for a headless behavioral eval run.",
+  "author": {
+    "name": "lean-flow eval harness",
+    "email": "aldian.mar@gmail.com"
+  },
+  "license": "MIT"
+}

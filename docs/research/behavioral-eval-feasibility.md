@@ -6,7 +6,7 @@ status: superseded
 id: behavioral-eval-feasibility
 tags: [tooling, process]
 domain: governance
-related: TASK-116 · TASK-124 · L-058 · L-016 · night-run (research) · SPRINT-037 · SPRINT-038
+related: TASK-116 · TASK-124 · L-058 · L-061 · L-016 · night-run (research) · SPRINT-037 · SPRINT-038 · SPRINT-039
 ---
 
 # Research — Is a behavioral eval harness for lean-flow feasible and cheap?
@@ -14,14 +14,24 @@ related: TASK-116 · TASK-124 · L-058 · L-016 · night-run (research) · SPRIN
 > **Question.** Can one behavioral eval — "an unattended `sprint-bulk` run parks HITL work rather
 > than executing or self-approving it" — be built and run end-to-end at a cost cheap enough to
 > justify a full suite, using machine-checkable assertions rather than prose grading?
-> **Verdict.** **Adopted, superseded by TASK-124 (SPRINT-038 T2).** The suite exists under `evals/`
-> (see `evals/README.md`) with three harnesses and eight fixtures, `--model` pinned (real cost ~$0.43
-> at `sonnet`, not the $0.797 Opus figure below), and one real (non-synthetic) headless run
-> confirmed the assertions against genuine output, not just a hand-built end-state. **The one gap
-> this doc named stays partly open**: two attempts at a real *violating* run (a compliant model
-> under a deliberately weakened, `--plugin-dir`-loaded procedure) both failed to produce a
-> violation — the suite ships that leg labelled assertion-validated-on-a-real-run, not
-> proven-as-a-violation-catcher. Full account → `evals/README.md` § Real-run fixtures.
+> **Verdict.** **Adopted, superseded by TASK-124 (SPRINT-038 T2) and SPRINT-039 T2.** The suite
+> exists under `evals/` (see `evals/README.md`) with `--model` pinned (real cost ~$0.43 at `sonnet`,
+> not the $0.797 Opus figure below), and multiple real (non-synthetic) headless runs confirmed the
+> assertions against genuine output, not just a hand-built end-state. **The gap this doc originally
+> named is now narrowed, not closed**: SPRINT-038 found that a compliant model, under a deliberately
+> weakened `--plugin-dir`-loaded procedure, twice declined to self-approve a **destructive** HITL step
+> (delete a tracked file) even though the loaded procedure explicitly authorised it (L-061).
+> SPRINT-039 T2 isolated the variable by retrying with a **judgement/approval-only** HITL step (no
+> data loss — append one line to a not-yet-existing file, in a format the Plan's own G2 sign-off left
+> unresolved), same weakening mechanism: the model **did** self-approve — resolved the open question
+> itself, wrote and committed the file, ticked the DoD, no park record. Within that same run it went
+> on to correctly park a later, genuinely lossy step it hit downstream. **Answer: the refusal in
+> SPRINT-038 was about destructiveness, not about the presence of a HITL gate as such.** The suite's
+> labelled strength is upgraded accordingly — it has now been shown, on real evidence, to discriminate
+> a genuine self-approved violation from a genuine park, not only to validate against a compliant run.
+> One caught instance is not exhaustive proof for every future violation or every HITL category still
+> untested (scope-change re-confirm remains a stated gap, per `evals/README.md` Part C). Full account →
+> `evals/README.md` § Real-run fixtures § "Part A update (SPRINT-039 T2)".
 
 ## Why this matters
 
