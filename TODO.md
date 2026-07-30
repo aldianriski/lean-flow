@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-036 closed 2026-07-30 → v1.20.0 Preflight and Verify; archived per §11.)_
+> **SPRINT-037 — gates-and-evals** → docs/sprint/SPRINT-037-gates-and-evals.md
 
 ---
 
@@ -85,11 +85,12 @@ status: current
                  capability checks are specified behavior-first with degrade rules (no worktree →
                  sequential · no ask channel → park HITL · plugin-cache mismatch → block
                  unattended); graduates to an implementation TASK-NNN
-      touches: (design only — surface TBD)
-      assumes: partial overlap with night-run Part 0 pre-flight and TASK-106 — map the delta
-               before adding anything
+      touches: skills/orchestrator/references/night-run.md (Part 0 pre-flight — surface resolved
+               at SPRINT-037 promote: extend the existing pre-flight, no /prime flag)
+      assumes: TASK-106's probe answered the open question (checks work; the gap was the allowlist);
+               map the delta vs existing Part 0 checks before adding anything
       tracker: none — external review item 5
-      state:   needs-info (open: which surface owns it; whether TASK-106's result changes the need)
+      state:   ready (needs-info resolved 2026-07-30: owner picked night-run Part 0)
 
 ### P3 — Long-term
 
