@@ -52,9 +52,9 @@ The T4-036 probe's clean halt was stopped one step short: `Skill(/handoff)` deni
 probe should reach it without a `denied-tool` record (full proof rides that future run).
 
 **DoD:**
-- [ ] Part 1 allowlist builder includes the /handoff invocation, consumer-legible (L-015)
-- [ ] fallback (halt-record via Execution Log) stays documented — the allowlist add is belt, not replacement
-- [ ] verification note logged: proof completes on the next real headless run
+- [x] Part 1 allowlist builder includes the /handoff invocation, consumer-legible (L-015)
+- [x] fallback (halt-record via Execution Log) stays documented — the allowlist add is belt, not replacement
+- [x] verification note logged: proof completes on the next real headless run
 
 ### T3 — Prototype one behavioral eval fixture end-to-end `[size: S · risk: low · class: execution · HITL]` (TASK-116)
 Layers: (throwaway per /prototype discipline · capture → docs/research/ or ADR)
@@ -99,6 +99,20 @@ park HITL · cache mismatch → block unattended), delta-mapped against Part 0's
 - **A3** — T4 stays spec-only even if the spec is small enough to implement — wiring is a separate verified step (L-020). *Confirm: G2 holds the line.*
 
 ## Execution Log
+
+### 2026-07-30 | T2 complete | /handoff allowlisted as a Part 1 pre-flight item
+Kept inline (trivial doc edit; also avoids handing `night-run.md` between an agent and the
+coordinator two steps before T4 edits the same file). Scope went one step past the task title on
+purpose: allowlisting `Skill(/handoff)` alone is insufficient — the handoff **doc write to the OS
+temp dir** is a separate tool call that `dontAsk` would also deny, so a run could clear the skill
+gate and still fail to halt. Both are now named, and Part 3's watchdog recovery call is cited as the
+second consumer of the same rule.
+Deliberately **not** asserting a matcher string: the only evidence is one denial record
+(`Skill(/handoff)`), so the item tells the reader to confirm what their builder emits rather than
+fabricating rule syntax. That is what DoD 3's "proof completes on the next real headless run" means —
+this task closes the *gap*, the next headless run closes the *proof*. Fallback (rollup line → Execution
+Log) explicitly retained as belt-not-replacement, so an allowlisted `/handoff` never becomes the only exit.
+T4 unblocked (`Depends-on: T2` satisfied).
 
 ### 2026-07-30 | T1 complete | preflight shipped as a procedure step — negative-tested, fired on this Plan
 D3 resolved at G2: **procedure step in `dispatch.md` + optional inline POSIX-sh snippet, no new file**

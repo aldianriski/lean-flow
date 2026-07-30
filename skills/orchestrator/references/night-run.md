@@ -118,6 +118,17 @@ All items must pass or the night-run does not fire:
       `dontAsk` **denies** anything outside the list rather than pausing for it — an under-scoped
       allowlist silently fails tasks instead of asking, so this step is load-bearing; over-denial
       shows up in the morning report, never as a bypass.
+- [ ] Allowlist includes the **`/handoff` skill invocation** *and* the write of its output doc to the
+      OS temp dir. The clean halt (Part 0 step 4) and the watchdog's recovery call (Part 3) are tool
+      calls like any other, so `dontAsk` denies them unless listed — and a run that cannot halt
+      cleanly is the one case where the failure lands after all the work is done. Observed on a real
+      probe: the run parked every HITL task correctly, then `Skill(/handoff)` was refused as
+      out-of-list and the protocol stopped one step short. Confirm the matcher your builder actually
+      emits rather than assuming the form — that denial record is the only evidence so far, and the
+      next real headless run is what proves the rule is right.
+      **Belt, not replacement.** The fallback stays: a denied or unavailable `/handoff` still halts
+      cleanly by appending its rollup line (Part 4) to the sprint Execution Log, which the morning
+      `/prime` reads. Never let an allowlisted `/handoff` become the run's only exit.
 - [ ] `bypassPermissions` is off the table — never the fallback for a lazy allowlist. The safety
       default stays OFF; flipping it is an owner decision, not a night-run convenience.
 
