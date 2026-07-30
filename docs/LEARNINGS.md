@@ -21,11 +21,19 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-057**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-058**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-058 [tags: tooling] [status: active]: A gate script's worst failure mode is the silent false-negative — and only a must-FAIL fixture exposes it. The T2 preflight prototype hit it live: POSIX `while read` over an unterminated stream silently dropped the last `Layers:` token (and single-file Layers entirely), so the multi-owner check would have PASSED a real overlap. The positive run looked perfect; the crafted-to-fail fixture caught the hole. Corollary to L-007: "exercised once on real input" is one-sided for GATES — a gate is also exercised once on input that must fail, one fixture per check, each failing with its named finding. Same family as L-057 (a gate that runs but doesn't gate).
+- seen: Sprint-036
+- count: 1
+- promoted: no
+- related: L-007 · L-057
 
 ---
 

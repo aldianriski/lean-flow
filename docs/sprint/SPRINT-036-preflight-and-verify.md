@@ -3,7 +3,7 @@ sprint: 036
 slug: preflight-and-verify
 owner: Maintainer
 last_updated: 2026-07-30
-status: active
+status: closed
 plan_commit: 0f34b54
 close_commit: [set at close]
 update_trigger: sprint execute/close events
@@ -167,15 +167,26 @@ carries class + autonomy; Depends-on explicit.
 
 ## Retro
 
-<!-- Written at close. -->
-
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no miss; two retrieval WINS: the headless probe applied L-042 (refused to
+commit over coordinator WIP) and Part 0 unprompted, from the installed cache; G2 applied L-055 at
+design time (no-worktree sequencing) before TASK-118 even shipped the rule.
 
 **Worked**
--
+- The probe as its own scribe: T4's evidence was written by the thing under test, on the consumer
+  path — the strongest L-016 verification yet, and it cost one background run.
+- Negative fixtures on the T2 gate: caught a silent false-negative the positive run couldn't (→ L-058).
+- The cold read (T3): 3 author-blind gaps in supposedly-settled text, incl. a prose-vs-table
+  contradiction — L-006's third confirmation.
+- Laziness ladder held under pressure: the JSON DAG — the external review's flagship proposal —
+  died to a 163-line shell script exercised honestly.
 
 **Friction**
--
+- `/handoff` denied under `dontAsk` — the clean-halt protocol can't complete headless (→ TASK-122).
+- `claude plugin update lean-flow` fails unqualified; needs `lean-flow@lean-flow` (minor, noted for
+  TASK-116's fixture).
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- L-058 (a gate needs a must-FAIL fixture per check) — filed, count 1.
+
+**Buckets routed:** Shipped → CHANGELOG v1.20.0 (at release) · Tech debt → none · Follow-ups →
+TASK-121 (productionize preflight) · TASK-122 (/handoff allowlist) · Learnings → L-058.

@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-036 — preflight-and-verify** → docs/sprint/SPRINT-036-preflight-and-verify.md
+> _(no active sprint — SPRINT-036 closed 2026-07-30 → v1.20.0 Preflight and Verify; retention pass pending owner approval.)_
 
 ---
 
@@ -98,6 +98,30 @@ status: current
                note in LEARNINGS (ADR-013 kill-switch)
       tracker: ADR-013
       state:   blocked (unblock: the promotion trigger fires — a real unresumable run)
+
+- [ ] TASK-121 — Productionize the dispatch preflight (cycles · single-owner · base-ref · waves)  [size: S] [risk: low] [HITL]
+      class:      execution
+      depends-on: none
+      done-when: the pre-dispatch gate ships per the ADR-013 addendum — three checks + wave
+                 computation as a step in the dispatch procedure, negative-tested per L-058, and
+                 fired once on a real sprint before a parallel wave
+      touches: skills/orchestrator/references/dispatch.md · (script home decided at G2 — consumer
+               surface: shipped-in-plugin vs host-repo script is the open design question)
+      assumes: T2's prototype design is the spec (163-line POSIX sh proved all four derivations);
+               L-015/L-016 bind whatever ships
+      tracker: ADR-013 addendum
+      state:   ready
+
+- [ ] TASK-122 — Add /handoff to the night-run allowlist builder  [size: S] [risk: low] [HITL]
+      class:      execution
+      depends-on: none
+      done-when: night-run.md Part 1's allowlist builder includes the /handoff invocation so a
+                 headless run can complete its clean-halt protocol; verified when the next headless
+                 probe reaches /handoff without a denied-tool record
+      touches: skills/orchestrator/references/night-run.md
+      assumes: T4's probe denial is the trigger evidence; halt-via-Execution-Log stays the fallback
+      tracker: none — SPRINT-036 T4 probe finding
+      state:   ready
 
 - [ ] TASK-117 — Design the capability preflight  [size: S] [risk: low] [HITL]
       done-when: the preflight surface is decided (extend /prime vs night-run Part 0) and its
