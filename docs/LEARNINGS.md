@@ -21,11 +21,19 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-056**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-057**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-057 [tags: tooling] [status: active]: A gate command piped into a formatter stops gating — `check | tail && commit` commits on the FORMATTER's exit code, not the check's. Twice at SPRINT-035 close, `sh scripts/qa-check.sh 2>&1 | tail -3 && git add … && git commit` committed through a genuine FAIL (missing corpus metadata; stale README footer version): POSIX sh pipeline status is the LAST command's, and `tail` always exits 0, so the `&&` chain read red as green both times. The failing line was even printed — but the chain, not the reader, made the decision. Run the gate bare (`qa-check && commit`) or gate on its captured status; pipe to a formatter only AFTER the exit code has done its job.
+- seen: Sprint-035 (×2, same close)
+- count: 1
+- promoted: no
+- related: L-007 (the check existed and ran — the wiring made it decorative) · ADR-008
 
 ---
 
