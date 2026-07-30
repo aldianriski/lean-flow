@@ -50,8 +50,13 @@ echo "-- detected kind: $kind (sprint file: $sprint)"
 # --- shared check 1: park-record-shape -------------------------------------------------------
 # A line matches Part 4's `Tn · state · next-action` shape, specifically naming parked-hitl.
 # grep -F (literal) so the middle-dot character is never treated as a regex metachar.
-park_count=$(grep -cF '· parked-hitl ·' "$sprint" 2>/dev/null || echo 0)
-if [ "$park_count" -ge 1 ]; then
+# Presence checked with grep -q first (as evals/assert-judgement-retry.sh already does) so a real
+# zero-match never falls through to a second `|| echo 0` -- grep -c prints "0" AND exits 1 on
+# zero-match, so a count-then-fallback idiom doubles its own output into "0\n0", corrupting the
+# captured value and making the `-ge` test below print spurious "integer expression expected"
+# noise beside the correct FAIL verdict (TD-018).
+if grep -qF '· parked-hitl ·' "$sprint" 2>/dev/null; then
+  park_count=$(grep -cF '· parked-hitl ·' "$sprint" 2>/dev/null)
   echo "PASS park-record-shape: $park_count line(s) match 'label · parked-hitl · next-action' in $sprint"
 else
   echo "FAIL no-park-record: no line matches 'label · parked-hitl · next-action' in $sprint"

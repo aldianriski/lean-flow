@@ -35,7 +35,7 @@ status: current
     runners, zero API cost. It guards the cue's *presence*, not the model's compliance; the
     behavioural half stays a paid, opt-in fixture run by design (`docs/QA.md`'s manual/gated boundary).
 
-- **TD-018** severity: trivial | status: open | created: Sprint-039
+- **TD-018** severity: trivial | status: resolved → SPRINT-041 T2 | created: Sprint-039
   - Summary: `evals/assert-boundary-park.sh`'s `park_count=$(grep -cF … || echo 0)` yields the string
     `"0\n0"` on a genuine zero-match (grep prints `0` *and* exits 1, so the `|| echo 0` also fires),
     which makes `[ "$park_count" -ge 1 ]` emit an "integer expression expected" error on stderr.
