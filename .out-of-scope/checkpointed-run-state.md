@@ -1,0 +1,8 @@
+# Checkpointed run-state file (resumable unattended runs)
+
+- date: 2026-07-30
+- decision: out of scope
+- reason: ADR-013 option (b) — deferred with a graduation contract whose **expiry fired**. The promotion trigger was *one real unattended run that the Execution Log + `/handoff` could not cleanly resume*; it never fired within the 5-sprint window (SPRINT-035 → SPRINT-040 promote). SPRINT-039 T1 ran five real headless fixtures (`migrate` · `init` · `promote` · `/triage` · `release-patch push`) and every one either completed or parked with a readable trail — the markdown Execution Log kept proving sufficient at 4–8-task scale. ADR-013 pre-specified this outcome: "trigger unfired within 5 sprints (by SPRINT-040 promote) → auto-close as rejected". Rejecting costs nothing that a re-proposal could not recover, because the graduation contract itself is the durable artifact.
+- revisit-if: the original trigger fires for real — a night run dies mid-wave and neither the Execution Log nor the `/handoff` doc can reconstruct where to resume. Then it re-enters **with the contract's precondition intact**: the reconciliation rule is written *first* (run-state is a cache of the Execution Log · the log always wins · rebuildable from the log alone), before any field is designed. Guardrail (ADR-013 pre-mortem 1): TASK-119's no-JSON preflight must never quietly accrete `status`/`attempts` fields and become this by drift.
+- related: `.out-of-scope/run-event-log.md` — the sibling ADR-013 option (c), rejected outright on a different ground (a derived view with no consumer). Distinct concept: that one duplicates the log, this one would resume from it.
+- prior-requests: TASK-111 (external review item 5, SPRINT-035), TASK-120

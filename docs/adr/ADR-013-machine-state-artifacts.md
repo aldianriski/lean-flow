@@ -81,3 +81,16 @@ degrading to silent false-negative), caught only by the negative fixtures. Revis
 production preflight hits a real markdown-parsing limit in use — JSON re-enters as serialization
 of the already-proven checks, never as a new source of truth. Prototype deleted (scratch-dir only,
 never entered the repo).
+
+## Addendum — (b) expiry FIRED: run-state auto-closed as rejected (2026-07-30 · SPRINT-040 triage / TASK-120)
+
+The kill-switch resolved as written. The promotion trigger — *one real unattended run the Execution
+Log + `/handoff` could not cleanly resume* — never fired inside the 5-sprint window: SPRINT-039 T1's
+five real headless fixtures (`migrate` · `init` · `promote` · `/triage` · `release-patch push`) each
+completed or parked with a readable trail, and no run in SPRINT-035…039 needed resume state the
+markdown log could not supply. TASK-120 therefore routed to `.out-of-scope/checkpointed-run-state.md`
+at SPRINT-040 triage, carrying the revisit-if and the reconciliation-rule precondition forward intact
+(so a re-proposal restarts from the contract, not from scratch). Decision (b) is now **rejected**;
+(a) and (c) are unchanged. Note the pre-mortem this leaves live: TASK-119's preflight must still never
+accrete `status`/`attempts` fields and become (b) by drift — the guardrail outlives the deferral.
+Pattern recorded as `L-068`.

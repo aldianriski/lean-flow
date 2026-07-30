@@ -21,11 +21,19 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-063**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-068**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-068 [tags: process] [status: active]: A **deferral with a written kill-switch** closes itself without re-litigation — and that is the whole value. ADR-013 deferred the checkpointed run-state file behind a named promotion trigger plus a dated expiry ("unfired by SPRINT-040 promote → auto-close as rejected"). At SPRINT-040 triage the decision took no debate: the trigger provably never fired (SPRINT-039 T1's five real headless fixtures all completed or parked with a readable trail), so the pre-agreed answer applied and TASK-120 routed to `.out-of-scope/` in one step. Contrast the default shape — an open `blocked` task with no expiry, which is re-argued at every promote and drifts toward "never" without anyone deciding it. The pattern to reuse: when deferring, write **what would have to happen** and **by when**, so the null result is itself a verdict rather than an absence of one.
+- seen: Sprint-040
+- count: 1
+- promoted: no
+- related: ADR-013 (graduation contract) · `.out-of-scope/checkpointed-run-state.md` · `.out-of-scope/run-event-log.md` (sibling option, rejected outright)
 
 ---
 
