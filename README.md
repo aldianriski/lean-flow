@@ -130,7 +130,8 @@ invoked as the work needs it. Every skill also runs **alone**; `/flow` just cond
   session end → /handoff  ──▶  temp-dir doc  ──▶  next session: /prime reads it
 ```
 
-1. **`/prime`** — load project context in a fixed order, emit a health check.
+1. **`/prime`** — load project context in a fixed order, emit a health check (including a `Skills:`
+   row: is the plugin copy this session loaded the same version as the repo, or stale?).
 2. **`/lean-doc-generator`** — capture WHY/WHERE (never HOW); run the sprint lifecycle.
 3. **`/orchestrator`** — execute through the G1 Scope and G2 Design gates, then commit.
 4. Repeat. When a session ends mid-work, **`/handoff`** compacts it so `/prime` can resume next time.
@@ -150,7 +151,7 @@ stage-skills each also run **standalone** (none require another); `/council` is 
 | Stage | Skill | Use it for |
 |---|---|---|
 | **conduct** | `/flow` | opt-in — run the whole loop in order; enforces gates + governance, never auto-approves |
-| **orient** | `/prime` | session start — ordered context load + health check |
+| **orient** | `/prime` | session start — ordered context load + health check (incl. whether the installed skills match the repo) |
 | **plan** | `/lean-doc-generator` | docs / ADRs / sprint promote + close (WHY & WHERE only) — **ships its own templates + standard** |
 | | `/task-decomposer` | intent / ticket / PRD → `TASK-NNN` backlog entries (tracer-bullet slices; or a **fog-map** for foggy work too big to plan) |
 | | `/triage` | re-prioritise + state the backlog; route rejects to `.out-of-scope/` |

@@ -55,7 +55,7 @@ status: current
     scripts). (c) is the principled cut. Trigger for deciding: a 7th harness, or the first time
     someone skips the gate because of the wait.
 
-- **TD-015** severity: medium | status: open | created: Sprint-039
+- **TD-015** severity: medium | status: resolved → SPRINT-040 T1 | created: Sprint-039
   - Summary: the skill-freshness check shipped in `skills/orchestrator/references/night-run.md`
     guards only the **unattended** path, where a version/content mismatch is a `BLOCK`. Nothing
     guards an **interactive** session — which is where the loop actually runs day to day.
@@ -70,6 +70,16 @@ status: current
     an automatic interactive guard has no obvious carrier. Cheapest real option is a `/prime` step
     that reads the loaded skill's base-dir version and reports it in the health line — turning an
     invisible fact into a checked one at the exact moment a session starts.
+  - Resolution: `/prime` (v0.3.0) gained a § Skill freshness step and a `Skills:` health row comparing
+    the invocation header's base-dir version against `.claude-plugin/plugin.json`. All three branches
+    were demonstrated on real input rather than reasoned about — `fresh` on this repo, `STALE` on a
+    fixture manifest reading 9.9.9, `n/a` on a repo with no manifest (the consumer path, which must
+    never false-alarm). Deliberately a **report, not a gate**: priming is read-only, and whether a
+    stale procedure is acceptable is the session's call. Deliberately **version-only** (SPRINT-040 D1)
+    — /prime declares no Bash and the content-first check lives in `orchestrator/references/`, so
+    reaching it would mean a cross-skill reference tree or a drifting copy. **Residual, accepted:** a
+    skill edited without a version bump still reads `fresh` interactively; that leg stays covered only
+    on the unattended path, whose pre-flight diffs cache content against the working tree.
 
 - **TD-014** severity: minor | status: open | created: Sprint-038
   - Summary: `skills/orchestrator/references/night-run.md` is now **427 lines**, carrying the Part 0
