@@ -38,7 +38,7 @@ new behaviour→`/tdd` **(default, test-first)** · bug→`/diagnose` · hard-to
 
 ## Built-in leverage
 
-lean-flow ships **no agents/hooks** — it dispatches Claude's built-ins in **isolated passes** (fresh context): recon→`Explore` ·
+lean-flow ships **no custom agents/hooks** — it dispatches Claude's built-ins in **isolated passes** (fresh context): recon→`Explore` ·
 `/code-review` (small/med → one scoped `sonnet`; **Standards vs Spec** reported separately) · `/verify` · `/security-review` ·
 `/council` (internal sub-agents); commands `/goal /plan /batch /loop /run /simplify`. Wiring → ARCHITECTURE.md § Key integration points.
 
@@ -55,7 +55,7 @@ re-implements one. **Bug intake** — a bug (`BUG.md.template`) enters at `/tria
 | G1 | Scope | all `/orchestrator` modes | goal restated · size S/M/L (L splits) · files/blast-radius · out-of-scope named · assumptions confirmed · decomposer-approved task → fast-path confirm (scope unchanged?) |
 | G2 | Design | `mvp` · `sprint-bulk` | approach + WHY · verifiable micro-tasks · ADR if hard-to-reverse · `risk:high` on auth/input/secrets/data → one-line abuse-case sketch · **overlap-ownership map** (shared files → single owner + commit order, before first task) · residual grill until unambiguous |
 
-Humans approve gates — the skill never self-approves. Review is a self-review checklist (no review agent).
+Humans approve gates — the skill never self-approves; G1/G2 are inline, human-approved checklists. Review may dispatch an isolated built-in or ad-hoc subagent (`/code-review` et al.) — lean-flow ships no custom agent definitions.
 
 **Unattended** (headless night-run) — charter **execute-only**: run a promoted Plan, decide nothing. **Declared** at trigger (`sprint-bulk unattended`), never inferred. **Absence ≠ consent**: headless has *no ask channel* (`AskUserQuestion` unregistered; `dontAsk` auto-denies) — missing channel/denial/timeout = BLOCK, never a default-yes, and never reason the answer out yourself.
 A HITL step is **parked** (record → continue disjoint AFK → clean halt via `/handoff`), never asked, decided, or worked around; boundary derives from **AFK-safe = additive + reversible + already-approved-in-scope**; a gate is pre-signable only if its subject is frozen at pre-flight. Table + protocol → `orchestrator/references/night-run.md` Part 0.
