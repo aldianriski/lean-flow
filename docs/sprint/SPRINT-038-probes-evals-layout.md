@@ -48,10 +48,10 @@ its named finding, and fired once on a real pre-flight before an unattended run.
 
 **DoD:**
 - [x] version check probes installed-vs-repo and **blocks** unattended on mismatch, named finding
-- [ ] dispatch + worktree checks probe availability and **degrade** per their spec'd rules
-- [ ] negative-tested per L-058 — one must-FAIL fixture per check, each failing with its own finding
-- [ ] **fixtures retained**, not deleted with the scaffolding (the TD-012 mistake, now an anti-pattern)
-- [ ] fired once on a real pre-flight (L-007); consumer-runnable, no repo-specific path (L-015)
+- [x] dispatch + worktree checks probe availability and **degrade** per their spec'd rules
+- [x] negative-tested per L-058 — one must-FAIL fixture per check, each failing with its own finding
+- [x] **fixtures retained**, not deleted with the scaffolding (the TD-012 mistake, now an anti-pattern)
+- [x] fired once on a real pre-flight (L-007); consumer-runnable, no repo-specific path (L-015)
 
 ### T2 — Decompose the behavioural eval suite `[size: M · risk: low · class: execution · HITL]` (TASK-124)
 Layers: harness home decided at G2 · docs/research/behavioral-eval-feasibility.md (status update)
@@ -136,6 +136,31 @@ as though intake classification is binding.
   choosing a procedure step), it earns an ADR before it ships.*
 
 ## Execution Log
+
+### 2026-07-30 | T1b complete | worktree probed · agent-dispatch honestly left un-probed (T1 now closed)
+Worktree row **is** a real probe: `git worktree list --porcelain`, three legs — errors/not-a-repo →
+`DEGRADE no-worktree-support` · more than the main tree → `DEGRADE leftover-worktrees` (naming the
+paths) · else `AVAILABLE worktree-clean`. Never blocks: exit 0 covers both outcomes, and non-zero is
+reserved for the probe's own plumbing failing (L-059). Probed **read-only** with a canned-listing
+fixture seam, so asserting `leftover-worktrees` never runs `git worktree add` — the task's own subject
+could otherwise have violated L-043.
+**DoD 2 deviation, recorded not buried.** The DoD says both rows "probe"; the agent-dispatch row
+**does not**, by deliberate decision. "Can this run spawn sub-agents" is a property of the agent
+runtime, not the filesystem — no file, env var, or git state answers it from a shell snippet, and any
+proxy (API key present, config flag, process count) would only ever report "available". That is a gate
+that runs but cannot gate (L-057's family), and inventing one would have been worse than the honest
+gap. So it stays a pre-flight line a human confirms by knowing what they launched into — same class as
+the `unattended` signal itself — with no fixture, because a fixture would have to fake the one signal
+that can't be faked. DoD 2 is ticked on that basis; the owner was told and can overturn it, in which
+case the mechanism becomes a new task rather than a retrofit here.
+Fixtures now **5 retained** across two harnesses (3 freshness + 2 worktree), both extracting their
+snippet from `night-run.md` between anchors — no hand-copied duplicate can drift. Both green; the
+freshness set re-run to confirm T1a is unaffected. Real fire: `AVAILABLE worktree-clean`, exit 0.
+Coordinator verified additive-only (0 deletions in `night-run.md`), both anchor pairs intact, no
+`D:\…`/`scripts/` leak, qa-check 61/0.
+**Friction for the Retro:** `night-run.md` is now **427 lines** carrying the contract plus two ~100-line
+shell snippets. Uncounted per ADR-006, but it is well past comfortable reading and a capability-checks
+split is the obvious next move if a third snippet ever lands.
 
 ### 2026-07-30 | T1a complete | skill-freshness check ships — and caught its own author's drift
 The load-bearing leg (the one that *blocks*) is in: 4-leg decision order — SKIP no-local-repo → BLOCK

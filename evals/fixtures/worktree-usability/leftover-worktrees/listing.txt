@@ -1,0 +1,7 @@
+worktree /path/to/lean-flow
+HEAD 1234567890abcdef1234567890abcdef12345678
+branch refs/heads/main
+
+worktree /path/to/lean-flow-agent-1
+HEAD abcdef1234567890abcdef1234567890abcdef12
+branch refs/heads/task-agent-1

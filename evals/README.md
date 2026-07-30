@@ -24,13 +24,26 @@ if the check they guard is later rewritten; update the fixtures alongside it ins
 `cache-differs/installed_plugins.json` templates its `installPath` as `__CACHE_DIR__` — a committed
 fixture can't hardcode a machine-specific absolute path — substituted at run time by the harness.
 
+`fixtures/worktree-usability/` — one fixture per **degrade** leg of the worktree-isolation check,
+same section of `night-run.md`. Only the two legs that actually probe (never blocks — see the check's
+own text for why "agent dispatch" has no fixture) get one, per L-058:
+
+| Fixture | Exercises |
+|---|---|
+| `no-worktree-support/` | leg 1 — `git worktree list` genuinely fails (pointed at a repo-root path that doesn't exist) → `DEGRADE no-worktree-support` |
+| `leftover-worktrees/` | leg 2 — a canned `git worktree list --porcelain` listing with a second entry → `DEGRADE leftover-worktrees` |
+
+Neither fixture creates or removes a real worktree — see each fixture's own `README.md` for why: the
+probe's own file exists precisely to avoid that hazard on this repo's tree.
+
 ## How to run
 
 ```sh
 sh evals/run-skill-freshness-fixtures.sh
+sh evals/run-worktree-usability-fixtures.sh
 ```
 
-Extracts the actual snippet shipped between the `<!-- skill-freshness-check:start/end -->` anchors
+Each harness extracts the actual snippet shipped between its check's `<!-- …:start/end -->` anchors
 in `night-run.md` and runs it against each fixture, asserting both the exit code and the named
 finding on its first output line. This tests the real shipped snippet, not a hand-copied duplicate
 that could silently drift out of sync with it. Run bare, per L-057 — never pipe its output into a
