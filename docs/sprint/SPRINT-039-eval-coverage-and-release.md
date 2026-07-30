@@ -122,8 +122,11 @@ footer, and INDEX all agree at 1.22.0.
 - [x] `1.21.0` grepped repo-wide before the gate — README footer and any other echo updated (L-048)
 - [x] `INDEX.md`'s SPRINT-038 row drops "(MINOR pending)"
 - [x] Rotation checked: v1.22.0 + v1.21.0 inline, v1.20.0 and older → `docs/changelog/` per §11
-- [ ] **Plugin reinstalled and skill-freshness re-verified** — see D3; a bumped manifest without a
+- [x] **Plugin reinstalled and skill-freshness re-verified** — see D3; a bumped manifest without a
       reinstall makes every later headless run `BLOCK stale-release`
+      <!-- Owner reinstalled + reloaded. Verified by running the SHIPPED check, not by eyeballing
+           versions: `PASS skill-freshness: installed 1.22.0 == repo 1.22.0; cache skills/ matches
+           working tree`, exit 0 — the content leg passed too, not just the version leg. -->
 - [x] Bare `sh scripts/qa-check.sh` green (footer↔manifest lint is leg 6) — 67 pass, 0 fail
 
 ## Owner-action checklist
@@ -135,7 +138,7 @@ footer, and INDEX all agree at 1.22.0.
       <!-- Resolved on evidence rather than asked: 038's only consumer-facing diff was
            night-run.md +202 (runnable snippets v1.21.0 had only specified in prose) → added
            functionality → MINOR. -->
-- [ ] **Reinstall the plugin and re-verify skill-freshness** (T4's one un-actionable DoD line).
+- [x] **Reinstall the plugin and re-verify skill-freshness** (T4's one un-actionable DoD line).
       Re-routed to owner: a reinstall does not affect the *running* session — it keeps the previously
       cached skill version (L-021) — so the check cannot be performed from inside the session that
       needs it, and it writes outside the repo. **Unblock:** `plugin install`, restart the session,
@@ -321,6 +324,29 @@ running session (L-021: it keeps the previously cached skill version), so the ve
 performed from inside the session that needs it — and it writes outside the repo. Recorded as an
 Owner-action with an explicit unblock condition rather than left as a passive `TBD`. **The sprint is
 therefore not closeable yet:** 1 of 24 DoD boxes is open by design, awaiting that owner step.
+
+### 2026-07-30 | owner-action | Freshness verified — and the check caught this session running stale skills
+Owner reinstalled + `/reload-plugins`. Verified by executing the **shipped** snippet rather than
+comparing versions by eye: `PASS skill-freshness: installed 1.22.0 == repo 1.22.0; cache skills/
+matches working tree`, exit 0 — the *content* leg passed too, not just the version leg. Last DoD box
+ticked; sprint is 24/24 and closeable.
+
+**Unplanned finding, and it is about this very session.** Every skill invoked today loaded from the
+**1.18.0** cache while the repo sat at 1.21.0 → 1.22.0 — visible all along in each skill's printed
+base directory, unnoticed. Normalising the `${CLAUDE_SKILL_DIR}` path expansion (which inflates a
+naive diff to ~200 lines), the true `orchestrator/SKILL.md` delta is **4 lines / 2 semantic
+additions**, one of which is step 3's *"run the pre-dispatch preflight first."*
+
+**No actual deviation occurred** — the preflight ran at all three wave boundaries — but only because
+`dispatch.md` was read from the **repo** rather than the cache, i.e. by reaching past the stale
+procedure, not by following it. Had the drift been larger, or landed in a step with no repo-side
+reference to fall through to, it would have executed silently and looked exactly like this.
+
+**The gap is structural, not incidental:** SPRINT-038's skill-freshness check guards the *unattended*
+path, where a stale skill is a `BLOCK`. Nothing guards an **interactive** session, which is where the
+loop actually runs day to day — and L-021 already recorded that a running session keeps its cached
+version even after a reinstall. This is L-054's shape at one remove (a correct check on the wrong side
+of a boundary) and L-020's (shipped, but not wired into every entry point). → TD/L candidate at close.
 
 ## Files Changed
 
