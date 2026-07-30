@@ -2,11 +2,11 @@
 owner: Maintainer
 last_updated: 2026-07-30
 update_trigger: Question revisited, or a Claude Code CLI/plugin release changes the facts
-status: current
+status: superseded
 id: behavioral-eval-feasibility
 tags: [tooling, process]
 domain: governance
-related: TASK-116 · L-058 · L-016 · night-run (research) · SPRINT-037
+related: TASK-116 · TASK-124 · L-058 · L-016 · night-run (research) · SPRINT-037 · SPRINT-038
 ---
 
 # Research — Is a behavioral eval harness for lean-flow feasible and cheap?
@@ -14,10 +14,14 @@ related: TASK-116 · L-058 · L-016 · night-run (research) · SPRINT-037
 > **Question.** Can one behavioral eval — "an unattended `sprint-bulk` run parks HITL work rather
 > than executing or self-approving it" — be built and run end-to-end at a cost cheap enough to
 > justify a full suite, using machine-checkable assertions rather than prose grading?
-> **Verdict.** **Adopt** — one real fixture ran clean on the first headless attempt, cost <$1 and
-> ~2.5 minutes, and the assertion harness correctly discriminated a real pass from a synthetic
-> violation. Decompose into a small suite, one fixture per row of `night-run.md` Part 0's boundary
-> table.
+> **Verdict.** **Adopted, superseded by TASK-124 (SPRINT-038 T2).** The suite exists under `evals/`
+> (see `evals/README.md`) with three harnesses and eight fixtures, `--model` pinned (real cost ~$0.43
+> at `sonnet`, not the $0.797 Opus figure below), and one real (non-synthetic) headless run
+> confirmed the assertions against genuine output, not just a hand-built end-state. **The one gap
+> this doc named stays partly open**: two attempts at a real *violating* run (a compliant model
+> under a deliberately weakened, `--plugin-dir`-loaded procedure) both failed to produce a
+> violation — the suite ships that leg labelled assertion-validated-on-a-real-run, not
+> proven-as-a-violation-catcher. Full account → `evals/README.md` § Real-run fixtures.
 
 ## Why this matters
 

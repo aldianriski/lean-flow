@@ -68,9 +68,9 @@ fixture where a genuinely violating run is caught, at a cost measured at the tie
 - [ ] one fixture per Part 0 boundary-table row, reusing the prototype's skeleton + assertion script
 - [ ] **a real violating fixture** — an actual run that misbehaves is detected, not just a hand-built
       end-state (this is the leg TASK-116 explicitly did not cover)
-- [ ] `--model` pinned; suite cost re-measured at that tier (the $0.797 figure is an Opus upper bound)
-- [ ] TD-012's retained preflight fixtures adopted into the harness, or an explicit reason they aren't
-- [ ] harness home + fixture-maintenance ownership decided and recorded; capture doc's status updated
+- [x] `--model` pinned; suite cost re-measured at that tier (the $0.797 figure is an Opus upper bound)
+- [x] TD-012's retained preflight fixtures adopted into the harness, or an explicit reason they aren't
+- [x] harness home + fixture-maintenance ownership decided and recorded; capture doc's status updated
 
 ### T3 — Migrate this repo to the ADR-012 canonical layout `[size: S · risk: med · class: execution · HITL]` (TASK-074)
 Layers: docs/ARCHITECTURE.md → docs/architecture/overview.md · docs/CHANGELOG.md → root · README.md ·
@@ -136,6 +136,44 @@ as though intake classification is binding.
   choosing a procedure step), it earns an ADR before it ships.*
 
 ## Execution Log
+
+### 2026-07-30 | T2a | harness home settled · TD-012 closed · a violating run could NOT be induced
+Home: **`evals/` is permanent** (was provisional). WHY recorded in `evals/README.md`: `scripts/`
+(ADR-008) is tooling that supports the *repo*; `evals/` guards a *shipped skill's behavioural
+contract* — different lifecycle, run on demand, not in qa-check's always-on path. Both maintainer-only
+and absent from `plugin.json`, so **A4's ADR trigger did not fire** (verified, not assumed). T1's two
+ad-hoc runners generalised into `evals/lib/harness-common.sh`; both re-verified green after refactor.
+**TD-012's core risk is closed.** The three deleted preflight fixtures are recreated
+(`cycle` · `shared-file-unowned` · `base-ref-drift`, each failing with its named finding) against the
+snippet **actually shipped in `dispatch.md`**. `dispatch.md` predates the anchor convention and was
+frozen for T2a, so rather than reach into `skills/**` it added `extract_sole_fenced_block` — the file
+has exactly one `sh` fence. Good instinct: it solved a cross-ownership problem without crossing the
+ownership line. Residual: the runner is **not** wired into `qa-check.sh` (TD-012's alternative
+mitigation), out of scope for T2a — so TD-012 goes to `status: resolved` on the retained-guard leg
+with the wiring noted as unclaimed, not silently implied.
+**The headline result is a negative one, and it matters more than the positives.** Two independent
+attempts to induce a *real* violating run both failed. Method was sound and safe — a weakened
+orchestrator with Part 0's park protocol inverted, loaded via `claude --plugin-dir`, never touching the
+real cache. The model **declined to self-approve the destructive step even though the loaded procedure
+explicitly authorised it**, once with the fixture self-flagged as fake and once fully neutralised (no
+"fixture"/"weak" tells, a plain `HITL` tag matching real convention). Its stated reasoning cited its own
+priors, not the loaded doc.
+Two consequences, both uncomfortable and both worth keeping. (a) The eval suite **cannot prove it
+catches a violation** by this route, so it ships labelled *assertion-validated-on-a-real-run*, not
+*proven-as-a-violation-catcher* — exactly the A2 fallback, taken knowingly. (b) More significant:
+**Part 0's text may be getting credit for behaviour the model would exhibit anyway.** SPRINT-036's
+Retro logged the headless probe honouring Part 0 "unprompted, from the installed cache" as a retrieval
+WIN; this result says some of that may be priors rather than the doc. That does not make Part 0
+worthless — it still fixes *which* park record gets written and where — but it does mean the contract's
+observable-artifact value is better evidenced than its compliance-causing value. → Retro learning.
+Genuine improvement over SPRINT-037 regardless: the control run validated all four assertions against a
+**real, non-synthetic** headless run, which the prototype never did.
+Cost at the pinned tier: **$0.4255 · ~96s · 12 turns** on `sonnet`, ~53% of the $0.797 Opus baseline —
+so the earlier figure was indeed an upper bound. No 529s. One self-inflicted MSYS path-conversion bug
+(`/orchestrator` mangled to a Windows path) burned $0.14 before being fixed with a scoped
+`MSYS2_ARG_CONV_EXCL` — disclosed rather than absorbed.
+DoD 3/4/5 ticked. **DoD 1 (per-row fixtures) is Part B**; **DoD 2 (real violating fixture) stands open**
+pending an owner call, since the finding changes what the remaining fixtures are worth.
 
 ### 2026-07-30 | T1b complete | worktree probed · agent-dispatch honestly left un-probed (T1 now closed)
 Worktree row **is** a real probe: `git worktree list --porcelain`, three legs — errors/not-a-repo →
