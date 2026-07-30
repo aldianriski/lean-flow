@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint — SPRINT-036 closed 2026-07-30 → v1.20.0 Preflight and Verify; retention pass pending owner approval.)_
+> _(no active sprint — SPRINT-036 closed 2026-07-30 → v1.20.0 Preflight and Verify; archived per §11.)_
 
 ---
 
@@ -32,24 +32,6 @@ status: current
 
 ### P2 — Quality / Polish
 
-- [ ] TASK-109 — Cold-read SPRINT-034's shipped wording from a fresh session  [size: S] [risk: low] [HITL]
-      done-when: the four surfaces SPRINT-034 edited (orchestrator intake routing + spawn red flag ·
-                 night-run Part 1a + Part 2 precondition · CONTEXT § Unattended clause · /flow launcher
-                 bullet) are read in a session that did not write them, and either confirmed unambiguous
-                 or corrected — closing the L-006 fresh-context leg that SPRINT-034 could not run
-      touches: (review — correction only if the cold read finds a gap)
-      assumes: SPRINT-034's L-007 exercise was an author-run text trace; AgentTool dispatch was disabled
-               by owner policy that session, so no independent reader checked the wording (L-006)
-      tracker: none — closes SPRINT-034's stated verification gap
-      state:   ready
-
-- [ ] TASK-106 — Verify the unattended contract from the installed plugin, not repo source  [size: S] [risk: low] [HITL]
-      done-when: with the **current** release installed to the plugin cache (verify the cache version first — don't assume it matches the repo), a headless `claude -p "/lean-flow:orchestrator sprint-bulk unattended" --permission-mode dontAsk` run meets a HITL step and parks — proving the contract ships, not just that it exists in the repo
-      touches: (verification — no source change)
-      assumes: SPRINT-033 T6 verified against repo source only; the cache held 1.16.1 at test time, so packaged behaviour is unverified (L-016: verify on the consumer path). Version left unpinned deliberately — a pinned version goes stale at every release (L-048)
-      tracker: none — closes the last unverified edge of SPRINT-033
-      state:   ready
-
 - [ ] TASK-116 — Prototype one behavioral eval fixture end-to-end  [size: S] [risk: low] [HITL]
       done-when: one safety eval (unattended run parks HITL work) runs headless against the
                  installed plugin and asserts behavior (files written · state transitions · exit
@@ -59,31 +41,6 @@ status: current
       assumes: answers ONE question — is a behavioral eval harness feasible and cheap?; can share
                TASK-106's headless fixture
       tracker: none — external review item 4, tracer bullet before committing to a suite
-      state:   ready
-
-- [ ] TASK-118 — Add the base-ref branching rule to dispatch  [size: S] [risk: low] [HITL]
-      class:      execution
-      depends-on: none
-      done-when: dispatch/night-run procedure states "every worktree branches from the current
-                 wave's declared base commit, verified against live HEAD at spawn; mismatch halts
-                 dispatch", and the rule is traced once against the 2026-07-30 stale-HEAD incident
-                 (L-055 — would it have caught it?) — ADR-013's prose-cure leg
-      touches: skills/orchestrator/references/dispatch.md · night-run.md
-      assumes: the rule is the root-cause fix; any DAG artifact is enforcement only (ADR-013)
-      tracker: ADR-013
-      state:   ready
-
-- [ ] TASK-119 — Prototype the no-JSON dispatch preflight (cycles · single-owner · base-ref)  [size: S] [risk: low] [HITL]
-      class:      execution
-      depends-on: TASK-118
-      done-when: a bash/prose preflight derives cycle check + shared-file single-owner check +
-                 base-ref-vs-HEAD check directly from the active sprint's markdown Plan and is
-                 exercised once against a real sprint; captured answer decides whether the JSON
-                 DAG format is admitted (insufficient rung) or rejected (sufficient) — ADR-013's
-                 laziness-ladder precondition for artifact (a)
-      touches: (prototype — throwaway per /prototype discipline; capture → ADR-013 addendum)
-      assumes: prose+script may already cover artifact (a)'s value; JSON only if this rung fails
-      tracker: ADR-013
       state:   ready
 
 - [ ] TASK-120 — Build the checkpointed run-state file (deferred by ADR-013)  [size: M] [risk: med] [HITL]
