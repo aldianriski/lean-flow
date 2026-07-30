@@ -73,44 +73,7 @@ _(none active)_ — SPRINT-038 closed 2026-07-30. Next: `/lean-doc-generator pro
       tracker: docs/research/behavioral-eval-feasibility.md · L-061
       state:   ready
 
-- [ ] TASK-124 — Decompose the behavioral eval suite (adopted by TASK-116)  [size: M] [risk: low] [HITL]
-      class:      execution
-      depends-on: none
-      done-when: fixtures exist one per night-run Part 0 boundary-table row, reusing the prototype's
-                 ~40-line fixture skeleton + ~40-line assertion script; a **real violating fixture**
-                 (not only a synthetic end-state) proves the suite gates rather than sanity-checks its
-                 own assertion logic; `--model` pinned so cost is measured at the tier it will actually
-                 run; harness home + fixture-maintenance ownership decided
-      touches: (harness home is the open G2 question — also the candidate carrier for TD-012's
-               orphaned preflight fixtures, same fixture shape)
-      assumes: the capture's numbers hold at a cheaper tier — $0.797/fixture is an Opus **upper
-               bound**, unpinned; ~11 boundary-table rows
-      tracker: docs/research/behavioral-eval-feasibility.md
-      state:   ready
-
-- [ ] TASK-123 — Implement the night-run capability probes (graduated from TASK-117's spec)  [size: S] [risk: low] [HITL]
-      class:      execution
-      depends-on: none
-      done-when: the three live capability checks specified in night-run.md Part 1 § Capability checks
-                 are actually probed at pre-flight rather than read as prose — agent-dispatch
-                 availability · worktree usability + leftover sweep · installed-skill-version vs repo
-                 manifest — each emitting its named finding, negative-tested per L-058, and fired
-                 once on a real pre-flight before an unattended run (L-007)
-      touches: skills/orchestrator/references/night-run.md (Part 1) · form per G2 — the T1 precedent
-               (procedure step + optional inline snippet, no new shipped file) is the default
-      assumes: the version check is the load-bearing one (it blocks; the other two degrade) — build it
-               first and ship it alone if the other two prove not worth probing
-      tracker: none — graduated from TASK-117 / SPRINT-037 T4 spec
-      state:   ready
-
 ### P3 — Long-term
-
-- [ ] TASK-074 — Migrate lean-flow's own repo to the ADR-012 canonical layout  [size: S] [risk: low] [HITL]
-      done-when: /lean-doc-generator migrate re-run relocates this repo's legacy-lean docs (docs/ARCHITECTURE.md → docs/architecture/overview.md · docs/CHANGELOG.md → root · + inbound-link fixes) via the Legacy-lean mapping block, propose→approve; /prime + qa-check pass on the new layout
-      touches: docs/ · README.md · .claude/CONTEXT.md · scripts/qa-check.sh (path expectations)
-      assumes: deferred from SPRINT-032 (A1 — consumer surface shipped first); dogfoods the Legacy-lean relocation path
-      tracker: none — internal housekeeping
-      state: ready
 
 > TASK-040 (derived graph view) → routed to `.out-of-scope/derived-graph-view.md` (2026-07-29) — council-2 gate held; the TASK-041 retrieval-miss signal never fired; graphify serves the need ad-hoc (revisit-if + 3 guardrails recorded).
 > TASK-047 (council multi-model backend) → routed to `.out-of-scope/council-multi-model-backend.md` (2026-07-29) — TASK-048 + TASK-065 probes found no exposed crack; revisit-if: a cross-provider test shows a real shared factual error (BYO-provider seam only).
