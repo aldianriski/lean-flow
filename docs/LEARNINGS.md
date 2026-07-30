@@ -45,12 +45,10 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-058 [tags: tooling] [status: active]: A gate script's worst failure mode is the silent false-negative — and only a must-FAIL fixture exposes it. The T2 preflight prototype hit it live: POSIX `while read` over an unterminated stream silently dropped the last `Layers:` token (and single-file Layers entirely), so the multi-owner check would have PASSED a real overlap. The positive run looked perfect; the crafted-to-fail fixture caught the hole. Corollary to L-007: "exercised once on real input" is one-sided for GATES — a gate is also exercised once on input that must fail, one fixture per check, each failing with its named finding. Same family as L-057 (a gate that runs but doesn't gate).
-- seen: Sprint-036 · Sprint-037 (the same silent false-negative reproduced deliberately: stripping the
-  parse guard from the productionized snippet made it exit `0/CLEAR` on a real shared-file overlap)
-- count: 2
-- promoted: no — **candidate at next promote** (count ≥ 2)
-- related: L-007 · L-057 · L-059
+## L-058 [tags: tooling] [status: promoted]: A gate's worst failure is the silent false-negative — only a must-FAIL fixture per check exposes it, and the fixtures must be retained.
+- L-058 → promoted: `.claude/CLAUDE.md` anti-patterns (folded into the spec-only-debt bullet, whose
+  "exercised once on real input" bar it completes for gates) · seen Sprint-036 · Sprint-037 · count 2
+- related: L-007 · L-057 · L-059 · TD-012 (the retention leg, still open)
 
 ---
 
