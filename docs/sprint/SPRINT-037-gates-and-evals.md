@@ -4,7 +4,7 @@ slug: gates-and-evals
 owner: Maintainer
 last_updated: 2026-07-30
 status: active
-plan_commit: [set at promote commit]
+plan_commit: 5e5bd95
 close_commit: [set at close]
 update_trigger: sprint execute/close events
 ---
