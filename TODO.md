@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-035 — contract-hardening** → docs/sprint/SPRINT-035-contract-hardening.md
+> _(no active sprint — SPRINT-035 closed 2026-07-30 → v1.19.0 Contract Hardening; retention pass pending owner approval.)_
 
 ---
 

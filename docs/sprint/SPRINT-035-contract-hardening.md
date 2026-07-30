@@ -3,7 +3,7 @@ sprint: 035
 slug: contract-hardening
 owner: Maintainer
 last_updated: 2026-07-30
-status: active
+status: closed
 plan_commit: 0d12cc0
 close_commit: [set at close]
 update_trigger: sprint execute/close events
@@ -201,15 +201,28 @@ Six tasks pulled from Backlog (TASK-110…115 → T1…T6 in dependency order). 
 
 ## Retro
 
-<!-- Written at close. -->
-
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — no miss: L-015/016/017, L-007, L-009, council-2/TASK-040, and ADR-010 were all
+found and load-bearing (the delta map, the negative lint test, the council framing, the A3 grill).
 
 **Worked**
--
+- L-017 delta map at intake: a sprawling external review → 8 curated tasks, most of its roadmap
+  folded or rejected before it could bloat the backlog.
+- Fresh-context review on the one M-size diff: caught an L-015 recurrence the author provably
+  couldn't see (→ L-056), plus a real lint false-positive.
+- Council on a genuine fork: the split (reject↔adopt spread on b/c) was the signal; peer review's
+  "all-missed" catch became ADR-013's expiry clause — the kill-switch none of the 5 lenses produced.
+- Immediate dogfood: T5's `class:`/`depends-on:` fields used by T6's own routed tasks same-session.
 
 **Friction**
--
+- Worktree fleet branched from session-start HEAD → cherry-pick merges, one confused agent (→ L-055,
+  TASK-118); the sprint's own live incident became the council's sharpest evidence.
+- T5's DoD wording (backlog-entry field names) vs the sprint-block lint's actual field set needed a
+  mapping note at tick time — spec'd against one surface, implemented against another.
+- ADR-010's older amendment wording now reads ambiguously against advisory-default (→ TD-011).
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- L-055 (worktree base = declared state, verified at spawn) · L-056 (fixing an instance doesn't
+  inoculate the sprint against the class) — both filed, count 1.
+
+**Buckets routed:** Shipped → CHANGELOG v1.19.0 (at release) · Tech debt → TD-011 · Follow-ups →
+TASK-118/119/120 (filed at T6) · Learnings → L-055 · L-056.

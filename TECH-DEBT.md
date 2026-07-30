@@ -16,6 +16,16 @@ status: current
 
 ## Tech Debt
 
+- **TD-011** severity: minor | status: open | created: Sprint-035
+  - Summary: `docs/adr/ADR-010-model-dispatch-role-tiers.md`'s 2026-07-10 amendment wording ("a
+    mis-classification mis-routes") predates ADR-013/T5's advisory-default framing — read cold it
+    can imply intake classification is binding, contradicting the now-canonical "persisted `class:`
+    is an advisory default; dispatch-time classification stays authoritative."
+  - Impact: a cold reader reconciling ADR-010 with CONTEXT.md § Task entry shape may resolve the
+    ambiguity the wrong way. Not contradicted in substance — wording only.
+  - Mitigation (not yet done): one-line amendment note on ADR-010 pointing at ADR-013's advisory-
+    default clause; sweep on the next touch of the file.
+
 - **TD-010** severity: minor | status: resolved → TASK-114 (Sprint-035) | created: Sprint-034
   - Summary: `skills/orchestrator/references/night-run.md` cites a **repo-local path** in shipped
     skill text — lines 5 and 158 point at `docs/research/night-run.md`, which does not exist in a
