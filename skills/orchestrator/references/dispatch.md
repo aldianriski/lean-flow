@@ -83,6 +83,11 @@ pre-decided shape (BYO opt-in + AGENTS.md brief carrier) is parked, not built.
 Guardrail: stale-branch reuse on agent-id collision is an open harness issue (#51596). Before
 dispatch, `git worktree list` should show no leftover agent worktrees — clean any first.
 
+**Declared-base rule** (ADR-013 · L-055): every worktree/agent branches from the current wave's
+declared base commit — stated up front, then verified against live HEAD at spawn, never assumed.
+Mismatch halts dispatch for the wave. Re-run the check at every wave boundary, not just once at the
+start — HEAD moves as waves land, so a base verified for wave 1 is stale by wave 2.
+
 Base-ref caveat (observed on the first real wave): agent worktrees fork from the **remote default
 branch**, not local HEAD (unless `worktree.baseRef: "head"` is set) — unpushed local commits are
 invisible in an agent's tree. Brief agents to read newer docs via `git show main:<path>` (read-only,

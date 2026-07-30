@@ -145,6 +145,12 @@ Checkpointing is inherited free from `sprint-bulk` steps 4–5 — no new mechan
 Execution Log append is the checkpoint; first-blocker-halt parks the blocked task with its unblock
 condition and lets disjoint work continue per the G2 parallel map.
 
+**Base verification carries into the run.** If the run fans work out to parallel workers (worktrees
+or sub-agents), each one branches from the wave's declared base commit, verified against live HEAD
+at spawn, re-checked at every later wave boundary — a mismatch halts that wave, not the whole run.
+This binds unattended runs the same as interactive ones, for the same reason the rest of Part 0
+exists: nobody is watching to catch a silent divergence before it reaches a commit.
+
 **Morning.** Read the sprint file's Execution Log + DoD state — that's the report; no new artifact.
 Stall/kill/resume path: Part 3. Rollup line format: Part 4.
 
