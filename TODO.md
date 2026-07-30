@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-_(none active)_ — SPRINT-039 closed 2026-07-30. Next: `/lean-doc-generator promote` from the Backlog below.
+> **SPRINT-040 — Freshness Row and Park Records** → docs/sprint/SPRINT-040-freshness-and-park-records.md
 
 ---
 
