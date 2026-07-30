@@ -102,6 +102,12 @@ run meets a HITL step and parks — proving the contract ships.
 
 ## Execution Log
 
+### 2026-07-30 | gates | batch G1+G2 signed off
+Fast-path G1 (same-session promote). G2: D1/D2 confirmed; **no worktree isolation** — L-055
+applied at design time (worktrees branch from session-start HEAD, here pre-v1.19.0): agents work
+in the main tree with base declared = 400866e, verified at start. A1 resolved by attempt (T4
+tries the cache update itself). Sequence: T1→T2 · T3 ∥ · T4 after cache check.
+
 ### 2026-07-30 | promote | plan locked
 Four tasks pulled (TASK-118/119/109/106 → T1–T4). Governance scan clean (no L-promotions · no TD
 aging · TODO at cap boundary accepted). First sprint rendered under the T5 schema — header meta
