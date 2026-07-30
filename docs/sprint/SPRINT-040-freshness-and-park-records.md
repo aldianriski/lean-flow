@@ -4,7 +4,7 @@ slug: freshness-and-park-records
 owner: Maintainer
 last_updated: 2026-07-30
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: d5d7b5b
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
