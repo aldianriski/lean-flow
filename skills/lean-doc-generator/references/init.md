@@ -27,6 +27,14 @@ bounded by the safe-scaffold allowlist (ADR-012).
      FIRST flow doc from `flows.md.template` for the project's main business flow — e.g. the
      primary user journey the app exists to support; skip if the user has no flow in mind yet).
    - Scaffold only what's chosen. Full tier table → DOCS_Guide §6.
+   - **Headless (the popup cannot be answered)** — detect it, don't assume it: probe the channel
+     (`ToolSearch select:AskUserQuestion` → *no matching deferred tools* means unregistered; `dontAsk`
+     auto-denies any prompting call). An interactive run asks the popup normally — that stays correct.
+     Once verified headless, the tier choice can be neither asked nor assumed. Record the park before halting:
+     write the detected substrate, the tiers you would have offered, and the unblock condition
+     ("owner picks the tiers") into a `/handoff` doc — there is no sprint file at this entry point.
+     Base-tier scaffolding waits with it: it is additive, but it is downstream of a choice nobody made
+     (TD-017 · night-run.md Part 0). Declining in prose alone leaves no artifact that init ran.
 
    | Doc | Fires on | Template |
    |---|---|---|

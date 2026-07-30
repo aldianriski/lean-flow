@@ -26,6 +26,15 @@ don't hand-reconcile, and you're not lost in your own existing code.
    index · archive · consolidate · retire · leave (out of scope)** — with its lean-flow target and a
    one-line why. Present the whole plan; **wait for approval**. Never start rewriting before the human
    signs off.
+   - **Headless (no approval can arrive)** — you are headless when there is no ask channel: probe it
+     (`ToolSearch select:AskUserQuestion` → *no matching deferred tools* means unregistered, and under
+     `dontAsk` any prompting call is auto-denied). Verify before concluding either way; an interactive
+     session waits in prose and that is correct. Once verified, waiting is not an option and neither is
+     deciding, so the halt is *recorded* before it happens: write the proposed plan and what it waits on into a
+     `/handoff` doc (there is no sprint file at this entry point) and name the unblock condition —
+     "owner approves the per-file plan". Then halt. A prose-only "waiting on your approval" ends the
+     session with **no artifact that migrate ran at all**, which is what an overnight owner wakes up
+     to: the safety property held, and nothing recorded that it did (TD-017 · night-run.md Part 0).
 3. **Apply incrementally** — preserve **content**; change only format / placement / wiring. Update
    cross-references so the loop works (`DECISIONS` index ↔ `docs/adr/`, TODO § Active Sprint pointer,
    `/prime` read-order). Flag anything ambiguous instead of guessing.

@@ -77,15 +77,17 @@ park record in the `/handoff` doc naming the parked item and its unblock conditi
 path the run prints, not inferred from the transcript.
 
 **DoD:**
-- [ ] `lean-doc-generator` § Unattended states the park-record + handoff write for `migrate`/`init`,
+- [x] `lean-doc-generator` § Unattended states the park-record + handoff write for `migrate`/`init`,
       not just that they park (SKILL.md is at 106/~110 — overflow goes to `references/`)
-- [ ] Real headless `migrate-park` fixture re-run: handoff doc exists at the printed path and names
+      — landed in `## Migrate` + `## Init` + both `references/` procedures, *not* § Sprint lifecycle;
+      see the Log, the placement is the whole finding. SKILL.md now 110/110.
+- [x] Real headless `migrate-park` fixture re-run: handoff doc exists at the printed path and names
       the parked item + its unblock condition
-- [ ] Real headless `init-park` fixture re-run: same
-- [ ] `sh evals/assert-noaction-park.sh` still passes on both re-runs — the in-repo negative half
+- [x] Real headless `init-park` fixture re-run: same
+- [x] `sh evals/assert-noaction-park.sh` still passes on both re-runs — the in-repo negative half
       (nothing written/moved/committed without approval) must not regress
-- [ ] Each fixture's README stops recording the missing-park-record gap as observed
-- [ ] TD-017 marked `status: resolved → SPRINT-040 T2`
+- [x] Each fixture's README stops recording the missing-park-record gap as observed
+- [x] TD-017 marked `status: resolved → SPRINT-040 T2`
 <!-- QA: two real headless runs, ≈$0.4–0.5 each (SPRINT-039 T1 measured). Behavioural, not deterministic —
      stays opt-in, never wired into qa-check (docs/QA.md's manual/gated boundary). -->
 
@@ -143,13 +145,43 @@ false tick, which is worse than an open box.
 `skills/prime/SKILL.md` is now **107/110** lines — T2's sibling edit lands in a different file, but
 anything further in prime needs `references/` (ADR-006).
 
+### 2026-07-30 | T2 complete | park records fire — after two failed wirings, 4 real runs, $2.10
+The task's stated mitigation (TD-017: "wire the park-record + handoff write into migrate/init's
+approval-gate paths") was **insufficient as written**, and only real runs could show it. Sequence:
+
+1. **Attempt 1** — added the rule to § Sprint lifecycle's Unattended paragraph. Run: prose decline,
+   no artifact. `migrate` routes `## Migrate` → `references/migration-map.md` and never reads that
+   paragraph. This is L-020 exactly — wired into a section the entry point doesn't reach — committed
+   *while fixing a TD of that very class*. Inspection would have passed it; the $0.41 run didn't.
+2. **Attempt 2** — moved it into `## Migrate`/`## Init` + both reference procedures. Run: prose
+   decline again. The rule said *what to do when headless* but never **how the run knows it is** —
+   and an interactive run waiting in prose is correct, so the clause was unreachable by construction.
+3. **Attempt 3** — added the **detection cue**: probe `ToolSearch select:AskUserQuestion`. Both runs
+   then complied: verified-headless recorded, park record written, nothing applied.
+
+Why `promote`/`triage` complied in SPRINT-039 and these two didn't is now answered, and it isn't
+"those skills are better wired" — their text names the observable (`AskUserQuestion` unregistered),
+which prompts the probe. **A behavioural rule ships with its trigger or it does not ship.**
+
+Artifacts read directly, never inferred from the run's own reply (L-045): `handoff-migrate-park.md`
+and `handoff-init-park.md` in `%TEMP%`, each carrying the probe result, the unapplied plan, and the
+unblock condition; `assert-noaction-park.sh` re-run on both completed repos (4/4 and 3/3 PASS), so
+the safety half never regressed while the observability half was added.
+
+Cost ran over estimate and is reported as it landed, not as quoted: **$2.10 across 4 runs** vs ~$0.85
+planned — the overrun bought two findings that no amount of re-reading would have produced.
+
 ## Files Changed
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 | `skills/prime/SKILL.md` | T1 | report installed-vs-repo skill version at session start — L-021 fired twice unseen | Low | 3 branches run on real fixtures |
 | `README.md` | T1 | consumer-facing: the health check's new `Skills:` row (L-015) | Low | qa-check README/version legs |
-| `TECH-DEBT.md` | T1 | TD-015 resolved, accepted residual stated | Low | qa-check TD-aging leg |
+| `TECH-DEBT.md` | T1·T2 | TD-015 + TD-017 resolved; both residuals stated | Low | qa-check TD-aging leg |
+| `skills/lean-doc-generator/SKILL.md` | T2 | park is *recorded* at the migrate/init entry points, not only in the sprint-lifecycle §  | Med | 2 real headless runs |
+| `…/references/migration-map.md` | T2 | headless detection cue + park-record step at the approval gate | Med | migrate-park re-run + assertions |
+| `…/references/init.md` | T2 | same at init's tier popup; base tier waits with the parked choice | Med | init-park re-run + assertions |
+| `evals/fixtures/boundary-rows/{migrate,init}-park/README.md` | T2 | record the closed gap + the two failed wirings | Low | n/a (docs) |
 
 ## Retro
 

@@ -40,7 +40,17 @@ cd "$dest" && MSYS_NO_PATHCONV=1 claude -p "/lean-doc-generator init" --model so
   fixture's own `fixture: initial state`.
 - Cost: **$0.3556, ~51s API time, 6 turns** (pinned `sonnet`, `--output-format json`).
 
-**Observed gap (report, not asserted) — same shape as `../migrate-park/README.md`'s finding:** the
+**Gap closed — SPRINT-040 T2 (2026-07-30).** Re-run against the fixed procedure (loaded via
+`--plugin-dir`, name `lf-s040`, otherwise the identical command above): the run probed
+`ToolSearch select:AskUserQuestion`, recorded **confirmed headless**, and wrote
+`%TEMP%/handoff-init-park.md` naming the blocked tier choice, its unblock condition ("use an
+interactive session"), and an explicit "nothing was written this run" inventory. Base-tier
+scaffolding correctly waited *with* the parked choice rather than proceeding as additive work.
+`assert-noaction-park.sh` still passes 3/3. Cost: **$0.4795, ~10 turns**. The fix that made it fire
+was the **detection cue**, not the instruction itself — see `../migrate-park/README.md` for the two
+failed attempts that established that.
+
+**Original observed gap (SPRINT-039 T1 — kept for the record) — same shape as `../migrate-park/README.md`'s finding:** the
 run correctly noticed no `AskUserQuestion` channel exists ("that tool isn't available in this
 environment, so I'm asking directly instead of guessing") but then asked in prose and stopped, rather
 than running `night-run.md` Part 0's park protocol (write a park record, halt clean via `/handoff`).

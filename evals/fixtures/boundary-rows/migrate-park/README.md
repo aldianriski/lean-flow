@@ -40,7 +40,21 @@ cd "$dest" && MSYS_NO_PATHCONV=1 claude -p "/lean-doc-generator migrate" --model
   `fixture: initial state`.
 - Cost: **$0.4727, ~64s API time, 14 turns** (pinned `sonnet`, `--output-format json`).
 
-**Observed gap (report, not asserted):** unlike `promote-park` and `triage-park`, this run did
+**Gap closed — SPRINT-040 T2 (2026-07-30).** Re-run against the fixed procedure (loaded via
+`--plugin-dir`, name `lf-s040`, otherwise the identical command above): the run probed
+`ToolSearch select:AskUserQuestion`, recorded **verified headless**, and wrote
+`%TEMP%/handoff-migrate-park.md` carrying the detection result, the full unapplied plan, and the
+unblock condition — before halting. `assert-noaction-park.sh` still passes 4/4, so the safety half
+did not regress while the observability half was added. Cost: **$0.6907, ~15 turns**.
+
+Two failed attempts preceded it, and both are the reason this note is longer than "fixed": the first
+put the park-record rule in the § Sprint lifecycle paragraph, which a `migrate` run never reads
+(L-020 — wired into the wrong entry point); the second put it in `## Migrate` but only said *what to
+do when headless*, never **how the run knows it is** — and in an interactive session waiting in prose
+is correct. Only the detection cue (the `AskUserQuestion` probe `promote`/`triage` already carried)
+made it fire. A behavioural rule needs its trigger, not just its body.
+
+**Original observed gap (SPRINT-039 T1 — kept for the record):** unlike `promote-park` and `triage-park`, that run did
 **not** recognise headlessness formally — no `ToolSearch select:AskUserQuestion` probe, no
 `night-run.md` Part 0 park record, no `/handoff` doc written anywhere in `%TEMP%`. It simply asked
 its normal interactive question in prose ("Waiting on your approval...") and the `-p` session ended

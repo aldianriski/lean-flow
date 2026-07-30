@@ -27,7 +27,7 @@ status: current
   - Mitigation (not yet done): use `grep -q` (as `assert-judgement-retry.sh` already does) or
     `|| true` with an explicit count. Fix opportunistically if that file is touched again.
 
-- **TD-017** severity: minor | status: open | created: Sprint-039
+- **TD-017** severity: minor | status: resolved → SPRINT-040 T2 | created: Sprint-039
   - Summary: `migrate` and `init` do **not** execute Part 0's park protocol. SPRINT-039 T1's real
     headless runs found both correctly *withheld* every unauthorized write, but neither wrote a park
     record nor a `/handoff` doc — they simply declined in prose. `promote` and `/triage`, tested in
@@ -39,6 +39,18 @@ status: current
   - Mitigation (not yet done): wire the park-record + handoff write into `migrate`/`init`'s
     approval-gate paths, then cover with the retained `migrate-park`/`init-park` fixtures — which
     already exist and currently assert only the withheld-write half.
+  - Resolution: both entry points now write a park record to a `/handoff` doc before halting —
+    verified on real headless re-runs of both retained fixtures (`handoff-migrate-park.md` ·
+    `handoff-init-park.md`, each naming what stopped and its unblock condition), with
+    `assert-noaction-park.sh` still passing 4/4 and 3/3 so the safety half didn't regress.
+    **The mitigation above was insufficient as written, and the runs are what proved it.** Wiring the
+    rule into the approval paths took two failed attempts: first into § Sprint lifecycle, which a
+    `migrate` run never reads (L-020's exact shape, committed while fixing a TD of that class); then
+    into `## Migrate`/`## Init` stating *what to do when headless* but never **how the run knows it
+    is** — and an interactive run waiting in prose is correct behaviour. What made it fire was the
+    **detection cue**: probe `ToolSearch select:AskUserQuestion`, which is precisely what `promote`
+    and `/triage` already carried and why they alone complied in SPRINT-039. A behavioural rule ships
+    with its trigger or it does not ship. Cost of finding that out: 4 real runs, $2.10.
 
 - **TD-016** severity: minor | status: open | created: Sprint-039
   - Summary: `scripts/qa-check.sh` leg 12 (TD-013's fix) runs 6 zero-API eval harnesses, taking the

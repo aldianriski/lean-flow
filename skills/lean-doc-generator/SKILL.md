@@ -52,15 +52,19 @@ detect (incl. dupes / orphans / stale) → propose a per-file plan (keep / refor
 index / archive / consolidate / retire / leave) → **wait for approval** → apply incrementally; never
 delete content without explicit per-item approval, never touch out-of-scope artifacts. **Re-runnable
 as an update sync** — on an already-adopted repo, migrate detects standard/template deltas since
-adoption and **reports** them (idempotent · report-only · never clobbers user edits). Full mapping +
-re-run procedure → `${CLAUDE_SKILL_DIR}/references/migration-map.md`.
+adoption and **reports** them (idempotent · report-only · never clobbers user edits). **Headless** — no
+approval can arrive, so record the park before halting: the plan + what it waits on → the `/handoff`
+doc (no sprint file exists here). A prose-only "waiting on your approval" leaves the morning owner no
+artifact that the run happened. Full mapping + re-run procedure → `${CLAUDE_SKILL_DIR}/references/migration-map.md`.
 
 ## Init (scaffold a fresh repo)
 
 For a **greenfield** repo with no lean-flow docs yet — the twin of migrate. **Scope-interactive +
 docs-only** — the base-tier mandatory minimum always, higher tiers offered via an AskUserQuestion
 popup; writes docs plus exactly the three-file safe-scaffold allowlist (`.env.example` ·
-`.gitignore` · `LICENSE`, write-if-absent), never `settings.json` or any other non-doc file. Full
+`.gitignore` · `LICENSE`, write-if-absent), never `settings.json` or any other non-doc file. **Headless**
+— the tier popup cannot be answered, so record the park before halting: the detected substrate + the
+unanswered tier choice → the `/handoff` doc. Declining in prose alone leaves no artifact. Full
 procedure, base-tier table, and the safe-scaffold allowlist → `${CLAUDE_SKILL_DIR}/references/init.md`.
 
 ## Execution flow
@@ -94,7 +98,7 @@ Shipped → `CHANGELOG.md` (root; legacy `docs/`) · Tech debt → `TD-NNN` in r
 **Governance review at promote** — before planning, run the scan and **emit it as a checklist the owner signs off on**, never silent prose:
 `☐ L-promotion (count≥2, promoted:no): <findings|none>` · `☐ TD aging (≥3 sprints unaddressed): <findings|none>` · `☐ doc-aging §11 (TD collapse · CHANGELOG rotation · LEARNINGS pointer-collapse · TODO ~150-line cap): <findings|none>`.
 Resolve each ☑ line before sign-off: promote flagged learnings into a durable rule (CLAUDE.md anti-pattern / CONTEXT.md rule / skill red-flag) and mark `promoted: yes → <where>`; aged TD → re-review prompt, `severity: high` → auto-escalate Backlog P1; doc-aging → propose compression, apply on approval. **Explicit owner sign-off on the checklist is required before rendering the sprint file or committing `plan locked`.**
-**Unattended** — promote is HITL end-to-end (it *forms* the Plan, so nothing here is pre-approvable): a headless run **parks** at the scan and exits; it never signs its own checklist, and never renders a sprint to get on with the night. Same for `migrate`/`init` per-item approvals. Contract → `orchestrator/references/night-run.md` Part 0.
+**Unattended** — promote is HITL end-to-end (it *forms* the Plan, so nothing here is pre-approvable): a headless run **parks** at the scan and exits; it never signs its own checklist, and never renders a sprint to get on with the night. Same for `migrate`/`init` per-item approvals (recorded there too — see each section). Every park is **recorded, not merely performed**: no sprint file to log into → the record (what stopped · its unblock condition) goes in the `/handoff` doc. Contract → `orchestrator/references/night-run.md` Part 0.
 
 ## Red flags
 
