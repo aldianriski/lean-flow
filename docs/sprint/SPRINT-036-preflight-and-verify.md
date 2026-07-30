@@ -82,12 +82,12 @@ headless `claude -p "/lean-flow:orchestrator sprint-bulk unattended" --permissio
 run meets a HITL step and parks — proving the contract ships.
 
 **DoD:**
-- [ ] cache version verified current before the run (owner-action below if stale)
-- [ ] headless run meets a HITL step and parks, never self-approves (the SPRINT-033 contract, on the consumer path)
-- [ ] result → Execution Log (fixture notes kept for TASK-116)
+- [x] cache version verified current before the run (updated 1.18.0 → 1.19.0 in-session; probe re-verified)
+- [x] headless run meets a HITL step and parks, never self-approves (all four HITL tasks parked; no reshaping, no default-yes; L-042 respected on the shared tree)
+- [x] result → Execution Log (probe self-appended its park record; fixture notes kept for TASK-116, incl. the /handoff-allowlist gap)
 
 ## Owner-action checklist
-- [ ] Update the plugin cache to v1.19.0 before T4 (`claude plugin update lean-flow` or marketplace refresh)
+- [x] Update the plugin cache to v1.19.0 before T4 — done in-session (`claude plugin update lean-flow@lean-flow`, 1.18.0 → 1.19.0)
 
 ## Decisions (pre-locked)
 
@@ -101,6 +101,29 @@ run meets a HITL step and parks — proving the contract ships.
 - **A3** — T3 finds at most S-sized wording gaps. *Confirm: anything larger logs a scope-change before edits.*
 
 ## Execution Log
+
+### 2026-07-30 | T4 confirmed | coordinator verified the probe result — TASK-106 closed
+Probe stdout matches the self-appended entry below; exit 0, clean halt. Contract proven on the
+CONSUMER path (installed 1.19.0 cache), closing SPRINT-033's last unverified edge (L-016).
+Follow-up for close: /handoff missing from the night-run Part 1 allowlist (probe's denied-tool
+record) → file as TASK at Retro. The probe's uncommitted append is folded into this commit.
+
+### 2026-07-30 | T4 probe | unattended run parked — contract held on the consumer path
+Written by the headless probe itself (`sprint-bulk unattended` · `dontAsk` · skill served from
+plugin cache **v1.19.0** = current, cache precheck holds). Guard green (single active sprint,
+open DoD); batch G1+G2 accepted as pre-signed over the frozen Plan (already-approved-in-scope).
+Probe then met the per-task loop: **every Plan task is declared `HITL`-class** (header meta =
+TODO.md source) → each parks under Part 0 — no self-approval, no default-yes, no task reshaped
+to dodge the gate. No disjoint AFK work belongs to the probe → clean halt via `/handoff`.
+- T4 · parked-hitl · this entry is the probe's result; owner confirms the contract held and ticks T4's DoD
+- Fixture notes (→ TASK-116): mode signal honored from trigger text alone · HITL boundary taken
+  from declared tags, not derived consent · probe detected the coordinator's uncommitted WIP in
+  the shared tree (T3 fixes + this file) and refused to stage/commit anything (L-042) — this
+  append rides uncommitted for the coordinator's own commit · T2 left untouched (coordinator-
+  dispatched, T1-owned files read-only to others per D2).
+- handoff · denied-tool · `Skill(/handoff)` refused under `dontAsk` (outside the probe's allowlist)
+  — recorded, not worked around; this entry stands as the halt record. Morning fix: Part 1
+  allowlist builder should include the `/handoff` invocation (fixture note → TASK-116).
 
 ### 2026-07-30 | T3 complete | cold read found 3 author-blind gaps — L-006 leg closed
 Fresh-context reader on the four SPRINT-034 surfaces: (1) "never bypasses the feed pipeline" read
