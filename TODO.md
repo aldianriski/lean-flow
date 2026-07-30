@@ -92,6 +92,21 @@ status: current
       tracker: none — external review item 5
       state:   ready (needs-info resolved 2026-07-30: owner picked night-run Part 0)
 
+- [ ] TASK-123 — Implement the night-run capability probes (graduated from TASK-117's spec)  [size: S] [risk: low] [HITL]
+      class:      execution
+      depends-on: none
+      done-when: the three live capability checks specified in night-run.md Part 1 § Capability checks
+                 are actually probed at pre-flight rather than read as prose — agent-dispatch
+                 availability · worktree usability + leftover sweep · installed-skill-version vs repo
+                 manifest — each emitting its named finding, negative-tested per L-058, and fired
+                 once on a real pre-flight before an unattended run (L-007)
+      touches: skills/orchestrator/references/night-run.md (Part 1) · form per G2 — the T1 precedent
+               (procedure step + optional inline snippet, no new shipped file) is the default
+      assumes: the version check is the load-bearing one (it blocks; the other two degrade) — build it
+               first and ship it alone if the other two prove not worth probing
+      tracker: none — graduated from TASK-117 / SPRINT-037 T4 spec
+      state:   ready
+
 ### P3 — Long-term
 
 - [ ] TASK-074 — Migrate lean-flow's own repo to the ADR-012 canonical layout  [size: S] [risk: low] [HITL]

@@ -82,9 +82,9 @@ channel · cache-vs-repo version) with degrade rules (no worktree → sequential
 park HITL · cache mismatch → block unattended), delta-mapped against Part 0's existing checks.
 
 **DoD:**
-- [ ] delta vs existing Part 0 pre-flight mapped first — only the unmatched remainder is spec'd (L-017)
-- [ ] checks specified behavior-first with the three degrade rules
-- [ ] spec lands as the Part 0 extension or a graduation TASK-NNN (G2 decides which)
+- [x] delta vs existing Part 0 pre-flight mapped first — only the unmatched remainder is spec'd (L-017)
+- [x] checks specified behavior-first with the three degrade rules
+- [x] spec lands as the Part 0 extension or a graduation TASK-NNN (G2 decides which)
 
 ## Decisions (pre-locked)
 
@@ -99,6 +99,26 @@ park HITL · cache mismatch → block unattended), delta-mapped against Part 0's
 - **A3** — T4 stays spec-only even if the spec is small enough to implement — wiring is a separate verified step (L-020). *Confirm: G2 holds the line.*
 
 ## Execution Log
+
+### 2026-07-30 | T4 complete | capability preflight spec'd — one of four checks rejected as already-covered
+L-017 delta map run **before** spec'ing, and it changed the deliverable: of the four proposed checks,
+**the ask-channel check is a reject** — Part 0's "Absence ≠ consent" already establishes there is no
+channel headless (verified, with the park protocol as its degrade rule), so probing it would only
+re-derive a known fact. Spec'ing it would have duplicated the SSOT (L-008). It stays in the table as a
+pointer, not a check. Agent-dispatch = unmatched (kept). Worktree = *hygiene* was covered in
+dispatch.md but *availability* wasn't (kept as the general rule). Skill-version = zero coverage
+anywhere in night-run.md (kept, and it turned out to be the load-bearing one).
+**The version check earned its place empirically, mid-sprint.** T3's headless run was served
+`lean-flow@lean-flow` **v1.19.0** from the user-scope cache while this repo sits at **v1.20.0** — and
+T1's preflight, committed hours earlier, is in no cache at all. So the trap the spec describes (edit a
+skill, fire a night run, silently execute the *previous* procedure) is not hypothetical; it was live in
+this sprint. That is why its degrade rule is **block**, not degrade: unlike the other rows there is no
+correct reduced shape for executing a procedure nobody approved.
+Placement judgment (D1's wording was loose — "Part 0 pre-flight" conflates Part 0 = the contract with
+Part 1 = the pre-flight pass): the checks landed as a **Part 1 subsection**, where checks live and
+where a human runs them, with the ask-channel row cross-referencing Part 0 instead of restating it.
+A3 held — spec only, no probing mechanism built, nothing wired into other surfaces. Mechanism filed as
+**TASK-123** (P2, `ready`) so it isn't orphaned, with the version check named as build-first.
 
 ### 2026-07-30 | T2 complete | /handoff allowlisted as a Part 1 pre-flight item
 Kept inline (trivial doc edit; also avoids handing `night-run.md` between an agent and the

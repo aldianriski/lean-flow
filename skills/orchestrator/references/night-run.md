@@ -132,6 +132,29 @@ All items must pass or the night-run does not fire:
 - [ ] `bypassPermissions` is off the table — never the fallback for a lazy allowlist. The safety
       default stays OFF; flipping it is an owner decision, not a night-run convenience.
 
+### Capability checks (specified — the probing mechanism graduates to its own task)
+
+The items above verify the *run's* readiness; these verify the **environment's**. They are separate
+because each one **degrades** the run rather than stopping it — so the useful output is not
+pass/fail but *which shape the run takes*. Specified behaviour-first on purpose: a documented check
+a human runs at pre-flight is the floor, and automating the probe is a separate, separately-verified
+step (a spec small enough to implement is still not implemented here).
+
+| Capability | What's checked | If absent — degrade rule |
+|---|---|---|
+| **Agent dispatch** | the run can spawn sub-agents at all | execute **inline and sequentially**; a task that then can't finish inside the window **parks** with its unblock condition rather than half-landing |
+| **Worktree isolation** | `git worktree` is usable *and* no leftover agent worktrees remain | run the wave **sequentially in the shared tree** — agents make no git writes, the coordinator commits; the same shape already prescribed for an unpushed base |
+| **Ask channel** | *nothing to check — already settled.* Part 0 establishes headless has none, by construction | **park the HITL step** (Part 0 park protocol). Named here only so the set looks complete; a probe would re-derive a known fact |
+| **Skill version** | the run is served the skill from the plugin **install cache**, not the working tree — so compare installed version against the repo manifest | **block the unattended run** |
+
+**Why the version check earns its place** (the others are conveniences; this one is a correctness
+trap). A night run executes the *installed* skill. Edit a skill, don't reinstall, fire the run, and
+it faithfully executes the **previous** procedure — no error, no denial, and a morning diff that
+looks like the run simply ignored the change. Nothing else in this pre-flight would catch it, and it
+is most likely exactly when a maintainer is iterating on the procedure the run depends on. Blocking
+is right rather than degrading: unlike the other rows there is no correct reduced shape, because the
+run would be executing a procedure nobody approved.
+
 ## Part 2 — Trigger recipe (consumer-generic)
 
 > **Precondition — do not fire this until Part 1a's entry path and Part 1's pre-flight are both green.**
