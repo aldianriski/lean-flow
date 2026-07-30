@@ -3,19 +3,19 @@ sprint: 038
 slug: probes-evals-layout
 owner: Maintainer
 last_updated: 2026-07-30
-status: active
+status: closed
 plan_commit: add96ff
-close_commit: [set at close]
+close_commit: [recorded in the follow-up commit]
 update_trigger: sprint execute/close events
 ---
 
 # SPRINT-038 — Probes, Evals, and Layout
 
 > **Theme:** Turn SPRINT-037's two specs into things that actually fire, then clear the decks. The
-> capability checks are prose; the eval harness is a validated prototype with no suite behind it.
-> Both graduate here. Alongside them, the repo finally dogfoods its own canonical layout and the
-> ledgers get the overdue collapse the SPRINT-038 governance scan surfaced. Foundations first: the
-> probes guard every future unattended run, and the eval suite is what stops the guards rotting.
+> capability checks are prose; the eval harness is a validated prototype with no suite behind it. Both
+> graduate here. Alongside them the repo finally dogfoods its own canonical layout, and the ledgers get
+> the overdue collapse the governance scan surfaced. The probes guard every future unattended run; the
+> eval suite is what stops the guards rotting.
 
 ## Scope
 
@@ -27,11 +27,10 @@ housekeeping (3 overdue TD collapses + TD-011's ADR-010 sweep).
 promote closes it as rejected if the trigger hasn't fired**) · any new gate mechanism beyond what
 TASK-123 specifies · CI wiring for the eval suite (ARCHITECTURE boundary: lean-flow doesn't own CI).
 
-**Standing constraint (owner directive, 2026-07-30 promote).** Every task's output must be usable by
-a consumer **immediately on `plugin update`** — no repo-specific path in a shipped skill or template
-(L-015), README + CHANGELOG reflecting anything user-visible, and any consumer-affecting change
-called out at close so the release carries it. Where a task can't be dogfooded here, verify on the
-consumer path rather than reading "didn't fire in our repo" as either broken or fine (L-016).
+**Standing constraint (owner directive, 2026-07-30 promote).** Every task's output must be usable by a
+consumer **immediately on `plugin update`** — no repo-specific path in a shipped skill (L-015), README +
+CHANGELOG reflecting anything user-visible, consumer-affecting changes called out at close. Where a task
+can't be dogfooded here, verify on the consumer path (L-016).
 
 ## Plan
 
@@ -144,19 +143,14 @@ file TASK-074's `done-when` never named (found at G2; the mapping covered it, th
 Its `## Rollback` section split out to `docs/deployment/rollback-guide.md` per the mapping's split-don't-fold
 rule, template read first. Our rollback is ~3 lines of substance because the project is markdown-only with
 no runtime state — stated plainly rather than padded.
-**The trap, and why the obvious approach was wrong.** ~20 inbound references split into four classes, and
-a repo-wide find/replace on `docs/CHANGELOG.md` → `CHANGELOG.md` would have **corrupted the consumer-facing
-standard**: every mention inside `skills/**` is deliberate guidance about the *legacy* placement — the
-migration map's own source column (it maps *from* `docs/CHANGELOG.md`, so that path must stay named),
-DOCS_Guide's "still matched, second" note, `release-patch`'s legacy-detection fallback, and `prime`'s
-legacy read-order row. `docs/adr/**` is append-only, so ADR-008's reference to the old path is stale
-**by design** and was left. Asserted after the fact, not merely intended: `git status` confirms **zero
-files under `skills/` and zero under `docs/adr/`** changed.
-Left deliberately untouched as historical record: `docs/LEARNINGS.md` L-001 (describes the *past*
-contradiction), sprint archives, rotated changelogs. `README.md`'s "legacy root locations still matched"
-sentence stays — it describes the standard, not our layout. The dispatched agent **reported rather than
-edited** a real stale link in `TODO.md` (the "Sprint history →" pointer) because TODO.md was out of its
-bounds; coordinator fixed it. Exactly the right behaviour at an ownership boundary.
+**The trap:** ~20 inbound refs across four classes, and a find/replace would have **corrupted the
+consumer-facing standard** — every `skills/**` mention is deliberate *legacy-placement* guidance (the
+migration map maps *from* `docs/CHANGELOG.md`; DOCS_Guide's "still matched, second"; release-patch's
+fallback; prime's read-order row). `docs/adr/**` is append-only → ADR-008's link is stale **by design**.
+Asserted, not intended: **zero `skills/` and zero `docs/adr/`** files changed. Full rule → **L-063**.
+Left as historical record: LEARNINGS L-001, archives, rotated changelogs; README's "legacy locations still
+matched" sentence describes the standard, not our layout. The agent **reported rather than edited** a stale
+`TODO.md` link outside its bounds — right behaviour at an ownership boundary; coordinator fixed it.
 **DoD 1 deviation, recorded.** "Applied via migrate's propose→approve path" — the propose→approve
 *discipline* was followed (coordinator produced the four-class proposal, owner approved it, only then was
 anything applied), and migrate's Legacy-lean mapping was the spec. But `/lean-doc-generator migrate` was
@@ -177,21 +171,15 @@ skills); mid-sprint `scope-change` was excluded because "is this scope-changing"
 markup token, and Part A already showed this class resists fixture steering; `release-patch` push was
 excluded because a throwaway repo has no remote, so "no push occurred" is **vacuously** true — the exact
 L-057 trap of a check that runs but cannot check. Good calls, all of them.
-**Coordinator caught a real defect in T2b, and it was partly mine.** T2b checked in **nothing** — 66
-lines of README prose, zero fixtures, the repos left in scratch to die with the session. That is the
-precise pattern promoted into CLAUDE.md *this sprint* ("retain those fixtures — deleting them with the
-prototype leaves the gate unguarded"), and DoD 1 says "reusing the skeleton + assertion script", which
-requires something reusable to exist. Root cause: **T2a set the precedent** ("no fixture files committed
-for this class") and the coordinator committed it without challenge, so T2b followed a standing decision
-rather than inventing a bad one. The distinction that should have been drawn at T2a: three separable
-things — the fixture **input** (deterministic, retainable) · the **assertions** over a finished run's
-artifacts (deterministic, retainable) · the **headless run** (nondeterministic and costly, correctly
-on-demand). Conflating them justified retaining nothing.
-**T2c salvaged it at zero API cost** — the scratch repos were still intact. Retained: both fixture
-skeletons under `evals/fixtures/boundary-rows/`, machine-specifics stripped (extracted from each scratch
-repo's *initial* commit, not its post-run HEAD — the right call), plus `assert-boundary-park.sh` and a
-**10-leg self-test** (5 must-PASS + 5 must-FAIL per fixture kind) that proves the assertions discriminate
-without spending a cent. All green.
+**Coordinator caught a real defect in T2b, and it was partly mine.** T2b checked in **nothing** — README
+prose only, fixtures left in scratch to die with the session: the precise pattern promoted into CLAUDE.md
+*this sprint*. Root cause was not T2b's: **T2a set the precedent** ("no fixture files committed for this
+class") and the coordinator committed that framing without challenge. Full mechanism + the missing
+input/assertions/run distinction → **L-062**.
+**T2c salvaged it at zero API cost** — scratch repos intact. Retained: both fixture skeletons under
+`evals/fixtures/boundary-rows/` (taken from each repo's *initial* commit, not post-run HEAD — the right
+call), `assert-boundary-park.sh`, and a **10-leg self-test** (5 must-PASS + 5 must-FAIL per kind) proving
+the assertions discriminate for free. All green.
 **Third silent-false-negative caught by a must-FAIL leg this sprint.** T2c's own kind-detection keyed off
 the sprint file's canonical path, so the `archive-moved` mutation broke detection *before* the check could
 fire — `unknown-fixture` instead of `FAIL archive-moved`. A positive-only test would have shipped it. It
@@ -321,18 +309,14 @@ G1 fast-path (plan frozen at `add96ff`, tree clean, 0 unpushed — scope unchang
 D2/D3 re-verified by *running* T1-037's preflight against this Plan (waves T1=0 T4=0 T2=1 T3=2,
 single-owner clean). A3 confirms in-task via migrate's propose→approve; A2 and A4 carry pre-authorized
 fallbacks, so neither is a passive placeholder.
-**A1 resolved, and it changed what T1 builds.** Recon found `installed_plugins.json` records a usable
-`version`, but its `gitCommitSha` reads `56a33a8` — this repo's *initial* release commit, stale by the
-entire project history, so it cannot serve as a content check. That exposed a hole in T4-037's spec:
-comparing version *strings* cannot catch an unbumped skill edit, which is the likeliest form of the
-trap (mid-sprint edits don't bump versions). Owner chose a **content diff with the version string as a
-fast path, plus a SKIP leg when there is no local plugin repo** — so it catches the real trap and can
-never fire at an ordinary consumer. Within T1's DoD ("installed-vs-repo"), so a design decision, not a
-scope change.
-Also found at G2: the repo has **three** legacy-lean files — `docs/DEPLOY.md` as well as ARCHITECTURE
-and CHANGELOG — but TASK-074's `done-when` named only two. The migrate mapping covers DEPLOY
-(→ `docs/deployment/deployment-guide.md`, rollback content split out), so A3 holds; carried into T3's
-brief so it isn't silently dropped.
+**A1 resolved, and it changed what T1 builds.** `installed_plugins.json` records a usable `version`, but
+its `gitCommitSha` reads `56a33a8` — this repo's *initial* release commit, useless as a content check.
+That exposed a hole in T4-037's spec: version *strings* cannot catch an unbumped skill edit, the likeliest
+form of the trap. Owner chose a **content diff, version string as fast path, SKIP when no local plugin
+repo** — catches the real trap, never fires at an ordinary consumer. Inside T1's DoD, so a design
+decision, not a scope change.
+Also found: **three** legacy-lean files, not two — `docs/DEPLOY.md` too, which TASK-074's `done-when`
+never named. The mapping covers it, so A3 holds; carried into T3's brief rather than dropped.
 
 ### 2026-07-30 | promote | plan locked
 Four tasks (TASK-123/124/074 → T1–T3; T4 is governance-filed, no Backlog id). Governance scan was
@@ -347,18 +331,70 @@ SPRINT-040. TODO.md 115 lines, under the soft cap after SPRINT-037's retention p
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/references/night-run.md` | T1a · T1b | two capability probes implemented behind Part 1's spec table — the checks now fire instead of being read | low | 5 retained fixtures; both fired live (`BLOCK cache-differs` · `AVAILABLE worktree-clean`) |
+| `evals/**` (new tree) | T1a · T1b · T2a · T2b · T2c | permanent maintainer-only harness home: `lib/harness-common.sh` + 4 runners + 8 fixtures + a 10-leg self-test — fixtures retained so a gate keeps its guard | low | every harness re-run green after each change |
+| `TECH-DEBT.md` | T4 · close | 3 overdue rows collapsed · TD-011 resolved · TD-012 resolved (retained-guard leg) · TD-013/TD-014 filed | low | qa-check; L-009 structure re-read |
+| `docs/adr/ADR-010-…md` | T4 | dated amendment reconciling its wording with ADR-013's advisory-default framing | low | `git diff` proved 11 insertions / **0 deletions** (append-only) |
+| 3 relocations: `docs/ARCHITECTURE.md`→`docs/architecture/overview.md` · `docs/CHANGELOG.md`→root · `docs/DEPLOY.md`→`docs/deployment/deployment-guide.md` + new `rollback-guide.md` | T3 | ADR-012 canonical placement, dogfooding our own migrate path; DEPLOY was the relocation the task text never named | med | qa-check 61/0 · `/prime` slot-6 resolves · all 8 archive links resolve from root · template read first |
+| `scripts/qa-check.sh` · `.claude/CONTEXT.md` · `README.md` · `docs/QA.md` · `TODO.md` | T3 · close | inbound links repointed — only real links to our own files, never the standard's own legacy guidance | med | asserted **zero** `skills/**` and `docs/adr/**` files changed |
+| `docs/research/behavioral-eval-feasibility.md` | T2a | verdict honestly downgraded to `superseded`; the violation-catching gap stated, not smoothed | low | reviewed by coordinator |
+| `docs/LEARNINGS.md` · `docs/knowledge-index.md` | close | L-061/062/063 filed; index regenerated (derived, ADR-009) | low | qa-check index lint |
 
 ## Retro
 
 <!-- Written at close. -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — **one real MISS, and it is the uncomfortable kind.** L-058 was promoted into
+CLAUDE.md's anti-patterns *at this sprint's own promote*, complete with "**retain those fixtures**".
+One task later, T2a declared behavioural fixtures unretainable as a class and checked in nothing, the
+coordinator committed that framing without challenge, and T2b inherited it and also checked in nothing.
+A freshly-promoted rule failed to fire twice inside the sprint that promoted it — promotion is not
+retrieval. Salvage (T2c) cost nothing because the scratch repos were intact, which is luck, not process.
+Retrieval **wins**, several load-bearing: L-017 subtracted a check at T4-037's delta map · L-015 caught
+T1a's `evals/` leak in review (the TD-010 shape) · L-055 killed worktree isolation at G2 pre-spawn ·
+L-042/L-043 held across five dispatches (explicit staging, zero agent git writes) · L-009's re-read after
+every table edit · L-010 kept reads on repo source not the 1.18.0 cache · ADR append-only stopped T4
+rewriting ADR-010 and T3 touching ADR-008.
 
 **Worked**
--
+- **Must-FAIL fixtures caught three independent silent false-negatives in one sprint.** T1a: a stripped
+  parse guard made the shipped preflight report `CLEAR` on a real overlap. T1a again: a naive `diff -rq`
+  false-BLOCKed on CRLF-vs-LF. T2c: its own kind-detection keyed off the canonical sprint path, so the
+  `archive-moved` mutation broke detection *before* the check could fire. Every one was invisible to a
+  positive-only test. L-058's promotion is now evidenced three times over, not argued.
+- **The gate caught its own author.** T1a edited `night-run.md`, and the freshness check immediately
+  returned `BLOCK cache-differs` naming that very file. SPRINT-037 T4 predicted that failure from
+  reasoning alone; a mechanism now catches it on genuine drift.
+- **Honest un-buildable answers, three times, each with a stated reason** — the agent-dispatch probe
+  (no filesystem-observable signal), the real violating fixture (priors, not the doc), and six
+  unreachable boundary rows. Naming what cannot be checked is worth more than a proxy that always
+  passes; `release-patch push` in a remote-less fixture is the sharpest example (vacuously true).
+- **Splitting the dispatch, not the DoD, rescued a task twice.** T1 died on 529 twice as the wave's
+  heaviest brief; split into T1a/T1b it landed. T2 was pre-split on that evidence and never stalled.
+- **Ownership boundaries held unprompted.** T2a hit a frozen `skills/**` and invented
+  `extract_sole_fenced_block` rather than reach across it; T3's agent reported a stale `TODO.md` link
+  instead of editing it.
+- **Verify the claim, not the report.** Every agent claim that mattered was independently checked: `0
+  deletions` proved ADR append-only · `git diff --name-only` proved no `skills/**` touched · 8 archive
+  links resolved · harnesses re-run after every change. Two claims were wrong on inspection.
 
 **Friction**
--
+- **The API fought us** — two 529 deaths plus a classifier outage blocking `Bash`/`Edit`/`Agent`. Cost one
+  re-plan; handled by verifying read-only that nothing partial had landed (true both times).
+- **My own false reads of a gate** — an unset `$TMPDIR` broke a redirect and reported `EXIT=1` with
+  qa-check never running (→ L-059); a PowerShell here-string in Bash committed `@` as a subject (→ L-060).
+- **T3 was mis-sized S** — three files, ~20 refs, four decision classes. Caught before applying, but the
+  promote estimate was wrong.
+- **This Retro breached the 400-line sprint cap** and had to be compressed to pointers mid-close — the
+  cap did its job, but a sprint this eventful wants shorter log entries written *as it goes*.
+- **`night-run.md` reached 427 lines** with two embedded snippets (→ TD-014), and the dispatch-preflight
+  guard is retained but unwired (→ TD-013).
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+**Pattern candidate** — all three filed in `docs/LEARNINGS.md` (bodies there, not duplicated here):
+**L-061** priors hold a safety contract's line independently of the doc — *the sprint's most consequential
+finding* · **L-062** retention needs the input/assertions/run split, and an unchallenged subagent framing
+binds the next one · **L-063** a path rename in a standard-documenting repo is never a find/replace.
+
+**Buckets routed:** Shipped → root `CHANGELOG.md` at release (feature sprint → MINOR by hand) · Tech debt
+→ **TD-013** (unwired guard) + **TD-014** (night-run size), **TD-012 resolved** · Follow-ups → **TASK-125**
+(judgement-only violation retry) + **TASK-126** (6 unreachable rows) · Learnings → **L-061/062/063**.

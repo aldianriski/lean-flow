@@ -16,7 +16,29 @@ status: current
 
 ## Tech Debt
 
-- **TD-012** severity: minor | status: open | created: Sprint-037
+- **TD-014** severity: minor | status: open | created: Sprint-038
+  - Summary: `skills/orchestrator/references/night-run.md` is now **427 lines**, carrying the Part 0
+    contract, the entry path, the pre-flight pass, and **two ~100-line embedded shell snippets**
+    (skill-freshness + worktree-usability).
+  - Impact: uncounted against the SKILL.md cap (ADR-006, it's a `references/` file) so no lint fires,
+    but it is past comfortable reading for the audience that most needs it — someone deciding whether
+    to fire an unattended run. A cold reader must scroll two code blocks to reach Part 2's trigger.
+  - Mitigation (not yet done): split the capability checks into their own `references/` sibling if a
+    third snippet lands. Not urgent at two; the trigger is the third.
+
+- **TD-013** severity: minor | status: open | created: Sprint-038
+  - Summary: `evals/run-dispatch-preflight-fixtures.sh` guards the `dispatch.md` preflight snippet but
+    is **not wired into `scripts/qa-check.sh`** — TD-012's stated alternative mitigation. The fixtures
+    exist and pass; nothing runs them automatically.
+  - Impact: the retained-guard leg of TD-012 is closed (the fixtures can no longer be lost), but the
+    guard is opt-in — a maintainer editing the snippet gets no automatic signal. Strictly better than
+    TD-012's original state, not equivalent to a wired gate (L-057's family: a check that exists but
+    isn't reached).
+  - Mitigation (not yet done): add a qa-check leg that runs the eval fixture harnesses, or accept
+    opt-in and say so in `docs/QA.md`. Note the tension: qa-check is fast and always-on; the
+    behavioural harnesses cost money, so only the *snippet* harnesses belong there.
+
+- **TD-012** severity: resolved → SPRINT-038 T2a (retained-guard leg; wiring → TD-013) | created: Sprint-037
   - Summary: the pre-dispatch preflight snippet now shipped in
     `skills/orchestrator/references/dispatch.md` was negative-tested by three must-FAIL fixtures that
     lived in a scratch dir and were **deleted** with the prototype. The shipped sh/awk block therefore
