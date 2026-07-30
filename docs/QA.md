@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-17
+last_updated: 2026-07-30
 update_trigger: A QA rule added/changed, the check script changes, or a release-checklist gap is found
 status: current
 ---
@@ -17,7 +17,7 @@ Run both before cutting a release or closing a sprint.
 |---|---|
 | Line caps | `SKILL.md` <=110 · `CLAUDE.md` <=80 · `CONTEXT.md` <=130 · active `SPRINT-*` <=400 |
 | Skill count | disk count of `skills/*/SKILL.md` == the number claimed in CLAUDE.md / CONTEXT.md / ARCHITECTURE.md |
-| Template count | `templates/*.md.template` files == claimed core + 1 non-core (DESIGN); claim in CLAUDE.md + ARCHITECTURE.md |
+| Template count | `templates/*.md.template` files == claimed core + 2 non-core (DESIGN, QA-TESTCASE); claim in CLAUDE.md + ARCHITECTURE.md |
 | Frontmatter | every `SKILL.md` has `---`/`name`/`description`; every core ledger has `owner`/`last_updated`/`status` |
 
 Non-zero exit = fix before release. Watch the near-cap files the run prints — one edit can breach

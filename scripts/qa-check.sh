@@ -56,6 +56,18 @@ check_claim "tmpl-core" "$tmpl_core"     .claude/CLAUDE.md     '([0-9]+) canonic
 check_claim "tmpl-core" "$tmpl_core"     docs/ARCHITECTURE.md  '([0-9]+) canonical doc templates'
 note "templates: $tmpl_files files = $tmpl_core core + $noncore non-core (DESIGN, QA-TESTCASE)"
 
+# doc-vs-script drift guard: docs/QA.md's stated non-core count must match $noncore above,
+# else the script and its own doc can silently disagree (TASK-112).
+if [ -f docs/QA.md ]; then
+  qa_noncore=$(num docs/QA.md '[0-9]+ non-core \(DESIGN, QA-TESTCASE\)')
+  if   [ -z "$qa_noncore" ];           then bad "qa.md non-core claim: no claim found in docs/QA.md"
+  elif [ "$qa_noncore" = "$noncore" ]; then ok "qa.md non-core claim: docs/QA.md claims $qa_noncore = script $noncore"
+  else                                      bad "qa.md non-core claim: docs/QA.md claims $qa_noncore != script $noncore"
+  fi
+else
+  note "skip (missing): docs/QA.md"
+fi
+
 # --- 3. Frontmatter / ownership presence ------------------------------------
 has_field() { grep -qE "^$2:" "$1"; }
 
