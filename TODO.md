@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-_(none active)_ — SPRINT-037 closed 2026-07-30. Next: `/lean-doc-generator promote` from the Backlog below.
+> **SPRINT-038 — probes-evals-layout** → docs/sprint/SPRINT-038-probes-evals-layout.md
 
 ---
 
