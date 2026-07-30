@@ -2,8 +2,8 @@
 
 Read before firing `sprint-bulk` unattended overnight. The mechanism is already decided — headless
 `claude -p`, OS-scheduled, `--permission-mode dontAsk` + a pre-built scoped allowlist, never
-`--dangerously-skip-permissions` (decision record: the lean-flow repo's `docs/research/night-run.md`).
-This file is the operational procedure, not a re-decision.
+`--dangerously-skip-permissions` (it removes every guardrail for a run nobody is watching to catch —
+an unacceptable risk unattended). This file is the operational procedure, not a re-decision.
 
 ## Part 0 — The unattended contract (read first)
 
@@ -154,8 +154,8 @@ A small wrapper the OS scheduler runs alongside Part 2's `claude -p` call — no
 
 - **Stall signal**: no new `stream-json` line and no new commit for N minutes (default ≈20–30 min,
   scaled to the run's task size — raise for large/slow tasks, lower for small ones).
-- **On stall**: SIGTERM the `claude -p` process — it runs `SessionEnd` then exits 143 (confirmed in
-  `docs/research/night-run.md` Findings), the same clean-exit path a closed terminal triggers.
+- **On stall**: SIGTERM the `claude -p` process — it runs `SessionEnd` then exits 143 (verified by
+  testing), the same clean-exit path a closed terminal triggers.
 - **Recovery**: the kill handler fires one final `claude -p --resume <session-id> "/handoff"` so the
   handoff doc lands in the OS temp dir exactly as a human-ended session would.
 - **Shape** (pseudo): `every K min → if idle > N min → SIGTERM → wait for exit 143 → claude -p
