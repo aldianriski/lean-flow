@@ -1,0 +1,7 @@
+{
+  "name": "init-park-fixture",
+  "version": "0.1.0",
+  "description": "Throwaway behavioral-eval fixture for /lean-doc-generator init's per-item approval park rule (SPRINT-039 T1). Not a real project. Safe to delete.",
+  "private": true,
+  "dependencies": {}
+}
