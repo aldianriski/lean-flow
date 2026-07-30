@@ -338,6 +338,29 @@ for hp in evals/run-*.sh evals/selftest-*.sh; do
   esac
 done
 
+# --- 13. Headless park-record cue: migrate + init procedures (TD-019, SPRINT-041 T1) -------
+# The ask-channel probe (`ToolSearch select:AskUserQuestion`) and the park-record instruction
+# (write the halt into a `/handoff` doc) are one prose line each inside migrate and init's
+# procedures. Their absence is invisible to every other check here -- a prose-only decline also
+# writes nothing, so the in-repo park assertions keep passing either way (the silent-false-negative
+# shape L-058 names). This leg reads the two procedure files directly and FAILs by name if either
+# cue is missing from either file.
+headless_procs="skills/lean-doc-generator/references/migration-map.md skills/lean-doc-generator/references/init.md"
+for hp in $headless_procs; do
+  if [ ! -f "$hp" ]; then
+    bad "headless park-record cue $hp: file not found"
+    continue
+  fi
+  if grep -qE 'ToolSearch select:AskUserQuestion' "$hp"
+  then ok "headless park-record cue $hp: ask-channel probe present"
+  else bad "headless park-record cue $hp: ask-channel probe (ToolSearch select:AskUserQuestion) missing"
+  fi
+  if grep -qE '/handoff` doc' "$hp"
+  then ok "headless park-record cue $hp: park-record instruction (/handoff doc) present"
+  else bad "headless park-record cue $hp: park-record instruction naming the /handoff doc missing"
+  fi
+done
+
 # --- Summary ----------------------------------------------------------------
 printf '\n----------------------------------------\n'
 printf 'QA-CHECK: %s pass, %s fail\n' "$pass" "$fail"

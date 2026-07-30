@@ -21,6 +21,7 @@ Run both before cutting a release or closing a sprint.
 | Frontmatter | every `SKILL.md` has `---`/`name`/`description`; every core ledger has `owner`/`last_updated`/`status` |
 | Task schema | active-sprint `### Tn` Plan blocks carry `class:` + an autonomy tag (HITL/AFK) in header meta, plus `Depends-on:`/`Layers:`/`**Acceptance:**` — else FAIL (TASK-110) |
 | Eval harnesses (TD-013) | the 5 zero-API harnesses under `evals/` (skill-freshness, worktree-usability, dispatch-preflight fixtures + the boundary-park/no-action-park selftests) each run bare, gated on **that harness's own exit status** — a FAIL names both the harness and the finding it reported |
+| Headless park-record cue (TD-019) | migrate's and init's procedures (`skills/lean-doc-generator/references/{migration-map,init}.md`) each still carry the ask-channel probe (`ToolSearch select:AskUserQuestion`) and the park-record instruction naming a `/handoff` doc — a FAIL names the procedure and which of the two it lost |
 
 Non-zero exit = fix before release. Watch the near-cap files the run prints — one edit can breach
 them.
