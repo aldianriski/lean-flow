@@ -189,6 +189,11 @@ security → `/security-review`. `/council` is the one skill that orchestrates s
 - **G1 Scope** (all modes) — goal restated as one verifiable sentence · size S/M/L (an **L splits**) · files / blast-radius · out-of-scope named · assumptions confirmed.
 - **G2 Design** (`mvp` · `sprint-bulk`) — approach + one-line WHY · verifiable micro-tasks · an ADR only if the decision is hard-to-reverse **and** surprising **and** a real trade-off · residual grill until the goal is unambiguous (the detailed grill already ran at intake, in `/task-decomposer`).
 
+Before any **parallel wave**, `sprint-bulk` also runs a mechanical **pre-dispatch preflight** — cycle ·
+shared-file single-owner · declared-base-vs-HEAD · wave computation — all derived from tokens your sprint
+Plan already carries, so there is nothing extra to maintain. A failure halts that wave with a *named*
+finding. Not a human gate (nothing to approve); it just refuses to fan out work whose ordering is unsafe.
+
 **Modes** (`/orchestrator <mode>`) — three: `quick` (single small low-risk task, G1 only) · `mvp`
 (feature work, medium+, G1+G2) · `sprint-bulk` (auto-loop the Active Sprint task list, G1+G2 once) —
 full mode/gate contract → [`.claude/CONTEXT.md`](.claude/CONTEXT.md) (SSOT).
@@ -361,7 +366,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-07-30 · status: current · v1.20.0</sub>
+<sub>Doc owner: Maintainer · last updated 2026-07-30 · status: current · v1.21.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge
