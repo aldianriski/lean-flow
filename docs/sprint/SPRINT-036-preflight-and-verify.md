@@ -38,9 +38,9 @@ commit, verified against live HEAD at spawn, mismatch halts, re-verified at each
 and the rule is traced once against the L-055 incident.
 
 **DoD:**
-- [ ] dispatch.md parallel/worktree section carries the rule (spawn-time verify + wave-boundary re-verify)
-- [ ] night-run.md carries it at its dispatch step, consumer-legible (no repo-local refs — L-015)
-- [ ] traced against the L-055 incident (would it have caught the stale branch point?) → Execution Log
+- [x] dispatch.md parallel/worktree section carries the rule (spawn-time verify + wave-boundary re-verify)
+- [x] night-run.md carries it at its dispatch step, consumer-legible (no repo-local refs — L-015; inline rationale, zero L-NNN cites by design)
+- [x] traced against the L-055 incident (would it have caught the stale branch point?) → Execution Log
 
 ### T2 — Prototype the no-JSON dispatch preflight `[size: S · risk: low · class: execution · HITL]` (TASK-119)
 Layers: (throwaway prototype — /prototype discipline; capture → ADR-013 addendum)
@@ -67,9 +67,9 @@ wording (L-006). A fresh-context agent that wrote none of it closes that leg.
 corrected.
 
 **DoD:**
-- [ ] fresh-context read of: orchestrator intake routing + spawn red flag · night-run Part 1a + Part 2 precondition · CONTEXT § Unattended clause · /flow launcher bullet
-- [ ] each surface confirmed unambiguous or corrected (S-sized wording fixes only; larger → scope-change)
-- [ ] findings → Execution Log; closes SPRINT-034's stated verification gap
+- [x] fresh-context read of: orchestrator intake routing + spawn red flag · night-run Part 1a + Part 2 precondition · CONTEXT § Unattended clause · /flow launcher bullet
+- [x] each surface confirmed unambiguous or corrected (3 gaps, all S: "feed pipeline"→"routing checks" · mode-note vs Part 0 table contradiction rewritten · flow's night-run.md path qualified; CONTEXT clause clean)
+- [x] findings → Execution Log; closes SPRINT-034's stated verification gap
 
 ### T4 — Verify the unattended contract from the installed plugin `[size: S · risk: low · class: execution · HITL]` (TASK-106)
 Layers: (verification — no source change)
@@ -101,6 +101,21 @@ run meets a HITL step and parks — proving the contract ships.
 - **A3** — T3 finds at most S-sized wording gaps. *Confirm: anything larger logs a scope-change before edits.*
 
 ## Execution Log
+
+### 2026-07-30 | T3 complete | cold read found 3 author-blind gaps — L-006 leg closed
+Fresh-context reader on the four SPRINT-034 surfaces: (1) "never bypasses the feed pipeline" read
+two ways (checks vs the feed skill itself) → "these routing checks"; (2) night-run.md Mode note
+claimed all of steps 1–4 map to ⛔ park rows — cold verification against Part 0's table found
+2-of-4 (G1/G2 row is conditional-✅, step 1 has no row) → rewritten via the derivation rule;
+(3) flow's bullet cited bare `night-run.md`, unresolvable from flow's own dir → path qualified.
+Core contract consistent across all four surfaces (launcher runs pre-flight · trigger last).
+Fixes applied inline (trivial wording, coordinator); qa-check at next commit gate.
+
+### 2026-07-30 | T1 complete | base-ref rule shipped + incident trace: CAUGHT
+T1 `858eb9d`. Trace: declared base at the 2026-07-30 spawn would have been 4a4ac71 (live HEAD);
+worktrees were cut from 3ce0ddd (session start) — mismatch → wave halts pre-spawn; the cherry-pick
+merges and the confused agent never happen. Cache updated to 1.19.0 in-session (A1 confirmed —
+`claude plugin update lean-flow@lean-flow`); T4 headless probe launched against it. T2 dispatched.
 
 ### 2026-07-30 | gates | batch G1+G2 signed off
 Fast-path G1 (same-session promote). G2: D1/D2 confirmed; **no worktree isolation** — L-055

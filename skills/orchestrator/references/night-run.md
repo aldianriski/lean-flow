@@ -93,8 +93,10 @@ decide; do not narrow, re-slice, or defer the work to get past it (that's scope-
 the same dodge Part 0 forbids the run itself from making).
 
 **Mode note.** Preparing is *not* an unattended activity — it is the interactive work that makes an
-unattended run legitimate. Steps 1–4 are exactly the items Part 0's boundary table marks ⛔ park, and
-they are legal here precisely *because* a human is present. That is the whole asymmetry: prepare with
+unattended run legitimate. Steps 1–4 are exactly the items Part 0's derivation rule makes HITL
+(approval · judgement · scope-changing): steps 2–3 hit explicit ⛔ rows; step 1 has no dedicated row
+but is judgement work; step 4's G1/G2 row is ✅ only-if-pre-signed — and unsigned means not yet
+approved, i.e. still HITL. All four are legal here precisely *because* a human is present. That is the whole asymmetry: prepare with
 a human, execute without one.
 
 ## Part 1 — Pre-flight pass (run interactively, the evening before)

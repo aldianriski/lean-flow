@@ -20,7 +20,7 @@ self-approve. No specialist agents: gates are inline checklists and review is a 
 | `mvp` | G1 + G2 | feature work, medium+, multi-step |
 | `sprint-bulk` | G1+G2 once | auto-loop the Active Sprint task list |
 
-**Intake routing — a mode keyword selects the mode, it never bypasses the feed pipeline.** Run these on every invocation, named mode or not:
+**Intake routing — a mode keyword selects the mode, it never bypasses these routing checks.** Run them on every invocation, named mode or not:
 - No tracked task → run `/task-decomposer` first, then return here.
 - Intent too **foggy to slice** (decisions unknown — no acceptance criteria writable yet) → `/task-decomposer` **fog-mode** (`--fog`): map the decisions before forcing tasks.
 - Task is in an **active sprint** → default to the sprint mode (or `quick` for a single one).
