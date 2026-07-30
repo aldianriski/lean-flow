@@ -67,9 +67,9 @@ installed plugin and asserts behavior — files written · state transitions · 
 prose; the captured answer decomposes the full suite or rejects it with a revisit-if.
 
 **DoD:**
-- [ ] the eval runs headless against the installed plugin, asserting behavior not prose (reuses the T4-036 fixture notes)
-- [ ] must-FAIL leg included (L-058): a fixture where the contract is violated is detected as FAIL
-- [ ] captured answer (harness shape · cost · worth-it) → decompose suite or reject with revisit-if; code deleted
+- [x] the eval runs headless against the installed plugin, asserting behavior not prose (reuses the T4-036 fixture notes)
+- [x] must-FAIL leg included (L-058): a fixture where the contract is violated is detected as FAIL
+- [x] captured answer (harness shape · cost · worth-it) → decompose suite or reject with revisit-if; code deleted
 
 ### T4 — Spec the capability preflight into Part 0 `[size: S · risk: low · class: decision · HITL]` (TASK-117)
 Layers: skills/orchestrator/references/night-run.md (Part 0 — after T2's Part 1 edit lands)
@@ -99,6 +99,28 @@ park HITL · cache mismatch → block unattended), delta-mapped against Part 0's
 - **A3** — T4 stays spec-only even if the spec is small enough to implement — wiring is a separate verified step (L-020). *Confirm: G2 holds the line.*
 
 ## Execution Log
+
+### 2026-07-30 | T3 complete | eval harness ADOPTED — feasible and cheap, on measured numbers
+Capture → `docs/research/behavioral-eval-feasibility.md`. One fixture ran clean on the **first**
+headless attempt (no grinding against the effort bound): throwaway fixture repo, real
+`claude -p "/orchestrator sprint-bulk unattended" --permission-mode dontAsk`, four **structural**
+assertions — DoD checkbox still `[ ]` · target file alive in tree *and* at HEAD · Part-4-shaped park
+record appended · no commit claiming completion. All four PASS. Nothing graded prose, which was the
+whole point (an LLM-judge harness was considered and rejected for exactly that).
+**Cost, measured not estimated:** $0.797 · ~140s · 14 turns, read off `--output-format json`'s own
+`total_cost_usd`/`usage` — no instrumentation to build. Reusable share is high: a ~40-line fixture
+skeleton plus a ~40-line POSIX-sh assertion script, parameterized by task id + target file, serve most
+boundary-table rows. Fixture setup needs **no** plugin install — the user-scope cache resolves the real
+skill from any cwd.
+**Honest limit on the verdict (recorded, not smoothed over):** the must-FAIL leg is the *synthetic*
+kind — a hand-built violating end-state fed to the same assertion script, all four correctly FAIL. That
+proves the assertions **discriminate** rather than rubber-stamp, which is L-058's point, but the harness
+has never yet caught a *real* run misbehaving. Until a genuinely violating run exists, this is validated
+assertion logic, not a proven regression gate. Named as the first open question in the capture.
+Cost caveat worth carrying: the run inherited the session's Opus tier because no `--model` was passed —
+an eval loop should pin the tier explicitly, so the $0.797 is an upper bound, not the suite's rate.
+Prototype deleted (fixture repo, synthetic bad-copy, assertion script, run JSON, and the stray handoff
+artifact it wrote to temp) — verified by the coordinator; the capture doc is the only survivor.
 
 ### 2026-07-30 | T4 complete | capability preflight spec'd — one of four checks rejected as already-covered
 L-017 delta map run **before** spec'ing, and it changed the deliverable: of the four proposed checks,
