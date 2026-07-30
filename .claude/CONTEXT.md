@@ -79,7 +79,7 @@ Route by **nature, not size — ambiguity & consequence up, volume & repetition 
 | `execution` → **Sonnet** *(dispatched)* | implement · recon (`Explore`) · council advisors + review · research |
 | `mechanical-ingest` → **Haiku** *(dispatched)* | bulk extraction · validation · triage · high-volume reads |
 
-**Fable = manual escalation, no dispatch row** — invoke by hand when execution fails twice or a fork is ADR-grade (opt. `/council`); **no automated ladder** (a fail point may dispatch a built-in — never a hook). Contract: spawn-with-brief — execution dispatch hands the subagent its **procedure skill** (runtime Skill invocation on a `general-purpose` agent), not a re-described brief; G1/G2 + review guard quality. Full doctrine → ADR-010; dispatch-by-classification + parallel/sequential → `orchestrator/references/dispatch.md`.
+**Fable = manual escalation, no dispatch row** — invoke by hand when execution fails twice or a fork is ADR-grade (opt. `/council`); **no automated ladder** (a fail point may dispatch a built-in — never a hook). Contract: spawn-with-brief — execution dispatch hands the subagent its **procedure skill** (runtime Skill invocation on a `general-purpose` agent), not a re-described brief; G1/G2 + review guard quality. Full doctrine → ADR-010; dispatch-by-classification + parallel/sequential + the **pre-dispatch preflight** (cycle · ownership · base-ref · waves) → `orchestrator/references/dispatch.md`.
 
 ## Sprint model
 

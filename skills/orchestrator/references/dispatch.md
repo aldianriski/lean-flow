@@ -45,6 +45,140 @@ note a manual verification step in its place; a silent skip is how spec-only deb
 **Drive with `/goal`.** Set a `/goal` equal to the task's done-when / acceptance so execution keeps working
 across turns until it is verifiably met (Goal-Driven Execution, native), then clear it at task end.
 
+## Pre-dispatch preflight (cycle · ownership · base-ref · waves)
+
+Runs before any wave-shape decision below — the Parallel-vs-sequential call is only as good as the
+tokens it's read from, so read them mechanically first. Derives four things from the three markup
+tokens every active-sprint Plan task already carries mandatorily (`### Tn` · `Layers:` ·
+`Depends-on:`) — no new file format, no second source of truth (ADR-013: a no-JSON preflight over
+this markup proved sufficient; a compiled DAG was rejected as a needless second SSOT):
+
+1. **Cycle check** — the `Depends-on` graph must be acyclic; a cycle means no valid dispatch order exists.
+2. **Shared-file single-owner check** — a file named in more than one task's `Layers:` needs an
+   ordering. A `Depends-on:` edge between the two tasks (either direction) makes it a PASS, with
+   ownership order derived from the edge; no edge between them is a FAIL — an unowned overlap, the
+   exact hazard concurrent dispatch creates.
+3. **Base-ref check** — the wave's declared base commit (stated up front, never assumed) must equal
+   live HEAD; drift means unrelated work landed since declaration (L-055's root cause).
+4. **Wave computation** — topological rank over the `Depends-on` DAG; rank 0 dispatches in parallel,
+   higher ranks wait behind a barrier.
+
+Any FAIL halts the wave and reports its own named finding — a bare "FAIL" doesn't tell a morning
+rollup which check tripped (L-058: a gate needs a must-FAIL fixture per check, proven on this one).
+
+Optional snippet, dependency-free POSIX sh, runnable verbatim on a sprint file (`$1`) and the
+declared base commit (`$2`). Run it bare — never piped into a formatter inside an `&&` chain; a
+POSIX pipeline's exit status is its last command's, so `check | tail && dispatch` would dispatch
+through a real FAIL (L-057). Its Plan-parsing loop is guarded (`read … || [ -n "$line" ]`) because an
+unguarded `while read` silently drops the file's last line — degrading check 2 to a false PASS on a
+real overlap (L-058's own finding):
+
+```sh
+#!/bin/sh
+# Dispatch preflight -- derives cycle / shared-file-ownership / base-ref / wave-rank
+# from a sprint's Plan (### Tn, Layers:, Depends-on:). Exit 0 = clear; exit >0 = halt.
+sprint="${1:?usage: preflight.sh <sprint.md> <declared-base-ref>}"
+declared_base="${2:?usage: preflight.sh <sprint.md> <declared-base-ref>}"
+[ -f "$sprint" ] || { echo "FAIL sprint-not-found: $sprint"; exit 1; }
+
+fail=0
+records=$(mktemp)
+trap 'rm -f "$records"' EXIT
+
+# --- base-ref check: declared base must equal live HEAD -----------------
+declared_sha=$(git rev-parse --verify -q "${declared_base}^{commit}" 2>/dev/null)
+live_sha=$(git rev-parse HEAD 2>/dev/null)
+if [ -z "$declared_sha" ] || [ "$declared_sha" != "$live_sha" ]; then
+  echo "FAIL base-ref-drift: declared base ($declared_base -> ${declared_sha:-unresolved}) != live HEAD ($live_sha)"
+  fail=1
+else
+  echo "PASS base-ref: declared base matches live HEAD ($live_sha)"
+fi
+
+# --- parse the Plan section: one guarded pass over the raw file ---------
+# Guard note (L-058): `read` on the file's last line returns non-zero if that
+# line has no trailing newline -- `|| [ -n "$line" ]` still lets the body run
+# once more for it, so a single-file Layers: entry on the final line survives.
+inplan=0; tid=""; layers=""; deps=""
+flush() { [ -n "$tid" ] && printf '%s\t%s\t%s\n' "$tid" "$layers" "$deps" >>"$records"; }
+while IFS= read -r line || [ -n "$line" ]; do
+  case "$line" in
+    "## Plan"*) inplan=1; continue ;;
+    "## "*) inplan=0 ;;
+  esac
+  [ "$inplan" = 1 ] || continue
+  case "$line" in
+    "### T"*)
+      flush
+      tid=$(printf '%s' "$line" | grep -oE '^### T[0-9]+' | sed 's/^### //')
+      layers=""; deps=""
+      ;;
+    "Layers:"*)
+      layers=$(printf '%s' "$line" | grep -oE '[A-Za-z0-9_./-]+\.[A-Za-z0-9]+' | tr '\n' ',')
+      ;;
+    "Depends-on:"*)
+      deps=$(printf '%s' "$line" | grep -oE 'T[0-9]+' | tr '\n' ',')
+      ;;
+  esac
+done < "$sprint"
+flush
+
+# --- cycle check + wave computation (topological rank) + shared-file check
+awk -F'\t' '
+{ order[NR]=$1; layers[$1]=$2; deps[$1]=$3; n=NR }
+END {
+  fail=0
+  for (i=1;i<=n;i++) rank[order[i]]=-1
+  for (iter=1; iter<=n+1; iter++) {
+    progress=0
+    for (i=1;i<=n;i++) {
+      t=order[i]
+      if (rank[t] != -1) continue
+      dl=deps[t]; ok=1; mx=-1
+      if (dl != "") {
+        m=split(dl,darr,",")
+        for (j=1;j<=m;j++) {
+          d=darr[j]; if (d=="") continue
+          if (rank[d]==-1) { ok=0; break }
+          if (rank[d]>mx) mx=rank[d]
+        }
+      }
+      if (ok) { rank[t]=mx+1; progress=1 }
+    }
+    if (!progress) break
+  }
+  cyc=""
+  for (i=1;i<=n;i++) { t=order[i]; if (rank[t]==-1) cyc=cyc" "t }
+  if (cyc != "") { print "FAIL cycle-detected: tasks unresolved ->" cyc; fail=1 }
+  else { line="PASS wave-computation:"; for (i=1;i<=n;i++) line=line" "order[i]"="rank[order[i]]; print line }
+
+  for (i=1;i<=n;i++) {
+    ti=order[i]; li=layers[ti]; if (li=="") continue
+    ni=split(li,fi,",")
+    for (j=i+1;j<=n;j++) {
+      tj=order[j]; lj=layers[tj]; if (lj=="") continue
+      nj=split(lj,fj,",")
+      for (a=1;a<=ni;a++) { if (fi[a]=="") continue
+        for (b=1;b<=nj;b++) { if (fj[b]=="") continue
+          if (fi[a]==fj[b]) {
+            edge=0
+            if (index(","deps[tj]",", ","ti",")>0) { edge=1; first=ti; second=tj }
+            else if (index(","deps[ti]",", ","tj",")>0) { edge=1; first=tj; second=ti }
+            if (edge) print "PASS shared-file-owned: "fi[a]" in "ti","tj" order="first"->"second
+            else { print "FAIL shared-file-unowned: "fi[a]" in "ti" and "tj" has no Depends-on edge"; fail=1 }
+          }
+        }
+      }
+    }
+  }
+  exit fail
+}' "$records"
+[ $? -ne 0 ] && fail=1
+
+[ "$fail" -eq 0 ] && echo "PREFLIGHT: CLEAR" || echo "PREFLIGHT: HALT"
+exit $fail
+```
+
 ## Parallel vs sequential
 
 Decide from the **G2 overlap-ownership map** — the same map that assigns shared-file single-owner + order:
