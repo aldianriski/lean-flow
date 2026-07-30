@@ -94,11 +94,14 @@ and reader, and lint them mandatory on active-sprint tasks (L-020: wired, not ju
 consumes them; `qa-check.sh` fails an active-sprint task missing a mandatory field.
 
 **DoD:**
-- [ ] CONTEXT.md § Task entry shape carries `depends-on:` + `class:` (decision | execution | mechanical-ingest)
-- [ ] writers updated: task-decomposer output shape · TODO.md header · SPRINT.md.template
-- [ ] readers updated: dispatch parallel-wave check uses `depends-on` · tier routing reads `class`
-- [ ] qa-check.sh fails an active-sprint task missing done-when · touches · state · class · depends-on-or-none · HITL/AFK
-- [ ] line caps hold (overflow → references/, ADR-006) · consumer-surface check (L-015)
+- [x] CONTEXT.md § Task entry shape carries `depends-on:` + `class:` (decision | execution | mechanical-ingest)
+- [x] writers updated: task-decomposer output shape · SPRINT.md.template (TODO.md: no schema
+      artifact exists there — CONTEXT.md owns the shape; grep-verified, no edit needed)
+- [x] readers updated: dispatch parallel-wave check uses `depends-on` · tier routing reads `class`
+- [x] qa-check.sh fails an active-sprint task missing a mandatory field (sprint-block equivalents:
+      class · HITL/AFK · Depends-on · Layers · Acceptance) — negative-tested per L-007
+- [x] line caps hold (CONTEXT 119/130 · decomposer 94/110) · consumer-surface check (L-015 —
+      reviewer caught one template leak, fixed in fa47d13)
 
 ### T6 — Decide the machine-state-artifact fork `[size: M · risk: med · class: decision · HITL]` (TASK-111)
 Layers: docs/adr/ · docs/DECISIONS.md · (verdict doc) — decision only, no runtime code
@@ -131,6 +134,16 @@ c: run-event log) with revisit-ifs; accepted items graduate to TASK-NNN, rejecte
 - **A4** — The three machine-state artifacts are one fork, councilled once. *Confirm: T6 council run — if the council splits the fork, log a scope-change.*
 
 ## Execution Log
+
+### 2026-07-30 | wave-2 complete | T5 landed + scoped review FIX-FIRST → fixed
+T5 `af6d951` (schema wired end-to-end, lint negative-tested). Fresh-context sonnet review on the
+diff: FIX-FIRST — (1) shipped SPRINT template comment cited `qa-check.sh` (maintainer-only tooling)
+= the exact L-015/TD-010 leak class T3 fixed this same sprint, reintroduced one task later;
+(2) autonomy lint false-positived on wrapped headers; (3) `depends-on:` alignment; (4) 244-char
+line reflow. All four fixed in `fa47d13`; qa-check 63/0. Informational (not blocking, for Retro):
+ADR-010's pre-advisory amendment wording could read as binding on a cold read — candidate for a
+future amendment pass. Retro candidate: the L-015 recurrence proves the fresh-context review pass
+earns its cost even inside the sprint that fixes the same class.
 
 ### 2026-07-30 | wave-1 complete | T2 landed — all four wave-1 tasks merged
 T2 `49831e9`: CONTEXT.md + README reworded; CLAUDE.md and ARCHITECTURE.md judged already precise
@@ -166,6 +179,13 @@ Six tasks pulled from Backlog (TASK-110…115 → T1…T6 in dependency order). 
 | `docs/research/harness-engineering-adaptation.md` | T4 | verdict: operational keepers, tracked | Low | table verdicts untouched |
 | `.claude/CONTEXT.md` | T2 | review-agent contradiction resolved | Low | qa-check caps 117/130 |
 | `README.md` | T2 | "no custom agent definitions" phrasing | Low | qa-check 57 pass |
+| `.claude/CONTEXT.md` | T5 | task shape: +`class:` +`depends-on:` | Med | cap 119/130 |
+| `skills/task-decomposer/SKILL.md` | T5 | writer sets both fields (advisory class) | Med | cap 94/110 |
+| `skills/lean-doc-generator/templates/SPRINT.md.template` | T5 | header meta + Depends-on line | Med | renders valid; leak fixed fa47d13 |
+| `skills/orchestrator/references/dispatch.md` | T5 | readers: waves ← depends-on · tier ← class | Med | review clean post-fix |
+| `scripts/qa-check.sh` | T5 | active-sprint mandatory-field lint | Med | negative test FAILs, restore PASSes |
+| `docs/QA.md` | T5 | new check documented | Low | drift guard passes |
+| `docs/sprint/SPRINT-035-contract-hardening.md` | T5 | mechanical header backfill | Low | L-009 re-read clean (review) |
 
 ## Retro
 
