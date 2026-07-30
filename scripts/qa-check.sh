@@ -272,7 +272,7 @@ for sp in docs/sprint/SPRINT-*.md; do
     [ -n "$tid" ] || return
     m=""
     printf '%s' "$blk" | grep -qE 'class: (decision|execution|mechanical-ingest)' || m="$m class"
-    printf '%s' "$blk" | grep -qE '\[[^]]*\b(HITL|AFK)\b[^]]*\]' || m="$m autonomy"
+    printf '%s' "$blk" | tr '\n' ' ' | grep -qE '\[[^]]*\b(HITL|AFK)\b[^]]*\]' || m="$m autonomy"
     printf '%s' "$blk" | grep -qE '^Depends-on:' || m="$m Depends-on"
     printf '%s' "$blk" | grep -qE '^Layers:' || m="$m Layers"
     printf '%s' "$blk" | grep -qE '\*\*Acceptance:\*\*' || m="$m Acceptance"

@@ -26,7 +26,7 @@ update_trigger: sprint execute/close events
      checkboxes are what /orchestrator sprint-bulk loops over and what /prime counts.
      Tasks sharing a file: fix single-owner + commit order in § Decisions (a D-row); at commit stage
      shared files per-hunk, never a plain `git add` over another task/stream's WIP (L-042/L-037).
-     Mandatory per block (qa-check.sh lints active-sprint tasks): header meta carries `class:`
+     Mandatory per block: header meta carries `class:`
      (decision | execution | mechanical-ingest — advisory default, dispatch may override, ADR-010)
      + an autonomy tag (HITL|AFK); plus a `Depends-on:` line, `Layers:`, and `**Acceptance:**`. -->
 

@@ -7,7 +7,9 @@ ambiguity/consequence up, volume/repetition down; ADR-010.)
 
 ## Route by classification (nature, not size)
 
-Each task carries a persisted `class:` field (advisory default set at decompose / G1). Dispatch reads it as the default — task *size* is irrelevant — but may override at dispatch time; ADR-010's dispatch-time classification stays authoritative:
+Each task carries a persisted `class:` field (advisory default set at decompose / G1). Dispatch reads it as
+the default — task *size* is irrelevant — but may override at dispatch time; ADR-010's dispatch-time
+classification stays authoritative:
 
 | Classification | Tier (default map) | Dispatched? | Runs on |
 |---|---|---|---|
