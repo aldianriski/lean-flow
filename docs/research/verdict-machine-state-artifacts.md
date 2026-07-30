@@ -1,3 +1,14 @@
+---
+owner: Maintainer
+last_updated: 2026-07-30
+update_trigger: ADR-013 revisit-if fires (run-state graduation/expiry, or a named run-event consumer)
+status: current
+id: verdict-machine-state-artifacts
+tags: [process, tooling]
+domain: skills
+related: [ADR-013, ADR-009, ADR-010]
+---
+
 # Council Verdict — machine-state artifacts (execution graph · run-state · run events)
 
 > SPRINT-035 T6 / TASK-111 · 2026-07-30 · base run: 5 advisors + 5 peer reviews + chairman (11 calls).
