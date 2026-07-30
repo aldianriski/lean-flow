@@ -35,9 +35,9 @@ never checked its own doc — add QA.md to the claim-consistency surface so drif
 **Acceptance:** QA.md matches the script's counts and a future divergence fails `qa-check.sh`.
 
 **DoD:**
-- [ ] docs/QA.md template-count row claims 2 non-core (DESIGN, QA-TESTCASE), matching `noncore=2`
-- [ ] qa-check.sh claim-consistency checks include docs/QA.md's own counts (mismatch → fail)
-- [ ] `sh scripts/qa-check.sh` passes
+- [x] docs/QA.md template-count row claims 2 non-core (DESIGN, QA-TESTCASE), matching `noncore=2`
+- [x] qa-check.sh claim-consistency checks include docs/QA.md's own counts (mismatch → fail)
+- [x] `sh scripts/qa-check.sh` passes
 
 ### T2 — Align agent-review terminology across surfaces `[size: S · risk: low]` (TASK-113)
 Layers: .claude/CONTEXT.md · .claude/CLAUDE.md · README.md · docs/ARCHITECTURE.md
@@ -48,9 +48,10 @@ reads as false to anyone watching subagents get dispatched. One wording sweep, f
 code review may dispatch built-in/ad-hoc isolated subagents; no custom agent definitions shipped.
 
 **DoD:**
-- [ ] CONTEXT.md contradiction replaced by the single precise statement
-- [ ] all four surfaces say "no custom agent definitions" — no bare "ships no agents" remains
-- [ ] qa-check passes (line caps hold — CONTEXT.md at 116/130)
+- [x] CONTEXT.md contradiction replaced by the single precise statement
+- [x] all four surfaces say "no custom agent definitions" — no bare "ships no agents" remains
+      (CLAUDE.md + ARCHITECTURE.md judged already precise, untouched — surgical)
+- [x] qa-check passes (line caps hold — CONTEXT.md at 117/130)
 
 ### T3 — Resolve TD-010: de-localize the shipped night-run reference `[size: S · risk: low]` (TASK-114)
 Layers: skills/orchestrator/references/night-run.md · TECH-DEBT.md
@@ -61,9 +62,9 @@ one-line rationale, drop the pointer.
 **Acceptance:** a consumer reading night-run.md cold hits zero unresolvable references.
 
 **DoD:**
-- [ ] both repo-local citations replaced by inline self-contained rationale
-- [ ] grep for `docs/` repo-local paths in the file comes back clean
-- [ ] TD-010 → `status: resolved → TASK-114` in TECH-DEBT.md
+- [x] both repo-local citations replaced by inline self-contained rationale
+- [x] grep for `docs/` repo-local paths in the file comes back clean
+- [x] TD-010 → `status: resolved → TASK-114` in TECH-DEBT.md
 
 ### T4 — Revise the harness-engineering verdict to name operational keepers `[size: S · risk: low]` (TASK-115)
 Layers: docs/research/harness-engineering-adaptation.md
@@ -74,8 +75,8 @@ scheduling/recovery state · maintenance recipe) are real and now tracked.
 **Acceptance:** the verdict reads "no new core stages, but operational keepers" with pointers.
 
 **DoD:**
-- [ ] verdict revised; keepers listed with pointers to TASK-111 / TASK-116
-- [ ] `sh scripts/gen-index.sh` re-run if ADR-009 metadata changed
+- [x] verdict revised; keepers listed with pointers to TASK-111 / TASK-116
+- [x] `sh scripts/gen-index.sh` re-run if ADR-009 metadata changed (metadata unchanged — skip correct)
 
 ### T5 — Harden the task schema with formal `depends-on:` and `class:` fields `[size: M · risk: med]` (TASK-110)
 Layers: .claude/CONTEXT.md · skills/task-decomposer · skills/orchestrator (+ references/dispatch.md) ·
@@ -125,6 +126,25 @@ c: run-event log) with revisit-ifs; accepted items graduate to TASK-NNN, rejecte
 
 ## Execution Log
 
+### 2026-07-30 | wave-1 complete | T2 landed — all four wave-1 tasks merged
+T2 `49831e9`: CONTEXT.md + README reworded; CLAUDE.md and ARCHITECTURE.md judged already precise
+("no agent definitions of its own" / "no shipped agent files") and left untouched — surgical over
+literal. qa-check 57/0. Wave 2 (T5) dispatching sequentially in the main tree — no worktree, so it
+sees T1's qa-check.sh changes and T2's CONTEXT.md state (both are T5 inputs per D3).
+
+### 2026-07-30 | wave-1 merge | T1 · T3 · T4 landed; T2 in flight
+Agent worktrees branched from session-start HEAD (pre-promote), so merge-back = cherry-pick
+(linear history kept): T3 `c073c97` · T1 `7e8e5c0` · T4 `da11d8a`. qa-check 57 pass / 0 fail
+including T1's new QA.md-vs-script drift guard. T4 note: its worktree lacked TASK-111/116
+TODO entries (branch-point artifact, present on main — no reconcile needed).
+
+### 2026-07-30 | gates | batch G1+G2 signed off; A3 resolved
+G1 fast-path (scope unchanged since same-session decompose approval). G2: D1–D3 confirmed;
+3-wave sequence (T1·T2·T3·T4 parallel worktrees → T5 → T6). **A3 resolved: `class:` is an
+advisory default** — decomposer persists the hint, dispatcher may override; ADR-010's
+dispatch-time classification stays authoritative (T5 encodes this wording). Wave 1 dispatched
+as 4 cheap-tier worktree-isolated subagents.
+
 ### 2026-07-30 | promote | plan locked
 Six tasks pulled from Backlog (TASK-110…115 → T1…T6 in dependency order). Governance scan clean
 (no L-promotions due · no TD aging · TODO.md 182-line cap accepted: close's archival drains it).
@@ -133,6 +153,13 @@ Six tasks pulled from Backlog (TASK-110…115 → T1…T6 in dependency order). 
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/QA.md` | T1 | claim matched to script (2 non-core) | Low | qa-check 57 pass |
+| `scripts/qa-check.sh` | T1 | drift guard: QA.md count vs `noncore` | Low | new check passes |
+| `skills/orchestrator/references/night-run.md` | T3 | W5 inline, repo-local refs dropped (L-015) | Low | grep `docs/` clean |
+| `TECH-DEBT.md` | T3 | TD-010 → resolved → TASK-114 | Low | L-009 re-read clean |
+| `docs/research/harness-engineering-adaptation.md` | T4 | verdict: operational keepers, tracked | Low | table verdicts untouched |
+| `.claude/CONTEXT.md` | T2 | review-agent contradiction resolved | Low | qa-check caps 117/130 |
+| `README.md` | T2 | "no custom agent definitions" phrasing | Low | qa-check 57 pass |
 
 ## Retro
 
