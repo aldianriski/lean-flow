@@ -114,9 +114,9 @@ TASK-040. Council it once; the verdict gates the whole v1.20 phase.
 c: run-event log) with revisit-ifs; accepted items graduate to TASK-NNN, rejected → `.out-of-scope/`.
 
 **DoD:**
-- [ ] `/council` run on the fork; `verdict-<slug>.md` written
-- [ ] ADR-NNN records the three per-artifact outcomes + revisit-ifs; DECISIONS.md row added
-- [ ] accepted → new TASK-NNN in Backlog · rejected → `.out-of-scope/<slug>.md`
+- [x] `/council` run on the fork; verdict → docs/research/verdict-machine-state-artifacts.md
+- [x] ADR-013 records the three per-artifact outcomes + revisit-ifs; DECISIONS.md row added
+- [x] accepted → TASK-118/119 (+ TASK-120 blocked w/ expiry) · rejected → `.out-of-scope/run-event-log.md`
 
 ## Decisions (pre-locked)
 
@@ -134,6 +134,15 @@ c: run-event log) with revisit-ifs; accepted items graduate to TASK-NNN, rejecte
 - **A4** — The three machine-state artifacts are one fork, councilled once. *Confirm: T6 council run — if the council splits the fork, log a scope-change.*
 
 ## Execution Log
+
+### 2026-07-30 | T6 complete | council verdict ratified → ADR-013
+Base run 11 calls (moderator + fact-verify both skipped: genuine split, pure judgment fork).
+Verdict: (a) adopt w/ 3 conditions + no-JSON rung first · (b) defer w/ graduation contract +
+5-sprint expiry · (c) reject. Owner ratified as recommended; A4 held — the council treated the
+three as one fork without splitting it. Routed: TASK-118 (base-ref rule) · TASK-119 (no-JSON
+preflight prototype, depends-on 118) · TASK-120 (blocked, expiry SPRINT-040) ·
+.out-of-scope/run-event-log.md. New backlog entries dogfood T5's class:/depends-on: fields.
+Peer review's all-missed catch (no kill-switch on DEFER items) became ADR-013's expiry clause.
 
 ### 2026-07-30 | wave-2 complete | T5 landed + scoped review FIX-FIRST → fixed
 T5 `af6d951` (schema wired end-to-end, lint negative-tested). Fresh-context sonnet review on the
@@ -186,6 +195,9 @@ Six tasks pulled from Backlog (TASK-110…115 → T1…T6 in dependency order). 
 | `scripts/qa-check.sh` | T5 | active-sprint mandatory-field lint | Med | negative test FAILs, restore PASSes |
 | `docs/QA.md` | T5 | new check documented | Low | drift guard passes |
 | `docs/sprint/SPRINT-035-contract-hardening.md` | T5 | mechanical header backfill | Low | L-009 re-read clean (review) |
+| `docs/research/verdict-machine-state-artifacts.md` | T6 | council verdict (durable — ADR refs it) | Low | — |
+| `docs/adr/ADR-013-machine-state-artifacts.md` + `docs/DECISIONS.md` | T6 | the fork decided, indexed | Med | template-conform |
+| `TODO.md` (TASK-118/119/120) + `.out-of-scope/run-event-log.md` | T6 | graduation + rejection routed | Low | L-009 re-read + qa-check |
 
 ## Retro
 

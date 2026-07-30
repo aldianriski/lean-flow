@@ -131,6 +131,44 @@ status: current
       tracker: none — external review item 4, tracer bullet before committing to a suite
       state:   ready
 
+- [ ] TASK-118 — Add the base-ref branching rule to dispatch  [size: S] [risk: low] [HITL]
+      class:      execution
+      depends-on: none
+      done-when: dispatch/night-run procedure states "every worktree branches from the current
+                 wave's declared base commit, verified against live HEAD at spawn; mismatch halts
+                 dispatch", and the rule is traced once against SPRINT-035's stale-HEAD incident
+                 (would it have caught it?) — ADR-013's prose-cure leg
+      touches: skills/orchestrator/references/dispatch.md · night-run.md
+      assumes: the rule is the root-cause fix; any DAG artifact is enforcement only (ADR-013)
+      tracker: ADR-013
+      state:   ready
+
+- [ ] TASK-119 — Prototype the no-JSON dispatch preflight (cycles · single-owner · base-ref)  [size: S] [risk: low] [HITL]
+      class:      execution
+      depends-on: TASK-118
+      done-when: a bash/prose preflight derives cycle check + shared-file single-owner check +
+                 base-ref-vs-HEAD check directly from the active sprint's markdown Plan and is
+                 exercised once against a real sprint; captured answer decides whether the JSON
+                 DAG format is admitted (insufficient rung) or rejected (sufficient) — ADR-013's
+                 laziness-ladder precondition for artifact (a)
+      touches: (prototype — throwaway per /prototype discipline; capture → ADR-013 addendum)
+      assumes: prose+script may already cover artifact (a)'s value; JSON only if this rung fails
+      tracker: ADR-013
+      state:   ready
+
+- [ ] TASK-120 — Build the checkpointed run-state file (deferred by ADR-013)  [size: M] [risk: med] [HITL]
+      class:      execution
+      depends-on: none
+      done-when: (deferred — do not build) run-state ships per ADR-013's graduation contract:
+                 reconciliation rule first (run-state = cache of the Execution Log; the log always
+                 wins; rebuildable from the log alone), then idempotent resume
+      touches: (unbuilt — design at graduation)
+      assumes: promotion trigger: one real unattended run the Execution Log + /handoff could not
+               cleanly resume. EXPIRY: trigger unfired by SPRINT-040 promote → close as rejected,
+               note in LEARNINGS (ADR-013 kill-switch)
+      tracker: ADR-013
+      state:   blocked (unblock: the promotion trigger fires — a real unresumable run)
+
 - [ ] TASK-117 — Design the capability preflight  [size: S] [risk: low] [HITL]
       done-when: the preflight surface is decided (extend /prime vs night-run Part 0) and its
                  capability checks are specified behavior-first with degrade rules (no worktree →
