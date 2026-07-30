@@ -65,7 +65,7 @@ fixture shape, so it should cost a row rather than a mechanism).
 fixture where a genuinely violating run is caught, at a cost measured at the tier it will really run.
 
 **DoD:**
-- [ ] one fixture per Part 0 boundary-table row, reusing the prototype's skeleton + assertion script
+- [x] one fixture per Part 0 boundary-table row, reusing the prototype's skeleton + assertion script
 - [ ] **a real violating fixture** — an actual run that misbehaves is detected, not just a hand-built
       end-state (this is the leg TASK-116 explicitly did not cover)
 - [x] `--model` pinned; suite cost re-measured at that tier (the $0.797 figure is an Opus upper bound)
@@ -136,6 +136,39 @@ as though intake classification is binding.
   choosing a procedure step), it earns an ADR before it ships.*
 
 ## Execution Log
+
+### 2026-07-30 | T2b + T2c complete | boundary rows covered, then the fixtures actually retained
+**T2b covered 3 reachable rows** across 2 runs ($1.667 measured, `sonnet` pinned, no 529s): residual
+grill / `AskUserQuestion` (`SPRINT-902`), and `close` §11-retention + `close` doc-freshness batched into
+one `SPRINT-903` run since both are `close`'s park-bound legs and genuinely co-occur. Reachability
+honestly reported rather than faked — **6 rows get no fixture, each with a reason**: `promote` sign-off
+and sprint render, `/triage`, and `migrate`/`init` are unreachable from `sprint-bulk` (they live in other
+skills); mid-sprint `scope-change` was excluded because "is this scope-changing" is a judgement, not a
+markup token, and Part A already showed this class resists fixture steering; `release-patch` push was
+excluded because a throwaway repo has no remote, so "no push occurred" is **vacuously** true — the exact
+L-057 trap of a check that runs but cannot check. Good calls, all of them.
+**Coordinator caught a real defect in T2b, and it was partly mine.** T2b checked in **nothing** — 66
+lines of README prose, zero fixtures, the repos left in scratch to die with the session. That is the
+precise pattern promoted into CLAUDE.md *this sprint* ("retain those fixtures — deleting them with the
+prototype leaves the gate unguarded"), and DoD 1 says "reusing the skeleton + assertion script", which
+requires something reusable to exist. Root cause: **T2a set the precedent** ("no fixture files committed
+for this class") and the coordinator committed it without challenge, so T2b followed a standing decision
+rather than inventing a bad one. The distinction that should have been drawn at T2a: three separable
+things — the fixture **input** (deterministic, retainable) · the **assertions** over a finished run's
+artifacts (deterministic, retainable) · the **headless run** (nondeterministic and costly, correctly
+on-demand). Conflating them justified retaining nothing.
+**T2c salvaged it at zero API cost** — the scratch repos were still intact. Retained: both fixture
+skeletons under `evals/fixtures/boundary-rows/`, machine-specifics stripped (extracted from each scratch
+repo's *initial* commit, not its post-run HEAD — the right call), plus `assert-boundary-park.sh` and a
+**10-leg self-test** (5 must-PASS + 5 must-FAIL per fixture kind) that proves the assertions discriminate
+without spending a cent. All green.
+**Third silent-false-negative caught by a must-FAIL leg this sprint.** T2c's own kind-detection keyed off
+the sprint file's canonical path, so the `archive-moved` mutation broke detection *before* the check could
+fire — `unknown-fixture` instead of `FAIL archive-moved`. A positive-only test would have shipped it. It
+also fixed a no-op `git commit` that silently dropped the completion-claimed mutation (`--allow-empty`).
+L-058 now has three independent live confirmations inside one sprint.
+DoD 1 ticked on the reachable-rows reading with the 6 exclusions recorded above. **DoD 2 remains open** —
+the A2-sanctioned gap, ratified by the owner.
 
 ### 2026-07-30 | T2a | harness home settled · TD-012 closed · a violating run could NOT be induced
 Home: **`evals/` is permanent** (was provisional). WHY recorded in `evals/README.md`: `scripts/`
