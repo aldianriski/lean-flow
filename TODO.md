@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-040 — Freshness Row and Park Records** → docs/sprint/SPRINT-040-freshness-and-park-records.md
+_(none active)_ — SPRINT-040 closed 2026-07-30 (v1.23.0). Next: `/lean-doc-generator promote` from the Backlog below.
 
 ---
 
@@ -32,43 +32,6 @@ status: current
 
 ### P2 — Quality / Polish
 
-- [ ] TASK-127 — Report installed-skill freshness in the /prime health line  [size: S] [risk: low] [HITL]
-      class:      execution
-      done-when:  /prime emits a `Skills:` row comparing the base-dir version from its own invocation
-                  header against `.claude-plugin/plugin.json` — printing `fresh`, `STALE — reinstall
-                  before trusting any procedure`, or `n/a (no local plugin repo)`; the STALE branch is
-                  demonstrated actually firing against a manifest whose version differs (a freshness
-                  row that can only print `fresh` is the silent false-negative L-058 names), and the
-                  n/a branch against a repo with no plugin manifest
-      touches:    skills/prime/SKILL.md (read order + Steps + Output format + version bump) · README
-                  /prime blurb + CHANGELOG (user-visible) · TECH-DEBT.md TD-015 resolution
-      depends-on: none
-      assumes:    version-only by decision — the unbumped-content-edit blind spot is accepted here and
-                  stays covered on the unattended path by night-run.md's content-first check; the
-                  base-dir version is readable at runtime (verified live) and covers the whole roster
-                  (one version-scoped install root); a consumer with no plugin checkout gets `n/a`,
-                  never a false alarm (L-015)
-      tracker:    TD-015
-      state:      ready
-
-- [ ] TASK-128 — Make migrate/init write a park record when they decline unattended  [size: M] [risk: med] [HITL]
-      class:      execution
-      done-when:  a headless `migrate` and a headless `init` that hit a per-item approval each produce
-                  the Part 0 step-2 artifact — a park record in the `/handoff` doc naming the parked
-                  item and its unblock condition — instead of declining in prose only; proven by
-                  re-running the retained `migrate-park` and `init-park` fixtures and reading the
-                  handoff doc at the path the run prints; `assert-noaction-park.sh`'s in-repo negative
-                  half still passes unchanged, and each fixture's README stops recording the gap as
-                  observed
-      touches:    skills/lean-doc-generator/SKILL.md § Unattended (≈4 lines of cap headroom — overflow
-                  goes to references/, ADR-006) · evals/fixtures/*-park READMEs · TECH-DEBT.md TD-017
-                  resolution
-      depends-on: none
-      assumes:    the positive half is verified from the temp-dir handoff artifact, not asserted
-                  in-repo (assert-noaction-park.sh deliberately covers only the deterministic in-repo
-                  half); two real headless runs cost ≈$0.4–0.5 each (SPRINT-039 T1 measured)
-      tracker:    TD-017
-      state:      ready
 
 ### P3 — Long-term
 
