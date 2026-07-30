@@ -25,10 +25,14 @@ update_trigger: sprint execute/close events
 <!-- One block per task. Pull these from TODO.md Backlog at promote (dependency order). The DoD
      checkboxes are what /orchestrator sprint-bulk loops over and what /prime counts.
      Tasks sharing a file: fix single-owner + commit order in § Decisions (a D-row); at commit stage
-     shared files per-hunk, never a plain `git add` over another task/stream's WIP (L-042/L-037). -->
+     shared files per-hunk, never a plain `git add` over another task/stream's WIP (L-042/L-037).
+     Mandatory per block (qa-check.sh lints active-sprint tasks): header meta carries `class:`
+     (decision | execution | mechanical-ingest — advisory default, dispatch may override, ADR-010)
+     + an autonomy tag (HITL|AFK); plus a `Depends-on:` line, `Layers:`, and `**Acceptance:**`. -->
 
-### T1 — [verb-first title] `[size: M · risk: med]` [CUSTOMIZE]
+### T1 — [verb-first title] `[size: M · risk: med · class: execution · HITL]` [CUSTOMIZE]
 Layers: [files / modules this touches]
+Depends-on: [Tn / TASK-NNN list, or none]
 [1–3 sentences of WHY + the approach — never step-by-step HOW.]
 
 **Acceptance:** [one observable, human-verifiable outcome — "done when …"]
@@ -39,7 +43,7 @@ Layers: [files / modules this touches]
 <!-- QA (suggestion, never a gate): does this task want tests (type → tdd/references/test-strategy.md),
      a lint / security-review pass, or a perf budget? Note it here; the Review step raises the same prompt. -->
 
-### T2 — [verb-first title] `[size: S · risk: low]` [CUSTOMIZE]
+### T2 — [verb-first title] `[size: S · risk: low · class: execution · AFK]` [CUSTOMIZE]
 …
 
 ## Owner-action checklist

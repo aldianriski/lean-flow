@@ -7,7 +7,7 @@ ambiguity/consequence up, volume/repetition down; ADR-010.)
 
 ## Route by classification (nature, not size)
 
-Each task was already classified at decompose / G1. Dispatch follows that classification — task *size* is irrelevant:
+Each task carries a persisted `class:` field (advisory default set at decompose / G1). Dispatch reads it as the default — task *size* is irrelevant — but may override at dispatch time; ADR-010's dispatch-time classification stays authoritative:
 
 | Classification | Tier (default map) | Dispatched? | Runs on |
 |---|---|---|---|
@@ -47,11 +47,12 @@ across turns until it is verifiably met (Goal-Driven Execution, native), then cl
 
 Decide from the **G2 overlap-ownership map** — the same map that assigns shared-file single-owner + order:
 
-- **Parallel** — a task with **no shared file AND no `depends-on`** is independent. Dispatch independent
-  tasks concurrently by issuing **multiple Agent calls in a single assistant message** (they run as
-  background sub-agents). This is the speed win of `sprint-bulk`.
-- **Sequential** — a task that **shares a file** (per the overlap map) or has a `depends-on` runs after its
-  predecessor, in the ownership/commit order; stage shared files per-hunk (`git add -p`) — promoted rule.
+- **Parallel** — a task with **no shared file AND a persisted `Depends-on: none`** is independent. Dispatch
+  independent tasks concurrently by issuing **multiple Agent calls in a single assistant message** (they run
+  as background sub-agents). This is the speed win of `sprint-bulk`.
+- **Sequential** — a task that **shares a file** (per the overlap map) or has a persisted `Depends-on:` list
+  runs after its predecessor, in the ownership/commit order; stage shared files per-hunk (`git add -p`) —
+  promoted rule.
 
 Group the Plan into **parallel batches separated by sequential barriers**: fan out each batch of independent
 tasks in one message, await it, then the next. Worktree isolation for a parallel batch is **first-class —

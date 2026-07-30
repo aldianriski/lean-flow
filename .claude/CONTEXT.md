@@ -106,8 +106,10 @@ CONTEXT rule · skill red-flag); age TD; doc-aging. Propose → approve, never s
 
 ```
 - [ ] TASK-NNN — <verb-first title>  [size: M] [risk: med] [HITL|AFK]
+      class:     decision | execution | mechanical-ingest   (advisory default — dispatch may override, ADR-010)
       done-when: <observable outcome>
       touches:   <files / layers>
+      depends-on:<TASK-NNN/Tn list, or none>
       assumes:   <key assumptions, or none>
       tracker:   <ticket URL, or none — justification>
       state:     ready | needs-info | blocked   (Backlog only; set by /triage)

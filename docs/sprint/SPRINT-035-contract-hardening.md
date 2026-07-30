@@ -27,8 +27,9 @@ graduate to v1.20 tasks) · behavioral eval suite (TASK-116, Backlog) · capabil
 
 ## Plan
 
-### T1 — Fix the QA template-count claim and lint QA.md against qa-check.sh `[size: S · risk: low · AFK]` (TASK-112)
+### T1 — Fix the QA template-count claim and lint QA.md against qa-check.sh `[size: S · risk: low · class: execution · AFK]` (TASK-112)
 Layers: docs/QA.md · scripts/qa-check.sh
+Depends-on: none
 docs/QA.md claims 1 non-core template; the script defines 2 (DESIGN, QA-TESTCASE). The QA system
 never checked its own doc — add QA.md to the claim-consistency surface so drift fails the run.
 
@@ -39,8 +40,9 @@ never checked its own doc — add QA.md to the claim-consistency surface so drif
 - [x] qa-check.sh claim-consistency checks include docs/QA.md's own counts (mismatch → fail)
 - [x] `sh scripts/qa-check.sh` passes
 
-### T2 — Align agent-review terminology across surfaces `[size: S · risk: low]` (TASK-113)
+### T2 — Align agent-review terminology across surfaces `[size: S · risk: low · class: execution · HITL]` (TASK-113)
 Layers: .claude/CONTEXT.md · .claude/CLAUDE.md · README.md · docs/ARCHITECTURE.md
+Depends-on: none
 CONTEXT.md both claims isolated `/code-review` passes and "no review agent"; "ships no agents"
 reads as false to anyone watching subagents get dispatched. One wording sweep, four files.
 
@@ -53,8 +55,9 @@ code review may dispatch built-in/ad-hoc isolated subagents; no custom agent def
       (CLAUDE.md + ARCHITECTURE.md judged already precise, untouched — surgical)
 - [x] qa-check passes (line caps hold — CONTEXT.md at 117/130)
 
-### T3 — Resolve TD-010: de-localize the shipped night-run reference `[size: S · risk: low]` (TASK-114)
+### T3 — Resolve TD-010: de-localize the shipped night-run reference `[size: S · risk: low · class: execution · HITL]` (TASK-114)
 Layers: skills/orchestrator/references/night-run.md · TECH-DEBT.md
+Depends-on: none
 Two citations point at `docs/research/night-run.md`, which doesn't exist in a consumer's repo —
 the L-015 leak class. Apply the W5 treatment already used in `prime` and `dispatch.md`: inline the
 one-line rationale, drop the pointer.
@@ -66,8 +69,9 @@ one-line rationale, drop the pointer.
 - [x] grep for `docs/` repo-local paths in the file comes back clean
 - [x] TD-010 → `status: resolved → TASK-114` in TECH-DEBT.md
 
-### T4 — Revise the harness-engineering verdict to name operational keepers `[size: S · risk: low]` (TASK-115)
+### T4 — Revise the harness-engineering verdict to name operational keepers `[size: S · risk: low · class: execution · HITL]` (TASK-115)
 Layers: docs/research/harness-engineering-adaptation.md
+Depends-on: none
 The "no keepers" verdict conflated conceptual equivalence with operational equivalence. The
 techniques map to existing surfaces, but the operational gaps (evals · machine-readable
 scheduling/recovery state · maintenance recipe) are real and now tracked.
@@ -78,9 +82,10 @@ scheduling/recovery state · maintenance recipe) are real and now tracked.
 - [x] verdict revised; keepers listed with pointers to TASK-111 / TASK-116
 - [x] `sh scripts/gen-index.sh` re-run if ADR-009 metadata changed (metadata unchanged — skip correct)
 
-### T5 — Harden the task schema with formal `depends-on:` and `class:` fields `[size: M · risk: med]` (TASK-110)
+### T5 — Harden the task schema with formal `depends-on:` and `class:` fields `[size: M · risk: med · class: execution · HITL]` (TASK-110)
 Layers: .claude/CONTEXT.md · skills/task-decomposer · skills/orchestrator (+ references/dispatch.md) ·
 skills/lean-doc-generator/templates/SPRINT.md.template · TODO.md header · scripts/qa-check.sh · docs/QA.md
+Depends-on: T1, T2
 Fleet scheduling and tier routing both assume per-task fields (`depends-on`, classification) that
 no writer persists — the schema/runtime mismatch. Make the two fields canonical, wire every writer
 and reader, and lint them mandatory on active-sprint tasks (L-020: wired, not just present).
@@ -95,8 +100,9 @@ consumes them; `qa-check.sh` fails an active-sprint task missing a mandatory fie
 - [ ] qa-check.sh fails an active-sprint task missing done-when · touches · state · class · depends-on-or-none · HITL/AFK
 - [ ] line caps hold (overflow → references/, ADR-006) · consumer-surface check (L-015)
 
-### T6 — Decide the machine-state-artifact fork `[size: M · risk: med]` (TASK-111)
+### T6 — Decide the machine-state-artifact fork `[size: M · risk: med · class: decision · HITL]` (TASK-111)
 Layers: docs/adr/ · docs/DECISIONS.md · (verdict doc) — decision only, no runtime code
+Depends-on: none
 Execution graph, checkpointed run-state, and structured run events are one fork: the first
 machine-readable state files in a markdown-first plugin — the same axis council-2 held on
 TASK-040. Council it once; the verdict gates the whole v1.20 phase.

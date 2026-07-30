@@ -35,7 +35,7 @@ For a ticket, fetch the description first (ask the user to paste if credentials 
 
    Stop when the goal is unambiguous. **Synthesize from context instead of re-interviewing ONLY when step 2's registry comes back with zero open assumptions** (a design discussion just happened and nothing is open); otherwise grill the open ones.
 2. **Assumption registry** — list every assumption that affects behavior (auth model, data shape, third-party limits). Confirm the risky ones explicitly.
-3. **Decompose into tracer-bullet vertical slices** — each task is a thin path through *every* layer end-to-end (schema → API → UI → tests), independently demoable. Prefer many thin slices over few thick ones; record `depends-on`. Horizontal layers ("write all the models", "all the tests") are NOT valid tasks.
+3. **Decompose into tracer-bullet vertical slices** — each task is a thin path through *every* layer end-to-end (schema → API → UI → tests), independently demoable. Prefer many thin slices over few thick ones; record `depends-on` (or `none`). Set `class:` by nature — ambiguity/consequence → `decision` · implement/research → `execution` · bulk mechanical reads/extraction → `mechanical-ingest`; it's an advisory default the dispatcher may override (ADR-010). Horizontal layers ("write all the models", "all the tests") are NOT valid tasks.
 4. **Risk score** — per task, rate impact × likelihood (low / med / high); note the blast radius (files / layers touched).
 5. **Classify HITL / AFK** — `HITL` = a human must review the output before proceeding; `AFK` = autonomous completion is safe (acceptance is mechanically checkable · no irreversible side effects · no product/UX judgment call · spec is durable). Default to `HITL` when uncertain. **For `AFK` tasks, spec durably** — an AFK task may sit in the backlog for weeks before an agent picks it up: write behavioral contracts (name the types / interfaces / config shapes to change) + testable acceptance + explicit out-of-scope; **never reference file paths or line numbers** — they go stale.
 6. **Validate** — every task has an observable acceptance criterion ("done when …"); no two tasks share identical criteria (merge or differentiate). For multi-slice breakdowns, run the **breakdown quiz** (reference) — confirm granularity, dependencies, merge/split, HITL/AFK — before Write.
@@ -56,10 +56,12 @@ normally. Full artifact + loop → `${CLAUDE_SKILL_DIR}/references/fog-map.md`.
 
 ```
 - [ ] TASK-042 — <verb-first title>  [size: M] [risk: med] [HITL]
-      done-when: <observable outcome>
-      touches: <files / layers>
-      assumes: <key assumptions>
-      state:   ready | needs-info   (set ready only if done-when is concrete)
+      class:      decision | execution | mechanical-ingest   (advisory default — dispatch may override, ADR-010)
+      done-when:  <observable outcome>
+      touches:    <files / layers>
+      depends-on: <TASK-NNN/Tn list, or none>
+      assumes:    <key assumptions>
+      state:      ready | needs-info   (set ready only if done-when is concrete)
 ```
 
 Set the initial `state:` (`ready` if the done-when is concrete, else `needs-info`). Re-prioritising,

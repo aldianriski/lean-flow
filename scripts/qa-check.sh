@@ -258,6 +258,44 @@ else
   note "skip (missing): docs/LEARNINGS.md"
 fi
 
+# --- 11. Active-sprint task schema: class + autonomy + Depends-on mandatory (TASK-110) -----
+# Every `### Tn` Plan block in an ACTIVE sprint (status: active) must carry: class: (one of the
+# three values) + an autonomy tag (HITL|AFK) in its header meta · a `Depends-on:` line ·
+# `Layers:` · `**Acceptance:**`. Missing any → FAIL naming the block.
+for sp in docs/sprint/SPRINT-*.md; do
+  [ -f "$sp" ] || { note "skip (missing): docs/sprint/SPRINT-*.md"; continue; }
+  st=$(fmv "$sp" status)
+  [ "$st" = "active" ] || continue
+  plan=$(awk '/^## Plan/{f=1;next} /^## /{f=0} f' "$sp")
+  tid=""; blk=""
+  check_block() {
+    [ -n "$tid" ] || return
+    m=""
+    printf '%s' "$blk" | grep -qE 'class: (decision|execution|mechanical-ingest)' || m="$m class"
+    printf '%s' "$blk" | grep -qE '\[[^]]*\b(HITL|AFK)\b[^]]*\]' || m="$m autonomy"
+    printf '%s' "$blk" | grep -qE '^Depends-on:' || m="$m Depends-on"
+    printf '%s' "$blk" | grep -qE '^Layers:' || m="$m Layers"
+    printf '%s' "$blk" | grep -qE '\*\*Acceptance:\*\*' || m="$m Acceptance"
+    if [ -n "$m" ]; then bad "$sp $tid missing:$m"; else ok "$sp $tid schema complete"; fi
+  }
+  while IFS= read -r line; do
+    case "$line" in
+      "### "*)
+        check_block
+        tid=$(printf '%s' "$line" | grep -oE '^### T[0-9]+')
+        blk="$line"
+        ;;
+      *)
+        blk="$blk
+$line"
+        ;;
+    esac
+  done <<PLANEOF
+$plan
+PLANEOF
+  check_block
+done
+
 # --- Summary ----------------------------------------------------------------
 printf '\n----------------------------------------\n'
 printf 'QA-CHECK: %s pass, %s fail\n' "$pass" "$fail"
