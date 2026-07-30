@@ -16,7 +16,7 @@ status: current
 
 ## Tech Debt
 
-- **TD-019** severity: minor | status: open | created: Sprint-040
+- **TD-019** severity: minor | status: resolved → SPRINT-041 T1 | created: Sprint-040
   - Summary: the park-record behaviour SPRINT-040 T2 shipped has **no retained guard**. Its positive
     half — that a headless `migrate`/`init` writes a `/handoff` park record — was verified by two real
     runs whose artifacts land at machine-specific `%TEMP%` paths, so `assert-noaction-park.sh`
