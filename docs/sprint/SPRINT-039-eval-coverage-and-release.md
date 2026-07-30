@@ -4,7 +4,7 @@ slug: eval-coverage-and-release
 owner: Maintainer
 last_updated: 2026-07-30
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: 329b9ba
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
