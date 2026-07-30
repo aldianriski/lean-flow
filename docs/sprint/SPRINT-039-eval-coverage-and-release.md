@@ -3,7 +3,7 @@ sprint: 039
 slug: eval-coverage-and-release
 owner: Maintainer
 last_updated: 2026-07-30
-status: active
+status: closed
 plan_commit: 329b9ba
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -221,19 +221,14 @@ must never pass). Second, narrower: `no-push` read a non-repo `origin` as "zero 
 false-negative waiting to happen — and the must-FAIL leg that would expose it is the one testing the
 *named* violation, not an adjacent one (deletion ≠ mutation).
 
-**Accepted, not fixed:** the `claim_pattern` commit-message regex is brittle both ways
-(`"chore: release finalized"` evades; `"doc-freshness review … approved"` false-trips), but every row
+**Accepted, not fixed:** the `claim_pattern` commit-message regex is brittle both ways, but every row
 it touches has a structural non-text check carrying the safety property — tightening a non-load-bearing
 heuristic adds brittleness for no gain.
 
-**Two items for the close buckets** (surfaced here, filed at close, not by the subagent):
-1. **TD candidate** — `migrate`/`init` correctly *withheld* unauthorized writes but wrote **no park
-   record and no handoff doc**, unlike `promote`/`triage` which ran Part 0's protocol formally. The
-   safety property held; the observability contract did not. A real overnight run parking there leaves
-   the morning maintainer no trace it ran. L-020's class (shipped ≠ wired at every entry point).
-2. **L candidate** — on Windows/Git-Bash, `claude -p "/triage"` gets MSYS-path-mangled into a Windows
-   path before reaching `claude.exe`; `MSYS_NO_PATHCONV=1` fixes it. Cost one run to find. Same family
-   as L-060 (shell-boundary mangling that fails silently and reports success).
+**Two items for the close buckets** (surfaced here, filed at close): `migrate`/`init` withheld
+unauthorized writes but wrote **no park record or handoff doc**, unlike `promote`/`triage` — safety
+held, observability didn't (→ `TD-017`); and Windows/Git-Bash MSYS path-mangling of a bare `/skill`
+prompt, cost one run to find (→ `L-067`).
 
 ### 2026-07-30 | T3 | TD-013 resolved — 5 zero-API harnesses gated; qa-check 61→66 pass, 44s→84s
 New leg 12 loops the 5 zero-API harnesses, capturing each one's status by **command substitution**
@@ -294,16 +289,12 @@ future *paid* harness into an always-on gate, which is worse than the gap. Negat
 check (a dummy `run-fake-unwired.sh` → `FAIL eval harness run-fake-unwired.sh: … neither gated nor
 explicitly excluded`, 67 pass/1 fail; green after removal).
 
-**Two items accepted, not fixed:** (a) `assert-boundary-park.sh`'s `grep -c … || echo 0` yields
-`"0\n0"` on a genuine zero-match, emitting a confusing stderr error beside a legitimate FAIL —
-verified to **fail safe in both directions** (zero matches → the correct `FAIL no-park-record`; a real
-match exits 0 so the fallback never fires), so it is noise, not a wrong verdict → nit at close.
-(b) The `claim_pattern` brittleness from T1's review, unchanged.
+**Accepted, not fixed** (both → close buckets): `assert-boundary-park.sh`'s `grep -c … || echo 0`
+noise — verified fail-safe both directions → `TD-018`; and T1's `claim_pattern` brittleness, unchanged.
 
-**Budget: over the approved ceiling.** T1 $3.3541 + T2 $2.6103 + ~$0.36 diagnostics ≈ **$6.32**
-against the ~$4–5 signed off at G2. Driver: T2 run 2 cost $2.0665 (45 turns) versus the ~$0.30–0.45
-per-run figure the Plan assumed — a full sprint-bulk→close chain, not a single park. Surfaced, not
-absorbed; T4 spends nothing, so nothing downstream is blocked.
+**Budget over ceiling: ≈$6.32 vs the ~$4–5 signed off at G2** (T1 $3.3541 + T2 $2.6103 + ~$0.36
+diagnostics). Driver: T2 run 2 at $2.0665/45 turns vs the Plan's assumed ~$0.30–0.45 — a full
+sprint-bulk→close chain, not a single park. See § Retro Friction.
 
 ### 2026-07-30 | T4 | v1.22.0 shipped for SPRINT-038; one DoD line owner-pending
 Consumer-facing block written against the diff, not the sprint file: `git diff --stat add96ff b2a3241`
@@ -357,12 +348,50 @@ of a boundary) and L-020's (shipped, but not wired into every entry point). → 
 | `docs/knowledge-index.md` | promote | regenerated after LEARNINGS edit | Low | qa-check index-freshness green |
 
 ## Retro
-<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10). -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check — YES, a clear miss.** `L-021` (Sprint-023) says verbatim: *"check the skill's
+base-dir version in the invocation header BEFORE debugging the code."* This session ran its entire
+loop on **1.18.0** skills against a 1.21.0 → 1.22.0 repo, with the stale path printed in every skill
+header, and nobody looked. The learning existed, was specific, named the exact check, and still did
+not fire — which is the retrieval-miss signal §10 asks about, observed rather than hypothesised.
+→ **L-021 bumped to `count: 2` and promoted**; the durable rule folds into CLAUDE.md's existing
+install-cache bullet (L-010's), since *reading/running from* the cache is the sibling of *editing* it.
+
+Worth noting: **D4 predicted this exact squeeze at promote** — "the next promotion has zero headroom"
+— one sprint before it happened. The fold works because CLAUDE.md's anti-pattern bullets are single
+physical lines, so extending one costs 0 lines. That is a reprieve, not a fix; the cap problem stands.
 
 **Worked**
+- **The adversarial review pass paid for itself outright.** It found a CONFIRMED silent false-negative
+  (`originals-untouched` asserting "untouched" while testing only existence) that the author, the
+  author's own must-FAIL suite, and a green qa-check all missed. Without it the sprint would have
+  shipped a gate that reports CLEAR on a real violation — the exact thing the sprint existed to prevent.
+- **Verifying subagent claims rather than accepting them** caught the review's own miscount (15 vs 16
+  legs), a wrong CRLF claim, and — via the post-merge check — the un-gated 6th harness. L-062's rule
+  ("review a subagent's *reasoning*, not just its diff") held up on every single dispatch this sprint.
+- **Both probe outcomes were pre-declared as successes.** T2 was briefed that a repeated refusal and a
+  caught violation were equally valid, with an explicit ban on escalating the fixture to force a result.
+  That is why its answer is trustworthy — and it happened to overturn the prior finding.
+- **Running the shipped snippet instead of reasoning about it** — the preflight, the freshness check,
+  the negative tests. Every load-bearing claim this sprint was executed, not argued.
 
 **Friction**
+- **The budget overran ~30% ($6.32 vs ~$4–5).** The per-run estimate was wrong by 5× (T2 run 2:
+  $2.07/45 turns vs an assumed $0.30–0.45), and that was visible the moment the run ended. The failure
+  was not the overspend — it was reporting it afterwards instead of re-checking at the moment the
+  estimate broke.
+- **A parallel wave silently invalidated a sibling's work.** T3 hardcoded a 5-harness list; T2 landed a
+  6th. Neither could see it; only the post-merge interaction check could.
+- **CLAUDE.md is at its cap** (80/80) with no split target defined, and absorbed this sprint's two
+  promotions only by inlining into existing bullets.
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+**Pattern candidates** → filed as `L-064`…`L-067` + the `L-021` promotion (see § Retro routing below).
+
+### Retro routing (DOCS_Guide §10)
+
+| Bucket | Filed |
+|---|---|
+| Shipped | **Nothing consumer-facing** — `git diff 329b9ba..HEAD -- skills/` is empty. 039 is a maintainer-only sprint (evals · qa-check · docs), so **no CHANGELOG block and no version bump**; v1.22.0 was T4 shipping *038*, not this sprint. |
+| Tech debt | `TD-015` interactive-session freshness gap · `TD-016` qa-check +80% runtime · `TD-017` migrate/init write no park record · `TD-018` `grep -c` cosmetic stderr |
+| Follow-ups | **None.** The four TD rows carry the actionable work; no `TASK-NNN` would add anything. Standing: **TASK-120 expires at SPRINT-040 promote** (ADR-013 kill-switch) — decide it there. |
+| Learnings | `L-064` destructive-vs-judgement self-approval · `L-065` comment-asserts-more-than-code · `L-066` stale sibling list in a parallel wave · `L-067` MSYS_NO_PATHCONV scope · **`L-021` → count 2, promoted** |

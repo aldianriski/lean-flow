@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-039 — Eval Coverage and Release** → [docs/sprint/SPRINT-039-eval-coverage-and-release.md](docs/sprint/SPRINT-039-eval-coverage-and-release.md)
+_(none active)_ — SPRINT-039 closed 2026-07-30. Next: `/lean-doc-generator promote` from the Backlog below.
 
 ---
 

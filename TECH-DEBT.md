@@ -16,6 +16,61 @@ status: current
 
 ## Tech Debt
 
+- **TD-018** severity: trivial | status: open | created: Sprint-039
+  - Summary: `evals/assert-boundary-park.sh`'s `park_count=$(grep -cF … || echo 0)` yields the string
+    `"0\n0"` on a genuine zero-match (grep prints `0` *and* exits 1, so the `|| echo 0` also fires),
+    which makes `[ "$park_count" -ge 1 ]` emit an "integer expression expected" error on stderr.
+  - Impact: cosmetic only — **verified fail-safe in both directions**: zero matches take the else
+    branch, which is the correct `FAIL no-park-record`; a real match exits 0 so the fallback never
+    fires. The cost is a confusing stderr error printed beside a legitimate FAIL, which could send a
+    reader debugging the harness instead of the finding.
+  - Mitigation (not yet done): use `grep -q` (as `assert-judgement-retry.sh` already does) or
+    `|| true` with an explicit count. Fix opportunistically if that file is touched again.
+
+- **TD-017** severity: minor | status: open | created: Sprint-039
+  - Summary: `migrate` and `init` do **not** execute Part 0's park protocol. SPRINT-039 T1's real
+    headless runs found both correctly *withheld* every unauthorized write, but neither wrote a park
+    record nor a `/handoff` doc — they simply declined in prose. `promote` and `/triage`, tested in
+    the same task, both ran the protocol formally.
+  - Impact: the **safety** property holds; the **observability** contract does not. An unattended run
+    that parks at `migrate`/`init` leaves the morning maintainer no artifact showing it ran or why it
+    stopped — the Execution-Log/handoff trail the contract promises is simply absent. L-020's class:
+    shipped, but not wired into every entry point that can reach it.
+  - Mitigation (not yet done): wire the park-record + handoff write into `migrate`/`init`'s
+    approval-gate paths, then cover with the retained `migrate-park`/`init-park` fixtures — which
+    already exist and currently assert only the withheld-write half.
+
+- **TD-016** severity: minor | status: open | created: Sprint-039
+  - Summary: `scripts/qa-check.sh` leg 12 (TD-013's fix) runs 6 zero-API eval harnesses, taking the
+    gate from **~44s to ~90s (+80%)**; the two `selftest-assert-*` harnesses are ~26s of that, since
+    each spins up many throwaway git repos.
+  - Impact: qa-check is the always-on pre-commit gate, so the cost is paid on every commit. Still
+    under two minutes, but the "fast and always-on" character it was designed around is eroding, and
+    a slow gate is a gate people start skipping.
+  - Mitigation (not yet done) — three options, deliberately left to the owner because two of them
+    narrow what SPRINT-039 T3's DoD specified: (a) accept ~90s; (b) move leg 12 behind an opt-in
+    `--full`, which reverts it to what TD-013 itself called "strictly better than nothing, not
+    equivalent to a wired gate"; (c) keep the **3 snippet runners** always-on (they guard *shipped*
+    `skills/**` text) and make the **2 selftests** opt-in (they guard maintainer-only assertion
+    scripts). (c) is the principled cut. Trigger for deciding: a 7th harness, or the first time
+    someone skips the gate because of the wait.
+
+- **TD-015** severity: medium | status: open | created: Sprint-039
+  - Summary: the skill-freshness check shipped in `skills/orchestrator/references/night-run.md`
+    guards only the **unattended** path, where a version/content mismatch is a `BLOCK`. Nothing
+    guards an **interactive** session — which is where the loop actually runs day to day.
+  - Impact: proven live, not theoretical. SPRINT-039 executed its entire promote→build→close loop on
+    **1.18.0** cached skills against a 1.21.0→1.22.0 repo; the stale path was printed in every skill's
+    invocation header and went unread for the whole session. Damage was nil only because references
+    were read from the repo rather than the cache (reaching *past* the stale procedure). A larger
+    drift, or one in a step with no repo-side reference to fall through to, would have executed
+    silently and been indistinguishable from a clean run. This is L-054's shape — a correct check on
+    the wrong side of the boundary — and L-021's second occurrence.
+  - Mitigation (not yet done): lean-flow ships no hooks (ADR-011 killed in-core gate enforcement), so
+    an automatic interactive guard has no obvious carrier. Cheapest real option is a `/prime` step
+    that reads the loaded skill's base-dir version and reports it in the health line — turning an
+    invisible fact into a checked one at the exact moment a session starts.
+
 - **TD-014** severity: minor | status: open | created: Sprint-038
   - Summary: `skills/orchestrator/references/night-run.md` is now **427 lines**, carrying the Part 0
     contract, the entry path, the pre-flight pass, and **two ~100-line embedded shell snippets**

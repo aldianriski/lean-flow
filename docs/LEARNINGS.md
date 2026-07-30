@@ -29,6 +29,38 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
+## L-067 [tags: tooling] [status: active]: On Windows/Git-Bash, `MSYS_NO_PATHCONV=1` — needed so a bare `/skill` prompt isn't rewritten into a Windows path before reaching `claude.exe` — disables path translation for **every argument in that invocation**, not just the one you meant. A POSIX-style `--plugin-dir "/c/Users/…"` then arrives literally and **fails silently**: no error, the plugin simply never loads, and the run reports "Unknown command". Fix: pass `--plugin-dir` a native Windows path while keeping `MSYS_NO_PATHCONV=1` for the prompt. Cost two runs across SPRINT-039 T1 and T2 before being root-caused. Same family as L-060 — a shell-boundary transformation that succeeds loudly and produces the wrong artifact quietly.
+- seen: Sprint-039
+- count: 1
+- promoted: no
+- related: L-060 (shell-boundary mangling) · CLAUDE.md Edit-safety trap (c)
+
+---
+
+## L-066 [tags: process] [status: active]: In a parallel wave, a task that hardcodes a list of its siblings' artifacts is stale the moment a concurrent task adds one — and **neither agent can see it**. SPRINT-039 W2: T3 wired a 5-entry list of zero-API eval harnesses into `qa-check`; T2, running concurrently, landed a 6th. T3's list was correct when written and wrong when merged, leaving a harness that exists but is never reached — TD-013's exact shape, recreated the same day TD-013 was resolved. Only the coordinator's post-merge interaction check could catch it, because per-branch review sees one side. Fix the class, not the instance: have the list **check itself against disk** and FAIL on anything neither included nor *explicitly* excluded-with-a-reason. Note the rejected alternative — globbing everything would auto-enroll a future *paid* harness into an always-on gate, which is worse than the gap.
+- seen: Sprint-039
+- count: 1
+- promoted: no
+- related: L-047 (a derived view regenerated mid-wave is stale on arrival — same wave-timing class) · L-020 · TD-013
+
+---
+
+## L-065 [tags: tooling] [status: active]: A check whose **comment asserts more than its code tests** is a false-negative already written — and the must-FAIL leg that would expose it is the one exercising the **named** violation, not an adjacent one. SPRINT-039 T1's `originals-untouched` said "still present, **untouched**" but tested only `[ -f ]` existence; its must-FAIL leg tested *deletion*, so *mutation* was never probed. An unauthorized content edit folded via `git commit --amend` (commit count 1, tree clean) produced a full **exit-0 all-PASS**, and the neighbouring commit-count check did not backstop it. Found only by an adversarial reviewer who constructed the violation rather than reading the code. Two rules: when a check cannot inspect its subject (missing baseline, unverifiable remote), that is a **named FAIL**, never a pass; and read every gate's comment as a *claim to be tested*, since the gap between what it promises and what it executes is invisible to a green run.
+- seen: Sprint-039
+- count: 1
+- promoted: no
+- related: L-058 (must-FAIL fixture per check — this is its sharp edge) · L-062 (review a subagent's reasoning) · L-056 (the author cannot see their own class)
+
+---
+
+## L-064 [tags: process] [status: active]: The unattended contract's refusal was about **destructiveness**, not about the gate. SPRINT-038 twice failed to induce a violating run and recorded the ambiguity as L-061; SPRINT-039 T2 isolated the variable by swapping the gated action from a file deletion to a **pure judgement/approval call with no data loss**, reusing the identical weakening mechanism. The model **self-approved** — resolved the open question, wrote the file, committed, ticked the DoD, no park record — and then, *within the same run*, correctly **parked** a later genuinely lossy step. The split therefore holds **inside one run**, which is far stronger than any number of separate refusals. Consequences: the eval suite has now caught a real violation (labelled strength raised, still short of "catches every future violation"), and a HITL gate guarding a **non-destructive** step should not be assumed self-enforcing by model priors — that is exactly where the written contract has to carry the weight. Method note: the answer only counts because *both* outcomes were pre-declared as successes and forcing a violation was banned up front.
+- seen: Sprint-039
+- count: 1
+- promoted: no
+- related: L-061 (**narrowed by this, not repeated** — a `count` bump would have erased the correction) · L-053 (isolate the variable) · L-052
+
+---
+
 ## L-063 [tags: docs] [status: active]: In a repo that **documents a standard**, a repo-wide path rename cannot be a find/replace — every occurrence is either a link to our own file (rewrite) or a description of the standard itself (must NOT change). Migrating `docs/CHANGELOG.md` → root would have rewritten the migration map's own **source column** (it maps *from* the legacy path, so that path must stay named), DOCS_Guide's "still matched, second" note, `release-patch`'s legacy-detection fallback, and `prime`'s legacy read-order row — i.e. corrupted the very standard consumers rely on to migrate. Append-only files (ADRs) add a third class: their stale link is stale *by design*. Classify every occurrence before touching one, and **assert the prohibited paths were untouched afterwards** (`git diff --name-only`) rather than trusting intent.
 - seen: Sprint-038
 - count: 1
@@ -49,7 +81,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 - seen: Sprint-038
 - count: 1
 - promoted: no
-- related: L-016 (verify on the consumer path) · L-057 · ADR-013
+- related: L-016 (verify on the consumer path) · L-057 · ADR-013 · **L-064 (SPRINT-039 T2 narrowed this: the refusal was about destructiveness, not the gate — read L-064 before citing this entry)**
 
 ---
 
@@ -172,11 +204,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-021 [tags: tooling] [status: active]: After a plugin update, the RUNNING session keeps the OLD cached skill version — verify the loaded skill's base-dir version, not just `/plugin`'s report. SPRINT-023: `/plugin` said 1.10.1, but the live session loaded `/orchestrator` from the stale `…/cache/…/1.5.0/…` dir (pre-improvement content), so none of the shipped dispatch improvements fired — the "orchestrator doesn't spawn after update" complaint was a **stale-session / leftover-cache-dir** issue, not a code gap. Fix: restart the session to load the current version; remove stale cache version dirs (keep only the latest). Pattern: when a plugin change "doesn't take effect," check the skill's base-dir version in the invocation header BEFORE debugging the code.
-- seen: Sprint-023
-- count: 1
-- promoted: no
-- related: L-010 (edit the repo source, never the install cache)
+## L-021 [tags: tooling] [status: promoted] → promoted: yes → `.claude/CLAUDE.md` install-cache anti-pattern (folded into L-010's bullet: *running* from the cache is the sibling of *editing* it). A running session keeps the OLD cached skill version — check the loaded skill's **base-dir version in the invocation header**, never `/plugin`'s report. Sprint-023: the session loaded `/orchestrator` from a stale `…/1.5.0/…` dir, so no shipped dispatch improvement fired and it read as a code gap. **Sprint-039: recurred, undetected for an entire session** — the whole loop ran on 1.18.0 skills against a 1.21.0→1.22.0 repo, with the stale path printed in every skill header; the true `orchestrator/SKILL.md` delta was small (4 lines, one of them "run the pre-dispatch preflight first") and no deviation resulted **only because references were read from the repo rather than the cache** — i.e. by reaching past the stale procedure, not by following it. Seen Sprint-023 + Sprint-039 (count 2). Related: L-010 · L-054 (a correct check on the wrong side of a boundary) · TD-015 (nothing guards the *interactive* path).
 
 ---
 
