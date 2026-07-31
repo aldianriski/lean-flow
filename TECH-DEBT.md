@@ -117,6 +117,13 @@ status: current
     `skills/**` text) and make the **2 selftests** opt-in (they guard maintainer-only assertion
     scripts). (c) is the principled cut. Trigger for deciding: a 7th harness, or the first time
     someone skips the gate because of the wait.
+  - **Decided 2026-08-01 (SPRINT-042 promote, 3 sprints open) — option (c).** The trigger fired on
+    schedule: SPRINT-042's Layers-completeness task lands a **7th** harness, which is exactly the
+    condition this row named. Decided *before* planning rather than after the harness lands, per
+    L-068 — a deferral with a written trigger is answered when the trigger fires, or it drifts toward
+    never. Split: the snippet runners stay always-on (they guard shipped `skills/**` text, which is
+    what a consumer receives); the selftests move behind an opt-in flag (they guard maintainer-only
+    assertion scripts). Resolution lands as a SPRINT-042 task; row stays `open` until it does.
 
 - **TD-015** severity: medium | status: resolved → SPRINT-040 T1 | created: Sprint-039
   - Summary: the skill-freshness check shipped in `skills/orchestrator/references/night-run.md`
@@ -160,23 +167,6 @@ status: current
     no reduction in what they must read. Next re-review at SPRINT-044 promote, or immediately if a
     third snippet lands.
 
-- **TD-013** severity: minor | status: resolved → SPRINT-039 T3 | created: Sprint-038
-  - Summary: `evals/run-dispatch-preflight-fixtures.sh` guards the `dispatch.md` preflight snippet but
-    is **not wired into `scripts/qa-check.sh`** — TD-012's stated alternative mitigation. The fixtures
-    exist and pass; nothing runs them automatically.
-  - Impact: the retained-guard leg of TD-012 is closed (the fixtures can no longer be lost), but the
-    guard is opt-in — a maintainer editing the snippet gets no automatic signal. Strictly better than
-    TD-012's original state, not equivalent to a wired gate (L-057's family: a check that exists but
-    isn't reached).
-  - Resolution: `qa-check.sh` gained a leg that runs all 5 zero-API harnesses (`run-skill-freshness-
-    fixtures.sh`, `run-worktree-usability-fixtures.sh`, `run-dispatch-preflight-fixtures.sh`,
-    `selftest-assert-boundary-park.sh`, `selftest-assert-noaction-park.sh`), gated on each harness's
-    own exit status (never a pipe/redirect), naming the failing harness plus its own FAIL line on a
-    red run. Negative-tested against a scratch copy with one guarded snippet deliberately broken —
-    bare `sh scripts/qa-check.sh` FAILed naming that harness, then the test edit was reverted. The
-    manual/gated boundary is stated in `docs/QA.md`: the behavioural real-run fixtures (API cost, not
-    deterministic) stay opt-in, by design, not by the gap this TD named.
-
 ---
 
 ## Resolved (collapsed)
@@ -189,3 +179,6 @@ status: current
 
 <!-- TD-008…010 all resolved (§11 collapse — per-TD summaries live in their sprint files + git). -->
 - resolved: **TD-008**→SPRINT-032 · **TD-009**→SPRINT-034 · **TD-010**→SPRINT-035 (collapsed 2026-07-30, SPRINT-038 T4).
+
+<!-- TD-013 collapsed at SPRINT-042 promote (3 sprints after resolution — summary lives in its sprint file + git). -->
+- resolved: **TD-013**→SPRINT-039 T3 (6 zero-API eval harnesses wired into `qa-check`; runtime cost → TD-016) (collapsed 2026-08-01).

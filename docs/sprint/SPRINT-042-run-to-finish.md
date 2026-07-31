@@ -1,0 +1,175 @@
+---
+sprint: 042
+slug: run-to-finish
+owner: Maintainer
+last_updated: 2026-08-01
+status: active
+plan_commit: [sha — set at promote]
+close_commit: [sha — set at close]
+update_trigger: sprint execute/close events
+---
+
+# SPRINT-042 — Run to Finish
+
+> **Theme:** SPRINT-041's night run did everything right and delivered nothing. Two agents built,
+> committed, and self-reviewed their work; then the merge-back was denied and both branches stranded.
+> The blocker was never HITL — it was the shared landing path every unit funnels through, plus a Plan
+> declaration that omitted a file both tasks edited and a preflight that cannot see an omission. This
+> sprint makes a single unattended run able to *finish*, and replaces one cost datapoint with a series.
+
+## Scope
+
+**In:** the pre-flight allowlist recipe covers the commands a run needs to finish, not only the ones
+its tasks need to work (T1) · a run's own cost and throughput recorded as first-class pre-flight and
+rollup data, distinct from its tasks' verification cost (T2) · a gate leg that cross-checks a Plan's
+declared `Layers:`/`Depends-on:` against what each task's DoD prose implies (T3) · TD-016's decided
+split of the harness legs into always-on vs opt-in (T4).
+
+**Out (deferred):** a **pre-decision register** — no run has ever parked on an emergent fork, and
+`## Decisions (pre-locked)` already carries the case if one occurs; building for it now is the
+speculative-section trap · a **6–8h sizing standard** — T2 produces the data it would need, and
+writing it from a single datapoint is spec-only debt (L-007) · **TD-021** (`gen-index.sh`
+non-atomic write) — filed, no forcing trigger · **TD-014** (night-run.md length) — trigger is a third
+embedded snippet, and no task here adds one · **firing the proof night run** — it belongs to the next
+sprint, because T1 is the fix that makes landing possible (D3).
+
+## Plan
+
+### T1 — Extend the pre-flight allowlist recipe to the run's terminal steps `[size: S · risk: low · class: execution · AFK]`
+Layers: `skills/orchestrator/references/night-run.md` · `skills/orchestrator/references/dispatch.md`
+Depends-on: none
+
+L-072, promoted this promote. The recipe enumerates the commands *tasks* need and omits the ones the
+*run* needs to finish. Because every unit funnels through one landing path, a denial there converts a
+fully-successful run into zero delivered work — the asymmetry per-task risk assessment misses. Second
+occurrence of the shape; the `/handoff` denial already recorded in Part 1 was the first. State a
+derivation method rather than a copyable literal list: a list goes stale and leaks this repo's
+commands into generic guidance (L-015).
+
+**Acceptance:** taking SPRINT-041's four recorded denials as the test input, the documented derivation
+method yields an allowlist covering every one of them — checked against the Execution Log, no paid run.
+
+**DoD:**
+- [ ] Pre-flight covers the coordinator's landing path (integration-worktree creation · the no-ff
+      merge · worktree removal/prune) and the git writes the always-on gate's own harnesses perform
+      on throwaway repos — as a stated derivation method, not a literal command list
+- [ ] The reasoning is stated, not just the fix: the shared landing path is where a denial costs the
+      whole run, so it is scoped harder than any per-task command
+- [ ] The two references no longer disagree — if dispatch prescribes a merge-back command, pre-flight's
+      method reaches it
+- [ ] Verified against SPRINT-041's recorded denials: each one falls inside what the method derives
+- [ ] No new embedded shell snippet (TD-014's split trigger stays unfired — A3)
+
+### T2 — Record a run's own cost and throughput as pre-flight and rollup data `[size: S · risk: low · class: execution · AFK]`
+Layers: `skills/orchestrator/references/night-run.md` · `skills/lean-doc-generator/templates/SPRINT.md.template`
+Depends-on: T1
+
+L-073. "Zero API cost" at SPRINT-041's promote was true of the tasks' verification and false of the
+run, which spent $6.60 on two ~25-line changes. Two unrelated budgets in one reassuring phrase is what
+let the number land as a surprise afterwards instead of as an input to firing. One datapoint is not a
+budget — the fix is to start a series, not to write a sizing rule on top of a single row.
+
+**Acceptance:** pre-flight states the run's own expected cost on a line distinct from its tasks'
+verification cost, and the morning rollup carries actual cost · turns · wall-clock · units completed,
+with SPRINT-041's figures present as the first calibration row.
+
+**DoD:**
+- [ ] Pre-flight carries the run's own expected cost as its own line, explicitly not the tasks'
+      verification cost
+- [ ] The morning rollup format carries actual cost · turn count · wall-clock · units of work completed
+- [ ] SPRINT-041's recorded figures ($6.60 · 15 turns · coordinator + 2 worktree agents · 2 tasks) are
+      entered as the first calibration row
+- [ ] The format states plainly that one row is an estimate, not a budget
+- [ ] If cost is not observable from the harness result output, the row degrades to the observable
+      fields and **says so** rather than omitting the line (A1)
+- [ ] Shares `night-run.md` with T1 — lands after it, per D2
+
+### T3 — Cross-check a Plan's declared Layers against what its DoD implies `[size: M · risk: low · class: execution · AFK]`
+Layers: `scripts/qa-check.sh` · `docs/QA.md` · `evals/run-layers-completeness-fixtures.sh` · `TECH-DEBT.md`
+Depends-on: none
+
+TD-020 · L-071. The preflight's shared-file check is sound and negative-tested; its *input* is an
+author's memory at promote time, and a gate reading a manifest cannot detect an omission from that
+manifest, because omission looks identical to absence. SPRINT-041 is the proof: both tasks' DoDs
+required marking a TD resolved, neither declared the debt ledger, the check passed, and the parallel
+edits merged clean by ~19 lines of luck. Fails toward over-reporting by design — a false positive
+costs a glance, the current false negative costs a corrupted merge.
+
+**Acceptance:** run against SPRINT-041's Plan reconstructed as a fixture, the gate FAILs naming the
+debt ledger as required-by-DoD but absent from `Layers:`; run against this sprint's own Plan, it passes.
+
+**DoD:**
+- [ ] For each task block in an active sprint's Plan, the gate reports any file named in that task's
+      DoD/Acceptance prose but absent from its `Layers:`
+- [ ] Same treatment for a dependency the prose implies but `Depends-on:` omits
+- [ ] Leg follows the existing text-lint idiom (`ok`/`bad` helpers, named finding, never a bare FAIL)
+- [ ] **Negative-tested per check**, each failing with its own named finding, with **SPRINT-041's Plan
+      reconstructed as the must-FAIL fixture** — a real recorded miss, not an invented one. Run bare,
+      never piped (L-057)
+- [ ] Fixtures **retained** in the eval set, not deleted with the scaffolding that built them (L-058 ·
+      TD-012's lesson)
+- [ ] Green on this sprint's own Plan, whose `Layers:` were written to be complete (D4)
+- [ ] `docs/QA.md` leg inventory updated; TD-020 marked `status: resolved → SPRINT-042 T3`
+
+### T4 — Split the harness legs into always-on and opt-in (TD-016, option c) `[size: S · risk: med · class: execution · AFK]`
+Layers: `scripts/qa-check.sh` · `docs/QA.md` · `TECH-DEBT.md`
+Depends-on: T3
+
+TD-016, decided at this promote because its written trigger fired: T3 lands the **7th** harness, and
+the row named "a 7th harness" as the deciding condition (L-068 — a deferral with a written trigger is
+answered when it fires, or it drifts toward never). The principled cut the row itself identified: the
+snippet runners guard **shipped** `skills/**` text, which is what a consumer receives, so they stay
+always-on; the selftests guard maintainer-only assertion scripts, so they move behind an opt-in flag.
+`risk: med` because this *removes* checks from the always-on path — the failure mode is a guard
+silently no longer running.
+
+**Acceptance:** a bare gate run no longer executes the selftests and reports the reduced runtime; the
+opt-in flag runs the full set; a deliberately broken guarded snippet still FAILs the bare run.
+
+**DoD:**
+- [ ] Snippet runners stay always-on; selftests run only under the opt-in flag
+- [ ] The bare gate still FAILs on a deliberately broken **shipped-text** guard — verified, then reverted
+- [ ] The opt-in flag runs the full set and still FAILs on a broken maintainer-only assertion — verified
+- [ ] The always-on/opt-in split is stated in `docs/QA.md` beside the existing manual/gated boundary,
+      so what no longer runs by default is discoverable rather than silently dropped
+- [ ] Runtime before/after recorded — the number is TD-016's whole subject
+- [ ] TD-016 marked `status: resolved → SPRINT-042 T4`
+
+## Decisions (pre-locked)
+
+- **D1** — TD-016 resolved as **option (c)** at this promote, not deferred a fourth time. Its written
+  trigger (a 7th harness) is exactly what T3 lands, so the decision is made before the harness arrives
+  rather than after (L-068).
+- **D2** — **Single-owner order, declared up front.** `night-run.md`: T1 → T2. `qa-check.sh` ·
+  `docs/QA.md` · `TECH-DEBT.md`: T3 → T4. Both pairs carry a `Depends-on:` edge, so the preflight's
+  shared-file check resolves them rather than reporting an unowned overlap.
+- **D3** — **This sprint runs interactively, not unattended.** T1 is the fix that lets a night run land
+  its work; executing this sprint unattended would depend on the very thing it ships. The proof-run is
+  the next sprint, fired once T1 has shipped.
+- **D4** — `Layers:` on every block here was written to include files implied by the DoD — notably the
+  debt ledger on T3 and T4. Deliberate: it is the omission T3 exists to catch, and this Plan is T3's
+  must-PASS input.
+
+## Assumptions
+
+- **A1** — A headless run can observe its own cost from the harness result output. *Confirm: T2's
+  degrade-path DoD line — if it cannot, the row drops to observable fields and says so.*
+- **A2** — T3 lands the 7th harness, which is the count T4's split is sized against. *Confirm: harness
+  count at T3 completion, before T4 starts.*
+- **A3** — T1 and T2 grow `night-run.md` with prose only, so TD-014's split trigger (a third embedded
+  snippet) stays unfired. *Confirm: T1's final DoD line + a line-count check at T2.*
+
+## Execution Log
+
+<!-- Append-only, dated. The Plan is frozen at promote — log here rather than editing § Plan. -->
+
+## Files Changed
+
+<!-- Filled during execution; feeds CHANGELOG at close. -->
+
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+
+## Retro
+
+<!-- Written at close. -->

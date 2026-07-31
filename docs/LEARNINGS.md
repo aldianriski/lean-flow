@@ -40,7 +40,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 ## L-072 [tags: process] [status: active]: **In an autonomous run, the terminal step is the choke point every unit shares — scope its permissions harder than the per-task ones.** SPRINT-041's night run dispatched two worktree agents, both of which built, committed, and self-reviewed their work successfully; then the coordinator's merge-back was denied — `git worktree add` and `git merge --no-ff` were outside the `dontAsk` allowlist. Because *both* tasks funnelled through that one step, there was no disjoint AFK work left to continue with, and a fully-successful run delivered **zero landed work**, stranded on branches. The failure is asymmetric in a way per-task risk assessment misses: a denial in one task's own commands costs that task, while a denial in the shared landing path costs the entire run, no matter how many units succeeded. Second occurrence of the shape — night-run.md Part 1 already records a `Skill(/handoff)` denial that stopped the protocol one step short *after* every task parked correctly. Both are the same defect: the recipe enumerates the commands tasks need and omits the ones the run needs to finish. Generalisation beyond allowlists — when an orchestration has a single integration point, its failure modes deserve the scrutiny normally spent on the fan-out.
 - seen: Sprint-040, Sprint-041
 - count: 2
-- promoted: no
+- promoted: yes → `.claude/CONTEXT.md` § Gates, Unattended block ("Scope the terminal step hardest") — SPRINT-042 promote
 - related: L-020 (shipping ≠ wiring — this is its permissions-surface form) · night-run.md Part 1 (the `/handoff` denial, occurrence 1) · dispatch.md § Merge-back queue · TASK-131
 
 ---

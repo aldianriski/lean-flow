@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-_(none active)_ — SPRINT-041 closed 2026-08-01. Promote the next sprint from `state: ready` Backlog tasks.
+> **SPRINT-042 — Run to Finish** → docs/sprint/SPRINT-042-run-to-finish.md
 
 ---
 
