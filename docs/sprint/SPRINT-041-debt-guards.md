@@ -48,12 +48,11 @@ itself be negative-tested — a leg that can only pass is the failure it exists 
 - [x] **Negative-tested per check**: cue stripped from the migrate procedure → FAIL naming it; cue
       stripped from the init procedure → FAIL naming it; park-record instruction removed → FAIL. Each
       run bare, never piped (L-057), then the scratch edits reverted
-- [ ] Green on the unmodified tree, and the whole gate still exits 0 — **not verifiable in this
-      run**: `qa-check.sh` invokes 4 eval harnesses that `mktemp -d` then `git -C` that dir; this
-      session's `dontAsk` allowlist denies `git init`/related writes, so those legs (plus a stale
-      knowledge-index leg) fail on `git -C: cannot change to '<dir>'` on the **unmodified tree too**
-      (confirmed by reverting T1's own edit and reproducing the identical failure). New leg 13 itself
-      passes cleanly, positive and negative. Re-run interactively once the allowlist covers it.
+- [x] Green on the unmodified tree, and the whole gate still exits 0 — closed interactively after
+      merge-back: **69 pass, 0 fail**. The run's diagnosis was correct and was left honestly unticked
+      rather than fudged: `qa-check.sh` invokes eval harnesses that `mktemp -d` then `git -C` that dir,
+      which its `dontAsk` allowlist denied, and it proved the failure pre-existing by reverting its own
+      edit and reproducing it.
 - [x] `docs/QA.md` leg inventory updated; TD-019 marked `status: resolved → SPRINT-041 T1`
 <!-- QA: this IS a gate — the must-FAIL fixtures above are the bar, not optional (CLAUDE.md). -->
 
@@ -74,11 +73,10 @@ and a real match still prints the PASS verdict with its count.
       assertion already does, or an explicit count — not a second `|| echo`)
 - [x] Zero-match direction exercised on a real fixture: verdict text unchanged, stderr clean
 - [x] Match direction exercised: PASS verdict and its count unchanged
-- [ ] `sh evals/selftest-assert-boundary-park.sh` passes; `sh scripts/qa-check.sh` stays green — **not
-      verifiable in this run**: both scripts `mktemp -d` then `git -C` that dir, and this session's
-      `dontAsk` allowlist denies `git init`; reverting T2's fix and re-running reproduced the identical
-      failure, so it predates and is unrelated to this change. Re-run interactively once the allowlist
-      covers it (same blocker as T1's equivalent line).
+- [x] `sh evals/selftest-assert-boundary-park.sh` passes; `sh scripts/qa-check.sh` stays green —
+      closed interactively after merge-back: selftest all PASS (must-PASS and must-FAIL legs both
+      discriminate), gate 69 pass / 0 fail. Same sandbox blocker as T1's equivalent line, same correct
+      pre-existing diagnosis.
 - [x] TD-018 marked `status: resolved → SPRINT-041 T2`
 
 ## Decisions (pre-locked)
@@ -158,6 +156,43 @@ both DoD lists are fully `[x]`.
 
 No AFK work remains disjoint from the parked merge (the Plan only held T1+T2, both now blocked on
 the same merge-back). Clean-halting via `/handoff` next, per Part 0 step 4.
+
+### 2026-07-31 | merge-back + independent verification | all 10 DoD closed
+Unparked interactively, per the run's own next-action list. Both branches merged (`54bd622` T1,
+`aa1ed1b` T2) — no conflict — then the two blocked DoD lines closed against the real gate: **69 pass,
+0 fail**, selftest all PASS.
+
+**The run's negative-test claim was re-verified independently, not accepted.** T1's whole subject is a
+guard that must be able to fail, so taking "I negative-tested it" on trust would reproduce the exact
+defect it exists to prevent. Re-run against scratch copies: cue stripped from `migration-map.md` →
+FAIL naming that file · cue stripped from `init.md` → FAIL naming that file · park-record instruction
+removed → FAIL naming it. Three named findings, all confirmed. The run's claim held.
+
+**Three findings the run surfaced, none of them in its Plan:**
+1. **The preflight can't check what the Plan doesn't declare.** Both tasks edited `TECH-DEBT.md` (each
+   marking its own TD resolved — required by their DoDs), but neither task's `Layers:` listed it, so
+   the shared-file single-owner check passed on incomplete input and both agents edited it in parallel
+   worktrees. They merged clean only because the hunks sat ~19 lines apart — luck, not design. The
+   check is sound; the *declaration* was mine, written at promote, and it omitted a file the DoD
+   plainly required. A mechanical check over a hand-written manifest inherits that manifest's blind
+   spots.
+2. **`denied-tool`: the merge-back path is missing from the allowlist recipe.** `git worktree add` and
+   `git merge --no-ff` are how a coordinator lands parallel work, and both were denied. The run did
+   the right thing — parked, didn't force it through another path — but a night run that can dispatch
+   in worktrees and cannot merge them is structurally unable to finish; the work strands on branches
+   every time. This is night-run.md's own allowlist row being under-specified, the same shape as the
+   `/handoff` denial it already records.
+3. **Cost: $6.60 for two ~25-line changes.** My "zero API cost" framing at promote was about the
+   tasks' *verification* needing no paid fixtures; the run itself was never free, and I should have
+   said so before firing. Coordinator plus two worktree agents, 15 turns, on work a live session
+   would have done for a fraction of that.
+
+**Incident (environment, not the run):** the C: volume hit 0 bytes free during post-merge
+verification, and `gen-index.sh` failed **mid-write**, truncating the generated
+`docs/knowledge-index.md` from 34 lines to 12 — a partial write that left a syntactically valid file.
+Restored from git; regenerated with `TMPDIR` on D:; gate green. `qa-check` caught it only as "index
+STALE", which is the right alarm for the wrong reason — a generated SSOT has no atomic-write guard,
+so a failed write degrades it silently rather than loudly.
 
 ## Files Changed
 
