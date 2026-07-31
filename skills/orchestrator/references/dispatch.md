@@ -237,6 +237,12 @@ Once a wave completes, merge on a **separate integration worktree** — never sw
 which may hold the coordinator's own WIP. Merge sequentially in **G2-ownership order**, one
 `--no-ff` commit per task (clean per-task revert via `git revert -m 1`).
 
+**Unattended runs must have these commands pre-authorized.** Integration-worktree creation, the merge,
+and the cleanup below are the run's landing path — every task's output funnels through them, so a
+permission denial here strands an entire successful wave on its branches. They are source 2 of the
+allowlist derivation in `night-run.md` Part 1; that list is built from this section, so a step added
+here is a step to add there.
+
 Review two-tier: **pre-merge** — full scoped review of each branch's diff, against that task's own
 branch (the primary pass). **Post-merge** — an interaction-only smoke check per wave (lint/verify),
 catching what per-branch review can't: cross-task interaction.

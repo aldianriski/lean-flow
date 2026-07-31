@@ -112,20 +112,40 @@ All items must pass or the night-run does not fire:
 - [ ] Batch G1 + G2 already signed off by the human (per `sprint-bulk` steps 1–2).
 - [ ] Zero open `assumes:` / `needs-info` tasks in the run — G2 already blocks on this; pre-flight
       re-verifies it still holds at trigger time (state can drift between G2 and the evening run).
-- [ ] Scoped allowlist built from the tasks' `touches:` files plus the commit/review/lint commands
-      the run will need, in `--allowedTools` permission-rule syntax (e.g. `Bash(git commit *)`).
-      The `fewer-permission-prompts` skill's transcript-scan approach is a candidate builder.
+- [ ] Scoped allowlist built in `--allowedTools` permission-rule syntax (e.g. `Bash(git commit *)`),
+      derived from **four sources, not one**. Enumerating only the first is the recurring failure:
+      1. **Per-task commands** — each task's `touches:` files, plus the commit / review / lint
+         commands its routed procedure runs.
+      2. **The landing path** — how the run's output becomes committed history. If the run fans work
+         out, that is the coordinator's merge-back: integration-worktree creation, the merge itself,
+         and the worktree removal/prune after it. Read the steps off `dispatch.md` § Merge-back queue
+         rather than recalling them.
+      3. **The gate's own subprocesses** — any always-on check that shells out and *writes*. A
+         harness that creates throwaway repos or temp dirs is doing git writes like any other, and
+         `dontAsk` denies them, so a gate that is green interactively can still fail unattended.
+      4. **The exit path** — the `/handoff` invocation and its temp-dir write (next item).
+
+      **Scope 2 and 4 hardest.** A denial in a per-task command costs that task; a denial in the
+      shared landing or exit path costs the **whole run**, however many units already succeeded,
+      because every unit funnels through it. Both have now failed for real: a probe parked every task
+      correctly and then could not `/handoff`, and a later run stranded two complete, reviewed
+      branches on a denied merge-back — delivering nothing after doing everything right.
+
       `dontAsk` **denies** anything outside the list rather than pausing for it — an under-scoped
-      allowlist silently fails tasks instead of asking, so this step is load-bearing; over-denial
-      shows up in the morning report, never as a bypass.
+      allowlist silently fails work instead of asking, so this step is load-bearing; over-denial shows
+      up in the morning report, never as a bypass. The `fewer-permission-prompts` skill's
+      transcript-scan approach is a candidate builder, with one blind spot worth naming: a transcript
+      only holds commands some run already reached, so it cannot suggest a landing-path command that
+      no run has yet got far enough to attempt — which is precisely how source 2 stays missing.
 - [ ] Allowlist includes the **`/handoff` skill invocation** *and* the write of its output doc to the
       OS temp dir. The clean halt (Part 0 step 4) and the watchdog's recovery call (Part 3) are tool
       calls like any other, so `dontAsk` denies them unless listed — and a run that cannot halt
       cleanly is the one case where the failure lands after all the work is done. Observed on a real
       probe: the run parked every HITL task correctly, then `Skill(/handoff)` was refused as
       out-of-list and the protocol stopped one step short. Confirm the matcher your builder actually
-      emits rather than assuming the form — that denial record is the only evidence so far, and the
-      next real headless run is what proves the rule is right.
+      emits rather than assuming the form. This was the first of two recorded denials of a shared
+      terminal step — the merge-back denial behind source 2 above is the second, which is why that
+      pair is called out as the pre-flight's load-bearing half rather than left as one anecdote.
       **Belt, not replacement.** The fallback stays: a denied or unavailable `/handoff` still halts
       cleanly by appending its rollup line (Part 4) to the sprint Execution Log, which the morning
       `/prime` reads. Never let an allowlisted `/handoff` become the run's only exit.

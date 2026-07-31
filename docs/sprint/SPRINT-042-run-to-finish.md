@@ -50,15 +50,15 @@ commands into generic guidance (L-015).
 method yields an allowlist covering every one of them — checked against the Execution Log, no paid run.
 
 **DoD:**
-- [ ] Pre-flight covers the coordinator's landing path (integration-worktree creation · the no-ff
+- [x] Pre-flight covers the coordinator's landing path (integration-worktree creation · the no-ff
       merge · worktree removal/prune) and the git writes the always-on gate's own harnesses perform
       on throwaway repos — as a stated derivation method, not a literal command list
-- [ ] The reasoning is stated, not just the fix: the shared landing path is where a denial costs the
+- [x] The reasoning is stated, not just the fix: the shared landing path is where a denial costs the
       whole run, so it is scoped harder than any per-task command
-- [ ] The two references no longer disagree — if dispatch prescribes a merge-back command, pre-flight's
+- [x] The two references no longer disagree — if dispatch prescribes a merge-back command, pre-flight's
       method reaches it
-- [ ] Verified against SPRINT-041's recorded denials: each one falls inside what the method derives
-- [ ] No new embedded shell snippet (TD-014's split trigger stays unfired — A3)
+- [x] Verified against SPRINT-041's recorded denials: each one falls inside what the method derives
+- [x] No new embedded shell snippet (TD-014's split trigger stays unfired — A3)
 
 ### T2 — Record a run's own cost and throughput as pre-flight and rollup data `[size: S · risk: low · class: execution · AFK]`
 Layers: `skills/orchestrator/references/night-run.md` · `skills/lean-doc-generator/templates/SPRINT.md.template`
@@ -162,6 +162,42 @@ opt-in flag runs the full set; a deliberately broken guarded snippet still FAILs
 ## Execution Log
 
 <!-- Append-only, dated. The Plan is frozen at promote — log here rather than editing § Plan. -->
+
+### 2026-08-01 | sprint-bulk G1+G2 | signed off — sequential, shared tree, no worktrees
+Batch G1 fast-path (T1–T3 arrived via decomposer `approve` this session; T4 signed off on the promote
+checklist). G2 approved as designed.
+
+**Worktree isolation ruled out on evidence, not preference.** The repo is 11 commits ahead of
+`origin/main` and the sprint file does not exist there at all — every task appends to the Execution Log
+and ticks DoD, so every agent would hit an add/add merge on it (dispatch.md's own corollary). Worse,
+`scripts/qa-check.sh` on the remote predates SPRINT-041's leg 13, so a worktree agent editing it would
+fork from a base missing the guard we just shipped. Shared tree, coordinator-owned commits.
+
+**Sequential over parallel** despite T1→T2 and T3→T4 being disjoint chains: L-073's measured $6.60 for
+two ~25-line changes says fan-out re-pays the full substrate per branch, and these are four small
+markdown/shell edits. T3+T4 dispatch to Sonnet; T1+T2 run inline — prose edits to two references
+already read in full this session, where dispatching would re-pay the substrate to produce ~15 lines.
+
+Pre-dispatch preflight re-run at live HEAD (`bac6f01`): **CLEAR** — waves T1+T3 (rank 0), T2+T4 (rank 1),
+all four shared-file overlaps carrying an ownership edge.
+
+### 2026-08-01 | T1 | allowlist derivation extended to the run's terminal steps
+Replaced the single-source allowlist bullet with a **four-source derivation** (per-task commands ·
+landing path · the gate's own writing subprocesses · the exit path), plus the asymmetry that makes 2
+and 4 load-bearing: a per-task denial costs one task, a shared-path denial costs the whole run.
+
+All five denial signatures recorded in SPRINT-041 map onto the new sources — `mktemp`/`git -C` → 3,
+`git worktree add`/`git merge --no-ff` → 2, `Skill(/handoff)` → 4. Verified against the archived
+Execution Log, no paid run needed.
+
+Reconciled the two references bidirectionally: `dispatch.md` § Merge-back queue now states that its
+steps are source 2 and must be pre-authorized, so a step added there is a step to add here. Also
+corrected a clause my own change made stale — Part 1 claimed the `/handoff` denial was "the only
+evidence so far", which the merge-back denial makes false.
+
+Noted, not acted on: night-run.md is now **446 lines** (was 427). TD-014's split trigger is a *third
+embedded snippet* and the count is unchanged at 2, so it stays unfired — but the file keeps growing,
+and T2 adds to it again.
 
 ## Files Changed
 
