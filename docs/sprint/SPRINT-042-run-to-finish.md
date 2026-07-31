@@ -99,17 +99,17 @@ costs a glance, the current false negative costs a corrupted merge.
 debt ledger as required-by-DoD but absent from `Layers:`; run against this sprint's own Plan, it passes.
 
 **DoD:**
-- [ ] For each task block in an active sprint's Plan, the gate reports any file named in that task's
+- [x] For each task block in an active sprint's Plan, the gate reports any file named in that task's
       DoD/Acceptance prose but absent from its `Layers:`
-- [ ] Same treatment for a dependency the prose implies but `Depends-on:` omits
-- [ ] Leg follows the existing text-lint idiom (`ok`/`bad` helpers, named finding, never a bare FAIL)
-- [ ] **Negative-tested per check**, each failing with its own named finding, with **SPRINT-041's Plan
+- [x] Same treatment for a dependency the prose implies but `Depends-on:` omits
+- [x] Leg follows the existing text-lint idiom (`ok`/`bad` helpers, named finding, never a bare FAIL)
+- [x] **Negative-tested per check**, each failing with its own named finding, with **SPRINT-041's Plan
       reconstructed as the must-FAIL fixture** — a real recorded miss, not an invented one. Run bare,
       never piped (L-057)
-- [ ] Fixtures **retained** in the eval set, not deleted with the scaffolding that built them (L-058 ·
+- [x] Fixtures **retained** in the eval set, not deleted with the scaffolding that built them (L-058 ·
       TD-012's lesson)
-- [ ] Green on this sprint's own Plan, whose `Layers:` were written to be complete (D4)
-- [ ] `docs/QA.md` leg inventory updated; TD-020 marked `status: resolved → SPRINT-042 T3`
+- [x] Green on this sprint's own Plan, whose `Layers:` were written to be complete (D4)
+- [x] `docs/QA.md` leg inventory updated; TD-020 marked `status: resolved → SPRINT-042 T3`
 
 ### T4 — Split the harness legs into always-on and opt-in (TD-016, option c) `[size: S · risk: med · class: execution · AFK]`
 Layers: `scripts/qa-check.sh` · `docs/QA.md` · `TECH-DEBT.md`
@@ -220,6 +220,40 @@ unattended ones (consumer lens, L-015).
 
 night-run.md is now **484 lines**, up 57 this sprint. TD-014's trigger (a third embedded snippet)
 remains unfired at 2, so no split — but the growth is real and worth raising at close.
+
+### 2026-08-01 | T3 | Layers-vs-DoD completeness leg — dispatched, then independently re-verified
+Dispatched to a `general-purpose` Sonnet sub-agent per G2 (the first dispatch of this sprint; T1/T2 ran
+inline). It invoked `/tdd` and adapted it to the repo's fixtures-first idiom — must-FAIL fixtures as
+RED, real Plan as GREEN — and said so rather than skipping silently. Leg 14 delegates to a retained
+checker with three checks: backtick-quoted file tokens in DoD/Acceptance prose vs `Layers:` · a
+`TD-NNN`+"resolved" co-occurrence implying the debt ledger · another task's id in the prose vs
+`Depends-on:`. Gate **73 pass, 0 fail**.
+
+**The claim was not accepted — it was re-run.** T3's whole subject is a guard that must be able to
+fail, so taking "I negative-tested it" on trust would reproduce the defect it exists to prevent.
+Verified in five directions, all bare: SPRINT-041 reconstructed → FAIL naming `TECH-DEBT.md` on both
+T1 and T2 · depends-on fixture → FAIL naming the omitted `T1` · SPRINT-042's real Plan → 8/8 PASS ·
+plus **two adversarial cases the agent did not construct** (L-065), a file named only in a DoD line and
+one named only in an Acceptance line — both FAIL naming the file, exit 1.
+
+One of those adversarial runs first appeared to expose a false negative. It was **my own broken
+fixture**: the `sed` targeted `- [x]` while T3's DoD was still unticked, so the injected violation never
+landed and the checker correctly passed a clean file. Re-run properly, it FAILs. Recording it because
+the near-miss is the point — I nearly filed a defect against a working guard on the strength of a test
+I had not validated, which is the same class of error as trusting the guard without testing it.
+
+**Finding — TD-020's fix carries a residual of TD-020's own shape.** The agent created
+`scripts/lib/check-layers-completeness.sh`, which is **not in T3's declared `Layers:`**, and the new
+check cannot catch that: it compares the declaration against files *named in the DoD prose*, and a DoD
+written at promote cannot name a file invented during implementation. So the second source catches
+**forgotten** files, not **invented** ones. No hazard materialised here (T3 ran alone; T4 depends on
+it), but under the parallel dispatch this check exists to protect, a file invented by one agent and
+touched by another would still collide unseen. The missing third source is the *observed* one — actual
+touched files at commit time vs the declaration. Raising at close, not fixing here: the Plan is frozen,
+and this is new scope.
+
+Also noted for T4: `docs/QA.md`'s eval-harness row still reads "the 5 zero-API harnesses" — stale at 6
+before this task, 7 now. The agent deliberately left it to T4, which owns the harness count.
 
 ## Files Changed
 

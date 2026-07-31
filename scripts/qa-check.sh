@@ -305,7 +305,7 @@ done
 # unset $TMPDIR) could masquerade as the harness's verdict (CLAUDE.md Edit-safety trap (c)). A
 # harness that can't even be found or that exits non-zero for any reason is its own named FAIL,
 # never a silent skip.
-eval_harnesses="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh"
+eval_harnesses="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh"
 # Harnesses deliberately NOT gated. Empty is a valid state -- but a paid/non-deterministic harness is
 # excluded by being NAMED here with a reason, never by being left out of the list above.
 eval_harnesses_excluded=""
@@ -360,6 +360,37 @@ for hp in $headless_procs; do
   else bad "headless park-record cue $hp: park-record instruction naming the /handoff doc missing"
   fi
 done
+
+# --- 14. Layers/Depends-on completeness vs DoD prose (TD-020, L-071, SPRINT-042 T3) --------
+# The dispatch preflight's shared-file check reads a hand-written `Layers:` declaration -- sound
+# logic, unvalidated input (L-071): a check over a manifest cannot detect an omission from that
+# manifest, because omission looks identical to absence. SPRINT-041 is the real recorded miss: both
+# T1 and T2's DoDs required marking a TD resolved, neither declared TECH-DEBT.md in Layers:, the
+# preflight passed on the incomplete input, and two agents edited the file concurrently in separate
+# worktrees -- merging clean only by ~19 lines of luck. This leg delegates to the retained checker
+# (scripts/lib/check-layers-completeness.sh, itself covered by evals/run-layers-completeness-
+# fixtures.sh) which derives a second, independently-sourced candidate set from each task block's
+# own DoD+Acceptance prose and diffs it against Layers:/Depends-on:. Fails toward over-reporting by
+# design (TD-020): a false positive costs a glance, the false negative above cost a corrupted merge.
+lc_script="scripts/lib/check-layers-completeness.sh"
+if [ ! -f "$lc_script" ]; then
+  bad "layers completeness: checker not found at $lc_script"
+else
+  lc_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
+  if [ -z "$lc_files" ]; then
+    note "layers completeness: skip (missing): docs/sprint/SPRINT-*.md"
+  else
+    lc_out=$(sh "$lc_script" $lc_files 2>&1); lc_code=$?
+    if [ "$lc_code" -eq 0 ]; then
+      lc_n=$(printf '%s\n' "$lc_out" | grep -cE '^PASS')
+      ok "layers completeness ($lc_n block-check(s) verified against DoD/Acceptance prose)"
+    else
+      lc_find=$(printf '%s\n' "$lc_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
+      [ -n "$lc_find" ] || lc_find="no FAIL line in output -- checker exited $lc_code without reporting one"
+      bad "layers completeness: $lc_find"
+    fi
+  fi
+fi
 
 # --- Summary ----------------------------------------------------------------
 printf '\n----------------------------------------\n'

@@ -30,7 +30,7 @@ status: current
     the freshness leg compare entry *counts* against the corpus, not just mtime/hash. Note the
     environment half was real and is fixed separately (`TMPDIR` moved off the full volume).
 
-- **TD-020** severity: medium | status: open | created: Sprint-041
+- **TD-020** severity: medium | status: resolved → SPRINT-042 T3 | created: Sprint-041
   - Summary: the dispatch preflight's **shared-file single-owner check reads `Layers:`** — a
     hand-written declaration in the sprint Plan. SPRINT-041's Plan omitted `TECH-DEBT.md` from both
     tasks' `Layers:` even though each task's DoD explicitly required marking its own TD resolved. The

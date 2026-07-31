@@ -22,6 +22,7 @@ Run both before cutting a release or closing a sprint.
 | Task schema | active-sprint `### Tn` Plan blocks carry `class:` + an autonomy tag (HITL/AFK) in header meta, plus `Depends-on:`/`Layers:`/`**Acceptance:**` — else FAIL (TASK-110) |
 | Eval harnesses (TD-013) | the 5 zero-API harnesses under `evals/` (skill-freshness, worktree-usability, dispatch-preflight fixtures + the boundary-park/no-action-park selftests) each run bare, gated on **that harness's own exit status** — a FAIL names both the harness and the finding it reported |
 | Headless park-record cue (TD-019) | migrate's and init's procedures (`skills/lean-doc-generator/references/{migration-map,init}.md`) each still carry the ask-channel probe (`ToolSearch select:AskUserQuestion`) and the park-record instruction naming a `/handoff` doc — a FAIL names the procedure and which of the two it lost |
+| Layers/Depends-on completeness (TD-020) | for every `### Tn` block in an active sprint's Plan, `scripts/lib/check-layers-completeness.sh` derives a second, DoD/Acceptance-prose-sourced candidate touched-file and dependency set and diffs it against the block's `Layers:`/`Depends-on:` — a FAIL names the block and the file or task id the declaration omitted |
 
 Non-zero exit = fix before release. Watch the near-cap files the run prints — one edit can breach
 them.
