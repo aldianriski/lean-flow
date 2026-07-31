@@ -48,6 +48,41 @@ _(none active)_ — SPRINT-041 closed 2026-08-01. Promote the next sprint from `
       tracker:    SPRINT-041 Retro · L-072
       state:      ready
 
+- [ ] TASK-132 — Cross-check a sprint Plan's declared Layers against what its DoD implies  [size: M] [risk: low] [AFK]
+      class:      execution
+      done-when:  the always-on gate reports, for each task block in an active sprint's Plan, any file
+                  named in that task's DoD/Acceptance prose but absent from its `Layers:` declaration —
+                  and any dependency the prose implies but `Depends-on:` omits. Negative-tested per
+                  check, each failing with its own named finding, using SPRINT-041's Plan reconstructed
+                  as the must-FAIL fixture: a real recorded miss whose DoDs require marking a TD
+                  resolved while its `Layers:` omits the debt ledger. Fixtures retained (L-058) — a
+                  guard shipped without the input that makes it fail is the failure it exists to prevent
+      touches:    the qa gate script · its leg inventory doc · the retained eval fixture set · the tech
+                  debt ledger (marks TD-020 resolved — declared deliberately, since omitting exactly
+                  this kind of DoD-implied file IS what TD-020 names)
+      depends-on: none
+      assumes:    grep-shaped over the Plan's existing markup — no new file format and no second source
+                  of truth (ADR-013 already rejected a compiled DAG). Fails toward over-reporting: a
+                  false positive costs a glance, the current false negative costs a corrupted merge
+      tracker:    TD-020 · L-071
+      state:      ready
+
+- [ ] TASK-133 — Record an unattended run's own cost and throughput as pre-flight and rollup data  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  the unattended pre-flight states the run's own expected cost as a line distinct from
+                  its tasks' verification cost (the conflation L-073 names), and the morning rollup
+                  carries actual cost, turn count, wall-clock, and units of work completed. SPRINT-041's
+                  recorded figures are entered as the first calibration row, with the format stating
+                  plainly that one row is an estimate and not a budget
+      touches:    the unattended-run reference's pre-flight and morning-rollup sections · the sprint
+                  template's retro section
+      depends-on: none
+      assumes:    a headless run can observe its own cost from the harness result output; if it cannot,
+                  the row degrades to the observable fields (turns · wall-clock · units) and says so
+                  rather than omitting the line — the degraded form still yields a calibration series
+      tracker:    L-073
+      state:      ready
+
 ### P2 — Quality / Polish
 
 ### P3 — Long-term
