@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-30
+last_updated: 2026-08-01
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -15,6 +15,38 @@ status: current
 ---
 
 ## Tech Debt
+
+- **TD-021** severity: minor | status: open | created: Sprint-041
+  - Summary: `scripts/gen-index.sh` writes `docs/knowledge-index.md` **non-atomically**. When the C:
+    volume hit zero free space mid-close, the script failed partway through and left the generated
+    index truncated from 34 lines to 12 — a **syntactically valid file with silently missing content**.
+  - Impact: `qa-check` did catch it, but as "index STALE" — the right alarm for the wrong reason, and
+    only because the truncation happened to also make it stale. A partial write that preserved
+    staleness parity would have passed. A generated SSOT that can degrade into a plausible-looking
+    subset of itself is the silent-false-negative shape (L-058), one layer down: nothing here is
+    *wrong*, there is just less of it, and no check counts what should be there.
+  - Mitigation (not yet done): write to a temp file in the same directory and `mv` it into place, so
+    a failed generation leaves the previous index intact rather than a truncated one. Optionally have
+    the freshness leg compare entry *counts* against the corpus, not just mtime/hash. Note the
+    environment half was real and is fixed separately (`TMPDIR` moved off the full volume).
+
+- **TD-020** severity: medium | status: open | created: Sprint-041
+  - Summary: the dispatch preflight's **shared-file single-owner check reads `Layers:`** — a
+    hand-written declaration in the sprint Plan. SPRINT-041's Plan omitted `TECH-DEBT.md` from both
+    tasks' `Layers:` even though each task's DoD explicitly required marking its own TD resolved. The
+    check passed on incomplete input and both agents edited the file concurrently in separate
+    worktrees.
+  - Impact: they merged clean only because the hunks sat ~19 lines apart — luck, not design. The
+    check's *logic* is sound and negative-tested; its *input* is unvalidated, so the guard silently
+    inherits whatever the author forgot at promote. This is the exact hazard concurrent dispatch
+    creates, and the one check meant to catch it cannot see the omission. Applies to `Depends-on:`
+    equally — an undeclared dependency is invisible the same way.
+  - Mitigation (not yet done): give the declaration a **second source** rather than trusting it —
+    derive a candidate touched-file set from each task's DoD/Acceptance prose and diff it against
+    `Layers:`, reporting any file named in the DoD but absent from the declaration. Cheap, grep-shaped,
+    and it fails toward over-reporting (a false positive costs a glance; the current false negative
+    costs a corrupted merge). Must itself be negative-tested per L-058 — reconstruct SPRINT-041's own
+    Plan as the must-FAIL fixture, since it is a real recorded miss.
 
 - **TD-019** severity: minor | status: resolved → SPRINT-041 T1 | created: Sprint-040
   - Summary: the park-record behaviour SPRINT-040 T2 shipped has **no retained guard**. Its positive

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-30
+last_updated: 2026-08-01
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-041 — Debt Guards** → docs/sprint/SPRINT-041-debt-guards.md
+_(none active)_ — SPRINT-041 closed 2026-08-01. Promote the next sprint from `state: ready` Backlog tasks.
 
 ---
 
@@ -30,33 +30,25 @@ status: current
 
 ### P1 — Next Phase Required
 
+- [ ] TASK-131 — Extend the night-run allowlist recipe to cover the run's terminal steps  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  the pre-flight allowlist recipe enumerates the commands an unattended run needs to
+                  *finish*, not only the ones its tasks need to work — the coordinator's merge-back
+                  path (integration-worktree creation, the no-ff merge, worktree removal/prune) and
+                  the git writes the always-on gate's own eval harnesses perform on throwaway repos;
+                  a stated method for deriving the set (not a copyable literal list, which goes stale
+                  and leaks this repo's commands into a generic skill) plus the reasoning that the
+                  shared landing path is where a denial costs the whole run
+      touches:    the unattended-run reference's pre-flight section · the dispatch reference's
+                  merge-back section, if the two still disagree about which commands merge-back needs
+      depends-on: none
+      assumes:    the fix is a specification gap in shipped guidance, not a permission-model change —
+                  building the actual allowlist stays an owner action at each pre-flight, and no
+                  default is loosened
+      tracker:    SPRINT-041 Retro · L-072
+      state:      ready
+
 ### P2 — Quality / Polish
-
-- [ ] TASK-129 — Guard the headless park-record cue in qa-check  [size: S] [risk: low] [AFK]
-      class:      execution
-      done-when:  qa-check gains a leg asserting both the migrate and init procedures still carry
-                  (a) a headless *detection* cue and (b) a park-record instruction naming the handoff
-                  doc; the leg is negative-tested against a scratch copy with the cue stripped and
-                  FAILs there naming which procedure lost it — a guard that can only pass is the
-                  failure mode it exists to prevent (L-058)
-      touches:    the qa gate script · docs/QA.md leg inventory
-      depends-on: none
-      assumes:    grep-shaped presence check only — model compliance stays a paid opt-in fixture,
-                  per docs/QA.md's manual/gated boundary
-      tracker:    TD-019
-      state:      ready
-
-- [ ] TASK-130 — Fix the zero-match grep idiom in the boundary-park assertion  [size: S] [risk: low] [AFK]
-      class:      execution
-      done-when:  a genuine zero-match no longer emits "integer expression expected" on stderr; the
-                  FAIL no-park-record verdict is unchanged, and both the harness selftest and a real
-                  zero-match case are run to prove each direction still reports correctly
-      touches:    the boundary-park assertion script
-      depends-on: none
-      assumes:    fail-safe in both directions today (TD-018 verified it) — this is noise removal,
-                  not a correctness fix, so the verdict text must not change
-      tracker:    TD-018
-      state:      ready
 
 ### P3 — Long-term
 

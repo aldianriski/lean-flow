@@ -2,8 +2,8 @@
 sprint: 041
 slug: debt-guards
 owner: Maintainer
-last_updated: 2026-07-30
-status: active
+last_updated: 2026-08-01
+status: closed
 plan_commit: de4f173
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -205,4 +205,53 @@ so a failed write degrades it silently rather than loudly.
 
 ## Retro
 
-<!-- Written at close. -->
+**Retrieval check** — no retrieval miss. The run applied L-057 (run gates bare, never piped), L-058
+(a must-FAIL fixture per check), and L-042/L-043 (the worktree git-op bans) unprompted. One
+**contradiction between two shipped references** did surface: `dispatch.md` prescribes a separate
+integration worktree for merge-back (`git worktree add`), while `night-run.md` Part 1's allowlist
+recipe never lists that command — the run followed the first and was denied by the second. That is a
+fileable friction (→ L-072), not a failure to retrieve.
+
+**Worked**
+- **The park protocol held under real pressure.** Denied at merge-back with both branches built,
+  committed, and reviewed, the run did not force the merge through another path, did not ask (no
+  channel), and did not decide. It parked with a next-action list precise enough to execute verbatim
+  the next morning. Part 0's hardest clause is *don't decide*, and it was obeyed at exactly the point
+  where reasoning past it would have looked reasonable.
+- **Both agents proved their blocker pre-existing** — each reverted its own edit and reproduced the
+  identical failure — rather than reporting it as a regression they had introduced. CLAUDE.md trap (c)
+  applied without being prompted.
+- **The run's negative-test claim was re-verified, not accepted.** T1's whole subject is a guard that
+  must be able to fail; taking "I negative-tested it" on trust would have reproduced the exact defect
+  it exists to prevent. Three must-FAIL fixtures re-run independently at merge-back, three named
+  findings confirmed. The claim held — the re-run is what makes saying so worth anything.
+
+**Friction**
+- **The Plan's `Layers:` omitted a file both DoDs plainly required.** `TECH-DEBT.md` went undeclared,
+  so the preflight's shared-file single-owner check passed on incomplete input and both agents edited
+  it in parallel worktrees. They merged clean only because the hunks sat ~19 lines apart — luck, not
+  design. → **TD-020**.
+- **One denied command stranded 100% of the run's output.** Both tasks funnelled through the
+  merge-back, so a single `denied-tool` there left no disjoint AFK work to continue with. A run that
+  can dispatch into worktrees and cannot merge them is structurally unable to finish. → **TASK-131**.
+- **$6.60 for two ~25-line changes**, 15 turns, coordinator plus two worktree agents. The "zero API
+  cost" framing at promote was about the *tasks' verification* needing no paid fixtures; the run
+  itself was never free, and that should have been said before firing. → **L-073**.
+- **A generated SSOT degraded silently.** The C: volume hit zero free space and `gen-index.sh` failed
+  mid-write, truncating `docs/knowledge-index.md` from 34 lines to 12 — a partial write that left a
+  syntactically valid file. `qa-check` flagged it as "index STALE": the right alarm for the wrong
+  reason. → **TD-021**.
+
+**Pattern candidate**
+- **L-072 is the second occurrence** of the allowlist-denies-the-terminal-step shape — the first is
+  the `Skill(/handoff)` denial night-run.md Part 1 already records in prose. `count: 2` → promotion
+  candidate at the next promote (§10).
+
+**Bucket routing**
+
+| Bucket | Filed |
+|---|---|
+| Shipped | **no CHANGELOG version block, no bump** (owner call at close). Both changes are repo-internal guards — `scripts/qa-check.sh` leg 13 and `evals/assert-boundary-park.sh`. The files do ship (the whole repo lands in the install cache), but no skill, template, or procedure a consumer invokes changed, so an entry would be one a reader cannot act on (LAW 4). Maintainer history lives in this archived file + the INDEX line |
+| Tech debt | **TD-020** (preflight reads a hand-written manifest) · **TD-021** (`gen-index.sh` has no atomic-write guard) |
+| Follow-ups | **TASK-131** (allowlist recipe misses the run's terminal steps) |
+| Learnings | **L-071** (a check inherits its manifest's blind spots) · **L-072** (the terminal step is the choke point) · **L-073** (state the run's own cost, separately from the tasks') |

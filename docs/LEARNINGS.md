@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-30
+last_updated: 2026-08-01
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -21,11 +21,35 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-070**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-073**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-073 [tags: process] [status: active]: **State an autonomous run's own cost at pre-flight, separately from the cost of verifying its tasks.** SPRINT-041 was framed at promote as "zero API cost" — true of the *tasks*, whose acceptance needed no paid behavioural fixtures, and false of the *run*, which spent **$6.60** on two ~25-line changes (coordinator plus two worktree agents, 15 turns) doing work a live session would have done for a fraction of it. The two budgets are unrelated and were conflated in a single reassuring phrase, which is what let the number arrive as a surprise afterwards rather than as an input to the decision to fire. Two consequences: fan-out cost scales with **branch-count × substrate-size** (every branch re-pays the full CLAUDE.md + tool context before doing any work — ADR-010's addendum, now with a measured figure attached), so parallel dispatch is a poor trade on small surgical tasks however disjoint they are; and this is the **first real calibration datum** for what an unattended run costs per unit of work — one point, so treat any extrapolation to a full-night window as an estimate, not a budget.
+- seen: Sprint-041
+- count: 1
+- promoted: no
+- related: ADR-010 (dispatch doctrine + the fan-out cost addendum) · L-072 (same run) · night-run.md Part 1 (pre-flight — where the run's own cost belongs)
+
+---
+
+## L-072 [tags: process] [status: active]: **In an autonomous run, the terminal step is the choke point every unit shares — scope its permissions harder than the per-task ones.** SPRINT-041's night run dispatched two worktree agents, both of which built, committed, and self-reviewed their work successfully; then the coordinator's merge-back was denied — `git worktree add` and `git merge --no-ff` were outside the `dontAsk` allowlist. Because *both* tasks funnelled through that one step, there was no disjoint AFK work left to continue with, and a fully-successful run delivered **zero landed work**, stranded on branches. The failure is asymmetric in a way per-task risk assessment misses: a denial in one task's own commands costs that task, while a denial in the shared landing path costs the entire run, no matter how many units succeeded. Second occurrence of the shape — night-run.md Part 1 already records a `Skill(/handoff)` denial that stopped the protocol one step short *after* every task parked correctly. Both are the same defect: the recipe enumerates the commands tasks need and omits the ones the run needs to finish. Generalisation beyond allowlists — when an orchestration has a single integration point, its failure modes deserve the scrutiny normally spent on the fan-out.
+- seen: Sprint-040, Sprint-041
+- count: 2
+- promoted: no
+- related: L-020 (shipping ≠ wiring — this is its permissions-surface form) · night-run.md Part 1 (the `/handoff` denial, occurrence 1) · dispatch.md § Merge-back queue · TASK-131
+
+---
+
+## L-071 [tags: process] [status: active]: **A mechanical check over a hand-written declaration validates that declaration's consistency, never its completeness.** SPRINT-041's dispatch preflight ran its shared-file single-owner check and reported CLEAR; both tasks then edited `TECH-DEBT.md` concurrently in separate worktrees, because neither task's `Layers:` listed it — even though each task's DoD explicitly required marking its own TD resolved. The check's logic is sound and was negative-tested; the *input* was an author's memory at promote time, and the guard inherited its blind spot silently. They merged clean only because the hunks sat ~19 lines apart. The distinguishing property: a gate that reads a manifest cannot detect an **omission** from that manifest, because omission looks identical to absence — so the only fix is a second, independently-derived source to diff against (here: the touched-file set implied by each task's own DoD prose). Ask of any declaration-driven gate: *what would a forgotten entry look like?* If the answer is "a pass", the gate is guarding the honest case only.
+- seen: Sprint-041
+- count: 1
+- promoted: no
+- related: L-058 (a gate's worst failure is the silent false-negative) · L-065 (a check whose comment asserts more than its code tests) · L-066 (a hardcoded sibling list goes stale mid-wave — same family: derived-from-disk beats hand-maintained) · TD-020
 
 ---
 

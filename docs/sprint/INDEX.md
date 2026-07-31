@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-30
+last_updated: 2026-08-01
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-041 — Debt Guards — closed 2026-08-01 · CLOSESHA (no release — maintainer-only)
 - SPRINT-040 — Freshness Row and Park Records — closed 2026-07-30 · ebef0fe (MINOR v1.23.0)
 - SPRINT-039 — Eval Coverage and Release — closed 2026-07-30 · dfc60e4 (no release — maintainer-only)
 - SPRINT-038 — Probes, Evals, and Layout — closed 2026-07-30 · e4d132c (MINOR v1.22.0)
