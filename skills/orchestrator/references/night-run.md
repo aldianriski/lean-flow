@@ -151,6 +151,15 @@ All items must pass or the night-run does not fire:
       `/prime` reads. Never let an allowlisted `/handoff` become the run's only exit.
 - [ ] `bypassPermissions` is off the table — never the fallback for a lazy allowlist. The safety
       default stays OFF; flipping it is an owner decision, not a night-run convenience.
+- [ ] **The run's own expected cost is stated** — as its own line, and explicitly *not* the cost of
+      verifying its tasks. These are unrelated budgets and conflating them is how a bill arrives as a
+      surprise instead of as an input to firing: a sprint whose tasks need no paid fixtures is not a
+      free sprint, because the run itself is never free. Estimate from the calibration rows in Part 4
+      (units × the per-unit cost observed there), and say which shape you are paying for — a
+      coordinator plus N dispatched agents costs multiples of the same work done inline, since **every
+      branch re-pays the full substrate** (project instructions + tool context) before it does anything.
+      Measured on this repo: ~$0.22 for a single-turn agent that does no work at all. Fan-out earns
+      that overhead on long or genuinely parallel tasks; on a handful of small edits it does not.
 
 ### Capability checks (specified — the probing mechanism graduates to its own task)
 
@@ -445,3 +454,31 @@ allowlist, re-run). `stalled` = the watchdog fired (next: resume via `/prime` + 
 
 Distinguish `parked-hitl` from `denied-tool` in the morning: a park is the contract working as
 designed and needs a decision; a denial is an under-scoped allowlist and needs a config fix.
+
+### The calibration row (one per run, always — green or not)
+
+The per-task lines above say what happened; this one says **what it cost**. Append it beside them:
+
+```
+run · <actual cost> · <turns> · <wall-clock> · <units completed / attempted> · <shape>
+```
+
+`shape` is what you paid for — `inline`, or `coordinator + N agents`, since the same work costs
+multiples in the second form. Read the numbers off the harness rather than estimating: a headless
+`claude -p --output-format json` result carries `total_cost_usd`, `num_turns`, and `duration_api_ms`
+(with a per-model breakdown under `modelUsage`), so this is a transcription, not a judgement.
+**Degrade rule** — where cost is not exposed, record the fields that are (turns · wall-clock · units)
+and **say the cost was unavailable**. A row with a stated gap still calibrates; a silently omitted row
+is what leaves the next person estimating from nothing.
+
+**Rows so far** — this is a series being started, not a budget. One row is an anecdote; do not size a
+window from it:
+
+| Sprint | Cost | Turns | Units | Shape |
+|---|---|---|---|---|
+| SPRINT-041 | $6.60 | 15 | 2 / 2 built, 0 landed | coordinator + 2 worktree agents |
+
+Read that row honestly: the run *built* both units and landed neither, because the merge-back was
+denied — so $6.60 bought two stranded branches. Cost per unit **delivered** is the number that
+matters, and it was undefined. Note also the floor underneath it: a single-turn agent doing no work
+at all measured ~$0.22 on this repo, which is the substrate every branch re-pays before starting.

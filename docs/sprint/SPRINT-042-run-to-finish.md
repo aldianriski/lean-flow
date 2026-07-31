@@ -74,15 +74,15 @@ verification cost, and the morning rollup carries actual cost · turns · wall-c
 with SPRINT-041's figures present as the first calibration row.
 
 **DoD:**
-- [ ] Pre-flight carries the run's own expected cost as its own line, explicitly not the tasks'
+- [x] Pre-flight carries the run's own expected cost as its own line, explicitly not the tasks'
       verification cost
-- [ ] The morning rollup format carries actual cost · turn count · wall-clock · units of work completed
-- [ ] SPRINT-041's recorded figures ($6.60 · 15 turns · coordinator + 2 worktree agents · 2 tasks) are
+- [x] The morning rollup format carries actual cost · turn count · wall-clock · units of work completed
+- [x] SPRINT-041's recorded figures ($6.60 · 15 turns · coordinator + 2 worktree agents · 2 tasks) are
       entered as the first calibration row
-- [ ] The format states plainly that one row is an estimate, not a budget
-- [ ] If cost is not observable from the harness result output, the row degrades to the observable
+- [x] The format states plainly that one row is an estimate, not a budget
+- [x] If cost is not observable from the harness result output, the row degrades to the observable
       fields and **says so** rather than omitting the line (A1)
-- [ ] Shares `night-run.md` with T1 — lands after it, per D2
+- [x] Shares `night-run.md` with T1 — lands after it, per D2
 
 ### T3 — Cross-check a Plan's declared Layers against what its DoD implies `[size: M · risk: low · class: execution · AFK]`
 Layers: `scripts/qa-check.sh` · `docs/QA.md` · `evals/run-layers-completeness-fixtures.sh` · `TECH-DEBT.md`
@@ -198,6 +198,28 @@ evidence so far", which the merge-back denial makes false.
 Noted, not acted on: night-run.md is now **446 lines** (was 427). TD-014's split trigger is a *third
 embedded snippet* and the count is unchanged at 2, so it stays unfired — but the file keeps growing,
 and T2 adds to it again.
+
+### 2026-08-01 | T2 | run cost + throughput made first-class; A1 confirmed on real input
+**A1 resolved by measurement, not reasoning.** `claude -p --output-format json` returns
+`total_cost_usd`, `num_turns`, `duration_api_ms`, and a per-model `modelUsage` breakdown — verified by
+running it, not by reading docs. So the degrade path shipped in the DoD is a genuine fallback rather
+than the expected case, which is the opposite of what the assumption feared.
+
+The same probe produced a second datum worth more than the first: a **single-turn agent that does no
+work at all cost ~$0.22**, almost entirely cache-creation. That is the substrate every dispatched
+branch re-pays before starting, measured directly rather than inferred from ADR-010's cost term. It is
+now stated in pre-flight as the floor under any fan-out decision.
+
+Pre-flight gained a cost line explicitly separated from the tasks' verification cost — the exact
+conflation L-073 names. Part 4 gained a per-run calibration row (`cost · turns · wall-clock · units ·
+shape`) with a degrade rule (unavailable cost is *stated*, never silently dropped) and SPRINT-041 as
+row one. The table is framed as a series being started, and the row is annotated honestly: $6.60
+bought two branches that were built and never landed, so cost **per unit delivered** was undefined.
+`SPRINT.md.template`'s Retro gained the matching prompt, phrased for any sprint rather than only
+unattended ones (consumer lens, L-015).
+
+night-run.md is now **484 lines**, up 57 this sprint. TD-014's trigger (a third embedded snippet)
+remains unfired at 2, so no split — but the growth is real and worth raising at close.
 
 ## Files Changed
 

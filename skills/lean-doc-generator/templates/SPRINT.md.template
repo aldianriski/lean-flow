@@ -80,6 +80,8 @@ Depends-on: [Tn / TASK-NNN list, or none]
 
 **Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint? (yes → a Learnings-bucket friction + the retrieval-miss signal, DOCS_Guide §10)
 
+**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents). Record it even when it is unremarkable: one row is an anecdote, and the series is what lets the next promote size a batch instead of guessing. Cost per unit **delivered**, not per unit attempted. Unavailable → say so rather than omitting the line.
+
 **Worked**
 - [what to keep doing]
 
