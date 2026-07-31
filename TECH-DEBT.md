@@ -103,7 +103,7 @@ status: current
     and `/triage` already carried and why they alone complied in SPRINT-039. A behavioural rule ships
     with its trigger or it does not ship. Cost of finding that out: 4 real runs, $2.10.
 
-- **TD-016** severity: minor | status: open | created: Sprint-039
+- **TD-016** severity: minor | status: resolved → SPRINT-042 T4 | created: Sprint-039
   - Summary: `scripts/qa-check.sh` leg 12 (TD-013's fix) runs 6 zero-API eval harnesses, taking the
     gate from **~44s to ~90s (+80%)**; the two `selftest-assert-*` harnesses are ~26s of that, since
     each spins up many throwaway git repos.
@@ -124,6 +124,21 @@ status: current
     never. Split: the snippet runners stay always-on (they guard shipped `skills/**` text, which is
     what a consumer receives); the selftests move behind an opt-in flag (they guard maintainer-only
     assertion scripts). Resolution lands as a SPRINT-042 task; row stays `open` until it does.
+  - Resolution (SPRINT-042 T4): `qa-check.sh` leg 12 now splits `eval_harnesses_always` (the 3
+    snippet runners + the layers-completeness harness landed by T3, all cheap) from
+    `eval_harnesses_optin` (the 3 `selftest-assert-*` harnesses, each spinning up many throwaway git
+    repos) gated behind `QA_FULL=1`. Applied the option-(c) heuristic as a proxy, not a literal rule:
+    layers-completeness is maintainer-facing like the selftests but cheap, so it stayed always-on
+    rather than hiding a corrupted-merge false-negative behind a flag — where the shipped-text/
+    maintainer-only proxy and the runtime cost disagreed, cost won. Measured on this machine at the
+    pre-T4 commit (all 7 harnesses always-on): **1m24s**, 73 pass. Post-T4 bare (4 always-on):
+    **57s**, 70 pass — a ~33% cut. Post-T4 `QA_FULL=1` (all 7): **1m24s**, 73 pass — unchanged from
+    baseline, confirming the flag recovers the full set rather than a subset of it.
+    Verified both directions on deliberately broken input: a broken shipped-text guard
+    (`night-run.md`'s stale-release leg) still FAILs the bare gate by name; a broken maintainer-only
+    assertion (`assert-boundary-park.sh`'s no-completion-claim check) still FAILs under `QA_FULL=1`
+    by name. Both breaks reverted and re-verified clean. Split stated in `docs/QA.md` beside the
+    existing manual/gated boundary so the reduced bare-run set is discoverable, not silently dropped.
 
 - **TD-015** severity: medium | status: resolved → SPRINT-040 T1 | created: Sprint-039
   - Summary: the skill-freshness check shipped in `skills/orchestrator/references/night-run.md`

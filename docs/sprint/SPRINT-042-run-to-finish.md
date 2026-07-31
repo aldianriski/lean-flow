@@ -127,13 +127,13 @@ silently no longer running.
 opt-in flag runs the full set; a deliberately broken guarded snippet still FAILs the bare run.
 
 **DoD:**
-- [ ] Snippet runners stay always-on; selftests run only under the opt-in flag
-- [ ] The bare gate still FAILs on a deliberately broken **shipped-text** guard — verified, then reverted
-- [ ] The opt-in flag runs the full set and still FAILs on a broken maintainer-only assertion — verified
-- [ ] The always-on/opt-in split is stated in `docs/QA.md` beside the existing manual/gated boundary,
+- [x] Snippet runners stay always-on; selftests run only under the opt-in flag
+- [x] The bare gate still FAILs on a deliberately broken **shipped-text** guard — verified, then reverted
+- [x] The opt-in flag runs the full set and still FAILs on a broken maintainer-only assertion — verified
+- [x] The always-on/opt-in split is stated in `docs/QA.md` beside the existing manual/gated boundary,
       so what no longer runs by default is discoverable rather than silently dropped
-- [ ] Runtime before/after recorded — the number is TD-016's whole subject
-- [ ] TD-016 marked `status: resolved → SPRINT-042 T4`
+- [x] Runtime before/after recorded — the number is TD-016's whole subject
+- [x] TD-016 marked `status: resolved → SPRINT-042 T4`
 
 ## Decisions (pre-locked)
 
@@ -254,6 +254,33 @@ and this is new scope.
 
 Also noted for T4: `docs/QA.md`'s eval-harness row still reads "the 5 zero-API harnesses" — stale at 6
 before this task, 7 now. The agent deliberately left it to T4, which owns the harness count.
+
+### 2026-08-01 | T4 | TD-016 split shipped — and the cost of it measured, not assumed
+One `decision`-class call stayed inline rather than going to the agent: D1 predates the 7th harness and
+does not say where it lands. **Placed always-on.** TD-016's stated cut (shipped-vs-maintainer) is a
+proxy; the problem the row actually names is *runtime*, and the slow harnesses are the three
+`selftest-assert-*` that each spin up many throwaway git repos. The layers-completeness harness is
+maintainer-facing but cheap, and hiding a cheap check behind a flag buys nothing while its
+false-negative is a corrupted merge. Gap-filling, not a reversal of D1 — logged rather than assumed.
+
+Mechanism: `QA_FULL=1`, an env var, chosen because the script already reads env state and parses no
+flags anywhere. **Runtime: 84s → 57s bare (−32%)**; `QA_FULL=1` returns to 84s.
+
+**Independently re-verified on different targets than the agent used**, since this is the one task that
+*removes* checks:
+- Bare gate still catches a broken always-on subject — I broke the **dispatch-preflight** snippet (the
+  agent had used skill-freshness): FAIL naming the harness and its finding. Reverted, verified clean.
+- **What we gave up, measured rather than asserted:** breaking a selftest subject leaves the bare gate
+  at **70 pass, 0 fail** — genuinely invisible — while `QA_FULL=1` catches it. That is exactly the
+  trade TD-016 chose, and it is now a demonstrated property rather than a claim.
+- **The silent-drop guard holds.** Removing a harness from every list makes a bare run FAIL by name
+  (`in evals/ but neither gated ... nor explicitly excluded`). This is L-066's lesson wired in: the
+  list checks itself against disk instead of trusting a hand-maintained enumeration.
+- Both of the agent's own break/revert tests confirmed reverted — `git diff` clean on both files.
+
+`docs/QA.md`'s stale count is fixed the right way: replaced with a derived reference
+(`ls evals/run-*.sh evals/selftest-*.sh`) so it cannot go stale again, rather than a corrected number
+that would rot on the next harness.
 
 ## Files Changed
 
