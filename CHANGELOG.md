@@ -11,6 +11,30 @@ status: current
 
 ---
 
+## v1.25.1 — Gate Precision (2026-08-01)
+
+PATCH — SPRINT-045. Two guards were failing on input they should accept. A check that cries wolf on a
+known-good state is on its way to being read past, which costs more than the false alarm itself — and
+both of these were caught by blocking real work.
+
+**What changed for you:**
+- **A dependency chain now counts as shared-file ownership.** The dispatch preflight demanded a
+  *direct* `Depends-on:` edge between every pair of tasks touching the same file, so a Plan that chained
+  four tasks on one reference — unambiguously ordered, and impossible to collide because execution is
+  strictly sequential — was HALTed. The workaround was writing redundant edges into the Plan, noise the
+  next Plan copies. Ownership is now derived from the transitive closure, and the PASS line names the
+  derived order so you can tell chain-ownership from direct.
+- **The plan-commit window no longer reports a false failure.** The sprint convention records a plan
+  commit's sha in a follow-up commit, so between the two there is a window — one that always exists —
+  where the observed-layers check read a placeholder and reported `plan_commit not recorded`. That case
+  is now a named SKIP. A genuinely missing or unresolvable value still FAILs by name; that leg was the
+  whole risk of the change and it is covered by retained fixtures in both directions.
+
+Both fixes narrow a **false positive only**. Neither loosens what its guard catches — verified against
+adversarial fixtures built separately from the ones that shipped with the fixes.
+
+---
+
 ## v1.25.0 — Proof Run and Night-Run Ergonomics (2026-08-01)
 
 MINOR — SPRINT-043 **and** SPRINT-044, cut as one release. SPRINT-043 ran unattended and parked the
