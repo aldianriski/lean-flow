@@ -21,11 +21,35 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-076**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-079**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-079 [tags: process] [status: active]: **Making a command satisfy a permission matcher can remove what was anchoring it — command *safety* and command *anchoring* are different properties, and fixing one can silently break the other.** SPRINT-043 found that `dontAsk` denies a permitted command when it is wrapped in `cd X && … 2>&1` (L-077), so the run's natural correction was to issue everything bare. That stripped the `cd` prefix which — unnoticed — had been the only thing pinning each command to the main tree. The shell's cwd persists across calls, an earlier verification had left it inside an agent worktree, and the next three "bare, therefore safe" commands ran there: the integration worktree was created nested inside an agent worktree, and `git merge --ff-only` advanced an agent's branch instead of `main`. Nothing was lost, and nothing detected it either — it surfaced only by reading the command's actual output and noticing a sha (`Updating c94a8c0..`) that had no business appearing. The durable form: when you change *how* a command is issued to satisfy one constraint, re-ask what the old form was silently providing. Anchor explicitly instead (`git -C <abs-path>`), so the property survives the rewrite rather than riding on a prefix.
+- seen: Sprint-043
+- count: 1
+- promoted: no
+- related: L-077 (the constraint that forced the rewrite — same run) · L-060 (caught by inspecting the output, not the status) · TD-023
+
+---
+
+## L-078 [tags: tooling] [status: active]: **A fixture harness that builds its own environment can fail to build it and still report green — the setup failure routes every case into a *different* check that passes its assertion for the wrong reason.** SPRINT-043 T1 shipped a harness whose fixtures create throwaway git repos via `mktemp -d` + `git init`. On this Windows/MSYS host `git -C` cannot resolve the `/d/tmp/...` path `mktemp -d` returns, so every setup commit silently failed, every fixture sprint kept its placeholder `plan_commit:`, and cases written to exercise a real git diff instead tripped the checker's *`plan_commit not recorded`* branch. Some assertions still matched, so the harness printed all-green while never once running the check it existed to guard. This is L-058's worst case reached from a new direction — not a missing must-FAIL fixture, but a present one that never got to fail — and it is invisible to exit codes, which is why it survived the implementing agent's own verification and was caught only by an independent pre-merge review. The general rule: a harness that constructs its fixtures must assert the **construction** succeeded, not just that the assertions matched. A green test whose setup failed is not a weaker signal than no test — it is a worse one, because it is trusted.
+- seen: Sprint-043
+- count: 1
+- promoted: no
+- related: L-058 (must-FAIL fixtures — this is the "fixture never ran" case) · L-075 (its mirror: validate the fixture holds the violation) · L-060 (the artifact, not the report) · TD-024
+
+---
+
+## L-077 [tags: process] [status: active]: **An allowlist derivation answers *which* commands the run may issue, never *in what form* — and a permission matcher reads the literal invocation, so a correctly-derived list still denies the landing path.** SPRINT-042 T1 fixed night-run allowlists by deriving them from four sources instead of one, closing the gap that stranded SPRINT-041's merge-back on a denial. SPRINT-043 tested that fix and it held: `git worktree add` · `merge --no-ff` · `worktree remove` · `prune` were all authorized and both units landed. But the same command was *denied* when issued as `cd X && git worktree add … 2>&1 && echo …` and *permitted* issued bare — character-for-character the same operation, matched differently. So a run can derive its allowlist perfectly from all four sources and still lose the shared landing path, which is the exact failure the four-source rule exists to prevent, reached by a different route. Two rules now point the same way for unrelated reasons: L-057 says never pipe a gate because a pipeline's status is its last command's; this says never chain a permitted command because the matcher stops recognizing it. One command per invocation, anchored with `git -C <abs-path>` rather than a `cd` prefix (L-079).
+- seen: Sprint-043
+- count: 1
+- promoted: no
+- related: L-072 (scope the terminal step hardest — same choke point) · L-057 (never pipe a gate — converging rule) · L-079 (what the fix for this broke) · TD-023 · night-run.md Part 1
 
 ---
 

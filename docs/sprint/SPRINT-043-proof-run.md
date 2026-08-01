@@ -3,7 +3,7 @@ sprint: 043
 slug: proof-run
 owner: Maintainer
 last_updated: 2026-08-01
-status: active
+status: closed
 plan_commit: 96d93ea
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -264,4 +264,51 @@ dollar figure but the denominator — **cost per unit *delivered* was undefined 
 
 ## Retro
 
-<!-- Written at close. -->
+**The experiment returned a verdict: SPRINT-042 T1's rule holds.** The four-source allowlist derivation
+was an untested claim; this run falsified nothing and confirmed the load-bearing part — source 2, the
+landing path. `git worktree add` · `merge --no-ff` · `worktree remove` · `prune` were all authorized,
+both branches merged, and `main` moved. SPRINT-041 spent $6.60 to strand two branches; this run landed
+2/2. That is the whole deliverable, and it is green.
+
+**But the run found a failure mode the rule doesn't cover, and it is the more interesting result.** The
+four sources answer *which commands* the allowlist needs. They say nothing about *what form* the command
+is issued in — and `dontAsk` matches the literal invocation. `git worktree add …` was denied as
+`cd X && … 2>&1 && echo …` and permitted bare, character-for-character the same operation. A perfectly
+derived allowlist still fails if the run habitually chains its commands. That gap is now TD-023.
+
+**Then the fix for it caused the run's only real mistake**, which is the part worth remembering.
+Stripping `cd` prefixes to satisfy the matcher removed the thing that was anchoring the commands, and
+the shell's persistent cwd — left inside an agent worktree by an earlier verification — silently
+retargeted them. The integration worktree was built in the wrong place and a fast-forward advanced an
+agent branch instead of `main`. Caught by reading the command's actual output (`Updating c94a8c0..`,
+a sha that had no business being there), not by any check. Nothing was lost, but the general shape is
+sharp: **command safety and command anchoring are different properties, and satisfying one can quietly
+break the other.**
+
+**The pre-merge review earned its place twice.** T1's harness reported all fixtures green while its
+fixture *setup* was silently failing — `git -C` cannot resolve the `/d/tmp/...` path `mktemp -d` returns
+on this host, so cases meant to exercise a real git diff were tripping the `plan_commit not recorded`
+branch and passing on the wrong assertion. A green gate that never ran its own check is exactly L-058's
+worst case, and no exit code would have shown it. The same root cause is live and unfixed in
+`run-dispatch-preflight-fixtures.sh` (TD-024) — which means the dispatch preflight's own guard is
+currently not running in this environment, while the preflight itself works.
+
+**What the contract got right.** Three things were parked rather than decided: the night-run.md doc
+change (out of scope), the TD-024 fix (pre-existing, undeclared), and the MINOR release (a capability
+shipped, and no release task in the frozen Plan). None was reasoned around, and the execute-only charter
+is why the run has a clean report instead of a defensible-looking one.
+
+### Buckets routed
+
+| Bucket | Filed |
+|---|---|
+| Shipped | `CHANGELOG.md` — Unreleased block (version bump is owner-reserved) |
+| Tech debt | `TD-021` → resolved (T2) · `TD-022` → resolved (T1) · **TD-023** (allowlist invocation form) · **TD-024** (harness `git -C` MSYS path) |
+| Follow-ups | **TASK-137** — owner: decide + apply the MINOR release for this sprint |
+| Learnings | **L-077** (allowlist form vs command) · **L-078** (fixture setup failing into a wrong-check pass) · **L-079** (safety vs anchoring) |
+
+### Parked for the morning (unattended contract)
+
+- **§11 retention** — archival pass, Backlog entry removal for TASK-134/135/136, INDEX.md line, compaction sweep. Lossy → owner-approved, never self-approved.
+- **Doc-freshness propose→approve** — Files Changed maps to `docs/QA.md` (already updated in-task) and `night-run.md` (TD-023); the propose→approve pass itself is approval-bound.
+- **TD-023 / TD-024 fixes · the MINOR release** — each named above with its unblock condition.

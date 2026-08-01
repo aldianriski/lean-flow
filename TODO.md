@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-043 — Proof Run** → docs/sprint/SPRINT-043-proof-run.md
+> _None._ SPRINT-043 closed 2026-08-01.
 
 ---
 
@@ -29,6 +29,18 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-137 — Decide and apply the MINOR release for SPRINT-043  [size: S] [risk: low] [HITL]
+      class:      decision
+      state:      ready
+      done-when:  the version reflecting SPRINT-043 is chosen and applied — `plugin.json` +
+                  `marketplace.json` bumped in lockstep, and `CHANGELOG.md`'s Unreleased block
+                  retitled to that version. **Owner-reserved:** SPRINT-043 shipped a new capability
+                  (the observed-layers gate), so `/release-patch` does not apply — it is PATCH-only.
+                  The unattended run parked this rather than bumping: no release task was in the
+                  frozen Plan, and a version choice is judgement, not execution.
+      notes:      raised by SPRINT-043 close. See also TD-023 · TD-024, either of which the owner may
+                  want folded in before cutting the release.
 
 - [ ] TASK-135 — Add an observed third source to the declaration cross-check  [size: M] [risk: low] [AFK]
       class:      execution

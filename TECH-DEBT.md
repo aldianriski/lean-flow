@@ -16,7 +16,38 @@ status: current
 
 ## Tech Debt
 
-- **TD-022** severity: medium | status: open | created: Sprint-042
+- **TD-024** severity: medium | status: open | created: Sprint-043
+  - Summary: `evals/run-dispatch-preflight-fixtures.sh` fails with `could not resolve live HEAD in
+    /d/Project/lean-flow`. `git -C` cannot resolve the POSIX-style path that `$(cd … && pwd)` and
+    `mktemp -d` return on this Windows/MSYS host; `git -C D:/…` and `cd … && git …` both work.
+  - Impact: the harness guarding the **dispatch preflight snippet** — the check that computes wave
+    ranks and shared-file ownership before any parallel dispatch — is not running at all here, and
+    `qa-check.sh` has been reporting it as its single FAIL. The preflight itself works (it ran clean
+    for SPRINT-043's own wave); it is the *guard on the preflight* that is dark. Same shape as L-058:
+    a gate that cannot gate. Found while reviewing SPRINT-043 T1, whose own harness had the identical
+    bug and fixed it in place.
+  - Mitigation (not yet done): apply the same normalization T1 used — `pwd -W` after the path is
+    computed (no-op on non-MSYS POSIX) — to `run-dispatch-preflight-fixtures.sh`, and sweep
+    `evals/lib/harness-common.sh` and the `selftest-assert-*.sh` harnesses for the same pattern.
+    Parked at SPRINT-043 rather than fixed mid-run: the file is in no task's `Layers:`, so touching it
+    was scope-changing under the unattended contract.
+
+- **TD-023** severity: medium | status: open | created: Sprint-043
+  - Summary: `night-run.md` Part 1's allowlist derivation names the four **sources** a command must be
+    derived from, but says nothing about the **form** the command is issued in. `dontAsk` matches the
+    literal invocation, so `git worktree add …` issued bare was permitted while the identical operation
+    wrapped as `cd X && … 2>&1 && echo …` was denied.
+  - Impact: an allowlist can be derived perfectly from all four sources and still deny the landing
+    path, which is the failure SPRINT-042 T1 exists to prevent — reached by a different route. Observed
+    live in SPRINT-043 on `git worktree add` and twice more on ordinary compound read commands. The
+    consequence is worse than a lost task: the run's natural fix (strip the `cd`) removed the anchor
+    that kept commands pointed at the right tree (L-079).
+  - Mitigation (not yet done): state in Part 1 that landing-path commands are issued **bare** — one
+    command per invocation, no `cd` prefix, no `&&` chain, no redirect — and that anchoring is done
+    with `git -C <abs-path>` rather than by changing directory. Note the interaction with L-057's
+    never-pipe rule: both point the same way, for different reasons.
+
+- **TD-022** severity: medium | status: resolved → SPRINT-043 T1 | created: Sprint-042
   - Summary: SPRINT-042 T3 gave the `Layers:` declaration a second source — the files named in each
     task's own DoD/Acceptance prose. That source is still **authored at promote**, so it catches a file
     the author *forgot* to declare but is blind to one *invented during implementation*. Proven the day
@@ -34,7 +65,7 @@ status: current
     forgotten, because it reads what happened rather than what someone predicted. Negative-test it per
     L-058 against this sprint's own miss, which is a real recorded instance.
 
-- **TD-021** severity: minor | status: open | created: Sprint-041
+- **TD-021** severity: minor | status: resolved → SPRINT-043 T2 | created: Sprint-041
   - Summary: `scripts/gen-index.sh` writes `docs/knowledge-index.md` **non-atomically**. When the C:
     volume hit zero free space mid-close, the script failed partway through and left the generated
     index truncated from 34 lines to 12 — a **syntactically valid file with silently missing content**.

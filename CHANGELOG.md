@@ -11,6 +11,36 @@ status: current
 
 ---
 
+## Unreleased — Proof Run (2026-08-01)
+
+MINOR when cut — SPRINT-043. **Version deliberately unset:** this sprint ran unattended, and choosing
+a release version is judgement rather than execution, so the run parked it (→ `TASK-137`). The previous
+release fixed the landing path that stranded a night run and could not test it — the sprint that ships
+a fix cannot be the sprint that proves it. This one is the proof: two genuinely disjoint tasks, fanned
+out to worktree agents, merged back through the integration queue. **Both units landed.** The
+predecessor built two and delivered zero.
+
+**What changed for you:**
+- **Your `Layers:` declaration now gets checked against what actually changed.** The existing check
+  compares a sprint task's declared files against the files its own DoD prose mentions — but both are
+  written by one author at one moment, so it catches a file you *forgot* to declare and is blind to one
+  *invented while implementing*. The new leg reads the git diff since the sprint's recorded plan commit
+  and reports anything changed but undeclared. It cannot be forgotten, because it reads history rather
+  than intent. Coordinator close-bookkeeping files are excluded, each with its reason stated in the
+  checker rather than hidden in a silent skip list.
+- **A failed index generation can no longer publish a truncated file.** `gen-index.sh` wrote its
+  temporary file to the system temp directory, which is often a *different volume* from your repo — so
+  the final move was a copy, and a failure partway through left a shorter but perfectly valid-looking
+  index. The temp file now lives beside its destination, making the move a same-volume rename. The
+  limit is stated rather than claimed away: on Windows/NTFS this is not POSIX-grade atomicity.
+- **Two findings you should know about if you run unattended.** A permission allowlist matches the
+  *literal* invocation, so a command you correctly authorized can still be denied when it is issued as
+  part of a `cd … && … 2>&1` chain — issue landing-path commands bare and anchor them with
+  `git -C <path>` (`TD-023`). And a fixture harness that builds throwaway git repos can have its setup
+  fail silently and still report green, guarding nothing (`TD-024`).
+
+---
+
 ## v1.24.0 — Run to Finish (2026-08-01)
 
 MINOR — SPRINT-042. The previous release's night run did everything right and delivered nothing: two
