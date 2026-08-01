@@ -146,11 +146,8 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-067 [tags: tooling] [status: active]: On Windows/Git-Bash, `MSYS_NO_PATHCONV=1` — needed so a bare `/skill` prompt isn't rewritten into a Windows path before reaching `claude.exe` — disables path translation for **every argument in that invocation**, not just the one you meant. A POSIX-style `--plugin-dir "/c/Users/…"` then arrives literally and **fails silently**: no error, the plugin simply never loads, and the run reports "Unknown command". Fix: pass `--plugin-dir` a native Windows path while keeping `MSYS_NO_PATHCONV=1` for the prompt. Cost two runs across SPRINT-039 T1 and T2 before being root-caused. Same family as L-060 — a shell-boundary transformation that succeeds loudly and produces the wrong artifact quietly.
-- seen: Sprint-039, Sprint-044
-- count: 2
-- promoted: no
-- related: L-060 (shell-boundary mangling) · L-081 (Sprint-044's occurrence — the same variable, one blast radius wider: inherited by children) · CLAUDE.md Edit-safety trap (c)
+## L-067 [tags: tooling] [status: promoted]: `MSYS_NO_PATHCONV=1` disables path translation for every argument — and is inherited by every child.
+- **L-067 → promoted: `.claude/CLAUDE.md` Edit-safety trap (d)** — the durable rule is the record now (§11 collapse, SPRINT-045 promote). Body: git + L-081, which carries the second occurrence and the TD-024 root cause.
 
 ---
 

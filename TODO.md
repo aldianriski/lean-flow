@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-044 closed 2026-08-01.
+> **SPRINT-045 — Gate Precision** → docs/sprint/SPRINT-045-gate-precision.md
 
 ---
 
@@ -29,6 +29,36 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-144 — Let the dispatch preflight see ordering through a dependency chain  [size: M] [risk: low] [AFK]
+      class:      execution
+      done-when:  the shared-file ownership check treats a file as owned when the tasks touching it are
+                  ordered **transitively**, not only by a direct edge — a chain orders its members
+                  unambiguously and strictly sequential execution cannot collide, so halting on it is a
+                  false positive that blocks a legitimate Plan. Negative-tested per L-058 with retained
+                  fixtures: a genuine unowned overlap (two rank-0 tasks with no path between them) must
+                  still FAIL by name, and a chained overlap must PASS naming the derived order
+      touches:    the dispatch reference's preflight snippet · its retained fixture harness and fixtures
+      depends-on: none
+      assumes:    the fix is a closure computed over the existing `Depends-on:` markup — no new field
+                  and no second source of truth, which ADR-013 already rejected once
+      tracker:    TD-025
+      state:      ready
+
+- [ ] TASK-145 — Stop the observed-layers check failing in the sha-recording window  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  a sprint whose plan-commit field still holds its placeholder because the sha has not
+                  yet been recorded reports a **named SKIP** rather than a FAIL, while a sprint genuinely
+                  missing that field at execute time still FAILs by name. Both directions negative-tested
+                  with retained fixtures — the point is to remove a guaranteed false alarm without
+                  weakening the real check underneath it
+      touches:    the observed-layers checker · its retained fixture set
+      depends-on: none
+      assumes:    the placeholder is distinguishable from a genuinely absent value, so the two cases can
+                  be told apart without a new convention; if they cannot, the task says so rather than
+                  widening the SKIP to cover both
+      tracker:    TD-026
+      state:      ready
 
 - [ ] TASK-143 — Fire a night run through the launcher and record calibration row three  [size: S] [risk: med] [HITL]
       class:      decision
