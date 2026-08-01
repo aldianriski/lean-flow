@@ -29,6 +29,14 @@ checker="$repo_root/scripts/lib/check-layers-observed.sh"
 
 work=$(mktemp -d) || { echo "FAIL harness: mktemp -d failed"; exit 2; }
 trap 'rm -rf "$work"' EXIT
+# On Windows/MSYS, git.exe's own `-C <path>` chdir sometimes fails to resolve the POSIX-style path
+# mktemp returns (`/d/tmp/...`) -- "cannot change to '/d/tmp/...': No such file or directory" -- even
+# though the shell's own cd/mkdir handle that exact path fine (a git.exe-vs-shell path-resolution
+# mismatch, reproduced directly: `git -C /d/tmp/x init` fails, `git -C D:/tmp/x init` succeeds).
+# Every case below builds its dir as "$work/<name>" then drives it via `git -C`, so normalizing once
+# here to the Windows-style form makes all of them safe. `pwd -W` is unsupported (silently, since we
+# discard stderr) on non-MSYS POSIX, where the original path already works with `-C` -- no-op there.
+if wwork=$(cd "$work" && pwd -W 2>/dev/null) && [ -n "$wwork" ]; then work=$wwork; fi
 
 fail=0
 
@@ -199,6 +207,55 @@ printf '| 905 | exclusion | 2026-08-01 |\n' > "$c4/docs/sprint/INDEX.md"  # untr
 run_case_anywhere "coordinator-exclusion-safe" 0 \
   "layers observed (all changed files declared" -- \
   sh -c "cd \"$c4\" && sh \"$checker\" docs/sprint/SPRINT-905-exclusion.md"
+
+# ================================================================================================
+# case 5: sprint file path does not exist on disk (constructed) -- must FAIL, its own named finding.
+# This is the checker's very first guard (`[ -f "$sp" ]`), before any git command runs, so the
+# throwaway repo below never even needs a commit -- it exists only so the fixture follows the same
+# "runs inside a git work tree" shape as every other case in this harness.
+# ================================================================================================
+c5="$work/file-not-found"
+mkdir -p "$c5"
+git -C "$c5" init -q
+
+run_case_anywhere "file-not-found" 1 \
+  "layers observed: file not found: docs/sprint/SPRINT-902-missing.md" -- \
+  sh -c "cd \"$c5\" && sh \"$checker\" docs/sprint/SPRINT-902-missing.md"
+
+# ================================================================================================
+# case 6: plan_commit is recorded but does not resolve to a commit (constructed) -- must FAIL, its
+# own named finding. Distinct from case 3 (empty/placeholder plan_commit): here the field holds a
+# non-empty, non-placeholder string that still fails `git rev-parse --verify` because no such commit
+# (or ref) was ever created in this throwaway repo.
+# ================================================================================================
+c6="$work/plan-commit-unresolvable"
+mkdir -p "$c6/docs/sprint"
+cat > "$c6/docs/sprint/SPRINT-903-badsha.md" <<'EOF'
+---
+sprint: 903
+slug: badsha
+status: active
+plan_commit: totally-bogus-not-a-sha
+---
+
+# SPRINT-903 — Plan Commit Does Not Resolve (constructed fixture)
+
+## Plan
+
+### T1 — edit foo.txt
+Layers: `foo.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] foo.txt updated
+EOF
+printf 'a\n' > "$c6/foo.txt"
+git -C "$c6" init -q
+commit_all "$c6" 'sprint file references a plan_commit that was never actually committed'
+
+run_case_anywhere "plan-commit-unresolvable" 1 \
+  "plan_commit 'totally-bogus-not-a-sha' does not resolve to a commit" -- \
+  sh -c "cd \"$c6\" && sh \"$checker\" docs/sprint/SPRINT-903-badsha.md"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-OBSERVED FIXTURES: all green"; else echo "LAYERS-OBSERVED FIXTURES: at least one FAIL"; fi
