@@ -21,11 +21,35 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-073**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-076**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-076 [tags: process] [status: active]: **When a gate's coverage is deliberately narrowed, demonstrate the newly-uncovered case passing silently — otherwise the trade is described rather than measured.** SPRINT-042 T4 moved three slow harnesses behind an opt-in flag, cutting the always-on gate 84s → 57s. The DoD asked to prove the *retained* checks still fail correctly, and they do; but the decision-relevant fact is the other half — what a bare run now misses. Breaking a selftest's subject leaves the bare gate at a clean **70 pass, 0 fail**, and only `QA_FULL=1` catches it. That number is what makes the trade legible: a reviewer can weigh "33% faster" against "this specific class is now invisible by default" instead of against an adjective. The general move: a change that *removes* coverage carries an extra proof obligation its additive sibling does not — the must-FAIL fixture shows what the gate still catches, and a **must-not-catch demonstration** shows what it no longer does. Skipping the second is how a narrowing ships as a pure win and is remembered as one, right up until the uncovered case fires.
+- seen: Sprint-042
+- count: 1
+- promoted: no
+- related: L-058 (a gate's worst failure is the silent false-negative — this is its coverage-reduction case) · L-065 (a check's comment as a claim to be tested) · TD-016
+
+---
+
+## L-075 [tags: process] [status: active]: **A negative test that fails to fail is indistinguishable from a broken fixture — validate that the fixture holds the violation before concluding the guard missed it.** Verifying SPRINT-042 T3, an adversarial case appeared to expose a false negative: a file named in a DoD line, absent from `Layers:`, went unreported. The guard was fine. My `sed` had targeted `- [x]` while that DoD was still unticked, so the injection silently never landed and the checker correctly passed a clean file — a green result from an empty test, which looks exactly like a green result from a blind test. Caught only by grepping the scratch file for the string I thought I had injected, one step before filing a defect against working code. The symmetry is the lesson: L-058 says do not trust a guard you have not seen fail, and this is its mirror — do not trust a *failure to fail* you have not seen the input for. Both reduce to the same discipline as CLAUDE.md's trap (c): inspect the artifact, not the report about it. A test's artifact is its fixture, and mine was never inspected until it had already produced a conclusion.
+- seen: Sprint-042
+- count: 1
+- promoted: no
+- related: L-058 (must-FAIL fixtures) · L-065 (construct the violation adversarially — the pass that produced this fixture) · L-045 · CLAUDE.md Edit-safety trap (c)
+
+---
+
+## L-074 [tags: process] [status: active]: **A second source derived from *authored* text closes the forgetting gap, not the inventing gap — only an *observed* source closes both.** SPRINT-042 T3 fixed TD-020 by cross-checking a sprint Plan's hand-written `Layers:` against the files named in each task's own DoD prose, negative-tested against SPRINT-041's real recorded miss. It works, and it was defeated on the day it shipped: T3 created a new implementation file, that file is absent from T3's own `Layers:`, and the check passes the Plan regardless — because a DoD written at promote cannot name a file invented during implementation. Both sources are *predictions* by the same author at the same moment, so they share a failure mode no amount of cross-checking between them removes. The distinguishing question for any "add a second source" fix: are the two sources independent in **origin**, or only in **location**? Two documents written by one person at one time are one source in two places. The escape is an observation — here, the actual touched-file set at commit time, which reads what happened instead of what was foreseen.
+- seen: Sprint-042
+- count: 1
+- promoted: no
+- related: L-071 (its direct parent — consistency vs completeness) · L-066 (derived-from-disk beats hand-maintained) · TD-020 · TD-022
 
 ---
 
@@ -37,11 +61,8 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-072 [tags: process] [status: active]: **In an autonomous run, the terminal step is the choke point every unit shares — scope its permissions harder than the per-task ones.** SPRINT-041's night run dispatched two worktree agents, both of which built, committed, and self-reviewed their work successfully; then the coordinator's merge-back was denied — `git worktree add` and `git merge --no-ff` were outside the `dontAsk` allowlist. Because *both* tasks funnelled through that one step, there was no disjoint AFK work left to continue with, and a fully-successful run delivered **zero landed work**, stranded on branches. The failure is asymmetric in a way per-task risk assessment misses: a denial in one task's own commands costs that task, while a denial in the shared landing path costs the entire run, no matter how many units succeeded. Second occurrence of the shape — night-run.md Part 1 already records a `Skill(/handoff)` denial that stopped the protocol one step short *after* every task parked correctly. Both are the same defect: the recipe enumerates the commands tasks need and omits the ones the run needs to finish. Generalisation beyond allowlists — when an orchestration has a single integration point, its failure modes deserve the scrutiny normally spent on the fan-out.
-- seen: Sprint-040, Sprint-041
-- count: 2
-- promoted: yes → `.claude/CONTEXT.md` § Gates, Unattended block ("Scope the terminal step hardest") — SPRINT-042 promote
-- related: L-020 (shipping ≠ wiring — this is its permissions-surface form) · night-run.md Part 1 (the `/handoff` denial, occurrence 1) · dispatch.md § Merge-back queue · TASK-131
+## L-072 [tags: process] [status: promoted]: the terminal step is the choke point every unit shares — scope its permissions harder than the per-task ones.
+- **L-072 → promoted: `.claude/CONTEXT.md` § Gates, Unattended block ("Scope the terminal step hardest")** — the durable rule is the record now (§11 collapse, SPRINT-042 close). Body: SPRINT-041 + git history. Shipped as SPRINT-042 T1.
 
 ---
 

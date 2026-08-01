@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-30
+last_updated: 2026-08-01
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -29,16 +29,22 @@ skills/           14 skills (auto-discovered at root)
   lean-doc-generator/templates/   30 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 32 total)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
 docs/             architecture/ · deployment/ · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
-scripts/          qa-check.sh · gen-index.sh    maintainer tooling for the REPO itself (ADR-008)
+scripts/          qa-check.sh · gen-index.sh · lib/ (extracted checkers the gate delegates to)
+                                                maintainer tooling for the REPO itself (ADR-008)
 evals/            must-FAIL/must-SKIP fixtures + assertion scripts guarding a SHIPPED skill's
                   behavioural contract; lib/ · fixtures/                        (SPRINT-038)
 TODO.md · TECH-DEBT.md · README.md · CHANGELOG.md
 ```
 
-`scripts/` and `evals/` are both **maintainer-only** — absent from `plugin.json`, never installed. They
-differ by *what they guard*: `scripts/` supports this repo (lint, index generation), `evals/` guards
-behaviour that ships inside a skill. The zero-API `evals/` harnesses run inside `qa-check.sh`; the
-paid behavioural fixtures stay a manual step (`evals/README.md`).
+`scripts/` and `evals/` are both **maintainer-oriented** — they target *this* repo and no consumer
+invokes them. They are **not**, however, absent from an install: `plugin.json` declares no file
+manifest, so `plugin install` copies the whole repo and both directories land in the consumer's cache
+verbatim (verified against a real install, SPRINT-042). The distinction that matters for a
+consumer-facing check (L-015) is therefore *usable surface*, not presence on disk. They differ by
+*what they guard*: `scripts/` supports this repo (lint, index generation), `evals/` guards behaviour
+that ships inside a skill. The zero-API `evals/` harnesses run inside `qa-check.sh` — always-on ones
+on every run, the slow selftests under `QA_FULL=1` (TD-016); the paid behavioural fixtures stay a
+manual step (`evals/README.md`).
 
 ## The loop
 

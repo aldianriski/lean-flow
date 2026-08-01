@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-042 — Run to Finish — closed 2026-08-01 · CLOSESHA (MINOR v1.24.0)
 - SPRINT-041 — Debt Guards — closed 2026-08-01 · a90ab0e (no release — maintainer-only)
 - SPRINT-040 — Freshness Row and Park Records — closed 2026-07-30 · ebef0fe (MINOR v1.23.0)
 - SPRINT-039 — Eval Coverage and Release — closed 2026-07-30 · dfc60e4 (no release — maintainer-only)

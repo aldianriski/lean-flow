@@ -16,6 +16,24 @@ status: current
 
 ## Tech Debt
 
+- **TD-022** severity: medium | status: open | created: Sprint-042
+  - Summary: SPRINT-042 T3 gave the `Layers:` declaration a second source — the files named in each
+    task's own DoD/Acceptance prose. That source is still **authored at promote**, so it catches a file
+    the author *forgot* to declare but is blind to one *invented during implementation*. Proven the day
+    it shipped: T3 itself created `scripts/lib/check-layers-completeness.sh`, which is absent from T3's
+    declared `Layers:`, and the new check passes the Plan anyway — a DoD written at promote cannot name
+    a file that did not yet exist.
+  - Impact: strictly better than TD-020's original state (the forgetting case is now caught, with
+    retained fixtures), but not the whole hazard. Under the concurrent dispatch this check exists to
+    protect, a file invented by one agent and also touched by another still collides unseen — which is
+    exactly the corrupted-merge risk, reached by a different route. Both existing sources are
+    *declarations*; neither is an *observation*.
+  - Mitigation (not yet done): add a third source that is **observed rather than authored** — the
+    actual touched-file set at commit time (`git status`/`git diff --name-only`) diffed against the
+    task's `Layers:`, reported at the commit or merge-back step. Unlike the first two it cannot be
+    forgotten, because it reads what happened rather than what someone predicted. Negative-test it per
+    L-058 against this sprint's own miss, which is a real recorded instance.
+
 - **TD-021** severity: minor | status: open | created: Sprint-041
   - Summary: `scripts/gen-index.sh` writes `docs/knowledge-index.md` **non-atomically**. When the C:
     volume hit zero free space mid-close, the script failed partway through and left the generated

@@ -3,7 +3,7 @@ sprint: 042
 slug: run-to-finish
 owner: Maintainer
 last_updated: 2026-08-01
-status: active
+status: closed
 plan_commit: ccf1f07
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -284,11 +284,74 @@ that would rot on the next harness.
 
 ## Files Changed
 
-<!-- Filled during execution; feeds CHANGELOG at close. -->
-
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/references/night-run.md` | T1, T2 | four-source allowlist derivation so pre-flight covers what the run needs to *finish* (L-072); run-cost pre-flight line + Part 4 calibration row, separating the run's cost from its tasks' (L-073) | low — guidance only | all 5 of SPRINT-041's recorded denial signatures map to a derived source; A1 confirmed by running the harness |
+| `skills/orchestrator/references/dispatch.md` | T1 | merge-back section states its steps *are* allowlist source 2, making the reference pair bidirectional | low | cross-read in both directions |
+| `skills/lean-doc-generator/templates/SPRINT.md.template` | T2 | Retro gains a Cost prompt, phrased for any sprint rather than only unattended ones (L-015) | none | exercised by this close |
+| `scripts/qa-check.sh` | T3, T4 | leg 14 cross-checks `Layers:`/`Depends-on:` against DoD-implied files (TD-020); leg 12 split always-on vs opt-in behind `QA_FULL` (TD-016) | **med** — T4 removes coverage from the always-on path | T3 verified 5 ways incl. 2 adversarial; T4 verified 4 ways incl. the silent-drop guard |
+| `scripts/lib/check-layers-completeness.sh` | T3 | the retained checker (new file — **undeclared in T3's `Layers:`**, see Friction) | low | 2 retained fixtures + 2 adversarial cases, all bare |
+| `evals/run-layers-completeness-fixtures.sh` · `evals/fixtures/layers-completeness/` | T3 | retained must-FAIL fixtures, incl. SPRINT-041's Plan reconstructed (L-058) | none | run bare; both FAIL with their named findings |
+| `docs/QA.md` | T3, T4 | leg-14 inventory row; always-on/opt-in split documented; stale hand-written harness count replaced with a derived reference so it cannot rot again | none | gate green |
+| `TECH-DEBT.md` | T3, T4 | TD-020 and TD-016 marked resolved | none | n/a |
 
 ## Retro
 
-<!-- Written at close. -->
+**Retrieval check** — no miss. L-057 (bare runs), L-058 (must-FAIL per check), L-065 (construct the
+violation adversarially), L-066 (a list that checks itself against disk), L-068 (a written trigger is
+answered when it fires), L-071/L-072/L-073 were all applied, and L-065 is what surfaced the sprint's
+sharpest finding. One **contradiction found and fixed**: night-run.md claimed the `/handoff` denial was
+"the only evidence so far" for a terminal-step denial, which the merge-back denial had already made
+false — corrected in T1.
+
+**Cost** — inline coordinator + 2 dispatched agents; ~233k subagent tokens (141k T3 · 91k T4); 4 units
+delivered **and landed**, 4 attempted. Dollar cost is not observable from inside an interactive
+session, so it is stated as unavailable rather than omitted — the degrade rule T2 shipped, applied to
+the sprint that shipped it. The contrast worth keeping: SPRINT-041 spent $6.60 to land **zero** units;
+this one landed all four, and the two tasks that most needed care were the ones dispatched.
+
+**Worked**
+- **Re-verifying dispatched work on different targets than the agent used.** Both agents reported
+  success honestly and both were right — but T3's subject is a guard that must be able to fail and T4
+  *removes* checks, so accepting either report would have been trusting the reporter over the artifact.
+  The independent passes added two adversarial cases, a different broken harness, and the silent-drop
+  test; none contradicted the agents, and that is the outcome that makes the verification worth its cost.
+- **Proving what a change gives up, not just what it keeps.** T4's honest characterization came from
+  breaking a selftest subject and watching the bare gate stay green at 70/0. Describing the tradeoff
+  would have been cheaper and would have left it unmeasured.
+- **Deciding TD-016 at the promote where its trigger fired**, rather than after the 7th harness landed.
+  L-068's deferral pattern worked exactly as designed: no re-litigation, the pre-agreed condition simply
+  became true.
+- **Declaring `Layers:` completely on purpose** so this Plan could serve as T3's must-PASS input — the
+  Plan and the check that guards Plans were built against each other.
+
+**Friction**
+- **T3's fix carries a residual of T3's own shape.** `scripts/lib/check-layers-completeness.sh` was
+  created during implementation and is absent from T3's declared `Layers:` — and the new check cannot
+  see it, because it compares the declaration against files named in **DoD prose**, and a DoD written at
+  promote cannot name a file invented later. The second source catches **forgotten** files, not
+  **invented** ones. → **TD-022**.
+- **I nearly filed a defect against a working guard.** An adversarial test appeared to expose a false
+  negative in T3; the fixture was broken — the `sed` targeted `- [x]` while the DoD was still unticked,
+  so the violation never landed and the checker correctly passed a clean file. → **L-075**.
+- **`night-run.md` grew 427 → 484 lines** (+13%) across T1 and T2. TD-014's split trigger is a *third
+  embedded snippet* and the count is unchanged at 2, so it stays correctly unfired — but two of this
+  sprint's four tasks added prose to the file a reader consults while deciding whether to fire a run.
+  Re-review is already scheduled for SPRINT-044.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **L-074** — a second source derived from *authored* text closes the forgetting gap, not the inventing
+  gap; only an *observed* source closes both.
+- **L-075** — a negative test that fails to fail is indistinguishable from a broken fixture; validate the
+  fixture holds the violation before concluding the guard missed it.
+- **L-076** — when a gate's coverage is deliberately narrowed, demonstrate the newly-uncovered case
+  passing silently, so the trade is measured rather than described.
+
+**Bucket routing**
+
+| Bucket | Filed |
+|---|---|
+| Shipped | consumer-facing this time (skill references + a template) → `CHANGELOG.md` **v1.24.0 (MINOR, by hand)** — proposed, owner-gated |
+| Tech debt | **TD-022** — the declaration cross-check has no *observed* third source |
+| Follow-ups | **TASK-134** — fire the unattended proof run and record its calibration row |
+| Learnings | **L-074** · **L-075** · **L-076** |
