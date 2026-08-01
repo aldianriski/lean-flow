@@ -18,6 +18,25 @@ status: current
 
 ## Tech Debt
 
+- **TD-031** severity: minor | status: open | created: Sprint-046
+  - Summary: the observed-layers check's exclusion list has grown by one entry per sprint for four
+    sprints — close bookkeeping, the generated index, the pre-flight settings file, and now agent
+    worktree paths. Each entry was individually correct and individually reasoned; the pattern is the
+    problem.
+  - Impact: the check asks *"did a task declare this file?"* when what it means is *"was this change
+    task work, or coordinator/tooling bookkeeping?"*. Those coincide for task files and diverge for
+    everything else, so every new class of non-task change arrives as a false positive and is answered
+    with another exclusion. The list stays honest only as long as someone applies L-082's test to each
+    entry, and a list that must be defended entry-by-entry forever is a design smell, not a guard.
+  - Mitigation (not yet done): consider deriving the answer instead of enumerating it — attribute
+    changed paths to *who* changed them (task commits on an agent branch versus coordinator commits on
+    the main tree) rather than to whether a frozen declaration named them. **Explicitly not urgent**:
+    the check works, each exclusion is defensible, and a redesign of a functioning guard under no
+    pressure is how a working thing gets broken. Trigger for acting: a **sixth** exclusion, or the first
+    one that fails L-082's test.
+  - Owner decision (SPRINT-046 promote): add TD-030's entry now, file this pattern rather than solve it
+    under time pressure.
+
 - **TD-030** severity: minor | status: open | created: Sprint-045
   - Summary: the worktree dispatch protocol creates agent worktrees **inside the repo**
     (`.claude/worktrees/agent-<id>/`), and the observed-layers check counts those paths as changed-but-
@@ -142,38 +161,6 @@ status: current
     command per invocation, no `cd` prefix, no `&&` chain, no redirect — and that anchoring is done
     with `git -C <abs-path>` rather than by changing directory. Note the interaction with L-057's
     never-pipe rule: both point the same way, for different reasons.
-
-- **TD-022** severity: medium | status: resolved → SPRINT-043 T1 | created: Sprint-042
-  - Summary: SPRINT-042 T3 gave the `Layers:` declaration a second source — the files named in each
-    task's own DoD/Acceptance prose. That source is still **authored at promote**, so it catches a file
-    the author *forgot* to declare but is blind to one *invented during implementation*. Proven the day
-    it shipped: T3 itself created `scripts/lib/check-layers-completeness.sh`, which is absent from T3's
-    declared `Layers:`, and the new check passes the Plan anyway — a DoD written at promote cannot name
-    a file that did not yet exist.
-  - Impact: strictly better than TD-020's original state (the forgetting case is now caught, with
-    retained fixtures), but not the whole hazard. Under the concurrent dispatch this check exists to
-    protect, a file invented by one agent and also touched by another still collides unseen — which is
-    exactly the corrupted-merge risk, reached by a different route. Both existing sources are
-    *declarations*; neither is an *observation*.
-  - Mitigation (not yet done): add a third source that is **observed rather than authored** — the
-    actual touched-file set at commit time (`git status`/`git diff --name-only`) diffed against the
-    task's `Layers:`, reported at the commit or merge-back step. Unlike the first two it cannot be
-    forgotten, because it reads what happened rather than what someone predicted. Negative-test it per
-    L-058 against this sprint's own miss, which is a real recorded instance.
-
-- **TD-021** severity: minor | status: resolved → SPRINT-043 T2 | created: Sprint-041
-  - Summary: `scripts/gen-index.sh` writes `docs/knowledge-index.md` **non-atomically**. When the C:
-    volume hit zero free space mid-close, the script failed partway through and left the generated
-    index truncated from 34 lines to 12 — a **syntactically valid file with silently missing content**.
-  - Impact: `qa-check` did catch it, but as "index STALE" — the right alarm for the wrong reason, and
-    only because the truncation happened to also make it stale. A partial write that preserved
-    staleness parity would have passed. A generated SSOT that can degrade into a plausible-looking
-    subset of itself is the silent-false-negative shape (L-058), one layer down: nothing here is
-    *wrong*, there is just less of it, and no check counts what should be there.
-  - Mitigation (not yet done): write to a temp file in the same directory and `mv` it into place, so
-    a failed generation leaves the previous index intact rather than a truncated one. Optionally have
-    the freshness leg compare entry *counts* against the corpus, not just mtime/hash. Note the
-    environment half was real and is fixed separately (`TMPDIR` moved off the full volume).
 
 - **TD-014** severity: minor | status: resolved → SPRINT-044 T1 | created: Sprint-038
   - Summary: `skills/orchestrator/references/night-run.md` is now **427 lines**, carrying the Part 0

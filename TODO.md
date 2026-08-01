@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-045 closed 2026-08-01.
+> **SPRINT-046 — Permission Surface** → docs/sprint/SPRINT-046-permission-surface.md
 
 ---
 
@@ -29,6 +29,41 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-146 — Establish what actually governs command denial in a headless run  [size: M] [risk: low] [AFK]
+      class:      execution
+      done-when:  a research note records, from real headless sessions rather than inference, two
+                  things that are currently guesses: **(a)** whether mid-session denial correlates with
+                  elapsed time, turn count, tool-call count — or none of them, stated as "not
+                  established" if the effect does not reproduce; and **(b)** which permission-rule
+                  forms actually match, tested directly one form at a time (exact-file · directory
+                  prefix · glob · bare command), rather than inferred from documentation. Every claim
+                  carries its evidence, and anything unproven is **named as unproven**
+      touches:    a research note · the unattended reference, only if a form finding is conclusive
+                  enough to change the guidance there
+      depends-on: none
+      assumes:    the effect is observable within one session — the run that surfaced it saw denials
+                  by turn 25 — but if a single session does not reproduce it, the note says so instead
+                  of extrapolating from one prior observation
+      tracker:    TD-027 · TD-028
+      state:      ready
+      notes:      **No mitigation ships from this task.** Its entire purpose is to stop guessing; the
+                  owner decision on TD-027 was reproduce-before-mitigate, because a defence built on an
+                  unpinned mechanism is exactly what produced TD-024's two wrong diagnoses
+
+- [ ] TASK-147 — Exclude agent worktree paths from the observed-layers check  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  the check no longer counts in-repo agent worktree paths as changed-but-undeclared,
+                  with the reason stated inline the way every other exclusion is — never a silent skip.
+                  Negative-tested with a retained fixture: a genuinely undeclared file outside those
+                  paths must still FAIL by name, since an exclusion that swallowed the real case would
+                  satisfy the acceptance and hollow out the guard
+      touches:    the observed-layers checker · its retained fixture set
+      depends-on: none
+      assumes:    the worktree path prefix is stable enough to match on; if dispatch ever relocates
+                  worktrees outside the repo the exclusion becomes dead code rather than wrong code
+      tracker:    TD-030
+      state:      ready
 
 ### P2 — Quality / Polish
 
