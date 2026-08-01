@@ -21,11 +21,35 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-079**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-082**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-082 [tags: process] [status: active]: **When a guard flags its own file, the one fix never available is exempting it.** SPRINT-044's observed-layers check FAILed on a generated index nobody declares — a genuine gap, fixed by adding it to the checker's exclusion list with a stated reason. Editing the checker then made *it* undeclared, and the check FAILed again naming its own source file. The obvious move was another exclusion line; it would have taken ten seconds and turned the guard into one that cannot see changes to itself. Rejected: the checker is hand-authored source, exactly the category the check exists to watch, and the only thing the second exclusion would have bought is one convenient commit. The discriminator is cheap and worth applying every time an exclusion is tempting: **would I add this exclusion if the change were someone else's?** For the generated index, yes — it is derived, and no author could ever have declared it. For the checker, obviously not. An exclusion list stays honest exactly as long as each entry answers that question the same way regardless of who is asking.
+- seen: Sprint-044
+- count: 1
+- promoted: no
+- related: L-058 (a gate's worst failure is the silent false-negative — this is how one gets created deliberately) · L-076 (narrowing coverage carries an extra proof obligation) · TD-022
+
+---
+
+## L-081 [tags: tooling] [status: active]: **An environment workaround is inherited — it applies to every child process, so it can cause a second bug far from where it was set, in a component that never heard of it.** `MSYS_NO_PATHCONV=1` is exported on Git-Bash hosts so a leading-slash prompt isn't rewritten into a Windows path before reaching `claude.exe` (L-067). Because it is *exported*, it also reached the QA gate and every fixture harness the gate spawns, where it disabled path translation and broke `git -C` on a POSIX path. Symptom: `72 pass, 1 fail` from inside the launcher against `73 pass, 0 fail` standalone, repeatably — and the failing message, `could not resolve live HEAD`, was the exact string a tech-debt row had been carrying for two sprints under two different wrong diagnoses. What made it near-invisible is the distance: the variable is set at the *trigger*, the failure appears in an *unrelated gate two layers down*, and nothing in either place mentions the other. Two rules: **scope an env workaround to the single invocation that needs it** rather than exporting it, and when a check behaves differently in two contexts, **diff the environments before diffing the code** — the answer was never in the harness.
+- seen: Sprint-044
+- count: 1
+- promoted: no
+- related: L-067 (its first occurrence — same variable, narrower blast radius) · L-078 (a green result from a broken setup) · TD-024 (the row it root-caused)
+
+---
+
+## L-080 [tags: process] [status: active]: **A `Depends-on` edge orders the work, not the reading — a later task can contradict the change it was sequenced behind.** SPRINT-044's T3 depended on T2 precisely so it would land after T2 moved the allowlist from a CLI string into settings permissions. It landed after, and still shipped a launcher that hard-required `--allowedTools` — rejecting the exact invocation T2 had just made canonical. The dependency did its job perfectly; nothing about it makes the second implementer *read* the first's change, and a dispatched agent starts from the brief plus the repo, not from the sibling task's diff. Generalisation: an edge guarantees ordering, never context transfer. When task B depends on task A because A **changes a contract B consumes** — as opposed to merely touching the same file — B's brief has to state the new contract explicitly. Cheap tell at planning time: if you can describe the edge as "B must not contradict A", the edge alone will not achieve it.
+- seen: Sprint-044
+- count: 1
+- promoted: no
+- related: L-020 (shipping ≠ wiring — this is its sequencing form) · L-071 (a declaration cannot carry what its author did not know) · dispatch.md § Hand the sub-agent its procedure skill
 
 ---
 
@@ -123,10 +147,10 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 ---
 
 ## L-067 [tags: tooling] [status: active]: On Windows/Git-Bash, `MSYS_NO_PATHCONV=1` — needed so a bare `/skill` prompt isn't rewritten into a Windows path before reaching `claude.exe` — disables path translation for **every argument in that invocation**, not just the one you meant. A POSIX-style `--plugin-dir "/c/Users/…"` then arrives literally and **fails silently**: no error, the plugin simply never loads, and the run reports "Unknown command". Fix: pass `--plugin-dir` a native Windows path while keeping `MSYS_NO_PATHCONV=1` for the prompt. Cost two runs across SPRINT-039 T1 and T2 before being root-caused. Same family as L-060 — a shell-boundary transformation that succeeds loudly and produces the wrong artifact quietly.
-- seen: Sprint-039
-- count: 1
+- seen: Sprint-039, Sprint-044
+- count: 2
 - promoted: no
-- related: L-060 (shell-boundary mangling) · CLAUDE.md Edit-safety trap (c)
+- related: L-060 (shell-boundary mangling) · L-081 (Sprint-044's occurrence — the same variable, one blast radius wider: inherited by children) · CLAUDE.md Edit-safety trap (c)
 
 ---
 

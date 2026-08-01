@@ -29,7 +29,7 @@ skills/           14 skills (auto-discovered at root)
   lean-doc-generator/templates/   30 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 32 total)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
 docs/             architecture/ · deployment/ · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
-scripts/          qa-check.sh · gen-index.sh · lib/ (extracted checkers the gate delegates to)
+scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launcher) · lib/ (extracted checkers)
                                                 maintainer tooling for the REPO itself (ADR-008)
 evals/            must-FAIL/must-SKIP fixtures + assertion scripts guarding a SHIPPED skill's
                   behavioural contract; lib/ · fixtures/                        (SPRINT-038)

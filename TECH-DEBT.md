@@ -18,33 +18,60 @@ status: current
 
 ## Tech Debt
 
-- **TD-024** severity: minor | status: open — **diagnosis corrected, cause unconfirmed** | created: Sprint-043
-  - Summary: during SPRINT-043's unattended run, `evals/run-dispatch-preflight-fixtures.sh` emitted
-    `FAIL harness: could not resolve live HEAD in /d/Project/lean-flow` and exited 2. The **symptom was
-    real and is recorded**; the cause originally filed with it was not.
-  - **Correction (verified interactively at the SPRINT-043 close, on the main tree).** The original row
-    blamed `git -C` being unable to resolve POSIX-style MSYS paths. That does not reproduce:
-    `git -C /d/Project/lean-flow rev-parse HEAD` → exit 0, and `git -C` on a fresh `mktemp -d` path →
-    exit 0. The harness itself runs **all green** with `TMPDIR` set and unset, and `qa-check.sh` is
-    **67 pass / 0 fail** — so the claim that it "has been reporting this as its single FAIL" does not
-    hold either. The guard that fired is *correct behaviour*: it named its finding and exited rather
-    than passing (L-059), so the harness did its job.
-  - Impact: low, and not what was first written. The dispatch-preflight guard is **not dark** on the
-    main tree. The likelier cause is transient run state rather than a path-resolution defect — the
-    run's own L-079 records its cwd drifting into an agent worktree, and a `$repo_root` pointing at a
-    worktree already removed would produce this exact empty-`rev-parse` result. That remains a
-    hypothesis; nobody has reproduced it.
-  - Mitigation (not yet done): **do not apply the original `pwd -W` sweep** — it would harden the
-    harnesses against a mechanism that has not been shown to exist, and T1 already shipped one such
-    guarded workaround on this reasoning. First **reproduce**: run the harness with `$repo_root`
-    pointing at a removed worktree and confirm the message. If that is the cause, the fix is for the
-    harness to validate `$repo_root` is a live work tree before use, not to normalize path style.
-  - Note on provenance: filed by an unattended run that correctly parked rather than fixing it
-    mid-flight. The park was right; the diagnosis inside it was not independently checked, which is
-    why the close re-checked it. A finding produced without an ask channel is still a finding that
-    needs verifying (L-078's family).
+- **TD-026** severity: trivial | status: open | created: Sprint-044
+  - Summary: the two-commit convention for `plan_commit`/`close_commit` (commit, then record the sha in
+    a follow-up) collides with the observed-layers check, which reads `plan_commit` from frontmatter.
+    Between the `plan locked` commit and the sha-recording commit the gate necessarily reports
+    `plan_commit not recorded` — one FAIL, by construction, in a window that always exists.
+  - Impact: cosmetic but corrosive. Anyone running the gate in that window sees a red result that is
+    neither a defect nor actionable, and a gate that cries wolf on a known-good state is a gate people
+    start reading past. The check is otherwise behaving correctly — it names its finding rather than
+    passing (L-059).
+  - Mitigation (not yet done): let the check treat an unset-but-placeholder `plan_commit` on a sprint
+    whose `status:` just became active as a `SKIP` with a named reason, rather than a FAIL — or record
+    the sha in the same commit by writing it post-hoc, which the current convention deliberately avoids.
+    Either way the fix should not weaken the genuine "plan_commit missing at execute time" case.
 
-- **TD-023** severity: medium | status: open | created: Sprint-043
+- **TD-025** severity: minor | status: open | created: Sprint-044
+  - Summary: the dispatch preflight's shared-file check requires a **direct** `Depends-on:` edge between
+    every pair of tasks touching one file. A transitive chain (`T1→T2→T3→T4`, all editing one reference)
+    orders those tasks unambiguously, but the check HALTs on the pairs without a direct edge.
+  - Impact: a false positive that blocks a legitimate Plan. SPRINT-044 hit it at promote with four tasks
+    chained on one file and worked around it by writing redundant edges (`Depends-on: T1, T2, T3`),
+    which is noise that will be copied by the next Plan. The check's *intent* — no unowned concurrent
+    edit — is fully satisfied by a chain, since strictly sequential execution cannot collide.
+  - Mitigation (not yet done): compute the transitive closure of `Depends-on:` before the pairwise
+    check, so an ordering derivable through the chain counts as owned. Negative-test it per L-058: a
+    genuine unowned overlap (two rank-0 tasks, no path between them) must still FAIL.
+
+- **TD-024** severity: minor | status: resolved → SPRINT-044 T3 | created: Sprint-043
+  - **ROOT CAUSE FOUND (SPRINT-044 T3), fully reproducible.** `MSYS_NO_PATHCONV=1` in the environment.
+    It is exported on this host so a bare `/orchestrator …` prompt isn't rewritten into a Windows path
+    before reaching `claude.exe` (L-067) — and it is **inherited**, so it reached the gate and every
+    harness the gate spawns, disabling path translation and breaking `git -C` on a POSIX path. With it
+    set: `72 pass, 1 fail` emitting `could not resolve live HEAD in /d/Project/lean-flow` — the exact
+    string this row recorded. Without it: `73 pass, 0 fail`, three consecutive runs.
+  - Why it was hard to see: the variable is set at the *trigger*, and the symptom appears in an
+    *unrelated gate* two layers down. Both earlier diagnoses were near-misses — the first blamed `git -C`
+    on MSYS paths generally (false: it works fine unset), the second guessed transient worktree state.
+    Neither was wrong about *where*; both missed the environment as the *what*.
+  - Resolution: `scripts/night-run.sh` clears the variable around the pre-flight gate only, in a
+    subshell, leaving the fired command's environment untouched. **Residual, accepted and stated:** a
+    maintainer running `qa-check` by hand with the variable exported still sees the spurious FAIL. The
+    guard is behaving correctly in that case — it names its finding and exits — so this is a
+    surprising-message problem, not a coverage gap.
+  - Summary: during SPRINT-043's unattended run, `evals/run-dispatch-preflight-fixtures.sh` emitted
+    `FAIL harness: could not resolve live HEAD in /d/Project/lean-flow` and exited 2. The symptom was
+    real throughout; two successive diagnoses filed with it were not.
+  - Provenance worth keeping: filed by an unattended run that correctly **parked** rather than fixing it
+    mid-flight — the park was right — but nothing inside a headless run can challenge its own diagnosis,
+    because there is no one to challenge it. The SPRINT-043 close re-checked it and downgraded it;
+    SPRINT-044 root-caused it. A finding produced without an ask channel still needs verifying
+    (L-078's family). The `pwd -W` sweep the first diagnosis proposed was never applied, which is the
+    outcome that mattered — it would have hardened seven harnesses against a mechanism that never
+    existed.
+
+- **TD-023** severity: medium | status: resolved → SPRINT-044 T2 | created: Sprint-043
   - Summary: `night-run.md` Part 1's allowlist derivation names the four **sources** a command must be
     derived from, but says nothing about the **form** the command is issued in. `dontAsk` matches the
     literal invocation, so `git worktree add …` issued bare was permitted while the identical operation
@@ -146,7 +173,7 @@ status: current
     by name. Both breaks reverted and re-verified clean. Split stated in `docs/QA.md` beside the
     existing manual/gated boundary so the reduced bare-run set is discoverable, not silently dropped.
 
-- **TD-014** severity: minor | status: open | created: Sprint-038
+- **TD-014** severity: minor | status: resolved → SPRINT-044 T1 | created: Sprint-038
   - Summary: `skills/orchestrator/references/night-run.md` is now **427 lines**, carrying the Part 0
     contract, the entry path, the pre-flight pass, and **two ~100-line embedded shell snippets**
     (skill-freshness + worktree-usability).

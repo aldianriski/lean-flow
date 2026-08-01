@@ -3,7 +3,7 @@ sprint: 044
 slug: night-run-ergonomics
 owner: Maintainer
 last_updated: 2026-08-01
-status: active
+status: closed
 plan_commit: 8024a7d
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -210,186 +210,144 @@ in the repo matches, and the run stops before push.
 
 ## Execution Log
 
-<!-- Append-only, dated. The Plan is frozen at promote — log here rather than editing § Plan. -->
+<!-- Append-only, dated. The Plan is frozen at promote — log here rather than editing § Plan.
+     Compressed at close: each finding below now has a durable home (TECH-DEBT / LEARNINGS /
+     CHANGELOG), so this section records what happened and points there rather than restating it. -->
 
-### 2026-08-01 | scope-change | T2 widened to fix TD-023, not merely cite it
-**What changed.** The Plan froze with TD-023's fix explicitly *out* of scope: T2 was to carry the
-form-sensitivity caveat forward and nothing more, on the understanding that the evidence was a single
-observed `git worktree add` denial. Reading the captured run's `permission_denials` array at G2
-overturned that. All **25** denials classified:
+### 2026-08-01 | scope-change | T2 widened to fix TD-023, and to cover tools
+Frozen Plan had TD-023's fix **out** of scope, on the understanding its evidence was a single observed
+denial. Reading the captured run's `permission_denials` at G2 overturned that: of **25** denials,
+**21** were `cd`-prefixed, **2** variable-assignment-prefixed, 1 a `git -C` form, 1 an unauthorized
+**tool** (PowerShell). So 23 of 25 were *form* failures on individually-permitted commands — TD-023 was
+the dominant failure mode of the run that tested the four-source rule, not a footnote to it, and the
+25th exposed that the derivation enumerates commands but not tools.
 
-| Shape | Count | Cause |
-|---|---|---|
-| `cd <path> && …` | 21 | prefix broke the match |
-| `w=$(mktemp -d); echo …` | 2 | variable-assignment prefix broke the match |
-| `git -C …` | 1 | allowlisted as `Bash(git -C *)` and denied anyway |
-| `PowerShell` | 1 | tool never authorized at all |
+Owner re-signed G2 with both folded into T2 rather than a new task: T2 already edits that section, its
+`Layers:` are unchanged, no new file enters the sprint — overlap map, wave ranks and preflight verdict
+all hold. Logged before § Plan was edited. Also recorded: the array's first entry is the very probe
+TD-024's evidence came from, and it never ran.
 
-**Impact.** 23 of 25 were **form** failures — every one of those commands was individually permitted and
-the prefix stopped the matcher recognising it. TD-023 is not a footnote to the four-source rule; it is
-the dominant failure mode of the run that tested it, and skipping it would have shipped a sprint about
-night-run ergonomics with its largest known ergonomic defect deliberately left in. The 25th denial
-exposes a second gap: the derivation enumerates **commands** but not **tools** — this host has two
-shells and one was authorized.
+### 2026-08-01 | T1 | capability checks split out — TD-014 resolved
+Dispatched. `night-run.md` **495 → 283**; moved material in `night-run-checks.md` (236). **The verbatim
+claim was verified against git, not accepted**: both snippets extracted from `HEAD`'s pre-move file and
+the new file, diffed **byte-identical** (89 and 46 lines). Harness diffs are one path line each, so the
+guarding assertions are unchanged — a quiet rewrite would have failed them. Negative test re-run on the
+harness the agent did *not* use: exit 2, named finding, reverted, green.
 
-**Bonus finding, recorded not acted on.** The array's first entry is
-`cd "D:/Project/lean-flow" && sh scripts/qa-check.sh > /tmp/qa-main.txt …` — the *probe TD-024's
-evidence came from*. It never ran, confirming the downgrade applied at the SPRINT-043 close.
+Correction to T1's own commit: it claimed both harnesses changed by "exactly one line each" — true of
+one, false of the other, where my negative-test revert used a broad `sed` that also updated two comment
+lines. Fixed in a follow-up; caught by reading the diffstat rather than the message.
 
-**Re-confirm G2.** Owner re-signed with both additions folded into T2 rather than a new task: T2 already
-edits the section that must carry the rule, its `Layers:` are unchanged, and no new file enters the
-sprint — so the overlap map, wave ranks and preflight verdict all hold. Logged before § Plan was edited.
+### 2026-08-01 | T2 | allowlist moved into settings permissions
+Run inline. Pre-flight now derives into settings permissions with the tracked/local split stated as a
+rule, one syntax form pinned (`Bash(<cmd>:*)`), the bare-invocation rule carrying its measured evidence,
+and tool coverage. Repo settings 5 → 20 rules; `git checkout`/reset deliberately excluded (L-043 bans
+tree-wide state ops). **`Bash(git -C:*)` is the one genuinely broad rule** — any git subcommand, any
+path, and tracked so it applies interactively too; flagged for the owner to move local if unwanted.
 
+### 2026-08-01 | T3 | launcher shipped — and it root-caused TD-024
+Dispatched; the agent **returned before finishing**, so the artifact was inspected rather than its reply
+(trap (c)): script sound, `night-run.md` untouched, nothing left running. Finished inline.
 
-### 2026-08-01 | T1 | capability checks split out — TD-014's subject resolved
-Dispatched to a Sonnet sub-agent (docs restructure, implemented directly — no routed procedure skill).
-`night-run.md` **495 → 283 lines** (−43%), zero embedded snippets remaining; the moved material lives
-in `night-run-checks.md` (236 lines) with a pointer left behind. All six Parts intact.
+Two defects. The launcher hard-required `--allowedTools`, contradicting T2 — **the edge ordered the work,
+not the reading** (→ **L-080**). Then it blocked its own live test with `qa-check` at 72/1 inside and
+73/0 standalone: **`MSYS_NO_PATHCONV=1`, inherited into the gate** — TD-024's root cause, reproducible,
+emitting the exact string that row had carried under two wrong diagnoses (→ **TD-024**, **L-081**).
 
-**The verbatim claim was checked, not accepted.** "Moved verbatim" is the kind of assertion that reads
-identically whether or not it is true, so it was verified against git rather than the agent's word:
-both snippets extracted from `HEAD`'s pre-move file and from the new file, diffed —
-**byte-identical**, 89 and 46 lines. Harness diffs are exactly one line each (the path), so the
-assertions that guard those snippets are unchanged; if a snippet had been quietly rewritten, unchanged
-assertions would have failed.
+Verified on real input: three `DEAD-ON-ARRIVAL` paths each naming its cause; `ALIVE` under the hostile
+environment with the child logging `ok` and exiting 0; **detachment proven by observation** — launcher
+exited first, child still running, completing later on its own. That run also showed the live-PID rule
+firing correctly. ~$0.5 across four `claude -p` calls.
 
-Negative test re-run **on the harness the agent did not use** — mis-pointed the worktree-usability
-harness at the now-anchorless file: exit 2 with its named finding
-(`no snippet extracted between … in …/night-run.md`), then reverted and confirmed green. The anchor
-guard discriminates a real miss rather than silently passing, which is what makes the whole
-unchanged-assertions proof meaningful.
+### 2026-08-01 | scope-change | T4 gains the observed-checker
+Writing T4's research note regenerated the knowledge index, and the observed-layers check FAILed: index
+undeclared. Both ways out fail the gate (regenerate → undeclared; skip → stale), so the exclusion was
+forced — the index is generated, never hand-authored, and its sources are already excluded. **Then the
+guard caught itself**: editing the checker made it undeclared. Adding it to its own exclusion list was
+rejected outright (→ **L-082**); declared in T4's `Layers:` instead. No new file, no edge change, ranks
+untouched — G2 re-confirmed. Logged before § Plan was edited.
 
-Note: `night-run.md` previously carried **no** ownership header; DoD line 5 asked for one on both
-files, so it gained one. Additive, and it brings the file into line with DOCS_Guide §3.
+### 2026-08-01 | T4 | cost driver measured
+Run inline (the run data was already in context). Cache reads dominate — 26.5M against 191K output —
+and turns drive them, so the lever is turn count; ~40% of turns went to denials. Ruled out and recorded:
+output volume, wall-clock. T2's rule is therefore also the cost fix; T4 adds the no-retry-in-a-different-
+wrapper rule. Full attribution → `docs/research/night-run-cost.md`. Proof of reduction deliberately left
+to the next run's calibration row (→ **TASK-143**).
 
-Gate: 73 pass, 0 fail. Diff confined to the four declared `Layers:` files.
+### 2026-08-01 | T5 | resolved TD rows are deleted, not collapsed
+Run inline. Rule changed in **four** places, because it was stated in four — a rule changed in one of
+its homes is the L-020 shape. § Resolved removed; TD-018/TD-019 deleted (due at this promote, deferred
+here deliberately). Ledger 210 → 165.
 
-**Correction to this task's own commit.** It claimed both harnesses changed by "exactly one line each
-(the path)". True of one, false of the other: the negative-test revert used a broad `sed` that also
-updated two comment lines naming the old file. Those updates were correct in themselves but unintended,
-and they left the two harnesses inconsistent — one with fresh comments, one still pointing readers at a
-file that no longer holds the snippet. Fixed in a follow-up commit; caught by reading the diffstat
-rather than trusting the message just written.
-
-### 2026-08-01 | T2 | allowlist moved into settings permissions; TD-023 fixed, not cited
-Run inline — prose edits to a section read end-to-end this session, where dispatching would re-pay the
-full substrate to produce ~30 lines (this sprint's own T4 subject).
-
-Pre-flight now derives into **settings permissions** rather than an inline string, with the split
-stated as a rule: repo-generic rules tracked, owner-reserved and machine-specific ones in the gitignored
-local file — the pattern this repo already follows, with `git push` sitting on the local side. Wording
-never assumes a settings file exists, since a consumer may have none and no skill creates one.
-
-**Three things the scope-change added**, each carrying its evidence rather than asserted as style:
-- **Bare invocation.** One command per call — no `cd` prefix, no `VAR=` prefix, no `&&` chain, no
-  redirect; anchor with `git -C <abs-path>`. Stated with the measurement: 23 of 25 denials were form
-  failures on individually-permitted commands. Noted as converging with L-057 from the opposite
-  direction — that rule protects the exit status, this one protects the permission match.
-- **Tools, not only commands.** A two-shell host needs each shell authorized; the run had every `Bash`
-  rule it needed and no `PowerShell` rule at all.
-- **One pinned syntax.** `Bash(<cmd>:*)`, the form the settings file already used. A bare-glob variant
-  was observed denying a command it was written to permit, so a second spelling is treated as suspect
-  until seen to match.
-
-This repo's tracked settings gained 15 rules (5 → 20): read-only git, the landing path (`worktree`,
-`merge`), and the gate's subprocesses (`init`, `config`, `-C`, `mktemp`). Deliberately **excluded**:
-`git checkout` and any reset/clean — L-043 bans tree-wide state ops because they can sweep a sibling's
-uncommitted work, and the merge-back protocol uses a separate integration worktree instead. `git push`
-stays owner-reserved in the untracked local file.
-
-**One rule worth your eye: `Bash(git -C:*)`.** It is genuinely broad — it authorizes any git subcommand
-against any path, including destructive ones, and because it is in the *tracked* file it applies to
-interactive sessions too. The gate's harnesses need it to drive throwaway repos. Flagged rather than
-buried: move it to the local file if you would rather it not be repo-wide.
-
-Gate: 73 pass, 0 fail. `night-run.md` 283 → 311 lines, still far below the 495 it started the sprint at.
-
-### 2026-08-01 | T3 | launcher shipped — and it root-caused TD-024 on the way
-Dispatched to a Sonnet sub-agent, which **returned before finishing** (waiting on its own background
-test). Per CLAUDE.md trap (c) the artifact was inspected rather than the reply: `scripts/night-run.sh`
-existed and was well-built, `night-run.md` was untouched, and no stray process was left running. The
-remainder was completed inline.
-
-**A defect the chain ordering should have caught.** The launcher hard-required `--allowedTools` — which
-T2 had just made optional by moving the allowlist into settings permissions, so a correct settings-based
-invocation would have been rejected. T3 depends on T2 precisely so this could not happen; the dependency
-ordered the *work*, not the agent's *reading*. Now accepts `--allowedTools`, `--settings`, or a settings
-file with a `permissions.allow` block, refusing only when none exists.
-
-**Then the launcher blocked its own live test, correctly — and that root-caused TD-024.** `qa-check`
-returned **72/1** from inside the launcher and 73/0 standalone, three times: context-dependent, not
-flaky. Ruled out command substitution and absolute-path invocation, then found **`MSYS_NO_PATHCONV=1`**
-— exported so a bare `/orchestrator` prompt isn't rewritten into a Windows path (L-067). It is
-*inherited*, so it reached the gate and broke `git -C` on a POSIX path, emitting
-`could not resolve live HEAD in /d/Project/lean-flow` — the **exact string TD-024 recorded**. The debt's
-filed mechanism was nearly right and missed the trigger: **L-067's own workaround causing a second
-path-translation bug in a child process, far from where it was set.** The launcher now clears the
-variable around the gate only; the fired command keeps the caller's environment.
-
-**Verified on real input, both verdicts:**
-- Three `DEAD-ON-ARRIVAL` paths, each naming its cause: missing `unattended` signal · wrong permission
-  mode · forbidden `--dangerously-skip-permissions`.
-- `ALIVE` under the hostile environment (`MSYS_NO_PATHCONV=1` still exported) — the child logged `ok`
-  and exited 0. Real work, not a heartbeat.
-- **Detachment proven by observation**: fired with a 5s window so the launcher exited first, then
-  confirmed the child was **still running** after its parent was gone, and later completed on its own
-  with exit 0. That same run also demonstrated "a live PID is not progress" — up but silent at 5s, so
-  the verdict was correctly `DEAD-ON-ARRIVAL`. A window that short is a false negative for a healthy
-  slow starter, which is why the default is ~150s; noted in the shipped guidance.
-
-Live-test cost: ~$0.5 across four `claude -p` calls. No stray logs in the repo (all under `TMPDIR`), no
-surviving processes.
-
-### 2026-08-01 | scope-change | T4 gains the observed-checker; the gate caught its own gap, then itself
-**What changed.** T4's research note is a metadata-carrying doc, so writing it regenerates
-`docs/knowledge-index.md`. The **observed-layers check shipped last sprint then FAILed**: the index had
-changed and no task declared it. Both ways out fail the gate — regenerate and the index is undeclared,
-skip it and the freshness leg reports STALE — so the fix was forced rather than chosen.
-
-**Impact.** The index is **generated, never hand-authored**, regenerating whenever any
-LEARNINGS/ADR/research doc changes; its sources are already excluded or declared, so declaring it would
-mean naming it in every task that touches a learning. It belongs in the checker's exclusion list — a
-genuine gap in a guard shipped five commits ago, found by that guard.
-
-**Then the guard caught itself**, which is the part worth keeping: editing the checker made *it*
-undeclared and the check FAILed again, naming its own file. The tempting fix — adding the checker to its
-own exclusion list — was rejected outright: it is a hand-authored source file, exactly what the check
-exists to watch, and excluding it would hollow out the guard for one commit's convenience. Declared in
-T4's `Layers:` instead.
-
-**Re-confirm G2.** No new file beyond this one, no edge changes, wave ranks untouched — overlap map and
-preflight verdict hold. Logged before § Plan was edited, same as the T2 scope-change.
-
-### 2026-08-01 | T5 | resolved tech-debt rows are deleted now, not collapsed forever
-Run inline. The retention leg changes from "collapse the row to a one-line § Resolved entry" to
-**delete the row**, at the same 3-sprint trigger. The delay is kept deliberately — a just-resolved debt
-is still context at the next promote — so what goes is the *permanent residue*, not the review window.
-
-Updated in four places rather than one, because the rule was stated in four: §11's retention row, §2's
-lifecycle row for the ledger (`collapsed rows` → `open rows only`), §11's "when it runs" list, and the
-promote governance checklist in the skill (`TD collapse` → `TD deletion`). A rule changed in one of its
-four homes is the L-020 shape — half-shipped and readable as complete.
-
-**Id monotonicity restated where it now matters more.** Collapsing left a visible pointer, so id reuse
-was self-evidently wrong; deleting removes that reminder. Both the standard and the ledger header now
-say a deleted row never frees its id.
-
-Applied to this repo: § Resolved and its five collapsed lines removed, and **TD-018 + TD-019 deleted**
-outright — they hit the 3-sprint mark at this promote, and their action was deliberately deferred here
-rather than collapsed at promote and deleted a week later. Ledger **210 → 165 lines** (−21%). Nothing
-else was due: TD-016/TD-020 resolved at SPRINT-042 and TD-021/TD-022 at SPRINT-043, so their windows
-close at SPRINT-045 and SPRINT-046.
-
-Consumer-facing — a shipped standard changed — so it needs a CHANGELOG line at close (L-015).
-Gate: 73 pass, 0 fail.
+### 2026-08-01 | T6 | v1.25.0 cut, stopped before push
+One MINOR covering SPRINT-043 + SPRINT-044 (D3). Manifests lockstep, L-048 sweep found and fixed the
+README echo, §11 rotation moved v1.23.0 out with all 11 archive links verified. Two gate failures fixed
+rather than worked around: the rotation archive was undeclared (joined T6's `Layers:`), and the sprint
+file hit **405 > 400** — trimmed my own prose, never the cap (§7).
 
 ## Files Changed
 
-<!-- Filled during execution; feeds CHANGELOG at close. -->
-
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/references/night-run.md` | T1–T4 | checks split out (TD-014); allowlist → settings permissions + bare-invocation + tool coverage (TD-023); launcher section; denial no-retry rule | low — guidance | snippets diffed byte-identical vs git; harnesses green |
+| `skills/orchestrator/references/night-run-checks.md` | T1 | new sibling holding the two capability-check snippets verbatim | low | both extracting harnesses pass unmodified |
+| `evals/run-skill-freshness-fixtures.sh` · `evals/run-worktree-usability-fixtures.sh` | T1 | re-pointed at the moved reference (one path line each) | low | mis-pointed path FAILs loud by name, both directions |
+| `.claude/settings.json` | T2 | night-run rules, 5 → 20, in the pinned `Bash(<cmd>:*)` form | **med** — `git -C:*` is broad and tracked | JSON validated; flagged for owner review |
+| `scripts/night-run.sh` | T3 | new detached launcher with `ALIVE`/`DEAD-ON-ARRIVAL` verdicts | **med** — fires real runs | both verdicts live-fired; detachment proven by observation |
+| `docs/research/night-run-cost.md` | T4 | cost attribution from captured run data | none | figures read off `modelUsage`, not estimated |
+| `scripts/lib/check-layers-observed.sh` | T4 | generated index added to the exclusion list, with its reason stated | low | check re-run; caught its own edit, which is the point |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` · `.../SKILL.md` | T5 | TD retention: collapse → delete, updated in all four places the rule was stated | low | gate green |
+| `TECH-DEBT.md` | T5, close | § Resolved removed; TD-018/019 deleted; TD-014/023/024 resolved; TD-025/026 filed | none | 210 → 165 lines |
+| `CHANGELOG.md` · `.claude-plugin/*.json` · `README.md` · `docs/changelog/CHANGELOG-1.23.0.md` | T6 | v1.25.0 cut, manifests lockstep, §11 rotation | low | L-048 sweep clean; 11 archive links resolve |
 
 ## Retro
 
-<!-- Written at close. -->
+**Retrieval check** — no miss, but one **gap in a learning rather than in retrieval**. L-067 was
+applied correctly (the trigger needed `MSYS_NO_PATHCONV=1`), yet it describes the variable as affecting
+"every argument in that invocation" and says nothing about *inheritance* — which is the property that
+broke the gate two layers down. The learning was found and followed; it was incomplete. Filed as
+**L-081** and L-067's count bumped to 2.
+
+**Cost** — 6 units delivered and landed, 6 attempted. Two dispatched agents (~241k subagent tokens),
+four live `claude -p` launcher tests (~$0.5), the rest inline. Total dollar cost is not observable from
+inside an interactive session, so it is stated as unavailable rather than omitted — the same degrade
+rule this repo shipped two sprints ago. Cheaper in shape than SPRINT-043 by deliberate choice: only the
+two genuinely mechanical tasks were dispatched, and T4's own finding (turns drive cost) is why.
+
+**Worked**
+- **Verifying dispatched claims against git rather than accepting them.** T1's "moved verbatim" is
+  exactly the assertion that reads identically whether true or false; diffing both snippets against
+  `HEAD` made it evidence. The harness coupling is the elegant part — assertions unchanged means a
+  rewrite would have failed them, so the proof was already built into the task's shape.
+- **Inspecting the artifact when a subagent returned early.** T3's agent stopped mid-task; the script
+  on disk was sound and nearly complete. Reading the reply alone would have suggested starting over.
+- **Chasing a context-dependent gate failure instead of shrugging at it.** 72/1 inside the launcher
+  versus 73/0 standalone looked like flakiness. It was an inherited environment variable, and following
+  it root-caused a debt that had survived two wrong diagnoses across two sprints.
+- **Letting the gates fail on my own work.** Three separate blocks — undeclared index, the checker
+  flagging itself, the 405-line cap — each fixed at the cause rather than by loosening the check.
+
+**Friction**
+- **A dependency edge did not prevent a contradiction.** T3 shipped a launcher that rejected T2's
+  invocation despite depending on it. → **L-080**.
+- **The preflight cannot see transitive ordering**, so a legitimate four-task chain on one file HALTed
+  and was worked around with redundant edges. → **TD-025**.
+- **The two-commit sha convention guarantees a red gate** in the window between `plan locked` and
+  recording the sha. → **TD-026**.
+- **My own Execution Log breached the 400-line cap** and had to be compressed at close — the findings
+  belonged in their durable homes all along, not restated at length in a working doc.
+
+**Pattern candidate**
+- **L-080** — an edge orders the work, not the reading.
+- **L-081** — an environment workaround is inherited, and can cause a second bug far from where it was set.
+- **L-082** — when a guard flags its own file, exempting it is the one fix never available.
+- **L-067 now at count 2** → promotion candidate at the next promote.
+
+**Bucket routing**
+
+| Bucket | Filed |
+|---|---|
+| Shipped | `CHANGELOG.md` **v1.25.0** (cut in T6, covering SPRINT-043 + 044) |
+| Tech debt | **TD-014** · **TD-023** · **TD-024** resolved · **TD-025** (transitive ordering) · **TD-026** (sha-window red gate) filed |
+| Follow-ups | **TASK-143** — fire a run through the launcher, produce calibration row three |
+| Learnings | **L-080** · **L-081** · **L-082**; **L-067** count → 2 |
