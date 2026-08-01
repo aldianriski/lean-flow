@@ -96,31 +96,6 @@ status: current
   - Mitigation (not yet done): use `grep -q` (as `assert-judgement-retry.sh` already does) or
     `|| true` with an explicit count. Fix opportunistically if that file is touched again.
 
-- **TD-017** severity: minor | status: resolved → SPRINT-040 T2 | created: Sprint-039
-  - Summary: `migrate` and `init` do **not** execute Part 0's park protocol. SPRINT-039 T1's real
-    headless runs found both correctly *withheld* every unauthorized write, but neither wrote a park
-    record nor a `/handoff` doc — they simply declined in prose. `promote` and `/triage`, tested in
-    the same task, both ran the protocol formally.
-  - Impact: the **safety** property holds; the **observability** contract does not. An unattended run
-    that parks at `migrate`/`init` leaves the morning maintainer no artifact showing it ran or why it
-    stopped — the Execution-Log/handoff trail the contract promises is simply absent. L-020's class:
-    shipped, but not wired into every entry point that can reach it.
-  - Mitigation (not yet done): wire the park-record + handoff write into `migrate`/`init`'s
-    approval-gate paths, then cover with the retained `migrate-park`/`init-park` fixtures — which
-    already exist and currently assert only the withheld-write half.
-  - Resolution: both entry points now write a park record to a `/handoff` doc before halting —
-    verified on real headless re-runs of both retained fixtures (`handoff-migrate-park.md` ·
-    `handoff-init-park.md`, each naming what stopped and its unblock condition), with
-    `assert-noaction-park.sh` still passing 4/4 and 3/3 so the safety half didn't regress.
-    **The mitigation above was insufficient as written, and the runs are what proved it.** Wiring the
-    rule into the approval paths took two failed attempts: first into § Sprint lifecycle, which a
-    `migrate` run never reads (L-020's exact shape, committed while fixing a TD of that class); then
-    into `## Migrate`/`## Init` stating *what to do when headless* but never **how the run knows it
-    is** — and an interactive run waiting in prose is correct behaviour. What made it fire was the
-    **detection cue**: probe `ToolSearch select:AskUserQuestion`, which is precisely what `promote`
-    and `/triage` already carried and why they alone complied in SPRINT-039. A behavioural rule ships
-    with its trigger or it does not ship. Cost of finding that out: 4 real runs, $2.10.
-
 - **TD-016** severity: minor | status: resolved → SPRINT-042 T4 | created: Sprint-039
   - Summary: `scripts/qa-check.sh` leg 12 (TD-013's fix) runs 6 zero-API eval harnesses, taking the
     gate from **~44s to ~90s (+80%)**; the two `selftest-assert-*` harnesses are ~26s of that, since
@@ -158,32 +133,6 @@ status: current
     by name. Both breaks reverted and re-verified clean. Split stated in `docs/QA.md` beside the
     existing manual/gated boundary so the reduced bare-run set is discoverable, not silently dropped.
 
-- **TD-015** severity: medium | status: resolved → SPRINT-040 T1 | created: Sprint-039
-  - Summary: the skill-freshness check shipped in `skills/orchestrator/references/night-run.md`
-    guards only the **unattended** path, where a version/content mismatch is a `BLOCK`. Nothing
-    guards an **interactive** session — which is where the loop actually runs day to day.
-  - Impact: proven live, not theoretical. SPRINT-039 executed its entire promote→build→close loop on
-    **1.18.0** cached skills against a 1.21.0→1.22.0 repo; the stale path was printed in every skill's
-    invocation header and went unread for the whole session. Damage was nil only because references
-    were read from the repo rather than the cache (reaching *past* the stale procedure). A larger
-    drift, or one in a step with no repo-side reference to fall through to, would have executed
-    silently and been indistinguishable from a clean run. This is L-054's shape — a correct check on
-    the wrong side of the boundary — and L-021's second occurrence.
-  - Mitigation (not yet done): lean-flow ships no hooks (ADR-011 killed in-core gate enforcement), so
-    an automatic interactive guard has no obvious carrier. Cheapest real option is a `/prime` step
-    that reads the loaded skill's base-dir version and reports it in the health line — turning an
-    invisible fact into a checked one at the exact moment a session starts.
-  - Resolution: `/prime` (v0.3.0) gained a § Skill freshness step and a `Skills:` health row comparing
-    the invocation header's base-dir version against `.claude-plugin/plugin.json`. All three branches
-    were demonstrated on real input rather than reasoned about — `fresh` on this repo, `STALE` on a
-    fixture manifest reading 9.9.9, `n/a` on a repo with no manifest (the consumer path, which must
-    never false-alarm). Deliberately a **report, not a gate**: priming is read-only, and whether a
-    stale procedure is acceptable is the session's call. Deliberately **version-only** (SPRINT-040 D1)
-    — /prime declares no Bash and the content-first check lives in `orchestrator/references/`, so
-    reaching it would mean a cross-skill reference tree or a drifting copy. **Residual, accepted:** a
-    skill edited without a version bump still reads `fresh` interactively; that leg stays covered only
-    on the unattended path, whose pre-flight diffs cache content against the working tree.
-
 - **TD-014** severity: minor | status: open | created: Sprint-038
   - Summary: `skills/orchestrator/references/night-run.md` is now **427 lines**, carrying the Part 0
     contract, the entry path, the pre-flight pass, and **two ~100-line embedded shell snippets**
@@ -212,6 +161,9 @@ status: current
 
 <!-- TD-008…010 all resolved (§11 collapse — per-TD summaries live in their sprint files + git). -->
 - resolved: **TD-008**→SPRINT-032 · **TD-009**→SPRINT-034 · **TD-010**→SPRINT-035 (collapsed 2026-07-30, SPRINT-038 T4).
+
+<!-- TD-015 + TD-017 collapsed at SPRINT-043 promote (3 sprints after resolution — summaries live in their sprint files + git). -->
+- resolved: **TD-015**→SPRINT-040 T1 (`/prime` freshness row — interactive side of the skill-version guard) · **TD-017**→SPRINT-040 T2 (migrate/init park records; the detection-cue lesson → L-069) (collapsed 2026-08-01).
 
 <!-- TD-013 collapsed at SPRINT-042 promote (3 sprints after resolution — summary lives in its sprint file + git). -->
 - resolved: **TD-013**→SPRINT-039 T3 (6 zero-API eval harnesses wired into `qa-check`; runtime cost → TD-016) (collapsed 2026-08-01).

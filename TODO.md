@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-_(none active)_ — SPRINT-042 closed 2026-08-01. Promote the next sprint from `state: ready` Backlog tasks.
+> **SPRINT-043 — Proof Run** → docs/sprint/SPRINT-043-proof-run.md
 
 ---
 
@@ -29,6 +29,38 @@ _(none active)_ — SPRINT-042 closed 2026-08-01. Promote the next sprint from `
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-135 — Add an observed third source to the declaration cross-check  [size: M] [risk: low] [AFK]
+      class:      execution
+      done-when:  the gate compares the **actually changed** file set for the active sprint against the
+                  union of its tasks' declared `Layers:`, reporting any file changed but undeclared.
+                  Unlike the two existing sources this one is *observed*, not authored, so it cannot be
+                  forgotten — it reads what happened rather than what someone predicted at promote.
+                  Negative-tested using SPRINT-042's own recorded miss as the must-FAIL fixture (a new
+                  checker file was created during implementation and never declared, and the existing
+                  prose-based check passes that Plan regardless); fixtures retained (L-058)
+      touches:    the qa gate script and its extracted-checker directory · the gate's leg inventory doc ·
+                  the retained eval fixture set
+      depends-on: none
+      assumes:    the comparison base is the sprint's recorded plan commit, so "changed this sprint" is
+                  well-defined without a second source of truth; a file changed by the coordinator's own
+                  close bookkeeping is expected noise and needs an explicit, reasoned exclusion rather
+                  than a silent one
+      tracker:    TD-022 · L-074
+      state:      ready
+
+- [ ] TASK-136 — Make the generated knowledge index survive a failed write  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  an interrupted or failed generation leaves the **previous** index intact instead of a
+                  truncated one — write to a temporary file in the same directory, then move it into
+                  place, so the swap is atomic. Verified by simulating a mid-write failure and
+                  confirming the prior file survives byte-identical, not merely that a normal run works
+      touches:    the index generator script
+      depends-on: none
+      assumes:    same-directory rename is atomic on the target filesystem; if it is not, the check
+                  degrades to reporting rather than silently claiming a guarantee it cannot make
+      tracker:    TD-021
+      state:      ready
 
 - [ ] TASK-134 — Fire an unattended proof run and record its calibration row  [size: S] [risk: med] [HITL]
       class:      decision
