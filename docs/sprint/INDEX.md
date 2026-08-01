@@ -9,7 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
-- SPRINT-045 — Gate Precision — closed 2026-08-01 · CLOSESHA (PATCH v1.25.1)
+- SPRINT-045 — Gate Precision — closed 2026-08-01 · eaf3e1f (PATCH v1.25.1)
 - SPRINT-044 — Night-Run Ergonomics — closed 2026-08-01 · a32090b (MINOR v1.25.0)
 - SPRINT-043 — Proof Run — closed 2026-08-01 · 3bfae3c (released in MINOR v1.25.0)
 - SPRINT-042 — Run to Finish — closed 2026-08-01 · cba78de (MINOR v1.24.0)
