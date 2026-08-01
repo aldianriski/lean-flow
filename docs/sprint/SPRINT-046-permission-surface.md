@@ -75,12 +75,12 @@ just fixed.
 genuinely undeclared file elsewhere still FAILs by name.
 
 **DoD:**
-- [ ] In-repo agent worktree paths no longer counted as undeclared
-- [ ] The reason is stated **inline** with the other exclusions — never a silent skip entry
-- [ ] **Negative-tested, fixture retained** (L-058): a genuinely undeclared file outside those paths
+- [x] In-repo agent worktree paths no longer counted as undeclared
+- [x] The reason is stated **inline** with the other exclusions — never a silent skip entry
+- [x] **Negative-tested, fixture retained** (L-058): a genuinely undeclared file outside those paths
       still FAILs by name. An exclusion that swallowed the real case would satisfy the acceptance and
       hollow out the guard — which is the only way this task can go wrong
-- [ ] L-082's test applied and recorded: this entry is added because no task *can* declare a path the
+- [x] L-082's test applied and recorded: this entry is added because no task *can* declare a path the
       dispatch protocol creates, not because it makes a commit convenient
 
 ## Owner-action checklist
@@ -124,3 +124,22 @@ genuinely undeclared file elsewhere still FAILs by name.
 ## Retro
 
 <!-- Written at close. -->
+
+### 2026-08-01 | T2 | agent worktree paths excluded — verified narrow, not broad
+Dispatched to a Sonnet sub-agent (small config change, implemented directly). One `is_excluded()` entry
+for `.claude/worktrees/agent-*`, reason stated inline beside the others as that file's convention
+requires.
+
+**The only way this task could fail is an over-broad pattern swallowing the true positive, so that is
+what I checked** rather than the happy path. Pattern breadth tested directly: `agent-001/x.txt`
+excluded · `worktrees/notanagent/x.txt` **counted** · `.claude/other.md` **counted** ·
+`scripts/real-miss.sh` **counted**. Then end-to-end on the live repo with a simulated agent artifact
+*and* a genuinely undeclared file present at once: the checker FAILed naming **only** the real miss and
+ignored the worktree path; cleaned up, back to PASS.
+
+The agent recorded L-082's test rather than skipping it, and its reasoning holds: the dispatch protocol
+creates these paths at fan-out, strictly after `Layers:` is frozen, so no task can name a path that did
+not exist when it was written — undeclarable by construction, the same category as the settings row.
+
+It also flagged, correctly and without acting: TD-031's question (four exclusions in four sprints) is
+out of this sprint's scope. Fixtures: 8 cases / 13 assertions green. Gate 69 pass, 0 fail.

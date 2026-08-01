@@ -253,6 +253,100 @@ run_case_anywhere "coordinator-exclusion-safe" 0 \
   sh -c "cd \"$c4\" && sh \"$checker\" docs/sprint/SPRINT-905-exclusion.md"
 
 # ================================================================================================
+# case 4b: in-repo agent worktree paths change but stay unflagged (constructed) -- must PASS.
+# Reconstructs TD-030 (SPRINT-046 T2): worktree dispatch creates .claude/worktrees/agent-<id>/...
+# INSIDE the repo at fan-out time, after the Plan's Layers: already froze -- the exact "undeclarable
+# by construction" shape the exclusion covers. Exercises both observed-change paths at once: a
+# tracked-but-uncommitted edit AND a brand-new untracked file, both under the worktree path.
+# ================================================================================================
+c4b="$work/agent-worktree-exclusion-safe"
+mkdir -p "$c4b/docs/sprint" "$c4b/.claude/worktrees/agent-001"
+cat > "$c4b/docs/sprint/SPRINT-906-worktree.md" <<'EOF'
+---
+sprint: 906
+slug: worktree
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-906 — Agent Worktree Exclusion Safety (constructed fixture)
+
+## Plan
+
+### T1 — edit foo.txt only
+Layers: `foo.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] foo.txt updated
+EOF
+printf 'a\n' > "$c4b/foo.txt"
+printf 'seed\n' > "$c4b/.claude/worktrees/agent-001/seed.txt"
+git -C "$c4b" init -q
+lock_plan "$c4b" 'docs/sprint/SPRINT-906-worktree.md'
+printf 'a2\n' >> "$c4b/foo.txt"                                    # tracked, uncommitted, declared
+printf 'wip\n' >> "$c4b/.claude/worktrees/agent-001/seed.txt"      # tracked, uncommitted, excluded
+printf 'new\n' > "$c4b/.claude/worktrees/agent-001/task-notes.md"  # untracked, excluded
+
+run_case_anywhere "agent-worktree-exclusion-safe" 0 \
+  "layers observed (all changed files declared" -- \
+  sh -c "cd \"$c4b\" && sh \"$checker\" docs/sprint/SPRINT-906-worktree.md"
+
+# ================================================================================================
+# case 4c: a genuinely undeclared file OUTSIDE the worktree path still FAILs by name, even with an
+# excluded worktree path present alongside it (L-058 negative test, SPRINT-046 T2). This is the only
+# way T2's exclusion could go wrong -- an over-broad `.claude/worktrees/agent-*` pattern that also
+# swallowed real undeclared work -- so this asserts both that the real file IS named in the finding
+# AND that the excluded worktree path is NOT named in it.
+# ================================================================================================
+c4c="$work/agent-worktree-does-not-swallow-real-miss"
+mkdir -p "$c4c/docs/sprint" "$c4c/.claude/worktrees/agent-002" "$c4c/scripts/lib"
+cat > "$c4c/docs/sprint/SPRINT-907-worktree-miss.md" <<'EOF'
+---
+sprint: 907
+slug: worktree-miss
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-907 — Agent Worktree Does Not Swallow A Real Miss (constructed fixture)
+
+## Plan
+
+### T1 — edit foo.txt only
+Layers: `foo.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] foo.txt updated
+EOF
+printf 'a\n' > "$c4c/foo.txt"
+git -C "$c4c" init -q
+lock_plan "$c4c" 'docs/sprint/SPRINT-907-worktree-miss.md'
+printf 'a2\n' >> "$c4c/foo.txt"                                          # tracked, uncommitted, declared
+printf 'wip\n' > "$c4c/.claude/worktrees/agent-002/seed.txt"             # untracked, excluded
+printf 'oops\n' > "$c4c/scripts/lib/undeclared-real-file.sh"             # untracked, NOT excluded, real miss
+
+run_case_anywhere "agent-worktree-does-not-swallow-real-miss (fails)" 1 \
+  "changed but undeclared in any task's Layers::" -- \
+  sh -c "cd \"$c4c\" && sh \"$checker\" docs/sprint/SPRINT-907-worktree-miss.md"
+run_case_anywhere "agent-worktree-does-not-swallow-real-miss (names the real file)" 1 \
+  "scripts/lib/undeclared-real-file.sh" -- \
+  sh -c "cd \"$c4c\" && sh \"$checker\" docs/sprint/SPRINT-907-worktree-miss.md"
+
+out4c=$(cd "$c4c" && sh "$checker" docs/sprint/SPRINT-907-worktree-miss.md 2>&1)
+case "$out4c" in
+  *".claude/worktrees/agent-002"*)
+    echo "FAIL fixture(agent-worktree-does-not-swallow-real-miss (worktree path excluded from finding)): worktree path appeared in output -- got:"
+    printf '%s\n' "$out4c"
+    fail=1
+    ;;
+  *)
+    echo "PASS fixture(agent-worktree-does-not-swallow-real-miss (worktree path excluded from finding)): worktree path correctly absent from finding"
+    ;;
+esac
+
+# ================================================================================================
 # case 5: sprint file path does not exist on disk (constructed) -- must FAIL, its own named finding.
 # This is the checker's very first guard (`[ -f "$sp" ]`), before any git command runs, so the
 # throwaway repo below never even needs a commit -- it exists only so the fixture follows the same

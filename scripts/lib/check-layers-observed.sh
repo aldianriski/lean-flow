@@ -81,6 +81,13 @@ is_excluded() {
                                                 # concern, which is what Layers: exists to manage.
     .claude-plugin/plugin.json) return 0 ;;     # version bump, owned by release-patch
     .claude-plugin/marketplace.json) return 0 ;; # lockstep with plugin.json, same owner
+    .claude/worktrees/agent-*) return 0 ;;      # worktree dispatch protocol: agent worktrees are
+                                                # created INSIDE the repo, by the dispatch protocol
+                                                # itself, at fan-out time -- AFTER the Plan freezes. No
+                                                # task can declare a path that doesn't exist yet when
+                                                # Layers: is written. Undeclarable by construction, not
+                                                # by omission -- same category as the settings.json rows
+                                                # above (TD-030).
     *) return 1 ;;
   esac
 }
