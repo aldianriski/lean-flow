@@ -23,6 +23,7 @@ Run both before cutting a release or closing a sprint.
 | Eval harnesses (TD-013, split TD-016) | every zero-API harness under `evals/` (`ls evals/run-*.sh evals/selftest-*.sh` — see the split below) is gated on **that harness's own exit status** — a FAIL names both the harness and the finding it reported |
 | Headless park-record cue (TD-019) | migrate's and init's procedures (`skills/lean-doc-generator/references/{migration-map,init}.md`) each still carry the ask-channel probe (`ToolSearch select:AskUserQuestion`) and the park-record instruction naming a `/handoff` doc — a FAIL names the procedure and which of the two it lost |
 | Layers/Depends-on completeness (TD-020) | for every `### Tn` block in an active sprint's Plan, `scripts/lib/check-layers-completeness.sh` derives a second, DoD/Acceptance-prose-sourced candidate touched-file and dependency set and diffs it against the block's `Layers:`/`Depends-on:` — a FAIL names the block and the file or task id the declaration omitted |
+| Layers observed vs git diff (TD-022) | for an active sprint, `scripts/lib/check-layers-observed.sh` diffs the actual git state since the sprint's recorded `plan_commit:` (tracked changes + untracked new files) against the union of every task's declared `Layers:` — a third, *observed* source that reads history rather than authored text, so it catches an **invented** file a DoD/Acceptance-prose source (leg above) cannot; a FAIL names the file. Coordinator close-bookkeeping files (`docs/sprint/**`, `TECH-DEBT.md`, `TODO.md`, `CHANGELOG.md`, `docs/LEARNINGS.md`, `.claude-plugin/*.json`) are excluded, each with its reason stated in the checker (`is_excluded()`) — never a silent list |
 
 Non-zero exit = fix before release. Watch the near-cap files the run prints — one edit can breach
 them.
@@ -39,13 +40,15 @@ nothing runs it" gap TD-013 described.
 **Always-on vs opt-in split (TD-016).** Within the zero-API set, `qa-check.sh` further splits
 always-on from opt-in — a *different* boundary than the manual step above (that one is excluded
 entirely; this one is gated either way, just not both on every run). The 3 `selftest-assert-*.sh`
-harnesses each spin up many throwaway git repos and account for most of the leg's runtime, so a bare
-run skips them; `QA_FULL=1 sh scripts/qa-check.sh` runs the full set, selftests included. Everything
-else — the snippet-runner harnesses (skill-freshness, worktree-usability, dispatch-preflight) that
-guard shipped `skills/**` text, and the layers-completeness harness (maintainer-facing but cheap,
-so it stays always-on rather than hiding a corrupted-merge false-negative behind a flag) — always
-runs. So nothing drops out silently: what a bare run skips is named right here, and `QA_FULL=1`
-recovers it.
+harnesses, plus `run-layers-observed-fixtures.sh` (SPRINT-043 T1), each spin up throwaway git repos
+via `mktemp -d` + `git init` and account for most of the leg's runtime (~4s for the 4 repos the
+layers-observed harness builds, on top of the selftests' own cost), so a bare run skips them;
+`QA_FULL=1 sh scripts/qa-check.sh` runs the full set, selftests + layers-observed included.
+Everything else — the snippet-runner harnesses (skill-freshness, worktree-usability,
+dispatch-preflight) that guard shipped `skills/**` text, and the layers-completeness harness
+(maintainer-facing but cheap and git-free, so it stays always-on rather than hiding a
+corrupted-merge false-negative behind a flag) — always runs. So nothing drops out silently: what a
+bare run skips is named right here, and `QA_FULL=1` recovers it.
 
 ## Judgment — manual / agent pass (a script can't decide these)
 

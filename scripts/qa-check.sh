@@ -316,7 +316,11 @@ done
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
 eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh"
-eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh"
+eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
+# run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
+# run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via
+# mktemp -d + git init -- the exact cost TD-016 named as the selftest-assert-* boundary (~4s for 4
+# repos on this host). Cheap-and-git-free stays always-on; git-repo-building stays opt-in (SPRINT-043 T1).
 # Harnesses deliberately NOT gated at all (neither always-on nor opt-in). Empty is a valid state --
 # but a paid/non-deterministic harness is excluded by being NAMED here with a reason, never by being
 # left out of the lists above.
@@ -410,6 +414,37 @@ else
       lc_find=$(printf '%s\n' "$lc_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
       [ -n "$lc_find" ] || lc_find="no FAIL line in output -- checker exited $lc_code without reporting one"
       bad "layers completeness: $lc_find"
+    fi
+  fi
+fi
+
+# --- 15. Layers observed vs actual git diff since plan_commit (TD-022, L-074, SPRINT-043 T1) ------
+# Leg 14's second source is derived from DoD/Acceptance prose written at promote time -- and
+# SPRINT-042 T3 defeated it the day it shipped: the task created scripts/lib/check-layers-
+# completeness.sh, a file its own DoD prose never named, because a DoD written at promote cannot
+# name a file invented during implementation (TD-022). Two documents written by one author at one
+# moment are one source in two places (L-074) -- a second *authored* source closes the forgetting
+# gap, not the inventing gap. This leg delegates to a third, OBSERVED checker
+# (scripts/lib/check-layers-observed.sh, covered by evals/run-layers-observed-fixtures.sh) that
+# diffs the actual git state since the sprint's recorded `plan_commit:` against the union of every
+# task's declared `Layers:` -- it reads history rather than intent, so it cannot be forgotten the
+# way a second sentence can. Fails toward over-reporting, same as leg 14.
+lo_script="scripts/lib/check-layers-observed.sh"
+if [ ! -f "$lo_script" ]; then
+  bad "layers observed: checker not found at $lo_script"
+else
+  lo_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
+  if [ -z "$lo_files" ]; then
+    note "layers observed: skip (missing): docs/sprint/SPRINT-*.md"
+  else
+    lo_out=$(sh "$lo_script" $lo_files 2>&1); lo_code=$?
+    if [ "$lo_code" -eq 0 ]; then
+      lo_n=$(printf '%s\n' "$lo_out" | grep -cE '^PASS')
+      ok "layers observed ($lo_n sprint file(s) verified against actual git diff since plan_commit)"
+    else
+      lo_find=$(printf '%s\n' "$lo_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
+      [ -n "$lo_find" ] || lo_find="no FAIL line in output -- checker exited $lo_code without reporting one"
+      bad "layers observed: $lo_find"
     fi
   fi
 fi
