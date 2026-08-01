@@ -11,6 +11,28 @@ status: current
 
 ---
 
+## v1.25.2 — Permission Surface (2026-08-01)
+
+PATCH — SPRINT-046. If you run unattended, two of these will save you a debugging session, because both
+make a correct-looking allowlist do nothing without saying so.
+
+**What changed for you:**
+- **Night-run guidance now names two preconditions that were costing real runs.** First: a
+  **directory-prefix permission rule never matches**. `Bash(sh evals/:*)` looks like coverage and
+  authorizes nothing; exact-file, bare-command and space-glob forms all work. Second: an **untrusted
+  workspace has its `permissions.allow` ignored entirely** — one warning line, otherwise silent, so
+  every rule in the file is inert while looking correct. Both were measured one variable at a time, not
+  inferred; the evidence is in `docs/research/headless-permission-surface.md`.
+- **A hypothesis we had published is retracted.** The previous release's notes implied an unattended
+  run's permission surface can narrow mid-session. A 26-turn probe found no such effect. The denials
+  that suggested it were caused by **redirects** — `sh … > file` is denied where the same command
+  without the redirect is permitted — which the existing "issue commands bare" guidance already covers.
+  If you changed anything on account of that claim, you can undo it.
+- **Parallel runs no longer report a false gate failure.** Agent worktrees are created inside the repo,
+  and the declaration cross-check counted them as undeclared changes on every fan-out.
+
+---
+
 ## v1.25.1 — Gate Precision (2026-08-01)
 
 PATCH — SPRINT-045. Two guards were failing on input they should accept. A check that cries wolf on a
