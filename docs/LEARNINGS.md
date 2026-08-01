@@ -21,11 +21,27 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-085**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-087**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-087 [tags: process] [status: active]: **A reported symptom is evidence; the mechanism reported alongside it is a hypothesis — and in this repo the hypothesis has been wrong three times running.** TD-024 was filed with "`git -C` cannot resolve POSIX paths on MSYS" (false — it resolves fine), corrected at a close to "probably transient worktree state" (also false), and finally root-caused to an inherited `MSYS_NO_PATHCONV`. TD-027 was filed as "the permission surface degrades mid-session" and falsified by a 26-turn probe; the discriminator was a redirect, which an existing rule already covered. In every case the **symptom was real and precisely recorded** — the exact error string, the exact denied commands — and in every case the attached explanation was wrong. That asymmetry is the lesson: a symptom is something observed, a mechanism is something *inferred*, and they arrive welded together in the same report looking equally factual. The costs are asymmetric too — TD-024's first diagnosis nearly spread a `pwd -W` workaround across seven harnesses, and TD-027's would have bought a structural defence against nothing. Practical rule: **when a report contains both, treat the symptom as data and the mechanism as the thing to test first** — and prefer "not established" over a plausible story, because a plausible story ends inquiry while an honest gap invites it.
+- seen: Sprint-044, Sprint-045, Sprint-046
+- count: 3
+- promoted: no
+- related: L-078 (a green result from a broken setup) · L-085 (hand the verification forward) · L-060 (inspect the artifact, not the report) · TD-024 · TD-027
+
+---
+
+## L-086 [tags: tooling] [status: active]: **A permission rule can be present, correct, and completely inert — presence is not effect.** Measured directly, one variable at a time (SPRINT-046 T1). **(1) Workspace trust is a precondition for the whole file**: an untrusted workspace has its `permissions.allow` *ignored entirely*, announced in a single line and otherwise silent, so a character-exact rule produced a denial purely because the file was never honoured. **(2) Rule form decides matching**: against one identical command, exact-file (`Bash(sh path/x.sh:*)`), bare-command (`Bash(sh:*)`) and space-glob (`Bash(sh *)`) all matched, while **directory-prefix (`Bash(sh dir/:*)`) denied**, reproduced. **(3) The command's own shape still governs**: relative → permitted, absolute → permitted, but adding `> file` → **denied**, reproduced — which is L-077's rule, and is what actually explains the denials once blamed on mid-session degradation (L-084, now superseded). Three independent ways for a correct-looking allowlist to do nothing, none of which announce themselves as a rule problem. The habit worth keeping: **verify a rule *matched*, never that it exists** — the failure modes all look identical from the settings file.
+- seen: Sprint-046
+- count: 1
+- promoted: no
+- related: L-077 (the matcher reads the literal invocation) · L-084 (superseded by this) · L-083 (a precondition that silently stopped holding) · TD-028 · `docs/research/headless-permission-surface.md`
 
 ---
 
@@ -37,10 +53,10 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-084 [tags: tooling] [status: active]: **A permission surface can narrow *mid-session* — so allowlist derivation, a static exercise done once at pre-flight, cannot fully protect a long run.** SPRINT-045's run had `awk … > file` and `sh <path>` denied *after* those exact command forms had already succeeded earlier in the same session; they were how its own wave-start preflight had been extracted and executed minutes before. The dispatched T1 agent independently reported the same shape inside its own sandbox — every `sh` and `awk -f <file>` invocation denied regardless of allowlist match, while inline `awk '…'` kept working. Two observers, one run, same signature. This is materially different from the form-failure story (L-077: the matcher reads the literal invocation), and it partly undercuts the fix built on it: a perfectly derived, perfectly formed allowlist still degrades if the surface itself changes under the run. Consequence for the unattended contract — pre-flight can no longer be treated as *sufficient* for a long run, only necessary; a run that suddenly cannot execute a command it ran an hour ago is not misconfigured, and diagnosing it as a rule gap sends the next person to the wrong file. **Reproduce before theorising** (TD-024's lesson, applied here in advance): nobody has yet established whether the trigger is elapsed time, turn count, or a budget.
+## L-084 [tags: tooling] [status: superseded]: **A permission surface can narrow *mid-session* — so allowlist derivation, a static exercise done once at pre-flight, cannot fully protect a long run.** SPRINT-045's run had `awk … > file` and `sh <path>` denied *after* those exact command forms had already succeeded earlier in the same session; they were how its own wave-start preflight had been extracted and executed minutes before. The dispatched T1 agent independently reported the same shape inside its own sandbox — every `sh` and `awk -f <file>` invocation denied regardless of allowlist match, while inline `awk '…'` kept working. Two observers, one run, same signature. This is materially different from the form-failure story (L-077: the matcher reads the literal invocation), and it partly undercuts the fix built on it: a perfectly derived, perfectly formed allowlist still degrades if the surface itself changes under the run. Consequence for the unattended contract — pre-flight can no longer be treated as *sufficient* for a long run, only necessary; a run that suddenly cannot execute a command it ran an hour ago is not misconfigured, and diagnosing it as a rule gap sends the next person to the wrong file. **Reproduce before theorising** (TD-024's lesson, applied here in advance): nobody has yet established whether the trigger is elapsed time, turn count, or a budget.
 - seen: Sprint-045
 - count: 1
-- promoted: no
+- promoted: no — **SUPERSEDED by L-086** (SPRINT-046 T1 falsified the degradation hypothesis; the discriminator is the redirect, an instance of L-077). Retained rather than deleted: the observation was real and the wrong inference is the instructive part.
 - related: L-077 (form failures — the *static* half of the same surface) · L-072 (the terminal step is the shared choke point) · TD-027 · TD-028
 
 ---

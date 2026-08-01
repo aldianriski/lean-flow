@@ -3,7 +3,7 @@ sprint: 046
 slug: permission-surface
 owner: Maintainer
 last_updated: 2026-08-01
-status: active
+status: closed
 plan_commit: 3459149
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -174,3 +174,59 @@ the rule promoted to CLAUDE.md trap (d) at *this sprint's own promote* — catch
 Per D3 **no mitigation shipped**. The one permitted change was made because the form finding is
 conclusive: the derivation guidance now states both preconditions and points at the evidence.
 Gate 69 pass, 0 fail.
+
+## Files Changed
+
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+| `docs/research/headless-permission-surface.md` | T1 | measured answers to TD-027/TD-028, plus what turned out not to be true | none | every claim carries its probe; unproven items named as unproven |
+| `skills/orchestrator/references/night-run.md` | T1 | derivation guidance gains the two measured preconditions (workspace trust · rule form) | low — guidance | the only change D3 permits, and only because the form finding is conclusive |
+| `scripts/lib/check-layers-observed.sh` | T2 | agent worktree paths excluded, reason stated inline (TD-030) | low | breadth tested directly; real miss still FAILs by name, end-to-end on the live repo |
+| `evals/run-layers-observed-fixtures.sh` | T2 | retained fixture proving the exclusion does not swallow a real miss (L-058) | none | 8 cases / 13 assertions green |
+
+## Retro
+
+**Retrieval check** — no miss, but something sharper: **L-067 caught me the same day it was promoted.**
+It became CLAUDE.md trap (d) at this sprint's own promote, and hours later `MSYS_NO_PATHCONV=1` broke a
+`--settings` path in my own probe, producing a session that errored before running and reported zero
+denials — which read as success. Knowing a rule did not prevent the error; the rule has to fire at the
+moment the command is written, not afterwards. Recording that honestly matters more than the clean
+retrieval record would have.
+
+**Cost** — 2/2 units landed. T1 ~$4 across 12 probe sessions (largest single: the 26-turn degradation
+probe at $0.73); T2 one dispatched agent, ~80k tokens. Run interactively per D2, so no calibration row —
+this sprint deliberately was not a night run.
+
+**Worked**
+- **Reproduce-before-mitigate was the right call, and it paid immediately.** TD-027's structural defence
+  would have been built against nothing. The owner decision to investigate first turned a would-be
+  architecture change into a closed hypothesis and a one-line guidance correction.
+- **Separating the two probe sessions saved the result.** Had rule forms been tested late in a long
+  session, a form could have read as "never matches" when it was simply denied for another reason. The
+  design question was worth asking before the first probe rather than after.
+- **Two confounds were caught before they became findings** — an untrusted probe workspace, and the
+  MSYS path. Both produced convincing readings. Both were caught only by reading actual output instead
+  of a counter, which is the same discipline that has now corrected three wrong diagnoses.
+- **T2's only real failure mode was tested rather than assumed.** An over-broad exclusion would have
+  passed its acceptance while hollowing out the guard; breadth was probed directly and end-to-end.
+
+**Friction**
+- **TD-027 consumed two sprints of attention on a mechanism that did not exist.** Not wasted — closing
+  it is a real result — but the cost of a plausible story is that it *feels* like knowledge. → **L-087**.
+- **L-084 had to be superseded**, having been filed at the previous close on the same false premise. It
+  is retained rather than deleted: the observation was real and the wrong inference is the instructive
+  part.
+
+**Pattern candidate**
+- **L-086** — a permission rule can be present, correct, and inert; verify it *matched*, never that it exists.
+- **L-087** — a symptom is data, an attached mechanism is a hypothesis. **count 3** → promotion candidate
+  at the next promote.
+
+**Bucket routing**
+
+| Bucket | Filed |
+|---|---|
+| Shipped | guidance correction + one gate fix → PATCH release (owner call at retention) |
+| Tech debt | **TD-028 · TD-030** resolved · **TD-027 CLOSED as not supported** — falsified, not fixed, with a stated reopen condition |
+| Follow-ups | none new — TD-029 and TD-031 remain open and untouched by design |
+| Learnings | **L-086 · L-087** filed · **L-084 superseded** |

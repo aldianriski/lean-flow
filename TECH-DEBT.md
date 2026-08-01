@@ -37,7 +37,7 @@ status: current
   - Owner decision (SPRINT-046 promote): add TD-030's entry now, file this pattern rather than solve it
     under time pressure.
 
-- **TD-030** severity: minor | status: open | created: Sprint-045
+- **TD-030** severity: minor | status: resolved → SPRINT-046 T2 | created: Sprint-045
   - Summary: the worktree dispatch protocol creates agent worktrees **inside the repo**
     (`.claude/worktrees/agent-<id>/`), and the observed-layers check counts those paths as changed-but-
     undeclared. Every parallel run produces this FAIL for as long as the worktrees exist.
@@ -63,7 +63,7 @@ status: current
     buffered output format and report a named `UNKNOWN` rather than `DEAD-ON-ARRIVAL`, since the
     inference ("the prompt may have been rejected") is simply invalid when no output can appear.
 
-- **TD-028** severity: medium | status: open | created: Sprint-045
+- **TD-028** severity: medium | status: resolved → SPRINT-046 T1 | created: Sprint-045
   - Summary: a **directory-prefix permission rule does not match**. `Bash(sh evals/:*)` was written to
     authorize the eval harnesses and denied every one of them, while `Bash(sh scripts/qa-check.sh:*)` —
     the exact-file form — works. The broader-looking rule is the one that silently fails.
@@ -75,7 +75,7 @@ status: current
     prefix, glob) and state the finding where the derivation is described, rather than inferring a form
     from documentation. Until then prefer exact-file rules and treat any broader form as unverified.
 
-- **TD-027** severity: medium | status: open | created: Sprint-045
+- **TD-027** severity: medium | status: CLOSED — not supported → SPRINT-046 T1 | created: Sprint-045
   - Summary: the **permission surface degraded mid-session**. In SPRINT-045's run, `awk … > file` and
     `sh <path>` were denied *after* the identical command forms had succeeded earlier in the same
     session — they are how the wave-start preflight was extracted and executed. The T1 agent
@@ -93,6 +93,19 @@ status: current
     against an unpinned mechanism is what produced TD-024's two wrong diagnoses and the `pwd -W` sweep
     nearly applied to a phantom. The reproduction is the next sprint's first task; guidance waits on
     what it finds.
+  - **CLOSED — NOT SUPPORTED (SPRINT-046 T1). The hypothesis was falsified, not fixed.** A 26-turn
+    session replaying a known-good rule form produced **zero denials**, so degradation did not
+    reproduce. The actual discriminator is the **redirect**: same session, same loaded rules — relative
+    path → 0 denials · absolute path → 0 · `sh … > file` → 1, reproduced. SPRINT-045's denied commands
+    were `git show … > file` and `awk … > /tmp/file`, both redirects. They are therefore an instance of
+    the **existing** bare-invocation rule (L-077), not a new phenomenon, and no structural defence is
+    warranted. Evidence → `docs/research/headless-permission-surface.md`.
+  - Residual, explicitly **not established**: why `sh /tmp/pf-045.sh` was denied in SPRINT-045, given
+    absolute paths probe clean. Its logged command was truncated at 80 characters, so the full form is
+    unknown. Recorded as unknown rather than folded into the redirect story — the habit of attaching a
+    plausible mechanism to an unexplained symptom is what put this row here twice.
+  - **Reopen only on new evidence**: a long run that hits the same shape *after* the redirect
+    explanation has been excluded. Reproduce-before-theorising applies to the reopen too.
 
 - **TD-026** severity: trivial | status: resolved → SPRINT-045 T2 | created: Sprint-044
   - Summary: the two-commit convention for `plan_commit`/`close_commit` (commit, then record the sha in
