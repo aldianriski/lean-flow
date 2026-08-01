@@ -70,11 +70,11 @@ finding rather than passing — which is precisely why the false alarm is worth 
 the field at execute time still FAILs by name.
 
 **DoD:**
-- [ ] The placeholder case reports a **named SKIP**, never a bare skip and never a FAIL
-- [ ] A genuinely absent or unresolvable plan-commit at execute time **still FAILs by name** — this is
+- [x] The placeholder case reports a **named SKIP**, never a bare skip and never a FAIL
+- [x] A genuinely absent or unresolvable plan-commit at execute time **still FAILs by name** — this is
       the leg that must not weaken, and it is the whole risk of the task
-- [ ] **Both directions negative-tested, fixtures retained** (L-058)
-- [ ] If placeholder and absent cannot be told apart, the task **says so** and stops rather than
+- [x] **Both directions negative-tested, fixtures retained** (L-058)
+- [x] If placeholder and absent cannot be told apart, the task **says so** and stops rather than
       widening the SKIP to cover both (A2)
 
 ## Owner-action checklist
@@ -167,12 +167,50 @@ the verbatim tree-wide-git-state-op ban (L-043), the coordinator-owned file list
 form rule, and **D4** — the must-FAIL leg outranks the fix at review. Each must return its fixtures'
 literal printed findings, not a self-reported pass (an exit code is evidence about the reporter).
 
+### 2026-08-01 | T2 landed | merged --no-ff; two allowlist form findings; one park
+
+**T2 reviewed and merged.** Pre-merge review read the whole diff rather than the agent's summary.
+D4 holds: the `case` arm split `''|*'['*` into `''` → FAIL (text unchanged) and `*'['*` → named SKIP;
+the `git rev-parse` unresolvable leg is untouched. Both true-positive legs survive, and the new
+`skip()` never flips `$fail`. **A2 confirmed** — emptiness vs non-empty-bracketed is the split, and
+real shas are bare hex, so the two states are reliably distinguishable. Fixtures retained in the
+harness for both directions.
+
+**Two `denied-tool` findings — the run's own product (D3), recorded once and not re-wrapped (Part 4).**
+Both are *form* failures on the rule syntax, not missing capability:
+1. `sh <abs-path>/evals/<harness>.sh` → **denied**. The `Bash(sh evals/:*)` rule is relative-anchored,
+   so the same script denied by absolute path. With the `cd`-prefix ban, the consequence is that
+   **a harness inside an agent worktree cannot be executed at all** from the coordinator.
+2. `sh evals/run-layers-observed-fixtures.sh` (relative, exactly the rule's shape) → **also denied**,
+   while `sh scripts/qa-check.sh` runs fine under `Bash(sh scripts/qa-check.sh:*)`. So the
+   **directory-prefix rule form does not match; only the exact-file form does.** This is night-run.md's
+   "pin one rule syntax" warning firing for real: the settings file carries both spellings, and the
+   broader-looking one is the one that silently fails.
+
+Consequence for this task's evidence: I could not independently execute T2's fixture harness. Verified
+instead by reading the checker diff and the harness diff together and confirming the asserted finding
+strings match the checker's emitted strings literally, plus the merged `layers observed` leg running
+green on the real sprint file inside `qa-check.sh`. Stated as a gap rather than papered over.
+
+**Parked (scope-change → HITL, Part 0).** Post-merge gate surfaced a *new* false positive:
+`layers observed … changed but undeclared: .claude/worktrees/agent-<id>/` — the worktree dispatch
+protocol creates agent worktrees **inside the repo**, and this checker counts them as undeclared
+changed paths. Same defect class as T2, different instance, and outside T2's chartered scope — so it
+is parked, not fixed. Expected to clear when the worktrees are pruned at cleanup; that will be
+verified, not assumed. Durable home: a TD candidate at close.
+
+Also corrected: the agent reported `knowledge index STALE` from inside its worktree. On the merged
+main tree the gate reads `PASS knowledge index current` — a worktree-local artifact, not a repo fact,
+and another instance of a report disagreeing with the artifact (CLAUDE.md trap (c)).
+
 ## Files Changed
 
 <!-- Filled during execution; feeds CHANGELOG at close. -->
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/check-layers-observed.sh` | T2 | Split the `plan_commit` case arm so the bracketed promote-time placeholder reports a named SKIP instead of a FAIL — the two-commit convention guarantees that window exists, so the old FAIL was a false alarm by construction (TD-026) | low | `run-layers-observed-fixtures.sh` cases 3 (named SKIP, exit 0) + 3b (genuinely absent, still FAILs by name, exit 1) |
+| `evals/run-layers-observed-fixtures.sh` | T2 | Repurposed case 3 to assert the named SKIP and added case 3b for the must-not-weaken leg — retained so the narrowed check keeps a regression guard (L-058 · TD-012) | low | self (harness) |
 
 ## Retro
 
