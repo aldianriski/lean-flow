@@ -37,7 +37,7 @@ gating → §6.
 | `.env.example` | Dev | — | init **safe-scaffold** (write-if-absent; names only, never values) | a new env var is introduced | — |
 | `.gitignore` | git | — | init **safe-scaffold** (write-if-absent; from the §12 boundary rule) | a new generated-artifact class appears | — |
 | `TODO.md` | Dev / AI | ~150 soft | init (always) | backlog change · sprint promote/close | §11 prune |
-| `TECH-DEBT.md` | Dev / AI | collapsed rows | first TD filed | close files TD · promote ages · debt resolved | §11 collapse |
+| `TECH-DEBT.md` | Dev / AI | open rows only | first TD filed | close files TD · promote ages · debt resolved | §11 delete (3 sprints after resolved) |
 
 **AI context (`.claude/`):**
 
@@ -303,20 +303,20 @@ debt from rotting — and stops the review itself from being skipped unnoticed.
 ## §11 — Retention (LAW 3's archive leg)
 
 The single-file ledgers grow forever in an agentic loop. Compression keeps them lean without losing
-history: **git is the full audit trail — archives and collapses move or shrink blocks, never rewrite
+history: **git is the full audit trail — archives, collapses and deletions move or shrink blocks, never rewrite
 them**. Append-only is preserved *inside* each archive file.
 
 | Ledger | Trigger | Action |
 |---|---|---|
 | `TODO.md` Backlog entries (shipped/promoted) | sprint close | **remove outright** (propose→approve) — no shipped-in-SPRINT breadcrumb comments left in TODO.md; history's durable homes are root `CHANGELOG.md` + `docs/sprint/archive/` |
-| `TECH-DEBT.md` | `resolved` ≥ 3 sprints ago | collapse the row to one line in § Resolved: `TD-NNN resolved → TASK-NNN (Sprint-NNN)` |
+| `TECH-DEBT.md` | `resolved` ≥ 3 sprints ago | **delete the row.** The substance already lives in `CHANGELOG.md`, the sprint archive and git, so a permanent in-file pointer is a breadcrumb rather than a record — and a ledger that only ever grows stops being read. **Ids stay monotonic: deleting a row never frees its id for reuse.** The 3-sprint delay is deliberate — a just-resolved debt is still context at the next promote |
 | `TODO.md` whole file | > ~150 lines at promote | flag in the governance review; prune with the user |
 | `CHANGELOG.md` (root) | a new MINOR version lands | keep current + previous minor inline; older blocks move verbatim → `docs/changelog/CHANGELOG-<version>.md` + one link line |
 | `docs/LEARNINGS.md` | an entry reaches `promoted: yes` | collapse it to a pointer line — `L-NNN → promoted: <where>`; the durable rule is the record now. **Ids are monotonic, never reused** — pruning removes the body, never frees the id; the next new id = highest-ever + 1 |
 | `docs/sprint/SPRINT-NNN-<slug>.md` | sprint closed | move → `docs/sprint/archive/`; add to `docs/sprint/INDEX.md` (created lazily) one line: `- SPRINT-NNN — <theme> — closed YYYY-MM-DD · <close_commit>` |
 
 **When it runs** — close-time triggers (Backlog removal · sprint archive) execute during `close`;
-scan-based triggers (TD collapse · rotation · LEARNINGS collapse · the soft cap) run at **Promote**
+scan-based triggers (TD deletion · rotation · LEARNINGS collapse · the soft cap) run at **Promote**
 as **doc-aging**, alongside tech-debt aging in the governance review. Always propose → approve →
 apply; never compress silently.
 

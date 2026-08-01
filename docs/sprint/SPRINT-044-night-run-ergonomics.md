@@ -152,14 +152,14 @@ still useful context at the next promote; only the permanent residue goes.
 existing collapsed lines are gone, and the promote governance scan no longer looks for that section.
 
 **DoD:**
-- [ ] The retention leg changes from "collapse to a one-line § Resolved entry" to **delete the row**,
+- [x] The retention leg changes from "collapse to a one-line § Resolved entry" to **delete the row**,
       at the same 3-sprint trigger
-- [ ] The ledger's § Resolved section and its existing collapsed lines are removed
-- [ ] The promote governance doc-aging scan is updated to match, so it stops scanning for a section
+- [x] The ledger's § Resolved section and its existing collapsed lines are removed
+- [x] The promote governance doc-aging scan is updated to match, so it stops scanning for a section
       that no longer exists — a check looking for something deleted is a check that cannot fire
-- [ ] The id-monotonicity rule is restated where it now matters more: deleting a row must not free its
+- [x] The id-monotonicity rule is restated where it now matters more: deleting a row must not free its
       id for reuse
-- [ ] Consumer-facing (a shipped standard changes) → a CHANGELOG line at close (L-015)
+- [x] Consumer-facing (a shipped standard changes) → a CHANGELOG line at close (L-015)
 
 ### T6 — Cut the MINOR release covering SPRINT-043 and SPRINT-044 `[size: S · risk: low · class: decision · HITL]`
 Layers: `CHANGELOG.md` · `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `README.md`
@@ -369,6 +369,29 @@ the guard to make one commit convenient. Declared in T4's `Layers:` instead.
 **Re-confirm G2.** No new file enters the sprint beyond this one, no `Depends-on` edge changes, and the
 wave ranks are untouched — so the overlap map and preflight verdict still hold. Logged before § Plan
 was edited, same as the T2 scope-change.
+
+### 2026-08-01 | T5 | resolved tech-debt rows are deleted now, not collapsed forever
+Run inline. The retention leg changes from "collapse the row to a one-line § Resolved entry" to
+**delete the row**, at the same 3-sprint trigger. The delay is kept deliberately — a just-resolved debt
+is still context at the next promote — so what goes is the *permanent residue*, not the review window.
+
+Updated in four places rather than one, because the rule was stated in four: §11's retention row, §2's
+lifecycle row for the ledger (`collapsed rows` → `open rows only`), §11's "when it runs" list, and the
+promote governance checklist in the skill (`TD collapse` → `TD deletion`). A rule changed in one of its
+four homes is the L-020 shape — half-shipped and readable as complete.
+
+**Id monotonicity restated where it now matters more.** Collapsing left a visible pointer, so id reuse
+was self-evidently wrong; deleting removes that reminder. Both the standard and the ledger header now
+say a deleted row never frees its id.
+
+Applied to this repo: § Resolved and its five collapsed lines removed, and **TD-018 + TD-019 deleted**
+outright — they hit the 3-sprint mark at this promote, and their action was deliberately deferred here
+rather than collapsed at promote and deleted a week later. Ledger **210 → 165 lines** (−21%). Nothing
+else was due: TD-016/TD-020 resolved at SPRINT-042 and TD-021/TD-022 at SPRINT-043, so their windows
+close at SPRINT-045 and SPRINT-046.
+
+Consumer-facing — a shipped standard changed — so it needs a CHANGELOG line at close (L-015).
+Gate: 73 pass, 0 fail.
 
 ## Files Changed
 
