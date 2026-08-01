@@ -55,9 +55,11 @@ this markup proved sufficient; a compiled DAG was rejected as a needless second 
 
 1. **Cycle check** — the `Depends-on` graph must be acyclic; a cycle means no valid dispatch order exists.
 2. **Shared-file single-owner check** — a file named in more than one task's `Layers:` needs an
-   ordering. A `Depends-on:` edge between the two tasks (either direction) makes it a PASS, with
-   ownership order derived from the edge; no edge between them is a FAIL — an unowned overlap, the
-   exact hazard concurrent dispatch creates.
+   ordering. A `Depends-on:` path between the two tasks — a direct edge, or a chain through
+   intermediate tasks — makes it a PASS, with ownership order derived from that edge or chain; no
+   path between them either direction is a FAIL — an unowned overlap, the exact hazard concurrent
+   dispatch creates. (TD-025: sequential execution can't collide, so a transitive chain already
+   satisfies the check's intent — derived from the same `Depends-on:` markup, no new field.)
 3. **Base-ref check** — the wave's declared base commit (stated up front, never assumed) must equal
    live HEAD; drift means unrelated work landed since declaration (L-055's root cause).
 4. **Wave computation** — topological rank over the `Depends-on` DAG; rank 0 dispatches in parallel,
@@ -125,10 +127,56 @@ flush
 
 # --- cycle check + wave computation (topological rank) + shared-file check
 awk -F'\t' '
+# find_chain(tgt, anchor): walks the Depends-on graph back from tgt to anchor and returns the
+# derived order as "anchor -> ... -> tgt" (TD-025 -- names the chain, not just the two endpoints,
+# so a PASS reads as ownership-by-chain rather than ownership-by-direct-edge). visited guards
+# against runaway recursion if this is ever reached alongside an undetected cycle.
+function find_chain(tgt, anchor, visited,   d, m, darr, j, chainsub, v2) {
+  if (tgt == anchor) return tgt
+  if (index(","visited",", ","tgt",") > 0) return ""
+  v2 = visited","tgt
+  if (index(","deps[tgt]",", ","anchor",") > 0) return anchor" -> "tgt
+  m = split(deps[tgt], darr, ",")
+  for (j=1; j<=m; j++) {
+    d = darr[j]; if (d == "") continue
+    if (index(reach[d], ","anchor",") > 0) {
+      chainsub = find_chain(d, anchor, v2)
+      if (chainsub != "") return chainsub" -> "tgt
+    }
+  }
+  return ""
+}
 { order[NR]=$1; layers[$1]=$2; deps[$1]=$3; n=NR }
 END {
   fail=0
   for (i=1;i<=n;i++) rank[order[i]]=-1
+
+  # --- transitive closure of Depends-on (TD-025) ---------------------------
+  # reach[t] holds every task t transitively depends on (direct or chained), computed by
+  # fixed-point expansion over the same Depends-on markup already parsed above -- no new field,
+  # no second source of truth (ADR-013). Used below so the shared-file check recognises a
+  # dependency CHAIN as ownership, not only a direct edge.
+  for (i=1;i<=n;i++) { t=order[i]; reach[t]="," }
+  for (i=1;i<=n;i++) {
+    t=order[i]; dl=deps[t]; if (dl=="") continue
+    m=split(dl,darr,",")
+    for (j=1;j<=m;j++) { d=darr[j]; if (d=="") continue; if (index(reach[t],","d",")==0) reach[t]=reach[t] d "," }
+  }
+  for (iter=1; iter<=n; iter++) {
+    for (i=1;i<=n;i++) {
+      t=order[i]
+      nr=split(reach[t],rarr,",")
+      for (k=1;k<=nr;k++) {
+        a=rarr[k]; if (a=="") continue
+        na=split(reach[a],aarr,",")
+        for (kk=1;kk<=na;kk++) {
+          e=aarr[kk]; if (e=="") continue
+          if (index(reach[t],","e",")==0) reach[t]=reach[t] e ","
+        }
+      }
+    }
+  }
+
   for (iter=1; iter<=n+1; iter++) {
     progress=0
     for (i=1;i<=n;i++) {
@@ -161,11 +209,14 @@ END {
       for (a=1;a<=ni;a++) { if (fi[a]=="") continue
         for (b=1;b<=nj;b++) { if (fj[b]=="") continue
           if (fi[a]==fj[b]) {
-            edge=0
-            if (index(","deps[tj]",", ","ti",")>0) { edge=1; first=ti; second=tj }
-            else if (index(","deps[ti]",", ","tj",")>0) { edge=1; first=tj; second=ti }
-            if (edge) print "PASS shared-file-owned: "fi[a]" in "ti","tj" order="first"->"second
-            else { print "FAIL shared-file-unowned: "fi[a]" in "ti" and "tj" has no Depends-on edge"; fail=1 }
+            edge=0; direct=0; first=""; second=""; chain=""
+            if (index(","deps[tj]",", ","ti",")>0) { edge=1; direct=1; first=ti; second=tj }
+            else if (index(","deps[ti]",", ","tj",")>0) { edge=1; direct=1; first=tj; second=ti }
+            else if (index(reach[tj], ","ti",")>0) { edge=1; direct=0; first=ti; second=tj; chain=find_chain(tj,ti,"") }
+            else if (index(reach[ti], ","tj",")>0) { edge=1; direct=0; first=tj; second=ti; chain=find_chain(ti,tj,"") }
+            if (edge && direct) print "PASS shared-file-owned: "fi[a]" in "ti","tj" order="first"->"second
+            else if (edge) print "PASS shared-file-owned-transitive: "fi[a]" in "ti","tj" derived-order="chain
+            else { print "FAIL shared-file-unowned: "fi[a]" in "ti" and "tj" has no Depends-on edge, direct or transitive"; fail=1 }
           }
         }
       }
