@@ -1,11 +1,22 @@
 {
   "permissions": {
     "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Write",
+      "Edit",
+      "Skill",
+      "Agent",
+      "TodoWrite",
+
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git mv:*)",
       "Bash(sh scripts/qa-check.sh:*)",
       "Bash(sh scripts/gen-index.sh:*)",
+      "Bash(sh evals/:*)",
+      "Bash(sh scripts/:*)",
 
       "Bash(git status:*)",
       "Bash(git log:*)",
@@ -23,7 +34,23 @@
       "Bash(git init:*)",
       "Bash(git config:*)",
       "Bash(git -C:*)",
-      "Bash(mktemp:*)"
+      "Bash(mktemp:*)",
+      "Bash(diff:*)",
+      "Bash(grep:*)",
+      "Bash(sed:*)",
+      "Bash(awk:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(printf:*)",
+      "Bash(echo:*)"
     ]
   }
 }

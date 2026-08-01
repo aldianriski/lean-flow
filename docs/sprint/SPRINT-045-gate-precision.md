@@ -114,6 +114,36 @@ the field at execute time still FAILs by name.
      Keep entries short: a finding's durable home is TECH-DEBT / LEARNINGS / CHANGELOG, and restating
      it at length here is what pushed the last sprint past its 400-line cap. -->
 
+### 2026-08-01 | pre-flight | green — G1+G2 pre-signed, fired through the launcher
+Owner reinstalled; **skill-freshness PASS, content-verified** rather than read off `/plugin` (L-021):
+the installed 1.25.0 cache carries `scripts/night-run.sh` (with the `MSYS_NO_PATHCONV` fix, ×2), the
+bare-invocation rule, and the split `night-run-checks.md`. The run will execute *this* sprint's
+procedure, which is the whole point of the check.
+
+Pre-flight green: charter execute-only over a Plan frozen at `d6f3c75` · both tasks AFK · zero open
+`assumes:` (A1 confirmed here, A2/A3 confirmed by preflight `T1=0 T2=0` and T2's own DoD) · worktree
+AVAILABLE, clean · 0 unpushed · gate 69/0 · `bypassPermissions` off the table.
+
+**Gap found and closed before firing — my own incomplete application of T2's rule.** T2 shipped
+"the derivation covers **tools** as well as commands", and I had populated `.claude/settings.json` with
+Bash rules only. Under `dontAsk` the run would have been denied on `Write`/`Edit`/`Agent`/`Skill` — a
+predictable denial, not a discovery worth a paid run. Settings now carry tool names plus the
+script/text-utility commands the gate and harnesses need: **20 → 46 rules**. This is pre-flight
+allowlist building (an owner-action checklist item), not a scope change; the Plan is untouched.
+
+**G1 + G2 pre-signed by the owner** over the frozen Plan. Parallel worktree dispatch, both tasks rank 0
+and disjoint, coordinator merge-back on a separate integration worktree, no ADR. **D4 reaffirmed**: each
+task's must-FAIL leg outranks its fix at review.
+
+**Expected cost: $10–16** — and the estimate is itself the hypothesis under test. SPRINT-043's
+comparable shape cost $16.54 across 64 turns with ~40% of those turns lost to denials that T2's rule
+should now prevent; a result near $16 would falsify the cost finding as surely as a lower one confirms
+it. Fired via `scripts/night-run.sh`, which is what makes this run TASK-143's proof rather than another
+manual trigger.
+
+Recovery if it misbehaves: `origin/main` is current at `ba493cd` and the run cannot push, so
+`git reset --hard origin/main` restores everything.
+
 ## Files Changed
 
 <!-- Filled during execution; feeds CHANGELOG at close. -->
