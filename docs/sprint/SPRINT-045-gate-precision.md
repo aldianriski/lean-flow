@@ -33,7 +33,7 @@ the launcher handles it, and the standing rule is now CLAUDE.md trap (d).
 ## Plan
 
 ### T1 — Let the dispatch preflight see ordering through a dependency chain `[size: M · risk: low · class: execution · AFK]`
-Layers: `skills/orchestrator/references/dispatch.md` · `evals/run-dispatch-preflight-fixtures.sh`
+Layers: `skills/orchestrator/references/dispatch.md` · `evals/run-dispatch-preflight-fixtures.sh` · `evals/fixtures/dispatch-preflight/sprint-044-chain/sprint.md` · `evals/fixtures/dispatch-preflight/shared-file-unowned-diverging-ranks/sprint.md`
 Depends-on: none
 
 TD-025. The shared-file check demands a **direct** `Depends-on:` edge between every pair of tasks
@@ -277,3 +277,26 @@ on its files, so `close` would be closing through a failing check.
 ## Retro
 
 <!-- Written at close. -->
+
+### 2026-08-01 | scope-change | T1's fixture files declared; verification gap closed interactively
+**What changed.** T1 created two fixture data files during implementation that its frozen `Layers:`
+could not name — TD-022's shape, caught by the observed check built for exactly it. The run **parked**
+this correctly rather than editing § Plan or reshaping the task to dodge it.
+
+**Impact.** Declaration only; no code changes. Both files are T1's own work and were already reviewed
+and merged. Adding them makes the declaration match what happened.
+
+**Re-confirm G2.** No new task, no edge change, no wave-rank change, and no file enters the sprint that
+was not already committed by T1 — the overlap map and preflight verdict hold.
+
+**The run's owner-verification item is now discharged.** It could not execute the harness end-to-end
+(five `denied-tool` findings), so it explicitly refused to treat TD-025 as closed on review alone. Run
+interactively with `MSYS_NO_PATHCONV` cleared: **all 5 fixtures green**, including both new ones —
+`sprint-044-chain` → `PASS shared-file-owned-transitive`, `shared-file-unowned-diverging-ranks` →
+`FAIL shared-file-unowned`.
+
+**Both tasks additionally re-verified against fixtures I built, not theirs** (D4 makes the must-FAIL leg
+outrank the fix): T2 — empty `plan_commit` → FAIL · placeholder → SKIP, exit 0 · non-resolving sha →
+FAIL. T1 — two rank-0 tasks sharing a file with no path → FAIL naming "direct or transitive" · a file
+shared only across a transitive chain → PASS naming `derived-order=T1 -> T2 -> T3`. The true positives
+survived both narrowings, which was D4's whole concern.
