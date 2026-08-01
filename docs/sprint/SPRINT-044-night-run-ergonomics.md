@@ -162,7 +162,7 @@ existing collapsed lines are gone, and the promote governance scan no longer loo
 - [x] Consumer-facing (a shipped standard changes) → a CHANGELOG line at close (L-015)
 
 ### T6 — Cut the MINOR release covering SPRINT-043 and SPRINT-044 `[size: S · risk: low · class: decision · HITL]`
-Layers: `CHANGELOG.md` · `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `README.md`
+Layers: `CHANGELOG.md` · `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `README.md` · `docs/changelog/CHANGELOG-1.23.0.md`
 Depends-on: T1, T2, T3, T4, T5
 
 TASK-137, expanded by D3. SPRINT-043's work sits in an `Unreleased` CHANGELOG block; this sprint adds
@@ -174,12 +174,12 @@ by construction — a release that precedes the work it releases is the bug.
 in the repo matches, and the run stops before push.
 
 **DoD:**
-- [ ] `Unreleased` retitled to the chosen MINOR, with this sprint's user-visible changes folded in
-- [ ] `plugin.json` + `marketplace.json` bumped in **lockstep**
-- [ ] **Every version echo outside the manifests** grepped repo-wide and updated (L-048 — the README
+- [x] `Unreleased` retitled to the chosen MINOR, with this sprint's user-visible changes folded in
+- [x] `plugin.json` + `marketplace.json` bumped in **lockstep**
+- [x] **Every version echo outside the manifests** grepped repo-wide and updated (L-048 — the README
       footer shipped stale once already this way)
-- [ ] §11 CHANGELOG rotation applied if the new MINOR pushes a third block inline
-- [ ] **Stops before push.** Push stays owner-reserved
+- [x] §11 CHANGELOG rotation applied if the new MINOR pushes a third block inline
+- [x] **Stops before push.** Push stays owner-reserved
 
 ## Owner-action checklist
 - [ ] `git push` after T6 — never performed by a task or a run.
@@ -225,23 +225,20 @@ overturned that. All **25** denials classified:
 | `git -C …` | 1 | allowlisted as `Bash(git -C *)` and denied anyway |
 | `PowerShell` | 1 | tool never authorized at all |
 
-**Impact.** 23 of 25 were **form** failures, not command failures — every one of those commands was
-individually permitted and the prefix stopped the matcher recognising it. TD-023 is therefore not a
-footnote to the four-source rule, it is the dominant failure mode of the run that tested it. Leaving it
-out would have shipped a sprint about night-run ergonomics whose largest known ergonomic defect was
-deliberately skipped. The 25th denial exposes a second gap: the derivation enumerates **commands** but
-not **tools** — this host has two shells and only one was authorized, so the run silently lost the other.
+**Impact.** 23 of 25 were **form** failures — every one of those commands was individually permitted and
+the prefix stopped the matcher recognising it. TD-023 is not a footnote to the four-source rule; it is
+the dominant failure mode of the run that tested it, and skipping it would have shipped a sprint about
+night-run ergonomics with its largest known ergonomic defect deliberately left in. The 25th denial
+exposes a second gap: the derivation enumerates **commands** but not **tools** — this host has two
+shells and one was authorized.
 
-**Bonus finding, recorded not acted on.** The first denial in the array is
+**Bonus finding, recorded not acted on.** The array's first entry is
 `cd "D:/Project/lean-flow" && sh scripts/qa-check.sh > /tmp/qa-main.txt …` — the *probe TD-024's
-evidence came from*. It never ran. Combined with the close's independent checks (harness green,
-`git -C` resolving both path styles), TD-024 was filed on evidence the run never obtained. Its row was
-already downgraded at the SPRINT-043 close; this is the confirmation.
+evidence came from*. It never ran, confirming the downgrade applied at the SPRINT-043 close.
 
-**Re-confirm G2.** Owner re-signed with both additions folded into T2 rather than a new task: T2
-already edits precisely the section that must carry the rule, its `Layers:` are unchanged, and no new
-file enters the sprint — so the overlap map, the wave ranks and the preflight verdict all still hold.
-Logged here before § Plan was edited.
+**Re-confirm G2.** Owner re-signed with both additions folded into T2 rather than a new task: T2 already
+edits the section that must carry the rule, its `Layers:` are unchanged, and no new file enters the
+sprint — so the overlap map, wave ranks and preflight verdict all hold. Logged before § Plan was edited.
 
 
 ### 2026-08-01 | T1 | capability checks split out — TD-014's subject resolved
@@ -314,25 +311,20 @@ existed and was well-built, `night-run.md` was untouched, and no stray process w
 remainder was completed inline.
 
 **A defect the chain ordering should have caught.** The launcher hard-required `--allowedTools` — which
-T2 had just made optional by moving the allowlist into settings permissions. A correct settings-based
-invocation would have been rejected as `DEAD-ON-ARRIVAL`. T3 depends on T2 precisely so this could not
-happen; the dependency ordered the *work*, not the agent's *reading*. Fixed to accept any of three
-sources (`--allowedTools`, `--settings`, or a settings file with a `permissions.allow` block) and refuse
-only when none exists.
+T2 had just made optional by moving the allowlist into settings permissions, so a correct settings-based
+invocation would have been rejected. T3 depends on T2 precisely so this could not happen; the dependency
+ordered the *work*, not the agent's *reading*. Now accepts `--allowedTools`, `--settings`, or a settings
+file with a `permissions.allow` block, refusing only when none exists.
 
-**Then the launcher blocked its own live test — and the block was correct.** `qa-check` returned
-**72 pass, 1 fail** from inside the launcher while returning 73/0 standalone, three times. Not flaky:
-**context-dependent**. Ruled out command substitution and absolute-path invocation, then found it —
-**`MSYS_NO_PATHCONV=1`**, which I export so a bare `/orchestrator` prompt isn't rewritten into a Windows
-path (L-067). It is *inherited*, so it propagated into the gate and every harness it spawns, breaking
-`git -C` on a POSIX path.
-
-**That is TD-024's root cause, fully reproducible.** The failing leg emits
-`could not resolve live HEAD in /d/Project/lean-flow` — the *exact string* TD-024 recorded. The debt's
-filed mechanism was nearly right (`git -C` failing on a POSIX path) but missed the trigger, and the
-trigger is **L-067's own workaround causing a second path-translation bug in a child process, far from
-where it was set**. The launcher now clears the variable around the gate only, in a subshell; the fired
-command keeps the caller's environment untouched.
+**Then the launcher blocked its own live test, correctly — and that root-caused TD-024.** `qa-check`
+returned **72/1** from inside the launcher and 73/0 standalone, three times: context-dependent, not
+flaky. Ruled out command substitution and absolute-path invocation, then found **`MSYS_NO_PATHCONV=1`**
+— exported so a bare `/orchestrator` prompt isn't rewritten into a Windows path (L-067). It is
+*inherited*, so it reached the gate and broke `git -C` on a POSIX path, emitting
+`could not resolve live HEAD in /d/Project/lean-flow` — the **exact string TD-024 recorded**. The debt's
+filed mechanism was nearly right and missed the trigger: **L-067's own workaround causing a second
+path-translation bug in a child process, far from where it was set.** The launcher now clears the
+variable around the gate only; the fired command keeps the caller's environment.
 
 **Verified on real input, both verdicts:**
 - Three `DEAD-ON-ARRIVAL` paths, each naming its cause: missing `unattended` signal · wrong permission
@@ -354,21 +346,19 @@ surviving processes.
 changed and no task declared it. Both ways out fail the gate — regenerate and the index is undeclared,
 skip it and the freshness leg reports STALE — so the fix was forced rather than chosen.
 
-**Impact.** The index is **generated, never hand-authored**, and regenerates whenever any
-LEARNINGS/ADR/research doc changes; its sources are already excluded or declared. Declaring it would
-mean naming it in every task that touches a learning. It belongs in the checker's exclusion list, which
-already carries per-file stated reasons precisely so the list stays auditable — a genuine gap in a
-guard shipped five commits ago, found by that guard.
+**Impact.** The index is **generated, never hand-authored**, regenerating whenever any
+LEARNINGS/ADR/research doc changes; its sources are already excluded or declared, so declaring it would
+mean naming it in every task that touches a learning. It belongs in the checker's exclusion list — a
+genuine gap in a guard shipped five commits ago, found by that guard.
 
-**Then the guard caught itself**, which is the part worth keeping: editing
-`scripts/lib/check-layers-observed.sh` made *it* undeclared, and the check FAILed again naming its own
-file. The tempting fix — adding the checker to its own exclusion list — was rejected outright: it is a
-hand-authored source file, exactly what the check exists to watch, and excluding it would hollow out
-the guard to make one commit convenient. Declared in T4's `Layers:` instead.
+**Then the guard caught itself**, which is the part worth keeping: editing the checker made *it*
+undeclared and the check FAILed again, naming its own file. The tempting fix — adding the checker to its
+own exclusion list — was rejected outright: it is a hand-authored source file, exactly what the check
+exists to watch, and excluding it would hollow out the guard for one commit's convenience. Declared in
+T4's `Layers:` instead.
 
-**Re-confirm G2.** No new file enters the sprint beyond this one, no `Depends-on` edge changes, and the
-wave ranks are untouched — so the overlap map and preflight verdict still hold. Logged before § Plan
-was edited, same as the T2 scope-change.
+**Re-confirm G2.** No new file beyond this one, no edge changes, wave ranks untouched — overlap map and
+preflight verdict hold. Logged before § Plan was edited, same as the T2 scope-change.
 
 ### 2026-08-01 | T5 | resolved tech-debt rows are deleted now, not collapsed forever
 Run inline. The retention leg changes from "collapse the row to a one-line § Resolved entry" to

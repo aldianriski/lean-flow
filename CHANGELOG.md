@@ -11,16 +11,39 @@ status: current
 
 ---
 
-## Unreleased — Proof Run (2026-08-01)
+## v1.25.0 — Proof Run and Night-Run Ergonomics (2026-08-01)
 
-MINOR when cut — SPRINT-043. **Version deliberately unset:** this sprint ran unattended, and choosing
-a release version is judgement rather than execution, so the run parked it (→ `TASK-137`). The previous
-release fixed the landing path that stranded a night run and could not test it — the sprint that ships
-a fix cannot be the sprint that proves it. This one is the proof: two genuinely disjoint tasks, fanned
-out to worktree agents, merged back through the integration queue. **Both units landed.** The
-predecessor built two and delivered zero.
+MINOR — SPRINT-043 **and** SPRINT-044, cut as one release. SPRINT-043 ran unattended and parked the
+version choice, correctly: picking a release number is judgement, not execution. SPRINT-044 then
+shipped more user-visible change on top, so releasing separately would have published half the surface
+and left the rest pending. The previous release fixed the landing path that stranded a night run and
+could not test it — the sprint that ships a fix cannot be the sprint that proves it. SPRINT-043 was the
+proof: two genuinely disjoint tasks, fanned out to worktree agents, merged back through the integration
+queue. **Both units landed.** Its predecessor built two and delivered zero.
 
-**What changed for you:**
+**Night runs are now startable and walk-away-able (SPRINT-044):**
+- **A launcher that tells you whether the run is actually alive.** `scripts/night-run.sh` re-checks the
+  mechanically-verifiable half of pre-flight, fires **detached** — so closing your terminal cannot
+  signal the run dead — waits ~2–3 minutes, then prints one verdict: `ALIVE`, or `DEAD-ON-ARRIVAL`
+  naming what failed. `ALIVE` requires *observable progress*, not merely a live process: a run whose
+  prompt was rejected sits up doing nothing and would otherwise look healthy for 20 minutes.
+- **Permissions live in your settings file, not a command line.** The four-source allowlist derivation
+  now lands in settings permissions — diffable, reviewable, and split the way a repo already splits
+  config: shared rules tracked, owner-reserved ones local.
+- **Issue commands bare.** A permission matcher reads the *literal* invocation, so a command you
+  correctly authorized is still denied when wrapped in `cd X && …`. Of one run's 25 denials, **23 were
+  form failures on commands that were individually permitted**. The derivation also now covers *tools*,
+  not just commands — a two-shell host needs both authorized.
+- **What an unattended run actually costs, measured.** Cache reads dominate — 26.5M against 191K output
+  tokens — and turns drive cache reads, so the cost lever is turn count, not verbosity or agent count.
+  About 40% of that run's turns went to denials. Details in `docs/research/night-run-cost.md`.
+- **Resolved tech-debt rows are now deleted, not collapsed forever.** Three sprints after a debt is
+  resolved its row goes entirely, instead of leaving a permanent pointer. Ids stay monotonic — a
+  deleted row never frees its id.
+- The unattended reference was **split 495 → 283 lines**, with the capability-check snippets moved to
+  their own file.
+
+**And from the proof run itself (SPRINT-043):**
 - **Your `Layers:` declaration now gets checked against what actually changed.** The existing check
   compares a sprint task's declared files against the files its own DoD prose mentions — but both are
   written by one author at one moment, so it catches a file you *forgot* to declare and is blind to one
@@ -76,33 +99,5 @@ the commands the run needed to *finish*.
 
 ---
 
-## v1.23.0 — Freshness Row and Park Records (2026-07-30)
 
-MINOR — SPRINT-040. Two things this repo already did correctly but left no trace of. A contract you
-can't see the results of is one you end up taking on faith.
-
-**What changed for you:**
-- **`/prime` now tells you whether the skills you're running are the ones in your repo.** A live
-  session keeps whatever installed plugin copy it started with, so a skill you edited but didn't
-  reinstall keeps executing its **old** procedure — no error, and a diff that reads as if your change
-  was ignored. The version was never hidden; it's printed in every skill's invocation header. It just
-  went unread, once for an entire sprint. The health check now carries a `Skills:` row: `fresh`,
-  `STALE — reinstall before trusting any procedure`, or `n/a (no local plugin repo)` if you only ran
-  `plugin install` and have no checkout to compare against. It reports and never blocks — whether a
-  stale procedure is acceptable is your call, not the skill's. Version-only by design: an edit that
-  skips the version bump still reads `fresh` here, and that leg stays covered by the unattended
-  pre-flight, which diffs cache content against the working tree.
-- **`migrate` and `init` now leave a record when a headless run can't get your approval.** Both
-  already refused to touch anything without sign-off — that half was never in doubt. But they
-  declined *in prose*, so an overnight run ended with no artifact showing it had run or what it was
-  waiting on. Both now detect the missing ask channel and write a park record to a `/handoff` doc
-  naming the proposed plan and the unblock condition, before halting.
-- **The fix that mattered was the trigger, not the rule.** Stating what to do when headless changed
-  nothing across two real test runs, because nothing told the run *how it knows* it is headless — and
-  waiting in prose is correct when someone is watching. Adding the detection probe made both comply
-  immediately. If you write conditional behaviour into a skill, ship the condition's observable with
-  it; that's the difference between the entry points that complied and the ones that didn't.
-
----
-
-_Older releases (**v1.22.0** and earlier) → [`docs/changelog/CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._
+_Older releases (**v1.23.0** and earlier) → [`docs/changelog/CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._
