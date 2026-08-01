@@ -123,6 +123,36 @@ run still regenerates it correctly.
 
 <!-- Append-only, dated. The Plan is frozen at promote — log here rather than editing § Plan. -->
 
+### 2026-08-01 | pre-flight | green — G1+G2 pre-signed, trigger authorized
+Owner reinstalled the plugin; **skill-freshness now PASS** and verified at content level rather than by
+version string alone — the installed 1.24.0 cache carries SPRINT-042 T1's "four sources, not one" text,
+so the run will execute the fixed procedure rather than the one that stranded SPRINT-041. `/plugin`'s
+own report was not used as the evidence (L-021).
+
+Pre-flight, all items green: charter execute-only over a Plan frozen at `96d93ea` · both tasks
+AFK-class · zero open `assumes:` (A1 freshness PASS · A2 base-ref PASS after pushing the plan commit ·
+A3 wave computation `T1=0 T2=0`) · worktree **AVAILABLE, worktree-clean** · agent dispatch available ·
+`bypassPermissions` off the table. Ask channel: none, by construction — park protocol applies.
+
+**G1 + G2 pre-signed by the owner** over the frozen Plan. G1: goal restated, sizes M+S with no L,
+files declared and verified disjoint, out-of-scope named. G2: one `Agent(isolation:"worktree")` per
+task in a single message, coordinator merge-back on a separate integration worktree, `--no-ff` per
+task; overlap map is empty by construction (D1 + D3 moved both would-be shared files to the
+coordinator); no ADR; no residual grill.
+
+**Allowlist derived from night-run.md Part 1's four sources** — the artefact under test. Source 2 (the
+landing path: `git worktree` · `git merge` · `git branch` · `git checkout`) and source 3 (the gate's own
+`mktemp` + `git init`/`git -C` subprocesses) are the two that SPRINT-041 lacked entirely.
+`Bash(git push*)` is **deliberately absent** — owner-reserved; if the run reaches for it, that is a
+finding, not a gap to patch.
+
+**Expected cost: ~$7–12** (stated before firing, per the pre-flight line T2 shipped). SPRINT-041's
+comparable shape was $6.60 for two tasks; T1 here is heavier at size M with fixtures. This is the run's
+own cost, not its tasks' verification cost — the tasks need no paid fixtures.
+
+Recovery if the run misbehaves: `origin/main` is current at `7541597` and the run cannot push, so
+`git reset --hard origin/main` restores everything.
+
 ## Files Changed
 
 <!-- Filled during execution; feeds CHANGELOG at close. -->
