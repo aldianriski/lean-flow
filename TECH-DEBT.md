@@ -18,7 +18,64 @@ status: current
 
 ## Tech Debt
 
-- **TD-026** severity: trivial | status: open | created: Sprint-044
+- **TD-030** severity: minor | status: open | created: Sprint-045
+  - Summary: the worktree dispatch protocol creates agent worktrees **inside the repo**
+    (`.claude/worktrees/agent-<id>/`), and the observed-layers check counts those paths as changed-but-
+    undeclared. Every parallel run produces this FAIL for as long as the worktrees exist.
+  - Impact: transient — it clears when the worktrees are pruned at cleanup, verified by re-running the
+    gate rather than assumed — but it fires on *every* fan-out, so a run's post-merge gate is red for
+    reasons unrelated to its work. Same cry-wolf shape TD-026 just fixed, different instance.
+  - Mitigation (not yet done): exclude the agent-worktree path prefix with a stated reason, as the
+    other structural exclusions are. Note the tension: this is the **fourth** exclusion in four sprints
+    — the list is answering "did a task declare this?" when it means "was this task work or coordinator
+    bookkeeping?". Add the exclusion, but weigh whether the check should ask the second question.
+
+- **TD-029** severity: minor | status: open | created: Sprint-045
+  - Summary: the launcher's `ALIVE` test requires observable progress — a log line or a new commit —
+    but `claude -p --output-format json` **buffers all output until exit**, so the log stays empty for
+    the entire run. A healthy run is reported `DEAD-ON-ARRIVAL`.
+  - Impact: observed live. SPRINT-045's fire returned `DEAD-ON-ARRIVAL: … no observable progress in
+    150s` while the run was working normally and went on to land both units. The verdict is advisory —
+    the run is detached and continues — but a launcher whose headline output is wrong is worse than one
+    with no verdict, because the operator acts on it. `night-run.md` Part 3 already names the right
+    format (`stream-json`, which emits incrementally); the conflict is that `json` is what exposes
+    `total_cost_usd` for the calibration row, so the two needs pull opposite ways.
+  - Mitigation (not yet done): accept `stream-json` and treat any new line as progress; **or** detect a
+    buffered output format and report a named `UNKNOWN` rather than `DEAD-ON-ARRIVAL`, since the
+    inference ("the prompt may have been rejected") is simply invalid when no output can appear.
+
+- **TD-028** severity: medium | status: open | created: Sprint-045
+  - Summary: a **directory-prefix permission rule does not match**. `Bash(sh evals/:*)` was written to
+    authorize the eval harnesses and denied every one of them, while `Bash(sh scripts/qa-check.sh:*)` —
+    the exact-file form — works. The broader-looking rule is the one that silently fails.
+  - Impact: this is night-run.md's own "pin one rule syntax" warning firing for real, and worse than a
+    plain gap: the rule *looks* correct in the settings file, so a reader reviewing the allowlist sees
+    coverage that does not exist. Combined with the `cd`-prefix ban, the practical consequence during
+    SPRINT-045 was that a harness inside an agent worktree could not be executed at all.
+  - Mitigation (not yet done): establish empirically which rule forms actually match (exact-file,
+    prefix, glob) and state the finding where the derivation is described, rather than inferring a form
+    from documentation. Until then prefer exact-file rules and treat any broader form as unverified.
+
+- **TD-027** severity: medium | status: open | created: Sprint-045
+  - Summary: the **permission surface degraded mid-session**. In SPRINT-045's run, `awk … > file` and
+    `sh <path>` were denied *after* the identical command forms had succeeded earlier in the same
+    session — they are how the wave-start preflight was extracted and executed. The T1 agent
+    independently reported the same shape in its own sandbox: every `sh` and `awk -f <file>` invocation
+    denied regardless of allowlist match, while inline `awk '…'` kept working.
+  - Impact: materially different from TD-023's form-failure story, and it partly undercuts it. If the
+    surface can narrow mid-run, then **allowlist derivation — a static exercise done at pre-flight —
+    cannot fully protect a long run**, however well derived. Five denials total this run; the run
+    recorded each once and correctly did not re-wrap them (Part 4).
+  - Mitigation (not yet done): **reproduce before theorising** (TD-024's lesson). Establish whether the
+    trigger is elapsed time, turn count, a tool-call budget, or something else, by replaying one known-
+    good command form at intervals within a single headless session. Only then decide whether the fix
+    is a run-length cap, a re-derivation checkpoint, or guidance to prefer inline forms.
+  - **Owner decision (SPRINT-045 close): reproduce first, do not mitigate yet.** A defence shipped
+    against an unpinned mechanism is what produced TD-024's two wrong diagnoses and the `pwd -W` sweep
+    nearly applied to a phantom. The reproduction is the next sprint's first task; guidance waits on
+    what it finds.
+
+- **TD-026** severity: trivial | status: resolved → SPRINT-045 T2 | created: Sprint-044
   - Summary: the two-commit convention for `plan_commit`/`close_commit` (commit, then record the sha in
     a follow-up) collides with the observed-layers check, which reads `plan_commit` from frontmatter.
     Between the `plan locked` commit and the sha-recording commit the gate necessarily reports
@@ -32,7 +89,7 @@ status: current
     the sha in the same commit by writing it post-hoc, which the current convention deliberately avoids.
     Either way the fix should not weaken the genuine "plan_commit missing at execute time" case.
 
-- **TD-025** severity: minor | status: open | created: Sprint-044
+- **TD-025** severity: minor | status: resolved → SPRINT-045 T1 | created: Sprint-044
   - Summary: the dispatch preflight's shared-file check requires a **direct** `Depends-on:` edge between
     every pair of tasks touching one file. A transitive chain (`T1→T2→T3→T4`, all editing one reference)
     orders those tasks unambiguously, but the check HALTs on the pairs without a direct edge.

@@ -334,12 +334,20 @@ window from it:
 |---|---|---|---|---|---|
 | SPRINT-041 | $6.60 | 15 | — | 2 built, **0 landed** | coordinator + 2 worktree agents |
 | SPRINT-043 | $16.54 | 64 | 22 min | 2 built, **2 landed** | coordinator + 3 agents (2 worktree + 1 follow-up) |
+| SPRINT-045 | $10.84 | 25 | 17 min | 2 built, **2 landed** | coordinator + 2 worktree agents |
 
 Read those rows honestly. SPRINT-041 *built* both units and landed neither, because the merge-back was
 denied — $6.60 bought two stranded branches, and cost per unit **delivered** was undefined. SPRINT-043
 ran the same shape after the allowlist fix and landed both: **$8.27 per unit delivered**, against a
 predecessor where that number did not exist. Note the floor underneath both: a single-turn agent doing
 no work at all measured ~$0.22 on this repo, the substrate every branch re-pays before starting.
+
+**The third row is the one that pays for the table.** SPRINT-045 ran the same shape as SPRINT-043 — two
+tasks, two worktree agents — after a rule change aimed squarely at wasted turns, and came in at **25
+turns against 64, 3 denials against 25, $10.84 against $16.54**: $5.42 per unit delivered where the
+previous row was $8.27. That is the cost hypothesis (cost ≈ turns × accumulated context, and denials
+are the cheapest turns to eliminate) surviving a real test rather than being asserted. Do not read it
+as a fixed rate — it is one comparison between two runs of one shape.
 
 Two cautions the second row buys, which the first could not:
 

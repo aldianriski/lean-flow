@@ -3,7 +3,7 @@ sprint: 045
 slug: gate-precision
 owner: Maintainer
 last_updated: 2026-08-01
-status: active
+status: closed
 plan_commit: d6f3c75
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -300,3 +300,69 @@ outrank the fix): T2 — empty `plan_commit` → FAIL · placeholder → SKIP, e
 FAIL. T1 — two rank-0 tasks sharing a file with no path → FAIL naming "direct or transitive" · a file
 shared only across a transitive chain → PASS naming `derived-order=T1 -> T2 -> T3`. The true positives
 survived both narrowings, which was D4's whole concern.
+
+## Files Changed
+
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+| `skills/orchestrator/references/dispatch.md` | T1 | preflight derives shared-file ownership from the **transitive closure** of `Depends-on:`, so a chain counts as owned (TD-025) | low — narrows a false positive | 5 fixtures green end-to-end; unowned overlap still FAILs, verified against my own fixture too |
+| `evals/run-dispatch-preflight-fixtures.sh` + 2 fixture dirs | T1 | retained must-PASS chain + must-FAIL diverging-ranks cases (L-058) | none | both run bare; the must-FAIL discriminates |
+| `scripts/lib/check-layers-observed.sh` | T2, close | three-state `plan_commit`: empty → FAIL · placeholder → named SKIP · unresolvable → FAIL (TD-026). Pre-flight settings file excluded (close) | low — the SKIP never flips exit | all three states verified against fixtures I built |
+| `evals/run-layers-observed-fixtures.sh` | T2 | retained fixtures for all three states | none | harness green |
+| `skills/orchestrator/references/night-run.md` | close | calibration row three + what it proves | none | figures read off the captured result |
+| `.claude/settings.json` | pre-flight | tool rules added (20 → 46) so `dontAsk` covers more than Bash | low | run executed; 3 denials, all recorded |
+
+## Retro
+
+**Retrieval check** — **one genuine miss, mine.** `night-run.md` Part 3 already names `stream-json` as
+the format whose lines signal liveness; I fired with `--output-format json` because it is what exposes
+`total_cost_usd`, and thereby made a healthy run report `DEAD-ON-ARRIVAL`. The information was in our
+own doc and I reached past it. → **L-083**, **TD-029**. The run itself had no miss and did the opposite:
+it applied **CLAUDE.md trap (d)** — promoted at *this sprint's own promote* — to diagnose the baseline
+68/1 as TD-024's residual by diffing environments before code, then briefed both agents so neither
+re-derived it a third time.
+
+**Cost** — **$10.84 · 25 turns · 17 min wall · 2/2 units landed**, coordinator + 2 worktree agents.
+$5.42 per unit delivered. Against SPRINT-043's identical shape ($16.54 / 64 turns / 25 denials), the
+turn-count hypothesis held: **−61% turns, −88% denials, −34% cost.** That is calibration row three, and
+it is the first evidence that T4's cost finding was actionable rather than merely true.
+
+**Worked**
+- **The park protocol converted a blocker into a five-minute task.** The run hit an undeclared-fixture
+  FAIL it could not fix without editing a frozen Plan, and parked with a rollup naming the exact files
+  to declare and the exact command to verify. I executed both verbatim. Nothing was reshaped to dodge
+  the gate, and no scope was quietly widened.
+- **It refused to call TD-025 closed on review alone.** Five denials blocked end-to-end execution, so
+  it wrote an owner-verification item instead of accepting its own careful diff review as proof.
+  Discharged at close in one command: all 5 fixtures green. → **L-085**.
+- **It adjudicated a fixture-design question rather than following the DoD literally.** The DoD said
+  "replay SPRINT-044's Plan"; the agent declined, because that Plan carries the redundant workaround
+  edges and would pass under the *old* check too — a fixture that cannot fail (L-058's worst case). It
+  surfaced the ambiguity instead of silently resolving it, and the coordinator confirmed by reading the
+  archive. Both were right.
+- **Both narrowings kept their true positives**, verified at close against fixtures I built rather than
+  theirs — which is what D4 was for.
+
+**Friction**
+- **The permission surface degraded mid-session** — command forms denied after succeeding earlier in
+  the same run, observed independently by coordinator and agent. Undercuts the assumption that a
+  well-derived allowlist is sufficient for a long run. → **TD-027**.
+- **A directory-prefix permission rule silently never matches** (`Bash(sh evals/:*)`), while the
+  exact-file form works. The rule *looks* like coverage. → **TD-028**.
+- **The launcher's liveness check and the cost-capture format are in direct conflict.** → **TD-029**.
+- **Agent worktrees live inside the repo**, so the observed check counts them as undeclared on every
+  fan-out. → **TD-030**, which also notes this is the fourth exclusion in four sprints.
+
+**Pattern candidate**
+- **L-083** — a guard that infers state from an observable inherits that observable's format as a precondition.
+- **L-084** — a permission surface can narrow mid-session; static derivation is necessary, not sufficient.
+- **L-085** — when verification is blocked, ship the artifact *plus the named command the next person must run*.
+
+**Bucket routing**
+
+| Bucket | Filed |
+|---|---|
+| Shipped | two shipped guards fixed → CHANGELOG at release (owner call below) |
+| Tech debt | **TD-025 · TD-026** resolved · **TD-027** (mid-session degradation) · **TD-028** (prefix rule never matches) · **TD-029** (liveness vs output format) · **TD-030** (worktree paths) filed |
+| Follow-ups | none new — **TASK-143 satisfied by this run** (fired via the launcher, both units landed, row three recorded) |
+| Learnings | **L-083 · L-084 · L-085** |

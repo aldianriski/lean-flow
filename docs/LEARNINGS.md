@@ -21,11 +21,35 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-082**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-085**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-085 [tags: process] [status: active]: **An agent that *cannot* verify should hand the verification forward as a named command, not quietly accept review as proof.** SPRINT-045's unattended run could not execute either task's fixture harness — five `denied-tool` findings blocked it — so it had a choice between three things: claim the tasks verified on the strength of a careful diff review, drop the question silently, or say what it could not do. It said so: *"That is strong but not equivalent to an end-to-end run"*, and wrote an **owner verification item** naming the exact command and the exact precondition (`run this with MSYS_NO_PATHCONV cleared before treating TD-025 as closed`). At close that item took one command and passed, converting an unverifiable claim into a verified one at near-zero cost. What makes this worth keeping is the asymmetry: review-as-verification is *usually* right, which is exactly why accepting it silently is dangerous — the times it is wrong are indistinguishable from the times it is not, unless someone recorded that the real check never ran. The durable form: when a verification step is blocked, the deliverable is not the reviewed artifact, it is the artifact **plus the named command the next person must run**. A gap that is written down is a five-minute task; the same gap unwritten is a false green.
+- seen: Sprint-045
+- count: 1
+- promoted: no
+- related: L-078 (a green result from a broken setup) · L-058 (a guard needs a must-FAIL leg) · L-060 (inspect the artifact, not the report) · TD-025
+
+---
+
+## L-084 [tags: tooling] [status: active]: **A permission surface can narrow *mid-session* — so allowlist derivation, a static exercise done once at pre-flight, cannot fully protect a long run.** SPRINT-045's run had `awk … > file` and `sh <path>` denied *after* those exact command forms had already succeeded earlier in the same session; they were how its own wave-start preflight had been extracted and executed minutes before. The dispatched T1 agent independently reported the same shape inside its own sandbox — every `sh` and `awk -f <file>` invocation denied regardless of allowlist match, while inline `awk '…'` kept working. Two observers, one run, same signature. This is materially different from the form-failure story (L-077: the matcher reads the literal invocation), and it partly undercuts the fix built on it: a perfectly derived, perfectly formed allowlist still degrades if the surface itself changes under the run. Consequence for the unattended contract — pre-flight can no longer be treated as *sufficient* for a long run, only necessary; a run that suddenly cannot execute a command it ran an hour ago is not misconfigured, and diagnosing it as a rule gap sends the next person to the wrong file. **Reproduce before theorising** (TD-024's lesson, applied here in advance): nobody has yet established whether the trigger is elapsed time, turn count, or a budget.
+- seen: Sprint-045
+- count: 1
+- promoted: no
+- related: L-077 (form failures — the *static* half of the same surface) · L-072 (the terminal step is the shared choke point) · TD-027 · TD-028
+
+---
+
+## L-083 [tags: tooling] [status: active]: **A check that watches for a side effect is only as valid as the output format that produces it — verifying it under one format does not verify it under another.** SPRINT-044's launcher defines `ALIVE` as "process up **and** observable progress", deliberately, because a live PID can mean a rejected prompt. It was verified against the default output format and worked. SPRINT-045 fired the same launcher with `--output-format json`, which **buffers everything until exit** — so no progress can appear by construction, and a healthy run that went on to land both units was reported `DEAD-ON-ARRIVAL`. The check's logic was never wrong; its precondition silently stopped holding. Two things follow. The narrow one: `night-run.md` Part 3 already names `stream-json` as the format whose lines signal liveness, and I reached past that for `json` because it is what exposes `total_cost_usd` — a **retrieval miss against our own doc**, and the two needs genuinely pull opposite ways. The general one: when a guard infers state from an observable, the *shape of the observable* is part of its contract. Ask what makes the signal appear, and whether every supported invocation still produces it — otherwise the guard keeps returning confident verdicts about a channel that has gone silent for reasons unrelated to the thing being watched.
+- seen: Sprint-045
+- count: 1
+- promoted: no
+- related: L-065 (a check whose comment asserts more than its code tests) · L-076 (demonstrate what a narrowed gate no longer catches) · L-081 (a precondition changed by the environment) · TD-029
 
 ---
 

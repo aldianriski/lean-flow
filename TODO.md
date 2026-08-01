@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-045 — Gate Precision** → docs/sprint/SPRINT-045-gate-precision.md
+> _None._ SPRINT-045 closed 2026-08-01.
 
 ---
 
@@ -29,54 +29,6 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
-
-- [ ] TASK-144 — Let the dispatch preflight see ordering through a dependency chain  [size: M] [risk: low] [AFK]
-      class:      execution
-      done-when:  the shared-file ownership check treats a file as owned when the tasks touching it are
-                  ordered **transitively**, not only by a direct edge — a chain orders its members
-                  unambiguously and strictly sequential execution cannot collide, so halting on it is a
-                  false positive that blocks a legitimate Plan. Negative-tested per L-058 with retained
-                  fixtures: a genuine unowned overlap (two rank-0 tasks with no path between them) must
-                  still FAIL by name, and a chained overlap must PASS naming the derived order
-      touches:    the dispatch reference's preflight snippet · its retained fixture harness and fixtures
-      depends-on: none
-      assumes:    the fix is a closure computed over the existing `Depends-on:` markup — no new field
-                  and no second source of truth, which ADR-013 already rejected once
-      tracker:    TD-025
-      state:      ready
-
-- [ ] TASK-145 — Stop the observed-layers check failing in the sha-recording window  [size: S] [risk: low] [AFK]
-      class:      execution
-      done-when:  a sprint whose plan-commit field still holds its placeholder because the sha has not
-                  yet been recorded reports a **named SKIP** rather than a FAIL, while a sprint genuinely
-                  missing that field at execute time still FAILs by name. Both directions negative-tested
-                  with retained fixtures — the point is to remove a guaranteed false alarm without
-                  weakening the real check underneath it
-      touches:    the observed-layers checker · its retained fixture set
-      depends-on: none
-      assumes:    the placeholder is distinguishable from a genuinely absent value, so the two cases can
-                  be told apart without a new convention; if they cannot, the task says so rather than
-                  widening the SKIP to cover both
-      tracker:    TD-026
-      state:      ready
-
-- [ ] TASK-143 — Fire a night run through the launcher and record calibration row three  [size: S] [risk: med] [HITL]
-      class:      decision
-      done-when:  an unattended run is started **via the launcher** rather than a hand-pasted command,
-                  returns `ALIVE`, and completes with its work landed. Its rollup carries the third
-                  calibration row, which is the first able to show whether the turn-count reduction
-                  actually moved cost per unit delivered — the prior sprint deliberately left that proof
-                  to the next run rather than blocking a task on a paid one. Any denial it hits is
-                  recorded against which allowlist source or command *form* failed to cover it
-      touches:    the active sprint's execution log · the unattended reference's calibration table
-      depends-on: none
-      assumes:    the launcher and the settings-based allowlist both work as verified interactively; a
-                  denial or a `DEAD-ON-ARRIVAL` would falsify that directly, which is the point of
-                  running it rather than reasoning about it
-      tracker:    SPRINT-044 Retro · L-073 · docs/research/night-run-cost.md
-      state:      blocked
-      blocked-on: a promoted sprint whose tasks are all AFK-class and whose pre-flight passes green —
-                  unblocks at the next promote that meets it
 
 ### P2 — Quality / Polish
 
