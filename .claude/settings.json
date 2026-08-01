@@ -5,7 +5,25 @@
       "Bash(git commit:*)",
       "Bash(git mv:*)",
       "Bash(sh scripts/qa-check.sh:*)",
-      "Bash(sh scripts/gen-index.sh:*)"
+      "Bash(sh scripts/gen-index.sh:*)",
+
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git diff:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git rev-list:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git cat-file:*)",
+      "Bash(git branch:*)",
+
+      "Bash(git worktree:*)",
+      "Bash(git merge:*)",
+
+      "Bash(git init:*)",
+      "Bash(git config:*)",
+      "Bash(git -C:*)",
+      "Bash(mktemp:*)"
     ]
   }
 }

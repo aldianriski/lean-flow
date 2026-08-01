@@ -119,10 +119,14 @@ All items must pass or the night-run does not fire:
 - [ ] Batch G1 + G2 already signed off by the human (per `sprint-bulk` steps 1–2).
 - [ ] Zero open `assumes:` / `needs-info` tasks in the run — G2 already blocks on this; pre-flight
       re-verifies it still holds at trigger time (state can drift between G2 and the evening run).
-- [ ] Scoped allowlist built in `--allowedTools` permission-rule syntax (e.g. `Bash(git commit *)`),
-      derived from **four sources, not one**. Enumerating only the first is the recurring failure:
-      1. **Per-task commands** — each task's `touches:` files, plus the commit / review / lint
-         commands its routed procedure runs.
+- [ ] Scoped allowlist derived from **four sources, not one**, and written into your project's
+      **settings permissions** rather than assembled inline. Enumerating only the first source is the
+      recurring failure:
+      1. **Per-task commands and the tools that carry them** — each task's `touches:` files, plus the
+         commit / review / lint commands its routed procedure runs. Authorize **tools, not only
+         commands**: a host offering more than one shell needs each one listed, or the run silently
+         loses the unauthorized one and its work with it. Observed — a run on a two-shell host had
+         every `Bash` rule it needed and no `PowerShell` rule at all.
       2. **The landing path** — how the run's output becomes committed history. If the run fans work
          out, that is the coordinator's merge-back: integration-worktree creation, the merge itself,
          and the worktree removal/prune after it. Read the steps off `dispatch.md` § Merge-back queue
@@ -137,6 +141,30 @@ All items must pass or the night-run does not fire:
       because every unit funnels through it. Both have now failed for real: a probe parked every task
       correctly and then could not `/handoff`, and a later run stranded two complete, reviewed
       branches on a denied merge-back — delivering nothing after doing everything right.
+
+      **Where the rules live.** Put them in your project's settings permissions, not in a command-line
+      string rebuilt from memory each run — a file is diffable, reviewable, and survives the next
+      person. Split it the way a repo already splits config: **repo-generic rules in the tracked
+      settings file** (they are the reviewed, shared set) and **owner-reserved or machine-specific
+      rules in the gitignored local one** — which is exactly where a `git push` rule belongs, if you
+      grant one at all. *If your project has no settings file, derive into one; nothing here creates it
+      for you, and no lean-flow skill writes one.*
+
+      **Pin one rule syntax and use it everywhere.** A repo that accumulates two spellings of the same
+      rule gets no warning from either a reader or the matcher. Prefer the `Bash(<cmd>:*)` form the
+      settings file already uses; a bare-glob variant was observed denying a command it was written to
+      permit, so treat any second spelling as suspect until you have seen it match.
+
+      **Issue the commands bare — one per invocation.** The matcher reads the **literal invocation**,
+      not the operation you meant, so a permitted command wrapped in a prefix stops being recognised:
+      no `cd X && …`, no `VAR=y …` prefix, no `&&` chain, no redirect. Anchor with `git -C <abs-path>`
+      instead of changing directory. This is not style — of one run's **25 denials, 23 were form
+      failures on commands that were individually permitted** (21 behind a `cd`, 2 behind a variable
+      assignment). It converges with L-057's never-pipe-a-gate rule from the opposite direction: that
+      one protects the exit status, this one protects the permission match.
+
+      **A settings file changes ergonomics, not form-sensitivity.** Moving the rules out of the command
+      line makes them reviewable; it does nothing about the paragraph above. Both are needed.
 
       `dontAsk` **denies** anything outside the list rather than pausing for it — an under-scoped
       allowlist silently fails work instead of asking, so this step is load-bearing; over-denial shows

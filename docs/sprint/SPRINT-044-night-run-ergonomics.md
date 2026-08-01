@@ -75,22 +75,22 @@ split stated, one syntax form pinned, and TD-023's caveat carried; this repo's o
 file gains the night-run rules.
 
 **DoD:**
-- [ ] Pre-flight says the derivation lands in settings permissions, not an inline string
-- [ ] The tracked-vs-local split is stated as a rule, not an example — repo-generic tracked,
+- [x] Pre-flight says the derivation lands in settings permissions, not an inline string
+- [x] The tracked-vs-local split is stated as a rule, not an example — repo-generic tracked,
       owner-reserved and machine-specific local
-- [ ] **One permission-rule syntax form is pinned and stated once.** The repo currently carries two
+- [x] **One permission-rule syntax form is pinned and stated once.** The repo currently carries two
       spellings of the same rule and neither reader nor matcher flags the mismatch
-- [ ] TD-023's caveat carried explicitly: a settings file changes ergonomics, **not** form-sensitivity
+- [x] TD-023's caveat carried explicitly: a settings file changes ergonomics, **not** form-sensitivity
       — the matcher still reads the literal invocation
-- [ ] Wording never assumes a settings file exists — a consumer may have none, and no skill gains the
+- [x] Wording never assumes a settings file exists — a consumer may have none, and no skill gains the
       ability to write one (`init`'s exclusion is unchanged, L-015)
-- [ ] **(scope-change)** The **bare-invocation rule** is stated: landing-path and gate commands are
+- [x] **(scope-change)** The **bare-invocation rule** is stated: landing-path and gate commands are
       issued one per call — no `cd` prefix, no `&&` chain, no variable-assignment prefix, no redirect —
       and anchored with `git -C <abs-path>` rather than by changing directory. Carries the measured
       evidence (23 of 25 denials were form failures on individually-permitted commands) so the rule
       reads as a finding rather than a style preference, and notes it converges with L-057's
       never-pipe-a-gate rule for a different reason
-- [ ] **(scope-change)** The derivation covers **tools as well as commands** — a host offering more
+- [x] **(scope-change)** The derivation covers **tools as well as commands** — a host offering more
       than one shell needs each authorized, or the run silently loses the unauthorized one. This is the
       same class of omission as the landing-path gap, one level up
 
@@ -266,6 +266,46 @@ Note: `night-run.md` previously carried **no** ownership header; DoD line 5 aske
 files, so it gained one. Additive, and it brings the file into line with DOCS_Guide §3.
 
 Gate: 73 pass, 0 fail. Diff confined to the four declared `Layers:` files.
+
+**Correction to this task's own commit.** It claimed both harnesses changed by "exactly one line each
+(the path)". True of one, false of the other: the negative-test revert used a broad `sed` that also
+updated two comment lines naming the old file. Those updates were correct in themselves but unintended,
+and they left the two harnesses inconsistent — one with fresh comments, one still pointing readers at a
+file that no longer holds the snippet. Fixed in a follow-up commit; caught by reading the diffstat
+rather than trusting the message just written.
+
+### 2026-08-01 | T2 | allowlist moved into settings permissions; TD-023 fixed, not cited
+Run inline — prose edits to a section read end-to-end this session, where dispatching would re-pay the
+full substrate to produce ~30 lines (this sprint's own T4 subject).
+
+Pre-flight now derives into **settings permissions** rather than an inline string, with the split
+stated as a rule: repo-generic rules tracked, owner-reserved and machine-specific ones in the gitignored
+local file — the pattern this repo already follows, with `git push` sitting on the local side. Wording
+never assumes a settings file exists, since a consumer may have none and no skill creates one.
+
+**Three things the scope-change added**, each carrying its evidence rather than asserted as style:
+- **Bare invocation.** One command per call — no `cd` prefix, no `VAR=` prefix, no `&&` chain, no
+  redirect; anchor with `git -C <abs-path>`. Stated with the measurement: 23 of 25 denials were form
+  failures on individually-permitted commands. Noted as converging with L-057 from the opposite
+  direction — that rule protects the exit status, this one protects the permission match.
+- **Tools, not only commands.** A two-shell host needs each shell authorized; the run had every `Bash`
+  rule it needed and no `PowerShell` rule at all.
+- **One pinned syntax.** `Bash(<cmd>:*)`, the form the settings file already used. A bare-glob variant
+  was observed denying a command it was written to permit, so a second spelling is treated as suspect
+  until seen to match.
+
+This repo's tracked settings gained 15 rules (5 → 20): read-only git, the landing path (`worktree`,
+`merge`), and the gate's subprocesses (`init`, `config`, `-C`, `mktemp`). Deliberately **excluded**:
+`git checkout` and any reset/clean — L-043 bans tree-wide state ops because they can sweep a sibling's
+uncommitted work, and the merge-back protocol uses a separate integration worktree instead. `git push`
+stays owner-reserved in the untracked local file.
+
+**One rule worth your eye: `Bash(git -C:*)`.** It is genuinely broad — it authorizes any git subcommand
+against any path, including destructive ones, and because it is in the *tracked* file it applies to
+interactive sessions too. The gate's harnesses need it to drive throwaway repos. Flagged rather than
+buried: move it to the local file if you would rather it not be repo-wide.
+
+Gate: 73 pass, 0 fail. `night-run.md` 283 → 311 lines, still far below the 495 it started the sprint at.
 
 ## Files Changed
 
