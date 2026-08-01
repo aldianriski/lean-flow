@@ -474,11 +474,22 @@ is what leaves the next person estimating from nothing.
 **Rows so far** — this is a series being started, not a budget. One row is an anecdote; do not size a
 window from it:
 
-| Sprint | Cost | Turns | Units | Shape |
-|---|---|---|---|---|
-| SPRINT-041 | $6.60 | 15 | 2 / 2 built, 0 landed | coordinator + 2 worktree agents |
+| Sprint | Cost | Turns | Wall-clock | Units | Shape |
+|---|---|---|---|---|---|
+| SPRINT-041 | $6.60 | 15 | — | 2 built, **0 landed** | coordinator + 2 worktree agents |
+| SPRINT-043 | $16.54 | 64 | 22 min | 2 built, **2 landed** | coordinator + 3 agents (2 worktree + 1 follow-up) |
 
-Read that row honestly: the run *built* both units and landed neither, because the merge-back was
-denied — so $6.60 bought two stranded branches. Cost per unit **delivered** is the number that
-matters, and it was undefined. Note also the floor underneath it: a single-turn agent doing no work
-at all measured ~$0.22 on this repo, which is the substrate every branch re-pays before starting.
+Read those rows honestly. SPRINT-041 *built* both units and landed neither, because the merge-back was
+denied — $6.60 bought two stranded branches, and cost per unit **delivered** was undefined. SPRINT-043
+ran the same shape after the allowlist fix and landed both: **$8.27 per unit delivered**, against a
+predecessor where that number did not exist. Note the floor underneath both: a single-turn agent doing
+no work at all measured ~$0.22 on this repo, the substrate every branch re-pays before starting.
+
+Two cautions the second row buys, which the first could not:
+
+- **A finished run costs multiples of a stranded one.** SPRINT-043 spent 2.5× SPRINT-041 for the same
+  two tasks, because a run that dies at merge-back never pays for merging, reviewing, or closing. When
+  estimating from a row, check whether that row's run actually *finished* — a cheap row may just be a
+  run that failed early.
+- **Estimate from turns, not task count.** Both sprints held two tasks; SPRINT-043 took 64 turns to
+  SPRINT-041's 15. Task count predicted nothing.

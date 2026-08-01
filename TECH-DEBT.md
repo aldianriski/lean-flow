@@ -16,21 +16,31 @@ status: current
 
 ## Tech Debt
 
-- **TD-024** severity: medium | status: open | created: Sprint-043
-  - Summary: `evals/run-dispatch-preflight-fixtures.sh` fails with `could not resolve live HEAD in
-    /d/Project/lean-flow`. `git -C` cannot resolve the POSIX-style path that `$(cd … && pwd)` and
-    `mktemp -d` return on this Windows/MSYS host; `git -C D:/…` and `cd … && git …` both work.
-  - Impact: the harness guarding the **dispatch preflight snippet** — the check that computes wave
-    ranks and shared-file ownership before any parallel dispatch — is not running at all here, and
-    `qa-check.sh` has been reporting it as its single FAIL. The preflight itself works (it ran clean
-    for SPRINT-043's own wave); it is the *guard on the preflight* that is dark. Same shape as L-058:
-    a gate that cannot gate. Found while reviewing SPRINT-043 T1, whose own harness had the identical
-    bug and fixed it in place.
-  - Mitigation (not yet done): apply the same normalization T1 used — `pwd -W` after the path is
-    computed (no-op on non-MSYS POSIX) — to `run-dispatch-preflight-fixtures.sh`, and sweep
-    `evals/lib/harness-common.sh` and the `selftest-assert-*.sh` harnesses for the same pattern.
-    Parked at SPRINT-043 rather than fixed mid-run: the file is in no task's `Layers:`, so touching it
-    was scope-changing under the unattended contract.
+- **TD-024** severity: minor | status: open — **diagnosis corrected, cause unconfirmed** | created: Sprint-043
+  - Summary: during SPRINT-043's unattended run, `evals/run-dispatch-preflight-fixtures.sh` emitted
+    `FAIL harness: could not resolve live HEAD in /d/Project/lean-flow` and exited 2. The **symptom was
+    real and is recorded**; the cause originally filed with it was not.
+  - **Correction (verified interactively at the SPRINT-043 close, on the main tree).** The original row
+    blamed `git -C` being unable to resolve POSIX-style MSYS paths. That does not reproduce:
+    `git -C /d/Project/lean-flow rev-parse HEAD` → exit 0, and `git -C` on a fresh `mktemp -d` path →
+    exit 0. The harness itself runs **all green** with `TMPDIR` set and unset, and `qa-check.sh` is
+    **67 pass / 0 fail** — so the claim that it "has been reporting this as its single FAIL" does not
+    hold either. The guard that fired is *correct behaviour*: it named its finding and exited rather
+    than passing (L-059), so the harness did its job.
+  - Impact: low, and not what was first written. The dispatch-preflight guard is **not dark** on the
+    main tree. The likelier cause is transient run state rather than a path-resolution defect — the
+    run's own L-079 records its cwd drifting into an agent worktree, and a `$repo_root` pointing at a
+    worktree already removed would produce this exact empty-`rev-parse` result. That remains a
+    hypothesis; nobody has reproduced it.
+  - Mitigation (not yet done): **do not apply the original `pwd -W` sweep** — it would harden the
+    harnesses against a mechanism that has not been shown to exist, and T1 already shipped one such
+    guarded workaround on this reasoning. First **reproduce**: run the harness with `$repo_root`
+    pointing at a removed worktree and confirm the message. If that is the cause, the fix is for the
+    harness to validate `$repo_root` is a live work tree before use, not to normalize path style.
+  - Note on provenance: filed by an unattended run that correctly parked rather than fixing it
+    mid-flight. The park was right; the diagnosis inside it was not independently checked, which is
+    why the close re-checked it. A finding produced without an ask channel is still a finding that
+    needs verifying (L-078's family).
 
 - **TD-023** severity: medium | status: open | created: Sprint-043
   - Summary: `night-run.md` Part 1's allowlist derivation names the four **sources** a command must be

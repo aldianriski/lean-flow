@@ -42,54 +42,6 @@ status: current
       notes:      raised by SPRINT-043 close. See also TD-023 · TD-024, either of which the owner may
                   want folded in before cutting the release.
 
-- [ ] TASK-135 — Add an observed third source to the declaration cross-check  [size: M] [risk: low] [AFK]
-      class:      execution
-      done-when:  the gate compares the **actually changed** file set for the active sprint against the
-                  union of its tasks' declared `Layers:`, reporting any file changed but undeclared.
-                  Unlike the two existing sources this one is *observed*, not authored, so it cannot be
-                  forgotten — it reads what happened rather than what someone predicted at promote.
-                  Negative-tested using SPRINT-042's own recorded miss as the must-FAIL fixture (a new
-                  checker file was created during implementation and never declared, and the existing
-                  prose-based check passes that Plan regardless); fixtures retained (L-058)
-      touches:    the qa gate script and its extracted-checker directory · the gate's leg inventory doc ·
-                  the retained eval fixture set
-      depends-on: none
-      assumes:    the comparison base is the sprint's recorded plan commit, so "changed this sprint" is
-                  well-defined without a second source of truth; a file changed by the coordinator's own
-                  close bookkeeping is expected noise and needs an explicit, reasoned exclusion rather
-                  than a silent one
-      tracker:    TD-022 · L-074
-      state:      ready
-
-- [ ] TASK-136 — Make the generated knowledge index survive a failed write  [size: S] [risk: low] [AFK]
-      class:      execution
-      done-when:  an interrupted or failed generation leaves the **previous** index intact instead of a
-                  truncated one — write to a temporary file in the same directory, then move it into
-                  place, so the swap is atomic. Verified by simulating a mid-write failure and
-                  confirming the prior file survives byte-identical, not merely that a normal run works
-      touches:    the index generator script
-      depends-on: none
-      assumes:    same-directory rename is atomic on the target filesystem; if it is not, the check
-                  degrades to reporting rather than silently claiming a guarantee it cannot make
-      tracker:    TD-021
-      state:      ready
-
-- [ ] TASK-134 — Fire an unattended proof run and record its calibration row  [size: S] [risk: med] [HITL]
-      class:      decision
-      done-when:  an unattended run executes a promoted Plan end-to-end and **lands** its work — the
-                  claim SPRINT-042 shipped but could not itself test, since the sprint that fixes the
-                  landing path cannot be the sprint that proves it. Its morning rollup carries the
-                  calibration row (cost · turns · wall-clock · units · shape) as row two of the series,
-                  and any denial it hits is recorded against which allowlist source failed to derive it
-      touches:    the active sprint's execution log · the unattended reference's calibration table
-      depends-on: none
-      assumes:    the four-source derivation now covers the landing path; a denial at merge-back would
-                  falsify that directly, which is the point of running it rather than reasoning about it
-      tracker:    SPRINT-042 Retro · L-072 · L-073
-      state:      blocked
-      blocked-on: a promoted sprint whose tasks are all AFK-class and whose pre-flight passes green —
-                  unblocks at the next promote that meets it; do not fire against an unpromoted Plan
-
 ### P2 — Quality / Polish
 
 ### P3 — Long-term
