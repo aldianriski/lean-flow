@@ -153,6 +153,30 @@ own cost, not its tasks' verification cost — the tasks need no paid fixtures.
 Recovery if the run misbehaves: `origin/main` is current at `7541597` and the run cannot push, so
 `git reset --hard origin/main` restores everything.
 
+### 2026-08-01 | dispatch | wave 1 fanned out — T1 + T2, worktree-isolated
+
+Run started under the explicit `unattended` signal. Pre-flight re-verified at run time rather than
+trusted from the evening's record: **skill-freshness PASS** (installed 1.24.0 == repo 1.24.0, cache
+`skills/` content-identical to the working tree) · **dispatch preflight CLEAR** (`PASS base-ref` —
+declared base `21c1e14` == live HEAD == `origin/main`; `PASS wave-computation: T1=0 T2=0`; no
+shared-file finding, confirming **A3**) · **worktree AVAILABLE, worktree-clean** (main tree only).
+Both probes run bare, never piped (L-057).
+
+Wave 1 = both tasks at rank 0 → one `Agent(isolation:"worktree")` per task, issued in a single
+message, model `sonnet` (`class: execution`). T1 routed to `/tdd` (new gate behaviour, fixtures
+first); T2's `/tdd` **declined with a stated reason** — its `Layers:` declares one file, so a retained
+test file would itself be undeclared, and its DoD asks for a one-time real-input failure exercise,
+which is the manual verification step standing in for `/tdd` (L-007). Both briefs carry the L-043
+tree-wide-state-op ban verbatim, the coordinator-owned file list (D1 · D3), and the park protocol.
+
+**Coordinator design call (inline, `decision` tier).** T1's fixtures must observe a git diff from a
+plan commit, so they cannot be static `.md` files — the harness builds throwaway repos under
+`mktemp -d`, the `selftest-assert-*.sh` idiom. This keeps T1 inside its four declared `Layers:` paths:
+a new `evals/fixtures/layers-observed/` tree would be a file changed-but-undeclared that T1's own gate
+would flag on its own sprint, and amending the frozen § Plan to absorb it is HITL → a park. Retention
+(L-058) is satisfied by fixtures living permanently inside the retained harness file. Not a dodge —
+the decision predates the gate and respects the declaration rather than widening it.
+
 ## Files Changed
 
 <!-- Filled during execution; feeds CHANGELOG at close. -->
