@@ -64,7 +64,18 @@ gen() {
   printf '\n'
 }
 
-tmp=$(mktemp)
+# TD-021: tmp must live in the SAME directory as $OUT so the final `mv` below is a
+# same-filesystem rename, not a cross-device copy+delete. A bare `mktemp` lands in
+# $TMPDIR, which is not guaranteed to share a filesystem with the repo (confirmed on
+# this box: with TMPDIR unset, mktemp resolves under /tmp, a different device than the
+# repo's D: checkout) — a failure partway through a cross-device copy can publish a
+# truncated-but-syntactically-valid file, which is exactly how SPRINT-041's disk-full
+# truncated the index from 34 lines to 12. Same-directory mktemp forces a real rename
+# instead, so a failed/interrupted generation cannot publish a partial result.
+# (The `entries` scratch file above stays on system tmp — it's never moved into place,
+# only read and then deleted, so it isn't exposed to this failure mode.)
+tmp=$(mktemp "$(dirname "$OUT")/.knowledge-index.XXXXXX")
+trap 'rm -f "$tmp"' EXIT  # best-effort cleanup if we exit/die before the mv below
 today=$(date +%F)
 sed -n '1,/<!-- INDEX:START/p' "$OUT" \
   | awk -v d="$today" '{ if ($0 ~ /^last_updated:/) print "last_updated: " d; else print }' >> "$tmp"
@@ -76,5 +87,12 @@ if [ "${1:-}" = "--check" ]; then
   if cmp -s "$tmp" "$OUT"; then echo "PASS  gen-index: knowledge index current"; rm -f "$tmp"; exit 0
   else echo "FAIL  gen-index: knowledge index STALE — run: sh scripts/gen-index.sh" >&2; rm -f "$tmp"; exit 1; fi
 fi
+# NOTE on atomicity: same-directory `mv` is a real rename(2) on POSIX filesystems, which
+# is atomic there. This repo runs on Windows/NTFS via Git Bash — `mv` onto an existing
+# destination is NOT guaranteed atomic the way POSIX rename(2) is (e.g. an open handle
+# on $OUT held by another process can make the replace fail outright rather than commit
+# instantaneously). That limit is real and unresolved here, not claimed away; what the
+# same-directory tmp *does* guarantee on this platform is that the move is same-volume
+# (no cross-device copy+delete), which is what prevented the TD-021 truncation.
 mv "$tmp" "$OUT"
 echo "gen-index: regenerated docs/knowledge-index.md"
