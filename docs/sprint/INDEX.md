@@ -9,7 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
-- SPRINT-044 — Night-Run Ergonomics — closed 2026-08-01 · CLOSESHA (MINOR v1.25.0)
+- SPRINT-044 — Night-Run Ergonomics — closed 2026-08-01 · a32090b (MINOR v1.25.0)
 - SPRINT-043 — Proof Run — closed 2026-08-01 · 3bfae3c (released in MINOR v1.25.0)
 - SPRINT-042 — Run to Finish — closed 2026-08-01 · cba78de (MINOR v1.24.0)
 - SPRINT-041 — Debt Guards — closed 2026-08-01 · a90ab0e (no release — maintainer-only)
