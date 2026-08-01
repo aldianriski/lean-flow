@@ -1,0 +1,215 @@
+---
+sprint: 044
+slug: night-run-ergonomics
+owner: Maintainer
+last_updated: 2026-08-01
+status: active
+plan_commit: [sha — set at promote]
+close_commit: [sha — set at close]
+update_trigger: sprint execute/close events
+---
+
+# SPRINT-044 — Night-Run Ergonomics
+
+> **Theme:** SPRINT-043 proved a night run can finish. What it did not do is make one pleasant to
+> start or affordable to repeat: the trigger was a hand-assembled 50-rule command line, nothing
+> confirmed the run was alive before the owner walked away, and two units cost $16.54. This sprint
+> closes the distance between "it works" and "you would actually use it nightly" — and clears the
+> reference-length debt the last two sprints kept making worse.
+
+## Scope
+
+**In:** splitting the capability-check snippets out of the unattended reference so it stays readable
+while three tasks add to it (T1) · deriving the allowlist into settings permissions instead of a CLI
+string (T2) · a launcher that fires detached and reports whether the run is actually alive (T3) ·
+finding and cutting the dominant cost driver (T4) · erasing resolved tech-debt rows rather than
+collapsing them (T5) · cutting the MINOR release that covers SPRINT-043 **and** this sprint (T6).
+
+**Out (deferred):** **TD-023**'s form-sensitivity fix — T2 carries the caveat forward but does not
+revise the derivation rule; the fix wants its own task once a reproduction exists · **TD-024** — its
+diagnosis was corrected at the last close and it needs *reproduction* before any mitigation, which is
+research, not execution · **throughput** (larger Plans per night) — T4 establishes cost per unit
+first, because scaling an unmeasured cost is how a night run gets expensive · running **this** sprint
+unattended, which D2 rules out.
+
+## Plan
+
+### T1 — Split the capability checks out of the unattended-run reference `[size: M · risk: low · class: execution · AFK]`
+Layers: `skills/orchestrator/references/night-run.md` · `skills/orchestrator/references/night-run-checks.md` · `evals/run-skill-freshness-fixtures.sh` · `evals/run-worktree-usability-fixtures.sh`
+Depends-on: none
+
+TD-014, whose re-review fell due at this promote. Its written trigger — a third embedded snippet —
+has still not fired, but the file has grown 427 → 495 lines since the debt was filed and **three tasks
+in this sprint add to it again**. The trigger was a proxy for "past comfortable reading for someone
+deciding whether to fire a run", and the proxy has drifted from what it measures. Goes first so the
+rest of the sprint edits the smaller file.
+
+**Acceptance:** the two snippets and their decision tables live in a sibling reference, the
+unattended-run doc points at them, and both fixture harnesses pass with their content unchanged —
+re-pointed at the new path and nothing else.
+
+**DoD:**
+- [ ] Both capability-check snippets and their decision tables moved **verbatim** — no wording,
+      logic, or exit-path changes ride along with the move
+- [ ] The unattended-run reference keeps the contract, entry path, pre-flight, trigger, watchdog and
+      rollup, and points to the new sibling for the checks
+- [ ] Both extracting harnesses re-pointed at the new path, their assertion content otherwise
+      **unmodified** — this is the proof the move was verbatim rather than a rewrite
+- [ ] Both harnesses pass, run bare (L-057); a deliberately mis-pointed path FAILs loud by name,
+      confirming the anchor guard still discriminates
+- [ ] Both files carry ownership headers
+<!-- QA: the harness pass/fail IS the verbatim proof — treat a green run as the evidence, not a formality. -->
+
+### T2 — Derive the allowlist into the project settings permissions `[size: S · risk: low · class: execution · AFK]`
+Layers: `skills/orchestrator/references/night-run.md` · `.claude/settings.json`
+Depends-on: T1
+
+The four-source derivation currently lands in a `--allowedTools` string assembled by hand — 50 rules
+for SPRINT-043, rebuilt from scratch each run and reviewable only as a command line. A settings file
+makes it a static, diffable artefact. Split it the way this repo already splits config: repo-generic
+rules tracked, owner-reserved or machine-specific ones in the gitignored local file, which is exactly
+where `git push` already sits.
+
+**Acceptance:** the pre-flight describes deriving into settings permissions with the tracked/local
+split stated, one syntax form pinned, and TD-023's caveat carried; this repo's own tracked settings
+file gains the night-run rules.
+
+**DoD:**
+- [ ] Pre-flight says the derivation lands in settings permissions, not an inline string
+- [ ] The tracked-vs-local split is stated as a rule, not an example — repo-generic tracked,
+      owner-reserved and machine-specific local
+- [ ] **One permission-rule syntax form is pinned and stated once.** The repo currently carries two
+      spellings of the same rule and neither reader nor matcher flags the mismatch
+- [ ] TD-023's caveat carried explicitly: a settings file changes ergonomics, **not** form-sensitivity
+      — the matcher still reads the literal invocation
+- [ ] Wording never assumes a settings file exists — a consumer may have none, and no skill gains the
+      ability to write one (`init`'s exclusion is unchanged, L-015)
+
+### T3 — Ship a launcher that fires detached and confirms the run is alive `[size: M · risk: med · class: execution · AFK]`
+Layers: `scripts/night-run.sh` · `skills/orchestrator/references/night-run.md`
+Depends-on: T1, T2
+
+Firing a run today means pasting a long command and then having no idea whether it survived its first
+seconds — a trigger that dies immediately and one running normally look identical until the watchdog's
+20-minute stall window elapses. The hidden half: a run started as a child of the terminal dies when
+that terminal closes, so a confirmation that dies with it would be worse than none, not better.
+
+**Acceptance:** the launcher fires detached and prints exactly one verdict after ~2–3 minutes —
+`ALIVE` or `DEAD-ON-ARRIVAL` naming the failure — and the run demonstrably survives closing the shell
+that launched it.
+
+**DoD:**
+- [ ] Dependency-free POSIX sh; runs the pre-flight checks before firing, and does not fire if one blocks
+- [ ] Fires **detached** — closing the launching terminal cannot signal the run dead
+- [ ] After ~2–3 minutes prints one verdict: `ALIVE` requires process up **and** first observable
+      progress (a log line or a commit), never merely a live PID
+- [ ] `DEAD-ON-ARRIVAL` names what failed, rather than reporting a bare non-zero (L-059)
+- [ ] **Both verdicts exercised on real input** — a genuine start and a deliberately broken trigger —
+      using a throwaway prompt costing cents, not a sprint
+- [ ] **Detachment proven by doing it**: close the parent shell, confirm the run continues. Reasoning
+      about `nohup` semantics is not the test
+- [ ] Consumer-generic: no path or command specific to this repo leaks into the shipped guidance (L-015)
+
+### T4 — Find and cut the dominant cost driver `[size: M · risk: low · class: execution · AFK]`
+Layers: `docs/research/night-run-cost.md` · `skills/orchestrator/references/night-run.md`
+Depends-on: T1, T2, T3
+
+L-073. $16.54 for two ~25-line changes, 64 turns, against SPRINT-041's 15 turns for comparable work.
+Something in the loop is spending turns disproportionately and nobody has looked at where. Wall-clock
+is explicitly not the target: 22 minutes for two units leaves a full night with capacity to spare.
+
+**Acceptance:** the run's spend is attributed to **named** drivers in a research note, and the largest
+one has a named change applied.
+
+**DoD:**
+- [ ] Spend decomposed into named drivers — coordinator versus dispatched agents, and by phase — from
+      the captured run data rather than estimated
+- [ ] The single largest driver is identified and a change applied to it, stated as a change to a
+      specific behaviour rather than an aspiration
+- [ ] The note records what was *not* the driver, so the next investigation does not re-derive it
+- [ ] Proof of reduction is **explicitly out of scope** — it is the next run's calibration row. This
+      task must not be closeable only by firing a paid run it does not control
+
+### T5 — Erase resolved tech-debt rows instead of collapsing them `[size: S · risk: low · class: execution · AFK]`
+Layers: `skills/lean-doc-generator/references/DOCS_Guide.md` · `skills/lean-doc-generator/SKILL.md` · `TECH-DEBT.md`
+Depends-on: none
+
+The retention leg keeps a permanent one-line pointer per resolved debt. The substance already lives in
+the changelog, the sprint archive and git, so the pointer is a breadcrumb rather than a record, and the
+ledger accretes rows that will never be read again. The 3-sprint delay stays — a just-resolved debt is
+still useful context at the next promote; only the permanent residue goes.
+
+**Acceptance:** the standard says delete at the 3-sprint mark, the ledger's § Resolved section and its
+existing collapsed lines are gone, and the promote governance scan no longer looks for that section.
+
+**DoD:**
+- [ ] The retention leg changes from "collapse to a one-line § Resolved entry" to **delete the row**,
+      at the same 3-sprint trigger
+- [ ] The ledger's § Resolved section and its existing collapsed lines are removed
+- [ ] The promote governance doc-aging scan is updated to match, so it stops scanning for a section
+      that no longer exists — a check looking for something deleted is a check that cannot fire
+- [ ] The id-monotonicity rule is restated where it now matters more: deleting a row must not free its
+      id for reuse
+- [ ] Consumer-facing (a shipped standard changes) → a CHANGELOG line at close (L-015)
+
+### T6 — Cut the MINOR release covering SPRINT-043 and SPRINT-044 `[size: S · risk: low · class: decision · HITL]`
+Layers: `CHANGELOG.md` · `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `README.md`
+Depends-on: T1, T2, T3, T4, T5
+
+TASK-137, expanded by D3. SPRINT-043's work sits in an `Unreleased` CHANGELOG block; this sprint adds
+more consumer-facing change on top. Cutting one MINOR that covers both is simpler than two releases
+days apart, and avoids a window where half the shipped surface is released and half is not. Runs last
+by construction — a release that precedes the work it releases is the bug.
+
+**Acceptance:** one MINOR version covers both sprints, manifests are in lockstep, every version echo
+in the repo matches, and the run stops before push.
+
+**DoD:**
+- [ ] `Unreleased` retitled to the chosen MINOR, with this sprint's user-visible changes folded in
+- [ ] `plugin.json` + `marketplace.json` bumped in **lockstep**
+- [ ] **Every version echo outside the manifests** grepped repo-wide and updated (L-048 — the README
+      footer shipped stale once already this way)
+- [ ] §11 CHANGELOG rotation applied if the new MINOR pushes a third block inline
+- [ ] **Stops before push.** Push stays owner-reserved
+
+## Owner-action checklist
+- [ ] `git push` after T6 — never performed by a task or a run.
+
+## Decisions (pre-locked)
+
+- **D1** — **`TECH-DEBT.md` is coordinator-owned at close.** T1 resolves TD-014 and T5 restructures the
+  ledger; if each marked its own row, the two would share a file and serialize for no benefit. Marking
+  moves to close, as SPRINT-043 did. L-071 applied at planning time.
+- **D2** — **This sprint does not run unattended**, and that is a deliberate trade. T6 is a version
+  choice — judgement, not execution — so it would park immediately under the unattended contract,
+  taking its five dependencies' completion report with it. Recorded rather than discovered.
+- **D3** — **One release covers SPRINT-043 and SPRINT-044.** TASK-137 was written for SPRINT-043 alone;
+  since this sprint ships consumer-facing change too, cutting separately would release half the surface
+  and leave the rest pending days later.
+- **D4** — **T1 goes first.** Three later tasks edit the reference it restructures; splitting after they
+  land would mean moving text they just wrote.
+
+## Assumptions
+
+- **A1** — The two fixture harnesses locate their snippets by anchor and fail loud when it is missing,
+  so a missed re-point in T1 surfaces as a named FAIL. *Confirm: T1's mis-pointed-path DoD line.*
+- **A2** — The captured SPRINT-043 run data is sufficient to attribute spend to named drivers without
+  re-running anything. *Confirm: T4's decomposition DoD line — if it is not sufficient, T4 says so
+  rather than estimating.*
+- **A3** — A throwaway prompt is enough to exercise both launcher verdicts. *Confirm: T3's both-verdicts
+  DoD line.*
+
+## Execution Log
+
+<!-- Append-only, dated. The Plan is frozen at promote — log here rather than editing § Plan. -->
+
+## Files Changed
+
+<!-- Filled during execution; feeds CHANGELOG at close. -->
+
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+
+## Retro
+
+<!-- Written at close. -->

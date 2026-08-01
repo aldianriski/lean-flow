@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-043 closed 2026-08-01.
+> **SPRINT-044 — Night-Run Ergonomics** → docs/sprint/SPRINT-044-night-run-ergonomics.md
 
 ---
 
@@ -41,6 +41,25 @@ status: current
                   frozen Plan, and a version choice is judgement, not execution.
       notes:      raised by SPRINT-043 close. See also TD-023 · TD-024, either of which the owner may
                   want folded in before cutting the release.
+
+- [ ] TASK-142 — Split the capability checks out of the unattended-run reference  [size: M] [risk: low] [AFK]
+      class:      execution
+      done-when:  the two embedded capability-check snippets (skill freshness, worktree usability) and
+                  their decision tables move **verbatim** into a sibling reference, leaving the
+                  unattended-run doc holding the contract, entry path, pre-flight checklist, trigger,
+                  watchdog and rollup, plus a pointer. Proof the move was verbatim rather than a
+                  rewrite: the retained fixture harnesses that extract those snippets by anchor still
+                  pass **unmodified in content**, re-pointed only at the new path. Both files carry
+                  ownership headers
+      touches:    the unattended-run reference · a new sibling reference for the capability checks ·
+                  the two eval harnesses that extract those snippets by anchor and currently hardcode
+                  the reference's path
+      depends-on: none
+      assumes:    the harnesses fail loud when their anchor is absent, so a missed re-point surfaces as
+                  a named FAIL rather than a silent skip — that failure mode is what makes the
+                  unmodified-harness proof meaningful
+      tracker:    TD-014
+      state:      ready
 
 - [ ] TASK-138 — Derive the night-run allowlist into the project settings file  [size: S] [risk: low] [AFK]
       class:      execution
