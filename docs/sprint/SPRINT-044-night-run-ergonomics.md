@@ -108,16 +108,16 @@ that terminal closes, so a confirmation that dies with it would be worse than no
 that launched it.
 
 **DoD:**
-- [ ] Dependency-free POSIX sh; runs the pre-flight checks before firing, and does not fire if one blocks
-- [ ] Fires **detached** — closing the launching terminal cannot signal the run dead
-- [ ] After ~2–3 minutes prints one verdict: `ALIVE` requires process up **and** first observable
+- [x] Dependency-free POSIX sh; runs the pre-flight checks before firing, and does not fire if one blocks
+- [x] Fires **detached** — closing the launching terminal cannot signal the run dead
+- [x] After ~2–3 minutes prints one verdict: `ALIVE` requires process up **and** first observable
       progress (a log line or a commit), never merely a live PID
-- [ ] `DEAD-ON-ARRIVAL` names what failed, rather than reporting a bare non-zero (L-059)
-- [ ] **Both verdicts exercised on real input** — a genuine start and a deliberately broken trigger —
+- [x] `DEAD-ON-ARRIVAL` names what failed, rather than reporting a bare non-zero (L-059)
+- [x] **Both verdicts exercised on real input** — a genuine start and a deliberately broken trigger —
       using a throwaway prompt costing cents, not a sprint
-- [ ] **Detachment proven by doing it**: close the parent shell, confirm the run continues. Reasoning
+- [x] **Detachment proven by doing it**: close the parent shell, confirm the run continues. Reasoning
       about `nohup` semantics is not the test
-- [ ] Consumer-generic: no path or command specific to this repo leaks into the shipped guidance (L-015)
+- [x] Consumer-generic: no path or command specific to this repo leaks into the shipped guidance (L-015)
 
 ### T4 — Find and cut the dominant cost driver `[size: M · risk: low · class: execution · AFK]`
 Layers: `docs/research/night-run-cost.md` · `skills/orchestrator/references/night-run.md`
@@ -306,6 +306,47 @@ interactive sessions too. The gate's harnesses need it to drive throwaway repos.
 buried: move it to the local file if you would rather it not be repo-wide.
 
 Gate: 73 pass, 0 fail. `night-run.md` 283 → 311 lines, still far below the 495 it started the sprint at.
+
+### 2026-08-01 | T3 | launcher shipped — and it root-caused TD-024 on the way
+Dispatched to a Sonnet sub-agent, which **returned before finishing** (waiting on its own background
+test). Per CLAUDE.md trap (c) the artifact was inspected rather than the reply: `scripts/night-run.sh`
+existed and was well-built, `night-run.md` was untouched, and no stray process was left running. The
+remainder was completed inline.
+
+**A defect the chain ordering should have caught.** The launcher hard-required `--allowedTools` — which
+T2 had just made optional by moving the allowlist into settings permissions. A correct settings-based
+invocation would have been rejected as `DEAD-ON-ARRIVAL`. T3 depends on T2 precisely so this could not
+happen; the dependency ordered the *work*, not the agent's *reading*. Fixed to accept any of three
+sources (`--allowedTools`, `--settings`, or a settings file with a `permissions.allow` block) and refuse
+only when none exists.
+
+**Then the launcher blocked its own live test — and the block was correct.** `qa-check` returned
+**72 pass, 1 fail** from inside the launcher while returning 73/0 standalone, three times. Not flaky:
+**context-dependent**. Ruled out command substitution and absolute-path invocation, then found it —
+**`MSYS_NO_PATHCONV=1`**, which I export so a bare `/orchestrator` prompt isn't rewritten into a Windows
+path (L-067). It is *inherited*, so it propagated into the gate and every harness it spawns, breaking
+`git -C` on a POSIX path.
+
+**That is TD-024's root cause, fully reproducible.** The failing leg emits
+`could not resolve live HEAD in /d/Project/lean-flow` — the *exact string* TD-024 recorded. The debt's
+filed mechanism was nearly right (`git -C` failing on a POSIX path) but missed the trigger, and the
+trigger is **L-067's own workaround causing a second path-translation bug in a child process, far from
+where it was set**. The launcher now clears the variable around the gate only, in a subshell; the fired
+command keeps the caller's environment untouched.
+
+**Verified on real input, both verdicts:**
+- Three `DEAD-ON-ARRIVAL` paths, each naming its cause: missing `unattended` signal · wrong permission
+  mode · forbidden `--dangerously-skip-permissions`.
+- `ALIVE` under the hostile environment (`MSYS_NO_PATHCONV=1` still exported) — the child logged `ok`
+  and exited 0. Real work, not a heartbeat.
+- **Detachment proven by observation**: fired with a 5s window so the launcher exited first, then
+  confirmed the child was **still running** after its parent was gone, and later completed on its own
+  with exit 0. That same run also demonstrated "a live PID is not progress" — up but silent at 5s, so
+  the verdict was correctly `DEAD-ON-ARRIVAL`. A window that short is a false negative for a healthy
+  slow starter, which is why the default is ~150s; noted in the shipped guidance.
+
+Live-test cost: ~$0.5 across four `claude -p` calls. No stray logs in the repo (all under `TMPDIR`), no
+surviving processes.
 
 ## Files Changed
 

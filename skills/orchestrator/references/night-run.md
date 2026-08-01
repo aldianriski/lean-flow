@@ -213,8 +213,40 @@ this pre-flight pass.
 The one-liner, fired by an OS-level scheduler (outside lean-flow's own surface — it ships no hooks):
 
 ```
-claude -p "/orchestrator sprint-bulk unattended" --permission-mode dontAsk --allowedTools "<built list>"
+claude -p "/orchestrator sprint-bulk unattended" --permission-mode dontAsk
 ```
+
+(Permissions come from your settings file per Part 1; `--allowedTools "<built list>"` still works if you
+prefer them inline.)
+
+### Firing it so you can walk away
+
+Fired bare from a terminal, the run is a **child of that terminal** — closing the window signals it dead,
+however healthy it looked a second earlier. And for the first ~20 minutes a run that died instantly and
+one working normally are indistinguishable, because the Part 3 watchdog only reacts to a *stall*.
+
+A launcher closes both gaps: it re-checks the mechanically-verifiable half of Part 1, fires **detached**,
+watches for a couple of minutes, and prints exactly one verdict. lean-flow ships one at
+`scripts/night-run.sh` as a working reference — the pattern matters more than the file:
+
+```
+sh scripts/night-run.sh -- claude -p "/orchestrator sprint-bulk unattended" --permission-mode dontAsk
+```
+
+| Verdict | Meaning |
+|---|---|
+| `ALIVE` | process is up **and** producing observable progress — a log line or a new commit. You can close the terminal. |
+| `DEAD-ON-ARRIVAL: <reason>` | it never got going, and the line names why (missing mode signal · wrong permission mode · no allowlist · the gate blocked · exited early). Nothing was left running. |
+
+**A live PID is not progress.** A process can sit up and idle because its prompt was rejected, so the
+verdict requires *output*, never just a heartbeat — which is also why the window defaults to ~150s
+rather than a few seconds. Too short a window reports a healthy slow starter as dead.
+
+**Environment caveat, learned the hard way.** On Git-Bash/MSYS hosts `MSYS_NO_PATHCONV=1` is often
+exported so a leading-slash prompt isn't rewritten into a Windows path — but it is **inherited**, and it
+disables path translation for every child, breaking any check that hands a POSIX path to a native `git`.
+A gate that is green in your shell then blocks the launcher for reasons unrelated to the repo. Clear it
+around the gate, not globally.
 
 The `unattended` word is the Part 0 mode signal — without it the run behaves interactively and will
 stop at the first gate instead of parking it.
