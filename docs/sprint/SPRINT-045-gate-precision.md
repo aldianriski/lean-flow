@@ -46,14 +46,14 @@ collide, so a chain already satisfies the check's actual intent.
 derived order; a Plan with two rank-0 tasks sharing a file and no path between them still FAILs by name.
 
 **DoD:**
-- [ ] Ownership is derived from the **transitive closure** of `Depends-on:`, not pairwise direct edges
-- [ ] Computed over the existing markup — no new field, no second source of truth (ADR-013 rejected a
+- [x] Ownership is derived from the **transitive closure** of `Depends-on:`, not pairwise direct edges
+- [x] Computed over the existing markup — no new field, no second source of truth (ADR-013 rejected a
       compiled DAG once already)
-- [ ] The PASS line names the **derived** order, so a reader can tell chain-ownership from direct
-- [ ] **Negative-tested per check, fixtures retained** (L-058): a genuine unowned overlap still FAILs by
+- [x] The PASS line names the **derived** order, so a reader can tell chain-ownership from direct
+- [x] **Negative-tested per check, fixtures retained** (L-058): a genuine unowned overlap still FAILs by
       name. A fix that made every overlap pass would satisfy the acceptance and destroy the guard
-- [ ] SPRINT-044's Plan replayed as a must-PASS fixture — the real case that exposed this
-- [ ] Run bare, never piped (L-057); commands issued one per invocation (CLAUDE.md trap (d) family)
+- [x] SPRINT-044's Plan replayed as a must-PASS fixture — the real case that exposed this
+- [x] Run bare, never piped (L-057); commands issued one per invocation (CLAUDE.md trap (d) family)
 <!-- QA: this IS a gate — the must-FAIL fixture is the bar. Narrowing a false positive is exactly when
      a true positive gets lost, so the unowned-overlap case earns more scrutiny than the fix itself. -->
 
@@ -203,6 +203,65 @@ Also corrected: the agent reported `knowledge index STALE` from inside its workt
 main tree the gate reads `PASS knowledge index current` — a worktree-local artifact, not a repo fact,
 and another instance of a report disagreeing with the artifact (CLAUDE.md trap (c)).
 
+### 2026-08-01 | T1 landed | merged; fixture reading adjudicated; end-to-end verification blocked
+
+**T1 reviewed and merged.** Logic read in full: `reach[]` is a fixed-point transitive closure over the
+already-parsed `deps[]`, so no new field and no second SSOT (ADR-013 holds). The shared-file loop tries
+the direct edge first (original PASS text unchanged), falls back to `reach[]` for a chain
+(`PASS shared-file-owned-transitive: … derived-order=T1 -> T2 -> T3`), and FAILs only when no path
+exists in either direction — **D4 holds, the true positive is intact**, and the FAIL text now names
+"direct or transitive".
+
+**Coordinator adjudication — the agent's fixture judgment call is CONFIRMED.** It declined to replay
+SPRINT-044's archived Plan verbatim, and it was right to. I checked the archive: T2 `T1` · T3 `T1, T2` ·
+T4 `T1, T2, T3` — every pair sharing `night-run.md` already carries a **direct** edge, because the
+redundant workaround edges are baked into the shipped Plan. Replaying it verbatim would produce a
+fixture that passes under the *old* pairwise check too — a guard that cannot fail, which is L-058's
+exact worst case. The fixture uses the natural minimal chain (T2→T1, T3→T2, T4→T3), which is the form
+that actually HALTed, matching the DoD line's own "the real case that exposed this". The agent surfaced
+the ambiguity instead of silently resolving it — the behaviour the brief asked for.
+
+**Verification gap, stated plainly.** Neither the agent nor I could execute the shipped snippet
+end-to-end. The agent verified the awk program in isolation against hand-built records; I reviewed the
+merged diff and confirmed T1 touches **only** the prose and the awk block — the `sh` parsing loop is
+byte-unchanged from the version I ran successfully against this sprint at wave start. That is strong
+but not equivalent to an end-to-end run. **Owner verification item:** run
+`sh evals/run-dispatch-preflight-fixtures.sh` interactively with `MSYS_NO_PATHCONV` cleared before
+treating TD-025 as closed.
+
+**Three more `denied-tool` findings, and together they change the diagnosis.** `git show … > file`,
+`awk … > /tmp/file`, and `sh /tmp/pf-045.sh <args>` were all denied — but the **last two are the exact
+command forms that succeeded earlier in this same run** (they are how the wave-start preflight was
+extracted and executed). The T1 agent independently reported the same shape in its own sandbox: every
+`sh` and `awk -f <file>` invocation denied regardless of allowlist match, while inline `awk '…'` worked.
+So this is **not** a static allowlist gap that a better-derived rule list would have prevented — the
+permission surface **degraded mid-session**. That is a materially different finding from SPRINT-043's
+form-failure story, and it is the most valuable thing this run produced (D3). Five denials total; each
+recorded once and never re-wrapped (Part 4).
+
+**Parked (scope-change → HITL).** Gate is 67/2. Worktree cleanup cleared the transient half of the
+`layers observed` finding — **verified by re-running the gate after pruning, not assumed**. The
+remaining half is real: T1's two new fixture files are undeclared in its **frozen** `Layers:`. Declaring
+them means editing § Plan, which is scope-changing and needs an owner G2 re-confirm — the identical
+situation SPRINT-044 resolved that way. Parked as-is; not worked around, and no task reshaped to dodge
+it. The other FAIL is TD-024's known MSYS residual, out of scope by § Scope.
+
+### 2026-08-01 | rollup | run complete, halting clean
+
+```
+T1 · parked-hitl · new fixture files undeclared in frozen Layers: — owner logs a scope-change,
+     adds evals/fixtures/dispatch-preflight/{sprint-044-chain,shared-file-unowned-diverging-ranks}/sprint.md
+     to T1's Layers:, re-confirms G2, re-runs gate (expect 69/0 with MSYS cleared)
+T1 · denied-tool · end-to-end harness run unavailable — verify interactively before closing TD-025
+run · cost unavailable from inside the session · ~2 waves, 2 units built / 2 landed · coordinator + 2
+     worktree agents · subagent tokens 89k (T2) + 156k (T1); agent tool-uses 28 (T2) + 75 (T1)
+```
+
+Cost is stated as **unavailable** rather than omitted (Part 4 degrade rule) — a headless `claude -p`
+exposes `total_cost_usd` to its *caller*, not to itself, so the launcher's JSON result carries the
+figure this row needs. Sprint is **not closed**: T1 carries a parked HITL blocker and the gate is red
+on its files, so `close` would be closing through a failing check.
+
 ## Files Changed
 
 <!-- Filled during execution; feeds CHANGELOG at close. -->
@@ -211,6 +270,9 @@ and another instance of a report disagreeing with the artifact (CLAUDE.md trap (
 |------|------|--------------|------|------|
 | `scripts/lib/check-layers-observed.sh` | T2 | Split the `plan_commit` case arm so the bracketed promote-time placeholder reports a named SKIP instead of a FAIL — the two-commit convention guarantees that window exists, so the old FAIL was a false alarm by construction (TD-026) | low | `run-layers-observed-fixtures.sh` cases 3 (named SKIP, exit 0) + 3b (genuinely absent, still FAILs by name, exit 1) |
 | `evals/run-layers-observed-fixtures.sh` | T2 | Repurposed case 3 to assert the named SKIP and added case 3b for the must-not-weaken leg — retained so the narrowed check keeps a regression guard (L-058 · TD-012) | low | self (harness) |
+| `skills/orchestrator/references/dispatch.md` | T1 | Shared-file ownership now derived from the transitive closure of `Depends-on:` so a chain counts as owned, with the PASS line naming the derived order — a legitimate chained Plan no longer HALTs (TD-025) | low | awk logic verified in isolation; **end-to-end run blocked by denials — owner to re-run** |
+| `evals/run-dispatch-preflight-fixtures.sh` | T1 | Added the SPRINT-044 chain must-PASS case and a rank-divergence must-FAIL case, guarding against a rank-based false PASS (L-058) | low | fixtures retained; wrapper unrunnable under inherited `MSYS_NO_PATHCONV` |
+| `evals/fixtures/dispatch-preflight/sprint-044-chain/sprint.md` · `.../shared-file-unowned-diverging-ranks/sprint.md` | T1 | New fixture inputs — **undeclared in T1's frozen `Layers:`, parked for owner** | low | gate FAIL is the parked finding |
 
 ## Retro
 
