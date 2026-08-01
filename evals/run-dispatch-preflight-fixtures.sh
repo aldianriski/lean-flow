@@ -50,6 +50,16 @@ run_case_anywhere "shared-file-unowned" 1 "FAIL shared-file-unowned" -- \
 run_case_anywhere "base-ref-drift" 1 "FAIL base-ref-drift" -- \
   sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/base-ref-drift/sprint.md\" \"$drifted_base\""
 
+# --- case 4 (TD-025): T1->T2->T3->T4 chain on night-run.md, replaying SPRINT-044's real case --
+# no direct edge between non-adjacent pairs -> must PASS, naming the derived transitive order ----
+run_case_anywhere "sprint-044-chain" 0 "PASS shared-file-owned-transitive" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/sprint-044-chain/sprint.md\" \"$live_head\""
+
+# --- case 5: T1 and T3 share shared.md with DIFFERING ranks but no Depends-on path between them --
+# guards TD-025's fix from ever mistaking rank divergence for ownership -> must still FAIL by name -
+run_case_anywhere "shared-file-unowned-diverging-ranks" 1 "FAIL shared-file-unowned" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/shared-file-unowned-diverging-ranks/sprint.md\" \"$live_head\""
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "DISPATCH-PREFLIGHT FIXTURES: all green"; else echo "DISPATCH-PREFLIGHT FIXTURES: at least one FAIL"; fi
 exit $fail
