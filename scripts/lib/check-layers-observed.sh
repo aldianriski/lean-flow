@@ -47,6 +47,11 @@ is_excluded() {
     docs/sprint/*) return 0 ;;                 # sprint file + archive/ + INDEX.md: coordinator-owned (D3)
     TECH-DEBT.md) return 0 ;;                   # TD marking moved to close (D1)
     TODO.md) return 0 ;;                        # backlog bookkeeping, written at close
+    .claude/settings.json|.claude/settings.local.json) return 0 ;;
+                                                # PRE-FLIGHT bookkeeping: the unattended allowlist is
+                                                # derived and written AFTER the Plan freezes, so no task
+                                                # can declare it — undeclarable by construction, not by
+                                                # omission. Same category as the close-time rows above.
     CHANGELOG.md) return 0 ;;                   # release bookkeeping, written at close
     docs/LEARNINGS.md) return 0 ;;              # retro bucket routing, written at close
     docs/knowledge-index.md) return 0 ;;        # GENERATED, never hand-authored: regenerated whenever
