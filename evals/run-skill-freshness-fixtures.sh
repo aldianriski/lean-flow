@@ -9,7 +9,7 @@
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-nightrun="$here/../skills/orchestrator/references/night-run.md"
+nightrun="$here/../skills/orchestrator/references/night-run-checks.md"
 . "$here/lib/harness-common.sh"
 
 script_tmp=$(mktemp) || { echo "FAIL harness: mktemp failed"; exit 2; }

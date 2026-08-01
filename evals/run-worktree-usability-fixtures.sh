@@ -1,14 +1,14 @@
 #!/bin/sh
 # run-worktree-usability-fixtures.sh -- must-degrade fixtures for the worktree-isolation check in
-# skills/orchestrator/references/night-run.md (L-058: retain one fixture per outcome).
+# skills/orchestrator/references/night-run-checks.md (L-058: retain one fixture per outcome).
 #
-# Extracts the *actual shipped snippet* from night-run.md (between the worktree-usability-check
+# Extracts the *actual shipped snippet* from night-run-checks.md (between the worktree-usability-check
 # anchors) so the fixtures test what a consumer really runs, not a hand-copied duplicate that can
 # drift out of sync with it. Dependency-free POSIX sh. Run bare: sh evals/run-worktree-usability-fixtures.sh
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-nightrun="$here/../skills/orchestrator/references/night-run.md"
+nightrun="$here/../skills/orchestrator/references/night-run-checks.md"
 . "$here/lib/harness-common.sh"
 
 script_tmp=$(mktemp) || { echo "FAIL harness: mktemp failed"; exit 2; }

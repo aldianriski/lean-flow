@@ -49,15 +49,15 @@ unattended-run doc points at them, and both fixture harnesses pass with their co
 re-pointed at the new path and nothing else.
 
 **DoD:**
-- [ ] Both capability-check snippets and their decision tables moved **verbatim** — no wording,
+- [x] Both capability-check snippets and their decision tables moved **verbatim** — no wording,
       logic, or exit-path changes ride along with the move
-- [ ] The unattended-run reference keeps the contract, entry path, pre-flight, trigger, watchdog and
+- [x] The unattended-run reference keeps the contract, entry path, pre-flight, trigger, watchdog and
       rollup, and points to the new sibling for the checks
-- [ ] Both extracting harnesses re-pointed at the new path, their assertion content otherwise
+- [x] Both extracting harnesses re-pointed at the new path, their assertion content otherwise
       **unmodified** — this is the proof the move was verbatim rather than a rewrite
-- [ ] Both harnesses pass, run bare (L-057); a deliberately mis-pointed path FAILs loud by name,
+- [x] Both harnesses pass, run bare (L-057); a deliberately mis-pointed path FAILs loud by name,
       confirming the anchor guard still discriminates
-- [ ] Both files carry ownership headers
+- [x] Both files carry ownership headers
 <!-- QA: the harness pass/fail IS the verbatim proof — treat a green run as the evidence, not a formality. -->
 
 ### T2 — Derive the allowlist into the project settings permissions `[size: S · risk: low · class: execution · AFK]`
@@ -242,6 +242,30 @@ already downgraded at the SPRINT-043 close; this is the confirmation.
 already edits precisely the section that must carry the rule, its `Layers:` are unchanged, and no new
 file enters the sprint — so the overlap map, the wave ranks and the preflight verdict all still hold.
 Logged here before § Plan was edited.
+
+
+### 2026-08-01 | T1 | capability checks split out — TD-014's subject resolved
+Dispatched to a Sonnet sub-agent (docs restructure, implemented directly — no routed procedure skill).
+`night-run.md` **495 → 283 lines** (−43%), zero embedded snippets remaining; the moved material lives
+in `night-run-checks.md` (236 lines) with a pointer left behind. All six Parts intact.
+
+**The verbatim claim was checked, not accepted.** "Moved verbatim" is the kind of assertion that reads
+identically whether or not it is true, so it was verified against git rather than the agent's word:
+both snippets extracted from `HEAD`'s pre-move file and from the new file, diffed —
+**byte-identical**, 89 and 46 lines. Harness diffs are exactly one line each (the path), so the
+assertions that guard those snippets are unchanged; if a snippet had been quietly rewritten, unchanged
+assertions would have failed.
+
+Negative test re-run **on the harness the agent did not use** — mis-pointed the worktree-usability
+harness at the now-anchorless file: exit 2 with its named finding
+(`no snippet extracted between … in …/night-run.md`), then reverted and confirmed green. The anchor
+guard discriminates a real miss rather than silently passing, which is what makes the whole
+unchanged-assertions proof meaningful.
+
+Note: `night-run.md` previously carried **no** ownership header; DoD line 5 asked for one on both
+files, so it gained one. Additive, and it brings the file into line with DOCS_Guide §3.
+
+Gate: 73 pass, 0 fail. Diff confined to the four declared `Layers:` files.
 
 ## Files Changed
 
