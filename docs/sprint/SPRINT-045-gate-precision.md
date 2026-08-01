@@ -144,6 +144,29 @@ manual trigger.
 Recovery if it misbehaves: `origin/main` is current at `ba493cd` and the run cannot push, so
 `git reset --hard origin/main` restores everything.
 
+### 2026-08-01 | wave 1 dispatched | T1 + T2 in parallel worktrees
+
+Pre-dispatch preflight run bare against the frozen Plan at declared base `ba393a3`:
+`PASS base-ref` · `PASS wave-computation: T1=0 T2=0` · no shared-file finding → `PREFLIGHT: CLEAR`.
+**A3 confirmed** — both tasks rank 0 and disjoint, so the run fans out as designed. `origin/main` ==
+local HEAD == `ba393a3` (0 unpushed), so agent worktrees fork from a base that already carries both
+tasks' target files — no add/add hazard.
+
+**Baseline gate: 68 pass / 1 fail — the one FAIL is TD-024's accepted residual, not a regression.**
+`run-dispatch-preflight-fixtures.sh` exits 2 with `could not resolve live HEAD in /d/Project/lean-flow`
+because `MSYS_NO_PATHCONV=1` is exported into this headless session (inherited) and the harness passes
+a POSIX `$repo_root` to `git -C`. Diffed the environments before the code, per CLAUDE.md trap (d):
+`git -C /d/Project/lean-flow rev-parse HEAD` → fatal, while `git -C D:/Project/lean-flow rev-parse HEAD`
+resolves. The launcher clears the variable around its own gate run (69/0); the spawned run inherits it.
+Explicitly **out of scope** for this sprint — both dispatch briefs name it so neither agent burns turns
+re-diagnosing it a third time (L-081).
+
+Dispatched `class: execution` → Sonnet, one `general-purpose` agent per task, worktree-isolated, both
+Agent calls in one message. Each brief carries its procedure skill (`/tdd`) rather than a paraphrase,
+the verbatim tree-wide-git-state-op ban (L-043), the coordinator-owned file list (D1), the bare-command
+form rule, and **D4** — the must-FAIL leg outranks the fix at review. Each must return its fixtures'
+literal printed findings, not a self-reported pass (an exit code is evidence about the reporter).
+
 ## Files Changed
 
 <!-- Filled during execution; feeds CHANGELOG at close. -->
