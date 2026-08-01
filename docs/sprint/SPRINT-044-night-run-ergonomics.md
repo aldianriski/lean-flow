@@ -84,6 +84,15 @@ file gains the night-run rules.
       — the matcher still reads the literal invocation
 - [ ] Wording never assumes a settings file exists — a consumer may have none, and no skill gains the
       ability to write one (`init`'s exclusion is unchanged, L-015)
+- [ ] **(scope-change)** The **bare-invocation rule** is stated: landing-path and gate commands are
+      issued one per call — no `cd` prefix, no `&&` chain, no variable-assignment prefix, no redirect —
+      and anchored with `git -C <abs-path>` rather than by changing directory. Carries the measured
+      evidence (23 of 25 denials were form failures on individually-permitted commands) so the rule
+      reads as a finding rather than a style preference, and notes it converges with L-057's
+      never-pipe-a-gate rule for a different reason
+- [ ] **(scope-change)** The derivation covers **tools as well as commands** — a host offering more
+      than one shell needs each authorized, or the run silently loses the unauthorized one. This is the
+      same class of omission as the landing-path gap, one level up
 
 ### T3 — Ship a launcher that fires detached and confirms the run is alive `[size: M · risk: med · class: execution · AFK]`
 Layers: `scripts/night-run.sh` · `skills/orchestrator/references/night-run.md`
@@ -202,6 +211,37 @@ in the repo matches, and the run stops before push.
 ## Execution Log
 
 <!-- Append-only, dated. The Plan is frozen at promote — log here rather than editing § Plan. -->
+
+### 2026-08-01 | scope-change | T2 widened to fix TD-023, not merely cite it
+**What changed.** The Plan froze with TD-023's fix explicitly *out* of scope: T2 was to carry the
+form-sensitivity caveat forward and nothing more, on the understanding that the evidence was a single
+observed `git worktree add` denial. Reading the captured run's `permission_denials` array at G2
+overturned that. All **25** denials classified:
+
+| Shape | Count | Cause |
+|---|---|---|
+| `cd <path> && …` | 21 | prefix broke the match |
+| `w=$(mktemp -d); echo …` | 2 | variable-assignment prefix broke the match |
+| `git -C …` | 1 | allowlisted as `Bash(git -C *)` and denied anyway |
+| `PowerShell` | 1 | tool never authorized at all |
+
+**Impact.** 23 of 25 were **form** failures, not command failures — every one of those commands was
+individually permitted and the prefix stopped the matcher recognising it. TD-023 is therefore not a
+footnote to the four-source rule, it is the dominant failure mode of the run that tested it. Leaving it
+out would have shipped a sprint about night-run ergonomics whose largest known ergonomic defect was
+deliberately skipped. The 25th denial exposes a second gap: the derivation enumerates **commands** but
+not **tools** — this host has two shells and only one was authorized, so the run silently lost the other.
+
+**Bonus finding, recorded not acted on.** The first denial in the array is
+`cd "D:/Project/lean-flow" && sh scripts/qa-check.sh > /tmp/qa-main.txt …` — the *probe TD-024's
+evidence came from*. It never ran. Combined with the close's independent checks (harness green,
+`git -C` resolving both path styles), TD-024 was filed on evidence the run never obtained. Its row was
+already downgraded at the SPRINT-043 close; this is the confirmation.
+
+**Re-confirm G2.** Owner re-signed with both additions folded into T2 rather than a new task: T2
+already edits precisely the section that must carry the rule, its `Layers:` are unchanged, and no new
+file enters the sprint — so the overlap map, the wave ranks and the preflight verdict all still hold.
+Logged here before § Plan was edited.
 
 ## Files Changed
 
