@@ -49,6 +49,12 @@ is_excluded() {
     TODO.md) return 0 ;;                        # backlog bookkeeping, written at close
     CHANGELOG.md) return 0 ;;                   # release bookkeeping, written at close
     docs/LEARNINGS.md) return 0 ;;              # retro bucket routing, written at close
+    docs/knowledge-index.md) return 0 ;;        # GENERATED, never hand-authored: regenerated whenever
+                                                # any metadata-carrying doc (LEARNINGS/ADR/research)
+                                                # changes, so declaring it would mean naming it in every
+                                                # task that touches one. Its sources are already excluded
+                                                # or declared; a derived view is not a coordination
+                                                # concern, which is what Layers: exists to manage.
     .claude-plugin/plugin.json) return 0 ;;     # version bump, owned by release-patch
     .claude-plugin/marketplace.json) return 0 ;; # lockstep with plugin.json, same owner
     *) return 1 ;;

@@ -303,6 +303,14 @@ allowlist, re-run). `stalled` = the watchdog fired (next: resume via `/prime` + 
 Distinguish `parked-hitl` from `denied-tool` in the morning: a park is the contract working as
 designed and needs a decision; a denial is an under-scoped allowlist and needs a config fix.
 
+**On a denial, record it once and move on — never re-attempt the same operation in a different
+wrapper.** Re-wrapping (adding a `cd`, splitting into a chain, redirecting elsewhere) does not make a
+refused operation permitted, and each attempt costs a full turn. Measured: one run spent ~40% of its
+64 turns on 25 denials, and a turn costs roughly the same whether it accomplishes anything or not,
+because every turn re-reads the whole accumulated context (→ `docs/research/night-run-cost.md`). A
+denied operation is a `denied-tool` rollup line and a morning config fix, not something to solve
+in-flight.
+
 ### The calibration row (one per run, always — green or not)
 
 The per-task lines above say what happened; this one says **what it cost**. Append it beside them:

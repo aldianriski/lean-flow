@@ -120,7 +120,7 @@ that launched it.
 - [x] Consumer-generic: no path or command specific to this repo leaks into the shipped guidance (L-015)
 
 ### T4 — Find and cut the dominant cost driver `[size: M · risk: low · class: execution · AFK]`
-Layers: `docs/research/night-run-cost.md` · `skills/orchestrator/references/night-run.md`
+Layers: `docs/research/night-run-cost.md` · `skills/orchestrator/references/night-run.md` · `scripts/lib/check-layers-observed.sh`
 Depends-on: T1, T2, T3
 
 L-073. $16.54 for two ~25-line changes, 64 turns, against SPRINT-041's 15 turns for comparable work.
@@ -131,12 +131,12 @@ is explicitly not the target: 22 minutes for two units leaves a full night with 
 one has a named change applied.
 
 **DoD:**
-- [ ] Spend decomposed into named drivers — coordinator versus dispatched agents, and by phase — from
+- [x] Spend decomposed into named drivers — coordinator versus dispatched agents, and by phase — from
       the captured run data rather than estimated
-- [ ] The single largest driver is identified and a change applied to it, stated as a change to a
+- [x] The single largest driver is identified and a change applied to it, stated as a change to a
       specific behaviour rather than an aspiration
-- [ ] The note records what was *not* the driver, so the next investigation does not re-derive it
-- [ ] Proof of reduction is **explicitly out of scope** — it is the next run's calibration row. This
+- [x] The note records what was *not* the driver, so the next investigation does not re-derive it
+- [x] Proof of reduction is **explicitly out of scope** — it is the next run's calibration row. This
       task must not be closeable only by firing a paid run it does not control
 
 ### T5 — Erase resolved tech-debt rows instead of collapsing them `[size: S · risk: low · class: execution · AFK]`
@@ -347,6 +347,28 @@ command keeps the caller's environment untouched.
 
 Live-test cost: ~$0.5 across four `claude -p` calls. No stray logs in the repo (all under `TMPDIR`), no
 surviving processes.
+
+### 2026-08-01 | scope-change | T4 gains the observed-checker; the gate caught its own gap, then itself
+**What changed.** T4's research note is a metadata-carrying doc, so writing it regenerates
+`docs/knowledge-index.md`. The **observed-layers check shipped last sprint then FAILed**: the index had
+changed and no task declared it. Both ways out fail the gate — regenerate and the index is undeclared,
+skip it and the freshness leg reports STALE — so the fix was forced rather than chosen.
+
+**Impact.** The index is **generated, never hand-authored**, and regenerates whenever any
+LEARNINGS/ADR/research doc changes; its sources are already excluded or declared. Declaring it would
+mean naming it in every task that touches a learning. It belongs in the checker's exclusion list, which
+already carries per-file stated reasons precisely so the list stays auditable — a genuine gap in a
+guard shipped five commits ago, found by that guard.
+
+**Then the guard caught itself**, which is the part worth keeping: editing
+`scripts/lib/check-layers-observed.sh` made *it* undeclared, and the check FAILed again naming its own
+file. The tempting fix — adding the checker to its own exclusion list — was rejected outright: it is a
+hand-authored source file, exactly what the check exists to watch, and excluding it would hollow out
+the guard to make one commit convenient. Declared in T4's `Layers:` instead.
+
+**Re-confirm G2.** No new file enters the sprint beyond this one, no `Depends-on` edge changes, and the
+wave ranks are untouched — so the overlap map and preflight verdict still hold. Logged before § Plan
+was edited, same as the T2 scope-change.
 
 ## Files Changed
 
