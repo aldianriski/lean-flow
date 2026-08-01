@@ -150,10 +150,18 @@ All items must pass or the night-run does not fire:
       grant one at all. *If your project has no settings file, derive into one; nothing here creates it
       for you, and no lean-flow skill writes one.*
 
-      **Pin one rule syntax and use it everywhere.** A repo that accumulates two spellings of the same
-      rule gets no warning from either a reader or the matcher. Prefer the `Bash(<cmd>:*)` form the
-      settings file already uses; a bare-glob variant was observed denying a command it was written to
-      permit, so treat any second spelling as suspect until you have seen it match.
+      **Two preconditions, both measured — a rule can be perfectly written and still do nothing:**
+      1. **The workspace must be trusted.** An untrusted one has its `permissions.allow` **ignored
+         entirely**, announced in a single line (`Ignoring N permissions.allow entry … not been
+         trusted`) and otherwise silent. Every rule in the file is inert; denials then look exactly
+         like form failures.
+      2. **A directory-prefix rule form does not match.** Measured one rule at a time against one
+         command: exact-file (`Bash(sh path/to/x.sh:*)`), bare-command (`Bash(sh:*)`) and space-glob
+         (`Bash(sh *)`) all matched; **`Bash(sh dir/:*)` denied**, reproduced. Prefer exact-file or
+         bare-command; treat a directory prefix as non-functional, and any unverified spelling as
+         suspect until you have watched it match.
+
+      Evidence for both, plus what turned out **not** to be true, → `docs/research/headless-permission-surface.md`.
 
       **Issue the commands bare — one per invocation.** The matcher reads the **literal invocation**,
       not the operation you meant, so a permitted command wrapped in a prefix stops being recognised:

@@ -48,17 +48,17 @@ before it was root-caused.
 not established — and ships **no** mitigation either way.
 
 **DoD:**
-- [ ] Mid-session effect probed by **replaying a fixed known-good command form at intervals** inside one
+- [x] Mid-session effect probed by **replaying a fixed known-good command form at intervals** inside one
       headless session, recording turn index and elapsed time at each attempt
-- [ ] Rule forms tested **one at a time** — exact-file, directory prefix, glob, bare command — so a
+- [x] Rule forms tested **one at a time** — exact-file, directory prefix, glob, bare command — so a
       result attaches to a single variable rather than a bundle
-- [ ] Every claim carries the observation behind it; anything the probe fails to establish is **named as
+- [x] Every claim carries the observation behind it; anything the probe fails to establish is **named as
       not established**, never softened into a likely story (TD-024 was filed twice on plausible stories)
-- [ ] If the effect does not reproduce in one session, the note **says so** rather than extrapolating
+- [x] If the effect does not reproduce in one session, the note **says so** rather than extrapolating
       from SPRINT-045's single observation
-- [ ] **No mitigation, no guidance change**, unless a form finding is conclusive — in which case it may
+- [x] **No mitigation, no guidance change**, unless a form finding is conclusive — in which case it may
       update the derivation guidance and nothing else
-- [ ] Probe cost recorded, so the next investigation knows what this class of question costs
+- [x] Probe cost recorded, so the next investigation knows what this class of question costs
 <!-- QA: this is research, not a gate — the deliverable is a defensible answer, and "not established"
      is a valid one. The failure mode here is a confident conclusion, not an absent one. -->
 
@@ -143,3 +143,34 @@ not exist when it was written — undeclarable by construction, the same categor
 
 It also flagged, correctly and without acting: TD-031's question (four exclusions in four sprints) is
 out of this sprint's scope. Fixtures: 8 cases / 13 assertions green. Gate 69 pass, 0 fail.
+
+### 2026-08-01 | T1 | TD-028 answered · TD-027 not supported · one new precondition found
+Run inline (D2): the subject is headless-session behaviour, so a dispatched agent would have been a
+session subject to the effect it was measuring. Two separate probe sessions per the approved design, so
+neither result could contaminate the other. ~$4 across 12 sessions. Full evidence →
+`docs/research/headless-permission-surface.md`.
+
+**TD-028 answered.** One rule loaded at a time against one identical command: exact-file, bare-command
+and space-glob forms all matched; **`Bash(sh dir/:*)` denied, reproduced twice.** The directory-prefix
+form genuinely does not match.
+
+**A precondition nobody had written down.** An **untrusted workspace has its `permissions.allow`
+ignored entirely** — one warning line, otherwise silent. A character-exact rule produced a denial purely
+because the file was never honoured. This is the more dangerous of the two findings: it makes a correct
+allowlist inert while looking correct.
+
+**TD-027 is not supported.** A 26-turn session replaying a known-good form: **zero denials**. The
+discriminator turned out to be the **redirect** — relative → 0 · absolute → 0 · `> file` → **1**,
+reproduced — and SPRINT-045's denied commands were `git show … > file` and `awk … > /tmp/file`. So
+those denials are an instance of the *existing* bare-invocation rule (L-077), not a new phenomenon.
+**Third time a plausible story attached to a symptom has been wrong** (TD-024 twice, now TD-027).
+
+**Two confounds hit while probing, both of which produced convincing false readings** and are recorded
+because they show how cheap a wrong finding is here: an untrusted probe workspace (rules silently
+ignored → read as "exact-file rules fail"), and `MSYS_NO_PATHCONV=1` breaking `--settings` path
+translation (session errored before running → read as "zero denials, success"). The second is L-067 —
+the rule promoted to CLAUDE.md trap (d) at *this sprint's own promote* — catching me the same day.
+
+Per D3 **no mitigation shipped**. The one permitted change was made because the form finding is
+conclusive: the derivation guidance now states both preconditions and points at the evidence.
+Gate 69 pass, 0 fail.
