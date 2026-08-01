@@ -26,18 +26,37 @@
 #
 # Usage: sh check-layers-observed.sh <sprint-plan.md> [<sprint-plan.md> ...]
 # Only files whose frontmatter `status:` is `active` are checked; a non-active file is silently
-# skipped (not a FAIL) -- same convention as check-layers-completeness.sh. A missing file, a missing
-# `plan_commit:`, or a `plan_commit:` that doesn't resolve to a commit is its own named FAIL, never a
-# silent skip -- unlike "not active", those are input the checker cannot proceed without.
-# Prints one PASS/FAIL line per sprint file checked; exits 1 if any FAIL line was printed, 0
-# otherwise. Dependency-free POSIX sh -- no jq, no bashisms. Must run inside a git work tree.
+# skipped (not a FAIL) -- same convention as check-layers-completeness.sh. A missing file or a
+# `plan_commit:` that doesn't resolve to a commit is its own named FAIL, never a silent skip --
+# those are input the checker cannot proceed without.
+#
+# plan_commit: has THREE distinguishable states, not two (TD-026, SPRINT-045 T2). The repo's
+# two-commit sprint convention (see lock_plan() in evals/run-layers-observed-fixtures.sh) always
+# lands "plan locked" before the follow-up commit that patches the sprint file's own `plan_commit:`
+# field -- so a window always exists where the field still holds its promote-time placeholder
+# (`[sha -- set at promote]` or similar). That is a known-good, expected transient state, not a
+# defect, and reporting it as a FAIL is a guaranteed false alarm baked into the convention itself --
+# exactly the kind of cry-wolf a checker earns by naming its finding, then loses credibility by
+# firing on a state that always exists. So:
+#   - field genuinely empty (frontmatter never carried the key, or carried it with no value) --
+#     FAIL by name. This is real missing input the checker cannot proceed without.
+#   - field holds the bracketed placeholder literal (non-empty, contains `[`) -- named SKIP, never
+#     a bare `skip` and never a FAIL. Real commit shas are bare hex and never contain `[`, so
+#     emptiness-vs-bracketed-non-empty is a clean, reliable split between "never filled in" and
+#     "known placeholder, not yet promoted" -- no case has been found where the two are ambiguous.
+#   - field holds a non-empty, non-bracketed value that still doesn't resolve to a real commit --
+#     FAIL by name (existing `git rev-parse` guard below), unchanged.
+# Prints one PASS/FAIL/SKIP line per sprint file checked; exits 1 if any FAIL line was printed, 0
+# otherwise (a SKIP never flips the exit code). Dependency-free POSIX sh -- no jq, no bashisms. Must
+# run inside a git work tree.
 set -u
 
 fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
 
 fail=0
-ok()  { printf 'PASS  %s\n' "$1"; }
-bad() { fail=1; printf 'FAIL  %s\n' "$1"; }
+ok()   { printf 'PASS  %s\n' "$1"; }
+bad()  { fail=1; printf 'FAIL  %s\n' "$1"; }
+skip() { printf 'SKIP  %s\n' "$1"; }   # never flips $fail -- a SKIP is not a FAIL (TD-026)
 
 # Coordinator close-bookkeeping: files a sprint's own tasks never declare in Layers: because they
 # are edited at close by convention/decision (D1/D3 across SPRINT-042/SPRINT-043), never by a task.
@@ -73,8 +92,12 @@ for sp in "$@"; do
 
   plan_commit=$(fmv "$sp" plan_commit)
   case "$plan_commit" in
-    ''|*'['*)
+    '')
       bad "$sp layers observed: plan_commit not recorded in frontmatter"
+      continue
+      ;;
+    *'['*)
+      skip "$sp layers observed: plan_commit still holds the promote-time placeholder ($plan_commit) -- not recorded yet, skipping until the follow-up commit patches it in (TD-026)"
       continue
       ;;
   esac

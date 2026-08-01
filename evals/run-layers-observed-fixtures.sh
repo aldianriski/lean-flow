@@ -138,19 +138,27 @@ run_case_anywhere "matching-declaration" 0 \
   sh -c "cd \"$c2\" && sh \"$checker\" docs/sprint/SPRINT-900-matching.md"
 
 # ================================================================================================
-# case 3: plan_commit never recorded (constructed) -- must FAIL, its own named finding
+# case 3: plan_commit still holds the promote-time placeholder (constructed) -- must SKIP, named,
+# never a bare `skip` and never a FAIL (TD-026, SPRINT-045 T2). The two-commit sprint convention
+# (see lock_plan() above) always has a real window where "plan locked" has landed but the follow-up
+# "record plan_commit sha" commit hasn't -- the frontmatter still literally reads the bracketed
+# placeholder below. That is a known-good, expected transient, not a defect, so it must not report
+# as a FAIL (the old behaviour, which cried wolf on a state that always exists). Distinguished from
+# genuinely-absent (case 3b below) because the placeholder is a non-empty string containing `[`,
+# while a field that was never filled in resolves to true emptiness -- see check-layers-observed.sh
+# comment above its plan_commit case statement for the mechanism.
 # ================================================================================================
-c3="$work/plan-commit-missing"
+c3="$work/plan-commit-placeholder"
 mkdir -p "$c3/docs/sprint"
-cat > "$c3/docs/sprint/SPRINT-901-noplancommit.md" <<'EOF'
+cat > "$c3/docs/sprint/SPRINT-901-placeholder.md" <<'EOF'
 ---
 sprint: 901
-slug: noplancommit
+slug: placeholder
 status: active
-plan_commit: [sha — set at close]
+plan_commit: [sha — set at promote]
 ---
 
-# SPRINT-901 — No Plan Commit Recorded (constructed fixture)
+# SPRINT-901 — Plan Commit Still Placeholder (constructed fixture)
 
 ## Plan
 
@@ -163,11 +171,47 @@ Depends-on: none
 EOF
 printf 'a\n' > "$c3/foo.txt"
 git -C "$c3" init -q
-commit_all "$c3" 'plan locked, plan_commit not yet recorded'
+commit_all "$c3" 'plan locked, plan_commit not yet recorded (placeholder window)'
 
-run_case_anywhere "plan-commit-missing" 1 \
+run_case_anywhere "plan-commit-placeholder" 0 \
+  "plan_commit still holds the promote-time placeholder" -- \
+  sh -c "cd \"$c3\" && sh \"$checker\" docs/sprint/SPRINT-901-placeholder.md"
+
+# ================================================================================================
+# case 3b: plan_commit field genuinely absent -- never carried a value at all (constructed) -- must
+# still FAIL, its own named finding (TD-026's must-not-weaken leg, D4). Distinct from case 3: here
+# the frontmatter key is present but empty (fmv() returns true emptiness, no bracket, nothing to
+# mistake for a known placeholder), reproducing "a task promoted without ever wiring plan_commit in"
+# rather than the always-expected two-commit window.
+# ================================================================================================
+c3b="$work/plan-commit-genuinely-absent"
+mkdir -p "$c3b/docs/sprint"
+cat > "$c3b/docs/sprint/SPRINT-904-absent.md" <<'EOF'
+---
+sprint: 904
+slug: absent
+status: active
+plan_commit:
+---
+
+# SPRINT-904 — Plan Commit Genuinely Absent (constructed fixture)
+
+## Plan
+
+### T1 — edit foo.txt
+Layers: `foo.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] foo.txt updated
+EOF
+printf 'a\n' > "$c3b/foo.txt"
+git -C "$c3b" init -q
+commit_all "$c3b" 'plan locked, plan_commit field never wired in'
+
+run_case_anywhere "plan-commit-genuinely-absent" 1 \
   "plan_commit not recorded in frontmatter" -- \
-  sh -c "cd \"$c3\" && sh \"$checker\" docs/sprint/SPRINT-901-noplancommit.md"
+  sh -c "cd \"$c3b\" && sh \"$checker\" docs/sprint/SPRINT-904-absent.md"
 
 # ================================================================================================
 # case 4: coordinator close-bookkeeping files change but stay unflagged (constructed) -- must PASS.
