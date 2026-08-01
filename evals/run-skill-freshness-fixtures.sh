@@ -1,9 +1,9 @@
 #!/bin/sh
 # run-skill-freshness-fixtures.sh -- must-FAIL/must-SKIP/must-PASS fixtures for the
-# skill-freshness check in skills/orchestrator/references/night-run.md (L-058: a gate's worst
+# skill-freshness check in skills/orchestrator/references/night-run-checks.md (L-058: a gate's worst
 # failure is the silent false-negative; retain one fixture per outcome, never delete them).
 #
-# Extracts the *actual shipped snippet* from night-run.md (between the skill-freshness-check
+# Extracts the *actual shipped snippet* from night-run-checks.md (between the skill-freshness-check
 # anchors) so the fixtures test what a consumer really runs, not a hand-copied duplicate that can
 # drift out of sync with it. Dependency-free POSIX sh. Run bare: sh evals/run-skill-freshness-fixtures.sh
 set -u
