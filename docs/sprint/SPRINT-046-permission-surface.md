@@ -4,7 +4,7 @@ slug: permission-surface
 owner: Maintainer
 last_updated: 2026-08-01
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: 3459149
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
