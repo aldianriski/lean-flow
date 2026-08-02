@@ -81,17 +81,52 @@ context in a fixed order; **`/handoff`** carries the live thread to the next ses
 
 ## Quickstart
 
-Install (Claude Code):
+### Claude Code
 
-```bash
-claude plugin install lean-flow@lean-flow
-```
-
-Or via marketplace URL:
+Add the marketplace and install the plugin:
 
 ```bash
 claude plugin marketplace add https://github.com/aldianriski/lean-flow
+claude plugin install lean-flow@lean-flow
 ```
+
+Start a new Claude Code session, then invoke skills with slash commands such as `/prime`.
+
+### Codex
+
+Add the GitHub repository as a Codex marketplace:
+
+```bash
+codex plugin marketplace add aldianriski/lean-flow
+```
+
+Then start Codex, enter `/plugins`, select the **lean-flow** marketplace, and install and enable
+**Lean Flow**. Start a new Codex session so its bundled skills are loaded.
+
+Codex invokes skills with `$` mentions rather than custom slash commands. Plugin skills are
+namespaced, so use `$lean-flow:prime` instead of `/prime`:
+
+```text
+$lean-flow:prime Prime this repository.
+```
+
+You can also enter `/skills` and select any `lean-flow:*` skill. The command examples below use
+Claude Code's shorter `/skill-name` spelling; in Codex, use the corresponding
+`$lean-flow:skill-name` mention.
+
+### Kimi Code CLI
+
+Install the plugin from GitHub (or from a local checkout), then reload:
+
+```text
+/plugins install https://github.com/aldianriski/lean-flow
+/plugins install /path/to/lean-flow     # local checkout instead
+/reload
+```
+
+Kimi invokes skills with `/skill:` slash commands, so `/prime` becomes `/skill:prime`, `/flow`
+becomes `/skill:flow`, and so on — or just describe the task and let the model auto-invoke the
+skill from its description. Manifest → [`.kimi-plugin/plugin.json`](.kimi-plugin/plugin.json).
 
 Two ways to run it — **conducted** or **à la carte**.
 
@@ -306,6 +341,7 @@ Full map — composition rule, the loop, integration points, boundaries →
 
 ```
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
+.kimi-plugin/     plugin.json                           (Kimi Code CLI manifest, lockstep version)
 skills/           14 skills — /flow conductor + 12 stages + /council (auto-discovered)
   lean-doc-generator/
     references/   DOCS_Guide.md · migration-map.md · ADR-example.md

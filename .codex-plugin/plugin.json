@@ -1,0 +1,38 @@
+{
+  "name": "lean-flow",
+  "version": "1.25.2",
+  "description": "Lean agentic development workflow with planning, gated execution, testing, debugging, documentation, and release skills.",
+  "author": {
+    "name": "Aldian Rizki",
+    "email": "aldian.mar@gmail.com",
+    "url": "https://aldianrizki.com/"
+  },
+  "homepage": "https://github.com/aldianriski/lean-flow#readme",
+  "repository": "https://github.com/aldianriski/lean-flow",
+  "license": "MIT",
+  "keywords": [
+    "agentic-development",
+    "developer-workflow",
+    "planning",
+    "testing",
+    "documentation"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Lean Flow",
+    "shortDescription": "A lean, gated agentic development workflow.",
+    "longDescription": "Plan, implement, test, diagnose, document, and release software through a curated set of composable development skills.",
+    "developerName": "Aldian Rizki",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://aldianrizki.com/",
+    "defaultPrompt": [
+      "Prime this repository and summarize its current state.",
+      "Turn this feature request into a lean implementation plan.",
+      "Run the lean development flow for this task."
+    ]
+  }
+}

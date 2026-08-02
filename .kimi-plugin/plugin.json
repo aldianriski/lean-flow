@@ -1,0 +1,28 @@
+{
+  "name": "lean-flow",
+  "version": "1.25.2",
+  "description": "Lean agentic development workflow with planning, gated execution, testing, debugging, documentation, and release skills.",
+  "author": {
+    "name": "Aldian Rizki",
+    "email": "aldian.mar@gmail.com",
+    "url": "https://aldianrizki.com/"
+  },
+  "homepage": "https://github.com/aldianriski/lean-flow#readme",
+  "license": "MIT",
+  "keywords": [
+    "agentic-development",
+    "developer-workflow",
+    "planning",
+    "testing",
+    "documentation"
+  ],
+  "skills": "./skills/",
+  "skillInstructions": "These skills are cross-platform (written tool-agnostically, first shipped for Claude Code). When a skill body references `${CLAUDE_SKILL_DIR}`, resolve it to the directory containing that skill's SKILL.md and read its `references/` and `templates/` files from there. Mentions of Claude-specific built-ins (`/code-review`, `/verify`, `/security-review`, the `Explore` agent) have no direct Kimi equivalent — use the closest available capability (e.g. the `explore` subagent) or do the step directly.",
+  "interface": {
+    "displayName": "Lean Flow",
+    "shortDescription": "A lean, gated agentic development workflow.",
+    "longDescription": "Plan, implement, test, diagnose, document, and release software through a curated set of composable development skills.",
+    "developerName": "Aldian Rizki",
+    "websiteURL": "https://aldianrizki.com/"
+  }
+}
