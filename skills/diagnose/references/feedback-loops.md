@@ -11,7 +11,7 @@ give up. Spend disproportionate effort here.
 2. **Curl / HTTP script** against a running dev server.
 3. **CLI invocation** with a fixture input, diffing stdout against a known-good snapshot.
 4. **Headless browser script** (Playwright / Puppeteer) — drives the UI, asserts on DOM / console / network.
-5. **Replay a captured trace** — save a real request / payload / event log to disk, replay it through the code path in isolation.
+5. **Replay a captured trace** — save a real request / payload / event log to disk, replay it through the code path in isolation. *A captured trace carries live auth headers: keep the secret in an env var the replay reads, and quote only signal-carrying lines when showing it (SKILL.md § Redact before you show).*
 6. **Throwaway harness** — a minimal subset of the system (one service, mocked deps) that hits the bug code path in a single call.
 7. **Property / fuzz loop** — for "sometimes wrong output", run 1000 random inputs and look for the failure mode.
 8. **Bisection harness** — if the bug appeared between two known states (commit, dataset, version), automate "boot at state X → check → repeat" so `git bisect run` can drive it.

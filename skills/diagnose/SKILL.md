@@ -12,6 +12,20 @@ version: "0.2.0"
 A discipline for hard bugs. The rate of feedback is your speed limit — build the loop first. Skip a
 phase only when you can explicitly justify it.
 
+## Redact before you show
+
+Every phase below **produces an artifact and then shows it** — loop output, a captured trace, a log
+dump, a replayed payload, a HITL transcript. Those carry auth headers, tokens, connection strings and
+PII *by default*, and a debugging session is exactly where they get pasted into a chat, an issue, or a
+commit message. Redact first, and prefer the mechanism over the reminder:
+
+- **Build the loop against environment variables** so the credential stays in the environment rather
+  than in the command you show. That removes the whole class; redacting afterwards removes instances.
+- **Quote only the signal-carrying lines** of a captured artifact — never a whole HAR file or log dump.
+- Whatever must still be shown gets `<REDACTED>` in place of the secret, *before* it is shown.
+- If the redacted output is no longer enough to diagnose the bug, **say so and ask** — never widen what
+  you paste to compensate.
+
 ## Phase 1 — Build a feedback loop
 
 **This is the skill** — everything else just consumes the signal. Get a fast, deterministic,
@@ -71,6 +85,7 @@ promote) and hand the specifics to `/refactor-advisor` to design the deepening �
 
 ## Red flags
 
+❌ **Showing a captured artifact unredacted** — traces, HAR files, log dumps and replayed payloads carry auth headers by default, and this skill's whole method is to capture then show. Build the loop against env vars, quote only the signal-carrying lines, `<REDACTED>` whatever remains. `/handoff` already carries this rule; the two must not disagree about a safety default.
 ❌ **Hypothesising without a feedback loop** — guessing compounds bugs; Phase 1 is non-negotiable.
 ❌ **Fixing the wrong bug** — the loop must reproduce the *user's* symptom, not a nearby one.
 ❌ **Multiple simultaneous changes** — violates one-variable-per-test; invalidates the diagnosis.
