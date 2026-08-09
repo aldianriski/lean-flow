@@ -105,6 +105,13 @@ status: current
   - Mitigation (not yet done): accept `stream-json` and treat any new line as progress; **or** detect a
     buffered output format and report a named `UNKNOWN` rather than `DEAD-ON-ARRIVAL`, since the
     inference ("the prompt may have been rejected") is simply invalid when no output can appear.
+  - **Re-reviewed 2026-08-09 (SPRINT-048 promote, 3 sprints open) — escalated, not deferred again.**
+    The trigger is unchanged and the row has aged the full window without action. It also fits L-087's
+    newly-promoted rule closely enough to be worth naming: the *symptom* (a healthy run reported
+    `DEAD-ON-ARRIVAL`) is precisely recorded, and the *mechanism* (`json` buffers until exit) is stated
+    but never actually tested — no probe has confirmed the launcher goes quiet for buffering rather than
+    for some other reason. **Scheduled as SPRINT-048 T5**, whose first step is therefore to reproduce
+    the buffering claim before choosing between the two mitigations, not after.
 
 - **TD-028** severity: medium | status: resolved → SPRINT-046 T1 | created: Sprint-045
   - Summary: a **directory-prefix permission rule does not match**. `Bash(sh evals/:*)` was written to
@@ -150,31 +157,6 @@ status: current
   - **Reopen only on new evidence**: a long run that hits the same shape *after* the redirect
     explanation has been excluded. Reproduce-before-theorising applies to the reopen too.
 
-- **TD-026** severity: trivial | status: resolved → SPRINT-045 T2 | created: Sprint-044
-  - Summary: the two-commit convention for `plan_commit`/`close_commit` (commit, then record the sha in
-    a follow-up) collides with the observed-layers check, which reads `plan_commit` from frontmatter.
-    Between the `plan locked` commit and the sha-recording commit the gate necessarily reports
-    `plan_commit not recorded` — one FAIL, by construction, in a window that always exists.
-  - Impact: cosmetic but corrosive. Anyone running the gate in that window sees a red result that is
-    neither a defect nor actionable, and a gate that cries wolf on a known-good state is a gate people
-    start reading past. The check is otherwise behaving correctly — it names its finding rather than
-    passing (L-059).
-  - Mitigation (not yet done): let the check treat an unset-but-placeholder `plan_commit` on a sprint
-    whose `status:` just became active as a `SKIP` with a named reason, rather than a FAIL — or record
-    the sha in the same commit by writing it post-hoc, which the current convention deliberately avoids.
-    Either way the fix should not weaken the genuine "plan_commit missing at execute time" case.
-
-- **TD-025** severity: minor | status: resolved → SPRINT-045 T1 | created: Sprint-044
-  - Summary: the dispatch preflight's shared-file check requires a **direct** `Depends-on:` edge between
-    every pair of tasks touching one file. A transitive chain (`T1→T2→T3→T4`, all editing one reference)
-    orders those tasks unambiguously, but the check HALTs on the pairs without a direct edge.
-  - Impact: a false positive that blocks a legitimate Plan. SPRINT-044 hit it at promote with four tasks
-    chained on one file and worked around it by writing redundant edges (`Depends-on: T1, T2, T3`),
-    which is noise that will be copied by the next Plan. The check's *intent* — no unowned concurrent
-    edit — is fully satisfied by a chain, since strictly sequential execution cannot collide.
-  - Mitigation (not yet done): compute the transitive closure of `Depends-on:` before the pairwise
-    check, so an ordering derivable through the chain counts as owned. Negative-test it per L-058: a
-    genuine unowned overlap (two rank-0 tasks, no path between them) must still FAIL.
 
 
 

@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-047 closed 2026-08-09.
+> **SPRINT-048 — Epic Layer** → [`docs/sprint/SPRINT-048-epic-layer.md`](docs/sprint/SPRINT-048-epic-layer.md)
 
 ---
 
@@ -89,6 +89,21 @@ status: current
       assumes:    ADR-006 is append-only once decided, so this lands as a superseding note or an
                   amendment rather than an edit to the decided text
       tracker:    docs/research/mattpocock.md § Re-scan, Keeper 2
+      state:      ready
+
+- [ ] TASK-151 — Fix the launcher's DEAD-ON-ARRIVAL false verdict (TD-029)  [size: S] [risk: low] [HITL]
+      class:      execution
+      done-when:  the buffering claim is **reproduced first** (does `--output-format json` actually keep
+                  the log empty for a whole healthy run?), then either `stream-json` is accepted and any
+                  new line counts as progress, or a buffered format reports a named `UNKNOWN` instead of
+                  `DEAD-ON-ARRIVAL`; the calibration row's `total_cost_usd` need is met either way, and
+                  the chosen behaviour is exercised against a run that is genuinely healthy
+      touches:    scripts/night-run.sh · orchestrator/references/night-run.md (Part 3)
+      depends-on: none
+      assumes:    TD-029's stated mechanism (json buffers until exit) is a **hypothesis, not a finding** —
+                  L-087 applies, so reproduce before mitigating · the json-vs-stream-json conflict is
+                  real: json is what exposes total_cost_usd for the calibration row
+      tracker:    TECH-DEBT.md TD-029
       state:      ready
 
 - [ ] TASK-148 — Prove bulk throughput on one real night run  [size: M] [risk: med] [HITL]

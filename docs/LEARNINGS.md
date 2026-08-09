@@ -37,10 +37,9 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-087 [tags: process] [status: active]: **A reported symptom is evidence; the mechanism reported alongside it is a hypothesis — and in this repo the hypothesis has been wrong three times running.** TD-024 was filed with "`git -C` cannot resolve POSIX paths on MSYS" (false — it resolves fine), corrected at a close to "probably transient worktree state" (also false), and finally root-caused to an inherited `MSYS_NO_PATHCONV`. TD-027 was filed as "the permission surface degrades mid-session" and falsified by a 26-turn probe; the discriminator was a redirect, which an existing rule already covered. In every case the **symptom was real and precisely recorded** — the exact error string, the exact denied commands — and in every case the attached explanation was wrong. That asymmetry is the lesson: a symptom is something observed, a mechanism is something *inferred*, and they arrive welded together in the same report looking equally factual. The costs are asymmetric too — TD-024's first diagnosis nearly spread a `pwd -W` workaround across seven harnesses, and TD-027's would have bought a structural defence against nothing. Practical rule: **when a report contains both, treat the symptom as data and the mechanism as the thing to test first** — and prefer "not established" over a plausible story, because a plausible story ends inquiry while an honest gap invites it.
-- seen: Sprint-044, Sprint-045, Sprint-046
-- count: 3
-- promoted: no
+## L-087 [tags: process] [status: promoted]: a symptom is observed, the mechanism welded to it is inferred — treat the symptom as data and the mechanism as the first thing to test.
+- **L-087 → promoted: `skills/diagnose/SKILL.md` § Red flags** — the durable rule is the record now (§11 collapse, SPRINT-048 promote). Body: git; TD-024 (three mechanisms, two wrong) · TD-027 (falsified by a 26-turn probe). seen Sprint-044/045/046, count 3.
+- **Promotion was overdue**: it reached count 3 and sat unpromoted, because the SPRINT-047 promote scan matched `count` and `promoted:` on the same line while this ledger puts them on separate ones. The scan, not the rule, was the failure.
 - related: L-078 (a green result from a broken setup) · L-085 (hand the verification forward) · L-060 (inspect the artifact, not the report) · TD-024 · TD-027
 
 ---
