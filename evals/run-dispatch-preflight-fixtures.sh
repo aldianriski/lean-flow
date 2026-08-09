@@ -60,6 +60,46 @@ run_case_anywhere "sprint-044-chain" 0 "PASS shared-file-owned-transitive" -- \
 run_case_anywhere "shared-file-unowned-diverging-ranks" 1 "FAIL shared-file-unowned" -- \
   sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/shared-file-unowned-diverging-ranks/sprint.md\" \"$live_head\""
 
+# --- case 6 (TD-040): shared.md sits on an INDENTED CONTINUATION of Layers: in both tasks --------
+# Pre-fix the parser matched only lines beginning `Layers:`, so a wrapped declaration kept its first
+# line and every path on the continuation was invisible -> PREFLIGHT: CLEAR over a real unowned
+# overlap. Observed live at the SPRINT-053 and SPRINT-054 promotes; harmless both times only because
+# the overlap happened to carry a Depends-on edge anyway (luck, not the check).
+run_case_anywhere "wrapped-layers-unowned" 1 "FAIL shared-file-unowned: shared.md" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/wrapped-layers-unowned/sprint.md\" \"$live_head\""
+
+# --- case 7 (TD-043): T1 declares a DIRECTORY token, T2 a file inside that tree ------------------
+# Pre-fix the token pattern required a dot extension, so a token ending in "/" was extracted by
+# nothing and compared against nothing. The rule "declare a directory only for a tree ONE task owns"
+# was stated in a header comment -- a comment, not a check.
+run_case_anywhere "directory-token-unowned" 1 "FAIL shared-file-unowned: evals/fixtures/ ~ " -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/directory-token-unowned/sprint.md\" \"$live_head\""
+
+# --- case 8: PARSER PARITY -- one input, both parsers, same declarations seen --------------------
+# The snippet re-implements a parser scripts/lib/check-layers-completeness.sh already has correct,
+# and drifted from it twice (TD-040, TD-043). G2 ruled against removing the duplication -- dispatch.md
+# publishes the snippet as dependency-free and runnable-verbatim, and pointing it at scripts/lib/
+# would ship a maintainer-only path inside a consumer-facing reference (L-015). So the duplication is
+# guarded instead of removed: one fixture, deliberately awkward in both ways that broke the snippet,
+# driven through both tools.
+#
+# Asserted on OUTPUT CONTENT, never on exit status -- and that distinction is the whole case. Run
+# against the pre-fix snippet this same fixture exits 0 and prints "PREFLIGHT: CLEAR" while silently
+# reporting NEITHER overlap: the parser saw no shared files at all. Exit code identical, verdict
+# empty. That is CLAUDE.md trap (c) in one line -- a status is evidence about the reporter, never
+# about the artifact (L-060).
+parity="$here/fixtures/dispatch-preflight/parser-parity/sprint.md"
+parity_out=$(cd "$repo_root" && sh "$script_tmp" "$parity" "$live_head" 2>&1)
+for want in "shared/tree/ ~ shared/tree/nested.md in T1,T2" "common.md in T1,T2"; do
+  case "$parity_out" in
+    *"$want"*) echo "PASS fixture(parser-parity/preflight): saw '$want'" ;;
+    *) echo "FAIL fixture(parser-parity/preflight): '$want' missing -- the snippet stopped reading a declaration the full checker still reads:"
+       printf '%s\n' "$parity_out"; fail=1 ;;
+  esac
+done
+run_case_anywhere "parser-parity/completeness" 0 "### T2 Layers completeness" -- \
+  sh -c "cd \"$repo_root\" && sh scripts/lib/check-layers-completeness.sh \"$parity\""
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "DISPATCH-PREFLIGHT FIXTURES: all green"; else echo "DISPATCH-PREFLIGHT FIXTURES: at least one FAIL"; fi
 exit $fail

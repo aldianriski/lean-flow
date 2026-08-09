@@ -85,3 +85,37 @@ No task is added to the sprint's *substance*; one task's two halves became two t
 **Re-confirm G2.** Owner signed the split, the ownership chain extension and the retained-allowlist
 requirement in the same round as A1–A4. G1 scope is unchanged — the sprint still delivers exactly what
 § Scope names.
+
+### 2026-08-09 | complete | T1 — preflight parser patched; the parity fixture caught the old parser reporting nothing at exit 0
+Both defects fixed in the `dispatch.md` snippet: `Layers:`/`Depends-on:` now carry an open-declaration
+state so **indented continuations** are collected (a `Cites:` continuation deliberately is not — those
+tokens are cited, not touched), and the token pattern gained a directory arm
+(`[A-Za-z0-9_.-][A-Za-z0-9_./-]*/`) with a prefix-aware `overlaps()` in the awk comparison. A collision
+by prefix now names **both** tokens (`evals/fixtures/ ~ evals/fixtures/dispatch-preflight/sprint.md`)
+rather than a file neither task declared.
+
+**L-090 pair, both fixtures, measured rather than asserted:**
+
+| fixture | old snippet | new snippet |
+|---|---|---|
+| `wrapped-layers-unowned` | exit 0 · `PREFLIGHT: CLEAR` | exit 1 · `FAIL shared-file-unowned: shared.md` |
+| `directory-token-unowned` | exit 0 · `PREFLIGHT: CLEAR` | exit 1 · `FAIL shared-file-unowned: evals/fixtures/ ~ …` |
+
+**The parity fixture produced the sprint's sharpest result so far.** Driven through the *pre-fix*
+snippet it exits **0** and prints `PREFLIGHT: CLEAR` — while reporting **neither** of the two overlaps
+the two tasks genuinely share. Same exit code as the fixed parser, empty verdict. An
+exit-code-only assertion would have called that a pass, so the parity case asserts on output content
+and names the two overlap lines it must see. This is CLAUDE.md trap (c) reproduced in a controlled
+setting: a status is evidence about the reporter, never about the artifact (L-060) — and it is worth
+recording that the *fixtures for this very task* would have been fooled had they been written the
+obvious way.
+
+Regression: the five pre-existing preflight fixtures still pass unchanged, and the live SPRINT-056
+Plan still reports `PREFLIGHT: CLEAR` under the new parser. Suite now 10 cases, all green.
+Gate: 89 pass, 0 fail.
+
+**Not done, deliberately:** the snippet still duplicates the full checker's parser. G2 ruled against
+removing the duplication (the snippet is published dependency-free and runnable-verbatim; a
+`scripts/lib/` dependency would be an L-015 leak into a consumer-facing reference), so the duplication
+is now *guarded* by the parity case rather than removed. If a third drift appears, the ruling to
+revisit is that contract, not the parser.

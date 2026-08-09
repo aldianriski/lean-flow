@@ -50,16 +50,16 @@ the real checker rather than be patched a second time, and patching twice is how
 (a) a wrapped/indented `Layers:` declaration and (b) a directory token ending in `/`.
 
 **DoD:**
-- [ ] Re-derive the shape first (TD-040's open question): patch the snippet, or have it call
+- [x] Re-derive the shape first (TD-040's open question): patch the snippet, or have it call
       `check-layers-completeness.sh`. Record the ruling and its reason before writing code — the
       snippet ships inside a consumer-facing reference, which is what makes duplication expensive
-- [ ] Wrapped/indented `Layers:` continuation lines are read by the preflight
-- [ ] A directory token ending in `/` participates in the overlap comparison (prefix-aware), or is
+- [x] Wrapped/indented `Layers:` continuation lines are read by the preflight
+- [x] A directory token ending in `/` participates in the overlap comparison (prefix-aware), or is
       rejected outright in a multi-task Plan — whichever the ruling above chose
-- [ ] Two must-FAIL fixtures, one per check, each currently reporting CLEAR on a real overlap and
+- [x] Two must-FAIL fixtures, one per check, each currently reporting CLEAR on a real overlap and
       afterwards HALTing with its named finding (L-058)
-- [ ] Both fixtures verified red-on-new **and** green-on-old against the pre-fix snippet (L-090)
-- [ ] Fixtures retained and wired into `qa-check.sh`, not deleted with the prototype (TD-012)
+- [x] Both fixtures verified red-on-new **and** green-on-old against the pre-fix snippet (L-090)
+- [x] Fixtures retained and wired into `qa-check.sh`, not deleted with the prototype (TD-012)
 
 ### T2 — Derive doc-cap coverage from the §2 table instead of hand-listing it `[size: M · risk: med · class: decision · HITL]`
 Layers: `scripts/qa-check.sh` · `scripts/lib/check-doc-caps.sh` · `skills/lean-doc-generator/references/DOCS_Guide.md` · `evals/run-doc-caps-fixtures.sh` · `evals/fixtures/doc-caps/`

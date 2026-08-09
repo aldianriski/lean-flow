@@ -101,7 +101,11 @@ fi
 # Guard note (L-058): `read` on the file's last line returns non-zero if that
 # line has no trailing newline -- `|| [ -n "$line" ]` still lets the body run
 # once more for it, so a single-file Layers: entry on the final line survives.
-inplan=0; tid=""; layers=""; deps=""
+# TOK (TD-043): a token is file-shaped (carries a .ext) OR directory-shaped (ends in "/"). The
+# directory arm matters because `Layers: evals/fixtures/` carries no dot at all, so a file-only
+# pattern skipped it silently and two tasks could declare the same tree with no overlap reported.
+TOK='[A-Za-z0-9_./-]+\.[A-Za-z0-9]+|[A-Za-z0-9_.-][A-Za-z0-9_./-]*/'
+inplan=0; tid=""; layers=""; deps=""; cur=""
 flush() { [ -n "$tid" ] && printf '%s\t%s\t%s\n' "$tid" "$layers" "$deps" >>"$records"; }
 while IFS= read -r line || [ -n "$line" ]; do
   case "$line" in
@@ -113,14 +117,30 @@ while IFS= read -r line || [ -n "$line" ]; do
     "### T"*)
       flush
       tid=$(printf '%s' "$line" | grep -oE '^### T[0-9]+' | sed 's/^### //')
-      layers=""; deps=""
+      layers=""; deps=""; cur=""
       ;;
     "Layers:"*)
-      layers=$(printf '%s' "$line" | grep -oE '[A-Za-z0-9_./-]+\.[A-Za-z0-9]+' | tr '\n' ',')
+      cur=L; layers="$layers$(printf '%s' "$line" | grep -oE "$TOK" | tr '\n' ',')"
       ;;
     "Depends-on:"*)
-      deps=$(printf '%s' "$line" | grep -oE 'T[0-9]+' | tr '\n' ',')
+      cur=D; deps="$deps$(printf '%s' "$line" | grep -oE 'T[0-9]+' | tr '\n' ',')"
       ;;
+    "Cites:"*)
+      cur=C
+      ;;
+    [[:blank:]]*)
+      # An INDENTED line CONTINUES the declaration above it (TD-040), matching how the full
+      # checker and TODO.md entries already wrap. Previously only column-0 `Layers:` lines were
+      # read, so a wrapped declaration kept its first line and every path on the continuation was
+      # invisible -- a silent false PASS on a real overlap, observed live at the SPRINT-053 and
+      # SPRINT-054 promotes. A `Cites:` continuation is deliberately NOT collected: those tokens
+      # are cited, not touched, so folding them into Layers: would invent overlaps.
+      case "$cur" in
+        L) layers="$layers$(printf '%s' "$line" | grep -oE "$TOK" | tr '\n' ',')" ;;
+        D) deps="$deps$(printf '%s' "$line" | grep -oE 'T[0-9]+' | tr '\n' ',')" ;;
+      esac
+      ;;
+    *) cur="" ;;
   esac
 done < "$sprint"
 flush
@@ -131,6 +151,16 @@ awk -F'\t' '
 # derived order as "anchor -> ... -> tgt" (TD-025 -- names the chain, not just the two endpoints,
 # so a PASS reads as ownership-by-chain rather than ownership-by-direct-edge). visited guards
 # against runaway recursion if this is ever reached alongside an undetected cycle.
+# overlaps(x,y): two declared tokens collide when they are the same path, OR when one is a
+# directory token (trailing "/") that prefixes the other (TD-043). Without the prefix arm `evals/`
+# and `evals/fixtures/dispatch-preflight/` read as unrelated files and a genuinely shared tree
+# dispatches unowned -- the same silent false PASS the equality-only test was already producing.
+function overlaps(x, y) {
+  if (x == y) return 1
+  if (substr(x, length(x), 1) == "/" && substr(y, 1, length(x)) == x) return 1
+  if (substr(y, length(y), 1) == "/" && substr(x, 1, length(y)) == y) return 1
+  return 0
+}
 function find_chain(tgt, anchor, visited,   d, m, darr, j, chainsub, v2) {
   if (tgt == anchor) return tgt
   if (index(","visited",", ","tgt",") > 0) return ""
@@ -208,15 +238,18 @@ END {
       nj=split(lj,fj,",")
       for (a=1;a<=ni;a++) { if (fi[a]=="") continue
         for (b=1;b<=nj;b++) { if (fj[b]=="") continue
-          if (fi[a]==fj[b]) {
+          if (overlaps(fi[a],fj[b])) {
+            # name BOTH tokens when they collide by prefix rather than by equality, so the finding
+            # reads as the tree it is and not as a file neither task declared.
+            lbl = (fi[a]==fj[b]) ? fi[a] : fi[a]" ~ "fj[b]
             edge=0; direct=0; first=""; second=""; chain=""
             if (index(","deps[tj]",", ","ti",")>0) { edge=1; direct=1; first=ti; second=tj }
             else if (index(","deps[ti]",", ","tj",")>0) { edge=1; direct=1; first=tj; second=ti }
             else if (index(reach[tj], ","ti",")>0) { edge=1; direct=0; first=ti; second=tj; chain=find_chain(tj,ti,"") }
             else if (index(reach[ti], ","tj",")>0) { edge=1; direct=0; first=tj; second=ti; chain=find_chain(ti,tj,"") }
-            if (edge && direct) print "PASS shared-file-owned: "fi[a]" in "ti","tj" order="first"->"second
-            else if (edge) print "PASS shared-file-owned-transitive: "fi[a]" in "ti","tj" derived-order="chain
-            else { print "FAIL shared-file-unowned: "fi[a]" in "ti" and "tj" has no Depends-on edge, direct or transitive"; fail=1 }
+            if (edge && direct) print "PASS shared-file-owned: "lbl" in "ti","tj" order="first"->"second
+            else if (edge) print "PASS shared-file-owned-transitive: "lbl" in "ti","tj" derived-order="chain
+            else { print "FAIL shared-file-unowned: "lbl" in "ti" and "tj" has no Depends-on edge, direct or transitive"; fail=1 }
           }
         }
       }
