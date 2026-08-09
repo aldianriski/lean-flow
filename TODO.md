@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-050 closed 2026-08-09.
+> **SPRINT-051 — Keeper Adoption** → [`docs/sprint/SPRINT-051-keeper-adoption.md`](docs/sprint/SPRINT-051-keeper-adoption.md)
 
 ---
 
@@ -80,20 +80,6 @@ status: current
       tracker:    docs/research/mattpocock.md § Keepers K2 · K3 · K4
       state:      ready
 
-- [ ] TASK-148 — Prove bulk throughput on one real night run  [size: M] [risk: med] [HITL]
-      class:      execution
-      done-when:  a ≥10-task Plan promoted and fired unattended; ≥8 units landed; calibration row recorded in
-                  night-run.md with cost · turns · wall-clock · units · shape
-      touches:    docs/sprint/ · orchestrator/references/night-run.md (calibration row)
-      depends-on: TASK-147
-      assumes:    the log split is the binding constraint — if the run still halts early, the cause is elsewhere
-                  (headless turn budget / AFK classification) and this task becomes a /diagnose ·
-                  cost at recorded $5.42–8.27 per unit delivered ≈ $55–85 for ten units
-      tracker:    none — local plugin repo, no external tracker
-      state:      blocked — done-when needs a ≥10-task Plan; the backlog holds three tasks, so this is
-                  unsatisfiable today. Unblock when the backlog carries ≥10 ready AFK-suitable tasks,
-                  or when the owner lowers the threshold to what a real Plan can reach.
-
 ### P3 — Long-term
 
 - [ ] TASK-159 — Get evidence on whether "push right" beats gate-before-work  [size: S] [risk: low] [HITL]
@@ -127,6 +113,7 @@ status: current
                   evidence is not a task. Unblock when either a measurable signal is identified or the
                   owner rules it closed on judgement.
 
+> TASK-148 (bulk-throughput proof) → routed to `.out-of-scope/bulk-throughput-proof.md` (2026-08-09) — unsatisfiable by construction for three consecutive promotes: its ≥10-task Plan threshold mistook the log split's *capacity* ceiling for task *supply*. Revisit-if + a SPRINT-060 expiry recorded; the calibration-series gap it named is real and explicitly not closed by the routing.
 > TASK-120 (checkpointed run-state) → routed to `.out-of-scope/checkpointed-run-state.md` (2026-07-30) — ADR-013's kill-switch fired: the promotion trigger (a real unattended run the Execution Log + `/handoff` could not resume) stayed unfired through the 5-sprint window; revisit-if + the reconciliation-rule precondition recorded. Learning: L-068.
 > TASK-040 (derived graph view) → routed to `.out-of-scope/derived-graph-view.md` (2026-07-29) — council-2 gate held; the TASK-041 retrieval-miss signal never fired; graphify serves the need ad-hoc (revisit-if + 3 guardrails recorded).
 > TASK-047 (council multi-model backend) → routed to `.out-of-scope/council-multi-model-backend.md` (2026-07-29) — TASK-048 + TASK-065 probes found no exposed crack; revisit-if: a cross-provider test shows a real shared factual error (BYO-provider seam only).
