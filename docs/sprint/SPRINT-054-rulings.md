@@ -73,7 +73,7 @@ six lean-flow deliberately does without, and why.
 ### T2 — Close the ❌-negation question by reading `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/research/mattpocock.md` · `.claude/CLAUDE.md`
 Depends-on: T1
-Cites: `TECH-DEBT.md`
+Cites: `TECH-DEBT.md` · T4
 
 TASK-155. `writing-for-agents` claims prohibition activates the forbidden behaviour, which cuts against
 the ❌ house style every anti-pattern row uses. L-094's test names this a **documented-behaviour**
@@ -85,19 +85,22 @@ warranted") is a real outcome and is recorded as one, not treated as a failure t
 sources rather than preference, and § Still open no longer carries it.
 
 **DoD:**
-- [ ] Sources on negation / prohibition in instruction-following read and **cited** — a verdict with no
+- [x] Sources on negation / prohibition in instruction-following read and **cited** — a verdict with no
       citation is the preference this task exists to avoid
-- [ ] Verdict tested against our actual style, not the general claim: confirm A3 by reading
+- [x] Verdict tested against our actual style, not the general claim: confirm A3 by reading
       `.claude/CLAUDE.md` § Anti-Patterns — every ❌ row pairs the trap with a positive rule — and rule
       on whether that pairing neutralises the effect
-- [ ] The verdict lands in `docs/research/mattpocock.md`; its § Still open row is removed (closed, not
+- [x] The verdict lands in `docs/research/mattpocock.md`; its § Still open row is removed (closed, not
       re-parked)
-- [ ] If the verdict is "amend", the amendment lands in `.claude/CLAUDE.md` only — §10's placement test
+- [x] If the verdict is "amend", the amendment lands in `.claude/CLAUDE.md` only — §10's placement test
       puts a repo-wide style rule where every flow reads it — and skill `## Red flags` rewrites are
       filed as a follow-up `TASK-NNN` rather than swept into an S-sized task. That file sits at **80 of
       its 80 cap**, so an amendment there displaces something — a ruling, not an append
-- [ ] If the edit pushes `mattpocock.md` past its 120 soft cap, apply **TD-038's** named remedy (split
+- [x] If the edit pushes `mattpocock.md` past its 120 soft cap, apply **TD-038's** named remedy (split
       per-scan files behind an index), never a squeeze — and log it as a scope-change first
+      → **discharged as routed, not applied.** The premise was stale: the file was **124 before T2**
+      (breached at `bab405f`, SPRINT-050 T2 — the sprint that filed TD-038 recording 117) and is 143
+      after. Scope-change logged, nothing squeezed, remedy owner-ruled to **T4**
 
 ### T3 — Rule on push-right vs gate-before-work `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/research/mattpocock.md` · `.claude/CONTEXT.md` · `skills/orchestrator/SKILL.md`
@@ -126,6 +129,37 @@ re-parked.
       half-shipped). `CONTEXT.md` sits at 124 of its 130 cap (ADR-007): any addition fits or displaces,
       never raises the cap
 - [ ] If nothing changes, both files are left untouched and the reason is in the verdict
+
+### T4 — Split `mattpocock.md` per TD-038's remedy `[size: S · risk: low · class: execution · HITL]`
+Layers: `docs/research/mattpocock.md` · `TECH-DEBT.md`
+Depends-on: T3
+Cites: `TODO.md` · `scripts/qa-check.sh` · T2
+
+**Added mid-sprint by owner ruling** (2026-08-09 scope-change) — not promoted with the Plan. T2
+measured the file at **143 against its 120 soft cap**, already breached at 124 before this sprint
+started, at `bab405f` — the SPRINT-050 commit four steps after TD-038 was filed recording 117. TD-038
+held on the grounds that the breach was *hypothetical* and the doc *correct at 117*; both are now
+false, which retires the reason for holding. Runs last because T2 and T3 both write into this file, and
+restructuring a document that is about to change again is how a split gets done twice.
+
+**Acceptance:** `mattpocock.md` is back under its 120 soft cap with **no signal removed** — per-scan
+detail lives behind an index, every inbound reference still resolves, and TD-038 is closed against
+measured numbers rather than the stale ones it still carries.
+
+**DoD:**
+- [ ] Split by **moving whole sections**, never compressing (§7 growth rule — knowledge docs split,
+      ledgers compress). The parent keeps the question, the scan-verdict block, the delta map and the
+      closed/open verdicts; per-scan keeper detail is what moves
+- [ ] Every inbound reference resolves after the move — `TODO.md` trackers, `TECH-DEBT.md`, and the
+      sprint files that cite this doc
+- [ ] Line delta measured and reported for parent **and** children, not estimated
+- [ ] TD-038 marked `status: resolved → SPRINT-054 T4`, and its stale text corrected to the measured
+      history (114 → 117 → 124 → 143) — a row whose summary is false is TD-036's shape repeating
+- [ ] `sh scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+
+<!-- Deliberately NOT in this task: teaching qa-check.sh to cap-check docs/research/. That gap is why
+     the breach went unseen for four sprints, and it is a real finding — but the owner ruled a split,
+     not a gate change, and a new gate check needs its own must-FAIL fixture (L-058). → Retro follow-up. -->
 
 ## Owner-action checklist
 - [ ] **Reinstall the plugin before the next session** — this promote ran on 1.25.2 skills against a
@@ -182,6 +216,8 @@ re-parked.
 | `docs/architecture/overview.md` | T1 | § Boundaries gains the three exemptions with reason + revisit trigger (A2 home); dir map gains `development/`, `AGENTS.md`, `SECURITY.md`, `LICENSE` | Low | 92 ≤ 150 cap; qa-check ownership + structure re-read (L-009) |
 | `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §2 `product/requirements.md` create-trigger states the second-SSOT condition — consumer-facing, authorised by the 2026-08-09 scope-change | Med | greenfield `init` explicitly unaffected; no repo-specific path in the clause (L-015) |
 | `README.md` | T1 | repo-layout block reflects what landed | Low | structure re-read after the edit (L-009) |
+| `docs/research/mattpocock.md` | T2 | negation question closed with a cited verdict — null result; § Still open drops to one row | Low | 4 sources read incl. 2 primary; 124 → 143 lines, cap breach routed to T4 |
+| `.claude/CLAUDE.md` | T2 | **not changed** — verdict was "no change warranted"; recorded so the untouched file reads as a decision | — | A3 confirmed row-by-row against § Anti-Patterns |
 
 ## Retro
 

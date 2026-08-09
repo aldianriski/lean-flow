@@ -104,12 +104,31 @@ invocations of the same forked skill**, and our fan-out runs one procedure skill
 once, so B removes the concurrency it was being considered for. Trail, evidence, revisit-if and a
 dated expiry → [`.out-of-scope/skill-self-fork.md`](../../.out-of-scope/skill-self-fork.md).
 
+**Closed at SPRINT-054 T2 (TASK-155) — negation in anti-patterns: no change warranted.** The claim is
+real but narrower than `writing-for-agents` states, and our ❌ rows already sit on its safe side. In
+order of weight: the popular write-up runs **no experiment** — it rests on Ironic Process Theory, a
+*human* result, plus forum anecdotes, and says so
+([16x](https://eval.16x.engineer/blog/the-pink-elephant-negative-instructions-llms-effectiveness-analysis)).
+**NeQA**, the benchmark usually invoked, measures *negation comprehension in question answering*, not
+instruction-following under prohibition — a different construct — and its own finding is that the task
+shows "inverse scaling, U-shaped scaling, or positive scaling", shifting in that order with more
+powerful prompting methods or model families; the alarming version is its weakest-prompt corner
+([Zhang et al., ACL 2023 Findings](https://arxiv.org/abs/2305.17311)). Anthropic's guidance — "Tell
+Claude what to do instead of what not to do", worked as "Do not use markdown" → "smoothly flowing prose
+paragraphs" — targets a **bare** prohibition that leaves no positive target
+([prompting best practices](https://platform.claude.com/docs/en/docs/build-with-claude/prompt-engineering/be-clear-and-direct)).
+The decisive datum is on that same page: its own production prompt samples are built *from*
+prohibitions — "DO NOT use ordered lists … unless: a) … b) …" · "NEVER output a series of overly short
+bullet points" · "Don't add features … beyond what was asked" · "Don't add error handling … for
+scenarios that can't happen. … Only validate at system boundaries." Each is **scoped and paired with a
+positive rule**, which is the shape our rows already use — checked row by row across `.claude/CLAUDE.md`
+§ Anti-Patterns rather than assumed (A3 confirmed). So the invariant worth protecting is the
+**pairing**, not the ❌ glyph. Recorded as a null result and nothing was edited to prove the question
+was answered — that is this sprint's named failure mode (SPRINT-054 D1).
+
 **Still open**
-- **Negation in anti-patterns** — `writing-for-agents` argues prohibition activates the forbidden
-  behaviour, cutting against `.claude/CLAUDE.md`'s ❌ house style. Needs evidence, not preference. →
-  TASK-155 (`needs-info`).
 - **Push right** — `loop-me` argues for deferring a human checkpoint as far as it will go, against our
-  gate-*before*-work model. Same shape as the negation question: a real tension, needs evidence.
+  gate-*before*-work model. A judgement call about our own gate placement (L-094), settled by ruling.
 
 ## Not scanned
 

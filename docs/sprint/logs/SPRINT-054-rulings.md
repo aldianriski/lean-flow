@@ -110,3 +110,37 @@ doc templates … = 32 total" while the real count is 32 core + 2 non-core = 34,
 T1's scope — routed to the Retro's follow-up bucket.
 
 QA gate re-run bare immediately before the commit: 71 pass, 0 fail.
+
+### 2026-08-09 | scope-change | T2's cap DoD rests on a stale number — the breach predates this sprint
+
+**What broke.** T2's fifth DoD line reads "*if the edit pushes `mattpocock.md` past its 120 soft cap,
+apply TD-038's named remedy*". It assumes the file is under the cap and that this task's edit would be
+what crosses it. Measured at execution: the file was **124 lines before T2 touched it** and is **143
+after**. The premise was false when the Plan froze.
+
+Traced with `git show <sha>:<path> | wc -l` rather than inferred: 114 at `5fa44de` (SPRINT-050 T1) →
+117 at `4793504` (T3) → **124 at `bab405f` (SPRINT-050 T2)**. TD-038 was filed *during Sprint-050*
+recording 117 and stating the next re-scan would "breach on contact"; the breach then happened four
+commits later in that same sprint, and the row still says 117 today. Nothing caught it because
+`qa-check.sh` cap-checks `skills/*/SKILL.md`, `.claude/*` and `docs/sprint/SPRINT-*.md` — not
+`docs/research/`. A soft cap with no check behind it is a comment.
+
+**Impact.** T2's DoD line cannot be ticked as written — its conditional never applies, because the
+condition was already true before the task started. Ticking it would be reading the words to fit what
+was built (L-088), and the honest reading is that the criterion is stale, not met. Nothing about T2's
+verdict changes; only the disposition of that one line. TD-038's own text is also now wrong on its face
+("117 against its 120 soft cap", "the doc is *correct* at 117"), and its stated reason for holding —
+that acting early would restructure a correct doc against a **hypothetical** breach (TD-031's shape) —
+no longer holds, because the breach is actual and measured.
+
+**Re-confirm G2.** Ruling requested from the owner rather than taken: the remedy TD-038 names (split
+per-scan files behind an index) is real work outside T2's Plan, and T3 still has to write into the same
+file, so splitting mid-wave would restructure a document that is about to change again.
+
+**Owner ruling (2026-08-09).** Split *after* T3, inside this sprint. Rationale accepted: T3 writes into
+the same file, so splitting now would restructure a document about to change again, and deferring to a
+follow-up leaves a measured, known breach sitting in the repo behind a check that cannot see it. The
+Plan therefore gains a **T4** — the only structural addition this sprint makes — and T2's fifth DoD
+line is discharged as *routed*, not as *applied*: the scope-change was logged, nothing was squeezed,
+and the remedy now has an owner and a home. `mattpocock.md` moves from T2/T3's `Layers:` into T4's as
+its owner for the restructure; the wave gains rank 3 and stays strictly sequential.
