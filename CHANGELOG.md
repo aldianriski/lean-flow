@@ -11,6 +11,53 @@ status: current
 
 ---
 
+## v1.27.1 — Layer Checks and Keeper Adoption (2026-08-09)
+
+PATCH — SPRINT-049 **and** SPRINT-051, cut as one release. SPRINT-049's user-visible surface was a
+single red flag, too thin to release on its own; two sprints later there were five more. Releasing
+separately would have published one and left the rest pending, so they go together. Most of
+SPRINT-049 was maintainer tooling and is summarised at the end.
+
+**What changed for you:**
+- **`/diagnose` now tells you to redact before you show — and how.** The skill has always instructed
+  capturing traces, HAR files, log dumps and replayed payloads; those carry auth headers by default,
+  and a debugging session is exactly where they get pasted into a chat or an issue. The new rule sits
+  *before* Phase 1, so you meet it before anything produces an artifact, and it leads with the
+  mechanism rather than the warning: **build the loop against environment variables**, so the
+  credential never enters the command you show. Redacting afterwards removes instances; the env var
+  removes the class. `/handoff` had carried this rule for a long time — `/diagnose` never did.
+- **`/tdd` names the tautological test.** An assertion that recomputes the expected value the way the
+  code does — `expect(add(a, b)).toBe(a + b)`, a hand-derived snapshot — passes by construction and can
+  never disagree with the code. It reads as coverage while testing nothing. The tell is a question you
+  can actually apply: *what would have to be wrong for this to fail?* If the only answer is "the
+  language", it is tautological. Expected values now have to come from an independent source — a
+  known-good literal, a worked example, the spec — and it is in the per-cycle checklist, so it fires
+  every loop rather than only when you re-read the anti-patterns.
+- **`/orchestrator` catches a DoD that went stale.** Distinct from the existing scope-change rule: the
+  scope holds, but a *criterion* frozen at promote turns out to carry a number nobody measured or a
+  premise a later decision dissolved. Log a `scope-change`, get a ruling — never round a measurement up
+  to meet a stated figure, and never re-read the words to fit what was built.
+- **`/refactor-advisor` scopes before it scans.** It used to scan, then rank. Deepening only pays off
+  where change is frequent, so it now walks `git log` for the files that keep reappearing and lets
+  those pull first.
+- **`/prototype` stops throwing the prototype away.** "Delete or absorb" lost the artifact entirely;
+  a spent prototype now goes to a throwaway branch with a pointer beside the captured answer, so the
+  primary source stays retrievable when the verdict is later questioned.
+- **Merge-back guidance for parallel runs.** When a wave's branches conflict, recover each side's
+  intent from the commit messages before choosing, preserve both where they compose, never invent
+  behaviour to bridge them, and always resolve rather than `--abort` — abandoning the merge strands
+  the whole wave the fan-out existed to produce.
+
+**Maintainer tooling (ships in the install; no consumer runs it):** the two `Layers:` declaration
+checks were redesigned rather than patched a fifth time. They now attribute each changed path to the
+task that changed it instead of testing against one union of every task's declaration — closing a
+false negative where a file declared by *any* task satisfied the check for *all* of them. Proven in
+both directions: the same fixture passes on the old checker and fails by name on the new one. A
+`Cites:` escape lets a Plan name a file it merely cites without the gate reading it as a touch, and a
+wrapped declaration is no longer silently truncated to its first line.
+
+---
+
 ## v1.27.0 — Epic Layer (2026-08-09)
 
 MINOR — SPRINT-048. `/task-decomposer` has advertised an `--epic` input since long before an epic had

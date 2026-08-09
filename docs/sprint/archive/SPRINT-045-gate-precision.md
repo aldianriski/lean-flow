@@ -2,7 +2,7 @@
 sprint: 045
 slug: gate-precision
 owner: Maintainer
-last_updated: 2026-08-01
+last_updated: 2026-08-09
 status: closed
 plan_commit: d6f3c75
 close_commit: eaf3e1f

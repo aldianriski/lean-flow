@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-01
+last_updated: 2026-08-09
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
