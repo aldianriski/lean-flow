@@ -4,7 +4,7 @@ slug: epic-layer
 owner: Maintainer
 last_updated: 2026-08-09
 status: active
-plan_commit: [pending — recorded in the follow-up commit]
+plan_commit: 914992a
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
