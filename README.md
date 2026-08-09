@@ -280,7 +280,8 @@ The skills write durable, human-readable state into your repo — plain markdown
 |---|---|---|
 | `TODO.md` | `/task-decomposer` · `/triage` | backlog (P0–P3) · active-sprint pointer(s) |
 | `TECH-DEBT.md` | sprint close · `/triage` | tech-debt ledger (`TD-NNN` — filed at close, aged at promote) |
-| `docs/sprint/SPRINT-NNN-*.md` | `/lean-doc-generator` | active sprint plan · execution log · retro |
+| `docs/sprint/SPRINT-NNN-*.md` | `/lean-doc-generator` | active sprint plan · files changed · retro (400-line hard cap) |
+| `docs/sprint/logs/SPRINT-NNN-*.md` | `/orchestrator` during execution | that sprint's execution log — append-only, uncapped, so it never eats the Plan's budget (ADR-014) |
 | `docs/DECISIONS.md` / `docs/adr/` | `/lean-doc-generator` | ADRs — the WHY behind hard-to-reverse choices |
 | `CHANGELOG.md` | `/release-patch` · sprint close | what shipped, per release |
 | `docs/LEARNINGS.md` | sprint close | confirmed learnings; recurring → durable rules |
@@ -404,7 +405,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-08-01 · status: current · v1.25.2</sub>
+<sub>Doc owner: Maintainer · last updated 2026-08-09 · status: current · v1.26.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge

@@ -18,6 +18,49 @@ status: current
 
 ## Tech Debt
 
+- **TD-034** severity: trivial | status: open | created: Sprint-047
+  - Summary: the archived `docs/sprint/archive/SPRINT-045-gate-precision.md` carries **duplicate
+    `## Files Changed` and `## Retro` sections**, plus one `### 2026-08-01 | scope-change` Execution
+    Log entry stranded inside the first Retro block rather than in the Log.
+  - Impact: low but confusing — a reader gets two answers to "what changed" and "what did we learn",
+    with no marker saying which supersedes. Verified pre-existing at HEAD before SPRINT-047 T1 touched
+    the file, so the split did not cause it; T1 deliberately left it alone (clean up your own mess
+    only). Most likely an L-009 structure-adjacent fusion during that sprint's close.
+  - Mitigation (not yet done): reconcile the two pairs into one, and move the stranded entry into
+    `archive/logs/SPRINT-045-gate-precision.md` where it now belongs. Cheap, but it edits a closed
+    archive record, so it wants an explicit decision rather than a drive-by fix.
+
+- **TD-033** severity: trivial | status: open | created: Sprint-047
+  - Summary: `docs/research/mattpocock.md` now runs **136 lines against its 120 soft cap** (DOCS_Guide
+    §2), carrying two scans — the 2026-07-10 original and the 2026-08-09 re-scan.
+  - Impact: none functional; research caps are soft and nothing lints them, which is exactly why this
+    will otherwise go unnoticed. The structural question is real though: a doc accumulating one scan
+    per revisit grows without bound, and scan 1's detail is now largely historical since all three of
+    its keepers shipped.
+  - Mitigation (not yet done): either collapse scan 1's shipped sections to pointers (the §11
+    LEARNINGS-collapse pattern applied to research), or split per-scan files with an index. Note there
+    is no automated scan for research-doc caps at promote — only TODO.md's ~150 line trigger exists —
+    so this row is the only thing that will resurface it.
+
+- **TD-032** severity: minor | status: open | created: Sprint-047
+  - Summary: `scripts/lib/check-layers-completeness.sh` cannot distinguish a file the task **will
+    touch** from a file its prose merely **mentions**. It fired three times in one task during
+    SPRINT-047 T1 — on a `CHANGELOG.md` used as an analogy ("the CHANGELOG.md shape"), on a fixture
+    harness named only as a cross-reference, and once legitimately.
+  - Impact: TD-020 deliberately made this check fail toward over-reporting, and that trade is still
+    right — its false negative once cost a corrupted merge. But the false positives have a shape: they
+    all involve a **backtick-quoted filename in explanatory prose**, and the only fix available to the
+    author is to *reword the explanation* so the gate stops seeing it. That is the tail wagging the
+    dog: a check that makes docs worse to keep itself quiet. Three in one task is the first time the
+    cost has been concentrated enough to notice.
+  - Mitigation (not yet done): consider narrowing the derivation to prose in **DoD/Acceptance lines
+    only** (excluding the free-text rationale paragraph), or honouring an explicit inline escape for
+    "mentioned, not touched". Negative-test either per L-058: SPRINT-041's real miss — a TD marked
+    resolved with `TECH-DEBT.md` undeclared — must still FAIL.
+  - Related: TD-031 names the sibling complaint about `check-layers-observed.sh` asking the wrong
+    question. Two rows now describe the same family; if a third arrives, the checks want a rethink
+    rather than another narrowing.
+
 - **TD-031** severity: minor | status: open | created: Sprint-046
   - Summary: the observed-layers check's exclusion list has grown by one entry per sprint for four
     sprints — close bookkeeping, the generated index, the pre-flight settings file, and now agent

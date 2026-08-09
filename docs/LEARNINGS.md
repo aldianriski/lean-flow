@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-01
+last_updated: 2026-08-09
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -21,11 +21,19 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-087**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-088**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-088 [tags: sprint-model] [status: active]: **A DoD written at promote freezes assumptions that execution can invalidate — both the numbers in it and the premises under it.** SPRINT-047 broke on each half in one task. *The number:* Acceptance asked for "≥15 tasks under the cap", a figure estimated before the overhead was ever measured; the measurement came back ~12, because Files Changed and the Retro still share the Plan's budget. *The premise:* DoD items 7–9 required must-FAIL fixtures for three gate globs — written assuming those globs would be edited. Decision D1 then chose a subdirectory layout under which **no glob changes at all**, so the fixtures would have been testing checks the task does not touch, reachable only by first refactoring a working gate. Neither failure is a planning mistake exactly: at promote the overhead was genuinely unmeasured and D1 genuinely undecided. The lesson is what to do when it surfaces — **amend the Plan explicitly through a `scope-change` entry and get the ruling, rather than quietly reinterpreting the DoD to fit what was built, and never round a measurement up to meet a stated figure.** The failure mode both invite is the same: a sprint that closes green against criteria nobody re-agreed to.
+- seen: Sprint-047
+- count: 1
+- promoted: no
+- related: L-007 (exercised once on real input) · L-058 (a gate's must-FAIL bar) · TD-031
 
 ---
 
@@ -438,7 +446,8 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 ---
 
 ## L-010 [tags: tooling] [status: promoted]: when editing an installed plugin the target is the repo source (`skills/…`), never the install cache — a cache Read does not satisfy read-before-edit.
-- **L-010 → promoted: CLAUDE.md install-cache anti-pattern** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; seen Sprint-007 + Sprint-009. L-021 carries the *running*-from-cache sibling.
+- **L-010 → promoted: CLAUDE.md install-cache anti-pattern** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; seen Sprint-007 + Sprint-009 + **Sprint-047 (count 3)**. L-021 carries the *running*-from-cache sibling.
+- Sprint-047's sighting is a **retrieval miss, not a knowledge gap**: the rule was promoted, in context, and still broken — `SPRINT.md.template` was edited in the cache before being caught and redone against the source. A promoted rule that keeps getting broken needs a different intervention than another promotion.
 
 ---
 

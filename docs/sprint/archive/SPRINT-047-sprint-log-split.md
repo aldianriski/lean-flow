@@ -3,7 +3,7 @@ sprint: 047
 slug: sprint-log-split
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 plan_commit: 458c76b
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -84,7 +84,7 @@ skills against the specific lean-flow surface it maps to, and a keeper count.
 - [x] `wayfinder` re-check row — fog-map still matches; the new mechanics are tracker artefacts scan 1 already rejected
 - [x] One delta-map row per skill, each naming the lean-flow surface it duplicates or the gap it fills
 - [x] Verdict line states the keeper count — **2 keepers of 5 examined**
-- [ ] Keepers **filed** as follow-up `TASK-NNN` at close — never adopted inside this task *(close-time action by design; ticked during `/lean-doc-generator close`)*
+- [x] Keepers **filed** as follow-up `TASK-NNN` at close — never adopted inside this task — **TASK-149** (frontier batching) · **TASK-150** (disclosure test + completion criteria)
 - [x] Ownership header + `last_updated` refreshed; `sh scripts/gen-index.sh` re-run if metadata changed
 
 ## Owner-action checklist
@@ -200,12 +200,46 @@ its 120 soft cap**, carrying two scans; the split-or-supersede call is doc-aging
      shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — **yes, one genuine miss.** `SPRINT.md.template` was edited in the *plugin cache*
+(`~/.claude/plugins/cache/…`) instead of the repo source. L-010 is a **promoted** CLAUDE.md
+anti-pattern naming exactly that, and it was in context the whole time — the rule was available and
+not applied. Caught immediately, reverted, redone against `skills/…` with a fresh read (a cache Read
+does not satisfy read-before-edit). Third sighting of L-010, after Sprint-007 and Sprint-009. Nothing
+shipped wrong, but the miss is the point: a promoted rule that still gets broken is a retrieval
+problem, not a knowledge problem. → count bumped on L-010; retrieval-miss signal recorded.
 
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents). Cost per unit **delivered**, not attempted. Unavailable → say so rather than omitting the line.
+**Cost** — **shape: fully inline, single interactive session, zero dispatched agents.** The
+orchestrator's dispatch doctrine would have sent T2 (`class: execution`) to a sub-agent and run the
+two disjoint tasks in parallel worktrees; this session is configured not to use the Agent tool
+unless asked, so both ran sequentially in the coordinator's own context. **Dollar cost is not exposed
+for an inline session** — recorded as unavailable rather than omitted (degrade rule). What is
+observable: 2 units delivered, 3 commits, 1 network-dependent task, gate run 8 times. No calibration
+row is added to `night-run.md` — that series is for unattended runs, and quietly mixing an inline
+sprint into it would corrupt the comparison it exists to support.
 
 **Worked**
+- **D1 turned a three-exclusion change into a zero-exclusion one.** Choosing the subdirectory over a
+  `-log.md` suffix meant no check's logic or glob moved at all. The gate stayed untouched precisely
+  because the design was chosen against the gate's existing behaviour rather than around it.
+- **Gates caught what review didn't** — three separate times. The under-declared `Layers:`, the
+  `CHANGELOG.md` analogy, the stale knowledge index: all found by `qa-check`, none by reading.
+- **Negative-testing the new fixture found a bug in the fixture.** Its first run failed on locale
+  collation, not on the thing under test. A fixture only asserted in the passing direction would have
+  shipped that.
 
 **Friction**
+- **The DoD encoded two things it could not yet know** — an unmeasured ≥15 as an acceptance target,
+  and must-FAIL fixtures premised on a design (glob edits) that D1 then dissolved. Both surfaced only
+  during execution, and both needed an owner ruling to resolve. → L-088.
+- **`layers-completeness` cannot tell a file *mentioned* from a file *touched*** — it fired three
+  times in one task on prose references. TD-020 accepts over-reporting by design, but three in one
+  task is a cost worth recording. → TD-032.
+- **The observed-layers check requires exact whole-path tokens** — `evals/fixtures/` does not cover
+  files beneath it, so a new fixture tree means enumerating every file in `Layers:`. Adjacent to
+  TD-031's complaint about the same check.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- **L-088** — a DoD written at promote freezes assumptions execution can invalidate: numbers not yet
+  measured become acceptance targets, and premises can be dissolved by a design decision taken later
+  in the same sprint. Amend the Plan explicitly through a `scope-change`; never quietly reinterpret
+  it, and never round a measurement up to meet a stated figure.

@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-047 — Sprint Log Split** → [`docs/sprint/SPRINT-047-sprint-log-split.md`](docs/sprint/SPRINT-047-sprint-log-split.md)
+> _None._ SPRINT-047 closed 2026-08-09.
 
 ---
 
@@ -58,38 +58,37 @@ status: current
       tracker:    none — local plugin repo, no external tracker
       state:      ready
 
-- [ ] TASK-147 — Split the sprint Execution Log into an uncapped sibling  [size: M] [risk: high] [HITL]
-      class:      decision
-      done-when:  the Execution Log lives outside the `docs/sprint/SPRINT-*.md` glob; DOCS_Guide §2 row + §9 + §11
-                  retention updated; SPRINT.md.template's Log section repointed; the append-during-sprint rule
-                  repointed in lean-doc-generator; ALL THREE qa-check globs (cap-400 :33 · task-schema :267 ·
-                  layers-completeness :405) proven not to mis-fire on the new file — EACH with a retained negative
-                  fixture that FAILS with its named finding (L-058, TD-012); one real sprint migrated; measured
-                  Plan-file headroom reported (target: a Plan holds ≥15 tasks under 400)
-      touches:    DOCS_Guide §2/§9/§11 · SPRINT.md.template · lean-doc-generator/SKILL.md · scripts/qa-check.sh ·
-                  evals/fixtures · docs/sprint/
-      depends-on: none
-      assumes:    A3 — a subdirectory escapes the glob (non-recursive, same reason `archive/` already does) ·
-                  A4 — Plan file keeps its 400 cap, sibling is append-only/uncapped like CHANGELOG.md ·
-                  A5 — alters ADR-012 repo structure, so an ADR may be required (G2 decides)
-      tracker:    none — local plugin repo, no external tracker
-      state:      ready
-
 ### P2 — Quality / Polish
 
-- [ ] TASK-144 — Re-scan mattpocock/skills for adoption delta  [size: M] [risk: low] [AFK]
-      class:      execution
-      done-when:  `docs/research/mattpocock.md` carries a delta-map row for `grill-me`, `writing-for-agents`,
-                  `wizard`, `wait-what` plus a `wayfinder` re-check row; each row states Keeper|Reject mapped to the
-                  lean-flow surface it duplicates; the verdict line states the keeper count; `last_updated` refreshed
-      touches:    docs/research/mattpocock.md
+- [ ] TASK-149 — Replace the grill's "one question at a time" rule with frontier batching  [size: S] [risk: med] [HITL]
+      class:      decision
+      done-when:  the grill rule states the discriminator is **dependency, not count** — ask every
+                  question whose prerequisites are settled as one round, serialise only the dependent
+                  ones, stop when the frontier is empty; `.claude/CLAUDE.md` Behavioral Guidelines,
+                  `/task-decomposer` Clarify, and its "four questions at once" red flag all updated to
+                  agree; the fact/decision separation ("finding facts is the agent's job, never the
+                  user's") stated alongside
+      touches:    .claude/CLAUDE.md · .claude/CONTEXT.md · task-decomposer/SKILL.md · orchestrator/SKILL.md
       depends-on: none
-      assumes:    the 5 named skills are the whole delta since the 2026-07-10 scan · the prior scan's 3 keepers all
-                  shipped (Standards-vs-Spec · skill-powered dispatch · wayfinder→fog-map), so wayfinder is a
-                  re-check only · keepers are FILED as follow-up TASKs, never adopted in this task · L-017 is the
-                  durable rubric (judge the delta over existing surface, not standalone merit) ·
-                  AFK precondition: a headless run has WebFetch allowed — if not, this reverts to HITL
-      tracker:    https://github.com/mattpocock/skills — docs at https://www.aihero.dev/skills
+      assumes:    the current rule over-corrects rather than being wrong — batching DEPENDENT questions
+                  really does produce vague answers, so the fix narrows the ban, it does not lift it ·
+                  SPRINT-047 demonstrated the gap live (two popups carried two independent questions
+                  each, justified ad hoc) — evidence, not theory
+      tracker:    docs/research/mattpocock.md § Re-scan, Keeper 1
+      state:      ready
+
+- [ ] TASK-150 — Adopt writing-for-agents' disclosure test + completion-criteria sharpness  [size: S] [risk: low] [HITL]
+      class:      execution
+      done-when:  ADR-006's rule carries the branching **test** for what goes in SKILL.md vs
+                  `references/` — "inline what every path needs, disclose what only some reach" —
+                  since the cap is a size limit, not a criterion; and the DoD/Acceptance guidance says
+                  completion criteria are behavioural levers (demand "every rule applied", not
+                  "understanding reached")
+      touches:    docs/adr/ADR-006-*.md · .claude/CLAUDE.md · lean-doc-generator/references/DOCS_Guide.md
+      depends-on: none
+      assumes:    ADR-006 is append-only once decided, so this lands as a superseding note or an
+                  amendment rather than an edit to the decided text
+      tracker:    docs/research/mattpocock.md § Re-scan, Keeper 2
       state:      ready
 
 - [ ] TASK-148 — Prove bulk throughput on one real night run  [size: M] [risk: med] [HITL]
