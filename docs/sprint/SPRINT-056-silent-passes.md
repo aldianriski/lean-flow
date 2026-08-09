@@ -166,12 +166,12 @@ five releases behind before v1.28.0 caught it by hand. The lockstep rule is alre
 siblings fails the gate with a named finding; the README footer check keeps working unchanged.
 
 **DoD:**
-- [ ] All four manifests compared to each other (not pairwise-to-plugin.json by hand — the list is
+- [x] All four manifests compared to each other (not pairwise-to-plugin.json by hand — the list is
       derived from the `*-plugin/` directories on disk, so a fifth manifest enrolls itself, L-066)
-- [ ] The existing README-footer check (leg 6) still passes and is not replaced by this
-- [ ] A must-FAIL fixture: one manifest out of lockstep → FAIL with its named finding (L-058),
+- [x] The existing README-footer check (leg 6) still passes and is not replaced by this
+- [x] A must-FAIL fixture: one manifest out of lockstep → FAIL with its named finding (L-058),
       verified red-on-new and green-on-old (L-090)
-- [ ] Fixture retained and wired into `qa-check.sh` (TD-012)
+- [x] Fixture retained and wired into `qa-check.sh` (TD-012)
 
 ## Owner-action checklist
 

@@ -245,3 +245,27 @@ must-NOT-catch half that shows where the boundary now sits, L-076), and a direct
 zero-scope run emits no PASS line.
 
 Gate: **121 pass, 0 fail.**
+
+### 2026-08-09 | complete | T5 — manifest lockstep gets a check; the glob missed every manifest on its first run
+Four manifests carry the version and leg 6 compared the README *footer* against one of them, so no
+two manifests were ever compared to each other. `.codex-plugin/` and `.kimi-plugin/` drifted **five
+releases** behind before v1.28.0 caught it by hand. The lockstep rule has been a DoD line in
+`.claude/CLAUDE.md` the whole time — it just never had a check behind it, which is this sprint's
+theme stated in one sentence.
+
+The manifest set is **derived from the `*-plugin/` directories on disk**, never hand-listed: a
+hardcoded sibling list goes stale the moment a fifth manifest lands, and neither author nor reviewer
+can see it (L-066). Leg 6 is **kept, not replaced** — it compares a different pair and still catches
+a drift this cannot see; swapping it out would be a narrowing dressed as a widening (L-076).
+
+**L-102 again, third time this sprint.** The checker's first live run reported
+`no manifests found` — every manifest here lives in a **dot** directory (`.claude-plugin`,
+`.codex-plugin`, `.kimi-plugin`) and a shell glob does not match a leading dot. Had that shipped, the
+checker would have found zero files and exited 0 on every run: a green line meaning nothing, which is
+the precise defect T4 fixed one task earlier. Case 4 now asserts the live repo yields ≥2 manifests, so
+the glob itself is guarded rather than assumed.
+
+Four fixtures: the real v1.28.0 drift reproduced (1.23.0 siblings against 1.28.0), a manifest with no
+parseable version (**FAIL, never a skip** — a file the checker cannot read is not a file that passes,
+L-065), a single manifest (**FAIL** — lockstep over one file compared nothing), and the live-repo
+case. All four manifests are currently at 1.29.0.

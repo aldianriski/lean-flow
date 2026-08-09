@@ -273,6 +273,30 @@ else
   note "skip (missing): README.md or .claude-plugin/plugin.json"
 fi
 
+# --- 6b. Manifest lockstep (every *-plugin manifest carries the same version) --------------------
+# Leg 6 above compares the README FOOTER against plugin.json, so until now no two MANIFESTS were ever
+# compared to each other -- and .codex-plugin/ + .kimi-plugin/ drifted five releases behind before
+# v1.28.0 caught it by hand. The lockstep rule is a DoD line in .claude/CLAUDE.md and had no check
+# (SPRINT-056 T5). Leg 6 is kept, not replaced: it catches a different drift this cannot see.
+# Delegated to scripts/lib/check-manifest-lockstep.sh, covered by evals/run-manifest-lockstep-fixtures.sh.
+ml_script="scripts/lib/check-manifest-lockstep.sh"
+if [ ! -f "$ml_script" ]; then
+  bad "manifest lockstep: checker not found at $ml_script"
+else
+  ml_out=$(sh "$ml_script" "$ROOT" 2>&1); ml_code=$?
+  printf '%s\n' "$ml_out"
+  ml_pass=$(printf '%s\n' "$ml_out" | grep -cE '^PASS')
+  ml_fails=$(printf '%s\n' "$ml_out" | grep -cE '^FAIL')
+  pass=$((pass + ml_pass))
+  if [ "$ml_code" -ne 0 ]; then
+    if [ "$ml_fails" -gt 0 ]; then
+      fail=$((fail + ml_fails))
+    else
+      bad "manifest lockstep: checker exited $ml_code without reporting a FAIL line"
+    fi
+  fi
+fi
+
 # --- 7. TD aging: open TD >=3 sprints behind Active Sprint, no re-review ----
 if [ -f TODO.md ]; then
   active=$(awk '/^## Active Sprint/{f=1;next} /^## /{f=0} f' TODO.md)
@@ -405,7 +429,7 @@ done
 # the selftests, yet it stays always-on: it's cheap (extracts + diffs, no throwaway repos), and
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh"
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh"
 eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
 # run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
 # run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via
