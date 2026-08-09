@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-048 closed 2026-08-09.
+> **SPRINT-049 — Layer-Check Redesign** → [`docs/sprint/SPRINT-049-layer-check-redesign.md`](docs/sprint/SPRINT-049-layer-check-redesign.md)
 
 ---
 

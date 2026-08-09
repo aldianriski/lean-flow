@@ -109,18 +109,6 @@ status: current
   - Owner decision (SPRINT-046 promote): add TD-030's entry now, file this pattern rather than solve it
     under time pressure.
 
-- **TD-030** severity: minor | status: resolved → SPRINT-046 T2 | created: Sprint-045
-  - Summary: the worktree dispatch protocol creates agent worktrees **inside the repo**
-    (`.claude/worktrees/agent-<id>/`), and the observed-layers check counts those paths as changed-but-
-    undeclared. Every parallel run produces this FAIL for as long as the worktrees exist.
-  - Impact: transient — it clears when the worktrees are pruned at cleanup, verified by re-running the
-    gate rather than assumed — but it fires on *every* fan-out, so a run's post-merge gate is red for
-    reasons unrelated to its work. Same cry-wolf shape TD-026 just fixed, different instance.
-  - Mitigation (not yet done): exclude the agent-worktree path prefix with a stated reason, as the
-    other structural exclusions are. Note the tension: this is the **fourth** exclusion in four sprints
-    — the list is answering "did a task declare this?" when it means "was this task work or coordinator
-    bookkeeping?". Add the exclusion, but weigh whether the check should ask the second question.
-
 - **TD-029** severity: minor | status: resolved → SPRINT-048 T5 (**residual: the buffering mechanism was never reproduced**) | created: Sprint-045
   - Summary: the launcher's `ALIVE` test requires observable progress — a log line or a new commit —
     but `claude -p --output-format json` **buffers all output until exit**, so the log stays empty for
@@ -156,49 +144,6 @@ status: current
     **Residual, explicitly open:** why a real `json` run stays silent past the window is still
     unestablished. Reopen on evidence from an actual run — never on another inference.
 
-- **TD-028** severity: medium | status: resolved → SPRINT-046 T1 | created: Sprint-045
-  - Summary: a **directory-prefix permission rule does not match**. `Bash(sh evals/:*)` was written to
-    authorize the eval harnesses and denied every one of them, while `Bash(sh scripts/qa-check.sh:*)` —
-    the exact-file form — works. The broader-looking rule is the one that silently fails.
-  - Impact: this is night-run.md's own "pin one rule syntax" warning firing for real, and worse than a
-    plain gap: the rule *looks* correct in the settings file, so a reader reviewing the allowlist sees
-    coverage that does not exist. Combined with the `cd`-prefix ban, the practical consequence during
-    SPRINT-045 was that a harness inside an agent worktree could not be executed at all.
-  - Mitigation (not yet done): establish empirically which rule forms actually match (exact-file,
-    prefix, glob) and state the finding where the derivation is described, rather than inferring a form
-    from documentation. Until then prefer exact-file rules and treat any broader form as unverified.
-
-- **TD-027** severity: medium | status: CLOSED — not supported → SPRINT-046 T1 | created: Sprint-045
-  - Summary: the **permission surface degraded mid-session**. In SPRINT-045's run, `awk … > file` and
-    `sh <path>` were denied *after* the identical command forms had succeeded earlier in the same
-    session — they are how the wave-start preflight was extracted and executed. The T1 agent
-    independently reported the same shape in its own sandbox: every `sh` and `awk -f <file>` invocation
-    denied regardless of allowlist match, while inline `awk '…'` kept working.
-  - Impact: materially different from TD-023's form-failure story, and it partly undercuts it. If the
-    surface can narrow mid-run, then **allowlist derivation — a static exercise done at pre-flight —
-    cannot fully protect a long run**, however well derived. Five denials total this run; the run
-    recorded each once and correctly did not re-wrap them (Part 4).
-  - Mitigation (not yet done): **reproduce before theorising** (TD-024's lesson). Establish whether the
-    trigger is elapsed time, turn count, a tool-call budget, or something else, by replaying one known-
-    good command form at intervals within a single headless session. Only then decide whether the fix
-    is a run-length cap, a re-derivation checkpoint, or guidance to prefer inline forms.
-  - **Owner decision (SPRINT-045 close): reproduce first, do not mitigate yet.** A defence shipped
-    against an unpinned mechanism is what produced TD-024's two wrong diagnoses and the `pwd -W` sweep
-    nearly applied to a phantom. The reproduction is the next sprint's first task; guidance waits on
-    what it finds.
-  - **CLOSED — NOT SUPPORTED (SPRINT-046 T1). The hypothesis was falsified, not fixed.** A 26-turn
-    session replaying a known-good rule form produced **zero denials**, so degradation did not
-    reproduce. The actual discriminator is the **redirect**: same session, same loaded rules — relative
-    path → 0 denials · absolute path → 0 · `sh … > file` → 1, reproduced. SPRINT-045's denied commands
-    were `git show … > file` and `awk … > /tmp/file`, both redirects. They are therefore an instance of
-    the **existing** bare-invocation rule (L-077), not a new phenomenon, and no structural defence is
-    warranted. Evidence → `docs/research/headless-permission-surface.md`.
-  - Residual, explicitly **not established**: why `sh /tmp/pf-045.sh` was denied in SPRINT-045, given
-    absolute paths probe clean. Its logged command was truncated at 80 characters, so the full form is
-    unknown. Recorded as unknown rather than folded into the redirect story — the habit of attaching a
-    plausible mechanism to an unexplained symptom is what put this row here twice.
-  - **Reopen only on new evidence**: a long run that hits the same shape *after* the redirect
-    explanation has been excluded. Reproduce-before-theorising applies to the reopen too.
 
 
 
