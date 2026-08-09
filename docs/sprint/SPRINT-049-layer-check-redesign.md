@@ -4,7 +4,7 @@ slug: layer-check-redesign
 owner: Maintainer
 last_updated: 2026-08-09
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: d5b0fa9
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
