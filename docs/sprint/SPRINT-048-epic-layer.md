@@ -127,6 +127,49 @@ launcher now reports was chosen *after* the buffering claim was confirmed or ref
 - [ ] TD-029 marked `resolved → SPRINT-048 T5`
 - [ ] `sh scripts/qa-check.sh` green on a bare run
 
+### T6 — Raise the SKILL cap to 140 and reclaim the duplicated lines `[size: S · risk: med · class: decision · HITL]`
+Layers: `docs/adr/ADR-006-skill-cap-executable-artifacts.md` · `scripts/qa-check.sh` · `.claude/CLAUDE.md` · `skills/lean-doc-generator/SKILL.md`
+Depends-on: none
+
+Added mid-sprint (see the log's scope-change entry). `lean-doc-generator/SKILL.md` is at 110/110 and a
+later task needs room in it. Two things happen here, deliberately together: the **duplication is
+reclaimed** — the Migrate (14 lines) and Init (10) sections restate procedures that already live in
+their own reference files, so they compress to dispatch entries — **and the cap lifts to 140**
+repo-wide. The reclaim alone would have covered the immediate need; the raise is an owner decision to
+give the generator real headroom, and it amends ADR-006.
+
+**Acceptance:** the lint enforces 140, ADR-006 carries a dated amendment explaining why, and
+`lean-doc-generator/SKILL.md` is materially under the new cap — not merely legal against a looser one.
+
+**DoD:**
+- [ ] Migrate compressed to a dispatch entry; its own reference file keeps the full procedure, unedited
+- [ ] Init compressed the same way, its reference file likewise untouched
+- [ ] Measured line delta reported — the reclaim must stand on its own, before the raise is counted
+- [ ] `scripts/qa-check.sh` SKILL cap lint 110 → 140
+- [ ] `.claude/CLAUDE.md` DoD line updated (same-line edit — it is at 80/80)
+- [ ] ADR-006 amended, append-only, **recording the argument against raising** as well as the decision
+- [ ] `sh scripts/qa-check.sh` green on a bare run; no other skill's content changed by the looser cap
+
+### T7 — Move PRD creation into /lean-doc-generator `[size: M · risk: med · class: execution · HITL]`
+Layers: `skills/lean-doc-generator/SKILL.md` · `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/prd-and-slices.md` · `.claude/CONTEXT.md`
+Depends-on: T6
+
+Added mid-sprint. One principle: **`/lean-doc-generator` creates every core doc; `/task-decomposer`
+consumes and emits tasks.** Three defects fall out of applying it — `--prd` currently means both "path
+to an existing PRD" and "synthesize one"; two PRD templates exist in two skills; and the generator's
+own bundled product-requirements template is orphaned, never referenced by its owning skill.
+
+**Acceptance:** a PRD is created through `/lean-doc-generator` from its own bundled template, and
+`/task-decomposer --prd <path>` only ever consumes — exercised once end-to-end on a real PRD.
+
+**DoD:**
+- [ ] `/lean-doc-generator` gains a `prd` verb wired to its own bundled product-requirements template (no longer orphaned)
+- [ ] `--prd` disambiguated in `task-decomposer` — consumption only; synthesis becomes a pointer
+- [ ] `references/prd-and-slices.md` keeps the slicing half (tracer bullets, breakdown quiz); its PRD-template half is removed as duplication, not copied across
+- [ ] `.claude/CONTEXT.md` states the creates-vs-consumes boundary so the split is not re-litigated
+- [ ] Exercised once on a real PRD, not spec-only (L-007)
+- [ ] `sh scripts/qa-check.sh` green on a bare run
+
 ## Owner-action checklist
 <!-- Omit if none. -->
 - [ ] None identified at promote.
@@ -146,7 +189,7 @@ launcher now reports was chosen *after* the buffering claim was confirmed or ref
 - **A2** — adding `EPIC.md.template` makes 32 core + 2 non-core; three linted count claims move together or the gate fails. *Confirm: `qa-check.sh:40-59`.*
 - **A3** — two files are at hard caps (`CLAUDE.md` 80/80, `lean-doc-generator/SKILL.md` 110/110), so T2 and T3 must edit them line-neutrally. *Confirm: the cap legs of `qa-check.sh`.*
 - **A4** — T3 changes a rule this very loop runs on, so the change applies to the sprint executing it. *Confirm: use the new rule for T1/T2's own grilling and note whether it held.*
-- **A5** — T1–T5 are mutually disjoint except T2→T1; no shared file across tasks. *Confirm: G2 overlap map before the first task.*
+- **A5** — ~~T1–T5 are mutually disjoint except T2→T1; no shared file across tasks.~~ **FALSIFIED at G2, 2026-08-09.** Four shared files, one declared edge: `.claude/CONTEXT.md` (T1·T2·T3) · `.claude/CLAUDE.md` (T1·T3) · `DOCS_Guide.md` (T1·T4) · `task-decomposer/SKILL.md` (T2·T3); plus, after T6/T7 were added, `ADR-006` (T4·T6) and `lean-doc-generator/SKILL.md` (T2·T6·T7). **Resolved by strict ordering, not by splitting:** `T3 → T6 → T1 → T2 → T7 → T4 → T5`, single owner per file at each step. A parallel run would HALT here and must not be attempted against this Plan without redoing the map.
 
 ## Execution Log
 
