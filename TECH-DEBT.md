@@ -24,10 +24,20 @@ status: current
 ## Tech Debt
 
 - **TD-044** severity: minor | status: open | created: Sprint-055
-  - Summary: `check-layers-observed.sh` runs two paths with **two different exclusion lists** —
+  - Summary: `check-layers-observed.sh` runs two paths with two different exclusion lists —
     `is_excluded()` for uncommitted WIP, `is_excluded_committed()` for history — and `TODO.md` is on
-    the first and not the second. So the same undeclared edit is invisible while uncommitted and a
-    violation once committed. The verdict depends on whether `git commit` has run, not on the artifact.
+    the first and not the second, so the same undeclared edit is invisible while uncommitted and a
+    violation once committed.
+  - **Corrected at close (2026-08-09):** this row was first filed calling the asymmetry an oversight.
+    It is not. `docs/QA.md` documents it as deliberate — the committed path is *intentionally* stricter
+    ("exclusions down to three … since attribution answers the rest by role", TD-031/TD-035/TD-037
+    lineage), because a commit can be attributed to a task and uncommitted work cannot. The design is
+    sound and the row stands on a narrower claim: not that the lists disagree, but that **the feedback
+    arrives after the moment it was cheap to act on**. A violation stays invisible through the whole
+    task, then surfaces attributed to a task already finished and pushed — where the only remedies are
+    amending closed history or correcting a frozen Plan after the fact. Filed the way it was because
+    the checker's source was read and the doc explaining its intent was not (L-098's shape, one sprint
+    after L-098 was filed).
   - Impact: observed in SPRINT-055 T6, which stamped `origin:` onto seven `TODO.md` Backlog entries as
     task work. Its gate ran green while the edit sat uncommitted; the finding surfaced during T7,
     attributed to a task already finished and pushed. Attribution to a closed task is the damaging
