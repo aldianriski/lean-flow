@@ -162,3 +162,24 @@ Five fixtures retained: absent · unfilled placeholder · malformed (FAIL — a 
 looks like evidence and is worse than none) · well-formed · archived-and-out-of-scope, the last
 carrying a deliberately garbled value so a regression that started re-checking archives fails loudly
 instead of quietly re-opening settled sprints.
+
+### 2026-08-10 | complete | T6 — promote size-checks before it freezes, because G1 runs too late to be free
+`promote` now size-checks the tasks it is about to pull and splits (or returns to `/task-decomposer`)
+any `[size: L]` **before** rendering. The rule already existed — G1's "an L splits before proceeding" —
+and the defect was purely one of *ordering*: G1 runs after `promote` has rendered, frozen and
+committed the Plan as `plan locked`, so by the time the rule fires, acting on it costs a
+`scope-change` entry plus a Plan amendment against a commit minutes old. At pull time it costs
+nothing. The reporter hit exactly this: one `L` promoted cleanly, was caught at G1, split into two
+`M` units, and required a logged scope-change against a Plan committed minutes earlier.
+
+Stated in both places a reader meets it: the `promote` row (what an executing agent follows) and
+`CONTEXT.md` § Gates beside G1's own split clause (where the rule already lived, now carrying the
+ordering caveat). Two surfaces, one rule — the second is a pointer to the ordering fact rather than a
+second copy of the rule, which is the distinction §10 draws when it warns that a stale duplicate
+reproduces the failure.
+
+Worth naming as a pattern rather than an incident: this is the third ordering defect this sprint pair
+has fixed. SPRINT-056 T4 found checks disarmed by a status flip in the same commit that made the
+edit; T5 above found a sign-off written after the artifact the run reads; and this one finds a gate
+that fires after the thing it guards is already frozen. Each is a correct rule evaluated at the wrong
+moment, and none of them looked wrong in isolation.

@@ -159,9 +159,9 @@ pulled, at the moment they are pulled, where splitting is still free.
 **Acceptance:** `promote` refuses to render a `size: L` task into a Plan, and says what to do instead.
 
 **DoD:**
-- [ ] `promote` checks the size tag of every task it pulls, before rendering
-- [ ] An `L` is split (or returned to decompose) *before* `plan locked`, never after
-- [ ] The rule is stated where promote's reader will meet it, and in `CONTEXT.md` § Gates if that is
+- [x] `promote` checks the size tag of every task it pulls, before rendering
+- [x] An `L` is split (or returned to decompose) *before* `plan locked`, never after
+- [x] The rule is stated where promote's reader will meet it, and in `CONTEXT.md` § Gates if that is
       where the G1 split rule already lives
 
 ## Owner-action checklist
