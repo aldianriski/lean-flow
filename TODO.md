@@ -48,81 +48,7 @@ status: current
       tracker:    TECH-DEBT.md TD-031 · TD-032 · TD-035
       state:      ready
 
-- [ ] TASK-145 — Add the EPIC doc layer (template + §2 lifecycle row)  [size: M] [risk: med] [HITL]
-      class:      decision
-      done-when:  `EPIC.md.template` exists; DOCS_Guide §2 carries an `epic/EPIC-NNN-<slug>.md` row with cap +
-                  create/update/archive triggers, §11 carries its retention leg; the linted template counts move in
-                  the same commit (`.claude/CLAUDE.md` + `docs/architecture/overview.md`; CONTEXT.md § Doc standard
-                  for accuracy); ONE real epic rendered from the template — the fleet epic, retro-fitted from
-                  SPRINT-025/026 + `docs/research/agents-md-adoption.md`; `scripts/qa-check.sh` green
-      touches:    lean-doc-generator/templates · DOCS_Guide §2/§11 · .claude/CLAUDE.md · .claude/CONTEXT.md ·
-                  docs/architecture/overview.md · docs/epic/
-      depends-on: none
-      assumes:    A1 — /lean-doc-generator owns epic creation, /task-decomposer `--epic` consumes it (G2 confirms) ·
-                  A2 — 31 core + 2 non-core = 33 templates, count linted at qa-check.sh:40-59
-      tracker:    none — local plugin repo, no external tracker
-      state:      ready
-
-- [ ] TASK-146 — Wire the epic into decompose → promote → close  [size: M] [risk: med] [HITL]
-      class:      execution
-      done-when:  `--epic` resolves to a real epic doc and decomposes it into TASK-NNN; promote sets `epic:`
-                  frontmatter on member sprints; close rolls the member sprint's outcome up into the epic;
-                  CONTEXT.md SSOT + README reflect the new layer; the chain FIRES end-to-end once on TASK-145's
-                  real epic — not spec-only (L-020 wiring check, L-007 spec-only-debt)
-      touches:    task-decomposer/SKILL.md · lean-doc-generator/SKILL.md · SPRINT.md.template ·
-                  .claude/CONTEXT.md · README.md
-      depends-on: TASK-145
-      assumes:    the epic artifact from TASK-145 is the input contract; no new skill is added (existing two grow)
-      tracker:    none — local plugin repo, no external tracker
-      state:      ready
-
 ### P2 — Quality / Polish
-
-- [ ] TASK-149 — Replace the grill's "one question at a time" rule with frontier batching  [size: S] [risk: med] [HITL]
-      class:      decision
-      done-when:  the grill rule states the discriminator is **dependency, not count** — ask every
-                  question whose prerequisites are settled as one round, serialise only the dependent
-                  ones, stop when the frontier is empty; `.claude/CLAUDE.md` Behavioral Guidelines,
-                  `/task-decomposer` Clarify, and its "four questions at once" red flag all updated to
-                  agree; the fact/decision separation ("finding facts is the agent's job, never the
-                  user's") stated alongside
-      touches:    .claude/CLAUDE.md · .claude/CONTEXT.md · task-decomposer/SKILL.md · orchestrator/SKILL.md
-      depends-on: none
-      assumes:    the current rule over-corrects rather than being wrong — batching DEPENDENT questions
-                  really does produce vague answers, so the fix narrows the ban, it does not lift it ·
-                  SPRINT-047 demonstrated the gap live (two popups carried two independent questions
-                  each, justified ad hoc) — evidence, not theory
-      tracker:    docs/research/mattpocock.md § Re-scan, Keeper 1
-      state:      ready
-
-- [ ] TASK-150 — Adopt writing-for-agents' disclosure test + completion-criteria sharpness  [size: S] [risk: low] [HITL]
-      class:      execution
-      done-when:  ADR-006's rule carries the branching **test** for what goes in SKILL.md vs
-                  `references/` — "inline what every path needs, disclose what only some reach" —
-                  since the cap is a size limit, not a criterion; and the DoD/Acceptance guidance says
-                  completion criteria are behavioural levers (demand "every rule applied", not
-                  "understanding reached")
-      touches:    docs/adr/ADR-006-*.md · .claude/CLAUDE.md · lean-doc-generator/references/DOCS_Guide.md
-      depends-on: none
-      assumes:    ADR-006 is append-only once decided, so this lands as a superseding note or an
-                  amendment rather than an edit to the decided text
-      tracker:    docs/research/mattpocock.md § Re-scan, Keeper 2
-      state:      ready
-
-- [ ] TASK-151 — Fix the launcher's DEAD-ON-ARRIVAL false verdict (TD-029)  [size: S] [risk: low] [HITL]
-      class:      execution
-      done-when:  the buffering claim is **reproduced first** (does `--output-format json` actually keep
-                  the log empty for a whole healthy run?), then either `stream-json` is accepted and any
-                  new line counts as progress, or a buffered format reports a named `UNKNOWN` instead of
-                  `DEAD-ON-ARRIVAL`; the calibration row's `total_cost_usd` need is met either way, and
-                  the chosen behaviour is exercised against a run that is genuinely healthy
-      touches:    scripts/night-run.sh · orchestrator/references/night-run.md (Part 3)
-      depends-on: none
-      assumes:    TD-029's stated mechanism (json buffers until exit) is a **hypothesis, not a finding** —
-                  L-087 applies, so reproduce before mitigating · the json-vs-stream-json conflict is
-                  real: json is what exposes total_cost_usd for the calibration row
-      tracker:    TECH-DEBT.md TD-029
-      state:      ready
 
 - [ ] TASK-148 — Prove bulk throughput on one real night run  [size: M] [risk: med] [HITL]
       class:      execution
@@ -170,3 +96,4 @@ _(no active sprint)_ — Sprint history → [`CHANGELOG.md`](CHANGELOG.md) (rota
 - ADRs: rich, one file per docs/adr/ADR-NNN; offered only when hard-to-reverse + surprising + a real trade-off.
 - Concise reporting: terse by default; full sentences only where a caveat is load-bearing.
 ```
+
