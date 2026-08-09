@@ -11,6 +11,37 @@ status: current
 
 ---
 
+## v1.27.2 — Rule Placement (2026-08-09)
+
+PATCH — SPRINT-052. One surface changed, and it is the one that decides where every *future* rule
+lands. Two tasks, both placement questions, both wider than the plan assumed.
+
+**What changed for you:**
+- **Promoting a learning now has a test instead of a menu.** `DOCS_Guide` §10 used to say a recurring
+  learning becomes "a `CLAUDE.md` anti-pattern, a `CONTEXT.md` rule, **or** a skill red-flag" and stop
+  there, as though the three were interchangeable. They are not: a skill red-flag only ever fires
+  inside that skill's flow. So a rule about mis-diagnosis filed into `/diagnose` stayed silent when the
+  same mistake happened during a `promote`, and a redaction rule that lived in `/handoff` never reached
+  `/diagnose` — the skill that tells you to capture HAR files and traces. The rule now: **ask which
+  flows can hit this failure, then place it where all of them read.** A `CONTEXT.md` rule reaches
+  everything that reads your SSOT; a `CLAUDE.md` anti-pattern reaches everything, and is the honest
+  answer when the enumeration says "all of them" — it is capped, so landing there displaces something,
+  which is a decision rather than an append. And where the rule already appears on more than one
+  surface, the duplicates get rewritten to point at the one home, because a stale second copy
+  reproduces the very failure being promoted against.
+- **A `Mitigation:` line is treated as a hypothesis, not a plan.** The cure written on a tech-debt row
+  is the filer's best guess, recorded at the moment the cost was being felt — and after a few re-reads
+  it starts to read as settled, which is how it ends up carried unquestioned into a sprint's
+  acceptance criteria. §10 now says to cite the evidence for the *problem* and re-derive the *fix*,
+  both when filing one at close and before building a task on one at promote. Two rows in a row were
+  right about the symptom and wrong about the cause; one proposed cure would have destroyed evidence.
+
+**Maintainer-side (no consumer runs it):** the `Cites:` escape stays undocumented in the SPRINT
+template on purpose — the checker that reads it is maintainer tooling that ships to nobody, so a
+template line would advertise a convention nothing enforces on your side.
+
+---
+
 ## v1.27.1 — Layer Checks and Keeper Adoption (2026-08-09)
 
 PATCH — SPRINT-049 **and** SPRINT-051, cut as one release. SPRINT-049's user-visible surface was a
