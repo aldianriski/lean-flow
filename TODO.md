@@ -50,6 +50,23 @@ status: current
                   content repo today gets four docs describing a substrate that is not there.
                   lean-flow is the proof case — the repo shipping `init` deliberately has none of them.
 
+- [ ] TASK-165 — Resolve lean-flow's six absent base-tier docs  [size: M] [risk: low] [HITL]
+      class:      decision
+      done-when:  each of the six base-tier rows lean-flow lacks for **no substrate reason** —
+                  `CONTRIBUTING.md` · `SECURITY.md` · `AGENTS.md` · `docs/product/requirements.md` ·
+                  `docs/product/acceptance-criteria.md` · `docs/development/setup.md` — is either
+                  created from its template or recorded as a deliberate, reasoned exemption. Not a
+                  bulk scaffold: LAW 1 says a doc exists only where its absence causes repeated
+                  mistakes, so "create all six" is a candidate answer, not the default
+      touches:    CONTRIBUTING.md · SECURITY.md · AGENTS.md · docs/product/ · docs/development/setup.md
+      depends-on: TASK-162
+      assumes:    these six are genuinely not substrate-gateable — checked at the SPRINT-053 G2 against
+                  all 18 base rows. The two that ARE gateable (coding-standards, testing-guide) belong
+                  to TASK-162 and are excluded here; deployment guides already exist and are correct
+      tracker:    SPRINT-053 § Decisions D6 · docs/sprint/logs/SPRINT-053-surface-truth.md scope-change
+      state:      blocked — TASK-162 decides the substrate conditions first; a row this task would
+                  create might turn out gateable after all. Unblock when TASK-162 lands.
+
 ### P2 — Quality / Polish
 
 - [ ] TASK-163 — Name the `Cites:` escape in the two completeness FAILs (TD-039)  [size: S] [risk: low] [HITL]

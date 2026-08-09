@@ -33,27 +33,28 @@ TD-038's hold is recorded as D2 below. TODO.md's ~150-line breach is flagged, no
 
 ### T1 — Substrate-gate `init`'s base tier `[size: M · risk: low · class: decision · HITL]`
 Layers: `skills/lean-doc-generator/references/init.md` ·
-    `skills/lean-doc-generator/references/DOCS_Guide.md` · `docs/product/requirements.md`
+    `skills/lean-doc-generator/references/DOCS_Guide.md`
 Depends-on: none
 Cites: `scripts/qa-check.sh`
 
 `init.md` step 2 reads "Scaffold the base tier (**always**)" while every higher tier is substrate-gated
-— DB detected → database docs, API detected → integrations. So a consumer running `init` on a docs,
-config or content repo receives a testing guide, coding standards and two deployment guides describing
-substrate that does not exist. lean-flow is the proof case: the repo that ships `init` deliberately has
-none of them, which means DOCS_Guide §6's "base = every dev repo" and the tool it governs disagree. The
-fix is to extend gating that already exists, not to invent detection.
+— DB detected → database docs, API detected → integrations. So a consumer running `init` on a repo with
+no code receives coding standards and a testing guide describing substrate that does not exist. The fix
+extends gating that already exists (step 3's "substrate-conditional rows fire automatically") rather
+than inventing detection. **Narrowed by the 2026-08-09 scope-change** — see the Log: the axis is
+per-substrate, never "docs-only", and lean-flow's own absent base docs left with the dropped half.
 
-**Acceptance:** a docs-only repo run through `init` receives no testing-guide, coding-standards or
-deployment-guide files, and §6 states the exemption that makes that correct rather than a deviation.
+**Acceptance:** a repo with no code substrate, run through `init`, receives no coding-standards or
+testing-guide file, and §6 states the condition that makes that correct rather than a deviation.
 
 **DoD:**
-- [ ] Read `init.md`'s step-1 detection and confirm A1 — that substrate gating extends to "has code" /
-      "is deployable" without new machinery. If it needs new detection this is L-sized and **splits**
-- [ ] Base-tier rows carry their substrate condition, in the same form the higher tiers already use
-- [ ] `DOCS_Guide` §6's base row states the exemption, so the standard and `init` agree
-- [ ] **Consumer check (L-015)** — traced on a docs-only repo, not on lean-flow's dogfooding alone
-- [ ] lean-flow's own absent base docs resolved explicitly: correct-by-exemption, or created
+- [x] Read `init.md`'s step-1 detection and confirm A1 — **confirmed at G2**: step 1 already detects
+      stack / DB / auth and step 3 already fires conditional rows, so no new machinery is needed
+- [ ] Base-tier rows carry a **per-substrate** condition in the form step 3 already uses. The axis is
+      *has code* · *publishes an artifact* · *has DB* · *has auth* — **not** "docs-only", since a docs
+      repo that publishes still deploys (lean-flow is exactly that, and its deployment guides are right)
+- [ ] `DOCS_Guide` §6's base row states the condition, so the standard and `init` agree
+- [ ] **Consumer check (L-015)** — traced on a repo with no code substrate, not on dogfooding alone
 - [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ### T2 — Name the `Cites:` escape in the two completeness FAILs `[size: S · risk: low · class: execution · HITL]`
@@ -140,12 +141,17 @@ sits where every flow that can defer a question reads it.
   single owner without guessing — ownership by dependency chain, which the preflight accepts (TD-025).
 - **D5** — **TODO.md's ~150-line breach is flagged, not fixed.** It sits at 154. Four of its five
   Backlog tasks leave at close anyway, so pruning now would be work the close performs for free.
+- **D6** — **T1 narrowed to the mechanism** *(owner ruling, 2026-08-09 — logged as a `scope-change`
+  before § Plan was edited)*. Its "docs-only" premise was falsified by its own A1 confirm step, and its
+  second half proved to be ~6 new documents rather than an exemption ruling. The dropped half is
+  **TASK-165**, filed rather than lost.
 
 ## Assumptions
 
 - **A1** — `init`'s existing substrate detection extends to "has code" / "is deployable" without new
   machinery. *Confirm: T1's first DoD line, by reading `init.md` step 1. If new detection is required,
-  T1 is L-sized and splits rather than absorbing the growth silently.*
+  T1 is L-sized and splits rather than absorbing the growth silently.* **CONFIRMED at G2** — and the
+  same read falsified T1's "docs-only" premise, which is what triggered the scope-change.
 - **A2** — L-094's placement test resolves to a nameable home rather than "everywhere". *Confirm: T4's
   first step, by listing the deferring flows. If the answer genuinely is every flow, `CLAUDE.md` is the
   home and something must be displaced — a ruling, surfaced, not a quiet cap breach.*
