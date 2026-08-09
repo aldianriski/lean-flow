@@ -17,7 +17,7 @@ Karpathy's LLM Council, run inside Claude via sub-agents with different lenses i
 
 > **Cap (ADR-006):** this SKILL is the **procedure only**. The executable artifacts — advisor
 > definitions, prompt templates, the worked example — live in `references/` and are read on demand,
-> so they don't count toward the ~110-line cap.
+> so they don't count toward the ~140-line cap.
 
 ## When to invoke
 

@@ -371,7 +371,7 @@ TODO.md · TECH-DEBT.md · README.md · CHANGELOG.md
 - **Curated, not copied** — the core discipline. Every component was reviewed against "genuinely useful · important · actually used" and approved before adding — the opposite of bulk-importing from every reference. The bar is review, not a feature ban.
 - **Standalone, conducted when you want** — the twelve stage-skills each run alone (none require another); the opt-in `/flow` conductor sequences them through the full loop without bypassing a gate.
 - **Ships no custom agent definitions; leverages the built-in ones** — the loop dispatches Claude's built-in agents (`Explore` · `/code-review` · `/verify` · `/security-review`) in isolated passes. `/council` is the one skill that orchestrates sub-agents internally.
-- **Lean** — most SKILL.md ≤ ~110 lines; the one skill that needs a canonical format (`lean-doc-generator`) bundles its own templates + standard and stays self-contained.
+- **Lean** — most SKILL.md ≤ ~140 lines; the one skill that needs a canonical format (`lean-doc-generator`) bundles its own templates + standard and stays self-contained.
 - **Adaptable** — no required scaffold; skills detect the host project's layout and degrade gracefully.
 - **Human-gated** — G1 Scope and G2 Design need explicit sign-off; `/release-patch` never pushes.
 

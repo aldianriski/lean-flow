@@ -94,3 +94,33 @@ Behavioral Guidelines sentence absorbed the new rule by dropping a parenthetical
 
 Worth recording: **T3's own grill ran under the old rule**, necessarily — it is the task that changes
 it. Everything after this point exercises the new one, which is what A4 exists to check.
+
+### 2026-08-09 | complete | T6 — cap 110 → 140, after a measured 7-line reclaim
+**The reclaim stands on its own.** Migrate (13 lines) and Init (9) compressed to dispatch entries:
+`lean-doc-generator/SKILL.md` **110 → 103**, verified green against the *old* 110 cap before the number
+moved. Every detail dropped was confirmed present in `references/migration-map.md` / `references/init.md`
+first — plan vocabulary, out-of-scope filter, idempotent re-run, headless park — so this is reclaim,
+not content loss. **My G2 estimate of ~15 lines was optimistic; the measured figure is 7.**
+
+**The cap is stated in seven places, not the four T6 declared.** `.claude/CLAUDE.md` ×2 (Lean
+principle · DoD), `DOCS_Guide` ×2 (§7 row · growth rule), `council/SKILL.md`, `qa-check.sh`, `README.md`.
+Only `council` was caught by the gate — the observed-layers check **unions Layers across all tasks**, so
+declarations belonging to later tasks masked T6's edits to DOCS_Guide and README. Under sequential
+execution that is harmless; under a parallel run it is exactly the unowned overlap the check exists to
+prevent, and it would have passed. Worth folding into TD-032's family at close.
+
+**A contradiction found and reconciled rather than left.** `DOCS_Guide` §7 read "Mega doc → split;
+**never raise the limit**", and the growth rule repeated it. Raising the cap while that stood would
+have recreated this ADR's own founding problem — *"a rule with silent exceptions rots into
+suggestion"*. Reconciled by narrowing both to "never raise the limit **to fit content** — a cap moves
+only by ADR, diet first", naming the two instances.
+
+**A precedent I should have found before arguing.** **ADR-007 already did this**: "Diet first (dedup),
+then raise the cap to 130" for `CONTEXT.md`, cited inline in §2's row. Reclaim-then-raise is therefore
+established practice here, not a new loosening — which materially strengthens the owner's call and
+weakens the objection I raised at G2. Recorded because the objection is in the log above and should
+not stand unqualified.
+
+The ADR-006 amendment carries all of it: the argument against, the ADR-007 precedent, the measured
+diet, and the accepted consequence (13 other skills may now grow to 140 with no gate objection;
+trigger for revisiting is a second skill crossing ~120 without a comparable scope story).

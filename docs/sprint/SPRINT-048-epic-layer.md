@@ -128,8 +128,13 @@ launcher now reports was chosen *after* the buffering claim was confirmed or ref
 - [ ] `sh scripts/qa-check.sh` green on a bare run
 
 ### T6 — Raise the SKILL cap to 140 and reclaim the duplicated lines `[size: S · risk: med · class: decision · HITL]`
-Layers: `docs/adr/ADR-006-skill-cap-executable-artifacts.md` · `scripts/qa-check.sh` · `.claude/CLAUDE.md` · `skills/lean-doc-generator/SKILL.md`
+Layers: `docs/adr/ADR-006-skill-cap-executable-artifacts.md` · `scripts/qa-check.sh` · `.claude/CLAUDE.md` · `skills/lean-doc-generator/SKILL.md` · `skills/council/SKILL.md` · `skills/lean-doc-generator/references/DOCS_Guide.md` · `README.md`
 Depends-on: none
+<!-- Layers: widened 2026-08-09 during execution — the cap number is stated in 7 places, not 4.
+     council/SKILL.md, DOCS_Guide (§7 + growth rule) and README all restate it. Only council was
+     caught by the gate: the check unions Layers across ALL tasks, so declarations made by later
+     tasks masked T6's edits to the other two. Declared here so the ownership map is honest. -->
+Owner-note: this task owns the cap NUMBER wherever it appears; the disclosure-test edit to DOCS_Guide and the roster prose in README belong to later tasks. Sequential order keeps them disjoint in practice.
 
 Added mid-sprint (see the log's scope-change entry). `lean-doc-generator/SKILL.md` is at 110/110 and a
 later task needs room in it. Two things happen here, deliberately together: the **duplication is
@@ -142,13 +147,13 @@ give the generator real headroom, and it amends ADR-006.
 `lean-doc-generator/SKILL.md` is materially under the new cap — not merely legal against a looser one.
 
 **DoD:**
-- [ ] Migrate compressed to a dispatch entry; its own reference file keeps the full procedure, unedited
-- [ ] Init compressed the same way, its reference file likewise untouched
-- [ ] Measured line delta reported — the reclaim must stand on its own, before the raise is counted
-- [ ] `scripts/qa-check.sh` SKILL cap lint 110 → 140
-- [ ] `.claude/CLAUDE.md` DoD line updated (same-line edit — it is at 80/80)
-- [ ] ADR-006 amended, append-only, **recording the argument against raising** as well as the decision
-- [ ] `sh scripts/qa-check.sh` green on a bare run; no other skill's content changed by the looser cap
+- [x] Migrate compressed to a dispatch entry; its own reference file keeps the full procedure, unedited
+- [x] Init compressed the same way, its reference file likewise untouched
+- [x] Measured line delta reported — **110 → 103, a 7-line reclaim**, verified green against the *old* 110 cap before the number moved. The ~15 estimated at G2 was optimistic; 7 is the measured figure
+- [x] `scripts/qa-check.sh` SKILL cap lint 110 → 140
+- [x] `.claude/CLAUDE.md` DoD line updated (same-line — still 80/80); the number appears in **7 places**, not 4, all now consistent
+- [x] ADR-006 amended, append-only, recording the argument against raising, the ADR-007 precedent, and the accepted consequence
+- [x] `sh scripts/qa-check.sh` green on a bare run — 75 pass, 0 fail; no other skill's content changed (next largest is `prime` at 107, untouched)
 
 ### T7 — Move PRD creation into /lean-doc-generator `[size: M · risk: med · class: execution · HITL]`
 Layers: `skills/lean-doc-generator/SKILL.md` · `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/prd-and-slices.md` · `.claude/CONTEXT.md`

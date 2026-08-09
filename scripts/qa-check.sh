@@ -27,7 +27,7 @@ cap() { # <file> <maxlines>
   if [ "$n" -le "$max" ]; then ok "cap $f ($n <= $max)"; else bad "cap $f ($n > $max)"; fi
 }
 
-for s in skills/*/SKILL.md; do cap "$s" 110; done
+for s in skills/*/SKILL.md; do cap "$s" 140; done
 cap .claude/CLAUDE.md 80
 cap .claude/CONTEXT.md 130
 for sp in docs/sprint/SPRINT-*.md; do [ -f "$sp" ] && cap "$sp" 400; done

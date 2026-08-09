@@ -45,27 +45,20 @@ template ship inside this skill under `${CLAUDE_SKILL_DIR}/`.
 
 ## Migrate (adopt + clean existing docs)
 
-For a repo that already has documentation — ran dev-flow / adlc-flow, or has its own ad-hoc docs —
-align it to lean-flow's **placement · format · wiring**, and **clean house** (consolidate duplicates,
-retire dead docs), so you don't hand-reconcile or get lost in existing code. **HITL + surgical**:
-detect (incl. dupes / orphans / stale) → propose a per-file plan (keep / reformat / relocate / split /
-index / archive / consolidate / retire / leave) → **wait for approval** → apply incrementally; never
-delete content without explicit per-item approval, never touch out-of-scope artifacts. **Re-runnable
-as an update sync** — on an already-adopted repo, migrate detects standard/template deltas since
-adoption and **reports** them (idempotent · report-only · never clobbers user edits). **Headless** — no
-approval can arrive, so record the park before halting: the plan + what it waits on → the `/handoff`
-doc (no sprint file exists here). A prose-only "waiting on your approval" leaves the morning owner no
-artifact that the run happened. Full mapping + re-run procedure → `${CLAUDE_SKILL_DIR}/references/migration-map.md`.
+Align an existing docs tree (dev-flow · adlc-flow · ad-hoc) to lean-flow **placement · format · wiring**;
+consolidate dupes, retire dead docs. **HITL + surgical** — detect → propose a per-file plan → **wait for
+approval** → apply incrementally, never deleting without per-item approval, never touching out-of-scope
+artifacts. Idempotent and report-only on re-run. **Headless parks and records** to the `/handoff` doc —
+prose alone leaves no artifact that the run happened. Full mapping · plan vocabulary · out-of-scope
+filter · re-run + park protocol → `${CLAUDE_SKILL_DIR}/references/migration-map.md`.
 
 ## Init (scaffold a fresh repo)
 
-For a **greenfield** repo with no lean-flow docs yet — the twin of migrate. **Scope-interactive +
-docs-only** — the base-tier mandatory minimum always, higher tiers offered via an AskUserQuestion
-popup; writes docs plus exactly the three-file safe-scaffold allowlist (`.env.example` ·
-`.gitignore` · `LICENSE`, write-if-absent), never `settings.json` or any other non-doc file. **Headless**
-— the tier popup cannot be answered, so record the park before halting: the detected substrate + the
-unanswered tier choice → the `/handoff` doc. Declining in prose alone leaves no artifact. Full
-procedure, base-tier table, and the safe-scaffold allowlist → `${CLAUDE_SKILL_DIR}/references/init.md`.
+Greenfield twin of migrate. **Scope-interactive + docs-only** — base tier always, higher tiers via an
+AskUserQuestion popup; docs plus exactly three safe-scaffold files (`.env.example` · `.gitignore` ·
+`LICENSE`, write-if-absent), never `settings.json` or any other non-doc file. **Headless parks and
+records** to the `/handoff` doc — the tier popup cannot be answered. Procedure · base-tier table ·
+allowlist → `${CLAUDE_SKILL_DIR}/references/init.md`.
 
 ## Execution flow
 

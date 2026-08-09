@@ -86,7 +86,8 @@ relocates a legacy layout (`git mv` + inbound-link fixes — content untouched).
 tree**: `architecture/overview.md` spawns `data-flow.md` / `authentication.md` / `integrations.md`
 (overview keeps the map + links); `development/setup.md` can spawn per-platform pages;
 `deployment-guide.md` spawns the environment matrix. Move whole sections; never compress signal away
-to stay under a cap, and never raise the cap (§7). Ledgers (§11) compress; **knowledge docs split**.
+to stay under a cap, and never raise the cap to fit content (§7 — a cap moves only by ADR, diet first).
+Ledgers (§11) compress; **knowledge docs split**.
 
 **LAW 1, reinterpreted (ADR-012).** The mandatory minimum above is scaffolded at **init** — with
 real content prompts, never empty shells; beyond the minimum, create-lazily still governs (no doc
@@ -126,7 +127,7 @@ artifact** — it defines agreed tokens and components (as SPRINT captures WHAT/
 own design-token frontmatter instead of the §3 ownership header. Never auto-create; never add to the
 core doc generation loop; never listed in the §2 table.
 
-**SKILL.md cap (ADR-006).** A skill's `SKILL.md` stays ≤ ~110 lines of **procedure + scaffolding**;
+**SKILL.md cap (ADR-006).** A skill's `SKILL.md` stays ≤ ~140 lines of **procedure + scaffolding**;
 **executable artifacts** (prompt templates, persona/advisor definitions, schemas) live in the skill's
 own `references/` and **don't count** toward the cap. "Executable artifact" must not stretch to cover
 ordinary prose — police it honestly.
@@ -142,7 +143,7 @@ canonical name — never "When to run") → one procedure section (name free —
 Workflow/Phases) → `## Output format` (required only for deterministic-output skills; canonical
 name — never bare "Output") → `## Hard rules` (optional) → `## Red flags` (required, ❌-bullets).
 **References**: internal pointers use `${CLAUDE_SKILL_DIR}/references/...`; a skill never points into
-ANOTHER skill's `references/`/`templates/`. **Caps**: `SKILL.md` ≤ ~110 lines procedure+scaffolding
+ANOTHER skill's `references/`/`templates/`. **Caps**: `SKILL.md` ≤ ~140 lines procedure+scaffolding
 (ADR-006); `references/` uncapped.
 
 ---
@@ -235,7 +236,7 @@ their §11 leg retires them.
 | HOW documentation | Redirect to a code comment |
 | Orphan doc (no header) | Add header before touching file |
 | Person ownership ("Alice") | Reassign to a role |
-| Mega doc (over line limit) | Split per §2; never raise the limit |
+| Mega doc (over line limit) | Split per §2; never raise the limit **to fit content**. A cap moves only by ADR, and only after a diet pass has been measured first — the precedent is ADR-007 (`CONTEXT.md` → 130) and ADR-006 as amended (`SKILL.md` → 140). Raising it silently is what the rule forbids; an ADR that records the argument is the escape hatch, cited inline in §2 |
 | Sprint file > 400 lines | Block — split the sprint |
 | Stale doc used as source | Run the staleness scan first |
 | File outside the core set | Redirect to code or an existing core file |
