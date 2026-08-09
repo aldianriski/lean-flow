@@ -9,7 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
-- SPRINT-057 — Prove the Guards — closed 2026-08-10 · CLOSE_COMMIT (MINOR v1.31.0)
+- SPRINT-057 — Prove the Guards — closed 2026-08-10 · 75c2f66 (MINOR v1.31.0)
 - SPRINT-056 — Silent Passes — closed 2026-08-09 · 07637d6 (MINOR v1.30.0)
 - SPRINT-055 — Wiring the Standard — closed 2026-08-09 · 9aa1075 (MINOR v1.29.0)
 - SPRINT-054 — Rulings — closed 2026-08-09 · b31e170 (MINOR v1.28.0)
