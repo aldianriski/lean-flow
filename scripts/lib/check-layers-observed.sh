@@ -115,8 +115,18 @@ for sp in "$@"; do
 
   # Union of every task block's declared Layers: tokens (backtick-quoted paths), single-line
   # space-separated so a `case " $layers_all " in *" $f "*)` word match works below.
+  #
+  # A declaration continues onto INDENTED following lines (SPRINT-049 T3). Reading only `^Layers:`
+  # silently kept the first line of a wrapped declaration and treated every path after it as
+  # undeclared -- the same truncation defect as in check-layers-completeness.sh, which is where the
+  # rule and its must-FAIL fixtures live. Kept in sync deliberately: both checkers read the same
+  # declaration, so a parsing rule that differs between them would make one of the two lie.
   plan=$(awk '/^## Plan/{f=1;next} /^## /{f=0} f' "$sp")
-  layers_all=$(printf '%s\n' "$plan" | grep -E '^Layers:' | grep -oE '`[^`]+`' | tr -d '`' | tr '\n' ' ')
+  layers_all=$(printf '%s\n' "$plan" | awk '
+      /^Layers:/ { inl=1; print; next }
+      inl && /^[ \t]+[^ \t]/ { print; next }
+      { inl=0 }
+    ' | grep -oE '`[^`]+`' | tr -d '`' | tr '\n' ' ')
 
   # Observed changed-file set: tracked diff since plan_commit (staged + unstaged) UNION untracked
   # new files -- a file never `git add`ed is exactly SPRINT-042 T3's real recorded shape.

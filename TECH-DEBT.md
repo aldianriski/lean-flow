@@ -62,7 +62,7 @@ status: current
     is no automated scan for research-doc caps at promote — only TODO.md's ~150 line trigger exists —
     so this row is the only thing that will resurface it.
 
-- **TD-032** severity: minor | status: open | created: Sprint-047
+- **TD-032** severity: minor | status: resolved → SPRINT-049 T3 | created: Sprint-047
   - Summary: `scripts/lib/check-layers-completeness.sh` cannot distinguish a file the task **will
     touch** from a file its prose merely **mentions**. It fired three times in one task during
     SPRINT-047 T1 — on a `CHANGELOG.md` used as an analogy ("the CHANGELOG.md shape"), on a fixture
@@ -89,6 +89,29 @@ status: current
     TD-035 (filed this sprint) is the third row in the family, so the trigger this row set — "if a
     third arrives, the checks want a rethink rather than another narrowing" — **has fired**. Treat
     TD-031 · TD-032 · TD-035 as one redesign, not three patches.
+  - **RESOLVED (SPRINT-049 T3) — and this row's own proposed mitigation was falsified first.** The
+    Mitigation line above proposed narrowing the derivation to "DoD/Acceptance lines only, excluding
+    the free-text rationale paragraph". Replaying the checker across all 11 revisions of the
+    SPRINT-048 Plan shows every false positive sitting **inside a DoD checkbox item** — a source read
+    (`fog-fleet-orchestration.md`), a pipeline explanation (`requirements.md`), a retrospective note
+    (`T6`). The narrowing would have fixed none of them, because the discriminator is the token's
+    *role in the sentence*, which no line-scoped filter separates.
+    Shipped instead: an explicit **`Cites:`** declaration line beside `Layers:`/`Depends-on:`, listing
+    tokens that are cited-not-touched, exempting them from legs (a) and (c). Absence changes nothing
+    — an unescaped mention still FAILs — so an author who forgets the escape gets today's behaviour,
+    never a silent pass (L-071). The escape's own abuse case is a named FAIL: a token in both `Cites:`
+    and `Layers:` is a contradiction. Leg (a) was deliberately **not** demoted to a WARN: it is the
+    only validation of `Layers:` that runs before any file changes, and the dispatch ownership map is
+    derived from `Layers:` at promote, so the observed checker cannot substitute for it — it fires
+    after the collision it exists to prevent.
+    Also fixed here, a third defect found during the work: a **wrapped `Layers:` declaration was
+    silently truncated** to its first line by both checkers, turning every path on the continuation
+    into a simultaneous "undeclared" and "prose-implied" false positive under a misleading finding.
+    Indented continuations are now read by both; an unindented one is its own named FAIL rather than
+    being reclassified as prose.
+    Fixtures retained (TD-012): `sprint-048-citations.md` (must-PASS, the three real shapes) ·
+    `cites-contradiction.md` · `unindented-continuation.md`, plus the two pre-existing must-FAIL rows,
+    all wired into `evals/run-layers-completeness-fixtures.sh`.
 
 - **TD-031** severity: minor | status: open | created: Sprint-046
   - Summary: the observed-layers check's exclusion list has grown by one entry per sprint for four

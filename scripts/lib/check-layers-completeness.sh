@@ -18,6 +18,42 @@
 #       marked ... resolved", never names the file it lives in)
 #   (c) another task's id (T<N>) named in the block's prose but absent from its Depends-on: line
 #
+# --- `Cites:` -- the explicit escape (SPRINT-049 T3, ruling R3/R4) -------------------------------
+# Legs (a) and (c) cannot tell a filename the task will TOUCH from one its prose merely CITES, and
+# TD-032's proposed narrowing ("scan DoD/Acceptance lines only, not the rationale paragraph") is
+# refuted by its own evidence: replaying all 11 revisions of the SPRINT-048 Plan shows every false
+# positive sitting INSIDE a DoD checkbox item -- `fog-fleet-orchestration.md` cited as a source read,
+# `requirements.md` cited while explaining a pipeline, `T6` cited in a retrospective note. The
+# discriminator is the token's ROLE in the sentence, which no line-scoped filter separates.
+#
+# Leg (a) still earns a FAIL rather than a WARN because it is the only validation of `Layers:` that
+# runs BEFORE any file changes, and the worktree dispatch ownership map is derived from `Layers:` at
+# promote. The observed checker (check-layers-observed.sh) cannot substitute: it fires post-hoc,
+# after the collision it exists to prevent. So the author declares intent instead of rewording the
+# documentation to keep the gate quiet -- which is the behaviour TD-032 recorded, ~11 times in one
+# sprint, as the check actively making docs worse.
+#
+#   Cites: `fog-fleet-orchestration.md` `requirements.md` T6 T7
+#
+# One optional line per task block, beside Layers:/Depends-on:. A token listed there is exempt from
+# (a)/(c) for that block only. ABSENCE CHANGES NOTHING -- an unescaped mention still FAILs, so the
+# escape is opt-in and an author who forgets it gets today's behaviour, never a silent pass (L-071:
+# an omission must not look like absence).
+#
+# The escape cannot become a blanket silencer: a token in BOTH Cites: and Layers: is contradictory
+# -- the block claims to touch it and to merely cite it -- and is its own named FAIL. Whether a
+# Cites: token was nonetheless CHANGED is not knowable here (this checker reads text, not history);
+# that is check-layers-observed.sh's job, which attributes real changes per task.
+#
+# --- multi-line declarations --------------------------------------------------------------------
+# A declaration continues onto following lines that are INDENTED, matching how TODO.md task entries
+# already wrap. Previously only `grep -E '^Layers:'` was read, so a wrapped declaration silently kept
+# its first line and every path on the continuation became simultaneously undeclared AND
+# prose-implied -- a cascade of false positives under a misleading finding (this is what failed at
+# the SPRINT-049 promote and was first mis-diagnosed as TD-032's prose-mention shape). A continuation
+# left at column 0 is NOT silently reclassified as prose: it is its own named FAIL, because that is
+# precisely the shape whose finding used to mislead.
+#
 # Usage: sh check-layers-completeness.sh <sprint-plan.md> [<sprint-plan.md> ...]
 # Only files whose frontmatter `status:` is `active` are checked; a non-active, malformed, or
 # missing file is silently skipped (not a FAIL) -- safe to run unconditionally over every
@@ -31,24 +67,69 @@ fail=0
 ok()  { printf 'PASS  %s\n' "$1"; }
 bad() { fail=1; printf 'FAIL  %s\n' "$1"; }
 
+# Classify every line of a task block as a declaration line (its key), a stray continuation, or
+# prose. Emits "<tag>|<text>" where tag is one of: Layers | Depends-on | Cites | STRAY | P.
+# A line indented under a declaration continues it; a column-0 line starting with a backtick
+# immediately after a declaration is a STRAY -- an unindented continuation the author expected to
+# be read (see header).
+classify() {
+  printf '%s\n' "$1" | awk '
+    /^### / { cur=""; next }
+    /^(Layers|Depends-on|Cites):[ \t]*/ {
+      cur=$0; sub(/:.*/,"",cur); line=$0; sub(/^[^:]*:[ \t]*/,"",line)
+      print cur "|" line; next
+    }
+    cur != "" && /^[ \t]+[^ \t]/ { line=$0; sub(/^[ \t]+/,"",line); print cur "|" line; next }
+    cur != "" && /^`/ { print "STRAY|" cur; cur=""; print "P|" $0; next }
+    { cur=""; print "P|" $0 }
+  '
+}
+
+# Pull the joined value of one declaration key out of classified block text.
+declval() { printf '%s\n' "$1" | sed -n "s/^$2|//p" | tr '\n' ' '; }
+
 check_block() {
   # $1=sprint-file $2=tid (e.g. "### T1") $3=block-text (header line through the next header)
   sp=$1; tid=$2; blk=$3
   tshort=$(printf '%s' "$tid" | grep -oE 'T[0-9]+')
-  layers_line=$(printf '%s' "$blk" | grep -E '^Layers:')
-  deps_line=$(printf '%s' "$blk" | grep -E '^Depends-on:')
-  # prose = the whole block minus its own header/Layers:/Depends-on: lines, so the declaration is
-  # never diffed against itself.
-  prose=$(printf '%s' "$blk" | grep -vE '^(### |Layers:|Depends-on:)')
+  cls=$(classify "$blk")
+
+  layers_line=$(declval "$cls" 'Layers')
+  deps_line=$(declval "$cls" 'Depends-on')
+  cites_line=$(declval "$cls" 'Cites')
+  # prose = everything not part of a declaration, so a declaration is never diffed against itself.
+  prose=$(printf '%s\n' "$cls" | sed -n 's/^P|//p')
+
+  # -- unindented continuation: named, never silently folded into prose ----------------------
+  strays=$(printf '%s\n' "$cls" | sed -n 's/^STRAY|//p' | sort -u | tr '\n' ' ')
+  if [ -n "$(printf '%s' "$strays" | tr -d ' ')" ]; then
+    bad "$sp $tid declaration continuation: a wrapped ${strays}line must be indented to continue; at column 0 it reads as prose"
+  fi
+
+  cites_toks=$(printf '%s' "$cites_line" | grep -oE '`[^`]+`' | tr -d '`' | sort -u)
+  cites_tids=$(printf '%s' "$cites_line" | grep -oE '\bT[0-9]+\b' | sort -u)
+
+  # -- Cites:/Layers: contradiction -- the escape must not double as a declaration ------------
+  contra=""
+  for c in $cites_toks; do
+    printf '%s' "$layers_line" | grep -qF "$c" && contra="$contra $c"
+  done
+  if [ -n "$contra" ]; then
+    bad "$sp $tid Cites/Layers contradiction:$contra declared as touched AND escaped as merely cited"
+  fi
 
   # -- (a)+(b): file-shaped tokens named in prose, absent from Layers: -----------------------
   miss_f=""
   toks=$(printf '%s' "$prose" | grep -oE '`[A-Za-z0-9_./-]+\.[A-Za-z]+`' | tr -d '`' | sort -u)
   for t in $toks; do
-    printf '%s' "$layers_line" | grep -qF "$t" || miss_f="$miss_f $t"
+    printf '%s' "$layers_line" | grep -qF "$t" && continue
+    printf '%s\n' "$cites_toks" | grep -qxF "$t" && continue
+    miss_f="$miss_f $t"
   done
   if printf '%s' "$prose" | grep -qE 'TD-[0-9]+' && printf '%s' "$prose" | grep -qi 'resolved'; then
-    printf '%s' "$layers_line" | grep -qF 'TECH-DEBT.md' || miss_f="$miss_f TECH-DEBT.md(TD-marked-resolved)"
+    if ! printf '%s' "$layers_line" | grep -qF 'TECH-DEBT.md'; then
+      printf '%s\n' "$cites_toks" | grep -qxF 'TECH-DEBT.md' || miss_f="$miss_f TECH-DEBT.md(TD-marked-resolved)"
+    fi
   fi
   if [ -n "$miss_f" ]
   then bad "$sp $tid Layers completeness: DoD/Acceptance implies$miss_f, absent from Layers:"
@@ -60,7 +141,9 @@ check_block() {
   oids=$(printf '%s' "$prose" | grep -oE '\bT[0-9]+\b' | sort -u)
   for o in $oids; do
     [ "$o" = "$tshort" ] && continue
-    printf '%s' "$deps_line" | grep -qE "\b$o\b" || miss_d="$miss_d $o"
+    printf '%s' "$deps_line" | grep -qE "\b$o\b" && continue
+    printf '%s\n' "$cites_tids" | grep -qxF "$o" && continue
+    miss_d="$miss_d $o"
   done
   if [ -n "$miss_d" ]
   then bad "$sp $tid Depends-on completeness: DoD/Acceptance references$miss_d, absent from Depends-on:"

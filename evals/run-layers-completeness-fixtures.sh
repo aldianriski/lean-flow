@@ -36,6 +36,24 @@ run_case_anywhere "depends-on-omitted" 1 \
   "Depends-on completeness: DoD/Acceptance references T1, absent from Depends-on:" -- \
   sh "$checker" "$here/fixtures/layers-completeness/depends-on-omitted.md"
 
+# --- cases 3-5: the `Cites:` escape and the wrapped-declaration rule (SPRINT-049 T3) -------------
+# Case 3 is the only must-PASS fixture in this harness, and it is the one that guards against the
+# regression TD-032 actually recorded: the gate quietly reshaping documentation. Its three blocks are
+# the real SPRINT-048 false positives (commits 45ff548 / 68bdc7e / c401a0e). Cases 4 and 5 are the
+# escape's own must-FAIL bar -- an escape with no abuse case is a silencer (L-058).
+
+run_case_anywhere "sprint-048-citations-escaped" 0 \
+  "Layers completeness (DoD-implied files all declared)" -- \
+  sh "$checker" "$here/fixtures/layers-completeness/sprint-048-citations.md"
+
+run_case_anywhere "cites-contradiction" 1 \
+  "Cites/Layers contradiction: docs/QA.md declared as touched AND escaped as merely cited" -- \
+  sh "$checker" "$here/fixtures/layers-completeness/cites-contradiction.md"
+
+run_case_anywhere "unindented-continuation" 1 \
+  "declaration continuation: a wrapped Layers line must be indented to continue" -- \
+  sh "$checker" "$here/fixtures/layers-completeness/unindented-continuation.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-COMPLETENESS FIXTURES: all green"; else echo "LAYERS-COMPLETENESS FIXTURES: at least one FAIL"; fi
 exit $fail

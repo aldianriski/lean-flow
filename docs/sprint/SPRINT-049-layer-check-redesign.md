@@ -34,45 +34,87 @@ promised here — the checks are maintainer tooling, so the version decision wai
 
 ## Plan
 
-### T1 — Redesign the two layer checks as one attribution-based check `[size: M · risk: med · class: decision · HITL]`
-Layers: `scripts/lib/check-layers-completeness.sh` · `scripts/lib/check-layers-observed.sh` · `scripts/qa-check.sh` · `evals/run-layers-completeness-fixtures.sh` · `evals/run-layers-observed-fixtures.sh` · `evals/fixtures/layers-completeness/` · `TECH-DEBT.md`
+### T1 — Attribute each changed path to the task that changed it `[size: M · risk: med · class: decision · HITL]`
+Layers: `scripts/lib/check-layers-observed.sh` · `scripts/qa-check.sh` ·
+    `evals/run-layers-observed-fixtures.sh` · `TECH-DEBT.md`
 Depends-on: none
+Cites: T3
 
-TD-031, TD-032 and TD-035 are three symptoms of one design error: a declaration-driven gate cannot
-tell task work from coordinator bookkeeping, so every new class of legitimate change arrives as a
-false positive and is answered with another exclusion — while the union it tests against hides a real
-collision. Deriving the answer from *who* changed a path replaces both the exclusion list and the
-union. TD-031 explicitly warned against redesigning a working guard under no pressure; TD-035 is that
-pressure, and it is a false negative, so this is correctness rather than polish.
+<!-- Amended 2026-08-09 by scope-change (log, rulings R1+R2): T1 was an L covering both checkers;
+     it split into T1 (attribution) + T3 (prose precision). Substance retained, nothing dropped. -->
 
-**Acceptance:** `scripts/qa-check.sh` reports the layer checks green on this repo at HEAD, while a Plan in
-which task A edits a file only task B declared FAILs by a named finding — a case that passes today.
+TD-035 is a false negative in the check built to prevent concurrent-edit collisions: one union of
+every task's `Layers:` means a file declared by *any* task satisfies the check for *all* tasks. TD-031
+names the sibling cause — the exclusion list has grown one entry per sprint because the check asks
+"did a task declare this?" when it means "was this task work or coordinator bookkeeping?". Attributing
+each path to *who* changed it answers the second question directly and retires both.
+
+**Acceptance:** `scripts/qa-check.sh` reports the observed check green on this repo at HEAD, while a
+Plan in which task A edits a file only task B declared FAILs by a named finding — a case that passes today.
 
 **DoD:**
-- [ ] Baseline recorded first: run both fixture harnesses on the *unchanged* checkers and record which
-      assertions pass, so a later green cannot be mistaken for a fixture that stopped testing (L-058)
-- [ ] Attribution source established and stated **in the checker** — how a changed path is attributed
-      to the task that changed it (task commit on an agent branch vs coordinator bookkeeping), never a
-      silent skip list; the exclusion list shrinks to what attribution cannot cover, each survivor
-      re-justified
+- [ ] Baseline recorded first: run the observed-fixture harness on the *unchanged* checker and record
+      which assertions pass, so a later green cannot be mistaken for a fixture that stopped testing (L-058)
+- [ ] Attribution implemented per ruling **R2** and stated **in the checker**: prefer a `Task: T<n>`
+      git trailer, fall back to the three observed subject forms (`sprint(NN) T<n>:` ·
+      `merge(…): T<n>` · trailing `(SPRINT-NNN T<n>)`), never a silent skip list
+- [ ] An **unattributable** commit's non-bookkeeping paths FAIL by name — never a default-to-coordinator
+      pass, which would rebuild TD-035's shape one layer down (five real task commits carry no id)
 - [ ] `check-layers-observed.sh` tests **per task**; the all-task union is gone
-- [ ] `check-layers-completeness.sh` no longer registers a backtick-quoted filename that appears only
-      in explanatory prose
-- [ ] Must-FAIL fixture (retained): SPRINT-041's real miss — a TD marked resolved with the debt ledger
-      undeclared — still FAILs, by its *named* finding, not merely non-zero
+- [ ] The exclusion list shrinks to what attribution cannot cover; each survivor re-justified in place
 - [ ] Must-FAIL fixture (new): a task editing a file only another task declared **newly** FAILs, by its
       named finding
-- [ ] Must-PASS fixture: SPRINT-048's prose-mention instances (analogy · cross-reference · coordination
-      note · research citation) report clean
-- [ ] All fixtures land under `evals/` and run from the harness scripts — retained, not deleted with
-      the change (TD-012)
-- [ ] `TD-031` · `TD-032` · `TD-035` marked `status: resolved → SPRINT-049 T1` in the ledger
+- [ ] Must-FAIL fixture (new): a commit no rule attributes reports its own named finding
+- [ ] Fixtures land under `evals/` and run from the harness — retained, not deleted with the change (TD-012)
+- [ ] `TD-031` · `TD-035` marked `status: resolved → SPRINT-049 T1` in the ledger
 - [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit, after the DoD ticks and the log
       entry — those are edits too (L-089)
 
-<!-- QA: this is a gate change, so the L-058 bar binds — one must-FAIL fixture per check, each failing
-     with its named finding. A security or perf pass is not indicated; maintainer tooling, no input
-     surface. -->
+<!-- QA: gate change → the L-058 bar binds (one must-FAIL fixture per check, each failing by its named
+     finding). No security or perf pass indicated; maintainer tooling, no input surface. -->
+
+### T3 — Give the prose-derived checks an explicit escape, and fix the single-line `Layers:` defect `[size: M · risk: med · class: decision · HITL]`
+Layers: `scripts/lib/check-layers-completeness.sh` · `scripts/lib/check-layers-observed.sh` ·
+    `scripts/qa-check.sh` · `evals/run-layers-completeness-fixtures.sh` ·
+    `evals/fixtures/layers-completeness/sprint-048-citations.md` ·
+    `evals/fixtures/layers-completeness/cites-contradiction.md` ·
+    `evals/fixtures/layers-completeness/unindented-continuation.md` · `TECH-DEBT.md`
+Depends-on: none
+Cites: `fog-fleet-orchestration.md` `requirements.md` `product-requirements.md.template` T1 T2 T4 T6 T7
+
+<!-- Added 2026-08-09 by scope-change (log, rulings R1+R3+R4). Numbered T3, not T1b: both
+     qa-check.sh and the completeness checker extract block ids with `^### T[0-9]+`, under which
+     `T1a`/`T1b` collapse to one id and make a per-block finding ambiguous. -->
+
+TD-032's own mitigation is falsified by its own evidence (log, A2): every SPRINT-048 false positive
+sits **inside a DoD checkbox item**, so narrowing to DoD/Acceptance lines fixes none of them. The
+discriminator is the token's role — cited versus touched — which no line-scoped filter separates. Leg
+(a) still earns its FAIL because it is the only validation of `Layers:` that runs *before* any file
+changes, and the dispatch ownership map is derived from `Layers:` at promote; so the author declares
+intent through an explicit escape rather than by rewording the documentation.
+
+**Acceptance:** the three SPRINT-048 false positives report clean without their prose being reworded,
+while a genuinely forgotten declaration still FAILs by name.
+
+**DoD:**
+- [x] Explicit inline escape defined and documented in the checker — marks a backtick-quoted filename
+      as cited-not-touched; absent the marker, behaviour is unchanged (a FAIL) — a `Cites:` line
+- [x] Escape applies to leg (c) `Depends-on` completeness as well, per ruling **R4** — a retrospective
+      note naming another task is not a dependency
+- [x] Multi-line `Layers:` no longer silently truncates: either continuation lines are read, or a
+      multi-line declaration is its own named FAIL — never silently reclassified as prose — **both**
+      checkers fixed, since both parse the same declaration
+- [x] Must-PASS fixtures from real history: `fog-fleet-orchestration.md` (T1 DoD) ·
+      `requirements.md` + `product-requirements.md.template` (T7 DoD) · the `T6` retrospective note
+      (T2 + T4 DoD) all report clean once escaped
+- [x] Must-FAIL fixture (retained): SPRINT-041's real miss — a TD marked resolved with the debt ledger
+      undeclared — still FAILs, by its *named* finding, not merely non-zero
+- [x] Must-FAIL fixture (new): an escape marker does **not** suppress a path that was actually changed
+      — the escape must not become a blanket silencer. **Delivered as the `Cites:`/`Layers:`
+      contradiction fixture; read the log entry for what that does and does not establish**
+- [x] Fixtures land under `evals/` and run from the harness — retained, not deleted with the change (TD-012)
+- [x] `TD-032` marked `status: resolved → SPRINT-049 T3` in the ledger
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ### T2 — Promote L-088 into an `/orchestrator` red flag `[size: S · risk: low · class: execution · HITL]`
 Layers: `skills/orchestrator/SKILL.md` · `docs/LEARNINGS.md` · `docs/knowledge-index.md`
@@ -111,18 +153,22 @@ L-088 reads `promoted: yes → skills/orchestrator/SKILL.md § Red flags`.
   `TD-028` and `TD-030` deleted (resolved ≥3 sprints ago; ids stay retired), and the three `v1.25.x`
   CHANGELOG blocks rotated verbatim to `docs/changelog/CHANGELOG-1.25.2.md` (root 177 → 78 lines).
   LEARNINGS pointer-collapse had nothing pending; `TODO.md` at 99 lines is under its ~150 trigger.
+- **D5** *(added 2026-08-09 by scope-change)* — rulings **R1**–**R4** are recorded in the Execution
+  Log's `scope-change` entry, which is their authoritative statement: R1 split T1 → T1 + T3 · R2
+  trailer-preferred attribution with a named FAIL for the unattributable · R3 leg (a) keeps its FAIL
+  behind an explicit escape · R4 leg (c) takes the same escape, widening TASK-152's stated boundary.
 
 ## Assumptions
 
-- **A1** — a changed path can be attributed to *who* changed it in **both** execution shapes this repo
-  uses: worktree-parallel dispatch (agent branch vs coordinator commits) and sequential inline
-  execution, where there are no branches to discriminate on. *Confirm: T1's first step, against a real
-  sequential sprint's commit range and a worktree run's branch set. If inline execution cannot yield
-  the discriminator, T1 re-scopes through a `scope-change` entry and an owner ruling — never by
-  quietly reinterpreting the DoD (this is L-088, which T2 promotes).*
-- **A2** — the retained SPRINT-041 fixture still reproduces its FAIL against the *current* checkers.
-  *Confirm: the baseline run in T1's first DoD item, before any edit — a fixture assumed to be
-  guarding is the silent false-negative L-058 is about.*
+- **A1** — ✅ **confirmed with a caveat (2026-08-09)** — a changed path can be attributed to *who*
+  changed it under both execution shapes, but by **three** subject forms plus a trailer, not one rule;
+  five real task commits carry no id and are reachable only through their merge-back commit, so
+  *unattributable* must be a named FAIL rather than a default bucket. Evidence + commit shas → the
+  Execution Log's first entry. Folded into T1's DoD as ruling R2.
+- **A2** — ⬜ **still open** — the retained SPRINT-041 fixture still reproduces its FAIL against the
+  *current* checkers. *Confirm: the baseline run, now T3's first DoD item, before any edit — a fixture
+  assumed to be guarding is the silent false-negative L-058 is about.* (The premise falsified during
+  G2 was a DoD item's, not this one — see the Log's correction entry.)
 - **A3** — TD-035's collision scenario is presently harmless because execution is sequential; the
   exposure is real only under the worktree-parallel dispatch this repo ships. *Confirm: stated in
   TD-035 and unchanged — this bounds the risk of the sprint, not its necessity.*
