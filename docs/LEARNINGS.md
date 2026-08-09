@@ -160,10 +160,31 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 ---
 
 ## L-086 [tags: tooling] [status: active]: **A permission rule can be present, correct, and completely inert — presence is not effect.** Measured directly, one variable at a time (SPRINT-046 T1). **(1) Workspace trust is a precondition for the whole file**: an untrusted workspace has its `permissions.allow` *ignored entirely*, announced in a single line and otherwise silent, so a character-exact rule produced a denial purely because the file was never honoured. **(2) Rule form decides matching**: against one identical command, exact-file (`Bash(sh path/x.sh:*)`), bare-command (`Bash(sh:*)`) and space-glob (`Bash(sh *)`) all matched, while **directory-prefix (`Bash(sh dir/:*)`) denied**, reproduced. **(3) The command's own shape still governs**: relative → permitted, absolute → permitted, but adding `> file` → **denied**, reproduced — which is L-077's rule, and is what actually explains the denials once blamed on mid-session degradation (L-084, now superseded). Three independent ways for a correct-looking allowlist to do nothing, none of which announce themselves as a rule problem. The habit worth keeping: **verify a rule *matched*, never that it exists** — the failure modes all look identical from the settings file.
-- seen: Sprint-046
-- count: 1
-- promoted: no
-- related: L-077 (the matcher reads the literal invocation) · L-084 (superseded by this) · L-083 (a precondition that silently stopped holding) · TD-028 · `docs/research/headless-permission-surface.md`
+- **Second sighting, from OUTSIDE this repo (2026-08-09).** A consumer's field report — their own
+  SPRINT-131 on lean-flow 1.29.0, a different OS and shell — hit mechanisms (1) and (2) blind, in that
+  order, and lost a whole configuration to each. Workspace trust: **two records for one directory**, the
+  interactive session landing on the trusted key and the headless launcher on the untrusted one, so all
+  57 rules were ignored — and the remedy the CLI itself prints ("run interactively once and accept")
+  *provably cannot fix it*, because the interactive session resolves to the key that is already trusted.
+  Rule form: the natural extrapolation from our measured `Bash` rows, a path-scoped `Write(<abs>/**)`,
+  **denied**, while the bare tool name matched — so our measured table generalised in shape but not in
+  spelling, and no rows existed for `Read`/`Edit`/`Write` at all. What makes this a genuine recurrence
+  rather than a restatement: it is *independent* evidence, on hardware we do not control, for a learning
+  filed on one host and never re-tested (which is L-097's own warning applied to a learning instead of a
+  figure). The report's own consolidation is worth keeping — findings 1·2·3·8 are one principle, *a
+  control that is absent, misspelled, or dead is indistinguishable from one that is working*, because
+  the failure mode of a guard is silence — and its transferable technique is the **negative control**: a
+  deliberate must-deny action in the probe, without which "every call succeeded" and "the allowlist was
+  ignored entirely" produce identical output. Their probe caught two total-loss configurations for
+  $1.77 against a run estimated at $40–150.
+- seen: Sprint-046, consumer field report 2026-08-09
+- count: 2
+- promoted: no — **ruled at the SPRINT-057 promote → `night-run.md` Part 1, delivered by that sprint's
+  probe task.** Deliberately not written into a doc at the moment of ruling: the task rewrites that exact
+  section, and promoting it separately would create a second copy the same day, which §10 names as the
+  way a promotion reproduces the failure it was meant to stop (L-092). Flips to `yes` at close if the
+  rule actually lands; stays flagged by the scan until it does.
+- related: L-077 (the matcher reads the literal invocation) · L-084 (superseded by this) · L-083 (a precondition that silently stopped holding) · L-103 (the same principle one level up, at the checker layer) · TD-028 · `docs/research/headless-permission-surface.md`
 
 ---
 

@@ -45,7 +45,20 @@ run_case_anywhere "grandfather-grew" 1 "it GREW" -- \
 run_case_anywhere "grandfather-held" 0 "OVER-CAP (grandfathered): drifting.md" -- \
   sh "$checker" "$fx/grandfather-grew/DOCS_Guide.md" "$fx/grandfather-grew" "$fx/grandfather-grew/gf-held.txt"
 
-# --- case 5: the live repo's own §2 must still derive rows ---------------------------------------
+# --- case 5a/5b: SOFT caps report, HARD caps fail, in one fixture --------------------------------
+# §2 marks its caps ("~150 soft" vs "400 hard") and the first version of this checker discarded the
+# marker, so a soft breach failed the gate exactly like a hard one. §11 routes a soft cap to the
+# governance review for a prune-with-the-owner, which means failing there blocks the very commit that
+# would do the pruning. The narrowing is deliberate, so both halves are asserted: 5a is the
+# must-NOT-catch demonstration L-076 requires (soft over cap, exit 0, still reported by name), 5b
+# proves the hard leg was not weakened along with it. One fixture, both caps, opposite verdicts.
+run_case_anywhere "soft-cap-reports-not-fails" 0 "OVER-CAP (soft): soft.md (5 > 3)" -- \
+  sh "$checker" "$fx/soft-cap/DOCS_Guide.md" "$fx/soft-cap" "$fx/soft-cap/none.txt"
+
+run_case_anywhere "hard-cap-still-fails-beside-it" 1 "FAIL  cap hard.md (4 > 3)" -- \
+  sh "$checker" "$fx/soft-cap-hard-breach/DOCS_Guide.md" "$fx/soft-cap-hard-breach" "$fx/soft-cap-hard-breach/none.txt"
+
+# --- case 6: the live repo's own §2 must still derive rows ---------------------------------------
 # A parser that stops matching the real table degrades to zero coverage, and zero coverage over zero
 # rows would otherwise exit 0 -- a PASS over an empty input set, which is the L-058 family in its
 # purest form and the very thing T4 fixes elsewhere in this sprint. Assert the real standard yields

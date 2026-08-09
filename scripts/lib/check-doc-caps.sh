@@ -68,12 +68,20 @@ rows=$(awk '
     # first integer in the Cap cell -- absent means the row states no numeric cap
     if (match(cap, /[0-9]+/)) capn = substr(cap, RSTART, RLENGTH); else capn = ""
     if (capn == "") next
+    # SOFT vs HARD (SPRINT-057 promote). Section 2 marks its caps: "~150 soft", "~120", "400 hard",
+    # "80", "130 (ADR-007)". The first parser took the integer and threw the marker away, so every
+    # soft cap failed the gate like a hard one. Section 11 is explicit that the TODO cap trigger is
+    # "flag in the governance review; prune with the user" -- a REPORT, by design -- and the first
+    # time a soft cap was actually exceeded, the gate went red on a false positive. Note what is NOT
+    # being done here: soft caps keep their coverage. TD-041 found that a soft cap with no check
+    # behind it is a comment; the fix is to report it, not to stop looking.
+    soft = (cap ~ /~/ || cap ~ /soft/) ? 1 : 0
     # first backtick-quoted token in the File cell
     if (match(file, /`[^`]+`/)) path = substr(file, RSTART+1, RLENGTH-2); else path = ""
     # "|" rather than a tab: the root-files table has an EMPTY prefix, and `read` with a whitespace
     # IFS strips leading empty fields -- which silently shifted every root row by one and dropped it.
     # Caught by the over-cap fixture; the live run looked entirely healthy without those rows.
-    printf "%s|%s|%s\n", pfx, path, capn
+    printf "%s|%s|%s|%s\n", pfx, path, capn, soft
   }
 ' "$guide")
 
@@ -103,7 +111,7 @@ cap_file() { # <file> <max> <source>
   if [ "$n" -le "$2" ]; then ok "cap $1 ($n <= $2) [$3]"; else bad "cap $1 ($n > $2) [$3]"; fi
 }
 
-printf '%s\n' "$rows" | while IFS='|' read -r pfx path capn; do
+printf '%s\n' "$rows" | while IFS='|' read -r pfx path capn soft; do
   [ -n "$capn" ] || continue
   if [ -z "$path" ]; then
     echo "FAIL  doc-caps: §2 row states cap $capn but no path could be derived from its File cell"
@@ -132,6 +140,10 @@ printf '%s\n' "$rows" | while IFS='|' read -r pfx path capn; do
       printf '      OVER-CAP (grandfathered): %s (%s > %s, recorded %s) -- %s\n' "$f" "$n" "$capn" "$rec" "$(gf_reason "$f")"
     elif [ -n "$rec" ]; then
       printf 'FAIL  cap %s (%s > %s) [§2] -- grandfathered at %s and it GREW; a grandfather clause is not a licence to drift\n' "$f" "$n" "$capn" "$rec"
+    elif [ "$soft" = 1 ]; then
+      # A soft cap REPORTS. §11 routes its trigger to the governance review for a prune-with-the-owner,
+      # so failing the gate here would block the very commit that does the pruning.
+      printf '      OVER-CAP (soft): %s (%s > %s) [§2 soft] -- prune at the next promote governance review (§11)\n' "$f" "$n" "$capn"
     else
       printf 'FAIL  cap %s (%s > %s) [§2]\n' "$f" "$n" "$capn"
     fi
