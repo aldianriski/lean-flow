@@ -103,10 +103,11 @@ decided, so this lands as an amendment note rather than an edit to the decided t
 states that completion criteria are behavioural levers.
 
 **DoD:**
-- [ ] ADR-006 amended (append-only — a dated amendment note, never an edit to the decided text)
-- [ ] The branching test stated where authors will meet it, not only in the ADR
-- [ ] Completion-criteria guidance added: demand "every rule applied", not "understanding reached"
-- [ ] `sh scripts/qa-check.sh` green on a bare run
+- [x] ADR-006 amended — a **second** dated amendment (T6 added the first); decided text untouched
+- [x] Branching test stated in DOCS_Guide beside the cap rule, where an author meets it — with the context-load vs cognitive-load tension named, since optimising the latter at the former's expense is the common error
+- [x] Completion-criteria guidance added: write the bound you would accept as proof, not the activity
+- [x] Negation-as-anti-pattern recorded as **not adopted, open** — it cuts against CLAUDE.md's ❌ house style, and settling it on style preference alone would be the unevidenced call this repo keeps getting wrong
+- [x] `sh scripts/qa-check.sh` green on a bare run — 75 pass, 0 fail
 
 ### T5 — Fix the launcher's DEAD-ON-ARRIVAL false verdict `[size: S · risk: low · class: execution · HITL]`
 Layers: `scripts/night-run.sh` · `skills/orchestrator/references/night-run.md` · `TECH-DEBT.md`
@@ -168,9 +169,9 @@ own bundled product-requirements template is orphaned, never referenced by its o
 `/task-decomposer --prd <path>` only ever consumes — exercised once end-to-end on a real PRD.
 
 **DoD:**
-- [x] `/lean-doc-generator prd` verb added, wired to `templates/product-requirements.md.template` — the orphan now has exactly one owner
+- [x] `/lean-doc-generator prd` verb added, wired to the generator's own bundled product-requirements template — the orphan now has exactly one owner
 - [x] `--prd <path>` disambiguated — **consume only**; the durable write is handed to the generator, never done from the decomposer
-- [x] `references/prd-and-slices.md` keeps the slicing half — but its PRD format was **NOT removed**: it is a *feature* PRD (Problem · User Stories · Implementation/Testing Decisions), not a duplicate of the *project*-scoped `requirements.md` (Users · Functional/Non-functional). The DoD's "remove as duplication" premise was wrong; both are kept and the pipeline between them stated instead — see the log
+- [x] `references/prd-and-slices.md` keeps the slicing half — but its PRD format was **NOT removed**: it is a *feature* PRD (Problem · User Stories · Implementation/Testing Decisions), not a duplicate of the *project*-scoped requirements doc (Users · Functional/Non-functional). The DoD's "remove as duplication" premise was wrong; both are kept and the pipeline between them stated instead — see the log
 - [x] `.claude/CONTEXT.md` states the creates-vs-consumes boundary, in the roster row and its own paragraph
 - [x] **Consumer-path verification (L-016)** — this repo has no `docs/product/`, so there is no real PRD to dogfood against; the six-point mechanism trace is recorded in the log instead of a fabricated exercise
 - [x] `sh scripts/qa-check.sh` green on a bare run — 75 pass, 0 fail

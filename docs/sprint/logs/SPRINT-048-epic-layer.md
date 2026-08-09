@@ -207,3 +207,26 @@ All six confirmed. This is exactly L-016's case: absent substrate means verify t
 "didn't fire here" is neither broken nor fine.
 
 Sizes: generator 124/140, decomposer 106/140, CONTEXT.md 123/130.
+
+### 2026-08-09 | complete | T4 — the cap gains a criterion
+ADR-006 established *when* something must move out of a `SKILL.md` (the number) but never *which*
+something. In practice that meant whatever was easiest to cut when a file hit the limit — which is
+precisely how the generator accumulated 24 lines restating procedures already written out in its own
+reference files. **Nothing was wrong under the rule as written**, which is the point: the rule was
+incomplete, not violated.
+
+Adopted (re-scan Keeper 2): **inline what every path needs; disclose what only some paths reach**, with
+the two budgets it balances named explicitly — context load (tokens every turn) vs cognitive load (what
+a human holds to navigate). Optimising the second at the first's expense is the common error and worth
+saying out loud. Plus completion criteria as behavioural levers: write the bound you would accept as
+proof, not the activity.
+
+Both live in DOCS_Guide beside the cap rule — where an author meets them — with the ADR carrying the
+reasoning. ADR-006 now has two dated amendments from this sprint (T6's number, T4's criterion); the
+decided text is untouched in both.
+
+**Negation deliberately not adopted.** The same source argues prohibition activates the forbidden
+behaviour, which cuts against CLAUDE.md being built almost entirely on ❌ anti-patterns. Ours pair the
+trap with a positive rule, blunting it — but that is a defence, not evidence, and settling a house-style
+question on preference is the unevidenced call this repo keeps getting wrong (L-087's family). Recorded
+as open in the ADR rather than quietly dropped.

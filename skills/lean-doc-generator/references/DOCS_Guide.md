@@ -133,6 +133,22 @@ core doc generation loop; never listed in the §2 table.
 own `references/` and **don't count** toward the cap. "Executable artifact" must not stretch to cover
 ordinary prose — police it honestly.
 
+**The disclosure test — what belongs inline vs in `references/`.** The cap is a size limit, not a
+criterion; it tells you *when* to move something, never *which* something. The test is branching:
+**inline what EVERY path needs; disclose what only SOME paths reach.** A step every invocation
+executes belongs in `SKILL.md` even when it is long; a table consulted only on one branch belongs in
+`references/` even when it is short. Push too little down and the top bloats until the procedure is
+buried; push too much and the agent cannot act without a second read. Two budgets are in tension and
+they are not the same: **context load** (tokens spent every turn — steep) versus **cognitive load**
+(what a human must hold to navigate — acceptable where judgment lives).
+
+**Completion criteria are a behavioural lever, not decoration.** A step's stopping condition changes
+how thoroughly it is executed. Vague bounds — "understanding reached", "reviewed", "produce output" —
+invite stopping at the first plausible moment. Demanding ones — "every rule applied", "each fixture
+FAILs with its named finding", "all four touchpoints agree" — drive exhaustiveness without ever
+saying "be thorough". Applies to DoD lines, `**Acceptance:**` lines, and any skill step whose
+completion is a judgement call: **write the bound you would accept as proof, not the activity**.
+
 **SKILL.md skeleton (canonical structure).** Frontmatter: exactly 6 fields, in order — `name` ·
 `description` (trigger surface: what it does + a `Do not use for X → /Y` redirect where a confusable
 sibling exists) · `argument-hint` (may be `""`) · `allowed-tools` · `user-invocable` · `version`.

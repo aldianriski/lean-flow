@@ -89,3 +89,35 @@ down and costs an ADR, which is the opposite of a silent exception.
 **Consequence accepted:** 13 other skills may now grow to 140 with no gate objection, and nothing but
 review stops that. The trigger for revisiting is a second skill crossing ~120 without a comparable
 scope story.
+
+---
+
+## Amendment — 2026-08-09 (SPRINT-048 T4): the cap gains a criterion
+
+**Decided text above is unchanged.** This adds the *test* the original decision left implicit.
+
+**The gap.** ADR-006 established the mechanism — procedure in `SKILL.md`, executable artifacts in
+`references/`, artifacts uncounted — and a number. It never said how to decide which side a given
+piece belongs on. A cap answers *when* something must move; it cannot answer *what* should move, so in
+practice the decision was made by whatever was easiest to cut when a file hit the limit. That is how
+`lean-doc-generator` ended up with 24 lines restating procedures already written out in its own
+reference files (found and reclaimed in T6): nothing was wrong under the rule as written.
+
+**The test, adopted from `mattpocock/skills`' `writing-for-agents` (re-scan verdict,
+`docs/research/mattpocock.md`, Keeper 2).** *Inline what **every** path needs; disclose what only
+**some** paths reach.* A step every invocation executes stays in `SKILL.md` even when long; a table
+consulted on one branch moves to `references/` even when short. The two budgets it balances are
+distinct and easy to conflate: **context load** (tokens spent every turn) versus **cognitive load**
+(what a human must hold to navigate). Optimising the second at the first's expense is the common error.
+
+**Adopted alongside it:** completion criteria are behavioural levers — a vague stopping condition
+("understanding reached") invites premature completion, a demanding one ("every rule applied") drives
+exhaustiveness without an instruction to be thorough. Both now live in DOCS_Guide beside the cap rule,
+where an author meets them, rather than only here.
+
+**Not adopted, recorded as an open question.** The same source argues **negation is an anti-pattern** —
+prohibition activates the forbidden behaviour ("don't think of an elephant"). `.claude/CLAUDE.md` is
+built almost entirely on ❌-prefixed anti-patterns, so this cuts at our house style. Ours generally
+pair the trap with the positive rule, which blunts the objection, but it is not resolved — and
+resolving it on style preference alone would be exactly the unevidenced call this repo keeps getting
+wrong. Left open for a doc-aging pass with evidence.
