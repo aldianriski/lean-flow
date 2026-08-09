@@ -15,35 +15,33 @@ related: [harness-engineering-adaptation, ADR-010, ADR-013]
 > decisions and human checkpoints, where nodes do work and edges control transitions — became a widely
 > used term around July–August 2026. Does any element of it add capability `/orchestrator` +
 > `dispatch.md` do not already have?
-> **Verdict.** **Reject on mechanism; keep the vocabulary.** Every node/edge/graph element maps onto a
-> shipped lean-flow surface, and the four elements we lack were each declined earlier in writing —
-> with an ADR or a recorded revisit-if. The term is worth recording so the concept is not
-> re-evaluated from scratch a fourth time.
+> **Verdict.** **Reject on mechanism; keep the vocabulary.** Every element either maps onto a shipped
+> lean-flow surface or was declined earlier in writing — five recorded declines and two deliberate
+> divergences. The louder divergence is that our edges are *prompted defaults, not runtime enforcement*,
+> which is the objection any informed reader raises first and which ADR-011 already answers. The term is
+> worth recording so the concept is not re-evaluated from scratch a fourth time.
 
 ## Why this matters
 
 lean-flow scans external frameworks often enough that L-017 exists to govern it: judge the **delta over
-our existing surface**, never standalone merit. The cost of guessing wrong runs both ways — adopting a
-vocabulary as though it were a mechanism bloats the surface (the dev-flow failure), while dismissing it
-unrecorded means the next scan pays the full evaluation again. `harness-engineering-adaptation.md`
-established the method this doc reuses: answer two axes separately, because a mechanism can exist and
-still be operationally shallow.
+our existing surface**, never standalone merit. Guessing wrong costs both ways — adopting a vocabulary
+as though it were a mechanism bloats the surface (the dev-flow failure); dismissing it unrecorded makes
+the next scan pay the full evaluation again. Method reused from `harness-engineering-adaptation.md`:
+two axes, because a mechanism can exist and still be operationally shallow.
 
 ## Options considered
 
-- **A — Adopt the mechanism.** Build an explicit graph artifact: typed nodes with per-node model/tools/
-  memory, typed edges with conditions and retry policy, a compiled DAG the runtime executes.
-  *Trade-off:* it is the shape of the problem, but nearly all of it already exists here in derived form,
-  and the compiled-artifact half was rejected on its merits (ADR-013).
-- **B — Adopt the vocabulary only.** Record "graph engineering" as the external name for what
-  `dispatch.md` implements; change nothing. *Trade-off:* zero surface cost, and its whole value is
-  preventing a re-scan — which is real but modest.
-- **C — Ignore it.** *Trade-off:* cheapest today; guarantees the fourth re-evaluation, and leaves the
-  scanned-frameworks list incomplete in exactly the way L-093 warns about.
+- **A — Adopt the mechanism.** Typed nodes (per-node model/tools/memory), typed edges with conditions
+  and retry policy, a compiled DAG the runtime executes. *Trade-off:* the right shape of the problem,
+  but nearly all of it exists here in derived form and the compiled half was rejected on merit (ADR-013).
+- **B — Adopt the vocabulary only.** Record the external name for what `dispatch.md` implements; change
+  nothing. *Trade-off:* zero surface cost; its whole value is preventing a re-scan — real but modest.
+- **C — Ignore it.** *Trade-off:* cheapest today; guarantees a fourth re-evaluation (its downside is
+  already stated above).
 
 ## Findings
 
-**Axis 1 — does the mechanism exist? Yes, essentially one-to-one.**
+**Axis 1 — does the mechanism exist? Yes, with one deliberate absence (cycles, last row).**
 
 | Graph-engineering element | lean-flow surface |
 |---|---|
@@ -59,29 +57,45 @@ still be operationally shallow.
 | Graph: parallel + barriers | parallel batches separated by sequential barriers |
 | Graph: verification | two-tier — per-branch pre-merge, interaction smoke post-merge |
 | Graph: human approval · termination | G1/G2 + the unattended park contract · DoD · first-blocker-halt |
+| Edge: **cycles** / loop-until-condition | **deliberately absent at the task graph** — the preflight FAILs on a cycle (`dispatch.md` check 1), because iteration lives *inside* nodes: `/tdd` red-green · `/diagnose`'s 6 phases · `/loop` pacing · the bounded two-failures-then-escalate rule |
 
-In places ours is more specific than the generic framing: transitive-chain ownership (TD-025), base-ref
-drift as its own named FAIL, and the rule that a conflict is resolved by recovering both authors'
-intent from their commit messages first.
+Several rows are *more* specific than the generic framing — transitive-chain ownership (TD-025),
+base-ref drift as its own named FAIL, conflict resolution by recovering both authors' intent first.
 
-**The four elements we lack were each declined in writing.**
+**The five elements we lack were each declined in writing.**
 
 - **Compiled DAG as an executed artifact** — ADR-013 rejected it as a needless second SSOT; the
   preflight derives waves from markup already mandatory in every Plan.
 - **Automated retry / escalation ladder** — ADR-010: escalate by hand after two failures, because an
   automated ladder is agent behaviour a no-hooks plugin cannot own.
-- **Derived knowledge-graph view** — `.out-of-scope/derived-graph-view.md`; council-2 gate held, and
-  its revisit-if (a TASK-041 retrieval-miss signal) has never fired.
+- **A rendered/queryable run graph** — ADR-013(a) is the primary decline, with this doc's revisit-if
+  below as the live signal. (`.out-of-scope/derived-graph-view.md` is adjacent but a *different object*
+  — a knowledge-metadata graph over docs, not an execution graph; its own revisit-if has never fired.)
+- **Run-event log (JSONL)** — ADR-013(c) REJECT: a derived machine view with no firing trigger and no
+  first consumer; the sprint Execution Log already *is* the event log at 4–8-task scale. This is the
+  element graph-engineering framings call observability/streaming.
 - **Typed shared run-state** — TASK-120; ADR-013's kill-switch fired when the promotion trigger stayed
   unfired across the full 5-sprint window.
 
-**Axis 2 — is the operational depth equivalent? One deliberate divergence, no gap.**
+**Axis 2 — is the operational depth equivalent? Two deliberate divergences, no gap.**
 
-- **Confidence-thresholded routing is the real difference, and the divergence is deliberate.** The
-  canonical illustration routes to a human on `confidence < 90%`. Our gates are categorical —
-  `risk: high`, auth/input/secrets/data, HITL. A self-reported confidence number is poorly calibrated,
-  so thresholding on it makes a human gate *look* principled while firing on a figure nothing
-  validates. Categorical risk classes are cruder and more honest.
+- **Edges here are prompted defaults, not runtime enforcement — and this is the bigger one.** Graph
+  engineering's definition says edges *control* transitions. Several rows above are mechanically backed
+  (the `Depends-on` DAG by the preflight script · permissions by the harness allowlist · fan-out by
+  worktree isolation), but the rest are discipline the model can decline: ADR-010 states it verbatim —
+  "a **prompt-driven nudge, not a guarantee** — a skill can't force the model to spawn or parallelize"
+  — and `dispatch.md` § The ceiling (honest) concedes the same in-skill. **Declined, not overlooked:**
+  ADR-011 rules out gate enforcement everywhere (no in-core hook — plugin hooks auto-activate with no
+  per-hook disable, so any would be mandatory for every installer — and no sibling plugin), with the
+  revisit trigger recorded in `.out-of-scope/gate-guard-hook.md`: gate-skipping observed as a recurring
+  real failure. Anyone re-scanning this concept will raise this first; the answer is ADR-011.
+- **Confidence-thresholded routing is the second, and it is structurally forced.** The canonical
+  illustration routes to a human on `confidence < 90%`. Our gates are categorical — `risk: high`,
+  auth/input/secrets/data, HITL. A no-hooks markdown plugin has no access to logprobs or sampling, so
+  any threshold could only bind on *verbalized* confidence, the poorly-calibrated kind. The sharper
+  argument is falsifiability: "touches auth" can be checked against the diff afterwards, a confidence
+  number cannot be checked against anything. lean-flow does route on uncertainty — G1 BLOCKs on any
+  "unknown", an unconfirmed `assumes:` blocks G2, `needs-info` holds a task — it declines only the scalar.
 - **Evaluation is not the gap it first appears.** Graph-engineering hierarchies place evaluation above
   the graph, which reads as a hole here until `behavioral-eval-feasibility.md` is checked: the suite
   exists under `evals/`, was exercised on real headless runs with `--model` pinned, and its residual
@@ -89,12 +103,14 @@ intent from their commit messages first.
 
 ## Recommendation
 
-**Option B.** Record the term, change nothing. The concept is a name for the architecture lean-flow
-already runs, and each element it would add has a prior written decision against it — which is stronger
-evidence that the design is settled than any map showing we merely "have the boxes". Adopting the
-mechanism would mean reversing ADR-010 and ADR-013 with no new evidence, which is the pattern TD-031
-warns about: narrowing a working guard under no pressure. Not ADR-grade — nothing is being reversed,
-so there is no hard-to-reverse decision to record.
+**Option B.** Record the term, change nothing. The concept names the architecture lean-flow already
+runs, and every element it would add has a prior written decision against it — stronger evidence that
+the design is settled than any map showing we merely "have the boxes". Adopting the mechanism means
+reversing ADR-010, ADR-011 and ADR-013 with no new evidence: TD-031's pattern, narrowing a working
+guard under no pressure. Not ADR-grade — nothing is reversed, so nothing hard-to-reverse is decided.
+Pressure-tested adversarially (Fable, 2026-08-09) → CONFIRMED-WITH-AMENDMENTS; its three landed
+findings are folded in above, and the five declines, the confidence divergence and the evaluation
+claim each survived the attack.
 
 ## Out of scope / open questions
 
@@ -102,6 +118,5 @@ so there is no hard-to-reverse decision to record.
   rendered **before** dispatch rather than printed during it. That is the only signal that would
   reopen ADR-013's compiled-DAG rejection. Absent it, this stays closed.
 - **Not scanned** — the LangGraph/GraphFlow implementations themselves, only the concept as described.
-  A recorded boundary, not an implied all-clear (L-093): if a specific implementation is later claimed
-  to carry a mechanism this table misses, that claim is checked per-row, and "we have one with the same
-  name" is not the sentence that closes it.
+  A recorded boundary, not an implied all-clear (L-093): a later claim that some implementation carries
+  a mechanism this table misses gets checked per-row, and "we have one with the same name" never closes it.
