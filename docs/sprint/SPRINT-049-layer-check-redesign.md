@@ -134,14 +134,14 @@ where the DoD is looped and ticked, not where the project's shape is described.
 L-088 reads `promoted: yes → skills/orchestrator/SKILL.md § Red flags`.
 
 **DoD:**
-- [ ] Red flag added to `skills/orchestrator/SKILL.md` § Red flags: a DoD criterion invalidated by
+- [x] Red flag added to `skills/orchestrator/SKILL.md` § Red flags: a DoD criterion invalidated by
       execution earns a `scope-change` entry and an owner ruling, never a quiet reinterpretation — and
       a measurement is never rounded up to meet a stated figure
-- [ ] Distinct from the adjacent scope-change red flag, which covers a *pivot*; this one covers a
-      criterion that went stale while the scope held
-- [ ] `L-088` marked `promoted: yes → <where>` and its body collapsed to a pointer line (§11)
-- [ ] `skills/orchestrator/SKILL.md` stays ≤ ~140 lines
-- [ ] `docs/knowledge-index.md` regenerated (`sh scripts/gen-index.sh`) — LEARNINGS metadata changed
+- [x] Distinct from the adjacent scope-change red flag, which covers a *pivot*; this one covers a
+      criterion that went stale while the scope held — the distinction is stated in the rule itself
+- [x] `L-088` marked `promoted: yes → <where>` and its body collapsed to a pointer line (§11)
+- [x] `skills/orchestrator/SKILL.md` stays ≤ ~140 lines — 101
+- [x] `docs/knowledge-index.md` regenerated (`sh scripts/gen-index.sh`) — LEARNINGS metadata changed
 
 ## Decisions (pre-locked)
 

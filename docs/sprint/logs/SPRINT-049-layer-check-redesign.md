@@ -192,3 +192,23 @@ rediscovered.
 **Verification.** `evals/run-layers-observed-fixtures.sh` 16/16 green (12 retained + 4 new) ·
 `evals/run-layers-completeness-fixtures.sh` 5/5 · `scripts/qa-check.sh` bare: 71 pass, 0 fail, exit 0,
 re-run after the DoD ticks and this entry (L-089).
+
+### 2026-08-09 | complete | T2 — L-088 promoted to an `/orchestrator` red flag
+
+Placed immediately after the existing scope-change red flag and explicitly distinguished from it in
+its own text: that row covers a **pivot** that shifts scope, this one covers a **criterion that went
+stale while the scope held**. Without the distinction the two read as duplicates and the new one gets
+skimmed past, which is how a promoted rule quietly stops working.
+
+L-088's body collapsed to a pointer line per §11 — the durable rule is the record now, the body is in
+git. `skills/orchestrator/SKILL.md` 100 → 101 lines, well under its ~140 cap.
+`docs/knowledge-index.md` regenerated, since LEARNINGS metadata changed.
+
+Worth recording: **L-088 fired a fourth time inside the sprint that promoted it.** T1's DoD carried
+TD-032's narrowing mitigation as a premise; replaying the check across 11 revisions of the SPRINT-048
+Plan falsified it. The new rule was followed rather than merely written — `scope-change` entry, owner
+ruling, then the Plan amended. A promoted rule exercised once on real input in its own sprint is the
+L-007 bar, met by accident of timing rather than design.
+
+**Verification.** `scripts/qa-check.sh` bare: 71 pass, 0 fail, exit 0, re-run after the DoD ticks and
+this entry.
