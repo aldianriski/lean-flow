@@ -21,11 +21,27 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-092**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-094**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-094 [tags: process] [status: active]: **Before deferring a question for lack of evidence, check what *kind* of question it is — a capability question wearing a cost question's clothes will never accumulate the evidence it is waiting for.** "Is skill self-fork worth the per-run fork cost over runtime invocation?" sat open across three consecutive research scans, each closing with "no new evidence either way". The framing made that inevitable: nobody keeps a fork-cost measurement lying around, and taking one needs a paid dispatch run, so every scan correctly observed that nothing had changed and moved on. The question was never about cost. Claude Code **serializes concurrent invocations of the same forked skill**, and lean-flow's fan-out runs one procedure skill across N tasks at once — so the mechanism removes the concurrency it was being considered for, and one documentation read settles it. What made the deferral self-perpetuating is that each scan re-examined the *evidence* and never the *shape of the question*. The check is cheap and belongs at the moment of deferral, not the third revisit: ask what class of fact would close this — a measurement, a documented behaviour, a judgement call — and if it is a documented behaviour, go read the documentation instead of writing "no new evidence". A deferral with a written kill-switch (L-068) stops a question drifting toward never; this stops one drifting toward *unanswerable* when it was never hard.
+- seen: Sprint-050
+- count: 1
+- promoted: no
+- related: L-068 (a deferral needs a written kill-switch) · L-087 (test the mechanism, don't infer it) · L-017 (delta over existing surface) · `.out-of-scope/skill-self-fork.md`
+
+---
+
+## L-093 [tags: docs] [status: active]: **An entry leaves an explicit boundary list by a written verdict, never by an assumed coverage — and a shared name is a hypothesis, not a finding.** A research doc's § Not scanned list was created precisely so a gap would be "a recorded boundary rather than an implied all-clear". It then quietly shed five entries — `diagnosing-bugs` · `prototype` · `tdd` · `triage` · `handoff` — every one of which shares a name with a lean-flow skill, so each *looked* obviously covered. The list granted the implied all-clear it existed to prevent, inside the mechanism built to stop it. SPRINT-050 checked all five at a cost of one line each and **two produced keepers**: `/diagnose` had no redaction rule despite instructing the capture of HAR files and traces, and `/tdd` was missing the tautological-test anti-pattern. So the assumption was not merely unverified — it was wrong, and it had been hiding the two most substantive findings of the scan. The general shape: a boundary list's value is entirely in its being *complete*, and the entries most likely to be dropped from one are the entries that look most obviously fine, because that is what makes dropping them feel safe. The rule is mechanical — nothing leaves the list without a sentence saying what covers it, and "we have one with the same name" is not that sentence, since L-017's whole point is that the delta lives in behaviour, not in the label.
+- seen: Sprint-050
+- count: 1
+- promoted: no
+- related: L-017 (delta over standalone merit) · L-058 (a gate's silent false-negative) · L-016 (verify on the consumer path rather than assuming) · `docs/research/mattpocock.md`
 
 ---
 

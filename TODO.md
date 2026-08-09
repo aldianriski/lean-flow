@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-050 — Adoption Remainder** → [`docs/sprint/SPRINT-050-adoption-remainder.md`](docs/sprint/SPRINT-050-adoption-remainder.md)
+> _None._ SPRINT-050 closed 2026-08-09.
 
 ---
 
@@ -80,22 +80,6 @@ status: current
       tracker:    docs/research/mattpocock.md § Keepers K2 · K3 · K4
       state:      ready
 
-- [ ] TASK-153 — Scan the mattpocock remainder (scan 3)  [size: M] [risk: low] [HITL]
-      class:      decision
-      done-when:  the 13 skills named as "Not scanned" in docs/research/mattpocock.md are mapped
-                  against lean-flow's existing surface per L-017 (delta first, standalone merit
-                  never), each with an explicit Keep/Reject and a one-line reason; keepers are FILED
-                  as TASK-NNN and not adopted inside the scan task; the § Not scanned list is either
-                  emptied or restated with what still remains
-      touches:    docs/research/mattpocock.md · TODO.md (keepers filed)
-      depends-on: none
-      assumes:    the prior two scans' hit rate holds — 5 keepers from 12 skills examined across two
-                  scans, so expect mostly fast rejects and budget accordingly · TD-033 (this doc is
-                  136 lines against a 120 soft cap) will be forced by a third scan, so the split or
-                  collapse it proposes lands here rather than separately
-      tracker:    docs/research/mattpocock.md § Not scanned
-      state:      ready
-
 - [ ] TASK-148 — Prove bulk throughput on one real night run  [size: M] [risk: med] [HITL]
       class:      execution
       done-when:  a ≥10-task Plan promoted and fired unattended; ≥8 units landed; calibration row recorded in
@@ -112,19 +96,20 @@ status: current
 
 ### P3 — Long-term
 
-- [ ] TASK-154 — Settle skill self-fork (mechanism B) vs runtime invocation (mechanism C)  [size: S] [risk: low] [HITL]
+- [ ] TASK-159 — Get evidence on whether "push right" beats gate-before-work  [size: S] [risk: low] [HITL]
       class:      decision
-      done-when:  the open question carried in docs/research/mattpocock.md since scan 1 is closed
-                  either way — B adopted with its per-run fork cost measured, or rejected with a
-                  written revisit-if condition so the null result is itself a verdict (L-068). A
-                  deferral without an expiry does not close it
-      touches:    docs/research/mattpocock.md · docs/adr/ADR-010-*.md (only if the answer changes it)
+      done-when:  the tension `loop-me` raised — defer a human checkpoint as far as it will go, ask
+                  once, late, fully prepared — is resolved against our G1/G2 gate-before-work model
+                  with evidence, and either the gate placement is amended or the question is closed
+                  with why. Same shape as TASK-155; both are tensions, not defects
+      touches:    .claude/CONTEXT.md § Gates · skills/orchestrator/SKILL.md (only if the answer changes them)
       depends-on: none
-      assumes:    mechanism C (runtime Skill invocation on a general-purpose agent) is shipped and
-                  working, so this is an optimisation question, not a gap — if C is failing in
-                  practice, this is the wrong task and it becomes a /diagnose
+      assumes:    the two are not actually opposed — our gates approve *direction* before wasted work,
+                  while push-right defers *verification* until work is presentable, so the honest
+                  outcome may be "both, at different points" rather than a winner
       tracker:    docs/research/mattpocock.md § Still open
-      state:      ready
+      state:      needs-info — needs an evidence source before it is plannable. Unblock when a
+                  measurable signal is identified, or when the owner rules it closed on judgement.
 
 - [ ] TASK-155 — Get evidence on whether ❌ negation in anti-patterns backfires  [size: S] [risk: low] [HITL]
       class:      decision

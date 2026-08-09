@@ -3,7 +3,7 @@ sprint: 050
 slug: adoption-remainder
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 plan_commit: 6484b47
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -176,5 +176,54 @@ its cost stated, or by a rejection carrying a named revisit-if condition and a d
 | | | | | |
 
 ## Retro
-<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
-     shipped → CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md. -->
+
+Three tasks, 19/19 DoD. Both dangling pointers closed: the corpus is fully mapped (35 of 35 carry a
+written verdict, § Not scanned reads *None*) and the mechanism B question is decided after surviving
+three scans. 5 keepers from 23 skills — all micro, all filed rather than adopted.
+
+**No release.** Everything this sprint touched is a research doc, the backlog, and an out-of-scope
+trail; nothing reached a consumer-facing surface, so there is no CHANGELOG entry and no version bump.
+SPRINT-049's **v1.27.1 remains pending** `/release-patch` — unchanged by this sprint, and still owed.
+
+**Retrieval check — no miss, and one promoted rule demonstrably worked.** L-088 (a DoD frozen at
+promote carries premises execution invalidates) was promoted only last sprint, into `/orchestrator`'s
+red flags. It fired here on the very first fact-finding step: the Plan said 13 unscanned skills, the
+real figure was 23. The new rule did what it was written to do — a `scope-change` entry and an owner
+ruling, rather than a quiet narrowing of the list to whatever fit. A promoted rule being *used* in the
+sprint after promotion is the L-007 bar met on real input.
+
+**Cost** — inline, single session, no sub-agent dispatch (owner instruction). Research reads went to
+`gh api` and one `WebFetch`. Token/dollar figures **unavailable** in this session; recorded as
+unavailable rather than omitted, so the calibration series gains no phantom row.
+
+**Worked**
+- **Checking an assumption that looked safe.** Ruling R1 forced a one-line verdict on 5 skills
+  previously waved through because they share a name with a lean-flow skill. Two of the five produced
+  keepers — the scan's most substantive findings were hiding behind the cheapest possible assumption.
+- **Counting deterministically instead of reading a summary.** A `WebFetch` summary of the GitHub tree
+  reported 32 files while listing 35, its headline counts disagreeing with its own body. Re-taking the
+  count with `gh api` cost one command; believing it would have put a fourth wrong figure into a doc
+  whose figure was already wrong. CLAUDE.md's trap (c) working as intended.
+- **Reading the docs before pricing the trade-off** (T2) — see Friction; the same act was both.
+- **The SPRINT-049 gate redesign caught a real miss on its first live outing** — T2's out-of-scope
+  trail file, created during implementation and named in DoD prose only as a directory, was caught by
+  the *observed* leg from the git diff. Precisely the invented-during-implementation shape the
+  prose-derived source cannot see.
+
+**Friction**
+- **A question can survive by being framed on the wrong axis.** Mechanism B vs C sat open through
+  three scans because it was written as "is the fork cost worth it?" — a question with no cheap answer.
+  It was a capability question all along, settled by one documentation read. Nobody re-examined the
+  *shape* of the question, only its lack of new evidence → **L-094**.
+- **A boundary list leaked five entries.** § Not scanned existed specifically so gaps could not read as
+  an implied all-clear, and five skills left it on an assumption rather than a verdict → **L-093**.
+- Mid-task I nearly rejected mechanism B on a wrong mechanism ("a fork cannot be briefed" — false,
+  `$ARGUMENTS` substitutes into the prompt). Caught by checking before writing. L-087 held; noting it
+  because the rejection would have been *correct with a wrong reason*, which is worse than no verdict.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **L-093** — an entry leaves an explicit boundary list by a written verdict, never by an assumed
+  coverage; a shared name is a hypothesis, not a finding.
+- **L-094** — before deferring a question for lack of evidence, check what *kind* of question it is; a
+  capability question wearing a cost question's clothes will never accumulate the evidence it is
+  waiting for.

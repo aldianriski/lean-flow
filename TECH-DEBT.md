@@ -18,6 +18,18 @@ status: current
 
 ## Tech Debt
 
+- **TD-038** severity: trivial | status: open | created: Sprint-050
+  - Summary: `docs/research/mattpocock.md` sits at **117 lines against its 120 soft cap** with the
+    corpus now fully mapped. TD-033 bought headroom by collapsing two scans to pointers; that lever is
+    spent, and the next re-scan breaches on contact.
+  - Impact: none today, and deliberately not pre-solved — the doc is *correct* at 117 and restructuring
+    a correct doc against a hypothetical future scan is the shape TD-031 warned about. What makes this
+    worth a row rather than nothing is that the breach is now **certain rather than possible**: the
+    upstream repo grew 34 → 35 files between two scans, so a re-scan is a matter of when.
+  - Mitigation (not yet done): at the next re-scan, split per-scan files behind an index — the option
+    scan 3 rejected because one readable table was worth more than a lower line count. That trade
+    reverses once the table stops fitting. Do **not** apply it before then.
+
 - **TD-037** severity: minor | status: open | created: Sprint-049
   - Summary: attribution needs a commit to read, so **uncommitted work in progress is still tested
     against the all-task union** — the exact weakness TD-035 was filed about, surviving on the one
