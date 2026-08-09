@@ -9,10 +9,10 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
-- SPRINT-052 — Rule Placement — closed 2026-08-09 · 9f3da3d (PATCH pending — `/release-patch`)
-- SPRINT-051 — Keeper Adoption — closed 2026-08-09 · 351252a (PATCH pending — covers SPRINT-049 too)
+- SPRINT-052 — Rule Placement — closed 2026-08-09 · 9f3da3d (PATCH v1.27.2)
+- SPRINT-051 — Keeper Adoption — closed 2026-08-09 · 351252a (PATCH v1.27.1 — covers SPRINT-049 too)
 - SPRINT-050 — Adoption Remainder — closed 2026-08-09 · b70ebb6 (docs-only, no release)
-- SPRINT-049 — Layer-Check Redesign — closed 2026-08-09 · 75e61a8 (PATCH pending — `/release-patch`)
+- SPRINT-049 — Layer-Check Redesign — closed 2026-08-09 · 75e61a8 (PATCH v1.27.1)
 - SPRINT-048 — Epic Layer — closed 2026-08-09 · 3ff51d3 (MINOR v1.27.0)
 - SPRINT-047 — Sprint Log Split — closed 2026-08-09 · 531e073 (MINOR v1.26.0)
 - SPRINT-046 — Permission Surface — closed 2026-08-01 · e49cb55 (PATCH v1.25.2)

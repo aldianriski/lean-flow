@@ -94,11 +94,11 @@ glossary "lives **here**" and no glossary section exists — a promise with noth
 CONTEXT.md either has the glossary or stops promising it.
 
 **DoD:**
-- [ ] INDEX rows 049 and 051 name v1.27.1 instead of "PATCH pending"
-- [ ] The glossary claim resolved — content added, relocated, or the claim dropped
-- [ ] Before dropping it, check whether any **consumer-facing** surface promises the glossary (L-015);
+- [x] INDEX rows 049 and 051 name v1.27.1 instead of "PATCH pending"
+- [x] The glossary claim resolved — content added, relocated, or the claim dropped
+- [x] Before dropping it, check whether any **consumer-facing** surface promises the glossary (L-015);
       CONTEXT.md sits at 123/130, so adding a section displaces something
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ### T4 — Promote L-094 into a durable rule `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/LEARNINGS.md` · `.claude/CONTEXT.md` ·
@@ -180,6 +180,8 @@ sits where every flow that can defer a question reads it.
 | `scripts/lib/check-layers-completeness.sh` | T2 | both completeness FAILs name the `Cites:` escape, stating the condition not the remedy | low | fixtures + old/new pair |
 | `evals/run-layers-completeness-fixtures.sh` | T2 | expectations assert the hint, so it cannot silently vanish (TD-012) | low | harness green |
 | `docs/QA.md` | T2 | records that the FAIL now names the escape and that fixtures guard it | low | `qa-check.sh` |
+| `docs/sprint/INDEX.md` | T3 | three rows (049 · 051 · 052) name their release instead of "PATCH pending" | low | read-back |
+| `.claude/CONTEXT.md` | T3 | glossary line states the placement rule + create-lazily condition, rather than asserting content §7 says should not exist yet | low | `qa-check.sh` |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):

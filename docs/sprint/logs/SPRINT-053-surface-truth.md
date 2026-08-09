@@ -112,3 +112,20 @@ Worth noting which leg caught it: the prose-reading completeness check could not
 is never named in T2's DoD prose. The observed leg reads git rather than text — the same asymmetry T2's
 re-derivation leaned on when arguing the `Cites:` escape is safe to advertise. The argument was tested
 against its author within the hour.
+
+### 2026-08-09 | complete | T3 — three stale INDEX rows, and the glossary claim was right but mis-phrased
+**Three rows, not two.** T3's DoD named SPRINT-049 and SPRINT-051, but SPRINT-052's row was equally
+stale — written by hand at that sprint's close and left reading "PATCH pending" after v1.27.2 shipped
+hours later. Same defect, same author, so it was corrected with the other two rather than left for a
+future task to rediscover; cleaning up one's own mess is not scope creep.
+
+**The glossary claim resolved the opposite way from the obvious one.** The tempting fix was to delete
+it, since `CONTEXT.md` has no glossary section. Checking the consumer surfaces first (L-015) showed
+three skills actively depend on that placement: `/refactor-advisor` reads the glossary and adds the
+first term when a new concept is named, `/task-decomposer` challenges a term against it, and
+`CONTEXT.md.template` promises it to every consumer's own file. Deleting the claim would have broken a
+contract three skills rely on. And `DOCS_Guide` §7 already settles whether the *absence* is a defect:
+"don't pre-create `DECISIONS.md` / `docs/adr/` / a glossary until the first real entry exists" — so an
+absent glossary is correct, and only the phrasing asserted content that create-lazily says should not
+be there yet. The line now states the placement rule and its lazy-creation condition, at 123/130 with
+no displacement needed.
