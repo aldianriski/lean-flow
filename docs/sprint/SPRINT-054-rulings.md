@@ -3,7 +3,7 @@ sprint: 054
 slug: rulings
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 plan_commit: 2af73ee
 close_commit:
 update_trigger: sprint execute/close events
@@ -229,12 +229,73 @@ measured numbers rather than the stale ones it still carries.
 
 ## Retro
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+Four tasks, 23/23 DoD, three scope-changes, one task added mid-sprint. Two of the three promoted
+rulings ended in **no change**, which D1 named as this sprint's exposure before it started — and the
+check that they are honest is that each was tested against a *source* rather than against the summary
+of it already in the repo. In T3 that summary was itself the error.
 
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents).
+**Buckets routed** (DOCS_Guide §10):
+- **Shipped** → T1 only, consumer-facing: `AGENTS.md`, `SECURITY.md`, `docs/development/setup.md`, and
+  the `DOCS_Guide` §2 amendment. T2/T3 changed nothing by ruling; T4 is repo-internal restructuring.
+  Held for the release step — **this is not fixes-only, so it wants a MINOR by hand**, not
+  `/release-patch`.
+- **Tech debt** → **TD-041** (`qa-check.sh` cap-checks `skills/`, `.claude/` and `docs/sprint/` but not
+  `docs/research/` — the reason a 120-line cap absorbed 39 lines unnoticed). **TD-038 resolved** by T4.
+  **TD-040** gained its second live sighting, recorded on the row.
+- **Follow-ups** → **TASK-166** (README repo-layout: stale template count 30/32 vs a real 34, and
+  `.codex-plugin/` missing — found in T1, deliberately not swept in).
+- **Learnings** → **L-097** (a number inside a criterion is remembered, not measured, and rots
+  silently) · **L-098** (a summary of an external source is a hypothesis; re-read the source when a
+  decision turns on it).
+
+**Retrieval check** — **yes, one, and it shaped the sprint's biggest task.** TASK-165 argued from LAW 1
+that "create all six is a candidate answer, not the default", without retrieving **ADR-012's LAW 1
+reinterpretation**, which says the opposite for the base tier: the mandatory minimum *is* scaffolded at
+init, so create is the default and an exemption needs a positive reason. Both bars were applied at
+execution and the 3/3 split holds under either, so the contradiction cost nothing here — but the task
+was authored against a rule the repo had already amended, and nothing surfaced that until the work
+started. A retrieval miss on our own ADR set, which is the tracked signal for a derived
+knowledge-graph view.
+
+**Cost** — one interactive session, **coordinator-inline, zero sub-agents dispatched**. `dispatch.md`
+makes dispatch the default for `execution`-nature work and T2's research leg qualified; it ran inline
+on a session-level constraint (this session was instructed not to call the Agent tool unless asked).
+Same deviation SPRINT-053 recorded, and now the second consecutive sprint where the dispatch default
+did not fire for a reason outside the loop's control — worth noting before the series is read as
+evidence about the default itself. Token cost: **not available** — no per-session accounting was
+captured, stated rather than omitted (the series is what lets a later promote size a batch).
 
 **Worked**
+- **Naming the failure mode in the Plan (D1) before it could happen.** Two tasks ended in "no change",
+  and having written down that a null result is a completed task made recording them straightforward
+  instead of a temptation to manufacture an edit. Cheap to do, and it was load-bearing twice.
+- **Measuring instead of trusting a stated figure**, every time it came up: line counts via
+  `git show <sha>:<path> | wc -l`, the unscoped-`Bash` count against all 14 `allowed-tools:` lines,
+  the corpus source via `gh api`. Every one of those disagreed with what was written down.
+- **The gate caught three real things before they shipped**: T2's undeclared `T4` reference, T4's two
+  undeclared new files, and — in the same message — TD-039's fix naming the `Cites:` escape on its
+  first real trip. Also the self-review catch of a fabricated-looking repo slug (`aldianrizki` vs the
+  real `aldianriski`) in a doc that had just been created.
 
 **Friction**
+- **Ran the whole sprint on stale skills** — 1.25.2 installed against a 1.27.3 repo. Survived only by
+  reading every procedure from the repo source instead of the invocation's own base dir, which is
+  reaching *past* the stale procedure rather than following it. Third occurrence of L-021 (Sprint-023,
+  Sprint-039, now). The `/prime` freshness row did its job and reported it; the gap is that nothing
+  between the report and the work stops a session from proceeding on it.
+- **Two DoD lines could not be met as written**, in different ways: T2's had a stale premise, T4's was
+  self-contradictory at authoring. Both cost a scope-change and an owner ruling mid-wave. → L-097.
+- **The preflight reported CLEAR over an overlap it structurally cannot see**, for the second promote
+  running. Both times a human reading the parsed record caught it, which is not a control (TD-040).
+- **Closing the sprint disarmed four of its own checks, silently** — found at this close by noticing
+  the run went 72 pass → 68 pass, 0 fail. `qa-check.sh` gates the sprint checks on `status = active`,
+  so the status flip and the largest edit to the file land in one unguarded commit, and the two layers
+  checks then print PASS with *zero* verified rather than reporting a skip (TD-042). Third gate gap
+  this sprint, all the same shape: silence read as compliance.
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+**Pattern candidate** (surfaced → `docs/LEARNINGS.md`)
+- **L-097** — a number written into a criterion is remembered, not measured; three instances this
+  sprint (TD-038's premise, T2's DoD, T4's DoD), and the third consecutive TD row falsified at
+  execution. Aggravated wherever a stated cap has no check behind it.
+- **L-098** — re-read the source when a decision turns on it; the repo's own summary is a hypothesis.
+  T3's entire recorded tension dissolved on one `gh api` call.

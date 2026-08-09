@@ -23,6 +23,47 @@ status: current
 
 ## Tech Debt
 
+- **TD-042** severity: minor | status: open | created: Sprint-054
+  - Summary: the sprint checks in `qa-check.sh` gate on `[ "$st" = "active" ] || continue`, so setting
+    `status: closed` **disarms four of them in the same commit that makes the largest edit to the
+    file**. The Retro, the four-bucket routing and `close_commit` are written unguarded. Worse, the two
+    layers checks do not go quiet — they print `PASS layers completeness (0 block-check(s) verified)`
+    and `PASS layers observed (0 sprint file(s) verified)`, which in a green run is indistinguishable
+    from real coverage.
+  - Impact: observed live at this sprint's close — the run went 72 pass → **68 pass, 0 fail**, and the
+    drop is only visible if you happen to be comparing counts across runs. A PASS over an empty input
+    set is the L-058 family in its purest form: the check cannot fail, so its green says nothing. The
+    scoping itself is defensible (a closed sprint is history; re-validating it forever is noise) — the
+    defect is the **ordering**, since status flips and content changes in one commit, and the
+    **reporting**, since zero-verified announces itself as a pass.
+  - Mitigation (not yet done) — a hypothesis, per this ledger's header: make a zero-verified result
+    report as a skip rather than a PASS (`note` already exists for exactly this and is used elsewhere
+    in the script). **Re-derive before building**: that is the reporting half only, and it may be the
+    whole fix if closing is genuinely the right place to stop validating — decide whether the close
+    commit should be validated *before* the status flip is honoured, which is the ordering half and
+    the more invasive of the two. Ships with a must-FAIL fixture per changed check (L-058).
+
+- **TD-041** severity: minor | status: open | created: Sprint-054
+  - Summary: `scripts/qa-check.sh` cap-checks `skills/*/SKILL.md`, `.claude/CLAUDE.md`,
+    `.claude/CONTEXT.md` and `docs/sprint/SPRINT-*.md`. It does **not** cap-check `docs/research/`,
+    although DOCS_Guide §2 gives those files a 120 soft cap. Same gap for any other §2 row with a
+    stated cap and no check — the coverage was never derived from the table.
+  - Impact: a stated cap with nothing behind it is a comment, and it drifted in exactly that way.
+    `docs/research/mattpocock.md` absorbed **39 lines over its cap across four sprints** with no
+    signal, while TD-038 sat open citing a line count that had been wrong since the sprint it was
+    filed in. The failure is silent by construction: nothing reports, so absence of a complaint reads
+    as compliance — the L-058 family, one level up from a check that cannot fail to a check that does
+    not exist. Filed rather than fixed inside SPRINT-054 T4 because the owner ruled a split, not a
+    gate change, and a new gate check ships with its own must-FAIL fixture (L-058) — which makes this
+    a task, not a drive-by.
+  - Mitigation (not yet done) — a hypothesis, per this ledger's header: extend the existing `cap`
+    helper over `docs/research/*.md` at 120. **Re-derive first**, on two points the cheap version
+    ducks. (a) Whether the cap belongs to the *check* or to the §2 table — hand-listing globs in the
+    script is how the coverage got out of step with the standard in the first place, so deriving the
+    list from §2 may be the actual fix. (b) Whether 120 is right for a doc tracking a 35-file corpus;
+    §7 says a cap moves only by ADR after a measured diet, and T4 has now done the diet (159 → 110),
+    so the figure has evidence behind it either way.
+
 - **TD-040** severity: minor | status: open | created: Sprint-053
   - Summary: the **dispatch preflight snippet** (`orchestrator/references/dispatch.md`) matches only
     lines beginning `Layers:` / `Depends-on:`, so an **indented continuation line is invisible to it**.
@@ -38,6 +79,14 @@ status: current
     that rule has there (L-058). Re-derive first: confirm the snippet is still the surface worth fixing
     rather than having it call the real checker, which would remove the duplication that caused the
     drift instead of patching it a second time.
+  - **Second live sighting, SPRINT-054 promote (2026-08-09).** Same shape, one sprint later: T1's
+    `Layers:` wrapped across four lines, the snippet parsed only the first, and five declared files —
+    including `.claude/CLAUDE.md` — were invisible to it. The T1/T2 overlap on that file was never
+    examined, and the snippet still printed `PREFLIGHT: CLEAR`. Harmless a second time for the same
+    reason as the first: the overlap already carried a `Depends-on:` edge, so it was owned anyway.
+    Twice is the count that makes this a property of the check rather than an unlucky Plan — a wrapped
+    declaration is the normal shape for a multi-file task, and both sightings were caught by a human
+    reading the parsed record, which is not a control.
 
 - **TD-039** severity: minor | status: resolved → SPRINT-053 T2 | created: Sprint-052
   - Summary: `check-layers-completeness.sh`'s two completeness FAILs — `Layers completeness:

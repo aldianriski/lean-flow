@@ -22,11 +22,27 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-096**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-098**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-098 [tags: process] [status: active]: **A summary of an external source is a hypothesis about it; when a decision turns on the source, re-read the source.** SPRINT-054 T3 was promoted to settle a "real tension" this repo had carried since scan 3: `loop-me`'s *push right* (defer the checkpoint as far as it will go) against our gate-before-work model. Every artifact describing that tension — the research doc's delta-map row, the Backlog task, the sprint's own Plan prose — restated our one-line summary of the skill. Fetching the skill itself (via `gh api`; the raw URL 404s, it lives under `skills/in-progress/`) dissolved the tension in one read: `loop-me` defines a **Checkpoint** as a *runtime* verify-or-decide point inside an already-specified workflow, and the skill **is itself a grilling session** whose DoD is "done when an implementer agent could build it without asking a single question". Its model is grill-exhaustively-up-front plus push-the-runtime-checkpoint-right — the same shape as ours. The recorded tension had compared his runtime checkpoints against our design gates: not a disagreement, a category mismatch. Note what would have happened otherwise: the ruling was a judgement call, so arguing from the summary would have produced a confident, well-reasoned verdict about a position nobody holds. The cost of re-reading was one API call. Distinct from L-017 (map the delta against *our* surface before judging) and from this doc's own "a shared name is a hypothesis about coverage" note — both are about the first scan; this is about every decision **after** it, where the summary has become the only thing anyone reads.
+- seen: Sprint-054
+- count: 1
+- promoted: no
+- related: L-017 (delta over standalone merit) · L-097 (a criterion's numbers rot the same way) · L-096 (falsify a rule against a case whose answer you know) · `docs/research/mattpocock.md`
+
+---
+
+## L-097 [tags: process] [status: active]: **A number written into a criterion is remembered, not measured — and nothing re-measures it, so the criterion rots while still reading as precise.** Three instances in SPRINT-054 alone, all found only because execution happened to check. **TD-038** recorded `mattpocock.md` at "117 against its 120 soft cap" and held twice on the reasoning that the doc was "*correct* at 117" and the breach merely "hypothetical"; `git show <sha>:<path> | wc -l` showed it had reached 124 at `bab405f` — **four commits after the row was filed, in that same sprint** — so the row, its trigger, and a SPRINT-053 re-review that reaffirmed it were all reasoning from a dead number. **T2's DoD** said "if the edit pushes the file past its cap" when the file was already past it. **T4's DoD** required the parent to keep both the delta map and the closed verdicts *and* return under the cap — measured, those clauses land at 130 and cannot both hold; it was **unsatisfiable at authoring time**, not merely stale. The pattern is not that mitigations are guesses (L-091, one level down); it is that a *fact* inside a filed criterion decays silently while the prose around it stays confident, because a stated figure looks like evidence and nobody re-runs the measurement. Two structural aggravators, both real here: a soft cap with **no check behind it is a comment** (`qa-check.sh` covers `skills/`, `.claude/` and `docs/sprint/`, never `docs/research/` — which is how 39 lines accumulated unnoticed across four sprints, TD-041), and a criterion frozen at promote is read many times but measured once, at authoring. The move is cheap: **before acting on a stated figure, re-derive it** — at promote when a DoD is built on one, and at the re-review when a TD row is held on one. Third consecutive TD row falsified at execution (TD-036's Summary · TD-034's cause · TD-038's premise), which is what makes this a pattern rather than an anecdote.
+- seen: Sprint-054
+- count: 1
+- promoted: no
+- related: L-091 (a Mitigation is a hypothesis — this is its facts-level sibling) · L-088 (a DoD invalidated by execution) · L-058 (a check that cannot fail) · TD-041 (the missing cap check) · L-098
 
 ---
 

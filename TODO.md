@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-054 — Rulings** → [`docs/sprint/SPRINT-054-rulings.md`](docs/sprint/SPRINT-054-rulings.md)
+> _None._ SPRINT-054 closed 2026-08-09.
 
 ---
 
@@ -50,6 +50,25 @@ status: current
                   shrink the list.
 
 ### P2 — Quality / Polish
+
+- [ ] TASK-166 — Correct the README repo-layout block and give its counts a check  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  `README.md` § Architecture "Repo layout" states the real template count
+                  (32 core + 2 non-core = 34, not "30 … = 32 total") and lists `.codex-plugin/`
+                  alongside `.kimi-plugin/`; and the count claim is covered by a check, so it
+                  cannot drift again
+      touches:    README.md · scripts/qa-check.sh · evals/fixtures/ (a must-FAIL fixture if a
+                  check is added — L-058)
+      depends-on: none
+      assumes:    the drift is unguarded rather than unnoticed — `qa-check.sh` verifies the template
+                  count in `.claude/CLAUDE.md` and `docs/architecture/overview.md` and passes today,
+                  so extending the same check to the README is the small version. Confirm that before
+                  writing a new checker
+      tracker:    SPRINT-054 T1 (found, deliberately not swept in — pre-existing, outside T1's scope)
+      state:      ready — found during SPRINT-054 T1 while updating the same block for the new root
+                  docs. Left alone at the time under "clean up only your own mess"; filed here so it
+                  is not lost. Same family as TD-041: a claim nothing checks drifts silently, and this
+                  one is consumer-facing.
 
 ### P3 — Long-term
 

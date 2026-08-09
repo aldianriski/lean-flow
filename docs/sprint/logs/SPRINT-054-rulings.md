@@ -3,7 +3,7 @@ sprint: 054
 slug: rulings
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -221,3 +221,31 @@ git — a dangling anchor this task did not create.
 
 Knowledge index regenerated (`sh scripts/gen-index.sh`) — two new corpus docs. QA gate re-run bare:
 72 pass, 0 fail. Layers caught the two new files before the commit, as designed.
+
+### 2026-08-09 | close | Retro written, four buckets routed, and a third gate gap found at the close itself
+
+23/23 Plan DoD. Buckets: **Shipped** → T1's three new docs + the DOCS_Guide §2 amendment, held for a
+**MINOR by hand** (not fixes-only, so `/release-patch` is the wrong tool). **Tech debt** → TD-041
+(no cap check over `docs/research/`), TD-042 (below), TD-038 resolved, TD-040 second sighting recorded.
+**Follow-ups** → TASK-166 (README repo-layout counts). **Learnings** → L-097 · L-098.
+
+**Retrieval miss, recorded as one.** TASK-165 was authored arguing from LAW 1 that "create all six is
+not the default", without retrieving ADR-012's LAW 1 reinterpretation, which says the reverse for the
+base tier. Cost nothing — the 3/3 split holds under either bar — but the task was written against a
+rule the repo had already amended, and nothing surfaced it until execution. That is the tracked signal
+for a derived knowledge-graph view.
+
+**TD-042, found by the close itself.** Setting `status: closed` took the QA run from 72 pass to
+**68 pass, 0 fail**. The four missing checks are the per-task schema checks and the two layers checks,
+which gate on `[ "$st" = "active" ] || continue`. Two things wrong, and they are separable: the
+**ordering** — status flips and the Retro/bucket/close_commit edits land in one commit, so the file's
+final content is never validated — and the **reporting**, because the layers checks do not fall silent,
+they print `PASS … (0 block-check(s) verified)`. A pass over an empty set reads exactly like a pass over
+a full one. Verified by reading the script rather than inferred from the count drop.
+
+Third gate gap this sprint (TD-040 blind to wrapped declarations · TD-041 no cap check on research docs
+· TD-042 checks disarmed at close), all the same shape: **silence read as compliance**. Whether that
+convergence is worth a rule of its own is a promote-time question for the next sprint, not a call to
+make while writing the Retro that noticed it — L-058 already covers "a gate needs a must-FAIL fixture",
+and three instances is the point at which the pattern is worth *examining*, not the point at which a
+fourth rule is added on top.
