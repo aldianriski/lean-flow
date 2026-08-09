@@ -32,6 +32,54 @@ status: current
 
 ### P2 — Quality / Polish
 
+- [ ] TASK-156 — Add a redaction discipline to /diagnose  [size: S] [risk: med] [HITL]
+      class:      execution
+      done-when:  /diagnose instructs redacting secrets before showing any captured artifact, and
+                  states the mechanism rather than only the warning — build feedback loops against
+                  env vars so the credential stays in the environment, and quote only the
+                  signal-carrying lines of a captured trace. Consumer-facing surface checked (L-015):
+                  the rule must read correctly for a repo that is not lean-flow
+      touches:    skills/diagnose/SKILL.md · skills/diagnose/references/feedback-loops.md
+      depends-on: none
+      assumes:    this is a real gap, not a stylistic one — /diagnose actively instructs capturing
+                  HAR files, log dumps and replayed payloads, and those routinely carry auth headers;
+                  the skill currently has zero occurrences of redact/secret/credential (verified
+                  SPRINT-050 T1)
+      tracker:    docs/research/mattpocock.md § Keepers K1
+      state:      ready
+
+- [ ] TASK-157 — Add the tautological-test anti-pattern to /tdd  [size: S] [risk: low] [HITL]
+      class:      execution
+      done-when:  /tdd names the anti-pattern and its tell — an assertion that recomputes the expected
+                  value the way the code does passes by construction and can never disagree with the
+                  code — and states the fix: expected values come from an independent source of truth
+                  (a known-good literal, a worked example, the spec)
+      touches:    skills/tdd/SKILL.md · skills/tdd/references/testability.md
+      depends-on: none
+      assumes:    genuinely absent — /tdd carries implementation-coupled and horizontal-slicing but
+                  not this one (verified SPRINT-050 T1) · same family as L-058, a check that can only
+                  pass is the failure it exists to prevent
+      tracker:    docs/research/mattpocock.md § Keepers K5
+      state:      ready
+
+- [ ] TASK-158 — Adopt three micro techniques from the scan-3 keepers  [size: S] [risk: low] [HITL]
+      class:      execution
+      done-when:  all three land, each one or two lines, none expanding into a new skill:
+                  (a) /refactor-advisor gains a scoping step before it scans — walk git history for
+                  hot spots, since deepening only pays off where change is frequent;
+                  (b) /prototype retains a spent prototype on a throwaway branch with a pointer
+                  instead of deleting it outright;
+                  (c) dispatch.md's merge-back queue says to recover each side's intent from commit
+                  messages/PRs before resolving, preserve both intents, never invent behaviour, and
+                  always resolve rather than --abort
+      touches:    skills/refactor-advisor/SKILL.md · skills/prototype/SKILL.md ·
+                  skills/orchestrator/references/dispatch.md
+      depends-on: none
+      assumes:    all three are genuinely micro — if any turns out to need a section rather than a
+                  line, it splits out rather than growing this task quietly (L-088)
+      tracker:    docs/research/mattpocock.md § Keepers K2 · K3 · K4
+      state:      ready
+
 - [ ] TASK-153 — Scan the mattpocock remainder (scan 3)  [size: M] [risk: low] [HITL]
       class:      decision
       done-when:  the 13 skills named as "Not scanned" in docs/research/mattpocock.md are mapped

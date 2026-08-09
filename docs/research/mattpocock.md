@@ -11,126 +11,104 @@ related: [model-purpose]
 # Research — what, if anything, from mattpocock/skills should lean-flow adopt?
 
 > **Question.** Of the skills in [mattpocock/skills](https://github.com/mattpocock/skills), which carry a *delta* over lean-flow's existing surface worth adopting?
-> **Verdict (scan 1, 2026-07-10).** **2 keepers + 1 micro; the real prize was a capability the scan surfaced — skill-powered tier dispatch.** The 7 skills were largely lean-flow's own loop with an *issue tracker* backend swapped in (reject the backend). Adopted: (1) `code-review`'s Standards-vs-Spec separation, (2) `wayfinder`'s decision-ticket / fog-graduation model, (3) the ADR-010 amendment handing dispatched sub-agents a *procedure skill*. **All three shipped.**
-> **Verdict (re-scan 2, 2026-08-09).** **2 keepers of 5 examined.** Keep `grilling`'s **frontier batching + fact/decision separation** and `writing-for-agents`' **branching disclosure test + completion-criteria sharpness**. Reject `wizard`, `wait-what`, and — on re-check — any change from `wayfinder`. Detail → § Re-scan below.
+> **Scan 1 (2026-07-10)** — 7 examined, 2 keepers + 1 micro. **All shipped**: Standards-vs-Spec → the review split · skill-powered dispatch → ADR-010's spawn-with-brief · wayfinder fog-mapping → `/task-decomposer --fog`. Detail in git (SPRINT-016 era).
+> **Scan 2 (2026-08-09, SPRINT-047 T2)** — 5 examined, 2 keepers. **Both shipped in SPRINT-048**: `grilling`'s frontier batching (T3) · `writing-for-agents`' disclosure test + completion-criteria sharpness (T4). Detail in git.
+> **Scan 3 (2026-08-09, SPRINT-050 T1)** — the `engineering/` remainder, 10 examined, **5 keepers, all micro**. § below.
+
+**Corpus: 35 `SKILL.md` files** — 18 `engineering/` · 7 `productivity/` · 6 `in-progress/` · 4 `misc/`.
+Counted deterministically (`gh api …/git/trees/main?recursive=1`), not read off a summary: a `WebFetch`
+summary of the same endpoint reported 32 while listing 35, its headline counts disagreeing with its
+own lists. The previous figure recorded here (34) was wrong.
 
 ## Why this matters
 
-lean-flow keeps being offered near-identical loops (bmad, structarmed, brainstorming — all fast rejects, L-017). The recurring value is never the whole framework; it's the one or two techniques we lack. Guessing wrong here means either importing a redundant tracker dependency (off-ethos) or missing a genuine execution-quality upgrade.
+lean-flow keeps being offered near-identical loops (bmad, structarmed, brainstorming — all fast
+rejects, L-017). The recurring value is never the whole framework; it's the one or two techniques we
+lack. Guessing wrong means importing a redundant tracker dependency (off-ethos) or missing a genuine
+execution-quality upgrade.
 
 ## What the repo is
 
-An **issue-tracker-centric** rebuild of lean-flow's loop: idea → `to-spec` → `to-tickets` → `implement` (tdd + `code-review`) → ship, with `triage` / `diagnose` / `wayfinder` on-ramps and `ask-matt` as a router. The one structural difference coloring all of it: shared state lives in a **real tracker** (GitHub Issues / GitLab / local `.scratch/*.md`), where lean-flow keeps it in-repo (`TODO.md` + `docs/sprint/*.md`).
+An **issue-tracker-centric** rebuild of lean-flow's loop: idea → `to-spec` → `to-tickets` →
+`implement` → ship, with `triage`/`diagnosing-bugs`/`wayfinder` on-ramps. The structural difference
+colouring everything: shared state lives in a **real tracker** (GitHub Issues / `.scratch/*.md`),
+where lean-flow keeps it in-repo (`TODO.md` + `docs/sprint/*.md`). Scan 1 rejected that backend and
+nothing since has changed the verdict.
 
-## Delta map (L-017)
-
-| Matt skill | lean-flow equivalent | Verdict |
-|---|---|---|
-| `implement` | `/orchestrator` — richer (G1/G2 gates, 3 modes, tdd/diagnose routing) | **Reject** (covered) — but see § Skill-powered dispatch |
-| `to-tickets` | `/task-decomposer` (vertical slices, risk, `depends-on`/`blocked`) | **Reject** — *expand–contract* naming is a micro-keeper |
-| `to-spec` | `/task-decomposer` PRD template + `/lean-doc-generator` | **Reject** — its "no interview, synthesize" ethos directly *contradicts* our grill-at-intake |
-| `ask-matt` | CONTEXT.md roster + `/flow` + skill auto-dispatch | **Reject** — Claude already routes on descriptions |
-| `setup-matt-pocock-skills` | We ship **no scaffold** (adaptable, degrade gracefully); `/lean-doc-generator init` covers fresh scaffold | **Reject** — its purpose is to configure the tracker backend we don't want |
-| `wayfinder` | partial: `/task-decomposer` + `/prototype` + research spikes | **Keeper (technique)** |
-| `code-review` | dispatched built-in `/code-review` (single self-review checklist) | **Keeper (principle)** |
-
-## Keepers
-
-- **`code-review` — Standards vs Spec separation.** Reviews two *independent* axes and refuses to merge/re-rank them: **Standards** (obeys repo conventions?) vs **Spec** (builds the *right thing*?). Insight: "perfect code, wrong feature" and "right feature, violated conventions" are different failures — merging lets one mask the other. Our review is one checklist; this split is a real delta. *Source:* code-review/SKILL.md § Separation Principle.
-- **`wayfinder` — decision-ticket + fog-graduation.** For work *too big to even plan in one session*: tickets resolve **decisions, not deliverables**; a `map` index tracks Destination / Decisions-so-far / Not-yet-specified (fog) / Out-of-scope, and you "graduate fog into new tickets" as it sharpens. lean-flow sizes *known* work well and answers *single* design questions (`/prototype`, `/council`) — but has no structured method for a large **foggy** problem where the tasks aren't knowable yet. Closest real gap. *Source:* wayfinder/SKILL.md.
-- **micro — expand–contract** for wide refactors (add new form alongside old → migrate in batches → remove old). `/refactor-advisor` doesn't name it; one-line reference at most.
-
-## Skill-powered tier dispatch (the prize — your note)
-
-**Confirmed capability** (Claude Code docs, verified via claude-code-guide): a dispatched sub-agent CAN run a skill. Three mechanisms, ranked by fit with our **agent-free-core** principle:
-
-- **C — runtime invocation (best fit).** `/orchestrator` dispatches a built-in agent (Agent tool — *already* how ADR-010 tier-routing works) and instructs it to invoke `/tdd` at runtime via the `Skill` tool. No new files. Turns "spawn-with-brief" into "spawn-with-brief **+ procedure skill**" — execution follows discipline (tdd at seams → code-review → commit) instead of improvising. *Small, reversible ADR-010 amendment.*
-- **B — skill self-fork.** A SKILL.md declares `context: fork` + `agent:` + `model:` in its own frontmatter, forking into a tiered sub-agent with **no agent definition**. Reconciles with agent-free-core; heavier (fork cost per run). A later evolution if C proves out.
-- **A — agent def with `skills:` preload.** `.claude/agents/*.md` injects skill content at startup. **Crosses the agent-free-core line** (we ship no agent definitions) — ADR/council-grade, like the provider dep in TASK-047. Not recommended without that gate.
-
-**Gotchas:** (i) preload/model-trigger requires the skill to be model-invocable — lean-flow's skills qualify, but Matt's all set `disable-model-invocation: true` (can't be preloaded), a caution if ever adopting them literally; (ii) built-in `Explore`/`Plan` skip CLAUDE.md — a forked execution agent should be `general-purpose`, not those, so it inherits project context. *Source:* code.claude.com/docs sub-agents.md, skills.md.
-
-## Recommendation
-
-- **Adopt now (small, reversible):** fold the **Standards-vs-Spec split** into review guidance; name **expand–contract** in `/refactor-advisor`.
-- **Adopt as ADR-010 amendment (mechanism C):** `/orchestrator` execution dispatch = brief **+** runtime skill invocation on the tiered sub-agent. Highest workflow leverage, stays agent-free.
-- **Design candidate (technique):** wayfinder's fog-mapping as a pre-decomposition mode in `/task-decomposer` (not a new skill) — for work too foggy to slice.
-- **Reject:** the tracker backend and the `setup-*` scaffold (off-ethos: adds a `gh`/`glab`/external dependency for state we keep in-repo and git-versioned).
-
-## Re-scan (2026-08-09, SPRINT-047 T2)
-
-Scan 1 closed with an explicit **"Not scanned"** list. Four of the five skills below sit in that
-remainder; `wayfinder` is a re-check of something already adopted. The repo has also grown — 34
-SKILL.md files across `engineering/`, `productivity/`, `in-progress/`, `misc/`.
+## Delta map — every skill examined (L-017: delta over our surface, never standalone merit)
 
 | Skill | lean-flow equivalent | Verdict |
 |---|---|---|
-| `grill-me` → `grilling` | the intake grill (`/task-decomposer` Clarify) + G2 residual grill | **Keeper (technique)** |
-| `writing-for-agents` | ADR-006 (cap = procedure; artifacts → `references/`) · DOCS_Guide HOW-filter | **Keeper (2 techniques)** |
-| `wizard` | SPRINT template § Owner-action checklist · night-run's parked-HITL rule | **Reject** — concept owned |
-| `wayfinder` | `/task-decomposer` fog-map mode (adopted from scan 1) | **Reject** — no change worth taking |
-| `wait-what` | CONTEXT.md domain glossary · "Concise reporting" guideline | **Reject** (micro noted) |
+| `implement` | `/orchestrator` — richer (G1/G2, 3 modes, routing) | Reject (scan 1) |
+| `to-tickets` | `/task-decomposer` | Reject (scan 1) — expand–contract kept |
+| `to-spec` | `/task-decomposer` PRD + `/lean-doc-generator` | Reject (scan 1) |
+| `ask-matt` | CONTEXT roster + `/flow` | Reject (scan 1) |
+| `setup-matt-pocock-skills` | we ship no scaffold; `init` covers greenfield | Reject (scan 1) |
+| `wayfinder` | `/task-decomposer --fog` | Keeper (scan 1, shipped) · re-checked scan 2, no change |
+| `code-review` | dispatched `/code-review` | Keeper (scan 1, shipped) |
+| `grill-me` → `grilling` | intake grill + G2 residual grill | Keeper (scan 2, shipped) |
+| `writing-for-agents` | ADR-006 · DOCS_Guide HOW-filter | Keeper (scan 2, shipped ×2) |
+| `wizard` | SPRINT § Owner-action + night-run park rule | Reject (scan 2) |
+| `wait-what` | CONTEXT glossary · Concise reporting | Reject (scan 2, micro) |
+| `codebase-design` | `refactor-advisor/references/deepening.md` | **Reject** — same vocabulary table, deletion test, interface-is-test-surface, one-vs-two-adapters; ours adds dependency categories, expand–contract, design-it-twice |
+| `diagnosing-bugs` | `/diagnose` + `references/feedback-loops.md` | **Reject on the loop** (ours has the same 10 ways) · **Keeper K1** |
+| `domain-modeling` | CONTEXT glossary (canonical + `_Avoid_:`) + ADRs | **Reject (micro)** — the active "challenge a term that conflicts with the glossary" move is one line; `CONTEXT-MAP.md` multi-context is off-shape for a single-context repo |
+| `grill-with-docs` | — | **Reject** — three lines composing `/grilling` + `/domain-modeling`; no independent content, both parts already judged |
+| `improve-codebase-architecture` | `/refactor-advisor` | **Reject** on the Tailwind+Mermaid CDN HTML report (no scaffold, off-ethos, terse-by-default) · **Keeper K2** |
+| `prototype` | `/prototype` + `references/{logic,ui}.md` | **Keeper K3** — otherwise covered |
+| `research` | `RESEARCH.md.template` (`Cite sources`, `*Source:*`) | **Reject (micro)** — "primary sources, follow every claim back to the source that owns it" is sharper than "cite sources"; one line if ever wanted |
+| `resolving-merge-conflicts` | none — merge-back lives in `orchestrator/references/dispatch.md` | **Keeper K4** |
+| `tdd` | `/tdd` + `references/testability.md` | **Reject** on pre-agreed seams (step 1 already confirms the public interface) and horizontal slicing (we have it) · **Keeper K5** |
+| `triage` | `/triage` (ready/needs-info/blocked) + `.out-of-scope/` + HITL/AFK | **Reject** — covered; the tracker backend and the AI-disclaimer-on-tracker-comments rule are backend artefacts scan 1 already rejected |
 
-### Keeper 1 — `grilling`: frontier batching + facts are never the user's job
+## Keepers — scan 3 (all micro; filed, never adopted in-scan)
 
-**Frontier batching contradicts a rule we ship.** Decisions form a dependency tree; each round asks
-the *entire frontier* — every decision whose prerequisites are settled — as one numbered batch, then
-recomputes. Stops when the frontier is empty. Our rule is flatly *one question at a time* ("stacked
-questions get vague answers"). The delta: **the discriminator is dependency, not count.** Batching
-*dependent* questions is bad because the user must guess at inputs they haven't given; batching
-*independent* ones is free. We ban both, so we over-correct — and SPRINT-047 proved it live, sending
-two popups carrying two independent questions each, justified ad hoc as "not stacked ambiguity". The
-frontier rule was being reinvented because the written rule didn't cover it.
-
-**"Finding facts is your job, never the user's."** Research delegates to sub-agents running in
-parallel *without blocking* other frontier questions — only the downstream branch waits. Our "explore
-the codebase before asking" is the same instinct, weaker: it sequences recon *before* the grill rather
-than treating an open fact as one more prerequisite in the tree.
-
-### Keeper 2 — `writing-for-agents`: two techniques
-
-- **A branching test for progressive disclosure** — "inline what *every* path needs; disclose what
-  only *some* reach." ADR-006 gives the mechanism (procedure vs `references/`) but no criterion for
-  which is which; a cap is a size limit, not a test. One line fixes that.
-- **Completion criteria as behavioural levers** — vague bounds ("understanding reached") invite
-  premature completion; demanding ones ("every rule applied") drive exhaustiveness without saying
-  "be thorough". Applies directly to our DoD and Acceptance lines.
-
-*Noted, not adopted:* it argues **negation is an anti-pattern** (prohibition activates the forbidden
-behaviour), which cuts against CLAUDE.md's ❌ house style. Ours pair the trap with a positive rule,
-blunting it — but the tension is real. Carried to § open questions.
-
-### Rejects, with reasons
-
-- **`wizard`** — an interactive bash script walking a human through dashboard/credential steps. The
-  SPRINT template's **Owner-action checklist** already owns "non-dev actions a human must do", and
-  night-run's park rule owns the boundary. The only delta is *executability* — a consumer-repo tool,
-  not a loop skill, and lean-flow ships no scaffold by design.
-- **`wayfinder`** — re-checked against our fog-map: all four map sections, decision-tickets and
-  graduation still match. Genuinely new are **claim-first** (assign before working, so concurrent
-  sessions don't collide) and a **one-ticket-per-session** limit. Both are issue-tracker artefacts
-  scan 1 already rejected — our concurrency control is G2's ownership map plus worktree isolation,
-  and `sprint-bulk` loops many tasks by design. Nothing to take.
-- **`wait-what`** — on "wait, I don't understand", re-explain in ASD-STE100 Simplified Technical
-  English anchored on the project's ubiquitous language. Plugs into an asset we keep (the CONTEXT.md
-  glossary) but is a conversational move, not a loop stage, and we guard hard against skill-count
-  bloat. **Micro if ever wanted:** one line in Behavioral Guidelines.
+- **K1 — redact secrets before showing captured artifacts** (`diagnosing-bugs`). `/diagnose` instructs
+  capturing traces, HAR files, log dumps and replayed payloads, and says **nothing** about redaction —
+  zero occurrences of redact/secret/credential across `SKILL.md` and `feedback-loops.md`. Captured
+  artifacts routinely carry auth headers, and a debugging session is where they get pasted. Matt's
+  rule is also the *right* mechanism, not just a warning: build loops against **env vars** so the
+  credential stays in the environment rather than in what you show, and quote only the signal-carrying
+  lines. → **TASK-156**.
+- **K2 — scope a refactor scan by git hot-spots before scanning** (`improve-codebase-architecture`).
+  `/refactor-advisor` has no scoping step at all: it scans, then ranks. Deepening only pays off where
+  change is frequent, so walking `git log` for the files that keep reappearing is a YAGNI filter on
+  the scan itself. → **TASK-158**.
+- **K3 — retain a spent prototype on a throwaway branch instead of deleting it** (`prototype`).
+  `/prototype` says "delete or absorb — never leave it rotting", which loses the artifact entirely;
+  Matt commits it out of main and leaves a pointer, keeping it as a retrievable primary source at zero
+  repo cost. TD-012 is our scar for exactly this (fixtures deleted with the prototype left a gate
+  unguarded). → **TASK-158**.
+- **K4 — recover each side's intent before resolving a merge conflict** (`resolving-merge-conflicts`).
+  Read the commit messages / PRs behind each hunk, preserve both intents, never invent new behaviour,
+  always resolve rather than `--abort`. Not a new skill — two lines in `dispatch.md`'s merge-back
+  queue, which is where our conflicts actually arise. SPRINT-041's corrupted merge is why this is not
+  theoretical. → **TASK-158**.
+- **K5 — the tautological-test anti-pattern** (`tdd`). An assertion that recomputes the expected value
+  the way the code does (`expect(add(a,b)).toBe(a+b)`, a hand-derived snapshot) passes **by
+  construction** and can never disagree with the code. Absent from `/tdd` and `testability.md`, which
+  carry implementation-coupled and horizontal-slicing but not this. Same family as L-058: a check that
+  can only pass is the failure it exists to prevent. → **TASK-157**.
 
 ## Out of scope / open questions
 
-**Closed since scan 1** — all three keepers shipped: Standards-vs-Spec is live in the review split;
-skill-powered dispatch became ADR-010's spawn-with-brief contract; wayfinder's fog-mode ships as
-`/task-decomposer --fog`. Scan 1's "follow-up tasks not yet filed" list is therefore spent.
+**Closed** — every scan-1 and scan-2 keeper shipped (see the verdict block above).
 
 **Still open**
 - **Mechanism B vs C** — is skill self-fork (`context: fork`) worth the per-run cost over runtime
-  invocation? Unchanged since scan 1; no new evidence either way. → `/prototype` or a follow-up TASK.
+  invocation? Open since scan 1, unchanged through two re-scans. → SPRINT-050 T2.
 - **Negation in anti-patterns** — `writing-for-agents` argues prohibition activates the forbidden
-  behaviour, which cuts against `.claude/CLAUDE.md`'s ❌ house style. Not a keeper, not dismissed. →
-  a question for a doc-aging pass, needing evidence rather than a style preference.
+  behaviour, cutting against `.claude/CLAUDE.md`'s ❌ house style. Needs evidence, not preference. →
+  TASK-155 (`needs-info`).
 
-**Not scanned (re-scan 2).** The repo now holds 34 SKILL.md files. Examined here: the 5 named. Still
-uninspected: `grill-with-docs` · `domain-modeling` · `codebase-design` ·
-`improve-codebase-architecture` · `teach` · `research` · `to-questionnaire` ·
-`resolving-merge-conflicts` · the 6 `in-progress/` skills · the 4 `misc/` skills. Named so the gap is
-a recorded boundary rather than an implied all-clear.
+## Not scanned
+
+**13 remain** — `productivity/`: `handoff` · `teach` · `to-questionnaire` · the 6 `in-progress/` · the
+4 `misc/`. Scheduled as SPRINT-050 T3. Reconciliation: 12 scanned (scans 1–2) + 10 (scan 3) + 13
+pending = 35.
+
+> **A boundary entry leaves this list by a written verdict, never by an assumption of coverage.**
+> Scan 2's list silently omitted `diagnosing-bugs` · `prototype` · `tdd` · `triage` · `handoff`,
+> apparently because each shares a name with a lean-flow skill. Four of those five were scanned above
+> and **two produced keepers** (K1, K5) — so the same-name assumption was not merely unverified, it was
+> wrong. A shared name is a hypothesis about coverage, not a finding.

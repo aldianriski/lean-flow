@@ -34,45 +34,78 @@ and TD-037 (the uncommitted-WIP union residual) are one sprint old and not yet a
 
 ## Plan
 
-### T1 — Scan the 13 unexamined mattpocock skills, and restructure the doc that holds them `[size: M · risk: low · class: decision · HITL]`
+### T1 — Scan the 10 unexamined `engineering/` skills, and restructure the doc that holds them `[size: M · risk: low · class: decision · HITL]`
 Layers: `docs/research/mattpocock.md` · `TODO.md` · `TECH-DEBT.md`
 Depends-on: none
-Cites: `scripts/qa-check.sh` T2
+Cites: `scripts/qa-check.sh` `SKILL.md` T3 T2
+
+<!-- Amended 2026-08-09 by scope-change (log, rulings R1+R2): the unscanned set is 23, not the 13
+     this block originally named, and the doc's own boundary list was short by 5. T1 keeps
+     engineering/; T3 takes the remaining 13. Nothing dropped. -->
 
 Scan 2 closed with an explicit "Not scanned" list precisely so this could not be mistaken for
-completeness. Two prior scans returned 5 keepers from 12 skills examined, so the expected shape is
-mostly fast rejects — and L-017 exists because the failure mode here is judging a candidate on its
-standalone merit instead of the delta over what we already ship. The doc is simultaneously at 136
-lines against its 120 soft cap (TD-033), and a third scan cannot be appended to it without making
-that worse, so the restructure is not separable from the scan.
+completeness — and then five skills left that list on a same-name assumption rather than a verdict.
+`engineering/` is where the delta is most likely, since it mirrors our loop most closely. L-017 exists
+because the failure mode here is judging a candidate on its standalone merit instead of the delta over
+what we already ship. The doc is simultaneously at 136 lines against its 120 soft cap (TD-033), and a
+third scan cannot be appended without making that worse, so the restructure is not separable.
 
-**Acceptance:** every one of the 13 named skills carries an explicit Keep or Reject with a one-line
-reason in the research doc; each keeper exists as a `TASK-NNN` in the Backlog; and the § Not scanned
-list is either empty or restates exactly what remains and why.
+**Acceptance:** each of the 10 `engineering/` skills below carries an explicit Keep or Reject with its
+lean-flow equivalent named; keepers exist as `TASK-NNN`; and the doc's corpus figure and boundary list
+are corrected to what was actually counted.
 
 **DoD:**
-- [ ] All 13 mapped — `grill-with-docs` · `domain-modeling` · `codebase-design` ·
-      `improve-codebase-architecture` · `teach` · `research` · `to-questionnaire` ·
-      `resolving-merge-conflicts` · the 6 `in-progress/` · the 4 `misc/` — each Keep/Reject with its
-      lean-flow equivalent named, per L-017's delta-first rule
-- [ ] Keepers **filed as `TASK-NNN`**, not adopted inside this task — the discipline SPRINT-047 T2
-      followed, which is what made its two keepers reviewable before they shipped
-- [ ] A Reject states what already covers it; "not useful" alone is not a reason
-- [ ] § Not scanned emptied, or restated with what remains and the reason it was skipped — never
-      silently dropped, since its whole purpose is to be an honest boundary
-- [ ] TD-033 addressed by the restructure: the doc lands **under its 120 soft cap**, either by
-      collapsing shipped scan-1 detail to pointers (the §11 LEARNINGS pattern) or by splitting
-      per-scan files behind an index. Whichever is chosen, state why in the doc
-- [ ] `TD-033` marked `status: resolved → SPRINT-050 T1` in the ledger
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit, after the DoD ticks and the
+- [x] All 10 mapped — `codebase-design` · `diagnosing-bugs` · `domain-modeling` · `grill-with-docs` ·
+      `improve-codebase-architecture` · `prototype` · `research` · `resolving-merge-conflicts` ·
+      `tdd` · `triage` — each Keep/Reject with its lean-flow equivalent named (L-017, delta first)
+- [x] The 5 name-matched ones (`diagnosing-bugs` · `prototype` · `tdd` · `triage` — plus `handoff`
+      in T3) get a **one-line confirm-or-reject each**, per ruling R1: a shared name is a hypothesis
+      about coverage, not a finding — **4 checked here, 2 produced keepers**, so the assumption was
+      wrong, not merely unverified
+- [x] Keepers **filed as `TASK-NNN`**, not adopted inside this task — the discipline SPRINT-047 T2
+      set, which is what made its two keepers reviewable before they shipped — TASK-156/157/158
+- [x] A Reject states what already covers it; "not useful" alone is not a reason
+- [x] The doc's corpus figure corrected — **35** `SKILL.md` files, counted deterministically, not 34
+- [x] TD-033 addressed by the restructure: the doc lands **under its 120 soft cap** — 136 → 114 while
+      adding scan 3, by collapsing scan 1/2 narrative to pointers; the split-per-file option was
+      rejected in the doc with its reason
+- [x] `TD-033` marked `status: resolved → SPRINT-050 T1` in the ledger
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit, after the DoD ticks and the
       log entry — those are edits too (L-089)
 
 <!-- QA: docs-only, no executable surface — self-review is the floor, no security or perf pass
      indicated. The risk here is judgement (adopting something redundant), not correctness. -->
 
+### T3 — Scan the remaining 13: `productivity/`, `in-progress/`, `misc/` `[size: M · risk: low · class: decision · HITL]`
+Layers: `docs/research/mattpocock.md` · `TODO.md`
+Depends-on: T1
+Cites: `scripts/qa-check.sh` T1
+
+<!-- Added 2026-08-09 by scope-change (log, rulings R1+R2). Depends-on: T1 is file ownership, not
+     logical need — T1 restructures the doc both write into (D1, extended). -->
+
+The three directories the delta map has never touched. `in-progress/` and `misc/` were skipped by both
+prior scans as presumptively unfinished or off-topic — plausible, and never checked, which is the same
+assumption that removed five skills from the boundary list. Cheap to settle definitively.
+
+**Acceptance:** each of the 13 carries an explicit Keep or Reject with a reason, and § Not scanned is
+**empty** — the boundary closed rather than restated.
+
+**DoD:**
+- [ ] `productivity/` (3) mapped — `handoff` · `teach` · `to-questionnaire`; `handoff` gets the
+      name-match confirm-or-reject treatment per R1
+- [ ] `in-progress/` (6) mapped — `claude-handoff` · `loop-me` · `setup-ts-deep-modules` ·
+      `writing-beats` · `writing-fragments` · `writing-shape`. "Unfinished upstream" is a valid Reject
+      **only if checked** and stated as the reason
+- [ ] `misc/` (4) mapped — `git-guardrails-claude-code` · `migrate-to-shoehorn` ·
+      `scaffold-exercises` · `setup-pre-commit`
+- [ ] Keepers filed as `TASK-NNN`, not adopted in-task
+- [ ] § Not scanned **empty**, with the count reconciled: 12 previously scanned + 10 (T1) + 13 (T3) = 35
+- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+
 ### T2 — Settle mechanism B vs C, with an expiry if it is deferred again `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/research/mattpocock.md` · `docs/adr/ADR-010-model-tier-dispatch.md`
-Depends-on: T1
+Depends-on: T1 T3
 Cites: `scripts/qa-check.sh`
 
 Open since scan 1 and carried through two re-scans unchanged. Mechanism C (runtime `Skill` invocation

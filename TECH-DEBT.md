@@ -92,7 +92,7 @@ status: current
     `archive/logs/SPRINT-045-gate-precision.md` where it now belongs. Cheap, but it edits a closed
     archive record, so it wants an explicit decision rather than a drive-by fix.
 
-- **TD-033** severity: trivial | status: open | created: Sprint-047
+- **TD-033** severity: trivial | status: resolved → SPRINT-050 T1 | created: Sprint-047
   - Summary: `docs/research/mattpocock.md` now runs **136 lines against its 120 soft cap** (DOCS_Guide
     §2), carrying two scans — the 2026-07-10 original and the 2026-08-09 re-scan.
   - Impact: none functional; research caps are soft and nothing lints them, which is exactly why this
@@ -103,6 +103,17 @@ status: current
     LEARNINGS-collapse pattern applied to research), or split per-scan files with an index. Note there
     is no automated scan for research-doc caps at promote — only TODO.md's ~150 line trigger exists —
     so this row is the only thing that will resurface it.
+  - **RESOLVED (SPRINT-050 T1) — the first mitigation was taken.** Scan 1 and scan 2's narrative
+    sections collapsed to pointer lines in the verdict block (their keepers all shipped, so the detail
+    is historical and lives in git), and every skill examined now occupies one row of a single delta
+    map rather than a per-scan prose section. 136 → **114 lines** against the 120 soft cap, while
+    *adding* scan 3's 10 rows and 5 keepers. The split-per-scan-file option was rejected: the value of
+    this doc is one table you can read top to bottom, and an index over three files would trade that
+    for a lower line count in each.
+  - **Residual, and it will bite T3:** the doc has ~6 lines of headroom and T3 adds 13 more delta-map
+    rows. The compression available then is collapsing the 11 scan-1/scan-2 rows into two summary
+    lines, since their verdicts are already stated in the header block. Recorded here rather than left
+    for T3 to discover mid-task.
 
 - **TD-032** severity: minor | status: resolved → SPRINT-049 T3 | created: Sprint-047
   - Summary: `scripts/lib/check-layers-completeness.sh` cannot distinguish a file the task **will
