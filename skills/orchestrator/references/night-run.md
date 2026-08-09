@@ -278,11 +278,26 @@ this pre-flight pass.
 The one-liner, fired by an OS-level scheduler (outside lean-flow's own surface — it ships no hooks):
 
 ```
-claude -p "/orchestrator sprint-bulk unattended" --permission-mode dontAsk
+claude -p "/orchestrator sprint-bulk unattended" --permission-mode dontAsk \
+  --output-format stream-json --verbose
 ```
 
 (Permissions come from your settings file per Part 1; `--allowedTools "<built list>"` still works if you
 prefer them inline.)
+
+**`stream-json` is not optional here, and it is the one flag the rest of this document depends on.**
+Part 3's watchdog defines its stall signal in terms of new stream lines, and Part 4 reads the run's
+cost off the stream's last event — neither works under the alternative. `--output-format json`
+**buffers everything until exit**, so during the run there is nothing to observe *by construction*: a
+healthy run and a dead one are externally identical, and an empty log proves nothing either way. That
+is not hypothetical — SPRINT-045 fired with `json`, the launcher reported `DEAD-ON-ARRIVAL … the
+prompt may have been rejected`, and the run was working normally and went on to land both units
+(L-083, TD-029). Choosing the format for the cost fields is what caused it, and that reason no longer
+applies: the stream carries the same figures (Part 4).
+
+`--verbose` is the documented pairing for `stream-json` under `-p`. `--include-partial-messages` adds
+token-level deltas on top; it is optional and only worth it if you want finer-grained liveness than
+per-event lines.
 
 ### Firing it so you can walk away
 
@@ -302,7 +317,7 @@ sh scripts/night-run.sh -- claude -p "/orchestrator sprint-bulk unattended" --pe
 |---|---|
 | `ALIVE` | process is up **and** producing observable progress — a log line or a new commit. You can close the terminal. |
 | `DEAD-ON-ARRIVAL: <reason>` | it never got going, and the line names why (missing mode signal · wrong permission mode · no allowlist · the gate blocked · exited early). Nothing was left running. |
-| `UNKNOWN: <reason>` *(exit 2)* | the process is **up**, but nothing observable happened inside the window — no log line, no commit. **Indeterminate, not dead.** A silent-but-working run is externally identical to a stalled one, and with `--output-format json` — which buffers until exit — an empty log is *expected*, so its absence of content proves nothing. The run is detached and continues either way; check the log later or widen `--wait-seconds`. Before TD-029 this case was reported as `DEAD-ON-ARRIVAL … the prompt may have been rejected`, an inference the launcher cannot support and which SPRINT-045 acted on while the run was working normally and went on to land both units. |
+| `UNKNOWN: <reason>` *(exit 2)* | the process is **up**, but nothing observable happened inside the window — no log line, no commit. **Indeterminate, not dead.** A silent-but-working run is externally identical to a stalled one. Under Part 2's mandated `--output-format stream-json` this verdict should be **rare** — the stream emits per-event lines, so silence is real evidence of a stall rather than an artifact of the format. It stays in the table for the case that produced it: fired with `--output-format json`, which buffers until exit, an empty log is *expected* and proves nothing either way, so a run configured that way can never be judged from its output. If you see `UNKNOWN` repeatedly, check the format before diagnosing the run. Either way the run is detached and continues; check the log later or widen `--wait-seconds`. Before TD-029 this case was reported as `DEAD-ON-ARRIVAL … the prompt may have been rejected`, an inference the launcher cannot support and which SPRINT-045 acted on while the run was working normally and went on to land both units. |
 
 **A live PID is not progress.** A process can sit up and idle because its prompt was rejected, so the
 verdict requires *output*, never just a heartbeat — which is also why the window defaults to ~150s
@@ -386,9 +401,14 @@ run · <actual cost> · <turns> · <wall-clock> · <units completed / attempted>
 ```
 
 `shape` is what you paid for — `inline`, or `coordinator + N agents`, since the same work costs
-multiples in the second form. Read the numbers off the harness rather than estimating: a headless
-`claude -p --output-format json` result carries `total_cost_usd`, `num_turns`, and `duration_api_ms`
-(with a per-model breakdown under `modelUsage`), so this is a transcription, not a judgement.
+multiples in the second form. Read the numbers off the harness rather than estimating: **the last line
+of the `stream-json` output is a `result` event carrying `total_cost_usd`, `num_turns` and
+`duration_api_ms`** (with a per-model breakdown under `modelUsage`), so this is a transcription, not a
+judgement. Take them from there rather than from `--output-format json`: the figures are the same, and
+Part 2 mandates the streaming form because the buffering one makes the run unobservable while it runs
+(L-083). The two needs that used to pull in opposite directions — *watch it live* and *read its cost*
+— are served by one format, so there is no longer a trade to get wrong. Both figures are client-side
+estimates and can differ from the bill.
 **Degrade rule** — where cost is not exposed, record the fields that are (turns · wall-clock · units)
 and **say the cost was unavailable**. A row with a stated gap still calibrates; a silently omitted row
 is what leaves the next person estimating from nothing.

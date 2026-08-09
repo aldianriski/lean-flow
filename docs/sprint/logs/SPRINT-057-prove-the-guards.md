@@ -84,3 +84,35 @@ invocation per command, stated inline so it reads as a line to tick rather than 
 Generic by construction — the reporter's two unrunnable commands are evidence in this log, not
 content in the doc (L-015 · the report's own generalizes/host-specific split). L-052 cited: a platform
 fact gets run, never inferred.
+
+### 2026-08-10 | complete | T3 — one format across all three Parts; the trade that caused the conflict no longer exists
+Part 2's recipe now mandates `--output-format stream-json --verbose`, and the two sections that
+consumed the format follow it. This conflict was **ours, not the reporter's** — found while verifying
+their finding 7, and worse than what they reported: Part 2 specified no format at all, Part 3's stall
+signal was written in terms of `stream-json` lines, and Part 4 told you to read cost off
+`--output-format json`. Three sections, three incompatible assumptions, and a documented instance of
+the collision already in the ledger (L-083, TD-029: SPRINT-045 fired with `json`, the launcher
+reported `DEAD-ON-ARRIVAL … the prompt may have been rejected`, and the run was working normally and
+landed both units).
+
+**The reason the conflict existed is now gone, which is what makes this fixable rather than a
+trade-off to document.** `json` was chosen in Part 4 precisely because it exposes `total_cost_usd` —
+a real need, pulling against liveness. A1's resolution removes the tension: the last line of the
+stream is a `result` event carrying the same `total_cost_usd`, `num_turns` and `duration_api_ms`. One
+format serves both needs, so Part 4 now reads its numbers from the stream's terminating event and says
+why.
+
+Part 3's `UNKNOWN` verdict row was **kept, not deleted**. Under the mandated format it should be rare
+— per-event lines mean silence is genuine evidence of a stall rather than an artifact — but the row
+documents the case that produced it, and now tells a reader seeing `UNKNOWN` repeatedly to check the
+format before diagnosing the run. Deleting it would have removed the explanation for the one recorded
+false verdict.
+
+`scripts/night-run.sh` needed no change and was verified rather than assumed (its `Cites:` line said
+so): it already detects `--output-format json`, reports `UNKNOWN` instead of `DEAD`, and recommends
+`stream-json` in the message. The launcher was ahead of the doc.
+
+Claimed only what is verified (L-052): the `result`-event fields are documented; `--verbose` is the
+documented pairing; `--include-partial-messages` is optional and token-level, checked against the
+local CLI's own help. Whether `stream-json` alone emits intermediate events without `--verbose` was
+**not** verified, so nothing in the doc asserts it.

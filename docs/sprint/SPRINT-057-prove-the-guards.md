@@ -98,13 +98,13 @@ reported `DEAD-ON-ARRIVAL` because the format it was given could not emit progre
 signal, calibration row) is consistent with that choice.
 
 **DoD:**
-- [ ] Part 2's recipe mandates `stream-json`, so liveness is observable by construction
-- [ ] Part 4's calibration row reads cost from the **terminating result event** in the stream rather
+- [x] Part 2's recipe mandates `stream-json`, so liveness is observable by construction
+- [x] Part 4's calibration row reads cost from the **terminating result event** in the stream rather
       than from `--output-format json`
-- [ ] **Verify first** that the terminating event actually carries `total_cost_usd` / `num_turns` /
+- [x] **Verify first** that the terminating event actually carries `total_cost_usd` / `num_turns` /
       `duration_api_ms` — a platform fact to run, not infer (L-052). If it does not, the degrade rule
       applies and the calibration row says so rather than going quiet
-- [ ] No section left assuming a format another section contradicts
+- [x] No section left assuming a format another section contradicts
 
 ### T4 — Verify the watchdog actually started `[size: S · risk: low · class: execution · HITL]`
 Layers: `skills/orchestrator/references/night-run.md`
