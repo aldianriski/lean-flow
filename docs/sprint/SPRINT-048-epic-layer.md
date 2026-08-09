@@ -103,7 +103,7 @@ decided, so this lands as an amendment note rather than an edit to the decided t
 states that completion criteria are behavioural levers.
 
 **DoD:**
-- [x] ADR-006 amended — a **second** dated amendment (T6 added the first); decided text untouched
+- [x] ADR-006 amended — a **second** dated amendment this sprint (the cap raise added the first); decided text untouched
 - [x] Branching test stated in DOCS_Guide beside the cap rule, where an author meets it — with the context-load vs cognitive-load tension named, since optimising the latter at the former's expense is the common error
 - [x] Completion-criteria guidance added: write the bound you would accept as proof, not the activity
 - [x] Negation-as-anti-pattern recorded as **not adopted, open** — it cuts against CLAUDE.md's ❌ house style, and settling it on style preference alone would be the unevidenced call this repo keeps getting wrong
