@@ -84,11 +84,11 @@ cap**, so this must be line-neutral there.
 and the "four questions at once" red flag no longer contradicts it.
 
 **DoD:**
-- [ ] Rule restated: ask every question whose prerequisites are settled as one round, serialise only dependents, stop when the frontier is empty
-- [ ] The "four questions at once is faster" red flag reworded so it forbids *dependent* batching, not all batching
-- [ ] "Finding facts is the agent's job, never the user's" stated — an open fact is a prerequisite in the tree, not a question for the user
-- [ ] All four touchpoints agree; `.claude/CLAUDE.md` edits line-neutral (80/80)
-- [ ] `sh scripts/qa-check.sh` green on a bare run
+- [x] Rule restated: ask every question whose prerequisites are settled as one round, serialise only dependents, stop when the frontier is empty
+- [x] The "four questions at once is faster" red flag reworded so it forbids *dependent* batching, not all batching
+- [x] "Finding facts is the agent's job, never the user's" stated — an open fact is a prerequisite in the tree, not a question for the user
+- [x] All four touchpoints agree; `.claude/CLAUDE.md` edits line-neutral (**80/80 before and after**)
+- [x] `sh scripts/qa-check.sh` green on a bare run — 75 pass, 0 fail
 
 ### T4 — Adopt the disclosure test + completion-criteria sharpness `[size: S · risk: low · class: execution · HITL]`
 Layers: `docs/adr/ADR-006-skill-cap-executable-artifacts.md` · `skills/lean-doc-generator/references/DOCS_Guide.md`

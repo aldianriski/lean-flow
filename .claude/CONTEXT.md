@@ -33,7 +33,7 @@ Every skill works standalone; the loop is just the order they reward most togeth
 | `/insights` | learn | anytime — a friction → an `L-NNN` candidate in `LEARNINGS` (or bump a match's `count`); complements the Sprint-Close Retro |
 | `/council` | decide | **opt-in, agent-using** — pressure-test a hard call via 5 advisors + peer review → `verdict-<slug>.md` → ADR |
 
-**Grill** at intake (`/task-decomposer`); G2 re-grills residuals (an unconfirmed assumption blocks G2). **Implement routing** (`/orchestrator`):
+**Grill** at intake (`/task-decomposer`); G2 re-grills residuals (an unconfirmed assumption blocks G2). Both run **by frontier round** — batch every question whose prerequisites are settled into one popup, serialise only dependents (dependency is the discriminator, not count); facts are the agent's job to resolve, never the user's. **Implement routing** (`/orchestrator`):
 new behaviour→`/tdd` **(default, test-first)** · bug→`/diagnose` · hard-to-change→`/refactor-advisor` · docs/spike→direct. `/prototype` feeds design (can't resolve on paper → fold into G2 + ADR); `/council` feeds a hard fork → verdict → ADR §4.
 
 ## Built-in leverage

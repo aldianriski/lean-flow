@@ -47,7 +47,7 @@ Before implementing, draft the design in **`/plan`** (plan mode) and get human s
 - [ ] Residual ambiguity grilled (below) until the goal is unambiguous
 
 **Residual grill** — the detailed grill runs at intake (`/task-decomposer` Clarify); here, re-grill only what is still open —
-one question at a time (as an **AskUserQuestion popup**, not inline prose), recommending an answer each time. An unconfirmed
+by **frontier round** — batch every still-open question whose prerequisites are settled into one **AskUserQuestion popup**, serialise only the dependents (dependency is the discriminator, not count), recommending an answer each time. An unconfirmed
 `assumes:` or a `needs-info` task **BLOCKS G2** until resolved — surface it or mark it `blocked` with an unblock condition, never
 park it as a passive note. A design that must be *felt* → `/prototype`, fold the verdict back into G2; a high-stakes hard-to-reverse fork → `/council` (`verdict-<slug>.md`) → ADR.
 

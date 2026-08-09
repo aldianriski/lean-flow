@@ -76,3 +76,21 @@ Splitting rather than folding into T1/T2 keeps what was signed off intact, and a
 `lean-doc-generator/SKILL.md` by T2, T6, T7. **Revised order: T3 → T6 → T1 → T2 → T7 → T4 → T5** —
 T6 moves early so the headroom exists before T1/T2/T7 edit the generator, and T4's ADR-006 amendment
 lands after T6's. Seven tasks against ~12 capacity.
+
+### 2026-08-09 | complete | T3 — frontier batching replaces one-question-at-a-time
+Six occurrences across the four declared touchpoints, all now agreeing: `task-decomposer/SKILL.md`
+(the grill procedure · the blocking-question rule · the red-flag row), `orchestrator/SKILL.md` (the
+residual grill), `.claude/CLAUDE.md` (Behavioral Guidelines · the parked-question anti-pattern), and
+`.claude/CONTEXT.md` (the Grill line). `grep` for the old wording returns nothing.
+
+The red-flag row was **inverted rather than deleted** — it used to read "four questions at once is
+faster → one at a time forces precision", and now reads "batching is allowed *only if they are
+independent*". Keeping the row matters: the old failure mode (stacking dependent questions) is still a
+real error, and deleting the flag would have read as blanket permission to batch.
+
+`.claude/CLAUDE.md` was **80/80 before and after** — both edits same-line, as A3 required. The
+Behavioral Guidelines sentence absorbed the new rule by dropping a parenthetical citation
+(`SPRINT-015 T3 scoped it to skills; this globalizes it`) that L-002 already covers.
+
+Worth recording: **T3's own grill ran under the old rule**, necessarily — it is the task that changes
+it. Everything after this point exercises the new one, which is what A4 exists to check.

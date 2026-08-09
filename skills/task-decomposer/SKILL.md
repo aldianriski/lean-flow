@@ -26,7 +26,7 @@ For a ticket, fetch the description first (ask the user to paste if credentials 
 
 ## Procedure
 
-1. **Clarify — the grill** *(freeform / ticket only)* — ambiguity is cheapest to kill at intake. Ask ONE question at a time (surface it as an **AskUserQuestion popup**, never inline prose), each with a recommended answer; explore the codebase before asking. For mature / unfamiliar code, **recon first via the `Explore` agent** (existing impl + tests + deps → a tight brief, in its own context — a cheap-tier `sonnet` pass; the grill itself stays on the session model. Tier map → `CONTEXT.md`). Moves:
+1. **Clarify — the grill** *(freeform / ticket only)* — ambiguity is cheapest to kill at intake. Decisions form a dependency tree; work it in **rounds by frontier**. The frontier is every decision whose prerequisites are already settled — ask **all of it at once** as one **AskUserQuestion popup** (each option with a recommended answer), then recompute the frontier from the answers. **The discriminator is dependency, not count:** batching *dependent* questions is what produces vague answers, because the user must guess at inputs they have not given yet; batching *independent* ones costs nothing and saves a round-trip. Stop when the frontier is empty — every branch visited, nothing silently assumed. **Finding *facts* is your job, never the user's:** an unresolved fact is a prerequisite in the tree, not a question — resolve it yourself (for mature / unfamiliar code, **recon via the `Explore` agent** — existing impl + tests + deps → a tight brief in its own context, a cheap-tier `sonnet` pass; the grill itself stays on the session model. Tier map → `CONTEXT.md`). Only the branch *downstream* of an open exploration waits; the rest of the frontier proceeds. Moves:
    - **Challenge the glossary** — a term conflicts with `CONTEXT.md`? Surface it: "your glossary says X, you seem to mean Y — which?"
    - **Sharpen fuzzy language** — replace an overloaded word ("account", "user") with a precise canonical term; feed a newly-pinned term straight to `/lean-doc-generator` (glossary), don't batch.
    - **Invent edge-case scenarios** — concrete cases that force the boundaries between concepts to be made explicit.
@@ -80,7 +80,7 @@ conversation alone. Task output stays local (TODO.md Backlog) — no external is
 - After `approve`: Backlog only; never write directly into an Active Sprint.
 - Identical acceptance criteria on two tasks → merge or differentiate first.
 - A task with no observable acceptance criterion fails validation — rewrite it.
-- A question that BLOCKS scope/design is asked here (one at a time) or recorded as an explicit `needs-info`/`blocked` with its unblock condition — never parked as a silent `assumes:` or a passive doc note that stalls dev.
+- A question that BLOCKS scope/design is asked here (with its frontier round) or recorded as an explicit `needs-info`/`blocked` with its unblock condition — never parked as a silent `assumes:` or a passive doc note that stalls dev.
 
 ## Red flags
 
@@ -88,7 +88,7 @@ conversation alone. Task output stays local (TODO.md Backlog) — no external is
 |---|---|
 | "I'll guess the acceptance criteria" | "works correctly" fails validation — write the observable outcome |
 | "Skip the assumption registry, it's small" | unconfirmed auth assumptions are the top source of regressions |
-| "Four questions at once is faster" | stacked questions get vague answers — one at a time forces precision |
+| "I'll ask all four now, batching is allowed" | only if they are **independent**. A question whose answer depends on another still-open one makes the user guess — that is what produces vague answers, not the count. Serialise dependents; batch the frontier |
 | "These two are related, I'll merge them" | related ≠ same concern — verify the criteria are truly identical |
 | "I'll slice it by layer" | horizontal layers aren't demoable — slice vertically |
 | "A multiple-choice question pins the term" | an MCQ captures a *preference*, not a *definition* — pin a domain term with a concrete example, then confirm (promoted rule) |
