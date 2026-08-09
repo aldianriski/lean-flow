@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-056 — Silent Passes** → [docs/sprint/SPRINT-056-silent-passes.md](docs/sprint/SPRINT-056-silent-passes.md)
+> _None._ SPRINT-056 closed 2026-08-09.
 
 ---
 
@@ -32,73 +32,38 @@ status: current
 
 ### P2 — Quality / Polish
 
-- [ ] TASK-173 — Stop the dispatch preflight silently passing what it cannot parse  [size: M] [risk: med] [HITL]
+- [ ] TASK-177 — Put the four grandfathered cap breaches on a diet, or move their caps by ADR  [size: M] [risk: low] [HITL]
       class:      decision
-      done-when:  the preflight reports the same shared-file ownership verdict as the full checker on
-                  (a) a wrapped/indented `Layers:` declaration and (b) a directory token ending in `/`;
-                  both proven by must-FAIL fixtures in which the preflight currently reports CLEAR on
-                  a real overlap and afterwards HALTs with its named finding
-      touches:    orchestrator/references/dispatch.md (the embedded snippet) · scripts/lib/ ·
-                  evals/ (fixtures + harness) · scripts/qa-check.sh if the wiring changes
+      done-when:  `scripts/lib/doc-caps-grandfathered.txt` is empty, and each entry left it by one of
+                  two routes recorded in the file's history: the doc came back under its stated cap,
+                  or its cap moved by ADR after a measured diet (§7). The checker already prints
+                  "back under cap: DELETE its grandfather row" when a row has earned removal
+      touches:    docs/research/{loop-hygiene-prd,graphify-daily-value,graph-engineering}.md ·
+                  AGENTS.md · scripts/lib/doc-caps-grandfathered.txt · docs/adr/ if a cap moves
       depends-on: none
-      assumes:    the snippet and check-layers-completeness.sh duplicate a parser, and TD-040's own
-                  mitigation asks whether the snippet should CALL the real checker rather than be
-                  patched a second time. Re-derive that first — patching twice is how the drift
-                  happened. Consumer-facing surface: the snippet ships inside a reference doc
-      tracker:    TD-040 (2 live silent false PASSes: SPRINT-053 + SPRINT-054 promotes) · TD-043
-      origin:     decomposer
+      assumes:    the three research docs (214 · 157 · 122 against 120) split by moving whole
+                  sections, never by compressing — §7 says knowledge docs split and ledgers compress,
+                  and SPRINT-054 T4 has a worked precedent. AGENTS.md at 11 vs ~10 is the odd one:
+                  the cap is written approximate and the file is a thin pointer, so the honest fix
+                  may be to state a real number in §2 rather than to trim a line
+      tracker:    SPRINT-056 T2 — the check that found them; three were known, AGENTS.md was not
+      origin:     close-retro
       state:      ready
 
-- [ ] TASK-174 — Derive gate coverage from the standard instead of hand-listing it  [size: M] [risk: med] [HITL]
+- [ ] TASK-178 — Measure where the gate's 126 seconds actually go before moving anything  [size: S] [risk: low] [HITL]
       class:      decision
-      done-when:  a §2 row that states a cap is cap-checked without anyone adding a glob by hand, and
-                  all four version manifests are compared to each other rather than one being compared
-                  to the README; a must-FAIL fixture proves each half — a doc over its stated cap, and
-                  one manifest out of lockstep with its siblings
-      touches:    scripts/qa-check.sh · scripts/lib/ · DOCS_Guide §2 (as the source the coverage is
-                  derived FROM, if that is the chosen shape) · evals/
+      done-when:  a per-harness timing breakdown exists for a bare `qa-check.sh` run, and the
+                  decision to move / cheapen / keep each always-on harness is made against that
+                  table rather than against an impression
+      touches:    scripts/qa-check.sh · evals/ (measurement only; changes are a separate task)
       depends-on: none
-      assumes:    the two halves are one concern — coverage hand-listed instead of derived — which is
-                  why they are one task. If G2 rules that caps derive from §2 but manifests cannot,
-                  split before implementing. `docs/research/` at 120 is the known-drifted case; §7 says
-                  its figure moves only by ADR after a measured diet, and SPRINT-054 T4 did one
-      tracker:    TD-041 (mattpocock.md drifted 39 lines over 4 sprints unreported) · the v1.29.0
-                  release finding (4 manifests carry the version, 1 is guarded)
-      origin:     decomposer
-      state:      ready
-
-- [ ] TASK-175 — Make an undeclared edit fail while it can still be fixed cheaply  [size: M] [risk: low] [HITL]
-      class:      decision
-      done-when:  an undeclared edit to a file that the WIP path excludes is reported BEFORE its task
-                  commits, not after — demonstrated on the recorded case (a task editing `TODO.md` as
-                  task work rather than close bookkeeping); a must-FAIL fixture holds the behaviour
-      touches:    scripts/lib/check-layers-observed.sh · docs/QA.md (it documents the two paths) ·
-                  evals/
-      depends-on: none
-      assumes:    the WIP/committed exclusion asymmetry is DELIBERATE and documented (attribution
-                  answers by role) — this task must not flatten it. The open design question is whether
-                  exclusion should key on the file or on the phase that touched it, and that is
-                  unanswered on purpose. Narrowing either list on one observation is TD-031's pattern
-      tracker:    TD-044 (SPRINT-055 T6/T7)
-      origin:     decomposer
-      state:      ready
-
-- [ ] TASK-176 — Keep the sprint checks armed through the commit that closes the sprint  [size: M] [risk: med] [HITL]
-      class:      decision
-      done-when:  the commit that writes a Retro and flips `status: closed` is validated against the
-                  sprint schema and caps before the flip is honoured, and a check that verified zero
-                  inputs reports as a skip rather than a PASS; a must-FAIL fixture presents a close
-                  commit carrying a schema violation and the gate goes red
-      touches:    scripts/qa-check.sh (sprint checks + the two layers legs) · scripts/lib/ ·
-                  docs/QA.md · evals/
-      depends-on: none
-      assumes:    two halves — reporting (zero-verified must not read as a pass) and ordering (the
-                  close commit is validated before the status flip). TD-042 says the reporting half may
-                  be the whole fix; re-derive before building, and split if G2 finds them separable.
-                  Scoping a closed sprint out of validation is itself defensible — the defect is the
-                  timing, not the scoping
-      tracker:    TD-042 (2 instances: 72→68 at SPRINT-054 close, 94→87 at SPRINT-055 close)
-      origin:     decomposer
+      assumes:    no harness is moved to `QA_FULL=1` inside this task. Moving one is a coverage
+                  reduction and carries L-076's proof obligation — demonstrate what a bare run no
+                  longer catches — which is its own work. This task produces the number that decision
+                  needs, because there isn't one: 126s is the only figure anyone has, and the
+                  per-harness split has never been taken (L-097)
+      tracker:    TD-046
+      origin:     close-retro
       state:      ready
 
 ### P3 — Long-term
@@ -121,7 +86,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-055's shipped changes are written up as **v1.29.0** in [`CHANGELOG.md`](CHANGELOG.md) and await the MINOR version bump (feature sprint → by hand; `/release-patch` is PATCH-only). SPRINT-054's changes shipped in v1.28.0. Rotated archives → `docs/changelog/`.
+_(no active sprint)_ — SPRINT-056's shipped changes are written up as **v1.30.0** in [`CHANGELOG.md`](CHANGELOG.md) and await the MINOR version bump (feature sprint → by hand; `/release-patch` is PATCH-only). SPRINT-055's shipped as v1.29.0, SPRINT-054's as v1.28.0. Rotated archives → `docs/changelog/`.
 
 ---
 

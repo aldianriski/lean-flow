@@ -22,11 +22,27 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-098**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-104**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-104 [tags: process] [status: active]: **A design question parked as "not yet designed" is often already answered in the implementation's own comments — read what the code says about itself before designing anything new.** TD-044 recorded an open fork and explicitly refused to guess at it: "the real question is whether exclusion should key on the *file* or on the *phase that touched it*, and that has not been designed." SPRINT-056 T3 was promoted to design it. The design step took one read of the function being changed. Every reason on the WIP exclusion list was already written inline — `TODO.md`: "backlog bookkeeping, **written at close**"; `TECH-DEBT.md`: "TD marking **moved to close**"; `CHANGELOG.md`: "release bookkeeping, **written at close**" — three statements about a *phase*, sitting beside genuinely structural ones ("GENERATED, never hand-authored", "undeclarable by construction") that hold in every phase. The list was one list with two kinds of reason, implemented uniformly on the file. That *is* the answer to "file or phase", and it had been sitting in the source the whole time, written by whoever added each exclusion. What made it invisible is that the comments justify entries *individually* — each one reads as obviously correct on its own — and the pattern only appears when you read them as a set and ask what kind of claim each is making. Cheap habit with a good hit rate: before designing a fork the debt row calls undesigned, read the existing implementation's comments **as a group** and ask whether they are all the same kind of statement. A row that says "not yet derived" is a statement about the filer's evidence at filing time, never a finding that the answer is absent.
+- seen: Sprint-056
+- count: 1
+- promoted: no
+- related: L-098 (a summary is a hypothesis — this is its code-comment form) · L-091 (a Mitigation is a hypothesis) · L-102 (run it live to find out what is true) · TD-044
+
+---
+
+## L-103 [tags: tooling] [status: active]: **A live run shows what a checker reports; only a fixture shows what it fails to report — and an exit code distinguishes neither.** L-102 established that a new checker's first run belongs against the live repo, because that run surveys how far the rule had already drifted. SPRINT-056 confirmed that three times over and then found its sharp limit: **the live run cannot see an omission**, because what is missing from a report is invisible in it. Three instances in one sprint, each caught only by a fixture and each exiting **0**. (a) `check-doc-caps.sh` emitted `prefix<TAB>path<TAB>cap` and read it with `IFS=<tab>`; the root-files table has an *empty* prefix and POSIX `read` strips leading whitespace-IFS fields, so every root row shifted by one and vanished — `SECURITY.md`, `AGENTS.md`, `TODO.md` silently uncovered while the output looked comprehensive and healthy. (b) The pre-fix dispatch preflight, run over the parity fixture, printed `PREFLIGHT: CLEAR` at exit 0 while reporting **neither** of the two overlaps the tasks genuinely shared — same exit code as the fixed parser, empty verdict. (c) `check-manifest-lockstep.sh`'s first live run found *zero* manifests, because every one lives in a dot directory and a shell glob does not match a leading dot; shipped, it would have exited 0 forever. The consequence for fixture design is concrete and was nearly missed here: **assert on output content, never on exit status**, because all three of these are indistinguishable from success by status alone, and the obvious fixture (`expect exit 0`) would have blessed every one. The pairing to keep: live run for *drift*, fixture for *omission*, content assertions for both.
+- seen: Sprint-056
+- count: 1
+- promoted: no
+- related: L-102 (its direct parent — the live run is for drift, this is its blind spot) · L-058 (the silent false-negative) · L-060 · CLAUDE.md Edit-safety trap (c) · L-078 (a green result from a setup that never ran) · L-075 (a fixture that never held the violation)
 
 ---
 

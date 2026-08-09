@@ -3,7 +3,7 @@ sprint: 056
 slug: silent-passes
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 plan_commit: 1f0c012
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -226,3 +226,40 @@ siblings fails the gate with a named finding; the README footer check keeps work
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
      shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Retrieval check** — yes, twice, both the same shape and both mine: I asserted "three non-§2 caps
+would be dropped" at G2 and "the gate was 57s" mid-T2, neither measured. §2 carries all but one, and
+the gate was already 115s. Both are L-097 — the learning this sprint *promoted*, violated inside the
+sprint that promoted it, on the task about caps. Filed as friction; no `count` bump, since L-097 is
+already durable and a third instance changes nothing about where the rule lives.
+
+**Cost** — inline, single session, no dispatch (all five tasks `class: decision`; agent dispatch was
+off for this session). 5 tasks · 4 new checkers · 15 retained fixture cases · 35 files · +1162/−73.
+Gate 89 → 126 checks. No API spend beyond the session itself; unmeasured in dollars, so recorded as
+shape rather than a figure.
+
+**Worked**
+- **Re-deriving every filed mitigation before building.** Four of four resolved *against* the fix its
+  TD row proposed, and T4's re-derivation dissolved the problem rather than solving it. The DoD line
+  "re-derive first" was worth more than any other line in the Plan.
+- **Running each new checker against the live repo before fixing anything** (L-102). Three of four
+  first runs were informative: a fourth unrecorded cap breach, a glob matching zero manifests, and
+  coverage 4× wider than the hand-list.
+- **Fixtures that assert on output content, not exit status.** Three separate times a broken or
+  absent parser exited 0 — the pre-fix preflight over the parity input, the tab-IFS drop, the dotless
+  manifest glob. An exit-code assertion would have blessed all three.
+
+**Friction**
+- Two unmeasured figures asserted at a gate (above). Cheap to avoid, and neither was caught by a
+  check — only by happening to look.
+- The gate is now ~126s, up from 115s at T1 and rising each sprint. Not yet a problem; on the path to
+  one, since a slow gate is a skipped gate.
+- `evals/fixtures/layers-observed/` was declared in T3's `Layers:` and never created — the harness
+  builds throwaway repos instead. Harmless over-declaration, but it means a declaration can name a
+  path that never exists and nothing notices.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- A live run shows what a checker *reports*; only a fixture shows what it *omits* — the two are not
+  interchangeable, and the omission is invisible in a healthy-looking report (→ L-103).
+- A design question parked as "undesigned" was already answered in the implementation's own comments
+  (→ L-104).

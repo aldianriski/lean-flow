@@ -23,7 +23,40 @@ status: current
 
 ## Tech Debt
 
-- **TD-044** severity: minor | status: open | created: Sprint-055
+- **TD-046** severity: minor | status: open | created: Sprint-056
+  - Summary: the always-on gate now takes **~126s** (measured: 115s at SPRINT-056 T1, 126s at close),
+    up from the 57s recorded when TD-016 moved three slow harnesses behind `QA_FULL=1`. Twelve
+    always-on eval harnesses now run on every invocation, several of which spawn the checker they
+    guard against the whole live repo.
+  - Impact: none yet — it is green and it is correct. The concern is behavioural: a gate slow enough
+    to be skipped is a gate that stops running, and L-089 already records a red gate committed
+    because it was not re-run after a "clerical" edit. Every second added raises the odds of that.
+    Recorded now because the trend is only visible across sprints and nothing measures it.
+  - Mitigation (**not yet derived**, L-091): the obvious lever is moving more harnesses to `QA_FULL=1`,
+    but that is a coverage reduction and carries L-076's proof obligation — show what a bare run no
+    longer catches. A better question first: several harnesses re-run their checker over the entire
+    live repo purely to guard a glob, and a cheaper assertion may exist. **Measure where the 126s
+    actually goes before moving anything** — no figure has been taken per-harness, and L-097 is
+    specifically about acting on a number nobody re-derived.
+
+- **TD-045** severity: minor | status: open | created: Sprint-056
+  - Summary: the dispatch preflight in `dispatch.md` still re-implements the `Layers:`/`Depends-on:`
+    parser that `check-layers-completeness.sh` owns. SPRINT-056 T1 fixed the two drifts (TD-040,
+    TD-043) and added a parity fixture, but did **not** remove the duplication.
+  - Impact: bounded and deliberately so. G2 ruled against removing it — `dispatch.md` publishes the
+    snippet as an *"Optional snippet, dependency-free POSIX sh, runnable verbatim"*, and pointing it
+    at `scripts/lib/` would both break that published contract and ship a maintainer-only `scripts/…`
+    path inside a consumer-facing reference (L-015). So the duplication is now *guarded* by
+    `evals/fixtures/dispatch-preflight/parser-parity/`, which drives one input through both parsers
+    and fails if either stops seeing a declaration the other still reads. Two drifts happened before
+    that guard existed; a third would now be caught rather than shipped.
+  - Mitigation (**not yet derived**, L-091): if a third drift appears, the thing to revisit is the
+    **published contract**, not the parser — either the snippet stops claiming to be dependency-free,
+    or the shared parser is vendored into the fenced block by a generator. Do not re-open this on age
+    alone: the guard is the point, and a parity fixture that has never fired is evidence the design
+    is holding, not evidence it is unused.
+
+- **TD-044** severity: minor | status: resolved → SPRINT-056 T3 | created: Sprint-055
   - Summary: `check-layers-observed.sh` runs two paths with two different exclusion lists —
     `is_excluded()` for uncommitted WIP, `is_excluded_committed()` for history — and `TODO.md` is on
     the first and not the second, so the same undeclared edit is invisible while uncommitted and a
@@ -54,7 +87,7 @@ status: current
   - Same family as Edit-safety trap (c): a report that describes the reporter's state rather than the
     artifact's.
 
-- **TD-043** severity: minor | status: open | created: Sprint-055
+- **TD-043** severity: minor | status: resolved → SPRINT-056 T1 | created: Sprint-055
   - Summary: SPRINT-055 T1 taught both layers checkers that a `Layers:` token ending in `/` is a
     directory prefix. The **dispatch preflight** (`dispatch.md`) extracts only dot-bearing tokens
     (`[A-Za-z0-9_./-]+\.[A-Za-z0-9]+`), so a directory token is invisible to its **shared-file overlap**
@@ -71,7 +104,7 @@ status: current
     tokens could be rejected outright in a Plan that has more than one task — cheaper, and it removes
     the feature's only sharp edge. Decide before a sprint declares the same directory twice.
 
-- **TD-042** severity: minor | status: open | created: Sprint-054
+- **TD-042** severity: minor | status: resolved → SPRINT-056 T4 | created: Sprint-054
   - Summary: the sprint checks in `qa-check.sh` gate on `[ "$st" = "active" ] || continue`, so setting
     `status: closed` **disarms four of them in the same commit that makes the largest edit to the
     file**. The Retro, the four-bucket routing and `close_commit` are written unguarded. Worse, the two
@@ -99,7 +132,7 @@ status: current
     commit should be validated *before* the status flip is honoured, which is the ordering half and
     the more invasive of the two. Ships with a must-FAIL fixture per changed check (L-058).
 
-- **TD-041** severity: minor | status: open | created: Sprint-054
+- **TD-041** severity: minor | status: resolved → SPRINT-056 T2 | created: Sprint-054
   - Summary: `scripts/qa-check.sh` cap-checks `skills/*/SKILL.md`, `.claude/CLAUDE.md`,
     `.claude/CONTEXT.md` and `docs/sprint/SPRINT-*.md`. It does **not** cap-check `docs/research/`,
     although DOCS_Guide §2 gives those files a 120 soft cap. Same gap for any other §2 row with a
@@ -120,7 +153,7 @@ status: current
     §7 says a cap moves only by ADR after a measured diet, and T4 has now done the diet (159 → 110),
     so the figure has evidence behind it either way.
 
-- **TD-040** severity: minor | status: open | created: Sprint-053
+- **TD-040** severity: minor | status: resolved → SPRINT-056 T1 | created: Sprint-053
   - Summary: the **dispatch preflight snippet** (`orchestrator/references/dispatch.md`) matches only
     lines beginning `Layers:` / `Depends-on:`, so an **indented continuation line is invisible to it**.
     The full `check-layers-completeness.sh` reads continuations correctly (SPRINT-049 T3); the snippet
