@@ -61,31 +61,33 @@ the real checker rather than be patched a second time, and patching twice is how
 - [ ] Both fixtures verified red-on-new **and** green-on-old against the pre-fix snippet (L-090)
 - [ ] Fixtures retained and wired into `qa-check.sh`, not deleted with the prototype (TD-012)
 
-### T2 — Derive gate coverage from the standard instead of hand-listing it `[size: M · risk: med · class: decision · HITL]`
-Layers: `scripts/qa-check.sh` · `scripts/lib/check-doc-caps.sh` · `scripts/lib/check-manifest-lockstep.sh` · `skills/lean-doc-generator/references/DOCS_Guide.md` · `evals/run-doc-caps-fixtures.sh` · `evals/fixtures/doc-caps/`
-Cites: `README.md` · `plugin.json` · `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json` · `mattpocock.md` · `loop-hygiene-prd.md` · `graphify-daily-value.md` · `graph-engineering.md` · T4 (SPRINT-054's, not this sprint's) — read as the surfaces compared and the evidence cited, not edited here
+### T2 — Derive doc-cap coverage from the §2 table instead of hand-listing it `[size: M · risk: med · class: decision · HITL]`
+Layers: `scripts/qa-check.sh` · `scripts/lib/check-doc-caps.sh` · `skills/lean-doc-generator/references/DOCS_Guide.md` · `evals/run-doc-caps-fixtures.sh` · `evals/fixtures/doc-caps/`
+Cites: `mattpocock.md` · `loop-hygiene-prd.md` · `graphify-daily-value.md` · `graph-engineering.md` · T4 (SPRINT-054's, not this sprint's) · T5 (the half split out of this task) — read as the evidence cited, not edited here
 Depends-on: T1 (shared `scripts/qa-check.sh` — T1 owns it first)
-Two halves of one concern: coverage hand-listed instead of derived. `qa-check.sh` cap-checks four
-globs it names by hand, so every §2 row with a stated cap and no matching glob is a comment — that is
-how `docs/research/` drifted unwatched. And leg 6 compares the README *footer* against
-`plugin.json`, so of the **four** manifests carrying the version (`.claude-plugin/plugin.json`,
-`.claude-plugin/marketplace.json`, `.codex-plugin/plugin.json`, `.kimi-plugin/plugin.json`) no two are
-ever compared to each other — which is how `.codex-plugin` and `.kimi-plugin` drifted five releases
-behind before v1.28.0 caught it by hand. **Re-derived at this promote:** TD-041 names
-`mattpocock.md` as the drifted case, but that file was fixed at SPRINT-054 T4 (110 lines); three
-*other* research docs are over the 120 cap today — `loop-hygiene-prd.md` 214, `graphify-daily-value.md`
-157, `graph-engineering.md` 122. The row's example decayed into the one case that no longer applies.
+The gate cap-checks four globs it names by hand, so every §2 row that states a cap and has no
+matching glob is a comment — which is how `docs/research/` drifted unwatched. **Re-derived at G2:**
+TD-041 names `mattpocock.md` as the drifted case, but that file was fixed at SPRINT-054 T4 (110
+lines); three *other* research docs are over the 120 cap today — `loop-hygiene-prd.md` 214,
+`graphify-daily-value.md` 157, `graph-engineering.md` 122. The row's example decayed into the one
+case that no longer applies. Also found at G2 and load-bearing: §2 does **not** carry every cap the
+script enforces — `skills/*/SKILL.md` (140, ADR-006) and the sprint files (400, §9/ADR-014) are not
+§2 rows, so deriving *only* from §2 would silently drop three live checks. That is a coverage
+reduction shipped as an increase (L-076), and it is why the non-§2 caps stay as a reasoned allowlist.
 
 **Acceptance:** a §2 row that states a cap is cap-checked without anyone adding a glob by hand, and
-all four version manifests are compared to each other rather than one being compared to the README.
+the three caps that do not come from §2 are still enforced, each naming the ADR it comes from.
 
 **DoD:**
-- [ ] Re-derive whether the two halves are separable. If G2 rules that caps derive from §2 but
-      manifests cannot, split before implementing rather than forcing one mechanism over both
-- [ ] Cap coverage is derived from the §2 table, not hand-listed in the script
-- [ ] All four manifests are compared to each other; the README footer check stays as-is
-- [ ] A must-FAIL fixture per half: a doc over its stated §2 cap, and one manifest out of lockstep
-      with its siblings — each failing with its named finding (L-058)
+- [x] Re-derive whether the two halves are separable — **ruled separable at G2; manifests split out
+      to T5** (Execution Log, 2026-08-09 `scope-change`)
+- [ ] Cap coverage for §2 rows is derived from the §2 table, not hand-listed in the script
+- [ ] The three non-§2 caps (`skills/*/SKILL.md` 140 · `docs/sprint/SPRINT-*.md` 400) are retained as
+      an explicit allowlist, each entry stating its source ADR (L-082: an exclusion earns a written
+      reason). Losing one of them is the failure this task must not cause
+- [ ] A must-FAIL fixture: a doc over its stated §2 cap → FAIL with its named finding (L-058)
+- [ ] A second must-FAIL fixture: a §2 row whose cap has no check → FAIL (this is the derivation
+      itself; without it the task ships the same hand-listing behind a new name)
 - [ ] Both fixtures verified red-on-new **and** green-on-old (L-090)
 - [ ] The three research docs currently over cap are **reported, not fixed** — a cap moves only by
       ADR after a measured diet (§7), and the diet is not this sprint. File what the new check finds
@@ -147,6 +149,28 @@ skip rather than a PASS.
       with its named finding (L-058), verified red-on-new and green-on-old (L-090)
 - [ ] Fixture retained and wired into `qa-check.sh` (TD-012)
 
+### T5 — Compare the four version manifests to each other, not one to the README `[size: S · risk: low · class: execution · HITL]`
+Layers: `scripts/qa-check.sh` · `scripts/lib/check-manifest-lockstep.sh` · `evals/run-manifest-lockstep-fixtures.sh` · `evals/fixtures/manifest-lockstep/`
+Cites: `README.md` · `plugin.json` · `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json` · `.claude/CLAUDE.md` · T2 (the task this was split out of) — read as the surfaces compared and the rule cited, not edited here
+Depends-on: T4 (shared `scripts/qa-check.sh` — last in the ownership chain)
+Split out of T2 at G2 (Execution Log `scope-change`). Four manifests carry the version —
+`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.codex-plugin/plugin.json`,
+`.kimi-plugin/plugin.json` — and leg 6 compares the README *footer* against the first of them, so no
+two manifests are ever compared to each other. That is how `.codex-plugin` and `.kimi-plugin` drifted
+five releases behind before v1.28.0 caught it by hand. The lockstep rule is already a DoD line in
+`.claude/CLAUDE.md`; it has simply never had a check.
+
+**Acceptance:** all four manifests are compared to each other, and one out of lockstep with its
+siblings fails the gate with a named finding; the README footer check keeps working unchanged.
+
+**DoD:**
+- [ ] All four manifests compared to each other (not pairwise-to-plugin.json by hand — the list is
+      derived from the `*-plugin/` directories on disk, so a fifth manifest enrolls itself, L-066)
+- [ ] The existing README-footer check (leg 6) still passes and is not replaced by this
+- [ ] A must-FAIL fixture: one manifest out of lockstep → FAIL with its named finding (L-058),
+      verified red-on-new and green-on-old (L-090)
+- [ ] Fixture retained and wired into `qa-check.sh` (TD-012)
+
 ## Owner-action checklist
 
 - [ ] Reinstall the plugin before executing — this session primed at `1.28.0 base-dir != 1.29.0 repo`.
@@ -157,8 +181,8 @@ skip rather than a PASS.
 
 - **D1** — The shared-file ownership map is written into `Depends-on:` edges, not into this section as
   prose. Every task wires its retained fixture into `scripts/qa-check.sh` (TD-012), so that file is
-  shared by all four and the chain is strictly sequential: **T1 → T2 → T3 → T4**. No task may run in
-  parallel with another this sprint. SPRINT-055 signed "strictly sequential" at G2, wrote it only in
+  shared by every task and the chain is strictly sequential: **T1 → T2 → T3 → T4 → T5**. No task may
+  run in parallel with another this sprint. SPRINT-055 signed "strictly sequential" at G2, wrote it only in
   its § Decisions, and its own preflight HALTed because nothing reads prose (L-099). This Plan was
   first written claiming T3 could run parallel — the gate rejected it, because T3's own DoD wires a
   fixture into the file T2 owns. The map is what the checker parses, not what the author intended.
