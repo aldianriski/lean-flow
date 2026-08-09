@@ -104,6 +104,29 @@ else
   fi
 fi
 
+# --- 2d. Ephemeral intake artifacts (DOCS_Guide section 2 temp-dir rule) -------------------------
+# A BUG-<slug>.md report is temp-dir intake scaffolding, never committed (SPRINT-055 T4). §2 used to
+# describe the report's CONTENT as "routed away at /triage" and say nothing about the file, so
+# "undisposed" was not expressible and could not be checked. Under the temp-dir rule a committed
+# report IS the failure. Covered by evals/run-ephemeral-intake-fixtures.sh.
+ei_script="scripts/lib/check-ephemeral-intake.sh"
+if [ ! -f "$ei_script" ]; then
+  bad "ephemeral intake: checker not found at $ei_script"
+else
+  ei_out=$(sh "$ei_script" "$ROOT" 2>&1); ei_code=$?
+  printf '%s\n' "$ei_out"
+  ei_pass=$(printf '%s\n' "$ei_out" | grep -cE '^PASS')
+  ei_fails=$(printf '%s\n' "$ei_out" | grep -cE '^FAIL')
+  pass=$((pass + ei_pass))
+  if [ "$ei_code" -ne 0 ]; then
+    if [ "$ei_fails" -gt 0 ]; then
+      fail=$((fail + ei_fails))
+    else
+      bad "ephemeral intake: checker exited $ei_code without reporting a FAIL line"
+    fi
+  fi
+fi
+
 # --- 3. Frontmatter / ownership presence ------------------------------------
 has_field() { grep -qE "^$2:" "$1"; }
 
@@ -349,7 +372,7 @@ done
 # the selftests, yet it stays always-on: it's cheap (extracts + diffs, no throwaway repos), and
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh"
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh"
 eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
 # run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
 # run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via

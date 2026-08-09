@@ -189,3 +189,50 @@ sections, then was removed and the index regenerated to a clean diff.
 
 **§ Plan edit:** T3 `Layers:` gains `scripts/lib/check-research-archive.sh`, `scripts/gen-index.sh`
 and `scripts/qa-check.sh`. Fourth `Layers:` correction in three tasks — same TD-022 cause each time.
+
+### 2026-08-09 | progress | T4 — the two halves were not in the same state, and the DoD said what to do
+
+T4's own final DoD item was "split this task instead of forcing it if the two disposal rules
+diverge". They did not diverge — but they were not equally missing either, which is a third case the
+item did not anticipate.
+
+**The feature PRD already had its rule.** `prd-and-slices.md` line 59 states *"The raw PRD is intake
+working material — no durable file of its own"*, and `/task-decomposer` already routes the approved
+residue to `docs/product/requirements.md` via `/lean-doc-generator prd`. Nothing to invent. Owner
+ruled verify-and-cross-link, so §2's temp-dir note now names it and states why §11 has no row for it.
+
+**The BUG file had two gaps, not one.** §2 listed it as `BUG-<slug>.md` with **no directory prefix**
+while every sibling row in that table carries one, and "routed away at `/triage`" described the
+*content's* fate, never the file's. Committed, deleted, or archived was simply unanswered.
+
+**The ruling made the failure expressible.** Owner chose temp-dir working material — the same shape as
+the feature PRD, `/handoff` docs and council verdicts. That is what turned T4's fixture from vague
+("undisposed") into mechanical: a **committed** `BUG-*.md` IS the failure. Before the ruling there was
+no state a checker could name. Worth remembering next time a DoD asks for a fixture over an
+undefined rule — the fixture was not hard to write, it was impossible until the rule existed.
+
+The `clean` control fixture deliberately contains a `BUG.md.template`: the blank form is a legitimate
+committed file that every consumer of this plugin ships, and a checker confusing it with a report
+would fail all of them. The glob separates them without needing an exception.
+
+**§ Plan edit:** T4 `Layers:` gains `scripts/lib/check-ephemeral-intake.sh`. Fifth correction, four
+tasks.
+
+### 2026-08-09 | scope-change | T4 DoD amendment — "Both mirrored in §11" (owner-ruled)
+
+**The criterion, and why it could not be met as written.** T4's DoD required both artifacts to be
+"mirrored in §11". The temp-dir ruling taken earlier in this task dissolved its premise: §11 is the
+retention table, retention acts on **committed** files, and neither a `BUG-<slug>.md` report nor the
+working feature PRD is ever committed. A §11 row would describe a case that cannot occur.
+
+**Why this was escalated rather than annotated.** Ticking it with a note explaining why the row was
+unnecessary would have been a DoD reinterpretation to match what was built — L-088's shape exactly,
+and the orchestrator's own red flag against "quietly reinterpreting a DoD that execution
+invalidated". The scope held; the *criterion* went stale. That is the case L-088 says must get an
+owner ruling before the box is ticked, and in a sprint about rules that stop being enforced, applying
+it loosely to our own Plan would have been the wrong place to start.
+
+**Ruling:** amend. Absence from §11 IS the rule. `DOCS_Guide` §2's temp-dir note carries both
+artifacts and states explicitly that §11 has no row for them *because* retention acts on committed
+files — so a reader who checks the retention table and finds nothing has an answer waiting where they
+were sent from, rather than a silence to interpret. DoD item ticked with the amendment recorded here.

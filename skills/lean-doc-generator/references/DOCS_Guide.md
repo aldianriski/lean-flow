@@ -72,7 +72,7 @@ gating → §6.
 | `sprint/logs/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | append-only | lazily, at the first Execution Log entry | every Execution Log entry → §11 archive with its sprint. **Must live in the `logs/` subdirectory**: the sprint-file checks glob `docs/sprint/SPRINT-*.md`, which is non-recursive, so a sibling here is excluded for free while a same-directory `-log.md` suffix would be capped at 400 and schema-checked as a Plan (ADR-014) |
 | `LEARNINGS.md` | lean loop | Team / AI | append-only | first confirmed learning | close confirms · promote collapses (§11) |
 | `research/<slug>.md` | as needed | Team / AI | 120 soft | a decision-driving question | question revisited · verdict changes; a verdict a decision has been built on is marked `status: superseded` rather than edited → §11 archive once nothing live cites it |
-| `BUG-<slug>.md` | ephemeral | Anyone | lean | a defect is reported | routed away at `/triage` |
+| `BUG-<slug>.md` | ephemeral | Anyone | lean | a defect is reported — **written to the OS temp dir, never committed** (see the temp-dir note below) | routed away at `/triage`; the file is intake scaffolding, so once its content lands in a `TASK-NNN` / `TD-NNN` / `/diagnose` run there is nothing to retain and no §11 row to reach |
 
 Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`; tree docs use a flattened name
 (`architecture-overview.md.template` · `database-erd.md.template` · …).
@@ -95,7 +95,12 @@ real content prompts, never empty shells; beyond the minimum, create-lazily stil
 until its absence causes repeated interruptions). Minimal stays the floor *per doc* (LAW 4), not a
 ceiling on the doc *set*.
 
-**Temp-dir artifacts** (council verdicts, handoff docs) are never referenced from durable docs — copy to `docs/research/` (verdicts) before citing.
+**Temp-dir artifacts** (council verdicts, handoff docs, **`BUG-<slug>.md` reports**, and the
+**working feature PRD** `/task-decomposer` synthesizes) are never referenced from durable docs — copy
+to `docs/research/` (verdicts) before citing. They are intake or hand-off scaffolding: their substance
+moves into a durable artifact (a `TASK-NNN` · `TD-NNN` · a regression test · `docs/product/requirements.md`)
+and the scaffolding itself is simply gone. **This is why §11 has no row for either** — retention acts on
+committed files, and neither is ever committed. Absence there is the rule, not a gap in it.
 
 ¹ **README is the full front-door** — the complete overview of the repo. Don't truncate it to hit a
 line count; deep detail belongs in `CLAUDE.md` (project shape) and `CONTEXT.md` (vocabulary) and

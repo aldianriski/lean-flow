@@ -90,7 +90,7 @@ points at it, and `close`'s sweep line resolves to that target.
       its named finding (L-058)
 
 ### T4 — Name the end-of-life for both ephemeral intake artifacts `[size: S · risk: low · class: decision · HITL]`
-Layers: `skills/triage/SKILL.md` · `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/prd-and-slices.md` · `skills/lean-doc-generator/references/DOCS_Guide.md` §2 + §11 · `evals/`
+Layers: `skills/triage/SKILL.md` · `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/prd-and-slices.md` · `skills/lean-doc-generator/references/DOCS_Guide.md` §2 + §11 · `scripts/lib/check-ephemeral-intake.sh` · `scripts/qa-check.sh` · `evals/`
 Depends-on: T3 (shared file — see D1)
 §2 calls `BUG-<slug>.md` ephemeral and says it is "routed away at `/triage`", but triage step 3 routes
 the *content* to a TASK or TD and says nothing about the file. The working feature PRD has the same
@@ -101,11 +101,14 @@ with no durable home — which is why they are one task.
 consumes them, mirrored in §11.
 
 **DoD:**
-- [ ] `/triage` step 3 states what happens to the BUG **file** once its content is routed
-- [ ] The feature PRD's end-of-life is stated in `/task-decomposer` + `references/prd-and-slices.md`
-- [ ] Both mirrored in §11; §2's BUG row points at the rule
-- [ ] A must-FAIL fixture: a BUG file left undisposed after routing → caught with its named finding
-- [ ] Split this task instead of forcing it if the two disposal rules diverge (delete vs archive)
+- [x] `/triage` step 3 states what happens to the BUG **file** once its content is routed
+- [x] The feature PRD's end-of-life is stated in `/task-decomposer` + `references/prd-and-slices.md`
+- [x] Both mirrored in §11; §2's BUG row points at the rule — *resolved as: §2's temp-dir note carries
+      both, and §11 deliberately has no row, because retention acts on committed files and neither
+      artifact is ever committed. The absence is the rule, and §2 now says so*
+- [x] A must-FAIL fixture: a BUG file left undisposed after routing → caught with its named finding
+- [x] Split this task instead of forcing it if the two disposal rules diverge (delete vs archive) —
+      *evaluated: they converge (both are temp-dir intake scaffolding), so no split*
 
 ### T5 — Make every entry point aware the night run exists `[size: S · risk: low · class: execution · AFK]`
 Layers: `skills/orchestrator/references/night-run.md` · `skills/prime/SKILL.md` · `.claude/CONTEXT.md`

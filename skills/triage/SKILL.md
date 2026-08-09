@@ -44,6 +44,10 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
    - known cause + trivial fix → convert to `TASK-NNN` (`state: ready`)
    - unknown cause / needs investigation → record as a task, `next: /diagnose`
    - systemic / architectural → file as `TD-NNN` in root `TECH-DEBT.md`
+   - **then the report itself is done.** A `BUG-<slug>.md` is temp-dir intake scaffolding, never a
+     committed doc (DOCS_Guide §2): once its repro and verdict live in the destination, the file has
+     no durable home to be moved to. Carry anything still load-bearing — repro steps especially —
+     **into** the `TASK`/`TD`/`/diagnose` brief rather than pointing back at a file that will vanish.
 4. **Re-rank** — re-evaluate each task's P0–P3 tier; propose moves with a one-line reason each. Order within a tier by dependency, then impact × urgency.
 5. **Flag** — surface **stale** (no movement / superseded), **duplicate** (same concern → merge or differentiate), **conflict** (acceptance criteria that contradict another task).
 6. **State** — set `ready` / `needs-info` / `blocked`; for `needs-info` list the specific questions; for `blocked` name the blocker.

@@ -84,7 +84,10 @@ the breakdown quiz → `${CLAUDE_SKILL_DIR}/references/prd-and-slices.md` (`${CL
 skill's install directory at load time). Its approved residue belongs in the durable, project-scoped
 `docs/product/requirements.md` (+ `acceptance-criteria.md`) — **hand that write to
 `/lean-doc-generator prd`**, sanitized, never the raw conversation and never written from here. Task
-output stays local (TODO.md Backlog) — no external issue tracker.
+output stays local (TODO.md Backlog) — no external issue tracker. **End of life:** the working PRD is
+temp-dir scaffolding with no durable file of its own — once sliced and its residue sanitized into
+`requirements.md`, it is gone, and §11 has no row for it because retention acts on committed files
+(DOCS_Guide §2 temp-dir note). Same shape as a `BUG-<slug>.md` report.
 
 ## Hard rules
 
