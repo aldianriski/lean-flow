@@ -92,10 +92,15 @@ lock_plan "$c1" 'docs/sprint/SPRINT-042-run-to-finish.md'
 mkdir -p "$c1/scripts/lib"
 printf 'echo checker\n' > "$c1/scripts/lib/check-layers-completeness.sh"
 printf 'echo qa v2\n' > "$c1/scripts/qa-check.sh"
-commit_all "$c1" 'feat(qa-check): T3 leg 14 implementation'
+# SPRINT-042 T3's REAL commit subject (e01d782), not a paraphrase: attribution reads the subject, so
+# a fixture using an invented message would test a form this repo never produces (SPRINT-049 T1).
+commit_all "$c1" 'feat(qa-check): cross-check declared Layers against DoD-implied files (SPRINT-042 T3)'
 
+# Finding changed with the attribution redesign: the miss is now reported against the task that made
+# it rather than against the union, so it names T3. Still a must-FAIL on the same recorded miss, and
+# the file is still named (asserted separately below) -- strictly more information, not less.
 run_case_anywhere "sprint-042-reconstructed" 1 \
-  "changed but undeclared in any task's Layers::" -- \
+  "changed by a task that never declared it:" -- \
   sh -c "cd \"$c1\" && sh \"$checker\" docs/sprint/SPRINT-042-run-to-finish.md"
 run_case_anywhere "sprint-042-reconstructed (names the file)" 1 \
   "scripts/lib/check-layers-completeness.sh" -- \
@@ -131,11 +136,124 @@ git -C "$c2" init -q
 lock_plan "$c2" 'docs/sprint/SPRINT-900-matching.md'
 printf 'a2\n' >> "$c2/foo.txt"
 printf 'b2\n' >> "$c2/bar.txt"
-commit_all "$c2" 'implement T1'
+commit_all "$c2" 'sprint(900) T1: implement'
 
 run_case_anywhere "matching-declaration" 0 \
   "layers observed (all changed files declared" -- \
   sh -c "cd \"$c2\" && sh \"$checker\" docs/sprint/SPRINT-900-matching.md"
+
+# ================================================================================================
+# case 2b: CROSS-TASK DECLARATION (constructed) -- must FAIL. This is TD-035 itself, and the case
+# that passed silently before SPRINT-049 T1. T1 edits a file only T2 declared; under the old union
+# check the file was declared by *someone*, so the gate reported green while the ownership map the
+# worktree dispatch derives from Layers: was wrong in exactly the way SPRINT-041's corrupted merge
+# was wrong. The fixture must name the offending task, not merely fail.
+# ================================================================================================
+c2b="$work/cross-task-declaration"
+mkdir -p "$c2b/docs/sprint"
+cat > "$c2b/docs/sprint/SPRINT-908-crosstask.md" <<'EOF'
+---
+sprint: 908
+slug: crosstask
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-908 — Cross-Task Declaration (constructed fixture)
+
+## Plan
+
+### T1 — edit only foo.txt
+Layers: `foo.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] foo.txt updated
+
+### T2 — edit only bar.txt
+Layers: `bar.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] bar.txt updated
+EOF
+printf 'a\n' > "$c2b/foo.txt"
+printf 'b\n' > "$c2b/bar.txt"
+git -C "$c2b" init -q
+lock_plan "$c2b" 'docs/sprint/SPRINT-908-crosstask.md'
+printf 'a2\n' >> "$c2b/foo.txt"
+printf 'b2\n' >> "$c2b/bar.txt"          # <-- bar.txt is T2's, edited by a T1 commit
+commit_all "$c2b" 'sprint(908) T1: edit foo and, wrongly, bar'
+
+run_case_anywhere "cross-task-declaration (fails)" 1 \
+  "changed by a task that never declared it:" -- \
+  sh -c "cd \"$c2b\" && sh \"$checker\" docs/sprint/SPRINT-908-crosstask.md"
+run_case_anywhere "cross-task-declaration (names T1 and the file)" 1 \
+  "T1:bar.txt" -- \
+  sh -c "cd \"$c2b\" && sh \"$checker\" docs/sprint/SPRINT-908-crosstask.md"
+
+# ================================================================================================
+# case 2c: UNATTRIBUTABLE COMMIT (constructed) -- must FAIL. Rule 6 of attribute(). A commit whose
+# subject matches no task form and is not `sprint(NN):` coordinator bookkeeping cannot be assigned an
+# owner, and five real task commits in this repo's history are exactly that shape. Defaulting them to
+# "coordinator" would pass their files silently, rebuilding TD-035 one layer down -- so the fixture
+# proves the checker reports rather than absorbs.
+# ================================================================================================
+c2c="$work/unattributable-commit"
+mkdir -p "$c2c/docs/sprint"
+cat > "$c2c/docs/sprint/SPRINT-909-unattributed.md" <<'EOF'
+---
+sprint: 909
+slug: unattributed
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-909 — Unattributable Commit (constructed fixture)
+
+## Plan
+
+### T1 — edit foo.txt
+Layers: `foo.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] foo.txt updated
+EOF
+printf 'a\n' > "$c2c/foo.txt"
+git -C "$c2c" init -q
+lock_plan "$c2c" 'docs/sprint/SPRINT-909-unattributed.md'
+printf 'a2\n' >> "$c2c/foo.txt"
+commit_all "$c2c" 'fix(qa): a real change with no task id anywhere in it'
+
+run_case_anywhere "unattributable-commit" 1 \
+  "commit attributable to no task and not coordinator bookkeeping:" -- \
+  sh -c "cd \"$c2c\" && sh \"$checker\" docs/sprint/SPRINT-909-unattributed.md"
+
+# ================================================================================================
+# case 2d: a `Task:` TRAILER attributes a commit whose subject says nothing (constructed) -- must
+# PASS. The forward-looking half of ruling R2: case 2c's commit becomes attributable by adding one
+# trailer, with no change to the subject line. Without this, the trailer branch of attribute() would
+# ship untested and only the regex fallbacks would actually be exercised.
+# ================================================================================================
+c2d="$work/task-trailer"
+mkdir -p "$c2d/docs/sprint"
+sed 's/SPRINT-909 — Unattributable Commit/SPRINT-910 — Task Trailer/; s/^sprint: 909/sprint: 910/; s/^slug: unattributed/slug: trailer/' \
+  "$c2c/docs/sprint/SPRINT-909-unattributed.md" > "$c2d/docs/sprint/SPRINT-910-trailer.md"
+sed -i.bak "s/^plan_commit: .*/plan_commit: PLAN_COMMIT_PLACEHOLDER/" "$c2d/docs/sprint/SPRINT-910-trailer.md" 2>/dev/null || \
+  { sed "s/^plan_commit: .*/plan_commit: PLAN_COMMIT_PLACEHOLDER/" "$c2d/docs/sprint/SPRINT-910-trailer.md" > "$c2d/t" && mv "$c2d/t" "$c2d/docs/sprint/SPRINT-910-trailer.md"; }
+rm -f "$c2d/docs/sprint/SPRINT-910-trailer.md.bak"
+printf 'a\n' > "$c2d/foo.txt"
+git -C "$c2d" init -q
+lock_plan "$c2d" 'docs/sprint/SPRINT-910-trailer.md'
+printf 'a2\n' >> "$c2d/foo.txt"
+commit_all "$c2d" 'fix(qa): a real change with no task id in the subject
+
+Task: T1'
+
+run_case_anywhere "task-trailer-attributes" 0 \
+  "layers observed (all changed files declared" -- \
+  sh -c "cd \"$c2d\" && sh \"$checker\" docs/sprint/SPRINT-910-trailer.md"
 
 # ================================================================================================
 # case 3: plan_commit still holds the promote-time placeholder (constructed) -- must SKIP, named,

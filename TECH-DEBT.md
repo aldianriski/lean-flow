@@ -18,7 +18,7 @@ status: current
 
 ## Tech Debt
 
-- **TD-035** severity: medium | status: open | created: Sprint-048
+- **TD-035** severity: medium | status: resolved → SPRINT-049 T1 | created: Sprint-048
   - Summary: `check-layers-observed.sh` builds **one union of every task's `Layers:`** and tests each
     changed file against it. A file declared by *any* task therefore satisfies the check for *all*
     tasks — so a task editing a file it never declared passes silently, provided some other task in
@@ -37,6 +37,16 @@ status: current
     a point in favour of doing both together rather than patching each check again.
   - Negative-test per L-058: a Plan where task A edits a file only task B declares must **FAIL**;
     today it passes. That fixture is the proof this row is real.
+  - **RESOLVED (SPRINT-049 T1) — and the negative test was run in both directions.** The union is
+    gone from the committed path: each commit in `plan_commit..HEAD` is attributed to a task, and its
+    files are tested against **that task's** `Layers:` alone. The fixture this row demanded
+    (`cross-task-declaration`) was run against the pre-T1 checker and the post-T1 checker in the same
+    throwaway repo: **old → `PASS`, exit 0 · new → `FAIL … T1:bar.txt`, exit 1.** That is the proof
+    the row asked for, not an assertion that it works.
+    Residual, stated rather than buried: attribution needs a commit, so **uncommitted** work in
+    progress is still tested against the union — unchanged behaviour, since a mid-flight edit belongs
+    to no commit yet. The collision this row is about happens between *committed* worktree branches
+    at merge-back, which is the path now covered.
 
 - **TD-034** severity: trivial | status: open | created: Sprint-047
   - Summary: the archived `docs/sprint/archive/SPRINT-045-gate-precision.md` carries **duplicate
@@ -113,7 +123,7 @@ status: current
     `cites-contradiction.md` · `unindented-continuation.md`, plus the two pre-existing must-FAIL rows,
     all wired into `evals/run-layers-completeness-fixtures.sh`.
 
-- **TD-031** severity: minor | status: open | created: Sprint-046
+- **TD-031** severity: minor | status: resolved → SPRINT-049 T1 | created: Sprint-046
   - Summary: the observed-layers check's exclusion list has grown by one entry per sprint for four
     sprints — close bookkeeping, the generated index, the pre-flight settings file, and now agent
     worktree paths. Each entry was individually correct and individually reasoned; the pattern is the
@@ -131,6 +141,20 @@ status: current
     one that fails L-082's test.
   - Owner decision (SPRINT-046 promote): add TD-030's entry now, file this pattern rather than solve it
     under time pressure.
+  - **RESOLVED (SPRINT-049 T1) — the check now asks the question this row said it meant.** Changed
+    paths are attributed to *who* changed them: a `Task: T<n>` trailer, else one of three real subject
+    forms this repo produces (`sprint(NN) T<n>:` · `merge(…): T<n>` · trailing `(SPRINT-NNN T<n>)`),
+    else `sprint(NN):` as coordinator bookkeeping, else **UNATTRIBUTED — a named FAIL**. That last
+    branch is deliberate: five real task commits in this repo carry no id at all, and defaulting them
+    to "coordinator" would have passed their files silently, rebuilding TD-035 one layer down.
+    The exclusion list this row was filed about shrank from **ten entries to three** on the committed
+    path — `TECH-DEBT.md`, `TODO.md`, `CHANGELOG.md`, `docs/LEARNINGS.md`, both settings files and
+    both plugin manifests are all answered by attribution instead of enumeration. The three that
+    remain are the ones attribution genuinely cannot cover, each re-justified in place: `docs/sprint/*`
+    (a task commit writes its own DoD ticks and log entry), `docs/knowledge-index.md` (generated, not
+    a coordination concern), `.claude/worktrees/agent-*` (created after the Plan freezes).
+    The full list still applies to the **uncommitted** path, where there is no commit to attribute —
+    stated in the checker rather than left implicit.
 
 - **TD-029** severity: minor | status: resolved → SPRINT-048 T5 (**residual: the buffering mechanism was never reproduced**) | created: Sprint-045
   - Summary: the launcher's `ALIVE` test requires observable progress — a log line or a new commit —

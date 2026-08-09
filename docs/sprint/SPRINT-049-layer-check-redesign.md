@@ -53,21 +53,26 @@ each path to *who* changed it answers the second question directly and retires b
 Plan in which task A edits a file only task B declared FAILs by a named finding — a case that passes today.
 
 **DoD:**
-- [ ] Baseline recorded first: run the observed-fixture harness on the *unchanged* checker and record
+- [x] Baseline recorded first: run the observed-fixture harness on the *unchanged* checker and record
       which assertions pass, so a later green cannot be mistaken for a fixture that stopped testing (L-058)
-- [ ] Attribution implemented per ruling **R2** and stated **in the checker**: prefer a `Task: T<n>`
+      — 12/12 green before any T1 edit
+- [x] Attribution implemented per ruling **R2** and stated **in the checker**: prefer a `Task: T<n>`
       git trailer, fall back to the three observed subject forms (`sprint(NN) T<n>:` ·
       `merge(…): T<n>` · trailing `(SPRINT-NNN T<n>)`), never a silent skip list
-- [ ] An **unattributable** commit's non-bookkeeping paths FAIL by name — never a default-to-coordinator
+- [x] An **unattributable** commit's non-bookkeeping paths FAIL by name — never a default-to-coordinator
       pass, which would rebuild TD-035's shape one layer down (five real task commits carry no id)
-- [ ] `check-layers-observed.sh` tests **per task**; the all-task union is gone
-- [ ] The exclusion list shrinks to what attribution cannot cover; each survivor re-justified in place
-- [ ] Must-FAIL fixture (new): a task editing a file only another task declared **newly** FAILs, by its
-      named finding
-- [ ] Must-FAIL fixture (new): a commit no rule attributes reports its own named finding
-- [ ] Fixtures land under `evals/` and run from the harness — retained, not deleted with the change (TD-012)
-- [ ] `TD-031` · `TD-035` marked `status: resolved → SPRINT-049 T1` in the ledger
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit, after the DoD ticks and the log
+- [x] `check-layers-observed.sh` tests **per task**; the all-task union is gone **on the committed
+      path** — it remains the only available bound for uncommitted WIP, stated in the checker
+- [x] The exclusion list shrinks to what attribution cannot cover; each survivor re-justified in place
+      — ten entries → three on the committed path
+- [x] Must-FAIL fixture (new): a task editing a file only another task declared **newly** FAILs, by its
+      named finding — proven both ways in one repo: old checker `PASS` exit 0, new `FAIL … T1:bar.txt`
+- [x] Must-FAIL fixture (new): a commit no rule attributes reports its own named finding
+- [x] Must-PASS fixture (new): a `Task:` trailer attributes a commit whose subject says nothing —
+      otherwise the trailer branch would ship untested and only the regex fallbacks be exercised
+- [x] Fixtures land under `evals/` and run from the harness — retained, not deleted with the change (TD-012)
+- [x] `TD-031` · `TD-035` marked `status: resolved → SPRINT-049 T1` in the ledger
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit, after the DoD ticks and the log
       entry — those are edits too (L-089)
 
 <!-- QA: gate change → the L-058 bar binds (one must-FAIL fixture per check, each failing by its named

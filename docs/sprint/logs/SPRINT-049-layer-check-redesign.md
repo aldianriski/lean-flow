@@ -154,3 +154,41 @@ since T1 owns the observed side.
 **Verification.** `evals/run-layers-completeness-fixtures.sh` 5/5 green (2 retained + 3 new) ·
 `evals/run-layers-observed-fixtures.sh` 12/12 green after the parser change · `scripts/qa-check.sh`
 bare: 71 pass, 0 fail, exit 0 — re-run after the DoD ticks and this entry, not before (L-089).
+
+### 2026-08-09 | complete | T1 — attribution replaces the union, proven in both directions
+
+**The negative test that mattered.** TD-035's shape was built once and run against two checkers in
+the same throwaway repo: a Plan where T1's commit edits `bar.txt`, a file only T2 declared.
+
+| Checker | Verdict |
+|---|---|
+| pre-T1 (`HEAD:scripts/lib/check-layers-observed.sh`) | `PASS … (all changed files declared)` — exit 0 |
+| post-T1 | `FAIL … changed by a task that never declared it: T1:bar.txt` — exit 1 |
+
+A fixture that fails on the new code proves nothing on its own; it has to pass on the old code, or
+the "newly FAILs" claim is unverified. Both directions were run.
+
+**Attribution probed against real history**, not only fixtures — all four forms resolve, including
+the two adversarial cases: `sprint(48): fix gate FAIL committed in T4` → `COORD`, not `T4` (the
+subject mentions a task but not in task position), and `c87e9e2 fix(qa): named SKIP …` →
+`UNATTRIBUTED`, which is one of the five real id-less task commits that motivated rule 6.
+
+**Exclusion list: ten entries → three** on the committed path. `TECH-DEBT.md`, `TODO.md`,
+`CHANGELOG.md`, `docs/LEARNINGS.md`, both settings files and both plugin manifests are now answered
+by attribution (`COORD`) rather than enumeration — which is exactly what TD-031 argued for. The three
+survivors are re-justified individually in the checker.
+
+**Carried assertion from T3, discharged.** `grep -c Cites scripts/lib/check-layers-observed.sh` → 0.
+The observed checker derives its set from `^Layers:` alone and never reads `Cites:`, so a file escaped
+as merely-cited that was nonetheless changed still surfaces here. The escape cannot hide a real
+change — structural, and now checked rather than argued.
+
+**Residual, explicitly open.** Attribution needs a commit, so uncommitted work in progress is still
+tested against the union. This is unchanged behaviour rather than a regression, and the collision
+TD-035 describes happens between committed worktree branches at merge-back — the path now covered.
+Recorded here, in TD-035's resolution note, and in the checker itself, rather than left to be
+rediscovered.
+
+**Verification.** `evals/run-layers-observed-fixtures.sh` 16/16 green (12 retained + 4 new) ·
+`evals/run-layers-completeness-fixtures.sh` 5/5 · `scripts/qa-check.sh` bare: 71 pass, 0 fail, exit 0,
+re-run after the DoD ticks and this entry (L-089).

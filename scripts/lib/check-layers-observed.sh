@@ -58,9 +58,92 @@ ok()   { printf 'PASS  %s\n' "$1"; }
 bad()  { fail=1; printf 'FAIL  %s\n' "$1"; }
 skip() { printf 'SKIP  %s\n' "$1"; }   # never flips $fail -- a SKIP is not a FAIL (TD-026)
 
+# --- attribution: who changed this path (SPRINT-049 T1, TD-031 · TD-035) ------------------------
+# The check used to ask "did SOME task declare this file?" against one union of every task's
+# Layers:. That question is wrong in both directions. It is too weak -- a file declared by ANY task
+# satisfies the check for ALL tasks, so a task editing a file it never declared passes silently
+# provided some sibling declared it (TD-035, observed in SPRINT-048 T6, and precisely the shape that
+# corrupted SPRINT-041's merge). And it is too blunt -- every class of legitimate non-task change
+# arrives as a false positive and gets answered with another exclusion entry, one per sprint for four
+# sprints (TD-031).
+#
+# Both dissolve once the real question is asked: WHO changed it. A commit is attributed to a task by,
+# in order:
+#   1. a `Task: T<n>` git trailer                     -- the convention going forward, unambiguous
+#   2. subject `sprint(NN) T<n>: ...`                 -- sequential inline execution (SPRINT-047/048)
+#   3. subject `merge(...): T<n> ...`                 -- coordinator merge-back of an agent branch
+#   4. subject `... (SPRINT-NNN T<n>)`                -- trailing parenthetical (SPRINT-042/046)
+#   5. subject `sprint(NN): ...` with no task id      -- COORDINATOR bookkeeping, exempt by role
+#   6. anything else                                  -- UNATTRIBUTED, its own named FAIL
+#
+# Rule 6 is the load-bearing one. Five real task commits across the sprints surveyed carry no id at
+# all (`c87e9e2` `29ae7cb` `aeadc78` `c94a8c0` `ba393a3`), reachable only through the merge-back
+# commit that absorbed them. Defaulting those to "coordinator" would pass their files silently --
+# rebuilding TD-035's false negative one layer down. So an unattributable commit is reported, never
+# absorbed: the author adds a trailer or uses the naming convention.
+#
+# Merge commits contribute no files here (`git diff-tree` on a merge lists none). That is correct
+# rather than a gap: the underlying commits are in the same range and are attributed individually.
+attribute() {   # <sha> -> "T<n>" | "COORD" | "UNATTRIBUTED"
+  a_t=$(git log -1 --format='%(trailers:key=Task,valueonly)' "$1" 2>/dev/null | tr -d ' \r\n')
+  case "$a_t" in T[0-9]*) printf '%s' "$a_t"; return ;; esac
+  a_s=$(git log -1 --format='%s' "$1" 2>/dev/null)
+  a_m=$(printf '%s' "$a_s" | sed -n \
+        -e 's/^sprint([0-9]\{1,\})[ ]\{1,\}\(T[0-9]\{1,\}\):.*/\1/p' \
+        -e 's/^merge([^)]*):[ ]*\(T[0-9]\{1,\}\)[^0-9].*/\1/p' \
+        -e 's/.*(SPRINT-[0-9]\{1,\}[ ]\{1,\}\(T[0-9]\{1,\}\)).*/\1/p' | head -n1)
+  [ -n "$a_m" ] && { printf '%s' "$a_m"; return; }
+  printf '%s' "$a_s" | grep -qE '^sprint\([0-9]+\):' && { printf 'COORD'; return; }
+  printf 'UNATTRIBUTED'
+}
+
+# Per-task declarations: emits one "T<n> <path>" line per declared token, so a task's Layers: can be
+# tested on its own instead of being melted into a union. Reads indented continuation lines, matching
+# check-layers-completeness.sh (SPRINT-049 T3) -- both checkers read the same declaration, so a
+# parsing rule that differed between them would make one of the two lie.
+task_decls() {   # <plan-text> -> lines "T<n> <path>"
+  printf '%s\n' "$1" | awk '
+      /^### T[0-9]+/ { if (match($0, /T[0-9]+/)) cur=substr($0,RSTART,RLENGTH); inl=0; next }
+      /^Layers:/ { inl=1; l=$0; sub(/^Layers:[ \t]*/,"",l); print cur "\t" l; next }
+      inl && /^[ \t]+[^ \t]/ { l=$0; sub(/^[ \t]+/,"",l); print cur "\t" l; next }
+      { inl=0 }
+    ' | while IFS=$(printf '\t') read -r t rest; do
+        [ -n "$t" ] || continue
+        printf '%s' "$rest" | grep -oE '`[^`]+`' | tr -d '`' | while read -r tok; do
+          [ -n "$tok" ] && printf '%s %s\n' "$t" "$tok"
+        done
+      done
+}
+
+# Structural exclusions for the ATTRIBUTED (committed) path -- what attribution genuinely cannot
+# cover, because a TASK commit legitimately touches these by convention. Everything the old list
+# carried for coordinator-role reasons (TECH-DEBT.md · TODO.md · CHANGELOG.md · LEARNINGS.md ·
+# settings · plugin manifests) is gone: attribution answers those directly via COORD, which is the
+# whole point of TD-031's redesign. What survives, re-justified individually:
+is_excluded_committed() {
+  case "$1" in
+    docs/sprint/*) return 0 ;;                  # the Plan's own DoD ticks and its Execution Log are
+                                                # appended INSIDE task commits by convention, so a
+                                                # task commit always touches them; declaring the file
+                                                # a task is writing its progress into is circular.
+    docs/knowledge-index.md) return 0 ;;        # GENERATED, never hand-authored; regenerated whenever
+                                                # any metadata-carrying doc changes. Derived views are
+                                                # not a coordination concern -- a textual conflict is
+                                                # resolved by re-running the generator, not by owner.
+    .claude/worktrees/agent-*) return 0 ;;      # created by the dispatch protocol at fan-out, AFTER
+                                                # the Plan freezes: undeclarable by construction.
+    *) return 1 ;;
+  esac
+}
+
 # Coordinator close-bookkeeping: files a sprint's own tasks never declare in Layers: because they
 # are edited at close by convention/decision (D1/D3 across SPRINT-042/SPRINT-043), never by a task.
 # Excluded WITH this stated reason, never silently -- the list stays auditable in this file.
+#
+# This list still applies to UNCOMMITTED work (see the two-path split below). Attribution needs a
+# commit to read; while the coordinator is mid-close with TECH-DEBT.md, TODO.md and CHANGELOG.md
+# edited but not yet committed, there is nothing to attribute them to, and the gate runs in exactly
+# that state. So the list shrinks on the committed path and stays whole on the WIP path.
 is_excluded() {
   case "$1" in
     docs/sprint/*) return 0 ;;                 # sprint file + archive/ + INDEX.md: coordinator-owned (D3)
@@ -128,14 +211,36 @@ for sp in "$@"; do
       { inl=0 }
     ' | grep -oE '`[^`]+`' | tr -d '`' | tr '\n' ' ')
 
-  # Observed changed-file set: tracked diff since plan_commit (staged + unstaged) UNION untracked
-  # new files -- a file never `git add`ed is exactly SPRINT-042 T3's real recorded shape.
-  tracked=$(git diff --name-only "$plan_commit" -- . 2>/dev/null)
+  # Per-task declarations as "T<n> <path>" lines -- the union is only kept for the WIP path below,
+  # where no attribution is possible.
+  decls=$(task_decls "$plan")
+
+  # ---- path 1: COMMITTED changes -- attributed, checked PER TASK -----------------------------
+  miss_attr=""; unattr=""
+  for c in $(git rev-list "$plan_commit..HEAD" 2>/dev/null); do
+    who=$(attribute "$c")
+    for f in $(git diff-tree --no-commit-id --name-only -r "$c" 2>/dev/null); do
+      is_excluded_committed "$f" && continue
+      case "$who" in
+        COORD) ;;
+        UNATTRIBUTED) unattr="$unattr $(git rev-parse --short "$c" 2>/dev/null):$f" ;;
+        *) printf '%s\n' "$decls" | grep -qxF "$who $f" || miss_attr="$miss_attr $who:$f" ;;
+      esac
+    done
+  done
+
+  # ---- path 2: UNCOMMITTED work in progress -- unattributable, checked against the union ------
+  # Attribution needs a commit. While a task is mid-flight its edits belong to no commit yet, so the
+  # union is the only bound available and this leg behaves exactly as the check always did. Stated
+  # rather than hidden: the per-task strictness that closes TD-035 applies to committed history --
+  # which is the collision-relevant set, since worktree agents commit before merge-back and the
+  # coordinator's post-merge gate run sees everything committed.
+  tracked=$(git diff --name-only HEAD -- . 2>/dev/null)
   untracked=$(git ls-files --others --exclude-standard -- . 2>/dev/null)
-  changed=$(printf '%s\n%s\n' "$tracked" "$untracked" | grep -v '^$' | sort -u)
+  wip=$(printf '%s\n%s\n' "$tracked" "$untracked" | grep -v '^$' | sort -u)
 
   miss=""
-  for f in $changed; do
+  for f in $wip; do
     is_excluded "$f" && continue
     case " $layers_all " in
       *" $f "*) ;;
@@ -143,10 +248,20 @@ for sp in "$@"; do
     esac
   done
 
-  if [ -n "$miss" ]
-  then bad "$sp layers observed: changed but undeclared in any task's Layers::$miss"
-  else ok  "$sp layers observed (all changed files declared, base $plan_commit)"
+  hit=0
+  if [ -n "$unattr" ]; then
+    bad "$sp layers observed: commit attributable to no task and not coordinator bookkeeping:$unattr"
+    hit=1
   fi
+  if [ -n "$miss_attr" ]; then
+    bad "$sp layers observed: changed by a task that never declared it:$miss_attr"
+    hit=1
+  fi
+  if [ -n "$miss" ]; then
+    bad "$sp layers observed: changed but undeclared in any task's Layers::$miss"
+    hit=1
+  fi
+  [ "$hit" -eq 0 ] && ok "$sp layers observed (all changed files declared, base $plan_commit)"
 done
 
 exit $fail
