@@ -103,6 +103,7 @@ Where-things-live = **`docs/architecture/overview.md`**; no hand-maintained code
 ## Continuous learning governance
 
 Every iteration feeds the next (full rules → DOCS_Guide §10/§11). **Close** Retro auto-files four buckets: Shipped→CHANGELOG · Tech debt→`TD-NNN` ·
+**Deferring a question** — before parking one for want of evidence, name the **class of fact** that would close it: a *measurement* · a *documented behaviour* · a *judgement call*. Only a measurement accumulates; a documented behaviour is closed by reading and a judgement call by ruling, so "unblock when a measurable signal appears" parks those two **forever** (L-094).
 Follow-ups→`TASK-NNN` · Learnings→`L-NNN`. **Promote** checkpoint: promote any `L-NNN` (`count ≥ 2, promoted: no`) → durable rule **placed by §10's placement test** —
 ask which flows can hit the failure, place it where all of them read (a skill red-flag fires in that skill's flow alone); age TD; doc-aging. Propose → approve, never silent. Learnings + ADRs + research carry ADR-009 metadata; the by-tag/-domain index is **generated** into `docs/knowledge-index.md`, lint-checked by `qa-check.sh`.
 

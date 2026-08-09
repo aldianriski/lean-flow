@@ -129,3 +129,26 @@ contract three skills rely on. And `DOCS_Guide` §7 already settles whether the 
 absent glossary is correct, and only the phrasing asserted content that create-lazily says should not
 be there yet. The line now states the placement rule and its lazy-creation condition, at 123/130 with
 no displacement needed.
+
+### 2026-08-09 | complete | T4 — L-094 promoted into CONTEXT.md; A2's displacement ruling did not fire
+**The enumeration decided it, not a preference.** Five flows can hit the failure: `/triage` setting
+`needs-info` · `promote` re-reviewing aged TD · `close` routing a follow-up · a research scan writing
+"no new evidence either way" · `.out-of-scope/` revisit-ifs. All five are **governance** moments
+spanning two skills plus a doc practice, so no skill red-flag reaches them — that is L-092's whole
+lesson — and the governance SSOT does. Crucially the honest answer is **not** "every flow": `/tdd` and
+`/diagnose` cannot hit it, so A2's `CLAUDE.md` displacement ruling never came due and the file stays at
+80/80. `CONTEXT.md` 123 → 124 of 130.
+
+**Two things deliberately not done, recorded so they read as decisions rather than misses.**
+*(a)* The wiring half was a genuine no-op: a grep across `.claude/` and `skills/` found no existing
+statement of this rule anywhere, so there was no stale duplicate to retire. The DoD line is ticked
+because it was checked, not because anything was rewritten. *(b)* A trigger-point cue in
+`/triage`'s state table was considered — that is where `needs-info` is actually written — and declined
+twice over: `skills/triage/SKILL.md` is outside T4's declared `Layers:` and would need a second
+declaration amendment this sprint, and the rule already reaches `/triage` through the SSOT every primed
+session loads. Wiring a cue is a defensible follow-up, not a gap this task left open.
+
+**L-068 stayed a ledger line.** It is L-094's direct complement — a deferral also needs a written
+kill-switch, *what* and *by when* — and the temptation was to promote the pair while the section was
+open. It sits at `count: 1`, and §10 is explicit that a single occurrence is context rather than law,
+so it waits for its own second firing. Referenced from L-094's `related:` instead.

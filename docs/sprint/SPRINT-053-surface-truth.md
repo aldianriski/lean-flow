@@ -117,15 +117,15 @@ test, shipped last sprint — which is what makes T4 depend on T1 and T3 rather 
 sits where every flow that can defer a question reads it.
 
 **DoD:**
-- [ ] **Placed by §10's test** — enumerate the flows that can hit it (`/triage` setting `needs-info` ·
+- [x] **Placed by §10's test** — enumerate the flows that can hit it (`/triage` setting `needs-info` ·
       `close` routing a follow-up · `promote` re-reviewing aged TD · a research scan writing "no new
       evidence"), then place where all of them read
-- [ ] If the honest enumeration is "every flow", the home is `CLAUDE.md` at 80/80 — a **displacement
+- [x] If the honest enumeration is "every flow", the home is `CLAUDE.md` at 80/80 — a **displacement
       ruling**, never a silent cap breach (A2)
-- [ ] Any stale duplicate of the rule rewritten to point at the one home — the wiring half (L-092)
-- [ ] Entry collapsed to a pointer line per §11; ids stay monotonic (next new id L-096)
-- [ ] `docs/knowledge-index.md` regenerated (`sh scripts/gen-index.sh`)
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+- [x] Any stale duplicate of the rule rewritten to point at the one home — the wiring half (L-092)
+- [x] Entry collapsed to a pointer line per §11; ids stay monotonic (next new id L-096)
+- [x] `docs/knowledge-index.md` regenerated (`sh scripts/gen-index.sh`)
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ## Decisions (pre-locked)
 
@@ -182,6 +182,8 @@ sits where every flow that can defer a question reads it.
 | `docs/QA.md` | T2 | records that the FAIL now names the escape and that fixtures guard it | low | `qa-check.sh` |
 | `docs/sprint/INDEX.md` | T3 | three rows (049 · 051 · 052) name their release instead of "PATCH pending" | low | read-back |
 | `.claude/CONTEXT.md` | T3 | glossary line states the placement rule + create-lazily condition, rather than asserting content §7 says should not exist yet | low | `qa-check.sh` |
+| `.claude/CONTEXT.md` | T4 | § Continuous learning governance gains L-094's rule — name the class of fact before deferring (owned by T3, committed after it per D4) | low | `qa-check.sh` |
+| `docs/LEARNINGS.md` | T4 | L-094 collapsed to a pointer, `promoted: yes → CONTEXT.md` | low | `gen-index.sh` |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
