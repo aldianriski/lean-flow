@@ -13,10 +13,29 @@ status: current
 > The delay is deliberate — a just-resolved debt is still context at the next promote — and the
 > substance survives in `CHANGELOG.md`, the sprint archive and git, so what goes is a breadcrumb, not a
 > record. **IDs stay monotonic: a deleted row never frees its id.** `severity` ∈ trivial · minor · medium · high.
+>
+> A row's **`Mitigation:` line is the filer's hypothesis, not a plan** — written while the cost was being
+> felt, and after a few re-reads it starts to read as settled. Cite the evidence for the *problem*;
+> re-derive the *fix* before a DoD is built on it (L-091 → DOCS_Guide §10). The same goes for a row's
+> Summary: TD-036's was false the day it was filed.
 
 ---
 
 ## Tech Debt
+
+- **TD-039** severity: minor | status: open | created: Sprint-052
+  - Summary: `check-layers-completeness.sh`'s two completeness FAILs — `Layers completeness:
+    DoD/Acceptance implies <file>, absent from Layers:` and its `Depends-on:` twin — never name the
+    `Cites:` escape. The author who trips the gate is told only what the declaration is missing.
+  - Impact: the obvious repair from that message is to add the token to `Layers:` — declaring a touch
+    that is not one, which is exactly what the escape exists to prevent. Discovery is broken at the one
+    moment it matters. TD-036 hunted this gap on the *authoring* surfaces (the SPRINT template, `QA.md`)
+    and it was on neither, because the surface a failing author actually reads is the FAIL message.
+  - Mitigation (not yet done) — a hypothesis, per this ledger's header: append the escape to the two
+    messages (`scripts/lib/check-layers-completeness.sh:135` and `:149`). Re-derive before building —
+    confirm a FAIL naming its own escape does not read as an invitation to silence the gate. The
+    evidence for the cheap version is that the abuse is already guarded: a token in both `Cites:` and
+    `Layers:` is a contradiction with its own named FAIL.
 
 - **TD-038** severity: trivial | status: open | created: Sprint-050
   - Summary: `docs/research/mattpocock.md` sits at **117 lines against its 120 soft cap** with the
@@ -55,7 +74,7 @@ status: current
     TD-031's pattern exactly: narrowing a working guard under no pressure. Held, with the trigger
     unchanged; a re-review that reaffirms is a decision, not a skipped line.
 
-- **TD-036** severity: minor | status: open | created: Sprint-049
+- **TD-036** severity: minor | status: closed-not-supported → SPRINT-052 T2 | created: Sprint-049
   - Summary: the `Cites:` escape shipped in `check-layers-completeness.sh` (SPRINT-049 T3) is
     documented **only inside the checker**. `templates/SPRINT.md.template` — the file an author
     actually writes a Plan from — never mentions it.
@@ -69,6 +88,19 @@ status: current
     checker is maintainer tooling (`scripts/`, ADR-008) that no consumer runs, so a template line
     would advertise a convention nothing enforces on their side. Decide which of the two surfaces the
     line belongs to before writing it.
+  - **CLOSED — not supported (SPRINT-052 T2).** The consumer question was answered first (L-015) and it
+    is not a tie: `check-layers-completeness.sh` lives in `scripts/` — maintainer tooling that ships to
+    nobody (ADR-008) — so a `Cites:` line in `templates/SPRINT.md.template` would advertise to every
+    consumer a convention nothing on their side enforces. Neither surface takes the line, and this row
+    closes rather than staying open as a nag.
+  - **The Summary was already false when it was filed.** `docs/QA.md`'s layers-completeness row
+    documents the escape in full — its exemption, that absence changes nothing, and the
+    `Cites:`/`Layers:` contradiction — added in `75e61a8`, *the SPRINT-049 close that filed this row*.
+    The escape was never checker-only; the maintainer surface that owns it had it from the first day.
+    A filed premise falsified at execution: L-091's shape, one level up from the Mitigation lines it
+    was promoted about, and found by the task sent to act on it.
+  - **Residual → TD-039.** What the row was reaching for survives on a surface neither it nor TASK-161
+    named — the FAIL message an author actually trips.
 
 - **TD-034** severity: trivial | status: resolved → SPRINT-051 T4 | created: Sprint-047
   - Summary: the archived `docs/sprint/archive/SPRINT-045-gate-precision.md` carries **duplicate

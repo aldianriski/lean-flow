@@ -77,12 +77,12 @@ advertise a convention nothing enforces on their side (L-015).
 closes with a written reason it belongs on none.
 
 **DoD:**
-- [ ] The **consumer question answered first and in writing**: does a consumer writing a sprint file
+- [x] The **consumer question answered first and in writing**: does a consumer writing a sprint file
       from the template benefit from a convention only our gate enforces? The answer drives placement
-- [ ] The line lands on the chosen surface — template, maintainer-facing docs, or neither
-- [ ] If "neither", TD-036 closes with that reasoning rather than staying open as a nag
-- [ ] `TD-036` marked resolved (or closed-not-supported) in the ledger, with the outcome stated
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+- [x] The line lands on the chosen surface — template, maintainer-facing docs, or neither
+- [x] If "neither", TD-036 closes with that reasoning rather than staying open as a nag
+- [x] `TD-036` marked resolved (or closed-not-supported) in the ledger, with the outcome stated
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ## Decisions (pre-locked)
 
@@ -129,6 +129,7 @@ closes with a written reason it belongs on none.
 | `docs/LEARNINGS.md` | T1 | L-091 + L-092 collapsed to pointers (§11); the header's three-home menu replaced by a pointer at the test | low | `qa-check.sh` |
 | `.claude/CONTEXT.md` | T1 | § Continuous learning governance menu → pointer at §10's test; same-line rewrite holds 123/130 | low | `qa-check.sh` |
 | `docs/knowledge-index.md` | T1 | regenerated after the status changes | low | `gen-index.sh` |
+| `TECH-DEBT.md` | T2 | TD-036 closed-not-supported (consumer answer + its premise was false at filing); TD-039 filed for the residual; header gains L-091's `Mitigation:`-is-a-hypothesis line for `/triage`, which reads the row rather than §10 | low | `qa-check.sh` |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):

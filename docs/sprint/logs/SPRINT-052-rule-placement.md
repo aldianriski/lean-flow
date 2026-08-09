@@ -45,3 +45,23 @@ to point at the one home) and **`Mitigation:` is a hypothesis** (cite the eviden
 re-derive the fix — at close when filing one, at promote before a DoD is built on one). `CLAUDE.md`
 untouched at 80/80: neither failure is repo-wide, so the cap-displacement ruling A1 warned about was
 not needed. `docs/knowledge-index.md` regenerated; `CONTEXT.md` held at 123/130 via a same-line rewrite.
+
+### 2026-08-09 | surprise | TD-036's Summary was false the day it was filed
+T2. The row says the `Cites:` escape is documented "only inside the checker". `docs/QA.md`'s
+layers-completeness row documents it in full — exemption, absence-changes-nothing, and the
+`Cites:`/`Layers:` contradiction — and `git log -S` puts that text in `75e61a8`, **the SPRINT-049 close
+that filed the row**. So the premise the task was sent to act on had never been true. This is L-091 one
+level up from the Mitigation lines it was promoted about: the rule fired against the very row T2 was
+opened to serve, in the same sprint that promoted it. A2 resolves cleanly and not as a tie.
+
+### 2026-08-09 | complete | T2 — TD-036 closed not-supported; the residual is TD-039
+The consumer question decides it: `check-layers-completeness.sh` is `scripts/` maintainer tooling
+(ADR-008) that ships to nobody, so a `Cites:` line in `SPRINT.md.template` would advertise to every
+consumer a convention nothing on their side enforces (L-015). Neither surface takes the line; the
+template and `docs/QA.md` are untouched. What survives is a gap on a surface neither the row nor
+TASK-161 named — `check-layers-completeness.sh:135`/`:149`, the two FAILs an author actually trips,
+name what is missing from `Layers:` but never the escape, so the obvious repair is to declare a touch
+that is not one. Filed as **TD-039** rather than fixed here: that file sits in T2's `Cites:`, not its
+`Layers:`, and widening the task to reach it is the L-088 trap. Per the owner ruling at G2, it goes to
+the next promote. `TECH-DEBT.md`'s header also takes L-091's pointer line under this task, which owns
+the file (see the G1/G2 entry above).
