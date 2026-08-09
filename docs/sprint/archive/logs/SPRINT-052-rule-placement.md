@@ -3,7 +3,7 @@ sprint: 052
 slug: rule-placement
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -65,3 +65,14 @@ that is not one. Filed as **TD-039** rather than fixed here: that file sits in T
 `Layers:`, and widening the task to reach it is the L-088 trap. Per the owner ruling at G2, it goes to
 the next promote. `TECH-DEBT.md`'s header also takes L-091's pointer line under this task, which owns
 the file (see the G1/G2 entry above).
+
+### 2026-08-09 | close | 12/12 DoD, four buckets routed, one new learning
+Retro written into § Plan's sibling. Buckets: **Shipped** → `DOCS_Guide` §10's two new rules, which
+ship inside the plugin and so are consumer-facing — held for `/release-patch` rather than written to
+`CHANGELOG.md` here, the same call SPRINT-051 made. **Tech debt** → TD-039, filed during T2 rather than
+at close. **Follow-ups** → none; TD-039's own Mitigation says re-derive before building, and it enters
+at the next promote's TD scan, so a TASK now would be the shape D4 rejected. **Learnings** → L-095
+(a red freshness row is a diff, not a mystery). Deliberately *no* entry for TD-036's stale Summary:
+that is L-091's third firing and "cite the evidence for the problem" already covers it — a fresh id
+would duplicate a promoted rule. §11 retention and the doc-freshness refresh go to the owner as one
+propose→approve pass; nothing lossy was applied unilaterally.

@@ -3,7 +3,7 @@ sprint: 052
 slug: rule-placement
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 plan_commit: 703373e
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -134,3 +134,45 @@ closes with a written reason it belongs on none.
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
      shipped → CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md. -->
+
+Two tasks, 12/12 DoD, no scope change. Both were placement questions and both turned out to be
+wider than the Plan assumed — in the same way, one level apart: the surface the task named was not
+the surface the failure lived on.
+
+**Retrieval check** — no miss. The opposite: the sprint was *about* retrieval failure, and the two
+rules it promoted were both found and applied to their own execution. L-091 fired against TD-036, the
+row T2 was opened to serve; L-092's placement test, applied to itself, is what found the duplicate
+menus. Nothing was contradicted.
+
+**Cost** — inline, coordinator only, no dispatched agents. Both tasks were `class: decision`, which is
+the tier that stays inline by the dispatch rule rather than by exception, and neither had executable
+work to hand off. Roughly 25 tool calls end to end across G1/G2, both tasks, and close — the bulk of it
+reading (LEARNINGS, DOCS_Guide §10/§11, the ledger, the checker) rather than writing. Cheap because the
+research was the deliverable: 8 files touched, ~90 lines net.
+
+**Worked**
+- **Confirming an `assumes:` line by actually doing the enumeration**, rather than reading it as a
+  formality. A1 said "the flows are enumerable"; enumerating them found the menu on three surfaces
+  instead of one, which changed what T1 had to do. The confirm step is where the scope got discovered.
+- **Diffing the installed skill against repo HEAD** when `/prime`'s freshness row came back red
+  (1.25.2 vs 1.27.1). Two orchestrator deltas came back — one of them the L-088 red flag this sprint
+  leaned on — for the cost of one `git diff`, with no reinstall and no session restart.
+- **Checking the premise before acting on it.** T2's first move was to grep for `Cites:` across the
+  repo instead of opening the template. That is the only reason the stale Summary was found rather
+  than a line being dutifully written to a surface that did not need it.
+
+**Friction**
+- **The approved T1 design crossed a task boundary** — L-091's `/triage`-facing pointer belongs in
+  `TECH-DEBT.md`, which sits in T2's `Layers:` and not T1's. Caught at G2 rather than at the gate, and
+  resolved by giving the file a single owner (T2) instead of widening a declaration. Cheap here; it
+  would not have been if it had surfaced after T1's commit.
+- **A gate that names what is missing but not the escape** is the sprint's own finding turned inward
+  (TD-039): the layers-completeness FAIL is exactly the surface that would have taught this sprint's
+  authoring rule, and it is silent.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- **L-095 filed** — a red skill-freshness row is repairable in-session by diffing the installed skill
+  against repo HEAD; L-021 says read the row and stops there. Count 1.
+- **No entry for TD-036's stale Summary.** It is L-091's third firing, not a new learning — "cite the
+  evidence for the *problem*" already covers a Summary written without any. Recorded on L-091's own
+  pointer entry instead of duplicating a promoted rule as a fresh id (`/insights` § no near-duplicates).

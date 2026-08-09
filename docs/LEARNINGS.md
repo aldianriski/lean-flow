@@ -22,11 +22,19 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-094**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-095**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-095 [tags: tooling] [status: active]: **A red skill-freshness row is repairable in-session — diff the installed skill against repo HEAD and you have the delta, without a reinstall or a restart.** `/prime` reported `1.25.2 base-dir != 1.27.1 repo → STALE` and, correctly, refused to block on it. L-021 establishes *reading* that row; it says nothing about what to do once it is red, and the two obvious moves are both bad — reinstall (restarts the session, loses the loaded context) or proceed and hope (Sprint-039 ran a whole sprint on 1.18.0 procedures). There is a cheap third: the repo is right there, so `git log -S'"version": "<installed>"' -- .claude-plugin/plugin.json` finds the release commit and `git diff <that>..HEAD -- skills/` prints exactly what the running copy is missing. Here it was 17 files, of which the one being executed had **two** changes — the frontier-round grill rule and the L-088 stale-DoD red flag, which the sprint then leaned on directly. Total cost: two commands, no restart. The general point is that a stale *procedure* is a diff, not a mystery, whenever the source is checked out beside it — which is exactly the maintainer's situation and never the consumer's, so this is a maintainer-path repair and the freshness row stays a report for everyone else.
+- seen: Sprint-052
+- count: 1
+- promoted: no
+- related: L-021 (read the base-dir version, never `/plugin`'s report) · L-060 (inspect the artifact rather than the report) · `skills/prime/SKILL.md` § Skill freshness
 
 ---
 
