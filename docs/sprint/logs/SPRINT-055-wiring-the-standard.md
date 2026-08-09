@@ -71,3 +71,58 @@ narrowing the `Layers:` declarations (which would have hidden the overlap rather
 TD-031's pattern of narrowing a guard under no pressure) and over overriding the FAIL.
 
 Logged here **before** § Plan is edited, per the freeze rule.
+
+### 2026-08-09 | scope-change | T1 `Layers:` gains the two files implementation invented
+
+**What broke:** the `layers observed` check FAILed —
+`changed but undeclared in any task's Layers:: scripts/lib/check-count-claims.sh`. T1's `Layers:`
+named `scripts/qa-check.sh`, because at promote time the plan was "extend the existing checker". It
+turned out the count block was inline and bound to this repo's own paths, so it could not be pointed
+at a fixture — and a check that cannot be run against input that must FAIL cannot satisfy T1's own
+L-058 DoD item. Extracting it to `scripts/lib/check-count-claims.sh` was the enabling means, and
+`evals/run-count-claims-fixtures.sh` came with it.
+
+This is **TD-022's shape exactly**: a DoD written at promote cannot name a file invented during
+implementation. Leg 15 exists because leg 14's prose-derived source shares an author and a moment
+with the Layers line (L-074) and so cannot catch invention — only the observed-diff source can. It
+caught this within one task of the sprint starting.
+
+**Impact:** T1 `Layers:` gains `scripts/lib/check-count-claims.sh` and
+`evals/run-count-claims-fixtures.sh`. No behaviour change and no new acceptance criterion — the
+extraction is refactoring in service of a DoD item already written, not added scope. T1's stated
+acceptance ("changing any one count claim out of lockstep makes `qa-check.sh` fail with a named
+finding") is unchanged and now demonstrable.
+
+**Re-confirm G2:** D1's sequential order is unaffected — the new files are touched by T1 alone, and
+the preflight re-run confirms no new shared-file overlap.
+
+*Also recorded, for the Retro:* the `python` heredoc used for the first attempt at this edit failed
+outright (`Python was not found`) while the surrounding `sh` pipeline still printed a full green
+count-claims report from the **unmodified** inline block. Read as a self-report it looked like the
+edit had landed and passed. The artifact said otherwise. CLAUDE.md Edit-safety trap (c), live.
+
+### 2026-08-09 | scope-change | `Layers:` directory tokens taught to both layers checkers (T1)
+
+**What broke:** T1's fixture set is 24 files. `layers observed` matches whole paths exactly, so the
+`evals/fixtures/` token already sitting in T1's `Layers:` matched **nothing** — it read as a
+declaration while guarding zero files. Not a new defect introduced by this sprint: any directory
+token ever written into a `Layers:` line has been silently inert. T1's fixture tree is simply the
+first thing large enough to make it visible.
+
+**Impact:** a `Layers:` token ending in `/` is now a directory prefix in both
+`scripts/lib/check-layers-completeness.sh` and `scripts/lib/check-layers-observed.sh`. The two are
+kept deliberately identical — they read the same declaration, so a parsing rule that differed
+between them would make one of the two lie (the file's own existing comment says so). Covered by a
+new fixture, `evals/fixtures/layers-completeness/dir-token-prefix.md`, asserted in **both**
+directions: T1's block must PASS (implied paths beneath the declared tree) and T2's must FAIL naming
+the path outside it. A prefix rule that swallowed everything would satisfy a PASS-only test.
+
+**Known boundary, recorded not hidden:** the dispatch preflight extracts only dot-bearing tokens
+from `Layers:`, so a directory token is invisible to its shared-file overlap check. Declaring a
+directory is therefore safe only for a tree ONE task owns; a path two tasks could both touch must
+still be named in full. Written into both checkers' comments. This asymmetry deserves a `TD-NNN` at
+close — the feature is sound but its blind spot is currently guarded by a comment, not a check.
+
+**Re-confirm G2:** owner ruled explicitly, choosing this over enumerating 24 paths, over excluding
+fixture trees in `is_excluded()` (TD-031's narrow-a-guard-under-no-pressure pattern), and over
+shrinking the fixture set. T1 `Layers:` additionally gains the two checker files.

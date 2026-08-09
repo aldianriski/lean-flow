@@ -54,6 +54,20 @@ run_case_anywhere "unindented-continuation" 1 \
   "declaration continuation: a wrapped Layers line must be indented to continue" -- \
   sh "$checker" "$here/fixtures/layers-completeness/unindented-continuation.md"
 
+# --- case 6: directory tokens are a PREFIX, not a wildcard (SPRINT-055 T1) -----------------------
+# A `Layers:` token ending in "/" now covers every path beneath it. Before T1 it matched nothing at
+# all while still reading as a declaration -- accepted, guarding zero files. Both halves are asserted
+# from the ONE fixture file: T1's block must PASS (its implied paths sit under the declared tree) and
+# T2's must FAIL naming the path outside it. Asserting only the PASS half would let a prefix rule
+# that swallowed everything look correct, which is the same false-negative the rule removed.
+run_case_anywhere "dir-token-prefix-covers" 1 \
+  "### T1 Layers completeness (DoD-implied files all declared)" -- \
+  sh "$checker" "$here/fixtures/layers-completeness/dir-token-prefix.md"
+
+run_case_anywhere "dir-token-prefix-outside" 1 \
+  "### T2 Layers completeness: DoD/Acceptance implies scripts/lib/check-count-claims.sh, absent from Layers:" -- \
+  sh "$checker" "$here/fixtures/layers-completeness/dir-token-prefix.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-COMPLETENESS FIXTURES: all green"; else echo "LAYERS-COMPLETENESS FIXTURES: at least one FAIL"; fi
 exit $fail

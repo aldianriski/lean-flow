@@ -119,10 +119,23 @@ check_block() {
   fi
 
   # -- (a)+(b): file-shaped tokens named in prose, absent from Layers: -----------------------
+  # A declared token ending in "/" is a DIRECTORY prefix covering every path beneath it (SPRINT-055
+  # T1). Before that, such a token was accepted and could never match anything, so it read as a
+  # declaration while guarding zero files -- the silent-false-negative shape L-058 is about. Kept
+  # deliberately identical to check-layers-observed.sh: both checkers read the same declaration, so
+  # a parsing rule that differs between them would make one of the two lie.
   miss_f=""
+  layers_dirs=$(printf '%s' "$layers_line" | grep -oE '`[^`]+/`' | tr -d '`')
+  covered_by_dir() { # <path>
+    for _d in $layers_dirs; do
+      case "$1" in "$_d"*) return 0 ;; esac
+    done
+    return 1
+  }
   toks=$(printf '%s' "$prose" | grep -oE '`[A-Za-z0-9_./-]+\.[A-Za-z]+`' | tr -d '`' | sort -u)
   for t in $toks; do
     printf '%s' "$layers_line" | grep -qF "$t" && continue
+    covered_by_dir "$t" && continue
     printf '%s\n' "$cites_toks" | grep -qxF "$t" && continue
     miss_f="$miss_f $t"
   done

@@ -33,41 +33,27 @@ cap .claude/CONTEXT.md 130
 for sp in docs/sprint/SPRINT-*.md; do [ -f "$sp" ] && cap "$sp" 400; done
 
 # --- 2. Count consistency (claims-vs-disk) ----------------------------------
-# Extract the first integer matching <pattern> in <file>.
-num() { grep -oE "$2" "$1" 2>/dev/null | grep -oE '[0-9]+' | head -n1; }
-
-skills_actual=$(ls -d skills/*/SKILL.md 2>/dev/null | wc -l | tr -d ' ')
-tmpl_files=$(ls skills/lean-doc-generator/templates/*.md.template 2>/dev/null | wc -l | tr -d ' ')
-noncore=2   # canonical-but-non-core templates (outside the doc-generation loop): DESIGN, QA-TESTCASE
-tmpl_core=$((tmpl_files - noncore))
-
-check_claim() { # <label> <actual> <file> <pattern>
-  lbl=$1; act=$2; file=$3; pat=$4
-  [ -f "$file" ] || { note "skip (missing): $file"; return; }
-  claim=$(num "$file" "$pat")
-  if   [ -z "$claim" ];      then bad "$lbl: no claim found in $file"
-  elif [ "$claim" = "$act" ]; then ok  "$lbl: $file claims $claim = disk $act"
-  else                            bad "$lbl: $file claims $claim != disk $act"
-  fi
-}
-
-check_claim "skills"    "$skills_actual" .claude/CONTEXT.md    'Skill roster \(([0-9]+)'
-check_claim "skills"    "$skills_actual" docs/architecture/overview.md  '([0-9]+) skills'
-check_claim "skills"    "$skills_actual" .claude/CLAUDE.md     '([0-9]+) SKILL\.md'
-check_claim "tmpl-core" "$tmpl_core"     .claude/CLAUDE.md     '([0-9]+) canonical doc templates'
-check_claim "tmpl-core" "$tmpl_core"     docs/architecture/overview.md  '([0-9]+) canonical doc templates'
-note "templates: $tmpl_files files = $tmpl_core core + $noncore non-core (DESIGN, QA-TESTCASE)"
-
-# doc-vs-script drift guard: docs/QA.md's stated non-core count must match $noncore above,
-# else the script and its own doc can silently disagree (TASK-112).
-if [ -f docs/QA.md ]; then
-  qa_noncore=$(num docs/QA.md '[0-9]+ non-core \(DESIGN, QA-TESTCASE\)')
-  if   [ -z "$qa_noncore" ];           then bad "qa.md non-core claim: no claim found in docs/QA.md"
-  elif [ "$qa_noncore" = "$noncore" ]; then ok "qa.md non-core claim: docs/QA.md claims $qa_noncore = script $noncore"
-  else                                      bad "qa.md non-core claim: docs/QA.md claims $qa_noncore != script $noncore"
-  fi
+# Delegates to a retained checker (scripts/lib/check-count-claims.sh, itself covered by
+# evals/run-count-claims-fixtures.sh). Extracted at SPRINT-055 T1: the block was inline and bound to
+# this repo's own paths, so it could never be pointed at a fixture -- meaning the check that catches
+# drift had itself never been exercised on input that must FAIL (L-058). Every PASS/FAIL/note line
+# the checker prints is relayed verbatim so the report reads exactly as it did inline.
+cc_script="scripts/lib/check-count-claims.sh"
+if [ ! -f "$cc_script" ]; then
+  bad "count claims: checker not found at $cc_script"
 else
-  note "skip (missing): docs/QA.md"
+  cc_out=$(sh "$cc_script" "$ROOT" 2>&1); cc_code=$?
+  printf '%s\n' "$cc_out"
+  cc_pass=$(printf '%s\n' "$cc_out" | grep -cE '^PASS')
+  cc_fails=$(printf '%s\n' "$cc_out" | grep -cE '^FAIL')
+  pass=$((pass + cc_pass))
+  if [ "$cc_code" -ne 0 ]; then
+    if [ "$cc_fails" -gt 0 ]; then
+      fail=$((fail + cc_fails))
+    else
+      bad "count claims: checker exited $cc_code without reporting a FAIL line"
+    fi
+  fi
 fi
 
 # --- 3. Frontmatter / ownership presence ------------------------------------
@@ -315,7 +301,7 @@ done
 # the selftests, yet it stays always-on: it's cheap (extracts + diffs, no throwaway repos), and
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh"
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh"
 eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
 # run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
 # run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via

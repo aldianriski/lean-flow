@@ -32,7 +32,7 @@ grill-until-frontier-empty, which is already correct and is not what T6 touches 
 ## Plan
 
 ### T1 — Correct the README repo-layout block and give its counts a check `[size: S · risk: low · class: execution · AFK]`
-Layers: `README.md` · `scripts/qa-check.sh` · `evals/fixtures/`
+Layers: `README.md` · `scripts/qa-check.sh` · `scripts/lib/check-count-claims.sh` · `scripts/lib/check-layers-completeness.sh` · `scripts/lib/check-layers-observed.sh` · `evals/run-count-claims-fixtures.sh` · `evals/run-layers-completeness-fixtures.sh` · `evals/fixtures/`
 Cites: `.claude/CLAUDE.md` · `docs/architecture/overview.md` — read as the surfaces the check already guards; not edited here
 Depends-on: none
 The README states a template count that is wrong (says 30 → 32 total; the truth is 32 core + 2
@@ -44,11 +44,11 @@ same check, which is why it drifted alone. Extend the existing checker rather th
 one count claim out of lockstep makes `qa-check.sh` fail with a named finding.
 
 **DoD:**
-- [ ] Confirm the assumption first: read `qa-check.sh`'s existing template-count check and verify it
+- [x] Confirm the assumption first: read `qa-check.sh`'s existing template-count check and verify it
       covers CLAUDE.md + overview.md but not README.md
-- [ ] README § Architecture "Repo layout" states the real count and lists `.codex-plugin/`
-- [ ] The check covers README.md alongside the two surfaces it already guards
-- [ ] A must-FAIL fixture: one surface's count edited out of lockstep → FAIL with its named finding (L-058)
+- [x] README § Architecture "Repo layout" states the real count and lists `.codex-plugin/`
+- [x] The check covers README.md alongside the two surfaces it already guards
+- [x] A must-FAIL fixture: one surface's count edited out of lockstep → FAIL with its named finding (L-058)
 
 ### T2 — Execute the epic archive at close, not just specify it `[size: S · risk: med · class: execution · AFK]`
 Layers: `skills/lean-doc-generator/SKILL.md` (close row) · `evals/` · `scripts/qa-check.sh` · `docs/epic/EPIC-001-parallel-worktree-fleet.md`

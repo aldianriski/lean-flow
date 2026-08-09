@@ -345,13 +345,14 @@ Full map — composition rule, the loop, integration points, boundaries →
 
 ```
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
+.codex-plugin/    plugin.json                           (Codex CLI manifest, lockstep version)
 .kimi-plugin/     plugin.json                           (Kimi Code CLI manifest, lockstep version)
 skills/           14 skills — /flow conductor + 12 stages + /council (auto-discovered)
   lean-doc-generator/
     references/   DOCS_Guide.md · migration-map.md · ADR-example.md
-    templates/    30 canonical doc templates (core, incl. SPRINT · ADR · RESEARCH · DEPLOYMENT ·
-                  ROLLBACK · BUG · TECH-DEBT · CONTRIBUTING · SECURITY · AGENTS; +2 non-core:
-                  DESIGN · QA-TESTCASE = 32 total)
+    templates/    32 canonical doc templates (core, incl. EPIC · SPRINT · ADR · RESEARCH ·
+                  DEPLOYMENT · ROLLBACK · BUG · TECH-DEBT · CONTRIBUTING · SECURITY · AGENTS;
+                  +2 non-core: DESIGN · QA-TESTCASE = 34 total)
   tdd/references/             testability.md
   diagnose/references/        feedback-loops.md
   task-decomposer/references/ prd-and-slices.md · fog-map.md

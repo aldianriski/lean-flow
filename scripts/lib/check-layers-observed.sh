@@ -215,6 +215,25 @@ for sp in "$@"; do
   # where no attribution is possible.
   decls=$(task_decls "$plan")
 
+  # A declared token ending in "/" is a DIRECTORY prefix covering every path beneath it (SPRINT-055
+  # T1). Before that, such a token was accepted and matched nothing, so it read as a declaration
+  # while guarding zero files -- exactly the silent false-negative L-058 is about; T1's own 24-file
+  # fixture tree is what surfaced it. Mirrored verbatim in check-layers-completeness.sh.
+  #
+  # BOUNDARY, deliberate: the dispatch preflight extracts only dot-bearing tokens from Layers:, so a
+  # directory token is invisible to its shared-file overlap check. Declare a directory only for a
+  # tree ONE task owns; any path two tasks could both touch must still be named in full.
+  covers() { # <space-separated declared tokens> <path>
+    _toks=$1; _f=$2
+    case " $_toks " in *" $_f "*) return 0 ;; esac
+    for _t in $_toks; do
+      case "$_t" in
+        */) case "$_f" in "$_t"*) return 0 ;; esac ;;
+      esac
+    done
+    return 1
+  }
+
   # ---- path 1: COMMITTED changes -- attributed, checked PER TASK -----------------------------
   miss_attr=""; unattr=""
   for c in $(git rev-list "$plan_commit..HEAD" 2>/dev/null); do
@@ -224,7 +243,8 @@ for sp in "$@"; do
       case "$who" in
         COORD) ;;
         UNATTRIBUTED) unattr="$unattr $(git rev-parse --short "$c" 2>/dev/null):$f" ;;
-        *) printf '%s\n' "$decls" | grep -qxF "$who $f" || miss_attr="$miss_attr $who:$f" ;;
+        *) who_toks=$(printf '%s\n' "$decls" | awk -v w="$who" '$1==w{print $2}' | tr '\n' ' ')
+           covers "$who_toks" "$f" || miss_attr="$miss_attr $who:$f" ;;
       esac
     done
   done
@@ -242,10 +262,7 @@ for sp in "$@"; do
   miss=""
   for f in $wip; do
     is_excluded "$f" && continue
-    case " $layers_all " in
-      *" $f "*) ;;
-      *) miss="$miss $f" ;;
-    esac
+    covers "$layers_all" "$f" || miss="$miss $f"
   done
 
   hit=0
