@@ -26,7 +26,7 @@ skills/           14 skills (auto-discovered at root)
   prototype/ tdd/ diagnose/ refactor-advisor/ release-patch/ handoff/ insights/   12 stage-skills
   council/                                               opt-in agent decision aid
   <skill>/references/   on-demand depth (DOCS_Guide, testability, feedback-loops, deepening, …)
-  lean-doc-generator/templates/   30 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 32 total)
+  lean-doc-generator/templates/   31 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 33 total)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
 docs/             architecture/ · deployment/ · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
 scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launcher) · lib/ (extracted checkers)

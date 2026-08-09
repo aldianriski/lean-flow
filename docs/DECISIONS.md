@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-30
+last_updated: 2026-08-09
 update_trigger: A new ADR is added under docs/adr/
 status: current
 ---
@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-014](adr/ADR-014-sprint-log-split.md) | Split the Execution Log into an uncapped `docs/sprint/logs/` sibling so the 400-line cap governs only the Plan | accepted | 2026-08-09 |
 | [ADR-013](adr/ADR-013-machine-state-artifacts.md) | Machine-state artifacts: adopt conditioned execution-graph check · defer run-state (5-sprint expiry) · reject run events | accepted | 2026-07-30 |
 | [ADR-012](adr/ADR-012-temidev-repo-structure-standard.md) | Adopt the TemiDev repo-structure standard as the consumer core (placement wins · lifecycle contract · tiered growth) | accepted | 2026-07-29 |
 | [ADR-011](adr/ADR-011-no-gate-enforcement.md) | No gate enforcement: G1/G2 stay human discipline (no hook, no sibling plugin) | accepted | 2026-07-29 |

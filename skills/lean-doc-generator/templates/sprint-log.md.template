@@ -1,0 +1,24 @@
+---
+sprint: NNN
+slug: [kebab-slug — matches the Plan file's slug]
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+status: active | closed
+update_trigger: an Execution Log entry is appended
+---
+
+# SPRINT-NNN — Execution Log
+
+> Append-only companion to [`../SPRINT-NNN-<slug>.md`](../SPRINT-NNN-<slug>.md). Uncapped by design:
+> this file grows with the work done, which is exactly why it is not inside the Plan's 400-line
+> budget (DOCS_Guide §9 · ADR-014). **Never edit a past entry** — correct it with a new one.
+>
+> The Plan is frozen at promote. A mid-sprint pivot that shifts scope is logged here as a
+> `scope-change` entry — what broke · impact · re-confirm G2 — **before** § Plan is edited.
+
+<!-- Newest entries at the BOTTOM: this reads as a chronology, unlike CHANGELOG.md which is
+     newest-first. Event is one of: promote · progress · surprise · scope-change · park · blocker ·
+     complete · close. -->
+
+### YYYY-MM-DD | [event] | [one-line summary]
+[detail — what changed and why it matters. Name the task (Tn) it belongs to.]

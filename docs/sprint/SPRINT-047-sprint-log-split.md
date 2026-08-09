@@ -30,7 +30,10 @@ reader, and a 1200-line working doc degrades exactly that reader).
 ## Plan
 
 ### T1 — Split the sprint Execution Log into an uncapped sibling `[size: M · risk: high · class: decision · HITL]`
-Layers: `skills/lean-doc-generator/references/DOCS_Guide.md` (§2 · §9 · §11) · `skills/lean-doc-generator/templates/SPRINT.md.template` · `skills/lean-doc-generator/SKILL.md` · `scripts/qa-check.sh` · `evals/fixtures/` · `docs/sprint/`
+Layers: `skills/lean-doc-generator/references/DOCS_Guide.md` (§2 · §9 · §11) · `skills/lean-doc-generator/templates/SPRINT.md.template` · `skills/lean-doc-generator/templates/sprint-log.md.template` · `skills/lean-doc-generator/SKILL.md` · `scripts/qa-check.sh` · `evals/run-sprint-log-layout-fixtures.sh` · `evals/fixtures/sprint-log-layout/correct/docs/sprint/SPRINT-900-layout-fixture.md` · `evals/fixtures/sprint-log-layout/correct/docs/sprint/logs/SPRINT-900-layout-fixture.md` · `evals/fixtures/sprint-log-layout/trap/docs/sprint/SPRINT-901-layout-fixture.md` · `evals/fixtures/sprint-log-layout/trap/docs/sprint/SPRINT-901-layout-fixture-log.md` · `docs/sprint/` · `docs/adr/ADR-014-sprint-log-split.md` · `docs/DECISIONS.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `docs/architecture/overview.md`
+<!-- Layers: widened 2026-08-09 after the observed-layers check named 8 undeclared paths; see the
+     Execution Log's scope-change entry. Declaration corrected, work unchanged (L-071). -->
+Layers-note: the three AI-context/architecture files carry the **linted** template-count claims, so they move whenever a template is added.
 Depends-on: none
 
 The Log is append-only prose that grows with the work done, so it competes with the Plan for the same
@@ -40,25 +43,26 @@ meant to govern: the frozen Plan. The risk sits in `qa-check.sh`, where three se
 `docs/sprint/SPRINT-*.md`; a change there that silently stops matching real sprints would disable cap
 enforcement without any FAIL to show for it.
 
-**Acceptance:** a sprint Plan can hold ≥15 tasks under the 400-line cap, with the measured headroom
-reported, and all three qa-check globs proven — by retained must-FAIL fixtures — to still catch what
-they caught before.
+**Acceptance:** a sprint Plan can hold **~12 tasks** under the 400-line cap — amended 2026-08-09 from
+an estimated ≥15 once the overhead was actually measured (see the Execution Log) — with the headroom
+reported, and the four sprint-file gate legs proven by retained, negative-tested fixtures to still
+select what they selected before.
 
 **DoD:**
-- [ ] Sibling path chosen as a **subdirectory** and recorded in § Decisions (D1); confirmed not to match `docs/sprint/SPRINT-*.md`
-- [ ] DOCS_Guide §2 gains the log row — reader · cap · create/update/archive triggers
-- [ ] DOCS_Guide §9 repointed: the 400 hard cap governs the Plan file; the Log is append-only elsewhere
-- [ ] DOCS_Guide §11 gains the log's retention leg (archives with its sprint)
-- [ ] `SPRINT.md.template` § Execution Log repointed to the sibling
-- [ ] `lean-doc-generator/SKILL.md` "append to the Execution Log" rule repointed
-- [ ] qa-check cap-400 (`:33`) verified against the new layout — negative fixture: an over-cap Plan FAILs **by name**
-- [ ] qa-check task-schema (`:267`) verified — negative fixture: a Plan block missing `class:`/autonomy/`Depends-on:` FAILs **by name**
-- [ ] qa-check layers-completeness (`:405`) verified — negative fixture: an undeclared layer FAILs **by name**
-- [ ] All three fixtures **retained** under `evals/` — deleting them with the prototype leaves the gate unguarded (TD-012)
-- [ ] One **archived** sprint migrated to the split format as the real-input proof (D2)
-- [ ] Measured Plan headroom reported (how many task blocks fit under 400)
-- [ ] `sh scripts/qa-check.sh` green on a **bare** run (never piped — L-057)
-- [ ] ADR recorded if G2 judges the structure change ADR-grade (A3)
+- [x] Sibling path chosen as a **subdirectory** and recorded in § Decisions (D1); confirmed not to match `docs/sprint/SPRINT-*.md`
+- [x] DOCS_Guide §2 gains the log row — reader · cap · create/update/archive triggers
+- [x] DOCS_Guide §9 repointed: the 400 hard cap governs the Plan file; the Log is append-only elsewhere
+- [x] DOCS_Guide §11 gains the log's retention leg (archives with its sprint)
+- [x] `SPRINT.md.template` § Execution Log repointed to the sibling
+- [x] `lean-doc-generator/SKILL.md` "append to the Execution Log" rule repointed
+- [x] qa-check cap-400 (`:33`) verified against the new layout — logs/ excluded, Plan still selected; **owner-ruled** satisfied by the layout fixtures, since T1 changes no check logic
+- [x] qa-check task-schema (`:267`) verified — same basis; a log file is never schema-checked as a Plan
+- [x] qa-check layers-completeness (`:405`) **and** layers-observed (`:436`, the 4th leg this list omitted) verified — both already ship retained must-FAIL harnesses; both green against the new layout
+- [x] Fixtures **retained** under `evals/` (TD-012) — `run-sprint-log-layout-fixtures.sh` + 4 fixture files, registered in the gate's always-on harness list, negative-tested both directions
+- [x] One **archived** sprint migrated to the split format as the real-input proof (D2) — SPRINT-045: **368 → 220 lines**, 153 log lines moved verbatim, 5 entries preserved
+- [x] Measured Plan headroom reported — **~12 task blocks** (fixed overhead 108 · 23.5 lines/block, from migrated SPRINT-045). **Short of the ≥15 in § Acceptance**: Files Changed and the Retro still share the Plan's budget
+- [x] `sh scripts/qa-check.sh` green on a **bare** run (never piped — L-057) — 70 pass, 0 fail
+- [x] ADR recorded — **ADR-014** + `docs/DECISIONS.md` row (A3 answered yes at G2)
 <!-- QA: this task edits the gate itself. The negative fixtures ARE the test strategy — a gate change
      verified only by a green run proves nothing about what it stopped catching (L-058). -->
 
@@ -113,12 +117,65 @@ three §11 doc-aging items applied in the same pass (TD-014/023/024 deleted, v1.
 LEARNINGS entries collapsed). Composition chosen deliberately over carrying the epic pair: fixing the
 container first means SPRINT-048 is written in the roomier format rather than migrating mid-flight.
 
+### 2026-08-09 | scope-change | T1's Layers: under-declared at promote; DoD 7–9 premise changed by D1
+**What broke — three separate things, all surfaced by gates rather than by review.**
+
+1. **`Layers:` was incomplete.** The observed-layers check named eight paths T1 changed but never
+   declared: `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `docs/architecture/overview.md` (the three
+   linted template-count claims, which move whenever a template is added) · `docs/adr/ADR-014-*.md` +
+   `docs/DECISIONS.md` (required by DoD 14, so foreseeable at promote and simply missed) ·
+   `templates/sprint-log.md.template` · the new fixture tree and its runner. This is L-071's shape
+   exactly: the declaration was internally consistent and incomplete, and only a second
+   independently-derived source caught it. **Impact:** declaration only — no unowned concurrent edit
+   occurred, since T1 and T2 are disjoint and execution is sequential and single-owner. **G2
+   re-confirmed:** the overlap map is unchanged; correcting `Layers:` widens what was declared, not
+   what is being built.
+
+2. **D1 dissolved DoD 7–9's premise.** Those items assumed the gate's globs would be *edited* and
+   therefore need must-FAIL fixtures. Choosing the `logs/` subdirectory means **no check's logic or
+   glob changes at all** — the non-recursive glob excludes the subdirectory for free. Must-FAIL
+   fixtures for cap-400 and task-schema would therefore be testing checks this task does not touch,
+   and building them requires extracting both out of `qa-check.sh` into `scripts/lib/` first — a
+   refactor of a working gate that TD-031 explicitly warns against under no pressure. **Shipped
+   instead:** `evals/run-sprint-log-layout-fixtures.sh`, three retained cases guarding the claim D1
+   actually rests on, negative-tested in both directions (a widened glob FAILs by name). **Parked for
+   the owner:** whether DoD 7–9 are satisfied by that, or whether the checker extraction is in scope.
+
+3. **Four legs, not three.** T1's DoD names three globbing checks; there are four —
+   layers-observed (`:436`) was missed. ADR-014 was corrected before it landed.
+
+**Also measured, and short of target:** post-split Plan capacity is **~12 task blocks**, not the ≥15
+the Acceptance line asks for. Fixed overhead on a closed sprint is 108 lines because Files Changed and
+the Retro still share the Plan's budget; only the Log moved. 12 against the 2–6 observed before is the
+real gain, but the stated number is not met — recorded here rather than rounded up.
+
+### 2026-08-09 | decision | owner ruled on both parked items; § Plan amended
+**DoD 7–9 → satisfied by the layout fixtures.** T1 changes no check's logic, so the must-FAIL bar
+attaches to the claim T1 actually introduces — the subdirectory exclusion — which is fixtured and
+negative-tested in both directions. cap-400 and task-schema remain unfixtured, exactly as they were
+before this sprint; that is a pre-existing gap T1 neither widens nor inherits.
+
+**Acceptance ≥15 → amended to the measured ~12.** 15 was an estimate written before the overhead was
+measured; the measurement supersedes it. The ceiling moved from 2–6 to ~12, which is the outcome the
+sprint existed to produce. The further split (Files Changed + Retro out of the Plan file) was
+considered and not taken — it would reopen ADR-014 for a gain nothing has yet shown to be needed.
+
+§ Plan edited after this entry, per the frozen-plan rule.
+
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| | | | | |
+| `references/DOCS_Guide.md` (§2·§9·§11) | T1 | the active sprint becomes two files; §9 states WHY with the six-sprint measurement, §11 archives the pair together | med — the standard other skills read | gate green; §2 row consistent with the shipped path |
+| `templates/sprint-log.md.template` | T1 | new core template so the generator can render the log at first entry | low | template count lint moved 30→31 and passes |
+| `templates/SPRINT.md.template` | T1 | § Execution Log becomes a pointer; names the `logs/` subdir as load-bearing | low | rendered SPRINT-047 unaffected (D2 keeps its log inline) |
+| `lean-doc-generator/SKILL.md` | T1 | append rule + archival pass repointed; line-neutral edits (file is at its 110 cap) | low | cap check still 110 ≤ 110 |
+| `scripts/qa-check.sh` | T1 | one line: register the new harness. **No check's logic or glob changed** | low | 70 pass, 0 fail |
+| `evals/run-sprint-log-layout-fixtures.sh` + 4 fixtures | T1 | guards ADR-014's load-bearing claim; extracts the glob from the gate rather than re-typing it | low | negative-tested: widened glob FAILs naming the offending pattern |
+| `docs/adr/ADR-014-sprint-log-split.md` + `docs/DECISIONS.md` | T1 | records the structural decision + its measured driver | low | corpus metadata + index lint green |
+| `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `docs/architecture/overview.md` | T1 | linted template counts 30→31; CONTEXT § Sprint model describes the two-file shape (SSOT) | low | all three count claims lint green |
+| `docs/sprint/archive/SPRINT-045-*.md` + `archive/logs/` | T1 | real-input migration proof: 368 → 220, log 167 in its own file | low | 5 entries preserved; content conserved |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):

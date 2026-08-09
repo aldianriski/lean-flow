@@ -59,12 +59,13 @@ Depends-on: [Tn / TASK-NNN list, or none]
 - **A1** — [assumption]. *Confirm: [source].*
 
 ## Execution Log
-<!-- Append-only, dated. Surprises, scope additions, completions. Log here rather than editing § Plan —
-     the plan is frozen at promote. Scope change: a mid-sprint pivot that shifts scope is logged as a
-     `scope-change` entry — what broke · impact · re-confirm G2 — BEFORE editing the Plan. -->
 
-### YYYY-MM-DD | [event] | [one-line summary]
-[detail — what changed and why it matters.]
+> **Lives in its own file** — `docs/sprint/logs/SPRINT-NNN-<slug>.md`, rendered from
+> `templates/sprint-log.md.template` and created lazily at the first entry. Append there, never here:
+> the Log grows with the work done, so keeping it out of this file is what stops it consuming the
+> 400-line budget the Plan needs (DOCS_Guide §9 · ADR-014). The `logs/` subdirectory is load-bearing —
+> the sprint-file checks glob `docs/sprint/SPRINT-*.md` non-recursively, so a same-directory
+> `-log.md` sibling would be capped and schema-checked as if it were a Plan.
 
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->

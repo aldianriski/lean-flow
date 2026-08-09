@@ -67,7 +67,8 @@ gating → §6.
 | `deployment/deployment-guide.md` *(was `docs/DEPLOY.md`)* | base | Dev / ops | 100 | a deploy target exists | deploy flow · environment matrix changes |
 | `deployment/rollback-guide.md` | base | Dev / ops | 80 | with deployment-guide | rollback process changes |
 | `flows/<slug>.md` (Mermaid) | medium+ | Dev | 100 each | a flow needs shared understanding | that flow changes |
-| `sprint/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | 400 hard | promote | append during sprint; retro at close → §11 archive |
+| `sprint/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | 400 hard | promote | DoD ticks · Files Changed · Retro during sprint (Plan frozen at promote) → §11 archive |
+| `sprint/logs/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | append-only | lazily, at the first Execution Log entry | every Execution Log entry → §11 archive with its sprint. **Must live in the `logs/` subdirectory**: the sprint-file checks glob `docs/sprint/SPRINT-*.md`, which is non-recursive, so a sibling here is excluded for free while a same-directory `-log.md` suffix would be capped at 400 and schema-checked as a Plan (ADR-014) |
 | `LEARNINGS.md` | lean loop | Team / AI | append-only | first confirmed learning | close confirms · promote collapses (§11) |
 | `research/<slug>.md` | as needed | Team / AI | 120 soft | a decision-driving question | question revisited · verdict changes |
 | `BUG-<slug>.md` | ephemeral | Anyone | lean | a defect is reported | routed away at `/triage` |
@@ -256,12 +257,21 @@ their §11 leg retires them.
 
 ## §9 — Sprint file (`templates/SPRINT.md.template`)
 
-The active sprint is its own working doc — `docs/sprint/SPRINT-NNN-<slug>.md`, 400-line hard cap.
-`TODO.md` holds the Backlog **pool**; the sprint file holds the **active** plan + history. Sections
-(see the template): frontmatter (`status` · `plan_commit` · `close_commit`) · Theme · Scope (In/Out) ·
-Plan (Tn + size·risk + Acceptance + **DoD checkboxes** — what `/orchestrator sprint-bulk` loops and
-`/prime` counts) · Owner-action checklist · Decisions→ADR · Assumptions · **Execution Log**
-(append-only; plan frozen at promote) · Files Changed · **Retro** (routed per §10).
+The active sprint is **two files** — a capped Plan and an uncapped log (ADR-014):
+
+| File | Cap | Holds |
+|---|---|---|
+| `docs/sprint/SPRINT-NNN-<slug>.md` | **400 hard** | frontmatter (`status` · `plan_commit` · `close_commit`) · Theme · Scope (In/Out) · Plan (Tn + size·risk + Acceptance + **DoD checkboxes** — what `/orchestrator sprint-bulk` loops and `/prime` counts) · Owner-action checklist · Decisions→ADR · Assumptions · Files Changed · **Retro** (routed per §10) |
+| `docs/sprint/logs/SPRINT-NNN-<slug>.md` | **append-only, uncapped** | the **Execution Log** only — created lazily at the first entry |
+
+`TODO.md` holds the Backlog **pool**. **Why they are separate:** the Log grows with the work done, so
+sharing one 400-line budget means the more a run accomplishes the closer the file gets to breaching —
+which caps how many tasks a Plan may hold, and therefore how much an unattended run can consume before
+it clean-halts. Measured before the split: six consecutive sprints ran 232–368 lines holding only 2–6
+tasks, one of them reaching 368 lines on **two** tasks. The Plan was never what filled the file.
+
+The Plan stays frozen at promote; a mid-sprint scope shift is logged as a `scope-change` entry in the
+log file (what broke · impact · re-confirm G2) **before** § Plan is edited.
 
 ---
 
@@ -314,6 +324,7 @@ them**. Append-only is preserved *inside* each archive file.
 | `CHANGELOG.md` (root) | a new MINOR version lands | keep current + previous minor inline; older blocks move verbatim → `docs/changelog/CHANGELOG-<version>.md` + one link line |
 | `docs/LEARNINGS.md` | an entry reaches `promoted: yes` | collapse it to a pointer line — `L-NNN → promoted: <where>`; the durable rule is the record now. **Ids are monotonic, never reused** — pruning removes the body, never frees the id; the next new id = highest-ever + 1 |
 | `docs/sprint/SPRINT-NNN-<slug>.md` | sprint closed | move → `docs/sprint/archive/`; add to `docs/sprint/INDEX.md` (created lazily) one line: `- SPRINT-NNN — <theme> — closed YYYY-MM-DD · <close_commit>` |
+| `docs/sprint/logs/SPRINT-NNN-<slug>.md` | sprint closed | move → `docs/sprint/archive/logs/` **with its Plan**, same commit — the pair is one record and splitting them across an archive boundary strands the evidence the Retro cites. No INDEX row of its own; the Plan's row covers both. Never compacted: the log is the append-only audit trail the Retro was written from |
 
 **When it runs** — close-time triggers (Backlog removal · sprint archive) execute during `close`;
 scan-based triggers (TD deletion · rotation · LEARNINGS collapse · the soft cap) run at **Promote**
