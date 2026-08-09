@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-051 closed 2026-08-09.
+> **SPRINT-052 — Rule Placement** → [`docs/sprint/SPRINT-052-rule-placement.md`](docs/sprint/SPRINT-052-rule-placement.md)
 
 ---
 
@@ -30,7 +30,40 @@ status: current
 
 ### P1 — Next Phase Required
 
+- [ ] TASK-160 — Promote L-091 and L-092 into durable rules  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  both entries read `promoted: yes → <where>` and are collapsed to pointer lines (§11),
+                  and each rule sits where **every flow that can hit its failure** reads it — not
+                  merely in one skill. For L-092 that test points at `DOCS_Guide` §10 itself, which
+                  currently offers "a CLAUDE.md anti-pattern, a CONTEXT.md rule, **or** a skill
+                  red-flag" as though the three were interchangeable homes; they are not
+      touches:    docs/LEARNINGS.md · skills/lean-doc-generator/references/DOCS_Guide.md ·
+                  .claude/CLAUDE.md · .claude/CONTEXT.md (whichever the placement test selects) ·
+                  docs/knowledge-index.md
+      depends-on: none
+      assumes:    L-092's own content is the criterion for its own placement — a rule about rules
+                  landing in only one skill must not itself land in only one skill. If that reasoning
+                  does not hold up under G2, the task is wrong-shaped and wants a ruling, not a quiet
+                  reinterpretation (L-088)
+      tracker:    docs/LEARNINGS.md L-091 · L-092
+      state:      ready
+
 ### P2 — Quality / Polish
+
+- [ ] TASK-161 — Decide which surface documents the `Cites:` convention (TD-036)  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  the **consumer question is answered first** (L-015) — the checker is maintainer
+                  tooling (`scripts/`, ADR-008) that no consumer runs, so documenting `Cites:` in the
+                  SPRINT template would advertise a convention nothing enforces on their side. Decide
+                  whether it belongs in the template, in maintainer-facing docs only, or neither; then
+                  the line lands in the chosen surface, or TD-036 closes with the reason it does not
+      touches:    skills/lean-doc-generator/templates/SPRINT.md.template · docs/QA.md · TECH-DEBT.md
+      depends-on: none
+      assumes:    this is a placement question, not a content one — the escape works and is documented
+                  inside the checker; what is undecided is **who should be told**. If the answer turns
+                  out to require changing the escape itself, that is a different task
+      tracker:    TECH-DEBT.md TD-036
+      state:      ready
 
 ### P3 — Long-term
 
