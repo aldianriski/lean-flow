@@ -80,15 +80,15 @@ only the unmatched remainder counts.
 skills against the specific lean-flow surface it maps to, and a keeper count.
 
 **DoD:**
-- [ ] Current source read for `grill-me` · `writing-for-agents` · `wizard` · `wait-what`
-- [ ] `wayfinder` re-check row — already adopted as fog-map; has it changed since 2026-07-10?
-- [ ] One delta-map row per skill, each naming the lean-flow surface it duplicates or the gap it fills
-- [ ] Verdict line states the keeper count
-- [ ] Keepers **filed** as follow-up `TASK-NNN` at close — never adopted inside this task
-- [ ] Ownership header + `last_updated` refreshed; `sh scripts/gen-index.sh` re-run if metadata changed
+- [x] Current source read for `grill-me` (→ `grilling`, which it delegates to) · `writing-for-agents` · `wizard` · `wait-what`
+- [x] `wayfinder` re-check row — fog-map still matches; the new mechanics are tracker artefacts scan 1 already rejected
+- [x] One delta-map row per skill, each naming the lean-flow surface it duplicates or the gap it fills
+- [x] Verdict line states the keeper count — **2 keepers of 5 examined**
+- [ ] Keepers **filed** as follow-up `TASK-NNN` at close — never adopted inside this task *(close-time action by design; ticked during `/lean-doc-generator close`)*
+- [x] Ownership header + `last_updated` refreshed; `sh scripts/gen-index.sh` re-run if metadata changed
 
 ## Owner-action checklist
-- [ ] Only if T2 is run unattended: confirm `WebFetch` is in the headless allowlist — without it T2 reverts to HITL (A4)
+- [x] ~~Only if T2 is run unattended: confirm `WebFetch` is in the headless allowlist~~ — **moot**: T2 ran attended in the interactive session (A4 resolved at G1)
 
 ## Decisions (pre-locked)
 - **D1** — the Log sibling lives in a **subdirectory**, not a same-directory `-log.md` suffix. A suffix
@@ -162,6 +162,23 @@ considered and not taken — it would reopen ADR-014 for a gain nothing has yet 
 
 § Plan edited after this entry, per the frozen-plan rule.
 
+### 2026-08-09 | complete | T2 landed — 2 keepers of 5
+Five skills examined against the existing surface (L-017). **Keepers:** `grilling`'s frontier batching
++ fact/decision separation; `writing-for-agents`' branching disclosure test + completion-criteria
+sharpness. **Rejects:** `wizard` (Owner-action checklist owns the concept), `wayfinder` (fog-map still
+matches; new mechanics are tracker artefacts scan 1 rejected), `wait-what` (conversational move, not a
+loop stage).
+
+The `grilling` keeper is the notable one: it **contradicts a rule we currently ship.** Our grill is
+"one question at a time"; theirs batches the whole *frontier* of independent decisions and serialises
+only the dependent ones. The discriminator is dependency, not count — and this sprint demonstrated the
+gap live, sending two popups with two independent questions each, justified ad hoc as "not stacked
+ambiguity". Changing that rule is a CLAUDE.md/CONTEXT.md edit and belongs in a follow-up TASK, not here.
+
+Also: scan 1's stale § open questions were refreshed — all three of its keepers had shipped, so its
+"follow-up tasks not yet filed" list was spent and said otherwise. The doc is now **136 lines against
+its 120 soft cap**, carrying two scans; the split-or-supersede call is doc-aging, for the owner.
+
 ## Files Changed
 <!-- Filled during execution; feeds CHANGELOG at close. -->
 
@@ -176,6 +193,7 @@ considered and not taken — it would reopen ADR-014 for a gain nothing has yet 
 | `docs/adr/ADR-014-sprint-log-split.md` + `docs/DECISIONS.md` | T1 | records the structural decision + its measured driver | low | corpus metadata + index lint green |
 | `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `docs/architecture/overview.md` | T1 | linted template counts 30→31; CONTEXT § Sprint model describes the two-file shape (SSOT) | low | all three count claims lint green |
 | `docs/sprint/archive/SPRINT-045-*.md` + `archive/logs/` | T1 | real-input migration proof: 368 → 220, log 167 in its own file | low | 5 entries preserved; content conserved |
+| `docs/research/mattpocock.md` | T2 | re-scan verdict for 5 skills + refreshed stale open-questions (scan 1's keepers had all shipped) | low | corpus metadata lint green; index regenerated |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-10
+last_updated: 2026-08-09
 status: current
 id: mattpocock-adaptation
 tags: [process, tooling]
@@ -10,8 +10,9 @@ related: [model-purpose]
 
 # Research — what, if anything, from mattpocock/skills should lean-flow adopt?
 
-> **Question.** Of the 7 engineering skills in [mattpocock/skills](https://github.com/mattpocock/skills), which carry a *delta* over lean-flow's existing surface worth adopting — and does the set unlock a way to power dispatched sub-agents with skills (ADR-010)?
-> **Verdict.** **2 keepers + 1 micro from the scan; the real prize is a capability the scan surfaced — skill-powered tier dispatch.** The 7 skills are largely lean-flow's own loop with an *issue tracker* backend swapped in (reject the backend). Adopt: (1) `code-review`'s Standards-vs-Spec separation, (2) `wayfinder`'s decision-ticket / fog-graduation model for foggy work. Then amend ADR-010 so `/orchestrator`'s execution dispatch hands the sub-agent a *procedure skill*, not just a prose brief.
+> **Question.** Of the skills in [mattpocock/skills](https://github.com/mattpocock/skills), which carry a *delta* over lean-flow's existing surface worth adopting?
+> **Verdict (scan 1, 2026-07-10).** **2 keepers + 1 micro; the real prize was a capability the scan surfaced — skill-powered tier dispatch.** The 7 skills were largely lean-flow's own loop with an *issue tracker* backend swapped in (reject the backend). Adopted: (1) `code-review`'s Standards-vs-Spec separation, (2) `wayfinder`'s decision-ticket / fog-graduation model, (3) the ADR-010 amendment handing dispatched sub-agents a *procedure skill*. **All three shipped.**
+> **Verdict (re-scan 2, 2026-08-09).** **2 keepers of 5 examined.** Keep `grilling`'s **frontier batching + fact/decision separation** and `writing-for-agents`' **branching disclosure test + completion-criteria sharpness**. Reject `wizard`, `wait-what`, and — on re-check — any change from `wayfinder`. Detail → § Re-scan below.
 
 ## Why this matters
 
@@ -56,9 +57,80 @@ An **issue-tracker-centric** rebuild of lean-flow's loop: idea → `to-spec` →
 - **Design candidate (technique):** wayfinder's fog-mapping as a pre-decomposition mode in `/task-decomposer` (not a new skill) — for work too foggy to slice.
 - **Reject:** the tracker backend and the `setup-*` scaffold (off-ethos: adds a `gh`/`glab`/external dependency for state we keep in-repo and git-versioned).
 
+## Re-scan (2026-08-09, SPRINT-047 T2)
+
+Scan 1 closed with an explicit **"Not scanned"** list. Four of the five skills below sit in that
+remainder; `wayfinder` is a re-check of something already adopted. The repo has also grown — 34
+SKILL.md files across `engineering/`, `productivity/`, `in-progress/`, `misc/`.
+
+| Skill | lean-flow equivalent | Verdict |
+|---|---|---|
+| `grill-me` → `grilling` | the intake grill (`/task-decomposer` Clarify) + G2 residual grill | **Keeper (technique)** |
+| `writing-for-agents` | ADR-006 (cap = procedure; artifacts → `references/`) · DOCS_Guide HOW-filter | **Keeper (2 techniques)** |
+| `wizard` | SPRINT template § Owner-action checklist · night-run's parked-HITL rule | **Reject** — concept owned |
+| `wayfinder` | `/task-decomposer` fog-map mode (adopted from scan 1) | **Reject** — no change worth taking |
+| `wait-what` | CONTEXT.md domain glossary · "Concise reporting" guideline | **Reject** (micro noted) |
+
+### Keeper 1 — `grilling`: frontier batching + facts are never the user's job
+
+**Frontier batching contradicts a rule we ship.** Decisions form a dependency tree; each round asks
+the *entire frontier* — every decision whose prerequisites are settled — as one numbered batch, then
+recomputes. Stops when the frontier is empty. Our rule is flatly *one question at a time* ("stacked
+questions get vague answers"). The delta: **the discriminator is dependency, not count.** Batching
+*dependent* questions is bad because the user must guess at inputs they haven't given; batching
+*independent* ones is free. We ban both, so we over-correct — and SPRINT-047 proved it live, sending
+two popups carrying two independent questions each, justified ad hoc as "not stacked ambiguity". The
+frontier rule was being reinvented because the written rule didn't cover it.
+
+**"Finding facts is your job, never the user's."** Research delegates to sub-agents running in
+parallel *without blocking* other frontier questions — only the downstream branch waits. Our "explore
+the codebase before asking" is the same instinct, weaker: it sequences recon *before* the grill rather
+than treating an open fact as one more prerequisite in the tree.
+
+### Keeper 2 — `writing-for-agents`: two techniques
+
+- **A branching test for progressive disclosure** — "inline what *every* path needs; disclose what
+  only *some* reach." ADR-006 gives the mechanism (procedure vs `references/`) but no criterion for
+  which is which; a cap is a size limit, not a test. One line fixes that.
+- **Completion criteria as behavioural levers** — vague bounds ("understanding reached") invite
+  premature completion; demanding ones ("every rule applied") drive exhaustiveness without saying
+  "be thorough". Applies directly to our DoD and Acceptance lines.
+
+*Noted, not adopted:* it argues **negation is an anti-pattern** (prohibition activates the forbidden
+behaviour), which cuts against CLAUDE.md's ❌ house style. Ours pair the trap with a positive rule,
+blunting it — but the tension is real. Carried to § open questions.
+
+### Rejects, with reasons
+
+- **`wizard`** — an interactive bash script walking a human through dashboard/credential steps. The
+  SPRINT template's **Owner-action checklist** already owns "non-dev actions a human must do", and
+  night-run's park rule owns the boundary. The only delta is *executability* — a consumer-repo tool,
+  not a loop skill, and lean-flow ships no scaffold by design.
+- **`wayfinder`** — re-checked against our fog-map: all four map sections, decision-tickets and
+  graduation still match. Genuinely new are **claim-first** (assign before working, so concurrent
+  sessions don't collide) and a **one-ticket-per-session** limit. Both are issue-tracker artefacts
+  scan 1 already rejected — our concurrency control is G2's ownership map plus worktree isolation,
+  and `sprint-bulk` loops many tasks by design. Nothing to take.
+- **`wait-what`** — on "wait, I don't understand", re-explain in ASD-STE100 Simplified Technical
+  English anchored on the project's ubiquitous language. Plugs into an asset we keep (the CONTEXT.md
+  glossary) but is a conversational move, not a loop stage, and we guard hard against skill-count
+  bloat. **Micro if ever wanted:** one line in Behavioral Guidelines.
+
 ## Out of scope / open questions
 
-- **Mechanism B vs C** — is skill self-fork (`context: fork`) worth the per-run fork cost over runtime invocation? Prototype after C ships. → `/prototype` or a follow-up TASK.
-- **Wayfinder fog-mode** — worth building, or does `/prototype` + research-spike already cover "foggy" adequately? Needs a real foggy problem to test against. → design call at next `promote`.
-- **Not scanned:** the ~10 skills `ask-matt` references but not listed (grill-with-docs, domain-modeling, codebase-design, improve-codebase-architecture, teach, research, writing-great-skills, compact) — only the 7 given were inspected.
-- **Follow-up tasks not yet filed** — proposed: (T) review Standards-vs-Spec split; (T) ADR-010 skill-powered-dispatch amendment; (T) refactor-advisor expand–contract ref; (T) wayfinder fog-mode design spike. Awaiting go-ahead to write to `TODO.md`.
+**Closed since scan 1** — all three keepers shipped: Standards-vs-Spec is live in the review split;
+skill-powered dispatch became ADR-010's spawn-with-brief contract; wayfinder's fog-mode ships as
+`/task-decomposer --fog`. Scan 1's "follow-up tasks not yet filed" list is therefore spent.
+
+**Still open**
+- **Mechanism B vs C** — is skill self-fork (`context: fork`) worth the per-run cost over runtime
+  invocation? Unchanged since scan 1; no new evidence either way. → `/prototype` or a follow-up TASK.
+- **Negation in anti-patterns** — `writing-for-agents` argues prohibition activates the forbidden
+  behaviour, which cuts against `.claude/CLAUDE.md`'s ❌ house style. Not a keeper, not dismissed. →
+  a question for a doc-aging pass, needing evidence rather than a style preference.
+
+**Not scanned (re-scan 2).** The repo now holds 34 SKILL.md files. Examined here: the 5 named. Still
+uninspected: `grill-with-docs` · `domain-modeling` · `codebase-design` ·
+`improve-codebase-architecture` · `teach` · `research` · `to-questionnaire` ·
+`resolving-merge-conflicts` · the 6 `in-progress/` skills · the 4 `misc/` skills. Named so the gap is
+a recorded boundary rather than an implied all-clear.
