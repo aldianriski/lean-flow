@@ -92,16 +92,18 @@ assumption that removed five skills from the boundary list. Cheap to settle defi
 **empty** — the boundary closed rather than restated.
 
 **DoD:**
-- [ ] `productivity/` (3) mapped — `handoff` · `teach` · `to-questionnaire`; `handoff` gets the
-      name-match confirm-or-reject treatment per R1
-- [ ] `in-progress/` (6) mapped — `claude-handoff` · `loop-me` · `setup-ts-deep-modules` ·
+- [x] `productivity/` (3) mapped — `handoff` · `teach` · `to-questionnaire`; `handoff` got the
+      name-match confirm-or-reject treatment per R1 and came back **covered, including redaction**
+- [x] `in-progress/` (6) mapped — `claude-handoff` · `loop-me` · `setup-ts-deep-modules` ·
       `writing-beats` · `writing-fragments` · `writing-shape`. "Unfinished upstream" is a valid Reject
-      **only if checked** and stated as the reason
-- [ ] `misc/` (4) mapped — `git-guardrails-claude-code` · `migrate-to-shoehorn` ·
+      **only if checked** and stated as the reason — and it was **not used**: every one was read and
+      rejected on domain or ethos grounds, never on being in-progress
+- [x] `misc/` (4) mapped — `git-guardrails-claude-code` · `migrate-to-shoehorn` ·
       `scaffold-exercises` · `setup-pre-commit`
-- [ ] Keepers filed as `TASK-NNN`, not adopted in-task
-- [ ] § Not scanned **empty**, with the count reconciled: 12 previously scanned + 10 (T1) + 13 (T3) = 35
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+- [x] Keepers filed as `TASK-NNN`, not adopted in-task — **none found**; 0 keepers of 13, recorded as
+      a result rather than an absence
+- [x] § Not scanned **empty**, with the count reconciled: 12 previously scanned + 10 (T1) + 13 (T3) = 35
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ### T2 — Settle mechanism B vs C, with an expiry if it is deferred again `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/research/mattpocock.md` · `docs/adr/ADR-010-model-tier-dispatch.md`

@@ -133,3 +133,40 @@ rows. The compression available is collapsing the 11 scan-1/scan-2 rows to two s
 their verdicts already appear in the header block. Recorded in TD-033's resolution note too.
 
 **Verification.** `scripts/qa-check.sh` bare: green, re-run after the DoD ticks and this entry (L-089).
+
+### 2026-08-09 | complete | T3 — remaining 13 mapped, 0 keepers, boundary closed
+
+A zero-keeper result, which is a finding rather than a wasted task: the two directories both prior
+scans skipped as presumptively low-yield **are** low-yield — now established instead of assumed. The
+same assumption applied to `engineering/` (T1) was wrong twice, so the check was worth making in both
+places, and only one of them paid.
+
+**`productivity/` (3).** `handoff` is fully covered — including the redaction rule, which `/handoff`
+already carries in its body *and* as a red flag. That sharpens K1 rather than duplicating it: the repo
+does hold the rule, it simply never reached `/diagnose`, the skill that actually instructs capturing
+HAR files and traces. An inconsistency inside our own surface, surfaced by an external scan.
+`teach` and `to-questionnaire` are out of domain (a personal-learning workspace; a third-party
+questionnaire) — Rejected on domain, not on quality.
+
+**`in-progress/` (6).** The DoD said "unfinished upstream" counts as a Reject **only if checked**.
+It was not used at all: every one was read and rejected on domain or ethos grounds.
+`claude-handoff` differs from `handoff` only by auto-spawning `claude --bg` — and a handoff is a
+stopping point, so auto-launching removes precisely the human gate the skill exists to create.
+`setup-ts-deep-modules` is off-ethos three ways (language-specific + external dep + scaffold).
+The three `writing-*` skills are article authoring; their explore/exploit split is already ours as
+fog-map → decompose. **`loop-me` is Rejected with a tension recorded, not dismissed:** its *push
+right* principle — defer the checkpoint as far as it goes, ask once, late, fully prepared — genuinely
+cuts against gate-*before*-work. Like the negation question, it needs evidence rather than a scan
+verdict, so it is named in the doc instead of being quietly dropped.
+
+**`misc/` (4).** All Rejects. Worth one note: `git-guardrails-claude-code` is a `PreToolUse` hook
+blocking `push` / `reset --hard` / `clean -f` — **the second time an external repo has offered us a
+hook**, against ADR-011's standing decision and `/release-patch`'s procedural stop. Recorded with
+TD-032's trigger shape attached: a third occurrence makes it worth re-opening rather than
+re-rejecting. The other three are repo- or library-specific scaffolds.
+
+**Doc stayed under cap** by the compression flagged in T1: the 11 scan-1/scan-2 rows collapsed to two
+summary rows, freeing room for 13 new ones. **117 / 120** with the boundary section now reading
+*None* and the count reconciled 12 + 10 + 13 = 35.
+
+**Verification.** `scripts/qa-check.sh` bare: green, re-run after the DoD ticks and this entry (L-089).
