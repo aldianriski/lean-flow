@@ -4,7 +4,7 @@ slug: keeper-adoption
 owner: Maintainer
 last_updated: 2026-08-09
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: e272617
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
