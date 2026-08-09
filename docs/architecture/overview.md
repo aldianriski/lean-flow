@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-01
+last_updated: 2026-08-09
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -28,7 +28,11 @@ skills/           14 skills (auto-discovered at root)
   <skill>/references/   on-demand depth (DOCS_Guide, testability, feedback-loops, deepening, …)
   lean-doc-generator/templates/   32 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 34 total)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
-docs/             architecture/ · deployment/ · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
+docs/             architecture/ · deployment/ · adr/ · DECISIONS.md · LEARNINGS.md · research/ · qa/
+  epic/             EPIC-NNN-<slug>.md + INDEX.md — multi-sprint outcomes (ADR-014 era; archive/ once closed)
+  sprint/           SPRINT-NNN-<slug>.md (Plan, 400 hard) · logs/ (Execution Log, uncapped — ADR-014)
+                    · archive/ + archive/logs/ (the pair moves together at close) · INDEX.md
+  changelog/        CHANGELOG-<version>.md — rotated out of root at each new MINOR (§11)
 scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launcher) · lib/ (extracted checkers)
                                                 maintainer tooling for the REPO itself (ADR-008)
 evals/            must-FAIL/must-SKIP fixtures + assertion scripts guarding a SHIPPED skill's
@@ -71,4 +75,5 @@ scaffolding a fresh repo by `/lean-doc-generator init`.
 ## Decision records
 
 See [`DECISIONS.md`](DECISIONS.md) (the index) → [`docs/adr/`](adr/) for the decisions behind this
-structure (ADR-001…005).
+structure — ADR-001…005 shaped the skill library; the `docs/` tree above is ADR-012 (repo-structure
+core) and ADR-014 (the sprint Plan/log split, which the `epic/` and `sprint/logs/` rows follow).
