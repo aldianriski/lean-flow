@@ -9,7 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
-- SPRINT-050 — Adoption Remainder — closed 2026-08-09 · CLOSE_TBD (docs-only, no release)
+- SPRINT-050 — Adoption Remainder — closed 2026-08-09 · b70ebb6 (docs-only, no release)
 - SPRINT-049 — Layer-Check Redesign — closed 2026-08-09 · 75e61a8 (PATCH pending — `/release-patch`)
 - SPRINT-048 — Epic Layer — closed 2026-08-09 · 3ff51d3 (MINOR v1.27.0)
 - SPRINT-047 — Sprint Log Split — closed 2026-08-09 · 531e073 (MINOR v1.26.0)
