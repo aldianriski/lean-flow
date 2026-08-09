@@ -8,8 +8,10 @@ status: current
 # [Project Name] — Learnings Ledger
 
 Append-only record of confirmed corrections and patterns surfaced at Sprint Close. A learning that
-**recurs (count ≥ 2)** is promoted into a *durable* rule — a `CLAUDE.md` anti-pattern, a `CONTEXT.md`
-rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promote** before planning.
+**recurs (count ≥ 2)** is promoted into a *durable* rule and marked below. The home is not a menu pick:
+ask **which flows can hit this failure**, then place the rule where all of them read — a skill red-flag
+fires inside that skill's flow alone (the placement test, DOCS_Guide §10). Reviewed at every
+**Sprint Promote** before planning.
 
 <!-- Newest first. Never edit a past entry except to bump `seen` / `count`, set `promoted`, or
      add/extend `related:` — an optional cross-link to sibling learnings (`L-NNN (one-line why)`)
@@ -28,7 +30,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 ## L-001 [tags: <tag>] [status: active]: [one line — what we got wrong or confirmed, and the fix] [CUSTOMIZE]
 - seen: Sprint-001
 - count: 1
-- promoted: no   <!-- once count ≥ 2: "yes → <CLAUDE.md anti-pattern | CONTEXT.md rule | skill red-flag>" -->
+- promoted: no   <!-- once count ≥ 2: "yes → <where>" — selected by §10's placement test, not picked from a list -->
 - related: —   <!-- optional: sibling learnings, e.g. L-007 (one-line why each); or — if none -->
 
 ---

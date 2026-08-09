@@ -28,7 +28,9 @@ lands. Two tasks, both placement questions, both wider than the plan assumed.
   answer when the enumeration says "all of them" — it is capped, so landing there displaces something,
   which is a decision rather than an append. And where the rule already appears on more than one
   surface, the duplicates get rewritten to point at the one home, because a stale second copy
-  reproduces the very failure being promoted against.
+  reproduces the very failure being promoted against. The test reaches you in three places, not one:
+  the standard, `/lean-doc-generator`'s governance checklist at promote, and the header of the
+  `LEARNINGS.md` the generator scaffolds for you.
 - **A `Mitigation:` line is treated as a hypothesis, not a plan.** The cure written on a tech-debt row
   is the filer's best guess, recorded at the moment the cost was being felt — and after a few re-reads
   it starts to read as settled, which is how it ends up carried unquestioned into a sprint's
