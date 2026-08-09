@@ -395,19 +395,38 @@ own `README.md`) and are checked with `evals/assert-noaction-park.sh "$dest"` in
 ## How to run
 
 ```sh
+# snippet-extracting harnesses — run the real shipped snippet from its doc
 sh evals/run-skill-freshness-fixtures.sh
 sh evals/run-worktree-usability-fixtures.sh
 sh evals/run-dispatch-preflight-fixtures.sh
+
+# checker harnesses — call a scripts/lib/ checker directly against fixture trees
+sh evals/run-layers-completeness-fixtures.sh
+sh evals/run-sprint-log-layout-fixtures.sh
+sh evals/run-count-claims-fixtures.sh          # SPRINT-055 T1
+sh evals/run-epic-archive-fixtures.sh          # SPRINT-055 T2
+sh evals/run-research-archive-fixtures.sh      # SPRINT-055 T3
+sh evals/run-ephemeral-intake-fixtures.sh      # SPRINT-055 T4
+sh evals/run-task-origin-fixtures.sh           # SPRINT-055 T6
+
+# opt-in selftests (slow — throwaway git repos; also run under QA_FULL=1)
 sh evals/selftest-assert-boundary-park.sh
 sh evals/selftest-assert-noaction-park.sh
 sh evals/selftest-assert-judgement-retry.sh
+sh evals/run-layers-observed-fixtures.sh
 ```
 
-Each of the first three harnesses extracts the actual snippet shipped in its target doc — between
+The **SPRINT-055 group** each pair a `scripts/lib/` checker with retained must-FAIL *and* must-PASS
+fixtures. The must-PASS controls are not decoration: without one, a checker that FAILed
+unconditionally would satisfy every must-FAIL case and still look correct. Four of the five failed on
+real pre-existing repo state on their first run against the live tree, which is both the evidence
+they work and the reason the rules they guard needed guarding (L-102).
+
+Each of the three snippet-extracting harnesses extracts the actual snippet shipped in its target doc — between
 `<!-- …:start/end -->` anchors where the doc has them, or the sole matching fenced code block where
 it doesn't — and runs it against each fixture, asserting both the exit code and the named finding
 (`harness-common.sh`). This tests the real shipped snippet, not a hand-copied duplicate that could
-silently drift out of sync with it. The last three self-test `assert-boundary-park.sh`,
+silently drift out of sync with it. The three `selftest-*` scripts self-test `assert-boundary-park.sh`,
 `assert-noaction-park.sh`, and `assert-judgement-retry.sh` respectively, against synthetic end-states
 instead — see "What's retained" above and `fixtures/judgement-only-retry/README.md`; none of those
 three assertion scripts is itself in this bare-run list, because each takes a completed real run's
