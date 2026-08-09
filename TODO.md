@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-053 closed 2026-08-09.
+> **SPRINT-054 — Rulings** → [`docs/sprint/SPRINT-054-rulings.md`](docs/sprint/SPRINT-054-rulings.md)
 
 ---
 
@@ -108,7 +108,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — Sprint history → [`CHANGELOG.md`](CHANGELOG.md) (rotated archives → `docs/changelog/`).
+_(SPRINT-054 in flight — nothing shipped yet)_ — Sprint history → [`CHANGELOG.md`](CHANGELOG.md) (rotated archives → `docs/changelog/`).
 
 ---
 
