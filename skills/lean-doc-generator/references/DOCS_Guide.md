@@ -341,6 +341,16 @@ filing one) and at **promote** (before a DoD is built on one). Two rows have now
 symptom and wrong about the cause, and in one case the proposed cure would have destroyed evidence
 (L-091).
 
+**A number inside a criterion is remembered, not measured.** Its facts-level sibling. A figure written
+into a DoD, a `TD-NNN` Summary or a Backlog `assumes:` line looks like evidence and reads as settled,
+but it was measured once — at authoring — and nothing re-measures it, so the criterion rots while its
+prose stays confident. A stated figure with no check behind it is a comment: that is how a research doc
+absorbed 39 lines over its cap across four sprints while an open row cited a count that had been wrong
+since the sprint it was filed in, and how a DoD shipped clauses that were unsatisfiable when written.
+**Re-derive a stated figure before acting on it** — at **promote** when a DoD is built on one, at the
+**TD re-review** when a row is held on one, and at **decompose/triage** when one is written into or
+groomed in a Backlog entry. One command is the whole cost (L-097).
+
 **Tech-debt aging** — at **Sprint Promote**: any `TD-NNN` unaddressed ≥ 3 sprints triggers a
 re-review prompt; `severity: high` auto-escalates to Backlog P1. Rows are never deleted — resolved
 debt is marked `status: resolved → TASK-NNN` for the audit trail.

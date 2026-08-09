@@ -144,20 +144,6 @@ status: current
     declaration is the normal shape for a multi-file task, and both sightings were caught by a human
     reading the parsed record, which is not a control.
 
-- **TD-039** severity: minor | status: resolved → SPRINT-053 T2 | created: Sprint-052
-  - Summary: `check-layers-completeness.sh`'s two completeness FAILs — `Layers completeness:
-    DoD/Acceptance implies <file>, absent from Layers:` and its `Depends-on:` twin — never name the
-    `Cites:` escape. The author who trips the gate is told only what the declaration is missing.
-  - Impact: the obvious repair from that message is to add the token to `Layers:` — declaring a touch
-    that is not one, which is exactly what the escape exists to prevent. Discovery is broken at the one
-    moment it matters. TD-036 hunted this gap on the *authoring* surfaces (the SPRINT template, `QA.md`)
-    and it was on neither, because the surface a failing author actually reads is the FAIL message.
-  - Mitigation (not yet done) — a hypothesis, per this ledger's header: append the escape to the two
-    messages (`scripts/lib/check-layers-completeness.sh:135` and `:149`). Re-derive before building —
-    confirm a FAIL naming its own escape does not read as an invitation to silence the gate. The
-    evidence for the cheap version is that the abuse is already guarded: a token in both `Cites:` and
-    `Layers:` is a contradiction with its own named FAIL.
-
 - **TD-038** severity: trivial | status: resolved → SPRINT-054 T4 | created: Sprint-050
   - Summary (**as filed, and wrong within its own sprint**): `docs/research/mattpocock.md` sits at
     117 lines against its 120 soft cap; the next re-scan breaches on contact.

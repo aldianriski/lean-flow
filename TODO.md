@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-055 closed 2026-08-09.
+> **SPRINT-056 — Silent Passes** → [docs/sprint/SPRINT-056-silent-passes.md](docs/sprint/SPRINT-056-silent-passes.md)
 
 ---
 
