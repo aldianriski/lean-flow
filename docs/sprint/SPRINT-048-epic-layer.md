@@ -67,7 +67,7 @@ sprint stamped with `epic:`, and roll that sprint's outcome back up — not mere
 - [x] `promote` sets `epic:` + appends the member row; `SPRINT.md.template` carries the field. Creation verb `/lean-doc-generator epic` added, else the decomposer's routing pointer dangled
 - [x] `close` completes the member row and closes the epic **only when every § Closed-when is `[x]`** — a member sprint closing is not an epic closing
 - [x] `.claude/CONTEXT.md` SSOT (roster + sprint model) + `README.md` artifact table reflect the layer (L-015)
-- [x] Chain **fired end-to-end on EPIC-001**: SPRINT-025/026 stamped `epic: EPIC-001`, both round-trips resolve (sprint→epic, epic→member sprints), `--epic EPIC-001` resolves by id. ~~line-neutral~~ — **constraint dissolved by T6** (110/110 → 114/140)
+- [x] Chain **fired end-to-end on EPIC-001**: SPRINT-025/026 stamped `epic: EPIC-001`, both round-trips resolve (sprint→epic, epic→member sprints), `--epic EPIC-001` resolves by id. ~~line-neutral~~ — **constraint dissolved by the cap raise earlier in this sprint** (110/110 → 114/140)
 - [x] `sh scripts/qa-check.sh` green on a bare run — 75 pass, 0 fail
 
 ### T3 — Replace the grill's "one question at a time" rule with frontier batching `[size: S · risk: med · class: decision · HITL]`
@@ -168,12 +168,12 @@ own bundled product-requirements template is orphaned, never referenced by its o
 `/task-decomposer --prd <path>` only ever consumes — exercised once end-to-end on a real PRD.
 
 **DoD:**
-- [ ] `/lean-doc-generator` gains a `prd` verb wired to its own bundled product-requirements template (no longer orphaned)
-- [ ] `--prd` disambiguated in `task-decomposer` — consumption only; synthesis becomes a pointer
-- [ ] `references/prd-and-slices.md` keeps the slicing half (tracer bullets, breakdown quiz); its PRD-template half is removed as duplication, not copied across
-- [ ] `.claude/CONTEXT.md` states the creates-vs-consumes boundary so the split is not re-litigated
-- [ ] Exercised once on a real PRD, not spec-only (L-007)
-- [ ] `sh scripts/qa-check.sh` green on a bare run
+- [x] `/lean-doc-generator prd` verb added, wired to `templates/product-requirements.md.template` — the orphan now has exactly one owner
+- [x] `--prd <path>` disambiguated — **consume only**; the durable write is handed to the generator, never done from the decomposer
+- [x] `references/prd-and-slices.md` keeps the slicing half — but its PRD format was **NOT removed**: it is a *feature* PRD (Problem · User Stories · Implementation/Testing Decisions), not a duplicate of the *project*-scoped `requirements.md` (Users · Functional/Non-functional). The DoD's "remove as duplication" premise was wrong; both are kept and the pipeline between them stated instead — see the log
+- [x] `.claude/CONTEXT.md` states the creates-vs-consumes boundary, in the roster row and its own paragraph
+- [x] **Consumer-path verification (L-016)** — this repo has no `docs/product/`, so there is no real PRD to dogfood against; the six-point mechanism trace is recorded in the log instead of a fabricated exercise
+- [x] `sh scripts/qa-check.sh` green on a bare run — 75 pass, 0 fail
 
 ## Owner-action checklist
 <!-- Omit if none. -->

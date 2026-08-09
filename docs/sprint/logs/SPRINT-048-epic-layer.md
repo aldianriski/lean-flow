@@ -175,3 +175,35 @@ sprint, is worth carrying to the Retro.
 
 Sizes after: generator 114/140 (over the old 110 — T6's raise was load-bearing, not speculative),
 decomposer 101/140, CONTEXT.md 121/130.
+
+### 2026-08-09 | complete | T7 — PRD creation moved to the generator; a DoD premise corrected
+The owner's principle is now real, not just stated: **`/lean-doc-generator` creates every core doc;
+`/task-decomposer` consumes and emits tasks.** `--prd <path>` means *consume that file*, full stop; the
+generator gained a `prd` verb wired to `templates/product-requirements.md.template`, which had been
+orphaned with zero mentions in its owning skill.
+
+**The DoD's "remove the duplicate template" premise was wrong — third L-088 this sprint.** Reading both
+formats side by side, they are not duplicates:
+
+| | `prd-and-slices.md` format | `product-requirements.md.template` |
+|---|---|---|
+| Scope | one **feature** | the **project** |
+| Sections | Problem Statement · Solution · User Stories · Implementation + Testing Decisions · Out of Scope | Problem · Users · Solution scope · Functional / Non-functional requirements · Open questions |
+| Lifetime | disposable intake scaffolding | durable §2 core file |
+
+They are a **pipeline** — *feature PRD → sanitize → `requirements.md`* — which is what
+`task-decomposer` already said ("the approved PRD's durable home is `docs/product/requirements.md` …
+sanitize before saving"). Deleting either half would have lost a real artifact. Both kept; the
+relationship is now written down in three places (generator § Creates vs consumes, the reference file's
+header, CONTEXT.md) precisely because they look similar enough to be mistaken for duplication again.
+What actually changed hands is the **write**, not the format.
+
+**Verified on the consumer path, not dogfooded (L-016).** This repo has no `docs/product/` — a plugin
+has no product requirements — so "exercised once on a real PRD" had no real input available. Rather
+than fabricate one, the mechanism was traced end to end: (1) `--prd` states consume-only · (2) the
+decomposer hands the durable write onward · (3) the generator has the verb · (4) the template is
+referenced by its owner · (5) the boundary is in the SSOT · (6) both formats are labelled distinct.
+All six confirmed. This is exactly L-016's case: absent substrate means verify the consumer path, and
+"didn't fire here" is neither broken nor fine.
+
+Sizes: generator 124/140, decomposer 106/140, CONTEXT.md 123/130.

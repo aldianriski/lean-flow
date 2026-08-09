@@ -41,6 +41,7 @@ template ship inside this skill under `${CLAUDE_SKILL_DIR}/`.
 | `/lean-doc-generator promote` | Sprint Promote (below) |
 | `/lean-doc-generator close` | Sprint Close (below) |
 | `/lean-doc-generator epic "<outcome>"` | **Open an epic** — a *multi-sprint* outcome (below). One sprint's worth of work is a sprint; an unnameable destination is fog (`/task-decomposer --fog`) until it isn't |
+| `/lean-doc-generator prd` | **Create/update `docs/product/requirements.md`** (+ `acceptance-criteria.md`) from `templates/product-requirements.md.template`. The durable, project-scoped requirements doc — distinct from the per-feature PRD `/task-decomposer` synthesizes at intake, whose approved residue is sanitized *into* this file |
 | `/lean-doc-generator migrate` | **Adopt + clean** existing docs (dev-flow · adlc-flow · any layout) — align placement/format/wiring, **consolidate dupes, retire dead docs**. Plan → approve → apply. **Re-runnable as an update sync** (report standard/template deltas, never clobber). |
 | `/lean-doc-generator init` | **Scaffold a fresh repo** (greenfield) — scope-interactive: base tier always + higher tiers by repo type; docs + the 3-file safe-scaffold allowlist only (never `settings.json`). The twin of migrate. |
 
@@ -71,6 +72,15 @@ allowlist → `${CLAUDE_SKILL_DIR}/references/init.md`.
 6. **Template-load protocol** *(this is the step that, when skipped, produces wrong docs)* — for each core file, **Read `${CLAUDE_SKILL_DIR}/templates/<X>.md.template` BEFORE writing**. Match its frontmatter order, section order, and placeholders; replace `[CUSTOMIZE]` / `[bracket]` tokens with real content. If the template is missing, WARN and fall back to `DOCS_Guide.md §2` — never hard-stop. Template wins on any divergence; note the correction inline.
 7. **Write** — target the canonical placement (DOCS_Guide §2: root for README/TODO · `.claude/` for AI-context · `docs/` for the rest); enforce the line cap and the ownership header on every file touched. **If the project maintains a generated knowledge index, regenerate it after writing a metadata-carrying doc (LEARNINGS · ADR · research)** — a derived view, never hand-edited (lean-flow itself: `sh scripts/gen-index.sh` → `docs/knowledge-index.md`).
 8. **Close** — list docs delivered + headers to verify + recommended follow-ups.
+
+## Creates vs consumes (the boundary)
+
+**This skill creates every core doc; `/task-decomposer` consumes them and emits tasks.** Two artifacts
+share the word "PRD" and are not the same thing: the **feature PRD** is a *working* intake artifact
+(Problem · User Stories · Implementation/Testing Decisions) that `/task-decomposer` synthesizes to slice
+against — not a §2 core file; **`docs/product/requirements.md`** is the durable, project-scoped core doc
+this skill owns. The pipeline is *feature PRD → sanitize → requirements.md*, never a second copy of the
+same content. `--prd <path>` on the decomposer therefore means **consume this file**, nothing else.
 
 ## Epic (a multi-sprint outcome)
 

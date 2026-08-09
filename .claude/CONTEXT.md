@@ -22,7 +22,7 @@ Every skill works standalone; the loop is just the order they reward most togeth
 | `/prime` | entry | ordered context load + health check (read-only) — incl. a `Skills:` freshness row: installed base-dir version vs repo manifest (report, never a block) |
 | `/lean-doc-generator` | plan | WHY/WHERE docs · ADRs · **epic** (open a multi-sprint outcome) · sprint promote/close · **migrate** (adopt + clean) · **init** (scaffold fresh) — bundles templates + standard; **creates** every core doc, `/task-decomposer` consumes them |
 | `/orchestrator` | build | gate-driven execution — `quick` · `mvp` · `sprint-bulk` |
-| `/task-decomposer` | feed | intent / ticket / PRD → `TASK-NNN` (or a **fog-map** when work's too foggy to plan) — **the detailed grill lives here** (intake) |
+| `/task-decomposer` | feed | intent / ticket / PRD / epic-slice → `TASK-NNN` (or a **fog-map** when work's too foggy to plan) — **the detailed grill lives here** (intake). **Consumes docs, never creates them** |
 | `/triage` | groom | re-prioritise + state the Backlog; flag stale/dupe/conflict; route rejects to `.out-of-scope/` |
 | `/prototype` | explore | throwaway code to answer one design question; capture → ADR/PRD, delete |
 | `/tdd` | test-first | build NEW behaviour test-first — vertical-slice red-green-refactor |
@@ -91,6 +91,8 @@ Route by **nature, not size — ambiguity & consequence up, volume & repetition 
 - **Streams** (optional) — parallel streams run one active sprint *each* (`stream:` frontmatter · one pointer per stream); cross-stream file overlap → coordinate, never parallel-build. **Disjoint tasks may parallel-build in isolated worktrees** (one `Agent(isolation:"worktree")` per task + coordinator merge-back queue → `orchestrator/references/dispatch.md`); L-042's per-hunk staging rule (`git add -p` + verify `git diff --cached`, never a plain `git add <shared>` over another's WIP) binds **intra-tree** — one shared working tree, or the coordinator staging merge resolutions. Single-stream omits `stream:`.
 
 ## Doc standard
+
+**Creates vs consumes** — `/lean-doc-generator` creates every core doc (`epic` · `prd` · sprint · ADRs · `migrate`/`init`); `/task-decomposer` consumes them and emits tasks. Two things share the name "PRD": the **working feature PRD** is disposable intake scaffolding the decomposer synthesizes to slice against (not a §2 file), while **`docs/product/requirements.md`** is the durable project-scoped core doc — pipeline is *feature PRD → sanitize → requirements.md*, and that write is the generator's. `--prd <path>` always means *consume*.
 
 LEAN standard on the **TemiDev repo-structure core** (ADR-012; WHY/WHERE, never HOW) → `skills/lean-doc-generator/references/DOCS_Guide.md`: §2 lifecycle-bound core · §6 four-tier scaffold (cap-hit → split into tree) · §12 Git boundary; templates → `…/templates/` (32 core + 2 non-core). Domain glossary lives **here** (canonical term + `_Avoid_:` synonyms). ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
 

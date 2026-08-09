@@ -1,8 +1,16 @@
 # PRD & tracer-bullet slices
 
-Used by `task-decomposer` when an intent is large (a feature, epic, or `--prd`). Two stages —
-synthesize a PRD, then cut it into tracer-bullet slices that become `TASK-NNN` Backlog entries.
-Output is **local**: `TODO.md` Backlog, never an external tracker.
+Used by `task-decomposer` when an intent is large (a feature, an epic slice, or `--prd`). Two stages —
+synthesize a working feature PRD, then cut it into tracer-bullet slices that become `TASK-NNN` Backlog
+entries. Output is **local**: `TODO.md` Backlog, never an external tracker.
+
+> **Scope of the format below — read this before using it.** It is a **working feature PRD**: intake
+> scaffolding you slice against, *not* a DOCS_Guide §2 core file. It is deliberately different from
+> `docs/product/requirements.md`, which is the durable, **project**-scoped requirements doc owned by
+> `/lean-doc-generator prd` (Users · Functional / Non-functional requirements). One is per-feature and
+> disposable; the other is per-project and durable. The pipeline runs **feature PRD → sanitize →
+> `requirements.md`**, and that write is the generator's, never this skill's. They look similar enough
+> to be mistaken for duplicates; keeping both is deliberate.
 
 ## Synthesize vs interview
 
@@ -10,7 +18,7 @@ If the conversation already contains the spec (a design discussion just happened
 PRD from context — do not re-interview**. Interview only to fill genuine gaps. Use the project's
 domain glossary (`CONTEXT.md`) for vocabulary throughout, and respect ADRs in the area.
 
-## PRD template
+## Working feature-PRD format (intake scaffolding — not a core doc)
 
 ```
 # <Feature> — PRD

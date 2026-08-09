@@ -74,12 +74,17 @@ normally. Full artifact + loop → `${CLAUDE_SKILL_DIR}/references/fog-map.md`.
 Set the initial `state:` (`ready` if the done-when is concrete, else `needs-info`). Re-prioritising,
 re-stating, and pruning the backlog later is `/triage`'s job — don't re-rank existing tasks here.
 
-**Large features / `--prd`**: synthesize a PRD first (Problem · Solution · exhaustive User Stories ·
-Implementation + Testing Decisions · Out-of-scope · seams), get approval, then decompose. Full PRD
-template + seams + the breakdown quiz → `${CLAUDE_SKILL_DIR}/references/prd-and-slices.md` (`${CLAUDE_SKILL_DIR}` resolves to this skill's install directory at load time). The approved PRD's
-durable home is `docs/product/requirements.md` (+ acceptance criteria →
-`docs/product/acceptance-criteria.md`), per DOCS_Guide §2 — sanitize before saving, never the
-conversation alone. Task output stays local (TODO.md Backlog) — no external issue tracker.
+**`--prd <path>` = CONSUME that file.** It never means "write one" — creation of core docs belongs to
+`/lean-doc-generator`. Read the PRD, then decompose it; do not re-interview what it already settles.
+
+**Large features with no PRD yet**: synthesize a **working feature PRD** (Problem · Solution ·
+exhaustive User Stories · Implementation + Testing Decisions · Out-of-scope · seams) and get approval,
+then decompose against it. That artifact is *intake scaffolding*, not a §2 core file — format + seams +
+the breakdown quiz → `${CLAUDE_SKILL_DIR}/references/prd-and-slices.md` (`${CLAUDE_SKILL_DIR}` resolves to this
+skill's install directory at load time). Its approved residue belongs in the durable, project-scoped
+`docs/product/requirements.md` (+ `acceptance-criteria.md`) — **hand that write to
+`/lean-doc-generator prd`**, sanitized, never the raw conversation and never written from here. Task
+output stays local (TODO.md Backlog) — no external issue tracker.
 
 ## Hard rules
 
