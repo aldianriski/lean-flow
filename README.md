@@ -359,8 +359,8 @@ skills/           14 skills — /flow conductor + 12 stages + /council (auto-dis
   prototype/references/       logic.md · ui.md
   council/                    opt-in agent decision aid
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · roster — SSOT)
-docs/             architecture/ · deployment/ · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
-TODO.md · TECH-DEBT.md · README.md · CHANGELOG.md
+docs/             architecture/ · development/ · deployment/ · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
+TODO.md · TECH-DEBT.md · README.md · CHANGELOG.md · AGENTS.md · SECURITY.md · LICENSE
 ```
 
 </details>

@@ -50,7 +50,7 @@ gating → §6.
 
 | File | Tier | Reader | Cap | Create ← | Update ← |
 |---|---|---|---|---|---|
-| `product/requirements.md` | base | Dev / PM | 150 soft | init, or first sanitized PRD lands | a requirement is approved / changed (via PR) |
+| `product/requirements.md` | base | Dev / PM | 150 soft | init, or first sanitized PRD lands — **skipped on an existing repo whose AI-context files already ARE the spec** (`CONTEXT.md` carries the behaviour, `CLAUDE.md` the principles + DoD): a third copy is a second SSOT. Greenfield `init` is unaffected — nothing owns the content yet | a requirement is approved / changed (via PR) |
 | `product/acceptance-criteria.md` | base | Dev / QA | 120 soft | with requirements | acceptance criteria change |
 | `architecture/overview.md` *(was `docs/ARCHITECTURE.md`)* | base | Tech lead | 150 | init (always) | major structural change |
 | `architecture/data-flow.md` | backend, or overview cap-split | Dev | 120 | a non-trivial data path exists | that flow changes |

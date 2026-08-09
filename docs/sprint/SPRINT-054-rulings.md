@@ -36,10 +36,10 @@ scope-change entry, not a silent extra task.
 ### T1 — Rule on the six absent base-tier docs `[size: M · risk: low · class: decision · HITL]`
 Layers: `CONTRIBUTING.md` · `SECURITY.md` · `AGENTS.md` · `docs/product/requirements.md` ·
     `docs/product/acceptance-criteria.md` · `docs/development/setup.md` · `README.md` ·
-    `.claude/CLAUDE.md` · `docs/architecture/overview.md`
+    `.claude/CLAUDE.md` · `docs/architecture/overview.md` ·
+    `skills/lean-doc-generator/references/DOCS_Guide.md`
 Depends-on: none
-Cites: `skills/lean-doc-generator/references/DOCS_Guide.md` · `skills/lean-doc-generator/templates/` ·
-    `scripts/qa-check.sh`
+Cites: `skills/lean-doc-generator/templates/` · `scripts/qa-check.sh`
 
 TASK-165, unblocked at the SPRINT-053 close. These six are the base-tier rows lean-flow does not have
 and cannot blame on absent substrate — the substrate question was settled at SPRINT-053 T1 and took
@@ -53,19 +53,22 @@ naming why its absence causes no repeated mistake — and a reader can tell from
 six lean-flow deliberately does without, and why.
 
 **DoD:**
-- [ ] Confirm A1 at G2 — re-check the six against `DOCS_Guide` §6's base row, which SPRINT-053 T1 made
+- [x] Confirm A1 at G2 — re-check the six against `DOCS_Guide` §6's base row, which SPRINT-053 T1 made
       authoritative; if any is in fact substrate-gated, it drops out here rather than being exempted
-- [ ] Per row, apply LAW 1 **explicitly**: name the repeated interruption or mistake its absence
+- [x] Per row, apply LAW 1 **explicitly**: name the repeated interruption or mistake its absence
       causes, or record that there is none. Verdict is `create` or `exempt` — never left silent
-- [ ] Every `create` renders from its template under `skills/lean-doc-generator/templates/` before
+- [x] Every `create` renders from its template under `skills/lean-doc-generator/templates/` before
       writing (Step 6 is mandatory — the named cause of wrong docs)
-- [ ] Every `exempt` is recorded in the home chosen at G2 (A2), not in this sprint file alone — a
-      closed archive is not a lookup surface
-- [ ] **Consumer check (L-015)** — all six are consumer-facing; judge what lands as a consumer who
+- [x] Every `exempt` is recorded in `docs/architecture/overview.md` § Boundaries (A2, ruled at G2), not
+      in this sprint file alone — a closed archive is not a lookup surface
+- [x] An exemption on a row `DOCS_Guide` §2 marks `init (always)` also amends that row's create-trigger
+      to state the condition — the standard and this repo do not get to disagree (2026-08-09
+      scope-change; L-096)
+- [x] **Consumer check (L-015)** — all six are consumer-facing; judge what lands as a consumer who
       installs the plugin sees it, not against dogfooding
-- [ ] `README.md` docs-map, `.claude/CLAUDE.md` § File Structure and `docs/architecture/overview.md`
+- [x] `README.md` docs-map, `.claude/CLAUDE.md` § File Structure and `docs/architecture/overview.md`
       § Directory structure reflect **whatever actually landed** — and nothing that did not
-- [ ] `sh scripts/qa-check.sh` re-run bare immediately before the commit (L-089)
+- [x] `sh scripts/qa-check.sh` re-run bare immediately before the commit (L-089)
 
 ### T2 — Close the ❌-negation question by reading `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/research/mattpocock.md` · `.claude/CLAUDE.md`
@@ -155,9 +158,9 @@ re-parked.
 - **A1** — The six rows are genuinely not substrate-gateable; checked at the SPRINT-053 G2 against all
   18 base rows. *Confirm: T1's first DoD line, re-checked against `DOCS_Guide` §6's base row — the
   SPRINT-053 change is what made that row the authority.*
-- **A2** — The home for an `exempt` verdict is **undecided** (candidates: `docs/architecture/overview.md`
-  § Boundaries · `.claude/CLAUDE.md`). *Confirm: T1's G2 design step — it depends on which rows exempt,
-  so it is a dependent question and serialises there rather than being asked at promote.*
+- **A2** — ~~The home for an `exempt` verdict is undecided.~~ **CONFIRMED at G2, 2026-08-09** —
+  `docs/architecture/overview.md` § Boundaries, which already answers "what lean-flow does not own" and
+  has room (79 of 150). `.claude/CLAUDE.md` was rejected: at 80 of 80 it would displace an anti-pattern.
 - **A3** — Our ❌ rows already pair each trap with a positive rule, which the research doc notes blunts
   the negation effect. *Confirm: T2's read of `.claude/CLAUDE.md` § Anti-Patterns against the sources.*
 - **A4** — Gates and push-right are not actually opposed — ours approve direction, push-right defers
@@ -173,6 +176,12 @@ re-parked.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `AGENTS.md` | T1 | created — `.codex-plugin/` + `.kimi-plugin/` exist, so non-Claude agents work here with no instructions at all | Low | 11 lines vs ~10 cap; footer ownership per §3 |
+| `SECURITY.md` | T1 | created — MIT plugin installed into others' dev environments; 6 of 14 skills declare unscoped `Bash` and no reporting channel existed | Low | 72 ≤ 80 cap; tool-grant table verified against `allowed-tools:` in all 14 skills |
+| `docs/development/setup.md` | T1 | created — three documented recurring frictions (L-067/L-081 env trap · L-021 staleness · `QA_FULL`) are exactly LAW 1's bar | Low | 73 ≤ 100 cap; commands run as written |
+| `docs/architecture/overview.md` | T1 | § Boundaries gains the three exemptions with reason + revisit trigger (A2 home); dir map gains `development/`, `AGENTS.md`, `SECURITY.md`, `LICENSE` | Low | 92 ≤ 150 cap; qa-check ownership + structure re-read (L-009) |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §2 `product/requirements.md` create-trigger states the second-SSOT condition — consumer-facing, authorised by the 2026-08-09 scope-change | Med | greenfield `init` explicitly unaffected; no repo-specific path in the clause (L-015) |
+| `README.md` | T1 | repo-layout block reflects what landed | Low | structure re-read after the edit (L-009) |
 
 ## Retro
 
