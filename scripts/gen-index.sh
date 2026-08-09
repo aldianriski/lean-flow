@@ -37,9 +37,14 @@ grep -E '^## L-[0-9]+ \[tags:' "$LEARN" 2>/dev/null | while IFS= read -r line; d
   printf '%s\t%s\t%s\t%s\t%s\n' learn "$id" "LEARNINGS.md" "$tg" "-" >> "$entries"
 done
 
-for f in "$ROOT"/docs/adr/ADR-*.md "$ROOT"/docs/research/*.md; do
+# docs/research/archive/ is included deliberately (SPRINT-055 T3): a superseded verdict is usually
+# the WHY-trail for whatever replaced it, so dropping it from the index at archive time would make
+# the trail findable only by knowing the path. Archived entries are marked so the index does not
+# present a spent verdict as current.
+for f in "$ROOT"/docs/adr/ADR-*.md "$ROOT"/docs/research/*.md "$ROOT"/docs/research/archive/*.md; do
   [ -f "$f" ] || continue
   id=$(fm "$f" id); [ -n "$id" ] || continue
+  case "$f" in */research/archive/*) id="$id (archived)" ;; esac
   tg=$(listwords "$(fm "$f" tags)")
   dm=$(fm "$f" domain); [ -n "$dm" ] || dm="-"
   link=$(printf '%s' "$f" | sed -E "s#^$ROOT/docs/##")

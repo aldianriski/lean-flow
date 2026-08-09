@@ -81,6 +81,29 @@ else
   fi
 fi
 
+# --- 2c. Research retention (DOCS_Guide section 11) ---------------------------------------------
+# close's compaction sweep pointed at an "or archive" target §11 never defined (SPRINT-055 T3).
+# Delegates to scripts/lib/check-research-archive.sh, covered by evals/run-research-archive-
+# fixtures.sh. Conservative by design: supersession alone does not license archiving, because a spent
+# verdict is usually the WHY-trail for whatever replaced it.
+ra_script="scripts/lib/check-research-archive.sh"
+if [ ! -f "$ra_script" ]; then
+  bad "research archive: checker not found at $ra_script"
+else
+  ra_out=$(sh "$ra_script" "$ROOT" 2>&1); ra_code=$?
+  printf '%s\n' "$ra_out"
+  ra_pass=$(printf '%s\n' "$ra_out" | grep -cE '^PASS')
+  ra_fails=$(printf '%s\n' "$ra_out" | grep -cE '^FAIL')
+  pass=$((pass + ra_pass))
+  if [ "$ra_code" -ne 0 ]; then
+    if [ "$ra_fails" -gt 0 ]; then
+      fail=$((fail + ra_fails))
+    else
+      bad "research archive: checker exited $ra_code without reporting a FAIL line"
+    fi
+  fi
+fi
+
 # --- 3. Frontmatter / ownership presence ------------------------------------
 has_field() { grep -qE "^$2:" "$1"; }
 
@@ -326,7 +349,7 @@ done
 # the selftests, yet it stays always-on: it's cheap (extracts + diffs, no throwaway repos), and
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh"
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh"
 eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
 # run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
 # run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via

@@ -156,3 +156,36 @@ one had the same cause — a file invented during implementation that a promote-
 not have named (TD-022). Leg 15 is catching them all, which is the system working, but three in two
 tasks suggests the cost is in writing `Layers:` at promote as though implementation were already
 known, rather than in the checker.
+
+### 2026-08-09 | surprise | T3's premise was half wrong, and the design got better for it
+
+**A2 confirmed and sharpened.** The trigger is not a judgement call to invent: `status: superseded`
+is already a documented frontmatter state, and `templates/RESEARCH.md.template` already instructs
+*"Once a decision is built on it, mark `status: superseded` rather than editing it."* The supersede
+half of `close`'s sweep line was real all along; only the retention leg was missing.
+
+**The accumulation premise was wrong.** T3 was scoped against "25 research files and no trigger". The
+real count is **27, of which 26 are `status: current` and exactly one is `superseded`**. Research docs
+are not piling up in a spent state — almost nothing ever reaches one. Owner ruled: ship the retention
+leg as scoped and record the fire-rate as a finding rather than re-scoping toward what drives a doc
+to `superseded`. Recorded here as that finding.
+
+**Archiving had a consequence nobody had priced.** `gen-index.sh` globs `docs/research/*.md`
+non-recursively, so an archived doc would have silently dropped out of `docs/knowledge-index.md` —
+and a superseded verdict is usually the WHY-trail for whatever replaced it. Owner chose to keep
+archived docs in the index, marked `(archived)`. The generator now includes `research/archive/` and
+suffixes the entry.
+
+**The rule's verdict on real input is "don't archive anything."** `behavioral-eval-feasibility.md` is
+superseded but still cited by `evals/README.md` and by `graph-engineering.md` (itself `status:
+current`), so the conservative gate correctly leaves it in place. A retention rule that moves zero
+files today is the right answer, not a gap — which is exactly why both must-PASS controls are
+retained alongside the three must-FAIL cases.
+
+**Verified rather than assumed (L-016).** The repo cannot dogfood the gen-index archive path, since
+it has no archived research. Exercised directly instead: a temporary archived doc produced
+`[temp-index-probe (archived)](research/archive/temp-index-probe.md)` in both the tag and domain
+sections, then was removed and the index regenerated to a clean diff.
+
+**§ Plan edit:** T3 `Layers:` gains `scripts/lib/check-research-archive.sh`, `scripts/gen-index.sh`
+and `scripts/qa-check.sh`. Fourth `Layers:` correction in three tasks — same TD-022 cause each time.

@@ -72,7 +72,7 @@ and EPIC-001 has actually moved.
 - [x] Fixture retained and wired into `qa-check.sh`, not deleted with the prototype (TD-012)
 
 ### T3 — Give docs/research/ a retention rule and an archive target `[size: M · risk: low · class: decision · HITL]`
-Layers: `skills/lean-doc-generator/references/DOCS_Guide.md` §2 + §11 · `skills/lean-doc-generator/SKILL.md` (compaction sweep) · `docs/architecture/overview.md` · `evals/`
+Layers: `skills/lean-doc-generator/references/DOCS_Guide.md` §2 + §11 · `skills/lean-doc-generator/SKILL.md` (compaction sweep) · `docs/architecture/overview.md` · `scripts/lib/check-research-archive.sh` · `scripts/gen-index.sh` · `scripts/qa-check.sh` · `evals/`
 Depends-on: T2 (shared file — see D1)
 Research docs are the one class `close` names in its compaction sweep ("superseded research
 → supersede note or archive") while §11 has no row for it, so "archive" resolves to nowhere. Twenty-five
@@ -82,11 +82,11 @@ live files and no trigger. Design the trigger before writing it: supersession is
 points at it, and `close`'s sweep line resolves to that target.
 
 **DoD:**
-- [ ] Trigger + target decided and recorded (a D-row if it is hard-to-reverse and surprising — §4)
-- [ ] §11 row added; §2 research row points at it
-- [ ] `close`'s compaction-sweep line names the resolved target instead of an undefined one
-- [ ] `docs/architecture/overview.md` directory tree shows the archive path
-- [ ] A must-FAIL fixture: archiving a research doc still cited by a live ADR or sprint → refused with
+- [x] Trigger + target decided and recorded (a D-row if it is hard-to-reverse and surprising — §4)
+- [x] §11 row added; §2 research row points at it
+- [x] `close`'s compaction-sweep line names the resolved target instead of an undefined one
+- [x] `docs/architecture/overview.md` directory tree shows the archive path
+- [x] A must-FAIL fixture: archiving a research doc still cited by a live ADR or sprint → refused with
       its named finding (L-058)
 
 ### T4 — Name the end-of-life for both ephemeral intake artifacts `[size: S · risk: low · class: decision · HITL]`

@@ -34,6 +34,8 @@ docs/             architecture/ · development/ · deployment/ · adr/ · DECISI
   sprint/           SPRINT-NNN-<slug>.md (Plan, 400 hard) · logs/ (Execution Log, uncapped — ADR-014)
                     · archive/ + archive/logs/ (the pair moves together at close) · INDEX.md
   changelog/        CHANGELOG-<version>.md — rotated out of root at each new MINOR (§11)
+  research/         <slug>.md · archive/ — a spent verdict moves there once `status: superseded`
+                    AND nothing live cites it; it stays in the generated index, marked (§11)
 scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launcher) · lib/ (extracted checkers)
                                                 maintainer tooling for the REPO itself (ADR-008)
 evals/            must-FAIL/must-SKIP fixtures + assertion scripts guarding a SHIPPED skill's
