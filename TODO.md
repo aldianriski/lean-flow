@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-052 closed 2026-08-09.
+> **SPRINT-053 — Surface Truth** → [`docs/sprint/SPRINT-053-surface-truth.md`](docs/sprint/SPRINT-053-surface-truth.md)
 
 ---
 

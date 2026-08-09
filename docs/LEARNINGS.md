@@ -39,9 +39,10 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 ---
 
 ## L-094 [tags: process] [status: active]: **Before deferring a question for lack of evidence, check what *kind* of question it is — a capability question wearing a cost question's clothes will never accumulate the evidence it is waiting for.** "Is skill self-fork worth the per-run fork cost over runtime invocation?" sat open across three consecutive research scans, each closing with "no new evidence either way". The framing made that inevitable: nobody keeps a fork-cost measurement lying around, and taking one needs a paid dispatch run, so every scan correctly observed that nothing had changed and moved on. The question was never about cost. Claude Code **serializes concurrent invocations of the same forked skill**, and lean-flow's fan-out runs one procedure skill across N tasks at once — so the mechanism removes the concurrency it was being considered for, and one documentation read settles it. What made the deferral self-perpetuating is that each scan re-examined the *evidence* and never the *shape of the question*. The check is cheap and belongs at the moment of deferral, not the third revisit: ask what class of fact would close this — a measurement, a documented behaviour, a judgement call — and if it is a documented behaviour, go read the documentation instead of writing "no new evidence". A deferral with a written kill-switch (L-068) stops a question drifting toward never; this stops one drifting toward *unanswerable* when it was never hard.
-- seen: Sprint-050
-- count: 1
-- promoted: no
+- seen: Sprint-050, **Sprint-052**
+- count: 2
+- promoted: no — **due now**, the `count ≥ 2` trigger fired at the SPRINT-053 promote
+- Sprint-052's occurrence: both P3 backlog tasks sat `needs-info` behind "unblock when a measurable signal is identified" — TASK-155 (does the ❌ house style backfire) and TASK-159 (push-right vs gate-before-work). Neither signal was ever going to arrive: the first is a **documented-behaviour** question with existing literature, the second a **judgement call** about our own gate placement with no instrument. Two tasks were parked indefinitely behind an unarrivable class of evidence, and naming the class took one pass and unblocked both. Same shape as the skill-self-fork deferral, now at a different altitude — a *backlog state* rather than a research scan.
 - related: L-068 (a deferral needs a written kill-switch) · L-087 (test the mechanism, don't infer it) · L-017 (delta over existing surface) · `.out-of-scope/skill-self-fork.md`
 
 ---
