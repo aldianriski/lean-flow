@@ -97,12 +97,19 @@ nothing since has changed the verdict.
 
 **Closed** — every scan-1 and scan-2 keeper shipped (see the verdict block above).
 
+**Closed at SPRINT-050 T2 — mechanism B vs C.** Skill self-fork **rejected** for execution dispatch;
+ADR-010's spawn-with-brief (C) stands, and ADR-010 was deliberately not edited. The binding constraint
+was never the per-run cost the question had been framed around: Claude Code **serializes concurrent
+invocations of the same forked skill**, and our fan-out runs one procedure skill across N tasks at
+once, so B removes the concurrency it was being considered for. Trail, evidence, revisit-if and a
+dated expiry → [`.out-of-scope/skill-self-fork.md`](../../.out-of-scope/skill-self-fork.md).
+
 **Still open**
-- **Mechanism B vs C** — is skill self-fork (`context: fork`) worth the per-run cost over runtime
-  invocation? Open since scan 1, unchanged through two re-scans. → SPRINT-050 T2.
 - **Negation in anti-patterns** — `writing-for-agents` argues prohibition activates the forbidden
   behaviour, cutting against `.claude/CLAUDE.md`'s ❌ house style. Needs evidence, not preference. →
   TASK-155 (`needs-info`).
+- **Push right** — `loop-me` argues for deferring a human checkpoint as far as it will go, against our
+  gate-*before*-work model. Same shape as the negation question: a real tension, needs evidence.
 
 ## Not scanned
 

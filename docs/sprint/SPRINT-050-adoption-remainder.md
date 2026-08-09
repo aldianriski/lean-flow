@@ -106,7 +106,8 @@ assumption that removed five skills from the boundary list. Cheap to settle defi
 - [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ### T2 — Settle mechanism B vs C, with an expiry if it is deferred again `[size: S · risk: low · class: decision · HITL]`
-Layers: `docs/research/mattpocock.md` · `docs/adr/ADR-010-model-tier-dispatch.md`
+Layers: `docs/research/mattpocock.md` · `docs/adr/ADR-010-model-tier-dispatch.md` ·
+    `.out-of-scope/skill-self-fork.md`
 Depends-on: T1 T3
 Cites: `scripts/qa-check.sh`
 
@@ -121,15 +122,16 @@ directly: write what would have to happen and by when, so the null result is its
 its cost stated, or by a rejection carrying a named revisit-if condition and a dated expiry.
 
 **DoD:**
-- [ ] The question is answered in one of exactly two shapes: **adopt B** (with the per-run fork cost
+- [x] The question is answered in one of exactly two shapes: **adopt B** (with the per-run fork cost
       measured, not estimated — a stated figure that was never measured is L-088's trap), or **reject
-      B** with a revisit-if condition and a dated expiry after which it auto-closes
-- [ ] If rejected, the trail goes to `.out-of-scope/` following the pattern TASK-047 and TASK-120 set,
-      so the decision is retrievable rather than only absent
-- [ ] ADR-010 amended **only if** the answer changes it — an unchanged ADR is the correct outcome of a
-      rejection and must not be edited to look busy
-- [ ] § Still open no longer lists mechanism B vs C
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+      B** with a revisit-if condition and a dated expiry after which it auto-closes — **rejected**, on
+      a documented capability constraint rather than a cost estimate; the cost stays honestly unmeasured
+- [x] If rejected, the trail goes to `.out-of-scope/` following the pattern TASK-047 and TASK-120 set,
+      so the decision is retrievable rather than only absent — `.out-of-scope/skill-self-fork.md`
+- [x] ADR-010 amended **only if** the answer changes it — an unchanged ADR is the correct outcome of a
+      rejection and must not be edited to look busy — **not amended**, deliberately
+- [x] § Still open no longer lists mechanism B vs C
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ## Decisions (pre-locked)
 

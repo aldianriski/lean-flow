@@ -134,6 +134,49 @@ their verdicts already appear in the header block. Recorded in TD-033's resoluti
 
 **Verification.** `scripts/qa-check.sh` bare: green, re-run after the DoD ticks and this entry (L-089).
 
+### 2026-08-09 | complete | T2 — mechanism B rejected; the question had been framed on the wrong axis for three scans
+
+**Why it stayed open so long: it was framed as a cost question.** "Is skill self-fork worth the
+per-run fork cost over runtime invocation?" — nobody had a fork-cost measurement, and taking one needs
+a paid dispatch run, so three scans in a row wrote "no new evidence either way" and moved on. The
+framing was wrong. It is a **capability** question, and the Claude Code skills documentation answers it
+outright. Three scans of deferral bought nothing that one documentation read would not have.
+
+**The decisive fact:** Claude Code waits for a forked skill's result "when you invoke a forked skill
+while an earlier invocation of **the same skill** is still running". lean-flow's parallel worktree
+dispatch runs *one procedure skill across N tasks at once* — N invocations of `/tdd` or `/diagnose`.
+Under B those queue. B removes the concurrency it was being considered for.
+
+Supporting: a backgrounded fork gets the narrower background-subagent tool set, and the full set needs
+`background: false`, which blocks the invoking turn — concurrency or full tools, not both, while our
+dispatched tasks edit files, run the gate and commit. And B's headline advantage ("no agent definition
+file") is already true of C, which dispatches a *built-in* `general-purpose` agent — B was never
+buying what it was credited with.
+
+**Two things recorded against my own first reading** (L-087 — the mechanism welded to a symptom is the
+first thing to test). I initially read "the fork won't have access to your conversation history" as
+disqualifying, i.e. that a fork cannot be briefed. **That is false**: `$ARGUMENTS` / `$0` / `$name`
+substitute into the skill content that becomes the prompt, so a brief passes fine. Checking before
+writing it into a rejection is the only reason the trail is accurate. And the per-run fork cost remains
+**unmeasured** — it simply stopped being the binding constraint, which is stated in the trail rather
+than quietly replaced by the constraint that did decide it.
+
+**ADR-010 not amended, deliberately.** The DoD called an unchanged ADR the correct outcome of a
+rejection, and it is: spawn-with-brief is unchanged. Trail with revisit-if and a dated
+**SPRINT-060 expiry** → `.out-of-scope/skill-self-fork.md` (L-068: the null result is itself a verdict).
+
+**Both layer checks fired on this task, correctly, and it is worth recording as the redesign's first
+live catch.** The trail file was created during implementation and named in T2's DoD prose only as a
+directory ("the trail goes to `.out-of-scope/`"), never as a path in `Layers:`. The completeness leg
+caught it from the prose; the **observed** leg caught it from the git diff — which is the
+invented-during-implementation shape TD-022 was filed for and the prose-derived source structurally
+cannot see. `Layers:` was corrected to declare the file, which it genuinely touches; this is completing
+an incomplete declaration, not a scope shift, so no ruling was sought. Notably the `Cites:` escape was
+**not** reached for — the file is touched, not cited, and using the escape here would have been the
+blanket-silencer abuse its contradiction fixture exists to prevent.
+
+**Verification.** `scripts/qa-check.sh` bare: green, re-run after the DoD ticks and this entry (L-089).
+
 ### 2026-08-09 | complete | T3 — remaining 13 mapped, 0 keepers, boundary closed
 
 A zero-keeper result, which is a finding rather than a wasted task: the two directories both prior
