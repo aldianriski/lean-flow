@@ -20,7 +20,7 @@ Every skill works standalone; the loop is just the order they reward most togeth
 |---|---|---|
 | `/flow` | **conductor** | opt-in — drives the whole loop, calling stage-skills in sequence; enforces gates + governance, never auto-approves |
 | `/prime` | entry | ordered context load + health check (read-only) — incl. a `Skills:` freshness row: installed base-dir version vs repo manifest (report, never a block) |
-| `/lean-doc-generator` | plan | WHY/WHERE docs · ADRs · sprint promote/close · **migrate** (adopt + clean) · **init** (scaffold fresh) — bundles templates + standard |
+| `/lean-doc-generator` | plan | WHY/WHERE docs · ADRs · **epic** (open a multi-sprint outcome) · sprint promote/close · **migrate** (adopt + clean) · **init** (scaffold fresh) — bundles templates + standard; **creates** every core doc, `/task-decomposer` consumes them |
 | `/orchestrator` | build | gate-driven execution — `quick` · `mvp` · `sprint-bulk` |
 | `/task-decomposer` | feed | intent / ticket / PRD → `TASK-NNN` (or a **fog-map** when work's too foggy to plan) — **the detailed grill lives here** (intake) |
 | `/triage` | groom | re-prioritise + state the Backlog; flag stale/dupe/conflict; route rejects to `.out-of-scope/` |
@@ -84,6 +84,7 @@ Route by **nature, not size — ambiguity & consequence up, volume & repetition 
 
 ## Sprint model
 
+- **`docs/epic/EPIC-NNN-<slug>.md`** (+ lazy `INDEX.md`) = a **multi-sprint outcome** with its own decision set — `EPIC.md.template`; 200 soft. Admission test in order: outcome not nameable → fog (`--fog`) · nameable but fits one sprint → a sprint · otherwise an epic. Created by `/lean-doc-generator epic`, **consumed** by `/task-decomposer --epic` (which never creates one). `promote` stamps `epic:` on a member sprint and appends its row; `close` completes that row and closes the epic only when every § Closed-when condition is `[x]` — a member sprint closing is not an epic closing.
 - **`TODO.md`** = Backlog pool (P0–P3); § Active Sprint is a pointer. **`TECH-DEBT.md`** (root) = the `TD-NNN` ledger — filed at close, aged at promote. `/triage` grooms both.
 - **`docs/sprint/SPRINT-NNN-<slug>.md`** = the active sprint (`SPRINT.md.template`), **400 hard**: Theme · Scope · Plan (Tn + **DoD `[ ]`**) · Owner-action · Decisions→ADR · Assumptions · Files Changed · **Retro** (§10). Its **Execution Log** is an *uncapped sibling* — `docs/sprint/logs/SPRINT-NNN-<slug>.md` (`sprint-log.md.template`, created lazily at the first entry; **ADR-014**): append-only, plan frozen at promote — a mid-sprint scope shift logs a `scope-change` **there** (what broke · impact · re-confirm G2) before the Plan is edited. The `logs/` subdirectory is load-bearing — the sprint-file checks glob `docs/sprint/SPRINT-*.md` non-recursively, so a same-dir `-log.md` suffix would be capped and schema-checked as a Plan.
 - Flow: `promote` renders the sprint (sets `plan_commit`) → `sprint-bulk` loops the DoD → execute appends to the Log → `close` writes the Retro, routes buckets, sets `close_commit`. `/prime` counts open DoD.

@@ -1,6 +1,7 @@
 ---
 sprint: 025
 slug: fleet-foundations
+epic: EPIC-001
 owner: Maintainer
 last_updated: 2026-07-29
 status: closed

@@ -2,6 +2,7 @@
 sprint: NNN
 slug: [kebab-slug]
 stream: [stream name — omit entirely on a single-stream repo]
+epic: [EPIC-NNN if this sprint advances one — omit entirely otherwise]
 owner: [role — not personal name]
 last_updated: YYYY-MM-DD
 status: planned | active | closed

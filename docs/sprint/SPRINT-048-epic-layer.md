@@ -47,11 +47,11 @@ edited) — and `sh scripts/qa-check.sh` is green.
 - [x] DOCS_Guide §2 gains the `epic/EPIC-NNN-<slug>.md` row — 200 soft cap, create ← a **multi-sprint** outcome is named, update ← a member sprint closes
 - [x] DOCS_Guide §11 gains the epic's retention leg — and tightened it: archive needs **every member sprint closed AND all Closed-when conditions `[x]`**, never member-count alone
 - [x] Linted template counts moved 31 → 32 in `.claude/CLAUDE.md` **and** `docs/architecture/overview.md`; `.claude/CONTEXT.md` § Doc standard updated
-- [x] **One real epic rendered on real input** — `EPIC-001 Parallel Worktree Fleet`, retro-fitted from the SPRINT-025/026 archives + `fog-fleet-orchestration.md`, with a lazily-created `docs/epic/INDEX.md`
+- [x] **One real epic rendered on real input** — `EPIC-001 Parallel Worktree Fleet`, retro-fitted from the SPRINT-025/026 archives and the fog-fleet orchestration research (read as sources, not edited), with a lazily-created `docs/epic/INDEX.md`
 - [x] `sh scripts/qa-check.sh` green on a bare run — 75 pass, 0 fail
 
 ### T2 — Wire the epic into decompose → promote → close `[size: M · risk: med · class: execution · HITL]`
-Layers: `skills/task-decomposer/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/templates/SPRINT.md.template` · `.claude/CONTEXT.md` · `README.md`
+Layers: `skills/task-decomposer/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/templates/SPRINT.md.template` · `.claude/CONTEXT.md` · `README.md` · `docs/sprint/archive/SPRINT-025-fleet-foundations.md` · `docs/sprint/archive/SPRINT-026-fleet-build.md`
 Depends-on: T1
 
 A capability written only in its own file is half-shipped (L-020). The epic has three trigger points —
@@ -63,12 +63,12 @@ line-neutral.
 sprint stamped with `epic:`, and roll that sprint's outcome back up — not merely described in the docs.
 
 **DoD:**
-- [ ] `--epic` resolves to a real epic doc and decomposes it into `TASK-NNN`
-- [ ] `promote` sets `epic:` frontmatter on member sprints; `SPRINT.md.template` carries the field
-- [ ] `close` rolls the member sprint's outcome up into the epic
-- [ ] `.claude/CONTEXT.md` SSOT + `README.md` reflect the new layer (consumer-facing — L-015)
-- [ ] The chain **fires end-to-end** on T1's epic; edits to `lean-doc-generator/SKILL.md` stay line-neutral
-- [ ] `sh scripts/qa-check.sh` green on a bare run
+- [x] `--epic` resolves (id → slug → INDEX row) to `docs/epic/EPIC-NNN-<slug>.md`, reads it before grilling, decomposes **only the named slice**, and **never creates** an epic — no doc → route to `/lean-doc-generator epic` or `--fog`
+- [x] `promote` sets `epic:` + appends the member row; `SPRINT.md.template` carries the field. Creation verb `/lean-doc-generator epic` added, else the decomposer's routing pointer dangled
+- [x] `close` completes the member row and closes the epic **only when every § Closed-when is `[x]`** — a member sprint closing is not an epic closing
+- [x] `.claude/CONTEXT.md` SSOT (roster + sprint model) + `README.md` artifact table reflect the layer (L-015)
+- [x] Chain **fired end-to-end on EPIC-001**: SPRINT-025/026 stamped `epic: EPIC-001`, both round-trips resolve (sprint→epic, epic→member sprints), `--epic EPIC-001` resolves by id. ~~line-neutral~~ — **constraint dissolved by T6** (110/110 → 114/140)
+- [x] `sh scripts/qa-check.sh` green on a bare run — 75 pass, 0 fail
 
 ### T3 — Replace the grill's "one question at a time" rule with frontier batching `[size: S · risk: med · class: decision · HITL]`
 Layers: `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `skills/task-decomposer/SKILL.md` · `skills/orchestrator/SKILL.md`

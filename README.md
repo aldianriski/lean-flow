@@ -280,6 +280,7 @@ The skills write durable, human-readable state into your repo — plain markdown
 |---|---|---|
 | `TODO.md` | `/task-decomposer` · `/triage` | backlog (P0–P3) · active-sprint pointer(s) |
 | `TECH-DEBT.md` | sprint close · `/triage` | tech-debt ledger (`TD-NNN` — filed at close, aged at promote) |
+| `docs/epic/EPIC-NNN-*.md` | `/lean-doc-generator epic` | a **multi-sprint** outcome + the sprints that carried it. Skip it when the work fits one sprint |
 | `docs/sprint/SPRINT-NNN-*.md` | `/lean-doc-generator` | active sprint plan · files changed · retro (400-line hard cap) |
 | `docs/sprint/logs/SPRINT-NNN-*.md` | `/orchestrator` during execution | that sprint's execution log — append-only, uncapped, so it never eats the Plan's budget (ADR-014) |
 | `docs/DECISIONS.md` / `docs/adr/` | `/lean-doc-generator` | ADRs — the WHY behind hard-to-reverse choices |

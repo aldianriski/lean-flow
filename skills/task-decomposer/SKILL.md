@@ -20,9 +20,16 @@ not a re-grill.
 | Freeform — `"add Google OAuth login"` | no URL, no `--` flag |
 | Ticket — `JIRA-123` or a Linear/GitHub URL | matches `[A-Z]+-[0-9]+` or a URL |
 | PRD — `--prd docs/feature.md` | `--prd` flag + path |
-| Epic — `--epic "Payments"` | `--epic` flag + name |
+| Epic — `--epic "Payments"` or `--epic EPIC-003` | `--epic` flag + name or id |
 
 For a ticket, fetch the description first (ask the user to paste if credentials are missing — never block on env vars).
+**For an epic**, resolve the flag to `docs/epic/EPIC-NNN-<slug>.md` (match on id, else slug, else the
+`INDEX.md` row) and **read it before grilling** — its Outcome, Scope-Out and Open questions are already-settled
+context, so re-asking them is the interview a resolved epic exists to prevent. Decompose only the slice
+the owner names, never the whole epic at once: an epic spans sprints by definition, and a Plan holds
+~12 tasks. No epic doc for that name → it is not an epic yet; say so and offer `/lean-doc-generator epic`
+(nameable outcome) or `--fog` (not yet nameable). **Never create the epic here** — creation is the
+generator's job; this skill consumes.
 
 ## Procedure
 

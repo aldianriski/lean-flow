@@ -147,3 +147,31 @@ Closed-when conditions `[x]`**, with the reason stated inline.
 
 Template count 31 → 32 (34 on disk incl. the 2 non-core), all three linted claims moved together.
 `docs/epic/INDEX.md` created lazily, as `docs/sprint/INDEX.md` is.
+
+### 2026-08-09 | complete | T2 — epic wired into decompose → promote → close, and fired
+All three trigger points now know the epic exists (L-020): `--epic` resolves and consumes,
+`promote` stamps `epic:` + appends the member row, `close` completes that row. SSOT and README
+updated.
+
+**Fired end-to-end on real artifacts, not described.** EPIC-001 is `closed`, so there was no live epic
+to promote a new sprint against. Instead the chain was exercised against its actual member sprints:
+SPRINT-025 and SPRINT-026 stamped `epic: EPIC-001`, and **both round-trips verified** — sprint →
+frontmatter → epic file resolves for both, and epic → § Member sprints → sprint file resolves for
+both. `--epic EPIC-001` resolves by id, with an INDEX row behind it. Retro-fitted rather than live,
+and said so rather than claiming a promote that did not happen.
+
+**One thing the DoD did not ask for, added anyway.** T2's DoD covers consumption but not creation.
+Writing the decomposer's "no epic doc → offer `/lean-doc-generator epic`" routing left that pointer
+dangling, since no such verb existed — a half-wire of exactly the kind L-020 is about. The `epic` verb
+and its admission test (not nameable → fog · fits one sprint → a sprint · else an epic) are now in the
+generator.
+
+**L-088 recurred inside its own sprint.** T2's DoD required edits to `lean-doc-generator/SKILL.md` to
+stay **line-neutral** — a constraint that existed only because the file was at 110/110. T6 dissolved it
+two tasks earlier; the file is now 114/140. The DoD item was frozen against a world that no longer
+existed by the time it was executed. Ticked as dissolved rather than silently reinterpreted, which is
+the behaviour L-088 asks for. That the pattern fired twice in one sprint, on a learning filed *last*
+sprint, is worth carrying to the Retro.
+
+Sizes after: generator 114/140 (over the old 110 — T6's raise was load-bearing, not speculative),
+decomposer 101/140, CONTEXT.md 121/130.
