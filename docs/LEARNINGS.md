@@ -22,11 +22,19 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-095**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-096**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-096 [tags: process] [status: active]: **A rule that predicts what should exist is falsifiable in one step — run it against a case whose answer you already know, and the sharpest such case is your own repo.** SPRINT-053 T1 set out to stop `init` scaffolding docs for absent substrate, and shipped into the sprint with the rule stated as "a docs-only repo should get no testing guide, coding standards or deployment guides". Every word of that reads as obviously right. Running it against lean-flow — a docs-only repo — showed it predicting our own two deployment guides out of existence, which are correct and load-bearing: we publish a plugin, and those docs own the push/deploy steps `/release-patch` deliberately stops short of. The rule was not slightly off, it was keyed on the wrong axis: "docs-only" bundles *has code* and *publishes an artifact* into one label when they vary independently, and a markdown plugin is exactly the case that separates them. The corrected rule then reproduced our real doc set on both axes, which is what promoted it from plausible to tested. The general move is cheap and underused: whenever a rule's output is a **prediction about what should exist**, you already own a labelled test case — the repo in front of you — and a wrong rule announces itself by predicting reality out of existence. This is the falsification step, distinct from L-016's question of *where* to verify; L-016 says use the consumer path when the substrate is absent, this says the strongest input is the case whose correct answer is already sitting on disk.
+- seen: Sprint-053
+- count: 1
+- promoted: no
+- related: L-016 (verify on the consumer path) · L-088 (a frozen premise invalidated by execution — the vehicle here) · L-015 (the consumer-facing surface check) · L-090 (a fixture proves a change only against the prior state)
 
 ---
 

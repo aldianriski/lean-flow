@@ -23,7 +23,23 @@ status: current
 
 ## Tech Debt
 
-- **TD-039** severity: minor | status: open | created: Sprint-052
+- **TD-040** severity: minor | status: open | created: Sprint-053
+  - Summary: the **dispatch preflight snippet** (`orchestrator/references/dispatch.md`) matches only
+    lines beginning `Layers:` / `Depends-on:`, so an **indented continuation line is invisible to it**.
+    The full `check-layers-completeness.sh` reads continuations correctly (SPRINT-049 T3); the snippet
+    never got the same treatment.
+  - Impact: a **silent false PASS** on shared-file ownership — the exact L-058 family. Observed live at
+    the SPRINT-053 promote: T4's `Layers:` wraps, so its `DOCS_Guide.md` entry sat on the continuation
+    line and the preflight never reported the T1/T4 overlap. Harmless there only because T4 already
+    declared `Depends-on: T1`, so the overlap was owned anyway — luck, not the check. A wrapped
+    declaration is the normal shape for a task touching three or more files, so this is not exotic.
+  - Mitigation (not yet done) — a hypothesis, per this ledger's header: teach the snippet the same
+    indented-continuation rule the full checker already implements, and give it the must-FAIL fixture
+    that rule has there (L-058). Re-derive first: confirm the snippet is still the surface worth fixing
+    rather than having it call the real checker, which would remove the duplication that caused the
+    drift instead of patching it a second time.
+
+- **TD-039** severity: minor | status: resolved → SPRINT-053 T2 | created: Sprint-052
   - Summary: `check-layers-completeness.sh`'s two completeness FAILs — `Layers completeness:
     DoD/Acceptance implies <file>, absent from Layers:` and its `Depends-on:` twin — never name the
     `Cites:` escape. The author who trips the gate is told only what the declaration is missing.

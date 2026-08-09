@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-053 — Surface Truth** → [`docs/sprint/SPRINT-053-surface-truth.md`](docs/sprint/SPRINT-053-surface-truth.md)
+> _None._ SPRINT-053 closed 2026-08-09.
 
 ---
 
@@ -29,26 +29,6 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
-
-- [ ] TASK-162 — Substrate-gate `init`'s base tier so absent substrate scaffolds nothing  [size: M] [risk: low] [HITL]
-      class:      decision
-      done-when:  `init` no longer scaffolds docs for substrate a repo does not have — a docs-only
-                  repo gets no `testing/testing-guide`, `development/coding-standards` or
-                  `deployment/{deployment,rollback}-guide` — using the same substrate gating the
-                  higher tiers already apply (DB → database docs · API → integrations). DOCS_Guide §6
-                  then carries the stated exemption, so the standard and the tool agree rather than
-                  contradicting each other, and lean-flow's own absent base docs resolve as
-                  correct-by-exemption or get created
-      touches:    skills/lean-doc-generator/references/init.md · references/DOCS_Guide.md §6 ·
-                  docs/product/requirements.md (only if the answer is "create them")
-      depends-on: none
-      assumes:    substrate detection already exists for the higher tiers and extends to "has code" /
-                  "is deployable" without new machinery — confirm at G2 by reading init's step 1
-                  detection. If it needs new detection, this is L-sized and splits
-      tracker:    init.md:12 "Scaffold the base tier (always)" · DOCS_Guide §6 "base = every dev repo"
-      state:      ready — consumer-facing (L-015): a consumer running `init` on a docs, config or
-                  content repo today gets four docs describing a substrate that is not there.
-                  lean-flow is the proof case — the repo shipping `init` deliberately has none of them.
 
 - [ ] TASK-165 — Resolve lean-flow's six absent base-tier docs  [size: M] [risk: low] [HITL]
       class:      decision
@@ -64,40 +44,12 @@ status: current
                   all 18 base rows. The two that ARE gateable (coding-standards, testing-guide) belong
                   to TASK-162 and are excluded here; deployment guides already exist and are correct
       tracker:    SPRINT-053 § Decisions D6 · docs/sprint/logs/SPRINT-053-surface-truth.md scope-change
-      state:      blocked — TASK-162 decides the substrate conditions first; a row this task would
-                  create might turn out gateable after all. Unblock when TASK-162 lands.
+      state:      ready — **unblocked at the SPRINT-053 close**: TASK-162 landed (T1), and the
+                  conditions it set gate only `coding-standards` and `testing-guide`, neither of which
+                  is in this task's six. The blocker's question is answered, and the answer did not
+                  shrink the list.
 
 ### P2 — Quality / Polish
-
-- [ ] TASK-163 — Name the `Cites:` escape in the two completeness FAILs (TD-039)  [size: S] [risk: low] [HITL]
-      class:      execution
-      done-when:  an author who trips either completeness FAIL learns the escape exists from the
-                  message itself, rather than by reading the checker's source. The row's Mitigation is
-                  **re-derived before it is built** (L-091, this ledger's header): confirm the FAIL
-                  message is where an author actually looks, and that naming an escape there does not
-                  read as an invitation to silence the gate
-      touches:    scripts/lib/check-layers-completeness.sh · evals/fixtures/layers-completeness/ ·
-                  docs/QA.md (only if the documented wording changes)
-      depends-on: none
-      assumes:    the abuse is already guarded — a token in both `Cites:` and `Layers:` is a
-                  contradiction with its own named FAIL — so the cheap version is safe. This is a gate
-                  change: it needs a must-FAIL fixture per check (L-058) and the red-on-new /
-                  green-on-old pair to prove the change rather than the code (L-090); fixtures retained
-      tracker:    TECH-DEBT.md TD-039
-      state:      ready
-
-- [ ] TASK-164 — Clear two stale doc facts  [size: S] [risk: low] [HITL]
-      class:      mechanical-ingest
-      done-when:  `docs/sprint/INDEX.md`'s SPRINT-049 and SPRINT-051 rows no longer read "PATCH
-                  pending" — both shipped in v1.27.1, which is now public — and `.claude/CONTEXT.md`
-                  either carries the domain glossary it promises at line 97 or drops the promise
-      touches:    docs/sprint/INDEX.md · .claude/CONTEXT.md
-      depends-on: none
-      assumes:    the glossary is a drop-or-relocate, not an add — CONTEXT.md sits at 123/130, so a
-                  new section would need something displaced; check whether any consumer-facing surface
-                  promises the glossary before deleting the claim
-      tracker:    CONTEXT.md:97 · docs/sprint/INDEX.md
-      state:      ready
 
 ### P3 — Long-term
 

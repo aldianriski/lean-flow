@@ -3,7 +3,7 @@ sprint: 053
 slug: surface-truth
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 plan_commit: 7779b27
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -188,3 +188,49 @@ sits where every flow that can defer a question reads it.
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
      shipped → CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md. -->
+
+Four tasks, 21/21 DoD, one scope-change. Every task was a surface disagreeing with reality, and in
+three of the four the disagreement was **larger or differently shaped than the Plan said** — which is
+the sprint's real result. A theme built on "these four things are untrue" turned out to be a theme
+about how the untruths got there.
+
+**Retrieval check** — no miss and no contradiction. Eight prior rules were found and applied on
+purpose: L-088 (the scope-change), L-091 (re-derive a Mitigation), L-092 (the placement test), L-058
+and L-090 (the gate's fixture bar), L-015 and L-016 (consumer surface, consumer path), TD-012 (retain
+fixtures). Two were applied *against the author* rather than by them, which is the stronger signal:
+the observed leg caught T2's own declaration gap, and A1's confirm step falsified T1's premise.
+
+**Cost** — inline, coordinator only, zero dispatched agents. `dispatch.md` would have sent T2
+(`execution`) and T3 (`mechanical-ingest`) to sub-agents by default; the session carried a standing
+no-subagent constraint, so both ran inline and that is a **deviation from the dispatch default, not a
+judgement that dispatch was unwarranted**. Cost favoured inline anyway — two S-sized doc tasks would
+each re-pay the full substrate for ~10 minutes of work. 9 commits, 12 files, ~4 hours wall-clock
+including promote and release. Comparable to SPRINT-052's shape, one task larger.
+
+**Worked**
+- **Confirming an assumption from its source before building on it.** A1 was written as "confirm at
+  T1's first step" and doing it there — rather than treating it as a formality — is the only reason
+  T1's premise was corrected before it became a wrong edit rather than after.
+- **Checking who depends on a claim before deleting it.** T3's glossary line looked like dead text;
+  three skills depend on that placement, and §7 says the *absence* is correct. The obvious fix was the
+  wrong one and the check cost one grep.
+- **Letting a gate be right about you.** The observed leg reported a real omission in T2's own
+  declaration; treating it as a correct FAIL rather than noise took ten seconds and left the
+  declaration honest.
+
+**Friction**
+- **T1 shipped into the sprint with a falsified premise**, and it survived intake, promote and G1
+  because "a docs-only repo doesn't need deployment guides" reads as obviously true. Only running it
+  against our own repo exposed it. Cost: one scope-change and a re-scope mid-gate.
+- **A declaration gap and three stale INDEX rows, all self-inflicted** — the fixtures directory named
+  where the harness was edited, and a "PATCH pending" row I wrote hours before cutting the release it
+  was pending on. Both cheap to fix, both invisible without a check that reads reality instead of text.
+- **The preflight under-reads wrapped declarations** (→ TD-040), found at promote and carried unfiled
+  until this close swept for it.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- **L-096 filed** — a rule that predicts what should exist is falsifiable in one step against a case
+  whose answer you already know, and the sharpest such case is your own repo: a wrong rule announces
+  itself by predicting reality out of existence. Count 1.
+- **No entry for T1's stale premise itself** — that is L-088, already promoted, already fired here and
+  handled the way it prescribes. Recording it again as a new id would duplicate a durable rule.
