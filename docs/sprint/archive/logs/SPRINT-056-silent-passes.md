@@ -3,7 +3,7 @@ sprint: 056
 slug: silent-passes
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
