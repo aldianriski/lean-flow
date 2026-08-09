@@ -114,9 +114,13 @@ the field at execute time still FAILs by name.
 > Split out at SPRINT-047 T1 per ADR-014: the Log is append-only and uncapped, so it no longer
 > competes with the Plan for this file's 400-line budget. Content moved verbatim.
 
-## Files Changed
+## Files Changed (during execution)
 
-<!-- Filled during execution; feeds CHANGELOG at close. -->
+> **Superseded by "Files Changed (final, at close)" below** — kept, not merged (SPRINT-051 T4). This is
+> the table as the *run* left it: it records per-row verification state at that moment, including work
+> still parked and steps the run could not execute. The final table records what the sprint shipped.
+> Two honest snapshots at different times, not a duplicate; TD-034's complaint was that nothing said
+> which superseded which.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
@@ -126,34 +130,7 @@ the field at execute time still FAILs by name.
 | `evals/run-dispatch-preflight-fixtures.sh` | T1 | Added the SPRINT-044 chain must-PASS case and a rank-divergence must-FAIL case, guarding against a rank-based false PASS (L-058) | low | fixtures retained; wrapper unrunnable under inherited `MSYS_NO_PATHCONV` |
 | `evals/fixtures/dispatch-preflight/sprint-044-chain/sprint.md` · `.../shared-file-unowned-diverging-ranks/sprint.md` | T1 | New fixture inputs — **undeclared in T1's frozen `Layers:`, parked for owner** | low | gate FAIL is the parked finding |
 
-## Retro
-
-<!-- Written at close. -->
-
-### 2026-08-01 | scope-change | T1's fixture files declared; verification gap closed interactively
-**What changed.** T1 created two fixture data files during implementation that its frozen `Layers:`
-could not name — TD-022's shape, caught by the observed check built for exactly it. The run **parked**
-this correctly rather than editing § Plan or reshaping the task to dodge it.
-
-**Impact.** Declaration only; no code changes. Both files are T1's own work and were already reviewed
-and merged. Adding them makes the declaration match what happened.
-
-**Re-confirm G2.** No new task, no edge change, no wave-rank change, and no file enters the sprint that
-was not already committed by T1 — the overlap map and preflight verdict hold.
-
-**The run's owner-verification item is now discharged.** It could not execute the harness end-to-end
-(five `denied-tool` findings), so it explicitly refused to treat TD-025 as closed on review alone. Run
-interactively with `MSYS_NO_PATHCONV` cleared: **all 5 fixtures green**, including both new ones —
-`sprint-044-chain` → `PASS shared-file-owned-transitive`, `shared-file-unowned-diverging-ranks` →
-`FAIL shared-file-unowned`.
-
-**Both tasks additionally re-verified against fixtures I built, not theirs** (D4 makes the must-FAIL leg
-outrank the fix): T2 — empty `plan_commit` → FAIL · placeholder → SKIP, exit 0 · non-resolving sha →
-FAIL. T1 — two rank-0 tasks sharing a file with no path → FAIL naming "direct or transitive" · a file
-shared only across a transitive chain → PASS naming `derived-order=T1 -> T2 -> T3`. The true positives
-survived both narrowings, which was D4's whole concern.
-
-## Files Changed
+## Files Changed (final, at close)
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|

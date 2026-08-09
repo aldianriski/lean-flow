@@ -48,16 +48,16 @@ in what gets shown, and quote only the signal-carrying lines of a captured artif
 they are told to show it, and the rule names the env-var mechanism rather than only warning.
 
 **DoD:**
-- [ ] Redaction rule added where capture is instructed, not appended at the end — it must be read
+- [x] Redaction rule added where capture is instructed, not appended at the end — it must be read
       *before* the step that produces the artifact
-- [ ] The **mechanism** is stated (build the loop against env vars; quote only signal-carrying lines),
+- [x] The **mechanism** is stated (build the loop against env vars; quote only signal-carrying lines),
       not just the prohibition
-- [ ] A red flag added, matching how `/handoff` carries the same rule — the two skills should not
+- [x] A red flag added, matching how `/handoff` carries the same rule — the two skills should not
       disagree about a safety rule
-- [ ] Consumer-facing surface checked (L-015): the rule reads correctly for a repo that is not
+- [x] Consumer-facing surface checked (L-015): the rule reads correctly for a repo that is not
       lean-flow; no repo-specific path leaks in
-- [ ] `skills/diagnose/SKILL.md` stays ≤ ~140 lines
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit, after the DoD ticks and the
+- [x] `skills/diagnose/SKILL.md` stays ≤ ~140 lines
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit, after the DoD ticks and the
       log entry (L-089)
 
 ### T2 — Add the tautological-test anti-pattern to `/tdd` `[size: S · risk: low · class: execution · HITL]`
@@ -74,14 +74,14 @@ prevent — which is why this belongs beside the existing anti-patterns rather t
 value comes from instead.
 
 **DoD:**
-- [ ] The anti-pattern is named with its **tell** — the assertion recomputes the expected value the
+- [x] The anti-pattern is named with its **tell** — the assertion recomputes the expected value the
       way the code does, so it passes by construction
-- [ ] The fix is stated: expected values come from an independent source of truth — a known-good
+- [x] The fix is stated: expected values come from an independent source of truth — a known-good
       literal, a worked example, the spec
-- [ ] Placed beside the existing anti-patterns, not buried in `references/` — it is a per-cycle check,
+- [x] Placed beside the existing anti-patterns, not buried in `references/` — it is a per-cycle check,
       which is the disclosure test ADR-006 carries (inline what every path needs)
-- [ ] `skills/tdd/SKILL.md` stays ≤ ~140 lines
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+- [x] `skills/tdd/SKILL.md` stays ≤ ~140 lines
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ### T3 — Adopt three micro techniques `[size: S · risk: low · class: execution · HITL]`
 Layers: `skills/refactor-advisor/SKILL.md` · `skills/prototype/SKILL.md` ·
@@ -95,18 +95,18 @@ splitting three one-liners across three tasks costs more in ceremony than the ed
 **Acceptance:** all three lines exist in their target files, and none has grown into a section.
 
 **DoD:**
-- [ ] `/refactor-advisor` gains a **scoping step before it scans** — walk git history for the files
+- [x] `/refactor-advisor` gains a **scoping step before it scans** — walk git history for the files
       that keep changing, since deepening only pays off where change is frequent (a YAGNI filter on
       the scan itself; the skill currently has no scoping step at all)
-- [ ] `/prototype` **retains** a spent prototype on a throwaway branch with a pointer, instead of
+- [x] `/prototype` **retains** a spent prototype on a throwaway branch with a pointer, instead of
       "delete or absorb" — the artifact stays retrievable at zero repo cost (TD-012 is the scar)
-- [ ] `dispatch.md`'s merge-back queue says to **recover each side's intent** from commit messages and
+- [x] `dispatch.md`'s merge-back queue says to **recover each side's intent** from commit messages and
       PRs before resolving, preserve both intents, never invent behaviour, and always resolve rather
       than `--abort` (SPRINT-041's corrupted merge is why this is not theoretical)
-- [ ] Each is one or two lines; **if any needs a section, it splits into its own task** through a
+- [x] Each is one or two lines; **if any needs a section, it splits into its own task** through a
       `scope-change` entry and a ruling rather than growing this one quietly (L-088)
-- [ ] All three files stay within their caps
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+- [x] All three files stay within their caps
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ### T4 — Reconcile the duplicated sections in the SPRINT-045 archive `[size: S · risk: low · class: execution · HITL]`
 Layers: `docs/sprint/archive/SPRINT-045-gate-precision.md` ·
@@ -122,16 +122,16 @@ deferrals is the signal to decide, and the owner's decision at this promote was 
 and the stranded Execution Log entry sits in the archived log where it belongs.
 
 **DoD:**
-- [ ] The duplicate `## Files Changed` and `## Retro` pairs reconciled into one each — **content
+- [x] The duplicate `## Files Changed` and `## Retro` pairs reconciled into one each — **content
       merged, never dropped**; if the two versions disagree, the later one wins and the difference is
       noted rather than silently resolved
-- [ ] The stranded `### 2026-08-01 | scope-change` entry moved into the archived log file
-- [ ] Re-read the whole structure after the edit — a markdown section move is exactly L-009's
+- [x] The stranded `### 2026-08-01 | scope-change` entry moved into the archived log file
+- [x] Re-read the whole structure after the edit — a markdown section move is exactly L-009's
       structure-adjacent trap, and this file is already suspected of one
-- [ ] The archive edit is called out in the commit message as a deliberate amendment of a closed
+- [x] The archive edit is called out in the commit message as a deliberate amendment of a closed
       record, so history does not read as a silent rewrite
-- [ ] `TD-034` marked `status: resolved → SPRINT-051 T4` in the ledger
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+- [x] `TD-034` marked `status: resolved → SPRINT-051 T4` in the ledger
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ## Decisions (pre-locked)
 

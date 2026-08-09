@@ -92,7 +92,7 @@ status: current
     to no commit yet. The collision this row is about happens between *committed* worktree branches
     at merge-back, which is the path now covered.
 
-- **TD-034** severity: trivial | status: open | created: Sprint-047
+- **TD-034** severity: trivial | status: resolved → SPRINT-051 T4 | created: Sprint-047
   - Summary: the archived `docs/sprint/archive/SPRINT-045-gate-precision.md` carries **duplicate
     `## Files Changed` and `## Retro` sections**, plus one `### 2026-08-01 | scope-change` Execution
     Log entry stranded inside the first Retro block rather than in the Log.
@@ -100,7 +100,20 @@ status: current
     with no marker saying which supersedes. Verified pre-existing at HEAD before SPRINT-047 T1 touched
     the file, so the split did not cause it; T1 deliberately left it alone (clean up your own mess
     only). Most likely an L-009 structure-adjacent fusion during that sprint's close.
-  - Mitigation (not yet done): reconcile the two pairs into one, and move the stranded entry into
+  - **RESOLVED (SPRINT-051 T4) — and the mitigation below was deliberately not followed.** This row
+    proposed reconciling the two pairs "into one". Diffing them first (the owner ruling at the
+    SPRINT-051 promote required it) showed they are **not duplicates**: the first table is the run's
+    own snapshot, carrying per-row verification state, a parked-fixture row and steps the run could not
+    execute; the second is the consolidated close-time table, with close-only rows the first cannot
+    have. Merging would have meant choosing which of two honest records survives — in a closed archive.
+    Shipped instead: both tables **labelled** `(during execution)` and `(final, at close)`, with a note
+    on the first saying what supersedes it and why it is kept. That answers this row's actual
+    complaint — "no marker saying which supersedes" — at zero content loss. The stray `## Retro`
+    heading held no retro content, only a misplaced Execution Log entry; the heading is gone and the
+    entry moved verbatim into `archive/logs/`, tagged with why it moved. L-091's shape again: a
+    Mitigation line is the filer's hypothesis, and this one was wrong about the *cause* while right
+    about the symptom.
+  - Original mitigation (superseded): reconcile the two pairs into one, and move the stranded entry into
     `archive/logs/SPRINT-045-gate-precision.md` where it now belongs. Cheap, but it edits a closed
     archive record, so it wants an explicit decision rather than a drive-by fix.
 
