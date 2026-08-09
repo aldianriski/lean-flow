@@ -25,9 +25,15 @@
 # Verdicts (exactly one, to stdout):
 #   ALIVE               process is up and making progress (or already finished cleanly)
 #   DEAD-ON-ARRIVAL: <reason>   names what failed -- never a bare non-zero
+#   UNKNOWN: <reason>   process is up but nothing observable happened in the window --
+#                       indeterminate, NOT dead (TD-029). A silent-but-working run looks
+#                       identical to a stalled one from outside, and with a buffering output
+#                       format (--output-format json) an empty log is expected rather than
+#                       diagnostic. Reporting DOA there asserts a cause we cannot see.
 #
-# Exit 0 on ALIVE, exit 1 on DEAD-ON-ARRIVAL (including a pre-flight block, which fires
-# before anything is launched).
+# Exit 0 on ALIVE, 1 on DEAD-ON-ARRIVAL (including a pre-flight block, which fires before
+# anything is launched), 2 on UNKNOWN. Never conflate 1 and 2: 1 means "it failed and here is
+# what failed", 2 means "I could not tell".
 
 set -u
 
@@ -38,6 +44,16 @@ logfile=""
 die_doa() {
   printf 'DEAD-ON-ARRIVAL: %s\n' "$1"
   exit 1
+}
+
+# Third verdict (TD-029). Silence is not death: when the process is still alive and simply has not
+# written anything, we know the run is UP and we do not know whether it is WORKING. Reporting DOA
+# there asserts a cause we cannot observe -- and the operator acts on the headline, so a confidently
+# wrong verdict is worse than an honest "indeterminate" (L-087: prefer "not established" over a
+# plausible story). Distinct exit code so it can never be mistaken for either ALIVE or DOA.
+report_unknown() {
+  printf 'UNKNOWN: %s\n' "$1"
+  exit 2
 }
 
 # --- parse launcher options, stop at `--` -----------------------------------
@@ -219,7 +235,16 @@ if ! kill -0 "$child_pid" 2>/dev/null; then
 fi
 
 if [ -z "$progress" ]; then
-  die_doa "process (pid $child_pid) is up but showed no observable progress in ${wait_seconds}s -- no log output and no new commit; a live pid alone is not enough (the prompt may have been rejected)"
+  # The process is still alive (the loop above exits on death or non-zero status), so the only
+  # honest statement is that liveness is UNPROVEN -- not that the run is dead. An empty log is
+  # especially weak evidence when the fired command uses an output format that buffers until exit:
+  # there, no output CAN appear during the window, so its absence means nothing at all.
+  case " $* " in
+    *" --output-format json "*|*"--output-format=json"*)
+      report_unknown "process (pid $child_pid) is up; no log output and no new commit in ${wait_seconds}s -- but the command uses --output-format json, which buffers until exit, so an empty log during the window is EXPECTED and proves nothing either way. Liveness unproven, not refuted. Use --output-format stream-json to make progress observable, or widen --wait-seconds past the first commit" ;;
+    *)
+      report_unknown "process (pid $child_pid) is up; no log output and no new commit in ${wait_seconds}s. That is indeterminate, not dead -- a silent-but-working process looks identical to a stalled one from outside. Check the log again later, or widen --wait-seconds; if the command buffers its output, prefer a streaming format" ;;
+  esac
 fi
 
 printf 'ALIVE\n'

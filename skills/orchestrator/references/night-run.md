@@ -245,6 +245,7 @@ sh scripts/night-run.sh -- claude -p "/orchestrator sprint-bulk unattended" --pe
 |---|---|
 | `ALIVE` | process is up **and** producing observable progress — a log line or a new commit. You can close the terminal. |
 | `DEAD-ON-ARRIVAL: <reason>` | it never got going, and the line names why (missing mode signal · wrong permission mode · no allowlist · the gate blocked · exited early). Nothing was left running. |
+| `UNKNOWN: <reason>` *(exit 2)* | the process is **up**, but nothing observable happened inside the window — no log line, no commit. **Indeterminate, not dead.** A silent-but-working run is externally identical to a stalled one, and with `--output-format json` — which buffers until exit — an empty log is *expected*, so its absence of content proves nothing. The run is detached and continues either way; check the log later or widen `--wait-seconds`. Before TD-029 this case was reported as `DEAD-ON-ARRIVAL … the prompt may have been rejected`, an inference the launcher cannot support and which SPRINT-045 acted on while the run was working normally and went on to land both units. |
 
 **A live PID is not progress.** A process can sit up and idle because its prompt was rejected, so the
 verdict requires *output*, never just a heartbeat — which is also why the window defaults to ~150s

@@ -230,3 +230,32 @@ behaviour, which cuts against CLAUDE.md being built almost entirely on ❌ anti-
 trap with a positive rule, blunting it — but that is a defence, not evidence, and settling a house-style
 question on preference is the unevidenced call this repo keeps getting wrong (L-087's family). Recorded
 as open in the ADR rather than quietly dropped.
+
+### 2026-08-09 | complete | T5 — DEAD-ON-ARRIVAL false verdict fixed, without inventing a mechanism
+**Reproduced, cheaply, and it did not need Claude at all.** `sh -c 'sleep 40'` — a process that is
+demonstrably healthy — was declared `DEAD-ON-ARRIVAL … the prompt may have been rejected`, on a 0-byte
+log, exit 1. The defect lives in the launcher's **inference**, not in Claude's output format, so no
+paid headless run was required to see it.
+
+**What was deliberately NOT established.** That `--output-format json` is what makes a *real* run
+silent remains untested — that does need a paid run, and it was not spent speculatively. So the fix
+was chosen precisely because it does not depend on that half: a third verdict, **`UNKNOWN` (exit 2)**,
+which states what was observed rather than asserting a cause, and names the buffering format when the
+fired command carries one. The `stream-json` switch was **declined** on two grounds: it depends on the
+unproven mechanism, and it would trade away the `total_cost_usd` the calibration row reads off `json`.
+This is L-087 applied to the very row that prompted its promotion.
+
+**Verification, honestly split.** Healthy+silent → `UNKNOWN` exit 2, verified live. Format detection
+unit-checked in isolation: `--output-format json` and `--output-format=json` match, **`stream-json`
+correctly does not** — a false match there would have mislabelled the one format that *does* stream.
+The DOA regression check could not be run: the harness hung on detached children across three
+attempts. Verified structurally instead — `git diff` shows exactly one `die_doa` removed (the false
+one), every other call site returns from *inside* the poll loop and never reaches the edited branch,
+and `sh -n` parses clean. Recorded as inspection, not claimed as execution.
+
+**A red flag I tripped, caught by the thing I was fixing.** T4 was committed through a **failing
+gate** — its DoD tick named "T6", layers-completeness flagged it, and I appended the log and committed
+without re-running. It surfaced only because `night-run.sh`'s pre-flight runs `qa-check` and refused to
+fire. Fixed in `c412019`. Two lessons worth the Retro: the gate must be re-run after *every* edit, not
+once per task; and the pre-flight caught what the author did not — an argument for the pre-flight
+gate existing at all.

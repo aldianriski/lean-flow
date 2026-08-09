@@ -92,7 +92,7 @@ status: current
     — the list is answering "did a task declare this?" when it means "was this task work or coordinator
     bookkeeping?". Add the exclusion, but weigh whether the check should ask the second question.
 
-- **TD-029** severity: minor | status: open | created: Sprint-045
+- **TD-029** severity: minor | status: resolved → SPRINT-048 T5 (**residual: the buffering mechanism was never reproduced**) | created: Sprint-045
   - Summary: the launcher's `ALIVE` test requires observable progress — a log line or a new commit —
     but `claude -p --output-format json` **buffers all output until exit**, so the log stays empty for
     the entire run. A healthy run is reported `DEAD-ON-ARRIVAL`.
@@ -112,6 +112,20 @@ status: current
     but never actually tested — no probe has confirmed the launcher goes quiet for buffering rather than
     for some other reason. **Scheduled as SPRINT-048 T5**, whose first step is therefore to reproduce
     the buffering claim before choosing between the two mitigations, not after.
+  - **RESOLVED (SPRINT-048 T5) — note carefully what was and was not established.**
+    **Reproduced:** the launcher reports `DEAD-ON-ARRIVAL … the prompt may have been rejected` for a
+    process that is perfectly healthy and merely silent — shown live against `sh -c 'sleep 40'` with a
+    0-byte log. No paid call was needed, because the defect lives in the launcher's *inference*, not
+    in Claude. **NOT reproduced:** that `--output-format json` is what makes a real run silent; that
+    needs a paid headless run and was not spent speculatively.
+    The fix was chosen **because it does not depend on the unreproduced half**: a third verdict,
+    `UNKNOWN` (exit 2), stating what was observed instead of asserting a cause, and naming the
+    buffering format when the fired command carries it. The `stream-json` switch was deliberately
+    **not** taken — it *does* depend on the mechanism, and it would trade away the `total_cost_usd`
+    the calibration row reads off `json`. Preferring "not established" over a plausible story is
+    L-087, promoted this same sprint.
+    **Residual, explicitly open:** why a real `json` run stays silent past the window is still
+    unestablished. Reopen on evidence from an actual run — never on another inference.
 
 - **TD-028** severity: medium | status: resolved → SPRINT-046 T1 | created: Sprint-045
   - Summary: a **directory-prefix permission rule does not match**. `Bash(sh evals/:*)` was written to

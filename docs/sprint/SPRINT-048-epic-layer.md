@@ -121,12 +121,12 @@ as dead — is a **hypothesis nobody has tested**, which is exactly L-087's shap
 launcher now reports was chosen *after* the buffering claim was confirmed or refuted.
 
 **DoD:**
-- [ ] Buffering claim **reproduced or refuted** before any fix is chosen (L-087)
-- [ ] Fix applied: accept `stream-json` and treat any new line as progress, **or** report a named `UNKNOWN` for a buffered format
-- [ ] The calibration row's `total_cost_usd` need still met, or the trade-off stated explicitly
-- [ ] Exercised against a run that is genuinely healthy — the false-positive case, not just the happy path
-- [ ] TD-029 marked `resolved → SPRINT-048 T5`
-- [ ] `sh scripts/qa-check.sh` green on a bare run
+- [x] **Reproduced — the half that mattered.** The launcher declares DOA on a healthy, silent process: shown live against `sh -c 'sleep 40'`, 0-byte log, `EXIT=1`. **The buffering half was NOT reproduced** — that needs a paid headless run and was not spent speculatively; recorded as an open residual on TD-029 rather than assumed
+- [x] Fix applied: third verdict `UNKNOWN` (exit 2), **chosen because it does not depend on the unreproduced half** — it reports what was observed instead of asserting a cause, and names the buffering format when the command carries one
+- [x] `total_cost_usd` preserved — the `stream-json` switch was **declined**: it depends on the unproven mechanism *and* would trade away the field the calibration row reads off `json`
+- [x] Exercised on the false-positive case: healthy+silent → `UNKNOWN` exit 2 (live). Format detection unit-checked — `--output-format json` and `=json` match, **`stream-json` correctly does not**. DOA paths verified structurally untouched (one `die_doa` removed, exactly the false one; all others return from inside the poll loop) after the live harness hung on detached children
+- [x] TD-029 marked `resolved → SPRINT-048 T5`, with the residual named in the row itself
+- [x] `sh scripts/qa-check.sh` green on a bare run — 75 pass, 0 fail
 
 ### T6 — Raise the SKILL cap to 140 and reclaim the duplicated lines `[size: S · risk: med · class: decision · HITL]`
 Layers: `docs/adr/ADR-006-skill-cap-executable-artifacts.md` · `scripts/qa-check.sh` · `.claude/CLAUDE.md` · `skills/lean-doc-generator/SKILL.md` · `skills/council/SKILL.md` · `skills/lean-doc-generator/references/DOCS_Guide.md` · `README.md`
