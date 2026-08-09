@@ -47,19 +47,19 @@ applied at promotion time, which means §10 is where it belongs.
 carries a placement test that would have caught both prior misses.
 
 **DoD:**
-- [ ] **L-092 placed by its own criterion** — ask *which flows can hit this failure*, then place the
+- [x] **L-092 placed by its own criterion** — ask *which flows can hit this failure*, then place the
       rule where all of them read. A rule about rules landing in one skill only must not itself land
       in one skill only; if the analysis says otherwise, that is a ruling, not a quiet override (L-088)
-- [ ] `DOCS_Guide` §10's promotion rule amended so the three homes are no longer presented as
+- [x] `DOCS_Guide` §10's promotion rule amended so the three homes are no longer presented as
       interchangeable — the choice gets a stated test rather than a menu
-- [ ] **L-091 placed by the same test** — a TD row's Mitigation line is the filer's hypothesis, and the
+- [x] **L-091 placed by the same test** — a TD row's Mitigation line is the filer's hypothesis, and the
       flows that hit it are *promote* (a Mitigation carried into a DoD) and *close* (a Mitigation
       written under pressure), so a `/diagnose`-only home would be wrong for it too
-- [ ] Both entries collapsed to pointer lines per §11; ids stay monotonic
-- [ ] `docs/knowledge-index.md` regenerated (`sh scripts/gen-index.sh`)
-- [ ] Every file touched stays within its cap — `CLAUDE.md` is at its 80-line limit, so anything landing
+- [x] Both entries collapsed to pointer lines per §11; ids stay monotonic
+- [x] `docs/knowledge-index.md` regenerated (`sh scripts/gen-index.sh`)
+- [x] Every file touched stays within its cap — `CLAUDE.md` is at its 80-line limit, so anything landing
       there displaces something rather than appending
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit, after the DoD ticks and the
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit, after the DoD ticks and the
       log entry (L-089)
 
 ### T2 — Decide which surface documents `Cites:` `[size: S · risk: low · class: decision · HITL]`
@@ -125,7 +125,10 @@ closes with a written reason it belongs on none.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| | | | | |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §10 gains the placement test + the `Mitigation:`-is-a-hypothesis rule — the two promotions land where every promoting flow reads | low | `qa-check.sh` |
+| `docs/LEARNINGS.md` | T1 | L-091 + L-092 collapsed to pointers (§11); the header's three-home menu replaced by a pointer at the test | low | `qa-check.sh` |
+| `.claude/CONTEXT.md` | T1 | § Continuous learning governance menu → pointer at §10's test; same-line rewrite holds 123/130 | low | `qa-check.sh` |
+| `docs/knowledge-index.md` | T1 | regenerated after the status changes | low | `gen-index.sh` |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):

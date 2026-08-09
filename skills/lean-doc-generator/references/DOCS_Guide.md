@@ -311,9 +311,29 @@ into four buckets, each **routed to a durable home** (don't leave them in the sp
 for investing in a derived knowledge-graph view — track the miss rather than guessing on corpus size.
 
 **Promotion rule** — a learning that recurs (**count ≥ 2** — a second sprint hits the same friction)
-is promoted from a ledger line into a *durable* rule: a `CLAUDE.md` anti-pattern, a `CONTEXT.md`
-rule, or a skill red-flag. Mark `promoted: yes → <where>` on the entry. One-offs stay ledger lines —
-they're context, not law. Don't promote on a single occurrence; don't let a 2nd occurrence pass unpromoted.
+is promoted from a ledger line into a *durable* rule. Mark `promoted: yes → <where>` on the entry.
+One-offs stay ledger lines — they're context, not law. Don't promote on a single occurrence; don't let
+a 2nd occurrence pass unpromoted.
+
+**Placement test — the three homes are not interchangeable.** Ask **which flows can hit this failure**,
+then place the rule where *all* of them read. A `skills/<x>/SKILL.md` red-flag is scoped to that skill's
+flow — correct only when the failure is confined to it. A `CONTEXT.md` rule reaches every flow that reads
+the SSOT. A `CLAUDE.md` anti-pattern reaches every flow in the repo, and is the answer when the honest
+enumeration is "all of them" (it is capped, so landing there displaces something — a ruling, not an
+append). Picking off the menu instead of enumerating is how a rule ends up firing in exactly one flow and
+staying silent in the rest: L-087 was filed into `/diagnose` and then failed to fire during a `promote`;
+a redaction rule lived in `/handoff` and never reached `/diagnose`, the skill that instructs capturing HAR
+files. Where the rule already appears on more than one surface, **rewrite the duplicates to point at the
+one home** — a stale second copy reproduces the failure it was promoted to stop. This is L-020
+(shipped ≠ wired) applied to rules rather than capabilities: a promotion earns the same wiring check a
+capability gets (L-092).
+
+**A `Mitigation:` line is a hypothesis, not a plan.** A `TD-NNN` row's proposed cure is the filer's best
+guess, written at the moment the cost was being felt; by the time it reaches a Plan, repeated re-reading
+has made it read as settled. Cite the evidence for the *problem*, re-derive the *fix* — at **close** (when
+filing one) and at **promote** (before a DoD is built on one). Two rows have now been right about the
+symptom and wrong about the cause, and in one case the proposed cure would have destroyed evidence
+(L-091).
 
 **Tech-debt aging** — at **Sprint Promote**: any `TD-NNN` unaddressed ≥ 3 sprints triggers a
 re-review prompt; `severity: high` auto-escalates to Backlog P1. Rows are never deleted — resolved

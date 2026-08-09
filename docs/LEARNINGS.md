@@ -8,8 +8,9 @@ status: current
 # lean-flow — Learnings Ledger
 
 Append-only record of confirmed corrections and patterns surfaced at Sprint Close. A learning that
-**recurs (count ≥ 2)** is promoted into a *durable* rule — a `CLAUDE.md` anti-pattern, a `CONTEXT.md`
-rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promote** before planning.
+**recurs (count ≥ 2)** is promoted into a *durable* rule and marked below. The home is not a menu pick:
+apply **DOCS_Guide §10's placement test** — ask which flows can hit the failure, then place the rule
+where all of them read. Reviewed at every **Sprint Promote** before planning.
 
 <!-- Newest first. Never edit a past entry except to bump `seen` / `count` or set `promoted`. -->
 
@@ -45,21 +46,13 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-092 [tags: process] [status: active]: **A promoted learning fires only inside the skill it was filed into — promotion needs the same wiring check a capability gets.** L-087 ("a symptom is observed, the mechanism welded to it is inferred") was promoted at SPRINT-048 close into `skills/diagnose/SKILL.md` § Red flags. One sprint later, at the SPRINT-049 *promote*, a gate FAIL was met by attaching TD-032's prose-mention mechanism to it without testing, and an Acceptance line was reworded on that wrong diagnosis — precisely the failure L-087 exists to prevent. The rule never fired because the flow was `/lean-doc-generator promote`, not `/diagnose`. The §10 promotion rule says to route a recurring learning into "a CLAUDE.md anti-pattern, a CONTEXT.md rule, **or** a skill red-flag" and stops there, as though the three were interchangeable homes; they are not — a skill red-flag is scoped to that skill's flow, and a mis-diagnosis is not a `/diagnose`-only event. This is L-020 (shipped ≠ wired) applied to *rules* rather than capabilities: ask of any promotion **which flows can hit this failure**, and place it where all of them read, or accept it will fire in exactly one.
-- seen: Sprint-049, **Sprint-051**
-- count: 2
-- promoted: no — **due now**, the `count ≥ 2` trigger fired at SPRINT-051 close
-- Sprint-051's occurrence is the cleanest possible statement of it: `/handoff` has carried a redaction rule — in its body *and* as a red flag — for sprints, while `/diagnose` had **zero** occurrences of redact/secret/credential despite being the skill that instructs capturing HAR files, traces and log dumps. The repo *held* the rule; it simply lived in the file where it was learned rather than every file that needs it. Nobody had to fail to know it — the surface was inconsistent with itself, and only an external scan (SPRINT-050 T3, comparing `handoff` to `handoff`) surfaced it.
-- related: L-020 (wire a capability into every triggering job) · L-087 (the rule that failed to fire) · L-002 (a rule that only fires inside skill flows) · L-015 (the consumer-facing surface check) · DOCS_Guide §10
+## L-092 [tags: process] [status: promoted]: a promoted learning fires only inside the skill it was filed into — place it by asking which flows can hit the failure, never by picking from the three-home menu.
+- **L-092 → promoted: `skills/lean-doc-generator/references/DOCS_Guide.md` §10 § Placement test** — the durable rule is the record now (§11 collapse, SPRINT-052 T1). Body: git; L-087 filed into `/diagnose` then failing during a `promote` · a redaction rule living in `/handoff` and never reaching `/diagnose`. Placed by its own criterion: the failure occurs only while *choosing a home for a promoted rule*, and every flow that does so reads §10 — so a single home is correct here, and it is not the trap the learning names (that trap is a home outside the failing flow, not a home in one file). The same enumeration found the menu duplicated on two further surfaces — `.claude/CONTEXT.md` § Continuous learning governance and this ledger's own header — both rewritten to point at the test rather than restate the menu, since a stale second copy reproduces the failure. seen Sprint-049/051, count 2.
 
 ---
 
-## L-091 [tags: process] [status: active]: **A tech-debt row's Mitigation line is a hypothesis written under time pressure, not a plan — test it before building it.** TD-032 proposed narrowing the prose derivation to "DoD/Acceptance lines only, excluding the free-text rationale paragraph". That line was written at the moment of filing, when the cost of the false positives was being felt and the fix seemed obvious, and it was carried unquestioned into SPRINT-049 T1's DoD at promote. Replaying the checker across all 11 revisions of the SPRINT-048 Plan showed every false positive sitting **inside a DoD checkbox item** — the narrowing would have fixed none of them, because the discriminator is the token's *role in the sentence*, not its location in the block. The row was right about the problem and wrong about the cure, which is the normal condition of a mitigation written while annoyed. What makes it dangerous is that by the time it reaches a Plan it has been re-read several times and reads as settled. Treat `Mitigation (not yet done):` as the filer's best guess: cite the evidence for the *problem*, re-derive the *fix*.
-- seen: Sprint-049, **Sprint-051**
-- count: 2
-- promoted: no — **due now**, the `count ≥ 2` trigger fired at SPRINT-051 close
-- Sprint-051's occurrence: **TD-034**'s Mitigation said "reconcile the two pairs into one". Diffing them first — required by the sprint's own A2 confirm step — showed they were never duplicates but two honest snapshots at different times, so the proposed cure would have destroyed one of them inside a closed archive. Same shape as TD-032: right about the symptom (a reader gets two answers with no marker), wrong about the cause (duplication) and therefore wrong about the cure. Both rows had been re-read across multiple promotes without anyone re-deriving the fix, which is exactly what makes a Mitigation line read as settled.
-- related: L-087 (mechanism inferred rather than tested) · L-088 (a DoD premise invalidated by execution — this is where the stale premise came from) · TD-032 · TD-034
+## L-091 [tags: process] [status: promoted]: a tech-debt row's `Mitigation:` line is a hypothesis written under pressure, not a plan — cite the evidence for the problem, re-derive the fix.
+- **L-091 → promoted: `skills/lean-doc-generator/references/DOCS_Guide.md` §10 § A `Mitigation:` line is a hypothesis** — the durable rule is the record now (§11 collapse, SPRINT-052 T1). Body: git; TD-032 (a narrowing that would have fixed none of the false positives, replayed across 11 revisions of the SPRINT-048 Plan) · TD-034 (a "reconcile the duplicates" cure that would have destroyed one of two honest snapshots inside a closed archive). Placed by L-092's test: the flows that hit it are *close* (filing a Mitigation) and *promote* (carrying one into a DoD), and both read §10 — a `/diagnose`-only home would have fired in neither. `/triage` reads the row rather than §10, so a pointer line lands in `TECH-DEBT.md`'s header under T2, which owns that file. seen Sprint-049/051, count 2. It then fired a third time inside the sprint that promoted it: TD-036's Summary was already false when filed (T2).
 
 ---
 
