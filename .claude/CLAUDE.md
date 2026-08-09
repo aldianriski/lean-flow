@@ -24,7 +24,7 @@ skills/              # 14 SKILL.md files (plugin auto-discovers)
   #  flow = opt-in conductor · 12 standalone stage-skills · council = opt-in agent-using decision aid
   lean-doc-generator/
     references/DOCS_Guide.md      # the LEAN DOCUMENTATION STANDARD
-    templates/*.md.template       # 32 canonical doc templates (core, incl. EPIC/SPRINT/sprint-log/ADR/RESEARCH/DEPLOYMENT/ROLLBACK/BUG/TECH-DEBT/CONTRIBUTING/SECURITY/AGENTS/database-{erd,schema,migration-guide}/architecture-{data-flow,authentication,integrations}/product-{requirements,acceptance-criteria}/flows/testing-guide/development-coding-standards; +2 non-core: DESIGN·QA-TESTCASE = 34 total)
+    templates/*.md.template       # 33 canonical doc templates (core, incl. EPIC/SPRINT/sprint-log/ADR/RESEARCH/DEPLOYMENT/ROLLBACK/BUG/TECH-DEBT/CONTRIBUTING/CODE_OF_CONDUCT/SECURITY/AGENTS/database-{erd,schema,migration-guide}/architecture-{data-flow,authentication,integrations}/product-{requirements,acceptance-criteria}/flows/testing-guide/development-coding-standards; +2 non-core: DESIGN·QA-TESTCASE = 35 total)
   tdd/references/testability.md          # what to mock · design-for-testability · refactor candidates
   diagnose/references/feedback-loops.md  # 10 ways to build a loop · determinism · perf
   task-decomposer/references/prd-and-slices.md  # PRD template · tracer-bullet slices · breakdown quiz

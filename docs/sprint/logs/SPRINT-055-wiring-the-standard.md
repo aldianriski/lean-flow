@@ -303,3 +303,53 @@ cap, so no split; the DoD's "at cap, split rather than squeeze" branch did not f
 
 **§ Plan edit:** T6 `Layers:` gains `scripts/lib/check-task-origin.sh`. Sixth correction, five tasks —
 the count is now the sprint's clearest Retro candidate.
+
+### 2026-08-09 | surprise | leg 15's two exclusion lists disagree, and the gap hides a violation until it is committed
+
+Found during T7. `check-layers-observed.sh` runs two paths with **two different exclusion lists**:
+`is_excluded()` for uncommitted WIP and `is_excluded_committed()` for history. `TODO.md` is on the
+first and not the second.
+
+T6 stamped `origin:` onto seven `TODO.md` Backlog entries — task work, not close bookkeeping — and
+never declared `TODO.md` in its `Layers:`. While the edit sat uncommitted, the WIP path skipped it and
+T6's gate ran green. Committing moved it onto the attributed path, where it surfaced as
+`changed by a task that never declared it: T6:TODO.md` — reported against a task that was already
+finished and pushed.
+
+**The rationale behind the WIP exclusion is sound but too broad.** `TODO.md` is excluded there as
+"backlog bookkeeping, written at close", and at close that is exactly right. It is wrong for a task
+whose actual work is editing `TODO.md`, and T6 was one. The two lists diverging means the same file
+can be simultaneously fine to leave undeclared and a violation, depending only on whether `git commit`
+has run yet.
+
+Corrected the honest way: T6's `Layers:` now declares `TODO.md`, since T6 genuinely edited it. Not
+fixed here: the exclusion-list asymmetry itself. That is a checker design question, it touches a
+guard shipped three sprints ago, and narrowing or widening either list on the strength of one
+observation is TD-031's pattern. **Filed for the Retro as a TD candidate**, with this as the recorded
+instance — a gate whose verdict depends on commit timing rather than on the artifact is the same
+family as Edit-safety trap (c).
+
+### 2026-08-09 | complete | T7 — CODE_OF_CONDUCT admitted to the standard; all seven DoD blocks closed
+
+Contributor Covenant 2.1 (A1, ruled at G2), adapted with `[CUSTOMIZE]` tokens and the CC BY 4.0
+attribution block intact — attribution is the licence condition, not decoration. §2 gates it exactly
+as `CONTRIBUTING.md` is gated: **team ≥ 2, or on request**.
+
+**One judgement written into both the template and `init`:** the enforcement contact is the only
+load-bearing token. A code of conduct nobody can report to is decoration, so `init` is told not to
+scaffold the file at all if the user cannot name a real monitored address. Shipping a CoC with an
+unfilled contact would be worse than shipping none — it advertises a process that does not exist.
+
+**lean-flow takes the exemption, and the distinction is the point.** Shipping the template is not the
+same as owing the file: `init` scaffolds it for a consumer who has met the condition, while this repo
+has one maintainer, no request, and nobody to route a report to. That reasoning is now a row in
+`overview.md` § "Base-tier docs this repo deliberately does not have", beside CONTRIBUTING's, so a
+future reader (or `init` run) can tell a deliberate absence from an oversight.
+
+**T1's guard proved itself here, in the right order.** Adding the 33rd template made all six count
+claims wrong at once, and the check went red on every one — `.claude/CLAUDE.md`, `overview.md` and
+`README.md` × core and total — before the numbers were touched. Red first, then green. That is the
+demonstration TASK-166 was filed for: the drift it was written about could not have recurred silently.
+
+`.claude/CLAUDE.md` sits at exactly **80/80**. Not a problem today and not squeezed, but the next edit
+to it has no room and must split rather than compress (§7 — a cap moves only by ADR, diet first).

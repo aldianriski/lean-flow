@@ -81,6 +81,7 @@ tier down. The two substrates that gate a base row:
 |---|---|---|
 | `README.md` | | `README.md.template` |
 | `CONTRIBUTING.md` | | `CONTRIBUTING.md.template` |
+| `CODE_OF_CONDUCT.md` | team ≥ 2, or on request | `CODE_OF_CONDUCT.md.template` — **the enforcement contact is load-bearing**: a code of conduct nobody can report to is decoration, so if the user cannot name a real monitored address, do not scaffold the file |
 | `SECURITY.md` | | `SECURITY.md.template` |
 | `AGENTS.md` | | `AGENTS.md.template` |
 | `CHANGELOG.md` | | `CHANGELOG.md.template` |

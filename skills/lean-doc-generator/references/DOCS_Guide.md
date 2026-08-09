@@ -30,6 +30,7 @@ gating → §6.
 |---|---|---|---|---|---|
 | `README.md` | Anyone | no hard cap¹ | init (always) | project scope changes | — |
 | `CONTRIBUTING.md` | Contributor | ~100 | init (team ≥ 2, or on request) | branching / commit / review / DoD convention changes | — |
+| `CODE_OF_CONDUCT.md` | Anyone | ~120 | init (team ≥ 2, or on request — same gate as CONTRIBUTING; a single-maintainer repo has not met the condition and is not deviating) | the enforcement contact or the policy changes | — |
 | `SECURITY.md` | Anyone | ~80 | init (always) | auth model · secret policy · vulnerability-reporting change | — |
 | `CHANGELOG.md` | Reviewer | append-only | first release or sprint close (always-core — ADR-012 deviation) | sprint close · release | rotate at new MINOR → `docs/changelog/` (§11) |
 | `LICENSE` | Anyone | — | init (license chosen; private → proprietary notice) | license change (rare) | — |

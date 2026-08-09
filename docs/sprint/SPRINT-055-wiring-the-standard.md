@@ -134,7 +134,7 @@ an active sprint has open DoD, and the chain runs end-to-end from an epic slice 
 - [x] `/prime` stays read-only: it names the next skill, it never launches a run
 
 ### T6 — Deny the G1 fast-path to tasks that never met the grill `[size: M · risk: med · class: decision · HITL]`
-Layers: `skills/orchestrator/SKILL.md` (G1) · `skills/lean-doc-generator/SKILL.md` (close §10 routing) · `skills/triage/SKILL.md` · `skills/task-decomposer/SKILL.md` · `.claude/CONTEXT.md` (task entry shape) · `scripts/lib/check-task-origin.sh` · `scripts/qa-check.sh` · `evals/`
+Layers: `skills/orchestrator/SKILL.md` (G1) · `skills/lean-doc-generator/SKILL.md` (close §10 routing) · `skills/triage/SKILL.md` · `skills/task-decomposer/SKILL.md` · `.claude/CONTEXT.md` (task entry shape) · `TODO.md` (stamping `origin:` on existing entries — task work, not close bookkeeping) · `scripts/lib/check-task-origin.sh` · `scripts/qa-check.sh` · `evals/`
 Depends-on: T4, T5 (shared files — see D1; T5 edge added by the 2026-08-09 plan-correction for `.claude/CONTEXT.md`)
 G1 fast-paths a "decomposer-approved task" to a scope-unchanged confirm, but no field records whether
 a task ever met the intake grill — the clause is unverifiable prose. Tasks auto-filed by the
@@ -168,14 +168,17 @@ exemption row, the same shape CONTRIBUTING already has.
 moves in lockstep, and T1's check proves the lockstep held.
 
 **DoD:**
-- [ ] A1 ruled on before writing the template (see § Assumptions — this blocks G2)
-- [ ] §2 root table carries a code-of-conduct row (create ← team ≥ 2 or on request; update ←
+- [x] A1 ruled on before writing the template (see § Assumptions — this blocks G2)
+      — *ruled at the G2 pass: Contributor Covenant 2.1*
+- [x] §2 root table carries a code-of-conduct row (create ← team ≥ 2 or on request; update ←
       enforcement contact / policy change; archive `—`). lean-flow writes no root file of its own —
       the row describes what `init` scaffolds for a consumer
-- [ ] `templates/CODE_OF_CONDUCT.md.template` ships and `init`'s list includes it
-- [ ] Counts move in lockstep to 33 core + 2 non-core = 35 across README, `.claude/CLAUDE.md`,
+- [x] `templates/CODE_OF_CONDUCT.md.template` ships and `init`'s list includes it
+- [x] Counts move in lockstep to 33 core + 2 non-core = 35 across README, `.claude/CLAUDE.md`,
       `docs/architecture/overview.md` — and T1's check passes on the new numbers
-- [ ] `overview.md` § "Base-tier docs this repo deliberately does not have" gains a CoC exemption row
+      — *T1's guard FAILed on all six claims when the template landed, then passed once updated;
+      red-before-green, in that order*
+- [x] `overview.md` § "Base-tier docs this repo deliberately does not have" gains a CoC exemption row
       with its own revisit-when
 
 ## Decisions (pre-locked)

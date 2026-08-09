@@ -26,7 +26,7 @@ skills/           14 skills (auto-discovered at root)
   prototype/ tdd/ diagnose/ refactor-advisor/ release-patch/ handoff/ insights/   12 stage-skills
   council/                                               opt-in agent decision aid
   <skill>/references/   on-demand depth (DOCS_Guide, testability, feedback-loops, deepening, …)
-  lean-doc-generator/templates/   32 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 34 total)
+  lean-doc-generator/templates/   33 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 35 total)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
 docs/             architecture/ · development/ · deployment/ · adr/ · DECISIONS.md · LEARNINGS.md
                   · research/ · qa/
@@ -84,6 +84,7 @@ rows are excluded: they are skipped, not owed (DOCS_Guide §6), and are not list
 | Absent | Why | Revisit when |
 |---|---|---|
 | `CONTRIBUTING.md` | §2 gates it on *team ≥ 2, or on request*. Single maintainer, no request received — the standard's own condition never fired, so this is not a deviation. | a second maintainer joins, or an external contributor asks |
+| `CODE_OF_CONDUCT.md` | Same gate as CONTRIBUTING (§2, added SPRINT-055 T7), and the same unmet condition: one maintainer, no request. The template ships so `init` can scaffold it for a consumer who *has* met the condition — lean-flow shipping the template is not lean-flow owing the file. Its enforcement contact is load-bearing, and a solo repo has no one to route a report to. | a second maintainer joins, an external contributor asks, or the project accepts public contributions |
 | `docs/product/requirements.md` | What it would hold already exists and is owned elsewhere: `.claude/CONTEXT.md` carries the roster · loop · gates · modes (what the product **is**), `.claude/CLAUDE.md` the design principles + DoD (what it must **satisfy**). A third copy would be a second SSOT, which LAW 4 and the anti-SSOT rule both forbid. The alternate trigger — a sanitized feature PRD landing — has never fired. | a feature PRD is sanitized into a durable requirement, or the AI-context files stop being the spec |
 | `docs/product/acceptance-criteria.md` | §2 trigger is *with requirements*. Dependent row; its condition is unmet while the row above is exempt. | with `requirements.md` |
 
