@@ -236,3 +236,39 @@ it loosely to our own Plan would have been the wrong place to start.
 artifacts and states explicitly that §11 has no row for them *because* retention acts on committed
 files — so a reader who checks the retention table and finds nothing has an answer waiting where they
 were sent from, rather than a silence to interpret. DoD item ticked with the amendment recorded here.
+
+### 2026-08-09 | progress | T5 — the awareness audit, and a defect this sprint's own T2 introduced
+
+**Audit (the DoD item, recorded rather than described).** Counting night-run / unattended mentions
+per entry point: `orchestrator` 4 · `.claude/CONTEXT.md` 3 · `flow` 2 · `lean-doc-generator` 2 ·
+`triage` 1 · **`prime` 0** · **`task-decomposer` 0**. So the two skills a session actually *starts*
+at were the two that had never heard of the mode. `/prime`'s `Next:` router now names
+`sprint-bulk unattended` when open DoD sit in an active sprint — naming only; priming stays read-only
+and launches nothing. `night-run.md` Part 1a step 1 now lists an epic slice beside intent / PRD /
+ticket, with `--epic` spelled out.
+
+**A defect T2 introduced, found by T5.** T2 archived EPIC-001 to `docs/epic/archive/`. The
+decomposer's epic resolution globs `docs/epic/EPIC-NNN-<slug>.md` only, and its miss branch says *"it
+is not an epic yet — offer `/lean-doc-generator epic`"*. So after T2, asking for `--epic EPIC-001`
+would advise **opening a new epic for work that is finished**. Not a hypothetical: the glob returns
+nothing today. Every archived epic acquires this the moment §11's rule (which T2 made executable for
+the first time) runs on it — so T2 handed a live edge to a rule that had never fired before.
+
+Fixed in T5 rather than filed, under "clean up your own mess": resolution now checks `archive/` too,
+and a match there reports a **closed** epic, noting that new work toward that outcome opens a new
+epic rather than reopening it — which is what EPIC-001's own closing note already says about its
+Claude-only boundary. In T5's blast radius because Part 1a step 1 now advertises an epic slice as a
+valid night-run input, and that advertisement depends on the resolution being sane.
+
+**Fired end-to-end (L-020) — and exactly which legs were live.** Part 1a steps 2→5 ran *for real this
+session*: SPRINT-055 itself went backlog → `/triage`-free promote → G1 + G2 → pre-flight CLEAR, which
+is the same path a night-run launcher walks. Step 1's **epic** branch is the new leg, and the repo has
+no open epic to slice (T2 archived the only one), so it was exercised directly instead of inferred
+(L-016): the closed-epic path resolves to `docs/epic/archive/EPIC-001-parallel-worktree-fleet.md` with
+`status: closed`, and a temporary `EPIC-902-probe.md` confirmed the open-epic path resolves and is
+decomposable before being removed. Pre-flight re-run after every edit: CLEAR.
+
+**Stated plainly:** `/prime`'s new `Next:` branch was verified **by inspection, not execution**. The
+condition it fires on (active sprint, open DoD) is true right now, so running `/prime` would have
+exercised it — but `/prime` mid-task is its own documented red flag ("mid-task use signals context
+drift"), and firing a probe that the skill itself warns against is not verification worth having.

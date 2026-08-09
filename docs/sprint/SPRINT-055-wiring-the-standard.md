@@ -111,7 +111,7 @@ consumes them, mirrored in §11.
       *evaluated: they converge (both are temp-dir intake scaffolding), so no split*
 
 ### T5 — Make every entry point aware the night run exists `[size: S · risk: low · class: execution · AFK]`
-Layers: `skills/orchestrator/references/night-run.md` · `skills/prime/SKILL.md` · `.claude/CONTEXT.md`
+Layers: `skills/orchestrator/references/night-run.md` · `skills/prime/SKILL.md` · `skills/task-decomposer/SKILL.md` · `.claude/CONTEXT.md`
 Cites: `skills/flow/SKILL.md` — audited for existing night-run awareness, expected unchanged
 Depends-on: none
 Part 1a's entry path lists "raw intent / a PRD / a ticket" but not an epic slice, though
@@ -124,11 +124,14 @@ told long-run AFK execution is an option. Audit the rest rather than assuming: `
 an active sprint has open DoD, and the chain runs end-to-end from an epic slice to a green pre-flight.
 
 **DoD:**
-- [ ] night-run.md Part 1a step 1 lists an epic slice alongside intent / PRD / ticket
-- [ ] `/prime`'s `Next:` router offers the unattended option when open DoD exist
-- [ ] Audit recorded: which entry points already carry night-run awareness and which were missing
-- [ ] Fired end-to-end once, epic slice → green pre-flight — present in its own file is not wired (L-020)
-- [ ] `/prime` stays read-only: it names the next skill, it never launches a run
+- [x] night-run.md Part 1a step 1 lists an epic slice alongside intent / PRD / ticket
+- [x] `/prime`'s `Next:` router offers the unattended option when open DoD exist
+- [x] Audit recorded: which entry points already carry night-run awareness and which were missing
+      — `prime` and `task-decomposer` were the two at zero (Execution Log)
+- [x] Fired end-to-end once, epic slice → green pre-flight — present in its own file is not wired (L-020)
+      — *steps 2→5 ran live this session forming SPRINT-055; step 1's epic branch exercised directly
+      on both the closed and open cases, no open epic existing to slice (L-016)*
+- [x] `/prime` stays read-only: it names the next skill, it never launches a run
 
 ### T6 — Deny the G1 fast-path to tasks that never met the grill `[size: M · risk: med · class: decision · HITL]`
 Layers: `skills/orchestrator/SKILL.md` (G1) · `skills/lean-doc-generator/SKILL.md` (close §10 routing) · `skills/triage/SKILL.md` · `.claude/CONTEXT.md` (task entry shape) · `evals/`

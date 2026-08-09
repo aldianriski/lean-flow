@@ -89,7 +89,7 @@ process, where there is no ask channel to halt into.
 
 | # | If… | Then run | Gate |
 |---|---|---|---|
-| 1 | `<X>` is raw intent / a PRD / a ticket | `/task-decomposer` → `TASK-NNN` in the Backlog | human `approve` |
+| 1 | `<X>` is raw intent / a PRD / a ticket / **a slice of an open epic** | `/task-decomposer` (`--prd <path>` · `--epic <id\|name>` — decompose only the slice named, never the whole epic) → `TASK-NNN` in the Backlog | human `approve` |
 | 2 | the Backlog is ungroomed, or nothing is `state: ready` | `/triage` | human sign-off |
 | 3 | no active sprint holds the work | `/lean-doc-generator promote` | governance checklist sign-off |
 | 4 | a sprint exists but G1/G2 are unsigned | `sprint-bulk` steps 1–2, interactively | human G1 + G2 |

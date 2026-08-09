@@ -73,7 +73,12 @@ version-scoped root, so this skill's base dir is the whole roster's. Out of scop
 3. Compare the invocation header's base-dir version against the plugin manifest (above).
 4. Emit the health report (below) — health check ONLY, no inline file summaries.
 5. Emit one `Next:` line:
-   - open tasks exist → `/orchestrator` to continue
+   - open tasks exist → `/orchestrator` to continue — and when those tasks sit in an **active
+     sprint**, name the unattended option too (`/orchestrator sprint-bulk unattended` — a night run
+     that executes the promoted Plan while nobody watches). **Naming it is the whole job:** priming is
+     read-only, so this line points at the next skill and never launches anything. The mode is
+     declared at the trigger, never inferred, and the run itself is gated by its own pre-flight
+     (`orchestrator/references/night-run.md`)
    - no open tasks but the backlog has `state: ready` tasks → `/lean-doc-generator` to promote / close
    - backlog exists but nothing is `state: ready` (blocked/needs-info/ungroomed) → `/triage` to groom
    - nothing tracked yet → `/task-decomposer "<intent>"`
@@ -90,7 +95,7 @@ version-scoped root, so this skill's base dir is the whole roster's. Out of scop
 [OK]      ARCHITECTURE.md
 Skills:   1.22.0 base-dir == 1.22.0 repo → fresh
 Tasks:    3 open
-Next:     /orchestrator — continue the 3 open tasks
+Next:     /orchestrator — continue the 3 open tasks (or `sprint-bulk unattended` for a night run)
 ====================
 ```
 

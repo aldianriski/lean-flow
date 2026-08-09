@@ -24,7 +24,11 @@ not a re-grill.
 
 For a ticket, fetch the description first (ask the user to paste if credentials are missing — never block on env vars).
 **For an epic**, resolve the flag to `docs/epic/EPIC-NNN-<slug>.md` (match on id, else slug, else the
-`INDEX.md` row) and **read it before grilling** — its Outcome, Scope-Out and Open questions are already-settled
+`INDEX.md` row) and **read it before grilling**. **Check `docs/epic/archive/` before concluding it does
+not exist** — a closed epic is archived there (§11) and resolving only the live directory would report
+a finished epic as never-created, sending the owner to `/lean-doc-generator epic` to re-open work that
+is already done. A match in `archive/` is a *closed* epic: say so, and note that new work toward that
+outcome opens a **new** epic rather than reopening this one — its Outcome, Scope-Out and Open questions are already-settled
 context, so re-asking them is the interview a resolved epic exists to prevent. Decompose only the slice
 the owner names, never the whole epic at once: an epic spans sprints by definition, and a Plan holds
 ~12 tasks. No epic doc for that name → it is not an epic yet; say so and offer `/lean-doc-generator epic`
