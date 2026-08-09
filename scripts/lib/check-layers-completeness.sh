@@ -132,7 +132,7 @@ check_block() {
     fi
   fi
   if [ -n "$miss_f" ]
-  then bad "$sp $tid Layers completeness: DoD/Acceptance implies$miss_f, absent from Layers:"
+  then bad "$sp $tid Layers completeness: DoD/Acceptance implies$miss_f, absent from Layers: -- if the prose only cites it rather than touching it, declare it on a Cites: line"
   else ok  "$sp $tid Layers completeness (DoD-implied files all declared)"
   fi
 
@@ -146,7 +146,7 @@ check_block() {
     miss_d="$miss_d $o"
   done
   if [ -n "$miss_d" ]
-  then bad "$sp $tid Depends-on completeness: DoD/Acceptance references$miss_d, absent from Depends-on:"
+  then bad "$sp $tid Depends-on completeness: DoD/Acceptance references$miss_d, absent from Depends-on: -- if the prose only cites that task rather than depending on it, declare it on a Cites: line"
   else ok  "$sp $tid Depends-on completeness (prose-referenced tasks all declared)"
   fi
 }

@@ -58,7 +58,8 @@ testing-guide file, and §6 states the condition that makes that correct rather 
 - [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ### T2 — Name the `Cites:` escape in the two completeness FAILs `[size: S · risk: low · class: execution · HITL]`
-Layers: `scripts/lib/check-layers-completeness.sh` · `evals/fixtures/layers-completeness/` · `docs/QA.md`
+Layers: `scripts/lib/check-layers-completeness.sh` · `evals/fixtures/layers-completeness/` ·
+    `evals/run-layers-completeness-fixtures.sh` · `docs/QA.md`
 Depends-on: none
 Cites: `scripts/qa-check.sh`
 
@@ -71,14 +72,14 @@ surface a failing author reads is the FAIL message itself.
 exists, without reading the checker's source.
 
 **DoD:**
-- [ ] **Mitigation re-derived before it is built** (L-091, TECH-DEBT header) — confirm A3, that the
+- [x] **Mitigation re-derived before it is built** (L-091, TECH-DEBT header) — confirm A3, that the
       message is where an author looks, and that naming an escape there does not read as an invitation
       to silence the gate
-- [ ] Both completeness FAILs name the escape; the `Cites:`/`Layers:` contradiction FAIL is unchanged
-- [ ] A must-FAIL fixture per changed check (L-058), **retained** not deleted (TD-012)
-- [ ] Proven as a change, not just as code: red-on-new / green-on-old against `git show HEAD:` (L-090)
-- [ ] `docs/QA.md`'s layers-completeness row still matches the shipped behaviour
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+- [x] Both completeness FAILs name the escape; the `Cites:`/`Layers:` contradiction FAIL is unchanged
+- [x] A must-FAIL fixture per changed check (L-058), **retained** not deleted (TD-012)
+- [x] Proven as a change, not just as code: red-on-new / green-on-old against `git show HEAD:` (L-090)
+- [x] `docs/QA.md`'s layers-completeness row still matches the shipped behaviour
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ### T3 — Clear two stale doc facts `[size: S · risk: low · class: mechanical-ingest · HITL]`
 Layers: `docs/sprint/INDEX.md` · `.claude/CONTEXT.md`
@@ -176,6 +177,9 @@ sits where every flow that can defer a question reads it.
 |------|------|--------------|------|------|
 | `skills/lean-doc-generator/references/init.md` | T1 | base table gains a Condition column (has code · publishes an artifact); step 2 stops saying "always" and reports skips | low | consumer trace ×2 |
 | `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §6's base row states the same conditions, so standard and tool agree | low | `qa-check.sh` |
+| `scripts/lib/check-layers-completeness.sh` | T2 | both completeness FAILs name the `Cites:` escape, stating the condition not the remedy | low | fixtures + old/new pair |
+| `evals/run-layers-completeness-fixtures.sh` | T2 | expectations assert the hint, so it cannot silently vanish (TD-012) | low | harness green |
+| `docs/QA.md` | T2 | records that the FAIL now names the escape and that fixtures guard it | low | `qa-check.sh` |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):

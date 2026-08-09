@@ -73,3 +73,42 @@ have both, correctly. The rule that would have been wrong is the one T1 shipped 
 scope-change — "docs-only ⇒ no deployment guides" — which would have predicted our own deployment docs
 out of existence. It also predicts we *should* hold `CONTRIBUTING`/`SECURITY`/`AGENTS`/`product/*`,
 which we do not: that is TASK-165, and the consistency is the point.
+
+### 2026-08-09 | complete | T2 — both completeness FAILs now name the escape, and the hint is guarded
+**Mitigation re-derived first (L-091), and it came out cheaper than TD-039 assumed.** Two checks:
+*is the message where an author looks?* — yes, evidenced at this sprint's own promote, where the FAIL
+was the only thing standing between the author and the wrong fix. *Does naming an escape invite
+silencing the gate?* — no, and the reason is not the contradiction check: that only catches a token
+declared in **both** lines. The real guard is `check-layers-observed.sh`, which reads git history, so a
+file falsely escaped as "merely cited" and then actually edited is caught by the observed leg. The
+text-reading checker says as much in its own comments; the escape is safe because a *different* leg
+answers the question this one cannot.
+
+Wording states the condition rather than the remedy — "if the prose only cites it rather than touching
+it" — so it reads as a test to apply, not an instruction to quieten the gate.
+
+**The fixtures now assert the hint.** They match substrings *anywhere*, so appending was
+fixture-compatible without edits — which is precisely why the hint had to be added to the expectations
+deliberately: an unasserted hint is one edit from vanishing with nothing going red (TD-012).
+
+**L-090 pair, adapted.** L-090's red-on-new/green-on-old proves a *detection* change; here detection is
+untouched and the message grew, so the meaningful pair is whether the new expectation discriminates.
+Checked mechanically, not by eye: old checker contains the hint — **NO**; new checker — **YES**; both
+still exit 1 on the same fixture, so the detection is provably unchanged while the guidance is new.
+
+### 2026-08-09 | surprise | the observed leg caught T2's own declaration gap — declaration corrected, scope unchanged
+T2's `Layers:` declared `evals/fixtures/layers-completeness/` (the fixtures directory) but the work
+edited `evals/run-layers-completeness-fixtures.sh` — the *harness*, a different path — so
+`check-layers-observed.sh` reported `changed but undeclared in any task's Layers:`. A correct FAIL on a
+real omission, not a false positive.
+
+**Not a scope-change.** Asserting the hint in the harness is what T2's own DoD requires ("a must-FAIL
+fixture per changed check, retained"); the declaration was simply incomplete when written at promote,
+and no scope moved. Corrected `Layers:` to name the harness rather than reshaping the task or dropping
+the assertion — L-088's distinction applies in reverse here: the criterion held, the *declaration* was
+wrong, so it is a correction rather than a ruling. Logged before § Plan was touched either way.
+
+Worth noting which leg caught it: the prose-reading completeness check could not, because the harness
+is never named in T2's DoD prose. The observed leg reads git rather than text — the same asymmetry T2's
+re-derivation leaned on when arguing the `Cites:` escape is safe to advertise. The argument was tested
+against its author within the hour.

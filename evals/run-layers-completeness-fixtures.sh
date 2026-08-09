@@ -28,12 +28,12 @@ fail=0
 
 # --- case 1: SPRINT-041 reconstructed -- TD marked resolved implies TECH-DEBT.md, undeclared -----
 run_case_anywhere "sprint-041-reconstructed" 1 \
-  "Layers completeness: DoD/Acceptance implies TECH-DEBT.md(TD-marked-resolved), absent from Layers:" -- \
+  "Layers completeness: DoD/Acceptance implies TECH-DEBT.md(TD-marked-resolved), absent from Layers: -- if the prose only cites it rather than touching it, declare it on a Cites: line" -- \
   sh "$checker" "$here/fixtures/layers-completeness/sprint-041-reconstructed.md"
 
 # --- case 2: Depends-on omission (constructed) -- T2's prose references T1, Depends-on: none -----
 run_case_anywhere "depends-on-omitted" 1 \
-  "Depends-on completeness: DoD/Acceptance references T1, absent from Depends-on:" -- \
+  "Depends-on completeness: DoD/Acceptance references T1, absent from Depends-on: -- if the prose only cites that task rather than depending on it, declare it on a Cites: line" -- \
   sh "$checker" "$here/fixtures/layers-completeness/depends-on-omitted.md"
 
 # --- cases 3-5: the `Cites:` escape and the wrapped-declaration rule (SPRINT-049 T3) -------------
