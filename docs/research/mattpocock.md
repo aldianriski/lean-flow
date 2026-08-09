@@ -56,7 +56,7 @@ nothing since has changed the verdict.
 | `to-questionnaire` | `blocked`/`needs-info` states · SPRINT § Owner-action checklist | **Reject (micro)** — "grill the send, not the subject" is a neat framing, but our model is agent + owner; a third-party knowledge holder is an owner-action, and the questionnaire artifact is one line if ever wanted |
 | `teach` | — | **Reject** — a personal-learning workspace (MISSION.md, lessons as HTML, learning records). Not a software-delivery loop; out of domain, not merely covered |
 | `claude-handoff` | `/handoff` | **Reject** — identical to `handoff` except it auto-spawns `claude --bg` with the summary as prompt. A handoff is a *stopping point*; auto-launching removes the human gate, and we ship no auto-spawn |
-| `loop-me` | `/task-decomposer` grill · gates | **Reject (tension noted)** — personal-workflow domain. Its **push right** principle (defer the checkpoint as far as it goes; ask once, late, fully prepared) genuinely cuts against gate-*before*-work. Not dismissed, not adopted: it needs evidence, like the negation question |
+| `loop-me` | `/task-decomposer` grill · gates | **Reject (tension noted)** — personal-workflow domain. Its **push right** principle (defer the checkpoint as far as it goes; ask once, late, fully prepared) genuinely cuts against gate-*before*-work. **Tension closed at SPRINT-054 T3** — category-mismatched, no change (§ Out of scope) |
 | `setup-ts-deep-modules` | `refactor-advisor` vocabulary | **Reject** — a TypeScript scaffold wiring dependency-cruiser. Language-specific + external dep + scaffold: off-ethos three ways |
 | `writing-beats` · `writing-fragments` · `writing-shape` | — | **Reject** (3) — article authoring on an explore/exploit split. Out of domain; the explore→exploit shape is already ours as fog-map → decompose |
 | `git-guardrails-claude-code` | **ADR-011** (no gate-enforcement hook) · `/release-patch` stops before push | **Reject** — a `PreToolUse` hook blocking `push`/`reset --hard`/`clean -f`. Our answer is procedural, and ADR-011 killed the in-core hook. **Second time an external repo has offered a hook**; a third makes it worth re-opening rather than re-rejecting (TD-032's trigger shape) |
@@ -66,32 +66,13 @@ nothing since has changed the verdict.
 
 ## Keepers — scan 3 (all micro; filed, never adopted in-scan)
 
-- **K1 — redact secrets before showing captured artifacts** (`diagnosing-bugs`). `/diagnose` instructs
-  capturing traces, HAR files, log dumps and replayed payloads, and says **nothing** about redaction —
-  zero occurrences of redact/secret/credential across `SKILL.md` and `feedback-loops.md`. Captured
-  artifacts routinely carry auth headers, and a debugging session is where they get pasted. Matt's
-  rule is also the *right* mechanism, not just a warning: build loops against **env vars** so the
-  credential stays in the environment rather than in what you show, and quote only the signal-carrying
-  lines. → **TASK-156**.
-- **K2 — scope a refactor scan by git hot-spots before scanning** (`improve-codebase-architecture`).
-  `/refactor-advisor` has no scoping step at all: it scans, then ranks. Deepening only pays off where
-  change is frequent, so walking `git log` for the files that keep reappearing is a YAGNI filter on
-  the scan itself. → **TASK-158**.
-- **K3 — retain a spent prototype on a throwaway branch instead of deleting it** (`prototype`).
-  `/prototype` says "delete or absorb — never leave it rotting", which loses the artifact entirely;
-  Matt commits it out of main and leaves a pointer, keeping it as a retrievable primary source at zero
-  repo cost. TD-012 is our scar for exactly this (fixtures deleted with the prototype left a gate
-  unguarded). → **TASK-158**.
-- **K4 — recover each side's intent before resolving a merge conflict** (`resolving-merge-conflicts`).
-  Read the commit messages / PRs behind each hunk, preserve both intents, never invent new behaviour,
-  always resolve rather than `--abort`. Not a new skill — two lines in `dispatch.md`'s merge-back
-  queue, which is where our conflicts actually arise. SPRINT-041's corrupted merge is why this is not
-  theoretical. → **TASK-158**.
-- **K5 — the tautological-test anti-pattern** (`tdd`). An assertion that recomputes the expected value
-  the way the code does (`expect(add(a,b)).toBe(a+b)`, a hand-derived snapshot) passes **by
-  construction** and can never disagree with the code. Absent from `/tdd` and `testability.md`, which
-  carry implementation-coupled and horizontal-slicing but not this. Same family as L-058: a check that
-  can only pass is the failure it exists to prevent. → **TASK-157**.
+**K1** redact secrets before showing captured artifacts (`diagnosing-bugs`) → **TASK-156** ·
+**K2** scope a refactor scan by git hot-spots before scanning (`improve-codebase-architecture`) →
+**TASK-158** · **K3** retain a spent prototype on a throwaway branch instead of deleting it
+(`prototype`) → **TASK-158** · **K4** recover each side's intent before resolving a merge conflict
+(`resolving-merge-conflicts`) → **TASK-158** · **K5** the tautological-test anti-pattern (`tdd`) →
+**TASK-157**. Evidence and rationale per keeper →
+[`mattpocock-scan3-keepers.md`](mattpocock-scan3-keepers.md).
 
 ## Out of scope / open questions
 
@@ -105,44 +86,14 @@ once, so B removes the concurrency it was being considered for. Trail, evidence,
 dated expiry → [`.out-of-scope/skill-self-fork.md`](../../.out-of-scope/skill-self-fork.md).
 
 **Closed at SPRINT-054 T2 (TASK-155) — negation in anti-patterns: no change warranted.** The claim is
-real but narrower than `writing-for-agents` states, and our ❌ rows already sit on its safe side. In
-order of weight: the popular write-up runs **no experiment** — it rests on Ironic Process Theory, a
-*human* result, plus forum anecdotes, and says so
-([16x](https://eval.16x.engineer/blog/the-pink-elephant-negative-instructions-llms-effectiveness-analysis)).
-**NeQA**, the benchmark usually invoked, measures *negation comprehension in question answering*, not
-instruction-following under prohibition — a different construct — and its own finding is that the task
-shows "inverse scaling, U-shaped scaling, or positive scaling", shifting in that order with more
-powerful prompting methods or model families; the alarming version is its weakest-prompt corner
-([Zhang et al., ACL 2023 Findings](https://arxiv.org/abs/2305.17311)). Anthropic's guidance — "Tell
-Claude what to do instead of what not to do", worked as "Do not use markdown" → "smoothly flowing prose
-paragraphs" — targets a **bare** prohibition that leaves no positive target
-([prompting best practices](https://platform.claude.com/docs/en/docs/build-with-claude/prompt-engineering/be-clear-and-direct)).
-The decisive datum is on that same page: its own production prompt samples are built *from*
-prohibitions — "DO NOT use ordered lists … unless: a) … b) …" · "NEVER output a series of overly short
-bullet points" · "Don't add features … beyond what was asked" · "Don't add error handling … for
-scenarios that can't happen. … Only validate at system boundaries." Each is **scoped and paired with a
-positive rule**, which is the shape our rows already use — checked row by row across `.claude/CLAUDE.md`
-§ Anti-Patterns rather than assumed (A3 confirmed). So the invariant worth protecting is the
-**pairing**, not the ❌ glyph. Recorded as a null result and nothing was edited to prove the question
-was answered — that is this sprint's named failure mode (SPRINT-054 D1).
+real but narrower than `writing-for-agents` states; our ❌ rows already pair each trap with a positive
+rule, which is the shape the sources themselves endorse and use.
 
 **Closed at SPRINT-054 T3 (TASK-159) — push right vs gate-before-work: no change; the tension was
-category-mismatched.** Read at the source rather than through this doc's summary,
-[`loop-me`](https://github.com/mattpocock/skills/blob/main/skills/in-progress/loop-me/SKILL.md) defines
-a **Checkpoint** as "a human-in-the-loop point where the user is asked to *verify or decide*" inside a
-running workflow, and push right as "defer the checkpoint as far as it will go … asked once, late, with
-everything prepared". But the skill **is itself a grilling session**, and its own DoD is "done when an
-implementer agent could build it without asking a single question. Grill until then." Its model is
-therefore *grill exhaustively up front, push the **runtime** checkpoint right* — and what this doc
-recorded as a tension compared our **design gates** against his **runtime checkpoints**, two different
-objects. A4 confirmed, though not for the reason it guessed. Both principles are already in our loop on
-the correct halves: the intake grill + G1/G2 are his grilling; `/code-review` · `/verify` · close ·
-`release-patch`'s single stop-before-push are his push right. Gate count already scales by size —
-`quick` runs G1 only, a decomposer-approved task collapses G1 to one confirm — which is the "ask once"
-half. `.claude/CONTEXT.md` § Gates and `skills/orchestrator/SKILL.md` were deliberately left untouched;
-the ruling is that placement is right, not that it was never examined. One micro surfaced on re-read
-and rejected: **Brief** ("a decision-ready summary … a link down to the asset itself, never the raw
-output") is covered by our recommend-an-answer popups plus terse-by-default reporting.
+category-mismatched.** Push right governs *runtime* checkpoints, G1/G2 govern *direction* before work,
+and `loop-me` grills exhaustively up front exactly as we do.
+
+Sources, evidence and the full argument for both → [`mattpocock-tensions.md`](mattpocock-tensions.md).
 
 **Still open** — nothing. Both tensions carried since scan 3 are closed: one by reading, one by ruling.
 

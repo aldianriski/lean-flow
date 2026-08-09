@@ -178,3 +178,46 @@ case the summary is exactly what was wrong.
 **Micro examined and rejected on the T3 re-read:** `loop-me`'s **Brief** ("a decision-ready summary …
 a link down to the asset itself, never the raw output"). Mapped against our surface first (L-017):
 covered by recommend-an-answer popups plus terse-by-default reporting. Not filed as a task.
+
+### 2026-08-09 | complete | T4 — split done; the debt row had been wrong about itself for four sprints
+
+Parent **159 → 110**, under the 120 soft cap with headroom. Scan 3's keeper detail →
+`mattpocock-scan3-keepers.md` (44); the two closed-tension verdicts and their evidence →
+`mattpocock-tensions.md` (55). Sections were **moved verbatim**, never compressed (§7: knowledge docs
+split, ledgers compress). The parent keeps the question, corpus, scan-verdict block, the full delta map
+— the one-glance "everything examined, verdict each" table the L-017 discipline depends on — and a
+one-line pointer to each verdict.
+
+**The DoD as promoted was unsatisfiable, which is a sharper failure than stale.** It said the parent
+keeps the delta map *and* the closed verdicts, with only keeper detail moving. Measured, that lands at
+**130** — over the cap the same task's Acceptance demanded. Both clauses could not hold at once, so the
+owner ruled which one gives: verdicts move, delta map stays. Recorded here rather than resolved by
+quietly reinterpreting whichever clause was inconvenient (L-088).
+
+**TD-038 resolved, and its own history is the finding.** Traced by `git show <sha>:<path> | wc -l`
+rather than trusted: 114 (`5fa44de`) → 117 (`4793504`) → **124 (`bab405f`)** → 143 (T2) → 159 (T3).
+`bab405f` is SPRINT-050 T2 — **four commits after this row was filed in that same sprint recording
+117**. So the row's premise ("none today… the doc is *correct* at 117"), its trigger ("the next re-scan
+breaches on contact") and the SPRINT-053 re-review that held on those grounds were all reasoning from
+a number that had already stopped being true. That is the **third consecutive TD row falsified at
+execution** — TD-036's Summary, TD-034's cause, now TD-038's premise — which is L-091 one level above
+the Mitigation lines it was promoted about. Worth the Retro's attention: the pattern is not "mitigations
+are guesses", it is "a filed row's *facts* rot and nothing re-measures them".
+
+**Root cause of the silent drift, deliberately not fixed here:** `qa-check.sh` cap-checks
+`skills/*/SKILL.md`, `.claude/*` and `docs/sprint/SPRINT-*.md`, but **not `docs/research/`**. A soft cap
+with no check behind it is a comment, which is why a 120-line limit absorbed 39 extra lines across four
+sprints unnoticed. The owner ruled a split, not a gate change, and a new gate check needs its own
+must-FAIL fixture (L-058) — so this is routed to the Retro rather than swept in. Splitting without it
+means the same drift can start again tomorrow, and that is the honest caveat on this task.
+
+**Inbound references.** `TECH-DEBT.md` corrected. `ADR-006`'s "Keeper 2" cites scan **2**, still in the
+parent's verdict block — resolves. `TODO.md`'s two `tracker:` lines for TASK-155/159 point at
+`mattpocock.md § Still open`, which still exists and now correctly says "nothing": the entries
+themselves are removed at close, so re-pointing them at the new file to delete them an hour later would
+be churn. Stated rather than silently skipped. Pre-existing and untouched: `ADR-010` cites a
+"§ Skill-powered tier dispatch" heading that has not existed in this doc since scan 1's detail moved to
+git — a dangling anchor this task did not create.
+
+Knowledge index regenerated (`sh scripts/gen-index.sh`) — two new corpus docs. QA gate re-run bare:
+72 pass, 0 fail. Layers caught the two new files before the commit, as designed.

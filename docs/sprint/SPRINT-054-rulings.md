@@ -131,7 +131,8 @@ re-parked.
 - [x] If nothing changes, both files are left untouched and the reason is in the verdict
 
 ### T4 — Split `mattpocock.md` per TD-038's remedy `[size: S · risk: low · class: execution · HITL]`
-Layers: `docs/research/mattpocock.md` · `TECH-DEBT.md`
+Layers: `docs/research/mattpocock.md` · `docs/research/mattpocock-scan3-keepers.md` ·
+    `docs/research/mattpocock-tensions.md` · `TECH-DEBT.md`
 Depends-on: T3
 Cites: `TODO.md` · `scripts/qa-check.sh` · T2
 
@@ -147,15 +148,15 @@ detail lives behind an index, every inbound reference still resolves, and TD-038
 measured numbers rather than the stale ones it still carries.
 
 **DoD:**
-- [ ] Split by **moving whole sections**, never compressing (§7 growth rule — knowledge docs split,
+- [x] Split by **moving whole sections**, never compressing (§7 growth rule — knowledge docs split,
       ledgers compress). The parent keeps the question, the scan-verdict block, the delta map and the
       closed/open verdicts; per-scan keeper detail is what moves
-- [ ] Every inbound reference resolves after the move — `TODO.md` trackers, `TECH-DEBT.md`, and the
+- [x] Every inbound reference resolves after the move — `TODO.md` trackers, `TECH-DEBT.md`, and the
       sprint files that cite this doc
-- [ ] Line delta measured and reported for parent **and** children, not estimated
-- [ ] TD-038 marked `status: resolved → SPRINT-054 T4`, and its stale text corrected to the measured
+- [x] Line delta measured and reported for parent **and** children, not estimated
+- [x] TD-038 marked `status: resolved → SPRINT-054 T4`, and its stale text corrected to the measured
       history (114 → 117 → 124 → 143) — a row whose summary is false is TD-036's shape repeating
-- [ ] `sh scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+- [x] `sh scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 <!-- Deliberately NOT in this task: teaching qa-check.sh to cap-check docs/research/. That gap is why
      the breach went unseen for four sprints, and it is a real finding — but the owner ruled a split,
@@ -220,6 +221,11 @@ measured numbers rather than the stale ones it still carries.
 | `.claude/CLAUDE.md` | T2 | **not changed** — verdict was "no change warranted"; recorded so the untouched file reads as a decision | — | A3 confirmed row-by-row against § Anti-Patterns |
 | `docs/research/mattpocock.md` | T3 | push-right tension closed as category-mismatched; § Still open now empty | Low | source fetched via `gh api`, not read off this doc's summary; 143 → 159 lines |
 | `.claude/CONTEXT.md` · `skills/orchestrator/SKILL.md` | T3 | **not changed** — gate placement ruled correct; recorded so the absence reads as a ruling | — | A4 tested against the source's own structure |
+| `docs/research/mattpocock.md` | T4 | split per §7 — 159 → **110**, back under the 120 soft cap; keeps question, corpus, delta map, verdict pointers | Low | sections moved verbatim, nothing compressed |
+| `docs/research/mattpocock-scan3-keepers.md` | T4 | new — scan 3's K1–K5 detail behind the index | Low | 44 lines; corpus metadata lint green |
+| `docs/research/mattpocock-tensions.md` | T4 | new — the two closed tensions with their sources and evidence | Low | 55 lines; corpus metadata lint green |
+| `TECH-DEBT.md` | T4 | TD-038 resolved, and its stale premise corrected against the measured history (114→117→124→143→159) | Low | each figure from `git show <sha>:<path>`, not estimated |
+| `docs/knowledge-index.md` | T4 | regenerated — two new metadata-carrying docs | Low | `sh scripts/gen-index.sh`; "knowledge index current" check green |
 
 ## Retro
 

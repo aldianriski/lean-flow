@@ -53,21 +53,27 @@ status: current
     evidence for the cheap version is that the abuse is already guarded: a token in both `Cites:` and
     `Layers:` is a contradiction with its own named FAIL.
 
-- **TD-038** severity: trivial | status: open | created: Sprint-050
-  - Summary: `docs/research/mattpocock.md` sits at **117 lines against its 120 soft cap** with the
-    corpus now fully mapped. TD-033 bought headroom by collapsing two scans to pointers; that lever is
-    spent, and the next re-scan breaches on contact.
-  - Impact: none today, and deliberately not pre-solved — the doc is *correct* at 117 and restructuring
-    a correct doc against a hypothetical future scan is the shape TD-031 warned about. What makes this
-    worth a row rather than nothing is that the breach is now **certain rather than possible**: the
-    upstream repo grew 34 → 35 files between two scans, so a re-scan is a matter of when.
-  - Mitigation (not yet done): at the next re-scan, split per-scan files behind an index — the option
-    scan 3 rejected because one readable table was worth more than a lower line count. That trade
-    reverses once the table stops fitting. Do **not** apply it before then.
-  - **Re-reviewed 2026-08-09 (SPRINT-053 promote, 3 sprints open) — held, trigger unchanged.** The row
-    already names its own precondition (the next re-scan) and no re-scan has happened, so acting now
-    would restructure a doc that is still correct at 117 against a breach that has not occurred. A
-    re-review that reaffirms is a decision, not a skipped line.
+- **TD-038** severity: trivial | status: resolved → SPRINT-054 T4 | created: Sprint-050
+  - Summary (**as filed, and wrong within its own sprint**): `docs/research/mattpocock.md` sits at
+    117 lines against its 120 soft cap; the next re-scan breaches on contact.
+  - **The breach had already happened when this row said it hadn't.** Measured at SPRINT-054 T2 with
+    `git show <sha>:<path> | wc -l`: 114 at `5fa44de` (SPRINT-050 T1) → 117 at `4793504` (T3) → **124
+    at `bab405f`** — SPRINT-050 T2, four commits after this row was filed in that same sprint — → 143
+    after T2 → 159 after T3. So the row's premise ("*none today*… the doc is **correct** at 117"), its
+    trigger (a future re-scan) and the SPRINT-053 re-review that held on those grounds were all
+    reasoning from a number that had stopped being true. **Nothing caught it because `qa-check.sh`
+    cap-checks `skills/*/SKILL.md`, `.claude/*` and `docs/sprint/SPRINT-*.md` — not `docs/research/`.**
+    A soft cap with no check behind it is a comment. Third row in a row whose stated premise was
+    falsified at execution (TD-036's Summary · TD-034's cause · this): L-091 one level up again.
+  - **RESOLVED (SPRINT-054 T4)** — split by moving whole sections, never compressing (§7: knowledge
+    docs split, ledgers compress). Parent 159 → **110**, under the cap with headroom for scan 5. Scan
+    3's keeper detail → `docs/research/mattpocock-scan3-keepers.md` (44); the two closed-tension
+    verdicts and their evidence → `docs/research/mattpocock-tensions.md` (55). The parent keeps the
+    question, corpus, scan-verdict block, the full delta map, and a one-line pointer to each verdict.
+    Applied *now* rather than at "the next re-scan": the trigger this row named was written against a
+    hypothetical breach, and the real one was two sprints old and measured.
+  - Residual, deliberately not fixed here: the `docs/research/` cap gap above. The owner ruled a split,
+    not a gate change, and a new gate check needs its own must-FAIL fixture (L-058). → Retro follow-up.
 
 - **TD-037** severity: minor | status: open | created: Sprint-049
   - Summary: attribution needs a commit to read, so **uncommitted work in progress is still tested
