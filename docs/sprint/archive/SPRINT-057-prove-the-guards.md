@@ -2,8 +2,8 @@
 sprint: 057
 slug: prove-the-guards
 owner: Maintainer
-last_updated: 2026-08-09
-status: active
+last_updated: 2026-08-10
+status: closed
 gates_signed: G1,G2 @ 6d3811b
 plan_commit: d9b1ab9
 close_commit: [sha — set at close]
@@ -215,3 +215,38 @@ pulled, at the moment they are pulled, where splitting is still free.
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
      shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Retrieval check** — no miss. The opposite, twice: L-017 stopped us rewriting a correct stall rule
+into the same rule (T4), and L-094 turned A1 from a parked measurement into a two-minute read (T3).
+Both fired because the Plan named them at authoring time rather than leaving them to be remembered.
+
+**Cost** — inline, single session, no dispatch (four `execution`-class tasks stayed inline for the
+stated reason: agent dispatch is off for this session, and all six are doc-surface edits). 6 tasks ·
+1 new checker · 5 retained fixture cases · gate 129 → 131 checks. Probe cost of the *source* evidence
+is the consumer's, not ours: $1.77 across three probes against a run estimated at $40–150.
+
+**Worked**
+- **Reading the target before writing anything.** Three of nine findings changed shape on contact:
+  Finding 8's second half was already satisfied, Finding 1 turned out to be a four-sprint-old deferral
+  that never graduated, and a conflict nobody reported (Parts 2/3/4 disagreeing on output format) only
+  surfaced because T3's premise was checked against the actual sections.
+- **Naming the class of fact before deferring.** A1 read as "needs a measurement" and was a
+  *documented behaviour* — closed by one fetch (L-094). Parked as a measurement it would have waited
+  for a $40–150 run to produce what a doc already stated.
+- **Consumer evidence, taken as evidence.** This repo cannot cheaply dogfood a night run, and the
+  report is the first outside data the protocol has ever had. Treating it as a real second sighting is
+  what moved L-086 to promotion after sitting at count 1 since Sprint-046.
+
+**Friction**
+- The gate crossed 120s and now needs a background run every time, which cost several minutes of
+  wall-clock across this sprint. TD-046 already tracks it; TASK-178 measures it. This sprint added
+  ~2s, not the problem, but it is now impossible to ignore.
+- T2's checklist item was written inside T1's edit and had to be split back out, because both land in
+  the same Part 1 list. Cheap here; a real hazard if the two had been dispatched in parallel.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- Three defects fixed across this sprint pair were the same shape: a **correct rule evaluated at the
+  wrong moment** — a check disarmed by a status flip in the commit that made the edit, a sign-off
+  written after the artifact its reader consumes, a size gate firing after the Plan is frozen. None
+  looked wrong in isolation, and each was found by asking *when* the rule runs rather than *what it
+  says* (→ L-105).

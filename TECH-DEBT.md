@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-09
+last_updated: 2026-08-10
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -22,6 +22,26 @@ status: current
 ---
 
 ## Tech Debt
+
+- **TD-047** severity: minor | status: open | created: Sprint-057
+  - Summary: `night-run.md` is **414 lines** and carries five Parts plus a pre-flight checklist that
+    now runs to a dozen items, several of them multi-paragraph. It has no cap: DOCS_Guide §2 does not
+    cover `skills/**/references/`, and ADR-006 explicitly leaves reference files uncounted so that
+    depth can live outside a `SKILL.md`.
+  - Impact: none mechanical — the exemption is deliberate and correct. The concern is that the
+    pre-flight checklist is now the doc's centre of gravity and is read *under time pressure, the
+    evening before a run*, which is the worst possible reading condition for a twelve-item list where
+    four items are load-bearing and the rest are context. SPRINT-057 added two items and lengthened
+    two more without removing anything. Recorded now because the trend is only visible across
+    sprints, and because the failure mode is a skipped item rather than a broken one — invisible to
+    every check in the repo.
+  - Mitigation (**not yet derived**, L-091): the obvious move is a split, as `night-run-checks.md`
+    already did once. **Re-derive before doing it**: that split is precisely what let the probe
+    mechanism sit deferred and unfiled for four sprints (SPRINT-057 T1), so splitting again without a
+    mechanism that fires is how the next item gets lost. A cheaper alternative worth pricing first:
+    order the checklist so the four total-loss items come first and say so, leaving the rest as
+    context that can be skimmed. Do not act on the line count alone — measure which items a real
+    pre-flight actually skips.
 
 - **TD-046** severity: minor | status: open | created: Sprint-056
   - Summary: the always-on gate now takes **~126s** (measured: 115s at SPRINT-056 T1, 126s at close),

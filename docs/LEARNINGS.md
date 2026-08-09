@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-09
+last_updated: 2026-08-10
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -22,11 +22,19 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-104**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-105**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-105 [tags: process] [status: active]: **A correct rule evaluated at the wrong moment is the defect that survives review, because reviewers check what a rule says and not when it runs.** Three instances across SPRINT-056/057, none of which looked wrong in isolation and all of which had passed review repeatedly. (a) The sprint checks gated on `status: active`, so writing `status: closed` **disarmed them inside the very commit that made the largest edit to the file** — 72→68 checks at one close, 94→87 at the next, both reporting "0 fail". The scoping was defensible; only the timing was wrong, and the fix was to key on archived *location*, which changes in a separate later commit. (b) Night-run pre-flight required batch G1/G2 "already signed off by the human" and never said the sign-off had to exist **in the artifact the run reads**, so a run consuming only the sprint file re-ran both gates, reached for an unregistered `AskUserQuestion`, and parked every task having done zero work. (c) G1 splits a `size: L` — but G1 runs *after* `promote` has rendered, frozen and committed the Plan, so the split costs a `scope-change` plus a Plan amendment against a commit minutes old, where at pull time it costs nothing. Each rule is individually correct and would survive any reading of its own text; what is wrong is its position in a sequence, which is invisible unless you ask the question directly. The move is cheap and mechanical: for any rule that guards a thing, ask **when does this fire relative to the thing it guards, and what else happens in that same commit?** A guard that fires after its subject is frozen, or that is disabled by a change carried in the same commit it should be checking, is not a weak guard — it is an absent one wearing the shape of a present one. Distinct from L-099 (a rule written where its reader does not read it): that is about *place*, this is about *time*, and (b) is the case where the two intersect.
+- seen: Sprint-056, Sprint-057
+- count: 2
+- promoted: no
+- related: L-099 (its spatial sibling — a rule nothing reads) · L-058 (the silent false negative it produces) · L-103 (an exit code distinguishes neither) · TD-042 · L-089 (the gate re-run *after* the last edit — the same axis, one level down)
 
 ---
 
