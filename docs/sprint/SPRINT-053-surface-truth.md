@@ -50,12 +50,12 @@ testing-guide file, and §6 states the condition that makes that correct rather 
 **DoD:**
 - [x] Read `init.md`'s step-1 detection and confirm A1 — **confirmed at G2**: step 1 already detects
       stack / DB / auth and step 3 already fires conditional rows, so no new machinery is needed
-- [ ] Base-tier rows carry a **per-substrate** condition in the form step 3 already uses. The axis is
+- [x] Base-tier rows carry a **per-substrate** condition in the form step 3 already uses. The axis is
       *has code* · *publishes an artifact* · *has DB* · *has auth* — **not** "docs-only", since a docs
       repo that publishes still deploys (lean-flow is exactly that, and its deployment guides are right)
-- [ ] `DOCS_Guide` §6's base row states the condition, so the standard and `init` agree
-- [ ] **Consumer check (L-015)** — traced on a repo with no code substrate, not on dogfooding alone
-- [ ] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
+- [x] `DOCS_Guide` §6's base row states the condition, so the standard and `init` agree
+- [x] **Consumer check (L-015)** — traced on a repo with no code substrate, not on dogfooding alone
+- [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
 ### T2 — Name the `Cites:` escape in the two completeness FAILs `[size: S · risk: low · class: execution · HITL]`
 Layers: `scripts/lib/check-layers-completeness.sh` · `evals/fixtures/layers-completeness/` · `docs/QA.md`
@@ -174,7 +174,8 @@ sits where every flow that can defer a question reads it.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| | | | | |
+| `skills/lean-doc-generator/references/init.md` | T1 | base table gains a Condition column (has code · publishes an artifact); step 2 stops saying "always" and reports skips | low | consumer trace ×2 |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §6's base row states the same conditions, so standard and tool agree | low | `qa-check.sh` |
 
 ## Retro
 <!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):

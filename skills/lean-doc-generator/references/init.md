@@ -9,9 +9,14 @@ bounded by the safe-scaffold allowlist (ADR-012).
 1. **Detect substrate** — read `package.json` / `pyproject.toml` / `go.mod` / etc. and the existing
    file tree to infer stack, and whether a database or auth substrate is present. If inaccessible,
    ask the user to paste the manifest + file tree.
-2. **Scaffold the base tier (always)** — the TemiDev mandatory minimum (table below), each via the
+2. **Scaffold the base tier** — the TemiDev mandatory minimum (table below), each via the
    template-load protocol (DOCS_Guide §2: **Read** `${CLAUDE_SKILL_DIR}/templates/<X>.md.template`
-   before writing — never free-generate; real content prompts, never empty shells).
+   before writing — never free-generate; real content prompts, never empty shells). Most rows are
+   unconditional; four carry a **substrate condition** and are skipped when that substrate is absent,
+   exactly as step 3's conditional rows fire only on detection. Gate per substrate, never on a repo
+   label: "docs-only" is not a condition — a docs repo that publishes an artifact still deploys, and
+   its deployment guides are correct. A skipped row is **reported, not silent** (step 5's file list
+   names it and the condition that skipped it), so an absent doc reads as a decision rather than a miss.
 3. **Offer higher tiers via an AskUserQuestion popup** — default the selection from the substrate
    detection in step 1, let the user confirm/override:
    - **Substrate-conditional rows** fire automatically when detected (confirmed, not asked):
@@ -60,28 +65,43 @@ bounded by the safe-scaffold allowlist (ADR-012).
    file's ownership header + placement match DOCS_Guide §2/§3; report the full file list, including
    safe-scaffold writes and any skips.
 
-## Base-tier mandatory minimum (always scaffolded)
+## Base-tier mandatory minimum
 
-| File | Template |
-|---|---|
-| `README.md` | `README.md.template` |
-| `CONTRIBUTING.md` | `CONTRIBUTING.md.template` |
-| `SECURITY.md` | `SECURITY.md.template` |
-| `AGENTS.md` | `AGENTS.md.template` |
-| `CHANGELOG.md` | `CHANGELOG.md.template` |
-| `LICENSE` | safe-scaffold (below) — no markdown template |
-| `TODO.md` | `TODO.md.template` |
-| `TECH-DEBT.md` | `TECH-DEBT.md.template` |
-| `.claude/CLAUDE.md` | `CLAUDE.md.template` |
-| `.claude/CONTEXT.md` | `CONTEXT.md.template` |
-| `docs/product/requirements.md` | `product-requirements.md.template` |
-| `docs/product/acceptance-criteria.md` | `product-acceptance-criteria.md.template` |
-| `docs/architecture/overview.md` | `architecture-overview.md.template` |
-| `docs/development/setup.md` | `development-setup.md.template` |
-| `docs/development/coding-standards.md` | `development-coding-standards.md.template` |
-| `docs/testing/testing-guide.md` | `testing-guide.md.template` |
-| `docs/deployment/deployment-guide.md` | `deployment-guide.md.template` |
-| `docs/deployment/rollback-guide.md` | `deployment-rollback.md.template` |
+**Condition** blank = always scaffolded. A named condition is checked against step 1's detection and
+the row is skipped when absent — same mechanism as step 3's substrate-conditional rows, applied one
+tier down. The two substrates that gate a base row:
+
+- **has code** — a language manifest (`package.json` · `pyproject.toml` · `go.mod` · `Cargo.toml` …)
+  or source files outside `docs/`. A pure docs, content or config repo has neither.
+- **publishes an artifact** — the repo ships something a consumer installs or runs: a package
+  manifest with a version, a plugin/extension manifest, a Dockerfile, a deploy config. Independent of
+  *has code* — a markdown plugin publishes without holding a line of application code.
+
+| File | Condition | Template |
+|---|---|---|
+| `README.md` | | `README.md.template` |
+| `CONTRIBUTING.md` | | `CONTRIBUTING.md.template` |
+| `SECURITY.md` | | `SECURITY.md.template` |
+| `AGENTS.md` | | `AGENTS.md.template` |
+| `CHANGELOG.md` | | `CHANGELOG.md.template` |
+| `LICENSE` | | safe-scaffold (below) — no markdown template |
+| `TODO.md` | | `TODO.md.template` |
+| `TECH-DEBT.md` | | `TECH-DEBT.md.template` |
+| `.claude/CLAUDE.md` | | `CLAUDE.md.template` |
+| `.claude/CONTEXT.md` | | `CONTEXT.md.template` |
+| `docs/product/requirements.md` | | `product-requirements.md.template` |
+| `docs/product/acceptance-criteria.md` | | `product-acceptance-criteria.md.template` |
+| `docs/architecture/overview.md` | | `architecture-overview.md.template` |
+| `docs/development/setup.md` | | `development-setup.md.template` |
+| `docs/development/coding-standards.md` | **has code** | `development-coding-standards.md.template` |
+| `docs/testing/testing-guide.md` | **has code** | `testing-guide.md.template` |
+| `docs/deployment/deployment-guide.md` | **publishes an artifact** | `deployment-guide.md.template` |
+| `docs/deployment/rollback-guide.md` | **publishes an artifact** | `deployment-rollback.md.template` |
+
+Why only these four: the rest describe the *project*, not its substrate. Every repo has a reason to
+exist (`product/`), a shape (`architecture/`), a way in (`README` · `setup`), and a security contact —
+a docs repo included. Coding standards and a testing guide describe code that may not exist, and
+deployment describes a release that may never happen; those are the ones that become ceremony.
 
 Missing template for a base-tier row → WARN and fall back to DOCS_Guide §2's inline description
 (template-load protocol step 2); never hard-stop.

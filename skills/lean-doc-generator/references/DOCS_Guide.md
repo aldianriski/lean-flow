@@ -235,7 +235,7 @@ Discard log: `"Skipped: '[detail]' explains HOW → add as a comment in [file]."
 
 | Tier | Trigger | Doc set |
 |---|---|---|
-| **Base** | every dev repo | the TemiDev mandatory minimum: root set (§2) · `product/{requirements,acceptance-criteria}` · `architecture/overview` · `development/{setup,coding-standards}` · `testing/testing-guide` · `deployment/{deployment,rollback}-guide` — conditional rows (`database/` · `authentication`) fire on substrate (DB / auth exists) |
+| **Base** | every dev repo | the TemiDev mandatory minimum: root set (§2) · `product/{requirements,acceptance-criteria}` · `architecture/overview` · `development/setup` — plus **substrate-conditional** rows that are skipped, not owed, when the substrate is absent: `development/coding-standards` + `testing/testing-guide` (**has code**) · `deployment/{deployment,rollback}-guide` (**publishes an artifact**) · `database/` (DB) · `authentication` (auth). Gate per substrate, never on a repo label — a docs repo that publishes still deploys |
 | **Backend / integration** | repo exposes an API or external integrations | + `api/openapi.yaml` (placement rule) · `architecture/integrations.md` |
 | **Medium / complex** | multi-dev, sustained, or architecturally forked | + `adr/` + `DECISIONS.md` · `flows/` (CHANGELOG is already always-core — ADR-012) |
 | **Multi-service** | several deployable services / repos | + service registry · cross-service dependency map · global decisions index — per-service repos each carry their own Base+ set; the umbrella repo owns the cross-cutting three |

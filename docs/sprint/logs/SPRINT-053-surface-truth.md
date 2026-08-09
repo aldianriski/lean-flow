@@ -51,3 +51,25 @@ unchanged, so no re-run of the preflight is required beyond the CLEAR above.
 rows. The dropped half is filed as TASK-165 in the Backlog with the six named docs, so it is deferred
 with a record rather than lost. This is L-088's rule applied in its intended direction: the criterion
 went stale while the scope held, so it was ruled on rather than quietly re-read to fit.
+
+### 2026-08-09 | complete | T1 — four base rows gated on two substrates; the rule reproduces our own doc set
+Four rows now carry a condition: `coding-standards` + `testing-guide` on **has code**, and both
+deployment guides on **publishes an artifact** — deliberately independent axes, because a markdown
+plugin publishes without holding a line of application code. The other 14 stay unconditional: they
+describe the *project* (why it exists, its shape, the way in, a security contact), which a docs repo
+has as much as a service does. Skips are reported with the condition that caused them, so an absent
+doc reads as a decision rather than a miss.
+
+**Consumer check (L-015 · L-016 corollary — traced, since this repo cannot run `init` on itself).**
+A markdown notes repo with no manifest, no source outside `docs/`, no Dockerfile or deploy config:
+step 1 detects `has code = false`, `publishes = false`, no DB, no auth → 14 docs scaffolded, 4 skipped
+by name. Before this change it received 18, four of them describing substrate that does not exist.
+
+**The stronger check is the second trace: run the new rule against lean-flow and it reproduces our
+actual doc set on both axes.** `has code = false` (no language manifest, no source outside `docs/`)
+→ `coding-standards` + `testing-guide` skipped, and we genuinely have neither. `publishes = true`
+(`.claude-plugin/plugin.json` carries a version) → both deployment guides scaffolded, and we genuinely
+have both, correctly. The rule that would have been wrong is the one T1 shipped with before the
+scope-change — "docs-only ⇒ no deployment guides" — which would have predicted our own deployment docs
+out of existence. It also predicts we *should* hold `CONTRIBUTING`/`SECURITY`/`AGENTS`/`product/*`,
+which we do not: that is TASK-165, and the consistency is the point.
