@@ -29,7 +29,7 @@ Wrong branch = wasted prototype. If genuinely ambiguous and the user is unreacha
 3. **No persistence by default** — state lives in memory. Persistence is the thing being *checked*, not depended on. If the question is about the DB, use a scratch store named `PROTOTYPE — wipe me`.
 4. **Skip the polish** — no tests, no error handling beyond runnable, no abstractions, no "what if we need X later". One question.
 5. **Surface the state** — after every action (logic) or variant switch (UI), render the full relevant state so the user sees what changed.
-6. **Delete or absorb when done** — never leave it rotting in the repo.
+6. **Retire it when done, don't lose it** — never leave it rotting on the working branch. Commit the spent prototype to a **throwaway branch** off main and leave a pointer to that branch beside the captured answer; then delete or absorb it here. The branch costs nothing, keeps the primary source retrievable when the verdict is later questioned, and avoids TD-012's shape — deleting the scaffolding also deleted the fixtures that were guarding something.
 
 ## State the question first
 

@@ -303,6 +303,13 @@ new tip. **Surprise** (map missed it) → halt that task only, kick back to G2 �
 incomplete. Resolution is coordinator-owned, never a blind sub-agent. First-blocker-halt is
 per-task; a whole wave halts only on a transitive dependency.
 
+**Resolving a hunk: recover both intents first.** Read the commit messages (and the task blocks) behind
+each side before choosing — a conflict is two authors who each had a reason, and the diff shows neither.
+Preserve both intents where they compose; where they genuinely cannot, keep the one matching the merge's
+stated goal and note the trade-off in the merge commit. **Never invent new behaviour** to bridge them,
+and **always resolve rather than `--abort`** — abandoning the merge strands the wave that was the whole
+point of the fan-out. SPRINT-041's corrupted merge is why this is written down.
+
 A broken or incomplete worktree never merges — return the task to backlog with an unblock
 condition, salvage any doc/research artifacts, drop the code.
 

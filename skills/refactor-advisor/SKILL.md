@@ -31,6 +31,8 @@ Three rules that do most of the work:
 ## Process
 
 ### 1. Explore
+**Scope before you scan — YAGNI.** Deepening pays off by making *future* changes easier, so it earns nothing in code that never changes. If the user named a direction, take it; otherwise walk back a good stretch of `git log --oneline` and let the files that keep reappearing pull your attention first. Scattered history with no hot spot → widen the net.
+
 Read the domain glossary (`CONTEXT.md`) + ADRs in the area first — the glossary names good seams; ADRs record decisions not to re-litigate. Then walk the code, noting friction (don't follow rigid heuristics):
 - Understanding one concept means bouncing between many small modules.
 - Modules where the interface is nearly as complex as the implementation (**shallow**).
