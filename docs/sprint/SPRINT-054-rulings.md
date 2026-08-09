@@ -119,16 +119,16 @@ unchanged **with the reason recorded** — an unchanged gate with no recorded re
 re-parked.
 
 **DoD:**
-- [ ] Ruled as a judgement call — an outcome of "wait for evidence" is explicitly unavailable (L-094)
-- [ ] The ruling separates approving *direction* (G1/G2, before wasted work) from deferring
+- [x] Ruled as a judgement call — an outcome of "wait for evidence" is explicitly unavailable (L-094)
+- [x] The ruling separates approving *direction* (G1/G2, before wasted work) from deferring
       *verification* (push-right, until work is presentable) and says whether they conflict at all —
       A4 tested, not assumed; "both, at different points" is a legitimate verdict
-- [ ] Verdict in `docs/research/mattpocock.md`; § Still open is now empty
-- [ ] If gate placement changes, `.claude/CONTEXT.md` § Gates is the SSOT edit and
+- [x] Verdict in `docs/research/mattpocock.md`; § Still open is now empty
+- [x] If gate placement changes, `.claude/CONTEXT.md` § Gates is the SSOT edit and
       `skills/orchestrator/SKILL.md` follows **in the same commit** (L-020 — a rule on one surface is
       half-shipped). `CONTEXT.md` sits at 124 of its 130 cap (ADR-007): any addition fits or displaces,
       never raises the cap
-- [ ] If nothing changes, both files are left untouched and the reason is in the verdict
+- [x] If nothing changes, both files are left untouched and the reason is in the verdict
 
 ### T4 — Split `mattpocock.md` per TD-038's remedy `[size: S · risk: low · class: execution · HITL]`
 Layers: `docs/research/mattpocock.md` · `TECH-DEBT.md`
@@ -218,6 +218,8 @@ measured numbers rather than the stale ones it still carries.
 | `README.md` | T1 | repo-layout block reflects what landed | Low | structure re-read after the edit (L-009) |
 | `docs/research/mattpocock.md` | T2 | negation question closed with a cited verdict — null result; § Still open drops to one row | Low | 4 sources read incl. 2 primary; 124 → 143 lines, cap breach routed to T4 |
 | `.claude/CLAUDE.md` | T2 | **not changed** — verdict was "no change warranted"; recorded so the untouched file reads as a decision | — | A3 confirmed row-by-row against § Anti-Patterns |
+| `docs/research/mattpocock.md` | T3 | push-right tension closed as category-mismatched; § Still open now empty | Low | source fetched via `gh api`, not read off this doc's summary; 143 → 159 lines |
+| `.claude/CONTEXT.md` · `skills/orchestrator/SKILL.md` | T3 | **not changed** — gate placement ruled correct; recorded so the absence reads as a ruling | — | A4 tested against the source's own structure |
 
 ## Retro
 

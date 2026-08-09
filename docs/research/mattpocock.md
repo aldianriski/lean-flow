@@ -126,9 +126,25 @@ positive rule**, which is the shape our rows already use — checked row by row 
 **pairing**, not the ❌ glyph. Recorded as a null result and nothing was edited to prove the question
 was answered — that is this sprint's named failure mode (SPRINT-054 D1).
 
-**Still open**
-- **Push right** — `loop-me` argues for deferring a human checkpoint as far as it will go, against our
-  gate-*before*-work model. A judgement call about our own gate placement (L-094), settled by ruling.
+**Closed at SPRINT-054 T3 (TASK-159) — push right vs gate-before-work: no change; the tension was
+category-mismatched.** Read at the source rather than through this doc's summary,
+[`loop-me`](https://github.com/mattpocock/skills/blob/main/skills/in-progress/loop-me/SKILL.md) defines
+a **Checkpoint** as "a human-in-the-loop point where the user is asked to *verify or decide*" inside a
+running workflow, and push right as "defer the checkpoint as far as it will go … asked once, late, with
+everything prepared". But the skill **is itself a grilling session**, and its own DoD is "done when an
+implementer agent could build it without asking a single question. Grill until then." Its model is
+therefore *grill exhaustively up front, push the **runtime** checkpoint right* — and what this doc
+recorded as a tension compared our **design gates** against his **runtime checkpoints**, two different
+objects. A4 confirmed, though not for the reason it guessed. Both principles are already in our loop on
+the correct halves: the intake grill + G1/G2 are his grilling; `/code-review` · `/verify` · close ·
+`release-patch`'s single stop-before-push are his push right. Gate count already scales by size —
+`quick` runs G1 only, a decomposer-approved task collapses G1 to one confirm — which is the "ask once"
+half. `.claude/CONTEXT.md` § Gates and `skills/orchestrator/SKILL.md` were deliberately left untouched;
+the ruling is that placement is right, not that it was never examined. One micro surfaced on re-read
+and rejected: **Brief** ("a decision-ready summary … a link down to the asset itself, never the raw
+output") is covered by our recommend-an-answer popups plus terse-by-default reporting.
+
+**Still open** — nothing. Both tensions carried since scan 3 are closed: one by reading, one by ruling.
 
 ## Not scanned
 

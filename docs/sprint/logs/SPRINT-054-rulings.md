@@ -144,3 +144,37 @@ Plan therefore gains a **T4** — the only structural addition this sprint makes
 line is discharged as *routed*, not as *applied*: the scope-change was logged, nothing was squeezed,
 and the remedy now has an owner and a home. `mattpocock.md` moves from T2/T3's `Layers:` into T4's as
 its owner for the restructure; the wave gains rank 3 and stays strictly sequential.
+
+### 2026-08-09 | complete | T2 + T3 — two closures, and the second one was mis-stated, not merely open
+
+**T2 (TASK-155) — no change warranted.** The negation claim survives contact only in a narrow form,
+and our rows already sit on its safe side. Weakest link first: the popular write-up runs no experiment
+and says so, resting on Ironic Process Theory (a human result) plus forum anecdotes. NeQA — the
+benchmark usually invoked — measures negation comprehension in *question answering*, a different
+construct from instruction-following under prohibition, and its own result is that the task shows
+inverse, U-shaped **or positive** scaling depending on prompting method and model family. Anthropic's
+"tell Claude what to do instead of what not to do" targets a **bare** prohibition; the same page's
+production prompt samples are themselves built from scoped, paired prohibitions. A3 confirmed by
+reading every ❌ row, not assumed. Nothing was edited: the invariant is the pairing, not the glyph.
+
+**T3 (TASK-159) — no change, and the tension was category-mismatched.** Fetched `loop-me` at source
+(`gh api` — the raw URL 404s; the skill lives under `skills/in-progress/`) instead of reasoning from
+this repo's one-line summary of it, which is what made the difference. Push right governs a
+**Checkpoint**, which `loop-me` defines as a runtime "verify or decide" point inside an already-specified
+workflow. The skill *is itself a grilling session*, and its DoD is "done when an implementer agent could
+build it without asking a single question." So the source's own model is grill-exhaustively-up-front
+plus push-the-runtime-checkpoint-right — and our doc had been comparing his runtime checkpoints against
+our design gates. A4 was right that the two are not opposed, and wrong about why. Both principles are
+already in our loop on the correct halves, and gate count already scales by size. `CONTEXT.md` § Gates
+and `orchestrator/SKILL.md` untouched by ruling, not by omission.
+
+**Two null results in a row is worth naming, not hiding.** D1 predicted the exposure and both tasks
+landed there. They are not the same kind of nothing, though: T2 is a genuine null (the claim is real,
+we already comply), while T3 is a **reclassification** — the recorded question was not the question, so
+"no change" is a positive finding about the doc rather than an absence of one. The check on both is
+that each was tested against a source rather than against the summary already in the repo, and in T3's
+case the summary is exactly what was wrong.
+
+**Micro examined and rejected on the T3 re-read:** `loop-me`'s **Brief** ("a decision-ready summary …
+a link down to the asset itself, never the raw output"). Mapped against our surface first (L-017):
+covered by recommend-an-answer popups plus terse-by-default reporting. Not filed as a task.
