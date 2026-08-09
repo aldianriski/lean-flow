@@ -5,7 +5,7 @@ owner: Maintainer
 last_updated: 2026-08-09
 status: closed
 plan_commit: d5b0fa9
-close_commit: [sha — set at close]
+close_commit: 75e61a8
 update_trigger: sprint execute/close events
 ---
 
