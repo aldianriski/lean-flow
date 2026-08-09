@@ -4,7 +4,7 @@ slug: rulings
 owner: Maintainer
 last_updated: 2026-08-09
 status: active
-plan_commit: pending
+plan_commit: 2af73ee
 close_commit:
 update_trigger: sprint execute/close events
 ---
