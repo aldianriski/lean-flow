@@ -69,3 +69,18 @@ is the distinction the report's own generalizes/host-specific table insists on.
 Nothing host-specific encoded: no Store-stub interpreter, no separator spelling, no BOM/ANSI note, no
 matcher string presented as portable (L-015 — and the report is *from* a consumer, which makes the
 leak-check the primary one here rather than an afterthought).
+
+### 2026-08-10 | complete | T2 — DoD commands are a claim about the host, so pre-flight runs them
+One checklist item in Part 1. The framing that earns it a line: a DoD command is not only about the
+code, it asserts that an interpreter, task runner or binary **exists and resolves** on the box the run
+will use. When one does not, the failure surfaces as a broken script rather than a missing tool, so
+the morning report blames the work.
+
+The asymmetry is what makes it worth a pre-flight slot rather than a footnote: these are the commands
+used to *prove* a task is finished, so a single missing binary fails **every** task's gate for a
+reason unrelated to any of them, and an otherwise-correct run delivers a page of red. Cost is one
+invocation per command, stated inline so it reads as a line to tick rather than a decision to weigh.
+
+Generic by construction — the reporter's two unrunnable commands are evidence in this log, not
+content in the doc (L-015 · the report's own generalizes/host-specific split). L-052 cited: a platform
+fact gets run, never inferred.

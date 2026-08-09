@@ -226,6 +226,17 @@ All items must pass or the night-run does not fire:
       configurations. Framed as a ratio, probing is not a judgement call each evening; it is
       unconditional, and the line item to compare it against is the run's own cost stated two items
       below.
+- [ ] **Every Definition-of-Done command has been executed once, on the host the run will use.** A
+      DoD command is a claim about the *machine*, not only about the code: project instructions can
+      name an interpreter, task runner or binary that is **absent or shadowed** on that box, and the
+      resulting failure reads as a broken script rather than as a missing tool — so the morning
+      report blames the work. This bites hardest precisely because these are the commands used to
+      **prove** a task is finished: if they cannot run, every task fails its gate for a reason
+      unrelated to its own work, and a run that was otherwise correct delivers a page of red.
+      Cost to check: **one invocation each**, which is why this is a checklist line and not a
+      judgement call. Platform facts get *run*, never inferred (L-052). Observed on a consumer's
+      host: two of that repo's own DoD gate commands could not execute at all — found by running
+      them, and invisible to any amount of reading.
 - [ ] Allowlist includes the **`/handoff` skill invocation** *and* the write of its output doc to the
       OS temp dir. The clean halt (Part 0 step 4) and the watchdog's recovery call (Part 3) are tool
       calls like any other, so `dontAsk` denies them unless listed — and a run that cannot halt

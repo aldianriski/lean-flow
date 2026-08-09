@@ -79,10 +79,10 @@ reason unrelated to the work.
 firing, and says why a failure there is not a failure of the work.
 
 **DoD:**
-- [ ] Pre-flight item added, naming the cost (one invocation per command) so it is not skipped
-- [ ] States the diagnostic point: a missing tool surfaces as a broken script (L-052 — a platform
+- [x] Pre-flight item added, naming the cost (one invocation per command) so it is not skipped
+- [x] States the diagnostic point: a missing tool surfaces as a broken script (L-052 — a platform
       fact is run, never inferred)
-- [ ] Generic — the reporter's specific absent binaries are evidence in the log, not content in the doc
+- [x] Generic — the reporter's specific absent binaries are evidence in the log, not content in the doc
 
 ### T3 — Agree one output format across Parts 2, 3 and 4 `[size: M · risk: med · class: decision · HITL]`
 Layers: `skills/orchestrator/references/night-run.md`
