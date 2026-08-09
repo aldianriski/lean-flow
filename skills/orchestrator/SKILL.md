@@ -36,7 +36,8 @@ Confirm before touching code. BLOCK if any answer is "unknown":
 - [ ] Out-of-scope explicitly named (what this task will NOT do)
 - [ ] Assumptions surfaced and confirmed where they affect behavior
 
-**Fast-path:** task arrived via `/task-decomposer` `approve` → G1 = one confirm ("scope unchanged since approval?"); changed/unsure → full checklist above.
+**Fast-path:** `origin: decomposer` (it met the intake grill) → G1 = one confirm ("scope unchanged since approval?"); changed/unsure → full checklist above.
+**Every other origin gets the full checklist** — `close-retro` follow-ups, `/triage`-converted bugs and `manual` entries never passed the intake grill, so there is no prior scope agreement for a fast-path to re-confirm. A **missing** `origin:` is treated as ungrilled, not as decomposer: the fast-path is the exception that must be earned, and the field says so in the task's own text — never inferred from `tracker:` or from how the entry reads.
 
 ## G2 — Design gate (mvp + sprint-bulk)
 

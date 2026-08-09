@@ -46,6 +46,7 @@ status: current
                   so extending the same check to the README is the small version. Confirm that before
                   writing a new checker
       tracker:    SPRINT-054 T1 (found, deliberately not swept in — pre-existing, outside T1's scope)
+      origin:     decomposer
       state:      ready — found during SPRINT-054 T1 while updating the same block for the new root
                   docs. Left alone at the time under "clean up only your own mess"; filed here so it
                   is not lost. Same family as TD-041: a claim nothing checks drifts silently, and this
@@ -64,6 +65,7 @@ status: current
       assumes:    the §11 row is correct as written — this wires it, it does not redesign it.
                   EPIC-001 is open, so the path has never run: exercise it once on real input (L-007)
       tracker:    none — found by recon 2026-08-09; §11 row exists, close never executes it (L-020)
+      origin:     decomposer
       state:      ready
 
 - [ ] TASK-168 — Give docs/research/ a retention rule and an archive target  [size: M] [risk: low] [HITL]
@@ -81,6 +83,7 @@ status: current
                   means the first pass is a real backlog, and pruning them is NOT in scope here —
                   this task ships the rule, not the sweep
       tracker:    none — found by recon 2026-08-09; the only doc class close names but §11 omits
+      origin:     decomposer
       state:      ready
 
 - [ ] TASK-169 — Name the end-of-life for both ephemeral intake artifacts  [size: S] [risk: low] [HITL]
@@ -98,6 +101,7 @@ status: current
                   split before implementing
       tracker:    none — found by recon 2026-08-09; `docs/product/requirements.md` deliberately
                   excluded (§2 sets its Archive to `—`; it is durable, not ephemeral)
+      origin:     decomposer
       state:      ready
 
 - [ ] TASK-171 — Make every entry point aware the night run exists  [size: S] [risk: low] [AFK]
@@ -113,6 +117,7 @@ status: current
       assumes:    prime stays read-only — the hint names the next skill, it never launches a run;
                   widening prime's charter beyond an emitted `Next:` line is out of scope
       tracker:    none — found by recon 2026-08-09; Part 1a omits the epic input, prime omits the mode
+      origin:     decomposer
       state:      ready
 
 - [ ] TASK-172 — Deny the G1 fast-path to tasks that never met the grill  [size: M] [risk: med] [HITL]
@@ -131,6 +136,7 @@ status: current
                   Grill-until-frontier-empty itself is already correct and is NOT being changed
       tracker:    none — found by recon 2026-08-09; G1's "decomposer-approved → fast-path" clause
                   has no field behind it, and close-filed follow-ups never meet the intake grill
+      origin:     decomposer
       state:      ready
 
 - [ ] TASK-170 — Add CODE_OF_CONDUCT to the standard, gated like CONTRIBUTING  [size: M] [risk: low] [HITL]
@@ -147,6 +153,7 @@ status: current
       assumes:    Contributor Covenant 2.1 as the base — **unconfirmed, blocks G2 until G1 rules on it**;
                   lean-flow itself takes the exemption, it does not adopt a CoC for a single maintainer
       tracker:    none — decided 2026-08-09; no CoC exists anywhere in the repo or the standard
+      origin:     decomposer
       state:      ready
 
 ### P3 — Long-term

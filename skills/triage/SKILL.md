@@ -41,9 +41,11 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
 1. **Scan `.out-of-scope/` first** — if a backlog task resembles a prior rejection, surface it and ask before keeping it.
 2. **Load** — read `TODO.md` § Backlog (+ root `TECH-DEBT.md`; legacy: TODO § Tech Debt). Ignore the Active Sprint.
 3. **Bug intake** — a BUG.md-shaped item (or bug-flavored backlog entry) is routed, not ranked like a feature:
-   - known cause + trivial fix → convert to `TASK-NNN` (`state: ready`)
-   - unknown cause / needs investigation → record as a task, `next: /diagnose`
+   - known cause + trivial fix → convert to `TASK-NNN` (`state: ready`, **`origin: triage-bug`**)
+   - unknown cause / needs investigation → record as a task, `next: /diagnose` (**`origin: triage-bug`**)
    - systemic / architectural → file as `TD-NNN` in root `TECH-DEBT.md`
+   - **stamp `origin:` on every task you file here** — a bug converted at triage never met the intake
+     grill, and the stamp is what stops G1 fast-pathing it on the strength of looking well-formed
    - **then the report itself is done.** A `BUG-<slug>.md` is temp-dir intake scaffolding, never a
      committed doc (DOCS_Guide §2): once its repro and verdict live in the destination, the file has
      no durable home to be moved to. Carry anything still load-bearing — repro steps especially —

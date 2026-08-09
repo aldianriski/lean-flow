@@ -127,6 +127,29 @@ else
   fi
 fi
 
+# --- 2e. Task origin (G1 fast-path provenance) --------------------------------------------------
+# G1 fast-paths a "decomposer-approved task"; until SPRINT-055 T6 no field recorded whether a task
+# had met the intake grill, so the clause was unverifiable prose and a close-Retro follow-up looked
+# identical to a grilled entry. This is the mechanical half -- no task reaches G1 unstamped. G1's own
+# clause is the procedural half. Covered by evals/run-task-origin-fixtures.sh.
+to_script="scripts/lib/check-task-origin.sh"
+if [ ! -f "$to_script" ]; then
+  bad "task origin: checker not found at $to_script"
+else
+  to_out=$(sh "$to_script" "$ROOT" 2>&1); to_code=$?
+  printf '%s\n' "$to_out"
+  to_pass=$(printf '%s\n' "$to_out" | grep -cE '^PASS')
+  to_fails=$(printf '%s\n' "$to_out" | grep -cE '^FAIL')
+  pass=$((pass + to_pass))
+  if [ "$to_code" -ne 0 ]; then
+    if [ "$to_fails" -gt 0 ]; then
+      fail=$((fail + to_fails))
+    else
+      bad "task origin: checker exited $to_code without reporting a FAIL line"
+    fi
+  fi
+fi
+
 # --- 3. Frontmatter / ownership presence ------------------------------------
 has_field() { grep -qE "^$2:" "$1"; }
 
@@ -372,7 +395,7 @@ done
 # the selftests, yet it stays always-on: it's cheap (extracts + diffs, no throwaway repos), and
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh"
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh"
 eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
 # run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
 # run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via

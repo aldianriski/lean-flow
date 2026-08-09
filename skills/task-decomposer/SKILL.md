@@ -72,6 +72,7 @@ normally. Full artifact + loop → `${CLAUDE_SKILL_DIR}/references/fog-map.md`.
       touches:    <files / layers>
       depends-on: <TASK-NNN/Tn list, or none>
       assumes:    <key assumptions>
+      origin:     decomposer            (always — these entries met the grill above; that is what earns G1's fast-path)
       state:      ready | needs-info   (set ready only if done-when is concrete)
 ```
 

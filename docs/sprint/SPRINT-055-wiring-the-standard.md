@@ -134,7 +134,7 @@ an active sprint has open DoD, and the chain runs end-to-end from an epic slice 
 - [x] `/prime` stays read-only: it names the next skill, it never launches a run
 
 ### T6 — Deny the G1 fast-path to tasks that never met the grill `[size: M · risk: med · class: decision · HITL]`
-Layers: `skills/orchestrator/SKILL.md` (G1) · `skills/lean-doc-generator/SKILL.md` (close §10 routing) · `skills/triage/SKILL.md` · `.claude/CONTEXT.md` (task entry shape) · `evals/`
+Layers: `skills/orchestrator/SKILL.md` (G1) · `skills/lean-doc-generator/SKILL.md` (close §10 routing) · `skills/triage/SKILL.md` · `skills/task-decomposer/SKILL.md` · `.claude/CONTEXT.md` (task entry shape) · `scripts/lib/check-task-origin.sh` · `scripts/qa-check.sh` · `evals/`
 Depends-on: T4, T5 (shared files — see D1; T5 edge added by the 2026-08-09 plan-correction for `.claude/CONTEXT.md`)
 G1 fast-paths a "decomposer-approved task" to a scope-unchanged confirm, but no field records whether
 a task ever met the intake grill — the clause is unverifiable prose. Tasks auto-filed by the
@@ -145,12 +145,16 @@ and nothing distinguishes them. Introduce the marker; do not infer provenance fr
 finding, and a decomposer-produced task still gets it.
 
 **DoD:**
-- [ ] A provenance field is added to the task entry shape (`.claude/CONTEXT.md`) — a field, not an inference
-- [ ] `close`'s follow-up bucket and `/triage` bug intake both stamp it
-- [ ] G1 states the inverse clause: no decomposer provenance → full grill, never fast-path
-- [ ] A must-FAIL fixture: close-filed follow-up at G1 → fast-path refused with its named finding (L-058)
-- [ ] Grill-until-frontier-empty is left unchanged — it is already correct
-- [ ] Watch `.claude/CONTEXT.md`'s 130-line cap (ADR-007); at cap, split rather than squeeze
+- [x] A provenance field is added to the task entry shape (`.claude/CONTEXT.md`) — a field, not an inference
+      — `origin: decomposer | close-retro | triage-bug | manual`
+- [x] `close`'s follow-up bucket and `/triage` bug intake both stamp it
+- [x] G1 states the inverse clause: no decomposer provenance → full grill, never fast-path
+- [x] A must-FAIL fixture: close-filed follow-up at G1 → fast-path refused with its named finding (L-058)
+      — *the checkable half: an unstamped or invalid `origin:` fails before G1 is reached; G1's own
+      clause is procedure and is not claimed as covered (fixture header states the split)*
+- [x] Grill-until-frontier-empty is left unchanged — it is already correct
+- [x] Watch `.claude/CONTEXT.md`'s 130-line cap (ADR-007); at cap, split rather than squeeze
+      — *124 → 126 of 130; inside cap, so the split branch did not fire*
 
 ### T7 — Add CODE_OF_CONDUCT to the standard, gated like CONTRIBUTING `[size: M · risk: low · class: execution · HITL]`
 Layers: `skills/lean-doc-generator/references/DOCS_Guide.md` §2 · `skills/lean-doc-generator/templates/CODE_OF_CONDUCT.md.template` (new) · `skills/lean-doc-generator/references/init.md` · `skills/lean-doc-generator/SKILL.md` · `.claude/CLAUDE.md` · `docs/architecture/overview.md` · `README.md`

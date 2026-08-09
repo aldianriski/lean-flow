@@ -117,8 +117,10 @@ ask which flows can hit the failure, place it where all of them read (a skill re
       depends-on: <TASK-NNN/Tn list, or none>
       assumes:   <key assumptions, or none>
       tracker:   <ticket URL, or none — justification>
+      origin:    decomposer | close-retro | triage-bug | manual   (where the task came from — set by whoever files it)
       state:     ready | needs-info | blocked   (Backlog only; set by /triage)
 ```
 
 **States** — `ready` (promotable) · `needs-info` (open questions) · `blocked` (`depends-on`). Orthogonal to `HITL`/`AFK` (who acts). Rejected work → `.out-of-scope/<slug>.md` (lazily created by `/triage`).
+**Origin** gates G1's fast-path: only `origin: decomposer` met the intake grill, so only it confirms scope in one line — every other origin gets the full G1 checklist. A **fact about where the task came from**, never a self-assessed "was it grilled?" and never inferred from `tracker:`; close-Retro follow-ups and `/triage`-converted bugs are stamped by the skill that files them.
 **QA (optional, never a gate)** — a task may note a `qa:` hint (tests/lint/security/perf to suggest at Review) — a suggestion for the owner, not a requirement.

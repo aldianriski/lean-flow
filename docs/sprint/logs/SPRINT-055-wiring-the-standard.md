@@ -272,3 +272,34 @@ decomposable before being removed. Pre-flight re-run after every edit: CLEAR.
 condition it fires on (active sprint, open DoD) is true right now, so running `/prime` would have
 exercised it — but `/prime` mid-task is its own documented red flag ("mid-task use signals context
 drift"), and firing a probe that the skill itself warns against is not verification worth having.
+
+### 2026-08-09 | progress | T6 — `origin:` gives G1's fast-path clause something to read
+
+**A4 held, and the owner chose the factual form.** The field records **where the task came from**
+(`decomposer | close-retro | triage-bug | manual`), not a self-assessed "was it grilled?". Faking it
+means misreporting the source, where `grilled: yes` would only mean typing a word. G1 derives
+eligibility: `origin: decomposer` fast-paths, every other origin gets the full checklist, and a
+**missing** `origin:` is treated as ungrilled rather than assumed fine — the fast-path is the
+exception that must be earned.
+
+**Both filers stamp.** `close`'s follow-up bucket writes `origin: close-retro`; `/triage` bug intake
+writes `origin: triage-bug`; `/task-decomposer` writes `origin: decomposer` as part of its entry
+shape. Those are the two paths that reach G1 without a grill, which is the whole hole.
+
+**Split honestly between the two halves.** `check-task-origin.sh` is the *mechanical* half — no task
+reaches G1 unstamped. G1's clause is the *procedural* half — what to do once the origin is known.
+Only the first is checkable, and the fixture header says so rather than letting the suite imply it
+verifies G1's behaviour. The `stamped` control deliberately includes a `triage-bug` entry that PASSes
+the checker while still being denied the fast-path: the checker guards the field, not the decision.
+
+**It failed on the live repo first, again.** All seven Backlog entries were unstamped, so the checker
+reported seven FAILs before any of them were fixed. They came from `/task-decomposer` in this session,
+so all seven are `decomposer` — but the point is that the state existed and nothing had ever been able
+to name it.
+
+**Cap watched, as the DoD required.** `.claude/CONTEXT.md` went 124 → **126 of 130** (ADR-007). Inside
+cap, so no split; the DoD's "at cap, split rather than squeeze" branch did not fire. Recorded because
+"it fit" is only meaningful next to the number.
+
+**§ Plan edit:** T6 `Layers:` gains `scripts/lib/check-task-origin.sh`. Sixth correction, five tasks —
+the count is now the sprint's clearest Retro candidate.
