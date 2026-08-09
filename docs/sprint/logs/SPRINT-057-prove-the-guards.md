@@ -116,3 +116,19 @@ Claimed only what is verified (L-052): the `result`-event fields are documented;
 documented pairing; `--include-partial-messages` is optional and token-level, checked against the
 local CLI's own help. Whether `stream-json` alone emits intermediate events without `--verbose` was
 **not** verified, so nothing in the doc asserts it.
+
+### 2026-08-10 | complete | T4 — the watchdog now proves it started; half the finding was already ours
+Part 3 gains a start-verification bullet. The point that earns it: a watchdog that dies at launch is
+**indistinguishable from a healthy one**, because silence is exactly what a working watchdog looks
+like all night — the inert-permission-rule family from Part 1, one layer up, with a worse schedule,
+since you find out at the only moment it mattered. Confirming it is alive and that its log has a line
+is the same evidence-not-assumption move the Part 1 probe makes, applied to the guard instead of the
+rules. The consumer's first watchdog died instantly on a parse error and logged nothing.
+
+**The other half of the finding needed no change, and that is the more useful result.** The report
+asked for the stall signal to be "log activity *or* new commits, not either alone". Part 3 already
+reads: *no new `stream-json` line **and** no new commit for N minutes* — both signals, exactly what was
+requested. Verified by reading before writing anything, and left untouched. L-017 is the rule that
+caught it: judge an external finding on the **delta over our existing surface**, not on its standalone
+merit. Adopting it wholesale would have meant rewriting a correct rule into the same rule, and the
+diff would have looked like progress.

@@ -364,6 +364,15 @@ A small wrapper the OS scheduler runs alongside Part 2's `claude -p` call — no
   --resume <session-id> "/handoff"`.
 - **Resume**: next session opens with `/prime`, which already reads a referenced handoff doc — no
   new resume mechanism.
+- **Verify it actually started, before you walk away.** A watchdog that dies at launch guards nothing
+  and is **indistinguishable from a healthy one** — both are silent, and silence is what a working
+  watchdog looks like all night. This is the inert-permission-rule family (Part 1) one layer up, with
+  a nastier schedule: you discover it at the only moment it was ever needed. Confirm the process is
+  alive and that its log has at least one line — the same evidence-not-assumption move the Part 1
+  probe makes, applied to the guard rather than the rules. Observed on a consumer's host: the first
+  watchdog written for a run **died instantly on a parse error and logged nothing**, and was caught
+  only because its startup was checked rather than assumed. If it is not running, that is a pre-flight
+  failure like any other — fix it or fire without a watchdog *knowingly*, never by accident.
 
 ## Part 4 — Morning rollup (rides the Execution Log, no new artifact)
 

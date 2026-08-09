@@ -119,8 +119,8 @@ it. The reporter's first watchdog died instantly on a parse error and logged not
 it is not.
 
 **DoD:**
-- [ ] Start-verification step added to Part 3, naming the failure it prevents
-- [ ] The existing two-signal stall rule is **left alone** — Part 3 already requires *no new line AND
+- [x] Start-verification step added to Part 3, naming the failure it prevents
+- [x] The existing two-signal stall rule is **left alone** — Part 3 already requires *no new line AND
       no new commit*, which is what the report asks for (L-017: the delta over our surface, not the
       finding's standalone merit)
 
