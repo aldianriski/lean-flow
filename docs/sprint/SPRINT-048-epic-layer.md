@@ -30,7 +30,7 @@ has shown to be needed.
 ## Plan
 
 ### T1 — Add the EPIC doc layer (template + §2 lifecycle row) `[size: M · risk: med · class: decision · HITL]`
-Layers: `skills/lean-doc-generator/templates/EPIC.md.template` · `skills/lean-doc-generator/references/DOCS_Guide.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `docs/architecture/overview.md` · `docs/epic/`
+Layers: `skills/lean-doc-generator/templates/EPIC.md.template` · `skills/lean-doc-generator/references/DOCS_Guide.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `docs/architecture/overview.md` · `docs/epic/EPIC-001-parallel-worktree-fleet.md` · `docs/epic/INDEX.md`
 Depends-on: none
 
 An epic is a multi-sprint outcome with its own decision set — too big for one 400-line Plan, outliving
@@ -43,12 +43,12 @@ from the SPRINT-025/026 archives and the AGENTS.md adoption research (both read 
 edited) — and `sh scripts/qa-check.sh` is green.
 
 **DoD:**
-- [ ] `EPIC.md.template` created; read before writing anything from it (Step 6 is mandatory)
-- [ ] DOCS_Guide §2 gains the `epic/EPIC-NNN-<slug>.md` row — reader · cap · create/update/archive triggers
-- [ ] DOCS_Guide §11 gains the epic's retention leg (archive when every member sprint has closed)
-- [ ] Linted template counts moved 31 → 32 in `.claude/CLAUDE.md` **and** `docs/architecture/overview.md`; `.claude/CONTEXT.md` § Doc standard updated for accuracy
-- [ ] **One real epic rendered on real input** — the fleet epic, not a placeholder (L-007)
-- [ ] `sh scripts/qa-check.sh` green on a bare run (never piped — L-057)
+- [x] `EPIC.md.template` created (34 templates on disk now); the real epic was rendered *from* it, not free-generated
+- [x] DOCS_Guide §2 gains the `epic/EPIC-NNN-<slug>.md` row — 200 soft cap, create ← a **multi-sprint** outcome is named, update ← a member sprint closes
+- [x] DOCS_Guide §11 gains the epic's retention leg — and tightened it: archive needs **every member sprint closed AND all Closed-when conditions `[x]`**, never member-count alone
+- [x] Linted template counts moved 31 → 32 in `.claude/CLAUDE.md` **and** `docs/architecture/overview.md`; `.claude/CONTEXT.md` § Doc standard updated
+- [x] **One real epic rendered on real input** — `EPIC-001 Parallel Worktree Fleet`, retro-fitted from the SPRINT-025/026 archives + `fog-fleet-orchestration.md`, with a lazily-created `docs/epic/INDEX.md`
+- [x] `sh scripts/qa-check.sh` green on a bare run — 75 pass, 0 fail
 
 ### T2 — Wire the epic into decompose → promote → close `[size: M · risk: med · class: execution · HITL]`
 Layers: `skills/task-decomposer/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/templates/SPRINT.md.template` · `.claude/CONTEXT.md` · `README.md`

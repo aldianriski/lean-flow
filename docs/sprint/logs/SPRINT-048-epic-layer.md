@@ -124,3 +124,26 @@ not stand unqualified.
 The ADR-006 amendment carries all of it: the argument against, the ADR-007 precedent, the measured
 diet, and the accepted consequence (13 other skills may now grow to 140 with no gate objection;
 trigger for revisiting is a second skill crossing ~120 without a comparable scope story).
+
+### 2026-08-09 | complete | T1 — EPIC layer, proven on a real epic
+`EPIC.md.template` created and then **used** to render `EPIC-001 — Parallel Worktree Fleet`,
+retro-fitted from the SPRINT-025/026 archives and `fog-fleet-orchestration.md`. Not a placeholder
+(L-007): every row cites a real sprint, a real close_commit, and a real decision.
+
+**The retro-fit justified the layer better than an argument could.** EPIC-001's status was previously
+recoverable only by reading two sprint archives and three research docs — and
+`docs/research/agents-md-adoption.md` still gates a decision on "*if/when the fleet epic graduates a
+non-Claude consumer*", pointing at something that had no file. Now it points somewhere.
+
+**Rendered as `closed`, deliberately.** The stated outcome shipped at SPRINT-026 and has been exercised
+since (SPRINT-039 ran parallel waves; 041/043/045 followed). The Claude-only boundary is a **scope
+edge, not unfinished work** — recorded so a future non-Claude consumer opens a *new* epic rather than
+reopening this one, since nothing in the delivered mechanism would change.
+
+**§11 tightened beyond the DoD's wording.** The DoD asked for "archive when every member sprint has
+closed". Written that way, an epic whose last sprint closed with exit conditions still unmet would be
+archived as done — hiding the gap. The shipped rule requires **every member sprint closed AND all
+Closed-when conditions `[x]`**, with the reason stated inline.
+
+Template count 31 → 32 (34 on disk incl. the 2 non-core), all three linted claims moved together.
+`docs/epic/INDEX.md` created lazily, as `docs/sprint/INDEX.md` is.

@@ -1,0 +1,50 @@
+---
+epic: NNN
+slug: [kebab-slug]
+owner: [role — not personal name]
+last_updated: YYYY-MM-DD
+status: proposed | active | closed
+member_sprints: [SPRINT-NNN, SPRINT-NNN — appended as each is promoted]
+update_trigger: a member sprint closes, or a decision lands that changes the outcome
+---
+
+# EPIC-NNN — [Outcome-shaped name] [CUSTOMIZE]
+
+> **Outcome:** [ONE verifiable sentence. What is true when this epic is done — an observable end
+> state, not a list of work. If you cannot write it, the work is still fog: chart it with
+> `/task-decomposer --fog` instead and graduate it here once the destination is nameable.]
+
+## Why this, why now
+
+[The driver. What forces the outcome, and why it spans sprints rather than fitting in one. An epic
+that could be a single sprint should be a single sprint — say so and close this file.]
+
+## Scope
+
+**In:** [the 2–5 capabilities this epic delivers]
+**Out (explicitly not):** [adjacent work this epic will NOT absorb — an epic without a stated
+boundary grows until it stops being finishable]
+
+## Member sprints
+<!-- The roll-up. One row per sprint that carried part of this epic; appended at promote, completed
+     at close. This table is why the epic exists — without it, epic status is reconstructable only by
+     reading N sprint archives. -->
+
+| Sprint | Theme | Status | What it contributed to the outcome |
+|---|---|---|---|
+| [SPRINT-NNN](../sprint/archive/SPRINT-NNN-<slug>.md) | [theme] | closed · `<close_commit>` | [the specific advance — not a restatement of the theme] |
+
+## Decisions
+<!-- Hard-to-reverse + surprising + a real trade-off → an ADR (DOCS_Guide §4); link it, never duplicate it. -->
+- **D1** — [what was decided + why, one line]. **→ ADR-NNN** (if it qualifies).
+
+## Open questions
+<!-- The epic's remaining fog. Each needs an owner-action or a routing target, never a bare TBD
+     (a parked flow-blocking question is an anti-pattern). Delete the section when empty. -->
+- [question] → [how it gets resolved: a research spike · `/prototype` · `/council` · a named sprint]
+
+## Closed when
+<!-- The exit condition, checked at each member sprint's close. An epic with no exit condition is a
+     theme, not an epic. -->
+- [ ] [observable condition]
+- [ ] [observable condition]

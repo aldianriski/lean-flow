@@ -91,7 +91,7 @@ Route by **nature, not size — ambiguity & consequence up, volume & repetition 
 
 ## Doc standard
 
-LEAN standard on the **TemiDev repo-structure core** (ADR-012; WHY/WHERE, never HOW) → `skills/lean-doc-generator/references/DOCS_Guide.md`: §2 lifecycle-bound core · §6 four-tier scaffold (cap-hit → split into tree) · §12 Git boundary; templates → `…/templates/` (31 core + 2 non-core). Domain glossary lives **here** (canonical term + `_Avoid_:` synonyms). ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
+LEAN standard on the **TemiDev repo-structure core** (ADR-012; WHY/WHERE, never HOW) → `skills/lean-doc-generator/references/DOCS_Guide.md`: §2 lifecycle-bound core · §6 four-tier scaffold (cap-hit → split into tree) · §12 Git boundary; templates → `…/templates/` (32 core + 2 non-core). Domain glossary lives **here** (canonical term + `_Avoid_:` synonyms). ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
 
 ## Orientation
 
