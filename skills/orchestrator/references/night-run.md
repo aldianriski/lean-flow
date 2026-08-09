@@ -151,15 +151,33 @@ All items must pass or the night-run does not fire:
       for you, and no lean-flow skill writes one.*
 
       **Two preconditions, both measured — a rule can be perfectly written and still do nothing:**
-      1. **The workspace must be trusted.** An untrusted one has its `permissions.allow` **ignored
-         entirely**, announced in a single line (`Ignoring N permissions.allow entry … not been
-         trusted`) and otherwise silent. Every rule in the file is inert; denials then look exactly
-         like form failures.
+      1. **The workspace must be trusted, under the key the *headless launcher* resolves.** An
+         untrusted one has its `permissions.allow` **ignored entirely**, announced in a single line
+         (`Ignoring N permissions.allow entry … not been trusted`) and otherwise silent. Every rule
+         in the file is inert; denials then look exactly like form failures.
+         **Check the record, not the directory.** Trust is stored per *resolved path key*, and one
+         directory can have more than one canonical spelling — separator style, symlinks, case,
+         mount points, a trailing slash. When the interactive session and the headless launcher
+         resolve differently they consult **different records**, and the sharp part is that the
+         remedy the CLI itself prints — *run interactively once and accept the dialog* — **provably
+         cannot fix it**: the interactive session lands on the key that is already trusted, so
+         following the printed advice produces no change and no error. Verify the key the launcher
+         will actually use. Observed on a consumer's host: two entries for one directory,
+         interactive trusted, headless not, all 57 rules ignored.
       2. **A directory-prefix rule form does not match.** Measured one rule at a time against one
          command: exact-file (`Bash(sh path/to/x.sh:*)`), bare-command (`Bash(sh:*)`) and space-glob
          (`Bash(sh *)`) all matched; **`Bash(sh dir/:*)` denied**, reproduced. Prefer exact-file or
          bare-command; treat a directory prefix as non-functional, and any unverified spelling as
          suspect until you have watched it match.
+         **The rows above are `Bash` only — file tools are their own surface.** The natural
+         extrapolation from them, a path-scoped glob mirroring the exact-file form, is **not** safe
+         to assume for `Read` / `Edit` / `Write`: measured on a consumer's host,
+         `Write(<abs-path>/**)` **denied** while the bare tool name `Write` allowed. The transferable
+         claim is *measure the file-tool forms on your host before relying on them*, never a spelling
+         — one host is one data point and the spellings may differ per platform. **Name the trade
+         when you land on the broad form**: a bare tool name is wider than a path fence, so
+         containment moves onto the deny list and the task scope rather than onto the allow rule. A
+         run that cannot write is a run that completes every task and produces nothing.
 
       Evidence for both, plus what turned out **not** to be true, → `docs/research/headless-permission-surface.md`.
 
@@ -180,6 +198,34 @@ All items must pass or the night-run does not fire:
       transcript-scan approach is a candidate builder, with one blind spot worth naming: a transcript
       only holds commands some run already reached, so it cannot suggest a landing-path command that
       no run has yet got far enough to attempt — which is precisely how source 2 stays missing.
+- [ ] **The allowlist is PROVEN live by a probe carrying a negative control.** Everything above says
+      how to *build* the rules; this is the only item that says how to know they are *in effect*. Run
+      a short throwaway `claude -p` against the same settings, permission mode and working directory
+      the real run will use, exercising one command from each source above — **plus one action you
+      have deliberately NOT allowed.**
+
+      **The must-deny action is the whole method.** Without it, "every call succeeded" and "the
+      allowlist was ignored in its entirety" produce *identical* output — and the second is exactly
+      what an untrusted workspace does (precondition 1). A probe with no negative control cannot tell
+      a working configuration from an absent one, so its green verdict is a vibe rather than
+      evidence. Read the two results together:
+
+      | Permitted calls | The must-deny call | Verdict |
+      |---|---|---|
+      | succeed | **denied** | the allowlist is live and scoped — the only green worth acting on |
+      | succeed | **also succeeds** | rules are not being enforced at all; suspect trust (precondition 1) or the mode, never the spellings |
+      | denied | denied | a real gap — a form failure or a missing rule; fix one thing, re-probe |
+
+      **Fix one thing per probe and re-measure.** A probe that changes two variables cannot say which
+      one mattered. A consumer's three probes went: *all 57 rules ignored* → *`Write` denied,
+      everything else allowed* → *all green*, each isolating a single cause — and the middle one
+      "looked like a success right up until the single denial that mattered".
+
+      **Cost it once and stop deciding.** Those three probes totalled **$1.77** against a run
+      estimated at $40–150 — roughly **two per cent**, and they caught two independent total-loss
+      configurations. Framed as a ratio, probing is not a judgement call each evening; it is
+      unconditional, and the line item to compare it against is the run's own cost stated two items
+      below.
 - [ ] Allowlist includes the **`/handoff` skill invocation** *and* the write of its output doc to the
       OS temp dir. The clean halt (Part 0 step 4) and the watchdog's recovery call (Part 3) are tool
       calls like any other, so `dontAsk` denies them unless listed — and a run that cannot halt

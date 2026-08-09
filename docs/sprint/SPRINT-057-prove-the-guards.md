@@ -51,19 +51,19 @@ carries a must-deny control, names which resolved trust key to verify, and state
 against the run's.
 
 **DoD:**
-- [ ] The probe procedure exists as a pre-flight item, with a **deliberate must-deny action** whose
+- [x] The probe procedure exists as a pre-flight item, with a **deliberate must-deny action** whose
       continued denial is what makes the other results readable
-- [ ] It names **which resolved trust key** to check, and why running interactively once cannot fix a
+- [x] It names **which resolved trust key** to check, and why running interactively once cannot fix a
       headless-key mismatch — the interactive session lands on the key that is already trusted, so the
       remedy the CLI itself prints produces no change and no error
-- [ ] Measured rows exist for **file-tool** forms (`Read`/`Edit`/`Write`), not `Bash` alone, with the
+- [x] Measured rows exist for **file-tool** forms (`Read`/`Edit`/`Write`), not `Bash` alone, with the
       containment trade named: a working form broader than a path glob pushes containment onto the
       deny list and the task scope
-- [ ] Probe cost is stated **against** run cost, so probing reads as unconditional rather than as a
+- [x] Probe cost is stated **against** run cost, so probing reads as unconditional rather than as a
       judgement call each time
-- [ ] **No host-specific detail encoded** — the transferable claim is "measure these forms before
+- [x] **No host-specific detail encoded** — the transferable claim is "measure these forms before
       relying on them", never a spelling that held on one machine (L-015 · the report's own table)
-- [ ] `L-086` marked `promoted: yes → night-run.md Part 1`, and its ledger body collapsed (§11)
+- [x] `L-086` marked `promoted: yes → night-run.md Part 1`, and its ledger body collapsed (§11)
 
 ### T2 — Execute the DoD commands once at pre-flight `[size: S · risk: low · class: execution · HITL]`
 Layers: `skills/orchestrator/references/night-run.md`

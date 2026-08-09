@@ -159,7 +159,7 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 
 ---
 
-## L-086 [tags: tooling] [status: active]: **A permission rule can be present, correct, and completely inert — presence is not effect.** Measured directly, one variable at a time (SPRINT-046 T1). **(1) Workspace trust is a precondition for the whole file**: an untrusted workspace has its `permissions.allow` *ignored entirely*, announced in a single line and otherwise silent, so a character-exact rule produced a denial purely because the file was never honoured. **(2) Rule form decides matching**: against one identical command, exact-file (`Bash(sh path/x.sh:*)`), bare-command (`Bash(sh:*)`) and space-glob (`Bash(sh *)`) all matched, while **directory-prefix (`Bash(sh dir/:*)`) denied**, reproduced. **(3) The command's own shape still governs**: relative → permitted, absolute → permitted, but adding `> file` → **denied**, reproduced — which is L-077's rule, and is what actually explains the denials once blamed on mid-session degradation (L-084, now superseded). Three independent ways for a correct-looking allowlist to do nothing, none of which announce themselves as a rule problem. The habit worth keeping: **verify a rule *matched*, never that it exists** — the failure modes all look identical from the settings file.
+## L-086 [tags: tooling] [status: promoted]: a permission rule can be present, correct, and completely inert — presence is not effect, so verify a rule *matched* and never that it exists.
 - **Second sighting, from OUTSIDE this repo (2026-08-09).** A consumer's field report — their own
   SPRINT-131 on lean-flow 1.29.0, a different OS and shell — hit mechanisms (1) and (2) blind, in that
   order, and lost a whole configuration to each. Workspace trust: **two records for one directory**, the
@@ -177,13 +177,15 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
   deliberate must-deny action in the probe, without which "every call succeeded" and "the allowlist was
   ignored entirely" produce identical output. Their probe caught two total-loss configurations for
   $1.77 against a run estimated at $40–150.
-- seen: Sprint-046, consumer field report 2026-08-09
-- count: 2
-- promoted: no — **ruled at the SPRINT-057 promote → `night-run.md` Part 1, delivered by that sprint's
-  probe task.** Deliberately not written into a doc at the moment of ruling: the task rewrites that exact
-  section, and promoting it separately would create a second copy the same day, which §10 names as the
-  way a promotion reproduces the failure it was meant to stop (L-092). Flips to `yes` at close if the
-  rule actually lands; stays flagged by the scan until it does.
+- **L-086 → promoted: `skills/orchestrator/references/night-run.md` Part 1** — the durable rule is the
+  record now (§11 collapse, SPRINT-057 T1). Body: git; the three original mechanisms (workspace trust ·
+  rule form · command shape) plus the consumer's independent recurrence summarised above. Placed by
+  §10's test: the flows that can hit it are night-run pre-flight (building an allowlist) and any
+  headless run consuming one, and both read Part 1 — a `CONTEXT.md` rule would reach flows that cannot
+  act on it, and `CLAUDE.md` is at 80/80. What actually lands there is the **method**, not the
+  measurements: a probe carrying a deliberate must-deny action, because without one "every call
+  succeeded" and "the allowlist was ignored entirely" are the same output. seen Sprint-046 + consumer
+  field report, count 2.
 - related: L-077 (the matcher reads the literal invocation) · L-084 (superseded by this) · L-083 (a precondition that silently stopped holding) · L-103 (the same principle one level up, at the checker layer) · TD-028 · `docs/research/headless-permission-surface.md`
 
 ---

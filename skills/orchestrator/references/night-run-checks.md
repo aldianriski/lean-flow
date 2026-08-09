@@ -10,13 +10,20 @@ status: current
 Split from `night-run.md` Part 1 (SPRINT-044 T1 — TD-014) so the pre-flight pass stays readable.
 Read `night-run.md` first; Part 1's pre-flight checklist points here.
 
-### Capability checks (specified — the probing mechanism graduates to its own task)
+### Capability checks (environment readiness — degrade rules, not pass/fail)
 
 The items above verify the *run's* readiness; these verify the **environment's**. They are separate
 because each one **degrades** the run rather than stopping it — so the useful output is not
 pass/fail but *which shape the run takes*. Specified behaviour-first on purpose: a documented check
-a human runs at pre-flight is the floor, and automating the probe is a separate, separately-verified
-step (a spec small enough to implement is still not implemented here).
+a human runs at pre-flight is the floor.
+
+> **The permission probe used to be deferred from here and never arrived.** This heading read
+> "*the probing mechanism graduates to its own task*" for four sprints; no such task was ever filed,
+> so there was no probe for a negative control to live in, and the two preconditions in `night-run.md`
+> Part 1 stayed measured-but-unverifiable at trigger time. The probe now lives where it is used —
+> Part 1's pre-flight checklist — rather than behind a deferral pointing at nothing. A deferral
+> without a filed task and a written trigger is an intention, not a plan (L-068 is the inverse: a
+> deferral *with* a kill-switch closes itself).
 
 | Capability | What's checked | If absent — degrade rule |
 |---|---|---|
