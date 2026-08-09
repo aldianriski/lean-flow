@@ -239,11 +239,13 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-060 [tags: tooling] [status: promoted] → promoted: yes → `.claude/CLAUDE.md` Edit-safety trap **(c)** (verify the artifact, not the command's self-report). Shell-specific multi-line string syntax fails silently across a two-shell session — a PowerShell here-string (`@'…'@`) handed to the Bash tool committed a literal `@` as the subject and demoted the real one into the body; git accepted it, the tool reported success, `git log --oneline` was the only tell. Match the quoting form to the tool actually executing, and when a command's job is to *record text*, inspect the stored text. Seen Sprint-037 · promoted as part of the 5-entry cluster (L-045 · L-049 · L-057 · L-059 · L-060, 4 sprints). Related: L-057 · L-059.
+## L-060 [tags: tooling] [status: promoted]: match the quoting form to the tool actually executing — and when a command's job is to *record* text, inspect the stored text, not the exit code.
+- **L-060 → promoted: `.claude/CLAUDE.md` Edit-safety trap (c)** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; promoted as part of the 5-entry cluster (L-045 · L-049 · L-057 · L-059 · L-060, 4 sprints).
 
 ---
 
-## L-059 [tags: tooling] [status: promoted] → promoted: yes → `.claude/CLAUDE.md` Edit-safety trap **(c)**. A gate's exit status can come from the **plumbing** rather than the gate — `sh scripts/qa-check.sh > "$TMPDIR/qa.txt"` with `$TMPDIR` unset made the *redirect* fail, reporting `EXIT=1` while qa-check never ran. The tell is structural: a non-zero status with **no report behind it** is not a verdict. Seen Sprint-037 · promoted as part of the 5-entry cluster (4 sprints). Related: L-057 (status from the wrong command) · L-058 (a gate that lies quietly).
+## L-059 [tags: tooling] [status: promoted]: a non-zero status with no report behind it is not a verdict — the failure can be the plumbing rather than the gate.
+- **L-059 → promoted: `.claude/CLAUDE.md` Edit-safety trap (c)** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; a failed redirect reported EXIT=1 while qa-check never ran. Part of the 5-entry cluster (4 sprints).
 
 ---
 
@@ -254,7 +256,8 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-057 [tags: tooling] [status: promoted] → promoted: yes → `.claude/CLAUDE.md` Edit-safety trap **(c)**. A gate piped into a formatter stops gating — `check | tail && commit` commits on the FORMATTER's exit code; twice at SPRINT-035 close a genuine FAIL (missing corpus metadata; stale README footer version) was committed through, because POSIX pipeline status is the last command's and `tail` always exits 0. The failing line was printed — the chain, not the reader, made the decision. Run the gate bare, or gate on its captured status. Seen Sprint-035 (×2, same close) · promoted as part of the 5-entry cluster (4 sprints). Related: L-045 (the same friction, filed as a separate entry instead of a `count` bump — which is why the `count ≥ 2` trigger never fired) · L-007 · ADR-008.
+## L-057 [tags: tooling] [status: promoted]: a gate piped into a formatter stops gating — POSIX pipeline status is the last command's, so run the gate bare or gate on its captured status.
+- **L-057 → promoted: `.claude/CLAUDE.md` Edit-safety trap (c)** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; part of the 5-entry cluster (4 sprints). See L-045 for why `count` never fired on this pair.
 
 ---
 
@@ -314,7 +317,8 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-049 [tags: process] [status: promoted] → promoted: yes → `.claude/CLAUDE.md` Edit-safety trap **(c)** (the fan-out leg: the per-unit output FILE is the success signal, not the agent's reply). A graphify extraction subagent was killed mid-run by a session limit AFTER writing valid chunk JSON — the reply channel reported failure, the file-on-disk protocol recovered the work with zero re-extraction. Design dispatches so each unit writes to a known path and the coordinator verifies the artifact. Seen 2026-07-29 (graphify reference run, non-sprint) · promoted as part of the 5-entry cluster (4 sprints). Related: L-046 · dispatch.md § Merge-back queue · night-run.md (per-task commit as durable checkpoint).
+## L-049 [tags: process] [status: promoted]: in a fan-out the per-unit output FILE is the success signal — a killed subagent can report failure over valid work already on disk.
+- **L-049 → promoted: `.claude/CLAUDE.md` Edit-safety trap (c), fan-out leg** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; part of the 5-entry cluster (4 sprints). Related surface: dispatch.md § Merge-back queue · night-run.md per-task commit checkpoint.
 
 ---
 
@@ -342,11 +346,13 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-045 [tags: process] [status: promoted] → promoted: yes → `.claude/CLAUDE.md` Edit-safety trap **(c)**. A piped quality gate masks its exit code — `qa-check.sh | tail` returns *tail's* status, so a vocab-tag lint FAIL sailed into an `&&`-chained commit unseen (SPRINT-025). **First occurrence of the class, and the promotion miss itself is the lesson**: the recurrence ten sprints later was filed as a *new* entry (L-057) rather than a `count` bump here, so `count` stayed at 1 on both and the `count ≥ 2` promotion trigger never fired — at close, check whether a "new" learning is an existing entry's second sighting. Seen Sprint-025 · promoted as part of the 5-entry cluster (4 sprints). Related: L-013 · L-057.
+## L-045 [tags: process] [status: promoted]: a piped quality gate masks its exit code — and at close, check whether a "new" learning is an existing entry's second sighting, or `count` never reaches its trigger.
+- **L-045 → promoted: `.claude/CLAUDE.md` Edit-safety trap (c)** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; first of the class, recurred ten sprints later as L-057, which is how the promotion miss was itself found.
 
 ---
 
-## L-044 [tags: tooling] [status: promoted] → promoted: yes → dispatch.md § Merge-back queue (leave the worktree dir before removing it; retry from a fresh shell — the Windows handle-lock caveat). Seen Sprint-025 + Sprint-026 (count 2). Related: L-043 · docs/research/fog-fleet-orchestration.md.
+## L-044 [tags: tooling] [status: promoted]: leave a worktree directory before removing it, and retry from a fresh shell — the Windows handle-lock caveat.
+- **L-044 → promoted: dispatch.md § Merge-back queue** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; seen Sprint-025 + Sprint-026.
 
 ---
 
@@ -358,11 +364,13 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-021 [tags: tooling] [status: promoted] → promoted: yes → `.claude/CLAUDE.md` install-cache anti-pattern (folded into L-010's bullet: *running* from the cache is the sibling of *editing* it). A running session keeps the OLD cached skill version — check the loaded skill's **base-dir version in the invocation header**, never `/plugin`'s report. Sprint-023: the session loaded `/orchestrator` from a stale `…/1.5.0/…` dir, so no shipped dispatch improvement fired and it read as a code gap. **Sprint-039: recurred, undetected for an entire session** — the whole loop ran on 1.18.0 skills against a 1.21.0→1.22.0 repo, with the stale path printed in every skill header; the true `orchestrator/SKILL.md` delta was small (4 lines, one of them "run the pre-dispatch preflight first") and no deviation resulted **only because references were read from the repo rather than the cache** — i.e. by reaching past the stale procedure, not by following it. Seen Sprint-023 + Sprint-039 (count 2). Related: L-010 · L-054 (a correct check on the wrong side of a boundary) · TD-015 (nothing guards the *interactive* path).
+## L-021 [tags: tooling] [status: promoted]: a live session keeps the skill version it started with — read the base-dir version in each invocation header, never `/plugin`'s report.
+- **L-021 → promoted: `.claude/CLAUDE.md` install-cache anti-pattern** (folded into L-010's bullet: *running* from the cache is the sibling of *editing* it) — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; Sprint-023 read it as a code gap, Sprint-039 ran a whole sprint stale and survived only by reading references from the repo. Related: TD-015 (nothing guards the interactive path).
 
 ---
 
-## L-020 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern + DoD (wire a new capability into every triggering/chaining job; verify it fires end-to-end). Seen Sprint-022 + Sprint-024 (count 2). Related: L-007 · L-015.
+## L-020 [tags: process] [status: promoted]: shipping ≠ wiring — a new capability must fire end-to-end through every job that triggers or chains it.
+- **L-020 → promoted: CLAUDE.md anti-pattern + DoD wiring check** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; seen Sprint-022 + Sprint-024.
 
 ---
 
@@ -382,15 +390,18 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-017 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern (adoption = delta over existing surface). An adoption scan judges the DELTA over lean-flow's existing surface, not the tool's standalone merit — map each candidate to what we already have FIRST; only the unmatched remainder is a keeper. Seen Sprint-014 (bmad → 5 keepers) + Sprint-016 (structarmed → 0 · brainstorming → ~90% owned) (count 2). Related: ADR-001 · L-015.
+## L-017 [tags: process] [status: promoted]: an adoption scan judges the DELTA over the existing surface, not a tool's standalone merit — map each candidate to what we already have first; only the remainder is a keeper.
+- **L-017 → promoted: CLAUDE.md anti-pattern (adoption = delta over existing surface)** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; Sprint-014 (bmad → 5 keepers) + Sprint-016 (structarmed → 0 · brainstorming → ~90% owned).
 
 ---
 
-## L-016 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern (L-015 extension: when the repo can't dogfood a feature, verify on the consumer path). A skill/tool repo can't dogfood a feature whose substrate it lacks — markdown-only lean-flow has no testable code, so `/tdd` never fires and skill-powered-dispatch's `/tdd` path can't be exercised → trace the consumer scenario / exercise the mechanism, don't read "didn't fire here" as broken OR fine. Seen Sprint-015 + Sprint-020 (count 2). Related: L-015 · L-007.
+## L-016 [tags: process] [status: promoted]: when the repo lacks a feature's substrate and cannot dogfood it, verify on the consumer path — "didn't fire here" means neither broken nor fine.
+- **L-016 → promoted: CLAUDE.md anti-pattern (L-015 extension)** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; seen Sprint-015 + Sprint-020.
 
 ---
 
-## L-015 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern + DoD item ("consumer-facing surface checked"). Evaluate every lean-flow change against the CONSUMER who installs the plugin, not only lean-flow's own dogfooding: generic skills/templates stay self-contained + adaptable (no leaked `scripts/…` / `docs/knowledge-index.md` path), and README/CHANGELOG reflect user-visible changes. Recurred — SPRINT-013 leaked gen-index refs into generic skills; SPRINT-014 extended the leak, shipped a stale README (v1.1.0 at v1.5.0) + an out-of-date `/council` worked example — the maintainer flagged it as a persistent skip, so promoted on first explicit surfacing. Related: L-007 · L-001.
+## L-015 [tags: process] [status: promoted]: evaluate every change against the CONSUMER who installs the plugin, not only our own dogfooding — no leaked repo-specific path, and README/CHANGELOG reflect user-visible changes.
+- **L-015 → promoted: CLAUDE.md anti-pattern + DoD item ("consumer-facing surface checked")** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; SPRINT-013 leaked gen-index refs into generic skills, SPRINT-014 extended the leak and shipped a stale README.
 
 ---
 
@@ -426,23 +437,28 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-010 [tags: tooling] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern (edit the repo source, never the install cache). When editing an installed plugin the target is the REPO SOURCE (`skills/…`), not the cache (`~/.claude/plugins/cache/…`); a cache Read doesn't satisfy read-before-edit. Seen Sprint-007 + Sprint-009 (count 2). Related: L-005.
+## L-010 [tags: tooling] [status: promoted]: when editing an installed plugin the target is the repo source (`skills/…`), never the install cache — a cache Read does not satisfy read-before-edit.
+- **L-010 → promoted: CLAUDE.md install-cache anti-pattern** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; seen Sprint-007 + Sprint-009. L-021 carries the *running*-from-cache sibling.
 
 ---
 
-## L-009 [tags: edit-safety] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern (structure-adjacent edits — table rows / list entries — silently fuse or corrupt neighbors; re-read the structure after the edit; fresh-context review catches author-blind corruption). Seen Sprint-007 + Sprint-028, + a 3rd found at 029 promote (TASK-006's TODO.md heading fused into TASK-099's block) (count 3). Related: L-006.
+## L-009 [tags: edit-safety] [status: promoted]: structure-adjacent edits — table rows, list entries — silently fuse or corrupt neighbours; re-read the whole structure afterwards.
+- **L-009 → promoted: CLAUDE.md Edit-safety trap (b)** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; Sprint-007 + Sprint-028 + a third at 029 promote (a TODO.md heading fused into a neighbouring task block).
 
 ---
 
-## L-008 [tags: docs] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern (periodic SSOT dedup at promote) + TD-006. SSOT docs accrete duplication of their satellites until they near the cap; seen Sprint-006 + Sprint-008 (count 2 — CONTEXT hit 129/130).
+## L-008 [tags: docs] [status: promoted]: an SSOT doc accretes duplication of its satellites until it nears its cap — run a periodic dedup pass at promote.
+- **L-008 → promoted: CLAUDE.md anti-pattern + TD-006** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; Sprint-006 + Sprint-008, when CONTEXT.md hit 129/130.
 
 ---
 
-## L-007 [tags: process] [status: promoted] → promoted: yes → CLAUDE.md anti-pattern ("a new behaviour's final DoD must be exercised once on real input"). Spec-only-debt trap; seen Sprint-003 (TD-001) + Sprint-004 (T3/T5); validation follow-ups TASK-023 · TASK-024.
+## L-007 [tags: process] [status: promoted]: a new behaviour's final DoD must be exercised once on real input — the spec-only-debt trap.
+- **L-007 → promoted: CLAUDE.md anti-pattern** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; Sprint-003 (TD-001) + Sprint-004 (T3/T5). L-058 completes it for gates with the must-FAIL fixture bar.
 
 ---
 
-## L-006 [tags: process] [status: promoted] → promoted: yes → orchestrator § Review (the fresh-context Review pass). Cold-context agents surface author-blind spec gaps (7 in one fresh-install run); seen Sprint-003 + Sprint-007 (count 2). Related: L-009 (table-row deletion fused neighbors — caught only by that review).
+## L-006 [tags: process] [status: promoted]: cold-context review surfaces author-blind spec gaps the author cannot see — 7 in one fresh-install run.
+- **L-006 → promoted: orchestrator § Review (the fresh-context Review pass)** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; Sprint-003 + Sprint-007. It is what caught L-009's fused table rows.
 
 ---
 

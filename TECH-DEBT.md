@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-01
+last_updated: 2026-08-09
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -133,62 +133,6 @@ status: current
     check, so an ordering derivable through the chain counts as owned. Negative-test it per L-058: a
     genuine unowned overlap (two rank-0 tasks, no path between them) must still FAIL.
 
-- **TD-024** severity: minor | status: resolved → SPRINT-044 T3 | created: Sprint-043
-  - **ROOT CAUSE FOUND (SPRINT-044 T3), fully reproducible.** `MSYS_NO_PATHCONV=1` in the environment.
-    It is exported on this host so a bare `/orchestrator …` prompt isn't rewritten into a Windows path
-    before reaching `claude.exe` (L-067) — and it is **inherited**, so it reached the gate and every
-    harness the gate spawns, disabling path translation and breaking `git -C` on a POSIX path. With it
-    set: `72 pass, 1 fail` emitting `could not resolve live HEAD in /d/Project/lean-flow` — the exact
-    string this row recorded. Without it: `73 pass, 0 fail`, three consecutive runs.
-  - Why it was hard to see: the variable is set at the *trigger*, and the symptom appears in an
-    *unrelated gate* two layers down. Both earlier diagnoses were near-misses — the first blamed `git -C`
-    on MSYS paths generally (false: it works fine unset), the second guessed transient worktree state.
-    Neither was wrong about *where*; both missed the environment as the *what*.
-  - Resolution: `scripts/night-run.sh` clears the variable around the pre-flight gate only, in a
-    subshell, leaving the fired command's environment untouched. **Residual, accepted and stated:** a
-    maintainer running `qa-check` by hand with the variable exported still sees the spurious FAIL. The
-    guard is behaving correctly in that case — it names its finding and exits — so this is a
-    surprising-message problem, not a coverage gap.
-  - Summary: during SPRINT-043's unattended run, `evals/run-dispatch-preflight-fixtures.sh` emitted
-    `FAIL harness: could not resolve live HEAD in /d/Project/lean-flow` and exited 2. The symptom was
-    real throughout; two successive diagnoses filed with it were not.
-  - Provenance worth keeping: filed by an unattended run that correctly **parked** rather than fixing it
-    mid-flight — the park was right — but nothing inside a headless run can challenge its own diagnosis,
-    because there is no one to challenge it. The SPRINT-043 close re-checked it and downgraded it;
-    SPRINT-044 root-caused it. A finding produced without an ask channel still needs verifying
-    (L-078's family). The `pwd -W` sweep the first diagnosis proposed was never applied, which is the
-    outcome that mattered — it would have hardened seven harnesses against a mechanism that never
-    existed.
 
-- **TD-023** severity: medium | status: resolved → SPRINT-044 T2 | created: Sprint-043
-  - Summary: `night-run.md` Part 1's allowlist derivation names the four **sources** a command must be
-    derived from, but says nothing about the **form** the command is issued in. `dontAsk` matches the
-    literal invocation, so `git worktree add …` issued bare was permitted while the identical operation
-    wrapped as `cd X && … 2>&1 && echo …` was denied.
-  - Impact: an allowlist can be derived perfectly from all four sources and still deny the landing
-    path, which is the failure SPRINT-042 T1 exists to prevent — reached by a different route. Observed
-    live in SPRINT-043 on `git worktree add` and twice more on ordinary compound read commands. The
-    consequence is worse than a lost task: the run's natural fix (strip the `cd`) removed the anchor
-    that kept commands pointed at the right tree (L-079).
-  - Mitigation (not yet done): state in Part 1 that landing-path commands are issued **bare** — one
-    command per invocation, no `cd` prefix, no `&&` chain, no redirect — and that anchoring is done
-    with `git -C <abs-path>` rather than by changing directory. Note the interaction with L-057's
-    never-pipe rule: both point the same way, for different reasons.
-
-- **TD-014** severity: minor | status: resolved → SPRINT-044 T1 | created: Sprint-038
-  - Summary: `skills/orchestrator/references/night-run.md` is now **427 lines**, carrying the Part 0
-    contract, the entry path, the pre-flight pass, and **two ~100-line embedded shell snippets**
-    (skill-freshness + worktree-usability).
-  - Impact: uncounted against the SKILL.md cap (ADR-006, it's a `references/` file) so no lint fires,
-    but it is past comfortable reading for the audience that most needs it — someone deciding whether
-    to fire an unattended run. A cold reader must scroll two code blocks to reach Part 2's trigger.
-  - Mitigation (not yet done): split the capability checks into their own `references/` sibling if a
-    third snippet lands. Not urgent at two; the trigger is the third.
-  - **Re-reviewed 2026-07-30 (SPRINT-041 promote, 3 sprints open — kept open).** The trigger is
-    unchanged and still unfired: night-run.md carries the same two embedded snippets it did at
-    SPRINT-038. SPRINT-040 added no snippet there, and TD-019's planned fix lands a leg in
-    `qa-check.sh`, not a third block in this file. Splitting now would cost a reader one more hop for
-    no reduction in what they must read. Next re-review at SPRINT-044 promote, or immediately if a
-    third snippet lands.
 
 
