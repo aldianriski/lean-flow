@@ -32,6 +32,21 @@ examples · refactor candidates). Unsure **which kind of test** (unit/integ/e2e/
 task → `${CLAUDE_SKILL_DIR}/references/test-strategy.md`. What makes a test *good* — the quality
 checklist + the 70/20/10 pyramid + risk-tier→depth, as **host-project** guidance → `${CLAUDE_SKILL_DIR}/references/test-standard.md`.
 
+## Anti-pattern: the tautological test
+
+An assertion that **recomputes the expected value the way the code does** passes by construction and
+can never disagree with the code — `expect(add(a, b)).toBe(a + b)`, a snapshot derived by hand using
+the same formula, a constant asserted equal to itself. It is green on day one and stays green through
+the bug it was written to catch, so it reads as coverage while testing nothing.
+
+**The tell:** ask *what would have to be wrong for this to fail?* If the only answer is "the language",
+it is tautological. Same family as L-058 — a check that can only pass is the failure it exists to
+prevent, and a test suite hides it better than a gate does.
+
+**The fix:** the expected value comes from an **independent source of truth** — a known-good literal, a
+worked example computed by hand or by a different method, or the spec. If you cannot produce one, that
+is a finding about the requirement, not a reason to assert the implementation against itself.
+
 ## Anti-pattern: horizontal slicing
 
 **Do NOT write all tests first, then all implementation.** Bulk-written tests verify *imagined*
@@ -69,6 +84,7 @@ tests after each refactor step.
 [ ] Test describes behaviour, not implementation
 [ ] Test uses the public interface only
 [ ] Test would survive an internal refactor
+[ ] Expected value comes from an independent source — not recomputed the way the code does
 [ ] Code is minimal for this test — no speculative features
 ```
 
