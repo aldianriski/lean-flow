@@ -3,7 +3,7 @@ sprint: 049
 slug: layer-check-redesign
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 plan_commit: d5b0fa9
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -193,5 +193,49 @@ L-088 reads `promoted: yes → skills/orchestrator/SKILL.md § Red flags`.
 | | | | | |
 
 ## Retro
-<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
-     shipped → CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md. -->
+
+Three tasks, all DoD closed (25/25). The family TD-032 predicted would need "a rethink rather than
+another narrowing" got one: both layer checks now ask *who changed it* instead of *did anyone declare
+it*, and the prose-derived legs got an explicit escape instead of another heuristic.
+
+**Retrieval check — yes, one miss, and it is the sharpest thing this sprint found.** `L-087` ("a
+symptom is observed, the mechanism welded to it is inferred") was promoted at SPRINT-048 close into
+`skills/diagnose/SKILL.md` § Red flags. At the SPRINT-049 **promote** I hit a gate FAIL, attached
+TD-032's prose-mention mechanism to it without testing, and reworded an Acceptance line on that wrong
+diagnosis — the exact failure L-087 exists to prevent, one sprint after promoting it. The rule did not
+fire because the flow was `/lean-doc-generator promote`, not `/diagnose`, and the rule lives only in
+`/diagnose`. That is L-020's shape (shipped ≠ wired) applied to a *promoted learning* rather than a
+capability → filed as **L-092**.
+
+**Cost** — inline, single session, no sub-agent dispatch (owner instruction), 3 tasks + 1 amendment
+across 4 commits. Token/dollar figures **unavailable** in this session — recorded as unavailable
+rather than omitted, so the calibration series does not silently gain a phantom row.
+
+**Worked**
+- **Running the fixture against the *old* code.** TD-035's case was built once and run against both
+  checkers: pre-T1 `PASS` exit 0, post-T1 `FAIL … T1:bar.txt`. Without the first half, "newly FAILs"
+  is an assertion. This is the practice worth keeping → **L-090**.
+- **Replaying a check across a sprint's whole revision history** (11 commits of the SPRINT-048 Plan)
+  turned "TD-032 fired ~11 times" from an anecdote into a located, categorised list — and falsified
+  the mitigation in the process.
+- **Attribution probed against real commits**, not only constructed fixtures. That is what surfaced
+  the three subject forms and the five id-less task commits; a fixture-only design would have shipped
+  a one-form regex and rebuilt TD-035 one layer down.
+- **The escape's first consumer was this sprint's own Plan** — the Plan could not be written without
+  it, so it was exercised on real input before it shipped (L-007), not merely specified.
+
+**Friction**
+- The Plan file could not be committed until the check it repairs was repaired, forcing T3 ahead of
+  T1. Not harmful, but it means a sprint that fixes a gate cannot describe its own fixtures until it
+  ships — worth knowing before the next one.
+- Two labelling errors inside the Execution Log itself (`T1a/T1b` vs the tooling's `^### T[0-9]+`, and
+  "A2 falsified" naming the wrong assumption), both corrected by appending rather than editing. The
+  append-only rule worked; the cost was three extra entries.
+- `TD-032`'s Mitigation line had been carried unquestioned into T1's DoD at promote. A ledger row's
+  proposed fix reads as a plan and is actually an untested hypothesis → **L-091**.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **L-090** — prove a gate's new FAIL against the pre-change code, or the negative test is unverified.
+- **L-091** — a TD row's Mitigation line is a hypothesis written under time pressure, not a plan.
+- **L-092** — a promoted learning fires only in the skill it was filed into; promotion needs the same
+  wiring check a capability gets (L-020 applied to rules).

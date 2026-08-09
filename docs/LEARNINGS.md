@@ -21,11 +21,35 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-089**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-092**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-092 [tags: process] [status: active]: **A promoted learning fires only inside the skill it was filed into — promotion needs the same wiring check a capability gets.** L-087 ("a symptom is observed, the mechanism welded to it is inferred") was promoted at SPRINT-048 close into `skills/diagnose/SKILL.md` § Red flags. One sprint later, at the SPRINT-049 *promote*, a gate FAIL was met by attaching TD-032's prose-mention mechanism to it without testing, and an Acceptance line was reworded on that wrong diagnosis — precisely the failure L-087 exists to prevent. The rule never fired because the flow was `/lean-doc-generator promote`, not `/diagnose`. The §10 promotion rule says to route a recurring learning into "a CLAUDE.md anti-pattern, a CONTEXT.md rule, **or** a skill red-flag" and stops there, as though the three were interchangeable homes; they are not — a skill red-flag is scoped to that skill's flow, and a mis-diagnosis is not a `/diagnose`-only event. This is L-020 (shipped ≠ wired) applied to *rules* rather than capabilities: ask of any promotion **which flows can hit this failure**, and place it where all of them read, or accept it will fire in exactly one.
+- seen: Sprint-049
+- count: 1
+- promoted: no
+- related: L-020 (wire a capability into every triggering job) · L-087 (the rule that failed to fire) · L-002 (a rule that only fires inside skill flows) · DOCS_Guide §10
+
+---
+
+## L-091 [tags: process] [status: active]: **A tech-debt row's Mitigation line is a hypothesis written under time pressure, not a plan — test it before building it.** TD-032 proposed narrowing the prose derivation to "DoD/Acceptance lines only, excluding the free-text rationale paragraph". That line was written at the moment of filing, when the cost of the false positives was being felt and the fix seemed obvious, and it was carried unquestioned into SPRINT-049 T1's DoD at promote. Replaying the checker across all 11 revisions of the SPRINT-048 Plan showed every false positive sitting **inside a DoD checkbox item** — the narrowing would have fixed none of them, because the discriminator is the token's *role in the sentence*, not its location in the block. The row was right about the problem and wrong about the cure, which is the normal condition of a mitigation written while annoyed. What makes it dangerous is that by the time it reaches a Plan it has been re-read several times and reads as settled. Treat `Mitigation (not yet done):` as the filer's best guess: cite the evidence for the *problem*, re-derive the *fix*.
+- seen: Sprint-049
+- count: 1
+- promoted: no
+- related: L-087 (mechanism inferred rather than tested) · L-088 (a DoD premise invalidated by execution — this is where the stale premise came from) · TD-032
+
+---
+
+## L-090 [tags: tooling] [status: active]: **A gate's new must-FAIL fixture proves nothing until it is run against the code from *before* the fix.** SPRINT-049 T1 replaced the observed check's all-task union with per-task attribution, closing TD-035 — a task editing a file only a sibling declared. The fixture failed on the new checker, which is necessary and not sufficient: a fixture can fail for a reason unrelated to the change, or test a path the old code never reached, and either way "this case used to pass" stays unverified. So the same fixture repo was driven twice, `git show HEAD:scripts/lib/check-layers-observed.sh` versus the working copy: **old → `PASS`, exit 0 · new → `FAIL … T1:bar.txt`, exit 1.** That two-line result is the whole claim. L-058 establishes that a gate needs a must-FAIL fixture per check; this sharpens *when* that fixture becomes evidence — a red result on new code is a test of the new code, while the red-on-new/green-on-old **pair** is a test of the change. Cheap to do (one `git show` into a temp file) and the only thing that distinguishes a closed hole from a fixture that was always going to be red.
+- seen: Sprint-049
+- count: 1
+- promoted: no
+- related: L-058 (a gate's must-FAIL bar) · L-007 (exercised once on real input) · TD-012 (retain the fixtures) · TD-035
 
 ---
 

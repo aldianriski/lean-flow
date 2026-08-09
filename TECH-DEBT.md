@@ -18,6 +18,38 @@ status: current
 
 ## Tech Debt
 
+- **TD-037** severity: minor | status: open | created: Sprint-049
+  - Summary: attribution needs a commit to read, so **uncommitted work in progress is still tested
+    against the all-task union** — the exact weakness TD-035 was filed about, surviving on the one
+    path where nothing can be attributed.
+  - Impact: bounded and arguably acceptable. The collision TD-035 describes happens between
+    *committed* worktree branches at merge-back, and the coordinator's post-merge gate run sees
+    everything committed — that path is now per-task. What stays uncovered is a single session's
+    mid-flight edits, where "which task is this?" has no mechanical answer because the work has not
+    been committed yet. Filed as its own row rather than left inside TD-035's resolution note, because
+    that note is deleted three sprints after resolution (§11) and the residual would go with it.
+  - Mitigation (not yet done): possibly none warranted — "unattributable because uncommitted" may
+    simply be the honest boundary of a history-reading check. If it is ever worth closing, the lever
+    is the sprint's own open-DoD state (exactly one task is usually in flight), which is a guess
+    rather than a derivation and should be treated as one. **Do not narrow this by adding a rule that
+    infers the current task** without evidence that a real miss occurred — that is TD-031's pattern
+    starting over.
+
+- **TD-036** severity: minor | status: open | created: Sprint-049
+  - Summary: the `Cites:` escape shipped in `check-layers-completeness.sh` (SPRINT-049 T3) is
+    documented **only inside the checker**. `templates/SPRINT.md.template` — the file an author
+    actually writes a Plan from — never mentions it.
+  - Impact: the only way to discover the escape exists is to trip the gate and read a checker's source
+    comments, which is precisely the "reword the docs until it goes quiet" behaviour TD-032 was filed
+    to stop. An author who does not know the escape exists will do the thing the escape was built to
+    prevent. Same family as L-069 (a behavioural rule ships with its trigger, or it does not ship) —
+    here the rule shipped and the *authoring surface* did not.
+  - Mitigation (not yet done): one line in the SPRINT template's Plan comment block naming `Cites:`
+    alongside the `Layers:`/`Depends-on:` requirements. Note the consumer question first (L-015): the
+    checker is maintainer tooling (`scripts/`, ADR-008) that no consumer runs, so a template line
+    would advertise a convention nothing enforces on their side. Decide which of the two surfaces the
+    line belongs to before writing it.
+
 - **TD-035** severity: medium | status: resolved → SPRINT-049 T1 | created: Sprint-048
   - Summary: `check-layers-observed.sh` builds **one union of every task's `Layers:`** and tests each
     changed file against it. A file declared by *any* task therefore satisfies the check for *all*

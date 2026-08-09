@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-049 — Layer-Check Redesign** → [`docs/sprint/SPRINT-049-layer-check-redesign.md`](docs/sprint/SPRINT-049-layer-check-redesign.md)
+> _None._ SPRINT-049 closed 2026-08-09.
 
 ---
 
@@ -30,25 +30,23 @@ status: current
 
 ### P1 — Next Phase Required
 
-- [ ] TASK-152 — Redesign the three layers checks as one, not three patches  [size: M] [risk: med] [HITL]
-      class:      decision
-      done-when:  TD-031, TD-032 and TD-035 are addressed together: changed paths are attributed to
-                  **who** changed them (task commit on an agent branch vs coordinator bookkeeping)
-                  rather than to whether a frozen declaration named them; per-task attribution replaces
-                  the all-task union; and prose that merely *mentions* a filename no longer registers
-                  as a touch. Negative-tested per L-058 — SPRINT-041's real miss (a TD marked resolved
-                  with the debt ledger undeclared) must still FAIL, and a task editing a file only
-                  another task declared must **newly** FAIL
-      touches:    scripts/lib/check-layers-completeness.sh · scripts/lib/check-layers-observed.sh ·
-                  scripts/qa-check.sh · evals/
-      depends-on: none
-      assumes:    TD-032's own stated trigger ("if a third arrives, the checks want a rethink rather
-                  than another narrowing") **fired at SPRINT-048 close** — TD-035 is the third ·
-                  TD-035 is a false NEGATIVE in the collision check, so this is correctness, not polish
-      tracker:    TECH-DEBT.md TD-031 · TD-032 · TD-035
-      state:      ready
-
 ### P2 — Quality / Polish
+
+- [ ] TASK-153 — Scan the mattpocock remainder (scan 3)  [size: M] [risk: low] [HITL]
+      class:      decision
+      done-when:  the 13 skills named as "Not scanned" in docs/research/mattpocock.md are mapped
+                  against lean-flow's existing surface per L-017 (delta first, standalone merit
+                  never), each with an explicit Keep/Reject and a one-line reason; keepers are FILED
+                  as TASK-NNN and not adopted inside the scan task; the § Not scanned list is either
+                  emptied or restated with what still remains
+      touches:    docs/research/mattpocock.md · TODO.md (keepers filed)
+      depends-on: none
+      assumes:    the prior two scans' hit rate holds — 5 keepers from 12 skills examined across two
+                  scans, so expect mostly fast rejects and budget accordingly · TD-033 (this doc is
+                  136 lines against a 120 soft cap) will be forced by a third scan, so the split or
+                  collapse it proposes lands here rather than separately
+      tracker:    docs/research/mattpocock.md § Not scanned
+      state:      ready
 
 - [ ] TASK-148 — Prove bulk throughput on one real night run  [size: M] [risk: med] [HITL]
       class:      execution
@@ -65,6 +63,36 @@ status: current
                   or when the owner lowers the threshold to what a real Plan can reach.
 
 ### P3 — Long-term
+
+- [ ] TASK-154 — Settle skill self-fork (mechanism B) vs runtime invocation (mechanism C)  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  the open question carried in docs/research/mattpocock.md since scan 1 is closed
+                  either way — B adopted with its per-run fork cost measured, or rejected with a
+                  written revisit-if condition so the null result is itself a verdict (L-068). A
+                  deferral without an expiry does not close it
+      touches:    docs/research/mattpocock.md · docs/adr/ADR-010-*.md (only if the answer changes it)
+      depends-on: none
+      assumes:    mechanism C (runtime Skill invocation on a general-purpose agent) is shipped and
+                  working, so this is an optimisation question, not a gap — if C is failing in
+                  practice, this is the wrong task and it becomes a /diagnose
+      tracker:    docs/research/mattpocock.md § Still open
+      state:      ready
+
+- [ ] TASK-155 — Get evidence on whether ❌ negation in anti-patterns backfires  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  the question `writing-for-agents` raised — prohibition activates the forbidden
+                  behaviour, which cuts against CLAUDE.md's ❌ house style — is answered with
+                  evidence rather than style preference, and either the house style is amended or the
+                  question is closed with why
+      touches:    .claude/CLAUDE.md · skills/*/SKILL.md § Red flags (only if the answer changes them)
+      depends-on: none
+      assumes:    our ❌ rows already pair each trap with a positive rule, which the research doc notes
+                  blunts the effect — so the honest null result ("no change warranted") is a real
+                  possible outcome and should be recorded as one
+      tracker:    docs/research/mattpocock.md § Still open
+      state:      needs-info — needs an evidence source before it is plannable; a style debate with no
+                  evidence is not a task. Unblock when either a measurable signal is identified or the
+                  owner rules it closed on judgement.
 
 > TASK-120 (checkpointed run-state) → routed to `.out-of-scope/checkpointed-run-state.md` (2026-07-30) — ADR-013's kill-switch fired: the promotion trigger (a real unattended run the Execution Log + `/handoff` could not resume) stayed unfired through the 5-sprint window; revisit-if + the reconciliation-rule precondition recorded. Learning: L-068.
 > TASK-040 (derived graph view) → routed to `.out-of-scope/derived-graph-view.md` (2026-07-29) — council-2 gate held; the TASK-041 retrieval-miss signal never fired; graphify serves the need ad-hoc (revisit-if + 3 guardrails recorded).
