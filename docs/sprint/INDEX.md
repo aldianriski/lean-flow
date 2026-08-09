@@ -9,7 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
-- SPRINT-054 — Rulings — closed 2026-08-09 · b31e170
+- SPRINT-054 — Rulings — closed 2026-08-09 · b31e170 (MINOR v1.28.0)
 - SPRINT-053 — Surface Truth — closed 2026-08-09 · c6229c5 (PATCH v1.27.3)
 - SPRINT-052 — Rule Placement — closed 2026-08-09 · 9f3da3d (PATCH v1.27.2)
 - SPRINT-051 — Keeper Adoption — closed 2026-08-09 · 351252a (PATCH v1.27.1 — covers SPRINT-049 too)
