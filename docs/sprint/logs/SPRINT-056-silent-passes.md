@@ -177,3 +177,38 @@ like. The checker itself went 6s after a cheap containment test replaced two awk
 `scripts/lib/doc-caps-grandfathered.txt` was created during implementation and is absent from T2's
 frozen `Layers:` — declared mid-sprint per L-100, which this sprint promoted into CONTEXT.md § Sprint
 model. Logged, declared, continued.
+
+### 2026-08-09 | complete | T3 — the WIP exclusion list split by kind; the answer was already inside the checker's own comments
+The open question TD-044 recorded ("key on the file, or on the phase that touched it?") did not need
+a design; it needed someone to read the reasons already written next to each entry. `TODO.md` says
+"backlog bookkeeping, **written at close**", `TECH-DEBT.md` "TD marking **moved to close**",
+`CHANGELOG.md` "release bookkeeping, **written at close**" — three statements about a *phase*, all
+implemented as statements about a *file*. Alongside them sit genuinely structural entries
+("GENERATED, never hand-authored", "undeclarable by construction", "created AFTER the Plan freezes")
+which are true in every phase. One list, two kinds of reason, uniform implementation — so a
+close-time reason silently held during execution, which is the whole of TD-044.
+
+Now: `is_excluded_closetime()` (TODO · TECH-DEBT · CHANGELOG · LEARNINGS) applies **only when the
+sprint has zero open DoD**; everything else is structural and applies always. The committed path is
+untouched — its stricter list is deliberate and answers attribution by role (T3's hard constraint).
+Phase is read, never *which task* is in flight, so TD-037's warning is respected rather than dodged.
+
+**L-090 pair, run against the real recorded case rather than a constructed one.** An uncommitted
+`TODO.md` edit while SPRINT-056 has open DoD — SPRINT-055 T6's exact shape:
+
+| | verdict |
+|---|---|
+| checker at HEAD (pre-T3) | exit 0 · `PASS … (all changed files declared)` |
+| checker after T3 | exit 1 · `FAIL … changed but undeclared in any task's Layers:: TODO.md` |
+
+**An existing fixture had to change, and that is the finding worth keeping.** Case 4
+(`coordinator-exclusion-safe`) edited `TECH-DEBT.md` under a Plan with an **open** DoD and asserted a
+clean run — it encoded the defect as the expected behaviour. Run against the new checker it went red
+immediately, which is the correct signal and not a regression. It is now two cases: the same repo
+mid-execution (**must FAIL**, close-time file edited as task work) and with its DoD ticked (**must
+PASS**, genuinely at close). The second half is not optional — without it this change reads as "stop
+excluding close-bookkeeping files", which would flag every real close and be reverted inside a sprint.
+`docs/sprint/INDEX.md` stays excluded in both, proving the structural half survived the split.
+
+`docs/QA.md` rewritten to document the two *kinds* rather than the two paths. Gate: 120 pass, 0 fail;
+layers-observed suite all green.

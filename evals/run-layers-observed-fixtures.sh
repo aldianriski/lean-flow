@@ -363,10 +363,25 @@ printf '# TD\n' > "$c4/TECH-DEBT.md"
 git -C "$c4" init -q
 lock_plan "$c4" 'docs/sprint/SPRINT-905-exclusion.md'
 printf 'a2\n' >> "$c4/foo.txt"                                    # tracked, uncommitted, declared
-printf 'TD-099 resolved\n' >> "$c4/TECH-DEBT.md"                  # tracked, uncommitted, excluded
-printf '| 905 | exclusion | 2026-08-01 |\n' > "$c4/docs/sprint/INDEX.md"  # untracked, excluded
+printf 'TD-099 resolved\n' >> "$c4/TECH-DEBT.md"                  # tracked, uncommitted, close-time
+printf '| 905 | exclusion | 2026-08-01 |\n' > "$c4/docs/sprint/INDEX.md"  # untracked, STRUCTURAL
 
-run_case_anywhere "coordinator-exclusion-safe" 0 \
+# T3 (TD-044) split this case in two, because the fixture as written could not tell the two kinds of
+# exclusion apart. The Plan above has an OPEN DoD, so the sprint is mid-execution -- and a
+# close-bookkeeping file edited during execution is task work, not bookkeeping. That is exactly the
+# SPRINT-055 T6 shape: a task whose real work was editing TODO.md, invisible for its whole run.
+# STRUCTURAL exclusions (docs/sprint/INDEX.md here) still hold in both phases.
+run_case_anywhere "closetime-file-during-execution (now reported)" 1 \
+  "changed but undeclared in any task's Layers:: TECH-DEBT.md" -- \
+  sh -c "cd \"$c4\" && sh \"$checker\" docs/sprint/SPRINT-905-exclusion.md"
+
+# The other phase: the SAME repo, same edits, with the DoD ticked. Zero open DoD == at close, which
+# is when "written at close" is actually true -- so TECH-DEBT.md is excluded again and the run is
+# clean. Both halves matter: without this one the change would read as "stop excluding close files",
+# which would flag every real close and be reverted within a sprint.
+sed -i.bak 's/^- \[ \] foo.txt updated/- [x] foo.txt updated/' "$c4/docs/sprint/SPRINT-905-exclusion.md"
+rm -f "$c4/docs/sprint/SPRINT-905-exclusion.md.bak"
+run_case_anywhere "closetime-file-at-close (still excluded)" 0 \
   "layers observed (all changed files declared" -- \
   sh -c "cd \"$c4\" && sh \"$checker\" docs/sprint/SPRINT-905-exclusion.md"
 

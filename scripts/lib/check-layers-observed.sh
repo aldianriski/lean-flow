@@ -144,18 +144,46 @@ is_excluded_committed() {
 # commit to read; while the coordinator is mid-close with TECH-DEBT.md, TODO.md and CHANGELOG.md
 # edited but not yet committed, there is nothing to attribute them to, and the gate runs in exactly
 # that state. So the list shrinks on the committed path and stays whole on the WIP path.
-is_excluded() {
+# --- the phase split (TD-044, SPRINT-056 T3) -----------------------------------------------------
+# The reasons on this list were never all the same KIND, and that is what let a real edit through.
+# Read them: "backlog bookkeeping, written at close", "TD marking moved to close", "release
+# bookkeeping, written at close" are statements about a PHASE. "GENERATED, never hand-authored",
+# "undeclarable by construction", "created AFTER the Plan freezes" are statements about STRUCTURE.
+# The list was implemented uniformly -- keyed on the file -- so a close-time reason silently held
+# during execution too. A task whose actual work IS editing TODO.md therefore passed its whole run
+# unreported, and the finding surfaced during a LATER task, attributed to one already finished and
+# pushed (SPRINT-055 T6/T7). By then the only remedies are amending closed history or correcting a
+# frozen Plan.
+#
+# So the close-time rows now apply ONLY at close, detected as "the sprint has zero open DoD" -- state
+# this checker already reads. Note what is NOT being inferred: TD-037 warns against guessing WHICH
+# task is in flight, and this guesses nothing of the kind. It reads a phase, and the phase is a fact
+# on the page. The committed path (is_excluded_committed) is untouched: its stricter list is
+# deliberate, documented, and answers attribution by role (TD-031/TD-035/TD-037 lineage).
+#
+# Direction of the change is widening, not narrowing -- more edits get reported, never fewer. The
+# sibling checker states it fails toward over-reporting by design, and a false positive costs a
+# glance while the false negative here cost a correction to pushed history.
+is_excluded_closetime() {
   case "$1" in
-    docs/sprint/*) return 0 ;;                 # sprint file + archive/ + INDEX.md: coordinator-owned (D3)
     TECH-DEBT.md) return 0 ;;                   # TD marking moved to close (D1)
     TODO.md) return 0 ;;                        # backlog bookkeeping, written at close
+    CHANGELOG.md) return 0 ;;                   # release bookkeeping, written at close
+    docs/LEARNINGS.md) return 0 ;;              # retro bucket routing, written at close
+    *) return 1 ;;
+  esac
+}
+
+# $1 = path, $2 = 1 when the sprint is at close (zero open DoD), 0 otherwise.
+is_excluded() {
+  [ "${2:-0}" = 1 ] && is_excluded_closetime "$1" && return 0
+  case "$1" in
+    docs/sprint/*) return 0 ;;                 # sprint file + archive/ + INDEX.md: coordinator-owned (D3)
     .claude/settings.json|.claude/settings.local.json) return 0 ;;
                                                 # PRE-FLIGHT bookkeeping: the unattended allowlist is
                                                 # derived and written AFTER the Plan freezes, so no task
                                                 # can declare it — undeclarable by construction, not by
                                                 # omission. Same category as the close-time rows above.
-    CHANGELOG.md) return 0 ;;                   # release bookkeeping, written at close
-    docs/LEARNINGS.md) return 0 ;;              # retro bucket routing, written at close
     docs/knowledge-index.md) return 0 ;;        # GENERATED, never hand-authored: regenerated whenever
                                                 # any metadata-carrying doc (LEARNINGS/ADR/research)
                                                 # changes, so declaring it would mean naming it in every
@@ -259,9 +287,15 @@ for sp in "$@"; do
   untracked=$(git ls-files --others --exclude-standard -- . 2>/dev/null)
   wip=$(printf '%s\n%s\n' "$tracked" "$untracked" | grep -v '^$' | sort -u)
 
+  # Zero open DoD in the Plan == the sprint is at close, which is when the close-bookkeeping
+  # exclusions are true. During execution they are not, and a file on that list being edited is task
+  # work that has to be declared like any other.
+  at_close=0
+  [ "$(awk '/^## Plan/{f=1;next} /^## /{f=0} f && /^- \[ \]/{n++} END{print n+0}' "$sp")" -eq 0 ] && at_close=1
+
   miss=""
   for f in $wip; do
-    is_excluded "$f" && continue
+    is_excluded "$f" "$at_close" && continue
     covers "$layers_all" "$f" || miss="$miss $f"
   done
 

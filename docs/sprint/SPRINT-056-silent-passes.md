@@ -113,15 +113,15 @@ commits, demonstrated on the recorded case (a task editing `TODO.md` as task wor
 bookkeeping).
 
 **DoD:**
-- [ ] Re-derive the open design question, which is unanswered on purpose: should exclusion key on the
+- [x] Re-derive the open design question, which is unanswered on purpose: should exclusion key on the
       *file* or on the *phase that touched it*? Record the ruling before writing code
-- [ ] The deliberate WIP/committed asymmetry survives — `docs/QA.md` still documents it and still
+- [x] The deliberate WIP/committed asymmetry survives — `docs/QA.md` still documents it and still
       explains why, and the committed path is not loosened to match the WIP path
-- [ ] Do not narrow or widen either list on this single observation (TD-031's pattern) — if the
+- [x] Do not narrow or widen either list on this single observation (TD-031's pattern) — if the
       ruling is that no change is warranted yet, that is a valid outcome; say so and close the row
-- [ ] A must-FAIL fixture holds the behaviour: the recorded case reported pre-commit with its named
+- [x] A must-FAIL fixture holds the behaviour: the recorded case reported pre-commit with its named
       finding (L-058), verified red-on-new and green-on-old (L-090)
-- [ ] Fixture retained and wired into `qa-check.sh` (TD-012)
+- [x] Fixture retained and wired into `qa-check.sh` (TD-012)
 
 ### T4 — Keep the sprint checks armed through the commit that closes the sprint `[size: M · risk: med · class: decision · HITL]`
 Layers: `scripts/qa-check.sh` · `scripts/lib/check-layers-observed.sh` · `docs/QA.md` · `evals/run-sprint-close-fixtures.sh` · `evals/fixtures/sprint-close/`
