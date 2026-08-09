@@ -11,6 +11,36 @@ status: current
 
 ---
 
+## v1.27.3 — Surface Truth (2026-08-09)
+
+PATCH — SPRINT-053. One consumer-facing change, and it stops `init` handing you documentation about
+things your repo does not have.
+
+**What changed for you:**
+- **`init` no longer scaffolds docs for substrate you don't have.** It used to scaffold the base tier
+  *always*, even though every higher tier was already gated on detection — a database repo got the
+  database docs, an API repo got the integration docs, but a repo with no code still got coding
+  standards and a testing guide describing code that does not exist. Four base rows now carry a
+  condition: `development/coding-standards` and `testing/testing-guide` need **code**;
+  `deployment/deployment-guide` and `deployment/rollback-guide` need something you **publish**. A
+  skipped row is reported by name along with the condition that skipped it, so an absent doc reads as
+  a decision rather than an oversight.
+- **The two substrates are deliberately independent**, because bundling them is what made the original
+  rule wrong. "Docs-only repo" is not a condition: a markdown plugin publishes an artifact without
+  holding a line of application code, and its deployment guides are correct and load-bearing. lean-flow
+  is exactly that repo, which is how the mistake was caught — the first version of this rule predicted
+  our own deployment docs out of existence.
+- **The standard agrees with the tool again.** `DOCS_Guide` §6's base row previously read "every dev
+  repo" flat out, so a consumer following the standard and a consumer running `init` got different
+  answers. §6 now states the same four conditions.
+
+**Maintainer-side (ships to nobody):** the two `Layers:` completeness FAILs now name the `Cites:`
+escape in the message. Tripping the gate used to tell you only what was missing from your declaration,
+whose obvious repair is to declare a touch that never happened — the behaviour the escape exists to
+prevent. The fixtures assert the hint, so it cannot quietly disappear.
+
+---
+
 ## v1.27.2 — Rule Placement (2026-08-09)
 
 PATCH — SPRINT-052. One surface changed, and it is the one that decides where every *future* rule
