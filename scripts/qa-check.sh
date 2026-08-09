@@ -158,6 +158,35 @@ else
   fi
 fi
 
+# --- 2f. Gate sign-off recorded where an unattended run can read it ------------------------------
+# night-run Part 1 required batch G1/G2 to be "already signed off" and never said the sign-off had to
+# live in the sprint artifact, so a run reading only the sprint file saw nothing, re-ran both gates,
+# reached for AskUserQuestion (unregistered headless) and parked every task (SPRINT-057 T5, L-099).
+# The guarded failure is a MISSING field read as approval, so absence is reported rather than passed
+# over. Covered by evals/run-gates-signed-fixtures.sh.
+gs_script="scripts/lib/check-gates-signed.sh"
+if [ ! -f "$gs_script" ]; then
+  bad "gates signed: checker not found at $gs_script"
+else
+  gs_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
+  if [ -z "$gs_files" ]; then
+    note "gates signed: skip (missing): docs/sprint/SPRINT-*.md"
+  else
+    gs_out=$(sh "$gs_script" $gs_files 2>&1); gs_code=$?
+    printf '%s\n' "$gs_out"
+    gs_pass=$(printf '%s\n' "$gs_out" | grep -cE '^PASS')
+    gs_fails=$(printf '%s\n' "$gs_out" | grep -cE '^FAIL')
+    pass=$((pass + gs_pass))
+    if [ "$gs_code" -ne 0 ]; then
+      if [ "$gs_fails" -gt 0 ]; then
+        fail=$((fail + gs_fails))
+      else
+        bad "gates signed: checker exited $gs_code without reporting a FAIL line"
+      fi
+    fi
+  fi
+fi
+
 # --- 3. Frontmatter / ownership presence ------------------------------------
 has_field() { grep -qE "^$2:" "$1"; }
 
@@ -429,7 +458,7 @@ done
 # the selftests, yet it stays always-on: it's cheap (extracts + diffs, no throwaway repos), and
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh"
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh"
 eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
 # run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
 # run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via

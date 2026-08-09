@@ -116,7 +116,13 @@ All items must pass or the night-run does not fire:
 - [ ] Trigger carries the explicit `unattended` signal (Part 0).
 - [ ] Active sprint exists; § Plan is frozen (true since `promote`); every task in the run is
       AFK-class — none needs a human mid-execution.
-- [ ] Batch G1 + G2 already signed off by the human (per `sprint-bulk` steps 1–2).
+- [ ] Batch G1 + G2 signed off by the human (per `sprint-bulk` steps 1–2) **and recorded in the sprint
+      file's `gates_signed:` frontmatter** — not merely agreed in the launching session. The run reads
+      the sprint file and nothing else; a sign-off that exists only in a transcript is invisible to it,
+      so the run re-runs both gates, reaches for `AskUserQuestion` — **unregistered headless** — and
+      parks every task having done zero work. A sign-off the run cannot read is a sign-off that did not
+      happen (L-099). **An absent field means NOT signed**, never "assume it was fine": the safe
+      default is the one that costs a parked run, not the one that executes an ungated Plan.
 - [ ] Zero open `assumes:` / `needs-info` tasks in the run — G2 already blocks on this; pre-flight
       re-verifies it still holds at trigger time (state can drift between G2 and the evening run).
 - [ ] Scoped allowlist derived from **four sources, not one**, and written into your project's

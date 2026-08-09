@@ -132,3 +132,33 @@ requested. Verified by reading before writing anything, and left untouched. L-01
 caught it: judge an external finding on the **delta over our existing surface**, not on its standalone
 merit. Adopting it wholesale would have meant rewriting a correct rule into the same rule, and the
 diff would have looked like progress.
+
+### 2026-08-10 | complete | T5 — the sign-off is now a field the run parses, and its ABSENCE is the guarded case
+`gates_signed: G1,G2 @ <sha>` in the sprint frontmatter, written by `promote`, pointed at by
+night-run Part 1, and checked by `scripts/lib/check-gates-signed.sh`. L-099 arriving from outside:
+Part 1 required the gates to be "already signed off by the human" and never said *where*, so a
+sign-off living in the launching session's transcript was invisible to the run — which then re-ran
+both gates, reached for `AskUserQuestion` (unregistered headless) and parked every task having done
+zero work.
+
+**The guarded failure is absence, not malformation, and the check is shaped around that.** A missing
+field read as approval would ship an ungated Plan into a run where nothing can ask — the L-058 false
+negative at its most expensive. So absence is **reported, visibly, as NOT SIGNED**: not a pass, and
+deliberately not a gate FAIL either, because a sprint legitimately sits unsigned between `promote` and
+the batch gate pass. Telling those two apart is only possible by asserting on output rather than exit
+status, which is L-103 filed one sprint ago and applied here.
+
+**The template's own placeholder had to be handled, and that is the subtle one.** `SPRINT.md.template`
+ships the field as `gates_signed: [G1,G2 @ <sha> — …]`. Left unhandled, an unfilled placeholder parses
+as *present* and the checker would bless a sprint nobody signed — the guarded failure reintroduced
+through the very artifact that creates every sprint, for every consumer. Its own fixture holds it.
+
+**Exercised on real input, not just fixtures** (L-007): SPRINT-057 itself carried no `gates_signed:`
+because it was promoted before the field existed, and the checker's first live run said exactly that.
+This sprint's own G2 sign-off is now recorded (`G1,G2 @ 6d3811b`) and reads back green — so the
+mechanism is proven on the artifact it was built for, not only on constructed ones.
+
+Five fixtures retained: absent · unfilled placeholder · malformed (FAIL — a record nobody can parse
+looks like evidence and is worse than none) · well-formed · archived-and-out-of-scope, the last
+carrying a deliberately garbled value so a regression that started re-checking archives fails loudly
+instead of quietly re-opening settled sprints.

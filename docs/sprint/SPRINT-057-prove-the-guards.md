@@ -4,6 +4,7 @@ slug: prove-the-guards
 owner: Maintainer
 last_updated: 2026-08-09
 status: active
+gates_signed: G1,G2 @ 6d3811b
 plan_commit: d9b1ab9
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -138,13 +139,13 @@ L-099 exactly, arriving from a consumer one sprint after we shipped that lesson.
 commit; a `sprint-bulk unattended` run reads it instead of re-running the gates.
 
 **DoD:**
-- [ ] `promote` sets a `gates_signed:` frontmatter field naming the gates and the commit
-- [ ] `night-run.md` Part 1's checklist item points at that field rather than at a human's memory
-- [ ] **An ABSENT field means NOT signed** — a must-FAIL fixture proves it, because a new field whose
+- [x] `promote` sets a `gates_signed:` frontmatter field naming the gates and the commit
+- [x] `night-run.md` Part 1's checklist item points at that field rather than at a human's memory
+- [x] **An ABSENT field means NOT signed** — a must-FAIL fixture proves it, because a new field whose
       absence reads as approval is the L-058 false negative shipped into a headless run
-- [ ] Frontmatter, not a body block: every checker already parses frontmatter via `fmv()`, so this
+- [x] Frontmatter, not a body block: every checker already parses frontmatter via `fmv()`, so this
       costs no new parser (ruled at this promote)
-- [ ] Fixture retained and wired into `qa-check.sh` (TD-012), verified red-on-new/green-on-old (L-090)
+- [x] Fixture retained and wired into `qa-check.sh` (TD-012), verified red-on-new/green-on-old (L-090)
 
 ### T6 — Stop promote freezing a size L into the Plan `[size: S · risk: low · class: execution · HITL]`
 Layers: `skills/lean-doc-generator/SKILL.md` · `.claude/CONTEXT.md`

@@ -6,6 +6,7 @@ epic: [EPIC-NNN if this sprint advances one — omit entirely otherwise]
 owner: [role — not personal name]
 last_updated: YYYY-MM-DD
 status: planned | active | closed
+gates_signed: [G1,G2 @ <sha> — set when the batch gates are signed; OMIT until they are. Absence means NOT signed]
 plan_commit: [sha — set at promote]
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
