@@ -18,6 +18,26 @@ status: current
 
 ## Tech Debt
 
+- **TD-035** severity: medium | status: open | created: Sprint-048
+  - Summary: `check-layers-observed.sh` builds **one union of every task's `Layers:`** and tests each
+    changed file against it. A file declared by *any* task therefore satisfies the check for *all*
+    tasks — so a task editing a file it never declared passes silently, provided some other task in
+    the same Plan happened to declare it.
+  - Impact: this is a **false negative in the check specifically built to prevent concurrent-edit
+    collisions**, and it is worse than TD-032's false positives, which are merely noisy. Observed in
+    SPRINT-048 T6: that task edited `DOCS_Guide.md` and `README.md` without declaring either, and the
+    gate stayed green because T4 and T2 had declared them for their own reasons. Only
+    `council/SKILL.md` — declared by nobody — was caught. Under the sequential inline execution this
+    sprint used, harmless. Under the **worktree-parallel dispatch this repo ships**, the ownership map
+    derived from those declarations would be wrong in exactly the way SPRINT-041's corrupted merge was
+    wrong, and the gate would report green.
+  - Mitigation (not yet done): attribute each changed path to the task that actually changed it and
+    test **per task**, not against the union. The natural discriminator is the same one TD-031 proposes
+    — *who* changed it (agent branch vs coordinator) rather than *whether anyone declared it*, which is
+    a point in favour of doing both together rather than patching each check again.
+  - Negative-test per L-058: a Plan where task A edits a file only task B declares must **FAIL**;
+    today it passes. That fixture is the proof this row is real.
+
 - **TD-034** severity: trivial | status: open | created: Sprint-047
   - Summary: the archived `docs/sprint/archive/SPRINT-045-gate-precision.md` carries **duplicate
     `## Files Changed` and `## Retro` sections**, plus one `### 2026-08-01 | scope-change` Execution
@@ -60,6 +80,15 @@ status: current
   - Related: TD-031 names the sibling complaint about `check-layers-observed.sh` asking the wrong
     question. Two rows now describe the same family; if a third arrives, the checks want a rethink
     rather than another narrowing.
+  - **Sprint-048 update — the third arrived, and the count is no longer arguable.** The check fired
+    **~11 times in one sprint**, every single time on a file that was only *mentioned* in prose: an
+    analogy ("the `CHANGELOG.md` shape"), a cross-reference to a fixture harness, a coordination note
+    naming another task, a citation of a research doc read as a source. **Every instance was resolved
+    by rewording the documentation so the gate would stop seeing a filename** — the check is now
+    actively shaping prose to keep itself quiet, which is the tail wagging the dog. Its sibling
+    TD-035 (filed this sprint) is the third row in the family, so the trigger this row set — "if a
+    third arrives, the checks want a rethink rather than another narrowing" — **has fired**. Treat
+    TD-031 · TD-032 · TD-035 as one redesign, not three patches.
 
 - **TD-031** severity: minor | status: open | created: Sprint-046
   - Summary: the observed-layers check's exclusion list has grown by one entry per sprint for four

@@ -50,8 +50,10 @@
 Coding agents fail in recognizable ways. Each skill is the fix for one of them.
 
 **1 · It built the wrong thing.** You assumed it understood you; it didn't.
-→ **`/task-decomposer`** grills ambiguous intent *at intake* — one question at a time, presents
-interpretations, never picks silently — and its assumption registry surfaces what it's guessing;
+→ **`/task-decomposer`** grills ambiguous intent *at intake* — by **frontier round**: everything whose
+prerequisites are settled is asked together, dependent questions wait their turn, and it stops when
+nothing is left assumed. It presents interpretations rather than picking silently, and its assumption
+registry surfaces what it's guessing;
 **G1 Scope** restates the task as one verifiable sentence; **G2** re-grills anything still open
 (an unconfirmed assumption blocks the gate). Align *before* building.
 
@@ -406,7 +408,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-08-09 · status: current · v1.26.0</sub>
+<sub>Doc owner: Maintainer · last updated 2026-08-09 · status: current · v1.27.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge

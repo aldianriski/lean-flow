@@ -21,7 +21,7 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-088**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-089**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
@@ -29,11 +29,20 @@ rule, or a skill red-flag — and marked below. Reviewed at every **Sprint Promo
 
 ---
 
-## L-088 [tags: sprint-model] [status: active]: **A DoD written at promote freezes assumptions that execution can invalidate — both the numbers in it and the premises under it.** SPRINT-047 broke on each half in one task. *The number:* Acceptance asked for "≥15 tasks under the cap", a figure estimated before the overhead was ever measured; the measurement came back ~12, because Files Changed and the Retro still share the Plan's budget. *The premise:* DoD items 7–9 required must-FAIL fixtures for three gate globs — written assuming those globs would be edited. Decision D1 then chose a subdirectory layout under which **no glob changes at all**, so the fixtures would have been testing checks the task does not touch, reachable only by first refactoring a working gate. Neither failure is a planning mistake exactly: at promote the overhead was genuinely unmeasured and D1 genuinely undecided. The lesson is what to do when it surfaces — **amend the Plan explicitly through a `scope-change` entry and get the ruling, rather than quietly reinterpreting the DoD to fit what was built, and never round a measurement up to meet a stated figure.** The failure mode both invite is the same: a sprint that closes green against criteria nobody re-agreed to.
-- seen: Sprint-047
+## L-089 [tags: tooling] [status: active]: **A gate is only as good as the last time you ran it — and the edit most likely to go unverified is the one you make *after* it passes.** SPRINT-048 committed a red gate: T4's work was green, then its DoD checkboxes were ticked, then the log was appended, then it was committed — and the tick had introduced a `layers-completeness` FAIL. Nothing in that sequence felt like a code change; ticking boxes and writing a log entry read as clerical bookkeeping, which is exactly why the gate was not re-run. It surfaced only because `night-run.sh`'s pre-flight refuses to fire on a red gate and reported it while an unrelated task was being reproduced — the tooling caught what the author did not, two tasks later. This is the same family as L-057/L-059 (a verdict about the wrong thing) with the axis rotated: not *which command* the status came from, but *when* it was taken. The practical rule: **re-run the gate immediately before `git commit`, after the final edit, not after the last edit that felt substantive** — and treat DoD-ticking and log-appending as edits, because they are.
+- seen: Sprint-048
 - count: 1
 - promoted: no
-- related: L-007 (exercised once on real input) · L-058 (a gate's must-FAIL bar) · TD-031
+- related: L-057 · L-059 (status from the wrong command) · L-060 (inspect the artifact) · L-088
+
+---
+
+## L-088 [tags: sprint-model] [status: active]: **A DoD written at promote freezes assumptions that execution can invalidate — both the numbers in it and the premises under it.** SPRINT-047 broke on each half in one task. *The number:* Acceptance asked for "≥15 tasks under the cap", a figure estimated before the overhead was ever measured; the measurement came back ~12, because Files Changed and the Retro still share the Plan's budget. *The premise:* DoD items 7–9 required must-FAIL fixtures for three gate globs — written assuming those globs would be edited. Decision D1 then chose a subdirectory layout under which **no glob changes at all**, so the fixtures would have been testing checks the task does not touch, reachable only by first refactoring a working gate. Neither failure is a planning mistake exactly: at promote the overhead was genuinely unmeasured and D1 genuinely undecided. The lesson is what to do when it surfaces — **amend the Plan explicitly through a `scope-change` entry and get the ruling, rather than quietly reinterpreting the DoD to fit what was built, and never round a measurement up to meet a stated figure.** The failure mode both invite is the same: a sprint that closes green against criteria nobody re-agreed to.
+- seen: Sprint-047, **Sprint-048 (×3 in one sprint)**
+- count: 2
+- promoted: no — **due now**, the `count ≥ 2` trigger fired at SPRINT-048 close
+- Sprint-048's three: the **≥15 capacity target** (an estimate written as an acceptance bound, measured at ~12) · **T2's line-neutral constraint** (real only while the file sat at 110/110; dissolved two tasks earlier by the cap raise) · **T7's "remove the duplicate PRD template"** (they were a feature-PRD and a project-requirements doc — a pipeline, not a copy; deleting either would have lost an artifact). All three were *correct when written* and wrong by the time they ran, which is the whole point: this is not a planning-quality problem, it is a staleness problem, and the remedy is a `scope-change` entry plus an owner ruling rather than quiet reinterpretation.
+- related: L-007 (exercised once on real input) · L-058 (a gate's must-FAIL bar) · L-089 · TD-031
 
 ---
 

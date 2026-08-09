@@ -3,7 +3,7 @@ sprint: 048
 slug: epic-layer
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 plan_commit: 914992a
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -178,7 +178,7 @@ own bundled product-requirements template is orphaned, never referenced by its o
 
 ## Owner-action checklist
 <!-- Omit if none. -->
-- [ ] None identified at promote.
+- [x] None identified at promote, and none arose.
 
 ## Decisions (pre-locked)
 - **D1** — the epic mirrors `docs/sprint/` (`docs/epic/` + lazy `INDEX.md` + `archive/`) rather than
@@ -215,12 +215,53 @@ own bundled product-requirements template is orphaned, never referenced by its o
      shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the Plan AND its log move → docs/sprint/archive/ + archive/logs/ (§11), same commit. -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — **two misses, both mine, both found late.**
+1. **ADR-007 was the direct precedent for T6 and I argued without it.** I objected to raising the SKILL
+   cap on the grounds that DOCS_Guide forbids it — while `ADR-007` had already done exactly this for
+   `CONTEXT.md` ("Diet first (dedup), then raise the cap to 130"), and is *cited inline in §2's own
+   table*. The objection was not wrong, but it was weaker than I presented it, and the owner's call was
+   better supported than I gave it credit for. Found only while reconciling §7.
+2. **A gate FAIL was committed.** T4's DoD tick referenced another task, layers-completeness flagged it,
+   and I appended the log and committed **without re-running the gate after that edit**. It surfaced
+   because `night-run.sh`'s pre-flight refuses to fire on a red gate — the tool caught what the author
+   did not. Fixed in `c412019`. → Learnings bucket.
 
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents). Cost per unit **delivered**, not attempted. Unavailable → say so rather than omitting the line.
+**Cost** — **shape: fully inline, single interactive session, zero dispatched agents**, unchanged from
+SPRINT-047. Doctrine would have dispatched T4/T5/T7 (`class: execution`) and parallelised the disjoint
+ones; this session does not use the Agent tool unless asked. **Dollar cost is not exposed for an inline
+session** — recorded as unavailable rather than omitted (degrade rule). Observable: **7 units
+delivered**, 11 commits, gate run ~25 times, 1 network-dependent task, 0 paid headless runs (T5 was
+reproduced without one). No calibration row added to `night-run.md` — that series sizes *unattended*
+runs, and mixing an inline sprint into it would corrupt the comparison it exists to support.
 
 **Worked**
+- **Reproducing before fixing cost nothing and changed the fix.** T5's defect turned out to be
+  reproducible with `sleep 40` — no paid run, no Claude at all — which also revealed that the
+  *mechanism* everyone assumed (json buffering) was a separate, still-unproven claim. Fixing the
+  inference instead of the assumed cause is what L-087 asks for, on the very row that promoted it.
+- **The pre-dispatch gate caught an author error.** The one red gate this sprint was found by
+  `night-run.sh` refusing to fire, not by review.
+- **Ordering resolved every shared-file overlap.** Seven tasks, six shared files, zero collisions —
+  because G2 mapped ownership before the first edit rather than discovering it at merge.
+- **Capacity was real.** Seven tasks in a 232-line Plan, against 2–6 in the six sprints before the split.
 
 **Friction**
+- **`layers-completeness` fired ~11 times on files that were only *mentioned*.** Every instance was
+  resolved by rewording prose so the gate would stop seeing a filename — the check making docs worse
+  to keep itself quiet. → TD-032 bumped with this sprint's count.
+- **The observed-layers check unions `Layers:` across all tasks**, so a declaration made by one task
+  silently satisfies another task's undeclared edit (found in T6: DOCS_Guide and README passed only
+  because other tasks had declared them). Under sequential execution harmless; under the parallel
+  dispatch this repo ships, it is a false negative in the exact check meant to prevent collisions.
+  → new TD.
+- **Three DoD premises were invalidated during execution** (the ≥15 capacity target · T2's
+  line-neutral constraint · T7's "remove the duplicate template"). All three were correct when
+  written and wrong by the time they ran.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- **L-088 recurred three times inside one sprint** — the learning filed at SPRINT-047's close about
+  DoDs freezing assumptions execution invalidates. `count` moves to 2 sprints, which is the promotion
+  trigger.
+- **New:** a gate is only as good as the last time you ran it. An edit made *after* the green run and
+  *before* the commit is unverified, and DoD-ticking is exactly such an edit — it happens last, feels
+  clerical, and is where this sprint's one red commit came from.

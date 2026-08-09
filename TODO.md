@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-048 — Epic Layer** → [`docs/sprint/SPRINT-048-epic-layer.md`](docs/sprint/SPRINT-048-epic-layer.md)
+> _None._ SPRINT-048 closed 2026-08-09.
 
 ---
 
@@ -29,6 +29,24 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-152 — Redesign the three layers checks as one, not three patches  [size: M] [risk: med] [HITL]
+      class:      decision
+      done-when:  TD-031, TD-032 and TD-035 are addressed together: changed paths are attributed to
+                  **who** changed them (task commit on an agent branch vs coordinator bookkeeping)
+                  rather than to whether a frozen declaration named them; per-task attribution replaces
+                  the all-task union; and prose that merely *mentions* a filename no longer registers
+                  as a touch. Negative-tested per L-058 — SPRINT-041's real miss (a TD marked resolved
+                  with the debt ledger undeclared) must still FAIL, and a task editing a file only
+                  another task declared must **newly** FAIL
+      touches:    scripts/lib/check-layers-completeness.sh · scripts/lib/check-layers-observed.sh ·
+                  scripts/qa-check.sh · evals/
+      depends-on: none
+      assumes:    TD-032's own stated trigger ("if a third arrives, the checks want a rethink rather
+                  than another narrowing") **fired at SPRINT-048 close** — TD-035 is the third ·
+                  TD-035 is a false NEGATIVE in the collision check, so this is correctness, not polish
+      tracker:    TECH-DEBT.md TD-031 · TD-032 · TD-035
+      state:      ready
 
 - [ ] TASK-145 — Add the EPIC doc layer (template + §2 lifecycle row)  [size: M] [risk: med] [HITL]
       class:      decision

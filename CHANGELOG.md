@@ -11,6 +11,39 @@ status: current
 
 ---
 
+## v1.27.0 — Epic Layer (2026-08-09)
+
+MINOR — SPRINT-048. `/task-decomposer` has advertised an `--epic` input since long before an epic had
+anywhere to live. Seven tasks against the ~12-task capacity the previous release created — the first
+sprint to actually spend that headroom, and the first written in the split log format.
+
+**What changed for you:**
+- **Epics have a home.** `docs/epic/EPIC-NNN-<slug>.md` + a lazily-created `INDEX.md`, mirroring the
+  `docs/sprint/` shape. `/lean-doc-generator epic` opens one; `/task-decomposer --epic` consumes it and
+  never creates one. `promote` stamps `epic:` on a member sprint and appends its row; `close` completes
+  that row — and closes the epic only when **every** Closed-when condition is ticked, because a member
+  sprint closing is not an epic closing. **Admission test, in order:** outcome not nameable → it is fog
+  (`--fog`) · nameable but fits one sprint → it is a sprint · otherwise an epic.
+- **One clear owner for document creation.** `/lean-doc-generator` creates every core doc;
+  `/task-decomposer` consumes them and emits tasks. Concretely: `--prd <path>` now means *consume this
+  file* and nothing else, and a new `prd` verb owns `docs/product/requirements.md` — a template that
+  had been shipping orphaned, never referenced by the skill that bundles it. **Note two things share
+  the name "PRD"** and are deliberately both kept: the working *feature* PRD the decomposer synthesizes
+  to slice against, and the durable *project* requirements doc. The pipeline is feature PRD → sanitize
+  → requirements.md.
+- **The SKILL.md cap is now ~140, and it finally has a criterion.** The cap only ever said *when* to
+  move something out of a skill file, never *which* something. It now carries the test: **inline what
+  every path needs; disclose what only some paths reach.** The raise itself follows ADR-007's
+  precedent — diet first, measured (a 7-line reclaim), then raise — and `DOCS_Guide` was corrected to
+  match: "never raise the limit **to fit content**; a cap moves only by ADR."
+- **The night-run launcher stops calling healthy runs dead.** A third verdict, `UNKNOWN` (exit 2), for
+  when the process is up but nothing observable has happened yet. Previously that reported
+  `DEAD-ON-ARRIVAL … the prompt may have been rejected` — an inference the launcher cannot support, and
+  one a real run acted on while working normally. It also names `--output-format json` when you use it,
+  since that format buffers until exit and an empty log there means nothing at all.
+
+---
+
 ## v1.26.0 — Sprint Log Split (2026-08-09)
 
 MINOR — SPRINT-047. Your sprint file has a 400-line hard cap, and the Execution Log was eating it.
