@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-055 — Wiring the Standard** → docs/sprint/SPRINT-055-wiring-the-standard.md
+> _None._ SPRINT-055 closed 2026-08-09.
 
 ---
 
@@ -176,7 +176,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-054's shipped changes are held for a MINOR release. Sprint history → [`CHANGELOG.md`](CHANGELOG.md) (rotated archives → `docs/changelog/`).
+_(no active sprint)_ — SPRINT-055's shipped changes are written up as **v1.29.0** in [`CHANGELOG.md`](CHANGELOG.md) and await the MINOR version bump (feature sprint → by hand; `/release-patch` is PATCH-only). SPRINT-054's changes shipped in v1.28.0. Rotated archives → `docs/changelog/`.
 
 ---
 

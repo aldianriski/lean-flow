@@ -3,7 +3,7 @@ sprint: 055
 slug: wiring-the-standard
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 plan_commit: c4eebef
 close_commit: [set at close]
 update_trigger: sprint execute/close events
@@ -220,17 +220,52 @@ moves in lockstep, and T1's check proves the lockstep held.
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10). -->
+**Retrieval check** — no retrieval miss: the prior rules that applied were found and applied
+(L-058 on every new gate · L-007 on T2's real-input exercise · L-016 on T3's gen-index and T5's epic
+branch · L-088 on T4's DoD amendment · TD-031 three times as a reason *not* to narrow a guard ·
+TD-022 on every `Layers:` correction · L-042's staging rule · L-009 after the `TODO.md` list edit).
+One **contradiction of a prior learning by this sprint's own Plan**: T3's scope said "25 research
+files" when there were 27 — a figure written at authoring that nothing re-measured, which is exactly
+what **L-097** describes. It recurred within one sprint of being filed, so L-097's `count` is bumped
+rather than a new entry created.
 
-**Retrieval check** —
-
-**Cost** —
+**Cost** — coordinator-inline, **no dispatched agents**. The owner ruled inline at G2 over ADR-010's
+default (execution-class → briefed Sonnet), because D1 already forbade parallel dispatch and the work
+was cross-file consistency editing over a shared-file chain; briefing seven subagents to run in strict
+sequence would have bought nothing. Shape delivered: **9 commits** — plan lock, one plan-correction,
+seven task commits — over 7 tasks and 34 DoD items; gate grew **74 → 94 checks**; 5 new checkers,
+5 new fixture suites, 19 retained fixtures. **Token cost: unavailable** — this session carried no
+measurement, and stating a figure here would be the L-097 mistake in the row meant to prevent it.
+Per unit *delivered*, that is 9 commits for 7 tasks, all closed, none deferred.
 
 **Worked**
--
+- **Writing each new checker against the live repo before fixing anything.** Four of five failed on
+  real pre-existing state on their first run — the unarchived epic, seven unstamped tasks, six drifted
+  count claims — which is both the strongest evidence the check works and free discovery. The fifth
+  (research) correctly reported *nothing to do*, which is its own kind of proof.
+- **The pre-dispatch preflight caught the sprint's own Plan** before T1 started. D1 said "strictly
+  sequential" in § Decisions prose; the preflight reads `Depends-on:`, found two unowned shared files,
+  and HALTed. The sprint's thesis, demonstrated on itself at the earliest possible moment.
+- **Escalating the T4 DoD instead of annotating it.** "Both mirrored in §11" could not be met once the
+  temp-dir ruling landed. Ticking it with an explanation would have been the exact failure this sprint
+  is about.
 
 **Friction**
--
+- **Six `Layers:` corrections across five tasks**, every one the same cause: a promote-time
+  declaration cannot name a file implementation invents. Leg 15 caught all six, so nothing escaped —
+  the friction is the loop, not the misses.
+- **Two premises in the frozen Plan were wrong at authoring** — T3's "25 research files" (really 27,
+  26 of them `current`) and T4's assumption that both intake artifacts lacked a rule (the feature PRD
+  already had one). Both were caught at the task's design step, which is where `class: decision` earns
+  its keep, but both had been signed at G2.
+- **A `python` heredoc failed silently-ish** (`Python was not found`) while the surrounding pipeline
+  printed a full green report from the *unmodified* file. Read as a self-report it looked like the
+  edit had landed and passed. Edit-safety trap (c), live.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
--
+- **L-099** — a rule written where its checker does not read it is not a rule.
+- **L-100** — a promote-time `Layers:` cannot name what implementation invents; treat it as a live
+  declaration, not a frozen guess.
+- **L-101** — a must-FAIL fixture over an undefined rule is impossible, not merely hard.
+- **L-102** — point a new checker at the live repo before fixing anything; it doubles as discovery.
+- **L-097 bumped to `count: 2`** — the "25 research files" figure.

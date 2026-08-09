@@ -23,6 +23,44 @@ status: current
 
 ## Tech Debt
 
+- **TD-044** severity: minor | status: open | created: Sprint-055
+  - Summary: `check-layers-observed.sh` runs two paths with **two different exclusion lists** —
+    `is_excluded()` for uncommitted WIP, `is_excluded_committed()` for history — and `TODO.md` is on
+    the first and not the second. So the same undeclared edit is invisible while uncommitted and a
+    violation once committed. The verdict depends on whether `git commit` has run, not on the artifact.
+  - Impact: observed in SPRINT-055 T6, which stamped `origin:` onto seven `TODO.md` Backlog entries as
+    task work. Its gate ran green while the edit sat uncommitted; the finding surfaced during T7,
+    attributed to a task already finished and pushed. Attribution to a closed task is the damaging
+    part — the person who can fix it has moved on, and the natural response is to widen an exclusion
+    list rather than declare the file.
+  - Why the WIP exclusion exists and is not simply wrong: `TODO.md` is excluded there as "backlog
+    bookkeeping, written at close", which is correct *at close*. It is wrong for a task whose actual
+    work is editing `TODO.md`. The lists need to disagree about close-time bookkeeping and agree about
+    task work, and today they encode only the first half.
+  - Mitigation (**not yet derived — this is the problem, not the plan**, L-091): resist narrowing or
+    widening either list on this single observation (TD-031's pattern). The real question is whether
+    exclusion should key on the *file* or on the *phase that touched it*, and that has not been
+    designed. Evidence for the problem is above; the fix is not.
+  - Same family as Edit-safety trap (c): a report that describes the reporter's state rather than the
+    artifact's.
+
+- **TD-043** severity: minor | status: open | created: Sprint-055
+  - Summary: SPRINT-055 T1 taught both layers checkers that a `Layers:` token ending in `/` is a
+    directory prefix. The **dispatch preflight** (`dispatch.md`) extracts only dot-bearing tokens
+    (`[A-Za-z0-9_./-]+\.[A-Za-z0-9]+`), so a directory token is invisible to its **shared-file overlap**
+    check. Two tasks could both declare `evals/fixtures/` and the preflight would report no overlap.
+  - Impact: bounded today and deliberately so — the rule "declare a directory only for a tree ONE task
+    owns" is stated in both checkers' header comments and in the T1 Execution Log entry. But it is
+    **guarded by a comment, not a check**, which is precisely the shape TD-041 and this whole sprint
+    were about. SPRINT-055 itself used directory tokens in three task blocks (`evals/`, `docs/epic/`),
+    each singly-owned, so no overlap was possible — the exposure is a future sprint, not this one.
+  - Mitigation (**not yet derived**, L-091): the preflight's token regex could be widened to accept a
+    trailing `/` and its overlap comparison made prefix-aware, but that script is embedded in a fenced
+    block inside a consumer-facing reference (`skills/orchestrator/references/dispatch.md`) and is
+    covered by its own fixture suite, so the change is larger than it looks. Alternatively directory
+    tokens could be rejected outright in a Plan that has more than one task — cheaper, and it removes
+    the feature's only sharp edge. Decide before a sprint declares the same directory twice.
+
 - **TD-042** severity: minor | status: open | created: Sprint-054
   - Summary: the sprint checks in `qa-check.sh` gate on `[ "$st" = "active" ] || continue`, so setting
     `status: closed` **disarms four of them in the same commit that makes the largest edit to the
@@ -30,7 +68,15 @@ status: current
     layers checks do not go quiet — they print `PASS layers completeness (0 block-check(s) verified)`
     and `PASS layers observed (0 sprint file(s) verified)`, which in a green run is indistinguishable
     from real coverage.
-  - Impact: observed live at this sprint's close — the run went 72 pass → **68 pass, 0 fail**, and the
+  - **Second instance, SPRINT-055 close (2026-08-09).** Same mechanism, larger drop: **94 pass → 87
+    pass, 0 fail** the moment `status: closed` was written — seven checks silenced by the commit that
+    added the Retro, the four-bucket routing and the close bookkeeping. Two sprints running, so the row
+    is not hypothetical. What is new is the confirmation that the *ordering* half is the real defect:
+    the artifact was verified by hand instead (271/400 lines · 7 task blocks · 0 open DoD · 14 schema
+    block-checks re-run against a copy with `status` forced back to `active`, no FAIL lines), and it was
+    clean — so nothing was hidden this time. That is luck about the content, not evidence about the
+    guard. A close that *did* break the schema would have reported the same green.
+  - Impact: observed live at Sprint-054's close — the run went 72 pass → **68 pass, 0 fail**, and the
     drop is only visible if you happen to be comparing counts across runs. A PASS over an empty input
     set is the L-058 family in its purest form: the check cannot fail, so its green says nothing. The
     scoping itself is defensible (a closed sprint is history; re-validating it forever is noise) — the

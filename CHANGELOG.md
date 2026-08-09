@@ -11,6 +11,56 @@ status: current
 
 ---
 
+## v1.29.0 — Wiring the Standard (2026-08-09)
+
+MINOR — SPRINT-055. Five rules had been written and were not running. The retention row for epics had
+never executed once; `close` pointed at a research archive target that was never defined; the standard
+described a bug report's content but not its file; G1 fast-passed "decomposer-approved" tasks with no
+field recording whether any task had met the grill; and the README's template count was guarded on two
+surfaces but not the third — the one it had drifted on. Each is now wired to something that reads it.
+
+**Retention that actually runs.** `close`'s archival pass now names the epic move (`docs/epic/archive/`,
+INDEX row kept) gated on *every* member sprint closed **and** every § Closed-when `[x]` — never on
+sprint count alone — and re-bases the relative links an archived epic needs one level deeper.
+EPIC-001 has moved: the rule's first execution since the epic layer shipped. `docs/research/` gains a
+§11 row: a verdict moves to `archive/` once `status: superseded` **and** nothing live still cites it,
+because a spent verdict is usually the WHY-trail for whatever replaced it. Archived research stays in
+the generated knowledge index, marked `(archived)`, rather than silently vanishing from it.
+
+**An end of life for intake scaffolding.** A `BUG-<slug>.md` report and the working feature PRD are
+temp-dir working material — never committed, like `/handoff` docs and council verdicts. Once `/triage`
+routes a bug's substance into a `TASK` / `TD` / `/diagnose` brief there is nothing left to dispose of,
+and §11 deliberately has no row for either: retention acts on committed files, so the absence is the
+rule. `/triage` now tells the author to carry the repro *into* the destination rather than point at a
+file that will vanish.
+
+**G1's fast-path has a field behind it.** New `origin: decomposer | close-retro | triage-bug | manual`
+on the task entry shape, stamped by all three filers. It records **where a task came from**, not a
+self-assessed "was it grilled?" — faking it means misreporting the source. Only `origin: decomposer`
+fast-paths; a missing origin reads as ungrilled, because the fast-path is the exception that must be
+earned.
+
+**Night runs are visible from where sessions start.** `/prime` and `/task-decomposer` were the only two
+skills with zero night-run awareness — and they are the two a session begins at. `/prime`'s `Next:` line
+now names `sprint-bulk unattended` when an active sprint has open DoD (naming only; priming stays
+read-only), and the entry path lists an epic slice beside intent / PRD / ticket. `--epic` now also
+resolves archived epics, reporting them as *closed* instead of advising you to create an epic for work
+that is already finished.
+
+**`CODE_OF_CONDUCT.md` joins the standard**, gated exactly like `CONTRIBUTING.md` (team ≥ 2, or on
+request) with a Contributor Covenant 2.1 template. Its enforcement contact is load-bearing: `init` is
+told not to scaffold the file at all if you cannot name a real monitored address, because a code of
+conduct nobody can report to advertises a process that does not exist. lean-flow itself takes the
+exemption and records why.
+
+**The gate grew 74 → 94 checks**, via five new checkers each with retained must-FAIL *and* must-PASS
+fixtures. Four of the five failed on real pre-existing repo state on their first run. Template counts
+are now guarded on all three surfaces and on **both** halves — core and total — since the total was the
+half that had drifted. A `Layers:` token ending in `/` is now a directory prefix in both layers
+checkers; previously such a token matched nothing while still reading as a declaration.
+
+---
+
 ## v1.28.0 — Rulings (2026-08-09)
 
 MINOR — SPRINT-054. Three questions the repo had been carrying are settled, and **two of the three
