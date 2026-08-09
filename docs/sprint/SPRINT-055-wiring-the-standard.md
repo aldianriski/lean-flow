@@ -53,7 +53,7 @@ one count claim out of lockstep makes `qa-check.sh` fail with a named finding.
 ### T2 — Execute the epic archive at close, not just specify it `[size: S · risk: med · class: execution · AFK]`
 Layers: `skills/lean-doc-generator/SKILL.md` (close row) · `evals/` · `scripts/qa-check.sh` · `docs/epic/EPIC-001-parallel-worktree-fleet.md`
 Cites: `INDEX.md` — the epic index row is verified to survive the move, not edited
-Depends-on: none
+Depends-on: T1 (shared `scripts/qa-check.sh` — T1 owns it first; added by the 2026-08-09 plan-correction)
 DOCS_Guide §11 carries the epic-archive row; `close`'s archival pass enumerates sprint, log, Backlog
 and TODO scrub, and stops short of the epic. The rule is correct as written — this wires it. The risk
 worth guarding is the wrong direction: archiving an epic whose Closed-when conditions are not all
@@ -129,7 +129,7 @@ an active sprint has open DoD, and the chain runs end-to-end from an epic slice 
 
 ### T6 — Deny the G1 fast-path to tasks that never met the grill `[size: M · risk: med · class: decision · HITL]`
 Layers: `skills/orchestrator/SKILL.md` (G1) · `skills/lean-doc-generator/SKILL.md` (close §10 routing) · `skills/triage/SKILL.md` · `.claude/CONTEXT.md` (task entry shape) · `evals/`
-Depends-on: T4 (shared file — see D1)
+Depends-on: T4, T5 (shared files — see D1; T5 edge added by the 2026-08-09 plan-correction for `.claude/CONTEXT.md`)
 G1 fast-paths a "decomposer-approved task" to a scope-unchanged confirm, but no field records whether
 a task ever met the intake grill — the clause is unverifiable prose. Tasks auto-filed by the
 close-Retro follow-up bucket and converted by `/triage` bug intake reach G1 having never been grilled,
