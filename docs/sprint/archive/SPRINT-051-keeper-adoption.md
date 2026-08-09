@@ -3,7 +3,7 @@ sprint: 051
 slug: keeper-adoption
 owner: Maintainer
 last_updated: 2026-08-09
-status: active
+status: closed
 plan_commit: e272617
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -133,6 +133,17 @@ and the stranded Execution Log entry sits in the archived log where it belongs.
 - [x] `TD-034` marked `status: resolved → SPRINT-051 T4` in the ledger
 - [x] `scripts/qa-check.sh` re-run **bare** immediately before the commit (L-089)
 
+## Owner-action checklist
+<!-- Non-dev actions a human must do. Added at close (SPRINT-051), not at promote. -->
+- [ ] **Release the two unreleased sprints.** SPRINT-049 shipped the `/orchestrator` stale-DoD red flag
+      and SPRINT-051 shipped five more consumer-facing surfaces; neither is in `CHANGELOG.md`.
+      `/release-patch` scans `plan_commit..HEAD`, which from here covers **SPRINT-051 only** — running
+      it as-is would publish a v1.27.1 that silently omits SPRINT-049's change. Either widen the scan
+      range to `d5b0fa9..HEAD` (SPRINT-049's plan commit) or write the entry by hand covering both.
+- [ ] **Reinstall the plugin.** This session ran skills from cache **1.25.2** against a **1.27.0** repo
+      throughout; every procedure was read from `skills/` in the repo instead. A fresh session that
+      does *not* do that will execute two-minor-old procedures (L-021).
+
 ## Decisions (pre-locked)
 
 - **D1** — **no shared files between tasks.** T1 (`diagnose/`), T2 (`tdd/`), T3 (three other skills),
@@ -174,5 +185,47 @@ and the stranded Execution Log entry sits in the archived log where it belongs.
 | | | | | |
 
 ## Retro
-<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
-     shipped → CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md. -->
+
+Four tasks, 23/23 DoD, no scope change. The quietest sprint in a while — as predicted at promote,
+because the judging had already been done by SPRINT-050's scan and this sprint only had to write.
+
+**This one is consumer-facing.** Five shipped surfaces changed: `/diagnose` (redaction discipline +
+red flag), `/tdd` (tautological-test anti-pattern + a per-cycle checklist line), `/refactor-advisor`
+(hot-spot scoping), `/prototype` (retire-without-losing), and `orchestrator/references/dispatch.md`
+(merge-conflict intent recovery). Combined with SPRINT-049's `/orchestrator` red flag, **two sprints
+of user-visible change are now unreleased** — see § Owner-action.
+
+**Retrieval check — no miss.** Two prior rules were applied and worked: A2's own confirm step caught
+that TD-034 was a reconstruction rather than a reconcile *before* any archive edit, and L-009's
+re-read-the-whole-structure rule was run after the section move on a file already suspected of a
+fusion. Nothing was contradicted; nothing had to be found late.
+
+**Cost** — inline, single session, no sub-agent dispatch (owner instruction). Token/dollar figures
+**unavailable** in this session; recorded as unavailable rather than omitted.
+
+**Worked**
+- **An assumption's confirm step did its job.** A2 said "if they carry materially different content,
+  T4 is not trivial and wants a ruling" — it did, and it got one. The alternative was a plausible
+  merge that would have destroyed one of two honest records inside a closed archive.
+- **Placement was treated as part of the content.** T1's rule sits *before* Phase 1 because every
+  phase produces an artifact, and T2's sits inline beside the other anti-patterns rather than in
+  `references/` on ADR-006's disclosure test. Both were DoD items rather than afterthoughts, and both
+  changed where the reader meets the rule.
+- **Mechanism over prohibition.** T1 leads with "build the loop against env vars" — that removes the
+  class; `<REDACTED>` only removes instances. A rule that states only the ban invites the workaround.
+
+**Friction**
+- **A rule the repo already held had never reached the skill that needed it most.** `/handoff` has
+  carried redaction for sprints; `/diagnose`, which instructs capturing HAR files and traces, had
+  nothing. It took an *external* scan comparing our `handoff` to theirs to notice → **L-092, count 2**.
+- **A second Mitigation line proved to be a hypothesis.** TD-034's proposed cure would have been
+  actively wrong, exactly as TD-032's was two sprints ago → **L-091, count 2**.
+- **The release has now slipped two sprints**, and `/release-patch` scans `plan_commit..HEAD` — which
+  from here covers SPRINT-051 only and would silently omit SPRINT-049's red flag. Recorded as an
+  owner-action rather than worked around.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **L-091** and **L-092** both reached `count: 2` at this close. Neither is a new entry; both are
+  existing entries whose second sighting fired the §10 promotion trigger, and both are **due for
+  promotion at the next promote** — flagged there rather than promoted here, since promotion is the
+  promote checkpoint's job.
