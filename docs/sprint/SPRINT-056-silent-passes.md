@@ -62,7 +62,7 @@ the real checker rather than be patched a second time, and patching twice is how
 - [x] Fixtures retained and wired into `qa-check.sh`, not deleted with the prototype (TD-012)
 
 ### T2 — Derive doc-cap coverage from the §2 table instead of hand-listing it `[size: M · risk: med · class: decision · HITL]`
-Layers: `scripts/qa-check.sh` · `scripts/lib/check-doc-caps.sh` · `skills/lean-doc-generator/references/DOCS_Guide.md` · `evals/run-doc-caps-fixtures.sh` · `evals/fixtures/doc-caps/`
+Layers: `scripts/qa-check.sh` · `scripts/lib/check-doc-caps.sh` · `scripts/lib/doc-caps-grandfathered.txt` · `skills/lean-doc-generator/references/DOCS_Guide.md` · `evals/run-doc-caps-fixtures.sh` · `evals/fixtures/doc-caps/`
 Cites: `mattpocock.md` · `loop-hygiene-prd.md` · `graphify-daily-value.md` · `graph-engineering.md` · T4 (SPRINT-054's, not this sprint's) · T5 (the half split out of this task) — read as the evidence cited, not edited here
 Depends-on: T1 (shared `scripts/qa-check.sh` — T1 owns it first)
 The gate cap-checks four globs it names by hand, so every §2 row that states a cap and has no
@@ -81,17 +81,19 @@ the three caps that do not come from §2 are still enforced, each naming the ADR
 **DoD:**
 - [x] Re-derive whether the two halves are separable — **ruled separable at G2; manifests split out
       to T5** (Execution Log, 2026-08-09 `scope-change`)
-- [ ] Cap coverage for §2 rows is derived from the §2 table, not hand-listed in the script
-- [ ] The three non-§2 caps (`skills/*/SKILL.md` 140 · `docs/sprint/SPRINT-*.md` 400) are retained as
-      an explicit allowlist, each entry stating its source ADR (L-082: an exclusion earns a written
-      reason). Losing one of them is the failure this task must not cause
-- [ ] A must-FAIL fixture: a doc over its stated §2 cap → FAIL with its named finding (L-058)
-- [ ] A second must-FAIL fixture: a §2 row whose cap has no check → FAIL (this is the derivation
+- [x] Cap coverage for §2 rows is derived from the §2 table, not hand-listed in the script
+- [x] The non-§2 caps are retained as an explicit allowlist, each entry stating its source ADR
+      (L-082). **Corrected mid-task: there is ONE, not three** — §2 states the sprint 400 and both
+      `.claude/` caps, so only `skills/*/SKILL.md` 140 (ADR-006) is non-§2. Measured, logged as a
+      `surprise`, owner confirmation wanted at close (L-088). Intent unchanged and met
+- [x] A must-FAIL fixture: a doc over its stated §2 cap → FAIL with its named finding (L-058)
+- [x] A second must-FAIL fixture: a §2 row whose cap has no check → FAIL (this is the derivation
       itself; without it the task ships the same hand-listing behind a new name)
-- [ ] Both fixtures verified red-on-new **and** green-on-old (L-090)
-- [ ] The three research docs currently over cap are **reported, not fixed** — a cap moves only by
+- [x] Both fixtures verified red-on-new **and** green-on-old (L-090) — plus, on real input, four
+      breaches that were reported by nothing before this task and by every run after it
+- [x] The three research docs currently over cap are **reported, not fixed** — a cap moves only by
       ADR after a measured diet (§7), and the diet is not this sprint. File what the new check finds
-- [ ] Fixtures retained and wired into `qa-check.sh` (TD-012)
+- [x] Fixtures retained and wired into `qa-check.sh` (TD-012)
 
 ### T3 — Make an undeclared edit fail while it can still be fixed cheaply `[size: M · risk: low · class: decision · HITL]`
 Layers: `scripts/lib/check-layers-observed.sh` · `docs/QA.md` · `scripts/qa-check.sh` · `evals/run-layers-observed-fixtures.sh` · `evals/fixtures/layers-observed/`

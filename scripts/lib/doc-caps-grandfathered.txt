@@ -1,0 +1,11 @@
+# Grandfathered cap breaches -- pre-existing drift, surfaced when check-doc-caps.sh turned coverage
+# on (SPRINT-056 T2). Every row prints on EVERY run: this is a report, not an exclusion.
+#
+# The check still bites. actual > recorded -> FAIL (it grew under the clause). cap < actual <=
+# recorded -> reported, named, tracked. actual <= cap -> PASS and the row is told to delete itself.
+#
+# format: <path> <count-at-adoption> <reason-no-spaces>
+AGENTS.md 11 ~10-is-approximate;-thin-pointer-1-line-over
+docs/research/graph-engineering.md 122 §7-diet-moves-only-by-ADR-after-a-measured-pass
+docs/research/graphify-daily-value.md 157 §7-diet-moves-only-by-ADR-after-a-measured-pass
+docs/research/loop-hygiene-prd.md 214 §7-diet-moves-only-by-ADR-after-a-measured-pass

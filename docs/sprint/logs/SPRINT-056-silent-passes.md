@@ -119,3 +119,61 @@ removing the duplication (the snippet is published dependency-free and runnable-
 `scripts/lib/` dependency would be an L-015 leak into a consumer-facing reference), so the duplication
 is now *guarded* by the parity case rather than removed. If a third drift appears, the ruling to
 revisit is that contract, not the parser.
+
+### 2026-08-09 | surprise | T2 — the DoD's "three non-§2 caps" is wrong; §2 carries all but one
+Measured while writing the parser, not assumed. §2's `docs/` table contains
+`| sprint/SPRINT-NNN-<slug>.md | lean loop | AI mid-sprint | 400 hard | …`, and the `.claude/` table
+carries `CLAUDE.md` 80 and `CONTEXT.md` 130. So of the four globs `qa-check.sh` hand-listed, **three
+are §2 rows** and exactly **one** is not: `skills/*/SKILL.md` at 140 (ADR-006), which is a plugin
+component budget rather than a documentation row.
+
+The G2 ruling that produced that DoD line said "three live checks would be dropped". That figure was
+asserted at the gate and never measured — L-097 firing inside the sprint that promoted L-097, on the
+task whose subject is caps. The DoD line is also internally inconsistent: it says "three" and then
+lists two. **Correction applied:** the allowlist retains one entry, `skills/*/SKILL.md`, naming
+ADR-006 as its authority. The DoD's *intent* — non-§2 caps survive derivation with a written reason —
+is unchanged and satisfied; only the count was wrong. Flagged here rather than silently reinterpreted
+(L-088), and it wants an owner confirmation at close.
+
+### 2026-08-09 | surprise | T2 — the new check found a FOURTH live breach, and a false negative in itself
+**L-102 exactly: the first run is discovery.** Pointed at the live repo before anything was fixed, the
+derived check reported the three known research breaches (`loop-hygiene-prd.md` 214,
+`graphify-daily-value.md` 157, `graph-engineering.md` 122) **and one nobody had recorded**:
+`AGENTS.md` at 11 against its ~10 cap. Coverage went from 4 hand-listed globs over 17 files to 47 cap
+checks over 30+ files.
+
+**And the fixtures caught a false negative in the checker itself.** The first version emitted
+`prefix<TAB>path<TAB>cap` and read it with `IFS=<tab>`. The root-files table has an **empty** prefix,
+and POSIX `read` strips leading whitespace-IFS fields — so every root row shifted by one and was
+dropped. `SECURITY.md`, `AGENTS.md` and `TODO.md` were silently uncovered while the live output looked
+entirely healthy, because what is missing from a report is invisible in it. Switched to `|`. The
+over-cap fixture is what exposed it; the live run alone never would have. That is a gate with a silent
+false negative, written *for the sprint about silent false negatives*, caught only because the task's
+own DoD demanded a must-FAIL fixture (L-058).
+
+### 2026-08-09 | complete | T2 — cap coverage derived from §2; four pre-existing breaches made visible, not fixed
+`scripts/lib/check-doc-caps.sh` parses §2's three tables (first integer of the Cap cell; first
+backtick token of the File cell; `NNN`/`<slug>` → globs) and cap-checks every row that states a
+number. A row that states a cap but yields no path is a **named FAIL, never a skip** — a derivation
+that silently drops what it cannot parse is hand-listing again with the hand-list hidden inside a
+parser, and that case has its own fixture.
+
+**The grandfather clause.** Turning coverage on over a never-covered repo surfaced four breaches, and
+the DoD forbids fixing the research docs (§7: a diet moves only by ADR). A silent exclusion list would
+have reproduced the original defect, so each entry lives in
+`scripts/lib/doc-caps-grandfathered.txt` with its count at adoption and **prints on every run**. The
+clause still bites: grew past the recorded count → FAIL; over cap but held → reported and named; back
+under cap → PASS *and told to delete its own row*. Both directions have fixtures, including the
+must-NOT-catch half that makes the trade legible rather than described (L-076).
+
+**Red-on-new / green-on-old, demonstrated on real input rather than a fixture:** the four breaches
+existed in this repo before this task and were reported by nothing; they are reported by every run
+now. That is the same evidence L-090 asks for, taken from the live repo.
+
+Gate: **120 pass, 0 fail** (89 → 120; +31 checks). Timing measured rather than assumed — the gate was
+already **115s at T1**, and is **120s** now, so this task cost ~5s, not the regression it first looked
+like. The checker itself went 6s after a cheap containment test replaced two awk spawns per file.
+
+`scripts/lib/doc-caps-grandfathered.txt` was created during implementation and is absent from T2's
+frozen `Layers:` — declared mid-sprint per L-100, which this sprint promoted into CONTEXT.md § Sprint
+model. Logged, declared, continued.

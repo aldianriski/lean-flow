@@ -1,0 +1,2 @@
+# recorded at 7; the file is 7 -- over cap but not growing, must be reported and NOT fail
+drifting.md 7 pre-existing-drift-tracked

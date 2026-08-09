@@ -1,0 +1,2 @@
+# recorded at 5; the file is now 7 -- it grew under the clause
+drifting.md 5 pre-existing-drift-tracked

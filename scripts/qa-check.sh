@@ -27,10 +27,18 @@ cap() { # <file> <maxlines>
   if [ "$n" -le "$max" ]; then ok "cap $f ($n <= $max)"; else bad "cap $f ($n > $max)"; fi
 }
 
-for s in skills/*/SKILL.md; do cap "$s" 140; done
-cap .claude/CLAUDE.md 80
-cap .claude/CONTEXT.md 130
-for sp in docs/sprint/SPRINT-*.md; do [ -f "$sp" ] && cap "$sp" 400; done
+# DERIVED from DOCS_Guide §2, not hand-listed (SPRINT-056 T2, TD-041). The four globs that used to
+# sit here covered 17 files; §2 states a cap on far more rows than that, and every unlisted row was a
+# cap with nothing behind it. `docs/research/` drifted 39 lines unnoticed across four sprints in
+# exactly that gap. Adding one more glob would have fixed that file and left the mechanism intact.
+# The one cap §2 does NOT state -- skills/*/SKILL.md at 140 (ADR-006) -- is retained inside the
+# checker as an explicit allowlist naming its authority, so deriving does not silently drop it (L-076).
+# Relayed verbatim so the report reads as it did inline. `cap()` above is still used by nothing else;
+# it is kept because the checker's own output format matches it.
+doccaps=$(sh scripts/lib/check-doc-caps.sh); doccaps_rc=$?
+printf '%s\n' "$doccaps"
+pass=$((pass + $(printf '%s\n' "$doccaps" | grep -c '^PASS' || true)))
+[ "$doccaps_rc" -eq 0 ] || fail=$((fail + $(printf '%s\n' "$doccaps" | grep -c '^FAIL' || true)))
 
 # --- 2. Count consistency (claims-vs-disk) ----------------------------------
 # Delegates to a retained checker (scripts/lib/check-count-claims.sh, itself covered by
@@ -395,7 +403,7 @@ done
 # the selftests, yet it stays always-on: it's cheap (extracts + diffs, no throwaway repos), and
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh"
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh"
 eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
 # run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
 # run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via
