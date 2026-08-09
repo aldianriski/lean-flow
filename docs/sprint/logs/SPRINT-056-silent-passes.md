@@ -212,3 +212,36 @@ excluding close-bookkeeping files", which would flag every real close and be rev
 
 `docs/QA.md` rewritten to document the two *kinds* rather than the two paths. Gate: 120 pass, 0 fail;
 layers-observed suite all green.
+
+### 2026-08-09 | complete | T4 — the ordering problem dissolved instead of solved
+TD-042 framed the fix as "validate the close commit *before* the status flip is honoured", which
+implies machinery to reconstruct pre-flip content. Re-deriving at G2 found a third option the row
+never considered: `close` writes `status: closed` in one commit, and §11's retention pass **moves**
+the file to `docs/sprint/archive/` in a **separate, later** commit. So keying the skip on *location*
+leaves the close commit fully covered — the file is still in `docs/sprint/` when it lands — while
+archived history stays out of scope, which was always the defensible half of the design. No
+reconstruction needed; the ordering problem stops existing.
+
+Applied at all three sites that gated on `status = active`: `check-layers-completeness.sh`,
+`check-layers-observed.sh`, and `qa-check.sh`'s task-schema leg. Each now skips on `*/archive/*`.
+
+**Reporting half (the other TD-042 defect):** both layers legs printed
+`PASS layers … (0 … verified)` when nothing was in scope — a green line over an empty input set,
+which is the L-058 family at its purest and is indistinguishable from real coverage. Zero verified
+now renders `SKIP (… nothing in scope)` via `note`, so it cannot be counted as a pass. The only
+reason the original 7-check drop was ever noticed was someone comparing pass *counts* between two
+runs; that is not a control.
+
+**L-090 pair, on a closed sprint carrying a real schema violation:**
+
+| | verdict |
+|---|---|
+| checker at HEAD (status-keyed) | exit 0, **zero output lines** — skipped on sight of `status: closed` |
+| checker after T4 (location-keyed) | exit 1 · `FAIL … T1 Layers completeness: DoD/Acceptance implies undeclared.md` |
+
+Note the old behaviour precisely: not a wrong verdict, *no verdict at all*, at exit 0. Three fixtures
+retained — the closed-but-not-archived case (must FAIL), the archived case (must be skipped, the
+must-NOT-catch half that shows where the boundary now sits, L-076), and a direct assertion that a
+zero-scope run emits no PASS line.
+
+Gate: **121 pass, 0 fail.**

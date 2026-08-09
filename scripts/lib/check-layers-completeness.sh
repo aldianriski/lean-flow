@@ -166,8 +166,15 @@ check_block() {
 
 for sp in "$@"; do
   [ -f "$sp" ] || { printf 'FAIL  %s\n' "layers-completeness: file not found: $sp"; fail=1; continue; }
-  st=$(fmv "$sp" status)
-  [ "$st" = "active" ] || continue
+  # Scoped by LOCATION, not by `status:` (SPRINT-056 T4, TD-042). Gating on `status = active` meant
+  # writing `status: closed` disarmed this check in the very commit that makes the largest edit to
+  # the file -- the Retro, the four-bucket routing and close_commit all landed unvalidated. Twice
+  # measured: 72->68 pass at SPRINT-054's close, 94->87 at SPRINT-055's, both reporting 0 fail.
+  # §11's retention pass MOVES a closed sprint to archive/ in a SEPARATE, later commit, so keying on
+  # location keeps the close commit covered (the file is still here) while archived history stays
+  # out of scope -- which was always the defensible half. The ordering problem dissolves rather than
+  # needing pre-flip content reconstructed.
+  case "$sp" in */archive/*) continue ;; esac
   plan=$(awk '/^## Plan/{f=1;next} /^## /{f=0} f' "$sp")
   tid=""; blk=""
   while IFS= read -r line; do

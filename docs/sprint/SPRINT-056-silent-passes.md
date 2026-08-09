@@ -124,7 +124,7 @@ bookkeeping).
 - [x] Fixture retained and wired into `qa-check.sh` (TD-012)
 
 ### T4 — Keep the sprint checks armed through the commit that closes the sprint `[size: M · risk: med · class: decision · HITL]`
-Layers: `scripts/qa-check.sh` · `scripts/lib/check-layers-observed.sh` · `docs/QA.md` · `evals/run-sprint-close-fixtures.sh` · `evals/fixtures/sprint-close/`
+Layers: `scripts/qa-check.sh` · `scripts/lib/check-layers-observed.sh` · `scripts/lib/check-layers-completeness.sh` · `docs/QA.md` · `evals/run-sprint-close-fixtures.sh` · `evals/fixtures/sprint-close/`
 Cites: `skills/lean-doc-generator/SKILL.md` (the close row) · `docs/sprint/archive/SPRINT-055-wiring-the-standard.md` — read as the close sequence being guarded
 Depends-on: T3 (shared `scripts/qa-check.sh` · `docs/QA.md` · `check-layers-observed.sh` — T3 is last in the chain before this)
 The sprint checks gate on `[ "$st" = "active" ] || continue`, so writing `status: closed` disarms them
@@ -140,16 +140,16 @@ sprint schema and caps before the flip is honoured, and a check that verified ze
 skip rather than a PASS.
 
 **DoD:**
-- [ ] Re-derive the split first: TD-042 says the *reporting* half may be the whole fix. Rule whether
+- [x] Re-derive the split first: TD-042 says the *reporting* half may be the whole fix. Rule whether
       the ordering half (validate the close commit before honouring the flip) is worth its cost, and
       split the task if G2 finds the two halves separable
-- [ ] A zero-verified check reports as a skip, not a PASS (`note` already exists for this and is used
+- [x] A zero-verified check reports as a skip, not a PASS (`note` already exists for this and is used
       elsewhere in the script)
-- [ ] If the ordering half is ruled in: the close commit is schema- and cap-validated before
+- [x] If the ordering half is ruled in: the close commit is schema- and cap-validated before
       `status: closed` is honoured
-- [ ] A must-FAIL fixture presents a close commit carrying a schema violation and the gate goes red
+- [x] A must-FAIL fixture presents a close commit carrying a schema violation and the gate goes red
       with its named finding (L-058), verified red-on-new and green-on-old (L-090)
-- [ ] Fixture retained and wired into `qa-check.sh` (TD-012)
+- [x] Fixture retained and wired into `qa-check.sh` (TD-012)
 
 ### T5 — Compare the four version manifests to each other, not one to the README `[size: S · risk: low · class: execution · HITL]`
 Layers: `scripts/qa-check.sh` · `scripts/lib/check-manifest-lockstep.sh` · `evals/run-manifest-lockstep-fixtures.sh` · `evals/fixtures/manifest-lockstep/`

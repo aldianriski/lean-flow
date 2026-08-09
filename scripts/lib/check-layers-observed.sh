@@ -205,8 +205,10 @@ is_excluded() {
 
 for sp in "$@"; do
   [ -f "$sp" ] || { bad "layers observed: file not found: $sp"; continue; }
-  st=$(fmv "$sp" status)
-  [ "$st" = "active" ] || continue
+  # Scoped by LOCATION, not by `status:` -- see the same note in check-layers-completeness.sh
+  # (SPRINT-056 T4, TD-042). A closed sprint leaves docs/sprint/ in §11's retention commit, which is
+  # separate from and later than the close commit, so the close commit itself stays covered.
+  case "$sp" in */archive/*) continue ;; esac
 
   plan_commit=$(fmv "$sp" plan_commit)
   case "$plan_commit" in

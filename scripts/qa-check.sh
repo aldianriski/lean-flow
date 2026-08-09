@@ -354,8 +354,10 @@ fi
 # `Layers:` · `**Acceptance:**`. Missing any → FAIL naming the block.
 for sp in docs/sprint/SPRINT-*.md; do
   [ -f "$sp" ] || { note "skip (missing): docs/sprint/SPRINT-*.md"; continue; }
-  st=$(fmv "$sp" status)
-  [ "$st" = "active" ] || continue
+  # Location-scoped, not status-scoped (SPRINT-056 T4, TD-042): a sprint stops being checked when
+  # §11 MOVES it to archive/, which is a separate later commit -- not when its status flips, which
+  # happens in the same commit as the Retro and the close bookkeeping.
+  case "$sp" in */archive/*) continue ;; esac
   plan=$(awk '/^## Plan/{f=1;next} /^## /{f=0} f' "$sp")
   tid=""; blk=""
   check_block() {
@@ -403,7 +405,7 @@ done
 # the selftests, yet it stays always-on: it's cheap (extracts + diffs, no throwaway repos), and
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh"
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh"
 eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
 # run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
 # run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via
@@ -497,7 +499,14 @@ else
     lc_out=$(sh "$lc_script" $lc_files 2>&1); lc_code=$?
     if [ "$lc_code" -eq 0 ]; then
       lc_n=$(printf '%s\n' "$lc_out" | grep -cE '^PASS')
-      ok "layers completeness ($lc_n block-check(s) verified against DoD/Acceptance prose)"
+      # Zero verified is a SKIP, never a PASS (TD-042). A green line over an empty input set is the
+      # L-058 family in its purest form: the check cannot fail, so its PASS says nothing -- and the
+      # only reason anyone noticed was comparing pass COUNTS across two runs.
+      if [ "$lc_n" -eq 0 ]; then
+        note "layers completeness: SKIP (0 block-checks verified -- nothing in scope)"
+      else
+        ok "layers completeness ($lc_n block-check(s) verified against DoD/Acceptance prose)"
+      fi
     else
       lc_find=$(printf '%s\n' "$lc_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
       [ -n "$lc_find" ] || lc_find="no FAIL line in output -- checker exited $lc_code without reporting one"
@@ -528,7 +537,11 @@ else
     lo_out=$(sh "$lo_script" $lo_files 2>&1); lo_code=$?
     if [ "$lo_code" -eq 0 ]; then
       lo_n=$(printf '%s\n' "$lo_out" | grep -cE '^PASS')
-      ok "layers observed ($lo_n sprint file(s) verified against actual git diff since plan_commit)"
+      if [ "$lo_n" -eq 0 ]; then
+        note "layers observed: SKIP (0 sprint files verified -- nothing in scope)"
+      else
+        ok "layers observed ($lo_n sprint file(s) verified against actual git diff since plan_commit)"
+      fi
     else
       lo_find=$(printf '%s\n' "$lo_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
       [ -n "$lo_find" ] || lo_find="no FAIL line in output -- checker exited $lo_code without reporting one"
