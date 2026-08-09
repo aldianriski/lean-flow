@@ -148,31 +148,7 @@ status: current
     guarding it would need its own negative test built against a failure nobody has observed. That is
     TD-031's pattern exactly: narrowing a working guard under no pressure. Held, with the trigger
     unchanged; a re-review that reaffirms is a decision, not a skipped line.
-
-- **TD-036** severity: minor | status: closed-not-supported → SPRINT-052 T2 | created: Sprint-049
-  - Summary: the `Cites:` escape shipped in `check-layers-completeness.sh` (SPRINT-049 T3) is
-    documented **only inside the checker**. `templates/SPRINT.md.template` — the file an author
-    actually writes a Plan from — never mentions it.
-  - Impact: the only way to discover the escape exists is to trip the gate and read a checker's source
-    comments, which is precisely the "reword the docs until it goes quiet" behaviour TD-032 was filed
-    to stop. An author who does not know the escape exists will do the thing the escape was built to
-    prevent. Same family as L-069 (a behavioural rule ships with its trigger, or it does not ship) —
-    here the rule shipped and the *authoring surface* did not.
-  - Mitigation (not yet done): one line in the SPRINT template's Plan comment block naming `Cites:`
-    alongside the `Layers:`/`Depends-on:` requirements. Note the consumer question first (L-015): the
-    checker is maintainer tooling (`scripts/`, ADR-008) that no consumer runs, so a template line
-    would advertise a convention nothing enforces on their side. Decide which of the two surfaces the
-    line belongs to before writing it.
-  - **CLOSED — not supported (SPRINT-052 T2).** The consumer question was answered first (L-015) and it
-    is not a tie: `check-layers-completeness.sh` lives in `scripts/` — maintainer tooling that ships to
-    nobody (ADR-008) — so a `Cites:` line in `templates/SPRINT.md.template` would advertise to every
-    consumer a convention nothing on their side enforces. Neither surface takes the line, and this row
-    closes rather than staying open as a nag.
-  - **The Summary was already false when it was filed.** `docs/QA.md`'s layers-completeness row
-    documents the escape in full — its exemption, that absence changes nothing, and the
-    `Cites:`/`Layers:` contradiction — added in `75e61a8`, *the SPRINT-049 close that filed this row*.
-    The escape was never checker-only; the maintainer surface that owns it had it from the first day.
-    A filed premise falsified at execution: L-091's shape, one level up from the Mitigation lines it
-    was promoted about, and found by the task sent to act on it.
-  - **Residual → TD-039.** What the row was reaching for survives on a surface neither it nor TASK-161
-    named — the FAIL message an author actually trips.
+  - **Re-reviewed 2026-08-09 (SPRINT-055 promote, 6 sprints open) — deferral reaffirmed again.** The
+    trigger is still unfired: no miss on the uncommitted path has been observed since. Age is not the
+    trigger and was never proposed as one, so the ruling is unchanged. Recorded rather than performed
+    silently, per the line above.
