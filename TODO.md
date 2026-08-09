@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-049 closed 2026-08-09.
+> **SPRINT-050 — Adoption Remainder** → [`docs/sprint/SPRINT-050-adoption-remainder.md`](docs/sprint/SPRINT-050-adoption-remainder.md)
 
 ---
 
