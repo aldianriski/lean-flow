@@ -4,7 +4,7 @@ slug: wiring-the-standard
 owner: Maintainer
 last_updated: 2026-08-09
 status: active
-plan_commit: [set at promote]
+plan_commit: c4eebef
 close_commit: [set at close]
 update_trigger: sprint execute/close events
 ---
