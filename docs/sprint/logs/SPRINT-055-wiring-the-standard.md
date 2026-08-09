@@ -126,3 +126,33 @@ close — the feature is sound but its blind spot is currently guarded by a comm
 **Re-confirm G2:** owner ruled explicitly, choosing this over enumerating 24 paths, over excluding
 fixture trees in `is_excluded()` (TD-031's narrow-a-guard-under-no-pressure pattern), and over
 shrinking the fixture set. T1 `Layers:` additionally gains the two checker files.
+
+### 2026-08-09 | progress | T2 — the §11 epic row executed for the first time, on EPIC-001
+
+**A3 confirmed before wiring:** the §11 row is correct as written — two conditions (every member
+sprint closed **and** every § Closed when `[x]`), move → `docs/epic/archive/`, keep the `INDEX.md`
+row. No redesign, so no scope-change on that front.
+
+`scripts/lib/check-epic-archive.sh` enforces the row in **both** directions, and the second one is
+the reason this task exists: an epic archived without earning it (what §11's text warns about), and
+an epic that earned it and never moved (what actually happened). Written against the live repo, the
+checker's first run FAILed on `docs/epic/EPIC-001-parallel-worktree-fleet.md` — the real drift,
+caught by the guard before the fix. Five fixtures: three must-FAIL (premature · eligible-unarchived ·
+archived-with-no-conditions, since "all met" is vacuously true for an epic stating none) and two
+must-PASS controls.
+
+**Exercised on real input (L-007):** EPIC-001 moved via `git mv`, its two relative links re-based
+`../sprint/archive/` → `../../sprint/archive/` and both verified to resolve, `INDEX.md` row left in
+place per §11. The checker now PASSes on the live repo. The move surfaced something T2's DoD did not
+anticipate — an archived epic sits one directory deeper, so its relative links break unless re-based.
+That is now stated in the `close` procedure, not left for the next person to rediscover.
+
+**§ Plan edit:** T2 `Layers:` gains `scripts/lib/check-epic-archive.sh` and swaps the EPIC-001 path
+for the directory token `docs/epic/`, which covers the file on both sides of its own move. Logged
+before the edit, per the freeze rule.
+
+**Pattern worth carrying to the Retro:** this is the third `Layers:` correction in two tasks. Every
+one had the same cause — a file invented during implementation that a promote-time declaration could
+not have named (TD-022). Leg 15 is catching them all, which is the system working, but three in two
+tasks suggests the cost is in writing `Layers:` at promote as though implementation were already
+known, rather than in the checker.

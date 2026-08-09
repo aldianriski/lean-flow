@@ -51,7 +51,7 @@ one count claim out of lockstep makes `qa-check.sh` fail with a named finding.
 - [x] A must-FAIL fixture: one surface's count edited out of lockstep → FAIL with its named finding (L-058)
 
 ### T2 — Execute the epic archive at close, not just specify it `[size: S · risk: med · class: execution · AFK]`
-Layers: `skills/lean-doc-generator/SKILL.md` (close row) · `evals/` · `scripts/qa-check.sh` · `docs/epic/EPIC-001-parallel-worktree-fleet.md`
+Layers: `skills/lean-doc-generator/SKILL.md` (close row) · `evals/` · `scripts/qa-check.sh` · `scripts/lib/check-epic-archive.sh` · `docs/epic/`
 Cites: `INDEX.md` — the epic index row is verified to survive the move, not edited
 Depends-on: T1 (shared `scripts/qa-check.sh` — T1 owns it first; added by the 2026-08-09 plan-correction)
 DOCS_Guide §11 carries the epic-archive row; `close`'s archival pass enumerates sprint, log, Backlog
@@ -64,12 +64,12 @@ retained) as an enumerated step gated on every member sprint closed **and** ever
 and EPIC-001 has actually moved.
 
 **DoD:**
-- [ ] The close archival pass enumerates the epic move with both gate conditions stated
-- [ ] Exercised on real input: EPIC-001 (closed, all Closed-when `[x]`) moves to `docs/epic/archive/`,
+- [x] The close archival pass enumerates the epic move with both gate conditions stated
+- [x] Exercised on real input: EPIC-001 (closed, all Closed-when `[x]`) moves to `docs/epic/archive/`,
       its `INDEX.md` row stays, and inbound links still resolve (L-007)
-- [ ] A must-FAIL fixture: an epic with one unticked Closed-when offered for archive → refused with
+- [x] A must-FAIL fixture: an epic with one unticked Closed-when offered for archive → refused with
       its named finding (L-058)
-- [ ] Fixture retained and wired into `qa-check.sh`, not deleted with the prototype (TD-012)
+- [x] Fixture retained and wired into `qa-check.sh`, not deleted with the prototype (TD-012)
 
 ### T3 — Give docs/research/ a retention rule and an archive target `[size: M · risk: low · class: decision · HITL]`
 Layers: `skills/lean-doc-generator/references/DOCS_Guide.md` §2 + §11 · `skills/lean-doc-generator/SKILL.md` (compaction sweep) · `docs/architecture/overview.md` · `evals/`

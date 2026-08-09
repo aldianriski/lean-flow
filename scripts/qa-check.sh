@@ -56,6 +56,31 @@ else
   fi
 fi
 
+# --- 2b. Epic retention (DOCS_Guide section 11, both directions) -------------------------------
+# The §11 epic-archive row shipped with the epic layer and `close` never executed it, so the rule
+# had never run once: EPIC-001 sat closed and fully ticked in docs/epic/ across five sprints with
+# every gate green (SPRINT-055 T2). Delegates to scripts/lib/check-epic-archive.sh, covered by
+# evals/run-epic-archive-fixtures.sh. Checks BOTH directions -- archived without earning it, and
+# earned it but never moved -- because a retention rule that silently stops running is the failure
+# actually observed here, not the hypothetical one.
+ea_script="scripts/lib/check-epic-archive.sh"
+if [ ! -f "$ea_script" ]; then
+  bad "epic archive: checker not found at $ea_script"
+else
+  ea_out=$(sh "$ea_script" "$ROOT" 2>&1); ea_code=$?
+  printf '%s\n' "$ea_out"
+  ea_pass=$(printf '%s\n' "$ea_out" | grep -cE '^PASS')
+  ea_fails=$(printf '%s\n' "$ea_out" | grep -cE '^FAIL')
+  pass=$((pass + ea_pass))
+  if [ "$ea_code" -ne 0 ]; then
+    if [ "$ea_fails" -gt 0 ]; then
+      fail=$((fail + ea_fails))
+    else
+      bad "epic archive: checker exited $ea_code without reporting a FAIL line"
+    fi
+  fi
+fi
+
 # --- 3. Frontmatter / ownership presence ------------------------------------
 has_field() { grep -qE "^$2:" "$1"; }
 
@@ -301,7 +326,7 @@ done
 # the selftests, yet it stays always-on: it's cheap (extracts + diffs, no throwaway repos), and
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh"
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh"
 eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
 # run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
 # run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via

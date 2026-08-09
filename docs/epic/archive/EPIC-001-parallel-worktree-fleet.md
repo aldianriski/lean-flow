@@ -42,8 +42,8 @@ time) tracked separately · any hook or agent-definition file, which ADR-002 for
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [SPRINT-025](../sprint/archive/SPRINT-025-fleet-foundations.md) | Fleet & Night-Run Foundations | closed · `2eb9bd5` | Decide-before-build. Drove the fleet fog-map from chart to full graduation inside one sprint, turning unknown decisions into buildable tasks — the epic existed as fog until this closed. |
-| [SPRINT-026](../sprint/archive/SPRINT-026-fleet-build.md) | Fleet & Night-Run Build | closed · `601e2e6` | Built it: worktree dispatch + merge-back wired into `sprint-bulk`. This is the sprint the outcome sentence became true. |
+| [SPRINT-025](../../sprint/archive/SPRINT-025-fleet-foundations.md) | Fleet & Night-Run Foundations | closed · `2eb9bd5` | Decide-before-build. Drove the fleet fog-map from chart to full graduation inside one sprint, turning unknown decisions into buildable tasks — the epic existed as fog until this closed. |
+| [SPRINT-026](../../sprint/archive/SPRINT-026-fleet-build.md) | Fleet & Night-Run Build | closed · `601e2e6` | Built it: worktree dispatch + merge-back wired into `sprint-bulk`. This is the sprint the outcome sentence became true. |
 
 ## Decisions
 
