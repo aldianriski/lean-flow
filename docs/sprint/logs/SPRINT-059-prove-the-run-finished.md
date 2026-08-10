@@ -107,3 +107,32 @@ written at promote, when the slug did not exist. Corrected to the real filename,
 `docs/knowledge-index.md`, which is regenerated whenever a metadata-carrying doc is added. Declaring
 before the work means the declaration gets corrected by the work; that is the expected cost, not a
 scope change. Caught by `check-layers-observed.sh`, not by me.
+
+### 2026-08-10 | progress | T3 — the rollup is now gated, not merely emitted
+
+`check-night-run-rollup.sh` + `run-night-run-rollup-fixtures.sh` + four retained fixtures, following
+the existing checker/fixture-runner convention. Two separately-named findings (missing DoD header ·
+missing calibration row), each asserted on by name rather than on exit status alone (L-058). The
+fourth fixture is the load-bearing non-failure: a mid-flight sprint has no `complete` entry, and a
+checker that fired there would paint every live sprint red and be switched off within a week.
+
+**Cost, stated because TD-046/TASK-180 is measuring exactly this:** harness 940 ms, inline check
+122 ms on the live logs. Full gate 173 s wall on this host.
+
+**Two guards caught this task, and one of them was worth more than the code.**
+
+1. **The corpus-metadata check rejected an invented vocabulary.** ADR-016 was filed with
+   `tags: [tooling, night-run]` / `domain: night-run`; neither exists in `gen-index.sh`'s vocab. The
+   right fix was to use the small existing vocab (`tooling, process` / `skills`), not to widen it for
+   one document — vocab sprawl is how an index stops being navigable.
+2. **The ADR-014 glob guard refused a second sprint pattern in `qa-check.sh`.** The new section
+   globbed `docs/sprint/logs/SPRINT-*.md`, and `run-sprint-log-layout-fixtures.sh` case 1 requires
+   this file to carry *exactly one* sprint pattern, the non-recursive one. The guard could not tell a
+   legitimate logs glob from the widening it exists to prevent — and rather than weaken it, each log
+   is now **derived from its already-globbed Plan** (`docs/sprint/logs/$(basename "$sp")`). That is
+   the better design independently of the guard: the Plan and its log are one record (§11), and
+   deriving means they cannot drift apart. A guard that forced a better implementation rather than
+   merely permitting a worse one is the argument for keeping guards narrow and loud.
+
+`Layers:` corrected again (L-100) — the promote-time declaration used `check-*.sh (new)` placeholders.
+Gate 140 pass, 0 fail.

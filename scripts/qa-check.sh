@@ -187,6 +187,43 @@ else
   fi
 fi
 
+# --- 2g. A recorded completed run carries its rollup ---------------------------------------------
+# A headless sprint-bulk loop can end mid-Plan and still exit `success` -- 4 of 7 units on a
+# consumer's host, every commit correct, three tasks never begun and nothing written about them.
+# Part 4 mandates a rollup at every exit; ADR-016 moves the writing of it into the launcher's
+# wrapper so the model cannot drop it. This is the enforcement half of that pair (SPRINT-059 T3).
+# Covered by evals/run-night-run-rollup-fixtures.sh.
+nr_script="scripts/lib/check-night-run-rollup.sh"
+if [ ! -f "$nr_script" ]; then
+  bad "night-run rollup: checker not found at $nr_script"
+else
+  # Each log is DERIVED from its Plan rather than globbed on its own. Two reasons, both
+  # load-bearing: ADR-014 requires this file to carry exactly one sprint pattern (the
+  # non-recursive one), enforced by run-sprint-log-layout-fixtures.sh case 1; and deriving
+  # means the Plan and its log cannot drift apart -- the pair is one record (§11).
+  nr_files=""
+  for nr_sp in $(ls docs/sprint/SPRINT-*.md 2>/dev/null); do
+    nr_lg="docs/sprint/logs/$(basename "$nr_sp")"
+    [ -f "$nr_lg" ] && nr_files="$nr_files $nr_lg"
+  done
+  if [ -z "$nr_files" ]; then
+    note "night-run rollup: skip -- no Execution Log alongside an active sprint"
+  else
+    nr_out=$(sh "$nr_script" $nr_files 2>&1); nr_code=$?
+    printf '%s\n' "$nr_out"
+    nr_pass=$(printf '%s\n' "$nr_out" | grep -cE '^PASS')
+    nr_fails=$(printf '%s\n' "$nr_out" | grep -cE '^FAIL')
+    pass=$((pass + nr_pass))
+    if [ "$nr_code" -ne 0 ]; then
+      if [ "$nr_fails" -gt 0 ]; then
+        fail=$((fail + nr_fails))
+      else
+        bad "night-run rollup: checker exited $nr_code without reporting a FAIL line"
+      fi
+    fi
+  fi
+fi
+
 # --- 3. Frontmatter / ownership presence ------------------------------------
 has_field() { grep -qE "^$2:" "$1"; }
 
@@ -458,7 +495,7 @@ done
 # the selftests, yet it stays always-on: it's cheap (extracts + diffs, no throwaway repos), and
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh"
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh"
 eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
 # run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
 # run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via

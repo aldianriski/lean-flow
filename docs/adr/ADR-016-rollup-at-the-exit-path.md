@@ -1,7 +1,7 @@
 ---
 id: ADR-016
-tags: [tooling, night-run]
-domain: night-run
+tags: [tooling, process]
+domain: skills
 status: accepted
 related: [ADR-002]
 ---

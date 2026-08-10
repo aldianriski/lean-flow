@@ -75,7 +75,7 @@ with no human transcribing them — the thing that did not happen either time in
 <!-- QA: shell change — exercise on a real run; T3 is its regression guard. -->
 
 ### T3 — Gate the rollup: a recorded run without one FAILs `[size: M · risk: low · class: execution · AFK]`
-Layers: `scripts/lib/check-*.sh` (new) · `scripts/qa-check.sh` · `evals/run-*-fixtures.sh` (new) · `evals/fixtures/<new>/`
+Layers: `scripts/lib/check-night-run-rollup.sh` (new) · `scripts/qa-check.sh` · `evals/run-night-run-rollup-fixtures.sh` (new) · `evals/fixtures/night-run-rollup/`
 Depends-on: T1
 Cites: T2
 
@@ -87,11 +87,11 @@ checker-plus-fixture-runner convention rather than inventing one.
 with a named finding; a well-formed one passes.
 
 **DoD:**
-- [ ] A new checker FAILs, with its own named finding, when a sprint Execution Log records a completed unattended run carrying no rollup block
-- [ ] It FAILs separately, with a distinct named finding, when the calibration row is missing
-- [ ] Retained must-FAIL fixtures: one missing-rollup, one missing-calibration-row, one well-formed pass — one fixture per check, each failing with its *named* finding (L-058), retained rather than deleted with the prototype (TD-012)
-- [ ] Wired into the always-on gate and its fixture runner; the gate stays green overall
-- [ ] Reads one file rather than sweeping the repo — the runtime cost is stated in the Execution Log, since TD-046 / TASK-180 is measuring exactly this
+- [x] A new checker FAILs, with its own named finding, when a sprint Execution Log records a completed unattended run carrying no rollup block
+- [x] It FAILs separately, with a distinct named finding, when the calibration row is missing
+- [x] Retained must-FAIL fixtures: one missing-rollup, one missing-calibration-row, one well-formed pass — one fixture per check, each failing with its *named* finding (L-058), retained rather than deleted with the prototype (TD-012)
+- [x] Wired into the always-on gate and its fixture runner; the gate stays green overall
+- [x] Reads one file rather than sweeping the repo — the runtime cost is stated in the Execution Log, since TD-046 / TASK-180 is measuring exactly this
 <!-- QA: the fixtures ARE the test; a checker with no must-FAIL fixture is the silent false-negative L-058 names. -->
 
 ### T4 — Re-check open parks at task boundaries `[size: S · risk: med · class: decision · HITL]`
