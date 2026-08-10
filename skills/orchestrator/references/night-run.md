@@ -69,9 +69,20 @@ not decide what the Plan should be, and it does not dispose of what the Plan pro
    write into (e.g. parked at `promote`) → the record goes in the `/handoff` doc instead.
 3. **Continue disjoint AFK work** — anything with no shared file and no `depends-on` against the
    parked unit, per the G2 overlap map. Same-owner, shared-file, or dependent work parks *with* it.
-4. **Clean halt** when no AFK work remains — finish through `/handoff` so the morning `/prime` reads
+4. **Re-check open parks as each later task takes ownership.** A park does not always outlive the
+   run. It can name an unblock condition *this same run* satisfies a task or two later — most often a
+   file-ownership order, where the parking task may not touch a file a later task will own. Nothing
+   used to re-examine it, so the condition was met and the park just sat there, surviving the night as
+   a morning to-do that never needed to be one. Observed: a field parked as *"saved but not rendered;
+   pick up when the next task owns the renderer"* — **three** subsequent tasks owned that renderer,
+   none revisited it, and the field is still written and never read. So at each task boundary, walk the
+   open parks: if a park's unblock condition names a task that has since completed, it is actionable
+   now — do it. If it is still not actionable at exit, it gets a rollup line (Part 4) rather than
+   silence. **Unattended runs only** — an interactive run halts at the first blocker with a human
+   present to resolve the park, which is the whole difference.
+5. **Clean halt** when no AFK work remains — finish through `/handoff` so the morning `/prime` reads
    it in. Never idle-spin waiting for an input that cannot arrive.
-5. **Never work around the park** — rewriting, splitting, or narrowing a task so it dodges the gate is
+6. **Never work around the park** — rewriting, splitting, or narrowing a task so it dodges the gate is
    itself scope-changing, and therefore HITL. Park it as-is.
 
 ## Part 1a — Entry path (you were asked to *start* a night run)

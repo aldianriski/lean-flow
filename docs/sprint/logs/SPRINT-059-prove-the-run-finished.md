@@ -136,3 +136,37 @@ checker that fired there would paint every live sprint red and be switched off w
 
 `Layers:` corrected again (L-100) — the promote-time declaration used `check-*.sh (new)` placeholders.
 Gate 140 pass, 0 fail.
+
+### 2026-08-10 | progress | T4 — a park the run itself unblocks is now re-checked
+
+Part 0's park protocol gained step 4: at each task boundary, walk the open parks; if a park's unblock
+condition names a task that has since completed, it is actionable *now*. Still not actionable at exit
+→ a rollup line rather than silence. Unattended only (A2) — an interactive run halts at the first
+blocker with a human present, which is the whole difference. Wired into `sprint-bulk` step 5.
+`assert-park-revisit.sh` + a retained fixture pair + `selftest-assert-park-revisit.sh` in the opt-in
+harness list, encoding the field report's real case: a field parked for the renderer, the renderer
+owned later in the same run, nobody going back.
+
+**The must-FAIL fixture earned its existence twice over — the assertion's first draft was broken in
+two independent ways, and a green run would have hidden both.**
+
+1. **It could only ever exit 0.** The loop was fed by a pipe, so every `fail=1` was set in a subshell
+   and discarded. A checker that cannot fail is worse than no checker, because it reports.
+2. **Then it passed the violation.** With the exit code fixed, the must-FAIL fixture still came back
+   green: the revisit was detected by grepping the whole log for `revisit|resolved|…`, and the
+   fixture's own slug was `unrevisited`. The word it searched for was in the fixture's name. Replaced
+   with a structural contract — a later line for the same task reaching `done`, or one explicitly
+   saying it stayed blocked — and the fixtures renamed so no fixture name contains a matched token.
+
+That is the same substring family as `in-stalled` matching "installed" in T1, twice in one sprint.
+Worth carrying forward: a contract is a line in a known shape, never a word appearing somewhere.
+
+**A latent bug fell out of it.** `grep -c … || printf 0` prints `0` *and* exits 1, so the fallback
+appended a second zero and arithmetic broke. Harmless in every test so far only because every sprint
+tested had ≥1 ticked box. Fixed in both the reaper and the assertion, and regression-tested against a
+sprint with zero ticked boxes: `run · 0 of 1 DoD ticked`, `cost unavailable`, degrade rule honoured.
+
+**Attribution caught a cross-task edit.** `check-layers-observed.sh` flagged that the T3 commit
+changed ADR-016, which T2 had declared. True: T3's gate run surfaced the ADR's invented tag/domain
+vocab, and fixing it was T3's work. Declared where the work happened rather than argued away.
+Gate 140 pass, 0 fail (144 with QA_FULL=1).

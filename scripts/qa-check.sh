@@ -5,7 +5,7 @@
 # Exit 0 = every mechanical rule passes; exit 1 = at least one FAIL.
 #
 # Usage:  sh scripts/qa-check.sh          (runs from anywhere; resolves the repo root via git)
-#         QA_FULL=1 sh scripts/qa-check.sh  (also runs the 3 opt-in selftest-assert-* harnesses;
+#         QA_FULL=1 sh scripts/qa-check.sh  (also runs the 4 opt-in selftest-assert-* harnesses;
 #                                             see leg 12, TD-016)
 
 set -u
@@ -496,7 +496,7 @@ done
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
 eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh"
-eval_harnesses_optin="selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
+eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh"
 # run-layers-observed-fixtures.sh joins the opt-in set, not the always-on one: unlike
 # run-layers-completeness-fixtures.sh (pure text diff, no git), it builds throwaway git repos via
 # mktemp -d + git init -- the exact cost TD-016 named as the selftest-assert-* boundary (~4s for 4

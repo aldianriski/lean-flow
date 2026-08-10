@@ -58,6 +58,7 @@ reap=1
 # output and this writes into a committed doc, so nothing free-text crosses that boundary:
 # a malformed or crafted log line must not be able to inject markdown structure into a
 # sprint record. Every extraction below is bounded to [0-9.] by its own pattern.
+
 # Locate the active sprint's Plan file. Shared by the launcher (to record how long the
 # Execution Log already was before firing) and by the reaper, so both agree on the target.
 find_sprint() {
@@ -81,18 +82,18 @@ reap() {
   [ -f "$rp_logdoc" ] || return 0
 
   # DoD boxes -- the header count.
-  rp_done=$(grep -c '^- \[x\]' "$rp_sprint" 2>/dev/null || printf 0)
-  rp_open=$(grep -c '^- \[ \]' "$rp_sprint" 2>/dev/null || printf 0)
+  rp_done=$(grep -c '^- \[x\]' "$rp_sprint" 2>/dev/null)
+  rp_open=$(grep -c '^- \[ \]' "$rp_sprint" 2>/dev/null)
   rp_total=$((rp_done + rp_open))
 
   # UNITS are Plan tasks, not checkboxes. The calibration series reads "4 of 7 units" and
   # means tasks; reporting DoD boxes in that field would silently redefine every existing
   # row's scale. A unit is delivered when its block has no open box left.
-  rp_units=$(grep -c '^### T[0-9]' "$rp_sprint" 2>/dev/null || printf 0)
+  rp_units=$(grep -c '^### T[0-9]' "$rp_sprint" 2>/dev/null)
   rp_units_done=$(awk '
     /^### T[0-9]+ /{ if (t!="") { if (!o) d++ } t=$2; o=0 }
     /^- \[ \]/{ if (t!="") o=1 }
-    END{ if (t!="" && !o) d++; print d+0 }' "$rp_sprint" 2>/dev/null || printf 0)
+    END{ if (t!="" && !o) d++; print d+0 }' "$rp_sprint" 2>/dev/null)
 
   rp_cost=$(grep -o '"total_cost_usd":[0-9.]*' "$rp_log" 2>/dev/null | tail -n1 | cut -d: -f2)
   rp_turns=$(grep -o '"num_turns":[0-9]*' "$rp_log" 2>/dev/null | tail -n1 | cut -d: -f2)
@@ -280,7 +281,7 @@ if [ "$reap" = "1" ]; then
   base_sprint=$(find_sprint "$repo_root" || printf '')
   if [ -n "$base_sprint" ]; then
     base_doc="$repo_root/docs/sprint/logs/$(basename "$base_sprint")"
-    [ -f "$base_doc" ] && logdoc_base=$(awk 'END{print NR}' "$base_doc" 2>/dev/null || printf 0)
+    [ -f "$base_doc" ] && logdoc_base=$(awk 'END{print NR}' "$base_doc" 2>/dev/null)
   fi
 fi
 

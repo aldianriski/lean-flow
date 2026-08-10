@@ -75,7 +75,7 @@ with no human transcribing them — the thing that did not happen either time in
 <!-- QA: shell change — exercise on a real run; T3 is its regression guard. -->
 
 ### T3 — Gate the rollup: a recorded run without one FAILs `[size: M · risk: low · class: execution · AFK]`
-Layers: `scripts/lib/check-night-run-rollup.sh` (new) · `scripts/qa-check.sh` · `evals/run-night-run-rollup-fixtures.sh` (new) · `evals/fixtures/night-run-rollup/`
+Layers: `scripts/lib/check-night-run-rollup.sh` (new) · `scripts/qa-check.sh` · `evals/run-night-run-rollup-fixtures.sh` (new) · `evals/fixtures/night-run-rollup/` · `docs/adr/ADR-016-rollup-at-the-exit-path.md` (vocab fix this task surfaced) · `docs/knowledge-index.md` (generated)
 Depends-on: T1
 Cites: T2
 
@@ -95,7 +95,7 @@ with a named finding; a well-formed one passes.
 <!-- QA: the fixtures ARE the test; a checker with no must-FAIL fixture is the silent false-negative L-058 names. -->
 
 ### T4 — Re-check open parks at task boundaries `[size: S · risk: med · class: decision · HITL]`
-Layers: `skills/orchestrator/references/night-run.md` (Part 0 park protocol) · `skills/orchestrator/SKILL.md` (sprint-bulk step 5 pointer) · `evals/assert-*.sh` (a sibling park assertion)
+Layers: `skills/orchestrator/references/night-run.md` (Part 0 park protocol) · `skills/orchestrator/SKILL.md` (sprint-bulk step 5 pointer) · `evals/assert-park-revisit.sh` · `evals/selftest-assert-park-revisit.sh` · `evals/fixtures/park-revisit/` · `scripts/qa-check.sh` (opt-in harness list)
 Depends-on: T1
 
 The park protocol assumes a park outlives the run. It can also name an unblock condition the same run
@@ -106,11 +106,11 @@ condition is met and the park just sits there, surviving as a morning to-do that
 parked for the renderer, three later tasks owning that renderer.
 
 **DoD:**
-- [ ] Part 0's park protocol gains a re-check step: when a park's unblock condition names a later task in the same Plan, re-examine open parks as each subsequent task takes ownership
-- [ ] A park still not actionable at exit gets a rollup line (T1's format) rather than silence
-- [ ] `sprint-bulk` step 5 points at it (wiring check, L-020)
-- [ ] A sibling behavioural assertion joins the existing park assertions, exercised on the field report's case
-- [ ] The unattended-only boundary is stated explicitly, with its reasoning — an interactive park reaches a human at first-blocker halt
+- [x] Part 0's park protocol gains a re-check step: when a park's unblock condition names a later task in the same Plan, re-examine open parks as each subsequent task takes ownership
+- [x] A park still not actionable at exit gets a rollup line (T1's format) rather than silence
+- [x] `sprint-bulk` step 5 points at it (wiring check, L-020)
+- [x] A sibling behavioural assertion joins the existing park assertions, exercised on the field report's case
+- [x] The unattended-only boundary is stated explicitly, with its reasoning — an interactive park reaches a human at first-blocker halt
 <!-- QA: assertion sits beside assert-boundary-park.sh / assert-noaction-park.sh. -->
 
 ### T5 — Add the two field-report runs to the calibration table `[size: S · risk: low · class: execution · AFK]`
