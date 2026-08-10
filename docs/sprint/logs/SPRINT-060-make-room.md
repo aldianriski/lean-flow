@@ -165,3 +165,48 @@ test. A standing rule should not live in a spent PRD.
 
 **Out of scope, but noted:** `loop-hygiene-findings.md` and `loop-hygiene-workstreams.md` are both still
 `current` and raise the same question. T4's scope is this doc; they are not silently swept along.
+
+### 2026-08-10 | scope-change | T5's acceptance became unreachable inside this sprint
+
+**What broke.** T5's Acceptance requires a real run that *stops mid-Plan*, leaving untouched tasks
+marked `unattempted` end-to-end through `scripts/night-run.sh`. Its DoD named the vehicle: "if a night
+run over T2–T4 stops mid-Plan for its own reasons, that IS this exercise."
+
+**Impact.** The run mode was ruled **interactive** at G2 — correctly, since four of five tasks are HITL
+and an unattended run would have delivered only T2 and parked the rest. That ruling foreclosed the
+vehicle: T2–T4 were built by hand, and T5 is now the only open task. A run fired at the Plan in this
+state would find one open HITL task and **park** it, producing a `parked-hitl` line — not
+`unattempted`. Those are different states, and only the second exercises what T5 is for. The mode
+decision and T5's acceptance were in quiet tension from the moment both were signed, and neither G1 nor
+G2 caught it.
+
+**Not worked around.** Firing a run in the hope it happens to end its turn before reaching T5 would be
+manufacturing the evidence by another route, which T5's own first DoD line forbids. Ticking the boxes
+on the grounds that the DoD accommodates a not-yet-exercised outcome would be reinterpreting a criterion
+execution invalidated (L-088) — the DoD permits that outcome, but the *Acceptance* line is still unmet,
+and a sprint that closes green against criteria nobody re-agreed to is the failure.
+
+**Re-confirm G2 → owner ruling required** before T5 is ticked or carried. Recorded here before any box
+is touched.
+
+### 2026-08-10 | park | T5 carried forward — owner ruling on the scope-change above
+
+**Ruled: carry T5 forward.** SPRINT-060 closes **4 of 5 units**, with T5's Acceptance explicitly unmet
+rather than satisfied by its DoD's escape clause. The alternative — ticking it because "not-yet-exercised
+and why" was recorded — would have closed the sprint 5 of 5 against a criterion nobody re-agreed to,
+which is precisely L-088's failure. The unflattering number is the true one.
+
+**Unblock condition, re-filed to the Backlog:** the next night run that stops mid-Plan *for its own
+reasons* is the exercise. Opportunistic by design — not a run to be scheduled, since scheduling one to
+produce a mid-Plan stop is manufacturing the evidence by another route.
+
+**What this sprint learned about its own planning.** T5's acceptance depended on the run mode, and the
+run mode was decided at G2 — *after* the Plan was frozen at promote. Nothing in G1 or G2 surfaced that
+a task's acceptance criterion had a dependency on a decision neither gate had taken yet. That is the
+same shape as L-105 (a guard placed in time, not only in text): the criterion was written as though the
+mode were already known, and by the time the mode existed the criterion was unreachable. A candidate
+learning for the Retro.
+
+**Owner-action checklist closed:** "decide whether SPRINT-060 runs unattended" was answered at G2 —
+interactive, because four of five tasks were HITL and an unattended run would have delivered T2 and
+parked the rest.

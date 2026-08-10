@@ -126,7 +126,7 @@ that was already complete. What has never run together is both halves at once.
 <!-- QA: the run itself is the test; there is nothing to assert until one happens. -->
 
 ## Owner-action checklist
-- [ ] Decide whether SPRINT-060 runs unattended. T2 is AFK-shaped; T1, T3, T4 and T5 are HITL, so an unattended run would park four of five — which is itself the natural way to satisfy T5's acceptance.
+- [x] Decide whether SPRINT-060 runs unattended. T2 is AFK-shaped; T1, T3, T4 and T5 are HITL, so an unattended run would park four of five — which is itself the natural way to satisfy T5's acceptance.
 
 ## Decisions (pre-locked)
 
