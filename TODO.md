@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-061 — Named, Not Answered** → [docs/sprint/SPRINT-061-named-not-answered.md](docs/sprint/SPRINT-061-named-not-answered.md)
+> _None._ SPRINT-061 closed 2026-08-10 (3 of 3).
 
 ---
 
@@ -51,55 +51,42 @@ status: current
       origin:     close-retro
       state:      blocked
 
-- [ ] TASK-189 — Promote "every hygiene rule gets a matcher" out of the spent PRD  [size: S] [risk: low] [HITL]
+- [ ] TASK-192 — Rule `qa-gate-timing.md`'s cap: raise it, or split the doc  [size: S] [risk: low] [HITL]
       class:      decision
-      done-when:  the principle lives in a durable home chosen by §10's placement test, and
-                  `loop-hygiene-prd.md` no longer carries a live rule inside a `superseded` doc
-      touches:    the durable home §10's test selects (likely DOCS_Guide §10 or `.claude/CLAUDE.md`) ·
-                  docs/research/loop-hygiene-prd.md
+      done-when:  the doc is no longer breaching a cap nobody intends it to meet — either the §2
+                  research cap is raised for it by an ADR, or the doc is split per §6's cap-hit rule,
+                  with the reasoning recorded either way
+      touches:    docs/research/qa-gate-timing.md · skills/lean-doc-generator/references/DOCS_Guide.md §2
+                  · possibly docs/adr/ · scripts/lib/doc-caps-grandfathered.txt
       depends-on: none
-      assumes:    the principle is genuinely still live — SPRINT-060 T2 applied it, turning ADR-015
-                  rule 2 from prose into an enforced check, so this is evidence rather than sentiment.
-                  Re-derive the placement before writing (L-091): ask which flows can hit the failure.
-                  Note `CLAUDE.md` is at 80/80 and would need its own diet pass or ADR first, exactly
-                  as ADR-017 did for CONTEXT.md — so the placement test may decide the home, and the
-                  cap may decide the timing
-      tracker:    SPRINT-060 T4 ruling
+      assumes:    this is L-106's tell, not ordinary fat: the doc is **223 / 120** and is a longitudinal
+                  measurement log accreting one round per sprint (three now), while the 120 cap is sized
+                  for a write-once decision doc. It cannot be trimmed without deleting measurements that
+                  are the whole point, which L-106 says means the number is wrong rather than the file.
+                  Do NOT bulk this with the other two breaches — `graph-engineering.md` (122) and
+                  `loop-hygiene-prd.md` (139) are ordinary drift and a different question. ADR-015 rules
+                  that a soft cap cannot be grandfathered, so "add it to the list" is not available
+      tracker:    SPRINT-061 Retro · L-106 · ADR-015 · SPRINT-058 T1 (the same tell, twice)
       origin:     close-retro
       state:      ready
 
-- [ ] TASK-190 — Rule on the two sibling loop-hygiene docs' statuses  [size: S] [risk: low] [HITL]
+- [ ] TASK-193 — Give the §2 soft-cap report a consumer at promote  [size: S] [risk: low] [HITL]
       class:      decision
-      done-when:  `loop-hygiene-findings.md` and `loop-hygiene-workstreams.md` each carry a deliberate
-                  `status:`, ruled on the RESEARCH template's actual trigger ("once a decision is built
-                  on it"), with the reasoning recorded
-      touches:    docs/research/loop-hygiene-findings.md · docs/research/loop-hygiene-workstreams.md
+      done-when:  a §2 soft-cap breach is visible to whoever signs the promote governance checklist,
+                  rather than only to the gate's scrollback
+      touches:    skills/lean-doc-generator/SKILL.md § Governance review ·
+                  skills/lean-doc-generator/references/DOCS_Guide.md §10/§11
       depends-on: none
-      assumes:    they raise the same question SPRINT-060 T4 answered for their parent and were
-                  explicitly left out of its scope rather than swept along. Do not assume the answer
-                  matches the parent's: a findings register can outlive the PRD that spawned it, and
-                  T4's own lesson was that the template's trigger is not the one people reach for
-      tracker:    SPRINT-060 T4 Execution Log, out-of-scope note
+      assumes:    the failure is a **matcher with no consumer**, which is the exact inverse of the rule
+                  SPRINT-061 T1 promoted, and neither caught it. `check-doc-caps.sh` has printed three
+                  `OVER-CAP (soft)` rows on every run for sprints; SPRINT-061's promote scan reported
+                  doc-aging clean because the checklist enumerates §11's four triggers and a §2 breach is
+                  not one of them. Re-derive before writing (L-091): "add a fifth checklist line" is the
+                  obvious move and may be wrong — the honest question is whether §11's trigger list or
+                  §2's caps should own this, and a fifth line on a checklist read under time pressure is
+                  how TD-047 describes items getting skipped
+      tracker:    SPRINT-061 Retro · L-106 (count 2)
       origin:     close-retro
-      state:      ready
-
-- [ ] TASK-191 — Split section 4's cost between its three jobs  [size: S] [risk: low] [AFK]
-      class:      execution
-      done-when:  `docs/research/qa-gate-timing.md` carries a per-job figure for section 4 — index
-                  freshness vs dangling refs vs frontmatter completeness — from at least two samples,
-                  with the shipped `scripts/qa-check.sh` verifiably byte-identical afterwards
-      touches:    docs/research/qa-gate-timing.md · an instrumented COPY of scripts/qa-check.sh
-                  (never the shipped one) · TECH-DEBT.md TD-050
-      depends-on: none
-      assumes:    **measurement only — no cure, no narrowing.** TD-050 names this as the first honest
-                  step precisely because "section 4 is expensive" is itself an undifferentiated blob,
-                  and treating it as one unit is the error L-107 describes (now promoted into the
-                  TECH-DEBT header). Do not touch the index-freshness read while here: it is a genuine
-                  whole-corpus read and that is exactly what ADR-009 wired it for, so cheapening it
-                  risks the L-058 family. Repeat SPRINT-060 T3's method — instrumented copy, shipped
-                  script verified byte-identical — rather than inventing one
-      tracker:    TD-050 · docs/research/qa-gate-timing.md · L-107
-      origin:     manual
       state:      ready
 
 
@@ -124,7 +111,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(SPRINT-061 just promoted — nothing shipped yet.)_ Current inline in [`CHANGELOG.md`](CHANGELOG.md): **v1.34.0** (SPRINT-060) + **v1.33.0** (SPRINT-059), which is §11's keep-current-plus-previous-minor rule satisfied; everything older is rotated under [`docs/changelog/`](docs/changelog/). Both manifests read **1.34.0** and are in lockstep — the MINOR bumps this block used to track as outstanding have all landed.
+_(no active sprint)_ — SPRINT-061's shipped changes are written up as **v1.35.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.35.0 + v1.34.0** inline, with **v1.33.0 rotated** → [`docs/changelog/CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) in the same commit.
 
 ---
 

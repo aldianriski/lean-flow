@@ -170,6 +170,13 @@ is_excluded_closetime() {
     TODO.md) return 0 ;;                        # backlog bookkeeping, written at close
     CHANGELOG.md) return 0 ;;                   # release bookkeeping, written at close
     docs/LEARNINGS.md) return 0 ;;              # retro bucket routing, written at close
+    README.md) return 0 ;;                      # footer version line, bumped with the manifests at
+                                                # close. CLOSE-TIME ONLY, deliberately: README is a
+                                                # large file and the only thing close touches in it is
+                                                # `v<X.Y.Z>` in the footer, so a general exclusion
+                                                # would silence every real README edit during
+                                                # execution -- the over-broad-reason failure TD-044
+                                                # was filed about, in the opposite direction.
     *) return 1 ;;
   esac
 }
@@ -192,6 +199,13 @@ is_excluded() {
                                                 # concern, which is what Layers: exists to manage.
     .claude-plugin/plugin.json) return 0 ;;     # version bump, owned by release-patch
     .claude-plugin/marketplace.json) return 0 ;; # lockstep with plugin.json, same owner
+    .codex-plugin/plugin.json) return 0 ;;      # same: a lockstep manifest, bumped by the same actor
+    .kimi-plugin/plugin.json) return 0 ;;       # same. Added SPRINT-061: the repo grew from two
+                                                # manifests to four, check-manifest-lockstep.sh was
+                                                # taught all four, and THIS list was not -- so a
+                                                # correct MINOR bump failed attribution (L-020,
+                                                # shipping != wiring). If a fifth manifest appears,
+                                                # it belongs here in the same commit.
     .claude/worktrees/agent-*) return 0 ;;      # worktree dispatch protocol: agent worktrees are
                                                 # created INSIDE the repo, by the dispatch protocol
                                                 # itself, at fan-out time -- AFTER the Plan freezes. No

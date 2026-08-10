@@ -3,7 +3,7 @@ sprint: 061
 slug: named-not-answered
 owner: Maintainer
 last_updated: 2026-08-10
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -178,3 +178,15 @@ Two separate things went wrong, and only one is T3's.
 
 Neither is fixed here: both are §11/§2 rulings, out of T3's scope, and inventing an answer under a task
 that says "measurement only" would be the scope-creep D2 forbids. Filed for the close Retro.
+
+### 2026-08-10 | close | 3 of 3 tasks, 16 of 16 DoD; shipped as v1.35.0
+
+Retro written, four buckets routed: **Shipped** → CHANGELOG v1.35.0 · **Learnings** → L-112 filed,
+L-106 bumped to count 2 (promotion-eligible next promote), L-107's pointer gains a third sighting ·
+**Follow-ups** → TASK-192 (rule `qa-gate-timing.md`'s 223/120) and TASK-193 (give the §2 soft-cap
+report a consumer at promote), both stamped `origin: close-retro` · **Tech debt** → none new; TD-050
+was corrected in place by T3 rather than superseded by a new row.
+
+MINOR bump applied by hand across all four manifests and the README footer — `/release-patch` is
+PATCH-only. The one consumer-facing change is T1's addition to `DOCS_Guide.md` §10; the CHANGELOG says
+so explicitly, because a MINOR bump normally implies more than one.

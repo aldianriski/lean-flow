@@ -480,6 +480,64 @@ case "$out4c" in
 esac
 
 # ================================================================================================
+# ================================================================================================
+# case 4d: release-bookkeeping files at the MINOR bump (constructed) -- must PASS at close.
+# Added SPRINT-061 close, which is where the gap was found: a correct v1.35.0 bump touched four
+# manifests plus README's footer, and the exclusion list still named only the two .claude-plugin/
+# ones it was written with. check-manifest-lockstep.sh had been taught all four; this list had not
+# (L-020, shipping != wiring). The two halves below are the guard against fixing that too widely.
+# ================================================================================================
+c4d="$work/release-bookkeeping-exclusion"
+mkdir -p "$c4d/docs/sprint" "$c4d/.claude-plugin" "$c4d/.codex-plugin" "$c4d/.kimi-plugin"
+cat > "$c4d/docs/sprint/SPRINT-907-release.md" <<'EOF'
+---
+sprint: 907
+slug: release
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-907 — Release Bookkeeping Exclusion (constructed fixture)
+
+## Plan
+
+### T1 — edit foo.txt only
+Layers: `foo.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] foo.txt updated
+EOF
+printf 'a\n' > "$c4d/foo.txt"
+printf '{ "version": "1.0.0" }\n' > "$c4d/.claude-plugin/plugin.json"
+printf '{ "version": "1.0.0" }\n' > "$c4d/.codex-plugin/plugin.json"
+printf '{ "version": "1.0.0" }\n' > "$c4d/.kimi-plugin/plugin.json"
+printf '# Readme\n\n<sub>status: current - v1.0.0</sub>\n' > "$c4d/README.md"
+git -C "$c4d" init -q
+lock_plan "$c4d" 'docs/sprint/SPRINT-907-release.md'
+printf 'a2\n' >> "$c4d/foo.txt"                                        # declared
+printf '{ "version": "1.1.0" }\n' > "$c4d/.codex-plugin/plugin.json"   # STRUCTURAL exclusion
+printf '{ "version": "1.1.0" }\n' > "$c4d/.kimi-plugin/plugin.json"    # STRUCTURAL exclusion
+printf '# Readme\n\n<sub>status: current - v1.1.0</sub>\n' > "$c4d/README.md"  # CLOSE-TIME only
+
+# Phase 1 -- DoD still open, so the sprint is mid-execution. The two sibling manifests are excluded
+# in both phases (a manifest bump is never task work), but the front door is NOT: a README edited
+# during execution is somebody's task work, and the whole point of scoping its exclusion to close is
+# that this stays reported. If a future widening moves it to the general list, this case goes green
+# and that is the signal.
+run_case_anywhere "release-manifests-excluded-but-front-door-reported" 1 \
+  "changed but undeclared in any task's Layers:: README.md" -- \
+  sh -c "cd \"$c4d\" && sh \"$checker\" docs/sprint/SPRINT-907-release.md"
+
+# Phase 2 -- same repo, same edits, DoD ticked. Zero open DoD == at close, which is the only moment
+# "footer bumped with the manifests" is true, so the run is clean. Without this half the change
+# would read as "never exclude the front door", which fails every real close.
+sed -i.bak 's/^- \[ \] foo.txt updated/- [x] foo.txt updated/' "$c4d/docs/sprint/SPRINT-907-release.md"
+rm -f "$c4d/docs/sprint/SPRINT-907-release.md.bak"
+run_case_anywhere "release-bookkeeping-at-close (all excluded)" 0 \
+  "layers observed (all changed files declared" -- \
+  sh -c "cd \"$c4d\" && sh \"$checker\" docs/sprint/SPRINT-907-release.md"
+
 # case 5: sprint file path does not exist on disk (constructed) -- must FAIL, its own named finding.
 # This is the checker's very first guard (`[ -f "$sp" ]`), before any git command runs, so the
 # throwaway repo below never even needs a commit -- it exists only so the fixture follows the same

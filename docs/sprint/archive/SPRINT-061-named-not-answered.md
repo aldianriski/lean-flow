@@ -3,10 +3,10 @@ sprint: 061
 slug: named-not-answered
 owner: Maintainer
 last_updated: 2026-08-10
-status: active
+status: closed
 gates_signed: G1,G2 @ 0c86582
 plan_commit: c15f2bd
-close_commit:
+close_commit: [pending — recorded in the follow-up commit]
 update_trigger: sprint execute/close events
 ---
 
@@ -125,11 +125,56 @@ freshness vs dangling refs vs frontmatter completeness — from at least two sam
 
 ## Files Changed
 
-<!-- Filled during execution; feeds CHANGELOG at close. -->
-
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §10 gains "Every hygiene rule gets a matcher" — the principle's durable home, reworded to ship | Low | gate 133 pass |
+| `docs/research/loop-hygiene-prd.md` | T1 | header note + § Solution now point at §10; rule kept only as a record of what the PRD argued | Low | gate 133 pass |
+| `docs/research/loop-hygiene-workstreams.md` | T2 | `status: superseded` — decisions built and spot-checked live | Low | research-archive PASS |
+| `docs/research/loop-hygiene-findings.md` | T2 | `status: superseded` — row 24 falsified by SPRINT-060 T1 | Low | research-archive PASS |
+| `docs/research/qa-gate-timing.md` | T3 | third measurement — section 4 split by loop, 2 samples | Low | gate 135 pass |
+| `TECH-DEBT.md` | promote · T3 | L-107 promoted into the header; 4 aged rows re-reviewed; TD-050 corrected twice | Low | TD-aging PASS |
+| `.claude/CONTEXT.md` | promote | L-108 promoted → § Gates | Low | cap 132/150 |
+| `docs/LEARNINGS.md` | promote | L-107 + L-108 collapsed to pointers (§11) | Low | metadata PASS |
+| `TODO.md` | promote | TASK-191 filed; stale § Changelog block corrected | Low | cap 139/150 |
+| `docs/sprint/SPRINT-061-*.md` + `logs/` | all | Plan, gate record, Execution Log | Low | schema PASS |
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10). -->
+**Retrieval check** — no prior `L-NNN`/ADR was failed-to-find or contradicted. The opposite happened
+twice: L-107 and L-098 were both *found and applied* mid-task (L-107 named the T3 finding, L-098 forced
+the spot-check in T2 rather than trusting the parent's summary). One miss is recorded below, but it is a
+scan-coverage miss, not a retrieval miss.
+
+**Cost** — inline coordinator, no sub-agents dispatched (the session is configured against it, so T3's
+`class: execution` ran inline with that stated). Five gate runs at ~2.5–3 min each dominate wall-clock;
+two of those were T3's instrumented samples, which are the deliverable rather than overhead. Three
+tasks, six commits, 503 insertions. Cheap sprint — all three tasks were `[size: S]` and all three were
+sized correctly, which is worth recording because the previous two sprints both carried a task whose
+acceptance turned out to be unreachable.
+
+**Worked**
+- **Resolving all three assumptions before signing G2 instead of carrying them.** A2's resolution
+  *changed T3's design* — had it been carried as written, T3 would have started by trying to instrument
+  a split the code cannot express, and discovered it halfway through with the Plan already frozen. One
+  file read at gate time replaced a mid-sprint `scope-change`.
+- **Ruling T2's two docs independently rather than inheriting.** Same verdict, opposite reasons — the
+  parent because its proposals shipped, the register because one of its observations was *overturned*.
+  Inheriting would have produced the right answer with wrong reasoning, and nothing would have caught it.
+- **T1 facing its own self-application.** A principle demanding that rules name their matcher would have
+  shipped pre-violated if written without one.
+
+**Friction**
+- **The promote governance scan reported doc-aging clean while three §2 soft-cap breaches printed on
+  every gate run.** The scan checks §11's four enumerated triggers; §2 soft caps are not among them, so
+  a report that fires every single run has no consumer. → bumps L-106 to count 2.
+- **`docs/research/qa-gate-timing.md` is 223/120** and structurally mismatched: a longitudinal log
+  accreting one measurement round per sprint, under a cap sized for a write-once decision doc. T3 added
+  54 of those lines, but it was already 169. → TASK-192.
+- **An instrumentation artifact had to be rebuilt and both samples retaken** because `awk` ate the
+  emitter's `printf` escapes. The data was valid; the published method would have been a broken artifact.
+
+**Pattern candidate** (surfaced → `docs/LEARNINGS.md`)
+- **L-112 filed** — a split asked to locate a cost centre can answer that there isn't one, and an evenly
+  distributed cost closes the search rather than failing the measurement.
+- **L-106 bumped to count 2** — promotion-eligible at the next promote.
+- **L-107's pointer gains a third sighting** — it recurred inside the sprint that promoted it.

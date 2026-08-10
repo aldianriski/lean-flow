@@ -69,3 +69,4 @@ One line per archived sprint (newest first); files live in [`archive/`](archive/
 - SPRINT-001 — Ship & Validate — closed 2026-06-11 · b0f2695
 - SPRINT-059 — Prove the Run Finished — closed 2026-08-10 · 0b4e06a
 - SPRINT-060 — Make Room — closed 2026-08-10 · afd693d · 4 of 5 units (T5 carried, acceptance unmet)
+- SPRINT-061 — Named, Not Answered — closed 2026-08-10 · CLOSE_SHA_PLACEHOLDER · 3 of 3 units (v1.35.0)
