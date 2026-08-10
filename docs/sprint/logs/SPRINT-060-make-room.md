@@ -135,3 +135,33 @@ harnesses, which have now been cleared twice. Nothing moved or cheapened; T3 mea
 **Noted, not fixed:** the research doc is now 169 lines against a 120 **soft** cap, so it reports and
 routes to the promote governance review (§11) — and by T2's rule shipped an hour ago it is ineligible
 for the grandfather list, which is the intended behaviour meeting itself.
+
+### 2026-08-10 | progress | T4 — ruled `superseded`, and the ruling found a misplaced rule
+
+`loop-hygiene-prd.md` is now `status: superseded`, with the reasoning written into the doc's own head
+rather than only into this log.
+
+**The task's framing was slightly off, and the correction matters.** TASK-181 assumed the trigger was
+"every workstream has shipped". The RESEARCH template's actual trigger is *"once a decision is built on
+it"* — a lower and more honest bar, and one that was cleared long ago: ADR-015 cites this doc directly.
+Both readings point the same way here, but the template's is the one that governs.
+
+**Its assumption was also understated.** The task said "three live surfaces cite this one." There are
+five — `ADR-015`, `LEARNINGS.md`, `architecture-baselines.md`, `loop-hygiene-findings.md`,
+`loop-hygiene-workstreams.md`. That strengthens rather than weakens the conclusion.
+
+**Nothing mechanical changed, and the gate proved it rather than me asserting it:**
+`check-research-archive.sh` now reports *"superseded but still cited by ADR-015 — correctly left in
+place."* §11 archives a superseded doc only once nothing live cites it, so the file stays put and keeps
+its cap coverage. What changed is that the corpus stopped saying something untrue about its own state.
+
+**The ruling surfaced a genuine misplacement.** The doc's governing principle — *"every hygiene rule
+gets a matcher; a rule with neither is aspirational"* — is **still live**: T2 of this very sprint applied
+it, turning ADR-015 rule 2 from prose into an enforced check. That made the ruling harder than it looks,
+because the easy way to keep a live rule alive is to leave its container marked `current`. That is using
+`status:` as a bookmark, and it is how a spent doc becomes permanently un-rulable. Ruled `superseded`
+anyway, and the principle is filed as a follow-up for promotion into the standard by §10's placement
+test. A standing rule should not live in a spent PRD.
+
+**Out of scope, but noted:** `loop-hygiene-findings.md` and `loop-hygiene-workstreams.md` are both still
+`current` and raise the same question. T4's scope is this doc; they are not silently swept along.

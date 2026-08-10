@@ -1,7 +1,7 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-17
-status: current
+last_updated: 2026-08-10
+status: superseded
 id: loop-hygiene-prd
 tags: [process, docs, tooling]
 domain: governance
@@ -9,6 +9,24 @@ related: [loop-mechanics-audit, trigger-accuracy-audit, okf-adoption]
 ---
 
 # Process Loop Engineering & Docs Hygiene — PRD
+
+> **`status: superseded` — ruled 2026-08-10 (SPRINT-060 T4).** All six workstreams have shipped and
+> decisions have been built on this doc (ADR-015 cites it directly), which is exactly the RESEARCH
+> template's trigger: *"once a decision is built on it, mark `status: superseded` rather than editing
+> it."* It had read `current` since 2026-07-17 — not because anyone judged it current, but because
+> nobody had looked, which is the one outcome the ruling was not allowed to have.
+>
+> **This changes nothing mechanical, deliberately.** §11 archives a superseded research doc *only once
+> nothing live cites it*, and this one is cited by `ADR-015`, `LEARNINGS.md`, `architecture-baselines.md`,
+> `loop-hygiene-findings.md` and `loop-hygiene-workstreams.md`. It stays exactly where it is and keeps
+> its cap coverage. The field now describes the doc's real state instead of contradicting it.
+>
+> **One thing this ruling deliberately does not do.** The doc's governing principle — *"every hygiene
+> rule gets a matcher; a rule with neither is aspirational"* — is still live, and SPRINT-060 T2 applied
+> it (ADR-015 rule 2 went from prose to an enforced check). A spent PRD is the wrong home for a standing
+> rule, and keeping this file `current` to preserve one would be using `status:` as a bookmark. If that
+> principle is durable it should be promoted into the standard by §10's placement test; filed as a
+> follow-up rather than smuggled in here.
 
 > Source: full-corpus audit 2026-07-17 (4 parallel passes: loop-core skills · support skills ·
 > docs corpus · cross-cutting consistency). Evidence register split out below. **Since applied** —

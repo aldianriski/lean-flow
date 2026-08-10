@@ -101,9 +101,9 @@ evidence and stopped short of ruling on the field itself.
 lands.
 
 **DoD:**
-- [ ] The `status:` field is set deliberately — either outcome is a result; what is unacceptable is it staying `current` because nobody looked
-- [ ] The reasoning is written down, not just the field changed
-- [ ] Note explicitly that this changes nothing mechanical: §11 archives a superseded doc only once nothing live cites it, and three live surfaces cite this one, so it stays put and keeps its cap coverage either way
+- [x] The `status:` field is set deliberately — either outcome is a result; what is unacceptable is it staying `current` because nobody looked
+- [x] The reasoning is written down, not just the field changed
+- [x] Note explicitly that this changes nothing mechanical: §11 archives a superseded doc only once nothing live cites it, and three live surfaces cite this one, so it stays put and keeps its cap coverage either way
 <!-- QA: judgement task; the recorded reasoning is the artifact. -->
 
 ### T5 — Exercise the reaper on a genuinely partial Plan `[size: S · risk: low · class: execution · HITL]`
