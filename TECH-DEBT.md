@@ -23,6 +23,21 @@ status: current
 
 ## Tech Debt
 
+- **TD-049** severity: minor | status: open | created: Sprint-059
+  - Summary: the night-run reaper (`scripts/night-run.sh`) parses the sprint file's DoD boxes and
+    `### Tn` headings itself, duplicating logic `scripts/lib/check-*.sh` already owns. A third parser
+    of the same format now exists (the dispatch-preflight snippet is the second — TD-045).
+  - Impact: bounded, and the duplication is deliberate rather than accidental — ADR-016 names it as an
+    accepted trade. The launcher is dependency-free POSIX sh a consumer reads in one sitting, and
+    pointing it at `scripts/lib/` would ship a maintainer-only path into a consumer-facing reference
+    (L-015). Unlike TD-045, this one has **no parity fixture**: nothing would catch the reaper's parser
+    drifting from the checkers' if the sprint format changed.
+  - Mitigation (**not yet derived**, L-091): the obvious move is a parity fixture like TD-045's, driving
+    one sprint file through both parsers. Whether that earns its keep depends on how the format actually
+    changes — the sprint schema has been stable for many sprints, so this may be a guard against a
+    drift that never happens. Re-derive before building: confirm a real divergence risk first, and note
+    that TD-045's parity fixture has never fired, which its own row reads as the design holding.
+
 - **TD-048** severity: trivial | status: open | created: Sprint-058
   - Summary: `check-layers-completeness.sh` matches a `Layers:`/`Cites:` declaration against DoD prose
     **by token spelling, not by path identity**. A DoD that names a script by basename

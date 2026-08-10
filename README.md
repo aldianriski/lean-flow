@@ -247,6 +247,16 @@ never an invitation to reason the answer out and carry on. Anything needing a hu
 sign-off, `close`'s §11 retention, a `/triage` apply) is **parked** — recorded with its unblock condition
 — while disjoint AFK work carries on; the run then halts cleanly through `/handoff`, and morning `/prime`
 reads it back. It never reshapes a task to dodge a gate. `bypassPermissions` is never the fallback.
+
+**Every run reports how much of the Plan it finished.** A `sprint-bulk` loop is driven by the model, and
+nothing outside it checks the Plan was exhausted — so a run can end after four of seven tasks with every
+commit correct and still exit `success`, saying nothing about the three it never began. The morning
+rollup therefore opens with `run · N of M DoD ticked` at *every* exit, and `unattempted` is a state
+alongside blocked, parked, denied and stalled. Asking the run to write that was tried and measured: it
+completed all its work and wrote none of its bookkeeping. So the bundled launcher
+[`scripts/night-run.sh`](scripts/night-run.sh) emits the rollup and the cost row itself, from the wrapper
+that outlives the model — and the QA gate fails a recorded run that is missing one. Fire `claude -p`
+directly instead and the format still applies; you just have no guarantee it was written (ADR-016).
 Pre-flight + contract → [`skills/orchestrator/references/night-run.md`](skills/orchestrator/references/night-run.md).
 
 **Implement routing** — at the build step, orchestrator routes by work type: new testable
@@ -409,7 +419,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-08-10 · status: current · v1.32.0</sub>
+<sub>Doc owner: Maintainer · last updated 2026-08-10 · status: current · v1.33.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge

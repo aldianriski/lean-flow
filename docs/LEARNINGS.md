@@ -22,11 +22,35 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-107**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-110**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-110 [tags: sprint-model] [status: active]: **A `Layers:` declaration goes stale in one predictable direction — a *fix* lands in whichever task's gate run exposed it, not in the task that owns the file.** L-100 established that `Layers:` is a live declaration corrected by the work rather than a prediction to defend. SPRINT-059 corrected it **three times in five tasks**, and all three were the same shape rather than three different misses: T2's declaration named `ADR-016-<slug>.md` before the slug existed; T3's gate run surfaced an invented tag vocabulary *in T2's ADR* and fixing it made T3 the toucher; T4's work exposed a `grep -c` bug *in T2's script* and fixing it made T4 the toucher. Only the first is a prediction problem. The other two are structural: a defect is discovered by whichever task's verification pass runs over it, and the fix is committed by that task — so file ownership at promote and file ownership at commit diverge for reasons no amount of care at promote could anticipate. This matters because the natural reaction to an attribution FAIL is to argue the file "really belongs" to the earlier task and amend there, which manufactures a cross-task commit to preserve a declaration. Declare it where the work happened; the declaration is the record of what was touched, not a claim about who should have touched it. Distinct from L-100 (which says corrections are expected) by naming *which* corrections are unavoidable.
+- seen: Sprint-059
+- count: 1
+- promoted: no
+- related: L-100 (the parent rule — a live declaration, not a frozen prediction) · `check-layers-observed.sh`
+
+---
+
+## L-109 [tags: tooling] [status: active]: **A checker whose loop is fed by a pipe can only ever pass — `fail=1` is set in a subshell and discarded — and it reports confidently while doing so.** POSIX `cmd | while read ...; do fail=1; done` runs the loop body in a subshell, so every flag it sets dies with it and the script exits on the value it started at. SPRINT-059's `assert-park-revisit.sh` shipped its first draft this way: the assertion printed its FAIL line, then exited 0. A harness reading the exit status would have called it green forever, and the FAIL text scrolling past is exactly the kind of output nobody re-reads once the status is good. The fix is mechanical — feed the loop by redirect (`done < file`), which does not fork — but the *detection* is not: this is invisible to review, invisible to a passing test suite, and invisible to the check's own output. Only pointing the checker at a known violation and looking at `$?` finds it, which is what a must-FAIL fixture is for (L-058). Worth stating as its own rule rather than as an instance of L-058, because it is a language trap with a one-token cause: whenever a shell check accumulates state in a loop, look at what feeds that loop before believing any result it reports.
+- seen: Sprint-059
+- count: 1
+- promoted: no
+- related: L-058 (a gate exercised on input that must FAIL) · L-057 (a command's self-report is evidence about the reporter) · TD-012 (retain the fixtures)
+
+---
+
+## L-108 [tags: tooling] [status: active]: **A contract is a line in a known shape, never a word appearing somewhere — a substring standing in for a structural claim fails *green*, and the corpus it searches contains its own documentation.** Three sightings in one sprint, each a match that was textually real and semantically wrong. (a) A grep for the rollup states over `CONTEXT.md` hit `in-stalled` inside "installed", nearly justifying an edit to a file already at its cap. (b) The night-run reaper asked "did the run already write a line for task Tn?" by grepping the whole Execution Log — and an earlier entry documenting the rollup *format* contained `T5 · unattempted · …` at line start, so the reaper read its own documentation as this run's output and silently dropped T5. (c) A park assertion detected a revisit by searching the log for `revisit|resolved|…`, and its must-FAIL fixture passed because that fixture's slug was `unrevisited`. Two of the three produced a green result, which is the whole danger: a false *positive* on a substring is a false *negative* on the contract. The pattern behind all three is that markdown corpora are self-describing — logs quote formats, fixtures are named after what they test, docs contain examples of the thing being matched — so any keyword search over them eventually matches prose about the search. Two fixes, both cheap: match a structural shape anchored to a position (a line starting `Tn · <state> · `), and scope the search to the window that can legitimately contain a hit (what *this run* appended, not the whole append-only file). Corollary for fixtures: never name one after a token its own assertion greps for.
+- seen: Sprint-059
+- count: 3
+- promoted: no
+- related: L-058 (must-FAIL fixtures — what caught (b) and (c)) · L-091 (re-derive before building on a stated cure) · L-109 (its sibling trap in the same assertion)
 
 ---
 

@@ -3,7 +3,7 @@ sprint: 059
 slug: prove-the-run-finished
 owner: Maintainer
 last_updated: 2026-08-10
-status: active
+status: closed
 gates_signed: G1,G2 @ 4d6e855
 plan_commit: 4859353
 close_commit: [sha — set at close]
@@ -167,23 +167,56 @@ comparison against the existing rows is loose.
 ## Files Changed
 
 <!-- Filled during execution; feeds CHANGELOG at close. -->
-
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/references/night-run.md` | T1·T2·T4·T5 | Parts 0/2/3/4 — rollup at every exit, `unattempted`, the reaper, park re-check, two consumer rows | Med | traced against run 1; end-to-end night run |
+| `skills/orchestrator/SKILL.md` | T1·T4 | sprint-bulk steps 4–5 route to the rollup and the park re-check (wiring, L-020) | Low | gate |
+| `scripts/night-run.sh` | T2·T4 | the reaper: emits the rollup post-exit so the model cannot drop it | High | real `claude -p` run + end-to-end launcher run |
+| `docs/adr/ADR-016-rollup-at-the-exit-path.md` | T2·T3 | WHY enforcement sits in the wrapper, and the launcher-only reach accepted | Low | — |
+| `docs/DECISIONS.md` | T2 | ADR-016 index row | Low | gate |
+| `scripts/lib/check-night-run-rollup.sh` | T3 | refuses a recorded run with no rollup | Low | 4 retained fixtures |
+| `evals/run-night-run-rollup-fixtures.sh` + `evals/fixtures/night-run-rollup/` | T3 | must-FAIL coverage, one per named finding (L-058) | Low | self |
+| `scripts/qa-check.sh` | T3·T4 | wires both harnesses; log paths derived from the Plan glob (ADR-014) | Low | gate |
+| `evals/assert-park-revisit.sh` + `selftest-` + `fixtures/park-revisit/` | T4 | park-revisit contract, proven to fail on the real violation | Low | selftest, both directions |
+| `docs/knowledge-index.md` | T2·T3 | regenerated (derived view) | Low | gate |
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
-     shipped → CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
-     After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Retrieval check** — no prior `L-NNN`/ADR was contradicted or missed. Three were actively *used*
+mid-work: L-058 (must-FAIL fixtures — which caught two defects), L-100 (a `Layers:` declaration is
+corrected by the work, not defended) and L-057 (a command's self-report is evidence about the
+reporter). ADR-014's glob guard also fired and forced a better implementation than the one proposed.
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
-
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents). Cost per
-unit **delivered**, not attempted. Unavailable → say so rather than omitting the line.
+**Cost** — $1.37 for the end-to-end night run + $0.22 for T2's exercise run = **$1.59 in dispatched
+runs**, shape `inline`, plus the session itself. Five units delivered, so ~$0.32/unit in *run* cost —
+not comparable to the calibration table's rows, which price a run doing the whole sprint rather than
+a session doing it with two verification runs alongside. Gate: 173 s wall, now 141 checks.
 
 **Worked**
 
+- **Exercising on real input, four times.** Every defect this sprint found came from running the thing,
+  never from reading it: the reaper dropping a task, the assertion that could only pass, the assertion
+  that passed the violation, the truncating wall-clock. Reading found none of them.
+- **Predicting the output before firing the night run.** Stating `26 of 26, zero unattempted, real
+  figures` in advance turned the run from a demo into a test — a matching result meant something
+  because a non-matching one would have.
+- **The gate as a collaborator, not a checkpoint.** It caught an invented tag vocabulary, a cross-task
+  attribution, three stale `Layers:` declarations, and refused a second sprint glob — the last of which
+  produced a better design (deriving the log path from its Plan) than the one it blocked.
+
 **Friction**
 
+- **`Layers:` was corrected three times in five tasks**, always the same shape: a *fix* surfaces in
+  whichever task's gate run exposes it, not in the task that owns the file. Promote cannot predict this
+  — it is not a declaration problem, it is where fixes live. → L-110.
+- **Two substring false-matches and a third near-miss**, all in one sprint, all where a word standing in
+  for a structural claim produced a *green* wrong answer. → L-108.
+- **The full gate is now 173 s and I ran it ~10 times**, twice by invoking it twice in one command to
+  get both a tail and a grep — which timed out. TD-046/TASK-180 is already measuring this; the
+  session-level lesson is to capture once to a file.
+
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+
+- A contract is a line in a known shape, never a word appearing somewhere (L-108, 3 sightings here).
+- A checker fed through a pipe can only ever pass — `fail=1` dies in the subshell (L-109).
+- A `Layers:` declaration goes stale in one predictable direction (L-110, refines L-100).

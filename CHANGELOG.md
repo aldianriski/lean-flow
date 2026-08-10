@@ -11,6 +11,55 @@ status: current
 
 ---
 
+## v1.33.0 — Prove the Run Finished (2026-08-10)
+
+MINOR — SPRINT-059. The night-run protocol could tell you a run failed. It could not tell you a run
+**stopped early** — and that is the failure that reports `success`.
+
+**What changed for you:**
+
+- **A night run now reports how much of the Plan it finished, at every exit.** The rollup used to
+  speak only for non-green tasks, so a run that ended mid-Plan without hitting a blocker wrote nothing
+  at all and the morning reader saw a clean page. It now opens with `run · N of M DoD ticked`,
+  unconditionally. Measured on a consumer's host before the fix: **4 of 7 units landed, every commit
+  correct, tree clean, exit `success`, three tasks never begun and not one line about them.**
+- **`unattempted` is a state.** It had no name, which is why those three tasks went *unreported*
+  rather than misreported — they were not blocked, parked, denied or stalled. They never began.
+- **The rollup is written by the launcher, not asked of the run** (ADR-016). This is the part worth
+  reading twice: asking was *tried and measured*. A run whose trigger requested a rollup, a
+  calibration row and a park re-check completed every unit of work and wrote **none of the three**. An
+  instruction about the work holds; an instruction about bookkeeping does not, because a step that
+  happens after the work and that no gate depends on is the first thing an agent drops. So
+  `scripts/night-run.sh` emits it from the wrapper that already captures the exit code. Trade named,
+  not hidden: this reaches only consumers who use the launcher, and the documented format still has
+  to stand alone for everyone else.
+- **A recorded run missing its rollup now FAILs the gate**, with two separately-named findings. The
+  reaper emits; the checker refuses to let a missing one pass. That pairing is what makes it *gated*
+  rather than merely requested.
+- **A park the run itself unblocks gets revisited.** The protocol assumed a park outlives the run. It
+  can also name a condition the same run satisfies two tasks later — observed: a field parked for the
+  renderer, **three** subsequent tasks owned that renderer, none went back. Unattended runs only; an
+  interactive run halts at the first blocker with a human present.
+- **Two consumer calibration rows**, the table's first `inline` rows and its first from a host that is
+  not ours. Read them loosely — different shape, different repo. The figure that transfers: **zero
+  denials across 318 turns** after **$1.77** of probing, against a predecessor run that lost ~40% of
+  its turns to denials.
+
+**For maintainers — everything found this sprint was found by running something, never by reading it.**
+The reaper silently dropped a task, because a whole-file grep matched a worked example in the log's own
+prose. The park assertion's first draft **could only ever exit 0** (its loop was behind a pipe, so
+`fail=1` died in a subshell) and, once fixed, still **passed the violation** because it searched for the
+word "revisit" and the fixture's slug was `unrevisited`. The end-to-end night run reported a wall-clock
+of `2 min` for a measured 163 s — correct arithmetic, 40% low, always in the same direction. Three of
+the four are one pattern: a substring standing in for a structural claim, failing *green*.
+
+**Housekeeping:** three learnings filed (`L-108` substring-vs-contract, 3 sightings · `L-109` the pipe
+that swallows a failure · `L-110` how a `Layers:` declaration goes stale), one debt row (`TD-049`), one
+follow-up (`TASK-188`). Five resolved TD rows deleted at promote (§11), ledger 281 → 160. Gate 131 →
+141 checks, with 6 retained fixtures added. Run cost: $1.59 across two verification runs.
+
+---
+
 ## v1.32.0 — Measure Before Moving (2026-08-10)
 
 MINOR — SPRINT-058. Two decisions had been held for sprints on figures nobody re-took. Taking the
@@ -55,46 +104,4 @@ suspect), one debt row (`TD-048`), three follow-ups (`TASK-179`/`180`/`181`). Ga
 
 ---
 
-## v1.31.0 — Prove the Guards (2026-08-10)
-
-MINOR — SPRINT-057. The night-run protocol told you how to build its guards and never how to prove
-one is live. Driven by a **field report from someone running lean-flow on their own project** — the
-first outside evidence this protocol has had, on an OS and shell we don't use.
-
-**What changed for you:**
-- **Pre-flight now proves the allowlist is in effect, instead of assuming it.** A new probe item
-  carries a deliberate **must-deny action**, because without one "every call succeeded" and "the
-  allowlist was ignored entirely" produce identical output — and the second is exactly what an
-  untrusted workspace does. A three-row table tells you how to read the two results together.
-- **Workspace trust: check the key the headless launcher resolves.** Trust is recorded per resolved
-  path key, and one directory can have more than one spelling, so the interactive session and the
-  launcher can consult different records. The remedy the CLI itself prints — run interactively once
-  and accept — **cannot** fix that, because the interactive session lands on the key already trusted.
-- **File-tool permission forms are their own surface.** The measured rows were `Bash` only; a
-  path-scoped `Write(<abs>/**)` was denied on a real host while the bare tool name matched. Measure
-  them before relying on them, and note the trade: the working form is broader than a path fence.
-- **DoD commands get executed once before the run fires.** A DoD command asserts a binary exists on
-  the host, and when it doesn't, every task fails its gate for a reason unrelated to its work.
-- **One output format, end to end.** The trigger now mandates `--output-format stream-json`, and the
-  watchdog's stall signal and the cost row follow it. Previously three sections assumed three
-  different formats, and `json` buffers until exit — which is how a healthy run once got reported
-  dead.
-- **The watchdog must be confirmed running.** One that dies at startup guards nothing and looks
-  exactly like a healthy one, because silence is what both look like.
-- **`gates_signed:` in sprint frontmatter.** An unattended run reads the sprint file and nothing
-  else, so a G1/G2 sign-off held only in your session's transcript was invisible to it — the run
-  re-ran both gates, couldn't ask, and parked every task. An **absent** field means *not signed*,
-  never "assume it was fine".
-- **`promote` refuses to freeze a `size: L`.** G1 already split an `L`, but it ran after the Plan was
-  committed, so the split cost a scope-change. It's now checked where splitting is still free.
-- **Doc line caps distinguish soft from hard.** A `~150 soft` cap in the standard now *reports* when
-  exceeded instead of failing the gate, which is what §11 always said it should do; `400 hard` still
-  fails. Coverage is unchanged.
-
-**Housekeeping:** L-086 promoted into the pre-flight procedure on its second, independent sighting;
-TD-038 deleted (resolved 3 sprints); TD-047 filed (the pre-flight checklist is becoming the doc's
-centre of gravity). Gate 126 → 131 checks, with 10 retained fixture cases added.
-
----
-
-_Older releases (**v1.30.0** and earlier) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._
+_Older releases (**v1.31.0** and earlier) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._
