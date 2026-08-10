@@ -53,7 +53,7 @@ from the specified rollup alone that three tasks were never attempted.
 <!-- QA: docs change, no tests; the trace is the exercise-on-real-input (L-007). -->
 
 ### T2 — Emit the rollup + calibration row from the launcher's exit path `[size: M · risk: high · class: decision · HITL]`
-Layers: `scripts/night-run.sh` · `skills/orchestrator/references/night-run.md` (Part 3, Part 4) · `docs/adr/ADR-016-<slug>.md` · `docs/DECISIONS.md`
+Layers: `scripts/night-run.sh` · `skills/orchestrator/references/night-run.md` (Part 2, Part 3, Part 4) · `docs/adr/ADR-016-rollup-at-the-exit-path.md` · `docs/DECISIONS.md` · `docs/knowledge-index.md` (generated)
 Depends-on: T1
 Cites: T3
 
@@ -66,12 +66,12 @@ it reaches only consumers who use the launcher.
 with no human transcribing them — the thing that did not happen either time in the field report.
 
 **DoD:**
-- [ ] After the fired command exits, the launcher counts DoD boxes in the active sprint file and appends the T1 rollup block
-- [ ] It reads `total_cost_usd`, `num_turns` and `duration_api_ms` off the last `result` event of the stream-json log and appends the Part 4 calibration row
-- [ ] No `jq` and no new dependency — the script stays dependency-free POSIX sh, as it is today
-- [ ] Fires only for a `sprint-bulk unattended` run, and is skippable
-- [ ] Exercised once on a real finished run, never a synthetic log (L-007)
-- [ ] **ADR-016** records where enforcement lives and names the launcher-only reach as an accepted trade, with the docs path serving everyone else; a row is added to `docs/DECISIONS.md`
+- [x] After the fired command exits, the launcher counts DoD boxes in the active sprint file and appends the T1 rollup block
+- [x] It reads `total_cost_usd`, `num_turns` and `duration_api_ms` off the last `result` event of the stream-json log and appends the Part 4 calibration row
+- [x] No `jq` and no new dependency — the script stays dependency-free POSIX sh, as it is today
+- [x] Fires only for a `sprint-bulk unattended` run, and is skippable
+- [x] Exercised once on a real finished run, never a synthetic log (L-007)
+- [x] **ADR-016** records where enforcement lives and names the launcher-only reach as an accepted trade, with the docs path serving everyone else; a row is added to `docs/DECISIONS.md`
 <!-- QA: shell change — exercise on a real run; T3 is its regression guard. -->
 
 ### T3 — Gate the rollup: a recorded run without one FAILs `[size: M · risk: low · class: execution · AFK]`

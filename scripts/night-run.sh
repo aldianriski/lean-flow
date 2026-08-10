@@ -40,6 +40,106 @@ set -u
 wait_seconds=150
 poll_seconds=5
 logfile=""
+reap=1
+
+# --- the reaper -------------------------------------------------------------
+# Runs AFTER the fired command exits, re-entrantly (`sh "$0" --reap ...`) from inside the
+# same wrapper that captures the exit code.
+#
+# WHY it lives here and not in the trigger prompt: a bookkeeping step that happens after
+# the work, and that no gate depends on, is the first thing an agent drops as its turn
+# winds down. Measured -- a run asked in plain language to write its calibration row and
+# to re-check its parks completed every unit of work and did neither (night-run.md Part 2).
+# An instruction about the work holds; an instruction about bookkeeping does not. So the
+# rollup is emitted by the process wrapper, which outlives the model's sense of completion,
+# instead of being requested from the model. Trade-off and alternatives -> ADR-016.
+#
+# Only CONSTRAINED NUMERIC fields are lifted out of the log. The log is the run's own
+# output and this writes into a committed doc, so nothing free-text crosses that boundary:
+# a malformed or crafted log line must not be able to inject markdown structure into a
+# sprint record. Every extraction below is bounded to [0-9.] by its own pattern.
+# Locate the active sprint's Plan file. Shared by the launcher (to record how long the
+# Execution Log already was before firing) and by the reaper, so both agree on the target.
+find_sprint() {
+  fs_root=$1
+  [ -n "$fs_root" ] || return 1
+  for f in "$fs_root"/docs/sprint/SPRINT-*.md; do
+    [ -f "$f" ] || continue
+    grep -q '^status: active' "$f" 2>/dev/null || continue
+    printf '%s' "$f"; return 0
+  done
+  return 1
+}
+
+reap() {
+  rp_log=$1; rp_root=$2; rp_started=$3; rp_base=${4:-0}
+  rp_sprint=$(find_sprint "$rp_root") || return 0
+
+  rp_logdoc="$rp_root/docs/sprint/logs/$(basename "$rp_sprint")"
+  # No Execution Log means the run never opened one -- it did nothing worth a rollup, and
+  # creating the file here would be this script inventing a record rather than completing one.
+  [ -f "$rp_logdoc" ] || return 0
+
+  # DoD boxes -- the header count.
+  rp_done=$(grep -c '^- \[x\]' "$rp_sprint" 2>/dev/null || printf 0)
+  rp_open=$(grep -c '^- \[ \]' "$rp_sprint" 2>/dev/null || printf 0)
+  rp_total=$((rp_done + rp_open))
+
+  # UNITS are Plan tasks, not checkboxes. The calibration series reads "4 of 7 units" and
+  # means tasks; reporting DoD boxes in that field would silently redefine every existing
+  # row's scale. A unit is delivered when its block has no open box left.
+  rp_units=$(grep -c '^### T[0-9]' "$rp_sprint" 2>/dev/null || printf 0)
+  rp_units_done=$(awk '
+    /^### T[0-9]+ /{ if (t!="") { if (!o) d++ } t=$2; o=0 }
+    /^- \[ \]/{ if (t!="") o=1 }
+    END{ if (t!="" && !o) d++; print d+0 }' "$rp_sprint" 2>/dev/null || printf 0)
+
+  rp_cost=$(grep -o '"total_cost_usd":[0-9.]*' "$rp_log" 2>/dev/null | tail -n1 | cut -d: -f2)
+  rp_turns=$(grep -o '"num_turns":[0-9]*' "$rp_log" 2>/dev/null | tail -n1 | cut -d: -f2)
+  # Degrade rule (Part 4): where a figure is not exposed, SAY it was unavailable. A row
+  # with a stated gap still calibrates; a silently omitted one leaves the next person
+  # estimating from nothing.
+  if [ -n "$rp_cost" ]; then rp_cost="\$$rp_cost"; else rp_cost="cost unavailable"; fi
+  [ -n "$rp_turns" ] || rp_turns="?"
+
+  rp_wall="unavailable"
+  if [ -n "$rp_started" ]; then
+    rp_now=$(date +%s 2>/dev/null || printf '')
+    case "$rp_now$rp_started" in
+      ''|*[!0-9]*) ;;
+      *) rp_wall="$(( (rp_now - rp_started) / 60 )) min" ;;
+    esac
+  fi
+
+  {
+    printf '\n### %s | complete | run exited — rollup emitted by the launcher\n\n' "$(date +%Y-%m-%d)"
+    printf '```\nrun · %s of %s DoD ticked\n' "$rp_done" "$rp_total"
+    # A task with an open DoD that the run wrote no rollup line for was never spoken about
+    # at all. That is `unattempted` -- stated as the fact it is (no line exists), never
+    # guessed at: a task the run DID report as blocked/parked/denied already has its line
+    # and is left alone.
+    #
+    # Scoped to what THIS run appended (everything past $rp_base), never the whole file.
+    # The Execution Log is append-only, so it accumulates earlier runs' rollups -- and, as
+    # this reaper's own first exercise proved, worked examples written in prose: a T1 entry
+    # documenting the format contained `T5 · unattempted · ...` at line start, and a
+    # whole-file grep read that documentation as this run's output and silently dropped T5
+    # from the rollup. A guard that reads the wrong window fails exactly like one that is
+    # absent, which is the failure family this whole protocol is about.
+    awk '/^### T[0-9]+ /{t=$2} /^- \[ \]/{if(t!=""){print t; t=""}}' "$rp_sprint" | while read -r tn; do
+      tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -q "^$tn · " && continue
+      printf '%s · unattempted · run ended before this task was started — re-fire; the Plan is unchanged\n' "$tn"
+    done
+    printf '```\n\nCalibration row (Part 4), transcribed from the harness result event:\n\n'
+    printf '```\nrun · %s · %s turns · %s · %s of %s units · inline\n```\n' \
+      "$rp_cost" "$rp_turns" "$rp_wall" "$rp_units_done" "$rp_units"
+  } >> "$rp_logdoc"
+}
+
+if [ "${1:-}" = "--reap" ]; then
+  reap "${2:-}" "${3:-}" "${4:-}" "${5:-0}"
+  exit 0
+fi
 
 die_doa() {
   printf 'DEAD-ON-ARRIVAL: %s\n' "$1"
@@ -62,8 +162,9 @@ while [ $# -gt 0 ]; do
     --wait-seconds) shift; wait_seconds=${1:-}; shift ;;
     --poll-seconds) shift; poll_seconds=${1:-}; shift ;;
     --log) shift; logfile=${1:-}; shift ;;
+    --no-reap) reap=0; shift ;;
     --) shift; break ;;
-    *) die_doa "unrecognized launcher option: $1 (expected --wait-seconds/--poll-seconds/--log, then -- <command>)" ;;
+    *) die_doa "unrecognized launcher option: $1 (expected --wait-seconds/--poll-seconds/--log/--no-reap, then -- <command>)" ;;
   esac
 done
 
@@ -167,10 +268,33 @@ pre_commit=""
 # script reads the pid back, the fired process is no longer tied to this shell's job
 # table. This combination (nohup + full fd redirection + immediate-return subshell) is
 # POSIX-portable; it does not depend on any single non-standard utility.
+# The reaper fires only for a sprint-bulk run -- that is the only shape with a Plan whose
+# DoD boxes mean anything -- and `--no-reap` opts out entirely.
+case "$allargs" in *sprint-bulk*) ;; *) reap=0 ;; esac
+started=$(date +%s 2>/dev/null || printf '')
+
+# How long the Execution Log already is. The reaper compares only what the run APPENDS
+# past this mark against its own rollup lines -- see the note in reap().
+logdoc_base=0
+if [ "$reap" = "1" ]; then
+  base_sprint=$(find_sprint "$repo_root" || printf '')
+  if [ -n "$base_sprint" ]; then
+    base_doc="$repo_root/docs/sprint/logs/$(basename "$base_sprint")"
+    [ -f "$base_doc" ] && logdoc_base=$(awk 'END{print NR}' "$base_doc" 2>/dev/null || printf 0)
+  fi
+fi
+
 (
-  NR_LOG="$logfile" NR_EC="$ecfile" nohup sh -c '
+  NR_LOG="$logfile" NR_EC="$ecfile" NR_SELF="$0" NR_ROOT="$repo_root" \
+  NR_REAP="$reap" NR_START="$started" NR_BASE="$logdoc_base" nohup sh -c '
     "$@" >"$NR_LOG" 2>&1 </dev/null
     printf "%s" "$?" >"$NR_EC"
+    # Emitted here, after the exit code is recorded, so it runs on EVERY exit -- clean
+    # finish, early end-of-turn, or non-zero. This is the whole point: the failure being
+    # guarded against is a run that ends mid-Plan and reports success (night-run.md Part 4).
+    if [ "$NR_REAP" = "1" ]; then
+      sh "$NR_SELF" --reap "$NR_LOG" "$NR_ROOT" "$NR_START" "$NR_BASE" >/dev/null 2>&1 || true
+    fi
   ' sh "$@" &
   echo $! >"$pidfile"
 ) &

@@ -303,7 +303,29 @@ completing all of its work. **An instruction about the work holds; an instructio
 does not** — a step that happens *after* the work, and that no gate depends on, is the first thing an
 agent drops as its turn winds down. So treat this clause as improving the odds on the work, and never
 as the guarantee that the rollup gets written. A protocol step that nothing depends on is not a step;
-it is a hope.
+it is a hope. **The guarantee lives in the launcher instead** — see the reaper, below.
+
+### The reaper — who actually writes the rollup
+
+`scripts/night-run.sh` fires the run inside a wrapper that captures its exit code. That wrapper
+outlives the model, so it is where the rollup belongs: after the fired command exits — cleanly, early,
+or badly — the launcher re-enters itself, counts the DoD boxes in the active sprint file, lifts the
+cost figures off the log's last `result` event, and appends the Part 4 block to the Execution Log.
+Nobody has to remember. `--no-reap` opts out; it fires only for a `sprint-bulk` run, since that is the
+only shape with a Plan whose boxes mean anything. Decision and its trade → **ADR-016**.
+
+Two properties worth knowing, because they bound what the rollup can tell you:
+
+- **It states facts and never guesses.** A task is marked `unattempted` only when the run wrote *no
+  line about it at all* — a fact about the log, not an inference about intent. A task the run reported
+  as blocked, parked or denied keeps its own line untouched.
+- **Only numbers cross from the log into the doc.** The run's log lands in a committed sprint record,
+  so nothing free-text makes that crossing: each figure is bounded by its own numeric extraction. A
+  malformed log line cannot inject structure into your sprint file.
+
+**If you do not use the launcher, none of this fires.** The format above is still the contract and a
+run can still write it — you simply have no guarantee that it did, which is the situation this section
+exists to describe rather than to hide. Counting DoD boxes remains the fallback.
 
 **`stream-json` is not optional here, and it is the one flag the rest of this document depends on.**
 Part 3's watchdog defines its stall signal in terms of new stream lines, and Part 4 reads the run's
@@ -384,6 +406,10 @@ A small wrapper the OS scheduler runs alongside Part 2's `claude -p` call — no
   --resume <session-id> "/handoff"`.
 - **Resume**: next session opens with `/prime`, which already reads a referenced handoff doc — no
   new resume mechanism.
+- **The rollup still lands on a stall.** A SIGTERM'd run exits through the launcher's wrapper like any
+  other, so the reaper (Part 2) fires and writes the block regardless of how the run ended. The
+  watchdog does not need to produce the report, and should not be extended to — it fires only on a
+  *stall*, and the failure that motivated the rollup is a run that ends cleanly and early.
 - **Verify it actually started, before you walk away.** A watchdog that dies at launch guards nothing
   and is **indistinguishable from a healthy one** — both are silent, and silence is what a working
   watchdog looks like all night. This is the inert-permission-rule family (Part 1) one layer up, with
@@ -459,6 +485,12 @@ estimates and can differ from the bill.
 **Degrade rule** — where cost is not exposed, record the fields that are (turns · wall-clock · units)
 and **say the cost was unavailable**. A row with a stated gap still calibrates; a silently omitted row
 is what leaves the next person estimating from nothing.
+
+**Under the launcher this row is written for you** (Part 2's reaper), which is the point: the two runs
+that produced this whole section both finished without writing theirs, and both rows below were
+reconstructed by a human afterwards from the harness payload. **`units` means Plan tasks, not DoD
+boxes** — the series is read as "4 of 7 units", and a row counting checkboxes in that field would
+silently rescale every row above it.
 
 **Rows so far** — this is a series being started, not a budget. One row is an anecdote; do not size a
 window from it:

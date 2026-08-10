@@ -73,3 +73,37 @@ vacuously satisfied and CONTEXT.md is untouched. That is also the right outcome 
 CONTEXT is at 129/130 lines and TASK-182 exists to give it headroom, so an edit here would have spent
 the last line of a file already flagged as over-full, to restate a Part 4 mechanism that the SSOT has
 no reason to carry. The contract belongs in CONTEXT; the reporting format belongs in Part 4.
+
+### 2026-08-10 | progress | T2 — the rollup is emitted by the wrapper, not asked for
+
+`scripts/night-run.sh` gained a reaper: re-entrant `--reap`, invoked from inside the same wrapper that
+already captures the fired command's exit code, so it runs on every exit — clean, early or bad. It
+counts the sprint's DoD boxes, lifts the cost figures off the log's last `result` event, and appends
+the Part 4 block. `--no-reap` opts out; it fires only for a `sprint-bulk` run. ADR-016 records the
+decision and its cost — this reaches only consumers who use the launcher, which is not mitigated,
+only bounded and stated.
+
+**Exercised on a real run, and the exercise earned its keep.** A genuine `claude -p ... --output-format
+stream-json` run produced a real `result` event ($0.224166, 1 turn); the reaper ran against a scratch
+copy of the sprint layout so nothing touched the live log. It found **two defects that reading would
+not have**:
+
+1. **A task went missing from the rollup.** The check for "did the run already write a line for this
+   task?" grepped the *whole* Execution Log — and T1's entry above contains a worked example of the
+   format, including `T5 · unattempted · …` at line start. The reaper read documentation prose as this
+   run's output and silently dropped T5. Fixed by scoping the search to what *this run* appended, via
+   a line-count baseline the launcher records before firing. The bug is the protocol's own subject
+   matter: a guard reading the wrong window fails exactly like one that is absent.
+2. **`units` was reporting DoD boxes.** The calibration series reads "4 of 7 units" and means *tasks*;
+   the first draft emitted `5 of 26 units`, which would have silently rescaled every existing row.
+   Units are now Plan tasks, a task counting as delivered when its block has no open box left — and
+   the distinction is now stated in Part 4 so the next writer cannot make the same substitution.
+
+Post-fix output on the same real log: `run · 5 of 26 DoD ticked`, all four unattempted tasks listed,
+`run · $0.224166 · 1 turns · 6 min · 1 of 5 units · inline`.
+
+**`Layers:` corrected (L-100).** T2's declaration named `docs/adr/ADR-016-<slug>.md` — a placeholder
+written at promote, when the slug did not exist. Corrected to the real filename, plus
+`docs/knowledge-index.md`, which is regenerated whenever a metadata-carrying doc is added. Declaring
+before the work means the declaration gets corrected by the work; that is the expected cost, not a
+scope change. Caught by `check-layers-observed.sh`, not by me.
