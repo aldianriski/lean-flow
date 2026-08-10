@@ -51,10 +51,10 @@ get written once, together, by the task holding the evidence.
 ruling — and L-106 reads `promoted: yes → <where>`, placed by §10's placement test.
 
 **DoD:**
-- [ ] The ruling is recorded: either a §2 cap raised for this doc-kind by ADR, or the doc split per §6
-- [ ] The reasoning is written down either way — including why the *other* two breaches are a different question
-- [ ] L-106 is promoted to a durable rule, placed by §10's test (which flows can author an approximate figure a checker reads?), and its entry collapsed to a pointer per §11
-- [ ] `check-doc-caps.sh` no longer reports `qa-gate-timing.md`, and reports no *new* breach it did not report before
+- [x] The ruling is recorded: either a §2 cap raised for this doc-kind by ADR, or the doc split per §6
+- [x] The reasoning is written down either way — including why the *other* two breaches are a different question
+- [x] L-106 is promoted to a durable rule, placed by §10's test (which flows can author an approximate figure a checker reads?), and its entry collapsed to a pointer per §11
+- [x] `check-doc-caps.sh` no longer reports `qa-gate-timing.md`, and reports no *new* breach it did not report before
 
 ### T2 — Give the §2 soft-cap report a consumer at promote `[size: S · risk: low · class: decision · HITL]`
 Layers: `skills/lean-doc-generator/SKILL.md` § Governance review ·
@@ -136,6 +136,11 @@ no durable rule losing the reader that stands on it.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/research/qa-gate-timing.md` | T1 | 223 → 87: keeps the standing verdict, sheds the series it could not hold under a 120 cap | Low | `check-doc-caps.sh` no longer reports it |
+| `docs/research/logs/qa-gate-timing.md` | T1 | new — the three measurement rounds, append-only and uncapped (ADR-014 precedent) | Low | excluded by the derived non-recursive glob; verified no new breach |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §2 gains a `research/logs/<slug>.md` row; Growth rule gains L-106's promoted rule | Low | cap report unchanged; §2-derived glob verified against the new row |
+| `docs/LEARNINGS.md` | T1 | L-106 collapsed to a pointer per §11 (718 → 698) | Low | 91 entries intact; neighbours L-105/107 unfused |
+| `docs/knowledge-index.md` | T1 | **unchanged** — regenerated twice, byte-identical both times; the log is outside the corpus glob and `related:` is not index input | Low | `gen-index.sh` produced no diff; the re-pointed `related:` resolves to a corpus doc |
 
 ## Retro
 

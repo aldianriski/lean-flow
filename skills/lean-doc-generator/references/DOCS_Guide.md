@@ -73,6 +73,7 @@ gating → §6.
 | `sprint/logs/SPRINT-NNN-<slug>.md` | lean loop | AI mid-sprint | append-only | lazily, at the first Execution Log entry | every Execution Log entry → §11 archive with its sprint. **Must live in the `logs/` subdirectory**: the sprint-file checks glob `docs/sprint/SPRINT-*.md`, which is non-recursive, so a sibling here is excluded for free while a same-directory `-log.md` suffix would be capped at 400 and schema-checked as a Plan (ADR-014) |
 | `LEARNINGS.md` | lean loop | Team / AI | append-only | first confirmed learning | close confirms · promote collapses (§11) |
 | `research/<slug>.md` | as needed | Team / AI | 120 soft | a decision-driving question | question revisited · verdict changes; a verdict a decision has been built on is marked `status: superseded` rather than edited → §11 archive once nothing live cites it |
+| `research/logs/<slug>.md` | as needed | Team / AI | append-only | a research question accretes a **second measurement round** — created lazily, never pre-created | every round appended → §11 archive with its decision doc. **Must live in the `logs/` subdirectory**: the cap check derives its glob from this table's File cell and `docs/research/*.md` is non-recursive, so a sibling here is excluded for free while a same-directory `-log.md` suffix would be capped at 120 and schema-checked as a decision doc (the ADR-014 mechanism, applied to research — SPRINT-062 T1) |
 | `BUG-<slug>.md` | ephemeral | Anyone | lean | a defect is reported — **written to the OS temp dir, never committed** (see the temp-dir note below) | routed away at `/triage`; the file is intake scaffolding, so once its content lands in a `TASK-NNN` / `TD-NNN` / `/diagnose` run there is nothing to retain and no §11 row to reach |
 
 Templates resolve under `${CLAUDE_SKILL_DIR}/templates/`; tree docs use a flattened name
@@ -89,6 +90,27 @@ tree**: `architecture/overview.md` spawns `data-flow.md` / `authentication.md` /
 (overview keeps the map + links); `development/setup.md` can spawn per-platform pages;
 `deployment-guide.md` spawns the environment matrix. Move whole sections; never compress signal away
 to stay under a cap, and never raise the cap to fit content (§7 — a cap moves only by ADR, diet first).
+
+**A figure a checker reads is exact — and a breach that resists every honest fix means the number is
+wrong, not the file** (L-106, promoted SPRINT-062 T1; three sightings). Writing a cap as `~10` or
+`120 soft` buys the appearance of judgement and defers the decision onto whoever next trips it: the
+check compares `actual <= cap` as integers, and `soft` changes only whether a breach FAILs or merely
+reports, never the arithmetic. So before trimming anything, sort the breach into one of two kinds —
+they need opposite actions, and the report cannot tell them apart:
+
+- **Drift** — removable content accreted past a cap that was always reachable. Trim, or split per the
+  growth rule above.
+- **The cap was never reachable.** Either the standard *mandates* content the number never budgeted
+  for (`AGENTS.md` at 11 against `~10`: nine lines plus the two-line ownership footer §3 requires), or
+  the doc's growth is an **append-only series** whose rounds are the whole point (`qa-gate-timing.md`
+  at 223 against `120 soft`: three measurement rounds). Neither can be trimmed without deleting what
+  the file exists to say. Fix the *number* — restate it exactly by ADR — or split the series into a
+  `logs/` sibling so the cap lands on the decision and never on the series (ADR-014's mechanism; the
+  `research/logs/` row above is its first application outside `docs/sprint/`).
+
+The tell is that every route back under the cap runs through deleting signal or re-wrapping prose —
+same words, fewer physical lines, number green, document unchanged. When that is the only route, stop
+and rule the number. Approximate a figure a human reads; state a real one wherever a checker can reach it.
 Ledgers (§11) compress; **knowledge docs split**.
 
 **LAW 1, reinterpreted (ADR-012).** The mandatory minimum above is scaffolded at **init** — with

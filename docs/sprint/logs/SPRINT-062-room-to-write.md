@@ -65,3 +65,32 @@ formatting so the corpus stops generating false matches, and filing the matcher 
 
 **Re-confirm G2.** Owner ruled at the G2 sign-off: log the scope-change and shrink T3 to what is real,
 rather than executing DoD lines that close as no-ops. § Plan is edited only after this entry lands.
+
+### 2026-08-10 | complete | T1 — cap ruled by split; L-106 promoted to DOCS_Guide §2
+`qa-gate-timing.md` split per §6 on ADR-014's precedent: the decision doc keeps the standing verdict
+at **223 → 82** lines, and the three measurement rounds move verbatim to an append-only
+`docs/research/logs/qa-gate-timing.md` (205 lines, uncapped). A `research/logs/<slug>.md` row was added
+to §2 with cap `append-only`.
+
+**The mechanism was verified before it was relied on, not after.** `check-doc-caps.sh` derives its
+globs from §2's own File cells, and `ls -d docs/research/*.md` is non-recursive — so a `logs/` sibling
+is excluded for free, while a same-directory `-log.md` suffix would have been capped at 120 and
+schema-checked as a decision doc. That is precisely the mechanism ADR-014 relies on for sprint logs;
+this is its first application outside `docs/sprint/`. Confirmed by reading the checker's derivation
+loop, then by the run: `qa-gate-timing.md` is off the report and **no new breach appeared**.
+
+**L-106 promoted → `DOCS_Guide.md` §2 Growth rule**, entry collapsed per §11 (LEARNINGS 718 → 698,
+91 entries intact). Placement by §10's test: the flows that can author or trip a cap are §2
+cap-authoring, checker-authoring, and ruling a breach at promote — three different skills, so no single
+skill red-flag reaches them all, and all three arrive at the Growth rule paragraph, which is the
+standard's own instruction for what to do at a cap. `CLAUDE.md` at 80/80 was not an option. The rule
+now sorts a breach into **drift** (trim/split) vs **a cap that was never reachable** (mandated content,
+or an append-only series) — because the report cannot tell them apart and they need opposite actions.
+
+**Retrieval miss found while verifying DoD line 2 (§10 Retrieval check).** TASK-192's `assumes:` calls
+`graph-engineering.md` (122) and `loop-hygiene-prd.md` (139) "ordinary drift and a different question".
+L-106's own body records the opposite for the first — "no movable section and no whitespace slack" —
+and states that **both had been carried as 'drift' for sprints**, which is the mislabelling L-106
+exists to correct. The task text inherited the error it was filed to fix. T1's scope is unchanged (the
+two stay out), but the *reason* is scope, not a settled diagnosis; recorded in the decision doc's
+§ Out of scope so the next owner re-sorts them against the new rule instead of inheriting "drift".

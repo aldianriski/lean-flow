@@ -74,29 +74,9 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 
 ---
 
-## L-106 [tags: docs] [status: active]: **A figure written approximately into a machine-read standard is not a tolerance — it is a decision that has not been made, and the checker will make it for you at full precision.** DOCS_Guide §2 writes some caps as `~10`, `120 soft`, `~150 soft`. `check-doc-caps.sh` compares `actual <= cap` as exact integers; "soft" changes only whether a breach FAILs or merely reports, never the arithmetic. Clearing the four grandfathered breaches (SPRINT-058 T1) found that **two of the four were not fat docs at all** — they were this. `AGENTS.md` was 11 against `~10` and had no removable line: nine lines of content plus the two-line ownership footer §3 *mandates*, so the cap never budgeted for the thing the standard itself requires and was unreachable the day it was written. `graph-engineering.md` was 122 against `120 soft` with no movable section and no whitespace slack, where the only route to 120 was re-wrapping prose — same words, fewer physical lines, number green, document unchanged. Both had been carried as "drift" for sprints, and both had sat in a report that prints every run, which is how a row nobody can act on becomes wallpaper. The tell is a breach that resists every honest fix: when a doc cannot be trimmed without losing what it exists to say, the number is what is wrong. Writing `~` bought the appearance of judgement and deferred the decision onto whoever next tripped it — and because the file, not the standard, is what a breach visibly implicates, the cost lands on the wrong artifact. Approximate a figure a human reads; state a real one wherever a checker can reach it.
-- **Second sighting, Sprint-061** — the wallpaper half of this entry recurred one level up, in the
-  governance scan that exists to act on such reports. `check-doc-caps.sh` printed three `OVER-CAP (soft)`
-  rows on *every* gate run for sprints; SPRINT-061's promote scan reported doc-aging **clean**, because
-  the promote checklist enumerates §11's four triggers (TD deletion · CHANGELOG rotation · LEARNINGS
-  collapse · TODO cap) and a §2 soft-cap breach is not among them. So the report has a matcher and no
-  consumer — the inverse of the failure T1 promoted a rule about in the same sprint, and invisible to
-  both. Caught only because T1's own edit nudged one of the three breaches and made the row legible.
-- **Third sighting, Sprint-062 promote** — on a *fourth* file, and this time the arithmetic is
-  unarguable. `TODO.md`'s cap is `~150 soft`; the roadmap triage took the Backlog to eight tasks and
-  the file to **206**. But eight entries written to the standard's own task shape (§ Task entry shape,
-  ~15 lines each) is ~120 lines of task text before any scaffolding, against ~50 lines of headers,
-  Quick Rules and the pointer blocks — so the cap and the schema the same standard mandates cannot
-  both be satisfied at eight tasks. As with `AGENTS.md`, the number never budgeted for what the
-  standard itself requires. Distinct from the first two sightings in that the breach was produced in
-  one session by ordinary in-scope work, not accreted as drift — which is the strongest form of the
-  tell: no trimming was available even in principle, because nothing had yet had time to rot.
-- seen: Sprint-058, Sprint-061, Sprint-062
-- count: 3
-- promoted: no — resolution folded into **TASK-192** (SPRINT-062 T1), which rules a concrete cap by
-  ADR; the general rule is written there, once, with the ruling that generalizes it (promote sign-off,
-  Sprint-062). Placement deferred to that task so the rule and its worked case land together.
-- related: ADR-015 (the ruling this produced) · L-097 (its sibling — a stated figure that rots, where this one was imprecise at birth) · L-099 (a rule its reader cannot read) · L-088 (the criterion met by re-reading it) · TASK-179 · TASK-193
+## L-106 [tags: docs] [status: promoted]: A figure a checker reads is exact — and a breach that resists every honest fix means the number is wrong, not the file.
+- **L-106 → promoted: `DOCS_Guide.md` §2 Growth rule** — the durable rule is the record now (§11 collapse, SPRINT-062 T1). Body: git; three sightings — `AGENTS.md` 11 vs `~10` (the cap never budgeted for the two-line ownership footer §3 mandates) · `graph-engineering.md` 122 vs `120 soft` (no movable section; the only route to green was re-wrapping prose) · `qa-gate-timing.md` 223 vs `120 soft`, an append-only measurement series, alongside `TODO.md` 206 vs `~150` where the standard's own § Task entry shape needs ~120 lines at eight tasks. Placed by §10's test: the flows that can author or trip a cap are §2 cap-authoring, checker-authoring, and ruling a breach at promote — no single skill red-flag reaches all three, and all three arrive at the Growth rule paragraph, which is the standard's own instruction for what to do at a cap, while `CLAUDE.md` sits at 80/80. Resolved by splitting per §6 on ADR-014's precedent rather than by moving a number. seen Sprint-058/061/062, count 3.
+- related: ADR-015 (the ruling this produced) · ADR-014 (the split precedent applied) · L-097 (its sibling — a stated figure that rots, where this one was imprecise at birth) · L-099 (a rule its reader cannot read) · L-088 (the criterion met by re-reading it) · L-107 (blaming the component that is legible) · TASK-179 · TASK-193 · TASK-196
 
 ---
 
