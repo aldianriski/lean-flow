@@ -4,7 +4,7 @@ slug: named-not-answered
 owner: Maintainer
 last_updated: 2026-08-10
 status: active
-plan_commit: [pending — recorded in the follow-up commit]
+plan_commit: c15f2bd
 close_commit:
 update_trigger: sprint execute/close events
 ---
