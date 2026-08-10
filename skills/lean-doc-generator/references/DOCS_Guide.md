@@ -334,6 +334,18 @@ one home** — a stale second copy reproduces the failure it was promoted to sto
 (shipped ≠ wired) applied to rules rather than capabilities: a promotion earns the same wiring check a
 capability gets (L-092).
 
+**Every hygiene rule gets a matcher.** The placement test decides *where* a rule fires; this decides
+**whether it fires at all**. A hygiene rule earns either a lint in the project's quality gate or a named
+checklist line in a close/promote sweep — a rule with neither is aspirational, and is deleted or wired
+rather than left looking enforced. What it prevents is not a wrong rule but an **absent rule that reads
+as present**, which is the shape every recurring miss in this class shares: a dedup pass nothing swept,
+a consumer-surface check nothing verified, a wiring check nothing ran, a retention convention nothing
+matched. So name the matcher in the same change that writes the rule, or say plainly that the line is
+documentation — documentation is a legitimate answer, and calling it a gate is the error. This is
+L-099's authoring-time twin: L-099 catches a rule written where its checker cannot read it, this one
+catches a rule with no checker at all. *Applied to itself:* its matcher is the Promote review's
+L-promotion line below, which is where a durable rule gets written and can therefore be asked for one.
+
 **A `Mitigation:` line is a hypothesis, not a plan.** A `TD-NNN` row's proposed cure is the filer's best
 guess, written at the moment the cost was being felt; by the time it reaches a Plan, repeated re-reading
 has made it read as settled. Cite the evidence for the *problem*, re-derive the *fix* — at **close** (when

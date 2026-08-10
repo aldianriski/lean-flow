@@ -21,12 +21,12 @@ related: [loop-mechanics-audit, trigger-accuracy-audit, okf-adoption]
 > `loop-hygiene-findings.md` and `loop-hygiene-workstreams.md`. It stays exactly where it is and keeps
 > its cap coverage. The field now describes the doc's real state instead of contradicting it.
 >
-> **One thing this ruling deliberately does not do.** The doc's governing principle — *"every hygiene
-> rule gets a matcher; a rule with neither is aspirational"* — is still live, and SPRINT-060 T2 applied
-> it (ADR-015 rule 2 went from prose to an enforced check). A spent PRD is the wrong home for a standing
-> rule, and keeping this file `current` to preserve one would be using `status:` as a bookmark. If that
-> principle is durable it should be promoted into the standard by §10's placement test; filed as a
-> follow-up rather than smuggled in here.
+> **The one thing this ruling deliberately did not do — since done (SPRINT-061 T1).** The doc's
+> governing principle, *"every hygiene rule gets a matcher; a rule with neither is aspirational"*, was
+> still live when this file was ruled spent, and a spent PRD is the wrong home for a standing rule.
+> It now lives in the standard — **`DOCS_Guide.md` §10, "Every hygiene rule gets a matcher"** — placed
+> there by §10's own test and reworded so it ships: the original names `qa-check.sh`, a path no consumer
+> has (L-015). This file keeps the proposal as a record and no longer carries the rule.
 
 > Source: full-corpus audit 2026-07-17 (4 parallel passes: loop-core skills · support skills ·
 > docs corpus · cross-cutting consistency). Evidence register split out below. **Since applied** —
@@ -61,10 +61,13 @@ maintainer feels daily:
 
 ## Solution
 
-One governing principle, then six workstreams:
+One governing principle, then six workstreams. The principle now stands in the standard —
+[`DOCS_Guide.md`](../../skills/lean-doc-generator/references/DOCS_Guide.md) §10 (SPRINT-061 T1),
+reworded to ship. Kept below as the record of what this PRD argued, not as a rule in force here:
 
-> **Every hygiene rule gets a matcher — either a lint in `qa-check.sh` or a named checklist
-> line in a close/promote sweep. A rule with neither is aspirational and gets deleted or wired.**
+> *As proposed, 2026-07-17:* "Every hygiene rule gets a matcher — either a lint in `qa-check.sh` or a
+> named checklist line in a close/promote sweep. A rule with neither is aspirational and gets deleted
+> or wired."
 
 **Gate answer (asked directly): no new gate.** G1/G2 stay the only gates. Close and promote get
 the *existing* propose→approve pattern (triage's `y`, decomposer's `approve`) mirrored onto

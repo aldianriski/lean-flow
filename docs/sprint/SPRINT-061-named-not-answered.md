@@ -46,13 +46,13 @@ L-092): ask which flows can hit the failure, then place it where all of them rea
 `docs/research/loop-hygiene-prd.md` no longer carries a live rule inside a `superseded` doc.
 
 **DoD:**
-- [ ] The placement test is run and *written down* — which flows can hit the failure, and why the
+- [x] The placement test is run and *written down* — which flows can hit the failure, and why the
       chosen home is where all of them read (not a menu pick)
-- [ ] If the test selects `.claude/CLAUDE.md`: stop and raise the cap question as a `scope-change`
+- [x] If the test selects `.claude/CLAUDE.md`: stop and raise the cap question as a `scope-change`
       before editing — it is at 80/80, and a silent cap raise is the failure ADR-017 was written to avoid
-- [ ] The principle is written into the selected home, in that file's voice
-- [ ] `docs/research/loop-hygiene-prd.md` points at the new home instead of carrying the rule
-- [ ] `sh scripts/qa-check.sh` green
+- [x] The principle is written into the selected home, in that file's voice
+- [x] `docs/research/loop-hygiene-prd.md` points at the new home instead of carrying the rule
+- [x] `sh scripts/qa-check.sh` green
 
 ### T2 — Rule on the two sibling loop-hygiene docs' statuses `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/research/loop-hygiene-findings.md` · `docs/research/loop-hygiene-workstreams.md`
