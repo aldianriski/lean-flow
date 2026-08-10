@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-057 closed 2026-08-10.
+> **SPRINT-058 — Measure Before Moving** → [docs/sprint/SPRINT-058-measure-before-moving.md](docs/sprint/SPRINT-058-measure-before-moving.md)
 
 ---
 
@@ -86,7 +86,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-057's shipped changes are written up as **v1.31.0** in [`CHANGELOG.md`](CHANGELOG.md); SPRINT-056's as **v1.30.0** in [`CHANGELOG.md`](CHANGELOG.md) and await the MINOR version bump (feature sprint → by hand; `/release-patch` is PATCH-only). SPRINT-055's shipped as v1.29.0, SPRINT-054's as v1.28.0. Rotated archives → `docs/changelog/`.
+_(SPRINT-058 in flight — nothing shipped yet)_ — SPRINT-057's shipped changes are written up as **v1.31.0** in [`CHANGELOG.md`](CHANGELOG.md); SPRINT-056's as **v1.30.0**, both awaiting the MINOR version bump (feature sprint → by hand; `/release-patch` is PATCH-only) — `plugin.json` still reads 1.29.0. SPRINT-055's (v1.29.0) and SPRINT-054's (v1.28.0) blocks rotated out at this promote → [`docs/changelog/CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md).
 
 ---
 

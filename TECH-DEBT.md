@@ -225,3 +225,21 @@ status: current
     trigger is still unfired: no miss on the uncommitted path has been observed since. Age is not the
     trigger and was never proposed as one, so the ruling is unchanged. Recorded rather than performed
     silently, per the line above.
+  - **Re-scoped 2026-08-10 (SPRINT-058 promote, 9 sprints open) — held, on a corrected basis.** Two
+    things were wrong with the record, neither of them the ruling. **(a) The reaffirm above is too
+    broadly worded and reads as falsified.** A miss on the uncommitted path *was* observed —
+    SPRINT-055 T6 edited `TODO.md` as task work, the gate ran green while it sat uncommitted, and the
+    finding surfaced attributed to a task already pushed. That miss is TD-044's, not this row's: it
+    was the exclusion list holding a **close-time** reason during **execution**, an error of *phase
+    keying*. This row's claim is narrower and untouched by it — that WIP is tested against the
+    **all-task union** rather than per-task, because attribution needs a commit to read. Re-derived
+    from the source rather than from the row (L-104): `check-layers-observed.sh` now carries the
+    phase split and states in the same comment block that `is_excluded_committed` is deliberately
+    untouched and that the split "guesses nothing of the kind" this row warns against. So TD-044's
+    fix moved a different axis, and the union-attribution trigger remains genuinely unfired.
+    **(b) SPRINT-057's promote re-reviewed and reaffirmed this row and never wrote it here** — the
+    record lives only in that sprint's § Scope *Out* line. The rule directly above ("recorded rather
+    than performed silently") failed its own next instance, which is L-105's shape: a rule that is
+    correct and simply did not run at the moment it applied. **Ruling: held, trigger unchanged and
+    now stated precisely** — evidence of a miss attributable to the *union*, not to any miss on the
+    uncommitted path. Age remains not a trigger.
