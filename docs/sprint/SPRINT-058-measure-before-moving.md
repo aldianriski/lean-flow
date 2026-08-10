@@ -3,7 +3,7 @@ sprint: 058
 slug: measure-before-moving
 owner: Maintainer
 last_updated: 2026-08-10
-status: active
+status: closed
 gates_signed: G1,G2 @ 4ff33a7
 plan_commit: 26fe6a0
 close_commit: [set at close]
@@ -71,8 +71,12 @@ diet that earned it.
 <!-- QA: no tests here — docs + a config line. The gate is the check; read its report, not its code. -->
 
 ### T2 — Measure where the gate's 126 seconds actually go `[size: S · risk: low · class: decision · HITL]`
-Layers: `docs/research/qa-gate-timing.md` · `TECH-DEBT.md`
-Cites: `scripts/qa-check.sh` · `qa-check.sh` · `evals/` — measured, not modified; any change to them is a separate task · `skills/lean-doc-generator/templates/RESEARCH.md.template` · `templates/RESEARCH.md.template` — the format the timing doc is rendered from, read not edited
+Layers: `docs/research/qa-gate-timing.md` · `TECH-DEBT.md` · `docs/adr/ADR-015-cap-precision-and-grandfathering.md`
+<!-- ADR-015 is T1's artifact. It appears here because its missing frontmatter `status:` was caught by
+     the gate during T2 and fixed inside T2's commit, so history attributes the change to T2. Declared
+     rather than argued away — the checker attributes by commit, and the commit is what happened. -->
+
+Cites: `scripts/qa-check.sh` · `qa-check.sh` · `evals/` — measured, not modified; any change to them is a separate task · `skills/lean-doc-generator/templates/RESEARCH.md.template` · `templates/RESEARCH.md.template` — the format the timing doc is rendered from, read not edited · T1 — its ADR is cited in the note above, not depended on; T2 ran independently and in parallel with it
 Depends-on: none
 126s is one sample, taken once at one close, and every argument about the gate being too slow to keep
 running has been made against it. TD-046's own mitigation says the obvious lever — moving harnesses
@@ -164,12 +168,63 @@ _None._
      shipped → CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+Both tasks were measurement tasks, and both measurements changed the answer they were taken for. T1
+found that two of four cap breaches were not fat documents but imprecise caps. T2 found the gate's
+suspected cost centre was a third of the runtime while the unexamined remainder was two-thirds. The
+sprint's own theme held: nothing moved that the numbers did not carry.
 
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents).
+**Retrieval check** — no retrieval miss: no prior `L-NNN` or ADR was contradicted or failed to be
+found. One **planning** miss, caught by its gate rather than by recall — T1's Plan declared
+`DOCS_Guide.md` on `Cites:` while its own DoD offered a route that edits §2. G1 caught it before the
+first edit; it originated upstream in TASK-177's `touches:` line, which named `docs/adr/` and never
+§2's home, so the Backlog entry carried the gap into the Plan. Worth noting the gates caught three
+things this sprint that would otherwise have shipped: that undeclared route, `TODO.md` undeclared when
+TASK-179 was filed, and ADR-015 missing its frontmatter `status:`.
+
+**Cost** — coordinator inline (session model) + 1 dispatched agent. T1 ran inline throughout: it is
+`class: decision` and needed three owner rulings mid-task, which a worktree agent has no channel to
+ask through. T2 split — its measurement half went to a briefed Sonnet subagent (**~85k tokens, 29 tool
+calls, ~11.6 min wall-clock**) which returned numbers and source citations and made no rulings; the
+doc and the TD-046 ruling were written inline from that table. The split held cleanly and is worth
+repeating for measurement work: the expensive half is mechanical and the judgement half is short.
 
 **Worked**
+- **Testing the preflight's silence instead of trusting it.** `PREFLIGHT: CLEAR` printed no ownership
+  line, which is also what a parser reading zero tokens prints — TD-040 shipped exactly that twice. An
+  injected-overlap fixture (`AGENTS.md` into T2's `Layers:`) produced the named FAIL, proving the
+  parser read both declarations. Thirty seconds to convert a verdict into evidence.
+- **Reading the cap checker's per-row output rather than its exit status.** It prints `back under cap:
+  DELETE its grandfather row` per row that earned removal — the signal the task actually needed, and
+  invisible from a green exit (L-103).
+- **Re-verifying the subagent's load-bearing claim from source.** The "only two harnesses rescan the
+  live repo" finding was re-read directly out of both fixture files before it went into a durable doc.
+  An agent's summary is evidence about the reporter, not the artifact.
+- **Checking the archive route before dieting.** All three research docs were tested against §11 first
+  — a verdict a decision was built on should be superseded and archived, not trimmed. All three failed
+  it on both halves (live citers), which closed the route on evidence and stopped a plausible detour.
 
 **Friction**
+- **A DoD row and the artifact genuinely disagreed.** `graph-engineering.md` left the grandfather file
+  by a third route the frozen DoD did not contain — it is still 122 and the research cap is still 120.
+  Ruled from a popup that named the route explicitly, so it is a decision rather than a re-reading
+  (L-088), but the disagreement is real and is recorded in the Execution Log rather than smoothed over.
+- **Declaring one file under two spellings to satisfy a parser** (→ `TD-048`). A DoD naming a script
+  by basename is not matched by a full-path `Cites:` declaration, so T2 declared `scripts/qa-check.sh`
+  and bare `qa-check.sh` on the same line. Cosmetic, and the checker errs safely, but the reflex it
+  teaches is to satisfy the parser rather than declare the file.
+- **`Layers:` was corrected three times**, for the ADR route, for `TODO.md`, and at close for
+  `ADR-015`. Expected cost per L-100 rather than a planning failure — but every correction was found
+  by the gate, not by the author, which is the part worth watching.
+- **A T1 defect was fixed inside T2's commit, so history attributes it to T2.** ADR-015 shipped
+  without its frontmatter `status:`; the gate caught it while T2 was being committed and the fix went
+  in there. Nothing is wrong with the artifact and the mis-attribution is small, but it is the same
+  family as TD-044 — attribution is read from commits, so whichever task happens to be committing when
+  a defect surfaces inherits it. Declared on T2 rather than argued away, since the commit is what
+  happened.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- **`L-106`** — a figure written approximately into a machine-read standard is a decision that has not
+  been made, and the checker makes it for you at full precision. Two of four breaches were this.
+- **`L-107`** — a hypothesis about where cost goes names the component that is *legible*, not the one
+  that dominates. TD-046 blamed the harnesses because they are an enumerable list; the inline checks
+  had no name to accuse and were twice the size.

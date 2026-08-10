@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-058 — Measure Before Moving** → [docs/sprint/SPRINT-058-measure-before-moving.md](docs/sprint/SPRINT-058-measure-before-moving.md)
+> _None._ SPRINT-058 closed 2026-08-10.
 
 ---
 
@@ -66,6 +66,42 @@ status: current
       origin:     close-retro
       state:      ready
 
+- [ ] TASK-180 — Measure the QA gate's inline half (sections 1–11) directly  [size: S] [risk: low] [HITL]
+      class:      execution
+      done-when:  a per-section wall-clock breakdown of `scripts/qa-check.sh` sections 1–11 exists,
+                  measured directly rather than by subtraction, ≥2 samples, appended to
+                  `docs/research/qa-gate-timing.md`. The move/cheapen/keep decision for the gate is
+                  then made against that table
+      touches:    docs/research/qa-gate-timing.md · scripts/qa-check.sh (instrumentation only, if any)
+      depends-on: none
+      assumes:    SPRINT-058 T2 established the inline half is ~66% of the runtime, but **by
+                  subtraction** — full-run minus standalone-harness totals, two separate process
+                  invocations with their own cache state. Re-derive that share before acting on it
+                  (L-097); the proportion is sound, the second-level figures are not. If direct
+                  timing needs a script edit, that is a finding, not a workaround — T2's brief
+                  refused the same trade and the refusal is what kept the measurement honest
+      tracker:    TD-046 · docs/research/qa-gate-timing.md § Out of scope
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-181 — Rule on `loop-hygiene-prd.md`'s status: current vs superseded  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  the doc carries a deliberate `status:`, and the reasoning is recorded wherever the
+                  ruling lands. Either outcome is a result; what is not acceptable is the field
+                  staying `current` because nobody looked
+      touches:    docs/research/loop-hygiene-prd.md · skills/lean-doc-generator/references/DOCS_Guide.md
+                  (only if the RESEARCH status rule needs sharpening)
+      depends-on: none
+      assumes:    every workstream in the doc has shipped, which is what the RESEARCH template says
+                  triggers `superseded` — SPRINT-058 T1 corrected its "nothing here has been applied"
+                  banner on exactly that evidence. Note this changes nothing mechanical: §11 archives
+                  a superseded doc only once nothing live cites it, and three live surfaces cite this
+                  one, so it stays put and keeps its cap coverage either way. The question is whether
+                  the corpus should say true things about its own state, not whether a file moves
+      tracker:    SPRINT-058 T1 Execution Log, 2026-08-10 surprise entry
+      origin:     close-retro
+      state:      ready
+
 - [ ] TASK-179 — Guard ADR-015 rule 2: reject a soft-cap row in the grandfather file  [size: S] [risk: low] [AFK]
       class:      execution
       done-when:  `check-doc-caps.sh` FAILs when `doc-caps-grandfathered.txt` names a path whose §2
@@ -103,7 +139,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(SPRINT-058 in flight — nothing shipped yet)_ — SPRINT-057's shipped changes are written up as **v1.31.0** in [`CHANGELOG.md`](CHANGELOG.md); SPRINT-056's as **v1.30.0**, both awaiting the MINOR version bump (feature sprint → by hand; `/release-patch` is PATCH-only) — `plugin.json` still reads 1.29.0. SPRINT-055's (v1.29.0) and SPRINT-054's (v1.28.0) blocks rotated out at this promote → [`docs/changelog/CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md).
+_(no active sprint)_ — SPRINT-058's shipped changes are written up as **v1.32.0** in [`CHANGELOG.md`](CHANGELOG.md), SPRINT-057's as **v1.31.0** and SPRINT-056's as **v1.30.0**. All three await the MINOR version bump (feature sprint → by hand; `/release-patch` is PATCH-only) — `plugin.json` still reads 1.29.0. SPRINT-055's (v1.29.0) and SPRINT-054's (v1.28.0) blocks rotated → [`docs/changelog/CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md).
 
 ---
 

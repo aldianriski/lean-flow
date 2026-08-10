@@ -22,11 +22,27 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-105**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-107**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-107 [tags: process] [status: active]: **A hypothesis about where cost goes names the component that is *legible*, not the one that dominates — the enumerable list gets blamed and the undifferentiated blob beside it never gets suspected.** TD-046 recorded the QA gate at ~126s and proposed moving eval harnesses behind `QA_FULL=1`, on the suspicion that "several harnesses re-run their checker over the entire live repo". Measured (SPRINT-058 T2): the fourteen harnesses are **~34%** of the runtime and the inline checks are **~66%**. The specific suspicion was two harnesses of fourteen, costing ~10s together — and both are deliberate zero-coverage guards whose live input is the entire point, so they were the *last* things to cheapen rather than the first. The row was wrong in both directions at once, and it sat unchallenged for two sprints. What made the harnesses the suspect is not evidence, it is **shape**: they are a named list in a shell variable you can read, count and point at, so a hypothesis can be phrased about them. Sections 1–11 are an undifferentiated run of inline checks with no name, no count and no enumeration, so there was nothing to phrase a hypothesis *about* — and an unnameable component cannot be accused. The bias is structural rather than careless, which is why re-reading the row never caught it. The cheap counter is to force the arithmetic before the diagnosis: whatever the suspect costs, subtract it from the total and ask out loud what the remainder is. Here the remainder was twice the suspect and had never been measured by anyone. Distinct from L-097 (a figure that went stale — this figure was never taken) and from L-091 (a Mitigation is a hypothesis — this is *why* that particular hypothesis was reached for).
+- seen: Sprint-058
+- count: 1
+- promoted: no
+- related: L-091 (a `Mitigation:` is the filer's guess) · L-097 (a number in a criterion is remembered, not measured) · L-102 (run it live to find out what is true) · TD-046
+
+---
+
+## L-106 [tags: docs] [status: active]: **A figure written approximately into a machine-read standard is not a tolerance — it is a decision that has not been made, and the checker will make it for you at full precision.** DOCS_Guide §2 writes some caps as `~10`, `120 soft`, `~150 soft`. `check-doc-caps.sh` compares `actual <= cap` as exact integers; "soft" changes only whether a breach FAILs or merely reports, never the arithmetic. Clearing the four grandfathered breaches (SPRINT-058 T1) found that **two of the four were not fat docs at all** — they were this. `AGENTS.md` was 11 against `~10` and had no removable line: nine lines of content plus the two-line ownership footer §3 *mandates*, so the cap never budgeted for the thing the standard itself requires and was unreachable the day it was written. `graph-engineering.md` was 122 against `120 soft` with no movable section and no whitespace slack, where the only route to 120 was re-wrapping prose — same words, fewer physical lines, number green, document unchanged. Both had been carried as "drift" for sprints, and both had sat in a report that prints every run, which is how a row nobody can act on becomes wallpaper. The tell is a breach that resists every honest fix: when a doc cannot be trimmed without losing what it exists to say, the number is what is wrong. Writing `~` bought the appearance of judgement and deferred the decision onto whoever next tripped it — and because the file, not the standard, is what a breach visibly implicates, the cost lands on the wrong artifact. Approximate a figure a human reads; state a real one wherever a checker can reach it.
+- seen: Sprint-058
+- count: 1
+- promoted: no
+- related: ADR-015 (the ruling this produced) · L-097 (its sibling — a stated figure that rots, where this one was imprecise at birth) · L-099 (a rule its reader cannot read) · L-088 (the criterion met by re-reading it) · TASK-179
 
 ---
 

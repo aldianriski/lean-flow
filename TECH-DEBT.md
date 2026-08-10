@@ -23,6 +23,28 @@ status: current
 
 ## Tech Debt
 
+- **TD-048** severity: trivial | status: open | created: Sprint-058
+  - Summary: `check-layers-completeness.sh` matches a `Layers:`/`Cites:` declaration against DoD prose
+    **by token spelling, not by path identity**. A DoD that names a script by basename
+    (``a bare `qa-check.sh` run``) is not satisfied by a declaration of `scripts/qa-check.sh`, so
+    SPRINT-058 T2 had to declare the same file twice — `scripts/qa-check.sh` **and** bare
+    `qa-check.sh` — on one `Cites:` line, and the same for `templates/RESEARCH.md.template` against
+    its full `skills/lean-doc-generator/templates/…` path.
+  - Impact: cosmetic today, and the checker's direction of error is the safe one — it over-reports,
+    which costs a glance, where the miss would cost a silent false PASS (the sibling checker states
+    that trade explicitly). The concern is behavioural and small: the fix a task author reaches for
+    is to paste the second spelling, which trains the habit of satisfying the parser rather than
+    declaring the file. A `Layers:` line carrying two spellings of one path also reads as two files
+    to a human skimming the Plan, which is the surface the overlap map is drawn from.
+  - Mitigation (**not yet derived**, L-091): the obvious move is basename-aware matching — treat a
+    bare `x.sh` in prose as satisfied by any declared token ending `/x.sh`. **Re-derive before
+    building**: that widening could mask a genuine overlap between two same-named files in different
+    directories, which is precisely the case the overlap map exists to catch, and this repo has
+    several (`evals/run-*-fixtures.sh` vs `scripts/lib/check-*.sh` share no basenames today, but
+    nothing prevents it). Cheaper alternative worth pricing first: leave the parser alone and let the
+    DoD prose carry full paths, which is better writing anyway. Do not act on one sighting (TD-031's
+    pattern).
+
 - **TD-047** severity: minor | status: open | created: Sprint-057
   - Summary: `night-run.md` is **414 lines** and carries five Parts plus a pre-flight checklist that
     now runs to a dozen items, several of them multi-paragraph. It has no cap: DOCS_Guide §2 does not

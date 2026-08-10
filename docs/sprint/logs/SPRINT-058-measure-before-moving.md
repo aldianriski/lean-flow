@@ -3,7 +3,7 @@ sprint: 058
 slug: measure-before-moving
 owner: Maintainer
 last_updated: 2026-08-10
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -135,3 +135,14 @@ against `plan_commit` over `scripts/qa-check.sh` and `evals/` is empty.
 Dispatch note for the cost series: T2's measurement half ran on a briefed Sonnet subagent (~85k tokens,
 29 tool calls, ~11.6 min wall-clock) while T1 ran inline on the session model. The split held — the
 agent returned numbers and source citations and made no rulings, which is what the brief asked for.
+
+### 2026-08-10 | close | Retro written, four buckets routed, retention proposed not applied
+All 11 DoD `[x]`. Buckets: **Shipped** → CHANGELOG v1.32.0 · **Tech debt** → `TD-048` (Layers/Cites
+matched by token spelling, so one file needed two spellings) · **Follow-ups** → `TASK-180` (measure the
+inline half directly — T2's 66% is a subtraction, not a measurement) and `TASK-181` (rule on the
+loop-hygiene PRD's `status:`), both stamped `origin: close-retro`; `TASK-179` was filed during
+execution as `origin: manual` since it came from ADR-015, not from this Retro · **Learnings** →
+`L-106` (an approximate figure in a machine-read standard) and `L-107` (the legible suspect).
+§11 retention and the doc-freshness pass are **proposed, not applied** — they are lossy and
+approval-bound, and approving my own retention pass to finish the close is the one thing the procedure
+names outright.
