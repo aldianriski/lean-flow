@@ -32,6 +32,36 @@ status: current
 
 ## Tech Debt
 
+- **TD-051** severity: medium | status: open | created: Sprint-061
+  - Summary: **`check-layers-observed.sh` (gate leg 15) never sees a close commit, because the close
+    commit is also the archival commit.** Line 225 skips any sprint file under `*/archive/*`, and its
+    comment states the precondition that makes that safe: *"A closed sprint leaves `docs/sprint/` in
+    §11's retention commit, which is separate from and later than the close commit, so the close
+    commit itself stays covered."* That precondition is false. `/lean-doc-generator close` performs
+    §11 archival and the squash-commit as one step, and the last three closes all did — verified by
+    `git show --name-status` on `afd693d` (SPRINT-060), `0b4e06a` (SPRINT-059) and this sprint's
+    `2f90504`, each carrying the `R` rename into `archive/` inside the close commit itself.
+  - Impact: the blind spot lands on the **largest and least task-like commit of every sprint** — the
+    one touching four manifests, README, CHANGELOG, TODO, LEARNINGS, the sprint file and, when a close
+    uncovers a defect, real code. SPRINT-061's close changed `scripts/lib/check-layers-observed.sh`
+    and `evals/run-layers-observed-fixtures.sh`, and leg 15 reported `skip (missing)` rather than
+    checking them. Found only because that change was to leg 15 itself, so its verification was being
+    attempted deliberately; a close that touches code for any other reason would pass unremarked. This
+    is L-105's shape (a correct rule evaluated at the wrong moment) sitting on top of L-099's (a
+    precondition written where nothing enforces it) — and the skip is **silent**, so nothing in the
+    gate's output distinguishes "checked and clean" from "never looked".
+  - Mitigation (**not yet derived**, L-091): at least three candidates with real trade-offs, and the
+    obvious one is not obviously right. (a) Split archival out of the close commit, restoring the
+    stated precondition — cheapest to reason about, but it makes every close two commits and §11
+    deliberately groups the sprint and its log *"as one record"*. (b) Teach the checker to resolve a
+    sprint that moved into `archive/` **within the commit being checked** — most faithful, and the
+    most parsing. (c) Make the skip loud rather than silent, so a close at least reports that leg 15
+    did not run — smallest, fixes the invisibility without fixing the coverage. **Do not reach for (a)
+    on the grounds that it restores the comment's assumption**: the assumption was written before the
+    close procedure grouped these steps, so the comment may simply be out of date rather than a
+    requirement. Establish first whether any close commit has ever carried an undeclared file that
+    mattered — this may be a real hole that has never been fallen into.
+
 - **TD-050** severity: minor | status: open | created: Sprint-060
   - Summary: **section 4 of `scripts/qa-check.sh` (knowledge metadata — index freshness, dangling refs,
     frontmatter completeness, ADR-009) is 45–49% of the entire gate on its own** — 75–76 s of a
