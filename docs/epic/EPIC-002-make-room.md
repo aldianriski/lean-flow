@@ -59,8 +59,9 @@ records are history, and history is not corpus) · relaxing a gate to reduce wor
 
 ## Open questions
 
-- Does §11's trigger list or §2's caps own the soft-cap report? → TASK-193's G2; re-derive before
-  writing (L-091) — "add a fifth checklist line" is the obvious move and may be wrong.
+- ~~Does §11's trigger list or §2's caps own the soft-cap report?~~ **Answered, SPRINT-062 T2:** §2
+  owns caps, §11 owns retention; the doc-aging line reads both. The "fifth checklist line" instinct was
+  indeed wrong — the enumeration was the wrong *source*, not an incomplete list.
 - Can 11 checkers consolidate without losing per-check named findings? → a `/prototype` if it cannot
   be settled on paper; the named finding is the contract (L-058), not the file count.
 
