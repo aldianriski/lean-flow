@@ -3,8 +3,8 @@ epic: 002
 slug: make-room
 owner: Maintainer
 last_updated: 2026-08-10
-status: proposed
-member_sprints: []
+status: active
+member_sprints: [SPRINT-062]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -46,7 +46,7 @@ records are history, and history is not corpus) · relaxing a gate to reduce wor
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| _(appended at promote)_ | | | |
+| [SPRINT-062](../sprint/SPRINT-062-room-to-write.md) | Room to Write — three governance signals, and whether anything is listening | active | _(completed at close)_ |
 
 ## Decisions
 

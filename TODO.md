@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-061 closed 2026-08-10 (3 of 3).
+> **SPRINT-062 — Room to Write** → [docs/sprint/SPRINT-062-room-to-write.md](docs/sprint/SPRINT-062-room-to-write.md) · `epic: EPIC-002`
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room** (runs first — the caps block everything after it) → **EPIC-003 The Standard**
