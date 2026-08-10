@@ -32,37 +32,21 @@ status: current
 
 ### P2 — Quality / Polish
 
-- [ ] TASK-177 — Put the four grandfathered cap breaches on a diet, or move their caps by ADR  [size: M] [risk: low] [HITL]
+- [ ] TASK-182 — Run the CONTEXT.md dedup pass; it is at 129/130  [size: M] [risk: low] [HITL]
       class:      decision
-      done-when:  `scripts/lib/doc-caps-grandfathered.txt` is empty, and each entry left it by one of
-                  two routes recorded in the file's history: the doc came back under its stated cap,
-                  or its cap moved by ADR after a measured diet (§7). The checker already prints
-                  "back under cap: DELETE its grandfather row" when a row has earned removal
-      touches:    docs/research/{loop-hygiene-prd,graphify-daily-value,graph-engineering}.md ·
-                  AGENTS.md · scripts/lib/doc-caps-grandfathered.txt · docs/adr/ if a cap moves
+      done-when:  `.claude/CONTEXT.md` has real headroom again, with every removal being prose that
+                  duplicated `CLAUDE.md` or `README.md` and is replaced by a pointer — never the
+                  SSOT's own content compressed to make a number go green (§7, and L-106's shape one
+                  level up)
+      touches:    .claude/CONTEXT.md · .claude/CLAUDE.md and README.md if a pointer target needs one
       depends-on: none
-      assumes:    the three research docs (214 · 157 · 122 against 120) split by moving whole
-                  sections, never by compressing — §7 says knowledge docs split and ledgers compress,
-                  and SPRINT-054 T4 has a worked precedent. AGENTS.md at 11 vs ~10 is the odd one:
-                  the cap is written approximate and the file is a thin pointer, so the honest fix
-                  may be to state a real number in §2 rather than to trim a line
-      tracker:    SPRINT-056 T2 — the check that found them; three were known, AGENTS.md was not
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-178 — Measure where the gate's 126 seconds actually go before moving anything  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  a per-harness timing breakdown exists for a bare `qa-check.sh` run, and the
-                  decision to move / cheapen / keep each always-on harness is made against that
-                  table rather than against an impression
-      touches:    scripts/qa-check.sh · evals/ (measurement only; changes are a separate task)
-      depends-on: none
-      assumes:    no harness is moved to `QA_FULL=1` inside this task. Moving one is a coverage
-                  reduction and carries L-076's proof obligation — demonstrate what a bare run no
-                  longer catches — which is its own work. This task produces the number that decision
-                  needs, because there isn't one: 126s is the only figure anyone has, and the
-                  per-harness split has never been taken (L-097)
-      tracker:    TD-046
+      assumes:    the duplication is there to find. TD-006 and L-008 both describe this file
+                  accreting its satellites' prose, and the dedup pass has run once in ~50 sprints —
+                  but that is the *hypothesis*, not the finding (L-091). Re-derive by diffing the
+                  three files' overlapping sections before deciding anything is removable; if the
+                  overlap turns out to be small, the honest answer is an ADR moving the cap, exactly
+                  as ADR-007 did to reach 130 in the first place
+      tracker:    TD-006 · SPRINT-058 close sweep — L-105's promotion took it to 129/130
       origin:     close-retro
       state:      ready
 
