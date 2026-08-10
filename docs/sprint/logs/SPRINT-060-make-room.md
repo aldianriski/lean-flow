@@ -102,3 +102,36 @@ correction therefore lands where operators actually read it — the grandfather 
 now names the enforcement, its fixtures, and its firing rule. Flagged rather than quietly reconciled,
 because "a doc in the corpus says something no longer true" is exactly the class SPRINT-058 T1 and
 TASK-181 exist for; if the owner prefers a superseding note on ADR-015, that is a one-line change.
+
+### 2026-08-10 | surprise | T3 — the inline half is not a blob; one section is half the gate
+
+Direct per-section measurement, 2 samples, at 136 checks. **Sections 1–11 are 60.8% / 63.7%** — the
+SPRINT-058 subtraction was sound as a proportion, exactly as its own caveat claimed.
+
+**But the proportion was never the interesting number. Section 4 (knowledge metadata, ADR-009) alone is
+45.3% / 48.9% of the entire gate** — 75–76 s, larger than all fifteen eval harnesses combined. One
+section of eighteen carries almost half the runtime; the other seventeen sum to ~14%. It is also the
+most *stable* thing in the gate (76.4 → 75.1 s, <2% apart) while the harness section swings 16%.
+Variance lives in the harnesses; cost lives in section 4.
+
+**This is L-107 repeating one level down, inside the sprint that promoted it.** TD-046 blamed the
+enumerable list because it was the only component you could phrase a hypothesis about. SPRINT-058
+measured that list, cleared it, and named the remainder — then measured the remainder as a *blob*, so
+"the inline half is 66%" became the new resting place. It is not a blob. The same cheap counter applies
+one level down: subtract the suspect from the total and ask out loud what the remainder is made of.
+
+**Method, recorded because the DoD asked for it.** No script edit was needed, so item 3's "that is a
+finding" clause never fired: `awk` produced a byte-identical instrumented copy in a temp dir, and
+`scripts/qa-check.sh` and `evals/` are verifiably untouched (`git diff --stat` empty). The copy `cd`s to
+the repo root via `git rev-parse` and has no `$0`-relative paths, so it runs the identical code path.
+Residual caveat stated rather than hidden: a copy is not the artifact.
+
+**Total re-taken: 130 s @ 131 checks → 154–169 s @ 136.** Growth is not proportional to check count,
+which is another way of saying the count is not the cost driver.
+
+Recommendation recorded in the research doc: the lever, if ever pulled, is section 4 — not the
+harnesses, which have now been cleared twice. Nothing moved or cheapened; T3 measures and does not cure.
+
+**Noted, not fixed:** the research doc is now 169 lines against a 120 **soft** cap, so it reports and
+routes to the promote governance review (§11) — and by T2's rule shipped an hour ago it is ineligible
+for the grandfather list, which is the intended behaviour meeting itself.

@@ -70,7 +70,7 @@ named finding.
 <!-- QA: the fixture IS the test; a guard with no must-FAIL fixture is L-058's silent false negative. -->
 
 ### T3 — Measure the QA gate's inline half (sections 1–11) directly `[size: S · risk: low · class: execution · HITL]`
-Layers: `docs/research/qa-gate-timing.md` · `scripts/qa-check.sh` (instrumentation only, if any)
+Layers: `docs/research/qa-gate-timing.md` (`scripts/qa-check.sh` NOT edited — an instrumented copy was used instead)
 Depends-on: none
 Cites: T2
 
@@ -82,10 +82,10 @@ the second-level figures are not. The gate has since grown to 141 checks and ~17
 directly, and the move/cheapen/keep decision is made against it.
 
 **DoD:**
-- [ ] Per-section breakdown of sections 1–11, measured **directly** rather than by subtraction, ≥2 samples
-- [ ] Appended to `docs/research/qa-gate-timing.md` with the measurement method stated
-- [ ] If direct timing needs a script edit, that is recorded as a **finding**, not worked around — SPRINT-058 T2's brief refused the same trade and the refusal is what kept the measurement honest
-- [ ] The current total is re-taken too: the gate was ~130 s at 131 checks and is now ~173 s at 141
+- [x] Per-section breakdown of sections 1–11, measured **directly** rather than by subtraction, ≥2 samples
+- [x] Appended to `docs/research/qa-gate-timing.md` with the measurement method stated
+- [x] If direct timing needs a script edit, that is recorded as a **finding**, not worked around — SPRINT-058 T2's brief refused the same trade and the refusal is what kept the measurement honest
+- [x] The current total is re-taken too: the gate was ~130 s at 131 checks and is now ~173 s at 141
 <!-- QA: measurement task; the numbers are the deliverable. -->
 
 ### T4 — Rule on `loop-hygiene-prd.md`'s status: current vs superseded `[size: S · risk: low · class: decision · HITL]`
