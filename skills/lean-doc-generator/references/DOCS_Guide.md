@@ -45,7 +45,7 @@ gating → §6.
 | File | Reader | Cap | Create ← | Update ← | Archive |
 |---|---|---|---|---|---|
 | `CLAUDE.md` | AI assistant | 80 | init (always) | project shape / workflow / anti-patterns change | — |
-| `CONTEXT.md` | AI assistant | 130 (ADR-007) | init (always) | vocabulary / patterns / conventions change | — |
+| `CONTEXT.md` | AI assistant | 150 (ADR-017) | init (always) | vocabulary / patterns / conventions change | — |
 
 **`docs/` tree** (tier column per §6; legacy lean paths in parentheses stay matched second):
 
@@ -259,7 +259,7 @@ their §11 leg retires them.
 | HOW documentation | Redirect to a code comment |
 | Orphan doc (no header) | Add header before touching file |
 | Person ownership ("Alice") | Reassign to a role |
-| Mega doc (over line limit) | Split per §2; never raise the limit **to fit content**. A cap moves only by ADR, and only after a diet pass has been measured first — the precedent is ADR-007 (`CONTEXT.md` → 130) and ADR-006 as amended (`SKILL.md` → 140). Raising it silently is what the rule forbids; an ADR that records the argument is the escape hatch, cited inline in §2 |
+| Mega doc (over line limit) | Split per §2; never raise the limit **to fit content**. A cap moves only by ADR, and only after a diet pass has been measured first — the precedent is ADR-007 then ADR-017 (`CONTEXT.md` → 130 → 150) and ADR-006 as amended (`SKILL.md` → 140); **a second raise on one file is a signal that file is doing too many jobs, not a routine renewal**. Raising it silently is what the rule forbids; an ADR that records the argument is the escape hatch, cited inline in §2 |
 | Sprint file > 400 lines | Block — split the sprint |
 | Stale doc used as source | Run the staleness scan first |
 | File outside the core set | Redirect to code or an existing core file |

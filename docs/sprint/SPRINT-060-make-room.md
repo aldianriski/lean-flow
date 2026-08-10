@@ -33,7 +33,7 @@ with reasons · any change to what the QA gate checks (T3 measures, it does not 
 ## Plan
 
 ### T1 — Run the CONTEXT.md dedup pass; both SSOT files are at their caps `[size: M · risk: low · class: decision · HITL]`
-Layers: `.claude/CONTEXT.md` · `.claude/CLAUDE.md` · `README.md` (only if a pointer target needs one)
+Layers: `.claude/CONTEXT.md` · `.claude/CLAUDE.md` · `README.md` (only if a pointer target needs one) · `docs/adr/ADR-017-context-cap-150.md` · `docs/DECISIONS.md` · `skills/lean-doc-generator/references/DOCS_Guide.md` (§2 cap row + §7 precedent) · `docs/knowledge-index.md` (generated)
 Depends-on: none
 
 This is the keystone. `L-108` earned promotion (`count: 3`) at this sprint's promote and had nowhere to
@@ -44,11 +44,11 @@ that duplicates a satellite, replaced by a pointer.
 duplicated `CLAUDE.md` or `README.md`.
 
 **DoD:**
-- [ ] The three files' overlapping sections are diffed before anything is judged removable — the duplication is the *hypothesis* (TD-006, L-008), not the finding (L-091)
-- [ ] Every removal is prose duplicating a satellite, replaced by a pointer — **never the SSOT's own content compressed to make a number go green** (§7, L-106)
-- [ ] If the overlap turns out to be small, the honest outcome is an ADR moving the cap, exactly as ADR-007 did to reach 130 — that is a result, not a failure
-- [ ] `CLAUDE.md` at 80/80 is assessed the same way; say explicitly whether it gained room or not
-- [ ] The resulting headroom is stated as a number, so the next promote knows whether `L-108` can land
+- [x] The three files' overlapping sections are diffed before anything is judged removable — the duplication is the *hypothesis* (TD-006, L-008), not the finding (L-091)
+- [x] Every removal is prose duplicating a satellite, replaced by a pointer — **never the SSOT's own content compressed to make a number go green** (§7, L-106)
+- [x] If the overlap turns out to be small, the honest outcome is an ADR moving the cap, exactly as ADR-007 did to reach 130 — that is a result, not a failure
+- [x] `CLAUDE.md` at 80/80 is assessed the same way; say explicitly whether it gained room or not
+- [x] The resulting headroom is stated as a number, so the next promote knows whether `L-108` can land
 <!-- QA: docs change; the gate's doc-caps checker is the verification. -->
 
 ### T2 — Guard ADR-015 rule 2: reject a soft-cap row in the grandfather file `[size: S · risk: low · class: execution · AFK]`

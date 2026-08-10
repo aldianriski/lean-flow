@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-017](adr/ADR-017-context-cap-150.md) | `CONTEXT.md` cap 130 → 150 — the file grows by design, not by duplication | accepted | 2026-08-10 |
 | [ADR-016](adr/ADR-016-rollup-at-the-exit-path.md) | The night-run rollup is emitted by the launcher, not requested from the run | accepted | 2026-08-10 |
 | [ADR-015](adr/ADR-015-cap-precision-and-grandfathering.md) | A stated cap is a real number; the grandfather file is hard-caps-only | accepted | 2026-08-10 |
 | [ADR-014](adr/ADR-014-sprint-log-split.md) | Split the Execution Log into an uncapped `docs/sprint/logs/` sibling so the 400-line cap governs only the Plan | accepted | 2026-08-09 |
