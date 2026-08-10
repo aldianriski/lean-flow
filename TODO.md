@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-059 closed 2026-08-10.
+> **SPRINT-060 — Make Room** → [docs/sprint/SPRINT-060-make-room.md](docs/sprint/SPRINT-060-make-room.md)
 
 ---
 
