@@ -34,7 +34,7 @@ gating → §6.
 | `SECURITY.md` | Anyone | ~80 | init (always) | auth model · secret policy · vulnerability-reporting change | — |
 | `CHANGELOG.md` | Reviewer | append-only | first release or sprint close (always-core — ADR-012 deviation) | sprint close · release | rotate at new MINOR → `docs/changelog/` (§11) |
 | `LICENSE` | Anyone | — | init (license chosen; private → proprietary notice) | license change (rare) | — |
-| `AGENTS.md` | AI tools | ~10 | init (always) — **thin pointer to `.claude/CLAUDE.md`, never duplicated instructions** | pointer targets move | — |
+| `AGENTS.md` | AI tools | 12 (ADR-015) | init (always) — **thin pointer to `.claude/CLAUDE.md`, never duplicated instructions** | pointer targets move | — |
 | `.env.example` | Dev | — | init **safe-scaffold** (write-if-absent; names only, never values) | a new env var is introduced | — |
 | `.gitignore` | git | — | init **safe-scaffold** (write-if-absent; from the §12 boundary rule) | a new generated-artifact class appears | — |
 | `TODO.md` | Dev / AI | ~150 soft | init (always) | backlog change · sprint promote/close | §11 prune |

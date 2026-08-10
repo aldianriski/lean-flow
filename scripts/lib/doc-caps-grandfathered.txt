@@ -4,8 +4,18 @@
 # The check still bites. actual > recorded -> FAIL (it grew under the clause). cap < actual <=
 # recorded -> reported, named, tracked. actual <= cap -> PASS and the row is told to delete itself.
 #
+# HARD CAPS ONLY (ADR-015, SPRINT-058 T1). A soft cap ("~N" / "N soft" in DOCS_Guide §2) already has
+# a route: the checker's soft branch reports the breach on every run and §11 sends it to the promote
+# governance review for a prune-with-the-owner. Recording it here as well buys only the growth
+# ratchet, at the price of a permanent row in a file whose whole purpose is to reach empty. Do not
+# add a soft-cap row. NOTE: nothing enforces this yet -- the rule is prose until its guard ships with
+# a must-FAIL fixture (L-058); the follow-up is filed as a TASK.
+#
 # format: <path> <count-at-adoption> <reason-no-spaces>
-AGENTS.md 11 ~10-is-approximate;-thin-pointer-1-line-over
-docs/research/graph-engineering.md 122 §7-diet-moves-only-by-ADR-after-a-measured-pass
-docs/research/graphify-daily-value.md 157 §7-diet-moves-only-by-ADR-after-a-measured-pass
-docs/research/loop-hygiene-prd.md 214 §7-diet-moves-only-by-ADR-after-a-measured-pass
+#
+# EMPTY as of SPRINT-058 T1 (2026-08-10). The four adopted rows left by three routes:
+#   docs/research/loop-hygiene-prd.md      214 -> 118  diet, sections split out (§7)
+#   docs/research/graphify-daily-value.md  157 -> 107  diet, sections split out (§7)
+#   AGENTS.md                              cap ~10 -> 12, ADR-015 (the cap never budgeted for the
+#                                          two-line ownership footer §3 mandates)
+#   docs/research/graph-engineering.md     122, soft cap -> not grandfathered, ADR-015 rule 2

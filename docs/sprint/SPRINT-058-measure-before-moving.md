@@ -4,6 +4,7 @@ slug: measure-before-moving
 owner: Maintainer
 last_updated: 2026-08-10
 status: active
+gates_signed: G1,G2 @ 4ff33a7
 plan_commit: 26fe6a0
 close_commit: [set at close]
 update_trigger: sprint execute/close events
@@ -36,8 +37,11 @@ TD-044's phase-split fix did not touch · the pending MINOR bump: `plugin.json` 
 ## Plan
 
 ### T1 — Clear the four grandfathered cap breaches by diet or by ADR `[size: M · risk: low · class: decision · HITL]`
-Layers: `docs/research/loop-hygiene-prd.md` · `docs/research/graphify-daily-value.md` · `docs/research/graph-engineering.md` · `AGENTS.md` · `scripts/lib/doc-caps-grandfathered.txt` · `docs/adr/` · `docs/DECISIONS.md`
-Cites: `skills/lean-doc-generator/references/DOCS_Guide.md` §2/§7 — the caps and the diet clause are read here, not edited · `docs/research/mattpocock.md` and SPRINT-054 T4 — the worked precedent for a split, read as an example and not touched
+Layers: `docs/research/loop-hygiene-prd.md` · `docs/research/graphify-daily-value.md` · `docs/research/graph-engineering.md` · `AGENTS.md` · `scripts/lib/doc-caps-grandfathered.txt` · `docs/adr/` · `docs/DECISIONS.md` · `skills/lean-doc-generator/references/DOCS_Guide.md` · `docs/research/loop-hygiene-workstreams.md` · `docs/research/loop-hygiene-findings.md` · `docs/research/graphify-reference-run.md` · `docs/knowledge-index.md` · `TODO.md`
+Cites: `docs/research/mattpocock.md` and SPRINT-054 T4 — the worked precedent for a split, read as an example and not touched
+<!-- Layers: corrected mid-task (L-100) — see the 2026-08-10 scope-change entry in the Execution Log.
+     DOCS_Guide.md moved Cites: -> Layers: when the ADR route was ruled; the three sibling docs did
+     not exist when the Plan was frozen. -->
 Depends-on: none
 The grandfather file is a **report, not an exclusion** — every row prints on every run, and a row that
 prints forever stops being read, which is how the breach it names becomes permanent. Each row leaves by
@@ -52,16 +56,16 @@ the route it took is legible from git — a doc back under cap, or an ADR record
 diet that earned it.
 
 **DoD:**
-- [ ] Each of the four counts **re-measured at task start** against the value recorded in the
+- [x] Each of the four counts **re-measured at task start** against the value recorded in the
       grandfather file before any of it is acted on (L-097 — a stated figure is re-derived, never carried)
-- [ ] The three research docs are under 120 by **moving whole sections into a tree behind an index**, or
+- [x] The three research docs are under 120 by **moving whole sections into a tree behind an index**, or
       their cap is moved by an ADR citing the measured diet — never by compressing prose (§7 ·
       SPRINT-054 T4's precedent, `docs/research/mattpocock.md` 159 → 110 with nothing compressed)
-- [ ] `AGENTS.md` resolved on its own terms — trimmed to its cap, **or** §2's approximate `~10` replaced
+- [x] `AGENTS.md` resolved on its own terms — trimmed to its cap, **or** §2's approximate `~10` replaced
       with a real number by ADR. The approximate cap is what is being ruled on, not the file
-- [ ] `scripts/lib/doc-caps-grandfathered.txt` contains zero data rows; the header comment stays, since
+- [x] `scripts/lib/doc-caps-grandfathered.txt` contains zero data rows; the header comment stays, since
       it documents the format the next breach will be recorded in
-- [ ] `sh scripts/qa-check.sh` green, and the cap check's **output** read per row — it already prints
+- [x] `sh scripts/qa-check.sh` green, and the cap check's **output** read per row — it already prints
       `back under cap: DELETE its grandfather row`, and that line is the per-row signal, not the exit
       status (L-103 — assert on content; all three of SPRINT-056's omissions exited 0)
 <!-- QA: no tests here — docs + a config line. The gate is the check; read its report, not its code. -->
@@ -138,6 +142,18 @@ _None._
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/research/loop-hygiene-prd.md` | T1 | 214 → 118; two sections moved out (§7 diet) + a false "nothing here has been applied" banner corrected | Low | cap check PASS 118 ≤ 120 |
+| `docs/research/loop-hygiene-workstreams.md` | T1 | new — W0–W6 moved verbatim | Low | cap check PASS 85 ≤ 120 |
+| `docs/research/loop-hygiene-findings.md` | T1 | new — 29-row findings register moved verbatim | Low | cap check PASS 49 ≤ 120 |
+| `docs/research/graphify-daily-value.md` | T1 | 157 → 107; reference run + consumer path moved out | Low | cap check PASS 107 ≤ 120 |
+| `docs/research/graphify-reference-run.md` | T1 | new — the measured run and the rules derived from it | Low | cap check PASS 73 ≤ 120 |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §2 `AGENTS.md` cap `~10` → `12` (ADR-015) — the cap never budgeted for the footer §3 mandates | Low | cap check PASS 11 ≤ 12 |
+| `docs/adr/ADR-015-cap-precision-and-grandfathering.md` | T1 | new — records both cap rulings and the accepted loss of the soft-cap growth ratchet | Low | corpus metadata + refs lint |
+| `docs/DECISIONS.md` | T1 | ADR-015 index row | Low | corpus refs resolve |
+| `scripts/lib/doc-caps-grandfathered.txt` | T1 | emptied of data rows; header now states the hard-caps-only rule | Low | no grandfathered rows printed |
+| `AGENTS.md` | T1 | unchanged — the cap moved, the file did not | Low | cap check PASS |
+| `TODO.md` | T1 | TASK-179 filed (the guard ADR-015 names as missing) | Low | TODO hygiene check |
+| `docs/knowledge-index.md` | T1 | regenerated (derived) after three new metadata-carrying docs | Low | knowledge index current |
 
 ## Retro
 

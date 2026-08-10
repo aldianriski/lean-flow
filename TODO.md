@@ -66,6 +66,23 @@ status: current
       origin:     close-retro
       state:      ready
 
+- [ ] TASK-179 — Guard ADR-015 rule 2: reject a soft-cap row in the grandfather file  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  `check-doc-caps.sh` FAILs when `doc-caps-grandfathered.txt` names a path whose §2
+                  cap is soft (`~N` / `N soft`), with a retained must-FAIL fixture holding exactly
+                  that violation (L-058). Today the rule is prose in the file's header and in
+                  ADR-015; nothing stops the next breach being recorded there
+      touches:    scripts/lib/check-doc-caps.sh · scripts/lib/doc-caps-grandfathered.txt ·
+                  evals/fixtures/doc-caps/ · evals/run-doc-caps-fixtures.sh
+      depends-on: none
+      assumes:    the checker already parses soft-vs-hard (it does — `soft = (cap ~ /~/ ||
+                  cap ~ /soft/)`), so this is a comparison against a list it already reads, not new
+                  parsing. Re-derive before building (L-091): ADR-015's Negative section names this
+                  guard's absence as an accepted trade, so confirm it is still worth closing
+      tracker:    ADR-015 § Consequences — "nothing enforces rule 2 yet"
+      origin:     manual
+      state:      ready
+
 ### P3 — Long-term
 
 > Rejected work lives in **`.out-of-scope/`** — each file carries its own reasoning, revisit-if and

@@ -11,8 +11,8 @@ related: [loop-mechanics-audit, trigger-accuracy-audit, okf-adoption]
 # Process Loop Engineering & Docs Hygiene — PRD
 
 > Source: full-corpus audit 2026-07-17 (4 parallel passes: loop-core skills · support skills ·
-> docs corpus · cross-cutting consistency). Evidence appendix at the bottom. Review-first —
-> nothing here has been applied.
+> docs corpus · cross-cutting consistency). Evidence register split out below. **Since applied** —
+> the workstreams shipped across later sprints; read this as a record, not as a proposal (SPRINT-058 T1).
 
 ## Problem Statement
 
@@ -77,73 +77,7 @@ enforcement) deferred: lint-in-script is the lower rung on the laziness ladder.
 
 ## Implementation Decisions
 
-### W1 — Hygiene enforcement loop (P0 · the complaint)
-- **Tombstone standard**: define ONE canonical tombstone string that `lean-doc-generator close`
-  writes (e.g. `<!-- shipped: TASK-NNN[, …] → SPRINT-NNN vX.Y.Z · CHANGELOG -->`) and that
-  §11's delete rule + a new qa-check lint both match. Policy: a tombstone survives exactly one
-  sprint (written at close N, deleted at close N+1) — or delete immediately; decide at G2.
-- **Close sweep** (new named substep in the close row): delete matured tombstones · grep TODO.md
-  for any reference to the just-closed `SPRINT-NNN` outside § Active Sprint and refresh/delete ·
-  verify CHANGELOG-rotation links still resolve. Presented propose→approve.
-- **qa-check.sh extensions** (each a cheap grep-class check): tombstone-format lint · README
-  footer version == plugin.json version · ownership frontmatter on CLAUDE.md + README (extend
-  the fixed 7-file list) · TD entries with `created:` ≥3 closed sprints ago and no re-review
-  annotation → FAIL · temp-dir/`(temp)` tracker refs in TODO.md → FAIL · no hand-written
-  "currently N/cap" snapshots outside generated docs (fix docs/QA.md:24 by deleting the snapshot).
-- **gen-index.sh**: rewrite `last_updated` on every run (one-line sed fix).
-- **Promote aging becomes a checklist**: §10's promote-time scan (TD aging · L-promotion ·
-  dedup-when-near-cap) emitted as explicit checkbox lines in promote's output, not recalled prose.
-
-### W2 — Wiring (P1)
-- Triage: add a bug-intake step implementing CONTEXT.md:53's routing, or delete the claim.
-- Promote: intake filters `state: ready` explicitly (consumes triage's shortlist contract).
-- Prime: add `Next:` branch — backlog exists but nothing `ready` → `/triage`.
-- CONTEXT.md built-in list: drop `/fork` (or wire it); point `/simplify` at its actual home
-  (`orchestrator/references/review-scoping.md`).
-- Loop statement: keep the 3-node headline but suffix it with the feed pipeline in the same
-  sentence, so a verbatim reader can't skip decomposer/triage.
-- G1 ownership: orchestrator states the rule — task arrived via decomposer `approve` → G1 runs
-  as a 10-second "scope unchanged since approval? y/n" fast-path; otherwise full G1.
-
-### W3 — Gate clarity (P1)
-- No G3. Close + promote each get one explicit human-approval line before their write/commit
-  actions, mirroring triage/decomposer verbs. Promote: after governance review, before render.
-  Close: before the delete/archive/squash sequence (the W1 sweep is inside this approval).
-
-### W4 — Knowledge integrity (P1)
-- `L-NNN` ids monotonic forever; §11 pruning removes the *body*, never frees the id (leave a
-  one-line `L-016: promoted → CLAUDE anti-pattern` stub or a retired-ids line in LEARNINGS.md).
-- Fix the two live collisions (tdd:82 cites old L-016 · task-decomposer:89 cites old L-017) and
-  the dangling L-024/L-037/L-042 cites — replace with "(promoted → red-flag)" wording.
-- Citation policy for shipped surface: generic SKILL.md/references cite no repo-local ids;
-  rationale is inlined or dropped. Repo-local docs (CLAUDE/CONTEXT) may cite freely.
-- Verdict archival: a council verdict referenced by any durable doc is copied into
-  `docs/research/verdict-<slug>.md` at reference time; TODO trackers point there. Fix TASK-040/047.
-
-### W5 — Consumer surface (P2)
-- `insights`: drop the `scripts/gen-index.sh` parenthetical (generalize to "the project's own
-  index-regen command, if any"); inline the minimal LEARNINGS entry shape instead of pointing
-  at lean-doc-generator's private template.
-- `prime:38` and `dispatch.md:5`: inline the one-line rationale, drop `docs/research/…` pointers.
-- Sweep remaining SPRINT/TASK-NNN ballast from generic files on next touch (low priority).
-
-### W6 — Format standard (P2)
-- Document the canonical SKILL.md skeleton once (DOCS_Guide or a short style note):
-  frontmatter (6 fields, `argument-hint` may be `""`) → `## When to invoke` (optional but
-  canonical name) → one procedure section (name free) → `## Output format` (required only for
-  deterministic-output skills) → `## Hard rules` (optional) → `## Red flags` (required, ❌-bullets).
-  Normalize deviations: council gets `argument-hint` + `${CLAUDE_SKILL_DIR}` prefixes; insights
-  `## Output` → `## Output format`; council `## When to run` → `## When to invoke`.
-- `allowed-tools`: keep unscoped Bash where genuinely needed (tdd/diagnose run arbitrary test
-  commands) but record that rationale once; scope the rest (release-patch pattern).
-- Templates: add `id/tags/domain/status/related` frontmatter to ADR + RESEARCH templates;
-  reconcile the count — BUG becomes core row 14 in DOCS_Guide §2; README "13" → "14 core
-  (+ DESIGN · QA-TESTCASE non-core = 16)".
-
-### W0 — One-shot mechanical cleanup (do first, no design needed)
-Delete TODO.md's 13 tombstone lines · fix TODO:48 (SPRINT-016) + TODO:98 (rotated CHANGELOG
-link) · README footer → v1.10.2 + real date · add CLAUDE.md ownership frontmatter · delete
-orphan `docs/research/image.png` · record TD-008 re-review (or promote it to a TASK).
+W1–W6 and the one-shot W0 cleanup, in full → [`loop-hygiene-workstreams.md`](loop-hygiene-workstreams.md).
 
 ## Testing Decisions
 
@@ -179,36 +113,6 @@ audit's tombstones/TD-aging) is the same failure shape — *prose rule, no match
 principle is the durable fix; the rest is applying it. Candidate learning at close:
 "A hygiene rule without a lint or checklist line is a wish" (likely bumps L-008/L-020 counts).
 
-## Appendix — Findings register (condensed, by severity)
+## Appendix — Findings register
 
-| # | Sev | Area | Finding | Evidence |
-|---|-----|------|---------|----------|
-| 1 | high | hygiene | Tombstone format close writes ≠ format §11 deletes; 13 graveyard lines never swept | TODO.md:33-74 · DOCS_Guide.md:231 |
-| 2 | high | hygiene | Stale "SPRINT-016 active" pointer survived close; close only clears § Active Sprint header | TODO.md:48 · lean-doc-generator/SKILL.md:90 |
-| 3 | high | hygiene | qa-check 47/47 green while README/CLAUDE/TD drift exists — coverage gap, not neglect | scripts/qa-check.sh:67 |
-| 4 | high | staleness | README footer v1.5.0 vs plugin 1.10.2 — L-015 incident recurred | README.md:347 · plugin.json:3 |
-| 5 | high | staleness | gen-index.sh never refreshes its own `last_updated` (script bug) | scripts/gen-index.sh:68 |
-| 6 | high | process | CLAUDE.md has no ownership frontmatter; invisible to checker | .claude/CLAUDE.md:1 · qa-check.sh:67 |
-| 7 | high | process | TD-008 six sprints past the 3-sprint re-review bar, no re-review | TODO.md:86 · DOCS_Guide.md:214 |
-| 8 | high | wiring | Bug-intake in CONTEXT.md unimplemented in triage | CONTEXT.md:53 · triage/SKILL.md:38-46 |
-| 9 | high | gates | Close's destructive ops (delete/archive/squash) run with no approval verb | lean-doc-generator/SKILL.md:90 |
-| 10 | high | integrity | L-016/L-017 ids reused after pruning — shipped citations now point at wrong learnings | tdd/SKILL.md:82 · task-decomposer/SKILL.md:89 · LEARNINGS.md:57,61 |
-| 11 | high | consumer | insights points at another skill's private `templates/LEARNINGS.md.template` (unresolvable cold) | insights/SKILL.md:36 |
-| 12 | high | templates | ADR + RESEARCH templates missing ADR-009 metadata all real instances carry | templates/ADR.md.template:1-9 · CONTEXT.md:112 |
-| 13 | med | wiring | Promote never filters `state: ready` | lean-doc-generator/SKILL.md:88 · triage/SKILL.md:46 |
-| 14 | med | wiring | Prime's Next: never routes to /triage | prime/SKILL.md:52-55 |
-| 15 | med | wiring | `/fork` advertised, wired nowhere; `/simplify` one hop removed | CONTEXT.md:45 |
-| 16 | med | gates | Promote has no explicit sign-off between governance review and render/commit | lean-doc-generator/SKILL.md:88 |
-| 17 | med | gates/wiring | G1 ownership contradiction: decomposer "approve is the gate" vs orchestrator "G1 all modes" | task-decomposer/SKILL.md:13 · orchestrator/SKILL.md:30 |
-| 18 | med | archive | TASK-040/047 trackers point at nonexistent temp-dir verdicts | TODO.md:60,69 |
-| 19 | med | consumer | insights hardcodes `scripts/gen-index.sh`; prime + dispatch.md embed `docs/research/…` paths | insights/SKILL.md:39 · prime/SKILL.md:38 · dispatch.md:5 |
-| 20 | med | consumer | Dangling L-024/L-037/L-042 citations in shipped orchestrator surface | orchestrator/SKILL.md:83,107 · dispatch.md:36 |
-| 21 | med | templates | Template count disagrees: README 13 · CLAUDE/ARCHITECTURE 14 · disk 16; BUG unlisted in DOCS_Guide §2 | README.md:290 · ARCHITECTURE.md:29 |
-| 22 | med | dup | Modes table byte-identical in CONTEXT.md and README, against ADR-007 pointer rule | CONTEXT.md:66-72 · README.md:192-198 |
-| 23 | med | staleness | TODO:98 points at rotated-away CHANGELOG content; QA.md hand-written cap snapshot drifted | TODO.md:98 · docs/QA.md:24 |
-| 24 | med | process | Dedup pass ran once in 23 sprints; CONTEXT.md back at 127/130 | commit ee8df02 |
-| 25 | low | format | council: no `argument-hint`, bare `references/` paths; `Output`/`Output format`/`When to run` naming drift; no shared skeleton | council/SKILL.md:1-7,33 · insights/SKILL.md:41 |
-| 26 | low | format | `allowed-tools` Bash scoping inconsistent, rationale unrecorded | release-patch vs tdd/diagnose frontmatter |
-| 27 | low | format | flow + release-patch descriptions lack the "do not use → /X" redirect 12/14 have | flow/SKILL.md · release-patch/SKILL.md frontmatter |
-| 28 | low | staleness | Orphan `docs/research/image.png`, unreferenced since SPRINT-006 | docs/research/image.png |
-| 29 | low | standalone | refactor-advisor reads CONTEXT.md/ADRs with no degrade-gracefully clause | refactor-advisor/SKILL.md:34 |
+The 29-row register, condensed by severity → [`loop-hygiene-findings.md`](loop-hygiene-findings.md).
