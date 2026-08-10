@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-058 closed 2026-08-10.
+> **SPRINT-059 — Prove the Run Finished** → [docs/sprint/SPRINT-059-prove-the-run-finished.md](docs/sprint/SPRINT-059-prove-the-run-finished.md)
 
 ---
 
@@ -29,6 +29,108 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
+
+<!-- Field report from the first unattended run (lean-flow 1.29.0, a consumer's host): 12 findings,
+     9 shipped in v1.31.0/SPRINT-057. These five close the remaining 3 — the class that survives a
+     perfect allowlist, where the run reports success having done part of the work. -->
+
+- [ ] TASK-183 — Define the unconditional exit rollup, with `unattempted`  [size: M] [risk: med] [HITL]
+      class:      decision
+      done-when:  Part 4 lists `unattempted` alongside done|blocked|parked-hitl|denied-tool|stalled,
+                  and specifies a rollup block emitted at EVERY exit — headed by a `N of M DoD
+                  ticked` line, so a short run is visible even when it hit no blocker. Part 2's
+                  trigger recipe carries the continue-until-exhausted instruction (the work half,
+                  which run 2 proved does hold). Orchestrator `sprint-bulk` steps 4 and 5 both route
+                  to it. Traced once against run 1's real numbers (4 of 7 units, tree clean, exit
+                  `success`): the trace shows what the morning reader would now see where they
+                  previously saw nothing at all
+      touches:    night-run.md Part 2 + Part 4 · orchestrator SKILL.md sprint-bulk 4–5 ·
+                  CONTEXT.md § Gates unattended block, if the state list is quoted there
+      depends-on: none
+      assumes:    `done` tasks still need no per-task line — what becomes unconditional is the
+                  BLOCK and its header count, not a line per green task. Findings 1–9 are already
+                  closed at 1.32.0 (verified against night-run.md + the v1.31.0 changelog, not
+                  inferred from the version number)
+      tracker:    field report artifact b2718bc1 — finding 10
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-184 — Emit the rollup + calibration row from the launcher's exit path  [size: M] [risk: high] [HITL]
+      class:      decision
+      done-when:  after the fired command exits, the launcher counts DoD boxes in the active sprint
+                  file, reads `total_cost_usd` / `num_turns` / `duration_api_ms` off the last
+                  `result` event of the stream-json log, and appends both the TASK-183 rollup block
+                  and the Part 4 calibration row to the Execution Log — with no `jq` dependency.
+                  Exercised once on a real finished run, never a synthetic log. An ADR records WHERE
+                  enforcement lives and names the trade: this reaches only consumers who use the
+                  launcher, so the docs path must still serve everyone else
+      touches:    scripts/night-run.sh · night-run.md Part 3 + Part 4 · docs/adr/ADR-NNN
+      depends-on: TASK-183
+      assumes:    the reaper fires only for a `sprint-bulk unattended` run and is skippable. A
+                  script writing a committed doc is not new here — `gen-index.sh` already generates
+                  one. The launcher is dependency-free POSIX sh and must stay that way, so the
+                  `result` event is parsed without `jq`. F12's own evidence is that both calibration
+                  rows in the field report were written by the human afterwards — this is the
+                  finding closing itself
+      tracker:    field report artifact b2718bc1 — finding 12 (governs 10 and 11)
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-185 — Gate the rollup: a recorded run without one FAILs the check  [size: M] [risk: low] [AFK]
+      class:      execution
+      done-when:  a new checker in the qa-check lib FAILs, with its own named finding, when a sprint
+                  Execution Log records a completed unattended run and carries no rollup block or no
+                  calibration row. Retained must-FAIL fixtures cover each check separately — one
+                  missing-rollup, one missing-calibration-row, one well-formed pass (L-058, TD-012).
+                  Wired into the always-on gate and its fixture runner, following the existing
+                  checker + fixture-runner convention rather than inventing a new one
+      touches:    the qa-check lib · the gate script · a new fixture directory + fixture runner
+                  under evals
+      depends-on: TASK-183
+      assumes:    this is the half that makes the step gated-like-a-commit rather than merely
+                  requested — the reaper emits, this refuses to let a missing one pass review.
+                  Costs a fifteenth harness while TD-046 / TASK-180 is measuring gate runtime; that
+                  is a stated trade, and this check reads one file rather than sweeping the repo
+      tracker:    field report artifact b2718bc1 — finding 12, enforcement half
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-186 — Re-check open parks at task boundaries  [size: S] [risk: med] [HITL]
+      class:      decision
+      done-when:  Part 0's park protocol gains a step — when a park's unblock condition names a
+                  later task in the same Plan, re-examine every open park as each subsequent task
+                  takes ownership; if it is still not actionable at exit, it gets a rollup line
+                  rather than silence. A sibling behavioural assertion joins the existing park
+                  assertions, exercised on the field report's real case: a field parked for the
+                  renderer, three later tasks owning that renderer, none revisiting it
+      touches:    night-run.md Part 0 park protocol · orchestrator sprint-bulk step 5 pointer ·
+                  an evals park assertion
+      depends-on: TASK-183
+      assumes:    the re-check binds the unattended protocol only — an interactive park reaches a
+                  human at first-blocker halt. Also that this cannot be closed by asking more
+                  clearly in the trigger: run 2 was asked in plain language to do exactly this and
+                  did not
+      tracker:    field report artifact b2718bc1 — finding 11
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-187 — Add the two field-report runs to the calibration table  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  Part 4's rows table carries run 1 ($23.04 · 178 turns · 64 min · 4 of 7 · inline)
+                  and run 2 ($18.26 · 140 turns · 45 min · 3 of 3 · inline), with the honest reading
+                  attached: $5.90 per unit delivered against the table's $8.27 and $5.42 — but those
+                  are dispatched two-unit runs on a lighter repository, so the comparison is loose.
+                  The figure that transfers is zero denials across 318 turns after $1.77 of probing,
+                  against a predecessor run that lost roughly 40% of its turns to denials
+      touches:    night-run.md Part 4 rows table
+      depends-on: none
+      assumes:    both rows were reconstructed by hand from the harness result payload, which is why
+                  the table must say so — it is TASK-184's justification sitting in the data. These
+                  are the first `inline` rows in a table whose three existing rows are all
+                  coordinator-plus-agents, so the shape column carries real weight here
+      tracker:    field report artifact b2718bc1 — evidence trail
+      origin:     decomposer
+      state:      ready
 
 ### P2 — Quality / Polish
 
