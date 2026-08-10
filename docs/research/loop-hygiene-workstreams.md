@@ -1,7 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-08-10
-status: current
+status: superseded
 id: loop-hygiene-workstreams
 tags: [process, docs, tooling]
 domain: governance
@@ -13,6 +13,19 @@ related: [loop-hygiene-prd, loop-hygiene-findings]
 > Split verbatim out of [`loop-hygiene-prd.md`](loop-hygiene-prd.md) at SPRINT-058 T1 (§7 diet — whole
 > sections moved, nothing compressed). The PRD keeps the problem, solution, stories and testing
 > decisions; this file keeps the six workstreams. Read the parent first — this is its detail level.
+>
+> **`status: superseded` — ruled 2026-08-10 (SPRINT-061 T2).** Ruled on this file's own evidence, not
+> inherited from the parent's ruling. This is a set of *implementation decisions*, several stated as
+> open questions ("decide at G2") — and all of them have since been decided and built. Spot-checked
+> rather than taken from the parent's summary (L-098): W2's `/triage` branch is live in `prime`, W4's
+> monotonic-id policy is in the LEARNINGS header, W5's `gen-index.sh` parenthetical is gone from
+> `insights`, W6's canonical SKILL.md skeleton is written into `DOCS_Guide.md`. That is the RESEARCH
+> template's trigger exactly: *once a decision is built on it, mark `status: superseded` rather than
+> editing it.*
+>
+> **Nothing moves.** §11 archives a superseded research doc only once nothing live cites it, and
+> `loop-hygiene-prd.md` still points here. Superseded does not demote this file — the template's own
+> wording is that such a doc *remains the WHY-trail*.
 
 ## Implementation Decisions
 

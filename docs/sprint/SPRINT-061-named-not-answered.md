@@ -69,11 +69,11 @@ each carry a deliberate `status:`, ruled against the RESEARCH template's stated 
 reasoning recorded.
 
 **DoD:**
-- [ ] `skills/lean-doc-generator/templates/RESEARCH.md.template`'s trigger is re-read, not recalled
-- [ ] Each doc is ruled independently — the parent's ruling is evidence, not a default
-- [ ] Both `status:` values and their reasoning are written; §11 archives a superseded doc only once
+- [x] `skills/lean-doc-generator/templates/RESEARCH.md.template`'s trigger is re-read, not recalled
+- [x] Each doc is ruled independently — the parent's ruling is evidence, not a default
+- [x] Both `status:` values and their reasoning are written; §11 archives a superseded doc only once
       nothing live cites it, so a citation check runs before any move is proposed
-- [ ] `sh scripts/qa-check.sh` green
+- [x] `sh scripts/qa-check.sh` green
 
 ### T3 — Split section 4's cost across its three jobs `[size: S · risk: low · class: execution · AFK]`
 Layers: `docs/research/qa-gate-timing.md` · an instrumented **copy** of `scripts/qa-check.sh` · `TECH-DEBT.md`

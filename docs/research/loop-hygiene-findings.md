@@ -1,7 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-08-10
-status: current
+status: superseded
 id: loop-hygiene-findings
 tags: [process, docs, tooling]
 domain: governance
@@ -13,6 +13,21 @@ related: [loop-hygiene-prd, loop-hygiene-workstreams]
 > Split verbatim out of [`loop-hygiene-prd.md`](loop-hygiene-prd.md) at SPRINT-058 T1 (§7 diet — whole
 > sections moved, nothing compressed). The evidence column cites line numbers as they stood at the
 > 2026-07-17 audit; they are a record of that snapshot, not live pointers.
+>
+> **`status: superseded` — ruled 2026-08-10 (SPRINT-061 T2).** This one was the genuinely open case,
+> and the task that filed it warned against inheriting the parent's answer: a findings register makes
+> no recommendation, so there is an honest argument that it has nothing to supersede and is simply a
+> record that stays accurate. What settles it is reading the rows. **Row 24 is now known false** —
+> it reports *"dedup pass ran once in 23 sprints; CONTEXT.md back at 127/130"*, implying accreted
+> duplication, and SPRINT-060 T1 went looking for that duplication section by section and found none;
+> the growth is 0.83 lines/sprint of promoted rules, which is the learning loop working (ADR-017).
+> A register carrying a falsified finding cannot honestly be `current`. The remaining 28 rows have all
+> been dispositioned through W0–W6.
+>
+> **What `superseded` means here, precisely:** the register no longer drives decisions. It stays the
+> evidence trail for why the workstreams existed, which is what the RESEARCH template intends by
+> *remains the WHY-trail*. Nothing is deleted and nothing moves — §11 archives only once nothing live
+> cites it, and `loop-hygiene-prd.md` still points here.
 
 ## Appendix — Findings register (condensed, by severity)
 

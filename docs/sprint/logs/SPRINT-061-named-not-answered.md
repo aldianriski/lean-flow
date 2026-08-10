@@ -86,3 +86,36 @@ where a durable rule gets written and can therefore be asked for one.
 ruling deliberately does not do"* note (now *since done*, pointing at the new home) and § Solution's
 governing-principle blockquote, which is relabelled as *what the PRD proposed* and kept verbatim as a
 record rather than deleted. The doc no longer states a standing rule; it records having argued for one.
+
+### 2026-08-10 | progress | T2 — both sibling docs ruled `superseded`, on independent evidence
+
+The template's trigger was **re-read, not recalled**: `RESEARCH.md.template:5,41-42` — status vocab is
+`current | superseded`, and the trigger is *"once a decision is built on it, mark `status: superseded`
+rather than editing it."* Worth having checked: nothing in the template keys on whether a doc is still
+*accurate*, which is the intuition the word "current" invites and the one T2 was warned about.
+
+**`loop-hygiene-workstreams.md` → superseded.** Six workstreams of implementation decisions, several
+written as open questions ("decide at G2"), all since decided and built. Spot-checked against the code
+rather than taken from the parent's "all six have shipped" summary (L-098 — a summary of a source is a
+hypothesis about it): W2's `/triage` branch is live at `prime/SKILL.md:83`, W4's monotonic-id policy is
+in the LEARNINGS header, W5's `gen-index.sh` parenthetical is gone from `insights/SKILL.md`, W6's
+canonical SKILL.md skeleton is at `DOCS_Guide.md:158`. Four for four.
+
+**`loop-hygiene-findings.md` → superseded.** This was the genuinely open one, and the reasoning did not
+come from the parent. A findings register makes no recommendation, so the honest counter-argument is
+that it has nothing to supersede and remains an accurate record. **What settles it is reading the rows:
+row 24 is now known false.** It reports *"dedup pass ran once in 23 sprints; CONTEXT.md back at
+127/130"*, implying accreted duplication — and SPRINT-060 T1 went looking for exactly that, section by
+section, and found none; the growth is 0.83 lines/sprint of promoted rules (ADR-017). A register
+carrying a falsified finding cannot honestly be `current`. The other 28 rows are all dispositioned
+through W0–W6.
+
+Note this is the opposite of inheriting the parent's answer: the parent was superseded because its
+proposals shipped, this one because one of its *observations* was overturned. Same verdict, different
+reason, which is what "ruled independently" had to mean.
+
+**Nothing moves, and that was checked before proposing anything** (the DoD's citation-check line). §11
+archives a superseded doc only once nothing live cites it; `loop-hygiene-prd.md` still points at both.
+The gate now confirms it directly — two new `research-archive` PASS lines appeared this run,
+*"superseded but still cited by `docs/research/loop-hygiene-prd.md` — correctly left in place"*. That
+is the A3 finding from G2 verified by a checker rather than by my grep.
