@@ -284,12 +284,26 @@ this pre-flight pass.
 The one-liner, fired by an OS-level scheduler (outside lean-flow's own surface — it ships no hooks):
 
 ```
-claude -p "/orchestrator sprint-bulk unattended" --permission-mode dontAsk \
-  --output-format stream-json --verbose
+claude -p "/orchestrator sprint-bulk unattended — continue until every Plan task is ticked or has a Part 4 rollup line" \
+  --permission-mode dontAsk --output-format stream-json --verbose
 ```
 
 (Permissions come from your settings file per Part 1; `--allowedTools "<built list>"` still works if you
 prefer them inline.)
+
+**The continue-until-exhausted clause is not decoration.** Step 4 of `sprint-bulk` is a loop the model
+runs, with nothing outside it checking the Plan is finished, so without an explicit instruction the run
+ends when the model's sense of completion says so — which measured 4 of 7 units, reported as `success`
+(Part 4). Stating the terminal condition in the trigger fixes that half: a later run carrying this
+clause delivered 3 of 3.
+
+**Know exactly how far that clause reaches, because it is not far.** The same run was also asked, in
+the same plain language, to write its calibration row and to re-check its parks. It did neither, while
+completing all of its work. **An instruction about the work holds; an instruction about bookkeeping
+does not** — a step that happens *after* the work, and that no gate depends on, is the first thing an
+agent drops as its turn winds down. So treat this clause as improving the odds on the work, and never
+as the guarantee that the rollup gets written. A protocol step that nothing depends on is not a step;
+it is a hope.
 
 **`stream-json` is not optional here, and it is the one flag the rest of this document depends on.**
 Part 3's watchdog defines its stall signal in terms of new stream lines, and Part 4 reads the run's
@@ -382,22 +396,40 @@ A small wrapper the OS scheduler runs alongside Part 2's `claude -p` call — no
 
 ## Part 4 — Morning rollup (rides the Execution Log, no new artifact)
 
-The first thing the morning human reads: one line per non-green task, appended as the run's last
-Execution Log entry — written by the run itself on a clean finish, or by the watchdog's `/handoff`
-on a stall.
+The first thing the morning human reads, appended as the run's last Execution Log entry — written by
+the run itself on a clean finish, or by the watchdog's `/handoff` on a stall.
+
+**The block is emitted at every exit, and it opens with a count.** Not only when something went
+wrong — *always*, headed by the line that says how much of the Plan is actually done:
 
 ```
-Tn · state (done | blocked | parked-hitl | denied-tool | stalled) · unblock condition / next action
+run · <N> of <M> DoD ticked
+Tn · state (done | blocked | parked-hitl | denied-tool | stalled | unattempted) · unblock condition / next action
 ```
 
+**Why the header line exists.** The `sprint-bulk` loop is run by the *model*, and nothing outside it
+checks that the Plan was exhausted. When the model ends a turn after finishing a task, the headless
+session ends with it — and the result carries `subtype: success`, `stop_reason: end_turn`, no error,
+and no indication that unstarted tasks remain. Measured on a consumer's host: **4 of 7 units landed,
+every one correct and committed, tree clean; 3 units untouched and not one line written about them.**
+A rollup that speaks only when something is wrong says *nothing at all* about a run like that, so the
+morning reader following this very section sees a clean page and believes it. This is a worse failure
+than anything in Part 1: those fail totally and are obvious once you look, while this one delivers
+real, correct, committed work and reports success. The count is what makes a short run visible.
+Without it the only trustworthy completion check is counting DoD boxes by hand.
+
+`unattempted` = the run ended before this task was ever started — no blocker, no decision, no denial,
+just an exhausted turn (next: re-fire the run; it resumes against the same frozen Plan). It is the
+state that had no name, which is why the case above went **unreported** rather than misreported.
 `parked-hitl` = the run reached a step only a human may take (Part 0) — the line names *which* step
 and what resolves it (next: do that one step interactively; the rest of the run already completed
 around it). `denied-tool` = `dontAsk` refused a call outside the pre-flight allowlist (next: extend
 allowlist, re-run). `stalled` = the watchdog fired (next: resume via `/prime` + the handoff path).
-`done` tasks need no line — the rollup is for non-green tasks only.
+`done` tasks need no per-task line — the header count already carries them.
 
 Distinguish `parked-hitl` from `denied-tool` in the morning: a park is the contract working as
-designed and needs a decision; a denial is an under-scoped allowlist and needs a config fix.
+designed and needs a decision; a denial is an under-scoped allowlist and needs a config fix. And
+distinguish both from `unattempted`: those two were *reached*, this one never was.
 
 **On a denial, record it once and move on — never re-attempt the same operation in a different
 wrapper.** Re-wrapping (adding a `cd`, splitting into a chain, redirecting elsewhere) does not make a

@@ -45,11 +45,11 @@ instruction sees a clean page.
 from the specified rollup alone that three tasks were never attempted.
 
 **DoD:**
-- [ ] `unattempted` is defined in Part 4 alongside `done | blocked | parked-hitl | denied-tool | stalled`, with its own next-action, distinguished from `blocked` (which was reached) and `parked-hitl` (which was a contract decision)
-- [ ] Part 4 specifies a rollup block emitted at **every** exit, headed by an `N of M DoD ticked` line, so a short run is visible without a blocker having occurred
-- [ ] Part 2's trigger recipe carries the continue-until-exhausted instruction — the work half, which run 2 demonstrated *does* hold
-- [ ] `sprint-bulk` steps 4 and 5 both route to the rollup; the CONTEXT § Gates unattended block agrees if it quotes the states (wiring check, L-020)
-- [ ] Traced once against run 1's numbers, in the Execution Log: what the morning reader saw then, what they would see now
+- [x] `unattempted` is defined in Part 4 alongside `done | blocked | parked-hitl | denied-tool | stalled`, with its own next-action, distinguished from `blocked` (which was reached) and `parked-hitl` (which was a contract decision)
+- [x] Part 4 specifies a rollup block emitted at **every** exit, headed by an `N of M DoD ticked` line, so a short run is visible without a blocker having occurred
+- [x] Part 2's trigger recipe carries the continue-until-exhausted instruction — the work half, which run 2 demonstrated *does* hold
+- [x] `sprint-bulk` steps 4 and 5 both route to the rollup; the CONTEXT § Gates unattended block agrees if it quotes the states (wiring check, L-020)
+- [x] Traced once against run 1's numbers, in the Execution Log: what the morning reader saw then, what they would see now
 <!-- QA: docs change, no tests; the trace is the exercise-on-real-input (L-007). -->
 
 ### T2 — Emit the rollup + calibration row from the launcher's exit path `[size: M · risk: high · class: decision · HITL]`
