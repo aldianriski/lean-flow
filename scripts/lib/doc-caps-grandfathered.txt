@@ -8,8 +8,12 @@
 # a route: the checker's soft branch reports the breach on every run and §11 sends it to the promote
 # governance review for a prune-with-the-owner. Recording it here as well buys only the growth
 # ratchet, at the price of a permanent row in a file whose whole purpose is to reach empty. Do not
-# add a soft-cap row. NOTE: nothing enforces this yet -- the rule is prose until its guard ships with
-# a must-FAIL fixture (L-058); the follow-up is filed as a TASK.
+# add a soft-cap row. ENFORCED since SPRINT-060 T2: check-doc-caps.sh FAILs on a soft-capped path
+# recorded here, named as [ADR-015 rule 2], with retained must-FAIL and must-NOT-catch fixtures
+# (evals/fixtures/doc-caps/soft-cap-grandfathered/). It fires on the ROW's existence, not on the line
+# count -- a soft-capped path is illegal here whether or not it is currently over -- and the row is
+# then ignored so the file still gets its ordinary soft-cap report, since failing the rule must not
+# suppress the route the rule points at.
 #
 # format: <path> <count-at-adoption> <reason-no-spaces>
 #

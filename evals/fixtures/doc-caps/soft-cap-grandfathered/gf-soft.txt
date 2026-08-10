@@ -1,0 +1,2 @@
+# fixture: the violation ADR-015 rule 2 forbids -- a soft-capped path recorded here.
+soft.md 5 soft-cap-must-not-be-grandfathered

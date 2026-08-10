@@ -130,6 +130,22 @@ printf '%s\n' "$rows" | while IFS='|' read -r pfx path capn soft; do
     # list pay for a lookup.
     rec=""
     case "$GF" in *"$f "*) rec=$(gf_recorded "$f") ;; esac
+
+    # ADR-015 rule 2: the grandfather list records HARD-cap breaches only (SPRINT-060 T2).
+    # A soft cap already has a route -- the soft branch below reports it every run and §11 sends it
+    # to the promote governance review -- so recording it here as well buys only the growth ratchet,
+    # at the price of a permanent row in a file whose whole purpose is to reach empty. Until now the
+    # rule was prose in that file's header and in the ADR, which its own Consequences section flagged
+    # as an accepted gap: "nothing enforces rule 2 yet".
+    #
+    # Fires on the ROW's existence, not on the line count: a soft-capped path is illegal here whether
+    # or not it is currently over. The row is then treated as absent so the file still gets its
+    # ordinary soft-cap verdict below -- failing the rule must not also suppress the report the rule
+    # says is the correct route.
+    if [ -n "$rec" ] && [ "$soft" = 1 ]; then
+      printf 'FAIL  doc-caps: %s has a SOFT cap (%s) and must not be in the grandfather list [ADR-015 rule 2] -- a soft cap already reports every run and routes to the promote review; delete the row\n' "$f" "$capn"
+      rec=""
+    fi
     if [ "$n" -le "$capn" ]; then
       if [ -n "$rec" ]; then
         printf 'PASS  cap %s (%s <= %s) [§2] -- back under cap: DELETE its grandfather row\n' "$f" "$n" "$capn"

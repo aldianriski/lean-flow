@@ -1,0 +1,2 @@
+# fixture control: same shape as gf-soft.txt but the path has a HARD cap, which IS legal here.
+hard.md 5 hard-cap-is-legal

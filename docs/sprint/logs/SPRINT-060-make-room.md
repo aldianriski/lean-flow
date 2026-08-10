@@ -66,3 +66,39 @@ the shape L-110 predicted: ADR-017's filename did not exist at promote.
 "absent"` printed nothing and did *not* fire the fallback — `head` exits 0, so the pipe masked grep's
 status. The same reporter-vs-artifact family as L-057, met while writing up a sprint about that family.
 Re-checked with `if grep -q`.
+
+### 2026-08-10 | progress | T2 — ADR-015 rule 2 is enforced, not just written down
+
+`check-doc-caps.sh` now FAILs when the grandfather list names a path whose §2 cap is soft, with its own
+named finding `[ADR-015 rule 2]`. Two design points, both deliberate:
+
+- **It fires on the row's existence, not the line count.** A soft-capped path is illegal in that list
+  whether or not it is currently over cap — the rule is about what may be *recorded*, not about drift.
+- **Failing the rule does not suppress the route the rule points at.** After the FAIL the row is
+  treated as absent, so the file still gets its ordinary `OVER-CAP (soft)` report. A guard that
+  silenced the correct route while rejecting the wrong one would have traded one gap for another.
+
+**Re-derived before building (DoD item 3, L-091).** ADR-015's Consequences named this gap outright
+("nothing enforces rule 2 yet"), so the trade was still open and worth closing. The existing soft/hard
+parse (`soft = (cap ~ /~/ || cap ~ /soft/)`) is reused as-is — the guard reads a value the checker
+already computes rather than re-deriving it, which is what stops this becoming a third parser.
+
+**Two retained fixture cases, differing in exactly one variable.** `soft-cap-must-not-be-grandfathered`
+(exit 1, asserted on the named finding) and `hard-cap-may-be-grandfathered` (exit 0, still earning its
+ordinary grandfathered report). The second is the must-NOT-catch half L-076 requires: a guard proven
+only to fire has not been proven to discriminate. Doc-caps fixtures now 9 cases, all green.
+
+**Checked before writing, not assumed: this checker was already immune to L-109.** Its per-file loop is
+fed by a pipe, so `fail=1` set inside would die in a subshell — but the script never relies on that: it
+writes the loop's output to a temp file and recovers failure from the *output* (`grep -q '^FAIL'`).
+Since the recovery reads printed lines, the new guard only had to print a `FAIL` line to be counted.
+Worth recording because the safe pattern is invisible until you look for it, and L-109 was filed hours
+earlier for the version of this that is not safe.
+
+**ADR-015 deliberately left unedited.** Its Consequences still read "nothing enforces the new rule yet",
+which is now false in the present tense but was true when the decision was taken. ADRs are append-only
+by convention (`never edit a decided ADR`), and an ADR records a decision *as of* its date. The
+correction therefore lands where operators actually read it — the grandfather file's own header, which
+now names the enforcement, its fixtures, and its firing rule. Flagged rather than quietly reconciled,
+because "a doc in the corpus says something no longer true" is exactly the class SPRINT-058 T1 and
+TASK-181 exist for; if the owner prefers a superseding note on ADR-015, that is a one-line change.

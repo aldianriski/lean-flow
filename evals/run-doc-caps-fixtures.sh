@@ -58,6 +58,20 @@ run_case_anywhere "soft-cap-reports-not-fails" 0 "OVER-CAP (soft): soft.md (5 > 
 run_case_anywhere "hard-cap-still-fails-beside-it" 1 "FAIL  cap hard.md (4 > 3)" -- \
   sh "$checker" "$fx/soft-cap-hard-breach/DOCS_Guide.md" "$fx/soft-cap-hard-breach" "$fx/soft-cap-hard-breach/none.txt"
 
+# --- case 6a/6b: ADR-015 rule 2 -- the grandfather list is HARD caps only (SPRINT-060 T2) ---------
+# The rule shipped as prose in the list's own header and in ADR-015, whose Consequences section named
+# the gap outright: "nothing enforces rule 2 yet". Recording a soft cap there buys only the growth
+# ratchet, since the soft branch already reports it every run and §11 routes it to the promote review.
+# The two cases differ in ONE variable -- the recorded path's cap is soft in 6a, hard in 6b -- so a
+# regression that stopped distinguishing them shows up here rather than as a silently tolerated row.
+run_case_anywhere "soft-cap-must-not-be-grandfathered" 1 "must not be in the grandfather list [ADR-015 rule 2]" -- \
+  sh "$checker" "$fx/soft-cap-grandfathered/DOCS_Guide.md" "$fx/soft-cap-grandfathered" "$fx/soft-cap-grandfathered/gf-soft.txt"
+
+# 6b is the must-NOT-catch half (L-076): the same list shape naming a HARD-capped path is legal, and
+# still earns its ordinary grandfathered report rather than being swept up by the new rule.
+run_case_anywhere "hard-cap-may-be-grandfathered" 0 "OVER-CAP (grandfathered): hard.md" -- \
+  sh "$checker" "$fx/soft-cap-grandfathered/DOCS_Guide.md" "$fx/soft-cap-grandfathered" "$fx/soft-cap-grandfathered/gf-hard.txt"
+
 # --- case 6: the live repo's own §2 must still derive rows ---------------------------------------
 # A parser that stops matching the real table degrades to zero coverage, and zero coverage over zero
 # rows would otherwise exit 0 -- a PASS over an empty input set, which is the L-058 family in its

@@ -63,10 +63,10 @@ Consequences section names this guard's absence as an accepted trade.
 named finding.
 
 **DoD:**
-- [ ] `check-doc-caps.sh` FAILs when `doc-caps-grandfathered.txt` names a path whose §2 cap is soft (`~N` / `N soft`)
-- [ ] A **retained** must-FAIL fixture holds exactly that violation, failing with its named finding (L-058, TD-012)
-- [ ] Re-derived before building (L-091): confirm ADR-015's accepted trade is still worth closing, and that the checker's existing soft/hard parse (`cap ~ /~/ || cap ~ /soft/`) is reused rather than reimplemented
-- [ ] The gate stays green overall
+- [x] `check-doc-caps.sh` FAILs when `doc-caps-grandfathered.txt` names a path whose §2 cap is soft (`~N` / `N soft`)
+- [x] A **retained** must-FAIL fixture holds exactly that violation, failing with its named finding (L-058, TD-012)
+- [x] Re-derived before building (L-091): confirm ADR-015's accepted trade is still worth closing, and that the checker's existing soft/hard parse (`cap ~ /~/ || cap ~ /soft/`) is reused rather than reimplemented
+- [x] The gate stays green overall
 <!-- QA: the fixture IS the test; a guard with no must-FAIL fixture is L-058's silent false negative. -->
 
 ### T3 — Measure the QA gate's inline half (sections 1–11) directly `[size: S · risk: low · class: execution · HITL]`
