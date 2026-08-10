@@ -82,9 +82,20 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
   collapse · TODO cap) and a §2 soft-cap breach is not among them. So the report has a matcher and no
   consumer — the inverse of the failure T1 promoted a rule about in the same sprint, and invisible to
   both. Caught only because T1's own edit nudged one of the three breaches and made the row legible.
-- seen: Sprint-058, Sprint-061
-- count: 2
-- promoted: no
+- **Third sighting, Sprint-062 promote** — on a *fourth* file, and this time the arithmetic is
+  unarguable. `TODO.md`'s cap is `~150 soft`; the roadmap triage took the Backlog to eight tasks and
+  the file to **206**. But eight entries written to the standard's own task shape (§ Task entry shape,
+  ~15 lines each) is ~120 lines of task text before any scaffolding, against ~50 lines of headers,
+  Quick Rules and the pointer blocks — so the cap and the schema the same standard mandates cannot
+  both be satisfied at eight tasks. As with `AGENTS.md`, the number never budgeted for what the
+  standard itself requires. Distinct from the first two sightings in that the breach was produced in
+  one session by ordinary in-scope work, not accreted as drift — which is the strongest form of the
+  tell: no trimming was available even in principle, because nothing had yet had time to rot.
+- seen: Sprint-058, Sprint-061, Sprint-062
+- count: 3
+- promoted: no — resolution folded into **TASK-192** (SPRINT-062 T1), which rules a concrete cap by
+  ADR; the general rule is written there, once, with the ruling that generalizes it (promote sign-off,
+  Sprint-062). Placement deferred to that task so the rule and its worked case land together.
 - related: ADR-015 (the ruling this produced) · L-097 (its sibling — a stated figure that rots, where this one was imprecise at birth) · L-099 (a rule its reader cannot read) · L-088 (the criterion met by re-reading it) · TASK-179 · TASK-193
 
 ---
