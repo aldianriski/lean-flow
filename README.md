@@ -299,6 +299,7 @@ The skills write durable, human-readable state into your repo — plain markdown
 | `CHANGELOG.md` | `/release-patch` · sprint close | what shipped, per release |
 | `docs/LEARNINGS.md` | sprint close | confirmed learnings; recurring → durable rules |
 | `docs/research/<slug>.md` | `/lean-doc-generator` | a research question → options · evidence · recommendation (feeds an ADR) |
+| `docs/research/logs/<slug>.md` | `/lean-doc-generator` | that question's **measurement series** — append-only, uncapped, created lazily at the second round, so a growing body of evidence never has to be deleted to keep the decision doc under its cap |
 | `docs/deployment/deployment-guide.md` | `/lean-doc-generator` | the standard-release runbook (push · verify) |
 | `docs/deployment/rollback-guide.md` | `/lean-doc-generator` | the rollback procedure |
 | `.out-of-scope/` | `/triage` | rejected ideas, so they aren't re-litigated |
@@ -419,7 +420,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-08-10 · status: current · v1.35.0</sub>
+<sub>Doc owner: Maintainer · last updated 2026-08-10 · status: current · v1.36.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge

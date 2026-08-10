@@ -32,6 +32,28 @@ status: current
 
 ## Tech Debt
 
+- **TD-052** severity: medium | status: open | created: Sprint-062
+  - Summary: **Nothing in `evals/` exercises skill *prose*, so a governance rule that lives as
+    procedure text ships without the must-FAIL fixture L-058 requires.** SPRINT-062 T2 changed the
+    promote doc-aging line to read two sources (§11 retention **+** every §2 cap breach). The change
+    was exercised on live failing input — the two research docs with no §11 row surfaced where the
+    scan previously read clean — but that is a one-time before/after, not a retained control. Every
+    existing harness targets a `scripts/lib/check-*.sh` with a parseable output contract; a checklist
+    emitted by a skill has neither an entry point nor an output to assert against.
+  - Impact: the exact failure T2 fixed can silently return. A future edit that re-narrows the
+    doc-aging line — or an agent that reads the enumeration as the source rather than the routing hint
+    it is now labelled — restores a matcher with no consumer, and nothing goes red. This is the
+    silent false negative L-058 exists to prevent, in the one category the eval suite cannot reach.
+    It generalises beyond this line: **every gate in lean-flow that is procedure rather than script**
+    (G1, G2, the promote governance checklist, close's §11 propose→approve) is unguarded the same way.
+  - Mitigation (hypothesis, re-derive before building — L-091): a prose-assertion harness that greps
+    a SKILL.md for a required clause is the obvious move and is probably **wrong twice over** — it
+    would be a substring standing in for a structural claim (L-108, which this very sprint broke three
+    times), and it would assert that text *exists* rather than that the procedure *fires*. The honest
+    question is whether a procedural gate can be fixtured at all, or whether the category needs a
+    different control entirely — a review-time checklist, or accepting the gap and naming it.
+  - Tracker: SPRINT-062 T2 · L-058 · L-108 · TD-012 (the fixture-retention leg, still open)
+
 - **TD-051** severity: medium | status: open | created: Sprint-061
   - Summary: **`check-layers-observed.sh` (gate leg 15) never sees a close commit, because the close
     commit is also the archival commit.** Line 225 skips any sprint file under `*/archive/*`, and its

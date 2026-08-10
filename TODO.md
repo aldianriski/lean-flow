@@ -18,7 +18,8 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-062 — Room to Write** → [docs/sprint/SPRINT-062-room-to-write.md](docs/sprint/SPRINT-062-room-to-write.md) · `epic: EPIC-002`
+> _None._ SPRINT-062 closed 2026-08-10 (3 of 3) — the first member sprint of EPIC-002, which stays
+> **active**: 0 of its 4 Closed-when conditions are met.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room** (runs first — the caps block everything after it) → **EPIC-003 The Standard**
@@ -39,79 +40,65 @@ status: current
 <!-- EPIC-002 Make Room — the critical path. These block EPIC-003/004/005, which have nowhere to
      write their rules while both SSOT files sit at cap. -->
 
-- [ ] TASK-192 — Rule `qa-gate-timing.md`'s cap: raise it, or split the doc  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  the doc is no longer breaching a cap nobody intends it to meet — either the §2
-                  research cap is raised for it by an ADR, or the doc is split per §6's cap-hit rule,
-                  with the reasoning recorded either way
-      touches:    docs/research/qa-gate-timing.md · skills/lean-doc-generator/references/DOCS_Guide.md §2
-                  · possibly docs/adr/ · scripts/lib/doc-caps-grandfathered.txt
-      depends-on: none
-      assumes:    this is L-106's tell, not ordinary fat: the doc is **223 / 120** and is a longitudinal
-                  measurement log accreting one round per sprint (three now), while the 120 cap is sized
-                  for a write-once decision doc. It cannot be trimmed without deleting measurements that
-                  are the whole point, which L-106 says means the number is wrong rather than the file.
-                  Do NOT bulk this with the other two breaches — `graph-engineering.md` (122) and
-                  `loop-hygiene-prd.md` (139) are ordinary drift and a different question. ADR-015 rules
-                  that a soft cap cannot be grandfathered, so "add it to the list" is not available
-      tracker:    SPRINT-061 Retro · L-106 · ADR-015 · SPRINT-058 T1 (the same tell, twice) · EPIC-002
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-193 — Give the §2 soft-cap report a consumer at promote  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  a §2 soft-cap breach is visible to whoever signs the promote governance checklist,
-                  rather than only to the gate's scrollback
-      touches:    skills/lean-doc-generator/SKILL.md § Governance review ·
-                  skills/lean-doc-generator/references/DOCS_Guide.md §10/§11
-      depends-on: none
-      assumes:    the failure is a **matcher with no consumer**, which is the exact inverse of the rule
-                  SPRINT-061 T1 promoted, and neither caught it. `check-doc-caps.sh` has printed three
-                  `OVER-CAP (soft)` rows on every run for sprints; SPRINT-061's promote scan reported
-                  doc-aging clean because the checklist enumerates §11's four triggers and a §2 breach is
-                  not one of them. Re-derive before writing (L-091): "add a fifth checklist line" is the
-                  obvious move and may be wrong — the honest question is whether §11's trigger list or
-                  §2's caps should own this, and a fifth line on a checklist read under time pressure is
-                  how TD-047 describes items getting skipped
-      tracker:    SPRINT-061 Retro · L-106 (count 2) · EPIC-002
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-194 — Establish whether LEARNINGS promotion is being stamped, then apply §11  [size: M] [risk: low] [HITL]
-      class:      decision
-      done-when:  it is known why 91 entries carry zero `promoted: yes`, and §11's collapse is applied
-                  on that basis — with no durable rule losing the reader that stands on it
-      touches:    docs/LEARNINGS.md · docs/knowledge-index.md · possibly DOCS_Guide §10/§11
-      depends-on: none
-      assumes:    **do not open this as a pruning task.** 91 entries and `grep -c "promoted: yes"` = 0
-                  has two readings: the collapse already ran and left pointers (healthy), or promotion
-                  happens without the field being stamped (a governance defect, and the count≥2
-                  promotion rule is then running blind). Establish which BEFORE editing anything —
-                  under the second reading, pruning destroys the evidence. EPIC-002's evidence rule
-                  binds: nothing removed without showing it is not load-bearing
-      tracker:    EPIC-002 · DOCS_Guide §11 · audit F7
-      origin:     manual
-      state:      ready
-
 - [ ] TASK-196 — Rule the cap structure on all three governance files, don't trim to fit  [size: M] [risk: med] [HITL]
       class:      decision
       done-when:  CLAUDE.md, CONTEXT.md **and TODO.md** each carry ≥15% headroom by a recorded ruling —
                   a raised cap with an ADR, a §6 split, or content moved to a satellite behind a pointer
       touches:    .claude/CLAUDE.md · .claude/CONTEXT.md · TODO.md · docs/adr/ · DOCS_Guide §2
                   · scripts/lib/doc-caps-grandfathered.txt
-      depends-on: TASK-192 (its cap-precision ruling sets the precedent this one applies)
+      depends-on: none — **unblocked**: TASK-192 shipped in SPRINT-062, and the precedent it set is
+                  now `DOCS_Guide` §2's Growth rule (drift vs a cap that was never reachable). Apply
+                  that rule here rather than re-deriving one
       assumes:    ADR-017 already raised CONTEXT 130→150 once, so a second raise needs a *different*
                   argument or it is trimming-by-ADR — and ADR-015 forbids grandfathering a soft cap.
                   L-008/TD-006 name the actual mechanism (CONTEXT accreting duplication of its
                   satellites); test that hypothesis before raising any number, per L-091.
-                  **TODO.md (206/150) is the clean case and is scoped in by the Sprint-062 promote
-                  sign-off:** eight entries at the standard's own § Task entry shape is ~120 lines
-                  before scaffolding, so cap and schema cannot both hold — arithmetic, not drift (L-106 ×3)
+                  **TODO.md is the clean case and is scoped in by the Sprint-062 promote sign-off:**
+                  entries written to the standard's own § Task entry shape run ~15 lines each, so a
+                  backlog of eight needs ~120 lines before any scaffolding — cap and schema cannot
+                  both hold. Arithmetic, not drift (L-106 ×3). The figure moves with the backlog;
+                  measure it at start rather than trusting a number written here
       tracker:    EPIC-002 · ADR-015 · ADR-017 · L-008 · L-106 · TD-006 · SPRINT-062 promote
       origin:     manual
-      state:      blocked
+      state:      ready
 
 ### P2 — Quality / Polish
+
+- [ ] TASK-199 — Re-sort the two remaining §2 breaches against the new Growth rule  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  `graph-engineering.md` (122) and `loop-hygiene-prd.md` (139) are each sorted into
+                  drift or never-reachable per §2's Growth rule, and ruled accordingly
+      touches:    docs/research/graph-engineering.md · docs/research/loop-hygiene-prd.md · possibly
+                  DOCS_Guide §2 · possibly docs/adr/
+      depends-on: none
+      assumes:    **do not inherit "ordinary drift" from TASK-192's text — that phrase is the error.**
+                  L-106's own body records `graph-engineering.md` as having "no movable section and no
+                  whitespace slack", and says both docs "had been carried as *drift* for sprints"; the
+                  mislabelling is what L-106 was written to correct, and TASK-192 repeated it while
+                  citing it. Sort each doc fresh against the Growth rule §2 now carries. `loop-hygiene-prd.md`
+                  has not been examined at all and may genuinely be drift — the point is that neither
+                  diagnosis is currently evidence-backed
+      tracker:    SPRINT-062 T1 Retrieval check · L-106 · DOCS_Guide §2 Growth rule
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-200 — Widen L-108's placement to reach verification, not just authoring  [size: S] [risk: med] [HITL]
+      class:      decision
+      done-when:  a promoted rule about matcher shape is reachable from the moment someone is running
+                  an ad-hoc verification query, not only when authoring a checker or naming a fixture
+      touches:    .claude/CONTEXT.md § Gates · possibly .claude/CLAUDE.md · docs/LEARNINGS.md
+      depends-on: none
+      assumes:    L-108 was promoted, correctly placed, **and loaded in context** for all of SPRINT-062,
+                  and still reached none of three fresh violations — two of them produced while
+                  verifying the first (L-113). Its placement enumeration lists only *authoring* flows;
+                  every failure was a verification grep inside a gate pass, where the result is acted
+                  on immediately with no review between query and conclusion. **`CLAUDE.md` is at
+                  80/80 and `CONTEXT.md` at 132/150, so this may be blocked behind TASK-196** — check
+                  before designing. Re-derive: "add another sentence to § Gates" is the obvious move
+                  and is what already failed to fire
+      tracker:    SPRINT-062 Retro · L-113 · L-108 (count 4)
+      origin:     close-retro
+      state:      ready
 
 - [ ] TASK-195 — Apply one §11 archive pass to docs/research/  [size: S] [risk: low] [HITL]
       class:      execution

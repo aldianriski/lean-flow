@@ -4,7 +4,7 @@ slug: room-to-write
 epic: EPIC-002
 owner: Maintainer
 last_updated: 2026-08-10
-status: active
+status: closed
 gates_signed: G1,G2 @ 19485be
 plan_commit: ade3b81
 close_commit: [sha — set at close]
@@ -135,7 +135,7 @@ no longer contains a promoted entry whose shape differs from the other twenty-ni
 
 ## Execution Log
 
-> **Lives in its own file** — `docs/sprint/logs/SPRINT-062-room-to-write.md`, rendered from
+> **Lives in its own file** — `docs/sprint/archive/logs/SPRINT-062-room-to-write.md`, rendered from
 > `templates/sprint-log.md.template` and created lazily at the first entry. Append there, never here.
 
 ## Files Changed
@@ -154,4 +154,43 @@ no longer contains a promoted entry whose shape differs from the other twenty-ni
 
 ## Retro
 
-<!-- Written at close. Route the four buckets to their durable homes (DOCS_Guide §10). -->
+**Retrieval check — two misses, both routed.** *(a)* **A prior L-NNN was contradicted by the task text
+built on it.** TASK-192's `assumes:` calls `graph-engineering.md` "ordinary drift"; L-106 — the very
+learning the task cites — records it as having "no movable section" and says both docs "had been
+carried as *drift* for sprints". The task inherited the error it was filed to fix. → TASK-199.
+*(b)* **A promoted rule failed to retrieve three times while in context.** L-108 sits in
+`CONTEXT.md` § Gates and was loaded all session; all three matcher failures happened anyway, two of
+them *while verifying the first*. → L-108 count 4 · L-113 · TASK-200.
+
+**Cost** — inline, single context, no dispatch and no sub-agents: all three tasks were `class: decision`,
+which the dispatch rule keeps with the coordinator. Five commits over one interactive session, plus
+~8 checker invocations (the full `qa-check.sh` was never completed — it exceeded a 120s tool timeout
+twice, so individual `scripts/lib/` checkers were run instead). **Token and dollar figures are
+unavailable in this session** — recorded as unavailable rather than omitted, per §10.
+
+**Worked**
+- **Resolving `assumes:` at the gate instead of asking.** A1 and A3 were both *facts*. Investigating
+  them cost minutes and A3 dissolved most of a task — before any work was done against its premise.
+- **Verifying the mechanism before relying on it.** T1's whole design rests on `docs/research/*.md`
+  being a non-recursive glob; reading the checker's derivation loop turned that from an assumption
+  into a fact, and the run then confirmed it (no new breach).
+- **Catching a dangling `related:` ref pre-commit.** `qa-gate-timing-log` would have failed §4b at the
+  next gate. Found by asking what the index actually contains rather than assuming the id resolved.
+- **Correcting the Files Changed table against the real diff.** It claimed `knowledge-index.md` changed;
+  the staged diff said otherwise. The artifact now matches the commit.
+
+**Friction**
+- **The corpus defeats substring verification, and knowing that did not help.** Three false results in
+  one session on `docs/LEARNINGS.md`. The only reason the worst was caught is that it contradicted a
+  count taken minutes earlier — not a check, an accident.
+- **`qa-check.sh` cannot be run to completion inside a 120s tool timeout.** Individual checkers had to
+  be invoked directly, which means no single run ever confirmed the whole gate green this sprint. The
+  measurement series in `logs/qa-gate-timing.md` predicts exactly this (~154–169s).
+- **A procedural fix has nowhere to put a fixture.** T2 changed skill prose; nothing in `evals/`
+  exercises prose, so the L-058 bar could not be fully met. → TD-052.
+
+**Pattern candidate** (surfaced → `docs/LEARNINGS.md`)
+- **L-113** — a rule can be correctly placed, currently in context, and still not fire, because the
+  enumeration of flows that trigger it omits the moment it is being exercised.
+- **L-114** — an `assumes:` that is a *fact* should be resolved before the task is sized, not after:
+  facts can invalidate the task, and a task sized on an unresolved fact is sized on a guess.

@@ -46,7 +46,7 @@ records are history, and history is not corpus) · relaxing a gate to reduce wor
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [SPRINT-062](../sprint/SPRINT-062-room-to-write.md) | Room to Write — three governance signals, and whether anything is listening | active | _(completed at close)_ |
+| [SPRINT-062](../sprint/archive/SPRINT-062-room-to-write.md) | Room to Write — three governance signals, and whether anything is listening | closed · `<close_commit>` | Ruled the first cap by **splitting** rather than moving a number, and generalised it: §2's Growth rule now sorts a breach into drift vs a cap that was never reachable, so the remaining three have a procedure instead of a hypothesis. Gave the §2 cap report a consumer at promote — the review had been reporting doc-aging clean over three standing breaches. Established that the LEARNINGS corpus is healthy and that the count suggesting otherwise was measuring its own query. **Headroom delivered: none** — that is TASK-196's, now unblocked. |
 
 ## Decisions
 

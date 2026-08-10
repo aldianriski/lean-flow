@@ -11,6 +11,50 @@ status: current
 
 ---
 
+## v1.36.0 — Room to Write (2026-08-10)
+
+MINOR — SPRINT-062, **3 of 3 units**, the first member sprint of **EPIC-002 Make Room**. Three
+governance signals, and in each case the question was whether anything was listening: a cap that could
+not be met, a report with a matcher and no consumer, and a count that turned out to be measuring its
+own query.
+
+**What changed for you:**
+
+- **A new doc-kind: `docs/research/logs/<slug>.md`.** When a research question accretes a second
+  measurement round, the series now splits into an append-only, uncapped sibling and the decision doc
+  keeps the cap. This is ADR-014's sprint Plan/log mechanism applied outside `docs/sprint/` for the
+  first time — and it works for the same structural reason: the cap check derives its globs from §2's
+  own File cells, and `docs/research/*.md` is non-recursive, so a `logs/` sibling is excluded for free.
+  Placement rule only, no template; never name it as a `related:` id, or it dangles the corpus-ref check.
+- **§2's Growth rule now tells you how to rule a cap breach, not just to split.** A breach sorts into
+  **drift** (removable content past a reachable cap → trim or split) or **a cap that was never
+  reachable** (the standard mandates content the number never budgeted for, or the growth is an
+  append-only series). They need opposite actions and the report cannot tell them apart. The tell is a
+  breach where every route back under the cap runs through deleting signal or re-wrapping prose.
+- **The promote governance check now reports cap breaches.** `doc-aging` reads **two** sources — §11's
+  retention triggers *and* every §2 cap breach — where it previously enumerated only §11's four
+  triggers. If you run `promote`, you will now see breaches you were never shown before. §11's ledger
+  owns retention; §2 owns caps; restating a §2 cap figure inside the checklist is now prohibited,
+  because a copied number is a second SSOT that drifts from the row it copied.
+- **§11's LEARNINGS row documents a trap that had been silently misleading readers.** The collapse
+  *consumes the trigger it fires on*: a promoted entry becomes `[status: promoted]` plus a pointer, so
+  `promoted: yes` is never the stored form. Grepping for it returns zero on a perfectly healthy corpus.
+  Count by `[status: promoted]`, position-anchored.
+- **`docs/research/qa-gate-timing.md` went 223 → 87 lines** with all three measurement rounds preserved
+  verbatim in its new log. No measurement was deleted to meet a number.
+
+**Fixed:** `.claude/CONTEXT.md` claimed **32** core templates against 33 on disk — the count-claim
+checker matches the phrase `N canonical doc templates`, which CONTEXT does not use, so no matcher ever
+reached it.
+
+**Known gaps, named rather than closed:** the promote doc-aging fix is procedural text, and nothing in
+`evals/` exercises skill prose — so it has no retained must-FAIL fixture and a future edit that
+re-narrows it goes uncaught (`TD-052`; the same gap covers every procedural gate: G1, G2, the promote
+checklist, close's §11 pass). `TODO.md` (210) and two research docs remain over their soft caps,
+scoped to `TASK-196` and `TASK-199`.
+
+---
+
 ## v1.35.0 — Named, Not Answered (2026-08-10)
 
 MINOR — SPRINT-061, **3 of 3 units**. Every task answered a question SPRINT-060 stated and left open.
@@ -59,50 +103,4 @@ inverse of the rule shipped above and invisible to both. L-106 → count 2; TASK
 
 ---
 
-## v1.34.0 — Make Room (2026-08-10)
-
-MINOR — SPRINT-060, **4 of 5 units**. Three tasks were written to confirm something and ended up
-overturning it. The sprint's real output is four corrected beliefs, two of which had been sitting in
-the ledger for sprints.
-
-**What changed for you:**
-
-- **`CONTEXT.md`'s cap moves 130 → 150** (ADR-017). The task was written to delete duplicated prose —
-  TD-006 and L-008 have both described the file as "accreting its satellites' prose" for sprints.
-  Diffed section by section, **there was none**: every section touching a satellite's territory already
-  ends in a pointer, and the duplication runs the *other* way (README summarises CONTEXT and defers to
-  it as SSOT). What actually drives growth is **0.83 lines per sprint of promoted rules** — the
-  learning loop depositing durable rules where multi-flow ones belong. The file was at its cap because
-  the mechanism works. Kept **hard** on purpose: the forcing function is what produced the measurement.
-- **A soft cap can no longer be grandfathered.** ADR-015 ruled the grandfather list records hard-cap
-  breaches only, and its own Consequences admitted "nothing enforces rule 2 yet". It does now, with a
-  named finding and two fixtures differing in exactly one variable. Failing the rule deliberately does
-  *not* suppress the soft-cap report the rule points at.
-- **`loop-hygiene-prd.md` is `superseded`.** It had read `current` since July — not because anyone
-  judged it current, but because nobody had looked. Nothing moves: §11 archives a superseded doc only
-  once nothing live cites it, and five live surfaces cite this one. The corpus just stopped saying
-  something untrue about itself.
-
-**For maintainers — the gate's cost is not where two sprints of work assumed it was.** Sections 1–11
-were measured **directly** for the first time (two samples, instrumented copy, shipped script untouched
-and verifiably byte-identical). The 66/34 split is confirmed at 61–64%. But the split was never the
-interesting number: **section 4 alone — knowledge metadata, ADR-009 — is 45–49% of the entire gate**,
-75–76 s, larger than all fifteen eval harnesses combined, while seventeen other sections sum to ~14%.
-It is also the gate's most *stable* component while the harness half swings 16%. TD-046 is resolved by
-this measurement and `TD-050` files the real cost centre, with an explicit warning not to reach for the
-obvious narrowing. Gate total re-taken: 130 s @ 131 checks → 154–169 s @ 136.
-
-**Housekeeping:** `L-111` filed (a task's acceptance can depend on a decision no gate has taken yet) and
-**`L-107` bumped to count 2** — it recurred inside the sprint that promoted it, one level down. Both it
-and `L-108` (count 3) are now promotion-eligible, which the cap raise finally makes possible. `TD-050`
-filed, `TD-046` resolved. Three follow-ups (`TASK-188` carried, `189`, `190`). CHANGELOG rotated.
-Gate 134 → 135 checks, doc-caps fixtures 7 → 9.
-
-**T5 did not land, and says so.** Exercising the night-run reaper on a genuinely partial Plan needed a
-run that stops mid-Plan; the run mode was ruled interactive at G2 — after the Plan froze — which
-foreclosed the only vehicle it had. Carried forward with its acceptance explicitly unmet rather than
-ticked against its DoD's escape clause. That tension is now `L-111`.
-
----
-
-_Older releases (**v1.33.0** and earlier) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._
+_Older releases (**v1.34.0** and earlier) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._
