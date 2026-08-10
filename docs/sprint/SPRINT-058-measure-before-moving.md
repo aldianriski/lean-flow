@@ -4,7 +4,7 @@ slug: measure-before-moving
 owner: Maintainer
 last_updated: 2026-08-10
 status: active
-plan_commit: [set at promote]
+plan_commit: 26fe6a0
 close_commit: [set at close]
 update_trigger: sprint execute/close events
 ---
