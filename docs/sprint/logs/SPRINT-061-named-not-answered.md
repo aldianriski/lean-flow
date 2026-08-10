@@ -119,3 +119,62 @@ archives a superseded doc only once nothing live cites it; `loop-hygiene-prd.md`
 The gate now confirms it directly — two new `research-archive` PASS lines appeared this run,
 *"superseded but still cited by `docs/research/loop-hygiene-prd.md` — correctly left in place"*. That
 is the A3 finding from G2 verified by a checker rather than by my grep.
+
+### 2026-08-10 | progress | T3 — section 4 split by loop; there is no cost centre to find
+
+**Method.** `awk` transform of `scripts/qa-check.sh` into a copy in the scratchpad with `_qat "<label>"`
+emitters at four boundaries, verified as a **pure-addition diff — 0 lines removed, 9 added** — before
+either sample ran. Shipped script SHA-256 `bd6bb83b…d250` identical before and after; `scripts/` and
+`evals/` clean at the end. Two samples, both exiting 0 at 135 checks.
+
+One method note worth keeping, because it is the reason there are three data points and not two. The
+first instrumented run emitted a mangled log (`awk` ate the `printf` format string's escapes, so every
+line read `%sn<ts><label>`). The timestamps were complete and unambiguous, so the run was *usable* —
+but a published method containing a broken `printf` is a bad artifact, so the emitter was rewritten as
+`echo` and both samples retaken. The mangled run is reported in the doc as a third freshness data point
+rather than discarded, since the code path was identical and it widens the variance band rather than
+flattering it.
+
+**Result — the split does not find what TD-050 expected it to find.**
+
+| slice | s1 | s2 | share of §4 |
+|---|---:|---:|---:|
+| index freshness (`gen-index.sh --check`) | 34.4s | 27.7s | 35–40% |
+| corpus + id-universe setup | 1.5s | 1.2s | ~1.6% |
+| 4a LEARNINGS refs+metadata | 26.3s | 23.8s | ~30% |
+| 4b corpus refs+metadata | 23.4s | 26.0s | 27–33% |
+| **section 4** | **85.6s** | **78.8s** | **51.5% of run** |
+
+Section 4 has **no cost centre — it has three comparable thirds.** Deleting the largest outright buys
+~19% of the gate, and that largest slice is the index-freshness whole-corpus read TD-050 itself names
+as the thing not to cheapen. The cheapest target and the most protected one are the same object.
+
+So the sprint's framing holds at both levels: TD-050 named a split it expected to *locate a cure*, and
+the honest answer is that no cheap lever exists. That is a more useful result than a target would have
+been, and it is only visible because the arithmetic was forced (L-107's own counter).
+
+Section 4 has grown 45–49% → 51.5% of the run since SPRINT-060 T3, on a corpus five entries larger —
+scaling as designed, not degrading. TD-050 updated with both corrections and stays open on its
+inherited behavioural concern.
+
+### 2026-08-10 | surprise | my own promote scan missed the §2 soft-cap breaches
+
+Surfacing this against myself rather than letting it sit. `docs/research/qa-gate-timing.md` is now
+**223 / 120** after T3's section — it was already 169 before this sprint touched it. Two others are
+also over: `graph-engineering.md` 122, `loop-hygiene-prd.md` 139 (136 before T1, +3 from me).
+
+Two separate things went wrong, and only one is T3's.
+
+1. **The promote governance scan reported doc-aging as clean and was wrong.** It checked the four
+   triggers §11 enumerates — TD deletion, CHANGELOG rotation, LEARNINGS collapse, the TODO cap — and
+   never looked at the §2 soft-cap breaches that print on *every single gate run*. Three of them have
+   been printing for sprints. This is L-106 precisely: "a row nobody can act on becomes wallpaper",
+   and the scan that was supposed to act on it read past it because the breach is not on §11's list.
+2. **`qa-gate-timing.md` is structurally mismatched to its cap.** It is a longitudinal measurement log
+   accreting one round per sprint (three now), and the 120-line research cap is sized for a decision
+   doc that gets written once. L-106's tell applies — a doc that cannot be trimmed without losing what
+   it exists to say has the wrong number, not too much content. §6's cap-hit rule (split into a tree)
+   is the other candidate.
+
+Neither is fixed here: both are §11/§2 rulings, out of T3's scope, and inventing an answer under a task
+that says "measurement only" would be the scope-creep D2 forbids. Filed for the close Retro.

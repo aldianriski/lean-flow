@@ -47,6 +47,24 @@ status: current
     honest step is to split section 4's own cost between its three jobs — freshness vs dangling refs vs
     completeness — because "section 4 is expensive" is itself an undifferentiated blob, and treating it
     as one is the exact error L-107 describes, now at count 2 partly because of this measurement.
+  - **Split measured 2026-08-10 (SPRINT-061 T3) — done, and it corrects this row twice.** Table →
+    [`docs/research/qa-gate-timing.md`](docs/research/qa-gate-timing.md) § Third measurement.
+    **(a) The "three jobs" above are not separable.** Freshness is one subprocess and is; but dangling
+    refs and completeness are computed *together* inside the same two loops (4a over LEARNINGS ids, 4b
+    over corpus files), each pass producing both verdicts from a shared `allids`. This row also omits
+    the corpus/id-universe setup they both depend on. Measured by **loop** instead — the boundary the
+    code actually has. **(b) There is no cost centre inside section 4 to find.** It is three comparable
+    thirds: freshness ~36%, 4a ~30%, 4b ~30%, setup ~2%. Deleting the *largest* outright would buy ~19%
+    of the gate — and that largest slice is the index-freshness whole-corpus read this row already
+    names as the thing not to cheapen. The cheapest target and the most protected one are the same
+    object. Section 4 has meanwhile grown 45–49% → **51.5%** of the run on a corpus five entries larger,
+    which is it scaling as designed rather than degrading.
+    **Ruling: the row stays open on its behavioural concern** (a gate slow enough to be skipped stops
+    running — TD-046's residual, inherited here). What is now closed is the expectation that splitting
+    further reveals a target: it does not, and any real cure is structural (cache the index digest
+    between runs, or accept that whole-corpus integrity costs proportional to the corpus), never a
+    narrowing of what is checked. Do not re-derive a narrowing from this row — it has been measured
+    twice and the answer did not change.
 
 - **TD-049** severity: minor | status: open | created: Sprint-059
   - Summary: the night-run reaper (`scripts/night-run.sh`) parses the sprint file's DoD boxes and

@@ -167,3 +167,57 @@ knowledge corpus, and at least the freshness half is a genuine whole-corpus read
 narrowed without losing what ADR-009 wired it for.
 
 **Still not ADR-grade.** Nothing is reversed; a hypothesis is replaced by a number, again.
+
+---
+
+## Third measurement — inside section 4 (SPRINT-061 T3, 2026-08-10)
+
+TD-050 asked to split section 4 across *"freshness vs dangling refs vs completeness"*. **Those are not
+three separable jobs**, which is the first finding. Reading `scripts/qa-check.sh:250-317`: freshness is
+one `gen-index.sh --check` subprocess and is separable; but **dangling refs and completeness are
+computed together inside the same two loops** — 4a (`:274-293`) over LEARNINGS ids, 4b (`:300-313`) over
+corpus files — each pass producing both verdicts from a shared `allids`. TD-050 also omits a third
+component entirely: the corpus enumeration and id-universe build (`:263-272`) they both depend on.
+Separating the two named jobs would mean restructuring the shipped gate. Measured **by loop** instead.
+
+**Method** — same as the second measurement: an `awk` transform of `scripts/qa-check.sh` into a copy in
+a temp dir with `_qat "<label>"` emitters inserted at the four boundaries, verified as a pure-addition
+diff (0 lines removed, 9 added). Shipped script SHA-256 identical before and after
+(`bd6bb83b…d250`); `scripts/` and `evals/` clean. Two samples, both exiting 0 at 135 checks.
+
+| Slice of section 4 | s1 (ms) | s2 (ms) | share of §4 | share of run |
+|---|---:|---:|---:|---:|
+| index freshness (`gen-index.sh --check`) | 34408 | 27693 | 35–40% | ~19% |
+| corpus + id-universe setup | 1465 | 1242 | ~1.6% | ~0.9% |
+| 4a — LEARNINGS refs **+** metadata | 26287 | 23837 | ~30% | ~16% |
+| 4b — corpus refs **+** metadata | 23399 | 26040 | 27–33% | ~16% |
+| **section 4 total** | **85583** | **78838** | 100% | **~51.5%** |
+| sections 1–3 | 15050 | 13143 | | ~9% |
+| sections 5–15 | 65296 | 61113 | | ~39% |
+| **full run** | **165929** | **153094** | | 100% |
+
+### Findings
+
+- **Section 4 has no cost centre. It has three comparable thirds.** Freshness ~36%, 4a ~30%, 4b ~30%,
+  setup ~2%. This is the answer TD-050 was really asking for, and it is the unwelcome one: there is no
+  dominant sub-part to cut. Removing the *largest* slice entirely would buy ~19% of the gate.
+- **The largest slice is the one nothing is allowed to touch.** Index freshness is a whole-corpus read,
+  which is exactly what ADR-009 wired it for; TD-050 names it as the thing not to cheapen, and it turns
+  out to be the biggest single item in the section. The cheapest target and the most protected one are
+  the same object.
+- **Section 4 has grown: 45–49% → 51.5%** of the run since SPRINT-060 T3, on a corpus five entries
+  larger. Its absolute cost moved 75–76s → 79–86s. It is scaling with the corpus, as designed.
+- **Variance lives in the freshness subprocess**, not in the loops: freshness swung 34.4 → 27.7s (19%)
+  while 4a held 26.3 → 23.8s. A discarded smoke run (identical code path, only the emitter's `printf`
+  differed) put freshness at 26.5s — a third point in the same spread, recorded because it widens the
+  band rather than because it flatters it.
+
+### Recommendation
+
+**No cure is proposed, and the measurement is now the argument against expecting a cheap one.** Every
+remaining lever is either small (setup, ~2%) or protected (freshness, and the two loops that produce the
+dangling-ref and completeness verdicts ADR-009 requires). If the gate's runtime ever becomes a real
+problem, the honest options are structural — caching the index digest between runs, or accepting that a
+whole-corpus integrity check costs proportional to the corpus — not a narrowing of what is checked.
+TD-050 stays open on its behavioural concern; what closes is the expectation that splitting it further
+would reveal a target.

@@ -89,13 +89,13 @@ freshness vs dangling refs vs frontmatter completeness — from at least two sam
 `scripts/qa-check.sh` is verifiably byte-identical afterwards.
 
 **DoD:**
-- [ ] Section 4 of `scripts/qa-check.sh` is read first, to confirm its three jobs are separably
+- [x] Section 4 of `scripts/qa-check.sh` is read first, to confirm its three jobs are separably
       instrumentable — if they interleave, that *is* the finding and it gets recorded as one
-- [ ] Two samples taken on an instrumented copy; the shipped `scripts/qa-check.sh` never edited
-- [ ] `scripts/qa-check.sh` confirmed byte-identical (hash before/after, recorded)
-- [ ] `docs/research/qa-gate-timing.md` updated with the per-job table
-- [ ] `TECH-DEBT.md` TD-050 updated with what the split found — including if it contradicts the row
-- [ ] `sh scripts/qa-check.sh` green
+- [x] Two samples taken on an instrumented copy; the shipped `scripts/qa-check.sh` never edited
+- [x] `scripts/qa-check.sh` confirmed byte-identical (hash before/after, recorded)
+- [x] `docs/research/qa-gate-timing.md` updated with the per-job table
+- [x] `TECH-DEBT.md` TD-050 updated with what the split found — including if it contradicts the row
+- [x] `sh scripts/qa-check.sh` green
 
 ## Decisions (pre-locked)
 
