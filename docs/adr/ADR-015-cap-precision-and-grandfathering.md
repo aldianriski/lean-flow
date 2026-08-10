@@ -2,6 +2,7 @@
 id: ADR-015
 tags: [docs, tooling]
 domain: governance
+status: accepted
 related: [ADR-006, ADR-007, ADR-012]
 ---
 

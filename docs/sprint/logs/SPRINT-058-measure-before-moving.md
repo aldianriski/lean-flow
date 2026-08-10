@@ -111,3 +111,27 @@ its rule 2 is prose today, and a rule with no matcher is exactly what this repo'
 was written about). `loop-hygiene-prd.md`'s false "nothing here has been applied" banner corrected;
 its `status:` deliberately left `current` per the owner's ruling — a records decision, separable from
 this task.
+
+### 2026-08-10 | complete | T2 — the measurement killed TD-046's proposed cure
+Full bare run 133.9s / 127.7s across two samples. The 14 always-on harnesses (read from
+`eval_harnesses_always`, not assumed — TD-046 recorded twelve) sum to 45.9s / 42.3s, **~34%**. The
+inline checks, sections 1–11, are **~66%** and have never been measured by anyone. So the proposed
+lever — move harnesses behind `QA_FULL=1` — buys at most a third of the gate, and the three harnesses
+that dominate it (layers-completeness 18.2/14.8, dispatch-preflight 9.3/8.9, doc-caps 8.3/8.2) are the
+highest-value suites in the set.
+
+The specific suspicion fared worse. "Several harnesses re-run their checker over the entire live repo"
+is **two of fourteen**, costing ~10s together — and both are deliberate zero-coverage guards whose live
+input is the entire point: `run-doc-caps-fixtures.sh` case 6 ("a PASS over an empty input set … the
+L-058 family in its purest form") and `run-manifest-lockstep-fixtures.sh` case 4, which exists because
+that checker's first live run matched nothing at all (L-102). They are the last things to cheapen.
+
+Both claims were re-verified from the fixture sources directly rather than accepted from the
+measurement agent's report — an agent's summary is evidence about the reporter, not the artifact
+(Edit-safety trap (c)). Its raw table is scratch; `docs/research/qa-gate-timing.md` is the durable
+record. "No harness edited" was likewise checked mechanically, not asserted: `git diff --stat`
+against `plan_commit` over `scripts/qa-check.sh` and `evals/` is empty.
+
+Dispatch note for the cost series: T2's measurement half ran on a briefed Sonnet subagent (~85k tokens,
+29 tool calls, ~11.6 min wall-clock) while T1 ran inline on the session model. The split held — the
+agent returned numbers and source citations and made no rulings, which is what the brief asked for.

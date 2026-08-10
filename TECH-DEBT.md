@@ -58,6 +58,20 @@ status: current
     live repo purely to guard a glob, and a cheaper assertion may exist. **Measure where the 126s
     actually goes before moving anything** — no figure has been taken per-harness, and L-097 is
     specifically about acting on a number nobody re-derived.
+  - **Measured 2026-08-10 (SPRINT-058 T2) — the mitigation above is retired, and both of its premises
+    were wrong.** Table → [`docs/research/qa-gate-timing.md`](docs/research/qa-gate-timing.md).
+    (a) The harness category is **~34%** of the runtime (45.9s / 42.3s of 133.9s / 127.7s across two
+    samples); the **inline checks, sections 1–11, are ~66%** and have never been measured. Moving all
+    fourteen harnesses behind `QA_FULL=1` therefore buys at most a third of the gate, and the three
+    that dominate — layers-completeness, dispatch-preflight, doc-caps — are the highest-value suites
+    in the set. (b) "Several harnesses re-run their checker over the entire live repo" is **two of
+    fourteen**, costing ~10s together, and both are deliberate *zero-coverage guards*
+    (`run-doc-caps-fixtures.sh` case 6 and `run-manifest-lockstep-fixtures.sh` case 4) whose live
+    input is the whole point — the second exists because that checker's first live run matched
+    nothing (L-102). They are the last things to cheapen, not the first. Also corrected: there are
+    **14** always-on harnesses, not the twelve this row records. The row stays open on its behavioural
+    concern (a gate slow enough to be skipped stops running); what is closed is the proposed cure.
+    Next measurement is the inline half — nothing has been moved or edited.
 
 - **TD-045** severity: minor | status: open | created: Sprint-056
   - Summary: the dispatch preflight in `dispatch.md` still re-implements the `Layers:`/`Depends-on:`

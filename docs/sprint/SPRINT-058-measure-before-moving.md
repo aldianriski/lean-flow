@@ -86,17 +86,17 @@ more than once, and the move/cheapen/keep question can now be argued against row
 an impression.
 
 **DoD:**
-- [ ] A per-harness wall-clock breakdown for a **bare** run (no `QA_FULL=1`), one row per always-on
+- [x] A per-harness wall-clock breakdown for a **bare** run (no `QA_FULL=1`), one row per always-on
       harness, measured on this host
-- [ ] The run is repeated and **at least two samples recorded per harness** — this task exists because a
+- [x] The run is repeated and **at least two samples recorded per harness** — this task exists because a
       single sample was treated as settled, and reproducing that would be the same error one level down
-- [ ] The table marks which harnesses **re-run their checker against the whole live repo**, since that is
+- [x] The table marks which harnesses **re-run their checker against the whole live repo**, since that is
       TD-046's stated suspicion and the measurement is what confirms or kills it
-- [ ] It lands as `docs/research/qa-gate-timing.md` rendered from `templates/RESEARCH.md.template`,
+- [x] It lands as `docs/research/qa-gate-timing.md` rendered from `templates/RESEARCH.md.template`,
       ≤120 lines, stating the decision question and **recommending without acting**
-- [ ] TD-046 points at the doc, and its `Mitigation:` line is either re-derived against the table or
+- [x] TD-046 points at the doc, and its `Mitigation:` line is either re-derived against the table or
       re-marked as still-a-hypothesis (L-091 — a Mitigation is the filer's guess, not a plan)
-- [ ] **No harness moved** to `QA_FULL=1`, and no harness edited — stated in the doc as the boundary,
+- [x] **No harness moved** to `QA_FULL=1`, and no harness edited — stated in the doc as the boundary,
       so the next reader does not mistake an unacted recommendation for a rejected one
 <!-- QA: measurement only. The doc is the deliverable; the gate stays byte-identical. -->
 
@@ -154,6 +154,9 @@ _None._
 | `AGENTS.md` | T1 | unchanged — the cap moved, the file did not | Low | cap check PASS |
 | `TODO.md` | T1 | TASK-179 filed (the guard ADR-015 names as missing) | Low | TODO hygiene check |
 | `docs/knowledge-index.md` | T1 | regenerated (derived) after three new metadata-carrying docs | Low | knowledge index current |
+| `docs/research/qa-gate-timing.md` | T2 | new — the per-harness table, two samples, recommending without acting | Low | cap check PASS 93 ≤ 120 |
+| `TECH-DEBT.md` | T2 | TD-046's mitigation retired against the measurement; both its premises corrected | Low | TD aging check |
+| `scripts/qa-check.sh` · `evals/` | T2 | **unchanged** — verified byte-identical vs `plan_commit` | None | empty `git diff --stat` |
 
 ## Retro
 
