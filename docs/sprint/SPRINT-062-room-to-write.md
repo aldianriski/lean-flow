@@ -82,25 +82,31 @@ not only to the gate's scrollback.
 - [x] The fix is exercised on input that **must FAIL**: a breach that should surface does, naming the doc (L-058)
 - [x] Nothing else the checklist already catches stops being caught (re-run the scan and diff the findings)
 
-### T3 — Establish whether LEARNINGS promotion is being stamped, then apply §11 `[size: M · risk: low · class: decision · HITL]`
-Layers: `docs/LEARNINGS.md` · `docs/knowledge-index.md` · possibly `DOCS_Guide` §10/§11
+### T3 — Record why the count reads zero, and normalise what made it readable that way `[size: S · risk: low · class: decision · HITL]`
+Layers: `docs/LEARNINGS.md` · `skills/lean-doc-generator/references/DOCS_Guide.md` §11
+Cites: `docs/knowledge-index.md`
 Depends-on: none
 
-91 entries carry zero `promoted: yes`. That has two readings and they demand opposite actions: either
-§11's collapse already ran and left pointer lines (healthy, nothing to do), or promotion happens
-without the field ever being stamped — in which case the `count ≥ 2` promotion rule has been running
-blind, and *pruning would destroy the evidence of that*. Establish which before editing anything.
-EPIC-002's evidence rule binds: nothing is removed without showing it is not load-bearing.
+<!-- Rescoped M → S at G2 by owner ruling; scope-change logged in the Execution Log before this
+     edit. Original premise: 91 entries carry zero `promoted: yes`, which might mean promotion is
+     never stamped — a governance defect whose evidence pruning would destroy. Investigation at the
+     gate settled it: the corpus is healthy, all 30 promoted entries carry a pointer, and
+     `promoted: yes` is simply never the stored form. Four of the five original DoD lines were
+     written against the defect branch and would close as no-ops. -->
 
-**Acceptance:** it is known why the count is zero, and §11's collapse is applied on that basis, with
-no durable rule losing the reader that stands on it.
+The zero is a **matcher artifact**: §11's collapse rewrites `promoted: yes` into `[status: promoted]`
+plus an `L-NNN → promoted: <where>` pointer, so the literal string it was greped for cannot survive a
+successful promotion. What remains worth doing is making that non-obvious fact durable, removing the
+one entry whose form defeats a uniform match, and recording that this corpus generated **three**
+false matcher results in a single session — including two produced while verifying the first.
+
+**Acceptance:** the zero is explained where the next person to check it will read it, and the corpus
+no longer contains a promoted entry whose shape differs from the other twenty-nine.
 
 **DoD:**
-- [ ] The zero is explained — collapsed-already vs never-stamped — with the evidence that settles it
-- [ ] If never-stamped: the governance defect is filed (`TD-NNN`), and the promotion rule's blind spot named
-- [ ] §11's collapse is applied on that basis, or explicitly not applied with the reason recorded
-- [ ] Every promoted rule still has a reader — spot-check each pointer resolves to a live durable rule
-- [ ] Line delta reported (§11 asks for the measurement, not just the pass)
+- [x] The explanation lives in §11's LEARNINGS row — the place someone checking promotion state reads — not only in a sprint log
+- [x] `L-058`'s collapsed pointer is normalised to the canonical form, so all 30 promoted entries match one shape
+- [x] `L-108` carries this sprint's sighting, including that it was violated three times by an agent holding the promoted rule in context
 
 ## Owner-action checklist
 - [ ] Reinstall the lean-flow plugin and restart the session — this session ran against a **1.32.0**
@@ -143,6 +149,8 @@ no durable rule losing the reader that stands on it.
 | `docs/knowledge-index.md` | T1 | **unchanged** — regenerated twice, byte-identical both times; the log is outside the corpus glob and `related:` is not index input | Low | `gen-index.sh` produced no diff; the re-pointed `related:` resolves to a corpus doc |
 | `skills/lean-doc-generator/SKILL.md` | T2 | doc-aging checklist line now reads §11 retention **+** every §2 cap breach, with the copy-a-cap prohibition | Low | exercised on live failing input; 3 breaches named where the scan previously read clean |
 | `skills/lean-doc-generator/references/DOCS_Guide.md` | T2 | §10 Promote review + §11 When-it-runs: caps are §2's, retention is §11's; doc-aging reads both | Low | L-015 leak diff clean; §11 triggers still report |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T3 | §11 LEARNINGS row: the collapse consumes `promoted: yes`; count by `[status: promoted]` instead | Low | position-anchored count agrees with pointer count (31 = 31) |
+| `docs/LEARNINGS.md` | T3 | L-058 pointer normalised to the canonical form; L-108 bumped to count 4 | Low | 91 entries intact; L-057/L-059 unfused |
 
 ## Retro
 

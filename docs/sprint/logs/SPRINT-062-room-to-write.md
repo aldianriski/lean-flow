@@ -130,3 +130,28 @@ will catch a future edit that quietly re-narrows this line. Raised for the Retro
 project's own cap check where it has one, otherwise measured against §2's table", so a consumer with
 no checker still has a defined procedure. Verified by diffing `skills/` for `scripts/` · `qa-check` ·
 `check-doc-caps` · `knowledge-index`: zero hits. `SKILL.md` 124 → 125 lines, inside its ~140 cap.
+
+### 2026-08-10 | complete | T3 — the trigger consumes itself; corpus normalised; L-108 at count 4
+Executed at its rescoped size. Three things landed.
+
+**§11's LEARNINGS row now states the trap.** The collapse *consumes the trigger it fires on*: a
+promoted entry becomes `[status: promoted]` + a pointer, so `promoted: yes` is never the stored form
+and grepping for it returns zero on a perfectly healthy corpus. The row now says to count by
+`[status: promoted]`, position-anchored, and that a zero here is evidence about the query rather than
+the corpus. Placed there rather than in the sprint log because §11's row is what someone checking
+promotion state actually reads (§10 placement test).
+
+**L-058 normalised.** It was the only one of the promoted entries written without the bold pointer
+wrapper — the reason a fixed-string search over the corpus named it as a gap when it was correctly
+collapsed. Verification now agrees with itself: position-anchored `[status: promoted]` = **31**,
+canonical pointer lines = **31**, 91 entries intact, neighbours L-057/L-059 unfused. (31 rather than
+30 because T1 collapsed L-106 earlier this sprint.)
+
+**L-108 bumped to count 4, and the sighting says something the first three did not.** The rule was
+already promoted into `CONTEXT.md` § Gates *and in context for this entire session* — and it reached
+none of the three failures anyway. The placement enumeration is what missed: it names checker
+authoring · the reaper · close-time log sweeps · fixture naming and symptom greps, while every failure
+here was an **ad-hoc verification grep during a governance/gate pass** — a flow not on the list, and
+the one where a wrong answer gets acted on immediately. A rule placed where its category is *discussed*
+can still miss the moment that category is being *exercised*. That is L-099's shape one level in, and
+it is the sprint's most transferable finding.
