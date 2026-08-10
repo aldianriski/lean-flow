@@ -108,7 +108,11 @@ reap() {
     rp_now=$(date +%s 2>/dev/null || printf '')
     case "$rp_now$rp_started" in
       ''|*[!0-9]*) ;;
-      *) rp_wall="$(( (rp_now - rp_started) / 60 )) min" ;;
+      # Rounded, not truncated. Integer division reported a measured 163s run as "2 min",
+      # a 40% under-statement -- negligible on a 64-minute run, material on a short one, and
+      # always in the same direction. A series used for estimating must not lean low by
+      # construction.
+      *) rp_wall="$(( (rp_now - rp_started + 30) / 60 )) min" ;;
     esac
   fi
 

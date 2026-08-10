@@ -184,3 +184,81 @@ to denials.
 T2. Three corrections in five tasks is worth carrying to the Retro: the promote-time declaration is
 reliably wrong in one specific way, which is that a *fix* surfaces in whichever task's gate run
 exposes it, not in the task that owns the file.
+
+### 2026-08-10 | complete | Part 4 rollup — the Plan is exhausted; close is denied-tool
+
+```
+run · 26 of 26 DoD ticked
+close · denied-tool · both Bash and PowerShell refused under dontAsk — `/lean-doc-generator close`
+        cannot run its gate or write `close_commit`. Next: authorize a shell and close interactively;
+        no Plan work is outstanding.
+run · cost unavailable · turns unavailable · wall-clock unavailable · 5 of 5 units · inline
+```
+
+All five Plan tasks carry every DoD box ticked (26 of 26), each with a `progress` entry above and a
+commit (`dd5c0c3` T1 → `638cab3` T5). Per Part 4 a `done` task needs no per-task line, so the header
+count carries them; the one non-green line is the close step, which is not a Plan task.
+
+**Verified rather than trusted, because this sprint's whole subject is a report disagreeing with its
+artifact.** The ticked boxes were spot-checked against the tree instead of read: `check-night-run-rollup.sh`,
+`run-night-run-rollup-fixtures.sh`, `assert-park-revisit.sh`, `selftest-assert-park-revisit.sh`,
+`night-run.sh` and `ADR-016-rollup-at-the-exit-path.md` all exist, and `qa-check.sh` carries the
+checker at line 196 with both harnesses in its always-on and opt-in lists. The DoD claims hold at the
+artifact level. What could **not** be verified is behavioural: no gate run was possible this session.
+
+**T4's park re-check ran and found nothing.** Walking the open parks at the exit boundary: this sprint
+logged no `park` event at any task boundary, so there is no park to re-examine and none to carry into a
+rollup line. The step fired and returned empty — recorded because a silent no-op and an unwired step
+look identical afterwards (L-020).
+
+**Why the calibration row degrades on all three figures.** The row is honoured with its gap stated
+rather than omitted (Part 4 degrade rule). Cost, turns and wall-clock are read off the last `result`
+event of the stream-json log — which is written *after* the process exits and is therefore unreadable
+from inside it, and the shell that would read it is denied here anyway. This is precisely the case
+ADR-016 exists for: under the launcher, the reaper appends its own block post-exit with the real
+figures. If this run was fired through `scripts/night-run.sh`, expect a second, better-populated block
+below this one; that duplication is the intended belt-and-braces, and the reaper's figures are the
+authoritative ones.
+
+**Not attempted, and why.** The § Files Changed table is still empty. It is derivable only from the
+`Layers:` declarations, which this sprint corrected three times (L-100) — reconstructing an attribution
+table from a source known to be wrong in exactly that way, with no `git` available to check it against,
+would be fabrication. It is left for close, where a shell can derive it from the commit range.
+
+### 2026-08-10 | complete | run exited — rollup emitted by the launcher
+
+```
+run · 26 of 26 DoD ticked
+```
+
+Calibration row (Part 4), transcribed from the harness result event:
+
+```
+run · $1.3692605 · 16 turns · 2 min · 5 of 5 units · inline
+```
+
+### 2026-08-10 | surprise | the end-to-end night run, and a figure that was quietly low
+
+Fired through `scripts/night-run.sh` against the completed Plan — the wrapper→reaper path was the one
+thing T2 had reasoned about but never executed. Prediction was stated before firing: `26 of 26 DoD
+ticked`, zero `unattempted` lines, real cost and turns. All three matched.
+
+**What the unattended run did on its own is the better result.** It applied the protocol shipped hours
+earlier: emitted the Part 4 block in the new format, reported `close · denied-tool` as a real denial
+rather than working around it, ran T4's park re-check and recorded that it fired and found nothing
+("a silent no-op and an unwired step look identical afterwards"), applied the degrade rule to figures
+it could not read from inside the process, and **refused to fabricate** the § Files Changed table
+because its only source is the `Layers:` declarations this sprint corrected three times. Then the
+reaper appended the authoritative figures post-exit, exactly as ADR-016 says it should:
+`run · $1.3692605 · 16 turns · 5 of 5 units · inline`. Two blocks, the second better-populated — the
+belt-and-braces the run itself predicted.
+
+**The gate then closed the loop**: T3's checker validated the run's own entry (`PASS night-run rollup
+… DoD header + calibration row present`). Emitter, reaper and gate all exercised on one real run.
+
+**And checking a green result found a defect, which is this sprint's whole thesis applied to itself.**
+The wall-clock read `2 min`. Measured: 163 s elapsed, harness `duration_ms` 156987. So the figure was
+*correct* — and truncating. Integer division under-stated a 2.7-minute run by 40%, always in the same
+direction. Negligible at 64 minutes, material at three, and a series used for estimating must not lean
+low by construction. Now rounds; re-verified at 163 s → `3 min`. Nobody would have found this from the
+row alone, because a plausible number is exactly what a wrong number looks like.
