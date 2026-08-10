@@ -4,6 +4,7 @@ slug: prove-the-run-finished
 owner: Maintainer
 last_updated: 2026-08-10
 status: active
+gates_signed: G1,G2 @ 4d6e855
 plan_commit: 4859353
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
