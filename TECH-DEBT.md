@@ -23,6 +23,22 @@ status: current
 
 ## Tech Debt
 
+- **TD-050** severity: minor | status: open | created: Sprint-060
+  - Summary: **section 4 of `scripts/qa-check.sh` (knowledge metadata — index freshness, dangling refs,
+    frontmatter completeness, ADR-009) is 45–49% of the entire gate on its own** — 75–76 s of a
+    154–169 s run, larger than all fifteen eval harnesses combined. Measured directly, two samples,
+    SPRINT-060 T3 (`docs/research/qa-gate-timing.md`). The other seventeen sections sum to ~14%.
+  - Impact: this is the gate's real cost centre and it has never been examined. It is also its most
+    *stable* component (<2% between samples) while the harness half swings 16%, so it is the part a
+    cure would actually move. Everything previously proposed — TD-046's `QA_FULL=1` idea — was aimed at
+    a third of the runtime that has now been cleared twice.
+  - Mitigation (**not yet derived**, L-091): do **not** reach for the obvious narrowing. At least the
+    index-freshness half is a genuine whole-corpus read and that is precisely what ADR-009 wired it for;
+    cheapening it risks the L-058 family (a check that stops seeing what it was built to see). The first
+    honest step is to split section 4's own cost between its three jobs — freshness vs dangling refs vs
+    completeness — because "section 4 is expensive" is itself an undifferentiated blob, and treating it
+    as one is the exact error L-107 describes, now at count 2 partly because of this measurement.
+
 - **TD-049** severity: minor | status: open | created: Sprint-059
   - Summary: the night-run reaper (`scripts/night-run.sh`) parses the sprint file's DoD boxes and
     `### Tn` headings itself, duplicating logic `scripts/lib/check-*.sh` already owns. A third parser
@@ -80,7 +96,7 @@ status: current
     context that can be skimmed. Do not act on the line count alone — measure which items a real
     pre-flight actually skips.
 
-- **TD-046** severity: minor | status: open | created: Sprint-056
+- **TD-046** severity: minor | status: resolved → SPRINT-060 T3 | created: Sprint-056
   - Summary: the always-on gate now takes **~126s** (measured: 115s at SPRINT-056 T1, 126s at close),
     up from the 57s recorded when TD-016 moved three slow harnesses behind `QA_FULL=1`. Twelve
     always-on eval harnesses now run on every invocation, several of which spawn the checker they

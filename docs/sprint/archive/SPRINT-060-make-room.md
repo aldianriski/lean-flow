@@ -3,7 +3,7 @@ sprint: 060
 slug: make-room
 owner: Maintainer
 last_updated: 2026-08-10
-status: active
+status: closed
 gates_signed: G1,G2 @ 865f446
 plan_commit: 9c1177d
 close_commit: [sha — set at close]
@@ -167,17 +167,45 @@ that was already complete. What has never run together is both halves at once.
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
-     shipped → CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
-     After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Retrieval check** — no prior `L-NNN`/ADR was missed or contradicted, and four were actively load-
+bearing: **L-091** (re-derive before building) is the reason T1 diffed before deleting and found its own
+premise false; **L-088** stopped T5 being ticked against an unmet acceptance; **L-058/L-076** shaped T2's
+two-fixture design; **L-107** was *re-observed*, one level below where it was written. ADR-014's glob
+guard and `check-layers-observed.sh` each caught a real error mid-sprint.
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
-
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents). Cost per
-unit **delivered**, not attempted. Unavailable → say so rather than omitting the line.
+**Cost** — inline, no dispatch. Two instrumented gate samples (~5.4 min of compute) plus ~10 ordinary
+gate runs at 135–169 s each. No paid sub-agent runs and no night run this sprint, so there is no
+harness cost row to transcribe; the honest figure is *session cost only*, which the harness does not
+expose to me. Stated as unavailable rather than omitted (Part 4 degrade rule). **4 of 5 units
+delivered.**
 
 **Worked**
 
+- **DoDs that force re-derivation before action.** T1's first DoD line was "diff before judging anything
+  removable". That single clause is why a task written to delete prose became an ADR instead of a
+  wrong deletion. Three of four completed tasks overturned the premise they were handed; in every case
+  the DoD had a re-derivation step in front of the doing.
+- **Measuring the artifact, not the report.** T3 used an instrumented *copy* so the shipped gate stayed
+  byte-identical, and proved it (`git diff --stat` empty). T4's "nothing mechanical changes" was
+  verified by running the retention checker, not asserted.
+- **Writing the guardrail into the Plan rather than carrying it in someone's head.** T5 was promoted
+  over a flagged concern, so the concern went into its DoD. When the moment came, the Plan itself
+  refused the shortcut.
+
 **Friction**
 
+- **A criterion depended on a decision no gate had taken yet.** T5's acceptance needed a night run;
+  the run mode was decided at G2, *after* promote froze the Plan. Neither G1 nor G2 surfaced the
+  dependency, and by the time the mode existed the criterion was unreachable. → **L-111**.
+- **`L-107` recurred inside the sprint that promoted it.** SPRINT-058 cleared the harnesses and then
+  measured the remainder as an undifferentiated blob; "the inline half is 66%" became the new resting
+  place for exactly the same reason the harnesses were the original suspect. → count bumped to 2.
+- **Two tasks' stated assumptions were wrong in detail** (T4's "three live citers" was five; its
+  "trigger" was not the template's actual trigger). Harmless here because both pointed the same way,
+  but a `assumes:` line is a claim and was treated as one only because the DoD forced a check.
+
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+
+- A task's acceptance can depend on a decision that no gate has taken yet (L-111).
+- L-107's second sighting: the blob beside the suspect gets measured *as a blob*, and the aggregate
+  becomes the new unexamined resting place.

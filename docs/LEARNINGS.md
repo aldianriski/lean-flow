@@ -22,11 +22,19 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-110**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-111**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-111 [tags: sprint-model] [status: active]: **A task's acceptance criterion can depend on a decision no gate has taken yet — the Plan freezes at promote, but some decisions are only made at G2 or later, and a criterion resting on one of them is unreachable before anyone notices.** SPRINT-060 T5's acceptance required "a real unattended run that stops mid-Plan", and its DoD named the vehicle: a night run over T2–T4. The **run mode** was ruled at G2 — interactive, correctly, because four of five tasks were HITL — and that ruling silently foreclosed the vehicle. By the time T5 was reached it was the only open task, so any run would *park* it (`parked-hitl`) rather than leave it `unattempted`: different states, and only the second exercises the thing. Neither G1 nor G2 caught it, because both gates read the criterion for *clarity* and never asked what it depends on that is not yet decided. The failure is the temporal sibling of L-105 one level in: L-105 asks when a **guard** fires relative to what it guards; this asks when a **criterion** becomes checkable relative to the decisions it rests on. Both are invisible to a review that reads what a line says rather than when it can be true. The cheap counter at G2, where the mode and dispatch shape are actually chosen: for each task, ask *does this acceptance depend on anything I am deciding right now — and if I decide it the other way, is the criterion still reachable?* Cost when missed is bounded but real — the sprint closed 4 of 5 and the task carried, which is the honest outcome and not a free one.
+- seen: Sprint-060
+- count: 1
+- promoted: no
+- related: L-105 (a guard is placed in time, not only in text — the guard-side sibling) · L-088 (do not reinterpret a DoD execution invalidated — what stopped this being papered over) · L-100 (a `Layers:` declaration is corrected by the work)
 
 ---
 
@@ -55,8 +63,8 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 ---
 
 ## L-107 [tags: process] [status: active]: **A hypothesis about where cost goes names the component that is *legible*, not the one that dominates — the enumerable list gets blamed and the undifferentiated blob beside it never gets suspected.** TD-046 recorded the QA gate at ~126s and proposed moving eval harnesses behind `QA_FULL=1`, on the suspicion that "several harnesses re-run their checker over the entire live repo". Measured (SPRINT-058 T2): the fourteen harnesses are **~34%** of the runtime and the inline checks are **~66%**. The specific suspicion was two harnesses of fourteen, costing ~10s together — and both are deliberate zero-coverage guards whose live input is the entire point, so they were the *last* things to cheapen rather than the first. The row was wrong in both directions at once, and it sat unchallenged for two sprints. What made the harnesses the suspect is not evidence, it is **shape**: they are a named list in a shell variable you can read, count and point at, so a hypothesis can be phrased about them. Sections 1–11 are an undifferentiated run of inline checks with no name, no count and no enumeration, so there was nothing to phrase a hypothesis *about* — and an unnameable component cannot be accused. The bias is structural rather than careless, which is why re-reading the row never caught it. The cheap counter is to force the arithmetic before the diagnosis: whatever the suspect costs, subtract it from the total and ask out loud what the remainder is. Here the remainder was twice the suspect and had never been measured by anyone. Distinct from L-097 (a figure that went stale — this figure was never taken) and from L-091 (a Mitigation is a hypothesis — this is *why* that particular hypothesis was reached for).
-- seen: Sprint-058
-- count: 1
+- seen: Sprint-058, Sprint-060
+- count: 2
 - promoted: no
 - related: L-091 (a `Mitigation:` is the filer's guess) · L-097 (a number in a criterion is remembered, not measured) · L-102 (run it live to find out what is true) · TD-046
 

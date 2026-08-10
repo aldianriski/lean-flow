@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-060 — Make Room** → [docs/sprint/SPRINT-060-make-room.md](docs/sprint/SPRINT-060-make-room.md)
+> _None._ SPRINT-060 closed 2026-08-10 (4 of 5 — T5 carried → TASK-188).
 
 ---
 
@@ -36,91 +36,54 @@ status: current
       class:      execution
       done-when:  a real unattended run that stops mid-Plan leaves a rollup naming the untouched tasks
                   as `unattempted`, verified end-to-end through `scripts/night-run.sh` rather than via
-                  `--reap`. The reaper's partial-Plan path is currently proven three ways that all
-                  stop short of this: a real log replayed through `--reap`, a zero-ticked-box
-                  regression, and an end-to-end run against a Plan that was already complete
+                  `--reap`
       touches:    scripts/night-run.sh (only if the exercise finds a defect) · a sprint Execution Log
       depends-on: none
-      assumes:    the gap is real but narrow — the wrapper→reaper path IS proven end-to-end, and the
-                  unattempted-line logic IS proven on real input; what has never run together is both
-                  at once. Re-derive before spending a run on it (L-091): if the next ordinary night
-                  run stops mid-Plan for its own reasons, that IS this exercise and no separate run is
-                  needed. Do not manufacture a partial sprint just to produce the evidence
-      tracker:    SPRINT-059 close Retro · ADR-016
+      assumes:    **carried from SPRINT-060 T5, acceptance unmet — read the ruling before re-promoting.**
+                  The trigger is OPPORTUNISTIC and that is the whole design: the next night run that
+                  stops mid-Plan *for its own reasons* is the exercise. Do not schedule a run to produce
+                  one, and do not promote this into a sprint whose shape cannot generate it — SPRINT-060
+                  promoted it alongside four HITL tasks, the run mode was then ruled interactive at G2,
+                  and that foreclosed the only vehicle it had (L-111). Its partial-Plan path is already
+                  proven three ways that each stop short of the others: a real log through `--reap`, a
+                  zero-ticked-box regression, and an end-to-end launcher run against a complete Plan
+      tracker:    SPRINT-060 T5 scope-change + owner ruling · ADR-016 · L-111
       origin:     close-retro
-      state:      ready
+      state:      blocked
 
-
-- [ ] TASK-182 — Run the CONTEXT.md dedup pass; it is at 129/130  [size: M] [risk: low] [HITL]
+- [ ] TASK-189 — Promote "every hygiene rule gets a matcher" out of the spent PRD  [size: S] [risk: low] [HITL]
       class:      decision
-      done-when:  `.claude/CONTEXT.md` has real headroom again, with every removal being prose that
-                  duplicated `CLAUDE.md` or `README.md` and is replaced by a pointer — never the
-                  SSOT's own content compressed to make a number go green (§7, and L-106's shape one
-                  level up)
-      touches:    .claude/CONTEXT.md · .claude/CLAUDE.md and README.md if a pointer target needs one
+      done-when:  the principle lives in a durable home chosen by §10's placement test, and
+                  `loop-hygiene-prd.md` no longer carries a live rule inside a `superseded` doc
+      touches:    the durable home §10's test selects (likely DOCS_Guide §10 or `.claude/CLAUDE.md`) ·
+                  docs/research/loop-hygiene-prd.md
       depends-on: none
-      assumes:    the duplication is there to find. TD-006 and L-008 both describe this file
-                  accreting its satellites' prose, and the dedup pass has run once in ~50 sprints —
-                  but that is the *hypothesis*, not the finding (L-091). Re-derive by diffing the
-                  three files' overlapping sections before deciding anything is removable; if the
-                  overlap turns out to be small, the honest answer is an ADR moving the cap, exactly
-                  as ADR-007 did to reach 130 in the first place
-      tracker:    TD-006 · SPRINT-058 close sweep — L-105's promotion took it to 129/130
+      assumes:    the principle is genuinely still live — SPRINT-060 T2 applied it, turning ADR-015
+                  rule 2 from prose into an enforced check, so this is evidence rather than sentiment.
+                  Re-derive the placement before writing (L-091): ask which flows can hit the failure.
+                  Note `CLAUDE.md` is at 80/80 and would need its own diet pass or ADR first, exactly
+                  as ADR-017 did for CONTEXT.md — so the placement test may decide the home, and the
+                  cap may decide the timing
+      tracker:    SPRINT-060 T4 ruling
       origin:     close-retro
       state:      ready
 
-- [ ] TASK-180 — Measure the QA gate's inline half (sections 1–11) directly  [size: S] [risk: low] [HITL]
-      class:      execution
-      done-when:  a per-section wall-clock breakdown of `scripts/qa-check.sh` sections 1–11 exists,
-                  measured directly rather than by subtraction, ≥2 samples, appended to
-                  `docs/research/qa-gate-timing.md`. The move/cheapen/keep decision for the gate is
-                  then made against that table
-      touches:    docs/research/qa-gate-timing.md · scripts/qa-check.sh (instrumentation only, if any)
-      depends-on: none
-      assumes:    SPRINT-058 T2 established the inline half is ~66% of the runtime, but **by
-                  subtraction** — full-run minus standalone-harness totals, two separate process
-                  invocations with their own cache state. Re-derive that share before acting on it
-                  (L-097); the proportion is sound, the second-level figures are not. If direct
-                  timing needs a script edit, that is a finding, not a workaround — T2's brief
-                  refused the same trade and the refusal is what kept the measurement honest
-      tracker:    TD-046 · docs/research/qa-gate-timing.md § Out of scope
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-181 — Rule on `loop-hygiene-prd.md`'s status: current vs superseded  [size: S] [risk: low] [HITL]
+- [ ] TASK-190 — Rule on the two sibling loop-hygiene docs' statuses  [size: S] [risk: low] [HITL]
       class:      decision
-      done-when:  the doc carries a deliberate `status:`, and the reasoning is recorded wherever the
-                  ruling lands. Either outcome is a result; what is not acceptable is the field
-                  staying `current` because nobody looked
-      touches:    docs/research/loop-hygiene-prd.md · skills/lean-doc-generator/references/DOCS_Guide.md
-                  (only if the RESEARCH status rule needs sharpening)
+      done-when:  `loop-hygiene-findings.md` and `loop-hygiene-workstreams.md` each carry a deliberate
+                  `status:`, ruled on the RESEARCH template's actual trigger ("once a decision is built
+                  on it"), with the reasoning recorded
+      touches:    docs/research/loop-hygiene-findings.md · docs/research/loop-hygiene-workstreams.md
       depends-on: none
-      assumes:    every workstream in the doc has shipped, which is what the RESEARCH template says
-                  triggers `superseded` — SPRINT-058 T1 corrected its "nothing here has been applied"
-                  banner on exactly that evidence. Note this changes nothing mechanical: §11 archives
-                  a superseded doc only once nothing live cites it, and three live surfaces cite this
-                  one, so it stays put and keeps its cap coverage either way. The question is whether
-                  the corpus should say true things about its own state, not whether a file moves
-      tracker:    SPRINT-058 T1 Execution Log, 2026-08-10 surprise entry
+      assumes:    they raise the same question SPRINT-060 T4 answered for their parent and were
+                  explicitly left out of its scope rather than swept along. Do not assume the answer
+                  matches the parent's: a findings register can outlive the PRD that spawned it, and
+                  T4's own lesson was that the template's trigger is not the one people reach for
+      tracker:    SPRINT-060 T4 Execution Log, out-of-scope note
       origin:     close-retro
       state:      ready
 
-- [ ] TASK-179 — Guard ADR-015 rule 2: reject a soft-cap row in the grandfather file  [size: S] [risk: low] [AFK]
-      class:      execution
-      done-when:  `check-doc-caps.sh` FAILs when `doc-caps-grandfathered.txt` names a path whose §2
-                  cap is soft (`~N` / `N soft`), with a retained must-FAIL fixture holding exactly
-                  that violation (L-058). Today the rule is prose in the file's header and in
-                  ADR-015; nothing stops the next breach being recorded there
-      touches:    scripts/lib/check-doc-caps.sh · scripts/lib/doc-caps-grandfathered.txt ·
-                  evals/fixtures/doc-caps/ · evals/run-doc-caps-fixtures.sh
-      depends-on: none
-      assumes:    the checker already parses soft-vs-hard (it does — `soft = (cap ~ /~/ ||
-                  cap ~ /soft/)`), so this is a comparison against a list it already reads, not new
-                  parsing. Re-derive before building (L-091): ADR-015's Negative section names this
-                  guard's absence as an accepted trade, so confirm it is still worth closing
-      tracker:    ADR-015 § Consequences — "nothing enforces rule 2 yet"
-      origin:     manual
-      state:      ready
+
 
 ### P3 — Long-term
 
