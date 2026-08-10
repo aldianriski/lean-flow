@@ -4,6 +4,7 @@ slug: named-not-answered
 owner: Maintainer
 last_updated: 2026-08-10
 status: active
+gates_signed: G1,G2 @ 0c86582
 plan_commit: c15f2bd
 close_commit:
 update_trigger: sprint execute/close events
