@@ -77,10 +77,10 @@ lengthening the checklist at all.
 not only to the gate's scrollback.
 
 **DoD:**
-- [ ] The ownership question is answered explicitly (§11 triggers vs §2 caps), with the reasoning recorded
-- [ ] The chosen mechanism is wired where the promote flow actually reads it, and fires — verified against the three live breaches
-- [ ] The fix is exercised on input that **must FAIL**: a breach that should surface does, naming the doc (L-058)
-- [ ] Nothing else the checklist already catches stops being caught (re-run the scan and diff the findings)
+- [x] The ownership question is answered explicitly (§11 triggers vs §2 caps), with the reasoning recorded
+- [x] The chosen mechanism is wired where the promote flow actually reads it, and fires — verified against the three live breaches
+- [x] The fix is exercised on input that **must FAIL**: a breach that should surface does, naming the doc (L-058)
+- [x] Nothing else the checklist already catches stops being caught (re-run the scan and diff the findings)
 
 ### T3 — Establish whether LEARNINGS promotion is being stamped, then apply §11 `[size: M · risk: low · class: decision · HITL]`
 Layers: `docs/LEARNINGS.md` · `docs/knowledge-index.md` · possibly `DOCS_Guide` §10/§11
@@ -141,6 +141,8 @@ no durable rule losing the reader that stands on it.
 | `skills/lean-doc-generator/references/DOCS_Guide.md` | T1 | §2 gains a `research/logs/<slug>.md` row; Growth rule gains L-106's promoted rule | Low | cap report unchanged; §2-derived glob verified against the new row |
 | `docs/LEARNINGS.md` | T1 | L-106 collapsed to a pointer per §11 (718 → 698) | Low | 91 entries intact; neighbours L-105/107 unfused |
 | `docs/knowledge-index.md` | T1 | **unchanged** — regenerated twice, byte-identical both times; the log is outside the corpus glob and `related:` is not index input | Low | `gen-index.sh` produced no diff; the re-pointed `related:` resolves to a corpus doc |
+| `skills/lean-doc-generator/SKILL.md` | T2 | doc-aging checklist line now reads §11 retention **+** every §2 cap breach, with the copy-a-cap prohibition | Low | exercised on live failing input; 3 breaches named where the scan previously read clean |
+| `skills/lean-doc-generator/references/DOCS_Guide.md` | T2 | §10 Promote review + §11 When-it-runs: caps are §2's, retention is §11's; doc-aging reads both | Low | L-015 leak diff clean; §11 triggers still report |
 
 ## Retro
 

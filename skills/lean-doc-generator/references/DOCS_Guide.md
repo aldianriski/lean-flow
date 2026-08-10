@@ -390,11 +390,23 @@ re-review prompt; `severity: high` auto-escalates to Backlog P1. Rows are never 
 debt is marked `status: resolved → TASK-NNN` for the audit trail.
 
 **Promote review (the governance checkpoint)** — before planning a sprint, run the L-promotion scan, TD
-aging, and doc-aging (§11) triggers, then **emit the result as an explicit checklist** rather than silent
+aging, and doc-aging triggers, then **emit the result as an explicit checklist** rather than silent
 prose — `☐ L-promotion (count≥2, promoted:no): <findings|none>` · `☐ TD aging (≥3 sprints unaddressed):
-<findings|none>` · `☐ doc-aging §11: <findings|none>`. **Explicit owner sign-off on the checklist is
-required before rendering the sprint file or committing `plan locked`.** This is what stops learning and
-debt from rotting — and stops the review itself from being skipped unnoticed.
+<findings|none>` · `☐ doc-aging — §11 retention + §2 cap breaches: <findings|none>`. **Explicit owner
+sign-off on the checklist is required before rendering the sprint file or committing `plan locked`.**
+This is what stops learning and debt from rotting — and stops the review itself from being skipped unnoticed.
+
+**Doc-aging has two sources, and §11 is only one of them.** §11's ledger is a *retention* table — what
+gets archived, pruned or collapsed. **Caps are §2's**, and the two are not the same question. The
+doc-aging line therefore reports **both**: every §11 retention trigger that fired, *and* every §2 cap
+breach, sourced from the project's own cap check where it has one and otherwise measured directly
+against §2's table. **Never restate a §2 cap inside this checklist**: a copied figure is a second SSOT
+that drifts silently from the row it copied, and enumerating triggers by hand is what lets an entire
+category go unreported (a cap check printed three soft breaches on every run for sprints while this
+review reported doc-aging clean — the report had a matcher and no consumer; SPRINT-062 T2 · L-106).
+The `TODO.md > ~150` row in §11's table is a **cap wearing a retention row's clothes** — it is listed
+there for its prune action, and it is the reason exactly one of §2's caps used to reach this checklist
+while the rest did not.
 
 ---
 
@@ -417,9 +429,14 @@ them**. Append-only is preserved *inside* each archive file.
 | `docs/sprint/logs/SPRINT-NNN-<slug>.md` | sprint closed | move → `docs/sprint/archive/logs/` **with its Plan**, same commit — the pair is one record and splitting them across an archive boundary strands the evidence the Retro cites. No INDEX row of its own; the Plan's row covers both. Never compacted: the log is the append-only audit trail the Retro was written from |
 
 **When it runs** — close-time triggers (Backlog removal · sprint archive) execute during `close`;
-scan-based triggers (TD deletion · rotation · LEARNINGS collapse · the soft cap) run at **Promote**
-as **doc-aging**, alongside tech-debt aging in the governance review. Always propose → approve →
-apply; never compress silently.
+scan-based triggers (TD deletion · rotation · LEARNINGS collapse · the `TODO.md` prune) run at
+**Promote** as **doc-aging**, alongside tech-debt aging in the governance review. Always propose →
+approve → apply; never compress silently.
+
+**Doc-aging is not bounded by this table.** The rows above are retention triggers; the promote review's
+doc-aging line also carries **every §2 cap breach**, which this table does not enumerate and must not
+try to (§10 Promote review). A breach and a retention trigger need different actions — a cap breach is
+ruled (trim · split · restate the number, per §2's Growth rule), not archived.
 
 ---
 

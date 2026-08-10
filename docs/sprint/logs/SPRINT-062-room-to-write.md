@@ -94,3 +94,39 @@ and states that **both had been carried as 'drift' for sprints**, which is the m
 exists to correct. The task text inherited the error it was filed to fix. T1's scope is unchanged (the
 two stay out), but the *reason* is scope, not a settled diagnosis; recorded in the decision doc's
 § Out of scope so the next owner re-sorts them against the new rule instead of inheriting "drift".
+
+### 2026-08-10 | complete | T2 — doc-aging now reads two sources; §2 owns caps, §11 owns retention
+**The ownership question has a clean answer, and it is not "add a line".** §11's ledger is a
+*retention* table — what gets archived, pruned or collapsed. **Caps belong to §2.** The two are
+different questions needing different actions: a retention trigger is applied, a cap breach is *ruled*
+(trim · split · restate the number, per §2's Growth rule).
+
+**Why exactly one cap was reaching the checklist.** §11's table carries a `TODO.md > ~150 lines` row —
+a cap wearing a retention row's clothes, listed there for its prune action. The governance checklist
+enumerated §11's triggers, so it inherited that one cap and none of §2's other ~40. Not an oversight in
+the enumeration: the enumeration was the wrong *source*.
+
+**Fix.** The doc-aging line now reads `§11 retention + every §2 cap breach`, sourced from the project's
+own cap check where it has one and otherwise measured directly against §2's table — with an explicit
+prohibition on restating a §2 cap figure inside the checklist, since a copied number is a second SSOT
+that drifts from the row it copied. Wired in both places the promote flow actually reads:
+`lean-doc-generator/SKILL.md` § Governance review (the emitted checklist) and `DOCS_Guide` §10 Promote
+review + §11 When-it-runs.
+
+**Exercised on must-FAIL input, and the discriminating case matters.** `TODO.md` was never the test —
+it has a §11 row and was already visible. The docs with **no** §11 row are `graph-engineering.md` (122)
+and `loop-hygiene-prd.md` (139): previously invisible to this review by construction. Running the new
+two-source procedure against the live repo names all three, each with its doc and figure, on the same
+input that made SPRINT-061's promote scan report doc-aging **clean**. Source A (§11 triggers) still
+reports — nothing that was caught stopped being caught.
+
+**Honest gap, not ticked as covered.** L-058's full bar wants a *retained* must-FAIL fixture per check.
+The checker underneath (`check-doc-caps.sh`) already has one; what T2 changed is procedural text in a
+skill, and this repo has no harness that exercises skill prose. The exercise above is a real live
+before/after on failing input, which is what T2's DoD asks for — but it is not a fixture, and nothing
+will catch a future edit that quietly re-narrows this line. Raised for the Retro.
+
+**Consumer check (L-015).** No repo-specific path entered either surface — the wording is "the
+project's own cap check where it has one, otherwise measured against §2's table", so a consumer with
+no checker still has a defined procedure. Verified by diffing `skills/` for `scripts/` · `qa-check` ·
+`check-doc-caps` · `knowledge-index`: zero hits. `SKILL.md` 124 → 125 lines, inside its ~140 cap.
