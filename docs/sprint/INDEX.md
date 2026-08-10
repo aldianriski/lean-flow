@@ -68,4 +68,4 @@ One line per archived sprint (newest first); files live in [`archive/`](archive/
 - SPRINT-002 — Dogfood Fixes — closed 2026-06-11 · 007869e
 - SPRINT-001 — Ship & Validate — closed 2026-06-11 · b0f2695
 - SPRINT-059 — Prove the Run Finished — closed 2026-08-10 · 0b4e06a
-- SPRINT-060 — Make Room — closed 2026-08-10 · <close_commit> · 4 of 5 units (T5 carried, acceptance unmet)
+- SPRINT-060 — Make Room — closed 2026-08-10 · afd693d · 4 of 5 units (T5 carried, acceptance unmet)
