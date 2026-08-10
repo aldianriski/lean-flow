@@ -95,7 +95,7 @@ with a named finding; a well-formed one passes.
 <!-- QA: the fixtures ARE the test; a checker with no must-FAIL fixture is the silent false-negative L-058 names. -->
 
 ### T4 — Re-check open parks at task boundaries `[size: S · risk: med · class: decision · HITL]`
-Layers: `skills/orchestrator/references/night-run.md` (Part 0 park protocol) · `skills/orchestrator/SKILL.md` (sprint-bulk step 5 pointer) · `evals/assert-park-revisit.sh` · `evals/selftest-assert-park-revisit.sh` · `evals/fixtures/park-revisit/` · `scripts/qa-check.sh` (opt-in harness list)
+Layers: `skills/orchestrator/references/night-run.md` (Part 0 park protocol) · `skills/orchestrator/SKILL.md` (sprint-bulk step 5 pointer) · `scripts/night-run.sh` (the `grep -c` fallback bug this task surfaced) · `evals/assert-park-revisit.sh` · `evals/selftest-assert-park-revisit.sh` · `evals/fixtures/park-revisit/` · `scripts/qa-check.sh` (opt-in harness list)
 Depends-on: T1
 
 The park protocol assumes a park outlives the run. It can also name an unblock condition the same run
@@ -126,11 +126,11 @@ real weight here.
 comparison against the existing rows is loose.
 
 **DoD:**
-- [ ] Run 1 recorded: $23.04 · 178 turns · 64 min · 4 of 7 units · inline
-- [ ] Run 2 recorded: $18.26 · 140 turns · 45 min · 3 of 3 units · inline
-- [ ] The honest reading is attached: $5.90 per unit delivered against the table's $8.27 and $5.42, but those are dispatched two-unit runs on a lighter repository — the comparison is loose and says so
-- [ ] The figure that transfers is stated: zero denials across 318 turns after $1.77 of probing, against a predecessor run that lost ~40% of its turns to denials
-- [ ] The table records that both rows were reconstructed by hand from the harness payload — T2's justification, sitting in the data
+- [x] Run 1 recorded: $23.04 · 178 turns · 64 min · 4 of 7 units · inline
+- [x] Run 2 recorded: $18.26 · 140 turns · 45 min · 3 of 3 units · inline
+- [x] The honest reading is attached: $5.90 per unit delivered against the table's $8.27 and $5.42, but those are dispatched two-unit runs on a lighter repository — the comparison is loose and says so
+- [x] The figure that transfers is stated: zero denials across 318 turns after $1.77 of probing, against a predecessor run that lost ~40% of its turns to denials
+- [x] The table records that both rows were reconstructed by hand from the harness payload — T2's justification, sitting in the data
 
 ## Decisions (pre-locked)
 

@@ -511,6 +511,8 @@ window from it:
 | SPRINT-041 | $6.60 | 15 | — | 2 built, **0 landed** | coordinator + 2 worktree agents |
 | SPRINT-043 | $16.54 | 64 | 22 min | 2 built, **2 landed** | coordinator + 3 agents (2 worktree + 1 follow-up) |
 | SPRINT-045 | $10.84 | 25 | 17 min | 2 built, **2 landed** | coordinator + 2 worktree agents |
+| consumer run 1 | $23.04 | 178 | 64 min | **4 of 7 landed** | inline |
+| consumer run 2 | $18.26 | 140 | 45 min | **3 of 3 landed** | inline |
 
 Read those rows honestly. SPRINT-041 *built* both units and landed neither, because the merge-back was
 denied — $6.60 bought two stranded branches, and cost per unit **delivered** was undefined. SPRINT-043
@@ -533,3 +535,19 @@ Two cautions the second row buys, which the first could not:
   run that failed early.
 - **Estimate from turns, not task count.** Both sprints held two tasks; SPRINT-043 took 64 turns to
   SPRINT-041's 15. Task count predicted nothing.
+
+**The last two rows are not ours** — they are a consumer's, on their own host, OS and shell, running
+one sprint from promote to a complete Plan across two runs. Read them with three caveats attached:
+
+- **The per-unit comparison is loose.** $5.90 per unit delivered across both, against $8.27 and $5.42
+  above — but those are two-unit *dispatched* runs on a considerably lighter repository, and these are
+  seven- and three-unit *inline* ones. Different shape, different substrate, different scale. The
+  number is recorded so the series has an inline data point at all, not because it settles anything.
+- **The figure that does transfer is the denial rate.** **Zero denials across 318 turns**, after
+  **$1.77** of probing — against a predecessor run on the same host that lost roughly **40% of its
+  turns** to denials. That is Part 1's probe discipline paying for itself at about two per cent of the
+  run's cost, and it is the strongest single argument in this document.
+- **Run 1 is the row that motivated half this file.** It reports 4 of 7 and exited `success`. Neither
+  run wrote its own calibration row; both were reconstructed afterwards by a human from the harness
+  result payload — which is precisely why the row is now emitted by the launcher rather than asked
+  for (Part 2's reaper · ADR-016).

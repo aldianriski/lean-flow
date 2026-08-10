@@ -170,3 +170,17 @@ sprint with zero ticked boxes: `run · 0 of 1 DoD ticked`, `cost unavailable`, d
 changed ADR-016, which T2 had declared. True: T3's gate run surfaced the ADR's invented tag/domain
 vocab, and fixing it was T3's work. Declared where the work happened rather than argued away.
 Gate 140 pass, 0 fail (144 with QA_FULL=1).
+
+### 2026-08-10 | progress | T5 — the consumer's two runs join the calibration series
+
+Both rows added ($23.04 / 178 turns / 64 min / 4 of 7 · $18.26 / 140 turns / 45 min / 3 of 3, both
+inline), with three caveats attached rather than a bare per-unit figure. The $5.90/unit comparison
+against the table's $8.27 and $5.42 is **loose** — those are two-unit dispatched runs on a lighter
+repo; these are seven- and three-unit inline ones on a host that is not ours. What does transfer is
+zero denials across 318 turns after $1.77 of probing, against a predecessor that lost ~40% of turns
+to denials.
+
+`Layers:` corrected a third time (L-100) — T4's `grep -c` fix touched `night-run.sh`, declared under
+T2. Three corrections in five tasks is worth carrying to the Retro: the promote-time declaration is
+reliably wrong in one specific way, which is that a *fix* surfaces in whichever task's gate run
+exposes it, not in the task that owns the file.
