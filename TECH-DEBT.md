@@ -18,6 +18,15 @@ status: current
 > felt, and after a few re-reads it starts to read as settled. Cite the evidence for the *problem*;
 > re-derive the *fix* before a DoD is built on it (L-091 → DOCS_Guide §10). The same goes for a row's
 > Summary: TD-036's was false the day it was filed.
+>
+> **A row naming where cost goes accuses the component that is *legible*, never the one that dominates** —
+> L-091's sibling, explaining why that particular hypothesis got reached for. An enumerable list you can
+> read, count and point at can have a hypothesis phrased *about* it; an unnamed, uncounted blob beside it
+> cannot be accused at all, so it is never suspected. TD-046 blamed fourteen nameable eval harnesses
+> (measured: ~34%) while the eleven unnamed inline sections (~66%) had never been measured by anyone —
+> wrong in both directions, unchallenged for two sprints, and invisible to every re-read. **Force the
+> arithmetic before the diagnosis:** subtract the suspect from the total and say out loud what the
+> remainder is (L-107 ×2).
 
 ---
 
@@ -75,6 +84,10 @@ status: current
     nothing prevents it). Cheaper alternative worth pricing first: leave the parser alone and let the
     DoD prose carry full paths, which is better writing anyway. Do not act on one sighting (TD-031's
     pattern).
+  - **Re-reviewed 2026-08-10 (SPRINT-061 promote, 3 sprints open) — held, trigger unchanged.** The
+    row's own trigger is a *second* sighting; SPRINT-059 and SPRINT-060 produced none, so age is the
+    only thing that has moved and the row already says age is not the trigger. Recorded here rather
+    than in the sprint's § Scope Out, per the rule SPRINT-058 found failing its own next instance.
 
 - **TD-047** severity: minor | status: open | created: Sprint-057
   - Summary: `night-run.md` is **414 lines** and carries five Parts plus a pre-flight checklist that
@@ -95,6 +108,11 @@ status: current
     order the checklist so the four total-loss items come first and say so, leaving the rest as
     context that can be skimmed. Do not act on the line count alone — measure which items a real
     pre-flight actually skips.
+  - **Re-reviewed 2026-08-10 (SPRINT-061 promote, 4 sprints open) — held, trigger unchanged.** The
+    trigger is a measurement of *which pre-flight items get skipped*, and no night run has been
+    launched since SPRINT-057 — SPRINT-060's run mode was ruled interactive at G2 (L-111), so the
+    checklist has not been read under the conditions this row is about. Nothing to measure yet is a
+    different state from measured-and-fine; the row waits on a run, not on a sprint count.
 
 - **TD-046** severity: minor | status: resolved → SPRINT-060 T3 | created: Sprint-056
   - Summary: the always-on gate now takes **~126s** (measured: 115s at SPRINT-056 T1, 126s at close),
@@ -125,6 +143,11 @@ status: current
     **14** always-on harnesses, not the twelve this row records. The row stays open on its behavioural
     concern (a gate slow enough to be skipped stops running); what is closed is the proposed cure.
     Next measurement is the inline half — nothing has been moved or edited.
+  - **Resolved 2026-08-10 (SPRINT-060 T3)** — the inline half the note above asked for was measured
+    directly, and the behavioural concern this row was held open on now has a successor with a
+    located cost centre: **TD-050**. The paragraph above says "the row stays open"; it was written at
+    SPRINT-058 T2 and is true as of that moment only. Dated rather than deleted — the sequence is the
+    record. Row is `resolved`; §11 deletes it three sprints on (Sprint-063).
 
 - **TD-045** severity: minor | status: open | created: Sprint-056
   - Summary: the dispatch preflight in `dispatch.md` still re-implements the `Layers:`/`Depends-on:`
@@ -142,6 +165,11 @@ status: current
     or the shared parser is vendored into the fenced block by a generator. Do not re-open this on age
     alone: the guard is the point, and a parity fixture that has never fired is evidence the design
     is holding, not evidence it is unused.
+  - **Re-reviewed 2026-08-10 (SPRINT-061 promote, 5 sprints open) — held, trigger unchanged.** No
+    third drift has appeared and the parity fixture has still never fired, which this row already
+    reads as the design holding. Age is explicitly not the trigger here. Noted alongside: TD-049
+    records the *same* duplication without a parity fixture, so if either is ever acted on it is
+    that one, not this.
 
 - **TD-037** severity: minor | status: open | created: Sprint-049
   - Summary: attribution needs a commit to read, so **uncommitted work in progress is still tested
@@ -189,3 +217,8 @@ status: current
     correct and simply did not run at the moment it applied. **Ruling: held, trigger unchanged and
     now stated precisely** — evidence of a miss attributable to the *union*, not to any miss on the
     uncommitted path. Age remains not a trigger.
+  - **Re-reviewed 2026-08-10 (SPRINT-061 promote, 12 sprints open) — held, trigger unchanged.** The
+    precisely-stated trigger from SPRINT-058 remains unfired: no miss attributable to the *all-task
+    union* has been observed in SPRINT-059 or SPRINT-060. Fourth consecutive reaffirm, recorded
+    rather than performed silently. This row is now the ledger's clearest case that a re-review which
+    reaffirms is a decision — worth leaving as the worked example next time age is mistaken for evidence.

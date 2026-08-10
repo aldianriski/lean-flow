@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-060 closed 2026-08-10 (4 of 5 — T5 carried → TASK-188).
+> **SPRINT-061 — Named, Not Answered** → [docs/sprint/SPRINT-061-named-not-answered.md](docs/sprint/SPRINT-061-named-not-answered.md)
 
 ---
 
@@ -83,6 +83,25 @@ status: current
       origin:     close-retro
       state:      ready
 
+- [ ] TASK-191 — Split section 4's cost between its three jobs  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  `docs/research/qa-gate-timing.md` carries a per-job figure for section 4 — index
+                  freshness vs dangling refs vs frontmatter completeness — from at least two samples,
+                  with the shipped `scripts/qa-check.sh` verifiably byte-identical afterwards
+      touches:    docs/research/qa-gate-timing.md · an instrumented COPY of scripts/qa-check.sh
+                  (never the shipped one) · TECH-DEBT.md TD-050
+      depends-on: none
+      assumes:    **measurement only — no cure, no narrowing.** TD-050 names this as the first honest
+                  step precisely because "section 4 is expensive" is itself an undifferentiated blob,
+                  and treating it as one unit is the error L-107 describes (now promoted into the
+                  TECH-DEBT header). Do not touch the index-freshness read while here: it is a genuine
+                  whole-corpus read and that is exactly what ADR-009 wired it for, so cheapening it
+                  risks the L-058 family. Repeat SPRINT-060 T3's method — instrumented copy, shipped
+                  script verified byte-identical — rather than inventing one
+      tracker:    TD-050 · docs/research/qa-gate-timing.md · L-107
+      origin:     manual
+      state:      ready
+
 
 
 ### P3 — Long-term
@@ -105,7 +124,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-058's shipped changes are written up as **v1.32.0** in [`CHANGELOG.md`](CHANGELOG.md), SPRINT-057's as **v1.31.0** and SPRINT-056's as **v1.30.0**. All three await the MINOR version bump (feature sprint → by hand; `/release-patch` is PATCH-only) — `plugin.json` still reads 1.29.0. SPRINT-055's (v1.29.0) and SPRINT-054's (v1.28.0) blocks rotated → [`docs/changelog/CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md).
+_(SPRINT-061 just promoted — nothing shipped yet.)_ Current inline in [`CHANGELOG.md`](CHANGELOG.md): **v1.34.0** (SPRINT-060) + **v1.33.0** (SPRINT-059), which is §11's keep-current-plus-previous-minor rule satisfied; everything older is rotated under [`docs/changelog/`](docs/changelog/). Both manifests read **1.34.0** and are in lockstep — the MINOR bumps this block used to track as outstanding have all landed.
 
 ---
 
