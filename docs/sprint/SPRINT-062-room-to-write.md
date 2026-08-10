@@ -5,6 +5,7 @@ epic: EPIC-002
 owner: Maintainer
 last_updated: 2026-08-10
 status: active
+gates_signed: G1,G2 @ 19485be
 plan_commit: ade3b81
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
