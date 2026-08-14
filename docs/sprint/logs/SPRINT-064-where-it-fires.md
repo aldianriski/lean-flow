@@ -164,6 +164,55 @@ rather than `cat >>` heredocs. The last one has a second benefit — running the
 forces its output to be read before a commit is issued, which is exactly the discipline that failed at
 `08e9182`.
 
+### 2026-08-14 | progress | T3 — the protection already existed; it was gated on a map that cannot see the class
+
+**The class has two members, not one.** DoD 2 asked whether `Files Changed` and the sprint file share
+the Execution Log's shape. They do: the sprint **Plan file** (its DoD ticks *and* § Files Changed) and
+the **Execution Log** sibling are both written by every task and declared by none. Two files, one class.
+
+**And the concept was already implemented — in the checker, under this exact name.**
+`check-layers-observed.sh` line 125 excludes `docs/sprint/*` with the comment *"the Plan's own DoD ticks
+and its Execution Log are…"*, and line 188 calls the tree *"coordinator-owned"*. `dispatch.md` line 296
+already said a worktree agent *"never touches a file the overlap map marks shared — those stay
+coordinator-owned."*
+
+So the rule was not missing. **It was gated on the wrong qualifier.** "What the overlap map marks shared"
+is derived from `Layers:`, and coordinator-owned files are in no `Layers:` — so the map cannot mark them
+*by construction*, and the clause protecting them could never fire for this class. The guard existed, was
+correctly worded for the case it named, and was structurally unreachable for the other. That is L-099's
+shape (a rule written where its reader cannot reach it) and precisely this sprint's theme.
+
+**Fix:** split the qualifier into (a) map-marked shared files and (b) sprint infrastructure named
+explicitly, and state the positive obligation — *a dispatched agent returns its Execution Log entry
+inside its report; the coordinator appends at merge-back.* Placed by §10's test in the two places the
+behaviour is decided: `orchestrator/SKILL.md` step 2 (where the map is built, one line) and
+`dispatch.md` § Worktree dispatch protocol (where the brief is specified, the substance — uncounted per
+ADR-006). Only `/orchestrator` flows can hit it, so `CONTEXT.md` was deliberately left untouched.
+
+**Exercised against SPRINT-063's actual collision** (DoD 4) — traced, not merely cited:
+
+| Step | SPRINT-063, as it happened | Under the new rule |
+|---|---|---|
+| Brief written | banned editing § Plan and ticking DoD; **silent on the Log** | clause (b) names the Log explicitly |
+| Agent finishes | creates `docs/sprint/logs/SPRINT-063-headroom.md`, commits it | returns its two entries as report text |
+| Coordinator | had already created the same file inline | appends the returned entries to the one Log |
+| Result | **two versions, merged by hand** | one Log, no merge |
+
+The old brief failed by **enumerating the members it happened to think of rather than the class** — the
+same failure mode as L-108's placement enumeration, one level down. That is the argument for wording the
+rule as a class with its members named, rather than as a list of don'ts.
+
+**Honest limit:** this is procedural text and skill prose has no fixture harness, so the walkthrough
+above is the only available exercise — TD-052 records that gap for the whole category (G1, G2, the
+promote checklist, close's §11 pass). Named rather than dressed up as a test.
+
+**Incidental — partially answers TD-054.** That row said to *"establish first why the worktree branched
+three sprints back"* before designing a guard. `dispatch.md` lines 309–316 already answer it: agent
+worktrees fork from the **remote default branch**, not local HEAD, unless `worktree.baseRef: "head"` is
+set (L-046, observed on the first real wave). SPRINT-063's unpushed local commits were therefore
+invisible to the agent's tree. Not fixed here — outside T3's scope — but the row's precondition is met
+and its mitigation can now be derived.
+
 ### 2026-08-14 | progress | T2 — the rule was never in the wrong file; it was the wrong *kind* of rule
 
 Sorted all sightings by the flow that was running, which is what the DoD asked for and what L-113 said

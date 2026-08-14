@@ -90,7 +90,7 @@ verification query — not only when authoring a checker or naming a fixture.
 ### T3 — Give the G2 overlap map a rule for files no task owns `[size: S · risk: low · class: decision · HITL]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `.claude/CONTEXT.md`
 Depends-on: T2 (owns `.claude/CONTEXT.md` — see D1)
-Cites: `docs/sprint/logs/SPRINT-063-headroom.md`
+Cites: `docs/sprint/logs/SPRINT-063-headroom.md` · `scripts/lib/check-layers-observed.sh`
 SPRINT-063 hit this live: the inline coordinator and the worktree agent **both created**
 `docs/sprint/logs/SPRINT-063-headroom.md`, and it was merged by hand. The overlap map enumerates shared
 files from each task's `Layers:`, and the Execution Log is in nobody's `Layers:` — sprint infrastructure
@@ -100,12 +100,19 @@ is invisible to the map by construction.
 Execution Log — such that a parallel dispatch does not produce two versions needing a hand merge.
 
 **DoD:**
-- [ ] **Not** solved by making tasks declare the log — that makes every task an owner of the one file
-      every task appends to, which is the opposite of an ownership map (rejected reason recorded)
-- [ ] `Files Changed` and the sprint file itself checked for the same shape before ruling — the rule
-      covers the class, or names why the Log is the only member
-- [ ] Rule placed by §10's placement test and wired where the G2 overlap map is actually built
-- [ ] Exercised once against SPRINT-063's actual collision as the worked example
+- [x] **Not** solved by making tasks declare the log — that makes every task an owner of the one file
+      every task appends to, which is the opposite of an ownership map (rejected reason recorded) —
+      **and it would also break `scripts/lib/check-layers-observed.sh`**, which excludes `docs/sprint/*`
+      precisely because it is coordinator-owned
+- [x] `Files Changed` and the sprint file itself checked for the same shape before ruling — the rule
+      covers the class, or names why the Log is the only member — **the class has 2 members**: the
+      sprint Plan file (DoD ticks · § Files Changed) and its Execution Log sibling
+- [x] Rule placed by §10's placement test and wired where the G2 overlap map is actually built —
+      **`orchestrator/SKILL.md` step 2** (where the map is built) + **`dispatch.md` § Worktree dispatch
+      protocol** (where the brief is specified). Only `/orchestrator` flows hit it → skill-local;
+      `CONTEXT.md` deliberately untouched
+- [x] Exercised once against SPRINT-063's actual collision as the worked example — traced end-to-end
+      below; **procedural walkthrough, not a fixture** — skill prose has no harness (TD-052)
 
 ## Owner-action checklist
 - [ ] Reinstall the plugin — session skills have now run at **1.34.0** against a **1.37.0** repo across

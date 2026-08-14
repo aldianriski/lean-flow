@@ -293,7 +293,24 @@ no `depends-on`): dispatch one `Agent(isolation: "worktree")` call per disjoint 
 Each agent gets its own branch + working tree; it commits only its own files there and **never**
 runs a tree-wide git state op (`stash` / `checkout` / `restore` / `reset`) — a state op on a shared
 tree can sweep a sibling's uncommitted work (L-043; state this ban verbatim in every worktree
-dispatch brief). It never touches a file the overlap map marks shared — those stay coordinator-owned.
+dispatch brief). It never touches a **coordinator-owned** file — and two kinds qualify, only one of
+which the map can see:
+
+- **(a) Files the overlap map marks shared.** Derived from `Layers:`, so the map sees them by design.
+- **(b) Sprint infrastructure** — the sprint **Plan file** (its DoD ticks and § Files Changed) and its
+  **Execution Log** sibling. Every task writes these; **no task declares them**, so they are in no
+  `Layers:` and the map cannot mark them *by construction*. `check-layers-observed.sh` already excludes
+  `docs/sprint/*` on exactly this reasoning and already calls it coordinator-owned — the protection
+  exists in the checker and was missing from the brief.
+
+**A dispatched agent returns its Execution Log entry inside its report; the coordinator appends it at
+merge-back.** The agent does not create or edit the Log, tick a DoD box, or touch § Plan.
+
+Proven live and this is why the clause is split: SPRINT-063 dispatched one agent whose brief correctly
+banned editing § Plan and ticking DoD **and said nothing about the Log** — so the coordinator and the
+agent each created `docs/sprint/logs/SPRINT-063-headroom.md`, and the two versions were merged by hand.
+The brief enumerated the members it could think of rather than the class; naming only (a) leaves (b)
+unguarded (SPRINT-064 T3).
 
 Claude-only v1 — external CLI agents are out of scope until a real consumer signal; the
 pre-decided shape (BYO opt-in + AGENTS.md brief carrier) is parked, not built.
