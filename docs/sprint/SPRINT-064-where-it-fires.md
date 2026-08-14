@@ -50,12 +50,16 @@ slot: the condition asks for a pass *applied*, and an unapplied pass is what has
 body; the applied count and measured line delta are reported, zero included.
 
 **DoD:**
-- [ ] Promotion state counted by `[status: promoted]` **anchored to the header's own bracket** — not a
+- [x] Promotion state counted by `[status: promoted]` **anchored to the header's own bracket** — not a
       bare substring; L-114's body quotes that exact string, so a loose matcher reports it as promoted
-      when it is `active` (observed at this promote)
-- [ ] Each promoted entry checked for its pointer bullet; any without one collapsed per §11
-- [ ] `sh scripts/gen-index.sh` re-run; `scripts/qa-check.sh` green
-- [ ] Applied count **and line delta** reported, zero included and not treated as underdelivery
+      when it is `active` (observed at this promote) — **96: 64 active · 31 promoted · 1 superseded**
+- [x] Each promoted entry checked for its pointer bullet; any without one collapsed per §11 — **31 of
+      31 carry it; 0 to collapse.** First audit query was structurally broken (nested `getline` ate
+      every second header, examining 20 of 31); caught by a cross-check that disagreed, rewritten
+      single-pass, and re-controlled against a seeded gap
+- [x] `sh scripts/gen-index.sh` re-run; `scripts/qa-check.sh` green — 151 pass, 0 fail
+- [x] Applied count **and line delta** reported, zero included and not treated as underdelivery —
+      **count 0, delta 0** (738 → 738), per D2
 
 ### T2 — Widen L-108's placement to reach verification, not just authoring `[size: S · risk: med · class: decision · HITL]`
 Layers: `.claude/CONTEXT.md` · `.claude/CLAUDE.md` · `docs/LEARNINGS.md`
