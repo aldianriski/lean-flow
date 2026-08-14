@@ -11,6 +11,45 @@ status: current
 
 ---
 
+## v1.38.0 — Where It Fires (2026-08-14)
+
+MINOR — SPRINT-064, **3 of 3 units**, the third member sprint of **EPIC-002 Make Room** (only its T1 is
+epic-tracked). Three governance mechanisms that existed and did not reach. In all three the rule was
+already written, already correct, and gated on something that could not reach the failure.
+
+**What changed for you**
+
+- **Worktree-dispatched agents no longer write the Execution Log.** `dispatch.md` previously said an
+  agent "never touches a file the overlap map marks shared". That map is derived from each task's
+  `Layers:`, and **sprint infrastructure is declared by no task** — so it could never be marked, and the
+  clause could never fire for it. `coordinator-owned` is now defined as a **class** with its members
+  named: the sprint **Plan file** (DoD ticks · § Files Changed) and its **Execution Log** sibling. A
+  dispatched agent **returns its Log entry inside its report**; the coordinator appends at merge-back.
+  Wired at both decision points — `orchestrator/SKILL.md` step 2 (where the overlap map is built) and
+  `dispatch.md` § Worktree dispatch protocol (where the brief is written).
+  *Symptom this fixes:* SPRINT-063 dispatched one agent and ended with **two copies of one Execution
+  Log**, merged by hand — from a brief that correctly banned editing § Plan and ticking DoD and said
+  nothing about the Log.
+
+**Maintainer-facing**
+
+- **A promoted rule became an action.** The "match by shape, not substring" guard (L-108) had been
+  correctly placed in `CONTEXT.md` § Gates and *loaded in context* for all eleven of its sightings,
+  reaching none. Sorting them by the flow that was running showed **8 of 11 were ad-hoc verification
+  queries inside a governance pass** — where § Gates is already loaded, so the file was never the
+  defect. Every instance ever caught was caught by **a second number that disagreed**, never by recalling
+  the rule. It is now `.claude/CLAUDE.md` § Behavioral Guidelines, phrased as a required cross-check.
+- **One §11 collapse pass applied to `docs/LEARNINGS.md` — applied count 0.** 96 entries (64 active, 31
+  promoted, 1 superseded); all 31 promoted already carry their pointer. With SPRINT-063's
+  `docs/research/` pass, **both §11 legs are now applied**, each returning zero with the evidence rule
+  honoured.
+- `L-108` → count 6 · `L-113` → count 2 (promotable at the next promote).
+
+**Known gaps, named rather than closed:** `complete` is a reserved run-level event in the Execution Log
+and the template does not say so — writing it to mean "this task finished" silently arms the Part 4
+rollup assertions (`TD-055`). The new cross-check rule is procedural text and skill prose has no fixture
+harness, so it ships with a walkthrough rather than a retained test (`TD-052`, whole category).
+
 ## v1.37.0 — Headroom (2026-08-14)
 
 MINOR — SPRINT-063, **4 of 4 units**, the second member sprint of **EPIC-002 Make Room**. SPRINT-062
@@ -55,48 +94,4 @@ and wrong.
 **Consumer-facing note:** `DOCS_Guide.md` §2 and §11 changed, and the standard ships inside the plugin —
 adopters pick up the new research cap, the frozen-verdict rule and the `TODO.md` cap on upgrade.
 
-## v1.36.0 — Room to Write (2026-08-10)
-
-MINOR — SPRINT-062, **3 of 3 units**, the first member sprint of **EPIC-002 Make Room**. Three
-governance signals, and in each case the question was whether anything was listening: a cap that could
-not be met, a report with a matcher and no consumer, and a count that turned out to be measuring its
-own query.
-
-**What changed for you:**
-
-- **A new doc-kind: `docs/research/logs/<slug>.md`.** When a research question accretes a second
-  measurement round, the series now splits into an append-only, uncapped sibling and the decision doc
-  keeps the cap. This is ADR-014's sprint Plan/log mechanism applied outside `docs/sprint/` for the
-  first time — and it works for the same structural reason: the cap check derives its globs from §2's
-  own File cells, and `docs/research/*.md` is non-recursive, so a `logs/` sibling is excluded for free.
-  Placement rule only, no template; never name it as a `related:` id, or it dangles the corpus-ref check.
-- **§2's Growth rule now tells you how to rule a cap breach, not just to split.** A breach sorts into
-  **drift** (removable content past a reachable cap → trim or split) or **a cap that was never
-  reachable** (the standard mandates content the number never budgeted for, or the growth is an
-  append-only series). They need opposite actions and the report cannot tell them apart. The tell is a
-  breach where every route back under the cap runs through deleting signal or re-wrapping prose.
-- **The promote governance check now reports cap breaches.** `doc-aging` reads **two** sources — §11's
-  retention triggers *and* every §2 cap breach — where it previously enumerated only §11's four
-  triggers. If you run `promote`, you will now see breaches you were never shown before. §11's ledger
-  owns retention; §2 owns caps; restating a §2 cap figure inside the checklist is now prohibited,
-  because a copied number is a second SSOT that drifts from the row it copied.
-- **§11's LEARNINGS row documents a trap that had been silently misleading readers.** The collapse
-  *consumes the trigger it fires on*: a promoted entry becomes `[status: promoted]` plus a pointer, so
-  `promoted: yes` is never the stored form. Grepping for it returns zero on a perfectly healthy corpus.
-  Count by `[status: promoted]`, position-anchored.
-- **`docs/research/qa-gate-timing.md` went 223 → 87 lines** with all three measurement rounds preserved
-  verbatim in its new log. No measurement was deleted to meet a number.
-
-**Fixed:** `.claude/CONTEXT.md` claimed **32** core templates against 33 on disk — the count-claim
-checker matches the phrase `N canonical doc templates`, which CONTEXT does not use, so no matcher ever
-reached it.
-
-**Known gaps, named rather than closed:** the promote doc-aging fix is procedural text, and nothing in
-`evals/` exercises skill prose — so it has no retained must-FAIL fixture and a future edit that
-re-narrows it goes uncaught (`TD-052`; the same gap covers every procedural gate: G1, G2, the promote
-checklist, close's §11 pass). `TODO.md` (210) and two research docs remain over their soft caps,
-scoped to `TASK-196` and `TASK-199`.
-
----
-
-_Older releases (**v1.35.0** and earlier) → [`CHANGELOG-1.35.0.md`](docs/changelog/CHANGELOG-1.35.0.md) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._
+_Older releases (**v1.36.0** and earlier) → [`CHANGELOG-1.36.0.md`](docs/changelog/CHANGELOG-1.36.0.md) → [`CHANGELOG-1.35.0.md`](docs/changelog/CHANGELOG-1.35.0.md) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._

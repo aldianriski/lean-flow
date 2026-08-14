@@ -4,7 +4,7 @@ slug: where-it-fires
 epic: EPIC-002
 owner: Maintainer
 last_updated: 2026-08-14
-status: active
+status: closed
 gates_signed: G1,G2 @ cf56aeb
 plan_commit: 730a10f
 close_commit: [sha — set at close]
@@ -168,12 +168,48 @@ Execution Log — such that a parallel dispatch does not produce two versions ne
      shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — **yes, three times, and all three are the same shape: the answer was already
+written down.** (a) T3's whole subject — "coordinator-owned" — already existed as a named concept in
+`check-layers-observed.sh` (line 125/188) *and* in `dispatch.md` line 296. TASK-205 was filed at
+SPRINT-063's close as though the territory were unmapped; it was mapped, and merely gated on a qualifier
+that could not reach the class. (b) TD-054, filed the same close, said to "establish first **why** the
+worktree branched three sprints back" — `dispatch.md` lines 309–316 answer it outright (worktrees fork
+from the remote default branch, not local HEAD; L-046). (c) T1 reproduced the exact L-108 failure with
+L-108 loaded in context — the seventh time that has happened. Each miss cost re-derivation rather than a
+wrong result, but the pattern is that this repo's answers are usually already in it. → Learnings.
 
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents).
+**Cost** — coordinator inline, **3 of 3 units, shape `inline`**, no agents dispatched. Token/turn/wall
+telemetry unavailable for an inline session, so the calibration row degrades every field rather than
+carrying an estimate. Recorded so the series stays measurements-only; **do not average this row with
+parallel-build sprints** — the chain was strictly linear (T1→T2→T3) with shared files on consecutive
+links, so dispatch was never on the table and this says nothing about fan-out.
 
 **Worked**
+- **The cross-check habit caught a real bug in the same session it was written.** T2's rule
+  ("pair a verification query with a second query that must agree") was derived from eleven historical
+  sightings; T1 had already produced the twelfth by running an inverse query that refused to reconcile.
+  The rule was validated by the work that motivated it, which is the strongest form available for a
+  procedural rule that cannot be fixtured.
+- **Reading the implementation before ruling.** T3 found `coordinator-owned` already implemented under
+  that exact name, which turned a "design a new rule" task into a "fix the qualifier" task and avoided
+  shipping a second, parallel concept. L-104's habit, applied deliberately.
+- **Discharging factual `assumes:` at promote held again.** T1 was resized before execution, and A1's
+  own instruction to re-measure at task start is what exposed the broken audit query.
 
 **Friction**
+- **A commit landed through a red gate** (`08e9182`). The gate ran in the same shell line and its exit
+  status was simply not consumed.
+- **My shell habits were generating every permission prompt the owner saw** — `cd` prefixes on an
+  already-correct working directory, `bash` where the allowlist names `sh`, and `if/then` wrappers that
+  match no prefix rule at all. Corrected mid-sprint; the prompts stopped immediately.
+- **`complete` is a reserved run-level event and nothing at the point of authoring says so.** Writing it
+  to mean "this task is complete" silently armed the Part 4 rollup assertions. → tech debt.
+- **TD-048 fired twice** (basename mismatch between a `Cites:` full path and a DoD's bare filename) —
+  re-reviewed and held at this sprint's own promote on the grounds that no false positive had cost a
+  real edit. It has now cost two small ones. Noted for the next re-review, not enough to reverse.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- Filed as **L-118** (a negative control proves a query fires on rows it *reaches*, never that it reached
+  them all), **L-119** (a guard can be correctly worded and structurally unreachable — check what its
+  qualifier is derived from), **L-120** (one command per call: a compound shell line both defeats a
+  prefix allowlist and lets a failing check pass unread).

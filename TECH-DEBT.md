@@ -32,6 +32,27 @@ status: current
 
 ## Tech Debt
 
+- **TD-055** severity: minor | status: open | created: Sprint-064
+  - Summary: **`complete` is a reserved run-level event in the Execution Log, and nothing at the point of
+    authoring says so.** `check-night-run-rollup.sh` line 42 treats **any** `### … | complete |` entry
+    header as the announcement that a *run* finished, then requires the Part 4 rollup header and the
+    calibration row. `sprint-log.md.template` lists the valid events as `promote · progress · surprise ·
+    scope-change · park · blocker · complete · close` with no indication that one of them carries
+    run-level semantics while the rest are entry-level.
+  - Impact: writing "this task is complete" is the obvious thing to do and silently arms two run-level
+    assertions. It fired mid-SPRINT-064 with T2 and T3 untouched, and the gate was correct to complain —
+    the log *did* claim a completed run. The failure is loud rather than silent, so the cost is
+    confusion and a correction, not a bad artifact. It reaches every consumer, since the template ships
+    inside the plugin (L-015).
+  - Mitigation (**not yet derived**, L-091): the obvious move is a parenthetical in the template
+    (`complete` = the whole run, not a task) and it is probably right but probably not sufficient —
+    the same word is listed in `orchestrator/SKILL.md` step 4 and in `night-run.md` Part 4, so a note in
+    one place repeats L-099's shape. Establish first whether the cleaner fix is **renaming** the
+    run-level event (e.g. `run-complete`) so the collision cannot occur, versus documenting a reserved
+    word in three places. A rename touches the checker and its fixtures; a note does not.
+  - Tracker: SPRINT-064 T1 Execution Log · `check-night-run-rollup.sh` line 42 · TD-052 (the same
+    category — a procedural contract with no fixture) · L-015
+
 - **TD-054** severity: medium | status: open | created: Sprint-063
   - Summary: **a worktree created by `Agent(isolation: "worktree")` can branch from a stale base, and
     nothing checks it.** SPRINT-063 T2's worktree was branched at `40603a6` (`sprint(60)`) — three

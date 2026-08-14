@@ -48,7 +48,7 @@ records are history, and history is not corpus) · relaxing a gate to reduce wor
 |---|---|---|---|
 | [SPRINT-062](../sprint/archive/SPRINT-062-room-to-write.md) | Room to Write — three governance signals, and whether anything is listening | closed · `f0f72c0` | Ruled the first cap by **splitting** rather than moving a number, and generalised it: §2's Growth rule now sorts a breach into drift vs a cap that was never reachable, so the remaining three have a procedure instead of a hypothesis. Gave the §2 cap report a consumer at promote — the review had been reporting doc-aging clean over three standing breaches. Established that the LEARNINGS corpus is healthy and that the count suggesting otherwise was measuring its own query. **Headroom delivered: none** — that is TASK-196's, now unblocked. |
 | [SPRINT-063](../sprint/archive/SPRINT-063-headroom.md) | Headroom — spend the procedure SPRINT-062 built | closed · `3998e23` | **Delivered the headroom SPRINT-062 could not.** `CLAUDE.md` 80→61 by removing a codemap that duplicated `overview.md` — cap **held**, the first cap breach this epic resolved by subtraction rather than by a number. Two numbers ruled where subtraction was impossible: **ADR-019** (`TODO.md` 320 — the entry schema costs ~17.6 lines/entry, so cap and schema could not both hold) and **ADR-020** (research 130, plus `status: superseded` ⇒ **frozen**, because the cap was counting the annotation that marks a doc dead). Closed conditions **2 and 3**. Also killed the epic's checker open question by showing it was *premature*, not unanswerable. |
-| [SPRINT-064](../sprint/SPRINT-064-where-it-fires.md) | Where It Fires — mechanisms that exist and do not reach | active · `plan locked` | _(completed at close)_ — **partial member: only its T1 is epic-tracked** (Closed-when 4's LEARNINGS leg). T2/T3 are Retro follow-ups on a shared theme, outside this epic's scope. |
+| [SPRINT-064](../sprint/archive/SPRINT-064-where-it-fires.md) | Where It Fires — mechanisms that exist and do not reach | closed · `<close_commit>` | **Partial member — only T1 was epic-tracked, and it closed condition 4.** Applied the LEARNINGS §11 leg (count 0), completing the pair SPRINT-063 started; the audit behind it was found to be scanning 20 of 31 entries and was rebuilt before the answer was accepted. T2 and T3 sat outside this epic but share its lesson: in all three tasks the rule already existed and was gated on something that could not reach the failure. **Leaves condition 1 as the only one open** — `CLAUDE.md` 63/80 (21%), `CONTEXT.md` held at 12% by the SPRINT-063 ruling → **TASK-206**. |
 
 ## Decisions
 
@@ -104,6 +104,8 @@ records are history, and history is not corpus) · relaxing a gate to reduce wor
       (`TODO.md`), ADR-020 (research cap + frozen verdicts). `qa-check.sh` emits **zero** `OVER-CAP` lines
 - [x] Every surviving `check-*.sh` is either consolidated or has a one-line reason it stands alone —
       **D3**, all 11 with their input model named; consolidation deferred to EPIC-004
-- [ ] LEARNINGS and `docs/research/` have had one §11 pass applied, with the evidence rule honoured —
-      **`docs/research/` done** (SPRINT-063 T2, applied count 0, every candidate kept with its live
-      citer named); **LEARNINGS outstanding → TASK-204**
+- [x] LEARNINGS and `docs/research/` have had one §11 pass applied, with the evidence rule honoured —
+      **both legs done, each returning zero.** `docs/research/`: SPRINT-063 T2, all four superseded docs
+      kept with their live citers named. `LEARNINGS`: SPRINT-064 T1 — 96 entries (64 active · 31
+      promoted · 1 superseded), all 31 promoted already carrying their pointer, verified by a query
+      proven to fire on a seeded gap after the first audit was found to be examining 20 of 31

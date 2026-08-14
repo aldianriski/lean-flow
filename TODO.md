@@ -18,11 +18,10 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-064 — Where It Fires** → [`docs/sprint/SPRINT-064-where-it-fires.md`](docs/sprint/SPRINT-064-where-it-fires.md)
->
-> Third member sprint of EPIC-002, though **only T1 is epic-tracked** (its Closed-when 4). T2 and T3
-> are Retro follow-ups sharing the theme: mechanisms that exist and do not reach. EPIC-002 stands at
-> 2 of 4 — the headroom condition remains an owner ruling on the epic, not a task, and is not in scope.
+> _None._ SPRINT-064 closed 2026-08-14 (3 of 3) — the third member sprint of EPIC-002, which stays
+> **active at 3 of 4**. Conditions 2, 3 and 4 are met; **condition 1 (headroom) is the only one open**
+> and is carried by **TASK-206** — `CLAUDE.md` sits at 63/80 (21%), `CONTEXT.md` holds at 132/150 (12%)
+> by the SPRINT-063 ruling that a flat percentage is the wrong instrument for it.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room** (runs first — the caps block everything after it) → **EPIC-003 The Standard**
@@ -45,22 +44,24 @@ status: current
 
 ### P2 — Quality / Polish
 
-- [ ] TASK-200 — Widen L-108's placement to reach verification, not just authoring  [size: S] [risk: med] [HITL]
+- [ ] TASK-206 — Rule EPIC-002's headroom condition, the last thing holding the epic open  [size: S] [risk: low] [HITL]
       class:      decision
-      done-when:  a promoted rule about matcher shape is reachable from the moment someone is running
-                  an ad-hoc verification query, not only when authoring a checker or naming a fixture
-      touches:    .claude/CONTEXT.md § Gates · possibly .claude/CLAUDE.md · docs/LEARNINGS.md
+      done-when:  EPIC-002 § Closed when condition 1 is either ticked with its reasoning, or re-worded
+                  to express what the epic actually wants and then judged against that — recorded
+                  either way, never left as a silent hold
+      touches:    docs/epic/EPIC-002-make-room.md · possibly `.claude/CONTEXT.md`
       depends-on: none
-      assumes:    L-108 was promoted, correctly placed, **and loaded in context** for all of SPRINT-062,
-                  and still reached none of three fresh violations — two of them produced while
-                  verifying the first (L-113). Its placement enumeration lists only *authoring* flows;
-                  every failure was a verification grep inside a gate pass, where the result is acted
-                  on immediately with no review between query and conclusion. **Unblocked as of
-                  SPRINT-063**: the room this was waiting on now exists — `CLAUDE.md` is 61/80 (24%)
-                  and `CONTEXT.md` holds at 132/150 (12%), so § Gates can take another rule if that is
-                  the answer. Re-derive rather than assume it is: "add another sentence to § Gates" is
-                  the obvious move and is exactly what already failed to fire (L-113)
-      tracker:    SPRINT-062 Retro · L-113 · L-108 (count 4)
+      assumes:    **this is the only condition left open.** 2, 3 and 4 are all met as of SPRINT-064:
+                  no doc sits over a soft cap without a ruling (ADR-019 · ADR-020, zero `OVER-CAP`
+                  lines), every `check-*.sh` has a stand-alone reason (D3), and both §11 legs have had
+                  a pass applied returning zero with the evidence rule honoured. Condition 1 reads
+                  "`CLAUDE.md` and `CONTEXT.md` each carry ≥15% headroom": **`CLAUDE.md` is 63/80 (21%)
+                  and `CONTEXT.md` 132/150 (12%)**, held at 150 by the SPRINT-063 T1 ruling that a flat
+                  percentage is the wrong instrument for a file whose growth is measured at 0.83
+                  lines/sprint and whose diet pass found nothing removable (ADR-017). Do **not** close
+                  the gap by trimming `CONTEXT.md` five lines to make a number go green — §2's Growth
+                  rule names that as the tell, and ADR-017 already ran that pass
+      tracker:    EPIC-002 Closed-when 1 · ADR-017 · SPRINT-063 T1 ruling · SPRINT-064 rollup
       origin:     close-retro
       state:      ready
 
@@ -76,45 +77,6 @@ status: current
                   task as how it gets retired. Blocking for EPIC-003, not for EPIC-002
       tracker:    EPIC-003 open question 3 · ADR-018
       origin:     manual
-      state:      ready
-
-- [ ] TASK-204 — Apply one §11 collapse pass to docs/LEARNINGS.md  [size: S] [risk: low] [HITL]
-      class:      execution
-      done-when:  every `L-NNN` at `[status: promoted]` carries a one-line pointer and no body; the
-                  applied count and measured line delta are reported, zero included
-      touches:    docs/LEARNINGS.md · docs/knowledge-index.md
-      depends-on: none
-      assumes:    this is the **other half** of EPIC-002's fourth Closed-when condition — SPRINT-063 T2
-                  applied the `docs/research/` leg (count 0), leaving LEARNINGS unswept. SPRINT-062 T3
-                  already established the corpus is healthy and that the count suggesting otherwise was
-                  measuring its own query, so **expect few or zero collapses and do not treat a low
-                  number as underdelivery**. §11's collapse consumes its own trigger — `promoted: yes`
-                  is never the stored form — so count promotion state by `[status: promoted]`,
-                  position-anchored (L-108); a zero from `grep "promoted: yes"` is evidence about the
-                  query, never about the corpus
-      tracker:    EPIC-002 Closed-when 4 · SPRINT-063 T2 · DOCS_Guide §11 · L-108
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-205 — Give the G2 overlap map a rule for files no task owns  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  a recorded rule covering sprint infrastructure that every task writes but no task
-                  declares — at minimum the Execution Log — so a parallel dispatch does not produce two
-                  versions of it needing a hand merge
-      touches:    skills/orchestrator/SKILL.md § G2 · skills/orchestrator/references/dispatch.md ·
-                  possibly `.claude/CONTEXT.md` § Gates
-      depends-on: none
-      assumes:    SPRINT-063 hit this live: the inline coordinator and the worktree agent **both created
-                  `docs/sprint/logs/SPRINT-063-headroom.md`** and it was merged by hand. The overlap map
-                  enumerates shared files from each task's `Layers:`, and the Execution Log is in
-                  nobody's `Layers:` — it is sprint infrastructure, so the map cannot see it by
-                  construction. **Do not fix this by telling tasks to declare the log**: that makes
-                  every task an owner of the one file every task appends to, which is the opposite of
-                  an ownership map. The honest question is whether append-only shared files need a
-                  different discipline from owned ones. Check whether `Files Changed` and the sprint
-                  file itself have the same shape before ruling
-      tracker:    SPRINT-063 Retro Friction · L-042 · dispatch.md merge-back queue
-      origin:     close-retro
       state:      ready
 
 - [ ] TASK-201 — Rule what the critic's Spec axis compares against  [size: S] [risk: low] [HITL]
@@ -148,8 +110,8 @@ status: current
                   single worst finding per axis" and nothing consumes it — the L-020 shape. Scope is
                   **attended modes only** (`quick`/`mvp`/`sprint-bulk` with a human present);
                   unattended is TASK-203 and must not be smuggled in here. Home is the reference file,
-                  uncounted under ADR-006, so this is **not** blocked behind TASK-196 the way TASK-200
-                  is — but new control flow is exactly where a silent false-negative hides, so L-058's
+                  uncounted under ADR-006, so no cap blocks it — but new control flow is exactly where a
+                  silent false-negative hides, so L-058's
                   must-FAIL half is the acceptance bar, not a nice-to-have (TD-012: retain them)
       tracker:    docs/research/gauntlet-loop-delta.md · L-020 · L-058 · TD-012 · ADR-006
       origin:     manual

@@ -72,3 +72,4 @@ One line per archived sprint (newest first); files live in [`archive/`](archive/
 - SPRINT-061 — Named, Not Answered — closed 2026-08-10 · 2f90504 · 3 of 3 units (v1.35.0)
 - SPRINT-062 — Room to Write — closed 2026-08-10 · f0f72c0 · 3 of 3 units (v1.36.0) · EPIC-002
 - SPRINT-063 — Headroom — closed 2026-08-14 · 3998e23 · 4 of 4 units (v1.37.0) · EPIC-002
+- SPRINT-064 — Where It Fires — closed 2026-08-14 · <close_commit> · 3 of 3 units (v1.38.0) · EPIC-002
