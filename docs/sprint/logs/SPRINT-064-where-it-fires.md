@@ -213,6 +213,31 @@ set (L-046, observed on the first real wave). SPRINT-063's unpushed local commit
 invisible to the agent's tree. Not fixed here — outside T3's scope — but the row's precondition is met
 and its mitigation can now be derived.
 
+### 2026-08-14 | complete | run finished — Plan exhausted, 3 of 3 units
+
+```
+run · 12 of 12 DoD ticked
+run · cost unavailable · turns unavailable · wall-clock unavailable · 3 of 3 units · inline
+```
+
+Non-green lines:
+
+- **Owner-action open** — reinstall the plugin. Not a Plan DoD and not this run's to close; carried from
+  SPRINT-063 and now three sprints old (skills at 1.34.0 against a 1.37.0 repo). Every skill used this
+  sprint was diffed against repo source first and the orchestrator surface was byte-identical, so no
+  procedure was followed stale — but that is a workaround holding, not the gap closing.
+
+**Cost line degraded honestly.** No token/turn/wall telemetry was available for an inline session, so
+each field says `unavailable` rather than carrying an estimate — the series this feeds is only useful if
+its rows are measurements. **Shape: `inline`** for all three tasks: the chain was strictly linear
+(T1→T2→T3) with shared files on consecutive links, so dispatch would have bought isolation and zero
+wall-clock. Recorded so this row is not later averaged against parallel-build sprints as though it were
+evidence about fan-out.
+
+**Two process failures happened inside this run and are logged above rather than summarised away:** a
+commit through a red gate (`08e9182`), and a shell-habit pattern that was generating every permission
+prompt the owner saw. Both are in the Retro's scope at close.
+
 ### 2026-08-14 | progress | T2 — the rule was never in the wrong file; it was the wrong *kind* of rule
 
 Sorted all sightings by the flow that was running, which is what the DoD asked for and what L-113 said
