@@ -113,3 +113,88 @@ don't bury it"*, and it is the same family as L-057: a command's exit status was
 not consumed. Nothing is corrupt — the two findings were about the log's own event word, not about T1's
 work — but the discipline failed and the record says so rather than the history reading clean.
 Fixed forward in the next commit rather than amended, so the sequence stays visible.
+
+### 2026-08-14 | progress | T2 — the rule was never in the wrong file; it was the wrong *kind* of rule
+
+Sorted all sightings by the flow that was running — what the DoD asked for and what L-113 said had
+never been done. **Eleven instances across six episodes**; the Plan said "seven", written before T1 and
+this sprint's promote each produced more. Sorting eleven satisfies and exceeds a criterion that asked
+for seven, so this is a figure that *grew*, not one that went stale — no `scope-change` raised, and the
+tick states the corrected number rather than the frozen one.
+
+```
+ad-hoc verification query inside a governance/gate pass   8
+authoring a checker or fixture                            2
+automated checker at runtime                              1
+```
+
+**The obvious move was re-derived and rejected on evidence.** "Add another sentence to `CONTEXT.md`
+§ Gates" fails for a reason now statable: § Gates **was loaded** during all eight governance-pass
+failures. The rule was present, correctly placed by §10's test, and in context. The file was never the
+defect — so extending it cannot be the fix.
+
+**What the evidence shows.** Not one of the eleven was caught by recalling a rule. Every one that was
+caught was caught by **a second number that disagreed** — a count that would not reconcile, an inverse
+whose sum was wrong, output too implausible to be real. That makes the durable form an *action taken at
+query time*, not a caution held in memory, and it moves the placement question: it fires whenever any
+flow is about to act on a query result, which is every flow. §10's test therefore lands on
+`.claude/CLAUDE.md` § Behavioral Guidelines, beside "finding facts is your job", not on § Gates.
+
+**A negative control is named insufficient**, because T1 proved it: the control passed while the query
+was examining 20 of 31 entries. A control shows the query fires on rows it *reaches*; it says nothing
+about rows it skips. That distinction is the new content this widening carries.
+
+Written: `CLAUDE.md` 61 → **63 / 80** (21% headroom, clear of the 68 line Closed-when 1 wants).
+`CONTEXT.md` untouched at 132/150. `L-108` → count 6 with the five new instances; `L-113` bumped
+1 → **2** with its second sighting, since its own phenomenon recurred — making it promotable at the
+next promote by the ordinary count≥2 trigger.
+
+### 2026-08-14 | surprise | my own shell habits were generating every permission prompt
+
+Not sprint work; recorded because it cost the owner repeated interruptions and the cause was mine.
+
+`.claude/settings.json` allows Bash by **command prefix** — `Bash(git add:*)`, `Bash(sh scripts/:*)`
+and so on. Three habits defeated every match: prefixing nearly every command with
+`cd "D:/Project/lean-flow"` when the working directory was already correct and `cd` is not allowlisted;
+invoking `bash scripts/qa-check.sh` when the rule names `sh`; and wrapping commits in `if … then … fi`,
+a compound that matches no prefix at all. The environment notes warn about the first one explicitly.
+
+Corrected habits: no `cd`, `sh` not `bash`, one command per call, and file appends via the Edit tool
+rather than `cat >>` heredocs. The last one has a second benefit — running the gate as its own call
+forces its output to be read before a commit is issued, which is exactly the discipline that failed at
+`08e9182`.
+
+### 2026-08-14 | progress | T2 — the rule was never in the wrong file; it was the wrong *kind* of rule
+
+Sorted all sightings by the flow that was running, which is what the DoD asked for and what L-113 said
+had never been done. **Eleven instances across six episodes** — the Plan said "seven", written before
+T1 and this sprint's promote each produced more. Sorting eleven satisfies and exceeds a criterion that
+asked for seven, so this is a figure that grew, not one that went stale; no `scope-change` was raised
+and the tick states the corrected number rather than the frozen one.
+
+```
+ad-hoc verification query inside a governance/gate pass   8
+authoring a checker or fixture                            2
+automated checker at runtime                              1
+```
+
+**The obvious move was re-derived and rejected on evidence, not on taste.** "Add another sentence to
+`CONTEXT.md` § Gates" fails for a reason now statable: § Gates **was loaded** during all eight
+governance-pass failures. The rule was present, correctly placed by §10's test, and in context. The
+file was never the defect — so moving or extending the text in that file cannot be the fix.
+
+**What the evidence actually shows.** Not one of the eleven was caught by recalling a rule. Every one
+that was caught was caught by **a second number that disagreed** — a count that would not reconcile, an
+inverse whose sum was wrong, output too implausible to be real. That makes the durable form an *action
+taken at query time*, not a caution held in memory, and it relocates the placement question: it fires
+whenever any flow is about to act on a query result, which is every flow — so §10's test lands on
+`.claude/CLAUDE.md` § Behavioral Guidelines, beside "finding facts is your job", not on § Gates.
+
+**A negative control is explicitly named as insufficient**, because T1 proved it: the control passed
+while the query was examining 20 of 31 entries. A control shows the query fires on rows it *reaches*;
+it says nothing about rows it skips. That distinction is the new content this widening carries.
+
+Written: `CLAUDE.md` 61 → **63 / 80** (21% headroom, clear of the 68 line that Closed-when 1 wants).
+`CONTEXT.md` untouched at 132/150. `L-108` → count 6 with the five new instances recorded; `L-113`
+bumped 1 → **2** with its second sighting, since its own phenomenon recurred — which makes it
+promotable at the next promote by the ordinary count≥2 trigger.

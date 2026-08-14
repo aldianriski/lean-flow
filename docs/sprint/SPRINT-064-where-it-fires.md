@@ -76,12 +76,16 @@ still not firing.
 verification query — not only when authoring a checker or naming a fixture.
 
 **DoD:**
-- [ ] The seven sightings sorted by *which flow was running* — authoring vs verifying — before any
-      placement is chosen; §10's placement test applied to the result
-- [ ] **"Add another sentence to § Gates" re-derived, not assumed** — that is the obvious move and is
-      precisely what already failed to fire seven times (L-091)
-- [ ] Placement recorded, and `L-108`'s entry updated with the new sighting count
-- [ ] Headroom confirmed at the chosen destination before writing (`CLAUDE.md` 61/80 · `CONTEXT.md` 132/150)
+- [x] The seven sightings sorted by *which flow was running* — authoring vs verifying — before any
+      placement is chosen; §10's placement test applied to the result — **eleven, not seven** (T1 added
+      one and the promote scan three); split **8 verification · 2 authoring · 1 runtime checker**
+- [x] **"Add another sentence to § Gates" re-derived, not assumed** — that is the obvious move and is
+      precisely what already failed to fire seven times (L-091) — **rejected with its reason:** § Gates
+      *was* loaded during all 8 governance-pass failures, so the file was never the defect
+- [x] Placement recorded, and `L-108`'s entry updated with the new sighting count — **`CLAUDE.md`
+      § Behavioral Guidelines**, phrased as a required cross-check; L-108 → count 6, L-113 → count 2
+- [x] Headroom confirmed at the chosen destination before writing (`CLAUDE.md` 61/80 · `CONTEXT.md` 132/150)
+      — written to CLAUDE.md, now **63/80** (21% headroom, still clear of the 68 line)
 
 ### T3 — Give the G2 overlap map a rule for files no task owns `[size: S · risk: low · class: decision · HITL]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `.claude/CONTEXT.md`
