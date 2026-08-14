@@ -111,10 +111,12 @@ per check** (L-058), never the file count.
 reason per survivor; or an explicit deferral to EPIC-004 with its reason.
 
 **DoD:**
-- [ ] Each of the 11 checkers' named findings enumerated before any merge is proposed
-- [ ] Decision recorded against EPIC-002 **and** EPIC-004's shared open question (they share it — the
-      answer is written once and cited twice, never re-decided)
-- [ ] If deferred: the deferral names the class of fact that would close it (L-094), not "when a signal appears"
+- [x] Each of the 11 checkers' named findings enumerated before any merge is proposed — **~82 asserted
+      across 16 retained fixture harnesses**; table of all 11 in EPIC-002 D3
+- [x] Decision recorded against EPIC-002 **and** EPIC-004's shared open question (they share it — the
+      answer is written once and cited twice, never re-decided) — **written in EPIC-002 D3, cited by EPIC-004**
+- [x] If deferred: the deferral names the class of fact that would close it (L-094), not "when a signal
+      appears" — **a documented behaviour**: EPIC-003's spec in a form a checker can read as its rule source
 
 ## Owner-action checklist
 - [ ] Reinstall the plugin — session skills ran at **1.34.0** against a **1.36.0** repo during promote

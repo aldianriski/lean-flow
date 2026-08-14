@@ -63,8 +63,12 @@ each other · any telemetry, ever (the README promises none).
 
 - Does the engine ship inside the plugin, or as a standalone script an adopter can run without
   installing lean-flow? → the second is more useful and more work; settle at the first member G2.
-- Can 11 checkers' named findings survive consolidation? → shares EPIC-002's open question; if the
-  answer there is no, this epic inherits the constraint rather than re-deciding it.
+- ~~Can 11 checkers' named findings survive consolidation?~~ **Answered in EPIC-002 D3 (SPRINT-063 T4)
+  — cited, not re-decided**, as this row always said it would be. The 11 stand alone for now because
+  they share no input model; consolidation was **deferred to this epic**, and its unblock condition is
+  a documented behaviour rather than a signal to wait for: **D1's spec existing in a form a checker can
+  read as its rule source.** So this epic inherits a live constraint — the ~82 named findings asserted
+  across 16 retained fixture harnesses are the contract any engine here must preserve (L-058).
 - What does a partially-conformant repo see — a level, a percentage, or a list? → a percentage invites
   gaming and a bare list gives no direction; likely a level plus the named gap to the next one.
 

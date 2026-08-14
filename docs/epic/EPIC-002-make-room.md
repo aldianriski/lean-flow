@@ -56,15 +56,41 @@ records are history, and history is not corpus) · relaxing a gate to reduce wor
   (not surprising, and reversible).
 - **D2** — The SSOT cap question is settled by ADR, not by trimming to fit. ADR-015 rules that a soft
   cap cannot be grandfathered, so "add it to the list" is unavailable and the number itself must be
-  argued. **→ ADR pending, EPIC-002 sprint 2.**
+  argued. **→ ADR-019** (`TODO.md` 320) **· ADR-020** (research 130 + frozen verdicts), SPRINT-063.
+- **D3** — **The 11 checkers stand alone; consolidation defers to EPIC-004** (SPRINT-063 T4). They
+  share no input model — markdown tables, frontmatter, git history, JSON manifests and prose inference
+  are five different parsing problems — so a single engine today is a dispatcher with eleven bodies:
+  the file count changes and nothing else does. EPIC-004 D1 makes the engine **spec-driven**, and a
+  spec is precisely the common rule representation they currently lack; building it before EPIC-003
+  exists means inventing a representation EPIC-003 will then define differently. The contract being
+  protected is the **named finding** (L-058) — ~82 of them asserted across 16 retained fixture
+  harnesses — never the file count. **Deferral closes on a documented behaviour** (L-094): the EPIC-003
+  spec existing in a form a checker can read as its rule source. Not "when a measurable signal
+  appears", which would park it forever.
+
+  | Checker | What it guards | Input model |
+  |---|---|---|
+  | `count-claims` | hand-written counts vs what is on disk | prose claims across 4 files |
+  | `doc-caps` | §2's caps, derived from the standard's own table | markdown table + line counts |
+  | `ephemeral-intake` | a BUG report is temp-dir scaffolding, never committed | filesystem walk |
+  | `epic-archive` | an epic archives only when every Closed-when is ticked | frontmatter + checkboxes |
+  | `gates-signed` | `gates_signed` present or absent — absence is never approval | frontmatter |
+  | `layers-completeness` | a file implied by DoD prose but absent from `Layers:` | prose inference |
+  | `layers-observed` | the real git diff since `plan_commit`, attributed per task | git history |
+  | `manifest-lockstep` | four manifests + the README footer at one version | JSON |
+  | `night-run-rollup` | a run emits its rollup at exit | append-only log |
+  | `research-archive` | §11: `superseded` **and** no live citer | frontmatter + cross-corpus refs |
+  | `task-origin` | `origin:` is stamped — it gates G1's fast-path | TODO entry fields |
 
 ## Open questions
 
 - ~~Does §11's trigger list or §2's caps own the soft-cap report?~~ **Answered, SPRINT-062 T2:** §2
   owns caps, §11 owns retention; the doc-aging line reads both. The "fifth checklist line" instinct was
   indeed wrong — the enumeration was the wrong *source*, not an incomplete list.
-- Can 11 checkers consolidate without losing per-check named findings? → a `/prototype` if it cannot
-  be settled on paper; the named finding is the contract (L-058), not the file count.
+- ~~Can 11 checkers consolidate without losing per-check named findings?~~ **Answered, SPRINT-063 T4
+  → D3:** the question was premature, not unanswerable. They share no input model, so consolidation
+  today buys a file count and risks ~82 named findings; it becomes a real question once EPIC-003's
+  spec gives them a common rule representation. Settled on paper — no `/prototype` needed.
 
 ## Closed when
 

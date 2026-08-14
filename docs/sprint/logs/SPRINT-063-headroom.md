@@ -251,3 +251,35 @@ that matters: it proves the exemption did not disarm the check, and that the mat
 position rather than a substring (L-108, built into the fixture rather than trusted).
 
 Cap report is now clean: zero `OVER-CAP` lines, `QA-CHECK: 154 pass, 0 fail`.
+
+### 2026-08-14 | progress | T4 — the 11 checkers stand alone; consolidation deferred to EPIC-004
+
+Enumerated first, as the DoD requires and before any merge was contemplated: **11 checkers, 1294
+lines, 16 retained fixture harnesses asserting ~82 named findings.** The first count came from a
+regex over the sources and was discarded — parsing `printf` strings to count findings is the ad-hoc
+verification grep L-113 is about. The fixtures are the honest enumeration: each `run_case` asserts one
+named finding, so the contract counts itself.
+
+**Ruling: defer, and it is not the tidy-move reflex L-091 warns about — the evidence points one way.**
+
+- **There is no spec to drive an engine from.** EPIC-004 D1 requires rules to come from the EPIC-003
+  spec, not from code. EPIC-003 has not started. Consolidating now means inventing a rule
+  representation that EPIC-003 will then define differently, and EPIC-004 would rebuild it.
+- **The 11 share no input model** — markdown tables, frontmatter, git history, JSON manifests, prose
+  inference. Five different parsing problems. One engine today is a dispatcher with eleven bodies: the
+  file count drops, nothing else changes. A *spec* is exactly the common rule representation they lack,
+  which is why this becomes a real question in EPIC-004 and is a non-question now.
+- **The duplication that does exist was already ruled deliberate — this same sprint.** TD-045 and
+  TD-049 (three parsers of the sprint format) were both re-reviewed and held at this sprint's own
+  promote, on ADR-016's accepted-trade reasoning. Reversing that hours later without new evidence
+  would be the failure, not the fix.
+- **EPIC-002's Closed-when never required consolidation** — "either consolidated **or** has a one-line
+  reason it stands alone". The eleven reasons are now a table in EPIC-002 D3, so that condition is
+  answerable either way.
+
+**The deferral names its closing class of fact (L-094): a documented behaviour** — EPIC-003's spec
+existing in a form a checker can read as its rule source. Deliberately *not* "when a measurable signal
+appears", which is the phrasing that parks a judgement or a documented behaviour forever.
+
+Written once in EPIC-002 D3 and **cited** by EPIC-004's open question rather than re-decided there —
+the two epics shared the question and EPIC-004's row already said it would inherit rather than re-rule.
