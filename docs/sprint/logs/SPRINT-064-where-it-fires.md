@@ -67,7 +67,7 @@ deliberate guard rather than by an implausible-looking result. It is the counter
 rule's value is not "write better greps", it is "cross-check a verification query against a second
 query that must agree". T2 should sort it with the other seven.
 
-### 2026-08-14 | complete | T1 — §11 LEARNINGS collapse pass applied, count 0
+### 2026-08-14 | progress | T1 — §11 LEARNINGS collapse pass applied, count 0
 
 Corpus: **96 entries — 64 `active`, 31 `promoted`, 1 `superseded`.** All 31 promoted entries carry
 their `L-NNN → promoted: <where>` pointer, verified by a query proven to fire on a seeded gap.
@@ -81,3 +81,35 @@ closed the `docs/research/` half the same way.
 **EPIC-002's Closed-when 4 is now satisfiable**: both legs — `docs/research/` (SPRINT-063) and LEARNINGS
 (here) — have had one §11 pass *applied*, each returning zero with the evidence rule honoured. The
 condition asked for a pass applied, not for a reduction.
+
+### 2026-08-14 | surprise | `complete` is a reserved run-level event, and the template does not say so
+
+T1's entry was first written with event `complete`, meaning "this task is complete". The gate went red:
+`check-night-run-rollup.sh` line 42 treats **any** `| complete |` entry header as the announcement that
+a *run* finished, and then requires the Part 4 rollup header plus a calibration row. Neither exists
+yet, correctly — T2 and T3 are untouched.
+
+**The word is reserved and nothing says it is.** `sprint-log.md.template` lists the valid events as
+`promote · progress · surprise · scope-change · park · blocker · complete · close` with no indication
+that `complete` carries run-level semantics while the others are entry-level. A task-completion entry is
+the obvious thing to write, and it silently arms a run-level assertion.
+
+Corrected to `progress`. The run-level `complete` and its rollup belong at the end of the sprint-bulk
+loop, not at the end of a task.
+
+Third instance of this sprint's own theme in one task: a mechanism that fires where it should not,
+because its trigger is documented in the checker and not at the point of authoring (L-099's shape).
+Carried to the Retro's tech-debt bucket rather than fixed inline — the fix touches a template that
+ships to consumers, which is not T1's declared blast radius.
+
+### 2026-08-14 | surprise | committed through a red gate — process failure, recorded not buried
+
+T1's commit `08e9182` landed **while the gate was failing** on the two rollup findings above. The
+qa-check ran immediately before it in the same shell line but the commit was not gated on its exit
+status, so the failure printed and the commit proceeded anyway.
+
+This is the `orchestrator` § Red flags entry *"Committing through a failing check — surface the failure,
+don't bury it"*, and it is the same family as L-057: a command's exit status was available and simply
+not consumed. Nothing is corrupt — the two findings were about the log's own event word, not about T1's
+work — but the discipline failed and the record says so rather than the history reading clean.
+Fixed forward in the next commit rather than amended, so the sequence stays visible.
