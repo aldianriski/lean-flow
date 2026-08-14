@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-10
+last_updated: 2026-08-14
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -10,6 +10,50 @@ status: current
 <!-- Prepend new sprints — newest first. Append-only; never edit past blocks. -->
 
 ---
+
+## v1.37.0 — Headroom (2026-08-14)
+
+MINOR — SPRINT-063, **4 of 4 units**, the second member sprint of **EPIC-002 Make Room**. SPRINT-062
+built the procedure for ruling a cap and delivered no headroom; this one spent it. Every task mapped to
+one of the epic's four Closed-when conditions, and in three of the four the tidy answer was available
+and wrong.
+
+**Governance caps — two ADRs, and neither moved a number by ceremony**
+- **ADR-019** — `TODO.md`'s cap `~150 soft` → **`320 soft`**. Derived, not chosen: § Task entry shape's
+  ten mandatory fields cost **~17.6 lines per entry** (measured 176 lines / 10 tasks), so the cap and
+  the schema could not both hold. Kept **soft** deliberately — §11's response to this cap is a prune
+  conversation with the owner, which needs the breach reported rather than the gate failed.
+- **ADR-020** — `docs/research/<slug>.md`'s cap `120 soft` → **`130 soft`**, *and* a
+  **`status: superseded` doc is FROZEN: the cap no longer applies to it.** A spent verdict's only legal
+  future is §11 archival, and the one thing that can still grow on it is the annotation recording *why*
+  it is spent — so the cap was asking for the supersession trail to be deleted.
+- `.claude/CLAUDE.md` **80 → 61 lines** (24% headroom) with its cap **held at 80**. Its diet pass found
+  real duplication: `## File Structure` was a hand-maintained codemap of `docs/architecture/overview.md`
+  § Directory structure, which `CONTEXT.md` § Orientation already forbids. The five per-skill
+  `references/` one-liners it uniquely held were **moved** to `overview.md` before the cut.
+- `.claude/CONTEXT.md` **held at 150** — ADR-017's diet pass had already falsified the standing
+  duplication hypothesis two sprints earlier, so re-running it would have re-derived a dead premise.
+
+**Checkers**
+- `check-doc-caps.sh` exempts frozen verdicts, **reported never silent** — `FROZEN (superseded): …`
+  names the state *and* the exit condition. The matcher is position-anchored to the frontmatter window,
+  and the retained fixture proves it: a `status: current` doc carrying the literal string
+  `status: superseded` in prose is still caught. Two fixtures added
+  (`evals/fixtures/doc-caps/frozen-spent/`), both retained per TD-012.
+- **The 11 checkers stand alone; consolidation is deferred to EPIC-004** (EPIC-002 D3, with a one-line
+  reason per checker). They share no input model — markdown tables, frontmatter, git history, JSON
+  manifests and prose inference are five different parsing problems — so one engine today would be a
+  dispatcher with eleven bodies. The deferral names its closing class of fact: EPIC-003's spec existing
+  in a form a checker can read as its rule source.
+
+**Retention**
+- One §11 archive pass applied to `docs/research/` — **applied count 0**. All four `status: superseded`
+  docs have live citers, each verified by reading the citing line rather than trusting a match.
+- `TD-046` deleted per §11 (resolved three sprints prior); `TD-050` and `TD-049` re-reviewed and held
+  with unblock conditions stated.
+
+**Consumer-facing note:** `DOCS_Guide.md` §2 and §11 changed, and the standard ships inside the plugin —
+adopters pick up the new research cap, the frozen-verdict rule and the `TODO.md` cap on upgrade.
 
 ## v1.36.0 — Room to Write (2026-08-10)
 
@@ -55,52 +99,4 @@ scoped to `TASK-196` and `TASK-199`.
 
 ---
 
-## v1.35.0 — Named, Not Answered (2026-08-10)
-
-MINOR — SPRINT-061, **3 of 3 units**. Every task answered a question SPRINT-060 stated and left open.
-The sprint's most useful output is a measurement that found nothing — and that turned out to be the
-answer rather than a failed search.
-
-**What changed for you:**
-
-- **The documentation standard gains a rule: `DOCS_Guide.md` §10, "Every hygiene rule gets a matcher."**
-  A hygiene rule earns either a lint in your project's quality gate or a named checklist line in a
-  close/promote sweep; a rule with neither is aspirational and gets deleted or wired. Documentation is
-  a legitimate answer — calling it a gate is the error. It had been sitting live inside a research doc
-  marked `superseded`, which is exactly what made it unreachable, and it was reworded on the way out:
-  the original named our own `qa-check.sh`, a path no consumer has.
-- **Nothing else here is consumer-facing.** The other two tasks are internal doc rulings and a
-  measurement. Called out because a MINOR bump usually implies more.
-
-**For maintainers — section 4 of the QA gate has no cost centre, and that closes the search.** TD-050
-asked to split it across "freshness vs dangling refs vs completeness". Those are not three separable
-jobs: dangling refs and completeness are computed *together* inside the same two loops, and the row
-omits the corpus setup they both depend on. Measured by loop instead, across two samples on an
-instrumented copy (shipped script SHA-256 identical before and after):
-
-| slice | s1 | s2 | share of §4 |
-|---|---:|---:|---:|
-| index freshness | 34.4s | 27.7s | 35–40% |
-| corpus + id-universe setup | 1.5s | 1.2s | ~2% |
-| 4a LEARNINGS | 26.3s | 23.8s | ~30% |
-| 4b corpus | 23.4s | 26.0s | 27–33% |
-| **section 4** | **85.6s** | **78.8s** | **51.5% of run** |
-
-Three comparable thirds. Deleting the largest buys ~19% of the gate — and the largest is the
-whole-corpus index read TD-050 itself says not to cheapen. The cheapest target and the most protected
-one are the same object, so any real cure is structural rather than a narrowing of what is checked.
-
-**Also:** both sibling loop-hygiene research docs are now `superseded` — reached independently, and by
-opposite routes: `workstreams.md` because its proposals shipped, `findings.md` because one of its
-*observations was overturned* (its row 24 reports duplication in `CONTEXT.md` that SPRINT-060 T1 went
-looking for and did not find). Two learnings promoted at promote: L-108 → `CONTEXT.md` § Gates ("a guard
-is matched by shape, not by substring"), L-107 → `TECH-DEBT.md` header. Four aged TD rows re-reviewed
-and held, recorded on the rows themselves.
-
-**Filed against ourselves:** the promote governance scan reported doc-aging clean while three §2
-soft-cap breaches printed on every gate run — a report with a matcher and no consumer, which is the
-inverse of the rule shipped above and invisible to both. L-106 → count 2; TASK-192 and TASK-193 filed.
-
----
-
-_Older releases (**v1.34.0** and earlier) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._
+_Older releases (**v1.35.0** and earlier) → [`CHANGELOG-1.35.0.md`](docs/changelog/CHANGELOG-1.35.0.md) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._

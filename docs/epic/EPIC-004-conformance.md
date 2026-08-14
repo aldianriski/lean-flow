@@ -2,7 +2,7 @@
 epic: 004
 slug: conformance
 owner: Maintainer
-last_updated: 2026-08-10
+last_updated: 2026-08-14
 status: proposed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome

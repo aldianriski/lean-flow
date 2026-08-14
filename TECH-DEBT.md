@@ -32,6 +32,45 @@ status: current
 
 ## Tech Debt
 
+- **TD-054** severity: medium | status: open | created: Sprint-063
+  - Summary: **a worktree created by `Agent(isolation: "worktree")` can branch from a stale base, and
+    nothing checks it.** SPRINT-063 T2's worktree was branched at `40603a6` (`sprint(60)`) — three
+    sprints behind `main` — while the dispatching session was at `85490ac`. The agent detected it
+    itself and fast-forwarded before doing any real work.
+  - Impact: had it not looked, the citer check would have run against a corpus where only 2 of its 4
+    named candidates were `status: superseded` and two docs the sprint's own Scope and A3 name did not
+    exist at all. The result would have been confidently wrong and internally consistent — the worst
+    shape. `dispatch.md`'s pre-dispatch preflight has a **base-ref-vs-HEAD** item, but it checks the
+    *sprint's* base ref, not the base each spawned worktree actually gets; the gap is that the two were
+    assumed to be the same thing. L-021's pattern one layer down: not the plugin cache this time, but
+    the worktree copy of the repo.
+  - Mitigation (**not yet derived**, L-091): the obvious move is "assert the worktree's HEAD equals the
+    coordinator's before the agent starts", which is probably right but assumes the coordinator can
+    read the worktree's base at spawn time — unverified. Establish first **why** the worktree branched
+    three sprints back when the session was current; that mechanism is not understood, and a guard
+    written against the wrong cause guards nothing.
+  - Tracker: SPRINT-063 T2 Execution Log · dispatch.md pre-dispatch preflight · L-021
+
+- **TD-053** severity: minor | status: open | created: Sprint-063
+  - Summary: **worktree-isolated dispatch places a full repo copy at `.claude/worktrees/<id>/`, inside
+    the repo, and `find`-based checkers walk into it.** `check-ephemeral-intake.sh` excludes fixture
+    trees with `grep -v '^evals/fixtures/'` — correctly position-anchored per L-108 — but the nested
+    copy defeats the `^` anchor, so `.claude/worktrees/<id>/evals/fixtures/…` is not excluded. The gate
+    reported a retained must-FAIL fixture as a live violation for as long as the worktree existed.
+    Separately, `.claude/worktrees/` is **not in `.gitignore`**, so a plain `git add -A` would commit a
+    second copy of the whole repo.
+  - Impact: bounded and transient — it clears when the worktree is removed — but it fires on exactly
+    the workflow `dispatch.md` prescribes for disjoint parallel tasks, so it lands on anyone following
+    the documented path. The false positive is loud rather than silent, which is the better failure;
+    the `.gitignore` gap is the sharper one, since a stray `git add -A` is recoverable but ugly.
+  - Mitigation (**not yet derived**, L-091): do not reach for "add `.gitignore`" as the whole fix — it
+    addresses the second leg only. `check-ephemeral-intake.sh` uses `find`, not `git ls-files`, so
+    ignoring the path does not stop the walk. Whether the cure belongs in each `find`-based checker, in
+    a shared exclusion, or in placing worktrees outside the repo entirely is a question about all of
+    them at once — which is EPIC-004's engine question, so this row may be absorbed there rather than
+    fixed alone.
+  - Tracker: SPRINT-063 Retro · L-108 (the anchor that was right and still defeated) · EPIC-004 D1
+
 - **TD-052** severity: medium | status: open | created: Sprint-062
   - Summary: **Nothing in `evals/` exercises skill *prose*, so a governance rule that lives as
     procedure text ships without the must-FAIL fixture L-058 requires.** SPRINT-062 T2 changed the

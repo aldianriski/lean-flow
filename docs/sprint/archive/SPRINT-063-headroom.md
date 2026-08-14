@@ -4,7 +4,7 @@ slug: headroom
 epic: EPIC-002
 owner: Maintainer
 last_updated: 2026-08-14
-status: active
+status: closed
 gates_signed: G1,G2 @ 222b437
 plan_commit: 124e05b
 close_commit: [sha — set at close]
@@ -173,12 +173,43 @@ reason per survivor; or an explicit deferral to EPIC-004 with its reason.
      shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — **yes, twice, and both were in the task text rather than in execution.**
+(a) TASK-196's `assumes:` cited ADR-017 *and* named L-008/TD-006 as "the actual mechanism" in the same
+block — ADR-017 is the record that falsified that mechanism, and `TD-006` had already been deleted from
+the ledger. The refuting evidence was inside the citation the task was already carrying. (b) TASK-199's
+`assumes:` correctly warned against inheriting "ordinary drift" from TASK-192 — a warning that existed
+only because TASK-192 had repeated the error **while citing L-106, the learning that corrects it**.
+Both misses happened at task-authoring time and were caught at G2/execution by re-deriving. → Learnings
+bucket, plus the two `L-NNN` below.
 
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents).
+**Cost** — coordinator inline (session model) + **1 dispatched agent** for T2 (`sonnet`,
+worktree-isolated): 181k tokens, 85 tool uses, ~17 min wall clock. Three of four tasks were
+`class: decision` and stayed inline by ADR-010's rule, so this sprint is **not** a fan-out data point —
+one row, and a misleading one to average with parallel-build sprints. Cost per unit delivered is not
+separable for the inline three; recorded as unavailable rather than estimated.
 
 **Worked**
+- **Measuring before ruling changed three of four answers.** T1's `TODO.md` split was re-ruled once its
+  25-file wiring cost was measured; T3's two "drift" docs both turned out not to be drift once git
+  history was read; T4's consolidation deferred once the input models were enumerated. In every case
+  the tidy answer was available and wrong (L-091).
+- **The gate caught two of my own errors** — a diet pass that silently deleted machine-checked count
+  claims, and a commit that omitted `skills/` while the report still read green. Neither was caught by
+  review; both were caught by a checker with a named finding.
+- **Dispatching the one execution-class task while running a decision inline** kept the decision work
+  in the session that had the context, and cost nothing in coordination beyond one merge-back.
 
 **Friction**
+- **The Execution Log is shared sprint infrastructure owned by no task**, so the G2 overlap map did not
+  cover it — the inline coordinator and the worktree agent both created it and it had to be merged by
+  hand. The overlap map enumerates files from `Layers:`, and this file is in nobody's `Layers:`.
+- **Worktree isolation is under-guarded in two ways** (both → tech-debt bucket): the nested repo copy
+  defeats `find`-based checkers' position-anchored exclusions, and the worktree branched from a
+  3-sprint-stale base that the agent had to detect and fix itself.
+- **`git add <dir-glob>` is not a substitute for reading `git diff --cached`.** Staging
+  `docs/ scripts/ evals/` silently excluded `skills/`.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- Filed as **L-115** (refuting evidence inside the citation a task already carries), **L-116** (a
+  derived-config checker cannot see an incomplete commit), **L-117** (apparent duplication may carry a
+  machine-checked contract — find its readers before deleting it).

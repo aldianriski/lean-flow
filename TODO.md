@@ -18,11 +18,10 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-063 — Headroom** → [`docs/sprint/SPRINT-063-headroom.md`](docs/sprint/SPRINT-063-headroom.md)
->
-> Second member sprint of EPIC-002. Every one of its four tasks maps to one of the epic's four
-> Closed-when conditions, so the epic is answerable at close. SPRINT-062 built the procedure for ruling
-> a cap and delivered no headroom; this one spends it.
+> _None._ SPRINT-063 closed 2026-08-14 (4 of 4) — the second member sprint of EPIC-002, which stays
+> **active**: 2 of its 4 Closed-when conditions are now met (no doc over a soft cap without a ruling ·
+> every checker has a stand-alone reason). Outstanding: the LEARNINGS §11 leg (**TASK-204**) and the
+> headroom condition, left open by owner ruling — `CLAUDE.md` is at 24% but `CONTEXT.md` holds at 12%.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room** (runs first — the caps block everything after it) → **EPIC-003 The Standard**
@@ -43,47 +42,7 @@ status: current
 <!-- EPIC-002 Make Room — the critical path. These block EPIC-003/004/005, which have nowhere to
      write their rules while both SSOT files sit at cap. -->
 
-- [ ] TASK-196 — Rule the cap structure on all three governance files, don't trim to fit  [size: M] [risk: med] [HITL]
-      class:      decision
-      done-when:  CLAUDE.md, CONTEXT.md **and TODO.md** each carry ≥15% headroom by a recorded ruling —
-                  a raised cap with an ADR, a §6 split, or content moved to a satellite behind a pointer
-      touches:    .claude/CLAUDE.md · .claude/CONTEXT.md · TODO.md · docs/adr/ · DOCS_Guide §2
-                  · scripts/lib/doc-caps-grandfathered.txt
-      depends-on: none — **unblocked**: TASK-192 shipped in SPRINT-062, and the precedent it set is
-                  now `DOCS_Guide` §2's Growth rule (drift vs a cap that was never reachable). Apply
-                  that rule here rather than re-deriving one
-      assumes:    ADR-017 already raised CONTEXT 130→150 once, so a second raise needs a *different*
-                  argument or it is trimming-by-ADR — and ADR-015 forbids grandfathering a soft cap.
-                  L-008/TD-006 name the actual mechanism (CONTEXT accreting duplication of its
-                  satellites); test that hypothesis before raising any number, per L-091.
-                  **TODO.md is the clean case and is scoped in by the Sprint-062 promote sign-off:**
-                  entries written to the standard's own § Task entry shape run ~15 lines each, so a
-                  backlog of eight needs ~120 lines before any scaffolding — cap and schema cannot
-                  both hold. Arithmetic, not drift (L-106 ×3). The figure moves with the backlog;
-                  measure it at start rather than trusting a number written here
-      tracker:    EPIC-002 · ADR-015 · ADR-017 · L-008 · L-106 · TD-006 · SPRINT-062 promote
-      origin:     manual
-      state:      ready
-
 ### P2 — Quality / Polish
-
-- [ ] TASK-199 — Re-sort the two remaining §2 breaches against the new Growth rule  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  `graph-engineering.md` (122) and `loop-hygiene-prd.md` (139) are each sorted into
-                  drift or never-reachable per §2's Growth rule, and ruled accordingly
-      touches:    docs/research/graph-engineering.md · docs/research/loop-hygiene-prd.md · possibly
-                  DOCS_Guide §2 · possibly docs/adr/
-      depends-on: none
-      assumes:    **do not inherit "ordinary drift" from TASK-192's text — that phrase is the error.**
-                  L-106's own body records `graph-engineering.md` as having "no movable section and no
-                  whitespace slack", and says both docs "had been carried as *drift* for sprints"; the
-                  mislabelling is what L-106 was written to correct, and TASK-192 repeated it while
-                  citing it. Sort each doc fresh against the Growth rule §2 now carries. `loop-hygiene-prd.md`
-                  has not been examined at all and may genuinely be drift — the point is that neither
-                  diagnosis is currently evidence-backed
-      tracker:    SPRINT-062 T1 Retrieval check · L-106 · DOCS_Guide §2 Growth rule
-      origin:     close-retro
-      state:      ready
 
 - [ ] TASK-200 — Widen L-108's placement to reach verification, not just authoring  [size: S] [risk: med] [HITL]
       class:      decision
@@ -95,41 +54,13 @@ status: current
                   and still reached none of three fresh violations — two of them produced while
                   verifying the first (L-113). Its placement enumeration lists only *authoring* flows;
                   every failure was a verification grep inside a gate pass, where the result is acted
-                  on immediately with no review between query and conclusion. **`CLAUDE.md` is at
-                  80/80 and `CONTEXT.md` at 132/150, so this may be blocked behind TASK-196** — check
-                  before designing. Re-derive: "add another sentence to § Gates" is the obvious move
-                  and is what already failed to fire
+                  on immediately with no review between query and conclusion. **Unblocked as of
+                  SPRINT-063**: the room this was waiting on now exists — `CLAUDE.md` is 61/80 (24%)
+                  and `CONTEXT.md` holds at 132/150 (12%), so § Gates can take another rule if that is
+                  the answer. Re-derive rather than assume it is: "add another sentence to § Gates" is
+                  the obvious move and is exactly what already failed to fire (L-113)
       tracker:    SPRINT-062 Retro · L-113 · L-108 (count 4)
       origin:     close-retro
-      state:      ready
-
-- [ ] TASK-195 — Apply one §11 archive pass to docs/research/  [size: S] [risk: low] [HITL]
-      class:      execution
-      done-when:  every research doc that is `status: superseded` **and** has no live citer sits in
-                  `archive/`, marked in the generated index; the applied count is reported either way
-      touches:    docs/research/* · docs/knowledge-index.md
-      depends-on: none
-      assumes:    31 docs, and §11 is explicit that supersession alone is not sufficient — a spent
-                  verdict is usually the WHY-trail for whatever replaced it, and closed history plus
-                  the generated index never count as citers. Expect **few** moves; the deliverable is
-                  the applied pass and its count, not a reduction target. `platform-readiness-audit.md`
-                  is `current` and cited by four epics — not a candidate
-      tracker:    EPIC-002 · DOCS_Guide §11
-      origin:     manual
-      state:      ready
-
-- [ ] TASK-197 — Decide whether the 11 checkers consolidate now, or wait for EPIC-004  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  a recorded decision — one engine, split by concern, or stand alone — with a one-line
-                  reason per survivor, or an explicit deferral to EPIC-004 with the reason
-      touches:    scripts/lib/check-*.sh · scripts/qa-check.sh · EPIC-002 · EPIC-004
-      depends-on: none
-      assumes:    **deferral may be the right answer and must stay on the table.** EPIC-004 makes the
-                  engine *spec-driven*; consolidating now into a non-spec-driven engine is work EPIC-004
-                  would redo. Do not assume consolidation because it is the tidy move (L-091). The
-                  contract being protected is the **named finding per check** (L-058), never the file count
-      tracker:    EPIC-002 · EPIC-004 D1 · L-058
-      origin:     manual
       state:      ready
 
 - [ ] TASK-198 — Rule what CONTEXT.md becomes once the spec is extracted  [size: S] [risk: med] [HITL]
@@ -144,6 +75,45 @@ status: current
                   task as how it gets retired. Blocking for EPIC-003, not for EPIC-002
       tracker:    EPIC-003 open question 3 · ADR-018
       origin:     manual
+      state:      ready
+
+- [ ] TASK-204 — Apply one §11 collapse pass to docs/LEARNINGS.md  [size: S] [risk: low] [HITL]
+      class:      execution
+      done-when:  every `L-NNN` at `[status: promoted]` carries a one-line pointer and no body; the
+                  applied count and measured line delta are reported, zero included
+      touches:    docs/LEARNINGS.md · docs/knowledge-index.md
+      depends-on: none
+      assumes:    this is the **other half** of EPIC-002's fourth Closed-when condition — SPRINT-063 T2
+                  applied the `docs/research/` leg (count 0), leaving LEARNINGS unswept. SPRINT-062 T3
+                  already established the corpus is healthy and that the count suggesting otherwise was
+                  measuring its own query, so **expect few or zero collapses and do not treat a low
+                  number as underdelivery**. §11's collapse consumes its own trigger — `promoted: yes`
+                  is never the stored form — so count promotion state by `[status: promoted]`,
+                  position-anchored (L-108); a zero from `grep "promoted: yes"` is evidence about the
+                  query, never about the corpus
+      tracker:    EPIC-002 Closed-when 4 · SPRINT-063 T2 · DOCS_Guide §11 · L-108
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-205 — Give the G2 overlap map a rule for files no task owns  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  a recorded rule covering sprint infrastructure that every task writes but no task
+                  declares — at minimum the Execution Log — so a parallel dispatch does not produce two
+                  versions of it needing a hand merge
+      touches:    skills/orchestrator/SKILL.md § G2 · skills/orchestrator/references/dispatch.md ·
+                  possibly `.claude/CONTEXT.md` § Gates
+      depends-on: none
+      assumes:    SPRINT-063 hit this live: the inline coordinator and the worktree agent **both created
+                  `docs/sprint/logs/SPRINT-063-headroom.md`** and it was merged by hand. The overlap map
+                  enumerates shared files from each task's `Layers:`, and the Execution Log is in
+                  nobody's `Layers:` — it is sprint infrastructure, so the map cannot see it by
+                  construction. **Do not fix this by telling tasks to declare the log**: that makes
+                  every task an owner of the one file every task appends to, which is the opposite of
+                  an ownership map. The honest question is whether append-only shared files need a
+                  different discipline from owned ones. Check whether `Files Changed` and the sprint
+                  file itself have the same shape before ruling
+      tracker:    SPRINT-063 Retro Friction · L-042 · dispatch.md merge-back queue
+      origin:     close-retro
       state:      ready
 
 - [ ] TASK-201 — Rule what the critic's Spec axis compares against  [size: S] [risk: low] [HITL]

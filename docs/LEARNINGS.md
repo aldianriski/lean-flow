@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-10
+last_updated: 2026-08-14
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -27,6 +27,30 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-117 [tags: docs] [status: active]: **Content that reads as duplication may be carrying a machine-checked contract — find what reads a block before deleting it.** SPRINT-063 T1 ran a diet pass on `CLAUDE.md` and correctly identified `## File Structure` as a hand-maintained codemap duplicating `docs/architecture/overview.md`, which `CONTEXT.md` § Orientation forbids by name. The block was cut, its one unique element (five per-skill `references/` one-liners) moved to `overview.md` first so no signal was lost, and the result looked clean: 80 → 61 lines, all eight sections intact, nothing that a human reader would miss. The gate then failed three times — `skills`, `tmpl-core`, `tmpl-total`: the deleted tree had carried the only copies of three count claims that `check-count-claims.sh` verifies against disk in `CLAUDE.md` specifically. The claims existed in `overview.md` too, but the checker asserts them **per file**, deliberately: its own header records that a claim living in one surface and not another is how "30 templates" survived in `README.md` while the other two surfaces had moved on. The lesson is not "be careful when deleting" — the diet pass was correct and the duplication was real. It is that **a block can be duplication for a reader and a sole source for a checker at the same time**, and those two facts are established by different means: reading the content tells you the first, and only grepping for the block's *consumers* tells you the second. Before removing content that duplicates another surface, search for what reads it — a checker, a fixture, a skill procedure, a generated index. Sibling of L-020 (shipped ≠ wired) inverted: that one catches a capability nothing calls, this catches content something calls being removed as though nothing did.
+- seen: Sprint-063
+- count: 1
+- promoted: no
+- related: L-058 (the check that caught it — a gate's worth is the failure it names) · L-020 (wiring, the inverse direction) · L-015 (consumer-facing surface) · ADR-006 (what a cap counts)
+
+---
+
+## L-116 [tags: tooling] [status: active]: **A checker that derives its rule from the working tree cannot see an incomplete commit — the gate goes green describing a state the commit does not contain.** SPRINT-063 T3 raised the research cap to 130 in `DOCS_Guide.md` §2 and taught `check-doc-caps.sh` to exempt frozen verdicts. The commit staged `docs/ scripts/ evals/` by directory glob and silently excluded `skills/`, where `DOCS_Guide.md` lives. `qa-check.sh` then reported **154 pass, 0 fail** — correctly, because `check-doc-caps.sh` *derives* its coverage by parsing §2's table from the file on disk, and on disk the cap was 130. The gate was reading the uncommitted change and grading the working tree, while the commit it was nominally validating carried a 120 cap that would have put `graph-engineering.md` back in breach. This is L-057's family (a command's self-report is evidence about the reporter) with a specific and non-obvious mechanism: **the more a checker derives from the repo's own documents rather than hard-coding rules, the less it can distinguish committed state from working state** — and derivation is otherwise the thing that makes these checkers good (TD-041 exists because hand-listed coverage drifted). Two habits, cheap: read `git diff --cached --name-only` before committing rather than trusting the glob that produced it, and treat a green gate as a statement about the working tree unless the gate was run against a clean tree. Caught here only because the staged-file list was printed and read.
+- seen: Sprint-063
+- count: 1
+- promoted: no
+- related: L-057 (self-report is evidence about the reporter) · L-059 · TD-041 (why coverage is derived at all) · `CLAUDE.md` § Anti-Patterns edit-safety (a) — where the staging-discipline rule lives now, its own entry having been retired
+
+---
+
+## L-115 [tags: process] [status: active]: **A task's `assumes:` can carry both a premise and the evidence that already refuted it — the citation list is the first place to look for the refutation, not a warrant for the premise.** TASK-196 was filed with an `assumes:` block naming two things: that `ADR-017` had already raised `CONTEXT.md`'s cap once, so a second raise needs a different argument; and that `L-008`/`TD-006` "name the actual mechanism (CONTEXT accreting duplication of its satellites)", to be tested before any number moved. Both sentences are in the same block, and the second is false *because of* the first: ADR-017 **is** the record of the diet pass that falsified L-008/TD-006, stating outright that "TD-006's premise is now known to be false", and `TD-006` had since been deleted from the ledger entirely. The task was carrying its own refutation as a citation. Nothing about it read as wrong — a task that cites an ADR looks better-grounded than one that does not, and the citation is what makes the premise feel checked. The same sprint produced a second instance: TASK-199's `assumes:` had to warn against inheriting "ordinary drift" from TASK-192, a phrase TASK-192 used **while citing L-106, the learning written to correct exactly that phrase**. Distinct from L-114 (discharge a factual `assumes:` before sizing), which says *when* to check; this says *where to look first* — open the cited artifact and ask what it concluded, before treating the sentence beside it as established. A citation is a pointer to evidence, never a summary of it, and the two diverge silently as the cited record is updated.
+- seen: Sprint-063
+- count: 1
+- promoted: no
+- related: L-114 (discharge facts before sizing — the *when*) · L-091 (re-derive a stated cure) · L-106 (the learning TASK-192 cited while repeating its error) · L-113 (a rule in context that still does not fire)
 
 ---
 
