@@ -25,7 +25,13 @@ skills/           14 skills (auto-discovered at root)
   prime/ lean-doc-generator/ orchestrator/ task-decomposer/ triage/
   prototype/ tdd/ diagnose/ refactor-advisor/ release-patch/ handoff/ insights/   12 stage-skills
   council/                                               opt-in agent decision aid
-  <skill>/references/   on-demand depth (DOCS_Guide, testability, feedback-loops, deepening, …)
+  <skill>/references/   on-demand depth — uncounted by the SKILL.md cap (ADR-006):
+    lean-doc-generator/references/DOCS_Guide.md   the LEAN DOCUMENTATION STANDARD
+    tdd/references/testability.md                 what to mock · design-for-testability · refactor candidates
+    diagnose/references/feedback-loops.md         10 ways to build a loop · determinism · perf
+    task-decomposer/references/prd-and-slices.md  PRD template · tracer-bullet slices · breakdown quiz
+    refactor-advisor/references/deepening.md      seam/depth vocab · dependency categories · design-it-twice
+    prototype/references/{logic,ui}.md            throwaway TUI over a portable module · web UI variants
   lean-doc-generator/templates/   33 canonical doc templates (core; +2 non-core: DESIGN · QA-TESTCASE = 35 total)
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · modes — SSOT)
 docs/             architecture/ · development/ · deployment/ · adr/ · DECISIONS.md · LEARNINGS.md

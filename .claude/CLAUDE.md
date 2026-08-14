@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-07-30
+last_updated: 2026-08-14
 update_trigger: Project shape, anti-patterns, or conventions changed
 status: current
 ---
@@ -14,27 +14,9 @@ status: current
 - **Architecture**: Plugin-first — components at repo root per the Claude Code plugin spec. Skills-first: no hooks, no scaffold, **no agent definitions of its own** — the loop dispatches Claude's built-in agents (`Explore` · `/code-review` · `/verify` · `/security-review`) at key steps; `/council` is the one skill that orchestrates sub-agents internally.
 
 ## File Structure
-```
-.claude-plugin/
-  plugin.json        # plugin manifest (lockstep version with marketplace.json)
-  marketplace.json
-skills/              # 14 SKILL.md files (plugin auto-discovers)
-  flow/    prime/   lean-doc-generator/  orchestrator/  task-decomposer/  triage/
-  prototype/  tdd/  diagnose/  refactor-advisor/  release-patch/  handoff/  insights/  council/
-  #  flow = opt-in conductor · 12 standalone stage-skills · council = opt-in agent-using decision aid
-  lean-doc-generator/
-    references/DOCS_Guide.md      # the LEAN DOCUMENTATION STANDARD
-    templates/*.md.template       # 33 canonical doc templates (core, incl. EPIC/SPRINT/sprint-log/ADR/RESEARCH/DEPLOYMENT/ROLLBACK/BUG/TECH-DEBT/CONTRIBUTING/CODE_OF_CONDUCT/SECURITY/AGENTS/database-{erd,schema,migration-guide}/architecture-{data-flow,authentication,integrations}/product-{requirements,acceptance-criteria}/flows/testing-guide/development-coding-standards; +2 non-core: DESIGN·QA-TESTCASE = 35 total)
-  tdd/references/testability.md          # what to mock · design-for-testability · refactor candidates
-  diagnose/references/feedback-loops.md  # 10 ways to build a loop · determinism · perf
-  task-decomposer/references/prd-and-slices.md  # PRD template · tracer-bullet slices · breakdown quiz
-  refactor-advisor/references/deepening.md      # seam/depth vocab · dependency categories · design-it-twice
-  prototype/references/{logic,ui}.md            # throwaway TUI over a portable module · web UI variants
-.claude/
-  CLAUDE.md          # this file — project shape for maintainers
-  CONTEXT.md         # vocabulary · the loop · gates · modes (single source of truth)
-README.md            # full front-door (no line cap)
-```
+→ **`docs/architecture/overview.md` § Directory structure** — the where-things-live map, and the only one.
+A second tree here is a hand-maintained codemap, which § Orientation of CONTEXT.md rules out (it rots — LAW 3).
+Shape: **14 SKILL.md** auto-discovered at root · **33 canonical doc templates** + 2 non-core (DESIGN · QA-TESTCASE) **= 35 total**.
 
 ## The loop
 `/prime → /lean-doc-generator → /orchestrator → repeat`. `/handoff` ends a session; `/prime`

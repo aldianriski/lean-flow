@@ -34,7 +34,9 @@ re-wrapping prose (§2 Growth rule forbids it).
 ## Plan
 
 ### T1 — Rule the cap structure on all three governance files `[size: M · risk: med · class: decision · HITL]`
-Layers: `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `TODO.md` · `docs/adr/` · `DOCS_Guide` §2 · `scripts/lib/doc-caps-grandfathered.txt`
+Layers: `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `TODO.md` · `docs/adr/` · `docs/DECISIONS.md`
+        · `docs/architecture/overview.md` · `skills/lean-doc-generator/references/DOCS_Guide.md`
+        · `scripts/lib/doc-caps-grandfathered.txt`
 Depends-on: none
 Cites: `scripts/qa-check.sh`
 The caps are the epic's blocker: EPIC-003/004/005 are three epics of incoming rules and there is
@@ -47,12 +49,14 @@ different argument or it is trimming-by-ADR.
 a raised cap with an ADR, a §6 split, or content moved to a satellite behind a pointer.
 
 **DoD:**
-- [ ] Each of the three files sorted into drift or never-reachable, per §2's Growth rule, with evidence
-- [ ] L-008/TD-006's hypothesis (CONTEXT accreting duplication of its satellites) tested before any
-      number moves — confirmed or falsified in writing, per L-091
-- [ ] The ruling recorded: ADR where the number moves, §6 split where it does not
-- [ ] ≥15% headroom verified by `scripts/qa-check.sh`, not by a hand count
-- [ ] `doc-caps-grandfathered.txt` left empty of soft-cap rows (ADR-015 rule 2 FAILs on the row's existence)
+- [x] Each of the three files sorted into drift or never-reachable, per §2's Growth rule, with evidence
+- [x] L-008/TD-006's hypothesis (CONTEXT accreting duplication of its satellites) tested before any
+      number moves — confirmed or falsified in writing, per L-091 — **falsified**, in ADR-017 (SPRINT-060 T1)
+- [x] The ruling recorded: ADR where the number moves, §6 split where it does not — **ADR-019** (TODO 320)
+- [x] ≥15% headroom verified by `scripts/qa-check.sh`, not by a hand count — CLAUDE 24% · TODO 20% ·
+      **CONTEXT 12%, ticked under the owner's ruling that 15% is the wrong instrument for it, not under
+      literal satisfaction** (scope-change logged before the tick — L-088)
+- [x] `doc-caps-grandfathered.txt` left empty of soft-cap rows (ADR-015 rule 2 FAILs on the row's existence)
 
 ### T2 — Apply one §11 archive pass to docs/research/ `[size: S · risk: low · class: execution · HITL]`
 Layers: `docs/research/*` · `docs/research/loop-hygiene-prd.md` · `docs/research/archive/` · `docs/knowledge-index.md`
@@ -67,10 +71,10 @@ replaced it — so the deliverable is the *applied pass and its count*, not a re
 `archive/`, marked in the generated index; the applied count is reported either way, including zero.
 
 **DoD:**
-- [ ] Citer check run per candidate; closed history and the generated index do not count as citers
-- [ ] Each of the 4 superseded docs either moved or kept with its live citer named
-- [ ] `sh scripts/gen-index.sh` re-run; index links resolve
-- [ ] Applied count reported to the owner, zero included
+- [x] Citer check run per candidate; closed history and the generated index do not count as citers
+- [x] Each of the 4 superseded docs either moved or kept with its live citer named — all 4 **kept**
+- [x] `sh scripts/gen-index.sh` re-run; index links resolve
+- [x] Applied count reported to the owner, zero included — **applied count: 0**
 
 ### T3 — Re-sort the surviving §2 research breaches against the Growth rule `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/research/graph-engineering.md` · `docs/research/loop-hygiene-prd.md` · possibly `DOCS_Guide` §2 · possibly `docs/adr/`

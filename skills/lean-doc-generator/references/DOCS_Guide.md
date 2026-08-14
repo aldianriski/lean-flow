@@ -37,7 +37,7 @@ gating → §6.
 | `AGENTS.md` | AI tools | 12 (ADR-015) | init (always) — **thin pointer to `.claude/CLAUDE.md`, never duplicated instructions** | pointer targets move | — |
 | `.env.example` | Dev | — | init **safe-scaffold** (write-if-absent; names only, never values) | a new env var is introduced | — |
 | `.gitignore` | git | — | init **safe-scaffold** (write-if-absent; from the §12 boundary rule) | a new generated-artifact class appears | — |
-| `TODO.md` | Dev / AI | ~150 soft | init (always) | backlog change · sprint promote/close | §11 prune |
+| `TODO.md` | Dev / AI | 320 soft (ADR-019) | init (always) | backlog change · sprint promote/close | §11 prune |
 | `TECH-DEBT.md` | Dev / AI | open rows only | first TD filed | close files TD · promote ages · debt resolved | §11 delete (3 sprints after resolved) |
 
 **AI context (`.claude/`):**
@@ -404,7 +404,7 @@ against §2's table. **Never restate a §2 cap inside this checklist**: a copied
 that drifts silently from the row it copied, and enumerating triggers by hand is what lets an entire
 category go unreported (a cap check printed three soft breaches on every run for sprints while this
 review reported doc-aging clean — the report had a matcher and no consumer; SPRINT-062 T2 · L-106).
-The `TODO.md > ~150` row in §11's table is a **cap wearing a retention row's clothes** — it is listed
+The `TODO.md` whole-file row in §11's table is a **cap wearing a retention row's clothes** — it is listed
 there for its prune action, and it is the reason exactly one of §2's caps used to reach this checklist
 while the rest did not.
 
@@ -420,7 +420,7 @@ them**. Append-only is preserved *inside* each archive file.
 |---|---|---|
 | `TODO.md` Backlog entries (shipped/promoted) | sprint close | **remove outright** (propose→approve) — no shipped-in-SPRINT breadcrumb comments left in TODO.md; history's durable homes are root `CHANGELOG.md` + `docs/sprint/archive/` |
 | `TECH-DEBT.md` | `resolved` ≥ 3 sprints ago | **delete the row.** The substance already lives in `CHANGELOG.md`, the sprint archive and git, so a permanent in-file pointer is a breadcrumb rather than a record — and a ledger that only ever grows stops being read. **Ids stay monotonic: deleting a row never frees its id for reuse.** The 3-sprint delay is deliberate — a just-resolved debt is still context at the next promote |
-| `TODO.md` whole file | > ~150 lines at promote | flag in the governance review; prune with the user |
+| `TODO.md` whole file | over its §2 cap at promote | flag in the governance review; prune with the user |
 | `CHANGELOG.md` (root) | a new MINOR version lands | keep current + previous minor inline; older blocks move verbatim → `docs/changelog/CHANGELOG-<version>.md` + one link line |
 | `docs/LEARNINGS.md` | an entry reaches `promoted: yes` | collapse it to a pointer line — `L-NNN → promoted: <where>`; the durable rule is the record now. **Ids are monotonic, never reused** — pruning removes the body, never frees the id; the next new id = highest-ever + 1. **The collapse consumes the trigger it fires on:** a promoted entry ends up as `[status: promoted]` + the pointer, so `promoted: yes` is *never* the stored form and grepping for it returns zero on a perfectly healthy corpus. Count promotion state by `[status: promoted]` (position-anchored, per L-108); a zero here is evidence about the query, not about the corpus (SPRINT-062 T3) |
 | `docs/sprint/SPRINT-NNN-<slug>.md` | sprint closed | move → `docs/sprint/archive/`; add to `docs/sprint/INDEX.md` (created lazily) one line: `- SPRINT-NNN — <theme> — closed YYYY-MM-DD · <close_commit>` |
