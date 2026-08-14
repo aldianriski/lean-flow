@@ -122,6 +122,17 @@ status: current
     close procedure grouped these steps, so the comment may simply be out of date rather than a
     requirement. Establish first whether any close commit has ever carried an undeclared file that
     mattered — this may be a real hole that has never been fallen into.
+  - **Re-reviewed 2026-08-14 (SPRINT-064 promote, 3 sprints open) — first aging re-review; held, and
+    SPRINT-063's close is a fresh instance rather than a hypothetical.** Close commit `3998e23` carried
+    the archival rename plus four manifests, README, CHANGELOG, TODO, TECH-DEBT, LEARNINGS and two epic
+    files — precisely the "largest and least task-like commit of every sprint" this row names — and leg
+    15 did not check it. Two corrections to the row's framing, from evidence: **(a)** the blind spot is
+    close-*specific*; a task commit that omitted a file was caught the same sprint by a different route
+    (the working-tree derivation described in L-116), so leg 15 is not the only guard on that failure.
+    **(b)** Nothing has yet been shown to actually slip through it — the cost so far is invisibility,
+    not missed coverage. That shifts the balance among the row's three candidates toward **(c) make the
+    skip loud**, which is the cheapest and addresses the demonstrated failure rather than the feared one.
+    Still not derived. **Unblock condition:** one close commit carrying an undeclared file that mattered.
 
 - **TD-050** severity: minor | status: open | created: Sprint-060
   - Summary: **section 4 of `scripts/qa-check.sh` (knowledge metadata — index freshness, dangling refs,
@@ -211,6 +222,12 @@ status: current
     row's own trigger is a *second* sighting; SPRINT-059 and SPRINT-060 produced none, so age is the
     only thing that has moved and the row already says age is not the trigger. Recorded here rather
     than in the sprint's § Scope Out, per the rule SPRINT-058 found failing its own next instance.
+  - **Re-reviewed 2026-08-14 (SPRINT-064 promote, 6 sprints open) — held, trigger unchanged.** SPRINT-063
+    exercised `Layers:`/`Cites:` four times across T1 and T3, and every finding was correct — including a
+    genuine catch (`docs/architecture/overview.md` · `docs/DECISIONS.md` · `DOCS_Guide.md` undeclared in
+    T1's Layers). No false positive from basename matching appeared in four opportunities: weak evidence
+    in the row's favour, and recorded as weak rather than dressed up. **Unblock condition:** a false
+    positive that costs a real edit — not a theoretical one, and not another sprint of quiet.
 
 - **TD-047** severity: minor | status: open | created: Sprint-057
   - Summary: `night-run.md` is **414 lines** and carries five Parts plus a pre-flight checklist that
@@ -236,6 +253,11 @@ status: current
     launched since SPRINT-057 — SPRINT-060's run mode was ruled interactive at G2 (L-111), so the
     checklist has not been read under the conditions this row is about. Nothing to measure yet is a
     different state from measured-and-fine; the row waits on a run, not on a sprint count.
+  - **Re-reviewed 2026-08-14 (SPRINT-064 promote, 7 sprints open) — held, trigger unchanged.** SPRINT-063
+    ruled two caps (ADR-019, ADR-020) without this file's exemption ever coming into question: it is a
+    skill reference, uncounted by ADR-006, so the cap conversation those ADRs opened does not reach it.
+    The concern stays navigational, not mechanical. **Unblock condition:** a reader or a run demonstrably
+    failing to find a Part it needed — never line count alone, which is what ADR-006 already settled.
 
 - **TD-045** severity: minor | status: open | created: Sprint-056
   - Summary: the dispatch preflight in `dispatch.md` still re-implements the `Layers:`/`Depends-on:`
@@ -258,6 +280,11 @@ status: current
     reads as the design holding. Age is explicitly not the trigger here. Noted alongside: TD-049
     records the *same* duplication without a parity fixture, so if either is ever acted on it is
     that one, not this.
+  - **Re-reviewed 2026-08-14 (SPRINT-064 promote, 8 sprints open) — held, and SPRINT-063 T4 narrowed what
+    would resolve it.** EPIC-002 **D3** ruled that the 11 checkers stand alone until EPIC-003's spec gives
+    them a common rule representation; this row's duplicate parser is a member of exactly that question,
+    so it now **inherits D3's unblock condition** instead of carrying its own. No third drift has appeared.
+    Do not re-derive a consolidation from this row before that spec exists — that is the work D3 declined.
 
 - **TD-037** severity: minor | status: open | created: Sprint-049
   - Summary: attribution needs a commit to read, so **uncommitted work in progress is still tested
@@ -310,3 +337,11 @@ status: current
     union* has been observed in SPRINT-059 or SPRINT-060. Fourth consecutive reaffirm, recorded
     rather than performed silently. This row is now the ledger's clearest case that a re-review which
     reaffirms is a decision — worth leaving as the worked example next time age is mistaken for evidence.
+  - **Re-reviewed 2026-08-14 (SPRINT-064 promote, 15 sprints open) — held, and this sprint finally gave it
+    a live sighting.** SPRINT-063's uncommitted close work (`docs/changelog/CHANGELOG-1.35.0.md`) was
+    reported by leg 15's path-2 union check as "changed but undeclared in any task's `Layers:`" — correct
+    by the letter of the check and useless in substance, since close-time work belongs to no task by
+    construction. It cleared the instant the COORD close commit landed. That is exactly the
+    "unattributable because uncommitted" shape this row describes, and its cost was a moment's confusion:
+    evidence **for** the row's own guess that no cure is warranted. **Unblock condition:** act only if a
+    path-2 report ever masks a real per-task collision, rather than merely inconveniencing a close.

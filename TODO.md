@@ -18,10 +18,11 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-063 closed 2026-08-14 (4 of 4) — the second member sprint of EPIC-002, which stays
-> **active**: 2 of its 4 Closed-when conditions are now met (no doc over a soft cap without a ruling ·
-> every checker has a stand-alone reason). Outstanding: the LEARNINGS §11 leg (**TASK-204**) and the
-> headroom condition, left open by owner ruling — `CLAUDE.md` is at 24% but `CONTEXT.md` holds at 12%.
+> **SPRINT-064 — Where It Fires** → [`docs/sprint/SPRINT-064-where-it-fires.md`](docs/sprint/SPRINT-064-where-it-fires.md)
+>
+> Third member sprint of EPIC-002, though **only T1 is epic-tracked** (its Closed-when 4). T2 and T3
+> are Retro follow-ups sharing the theme: mechanisms that exist and do not reach. EPIC-002 stands at
+> 2 of 4 — the headroom condition remains an owner ruling on the epic, not a task, and is not in scope.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room** (runs first — the caps block everything after it) → **EPIC-003 The Standard**

@@ -4,7 +4,7 @@ slug: make-room
 owner: Maintainer
 last_updated: 2026-08-14
 status: active
-member_sprints: [SPRINT-062, SPRINT-063]
+member_sprints: [SPRINT-062, SPRINT-063, SPRINT-064]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -48,6 +48,7 @@ records are history, and history is not corpus) · relaxing a gate to reduce wor
 |---|---|---|---|
 | [SPRINT-062](../sprint/archive/SPRINT-062-room-to-write.md) | Room to Write — three governance signals, and whether anything is listening | closed · `f0f72c0` | Ruled the first cap by **splitting** rather than moving a number, and generalised it: §2's Growth rule now sorts a breach into drift vs a cap that was never reachable, so the remaining three have a procedure instead of a hypothesis. Gave the §2 cap report a consumer at promote — the review had been reporting doc-aging clean over three standing breaches. Established that the LEARNINGS corpus is healthy and that the count suggesting otherwise was measuring its own query. **Headroom delivered: none** — that is TASK-196's, now unblocked. |
 | [SPRINT-063](../sprint/archive/SPRINT-063-headroom.md) | Headroom — spend the procedure SPRINT-062 built | closed · `3998e23` | **Delivered the headroom SPRINT-062 could not.** `CLAUDE.md` 80→61 by removing a codemap that duplicated `overview.md` — cap **held**, the first cap breach this epic resolved by subtraction rather than by a number. Two numbers ruled where subtraction was impossible: **ADR-019** (`TODO.md` 320 — the entry schema costs ~17.6 lines/entry, so cap and schema could not both hold) and **ADR-020** (research 130, plus `status: superseded` ⇒ **frozen**, because the cap was counting the annotation that marks a doc dead). Closed conditions **2 and 3**. Also killed the epic's checker open question by showing it was *premature*, not unanswerable. |
+| [SPRINT-064](../sprint/SPRINT-064-where-it-fires.md) | Where It Fires — mechanisms that exist and do not reach | active · `plan locked` | _(completed at close)_ — **partial member: only its T1 is epic-tracked** (Closed-when 4's LEARNINGS leg). T2/T3 are Retro follow-ups on a shared theme, outside this epic's scope. |
 
 ## Decisions
 
