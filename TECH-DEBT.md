@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-10
+last_updated: 2026-08-14
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -117,6 +117,13 @@ status: current
     between runs, or accept that whole-corpus integrity costs proportional to the corpus), never a
     narrowing of what is checked. Do not re-derive a narrowing from this row — it has been measured
     twice and the answer did not change.
+  - **Re-reviewed 2026-08-14 (SPRINT-063 promote, 3 sprints open) — held, trigger unchanged.** First
+    aging re-review for this row. Nothing re-derived: the two measurements above already retired the
+    narrowing cure, and L-091 binds against re-deriving it from the same row. The behavioural concern
+    (a gate slow enough to be skipped stops running) is what stays open, and it waits on a *structural*
+    cure — an index digest cached between runs, or accepting that whole-corpus integrity costs
+    proportional to the corpus. Neither is this sprint's work: SPRINT-063 is EPIC-002 subtraction, and
+    shrinking the corpus is the one lever that moves this row without touching the gate at all.
 
 - **TD-049** severity: minor | status: open | created: Sprint-059
   - Summary: the night-run reaper (`scripts/night-run.sh`) parses the sprint file's DoD boxes and
@@ -132,6 +139,13 @@ status: current
     changes — the sprint schema has been stable for many sprints, so this may be a guard against a
     drift that never happens. Re-derive before building: confirm a real divergence risk first, and note
     that TD-045's parity fixture has never fired, which its own row reads as the design holding.
+  - **Re-reviewed 2026-08-14 (SPRINT-063 promote, 4 sprints open) — held, trigger unchanged.** First
+    aging re-review; the row has been open four sprints without one, which the scan caught and this
+    line closes. The divergence risk this guards is still unrealised — the sprint schema has not moved
+    since the row was filed — so the parity fixture stays unbuilt on TD-045's own evidence rather than
+    on a fresh judgement. **Unblock condition, stated so the next re-review is not another hold:**
+    build it the first time the sprint format actually changes, or when TD-045's fixture fires once.
+    Until one of those, a re-review that reaffirms is a decision, not a skipped line.
 
 - **TD-048** severity: trivial | status: open | created: Sprint-058
   - Summary: `check-layers-completeness.sh` matches a `Layers:`/`Cites:` declaration against DoD prose
@@ -183,41 +197,6 @@ status: current
     launched since SPRINT-057 — SPRINT-060's run mode was ruled interactive at G2 (L-111), so the
     checklist has not been read under the conditions this row is about. Nothing to measure yet is a
     different state from measured-and-fine; the row waits on a run, not on a sprint count.
-
-- **TD-046** severity: minor | status: resolved → SPRINT-060 T3 | created: Sprint-056
-  - Summary: the always-on gate now takes **~126s** (measured: 115s at SPRINT-056 T1, 126s at close),
-    up from the 57s recorded when TD-016 moved three slow harnesses behind `QA_FULL=1`. Twelve
-    always-on eval harnesses now run on every invocation, several of which spawn the checker they
-    guard against the whole live repo.
-  - Impact: none yet — it is green and it is correct. The concern is behavioural: a gate slow enough
-    to be skipped is a gate that stops running, and L-089 already records a red gate committed
-    because it was not re-run after a "clerical" edit. Every second added raises the odds of that.
-    Recorded now because the trend is only visible across sprints and nothing measures it.
-  - Mitigation (**not yet derived**, L-091): the obvious lever is moving more harnesses to `QA_FULL=1`,
-    but that is a coverage reduction and carries L-076's proof obligation — show what a bare run no
-    longer catches. A better question first: several harnesses re-run their checker over the entire
-    live repo purely to guard a glob, and a cheaper assertion may exist. **Measure where the 126s
-    actually goes before moving anything** — no figure has been taken per-harness, and L-097 is
-    specifically about acting on a number nobody re-derived.
-  - **Measured 2026-08-10 (SPRINT-058 T2) — the mitigation above is retired, and both of its premises
-    were wrong.** Table → [`docs/research/qa-gate-timing.md`](docs/research/qa-gate-timing.md).
-    (a) The harness category is **~34%** of the runtime (45.9s / 42.3s of 133.9s / 127.7s across two
-    samples); the **inline checks, sections 1–11, are ~66%** and have never been measured. Moving all
-    fourteen harnesses behind `QA_FULL=1` therefore buys at most a third of the gate, and the three
-    that dominate — layers-completeness, dispatch-preflight, doc-caps — are the highest-value suites
-    in the set. (b) "Several harnesses re-run their checker over the entire live repo" is **two of
-    fourteen**, costing ~10s together, and both are deliberate *zero-coverage guards*
-    (`run-doc-caps-fixtures.sh` case 6 and `run-manifest-lockstep-fixtures.sh` case 4) whose live
-    input is the whole point — the second exists because that checker's first live run matched
-    nothing (L-102). They are the last things to cheapen, not the first. Also corrected: there are
-    **14** always-on harnesses, not the twelve this row records. The row stays open on its behavioural
-    concern (a gate slow enough to be skipped stops running); what is closed is the proposed cure.
-    Next measurement is the inline half — nothing has been moved or edited.
-  - **Resolved 2026-08-10 (SPRINT-060 T3)** — the inline half the note above asked for was measured
-    directly, and the behavioural concern this row was held open on now has a successor with a
-    located cost centre: **TD-050**. The paragraph above says "the row stays open"; it was written at
-    SPRINT-058 T2 and is true as of that moment only. Dated rather than deleted — the sequence is the
-    record. Row is `resolved`; §11 deletes it three sprints on (Sprint-063).
 
 - **TD-045** severity: minor | status: open | created: Sprint-056
   - Summary: the dispatch preflight in `dispatch.md` still re-implements the `Layers:`/`Depends-on:`

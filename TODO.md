@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-10
+last_updated: 2026-08-14
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -18,8 +18,11 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-062 closed 2026-08-10 (3 of 3) — the first member sprint of EPIC-002, which stays
-> **active**: 0 of its 4 Closed-when conditions are met.
+> **SPRINT-063 — Headroom** → [`docs/sprint/SPRINT-063-headroom.md`](docs/sprint/SPRINT-063-headroom.md)
+>
+> Second member sprint of EPIC-002. Every one of its four tasks maps to one of the epic's four
+> Closed-when conditions, so the epic is answerable at close. SPRINT-062 built the procedure for ruling
+> a cap and delivered no headroom; this one spends it.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room** (runs first — the caps block everything after it) → **EPIC-003 The Standard**
@@ -142,6 +145,62 @@ status: current
       tracker:    EPIC-003 open question 3 · ADR-018
       origin:     manual
       state:      ready
+
+- [ ] TASK-201 — Rule what the critic's Spec axis compares against  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  a recorded ruling on whether a task gains an external `reference:` comparand, or
+                  whether `done-when` plus the retained must-FAIL fixtures already supply one
+      touches:    skills/orchestrator/references/review-scoping.md · .claude/CONTEXT.md § Task entry
+                  shape (only if the ruling adds a field) · EPIC-004
+      depends-on: none
+      assumes:    **the null answer must stay genuinely on the table** — "add a field" is the tidy move
+                  and L-091 says test the hypothesis first. External comparands already exist for
+                  *gates* (a retained must-FAIL fixture failing with its named finding, L-058) and for
+                  behaviour (`/run` + `/verify`); what is unmatched is only the **Spec** axis, which
+                  today measures against a `done-when` written by the same pipeline that built the
+                  work. For this repo's substrate a doc rendered against its own template may already
+                  be the comparand (L-016) — check that before touching § Task entry shape, which
+                  would also pull in the CONTEXT.md cap and TASK-196
+      tracker:    docs/research/gauntlet-loop-delta.md · EPIC-004 · L-058 · L-091
+      origin:     manual
+      state:      ready
+
+- [ ] TASK-202 — Wire the worst-finding-per-axis into a bounded builder retry  [size: M] [risk: med] [HITL]
+      class:      execution
+      done-when:  a scoped reviewer's single worst finding **per axis** is handed back to the builder
+                  for a bounded retry, re-reviewed, and the outcome logged — exercised once on real
+                  input **and** once on input that must FAIL with its named finding, fixtures retained
+      touches:    skills/orchestrator/references/review-scoping.md · skills/orchestrator/SKILL.md
+                  § Review · evals/fixtures/
+      depends-on: TASK-201 — unblocks once the comparand is ruled
+      assumes:    this is **wiring, not a new capability**: review-scoping.md already computes "the
+                  single worst finding per axis" and nothing consumes it — the L-020 shape. Scope is
+                  **attended modes only** (`quick`/`mvp`/`sprint-bulk` with a human present);
+                  unattended is TASK-203 and must not be smuggled in here. Home is the reference file,
+                  uncounted under ADR-006, so this is **not** blocked behind TASK-196 the way TASK-200
+                  is — but new control flow is exactly where a silent false-negative hides, so L-058's
+                  must-FAIL half is the acceptance bar, not a nice-to-have (TD-012: retain them)
+      tracker:    docs/research/gauntlet-loop-delta.md · L-020 · L-058 · TD-012 · ADR-006
+      origin:     manual
+      state:      blocked
+
+- [ ] TASK-203 — Rule whether the revise loop may run unattended, and on what budget  [size: S] [risk: med] [HITL]
+      class:      decision
+      done-when:  a recorded ruling — an ADR if it carves out the charter — on whether a critic-driven
+                  retry may fire inside an unattended run, with a hard ceiling and a rollup line per
+                  retry, or an explicit "attended only" with the reason stated
+      touches:    skills/orchestrator/references/night-run.md · docs/adr/ · EPIC-005
+      depends-on: TASK-202 — there is nothing to rule on until the attended loop exists
+      assumes:    **a critic ruling "not good enough, retry" is a decision, and the unattended charter
+                  is execute-only — decide nothing.** That collision is the whole task; do not resolve
+                  it by reading the retry as mere execution. Hard-to-reverse **and** surprising **and**
+                  a real trade-off → likely ADR-grade, and a `/council` candidate if it does not settle
+                  at G2. The budget half is **EPIC-005 D2** shaped (delegation policy declared per repo,
+                  read by the run, never held by a coordinator) — note the source article's "agent
+                  fleet" is a false cognate for EPIC-005's fleet and does not import its design
+      tracker:    docs/research/gauntlet-loop-delta.md · ADR-016 · EPIC-005 D2 · night-run.md Part 0
+      origin:     manual
+      state:      blocked
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution

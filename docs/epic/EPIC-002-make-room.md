@@ -2,9 +2,9 @@
 epic: 002
 slug: make-room
 owner: Maintainer
-last_updated: 2026-08-10
+last_updated: 2026-08-14
 status: active
-member_sprints: [SPRINT-062]
+member_sprints: [SPRINT-062, SPRINT-063]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -47,6 +47,7 @@ records are history, and history is not corpus) · relaxing a gate to reduce wor
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-062](../sprint/archive/SPRINT-062-room-to-write.md) | Room to Write — three governance signals, and whether anything is listening | closed · `f0f72c0` | Ruled the first cap by **splitting** rather than moving a number, and generalised it: §2's Growth rule now sorts a breach into drift vs a cap that was never reachable, so the remaining three have a procedure instead of a hypothesis. Gave the §2 cap report a consumer at promote — the review had been reporting doc-aging clean over three standing breaches. Established that the LEARNINGS corpus is healthy and that the count suggesting otherwise was measuring its own query. **Headroom delivered: none** — that is TASK-196's, now unblocked. |
+| [SPRINT-063](../sprint/SPRINT-063-headroom.md) | Headroom — spend the procedure SPRINT-062 built | active · `plan locked` | _(completed at close)_ |
 
 ## Decisions
 
