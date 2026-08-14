@@ -35,7 +35,8 @@ research. Named so the close-time rollup does not over-claim.
 ## Plan
 
 ### T1 — Rule what the critic's Spec axis compares against `[size: S · risk: low · class: decision · HITL]`
-Layers: `skills/orchestrator/references/review-scoping.md` · `.claude/CONTEXT.md`
+Layers: `skills/orchestrator/references/review-scoping.md` · `.claude/CONTEXT.md` ·
+        `skills/lean-doc-generator/templates/SPRINT.md.template`
 Depends-on: none
 Cites: `docs/research/gauntlet-loop-delta.md` · `scripts/qa-check.sh`
 Today the Spec axis measures work against the task's own `done-when` — written by the same pipeline that
@@ -47,13 +48,13 @@ one.
 `done-when` plus the retained must-FAIL fixtures already supply one.
 
 **DoD:**
-- [ ] **The null answer tested first, not last** — "add a field" is the tidy move and L-091 says test the
+- [x] **The null answer tested first, not last** — "add a field" is the tidy move and L-091 says test the
       hypothesis before building on it
-- [ ] The doc-vs-template hypothesis checked against this repo's actual substrate: a doc rendered by
+- [x] The doc-vs-template hypothesis checked against this repo's actual substrate: a doc rendered by
       `/lean-doc-generator` against its own template may already *be* the external comparand (L-016)
-- [ ] Ruling recorded; if it adds a field, § Task entry shape is edited and the CONTEXT.md cost is
+- [x] Ruling recorded; if it adds a field, § Task entry shape is edited and the CONTEXT.md cost is
       stated (132/150 measured at promote — 18 lines free, no cap blocker)
-- [ ] Whatever is ruled, `review-scoping.md`'s Spec-axis paragraph says what the axis compares against
+- [x] Whatever is ruled, `review-scoping.md`'s Spec-axis paragraph says what the axis compares against
 
 ### T2 — Rule EPIC-002's headroom condition, the last thing holding the epic open `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/epic/EPIC-002-make-room.md` · `.claude/CONTEXT.md` · `docs/epic/INDEX.md`
@@ -146,6 +147,9 @@ bounded retry, re-reviewed, and the outcome logged.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/references/review-scoping.md` | T1 | Spec axis gains a **comparand ladder** (template · must-FAIL fixture · `check-*.sh` named finding · `Cites:`), with `done-when` demoted to a fallback that must announce itself — the axis was measuring against a criterion its own pipeline wrote | low | `qa-check.sh` |
+| `skills/lean-doc-generator/templates/SPRINT.md.template` | T1 | `Cites:` documented as optional-but-load-bearing (rung 4) — it was in real use across 17 of 65 sprints while defined nowhere; the preflight's deliberate exclusion is stated inline so a `Layers:` path is not parked there | low | `qa-check.sh` |
+| `docs/sprint/logs/SPRINT-065-the-critic-loop.md` | T1 | Execution Log created lazily at first entry (ADR-014) | low | `check-sprint-log-layout` |
 
 ## Retro
 

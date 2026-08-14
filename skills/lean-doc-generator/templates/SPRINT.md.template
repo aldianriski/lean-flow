@@ -30,11 +30,16 @@ update_trigger: sprint execute/close events
      shared files per-hunk, never a plain `git add` over another task/stream's WIP (L-042/L-037).
      Mandatory per block: header meta carries `class:`
      (decision | execution | mechanical-ingest — advisory default, dispatch may override, ADR-010)
-     + an autonomy tag (HITL|AFK); plus a `Depends-on:` line, `Layers:`, and `**Acceptance:**`. -->
+     + an autonomy tag (HITL|AFK); plus a `Depends-on:` line, `Layers:`, and `**Acceptance:**`.
+     `Cites:` is optional but load-bearing when present: it is rung 4 of the Review Spec-axis
+     comparand ladder (orchestrator/references/review-scoping.md § Two axes) — the sources this task
+     answers to. Cited, never touched: the dispatch preflight deliberately excludes it from the
+     shared-file overlap map, so a path belonging in `Layers:` must not be parked here. -->
 
 ### T1 — [verb-first title] `[size: M · risk: med · class: execution · HITL]` [CUSTOMIZE]
 Layers: [files / modules this touches]
 Depends-on: [Tn / TASK-NNN list, or none]
+Cites: [sources this task answers to — the Spec axis measures against them; omit if none]
 [1–3 sentences of WHY + the approach — never step-by-step HOW.]
 
 **Acceptance:** [one observable, human-verifiable outcome — "done when …"]

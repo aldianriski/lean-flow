@@ -22,7 +22,20 @@ A review answers two independent questions, and a change can pass one while fail
 
 - **Standards** — does the code obey the repo's conventions? (naming, structure, and the smell baseline —
   duplicated code, feature envy, mysterious names, data clumps; documented repo standards override the baseline.)
-- **Spec** — does it build the *right thing*? (correctness against the task's `done-when` / acceptance.)
+- **Spec** — does it build the *right thing*? (correctness against the **comparand ladder** below.)
+
+**The Spec comparand is the artifact that predates the task.** A `done-when` is written by the same
+pipeline that then builds the work, so measuring against it alone lets the pipeline grade its own
+homework. Take the first rung that exists, in order:
+
+1. the **template** the artifact renders against (`skills/lean-doc-generator/templates/`) — on a
+   markdown substrate this *is* the external comparand: written before the task, by someone else (L-016);
+2. a retained **must-FAIL fixture** — it fails with its *named* finding, or the guard is absent (L-058);
+3. a **`check-*.sh` named finding** — the checker already encodes the rule the work must satisfy;
+4. the task's own **`Cites:`** line — the sources its Plan block declared it answers to.
+
+`done-when` is the **fallback**, not the default. When the axis falls back to it, the report says so —
+an unremarked fallback reads as an external check that never happened.
 
 Report the two axes **separately — never merge or re-rank them into one list**. Perfect code that builds
 the wrong feature, and the right feature that violates every convention, are *different* failures; folding
