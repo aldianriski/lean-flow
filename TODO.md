@@ -18,10 +18,12 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-064 closed 2026-08-14 (3 of 3) — the third member sprint of EPIC-002, which stays
-> **active at 3 of 4**. Conditions 2, 3 and 4 are met; **condition 1 (headroom) is the only one open**
-> and is carried by **TASK-206** — `CLAUDE.md` sits at 63/80 (21%), `CONTEXT.md` holds at 132/150 (12%)
-> by the SPRINT-063 ruling that a flat percentage is the wrong instrument for it.
+> **SPRINT-065 — The Critic Loop** → [`docs/sprint/SPRINT-065-the-critic-loop.md`](docs/sprint/SPRINT-065-the-critic-loop.md)
+>
+> The first build from [`docs/research/gauntlet-loop-delta.md`](docs/research/gauntlet-loop-delta.md) —
+> both keepers that scan identified: what the critic measures against (T1) and feeding its worst finding
+> back to the builder (T3). T2 closes EPIC-002's last condition and is the only epic-tracked task.
+> **TASK-203 (unattended retry) is deliberately out** — ADR-grade charter fork, its own sprint.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room** (runs first — the caps block everything after it) → **EPIC-003 The Standard**

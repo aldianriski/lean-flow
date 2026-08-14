@@ -113,6 +113,20 @@ status: current
     question is whether a procedural gate can be fixtured at all, or whether the category needs a
     different control entirely — a review-time checklist, or accepting the gap and naming it.
   - Tracker: SPRINT-062 T2 · L-058 · L-108 · TD-012 (the fixture-retention leg, still open)
+  - **Re-reviewed 2026-08-14 (SPRINT-065 promote, 3 sprints open) — first aging re-review; held, and
+    the row got *more* expensive rather than staler.** SPRINT-064 hit this gap twice in one sprint:
+    T3's coordinator-owned rule shipped with a traced walkthrough because skill prose has no harness to
+    fixture it, and **TD-055** was filed for a second procedural contract with the same missing control
+    (`complete` as a reserved run-level event, documented in a checker and not at the point of
+    authoring). Two instances in one sprint is the first evidence that this category recurs rather than
+    sitting quietly. **The row's own mitigation still stands unbuilt and should stay that way** — its
+    text already argues a prose-grep harness would be wrong twice over (a substring standing in for a
+    structural claim, asserting text *exists* rather than that a procedure *fires*), and SPRINT-064 T2
+    strengthened that: the rule everyone could quote was loaded for all eleven of its sightings and
+    reached none, so asserting presence proves nothing about firing. **Unblock condition, stated so the
+    next pass is not another hold:** act when a *third* procedural gate is filed with no control, or
+    when EPIC-004's spec-driven engine gives procedural rules a machine-readable form to assert against
+    — whichever lands first. Do not build a prose-grep harness in the meantime.
 
 - **TD-051** severity: medium | status: open | created: Sprint-061
   - Summary: **`check-layers-observed.sh` (gate leg 15) never sees a close commit, because the close

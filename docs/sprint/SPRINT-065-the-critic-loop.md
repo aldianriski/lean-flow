@@ -1,0 +1,164 @@
+---
+sprint: 065
+slug: the-critic-loop
+epic: EPIC-002
+owner: Maintainer
+last_updated: 2026-08-14
+status: active
+plan_commit: [sha — set at promote]
+close_commit: [sha — set at close]
+update_trigger: sprint execute/close events
+---
+
+# SPRINT-065 — The Critic Loop
+
+> **Theme:** the first build from `docs/research/gauntlet-loop-delta.md`. That scan found six of eight
+> gauntlet-loop mechanics already matched — four of them more tightly specified here than in the source —
+> and exactly two keepers. This sprint takes both: what the critic measures against (T1), and feeding
+> its worst finding back to the builder (T3). T2 is unrelated by subject and closes EPIC-002's last
+> condition, which is a one-line ruling rather than a build.
+
+## Scope
+
+**In:** rule what the Spec axis compares against (T1) · rule EPIC-002's headroom condition and close the
+epic if it holds (T2) · wire the worst-finding-per-axis into a bounded retry, attended modes only (T3).
+
+**Out (deferred):** **TASK-203** — whether the retry may run **unattended**. That is the ADR-grade
+charter fork (a critic ruling "not good enough, retry" is a *decision*, and the unattended charter is
+execute-only), and the research doc marks it a `/council` candidate. Promoting it alongside its own
+prerequisites would invite deciding it under momentum. · TASK-198 (EPIC-003) · TASK-188 (still
+`blocked`; opportunistic trigger, L-111).
+
+**Epic note:** only **T2** is EPIC-002-tracked. T1 and T3 are EPIC-004-shaped, from the gauntlet
+research. Named so the close-time rollup does not over-claim.
+
+## Plan
+
+### T1 — Rule what the critic's Spec axis compares against `[size: S · risk: low · class: decision · HITL]`
+Layers: `skills/orchestrator/references/review-scoping.md` · `.claude/CONTEXT.md`
+Depends-on: none
+Cites: `docs/research/gauntlet-loop-delta.md` · `scripts/qa-check.sh`
+Today the Spec axis measures work against the task's own `done-when` — written by the same pipeline that
+built it. External comparands already exist, but only for **gates** (a retained must-FAIL fixture failing
+with its named finding, L-058) and for **behaviour** (`/run` + `/verify`). The Spec axis is the unmatched
+one.
+
+**Acceptance:** a recorded ruling on whether a task gains an external `reference:` comparand, or whether
+`done-when` plus the retained must-FAIL fixtures already supply one.
+
+**DoD:**
+- [ ] **The null answer tested first, not last** — "add a field" is the tidy move and L-091 says test the
+      hypothesis before building on it
+- [ ] The doc-vs-template hypothesis checked against this repo's actual substrate: a doc rendered by
+      `/lean-doc-generator` against its own template may already *be* the external comparand (L-016)
+- [ ] Ruling recorded; if it adds a field, § Task entry shape is edited and the CONTEXT.md cost is
+      stated (132/150 measured at promote — 18 lines free, no cap blocker)
+- [ ] Whatever is ruled, `review-scoping.md`'s Spec-axis paragraph says what the axis compares against
+
+### T2 — Rule EPIC-002's headroom condition, the last thing holding the epic open `[size: S · risk: low · class: decision · HITL]`
+Layers: `docs/epic/EPIC-002-make-room.md` · `.claude/CONTEXT.md` · `docs/epic/INDEX.md`
+Depends-on: T1 (owns `.claude/CONTEXT.md` — see D1)
+Cites: `.claude/CLAUDE.md`
+Conditions 2, 3 and 4 are met. Condition 1 reads "`.claude/CLAUDE.md` and `.claude/CONTEXT.md` each carry
+≥15% headroom": `.claude/CLAUDE.md` is **63/80 (21%) ✓**, `.claude/CONTEXT.md` **132/150 (12%)**, held at
+150 by the SPRINT-063 T1 ruling
+that a flat percentage is the wrong instrument for a file whose growth is measured at 0.83 lines/sprint
+and whose diet pass already found nothing removable (ADR-017).
+
+**Acceptance:** condition 1 is either ticked with its reasoning, or re-worded to express what the epic
+actually wants and then judged against that — recorded either way, never left as a silent hold.
+
+**DoD:**
+- [ ] **Do not close the gap by trimming `CONTEXT.md` five lines to make a number go green** — §2's
+      Growth rule names that as the tell, and ADR-017 already ran that pass
+- [ ] Ruling recorded in EPIC-002 § Closed when, with its reasoning inline
+- [ ] If all four conditions end `[x]`: epic archived → `docs/epic/archive/`, its `docs/epic/INDEX.md`
+      row kept and relative links re-based one level deeper (§11)
+- [ ] If it stays open: the reason is stated as a condition, not a mood — what would close it
+
+### T3 — Wire the worst-finding-per-axis into a bounded builder retry `[size: M · risk: med · class: execution · HITL]`
+Layers: `skills/orchestrator/references/review-scoping.md` · `skills/orchestrator/SKILL.md` · `evals/`
+Depends-on: T1 (owns `review-scoping.md`, and rules what the retry measures against — see D1)
+Cites: `docs/research/gauntlet-loop-delta.md`
+**Wiring, not a new capability.** `review-scoping.md` line 30 already ends a pass with "the single worst
+finding **per axis**, kept apart" — measured at promote, and **nothing consumes it**. Review is terminal:
+findings go to the owner. That is the L-020 shape, a computed value never wired to a consumer.
+
+**Acceptance:** a scoped reviewer's single worst finding per axis is handed back to the builder for a
+bounded retry, re-reviewed, and the outcome logged.
+
+**DoD:**
+- [ ] Retry is **bounded** and the ceiling is stated, not implied
+- [ ] **Attended modes only** (`quick` · `mvp` · `sprint-bulk` with a human present) — unattended is
+      TASK-203 and must not be smuggled in here
+- [ ] Exercised once on **real input** and once on input that **must FAIL** with its named finding
+      (L-058); fixtures **retained** (TD-012)
+- [ ] Home is `references/` (uncounted, ADR-006) with a hook from SKILL.md § Review — 102/140 at promote
+
+## Owner-action checklist
+- [ ] Reinstall the plugin — session skills have run at **1.34.0** against a repo now at **1.38.0**
+      across three sprints (L-021). Every skill has been diffed against repo source before use and no
+      stale procedure was followed, but that is a workaround holding, not the gap closing.
+
+## Decisions (pre-locked)
+
+- **D1 — Ownership: T1 owns `review-scoping.md` *and* `.claude/CONTEXT.md`.** T3 shares the first, T2 may
+  touch the second, so both sequence after T1. Commit order T1 → T2 → T3 is also dependency order; if it
+  changes, stage shared files with `git add -p` and verify `git diff --cached` (L-042). **→ no ADR.**
+- **D2 — T1 gates T3's content, not just its order.** What the retry measures against is T1's ruling, so
+  building T3 first would hard-code an answer T1 has not made. **→ no ADR.**
+- **D3 — The unattended question is out of scope by decision, not by oversight.** TASK-203 stays in the
+  Backlog. A critic ruling "retry" is a decision and the unattended charter is execute-only; that fork
+  is ADR-grade and gets its own sprint. **→ ADR expected there, not here.**
+
+## Assumptions
+
+- **A1** — `review-scoping.md` computes "the single worst finding per axis" (line 30) and **nothing
+  consumes it**. *Confirm: measured at promote 2026-08-14 — one occurrence, in the Standards-vs-Spec
+  section; zero occurrences of retry/comparand/`reference:` in the file.*
+- **A2** — Destinations have room: `CONTEXT.md` **132/150**, `orchestrator/SKILL.md` **102/140**,
+  `review-scoping.md` 99 lines (a reference — uncounted, ADR-006). **No cap blocks any task here**, and
+  TASK-196's cap work shipped in SPRINT-063, so its old caveat is discharged. *Confirm: measured at
+  promote 2026-08-14.*
+- **A3** — EPIC-002 conditions 2, 3 and 4 are `[x]`; only condition 1 is open. *Confirm:
+  `check-epic-archive.sh` reports "correctly live (status 'active', 1 of 4 condition(s) open)".*
+- **A4** — `L-113` was promoted at this promote (→ `CLAUDE.md` § Behavioral Guidelines) and collapsed;
+  `TD-052` had its first aging re-review and is held with an unblock condition. No other `L-NNN` is
+  promotable — every remaining active entry sits at `count: 1`, verified by two agreeing queries.
+  *Confirm: governance review, 2026-08-14.*
+
+## Execution Log
+
+> **Lives in its own file** — `docs/sprint/logs/SPRINT-065-the-critic-loop.md`, rendered from
+> `templates/sprint-log.md.template` and created lazily at the first entry. Append there, never here:
+> the Log grows with the work done, so keeping it out of this file is what stops it consuming the
+> 400-line budget the Plan needs (DOCS_Guide §9 · ADR-014). The `logs/` subdirectory is load-bearing —
+> the sprint-file checks glob `docs/sprint/SPRINT-*.md` non-recursively, so a same-directory
+> `-log.md` sibling would be capped and schema-checked as if it were a Plan.
+>
+> **It is coordinator-owned** (SPRINT-064 T3): a dispatched agent returns its entry in its report and
+> the coordinator appends. `complete` is a **reserved run-level event** — use `progress` for a task
+> (TD-055).
+
+## Files Changed
+
+<!-- Filled during execution; feeds CHANGELOG at close. -->
+
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+
+## Retro
+
+<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
+     shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
+     After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+
+**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents).
+
+**Worked**
+
+**Friction**
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
