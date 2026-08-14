@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-020](adr/ADR-020-research-cap-and-frozen-verdicts.md) | Research cap 120 → 130 soft; a `status: superseded` verdict is frozen, not capped | accepted | 2026-08-14 |
 | [ADR-019](adr/ADR-019-todo-cap-320.md) | `TODO.md` cap ~150 → 320 soft — the entry schema costs more than the cap budgeted | accepted | 2026-08-14 |
 | [ADR-018](adr/ADR-018-standard-implementation-split.md) | Extract the standard from the implementation; target fleet-scale adoption | accepted | 2026-08-10 |
 | [ADR-017](adr/ADR-017-context-cap-150.md) | `CONTEXT.md` cap 130 → 150 — the file grows by design, not by duplication | accepted | 2026-08-10 |

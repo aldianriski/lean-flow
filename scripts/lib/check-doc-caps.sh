@@ -111,6 +111,13 @@ cap_file() { # <file> <max> <source>
   if [ "$n" -le "$2" ]; then ok "cap $1 ($n <= $2) [$3]"; else bad "cap $1 ($n > $2) [$3]"; fi
 }
 
+# Frontmatter `status:`, position-anchored (L-108): line-start, inside the first 20 lines, first match
+# only. A substring search would match prose about supersession further down -- this corpus documents
+# its own formats, so `status: superseded` appears in DOCS_Guide, in ADRs and in this file's comments.
+fm_status() {
+  sed -n '1,20{/^status:[[:space:]]/{s/^status:[[:space:]]*//;s/[[:space:]]*$//;p;q;};}' "$1" 2>/dev/null
+}
+
 printf '%s\n' "$rows" | while IFS='|' read -r pfx path capn soft; do
   [ -n "$capn" ] || continue
   if [ -z "$path" ]; then
@@ -152,6 +159,18 @@ printf '%s\n' "$rows" | while IFS='|' read -r pfx path capn soft; do
       else
         printf 'PASS  cap %s (%s <= %s) [§2]\n' "$f" "$n" "$capn"
       fi
+    elif [ "$(fm_status "$root/$f")" = "superseded" ]; then
+      # FROZEN (ADR-020, SPRINT-063 T3). §2's research row says a spent verdict is "marked
+      # `status: superseded` **rather than edited**", and §11's only exit for it is archival once
+      # nothing live cites it. So a cap here measures the one thing that can still legally grow on the
+      # doc -- the annotation recording WHY it is spent. `loop-hygiene-prd.md` went 118 -> 139 on
+      # exactly that, and SPRINT-060 T4's own note claimed it "stays inside its cap coverage" while
+      # adding 18 of those lines. Trimming it would delete the supersession trail; that is not a diet.
+      #
+      # REPORTED, never silently skipped: a check that goes quiet is the silent false negative this
+      # file exists to prevent (L-058). The line states the state AND the exit condition, so it can
+      # never be read as a pass earned by shrinking.
+      printf '      FROZEN (superseded): %s (%s lines, cap %s) [§2 · ADR-020] -- uncapped while spent; exits via §11 archive once nothing live cites it, never via a diet\n' "$f" "$n" "$capn"
     elif [ -n "$rec" ] && [ "$n" -le "$rec" ]; then
       printf '      OVER-CAP (grandfathered): %s (%s > %s, recorded %s) -- %s\n' "$f" "$n" "$capn" "$rec" "$(gf_reason "$f")"
     elif [ -n "$rec" ]; then

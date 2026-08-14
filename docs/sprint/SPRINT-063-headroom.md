@@ -77,7 +77,9 @@ replaced it — so the deliverable is the *applied pass and its count*, not a re
 - [x] Applied count reported to the owner, zero included — **applied count: 0**
 
 ### T3 — Re-sort the surviving §2 research breaches against the Growth rule `[size: S · risk: low · class: decision · HITL]`
-Layers: `docs/research/graph-engineering.md` · `docs/research/loop-hygiene-prd.md` · possibly `DOCS_Guide` §2 · possibly `docs/adr/`
+Layers: `docs/research/graph-engineering.md` · `docs/research/loop-hygiene-prd.md`
+        · `skills/lean-doc-generator/references/DOCS_Guide.md` · `docs/adr/` · `docs/DECISIONS.md`
+        · `scripts/lib/check-doc-caps.sh` · `evals/run-doc-caps-fixtures.sh` · `evals/fixtures/doc-caps/`
 Depends-on: T2 (subtraction first) · T1 (owns `DOCS_Guide` §2 and `docs/adr/` — see D1)
 Cites: `scripts/qa-check.sh`
 **Do not inherit "ordinary drift" from TASK-192's text — that phrase is the error L-106 was written to
@@ -89,10 +91,13 @@ currently evidence-backed.
 never-reachable and ruled accordingly.
 
 **DoD:**
-- [ ] T2's outcome read first — a doc that archived is struck from this task, not ruled
-- [ ] Each survivor sorted with its evidence, not by inherited label
-- [ ] Ruling recorded (ADR where a number moves; §6/`logs/` split where the growth is a series)
-- [ ] `scripts/qa-check.sh` cap report reflects the ruling
+- [x] T2's outcome read first — a doc that archived is struck from this task, not ruled — **0 archived,
+      so both survivors were ruled**
+- [x] Each survivor sorted with its evidence, not by inherited label — git history per doc; **neither
+      was drift**, and the two breaches had unrelated causes
+- [x] Ruling recorded (ADR where a number moves; §6/`logs/` split where the growth is a series) —
+      **ADR-020**; `logs/` split explicitly checked and rejected (the growth is woven, not appended)
+- [x] `scripts/qa-check.sh` cap report reflects the ruling — checker + retained must-catch fixture
 
 ### T4 — Rule whether the 11 checkers consolidate now, or wait for EPIC-004 `[size: S · risk: low · class: decision · HITL]`
 Layers: `scripts/lib/check-*.sh` · `scripts/qa-check.sh` · `docs/epic/EPIC-002-make-room.md` · `docs/epic/EPIC-004-conformance.md`

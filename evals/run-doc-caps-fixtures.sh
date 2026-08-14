@@ -72,6 +72,23 @@ run_case_anywhere "soft-cap-must-not-be-grandfathered" 1 "must not be in the gra
 run_case_anywhere "hard-cap-may-be-grandfathered" 0 "OVER-CAP (grandfathered): hard.md" -- \
   sh "$checker" "$fx/soft-cap-grandfathered/DOCS_Guide.md" "$fx/soft-cap-grandfathered" "$fx/soft-cap-grandfathered/gf-hard.txt"
 
+# --- case 7a/7b: ADR-020 -- a spent verdict is FROZEN, a live doc is not -------------------------
+# §2's research row says a superseded verdict is "marked `status: superseded` rather than edited", and
+# §11's only exit for it is archival. So the cap was measuring the one thing that can still legally
+# grow on a spent doc -- the annotation recording why it is spent (loop-hygiene-prd.md: 118 -> 139 on
+# exactly that). 7a is the exemption; 7b is the leg that matters, because an exemption is a coverage
+# reduction and carries L-076's proof obligation: show it did NOT stop catching a live breach.
+#
+# Both docs are 5 lines against a cap of 3 -- identical overage, one variable: frontmatter `status:`.
+# `live.md` additionally contains the literal string "status: superseded" in PROSE below the
+# frontmatter, so a substring matcher would wrongly exempt it. That is L-108 built into the fixture
+# rather than trusted: this corpus documents its own formats, so the naive matcher fails green here.
+run_case_anywhere "spent-verdict-is-frozen" 1 "FROZEN (superseded): spent.md" -- \
+  sh "$checker" "$fx/frozen-spent/DOCS_Guide.md" "$fx/frozen-spent" "$fx/frozen-spent/none.txt"
+
+run_case_anywhere "exemption-does-not-disarm-the-check" 1 "FAIL  cap live.md (5 > 3)" -- \
+  sh "$checker" "$fx/frozen-spent/DOCS_Guide.md" "$fx/frozen-spent" "$fx/frozen-spent/none.txt"
+
 # --- case 6: the live repo's own §2 must still derive rows ---------------------------------------
 # A parser that stops matching the real table degrades to zero coverage, and zero coverage over zero
 # rows would otherwise exit 0 -- a PASS over an empty input set, which is the L-058 family in its

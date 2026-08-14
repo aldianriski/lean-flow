@@ -219,3 +219,35 @@ repo**. Two consequences, both live:
 
 Neither is T1/T2/T3/T4's scope. Filed as a candidate for the close Retro's tech-debt bucket rather than
 fixed inline — it touches the checkers, which is T4's territory and EPIC-004's beyond that.
+
+### 2026-08-14 | progress | T3 — neither breach was drift, and they had unrelated causes
+
+T3's `assumes:` warned against inheriting "ordinary drift" from TASK-192's text. Sorted fresh; the
+label was wrong for **both** docs, and git history is what settled it.
+
+**Corpus first, because it decides whether the number is wrong at all:** 33 docs, **median 73**, ten
+between 100–120, exactly two above. So 120 was not systematically mis-set — which killed the tidy
+answer of one raise covering both (L-091).
+
+- **`graph-engineering.md`** — created at **107**, moved to 122 in one later commit that folded an
+  adversarial pressure-test into the existing structure (Verdict, Options A/B/C, a table row, Findings
+  prose — **woven, not appended**). So ADR-014's `logs/` split does not reach it: checked and rejected,
+  not assumed. Every remaining route under 120 deletes the Verdict, an Option or table rows — §2's
+  stated tell to **rule the number**. → cap 120 → **130**.
+- **`loop-hygiene-prd.md`** — the opposite shape. Dieted to **118** at SPRINT-058, then 118 → 136 → 139
+  entirely through **supersession annotation**; its substance never grew. SPRINT-060 T4's note asserts
+  the doc "stays inside its cap coverage" **in the same commit that added 18 of those lines**. The
+  annotation marking a doc dead is what put it in breach — a category §2's Growth rule did not name.
+  §2 already forbids editing a spent verdict, and T2 measured its §11 archive exit as blocked by four
+  live citers. The cap demanded the one action the standard forbids, on a doc with no other exit,
+  permanently. → **`status: superseded` ⇒ FROZEN, uncapped** (ADR-020).
+
+**Coverage reduction, so it carries L-076's proof obligation.** `check-doc-caps.sh` now exempts spent
+verdicts, and the exemption is **reported, never silent** — `FROZEN (superseded): … ` names the state
+and the exit condition. Two retained fixtures (`evals/fixtures/doc-caps/frozen-spent/`): `spent.md` is
+exempted, and **`live.md` — identical 5-line overage, `status: current`, carrying the literal string
+`status: superseded` in prose below its frontmatter — is still caught.** That second leg is the one
+that matters: it proves the exemption did not disarm the check, and that the matcher is anchored to a
+position rather than a substring (L-108, built into the fixture rather than trusted).
+
+Cap report is now clean: zero `OVER-CAP` lines, `QA-CHECK: 154 pass, 0 fail`.
