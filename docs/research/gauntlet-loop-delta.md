@@ -6,7 +6,7 @@ status: current
 id: gauntlet-loop-delta
 tags: [process, tooling]
 domain: skills
-related: [fog-fleet-orchestration, EPIC-004, EPIC-005, ADR-010, ADR-016, L-017, L-058]
+related: [fog-fleet-orchestration, ADR-010, ADR-016, L-017, L-058]
 ---
 
 # Research — Which of the "gauntlet loop" mechanics does lean-flow not already have?
