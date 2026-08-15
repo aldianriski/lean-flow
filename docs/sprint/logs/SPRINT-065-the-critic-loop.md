@@ -157,3 +157,10 @@ Execution Log" before the entry existed — the L-057 family, a report ahead of 
 now states actuals and the cited entry exists). One retry, one re-review, both cleared; the reviewer
 also confirmed no contradiction with `night-run.md` Part 0 (unattended never retries — TASK-203's
 question, explicitly deferred). Secondary suggestion (hook-line bolding) applied in the same pass.
+
+### 2026-08-15 | progress | Plan exhausted — close deferred to next session, owner-ruled
+12/12 Plan DoD ticked (T1 · T2 · T3), QA 148/0, tree clean at `4945321`. Owner ruling: **reinstall
+the plugin first** (the open Owner-action box, 1.34.0 installed vs 1.38.0 repo), then the next
+session runs `/lean-doc-generator close` on fresh procedure — Retro, the EPIC-002 archival T2
+delegated to close, `close_commit`, and the feature-sprint MINOR bump (1.38.0 → 1.39.0) all land
+there rather than off a stale cache.
