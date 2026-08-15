@@ -1,5 +1,6 @@
 #!/bin/sh
-# run-checks.sh -- fixtures for evals/lib/check-system-verify-block.sh (SPRINT-067 T1).
+# run-system-verify-fixtures.sh -- fixtures for evals/lib/check-system-verify-block.sh (SPRINT-067 T1,
+# wired into qa-check.sh at SPRINT-068 T2).
 #
 # The checker exists because ADR-021 says a system-verify FAIL (dispatch.md § System verify) blocks the
 # SILENT close, and nothing mechanically stopped a `| close |` event landing in the log after the FAIL
@@ -7,26 +8,26 @@
 # to proceed). Retained per L-058 (a gate is exercised once on input that must FAIL, with its own named
 # finding) and TD-012 (fixtures survive the prototype rather than being deleted with it).
 #
-# Deliberately NOT `evals/run-system-verify-fixtures.sh` (the usual top-level naming every other
-# checker harness uses) -- that path is swept by qa-check.sh's own `evals/run-*.sh` completeness glob,
-# which requires registering the harness in qa-check.sh's eval_harnesses_always/optin lists. T1's own
-# Plan (Cites) marks qa-check.sh "run, never edited" for this task, so the harness is nested one level
-# deeper instead: same shape, same harness-common.sh, just outside that glob's reach. Wiring this into
-# qa-check.sh (moving it to evals/run-system-verify-fixtures.sh and registering it) is unfinished
-# business for a future task, same as TD-012's dispatch-preflight harness once was (evals/README.md).
+# Promoted here from evals/fixtures/system-verify/run-checks.sh (SPRINT-067 T1 nested it one level
+# deeper on purpose, to stay outside qa-check.sh's `evals/run-*.sh` completeness glob while that task's
+# own Plan marked qa-check.sh "run, never edited"). T2's job is exactly that wiring, so the harness now
+# lives at the standard top-level `evals/run-*.sh` location every other checker harness uses, and is
+# registered in qa-check.sh leg 12 below. The checker itself (evals/lib/check-system-verify-block.sh)
+# stays where it is -- promoting it to scripts/lib/ (the "full" wiring evals/README.md once floated) is
+# out of T2's editable-path scope (evals/** + qa-check.sh only) and not required for registration.
 #
 # Each FAIL case asserts on the checker's OWN NAMED FINDING, not merely on a non-zero exit (L-058).
 # Case 2 is the load-bearing non-failure: an unattended park never reaches a `| close |` event at all,
 # so a checker that fired on "FAIL line present" alone would paint every correctly-parked run red.
 #
-# Dependency-free POSIX sh, no git needed. Run bare: sh evals/fixtures/system-verify/run-checks.sh
+# Dependency-free POSIX sh, no git needed. Run bare: sh evals/run-system-verify-fixtures.sh
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-repo_root=$(CDPATH= cd -- "$here/../../.." && pwd)
+repo_root=$(CDPATH= cd -- "$here/.." && pwd)
 checker="$repo_root/evals/lib/check-system-verify-block.sh"
-fx="$here"
-. "$repo_root/evals/lib/harness-common.sh"
+fx="$here/fixtures/system-verify"
+. "$here/lib/harness-common.sh"
 
 fail=0
 

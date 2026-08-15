@@ -91,14 +91,15 @@ the "must run automatically" nice-to-have is not.
 (SPRINT-067 T1), which guards ADR-021's silent-close boundary for the "System verify" pass shipped in
 `skills/orchestrator/references/dispatch.md` § Merge-back queue: a `system-verify · FAIL(...)` rollup
 line (night-run.md Part 4) must not be followed by a `| close |` event with no recorded owner ruling.
-**Placement note:** the checker lives in `evals/lib/`, not `scripts/lib/` like its siblings
-(sprint-close, gates-signed, night-run-rollup), and its harness is nested at
-`fixtures/system-verify/run-checks.sh` rather than the usual top-level `evals/run-*.sh` — both moves
-keep every touched file under this task's `evals/` Layers declaration and out of qa-check.sh's
-`evals/run-*.sh` completeness glob, since T1's own Plan marks `qa-check.sh` "run, never edited."
-Wiring it in properly (promote to `scripts/lib/` + `evals/run-system-verify-fixtures.sh`, register in
-qa-check.sh) is unfinished business for a future task, the same shape TD-012's dispatch-preflight
-harness once was.
+**Placement note:** the checker itself still lives in `evals/lib/`, not `scripts/lib/` like its
+siblings (sprint-close, gates-signed, night-run-rollup) — that promotion stays out of scope for a
+checker covered only by an `evals/`-only harness. The harness that fixture-tests it, though, is now
+wired into `qa-check.sh` (SPRINT-068 T2): T1 nested it at `fixtures/system-verify/run-checks.sh`,
+deliberately outside qa-check.sh's `evals/run-*.sh` completeness glob since T1's own Plan marked
+`qa-check.sh` "run, never edited." T2's job was exactly that wiring, so the harness is promoted to the
+standard top-level `evals/run-system-verify-fixtures.sh` and registered in `qa-check.sh`'s
+`eval_harnesses_always` list (leg 12) — always-on, not `QA_FULL`-gated, per its measured ~0.66s runtime
+(dependency-free POSIX sh over 5 static fixture logs, no git/mktemp cost).
 
 | Fixture | Exercises |
 |---|---|
@@ -434,9 +435,7 @@ sh evals/run-epic-archive-fixtures.sh          # SPRINT-055 T2
 sh evals/run-research-archive-fixtures.sh      # SPRINT-055 T3
 sh evals/run-ephemeral-intake-fixtures.sh      # SPRINT-055 T4
 sh evals/run-task-origin-fixtures.sh           # SPRINT-055 T6
-
-# nested harness (outside qa-check.sh's evals/run-*.sh glob by design -- see fixtures/system-verify/ above)
-sh evals/fixtures/system-verify/run-checks.sh  # SPRINT-067 T1
+sh evals/run-system-verify-fixtures.sh         # SPRINT-067 T1 / wired SPRINT-068 T2
 
 # opt-in selftests (slow — throwaway git repos; also run under QA_FULL=1)
 sh evals/selftest-assert-boundary-park.sh
