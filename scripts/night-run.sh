@@ -117,7 +117,7 @@ reap() {
   fi
 
   {
-    printf '\n### %s | complete | run exited — rollup emitted by the launcher\n\n' "$(date +%Y-%m-%d)"
+    printf '\n### %s | run-complete | run exited — rollup emitted by the launcher\n\n' "$(date +%Y-%m-%d)"
     printf '```\nrun · %s of %s DoD ticked\n' "$rp_done" "$rp_total"
     # A task with an open DoD that the run wrote no rollup line for was never spoken about
     # at all. That is `unattempted` -- stated as the fact it is (no line exists), never

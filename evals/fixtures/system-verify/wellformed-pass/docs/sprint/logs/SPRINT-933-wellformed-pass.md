@@ -9,7 +9,7 @@ update_trigger: an Execution Log entry is appended
 
 # SPRINT-933 — Execution Log
 
-### 2026-08-15 | complete | run exited
+### 2026-08-15 | run-complete | run exited
 
 run · 4 of 4 DoD ticked
 

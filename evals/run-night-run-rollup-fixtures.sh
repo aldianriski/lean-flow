@@ -40,10 +40,17 @@ run_case_anywhere "wellformed-passes" 0 "DoD header + calibration row present" -
 
 # --- case 4: no completed run yet -> reported, exit 0, never a FAIL ------------------------------
 # The one that keeps the check usable. A live sprint has an Execution Log full of `progress` entries
-# and no `complete` event; treating that as a missing rollup would make the gate red for the entire
-# duration of every sprint.
+# and no `run-complete` event; treating that as a missing rollup would make the gate red for the
+# entire duration of every sprint.
 run_case_anywhere "midflight-does-not-fire" 0 "no completed-run entry yet" -- \
   sh "$checker" "$fx/no-complete-entry/docs/sprint/logs/SPRINT-923-no-complete-entry.md"
+
+# --- case 5: task-level `complete` does not arm the run-level assertions -> exit 0 ---------------
+# The TD-055 misfire shape, pinned as a passing case: an entry header saying a TASK completed
+# (`| complete |`) with no rollup block must read as mid-flight, not as a completed run. Before the
+# `run-complete` rename this exact log turned the gate red mid-SPRINT-064 (TASK-211).
+run_case_anywhere "task-level-complete-does-not-arm" 0 "no completed-run entry yet" -- \
+  sh "$checker" "$fx/task-level-complete-does-not-arm/docs/sprint/logs/SPRINT-924-task-level-complete-does-not-arm.md"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "NIGHT-RUN-ROLLUP FIXTURES: all green"; else echo "NIGHT-RUN-ROLLUP FIXTURES: at least one FAIL"; fi
