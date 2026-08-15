@@ -4,7 +4,7 @@ slug: the-proof-layer
 owner: Maintainer
 last_updated: 2026-08-15
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: 54999a3
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
