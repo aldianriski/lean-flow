@@ -87,6 +87,32 @@ green against the real shipped snippet. Not touched here: wiring this runner int
 until/unless a future task wires it in. TD-012's core risk (no retained regression guard) is closed;
 the "must run automatically" nice-to-have is not.
 
+`fixtures/system-verify/` — one fixture per outcome for `evals/lib/check-system-verify-block.sh`
+(SPRINT-067 T1), which guards ADR-021's silent-close boundary for the "System verify" pass shipped in
+`skills/orchestrator/references/dispatch.md` § Merge-back queue: a `system-verify · FAIL(...)` rollup
+line (night-run.md Part 4) must not be followed by a `| close |` event with no recorded owner ruling.
+**Placement note:** the checker lives in `evals/lib/`, not `scripts/lib/` like its siblings
+(sprint-close, gates-signed, night-run-rollup), and its harness is nested at
+`fixtures/system-verify/run-checks.sh` rather than the usual top-level `evals/run-*.sh` — both moves
+keep every touched file under this task's `evals/` Layers declaration and out of qa-check.sh's
+`evals/run-*.sh` completeness glob, since T1's own Plan marks `qa-check.sh` "run, never edited."
+Wiring it in properly (promote to `scripts/lib/` + `evals/run-system-verify-fixtures.sh`, register in
+qa-check.sh) is unfinished business for a future task, the same shape TD-012's dispatch-preflight
+harness once was.
+
+| Fixture | Exercises |
+|---|---|
+| `silently-closed/` | FAIL line + `\| close \|` event + no owner ruling → `FAIL system-verify-fail-silently-closed` |
+| `owner-ruled/` | FAIL line + `\| close \|` event + a recorded `owner-ruling:` line → PASS (attended path) |
+| `parked-unattended/` | FAIL line, no `\| close \|` event at all → PASS (the unattended park shape: a genuinely parked close never runs `close`, so this — not a "close + park line" combo — is what a correctly-parked FAIL looks like in the log) |
+| `wellformed-pass/` | `system-verify · PASS` line + `\| close \|` event → PASS |
+| `archived/` | the `silently-closed` violation verbatim, under `docs/sprint/archive/` → skipped, exit 0, no output (closed history not re-litigated) |
+
+The recorded-ruling line the checker asserts on (`owner-ruling: system-verify — <ruling + reason>`) is
+a documented contract, not a private format — `skills/orchestrator/references/dispatch.md` § System
+verify defines it and `night-run.md` Part 4 references the same shape, so a genuinely owner-approved
+override phrased any other way is never mis-flagged once this checker is wired into qa-check.sh.
+
 ## Real-run fixtures (live, on-demand, not part of the bare-run set)
 
 A fourth class, not listed above because it costs real API tokens and is **not deterministic
@@ -408,6 +434,9 @@ sh evals/run-epic-archive-fixtures.sh          # SPRINT-055 T2
 sh evals/run-research-archive-fixtures.sh      # SPRINT-055 T3
 sh evals/run-ephemeral-intake-fixtures.sh      # SPRINT-055 T4
 sh evals/run-task-origin-fixtures.sh           # SPRINT-055 T6
+
+# nested harness (outside qa-check.sh's evals/run-*.sh glob by design -- see fixtures/system-verify/ above)
+sh evals/fixtures/system-verify/run-checks.sh  # SPRINT-067 T1
 
 # opt-in selftests (slow — throwaway git repos; also run under QA_FULL=1)
 sh evals/selftest-assert-boundary-park.sh

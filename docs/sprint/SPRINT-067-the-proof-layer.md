@@ -4,6 +4,7 @@ slug: the-proof-layer
 owner: Maintainer
 last_updated: 2026-08-15
 status: active
+gates_signed: G1,G2 @ bcc8bd9
 plan_commit: 54999a3
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -44,17 +45,19 @@ own gate command, discovered — never hard-coded) runs against the integrated t
 lands in the rollup; exercised once on real input and once on must-FAIL input, fixtures retained.
 
 **DoD:**
-- [ ] The pass is defined at dispatch.md § Merge-back queue (post-final-wave, integrated tree,
+- [x] The pass is defined at dispatch.md § Merge-back queue (post-final-wave, integrated tree,
       host-repo gate command discovered per L-015) with a two-line hook from SKILL.md § sprint-bulk —
-      *Verify: the sections exist and `qa-check.sh` layer checks pass on the diff*
-- [ ] Its verdict is one named rollup line (ADR-016 shape; a FAIL blocks the silent close per
-      ADR-021 — surface → recorded owner ruling) — *Verify: night-run.md Part 4 carries the line
-      format; review pass confirms no contradiction with ADR-021/022*
+      *Verify: the sections exist and `qa-check.sh` layer checks pass on the diff* ✓ 145/0
+- [x] Its verdict is one named rollup line (ADR-016 shape; a FAIL blocks the silent close per
+      ADR-021 — surface → recorded owner ruling, shape `owner-ruling: system-verify — <ruling>`) —
+      *Verify: night-run.md Part 4 carries the line format; review pass confirms no contradiction
+      with ADR-021/022* ✓ reviewer + delta re-review
 - [ ] Exercised on real input: this run's own final merge-back gets the pass, verdict in this run's
       exit rollup — *Verify: the rollup line exists and the gate's output file (not its exit
-      channel) shows the run*
-- [ ] Exercised on must-FAIL input with its named finding; fixtures retained — *Verify:
-      `evals/fixtures/system-verify/` exists, both legs run, findings named (L-058 · TD-012)*
+      channel) shows the run* — ticks at exit (D3)
+- [x] Exercised on must-FAIL input with its named finding; fixtures retained — *Verify:
+      `evals/fixtures/system-verify/` exists, both legs run, findings named (L-058 · TD-012)* ✓
+      5 legs green incl. archive-skip, coordinator re-ran the harness
 
 ### T2 — Per-criterion evidence lines in the rollup and review report `[size: S · risk: low · class: execution · HITL]`
 Layers: `skills/orchestrator/references/night-run.md` ·
@@ -136,6 +139,11 @@ rollup.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `skills/orchestrator/references/dispatch.md` | T1 | § System verify — final-wave full gate: discovery order, verdict semantics (ADR-021 applied, ADR-022 deferred-to), `owner-ruling:` recorded shape, TD-053 caveat | med | scoped review + delta re-review |
+| `skills/orchestrator/references/night-run.md` | T1 | Part 4 gains the `system-verify · …` rollup line + the morning-after ruling reference (supplementary, no new state) | med | scoped review + delta re-review |
+| `skills/orchestrator/SKILL.md` | T1 | Step 6 runs system-verify before close (folded in, 107/140) | low | scoped review |
+| `evals/lib/check-system-verify-block.sh` + `evals/fixtures/system-verify/` | T1 | Retained must-FAIL contract fixtures — 5 legs incl. named-finding FAIL and archive-skip; harness nested to stay in declared Layers (wiring into qa-check.sh = stated gap) | low | harness run, all green ×2 |
+| `evals/README.md` | T1 | Documents the fixture family + nested-harness placement rationale | low | review |
 
 ## Retro
 

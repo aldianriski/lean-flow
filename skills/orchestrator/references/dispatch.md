@@ -372,6 +372,57 @@ L-042's per-hunk staging rule (`git add -p` on a shared file) still binds **intr
 sequential tasks sharing one tree, or the coordinator staging conflict resolutions here. Worktree
 isolation obsoletes it at the cross-worktree boundary: disjoint tasks never share a tree to begin with.
 
+### System verify (the final-wave full gate)
+
+This upgrades the "interaction-only smoke check per wave" above from a lint/verify skim to one named
+**full-gate pass**. It fires **once** — after the run's **FINAL** wave has merged back, never per-wave
+— against the fully integrated tree, because that is the only point where cross-task interaction is
+complete and there is nothing later to invalidate the verdict.
+
+**The gate command is DISCOVERED, never hard-coded.** A dispatched builder or the coordinator has no
+business assuming what "the tests" means in a host repo it doesn't own — the wrong assumption silently
+runs nothing, or runs the wrong thing, and reports a false PASS. Discover in this order and stop at the
+first hit: **(1)** the host's package manifest — a `test` / `check` / `verify` script (`package.json`
+"scripts", `pyproject.toml`, `Cargo.toml`, etc., whichever the repo's manifest actually is); **(2)** a
+`Makefile` or `justfile` target of the same names; **(3)** the test step of a CI config in the repo
+(`.github/workflows/*`, etc.) — read its command, don't re-derive one. Nothing found → **attended**:
+ask the owner what gates this repo; **unattended**: never silently skip — emit the `no-gate-discovered`
+rollup line (night-run.md Part 4) and continue to close, since there is nothing to block on.
+**lean-flow's own repo dogfoods this as `sh scripts/qa-check.sh`** — stated here only as the discovery
+*output* one host happens to produce, never as a path a consumer's skill should assume or inherit
+(L-015): a different host discovers a different command through the same three steps.
+
+**Verdict semantics.** PASS → one rollup line, run continues to close. FAIL → **blocks the silent
+close** (ADR-021): surface the FAIL and its named finding, never tick past it quietly. Attended → get
+a recorded owner ruling (override or fix-and-rerun) before closing. Unattended → the charter is
+execute-only (night-run.md Part 0), so a FAIL **parks the close** per the Part 0 boundary table rather
+than deciding anything — the rollup line names the finding, and whether a retry fires on it is governed
+entirely by ADR-022's three conditions (mechanical trigger, one-shot ceiling, declared repo policy);
+this pass decides nothing new about that.
+
+**Recording the ruling — the one shape, so a checker can assert on it rather than on prose.** The owner's
+ruling goes in the sprint's Execution Log as its own line, immediately below the `system-verify ·
+FAIL(...)` line it resolves:
+
+```
+owner-ruling: system-verify — <ruling + reason>
+```
+
+`<ruling>` is `overridden` (close proceeds despite the FAIL) or `fixed-and-rerun` (the gate was fixed
+and reissued a PASS); `<reason>` is the one-line why. This is the only recorded-ruling shape any
+mechanical check may assert against — a park record (unattended) never needs this line, since Part 0
+blocks the close before a ruling exists to record.
+
+**Read the gate's OUTPUT, never only its exit code** (CLAUDE.md edit-safety (c)) — a gate piped through
+a formatter, or a redirect that failed before the gate ran, can report a verdict about the wrong thing
+entirely. Capture what the command actually printed and name the real finding from it.
+
+**TD-053 caveat.** Run this pass only **after** worktree cleanup (`dispatch.md` § Merge-back queue,
+Cleanup) — a `find`-based gate walking `.claude/worktrees/<id>/` sees a second, stale copy of the
+whole tree and reports its contents as live violations. If the gate cannot be deferred past cleanup for
+some reason, exclude `.claude/worktrees/` from its scope explicitly rather than trusting the gate's own
+exclusions to reach a path they were never anchored against.
+
 ## Escalation
 
 Execution fails twice, or a fork is genuinely ADR-grade → escalate by hand to your strongest model

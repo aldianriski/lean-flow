@@ -475,6 +475,22 @@ distinguish both from `unattempted`: those two were *reached*, this one never wa
 A `still-open` outcome parks the task (`parked-hitl`, the finding named); the states above are
 unchanged — the retry line is supplementary, never a new task state.
 
+**A system-verify pass (dispatch.md § System verify) adds one line, once, after the final wave's
+merge-back** — supplementary to the header count above, never a new task state, same as the retry
+line:
+
+```
+system-verify · PASS | FAIL(<named finding>) | no-gate-discovered · <gate command>
+```
+
+`PASS` and `no-gate-discovered` let the run proceed to close. `FAIL` blocks the silent close (ADR-021)
+— attended, the owner's ruling is recorded immediately below in the one shape dispatch.md § System
+verify defines (`owner-ruling: system-verify — <ruling + reason>`) before the run proceeds to close;
+unattended, the close itself parks (`parked-hitl`, naming this line) with no ruling line yet, since
+Part 0 blocks the close before a human is present to rule. **Morning-after case**: when the owner
+reviews a parked FAIL the next morning and rules on it, the same `owner-ruling:` line is appended to
+the log at that point — the shape does not change with who's watching, only whether it exists yet.
+
 **On a denial, record it once and move on — never re-attempt the same operation in a different
 wrapper.** Re-wrapping (adding a `cd`, splitting into a chain, redirecting elsewhere) does not make a
 refused operation permitted, and each attempt costs a full turn. Measured: one run spent ~40% of its
