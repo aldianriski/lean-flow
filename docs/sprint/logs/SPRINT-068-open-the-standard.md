@@ -18,7 +18,7 @@ update_trigger: an Execution Log entry is appended
 
 <!-- Newest entries at the BOTTOM: this reads as a chronology, unlike CHANGELOG.md which is
      newest-first. Event is one of: promote · progress · surprise · scope-change · park · blocker ·
-     complete · close. -->
+     run-complete · close (run-complete = the whole run exited — a finished task logs progress). -->
 
 ### 2026-08-15 | progress | T1 ruled — CONTEXT.md becomes a consumer; ADR-023 + Layers correction
 T1: gates approved (batch G1+G2, owner-signed via popup; T2/T3 parallel worktree dispatch, T2→T3
@@ -73,3 +73,46 @@ exit as `| complete |`. Inert to their own checker (verified — it keys on `| c
 event), but a canonical example carrying a dead token is how TD-055 arose, so all four updated to
 `run-complete`; system-verify legs stay 5/5 green. Remaining old-token hits are archives and
 prose *about* the rename — correct by design.
+
+### 2026-08-15 | progress | Scoped review returned — Spec clean, one Standards finding, retried once
+One isolated reviewer (sonnet) over `622f420..HEAD`, briefed with the rulings verbatim as Spec
+comparands (L-122). Spec axis: zero findings after the adversarial re-pass — ADR-023 consistent vs
+ADR-018, T2's legs matched the retained fixtures verbatim, T3's rename + scope-change verified live.
+Standards axis worst finding: this Log's own boilerplate taxonomy comment still read `complete`
+(instantiated from the template before T3's rename landed) — inert to every checker, but the one
+doc narrating the rename displayed the pre-rename vocabulary. Fixed on the single bounded retry
+(boilerplate, not a past entry — append-only intact); delta verified. T2's must-FAIL red-run
+evidence (DoD 3): gate exit 1, `QA-CHECK: 144 pass, 2 fail`, naming
+`system-verify-fail-silently-closed` verbatim; fixture reverted byte-identical, gate green.
+
+### 2026-08-15 | surprise | System-verify's first real firing was RED — on its own sprint
+The integrated-tree gate pass (step 6, first run ever through the T2-wired leg) exited 1:
+`FAIL corpus metadata: ADR-023-context-becomes-consumer.md(tag:governance)` — T1's ADR used
+`governance` as a tag, but the ADR-009 vocabulary allows it only as a *domain*
+(`TAGS="process docs tooling edit-safety sprint-model"`, gen-index.sh:16). Neither the builder-side
+checks nor the scoped review caught it: the corpus-metadata leg is the one comparand nobody briefed.
+Blocked the close per ADR-021 — no silent tick. Fix: `tags: [process, docs]` (domain stays
+`governance`), index regenerated, full gate re-run for the clean PASS before close.
+
+### 2026-08-15 | run-complete | Plan exhausted — all three tasks landed; rollup below
+system-verify · PASS — `sh scripts/qa-check.sh` over the integrated tree at the fix commit:
+`QA-CHECK: 147 pass, 0 fail`, exit 0 (after one RED blocked the close and was fixed — the
+`surprise` entry above). First `run-complete` event ever written — the rename dogfooding itself.
+
+```
+run · 13 of 13 DoD ticked
+run · ~410k dispatched tokens + coordinator · ~14 coordinator turns · ~65 min · 3 of 3 units · coordinator + 2 worktree builders (sonnet) + 1 scoped reviewer (sonnet), T1 inline
+T1.1 · ticked · owner-ruling — fork ruled B via popup; ADR-023; review vs ADR-018 clean
+T1.2 · ticked · review — ADR-023 § Decision names the window + move+cite atomic mechanism
+T1.3 · ticked · review — EPIC-003 Q3 struck through with pointer, reviewer-verified
+T1.4 · ticked · check — wc -l = 132/150 post-ruling, 0 lines spent
+T2.1 · ticked · check — gate output names `PASS eval harness run-system-verify-fixtures.sh`; 0.66s → always-on
+T2.2 · ticked · fixture — 5/5 legs green standalone + in-gate, findings verbatim vs SPRINT-067 retained set
+T2.3 · ticked · fixture — must-FAIL red run captured (exit 1, `system-verify-fail-silently-closed` named), reverted byte-identical
+T2.4 · ticked · review — evals/README.md § system-verify read in full, matches wired reality
+T3.1 · ticked · check — commit f449e6b file list: checker + fixtures + template together; writer joined in b3d8c03 (owner-ruled scope-change)
+T3.2 · ticked · fixture — leg 5 `task-level-complete-does-not-arm` green, wired in harness
+T3.3 · ticked · check — two real archived logs on the old token skip silently; full gate green over repo
+T3.4 · ticked · check — TD-055 row `resolved → TASK-211` (877fbd0)
+OA.1 · ticked · owner-ruling — plugin reinstalled to 1.41.0 this session (invocation header, the L-021 signal)
+```

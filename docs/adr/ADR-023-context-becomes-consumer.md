@@ -1,6 +1,6 @@
 ---
 id: ADR-023
-tags: [process, docs, governance]
+tags: [process, docs]
 domain: governance
 status: accepted
 related: ADR-018, ADR-012, ADR-007

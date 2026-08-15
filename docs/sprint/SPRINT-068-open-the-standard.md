@@ -40,15 +40,19 @@ the anti-SSOT rule forbid — ADR-018 took that risk explicitly, on condition th
 consumer of the extracted spec, with the migration-window risk named and its mitigation stated.
 
 **DoD:**
-- [ ] The fork stated and ruled — SSOT-stays (spec generated/derived from it) vs
+- [x] The fork stated and ruled — SSOT-stays (spec generated/derived from it) vs
       CONTEXT-becomes-consumer (spec is the new SSOT) — with the WHY over the alternative —
       *Verify: ruling recorded (ADR if it qualifies, §4); review vs ADR-018 as comparand*
-- [ ] The migration-window risk named with a stated mitigation (what prevents the two-places state,
+      ✓ ADR-023 (owner ruled consumer + chose ADR, popup 2026-08-15); reviewer: consistent vs ADR-018
+- [x] The migration-window risk named with a stated mitigation (what prevents the two-places state,
       or bounds it to one commit) — *Verify: the ruling names the window and the mechanism*
-- [ ] EPIC-003 open question 3 marked answered with a pointer to the ruling —
+      ✓ ADR-023 § Decision: move+cite atomic commits — window bounded to zero at commit granularity
+- [x] EPIC-003 open question 3 marked answered with a pointer to the ruling —
       *Verify: the epic file's § Open questions*
-- [ ] CONTEXT.md cost stated: the ruling itself spends ~0 lines pre-extraction (132/150 at promote) —
+      ✓ struck through + pointer, verified by scoped review
+- [x] CONTEXT.md cost stated: the ruling itself spends ~0 lines pre-extraction (132/150 at promote) —
       *Verify: `wc -l .claude/CONTEXT.md`*
+      ✓ measured 132 post-ruling — 0 lines spent (cross-checked by reviewer)
 
 ### T2 — Wire check-system-verify-block.sh into the QA gate `[size: S · risk: low · class: execution · AFK]`
 Layers: `scripts/qa-check.sh` · `evals/`
@@ -61,15 +65,19 @@ checker exists, five legs green, nothing runs it in-gate.
 fixture legs green in-gate, and a deliberate violation FAILs the gate with the named finding.
 
 **DoD:**
-- [ ] Registered per the gate's own harness conventions (always-on vs `QA_FULL=1` judged against
+- [x] Registered per the gate's own harness conventions (always-on vs `QA_FULL=1` judged against
       measured runtime; harness moved to the standard location if registration requires it) —
       *Verify: the gate's output names the harness leg*
-- [ ] Five legs green in-gate, findings unchanged from the retained fixtures — *Verify: gate run
+      ✓ `PASS eval harness run-system-verify-fixtures.sh` in-gate; 0.66s measured → always-on (TD-016)
+- [x] Five legs green in-gate, findings unchanged from the retained fixtures — *Verify: gate run
       output, legs 5/5*
-- [ ] Must-FAIL proof: a deliberate violation FAILs the whole gate with
+      ✓ 5/5 standalone + in-gate; reviewer matched names/findings to SPRINT-067 fixtures verbatim
+- [x] Must-FAIL proof: a deliberate violation FAILs the whole gate with
       `system-verify-fail-silently-closed`, then reverted — *Verify: the red run's output captured
       in the Execution Log (L-058: the gate's worst failure is the silent false-negative)*
-- [ ] `evals/README.md` matches reality after any move — *Verify: README diff*
+      ✓ red run captured in the Log (T2 entry); revert verified byte-identical, gate green again
+- [x] `evals/README.md` matches reality after any move — *Verify: README diff*
+      ✓ reviewer read § system-verify in full — location, registration, table, runbook all current
       *(TD-056 piggyback: while in the gate's neighbourhood, run the one-command family scan its
       re-review names — which `check-*.sh` take file arguments, what does each do bare — and report.)*
 
@@ -86,18 +94,25 @@ and the template's taxonomy comment, with a task-level `complete` no longer armi
 assertions; TD-055 marked resolved.
 
 **DoD:**
-- [ ] Checker + fixtures + template renamed in **one commit** (L-123: the shape and its asserting
+- [x] Checker + fixtures + template renamed in **one commit** (L-123: the shape and its asserting
       checker are born — and renamed — together) — *Verify: the commit's file list*
-- [ ] A task-level `| complete |` entry no longer arms the run-level assertions — *Verify: a fixture
+      ✓ `f449e6b` (6 files: checker + 3 fixtures + new fixture + template); writer joined in `b3d8c03`
+      (owner-ruled scope-change, logged first)
+- [x] A task-level `| complete |` entry no longer arms the run-level assertions — *Verify: a fixture
       leg proves it (the TD-055 misfire shape, now passing)*
-- [ ] Archives are not re-litigated: historical `complete` logs stay valid — *Verify: the checker's
+      ✓ leg 5 `task-level-complete-does-not-arm` green, wired into the harness (TD-012)
+- [x] Archives are not re-litigated: historical `complete` logs stay valid — *Verify: the checker's
       archive handling + `qa-check.sh` green over the real archive*
-- [ ] TD-055 → `status: resolved → TASK-211` — *Verify: the row*
+      ✓ two real archived logs on the old token skipped silently; gate green over the repo
+- [x] TD-055 → `status: resolved → TASK-211` — *Verify: the row*
+      ✓ row updated `877fbd0`, resolution note appended, row retained
 
 ## Owner-action checklist
-- [ ] Reinstall the plugin — installed cache is **1.38.0** against a repo now at **1.41.0**, three
+- [x] Reinstall the plugin — installed cache is **1.38.0** against a repo now at **1.41.0**, three
       MINORs behind (carried from SPRINT-066 and 067, unactioned). T2/T3 change gate behaviour a
       future session will want fresh; the session reads repo source meanwhile (L-021).
+      ✓ actioned by owner 2026-08-15 this session: `/plugin` reports 1.41.0; the `/orchestrator`
+      invocation header confirmed the 1.41.0 base dir (the signal L-021 says to trust)
 
 ## Decisions (pre-locked)
 
@@ -140,6 +155,19 @@ assertions; TD-055 marked resolved.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/adr/ADR-023-context-becomes-consumer.md` | T1 | The pre-extraction ruling: spec/ becomes SSOT, CONTEXT.md a consumer; move+cite atomic commits close the migration window | med | reviewed vs ADR-018 as comparand |
+| `docs/epic/EPIC-003-the-standard.md` | T1 | Open question 3 marked answered → ADR-023 | low | review |
+| `docs/DECISIONS.md` + `docs/knowledge-index.md` | T1 | ADR-023 indexed (Layers corrected — L-100, logged first) | low | layers-observed PASS · index grep |
+| `scripts/qa-check.sh` | T2 | `run-system-verify-fixtures.sh` joins `eval_harnesses_always` (measured 0.66s, git-free — TD-016 axis) | low | gate run before/after violation |
+| `evals/run-system-verify-fixtures.sh` | T2 | Harness promoted from nested location into the `evals/run-*.sh` glob the gate scans | low | 5/5 in-gate + must-FAIL proof |
+| `evals/README.md` | T2 | Placement + how-to-run match the wired state | none | diff review |
+| `scripts/lib/check-night-run-rollup.sh` | T3 | Run-level event match → `run-complete`, anchored to the delimited field (L-108) | med | 5-leg harness + archive green |
+| `evals/fixtures/night-run-rollup/*` | T3 | 3 fixtures renamed + new `task-level-complete-does-not-arm` (the TD-055 misfire, now passing) | low | leg output |
+| `skills/lean-doc-generator/templates/sprint-log.md.template` | T3 | Event taxonomy renamed in the same commit (L-123); ships to consumers (L-015) | med | block re-read (L-009) |
+| `TECH-DEBT.md` | T3 | TD-055 → `resolved → TASK-211` | low | row diff |
+| `scripts/night-run.sh` | T3 (scope-change) | The event's live writer emits `run-complete` — writer and checker renamed together, no dark-gate window | med | census grep + harness |
+| `evals/run-night-run-rollup-fixtures.sh` | T3 (scope-change) | New fixture wired as leg 5 (an unwired fixture guards nothing — TD-012) | low | 5/5 green |
+| `evals/fixtures/system-verify/*` (4 logs) | T3 (scope-change) | Inert scenery off the dead token (census catch) | none | system-verify 5/5 green |
 
 ## Retro
 
