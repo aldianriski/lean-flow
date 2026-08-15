@@ -18,10 +18,13 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-065 closed 2026-08-15 (3 of 3) — the fourth and final member sprint of **EPIC-002
-> Make Room, which is closed and archived** (every member sprint closed, all four Closed-when `[x]`).
-> The revise loop shipped **attended-only**; its unattended charter fork is **TASK-203**, now `ready`
-> and the natural next promote (ADR-grade, a `/council` candidate).
+> **SPRINT-066 — Verification Authority** → [`docs/sprint/SPRINT-066-verification-authority.md`](docs/sprint/SPRINT-066-verification-authority.md)
+>
+> Two rulings that decide *who may say no*: whether mechanical evidence may gate the coordinator's
+> DoD tick (T1 = TASK-207, the second gauntlet audit's core fork) and whether the revise loop may
+> run unattended, on what budget (T2 = TASK-203, deferred by name from SPRINT-065). Both ADR-grade.
+> **TASK-208/209 stay `blocked`** on T1's ruling; no epic stamp (D3 — EPIC-003/004/005 still
+> `proposed`, these rulings are their inputs, not member work).
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard** (next — TASK-198 is its
@@ -76,6 +79,61 @@ status: current
       tracker:    docs/research/gauntlet-loop-delta.md · ADR-016 · EPIC-005 D2 · night-run.md Part 0
       origin:     manual
       state:      ready
+
+- [ ] TASK-207 — Rule whether mechanical evidence may gate the coordinator's progress  [size: S] [risk: med] [HITL]
+      class:      decision
+      done-when:  a recorded ruling — an ADR if it carves the boundary — on whether a per-done-when
+                  verification method + recorded evidence, produced at G2, may BLOCK the coordinator's
+                  DoD tick and the run's close, versus the raise-never-gate spine standing; the
+                  consumer boundary stated either way (lean-flow never runs the consumer's CI as a
+                  blocker on its own authority)
+      touches:    docs/adr/ · skills/orchestrator/references/review-scoping.md § QA suggestion
+      depends-on: none
+      assumes:    the never-gate line is charter, not accident — the ruling engages it, never routes
+                  around it. G2's completion-bound rule already exists (DOCS_Guide §2); the delta
+                  being ruled is evidence RECORDING + BLOCKING. Hard-to-reverse + surprising + a real
+                  trade-off → ADR-grade, and a /council candidate if it does not settle at G2. The
+                  retry ceiling (one per pass, owner-ruled SPRINT-065 T3) is out of scope. Source:
+                  second gauntlet audit (2026-08-15), delta-mapped against v1.39.0 — only the
+                  unmatched remainder was filed (L-017)
+      tracker:    docs/research/gauntlet-loop-delta.md · review-scoping.md § QA suggestion · L-017
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-208 — Wire a system-verify pass after the last wave's merge-back  [size: M] [risk: med] [HITL]
+      class:      execution
+      done-when:  after a multi-task run's final merge-back, one named full-gate pass (the host repo's
+                  own gate command) runs against the integrated tree and its verdict lands in the
+                  rollup — exercised once on real input AND once on input that must FAIL with its
+                  named finding, fixtures retained (L-058 · TD-012)
+      touches:    skills/orchestrator/references/dispatch.md § Merge-back queue ·
+                  skills/orchestrator/SKILL.md (hook line, cap-checked) · evals/fixtures/
+      depends-on: TASK-207 — whether the pass blocks or reports is that ruling
+      assumes:    upgrades dispatch.md's existing per-wave "interaction-only smoke check", not a new
+                  subsystem. Scope = multi-task merge-back only — locally-green ≠ globally-green is
+                  the failure it exists for; single-task mvp is already covered by Review. The gate
+                  command is discovered from the host repo, never hard-coded (no leaked scripts/…
+                  path — L-015; this repo dogfoods via its own gate). Unattended wording defers to
+                  TASK-203 by pointer, never decides
+      tracker:    dispatch.md § Merge-back queue · ADR-016 · L-015 · L-058
+      origin:     decomposer
+      state:      blocked
+
+- [ ] TASK-209 — Per-criterion evidence lines in the rollup and review report  [size: S] [risk: low] [HITL]
+      class:      execution
+      done-when:  a ticked DoD line names the evidence that ticked it (test / check / fixture /
+                  review outcome), and the run rollup carries verdict + evidence per criterion,
+                  extending ADR-016's N-of-M — exercised on one real sprint close
+      touches:    skills/orchestrator/references/night-run.md Part 4 · review-scoping.md ·
+                  sprint templates (consumer surface — L-015)
+      depends-on: TASK-207 — evidence can only be reported if the contract records it
+      assumes:    reporting-only regardless of TASK-207's gating answer — a report aligns with the
+                  raise-never-gate spine either way — but its SHAPE is the contract TASK-207 defines,
+                  so it stays blocked on the ruling. Extends the ADR-016 rollup, never forks it;
+                  template edits ship to consumers (L-015)
+      tracker:    ADR-016 · night-run.md Part 4 · L-015
+      origin:     decomposer
+      state:      blocked
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution

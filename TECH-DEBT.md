@@ -89,6 +89,14 @@ status: current
     three sprints back when the session was current; that mechanism is not understood, and a guard
     written against the wrong cause guards nothing.
   - Tracker: SPRINT-063 T2 Execution Log · dispatch.md pre-dispatch preflight · L-021
+  - **Re-reviewed 2026-08-15 (SPRINT-066 promote, 3 sprints open) — first aging re-review; held,
+    vehicle absent.** No worktree has been dispatched since the row was filed (SPRINT-064/065 ran
+    inline/sequential by their own G2 rulings), so the mechanism question — *why* the worktree
+    branched three sprints behind a current session — has had no opportunity to be investigated, and
+    the row's own text forbids writing a guard before that cause is understood. **Unblock condition:**
+    the next worktree dispatch compares the worktree's HEAD to the coordinator's at spawn (one
+    command) *before* real work, and records what it finds — that observation either explains the
+    mechanism or is the second sighting that forces the guard.
 
 - **TD-053** severity: minor | status: open | created: Sprint-063
   - Summary: **worktree-isolated dispatch places a full repo copy at `.claude/worktrees/<id>/`, inside
@@ -109,6 +117,14 @@ status: current
     them at once — which is EPIC-004's engine question, so this row may be absorbed there rather than
     fixed alone.
   - Tracker: SPRINT-063 Retro · L-108 (the anchor that was right and still defeated) · EPIC-004 D1
+  - **Re-reviewed 2026-08-15 (SPRINT-066 promote, 3 sprints open) — first aging re-review; held,
+    vehicle absent.** Same absence as TD-054: no worktree dispatch since filing, so neither leg (the
+    `find`-walk false positive, the `.gitignore` gap) has fired again. The cure question stays routed
+    to EPIC-004's engine per the row's own reasoning. One adjacency noted rather than acted on:
+    **TASK-208** (system-verify at merge-back, filed 2026-08-15) will touch the same merge-back
+    protocol — whoever builds it reads this row first, since a full-gate pass run while a worktree
+    still exists would hit exactly this false positive. **Unblock condition:** unchanged — the next
+    worktree dispatch, or EPIC-004 D1 landing.
 
 - **TD-052** severity: medium | status: open | created: Sprint-062
   - Summary: **Nothing in `evals/` exercises skill *prose*, so a governance rule that lives as
@@ -227,6 +243,12 @@ status: current
     cure — an index digest cached between runs, or accepting that whole-corpus integrity costs
     proportional to the corpus. Neither is this sprint's work: SPRINT-063 is EPIC-002 subtraction, and
     shrinking the corpus is the one lever that moves this row without touching the gate at all.
+  - **Re-reviewed 2026-08-15 (SPRINT-066 promote, 3 sprints since last) — held, trigger unchanged.**
+    The behavioural concern has produced no evidence: the gate ran at the SPRINT-065 close (138 pass,
+    ~same shape) and was not skipped under exactly the conditions the row worries about. The
+    structural cure remains un-derived and nothing this sprint touches it — SPRINT-066 is two
+    rulings, no corpus or gate work. **Unblock condition:** unchanged — a run demonstrably skipped
+    for cost, or a structural cure (cached index digest) being derived on its own merits.
 
 - **TD-049** severity: minor | status: open | created: Sprint-059
   - Summary: the night-run reaper (`scripts/night-run.sh`) parses the sprint file's DoD boxes and
@@ -249,6 +271,13 @@ status: current
     on a fresh judgement. **Unblock condition, stated so the next re-review is not another hold:**
     build it the first time the sprint format actually changes, or when TD-045's fixture fires once.
     Until one of those, a re-review that reaffirms is a decision, not a skipped line.
+  - **Re-reviewed 2026-08-15 (SPRINT-066 promote, 3 sprints since last) — held, and one near-trigger
+    ruled out explicitly.** SPRINT-065 T1 *documented* `Cites:` in `SPRINT.md.template` — a
+    definition of a field already in live use, not a schema change: every parser (the reaper, the
+    preflight snippet, `check-layers-completeness.sh`) already read or deliberately ignored `Cites:`
+    before the edit, so nothing any of the three parses moved. TD-045's parity fixture has still
+    never fired (QA green at the v1.39.0 close). **Unblock condition:** unchanged — a real format
+    change the parsers read, or the parity fixture firing once.
 
 - **TD-048** severity: trivial | status: open | created: Sprint-058
   - Summary: `check-layers-completeness.sh` matches a `Layers:`/`Cites:` declaration against DoD prose
