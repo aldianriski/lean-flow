@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-09
+last_updated: 2026-08-15
 update_trigger: Skill roster, the loop, gates, modes, or tiers changed
 status: current
 ---
@@ -39,7 +39,7 @@ new behaviour→`/tdd` **(default, test-first)** · bug→`/diagnose` · hard-to
 ## Built-in leverage
 
 lean-flow ships **no custom agents/hooks** — it dispatches Claude's built-ins in **isolated passes** (fresh context): recon→`Explore` ·
-`/code-review` (small/med → one scoped `sonnet`; **Standards vs Spec** reported separately) · `/verify` · `/security-review` ·
+`/code-review` (small/med → one scoped `sonnet`; **Standards vs Spec** reported separately; the worst finding per axis feeds **one bounded builder retry** — attended only, → `review-scoping.md` § The revise loop) · `/verify` · `/security-review` ·
 `/council` (internal sub-agents); commands `/goal /plan /batch /loop /run /simplify`. Wiring → docs/architecture/overview.md § Key integration points.
 
 **Standalone contract** — stage-skill cross-refs are routing *suggestions* (`→ /X`), never requirements; each completes its job

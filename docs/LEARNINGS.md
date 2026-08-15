@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-14
+last_updated: 2026-08-15
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -22,11 +22,19 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-111**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-121**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-121 [tags: sprint-model] [status: active]: **A DoD box that performs a later phase's work is untickable by construction — and two mutually exclusive branches written as two boxes double-count in every tally.** SPRINT-065 T2's box 3 ("if all four conditions end `[x]`: epic archived → `docs/epic/archive/`") delegated close-phase work to a task: §11 archives an epic only when **every member sprint has closed**, and the sprint running T2 was itself a member — so no execution of the task, however correct, could ever tick the box. Box 4 was its else-branch, so exactly one of the pair could ever fire while `/prime` and the DoD tally counted both as open work. Surfaced as a `scope-change`, owner-ruled: re-word box 3 to "delegated to `/lean-doc-generator close`", record box 4 antecedent-false, tick both. The promote-time tell: does any box's tick depend on an event that happens **after this sprint's own work**? If yes, it belongs to that event's phase (close · the epic · the next sprint), not in the Plan — and a branch pair belongs as one box with the branch stated, never two.
+- seen: Sprint-065
+- count: 1
+- promoted: no
+- related: L-105 (a guard placed in time, not only in text) · L-088 (rule the stale premise, never absorb it) · DOCS_Guide §11 (the member-sprint rule the box contradicted)
 
 ---
 

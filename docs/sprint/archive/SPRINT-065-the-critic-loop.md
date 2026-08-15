@@ -3,8 +3,8 @@ sprint: 065
 slug: the-critic-loop
 epic: EPIC-002
 owner: Maintainer
-last_updated: 2026-08-14
-status: active
+last_updated: 2026-08-15
+status: closed
 plan_commit: a94d19b
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -103,9 +103,11 @@ bounded retry, re-reviewed, and the outcome logged.
       83/140 measured after the edit
 
 ## Owner-action checklist
-- [ ] Reinstall the plugin — session skills have run at **1.34.0** against a repo now at **1.38.0**
+- [x] Reinstall the plugin — session skills have run at **1.34.0** against a repo now at **1.38.0**
       across three sprints (L-021). Every skill has been diffed against repo source before use and no
       stale procedure was followed, but that is a workaround holding, not the gap closing.
+      *Done: the close session's `/prime` freshness row reads `1.38.0 base-dir == 1.38.0 repo → fresh`
+      (2026-08-15); the close ran on fresh procedure as the deferral ruling required.*
 
 ## Decisions (pre-locked)
 
@@ -168,11 +170,26 @@ bounded retry, re-reviewed, and the outcome logged.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
 **Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+One miss: T2's box 3 was written at promote asserting the epic archival could happen *inside the
+task*, contradicting §11's member-sprint rule — readable then, read only after the tick. Surfaced as
+a `scope-change`, owner-ruled, filed as **L-121**. Against that, four promoted rules fired as
+designed: the L-113 cross-check caught the bare-checker silence · CLAUDE.md (c) caught the wrapper's
+exit-0 over `QA_EXIT=1` · L-100 handled the mid-task `Layers:` correction · L-091 moved T1 off the
+tidy answer before anything was built on it.
 
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents).
+**Cost** — inline, one coordinator session plus this deferred close session (owner-ruled: close on
+fresh procedure after reinstall). Dispatches only for T3's exercises: two scoped `sonnet` reviews,
+one scripted-partial `haiku` builder, one `sonnet` re-review. No worktrees — D1 ruled sequential.
 
-**Worked**
+**Worked** — null-answer-first (L-091) flipped T1's outcome: recon found `Cites:` in live use across
+17 of 65 sprints, defined nowhere — the field the tidy answer would have added already existed. The
+revise loop's first genuine firing caught two real violations in its own diff (TD-055's trap · the
+L-057 family). Both fixture legs held (L-058), including catching an accidental third violation.
 
-**Friction**
+**Friction** — two silent-pass shapes inside one task: a background wrapper reporting exit 0 over
+`QA_EXIT=1`, and a bare `check-layers-observed.sh` exiting 0 with no output having checked nothing
+(→ **TD-056**). T2's structurally untickable DoD pair (→ **L-121**).
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`) — **L-121** filed: a DoD box that
+performs a later phase's work is untickable by construction; never write two mutually exclusive
+branches as two boxes — `/prime` counts both.

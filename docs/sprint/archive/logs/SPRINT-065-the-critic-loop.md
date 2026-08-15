@@ -2,8 +2,8 @@
 sprint: 065
 slug: the-critic-loop
 owner: Maintainer
-last_updated: 2026-08-14
-status: active
+last_updated: 2026-08-15
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -164,3 +164,16 @@ the plugin first** (the open Owner-action box, 1.34.0 installed vs 1.38.0 repo),
 session runs `/lean-doc-generator close` on fresh procedure — Retro, the EPIC-002 archival T2
 delegated to close, `close_commit`, and the feature-sprint MINOR bump (1.38.0 → 1.39.0) all land
 there rather than off a stale cache.
+
+### 2026-08-15 | close | 3 of 3 units — EPIC-002 closed and archived; v1.39.0
+Reinstall verified before anything else: the close session's `/prime` freshness row read
+`1.38.0 base-dir == 1.38.0 repo → fresh`, satisfying the deferral ruling above. Retro written and
+routed: Shipped → CHANGELOG **v1.39.0** (MINOR by hand — feature sprint) · **TD-056** filed (a bare
+`check-layers-observed.sh` exits 0 having checked nothing) · **L-121** filed (a DoD box performing a
+later phase's work is untickable by construction) · **TASK-203** flipped `ready` (its depends-on,
+TASK-202, shipped as T3). §11 retention applied on owner approval, one pass: sprint + log →
+`docs/sprint/archive/` + `archive/logs/` · **EPIC-002 → `docs/epic/archive/`** — the first epic to
+take §11's archival leg, every member sprint closed and all four Closed-when `[x]`, links re-based
+one level deeper · TASK-206 / TASK-201 / TASK-202 removed from the Backlog outright · CHANGELOG
+v1.37.0 rotated → `docs/changelog/`. Doc-freshness, owner-approved: CONTEXT.md § Built-in leverage
+now names the revise loop (attended only) · CLAUDE.md (c) sighting count 5×/4 → 7×/5 sprints.

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-14
+last_updated: 2026-08-15
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -31,6 +31,24 @@ status: current
 ---
 
 ## Tech Debt
+
+- **TD-056** severity: minor | status: open | created: Sprint-065
+  - Summary: **`check-layers-observed.sh` invoked without its sprint-file argument exits 0 and prints
+    nothing, having checked nothing.** Its own must-FAIL fixtures show a clean run prints
+    `PASS … layers observed (all changed files declared, base <sha>)`; silence means no sprint was
+    examined. `qa-check.sh` always supplies the argument, so the gate path is unaffected — the silent
+    no-op exists only on direct invocation, which is exactly how it was run mid-SPRINT-065 to
+    re-verify a fix.
+  - Impact: a bare re-run after a fix reads as a pass. Caught in-session only because the cross-check
+    rule compared the run's silence against the fixtures' expected PASS line and the two disagreed
+    (SPRINT-065 Execution Log, 2026-08-14). Cost so far: one near-miss, zero bad artifacts. Same
+    family as TD-051's candidate (c) — a skip that is silent instead of loud.
+  - Mitigation (**not yet derived**, L-091): the obvious move — no argument → usage line + non-zero
+    exit — is small, but re-derive the scope first: establish whether the other `scripts/lib/check-*.sh`
+    that take file arguments share the bare-invocation shape, and whether the cure belongs per-checker
+    or in a shared guard. A one-checker fix to a family-shaped defect is how the next silent no-op ships.
+  - Tracker: SPRINT-065 Execution Log (surprise, 2026-08-14) · CLAUDE.md § Edit-safety (c) (the
+    L-045/L-057 family) · TD-051 candidate (c)
 
 - **TD-055** severity: minor | status: open | created: Sprint-064
   - Summary: **`complete` is a reserved run-level event in the Execution Log, and nothing at the point of
