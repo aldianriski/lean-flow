@@ -6,7 +6,7 @@ last_updated: 2026-08-15
 status: closed
 gates_signed: G1,G2 @ f208aad
 plan_commit: ee5fe2d
-close_commit: [sha — set at close]
+close_commit: 029f698
 update_trigger: sprint execute/close events
 ---
 
