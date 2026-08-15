@@ -491,6 +491,30 @@ Part 0 blocks the close before a human is present to rule. **Morning-after case*
 reviews a parked FAIL the next morning and rules on it, the same `owner-ruling:` line is appended to
 the log at that point — the shape does not change with who's watching, only whether it exists yet.
 
+**Per-criterion evidence (TASK-209) adds one block of lines, once, after the per-task state lines**
+— supplementary to the header count above, extending the N-of-M the same way the retry and
+system-verify lines do, never a new task state. Grouped by task in Plan order; the `Tn.k` prefix
+itself carries the task identity, so this reconciles with "`done` tasks need no per-task line" above
+rather than contradicting it — a `done` task still gets no state line, its criteria lines stand alone
+in this block:
+
+```
+Tn.k · ticked | open | overridden · <evidence: test | check | fixture | review | owner-ruling — name it>
+```
+
+Emitted always, same discipline as the header count — a `ticked` line with no named evidence is the
+silent tick ADR-021 exists to close. `ticked` names what proved the criterion: a test run, a
+`check-*.sh` finding, a retained fixture, or a review outcome. This is a distinct vocabulary from
+review-scoping.md's comparand ladder (template → must-FAIL fixture → `check-*.sh` finding →
+`Cites:` line) — the ladder is what a Spec review *measures against*, this line is what *proved a
+tick*; only two of the four overlap (`check`, `fixture`), and the two are related, not identical.
+`open` = not yet ticked, no evidence to claim. `overridden` = ADR-021's recorded owner ruling stands
+in for a failing named check; its evidence cites the Execution Log entry recording that ruling (a
+prose pointer, not a second machine-asserted shape — the only grep-able `owner-ruling:` line this
+repo defines is system-verify's, dispatch.md § System verify; a per-criterion machine-asserted shape
+gets defined only if and when a checker asserts one, not invented here). A task whose criteria share
+one evidence source may compress to one line; criteria that diverge list individually.
+
 **On a denial, record it once and move on — never re-attempt the same operation in a different
 wrapper.** Re-wrapping (adding a `cd`, splitting into a chain, redirecting elsewhere) does not make a
 refused operation permitted, and each attempt costs a full turn. Measured: one run spent ~40% of its

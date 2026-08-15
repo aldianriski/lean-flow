@@ -58,3 +58,34 @@ regex tightened to match the documented contract exactly) · `Standards: archive
 fixture + case 5 added — the violation shape verbatim under `archive/`, asserted skipped). Delta
 re-review: both fixed, non-conforming phrasing correctly rejected, pure-insertion diffs, no new
 violation. One retry total. Harness 5/5 green · QA 145/0.
+
+### 2026-08-15 | progress | T2 `Layers:` corrected — TD-055's row lives in TECH-DEBT.md (L-100)
+Recording before declaring: T2's DoD box 3 requires "TD-055 row updated either way", but
+`TECH-DEBT.md` was not in T2's `Layers:` — the declaration was written against the settle-or-decline
+*outcome*, not the ledger the record lands in. Declared now. Division of labour: the **builder**
+implements the settle inside T2's artifact files (the template's event-kind comment is the authoring
+point TD-055 says is missing) and returns a recommendation; the **coordinator** writes the TD-055 row
+update — the ledger stays coordinator-owned like the sprint file and Log.
+
+### 2026-08-15 | progress | T2 · builder report (dispatched `sonnet`, returned per protocol)
+Per-criterion evidence landed: night-run.md Part 4 (`Tn.k · ticked|open|overridden · <evidence: test |
+check | fixture | review | owner-ruling>`, emitted always — a `ticked` line with no named evidence is
+the silent tick ADR-021 closes), mirrored in review-scoping.md's revise-loop outcome bullet, taught in
+SPRINT.md.template's DoD comment (✓-evidence ticks + *Verify:* clauses, generic wording). TD-055:
+builder correctly declined a note in its files — none is the event-taxonomy authoring point, a fourth
+location repeats L-099 — and recommended the rename; coordinator recorded the ruling on the row
+(rename → follow-up task at close). One judgment call flagged and accepted: per-criterion lines are
+mandatory-always, same discipline as the header count, unlike the conditional retry/system-verify lines.
+
+### 2026-08-15 | progress | revise · T2
+Scoped review returned a concrete violation per axis; the loop fired — second firing this sprint, both
+on dispatched builders. `Spec: false-ladder-equivalence + undefined-analogue → fixed` (the block
+claimed its evidence vocabulary was "the same four" as the comparand ladder — only 2 of 4 overlap; it
+also referenced a "per-criterion analogue" of the `owner-ruling:` shape defined nowhere. Now: ladder
+quoted rung-for-rung as what Spec *measures against*, distinct from what *proved a tick*; `overridden`
+cites the ruling's log entry as a prose pointer — deliberately NOT a second machine-asserted shape
+nothing consumes, TD-052's trap, the mirror of T1's revise which documented a shape a checker DID
+assert) · `Standards: placement-vs-done-rule → fixed` (per-criterion lines are their own block after
+the state lines, `Tn.k` carries identity, reconciliation with "done tasks need no per-task line"
+stated in so many words). Delta re-review: both fixed, single pure-insertion hunk, no collateral,
+grep confirms exactly one machine-asserted `owner-ruling:` shape repo-wide. One retry total. QA 145/0.

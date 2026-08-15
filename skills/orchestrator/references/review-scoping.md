@@ -63,7 +63,10 @@ revise message**, takes the revised diff, and re-runs the same scoped reviewer o
   ≠ consent), writing one rollup line per firing (`night-run.md` Part 0 + Part 4 · ADR-022).
 - **Log the outcome.** The report always shows it; in sprint modes the coordinator also appends one
   Execution Log **`progress`** entry (the log taxonomy defines no `revise` kind, and inventing event
-  kinds is TD-055's trap) titled `revise · Tn`, body: `<axis>: <finding> → fixed | still-open` per axis.
+  kinds is TD-055's trap) titled `revise · Tn`, body: `<axis>: <finding> → fixed | still-open` per
+  axis — each outcome names its evidence in the rollup's own vocabulary (`test | check | fixture |
+  review | owner-ruling` — night-run.md Part 4): `fixed` names what proved it, `still-open` names
+  what's still missing.
 
 Guarded by a retained must-FAIL fixture (`evals/fixtures/revise-loop/`, L-058 · TD-012): the planted
 violation must surface as the named worst finding on its axis, and an inadequate fix must end at the

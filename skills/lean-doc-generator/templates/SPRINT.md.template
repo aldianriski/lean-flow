@@ -45,10 +45,14 @@ Cites: [sources this task answers to — the Spec axis measures against them; om
 **Acceptance:** [one observable, human-verifiable outcome — "done when …"]
 
 **DoD:**
+- [ ] [concrete, checkable step] — *Verify: [the mechanical check that proves it, if one exists]*
 - [ ] [concrete, checkable step]
-- [ ] [concrete, checkable step]
-<!-- QA (suggestion, never a gate): does this task want tests (type → tdd/references/test-strategy.md),
-     a lint / security-review pass, or a perf budget? Note it here; the Review step raises the same prompt. -->
+<!-- A ticked box names its evidence: `- [x] … ✓ <what proved it>` (a test run, a check, a retained
+     fixture, or a review outcome). Where a mechanical check exists, the `*Verify: …*` clause names
+     it — that check's FAIL blocks a silent tick until the owner records a ruling; a criterion naming
+     none stays a judgment tick and says so. QA (suggestion, never a gate): does this task want tests
+     (type → tdd/references/test-strategy.md), a lint / security-review pass, or a perf budget? Note
+     it here; the Review step raises the same prompt. -->
 
 ### T2 — [verb-first title] `[size: S · risk: low · class: execution · AFK]` [CUSTOMIZE]
 …

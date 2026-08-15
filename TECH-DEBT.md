@@ -79,6 +79,14 @@ status: current
     so that task reads this row and settles rename-vs-note in passing or states why not.
     **Unblock condition:** SPRINT-067 T2 landing (the natural vehicle), or the next mid-log
     `complete` misuse — whichever first.
+  - **Ruled 2026-08-15 (SPRINT-067 T2, the named vehicle) — note declined, rename recommended.**
+    T2's own files (night-run.md Part 4 · review-scoping.md · SPRINT.md.template) are none of them
+    the event-taxonomy authoring point — that is `sprint-log.md.template` (+ the checker and
+    `orchestrator/SKILL.md` step 4) — so a note there would be a *fourth* location, repeating L-099's
+    shape while fixing nothing. The clean fix is the rename this row already suspected:
+    `complete` → `run-complete` in `check-night-run-rollup.sh`, its fixtures, and
+    `sprint-log.md.template`, making the collision impossible. **Filed as a follow-up task at
+    SPRINT-067 close**; this row stays open until it ships.
 
 - **TD-054** severity: medium | status: open | created: Sprint-063
   - Summary: **a worktree created by `Agent(isolation: "worktree")` can branch from a stale base, and

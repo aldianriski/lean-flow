@@ -62,7 +62,8 @@ lands in the rollup; exercised once on real input and once on must-FAIL input, f
 ### T2 — Per-criterion evidence lines in the rollup and review report `[size: S · risk: low · class: execution · HITL]`
 Layers: `skills/orchestrator/references/night-run.md` ·
         `skills/orchestrator/references/review-scoping.md` ·
-        `skills/lean-doc-generator/templates/SPRINT.md.template`
+        `skills/lean-doc-generator/templates/SPRINT.md.template` · `TECH-DEBT.md`
+        <!-- TECH-DEBT.md added mid-sprint — TD-055's row is where box 3 records; logged first (L-100) -->
 Depends-on: T1 — night-run.md Part 4 is shared; T1 adds the system-verify verdict line first, T2
             extends the per-criterion format around it (single-owner order, D1)
 Cites: ADR-016 (the N-of-M this extends) · ADR-021 (the contract whose evidence this reports) ·
@@ -77,16 +78,20 @@ verdict + evidence per criterion, extending ADR-016's N-of-M — exercised on th
 rollup.
 
 **DoD:**
-- [ ] The per-criterion line shape is defined in night-run.md Part 4 (extends N-of-M; never a new
+- [x] The per-criterion line shape is defined in night-run.md Part 4 (extends N-of-M; never a new
       task state) and the review report mirrors it in review-scoping.md — *Verify: both sections
-      state the same shape; scoped review confirms no contradiction*
-- [ ] SPRINT.md.template's DoD guidance shows the evidence-noting convention (consumer surface —
-      generic wording, no repo path) — *Verify: template diff + L-015 check in review*
-- [ ] TD-055's rename-vs-note question settled in passing or explicitly declined with the reason
-      (this task owns its surfaces this sprint) — *Verify: TD-055 row updated either way*
+      state the same shape; scoped review confirms no contradiction* ✓ review + delta re-review
+      (revise loop fixed the ladder mis-reference before commit)
+- [x] SPRINT.md.template's DoD guidance shows the evidence-noting convention (consumer surface —
+      generic wording, no repo path) — *Verify: template diff + L-015 check in review* ✓ reviewer
+      grepped the template for repo paths: none
+- [x] TD-055's rename-vs-note question settled in passing or explicitly declined with the reason
+      (this task owns its surfaces this sprint) — *Verify: TD-055 row updated either way* ✓ declined
+      with reason (no in-scope file is the authoring point; a fourth location repeats L-099);
+      rename `complete`→`run-complete` recommended → follow-up task at close
 - [ ] Exercised on this run's own exit rollup — emitted in-run after the Plan's last task, the
       L-121-safe vehicle (a "real sprint close" clause would be close-phase and untickable here) —
-      *Verify: this sprint's rollup carries verdict + evidence per criterion*
+      *Verify: this sprint's rollup carries verdict + evidence per criterion* — ticks at exit (D3)
 
 ## Owner-action checklist
 - [ ] Reinstall the plugin — installed cache is **1.38.0** against a repo now at **1.40.0**, two
@@ -144,6 +149,10 @@ rollup.
 | `skills/orchestrator/SKILL.md` | T1 | Step 6 runs system-verify before close (folded in, 107/140) | low | scoped review |
 | `evals/lib/check-system-verify-block.sh` + `evals/fixtures/system-verify/` | T1 | Retained must-FAIL contract fixtures — 5 legs incl. named-finding FAIL and archive-skip; harness nested to stay in declared Layers (wiring into qa-check.sh = stated gap) | low | harness run, all green ×2 |
 | `evals/README.md` | T1 | Documents the fixture family + nested-harness placement rationale | low | review |
+| `skills/orchestrator/references/night-run.md` | T2 | Part 4 gains the per-criterion evidence block (`Tn.k · ticked\|open\|overridden · <evidence>`), reconciled with the done-task rule; the ladder relation stated accurately after the revise loop | med | scoped review + delta re-review |
+| `skills/orchestrator/references/review-scoping.md` | T2 | Revise-loop outcome lines name their evidence in the rollup's vocabulary | low | scoped review |
+| `skills/lean-doc-generator/templates/SPRINT.md.template` | T2 | DoD comment teaches ✓-evidence ticks + *Verify:* clauses (generic wording — L-015 clean) | low | scoped review (template grep: no repo path) |
+| `TECH-DEBT.md` | T2 | TD-055 ruled: note declined with reason, rename recommended → follow-up at close | low | row updated |
 
 ## Retro
 
