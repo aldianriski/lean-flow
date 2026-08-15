@@ -58,7 +58,7 @@ status: current
     arguments and what does each do bare?), one command's worth of observation; else the next
     bare-invocation near-miss.
 
-- **TD-055** severity: minor | status: open | created: Sprint-064
+- **TD-055** severity: minor | status: resolved → TASK-211 | created: Sprint-064
   - Summary: **`complete` is a reserved run-level event in the Execution Log, and nothing at the point of
     authoring says so.** `check-night-run-rollup.sh` line 42 treats **any** `### … | complete |` entry
     header as the announcement that a *run* finished, then requires the Part 4 rollup header and the
@@ -95,6 +95,18 @@ status: current
     `complete` → `run-complete` in `check-night-run-rollup.sh`, its fixtures, and
     `sprint-log.md.template`, making the collision impossible. **Filed as a follow-up task at
     SPRINT-067 close**; this row stays open until it ships.
+  - **Resolved 2026-08-15 (SPRINT-068 T3, TASK-211) — renamed as ruled.** `complete` → `run-complete`
+    in `check-night-run-rollup.sh` (the entry-header match, now anchored to the delimited event
+    field per L-108), its four fixtures under `evals/fixtures/night-run-rollup/` (three existing
+    logs renamed + a new `task-level-complete-does-not-arm` leg proving the exact misfire shape —
+    task-level `| complete |`, no rollup — now stays green), and `sprint-log.md.template`'s event
+    taxonomy comment (with a one-line note that `run-complete` is run-only; a task finishing is
+    `progress`). **Residual gap outside this task's editable-path scope:** `scripts/night-run.sh`
+    (ADR-016's launcher wrapper, the thing that actually emits the run-level entry) still prints
+    `### <date> | complete | run exited …` — it was not named in this row's own ruling and sits
+    outside T3's file boundary. Until it is updated to emit `run-complete`, the real unattended
+    reaper writes an event this checker no longer recognizes, and Part 4's gate goes silently dark
+    on genuine completed runs. Flagged for the next task/promote to pick up.
 
 - **TD-054** severity: medium | status: open | created: Sprint-063
   - Summary: **a worktree created by `Agent(isolation: "worktree")` can branch from a stale base, and
