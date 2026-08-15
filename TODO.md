@@ -18,9 +18,13 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-066 closed 2026-08-15 (2 of 2, v1.40.0) — ADR-021 (mechanical evidence gates the
-> silent path, never the owner) and ADR-022 (unattended retry only on the mechanical-trigger
-> carve-out). TASK-208/209 are `ready`: the build half of the audit remainder, next promote.
+> **SPRINT-067 — The Proof Layer** → [`docs/sprint/SPRINT-067-the-proof-layer.md`](docs/sprint/SPRINT-067-the-proof-layer.md)
+>
+> Build what SPRINT-066's rulings enabled: the system-verify pass over the integrated tree after the
+> last wave (T1 = TASK-208) and per-criterion verdict + evidence lines in the rollup (T2 = TASK-209).
+> With these the second gauntlet audit's remainder is fully landed — contract ruled (066), proof
+> built (067). Sequenced T1 → T2 (`night-run.md` Part 4 is shared, single-owner order). No epic
+> stamp; TD-055 gets settled or explicitly declined by T2, which owns its surfaces this sprint.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard** (next — TASK-198 is its

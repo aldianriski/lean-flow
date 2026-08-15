@@ -70,6 +70,15 @@ status: current
     word in three places. A rename touches the checker and its fixtures; a note does not.
   - Tracker: SPRINT-064 T1 Execution Log · `check-night-run-rollup.sh` line 42 · TD-052 (the same
     category — a procedural contract with no fixture) · L-015
+  - **Re-reviewed 2026-08-15 (SPRINT-067 promote, 3 sprints open) — first aging re-review; held, with
+    a named vehicle this time.** No new misuse since the SPRINT-064 firing — SPRINT-065/066 logs used
+    `progress` correctly throughout, including for retry outcomes (the `revise · Tn` title-text
+    convention exists precisely because inventing a `revise` event kind is this row's trap). The
+    rename-vs-document question stays un-derived per L-091 — but **SPRINT-067 T2 (TASK-209) edits
+    Part 4's rollup shape and the template's DoD guidance**, exactly the surfaces a fix would touch,
+    so that task reads this row and settles rename-vs-note in passing or states why not.
+    **Unblock condition:** SPRINT-067 T2 landing (the natural vehicle), or the next mid-log
+    `complete` misuse — whichever first.
 
 - **TD-054** severity: medium | status: open | created: Sprint-063
   - Summary: **a worktree created by `Agent(isolation: "worktree")` can branch from a stale base, and
@@ -211,6 +220,13 @@ status: current
     not missed coverage. That shifts the balance among the row's three candidates toward **(c) make the
     skip loud**, which is the cheapest and addresses the demonstrated failure rather than the feared one.
     Still not derived. **Unblock condition:** one close commit carrying an undeclared file that mattered.
+  - **Re-reviewed 2026-08-15 (SPRINT-067 promote, 3 sprints since last) — held, trigger unchanged.**
+    Two more closes since (SPRINT-065 `c723b76`, SPRINT-066 `029f698`), both carrying the archival
+    rename + manifests + ledgers, both invisible to leg 15, and no evidence either carried an
+    undeclared file that mattered — the blind spot's cost remains invisibility, not missed coverage.
+    Balance still favours candidate (c) make-the-skip-loud when the trigger fires. Adjacent note:
+    SPRINT-067 T1 (TASK-208) adds a system-verify pass at merge-back, which narrows what a close
+    commit could silently carry — evidence for holding, not for acting.
 
 - **TD-050** severity: minor | status: open | created: Sprint-060
   - Summary: **section 4 of `scripts/qa-check.sh` (knowledge metadata — index freshness, dangling refs,
@@ -319,6 +335,11 @@ status: current
     T1's Layers). No false positive from basename matching appeared in four opportunities: weak evidence
     in the row's favour, and recorded as weak rather than dressed up. **Unblock condition:** a false
     positive that costs a real edit — not a theoretical one, and not another sprint of quiet.
+  - **Re-reviewed 2026-08-15 (SPRINT-067 promote, 3 sprints since last) — held, and the checker banked
+    another genuine catch.** SPRINT-066's promote render was caught declaring a file in `Layers:` while
+    escaping it in `Cites:` — a correct finding that cost a real fix, the opposite direction from the
+    false positive this row waits on. Zero FPs across SPRINT-065/066's `Layers:`/`Cites:` exercises
+    (several per sprint, including two mid-task amendments). **Unblock condition:** unchanged.
 
 - **TD-047** severity: minor | status: open | created: Sprint-057
   - Summary: `night-run.md` is **414 lines** and carries five Parts plus a pre-flight checklist that
@@ -349,6 +370,13 @@ status: current
     skill reference, uncounted by ADR-006, so the cap conversation those ADRs opened does not reach it.
     The concern stays navigational, not mechanical. **Unblock condition:** a reader or a run demonstrably
     failing to find a Part it needed — never line count alone, which is what ADR-006 already settled.
+  - **Re-reviewed 2026-08-15 (SPRINT-067 promote, 3 sprints since last) — held, and the file grew
+    again.** SPRINT-066 added two boundary-table rows to Part 0 and a retry-line paragraph to Part 4
+    (ADR-022), and SPRINT-067 T1/T2 will add the system-verify verdict and evidence lines to Part 4 —
+    all load-bearing, none skippable, which is this row's trend continuing rather than its trigger
+    firing. Still no night run since SPRINT-057, so the read-under-pressure condition remains
+    unmeasured. **Unblock condition:** unchanged — and the next actual night-run pre-flight should
+    note which items it skims, which is one line of observation for free.
 
 - **TD-045** severity: minor | status: open | created: Sprint-056
   - Summary: the dispatch preflight in `dispatch.md` still re-implements the `Layers:`/`Depends-on:`
@@ -376,6 +404,10 @@ status: current
     them a common rule representation; this row's duplicate parser is a member of exactly that question,
     so it now **inherits D3's unblock condition** instead of carrying its own. No third drift has appeared.
     Do not re-derive a consolidation from this row before that spec exists — that is the work D3 declined.
+  - **Re-reviewed 2026-08-15 (SPRINT-067 promote, 3 sprints since last) — held on the inherited
+    condition.** EPIC-003 has not started (still `proposed`; TASK-198 is its opening ruling), so the
+    spec this row waits on does not exist yet. No third drift; the parity fixture has still never
+    fired across two more sprints of preflight runs. Nothing to re-derive.
 
 - **TD-037** severity: minor | status: open | created: Sprint-049
   - Summary: attribution needs a commit to read, so **uncommitted work in progress is still tested
@@ -436,3 +468,8 @@ status: current
     "unattributable because uncommitted" shape this row describes, and its cost was a moment's confusion:
     evidence **for** the row's own guess that no cure is warranted. **Unblock condition:** act only if a
     path-2 report ever masks a real per-task collision, rather than merely inconveniencing a close.
+  - **Re-reviewed 2026-08-15 (SPRINT-067 promote, 18 sprints open) — held, trigger unchanged.** No
+    union-attributable miss in SPRINT-065/066; both ran sequential single-owner tasks where the union
+    and the task coincide, so the window this row describes barely opened. Sixth consecutive reaffirm,
+    recorded rather than performed silently — still the ledger's worked example that a re-review which
+    reaffirms is a decision.
