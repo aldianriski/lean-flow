@@ -54,7 +54,11 @@ run's close, versus the spine standing unchanged.
 - [x] `review-scoping.md` § QA suggestion says, after the ruling, what may gate and what only reports
 
 ### T2 — Rule whether the revise loop may run unattended, and on what budget `[size: S · risk: med · class: decision · HITL]`
-Layers: `skills/orchestrator/references/night-run.md` · `docs/adr/`
+Layers: `skills/orchestrator/references/night-run.md` · `docs/adr/` ·
+        `skills/orchestrator/references/review-scoping.md` · `docs/DECISIONS.md` ·
+        `skills/orchestrator/SKILL.md` · `.claude/CONTEXT.md`
+        <!-- review-scoping/DECISIONS added mid-sprint (L-100); SKILL/CONTEXT added by the revise
+             loop's own Spec finding — the stale "unattended never retries" lines (L-020) -->
 Depends-on: T1 — its boundary is an input: a retry triggered by a mechanical FAIL under a
             T1-sanctioned gate is a different question from one triggered by critic judgement
 Cites: ADR-016 (rollup contract) · EPIC-005 D2 (delegation policy declared per repo) ·
@@ -69,14 +73,14 @@ with a hard ceiling and a rollup line per retry if allowed, or an explicit "atte
 reason stated in `night-run.md` Part 0.
 
 **DoD:**
-- [ ] The charter collision resolved head-on — the ruling says which yields, and never reads the
-      retry as mere execution
-- [ ] One branch recorded with the branch stated: allowed → hard ceiling + one ADR-016 rollup line
+- [x] The charter collision resolved head-on — the ruling says which yields, and never reads the
+      retry as mere execution (the carve-out splits ADR-021's *verdict classes*: judgment always
+      parks; a named-check FAIL executes three prior human decisions — logged in full)
+- [x] One branch recorded with the branch stated: allowed → hard ceiling + one ADR-016 rollup line
       per retry wired into Part 4's shape; refused → "attended only" + reason lands in Part 0
-- [ ] The budget half ruled EPIC-005-D2-shaped: policy declared per repo, read by the run, never held
-      by a coordinator process
-- [ ] Ruling recorded durably — an ADR if it qualifies (§4), else the D-row states why not; if G2
-      cannot settle it, `/council` runs before the ruling and its verdict is folded in
+- [x] The budget half ruled EPIC-005-D2-shaped: policy declared per repo, read by the run, never held
+      by a coordinator process (absence = never; format concretizes in EPIC-005)
+- [x] Ruling recorded durably — ADR-022; settled decisively at G2, so `/council` was not needed
 
 ## Owner-action checklist
 - [ ] Reinstall the plugin — installed cache is **1.38.0** against a repo at **1.39.0** (the v1.39.0
@@ -129,6 +133,12 @@ reason stated in `night-run.md` Part 0.
 | `skills/orchestrator/SKILL.md` | T1 | G2 checklist line: each done-when notes its verification method where a mechanical check exists (106/140) | low | scoped review |
 | `.claude/CONTEXT.md` | T1 | G2 row extended in place with the ADR-021 pointer (0 new lines, 132/150) | low | scoped review |
 | `docs/DECISIONS.md` | T1 | ADR-021 index row | low | link resolves |
+| `docs/adr/ADR-022-unattended-retry-mechanical-carve-out.md` | T2 | The ruling: unattended retry only on a mechanical verdict + declared repo policy (three prior human decisions); judgment always parks | med | scoped review + delta re-review |
+| `skills/orchestrator/references/night-run.md` | T2 | Part 0 gains the two carve-out boundary rows; Part 4 the one-line-per-retry shape; `last_updated` bumped (revise-loop Standards finding) | med | scoped review + delta re-review |
+| `skills/orchestrator/references/review-scoping.md` | T2 | Revise-loop "Unattended:" bullet now states the ADR-022 carve-out instead of citing TASK-203 as open | low | scoped review |
+| `skills/orchestrator/SKILL.md` | T2 | § Review sentence updated to the carve-out (revise-loop Spec finding — stale wiring; 107/140) | low | delta re-review |
+| `.claude/CONTEXT.md` | T2 | § Built-in leverage revise-loop clause updated in place (revise-loop Spec finding; 132/150) | low | delta re-review |
+| `docs/DECISIONS.md` | T2 | ADR-022 index row | low | link resolves |
 
 ## Retro
 

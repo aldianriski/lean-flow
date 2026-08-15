@@ -52,3 +52,40 @@ four touchpoints, and the reviewer independently verified the `gates_signed`/`pl
 against git. No concrete violation → the revise loop correctly did not fire. T2's fork was ruled by
 the owner while the review ran (frontier open once T1's answer existed): **mechanical-trigger
 carve-out → ADR-022** — implementation follows in D1 commit order.
+
+### 2026-08-15 | progress | T2 `Layers:` corrected — the ruling reaches the revise loop's own text (L-100)
+Recording before declaring: T2's `Layers:` named `night-run.md` and `docs/adr/`, but the revise
+loop's section in `review-scoping.md` carries the literal line "**Unattended: never** … is TASK-203's
+ruling, not this section's" — which the ruling just made stale. Leaving it would ship a contradiction
+between the two references (the exact wiring gap L-020 names, and the one the T1 reviewer was told to
+watch for). `review-scoping.md` and `docs/DECISIONS.md` (the index row every ADR gets) added to
+`Layers:`; T1's ownership of `review-scoping.md` ended at its commit (`d7a86e7`), so the D1 sequence
+holds — no shared WIP.
+
+**On the task's own warning** ("do not resolve the collision by reading the retry as mere
+execution"): the carve-out does not read *the retry* as execution — it splits the **verdict classes**
+ADR-021 created. A critic's "not good enough" stays a decision and still parks, always. A
+`done-when`-named check's FAIL is a decision the human already made — at G2, when they named the
+check — so acting on it once, under a ceiling the owner also set, inside a policy the repo explicitly
+declared, is executing three prior human decisions, not making a new one. Absence of the declared
+policy = never (absence ≠ consent).
+
+### 2026-08-15 | progress | revise · T2
+The scoped review of T2's diff returned a concrete violation per axis, and the loop fired on its own
+subject matter. `Standards: night-run-last-updated-stale → fixed` (the file's own `update_trigger`
+names "pre-flight/trigger/rollup logic" and this edit touched two of the three; frontmatter bumped to
+2026-08-15) · `Spec: stale-unattended-wiring → fixed` (the superseded rule survived in the two
+consumer touchpoints CLAUDE.md's wiring check names — `orchestrator/SKILL.md` § Review still said
+"unattended never retries — TASK-203" and CONTEXT.md § Built-in leverage said "attended only"; both
+now carry the ADR-022 carve-out, SKILL.md 107/140, CONTEXT.md in-place at 132/150). T2's `Layers:`
+amended a second time for the two files the fix touched — the revise loop's Spec axis caught the
+exact L-020 gap on the change that extends the revise loop, which is the mechanism working where it
+was built to. One retry total; re-review on the delta follows.
+
+### 2026-08-15 | progress | T2 shipped — ADR-022 recorded and wired; re-review confirms both fixes; 4/4 DoD ticked
+The delta re-review reported `Standards: night-run-last-updated-stale → fixed` and
+`Spec: stale-unattended-wiring → fixed`, no new violations introduced, SKILL.md confirmed 107/140,
+and the log's `revise · T2` entry confirmed taxonomy-clean (title text, not an invented event kind).
+All four touchpoints now agree on the carve-out's three conditions: ADR-022 · night-run.md Part 0
+rows + Part 4 retry-line · review-scoping.md § revise loop · SKILL.md § Review + CONTEXT.md § Built-in
+leverage. `/council` was not needed — the fork settled decisively at G2. Commit follows in D1 order.

@@ -55,10 +55,12 @@ revise message**, takes the revised diff, and re-runs the same scoped reviewer o
   review report surfaces `finding → retry → outcome` per axis before anything commits — the human gates
   the commit, not each firing. A suggestion-only pass (no concrete violation) skips the retry and reports
   as before.
-- **Unattended: never.** A critic ruling "not good enough, retry" is a *decision*, and the unattended
-  charter is execute-only (`night-run.md` Part 0) — an unattended run reports the findings in its rollup
-  and leaves them. Whether a bounded retry may ever fire unattended is TASK-203's ruling, not this
-  section's.
+- **Unattended: only the ADR-022 carve-out.** A critic ruling "not good enough, retry" is a
+  *decision* and **always parks** — the execute-only charter is unchanged for judgment findings. But a
+  **mechanical verdict** (a `done-when`-named check FAIL / failed comparand rung — the ADR-021 class)
+  is a decision the human already made at G2, so an unattended run may fire this same single bounded
+  retry on it **when the repo's declared policy enables it** (absence of the policy = never — absence
+  ≠ consent), writing one rollup line per firing (`night-run.md` Part 0 + Part 4 · ADR-022).
 - **Log the outcome.** The report always shows it; in sprint modes the coordinator also appends one
   Execution Log **`progress`** entry (the log taxonomy defines no `revise` kind, and inventing event
   kinds is TD-055's trap) titled `revise · Tn`, body: `<axis>: <finding> → fixed | still-open` per axis.

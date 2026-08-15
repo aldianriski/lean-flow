@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-01
+last_updated: 2026-08-15
 update_trigger: night-run mechanism changes (pre-flight, trigger, watchdog, or rollup logic)
 status: current
 ---
@@ -47,6 +47,8 @@ table below still resolves:
 | `promote` governance sign-off | ⛔ park | judgement + scope-changing (it *forms* the Plan) |
 | `promote` sprint render · `plan locked` commit | ⛔ park | downstream of the sign-off above |
 | Per-task Implement → self-review → commit → tick DoD | ✅ | additive, inside the approved Plan |
+| Revise-loop retry — trigger is **mechanical** (a `done-when`-named check FAIL / failed comparand rung, the ADR-021 class) **and** the repo's declared policy enables it | ✅ (ADR-022) | already-approved-in-scope ×3: the check was named at G2, the ceiling owner-ruled (one retry per pass), the policy declared per repo (EPIC-005 D2; **absence = never**). One rollup line per firing |
+| Revise-loop retry — critic **judgment** finding, or no policy declared | ⛔ park | judgement — a ceiling bounds a decision's cost, it does not make it not-a-decision (ADR-022) |
 | Execution Log append | ✅ | additive |
 | `close` Retro + four-bucket auto-file + `close_commit` | ✅ | additive bookkeeping, no approval gate |
 | `close` §11 retention (archive · move · prune · compact) | ⛔ park | lossy |
@@ -467,6 +469,11 @@ allowlist, re-run). `stalled` = the watchdog fired (next: resume via `/prime` + 
 Distinguish `parked-hitl` from `denied-tool` in the morning: a park is the contract working as
 designed and needs a decision; a denial is an under-scoped allowlist and needs a config fix. And
 distinguish both from `unattempted`: those two were *reached*, this one never was.
+
+**A revise-loop retry (ADR-022) adds one line per firing** beneath its task's state line —
+`Tn · retry · <axis>: <finding> → fixed | still-open` — emitted whether or not the retry succeeded.
+A `still-open` outcome parks the task (`parked-hitl`, the finding named); the states above are
+unchanged — the retry line is supplementary, never a new task state.
 
 **On a denial, record it once and move on — never re-attempt the same operation in a different
 wrapper.** Re-wrapping (adding a `cd`, splitting into a chain, redirecting elsewhere) does not make a
