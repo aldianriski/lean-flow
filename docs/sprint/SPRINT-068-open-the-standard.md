@@ -77,7 +77,7 @@ Layers: `scripts/lib/check-night-run-rollup.sh` · `evals/fixtures/` ·
         `skills/lean-doc-generator/templates/sprint-log.md.template` · `TECH-DEBT.md`
 Depends-on: none
 Cites: TD-055 (ruled 2026-08-15 — rename, not a note) · L-015 · L-123 · `qa-check.sh` (run to prove the archive stays green — never edited by this task)
-`complete` written to mean "this task finished" silently arms the run-level rollup assertions.
+Writing `complete` to mean "this task finished" silently arms the run-level rollup assertions.
 Renaming the run-level event makes the collision impossible instead of documented.
 
 **Acceptance:** the run-level Execution Log event is `run-complete` in the checker, its fixtures,
