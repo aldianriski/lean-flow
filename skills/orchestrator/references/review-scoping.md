@@ -42,6 +42,31 @@ the wrong feature, and the right feature that violates every convention, are *di
 them into a single ranking lets a strong showing on one axis mask a defect on the other. Close with the
 single worst finding **per axis**, kept apart. (mattpocock/skills → code-review, the separation principle.)
 
+## The revise loop — one bounded retry (attended modes only)
+
+The worst finding per axis is not terminal — it is the input to **one bounded retry**. When at least one
+axis's worst finding is a **concrete violation** (a failed comparand rung, or a named repo convention —
+not a style suggestion), the coordinator hands both axes' worst findings back to the builder in **one
+revise message**, takes the revised diff, and re-runs the same scoped reviewer once on the delta.
+
+- **Ceiling: one retry per review pass, total.** Both findings travel together; there is never a second
+  retry. Whatever the re-review still flags goes to the owner as `still-open` — the loop cannot spiral.
+- **Fires automatically in attended modes** (`quick` · `mvp` · `sprint-bulk` with a human present). The
+  review report surfaces `finding → retry → outcome` per axis before anything commits — the human gates
+  the commit, not each firing. A suggestion-only pass (no concrete violation) skips the retry and reports
+  as before.
+- **Unattended: never.** A critic ruling "not good enough, retry" is a *decision*, and the unattended
+  charter is execute-only (`night-run.md` Part 0) — an unattended run reports the findings in its rollup
+  and leaves them. Whether a bounded retry may ever fire unattended is TASK-203's ruling, not this
+  section's.
+- **Log the outcome.** The report always shows it; in sprint modes the coordinator also appends one
+  Execution Log **`progress`** entry (the log taxonomy defines no `revise` kind, and inventing event
+  kinds is TD-055's trap) titled `revise · Tn`, body: `<axis>: <finding> → fixed | still-open` per axis.
+
+Guarded by a retained must-FAIL fixture (`evals/fixtures/revise-loop/`, L-058 · TD-012): the planted
+violation must surface as the named worst finding on its axis, and an inadequate fix must end at the
+ceiling as `still-open → owner` — never a second retry.
+
 ## Skip table — which passes actually fire
 
 Don't fire every pass on every change. Decide per diff:

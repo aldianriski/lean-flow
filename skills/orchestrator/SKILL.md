@@ -86,7 +86,10 @@ Run checks in a **fresh, isolated context** (a reviewer who didn't write the cod
 the diff + its blast radius** — never the whole repo (the fan-out re-scan is the biggest token sink). A **skip table** +
 **scale-depth** rule decide what fires: docs/trivial → self-review only · small/med → one scoped `sonnet` reviewer · large/high-risk → `/code-review` · behaviour change → `/run` + `/verify` · auth/input/secrets → `/security-review` · bug → `/diagnose`.
 
-Full routing · skip table · the Standards-vs-Spec axes · adversarial floor · self-review checklist → `${CLAUDE_SKILL_DIR}/references/review-scoping.md`.
+A pass's worst finding **per axis** feeds **one bounded builder retry** — automatic in attended modes only, one retry per
+pass, re-reviewed once; whatever is still open goes to the owner (the revise loop; unattended never retries — TASK-203).
+
+Full routing · skip table · the Standards-vs-Spec axes · the revise loop · adversarial floor · self-review checklist → `${CLAUDE_SKILL_DIR}/references/review-scoping.md`.
 
 ## Red flags
 

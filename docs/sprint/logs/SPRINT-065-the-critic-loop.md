@@ -128,3 +128,32 @@ per the logged scope-change, tick all four, commit**. Box 3 now reads "archival 
 `/lean-doc-generator close`" (§11 member-sprint rule); box 4 is recorded antecedent-false. The archive
 itself fires at this sprint's close, where every member sprint of EPIC-002 will in fact have closed.
 T2 committed in D1 order (T1 → **T2** → T3).
+
+### 2026-08-15 | progress | T3 — revise loop shipped; residuals ruled; must-FAIL fixture ran both legs
+Owner ruled the three G2 residuals in one frontier popup: **ceiling = one retry per review pass**
+(both axes' worst findings travel together, never a second retry) · **fires automatically** in
+attended modes on a concrete violation, outcome surfaced before commit · **exercise in-session** via
+`sonnet` dispatches. Shipped: `review-scoping.md` § The revise loop + a two-line hook in
+`SKILL.md` § Review (83/140 after edit). Fixture: `evals/fixtures/revise-loop/` (planted violation
+per axis, tells kept out of `input/`).
+
+**Leg 1 (detection):** both planted violations surfaced named. The Standards run also caught an
+*accidental* third violation — the status file's own text parked an open question, a real CLAUDE.md
+anti-pattern — which outranked the planted one; removed from the retained input so it carries exactly
+one planted violation per axis, and the README asserts "surfaces as a violation" rather than "worst"
+on Standards (two runs showed that ranking is reviewer-mood-dependent; the Spec planted finding *is*
+asserted worst). **Leg 2 (ceiling):** scripted-partial builder (haiku) renamed the file, declined the
+Spec finding; re-review (sonnet) reported naming clean, re-flagged the missing sections →
+`Standards: naming-convention → fixed · Spec: template-sections-absent → still-open → owner`. One
+retry total; no second firing. Fixtures retained (TD-012), exercised per L-058.
+
+### 2026-08-15 | progress | revise · T3
+The real-input firing: a scoped `sonnet` reviewer took T3's own diff and returned a concrete violation
+per axis — the loop's first genuine run, on the change that built it. `Standards: undefined-event-kind
+→ fixed` (the prescribed log line invented a `revise` event kind the sprint-log taxonomy doesn't
+define — TD-055's trap, caught against the template comparand; now logs as a `progress` entry) ·
+`Spec: unverified-exercise-claim → fixed` (the fixture README asserted results "recorded in the
+Execution Log" before the entry existed — the L-057 family, a report ahead of its artifact; README
+now states actuals and the cited entry exists). One retry, one re-review, both cleared; the reviewer
+also confirmed no contradiction with `night-run.md` Part 0 (unattended never retries — TASK-203's
+question, explicitly deferred). Secondary suggestion (hook-line bolding) applied in the same pass.

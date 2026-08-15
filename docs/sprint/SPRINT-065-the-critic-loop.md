@@ -91,12 +91,16 @@ findings go to the owner. That is the L-020 shape, a computed value never wired 
 bounded retry, re-reviewed, and the outcome logged.
 
 **DoD:**
-- [ ] Retry is **bounded** and the ceiling is stated, not implied
-- [ ] **Attended modes only** (`quick` · `mvp` · `sprint-bulk` with a human present) — unattended is
-      TASK-203 and must not be smuggled in here
-- [ ] Exercised once on **real input** and once on input that **must FAIL** with its named finding
-      (L-058); fixtures **retained** (TD-012)
-- [ ] Home is `references/` (uncounted, ADR-006) with a hook from SKILL.md § Review — 102/140 at promote
+- [x] Retry is **bounded** and the ceiling is stated, not implied — **one retry per review pass,
+      total** (owner-ruled at the residual grill)
+- [x] **Attended modes only** (`quick` · `mvp` · `sprint-bulk` with a human present) — unattended is
+      TASK-203 and must not be smuggled in here — the section says "unattended: never" and defers
+      the question to TASK-203 by name
+- [x] Exercised once on **real input** (T3's own diff — both axes' violations handed back, fixed,
+      re-review cleared) and once on input that **must FAIL** with its named finding
+      (L-058); fixtures **retained** (TD-012) — `evals/fixtures/revise-loop/`
+- [x] Home is `references/` (uncounted, ADR-006) with a hook from SKILL.md § Review — 102/140 at promote,
+      83/140 measured after the edit
 
 ## Owner-action checklist
 - [ ] Reinstall the plugin — session skills have run at **1.34.0** against a repo now at **1.38.0**
@@ -153,6 +157,9 @@ bounded retry, re-reviewed, and the outcome logged.
 | `skills/lean-doc-generator/templates/SPRINT.md.template` | T1 | `Cites:` documented as optional-but-load-bearing (rung 4) — it was in real use across 17 of 65 sprints while defined nowhere; the preflight's deliberate exclusion is stated inline so a `Layers:` path is not parked there | low | `qa-check.sh` |
 | `docs/sprint/logs/SPRINT-065-the-critic-loop.md` | T1 | Execution Log created lazily at first entry (ADR-014) | low | `check-sprint-log-layout` |
 | `docs/epic/EPIC-002-make-room.md` | T2 | Condition 1 re-worded to **sprints of growth** (a percentage misreads a 0.83 lines/sprint file — ADR-017's prior ruling applied) and judged: both SSOT files ≈ 20–21 sprints of headroom, all four conditions `[x]`; archival deferred to close (§11 member-sprint rule) | low | `check-epic-archive.sh` |
+| `skills/orchestrator/references/review-scoping.md` | T3 | § The revise loop — the worst finding per axis now feeds **one bounded builder retry** (one per pass, attended only, auto-fire on a concrete violation, outcome logged as a `progress` entry); closes the L-020 gap where the computed value had no consumer | med | fixture legs 1+2 (`evals/fixtures/revise-loop/`) |
+| `skills/orchestrator/SKILL.md` | T3 | Two-line hook from § Review to the revise loop (83/140 after edit) | low | self-review |
+| `evals/fixtures/revise-loop/` | T3 | Retained must-FAIL fixture — planted violation per axis, scripted-partial builder recipe; exercised in-session, both legs held (L-058 · TD-012) | low | the exercise itself |
 
 ## Retro
 
