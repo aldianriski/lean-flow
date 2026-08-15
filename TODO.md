@@ -18,13 +18,10 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-067 — The Proof Layer** → [`docs/sprint/SPRINT-067-the-proof-layer.md`](docs/sprint/SPRINT-067-the-proof-layer.md)
->
-> Build what SPRINT-066's rulings enabled: the system-verify pass over the integrated tree after the
-> last wave (T1 = TASK-208) and per-criterion verdict + evidence lines in the rollup (T2 = TASK-209).
-> With these the second gauntlet audit's remainder is fully landed — contract ruled (066), proof
-> built (067). Sequenced T1 → T2 (`night-run.md` Part 4 is shared, single-owner order). No epic
-> stamp; TD-055 gets settled or explicitly declined by T2, which owns its surfaces this sprint.
+> _None._ SPRINT-067 closed 2026-08-15 (2 of 2, v1.41.0) — the system-verify pass (a run proves its
+> integrated tree) and per-criterion evidence lines (every tick names what proved it). The second
+> gauntlet audit's arc is complete: mapped → ruled (066) → proven (067). Follow-ups TASK-210/211
+> filed `ready`; TASK-198 remains EPIC-003's opening ruling.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard** (next — TASK-198 is its
@@ -61,41 +58,36 @@ status: current
       origin:     manual
       state:      ready
 
-- [ ] TASK-208 — Wire a system-verify pass after the last wave's merge-back  [size: M] [risk: med] [HITL]
+- [ ] TASK-210 — Wire check-system-verify-block.sh into the QA gate  [size: S] [risk: low] [AFK]
       class:      execution
-      done-when:  after a multi-task run's final merge-back, one named full-gate pass (the host repo's
-                  own gate command) runs against the integrated tree and its verdict lands in the
-                  rollup — exercised once on real input AND once on input that must FAIL with its
-                  named finding, fixtures retained (L-058 · TD-012)
-      touches:    skills/orchestrator/references/dispatch.md § Merge-back queue ·
-                  skills/orchestrator/SKILL.md (hook line, cap-checked) · evals/fixtures/
-      depends-on: none — TASK-207 ruled as ADR-021 (SPRINT-066 T1): a done-when-named check's FAIL
-                  blocks the silent tick, owner override recorded; the pass gates accordingly
-      assumes:    upgrades dispatch.md's existing per-wave "interaction-only smoke check", not a new
-                  subsystem. Scope = multi-task merge-back only — locally-green ≠ globally-green is
-                  the failure it exists for; single-task mvp is already covered by Review. The gate
-                  command is discovered from the host repo, never hard-coded (no leaked scripts/…
-                  path — L-015; this repo dogfoods via its own gate). Unattended wording defers to
-                  TASK-203 by pointer, never decides
-      tracker:    dispatch.md § Merge-back queue · ADR-016 · ADR-021 · L-015 · L-058
-      origin:     decomposer
+      done-when:  the system-verify contract checker runs inside `sh scripts/qa-check.sh` (registered
+                  per the gate's own harness conventions), its five fixture legs green in-gate, and a
+                  deliberate violation FAILs the gate with the named finding
+      touches:    scripts/qa-check.sh · evals/ (paths only if registration requires the harness at
+                  the standard evals/run-*.sh location)
+      depends-on: none
+      assumes:    SPRINT-067 T1 deliberately deferred this ("qa-check.sh: run, never edited" bound
+                  that task; the builder's placement deviation named the gap). Moving the nested
+                  harness is in scope; the five legs and their named findings stay identical (L-058)
+      tracker:    SPRINT-067 T1 builder deviation · evals/README.md § system-verify · L-058
+      origin:     close-retro
       state:      ready
 
-- [ ] TASK-209 — Per-criterion evidence lines in the rollup and review report  [size: S] [risk: low] [HITL]
+- [ ] TASK-211 — Rename the reserved `complete` event to `run-complete`  [size: S] [risk: med] [HITL]
       class:      execution
-      done-when:  a ticked DoD line names the evidence that ticked it (test / check / fixture /
-                  review outcome), and the run rollup carries verdict + evidence per criterion,
-                  extending ADR-016's N-of-M — exercised on one real sprint close
-      touches:    skills/orchestrator/references/night-run.md Part 4 · review-scoping.md ·
-                  sprint templates (consumer surface — L-015)
-      depends-on: none — TASK-207 ruled as ADR-021 (SPRINT-066 T1); the contract to report is the
-                  done-when-named check + recorded owner rulings it defines
-      assumes:    reporting-only regardless of TASK-207's gating answer — a report aligns with the
-                  raise-never-gate spine either way — but its SHAPE is the contract TASK-207 defines,
-                  so it stays blocked on the ruling. Extends the ADR-016 rollup, never forks it;
-                  template edits ship to consumers (L-015)
-      tracker:    ADR-016 · ADR-021 · night-run.md Part 4 · L-015
-      origin:     decomposer
+      done-when:  the run-level Execution Log event is `run-complete` in `check-night-run-rollup.sh`,
+                  its fixtures, and `sprint-log.md.template`'s taxonomy comment, with a task-level
+                  "complete" no longer arming the rollup assertions; the checker's must-FAIL legs
+                  pass with the renamed finding, and TD-055 is marked resolved
+      touches:    scripts/lib/check-night-run-rollup.sh · evals/fixtures/ (rollup fixtures) ·
+                  skills/lean-doc-generator/templates/sprint-log.md.template
+      depends-on: none
+      assumes:    TD-055's ruled cure (SPRINT-067 T2: a note was declined with reason — no in-scope
+                  file was the authoring point; the rename makes the collision impossible). Historical
+                  logs keep `complete` — archives are not re-litigated (the */archive/* skip
+                  convention). The template ships to consumers (L-015)
+      tracker:    TD-055 (ruled 2026-08-15) · check-night-run-rollup.sh · L-015
+      origin:     close-retro
       state:      ready
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
@@ -137,7 +129,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-066's shipped changes are written up as **v1.40.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.40.0 + v1.39.0** inline, with **v1.38.0 rotated** → [`docs/changelog/CHANGELOG-1.38.0.md`](docs/changelog/CHANGELOG-1.38.0.md) in the same commit.
+_(no active sprint)_ — SPRINT-067's shipped changes are written up as **v1.41.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.41.0 + v1.40.0** inline, with **v1.39.0 rotated** → [`docs/changelog/CHANGELOG-1.39.0.md`](docs/changelog/CHANGELOG-1.39.0.md) in the same commit.
 
 ---
 

@@ -3,7 +3,7 @@ sprint: 067
 slug: the-proof-layer
 owner: Maintainer
 last_updated: 2026-08-15
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -107,3 +107,14 @@ Both tasks done (no state lines — the header count carries them; the Tn.k bloc
 Part 4 now specifies). Shape: coordinator + 2 sonnet builders + 4 sonnet review passes (2 scoped ·
 2 delta re-reviews); the revise loop fired twice, once per task, both closed at the one-retry ceiling.
 Next: `/lean-doc-generator close`.
+
+### 2026-08-15 | close | 2 of 2 units — v1.41.0; §11 applied; L-122 reaches count 2
+Retro written and routed: Shipped → CHANGELOG **v1.41.0** (MINOR — both features consumer-visible) ·
+Follow-ups → **TASK-210** (wire the system-verify checker into the QA gate — T1's stated gap) +
+**TASK-211** (rename `complete`→`run-complete` — TD-055's ruled cure), both `origin: close-retro` ·
+Learnings → **L-123** filed (a machine-asserted shape and its checker are born together, or not at
+all — the sprint's two mirror-image revise catches) + **L-122 → count 2** (both builders' misses
+caught only by comparand-briefed reviewers), promotable at the next promote. §11 on owner approval:
+sprint + log → archive · TASK-208/209 removed from the Backlog · CHANGELOG v1.39.0 rotated. **The
+reinstall owner-action carries a third sprint** (1.38.0 installed vs 1.41.0 repo) — re-filed on
+SPRINT-068's checklist. QA gate before the close commit; `close_commit` backfilled after.

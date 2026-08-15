@@ -22,7 +22,7 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-122**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-123**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
@@ -30,9 +30,17 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 
 ---
 
-## L-122 [tags: process] [status: active]: **Brief the Spec-axis reviewer with the *decision as logged*, not the diff alone — it turns the wiring check into a mechanical matcher.** SPRINT-066 T2's builder pass shipped the ADR-022 ruling with two consumer touchpoints still stating the superseded rule (`orchestrator/SKILL.md` § Review "unattended never retries — TASK-203" · CONTEXT.md § Built-in leverage "attended only") — the exact L-020 gap, missed at build time with the wiring-check DoD loaded in context. The scoped reviewer was handed the Execution Log's ruling text as the Spec comparand plus the instruction "any touchpoint stating a condition the others omit, or omitting one, is a finding" — it caught both in one pass; the bounded retry fixed them; the delta re-review confirmed with no new violations. The promoted wiring rule said *what* to check; the comparand-briefed reviewer is the first thing that *checked* it mechanically. Pattern: when a review follows a ruling, the ruling text is the Spec comparand — the ladder's `Cites:` rung at minimum, the logged decision verbatim when one exists.
-- seen: Sprint-066
+## L-123 [tags: process] [status: active]: **A machine-asserted shape and its checker are born together, or not at all.** SPRINT-067's two revise firings were mirror images of one defect. T1 shipped a checker asserting `^owner-ruling:` against a format **no procedure documented** — an undocumented assertion, a false-positive trap on correct behaviour the day the checker is wired in. T2 shipped prose referencing a "per-criterion analogue" shape **no checker asserts** — an unasserted definition, a contract with no control (TD-052's trap). One rule covers both directions: when text defines a grep-able shape, the same change names the checker that asserts it; when a checker asserts a shape, the same change names the procedure that documents it. Either half alone is a defect, and both halves were caught by the revise loop's comparand-briefed reviewers before commit.
+- seen: Sprint-067 (×2 within the sprint — one per direction, one per task)
 - count: 1
+- promoted: no
+- related: L-058 (the named-finding bar) · TD-052 (procedural gates without controls) · L-122 (how both were caught)
+
+---
+
+## L-122 [tags: process] [status: active]: **Brief the Spec-axis reviewer with the *decision as logged*, not the diff alone — it turns the wiring check into a mechanical matcher.** SPRINT-066 T2's builder pass shipped the ADR-022 ruling with two consumer touchpoints still stating the superseded rule (`orchestrator/SKILL.md` § Review "unattended never retries — TASK-203" · CONTEXT.md § Built-in leverage "attended only") — the exact L-020 gap, missed at build time with the wiring-check DoD loaded in context. The scoped reviewer was handed the Execution Log's ruling text as the Spec comparand plus the instruction "any touchpoint stating a condition the others omit, or omitting one, is a finding" — it caught both in one pass; the bounded retry fixed them; the delta re-review confirmed with no new violations. The promoted wiring rule said *what* to check; the comparand-briefed reviewer is the first thing that *checked* it mechanically. Pattern: when a review follows a ruling, the ruling text is the Spec comparand — the ladder's `Cites:` rung at minimum, the logged decision verbatim when one exists.
+- seen: Sprint-066 · Sprint-067 (both dispatched builders' misses — the undocumented `owner-ruling:` format, the false comparand-ladder claim — caught only by reviewers briefed with the ruling/comparands; the builders carried the same rulings in their briefs and still drifted)
+- count: 2
 - promoted: no
 - related: L-020 (shipped ≠ wired) · L-058 (the named-finding bar) · review-scoping.md § Two axes (the comparand ladder)
 

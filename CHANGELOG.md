@@ -11,6 +11,42 @@ status: current
 
 ---
 
+## v1.41.0 — The Proof Layer (2026-08-15)
+
+MINOR — SPRINT-067, **2 of 2 units**, coordinator + dispatched builders. Builds what v1.40.0's
+rulings enabled; with it, the second gauntlet audit's remainder is fully landed — contract ruled,
+proof built.
+
+**What changed for you**
+
+- **A run now proves its integrated tree, not just its tasks.** `dispatch.md` § System verify: after
+  a multi-task run's **final** merge-back, one full-gate pass runs over the integrated tree — the
+  host repo's own gate command, **discovered** (manifest scripts → Makefile/justfile → CI test step →
+  ask attended / a `no-gate-discovered` rollup line unattended), never hard-coded. A FAIL **blocks
+  the silent close** (ADR-021): the coordinator surfaces it and the override is a documented,
+  machine-checkable shape — `owner-ruling: system-verify — <ruling + reason>`. Verdict is read from
+  the gate's output, never its exit code. Retained contract fixtures:
+  `evals/fixtures/system-verify/` (5 legs incl. the must-FAIL and the archive-skip).
+- **Every ticked criterion names what proved it.** `night-run.md` Part 4: the rollup's `N of M`
+  header gains a per-criterion block — `Tn.k · ticked | open | overridden · <evidence: test | check |
+  fixture | review | owner-ruling>` — emitted always; a `ticked` line with no named evidence is the
+  silent tick ADR-021 exists to close, and an `overridden` criterion cites the recorded owner ruling,
+  so an override reads as exactly that. The review report and `SPRINT.md.template`'s DoD guidance
+  teach the same convention (✓-evidence ticks + `*Verify:*` clauses).
+- **Both features first fired on the run that built them** — the sprint's exit rollup carries the
+  first real `system-verify · PASS` line and the first twelve `Tn.k` evidence lines.
+
+**Maintainer-facing**
+
+- **The revise loop fired twice — its first runs against dispatched builders — and both catches were
+  mirror images**: a checker asserting a format no procedure documented (T1), and prose referencing a
+  shape no checker asserts (T2). Filed as **L-123** (a machine-asserted shape and its checker are
+  born together, or not at all); **L-122 → count 2** (brief reviewers with the decision as logged —
+  promotable at the next promote).
+- Known gaps, named: `check-system-verify-block.sh` is deliberately not yet wired into `qa-check.sh`
+  (→ follow-up task) · TD-055 ruled — rename `complete` → `run-complete` (→ follow-up task) · the
+  plugin-reinstall owner action is three sprints unactioned (installed 1.38.0 vs repo 1.41.0).
+
 ## v1.40.0 — Verification Authority (2026-08-15)
 
 MINOR — SPRINT-066, **2 of 2 units**. Two ADR-grade rulings that decide *who may say no* — the
@@ -46,43 +82,4 @@ it (TASK-208/209 unblock with this release).
   TASK-208/209 → `ready`. The plugin-reinstall owner action carries a second sprint — installed
   cache 1.38.0 vs repo 1.40.0.
 
-## v1.39.0 — The Critic Loop (2026-08-15)
-
-MINOR — SPRINT-065, **3 of 3 units**, the fourth and final member sprint of **EPIC-002 Make Room**
-(only its T2 is epic-tracked; T1 and T3 are EPIC-004-shaped, from `docs/research/gauntlet-loop-delta.md`).
-The first build from the gauntlet-loop scan: what the critic measures against, and its worst finding
-feeding back to the builder. **EPIC-002 closes and archives with this sprint** — every member sprint
-closed, all four Closed-when conditions `[x]`.
-
-**What changed for you**
-
-- **The review pass now feeds a bounded builder retry.** `review-scoping.md` § The revise loop: a
-  scoped reviewer's single worst finding **per axis** is handed back to the builder for **one retry
-  per review pass, total**, re-reviewed, and the outcome logged as a `progress` entry. **Attended
-  modes only** (`quick` · `mvp` · `sprint-bulk` with a human present) — unattended never retries; that
-  charter fork is TASK-203, deliberately left open. Hooked from `orchestrator/SKILL.md` § Review.
-  Closes the L-020 gap where the worst-finding-per-axis was computed and nothing consumed it.
-  Exercised on its own diff (both axes' violations fixed, re-review cleared) and on a planted
-  must-FAIL fixture per axis (`evals/fixtures/revise-loop/`, retained — TD-012).
-- **The Spec axis measures against what predates the task.** It previously compared work to the task's
-  own `done-when` — written by the same pipeline that built the work. It now takes the first rung that
-  exists on a **comparand ladder**: the template the artifact renders against · a retained must-FAIL
-  fixture · a `check-*.sh` named finding · the task's `Cites:` line. `done-when` is the fallback, not
-  the default — and a fallback must announce itself in the report.
-- **`Cites:` is now a defined field.** In real use across 17 of 65 sprints while defined nowhere,
-  parsed and then deliberately discarded by the dispatch preflight — `SPRINT.md.template` documents it
-  as optional-but-load-bearing, with the preflight's exclusion stated inline so a `Layers:` path is
-  not parked there.
-
-**Maintainer-facing**
-
-- **EPIC-002 Make Room closed and archived** — the first epic through §11's archival leg. Condition 1
-  (headroom) re-worded from a flat percentage to **sprints of growth** (ADR-017's prior ruling
-  applied, not an escape invented at close): `CLAUDE.md` 63/80 ≈ 20 sprints · `CONTEXT.md` 132/150 ≈
-  21 sprints at the measured 0.83 lines/sprint, with `CONTEXT.md` untrimmed — T1 deliberately spent
-  **0** of its lines.
-- Filed: **TD-056** (a bare `check-layers-observed.sh` exits 0 having checked nothing — the silent-skip
-  family) · **L-121** (a DoD box that performs a later phase's work is untickable by construction).
-  TASK-203 (unattended retry ruling) unblocked → `ready`.
-
-_Older releases (**v1.38.0** and earlier) → [`CHANGELOG-1.38.0.md`](docs/changelog/CHANGELOG-1.38.0.md) → [`CHANGELOG-1.37.0.md`](docs/changelog/CHANGELOG-1.37.0.md) → [`CHANGELOG-1.36.0.md`](docs/changelog/CHANGELOG-1.36.0.md) → [`CHANGELOG-1.35.0.md`](docs/changelog/CHANGELOG-1.35.0.md) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._
+_Older releases (**v1.39.0** and earlier) → [`CHANGELOG-1.39.0.md`](docs/changelog/CHANGELOG-1.39.0.md) → [`CHANGELOG-1.38.0.md`](docs/changelog/CHANGELOG-1.38.0.md) → [`CHANGELOG-1.37.0.md`](docs/changelog/CHANGELOG-1.37.0.md) → [`CHANGELOG-1.36.0.md`](docs/changelog/CHANGELOG-1.36.0.md) → [`CHANGELOG-1.35.0.md`](docs/changelog/CHANGELOG-1.35.0.md) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._

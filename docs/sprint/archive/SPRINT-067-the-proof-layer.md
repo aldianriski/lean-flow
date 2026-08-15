@@ -3,7 +3,7 @@ sprint: 067
 slug: the-proof-layer
 owner: Maintainer
 last_updated: 2026-08-15
-status: active
+status: closed
 gates_signed: G1,G2 @ bcc8bd9
 plan_commit: 54999a3
 close_commit: [sha — set at close]
@@ -99,6 +99,8 @@ rollup.
       MINORs behind (carried from SPRINT-066, unactioned). This sprint edits dispatch/night-run
       procedures again; the session reads them from repo source (L-021), but the gap closes only by
       reinstalling.
+      *Carried open at close again (owner proceeded) — third sprint; now three MINORs behind
+      (1.38.0 vs 1.41.0). Re-filed on the next sprint's checklist.*
 
 ## Decisions (pre-locked)
 
@@ -162,12 +164,30 @@ rollup.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
 **Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+Yes, twice, both by dispatched builders against *fresh* rulings: T1's checker asserted a format no
+procedure documented, and T2's prose misdescribed the one-sprint-old comparand ladder ("the same
+four" — only two overlap). Both caught in-session by reviewers briefed with the decisions as
+comparands — the second sighting of L-122's pattern, **count 2 → promotable at the next promote**.
+The two misses are mirror images and yield one new pattern (→ L-123).
 
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents). Cost per
-unit **delivered**, not per unit attempted.
+**Cost** — coordinator + 2 dispatched `sonnet` builders (each resumed once for its revise fix) +
+4 `sonnet` review passes (2 scoped · 2 delta re-reviews); ≈0.9M subagent tokens for 2 of 2 units
+delivered. The revise loop fired twice and closed at its one-retry ceiling both times — no spiral,
+no second firing.
 
-**Worked**
+**Worked** — detailed builder briefs with hard file boundaries (neither builder strayed; T1's one
+deviation was reasoned, in-scope, and accepted with its gap named). The revise loop on dispatched
+work: both concrete violations per task were caught before commit, fixed on the single retry, and
+confirmed by delta re-review. The exit ate its own dogfood — system-verify and the Tn.k evidence
+block first fired on the run that built them.
 
-**Friction**
+**Friction** — both builders' *first* passes shipped a concrete violation per axis despite carrying
+the rulings in their briefs — the builder reads the decision and still drifts; only the
+comparand-briefed *reviewer* caught it (L-122's case strengthening). `Layers:` needed two mid-sprint
+corrections (TECH-DEBT.md for the TD-055 ruling; T1's evals placement) — L-100's expected cost, both
+logged first. The reinstall owner-action is now three sprints unactioned.
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`) — **L-123** filed: a machine-asserted
+shape and its checker are born together, or not at all — T1 shipped the assertion without the
+documented shape, T2 the shape-reference without an asserting checker; one rule covers both
+directions. **L-122 → count 2** (promotable).
