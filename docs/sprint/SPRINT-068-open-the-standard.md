@@ -5,6 +5,7 @@ owner: Maintainer
 last_updated: 2026-08-15
 status: active
 plan_commit: c574fda
+gates_signed: G1,G2 @ 622f420
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
@@ -27,7 +28,7 @@ lands · TASK-188 (`blocked`, opportunistic trigger — L-111) · any change to 
 ## Plan
 
 ### T1 — Rule what CONTEXT.md becomes once the spec is extracted `[size: S · risk: med · class: decision · HITL]`
-Layers: `.claude/CONTEXT.md` · `docs/adr/` · `docs/epic/EPIC-003-the-standard.md`
+Layers: `.claude/CONTEXT.md` · `docs/adr/` · `docs/DECISIONS.md` · `docs/epic/EPIC-003-the-standard.md`
 Depends-on: none
 Cites: ADR-018 (accepts the migration risk and names this ruling as how it retires) · EPIC-003
        open question 3

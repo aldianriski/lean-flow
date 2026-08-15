@@ -66,8 +66,10 @@ spec so a rule has exactly one home · ADR the split.
   → gates → attested; the count matters less than each level being independently checkable.
 - Are non-Claude implementations maintained here or by adopters? → a ruling, not a measurement (L-094):
   close it by deciding, not by waiting for evidence.
-- Does `.claude/CONTEXT.md` become a *consumer* of the spec or stay an SSOT? → the answer decides
-  whether extraction shrinks CONTEXT.md or duplicates it; settle before the first extraction commit.
+- ~~Does `.claude/CONTEXT.md` become a *consumer* of the spec or stay an SSOT?~~ **Answered
+  2026-08-15 (SPRINT-068 T1) → [ADR-023](../adr/ADR-023-context-becomes-consumer.md):** consumer —
+  `spec/` is the SSOT for standard-owned rules, CONTEXT.md cites it and keeps only project-local
+  facts; extraction commits are move+cite atomic, so no commit leaves a rule stated twice.
 
 ## Closed when
 

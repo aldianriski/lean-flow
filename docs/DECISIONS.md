@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-023](adr/ADR-023-context-becomes-consumer.md) | CONTEXT.md becomes a consumer of the extracted spec (`spec/` is the SSOT for standard-owned rules; move+cite atomic extraction commits) | accepted | 2026-08-15 |
 | [ADR-022](adr/ADR-022-unattended-retry-mechanical-carve-out.md) | Unattended retry: mechanical-trigger carve-out only (three prior human decisions required; critic judgment always parks; no declared policy = never) | accepted | 2026-08-15 |
 | [ADR-021](adr/ADR-021-evidence-gates-the-silent-path.md) | Mechanical evidence gates the silent path, never the owner (a named check's FAIL blocks a quiet DoD tick; consumer CI stays suggestion-only) | accepted | 2026-08-15 |
 | [ADR-020](adr/ADR-020-research-cap-and-frozen-verdicts.md) | Research cap 120 → 130 soft; a `status: superseded` verdict is frozen, not capped | accepted | 2026-08-14 |
