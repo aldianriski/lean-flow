@@ -18,7 +18,8 @@ update_trigger: an Execution Log entry is appended
 
 <!-- Newest entries at the BOTTOM: this reads as a chronology, unlike CHANGELOG.md which is
      newest-first. Event is one of: promote · progress · surprise · scope-change · park · blocker ·
-     complete · close. -->
+     run-complete · close. `run-complete` is reserved for the run itself finishing (carries the
+     Part 4 rollup) — a task finishing mid-run is logged as `progress`, never as `complete`. -->
 
 ### YYYY-MM-DD | [event] | [one-line summary]
 [detail — what changed and why it matters. Name the task (Tn) it belongs to.]

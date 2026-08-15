@@ -9,7 +9,7 @@ update_trigger: an Execution Log entry is appended
 
 # SPRINT-920 — Execution Log
 
-### 2026-08-10 | complete | run exited
+### 2026-08-10 | run-complete | run exited
 
 T3 · blocked · waiting on the upstream schema
 

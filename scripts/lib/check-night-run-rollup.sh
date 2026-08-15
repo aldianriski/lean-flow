@@ -39,8 +39,12 @@ for lg in "$@"; do
   [ -f "$lg" ] || { bad "night-run rollup: file not found: $lg"; continue; }
   case "$lg" in */archive/*) continue ;; esac
 
-  # A completed run announces itself with a `complete` event in the log's entry header.
-  if ! grep -qE '^### .*\| *complete *\|' "$lg" 2>/dev/null; then
+  # A completed run announces itself with a `run-complete` event in the log's entry header.
+  # Renamed from the bare `complete` (TD-055): that word collided with a task-level "this task
+  # is complete" entry, which silently armed these run-level assertions on a mid-Plan log
+  # (misfired mid-SPRINT-064). Anchored to the delimited event field, not a bare substring
+  # (L-108) -- a task-level `| complete |` header no longer arms anything here.
+  if ! grep -qE '^### .*\| *run-complete *\|' "$lg" 2>/dev/null; then
     note "night-run rollup: $lg has no completed-run entry yet -- nothing to verify"
     continue
   fi
