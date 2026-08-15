@@ -52,9 +52,9 @@ lands in the rollup; exercised once on real input and once on must-FAIL input, f
       ADR-021 — surface → recorded owner ruling, shape `owner-ruling: system-verify — <ruling>`) —
       *Verify: night-run.md Part 4 carries the line format; review pass confirms no contradiction
       with ADR-021/022* ✓ reviewer + delta re-review
-- [ ] Exercised on real input: this run's own final merge-back gets the pass, verdict in this run's
+- [x] Exercised on real input: this run's own final merge-back gets the pass, verdict in this run's
       exit rollup — *Verify: the rollup line exists and the gate's output file (not its exit
-      channel) shows the run* — ticks at exit (D3)
+      channel) shows the run* ✓ `system-verify · PASS · sh scripts/qa-check.sh` (145/0, output read)
 - [x] Exercised on must-FAIL input with its named finding; fixtures retained — *Verify:
       `evals/fixtures/system-verify/` exists, both legs run, findings named (L-058 · TD-012)* ✓
       5 legs green incl. archive-skip, coordinator re-ran the harness
@@ -89,9 +89,10 @@ rollup.
       (this task owns its surfaces this sprint) — *Verify: TD-055 row updated either way* ✓ declined
       with reason (no in-scope file is the authoring point; a fourth location repeats L-099);
       rename `complete`→`run-complete` recommended → follow-up task at close
-- [ ] Exercised on this run's own exit rollup — emitted in-run after the Plan's last task, the
+- [x] Exercised on this run's own exit rollup — emitted in-run after the Plan's last task, the
       L-121-safe vehicle (a "real sprint close" clause would be close-phase and untickable here) —
-      *Verify: this sprint's rollup carries verdict + evidence per criterion* — ticks at exit (D3)
+      *Verify: this sprint's rollup carries verdict + evidence per criterion* ✓ the exit rollup's
+      Tn.k block (Execution Log, 2026-08-15)
 
 ## Owner-action checklist
 - [ ] Reinstall the plugin — installed cache is **1.38.0** against a repo now at **1.40.0**, two

@@ -89,3 +89,21 @@ assert) · `Standards: placement-vs-done-rule → fixed` (per-criterion lines ar
 the state lines, `Tn.k` carries identity, reconciliation with "done tasks need no per-task line"
 stated in so many words). Delta re-review: both fixed, single pure-insertion hunk, no collateral,
 grep confirms exactly one machine-asserted `owner-ruling:` shape repo-wide. One retry total. QA 145/0.
+
+### 2026-08-15 | progress | Plan exhausted — exit rollup
+run · 8 of 8 DoD ticked
+T1 · retry · Spec: owner-ruling-format-undocumented → fixed · Standards: archive-skip-coverage → fixed
+T2 · retry · Spec: false-ladder-equivalence + undefined-analogue → fixed · Standards: placement-vs-done-rule → fixed
+system-verify · PASS · sh scripts/qa-check.sh
+T1.1 · ticked · check — qa-check.sh 145/0 over the diff (layers legs green)
+T1.2 · ticked · review — scoped review + delta re-review, no contradiction with ADR-021/022
+T1.3 · ticked · check — the system-verify line above, verdict read from the gate's output
+T1.4 · ticked · fixture — evals/fixtures/system-verify/ 5 legs green, coordinator re-ran the harness
+T2.1 · ticked · review — scoped review + delta re-review (revise loop fixed the ladder mis-reference)
+T2.2 · ticked · review — template grepped for repo paths: none (L-015)
+T2.3 · ticked · check — TD-055 row carries the ruling (note declined with reason, rename → follow-up)
+T2.4 · ticked · fixture — this block is the exercise: the run's own rollup, per-criterion evidence
+Both tasks done (no state lines — the header count carries them; the Tn.k block stands alone, as
+Part 4 now specifies). Shape: coordinator + 2 sonnet builders + 4 sonnet review passes (2 scoped ·
+2 delta re-reviews); the revise loop fired twice, once per task, both closed at the one-retry ceiling.
+Next: `/lean-doc-generator close`.
