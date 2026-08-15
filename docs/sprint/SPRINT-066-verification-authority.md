@@ -4,6 +4,7 @@ slug: verification-authority
 owner: Maintainer
 last_updated: 2026-08-15
 status: active
+gates_signed: G1,G2 @ f208aad
 plan_commit: ee5fe2d
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -29,7 +30,9 @@ SPRINT-065 T3 and not reopened without evidence (L-091).
 ## Plan
 
 ### T1 — Rule whether mechanical evidence may gate the coordinator's progress `[size: S · risk: med · class: decision · HITL]`
-Layers: `docs/adr/` · `skills/orchestrator/references/review-scoping.md`
+Layers: `docs/adr/` · `skills/orchestrator/references/review-scoping.md` ·
+        `skills/orchestrator/SKILL.md` · `.claude/CONTEXT.md` · `docs/DECISIONS.md`
+        <!-- SKILL/CONTEXT/DECISIONS added mid-sprint — the ruling's wiring; logged first (L-100) -->
 Depends-on: none
 Cites: DOCS_Guide §2 (the completion-bound rule) · `docs/research/gauntlet-loop-delta.md`
 Today the never-gate spine covers everything: QA checks are raised as suggestions, and no mechanical
@@ -42,13 +45,13 @@ per-`done-when` verification method + recorded evidence may BLOCK the coordinato
 run's close, versus the spine standing unchanged.
 
 **DoD:**
-- [ ] The never-gate spine engaged, not routed around — the ruling names the § QA suggestion line it
+- [x] The never-gate spine engaged, not routed around — the ruling names the § QA suggestion line it
       modifies or upholds
-- [ ] The consumer boundary stated either way: lean-flow never runs the consumer's CI as a blocker on
+- [x] The consumer boundary stated either way: lean-flow never runs the consumer's CI as a blocker on
       its own authority
-- [ ] Ruling recorded — ADR-021 if it qualifies (§4: hard-to-reverse + surprising + real trade-off),
+- [x] Ruling recorded — ADR-021 if it qualifies (§4: hard-to-reverse + surprising + real trade-off),
       else the D-row states why not
-- [ ] `review-scoping.md` § QA suggestion says, after the ruling, what may gate and what only reports
+- [x] `review-scoping.md` § QA suggestion says, after the ruling, what may gate and what only reports
 
 ### T2 — Rule whether the revise loop may run unattended, and on what budget `[size: S · risk: med · class: decision · HITL]`
 Layers: `skills/orchestrator/references/night-run.md` · `docs/adr/`
@@ -121,6 +124,11 @@ reason stated in `night-run.md` Part 0.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/adr/ADR-021-evidence-gates-the-silent-path.md` | T1 | The ruling: a done-when-named check's FAIL blocks the *silent* tick, never the owner; consumer CI stays suggestion-only | low | scoped review (both axes clean vs ADR template comparand) |
+| `skills/orchestrator/references/review-scoping.md` | T1 | § QA suggestion gains the evidence boundary — what may gate (task-named checks) vs what only reports (everything else) | low | scoped review |
+| `skills/orchestrator/SKILL.md` | T1 | G2 checklist line: each done-when notes its verification method where a mechanical check exists (106/140) | low | scoped review |
+| `.claude/CONTEXT.md` | T1 | G2 row extended in place with the ADR-021 pointer (0 new lines, 132/150) | low | scoped review |
+| `docs/DECISIONS.md` | T1 | ADR-021 index row | low | link resolves |
 
 ## Retro
 

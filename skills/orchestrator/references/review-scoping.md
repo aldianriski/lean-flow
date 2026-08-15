@@ -116,12 +116,21 @@ If a scoped reviewer returns **0 findings**, re-run it once with an assume-guilt
 a forced second look catches what a sycophantic first pass waves through. On a **test-touching** diff,
 add a branch/boundary enumeration lens (list the untested branches / boundary cases). (bmad-method K5.)
 
-## QA suggestion (raise, never gate)
+## QA suggestion (raise, never gate) — and the evidence boundary (ADR-021)
 
 Beyond the passes above, **surface** — as a suggestion, not a blocker — whether the change wants:
 **tests** (which type → `skills/tdd/references/test-strategy.md`) · **lint / format** · **`/security-review`**
 (if it touched a security surface) · a **perf budget** (if it's a hot path). lean-flow *suggests* these;
 it never runs the user's CI or blocks on them (the no-enforcement spine). The owner decides.
+
+**The evidence boundary (ADR-021).** The spine above governs lean-flow's authority over the
+*consumer's* QA surface. The coordinator's **own bookkeeping** is different: where a task's
+`done-when` names a mechanical check, that check's FAIL **blocks the silent path** — the coordinator
+may not tick the DoD box or close over it without surfacing the FAIL and getting a **recorded owner
+ruling** (the override is always available; the owner is never gated). What may gate: only the checks
+the task itself named, run as written. What only reports: everything else in this section. At G2,
+each `done-when` notes its verification method where a mechanical one exists; a task naming none
+remains a judgment tick, and says so.
 
 When the diff **touches tests**, the test-quality standard (`skills/tdd/references/test-standard.md`) is
 the floor to raise — the 12-point checklist + the 70/20/10 pyramid — plus a **regression gate**: the

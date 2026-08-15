@@ -44,6 +44,7 @@ Confirm before touching code. BLOCK if any answer is "unknown":
 Before implementing, draft the design in **`/plan`** (plan mode) and get human sign-off:
 - [ ] Approach chosen over alternatives, with a one-line WHY
 - [ ] Micro-task list, each independently verifiable (for an **L** design, present + approve it section-by-section, not one monolith)
+- [ ] Each `done-when` notes its **verification method** where a mechanical check exists — that named check's FAIL then blocks the *silent* tick: surface → recorded owner ruling, never tick past it quietly (ADR-021)
 - [ ] Hard-to-reverse decision? → record it (prompt `/lean-doc-generator <adr> <subject>`); a `risk: high` task touching auth / input / secrets / data-exposure → sketch its one-line abuse case here at design time (complements the Review-time `/security-review` row — never replaces it)
 - [ ] Residual ambiguity grilled (below) until the goal is unambiguous
 
