@@ -38,11 +38,8 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 
 ---
 
-## L-122 [tags: process] [status: active]: **Brief the Spec-axis reviewer with the *decision as logged*, not the diff alone — it turns the wiring check into a mechanical matcher.** SPRINT-066 T2's builder pass shipped the ADR-022 ruling with two consumer touchpoints still stating the superseded rule (`orchestrator/SKILL.md` § Review "unattended never retries — TASK-203" · CONTEXT.md § Built-in leverage "attended only") — the exact L-020 gap, missed at build time with the wiring-check DoD loaded in context. The scoped reviewer was handed the Execution Log's ruling text as the Spec comparand plus the instruction "any touchpoint stating a condition the others omit, or omitting one, is a finding" — it caught both in one pass; the bounded retry fixed them; the delta re-review confirmed with no new violations. The promoted wiring rule said *what* to check; the comparand-briefed reviewer is the first thing that *checked* it mechanically. Pattern: when a review follows a ruling, the ruling text is the Spec comparand — the ladder's `Cites:` rung at minimum, the logged decision verbatim when one exists.
-- seen: Sprint-066 · Sprint-067 (both dispatched builders' misses — the undocumented `owner-ruling:` format, the false comparand-ladder claim — caught only by reviewers briefed with the ruling/comparands; the builders carried the same rulings in their briefs and still drifted)
-- count: 2
-- promoted: no
-- related: L-020 (shipped ≠ wired) · L-058 (the named-finding bar) · review-scoping.md § Two axes (the comparand ladder)
+## L-122 [tags: process] [status: promoted]: brief every dispatched pass with the governing decision as logged — the ruling text is the Spec comparand when one exists.
+- **L-122 → promoted: review-scoping.md § Scope every pass** — the durable rule is the record now (§11 collapse, SPRINT-068 promote). Body: git; seen Sprint-066 + Sprint-067 (count 2 — both sightings were dispatched builders drifting from rulings they *carried*, caught only by comparand-briefed reviewers). Matcher: the revise loop — a drift from the quoted ruling is a concrete violation it feeds back.
 
 ---
 

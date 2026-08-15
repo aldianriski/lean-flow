@@ -49,6 +49,14 @@ status: current
     or in a shared guard. A one-checker fix to a family-shaped defect is how the next silent no-op ships.
   - Tracker: SPRINT-065 Execution Log (surprise, 2026-08-14) · CLAUDE.md § Edit-safety (c) (the
     L-045/L-057 family) · TD-051 candidate (c)
+  - **Re-reviewed 2026-08-15 (SPRINT-068 promote, 3 sprints open) — first aging re-review; held,
+    no new sighting.** No bare invocation since the SPRINT-065 near-miss — every run since went
+    through `qa-check.sh`, which supplies the argument. The mitigation stays un-derived per the
+    row's own text (scope the family first, never fix one checker of a family-shaped defect).
+    **Unblock condition, sharpened with a vehicle:** SPRINT-068 T2 (TASK-210) does gate-registration
+    work in the same neighbourhood — piggyback the family scan there (which `check-*.sh` accept file
+    arguments and what does each do bare?), one command's worth of observation; else the next
+    bare-invocation near-miss.
 
 - **TD-055** severity: minor | status: open | created: Sprint-064
   - Summary: **`complete` is a reserved run-level event in the Execution Log, and nothing at the point of
@@ -187,6 +195,16 @@ status: current
     SPRINT-066 produced the first *mechanical* control ever applied to a procedural rule — the Spec
     axis briefed with the ruling as comparand caught stale wiring in-session (L-122) — which is a
     candidate shape for this row's eventual cure.
+  - **Re-reviewed 2026-08-15 (SPRINT-068 promote, 3 sprints since last re-review) — held, and the
+    candidate cure matured into a promoted rule.** SPRINT-067 added two more catches: the revise
+    loop's comparand-briefed reviewers found a checker asserting an undocumented format and prose
+    referencing an unasserted shape (→ L-123, this row's territory exactly). **L-122 is now promoted**
+    (review-scoping.md § Scope every pass): comparand-briefed review + the revise loop is the working
+    *procedural* control for prose rules — not the machine-checkable one this row ultimately wants,
+    but no longer "no control at all". The third-uncontrolled-gate count stands at zero (ADR-021/022
+    both named controls at authoring; L-123 now makes that mandatory). **Unblock condition:**
+    unchanged — EPIC-004's spec-driven engine for the machine-checkable half; the procedural half is
+    now served.
 
 - **TD-051** severity: medium | status: open | created: Sprint-061
   - Summary: **`check-layers-observed.sh` (gate leg 15) never sees a close commit, because the close

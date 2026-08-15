@@ -8,8 +8,13 @@ isolated pass starts from zero context and re-scans unless you scope it.
 
 Hand each review pass a brief, not the repo:
 - the `git diff` (the actual change),
-- the changed files, and
-- their **direct callers / dependents** (the blast radius — one hop, not the transitive closure).
+- the changed files,
+- their **direct callers / dependents** (the blast radius — one hop, not the transitive closure), and
+- **the governing decision as logged** — when the change implements a ruling (an ADR, a G2 decision,
+  an owner ruling in the Execution Log), the brief quotes it and it becomes the Spec comparand.
+  Promoted rule (L-122, 2 sightings): in both, the *builder* carried the same ruling and still
+  drifted; only the comparand-briefed reviewer caught it. The revise loop is this rule's matcher —
+  a drift from the quoted ruling is a concrete violation, and the loop feeds it back.
 
 Tell the pass explicitly: *"Review the diff and its blast radius. Do not survey the rest of the repo.
 Report two independent axes — **Standards** (repo conventions) and **Spec** (builds the right thing) —

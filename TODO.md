@@ -18,10 +18,13 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-067 closed 2026-08-15 (2 of 2, v1.41.0) — the system-verify pass (a run proves its
-> integrated tree) and per-criterion evidence lines (every tick names what proved it). The second
-> gauntlet audit's arc is complete: mapped → ruled (066) → proven (067). Follow-ups TASK-210/211
-> filed `ready`; TASK-198 remains EPIC-003's opening ruling.
+> **SPRINT-068 — Open the Standard** → [`docs/sprint/SPRINT-068-open-the-standard.md`](docs/sprint/SPRINT-068-open-the-standard.md)
+>
+> Clear the ready pool and open EPIC-003's door: the pre-extraction ruling on what CONTEXT.md
+> becomes (T1 = TASK-198) · the system-verify checker joins the QA gate (T2 = TASK-210) · the
+> reserved `complete` event renamed `run-complete`, TD-055's ruled cure (T3 = TASK-211). All
+> file-disjoint; no epic stamp (D1 — the ruling is EPIC-003's prerequisite, not member work; the
+> extraction sprints will be the members).
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard** (next — TASK-198 is its
