@@ -70,12 +70,14 @@ and whose diet pass already found nothing removable (ADR-017).
 actually wants and then judged against that — recorded either way, never left as a silent hold.
 
 **DoD:**
-- [ ] **Do not close the gap by trimming `CONTEXT.md` five lines to make a number go green** — §2's
+- [x] **Do not close the gap by trimming `CONTEXT.md` five lines to make a number go green** — §2's
       Growth rule names that as the tell, and ADR-017 already ran that pass
-- [ ] Ruling recorded in EPIC-002 § Closed when, with its reasoning inline
-- [ ] If all four conditions end `[x]`: epic archived → `docs/epic/archive/`, its `docs/epic/INDEX.md`
-      row kept and relative links re-based one level deeper (§11)
-- [ ] If it stays open: the reason is stated as a condition, not a mood — what would close it
+- [x] Ruling recorded in EPIC-002 § Closed when, with its reasoning inline
+- [x] All four conditions end `[x]` — **archival delegated to `/lean-doc-generator close`** (§11
+      archives only when every member sprint has closed, and this sprint is itself an EPIC-002 member;
+      scope-change logged 2026-08-14, owner-ruled)
+- [x] Else-branch (epic stays open) — antecedent false under the same ruling: all four conditions are
+      `[x]`, nothing stays open to state a condition for
 
 ### T3 — Wire the worst-finding-per-axis into a bounded builder retry `[size: M · risk: med · class: execution · HITL]`
 Layers: `skills/orchestrator/references/review-scoping.md` · `skills/orchestrator/SKILL.md` · `evals/`
@@ -150,6 +152,7 @@ bounded retry, re-reviewed, and the outcome logged.
 | `skills/orchestrator/references/review-scoping.md` | T1 | Spec axis gains a **comparand ladder** (template · must-FAIL fixture · `check-*.sh` named finding · `Cites:`), with `done-when` demoted to a fallback that must announce itself — the axis was measuring against a criterion its own pipeline wrote | low | `qa-check.sh` |
 | `skills/lean-doc-generator/templates/SPRINT.md.template` | T1 | `Cites:` documented as optional-but-load-bearing (rung 4) — it was in real use across 17 of 65 sprints while defined nowhere; the preflight's deliberate exclusion is stated inline so a `Layers:` path is not parked there | low | `qa-check.sh` |
 | `docs/sprint/logs/SPRINT-065-the-critic-loop.md` | T1 | Execution Log created lazily at first entry (ADR-014) | low | `check-sprint-log-layout` |
+| `docs/epic/EPIC-002-make-room.md` | T2 | Condition 1 re-worded to **sprints of growth** (a percentage misreads a 0.83 lines/sprint file — ADR-017's prior ruling applied) and judged: both SSOT files ≈ 20–21 sprints of headroom, all four conditions `[x]`; archival deferred to close (§11 member-sprint rule) | low | `check-epic-archive.sh` |
 
 ## Retro
 

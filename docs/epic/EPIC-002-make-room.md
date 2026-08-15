@@ -96,12 +96,17 @@ records are history, and history is not corpus) · relaxing a gate to reduce wor
 
 ## Closed when
 
-- [ ] `CLAUDE.md` and `CONTEXT.md` each carry ≥ 15% headroom against their caps — **`CLAUDE.md` 63/80
-      = 21% ✓** (SPRINT-064 T2 spent 2 lines of the 19 SPRINT-063 freed); **`CONTEXT.md` 132/150 = 12%**,
-      held at 150 by owner ruling (SPRINT-063 T1): a flat percentage is the wrong instrument for a file
-      whose growth is measured at 0.83 lines/sprint and whose diet pass already found nothing removable
-      (ADR-017). **The only condition still open** — carried by **TASK-206**, which must rule it or
-      re-word it, never leave it as a silent hold. Not ticked unilaterally
+- [x] Both SSOT files carry headroom measured in **sprints of growth**, not a flat percentage —
+      **re-worded and then judged** by TASK-206 (SPRINT-065 T2), owner-ruled. The original wording
+      (`≥ 15% headroom`) was the wrong *instrument*, not merely an unmet target: ADR-017 had already
+      ruled — before this task and independent of it — that a percentage misreads a file growing at
+      **0.83 lines/sprint** whose diet pass found nothing removable. A percentage calls 18 free lines
+      in a 150-line file scarcer than 17 in an 80-line one, when the two absorb **~21** and **~20**
+      sprints respectively. Measured 2026-08-14: **`.claude/CLAUDE.md` 63/80 = 17 lines ≈ 20 sprints ·
+      `.claude/CONTEXT.md` 132/150 = 18 lines ≈ 21 sprints.** Both clear what the epic actually wants —
+      room to absorb a standard. The gap was **not** closed by trimming `CONTEXT.md` to make a number
+      go green (§2's Growth rule names that as the tell, and ADR-017 already ran that pass):
+      `CONTEXT.md` is unchanged at 132 lines, and SPRINT-065 T1 deliberately spent **0** of them
 - [x] No doc sits over a soft cap without an ADR recording the ruling — **SPRINT-063**: ADR-019
       (`TODO.md`), ADR-020 (research cap + frozen verdicts). `qa-check.sh` emits **zero** `OVER-CAP` lines
 - [x] Every surviving `check-*.sh` is either consolidated or has a one-line reason it stands alone —

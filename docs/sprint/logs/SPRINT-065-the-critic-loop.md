@@ -77,3 +77,54 @@ also leaves T2 free to take it under the D1 ownership order without a per-hunk s
 Worth recording separately: the gate was run in the background and the harness reported the wrapper's
 `exited with code 0` while the gate itself returned `QA_EXIT=1`. The FAIL was read off the **output
 file**, not the reply channel — CLAUDE.md § Edit-safety (c), and the fifth sighting of that family.
+
+### 2026-08-14 | surprise | a bare `check-layers-observed.sh` exits 0 having checked nothing
+Re-running the checker after the `Layers:` fix returned `LAYERS_EXIT=0` and printed **no output at
+all**. Taken alone that reads as a pass. It is not: the checker's own must-FAIL fixtures show a clean
+run prints `PASS … layers observed (all changed files declared, base <sha>)`, so silence means it
+never examined a sprint — it needs the file as an argument, which `qa-check.sh` supplies and a bare
+invocation does not. Re-run as `check-layers-observed.sh docs/sprint/SPRINT-065-…md` it printed the
+real PASS. Caught by the cross-check rule (CLAUDE.md § Behavioral Guidelines): the second query was
+the fixtures' expected output shape, and it *disagreed* with the bare run's silence. An exit code with
+no report behind it is not a verdict — L-045/L-057's family again, twice inside one task.
+
+### 2026-08-14 | progress | T2 ruled — condition 1 re-worded to sprints-of-growth, then judged; all four now `[x]`
+**Ruling (owner-approved at G2):** the `≥ 15% headroom` wording was the wrong *instrument*, not an
+unmet target, and ADR-017 had already ruled so before this task and independent of it — which is what
+makes this applying a prior ruling rather than inventing an escape. Re-worded to **sprints of growth**
+and judged: `.claude/CLAUDE.md` 63/80 = 17 lines ≈ **20 sprints**; `.claude/CONTEXT.md` 132/150 = 18
+lines ≈ **21 sprints**, at the measured 0.83 lines/sprint. Both clear what the epic wants. The gap was
+**not** closed by trimming — `CONTEXT.md` is unchanged at 132 lines and T1 deliberately spent 0 of
+them. `check-epic-archive.sh` now reports EPIC-002 `correctly live (status 'active', 0 of 4 open)`,
+confirming all-conditions-met with a live status is a legitimate state and not a lingering-archive
+violation.
+
+### 2026-08-14 | scope-change | T2's archive DoD cannot fire inside T2 — the criterion went stale, the scope did not
+**What broke.** T2's third DoD reads "If all four conditions end `[x]`: epic archived →
+`docs/epic/archive/`, its `docs/epic/INDEX.md` row kept and relative links re-based one level deeper
+(§11)". Written at promote, it assumes ticking the last condition is sufficient for archival. It is
+not. §11 — in both `check-epic-archive.sh`'s header and `/lean-doc-generator`'s close row — archives an
+epic when **every member sprint has closed AND every § Closed when condition is `[x]`**, and warns
+explicitly: "Never archive on member-sprint count alone." **SPRINT-065 is itself a member sprint of
+EPIC-002** (`epic: EPIC-002` in frontmatter, its row in § Member sprints still reading
+`_(completed at close)_`). So the archive is not merely premature inside T2 — it is structurally
+impossible, because the sprint performing it is one of the things that must have closed first.
+
+**Impact.** No scope change: the ruling T2 exists to make is *made*, recorded, and green. What is
+stale is the criterion's placement — archival is close-time work that `/lean-doc-generator close`
+already performs as its documented epic rollup ("If the sprint carries `epic:`, roll up before
+committing … close the epic only when **every** condition is `[x]`"). The fourth DoD is the else-branch
+of the third ("If it stays open: the reason is stated as a condition") and its antecedent is now false,
+so it cannot fire either — two mutually exclusive branches were both written as tickable boxes, and
+`/prime` counts both.
+
+**Re-confirm G2.** Ruled by the owner, not absorbed silently (L-088): a DoD frozen at promote carried a
+premise a later reading of §11 dissolved, so it goes back for a ruling rather than being re-read to fit
+what was built.
+
+### 2026-08-15 | progress | T2 closed — owner ruled the stale archive DoD: re-word, tick, commit
+The scope-change above went to the owner as a popup with three resolutions; ruling: **re-word boxes 3+4
+per the logged scope-change, tick all four, commit**. Box 3 now reads "archival delegated to
+`/lean-doc-generator close`" (§11 member-sprint rule); box 4 is recorded antecedent-false. The archive
+itself fires at this sprint's close, where every member sprint of EPIC-002 will in fact have closed.
+T2 committed in D1 order (T1 → **T2** → T3).
