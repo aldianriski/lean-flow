@@ -4,7 +4,7 @@ slug: verification-authority
 owner: Maintainer
 last_updated: 2026-08-15
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: ee5fe2d
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
