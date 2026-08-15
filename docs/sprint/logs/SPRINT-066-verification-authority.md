@@ -89,3 +89,14 @@ and the log's `revise · T2` entry confirmed taxonomy-clean (title text, not an 
 All four touchpoints now agree on the carve-out's three conditions: ADR-022 · night-run.md Part 0
 rows + Part 4 retry-line · review-scoping.md § revise loop · SKILL.md § Review + CONTEXT.md § Built-in
 leverage. `/council` was not needed — the fork settled decisively at G2. Commit follows in D1 order.
+
+### 2026-08-15 | progress | Plan exhausted — exit rollup
+run · 8 of 8 DoD ticked
+T1 · done · ADR-021 recorded + wired (commit `d7a86e7`); review clean both axes, no retry needed
+T2 · done · ADR-022 recorded + wired (commit `6a794f3`); revise loop fired once — one concrete
+     violation per axis, both `fixed` on the single bounded retry, delta re-review clean
+T2 · retry · Standards: night-run-last-updated-stale → fixed · Spec: stale-unattended-wiring → fixed
+QA gate at exit: 147 pass, 0 fail. Owner-action box (plugin reinstall, 1.38.0 installed vs 1.39.0+
+repo) remains open — an owner step, not Plan DoD; it carries to close. Shape: inline coordinator,
+two decision tasks ruled by the owner across two frontier popups; dispatches = 3 scoped `sonnet`
+review passes (T1 review · T2 review · T2 delta re-review). Next: `/lean-doc-generator close`.
