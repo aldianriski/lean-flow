@@ -18,13 +18,9 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-066 — Verification Authority** → [`docs/sprint/SPRINT-066-verification-authority.md`](docs/sprint/SPRINT-066-verification-authority.md)
->
-> Two rulings that decide *who may say no*: whether mechanical evidence may gate the coordinator's
-> DoD tick (T1 = TASK-207, the second gauntlet audit's core fork) and whether the revise loop may
-> run unattended, on what budget (T2 = TASK-203, deferred by name from SPRINT-065). Both ADR-grade.
-> **TASK-208/209 stay `blocked`** on T1's ruling; no epic stamp (D3 — EPIC-003/004/005 still
-> `proposed`, these rulings are their inputs, not member work).
+> _None._ SPRINT-066 closed 2026-08-15 (2 of 2, v1.40.0) — ADR-021 (mechanical evidence gates the
+> silent path, never the owner) and ADR-022 (unattended retry only on the mechanical-trigger
+> carve-out). TASK-208/209 are `ready`: the build half of the audit remainder, next promote.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard** (next — TASK-198 is its
@@ -61,45 +57,6 @@ status: current
       origin:     manual
       state:      ready
 
-- [ ] TASK-203 — Rule whether the revise loop may run unattended, and on what budget  [size: S] [risk: med] [HITL]
-      class:      decision
-      done-when:  a recorded ruling — an ADR if it carves out the charter — on whether a critic-driven
-                  retry may fire inside an unattended run, with a hard ceiling and a rollup line per
-                  retry, or an explicit "attended only" with the reason stated
-      touches:    skills/orchestrator/references/night-run.md · docs/adr/ · EPIC-005
-      depends-on: none — TASK-202 shipped as SPRINT-065 T3 (the attended loop exists:
-                  `review-scoping.md` § The revise loop)
-      assumes:    **a critic ruling "not good enough, retry" is a decision, and the unattended charter
-                  is execute-only — decide nothing.** That collision is the whole task; do not resolve
-                  it by reading the retry as mere execution. Hard-to-reverse **and** surprising **and**
-                  a real trade-off → likely ADR-grade, and a `/council` candidate if it does not settle
-                  at G2. The budget half is **EPIC-005 D2** shaped (delegation policy declared per repo,
-                  read by the run, never held by a coordinator) — note the source article's "agent
-                  fleet" is a false cognate for EPIC-005's fleet and does not import its design
-      tracker:    docs/research/gauntlet-loop-delta.md · ADR-016 · EPIC-005 D2 · night-run.md Part 0
-      origin:     manual
-      state:      ready
-
-- [ ] TASK-207 — Rule whether mechanical evidence may gate the coordinator's progress  [size: S] [risk: med] [HITL]
-      class:      decision
-      done-when:  a recorded ruling — an ADR if it carves the boundary — on whether a per-done-when
-                  verification method + recorded evidence, produced at G2, may BLOCK the coordinator's
-                  DoD tick and the run's close, versus the raise-never-gate spine standing; the
-                  consumer boundary stated either way (lean-flow never runs the consumer's CI as a
-                  blocker on its own authority)
-      touches:    docs/adr/ · skills/orchestrator/references/review-scoping.md § QA suggestion
-      depends-on: none
-      assumes:    the never-gate line is charter, not accident — the ruling engages it, never routes
-                  around it. G2's completion-bound rule already exists (DOCS_Guide §2); the delta
-                  being ruled is evidence RECORDING + BLOCKING. Hard-to-reverse + surprising + a real
-                  trade-off → ADR-grade, and a /council candidate if it does not settle at G2. The
-                  retry ceiling (one per pass, owner-ruled SPRINT-065 T3) is out of scope. Source:
-                  second gauntlet audit (2026-08-15), delta-mapped against v1.39.0 — only the
-                  unmatched remainder was filed (L-017)
-      tracker:    docs/research/gauntlet-loop-delta.md · review-scoping.md § QA suggestion · L-017
-      origin:     decomposer
-      state:      ready
-
 - [ ] TASK-208 — Wire a system-verify pass after the last wave's merge-back  [size: M] [risk: med] [HITL]
       class:      execution
       done-when:  after a multi-task run's final merge-back, one named full-gate pass (the host repo's
@@ -108,16 +65,17 @@ status: current
                   named finding, fixtures retained (L-058 · TD-012)
       touches:    skills/orchestrator/references/dispatch.md § Merge-back queue ·
                   skills/orchestrator/SKILL.md (hook line, cap-checked) · evals/fixtures/
-      depends-on: TASK-207 — whether the pass blocks or reports is that ruling
+      depends-on: none — TASK-207 ruled as ADR-021 (SPRINT-066 T1): a done-when-named check's FAIL
+                  blocks the silent tick, owner override recorded; the pass gates accordingly
       assumes:    upgrades dispatch.md's existing per-wave "interaction-only smoke check", not a new
                   subsystem. Scope = multi-task merge-back only — locally-green ≠ globally-green is
                   the failure it exists for; single-task mvp is already covered by Review. The gate
                   command is discovered from the host repo, never hard-coded (no leaked scripts/…
                   path — L-015; this repo dogfoods via its own gate). Unattended wording defers to
                   TASK-203 by pointer, never decides
-      tracker:    dispatch.md § Merge-back queue · ADR-016 · L-015 · L-058
+      tracker:    dispatch.md § Merge-back queue · ADR-016 · ADR-021 · L-015 · L-058
       origin:     decomposer
-      state:      blocked
+      state:      ready
 
 - [ ] TASK-209 — Per-criterion evidence lines in the rollup and review report  [size: S] [risk: low] [HITL]
       class:      execution
@@ -126,14 +84,15 @@ status: current
                   extending ADR-016's N-of-M — exercised on one real sprint close
       touches:    skills/orchestrator/references/night-run.md Part 4 · review-scoping.md ·
                   sprint templates (consumer surface — L-015)
-      depends-on: TASK-207 — evidence can only be reported if the contract records it
+      depends-on: none — TASK-207 ruled as ADR-021 (SPRINT-066 T1); the contract to report is the
+                  done-when-named check + recorded owner rulings it defines
       assumes:    reporting-only regardless of TASK-207's gating answer — a report aligns with the
                   raise-never-gate spine either way — but its SHAPE is the contract TASK-207 defines,
                   so it stays blocked on the ruling. Extends the ADR-016 rollup, never forks it;
                   template edits ship to consumers (L-015)
-      tracker:    ADR-016 · night-run.md Part 4 · L-015
+      tracker:    ADR-016 · ADR-021 · night-run.md Part 4 · L-015
       origin:     decomposer
-      state:      blocked
+      state:      ready
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution
@@ -174,7 +133,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-065's shipped changes are written up as **v1.39.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.39.0 + v1.38.0** inline, with **v1.37.0 rotated** → [`docs/changelog/CHANGELOG-1.37.0.md`](docs/changelog/CHANGELOG-1.37.0.md) in the same commit.
+_(no active sprint)_ — SPRINT-066's shipped changes are written up as **v1.40.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.40.0 + v1.39.0** inline, with **v1.38.0 rotated** → [`docs/changelog/CHANGELOG-1.38.0.md`](docs/changelog/CHANGELOG-1.38.0.md) in the same commit.
 
 ---
 

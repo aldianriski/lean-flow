@@ -74,3 +74,4 @@ One line per archived sprint (newest first); files live in [`archive/`](archive/
 - SPRINT-063 — Headroom — closed 2026-08-14 · 3998e23 · 4 of 4 units (v1.37.0) · EPIC-002
 - SPRINT-064 — Where It Fires — closed 2026-08-14 · 92a16c9 · 3 of 3 units (v1.38.0) · EPIC-002
 - SPRINT-065 — The Critic Loop — closed 2026-08-15 · c723b76 · 3 of 3 units (v1.39.0) · EPIC-002 (closes the epic)
+- SPRINT-066 — Verification Authority — closed 2026-08-15 · <close_commit> · 2 of 2 units (v1.40.0) · ADR-021 + ADR-022

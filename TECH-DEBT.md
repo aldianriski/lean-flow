@@ -161,6 +161,15 @@ status: current
     next pass is not another hold:** act when a *third* procedural gate is filed with no control, or
     when EPIC-004's spec-driven engine gives procedural rules a machine-readable form to assert against
     — whichever lands first. Do not build a prose-grep harness in the meantime.
+  - **Sighting note 2026-08-15 (SPRINT-066 close) — the third-gate trigger did NOT fire; read the
+    condition carefully before counting.** ADR-021 and ADR-022 are two more procedural gates and
+    neither ships a fixture — but both **name their control at authoring time**: ADR-021 names G2's
+    new checklist line as its matcher, and ADR-022 explicitly assigns its must-FAIL leg to
+    TASK-208/209's build. "Filed with **no** control" is the trigger, and a control scheduled by name
+    is not absent. Recorded so these two are not silently absorbed into the count. Separately,
+    SPRINT-066 produced the first *mechanical* control ever applied to a procedural rule — the Spec
+    axis briefed with the ruling as comparand caught stale wiring in-session (L-122) — which is a
+    candidate shape for this row's eventual cure.
 
 - **TD-051** severity: medium | status: open | created: Sprint-061
   - Summary: **`check-layers-observed.sh` (gate leg 15) never sees a close commit, because the close

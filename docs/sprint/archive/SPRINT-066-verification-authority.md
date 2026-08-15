@@ -3,7 +3,7 @@ sprint: 066
 slug: verification-authority
 owner: Maintainer
 last_updated: 2026-08-15
-status: active
+status: closed
 gates_signed: G1,G2 @ f208aad
 plan_commit: ee5fe2d
 close_commit: [sha — set at close]
@@ -87,6 +87,8 @@ reason stated in `night-run.md` Part 0.
       close moved the repo one MINOR past the fresh install made before it). The delta is exactly the
       SPRINT-065 skill changes (`review-scoping.md` · orchestrator SKILL § Review · SPRINT template);
       this session reads those from repo source (L-021), but the gap closes only by reinstalling.
+      *Carried open at close (owner proceeded): unactioned through the sprint; re-filed on
+      SPRINT-067's Owner-action checklist, now two MINORs behind (1.38.0 vs 1.40.0).*
 
 ## Decisions (pre-locked)
 
@@ -147,12 +149,27 @@ reason stated in `night-run.md` Part 0.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
 **Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+No miss of *prior* knowledge. The near-case was same-session: T2's builder pass left the superseded
+"unattended never retries" line in two consumer touchpoints — contradicting a ruling made minutes
+earlier — and the revise loop's Spec axis caught it in-session, briefed with the logged ruling as
+comparand. Promoted rules fired as designed: L-100 twice (both `Layers:` corrections logged first),
+and L-020's wiring check gained its first mechanical matcher (→ L-122).
 
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents). Cost per
-unit **delivered**, not per unit attempted.
+**Cost** — inline coordinator, one session, 2 of 2 units delivered. Two frontier popups carried all
+four owner rulings (G1+G2+T1's fork batched; T2's fork serialised behind T1's answer, ruled while
+T1's reviewer ran — zero added wall-clock). Dispatches: three scoped `sonnet` review passes (T1
+review · T2 review · T2 delta re-review), ≈220k subagent tokens total.
 
-**Worked**
+**Worked** — pipelining the T2 ruling into T1's review window. Briefing the Spec axis with the
+*decision as logged* rather than the diff alone: it caught the two stale touchpoints the builder
+missed. The revise loop's ceiling held exactly as specified: one retry, both axes fixed, one delta
+re-review, no spiral.
 
-**Friction**
+**Friction** — the builder pass missed the CLAUDE.md wiring-check DoD at build time (two consumer
+touchpoints stale until review) — caught by the loop, but the miss itself is the L-020 shape with
+the rule loaded in context. The plugin-reinstall owner action carried through a second sprint
+unactioned; at close the installed cache is two MINORs behind the repo.
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`) — **L-122** filed: brief the
+Spec-axis reviewer with the decision as logged, not the diff alone — it turns the wiring check into
+a mechanical matcher.

@@ -22,11 +22,19 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-121**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-122**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-122 [tags: process] [status: active]: **Brief the Spec-axis reviewer with the *decision as logged*, not the diff alone — it turns the wiring check into a mechanical matcher.** SPRINT-066 T2's builder pass shipped the ADR-022 ruling with two consumer touchpoints still stating the superseded rule (`orchestrator/SKILL.md` § Review "unattended never retries — TASK-203" · CONTEXT.md § Built-in leverage "attended only") — the exact L-020 gap, missed at build time with the wiring-check DoD loaded in context. The scoped reviewer was handed the Execution Log's ruling text as the Spec comparand plus the instruction "any touchpoint stating a condition the others omit, or omitting one, is a finding" — it caught both in one pass; the bounded retry fixed them; the delta re-review confirmed with no new violations. The promoted wiring rule said *what* to check; the comparand-briefed reviewer is the first thing that *checked* it mechanically. Pattern: when a review follows a ruling, the ruling text is the Spec comparand — the ladder's `Cites:` rung at minimum, the logged decision verbatim when one exists.
+- seen: Sprint-066
+- count: 1
+- promoted: no
+- related: L-020 (shipped ≠ wired) · L-058 (the named-finding bar) · review-scoping.md § Two axes (the comparand ladder)
 
 ---
 

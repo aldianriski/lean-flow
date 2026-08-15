@@ -3,7 +3,7 @@ sprint: 066
 slug: verification-authority
 owner: Maintainer
 last_updated: 2026-08-15
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -100,3 +100,14 @@ QA gate at exit: 147 pass, 0 fail. Owner-action box (plugin reinstall, 1.38.0 in
 repo) remains open — an owner step, not Plan DoD; it carries to close. Shape: inline coordinator,
 two decision tasks ruled by the owner across two frontier popups; dispatches = 3 scoped `sonnet`
 review passes (T1 review · T2 review · T2 delta re-review). Next: `/lean-doc-generator close`.
+
+### 2026-08-15 | close | 2 of 2 units — v1.40.0; §11 applied; owner-action carried
+Retro written and routed: Shipped → CHANGELOG **v1.40.0** (MINOR by hand — two ADRs change shipped
+skill behaviour) · **L-122** filed (brief the Spec axis with the decision as logged — the wiring
+check's first mechanical matcher) · sighting note appended to **TD-052** (ADR-021/022 are procedural
+gates that *name their control at authoring* — the third-gate trigger did not fire) · **TASK-208 /
+TASK-209 flipped `ready`** (their blocker ruled as ADR-021). §11 on owner approval: sprint + log →
+`docs/sprint/archive/` + `archive/logs/` · TASK-207 / TASK-203 removed from the Backlog · CHANGELOG
+v1.38.0 rotated → `docs/changelog/`. **The reinstall owner-action carries open** (owner proceeded
+with close): installed cache 1.38.0 vs repo 1.40.0 — re-filed on SPRINT-067's checklist. QA gate
+before the close commit; `close_commit` backfilled after.
