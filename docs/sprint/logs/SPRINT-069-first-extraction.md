@@ -199,3 +199,40 @@ The resolution states 497 and carries a comment telling the next editor to re-me
 Both merged worktrees removed. The gate had been reporting two `ephemeral-intake` FAILs — one per
 live worktree — which is leg 1 scaling with the number of concurrent agents, a detail the row did not
 anticipate. Post-removal the gate is **151 pass / 0 fail**.
+
+### 2026-08-16 | scope-change | T3's DoD named three exclusions; the repo freezes nine — exclusion clause amended, owner-ruled
+
+**What broke.** T3's DoD reads *"no live surface cites the standard by its pre-extraction document
+name"*, with an exclusion line naming **archived sprints · rotated changelogs · the generated index**.
+Re-deriving the citation set at execution (as DoD 1 requires) produced **140 live mentions**, and
+splitting them showed the exclusion list is incomplete by six categories:
+
+| Frozen surface | Sites | The rule that freezes it |
+|---|---|---|
+| `docs/adr/` — 10 accepted ADRs | 14 | append-only; "never edit a decided ADR" (§4) |
+| `docs/LEARNINGS.md` past entries | 10 | "never edit a past entry except to bump seen/count or set promoted" (§11) |
+| `loop-hygiene-{prd,findings,workstreams}` | 9 | `status: superseded` ⇒ FROZEN (ADR-020) |
+| `TECH-DEBT.md` past rows | 3 | the audit trail; rows are corrected by appending |
+| this sprint's own Plan + Execution Log | 4 | Plan frozen at promote; Log append-only |
+| `spec/CHANGELOG.md` · `sprint/INDEX.md` · a fixture | 2 | deliberate historical citation; fixture data |
+
+**42 frozen + 98 sweepable = 140**, reconciled against the live total.
+
+Taken literally the criterion is **unsatisfiable**: meeting it would require editing ten accepted
+ADRs and rewriting past learning entries — breaking three standing rules to satisfy the wording of
+one. This is L-088's shape with the fault at authoring rather than at drift: the scope was always
+right, the criterion was incomplete the moment it was written, because "live" was assumed to mean
+"not archived" when this repo also freezes append-only, superseded, and frozen-at-promote artifacts.
+
+**Impact.** None on scope — the 98 sweepable sites are exactly the consumer-facing surface T3 exists
+to fix (skills · templates · scripts · harness comments · README/AGENTS/SECURITY/CONTEXT/overview).
+What changes is the criterion's exclusion clause, from three named categories to nine.
+
+**Ruling (owner, 2026-08-16):** sweep the 98; record the 42 as explicitly out of scope, per class,
+with the rule that freezes each. DoD amended before execution, not reinterpreted after it — the red
+flag this avoids is re-reading a DoD's words to fit what was built.
+
+**Re-confirm G2.** No task gained or lost work; T3's `Layers:` are unchanged. One checked detail that
+could have gone wrong: `run-epic-archive-fixtures.sh`'s mention of the old name is a **comment**, not
+an assertion, so sweeping it cannot break a fixture that greps its own token (L-108) — verified by
+reading the line, not assumed from the filename.
