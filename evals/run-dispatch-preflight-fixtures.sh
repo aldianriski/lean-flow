@@ -7,12 +7,12 @@
 # regression guard (L-058's exact worst case -- a gate that can degrade silently). This runner
 # adopts the same fixture shape into the harness that TD-012 itself named as the natural carrier.
 #
-# Extraction note: dispatch.md predates the `<!-- name:start/end -->` anchor convention T1 shipped
-# in night-run.md (skills/** is frozen for this task, so no anchors were added). dispatch.md has
-# exactly ONE ```sh fenced block, so extract_sole_fenced_block pulls it unambiguously instead --
-# still testing the real shipped snippet, never a hand-copied duplicate (harness-common.sh checks
-# the fence count and fails loud if a second ```sh block is ever added, rather than silently
-# extracting the wrong one).
+# Extraction note: this runner used extract_sole_fenced_block while dispatch.md had exactly ONE ```sh
+# block and skills/** was frozen for the task that wrote it. SPRINT-070 T2 added a second ```sh block
+# (the worktree-base guard), which is precisely the case that helper fails loud on -- so dispatch.md
+# was retrofitted with the `<!-- name:start/end -->` anchor convention and this runner now extracts
+# by name. Still the real shipped snippet, never a hand-copied duplicate; the anchors additionally
+# make the extraction stable against any future third block.
 #
 # The snippet's git calls (`git rev-parse HEAD`, `git rev-parse <declared-base>`) are bare -- no
 # `-C <repo>` flag -- so they resolve against the CALLER's cwd. Every case below runs the extracted
@@ -28,7 +28,8 @@ dispatch_md="$repo_root/skills/orchestrator/references/dispatch.md"
 
 script_tmp=$(mktemp) || { echo "FAIL harness: mktemp failed"; exit 2; }
 trap 'rm -f "$script_tmp"' EXIT
-extract_sole_fenced_block "$dispatch_md" "sh" "$script_tmp"
+extract_between_anchors "$dispatch_md" \
+  "<!-- dispatch-preflight:start -->" "<!-- dispatch-preflight:end -->" "$script_tmp"
 
 live_head=$(git -C "$repo_root" rev-parse HEAD 2>/dev/null)
 [ -n "$live_head" ] || { echo "FAIL harness: could not resolve live HEAD in $repo_root"; exit 2; }

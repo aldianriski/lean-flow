@@ -442,7 +442,15 @@ sh evals/selftest-assert-boundary-park.sh
 sh evals/selftest-assert-noaction-park.sh
 sh evals/selftest-assert-judgement-retry.sh
 sh evals/run-layers-observed-fixtures.sh
+sh evals/run-worktree-base-fixtures.sh         # SPRINT-070 T2 / TD-054
 ```
+
+`run-worktree-base-fixtures.sh` is a **snippet-extracting** harness that lands in the opt-in group
+rather than the first one, because the shipped guard it extracts can only be exercised against real
+git history: its `stale` leg needs a worktree genuinely behind a shared ancestor and its `divergent`
+leg an unrelated root. It is the guard for the gap TD-054 sat in for six sprints — the pre-dispatch
+preflight's base-ref leg compares the *declared* base to live HEAD in the main checkout and is silent
+about what a spawned worktree actually got.
 
 The **SPRINT-055 group** each pair a `scripts/lib/` checker with retained must-FAIL *and* must-PASS
 fixtures. The must-PASS controls are not decoration: without one, a checker that FAILed

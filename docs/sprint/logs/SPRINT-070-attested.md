@@ -73,3 +73,68 @@ halting guard, per TD-054's own framing — the assertion catches it, the pin is
 Also observed, not acted on: two leftover branches `worktree-agent-a756b5b9e735387c6` and
 `worktree-agent-af7c31821869c7fd1` with no registered worktrees. `dispatch.md`'s pre-dispatch
 guardrail (harness issue #51596) says clean these before any dispatch.
+
+### 2026-08-16 | progress | T2 — `Layers:` corrected to add `scripts/qa-check.sh` (L-100, not a scope-change)
+
+The gate found it, which is the point of running it before the commit rather than after:
+`FAIL layers observed: … changed but undeclared in any task's Layers:: scripts/qa-check.sh`. T2
+declared `dispatch.md · evals/` at promote, and a `Layers:` written before the work cannot name the
+file the work turns out to need — the new harness has to be registered in `qa-check.sh`'s
+`eval_harnesses_optin` or its own completeness leg reports it as silently un-gated. Declared,
+logged, continuing; **not** filed as a `scope-change`, because no scope moved (L-100: a mid-sprint
+`Layers:` edit is the expected cost of declaring before the work, not a pivot to re-confirm at G2).
+
+`.claude/settings.json` also changed and the gate did **not** flag it. Checked rather than assumed:
+`check-layers-observed.sh` line 208 excludes both settings files by name, so the silence is by
+design. Declaring it anyway, since the overlap map reads `Layers:` and a file this task really does
+edit should appear there.
+
+### 2026-08-16 | progress | T2 — cause, cure and guard land; 3 of 4 DoD ticked
+
+**Cause (DoD 1), and it is not a bug.** `worktree.baseRef` defaults to `"fresh"`, which branches a
+worktree from `origin/HEAD`. Verified against the official worktrees documentation rather than
+inferred from our own logs: *"Subagent worktrees use the same base branch as `--worktree`, so they
+branch from your repository's default branch unless `worktree.baseRef` is set to `"head"`."* So the
+pin is documented default behaviour meeting a repo that pushes deliberately — `origin/main` stands
+still, every agent gets the same sha, and it looks like an inexplicable pin until you resolve
+`origin/HEAD`. Two details neither L-046 nor `dispatch.md` had, now written down: on a `"fresh"`
+base `origin/HEAD` is refreshed by a ≤5s fetch if stale >24h (so "current" means current *to the
+remote*), and with no remote — or an unfetchable `origin/HEAD` — it silently falls back to local
+HEAD, meaning the same setting yields opposite bases in two repos.
+
+**Cure.** `worktree.baseRef: "head"` in `.claude/settings.json`, which removes the pin at its cause,
+*plus* the guard — the setting is per-repo, absent in a fresh clone, and one deleted key from
+reverting. `git push` was considered and rejected in the doc text: it makes the base current exactly
+once and re-breaks on the next unpushed commit.
+
+**Guard (DoD 3).** New `### Worktree-base guard` in `dispatch.md`, extracted by anchor and exercised
+by `evals/run-worktree-base-fixtures.sh` — one case per named finding, six findings:
+`worktree-base-unresolved` · `-missing` · `-unreadable` · `-stale` · `-divergent` · plus a PASS
+control. Two design points worth recording: the guard resolves the *coordinator* ref first, so a
+broken invocation reports itself instead of masquerading as drift (L-091), and the `stale` arm counts
+distance only when the worktree's base is an actual ancestor — across unrelated roots `rev-list
+--count` returns a number that reads like a distance and means nothing, so that case reports
+`divergent` and `do not merge` instead.
+
+**The fixtures were proven to bite, not just to pass.** Ticking a must-FAIL suite because it is green
+is the false-negative L-058 is about, so the guard's comparison was deliberately inverted
+(`!=` → `=`) and the suite re-run: 4 of 7 assertions went red, including the TD-054 case and the PASS
+control. Restored and re-verified green. A suite that stays green under an inverted comparison would
+have been decoration.
+
+**DoD 4.** The preflight's base-ref item now states what it does *not* cover — it compares the
+declared base to live HEAD in the main checkout and is silent about any worktree — and points at the
+guard. Its own leg still passes: all 10 `run-dispatch-preflight-fixtures.sh` cases green, including
+`base-ref-drift`, after the runner was retrofitted from `extract_sole_fenced_block` to
+`extract_between_anchors` (the second ```sh block is exactly the case that helper fails loud on).
+
+Gate: **144 pass / 0 fail**, identical to the pre-task baseline; **150 / 0** under `QA_FULL=1`, where
+`PASS eval harness run-worktree-base-fixtures.sh` confirms the new harness is wired and firing rather
+than merely present. Tier is opt-in per `qa-check.sh`'s declared rule (cheap-and-git-free stays
+always-on; git-repo-building stays opt-in) — recorded in the runner header as a rule the guard
+*loses* to, since its own defect went six sprints unnoticed, and revisitable if it ever gains a
+git-free leg.
+
+**DoD 2 remains open** — it requires a *real* dispatched worktree with its base recorded, which needs
+one `Agent(isolation: "worktree")` spawn. Raised to the owner rather than substituted: a hand-made
+`git worktree add` would exercise git, not the harness path whose default is the entire defect.

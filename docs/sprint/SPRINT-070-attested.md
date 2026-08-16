@@ -66,7 +66,8 @@ verifier may conclude from it, with a real commit from this repo shown as the wo
       epic-archive leg still reports the epic correctly live*
 
 ### T2 — Stop worktree dispatch branching from a stale pinned base `[size: M · risk: med · class: execution · HITL]`
-Layers: `skills/orchestrator/references/dispatch.md` · `evals/`
+Layers: `skills/orchestrator/references/dispatch.md` · `evals/` · `scripts/qa-check.sh` ·
+        `.claude/settings.json`
 Depends-on: none
 Cites: TD-054 (second sighting + the mechanism, 2026-08-16) · SPRINT-069 Execution Log ·
        L-091 (re-derive the cure; a guard against the wrong cause guards nothing) ·
@@ -78,15 +79,15 @@ conflict, forced a task inline, and made every merge require union-verification.
 halts the dispatch when it does not rather than leaving it to be discovered at merge.
 
 **DoD:**
-- [ ] **The cause is established before the cure is written** — why the base is pinned, stated as a
+- [x] **The cause is established before the cure is written** — why the base is pinned, stated as a
       finding — *Verify: the finding names the mechanism, not just the symptom; L-091 forbids
       building on the symptom*
 - [ ] A dispatched worktree branches from the coordinator's HEAD, demonstrated on a **real
       dispatch** with the base recorded — *Verify: the worktree's merge-base equals the
       coordinator's HEAD at spawn, captured in the Execution Log*
-- [ ] A guard halts a dispatch whose base is not current, naming what it found —
+- [x] A guard halts a dispatch whose base is not current, naming what it found —
       *Verify: a must-FAIL fixture drives a stale base through the guard and it FAILs by name*
-- [ ] The pre-dispatch preflight's base-ref item reflects the new guard —
+- [x] The pre-dispatch preflight's base-ref item reflects the new guard —
       *Verify: the preflight's own `base-ref` leg still passes on a correct dispatch, and the
       reference text matches what the guard actually does*
 

@@ -61,7 +61,11 @@ this markup proved sufficient; a compiled DAG was rejected as a needless second 
    dispatch creates. (TD-025: sequential execution can't collide, so a transitive chain already
    satisfies the check's intent — derived from the same `Depends-on:` markup, no new field.)
 3. **Base-ref check** — the wave's declared base commit (stated up front, never assumed) must equal
-   live HEAD; drift means unrelated work landed since declaration (L-055's root cause).
+   live HEAD; drift means unrelated work landed since declaration (L-055's root cause). **This leg is
+   coordinator-side only — it says nothing about the base a spawned worktree actually gets**, and the
+   two were assumed to be the same thing for six sprints (TD-054). The worktree's own base is checked
+   after spawn by the **worktree-base guard** in § Worktree dispatch protocol; a CLEAR here is not a
+   statement about any worktree.
 4. **Wave computation** — topological rank over the `Depends-on` DAG; rank 0 dispatches in parallel,
    higher ranks wait behind a barrier.
 
@@ -75,6 +79,7 @@ through a real FAIL (L-057). Its Plan-parsing loop is guarded (`read … || [ -n
 unguarded `while read` silently drops the file's last line — degrading check 2 to a false PASS on a
 real overlap (L-058's own finding):
 
+<!-- dispatch-preflight:start -->
 ```sh
 #!/bin/sh
 # Dispatch preflight -- derives cycle / shared-file-ownership / base-ref / wave-rank
@@ -262,6 +267,7 @@ END {
 [ "$fail" -eq 0 ] && echo "PREFLIGHT: CLEAR" || echo "PREFLIGHT: HALT"
 exit $fail
 ```
+<!-- dispatch-preflight:end -->
 
 ## Parallel vs sequential
 
@@ -323,14 +329,89 @@ declared base commit — stated up front, then verified against live HEAD at spa
 Mismatch halts dispatch for the wave. Re-run the check at every wave boundary, not just once at the
 start — HEAD moves as waves land, so a base verified for wave 1 is stale by wave 2.
 
-Base-ref caveat (observed on the first real wave): agent worktrees fork from the **remote default
-branch**, not local HEAD (unless `worktree.baseRef: "head"` is set) — unpushed local commits are
-invisible in an agent's tree. Brief agents to read newer docs via `git show main:<path>` (read-only,
-L-043-safe); the three-way merge reconciles the old base cleanly as long as only the task's own
-files changed on its branch. **Corollary: a task EDITING a file that exists only in unpushed
-commits must not be worktree-dispatched** — the merge becomes add/add on that file. Fall back to
-shared-tree parallel dispatch (disjoint files, agents run no git writes, coordinator commits
-sequentially), or push / set `baseRef: "head"` first.
+### The stale base is a pin, and the pin is documented default behaviour
+
+Agent worktrees fork from the **remote default branch**, not local HEAD. This is not drift, not a
+harness bug, and not something that varies run to run: `worktree.baseRef` defaults to `"fresh"`,
+which branches from `origin/HEAD`. A repo whose local branch runs ahead of its remote — anywhere push
+is deliberate rather than continuous — therefore hands **every** agent the same stale sha, sprint
+after sprint, and the sha only looks arbitrary until you resolve `origin/HEAD` and find it staring
+back. Measured here: four worktrees across two sprints all branched from `622f420`, which was exactly
+`origin/main` while local `main` sat 31 commits ahead (TD-054 · L-046, first recorded SPRINT-026).
+
+Two details worth knowing before you reason about a base you did not check:
+
+- On a `"fresh"` base, `origin/HEAD` is refreshed by a fetch if the repo has not been fetched in 24h
+  (capped ~5s, falling back to the cached ref). "Current" therefore means *current to the remote*,
+  which is not a claim about your tree at all.
+- With **no remote configured**, or an `origin/HEAD` that is neither cached nor fetchable, the
+  worktree silently falls back to local HEAD — so the same setting produces opposite bases in two
+  repos, and a run that "worked last time" proves nothing about this one.
+
+**Cure, in this order.** Set `worktree.baseRef: "head"` in `.claude/settings.json` so worktrees carry
+unpushed work — that removes the pin at its cause. Then keep the guard below, because the setting is
+per-repo, silently absent in a fresh clone, and reverts to `"fresh"` the moment someone drops the
+key. Do **not** reach for `git push` as the fix: it makes the base current exactly once and re-breaks
+on the next unpushed commit, which is a coincidence wearing a fix's clothes.
+
+```json
+{ "worktree": { "baseRef": "head" } }
+```
+
+**Corollary that survives either setting: a task EDITING a file that exists only in unpushed commits
+must not be worktree-dispatched under a `"fresh"` base** — the merge becomes add/add on that file.
+Fall back to shared-tree parallel dispatch (disjoint files, agents run no git writes, coordinator
+commits sequentially). Where the stale base is merely inconvenient rather than disqualifying, brief
+agents to read newer docs via `git show main:<path>` (read-only, L-043-safe); the three-way merge
+reconciles the old base as long as only the task's own files changed on its branch.
+
+### Worktree-base guard (runs after spawn, before the agent does real work)
+
+The preflight's base-ref leg is coordinator-side and cannot see this — it compares the *declared*
+base to live HEAD, both in the main checkout. This guard compares the base the worktree **actually
+got** against the coordinator's HEAD, and halts naming what it found rather than leaving it to
+surface as a merge conflict two hours later. Run it per spawned worktree; a non-zero exit halts that
+dispatch, not the wave's other agents.
+
+<!-- worktree-base-guard:start -->
+```sh
+#!/bin/sh
+# Worktree-base guard -- the base a SPAWNED worktree actually got must equal the coordinator's HEAD.
+# Complements the pre-dispatch preflight's base-ref leg, which only ever compares the declared base
+# to live HEAD in the main checkout and is silent about worktrees (TD-054, six sprints).
+# Exit 0 = clear; exit >0 = halt this dispatch.
+wt="${1:?usage: worktree-base-guard.sh <worktree-path> <coordinator-sha>}"
+coord="${2:?usage: worktree-base-guard.sh <worktree-path> <coordinator-sha>}"
+
+# Resolve the coordinator's side FIRST. An unresolvable expectation is a broken invocation, not a
+# stale worktree -- reporting it as drift would name the wrong culprit and send the reader to the
+# wrong fix (L-091: a guard against the wrong cause guards nothing).
+coord_sha=$(git rev-parse --verify -q "${coord}^{commit}" 2>/dev/null)
+[ -n "$coord_sha" ] || { echo "FAIL worktree-base-unresolved: coordinator ref '$coord' does not resolve"; exit 2; }
+
+[ -d "$wt" ] || { echo "FAIL worktree-base-missing: no worktree at '$wt'"; exit 2; }
+wt_sha=$(git -C "$wt" rev-parse --verify -q HEAD 2>/dev/null)
+[ -n "$wt_sha" ] || { echo "FAIL worktree-base-unreadable: cannot read HEAD in '$wt'"; exit 2; }
+
+if [ "$wt_sha" != "$coord_sha" ]; then
+  # Name the gap in commits, not just the two shas: "3 behind" is actionable, two hex strings are a
+  # puzzle. Count only when the worktree's base is an ancestor -- an unrelated base has no count.
+  if git merge-base --is-ancestor "$wt_sha" "$coord_sha" 2>/dev/null; then
+    behind=$(git rev-list --count "$wt_sha..$coord_sha" 2>/dev/null)
+    echo "FAIL worktree-base-stale: worktree '$wt' is at $wt_sha, $behind commit(s) behind coordinator HEAD $coord_sha -- set worktree.baseRef to \"head\" (see the cure above); do NOT push to close the gap"
+  else
+    echo "FAIL worktree-base-divergent: worktree '$wt' is at $wt_sha, which is not an ancestor of coordinator HEAD $coord_sha -- unrelated base, do not merge"
+  fi
+  exit 1
+fi
+echo "PASS worktree-base: '$wt' branched from coordinator HEAD ($coord_sha)"
+exit 0
+```
+<!-- worktree-base-guard:end -->
+
+**Record the result in the Execution Log either way.** A PASS is the observation that keeps TD-054
+closed; a silent PASS is indistinguishable from never having run the guard, which is the state the
+row spent six sprints in.
 
 ## Merge-back queue (coordinator-only)
 
