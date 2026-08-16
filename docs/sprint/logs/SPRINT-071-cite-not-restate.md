@@ -89,3 +89,60 @@ by the dispatch rule anyway. T2 is `class: execution` and would dispatch by defa
 because its hard part is per-file judgement — deciding which text is the *rule* (goes) and which is the
 *routing that tells a reader the rule applies here* (stays, L-015) — over a bounded ~39 sites, where
 briefing a subagent costs more than the conversion. Recorded as a stated reason, not an omission.
+
+### 2026-08-16 | progress | T1 — inventory complete: 39 sites, and only 6 are restatements
+
+**Headline, because it resizes the rest of the sprint: 6 of 39 sites are actual restatements.** The
+other 33 are already correct. Condition 2 is far closer to satisfied than the promote framing implied,
+and T2 is a much smaller task than "sweep 15 files" suggested.
+
+**Bucket 1 — RESTATEMENT (6). T2's worklist.**
+
+| # | File · line | Rule restated | Target § |
+|---|---|---|---|
+| 1 | `council/SKILL.md:54` | §4's three-test, spelled out *alongside* its own `STANDARD §4` citation | §4 |
+| 2 | `prototype/SKILL.md:44` | §4's three-test, no citation at all | §4 |
+| 3 | `lean-doc-generator/SKILL.md:23` | §4's three-test ("only when hard-to-reverse **and** surprising **and** a real trade-off"), alongside its citation | §4 |
+| 4 | `lean-doc-generator/SKILL.md:123` | §3's ownership-header mandate, stated as a red flag, no citation | §3 |
+| 5 | `lean-doc-generator/SKILL.md:74` | §2's placement mapping, glossed inline after the citation | §2 |
+| 6 | `lean-doc-generator/references/init.md:61` | §2's placement mapping, same shape as #5 | §2 |
+
+Note the shape of 1, 3, 5 and 6: **they already cite the section and restate it anyway.** That is the
+harder half of ADR-023's "no rule stated twice" — the citation's presence makes them look compliant to
+any check that greps for one, which is precisely L-108's false-positive-is-a-false-negative.
+
+**#5 and #6 carry a live L-015 tension and T2 must not resolve it by reflex.** The placement gloss
+*is* §2's rule, so it duplicates. But it is also what lets the generator place a file without opening
+the spec, and a skill has to stay usable by someone who has the plugin and not the spec. Flagged on
+the worklist rather than pre-decided: T2's DoD 3 is the right place to rule it per file.
+
+**Bucket 2 — ALREADY-A-CITATION (25).** Leave alone. `init.md` ×7 (13·29·63·65·107·127·129) ·
+`lean-doc-generator/SKILL.md` ×7 (30·82·107·109·111·114·115) · `task-decomposer/SKILL.md` ×3
+(87·94·95) · `prd-and-slices.md` ×2 (8·57) · `migration-map.md:80` · `prime/SKILL.md:23` ·
+`release-patch/SKILL.md:44` · `triage/SKILL.md:50` · `flow/SKILL.md:43` · `night-run.md:54`.
+
+**Bucket 3 — LEGITIMATELY-LOCAL (8), each with its reason** — converting any of these would point a
+reader at a spec section that does not contain the rule:
+
+| File · line | Why it stays |
+|---|---|
+| `orchestrator/SKILL.md:54` | Routing, not §4's offer-test: *when to escalate a fork to `/council`*. A project-local decision the spec does not own. |
+| `lean-doc-generator/SKILL.md:70` | Procedural *use* of the ownership-header concept (a staleness scan step), not a statement of §3's rule. |
+| `lean-doc-generator/SKILL.md:73` | The template-load protocol — the generator's own procedure, owned by the skill. |
+| `lean-doc-generator/SKILL.md:3` | Frontmatter `description:` — trigger text a router matches on, not a rule. |
+| `council/SKILL.md:3` | Same: `description:` trigger text. |
+| `ADR-example.md:8` | A worked *example ADR* — rendered sample output, the same class D1 ruled out of scope for templates. |
+| `night-run.md:127` | The unattended parking classes — a local contract, not a spec rule. |
+| `night-run-checks.md:239` | **Pattern false positive.** "retention" here means *fixture* retention (L-058/TD-012), an unrelated sense of the word from §11's document retention. |
+
+**Cross-checks (DoD 4), both run before acting on the result.** (a) Bucket sum reconciles: 6 + 25 + 8
+= **39** = the census, and the corrected promote figure and this re-derivation agree, as the owner
+ruling requires. (b) **Seeded gap:** a planted restatement in a throwaway tree was **detected**, and a
+clean file in the same tree matched nothing. The negative control alone would have proved only that
+the scan fires on rows it reaches — the seed is what shows it reaches them.
+
+**A2 is true but was misleading as a premise, and this matters for T3.** A2 measured skills citing
+`spec/STANDARD.md` **by path** — exactly 1. But 25 sites cite the standard **by name** (`STANDARD §N`),
+which is what SPRINT-069 T3's 86-site sweep produced. So "1 of 14 cites the spec" reads as a corpus
+that ignores the spec, when the corpus overwhelmingly cites it and simply does not spell out the file
+path. No task changes; recorded because T3's audit must not mistake a name-citation for a missing one.

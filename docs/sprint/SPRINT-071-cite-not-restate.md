@@ -47,15 +47,15 @@ is the deliverable; the conversion that follows it is mechanical once the workli
 reader of the worklist can act on it without re-deriving the judgement.
 
 **DoD:**
-- [ ] All 15 non-template files inventoried, every candidate site classified **restatement** ·
+- [x] All 15 non-template files inventoried, every candidate site classified **restatement** ·
       **already-a-citation** · **legitimately-local** — *Verify: the three bucket counts sum to the
       site census taken at promote; a site in no bucket is an unfinished inventory, not a pass*
-- [ ] The **legitimately-local** bucket carries a stated reason per entry — a project fact the spec
+- [x] The **legitimately-local** bucket carries a stated reason per entry — a project fact the spec
       does not own, named — *Verify: no entry reads only "local"; converting one of these would point
       a reader at a spec section that does not contain the rule*
-- [ ] The worklist names file · line · target `spec/` § for every **restatement** entry —
+- [x] The worklist names file · line · target `spec/` § for every **restatement** entry —
       *Verify: each cited § exists in `spec/STANDARD.md` at its current version*
-- [ ] The inventory's own query is cross-checked before its result is acted on — *Verify: a second
+- [x] The inventory's own query is cross-checked before its result is acted on — *Verify: a second
       query disagreeing or reconciling (bucket sum vs census), plus one seeded site the scan must
       detect; a negative control alone proves only that it fires on rows it reached (L-105 · L-108)*
 
