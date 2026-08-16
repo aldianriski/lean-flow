@@ -11,6 +11,47 @@ status: current
 
 ---
 
+## v1.44.0 — Attested (2026-08-16)
+
+MINOR — SPRINT-070, **10 of 10 DoD**, EPIC-003's second member sprint. The top conformance level
+becomes writable, and parallel dispatch stops handing every agent a stale copy of your repo.
+
+**What changed for you**
+
+- **The attestation format is specified — `spec/STANDARD.md` §13, spec `0.2.0`** ([ADR-025]). Three
+  git trailers on the task's own commit (`Gate-Signed-By:` · `Gate:` · `Evidence:`), so gate approval
+  travels with the commit and a reviewer with a clone can read it without opening your sprint file.
+  You can adopt the format today.
+- **§13 states plainly that an unsigned trailer is a claim, not proof.** Trailers are plain text;
+  anyone who can write a commit can name anyone as approver. So **Attested is not reachable by
+  trailers alone** — it needs commit signing. Emitting trailers over unsigned commits leaves you at
+  **Gated** with more legible records, which is exactly where lean-flow itself sits. The worked
+  example in §13 is a real commit from this repo shown in its true unsigned state rather than an
+  invented signed one.
+- **The trailer carries your *sprint-level* sign-off onto each covered commit — it does not require
+  approving every task.** This corrects [ADR-018], which described git-native attestation as raising
+  approval to per-task granularity. What you gain is verifiability, not more approvals; batch G1/G2
+  stays viable and conformant.
+- **Worktree-isolated subagents now branch from your current work, not your remote's default branch.**
+  If you dispatch parallel tasks over commits you have not pushed, every agent used to get a tree
+  missing them — silently, and identically, every run. `.claude/settings.json` now sets
+  `worktree.baseRef: "head"`, and `dispatch.md` ships a **worktree-base guard** that halts a dispatch
+  whose base is not current, naming what it found. **If you dispatch worktree agents and push
+  infrequently, set `worktree.baseRef` in your own repo — the default is `"fresh"`.**
+- **Know before you dispatch:** a task editing a file that exists only in unpushed commits still must
+  not be worktree-dispatched under a `"fresh"` base — the merge becomes add/add. And a subagent
+  worktree that finishes without changes is deleted *with its branch* the moment it returns, so any
+  measurement you want from it belongs in the agent's brief, not in a check you run afterwards.
+
+**Fixed** — the stale-base pin behind SPRINT-069's merge conflict, a task forced inline, and
+union-verification on every merge (TD-054, open since SPRINT-063; the cause turned out to be
+documented default behaviour, recorded in this repo since SPRINT-026).
+
+[ADR-025]: docs/adr/ADR-025-git-native-attestation-format.md
+[ADR-018]: docs/adr/ADR-018-standard-implementation-split.md
+
+---
+
 ## v1.43.0 — First Extraction (2026-08-16)
 
 MINOR — SPRINT-069, **5 of 5 units**, EPIC-003's first member sprint. The standard stops being one
@@ -60,47 +101,5 @@ skill's reference file and becomes an artifact you can pin.
 
 [ADR-024]: docs/adr/ADR-024-conformance-levels.md
 
-## v1.42.0 — Open the Standard (2026-08-15)
 
-MINOR — SPRINT-068, **3 of 3 units**, coordinator + 2 dispatched builders + 1 scoped reviewer.
-Clears the ready pool and opens EPIC-003's door: the pre-extraction ruling lands, and the proof
-layer's two ruled follow-ups ship.
-
-**What changed for you**
-
-- **ADR-023 — CONTEXT.md becomes a consumer of the extracted spec.** EPIC-003's opening ruling,
-  settled before the first extraction commit as ADR-018 required: the future `spec/` tree is the
-  SSOT for every standard-owned rule; `.claude/CONTEXT.md` cites it and keeps only project-local
-  facts (roster · streams · tiers). The migration window is closed by **move+cite atomic commits** —
-  a rule enters `spec/` and its old home becomes a citation in the same commit, so no commit leaves
-  a rule stated twice. EPIC-003's extraction sprints can now promote.
-- **The run-level Execution Log event is now `run-complete`** (TD-055 resolved by rename, not by
-  note). Writing a task-level "complete" no longer arms the run-level rollup assertions —
-  `check-night-run-rollup.sh` matches the delimited `| run-complete |` field, `scripts/night-run.sh`
-  writes it, and `sprint-log.md.template` (ships to consumers) documents it, all renamed together.
-  A new fixture leg pins the old misfire shape as passing; historical `complete` logs stay valid
-  (archives are not re-litigated).
-- **The system-verify contract checker now runs inside the QA gate** — promoted to
-  `evals/run-system-verify-fixtures.sh` and registered always-on in `qa-check.sh` (0.66s, git-free —
-  TD-016's axis). Five legs green in-gate; a deliberate violation fails the whole gate naming
-  `system-verify-fail-silently-closed`.
-- **Every mechanism proved itself on this run**: system-verify's first real firing was a legitimate
-  RED that blocked this very close (an out-of-vocabulary ADR tag no reviewer was briefed on — fixed,
-  re-run, 147/0); the revise loop fired once and closed at its ceiling; the rollup carries the first
-  `run-complete` event plus 13 per-criterion evidence lines.
-
-**Maintainer-facing**
-
-- **Scope-change, owner-ruled mid-sprint:** TD-055's ruling named the checker, fixtures and template
-  but not the event's live **writer** — `night-run.sh` would have kept emitting `complete` against a
-  checker that no longer reads it (a silently dark rollup gate). Extended in-sprint; filed as
-  **L-124** (a rename's census enumerates producers, not only asserters and docs). **TD-056 family
-  scoped** by T2's scan (exactly two Layers-family checkers share the silent bare no-op) →
-  **TASK-212**. Plugin reinstall owner-action finally actioned (cache 1.41.0, three sprints carried).
-- **Found at this close and fixed in it:** `check-layers-observed.sh` excluded `CHANGELOG.md` from
-  close-time bookkeeping but never its §11 rotation sibling `docs/changelog/CHANGELOG-<version>.md`,
-  so every MINOR close since the rotation convention shipped has gone red on its own bookkeeping —
-  SPRINT-067's `CHANGELOG-1.39.0.md` tripped it unnoticed. Row added with the two-phase width guard
-  its neighbouring case already used (reported during execution, excluded at close).
-
-_Older releases (**v1.41.0** and earlier) → [`CHANGELOG-1.41.0.md`](docs/changelog/CHANGELOG-1.41.0.md) → [`CHANGELOG-1.40.0.md`](docs/changelog/CHANGELOG-1.40.0.md) → [`CHANGELOG-1.39.0.md`](docs/changelog/CHANGELOG-1.39.0.md) → [`CHANGELOG-1.38.0.md`](docs/changelog/CHANGELOG-1.38.0.md) → [`CHANGELOG-1.37.0.md`](docs/changelog/CHANGELOG-1.37.0.md) → [`CHANGELOG-1.36.0.md`](docs/changelog/CHANGELOG-1.36.0.md) → [`CHANGELOG-1.35.0.md`](docs/changelog/CHANGELOG-1.35.0.md) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._
+_Older releases (**v1.42.0** and earlier) → [`CHANGELOG-1.42.0.md`](docs/changelog/CHANGELOG-1.42.0.md) → [`CHANGELOG-1.41.0.md`](docs/changelog/CHANGELOG-1.41.0.md) → [`CHANGELOG-1.40.0.md`](docs/changelog/CHANGELOG-1.40.0.md) → [`CHANGELOG-1.39.0.md`](docs/changelog/CHANGELOG-1.39.0.md) → [`CHANGELOG-1.38.0.md`](docs/changelog/CHANGELOG-1.38.0.md) → [`CHANGELOG-1.37.0.md`](docs/changelog/CHANGELOG-1.37.0.md) → [`CHANGELOG-1.36.0.md`](docs/changelog/CHANGELOG-1.36.0.md) → [`CHANGELOG-1.35.0.md`](docs/changelog/CHANGELOG-1.35.0.md) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._

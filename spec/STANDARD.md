@@ -512,7 +512,15 @@ implements the work, not a separate approval commit and not the merge:
 |---|---|---|
 | `Gate-Signed-By:` | `Name <email>` | the **human** who approved the gate. One line per approver; repeat the trailer for more than one. |
 | `Gate:` | gate identifiers, comma-separated (e.g. `G1,G2`) | which gates that approval covers. |
-| `Evidence:` | a repo-relative path, optionally `@ <sha>` | where the approval is recorded in the repo, so the claim can be read in full rather than taken on faith. |
+| `Evidence:` | a repo-relative path, **`@ <sha>` strongly recommended** | where the approval is recorded in the repo, so the claim can be read in full rather than taken on faith. |
+
+**Qualify `Evidence:` with a sha.** A trailer is written into immutable history and cannot be amended
+later, but the *path* it names is not immutable — planning records get archived, renamed and
+reorganised, and a bare path silently stops resolving. `@ <sha>` pins the pointer to a commit where
+the file demonstrably existed, so `git show <sha>:<path>` keeps working no matter what the tree looks
+like afterwards. This is not hypothetical: the worked example below cites a sprint file that was moved
+to an archive directory during the very close that wrote it. At its stated sha it still resolves; had
+it been written bare, it would already be dead.
 
 All three are required together. A commit carrying `Gate:` without `Gate-Signed-By:` asserts that a
 gate applied and declines to say who approved it, which is weaker than saying nothing.

@@ -4,7 +4,7 @@ slug: attested
 epic: EPIC-003
 owner: Maintainer
 last_updated: 2026-08-16
-status: active
+status: closed
 gates_signed: G1,G2 @ cac204b
 plan_commit: 76eb88a
 close_commit: [sha — set at close]
@@ -143,9 +143,71 @@ halts the dispatch when it does not rather than leaving it to be discovered at m
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `spec/STANDARD.md` | T1 | **+§13 HITL attestation** — the Attested level was defined and unwritable; the format belongs where an adopter pins it, not only in an ADR. Version 0.1.0 → 0.2.0 | med | `qa-check` doc-caps/citer legs; §13 read standalone against its acceptance test |
+| `spec/CHANGELOG.md` | T1 | 0.2.0 entry — a new section is a spec change, and the plugin must not move with it (EPIC-003 D3) | low | `qa-check`; manifests verified untouched by T1 |
+| `docs/adr/ADR-025-…md` | T1 | D2's pending ADR, incl. the correction to ADR-018's per-task granularity claim | low | §4's three tests re-checked at close |
+| `docs/DECISIONS.md` | T1 | ADR-025 index row | low | `qa-check` |
+| `docs/epic/EPIC-003-the-standard.md` | T1 · close | Closed-when 4 ticked with evidence; D2 → ADR-025; SPRINT-070 member row completed | low | `qa-check` epic-archive leg (epic stays open: 2 and 5 remain) |
+| `skills/orchestrator/references/dispatch.md` | T2 | Base-pin cause + cure, **worktree-base guard**, anchor retrofit, preflight base-ref scope correction, worktree-sweep note | **high** | `run-worktree-base-fixtures.sh` (7 assertions, defect-seeded); `run-dispatch-preflight-fixtures.sh` 10/10 |
+| `.claude/settings.json` | T2 | `worktree.baseRef: "head"` — removes the pin at its cause | med | proven live: dispatched worktree returned at coordinator HEAD with `spec/` present |
+| `evals/run-worktree-base-fixtures.sh` | T2 | **new** must-FAIL harness, one case per named finding + PASS control | low | self; verified to bite by inverting the guard (4 of 7 red) |
+| `evals/run-dispatch-preflight-fixtures.sh` | T2 | switched to `extract_between_anchors` — a 2nd ```sh block is what the old helper fails loud on | med | 10/10 cases still green post-switch |
+| `evals/README.md` · `scripts/qa-check.sh` | T2 | wire the new harness into the opt-in set + document the tier reasoning | low | `QA_FULL=1` shows `PASS eval harness run-worktree-base-fixtures.sh` |
+| `CHANGELOG.md` · 4 manifests · `README.md` | close | v1.44.0 MINOR; v1.42.0 rotated out per §11 | low | `check-manifest-lockstep.sh` 4/4; every rotation link resolves |
+| `TECH-DEBT.md` | close | TD-054 **resolved**; TD-058 (spec uncapped) + TD-059 (guard fixtures opt-in) filed | low | `qa-check` |
+| `docs/LEARNINGS.md` · `TODO.md` | close | L-127 · L-128 filed; TASK-219 filed `origin: close-retro`; pointer cleared | low | `qa-check` task-origin leg |
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (STANDARD §10):
-     shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
-     After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint? **Yes, and
+it is this sprint's defining finding.** TD-054 held one question open from SPRINT-063 to SPRINT-069 —
+*why* does a dispatched worktree branch from a stale sha — and forbade writing the guard until it was
+answered (L-091). The answer was already in the repo the whole time: **L-046** (SPRINT-026,
+`status: active`) states the mechanism verbatim, and `dispatch.md`'s own base-ref caveat repeats
+it — *inside the file T2 was promoted to edit*. Three aging re-reviews each re-asked the question and
+re-parked it; none searched the record. This is not a failure to *find*, it is a failure to *look*,
+and it is L-094's sibling: that rule tells you to name the class of fact that would close a question,
+but not to check whether the fact is already recorded. Two smaller instances of the same family:
+**A4** stated `TODO.md 178/320` when the file was 118 at HEAD *and* at `plan_commit` (never true, not
+drifted), and **D2**'s rationale asserts "the commit author stays the agent" when this repo's commits
+are authored by the human with the agent as `Co-Authored-By:`. Every one was caught by re-deriving a
+figure, never by recalling a rule — CLAUDE.md's cross-check clause again.
+
+**Cost** — coordinator inline for both tasks and all gates (the session model), plus **one `haiku`
+measurement worktree agent (~28k)** for T2's live demonstration. No parallel builders: worktree
+dispatch was disqualified at G2 by the very defect T2 existed to fix, since `spec/` exists only in
+unpushed commits. Effective dispatch this sprint: 1 of 1 planned, and it was a measurement, not a build.
+
+**Worked**
+- **Measuring before the gate, not after the merge.** Resolving `origin/main` during G1 turned D3's
+  "no ordering constraint" into a real ordering, and disqualified worktree dispatch *before* it could
+  produce an add/add merge on `spec/STANDARD.md`. SPRINT-069 paid that cost at merge-back; this one
+  paid two commands.
+- **The must-FAIL suite was verified by breaking the guard.** Inverting one comparison turned 4 of 7
+  assertions red. A green must-FAIL suite is evidence about nothing until the thing it guards is
+  actually broken — L-058's point, exercised rather than cited.
+- **Re-deriving instead of repeating.** A2's 20-commit sample became a 673-of-673 census reconciled
+  against `rev-list --count`. The worked example in `spec/` §13 now rests on the whole history.
+- **The gate caught the undeclared `Layers:` file before the commit**, not in review — one line to fix.
+
+**Friction**
+- **The evidence destroyed itself.** The demonstration worktree *and its branch* were auto-removed the
+  moment the agent returned, because it finished without changes — so the guard could never be run
+  against the very worktree that proved the cure. Now written into `dispatch.md`: capture the base
+  from inside the worktree, or not at all.
+- **Three frozen statements in the Plan were wrong or stale** (A4's line count · D2's author premise ·
+  ADR-018's granularity claim, corrected by D1). None blocked; all needed re-derivation to notice.
+  A pre-locked decision's *rationale* gets no less scrutiny than its ruling.
+- **The session ran 1.41.0 skills against a 1.43.0 repo for the whole sprint** — L-021, third sighting
+  of the running-stale leg. Survived only because every procedure was read from `skills/` in the repo
+  rather than the cache, which is reaching past the stale procedure, not following it.
+- **The guard's own fixtures are opt-in**, by `qa-check.sh`'s declared cheap-and-git-free rule. The
+  defect they cover went six sprints unnoticed, which is the argument against — recorded as **TD-059**
+  rather than silently overridden.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`) — **L-127 filed**: before parking a
+question for want of evidence, search the repo's own answered record; an aging re-review that only
+re-asks will re-park a question the corpus already closed. **L-128 filed**: a subagent worktree that
+finishes without changes is deleted with its branch on return, so any fact about it must be captured
+from inside it while it lives — the artifact is destroyed by design and the report is all that
+survives.

@@ -18,11 +18,14 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-070 — Attested** → [`docs/sprint/SPRINT-070-attested.md`](docs/sprint/SPRINT-070-attested.md) — EPIC-003's second member sprint. Two `M` tasks: specify the git-native attestation format into `spec/` with a worked example against a real commit (the epic's D2, pending since ADR-018), and remove the stale-base pin that degraded every dispatch in SPRINT-069. Gates not yet signed — `/orchestrator` runs G1+G2 first.
+> _(no active sprint)_ — **SPRINT-070 — Attested** closed 2026-08-16 at **10 of 10 DoD**
+> ([archive](docs/sprint/archive/SPRINT-070-attested.md)). The next sprint forms from the Backlog
+> below via `/lean-doc-generator promote`.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
-> **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard** (active — SPRINT-069 is its
-> first member: the spec is extracted and the conformance levels are ruled) →
+> **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard** (active — SPRINT-069
+> extracted the spec and ruled the conformance levels; SPRINT-070 specified the attestation format,
+> leaving conditions 2 and 5, both sweeps rather than specifications) →
 > **EPIC-004 Conformance** → **EPIC-005 Fleet**. Evidence base:
 > [`docs/research/platform-readiness-audit.md`](docs/research/platform-readiness-audit.md).
 > Backlog below is ranked against that sequence, not by age.
@@ -64,6 +67,29 @@ status: current
 
 ### P2 — Quality / Polish
 
+- [ ] TASK-219 — Rule whether `spec/STANDARD.md` gets a §2 cap row, and which  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  `spec/STANDARD.md` either carries a §2 row whose cap `check-doc-caps.sh` derives and
+                  enforces, or an explicit recorded ruling that the spec is deliberately uncapped —
+                  either way the absence stops reading as an oversight, and the reasoning is written
+                  where the next reader of §2 finds it
+      touches:    spec/STANDARD.md (§2 table) · docs/adr/ if the ruling is hard-to-reverse
+      depends-on: none
+      assumes:    **the number is not derivable from this repo's history and that is the whole
+                  difficulty** — the file has never been capped, so there is no growth curve under a
+                  ceiling to reason from, while ADR-015 requires a stated cap to be a real number
+                  rather than a gesture. It is also self-referential: the standard would be capping
+                  itself, and whatever is chosen becomes a rule every adopter inherits with their pin.
+                  Candidates to price, none pre-selected: a soft cap with §6's tier-split escape
+                  (for a spec, that means numbered section files) · a hard cap, since an adopter's
+                  pin makes surprise growth expensive · an explicit "deliberately uncapped" ruling.
+                  Measured at filing: 587 lines, the largest governed doc in the repo, and
+                  `check-doc-caps.sh` reports zero rows for `spec/` because it derives coverage
+                  from §2 rather than hand-listing
+      tracker:    TD-058 · SPRINT-070 T1 Execution Log · A4 (flagged at promote; G1 scoped it out)
+      origin:     close-retro
+      state:      ready
+
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution
       done-when:  a real unattended run that stops mid-Plan leaves a rollup naming the untouched tasks
@@ -103,7 +129,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-069's shipped changes are written up as **v1.43.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.43.0 + v1.42.0** inline, with **v1.41.0 rotated** → [`docs/changelog/CHANGELOG-1.41.0.md`](docs/changelog/CHANGELOG-1.41.0.md) in the same commit. The **spec versions separately** and did not move: `spec/STANDARD.md` stays at **0.1.0** (EPIC-003 D3).
+_(no active sprint)_ — SPRINT-070's shipped changes are written up as **v1.44.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.44.0 + v1.43.0** inline, with **v1.42.0 rotated** → [`docs/changelog/CHANGELOG-1.42.0.md`](docs/changelog/CHANGELOG-1.42.0.md) in the same commit. The **spec versions separately** and *did* move this time: `spec/STANDARD.md` **0.1.0 → 0.2.0** for §13, independently of the plugin — EPIC-003 D3's first demonstration of the spec moving without a plugin release driving it.
 
 ---
 

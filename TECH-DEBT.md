@@ -32,6 +32,52 @@ status: current
 
 ## Tech Debt
 
+- **TD-059** severity: minor | status: open | created: Sprint-070
+  - Summary: **the worktree-base guard's must-FAIL fixtures are opt-in, so the always-on gate never
+    runs them.** `evals/run-worktree-base-fixtures.sh` covers all six of the guard's named findings
+    plus a PASS control, and it sits in `eval_harnesses_optin` (behind `QA_FULL=1`) rather than the
+    always-on set — correctly, by `qa-check.sh`'s declared rule that cheap-and-git-free stays
+    always-on while git-repo-building stays opt-in (SPRINT-043 T1 / TD-016). Costed, not assumed:
+    ~1.5s for 3 repos + 2 worktrees on this host.
+  - Impact: the rule is right in general and expensive here specifically. The leg this guard covers —
+    a dispatched worktree silently branching from `origin/main` — went **six sprints** undetected and
+    cost SPRINT-069 a merge conflict, a task forced inline, and union-verification on every merge. A
+    guard for a defect with that history sitting behind a flag is the shape L-058 warns about one
+    level up: not a silent false negative in the check, but a check nobody runs. Bounded by the fact
+    that the guard itself is always-on in `dispatch.md` for a coordinator who follows the protocol;
+    it is the *regression* cover that is flagged off.
+  - Mitigation (**not yet derived**, L-091): do not reach for "just move it to always-on" — that
+    trades a known 1.5s against a rule two sprints old, and the rule exists because throwaway-repo
+    harnesses were measurably the slow ones. The question to price first is whether the guard can be
+    given a **git-free leg** at all: cases 1–3 (`unresolved` · `missing` · `unreadable`) and the PASS
+    control need no history and could be split always-on, leaving only `stale` and `divergent` behind
+    the flag. That would put the cheap majority of the coverage on every run. Whether a split harness
+    is worth two files is the real trade-off, and it is undecided.
+  - Tracker: SPRINT-070 T2 · `evals/run-worktree-base-fixtures.sh` header · TD-054 (the defect) ·
+    TD-016 (the cost boundary the rule encodes)
+
+- **TD-058** severity: minor | status: open | created: Sprint-070
+  - Summary: **`spec/STANDARD.md` has no §2 row and therefore no cap, and it is now the largest
+    governed doc in the repo at 587 lines.** The extraction (SPRINT-069 T2) moved the standard into
+    `spec/` without giving it a row in its own §2 core-file table, so `check-doc-caps.sh` — which
+    *derives* its coverage from §2 rather than hand-listing — does not see it. Verified: the checker's
+    output contains zero `dispatch.md`-style rows for `spec/`. SPRINT-070 T1 added §13 and grew it by
+    ~90 lines against no ceiling at all.
+  - Impact: low today, structural tomorrow. The file is the SSOT an adopter pins, and it is the one
+    document in the repo whose growth nothing reports — the exact condition §2's cap table exists to
+    prevent, in the file that defines the cap table. It is also self-referential in a way that makes
+    the fix a governance decision rather than a config edit: the standard would be capping itself,
+    and the number chosen becomes a rule every adopter inherits.
+  - Mitigation (**not yet derived**, L-091): the obvious move is "add a §2 row with a soft cap" and it
+    is probably right, but the number is not derivable from this repo's history — the file has never
+    been capped, so there is no growth curve under a ceiling to reason from, and ADR-015 requires a
+    stated cap to be a real number rather than a gesture. Price at least: a soft cap with the §6
+    tier-split escape (cap-hit → split into a tree, which for a spec means numbered section files) ·
+    a hard cap, given that an adopter's pin makes surprise growth expensive · or an explicit ruling
+    that the spec is deliberately uncapped, recorded so the absence stops reading as an oversight.
+  - Tracker: SPRINT-070 T1 Execution Log · A4 (flagged it at promote; G1 scoped the ruling out) ·
+    ADR-015 (a stated cap is a real number) · ADR-023 (why the file moved) · **vehicle: TASK-219**
+
 - **TD-057** severity: minor | status: open | created: Sprint-069
   - Summary: **`Layers:` feeds three checkers that match it three different ways, and nothing states
     the contract.** The **pre-dispatch preflight** resolves directory globs — it reads T3's `docs/`
@@ -153,7 +199,7 @@ status: current
     reaper writes an event this checker no longer recognizes, and Part 4's gate goes silently dark
     on genuine completed runs. Flagged for the next task/promote to pick up.
 
-- **TD-054** severity: medium | status: open | created: Sprint-063
+- **TD-054** severity: medium | status: resolved → SPRINT-070 T2 | created: Sprint-063
   - Summary: **a worktree created by `Agent(isolation: "worktree")` can branch from a stale base, and
     nothing checks it.** SPRINT-063 T2's worktree was branched at `40603a6` (`sprint(60)`) — three
     sprints behind `main` — while the dispatching session was at `85490ac`. The agent detected it
@@ -216,6 +262,33 @@ status: current
     was nothing to raise. What changed is the *evidence under* that severity, from one historical
     sighting to a demonstrated cost on every dispatch; `high` was considered and declined, since it
     auto-escalates to Backlog P1 and would front-run the next promote rather than inform it.
+  - **RESOLVED 2026-08-16 (SPRINT-070 T2) — and the mechanism was documented in this repo before this
+    row was ever filed.** `worktree.baseRef` defaults to `"fresh"`, which branches from `origin/HEAD`.
+    Measured at execution: `origin/main` = `622f420` — the exact sha all four worktrees used — with
+    local `main` **31 commits ahead and unpushed**. Not drift, not a harness bug, and not the
+    "systematic pin" of unknown origin the second-sighting entry described: it is **documented default
+    behaviour** meeting a repo where push is owner-reserved, so `origin/HEAD` stands still while local
+    work accumulates. Confirmed against the official worktrees documentation, which states it outright
+    for subagent worktrees. **`L-046` (SPRINT-026, `status: active`) said this verbatim, and
+    `dispatch.md`'s own base-ref caveat repeated it — inside the file this fix was promoted to edit.**
+    Three aging re-reviews re-asked the question rather than searching the record; filed as **L-127**,
+    because the six-sprint delay is the reusable lesson here, not the git behaviour.
+  - **Cure shipped, both halves, per this row's own framing** ("the assertion catches it, the pin is
+    the thing to fix"): `worktree.baseRef: "head"` in `.claude/settings.json` removes the pin at its
+    cause, and a **worktree-base guard** in `dispatch.md` compares the base a spawned worktree
+    *actually got* against the coordinator's HEAD, halting by name. The pre-dispatch preflight's
+    base-ref leg could never have caught this and now says so: it compares the *declared* base to live
+    HEAD, both in the main checkout. `git push` was considered and rejected in the doc text — it makes
+    the base current exactly once and re-breaks on the next unpushed commit.
+  - **Verified live, not just in fixtures.** The next dispatched worktree came back at `97eca0b`, the
+    coordinator's HEAD exactly, with `spec/` and `ADR-024` present in its tree — both absent at
+    `origin/main`, so the base is provable without comparing a sha. Regression cover:
+    `evals/run-worktree-base-fixtures.sh`, one case per named finding, proven to bite by inverting the
+    guard's comparison (4 of 7 assertions went red). Its opt-in tier is carried as **TD-059**. One
+    thing the demonstration could *not* do is recorded as **L-128**: the worktree and its branch were
+    swept before the guard could be run against them.
+  - **Row retained, not deleted** — §11 keeps a resolved row for ≥ 3 sprints because a just-resolved
+    debt is still context at the next promote. Id stays monotonic when it goes.
 
 - **TD-053** severity: minor | status: open | created: Sprint-063
   - Summary: **worktree-isolated dispatch places a full repo copy at `.claude/worktrees/<id>/`, inside

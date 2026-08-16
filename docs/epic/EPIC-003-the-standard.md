@@ -55,7 +55,7 @@ spec so a rule has exactly one home · ADR the split.
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-069](../sprint/archive/SPRINT-069-first-extraction.md) | First Extraction | closed 2026-08-16 · `b744fed` | Made the standard **separable and pinnable**: `spec/STANDARD.md` at v0.1.0 with its own changelog, versioning independently of the plugin — which is condition 1 outright. Ruled the **conformance levels** (ADR-024, condition 3), the ruling the epic routed to its first member's G2. Left the epic's harder half untouched by design: attestation and the no-skill-restates-a-rule pass are later members. |
-| [SPRINT-070](../sprint/SPRINT-070-attested.md) | Attested | active | _(completed at close)_ |
+| [SPRINT-070](../sprint/archive/SPRINT-070-attested.md) | Attested | closed 2026-08-16 · `CLOSE_COMMIT` | Made the top rung **writable**: `spec/STANDARD.md` §13 (spec v0.2.0) + [ADR-025](../adr/ADR-025-git-native-attestation-format.md) specify the three-trailer format, closing **D2** and condition 4. Its harder contribution is a boundary, not a feature — §13 states that an unsigned trailer is a *claim, not proof*, so **Attested is unreachable by trailers alone** and this repo is honestly Gated; that is what stops the level from becoming self-certifying before EPIC-004 exists. Also corrected ADR-018's granularity claim (the trailer carries the batch sign-off, not per-task approval). Conditions 2 and 5 deliberately untouched — both are sweeps, not specifications. |
 
 ## Decisions
 

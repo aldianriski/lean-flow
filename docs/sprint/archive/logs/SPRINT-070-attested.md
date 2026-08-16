@@ -239,3 +239,23 @@ no cap, now at 587 lines (measured, after I first wrote 578 from memory — the 
 already caught once in A4). A4 flagged that T1 "may need to rule on" it; adding a cap row is a change to
 the standard's own governance and belongs to whoever owns that question, not to a task that happens
 to add a section. Raised for the Retro.
+
+### 2026-08-16 | surprise | close — ADR-025's own negative consequence fired during the close that wrote it
+
+ADR-025 accepted this cost in writing: "`Evidence:` is a repo-relative path, so a repo that relocates
+its planning records invalidates trailers already written into immutable history". §11 retention then
+archived this sprint's file to `docs/sprint/archive/` **in the same close**, and §13's worked example
+cites `Evidence: docs/sprint/SPRINT-070-attested.md @ cac204b` — a path that no longer exists at HEAD.
+
+Checked rather than assumed, and the example survives: `git show cac204b:docs/sprint/SPRINT-070-attested.md`
+resolves, because the `@ <sha>` qualifier pins the pointer to a commit where the file demonstrably
+existed. A **bare** path would already be dead, one commit after being written.
+
+So the mitigation was latent in the format and unstated. §13 now says it outright — `@ <sha>` is
+strongly recommended, with this exact incident as the reason. ADR-025's Consequences are **not**
+edited: ADRs are append-only, and the cost it names remains true for the bare-path case it was
+describing. What changed is the spec's guidance, which is where an implementer reads it.
+
+Worth noting how this was found: not by review, but by grepping for dangling references after the
+`git mv`. The archive move is a routine bookkeeping step nobody expects to interact with a
+specification's semantics.
