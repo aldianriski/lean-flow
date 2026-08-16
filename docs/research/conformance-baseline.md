@@ -15,6 +15,9 @@ SPRINT-072 T4. The frozen baseline EPIC-004's engine is designed **against**. Re
 nothing. Inventory: `conformance-inventory-criteria.md` (§2) · `-structural.md` (§1 §3–§8) ·
 `-git-boundary.md` (§12) · `-gated-attested.md` (§9 §10 §11 §13).
 
+> **§ Coverage by section is SUPERSEDED (SPRINT-073).** `spec/STANDARD.md` §14 is the rule source now;
+> counts, dispositions and the five divergences → `conformance-dispositions.md`. Marks below unchanged.
+
 ## The corpus, re-derived (T4 DoD 2)
 
 EPIC-004 states *"~82 named findings across 16 retained fixture harnesses"*. Measured 2026-08-16:

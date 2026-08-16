@@ -116,7 +116,9 @@ oversight to the next person who greps §2.
 - [x] TD-058 is closed or its status updated to match the ruling — *Verify: the row*
 
 ### T3 — Give each of the 39 uncovered-mechanical rules an explicit disposition `[size: M · risk: low · class: decision · HITL]`
-Layers: `docs/research/conformance-baseline.md` · `docs/adr/` (only if the scoping qualifies)
+Layers: `docs/research/conformance-baseline.md` · `docs/research/conformance-dispositions.md` (added
+        mid-task, L-100 — the baseline was at 126/130 and the register is 54 rows, so it splits rather
+        than squeezes: §2's growth rule, L-131) · `docs/adr/` (only if the scoping qualifies)
 Depends-on: T1, T2
 Cites: EPIC-004 § Closed-when 2 (second unmet half) · EPIC-004 D1 (no percentage, no score) ·
        ADR-024 · L-058 · TD-012 (a check ships with a retained must-FAIL fixture, and the fixture is
@@ -131,18 +133,18 @@ the finding it will name"* or *"deliberately out of scope, because —"*, with n
 undifferentiated middle.
 
 **DoD:**
-- [ ] All **39** carry a disposition — *Verify: count the dispositions against the 39 re-derived from
+- [x] All **39** carry a disposition — *Verify: count the dispositions against the 39 re-derived from
       the baseline at execution; "none yet" is not a disposition and an empty cell is a FAIL*
-- [ ] Every rule dispositioned **build** names the finding its check will fire — *Verify: a named
+- [x] Every rule dispositioned **build** names the finding its check will fire — *Verify: a named
       finding string per rule. A check specified without its finding name is the half-shipped gate L-058
       describes, decided one sprint before anyone writes it*
-- [ ] Every rule dispositioned **out of scope** carries its reason — *Verify: the reason distinguishes
+- [x] Every rule dispositioned **out of scope** carries its reason — *Verify: the reason distinguishes
       "checks a lean-flow convention, not the standard" from "too expensive" from "subsumed by another
       rule"; a bare "out of scope" is a deferral wearing a decision's clothes*
-- [ ] **No percentage, no score, no completion ratio appears in the output** — *Verify: grep the changed
+- [x] **No percentage, no score, no completion ratio appears in the output** — *Verify: grep the changed
       files for `%` used as a conformance figure. EPIC-004 D1; a ratio that improves when the standard
       declines to automate something is backwards*
-- [ ] The 8 covered and 45 judgment-only rules are **not** re-litigated — *Verify: `git diff` shows no
+- [x] The 8 covered and 45 judgment-only rules are **not** re-litigated — *Verify: `git diff` shows no
       change to their marks. This task owns the middle column only; re-opening the classification would
       un-freeze the baseline the engine is being designed against*
 

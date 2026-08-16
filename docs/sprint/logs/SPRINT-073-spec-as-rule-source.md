@@ -316,3 +316,48 @@ corrected, not that it was always green.
 
 **Standing correction for the rest of this run:** the gate runs as its own call, its exit code is read,
 and only then does anything commit. No pipes into `tail`, no `&&` chains from a gate.
+
+### 2026-08-16 | progress | T3 — 54 dispositions, not 39, and the denominator was the finding again
+
+**Re-derived from the annotated spec rather than from the baseline, because T1 established the spec as
+the rule source.** 100 candidates · 98 classified · **62 checkable** (48 `mechanical` + 14 `split`,
+counting a split's mechanical half) · **8 covered** · **54 to disposition** — against the Plan's stated
+**39**. The gap is not drift: it is §2 at 21, the split rules' mechanical halves counted properly, and
+`S11.WHENITRUNS` restored.
+
+**Dispositions: 42 `build` · 12 `scope-out`.** Reconciled mechanically — `8 + 42 + 12 = 62`, and a `comm`
+of the checkable set against the union of all three sections returns **empty**: no checkable rule is left
+without a disposition. Register → `docs/research/conformance-dispositions.md`.
+
+**Every `build` row names the finding its check will fire** (DoD 2) — `owner-not-a-role`,
+`adr-no-negative-consequence`, `sprint-log-outside-logs-dir`, `secret-committed`, and so on. A check
+specified without its finding name is the half-shipped gate L-058 describes, decided a sprint before
+anyone writes it. §13's five go to **TASK-228** by reference rather than being duplicated here.
+
+**`scope-out` carries three distinct reasons, and one of them turned out empty — which is worth more than
+the twelve that filled.** (a) restates a rule checked elsewhere (7) · (b) governs the standard document
+rather than an adopter's repo (5) · **(c) "mechanical but not worth the false-positive rate" — zero.**
+I expected (c) to be the large bucket. It is empty because every candidate I had in mind — §12's content
+categories, `S2.R-LAW1INIT` — is already marked **`judgment-only`** and was never in the checkable set at
+all. They are listed under (c) as context for a reader who expects to find them, explicitly **not** as
+dispositions. Had I not counted, they would have been double-counted as scoped-out work.
+
+**Two cap events, handled by the rule rather than by trimming.** The baseline was at 126/130 and the
+register is 54 rows, so the register is a **sibling file**, not an addition — split, never squeeze. Then
+the supersession note I first wrote into the baseline pushed it to **133 > 130, `OVER-CAP (soft)`**. I did
+**not** trim it: the full account already existed in the register's § Divergences, so the baseline keeps a
+two-line pointer and the explanation stays where it is owned. That is the growth rule's *move whole
+sections* leg, not a diet. L-131 one sprint after filing, recognised on the first breach this time rather
+than the third.
+
+**DoD 5 verified mechanically:** `git diff` over `conformance-baseline.md` shows **zero** changed lines
+containing `mechanical` / `judgment-only` / `implementation-directed`. No mark was re-litigated; the
+frozen classification stands and the baseline's tables are kept unedited as the record of what SPRINT-072
+measured.
+
+**DoD 4:** grep for a conformance percentage across the changed files returns nothing. The register says
+so in its own header, so the constraint travels with the artifact instead of living in this Log.
+
+**Still unruled, and surfaced rather than absorbed:** `S4.INDEX` and `S5.DISCARDLOG` carry `?` in the spec
+and are **not** dispositioned — a rule with no mark has no disposition to give. Recorded as an owner
+action in the register's § Divergences.
