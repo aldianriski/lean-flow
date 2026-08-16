@@ -17,7 +17,19 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 
 This is the epic that converts a style guide into a standard. Eleven checkers
 (`scripts/lib/check-*.sh`) and 24 eval harnesses already encode most of the rules, and every one of
-them is maintainer-only: ADR-008 scoped them to this repo and `docs/architecture/overview.md` confirms
+them is maintainer-only:
+
+<!-- CORRECTED at SPRINT-072 T4 — measured, not asserted. Two claims in this section are wrong and are
+     left in place (an epic is edited, but the correction is more useful beside the original).
+     (a) "already encode most of the rules" — they encode most of *lean-flow's project conventions*.
+     Only 3 of the standard's 13 sections are referenced anywhere in scripts/lib/ (§2 ×30, §11 ×16,
+     §7 ×1); ten sections have zero. Five of eleven checkers cite no section at all. Measured coverage
+     is 8 rules covered of 96 classified.
+     (b) "24 eval harnesses" / "~82 named findings across 16 retained fixture harnesses" (Open
+     questions) — actual: 22 harnesses on disk, 17 asserting, 98 fixture cases, 46 distinct named
+     finding strings. The ~82 conflated cases with findings.
+     Baseline: docs/research/conformance-baseline.md. -->
+ ADR-008 scoped them to this repo and `docs/architecture/overview.md` confirms
 no consumer invokes them (`docs/research/platform-readiness-audit.md` F4). The machinery exists and
 points inward. Turning it outward is a smaller build than it looks, and it is the highest-value
 consumer-facing gap in the audit.
@@ -85,6 +97,13 @@ each other · any telemetry, ever (the README promises none).
 
 - [ ] A repo that has never run lean-flow gets a conformance report naming its level
 - [ ] Every spec rule maps to a check, or is explicitly marked judgment-only in the spec
+      — **PARTIAL after SPRINT-072, and deliberately not ticked.** All **96** normative rules are now
+      classified with level + mechanical/judgment-only, reconciled against the corpus
+      (`docs/research/conformance-baseline.md`). But this condition says *"marked judgment-only **in
+      the spec**"*, and the marks live in a research doc — the spec itself is unchanged. Marking them
+      in `spec/STANDARD.md` is a spec change, which SPRINT-072's D4 excluded. **Remaining:** carry the
+      45 judgment-only marks into the spec, and close the 39 uncovered-mechanical rules or rule them
+      out of scope. The classification half is done; the *in the spec* half is not
 - [ ] Each check has a retained must-FAIL fixture that fails with its named finding
 - [ ] Attestation is verified from git trailers, per task, without trusting a self-report
 - [ ] ADR-008's scope is formally amended or superseded, not silently outgrown

@@ -114,18 +114,18 @@ finding fires, whether a retained must-FAIL fixture proves that finding, and wha
 can tell *uncovered* apart from *deliberately judgment-only*.
 
 **DoD:**
-- [ ] Every rule carries `checker → named finding → must-FAIL fixture → coverage status` —
+- [x] Every rule carries `checker → named finding → must-FAIL fixture → coverage status` —
       *Verify: no rule left blank; "none" is a value and is different from an empty cell*
-- [ ] The corpus side is **re-derived, not copied from EPIC-004's text** — *Verify: the epic claims
+- [x] The corpus side is **re-derived, not copied from EPIC-004's text** — *Verify: the epic claims
       "~82 named findings across 16 harnesses"; measured at promote it is 11 checkers · 22 harnesses
       (17 asserting) · 98 cases · 46 distinct findings. Re-measure and correct the epic*
-- [ ] **Coverage status distinguishes `uncovered` from `judgment-only`** — *Verify: both appear, and
+- [x] **Coverage status distinguishes `uncovered` from `judgment-only`** — *Verify: both appear, and
       collapsing them would misreport a deliberate boundary as a gap*
-- [ ] Findings the engine inherits are **recorded, not acted on** — *Verify: `git diff` touches no
+- [x] Findings the engine inherits are **recorded, not acted on** — *Verify: `git diff` touches no
       `scripts/lib/check-*.sh`, no `evals/**`, and no `skills/orchestrator/**`*
-- [ ] The baseline is committed as a durable artifact under `docs/research/` — *Verify: it survives
+- [x] The baseline is committed as a durable artifact under `docs/research/` — *Verify: it survives
       the close; a baseline living only in an Execution Log is not one*
-- [ ] EPIC-004 § Closed-when 2 ticked **only if** every normative rule is genuinely classified —
+- [x] EPIC-004 § Closed-when 2 ticked **only if** every normative rule is genuinely classified —
       *Verify: the epic file; a partial classification is reported as partial*
 
 ## Decisions (pre-locked)

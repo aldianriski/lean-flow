@@ -214,3 +214,46 @@ debt — the same error D1 rejected the percentage for.
 
 Marks: 39 rules — 18 mechanical · 9 judgment-only · 5 split · **6 implementation-directed** · 2 data.
 Artifact 112/130, PASS, zero OVER-CAP repo-wide. Gate 154/0.
+
+### 2026-08-16 | surprise | T4 — the checkers do not check the standard, and Closed-when 2 is partial
+
+**The baseline's headline overturns the epic's premise.** EPIC-004 opens with *"Eleven checkers …
+already encode most of the rules"*. Measured two independent ways, they do not — they encode most of
+**lean-flow's own project conventions**.
+
+*By reference:* only **3 of the standard's 13 sections** are named anywhere in `scripts/lib/` — §2
+(30 refs) · §11 (16) · §7 (1). **Ten sections have zero**: §1 §3 §4 §5 §6 §8 §9 §10 §12 §13.
+*By checker:* five of eleven cite no section at all and guard artifacts the standard never
+mentions — `count-claims` · `manifest-lockstep` · `night-run-rollup` · `task-origin` · `gates-signed`.
+
+`gates-signed` is the sharpest case: it checks a genuine §9 rule, but **§9 only acquired that rule at
+SPRINT-071**, after the checker existed. The checker predates its own specification and nothing links
+them. That is the corpus in miniature — grown from felt pain, not derived from the spec, which is
+EPIC-004 D1's diagnosis now measured instead of asserted.
+
+**Measured coverage: 8 covered · 39 uncovered-mechanical · 45 judgment-only · 6
+implementation-directed, across 96 rules.** Four checkers do all the standard-facing work; seven guard
+conventions no adopter shares. **§13 is entirely unchecked** — no attestation checker exists at all,
+which is Closed-when 4 in a single cell. Stated as counts, never a ratio (D1).
+
+**Corpus corrected in the epic (DoD 2).** Its "~82 named findings across 16 retained fixture
+harnesses" is wrong in both directions: **22 harnesses on disk (17 asserting) · 98 fixture cases · 46
+distinct finding strings**. The ~82 conflated cases with findings. Both stale claims are corrected
+beside the originals rather than overwritten, so the correction is legible.
+
+**Closed-when 2 is PARTIAL and was deliberately not ticked (DoD 6).** Reading it precisely: *"…or is
+explicitly marked judgment-only **in the spec**"*. All 96 rules are classified — but the marks live in
+a research doc and `spec/STANDARD.md` is unchanged, because carrying them into the spec is a spec
+change and **D4 excluded that from this sprint**. The classification half is done; the *in the spec*
+half is not. Ticking it would have been the exact L-088 failure this sprint's own DoD 6 was written to
+prevent — reading a criterion to fit what was built.
+
+**D4 verified mechanically, not promised (DoD 4).** `git diff 2084001..HEAD` and `git status` over
+`scripts/lib/check-*.sh`, `evals/**` and `skills/orchestrator/**` both return empty. No checker, no
+fixture, no execution architecture touched by any of the four tasks.
+
+**One arithmetic correction found by reconciling:** T3's file states 39 rules; the recount gives **38**
+— its mark table listed 2 data entries among the rules. The mark totals were right, the rule count was
+one high. Corrected in the baseline rather than left to propagate into the engine's design.
+
+Baseline artifact: 126/130 PASS. Gate 155/0.
