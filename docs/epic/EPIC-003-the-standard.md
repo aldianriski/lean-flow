@@ -107,7 +107,14 @@ spec so a rule has exactly one home · ADR the split.
       — ✓ SPRINT-069 T2: `spec/STANDARD.md` v0.1.0 + `spec/CHANGELOG.md`. Independence is
       demonstrated rather than asserted: the spec sits at 0.1.0 while the plugin moved to 1.43.0 in
       the same commit, and the manifest-lockstep check covers the four manifests, not `spec/`
-- [ ] No skill restates a rule the spec owns — each cites it instead
+- [x] No skill restates a rule the spec owns — each cites it instead
+      — ✓ SPRINT-071 T1+T2. Inventoried all **39** candidate sites across the 15 non-template skill
+      files and classified them: **6 restatements · 25 already-citations · 8 legitimately-local**
+      (each local entry carrying its reason). All 6 converted — `council` · `prototype` ·
+      `lean-doc-generator` ×3 · `init.md` — now citing §4 · §3 · §2. Four of the six had *already*
+      cited their section and restated it anyway, which is the case a citation-presence check cannot
+      see. Judged against **T2's D1**: templates are out of scope, being rendered output read by a
+      consumer who may not hold the spec
 - [x] Conformance levels are defined, and each is independently checkable in principle
       — ✓ SPRINT-069 T1: [ADR-024](../adr/ADR-024-conformance-levels.md) — Structural → Gated →
       Attested, each checkable from a different evidence class (file tree · planning records · git
@@ -119,4 +126,12 @@ spec so a rule has exactly one home · ADR the split.
       — as are all 673 commits here) rather than illustrated with a signature that does not exist.
       §13 states the claim-vs-proof boundary in its own words, so Attested is explicitly *not*
       reachable by trailers alone — this repo sits at Gated with more legible records
-- [ ] A reader could build a conformant tool from the spec alone, without reading `skills/`
+- [x] A reader could build a conformant tool from the spec alone, without reading `skills/`
+      — ✓ SPRINT-071 T3 (spec v0.3.0). Each of ADR-024's three levels walked with every check a tool
+      would perform mapped to its defining section: **Structural** → §2 (placement + `Cap` column) ·
+      §3 (header schema) · §6 (tier gating); **Attested** → §13. **Gated had two real gaps and both
+      are now closed in §9**: `gates_signed:` was *referenced* by §13 as living in §9 and never
+      defined there — a dangling cross-reference inside the spec — and the `*Verify:*` clause had
+      zero occurrences, leaving "criteria name how they were verified" unreadable to any tool. Both
+      are schema, so both belonged to the spec rather than to EPIC-004. The boundary that remains is
+      deliberate and named: the spec defines each property, EPIC-004's engine defines the traversal

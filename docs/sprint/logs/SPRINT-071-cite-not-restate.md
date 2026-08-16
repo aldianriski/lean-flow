@@ -193,3 +193,63 @@ intact and separate.
 
 **DoD 5** — gate **149 pass / 0 fail**. Caps hold on every touched file: `council` 74/140 ·
 `prototype` 54/140 · `lean-doc-generator` 126/140 · `init.md` 130.
+
+### 2026-08-16 | progress | T3 — spec-standalone audit: two real gaps at Gated, both closed; spec 0.3.0
+
+Walked ADR-024's three levels as a tool-builder would, asking of each check *"which `spec/` section
+defines this?"* — with "implied by §N" counted as a gap, not a mapping.
+
+**Structural — fully checkable from `spec/` alone.**
+
+| Check a tool performs | Defined by |
+|---|---|
+| the core doc set exists | §2's core-files tables (root · `.claude/` · `docs/` tree) |
+| each file is in canonical placement | §2, same tables — placement is the row |
+| each file carries an ownership header | §3 — the exact YAML schema, field by field |
+| each file is within its stated cap | §2's `Cap` column, tier-gated by §6 |
+
+**Attested — fully checkable from `spec/` alone**, and this was true before the audit started (it is
+what SPRINT-070 T1 shipped): §13 gives the three trailer fields, which commit carries them, how they
+relate to the sprint-level record, and the claim-vs-proof boundary that says what a verifier may and
+may not conclude.
+
+**Gated — two genuine gaps, and they were the whole finding.** ADR-024 defines Gated as *"human
+approval is recorded against the work … checkable from the repo's own planning records."* The spec did
+not define those records.
+
+- **Gap A — `gates_signed:` was referenced but never defined.** Both of its two occurrences in the
+  spec were in **§13**, and line 529 pointed at *"the sprint file — §9"* for it. §9's frontmatter list
+  read `status · plan_commit · close_commit`. So the spec contained a **dangling internal
+  cross-reference**: §13 sent a reader to §9 for a field §9 did not have. Worth owning plainly — that
+  reference is one I wrote last sprint, and it read as correct precisely because §9 was never checked
+  against it.
+- **Gap B — the `*Verify:*` clause had zero occurrences in the spec.** Gated requires criteria to name
+  how they were verified; nothing defined what that looks like, so a tool could not distinguish a
+  mechanically-checked criterion from a judged one — which is the *only* thing that property is for.
+
+**Both closed in `spec/` rather than deferred, because both are schema, and schema is what a spec
+owns.** Neither is an engine question, so neither belongs to EPIC-004. §9 now specifies the
+`gates_signed:` format plus the three properties that make it evidence (absence ⇒ NOT SIGNED · the
+record lives in the file, not the session · a malformed record is worse than none), and specifies the
+`*Verify:*` clause with the judgment-tick fallback. Spec bumped **0.2.0 → 0.3.0** with its changelog
+entry; the four manifests are untouched (EPIC-003 D3).
+
+**What was deliberately NOT closed — the EPIC-004 boundary, stated so it is not mistaken for an
+oversight.** The audit maps each check to a defining section; it does not specify *how a tool decides*
+whether the repo satisfies it. Where a check needs a traversal strategy rather than a definition —
+which files count as "the core doc set" for a repo that has not adopted every optional row, how a cap
+is measured against a grandfathered file, how a trailer is matched to the sprint record it claims — the
+spec defines the property and EPIC-004's engine defines the procedure. That split is ADR-024's own
+boundary ("a level whose description required the engine would make the standard depend on one
+implementation of itself"), and this audit does not move it.
+
+**DoD 3 — read as an adopter without the plugin installed.** The reachability question is what surfaced
+Gap A: the mapping was done from `spec/` only, and a reader with `skills/` open would have found
+`gates_signed:` documented in `lean-doc-generator/SKILL.md` and in `night-run.md` and never noticed the
+spec was silent. This is L-016 working exactly as written — the repo cannot become that reader by
+accident, so the consumer path was traced deliberately rather than assumed from a green gate.
+
+**Note carried from T1, and it mattered here.** A2 read as "1 of 14 skills cites the spec", which
+sounds like a corpus that ignores it; the real figure is 25 name-citations (`STANDARD §N`) plus 1 path
+citation. Had the audit taken A2 at face value it would have looked for missing citations, which were
+never the problem — the problem was the spec's own internal consistency.

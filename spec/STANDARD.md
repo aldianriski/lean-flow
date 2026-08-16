@@ -2,7 +2,7 @@
 owner: Maintainer
 last_updated: 2026-08-16
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.2.0
+version: 0.3.0
 status: current
 ---
 
@@ -326,6 +326,35 @@ tasks, one of them reaching 368 lines on **two** tasks. The Plan was never what 
 
 The Plan stays frozen at promote; a mid-sprint scope shift is logged as a `scope-change` entry in the
 log file (what broke · impact · re-confirm G2) **before** § Plan is edited.
+
+**Gate sign-off is a frontmatter field, and its absence is a negative answer.**
+
+```
+gates_signed: <GATE>[,<GATE>...] @ <sha>      e.g.  gates_signed: G1,G2 @ 1f0c012
+```
+
+It records which gates a human approved and the commit they approved against. Three properties carry
+the weight:
+
+- **Omit it until the gates are actually signed.** A missing `gates_signed:` means **NOT SIGNED** and
+  must never be read as approval. An unfilled template placeholder is absence, not a value.
+- **It lives in the sprint file, not in the approving session.** A sign-off recorded only in a
+  transcript is invisible to anything that reads the repo — including an autonomous run, which reads
+  the sprint file and nothing else.
+- **A malformed record is worse than none**, because it looks like evidence. A reader that cannot
+  parse it should say so rather than fall back to either answer.
+
+**A DoD criterion names how it was verified.** Where a mechanical check exists for a criterion, the
+criterion names it — conventionally an italic `*Verify: …*` clause on the same line:
+
+```
+- [ ] <the criterion> — *Verify: <the check that proves it>*
+```
+
+A criterion naming no check is a **judgment tick** and says so. This is what makes the level's
+"criteria name how they were verified" property readable: a tool can tell a mechanically-verified
+criterion from a judged one without inferring it from the wording. The named check's FAIL blocks a
+*silent* tick — a tick past it is recorded as an owner ruling, never left implicit.
 
 ---
 

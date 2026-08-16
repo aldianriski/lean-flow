@@ -97,17 +97,17 @@ a single writer this sprint despite two conditions closing (see D2).
 `spec/` section defining it — or records why that gap is EPIC-004's rather than the spec's.
 
 **DoD:**
-- [ ] Each of ADR-024's three levels walked, every check a tool would perform mapped to its defining
+- [x] Each of ADR-024's three levels walked, every check a tool would perform mapped to its defining
       `spec/` § — *Verify: the audit names a § per check; "implied by §N" is a gap, not a mapping*
-- [ ] Every gap either closed in `spec/` (bumping the spec version + changelog) or recorded as a
+- [x] Every gap either closed in `spec/` (bumping the spec version + changelog) or recorded as a
       deliberate EPIC-004 boundary with its reasoning — *Verify: no gap left unrouted; a silent gap is
       the spec-only-debt trap (L-007)*
-- [ ] Read as an adopter **without the plugin installed** — *Verify: the audit states which sections
+- [x] Read as an adopter **without the plugin installed** — *Verify: the audit states which sections
       were reachable from `spec/` alone; this repo cannot become that reader by accident, so the
       consumer path is traced deliberately (L-016)*
-- [ ] EPIC-003 § Closed-when **2 and 5** ticked with their evidence, or the shortfall named —
+- [x] EPIC-003 § Closed-when **2 and 5** ticked with their evidence, or the shortfall named —
       *Verify: the epic file; the gate's epic-archive leg still reports the epic correctly live*
-- [ ] If every condition is now `[x]`, the epic is proposed for close — *Verify: all five conditions
+- [x] If every condition is now `[x]`, the epic is proposed for close — *Verify: all five conditions
       re-read at once; a member sprint closing is not an epic closing, and §11's epic-archive move
       needs owner approval*
 

@@ -9,6 +9,27 @@ status: current
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
 
+## 0.3.0 — 2026-08-16
+
+**Added — §9 now defines the evidence the Gated conformance level is checked against.** Found by
+auditing the spec as a tool-builder would read it (SPRINT-070 T3, EPIC-003 § Closed-when 5): ADR-024
+defines **Gated** as "human approval is recorded against the work … checkable from the repo's own
+planning records", and the spec did not define the records. Two concrete gaps, both closed here:
+
+- **`gates_signed: <GATE>[,<GATE>…] @ <sha>`** is now specified in §9 — the field, its format, and
+  the three properties that carry the weight: **absence means NOT SIGNED** and is never approval; the
+  record lives in the sprint file rather than in the approving session, because a sign-off held only
+  in a transcript is invisible to anything reading the repo; and a malformed record is worse than none
+  because it looks like evidence. §13 already referenced this field as living in §9 — that
+  cross-reference now resolves.
+- **The `*Verify: …*` clause on a DoD criterion** is now specified. Gated requires that criteria name
+  how they were verified, and nothing in the spec said what that looks like, so a tool could not tell
+  a mechanically-checked criterion from a judged one. A criterion naming no check is a judgment tick
+  and says so.
+
+Minor rather than patch: this adds definitions and a new readable property, and changes no existing
+rule. `plugin.json` and the other three manifests do not move with it (EPIC-003 D3).
+
 ## 0.2.0 — 2026-08-16
 
 **Added — §13 HITL attestation (git-native).** The wire format for the **Attested** conformance level
