@@ -47,12 +47,18 @@ re-cutting the tree.
 makes it checkable in principle — with EPIC-003 open question 1 struck through and pointing at it.
 
 **DoD:**
-- [ ] The levels named and ordered, with the WHY for the count over the alternatives —
+- [x] The levels named and ordered, with the WHY for the count over the alternatives —
       *Verify: ruling recorded (ADR if §4's three tests all hold); reviewer reads ADR-018 as comparand*
-- [ ] Each level carries the property that makes it independently checkable **in principle**, with
+      ✓ ADR-024 (all three §4 tests hold; owner ruled three levels by popup 2026-08-16). The WHY is
+      evidence-class distinctness, not a preferred count; 3-row alternatives table
+- [x] Each level carries the property that makes it independently checkable **in principle**, with
       the engine explicitly out of scope — *Verify: no level's description requires EPIC-004 to exist*
-- [ ] EPIC-003 open question 1 struck through with a pointer to the ruling —
+      ✓ per-level evidence class stated (file tree · planning record · git history alone); the
+      exclusion is stated outright in § Decision. All three descriptions re-read for an engine
+      dependency: none found
+- [x] EPIC-003 open question 1 struck through with a pointer to the ruling —
       *Verify: the epic's § Open questions*
+      ✓ struck through + pointer to ADR-024; epic cap 87/200 after the edit
 
 ### T2 — Extract the standard to `spec/` v0.1.0 in one move+cite commit `[size: M · risk: med · class: execution · HITL]`
 Layers: `spec/` (new) · `skills/lean-doc-generator/references/DOCS_Guide.md` ·
@@ -138,12 +144,17 @@ close ran `git add -A` and was safe only because the worktrees had already been 
 **Acceptance:** with a worktree present, `git status --short` stays clean.
 
 **DoD:**
-- [ ] `.claude/worktrees/` ignored — *Verify: `git check-ignore -v .claude/worktrees/probe` resolves
+- [x] `.claude/worktrees/` ignored — *Verify: `git check-ignore -v .claude/worktrees/probe` resolves
       to the new rule*
-- [ ] Verified against a real dispatched worktree, not a `mkdir`'d stand-in —
+      ✓ resolves to `.gitignore:16`
+- [x] Verified against a real dispatched worktree, not a `mkdir`'d stand-in —
       *Verify: `git status --short` clean while the worktree exists*
-- [ ] Leg 1 explicitly untouched — the `find`-walk false positive stays routed to EPIC-004 D1 —
+      ✓ T4's live worktree used as the subject; before ` ?? .claude/worktrees/`, after only
+      ` M .gitignore` — both states observed, neither simulated
+- [x] Leg 1 explicitly untouched — the `find`-walk false positive stays routed to EPIC-004 D1 —
       *Verify: no checker changed by this task*
+      ✓ `git status -- scripts/ evals/` empty at commit; leg 1 then fired for real minutes later
+      (Execution Log, 2026-08-16 surprise) — the ignore does not stop a `find` walk, as predicted
 
 ## Decisions (pre-locked)
 

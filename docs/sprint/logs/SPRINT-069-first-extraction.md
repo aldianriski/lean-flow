@@ -58,3 +58,55 @@ dispatched in parallel against one epic file, which is SPRINT-041's corruption s
 criterion or a file. What changed is execution *order*, from three parallel waves to two plus a
 sequential tail. Batch G1 was signed before this entry (2026-08-16, all five tasks); G2 is signed
 against the amended Plan, with the preflight re-run to CLEAR as its evidence.
+
+### 2026-08-16 | progress | T1 — conformance levels ruled: Structural → Gated → Attested (ADR-024)
+
+Ruled inline by the coordinator (`class: decision`; rulings are the coordination tier's job,
+ADR-010), owner-decided by popup. Three levels, each checkable from a **different evidence class** —
+the file tree, the planning records, git history alone — which is what makes them independently
+checkable rather than three degrees of one measurement.
+
+The deciding evidence was where the reference implementation actually sits: lean-flow records
+`gates_signed: G1,G2 @ <sha>` but cannot yet emit ADR-018's per-task commit trailers (EPIC-003 D2,
+"ADR pending"), so it falls strictly between having the structure and being provable from a clone.
+A two-level ladder would have left the standard's own first conformant implementation at the bottom
+rung. lean-flow is **Gated**, deliberately not the top.
+
+Filed: ADR-024 · DECISIONS row · EPIC-003 open question 1 struck through · index regenerated.
+3 of 3 DoD ticked.
+
+### 2026-08-16 | surprise | TD-053 leg 1 fired for real — the gate walked into a live worktree
+
+The full gate, run to verify T1, returned **150 pass / 1 fail**:
+
+`FAIL ephemeral-intake: .claude/worktrees/agent-<id>/evals/fixtures/ephemeral-intake/committed-bug/
+docs/BUG-stale-pointer.md is a committed BUG report`
+
+That path is a **retained must-FAIL fixture inside T4's dispatched worktree**, reported as a live
+violation — TD-053 leg 1 exactly as its row describes: `check-ephemeral-intake.sh` excludes fixture
+trees with `grep -v '^evals/fixtures/'`, correctly position-anchored per L-108, and the nested repo
+copy defeats the `^` anchor.
+
+**Why this matters beyond the false positive.** This morning's promote review re-reviewed TD-053 and
+recorded leg 1 as *"untested, not clean — no full gate run is recorded while a worktree existed, so
+its silence is absence of evidence and nothing else"*, with the unblock condition *"a gate run
+observed against a live worktree"*. That condition was met the same day, by ordinary work rather
+than by a scheduled experiment — the vehicle was T4's dispatch, and the observation came free.
+
+No action taken mid-sprint: the row's own mitigation text routes the cure to EPIC-004's engine
+question and warns against a one-checker fix to a family-shaped defect (L-091). The TD-053 row gets
+this sighting at close, where TD updates belong; editing `TECH-DEBT.md` now would be an undeclared
+touch during execution, which is the phase split TD-044 exists to enforce.
+
+### 2026-08-16 | progress | T5 — .claude/worktrees/ ignored; TD-053 leg 2 closed
+
+One line, verified against a **real dispatched worktree** rather than a `mkdir`'d stand-in — which
+is what the DoD demanded and why T5 was sequenced to run while T4's worktree was live. Before:
+`?? .claude/worktrees/`, meaning a plain `git add -A` at that moment would have staged a full second
+copy of the repo. After: `check-ignore` resolves to `.gitignore:16`, status shows only the file
+itself.
+
+Scoped to leg 2 only, and the `.gitignore` comment says so — the obvious inference from "worktrees
+are ignored now" is that the walking problem is solved too, and it is not: `find` walks the
+filesystem, not the index. The surprise entry above is that same distinction observed live, minutes
+apart. 3 of 3 DoD ticked.
