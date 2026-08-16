@@ -134,3 +134,50 @@ gap is not a tooling gap. It is the standard deliberately caring about things a 
 **Cap check on the new artifact, which is why the G2 split mattered:** 123 lines, `PASS cap
 docs/research/conformance-inventory-criteria.md (123 <= 130) [§2]` — under the soft cap **and still
 matched by the checker**, which the subdirectory variant would not have been. Gate 151/0.
+
+### 2026-08-16 | progress | T2 — two criteria gaps found, and I caught myself squeezing a cap
+
+**Two gaps in T1's test, routed back rather than patched locally (DoD 3).**
+
+**Gap A — the census cannot see three line shapes.** The promote pattern counted table rows + bold
+statements + bold bullets. It misses `- [ ]` **checklist items** (8), **numbered items** (6), and
+sharpest, **fenced schema blocks** — §3's entire normative content is a ```yaml block defining the
+ownership header, and *nothing counted it*, so §3 read as "2 candidates" when both are mere
+*exceptions* to the rule the census never saw. **Corrected gross census: 170, not 156.** A1 called 156
+an upper bound; it was both too high (rows are parameter sets, not rules — T1's finding) and too low
+(three invisible shapes). Seventh stale figure this session, and the first that was wrong in two
+directions at once.
+
+**Gap B — some statements constrain the implementation, not the repo.** §12's `**Wiring.**` binds
+`init` and `migrate`. "This repo violates it" is not decidable — only a lean-flow implementation can
+violate it. T1's test has no bucket, and forcing one would either invent a repo obligation or discard
+a real constraint. Proposed fourth non-repo bucket: **`implementation-directed`**. This matters
+directly to EPIC-004: an engine must *not* evaluate these against an adopter's repo, and mistaking one
+for a repo rule emits a finding **no adopter can ever clear**.
+
+**Two structural findings about the standard's own shape**, both load-bearing for the engine:
+**§7 introduces almost no new rules** (7 of 9 restate §2/§3/§5/§11 as prohibitions) and **§8 introduces
+none at all** (7 items, all restatements). They are *views*, not rule sources. An engine ingesting
+them as rules double-counts sixteen constraints under second names — which is independently why D1's
+no-percentage ruling is right: the denominator would have been inflated by the standard's own
+cross-references.
+
+**The mistake I made, and the rule that caught it.** The T2 artifact came out at 140 lines against a
+130 soft cap, and I trimmed. Then trimmed again. Then trimmed a correct-but-verbose reconciliation
+into a shorter one. That is **squeezing**, and §2's growth rule says in as many words: *cap-hit →
+split, never squeeze*. §7 lists it as an anti-pattern with a named response. I was applying the
+anti-pattern while classifying the section that names it. Corrected by doing what the standard says:
+**§12 split out to `conformance-inventory-git-boundary.md`**, a coherent unit (what may live in the
+repo at all, vs how docs are shaped), at the top level where the checker still sees it. Result: 125 +
+29, both PASS, and **zero OVER-CAP rows repo-wide**.
+
+Worth keeping because the failure was invisible from inside: each individual trim looked like editing.
+Only the *sequence* was a squeeze, and nothing flags a sequence.
+
+**`Layers:` correction (L-100).** The gate caught the new sibling as undeclared —
+`FAIL layers observed: … conformance-inventory-git-boundary.md`. T2 now declares both files. Scope
+untouched: same sections, same test, same acceptance.
+
+**Marks after T2:** 38 rules — 17 mechanical · 15 judgment-only · 6 split. Running total with §2:
+**25 mechanical · 25 judgment-only · 8 split**. An even divide, and the mechanical half is inflated by
+the §7/§8 restatements just described.

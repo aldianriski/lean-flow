@@ -63,7 +63,7 @@ bucket it would have.
       `Cap`-vs-`Create ←` case is represented, since it is the case that motivated the criteria*
 
 ### T2 — Classify the remaining structural-evidence sections `[size: M · risk: low · class: execution · HITL]`
-Layers: `docs/research/conformance-inventory-structural.md`
+Layers: `docs/research/conformance-inventory-structural.md` · `docs/research/conformance-inventory-git-boundary.md`
 Depends-on: T1
 Cites: TASK-223's criteria (T1's output) · ADR-024 · `spec/STANDARD.md` §1 §3 §4 §5 §6 §7 §8 §12
 The sections whose evidence is the file tree alone. Grouped by evidence class rather than section
@@ -73,10 +73,10 @@ number, because evidence class *is* the mapping's level column.
 rather than a fresh judgement.
 
 **DoD:**
-- [ ] §1 · §3 · §4 · §5 · §6 · §7 · §8 · §12 fully classified — *Verify: per-section counts sum to the
+- [x] §1 · §3 · §4 · §5 · §6 · §7 · §8 · §12 fully classified — *Verify: per-section counts sum to the
       section census re-derived at execution*
-- [ ] Each rule carries level + mechanical|judgment-only — *Verify: no rule missing either field*
-- [ ] Any rule that T1's test **cannot** cleanly bucket is recorded as a criteria gap and routed back,
+- [x] Each rule carries level + mechanical|judgment-only — *Verify: no rule missing either field*
+- [x] Any rule that T1's test **cannot** cleanly bucket is recorded as a criteria gap and routed back,
       not resolved ad hoc — *Verify: the inventory names the ambiguous rule and what the test lacks;
       silently choosing a bucket is how two sections drift apart*
 
