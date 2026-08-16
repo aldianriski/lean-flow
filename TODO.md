@@ -58,6 +58,21 @@ status: current
       origin:     close-retro
       state:      ready
 
+- [ ] TASK-213 — Ignore `.claude/worktrees/` so a stray `git add -A` cannot commit a repo copy  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  `.claude/worktrees/` is in `.gitignore`, and `git status --short` stays clean with a
+                  worktree present — verified against a real dispatched worktree, not a mkdir'd stand-in
+      touches:    .gitignore
+      depends-on: none
+      assumes:    TD-053's leg 2 only. The row's mitigation rules out `.gitignore` as the *whole* fix
+                  because it does not stop `check-ephemeral-intake.sh`'s `find` walk — that is leg 1,
+                  which stays routed to EPIC-004 D1 and is NOT this task. Splitting them is the
+                  2026-08-16 re-review's ruling: a one-line cure was waiting on an engine question it
+                  does not depend on
+      tracker:    TD-053 (leg 2 split 2026-08-16) · SPRINT-069 promote governance review
+      origin:     manual
+      state:      ready
+
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution
       done-when:  a real unattended run that stops mid-Plan leaves a rollup naming the untouched tasks

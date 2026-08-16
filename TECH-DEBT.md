@@ -143,6 +143,17 @@ status: current
     the next worktree dispatch compares the worktree's HEAD to the coordinator's at spawn (one
     command) *before* real work, and records what it finds — that observation either explains the
     mechanism or is the second sighting that forces the guard.
+  - **Re-reviewed 2026-08-16 (SPRINT-069 promote, 3 sprints since last) — held, and the unblock
+    condition above is now SPENT: it fired, and came back null.** SPRINT-068 dispatched two worktree
+    builders — the first since this row was filed — and its Execution Log records both branching from
+    `622f420`, which is the sprint's own `gates_signed` commit and therefore the coordinator's HEAD at
+    spawn. Base current, both agents; SPRINT-063's three-sprints-behind branch did not reproduce. That
+    is one clean observation, not an explanation: the mechanism is still unknown and one null result
+    cannot retire a defect seen once. **Unblock condition, rewritten because re-parking on the same
+    measurement is L-094's trap** (a condition already satisfied once cannot be the thing we wait for
+    again): the *next* worktree dispatch records its base the same way — if it is current again, this
+    row closes as not-reproducible with the two observations as its record; if it is stale, that is the
+    second sighting and the guard gets written against a mechanism two data points can constrain.
 
 - **TD-053** severity: minor | status: open | created: Sprint-063
   - Summary: **worktree-isolated dispatch places a full repo copy at `.claude/worktrees/<id>/`, inside
@@ -171,6 +182,19 @@ status: current
     protocol — whoever builds it reads this row first, since a full-gate pass run while a worktree
     still exists would hit exactly this false positive. **Unblock condition:** unchanged — the next
     worktree dispatch, or EPIC-004 D1 landing.
+  - **Re-reviewed 2026-08-16 (SPRINT-069 promote, 3 sprints since last) — the two legs now separate,
+    and only one of them is still waiting on anything.** SPRINT-068's worktree dispatch was the vehicle
+    both legs were held for, and they came out of it in different states. **Leg 1 (the `find` walk) is
+    untested, not clean:** no full gate run is recorded while a worktree existed, so its silence is
+    absence of evidence and nothing else — read as "did not fire" it would be exactly the false-negative
+    L-058 warns about. It stays routed to EPIC-004 D1 as the row's own reasoning directs. **Leg 2 (the
+    `.gitignore` gap) is confirmed live and is not waiting on the engine question at all:**
+    `.claude/worktrees/` is still absent from `.gitignore`, and SPRINT-068's close ran `git add -A`,
+    which was safe only because the worktrees had already been removed — the mitigation text above
+    rules out `.gitignore` as *the whole fix*, which is not an argument against it as the fix for the
+    leg it actually covers. Split out to **TASK-213** so a one-line cure stops waiting on a question it
+    does not depend on. **Unblock condition:** leg 1 only — EPIC-004 D1, or a gate run observed against
+    a live worktree.
 
 - **TD-052** severity: medium | status: open | created: Sprint-062
   - Summary: **Nothing in `evals/` exercises skill *prose*, so a governance rule that lives as
@@ -274,6 +298,21 @@ status: current
     Balance still favours candidate (c) make-the-skip-loud when the trigger fires. Adjacent note:
     SPRINT-067 T1 (TASK-208) adds a system-verify pass at merge-back, which narrows what a close
     commit could silently carry — evidence for holding, not for acting.
+  - **Observation 2026-08-16 (SPRINT-068's close, recorded at SPRINT-069 promote — not a due
+    re-review; this row's aging clock still runs from SPRINT-067). The trigger came closer than any
+    prior instance, and on the same two files as SPRINT-061's.** Close commit `9fef02d` carried real
+    code — `scripts/lib/check-layers-observed.sh` and `evals/run-layers-observed-fixtures.sh`, changed
+    at close because the close itself surfaced a defect in leg 15's exclusion list — and neither file
+    is named in any task's `Layers:`, because both were invented after the Plan froze. Leg 15 printed
+    `skip (missing): docs/sprint/SPRINT-*.md` and did not check them, exactly as this row predicts.
+    Whether that counts as "an undeclared file that **mattered**" is the judgement the unblock
+    condition turns on, and the honest answer is **not quite**: the two files were covered by a fixture
+    leg and a strip-the-row guard proof run before the commit, so the coverage leg 15 would have
+    supplied was supplied by other means. The cost was again invisibility, not missed coverage — the
+    third close in a row to say so, now with the strongest instance yet behind it. **Balance:
+    candidate (c), make the skip loud, is what the evidence keeps pointing at** — a close that touches
+    code should at minimum be told leg 15 did not look. Still held, still not derived, but a fourth
+    instance of "invisibility only" should be read as the trigger being wrong rather than never met.
 
 - **TD-050** severity: minor | status: open | created: Sprint-060
   - Summary: **section 4 of `scripts/qa-check.sh` (knowledge metadata — index freshness, dangling refs,
@@ -321,6 +360,14 @@ status: current
     structural cure remains un-derived and nothing this sprint touches it — SPRINT-066 is two
     rulings, no corpus or gate work. **Unblock condition:** unchanged — a run demonstrably skipped
     for cost, or a structural cure (cached index digest) being derived on its own merits.
+  - **Re-reviewed 2026-08-16 (SPRINT-069 promote, 3 sprints since last) — held, trigger unchanged.**
+    Still no run skipped for cost: SPRINT-068 ran the gate four times across its close (twice bare,
+    twice under `QA_FULL=1`) with no reluctance recorded, and one of those runs was a deliberate
+    re-run to verify a revert — the opposite of the avoidance this row worries about. The structural
+    cure stays un-derived and nothing in the promoted work touches it. Noted for the next re-review:
+    the corpus grew again this sprint (L-124, ADR-023), so section 4's share is expected to have moved
+    up rather than down — which the row already frames as scaling as designed, not degrading, and is
+    **not** grounds to re-derive the narrowing L-091 binds against. **Unblock condition:** unchanged.
 
 - **TD-049** severity: minor | status: open | created: Sprint-059
   - Summary: the night-run reaper (`scripts/night-run.sh`) parses the sprint file's DoD boxes and
@@ -350,6 +397,20 @@ status: current
     before the edit, so nothing any of the three parses moved. TD-045's parity fixture has still
     never fired (QA green at the v1.39.0 close). **Unblock condition:** unchanged — a real format
     change the parsers read, or the parity fixture firing once.
+  - **Re-reviewed 2026-08-16 (SPRINT-069 promote, 3 sprints since last) — held, and this time the
+    near-trigger was much nearer.** SPRINT-068 T3 renamed a machine-read token in the Execution Log
+    format (`complete` → `run-complete`) and `scripts/night-run.sh` — this row's subject — had to be
+    edited for it, as a mid-sprint scope-change, because the ruling's census named the checker, the
+    fixtures and the template but not the event's **writer** (→ L-124). So a format the launcher both
+    writes and reads did move, and the launcher was very nearly left behind. It is still **not** this
+    row's trigger: what moved is the log's event vocabulary, not the DoD-box / `### Tn` grammar the
+    duplicated parser here actually reads, and no parser diverged — the miss was caught before merge.
+    But the row's standing argument has been "the sprint format has been stable for many sprints", and
+    that sentence is now weaker than it was: the format moved, and what caught the omission was a
+    builder's file-boundary flag, not any parity check. TD-045's fixture has still never fired.
+    **Unblock condition:** unchanged in substance, sharpened in wording — a change to the **DoD/`Tn`
+    grammar** the three parsers read (the log's event taxonomy is a different format and does not
+    count), or TD-045's parity fixture firing once.
 
 - **TD-048** severity: trivial | status: open | created: Sprint-058
   - Summary: `check-layers-completeness.sh` matches a `Layers:`/`Cites:` declaration against DoD prose
