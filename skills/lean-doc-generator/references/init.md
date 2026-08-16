@@ -58,8 +58,8 @@ bounded by the safe-scaffold allowlist (ADR-012).
    here; generated HTML docs need not be committed."* — carrying a `<sub>` footer ownership line
    (§3 pointer-file exception, like AGENTS.md; a doc without an owner is an orphan, §7).
 4. **Safe-scaffold allowlist (ADR-012)** — the only non-doc files init writes. See below.
-5. **Write** — target canonical placement (STANDARD §2: root for README/CONTRIBUTING/SECURITY/
-   AGENTS/CHANGELOG/LICENSE/TODO/TECH-DEBT · `.claude/` for AI-context · `docs/` for the rest);
+5. **Write** — target the canonical placement **STANDARD §2** defines (the standard is read first,
+   per the generator's § Bundled + cited assets);
    enforce the line cap and the ownership header (§3) on every file touched.
 6. **Verify** — `/prime` reads cleanly (no missing-file errors on required reads); every scaffolded
    file's ownership header + placement match STANDARD §2/§3; report the full file list, including

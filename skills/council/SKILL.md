@@ -51,7 +51,7 @@ All sub-agent prompt templates are in **`${CLAUDE_SKILL_DIR}/references/prompts.
 5. **Write the verdict (lean).** Present in chat AND write **only the verdict** (sections per prompts.md) to `verdict-<slug>.md` — use the slug the ADR will use. Default to the OS temp dir; repo only if asked. Never dump the full transcript.
    If the verdict will be **referenced by a durable doc** (ADR, TODO tracker, sprint file), copy it to
    `docs/research/verdict-<slug>.md` first and reference *that* path — a temp-dir path never lands in a durable doc.
-6. **Feed forward.** The verdict is a decision *input*, not a record. Hard-to-reverse + surprising + a real trade-off → fold the recommendation + alternatives into an **ADR** (`docs/adr/`, STANDARD §4), then the verdict file can be deleted. Don't accumulate stale verdicts.
+6. **Feed forward.** The verdict is a decision *input*, not a record. Where the decision clears STANDARD §4's bar for one, fold the recommendation + alternatives into an **ADR** (`docs/adr/`), then the verdict file can be deleted. Don't accumulate stale verdicts.
 
 ## Conditional passes (gated — off by default)
 

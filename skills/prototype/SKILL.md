@@ -41,7 +41,7 @@ explicit so it's checkable later, including AFK.
 
 When it's answered its question, record **the answer + the question** somewhere durable, then delete
 or absorb the prototype:
-- A genuine design decision → an **ADR** (hard-to-reverse + surprising + a real trade-off).
+- A genuine design decision → an **ADR**, where it clears STANDARD §4's bar for one.
 - A decision-rich snippet (state machine, schema, type shape) → feed it into `/task-decomposer`'s PRD (its Implementation Decisions already cite "a prototype produced a snippet").
 - Otherwise → a `NOTES.md` next to the prototype with the verdict, filled before deletion.
 

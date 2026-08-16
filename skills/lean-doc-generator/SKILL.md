@@ -20,7 +20,7 @@ SSOT for every standard-owned rule (ADR-023).
 | Explains… | Goes in… |
 |---|---|
 | HOW it works | code (comments, types, tests) |
-| WHY decided | a rich ADR — one file at `docs/adr/ADR-NNN-<slug>.md` (`templates/ADR.md.template`); add a row to the `docs/DECISIONS.md` index. Offer one only when hard-to-reverse **and** surprising **and** a real trade-off (STANDARD §4) |
+| WHY decided | a rich ADR — one file at `docs/adr/ADR-NNN-<slug>.md` (`templates/ADR.md.template`); add a row to the `docs/DECISIONS.md` index. Offer one only when it clears STANDARD §4's three-part bar |
 | WHERE things live | `docs/architecture/overview.md` or `README.md` |
 | WHAT changed | `CHANGELOG.md` (root) |
 | Unsure | code |
@@ -71,7 +71,7 @@ allowlist → `${CLAUDE_SKILL_DIR}/references/init.md`.
 4. **Read manifests** — `package.json` / `pyproject.toml` / `go.mod` etc. + existing docs. If inaccessible, ask the user to paste the file tree + manifest.
 5. **HOW filter** — discard anything that explains implementation; keep WHY / WHERE / WHAT only.
 6. **Template-load protocol** *(this is the step that, when skipped, produces wrong docs)* — for each core file, **Read `${CLAUDE_SKILL_DIR}/templates/<X>.md.template` BEFORE writing**. Match its frontmatter order, section order, and placeholders; replace `[CUSTOMIZE]` / `[bracket]` tokens with real content. If the template is missing, WARN and fall back to `STANDARD.md §2` — never hard-stop. Template wins on any divergence; note the correction inline.
-7. **Write** — target the canonical placement (STANDARD §2: root for README/TODO · `.claude/` for AI-context · `docs/` for the rest); enforce the line cap and the ownership header on every file touched. **If the project maintains a generated knowledge index, regenerate it after writing a metadata-carrying doc (LEARNINGS · ADR · research)** — a derived view, never hand-edited (lean-flow itself: `sh scripts/gen-index.sh` → `docs/knowledge-index.md`).
+7. **Write** — target the canonical placement **STANDARD §2** defines (the standard is read first — see § Bundled + cited assets); enforce the line cap and the ownership header on every file touched. **If the project maintains a generated knowledge index, regenerate it after writing a metadata-carrying doc (LEARNINGS · ADR · research)** — a derived view, never hand-edited (lean-flow itself: `sh scripts/gen-index.sh` → `docs/knowledge-index.md`).
 8. **Close** — list docs delivered + headers to verify + recommended follow-ups.
 
 ## Creates vs consumes (the boundary)
@@ -120,7 +120,7 @@ Resolve each ☑ line before sign-off: promote flagged learnings into a durable 
 
 ❌ **Writing a core doc without reading its template** — the cause of skipped/wrong generation; Step 6 is mandatory.
 ❌ **HOW in a doc** — redirect to a code comment; never raise a line cap to fit HOW.
-❌ **No ownership header** — every doc touched gets a fresh header before you leave it.
+❌ **No ownership header** — STANDARD §3 requires one on every doc; refresh it before you leave the file.
 ❌ **A person as owner** ("Alice") — reassign to a role.
 ❌ **Stale doc used as source** — run the staleness scan first.
 ❌ **A new file outside the core set** — fit it into an existing core file or a code comment.

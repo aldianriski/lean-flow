@@ -146,3 +146,50 @@ the scan fires on rows it reaches — the seed is what shows it reaches them.
 which is what SPRINT-069 T3's 86-site sweep produced. So "1 of 14 cites the spec" reads as a corpus
 that ignores the spec, when the corpus overwhelmingly cites it and simply does not spell out the file
 path. No task changes; recorded because T3's audit must not mistake a name-citation for a missing one.
+
+### 2026-08-16 | progress | T2 — all 6 restatements converted; the L-015 tension resolved on evidence
+
+**The #5/#6 ruling turned out not to be a judgement call at all.** T1 flagged the §2 placement gloss
+in `lean-doc-generator/SKILL.md:74` and `init.md:61` as a real L-015 tension — the gloss *is* §2's
+rule, but removing it might leave the generator unable to place a file without the spec. Checked
+rather than weighed: `lean-doc-generator/SKILL.md:30` lists `spec/STANDARD.md` under § Bundled + cited
+assets with **"Read first."** The generator already loads the standard before it does anything, so the
+inline mapping was duplication with *zero* usability cost to remove. The tension was real in the
+abstract and empty in this specific corpus — which is the difference between weighing a trade-off and
+looking for the fact that dissolves it.
+
+**Conversions (all six, one commit, each atomic within it — ADR-023).**
+
+| # | File | Before → after |
+|---|---|---|
+| 1 | `council/SKILL.md:54` | "Hard-to-reverse + surprising + a real trade-off →" → "Where the decision clears **STANDARD §4's bar** for one," |
+| 2 | `prototype/SKILL.md:44` | "an **ADR** (hard-to-reverse + surprising + a real trade-off)" → "an **ADR**, where it clears **STANDARD §4's bar** for one" |
+| 3 | `lean-doc-generator/SKILL.md:23` | "Offer one only when hard-to-reverse **and** surprising **and** a real trade-off (STANDARD §4)" → "Offer one only when it clears **STANDARD §4's three-part bar**" |
+| 4 | `lean-doc-generator/SKILL.md:123` | "every doc touched gets a fresh header before you leave it" → "**STANDARD §3** requires one on every doc; refresh it before you leave the file" |
+| 5 | `lean-doc-generator/SKILL.md:74` | "(STANDARD §2: root for README/TODO · `.claude/` … · `docs/` …)" → "the canonical placement **STANDARD §2** defines (the standard is read first)" |
+| 6 | `init.md:61` | same gloss, same fix |
+
+**DoD 1's reconciliation, and why the census moved rather than held.** The census went **39 → 36**,
+which looked wrong for a moment and is exactly right: for #1, #2 and #3 the restated phrase *was* the
+thing the pattern matched, so converting them removes the site from the scan entirely; for #4, #5 and
+#6 the surviving words (`ownership header`, `canonical placement`, `§2`) still match, now as
+citations. So the buckets are **0 restatement / 28 citation / 8 legitimately-local = 36**, and the
+citation bucket grew by exactly 3 — the three conversions that stayed visible to the scan. 25 + 3 = 28.
+
+Worth stating because it is a trap for T3 and for anyone re-running this later: **the scan cannot be
+used as a progress metric.** A converted site may vanish from it or remain in it depending on which
+words the pattern happened to key on, so "count went down" and "count held" are both consistent with
+a correct conversion. The bucket classification is the measurement; the raw count is not.
+
+**DoD 3 — read back as a consumer with no `spec/` open.** Each converted line still tells the reader
+that a rule applies and where it lives: a bar exists and §4 holds it · §3 requires a header on every
+doc · §2 defines placement. What is gone is the rule's *content*, which is the intended split. #3 keeps
+the words "three-part" deliberately — that is a shape hint, not the test.
+
+**DoD 4 — structure re-read, not inferred from the diff.** #3 edits a **markdown table row**, which is
+L-009's exact hazard (a row edit can fuse neighbours while grep and line caps both stay clean). Re-read
+lines 21–25: the `HOW it works` / `WHY decided` / `WHERE things live` / `WHAT changed` rows are all
+intact and separate.
+
+**DoD 5** — gate **149 pass / 0 fail**. Caps hold on every touched file: `council` 74/140 ·
+`prototype` 54/140 · `lean-doc-generator` 126/140 · `init.md` 130.

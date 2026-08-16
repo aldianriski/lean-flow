@@ -71,19 +71,19 @@ intermediate state where the rule is stated in both places.
 usable by someone who has the plugin and has never opened `spec/`.
 
 **DoD:**
-- [ ] Every **restatement** entry converted to a citation naming its `spec/` § — *Verify: re-run T1's
+- [x] Every **restatement** entry converted to a citation naming its `spec/` § — *Verify: re-run T1's
       inventory query; the restatement bucket is empty and the citation bucket grew by exactly that
       count*
-- [ ] Each conversion is **atomic within its commit** — no commit leaves the rule in both places
+- [x] Each conversion is **atomic within its commit** — no commit leaves the rule in both places
       (ADR-023) — *Verify: `git show <sha>` per touched file shows the deletion and the citation in
       the same diff*
-- [ ] **Routing preserved, rule text removed** — a skill still tells its reader that a rule applies
+- [x] **Routing preserved, rule text removed** — a skill still tells its reader that a rule applies
       here; only the restated text goes — *Verify: read each converted file as a consumer without
       `spec/` open; the skill must remain executable (L-015)*
-- [ ] Structure re-read after every edit, not trusted from the diff — *Verify: L-009/L-125 — a
+- [x] Structure re-read after every edit, not trusted from the diff — *Verify: L-009/L-125 — a
       markdown list or table edit can fuse neighbours while grep and line caps stay clean, and this
       corpus contains prose about its own rules*
-- [ ] Gate green, and the line caps still hold for every file touched — *Verify: `sh scripts/qa-check.sh`*
+- [x] Gate green, and the line caps still hold for every file touched — *Verify: `sh scripts/qa-check.sh`*
 
 ### T3 — Audit whether the spec alone is sufficient to build a conformant tool `[size: M · risk: med · class: decision · HITL]`
 Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/epic/EPIC-003-the-standard.md`
