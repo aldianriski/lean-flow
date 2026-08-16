@@ -61,6 +61,29 @@ gating → §6.
 | `TODO.md` | Dev / AI | 320 soft (ADR-019) | init (always) | backlog change · sprint promote/close | §11 prune |
 | `TECH-DEBT.md` | Dev / AI | open rows only | first TD filed | close files TD · promote ages · debt resolved | §11 delete (3 sprints after resolved) |
 
+**`spec/` — the standard itself, where a repo publishes one:**
+
+| File | Reader | Cap | Create ← | Update ← | Archive |
+|---|---|---|---|---|---|
+| `spec/STANDARD.md` | Adopter / tool | **no numeric cap** — ruled, see below | the standard is extracted for independent versioning (ADR-023) | a rule is added, amended or reclassified — bump per `spec/CHANGELOG.md` | — |
+| `spec/CHANGELOG.md` | Adopter | append-only | with `STANDARD.md` | every version bump | — |
+
+**Why `STANDARD.md` carries no number (ADR-026), stated here so the absence is a ruling and not an
+oversight.** Note the `Cap` cell holds **no digits at all**, deliberately: a cap check reads the first
+digit run in that cell as the number, so writing `no numeric cap (ADR-026)` would have been parsed as a
+cap of **26** and reported a breach on every run. Cite an ADR in the prose, never in a machine-read cell.
+Every other row's cap has a working escape: cap-hit → split into a tree (Growth rule below). That escape
+is **unavailable to this file**, three ways. Adopters pin it **by path**, so splitting into section files
+is a breaking change for every consumer. A cap check that derives its file set from this table expands
+a path into a **non-recursive** glob, so splitting into a subdirectory would move the spec *out of the
+checker's reach* — the remedy silently un-governing the file the cap was meant to govern. And §14's rule
+ids are cross-section, so a split fragments the rule source a tool must read as one document. A cap whose
+only escape is unusable can be met **only by squeezing**, which the Growth rule forbids in as many words.
+This is the *"cap was never reachable"* case that rule already names: the standard mandates content the
+number never budgeted for, and growth here is the standard gaining rules, which is the file doing its
+job. **The governor is §14's rule table, not a line count** — if this file bloats, it will be prose
+around the rules, and the rule count is what shows it.
+
 **AI context (`.claude/`):**
 
 | File | Reader | Cap | Create ← | Update ← | Archive |

@@ -112,7 +112,7 @@ status: current
     touches no harness, so it is not a vehicle either. Search recorded so the next reviewer does not
     repeat it.
 
-- **TD-058** severity: minor | status: open | created: Sprint-070
+- **TD-058** severity: minor | status: resolved → SPRINT-073 T2 (ADR-026) | created: Sprint-070
   - Summary: **`spec/STANDARD.md` has no §2 row and therefore no cap, and it is now the largest
     governed doc in the repo at 587 lines.** The extraction (SPRINT-069 T2) moved the standard into
     `spec/` without giving it a row in its own §2 core-file table, so `check-doc-caps.sh` — which
@@ -149,6 +149,24 @@ status: current
     sections, spec 0.3.0** — unchanged since the SPRINT-071 close update, so the +127-lines-since-
     extraction trend still stands at two data points and T1 supplies the third. This is L-127's shape
     resolving rather than recurring: the fact that would close the row was documented in the row.
+  - **RESOLVED 2026-08-16 (SPRINT-073 T2 → ADR-026).** `spec/STANDARD.md` and `spec/CHANGELOG.md` now
+    carry §2 rows; `STANDARD.md`'s cap is ruled **no numeric cap**, with the reasoning inline in §2 so
+    the absence reads as a decision rather than an oversight — which was this row's actual complaint.
+    The growth curve T1 supplied (497 → 587 → 595 → 624 → **923**) is in the ADR. The deciding argument
+    is that §2's cap-hit→split escape is **unavailable** to this file: adopters pin it by path, the
+    split target escapes the non-recursive cap glob (**TD-061**), and §14's rule ids are cross-section.
+    A cap whose only escape is unusable can be met only by squeezing (L-131).
+    **Two things this deliberately did not achieve, recorded so nobody reads more into it:** there is
+    now **no automated growth signal** on the file (accepted, argued in the ADR's Consequences), and the
+    cap checker emits **nothing** for the new rows — verified by diffing its full output before and
+    after, which was byte-identical. "In §2" and "the checker sees it" stayed two claims, and only the
+    first is true.
+    **A live trap found while ruling it:** the first attempt wrote the cap cell as
+    `no numeric cap (ADR-026)`, and `check-doc-caps.sh` scraped **026** out of it — `FAIL cap
+    spec/STANDARD.md (943 > 026)`. It reads the first digit run in the cell as the number. **Never cite
+    an ADR inside a machine-read cell**; the cell now holds no digits at all and the citation lives in
+    the prose. Caught because DoD 3 required running the checker rather than asserting the row worked
+    (L-057).
 
 - **TD-057** severity: minor | status: open | created: Sprint-069
   - Summary: **`Layers:` feeds three checkers that match it three different ways, and nothing states

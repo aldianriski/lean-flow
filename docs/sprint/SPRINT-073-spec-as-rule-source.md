@@ -98,21 +98,21 @@ a recorded ruling that it is deliberately uncapped — and either way the absenc
 oversight to the next person who greps §2.
 
 **DoD:**
-- [ ] The post-T1 line count is measured and stated — *Verify: `wc -l spec/STANDARD.md` at execution
+- [x] The post-T1 line count is measured and stated — *Verify: `wc -l spec/STANDARD.md` at execution
       against the **624** recorded at this promote; the delta T1 produced is the evidence this ruling
       turns on and is stated as a number, not as "grew substantially"*
-- [ ] The ruling is made and recorded where the next reader of §2 finds it — *Verify: §2 itself, not a
+- [x] The ruling is made and recorded where the next reader of §2 finds it — *Verify: §2 itself, not a
       research doc; a ruling that lives outside the table it concerns will not be read by anyone
       checking the table*
-- [ ] If a cap is chosen, `check-doc-caps.sh` actually reports on the spec — *Verify: run it; a row
+- [x] If a cap is chosen, `check-doc-caps.sh` actually reports on the spec — *Verify: run it; a row
       appears for `spec/STANDARD.md`. Today it reports **zero** rows for `spec/` because it derives
       coverage from §2 rather than hand-listing, so "added a row" and "the checker sees it" are two
       claims and only the second one matters (L-057)*
-- [ ] The §6 tier-split escape is priced explicitly, not assumed away — *Verify: the ruling states what
+- [x] The §6 tier-split escape is priced explicitly, not assumed away — *Verify: the ruling states what
       a cap-hit would mean for a spec — numbered section files — and whether that is acceptable for an
       artifact adopters pin by path. **TD-061 binds here**: a split into a subdirectory is exactly the
       remedy that escapes the checker*
-- [ ] TD-058 is closed or its status updated to match the ruling — *Verify: the row*
+- [x] TD-058 is closed or its status updated to match the ruling — *Verify: the row*
 
 ### T3 — Give each of the 39 uncovered-mechanical rules an explicit disposition `[size: M · risk: low · class: decision · HITL]`
 Layers: `docs/research/conformance-baseline.md` · `docs/adr/` (only if the scoping qualifies)

@@ -242,3 +242,48 @@ can now name any rule, its level, whether it is checkable, and whether it applie
 `S8` reports **0 rules** in the document itself, so an engine cannot double-count it. And §14 states
 the no-percentage ruling **normatively**, so it binds adopters' tools rather than living in this
 repository's epic notes.
+
+### 2026-08-16 | progress | T2 — the spec is ruled uncapped, and the cap cell nearly capped it at 26
+
+**The measurement TD-058 said was undiscoverable, re-derived from git rather than remembered:**
+497 (extraction) → 587 (+90, §13) → 595 (+8) → 624 (+29, §9) → **923** (+299, T1). Rule additions cost
+**30–90 lines**; T1's +299 is a one-time structural layer, not the trend. The promote figure of 624 was
+correct and is now superseded by 923.
+
+**Owner ruling → ADR-026: `spec/STANDARD.md` gets a §2 row whose `Cap` is `no numeric cap`.** The
+reasoning sits inline in §2, which is what TD-058 actually asked for — the absence now reads as a
+decision. `spec/CHANGELOG.md` joins as `append-only`.
+
+**The deciding argument is that §2's own escape hatch does not work on this file** (DoD 4, priced rather
+than assumed away). Every other capped row answers a cap-hit by splitting into a tree. Here that fails
+three ways: adopters **pin the file by path** (ADR-023), so splitting is a breaking change no other row
+carries · the split target is a subdirectory, and a cap check deriving its file set from §2 expands a
+path into a **non-recursive** glob (**TD-061**), so splitting would move the spec *out of the checker's
+reach* — the remedy un-governing the file the cap was added to govern, which is L-132's shape one sprint
+after filing it · §14's rule ids are **cross-section**, so a split fragments the rule source a tool must
+read as one document. A cap whose only escape is unusable can be met only by **squeezing** — forbidden
+by §2's Growth rule, named as an anti-pattern by §7, and recorded as L-131 last sprint.
+
+This is the *"cap was never reachable"* case §2 already names: the standard mandates content the number
+never budgeted for. §2's prescribed response is to fix the number, and fixing it honestly means ruling a
+line count the wrong instrument here.
+
+**The trap, and it was live.** The first attempt wrote the cell as `no numeric cap (ADR-026)`. The
+checker scraped the digits out of the citation: `FAIL cap spec/STANDARD.md (943 > 026)` — it takes the
+**first digit run in the cell** as the cap, so the spec was momentarily capped at **26** lines against
+943. Caught only because DoD 3 requires *running* the checker rather than asserting the row works
+(L-057: "added a row" and "the checker sees it" are two claims). Cell now holds **no digits at all**;
+the ADR is cited in the prose beneath. Recorded in §2 itself so the next person adding a non-numeric cap
+does not rediscover it.
+
+**DoD 3 answered honestly: the checker emits nothing for either new row, and that is the intended
+outcome, not a success.** Verified by diffing `check-doc-caps.sh`'s full output before and after the §2
+change — **byte-identical**. So "the spec is in §2" is true and "the cap checker sees it" is false, and
+ADR-026 records that as a stated **negative** consequence alongside the loss of any automated growth
+signal on this file. Two rejected alternatives are recorded with their numbers: soft caps at 1000 and
+1200, rejected for firing within a sprint and for being chosen for comfort rather than read off the
+curve (ADR-015's gesture test).
+
+**TD-058 → `resolved → SPRINT-073 T2 (ADR-026)`**, four sprints and five re-reviews after filing. It
+closed the moment the evidence it named arrived — which is the case for ordering T2 after T1 rather than
+by priority.

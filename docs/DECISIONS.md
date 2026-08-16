@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-026](adr/ADR-026-standard-carries-no-line-cap.md) | `spec/STANDARD.md` gets a §2 row whose cap is **no numeric cap** — §2's cap-hit→split escape is unavailable to a file adopters pin by path, whose split target escapes the non-recursive cap glob (TD-061), and whose rule ids are cross-section; the governor is §14's rule table | accepted | 2026-08-16 |
 | [ADR-025](adr/ADR-025-git-native-attestation-format.md) | HITL attestation is three git trailers on the task's own commit (`Gate-Signed-By:` · `Gate:` · `Evidence:`), specified in `spec/` §13; unsigned it is a claim, not proof, so Attested is unreachable by trailers alone | accepted | 2026-08-16 |
 | [ADR-024](adr/ADR-024-conformance-levels.md) | Three conformance levels — Structural → Gated → Attested, each checkable from a different evidence class (tree · record · signature) | accepted | 2026-08-16 |
 | [ADR-023](adr/ADR-023-context-becomes-consumer.md) | CONTEXT.md becomes a consumer of the extracted spec (`spec/` is the SSOT for standard-owned rules; move+cite atomic extraction commits) | accepted | 2026-08-15 |
