@@ -538,6 +538,61 @@ run_case_anywhere "release-bookkeeping-at-close (all excluded)" 0 \
   "layers observed (all changed files declared" -- \
   sh -c "cd \"$c4d\" && sh \"$checker\" docs/sprint/SPRINT-907-release.md"
 
+# ================================================================================================
+# case 4e: the CHANGELOG ROTATION artifact at the MINOR bump (constructed) -- must PASS at close.
+# Added SPRINT-068 close: the same shape as 4d, one file over. §11 rotates the older CHANGELOG
+# blocks verbatim into docs/changelog/CHANGELOG-<version>.md when a new MINOR lands, and the
+# exclusion list named CHANGELOG.md but never its rotation sibling. SPRINT-067's close created
+# CHANGELOG-1.39.0.md and tripped this leg unnoticed; SPRINT-068's caught it (L-020 again: the
+# rotation convention shipped, its exclusion row did not). Two halves, same width guard as 4d.
+# ================================================================================================
+c4e="$work/changelog-rotation-exclusion"
+mkdir -p "$c4e/docs/sprint" "$c4e/docs/changelog"
+cat > "$c4e/docs/sprint/SPRINT-908-rotation.md" <<'EOF'
+---
+sprint: 908
+slug: rotation
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-908 — Changelog Rotation Exclusion (constructed fixture)
+
+## Plan
+
+### T1 — edit foo.txt only
+Layers: `foo.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] foo.txt updated
+EOF
+printf 'a\n' > "$c4e/foo.txt"
+printf '# Changelog\n\n## v1.0.0\n' > "$c4e/CHANGELOG.md"
+git -C "$c4e" init -q
+lock_plan "$c4e" 'docs/sprint/SPRINT-908-rotation.md'
+printf 'a2\n' >> "$c4e/foo.txt"                                         # declared
+printf '## v1.0.0\n' > "$c4e/docs/changelog/CHANGELOG-1.0.0.md"         # CLOSE-TIME (the new row)
+# CHANGELOG.md itself is left untouched after the lock on purpose: its own exclusion row already has
+# a case, and editing it here would put two paths in the finding and make this leg's assertion pass
+# on the wrong one. The rotation artifact is the only variable.
+
+# Phase 1 -- DoD still open, so the sprint is mid-execution and the rotation artifact is NOT release
+# bookkeeping: a rotated file edited during execution is somebody's task work and must stay reported.
+# If a future widening moves this row to the general list, this half goes green and that is the signal.
+run_case_anywhere "changelog-rotation-reported-during-execution" 1 \
+  "changed but undeclared in any task's Layers:: docs/changelog/CHANGELOG-1.0.0.md" -- \
+  sh -c "cd \"$c4e\" && sh \"$checker\" docs/sprint/SPRINT-908-rotation.md"
+
+# Phase 2 -- same repo, same edits, DoD ticked. Zero open DoD == at close, the only moment "rotated
+# with the CHANGELOG" is true, so the run is clean. Without this half the close this row was written
+# for still fails.
+sed -i.bak 's/^- \[ \] foo.txt updated/- [x] foo.txt updated/' "$c4e/docs/sprint/SPRINT-908-rotation.md"
+rm -f "$c4e/docs/sprint/SPRINT-908-rotation.md.bak"
+run_case_anywhere "changelog-rotation-at-close (excluded)" 0 \
+  "layers observed (all changed files declared" -- \
+  sh -c "cd \"$c4e\" && sh \"$checker\" docs/sprint/SPRINT-908-rotation.md"
+
 # case 5: sprint file path does not exist on disk (constructed) -- must FAIL, its own named finding.
 # This is the checker's very first guard (`[ -f "$sp" ]`), before any git command runs, so the
 # throwaway repo below never even needs a commit -- it exists only so the fixture follows the same

@@ -30,6 +30,14 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 
 ---
 
+## L-124 [tags: process] [status: active]: **A contract rename's census enumerates producers, not only asserters and docs.** TD-055's ruling scoped the `complete` → `run-complete` rename to the checker, its fixtures, and the template — the shape's *asserter* and its *documentation* — and the event's live **writer** (`scripts/night-run.sh:120`, ADR-016's launcher wrapper) sat outside all three. The ruling, the builder's in-boundary pass, and the coordinator's pre-dispatch grep (which covered `skills/` and the procedure docs, never `scripts/`) all missed it; the builder's boundary-respecting *flag* caught it, and merging without the fix would have left the rollup gate silently dark on every real completed run — the L-058 false-negative wearing a rename. Same sprint, same shape at smaller scale: the sprint's own Execution Log, instantiated from the template *before* the rename landed, carried the pre-rename taxonomy until review caught it. The rule: renaming a machine-read token starts from a repo-wide census of **who writes it, who reads it, who documents it, and what was instantiated from any of those** — L-123 names birth ("shape and checker born together"); this is its rename corollary, and the missing party is usually the writer.
+- seen: Sprint-068 (×2 within the sprint — the live writer and the instantiated-from-template log)
+- count: 1
+- promoted: no
+- related: L-123 (birth-time sibling) · L-108 (anchor the census greps to the delimited field) · L-058 (what the miss would have cost)
+
+---
+
 ## L-123 [tags: process] [status: active]: **A machine-asserted shape and its checker are born together, or not at all.** SPRINT-067's two revise firings were mirror images of one defect. T1 shipped a checker asserting `^owner-ruling:` against a format **no procedure documented** — an undocumented assertion, a false-positive trap on correct behaviour the day the checker is wired in. T2 shipped prose referencing a "per-criterion analogue" shape **no checker asserts** — an unasserted definition, a contract with no control (TD-052's trap). One rule covers both directions: when text defines a grep-able shape, the same change names the checker that asserts it; when a checker asserts a shape, the same change names the procedure that documents it. Either half alone is a defect, and both halves were caught by the revise loop's comparand-briefed reviewers before commit.
 - seen: Sprint-067 (×2 within the sprint — one per direction, one per task)
 - count: 1

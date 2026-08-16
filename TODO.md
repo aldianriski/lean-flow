@@ -18,17 +18,12 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-068 — Open the Standard** → [`docs/sprint/SPRINT-068-open-the-standard.md`](docs/sprint/SPRINT-068-open-the-standard.md)
->
-> Clear the ready pool and open EPIC-003's door: the pre-extraction ruling on what CONTEXT.md
-> becomes (T1 = TASK-198) · the system-verify checker joins the QA gate (T2 = TASK-210) · the
-> reserved `complete` event renamed `run-complete`, TD-055's ruled cure (T3 = TASK-211). All
-> file-disjoint; no epic stamp (D1 — the ruling is EPIC-003's prerequisite, not member work; the
-> extraction sprints will be the members).
+> _(no active sprint)_ — SPRINT-068 closed 2026-08-15 → [`docs/sprint/archive/SPRINT-068-open-the-standard.md`](docs/sprint/archive/SPRINT-068-open-the-standard.md). Next: `/lean-doc-generator promote` — EPIC-003's opening ruling has landed (ADR-023), so the first extraction sprint can promote.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
-> **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard** (next — TASK-198 is its
-> opening ruling) → **EPIC-004 Conformance** → **EPIC-005 Fleet**. Evidence base:
+> **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard** (next — its opening
+> ruling landed as ADR-023 at SPRINT-068; extraction sprints are the members) →
+> **EPIC-004 Conformance** → **EPIC-005 Fleet**. Evidence base:
 > [`docs/research/platform-readiness-audit.md`](docs/research/platform-readiness-audit.md).
 > Backlog below is ranked against that sequence, not by age.
 
@@ -47,49 +42,19 @@ status: current
 
 ### P2 — Quality / Polish
 
-- [ ] TASK-198 — Rule what CONTEXT.md becomes once the spec is extracted  [size: S] [risk: med] [HITL]
-      class:      decision
-      done-when:  a recorded ruling on whether `.claude/CONTEXT.md` stays an SSOT or becomes a consumer
-                  of the extracted spec, with the migration-window risk named and its mitigation stated
-      touches:    .claude/CONTEXT.md · docs/adr/ · EPIC-003
-      depends-on: none
-      assumes:    this is settled BEFORE the first extraction commit, not during it. Extraction that
-                  leaves the same rule in two places mid-migration is precisely the second SSOT LAW 4
-                  and the anti-SSOT rule forbid — ADR-018 accepts that risk explicitly and names this
-                  task as how it gets retired. Blocking for EPIC-003, not for EPIC-002
-      tracker:    EPIC-003 open question 3 · ADR-018
-      origin:     manual
-      state:      ready
-
-- [ ] TASK-210 — Wire check-system-verify-block.sh into the QA gate  [size: S] [risk: low] [AFK]
+- [ ] TASK-212 — Guard the two Layers-family checkers against bare invocation  [size: S] [risk: low] [AFK]
       class:      execution
-      done-when:  the system-verify contract checker runs inside `sh scripts/qa-check.sh` (registered
-                  per the gate's own harness conventions), its five fixture legs green in-gate, and a
-                  deliberate violation FAILs the gate with the named finding
-      touches:    scripts/qa-check.sh · evals/ (paths only if registration requires the harness at
-                  the standard evals/run-*.sh location)
+      done-when:  `check-layers-completeness.sh` and `check-layers-observed.sh` invoked with no
+                  arguments print a "nothing verified" note (their guarded siblings' shape) instead
+                  of a silent exit-0 no-op, with a must-FAIL/must-note leg per checker proving it
+      touches:    scripts/lib/check-layers-completeness.sh · scripts/lib/check-layers-observed.sh ·
+                  evals/ (the proving legs)
       depends-on: none
-      assumes:    SPRINT-067 T1 deliberately deferred this ("qa-check.sh: run, never edited" bound
-                  that task; the builder's placement deviation named the gap). Moving the nested
-                  harness is in scope; the five legs and their named findings stay identical (L-058)
-      tracker:    SPRINT-067 T1 builder deviation · evals/README.md § system-verify · L-058
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-211 — Rename the reserved `complete` event to `run-complete`  [size: S] [risk: med] [HITL]
-      class:      execution
-      done-when:  the run-level Execution Log event is `run-complete` in `check-night-run-rollup.sh`,
-                  its fixtures, and `sprint-log.md.template`'s taxonomy comment, with a task-level
-                  "complete" no longer arming the rollup assertions; the checker's must-FAIL legs
-                  pass with the renamed finding, and TD-055 is marked resolved
-      touches:    scripts/lib/check-night-run-rollup.sh · evals/fixtures/ (rollup fixtures) ·
-                  skills/lean-doc-generator/templates/sprint-log.md.template
-      depends-on: none
-      assumes:    TD-055's ruled cure (SPRINT-067 T2: a note was declined with reason — no in-scope
-                  file was the authoring point; the rename makes the collision impossible). Historical
-                  logs keep `complete` — archives are not re-litigated (the */archive/* skip
-                  convention). The template ships to consumers (L-015)
-      tracker:    TD-055 (ruled 2026-08-15) · check-night-run-rollup.sh · L-015
+      assumes:    TD-056's family scan (SPRINT-068 T2) is the scope ruling — exactly these two
+                  checkers share the silent bare no-op; the cure is per-checker, matching the
+                  `check-gates-signed.sh` note-line shape. Gate path unaffected (qa-check.sh always
+                  supplies arguments)
+      tracker:    TD-056 (family scoped 2026-08-15) · SPRINT-068 T2 scan
       origin:     close-retro
       state:      ready
 
@@ -132,7 +97,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-067's shipped changes are written up as **v1.41.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.41.0 + v1.40.0** inline, with **v1.39.0 rotated** → [`docs/changelog/CHANGELOG-1.39.0.md`](docs/changelog/CHANGELOG-1.39.0.md) in the same commit.
+_(no active sprint)_ — SPRINT-068's shipped changes are written up as **v1.42.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.42.0 + v1.41.0** inline, with **v1.40.0 rotated** → [`docs/changelog/CHANGELOG-1.40.0.md`](docs/changelog/CHANGELOG-1.40.0.md) in the same commit.
 
 ---
 

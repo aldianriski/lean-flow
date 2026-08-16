@@ -53,6 +53,15 @@ status: current
     no new sighting.** No bare invocation since the SPRINT-065 near-miss — every run since went
     through `qa-check.sh`, which supplies the argument. The mitigation stays un-derived per the
     row's own text (scope the family first, never fix one checker of a family-shaped defect).
+  - **Family scoped 2026-08-15 (SPRINT-068 T2's piggyback scan — the re-review's named ask,
+    answered).** All 12 `check-*.sh` surveyed: the five `<repo-root>`-required checkers fail loudly
+    (`${1:?usage}`), the guarded variadic ones (`check-gates-signed` · `check-night-run-rollup` ·
+    `check-system-verify-block`) print a "nothing verified" note at exit 0, and exactly **two** share
+    the silent bare no-op — `check-layers-completeness.sh` and `check-layers-observed.sh` (`for sp in
+    "$@"` over empty args: zero output, exit 0). The cure is therefore per-checker on exactly those
+    two, matching their guarded siblings' note-line shape. **Vehicle: TASK-212** (filed at SPRINT-068
+    close). Bare invocation also recurred this sprint before the scan — the coordinator ran
+    `check-layers-observed.sh` bare mid-run and read silence (second sighting of this row's shape).
     **Unblock condition, sharpened with a vehicle:** SPRINT-068 T2 (TASK-210) does gate-registration
     work in the same neighbourhood — piggyback the family scan there (which `check-*.sh` accept file
     arguments and what does each do bare?), one command's worth of observation; else the next

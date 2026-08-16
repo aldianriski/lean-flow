@@ -169,6 +169,19 @@ is_excluded_closetime() {
     TECH-DEBT.md) return 0 ;;                   # TD marking moved to close (D1)
     TODO.md) return 0 ;;                        # backlog bookkeeping, written at close
     CHANGELOG.md) return 0 ;;                   # release bookkeeping, written at close
+    docs/changelog/*) return 0 ;;               # the SAME bookkeeping, one file over: at a new MINOR
+                                                # §11 rotates the older blocks verbatim into
+                                                # docs/changelog/CHANGELOG-<version>.md, same actor and
+                                                # same commit as the CHANGELOG.md row above. The row
+                                                # was never added when the rotation convention shipped,
+                                                # so every MINOR close since has gone red on its own
+                                                # bookkeeping -- found at SPRINT-068's close, and
+                                                # SPRINT-067's CHANGELOG-1.39.0.md tripped the same leg
+                                                # unnoticed (L-020: the convention shipped, its
+                                                # exclusion row did not). CLOSE-TIME ONLY, same
+                                                # reasoning as README.md below: a task that genuinely
+                                                # edits a rotated file is doing task work and stays
+                                                # reported.
     docs/LEARNINGS.md) return 0 ;;              # retro bucket routing, written at close
     README.md) return 0 ;;                      # footer version line, bumped with the manifests at
                                                 # close. CLOSE-TIME ONLY, deliberately: README is a

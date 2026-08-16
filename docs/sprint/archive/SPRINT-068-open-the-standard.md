@@ -3,7 +3,7 @@ sprint: 068
 slug: open-the-standard
 owner: Maintainer
 last_updated: 2026-08-15
-status: active
+status: closed
 plan_commit: c574fda
 gates_signed: G1,G2 @ 622f420
 close_commit: [sha — set at close]
@@ -168,6 +168,8 @@ assertions; TD-055 marked resolved.
 | `scripts/night-run.sh` | T3 (scope-change) | The event's live writer emits `run-complete` — writer and checker renamed together, no dark-gate window | med | census grep + harness |
 | `evals/run-night-run-rollup-fixtures.sh` | T3 (scope-change) | New fixture wired as leg 5 (an unwired fixture guards nothing — TD-012) | low | 5/5 green |
 | `evals/fixtures/system-verify/*` (4 logs) | T3 (scope-change) | Inert scenery off the dead token (census catch) | none | system-verify 5/5 green |
+| `scripts/lib/check-layers-observed.sh` | close | `docs/changelog/*` joins the close-time exclusion list: the CHANGELOG rotation artifact is the same bookkeeping as `CHANGELOG.md`, one file over — the row was never added when the rotation convention shipped (L-020) | low | new fixture leg + guard proof (row stripped → at-close leg red) |
+| `evals/run-layers-observed-fixtures.sh` | close | Case 4e pins the row both ways — reported during execution, excluded at close (the 4d width guard, reused) | low | 15/15 green |
 
 ## Retro
 
@@ -175,13 +177,32 @@ assertions; TD-055 marked resolved.
      shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint? No
+contradiction. One retrieval *gap* with prior art adjacent: L-123 (shape+checker born together) was
+loaded and briefed, yet its rename corollary — the shape's **writer** — was in nobody's census;
+TD-055's own ruling under-scoped it. Filed as L-124 rather than stretched onto L-123.
 
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents). Cost per
-unit **delivered**, not per unit attempted.
+**Cost** — coordinator (session model, inline T1 + gates + merges) + 2 worktree builders (sonnet,
+~145k + ~168k tokens) + 1 scoped reviewer (sonnet, ~93k) ≈ **410k dispatched tokens, ~65 min wall,
+3 of 3 units delivered**. First sprint where every proof-layer mechanism ran for real: revise loop
+(1 firing, closed at ceiling), system-verify (1 real RED then PASS), per-criterion evidence rollup.
 
-**Worked**
+**Worked** — the builder's hard file boundary turned a would-be defect into a *flag*: T3 could not
+touch `night-run.sh`, so the writer-miss surfaced as a report instead of merging dark. The
+second-query census then caught the fixture-scenery remainder all prior passes missed. System-verify
+earned its wiring on its own sprint — blocked the close on ADR-023's out-of-vocabulary tag, a leg
+neither builders nor the briefed reviewer had as a comparand (ADR-021 doing exactly its job).
 
-**Friction**
+**Friction** — TD-055's ruling under-scoped its own cure (three files named, the writer absent) →
+owner-ruled scope-change mid-sprint (L-124). The coordinator ran `check-layers-observed.sh` bare and
+read silence — TD-056's exact shape, second sighting, now scoped and vehicled (TASK-212). `tail`
+piped onto the gate swallowed 2 of 3 FAIL lines (L-057's shape; the exit code belonged to `tail`).
+The close itself went red on `layers observed` for its own `docs/changelog/CHANGELOG-1.40.0.md`:
+`CHANGELOG.md` sat on the close-time exclusion list, its §11 rotation sibling never did. SPRINT-067's
+close created `CHANGELOG-1.39.0.md` and tripped the identical leg unnoticed — a second sighting of
+L-020 found only because this sprint's own T2 work made the gate worth re-reading at close. Fixed in
+this close with the width guard its neighbour case already had, rather than deferred.
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`) — **L-124 filed**: a contract rename's
+census enumerates producers, not only asserters and docs (writer + instantiated-from-template both
+missed in one sprint). TD-056 sighting bumped in its row rather than a new entry.
