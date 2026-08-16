@@ -4,7 +4,7 @@ slug: conformance
 owner: Maintainer
 last_updated: 2026-08-16
 status: active
-member_sprints: [072, 073]
+member_sprints: [072, 073, 074]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -61,6 +61,7 @@ each other · any telemetry, ever (the README promises none).
 |---|---|---|---|
 | [SPRINT-072](../sprint/archive/SPRINT-072-conformance-baseline.md) | Conformance Baseline | closed 2026-08-16 · `87954f2` | **Overturned this epic's opening premise and replaced it with a measurement.** All **96** normative rules classified — 8 covered · 39 uncovered-mechanical · 45 judgment-only · 6 implementation-directed — and reconciled against the live corpus (11 checkers · 22 harnesses · 98 fixture cases · 46 distinct findings). The checkers do **not** encode the standard: 3 of 13 sections are referenced in `scripts/lib/`, ten have zero. Established the fourth bucket `implementation-directed` (6 rules an engine must never evaluate against an adopter), that a §2 row is a *parameter set* not a rule (6 families, not 37), and that **Gated is the hard level, not Attested**. Changed no checker and no execution architecture — verified by diff. |
 | [SPRINT-073](../sprint/archive/SPRINT-073-spec-as-rule-source.md) | The Spec as Rule Source | closed 2026-08-16 · `e7ce99b` | **Made D1 mechanically true: the spec is now the rule source.** `spec/STANDARD.md` **0.4.0** carries every rule's level and mark in-file, keyed by stable ids a finding can name, plus **§14** stating the model — including the **no-percentage** ruling *normatively*, so it binds adopters' tools rather than this epic's notes. **98 classified + 2 unclassified**, re-derived from the spec after the frozen baseline proved unable to reproduce its own total (96 stated vs 99 and 98 by column). **54 dispositions** — 42 `build` each naming its finding, 12 `scope-out` each with its reason. Ruled the spec uncapped (**ADR-026**, closing TD-058). No checker, no engine, no execution-architecture change. |
+| [SPRINT-074](../sprint/SPRINT-074-first-spec-driven-checker.md) | The First Spec-Driven Checker | active | _(completed at close)_ — the first checker to be *driven by* the annotated spec rather than hard-coding its rule, tested on §13: the largest covered-nothing block in the standard (7 rules, 5 mechanical, 0 covered) and § Closed-when 4 in one cell. Whether it reads §14's table or hard-codes §13 is the sprint's central question and its own recorded decision. Also completes §13's rule set and closes the WIP-attribution hole. Not the engine — one checker, to learn whether spec-driven is buildable before 42 dispositions depend on it. |
 
 ## Decisions
 

@@ -105,6 +105,19 @@ status: current
     and whether this belongs in `qa-check.sh` or is subsumed by EPIC-004's engine, since a conformance
     tool reading the spec has to resolve its cross-references anyway.
   - Tracker: SPRINT-071 T3 · **L-129** · ADR-023 (`spec/` is the SSOT an adopter pins) · vehicle absent
+  - **Re-reviewed 2026-08-16 (SPRINT-074 promote, 3 sprints open) — held, but the exposure has grown by
+    a whole class and the row is re-scoped rather than merely re-parked.** Ledger search first (L-127):
+    nothing new checks `§N` resolution, and no vehicle exists. **What changed is the surface.**
+    SPRINT-073 T1 added §14 and 13 per-section Conformance tables, introducing a second kind of
+    internal reference: **rule ids** (`S13.NOINFER`, `S2.F-CAP`). §14 cites ids, §7's table cites ids in
+    its `Restates` column, and §2's new prose cites §14. These are **worse than a dangling section
+    pointer in one specific way — they are machine-read.** A conformance finding *names a rule id*, so an
+    id that does not resolve produces a finding an adopter cannot trace to any rule, and the spec is the
+    artifact they pin. The original row's argument (a reference reads fluently from the source side, so
+    review never catches it) applies unchanged and now covers ~100 more references. **Unblock condition
+    updated:** any check must resolve **both** `§N` and `S<n>.<KEY>`, and EPIC-004's engine has to
+    resolve the ids anyway to name findings — so this is a strong candidate for subsumption rather than
+    a standalone checker. Not vehicled into SPRINT-074, which builds the §13 checker.
 
 - **TD-059** severity: minor | status: open | created: Sprint-070
   - Summary: **the worktree-base guard's must-FAIL fixtures are opt-in, so the always-on gate never
@@ -625,6 +638,27 @@ status: current
     case for its own removal.** **Unblock condition:** unchanged — a genuine false positive, or
     TD-057's resolution subsuming it. Longest-open aged row at 4 sprints; if TD-057 is not addressed
     by SPRINT-074's promote, re-review this one on its own merits rather than deferring to it again.
+  - **Re-reviewed 2026-08-16 (SPRINT-074 promote, 3 sprints since last) — THE TRIGGER FIRED, and it
+    fired as the stronger of the two conditions.** Ledger search first (L-127): TD-057 is unaddressed,
+    so the previous note's instruction applies — judge this row on its own merits. Doing so, the
+    unblock condition *"a genuine false positive"* is **met**, at SPRINT-073 T2. The `Cites:` line
+    declared `` `scripts/lib/check-doc-caps.sh` `` and the gate still emitted *"DoD/Acceptance implies
+    `check-doc-caps.sh`, absent from Layers"*, because the DoD prose used the bare basename. **The file
+    was declared. The checker did not recognise the declaration.** That is not over-reporting an
+    undeclared file; it is failing to match a correct one, which is the false positive four sprints of
+    true-positive catches had not produced.
+    **And the predicted behavioural cost landed with it.** The row warned that *"the fix a task author
+    reaches for is to paste the second spelling, which trains the habit of satisfying the parser rather
+    than declaring the file."* The author reached for exactly that — the `Cites:` line was rewritten to
+    the bare basename to make the gate pass, and the full path (the more useful declaration for a human
+    reading the Plan) was **removed**. The prediction is now observed, not hypothesised.
+    **Still `severity: trivial` and deliberately not auto-escalated** — only `high` escalates, and the
+    cost remains a glance plus a habit. **Not vehicled into SPRINT-074**, which pulls TASK-218 for the
+    adjacent `check-layers-observed.sh` WIP path; mixing two matcher changes in one sprint would make
+    either regression hard to attribute. **Its own Mitigation still binds the successor:** do not simply
+    widen to basename-aware matching — that could mask a genuine overlap between two same-named files in
+    different directories, which is the case the overlap map exists to catch. Price the cheaper
+    alternative first (require full paths in DoD prose, which is better writing anyway).
 
 - **TD-047** severity: minor | status: open | created: Sprint-057
   - Summary: `night-run.md` is **414 lines** and carries five Parts plus a pre-flight checklist that

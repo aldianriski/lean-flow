@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(none — SPRINT-073 closed 2026-08-16, archived → [`docs/sprint/archive/SPRINT-073-spec-as-rule-source.md`](docs/sprint/archive/SPRINT-073-spec-as-rule-source.md))_
+> **SPRINT-074 — The First Spec-Driven Checker** → [`docs/sprint/SPRINT-074-first-spec-driven-checker.md`](docs/sprint/SPRINT-074-first-spec-driven-checker.md) — EPIC-004's third member, and the first sprint since SPRINT-071 to change executable code. Three tasks: rule the two `?` marks (TASK-230), build the §13 attestation checker (TASK-228 — §13 is the largest covered-nothing block in the standard, 5 of 7 mechanical, and EPIC-004 § Closed-when 4 in one cell), then close the uncommitted-WIP attribution hole (TASK-218). **The sprint's real question is whether the checker reads §14's table or hard-codes §13** — D1's first live test. Gates not yet signed — `/orchestrator` runs G1+G2 first.
 >
 > **`spec/STANDARD.md` §14 is the rule source now — read it, not the research tree.** The spec carries
 > every rule's level and mark in-file at **0.4.0**: **98 classified + 2 unclassified**, 62 checkable, 8
