@@ -32,7 +32,36 @@ status: current
 
 ## Tech Debt
 
-- **TD-056** severity: minor | status: open | created: Sprint-065
+- **TD-057** severity: minor | status: open | created: Sprint-069
+  - Summary: **`Layers:` feeds three checkers that match it three different ways, and nothing states
+    the contract.** The **pre-dispatch preflight** resolves directory globs — it reads T3's `docs/`
+    against T1's `docs/adr/` and correctly reports `shared-file-owned-transitive`.
+    **`check-layers-completeness.sh`** matches DoD/Acceptance prose by **token spelling** (TD-048's
+    subject): `evals/` does not satisfy a DoD naming `run-doc-caps-fixtures.sh`, nor does
+    `scripts/qa-check.sh` satisfy prose saying `qa-check.sh`. **`check-layers-observed.sh`** matches
+    **actual changed paths per attributed task**: a glob never satisfies attribution for a specific
+    file, and a file declared by a *sibling* task does not count.
+  - Impact: SPRINT-069 T3 needed **four** `Layers:` corrections in one sprint — `AGENTS.md`,
+    `scripts/qa-check.sh`, three root files caught by attribution, and one basename token — while its
+    declaration was never wrong in the ordinary sense. Its globs were chosen deliberately, because a
+    citation sweep's file set is re-derived at execution and a path list written at promote goes
+    stale. So the author satisfies the gate that runs *before* dispatch and then discovers the other
+    two contracts one FAIL at a time, mid-sprint, against a frozen Plan. Distinct from L-100
+    (declarations corrected as implementation *invents* files): here the files were known, and the
+    correction was forced by matcher semantics. Cost so far: four cycles in one sprint, zero bad
+    artifacts — every finding was correct.
+  - Mitigation (**not yet derived**, L-091): do **not** reach for "make the two checkers glob-aware"
+    as the obvious fix — `check-layers-observed.sh`'s per-task attribution is deliberate (TD-035: a
+    file declared by ANY task once satisfied the check for ALL tasks, which is what corrupted
+    SPRINT-041's merge), and widening it back toward globs risks reintroducing exactly that. The open
+    question is whether the contract should be **documented** (state the intersection all three
+    accept, so an author writes to the strictest), **narrowed** (ban globs in `Layers:`, which
+    collides with the re-derived-set case this row is about), or **unified** (one matcher all three
+    share). Establish first which of the three consumers is the one that should move.
+  - Tracker: SPRINT-069 Execution Log (the four corrections) · TD-048 (its token-spelling half) ·
+    TD-035 (why per-task attribution is deliberate) · L-126
+
+- **TD-056** severity: minor | status: resolved → TASK-212 | created: Sprint-065
   - Summary: **`check-layers-observed.sh` invoked without its sprint-file argument exits 0 and prints
     nothing, having checked nothing.** Its own must-FAIL fixtures show a clean run prints
     `PASS … layers observed (all changed files declared, base <sha>)`; silence means no sprint was
@@ -66,6 +95,13 @@ status: current
     work in the same neighbourhood — piggyback the family scan there (which `check-*.sh` accept file
     arguments and what does each do bare?), one command's worth of observation; else the next
     bare-invocation near-miss.
+  - **Resolved 2026-08-16 (SPRINT-069 T4) → TASK-212.** The per-checker cure the family scan ruled:
+    both `check-layers-completeness.sh` and `check-layers-observed.sh` now print a "nothing verified"
+    note at exit 0 when invoked bare, matching `check-gates-signed.sh`'s note-line shape, with one
+    must-note leg per checker wired into the harnesses the gate runs. Guard-proof run (guard removed
+    → leg RED with its named finding → restored → green), and the with-arguments gate path verified
+    byte-identical against the pre-change checkers with repo state held fixed. Row retained for the
+    audit trail; §11 deletes it three sprints from now.
 
 - **TD-055** severity: minor | status: resolved → TASK-211 | created: Sprint-064
   - Summary: **`complete` is a reserved run-level event in the Execution Log, and nothing at the point of
@@ -154,6 +190,32 @@ status: current
     again): the *next* worktree dispatch records its base the same way — if it is current again, this
     row closes as not-reproducible with the two observations as its record; if it is stale, that is the
     second sighting and the guard gets written against a mechanism two data points can constrain.
+  - **SECOND SIGHTING — reproduced 2026-08-16 (SPRINT-069 T4 + T2), and the mechanism is now
+    visible.** Both worktrees dispatched this sprint branched from **`622f420`**, 13 commits behind
+    the dispatching session's HEAD. That sha is not arbitrary: it is SPRINT-068's `record plan_commit
+    sha` commit, and **the same base SPRINT-068's two builders used**. Four worktrees, two sprints,
+    one identical commit — which was current then and stale now. **That is a pin, not drift**, and it
+    answers the question this row has been held open on since SPRINT-063 ("*why* did a worktree branch
+    three sprints back when the session was current"). The row's own text forbids a guard before the
+    cause is understood; a systematic pin is a cause.
+  - **Measured cost this sprint, so the next re-review is not arguing from principle:** (a) T4's base
+    lacked 68 lines of SPRINT-068 close-time work on two of the four files it edited — the three-way
+    merge preserved both sides only because the edits sat in different regions, and the union was
+    verified rather than assumed; (b) T2's base predated T1 entirely, voiding *inside the builder's
+    tree* the `Depends-on: T1` edge that the pre-dispatch preflight had HALTed to enforce, and
+    producing a real merge conflict in which the builder carried forward a line-count figure that had
+    been corrected after its base; (c) T3's dispatch was abandoned for inline work, because a sweep
+    against a tree with no `spec/` would have been provably wrong work rather than a merge risk.
+    Effective dispatch yield: 2 of 3 planned, both requiring union-verification.
+  - **Unblock condition — met. This row is now actionable, not waiting.** The guard has a mechanism to
+    be written against: assert the worktree's HEAD equals the coordinator's at spawn and halt if not,
+    *and* establish why the base is pinned to a stale sha in the first place — the assertion catches
+    it, the pin is the thing to fix. **Vehicle: TASK-217** (filed at this close). **Severity reviewed
+    at this close and held at `medium`** — the close proposed raising it and the proposal was wrong
+    about the starting point: this row has been `medium` since it was filed at SPRINT-063, so there
+    was nothing to raise. What changed is the *evidence under* that severity, from one historical
+    sighting to a demonstrated cost on every dispatch; `high` was considered and declined, since it
+    auto-escalates to Backlog P1 and would front-run the next promote rather than inform it.
 
 - **TD-053** severity: minor | status: open | created: Sprint-063
   - Summary: **worktree-isolated dispatch places a full repo copy at `.claude/worktrees/<id>/`, inside
@@ -195,6 +257,25 @@ status: current
     leg it actually covers. Split out to **TASK-213** so a one-line cure stops waiting on a question it
     does not depend on. **Unblock condition:** leg 1 only — EPIC-004 D1, or a gate run observed against
     a live worktree.
+  - **Leg 2 resolved 2026-08-16 (SPRINT-069 T5) → TASK-213.** `.claude/worktrees/` is in `.gitignore`,
+    verified against a real dispatched worktree rather than a `mkdir`'d stand-in: before, `git status
+    --short` showed `?? .claude/worktrees/` while T4's worktree was live, meaning a plain `git add -A`
+    at that moment would have staged a full second copy of the repo; after, only the `.gitignore`
+    edit itself. **Leg 1 stays open.**
+  - **LEG 1 FIRED LIVE, twice, 2026-08-16 — the unblock condition is met with a positive observation.**
+    The full gate, run to verify T1 while T4's worktree existed, reported
+    `FAIL ephemeral-intake: .claude/worktrees/agent-<id>/evals/fixtures/ephemeral-intake/committed-bug/
+    docs/BUG-stale-pointer.md is a committed BUG report` — a retained must-FAIL fixture inside the
+    worktree, reported as a live violation, exactly as this row predicts (the nested copy defeats
+    `grep -v '^evals/fixtures/'`'s `^` anchor). **A detail the row did not anticipate: it scales with
+    concurrent agents** — with two worktrees live the gate emitted two such FAILs, one per worktree,
+    so a wider fan-out produces proportionally more false positives. Both cleared on worktree removal.
+    Note the timing: the SPRINT-069 promote re-review had recorded leg 1 as *"untested, not clean —
+    no full gate run is recorded while a worktree existed"*, and the condition was met the same day by
+    ordinary work rather than a scheduled experiment. **Unblock condition:** unchanged in substance —
+    the cure still belongs to EPIC-004 D1's engine question per this row's own mitigation text, which
+    warns against a one-checker fix to a family-shaped defect (L-091). What is now settled is that the
+    defect is real and observed, not hypothetical.
 
 - **TD-052** severity: medium | status: open | created: Sprint-062
   - Summary: **Nothing in `evals/` exercises skill *prose*, so a governance rule that lives as
@@ -448,6 +529,15 @@ status: current
     escaping it in `Cites:` — a correct finding that cost a real fix, the opposite direction from the
     false positive this row waits on. Zero FPs across SPRINT-065/066's `Layers:`/`Cites:` exercises
     (several per sprint, including two mid-task amendments). **Unblock condition:** unchanged.
+  - **Three sightings in one sprint, 2026-08-16 (SPRINT-069) — all three still correct findings, and
+    that is the point.** (a) At promote: a DoD spelling `qa-check.sh` bare was not satisfied by a
+    `Cites:` of `scripts/qa-check.sh`. (b) At G2: same shape again on the same file. (c) At
+    system-verify: a DoD naming `run-doc-caps-fixtures.sh` by basename was not satisfied by a
+    `Layers:` of `evals/`. Each cost one gate cycle and a re-word; none was a false positive, so this
+    row's trivial severity holds. What the cluster adds is **frequency data**: the mismatch is not
+    rare, it fires whenever prose and declaration are written at different moments by different
+    hands, and it is now the token-spelling half of the wider convention problem filed as **TD-057**.
+    **Unblock condition:** unchanged — a genuine false positive, or TD-057's resolution subsuming it.
 
 - **TD-047** severity: minor | status: open | created: Sprint-057
   - Summary: `night-run.md` is **414 lines** and carries five Parts plus a pre-flight checklist that

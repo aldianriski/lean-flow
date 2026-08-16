@@ -3,7 +3,7 @@ sprint: 069
 slug: first-extraction
 owner: Maintainer
 last_updated: 2026-08-16
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 

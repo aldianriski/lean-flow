@@ -4,7 +4,7 @@ slug: first-extraction
 epic: EPIC-003
 owner: Maintainer
 last_updated: 2026-08-16
-status: active
+status: closed
 gates_signed: G1,G2 @ d832200
 plan_commit: 0880347
 close_commit: [sha — set at close]
@@ -258,6 +258,47 @@ close ran `git add -A` and was safe only because the worktrees had already been 
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
-     shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
-     After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint? **Yes,
+three times, and all three were rules that were loaded and still did not fire.** (a) D3 ruled T1/T2's
+file ownership in § Decisions prose, where the preflight cannot read it — **L-099's own shape**,
+authored in the session that had just re-reviewed TD-051 for being a guard that cannot see what it
+guards. (b) A literal `T3` inside T3's own `Depends-on` annotation was read as a self-edge — **L-108**,
+in the sprint whose T4 exists to fix a checker-token defect. (c) The T3 sweep rewrote two historical
+statements into falsehoods — L-108's family again, one level up. Every one was caught by a checker or
+a diff, never by recalling the rule. That is the pattern CLAUDE.md's cross-check clause already
+predicts, now with three more instances.
+
+**Cost** — coordinator (session model; T1 + T3 + all gates, merges and verification inline) + 2
+worktree builders (sonnet, ~188k each) ≈ **376k dispatched tokens + coordinator**, 5 of 5 units
+delivered. Both dispatches needed union-verification after merge because of TD-054, and T3's
+dispatch was abandoned for inline work — so the *effective* dispatch yield this sprint was 2 of 3
+planned, at full token cost for the two that ran.
+
+**Worked**
+- **The preflight paid for itself before a single task ran.** It HALTed on 7 findings, one of which
+  (T1/T2 sharing the epic file with no edge) would have put two agents on one file in parallel —
+  SPRINT-041's corruption shape. Cost to fix at that moment: two lines.
+- **System-verify blocked the close twice on findings the per-task runs missed**, including one that
+  could only appear once the work had a commit to attribute. ADR-021 earning its mandate again.
+- **A builder's hard file boundary turned a defect into a flag, twice.** T2 found `SECURITY.md` and
+  `docs/LEARNINGS.md` genuinely broken, fixed them, and reported the `Layers:` gap instead of editing
+  the Plan; T4 diagnosed its own gate FAIL as a worktree artifact, proved it identical with
+  pre-change code, and refused to work around it.
+- **Verifying the union rather than trusting the merge.** T4's base lacked 68 lines of SPRINT-068
+  close-time work on two files it edited; the check that both survived was run, not assumed.
+
+**Friction**
+- **TD-054's stale-base pin** — four worktrees, two sprints, one identical sha. It caused T2's merge
+  conflict, forced T3 inline, and made every merge require union-verification.
+- **Four `Layers:` corrections on one task** (T3), plus one each on T2 and T5. Not carelessness: a
+  directory-glob declaration satisfies the preflight and fails the two Layers checkers. → **TD-057**.
+- **TD-048 fired three times in one sprint** (token spelling vs path identity) — at promote, at G2,
+  and at system-verify.
+- **The T3 sweep damaged two files** by rewriting statements about the past. Caught by reading the
+  diff; the reconciliation was green and would have stayed green.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`) — **L-125 filed**: a self-describing
+corpus is unsafe to edit by token, because some of its sentences are assertions about the past that
+stay true only if left alone. **L-126 filed**: a declaration convention read by two consumers with
+different matching semantics passes one gate and fails the other, and the mismatch is invisible until
+both have run.

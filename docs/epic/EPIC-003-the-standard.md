@@ -54,7 +54,7 @@ spec so a rule has exactly one home · ADR the split.
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [SPRINT-069](../sprint/SPRINT-069-first-extraction.md) | First Extraction | active | _(completed at close)_ |
+| [SPRINT-069](../sprint/archive/SPRINT-069-first-extraction.md) | First Extraction | closed 2026-08-16 · `<close_commit>` | Made the standard **separable and pinnable**: `spec/STANDARD.md` at v0.1.0 with its own changelog, versioning independently of the plugin — which is condition 1 outright. Ruled the **conformance levels** (ADR-024, condition 3), the ruling the epic routed to its first member's G2. Left the epic's harder half untouched by design: attestation and the no-skill-restates-a-rule pass are later members. |
 
 ## Decisions
 
@@ -85,8 +85,14 @@ spec so a rule has exactly one home · ADR the split.
 
 ## Closed when
 
-- [ ] The spec has its own version and changelog, and moves independently of `plugin.json`
+- [x] The spec has its own version and changelog, and moves independently of `plugin.json`
+      — ✓ SPRINT-069 T2: `spec/STANDARD.md` v0.1.0 + `spec/CHANGELOG.md`. Independence is
+      demonstrated rather than asserted: the spec sits at 0.1.0 while the plugin moved to 1.43.0 in
+      the same commit, and the manifest-lockstep check covers the four manifests, not `spec/`
 - [ ] No skill restates a rule the spec owns — each cites it instead
-- [ ] Conformance levels are defined, and each is independently checkable in principle
+- [x] Conformance levels are defined, and each is independently checkable in principle
+      — ✓ SPRINT-069 T1: [ADR-024](../adr/ADR-024-conformance-levels.md) — Structural → Gated →
+      Attested, each checkable from a different evidence class (file tree · planning records · git
+      history alone), none requiring EPIC-004's engine to exist
 - [ ] The attestation format is specified with a worked example against a real commit
 - [ ] A reader could build a conformant tool from the spec alone, without reading `skills/`
