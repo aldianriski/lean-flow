@@ -64,8 +64,13 @@ spec so a rule has exactly one home · ADR the split.
 
 ## Open questions
 
-- What the conformance levels are, and how many → first member sprint's G2. Candidate shape: structure
-  → gates → attested; the count matters less than each level being independently checkable.
+- ~~What the conformance levels are, and how many → first member sprint's G2. Candidate shape:
+  structure → gates → attested; the count matters less than each level being independently
+  checkable.~~ **Answered 2026-08-16 (SPRINT-069 T1) → [ADR-024](../adr/ADR-024-conformance-levels.md):**
+  three — **Structural → Gated → Attested**, the candidate shape confirmed. Each rung is checkable
+  from a different evidence class (the file tree · the planning records · git history alone), which
+  is what satisfies "independently checkable"; the wire format is D2's ADR and the engine is
+  EPIC-004, neither specified here.
 - Are non-Claude implementations maintained here or by adopters? → a ruling, not a measurement (L-094):
   close it by deciding, not by waiting for evidence.
 - ~~Does `.claude/CONTEXT.md` become a *consumer* of the spec or stay an SSOT?~~ **Answered
