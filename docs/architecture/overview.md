@@ -19,6 +19,8 @@ status: current
 ## Directory structure
 
 ```
+spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.1.0) · CHANGELOG.md
+                                versioned independently of plugin.json — the SSOT (ADR-023)
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
 skills/           14 skills (auto-discovered at root)
   flow/                                                  opt-in conductor
@@ -26,7 +28,6 @@ skills/           14 skills (auto-discovered at root)
   prototype/ tdd/ diagnose/ refactor-advisor/ release-patch/ handoff/ insights/   12 stage-skills
   council/                                               opt-in agent decision aid
   <skill>/references/   on-demand depth — uncounted by the SKILL.md cap (ADR-006):
-    lean-doc-generator/references/DOCS_Guide.md   the LEAN DOCUMENTATION STANDARD
     tdd/references/testability.md                 what to mock · design-for-testability · refactor candidates
     diagnose/references/feedback-loops.md         10 ways to build a loop · determinism · perf
     task-decomposer/references/prd-and-slices.md  PRD template · tracer-bullet slices · breakdown quiz

@@ -25,7 +25,7 @@ resumes it. Every skill is also usable standalone. See `.claude/CONTEXT.md` for 
 ## Design Principles
 - **Curated, not copied** — the core discipline. Every component was reviewed ("genuinely useful + important + actually used?") and approved before adding. The opposite of dev-flow, which bulk-imported from every reference and bloated. The bar is review — not a ban on any component type.
 - **Lean** — each SKILL.md ≤ ~140 lines of **procedure + scaffolding**; executable artifacts (prompt templates, persona/advisor definitions, schemas) live in the skill's own `references/` and don't count (ADR-006). No shared reference trees *across* skills.
-- **Self-contained** — gates/checklists inlined; `lean-doc-generator` bundles its own templates + standard.
+- **Self-contained** — gates/checklists inlined; `lean-doc-generator` bundles its own templates and cites the standard from the versioned `spec/` tree (ADR-023), rather than owning a copy.
 - **Adaptable** — skills read whatever context the host repo has and degrade gracefully when a file is missing.
 - **Human-gated** — G1 Scope + G2 Design need explicit sign-off; `release-patch` never pushes.
 

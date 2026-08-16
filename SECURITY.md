@@ -45,7 +45,7 @@ Three guarantees are load-bearing and are enforced by review, not by hooks (this
 - Secrets are **never committed** — not in code, config, or `.env`. This repo has no environment
   configuration at all, and therefore no `.env.example`.
 - The full commit boundary — what belongs in a repo and what never does, by category — is
-  `skills/lean-doc-generator/references/DOCS_Guide.md` §12. `/lean-doc-generator migrate` scans an
+  `spec/STANDARD.md` §12. `/lean-doc-generator migrate` scans an
   adopted repo against it and **reports only**; it never auto-removes anything.
 - Skills that capture diagnostic artifacts (HAR files, logs) are responsible for redaction before those
   artifacts land anywhere durable.

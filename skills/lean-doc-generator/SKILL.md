@@ -1,6 +1,6 @@
 ---
 name: lean-doc-generator
-description: Use when creating, updating, or reviewing technical documentation, ADRs, sprint files, or AI-context files; running the sprint lifecycle (promote / execute / close); or **migrating existing docs** (dev-flow / adlc-flow / any layout) into the lean-flow standard. Follows the LEAN DOCUMENTATION STANDARD — WHY and WHERE only, never HOW. Bundles its own templates + standard, so generated docs match a canonical format. Do not use to document HOW something works; redirect to code comments instead.
+description: Use when creating, updating, or reviewing technical documentation, ADRs, sprint files, or AI-context files; running the sprint lifecycle (promote / execute / close); or **migrating existing docs** (dev-flow / adlc-flow / any layout) into the lean-flow standard. Follows the LEAN DOCUMENTATION STANDARD — WHY and WHERE only, never HOW. Bundles its own templates and cites the versioned standard at `spec/STANDARD.md`, so generated docs match a canonical format. Do not use to document HOW something works; redirect to code comments instead.
 argument-hint: "[ | type subject | promote | close]"
 allowed-tools: Read, Write, Edit, Bash(git *), Glob, Grep
 user-invocable: true
@@ -9,8 +9,9 @@ version: "0.4.0"
 
 # Lean Documentation Generator
 
-Generate high-signal docs against a canonical format. Self-contained — the standard and every
-template ship inside this skill under `${CLAUDE_SKILL_DIR}/`.
+Generate high-signal docs against a canonical format. Every template ships inside this skill under
+`${CLAUDE_SKILL_DIR}/`; the standard itself is cited from the versioned `spec/STANDARD.md` — the
+SSOT for every standard-owned rule (ADR-023).
 
 ## Golden Rule
 
@@ -24,9 +25,9 @@ template ship inside this skill under `${CLAUDE_SKILL_DIR}/`.
 | WHAT changed | `CHANGELOG.md` (root) |
 | Unsure | code |
 
-## Bundled assets (load these — do not free-generate)
+## Bundled + cited assets (load these — do not free-generate)
 
-- `${CLAUDE_SKILL_DIR}/references/DOCS_Guide.md` — the standard: 4 Laws, Core Files + line caps, ownership header, ADR format, HOW filter, checklist. **Read first.**
+- `spec/STANDARD.md` — the standard (cited, not bundled — ADR-023): 4 Laws, Core Files + line caps, ownership header, ADR format, HOW filter, checklist. **Read first.**
 - `${CLAUDE_SKILL_DIR}/templates/*.md.template` — the canonical format per doc type. **The template IS the format** — read the matching one before writing any core doc.
 - `templates/DESIGN.md.template` — **OPTIONAL · frontend-only · non-core.** Offer only for UI/frontend repos wanting a shared design-system / token contract (`docs/DESIGN.md` or repo's design dir). Never auto-create; never include in core doc generation.
 - `templates/RESEARCH.md.template` — **occasional · create-lazily.** A decision-driving question → options · evidence · recommendation that **feeds an ADR** (desk synthesis; distinct from `/prototype` = design you must *feel*, and `/council` = a hard fork). → `docs/research/<slug>.md`.
@@ -64,7 +65,7 @@ allowlist → `${CLAUDE_SKILL_DIR}/references/init.md`.
 
 ## Execution flow
 
-1. **Load the standard** — read `references/DOCS_Guide.md`. It defines the Core Files, line caps, and the template-load protocol.
+1. **Load the standard** — read `spec/STANDARD.md`. It defines the Core Files, line caps, and the template-load protocol.
 2. **Date check** — compare today's date to any `last_updated:` you are about to write; if it would drift ≥1 day, ask before correcting. Never silently fix.
 3. **Staleness scan** — read existing docs; flag any with a stale/missing ownership header before using them as a source.
 4. **Read manifests** — `package.json` / `pyproject.toml` / `go.mod` etc. + existing docs. If inaccessible, ask the user to paste the file tree + manifest.

@@ -16,11 +16,11 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 
 ## Why this, why now
 
-Today the specification is `skills/lean-doc-generator/references/DOCS_Guide.md`: 450 lines inside one
-skill's references folder, with no version of its own and no changelog
-(`docs/research/platform-readiness-audit.md` F3). An adopter cannot take the standard without taking
-the tool, so "a standard for software delivery in the AI era" is a claim the artifact does not
-support. Extraction is what makes it true.
+Today the specification is `spec/STANDARD.md`: 450 lines, moved at SPRINT-069 T2 out of one skill's
+references folder and now versioned independently with its own changelog
+(`docs/research/platform-readiness-audit.md` F3 — the pre-move finding). An adopter still cannot take
+the *whole* standard without taking the tool while conformance levels, attestation and re-pointed
+skills remain open (see § Closed when); this commit is the first step that makes the claim true.
 
 It spans sprints because the spec is not one file: the doc standard, the gate contract, the
 task/sprint/epic schema and the HITL attestation format are today spread across `DOCS_Guide.md`,

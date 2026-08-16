@@ -1,3 +1,11 @@
+---
+owner: Maintainer
+last_updated: 2026-08-16
+update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
+version: 0.1.0
+status: current
+---
+
 # LEAN DOCUMENTATION STANDARD — Reference
 
 > WHY and WHERE only. Never HOW. This guide is the authority lean-doc-generator loads before
