@@ -275,3 +275,26 @@ written at promote does not cover. T2 gained two, T5's `Cites:` gained one. Thre
 five tasks is a rate worth a Retro line, not a shrug.
 
 3 of 3 DoD ticked. Gate 151 pass / 0 fail.
+
+### 2026-08-16 | progress | system-verify blocked the close twice, then passed — 156 pass / 0 fail
+
+ADR-021's mandatory pass over the integrated tree, run once after the final wave. It **blocked**, as
+designed, on two findings the per-task gate runs had not surfaced:
+
+1. `layers completeness` — T3's DoD evidence prose names `run-doc-caps-fixtures.sh` by basename while
+   its `Layers:` declared `evals/`. **TD-048's third sighting this sprint**: the checker matches by
+   token spelling, not path identity.
+2. `layers observed` — `.claude/CONTEXT.md`, `README.md` and `SECURITY.md` were attributed to T3 (its
+   commit subject) but declared only by T2. This passed while the work was uncommitted and failed the
+   moment it had a commit to attribute, because attribution is per-task by design (TD-035).
+
+**The structural finding underneath both.** T3's `Layers:` were written as directory globs — `docs/`,
+`skills/`, `evals/`, `scripts/lib/` — deliberately, because its file set is re-derived at execution.
+The **pre-dispatch preflight** reads those globs happily and computed a correct ownership map from
+them. The **two Layers checkers** match by explicit path or token identity and cannot. So one
+declaration style satisfies the gate that runs *before* dispatch and fails the two that run *after*
+it, and nothing says so anywhere. Four corrections to T3's `Layers:` in one sprint is not four
+oversights; it is a declaration convention that two consumers read differently.
+
+Fourth and final correction applied, then **156 pass / 0 fail**, whole gate, `QA_FULL=1`, clean tree.
+Plan exhausted: **19 of 19 DoD ticked, 5 of 5 units delivered.**

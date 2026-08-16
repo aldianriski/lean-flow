@@ -109,9 +109,11 @@ leaving a rule stated in two places.
 
 ### T3 — Sweep the standard's textual section citations to the new name `[size: M · risk: low · class: mechanical-ingest · AFK]`
 Layers: `skills/` · `skills/lean-doc-generator/templates/` · `docs/` · `scripts/lib/` · `evals/` ·
-        `AGENTS.md` · `scripts/qa-check.sh`   (both added mid-sprint — L-100, logged: the sweep
-        reaches root files and the gate script's own comments, which a directory-level declaration
-        written at promote does not cover)
+        `AGENTS.md` · `scripts/qa-check.sh` · `.claude/CONTEXT.md` · `README.md` · `SECURITY.md` ·
+        `run-doc-caps-fixtures.sh`   (all added mid-sprint — L-100, logged. The sweep reaches root
+        files and the gate script's own comments, and the two Layers checkers match by explicit path
+        or token identity where the preflight's ownership map reads directory globs — so a
+        directory-level declaration satisfies one and fails the others)
 Depends-on: T2 · T4
 Cites: ADR-023 (a name lagging is not a rule stated twice — which is why this is separate) ·
        L-118 (a single query's zero means clean **or** unreached) · L-009 (re-read the whole
