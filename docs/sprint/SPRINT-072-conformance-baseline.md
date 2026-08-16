@@ -4,6 +4,7 @@ slug: conformance-baseline
 epic: EPIC-004
 owner: Maintainer
 last_updated: 2026-08-16
+gates_signed: G1,G2 @ 1b2cdb4
 plan_commit: 2084001
 close_commit: [sha — set at close]
 status: active
@@ -37,7 +38,7 @@ EPIC-005 Fleet, until EPIC-004 produces a stable single-repo conformance contrac
 ## Plan
 
 ### T1 — Fix the rule-classification criteria, then classify spec §2 `[size: M · risk: med · class: decision · HITL]`
-Layers: `docs/research/conformance-inventory.md`
+Layers: `docs/research/conformance-inventory-criteria.md`
 Depends-on: none
 Cites: EPIC-004 § Closed-when 2 · ADR-024 (the three levels and their evidence classes) ·
        `spec/STANDARD.md` §2 · L-108 (match by shape, not substring) · CLAUDE.md § cross-check a query
@@ -62,7 +63,7 @@ bucket it would have.
       `Cap`-vs-`Create ←` case is represented, since it is the case that motivated the criteria*
 
 ### T2 — Classify the remaining structural-evidence sections `[size: M · risk: low · class: execution · HITL]`
-Layers: `docs/research/conformance-inventory.md`
+Layers: `docs/research/conformance-inventory-structural.md`
 Depends-on: T1
 Cites: TASK-223's criteria (T1's output) · ADR-024 · `spec/STANDARD.md` §1 §3 §4 §5 §6 §7 §8 §12
 The sections whose evidence is the file tree alone. Grouped by evidence class rather than section
@@ -80,7 +81,7 @@ rather than a fresh judgement.
       silently choosing a bucket is how two sections drift apart*
 
 ### T3 — Classify the Gated and Attested sections `[size: M · risk: med · class: execution · HITL]`
-Layers: `docs/research/conformance-inventory.md`
+Layers: `docs/research/conformance-inventory-gated-attested.md`
 Depends-on: T2
 Cites: ADR-024 · ADR-025 (§13's claim-vs-proof boundary) · `spec/STANDARD.md` §9 §10 §11 §13
 Planning-record evidence (§9 §10 §11) and git-history evidence (§13). This is where a rule is most
@@ -100,7 +101,7 @@ rule — the file, field or git object, not the section it came from.
       recorded as satisfying an Attested rule (ADR-025); if it is, the classification is wrong*
 
 ### T4 — Reconcile the inventory against the checker corpus and record the baseline `[size: M · risk: high · class: decision · HITL]`
-Layers: `docs/research/conformance-inventory.md` · `docs/epic/EPIC-004-conformance.md`
+Layers: `docs/research/conformance-baseline.md` · `docs/epic/EPIC-004-conformance.md`
 Depends-on: T2, T3
 Cites: EPIC-004 § Closed-when 2 and 3 · L-058 (a gate needs a named must-FAIL fixture) · TD-012
        (fixtures are retained) · EPIC-002 D3 (the 11 stand alone until a spec exists to read) ·
