@@ -149,56 +149,6 @@ status: current
     byte-identical against the pre-change checkers with repo state held fixed. Row retained for the
     audit trail; §11 deletes it three sprints from now.
 
-- **TD-055** severity: minor | status: resolved → TASK-211 | created: Sprint-064
-  - Summary: **`complete` is a reserved run-level event in the Execution Log, and nothing at the point of
-    authoring says so.** `check-night-run-rollup.sh` line 42 treats **any** `### … | complete |` entry
-    header as the announcement that a *run* finished, then requires the Part 4 rollup header and the
-    calibration row. `sprint-log.md.template` lists the valid events as `promote · progress · surprise ·
-    scope-change · park · blocker · complete · close` with no indication that one of them carries
-    run-level semantics while the rest are entry-level.
-  - Impact: writing "this task is complete" is the obvious thing to do and silently arms two run-level
-    assertions. It fired mid-SPRINT-064 with T2 and T3 untouched, and the gate was correct to complain —
-    the log *did* claim a completed run. The failure is loud rather than silent, so the cost is
-    confusion and a correction, not a bad artifact. It reaches every consumer, since the template ships
-    inside the plugin (L-015).
-  - Mitigation (**not yet derived**, L-091): the obvious move is a parenthetical in the template
-    (`complete` = the whole run, not a task) and it is probably right but probably not sufficient —
-    the same word is listed in `orchestrator/SKILL.md` step 4 and in `night-run.md` Part 4, so a note in
-    one place repeats L-099's shape. Establish first whether the cleaner fix is **renaming** the
-    run-level event (e.g. `run-complete`) so the collision cannot occur, versus documenting a reserved
-    word in three places. A rename touches the checker and its fixtures; a note does not.
-  - Tracker: SPRINT-064 T1 Execution Log · `check-night-run-rollup.sh` line 42 · TD-052 (the same
-    category — a procedural contract with no fixture) · L-015
-  - **Re-reviewed 2026-08-15 (SPRINT-067 promote, 3 sprints open) — first aging re-review; held, with
-    a named vehicle this time.** No new misuse since the SPRINT-064 firing — SPRINT-065/066 logs used
-    `progress` correctly throughout, including for retry outcomes (the `revise · Tn` title-text
-    convention exists precisely because inventing a `revise` event kind is this row's trap). The
-    rename-vs-document question stays un-derived per L-091 — but **SPRINT-067 T2 (TASK-209) edits
-    Part 4's rollup shape and the template's DoD guidance**, exactly the surfaces a fix would touch,
-    so that task reads this row and settles rename-vs-note in passing or states why not.
-    **Unblock condition:** SPRINT-067 T2 landing (the natural vehicle), or the next mid-log
-    `complete` misuse — whichever first.
-  - **Ruled 2026-08-15 (SPRINT-067 T2, the named vehicle) — note declined, rename recommended.**
-    T2's own files (night-run.md Part 4 · review-scoping.md · SPRINT.md.template) are none of them
-    the event-taxonomy authoring point — that is `sprint-log.md.template` (+ the checker and
-    `orchestrator/SKILL.md` step 4) — so a note there would be a *fourth* location, repeating L-099's
-    shape while fixing nothing. The clean fix is the rename this row already suspected:
-    `complete` → `run-complete` in `check-night-run-rollup.sh`, its fixtures, and
-    `sprint-log.md.template`, making the collision impossible. **Filed as a follow-up task at
-    SPRINT-067 close**; this row stays open until it ships.
-  - **Resolved 2026-08-15 (SPRINT-068 T3, TASK-211) — renamed as ruled.** `complete` → `run-complete`
-    in `check-night-run-rollup.sh` (the entry-header match, now anchored to the delimited event
-    field per L-108), its four fixtures under `evals/fixtures/night-run-rollup/` (three existing
-    logs renamed + a new `task-level-complete-does-not-arm` leg proving the exact misfire shape —
-    task-level `| complete |`, no rollup — now stays green), and `sprint-log.md.template`'s event
-    taxonomy comment (with a one-line note that `run-complete` is run-only; a task finishing is
-    `progress`). **Residual gap outside this task's editable-path scope:** `scripts/night-run.sh`
-    (ADR-016's launcher wrapper, the thing that actually emits the run-level entry) still prints
-    `### <date> | complete | run exited …` — it was not named in this row's own ruling and sits
-    outside T3's file boundary. Until it is updated to emit `run-complete`, the real unattended
-    reaper writes an event this checker no longer recognizes, and Part 4's gate goes silently dark
-    on genuine completed runs. Flagged for the next task/promote to pick up.
-
 - **TD-054** severity: medium | status: resolved → SPRINT-070 T2 | created: Sprint-063
   - Summary: **a worktree created by `Agent(isolation: "worktree")` can branch from a stale base, and
     nothing checks it.** SPRINT-063 T2's worktree was branched at `40603a6` (`sprint(60)`) — three
@@ -404,6 +354,16 @@ status: current
     both named controls at authoring; L-123 now makes that mandatory). **Unblock condition:**
     unchanged — EPIC-004's spec-driven engine for the machine-checkable half; the procedural half is
     now served.
+  - **Re-reviewed 2026-08-16 (SPRINT-071 promote, 3 sprints since last) — held, and SPRINT-070 added
+    a fresh instance rather than evidence for a cure.** `spec/STANDARD.md` §13 shipped as a governance
+    rule expressed entirely as prose — an adopter's obligation with no machine-checkable control — so
+    the row's territory grew by one section in the very sprint that specified the conformance format.
+    That is worth recording precisely because it looks like progress: §13 *is* checkable in principle
+    (ADR-024 says Attested is checkable from git history alone), but nothing in `evals/` checks that a
+    skill or spec section states the rule correctly, which is this row's actual subject. **Unblock
+    condition:** unchanged — EPIC-004's engine. Deliberately not vehicled into SPRINT-071: that sprint
+    removes rule *duplication* between skills and spec, which changes where a prose rule lives without
+    making any of it mechanically asserted.
 
 - **TD-051** severity: medium | status: open | created: Sprint-061
   - Summary: **`check-layers-observed.sh` (gate leg 15) never sees a close commit, because the close
@@ -620,6 +580,16 @@ status: current
     rare, it fires whenever prose and declaration are written at different moments by different
     hands, and it is now the token-spelling half of the wider convention problem filed as **TD-057**.
     **Unblock condition:** unchanged — a genuine false positive, or TD-057's resolution subsuming it.
+  - **Re-reviewed 2026-08-16 (SPRINT-071 promote, 4 sprints since last) — held, trigger still has not
+    fired.** SPRINT-070 produced exactly one `Layers:` correction (`scripts/qa-check.sh` on T2), and
+    checked rather than assumed: it was a **genuine miss**, not a false positive — the file really was
+    edited and really was undeclared, so the checker was right and the declaration was wrong. That is
+    the fourth consecutive sprint where the checker's catches were all true positives, which continues
+    to argue in the row's favour rather than against it. Noted for the next reviewer so the streak is
+    not mistaken for evidence of a defect: **a checker that keeps being right is not accumulating a
+    case for its own removal.** **Unblock condition:** unchanged — a genuine false positive, or
+    TD-057's resolution subsuming it. Longest-open aged row at 4 sprints; if TD-057 is not addressed
+    by SPRINT-074's promote, re-review this one on its own merits rather than deferring to it again.
 
 - **TD-047** severity: minor | status: open | created: Sprint-057
   - Summary: `night-run.md` is **414 lines** and carries five Parts plus a pre-flight checklist that

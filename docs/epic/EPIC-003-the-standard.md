@@ -4,7 +4,7 @@ slug: the-standard
 owner: Maintainer
 last_updated: 2026-08-16
 status: active
-member_sprints: [069, 070]
+member_sprints: [069, 070, 071]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -68,6 +68,7 @@ spec so a rule has exactly one home · ADR the split.
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-069](../sprint/archive/SPRINT-069-first-extraction.md) | First Extraction | closed 2026-08-16 · `b744fed` | Made the standard **separable and pinnable**: `spec/STANDARD.md` at v0.1.0 with its own changelog, versioning independently of the plugin — which is condition 1 outright. Ruled the **conformance levels** (ADR-024, condition 3), the ruling the epic routed to its first member's G2. Left the epic's harder half untouched by design: attestation and the no-skill-restates-a-rule pass are later members. |
+| [SPRINT-071](../sprint/SPRINT-071-cite-not-restate.md) | Cite, Not Restate | active | _(completed at close)_ — targets the two remaining conditions: 2 (no skill restates a rule the spec owns) and 5 (the spec suffices to build a conformant tool). Templates ruled **out of scope** for condition 2 at its promote (its D1: a template is rendered output read by a consumer who may not hold the spec), scoping the sweep to 15 of 38 candidate files — condition 2 is judged against that boundary. |
 | [SPRINT-070](../sprint/archive/SPRINT-070-attested.md) | Attested | closed 2026-08-16 · `d164924` | Made the top rung **writable**: `spec/STANDARD.md` §13 (spec v0.2.0) + [ADR-025](../adr/ADR-025-git-native-attestation-format.md) specify the three-trailer format, closing **D2** and condition 4. Its harder contribution is a boundary, not a feature — §13 states that an unsigned trailer is a *claim, not proof*, so **Attested is unreachable by trailers alone** and this repo is honestly Gated; that is what stops the level from becoming self-certifying before EPIC-004 exists. Also corrected ADR-018's granularity claim (the trailer carries the batch sign-off, not per-task approval). Conditions 2 and 5 deliberately untouched — both are sweeps, not specifications. |
 
 ## Decisions

@@ -1,0 +1,169 @@
+---
+sprint: 071
+slug: cite-not-restate
+epic: EPIC-003
+owner: Maintainer
+last_updated: 2026-08-16
+plan_commit: [sha — set at promote]
+close_commit: [sha — set at close]
+status: active
+update_trigger: sprint execute/close events
+---
+
+# SPRINT-071 — Cite, Not Restate
+
+> **Theme:** EPIC-003's third and intended-final member. The spec is now separable (SPRINT-069),
+> versioned and pinnable, and specifies the top conformance level (SPRINT-070) — but every rule it
+> owns is still *also* stated inside the skills, so an adopter who pins `spec/` has pinned a document
+> the implementation does not defer to. This sprint makes the deferral real, then checks whether the
+> spec can actually stand on its own. If both land, EPIC-003 closes.
+
+## Scope
+
+**In:** classify every candidate restatement across the 15 non-template skill files and rule the
+local-fact boundary (T1) · convert the flagged ones to citations under ADR-023's move+cite discipline
+(T2) · audit the spec standalone for tool-buildability and close or consciously defer every gap (T3).
+
+**Out (deferred):** the **23 template files** — ruled out of scope at this promote (D1) · building
+EPIC-004's conformance engine, which is what would make these rules machine-checkable rather than
+merely single-homed (TD-052's territory, re-reviewed and held at this promote) · TASK-218 and
+TASK-219, both `ready` and deliberately not pulled — this sprint is one dependent chain and adding a
+disjoint task would not shorten it · TASK-188, still `blocked` on an opportunistic trigger.
+
+## Plan
+
+### T1 — Inventory every spec-owned rule restated across the skills, and rule the local-fact boundary `[size: M · risk: med · class: decision · HITL]`
+Layers: `docs/sprint/logs/SPRINT-071-cite-not-restate.md`
+Depends-on: none
+Cites: EPIC-003 § Closed-when 2 · ADR-023 (`spec/` is SSOT for standard-owned rules; move+cite
+       atomic) · `spec/STANDARD.md` (read-only here — the target of every citation this classifies) ·
+       L-108 (match by shape, not substring) · CLAUDE.md § cross-check a query
+The candidate set was measured at promote — 38 files, of which 15 are non-template — but a raw match
+cannot tell a restatement from a citation, because both mention the same section. The classification
+is the deliverable; the conversion that follows it is mechanical once the worklist exists.
+
+**Acceptance:** every candidate site in the 15 files is classified into one of three buckets, and a
+reader of the worklist can act on it without re-deriving the judgement.
+
+**DoD:**
+- [ ] All 15 non-template files inventoried, every candidate site classified **restatement** ·
+      **already-a-citation** · **legitimately-local** — *Verify: the three bucket counts sum to the
+      site census taken at promote; a site in no bucket is an unfinished inventory, not a pass*
+- [ ] The **legitimately-local** bucket carries a stated reason per entry — a project fact the spec
+      does not own, named — *Verify: no entry reads only "local"; converting one of these would point
+      a reader at a spec section that does not contain the rule*
+- [ ] The worklist names file · line · target `spec/` § for every **restatement** entry —
+      *Verify: each cited § exists in `spec/STANDARD.md` at its current version*
+- [ ] The inventory's own query is cross-checked before its result is acted on — *Verify: a second
+      query disagreeing or reconciling (bucket sum vs census), plus one seeded site the scan must
+      detect; a negative control alone proves only that it fires on rows it reached (L-105 · L-108)*
+
+### T2 — Convert every flagged restatement to a citation of the spec `[size: M · risk: med · class: execution · HITL]`
+Layers: `skills/` (the flagged subset of T1's 15 — bounded by the worklist, corrected live per L-100)
+Depends-on: T1
+Cites: ADR-023 (no commit leaves a rule stated twice) · L-015 (consumer-facing surface) ·
+       L-125 (a self-describing corpus is unsafe to edit by token) · L-009 (re-read structure after edit)
+Owns `skills/**` for this sprint. The conversion is per-file atomic because ADR-023 forbids an
+intermediate state where the rule is stated in both places.
+
+**Acceptance:** no file on the worklist still states a rule the spec owns, and every skill remains
+usable by someone who has the plugin and has never opened `spec/`.
+
+**DoD:**
+- [ ] Every **restatement** entry converted to a citation naming its `spec/` § — *Verify: re-run T1's
+      inventory query; the restatement bucket is empty and the citation bucket grew by exactly that
+      count*
+- [ ] Each conversion is **atomic within its commit** — no commit leaves the rule in both places
+      (ADR-023) — *Verify: `git show <sha>` per touched file shows the deletion and the citation in
+      the same diff*
+- [ ] **Routing preserved, rule text removed** — a skill still tells its reader that a rule applies
+      here; only the restated text goes — *Verify: read each converted file as a consumer without
+      `spec/` open; the skill must remain executable (L-015)*
+- [ ] Structure re-read after every edit, not trusted from the diff — *Verify: L-009/L-125 — a
+      markdown list or table edit can fuse neighbours while grep and line caps stay clean, and this
+      corpus contains prose about its own rules*
+- [ ] Gate green, and the line caps still hold for every file touched — *Verify: `sh scripts/qa-check.sh`*
+
+### T3 — Audit whether the spec alone is sufficient to build a conformant tool `[size: M · risk: med · class: decision · HITL]`
+Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/epic/EPIC-003-the-standard.md`
+Depends-on: T2
+Cites: EPIC-003 § Closed-when 5 · ADR-024 (the three levels a tool would check) · ADR-025 (§13's
+       claim-vs-proof boundary) · L-016 (verify on the consumer path when the repo cannot dogfood it)
+Owns `docs/epic/EPIC-003-the-standard.md` — it ticks **both** conditions 2 and 5, so the epic file has
+a single writer this sprint despite two conditions closing (see D2).
+
+**Acceptance:** for every check a conformance tool would perform at each level, the audit names the
+`spec/` section defining it — or records why that gap is EPIC-004's rather than the spec's.
+
+**DoD:**
+- [ ] Each of ADR-024's three levels walked, every check a tool would perform mapped to its defining
+      `spec/` § — *Verify: the audit names a § per check; "implied by §N" is a gap, not a mapping*
+- [ ] Every gap either closed in `spec/` (bumping the spec version + changelog) or recorded as a
+      deliberate EPIC-004 boundary with its reasoning — *Verify: no gap left unrouted; a silent gap is
+      the spec-only-debt trap (L-007)*
+- [ ] Read as an adopter **without the plugin installed** — *Verify: the audit states which sections
+      were reachable from `spec/` alone; this repo cannot become that reader by accident, so the
+      consumer path is traced deliberately (L-016)*
+- [ ] EPIC-003 § Closed-when **2 and 5** ticked with their evidence, or the shortfall named —
+      *Verify: the epic file; the gate's epic-archive leg still reports the epic correctly live*
+- [ ] If every condition is now `[x]`, the epic is proposed for close — *Verify: all five conditions
+      re-read at once; a member sprint closing is not an epic closing, and §11's epic-archive move
+      needs owner approval*
+
+## Decisions (pre-locked)
+
+- **D1 — Templates are out of scope for condition 2.** A template is *rendered output*, not procedure:
+  the doc it produces is read by a consumer who may not have `spec/` at all, so carrying the guidance
+  inline is correct by design rather than a duplicated rule. This scopes the sweep from 38 candidate
+  files to **15**. Ruled at promote so T2's size is known before the Plan freezes — leaving it to T1
+  would have put a scope-defining ruling inside a frozen Plan, which is the trap the size-check rule
+  exists to prevent. **→ no ADR** (reversible, and it narrows rather than commits).
+- **D2 — T3 owns `docs/epic/EPIC-003-the-standard.md`, even though T2 completes condition 2.**
+  Two conditions close in one sprint and the file that records both has one writer. The chain
+  `T1 → T2 → T3` gives the preflight a transitive ownership path, so the overlap is owned rather than
+  unowned. **→ no ADR.**
+- **D3 — The sprint is a single dependent chain, deliberately.** T1's output is T2's input and T2's
+  completion is what makes T3 meaningful, so there is no parallel wave and no worktree dispatch here.
+  A disjoint backlog task was considered and declined: it would add wall-clock without shortening the
+  chain. **→ no ADR.**
+
+## Assumptions
+
+- **A1** — The candidate set is **38 files / ~121 raw sites**, splitting **15 non-template / 23
+  template**, and the raw count conflates restatements with correct citations. *Confirm: measured at
+  this promote; the 15+23 split was reconciled against the 38 total. Re-derive the per-bucket numbers
+  at T1 rather than trusting these (L-097).*
+- **A2** — Only `skills/lean-doc-generator/SKILL.md` currently cites `spec/STANDARD.md`. *Confirm:
+  `grep -rln 'spec/STANDARD.md' skills/`, read 2026-08-16 — 1 of 14 skills.*
+- **A3** — Governance at this promote: L-promotion **none** (107 entries reconciled: 74 open, 33
+  already promoted) · TD aging **TD-052 and TD-048 re-reviewed and held**, both unblock conditions
+  unchanged · TD-055 **deleted** per §11 · no §2 cap breach (58 governed files, tightest 122/130).
+  *Confirm: governance checklist, owner-signed 2026-08-16.*
+- **A4** — `spec/STANDARD.md` is **595 lines and has no §2 row**, so nothing caps it while T3 may add
+  to it. Filed as **TD-058** with **TASK-219** as its vehicle; not resolved here. *Confirm:
+  `check-doc-caps.sh` reports zero rows for `spec/`, measured 2026-08-16.*
+- **A5** — Skills in this session run **1.41.0 against a 1.44.0 repo**. Procedures must be read from
+  `skills/` in the repo, not the plugin cache — and T2 *edits* those files, so a stale cached copy
+  would be edited against the wrong baseline. *Confirm: `/prime` freshness row; L-021, third sighting.*
+
+## Execution Log
+
+> **Lives in its own file** — `docs/sprint/logs/SPRINT-071-cite-not-restate.md`, rendered from
+> `templates/sprint-log.md.template` and created lazily at the first entry. Append there, never here:
+> the Log grows with the work done, so keeping it out of this file is what stops it consuming the
+> 400-line budget the Plan needs (STANDARD §9 · ADR-014). The `logs/` subdirectory is load-bearing —
+> the sprint-file checks glob `docs/sprint/SPRINT-*.md` non-recursively, so a same-directory
+> `-log.md` sibling would be capped and schema-checked as if it were a Plan.
+
+## Files Changed
+
+<!-- Filled during execution; feeds CHANGELOG at close. -->
+
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+
+## Retro
+
+<!-- Written at close. Route the buckets to durable homes (STANDARD §10):
+     shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
+     After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->

@@ -18,9 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint)_ — **SPRINT-070 — Attested** closed 2026-08-16 at **10 of 10 DoD**
-> ([archive](docs/sprint/archive/SPRINT-070-attested.md)). The next sprint forms from the Backlog
-> below via `/lean-doc-generator promote`.
+> **SPRINT-071 — Cite, Not Restate** → [`docs/sprint/SPRINT-071-cite-not-restate.md`](docs/sprint/SPRINT-071-cite-not-restate.md) — EPIC-003's third and intended-final member. One dependent chain of three `M` tasks: inventory every spec-owned rule the skills restate and rule the local-fact boundary, convert the flagged ones to citations, then audit whether the spec stands alone well enough to build a conformant tool against. If all three land, EPIC-003 closes. Gates not yet signed — `/orchestrator` runs G1+G2 first.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard** (active — SPRINT-069
@@ -39,6 +37,55 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-220 — Inventory every spec-owned rule restated across the skills, and rule the local-fact boundary  [size: M] [risk: med] [HITL]
+      class:      decision
+      done-when:  each of the 15 non-template candidate files has every candidate site classified as
+                  **restatement** (the spec owns it → convert) · **already a citation** (correct, leave)
+                  · **legitimately local** (a project fact the spec does not own → leave, with the
+                  reason recorded); the output is a worklist naming file, line and target `spec/` §
+      touches:    skills/**/*.md (read) · the worklist lands in the sprint Execution Log
+      depends-on: none
+      assumes:    the 38-file candidate set was measured at promote and splits 15 non-template / 23
+                  template; **the raw grep conflates the problem with the solution** — a `§2` inside a
+                  skill may already BE the citation condition 2 wants, so the site count is a triage
+                  input and never a defect count. The third bucket is the load-bearing one: a skill
+                  legitimately states project-local facts, and converting those to citations would
+                  send a reader to a spec that does not contain them
+      tracker:    EPIC-003 § Closed-when 2 · ADR-023 (spec is SSOT for standard-owned rules)
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-221 — Convert every flagged restatement to a citation of the spec  [size: M] [risk: med] [HITL]
+      class:      execution
+      done-when:  no file on TASK-220's worklist still states a rule `spec/STANDARD.md` owns; each
+                  now cites it by section, and the gate is green with no rule left stated twice
+      touches:    the flagged subset of the 15 files (bounded by TASK-220's worklist)
+      depends-on: TASK-220
+      assumes:    ADR-023's move+cite discipline binds — **no commit may leave a rule stated in two
+                  places**, so a conversion is atomic per file rather than "add citation now, delete
+                  the copy later". Consumer check (L-015): a skill must still be usable by someone who
+                  has the plugin and has not opened `spec/`, so a citation replaces the *rule text*,
+                  never the routing that tells the reader a rule applies here
+      tracker:    EPIC-003 § Closed-when 2 · ADR-023 · L-015
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-222 — Audit whether the spec alone is sufficient to build a conformant tool  [size: M] [risk: med] [HITL]
+      class:      decision
+      done-when:  a recorded audit walks each conformance level (ADR-024) and names, for every check a
+                  tool would perform, the `spec/` section that defines it — every gap either closed in
+                  `spec/` or recorded as a deliberate EPIC-004 boundary with its reasoning
+      touches:    spec/STANDARD.md · docs/epic/EPIC-003-the-standard.md
+      depends-on: TASK-221
+      assumes:    **the audit is only meaningful after TASK-221** — while the skills still hold copies
+                  of the rules, a reader appears to succeed from `spec/` alone for rules the spec does
+                  not actually own. Must be read as an adopter with the plugin *not* installed, which
+                  is the one reader this repo cannot become by accident (L-016: verify on the consumer
+                  path when the repo cannot dogfood the condition)
+      tracker:    EPIC-003 § Closed-when 5 · ADR-024 (the levels the tool would check)
+      origin:     decomposer
+      state:      ready
 
 - [ ] TASK-218 — Stop the uncommitted-WIP path accepting a sibling task's declaration  [size: S] [risk: low] [HITL]
       class:      decision
