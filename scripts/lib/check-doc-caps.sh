@@ -36,7 +36,7 @@
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-guide=${1:-"$here/../../skills/lean-doc-generator/references/DOCS_Guide.md"}
+guide=${1:-"$here/../../spec/STANDARD.md"}
 root=${2:-"$here/../.."}
 
 fail=0

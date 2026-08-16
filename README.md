@@ -272,7 +272,7 @@ repo vs a secret manager / document store) that `migrate` also scans for on adop
 own canonical templates and reads the matching one *before* generating any core doc, so output
 matches a fixed format instead of free-improvising; `init`'s only non-doc writes are a safe-scaffold
 allowlist (`.env.example` · `.gitignore` · `LICENSE`, write-if-absent, never overwritten). Standard →
-[`skills/lean-doc-generator/references/DOCS_Guide.md`](skills/lean-doc-generator/references/DOCS_Guide.md).
+[`spec/STANDARD.md`](spec/STANDARD.md), versioned independently (`spec/CHANGELOG.md`).
 
 **Continuous learning** — every iteration feeds the next. At **Sprint Close** the Retro auto-files
 four buckets to durable homes — *shipped* → CHANGELOG, *tech debt* → `TD-NNN` (root `TECH-DEBT.md`), *follow-ups* →
@@ -408,7 +408,7 @@ markdown-first, agent-free-core, stack-agnostic constraints.
 
 **Further reading:** [`.claude/CONTEXT.md`](.claude/CONTEXT.md) (SSOT) ·
 [`.claude/CLAUDE.md`](.claude/CLAUDE.md) ·
-[`DOCS_Guide.md`](skills/lean-doc-generator/references/DOCS_Guide.md) (the standard).
+[`STANDARD.md`](spec/STANDARD.md) (the standard).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

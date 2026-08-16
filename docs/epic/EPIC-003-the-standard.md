@@ -16,13 +16,18 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 
 ## Why this, why now
 
-Today the specification is `skills/lean-doc-generator/references/DOCS_Guide.md`: **489** lines inside
-one skill's references folder, with no version of its own and no changelog
-(re-measured 2026-08-16 at SPRINT-069's promote — the 450 written here and in ADR-018 was accurate
-when the epic was drafted and has grown since; ADR-018 keeps its figure, being append-only)
-(`docs/research/platform-readiness-audit.md` F3). An adopter cannot take the standard without taking
-the tool, so "a standard for software delivery in the AI era" is a claim the artifact does not
-support. Extraction is what makes it true.
+The specification is **`spec/STANDARD.md`** — **497** lines, moved at SPRINT-069 T2 out of one
+skill's references folder and now versioned independently (v0.1.0) with its own changelog
+(`docs/research/platform-readiness-audit.md` F3 is the pre-move finding). An adopter still cannot
+take the *whole* standard without taking the tool while conformance levels, attestation and
+re-pointed skills remain open (see § Closed when); T2 is the first step that makes the claim true.
+
+<!-- The line figure has now been wrong twice in this paragraph, both times by being remembered
+     rather than measured (L-097): the epic was drafted at 450, SPRINT-069's promote re-measured 489,
+     and the move added an ownership header the standard never had, giving 497. Re-measure it, never
+     copy it forward. ADR-018 keeps its own 450 — an accepted ADR is append-only and was accurate
+     when written. -->
+
 
 It spans sprints because the spec is not one file: the doc standard, the gate contract, the
 task/sprint/epic schema and the HITL attestation format are today spread across `DOCS_Guide.md`,
