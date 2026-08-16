@@ -2,9 +2,9 @@
 epic: 003
 slug: the-standard
 owner: Maintainer
-last_updated: 2026-08-10
-status: proposed
-member_sprints: []
+last_updated: 2026-08-16
+status: active
+member_sprints: [069]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -16,8 +16,10 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 
 ## Why this, why now
 
-Today the specification is `skills/lean-doc-generator/references/DOCS_Guide.md`: 450 lines inside one
-skill's references folder, with no version of its own and no changelog
+Today the specification is `skills/lean-doc-generator/references/DOCS_Guide.md`: **489** lines inside
+one skill's references folder, with no version of its own and no changelog
+(re-measured 2026-08-16 at SPRINT-069's promote — the 450 written here and in ADR-018 was accurate
+when the epic was drafted and has grown since; ADR-018 keeps its figure, being append-only)
 (`docs/research/platform-readiness-audit.md` F3). An adopter cannot take the standard without taking
 the tool, so "a standard for software delivery in the AI era" is a claim the artifact does not
 support. Extraction is what makes it true.
@@ -47,7 +49,7 @@ spec so a rule has exactly one home · ADR the split.
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| _(appended at promote)_ | | | |
+| [SPRINT-069](../sprint/SPRINT-069-first-extraction.md) | First Extraction | active | _(completed at close)_ |
 
 ## Decisions
 

@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint)_ — SPRINT-068 closed 2026-08-15 → [`docs/sprint/archive/SPRINT-068-open-the-standard.md`](docs/sprint/archive/SPRINT-068-open-the-standard.md). Next: `/lean-doc-generator promote` — EPIC-003's opening ruling has landed (ADR-023), so the first extraction sprint can promote.
+> **SPRINT-069 — First Extraction** → [`docs/sprint/SPRINT-069-first-extraction.md`](docs/sprint/SPRINT-069-first-extraction.md) — EPIC-003's first member sprint. Five tasks: the conformance-levels ruling, the move+cite extraction to `spec/` v0.1.0, its citation sweep, and two small guards carried from SPRINT-068's close. Gates not yet signed — `/orchestrator mvp` or `sprint-bulk` runs G1+G2 first.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard** (next — its opening

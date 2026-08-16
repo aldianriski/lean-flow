@@ -1,0 +1,205 @@
+---
+sprint: 069
+slug: first-extraction
+epic: EPIC-003
+owner: Maintainer
+last_updated: 2026-08-16
+status: active
+plan_commit: [sha — set at promote]
+close_commit: [sha — set at close]
+update_trigger: sprint execute/close events
+---
+
+# SPRINT-069 — First Extraction
+
+> **Theme:** EPIC-003's first member sprint — the standard stops being one skill's reference file
+> and becomes a versioned artifact an adopter can pin. T1 rules the conformance levels the epic
+> routes here; T2 is the move itself, atomic per ADR-023; T3 is its follow-through. T4 and T5 are
+> two small guards carried from SPRINT-068's close, unrelated to the extraction and file-disjoint
+> from it.
+
+## Scope
+
+**In:** rule the conformance levels (T1) · move the standard into a versioned `spec/` tree at
+v0.1.0, one move+cite commit (T2) · sweep the textual section citations to the new name (T3) ·
+guard the two Layers-family checkers against bare invocation (T4) · ignore `.claude/worktrees/`
+(T5).
+
+**Out (deferred):** the conformance *engine* that checks a level — EPIC-004, and a level that
+cannot be described without it belongs there, not in T1 · the git-native attestation format
+(EPIC-003, a later member sprint) · re-pointing skills that *restate* a spec-owned rule rather than
+cite it — that is the epic's fourth Scope item and needs the spec to exist first · TD-053 leg 1
+(the `find`-walk false positive), which stays routed to EPIC-004 D1.
+
+## Plan
+
+### T1 — Rule the conformance levels and what makes each independently checkable `[size: S · risk: med · class: decision · HITL]`
+Layers: `docs/adr/` · `docs/DECISIONS.md` · `docs/epic/EPIC-003-the-standard.md`
+Depends-on: none
+Cites: EPIC-003 § Open questions (1) — "→ first member sprint's G2" · ADR-018 (names conformance
+       levels as what an adopting org pins) · L-094 (a ruling is closed by deciding, not by waiting)
+The epic routes this question here by name, and the extraction that follows is shaped by the answer:
+levels decide whether the spec is one document or several. Ruling it after the move would mean
+re-cutting the tree.
+
+**Acceptance:** a recorded ruling naming the levels, their order, and per level the property that
+makes it checkable in principle — with EPIC-003 open question 1 struck through and pointing at it.
+
+**DoD:**
+- [ ] The levels named and ordered, with the WHY for the count over the alternatives —
+      *Verify: ruling recorded (ADR if §4's three tests all hold); reviewer reads ADR-018 as comparand*
+- [ ] Each level carries the property that makes it independently checkable **in principle**, with
+      the engine explicitly out of scope — *Verify: no level's description requires EPIC-004 to exist*
+- [ ] EPIC-003 open question 1 struck through with a pointer to the ruling —
+      *Verify: the epic's § Open questions*
+
+### T2 — Extract the standard to `spec/` v0.1.0 in one move+cite commit `[size: M · risk: med · class: execution · HITL]`
+Layers: `spec/` (new) · `skills/lean-doc-generator/references/DOCS_Guide.md` ·
+        `skills/lean-doc-generator/SKILL.md` · `scripts/lib/check-doc-caps.sh` ·
+        `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `README.md` ·
+        `docs/architecture/overview.md` · `docs/epic/EPIC-003-the-standard.md`
+Depends-on: none
+Cites: ADR-023 (move+cite atomic; the extracted tree becomes SSOT, CONTEXT.md a consumer) ·
+       ADR-018 § Decision · EPIC-003 § Scope · L-097 (re-derive a stated figure before acting on it)
+The epic's claim — an adopter can take the standard without the plugin — is false while the spec is
+a file inside one skill's `references/`. This is the commit that makes it true. It also unlocks the
+epic's fourth Scope item: today only `lean-doc-generator` may cite the guide, because a skill never
+points into another skill's `references/`.
+
+**Acceptance:** the standard lives in a versioned `spec/` tree under a name that reads as a standard,
+every path reference resolves, and the gate is green — in one commit, with no commit in history
+leaving a rule stated in two places.
+
+**DoD:**
+- [ ] The document moved and renamed, carrying `version: 0.1.0` in its ownership header, beside
+      `spec/CHANGELOG.md` — *Verify: `git show --stat` shows an `R` rename; the gate's ownership leg*
+- [ ] Every **path** reference re-pointed, count re-derived at execution rather than taken from any
+      figure written at promote (L-097) — *Verify: a repo-wide search for the old path returns only
+      history (archived sprints · rotated changelogs), reconciled by a second query that sums*
+- [ ] `check-doc-caps.sh`'s default guide path follows the move — *Verify: the gate's cap legs still
+      report per-file caps, not a parse failure; a deliberate wrong path FAILs*
+- [ ] `.claude/CLAUDE.md`'s self-contained principle states what is true after the move —
+      *Verify: the line no longer claims lean-doc-generator bundles the standard*
+- [ ] Nothing is stated twice — *Verify: named review check "is any rule now stated twice?" (ADR-023
+      requires it per member sprint); the old home is a citation, never a copy*
+- [ ] Whole gate green in one run over the committed tree — *Verify: `sh scripts/qa-check.sh`*
+
+### T3 — Sweep the standard's textual section citations to the new name `[size: M · risk: low · class: mechanical-ingest · AFK]`
+Layers: `skills/` · `skills/lean-doc-generator/templates/` · `docs/` · `scripts/lib/` · `evals/`
+Depends-on: T2
+Cites: ADR-023 (a name lagging is not a rule stated twice — which is why this is separate) ·
+       L-118 (a single query's zero means clean **or** unreached) · L-009 (re-read the whole
+       structure after a table-row or list-entry edit)
+These are stale names rather than broken links, so folding them into T2 would turn an atomic move
+into a ~70-file commit — the shape where a structure-adjacent edit fuses neighbouring rows unseen.
+
+**Acceptance:** no live surface cites the standard by its pre-extraction document name.
+
+**DoD:**
+- [ ] The citation set re-derived at execution, never read off this Plan — *Verify: two queries that
+      reconcile (total mentions = renamed + legitimately-unchanged); a bare zero is not evidence*
+- [ ] History deliberately not swept — archived sprints, rotated changelogs, the generated index —
+      *Verify: those paths appear in the unchanged column of the reconciliation, by name*
+- [ ] Every touched table row / list entry re-read whole after editing (L-009) —
+      *Verify: block re-read; the gate's schema + cap legs green*
+- [ ] Gate green — *Verify: `sh scripts/qa-check.sh`*
+
+### T4 — Guard the two Layers-family checkers against bare invocation `[size: S · risk: low · class: execution · AFK]`
+Layers: `scripts/lib/check-layers-completeness.sh` · `scripts/lib/check-layers-observed.sh` ·
+        `evals/` (the proving legs)
+Depends-on: none
+Cites: TD-056 (family scoped by SPRINT-068 T2's scan) · `check-gates-signed.sh` (the note-line shape
+       to match) · `qa-check.sh` (run to prove the gate path is unaffected — never edited by this
+       task; spelled bare to match the DoD's token, per TD-048) ·
+       L-058 (a gate is exercised once on input that must FAIL)
+Both exit 0 silently when invoked with no arguments, so a bare run reads as a pass. SPRINT-068's own
+coordinator ran one bare and read the silence as clean — the row's second sighting, which is what
+vehicled it.
+
+**Acceptance:** each checker invoked bare prints a "nothing verified" note in its guarded siblings'
+shape instead of exiting 0 silently, with a proving leg per checker.
+
+**DoD:**
+- [ ] Both checkers print the note when invoked with no arguments — *Verify: run each bare; output
+      names what was not verified*
+- [ ] A must-note leg per checker, wired into the harness the gate runs (an unwired fixture guards
+      nothing — TD-012) — *Verify: the harness leg count rises by two and the gate names it*
+- [ ] The gate path is unaffected — `qa-check.sh` always supplies arguments —
+      *Verify: gate output for both legs unchanged from before the change*
+
+### T5 — Ignore `.claude/worktrees/` so a stray `git add -A` cannot commit a repo copy `[size: S · risk: low · class: execution · AFK]`
+Layers: `.gitignore`
+Depends-on: none
+Cites: TD-053 leg 2 (split out at SPRINT-069's promote review) · L-042 (staging discipline)
+The dispatch protocol places a full repo copy inside the repo and nothing ignores it; SPRINT-068's
+close ran `git add -A` and was safe only because the worktrees had already been removed.
+
+**Acceptance:** with a worktree present, `git status --short` stays clean.
+
+**DoD:**
+- [ ] `.claude/worktrees/` ignored — *Verify: `git check-ignore -v .claude/worktrees/probe` resolves
+      to the new rule*
+- [ ] Verified against a real dispatched worktree, not a `mkdir`'d stand-in —
+      *Verify: `git status --short` clean while the worktree exists*
+- [ ] Leg 1 explicitly untouched — the `find`-walk false positive stays routed to EPIC-004 D1 —
+      *Verify: no checker changed by this task*
+
+## Decisions (pre-locked)
+
+- **D1 — The move is wholesale, not section-at-a-time.** The document is already standalone, so one
+  `git mv` leaves no split-document state; a section-first move would create exactly the two-homes
+  condition ADR-023 exists to prevent, for the rest of the epic. **→ no ADR** (ADR-023 already owns
+  the mechanism).
+- **D2 — Rename now, sweep citations after.** 15 path references break on the move and are fixed
+  atomically with it; the 128 textual `§N` citations survive a move but not a rename, and folding
+  them in would make the atomic commit ~70 files wide. A lagging *name* is not a rule stated twice.
+  **→ no ADR.**
+- **D3 — `docs/epic/EPIC-003-the-standard.md` is shared by T1 and T2** (T1 strikes open question 1;
+  T2 re-points a path reference in it). **T1 owns the file and commits first**; T2 touches only its
+  path line, staged per-hunk (L-042). No other file is shared across tasks — T2/T3 are sequential by
+  `depends-on`, T4 and T5 are disjoint from everything.
+- **D4 — The spec starts at 0.1.0, not 1.0.0.** Four of EPIC-003's five Closed-when conditions are
+  still open and each will move the text; 1.0.0 is reserved for the epic's close, where it carries a
+  real signal. **→ no ADR.**
+
+## Assumptions
+
+- **A1** — `spec/` reaches consumers with no packaging work: the plugin manifest declares no file
+  list, so `plugin install` copies the whole repo. *Confirm: verified against a real install
+  (SPRINT-042), restated in `docs/architecture/overview.md`.*
+- **A2** — The move costs one line in the cap checker, which takes the guide path as its first
+  parameter with a default. *Confirm: `scripts/lib/check-doc-caps.sh` line 39, read 2026-08-16.*
+- **A3** — The other three checkers naming the guide do not open it — comments and output strings
+  only, so they fall to T3's sweep rather than T2's move. *Confirm: read 2026-08-16;
+  `check-ephemeral-intake.sh` mentions it in two `printf` findings, the other two in headers.*
+- **A4** — Extraction makes `.claude/CLAUDE.md`'s "lean-doc-generator bundles its own templates +
+  standard" **false**, so correcting it is inside T2's commit, not a follow-up. *Confirm:
+  `.claude/CLAUDE.md` § Design Principles, read 2026-08-16.*
+- **A5** — No cap blocks: `TODO.md` 186/320 · `CLAUDE.md` 63/80 · `CONTEXT.md` 132/150 (T2 *reduces*
+  CONTEXT.md per ADR-023) · `spec/` is a new tree with no §2 row yet — T1's ruling or T2 decides
+  whether it gets one. *Confirm: gate cap legs, measured 2026-08-16.*
+- **A6** — Governance resolved at this promote: L-promotion none · TD-054/053/050/049 re-reviewed
+  and held (TD-053 leg 2 split → TASK-213 = T5) · TD-051 observation recorded · doc-aging clean.
+  *Confirm: governance review 2026-08-16, owner-signed; commit `b03ada4`.*
+
+## Execution Log
+
+> **Lives in its own file** — `docs/sprint/logs/SPRINT-069-first-extraction.md`, rendered from
+> `templates/sprint-log.md.template` and created lazily at the first entry. Append there, never here:
+> the Log grows with the work done, so keeping it out of this file is what stops it consuming the
+> 400-line budget the Plan needs (DOCS_Guide §9 · ADR-014). The `logs/` subdirectory is load-bearing —
+> the sprint-file checks glob `docs/sprint/SPRINT-*.md` non-recursively, so a same-directory
+> `-log.md` sibling would be capped and schema-checked as if it were a Plan.
+
+## Files Changed
+
+<!-- Filled during execution; feeds CHANGELOG at close. -->
+
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+
+## Retro
+
+<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
+     shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
+     After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
