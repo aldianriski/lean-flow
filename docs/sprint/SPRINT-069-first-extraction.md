@@ -58,7 +58,7 @@ Layers: `spec/` (new) · `skills/lean-doc-generator/references/DOCS_Guide.md` ·
         `skills/lean-doc-generator/SKILL.md` · `scripts/lib/check-doc-caps.sh` ·
         `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `README.md` ·
         `docs/architecture/overview.md` · `docs/epic/EPIC-003-the-standard.md`
-Depends-on: none
+Depends-on: T1
 Cites: ADR-023 (move+cite atomic; the extracted tree becomes SSOT, CONTEXT.md a consumer) ·
        ADR-018 § Decision · EPIC-003 § Scope · L-097 (re-derive a stated figure before acting on it)
 The epic's claim — an adopter can take the standard without the plugin — is false while the spec is
@@ -86,7 +86,7 @@ leaving a rule stated in two places.
 
 ### T3 — Sweep the standard's textual section citations to the new name `[size: M · risk: low · class: mechanical-ingest · AFK]`
 Layers: `skills/` · `skills/lean-doc-generator/templates/` · `docs/` · `scripts/lib/` · `evals/`
-Depends-on: T2
+Depends-on: T2 · T4
 Cites: ADR-023 (a name lagging is not a rule stated twice — which is why this is separate) ·
        L-118 (a single query's zero means clean **or** unreached) · L-009 (re-read the whole
        structure after a table-row or list-entry edit)
