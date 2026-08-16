@@ -127,12 +127,19 @@ vehicled it.
 shape instead of exiting 0 silently, with a proving leg per checker.
 
 **DoD:**
-- [ ] Both checkers print the note when invoked with no arguments — *Verify: run each bare; output
+- [x] Both checkers print the note when invoked with no arguments — *Verify: run each bare; output
       names what was not verified*
-- [ ] A must-note leg per checker, wired into the harness the gate runs (an unwired fixture guards
+      ✓ verified by the coordinator in the **integrated** tree, not from the builder's report:
+      `layers completeness: no sprint files given -- nothing verified` / `layers observed: …`,
+      both exit 0, matching `check-gates-signed.sh`'s note shape
+- [x] A must-note leg per checker, wired into the harness the gate runs (an unwired fixture guards
       nothing — TD-012) — *Verify: the harness leg count rises by two and the gate names it*
-- [ ] The gate path is unaffected — `qa-check.sh` always supplies arguments —
+      ✓ one leg per harness, both green post-merge; builder ran the RED/GREEN guard proof
+      (guard commented out → leg red with its named finding → restored)
+- [x] The gate path is unaffected — `qa-check.sh` always supplies arguments —
       *Verify: gate output for both legs unchanged from before the change*
+      ✓ builder diffed with-args output against `git show HEAD:…` of the pre-change checkers,
+      repo state held fixed — byte-identical
 
 ### T5 — Ignore `.claude/worktrees/` so a stray `git add -A` cannot commit a repo copy `[size: S · risk: low · class: execution · AFK]`
 Layers: `.gitignore`

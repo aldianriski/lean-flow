@@ -110,3 +110,53 @@ Scoped to leg 2 only, and the `.gitignore` comment says so — the obvious infer
 are ignored now" is that the walking problem is solved too, and it is not: `find` walks the
 filesystem, not the index. The surprise entry above is that same distinction observed live, minutes
 apart. 3 of 3 DoD ticked.
+
+### 2026-08-16 | progress | T4 — both Layers-family checkers guarded against bare invocation
+
+Dispatched builder (worktree, base **622f420** — stale, see the next entry; merged `2654d31`).
+TD-056's per-checker cure shipped: a `note()` helper plus `[ "$#" -gt 0 ] || { note "…nothing
+verified"; exit 0; }` in `check-layers-completeness.sh` and `check-layers-observed.sh`, matching
+`check-gates-signed.sh`'s note-line shape exactly (the builder read that sibling first, as briefed).
+One must-note leg per harness, both wired and firing in-gate.
+
+Guard proof run and reported: with the guard commented out the leg goes RED with its named finding,
+restored → green. A fixture never seen to fail is not a proof (L-058).
+
+Coordinator re-verified in the **integrated** tree rather than accepting the builder's report
+(L-057): both checkers bare print their note at exit 0, and both harnesses are all-green *including*
+SPRINT-068's close-time case 4e, which the builder's base did not contain. 3 of 3 DoD ticked.
+
+### 2026-08-16 | surprise | TD-054 reproduced — every dispatched worktree branches from one stale sha
+
+**Second sighting, and it makes the mechanism visible for the first time.**
+
+Both of this sprint's worktrees — T4's and T2's — branched from **`622f420`**, which is 13 commits
+behind the dispatching session's HEAD. `622f420` is not an arbitrary point: it is SPRINT-068's
+`record plan_commit sha` commit, and the same sha *SPRINT-068's two builders used*. So across two
+sprints and four worktrees, every dispatch has branched from the identical commit — which was
+current during SPRINT-068 and is stale now.
+
+That is not drift. It is a **pin**, and it answers the question TD-054 has been held open on since
+SPRINT-063: *why* did a worktree branch three sprints behind a current session. The row's mitigation
+text forbids writing a guard before the cause is understood; a systematic pin is a cause, where "it
+was stale once" was not.
+
+**What it cost here, concretely:**
+- T4's base lacked SPRINT-068's close-time work on two of the four files it edited —
+  `check-layers-observed.sh` (+13 lines: the `docs/changelog/*` exclusion) and
+  `run-layers-observed-fixtures.sh` (+55 lines: case 4e). The three-way merge over `622f420`
+  preserved both sides because the edits sat in different regions, and the coordinator verified the
+  union rather than assuming it. Had either side rewritten a shared region, this merge would have
+  silently reverted a guard shipped the day before.
+- T4's own reported gate FAIL was an artifact of the same pin: its worktree had no
+  `SPRINT-069-first-extraction.md`, so leg 15 checked its commit against SPRINT-068's Plan and
+  correctly found the files undeclared there. The builder diagnosed this itself, proved it identical
+  with pre-change code, and did **not** work around it — exactly the right call, and the reason it
+  surfaced as a flag rather than as a mystery.
+- **T2 is worse and is still running:** its base predates T1, so the epic file it edits does not
+  contain ADR-024. The `Depends-on: T1` edge that this morning's preflight HALT existed to enforce
+  is void in the builder's tree — the ordering it guarantees is real only if the second task can
+  *see* the first task's output.
+
+No fix attempted mid-sprint: the cure is a dispatch-protocol change, which is nobody's task here.
+Filed to TD-054 at close with this entry as its evidence.
