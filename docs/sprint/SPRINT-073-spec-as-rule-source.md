@@ -80,7 +80,8 @@ it applies to their repo at all.
 
 ### T2 — Rule whether `spec/STANDARD.md` gets a §2 cap row, and which `[size: S · risk: low · class: decision · HITL]`
 Layers: `spec/STANDARD.md` (§2 table) · `TECH-DEBT.md` (TD-058's row) · `docs/adr/` (only if the
-        ruling qualifies)
+        ruling qualifies) · `docs/DECISIONS.md` (§4 requires the index row with the ADR — added
+        mid-task, L-100) · `docs/knowledge-index.md` (generated, `sh scripts/gen-index.sh`)
 Depends-on: T1
 Cites: TD-058 · TASK-219 · ADR-015 (a stated cap is a real number, and a soft cap cannot be
        grandfathered) · §6 (cap-hit → split into a tree) · §2's growth rule (split, never squeeze) ·

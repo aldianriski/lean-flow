@@ -287,3 +287,32 @@ curve (ADR-015's gesture test).
 **TD-058 → `resolved → SPRINT-073 T2 (ADR-026)`**, four sprints and five re-reviews after filing. It
 closed the moment the evidence it named arrived — which is the case for ordering T2 after T1 rather than
 by priority.
+
+### 2026-08-16 | surprise | T2 — I committed through a red gate, and the shell line I wrote is why
+
+**What happened.** T2's commit ran as one line: `sh scripts/qa-check.sh 2>&1 | tail -4 && git add -A &&
+git commit …`. The pipe makes the exit status **`tail`'s**, which is always 0, so `&&` fired on a gate
+that had returned **1**. `dc67563` landed with **151 pass / 2 fail**. The failures scrolled past inside
+the same tool call that committed, exactly where nothing forces them to be read.
+
+**Both failures were real, and both were my omissions, not false positives:**
+- `layers observed: changed by a task that never declared it: T2:docs/DECISIONS.md` — §4 requires the
+  index row alongside a new ADR, so T2 genuinely touches `docs/DECISIONS.md` and never declared it.
+- `knowledge index STALE` — ADR-026 is a metadata-carrying doc, and the generated index was not
+  regenerated.
+
+**This is L-120 verbatim**, and it names both costs in advance: *"when a check gates an action, they are
+two calls, because a single call makes the check's result advisory by construction."* It is also L-045 /
+L-057 — a gate piped into a formatter returns the **formatter's** status, and an exit code is evidence
+about the reporter, never the artifact. The rule was promoted, correctly placed, and loaded; it did not
+fire, because writing the pipeline felt like formatting output rather than gating an action. That is the
+same mechanism L-130 describes for authoring a criterion, one level down.
+
+**Fixed forward rather than rewritten:** `docs/DECISIONS.md` and `docs/knowledge-index.md` added to T2's
+`Layers:` (an L-100 correction — implementation invented the files), index regenerated, gate re-run **as
+its own tool call**: `gate exit: 0`, **153 pass / 0 fail**. The red commit stays in history with this
+entry beside it; `dc67563` is not amended, because the honest record is that it was committed red and
+corrected, not that it was always green.
+
+**Standing correction for the rest of this run:** the gate runs as its own call, its exit code is read,
+and only then does anything commit. No pipes into `tail`, no `&&` chains from a gate.
