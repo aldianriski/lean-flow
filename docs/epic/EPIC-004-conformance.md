@@ -60,7 +60,7 @@ each other · any telemetry, ever (the README promises none).
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-072](../sprint/archive/SPRINT-072-conformance-baseline.md) | Conformance Baseline | closed 2026-08-16 · `87954f2` | **Overturned this epic's opening premise and replaced it with a measurement.** All **96** normative rules classified — 8 covered · 39 uncovered-mechanical · 45 judgment-only · 6 implementation-directed — and reconciled against the live corpus (11 checkers · 22 harnesses · 98 fixture cases · 46 distinct findings). The checkers do **not** encode the standard: 3 of 13 sections are referenced in `scripts/lib/`, ten have zero. Established the fourth bucket `implementation-directed` (6 rules an engine must never evaluate against an adopter), that a §2 row is a *parameter set* not a rule (6 families, not 37), and that **Gated is the hard level, not Attested**. Changed no checker and no execution architecture — verified by diff. |
-| [SPRINT-073](../sprint/SPRINT-073-spec-as-rule-source.md) | The Spec as Rule Source | active | _(completed at close)_ — moves the classification **into `spec/STANDARD.md`**, which is what makes D1's "rules come from the spec" mechanically true rather than aspirational, and gives each of the 39 uncovered-mechanical rules a build-or-scope-out disposition. Closes both halves of § Closed-when 2. Carries TASK-219 as its middle task, because annotating 96 rules supplies the growth measurement TD-058 said was undiscoverable. Not the engine. |
+| [SPRINT-073](../sprint/archive/SPRINT-073-spec-as-rule-source.md) | The Spec as Rule Source | closed 2026-08-16 · `[close_commit]` | **Made D1 mechanically true: the spec is now the rule source.** `spec/STANDARD.md` **0.4.0** carries every rule's level and mark in-file, keyed by stable ids a finding can name, plus **§14** stating the model — including the **no-percentage** ruling *normatively*, so it binds adopters' tools rather than this epic's notes. **98 classified + 2 unclassified**, re-derived from the spec after the frozen baseline proved unable to reproduce its own total (96 stated vs 99 and 98 by column). **54 dispositions** — 42 `build` each naming its finding, 12 `scope-out` each with its reason. Ruled the spec uncapped (**ADR-026**, closing TD-058). No checker, no engine, no execution-architecture change. |
 
 ## Decisions
 
@@ -98,16 +98,16 @@ each other · any telemetry, ever (the README promises none).
 
 - [ ] A repo that has never run lean-flow gets a conformance report naming its level
 - [ ] Every spec rule maps to a check, or is explicitly marked judgment-only in the spec
-      — **PARTIAL after SPRINT-072, and deliberately not ticked.** All **96** normative rules are now
-      classified with level + mechanical/judgment-only, reconciled against the corpus
-      (`docs/research/conformance-baseline.md`). But this condition says *"marked judgment-only **in
-      the spec**"*, and the marks live in a research doc — the spec itself is unchanged. Marking them
-      in `spec/STANDARD.md` is a spec change, which SPRINT-072's D4 excluded. **Remaining:** carry the
-      45 judgment-only marks into the spec (**TASK-227**), and close the 39 uncovered-mechanical rules
-      or rule them out of scope (**TASK-229**). The classification half is done; the *in the spec* half
-      is not. **TASK-227 is the engine's input, not a follow-up to it** — the spec currently carries no
-      level and no mark on any rule, so an engine built first would hard-code the classification a
-      second time, which is the wrapper outcome D1 rules out
+      — **SUBSTANTIALLY ADVANCED at SPRINT-073, still not ticked, and the remaining gap is now small
+      and named.** The *"in the spec"* half is **done**: `spec/STANDARD.md` 0.4.0 marks every rule
+      in-file (§14), so the judgment-only rules satisfy this condition outright. What is left is the
+      other clause — *maps to a check* — for the **42** rules dispositioned `build`
+      (`docs/research/conformance-dispositions.md`). A disposition is a decision to build, not a check;
+      those land with the engine and with **TASK-228** for §13's five.
+      **Two smaller residuals, both explicit:** the **12** rules dispositioned `scope-out` neither map
+      to a check nor are marked judgment-only, so this condition may need re-reading once the engine
+      exists — flagged rather than quietly satisfied; and **2** rules (`S4.INDEX`, `S5.DISCARDLOG`)
+      carry `?` and have no mark at all → **TASK-230**
 - [ ] Each check has a retained must-FAIL fixture that fails with its named finding
       — measured at SPRINT-072: the corpus is **22 harnesses (17 asserting) · 98 fixture cases · 46
       distinct named findings**, and that set is the **contract any engine must preserve**, not a

@@ -7,7 +7,7 @@ last_updated: 2026-08-16
 gates_signed: G1,G2 @ 80b5eaa
 plan_commit: b0fb721
 close_commit: [sha — set at close]
-status: active
+status: closed
 update_trigger: sprint execute/close events
 ---
 
@@ -209,9 +209,77 @@ undifferentiated middle.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `spec/STANDARD.md` | T1 · T2 | **+324** — a `Conformance.` table on all 13 sections, new **§14** (the model, and the no-percentage ruling stated *normatively*), and §2 rows for `spec/` with T2's cap ruling inline | med | 154/0 · `+300/−1` on T1 with the one deletion being the version line |
+| `spec/CHANGELOG.md` | T1 | **0.3.0 → 0.4.0** — what an adopter pinning the old version does not get | low | file re-read |
+| `docs/adr/ADR-026-…md` | T2 | **new** — the spec carries no numeric cap, because §2's split escape is unavailable to a file adopters pin by path | low | §4 sections + ≥1 Negative present |
+| `docs/DECISIONS.md` | T2 | ADR-026 index row (§4 requires it) — **declared late, L-100** | low | gate |
+| `TECH-DEBT.md` | T2 | **TD-058 resolved** → SPRINT-073 T2 (ADR-026), with both non-achievements recorded | low | row re-read |
+| `docs/research/conformance-dispositions.md` | T3 | **new** — 54 dispositions (42 `build` with named findings · 12 `scope-out` with reasons). A sibling because the baseline was at 126/130: split, never squeeze | low | 129/130 PASS · `comm` reconciliation empty |
+| `docs/research/conformance-baseline.md` | T3 | two-line supersession pointer; **tables left unedited** as the record of what SPRINT-072 measured | low | `git diff` shows **0** changed lines containing a mark word |
+| `docs/knowledge-index.md` | T2 · T3 | regenerated — derived view, never hand-edited | low | `sh scripts/gen-index.sh` |
+| `docs/sprint/SPRINT-073-*.md` + `logs/` | coordinator | two `scope-change` entries, the ruling, `Layers:` corrections | low | gate |
+
+**Not touched, and that is D2:** no `scripts/lib/check-*.sh`, no `evals/**`, no `skills/**`. The one
+checker that came close — `check-doc-caps.sh` — was **run**, never edited, which is how the cap-cell
+digit-scrape trap was found rather than shipped.
 
 ## Retro
 
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint? **Yes, and it
+is the second sighting of a rule that was already promoted and already in context.** `dc67563` was
+committed through a **red gate** (151 pass / 2 fail) because the commit line read
+`sh scripts/qa-check.sh 2>&1 | tail -4 && git add -A && git commit …` — the pipe makes the exit status
+`tail`'s, so `&&` fired on a gate that returned 1. CLAUDE.md § Anti-Patterns edit-safety **(c)** already
+contains the sentence *"a gate piped into a formatter returns the formatter's status"*. It was loaded, it
+was correct, and it did not fire — because writing a shell pipeline feels like **formatting output**,
+not like gating an action. **L-120 reaches count 2 and is promoted** (below). A second, milder instance:
+my own G2 growth estimate of ~130 lines was wrong by more than double (+299), a figure written into a
+decision without a second derivation — L-130's shape, from the person who filed it.
+
+**Cost** — coordinator inline, all three tasks, zero agent tokens. Dispatch was not reconsidered: every
+task is `class: decision`, and T1 in particular is 100 individual classification judgements against a
+frozen source. The expensive part was reading — `spec/STANDARD.md` end to end before a line was written,
+which is what surfaced the count problem before it could be baked in.
+
+**Worked**
+- **Halting T1 instead of picking a number.** Re-derivation found the frozen baseline stating 96 against
+  its own columns summing to 99 and 98, and every available move broke something. Stopping produced the
+  ruling that actually resolves it — *transcribe the marks, re-derive the count* — which is the only
+  version that does not fork the spec from the baseline in two dimensions at once.
+- **Ordering T2 after T1 on evidence rather than priority.** TD-058 had been re-parked five times over
+  four sprints on one stated blocker: no growth curve under a ceiling. T1 supplied it, and the row closed
+  the same day. Sequencing a task to sit immediately downstream of the evidence it needs is cheaper than
+  any amount of re-review.
+- **Running the checker instead of asserting the row worked.** The first cap cell read
+  `no numeric cap (ADR-026)` and `check-doc-caps.sh` scraped **026** out of the citation — the spec was
+  momentarily capped at 26 lines against 943. DoD 3 required *running* it, which is the only reason this
+  was caught (L-057).
+- **Counting the empty bucket.** `scope-out` reason (c) was expected to be the large category and came
+  out **zero**; every candidate was already `judgment-only` and never checkable. Without counting they
+  would have been double-counted as scoped-out work.
+- **Recognising the cap breach on the first hit, not the third.** When the supersession note pushed the
+  baseline to 133/130 I moved the explanation to the file that owns it rather than trimming — L-131,
+  applied one sprint after filing it.
+
+**Friction**
+- **The red-gate commit**, above. `dc67563` stays in history unamended with its correction beside it.
+- **The frozen baseline could not reproduce its own total**, and three artifacts disagreed five ways.
+  Every divergence is now recorded in `conformance-dispositions.md` § Divergences.
+- **Two rules have no classification at all** — `S4.INDEX` and `S5.DISCARDLOG`, both stated in the spec
+  and both missed by the SPRINT-072 inventory. Annotated `?` rather than marked, because inventing a
+  mark is exactly what D4 forbids. → **TASK-230**.
+- **A machine-read table cell will eat any digits you put in it.** → **TD-062**.
+- **Two research docs now sit at 129/130.** Not a breach and not squeezable; the next addition to either
+  splits.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`) — **L-120 promoted** (count 2 → CLAUDE.md
+edit-safety (c) gains the *action* form: a gate and the action it gates are two tool calls, because one
+call makes the check advisory by construction). **L-134 filed**: a derived artifact's total that cannot
+be reproduced from its own parts is not a rounding error but a signal the derivation was the defect —
+reconcile a figure *internally* before freezing it, because a frozen wrong number becomes a
+denominator. **L-135 filed**: a category you expect to be large that comes out empty is itself the
+finding, and only counting reveals it — an uncounted expectation silently inflates the work.

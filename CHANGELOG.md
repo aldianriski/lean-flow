@@ -11,6 +11,60 @@ status: current
 
 ---
 
+## v1.47.0 — The Spec as Rule Source (2026-08-16)
+
+MINOR — SPRINT-073, **15 of 15 DoD**, EPIC-004's second member sprint. **`spec/STANDARD.md` 0.3.0 →
+0.4.0.** The standard now tells you, in the file itself, which of its rules a tool can check — which is
+what makes "build a conformance checker from the spec" possible rather than aspirational.
+
+**What changed for you**
+
+- **Every normative rule carries its conformance level and whether it is checkable, in the spec.** Each
+  `## §N` ends with a **Conformance.** table listing that section's rules by a stable id (`S13.TRAILERS`,
+  `S2.F-CAP`, …), its level (Structural · Gated · Attested) and its mark. A new **§14** defines the
+  model. **Nothing existing was reworded, removed or renumbered** — the prose you pinned at 0.3.0 reads
+  identically; this adds a layer beside it (`+300 / −1`, and the one deletion is the version line).
+- **Four marks, and the middle two are not the same thing.** `mechanical` · `judgment-only` (**not
+  checkable in principle** — the standard is choosing a human) · `split` · `implementation-directed`. A
+  `judgment-only` rule is **not debt and never will be**; a `mechanical` rule with no checker is a gap
+  someone can close. Collapsing them reports the standard's deliberate boundaries as failures.
+- **Five rules must never be evaluated against your repository**, marked `implementation-directed` —
+  two of them §13's inference constraints (*a verifier may not conclude approval from an unsigned
+  trailer* · *author identity is not the attestation*). They bind a tool, not a repo. A checker reading
+  them as repo rules emits findings **you could never clear**.
+- **No percentage, no score, no grade — now stated normatively in §14**, so it binds your tools rather
+  than living in our notes. A ratio *improves* when the standard declines to automate something.
+- **Rule ids are stable across versions and are what a finding names**, so a report stays comparable as
+  the standard evolves. An id is retired, never reused. **A `?` mark is a real state** — two rules
+  (`S4.INDEX`, `S5.DISCARDLOG`) are stated but unclassified, and a tool reporting on them says so.
+- **`spec/STANDARD.md` carries no line cap, and §2 now says so** ([ADR-026]). If you were wondering why
+  the standard was absent from its own cap table: it is a ruling, not an oversight.
+
+**Maintainer-facing**
+
+- **The frozen baseline could not reproduce its own total.** SPRINT-072's `conformance-baseline.md`
+  states **96** rules while its `rules` column sums to **99** and its bucket columns to **98**. T1 halted
+  rather than pick one, and the owner ruling split the constraint: **transcribe the marks, re-derive the
+  count**. Re-derived from the spec: **98 classified + 2 unclassified**. Five divergences recorded in
+  `conformance-dispositions.md`. → **L-134**.
+- **Dispositions are 54, not 39** — 42 `build` (each naming the finding its check will fire) and 12
+  `scope-out` (each with its reason). Reconciled mechanically: no checkable rule is left undispositioned.
+- **A category expected to be large came out empty.** `scope-out` reason (c) — "mechanical but not worth
+  the false-positive rate" — has **zero** members; every candidate was already `judgment-only` and never
+  checkable. Uncounted, they would have been double-counted as scoped-out work. → **L-135**.
+- **TD-058 resolved after four sprints**, because T2 was ordered immediately downstream of the evidence
+  it needed rather than by priority.
+- **A cap cell will eat any digits you put in it.** `no numeric cap (ADR-026)` was parsed as a cap of
+  **26** — `FAIL cap spec/STANDARD.md (943 > 026)`. Caught only because the DoD required *running* the
+  checker. → **TD-062**.
+- **A commit went through a red gate**, because the line was `qa-check | tail && git commit` and `&&`
+  read `tail`'s status. Second sighting → **L-120 promoted** to `CLAUDE.md` edit-safety (c), which
+  already carried the caution and did not fire; the promotion adds the *action* form.
+
+[ADR-026]: docs/adr/ADR-026-standard-carries-no-line-cap.md
+
+---
+
 ## v1.46.0 — Conformance Baseline (2026-08-16)
 
 MINOR — SPRINT-072, **17 of 17 DoD**, EPIC-004's first member sprint. Nothing you install behaves
@@ -72,48 +126,4 @@ design and verified mechanically.
 
 ---
 
-## v1.45.0 — Cite, Not Restate (2026-08-16)
-
-MINOR — SPRINT-071, **14 of 14 DoD**, and the sprint that **completes EPIC-003**. The standard is now
-something you can pin *and* build against: the skills defer to it instead of restating it, and the
-spec defines the evidence each conformance level is checked on.
-
-**What changed for you**
-
-- **`spec/STANDARD.md` is at `0.3.0`, and §9 now defines what the Gated level is checked against.**
-  Two things were missing and would have stopped you building a conformance tool from the spec alone:
-  **`gates_signed: <GATE>[,<GATE>…] @ <sha>`** is now specified — including that its **absence means
-  NOT SIGNED** and is never approval, that the record belongs in the sprint file rather than in the
-  session that approved it, and that a malformed record is worse than none because it looks like
-  evidence. And the **`*Verify: …*` clause** on a DoD criterion is now specified, so a criterion with a
-  mechanical check is distinguishable from a judgment tick.
-- **The skills cite the standard instead of restating it.** Six sites across `council`, `prototype`,
-  `lean-doc-generator` and its `init` reference now point at §4 · §3 · §2 rather than repeating their
-  rules. If you have been reading a rule out of a skill file, read it from `spec/` now — that is the
-  copy that is maintained.
-- **Nothing you rely on moved.** Every converted line still tells you a rule applies and where it
-  lives; only the duplicated rule text is gone. Templates were deliberately left alone — a template is
-  rendered output read by someone who may not hold the spec at all.
-
-**Maintainer-facing**
-
-- **A dangling cross-reference inside the spec, live for a full sprint.** §13 pointed at "§9" for
-  `gates_signed:`; §9 never defined it. It survived authoring, review and a green gate, and was found
-  only by auditing the spec as a reader with no `skills/` access — every other path finds the field
-  documented in a skill and never notices the spec is silent. Filed as **L-129**, with **TD-060** for
-  the absent check: nothing verifies that a `§N` reference resolves.
-- **The sweep was 6 sites, not 15 files.** Inventorying first turned a plausible-sounding sweep into a
-  small edit — 39 candidate sites classified as 6 restatements · 25 already-citations · 8
-  legitimately-local. Four of the six *already cited* their section and restated it anyway, which is
-  the case a citation-presence check cannot see.
-- **A DoD frozen at promote was unsatisfiable as written** — its census came from summing eight
-  overlapping greps (`~121`) when the real figure was 39. Caught at G2 by re-derivation before any
-  task ran. Filed as **L-130**: a figure entering a frozen artifact is a query result and needs the
-  same second-query treatment, at the moment it is written.
-
-**EPIC-003 — The Standard: closed**, all five conditions met across SPRINT-069 · 070 · 071. Next in
-the sequence is **EPIC-004 Conformance**, which builds the engine this spec was made checkable for.
-
----
-
-_Older releases (**v1.44.0** and earlier) → [`CHANGELOG-1.44.0.md`](docs/changelog/CHANGELOG-1.44.0.md) → [`CHANGELOG-1.43.0.md`](docs/changelog/CHANGELOG-1.43.0.md) → [`CHANGELOG-1.42.0.md`](docs/changelog/CHANGELOG-1.42.0.md) → [`CHANGELOG-1.41.0.md`](docs/changelog/CHANGELOG-1.41.0.md) → [`CHANGELOG-1.40.0.md`](docs/changelog/CHANGELOG-1.40.0.md) → [`CHANGELOG-1.39.0.md`](docs/changelog/CHANGELOG-1.39.0.md) → [`CHANGELOG-1.38.0.md`](docs/changelog/CHANGELOG-1.38.0.md) → [`CHANGELOG-1.37.0.md`](docs/changelog/CHANGELOG-1.37.0.md) → [`CHANGELOG-1.36.0.md`](docs/changelog/CHANGELOG-1.36.0.md) → [`CHANGELOG-1.35.0.md`](docs/changelog/CHANGELOG-1.35.0.md) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._
+_Older releases (**v1.45.0** and earlier) → [`CHANGELOG-1.45.0.md`](docs/changelog/CHANGELOG-1.45.0.md) → [`CHANGELOG-1.44.0.md`](docs/changelog/CHANGELOG-1.44.0.md) → [`CHANGELOG-1.43.0.md`](docs/changelog/CHANGELOG-1.43.0.md) → [`CHANGELOG-1.42.0.md`](docs/changelog/CHANGELOG-1.42.0.md) → [`CHANGELOG-1.41.0.md`](docs/changelog/CHANGELOG-1.41.0.md) → [`CHANGELOG-1.40.0.md`](docs/changelog/CHANGELOG-1.40.0.md) → [`CHANGELOG-1.39.0.md`](docs/changelog/CHANGELOG-1.39.0.md) → [`CHANGELOG-1.38.0.md`](docs/changelog/CHANGELOG-1.38.0.md) → [`CHANGELOG-1.37.0.md`](docs/changelog/CHANGELOG-1.37.0.md) → [`CHANGELOG-1.36.0.md`](docs/changelog/CHANGELOG-1.36.0.md) → [`CHANGELOG-1.35.0.md`](docs/changelog/CHANGELOG-1.35.0.md) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._

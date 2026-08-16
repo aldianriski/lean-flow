@@ -18,15 +18,15 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-073 — The Spec as Rule Source** → [`docs/sprint/SPRINT-073-spec-as-rule-source.md`](docs/sprint/SPRINT-073-spec-as-rule-source.md) — EPIC-004's second member. Three tasks: annotate all 96 normative rules in `spec/STANDARD.md` with level + mark so the spec becomes the rule source D1 requires (TASK-227), then rule the spec's §2 cap with T1's growth measurement in hand (TASK-219 — the evidence TD-058 said it lacked), then give each of the 39 uncovered-mechanical rules an explicit build-or-scope-out disposition (TASK-229). Changes the spec and the baseline's disposition column; no checker, no engine. Gates not yet signed — `/orchestrator` runs G1+G2 first.
+> _(none — SPRINT-073 closed 2026-08-16, archived → [`docs/sprint/archive/SPRINT-073-spec-as-rule-source.md`](docs/sprint/archive/SPRINT-073-spec-as-rule-source.md))_
 >
-> **Read the baseline before executing.**
-> [`docs/research/conformance-baseline.md`](docs/research/conformance-baseline.md) is the frozen
-> artifact the engine is designed *against*, and it overturns the epic's opening premise: the eleven
-> checkers encode lean-flow's **project conventions**, not the standard — only 3 of the spec's 13
-> sections are referenced anywhere in `scripts/lib/`. Measured coverage is **8 covered · 39
-> uncovered-mechanical · 45 judgment-only · 6 implementation-directed across 96 rules** (counts, never
-> a ratio — EPIC-004 D1).
+> **`spec/STANDARD.md` §14 is the rule source now — read it, not the research tree.** The spec carries
+> every rule's level and mark in-file at **0.4.0**: **98 classified + 2 unclassified**, 62 checkable, 8
+> covered. Dispositions → [`docs/research/conformance-dispositions.md`](docs/research/conformance-dispositions.md)
+> (42 `build` with named findings · 12 `scope-out` with reasons).
+> [`conformance-baseline.md`](docs/research/conformance-baseline.md) is kept as the frozen record of
+> what SPRINT-072 measured; its § Coverage by section is **superseded**. Counts, never a ratio — and
+> §14 now states that normatively, so it binds adopters' tools too.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard (closed 2026-08-16** across
@@ -47,30 +47,25 @@ status: current
 
 ### P1 — Next Phase Required
 
-- [ ] TASK-227 — Carry the classification into `spec/STANDARD.md` so the spec is the rule source  [size: M] [risk: med] [HITL]
+- [ ] TASK-230 — Rule the two unclassified spec rules (`S4.INDEX` · `S5.DISCARDLOG`)  [size: S] [risk: low] [HITL]
       class:      decision
-      done-when:  every normative rule in `spec/STANDARD.md` carries its conformance level and its
-                  mechanical | judgment-only | implementation-directed mark **in the spec itself**, in
-                  a form a tool can read without the plugin present; EPIC-004 § Closed-when 2's
-                  *"marked judgment-only in the spec"* half is then genuinely satisfiable
-      touches:    spec/STANDARD.md · spec version (MINOR) · docs/adr/ if the annotation form is
-                  hard-to-reverse
+      done-when:  both rules carry a real mark in `spec/STANDARD.md` instead of `?`, and §14's counts
+                  are updated to match; if either is ruled `implementation-directed` the §14 count
+                  moves from "five carried, one pending" to six
+      touches:    spec/STANDARD.md (§4, §5, §14) · spec/CHANGELOG.md (PATCH — a mark is not a new rule) ·
+                  docs/research/conformance-dispositions.md (each gains a disposition once marked)
       depends-on: none
-      assumes:    **this is the engine's input, not a tidy-up after it.** EPIC-004 D1 says rules come
-                  from the spec rather than from code; SPRINT-072 measured that the spec currently
-                  carries no level, no mark and no finding name on any rule, so a "spec-driven" engine
-                  built first would hard-code the classification a second time — the wrapper-over-11-
-                  checkers outcome D3 rules out. The classification exists and is frozen
-                  (`docs/research/conformance-baseline.md`, 96 rules): this task *transcribes* it into
-                  the spec, and re-deriving it is out of scope. **The annotation form is the real
-                  decision** and is not pre-selected — price at least: inline markers vs a per-section
-                  table vs a sidecar machine-readable file · what it costs a human reading the spec as
-                  prose, since the spec is the artifact an adopter pins · whether an unannotated rule
-                  must be an error rather than a silent skip. The 6 implementation-directed rules must
-                  survive as a distinct mark: an engine that reads them as repo rules emits findings
-                  **no adopter can ever clear**
-      tracker:    EPIC-004 § Closed-when 2 (the unmet half) · EPIC-004 D1 · SPRINT-072 D3 ·
-                  docs/research/conformance-baseline.md § What the engine inherits
+      assumes:    **both are rules the SPRINT-072 inventory never saw**, found by SPRINT-073 T1 reading
+                  the spec directly. `S4.INDEX` — *"`DECISIONS.md` is a thin index linking them"* — is
+                  almost certainly Structural/mechanical and is left `?` only because D4 forbade
+                  inventing a mark. `S5.DISCARDLOG` is the harder one: the discard-log line binds a
+                  *generator's* output rather than a repository, making it a strong
+                  `implementation-directed` candidate — and that bucket is the one an engine must never
+                  evaluate against an adopter, so guessing it wrong emits findings nobody can clear.
+                  **A `?` is a real state and is reported as one**, so this is not urgent; it is
+                  unfinished. Do not bulk-rule them — the whole point of the mark is that it was judged
+      tracker:    spec/STANDARD.md §14 · docs/research/conformance-dispositions.md § Divergences ·
+                  SPRINT-073 T1 Execution Log · EPIC-004 § Closed-when 2
       origin:     close-retro
       state:      ready
 
@@ -95,26 +90,6 @@ status: current
                   built as a standalone check that the engine later absorbs — that ordering is the
                   first thing its design must rule on
       tracker:    EPIC-004 § Closed-when 4 · ADR-025 · spec/STANDARD.md §13 · L-058 · TD-012
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-229 — Rule on the 39 uncovered-mechanical rules: close each or scope it out  [size: M] [risk: low] [HITL]
-      class:      decision
-      done-when:  each of the 39 rules the baseline marks **mechanical but unchecked** carries an
-                  explicit disposition — a check to build, or a recorded ruling that it is out of scope
-                  for the engine with its reason — so that "uncovered" stops being one undifferentiated
-                  number
-      touches:    docs/research/conformance-baseline.md (dispositions) · docs/adr/ if the scoping is
-                  hard-to-reverse
-      depends-on: TASK-227
-      assumes:    **39 is a backlog, not a verdict**, and some of it should never be built: 7 of the 11
-                  existing checkers guard lean-flow's own conventions rather than the standard, and
-                  folding that instinct into the engine emits findings an adopter cannot act on. The
-                  ruling is per rule, not en bloc. **Do not convert this into a percentage or a
-                  completion score** (EPIC-004 D1) — the output stays counts plus dispositions, because
-                  a ratio that improves when the standard declines to automate something is backwards
-      tracker:    EPIC-004 § Closed-when 2 (the second unmet half) ·
-                  docs/research/conformance-baseline.md § Coverage by section
       origin:     close-retro
       state:      ready
 
@@ -145,29 +120,6 @@ status: current
      member sprint, never the whole epic, which spans sprints by definition. -->
 
 ### P2 — Quality / Polish
-
-- [ ] TASK-219 — Rule whether `spec/STANDARD.md` gets a §2 cap row, and which  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  `spec/STANDARD.md` either carries a §2 row whose cap `check-doc-caps.sh` derives and
-                  enforces, or an explicit recorded ruling that the spec is deliberately uncapped —
-                  either way the absence stops reading as an oversight, and the reasoning is written
-                  where the next reader of §2 finds it
-      touches:    spec/STANDARD.md (§2 table) · docs/adr/ if the ruling is hard-to-reverse
-      depends-on: none
-      assumes:    **the number is not derivable from this repo's history and that is the whole
-                  difficulty** — the file has never been capped, so there is no growth curve under a
-                  ceiling to reason from, while ADR-015 requires a stated cap to be a real number
-                  rather than a gesture. It is also self-referential: the standard would be capping
-                  itself, and whatever is chosen becomes a rule every adopter inherits with their pin.
-                  Candidates to price, none pre-selected: a soft cap with §6's tier-split escape
-                  (for a spec, that means numbered section files) · a hard cap, since an adopter's
-                  pin makes surprise growth expensive · an explicit "deliberately uncapped" ruling.
-                  Measured at filing: 587 lines, the largest governed doc in the repo, and
-                  `check-doc-caps.sh` reports zero rows for `spec/` because it derives coverage
-                  from §2 rather than hand-listing
-      tracker:    TD-058 · SPRINT-070 T1 Execution Log · A4 (flagged at promote; G1 scoped it out)
-      origin:     close-retro
-      state:      ready
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution
@@ -208,7 +160,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-072's shipped changes are written up as **v1.46.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.46.0 + v1.45.0** inline, with **v1.44.0 rotated** → [`docs/changelog/CHANGELOG-1.44.0.md`](docs/changelog/CHANGELOG-1.44.0.md) in the same commit. **The spec did not move** — 0.3.0 stands. That is the sprint's own D4 holding: SPRINT-072 measured the standard and changed nothing in it, which is why EPIC-004 § Closed-when 2 is recorded PARTIAL rather than ticked.
+_(no active sprint)_ — SPRINT-073's shipped changes are written up as **v1.47.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.47.0 + v1.46.0** inline, with **v1.45.0 rotated** → [`docs/changelog/CHANGELOG-1.45.0.md`](docs/changelog/CHANGELOG-1.45.0.md) in the same commit. **The spec moved and the plugin did not drive it**: `spec/STANDARD.md` **0.3.0 → 0.4.0** for the per-section Conformance tables and §14 — ADR-023's independent-versioning property doing its job for the third time.
 
 ---
 

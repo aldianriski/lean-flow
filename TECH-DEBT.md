@@ -32,6 +32,32 @@ status: current
 
 ## Tech Debt
 
+- **TD-062** severity: medium | status: open | created: Sprint-073
+  - Summary: **`check-doc-caps.sh` takes the first digit run anywhere in a §2 `Cap` cell as the cap
+    number, so any incidental digits become the limit.** Line 69 is
+    `if (match(cap, /[0-9]+/)) capn = substr(cap, RSTART, RLENGTH)`. Found live at SPRINT-073 T2: a cell
+    written `no numeric cap (ADR-026)` produced `FAIL cap spec/STANDARD.md (943 > 026)` — the spec was
+    momentarily capped at **26** lines by its own ADR citation. The existing non-numeric cells survive
+    only because none happens to contain an ASCII digit (`append-only`, `open rows only`, `—`, and
+    `no hard cap¹`, whose superscript is not `[0-9]`).
+  - Impact: **wrong in the dangerous direction, and silently.** A stray digit produces a *smaller* cap
+    than intended, so the failure mode is a permanent FAIL on a correct file — loud, and it was caught
+    in one run. But the same parse admits the quiet inverse: a cell reading `120 (was 100)` yields
+    **120**, and a footnote marker `2` before the number would yield **2**. There is no validation that
+    the extracted integer is the whole cell, so the checker cannot distinguish "this cell states a cap"
+    from "this cell contains a digit". Every §2 cap the repo enforces rests on that parse.
+  - Mitigation (**not yet derived**, L-091): "anchor the pattern to the whole cell" is the obvious move
+    and is probably most of it. Price at least: whether a cell must be *either* a bare integer *or* a
+    known non-numeric keyword, with **anything else reported as a named finding** rather than parsed
+    optimistically — silence is what made this reachable · whether `soft` / `hard` qualifiers stay
+    parseable alongside the integer (`320 soft`, `400 hard` are live and must keep working) · and
+    whether the same first-digit-run habit appears in the other §2-derived readers, which is a survey,
+    not an assumption. Note the interaction: EPIC-004's engine must parse §2's table anyway, so this
+    may be subsumed rather than fixed in place.
+  - Tracker: SPRINT-073 T2 Execution Log · `scripts/lib/check-doc-caps.sh:69` · **ADR-026** (the ruling
+    that surfaced it) · L-057 (found only because the DoD required *running* the checker) · L-108
+    (a matcher anchored by shape, not by substring — the same lesson one level down)
+
 - **TD-061** severity: medium | status: open | created: Sprint-072
   - Summary: **`check-doc-caps.sh` expands §2's `research/<slug>.md` into a non-recursive glob, so any
     file under a `docs/research/` subdirectory is uncapped and unreported.** Probed live at SPRINT-072's
