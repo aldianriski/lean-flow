@@ -57,6 +57,12 @@ fail=0
 ok()   { printf 'PASS  %s\n' "$1"; }
 bad()  { fail=1; printf 'FAIL  %s\n' "$1"; }
 skip() { printf 'SKIP  %s\n' "$1"; }   # never flips $fail -- a SKIP is not a FAIL (TD-026)
+note() { printf '      %s\n' "$1"; }
+
+# A bare invocation (no sprint files) previously fell straight into `for sp in "$@"` over an empty
+# list: zero output, exit 0 -- reading as a silent pass rather than "nothing was checked" (TD-056,
+# one of exactly two check-*.sh sharing this shape). Cure matches check-gates-signed.sh's note-line.
+[ "$#" -gt 0 ] || { note "layers observed: no sprint files given -- nothing verified"; exit 0; }
 
 # --- attribution: who changed this path (SPRINT-049 T1, TD-031 · TD-035) ------------------------
 # The check used to ask "did SOME task declare this file?" against one union of every task's

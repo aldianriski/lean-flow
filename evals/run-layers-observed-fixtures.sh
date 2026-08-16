@@ -40,6 +40,16 @@ if wwork=$(cd "$work" && pwd -W 2>/dev/null) && [ -n "$wwork" ]; then work=$wwor
 
 fail=0
 
+# --- case 0: bare invocation (no sprint files) -- must-note, exit 0 (TD-056, SPRINT-069 T4) -------
+# Previously `for sp in "$@"` over an empty arg list printed nothing and exited 0 -- a silent pass
+# indistinguishable from a real clean run. This proves the guard fires: run the checker with zero
+# arguments and require the "nothing verified" note, at exit 0 (never non-zero -- the guarded
+# siblings note at exit 0, and qa-check.sh always supplies arguments so this leg never touches the
+# gate path). No throwaway git repo needed -- the guard returns before any git command runs.
+run_case_anywhere "bare-invocation-notes-nothing-verified" 0 \
+  "layers observed: no sprint files given -- nothing verified" -- \
+  sh "$checker"
+
 commit_all() {  # commit_all <dir> <message> -- stage everything, commit with a fixed fixture identity
   git -C "$1" add -A
   git -C "$1" -c user.name='Fixture Bot' -c user.email='fixture@example.com' commit -q -m "$2" >/dev/null

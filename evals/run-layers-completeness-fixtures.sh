@@ -26,6 +26,16 @@ checker="$repo_root/scripts/lib/check-layers-completeness.sh"
 
 fail=0
 
+# --- case 0: bare invocation (no sprint files) -- must-note, exit 0 (TD-056, SPRINT-069 T4) -------
+# Previously `for sp in "$@"` over an empty arg list printed nothing and exited 0 -- a silent pass
+# indistinguishable from a real clean run. This proves the guard fires: run the checker with zero
+# arguments and require the "nothing verified" note, at exit 0 (never non-zero -- the guarded
+# siblings note at exit 0, and qa-check.sh always supplies arguments so this leg never touches the
+# gate path).
+run_case_anywhere "bare-invocation-notes-nothing-verified" 0 \
+  "layers completeness: no sprint files given -- nothing verified" -- \
+  sh "$checker"
+
 # --- case 1: SPRINT-041 reconstructed -- TD marked resolved implies TECH-DEBT.md, undeclared -----
 run_case_anywhere "sprint-041-reconstructed" 1 \
   "Layers completeness: DoD/Acceptance implies TECH-DEBT.md(TD-marked-resolved), absent from Layers: -- if the prose only cites it rather than touching it, declare it on a Cites: line" -- \
