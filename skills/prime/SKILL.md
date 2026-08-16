@@ -20,7 +20,7 @@ Ordered context loader + health check. One-shot session priming. Read-only — n
 ## Read order
 
 Read each that exists, in order. Mark `[OK]` / `[MISSING]` per item. All are optional —
-absence is reported, never fatal. Canonical placement (DOCS_Guide §2) is listed first; legacy
+absence is reported, never fatal. Canonical placement (STANDARD §2) is listed first; legacy
 locations second. Adapt the globs to the host project's layout.
 
 | # | Path (first match wins) | Purpose |

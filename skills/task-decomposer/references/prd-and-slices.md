@@ -5,7 +5,7 @@ synthesize a working feature PRD, then cut it into tracer-bullet slices that bec
 entries. Output is **local**: `TODO.md` Backlog, never an external tracker.
 
 > **Scope of the format below — read this before using it.** It is a **working feature PRD**: intake
-> scaffolding you slice against, *not* a DOCS_Guide §2 core file. It is deliberately different from
+> scaffolding you slice against, *not* a STANDARD §2 core file. It is deliberately different from
 > `docs/product/requirements.md`, which is the durable, **project**-scoped requirements doc owned by
 > `/lean-doc-generator prd` (Users · Functional / Non-functional requirements). One is per-feature and
 > disposable; the other is per-project and durable. The pipeline runs **feature PRD → sanitize →
@@ -54,7 +54,7 @@ Anything else worth recording.
 ```
 
 **Durable home mapping** — after approval, fold the PRD into `docs/product/requirements.md` +
-`acceptance-criteria.md` (DOCS_Guide §2): Problem/Solution/User Stories → numbered `R-n` functional
+`acceptance-criteria.md` (STANDARD §2): Problem/Solution/User Stories → numbered `R-n` functional
 requirements · Testing Decisions → acceptance-criteria blocks keyed to those `R-n`. Sanitize first
 (no client-confidential content). The raw PRD is intake working material — no durable file of its own.
 

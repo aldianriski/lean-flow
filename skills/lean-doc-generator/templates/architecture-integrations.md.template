@@ -5,7 +5,7 @@ update_trigger: An integration is added or changed
 status: current
 ---
 
-<!-- Lives at docs/architecture/integrations.md (DOCS_Guide §2, ADR-012). Backend/integration
+<!-- Lives at docs/architecture/integrations.md (STANDARD §2, ADR-012). Backend/integration
      tier row — fires on the first external integration. Companion to architecture-overview.md;
      API contract itself lives at api/openapi.yaml (placement rule, no template). -->
 

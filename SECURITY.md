@@ -7,7 +7,7 @@ status: current
 
 # lean-flow — Security
 
-<!-- Divergence from SECURITY.md.template, noted per DOCS_Guide §2's template-as-canonical rule:
+<!-- Divergence from SECURITY.md.template, noted per STANDARD §2's template-as-canonical rule:
      the template's Authentication, Logging-restrictions and PII sections are stated as
      not-applicable with their reason rather than dropped silently, and "Secure coding" is replaced
      by "What this plugin can do in your repo" — the honest threat surface for a skill library that
@@ -58,7 +58,7 @@ no lockfile to audit and no scanner to run, because there is nothing installed t
 ## Not applicable — and why
 
 - **Authentication / authorization** — the plugin has no auth surface, which is why no
-  `docs/architecture/authentication.md` exists (DOCS_Guide §6 gates that row on auth existing).
+  `docs/architecture/authentication.md` exists (STANDARD §6 gates that row on auth existing).
 - **Logging restrictions** — nothing here writes logs.
 - **PII handling** — nothing here touches personal data. Doc templates use sanitized example values.
 

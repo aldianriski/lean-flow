@@ -1,6 +1,6 @@
 ---
 name: council
-description: "Run a high-stakes, hard-to-reverse, or ambiguous decision through a council of 5 AI advisors who independently analyze it, peer-review each other anonymously, and synthesize a final verdict to a lean verdict-<slug>.md. The opt-in decision aid for genuinely hard forks — the pressure-test before an ADR (DOCS_Guide §4) or a G2 design call. Based on Karpathy's LLM Council. Uses sub-agents (≈11 model calls/run) — reserve for decisions where being wrong is expensive, NOT every choice. MANDATORY TRIGGERS: 'council this', 'run the council', 'war room this', 'pressure-test this', 'stress-test this', 'debate this'. STRONG TRIGGERS (with a real decision/tradeoff): 'should I X or Y', 'which option', 'what would you do', 'is this the right move', 'validate this', 'get multiple perspectives', 'I can't decide', 'I'm torn between'. Do NOT trigger on simple yes/no questions, factual lookups, or casual 'should I' without a meaningful tradeoff."
+description: "Run a high-stakes, hard-to-reverse, or ambiguous decision through a council of 5 AI advisors who independently analyze it, peer-review each other anonymously, and synthesize a final verdict to a lean verdict-<slug>.md. The opt-in decision aid for genuinely hard forks — the pressure-test before an ADR (STANDARD §4) or a G2 design call. Based on Karpathy's LLM Council. Uses sub-agents (≈11 model calls/run) — reserve for decisions where being wrong is expensive, NOT every choice. MANDATORY TRIGGERS: 'council this', 'run the council', 'war room this', 'pressure-test this', 'stress-test this', 'debate this'. STRONG TRIGGERS (with a real decision/tradeoff): 'should I X or Y', 'which option', 'what would you do', 'is this the right move', 'validate this', 'get multiple perspectives', 'I can't decide', 'I'm torn between'. Do NOT trigger on simple yes/no questions, factual lookups, or casual 'should I' without a meaningful tradeoff."
 argument-hint: "[the decision to pressure-test]"
 allowed-tools: Read, Write, Glob, Grep, Agent, Task
 user-invocable: true
@@ -51,7 +51,7 @@ All sub-agent prompt templates are in **`${CLAUDE_SKILL_DIR}/references/prompts.
 5. **Write the verdict (lean).** Present in chat AND write **only the verdict** (sections per prompts.md) to `verdict-<slug>.md` — use the slug the ADR will use. Default to the OS temp dir; repo only if asked. Never dump the full transcript.
    If the verdict will be **referenced by a durable doc** (ADR, TODO tracker, sprint file), copy it to
    `docs/research/verdict-<slug>.md` first and reference *that* path — a temp-dir path never lands in a durable doc.
-6. **Feed forward.** The verdict is a decision *input*, not a record. Hard-to-reverse + surprising + a real trade-off → fold the recommendation + alternatives into an **ADR** (`docs/adr/`, DOCS_Guide §4), then the verdict file can be deleted. Don't accumulate stale verdicts.
+6. **Feed forward.** The verdict is a decision *input*, not a record. Hard-to-reverse + surprising + a real trade-off → fold the recommendation + alternatives into an **ADR** (`docs/adr/`, STANDARD §4), then the verdict file can be deleted. Don't accumulate stale verdicts.
 
 ## Conditional passes (gated — off by default)
 

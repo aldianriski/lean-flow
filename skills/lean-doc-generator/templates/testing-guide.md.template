@@ -5,7 +5,7 @@ update_trigger: Strategy, harness, or coverage rule changes
 status: current
 ---
 
-<!-- Lives at docs/testing/testing-guide.md (DOCS_Guide §2, ADR-012). Base-tier — created once a
+<!-- Lives at docs/testing/testing-guide.md (STANDARD §2, ADR-012). Base-tier — created once a
      test harness exists. Strategy + conventions, never a line-by-line HOW of individual tests. -->
 
 # [Project Name] — Testing Guide [CUSTOMIZE]

@@ -56,7 +56,7 @@ ethos. **1 follow-up filed: TASK-058.**
   local web server + scripts is exactly the scaffold lean-flow refuses; `/prototype` covers "feel the
   design" without a resident process.
 - **`docs/superpowers/specs/…` + `.superpowers/` conventions** — lean-flow already has doc placement
-  (DOCS_Guide §2); no second convention.
+  (STANDARD §2); no second convention.
 - **`writing-plans` / `elements-of-style` sub-skill dependencies** — external skill graph; native
   `/plan` and the doc standard cover it.
 

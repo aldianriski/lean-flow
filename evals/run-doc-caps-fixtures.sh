@@ -1,7 +1,7 @@
 #!/bin/sh
 # run-doc-caps-fixtures.sh -- must-FAIL fixtures for scripts/lib/check-doc-caps.sh (TD-041).
 #
-# The checker replaces four hand-listed globs in qa-check.sh with coverage DERIVED from DOCS_Guide
+# The checker replaces four hand-listed globs in qa-check.sh with coverage DERIVED from STANDARD
 # §2. Two of the cases below exist because a derivation has two distinct ways to lie:
 #   (a) it can under-report a file that IS over its stated cap -- the ordinary must-FAIL leg;
 #   (b) it can silently drop a §2 row it failed to parse, which is hand-listing again with the

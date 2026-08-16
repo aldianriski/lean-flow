@@ -5,7 +5,7 @@ update_trigger: Authn/authz architecture changes
 status: current
 ---
 
-<!-- Lives at docs/architecture/authentication.md (DOCS_Guide §2, ADR-012). Auth-exists
+<!-- Lives at docs/architecture/authentication.md (STANDARD §2, ADR-012). Auth-exists
      substrate-conditional row. Architecture-level model only — the policy (who's allowed to do
      what, secret handling, vuln reporting) lives in SECURITY.md; never duplicate it here. -->
 

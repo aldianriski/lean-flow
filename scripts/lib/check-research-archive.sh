@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# check-research-archive.sh -- enforces DOCS_Guide §11's research retention row (SPRINT-055 T3,
+# check-research-archive.sh -- enforces STANDARD §11's research retention row (SPRINT-055 T3,
 # TASK-168).
 #
 # Before T3, `close`'s compaction sweep said "superseded/duplicated research -> supersede note or

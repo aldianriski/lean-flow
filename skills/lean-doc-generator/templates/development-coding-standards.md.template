@@ -5,7 +5,7 @@ update_trigger: A convention is adopted or changed (mirror what config enforces 
 status: current
 ---
 
-<!-- Lives at docs/development/coding-standards.md (DOCS_Guide §2, ADR-012). Base-tier — created
+<!-- Lives at docs/development/coding-standards.md (STANDARD §2, ADR-012). Base-tier — created
      at init. Records only what config CANNOT express: the WHY behind a convention and the
      patterns config can't enforce. Never re-list a rule already enforced by .editorconfig /
      .eslintrc / .prettierrc / commitlint — see the closing note. -->

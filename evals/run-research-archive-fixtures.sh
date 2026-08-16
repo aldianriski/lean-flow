@@ -1,6 +1,6 @@
 #!/bin/sh
 # run-research-archive-fixtures.sh -- must-FAIL/must-PASS fixtures for
-# scripts/lib/check-research-archive.sh, the checker qa-check.sh delegates DOCS_Guide §11's research
+# scripts/lib/check-research-archive.sh, the checker qa-check.sh delegates STANDARD §11's research
 # retention row to (SPRINT-055 T3, TASK-168).
 #
 # `close`'s compaction sweep said "superseded/duplicated research -> supersede note or archive" while

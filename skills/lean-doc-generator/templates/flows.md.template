@@ -5,7 +5,7 @@ update_trigger: This flow changes
 status: current
 ---
 
-<!-- Lives at docs/flows/<slug>.md (DOCS_Guide §2, ADR-012) — medium/complex tier. ONE FILE PER
+<!-- Lives at docs/flows/<slug>.md (STANDARD §2, ADR-012) — medium/complex tier. ONE FILE PER
      FLOW, kebab-case slug named after the flow itself (e.g. authentication-flow.md,
      checkout-flow.md) — never a single shared flows.md. Created when a flow needs shared
      understanding across more than one person; WHY/WHERE-level steps, never a line-by-line

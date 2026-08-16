@@ -108,7 +108,10 @@ leaving a rule stated in two places.
       unrepresentative — stale base, see the Log)
 
 ### T3 — Sweep the standard's textual section citations to the new name `[size: M · risk: low · class: mechanical-ingest · AFK]`
-Layers: `skills/` · `skills/lean-doc-generator/templates/` · `docs/` · `scripts/lib/` · `evals/`
+Layers: `skills/` · `skills/lean-doc-generator/templates/` · `docs/` · `scripts/lib/` · `evals/` ·
+        `AGENTS.md` · `scripts/qa-check.sh`   (both added mid-sprint — L-100, logged: the sweep
+        reaches root files and the gate script's own comments, which a directory-level declaration
+        written at promote does not cover)
 Depends-on: T2 · T4
 Cites: ADR-023 (a name lagging is not a rule stated twice — which is why this is separate) ·
        L-118 (a single query's zero means clean **or** unreached) · L-009 (re-read the whole
@@ -119,13 +122,29 @@ into a ~70-file commit — the shape where a structure-adjacent edit fuses neigh
 **Acceptance:** no live surface cites the standard by its pre-extraction document name.
 
 **DoD:**
-- [ ] The citation set re-derived at execution, never read off this Plan — *Verify: two queries that
+- [x] The citation set re-derived at execution, never read off this Plan — *Verify: two queries that
       reconcile (total mentions = renamed + legitimately-unchanged); a bare zero is not evidence*
-- [ ] History deliberately not swept — archived sprints, rotated changelogs, the generated index —
-      *Verify: those paths appear in the unchanged column of the reconciliation, by name*
-- [ ] Every touched table row / list entry re-read whole after editing (L-009) —
+      ✓ re-derived **140 live** (the Plan's 128 was an estimate and was not used). Before:
+      live 140 + history 276 = 416. After: live 54 + history 276 = 330. **86 sites swept** = 88
+      sweepable − 2 reverted. Both totals reconcile in both directions
+- [ ] **Frozen and historical surfaces deliberately not swept** — archived sprints · rotated
+      changelogs · the generated index · append-only ADRs · past `LEARNINGS` entries · `superseded`
+      research · past `TECH-DEBT` rows · this sprint's own frozen Plan and append-only Log ·
+      fixture data. *(Exclusion clause amended 2026-08-16 from three categories to nine, owner-ruled,
+      scope-change logged: the original was unsatisfiable — see the Log.)*
+      *Verify: each class appears in the unchanged column of the reconciliation, by name, with the
+      rule that freezes it*
+      ✓ 54 unswept live mentions account for exactly: 42 frozen (14 ADR · 10 LEARNINGS · 9
+      superseded research · 3 TD rows · 4 this Plan+Log · 2 changelog/index/fixture) + 10 fixture
+      **data filenames** in `run-doc-caps-fixtures.sh` (throwaway temp paths, not citations) + 2
+      historical statements reverted after the sweep corrupted them (below)
+- [x] Every touched table row / list entry re-read whole after editing (L-009) —
       *Verify: block re-read; the gate's schema + cap legs green*
-- [ ] Gate green — *Verify: `sh scripts/qa-check.sh`*
+      ✓ mechanical check rather than eyeballing: `git diff --numstat` — every one of the 54 swept
+      files shows added == deleted, so no row was fused or dropped (a fusion changes the balance).
+      The only imbalance in the diff is this Plan's own amended DoD (+7 −2), which is intended
+- [x] Gate green — *Verify: `sh scripts/qa-check.sh`*
+      ✓ **151 pass / 0 fail**
 
 ### T4 — Guard the two Layers-family checkers against bare invocation `[size: S · risk: low · class: execution · AFK]`
 Layers: `scripts/lib/check-layers-completeness.sh` · `scripts/lib/check-layers-observed.sh` ·

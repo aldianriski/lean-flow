@@ -47,7 +47,7 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
    - **stamp `origin:` on every task you file here** — a bug converted at triage never met the intake
      grill, and the stamp is what stops G1 fast-pathing it on the strength of looking well-formed
    - **then the report itself is done.** A `BUG-<slug>.md` is temp-dir intake scaffolding, never a
-     committed doc (DOCS_Guide §2): once its repro and verdict live in the destination, the file has
+     committed doc (STANDARD §2): once its repro and verdict live in the destination, the file has
      no durable home to be moved to. Carry anything still load-bearing — repro steps especially —
      **into** the `TASK`/`TD`/`/diagnose` brief rather than pointing back at a file that will vanish.
 4. **Re-rank** — re-evaluate each task's P0–P3 tier; propose moves with a one-line reason each. Order within a tier by dependency, then impact × urgency.

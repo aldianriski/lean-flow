@@ -20,7 +20,7 @@ SSOT for every standard-owned rule (ADR-023).
 | Explains… | Goes in… |
 |---|---|
 | HOW it works | code (comments, types, tests) |
-| WHY decided | a rich ADR — one file at `docs/adr/ADR-NNN-<slug>.md` (`templates/ADR.md.template`); add a row to the `docs/DECISIONS.md` index. Offer one only when hard-to-reverse **and** surprising **and** a real trade-off (DOCS_Guide §4) |
+| WHY decided | a rich ADR — one file at `docs/adr/ADR-NNN-<slug>.md` (`templates/ADR.md.template`); add a row to the `docs/DECISIONS.md` index. Offer one only when hard-to-reverse **and** surprising **and** a real trade-off (STANDARD §4) |
 | WHERE things live | `docs/architecture/overview.md` or `README.md` |
 | WHAT changed | `CHANGELOG.md` (root) |
 | Unsure | code |
@@ -70,8 +70,8 @@ allowlist → `${CLAUDE_SKILL_DIR}/references/init.md`.
 3. **Staleness scan** — read existing docs; flag any with a stale/missing ownership header before using them as a source.
 4. **Read manifests** — `package.json` / `pyproject.toml` / `go.mod` etc. + existing docs. If inaccessible, ask the user to paste the file tree + manifest.
 5. **HOW filter** — discard anything that explains implementation; keep WHY / WHERE / WHAT only.
-6. **Template-load protocol** *(this is the step that, when skipped, produces wrong docs)* — for each core file, **Read `${CLAUDE_SKILL_DIR}/templates/<X>.md.template` BEFORE writing**. Match its frontmatter order, section order, and placeholders; replace `[CUSTOMIZE]` / `[bracket]` tokens with real content. If the template is missing, WARN and fall back to `DOCS_Guide.md §2` — never hard-stop. Template wins on any divergence; note the correction inline.
-7. **Write** — target the canonical placement (DOCS_Guide §2: root for README/TODO · `.claude/` for AI-context · `docs/` for the rest); enforce the line cap and the ownership header on every file touched. **If the project maintains a generated knowledge index, regenerate it after writing a metadata-carrying doc (LEARNINGS · ADR · research)** — a derived view, never hand-edited (lean-flow itself: `sh scripts/gen-index.sh` → `docs/knowledge-index.md`).
+6. **Template-load protocol** *(this is the step that, when skipped, produces wrong docs)* — for each core file, **Read `${CLAUDE_SKILL_DIR}/templates/<X>.md.template` BEFORE writing**. Match its frontmatter order, section order, and placeholders; replace `[CUSTOMIZE]` / `[bracket]` tokens with real content. If the template is missing, WARN and fall back to `STANDARD.md §2` — never hard-stop. Template wins on any divergence; note the correction inline.
+7. **Write** — target the canonical placement (STANDARD §2: root for README/TODO · `.claude/` for AI-context · `docs/` for the rest); enforce the line cap and the ownership header on every file touched. **If the project maintains a generated knowledge index, regenerate it after writing a metadata-carrying doc (LEARNINGS · ADR · research)** — a derived view, never hand-edited (lean-flow itself: `sh scripts/gen-index.sh` → `docs/knowledge-index.md`).
 8. **Close** — list docs delivered + headers to verify + recommended follow-ups.
 
 ## Creates vs consumes (the boundary)
@@ -91,7 +91,7 @@ route to `/task-decomposer --fog`. *Yes, and it fits one sprint?* → it is a sp
 nameable outcome that genuinely spans sprints earns a file. Created here; **consumed** by
 `/task-decomposer --epic`, which never creates one. Member sprints are appended at promote and
 completed at close (Sprint lifecycle below); the epic closes only when every § Closed-when condition
-is `[x]`, not when its last sprint closes. Retention → DOCS_Guide §11.
+is `[x]`, not when its last sprint closes. Retention → STANDARD §11.
 
 ## Sprint lifecycle
 
@@ -106,7 +106,7 @@ one pointer per stream in TODO § Active Sprint); single-stream repos omit it �
 | executing during a sprint | Tick DoD `[x]` as each passes; **append to the Execution Log sibling (`docs/sprint/logs/`, rendered lazily from `templates/sprint-log.md.template` at the first entry), never edit § Plan** (the plan is frozen); keep Files Changed current |
 | "close" / "sprint done" | Verify all DoD `[x]`; **sweep the full session** (Execution Log + any TD/follow-up surfaced mid-run but not yet filed) for the buckets; write the **Retro** + route its buckets (§10); set `status: closed` + `close_commit`; clear that stream's pointer in TODO § Active Sprint; **run §11 retention as one propose→approve pass** — apply only on owner approval: **archival pass** (move closed sprint → `docs/sprint/archive/` **and its log → `docs/sprint/archive/logs/` in the same commit** + a line in `docs/sprint/INDEX.md` · **if a rolled-up epic now has every member sprint closed AND every § Closed when `[x]`, move it → `docs/epic/archive/` and keep its `INDEX.md` row, re-basing its relative links one level deeper** — never on member-sprint count alone (§11) · remove shipped tasks' Backlog entries outright, no shipped-in comments · scrub remaining TODO.md refs to the closed SPRINT-NNN outside § Active Sprint · verify CHANGELOG rotation links resolve) + **compaction sweep** (periodic, same gate: promoted `L-NNN` bodies → one-line pointers; superseded/duplicated research → set `status: superseded`, then move → `docs/research/archive/` **only once nothing live still cites it** (§11); measured line delta reported); **doc-freshness check** — map Files Changed against §2 update triggers and propose refreshes for affected docs (propose→approve, never silent); squash-commit `sprint(N): <summary>`; then **fixes-only → `/release-patch` (PATCH) · feature sprint → MINOR by hand** (release-patch is PATCH-only). **If the sprint carries `epic:`, roll up before committing**: complete its row in that epic's § Member sprints (status · `close_commit` · *what it contributed*, not a restatement of the theme), re-check the epic's § Closed when, and close the epic only when **every** condition is `[x]` — a member sprint closing is not an epic closing |
 
-**Retro at close** — first **sweep the full session** (the Execution Log + any TD/follow-up surfaced mid-run but not yet filed), then sort the sprint into four buckets and **route each to its durable home** (DOCS_Guide §10):
+**Retro at close** — first **sweep the full session** (the Execution Log + any TD/follow-up surfaced mid-run but not yet filed), then sort the sprint into four buckets and **route each to its durable home** (STANDARD §10):
 Shipped → `CHANGELOG.md` (root; legacy `docs/`) · Tech debt → `TD-NNN` in root `TECH-DEBT.md` · Follow-ups → `TASK-NNN` in TODO § Backlog **stamped `origin: close-retro`** (filed from a Retro, never grilled at intake — the stamp is what denies them G1's fast-path) · Learnings → `L-NNN` in `docs/LEARNINGS.md`. **Auto-file all four** (per `templates/LEARNINGS.md.template`); show the user what was filed.
 **Unattended** — close splits: the Retro, the four-bucket auto-file, `close_commit`, and clearing the stream pointer are **additive → they run**; §11 retention (archive · move · prune · compact) and the doc-freshness propose→approve are **lossy or approval-bound → they park** for the morning. Never approve your own retention pass to "finish the close".
 

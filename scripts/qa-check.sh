@@ -19,7 +19,7 @@ note() { printf '      %s\n' "$1"; }
 ok()   { pass=$((pass + 1)); printf 'PASS  %s\n' "$1"; }
 bad()  { fail=$((fail + 1)); printf 'FAIL  %s\n' "$1"; }
 
-# --- 1. Line caps (DOCS_Guide section 2) ------------------------------------
+# --- 1. Line caps (STANDARD section 2) ------------------------------------
 cap() { # <file> <maxlines>
   f=$1; max=$2
   [ -f "$f" ] || { note "skip (missing): $f"; return; }
@@ -27,7 +27,7 @@ cap() { # <file> <maxlines>
   if [ "$n" -le "$max" ]; then ok "cap $f ($n <= $max)"; else bad "cap $f ($n > $max)"; fi
 }
 
-# DERIVED from DOCS_Guide §2, not hand-listed (SPRINT-056 T2, TD-041). The four globs that used to
+# DERIVED from STANDARD §2, not hand-listed (SPRINT-056 T2, TD-041). The four globs that used to
 # sit here covered 17 files; §2 states a cap on far more rows than that, and every unlisted row was a
 # cap with nothing behind it. `docs/research/` drifted 39 lines unnoticed across four sprints in
 # exactly that gap. Adding one more glob would have fixed that file and left the mechanism intact.
@@ -64,7 +64,7 @@ else
   fi
 fi
 
-# --- 2b. Epic retention (DOCS_Guide section 11, both directions) -------------------------------
+# --- 2b. Epic retention (STANDARD section 11, both directions) -------------------------------
 # The §11 epic-archive row shipped with the epic layer and `close` never executed it, so the rule
 # had never run once: EPIC-001 sat closed and fully ticked in docs/epic/ across five sprints with
 # every gate green (SPRINT-055 T2). Delegates to scripts/lib/check-epic-archive.sh, covered by
@@ -89,7 +89,7 @@ else
   fi
 fi
 
-# --- 2c. Research retention (DOCS_Guide section 11) ---------------------------------------------
+# --- 2c. Research retention (STANDARD section 11) ---------------------------------------------
 # close's compaction sweep pointed at an "or archive" target §11 never defined (SPRINT-055 T3).
 # Delegates to scripts/lib/check-research-archive.sh, covered by evals/run-research-archive-
 # fixtures.sh. Conservative by design: supersession alone does not license archiving, because a spent
@@ -112,7 +112,7 @@ else
   fi
 fi
 
-# --- 2d. Ephemeral intake artifacts (DOCS_Guide section 2 temp-dir rule) -------------------------
+# --- 2d. Ephemeral intake artifacts (STANDARD section 2 temp-dir rule) -------------------------
 # A BUG-<slug>.md report is temp-dir intake scaffolding, never committed (SPRINT-055 T4). §2 used to
 # describe the report's CONTENT as "routed away at /triage" and say nothing about the file, so
 # "undisposed" was not expressible and could not be checked. Under the temp-dir rule a committed
@@ -238,7 +238,7 @@ for d in TODO.md .claude/CLAUDE.md .claude/CONTEXT.md docs/architecture/overview
   then ok "ownership $d"; else bad "ownership $d (need owner/last_updated/status)"; fi
 done
 
-# README.md carries ownership as a FOOTER LINE, not YAML frontmatter (DOCS_Guide exception).
+# README.md carries ownership as a FOOTER LINE, not YAML frontmatter (STANDARD exception).
 if [ -f README.md ]; then
   if grep -qE '^<sub>.*Doc owner:.*last updated.*status:.*</sub>$' README.md
   then ok "ownership README.md (footer line)"

@@ -9,14 +9,14 @@
   front-door a person lands on (promotion is legitimate here). Agent-facing context (project
   shape, vocabulary, anti-patterns) lives in CLAUDE.md / CONTEXT.md instead, not here.
 
-  No hard line cap (DOCS_Guide §2 footnote) — this is the full front-door; keep every line
+  No hard line cap (STANDARD §2 footnote) — this is the full front-door; keep every line
   signal-dense (LAW 4), not short for its own sake.
 
   ANTI-SSOT RULE: this README PRESENTS (prose, diagrams, summaries, links) — it never
   byte-duplicates a volatile table/list that already lives in CONTEXT.md or another SSOT doc.
   Summarize + link instead (ADR-007 pattern) if a section below tempts a table that will drift.
 
-  Ownership stays a footer line, not top YAML frontmatter (DOCS_Guide §3 README exception),
+  Ownership stays a footer line, not top YAML frontmatter (STANDARD §3 README exception),
   so the rendered page leads with the project, not a metadata block.
 -->
 
@@ -111,5 +111,5 @@ Full map: [`docs/architecture/overview.md`](docs/architecture/overview.md)
 [MIT — see [LICENSE](LICENSE).] <!-- CUSTOMIZE -->
 
 <sub>Doc owner: [role] · last updated: YYYY-MM-DD · status: current · v[X.Y.Z]</sub>
-<!-- footer ownership — not top frontmatter (DOCS_Guide §3 README exception); the one
+<!-- footer ownership — not top frontmatter (STANDARD §3 README exception); the one
      other invariant besides anti-SSOT above -->

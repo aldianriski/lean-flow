@@ -1,6 +1,6 @@
 #!/bin/sh
 # run-epic-archive-fixtures.sh -- must-FAIL/must-PASS fixtures for scripts/lib/check-epic-archive.sh,
-# the checker qa-check.sh delegates DOCS_Guide §11's epic retention row to (SPRINT-055 T2, TASK-167).
+# the checker qa-check.sh delegates STANDARD §11's epic retention row to (SPRINT-055 T2, TASK-167).
 #
 # The §11 row shipped with the epic layer and `close` never executed it, so the rule had never run
 # once -- EPIC-001 sat closed and fully ticked in docs/epic/ across five sprints while every gate

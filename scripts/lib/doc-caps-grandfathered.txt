@@ -4,7 +4,7 @@
 # The check still bites. actual > recorded -> FAIL (it grew under the clause). cap < actual <=
 # recorded -> reported, named, tracked. actual <= cap -> PASS and the row is told to delete itself.
 #
-# HARD CAPS ONLY (ADR-015, SPRINT-058 T1). A soft cap ("~N" / "N soft" in DOCS_Guide §2) already has
+# HARD CAPS ONLY (ADR-015, SPRINT-058 T1). A soft cap ("~N" / "N soft" in STANDARD §2) already has
 # a route: the checker's soft branch reports the breach on every run and §11 sends it to the promote
 # governance review for a prune-with-the-owner. Recording it here as well buys only the growth
 # ratchet, at the price of a permanent row in a file whose whole purpose is to reach empty. Do not

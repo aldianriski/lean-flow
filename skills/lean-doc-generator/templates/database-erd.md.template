@@ -5,7 +5,7 @@ update_trigger: A migration changes entities or relations
 status: current
 ---
 
-<!-- Lives at docs/database/erd.md (DOCS_Guide §2, ADR-012). DB-exists substrate-conditional row.
+<!-- Lives at docs/database/erd.md (STANDARD §2, ADR-012). DB-exists substrate-conditional row.
      Companion: database-schema.md.template (conventions) · database-migration-guide.md.template
      (process). The migration files remain the schema SSOT — this doc is a navigable map, not DDL. -->
 

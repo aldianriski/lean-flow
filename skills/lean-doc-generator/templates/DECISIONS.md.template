@@ -15,6 +15,6 @@ content here. Add a row when a new `docs/adr/ADR-NNN-<slug>.md` is written.
 |---|---|---|---|
 | [ADR-001](adr/ADR-001-[slug].md) | [short title] | accepted | YYYY-MM-DD |
 
-<!-- Links are relative to this file's canonical place, docs/ (DOCS_Guide §2). Example row (filled):
+<!-- Links are relative to this file's canonical place, docs/ (STANDARD §2). Example row (filled):
 | [ADR-000](adr/ADR-000-postgres-write-model.md) | Postgres for the write model | accepted | 2026-01-15 |
 -->

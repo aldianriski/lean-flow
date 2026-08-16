@@ -32,7 +32,7 @@ existing surface**, never standalone merit. Existing surface read first: `refact
 `tdd` (testability.md, test-strategy.md, test-standard.md), `task-decomposer` (prd-and-slices.md —
 tracer-bullet vertical slices), `orchestrator` (G1/G2, review-scoping.md — Standards-vs-Spec axes,
 skip table, QA suggestion), `.claude/CONTEXT.md` (glossary, sprint/streams model, gates), and the
-`ARCHITECTURE.md.template` / `DOCS_Guide.md` §4 (ADR bar). Grep confirmed no existing mentions of
+`ARCHITECTURE.md.template` / `STANDARD.md` §4 (ADR bar). Grep confirmed no existing mentions of
 SOLID/STRIDE/DORA/hexagonal/bounded-context/CODEOWNERS/trunk-based outside this scan.
 
 ## Verdict table

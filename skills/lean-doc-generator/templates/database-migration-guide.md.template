@@ -5,7 +5,7 @@ update_trigger: Migration or seed process changes
 status: current
 ---
 
-<!-- Lives at docs/database/migration-guide.md (DOCS_Guide §2, ADR-012). DB-exists
+<!-- Lives at docs/database/migration-guide.md (STANDARD §2, ADR-012). DB-exists
      substrate-conditional row. Policy level only — WHAT to run and WHY, never the migration
      tool's internal HOW. Companion: database-erd.md.template · database-schema.md.template. -->
 

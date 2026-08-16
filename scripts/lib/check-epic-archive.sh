@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# check-epic-archive.sh -- enforces DOCS_Guide §11's epic retention row in BOTH directions
+# check-epic-archive.sh -- enforces STANDARD §11's epic retention row in BOTH directions
 # (SPRINT-055 T2, TASK-167).
 #
 # §11 says an epic moves to docs/epic/archive/ when every member sprint has closed AND every

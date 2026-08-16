@@ -236,3 +236,42 @@ flag this avoids is re-reading a DoD's words to fit what was built.
 could have gone wrong: `run-epic-archive-fixtures.sh`'s mention of the old name is a **comment**, not
 an assertion, so sweeping it cannot break a fixture that greps its own token (L-108) — verified by
 reading the line, not assumed from the filename.
+
+### 2026-08-16 | progress | T3 — 86 citation sites swept to the new name; two reverted after the sweep made them false
+
+Run **inline** by the coordinator, not dispatched — an owner-ruled deviation from the G2 dispatch
+plan, forced by TD-054: a worktree branching from the stale pin would contain no `spec/` at all, so
+the builder would have swept a tree where T2's move never happened. Wrong work, not merely a merge
+hazard. Logged here because a deviation from a signed gate is not the coordinator's to make silently.
+
+**Reconciliation, both directions.** Before: live 140 + history 276 = 416. After: live 54 + history
+276 = 330. **86 swept** = 88 sweepable − 2 reverted. The Plan's estimate of 128 was never used — DoD 1
+requires re-derivation, and the real number was 140.
+
+**The sweep damaged two files, and the reconciliation is not what caught it — reading the diff was.**
+A mechanical token replacement over a corpus that *documents its own history* rewrites history into
+falsehood, and both cases were exactly that:
+- `docs/research/platform-readiness-audit.md` — its F3 finding records the pre-move state, and the
+  sweep turned it into `skills/lean-doc-generator/references/STANDARD.md — 450 lines`, **a path that
+  has never existed at any point in this repo's history**. T2's builder had flagged this same file as
+  a judgment call and left it alone; the coordinator swept it and made it wrong.
+- `docs/research/logs/qa-gate-timing.md` — a measurement log, `append-only` by its §2 row. Editing a
+  past entry there is the same violation as editing a past LEARNINGS entry; it belonged in the frozen
+  set and the classification missed it.
+
+Both reverted. This is L-108's family one level up: the rule says a *matcher* must be anchored by
+shape because a self-describing corpus contains prose about its own formats — the same property makes
+a self-describing corpus unsafe to *edit* by token, because some of its sentences are assertions about
+the past that only stay true if left alone. The classification that drives a sweep needs a
+"describes history" axis, not only a "frozen by rule" axis.
+
+**L-009 discharged mechanically, not by eyeballing 54 files:** `git diff --numstat` shows added ==
+deleted for every swept file. A fused table row or dropped list entry changes that balance, so equality
+across all 54 is positive evidence rather than an absence of noticed problems.
+
+**Third `Layers:` correction this sprint (L-100):** T3 gained `AGENTS.md` and `scripts/qa-check.sh` —
+the sweep reaches root files and the gate script's own comments, which a directory-level declaration
+written at promote does not cover. T2 gained two, T5's `Cites:` gained one. Three corrections across
+five tasks is a rate worth a Retro line, not a shrug.
+
+3 of 3 DoD ticked. Gate 151 pass / 0 fail.

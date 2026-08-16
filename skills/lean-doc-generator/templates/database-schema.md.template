@@ -5,7 +5,7 @@ update_trigger: A migration lands
 status: current
 ---
 
-<!-- Lives at docs/database/schema.md (DOCS_Guide §2, ADR-012). DB-exists substrate-conditional row.
+<!-- Lives at docs/database/schema.md (STANDARD §2, ADR-012). DB-exists substrate-conditional row.
      States WHY/conventions only — the migration files are the schema SSOT; never duplicate DDL
      here. Companion: database-erd.md.template (map) · database-migration-guide.md.template
      (process). -->

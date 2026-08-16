@@ -8,7 +8,7 @@ related: [ADR-NNN]
 
 <!-- One ADR per file: docs/adr/ADR-NNN-<slug>.md · append-only (never edit a decided ADR — mark it
      deprecated/superseded) · WHY only, never HOW. Offer one only when the decision is hard-to-reverse
-     AND surprising AND a real trade-off (DOCS_Guide §4). Worked example → references/ADR-example.md.
+     AND surprising AND a real trade-off (STANDARD §4). Worked example → references/ADR-example.md.
      Frontmatter is the ADR-009 knowledge metadata SSOT — if the project maintains a generated
      knowledge index, source tags/domain vocab from its single origin and lint against it;
      otherwise keep a small, consistent vocab. -->

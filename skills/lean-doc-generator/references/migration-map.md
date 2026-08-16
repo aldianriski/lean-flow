@@ -15,7 +15,7 @@ don't hand-reconcile, and you're not lost in your own existing code.
      out-of-scope artifact (adlc-flow's, app-specific, generated) as a dupe/consolidate candidate; two
      *frameworks'* same-named files (e.g. a lean-flow `CONTEXT.md` beside an adlc-flow one) are
      coexistence, not a dupe. Heuristic only — flags for human judgment, never an auto-verdict.
-   - **Boundary scan (§12)** — also scan the tracked tree for **DOCS_Guide §12b** violations: committed
+   - **Boundary scan (§12)** — also scan the tracked tree for **STANDARD §12b** violations: committed
      secrets/dumps/backups by pattern (`.env`, `*.pem`, `id_rsa*`, `*.sql` dumps, `service-account*.json`)
      plus obvious PII fixtures. **Report-only** — list each hit with its §12 proper-home routing in the
      migrate plan; never auto-delete, never auto-rewrite git history. A committed secret additionally
@@ -59,7 +59,7 @@ as a per-item plan, exactly like first adoption. Guarantees:
 ## Surgical rules
 
 - **Never delete pre-existing content silently** — reformat/relocate/archive it, or surface it and ask. Content is the user's; format is ours. The **only** sanctioned deletion is `retire`-by-hard-delete, and only on **explicit per-item approval** (below) — never a batch "delete all".
-- WHY/WHERE only — if a migrated doc explains HOW, that line moves to a code comment (DOCS_Guide §5).
+- WHY/WHERE only — if a migrated doc explains HOW, that line moves to a code comment (STANDARD §5).
 - **Out-of-scope artifacts stay untouched + noted** — anything lean-flow doesn't own (adlc-flow's ADLC artifacts, app-specific docs, generated files). Don't "tidy" them.
 - One doc at a time; show the before→after shape for each.
 
@@ -77,7 +77,7 @@ that up, both **HITL and per-item** (never silent, never batched):
 Detection (step 1) is heuristic — duplicate-content match · inbound-link graph · `last_updated` age ·
 code contradiction — and only ever **proposes**; the human decides consolidate vs retire vs keep.
 
-## Placement — relocate to the canonical layout (DOCS_Guide §2, ADR-012)
+## Placement — relocate to the canonical layout (STANDARD §2, ADR-012)
 
 Applies to **any** source pattern. A relocation is a `git mv` + inbound-link fixes (grep the
 filename) — content untouched. Propose these in the per-file plan like any other action:

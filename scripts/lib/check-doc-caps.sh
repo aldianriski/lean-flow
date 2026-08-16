@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# check-doc-caps.sh -- DERIVES the line-cap coverage from DOCS_Guide §2 instead of hand-listing a
+# check-doc-caps.sh -- DERIVES the line-cap coverage from STANDARD §2 instead of hand-listing a
 # glob per cap in qa-check.sh (TD-041).
 #
 # Why derivation rather than "add docs/research/ to the list": the coverage got out of step with the
@@ -29,7 +29,7 @@
 # not by convenience (L-082). Losing one of them silently is the failure this checker must not cause.
 #
 # Usage: sh check-doc-caps.sh [<docs-guide.md> [<root-dir> [<grandfather-list>]]]
-# Defaults to this repo's own DOCS_Guide and repo root. Both are parameters so the checker can be
+# Defaults to this repo's own STANDARD and repo root. Both are parameters so the checker can be
 # pointed at a fixture -- a check that has only ever run on correct input has not been tested (L-102).
 # Prints one PASS/FAIL/note line per cap; exits 1 if any FAIL line was printed, 0 otherwise.
 # Dependency-free POSIX sh -- no jq, no bashisms.
@@ -113,7 +113,7 @@ cap_file() { # <file> <max> <source>
 
 # Frontmatter `status:`, position-anchored (L-108): line-start, inside the first 20 lines, first match
 # only. A substring search would match prose about supersession further down -- this corpus documents
-# its own formats, so `status: superseded` appears in DOCS_Guide, in ADRs and in this file's comments.
+# its own formats, so `status: superseded` appears in STANDARD, in ADRs and in this file's comments.
 fm_status() {
   sed -n '1,20{/^status:[[:space:]]/{s/^status:[[:space:]]*//;s/[[:space:]]*$//;p;q;};}' "$1" 2>/dev/null
 }

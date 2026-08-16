@@ -278,7 +278,7 @@ allowlist (`.env.example` · `.gitignore` · `LICENSE`, write-if-absent, never o
 four buckets to durable homes — *shipped* → CHANGELOG, *tech debt* → `TD-NNN` (root `TECH-DEBT.md`), *follow-ups* →
 `TASK-NNN` backlog, *learnings* → `LEARNINGS.md`. At **Sprint Promote** a governance checkpoint
 promotes any learning that recurs (**count ≥ 2**) into a durable rule and ages tech debt. Learning
-and debt can't silently rot. Governance → DOCS_Guide §10.
+and debt can't silently rot. Governance → STANDARD §10.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -360,7 +360,7 @@ Full map — composition rule, the loop, integration points, boundaries →
 .kimi-plugin/     plugin.json                           (Kimi Code CLI manifest, lockstep version)
 skills/           14 skills — /flow conductor + 12 stages + /council (auto-discovered)
   lean-doc-generator/
-    references/   DOCS_Guide.md · migration-map.md · ADR-example.md
+    references/   STANDARD.md · migration-map.md · ADR-example.md
     templates/    33 canonical doc templates (core, incl. EPIC · SPRINT · ADR · RESEARCH ·
                   DEPLOYMENT · ROLLBACK · BUG · TECH-DEBT · CONTRIBUTING · CODE_OF_CONDUCT ·
                   SECURITY · AGENTS; +2 non-core: DESIGN · QA-TESTCASE = 35 total)

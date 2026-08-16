@@ -10,7 +10,7 @@ status: current
 Append-only record of confirmed corrections and patterns surfaced at Sprint Close. A learning that
 **recurs (count ≥ 2)** is promoted into a *durable* rule and marked below. The home is not a menu pick:
 ask **which flows can hit this failure**, then place the rule where all of them read — a skill red-flag
-fires inside that skill's flow alone (the placement test, DOCS_Guide §10). Reviewed at every
+fires inside that skill's flow alone (the placement test, STANDARD §10). Reviewed at every
 **Sprint Promote** before planning.
 
 <!-- Newest first. Never edit a past entry except to bump `seen` / `count`, set `promoted`, or

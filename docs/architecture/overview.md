@@ -88,7 +88,7 @@ scaffolding a fresh repo by `/lean-doc-generator init`.
 
 Ruled at SPRINT-054 T1. Each row below is an **exemption with a reason**, not an oversight — the point
 of writing them down is that a future reader (or `init` run) can tell the two apart. Substrate-gated
-rows are excluded: they are skipped, not owed (DOCS_Guide §6), and are not listed here.
+rows are excluded: they are skipped, not owed (STANDARD §6), and are not listed here.
 
 | Absent | Why | Revisit when |
 |---|---|---|

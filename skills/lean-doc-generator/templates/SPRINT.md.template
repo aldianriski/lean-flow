@@ -74,7 +74,7 @@ Cites: [sources this task answers to — the Spec axis measures against them; om
 > **Lives in its own file** — `docs/sprint/logs/SPRINT-NNN-<slug>.md`, rendered from
 > `templates/sprint-log.md.template` and created lazily at the first entry. Append there, never here:
 > the Log grows with the work done, so keeping it out of this file is what stops it consuming the
-> 400-line budget the Plan needs (DOCS_Guide §9 · ADR-014). The `logs/` subdirectory is load-bearing —
+> 400-line budget the Plan needs (STANDARD §9 · ADR-014). The `logs/` subdirectory is load-bearing —
 > the sprint-file checks glob `docs/sprint/SPRINT-*.md` non-recursively, so a same-directory
 > `-log.md` sibling would be capped and schema-checked as if it were a Plan.
 
@@ -86,11 +86,11 @@ Cites: [sources this task answers to — the Spec axis measures against them; om
 | `path/to/file` | T1 | [why it changed] | Low | [how verified] |
 
 ## Retro
-<!-- Written at close. Route the buckets to durable homes (DOCS_Guide §10):
+<!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root; legacy docs/) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint? (yes → a Learnings-bucket friction + the retrieval-miss signal, DOCS_Guide §10)
+**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint? (yes → a Learnings-bucket friction + the retrieval-miss signal, STANDARD §10)
 
 **Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents). Record it even when it is unremarkable: one row is an anecdote, and the series is what lets the next promote size a batch instead of guessing. Cost per unit **delivered**, not per unit attempted. Unavailable → say so rather than omitting the line.
 

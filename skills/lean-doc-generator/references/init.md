@@ -10,7 +10,7 @@ bounded by the safe-scaffold allowlist (ADR-012).
    file tree to infer stack, and whether a database or auth substrate is present. If inaccessible,
    ask the user to paste the manifest + file tree.
 2. **Scaffold the base tier** — the TemiDev mandatory minimum (table below), each via the
-   template-load protocol (DOCS_Guide §2: **Read** `${CLAUDE_SKILL_DIR}/templates/<X>.md.template`
+   template-load protocol (STANDARD §2: **Read** `${CLAUDE_SKILL_DIR}/templates/<X>.md.template`
    before writing — never free-generate; real content prompts, never empty shells). Most rows are
    unconditional; four carry a **substrate condition** and are skipped when that substrate is absent,
    exactly as step 3's conditional rows fire only on detection. Gate per substrate, never on a repo
@@ -26,12 +26,12 @@ bounded by the safe-scaffold allowlist (ADR-012).
      `architecture/data-flow.md` · `architecture/integrations.md` · `docs/api/` (below) ·
      `architecture/authentication.md` if not already fired by the DB/auth substrate check above.
    - **Medium/complex tier** (multi-dev, sustained, or architecturally forked) — `docs/adr/` +
-     `DECISIONS.md` (create-lazily — DOCS_Guide §2 rule: never pre-created empty; scaffold
+     `DECISIONS.md` (create-lazily — STANDARD §2 rule: never pre-created empty; scaffold
      `DECISIONS.md` only once the first qualifying decision (§4) exists, and write the ADR
      itself alongside it, not before) · `docs/flows/` (offer, via the same popup, creating the
      FIRST flow doc from `flows.md.template` for the project's main business flow — e.g. the
      primary user journey the app exists to support; skip if the user has no flow in mind yet).
-   - Scaffold only what's chosen. Full tier table → DOCS_Guide §6.
+   - Scaffold only what's chosen. Full tier table → STANDARD §6.
    - **Headless (the popup cannot be answered)** — detect it, don't assume it: probe the channel
      (`ToolSearch select:AskUserQuestion` → *no matching deferred tools* means unregistered; `dontAsk`
      auto-denies any prompting call). An interactive run asks the popup normally — that stays correct.
@@ -58,11 +58,11 @@ bounded by the safe-scaffold allowlist (ADR-012).
    here; generated HTML docs need not be committed."* — carrying a `<sub>` footer ownership line
    (§3 pointer-file exception, like AGENTS.md; a doc without an owner is an orphan, §7).
 4. **Safe-scaffold allowlist (ADR-012)** — the only non-doc files init writes. See below.
-5. **Write** — target canonical placement (DOCS_Guide §2: root for README/CONTRIBUTING/SECURITY/
+5. **Write** — target canonical placement (STANDARD §2: root for README/CONTRIBUTING/SECURITY/
    AGENTS/CHANGELOG/LICENSE/TODO/TECH-DEBT · `.claude/` for AI-context · `docs/` for the rest);
    enforce the line cap and the ownership header (§3) on every file touched.
 6. **Verify** — `/prime` reads cleanly (no missing-file errors on required reads); every scaffolded
-   file's ownership header + placement match DOCS_Guide §2/§3; report the full file list, including
+   file's ownership header + placement match STANDARD §2/§3; report the full file list, including
    safe-scaffold writes and any skips.
 
 ## Base-tier mandatory minimum
@@ -104,7 +104,7 @@ exist (`product/`), a shape (`architecture/`), a way in (`README` · `setup`), a
 a docs repo included. Coding standards and a testing guide describe code that may not exist, and
 deployment describes a release that may never happen; those are the ones that become ceremony.
 
-Missing template for a base-tier row → WARN and fall back to DOCS_Guide §2's inline description
+Missing template for a base-tier row → WARN and fall back to STANDARD §2's inline description
 (template-load protocol step 2); never hard-stop.
 
 ## Safe-scaffold allowlist (ADR-012 — the only non-doc files init writes)
@@ -115,7 +115,7 @@ reported:
 | File | Content rule |
 |---|---|
 | `.env.example` | Variable **names only**, detected from the codebase (env-var reads, config loaders) — **never values**. |
-| `.gitignore` | DOCS_Guide **§12c** classes (build output, dependency dirs, editor/OS cruft, local env files) as the standard baseline, plus stack-detected additions on top (e.g. a Python repo adds `__pycache__/`, a Node repo adds `node_modules/`). |
+| `.gitignore` | STANDARD **§12c** classes (build output, dependency dirs, editor/OS cruft, local env files) as the standard baseline, plus stack-detected additions on top (e.g. a Python repo adds `__pycache__/`, a Node repo adds `node_modules/`). |
 | `LICENSE` | User chooses a license; a private repo gets a proprietary notice instead. |
 
 Every write (or skip-because-exists) is listed in the init report. `settings.json` and every other
@@ -124,7 +124,7 @@ non-doc file stay **banned** from init — no exceptions.
 ## Verify
 
 - `/prime` reads the new docs cleanly.
-- Every file carries its DOCS_Guide §3 ownership header (or the README/AGENTS footer-line
+- Every file carries its STANDARD §3 ownership header (or the README/AGENTS footer-line
   exception) with `owner` a role, never a person.
-- Placement matches DOCS_Guide §2 exactly — root vs `.claude/` vs the `docs/` tree.
+- Placement matches STANDARD §2 exactly — root vs `.claude/` vs the `docs/` tree.
 - Report: files written · files skipped (pre-existing) · any WARN (missing template).

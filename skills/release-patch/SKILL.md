@@ -41,7 +41,7 @@ First match wins. Priority: plugin > npm > python > cargo > go > flat.
 1. **Diff scan** — `git diff --name-only HEAD~1 HEAD` (or `HEAD` if uncommitted). **At sprint close → scan the whole sprint range `plan_commit..HEAD`** (read `plan_commit` from the just-closed sprint frontmatter) — else a multi-commit sprint is misjudged by its docs-only close commit. If every changed path is under `docs/`, abort: `[skip] docs-only diff — no version bump`. Exit.
 2. **Mode detect** — run the cascade; save the mode + manifest path(s). No manifest → **changelog-only mode** (below); do not exit.
 3. **PATCH bump** — increment the patch digit per mode. Plugin: verify both files are equal, then bump both. Single-manifest modes: read → bump → write. Go: prompt for the tag string.
-4. **CHANGELOG entry** — detect root `CHANGELOG.md` (canonical placement, DOCS_Guide §2, ADR-012), else legacy `docs/CHANGELOG.md` / `CHANGES.md` / `HISTORY.md` (default root `CHANGELOG.md`). Prepend a new block matching the file's existing entry shape; if empty/missing, use Keep-a-Changelog format.
+4. **CHANGELOG entry** — detect root `CHANGELOG.md` (canonical placement, STANDARD §2, ADR-012), else legacy `docs/CHANGELOG.md` / `CHANGES.md` / `HISTORY.md` (default root `CHANGELOG.md`). Prepend a new block matching the file's existing entry shape; if empty/missing, use Keep-a-Changelog format.
 5. **Stale-doc clear** — any doc with `last_updated:` frontmatter that appears in the diff → bump it to today (`yyyy-MM-dd`).
 6. **HARD STOP — push gate** — emit the message below and exit (if `docs/deployment/deployment-guide.md` exists — legacy `docs/DEPLOY.md` still matched — point to it for the push / deploy / verify / rollback steps). **This skill never invokes `git push`.**
 

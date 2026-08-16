@@ -5,7 +5,7 @@ update_trigger: Rollback process changes
 status: current
 ---
 
-<!-- Lives at docs/deployment/rollback-guide.md (DOCS_Guide §2, ADR-012). Operational, not
+<!-- Lives at docs/deployment/rollback-guide.md (STANDARD §2, ADR-012). Operational, not
      code-HOW. Companion to deployment-guide.md.template, which owns the forward deploy flow. -->
 
 # [Project] — Rollback Guide [CUSTOMIZE]

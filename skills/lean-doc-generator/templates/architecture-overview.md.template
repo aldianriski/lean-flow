@@ -5,7 +5,7 @@ update_trigger: Layer added, dependency rule changed, or major refactor
 status: current
 ---
 
-<!-- Lives at docs/architecture/overview.md (DOCS_Guide §2, ADR-012). At cap-hit (150 lines), split
+<!-- Lives at docs/architecture/overview.md (STANDARD §2, ADR-012). At cap-hit (150 lines), split
      into docs/architecture/{data-flow,authentication,integrations}.md siblings per the §2 growth
      rule — this file keeps the map + links, never squeeze to stay under the cap. -->
 

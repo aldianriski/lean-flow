@@ -1,7 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-08-15
-update_trigger: An epic is opened, or closed and archived (DOCS_Guide §11)
+update_trigger: An epic is opened, or closed and archived (STANDARD §11)
 status: current
 ---
 

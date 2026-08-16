@@ -5,7 +5,7 @@ update_trigger: A documented data path changes
 status: current
 ---
 
-<!-- Lives at docs/architecture/data-flow.md (DOCS_Guide §2, ADR-012). Fires once a non-trivial
+<!-- Lives at docs/architecture/data-flow.md (STANDARD §2, ADR-012). Fires once a non-trivial
      data path exists (backend/integration tier, or spawned off architecture-overview.md at its
      cap-hit per the §2 growth rule). Companion to architecture-overview.md.template. -->
 

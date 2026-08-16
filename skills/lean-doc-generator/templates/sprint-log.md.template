@@ -11,7 +11,7 @@ update_trigger: an Execution Log entry is appended
 
 > Append-only companion to [`../SPRINT-NNN-<slug>.md`](../SPRINT-NNN-<slug>.md). Uncapped by design:
 > this file grows with the work done, which is exactly why it is not inside the Plan's 400-line
-> budget (DOCS_Guide §9 · ADR-014). **Never edit a past entry** — correct it with a new one.
+> budget (STANDARD §9 · ADR-014). **Never edit a past entry** — correct it with a new one.
 >
 > The Plan is frozen at promote. A mid-sprint pivot that shifts scope is logged here as a
 > `scope-change` entry — what broke · impact · re-confirm G2 — **before** § Plan is edited.

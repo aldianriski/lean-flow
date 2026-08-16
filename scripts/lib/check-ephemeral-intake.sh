@@ -2,7 +2,7 @@
 # check-ephemeral-intake.sh -- catches intake scaffolding that was committed instead of disposed of
 # (SPRINT-055 T4, TASK-169).
 #
-# DOCS_Guide §2 lists two artifacts as ephemeral intake material with no durable home: a
+# STANDARD §2 lists two artifacts as ephemeral intake material with no durable home: a
 # `BUG-<slug>.md` defect report, and the working feature PRD `/task-decomposer` synthesizes. Both are
 # written to the OS temp dir. Their substance moves into something durable -- a TASK-NNN, a TD-NNN, a
 # regression test, docs/product/requirements.md -- and the scaffolding is simply gone.
@@ -35,10 +35,10 @@ found=$(find "$root" -type f -name 'BUG-*.md' 2>/dev/null |
 if [ -n "$found" ]; then
   for f in $found; do
     fail=1
-    printf 'FAIL  %s\n' "ephemeral-intake: $f is a committed BUG report -- a defect report is temp-dir intake scaffolding (DOCS_Guide §2), so once /triage routes it into a TASK/TD//diagnose brief there is nothing left to commit. Carry the repro into the destination instead of pointing back at this file"
+    printf 'FAIL  %s\n' "ephemeral-intake: $f is a committed BUG report -- a defect report is temp-dir intake scaffolding (STANDARD §2), so once /triage routes it into a TASK/TD//diagnose brief there is nothing left to commit. Carry the repro into the destination instead of pointing back at this file"
   done
 else
-  printf 'PASS  %s\n' "ephemeral-intake: no committed BUG-*.md reports (temp-dir intake, DOCS_Guide §2)"
+  printf 'PASS  %s\n' "ephemeral-intake: no committed BUG-*.md reports (temp-dir intake, STANDARD §2)"
 fi
 
 exit $fail

@@ -35,7 +35,7 @@ boundary grows until it stops being finishable]
 | [SPRINT-NNN](../sprint/archive/SPRINT-NNN-<slug>.md) | [theme] | closed · `<close_commit>` | [the specific advance — not a restatement of the theme] |
 
 ## Decisions
-<!-- Hard-to-reverse + surprising + a real trade-off → an ADR (DOCS_Guide §4); link it, never duplicate it. -->
+<!-- Hard-to-reverse + surprising + a real trade-off → an ADR (STANDARD §4); link it, never duplicate it. -->
 - **D1** — [what was decided + why, one line]. **→ ADR-NNN** (if it qualifies).
 
 ## Open questions

@@ -5,7 +5,7 @@ update_trigger: Acceptance criteria change
 status: current
 ---
 
-<!-- Lives at docs/product/acceptance-criteria.md (DOCS_Guide §2, ADR-012). Base-tier — created
+<!-- Lives at docs/product/acceptance-criteria.md (STANDARD §2, ADR-012). Base-tier — created
      alongside requirements.md. Keyed to the R-numbers in requirements.md, one block per
      requirement. Teams that already track acceptance criteria in an issue tracker may keep the
      criteria there instead of duplicating them here — in that case this file INDEXES/LINKS to

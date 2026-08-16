@@ -5,7 +5,7 @@ update_trigger: Deploy flow, environment matrix, or release verification changes
 status: current
 ---
 
-<!-- Lives at docs/deployment/deployment-guide.md (DOCS_Guide §2, ADR-012). Operational, not
+<!-- Lives at docs/deployment/deployment-guide.md (STANDARD §2, ADR-012). Operational, not
      code-HOW. Rollback owns its own file — see deployment-rollback.md.template. -->
 
 # [Project] — Deployment Guide [CUSTOMIZE]

@@ -100,7 +100,7 @@ Route by **nature, not size — ambiguity & consequence up, volume & repetition 
 
 **Creates vs consumes** — `/lean-doc-generator` creates every core doc (`epic` · `prd` · sprint · ADRs · `migrate`/`init`); `/task-decomposer` consumes them and emits tasks. Two things share the name "PRD": the **working feature PRD** is disposable intake scaffolding the decomposer synthesizes to slice against (not a §2 file), while **`docs/product/requirements.md`** is the durable project-scoped core doc — pipeline is *feature PRD → sanitize → requirements.md*, and that write is the generator's. `--prd <path>` always means *consume*.
 
-LEAN standard on the **TemiDev repo-structure core** (ADR-012; WHY/WHERE, never HOW) → `spec/STANDARD.md` (the SSOT — ADR-023): §2 lifecycle-bound core · §6 four-tier scaffold (cap-hit → split into tree; when the growth is an **append-only series** it splits to a `logs/` sibling instead — ADR-014's mechanism, now carried by both the `sprint/logs/` and `research/logs/` rows) · §12 Git boundary; templates → `…/templates/` (33 core + 2 non-core). Domain glossary lives **here** when the project has terms worth fixing (canonical + `_Avoid_:` synonyms) — **create-lazily**, never pre-created empty (DOCS_Guide §7); lean-flow has none yet, and `/refactor-advisor` adds the first term when one is named. ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
+LEAN standard on the **TemiDev repo-structure core** (ADR-012; WHY/WHERE, never HOW) → `spec/STANDARD.md` (the SSOT — ADR-023): §2 lifecycle-bound core · §6 four-tier scaffold (cap-hit → split into tree; when the growth is an **append-only series** it splits to a `logs/` sibling instead — ADR-014's mechanism, now carried by both the `sprint/logs/` and `research/logs/` rows) · §12 Git boundary; templates → `…/templates/` (33 core + 2 non-core). Domain glossary lives **here** when the project has terms worth fixing (canonical + `_Avoid_:` synonyms) — **create-lazily**, never pre-created empty (STANDARD §7); lean-flow has none yet, and `/refactor-advisor` adds the first term when one is named. ADRs only when hard-to-reverse **and** surprising **and** a real trade-off (§4).
 
 ## Orientation
 
@@ -108,7 +108,7 @@ Where-things-live = **`docs/architecture/overview.md`**; no hand-maintained code
 
 ## Continuous learning governance
 
-Every iteration feeds the next (full rules → DOCS_Guide §10/§11). **Close** Retro auto-files four buckets: Shipped→CHANGELOG · Tech debt→`TD-NNN` ·
+Every iteration feeds the next (full rules → STANDARD §10/§11). **Close** Retro auto-files four buckets: Shipped→CHANGELOG · Tech debt→`TD-NNN` ·
 **Deferring a question** — before parking one for want of evidence, name the **class of fact** that would close it: a *measurement* · a *documented behaviour* · a *judgement call*. Only a measurement accumulates; a documented behaviour is closed by reading and a judgement call by ruling, so "unblock when a measurable signal appears" parks those two **forever** (L-094).
 Follow-ups→`TASK-NNN` · Learnings→`L-NNN`. **Promote** checkpoint: promote any `L-NNN` (`count ≥ 2, promoted: no`) → durable rule **placed by §10's placement test** —
 ask which flows can hit the failure, place it where all of them read (a skill red-flag fires in that skill's flow alone); age TD; doc-aging. Propose → approve, never silent. Learnings + ADRs + research carry ADR-009 metadata; the by-tag/-domain index is **generated** into `docs/knowledge-index.md`, lint-checked by `qa-check.sh`.

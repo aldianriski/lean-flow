@@ -30,7 +30,7 @@ re-pointed skills remain open (see § Closed when); T2 is the first step that ma
 
 
 It spans sprints because the spec is not one file: the doc standard, the gate contract, the
-task/sprint/epic schema and the HITL attestation format are today spread across `DOCS_Guide.md`,
+task/sprint/epic schema and the HITL attestation format are today spread across `STANDARD.md`,
 `.claude/CONTEXT.md` and four skills, each restating parts of the others. Separating them without
 creating a second SSOT is the work.
 

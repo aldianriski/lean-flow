@@ -8,4 +8,4 @@ never duplicates them.
 Commands + validation: see [`docs/development/setup.md`](docs/development/setup.md).
 
 <sub>Doc owner: Maintainer · last updated: 2026-08-09 · status: current</sub>
-<!-- footer ownership, not top YAML — DOCS_Guide §3 README-exception, extended here -->
+<!-- footer ownership, not top YAML — STANDARD §3 README-exception, extended here -->

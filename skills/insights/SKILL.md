@@ -65,4 +65,4 @@ full sprint retro (→ `/lean-doc-generator close`).
 ❌ **A second near-duplicate entry** — a concept-match → bump `count` (that *is* the promotion signal), never duplicate.
 ❌ **Writing the ledger without a confirm** — it's durable + append-only; draft → `y` → write.
 ❌ **Using it for sprint state or a session handoff** — that's a commit / sprint record / `/handoff`.
-❌ **Editing a past entry beyond `seen` / `count` / `promoted` / `related`** — the ledger is append-only (DOCS_Guide §11).
+❌ **Editing a past entry beyond `seen` / `count` / `promoted` / `related`** — the ledger is append-only (STANDARD §11).

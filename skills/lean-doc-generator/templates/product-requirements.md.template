@@ -5,7 +5,7 @@ update_trigger: A requirement is approved or changed (via PR)
 status: current
 ---
 
-<!-- Lives at docs/product/requirements.md (DOCS_Guide §2, ADR-012). Base-tier — scaffolded at
+<!-- Lives at docs/product/requirements.md (STANDARD §2, ADR-012). Base-tier — scaffolded at
      init with real content, or the moment the first sanitized PRD lands. This is the
      developer-facing SPEC derived from an approved PRD, not the PRD itself — never paste the
      original PRD verbatim if it carries client-confidential or commercial content (pricing,
