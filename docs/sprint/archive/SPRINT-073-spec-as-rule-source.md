@@ -6,7 +6,7 @@ owner: Maintainer
 last_updated: 2026-08-16
 gates_signed: G1,G2 @ 80b5eaa
 plan_commit: b0fb721
-close_commit: [sha — set at close]
+close_commit: e7ce99b
 status: closed
 update_trigger: sprint execute/close events
 ---
