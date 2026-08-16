@@ -64,8 +64,14 @@ set -u
 fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
 
 fail=0
-ok()  { printf 'PASS  %s\n' "$1"; }
-bad() { fail=1; printf 'FAIL  %s\n' "$1"; }
+ok()   { printf 'PASS  %s\n' "$1"; }
+bad()  { fail=1; printf 'FAIL  %s\n' "$1"; }
+note() { printf '      %s\n' "$1"; }
+
+# A bare invocation (no sprint files) previously fell straight into `for sp in "$@"` over an empty
+# list: zero output, exit 0 -- reading as a silent pass rather than "nothing was checked" (TD-056,
+# one of exactly two check-*.sh sharing this shape). Cure matches check-gates-signed.sh's note-line.
+[ "$#" -gt 0 ] || { note "layers completeness: no sprint files given -- nothing verified"; exit 0; }
 
 # Classify every line of a task block as a declaration line (its key), a stray continuation, or
 # prose. Emits "<tag>|<text>" where tag is one of: Layers | Depends-on | Cites | STRAY | P.
