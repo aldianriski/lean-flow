@@ -77,4 +77,4 @@ One line per archived sprint (newest first); files live in [`archive/`](archive/
 - SPRINT-066 — Verification Authority — closed 2026-08-15 · 029f698 · 2 of 2 units (v1.40.0) · ADR-021 + ADR-022
 - SPRINT-067 — The Proof Layer — closed 2026-08-15 · 7df2d56 · 2 of 2 units (v1.41.0) · system-verify + per-criterion evidence
 - SPRINT-068 — Open the Standard — closed 2026-08-15 · 9fef02d · 3 of 3 units (v1.42.0) · ADR-023 opens EPIC-003
-- SPRINT-069 — First Extraction — closed 2026-08-16 · [sha — set at close] · 5 of 5 units (v1.43.0) · EPIC-003 (spec extracted · ADR-024)
+- SPRINT-069 — First Extraction — closed 2026-08-16 · b744fed · 5 of 5 units (v1.43.0) · EPIC-003 (spec extracted · ADR-024)

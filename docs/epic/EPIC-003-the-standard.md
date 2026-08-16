@@ -54,7 +54,7 @@ spec so a rule has exactly one home · ADR the split.
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [SPRINT-069](../sprint/archive/SPRINT-069-first-extraction.md) | First Extraction | closed 2026-08-16 · `<close_commit>` | Made the standard **separable and pinnable**: `spec/STANDARD.md` at v0.1.0 with its own changelog, versioning independently of the plugin — which is condition 1 outright. Ruled the **conformance levels** (ADR-024, condition 3), the ruling the epic routed to its first member's G2. Left the epic's harder half untouched by design: attestation and the no-skill-restates-a-rule pass are later members. |
+| [SPRINT-069](../sprint/archive/SPRINT-069-first-extraction.md) | First Extraction | closed 2026-08-16 · `b744fed` | Made the standard **separable and pinnable**: `spec/STANDARD.md` at v0.1.0 with its own changelog, versioning independently of the plugin — which is condition 1 outright. Ruled the **conformance levels** (ADR-024, condition 3), the ruling the epic routed to its first member's G2. Left the epic's harder half untouched by design: attestation and the no-skill-restates-a-rule pass are later members. |
 
 ## Decisions
 
