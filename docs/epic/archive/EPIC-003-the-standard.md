@@ -3,7 +3,7 @@ epic: 003
 slug: the-standard
 owner: Maintainer
 last_updated: 2026-08-16
-status: active
+status: closed
 member_sprints: [069, 070, 071]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
@@ -16,8 +16,8 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 
 ## Why this, why now
 
-The specification is **`spec/STANDARD.md`** — **595** lines, moved at SPRINT-069 T2 out of one
-skill's references folder and now versioned independently (v0.2.0) with its own changelog
+The specification is **`spec/STANDARD.md`** — **624** lines, moved at SPRINT-069 T2 out of one
+skill's references folder and now versioned independently (v0.3.0) with its own changelog
 (`docs/research/platform-readiness-audit.md` F3 is the pre-move finding). An adopter still cannot
 take the *whole* standard without taking the tool while conformance levels, attestation and
 re-pointed skills remain open (see § Closed when); T2 is the first step that makes the claim true.
@@ -31,7 +31,13 @@ re-pointed skills remain open (see § Closed when); T2 is the first step that ma
      was caught by the close's doc-freshness pass rather than by anyone recalling the warning
      directly above it — which is the same finding as this sprint's L-127, one file over: a note that
      says "re-measure" only fires if something makes you look. The growth is also why TD-058 now
-     exists: 595 lines and no §2 cap row governing any of it. -->
+     exists: 595 lines and no §2 cap row governing any of it.
+     FIFTH measurement, SPRINT-071 T3 close: 624, after §9 gained the `gates_signed:` and `*Verify:*`
+     definitions. Five measurements, five different numbers, and this paragraph has now been stale at
+     four of them. Since the figure is only ever right on the day it is written, it is kept here as a
+     dated observation rather than a fact about the file — and TD-058 carries the growth series
+     (+127 lines since extraction, two sprints) because that trend, not any single number, is what a
+     cap ruling will have to be derived from. -->
 
 
 It spans sprints because the spec is not one file: the doc standard, the gate contract, the
@@ -67,16 +73,16 @@ spec so a rule has exactly one home · ADR the split.
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [SPRINT-069](../sprint/archive/SPRINT-069-first-extraction.md) | First Extraction | closed 2026-08-16 · `b744fed` | Made the standard **separable and pinnable**: `spec/STANDARD.md` at v0.1.0 with its own changelog, versioning independently of the plugin — which is condition 1 outright. Ruled the **conformance levels** (ADR-024, condition 3), the ruling the epic routed to its first member's G2. Left the epic's harder half untouched by design: attestation and the no-skill-restates-a-rule pass are later members. |
-| [SPRINT-071](../sprint/SPRINT-071-cite-not-restate.md) | Cite, Not Restate | active | _(completed at close)_ — targets the two remaining conditions: 2 (no skill restates a rule the spec owns) and 5 (the spec suffices to build a conformant tool). Templates ruled **out of scope** for condition 2 at its promote (its D1: a template is rendered output read by a consumer who may not hold the spec), scoping the sweep to 15 of 38 candidate files — condition 2 is judged against that boundary. |
-| [SPRINT-070](../sprint/archive/SPRINT-070-attested.md) | Attested | closed 2026-08-16 · `d164924` | Made the top rung **writable**: `spec/STANDARD.md` §13 (spec v0.2.0) + [ADR-025](../adr/ADR-025-git-native-attestation-format.md) specify the three-trailer format, closing **D2** and condition 4. Its harder contribution is a boundary, not a feature — §13 states that an unsigned trailer is a *claim, not proof*, so **Attested is unreachable by trailers alone** and this repo is honestly Gated; that is what stops the level from becoming self-certifying before EPIC-004 exists. Also corrected ADR-018's granularity claim (the trailer carries the batch sign-off, not per-task approval). Conditions 2 and 5 deliberately untouched — both are sweeps, not specifications. |
+| [SPRINT-069](../../sprint/archive/SPRINT-069-first-extraction.md) | First Extraction | closed 2026-08-16 · `b744fed` | Made the standard **separable and pinnable**: `spec/STANDARD.md` at v0.1.0 with its own changelog, versioning independently of the plugin — which is condition 1 outright. Ruled the **conformance levels** (ADR-024, condition 3), the ruling the epic routed to its first member's G2. Left the epic's harder half untouched by design: attestation and the no-skill-restates-a-rule pass are later members. |
+| [SPRINT-070](../../sprint/archive/SPRINT-070-attested.md) | Attested | closed 2026-08-16 · `d164924` | Made the top rung **writable**: `spec/STANDARD.md` §13 (spec v0.2.0) + [ADR-025](../../adr/ADR-025-git-native-attestation-format.md) specify the three-trailer format, closing **D2** and condition 4. Its harder contribution is a boundary, not a feature — §13 states that an unsigned trailer is a *claim, not proof*, so **Attested is unreachable by trailers alone** and this repo is honestly Gated; that is what stops the level from becoming self-certifying before EPIC-004 exists. Also corrected ADR-018's granularity claim (the trailer carries the batch sign-off, not per-task approval). Conditions 2 and 5 deliberately untouched — both are sweeps, not specifications. |
+| [SPRINT-071](../../sprint/archive/SPRINT-071-cite-not-restate.md) | Cite, Not Restate | closed 2026-08-16 · `CLOSE_COMMIT` | **Closed the epic.** Condition 2: inventoried 39 candidate sites across the 15 non-template skill files, found only **6 real restatements** (25 were already citations, 8 legitimately local) and converted all six to cite §4 · §3 · §2 — four of them had cited their section *and* restated it anyway, the case a citation-presence check cannot see. Condition 5: audited the spec as a tool-builder with no `skills/` access, which is what exposed **two gaps at Gated** — `gates_signed:` referenced by §13 as living in §9 but never defined there, and the `*Verify:*` clause absent entirely. Both closed in §9 (spec 0.3.0) because both are schema, which a spec owns; the EPIC-004 boundary was named rather than widened. Templates ruled out of scope at promote (D1). |
 
 ## Decisions
 
 - **D1** — The standard is extracted from the implementation rather than grown inside it.
-  **→ [ADR-018](../adr/ADR-018-standard-implementation-split.md).**
+  **→ [ADR-018](../../adr/ADR-018-standard-implementation-split.md).**
 - **D2** — HITL attestation is git-native (commit trailers + optional signing), not a bespoke record
-  or an external service. **→ [ADR-025](../adr/ADR-025-git-native-attestation-format.md)** (SPRINT-070
+  or an external service. **→ [ADR-025](../../adr/ADR-025-git-native-attestation-format.md)** (SPRINT-070
   T1), designed against this sprint's own commits and specified in `spec/STANDARD.md` §13. Two rulings
   worth carrying forward: the trailer carries the *sprint-level* sign-off onto each covered commit and
   does **not** move approval per-task — correcting ADR-018's granularity framing — and an unsigned
@@ -89,7 +95,7 @@ spec so a rule has exactly one home · ADR the split.
 
 - ~~What the conformance levels are, and how many → first member sprint's G2. Candidate shape:
   structure → gates → attested; the count matters less than each level being independently
-  checkable.~~ **Answered 2026-08-16 (SPRINT-069 T1) → [ADR-024](../adr/ADR-024-conformance-levels.md):**
+  checkable.~~ **Answered 2026-08-16 (SPRINT-069 T1) → [ADR-024](../../adr/ADR-024-conformance-levels.md):**
   three — **Structural → Gated → Attested**, the candidate shape confirmed. Each rung is checkable
   from a different evidence class (the file tree · the planning records · git history alone), which
   is what satisfies "independently checkable"; the wire format is D2's ADR and the engine is
@@ -97,7 +103,7 @@ spec so a rule has exactly one home · ADR the split.
 - Are non-Claude implementations maintained here or by adopters? → a ruling, not a measurement (L-094):
   close it by deciding, not by waiting for evidence.
 - ~~Does `.claude/CONTEXT.md` become a *consumer* of the spec or stay an SSOT?~~ **Answered
-  2026-08-15 (SPRINT-068 T1) → [ADR-023](../adr/ADR-023-context-becomes-consumer.md):** consumer —
+  2026-08-15 (SPRINT-068 T1) → [ADR-023](../../adr/ADR-023-context-becomes-consumer.md):** consumer —
   `spec/` is the SSOT for standard-owned rules, CONTEXT.md cites it and keeps only project-local
   facts; extraction commits are move+cite atomic, so no commit leaves a rule stated twice.
 
@@ -116,11 +122,11 @@ spec so a rule has exactly one home · ADR the split.
       see. Judged against **T2's D1**: templates are out of scope, being rendered output read by a
       consumer who may not hold the spec
 - [x] Conformance levels are defined, and each is independently checkable in principle
-      — ✓ SPRINT-069 T1: [ADR-024](../adr/ADR-024-conformance-levels.md) — Structural → Gated →
+      — ✓ SPRINT-069 T1: [ADR-024](../../adr/ADR-024-conformance-levels.md) — Structural → Gated →
       Attested, each checkable from a different evidence class (file tree · planning records · git
       history alone), none requiring EPIC-004's engine to exist
 - [x] The attestation format is specified with a worked example against a real commit
-      — ✓ SPRINT-070 T1: `spec/STANDARD.md` §13 (spec v0.2.0) + [ADR-025](../adr/ADR-025-git-native-attestation-format.md).
+      — ✓ SPRINT-070 T1: `spec/STANDARD.md` §13 (spec v0.2.0) + [ADR-025](../../adr/ADR-025-git-native-attestation-format.md).
       Three trailers on the task's own commit; the worked example is commit `97eca0b` from this
       repo's own history, shown in its true **unsigned** state (`%G?` = `N`, re-derived at execution
       — as are all 673 commits here) rather than illustrated with a signature that does not exist.

@@ -32,6 +32,29 @@ status: current
 
 ## Tech Debt
 
+- **TD-060** severity: minor | status: open | created: Sprint-071
+  - Summary: **nothing checks that a cross-reference inside `spec/STANDARD.md` resolves.** §13 referred
+    to `gates_signed:` as living in "§9" while §9 never defined it — a dangling internal pointer that
+    survived authoring, review, a full sprint and a green gate, and was found only by a human reading
+    the spec as an adopter with no `skills/` access (SPRINT-071 T3). The same exposure applies to every
+    `§N` reference in the file, of which there are many, and to references *into* `spec/` from
+    `skills/` — 25 name-citations (`STANDARD §N`) whose targets nothing verifies either.
+  - Impact: bounded but badly placed. The spec is the artifact an adopter *pins*, so a dangling
+    reference is shipped to every consumer and is exactly the kind of defect that erodes trust in a
+    standard faster than a missing feature would — it reads as evidence the document was not checked.
+    The gap is also self-concealing: a reference reads fluently from the source side, so review does
+    not catch it, and the corpus is self-describing enough that grepping for `§9` finds the *pointer*
+    and reports success (L-108's shape again).
+  - Mitigation (**not yet derived**, L-091): the obvious move is "a checker that resolves every `§N`
+    against the section headings present in the file", which is probably most of it and is not
+    obviously the whole thing. Price at least: whether the check covers **references into `spec/` from
+    `skills/`** as well as spec-internal ones (the 25 name-citations are the larger surface, and they
+    cross a file boundary) · whether it verifies only that the section *exists* or that it *contains
+    the referenced subject*, which is the failure that actually occurred and is far harder to assert ·
+    and whether this belongs in `qa-check.sh` or is subsumed by EPIC-004's engine, since a conformance
+    tool reading the spec has to resolve its cross-references anyway.
+  - Tracker: SPRINT-071 T3 · **L-129** · ADR-023 (`spec/` is the SSOT an adopter pins) · vehicle absent
+
 - **TD-059** severity: minor | status: open | created: Sprint-070
   - Summary: **the worktree-base guard's must-FAIL fixtures are opt-in, so the always-on gate never
     runs them.** `evals/run-worktree-base-fixtures.sh` covers all six of the guard's named findings
@@ -77,6 +100,11 @@ status: current
     that the spec is deliberately uncapped, recorded so the absence stops reading as an oversight.
   - Tracker: SPRINT-070 T1 Execution Log · A4 (flagged it at promote; G1 scoped the ruling out) ·
     ADR-015 (a stated cap is a real number) · ADR-023 (why the file moved) · **vehicle: TASK-219**
+  - **Growth update, SPRINT-071 close — 595 → 624 lines** (T3 added §9's `gates_signed:` and
+    `*Verify:*` definitions). Two sprints, two additions, **+127 lines since the extraction**, against
+    no ceiling and no §2 row. Recorded rather than re-argued: the row's question is unchanged and
+    TASK-219 still owns it, but the trend is now two data points rather than one, which is what the
+    cap number will have to be derived from when someone rules it.
 
 - **TD-057** severity: minor | status: open | created: Sprint-069
   - Summary: **`Layers:` feeds three checkers that match it three different ways, and nothing states

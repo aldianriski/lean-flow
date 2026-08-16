@@ -7,7 +7,7 @@ last_updated: 2026-08-16
 gates_signed: G1,G2 @ 0ab0e01
 plan_commit: fd4ba3a
 close_commit: [sha — set at close]
-status: active
+status: closed
 update_trigger: sprint execute/close events
 ---
 
@@ -165,9 +165,61 @@ a single writer this sprint despite two conditions closing (see D2).
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/sprint/logs/SPRINT-071-*.md` | T1 | the 39-site inventory + three-bucket worklist — the deliverable, since the conversion is mechanical once it exists | low | bucket sum reconciles to census (39) + seeded-gap control |
+| `skills/council/SKILL.md` | T2 | §4's three-test restated beside its own citation → cites §4 only | low | scan re-run; site leaves the pattern |
+| `skills/prototype/SKILL.md` | T2 | §4's three-test, uncited → cites §4 | low | as above |
+| `skills/lean-doc-generator/SKILL.md` | T2 | three sites: §4 three-test (a **table row** — L-009 re-read), §3 header mandate, §2 placement gloss | med | scan re-run + table neighbours re-read whole |
+| `skills/lean-doc-generator/references/init.md` | T2 | §2 placement gloss → cites §2; the generator reads the standard first, so nothing is stranded | low | consumer read-back without `spec/` open |
+| `spec/STANDARD.md` | T3 | **§9 gains `gates_signed:` and the `*Verify:*` clause** — the two definitions Gated was unreadable without; version 0.2.0 → 0.3.0 | **high** | §13's forward reference to §9 now resolves; both gaps re-scanned |
+| `spec/CHANGELOG.md` | T3 | 0.3.0 entry naming both gaps and why they were spec-owned rather than EPIC-004's | low | gate |
+| `docs/epic/EPIC-003-the-standard.md` | T3 · close | conditions 2 and 5 ticked with evidence; member row completed; epic archived | med | all five conditions re-read at once |
+| `CHANGELOG.md` · 4 manifests · `README.md` | close | v1.45.0 MINOR; v1.43.0 rotated out per §11 | low | `check-manifest-lockstep.sh` 4/4; every rotation link resolves |
+| `TECH-DEBT.md` · `docs/LEARNINGS.md` | close | TD-060 filed, TD-058 growth updated; L-129 · L-130 filed | low | gate |
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (STANDARD §10):
-     shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
-     After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint? **Yes,
+once, and it was self-inflicted at the spec level.** §13 — written last sprint — referenced
+`gates_signed:` as living in "§9", and §9 never defined it. The reference was authored, reviewed and
+committed without the target ever being opened, which is not a retrieval *failure* so much as a
+retrieval that was never attempted: a cross-reference is an assertion about content someone else owns,
+and nothing treats it as a claim needing verification. Filed as **L-129**. A second, milder instance:
+A1's census was wrong at promote and A2 was true-but-misleading — both caught by re-derivation at G2
+and T1, neither by recalling a rule. That is now the fifth and sixth stale figure across two sprints.
+
+**Cost** — coordinator inline, all three tasks, no dispatch. T1 and T3 are `class: decision`; T2 was
+ruled inline because its hard part was per-file judgement over six sites. Zero agent tokens. The
+sprint's expensive part was reading, not writing: 39 sites classified to produce 6 edits.
+
+**Worked**
+- **The three-bucket triage was the right shape, and the numbers justify it retroactively.** Treating
+  the scan as a *triage input* rather than a defect list turned "sweep 15 files" into "convert 6
+  sites". A sweep run straight off the grep would have touched 33 correct sites.
+- **Ruling D1 at promote instead of inside T1.** Templates were 23 of 38 candidates; leaving that
+  boundary to T1 would have put a scope-defining decision inside a frozen Plan and cost a
+  `scope-change` on a Plan minutes old. It cost one popup at promote instead.
+- **Looking for the fact that dissolves a trade-off, rather than weighing it.** T1 flagged the §2
+  placement gloss as a real L-015 tension; one line (`SKILL.md:30`, "Read first") made it vanish.
+- **DoD 3's without-the-plugin constraint earned its place.** It is the only reason Gap A was found;
+  every other reading path has `gates_signed:` documented somewhere in `skills/`.
+
+**Friction**
+- **A criterion frozen at promote was unsatisfiable as written** (A1's 121 vs the real 39), caught at
+  G2 before any task ran. Cheap here only because G2 re-derives; a sprint that trusted its own
+  assumptions would have discovered it inside T1 with the Plan already committed.
+- **The raw scan count cannot measure progress and briefly looked like it could.** After T2 the census
+  moved 39 → 36, which is correct — three conversions removed the matched phrase entirely, three kept
+  matching as citations — but "count went down" and "count held" are both consistent with a correct
+  conversion. Only the bucket classification measures anything.
+- **Nothing checks that a spec-internal cross-reference resolves.** §13 → §9 dangled through a full
+  sprint and a green gate. → **TD-060**.
+- **Skills ran 1.41.0 against a 1.44.0 repo for a third consecutive sprint**, and this one *edited*
+  `skills/`. Safe only because every read and edit went through the repo source, which is reaching
+  past the stale copy rather than following it (L-021).
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`) — **L-129 filed**: a cross-reference is
+an assertion about content you do not own, and it reads as correct until someone opens the target;
+verify the target contains what the reference claims, at the moment you write it. **L-130 filed**:
+the cross-check-a-query discipline does not fire while *authoring a criterion*, because authoring
+feels like planning rather than querying — which is how a wrong number gets frozen into a DoD in the
+same session that writes the rule against wrong numbers.

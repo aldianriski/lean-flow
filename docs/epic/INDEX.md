@@ -16,6 +16,6 @@ destination cannot yet be named is fog (`/task-decomposer --fog`) until it can.
 
 - [EPIC-005](EPIC-005-fleet.md) — Fleet: one standard governing N repos — proposed 2026-08-10 · depends on 003 + 004
 - [EPIC-004](EPIC-004-conformance.md) — Conformance: the standard becomes checkable — proposed 2026-08-10 · depends on 003
-- [EPIC-003](EPIC-003-the-standard.md) — The Standard: a versioned spec, separable from the plugin — proposed 2026-08-10
+- [EPIC-003](archive/EPIC-003-the-standard.md) — The Standard: a versioned spec, separable from the plugin — closed 2026-08-16 · SPRINT-069 → SPRINT-071 (all five Closed-when `[x]`; spec/ v0.3.0 · ADR-023/024/025)
 - [EPIC-002](archive/EPIC-002-make-room.md) — Make Room: subtraction that unblocks the roadmap — closed 2026-08-15 · SPRINT-062 → SPRINT-065 (all four Closed-when `[x]`)
 - EPIC-001 — Parallel Worktree Fleet — closed 2026-08-09 · SPRINT-025 → SPRINT-026 (retro-fitted)
