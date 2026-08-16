@@ -2,9 +2,9 @@
 epic: 004
 slug: conformance
 owner: Maintainer
-last_updated: 2026-08-14
-status: proposed
-member_sprints: []
+last_updated: 2026-08-16
+status: active
+member_sprints: [072]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -47,7 +47,7 @@ each other · any telemetry, ever (the README promises none).
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| _(appended at promote)_ | | | |
+| [SPRINT-072](../sprint/SPRINT-072-conformance-baseline.md) | Conformance Baseline | active | _(completed at close)_ — the inventory and baseline the engine is designed against: every normative spec rule classified by evidence class and mechanical-vs-judgment, reconciled against the live checker corpus. Explicitly not the engine, and changes no checker architecture. |
 
 ## Decisions
 
@@ -62,15 +62,24 @@ each other · any telemetry, ever (the README promises none).
 ## Open questions
 
 - Does the engine ship inside the plugin, or as a standalone script an adopter can run without
-  installing lean-flow? → the second is more useful and more work; settle at the first member G2.
+  installing lean-flow? → the second is more useful and more work; ~~settle at the first member G2~~
+  **deferred at SPRINT-072's promote to the *engine* sprint's G2 (its D2)**. The first member turned
+  out to be the inventory-and-baseline sprint, and the answer depends on which rules prove mechanically
+  checkable *without the plugin present* — which is what that sprint measures. Deferred to the evidence
+  that decides it, which is not the same as parked (L-094).
 - ~~Can 11 checkers' named findings survive consolidation?~~ **Answered in EPIC-002 D3 (SPRINT-063 T4)
   — cited, not re-decided**, as this row always said it would be. The 11 stand alone for now because
   they share no input model; consolidation was **deferred to this epic**, and its unblock condition is
   a documented behaviour rather than a signal to wait for: **D1's spec existing in a form a checker can
   read as its rule source.** So this epic inherits a live constraint — the ~82 named findings asserted
   across 16 retained fixture harnesses are the contract any engine here must preserve (L-058).
-- What does a partially-conformant repo see — a level, a percentage, or a list? → a percentage invites
-  gaming and a bare list gives no direction; likely a level plus the named gap to the next one.
+- ~~What does a partially-conformant repo see — a level, a percentage, or a list?~~ **Answered
+  2026-08-16 (SPRINT-072 promote, owner ruling → its D1):** a **conformance level + the named findings
+  preventing the next level + the judgment-required items**. Explicitly **no percentage, no score, no
+  grade** — the row's own instinct was right, and the decisive argument is the third element: a
+  percentage averages a *deliberate judgment-only boundary* together with a *real gap*, so the number
+  goes up when the standard declines to automate something, which is exactly backwards. The engine's
+  ADR records this; it is not re-decided there.
 
 ## Closed when
 

@@ -134,6 +134,16 @@ status: current
     share). Establish first which of the three consumers is the one that should move.
   - Tracker: SPRINT-069 Execution Log (the four corrections) · TD-048 (its token-spelling half) ·
     TD-035 (why per-task attribution is deliberate) · L-126
+  - **Re-reviewed 2026-08-16 (SPRINT-072 promote, 3 sprints open) — first aging re-review; held, and
+    the vehicle is now visible.** No new sighting this cycle: SPRINT-071 produced no `Layers:`
+    correction at all, and SPRINT-070's single one was a genuine miss rather than a matcher
+    disagreement. What changed is downstream — **EPIC-004's spec-driven engine has to read `Layers:`
+    as a rule source**, and an engine cannot resolve a declaration whose contract is the undocumented
+    *intersection* of three matchers. That makes this row a likely prerequisite of the engine sprint
+    rather than an independent cleanup. Deliberately **not** pulled into SPRINT-072, which is
+    inventory-and-baseline only and changes no checker architecture. **Unblock condition:** unchanged
+    in substance, with a named successor — the engine sprint's G2 either consumes this contract or
+    states why it does not need to.
 
 - **TD-056** severity: minor | status: resolved → TASK-212 | created: Sprint-065
   - Summary: **`check-layers-observed.sh` invoked without its sprint-file argument exits 0 and prints
@@ -327,6 +337,16 @@ status: current
     the cure still belongs to EPIC-004 D1's engine question per this row's own mitigation text, which
     warns against a one-checker fix to a family-shaped defect (L-091). What is now settled is that the
     defect is real and observed, not hypothetical.
+  - **Re-reviewed 2026-08-16 (SPRINT-072 promote, 3 sprints since last) — held; leg 1's unblock
+    condition names this epic by name and the epic is now open.** The row's own text routes leg 1
+    (the `find`-walk that descends into `.claude/worktrees/<id>/` and defeats the `^`-anchored fixture
+    exclusion) to **"EPIC-004 D1, or a gate run observed against a live worktree"**. EPIC-004 is now
+    the active epic, so this is no longer waiting on an absent vehicle — but SPRINT-072 is inventory
+    and baseline only and touches no checker, so the wait continues one more sprint by design rather
+    than by neglect. Recorded because "held" three times running otherwise reads as a stalled row when
+    it is in fact a correctly-sequenced one. **Unblock condition:** unchanged — and it should be read
+    by the engine sprint's G2, since a conformance engine that walks a consumer's tree inherits
+    exactly this false-positive class the moment a worktree exists anywhere under it.
 
 - **TD-052** severity: medium | status: open | created: Sprint-062
   - Summary: **Nothing in `evals/` exercises skill *prose*, so a governance rule that lives as
@@ -519,6 +539,14 @@ status: current
     the corpus grew again this sprint (L-124, ADR-023), so section 4's share is expected to have moved
     up rather than down — which the row already frames as scaling as designed, not degrading, and is
     **not** grounds to re-derive the narrowing L-091 binds against. **Unblock condition:** unchanged.
+  - **Re-reviewed 2026-08-16 (SPRINT-072 promote, 3 sprints since last) — held, trigger unchanged, and
+    one observation added rather than a re-argument.** SPRINT-071 ran the knowledge-metadata section
+    twice (ADR-025 and the §9 additions each turned the index stale and each was caught by
+    `gen-index.sh`), so the narrowed section is still firing on real work — which is evidence *for*
+    the narrowing, not against it. Nothing this cycle demonstrably skipped a check it should have run.
+    **Unblock condition:** unchanged. Noted for the reader: EPIC-004 will produce a second, consumer-
+    facing reader of the same metadata, and if that engine needs checks this section narrowed away,
+    that is the demonstration this row has been waiting for — it is not one yet.
 
 - **TD-049** severity: minor | status: open | created: Sprint-059
   - Summary: the night-run reaper (`scripts/night-run.sh`) parses the sprint file's DoD boxes and
@@ -562,6 +590,16 @@ status: current
     **Unblock condition:** unchanged in substance, sharpened in wording — a change to the **DoD/`Tn`
     grammar** the three parsers read (the log's event taxonomy is a different format and does not
     count), or TD-045's parity fixture firing once.
+  - **Re-reviewed 2026-08-16 (SPRINT-072 promote, 3 sprints since last) — held, and its trigger is now
+    plausibly imminent for the first time.** The row waits on **a change to the DoD/`Tn` format**,
+    which has been a hypothetical for eight sprints. EPIC-004's engine must read DoD boxes and `Tn`
+    blocks *structurally*, as a rule source rather than as prose — and spec §9 gained the `*Verify:*`
+    clause definition at SPRINT-071, which is the first time that format has been specified anywhere
+    a checker could bind to. If the engine formalises the DoD grammar, this reaper's hand-rolled parse
+    is exactly the second consumer that diverges silently. **Unblock condition:** unchanged in
+    substance — but the engine sprint's G2 should check this row before it defines any DoD grammar,
+    rather than discovering the reaper afterwards (L-124's shape: a rename's census enumerates
+    *writers* and *readers*, and the reaper is a reader nobody lists).
 
 - **TD-048** severity: trivial | status: open | created: Sprint-058
   - Summary: `check-layers-completeness.sh` matches a `Layers:`/`Cites:` declaration against DoD prose

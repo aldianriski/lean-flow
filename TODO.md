@@ -18,9 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint)_ — **SPRINT-071 — Cite, Not Restate** closed 2026-08-16 at **14 of 14 DoD**
-> ([archive](docs/sprint/archive/SPRINT-071-cite-not-restate.md)), and it **closed EPIC-003**. The next
-> sprint forms from the Backlog below via `/lean-doc-generator promote`.
+> **SPRINT-072 — Conformance Baseline** → [`docs/sprint/SPRINT-072-conformance-baseline.md`](docs/sprint/SPRINT-072-conformance-baseline.md) — EPIC-004's first member, and deliberately **not** the engine. Four `M` tasks: fix the rule-classification criteria against §2 (the hardest case), classify the remaining structural sections, classify Gated + Attested, then reconcile the whole inventory against 11 checkers / 98 fixture cases / 46 named findings and freeze it as a baseline. Changes no checker and no execution architecture — findings are recorded, not acted on. Gates not yet signed — `/orchestrator` runs G1+G2 first.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard (closed 2026-08-16** across
@@ -40,6 +38,68 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-223 — Fix the rule-classification criteria, then classify spec §2  [size: M] [risk: med] [HITL]
+      class:      decision
+      done-when:  a written, applied test separates a **normative rule** from reference *data* and from
+                  *rationale*, and every one of §2's ~59 candidates is classified rule|data|rationale;
+                  each rule carries its conformance level (ADR-024) and a mechanical|judgment-only mark
+      touches:    docs/research/conformance-inventory.md (new) · the sprint Execution Log
+      depends-on: none
+      assumes:    §2 is chosen first because it is the densest section (59 of 156 gross candidates) and
+                  because its rows are the hardest case — a `Cap` cell is mechanical, a `Create ←` cell
+                  is a lifecycle *trigger* no tool can observe, and both sit in the same row. **Do not
+                  force a rule to be mechanical**: judgment-only is a first-class outcome and marking
+                  it is the deliverable, not a failure to automate
+      tracker:    EPIC-004 § Closed-when 2 · ADR-024 (the levels) · spec/STANDARD.md §2
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-224 — Classify the remaining structural-evidence sections  [size: M] [risk: low] [HITL]
+      class:      execution
+      done-when:  §1 · §3 · §4 · §5 · §6 · §7 · §8 · §12 fully classified under TASK-223's criteria,
+                  every candidate landing in exactly one bucket with its level and mechanical|judgment mark
+      touches:    docs/research/conformance-inventory.md
+      depends-on: TASK-223
+      assumes:    ~52 candidates. Grouped by **evidence class** (checkable from the file tree alone)
+                  rather than by section number, because evidence class is the mapping's own level
+                  column — a split by arbitrary section ranges would cut across it
+      tracker:    EPIC-004 § Closed-when 2 · ADR-024
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-225 — Classify the Gated and Attested sections  [size: M] [risk: med] [HITL]
+      class:      execution
+      done-when:  §9 · §10 · §11 (planning-record evidence) and §13 (git-history evidence) fully
+                  classified, with each rule's evidence class named — the artifact a tool would read
+      touches:    docs/research/conformance-inventory.md
+      depends-on: TASK-223
+      assumes:    ~45 candidates. §13 is the newest and least settled (shipped SPRINT-070, amended
+                  SPRINT-071), and §9's `gates_signed:` + `*Verify:*` definitions are three days old —
+                  so this group is where a rule most likely turns out to be **stated but not yet
+                  checkable**, which is a coverage finding rather than a defect
+      tracker:    EPIC-004 § Closed-when 2 · ADR-024 · ADR-025 (§13's claim-vs-proof boundary)
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-226 — Reconcile the inventory against the checker corpus and record the baseline  [size: M] [risk: high] [HITL]
+      class:      decision
+      done-when:  every classified rule carries `existing checker → named finding → must-FAIL fixture →
+                  coverage status`, reconciled against the live corpus; the baseline is committed as a
+                  durable artifact; and the constraints any spec-driven engine inherits are **recorded
+                  as findings**, with no checker architecture changed by this task
+      touches:    docs/research/conformance-inventory.md · docs/epic/EPIC-004-conformance.md
+      depends-on: TASK-224, TASK-225
+      assumes:    **the corpus figures in EPIC-004's own text are stale and must not be copied
+                  forward** — it claims "~82 named findings across 16 retained fixture harnesses";
+                  measured 2026-08-16 the corpus is **11 checkers · 22 harnesses (17 asserting) · 98
+                  fixture cases · 46 distinct finding strings**. Re-derive at execution (L-097/L-130).
+                  Coverage status must distinguish *uncovered* from *judgment-only* — collapsing them
+                  would read as a gap where the standard deliberately declines to automate
+      tracker:    EPIC-004 § Closed-when 2 and 3 · L-058 (a gate needs a named must-FAIL fixture) ·
+                  TD-012 (retained fixtures) · EPIC-002 D3 (the 11 stand alone until a spec exists to read)
+      origin:     decomposer
+      state:      ready
 
 - [ ] TASK-218 — Stop the uncommitted-WIP path accepting a sibling task's declaration  [size: S] [risk: low] [HITL]
       class:      decision
