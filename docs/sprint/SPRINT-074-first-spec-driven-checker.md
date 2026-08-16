@@ -4,7 +4,7 @@ slug: first-spec-driven-checker
 epic: EPIC-004
 owner: Maintainer
 last_updated: 2026-08-16
-plan_commit: [sha — set at promote]
+plan_commit: 10be550
 close_commit: [sha — set at close]
 status: active
 update_trigger: sprint execute/close events
