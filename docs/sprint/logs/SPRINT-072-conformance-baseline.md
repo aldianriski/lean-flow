@@ -97,3 +97,40 @@ dispatched agent would need the criteria restated in full to do what the coordin
 or execution architecture changes (D4, mechanically checked by T4's fourth DoD) · no percentage or
 score in any output (D1) · a wrapper over the 11 checkers does not satisfy spec-driven (D3) · findings
 are recorded, not acted on · EPIC-005 stays out of scope.
+
+### 2026-08-16 | progress | T1 — the test is fixed, and §2 turns out to be ~half checkable
+
+**§2's census re-derived at execution, per DoD 2: 59** — 40 table rows (37 data + 3 headers) + 17
+bold-lead + 2 bullets. The promote estimate was also 59 and the two agree, which is the first time
+this session a promote figure has survived re-derivation unchanged.
+
+**The test** (in `conformance-inventory-criteria.md`): a candidate is a **rule** iff *"this repo
+violates it"* is decidable of a repository. Everything else is **data** (a value a rule consumes),
+**rationale** (deleting it changes no repo's conformance), or **structure** (the spec's own layout).
+Exclusions were named rather than implied — 3 table headers and 2 sub-table labels as structure, the
+exact-figure block and its two bullets as rationale — because a test that excludes nothing has not
+been tested.
+
+**The finding that reshapes the inventory: a §2 row is not a rule, it is a parameter set.** One row
+carries six cells spanning three levels and both marks — `File` and `Cap` are Structural/mechanical,
+`Create ←` and `Update ←` are Gated/judgment-only (a trigger is an event; no tool observes that it
+happened), `Reader` is data, `Tier` is judgment. So §2 resolves into **6 rule families parameterised
+by 37 rows**, not 37 rules. That distinction is the whole of EPIC-004 D1 in miniature: the families
+are the rules and the table is their data, which is exactly what a spec-driven engine reads and what
+eleven hard-coded checkers cannot express.
+
+`Cap` and `Create ←` living in the same row is the case that motivated the test (DoD 4). A
+classification whose unit was the row would have had to force one mark and been wrong either way.
+
+**The number worth carrying to T4 and to the engine's design: §2 is at best half checkable.**
+20 rules — 6 families + 14 standalone — split **8 clean mechanical · 10 clean judgment-only · 2
+split**, counted exactly rather than rounded (8+10+2=20; the earlier draft said "8 mechanical and 12
+judgment-only", which silently folded the two split cases into judgment and was corrected before the
+tick). **§2 is the most mechanical section in the spec**, so this is the optimistic end of the range.
+That sits against EPIC-004's framing that "the machinery exists and points inward" — the machinery
+does exist, but the fraction of the standard it could ever cover is smaller than that reads, and the
+gap is not a tooling gap. It is the standard deliberately caring about things a tool cannot see.
+
+**Cap check on the new artifact, which is why the G2 split mattered:** 123 lines, `PASS cap
+docs/research/conformance-inventory-criteria.md (123 <= 130) [§2]` — under the soft cap **and still
+matched by the checker**, which the subdirectory variant would not have been. Gate 151/0.

@@ -51,15 +51,15 @@ stops each later section from inventing its own test.
 bucket it would have.
 
 **DoD:**
-- [ ] The test separating **normative rule** · reference **data** · **rationale** is written down and
+- [x] The test separating **normative rule** · reference **data** · **rationale** is written down and
       applied, not merely used — *Verify: it names at least one §2 row it excludes and why; a test
       with no exclusions has not been tested*
-- [ ] All ~59 §2 candidates classified, each in exactly one bucket — *Verify: bucket counts sum to the
+- [x] All ~59 §2 candidates classified, each in exactly one bucket — *Verify: bucket counts sum to the
       §2 candidate census re-derived at execution, not to the 59 estimated at promote*
-- [ ] Every §2 **rule** carries its conformance level (ADR-024) and a **mechanical | judgment-only**
+- [x] Every §2 **rule** carries its conformance level (ADR-024) and a **mechanical | judgment-only**
       mark — *Verify: no rule lacks either field; `judgment-only` is a valid terminal state and needs
       no further justification beyond its stated reason*
-- [ ] **A row split across both marks is recorded as such, not forced to one** — *Verify: at least the
+- [x] **A row split across both marks is recorded as such, not forced to one** — *Verify: at least the
       `Cap`-vs-`Create ←` case is represented, since it is the case that motivated the criteria*
 
 ### T2 — Classify the remaining structural-evidence sections `[size: M · risk: low · class: execution · HITL]`
