@@ -18,9 +18,9 @@ status: current
 
 ## Active Sprint
 
-> _(none — SPRINT-072 closed 2026-08-16, archived → [`docs/sprint/archive/SPRINT-072-conformance-baseline.md`](docs/sprint/archive/SPRINT-072-conformance-baseline.md))_
+> **SPRINT-073 — The Spec as Rule Source** → [`docs/sprint/SPRINT-073-spec-as-rule-source.md`](docs/sprint/SPRINT-073-spec-as-rule-source.md) — EPIC-004's second member. Three tasks: annotate all 96 normative rules in `spec/STANDARD.md` with level + mark so the spec becomes the rule source D1 requires (TASK-227), then rule the spec's §2 cap with T1's growth measurement in hand (TASK-219 — the evidence TD-058 said it lacked), then give each of the 39 uncovered-mechanical rules an explicit build-or-scope-out disposition (TASK-229). Changes the spec and the baseline's disposition column; no checker, no engine. Gates not yet signed — `/orchestrator` runs G1+G2 first.
 >
-> **Read the baseline before promoting EPIC-004's next member.**
+> **Read the baseline before executing.**
 > [`docs/research/conformance-baseline.md`](docs/research/conformance-baseline.md) is the frozen
 > artifact the engine is designed *against*, and it overturns the epic's opening premise: the eleven
 > checkers encode lean-flow's **project conventions**, not the standard — only 3 of the spec's 13

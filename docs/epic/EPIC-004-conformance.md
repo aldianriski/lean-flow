@@ -4,7 +4,7 @@ slug: conformance
 owner: Maintainer
 last_updated: 2026-08-16
 status: active
-member_sprints: [072]
+member_sprints: [072, 073]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -60,6 +60,7 @@ each other · any telemetry, ever (the README promises none).
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-072](../sprint/archive/SPRINT-072-conformance-baseline.md) | Conformance Baseline | closed 2026-08-16 · `87954f2` | **Overturned this epic's opening premise and replaced it with a measurement.** All **96** normative rules classified — 8 covered · 39 uncovered-mechanical · 45 judgment-only · 6 implementation-directed — and reconciled against the live corpus (11 checkers · 22 harnesses · 98 fixture cases · 46 distinct findings). The checkers do **not** encode the standard: 3 of 13 sections are referenced in `scripts/lib/`, ten have zero. Established the fourth bucket `implementation-directed` (6 rules an engine must never evaluate against an adopter), that a §2 row is a *parameter set* not a rule (6 families, not 37), and that **Gated is the hard level, not Attested**. Changed no checker and no execution architecture — verified by diff. |
+| [SPRINT-073](../sprint/SPRINT-073-spec-as-rule-source.md) | The Spec as Rule Source | active | _(completed at close)_ — moves the classification **into `spec/STANDARD.md`**, which is what makes D1's "rules come from the spec" mechanically true rather than aspirational, and gives each of the 39 uncovered-mechanical rules a build-or-scope-out disposition. Closes both halves of § Closed-when 2. Carries TASK-219 as its middle task, because annotating 96 rules supplies the growth measurement TD-058 said was undiscoverable. Not the engine. |
 
 ## Decisions
 

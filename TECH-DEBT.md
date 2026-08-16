@@ -103,6 +103,14 @@ status: current
     is worth two files is the real trade-off, and it is undecided.
   - Tracker: SPRINT-070 T2 · `evals/run-worktree-base-fixtures.sh` header · TD-054 (the defect) ·
     TD-016 (the cost boundary the rule encodes)
+  - **Re-reviewed 2026-08-16 (SPRINT-073 promote, 3 sprints open) — first aging re-review; held,
+    trigger unchanged.** Ledger search before any decision (L-127): `qa-check.sh`'s
+    `eval_harnesses_optin` list, the harness header, and TD-016 all agree the opt-in placement is the
+    **declared rule** rather than an oversight, and nothing since SPRINT-070 has re-priced that rule.
+    The row's own open question — whether cases 1–3 plus the PASS control split into a git-free
+    always-on leg — is still undecided and still unvehicled. SPRINT-073 is spec-annotation work and
+    touches no harness, so it is not a vehicle either. Search recorded so the next reviewer does not
+    repeat it.
 
 - **TD-058** severity: minor | status: open | created: Sprint-070
   - Summary: **`spec/STANDARD.md` has no §2 row and therefore no cap, and it is now the largest
@@ -130,6 +138,17 @@ status: current
     no ceiling and no §2 row. Recorded rather than re-argued: the row's question is unchanged and
     TASK-219 still owns it, but the trend is now two data points rather than one, which is what the
     cap number will have to be derived from when someone rules it.
+  - **Re-reviewed 2026-08-16 (SPRINT-073 promote, 3 sprints open) — VEHICLED, and the row's own
+    stated blocker dissolves inside this sprint.** Ledger search before any decision (L-127): the
+    Mitigation says the number *"is not derivable from this repo's history — the file has never been
+    capped, so there is no growth curve under a ceiling to reason from"*, and **TASK-219** has carried
+    that question since SPRINT-070 without ever meeting the evidence it named. **TASK-219 is pulled
+    into SPRINT-073 as T2**, ordered deliberately *after* T1's annotation pass: annotating 96 rules
+    with level + mark is the largest single edit `spec/STANDARD.md` will have taken, so T1 produces
+    exactly the growth measurement T2 said it lacked. Re-derived at this promote: **624 lines, 13
+    sections, spec 0.3.0** — unchanged since the SPRINT-071 close update, so the +127-lines-since-
+    extraction trend still stands at two data points and T1 supplies the third. This is L-127's shape
+    resolving rather than recurring: the fact that would close the row was documented in the row.
 
 - **TD-057** severity: minor | status: open | created: Sprint-069
   - Summary: **`Layers:` feeds three checkers that match it three different ways, and nothing states
@@ -169,139 +188,6 @@ status: current
     inventory-and-baseline only and changes no checker architecture. **Unblock condition:** unchanged
     in substance, with a named successor — the engine sprint's G2 either consumes this contract or
     states why it does not need to.
-
-- **TD-056** severity: minor | status: resolved → TASK-212 | created: Sprint-065
-  - Summary: **`check-layers-observed.sh` invoked without its sprint-file argument exits 0 and prints
-    nothing, having checked nothing.** Its own must-FAIL fixtures show a clean run prints
-    `PASS … layers observed (all changed files declared, base <sha>)`; silence means no sprint was
-    examined. `qa-check.sh` always supplies the argument, so the gate path is unaffected — the silent
-    no-op exists only on direct invocation, which is exactly how it was run mid-SPRINT-065 to
-    re-verify a fix.
-  - Impact: a bare re-run after a fix reads as a pass. Caught in-session only because the cross-check
-    rule compared the run's silence against the fixtures' expected PASS line and the two disagreed
-    (SPRINT-065 Execution Log, 2026-08-14). Cost so far: one near-miss, zero bad artifacts. Same
-    family as TD-051's candidate (c) — a skip that is silent instead of loud.
-  - Mitigation (**not yet derived**, L-091): the obvious move — no argument → usage line + non-zero
-    exit — is small, but re-derive the scope first: establish whether the other `scripts/lib/check-*.sh`
-    that take file arguments share the bare-invocation shape, and whether the cure belongs per-checker
-    or in a shared guard. A one-checker fix to a family-shaped defect is how the next silent no-op ships.
-  - Tracker: SPRINT-065 Execution Log (surprise, 2026-08-14) · CLAUDE.md § Edit-safety (c) (the
-    L-045/L-057 family) · TD-051 candidate (c)
-  - **Re-reviewed 2026-08-15 (SPRINT-068 promote, 3 sprints open) — first aging re-review; held,
-    no new sighting.** No bare invocation since the SPRINT-065 near-miss — every run since went
-    through `qa-check.sh`, which supplies the argument. The mitigation stays un-derived per the
-    row's own text (scope the family first, never fix one checker of a family-shaped defect).
-  - **Family scoped 2026-08-15 (SPRINT-068 T2's piggyback scan — the re-review's named ask,
-    answered).** All 12 `check-*.sh` surveyed: the five `<repo-root>`-required checkers fail loudly
-    (`${1:?usage}`), the guarded variadic ones (`check-gates-signed` · `check-night-run-rollup` ·
-    `check-system-verify-block`) print a "nothing verified" note at exit 0, and exactly **two** share
-    the silent bare no-op — `check-layers-completeness.sh` and `check-layers-observed.sh` (`for sp in
-    "$@"` over empty args: zero output, exit 0). The cure is therefore per-checker on exactly those
-    two, matching their guarded siblings' note-line shape. **Vehicle: TASK-212** (filed at SPRINT-068
-    close). Bare invocation also recurred this sprint before the scan — the coordinator ran
-    `check-layers-observed.sh` bare mid-run and read silence (second sighting of this row's shape).
-    **Unblock condition, sharpened with a vehicle:** SPRINT-068 T2 (TASK-210) does gate-registration
-    work in the same neighbourhood — piggyback the family scan there (which `check-*.sh` accept file
-    arguments and what does each do bare?), one command's worth of observation; else the next
-    bare-invocation near-miss.
-  - **Resolved 2026-08-16 (SPRINT-069 T4) → TASK-212.** The per-checker cure the family scan ruled:
-    both `check-layers-completeness.sh` and `check-layers-observed.sh` now print a "nothing verified"
-    note at exit 0 when invoked bare, matching `check-gates-signed.sh`'s note-line shape, with one
-    must-note leg per checker wired into the harnesses the gate runs. Guard-proof run (guard removed
-    → leg RED with its named finding → restored → green), and the with-arguments gate path verified
-    byte-identical against the pre-change checkers with repo state held fixed. Row retained for the
-    audit trail; §11 deletes it three sprints from now.
-
-- **TD-054** severity: medium | status: resolved → SPRINT-070 T2 | created: Sprint-063
-  - Summary: **a worktree created by `Agent(isolation: "worktree")` can branch from a stale base, and
-    nothing checks it.** SPRINT-063 T2's worktree was branched at `40603a6` (`sprint(60)`) — three
-    sprints behind `main` — while the dispatching session was at `85490ac`. The agent detected it
-    itself and fast-forwarded before doing any real work.
-  - Impact: had it not looked, the citer check would have run against a corpus where only 2 of its 4
-    named candidates were `status: superseded` and two docs the sprint's own Scope and A3 name did not
-    exist at all. The result would have been confidently wrong and internally consistent — the worst
-    shape. `dispatch.md`'s pre-dispatch preflight has a **base-ref-vs-HEAD** item, but it checks the
-    *sprint's* base ref, not the base each spawned worktree actually gets; the gap is that the two were
-    assumed to be the same thing. L-021's pattern one layer down: not the plugin cache this time, but
-    the worktree copy of the repo.
-  - Mitigation (**not yet derived**, L-091): the obvious move is "assert the worktree's HEAD equals the
-    coordinator's before the agent starts", which is probably right but assumes the coordinator can
-    read the worktree's base at spawn time — unverified. Establish first **why** the worktree branched
-    three sprints back when the session was current; that mechanism is not understood, and a guard
-    written against the wrong cause guards nothing.
-  - Tracker: SPRINT-063 T2 Execution Log · dispatch.md pre-dispatch preflight · L-021
-  - **Re-reviewed 2026-08-15 (SPRINT-066 promote, 3 sprints open) — first aging re-review; held,
-    vehicle absent.** No worktree has been dispatched since the row was filed (SPRINT-064/065 ran
-    inline/sequential by their own G2 rulings), so the mechanism question — *why* the worktree
-    branched three sprints behind a current session — has had no opportunity to be investigated, and
-    the row's own text forbids writing a guard before that cause is understood. **Unblock condition:**
-    the next worktree dispatch compares the worktree's HEAD to the coordinator's at spawn (one
-    command) *before* real work, and records what it finds — that observation either explains the
-    mechanism or is the second sighting that forces the guard.
-  - **Re-reviewed 2026-08-16 (SPRINT-069 promote, 3 sprints since last) — held, and the unblock
-    condition above is now SPENT: it fired, and came back null.** SPRINT-068 dispatched two worktree
-    builders — the first since this row was filed — and its Execution Log records both branching from
-    `622f420`, which is the sprint's own `gates_signed` commit and therefore the coordinator's HEAD at
-    spawn. Base current, both agents; SPRINT-063's three-sprints-behind branch did not reproduce. That
-    is one clean observation, not an explanation: the mechanism is still unknown and one null result
-    cannot retire a defect seen once. **Unblock condition, rewritten because re-parking on the same
-    measurement is L-094's trap** (a condition already satisfied once cannot be the thing we wait for
-    again): the *next* worktree dispatch records its base the same way — if it is current again, this
-    row closes as not-reproducible with the two observations as its record; if it is stale, that is the
-    second sighting and the guard gets written against a mechanism two data points can constrain.
-  - **SECOND SIGHTING — reproduced 2026-08-16 (SPRINT-069 T4 + T2), and the mechanism is now
-    visible.** Both worktrees dispatched this sprint branched from **`622f420`**, 13 commits behind
-    the dispatching session's HEAD. That sha is not arbitrary: it is SPRINT-068's `record plan_commit
-    sha` commit, and **the same base SPRINT-068's two builders used**. Four worktrees, two sprints,
-    one identical commit — which was current then and stale now. **That is a pin, not drift**, and it
-    answers the question this row has been held open on since SPRINT-063 ("*why* did a worktree branch
-    three sprints back when the session was current"). The row's own text forbids a guard before the
-    cause is understood; a systematic pin is a cause.
-  - **Measured cost this sprint, so the next re-review is not arguing from principle:** (a) T4's base
-    lacked 68 lines of SPRINT-068 close-time work on two of the four files it edited — the three-way
-    merge preserved both sides only because the edits sat in different regions, and the union was
-    verified rather than assumed; (b) T2's base predated T1 entirely, voiding *inside the builder's
-    tree* the `Depends-on: T1` edge that the pre-dispatch preflight had HALTed to enforce, and
-    producing a real merge conflict in which the builder carried forward a line-count figure that had
-    been corrected after its base; (c) T3's dispatch was abandoned for inline work, because a sweep
-    against a tree with no `spec/` would have been provably wrong work rather than a merge risk.
-    Effective dispatch yield: 2 of 3 planned, both requiring union-verification.
-  - **Unblock condition — met. This row is now actionable, not waiting.** The guard has a mechanism to
-    be written against: assert the worktree's HEAD equals the coordinator's at spawn and halt if not,
-    *and* establish why the base is pinned to a stale sha in the first place — the assertion catches
-    it, the pin is the thing to fix. **Vehicle: TASK-217** (filed at this close). **Severity reviewed
-    at this close and held at `medium`** — the close proposed raising it and the proposal was wrong
-    about the starting point: this row has been `medium` since it was filed at SPRINT-063, so there
-    was nothing to raise. What changed is the *evidence under* that severity, from one historical
-    sighting to a demonstrated cost on every dispatch; `high` was considered and declined, since it
-    auto-escalates to Backlog P1 and would front-run the next promote rather than inform it.
-  - **RESOLVED 2026-08-16 (SPRINT-070 T2) — and the mechanism was documented in this repo before this
-    row was ever filed.** `worktree.baseRef` defaults to `"fresh"`, which branches from `origin/HEAD`.
-    Measured at execution: `origin/main` = `622f420` — the exact sha all four worktrees used — with
-    local `main` **31 commits ahead and unpushed**. Not drift, not a harness bug, and not the
-    "systematic pin" of unknown origin the second-sighting entry described: it is **documented default
-    behaviour** meeting a repo where push is owner-reserved, so `origin/HEAD` stands still while local
-    work accumulates. Confirmed against the official worktrees documentation, which states it outright
-    for subagent worktrees. **`L-046` (SPRINT-026, `status: active`) said this verbatim, and
-    `dispatch.md`'s own base-ref caveat repeated it — inside the file this fix was promoted to edit.**
-    Three aging re-reviews re-asked the question rather than searching the record; filed as **L-127**,
-    because the six-sprint delay is the reusable lesson here, not the git behaviour.
-  - **Cure shipped, both halves, per this row's own framing** ("the assertion catches it, the pin is
-    the thing to fix"): `worktree.baseRef: "head"` in `.claude/settings.json` removes the pin at its
-    cause, and a **worktree-base guard** in `dispatch.md` compares the base a spawned worktree
-    *actually got* against the coordinator's HEAD, halting by name. The pre-dispatch preflight's
-    base-ref leg could never have caught this and now says so: it compares the *declared* base to live
-    HEAD, both in the main checkout. `git push` was considered and rejected in the doc text — it makes
-    the base current exactly once and re-breaks on the next unpushed commit.
-  - **Verified live, not just in fixtures.** The next dispatched worktree came back at `97eca0b`, the
-    coordinator's HEAD exactly, with `spec/` and `ADR-024` present in its tree — both absent at
-    `origin/main`, so the base is provable without comparing a sha. Regression cover:
-    `evals/run-worktree-base-fixtures.sh`, one case per named finding, proven to bite by inverting the
-    guard's comparison (4 of 7 assertions went red). Its opt-in tier is carried as **TD-059**. One
-    thing the demonstration could *not* do is recorded as **L-128**: the worktree and its branch were
-    swept before the guard could be run against them.
-  - **Row retained, not deleted** — §11 keeps a resolved row for ≥ 3 sprints because a just-resolved
-    debt is still context at the next promote. Id stays monotonic when it goes.
 
 - **TD-053** severity: minor | status: open | created: Sprint-063
   - Summary: **worktree-isolated dispatch places a full repo copy at `.claude/worktrees/<id>/`, inside
@@ -437,6 +323,13 @@ status: current
     condition:** unchanged — EPIC-004's engine. Deliberately not vehicled into SPRINT-071: that sprint
     removes rule *duplication* between skills and spec, which changes where a prose rule lives without
     making any of it mechanically asserted.
+  - **Re-reviewed 2026-08-16 (SPRINT-073 promote, 3 sprints since last) — held, trigger unchanged.**
+    Ledger search before any decision (L-127): `evals/` still contains no harness whose subject is
+    skill *prose*, and the two nearest things (`run-system-verify-fixtures.sh` and `qa-check.sh`'s
+    headless park-record cue checks) assert a checker's output or a grep-able cue, never a procedure's
+    behaviour — so the gap is unchanged in kind, not merely unaddressed. Unblock condition unchanged:
+    EPIC-004's engine. SPRINT-073 edits `spec/STANDARD.md`, not skill prose, so it neither vehicles
+    this row nor widens it.
 
 - **TD-051** severity: medium | status: open | created: Sprint-061
   - Summary: **`check-layers-observed.sh` (gate leg 15) never sees a close commit, because the close
@@ -510,6 +403,13 @@ status: current
     rotated out without a red leg, where every prior MINOR close went red on that file. Balance is
     unchanged and still favours candidate (c), make-the-skip-loud. **Unblock condition:** unchanged —
     one close commit carrying an undeclared file that mattered.
+  - **Re-reviewed 2026-08-16 (SPRINT-073 promote, 3 sprints since last) — held, and the trigger was
+    re-verified rather than assumed.** Ledger search before any decision (L-127): the row's claim is
+    that a close commit *is* the archival commit, so `check-layers-observed.sh`'s `*/archive/*` skip
+    hides it. **SPRINT-072's close did exactly that** — `87954f2` moved the sprint and its log into
+    `docs/sprint/archive/` in the same commit that closed the sprint, making this the fourth
+    consecutive close to confirm the precondition in the checker's own comment is false. Recorded as a
+    fresh observation rather than a restatement. Still unvehicled: SPRINT-073 changes no checker.
 - **TD-050** severity: minor | status: open | created: Sprint-060
   - Summary: **section 4 of `scripts/qa-check.sh` (knowledge metadata — index freshness, dangling refs,
     frontmatter completeness, ADR-009) is 45–49% of the entire gate on its own** — 75–76 s of a
@@ -728,6 +628,14 @@ status: current
     *should* say (a base-ref assertion), so acting on length before TASK-217 lands would edit a
     checklist that is about to gain an item. **Unblock condition:** unchanged — a real run, or a reader
     demonstrably skipping an item.
+  - **Re-reviewed 2026-08-16 (SPRINT-073 promote, 3 sprints since last) — held, but the block is
+    discharged and the row is now merely unscheduled.** Ledger search before any decision (L-127):
+    this row deferred to whatever would change what the pre-flight checklist *should say*, naming a
+    base-ref assertion — and **TD-054's cure shipped at SPRINT-070 T2**, with `dispatch.md` gaining
+    the worktree-base guard. So the stated dependency no longer holds. It is still not vehicled, and
+    SPRINT-073 (spec annotation, all HITL, no night run) is the wrong sprint for it. Recorded
+    explicitly so the next reviewer starts from *"unblocked but unscheduled"* rather than re-deriving
+    a block that has already lifted.
 - **TD-045** severity: minor | status: open | created: Sprint-056
   - Summary: the dispatch preflight in `dispatch.md` still re-implements the `Layers:`/`Depends-on:`
     parser that `check-layers-completeness.sh` owns. SPRINT-056 T1 fixed the two drifts (TD-040,
@@ -772,6 +680,11 @@ status: current
     read by three matchers with three different semantics. If a consolidation is ever derived, these
     two and TD-049 are one piece of work, not three. **Unblock condition:** EPIC-004's rule
     representation, or a third drift.
+  - **Re-reviewed 2026-08-16 (SPRINT-073 promote, 3 sprints since last) — held, trigger unchanged.**
+    Ledger search before any decision (L-127): the duplication is *guarded* by the parity fixture, and
+    the G2 ruling behind it — `dispatch.md` publishes a dependency-free snippet, and pointing it at
+    `scripts/lib/` would leak a maintainer-only path into a consumer-facing reference (L-015) — is
+    unchanged and still correct. Neither side has moved since SPRINT-070. No vehicle in SPRINT-073.
 - **TD-037** severity: minor | status: open | created: Sprint-049
   - Summary: attribution needs a commit to read, so **uncommitted work in progress is still tested
     against the all-task union** — the exact weakness TD-035 was filed about, surviving on the one
@@ -857,3 +770,10 @@ status: current
     accept the boundary and document it where a coordinator reads it.
   - **Vehicle: TASK-218** (filed at the SPRINT-070 promote). **Unblock condition: met** — superseded by
     the vehicle. What remains open is which cure, not whether one is warranted.
+  - **Re-reviewed 2026-08-16 (SPRINT-073 promote, 3 sprints since last) — held on a vehicle that is
+    ready and unscheduled, which is a different state from waiting on evidence.** Ledger search before
+    any decision (L-127): **TASK-218** is `state: ready`, P1, and already carries this row's standing
+    warning against inferring the in-flight task from open-DoD state. It was **not** pulled into
+    SPRINT-073: that sprint annotates `spec/STANDARD.md` and touches no checker, so including this
+    would mix two unrelated themes in one frozen Plan. Recorded rather than re-parked — the next
+    reviewer's question is *when to schedule it*, not *what would unblock it*.
