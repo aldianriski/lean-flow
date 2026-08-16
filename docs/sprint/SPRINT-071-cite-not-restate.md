@@ -4,7 +4,7 @@ slug: cite-not-restate
 epic: EPIC-003
 owner: Maintainer
 last_updated: 2026-08-16
-plan_commit: [sha — set at promote]
+plan_commit: fd4ba3a
 close_commit: [sha — set at close]
 status: active
 update_trigger: sprint execute/close events
