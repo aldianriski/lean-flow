@@ -8,6 +8,13 @@ graphify-out/
 .claude/settings.local.json
 .claude/.lean-doc-cache.json
 
+# worktree-isolated dispatch checkouts (TD-053 leg 2, SPRINT-069 T5)
+# The dispatch protocol places a FULL repo copy here, inside the repo, at fan-out time. Untracked,
+# a plain `git add -A` stages a second copy of the whole tree into the coordinator's commit.
+# This closes that leg only. It does NOT stop `find`-based checkers walking into the directory —
+# they walk the filesystem, not the index — which is TD-053 leg 1, routed to EPIC-004 D1.
+.claude/worktrees/
+
 # OS / editor
 .DS_Store
 Thumbs.db
