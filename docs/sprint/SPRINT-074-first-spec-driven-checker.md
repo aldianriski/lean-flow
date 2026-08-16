@@ -3,7 +3,8 @@ sprint: 074
 slug: first-spec-driven-checker
 epic: EPIC-004
 owner: Maintainer
-last_updated: 2026-08-16
+last_updated: 2026-08-17
+gates_signed: G1,G2 @ 296115e
 plan_commit: 10be550
 close_commit: [sha — set at close]
 status: active
@@ -50,16 +51,29 @@ an engine must never evaluate against an adopter.
 in the register like every other rule of its mark.
 
 **DoD:**
-- [ ] Both rules carry a real mark, each with its reason — *Verify: grep the spec for `unclassified`;
+- [x] Both rules carry a real mark, each with its reason — *Verify: grep the spec for `unclassified`;
       zero rows. A mark asserted without a reason is the invention D4 forbade, arriving late*
-- [ ] §14's counts are updated to match — *Verify: the count of `?` rows and the
+      → `S4.INDEX` Structural/mechanical · `S5.DISCARDLOG` `implementation-directed`, each with its
+      reason in-row. Row-shaped query returns **0**, with a negative control proving the pattern fires;
+      the 3 surviving `unclassified` strings are §14's own legend, prose *about* the mark (L-108)
+- [x] §14's counts are updated to match — *Verify: the count of `?` rows and the
       `implementation-directed` tally in §14 both re-derived from the tables, not edited by hand*
-- [ ] Each newly-marked rule gains a disposition — *Verify:
+      → **100 classified · 0 unclassified**, `implementation-directed` **6 carried, none pending**.
+      Independent per-section census summed **100** (§4=7 · §5=2 · §13=7) — a second query that could
+      have disagreed and did not
+- [x] Each newly-marked rule gains a disposition — *Verify:
       `docs/research/conformance-dispositions.md`; a `build` row names its finding, a `scope-out` row
       names its reason*
-- [ ] `spec/CHANGELOG.md` records it — *Verify: the file. **PATCH, not MINOR** — marking a rule that was
+      → `S4.INDEX` → `build` / `decisions-index-missing-adr` (build census **43**, matching the heading).
+      **`S5.DISCARDLOG` gains neither**, by owner ruling at G1: `implementation-directed` takes a rule
+      *out* of the checkable set rather than into `scope-out`, so the register records it beside the
+      other five carried rules. Read explicitly rather than silently (scope-change 2026-08-17)
+- [x] `spec/CHANGELOG.md` records it — *Verify: the file. **PATCH, not MINOR** — marking a rule that was
       already stated adds no obligation, and calling it MINOR would tell adopters to re-read a spec that
       gained nothing they must satisfy*
+      → **0.4.1**, with the PATCH reasoning stated in the entry. `version:` bumped in the spec's own
+      frontmatter too — not named by this DoD, but a PATCH entry without it would contradict the file
+      it describes
 
 ### T2 — Build the §13 attestation checker `[size: M · risk: med · class: execution · HITL]`
 Layers: `scripts/lib/check-attestation.sh` · `evals/run-attestation-fixtures.sh` ·
@@ -89,9 +103,11 @@ the spec or from its author.
 - [ ] All five `build` rules from the register are checked — `S13.TRAILERS` · `S13.OWNCOMMIT` ·
       `S13.EVIDENCESHA` · `S13.AGREE` · `S13.UNSIGNEDCLAIM` — *Verify: count the assertions against the
       register's rows for §13; a rule silently skipped is a FAIL*
-- [ ] **Each check fails with the finding name the register already published** — *Verify: the fixture
-      output string matches the register verbatim. The names were committed one sprint before the code,
-      so this is a contract, not a naming exercise (L-123)*
+- [ ] **Each check fails with a named finding, and the register resolves to those names** — *Verify: the
+      five names are specified here and `docs/research/conformance-dispositions.md` line 81 — which
+      deferred them to this task rather than publishing them — is completed to point at them; fixture
+      output matches. **Restated at G1 by owner ruling (scope-change 2026-08-17)**: the DoD as promoted
+      verified against a register entry that deliberately holds no names, so it had no referent (L-088)*
 - [ ] **One retained must-FAIL fixture per check**, plus a PASS control — *Verify: the harness runs and
       each case fails with its own named finding. A gate's worst failure is the silent false negative,
       and a fixture deleted with the prototype leaves it unguarded (L-058 · TD-012)*

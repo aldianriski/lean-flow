@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-16
+last_updated: 2026-08-17
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,32 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.4.1 — 2026-08-17
+
+**Changed — the last two unclassified rules are ruled, and a count that contradicted itself is fixed.**
+Nothing here adds an obligation: both rules were already stated and already binding at 0.4.0. What
+changes is that a tool reading this document can now decide what to do with them.
+
+- **`S4.INDEX`** (`DECISIONS.md` is a thin index linking the ADRs) → **Structural · mechanical**. It
+  binds a repository artifact and is decidable from the tree.
+- **`S5.DISCARDLOG`** (the `"Skipped: … explains HOW"` line) → **`implementation-directed`**. It is a
+  *generator's* output format, not repository content — an adopter's repo offers nothing to evaluate it
+  against. This is the bucket §14 says an engine must never test against an adopter, so the ruling
+  matters more than its size: guessing it the other way emits findings nobody can clear.
+- **§13's prose said `three` of its rules are `implementation-directed`; its own Conformance table, §14
+  and the reference implementation's register all said two.** Corrected to two at both sites. The
+  arithmetic was decisive rather than a judgement call — §13 states 5 mechanical of 7, and 5+3=8.
+
+**Counts, re-derived: 100 classified · 0 unclassified** (was 98 · 2), and `implementation-directed` is
+**6 carried, none pending** (was 5 + 1). §4 is 7 rules, §5 is 2.
+
+**No rule carries `?` at this version.** The mark stays defined, because a rule added to a later version
+arrives unruled and that is the honest state for it.
+
+**PATCH, not MINOR, deliberately.** Marking a rule that was already stated adds nothing an adopter must
+satisfy. Calling it MINOR would tell every adopter to re-read a specification that gained no new
+obligation — and a version number that cries wolf is worse than one that moves quietly.
 
 ## 0.4.0 — 2026-08-16
 

@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-16
+last_updated: 2026-08-17
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.4.0
+version: 0.4.1
 status: current
 ---
 
@@ -341,12 +341,12 @@ decisions (the explicit no's matter) · deliberate deviations · constraints inv
 | `S4.BAR` | Gated | judgment-only — offer an ADR only when hard-to-reverse **and** surprising **and** a real trade-off |
 | `S4.ONEFILE` | Structural | mechanical — one file per ADR at `docs/adr/ADR-NNN-<slug>.md` |
 | `S4.APPEND` | Gated | mechanical *via git history* — a decided ADR is never edited; mark `deprecated`/`superseded` |
-| `S4.INDEX` | Structural | **unclassified (`?`)** — `DECISIONS.md` is a thin index linking the ADRs. Present in this section and **absent from the SPRINT-072 inventory**; routed to T3 rather than given a mark here (D4: marks are transcribed, never invented) |
+| `S4.INDEX` | Structural | mechanical — `DECISIONS.md` exists and carries a row for every `docs/adr/ADR-NNN-<slug>.md`; a thin index, not a second copy of the decisions |
 | `S4.SECTIONS` | Structural | mechanical — Status · Deciders · Context · Decision · Consequences · Alternatives all present |
 | `S4.NEGATIVE` | Structural | mechanical — Consequences carries **at least one Negative** |
 | `S4.NOINVENT` | Gated | judgment-only — record only what was confirmed; never invent a decision |
 
-**7 rules, 1 unclassified.** Two statements in this section are deliberately **not** rules:
+**7 rules.** Two statements in this section are deliberately **not** rules:
 *"WHY only, never HOW"* restates `S5.FILTER` (the same ground on which §7 and §8 are ruled projections),
 and the `/council` pressure-test line is advice for a high-stakes call, not an obligation. **`Qualifies`
 / `Does not` are data** — they calibrate `S4.BAR`'s judgement, they are not separate rules.
@@ -369,9 +369,10 @@ Discard log: `"Skipped: '[detail]' explains HOW → add as a comment in [file]."
 | Rule | Level | Mark |
 |---|---|---|
 | `S5.FILTER` | Structural | judgment-only — no HOW content; every line passes the KEEP/DISCARD filter |
-| `S5.DISCARDLOG` | — | **unclassified (`?`)** — the discard-log line binds a *generator's* output, not a repository. A candidate for `implementation-directed`; **absent from the SPRINT-072 inventory** and routed to T3 |
+| `S5.DISCARDLOG` | — | **implementation-directed** — the discard-log string is a *generator's* output format. It binds what a tool emits when it drops a HOW line, not what a repository contains, so an adopter's repo offers nothing to evaluate it against |
 
-**1 rule, 1 unclassified.** The four KEEP/DISCARD rows are **data** calibrating `S5.FILTER`, not rules.
+**2 rules, 1 `implementation-directed`.** The four KEEP/DISCARD rows are **data** calibrating
+`S5.FILTER`, not rules.
 
 ---
 
@@ -856,7 +857,7 @@ field rather than something a verifier derives.
 
 **Conformance. Attested is the *most* mechanical level in this standard** — 5 of 7 — because a trailer
 is a literal string on a literal object. That inverts the usual intuition; the hard level to check is
-**Gated** (§10 is 4 of 10). But three of §13's rules are `implementation-directed`, and they are the
+**Gated** (§10 is 4 of 10). But two of §13's rules are `implementation-directed`, and they are the
 semantically load-bearing ones: they constrain **what a tool may infer**, not what a repository must
 contain. An engine that ingested them as repo rules would either drop the claim-vs-proof boundary this
 section exists to state, or emit findings **no adopter can ever clear**.
@@ -871,7 +872,7 @@ section exists to state, or emit findings **no adopter can ever clear**.
 | `S13.NOINFER` | — | **implementation-directed** | a verifier **may not** conclude approval from an unsigned trailer |
 | `S13.NOTAUTHOR` | — | **implementation-directed** | author/committer identity is **not** the attestation |
 
-**7 rules**, three `implementation-directed`. **§13 is entirely unchecked today** — no attestation
+**7 rules**, two `implementation-directed`. **§13 is entirely unchecked today** — no attestation
 checker exists in the reference implementation, which its own conformance report states plainly rather
 than rounding up.
 
@@ -913,9 +914,9 @@ inflating any denominator that ingests it. A conformant report states a **level*
 preventing the next level**, and the **judgment-required items**. Never a score, a grade, or a
 percentage.
 
-**`implementation-directed` is not a courtesy category.** **Five rules carry it** —
-`S9.GATESMALFORMED` · `S10.MATCHER` · `S12.WIRING` · `S13.NOINFER` · `S13.NOTAUTHOR` — and a **sixth is
-pending**, `S5.DISCARDLOG`, which is a strong candidate but unruled. Two sit in §13 and they are the
+**`implementation-directed` is not a courtesy category.** **Six rules carry it** —
+`S5.DISCARDLOG` · `S9.GATESMALFORMED` · `S10.MATCHER` · `S12.WIRING` · `S13.NOINFER` ·
+`S13.NOTAUTHOR`. Two sit in §13 and they are the
 load-bearing ones: *a verifier may not conclude approval from an unsigned trailer* and *author identity
 is not the attestation* are rules about **what a tool may infer**. A conformance engine that ingests
 them as repository rules must either drop them — losing the entire claim-vs-proof boundary §13 exists to
@@ -927,15 +928,16 @@ An id is retired, never reused.
 
 **A `?` mark means unclassified, and is a real state.** It marks a rule this specification states and
 whose classification has not yet been ruled. It is not a silent skip and it is not a pass — a tool
-reporting on a `?` rule says so.
+reporting on a `?` rule says so. **No rule carries `?` at this version**; the mark stays defined because
+a rule added to a later version arrives unruled, and the honest state for it is this one.
 
-**Counts, re-derived from this document.** **98 classified rules and 2 unclassified**, 100 candidates
+**Counts, re-derived from this document.** **100 classified rules and 0 unclassified**, 100 candidates
 across §1–§13:
 
 | § | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | total |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| classified | 4 | 21 | 3 | 6 | 1 | 4 | 9 | **0** | 10 | 10 | 11 | 12 | 7 | **98** |
-| unclassified | | | | 1 | 1 | | | | | | | | | **2** |
+| classified | 4 | 21 | 3 | 7 | 2 | 4 | 9 | **0** | 10 | 10 | 11 | 12 | 7 | **100** |
+| unclassified | | | | 0 | 0 | | | | | | | | | **0** |
 
 §8 contributes **0** — it is a projection of rules stated elsewhere, and an engine ingesting it
 double-counts seven constraints under a second name.

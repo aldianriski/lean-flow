@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-16
+last_updated: 2026-08-17
 update_trigger: A rule's disposition changes, or spec/STANDARD.md gains or reclassifies a rule
 status: current
 id: conformance-dispositions
@@ -16,13 +16,18 @@ SPRINT-073 T3. Every **mechanically checkable rule with no checker** carries one
 an undifferentiated middle. Rule ids are `spec/STANDARD.md` §14's; that file is the source, this one is
 the register. Split from `conformance-baseline.md` under §2's growth rule — split, never squeeze (L-131).
 
-**Counts, re-derived from the annotated spec (T1), not from the baseline.** 100 candidates · 98
-classified · **62 checkable** (48 `mechanical` + 14 `split`, counting a split's mechanical half) · **8
-covered** · **54 dispositioned here — 42 `build`, 12 `scope-out`**. The baseline's "39
-uncovered-mechanical" predates T1's re-derivation and is superseded; see § Divergences.
+**Counts, re-derived from the annotated spec, not from the baseline.** 100 candidates · **100
+classified** · **63 checkable** (49 `mechanical` + 14 `split`, counting a split's mechanical half) · **8
+covered** · **55 dispositioned here — 43 `build`, 12 `scope-out`**. The baseline's "39
+uncovered-mechanical" predates the re-derivation and is superseded; see § Divergences.
 
-Reconciled mechanically, not by eye: 8 + 42 + 12 = 62, and **no checkable rule is left without a
+Reconciled mechanically, not by eye: 8 + 43 + 12 = 63, and **no checkable rule is left without a
 disposition** (`comm` of the checkable set against the union of the three sections returns empty).
+
+**Updated at SPRINT-074 T1**, which ruled the two rules that were still `?`: `S4.INDEX` →
+Structural/mechanical, joining `build` below (+1 checkable, +1 `build`); `S5.DISCARDLOG` →
+`implementation-directed`, which takes it **out** of the checkable set rather than into `scope-out` —
+that mark is not a disposition, and the distinction is the one §14 exists to hold.
 
 **Stated as counts, never as a ratio (EPIC-004 D1).** There is no percentage here and there must not be
 one: a ratio would improve every time the standard declines to automate something.
@@ -37,7 +42,7 @@ one: a ratio would improve every time the standard declines to automate somethin
 | `S11.EPIC` | `check-epic-archive.sh` |
 | `S11.RESEARCH` | `check-research-archive.sh` |
 
-## `build` — 42 rules, each with the finding its check will fire
+## `build` — 43 rules, each with the finding its check will fire
 
 A check specified without its finding name is a half-shipped gate (L-058). Every row ships with a
 **retained** must-FAIL fixture proving that exact string fires (TD-012).
@@ -54,6 +59,7 @@ A check specified without its finding name is a half-shipped gate (L-058). Every
 | `S3.AGENTS` | `agents-ownership-footer-missing` |
 | `S4.ONEFILE` | `adr-path-noncanonical` |
 | `S4.APPEND` | `adr-edited-after-decision` |
+| `S4.INDEX` | `decisions-index-missing-adr` |
 | `S4.SECTIONS` | `adr-required-section-missing` |
 | `S4.NEGATIVE` | `adr-no-negative-consequence` |
 | `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` · `S6.MULTISVC` | `tier-doc-set-incomplete` *(one check, four tiers — the tier is a parameter, not four checkers)* |
@@ -112,17 +118,20 @@ reader who expects to find them, not as dispositions.
 ## Divergences from `conformance-baseline.md` (routed here by T1)
 
 The baseline's § Coverage by section states 96 rules while its own `rules` column sums to 99 and its
-bucket columns to 98, and its **39 uncovered-mechanical** is superseded by the 54 above. Causes, all
-identified by T1 re-deriving from the spec:
+bucket columns to 98, and its **39 uncovered-mechanical** is superseded by the 55 above. Causes, all
+identified by SPRINT-073 T1 re-deriving from the spec:
 
 1. **§2 is 21, not 20** — `S2.R-PLACEMENT` carries the legacy-path second-match rule, separable from
    `S2.F-FILE`.
 2. **§10 is 10, not 11** — *"doc-aging has two sources"* is data.
 3. **§11 is 11, not 12** — two rationale statements out, `S11.WHENITRUNS` in.
-4. **`S4.INDEX` and `S5.DISCARDLOG`** are rules the inventory never saw; both are annotated `?` in the
-   spec and remain **unclassified** — they are not dispositioned here, because a rule with no mark has no
-   disposition to give. **Owner action: rule them.**
-5. **`implementation-directed` is 5 carried + 1 pending**, and **2** sit in §13, not 3.
+4. **`S4.INDEX` and `S5.DISCARDLOG`** are rules the inventory never saw. Both were annotated `?` and
+   **were ruled at SPRINT-074 T1** — `S4.INDEX` Structural/mechanical (now a `build` row above),
+   `S5.DISCARDLOG` `implementation-directed`. No rule carries `?` at spec 0.4.1.
+5. **`implementation-directed` is 6 carried**, none pending, and **2** sit in §13, not 3. The spec's own
+   §13 prose said *three* at `:859` and `:874` while its table, §14 and this register all said two —
+   corrected at SPRINT-074 T1. The arithmetic settled it without a judgement call: §13 states 5
+   mechanical of 7, and 5+3=8.
 
 **The baseline is not edited to match.** `spec/STANDARD.md` §14 is the rule source now; a derived
 inventory that disagrees with it is the thing that is wrong, and the baseline stays as the frozen record
