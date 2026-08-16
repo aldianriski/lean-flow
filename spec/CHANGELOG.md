@@ -26,6 +26,11 @@ commit in the reference implementation and shown in its true unsigned state (`%G
 673 commits in that repository's history) rather than illustrated with a signature that does not
 exist.
 
+Also in §13: **`Evidence:` should carry `@ <sha>`.** A trailer is written into immutable history but
+the path it names is not immutable, and a bare path stops resolving the moment planning records are
+archived or renamed — which happened to §13's own worked example during the very close that wrote it.
+The sha-qualified form still resolves; a bare one would already be dead.
+
 Minor rather than patch: this adds a section and a new obligation for anyone claiming Attested, and
 changes no existing rule. `plugin.json` and the other three manifests do not move with it —
 the spec versions independently (EPIC-003 D3).

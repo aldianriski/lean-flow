@@ -16,8 +16,8 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 
 ## Why this, why now
 
-The specification is **`spec/STANDARD.md`** — **497** lines, moved at SPRINT-069 T2 out of one
-skill's references folder and now versioned independently (v0.1.0) with its own changelog
+The specification is **`spec/STANDARD.md`** — **595** lines, moved at SPRINT-069 T2 out of one
+skill's references folder and now versioned independently (v0.2.0) with its own changelog
 (`docs/research/platform-readiness-audit.md` F3 is the pre-move finding). An adopter still cannot
 take the *whole* standard without taking the tool while conformance levels, attestation and
 re-pointed skills remain open (see § Closed when); T2 is the first step that makes the claim true.
@@ -26,7 +26,12 @@ re-pointed skills remain open (see § Closed when); T2 is the first step that ma
      rather than measured (L-097): the epic was drafted at 450, SPRINT-069's promote re-measured 489,
      and the move added an ownership header the standard never had, giving 497. Re-measure it, never
      copy it forward. ADR-018 keeps its own 450 — an accepted ADR is append-only and was accurate
-     when written. -->
+     when written.
+     Fourth measurement, SPRINT-070 T1 close: 595, after §13 added the attestation format. This one
+     was caught by the close's doc-freshness pass rather than by anyone recalling the warning
+     directly above it — which is the same finding as this sprint's L-127, one file over: a note that
+     says "re-measure" only fires if something makes you look. The growth is also why TD-058 now
+     exists: 595 lines and no §2 cap row governing any of it. -->
 
 
 It spans sprints because the spec is not one file: the doc standard, the gate contract, the
@@ -36,9 +41,17 @@ creating a second SSOT is the work.
 
 **Git-native attestation is specified here, not built here.** The mechanism — a `Gate-Signed-By:` /
 `Gate:` / `Evidence:` trailer on each task's own commit, plus optional commit signing — is stronger
-than today's `gates_signed: G1,G2 @ <sha>`, not weaker (F5): it raises granularity from sprint-batch
-to per-task, takes identity from the commit author and signature, and is verifiable by anyone with a
-clone with no service to run or trust. EPIC-004 builds the checker that reads it.
+than today's `gates_signed: G1,G2 @ <sha>`, not weaker (F5): it is verifiable by anyone with a clone,
+with no service to run or trust. EPIC-004 builds the checker that reads it.
+
+<!-- Corrected at SPRINT-070's close. This paragraph read "it raises granularity from sprint-batch to
+     per-task, takes identity from the commit author and signature" — inherited from ADR-018 and
+     wrong on both halves, as T1's design established. D1 ruled the trailer *carries* the sprint-level
+     sign-off rather than moving approval per-task (batch G1/G2 is what makes sprint-bulk viable), and
+     §13(e) rules that author identity is not the attestation at all — it varies by setup and never
+     says who approved a gate, which is why `Gate-Signed-By:` is a separate field. What the mechanism
+     actually buys is verifiability, which is what the sentence now claims. ADR-018 keeps its original
+     wording: an accepted ADR is append-only, and ADR-025 carries the correction via `related:`. -->
 
 ## Scope
 
@@ -55,7 +68,7 @@ spec so a rule has exactly one home · ADR the split.
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-069](../sprint/archive/SPRINT-069-first-extraction.md) | First Extraction | closed 2026-08-16 · `b744fed` | Made the standard **separable and pinnable**: `spec/STANDARD.md` at v0.1.0 with its own changelog, versioning independently of the plugin — which is condition 1 outright. Ruled the **conformance levels** (ADR-024, condition 3), the ruling the epic routed to its first member's G2. Left the epic's harder half untouched by design: attestation and the no-skill-restates-a-rule pass are later members. |
-| [SPRINT-070](../sprint/archive/SPRINT-070-attested.md) | Attested | closed 2026-08-16 · `CLOSE_COMMIT` | Made the top rung **writable**: `spec/STANDARD.md` §13 (spec v0.2.0) + [ADR-025](../adr/ADR-025-git-native-attestation-format.md) specify the three-trailer format, closing **D2** and condition 4. Its harder contribution is a boundary, not a feature — §13 states that an unsigned trailer is a *claim, not proof*, so **Attested is unreachable by trailers alone** and this repo is honestly Gated; that is what stops the level from becoming self-certifying before EPIC-004 exists. Also corrected ADR-018's granularity claim (the trailer carries the batch sign-off, not per-task approval). Conditions 2 and 5 deliberately untouched — both are sweeps, not specifications. |
+| [SPRINT-070](../sprint/archive/SPRINT-070-attested.md) | Attested | closed 2026-08-16 · `d164924` | Made the top rung **writable**: `spec/STANDARD.md` §13 (spec v0.2.0) + [ADR-025](../adr/ADR-025-git-native-attestation-format.md) specify the three-trailer format, closing **D2** and condition 4. Its harder contribution is a boundary, not a feature — §13 states that an unsigned trailer is a *claim, not proof*, so **Attested is unreachable by trailers alone** and this repo is honestly Gated; that is what stops the level from becoming self-certifying before EPIC-004 exists. Also corrected ADR-018's granularity claim (the trailer carries the batch sign-off, not per-task approval). Conditions 2 and 5 deliberately untouched — both are sweeps, not specifications. |
 
 ## Decisions
 
