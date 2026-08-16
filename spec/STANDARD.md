@@ -2,7 +2,7 @@
 owner: Maintainer
 last_updated: 2026-08-16
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.3.0
+version: 0.4.0
 status: current
 ---
 
@@ -22,6 +22,19 @@ status: current
 | LAW 2 | Owned, Not Shared | Every doc has exactly one owner *role*; shared = no ownership |
 | LAW 3 | Lifecycle-Bound | Every doc has defined create / update / archive triggers |
 | LAW 4 | Signal-Dense | Every line carries info not already in code; repeating code = delete |
+
+**Conformance.** Each rule carries the level it belongs to and whether it is checkable. `mechanical` =
+a tool can decide it · `judgment-only` = **not checkable in principle**, the standard choosing a human ·
+`split` = mechanical on one half, judged on the other · `implementation-directed` = **constrains a tool,
+not your repo — never evaluate it against a repository.** Ids are stable across versions; a finding
+names one. Legend and the full model → §14.
+
+| Rule | Level | Mark |
+|---|---|---|
+| `S1.LAW1` | Structural | judgment-only — a counterfactual; nothing observable separates a needed doc from an unneeded one |
+| `S1.LAW2` | Structural | mechanical — one `owner:` field, value in a role vocabulary |
+| `S1.LAW3` | Structural | split — `update_trigger:` *present* is mechanical; whether it is the *right* trigger is not |
+| `S1.LAW4` | Structural | judgment-only — the §5 filter in law form |
 
 ---
 
@@ -199,6 +212,41 @@ name — never bare "Output") → `## Hard rules` (optional) → `## Red flags` 
 ANOTHER skill's `references/`/`templates/`. **Caps**: `SKILL.md` ≤ ~140 lines procedure+scaffolding
 (ADR-006); `references/` uncapped.
 
+**Conformance.** **A row in the tables above is a parameter set, not a rule.** Its cells span three
+levels and both marks — `Cap` is mechanical, `Create ←` is a lifecycle *event* no tool observes — so
+§2's rules are the **six column families**, and the 37 rows are their **data**. A checker that hard-codes
+one rule per row hard-codes 37 near-duplicates and drifts on the 38th; read the families, parameterised
+by the rows.
+
+| Rule | Level | Mark |
+|---|---|---|
+| `S2.F-FILE` | Structural | mechanical — the file exists at its canonical path (`File` cell) |
+| `S2.F-CAP` | Structural | mechanical — `wc -l` vs the `Cap` cell |
+| `S2.F-CREATE` | Gated | judgment-only — a create *trigger* is an event; no tool observes that it happened |
+| `S2.F-UPDATE` | Gated | judgment-only — same shape as `S2.F-CREATE` |
+| `S2.F-TIER` | Gated | split — tier *satisfaction* is mechanical (reduces to `S2.F-FILE`); tier *detection* is judged (§6) |
+| `S2.F-ARCHIVE` | Structural | mechanical — the `Archive` cell delegates to §11's ledger |
+| `S2.R-PLACEMENT` | Structural | mechanical — canonical placement; legacy paths matched second |
+| `S2.R-GROWTH` | Structural | judgment-only — *cap-hit → split, never squeeze*; which sections move is judged |
+| `S2.R-CAPEXACT` | Structural | mechanical — a cap a checker reads is an integer, not `~10` |
+| `S2.R-LAW1INIT` | Structural | judgment-only — the mandatory minimum is scaffolded at init; beyond it, create-lazily |
+| `S2.R-TEMPDIR` | Structural | mechanical — temp-dir artifacts are never referenced from durable docs |
+| `S2.R-README` | Structural | mechanical *on the invariants* — the anti-SSOT rule and the footer ownership line |
+| `S2.R-TPLCANON` | Gated | judgment-only — where a template exists, the template is the canonical format |
+| `S2.R-TPLLOAD` | Gated | judgment-only — read the template before generating; divergence → template wins, surfaced |
+| `S2.R-CODEFIRST` | Gated | judgment-only — before any new file, ask whether it can live in a code comment |
+| `S2.R-LAZY` | Gated | judgment-only — create only when there is something concrete to write |
+| `S2.R-DESIGN` | Structural | mechanical — `DESIGN.md` is non-core and never listed in the §2 table |
+| `S2.R-SKILLCAP` | Structural | split — `≤ ~140` is mechanical; policing "executable artifact" honestly is not |
+| `S2.R-DISCLOSE` | Structural | judgment-only — inline what every path needs, disclose what only some reach |
+| `S2.R-COMPLETION` | Gated | judgment-only — write the bound you would accept as proof, not the activity |
+| `S2.R-SKELETON` | Structural | mechanical — 6 frontmatter fields in order; canonical section order |
+
+**21 rules** — 6 families + 15 standalone. `Reader` is **data**, not a rule: it names an audience and no
+repository can violate it. *(One more than the SPRINT-072 inventory's 20: `S2.R-PLACEMENT` carries the
+**legacy-path second-match** rule, which `S2.F-FILE` does not — a repo on a legacy layout satisfies one
+and not the other, so they are separable.)*
+
 ---
 
 ## §3 — Ownership header (mandatory on every doc)
@@ -222,6 +270,17 @@ ownership is still tracked — just at the foot, not the top.
 **AGENTS.md exception** — same rationale, extended: `AGENTS.md` is a ~10-line thin pointer file, and
 a 6-line YAML block would defeat that budget — so it too carries ownership as a footer `<sub>` line
 instead of a top header (`AGENTS.md.template`).
+
+**Conformance.** §3's normative content is the **fenced schema block** above, which no line-shape
+census sees — it is one rule, not zero.
+
+| Rule | Level | Mark |
+|---|---|---|
+| `S3.SCHEMA` | Structural | mechanical — the four fields present on every doc; the *Flag if* conditions read from the same block |
+| `S3.README` | Structural | mechanical — README carries a footer `<sub>` line instead of a YAML header |
+| `S3.AGENTS` | Structural | mechanical — `AGENTS.md` likewise |
+
+**3 rules.** §3 is the most mechanical section in the standard: every rule is a field read.
 
 ---
 
@@ -252,6 +311,23 @@ peer review → `verdict-<slug>.md`), then fold its recommendation + alternative
 decisions (the explicit no's matter) · deliberate deviations · constraints invisible in code.
 **Does not**: easy-to-reverse choices · the obvious path · single-module detail.
 
+**Conformance.**
+
+| Rule | Level | Mark |
+|---|---|---|
+| `S4.BAR` | Gated | judgment-only — offer an ADR only when hard-to-reverse **and** surprising **and** a real trade-off |
+| `S4.ONEFILE` | Structural | mechanical — one file per ADR at `docs/adr/ADR-NNN-<slug>.md` |
+| `S4.APPEND` | Gated | mechanical *via git history* — a decided ADR is never edited; mark `deprecated`/`superseded` |
+| `S4.INDEX` | Structural | **unclassified (`?`)** — `DECISIONS.md` is a thin index linking the ADRs. Present in this section and **absent from the SPRINT-072 inventory**; routed to T3 rather than given a mark here (D4: marks are transcribed, never invented) |
+| `S4.SECTIONS` | Structural | mechanical — Status · Deciders · Context · Decision · Consequences · Alternatives all present |
+| `S4.NEGATIVE` | Structural | mechanical — Consequences carries **at least one Negative** |
+| `S4.NOINVENT` | Gated | judgment-only — record only what was confirmed; never invent a decision |
+
+**7 rules, 1 unclassified.** Two statements in this section are deliberately **not** rules:
+*"WHY only, never HOW"* restates `S5.FILTER` (the same ground on which §7 and §8 are ruled projections),
+and the `/council` pressure-test line is advice for a high-stakes call, not an obligation. **`Qualifies`
+/ `Does not` are data** — they calibrate `S4.BAR`'s judgement, they are not separate rules.
+
 ---
 
 ## §5 — HOW filter
@@ -264,6 +340,15 @@ decisions (the explicit no's matter) · deliberate deviations · constraints inv
 | External dependencies, setup commands | What each function does internally |
 
 Discard log: `"Skipped: '[detail]' explains HOW → add as a comment in [file]."`
+
+**Conformance.**
+
+| Rule | Level | Mark |
+|---|---|---|
+| `S5.FILTER` | Structural | judgment-only — no HOW content; every line passes the KEEP/DISCARD filter |
+| `S5.DISCARDLOG` | — | **unclassified (`?`)** — the discard-log line binds a *generator's* output, not a repository. A candidate for `implementation-directed`; **absent from the SPRINT-072 inventory** and routed to T3 |
+
+**1 rule, 1 unclassified.** The four KEEP/DISCARD rows are **data** calibrating `S5.FILTER`, not rules.
 
 ---
 
@@ -280,6 +365,20 @@ A repo **moves up a tier by event, not by ceremony** — the trigger appearing (
 second service) is the create-event for that tier's docs. Moving down never deletes: docs stay until
 their §11 leg retires them.
 
+**Conformance.** Every tier row is one rule with two halves: **detection** ("multi-dev, sustained, or
+architecturally forked") is judged, while **satisfaction** (given the tier, is its doc set present?) is
+mechanical and reduces to `S2.F-FILE`. Four tiers, four splits.
+
+| Rule | Level | Mark |
+|---|---|---|
+| `S6.BASE` | Structural | split — detection judged; the substrate-conditional rows are **skipped, not owed**, when the substrate is absent |
+| `S6.BACKEND` | Structural | split — same shape |
+| `S6.MEDIUM` | Structural | split — same shape |
+| `S6.MULTISVC` | Structural | split — same shape |
+
+**4 rules.** *Moves up by event, not ceremony* is **rationale** for how detection behaves, not a
+separate obligation.
+
 ---
 
 ## §7 — Anti-patterns
@@ -295,6 +394,24 @@ their §11 leg retires them.
 | File outside the core set | Redirect to code or an existing core file |
 | Ledger past a §11 retention trigger | Compress / rotate / archive at the next promote |
 
+**Conformance.** **§7 is a view, not a rule source** — seven of its nine restate §2/§3/§5/§11 as
+prohibitions. An engine ingesting it as fresh rules double-counts them under a second name. The
+`= <id>` column says which rule each one *is*.
+
+| Rule | Level | Mark | Restates |
+|---|---|---|---|
+| `S7.HOW` | Structural | judgment-only | `S5.FILTER` |
+| `S7.ORPHAN` | Structural | mechanical | `S3.SCHEMA` |
+| `S7.PERSON` | Structural | split — mechanical against a role vocabulary, judged without one | `S1.LAW2` |
+| `S7.MEGA` | Structural | mechanical | `S2.F-CAP` |
+| `S7.SPRINT400` | Structural | mechanical — hard cap | `S9.TWOFILES` |
+| `S7.STALE` | Gated | judgment-only | — *(new here)* |
+| `S7.OUTSIDE` | Structural | mechanical — set membership vs §2 | `S2.F-FILE` |
+| `S7.LEDGER` | Structural | mechanical | §11 |
+| `S7.CAPRAISE` | Gated | judgment-only — a cap moves only by ADR, and only after a measured diet | — *(new here)* |
+
+**9 rules, 2 of them new.** The `Response` column is **data** — the remedy, not the obligation.
+
 ---
 
 ## §8 — Pre-delivery checklist
@@ -306,6 +423,14 @@ their §11 leg retires them.
 - [ ] No person names as owners
 - [ ] `status` field set correctly
 - [ ] All referenced files exist
+
+**Conformance. §8 is a projection and introduces no rules at all.** All seven items restate rules
+stated elsewhere — template-load `S2.R-TPLLOAD` · header `S3.SCHEMA` · HOW `S5.FILTER` · line limit
+`S2.F-CAP` · person owners `S1.LAW2` · `status` `S3.SCHEMA` · referenced files exist `S2.R-PLACEMENT`.
+
+**0 rules.** Evaluate this section and you count seven constraints twice under a second name — which is
+independently why a conformance **percentage** would mislead: the denominator inflates on the standard's
+own cross-references. Checklist items are for a human at delivery time; a tool reads the originals.
 
 ---
 
@@ -355,6 +480,24 @@ A criterion naming no check is a **judgment tick** and says so. This is what mak
 "criteria name how they were verified" property readable: a tool can tell a mechanically-verified
 criterion from a judged one without inferring it from the wording. The named check's FAIL blocks a
 *silent* tick — a tick past it is recorded as an owner ruling, never left implicit.
+
+**Conformance.** Each rule names **the artifact a tool actually reads** — "the sprint file" is not an
+answer; the field or the git object is.
+
+| Rule | Level | Mark | Artifact read |
+|---|---|---|---|
+| `S9.TWOFILES` | Structural | mechanical | both paths exist; `wc -l` on the Plan (400 **hard**) |
+| `S9.LOGDIR` | Structural | mechanical | path shape — load-bearing, the sprint glob is non-recursive |
+| `S9.GATESWELLFORMED` | Gated | mechanical | the `gates_signed:` frontmatter field |
+| `S9.GATESABSENT` | Gated | mechanical | field absent ⇒ **NOT SIGNED**, never approval |
+| `S9.GATESINFILE` | Gated | mechanical | the same field — a session transcript is unreadable to any tool, which is the point |
+| `S9.GATESMALFORMED` | — | **implementation-directed** | constrains the *reader*: report it, never default either way |
+| `S9.PLANFROZEN` | Gated | split | mechanical via git (did § Plan change after `plan_commit`?); whether a change was legitimate is not |
+| `S9.SCOPECHANGE` | Gated | split | the two commits' order is mechanical; "was this a scope shift?" is not |
+| `S9.VERIFYCLAUSE` | Gated | mechanical | the `*Verify: …*` clause's presence on the criterion line |
+| `S9.JUDGMENTTICK` | Gated | judgment-only | — |
+
+**10 rules**, one of them `implementation-directed`.
 
 ---
 
@@ -445,6 +588,27 @@ The `TODO.md` whole-file row in §11's table is a **cap wearing a retention row'
 there for its prune action, and it is the reason exactly one of §2's caps used to reach this checklist
 while the rest did not.
 
+**Conformance. §10 is the hardest section in the standard to check** — 4 mechanical of 10. Not because
+it is unimplemented, but because *"was the placement test applied well?"* and *"was the checkpoint
+honestly run?"* are unobservable in principle. **Gated, not Attested, is the difficult level.**
+
+| Rule | Level | Mark | Artifact read |
+|---|---|---|---|
+| `S10.FOURBUCKETS` | Gated | mechanical | the four target files gained entries in the close commit |
+| `S10.RETRIEVALMISS` | Gated | judgment-only | — |
+| `S10.PROMOTION` | Gated | mechanical | the `count:` and `promoted:` fields (count ≥ 2) |
+| `S10.PLACEMENT` | Gated | judgment-only | — |
+| `S10.MATCHER` | — | **implementation-directed** | binds the standard's own gate, not an adopter |
+| `S10.MITIGATION` | Gated | judgment-only | — a `Mitigation:` line is a hypothesis, not a plan |
+| `S10.NUMBERINCRITERION` | Gated | judgment-only | — |
+| `S10.REDERIVE` | Gated | judgment-only | — re-derive a stated figure before acting on it |
+| `S10.TDAGING` | Gated | mechanical | `created:` / last re-review vs the sprint counter |
+| `S10.PROMOTEREVIEW` | Gated | split | the checklist's presence in the record is mechanical; that it was *honestly* run is not |
+
+**10 rules**, one `implementation-directed`. *"Doc-aging has two sources"* is **data** about where the
+doc-aging line reads from, not a separate obligation — it is why this table has 10 rows where the
+SPRINT-072 inventory counted 11.
+
 ---
 
 ## §11 — Retention (LAW 3's archive leg)
@@ -474,6 +638,29 @@ approve → apply; never compress silently.
 doc-aging line also carries **every §2 cap breach**, which this table does not enumerate and must not
 try to (§10 Promote review). A breach and a retention trigger need different actions — a cap breach is
 ruled (trim · split · restate the number, per §2's Growth rule), not archived.
+
+**Conformance.** The nine ledger rows share one shape — **trigger → action**, where the action is a move
+or a deletion. All nine are **mechanical on the action** (is the file under `archive/`? is the row
+gone?) and **split** wherever the trigger is itself judged.
+
+| Rule | Level | Mark | Note |
+|---|---|---|---|
+| `S11.BACKLOG` | Gated | split | removal is mechanical; "shipped/promoted" is judged. Propose→approve |
+| `S11.TDDELETE` | Structural | mechanical | `resolved` ≥ 3 sprints ⇒ the row is gone; ids stay monotonic |
+| `S11.TODOCAP` | Structural | mechanical | over its §2 cap at promote |
+| `S11.CHANGELOG` | Structural | mechanical | current + previous minor inline; older → `docs/changelog/` + a link line |
+| `S11.LEARNINGS` | Structural | mechanical | count by `[status: promoted]`, position-anchored — `promoted: yes` is never the stored form |
+| `S11.SPRINT` | Structural | mechanical | moved → `docs/sprint/archive/` + one INDEX line |
+| `S11.EPIC` | Structural | mechanical | a genuine **two-part** test: every member sprint closed **and** all Closed-when `[x]` |
+| `S11.RESEARCH` | Structural | mechanical | `superseded` **and** nothing live cites it — the citation half is a corpus scan, not a field read |
+| `S11.LOGPAIR` | Structural | mechanical | the log archives **with its Plan, same commit** |
+| `S11.WHENITRUNS` | Gated | split | close-time triggers execute at **close**, scan-based ones at **promote**; the phase is mechanical from commit history, whether the right trigger fired is not |
+| `S11.APPROVE` | Gated | judgment-only | always propose → approve, never silent; no artifact records that approval was *sought* |
+
+**11 rules.** *"Doc-aging is not bounded by this table"* is **rationale** — it explains the boundary
+against §2, and deleting it changes no repository's conformance. *"Git is the full audit trail"* is
+likewise rationale for why compression is safe. It is why this table has 11 rows where the SPRINT-072
+inventory counted 12.
 
 ---
 
@@ -524,6 +711,27 @@ Even a private repo is treated as potentially exposed.
 
 **Wiring.** `init`'s `.gitignore` safe-scaffold derives its content from **§12c** (write-if-absent);
 `migrate`'s adoption scan checks the tree against **§12b** (report-only — never auto-remediates).
+
+**Conformance.** The never-commit categories split cleanly on whether the category has a **file shape**:
+a `.pem` is a pattern, a meeting note is a judgement about content.
+
+| Rule | Level | Mark |
+|---|---|---|
+| `S12.BOUNDARY` | Structural | judgment-only — the commit-when / keep-out decision rule (§12a) |
+| `S12.SECRETS` | Structural | mechanical — `.env`, `*.pem`, `id_rsa`, `service-account.json`, key/token patterns |
+| `S12.LEGAL` | Structural | judgment-only — contracts, NDAs, legal correspondence |
+| `S12.FINANCIAL` | Structural | judgment-only — proposals, invoices, salaries |
+| `S12.PERSONAL` | Structural | judgment-only — real records, PII, medical, payment, prod exports |
+| `S12.PRODLOGS` | Structural | judgment-only — raw logs pulled from production |
+| `S12.BACKUPS` | Structural | mechanical — `backup.sql`, `production-dump.sql` and kin |
+| `S12.DESIGNSRC` | Structural | mechanical — large `.ai` / `.psd` / video sources by extension and size |
+| `S12.MEETINGNOTES` | Structural | judgment-only — convert outcomes into requirements / ADRs / issues |
+| `S12.DRAFTS` | Structural | judgment-only — unshipped commercial drafts |
+| `S12.GENERATED` | Structural | mechanical — anything reproducible by a command stays out (§12c classes) |
+| `S12.WIRING` | — | **implementation-directed** — binds `init` and `migrate`, not a repository |
+
+**12 rules**, one `implementation-directed`. §12d (the clean separation) is **data** — a routing map,
+not an obligation; *"even a private repo is treated as potentially exposed"* is **rationale**.
 
 ---
 
@@ -622,3 +830,94 @@ or `committer`. Both vary by setup: an agent may commit under its own identity, 
 git config with the agent recorded as `Co-Authored-By:` (the case above). Neither arrangement says
 anything about who approved a gate. That is what `Gate-Signed-By:` is for, and why it is a separate
 field rather than something a verifier derives.
+
+**Conformance. Attested is the *most* mechanical level in this standard** — 5 of 7 — because a trailer
+is a literal string on a literal object. That inverts the usual intuition; the hard level to check is
+**Gated** (§10 is 4 of 10). But three of §13's rules are `implementation-directed`, and they are the
+semantically load-bearing ones: they constrain **what a tool may infer**, not what a repository must
+contain. An engine that ingested them as repo rules would either drop the claim-vs-proof boundary this
+section exists to state, or emit findings **no adopter can ever clear**.
+
+| Rule | Level | Mark | Artifact read |
+|---|---|---|---|
+| `S13.TRAILERS` | Attested | mechanical | `git log --format=%(trailers)` — all three required **together** |
+| `S13.OWNCOMMIT` | Attested | mechanical | which commit carries them — the task's own, not a separate approval commit and not the merge |
+| `S13.EVIDENCESHA` | Attested | mechanical | the `Evidence:` value's shape (`@ <sha>`) |
+| `S13.AGREE` | Attested | mechanical | the trailer and the sprint-level `gates_signed:` compared |
+| `S13.UNSIGNEDCLAIM` | Attested | mechanical *on the fact* | `%G?` — an unsigned trailer is a claim, not proof |
+| `S13.NOINFER` | — | **implementation-directed** | a verifier **may not** conclude approval from an unsigned trailer |
+| `S13.NOTAUTHOR` | — | **implementation-directed** | author/committer identity is **not** the attestation |
+
+**7 rules**, three `implementation-directed`. **§13 is entirely unchecked today** — no attestation
+checker exists in the reference implementation, which its own conformance report states plainly rather
+than rounding up.
+
+---
+
+## §14 — Conformance model (how to read the annotations)
+
+Every `## §N` above ends with a **Conformance.** block: a table of that section's rules, each carrying a
+stable **id**, its **level**, and its **mark**. This section defines what those mean. It adds no rules of
+its own — it is the legend, and evaluating it against a repository is a category error.
+
+**Levels** (ADR-024) — what class of evidence answers the question:
+
+| Level | Evidence | Reads |
+|---|---|---|
+| **Structural** | the file tree | paths, presence, line counts, frontmatter fields |
+| **Gated** | planning records | sprint frontmatter, ledger rows, commit order |
+| **Attested** | git history | trailers, signatures, the objects themselves |
+
+**Marks** — whether a tool can decide it, and the distinction that matters most:
+
+| Mark | Meaning | Is it work? |
+|---|---|---|
+| `mechanical` | a tool can decide it from the named artifact | a check either exists or is a gap |
+| `judgment-only` | **not checkable in principle** — the standard is choosing a human | **no. This is not debt** |
+| `split` | mechanical on one half, judged on the other | only the mechanical half is |
+| `implementation-directed` | constrains a **tool's behaviour or inference**, not a repository | **no — and never evaluate it against an adopter** |
+
+**`judgment-only` and "mechanical but unchecked" are not the same thing, and collapsing them is the
+error this model exists to prevent.** A rule marked `judgment-only` will never have a checker, because
+no tool can decide whether the placement test was applied *well*. A rule marked `mechanical` with no
+checker behind it is a **gap someone can close**. Only the second is work. Report them as separate
+counts.
+
+**Which is why a conformance percentage is forbidden.** A ratio averages a deliberate judgment-only
+boundary together with a real gap, so **the number goes up when the standard declines to automate
+something** — exactly backwards. §8 makes it worse still: it restates seven rules under a second name,
+inflating any denominator that ingests it. A conformant report states a **level**, the **named findings
+preventing the next level**, and the **judgment-required items**. Never a score, a grade, or a
+percentage.
+
+**`implementation-directed` is not a courtesy category.** **Five rules carry it** —
+`S9.GATESMALFORMED` · `S10.MATCHER` · `S12.WIRING` · `S13.NOINFER` · `S13.NOTAUTHOR` — and a **sixth is
+pending**, `S5.DISCARDLOG`, which is a strong candidate but unruled. Two sit in §13 and they are the
+load-bearing ones: *a verifier may not conclude approval from an unsigned trailer* and *author identity
+is not the attestation* are rules about **what a tool may infer**. A conformance engine that ingests
+them as repository rules must either drop them — losing the entire claim-vs-proof boundary §13 exists to
+state — or emit findings **no adopter can ever clear**.
+
+**Reading a rule id.** `S<section>.<key>` — `S13.TRAILERS` is §13's three-trailer rule. Ids are stable
+across spec versions and are what a finding names, so a report stays comparable as the standard evolves.
+An id is retired, never reused.
+
+**A `?` mark means unclassified, and is a real state.** It marks a rule this specification states and
+whose classification has not yet been ruled. It is not a silent skip and it is not a pass — a tool
+reporting on a `?` rule says so.
+
+**Counts, re-derived from this document.** **98 classified rules and 2 unclassified**, 100 candidates
+across §1–§13:
+
+| § | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | total |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| classified | 4 | 21 | 3 | 6 | 1 | 4 | 9 | **0** | 10 | 10 | 11 | 12 | 7 | **98** |
+| unclassified | | | | 1 | 1 | | | | | | | | | **2** |
+
+§8 contributes **0** — it is a projection of rules stated elsewhere, and an engine ingesting it
+double-counts seven constraints under a second name.
+
+These counts are derived from the tables above and are the figure to cite. They supersede the
+`96 / 39 / 45 / 6` figures in the reference implementation's SPRINT-072 baseline, which stated 96 while
+its own rows summed to 99 and its own columns to 98. **The spec is the rule source; a derived inventory
+that disagrees with it is the thing that is wrong.**

@@ -44,7 +44,8 @@ Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md`
 Depends-on: none
 Cites: EPIC-004 § Closed-when 2 · EPIC-004 D1 (rules come from the spec) · SPRINT-072 D3 (a wrapper
        does not satisfy spec-driven) · `docs/research/conformance-baseline.md` · ADR-024 (the levels) ·
-       ADR-025 (§13's claim-vs-proof boundary) · L-015 (the consumer reads this file)
+       ADR-025 (§13's claim-vs-proof boundary) · L-015 (the consumer reads this file) · **T3** (divergences
+       are *routed to* it, not depended on — T3 owns the baseline file this task may not edit)
 The classification exists and is frozen; what does not exist is any way for a tool — or an adopter — to
 read it from the artifact they pin. **The annotation form is the real decision here**, not the
 transcription: the spec is prose a human reads *and* the rule source a checker parses, and those two
@@ -56,20 +57,24 @@ say of any normative rule what level it belongs to, whether it is mechanically c
 it applies to their repo at all.
 
 **DoD:**
-- [ ] The annotation form is chosen and its alternatives recorded — *Verify: at least inline markers ·
+- [x] The annotation form is chosen and its alternatives recorded — *Verify: at least inline markers ·
       a per-section table · a machine-readable sidecar are each priced, with the reason the loser lost;
       a form chosen without a rejected alternative has not been decided*
-- [ ] Every normative rule carries level + mark **in the spec** — *Verify: the count of annotated rules
-      equals **96**, re-derived against the baseline at execution rather than copied from this Plan
-      (L-130); a rule left unannotated is a FAIL, not a silent skip*
-- [ ] The **four** buckets survive as four — *Verify: `implementation-directed` appears as its own mark
+- [x] Every normative rule carries level + mark **in the spec** — *Verify: the count of annotated rules
+      equals the count T1 derives **from the spec**, reconciled against the baseline with **every
+      divergence named** and routed to T3. A rule left unannotated is a FAIL, and a divergence passed
+      over in silence is a FAIL. **Amended 2026-08-16 by owner ruling** — this criterion read "equals
+      **96**" at promote, and re-derivation found the baseline's own table stating 96 while its rules
+      column sums to 99 and its bucket columns to 98 (Execution Log, two `scope-change` entries). The
+      criterion keeps its force; it stops asserting a figure its own source contradicts (L-088)*
+- [x] The **four** buckets survive as four — *Verify: `implementation-directed` appears as its own mark
       on all **6** rules that carry it, three of them in §13. Collapsing it into judgment-only loses the
       claim-vs-proof boundary ADR-025 exists to state, and collapsing it into a repo rule emits findings
       no adopter can ever clear*
-- [ ] The annotated spec is still **readable as prose** — *Verify: judgment tick. Read §1 and §13 end to
+- [x] The annotated spec is still **readable as prose** — *Verify: judgment tick. Read §1 and §13 end to
       end as an adopter with no lean-flow context; if the annotation now dominates the rule it annotates,
       the form is wrong regardless of how well it parses*
-- [ ] `spec/CHANGELOG.md` records the version bump and what an adopter pinning the old version does not
+- [x] `spec/CHANGELOG.md` records the version bump and what an adopter pinning the old version does not
       get — *Verify: the file; the spec versions independently of the plugin (ADR-023) and this is a
       MINOR, additive change*
 
@@ -152,11 +157,15 @@ undifferentiated middle.
 - **D3 — The packaging question stays deferred to the engine sprint's G2.** T1's fourth DoD produces
   direct evidence for it (can a rule be read without the plugin present?) and deliberately stops short
   of ruling. Producing the evidence for a deferred decision is not the same as taking it. **→ no ADR.**
-- **D4 — T1 transcribes the classification; it does not re-derive it.** The baseline is frozen and is
-  the source of truth for all 96 marks. Re-classifying mid-transcription would silently fork the
-  inventory from the artifact the engine is designed against — and the one arithmetic correction
-  SPRINT-072 already found (T3's rule count one high) is exactly what a second uncontrolled pass
-  produces. **→ no ADR.**
+- **D4 — T1 transcribes the *marks*; it re-derives the *count*.** The baseline stays the source of
+  truth for every `mechanical | judgment-only | implementation-directed` mark — no rule is
+  reclassified on T1's say-so, because a mark is a judgement that cannot be re-checked, and
+  re-classifying mid-transcription would fork the inventory from the artifact the engine is designed
+  against. The **count** is different: it is arithmetic, and **amended 2026-08-16 by owner ruling**
+  after re-derivation found the frozen baseline stating 96 against its own columns summing to 99 and
+  98. T1 counts from `spec/STANDARD.md` and routes every divergence to T3, which owns the baseline
+  file. Discovering that a derived inventory cannot reproduce its own total *is* the evidence EPIC-004
+  D1's spec-as-rule-source premise was right. **→ no ADR.**
 
 ## Assumptions
 

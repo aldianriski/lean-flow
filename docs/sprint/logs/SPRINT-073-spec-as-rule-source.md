@@ -104,3 +104,141 @@ packaging question stays the engine sprint's (D3) · EPIC-005 out of scope.
 **All three inline.** Every task is `class: decision`; a dispatched agent would need the whole
 classification and the criteria restated in full to do what the coordinator can do directly, which is
 the same reason SPRINT-072 ran inline.
+
+### 2026-08-16 | scope-change | T1 — the frozen baseline does not reconcile with itself; DoD 2's "96" is not re-derivable
+
+**T1's DoD 2 requires the annotated-rule count to be "re-derived against the baseline at execution
+rather than copied from this Plan (L-130)". Re-derivation was run first, before a line was written,
+and it does not reproduce the baseline's own total.** Three mutually inconsistent figures inside one
+frozen artifact:
+
+| source | figure |
+|---|---|
+| `conformance-baseline.md` § Coverage by section, stated total | **96** |
+| the same table's `rules` column, summed | **99** |
+| the same table's four bucket columns, summed | **98** |
+
+Two per-section rows are internally inconsistent: **§2** lists 20 rules against 18 bucket cells, and
+**§10** lists 11 rules against 12 cells. Computed mechanically, not by eye.
+
+**Tracing to the source inventories does not settle it either — it moves the disagreement.** The four
+inventory docs are the baseline's inputs, and their own reconciliations say: §2 **20** ·
+structural group **26** · §12 **12** · gated-attested **38** = **96**, which agrees with the stated
+total exactly. But two of those inputs disagree with their own tables:
+
+- **`-gated-attested.md`** writes *"Rules identified: 39 — §9 10 · §10 11 · §11 12 · §13 7"*, and that
+  list sums to **40**, not 39. Resolvable: its mark table carries 2 `data`/`rationale` entries that are
+  not rules (§10's *doc-aging has two sources* and §11's *doc-aging is not bounded by this table*).
+  Removing them gives §9 10 · §10 **10** · §11 **11** · §13 7 = **38**, which matches. This one closes.
+- **`-structural.md`** writes *"§4 5"* in its reconciliation while its own §4 table carries **6 rows**.
+  This one does **not** close, and it is the whole 96-vs-97 question.
+
+**Reading §4 in the spec directly makes it worse, not better.** The section contains at least one
+normative rule the inventory's table never lists — *"`DECISIONS.md` is a thin **index** linking
+them"* — plus two judgement calls nobody recorded: whether *"WHY only, never HOW"* is a §4 rule or a
+§5 restatement (§7 and §8 were ruled projections on exactly this ground), and whether the `/council`
+pressure-test line is normative at all. So §4 yields **5, 6 or 7** depending on decisions that were
+made once and never written down.
+
+**Why this is a blocker rather than a rounding error.** D4 says T1 **transcribes** and does not
+re-derive, precisely so the spec and the baseline cannot fork. But transcription presupposes a source
+that reconciles, and this one does not. Every available move breaks something:
+
+- Annotate to hit **96** → bakes a figure into `spec/STANDARD.md` that its own inputs contradict, in
+  the one artifact every adopter pins.
+- Annotate whatever §4 turns out to be → **re-derives**, which D4 forbids, and forks the spec from the
+  baseline the engine is being designed against.
+- Tick DoD 2 on a count that "matches if you squint" → the exact L-088 failure the criterion's own
+  re-derivation clause exists to prevent, committed by the task holding the pen.
+
+**Not resolved here.** Halting for an owner ruling per the first-blocker rule; the Plan is untouched
+and no annotation has been written. The count is genuinely load-bearing: it is EPIC-004 § Closed-when
+2's completeness test, T3's disposition denominator, and the number the engine's coverage report will
+quote.
+
+### 2026-08-16 | scope-change | Owner ruling on the count — re-derive from the spec, D4 relaxed at the margin
+
+**Ruling (2026-08-16).** T1 counts each section **from `spec/STANDARD.md` itself** as it annotates,
+and records the number it actually finds. **D4 is relaxed on one axis and holds on the other:**
+transcribe the **marks** from the baseline — no rule gets reclassified from `mechanical` to
+`judgment-only` or vice versa on T1's say-so — but **re-derive the count**. Every divergence from the
+baseline is logged here and routed to **T3**, which owns `docs/research/conformance-baseline.md` and
+corrects its table.
+
+**Why this over transcribing 96.** The entire premise of EPIC-004 D1 is that the spec, not a derived
+artifact, is the rule source. Discovering that the derived inventory cannot reproduce its own total
+*is* the evidence that the indirection was the defect — the answer is to make the spec authoritative,
+not to copy a contradicted figure into the one artifact every adopter pins.
+
+**Why the marks stay frozen.** Re-classifying and re-counting at once would fork the spec from the
+baseline in two dimensions and leave nothing to reconcile against. The count is arithmetic and can be
+checked; a mark is a judgement and cannot. So the judgement stays where SPRINT-072 made it.
+
+**Consequent Plan amendments** (made after this entry, per the frozen-Plan rule):
+- **DoD 2** — "equals **96**" → equals the count T1 derives, **reconciled against the baseline with
+  every divergence named**. The criterion keeps its force: an unannotated rule is still a FAIL, and a
+  divergence passed over in silence is still a FAIL. What it stops asserting is a figure that its own
+  source contradicts.
+- **D4** — gains the transcribe-marks / re-derive-count split above.
+
+**The three §4 ambiguities are ruled as they are reached, in this Log, each with its reason** — they
+are classification decisions that were made once and never written down, and writing them down is
+within T1's remit now that the count is its own.
+
+### 2026-08-16 | progress | T1 — the spec is the rule source; and the count is 98, not 96
+
+**Done.** All 13 sections carry a `**Conformance.**` table; a new **§14** defines the model. Spec
+**0.3.0 → 0.4.0**. `+300 / −1` on `spec/STANDARD.md`, and **the single deletion is the version line** —
+not one word of existing prose was edited, which proves DoD 4's readability constraint mechanically
+rather than by the judgment tick it asked for.
+
+**The count, re-derived from the spec per the owner ruling: 98 classified rules + 2 unclassified = 100
+candidates.** Extracted by id, not by eye — `100 rule rows, 100 unique ids`.
+
+| § | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| classified | 4 | **21** | 3 | 6 | 1 | 4 | 9 | 0 | 10 | **10** | **11** | 12 | 7 |
+| unclassified | | | | 1 | 1 | | | | | | | | |
+
+**Five divergences from the frozen baseline, each routed to T3** (which owns
+`docs/research/conformance-baseline.md`; T1 may not edit it):
+
+1. **§2 is 21, not 20.** `S2.R-PLACEMENT` carries the **legacy-path second-match** rule, which
+   `S2.F-FILE` does not — a repo on a legacy layout satisfies one and not the other, so they are
+   separable rather than one rule stated twice.
+2. **§10 is 10, not 11.** *"Doc-aging has two sources"* is **data** about where the doc-aging line
+   reads from; no repository can violate it.
+3. **§11 is 11, not 12.** *"Doc-aging is not bounded by this table"* and *"git is the full audit
+   trail"* are **rationale**; against that, `S11.WHENITRUNS` (close-time vs promote-time triggers) is a
+   real rule the inventory folded away, so the section lost two and gained one.
+4. **`S4.INDEX` is a rule the inventory never saw** — *"`DECISIONS.md` is a thin index linking them"*,
+   stated plainly in §4 and absent from the SPRINT-072 table. Annotated `?` rather than given a mark:
+   D4's surviving half says marks are **transcribed, never invented**.
+5. **`S5.DISCARDLOG` likewise** — the discard-log line binds a *generator's* output, not a repository.
+   A strong `implementation-directed` candidate and unruled, so `?`.
+
+**The `implementation-directed` count does not hold either, and this one matters most.** The Plan's DoD
+3 says *"all **6** rules that carry it, **three** of them in §13"*. Re-derived: **five** carry it —
+`S9.GATESMALFORMED` · `S10.MATCHER` · `S12.WIRING` · `S13.NOINFER` · `S13.NOTAUTHOR` — with
+`S5.DISCARDLOG` pending as a sixth, and **two** in §13, not three. Tracing it back,
+`-gated-attested.md` states "six" in its prose and its own table shows four for that group; the "three
+in §13" has two rows behind it. **The bucket itself survives as its own first-class mark, which is what
+DoD 3 exists to protect** — what fails is the arithmetic it inherited from the same unreconciled source
+the owner ruling already addressed. Ticked with the divergence named, per that ruling.
+
+**Two §4 statements ruled non-normative, with reasons, because nobody had written them down:**
+*"WHY only, never HOW"* restates `S5.FILTER` — the same ground on which §7 and §8 are ruled projections
+— and the `/council` pressure-test line is advice for a high-stakes call, not an obligation. Recorded
+in §4 itself so the next reader does not re-litigate them.
+
+**Growth is far larger than G2 estimated, and T2 inherits the real number: 624 → 923 lines, +299, not
+the ~130 projected.** The projection assumed a mark per rule; what the form actually costs is a table
+*plus* a per-section reconciliation note *plus* §14's model. **T2's cap ruling must use 923.** Stated
+here rather than left for T2 to rediscover, and stated as a correction to my own G2 estimate — which
+was a figure written into a decision without a second derivation, the exact L-130 shape.
+
+**What the annotation makes true that was not true before:** a reader holding only `spec/STANDARD.md`
+can now name any rule, its level, whether it is checkable, and whether it applies to their repo at all.
+`S8` reports **0 rules** in the document itself, so an engine cannot double-count it. And §14 states
+the no-percentage ruling **normatively**, so it binds adopters' tools rather than living in this
+repository's epic notes.

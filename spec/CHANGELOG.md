@@ -9,6 +9,47 @@ status: current
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
 
+## 0.4.0 — 2026-08-16
+
+**Added — every normative rule now carries its conformance level and whether it is checkable, in the
+spec itself.** Each `## §N` ends with a **Conformance.** table listing that section's rules by a stable
+id (`S13.TRAILERS`, `S2.F-CAP`, …), its level (Structural · Gated · Attested) and its mark. A new **§14**
+defines the model. Nothing existing was reworded, removed or renumbered — the prose you pinned at 0.3.0
+still reads identically; this adds a layer beside it.
+
+**Why it matters if you are building against this standard.** Until now the classification existed only
+in the reference implementation's research notes, so a tool could not ask the spec what was checkable —
+it had to hard-code an answer and drift silently. Now the spec is the rule source. Concretely:
+
+- **Four marks, and the distinction between the middle two is the point.** `mechanical` (a tool decides
+  it) · `judgment-only` (**not checkable in principle** — the standard is choosing a human) · `split` ·
+  `implementation-directed`. A `judgment-only` rule is **not debt and never will be**; a `mechanical`
+  rule with no checker is a gap someone can close. Collapsing them into one "not covered" number
+  reports the standard's deliberate boundaries as failures.
+- **`implementation-directed` rules must never be evaluated against your repository.** Five carry it,
+  and two are §13's inference constraints (*a verifier may not conclude approval from an unsigned
+  trailer* · *author identity is not the attestation*). They bind a tool, not a repo. A checker that
+  reads them as repo rules emits findings **you could never clear**.
+- **No percentage, no score, no grade — this is now stated normatively in §14.** A ratio averages a
+  deliberate judgment-only boundary with a real gap, so the number *improves* when the standard
+  declines to automate something. Report a level, the named findings blocking the next level, and the
+  judgment-required items.
+- **Rule ids are stable across versions and are what a finding names**, so a conformance report stays
+  comparable as this standard evolves. An id is retired, never reused.
+- **A `?` mark is a real state**, not a silent skip: `S4.INDEX` and `S5.DISCARDLOG` are rules this spec
+  states whose classification has not been ruled. A tool reporting on them says so.
+
+**Counts, derived from this document:** **98 classified rules and 2 unclassified.** §8 contributes
+**zero** — it restates seven rules stated elsewhere, and an engine ingesting it double-counts them.
+**§13 is the most mechanical section** (5 of 7); **§10 is the least** (4 of 10), because "was the
+governance checkpoint honestly run?" is unobservable in principle. If you assumed Attested was the hard
+level to check, it is not — **Gated is**.
+
+Minor rather than patch: this adds a normative layer (§14 and the per-section tables) and a readable
+property that did not exist before. It removes nothing and changes no existing obligation, so a repo
+conformant at 0.3.0 remains conformant at 0.4.0 — what changes is that its report can now name which
+rules it was judged against.
+
 ## 0.3.0 — 2026-08-16
 
 **Added — §9 now defines the evidence the Gated conformance level is checked against.** Found by
