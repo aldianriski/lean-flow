@@ -4,6 +4,7 @@ slug: cite-not-restate
 epic: EPIC-003
 owner: Maintainer
 last_updated: 2026-08-16
+gates_signed: G1,G2 @ 0ab0e01
 plan_commit: fd4ba3a
 close_commit: [sha — set at close]
 status: active
@@ -129,10 +130,13 @@ a single writer this sprint despite two conditions closing (see D2).
 
 ## Assumptions
 
-- **A1** — The candidate set is **38 files / ~121 raw sites**, splitting **15 non-template / 23
-  template**, and the raw count conflates restatements with correct citations. *Confirm: measured at
-  this promote; the 15+23 split was reconciled against the 38 total. Re-derive the per-bucket numbers
-  at T1 rather than trusting these (L-097).*
+- **A1** — The candidate set is **38 files**, splitting **15 non-template / 23 template**, carrying
+  **39 distinct (file,line) sites** in the 15 — and the raw count conflates restatements with correct
+  citations. *Confirm: files re-derived at G2 (23+15=38 ✓). **The site figure is CORRECTED from the
+  `~121` written at promote** — that was the sum of eight overlapping per-section scans, double-counting
+  lines that matched two patterns. Owner-ruled 2026-08-16; full provenance + impact in the Execution
+  Log's `scope-change` entry. T1 must reconcile against **both** this figure and its own re-derivation,
+  which must agree (L-097).*
 - **A2** — Only `skills/lean-doc-generator/SKILL.md` currently cites `spec/STANDARD.md`. *Confirm:
   `grep -rln 'spec/STANDARD.md' skills/`, read 2026-08-16 — 1 of 14 skills.*
 - **A3** — Governance at this promote: L-promotion **none** (107 entries reconciled: 74 open, 33
