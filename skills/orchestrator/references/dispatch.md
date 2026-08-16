@@ -413,6 +413,15 @@ exit 0
 closed; a silent PASS is indistinguishable from never having run the guard, which is the state the
 row spent six sprints in.
 
+**Capture the base from inside the worktree, or you will not capture it at all.** A subagent worktree
+that finishes *without changes* is removed automatically the moment the agent returns — **and its
+branch goes with it**. There is then nothing left to point the guard at: the path is gone, the ref
+does not resolve, and a coordinator that planned to verify the base after the report finds only its
+own tree. Observed exactly this way on the first dispatch after the pin was cured. So put
+`git rev-parse HEAD` **in the agent's brief** and have it report the sha in its own output, and run
+the guard while the agent is live. A read-only measurement agent leaves no changes by construction,
+which makes it the *most* likely to be swept before you can check it.
+
 ## Merge-back queue (coordinator-only)
 
 Once a wave completes, merge on a **separate integration worktree** — never switch the main tree,

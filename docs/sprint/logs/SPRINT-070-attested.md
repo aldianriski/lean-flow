@@ -138,3 +138,47 @@ git-free leg.
 **DoD 2 remains open** — it requires a *real* dispatched worktree with its base recorded, which needs
 one `Agent(isolation: "worktree")` spawn. Raised to the owner rather than substituted: a hand-made
 `git worktree add` would exercise git, not the harness path whose default is the entire defect.
+
+### 2026-08-16 | progress | T2 DoD 2 — the cure proven on a real dispatch; T2 complete at 4 of 4
+
+Owner approved one worktree spawn for the demonstration. Coordinator HEAD recorded **before** the
+spawn, so the comparison could not be fitted to the result afterwards:
+`97eca0b10af4c22a79780d1947afe123a831f44f`, with `origin/main` at `622f4201…` — 31 commits behind and
+the sha every previous dispatch had pinned to.
+
+The dispatched agent reported, from inside its own tree:
+
+```
+git rev-parse HEAD          -> 97eca0b10af4c22a79780d1947afe123a831f44f
+git rev-parse --abbrev-ref  -> worktree-agent-a0750e8c1b2437a6d
+pwd                         -> /d/Project/lean-flow/.claude/worktrees/agent-a0750e8c1b2437a6d
+ls spec/                    -> CHANGELOG.md  STANDARD.md
+ADR-024 present?            -> yes
+```
+
+**The worktree's HEAD is the coordinator's HEAD exactly**, so DoD 2's stated verify — merge-base
+equals coordinator HEAD at spawn — holds by identity rather than by common ancestry, which is the
+stronger of the two. Stated precisely because `git merge-base` was **not** run: see the sweep note
+below. The corroborating evidence is independent of any sha comparison and is what makes this
+unfakeable — `spec/` and `ADR-024` **exist in the agent's tree**, and both are absent at
+`origin/main`. Under the old `"fresh"` default this dispatch would have landed on `622f420` with no
+`spec/` directory at all, which is precisely what disqualified T1 from worktree dispatch at G2.
+
+Also learned, and worth more than the tick: **the setting took effect without a session restart.**
+`.claude/settings.json` was edited during this same session and the very next spawn honoured it — so
+`worktree.baseRef` is not subject to the stale-session trap that L-021 describes for plugin skills.
+
+**Surprise, now written into `dispatch.md`: the evidence destroys itself.** The plan was to run the
+new guard against the live worktree. By the time the agent's report arrived, the worktree *and its
+branch* were both gone — a subagent worktree that finishes without changes is removed automatically,
+branch included. `git worktree list` showed only the main checkout and the branch ref did not
+resolve, so there was nothing left to point the guard at. A read-only measurement agent leaves no
+changes by construction, which makes it the *most* likely to be swept before it can be inspected.
+The protocol now says to put `git rev-parse HEAD` in the agent's brief and run the guard while the
+agent is live. This is the same class as L-057 — the report is not the artifact — with the twist that
+here the artifact is deleted by design, so the report is the only thing that ever existed.
+
+Consequence for the DoD, stated rather than glossed: the guard was exercised end-to-end against
+retained fixtures (7 assertions, defect-seeded), and the *base* was captured from a real dispatch.
+The guard was not run against this particular live worktree. Both halves of the DoD are met; the
+combination that was not achieved is a single command's timing, and the fix for it is in the doc.

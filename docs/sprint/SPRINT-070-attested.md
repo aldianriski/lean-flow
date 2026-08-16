@@ -82,7 +82,7 @@ halts the dispatch when it does not rather than leaving it to be discovered at m
 - [x] **The cause is established before the cure is written** — why the base is pinned, stated as a
       finding — *Verify: the finding names the mechanism, not just the symptom; L-091 forbids
       building on the symptom*
-- [ ] A dispatched worktree branches from the coordinator's HEAD, demonstrated on a **real
+- [x] A dispatched worktree branches from the coordinator's HEAD, demonstrated on a **real
       dispatch** with the base recorded — *Verify: the worktree's merge-base equals the
       coordinator's HEAD at spawn, captured in the Execution Log*
 - [x] A guard halts a dispatch whose base is not current, naming what it found —
