@@ -37,8 +37,67 @@ status: current
 
 ### P1 — Next Phase Required
 
-<!-- EPIC-002 Make Room — the critical path. These block EPIC-003/004/005, which have nowhere to
-     write their rules while both SSOT files sit at cap. -->
+<!-- EPIC-003 The Standard — the critical path since EPIC-002 closed 2026-08-15. ADR-018 sequences
+     it; ADR-023 rules how extraction commits behave (move+cite atomic, spec/ is SSOT). These are
+     the first member sprint's slice, decomposed 2026-08-16 — not the whole epic, which spans
+     sprints by definition. -->
+
+- [ ] TASK-214 — Rule the conformance levels and what makes each independently checkable  [size: S] [risk: med] [HITL]
+      class:      decision
+      done-when:  a recorded ruling naming the levels, their order, and — per level — the property
+                  that makes it checkable in principle; EPIC-003 open question 1 struck through with
+                  a pointer to the ruling. ADR only if §4's three tests all hold
+      touches:    docs/adr/ (if it qualifies) · docs/DECISIONS.md · docs/epic/EPIC-003-the-standard.md
+      depends-on: none
+      assumes:    the epic routes this to "the first member sprint's G2", so it is specified here and
+                  the engine that CHECKS a level is EPIC-004's — a level that cannot be described as
+                  checkable without naming the engine belongs to that epic, not this ruling
+      tracker:    EPIC-003 § Open questions (1) · ADR-018 · SPRINT-069 promote
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-215 — Extract the standard to `spec/` v0.1.0 in one move+cite commit  [size: M] [risk: med] [HITL]
+      class:      execution
+      done-when:  the standard lives in the versioned `spec/` tree under a name that reads as a
+                  standard, carrying `version: 0.1.0` in its ownership header and a sibling
+                  `spec/CHANGELOG.md`; every PATH reference to its old location resolves to the new
+                  one; the cap checker's default guide path follows it; `.claude/CLAUDE.md`'s
+                  self-contained principle states what is true after the move; the gate is green —
+                  **all in one commit** (ADR-023: no commit leaves a rule stated in two places), and
+                  the review carries "is any rule now stated twice?" as an explicit named check
+      touches:    spec/ (new) · the standard document's current home · the cap checker's default
+                  path · .claude/CLAUDE.md · .claude/CONTEXT.md · README · architecture overview
+      depends-on: none
+      assumes:    (a) `spec/` reaches consumers with no packaging work — the plugin manifest declares
+                  no file list, so install copies the whole repo (verified against a real install,
+                  SPRINT-042); (b) the cap checker takes the guide path as its first parameter with a
+                  default, so the move costs one default, not a rewrite; (c) the other three checkers
+                  naming the guide do not open it — comments and output strings only; (d) extraction
+                  makes CLAUDE.md's "bundles its own templates + standard" principle FALSE, so
+                  correcting it is part of this commit, not a follow-up. Re-measure the path-reference
+                  count at execution rather than trusting any figure written here (L-097)
+      tracker:    EPIC-003 § Scope · ADR-018 · ADR-023 · SPRINT-069 promote
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-216 — Sweep the standard's textual section citations to the new name  [size: M] [risk: low] [AFK]
+      class:      mechanical-ingest
+      done-when:  no live surface cites the standard by its pre-extraction document name; the count is
+                  established by **two queries that reconcile** (total mentions = renamed +
+                  legitimately-unchanged), never by a single grep whose zero could mean either clean
+                  or unreached (L-118); every table row and list entry touched is re-read whole after
+                  editing (L-009), and the gate is green
+      touches:    every live surface citing the standard by section — skills, templates, docs, ADRs,
+                  checker output strings. Not enumerated here: the set is re-derived at execution,
+                  since a path list written now goes stale before an AFK task is picked up
+      depends-on: TASK-215
+      assumes:    these are stale NAMES, not broken links — ADR-023 forbids a rule living in two
+                  places, not a name lagging a commit behind, which is why this is safely a separate
+                  task rather than bloating the move commit. Archived sprints, rotated changelogs and
+                  the generated index are history or derived: not swept
+      tracker:    EPIC-003 § Scope · ADR-023 · SPRINT-069 promote
+      origin:     decomposer
+      state:      ready
 
 ### P2 — Quality / Polish
 
