@@ -7,7 +7,7 @@ last_updated: 2026-08-16
 gates_signed: G1,G2 @ 1b2cdb4
 plan_commit: 2084001
 close_commit: [sha — set at close]
-status: active
+status: closed
 update_trigger: sprint execute/close events
 ---
 
@@ -187,9 +187,76 @@ can tell *uncovered* apart from *deliberately judgment-only*.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/research/conformance-inventory-criteria.md` | T1 | **new** — the rule/data/rationale test, plus §2 classified against it. A shared written test is what stops each later section inventing its own | low | 123/130 PASS · gate 151/0 |
+| `docs/research/conformance-inventory-structural.md` | T2 | **new** — §1 §3–§8 classified; two gaps in T1's test named and routed back rather than patched locally | low | 125/130 PASS |
+| `docs/research/conformance-inventory-git-boundary.md` | T2 | **new** — §12 split out under §2's own growth rule after I caught myself squeezing the cap instead of splitting | low | 29/130 PASS · gate 154/0 |
+| `docs/research/conformance-inventory-gated-attested.md` | T3 | **new** — §9 §10 §11 §13 classified, each rule naming the *artifact a tool reads*, not the section it came from | low | 112/130 PASS · gate 154/0 |
+| `docs/research/conformance-baseline.md` | T4 | **new** — the frozen baseline: the inventory reconciled against the live checker corpus, with the engine's inherited constraints recorded as findings | med | 126/130 PASS · gate 155/0 |
+| `docs/epic/EPIC-004-conformance.md` | T4 | two stale claims corrected **beside** the originals (an epic is edited, but the correction is more legible next to what it corrects); Closed-when 2 marked PARTIAL | low | epic re-read end-to-end; Closed-when 2 deliberately left unticked |
+| `docs/knowledge-index.md` | T1–T4 | regenerated — a derived view over the five new research docs, never hand-edited | low | `sh scripts/gen-index.sh` |
+| `docs/sprint/SPRINT-072-*.md` + `logs/` | coordinator | `Layers:` corrections and the execution record | low | gate 155/0 |
+
+**Nothing else was touched, and that is DoD 4's whole point:** no `scripts/lib/check-*.sh`, no
+`evals/**`, no `skills/orchestrator/**`. Verified by `git diff 2084001..HEAD` and `git status`, both
+empty over those paths — D4 checked mechanically rather than promised.
 
 ## Retro
 
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+
+**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint? **Yes, and
+it is the worst-placed miss this repo has recorded.** T2's artifact came out at 140 against a 130 soft
+cap and I trimmed it, then trimmed again, then trimmed a correct reconciliation into a shorter one.
+§2's growth rule says *cap-hit → split, never squeeze*, and §7 lists squeezing as a named
+anti-pattern — **and T2's own job was classifying §7**. The rule was not merely loaded, it was the
+text on screen. It fired on the third trim, from noticing the shape of what I was doing rather than
+from recalling the rule. Filed as **L-131**. A second, milder instance: the promote census was wrong
+in *two directions at once* and no rule caught it — re-derivation did, three separate times (§2 held
+at 59; T2 found 170 not 156; T3 found 46 not 45). That is the eighth through tenth stale figure across
+three sprints, every one caught by a disagreeing second number and none by recalling L-097/L-130.
+
+**Cost** — coordinator inline, all four tasks, zero agent tokens. Dispatch was reconsidered at G2
+after the artifact split dissolved the shared-file overlap that forced `T3 Depends-on: T2`, and
+declined: T2 is the first application of T1's test at volume, and a flaw in that test found twice
+concurrently is worse than found once. The expensive part was reading — `spec/STANDARD.md` was read
+end-to-end four times, once per task, and the writing was comparatively cheap.
+
+**Worked**
+- **Predicting the cap breach at G2 instead of hitting it mid-task.** ~156 classified rules as a table
+  will not fit 130; that was arithmetic available before a line was written, and the split cost one
+  ruling instead of a mid-task `scope-change`.
+- **Probing the reflex remedy rather than adopting it.** `docs/research/conformance-inventory/` is what
+  §6's cap-hit rule reads like it wants. One throwaway file proved it produces **zero** rows from
+  `check-doc-caps.sh` — the remedy would have bought a green gate by moving the artifact out of the
+  checker's reach. Cost: one probe. → **L-132**, **TD-061**.
+- **Keeping the chain strict when parallelism became available.** T3 inherited T2's two criteria gaps
+  instead of rediscovering them independently; Gap A then fired a third time in §9 and was recognised
+  in one line rather than re-derived.
+- **Refusing to tick Closed-when 2.** It says *"marked judgment-only **in the spec**"* and the marks
+  live in a research doc. Ticking it would have been exactly the L-088 failure that DoD 6 — *"ticked
+  only if every normative rule is genuinely classified"* — was written to prevent, committed by the
+  task holding the pen.
+
+**Friction**
+- **The squeeze above.** Each trim looked like editing; only the *sequence* was a squeeze, and nothing
+  flags a sequence.
+- **`docs/research/` has an uncapped subdirectory.** Found by probe, not by any check. → **TD-061**.
+- **The census pattern is wrong in both directions and neither is visible from inside it.** It
+  over-counts (a §2 row is a parameter set, not a rule) and under-counts (checkbox items, numbered
+  items, and fenced schema blocks are invisible — §3's entire normative content is a ```yaml block
+  that *nothing* counted). → **L-133**.
+- **T3's rule count was one high** and its own DoD did not catch it; T4's reconciliation did. A
+  per-task census that only has to sum against itself will accept an off-by-one.
+- **EPIC-004's opening premise was wrong**, which is a good outcome for the sprint and a bad one for
+  anything that was planned on it. Two of its stated figures were stale in both directions.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`) — **L-131 filed**: a cap breach met with
+an edit is a squeeze, and the second trim toward a limit is the tell; the rule against it can be the
+text you are reading and still not fire, because each trim is individually indistinguishable from
+editing. **L-132 filed**: the tidy remedy for a gate finding can resolve the *report* by leaving the
+checker's reach — probe any structural remedy against the checker before adopting it, because a green
+gate bought by hiding is the false negative L-058 exists to prevent. **L-133 filed**: a census by line
+shape over a structured document is wrong in both directions at once, and a total that "looks about
+right" is consistent with both errors cancelling.

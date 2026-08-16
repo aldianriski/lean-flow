@@ -59,7 +59,7 @@ each other · any telemetry, ever (the README promises none).
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [SPRINT-072](../sprint/SPRINT-072-conformance-baseline.md) | Conformance Baseline | active | _(completed at close)_ — the inventory and baseline the engine is designed against: every normative spec rule classified by evidence class and mechanical-vs-judgment, reconciled against the live checker corpus. Explicitly not the engine, and changes no checker architecture. |
+| [SPRINT-072](../sprint/archive/SPRINT-072-conformance-baseline.md) | Conformance Baseline | closed 2026-08-16 · `[close_commit]` | **Overturned this epic's opening premise and replaced it with a measurement.** All **96** normative rules classified — 8 covered · 39 uncovered-mechanical · 45 judgment-only · 6 implementation-directed — and reconciled against the live corpus (11 checkers · 22 harnesses · 98 fixture cases · 46 distinct findings). The checkers do **not** encode the standard: 3 of 13 sections are referenced in `scripts/lib/`, ten have zero. Established the fourth bucket `implementation-directed` (6 rules an engine must never evaluate against an adopter), that a §2 row is a *parameter set* not a rule (6 families, not 37), and that **Gated is the hard level, not Attested**. Changed no checker and no execution architecture — verified by diff. |
 
 ## Decisions
 
@@ -102,8 +102,18 @@ each other · any telemetry, ever (the README promises none).
       (`docs/research/conformance-baseline.md`). But this condition says *"marked judgment-only **in
       the spec**"*, and the marks live in a research doc — the spec itself is unchanged. Marking them
       in `spec/STANDARD.md` is a spec change, which SPRINT-072's D4 excluded. **Remaining:** carry the
-      45 judgment-only marks into the spec, and close the 39 uncovered-mechanical rules or rule them
-      out of scope. The classification half is done; the *in the spec* half is not
+      45 judgment-only marks into the spec (**TASK-227**), and close the 39 uncovered-mechanical rules
+      or rule them out of scope (**TASK-229**). The classification half is done; the *in the spec* half
+      is not. **TASK-227 is the engine's input, not a follow-up to it** — the spec currently carries no
+      level and no mark on any rule, so an engine built first would hard-code the classification a
+      second time, which is the wrapper outcome D1 rules out
 - [ ] Each check has a retained must-FAIL fixture that fails with its named finding
+      — measured at SPRINT-072: the corpus is **22 harnesses (17 asserting) · 98 fixture cases · 46
+      distinct named findings**, and that set is the **contract any engine must preserve**, not a
+      target to re-derive (L-058 · TD-012). Whether *every* check has one is not yet established
 - [ ] Attestation is verified from git trailers, per task, without trusting a self-report
+      — **§13 is entirely unchecked**: 7 rules, 0 covered, no attestation checker exists. The baseline
+      also puts §13 at 5 mechanical of 7, so this is more tractable than it reads → **TASK-228**
 - [ ] ADR-008's scope is formally amended or superseded, not silently outgrown
+      — unchanged; belongs with the engine sprint's design, where the packaging question (§ Open
+      questions) is also settled

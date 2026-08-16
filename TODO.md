@@ -18,14 +18,22 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-072 — Conformance Baseline** → [`docs/sprint/SPRINT-072-conformance-baseline.md`](docs/sprint/SPRINT-072-conformance-baseline.md) — EPIC-004's first member, and deliberately **not** the engine. Four `M` tasks: fix the rule-classification criteria against §2 (the hardest case), classify the remaining structural sections, classify Gated + Attested, then reconcile the whole inventory against 11 checkers / 98 fixture cases / 46 named findings and freeze it as a baseline. Changes no checker and no execution architecture — findings are recorded, not acted on. Gates not yet signed — `/orchestrator` runs G1+G2 first.
+> _(none — SPRINT-072 closed 2026-08-16, archived → [`docs/sprint/archive/SPRINT-072-conformance-baseline.md`](docs/sprint/archive/SPRINT-072-conformance-baseline.md))_
+>
+> **Read the baseline before promoting EPIC-004's next member.**
+> [`docs/research/conformance-baseline.md`](docs/research/conformance-baseline.md) is the frozen
+> artifact the engine is designed *against*, and it overturns the epic's opening premise: the eleven
+> checkers encode lean-flow's **project conventions**, not the standard — only 3 of the spec's 13
+> sections are referenced anywhere in `scripts/lib/`. Measured coverage is **8 covered · 39
+> uncovered-mechanical · 45 judgment-only · 6 implementation-directed across 96 rules** (counts, never
+> a ratio — EPIC-004 D1).
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard (closed 2026-08-16** across
 > SPRINT-069 · 070 · 071: spec extracted and independently versioned · conformance levels ruled ·
 > attestation format specified · skills cite rather than restate · the spec made buildable-against**)**
-> → **EPIC-004 Conformance** — *now the head of the sequence*, and it builds the engine EPIC-003 made
-> checkable → **EPIC-005 Fleet**. Evidence base:
+> → **EPIC-004 Conformance** — *now the head of the sequence*, one member closed (SPRINT-072), and the
+> engine it builds is what EPIC-003 made checkable → **EPIC-005 Fleet**. Evidence base:
 > [`docs/research/platform-readiness-audit.md`](docs/research/platform-readiness-audit.md).
 > Backlog below is ranked against that sequence, not by age.
 
@@ -39,66 +47,75 @@ status: current
 
 ### P1 — Next Phase Required
 
-- [ ] TASK-223 — Fix the rule-classification criteria, then classify spec §2  [size: M] [risk: med] [HITL]
+- [ ] TASK-227 — Carry the classification into `spec/STANDARD.md` so the spec is the rule source  [size: M] [risk: med] [HITL]
       class:      decision
-      done-when:  a written, applied test separates a **normative rule** from reference *data* and from
-                  *rationale*, and every one of §2's ~59 candidates is classified rule|data|rationale;
-                  each rule carries its conformance level (ADR-024) and a mechanical|judgment-only mark
-      touches:    docs/research/conformance-inventory.md (new) · the sprint Execution Log
+      done-when:  every normative rule in `spec/STANDARD.md` carries its conformance level and its
+                  mechanical | judgment-only | implementation-directed mark **in the spec itself**, in
+                  a form a tool can read without the plugin present; EPIC-004 § Closed-when 2's
+                  *"marked judgment-only in the spec"* half is then genuinely satisfiable
+      touches:    spec/STANDARD.md · spec version (MINOR) · docs/adr/ if the annotation form is
+                  hard-to-reverse
       depends-on: none
-      assumes:    §2 is chosen first because it is the densest section (59 of 156 gross candidates) and
-                  because its rows are the hardest case — a `Cap` cell is mechanical, a `Create ←` cell
-                  is a lifecycle *trigger* no tool can observe, and both sit in the same row. **Do not
-                  force a rule to be mechanical**: judgment-only is a first-class outcome and marking
-                  it is the deliverable, not a failure to automate
-      tracker:    EPIC-004 § Closed-when 2 · ADR-024 (the levels) · spec/STANDARD.md §2
-      origin:     decomposer
+      assumes:    **this is the engine's input, not a tidy-up after it.** EPIC-004 D1 says rules come
+                  from the spec rather than from code; SPRINT-072 measured that the spec currently
+                  carries no level, no mark and no finding name on any rule, so a "spec-driven" engine
+                  built first would hard-code the classification a second time — the wrapper-over-11-
+                  checkers outcome D3 rules out. The classification exists and is frozen
+                  (`docs/research/conformance-baseline.md`, 96 rules): this task *transcribes* it into
+                  the spec, and re-deriving it is out of scope. **The annotation form is the real
+                  decision** and is not pre-selected — price at least: inline markers vs a per-section
+                  table vs a sidecar machine-readable file · what it costs a human reading the spec as
+                  prose, since the spec is the artifact an adopter pins · whether an unannotated rule
+                  must be an error rather than a silent skip. The 6 implementation-directed rules must
+                  survive as a distinct mark: an engine that reads them as repo rules emits findings
+                  **no adopter can ever clear**
+      tracker:    EPIC-004 § Closed-when 2 (the unmet half) · EPIC-004 D1 · SPRINT-072 D3 ·
+                  docs/research/conformance-baseline.md § What the engine inherits
+      origin:     close-retro
       state:      ready
 
-- [ ] TASK-224 — Classify the remaining structural-evidence sections  [size: M] [risk: low] [HITL]
+- [ ] TASK-228 — Build the §13 attestation checker  [size: M] [risk: med] [HITL]
       class:      execution
-      done-when:  §1 · §3 · §4 · §5 · §6 · §7 · §8 · §12 fully classified under TASK-223's criteria,
-                  every candidate landing in exactly one bucket with its level and mechanical|judgment mark
-      touches:    docs/research/conformance-inventory.md
-      depends-on: TASK-223
-      assumes:    ~52 candidates. Grouped by **evidence class** (checkable from the file tree alone)
-                  rather than by section number, because evidence class is the mapping's own level
-                  column — a split by arbitrary section ranges would cut across it
-      tracker:    EPIC-004 § Closed-when 2 · ADR-024
-      origin:     decomposer
+      done-when:  a checker verifies §13's attestation from git trailers on the task's own commit —
+                  the three trailers present together, `Evidence:` carrying `@ <sha>`, the trailer
+                  agreeing with the sprint-level `gates_signed:`, and signature state read from `%G?`
+                  — each check failing with its own **named finding** against a **retained** must-FAIL
+                  fixture, one fixture per check
+      touches:    scripts/lib/ (new checker) · evals/ (fixture harness) · scripts/qa-check.sh
+      depends-on: none
+      assumes:    **§13 is the single largest covered-nothing block in the standard** — 7 rules, 0
+                  covered, and the baseline puts it at **5 mechanical of 7**, the most mechanical
+                  section in the spec. It is also EPIC-004 § Closed-when 4 in one cell. Two constraints
+                  bind hard: an **unsigned trailer is a claim, not proof** (ADR-025) — a checker
+                  concluding approval from one is wrong in the direction that matters — and the two
+                  rules marked `implementation-directed` (*a verifier may not conclude approval from an
+                  unsigned trailer* · *author identity is not the attestation*) constrain **this
+                  checker's own inference** and are not repo rules to evaluate. This is checker
+                  architecture, so it lands **after** TASK-227 settles what an engine reads, or is
+                  built as a standalone check that the engine later absorbs — that ordering is the
+                  first thing its design must rule on
+      tracker:    EPIC-004 § Closed-when 4 · ADR-025 · spec/STANDARD.md §13 · L-058 · TD-012
+      origin:     close-retro
       state:      ready
 
-- [ ] TASK-225 — Classify the Gated and Attested sections  [size: M] [risk: med] [HITL]
-      class:      execution
-      done-when:  §9 · §10 · §11 (planning-record evidence) and §13 (git-history evidence) fully
-                  classified, with each rule's evidence class named — the artifact a tool would read
-      touches:    docs/research/conformance-inventory.md
-      depends-on: TASK-223
-      assumes:    ~45 candidates. §13 is the newest and least settled (shipped SPRINT-070, amended
-                  SPRINT-071), and §9's `gates_signed:` + `*Verify:*` definitions are three days old —
-                  so this group is where a rule most likely turns out to be **stated but not yet
-                  checkable**, which is a coverage finding rather than a defect
-      tracker:    EPIC-004 § Closed-when 2 · ADR-024 · ADR-025 (§13's claim-vs-proof boundary)
-      origin:     decomposer
-      state:      ready
-
-- [ ] TASK-226 — Reconcile the inventory against the checker corpus and record the baseline  [size: M] [risk: high] [HITL]
+- [ ] TASK-229 — Rule on the 39 uncovered-mechanical rules: close each or scope it out  [size: M] [risk: low] [HITL]
       class:      decision
-      done-when:  every classified rule carries `existing checker → named finding → must-FAIL fixture →
-                  coverage status`, reconciled against the live corpus; the baseline is committed as a
-                  durable artifact; and the constraints any spec-driven engine inherits are **recorded
-                  as findings**, with no checker architecture changed by this task
-      touches:    docs/research/conformance-inventory.md · docs/epic/EPIC-004-conformance.md
-      depends-on: TASK-224, TASK-225
-      assumes:    **the corpus figures in EPIC-004's own text are stale and must not be copied
-                  forward** — it claims "~82 named findings across 16 retained fixture harnesses";
-                  measured 2026-08-16 the corpus is **11 checkers · 22 harnesses (17 asserting) · 98
-                  fixture cases · 46 distinct finding strings**. Re-derive at execution (L-097/L-130).
-                  Coverage status must distinguish *uncovered* from *judgment-only* — collapsing them
-                  would read as a gap where the standard deliberately declines to automate
-      tracker:    EPIC-004 § Closed-when 2 and 3 · L-058 (a gate needs a named must-FAIL fixture) ·
-                  TD-012 (retained fixtures) · EPIC-002 D3 (the 11 stand alone until a spec exists to read)
-      origin:     decomposer
+      done-when:  each of the 39 rules the baseline marks **mechanical but unchecked** carries an
+                  explicit disposition — a check to build, or a recorded ruling that it is out of scope
+                  for the engine with its reason — so that "uncovered" stops being one undifferentiated
+                  number
+      touches:    docs/research/conformance-baseline.md (dispositions) · docs/adr/ if the scoping is
+                  hard-to-reverse
+      depends-on: TASK-227
+      assumes:    **39 is a backlog, not a verdict**, and some of it should never be built: 7 of the 11
+                  existing checkers guard lean-flow's own conventions rather than the standard, and
+                  folding that instinct into the engine emits findings an adopter cannot act on. The
+                  ruling is per rule, not en bloc. **Do not convert this into a percentage or a
+                  completion score** (EPIC-004 D1) — the output stays counts plus dispositions, because
+                  a ratio that improves when the standard declines to automate something is backwards
+      tracker:    EPIC-004 § Closed-when 2 (the second unmet half) ·
+                  docs/research/conformance-baseline.md § Coverage by section
+      origin:     close-retro
       state:      ready
 
 - [ ] TASK-218 — Stop the uncommitted-WIP path accepting a sibling task's declaration  [size: S] [risk: low] [HITL]
@@ -191,7 +208,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-071's shipped changes are written up as **v1.45.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.45.0 + v1.44.0** inline, with **v1.43.0 rotated** → [`docs/changelog/CHANGELOG-1.43.0.md`](docs/changelog/CHANGELOG-1.43.0.md) in the same commit. The **spec moved again and the plugin did not drive it**: `spec/STANDARD.md` **0.2.0 → 0.3.0** for §9's `gates_signed:` + `*Verify:*` definitions — EPIC-003 D3's second such demonstration, and the last one the epic will produce.
+_(no active sprint)_ — SPRINT-072's shipped changes are written up as **v1.46.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.46.0 + v1.45.0** inline, with **v1.44.0 rotated** → [`docs/changelog/CHANGELOG-1.44.0.md`](docs/changelog/CHANGELOG-1.44.0.md) in the same commit. **The spec did not move** — 0.3.0 stands. That is the sprint's own D4 holding: SPRINT-072 measured the standard and changed nothing in it, which is why EPIC-004 § Closed-when 2 is recorded PARTIAL rather than ticked.
 
 ---
 

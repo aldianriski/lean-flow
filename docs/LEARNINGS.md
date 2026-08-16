@@ -22,11 +22,35 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-123**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-133**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-133 [tags: process] [status: active]: **A census by line shape over a structured document is wrong in both directions at once, and the two errors hide each other.** SPRINT-072's promote counted the spec's normative surface by matching three line shapes — table rows, bold-lead statements, bold bullets — and got **156 gross candidates**, recorded as an upper bound in A1. It was not an upper bound; it was wrong twice. **Too high:** a §2 table row is not a rule, it is a *parameter set* — one row carries `File` and `Cap` (Structural/mechanical), `Create ←` and `Update ←` (Gated/judgment-only), `Reader` (data) and `Tier` (judgment), so §2's 37 rows resolve into **6 rule families**, not 37 rules. **Too low:** three line shapes were invisible to every pattern — `- [ ]` checklist items (8), numbered items (6), and fenced blocks, the sharpest being §3, whose *entire* normative content is a ```yaml schema counted by nothing, so §3 registered as "2 candidates" when both were mere exceptions to the rule the census never saw. Corrected gross census: **170**. The dangerous property is that the errors are opposite-signed: a total inflated by row-splitting and deflated by invisible shapes lands somewhere plausible, and plausibility is the only signal a single count offers. Neither error was found by re-counting the same way; each was found by *reading the section* and noticing a constraint with no candidate behind it. Distinct from L-108 (anchor a matcher by shape, not substring — about false positives from prose) and from L-130 (a figure entering a frozen artifact needs a second query): both assume the unit being counted is the right unit. The rule: **before counting instances of a thing in a structured document, state what one instance *is* and find one the pattern cannot see.** A census whose unit is a line is measuring the document's typography, not its content.
+- seen: Sprint-072 (A1's 156 vs the corrected 170, and 37 rows vs 6 families — three re-derivations, three corrections)
+- count: 1
+- promoted: no
+- related: L-130 (the figure-in-a-frozen-artifact rule this slips past) · L-108 · L-105 (the cross-check family) · L-097
+
+---
+
+## L-132 [tags: tooling] [status: active]: **The tidy remedy for a gate finding can resolve the *report* by leaving the checker's reach — probe any structural remedy against the checker before adopting it.** SPRINT-072's G2 predicted a soft-cap breach: four tasks all declared `docs/research/conformance-inventory.md`, and ~156 classified rules rendered as a table will not fit §2's 130-line soft cap. §6's cap-hit rule says split into a tree, so `docs/research/conformance-inventory/` is the reflex — obviously correct, sanctioned by the standard's own text. It was probed rather than assumed: a throwaway file at `docs/research/_captest/probe.md` produced **zero** rows from `check-doc-caps.sh`, because the checker expands §2's `research/<slug>.md` into a **non-recursive** glob. The remedy would have "resolved" the breach by moving the artifact somewhere the cap check cannot see, in the sprint whose entire subject is checker coverage. What makes this generalisable is that the reflex was not sloppy — it was the standard's prescribed response, applied to a checker that implements a *different* section's glob, and no rule connects the two. A remedy is judged by what the checker says about the result, never by whether it follows the prescription. The rule: when a finding is answered by moving, renaming or restructuring an artifact, **re-run the checker against the proposed shape before committing to it** — a probe costs one throwaway file, and the failure it prevents is a green gate bought by hiding, which is the silent false negative L-058 exists to prevent. Corollary: a checker that derives its file set from a spec table inherits that table's glob semantics, and nothing warns you which sections' rules those semantics honour. → **TD-061** (the `docs/research/` subdirectory hole itself).
+- seen: Sprint-072 (G2, the conformance-inventory split — probed before adopting)
+- count: 1
+- promoted: no
+- related: L-058 (the false-negative bar) · L-131 (the sibling failure — the *other* wrong answer to the same cap breach) · L-126 (one declaration, two consumers, different matching semantics)
+
+---
+
+## L-131 [tags: process] [status: active]: **A cap breach answered with an edit is a squeeze, and the second trim toward the limit is the tell — because each trim is individually indistinguishable from editing.** SPRINT-072 T2's artifact came out at 140 lines against a 130 soft cap. I trimmed it. Then trimmed it again. Then compressed a correct-but-verbose reconciliation into a shorter one. `spec/STANDARD.md` §2's growth rule says, in as many words, *cap-hit → split, never squeeze*, and §7 lists squeezing as a named anti-pattern — **and T2's job was classifying §7**. The rule was not merely loaded in context; it was the text on screen being read for another purpose. It fired on the third trim, and from noticing the *shape of the sequence* rather than from recalling the rule. That is the mechanism worth keeping: no individual trim is a violation, and nothing observes a sequence. Each edit passes every test an editor applies to itself — it is shorter, it is still correct, it reads better — so the guard never engages, while the cumulative effect is exactly the one the rule forbids, and the information deleted is unrecoverable in a way an over-cap file is not. The correction was to do what the standard says: split §12 out to its own top-level file (125 + 29, both PASS, zero OVER-CAP repo-wide), at the top level so the checker still sees it (L-132 is why that qualifier matters). The rule: **the moment you edit a file *for length*, stop and ask whether it splits** — and treat a second length-motivated edit on the same file as a decision already made wrongly. Distinct from an ordinary tightening pass: the tell is not that the text got shorter, it is that the *cap* is the reason.
+- seen: Sprint-072 (T2, three trims before recognition — while classifying the section that names the anti-pattern)
+- count: 1
+- promoted: no
+- related: L-132 (the other wrong answer to the same breach) · L-121 (a rule violated by the phase that owns it) · ADR-015 (a soft cap reports and cannot be grandfathered — the pressure that makes trimming feel reasonable)
 
 ---
 

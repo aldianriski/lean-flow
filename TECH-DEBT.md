@@ -32,6 +32,31 @@ status: current
 
 ## Tech Debt
 
+- **TD-061** severity: medium | status: open | created: Sprint-072
+  - Summary: **`check-doc-caps.sh` expands §2's `research/<slug>.md` into a non-recursive glob, so any
+    file under a `docs/research/` subdirectory is uncapped and unreported.** Probed live at SPRINT-072's
+    G2: a file placed at `docs/research/_captest/probe.md` produced **zero** rows from the checker —
+    not `OVER-CAP`, not `PASS`, no row at all. Nothing depends on this today because no such
+    subdirectory exists, which is precisely why it would be discovered at the worst moment.
+  - Impact: this is a **silent false negative in a cap gate**, the failure class L-058 exists to
+    prevent, and it is reachable by following the standard's own advice — §6's cap-hit rule says split
+    into a tree, and a tree under `docs/research/` is the natural reading. So the documented remedy for
+    one finding creates a blind spot for another, and the resulting gate is green. SPRINT-072 avoided
+    it only by probing before adopting (L-132). The blast radius is bounded to `docs/research/` today;
+    whether other §2 rows with a `<slug>` component share the semantics is **not established** and is
+    part of pricing this.
+  - Mitigation (**not yet derived**, L-091): "make the glob recursive" is the obvious move and is
+    probably not the whole answer. Price at least: whether a `<slug>` path component in §2 is *meant*
+    to admit subdirectories at all, or whether the real defect is that §2 does not say (a checker
+    change would then encode a rule the standard never stated — L-123's shape) · whether other §2 rows
+    are exposed the same way, which is a survey, not an assumption · and whether a file matched by no
+    §2 row should report as an explicit **uncovered** row rather than as silence, since silence is what
+    made this invisible. Note the interaction: EPIC-004's engine has to resolve §2's path patterns
+    anyway, so this may be subsumed rather than fixed in place.
+  - Tracker: SPRINT-072 G2 Execution Log (the probe) · `docs/research/conformance-baseline.md`
+    § Findings recorded for later sprints · **L-132** · L-058 · ADR-015 (soft caps report, and cannot
+    be grandfathered)
+
 - **TD-060** severity: minor | status: open | created: Sprint-071
   - Summary: **nothing checks that a cross-reference inside `spec/STANDARD.md` resolves.** §13 referred
     to `gates_signed:` as living in "§9" while §9 never defined it — a dangling internal pointer that

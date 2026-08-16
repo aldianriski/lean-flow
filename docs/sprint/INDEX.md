@@ -80,3 +80,4 @@ One line per archived sprint (newest first); files live in [`archive/`](archive/
 - SPRINT-069 — First Extraction — closed 2026-08-16 · b744fed · 5 of 5 units (v1.43.0) · EPIC-003 (spec extracted · ADR-024)
 - SPRINT-070 — Attested — closed 2026-08-16 · d164924 · 10 of 10 DoD (v1.44.0) · EPIC-003 (spec §13 attestation · ADR-025) · TD-054 resolved
 - SPRINT-071 — Cite, Not Restate — closed 2026-08-16 · 015d663 · 14 of 14 DoD (v1.45.0) · EPIC-003 CLOSED (skills cite not restate · spec 0.3.0 makes Gated checkable) · TD-060 filed
+- SPRINT-072 — Conformance Baseline — closed 2026-08-16 · [close_commit] · 17 of 17 DoD (v1.46.0) · EPIC-004 (all 96 spec rules classified · the checkers do not check the standard) · TD-061 filed
