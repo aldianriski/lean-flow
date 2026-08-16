@@ -2,7 +2,7 @@
 owner: Maintainer
 last_updated: 2026-08-16
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.1.0
+version: 0.2.0
 status: current
 ---
 
@@ -495,3 +495,93 @@ Even a private repo is treated as potentially exposed.
 
 **Wiring.** `init`'s `.gitignore` safe-scaffold derives its content from **§12c** (write-if-absent);
 `migrate`'s adoption scan checks the tree against **§12b** (report-only — never auto-remediates).
+
+---
+
+## §13 — HITL attestation (git-native)
+
+The **Attested** conformance level requires that human approval be provable to a third party *from a
+clone alone*. §13 defines the format that carries it. It is a contract, not a procedure: it says what
+must be true of a commit, never how a tool produces or reads one. The reader that matters is someone
+with your repository and nothing else — no access to your planning tool, your CI, or you.
+
+**a. What carries the attestation.** Three git trailers on the **task's own commit** — the commit that
+implements the work, not a separate approval commit and not the merge:
+
+| Trailer | Value | Meaning |
+|---|---|---|
+| `Gate-Signed-By:` | `Name <email>` | the **human** who approved the gate. One line per approver; repeat the trailer for more than one. |
+| `Gate:` | gate identifiers, comma-separated (e.g. `G1,G2`) | which gates that approval covers. |
+| `Evidence:` | a repo-relative path, optionally `@ <sha>` | where the approval is recorded in the repo, so the claim can be read in full rather than taken on faith. |
+
+All three are required together. A commit carrying `Gate:` without `Gate-Signed-By:` asserts that a
+gate applied and declines to say who approved it, which is weaker than saying nothing.
+
+**b. Relation to the sprint-level record.** A conformant repo already records gate sign-off once per
+sprint (`gates_signed: <GATES> @ <sha>` in the sprint file — §9). The trailer does not replace that
+record and does not move approval to a per-task cadence: it **carries the sprint-level fact onto the
+commits it covers**, so a reader with a clone can reach it without knowing your sprint file exists or
+how to parse it. The two must agree; the sprint file stays the place the approval is *recorded*, and
+`Evidence:` is the pointer back to it.
+
+What this buys is **verifiability, not approval frequency.** An implementation that batches G1/G2 once
+per sprint and one that signs every task can both be conformant here; what §13 forbids is a repo that
+claims per-commit approval it never obtained. State the cadence honestly in `Evidence:` and the claim
+stays true at either granularity.
+
+**c. The claim-vs-proof boundary — this is the load-bearing paragraph.**
+
+**An unsigned trailer is an assertion by whoever wrote the commit, and nothing more.** Trailers are
+plain text in the commit message. Anyone who can write a commit can write any `Gate-Signed-By:` line
+they like, naming anyone. Nothing in git checks it. A verifier reading an unsigned trailer may
+conclude *"this repository states that this person approved these gates, and points at where it says
+so"* — and may **not** conclude that the named person approved anything.
+
+**Signing is what converts the claim into proof.** When the commit carries a valid signature
+(`git log --format=%G?` → `G`), the trailer's contents are covered by that signature, and a verifier
+with the signer's public key can conclude the *signer* attested to this text. Note precisely what
+that does and does not establish: it binds the **signer** to the claim, so `Gate-Signed-By:` is proof
+only when the signer and the named approver are the same party, or when the signer is an authority
+you already trust to make the statement.
+
+Consequently **Attested is not reachable by trailers alone.** An implementation that emits perfect
+trailers over unsigned commits has reached Gated and has made its records easier to read; it has not
+reached Attested, and reporting otherwise is exactly the theatre a conformance level exists to
+prevent. Do not soften this in an implementation's own documentation: the honest statement is that
+the format is in place and the signing is not.
+
+**d. Worked example — a real commit, shown in the weaker state.**
+
+Taken from this specification's own reference implementation, so the example is checkable rather than
+illustrative. Commit `97eca0b` was produced under a sprint whose gates were signed and recorded as
+`gates_signed: G1,G2 @ cac204b`. Its conformant trailer block would read:
+
+```
+sprint(70) T2: cure the worktree base pin at its cause, and guard it
+
+<body>
+
+Gate-Signed-By: Aldian Rizki <aldian.mar@gmail.com>
+Gate: G1,G2
+Evidence: docs/sprint/SPRINT-070-attested.md @ cac204b
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+```
+
+**What a verifier may conclude from it, and what it may not.** Re-derived at the time of writing
+rather than assumed: `git log -1 --format=%G?  97eca0b` → **`N`** — no signature. Across the whole
+repository, `git log --format=%G? | sort | uniq -c` → **673 of 673 commits `N`**. So for this example
+a verifier may conclude only that the repository *states* these gates were approved by that person
+and points at `docs/sprint/SPRINT-070-attested.md` for the record. It may **not** conclude that the
+named human approved anything, because nothing here is signed. Reaching Attested on this repository
+requires commit signing, which it does not yet do.
+
+This example is deliberately the unsigned case. Illustrating §13 with a signed commit that does not
+exist would demonstrate the format by misrepresenting the implementation — and a standard whose own
+worked example overstates its author's conformance has taught the wrong lesson before its first
+adopter has read a second page.
+
+**e. Author identity is not the attestation.** Do not infer the approver from the commit's `author`
+or `committer`. Both vary by setup: an agent may commit under its own identity, or under a human's
+git config with the agent recorded as `Co-Authored-By:` (the case above). Neither arrangement says
+anything about who approved a gate. That is what `Gate-Signed-By:` is for, and why it is a separate
+field rather than something a verifier derives.

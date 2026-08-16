@@ -47,22 +47,22 @@ because the spec is what an adopter pins and the ADR is why we chose it.
 verifier may conclude from it, with a real commit from this repo shown as the worked example.
 
 **DoD:**
-- [ ] The trailer format specified in `spec/` — fields, which commit carries it, and its relation to
+- [x] The trailer format specified in `spec/` — fields, which commit carries it, and its relation to
       the existing sprint-level `gates_signed:` — *Verify: the spec section stands alone; a reader
       needs no ADR and no `skills/` file to write a conformant trailer*
-- [ ] The **claim-vs-proof boundary stated in the spec, not softened** — an unsigned trailer is an
+- [x] The **claim-vs-proof boundary stated in the spec, not softened** — an unsigned trailer is an
       assertion by whoever wrote it; signing is what makes it verifiable against a clone —
       *Verify: the section says so in its own words, and the worked example below demonstrates the
       weaker case rather than hiding it*
-- [ ] Worked example against a **real commit in this repo's history**, showing the trailer as it
+- [x] Worked example against a **real commit in this repo's history**, showing the trailer as it
       would appear and what a verifier can and cannot conclude — *Verify: the cited sha resolves;
       the example's signature status is re-derived at execution (`%G?`), never assumed*
-- [ ] D2's pending ADR recorded, with the two forks ruled at promote as its Alternatives —
+- [x] D2's pending ADR recorded, with the two forks ruled at promote as its Alternatives —
       *Verify: `docs/DECISIONS.md` row + §4's three tests all hold*
-- [ ] `spec/` version bumped and its changelog entry written — a new section is a spec change, and
+- [x] `spec/` version bumped and its changelog entry written — a new section is a spec change, and
       the plugin's version must **not** move with it — *Verify: `spec/CHANGELOG.md` gains an entry;
       the four manifests are untouched by this task (EPIC-003 D3)*
-- [ ] EPIC-003 § Closed-when 4 ticked with its evidence — *Verify: the epic file; the gate's
+- [x] EPIC-003 § Closed-when 4 ticked with its evidence — *Verify: the epic file; the gate's
       epic-archive leg still reports the epic correctly live*
 
 ### T2 — Stop worktree dispatch branching from a stale pinned base `[size: M · risk: med · class: execution · HITL]`

@@ -9,6 +9,27 @@ status: current
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
 
+## 0.2.0 — 2026-08-16
+
+**Added — §13 HITL attestation (git-native).** The wire format for the **Attested** conformance level
+that ADR-024 defined but deliberately left unspecified: three trailers on the task's own commit
+(`Gate-Signed-By:` · `Gate:` · `Evidence:`), what they mean, and how they relate to the sprint-level
+`gates_signed:` record. Closes EPIC-003 D2, pending since ADR-018 (SPRINT-070 T1 · ADR-025).
+
+Two things §13 states that an implementation is likely to want softened, so they are called out here
+as well. First, **the trailer carries the sprint-level approval onto each covered commit; it does not
+raise approval to a per-task cadence** — the gain is verifiability, not frequency, and ADR-018's
+original framing of this as a granularity increase was corrected at SPRINT-070's promote. Second,
+**an unsigned trailer is a claim, not proof**: it is plain text anyone able to commit can write, so
+Attested is not reachable by trailers alone. §13's worked example is therefore drawn from a real
+commit in the reference implementation and shown in its true unsigned state (`%G?` = `N`, as are all
+673 commits in that repository's history) rather than illustrated with a signature that does not
+exist.
+
+Minor rather than patch: this adds a section and a new obligation for anyone claiming Attested, and
+changes no existing rule. `plugin.json` and the other three manifests do not move with it —
+the spec versions independently (EPIC-003 D3).
+
 ## 0.1.0 — 2026-08-16
 
 **Extracted.** The LEAN DOCUMENTATION STANDARD moved out of

@@ -62,8 +62,11 @@ spec so a rule has exactly one home · ADR the split.
 - **D1** — The standard is extracted from the implementation rather than grown inside it.
   **→ [ADR-018](../adr/ADR-018-standard-implementation-split.md).**
 - **D2** — HITL attestation is git-native (commit trailers + optional signing), not a bespoke record
-  or an external service. **→ ADR pending**, once the trailer format is designed against a real
-  sprint's commits.
+  or an external service. **→ [ADR-025](../adr/ADR-025-git-native-attestation-format.md)** (SPRINT-070
+  T1), designed against this sprint's own commits and specified in `spec/STANDARD.md` §13. Two rulings
+  worth carrying forward: the trailer carries the *sprint-level* sign-off onto each covered commit and
+  does **not** move approval per-task — correcting ADR-018's granularity framing — and an unsigned
+  trailer is a claim rather than proof, so Attested needs commit signing this repo does not yet do.
 - **D3** — The spec versions independently of `plugin.json`. Lockstep is a property of the *manifests*
   (ADR-012 era), and binding a standard's version to a plugin's patch releases would make every
   consumer's pin move for reasons that have nothing to do with the standard.
@@ -95,5 +98,11 @@ spec so a rule has exactly one home · ADR the split.
       — ✓ SPRINT-069 T1: [ADR-024](../adr/ADR-024-conformance-levels.md) — Structural → Gated →
       Attested, each checkable from a different evidence class (file tree · planning records · git
       history alone), none requiring EPIC-004's engine to exist
-- [ ] The attestation format is specified with a worked example against a real commit
+- [x] The attestation format is specified with a worked example against a real commit
+      — ✓ SPRINT-070 T1: `spec/STANDARD.md` §13 (spec v0.2.0) + [ADR-025](../adr/ADR-025-git-native-attestation-format.md).
+      Three trailers on the task's own commit; the worked example is commit `97eca0b` from this
+      repo's own history, shown in its true **unsigned** state (`%G?` = `N`, re-derived at execution
+      — as are all 673 commits here) rather than illustrated with a signature that does not exist.
+      §13 states the claim-vs-proof boundary in its own words, so Attested is explicitly *not*
+      reachable by trailers alone — this repo sits at Gated with more legible records
 - [ ] A reader could build a conformant tool from the spec alone, without reading `skills/`

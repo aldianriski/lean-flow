@@ -182,3 +182,60 @@ Consequence for the DoD, stated rather than glossed: the guard was exercised end
 retained fixtures (7 assertions, defect-seeded), and the *base* was captured from a real dispatch.
 The guard was not run against this particular live worktree. Both halves of the DoD are met; the
 combination that was not achieved is a single command's timing, and the fix for it is in the doc.
+
+### 2026-08-16 | progress | T1 — attestation format specified into `spec/` §13; spec v0.2.0; 6 of 6
+
+`spec/STANDARD.md` gains **§13 — HITL attestation (git-native)**: the three trailers on the task's own
+commit (`Gate-Signed-By:` · `Gate:` · `Evidence:`), what each means, how they relate to the
+sprint-level `gates_signed:` record, and the claim-vs-proof boundary. Written as a contract — what
+must be true of a commit — rather than a procedure, which keeps it inside §5's HOW filter while still
+satisfying the acceptance test that an adopter can write a conformant trailer from `spec/` alone.
+
+**A2 re-derived and strengthened rather than repeated.** A2 asserted `%G?` = `N` "across recent
+history" from a 20-commit sample. Two queries that had to agree: `git log --format=%G? | sort | uniq
+-c` → **673 `N`**, and `git rev-list --count HEAD` → **673**. The sum reconciles, so this is the whole
+history and not a window — the worked example can now say "673 of 673" instead of "the commits I
+happened to look at". Nothing in this repository has ever been signed.
+
+**The worked example is commit `97eca0b`** — T2's own implementation commit from earlier today, made
+under this sprint's `gates_signed: G1,G2 @ cac204b`. It is shown in its true unsigned state, with an
+explicit statement of what a verifier may conclude (the repo *states* an approval and points at the
+record) and may not (that the named human approved anything). §13 says in its own words that Attested
+is therefore **not reachable by trailers alone**, and that this repository sits at Gated.
+
+**D2's premise was wrong on one factual point, corrected rather than reproduced.** D2 reads
+"`Gate-Signed-By:` names the human; **the commit author stays the agent**". Measured: `97eca0b`'s
+author *and* committer are `Aldian Rizki <aldian.mar@gmail.com>` — the human — with the agent
+recorded as `Co-Authored-By:`. So the agent is the co-author here, not the author. D2's **ruling** is
+untouched (the approver is named by an explicit field, never derived), but its parenthetical
+rationale does not describe this repo. Rather than restate it, §13(e) and ADR-025 say the general
+thing that is actually true: author identity varies by setup, neither arrangement says who approved a
+gate, and that is precisely why `Gate-Signed-By:` is a separate field. Flagged for the Retro; not
+filed as a `scope-change`, since no scope moved and the decision's substance is intact.
+
+**ADR-025 recorded**, with §4's three tests each holding on evidence rather than assertion:
+*hard-to-reverse* — a wire format written into immutable commit history, and trailers already
+committed cannot be amended when the format changes; *surprising* — it contradicts ADR-018, which
+framed git-native attestation as raising granularity to per-task, where D1 ruled it carries the batch
+fact instead; *a real trade-off* — five alternatives, each with the reason it lost. ADR-018 is **not**
+edited or marked superseded: ADRs are append-only and only its granularity framing is corrected, which
+`related: ADR-018` on ADR-025 carries.
+
+Spec bumped **0.1.0 → 0.2.0** with its changelog entry. Minor, not patch: a new section and a new
+obligation for anyone claiming Attested, changing no existing rule. **The four manifests are
+untouched** — verified by `git diff --name-only 76eb88a..HEAD -- '*plugin.json' '*marketplace.json'`
+returning empty, which is EPIC-003 D3's first demonstration of the spec moving *without* a plugin
+release driving it. **EPIC-003 § Closed-when 4 ticked** with its evidence; D2's row now points at
+ADR-025 instead of "ADR pending".
+
+One gate interaction worth recording: adding ADR-025 turned the generated knowledge index stale
+(`FAIL knowledge index STALE`), fixed by `scripts/gen-index.sh`. `docs/knowledge-index.md` is not in
+T1's `Layers:` and the gate did **not** flag it as undeclared — checked rather than assumed, it is
+excluded by name at `check-layers-observed.sh` lines 135 and 213 as generated-never-hand-authored. No
+`Layers:` correction needed. Gate **144 pass / 0 fail**.
+
+**Out of scope and left alone, as ruled at G1:** `spec/STANDARD.md` still has no §2 row and therefore
+no cap, now at 587 lines (measured, after I first wrote 578 from memory — the exact slip this sprint
+already caught once in A4). A4 flagged that T1 "may need to rule on" it; adding a cap row is a change to
+the standard's own governance and belongs to whoever owns that question, not to a task that happens
+to add a section. Raised for the Retro.
