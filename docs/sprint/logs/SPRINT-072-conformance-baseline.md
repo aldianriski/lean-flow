@@ -181,3 +181,36 @@ untouched: same sections, same test, same acceptance.
 **Marks after T2:** 38 rules — 17 mechanical · 15 judgment-only · 6 split. Running total with §2:
 **25 mechanical · 25 judgment-only · 8 split**. An even divide, and the mechanical half is inflated by
 the §7/§8 restatements just described.
+
+### 2026-08-16 | progress | T3 — `implementation-directed` is not an edge case, and Attested is the *easy* level
+
+**Census re-derived: 46**, not the promote figure of 45. The difference is exactly one `- [ ]`
+checkbox in §9 — Gap A firing a third time, in the group T2 had already warned about it for.
+
+**The finding T3 exists to produce.** T2 met **one** `implementation-directed` statement and proposed
+the bucket tentatively. This group has **six**, and they cluster where an engine would lean hardest:
+three are in **§13, the Attested section**, and they are the semantically load-bearing ones — *a
+verifier may not conclude approval from an unsigned trailer* and *author identity is not the
+attestation* are rules about **what a tool may infer**, not about what a repo must contain. An engine
+that ingested §13 as repo rules would either drop them — losing the entire claim-vs-proof boundary
+ADR-025 exists to state — or emit them as findings **no adopter can ever clear**. The bucket is now
+load-bearing rather than tidy-minded, and T4 must carry it into the baseline.
+
+**Second finding, and it inverts the intuition: Attested is the most mechanical level in the
+standard.** §13 is **5 mechanical of 7**, against §9's 6-of-10 and §10's **4-of-11**. Git-history
+evidence looks exotic and is actually the cleanest — a trailer is a literal string on a literal
+object. **Gated is the hard level**, because "was the governance checkpoint honestly run?" and "was
+the placement test applied?" are unobservable in principle, not merely unimplemented. Anyone sizing
+EPIC-004's engine off "Attested sounds hard" would have mis-planned it.
+
+**The distinction T4 must not collapse (DoD 3), stated in the artifact:** *judgment-only* = not
+checkable in principle, the standard deliberately choosing a human; *mechanical with no checker* =
+uncovered, real work. Only the second is a gap. Merging them would report deliberate boundaries as
+debt — the same error D1 rejected the percentage for.
+
+**§13's claim-vs-proof boundary survived classification (DoD 4):** an unsigned trailer is recorded as
+*mechanical on the fact* (`%G?` is readable) while the inference it licenses is
+`implementation-directed`. At no point is an unsigned trailer recorded as satisfying an Attested rule.
+
+Marks: 39 rules — 18 mechanical · 9 judgment-only · 5 split · **6 implementation-directed** · 2 data.
+Artifact 112/130, PASS, zero OVER-CAP repo-wide. Gate 154/0.

@@ -92,12 +92,12 @@ likely to be **stated but not yet checkable** — §13 is three sprints old and 
 rule — the file, field or git object, not the section it came from.
 
 **DoD:**
-- [ ] §9 · §10 · §11 · §13 fully classified — *Verify: counts sum to the re-derived census*
-- [ ] Each rule names the **artifact a tool would read** to check it — *Verify: "the sprint file" is
+- [x] §9 · §10 · §11 · §13 fully classified — *Verify: counts sum to the re-derived census*
+- [x] Each rule names the **artifact a tool would read** to check it — *Verify: "the sprint file" is
       not an answer; the field or the git object is*
-- [ ] **Stated-but-not-yet-checkable rules are marked as coverage findings, not as defects** —
+- [x] **Stated-but-not-yet-checkable rules are marked as coverage findings, not as defects** —
       *Verify: the inventory distinguishes "no checker exists" from "not checkable in principle"*
-- [ ] §13's claim-vs-proof boundary survives classification — *Verify: an unsigned trailer is not
+- [x] §13's claim-vs-proof boundary survives classification — *Verify: an unsigned trailer is not
       recorded as satisfying an Attested rule (ADR-025); if it is, the classification is wrong*
 
 ### T4 — Reconcile the inventory against the checker corpus and record the baseline `[size: M · risk: high · class: decision · HITL]`
