@@ -160,3 +160,42 @@ was stale once" was not.
 
 No fix attempted mid-sprint: the cure is a dispatch-protocol change, which is nobody's task here.
 Filed to TD-054 at close with this entry as its evidence.
+
+### 2026-08-16 | progress | T2 — spec/STANDARD.md v0.1.0 extracted; the standard is now a separable artifact
+
+Dispatched builder (worktree, base **622f420** — stale, TD-054; merged `6a69a8b` with one conflict,
+resolved). `git mv` of the standard out of `skills/lean-doc-generator/references/` into
+`spec/STANDARD.md`, content verbatim, plus an ownership header carrying `version: 0.1.0` and a new
+`spec/CHANGELOG.md`. 12 path references repointed in the same commit; `check-doc-caps.sh`'s default
+followed in one line; CLAUDE.md's Self-contained principle now says the skill *cites* the standard
+rather than bundling it. **EPIC-003's first Closed-when condition is now materially met.**
+
+**Nothing is stated twice** (ADR-023's per-sprint review check, asked and answered): `git mv` leaves
+no content at the old path, so there is no old home left to restate from. Five references to the old
+path survive and every one is a citation, not a copy — ADR-018 (append-only), `loop-hygiene-prd.md`
+(frozen/superseded), `platform-readiness-audit.md` (its F3 evidence, flagged by the builder as a
+judgment call), this Plan's own T2 `Layers:` line, and `spec/CHANGELOG.md`'s deliberate note of where
+the document used to live. Coordinator re-derived that set independently rather than accepting the
+builder's count (L-097).
+
+**Two declaration corrections, per L-100 — declared, not defended:**
+- **T2 `Layers:` += `SECURITY.md` · `docs/LEARNINGS.md`.** Both carried genuinely broken path
+  references and neither was in the Plan's Layers text, because a declaration written at promote
+  cannot name what a repo-wide search finds at execution. The builder fixed them anyway (correctly,
+  per DoD 2's "every path reference") and flagged the gap rather than editing the Plan itself.
+- **T5 `Cites:` += `T4`.** T5's own DoD evidence line names T4's worktree as the live subject it
+  verified against, and `check-layers-completeness.sh` reads that prose. Cited, not depended on.
+
+**The merge conflict is worth recording, because the stale base made it.** T2 rewrote the epic's
+"Why this, why now" paragraph to describe the post-move state — and carried the **450**-line figure
+forward, because its base predated the promote where that figure was re-measured to 489. Resolving by
+picking either side would have shipped a wrong number: the true count is now **497**, the move having
+added the ownership header the standard never had. So this paragraph has been wrong twice in two
+days, both times by a figure being remembered rather than measured — L-097 demonstrated on itself.
+The resolution states 497 and carries a comment telling the next editor to re-measure.
+
+### 2026-08-16 | progress | worktrees removed; TD-053 leg 1's two false positives cleared with them
+
+Both merged worktrees removed. The gate had been reporting two `ephemeral-intake` FAILs — one per
+live worktree — which is leg 1 scaling with the number of concurrent agents, a detail the row did not
+anticipate. Post-removal the gate is **151 pass / 0 fail**.

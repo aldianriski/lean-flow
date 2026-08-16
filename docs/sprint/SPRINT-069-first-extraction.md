@@ -64,7 +64,8 @@ makes it checkable in principle — with EPIC-003 open question 1 struck through
 Layers: `spec/` (new) · `skills/lean-doc-generator/references/DOCS_Guide.md` ·
         `skills/lean-doc-generator/SKILL.md` · `scripts/lib/check-doc-caps.sh` ·
         `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `README.md` ·
-        `docs/architecture/overview.md` · `docs/epic/EPIC-003-the-standard.md`
+        `docs/architecture/overview.md` · `docs/epic/EPIC-003-the-standard.md` ·
+        `SECURITY.md` · `docs/LEARNINGS.md`   (both added mid-sprint — L-100, logged)
 Depends-on: T1
 Cites: ADR-023 (move+cite atomic; the extracted tree becomes SSOT, CONTEXT.md a consumer) ·
        ADR-018 § Decision · EPIC-003 § Scope · L-097 (re-derive a stated figure before acting on it)
@@ -78,18 +79,33 @@ every path reference resolves, and the gate is green — in one commit, with no 
 leaving a rule stated in two places.
 
 **DoD:**
-- [ ] The document moved and renamed, carrying `version: 0.1.0` in its ownership header, beside
+- [x] The document moved and renamed, carrying `version: 0.1.0` in its ownership header, beside
       `spec/CHANGELOG.md` — *Verify: `git show --stat` shows an `R` rename; the gate's ownership leg*
-- [ ] Every **path** reference re-pointed, count re-derived at execution rather than taken from any
+      ✓ `spec/STANDARD.md` 497 lines (rename detected 99% similar in the builder's commit), header
+      carries `version: 0.1.0`; `spec/CHANGELOG.md` created; old path confirmed absent
+- [x] Every **path** reference re-pointed, count re-derived at execution rather than taken from any
       figure written at promote (L-097) — *Verify: a repo-wide search for the old path returns only
       history (archived sprints · rotated changelogs), reconciled by a second query that sums*
-- [ ] `check-doc-caps.sh`'s default guide path follows the move — *Verify: the gate's cap legs still
+      ✓ builder: 85 pre-edit = 12 fixed + 73 history/frozen. Coordinator re-derived independently
+      post-merge: 5 live refs remain, each accounted for — ADR-018 (append-only) · loop-hygiene-prd
+      (frozen, superseded) · platform-readiness-audit (F3's evidence, flagged) · this Plan's own
+      T2 Layers line · `spec/CHANGELOG.md`'s deliberate historical citation
+- [x] `check-doc-caps.sh`'s default guide path follows the move — *Verify: the gate's cap legs still
       report per-file caps, not a parse failure; a deliberate wrong path FAILs*
-- [ ] `.claude/CLAUDE.md`'s self-contained principle states what is true after the move —
+      ✓ one-line default fix; cap legs report per-file caps in the integrated gate run, and the
+      builder verified a deliberate wrong path FAILs loudly ("standard not readable")
+- [x] `.claude/CLAUDE.md`'s self-contained principle states what is true after the move —
       *Verify: the line no longer claims lean-doc-generator bundles the standard*
-- [ ] Nothing is stated twice — *Verify: named review check "is any rule now stated twice?" (ADR-023
+      ✓ now reads "bundles its own templates **and cites the standard from the versioned `spec/`
+      tree (ADR-023), rather than owning a copy**"; CLAUDE.md 63/80
+- [x] Nothing is stated twice — *Verify: named review check "is any rule now stated twice?" (ADR-023
       requires it per member sprint); the old home is a citation, never a copy*
-- [ ] Whole gate green in one run over the committed tree — *Verify: `sh scripts/qa-check.sh`*
+      ✓ `git mv` left no content at the old path (confirmed absent), so there is no old home to
+      restate from; every fix is a pointer. Asked and answered explicitly by the builder, re-checked
+      by the coordinator against the 5 surviving references — all citations, none a copy
+- [x] Whole gate green in one run over the committed tree — *Verify: `sh scripts/qa-check.sh`*
+      ✓ **151 pass / 0 fail** over the integrated tree (the builder's own worktree run was
+      unrepresentative — stale base, see the Log)
 
 ### T3 — Sweep the standard's textual section citations to the new name `[size: M · risk: low · class: mechanical-ingest · AFK]`
 Layers: `skills/` · `skills/lean-doc-generator/templates/` · `docs/` · `scripts/lib/` · `evals/`
@@ -144,7 +160,9 @@ shape instead of exiting 0 silently, with a proving leg per checker.
 ### T5 — Ignore `.claude/worktrees/` so a stray `git add -A` cannot commit a repo copy `[size: S · risk: low · class: execution · AFK]`
 Layers: `.gitignore`
 Depends-on: none
-Cites: TD-053 leg 2 (split out at SPRINT-069's promote review) · L-042 (staging discipline)
+Cites: TD-053 leg 2 (split out at SPRINT-069's promote review) · L-042 (staging discipline) ·
+       T4 (cited, not depended on: its dispatched worktree was the live subject T5 verified
+       against — added mid-sprint, L-100, logged)
 The dispatch protocol places a full repo copy inside the repo and nothing ignores it; SPRINT-068's
 close ran `git add -A` and was safe only because the worktrees had already been removed.
 
