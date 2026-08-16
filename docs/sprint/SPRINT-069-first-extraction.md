@@ -127,7 +127,7 @@ into a ~70-file commit — the shape where a structure-adjacent edit fuses neigh
       ✓ re-derived **140 live** (the Plan's 128 was an estimate and was not used). Before:
       live 140 + history 276 = 416. After: live 54 + history 276 = 330. **86 sites swept** = 88
       sweepable − 2 reverted. Both totals reconcile in both directions
-- [ ] **Frozen and historical surfaces deliberately not swept** — archived sprints · rotated
+- [x] **Frozen and historical surfaces deliberately not swept** — archived sprints · rotated
       changelogs · the generated index · append-only ADRs · past `LEARNINGS` entries · `superseded`
       research · past `TECH-DEBT` rows · this sprint's own frozen Plan and append-only Log ·
       fixture data. *(Exclusion clause amended 2026-08-16 from three categories to nine, owner-ruled,
