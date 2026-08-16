@@ -395,6 +395,15 @@ status: current
     code should at minimum be told leg 15 did not look. Still held, still not derived, but a fourth
     instance of "invisibility only" should be read as the trigger being wrong rather than never met.
 
+  - **Re-reviewed 2026-08-16 (SPRINT-070 promote, 3 sprints since last) — held; fifth consecutive
+    "invisibility only", and one thing genuinely improved.** SPRINT-069's close commit carried **no
+    code at all** — archival move, manifests, ledgers and the Retro — so leg 15's blind spot cost
+    nothing this time, and the row's cost column stays at invisibility rather than missed coverage.
+    Separately, the fix SPRINT-068's close shipped for its own bookkeeping (`docs/changelog/*` joining
+    the close-time exclusion list) met its first real rotation here and behaved: `CHANGELOG-1.41.0.md`
+    rotated out without a red leg, where every prior MINOR close went red on that file. Balance is
+    unchanged and still favours candidate (c), make-the-skip-loud. **Unblock condition:** unchanged —
+    one close commit carrying an undeclared file that mattered.
 - **TD-050** severity: minor | status: open | created: Sprint-060
   - Summary: **section 4 of `scripts/qa-check.sh` (knowledge metadata — index freshness, dangling refs,
     frontmatter completeness, ADR-009) is 45–49% of the entire gate on its own** — 75–76 s of a
@@ -576,6 +585,15 @@ status: current
     unmeasured. **Unblock condition:** unchanged — and the next actual night-run pre-flight should
     note which items it skims, which is one line of observation for free.
 
+  - **Re-reviewed 2026-08-16 (SPRINT-070 promote, 3 sprints since last) — held, trigger unfired and
+    unfireable so far.** The trigger is a measurement of *which pre-flight items a real run skips*, and
+    no unattended run has been launched since SPRINT-057 — SPRINT-069 was attended end to end, its
+    dispatch decisions taken at an interactive G2. Nothing to measure is still a different state from
+    measured-and-fine, and the row waits on a run, not a sprint count. Adjacent and worth recording:
+    SPRINT-069's dispatch produced TD-054's mechanism, which will change what the pre-flight checklist
+    *should* say (a base-ref assertion), so acting on length before TASK-217 lands would edit a
+    checklist that is about to gain an item. **Unblock condition:** unchanged — a real run, or a reader
+    demonstrably skipping an item.
 - **TD-045** severity: minor | status: open | created: Sprint-056
   - Summary: the dispatch preflight in `dispatch.md` still re-implements the `Layers:`/`Depends-on:`
     parser that `check-layers-completeness.sh` owns. SPRINT-056 T1 fixed the two drifts (TD-040,
@@ -607,6 +625,19 @@ status: current
     spec this row waits on does not exist yet. No third drift; the parity fixture has still never
     fired across two more sprints of preflight runs. Nothing to re-derive.
 
+  - **Re-reviewed 2026-08-16 (SPRINT-070 promote, 3 sprints since last) — held, and the inherited
+    condition advanced for the first time.** EPIC-002 D3 parked this row until EPIC-003's spec gives
+    the checkers a common rule representation. EPIC-003 is now **active** and the spec exists:
+    `spec/STANDARD.md` v0.1.0, extracted at SPRINT-069 T2. The condition is **not** met — what was
+    extracted is the doc standard moved verbatim, and a machine-readable rule representation is
+    EPIC-004's engine, still unbuilt — but "the spec does not exist" has stopped being the reason.
+    Restate the condition accordingly: this row now waits on **EPIC-004's rule representation**, not on
+    EPIC-003 starting. No third drift; the parity fixture has still never fired, which this row reads
+    as the design holding rather than as neglect.
+  - Family note: **TD-057** (filed SPRINT-069) is the same question one level out — one `Layers:` field
+    read by three matchers with three different semantics. If a consolidation is ever derived, these
+    two and TD-049 are one piece of work, not three. **Unblock condition:** EPIC-004's rule
+    representation, or a third drift.
 - **TD-037** severity: minor | status: open | created: Sprint-049
   - Summary: attribution needs a commit to read, so **uncommitted work in progress is still tested
     against the all-task union** — the exact weakness TD-035 was filed about, surviving on the one
@@ -671,3 +702,24 @@ status: current
     and the task coincide, so the window this row describes barely opened. Sixth consecutive reaffirm,
     recorded rather than performed silently — still the ledger's worked example that a re-review which
     reaffirms is a decision.
+  - **Re-reviewed 2026-08-16 (SPRINT-070 promote, 3 sprints since last) — THE TRIGGER FIRED. This row
+    is now actionable, not deferred.** Its bar has always been *evidence of a real miss on the
+    uncommitted path*, deliberately reaffirmed four times for want of one. SPRINT-069 T3 produced it:
+    the sweep changed `.claude/CONTEXT.md`, `README.md` and `SECURITY.md`, all three declared by **T2**
+    and none by T3. `check-layers-observed.sh` ran mid-work and reported **151 pass / 0 fail** — the
+    union path accepting a sibling's declaration on T3's behalf, which is this row's defect stated
+    exactly. The identical check then FAILed the moment the work had a commit to attribute, naming all
+    three files against T3. Uncommitted: clean. Committed: three findings. Same tree, same checker.
+  - **What the evidence does and does not license.** It does not show damage: the committed leg caught
+    it minutes later, which is the boundary this row already called "arguably acceptable". What it
+    changes is that the masking is now **observed rather than reasoned about**, and it was observed on
+    the ordinary path — a coordinator running the gate to check its own WIP, which is how the gate is
+    used between commits all day. The row's standing warning survives intact and binds the cure:
+    **do not close this by inferring the in-flight task from open-DoD state.** That inference was a
+    guess when the row was filed and is still a guess; one observation of masking is not evidence that
+    a guess would have guessed right. Candidate directions worth pricing before any is chosen —
+    report the WIP leg as a named SKIP rather than a PASS (the TD-051 candidate-(c) shape, cheapest and
+    honest about what it did not check) · attribute WIP by staged-vs-unstaged rather than by task ·
+    accept the boundary and document it where a coordinator reads it.
+  - **Vehicle: TASK-218** (filed at the SPRINT-070 promote). **Unblock condition: met** — superseded by
+    the vehicle. What remains open is which cure, not whether one is warranted.

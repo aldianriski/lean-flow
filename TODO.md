@@ -18,7 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(no active sprint)_ — SPRINT-069 closed 2026-08-16 → [`docs/sprint/archive/SPRINT-069-first-extraction.md`](docs/sprint/archive/SPRINT-069-first-extraction.md), 5 of 5 units. Next: `/lean-doc-generator promote` — EPIC-003 is **active** with 2 of 5 Closed-when conditions met; its next member sprint takes the harder half (attestation format · the no-skill-restates-a-rule pass).
+> **SPRINT-070 — Attested** → [`docs/sprint/SPRINT-070-attested.md`](docs/sprint/SPRINT-070-attested.md) — EPIC-003's second member sprint. Two `M` tasks: specify the git-native attestation format into `spec/` with a worked example against a real commit (the epic's D2, pending since ADR-018), and remove the stale-base pin that degraded every dispatch in SPRINT-069. Gates not yet signed — `/orchestrator` runs G1+G2 first.
 >
 > **Roadmap** → [`docs/epic/INDEX.md`](docs/epic/INDEX.md). Four sequenced epics (ADR-018):
 > **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard** (active — SPRINT-069 is its
@@ -37,21 +37,23 @@ status: current
 
 ### P1 — Next Phase Required
 
-- [ ] TASK-217 — Stop worktree dispatch branching from a stale pinned base  [size: M] [risk: med] [HITL]
-      class:      execution
-      done-when:  a dispatched worktree provably branches from the coordinator's HEAD — demonstrated
-                  on a real dispatch, with the base recorded — AND a guard halts the dispatch when it
-                  does not, rather than discovering it at merge
-      touches:    the dispatch protocol reference · whatever creates the worktree · a proving fixture
+- [ ] TASK-218 — Stop the uncommitted-WIP path accepting a sibling task's declaration  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  a coordinator running the gate over uncommitted work no longer reads a PASS that
+                  the committed run would fail; whichever cure is chosen is recorded with its
+                  reasoning, and the behaviour is proven by a fixture driving the same tree through
+                  both paths
+      touches:    scripts/lib/check-layers-observed.sh · evals/
       depends-on: none
-      assumes:    TD-054's second sighting establishes the mechanism as a **pin**, not drift: four
-                  worktrees across SPRINT-068 and SPRINT-069 all branched from the same sha
-                  (`622f420`), current during the first sprint and 13 commits stale during the
-                  second. Two halves, and the row is explicit that they are not the same fix — the
-                  **assertion** (worktree HEAD == coordinator HEAD at spawn) catches it, the **pin**
-                  is the cause to remove. Deriving why the base is pinned comes first; a guard
-                  written against the wrong cause guards nothing (L-091)
-      tracker:    TD-054 (second sighting + mechanism, 2026-08-16) · SPRINT-069 Execution Log
+      assumes:    TD-037's trigger fired at SPRINT-069 (T3's sweep passed 151/0 uncommitted, then
+                  FAILed on three files once committed — the union accepting T2's declaration on
+                  T3's behalf). **The row's standing warning binds the cure: do not close this by
+                  inferring the in-flight task from open-DoD state** — that was a guess when the row
+                  was filed and one observation of masking is not evidence the guess would be right.
+                  Candidates to price first, none pre-selected: report the WIP leg as a named SKIP
+                  rather than a PASS (TD-051 candidate-(c) shape) · attribute WIP by staged-vs-
+                  unstaged · accept the boundary and document it where a coordinator reads it
+      tracker:    TD-037 (trigger fired, 2026-08-16) · SPRINT-069 Execution Log · TD-035 lineage
       origin:     close-retro
       state:      ready
 
