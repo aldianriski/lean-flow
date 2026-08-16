@@ -4,6 +4,7 @@ slug: spec-as-rule-source
 epic: EPIC-004
 owner: Maintainer
 last_updated: 2026-08-16
+gates_signed: G1,G2 @ 80b5eaa
 plan_commit: b0fb721
 close_commit: [sha — set at close]
 status: active
@@ -110,7 +111,7 @@ oversight to the next person who greps §2.
 
 ### T3 — Give each of the 39 uncovered-mechanical rules an explicit disposition `[size: M · risk: low · class: decision · HITL]`
 Layers: `docs/research/conformance-baseline.md` · `docs/adr/` (only if the scoping qualifies)
-Depends-on: T1
+Depends-on: T1, T2
 Cites: EPIC-004 § Closed-when 2 (second unmet half) · EPIC-004 D1 (no percentage, no score) ·
        ADR-024 · L-058 · TD-012 (a check ships with a retained must-FAIL fixture, and the fixture is
        kept) — *the baseline is on `Layers:` because this task **writes** its disposition column; it is
