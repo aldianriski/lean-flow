@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-15
+last_updated: 2026-08-18
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -18,12 +18,15 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-074 — The First Spec-Driven Checker** → [`docs/sprint/SPRINT-074-first-spec-driven-checker.md`](docs/sprint/SPRINT-074-first-spec-driven-checker.md) — EPIC-004's third member, and the first sprint since SPRINT-071 to change executable code. Three tasks: rule the two `?` marks (TASK-230), build the §13 attestation checker (TASK-228 — §13 is the largest covered-nothing block in the standard, 5 of 7 mechanical, and EPIC-004 § Closed-when 4 in one cell), then close the uncommitted-WIP attribution hole (TASK-218). **The sprint's real question is whether the checker reads §14's table or hard-codes §13** — D1's first live test. Gates not yet signed — `/orchestrator` runs G1+G2 first.
+> _No active sprint._ SPRINT-074 closed 2026-08-18 (15 of 15 DoD) — next sprint forms from the
+> groomed Backlog below via `/lean-doc-generator promote`.
 >
 > **`spec/STANDARD.md` §14 is the rule source now — read it, not the research tree.** The spec carries
-> every rule's level and mark in-file at **0.4.0**: **98 classified + 2 unclassified**, 62 checkable, 8
-> covered. Dispositions → [`docs/research/conformance-dispositions.md`](docs/research/conformance-dispositions.md)
-> (42 `build` with named findings · 12 `scope-out` with reasons).
+> every rule's level and mark in-file at **0.4.1**: **100 classified + 0 unclassified** — no rule carries
+> `?` any more (SPRINT-074 T1). Dispositions → [`docs/research/conformance-dispositions.md`](docs/research/conformance-dispositions.md)
+> (**43** `build` with named findings · 12 `scope-out` with reasons). **§13's five names are published**
+> there and emitted by `scripts/lib/check-attestation.sh`, the first checker driven by the spec rather
+> than by hard-coded rules (SPRINT-074 T2).
 > [`conformance-baseline.md`](docs/research/conformance-baseline.md) is kept as the frozen record of
 > what SPRINT-072 measured; its § Coverage by section is **superseded**. Counts, never a ratio — and
 > §14 now states that normatively, so it binds adopters' tools too.
@@ -32,8 +35,9 @@ status: current
 > **EPIC-002 Make Room (closed 2026-08-15)** → **EPIC-003 The Standard (closed 2026-08-16** across
 > SPRINT-069 · 070 · 071: spec extracted and independently versioned · conformance levels ruled ·
 > attestation format specified · skills cite rather than restate · the spec made buildable-against**)**
-> → **EPIC-004 Conformance** — *now the head of the sequence*, one member closed (SPRINT-072), and the
-> engine it builds is what EPIC-003 made checkable → **EPIC-005 Fleet**. Evidence base:
+> → **EPIC-004 Conformance** — *the head of the sequence*, **three members closed (SPRINT-072 · 073 ·
+> 074)** and **1 of 5 § Closed-when conditions ticked** (attestation, at SPRINT-074). The engine it
+> builds is what EPIC-003 made checkable → **EPIC-005 Fleet**. Evidence base:
 > [`docs/research/platform-readiness-audit.md`](docs/research/platform-readiness-audit.md).
 > Backlog below is ranked against that sequence, not by age.
 
@@ -46,78 +50,6 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
-
-- [ ] TASK-230 — Rule the two unclassified spec rules (`S4.INDEX` · `S5.DISCARDLOG`)  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  both rules carry a real mark in `spec/STANDARD.md` instead of `?`, and §14's counts
-                  are updated to match; if either is ruled `implementation-directed` the §14 count
-                  moves from "five carried, one pending" to six
-      touches:    spec/STANDARD.md (§4, §5, §14) · spec/CHANGELOG.md (PATCH — a mark is not a new rule) ·
-                  docs/research/conformance-dispositions.md (each gains a disposition once marked)
-      depends-on: none
-      assumes:    **both are rules the SPRINT-072 inventory never saw**, found by SPRINT-073 T1 reading
-                  the spec directly. `S4.INDEX` — *"`DECISIONS.md` is a thin index linking them"* — is
-                  almost certainly Structural/mechanical and is left `?` only because D4 forbade
-                  inventing a mark. `S5.DISCARDLOG` is the harder one: the discard-log line binds a
-                  *generator's* output rather than a repository, making it a strong
-                  `implementation-directed` candidate — and that bucket is the one an engine must never
-                  evaluate against an adopter, so guessing it wrong emits findings nobody can clear.
-                  **A `?` is a real state and is reported as one**, so this is not urgent; it is
-                  unfinished. Do not bulk-rule them — the whole point of the mark is that it was judged
-      tracker:    spec/STANDARD.md §14 · docs/research/conformance-dispositions.md § Divergences ·
-                  SPRINT-073 T1 Execution Log · EPIC-004 § Closed-when 2
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-228 — Build the §13 attestation checker  [size: M] [risk: med] [HITL]
-      class:      execution
-      done-when:  a checker verifies §13's attestation from git trailers on the task's own commit —
-                  the three trailers present together, `Evidence:` carrying `@ <sha>`, the trailer
-                  agreeing with the sprint-level `gates_signed:`, and signature state read from `%G?`
-                  — each check failing with its own **named finding** against a **retained** must-FAIL
-                  fixture, one fixture per check
-      touches:    scripts/lib/ (new checker) · evals/ (fixture harness) · scripts/qa-check.sh
-      depends-on: none
-      assumes:    **§13 is the single largest covered-nothing block in the standard** — 7 rules, 0
-                  covered, and the baseline puts it at **5 mechanical of 7**, the most mechanical
-                  section in the spec. It is also EPIC-004 § Closed-when 4 in one cell. Two constraints
-                  bind hard: an **unsigned trailer is a claim, not proof** (ADR-025) — a checker
-                  concluding approval from one is wrong in the direction that matters — and the two
-                  rules marked `implementation-directed` (*a verifier may not conclude approval from an
-                  unsigned trailer* · *author identity is not the attestation*) constrain **this
-                  checker's own inference** and are not repo rules to evaluate. This is checker
-                  architecture, so it lands **after** TASK-227 settles what an engine reads, or is
-                  built as a standalone check that the engine later absorbs — that ordering is the
-                  first thing its design must rule on
-      tracker:    EPIC-004 § Closed-when 4 · ADR-025 · spec/STANDARD.md §13 · L-058 · TD-012
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-218 — Stop the uncommitted-WIP path accepting a sibling task's declaration  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  a coordinator running the gate over uncommitted work no longer reads a PASS that
-                  the committed run would fail; whichever cure is chosen is recorded with its
-                  reasoning, and the behaviour is proven by a fixture driving the same tree through
-                  both paths
-      touches:    scripts/lib/check-layers-observed.sh · evals/
-      depends-on: none
-      assumes:    TD-037's trigger fired at SPRINT-069 (T3's sweep passed 151/0 uncommitted, then
-                  FAILed on three files once committed — the union accepting T2's declaration on
-                  T3's behalf). **The row's standing warning binds the cure: do not close this by
-                  inferring the in-flight task from open-DoD state** — that was a guess when the row
-                  was filed and one observation of masking is not evidence the guess would be right.
-                  Candidates to price first, none pre-selected: report the WIP leg as a named SKIP
-                  rather than a PASS (TD-051 candidate-(c) shape) · attribute WIP by staged-vs-
-                  unstaged · accept the boundary and document it where a coordinator reads it
-      tracker:    TD-037 (trigger fired, 2026-08-16) · SPRINT-069 Execution Log · TD-035 lineage
-      origin:     close-retro
-      state:      ready
-
-<!-- EPIC-003 The Standard is CLOSED (2026-08-16, archived → docs/epic/archive/). ADR-018 sequences
-     what follows; ADR-023 (extraction commits are move+cite atomic, spec/ is SSOT), ADR-024
-     (conformance levels) and ADR-025 (the attestation format) are its durable output, and spec/ at
-     0.3.0 is the artifact. EPIC-004 Conformance is now the head of the sequence — decompose it per
-     member sprint, never the whole epic, which spans sprints by definition. -->
 
 ### P2 — Quality / Polish
 
@@ -160,7 +92,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-073's shipped changes are written up as **v1.47.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.47.0 + v1.46.0** inline, with **v1.45.0 rotated** → [`docs/changelog/CHANGELOG-1.45.0.md`](docs/changelog/CHANGELOG-1.45.0.md) in the same commit. **The spec moved and the plugin did not drive it**: `spec/STANDARD.md` **0.3.0 → 0.4.0** for the per-section Conformance tables and §14 — ADR-023's independent-versioning property doing its job for the third time.
+_(no active sprint)_ — SPRINT-074's shipped changes are written up as **v1.48.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.48.0 + v1.47.0** inline, with **v1.46.0 rotated** → [`docs/changelog/CHANGELOG-1.46.0.md`](docs/changelog/CHANGELOG-1.46.0.md) in the same commit. **The spec moved and the plugin did not drive it, for the fourth time**: `spec/STANDARD.md` **0.4.0 → 0.4.1** — a PATCH, because marking two already-stated rules adds nothing an adopter must satisfy, and calling it MINOR would tell them to re-read a spec that gained no obligation (ADR-023's independent versioning earning its keep again). **The plugin MINOR is for the checker, not the spec**: `scripts/lib/check-attestation.sh` is a new capability, the first to read the standard as its rule source rather than hard-coding it.
 
 ---
 

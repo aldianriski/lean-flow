@@ -3,7 +3,7 @@ sprint: 074
 slug: first-spec-driven-checker
 owner: Maintainer
 last_updated: 2026-08-18
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 

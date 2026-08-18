@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-15
+last_updated: 2026-08-18
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -22,11 +22,35 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-133**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-138**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-138 [tags: tooling] [status: active]: **A caveat that fires on nearly every input is read as furniture — scope a warning to the cases where the weaker rule was actually applied.** SPRINT-074 T3 replaced the uncommitted-WIP leg's bare `PASS` with a named `SKIP` saying what it had *not* checked. The first version counted the raw dirty list, so any tree holding a single *excluded* uncommitted file — an agent worktree, close-time bookkeeping — collected a caveat about a weaker check that had never run on anything. Four existing exclusion fixtures went red and said so. The count now runs **after** exclusions, so the SKIP appears exactly when the union rule was actually applied to a file. The general shape: a warning's value is its *signal-to-noise*, and a warning attached to the trigger's raw population rather than to the population it actually affected trends toward always-on, at which point readers learn to skip the line — which is the same silent-pass the warning was introduced to remove, now wearing a caveat. **When adding a caveat, ask what fraction of ordinary runs will carry it; if the answer is "most", it is scoped to the wrong set.** Distinct from L-058 (a check that never fires) — this is a check that fires *too* readily and is therefore stopped being read.
+- seen: Sprint-074 (T3, the WIP SKIP counting the raw dirty list before exclusions)
+- count: 1
+- promoted: no
+- related: L-058 (the opposite failure — a guard that never fires) · L-103 (asserting on output rather than status) · TD-037 (the row this cure closed)
+
+---
+
+## L-137 [tags: tooling] [status: active]: **A fixture suite that passes on its first run has not been shown to discriminate — seed the design you rejected and confirm exactly the discriminating cases fail.** SPRINT-074 T2's 16 assertions went green immediately, which is the least informative possible result: the fixtures and the checker were written in the same session by the same author, so agreement between them is expected whether or not a single case reaches the behaviour it names. A negative control does not close this (L-058's own limit: it proves the guard fires on rows it *reaches*). What closed it was seeding **the rejected alternative** — replacing the spec-driven rule lookup with the hard-coded list that candidate (c) would have shipped — and observing that it reddened **exactly** the two cases that justify the chosen design (`rule-unimplemented`, mark-derived exclusion) while correctly leaving the other fourteen green, since a hard-coder still checks the five rules right. That precision is the evidence: it shows those two cases, and only those, carry the design claim. A second seed (reporting an unsigned trailer as proof) reddened four, confirming the claim-vs-proof cases too. **The rule: when a suite exists to justify a design decision, run it against the losing design.** All-green then means the fixtures agree with the code; all-green *plus* a seeded loser going red at the expected cases means the fixtures can tell the designs apart, which is the thing actually being asserted. Cheap — the seed is a throwaway edit, applied, run, reverted, with the restore verified.
+- seen: Sprint-074 (T2, hard-coded-rule-list seed reddening exactly the 2 rule-source cases; unsigned-as-proof seed reddening 4)
+- count: 1
+- promoted: no
+- related: L-058 (must-FAIL fixtures, and why a negative control alone is not enough) · L-123 (a shape and its checker are born together) · L-108 (a check that passes for the wrong reason)
+
+---
+
+## L-136 [tags: process] [status: active]: **A structural claim about another document is a query result — re-derive it before freezing a Plan against it, because the phrase gets copied forward and read as settled.** SPRINT-074's central design question was written as *"does the checker read **§14's** Conformance tables as its rule source, or hard-code §13?"* — in `TODO.md`, in the sprint header, and in T2's first DoD, three copies of one phrase. §14 has **no per-rule table**: it is the legend (levels, marks, the counts), and the per-rule tables live in each `## §N` section's own `Conformance.` block. The claim was never wrong in a way that changed the *decision* — the design ruling is the same either way — but it named the wrong artifact in the criterion a reader would later use to check the work, and a reader who went to §14 looking for the table would find prose about marks and conclude the checker had been built against something else. What makes this its own entry rather than a typo is the **propagation**: a structural assertion enters at intake, is copied into the frozen Plan, and every later copy inherits the authority of the freeze without anyone re-opening the document it describes. It is L-130 one level out — that entry covers a **figure** entering a frozen artifact; this covers a **claim about another document's structure**, which is checked even less often because it reads as background rather than as data. **The rule: any assertion about where something lives in another document gets re-derived at execution, exactly like a count.** Cheap to satisfy — opening §14 once at G2 would have caught it.
+- seen: Sprint-074 (T2, "§14's Conformance tables" — corrected at execution, recorded in the DoD and the Execution Log)
+- count: 1
+- promoted: no
+- related: L-130 (the same failure for a *figure*; this sighting bumps that entry to count 2) · L-100 (a declaration corrected at execution rather than defended) · L-088 (a criterion that went stale) · L-105 (a rule evaluated at the wrong moment)
 
 ---
 
@@ -71,10 +95,10 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 ---
 
 ## L-130 [tags: process] [status: active]: **The cross-check-a-query discipline does not fire while you are *authoring a criterion*, because authoring feels like planning rather than querying.** SPRINT-071's promote measured its own candidate set by summing eight overlapping per-section greps, wrote the total (`~121`) into assumption A1, and built T1's first DoD on it — *"the three bucket counts sum to the site census taken at promote"*. The real figure was **39** distinct sites; `~121` double-counted every line matching two patterns and included one scan whose pattern was not in the combined regex. The criterion was therefore unsatisfiable the moment it was frozen: correct buckets would have summed to 39 and read as a failed inventory. What makes this worth a rule is *where* it happened — the same session was, in the same file, writing T1's DoD 4 requiring a second query that must agree, and CLAUDE.md's cross-check clause was loaded throughout. The discipline is framed around "a search whose result you will act on immediately", and authoring does not feel like acting: the number is going into a document, not into a decision, so the guard never engages. But a number written into a criterion **is** acted on — later, by someone who cannot re-derive it, against a Plan that is frozen. The rule: **a figure entering a frozen artifact — an assumption, a DoD, an acceptance threshold — is a query result and gets the same second-query treatment as one, at the moment it is written.** Corollary for the reader: any figure you inherit from a promote is a query result someone else did not cross-check, so re-derive before building on it (which is what caught this one, at G2, before any task ran). Distinct from L-097 (a stated figure is remembered rather than measured): here it *was* measured, and the measurement was wrong in a way only a disagreeing second measurement exposes.
-- seen: Sprint-071 (A1's site census, 121 vs 39 — caught at G2 by re-derivation, not by recall)
-- count: 1
-- promoted: no
-- related: L-105 · L-108 (the cross-check family this fails to reach) · L-097 (remembered vs measured — the sibling case) · L-088 (a criterion that went stale)
+- seen: Sprint-071 (A1's site census, 121 vs 39 — caught at G2 by re-derivation, not by recall) · Sprint-074 (T2, the "§14's Conformance tables" premise copied into three artifacts and never re-derived — see L-136, which generalises this from a *figure* to a *structural claim*)
+- count: 2
+- promoted: no   <!-- count ≥ 2 as of SPRINT-074 close: promotion-eligible, to be ruled at the next promote per §10's placement test -->
+- related: L-105 · L-108 (the cross-check family this fails to reach) · L-097 (remembered vs measured — the sibling case) · L-088 (a criterion that went stale) · L-136 (the second sighting, one level out)
 
 ---
 
@@ -148,7 +172,7 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 ---
 
 ## L-120 [tags: tooling] [status: promoted]: one command per call — when a check gates an action they are two tool calls, because a single call makes the check advisory by construction.
-- **L-120 → promoted: `.claude/CLAUDE.md` § Anti-Patterns edit-safety (c)** — the durable rule is the record now (§11 collapse, SPRINT-073 close). Body: git. Seen Sprint-064 + Sprint-073 (**count 2**). Both sightings were a gate and a commit in one shell line, and the second is the instructive one: (c) *already* contained the sentence "a gate piped into a formatter returns the formatter status", loaded and correct, and it did not fire — because writing a pipeline feels like formatting output, not like gating an action. The promotion therefore adds the **action** form (two calls, read the exit code) rather than restating the caution. Matcher: the gate itself — a commit made on a red gate is a concrete violation the next run surfaces.
+- **L-120 → promoted: `.claude/CLAUDE.md` § Anti-Patterns edit-safety (c)** — the durable rule is the record now (§11 collapse, SPRINT-073 close). Body: git. Seen Sprint-064 + Sprint-073 (**count 2**). Both sightings were a gate and a commit in one shell line, and the second is the instructive one: (c) *already* contained the sentence "a gate piped into a formatter returns the formatter status", loaded and correct, and it did not fire — because writing a pipeline feels like formatting output, not like gating an action. The promotion therefore adds the **action** form (two calls, read the exit code) rather than restating the caution. Matcher: the gate itself — a commit made on a red gate is a concrete violation the next run surfaces. **Sprint-074 (×3) — a new reporter channel, not a new rule:** a *background-task completion notification* reported `exit code 0` for a run whose artifact read `QA-CHECK: 154 pass, 1 fail / QA_EXIT=1`, twice in one sprint. The status belonged to the wrapper (`cmd > log; echo EXIT=$? >> log`), whose final `echo` always succeeds. The promoted rule held — every verdict this sprint was read from the output file — so this is recorded as coverage of a fourth channel (pipeline · redirect · commit · **harness notification**) rather than a fresh entry.
 ---
 
 ## L-119 [tags: process] [status: active]: **A guard can be correctly worded, correctly placed, and structurally unreachable — check what its qualifier is *derived from*, not whether it reads well.** `dispatch.md` already carried the rule SPRINT-064 T3 was promoted to write: *"[a worktree agent] never touches a file the overlap map marks shared — those stay coordinator-owned."* Correct sentence, right file, right audience. It had never fired for the Execution Log, and could not: the overlap map is **derived from each task's `Layers:`**, and sprint infrastructure is written by every task and declared by none, so the map cannot mark it *by construction*. The qualifier "what the map marks shared" silently scoped the protection to files that could be enumerated, while the class needing protection was defined by *not* being enumerable. Reviewing the sentence finds nothing wrong, because nothing is wrong with the sentence. The tell is a rule whose condition is computed from a source that structurally excludes the case — so when writing or reviewing a guard, ask **what populates its condition**, and whether the thing being guarded can ever appear in that population. Distinct from L-099 (a rule written where its reader cannot read it: here the reader read it fine) and from L-105 (a rule evaluated at the wrong moment: here the moment was right). The fix was to split the qualifier into what the map marks *and* a named class it cannot — the same correction L-108's placement needed one level up, which is why both landed in one sprint.
@@ -747,7 +771,7 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 ---
 
 ## L-020 [tags: process] [status: promoted]: shipping ≠ wiring — a new capability must fire end-to-end through every job that triggers or chains it.
-- **L-020 → promoted: CLAUDE.md anti-pattern + DoD wiring check** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; seen Sprint-022 + Sprint-024.
+- **L-020 → promoted: CLAUDE.md anti-pattern + DoD wiring check** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; seen Sprint-022 + Sprint-024 + **Sprint-074 (×3)**: T3 changed a checker's verdict token from `PASS` to a named `SKIP`, and `qa-check.sh`'s leg both **counted only `^PASS`** and **did not echo that checker's output on success** — so the new verdict would have been tallied as nothing and printed nowhere, rendering as *"0 sprint files verified — nothing in scope"*. A cure that reaches no reader is not shipped; caught before commit because the wiring was checked rather than assumed.
 
 ---
 
@@ -821,7 +845,7 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 ---
 
 ## L-009 [tags: edit-safety] [status: promoted]: structure-adjacent edits — table rows, list entries — silently fuse or corrupt neighbours; re-read the whole structure afterwards.
-- **L-009 → promoted: CLAUDE.md Edit-safety trap (b)** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; Sprint-007 + Sprint-028 + a third at 029 promote (a TODO.md heading fused into a neighbouring task block).
+- **L-009 → promoted: CLAUDE.md Edit-safety trap (b)** — the durable rule is the record now (§11 collapse, SPRINT-047 promote). Body: git; Sprint-007 + Sprint-028 + a third at 029 promote (a TODO.md heading fused into a neighbouring task block) + **Sprint-074 (×4)**: an append to TD-037 landed mid-paragraph and split a sentence in the row's SPRINT-073 re-review, while the inserted lines themselves read perfectly. Caught by re-reading the whole row — which is what the rule instructs — then repaired and re-verified structurally (15 rows before and after, diff `+25/−1`, no reordering). The rule fired correctly; the note is that it fires *after* the damage by design, so the re-read is not optional.
 
 ---
 

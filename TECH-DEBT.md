@@ -1,6 +1,7 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-15
+last_updated: 2026-08-18
+__KEEP__2026-08-15
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -31,6 +32,33 @@ status: current
 ---
 
 ## Tech Debt
+
+- **TD-063** severity: minor | status: open | created: Sprint-074
+  - Summary: **`gen-index.sh --check` decides staleness with a byte compare that includes a field
+    guaranteed to drift.** The check is `cmp -s "$tmp" "$OUT"` — a freshly generated index against the
+    committed one — and the generator stamps `last_updated:` with **today's** date. So the gate reports
+    `knowledge index STALE` on any day after the index was last regenerated, whatever the corpus did.
+  - Evidence: three runs of effectively one tree. SPRINT-074's promote recorded **150 pass / 0 fail**;
+    T1 the next day recorded **150 pass / 1 fail** with the only difference being the date; T2 the day
+    after that recorded **154 pass / 1 fail**, and regenerating changed **one line**
+    (`last_updated: 2026-08-17` → `2026-08-18`) with the index body byte-identical both times. Neither
+    T1 nor T2 touched any ADR-009 metadata, which is what the index is derived from.
+  - Impact: a gate reporting **red on correct code** — the failure mode that costs most downstream,
+    because it teaches the reader to re-run the generator reflexively and move on. The day it goes red
+    for a real reason (a metadata-carrying doc genuinely edited and not regenerated) it will read
+    exactly the same. It also sits squarely on `S10.MATCHER`'s territory: a check deciding a property
+    from a comparison that includes a field unrelated to that property.
+  - Mitigation (hypothesis, not a plan — the filer's, written while the cost was being felt): compare
+    the generated **body** with the stamped field excluded, or stamp `last_updated:` from the newest
+    mtime across the corpus the index is derived from rather than from `date`. Either is a checker
+    change; which one is a judgement call about whether the stamp should track *the corpus* or *the
+    regeneration event*.
+  - **Not blocked on evidence, and must not be parked as if it were** (L-094): the class of fact that
+    settles this is a **documented behaviour** (read `gen-index.sh`) plus a **judgement call** (which
+    of the two cures), neither of which accumulates by waiting. The reason it is not fixed here is
+    scheduling, not uncertainty — SPRINT-074 D4's reasoning applies (T3 already changed one
+    `Layers:`-adjacent matcher, and two matcher changes in one sprint make either regression hard to
+    attribute). **Ready to schedule; no unblock condition.**
 
 - **TD-062** severity: medium | status: open | created: Sprint-073
   - Summary: **`check-doc-caps.sh` takes the first digit run anywhere in a §2 `Cap` cell as the cap

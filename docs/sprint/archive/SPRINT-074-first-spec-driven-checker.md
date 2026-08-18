@@ -7,7 +7,7 @@ last_updated: 2026-08-18
 gates_signed: G1,G2 @ 296115e
 plan_commit: 10be550
 close_commit: [sha — set at close]
-status: active
+status: closed
 update_trigger: sprint execute/close events
 ---
 
@@ -294,6 +294,63 @@ two different verdicts without saying why.
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (STANDARD §10):
-     shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
-     After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Retrieval check** — no failure to find, and one contradiction, caught early. The contradiction was
+D2's claim that §13's five finding names were "a contract already published one sprint before any
+code": the register deliberately held none, deferring them here. Found at G1 recon and ruled there
+(scope-change 2026-08-17), so the DoD that verified against it had a referent before any code ran —
+L-088 avoided rather than survived. **Rules that fired when they mattered:** L-120 (every gate verdict
+this sprint was read from the output artifact, and the background runner reported `exit 0` against an
+artifact reading `1 fail` **twice**); L-108 (the §13 table parse is position-anchored, cross-checked
+7/7/10 before being trusted); L-058 (a `spec-table-unreadable` fixture exists precisely so an
+unparseable rule source cannot degrade into checking nothing). **One fired late but correctly:** L-009
+— the TD-037 append split a sentence mid-paragraph, caught by re-reading the whole row, which is what
+the rule instructs. **One did not fire at all and is this sprint's real miss:** the premise "the
+checker reads **§14's** Conformance tables" was copied from TODO into the sprint header into T2's DoD,
+and §14 has no per-rule table. Nobody re-derived a structural claim about another document before
+freezing a Plan against it → **L-136**.
+
+**Cost** — **inline, coordinator-only; zero sub-agents dispatched.** T2 and T3 both ran in the session
+model rather than being handed to `general-purpose` builders, because both tasks' load-bearing work was
+`decision`-class (a rule-source design ruling, a cure chosen from priced candidates) with small
+mechanical tails. Wall-clock was dominated not by the build but by the **gate**: `qa-check.sh` takes
+~3.5 min and was run **five times** across the two tasks (two of them re-runs forced by findings the
+gate itself raised, which is the gate working). Two commits, 13 files. Token cost per unit delivered:
+not instrumented — said rather than omitted.
+
+**Worked**
+- **Seeding a defect to prove the fixtures discriminate.** Both harnesses went green on their first
+  run, which establishes nothing about whether the cases reach the code. Seeding the *rejected* design
+  (a hard-coded rule list) reddened **exactly** the two cases that justify the chosen one and left the
+  other fourteen correctly green. That precision is the evidence the design ruling rests on → **L-137**.
+- **Running the checker against real input immediately.** `S13.AGREE`'s uncleanable-finding bug was
+  invisible on paper and obvious on the first live run against this repo's own T1 commit. The spec's
+  §13d worked example then independently corroborated the whole checker: same verdict, Gated not
+  Attested, reached without reading that prose.
+- **Letting the existing gates find my mistakes.** Three of this sprint's corrections came from checks
+  already in the repo, not from review: `check-layers-completeness.sh` caught the Cites/Layers
+  contradiction *and* the fixture-task-id ambiguity; four exclusion fixtures caught the WIP over-report.
+
+**Friction**
+- **The knowledge-index gate goes red on the calendar, not the code** — second and third sightings this
+  sprint (T1 logged the first). `gen-index.sh --check` byte-compares a freshly generated file whose
+  `last_updated:` is stamped with *today*, so it fails on any day after the last regen regardless of
+  corpus. Cost: two spurious FAILs and two regenerations that changed one line each → **TD-063**.
+- **A five-minute feedback loop on a two-line change.** The full gate is the only way to verify a
+  checker's wiring, and at ~3.5 min it discourages the "run the gate alone, then act" discipline it
+  exists to serve. Not filed — no cure priced, and the runtime is honest work.
+- **`Layers:` needed correcting on both tasks**, for three different reasons (a predicted fixture tree
+  that design decisions ruled out, a file pulled in by a G1 scope-change, and a file T3's own DoD names
+  that the promoted Layers omitted). This is L-100 working as intended, but three corrections in one
+  sprint is a signal that Layers written at promote is a weak prediction for checker work.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- **L-136** — a structural claim about another document, frozen into a Plan and never re-derived
+  (count 1; sibling of L-130, whose count this bumps to 2 and which is now promotion-eligible).
+- **L-137** — a fixture suite that passes on its first run has not been shown to discriminate; seed the
+  rejected alternative and confirm exactly the discriminating cases fail (count 1).
+- **L-138** — a caveat that fires on nearly every input is read as furniture; scope a warning to the
+  cases where the weaker rule actually applied (count 1).
+- Sightings recorded against promoted rules rather than re-filed: **L-009 ×4** (mid-paragraph append),
+  **L-020 ×3** (the SKIP that `qa-check` neither counted nor printed), **L-120 ×3** (a background-task
+  notification reporting `exit 0` over an artifact reading `1 fail` — a **new reporter channel**, not a
+  new rule).

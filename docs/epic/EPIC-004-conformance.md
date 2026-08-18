@@ -2,7 +2,7 @@
 epic: 004
 slug: conformance
 owner: Maintainer
-last_updated: 2026-08-16
+last_updated: 2026-08-18
 status: active
 member_sprints: [072, 073, 074]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -61,7 +61,7 @@ each other · any telemetry, ever (the README promises none).
 |---|---|---|---|
 | [SPRINT-072](../sprint/archive/SPRINT-072-conformance-baseline.md) | Conformance Baseline | closed 2026-08-16 · `87954f2` | **Overturned this epic's opening premise and replaced it with a measurement.** All **96** normative rules classified — 8 covered · 39 uncovered-mechanical · 45 judgment-only · 6 implementation-directed — and reconciled against the live corpus (11 checkers · 22 harnesses · 98 fixture cases · 46 distinct findings). The checkers do **not** encode the standard: 3 of 13 sections are referenced in `scripts/lib/`, ten have zero. Established the fourth bucket `implementation-directed` (6 rules an engine must never evaluate against an adopter), that a §2 row is a *parameter set* not a rule (6 families, not 37), and that **Gated is the hard level, not Attested**. Changed no checker and no execution architecture — verified by diff. |
 | [SPRINT-073](../sprint/archive/SPRINT-073-spec-as-rule-source.md) | The Spec as Rule Source | closed 2026-08-16 · `e7ce99b` | **Made D1 mechanically true: the spec is now the rule source.** `spec/STANDARD.md` **0.4.0** carries every rule's level and mark in-file, keyed by stable ids a finding can name, plus **§14** stating the model — including the **no-percentage** ruling *normatively*, so it binds adopters' tools rather than this epic's notes. **98 classified + 2 unclassified**, re-derived from the spec after the frozen baseline proved unable to reproduce its own total (96 stated vs 99 and 98 by column). **54 dispositions** — 42 `build` each naming its finding, 12 `scope-out` each with its reason. Ruled the spec uncapped (**ADR-026**, closing TD-058). No checker, no engine, no execution-architecture change. |
-| [SPRINT-074](../sprint/SPRINT-074-first-spec-driven-checker.md) | The First Spec-Driven Checker | active | _(completed at close)_ — the first checker to be *driven by* the annotated spec rather than hard-coding its rule, tested on §13: the largest covered-nothing block in the standard (7 rules, 5 mechanical, 0 covered) and § Closed-when 4 in one cell. Whether it reads §14's table or hard-codes §13 is the sprint's central question and its own recorded decision. Also completes §13's rule set and closes the WIP-attribution hole. Not the engine — one checker, to learn whether spec-driven is buildable before 42 dispositions depend on it. |
+| [SPRINT-074](../sprint/archive/SPRINT-074-first-spec-driven-checker.md) | The First Spec-Driven Checker | closed 2026-08-18 · `<close_commit>` | **Answered D1 by building it: spec-driven is buildable, and the honest form is a split.** `scripts/lib/check-attestation.sh` reads §13's Conformance table **at runtime** for its rule set and marks; assertion bodies stay in code, because *"all three required together"* and *"the `Evidence:` value's shape"* are different code — and saying which half is which is the finding, since claiming both would be theatre. Three properties no hard-coder has, each fixture-guarded: a rule **added** to the spec reports `rule-unimplemented` rather than vanishing; an unparseable table reports `spec-table-unreadable` rather than checking nothing and exiting clean; and `implementation-directed` exclusion is **derived from the Mark column**, proven by re-marking a rule in a spec copy and watching the checker stop asserting it with no code edit. **The central question's premise was itself wrong** — §14 carries no per-rule table (it is the legend); the tables live in each section's `Conformance.` block (→ L-136). §13's five finding names published; **100 classified · 0 unclassified** at spec 0.4.1; TD-037 closed after 19 sprints. Not the engine — one checker, and it cost one uncleanable-finding bug caught only by running it against real history. |
 
 ## Decisions
 
@@ -107,15 +107,33 @@ each other · any telemetry, ever (the README promises none).
       those land with the engine and with **TASK-228** for §13's five.
       **Two smaller residuals, both explicit:** the **12** rules dispositioned `scope-out` neither map
       to a check nor are marked judgment-only, so this condition may need re-reading once the engine
-      exists — flagged rather than quietly satisfied; and **2** rules (`S4.INDEX`, `S5.DISCARDLOG`)
-      carry `?` and have no mark at all → **TASK-230**
+      exists — flagged rather than quietly satisfied; and ~~**2** rules (`S4.INDEX`, `S5.DISCARDLOG`)
+      carry `?` and have no mark at all → **TASK-230**~~ **closed at SPRINT-074 T1** (spec 0.4.1:
+      **100 classified · 0 unclassified**; `S4.INDEX` → Structural/mechanical + `build`,
+      `S5.DISCARDLOG` → `implementation-directed`, the sixth to carry that mark).
+      **Progress at SPRINT-074:** §13's five `build` rules now map to a real check, so the `build`
+      remainder is **38 of 43**, not 42 — and that remainder is the engine's work, not another
+      one-off checker's.
 - [ ] Each check has a retained must-FAIL fixture that fails with its named finding
       — measured at SPRINT-072: the corpus is **22 harnesses (17 asserting) · 98 fixture cases · 46
       distinct named findings**, and that set is the **contract any engine must preserve**, not a
-      target to re-derive (L-058 · TD-012). Whether *every* check has one is not yet established
-- [ ] Attestation is verified from git trailers, per task, without trusting a self-report
-      — **§13 is entirely unchecked**: 7 rules, 0 covered, no attestation checker exists. The baseline
-      also puts §13 at 5 mechanical of 7, so this is more tractable than it reads → **TASK-228**
+      target to re-derive (L-058 · TD-012). Whether *every* check has one is not yet established.
+      **SPRINT-074 added the 23rd harness** — `run-attestation-fixtures.sh`, one retained must-FAIL per
+      published §13 finding plus three guarding the *rule source* itself. It also demonstrated the
+      method this condition should be judged by: green-on-first-run proves nothing, so the **rejected
+      design was seeded** and the discriminating cases confirmed to fail (→ L-137)
+- [x] Attestation is verified from git trailers, per task, without trusting a self-report
+      — **DONE at SPRINT-074 T2** (TASK-228). `scripts/lib/check-attestation.sh` verifies §13's five
+      mechanical rules from `git log` trailers on the task's own commit, against any repository, from a
+      clone alone. *"Without trusting a self-report"* is the clause that was hardest and is met
+      literally: an unsigned trailer is reported as `attestation-unsigned-claim-only` and the level
+      stops at **Gated**, so the tool never concludes that the named human approved anything — §13c's
+      claim-vs-proof boundary enforced rather than restated. The two `implementation-directed` rules are
+      excluded by the spec's own Mark column, so the checker demonstrates them instead of emitting
+      findings no adopter could clear.
+      **What this does *not* claim:** the reference implementation is unsigned (673+ commits, `%G? = N`),
+      so it reaches Gated and not Attested — a fact about this repo's signing, not a gap in the
+      verification, and the checker reproduces §13d's worked example unprompted rather than rounding up.
 - [ ] ADR-008's scope is formally amended or superseded, not silently outgrown
       — unchanged; belongs with the engine sprint's design, where the packaging question (§ Open
       questions) is also settled
