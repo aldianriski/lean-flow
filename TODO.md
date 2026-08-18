@@ -18,8 +18,12 @@ status: current
 
 ## Active Sprint
 
-> _No active sprint._ SPRINT-074 closed 2026-08-18 (15 of 15 DoD) — next sprint forms from the
-> groomed Backlog below via `/lean-doc-generator promote`.
+> **SPRINT-075 — The Conformance Engine** → [`docs/sprint/SPRINT-075-the-conformance-engine.md`](docs/sprint/SPRINT-075-the-conformance-engine.md) — EPIC-004's fourth member, and the sprint that turns SPRINT-074's one spec-reading checker into an **engine** and points it at a stranger. Six tasks: generalize the rule-source reader (T1), the engine core (T2), the first run against a repo that never installed lean-flow (T3 — § Closed-when 1), migrate the §9 family as the consolidation proof (T4), amend ADR-008's scope (T5 — § Closed-when 5), and the ownership-header family as the first new coverage (T6). **The largest Plan this repo has run — 26 DoD against SPRINT-074's 15**, accepted knowingly because the threads only complete together. **Gates not yet signed** — `/orchestrator` runs G1+G2 first; `gates_signed:` is absent and its absence means NOT signed, never approval.
+>
+> **T3 is the one that can fail informatively.** All 43 `build` dispositions were judged against *this*
+> repo's shape by the people who wrote the standard. A report full of findings a stranger cannot act on
+> is evidence about `conformance-dispositions.md`, not about the code — route it back there rather than
+> tuning the engine to look quiet.
 >
 > **`spec/STANDARD.md` §14 is the rule source now — read it, not the research tree.** The spec carries
 > every rule's level and mark in-file at **0.4.1**: **100 classified + 0 unclassified** — no rule carries

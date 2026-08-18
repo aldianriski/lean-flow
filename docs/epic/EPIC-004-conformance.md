@@ -4,7 +4,7 @@ slug: conformance
 owner: Maintainer
 last_updated: 2026-08-18
 status: active
-member_sprints: [072, 073, 074]
+member_sprints: [072, 073, 074, 075]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -62,6 +62,7 @@ each other · any telemetry, ever (the README promises none).
 | [SPRINT-072](../sprint/archive/SPRINT-072-conformance-baseline.md) | Conformance Baseline | closed 2026-08-16 · `87954f2` | **Overturned this epic's opening premise and replaced it with a measurement.** All **96** normative rules classified — 8 covered · 39 uncovered-mechanical · 45 judgment-only · 6 implementation-directed — and reconciled against the live corpus (11 checkers · 22 harnesses · 98 fixture cases · 46 distinct findings). The checkers do **not** encode the standard: 3 of 13 sections are referenced in `scripts/lib/`, ten have zero. Established the fourth bucket `implementation-directed` (6 rules an engine must never evaluate against an adopter), that a §2 row is a *parameter set* not a rule (6 families, not 37), and that **Gated is the hard level, not Attested**. Changed no checker and no execution architecture — verified by diff. |
 | [SPRINT-073](../sprint/archive/SPRINT-073-spec-as-rule-source.md) | The Spec as Rule Source | closed 2026-08-16 · `e7ce99b` | **Made D1 mechanically true: the spec is now the rule source.** `spec/STANDARD.md` **0.4.0** carries every rule's level and mark in-file, keyed by stable ids a finding can name, plus **§14** stating the model — including the **no-percentage** ruling *normatively*, so it binds adopters' tools rather than this epic's notes. **98 classified + 2 unclassified**, re-derived from the spec after the frozen baseline proved unable to reproduce its own total (96 stated vs 99 and 98 by column). **54 dispositions** — 42 `build` each naming its finding, 12 `scope-out` each with its reason. Ruled the spec uncapped (**ADR-026**, closing TD-058). No checker, no engine, no execution-architecture change. |
 | [SPRINT-074](../sprint/archive/SPRINT-074-first-spec-driven-checker.md) | The First Spec-Driven Checker | closed 2026-08-18 · `6016738` | **Answered D1 by building it: spec-driven is buildable, and the honest form is a split.** `scripts/lib/check-attestation.sh` reads §13's Conformance table **at runtime** for its rule set and marks; assertion bodies stay in code, because *"all three required together"* and *"the `Evidence:` value's shape"* are different code — and saying which half is which is the finding, since claiming both would be theatre. Three properties no hard-coder has, each fixture-guarded: a rule **added** to the spec reports `rule-unimplemented` rather than vanishing; an unparseable table reports `spec-table-unreadable` rather than checking nothing and exiting clean; and `implementation-directed` exclusion is **derived from the Mark column**, proven by re-marking a rule in a spec copy and watching the checker stop asserting it with no code edit. **The central question's premise was itself wrong** — §14 carries no per-rule table (it is the legend); the tables live in each section's `Conformance.` block (→ L-136). §13's five finding names published; **100 classified · 0 unclassified** at spec 0.4.1; TD-037 closed after 19 sprints. Not the engine — one checker, and it cost one uncleanable-finding bug caught only by running it against real history. |
+| [SPRINT-075](../sprint/SPRINT-075-the-conformance-engine.md) | The Conformance Engine | active | _(completed at close)_ — turns SPRINT-074's single spec-reading checker into the **engine**, and points it at a repository that never installed lean-flow. Six tasks: a rule-source reader generalised from §13 to any `## §N` table · the engine core, where the spec's **mark column** decides what is evaluated and a rule it states but the engine cannot answer is reported as `rule-unimplemented` rather than being absent · the first foreign-repo run (**§ Closed-when 1**) · migrating the §9 gates-signed family off its standalone checker as the consolidation proof, taking EPIC-002 D3's deferral off the shelf now its unblock condition is met · formally amending ADR-008 (**§ Closed-when 5**) · and the ownership-header family as the first *new* coverage. **T3 depends on T6, not only T2** — with two migrated rules a foreign-repo report says nothing, so the consumer proof is vacuous without coverage behind it. |
 
 ## Decisions
 
@@ -75,8 +76,16 @@ each other · any telemetry, ever (the README promises none).
 
 ## Open questions
 
-- Does the engine ship inside the plugin, or as a standalone script an adopter can run without
-  installing lean-flow? → the second is more useful and more work; ~~settle at the first member G2~~
+- ~~Does the engine ship inside the plugin, or as a standalone script an adopter can run without
+  installing lean-flow?~~ **ANSWERED at SPRINT-075's intake: both — one implementation with two entry
+  points.** Settled at decompose rather than at G2 because it shapes every task in the Plan, and vague
+  tasks were the alternative. The estimate above was wrong in a useful direction: **standalone turned
+  out to be mostly already paid for.** SPRINT-074's checker takes a repo-dir argument and resolves its
+  spec relative to its own location, so it runs today against a repository that has never heard of
+  lean-flow — the "more work" half was largely done while proving something else. It is also the only
+  option that satisfies § Closed-when 1 as written, which the in-plugin-only reading cannot.
+  *Original text kept below, since the reasoning is the more useful record:* → the second is more
+  useful and more work; ~~settle at the first member G2~~
   **deferred at SPRINT-072's promote to the *engine* sprint's G2 (its D2)**. The first member turned
   out to be the inventory-and-baseline sprint, and the answer depends on which rules prove mechanically
   checkable *without the plugin present* — which is what that sprint measures. Deferred to the evidence
