@@ -193,7 +193,7 @@ rm -f "${TMPDIR:-/tmp}/doc-caps.$$"
 # --- non-§2 caps: an explicit allowlist, each naming its authority (L-082) ------------------------
 # `skills/*/SKILL.md` is the one cap this repo enforces that §2 does not state, because §2 describes a
 # documentation tree and this is a plugin component budget. Every other cap qa-check.sh used to
-# hand-list -- .claude/CLAUDE.md 80, .claude/CONTEXT.md 130, docs/sprint/SPRINT-*.md 400 -- IS a §2
+# hand-list -- .claude/CLAUDE.md 80, .claude/CONTEXT.md 150 (ADR-017), docs/sprint/SPRINT-*.md 400 -- IS a §2
 # row and is now derived above rather than duplicated here.
 for s in $(cd "$root" 2>/dev/null && ls -d skills/*/SKILL.md 2>/dev/null); do
   [ -f "$root/$s" ] || continue

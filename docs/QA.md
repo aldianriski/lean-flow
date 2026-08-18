@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-09
+last_updated: 2026-08-18
 update_trigger: A QA rule added/changed, the check script changes, or a release-checklist gap is found
 status: current
 ---
@@ -15,7 +15,7 @@ Run both before cutting a release or closing a sprint.
 
 | Rule | What it checks |
 |---|---|
-| Line caps | `SKILL.md` <=140 · `CLAUDE.md` <=80 · `CONTEXT.md` <=130 · active `SPRINT-*` <=400 |
+| Line caps | caps are **not restated here** — `scripts/lib/check-doc-caps.sh` reads them from STANDARD §2, the SSOT (a copied figure becomes a second SSOT and drifts: this row said `CONTEXT.md` 130 for the whole life of ADR-017, which raised it to 150) |
 | Skill count | disk count of `skills/*/SKILL.md` == the number claimed in CLAUDE.md / CONTEXT.md / docs/architecture/overview.md |
 | Template count (SPRINT-055 T1) | `templates/*.md.template` files == claimed core + 2 non-core (DESIGN, QA-TESTCASE). **Both halves on all three surfaces** — core *and* total, in CLAUDE.md + docs/architecture/overview.md + **README.md**. The README was the surface that drifted (`30 … = 32 total` against 32/34) precisely because it was the one not checked, and the *total* was claimed everywhere and guarded nowhere. Delegated to `scripts/lib/check-count-claims.sh` so it can be pointed at a fixture; a claim file that exists but carries no claim is a FAIL, not a silent skip |
 | Epic retention (SPRINT-055 T2) | `scripts/lib/check-epic-archive.sh` enforces STANDARD §11's epic row **in both directions**: an epic under `docs/epic/archive/` must be `status: closed` with every `## Closed when` box ticked (and must state at least one — "all met" is vacuously true otherwise), and an epic still in `docs/epic/` that already meets every condition is a FAIL. Checking only the first would pass the state the rule was written about: EPIC-001 sat closed and fully ticked, unarchived, for five sprints |
