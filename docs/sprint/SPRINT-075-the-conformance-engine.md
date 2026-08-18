@@ -42,7 +42,9 @@ unscheduled and to be priced together rather than raced · TD-063's index-freshn
 
 ### T1 — Generalize the rule-source reader from §13 to any `## §N` Conformance table `[size: M · risk: med · class: decision · HITL]`
 Layers: `scripts/lib/` (the extracted reader) · `scripts/lib/check-attestation.sh` (its first consumer) ·
-        `evals/` (reader fixtures)
+        `evals/` (reader fixtures) · `scripts/qa-check.sh` (registers the new harness in the always-on
+        set — **declared at execution, not at promote** (L-100): the gate's own completeness leg fails
+        any harness left in `evals/` ungated, so shipping the fixtures without this is half-shipped)
 Depends-on: none
 Cites: EPIC-004 D1 · `spec/STANDARD.md` §14 (the table format it defines) · L-108 (position-anchored
        matching) · L-058 · roadmap Phase A item 4
@@ -57,18 +59,37 @@ on it.
 provably identical to what the attestation checker derives today.
 
 **DoD:**
-- [ ] The reader parses **every** `## §N` section that carries a Conformance block — *Verify: run it
+- [x] The reader parses **every** `## §N` section that carries a Conformance block — *Verify: run it
       across all 13 and reconcile the per-section counts against §14's own table (`4·21·3·7·2·4·9·0·10·10·11·12·7 = 100`);
       a section returning zero rows when §14 says it has some is a FAIL, not an empty result*
-- [ ] §13's output is **unchanged** — *Verify: diff the reader's §13 rows against what
+      → `sh scripts/lib/read-spec-rules.sh spec/STANDARD.md --reconcile` — **13 of 13 PASS, total 100
+      reconciled**, section by section, against §14's own counts row *read from the spec* rather than
+      hard-coded. §8 returns 0 and that is correct — §14 publishes 0 for it, and the reader consults
+      that count in every mode precisely so *has no rules* is distinguishable from *was dropped*.
+- [x] §13's output is **unchanged** — *Verify: diff the reader's §13 rows against what
       `check-attestation.sh` derives today, mechanically. This is a refactor of a working parse; a
       behaviour change here is a regression, not an improvement*
-- [ ] An absent or unparseable table is a **named finding**, never an empty rule set — *Verify: a
+      → the shipped parse was **lifted verbatim** out of the file (`sed -n '87,105p'` piped to `eval`,
+      never retyped) and run against the same spec; `diff` against the reader's `--section 13` output
+      is **empty**, 7 rows each. Load-bearing detail: the row anchor had to widen from `[A-Z]+` to
+      `[A-Z0-9-]+` or **26 rules would have been silently dropped** (all of §1, all of §2, one in §7,
+      whose ids carry digits or hyphens) — widened, then proven not to change §13.
+- [x] An absent or unparseable table is a **named finding**, never an empty rule set — *Verify: a
       retained must-FAIL fixture pointing the reader at a spec with no tables reports
       `spec-table-unreadable`. A reader returning nothing checks nothing and exits clean, which is the
       false negative the whole engine would otherwise inherit (L-058)*
-- [ ] `check-attestation.sh` consumes the reader rather than keeping its own copy — *Verify:
+      → `evals/run-spec-reader-fixtures.sh`, **retained**: 9 cases, **5 must-FAIL, one per named
+      finding** — `spec-table-unreadable` (whole spec · and a section whose rows were stripped while
+      §14 still publishes 7 for it) · `section-rows-mismatch` · `spec-counts-unreadable` ·
+      `spec-not-found` — plus 3 PASS controls and a position-anchoring case. **Shown to discriminate,
+      not merely pass** (L-137): two breaks seeded, each reddening the right cases.
+- [x] `check-attestation.sh` consumes the reader rather than keeping its own copy — *Verify:
       `evals/run-attestation-fixtures.sh` still green, all 16 assertions, unmodified*
+      → its 25-line parse block is now one call to the reader; **all 16 assertions green with the
+      harness file untouched** (`git status` shows no change to it), which is what makes this a
+      refactor rather than a rewrite. The checker keeps its own `spec-table-unreadable` wording, so
+      the published finding text is unchanged. Registered in `qa-check.sh`'s always-on harness set —
+      the gate's own completeness leg fails any harness in `evals/` that is left ungated (L-020).
 
 ### T2 — Build the engine core: registry, dispatch, report `[size: M · risk: med · class: execution · HITL]`
 Layers: `scripts/lib/` (the engine) · `scripts/qa-check.sh` · `evals/` (engine fixtures)

@@ -66,10 +66,17 @@ done
 # The spec defaults to the copy shipped BESIDE this script, resolved relative to the script itself --
 # not to the repository under test, which is an adopter's and has no reason to contain a copy of the
 # standard it is being measured against. `--spec` overrides for a repo that vendors its own version.
-if [ -z "$spec" ]; then
-  here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-  spec="$here/../../spec/STANDARD.md"
-fi
+# `here` also locates the shared rule-source reader, so it is resolved unconditionally rather than
+# only on the default-spec path.
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+[ -n "$spec" ] || spec="$here/../../spec/STANDARD.md"
+reader="$here/read-spec-rules.sh"
+
+# Checked explicitly rather than left to fail through: without it a MISSING reader surfaces as
+# `spec-table-unreadable`, which blames the spec for a missing file and sends the reader of that
+# finding to the wrong artifact. An adopter who vendors this script without its sibling gets told
+# which file is absent.
+[ -f "$reader" ] || { bad "attestation: reader-missing -- $reader not found beside this script; the rule set is read through read-spec-rules.sh and this checker does not carry its own copy of the parse"; exit 1; }
 
 command -v git >/dev/null 2>&1 || { bad "attestation: git not found -- §13 reads git objects"; exit 1; }
 [ -d "$repo" ] || { bad "attestation: repo directory not found: $repo"; exit 1; }
@@ -79,30 +86,12 @@ sha=$(git -C "$repo" rev-parse --verify "$rev^{commit}" 2>/dev/null) || sha=""
 short=$(printf '%s' "$sha" | cut -c1-7)
 
 # --- rule source: §13's Conformance table ---------------------------------------------------------
-# Scoped to the §13..§14 window and anchored to a ROW POSITION (a line starting `| ` then a backticked
-# id), not to the substring "S13." -- §14 names S13.NOINFER and S13.NOTAUTHOR in prose when it
-# explains the implementation-directed category, and a substring match would ingest that prose as
-# rules (L-108). Cross-checked at build time: 7 rows in-window, 7 row-shaped file-wide, against 10
-# total "S13." mentions -- the three excluded are exactly §14's prose.
-rules=$(awk '
-  /^## §13 /            { inwin = 1 }
-  inwin && /^## §14 /   { exit }
-  inwin && /^\| *`S13\.[A-Z]+` *\|/ {
-    line = $0
-    sub(/^\| *`/, "", line); id = line; sub(/`.*$/, "", id)
-    n = split($0, f, "|")
-    level = (n >= 3) ? f[3] : ""
-    mark  = (n >= 4) ? f[4] : ""
-    gsub(/\*|`/, " ", level); gsub(/\*|`/, " ", mark)
-    # The mark cell may carry a qualifier -- §13 writes "mechanical *on the fact*". The mark is the
-    # first token; the qualifier is commentary for a human and must not become a distinct category.
-    nm = split(mark, m, " "); mark = "?"
-    for (i = 1; i <= nm; i++) if (m[i] != "") { mark = m[i]; break }
-    nl = split(level, l, " "); level = "--"
-    for (i = 1; i <= nl; i++) if (l[i] != "") { level = l[i]; break }
-    printf "%s %s %s\n", id, level, mark
-  }
-' "$spec" 2>/dev/null)
+# The parse itself now lives in read-spec-rules.sh, which generalised it from §13 to any `## §N`
+# section (SPRINT-075 T1). This script is its first consumer rather than its own copy: the window
+# scoping and row-position anchoring that keep §14's prose mentions of S13.NOINFER / S13.NOTAUTHOR out
+# of the rule set (L-108) are the reader's, and are exercised by the reader's own fixtures too.
+# Verified at the extraction: the reader's §13 rows are byte-identical to what this block derived.
+rules=$(sh "$reader" "$spec" --section 13 2>/dev/null)
 
 if [ -z "$rules" ]; then
   bad "attestation: spec-table-unreadable -- no §13 Conformance rows parsed from $spec. A checker that cannot read its rule source checks NOTHING; that is reported here rather than exiting clean (L-058)"
