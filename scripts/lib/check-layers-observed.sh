@@ -328,9 +328,16 @@ for sp in "$@"; do
   at_close=0
   [ "$(awk '/^## Plan/{f=1;next} /^## /{f=0} f && /^- \[ \]/{n++} END{print n+0}' "$sp")" -eq 0 ] && at_close=1
 
+  # n_wip counts what this leg ACTUALLY union-checked -- i.e. after exclusions, not the raw dirty
+  # list. The difference is the whole meaning of the SKIP below: a tree whose only uncommitted files
+  # are excluded ones (an agent worktree, close-time bookkeeping) had no weaker rule applied to
+  # anything, so it earns a plain PASS. Counting the raw list instead would fire the caveat on almost
+  # every tree, and a caveat that always fires is read as furniture and stops being read at all.
   miss=""
+  n_wip=0
   for f in $wip; do
     is_excluded "$f" "$at_close" && continue
+    n_wip=$((n_wip + 1))
     covers "$layers_all" "$f" || miss="$miss $f"
   done
 
@@ -347,7 +354,32 @@ for sp in "$@"; do
     bad "$sp layers observed: changed but undeclared in any task's Layers::$miss"
     hit=1
   fi
-  [ "$hit" -eq 0 ] && ok "$sp layers observed (all changed files declared, base $plan_commit)"
+  # ---- the verdict, and why the WIP leg no longer gets to say PASS (SPRINT-074 T3, TD-037) --------
+  # The two legs above apply DIFFERENT rules: committed history is attributed per task, uncommitted
+  # work is only bounded by the all-task union, because attribution needs a commit to read. Until
+  # now both fed one `ok`, so a coordinator running the gate mid-flight read a PASS that the very
+  # same tree would FAIL once committed -- the strictness change was invisible at exactly the moment
+  # someone was deciding whether to commit.
+  #
+  # The cure is NOT to make the legs agree; it is to stop them disagreeing SILENTLY. Two candidates
+  # were priced and rejected at the gate: attributing by staged-vs-unstaged infers intent rather than
+  # deriving it, and breaks precisely where it is needed -- L-042 prescribes `git add -p` for a
+  # shared file, so the staged set spans tasks by design in the only case attribution matters for;
+  # and documenting the boundary in this header alone leaves the output a bare PASS, which is the
+  # thing a coordinator actually reads. Inferring the in-flight task from open-DoD state stays
+  # forbidden by TD-037's standing warning and was not on the table.
+  #
+  # Note what is NOT weakened: `miss` (declared by no task at all) still FAILs from the WIP leg. Only
+  # the all-clear is renamed, because only the all-clear was overstating itself.
+  if [ "$hit" -eq 0 ]; then
+    if [ "$n_wip" -gt 0 ]; then
+      skip "$sp layers observed [WIP, unattributed] -- committed history since $plan_commit IS attributed per task; $n_wip uncommitted file(s) are not"
+      note "  the uncommitted files were checked against the ALL-TASK UNION only. Per-task attribution needs a commit, so the committed run applies a stricter rule and may FAIL where this leg does not -- commit, then re-run, before reading this as clear"
+      note "  still enforced here: a file declared by NO task is reported from this leg as a FAIL, exactly as before"
+    else
+      ok "$sp layers observed (all changed files declared and attributed, base $plan_commit)"
+    fi
+  fi
 done
 
 exit $fail

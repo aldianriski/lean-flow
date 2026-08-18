@@ -763,7 +763,7 @@ status: current
     the G2 ruling behind it — `dispatch.md` publishes a dependency-free snippet, and pointing it at
     `scripts/lib/` would leak a maintainer-only path into a consumer-facing reference (L-015) — is
     unchanged and still correct. Neither side has moved since SPRINT-070. No vehicle in SPRINT-073.
-- **TD-037** severity: minor | status: open | created: Sprint-049
+- **TD-037** severity: minor | status: resolved → SPRINT-074 T3 | created: Sprint-049
   - Summary: attribution needs a commit to read, so **uncommitted work in progress is still tested
     against the all-task union** — the exact weakness TD-035 was filed about, surviving on the one
     path where nothing can be attributed.
@@ -855,3 +855,27 @@ status: current
     SPRINT-073: that sprint annotates `spec/STANDARD.md` and touches no checker, so including this
     would mix two unrelated themes in one frozen Plan. Recorded rather than re-parked — the next
     reviewer's question is *when to schedule it*, not *what would unblock it*.
+  - **RESOLVED 2026-08-18 (SPRINT-074 T3, via TASK-218) — the cure is the named SKIP, and the
+    two legs are still allowed to disagree.** Chosen from the three candidates this row itself
+    listed, none pre-selected, owner-ruled at the gate. The WIP leg no longer emits a bare `PASS`:
+    a tree with real uncommitted work now reports `SKIP … [WIP, unattributed]`, naming how many
+    files were union-checked, that per-task attribution needs a commit, and that the committed run
+    applies a stricter rule and **may FAIL where this leg does not**. The point is not to make the
+    legs agree — they cannot, since one has a commit to read and one does not — but to stop them
+    disagreeing *silently*, which is what SPRINT-069 T3 actually cost.
+  - **What was rejected, and why it is worth keeping written down.** *Staged-vs-unstaged*
+    attribution infers intent rather than deriving it, and it breaks precisely where it is needed:
+    L-042 prescribes `git add -p` for a shared file, so the staged set spans tasks **by design**
+    in the only case attribution matters for. *Document-the-boundary-only* leaves the output a
+    bare PASS, and the output is what a coordinator reads. The row's standing warning was honoured
+    in full — **nothing infers the in-flight task from open-DoD state**; the cure adds no
+    inference at all, it removes an overstatement.
+  - **Nothing was weakened.** A file declared by *no* task still FAILs from the WIP leg exactly as
+    before. And the SKIP counts files **after** exclusions, so a tree whose only uncommitted files
+    are excluded ones (an agent worktree, close-time bookkeeping) still earns a plain PASS — a
+    caveat that fired on every tree would be read as furniture and stop being read at all.
+  - **Guarded by a fixture that drives ONE tree through BOTH paths** (`case 7` in
+    `evals/run-layers-observed-fixtures.sh`): the same edit reports the named SKIP while
+    uncommitted and FAILs `T1:bar.txt` once committed, plus an explicit assertion that leg A emits
+    **no** `PASS` line. Verified as a real regression guard, not decoration — run against the
+    pre-change checker, all three leg-A assertions fail. Retained (TD-012).

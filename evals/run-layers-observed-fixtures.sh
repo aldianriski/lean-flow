@@ -17,6 +17,15 @@
 # evals/selftest-assert-*.sh already uses. Retention (L-058) is satisfied by these fixtures living
 # permanently in this retained harness file.
 #
+# SPRINT-074 T3 changed the clean verdict for a tree that still has real uncommitted work: it is now
+# a named SKIP rather than a PASS, because that leg checks the all-task union while the committed leg
+# attributes per task (TD-037). Four cases below expect `layers observed [WIP, unattributed]` for
+# that reason -- they deliberately leave a declared, uncommitted edit in the tree while testing an
+# EXCLUSION, so their subject is unchanged and only the verdict token moved. Their strength is
+# unchanged too: `run_case_anywhere ... 0` still means no FAIL line was produced, which is what those
+# cases were ever asserting. The two remaining `(all changed files declared` expectations are trees
+# with nothing uncommitted, which still earn a plain PASS.
+#
 # Dependency-free POSIX sh + git. Run bare: sh evals/run-layers-observed-fixtures.sh
 set -u
 
@@ -392,7 +401,7 @@ run_case_anywhere "closetime-file-during-execution (now reported)" 1 \
 sed -i.bak 's/^- \[ \] foo.txt updated/- [x] foo.txt updated/' "$c4/docs/sprint/SPRINT-905-exclusion.md"
 rm -f "$c4/docs/sprint/SPRINT-905-exclusion.md.bak"
 run_case_anywhere "closetime-file-at-close (still excluded)" 0 \
-  "layers observed (all changed files declared" -- \
+  "layers observed [WIP, unattributed]" -- \
   sh -c "cd \"$c4\" && sh \"$checker\" docs/sprint/SPRINT-905-exclusion.md"
 
 # ================================================================================================
@@ -432,7 +441,7 @@ printf 'wip\n' >> "$c4b/.claude/worktrees/agent-001/seed.txt"      # tracked, un
 printf 'new\n' > "$c4b/.claude/worktrees/agent-001/task-notes.md"  # untracked, excluded
 
 run_case_anywhere "agent-worktree-exclusion-safe" 0 \
-  "layers observed (all changed files declared" -- \
+  "layers observed [WIP, unattributed]" -- \
   sh -c "cd \"$c4b\" && sh \"$checker\" docs/sprint/SPRINT-906-worktree.md"
 
 # ================================================================================================
@@ -545,7 +554,7 @@ run_case_anywhere "release-manifests-excluded-but-front-door-reported" 1 \
 sed -i.bak 's/^- \[ \] foo.txt updated/- [x] foo.txt updated/' "$c4d/docs/sprint/SPRINT-907-release.md"
 rm -f "$c4d/docs/sprint/SPRINT-907-release.md.bak"
 run_case_anywhere "release-bookkeeping-at-close (all excluded)" 0 \
-  "layers observed (all changed files declared" -- \
+  "layers observed [WIP, unattributed]" -- \
   sh -c "cd \"$c4d\" && sh \"$checker\" docs/sprint/SPRINT-907-release.md"
 
 # ================================================================================================
@@ -600,7 +609,7 @@ run_case_anywhere "changelog-rotation-reported-during-execution" 1 \
 sed -i.bak 's/^- \[ \] foo.txt updated/- [x] foo.txt updated/' "$c4e/docs/sprint/SPRINT-908-rotation.md"
 rm -f "$c4e/docs/sprint/SPRINT-908-rotation.md.bak"
 run_case_anywhere "changelog-rotation-at-close (excluded)" 0 \
-  "layers observed (all changed files declared" -- \
+  "layers observed [WIP, unattributed]" -- \
   sh -c "cd \"$c4e\" && sh \"$checker\" docs/sprint/SPRINT-908-rotation.md"
 
 # case 5: sprint file path does not exist on disk (constructed) -- must FAIL, its own named finding.
@@ -650,6 +659,78 @@ commit_all "$c6" 'sprint file references a plan_commit that was never actually c
 run_case_anywhere "plan-commit-unresolvable" 1 \
   "plan_commit 'totally-bogus-not-a-sha' does not resolve to a commit" -- \
   sh -c "cd \"$c6\" && sh \"$checker\" docs/sprint/SPRINT-903-badsha.md"
+
+# ================================================================================================
+# case 7: ONE TREE, BOTH PATHS -- the divergence TD-037 describes, now named (SPRINT-074 T3).
+# bar.txt is T2's. It is edited, and the edit will be committed under T1 -- a cross-task change.
+#
+#   leg A, UNCOMMITTED: attribution needs a commit, so this leg can only ask the weaker question
+#     "did SOME task declare it?" -- and T2 did. Before T3 this returned a bare PASS.
+#   leg B, COMMITTED:   the same tree, same edit, now attributable -- and it FAILs T1:bar.txt.
+#
+# That is one tree giving two verdicts. The cure is not to make them agree (they cannot: one has
+# a commit to read and one does not) but to stop leg A claiming a clean bill it never checked.
+# Both legs are asserted here, in order, on the SAME repository -- a cure asserted on the
+# committed path alone has not been exercised on the path the defect lives on.
+# ================================================================================================
+c7="$work/both-paths"
+mkdir -p "$c7/docs/sprint"
+cat > "$c7/docs/sprint/SPRINT-915-bothpaths.md" <<'EOF'
+---
+sprint: 915
+slug: bothpaths
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-915 — One Tree, Both Paths (constructed fixture)
+
+## Plan
+
+### T1 — edit only foo.txt
+Layers: `foo.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] foo.txt updated
+
+### T2 — edit only bar.txt
+Layers: `bar.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] bar.txt updated
+EOF
+printf 'a
+' > "$c7/foo.txt"
+printf 'b
+' > "$c7/bar.txt"
+git -C "$c7" init -q
+lock_plan "$c7" 'docs/sprint/SPRINT-915-bothpaths.md'
+
+# --- leg A: the edit exists but is NOT committed -------------------------------------------
+printf 'b2
+' >> "$c7/bar.txt"
+run_case_anywhere "both-paths leg A (uncommitted: named SKIP, never a bare PASS)" 0 \
+  "layers observed [WIP, unattributed]" -- \
+  sh -c "cd \"$c7\" && sh \"$checker\" docs/sprint/SPRINT-915-bothpaths.md"
+run_case_anywhere "both-paths leg A (says the committed run is stricter)" 0 \
+  "may FAIL where this leg does not" -- \
+  sh -c "cd \"$c7\" && sh \"$checker\" docs/sprint/SPRINT-915-bothpaths.md"
+# The regression this case exists to catch: leg A emitting PASS for this sprint again.
+lega=$(cd "$c7" && sh "$checker" docs/sprint/SPRINT-915-bothpaths.md 2>&1)
+if printf '%s
+' "$lega" | grep -qE '^PASS'; then
+  echo "FAIL fixture(both-paths leg A: no bare PASS): the WIP leg claimed a clean bill it did not check"; fail=1
+else
+  echo "PASS fixture(both-paths leg A: no bare PASS): the uncommitted leg emits no PASS line"
+fi
+
+# --- leg B: SAME tree, same edit, now committed under T1 ------------------------------------
+commit_all "$c7" 'sprint(915) T1: edit foo and, wrongly, bar'
+run_case_anywhere "both-paths leg B (committed: the same edit now FAILs)" 1 \
+  "T1:bar.txt" -- \
+  sh -c "cd \"$c7\" && sh \"$checker\" docs/sprint/SPRINT-915-bothpaths.md"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-OBSERVED FIXTURES: all green"; else echo "LAYERS-OBSERVED FIXTURES: at least one FAIL"; fi

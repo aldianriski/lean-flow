@@ -172,7 +172,13 @@ the spec or from its author.
 
 ### T3 — Stop the uncommitted-WIP path accepting a sibling task's declaration `[size: S · risk: low · class: decision · HITL]`
 Layers: `scripts/lib/check-layers-observed.sh` · `evals/run-layers-observed-fixtures.sh` ·
-        `evals/fixtures/layers-observed/`
+        `scripts/qa-check.sh` · `TECH-DEBT.md`
+        *(corrected at execution, L-100: `evals/fixtures/layers-observed/` was predicted and is not
+        built — this harness constructs repos under `mktemp -d` by its own stated design decision, so
+        there is no fixture tree. `qa-check.sh` joined because the cure needs its second wiring half
+        (a SKIP the leg neither counted nor printed would have been swallowed, L-020) — a shared file
+        with T2, which owns it and committed first. `TECH-DEBT.md` joined because DoD 4 writes TD-037's
+        outcome, which the promoted Layers simply omitted)*
 Depends-on: T2
 Cites: TD-037 (trigger fired at SPRINT-069) · TD-035 lineage · TD-051 (candidate-(c) shape) ·
        SPRINT-069 Execution Log · L-058
@@ -184,17 +190,41 @@ coordinator running the gate mid-flight reads a PASS the committed run would fai
 two different verdicts without saying why.
 
 **DoD:**
-- [ ] The cure is chosen from priced candidates, none pre-selected — *Verify: report the WIP leg as a
+- [x] The cure is chosen from priced candidates, none pre-selected — *Verify: report the WIP leg as a
       named **SKIP** rather than a PASS · attribute by staged-vs-unstaged · accept and document the
       boundary. **The row's standing warning binds: do not close this by inferring the in-flight task
       from open-DoD state** — that was a guess when filed, and one observation of masking is not
       evidence it would be right*
-- [ ] A fixture drives one tree through **both** paths — *Verify: the harness; a cure asserted on the
+      → **the named SKIP**, owner-ruled at a popup with all three priced and none pre-selected. The
+      other two lost on stated grounds: *staged-vs-unstaged* infers intent rather than deriving it and
+      breaks exactly where needed — L-042 prescribes `git add -p` for a shared file, so the staged set
+      spans tasks **by design** in the only case attribution matters for; *document-only* leaves the
+      output a bare PASS, and the output is what a coordinator reads. The standing warning was
+      honoured in full: **the cure adds no inference at all**, it removes an overstatement
+- [x] A fixture drives one tree through **both** paths — *Verify: the harness; a cure asserted on the
       committed path alone has not been exercised on the path the defect lives on*
-- [ ] The chosen behaviour is **not** a silent PASS — *Verify: whatever the WIP leg reports, it is
+      → `case 7` in `evals/run-layers-observed-fixtures.sh`: **one repository**, one edit to a file
+      that the fixture's Plan declares under one task, asserted while uncommitted (named SKIP, and no
+      `PASS` line at all) and then committed under a *different* task — where the identical edit FAILs,
+      naming the offending task and the file. Proven to be a real guard rather than decoration — run
+      against the **pre-change** checker, all three uncommitted-leg assertions fail. Harness
+      **26 PASS / 0 FAIL**, up from a 22-PASS baseline by exactly the four assertions added
+      *(the fixture's own task ids are deliberately not quoted here — they belong to a constructed
+      SPRINT-915, and naming them reads as a dependency on this sprint's tasks)*
+- [x] The chosen behaviour is **not** a silent PASS — *Verify: whatever the WIP leg reports, it is
       named in the output. A leg that checks nothing and says nothing is the false negative this row is
       about, one level up*
-- [ ] TD-037's row records the outcome — *Verify: the row*
+      → the SKIP names the file count, that per-task attribution needs a commit, and that **the
+      committed run may FAIL where this leg does not**. A second wiring half was needed to make that
+      true of what a reader actually sees: `qa-check.sh`'s leg counted only `^PASS` and **did not echo
+      the checker's output on success**, so a SKIP would have been swallowed and rendered as
+      *"0 sprint files verified — nothing in scope"*. Fixed in the same commit; the cure that stops at
+      the checker is half-shipped (L-020)
+- [x] TD-037's row records the outcome — *Verify: the row*
+      → `status: resolved → SPRINT-074 T3`, with the chosen cure, both rejections and their reasons,
+      what was **not** weakened, and the guarding fixture. Row structure re-verified after the edit:
+      15 TD rows before and after, diff is 25 insertions / 1 deletion and no reordering — the first
+      append landed mid-paragraph and split a sentence, caught by re-reading the whole row (L-009)
 
 ## Decisions (pre-locked)
 
@@ -256,8 +286,11 @@ two different verdicts without saying why.
 | `docs/research/conformance-dispositions.md` | T1 · T2 | T1 added `S4.INDEX`; T2 replaced §13's deferring row with five named findings + the two rulings an adopter must read | low | census: 43 rows · 43 unique · 43 by section |
 | `scripts/lib/check-attestation.sh` | T2 | **new** — §13 attestation checker; rule set + marks read from the spec at runtime, assertion bodies its own | med | `evals/run-attestation-fixtures.sh`, 16 assertions |
 | `evals/run-attestation-fixtures.sh` | T2 | **new** — one retained must-FAIL per published finding, plus 3 guarding the rule source itself | low | self; 2 seeded defects confirmed detected |
-| `scripts/qa-check.sh` | T2 | checker always-on (leg 2f-bis, HEAD); harness opt-in (builds repos) — split by the declared cost rule | low | 150 → 154 pass, the delta being the new leg |
+| `scripts/qa-check.sh` | T2 · T3 | T2: attestation checker always-on (leg 2f-bis, HEAD) + harness opt-in, split by the declared cost rule. T3: the layers-observed leg now counts and **prints** SKIP, which it did neither of | low | 150 → 154 pass; T3 leg verified on a dirty tree |
 | `docs/knowledge-index.md` | T1 · T2 | generated; regenerated to clear the date-drift FAIL (body byte-identical both times) | low | `gen-index.sh --check` |
+| `scripts/lib/check-layers-observed.sh` | T3 | WIP leg reports a named SKIP instead of a bare PASS; count is post-exclusion so the caveat fires only when a weaker rule was actually applied | low | `run-layers-observed-fixtures.sh` case 7, both paths |
+| `evals/run-layers-observed-fixtures.sh` | T3 | **case 7** — one tree, both paths; 4 stale expectations moved to the new verdict token | low | self; fails against the pre-change checker |
+| `TECH-DEBT.md` | T3 | TD-037 `resolved → SPRINT-074 T3` — cure, both rejections, what was not weakened | low | row re-verified: 15 rows, +25/−1, no reordering |
 
 ## Retro
 

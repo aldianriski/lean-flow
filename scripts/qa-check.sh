@@ -678,8 +678,18 @@ else
     lo_out=$(sh "$lo_script" $lo_files 2>&1); lo_code=$?
     if [ "$lo_code" -eq 0 ]; then
       lo_n=$(printf '%s\n' "$lo_out" | grep -cE '^PASS')
-      if [ "$lo_n" -eq 0 ]; then
+      # A sprint with uncommitted work now reports SKIP rather than PASS, because the WIP leg checks
+      # a weaker rule than the committed one (SPRINT-074 T3, TD-037). Counting only PASS would read
+      # that as "0 verified -- nothing in scope", which is both wrong and the silence T3 removed; and
+      # this leg does not echo lo_out on success, so an unprinted SKIP would be invisible here even
+      # though the checker said it. Both halves of the wiring, or the cure does not reach a reader
+      # (L-020).
+      lo_s=$(printf '%s\n' "$lo_out" | grep -cE '^SKIP')
+      [ "$lo_s" -gt 0 ] && printf '%s\n' "$lo_out" | grep -E '^SKIP|^      '
+      if [ "$((lo_n + lo_s))" -eq 0 ]; then
         note "layers observed: SKIP (0 sprint files verified -- nothing in scope)"
+      elif [ "$lo_s" -gt 0 ]; then
+        ok "layers observed ($lo_n fully verified against git diff since plan_commit; $lo_s with uncommitted work checked against the all-task union only -- see SKIP above)"
       else
         ok "layers observed ($lo_n sprint file(s) verified against actual git diff since plan_commit)"
       fi

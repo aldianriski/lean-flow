@@ -205,3 +205,60 @@ a content change. Still a `TD-NNN` for close, now with a second sighting.
 **exit code 0** while the artifact read `QA-CHECK: 154 pass, 1 fail / QA_EXIT=1` — the wrapper's status,
 not the gate's. T1's own entry warns about this in as many words. Read the output file, never the
 reporter (L-045 · L-057 · L-120).
+
+### 2026-08-18 | progress | T3 — the two legs may disagree; they may not disagree silently
+
+**The cure, chosen from the three candidates TD-037 itself listed, none pre-selected.** The WIP leg
+stops emitting a bare `PASS`: a tree with real uncommitted work now reports
+`SKIP … [WIP, unattributed]`, naming how many files were union-checked, that per-task attribution
+needs a commit, and that **the committed run applies a stricter rule and may FAIL where this leg does
+not**. Making the legs *agree* was never available — one has a commit to read and one does not. What
+was available was stopping the weaker leg from claiming a clean bill it never checked.
+
+**Why the other two lost, on the record.** *Staged-vs-unstaged* infers intent rather than deriving it,
+and it fails precisely where it would be needed: L-042 prescribes `git add -p` for a shared file, so
+the staged set spans tasks **by design** in the only situation attribution matters for. *Document the
+boundary only* leaves the output a bare PASS, and the output is the thing a coordinator reads at the
+moment they are deciding whether to commit. TD-037's standing warning is honoured completely — **the
+cure introduces no inference whatsoever**; it removes an overstatement.
+
+**A second wiring half, found before it shipped and not by reading the checker.** `qa-check.sh`'s
+layers-observed leg counted only `^PASS` **and did not echo the checker's output on success**. A SKIP
+would therefore have been counted as nothing and printed nowhere — rendering as *"0 sprint files
+verified — nothing in scope"*, which is both false and a fresh silence in place of the one just
+removed. The cure that stops at the checker is half-shipped (L-020); both halves landed together.
+
+**An over-report caught by four fixtures going red.** The first version counted the raw dirty list, so
+a tree whose only uncommitted files are *excluded* ones — an agent worktree, close-time bookkeeping —
+would have claimed a weaker check that never happened. Four existing exclusion fixtures failed and
+said so. The count now runs **after** exclusions, which is what makes the caveat mean something: a
+caveat that fires on nearly every tree gets read as furniture and stops being read at all. Those four
+fixtures then needed their expectation moved to the new token for a *different* and legitimate reason
+— they deliberately leave a declared uncommitted edit in the tree while testing an exclusion, so they
+genuinely have real WIP. Their strength is unchanged: `run_case_anywhere … 0` still asserts no FAIL
+line, which is all they ever asserted.
+
+**`case 7` drives ONE tree through BOTH paths**, which is the only way to exercise a cure on the path
+the defect lives on. One repository, one edit to a file `T2` declared: uncommitted it reports the named
+SKIP and **emits no `PASS` line at all** (asserted explicitly, since the absence is the point);
+committed under `T1` the identical edit FAILs `T1:bar.txt`. Same tree, two verdicts, now with the
+reason stated. **Proven to be a real guard rather than decoration** — run against the pre-change
+checker, all three leg-A assertions fail. Harness **26 PASS / 0 FAIL**, up from a 22-PASS baseline by
+exactly the four assertions added.
+
+**Verified on the live tree too, not only in fixtures.** Run mid-task against this sprint with three
+uncommitted files, the checker reports the SKIP naming them; before T3 that same tree read `PASS`.
+
+**TD-037 closed after nineteen sprints and seven reaffirms** — `status: resolved → SPRINT-074 T3`.
+The row records the cure, both rejections with reasons, what was deliberately *not* weakened (a file
+declared by no task still FAILs from this leg), and the guarding fixture. **The append landed
+mid-paragraph on the first attempt and split a sentence in the SPRINT-073 re-review**, caught by
+re-reading the whole row rather than the inserted lines — L-009's exact shape, third sighting. Repaired
+and re-verified structurally: 15 TD rows before and after, diff `+25/−1`, no reordering.
+
+**`Layers:` corrected twice this task, which is the declaration working as designed (L-100).**
+`evals/fixtures/layers-observed/` was predicted and does not exist — this harness builds repos under
+`mktemp -d` by its own stated design decision, so there is no fixture tree to touch. `qa-check.sh`
+joined for the second wiring half (shared with T2, which owns it and committed first — sequential, so
+no per-hunk staging was needed), and `TECH-DEBT.md` joined because DoD 4 writes to it and the promoted
+Layers simply omitted the file its own DoD names.
