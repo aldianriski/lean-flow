@@ -84,7 +84,32 @@ A check specified without its finding name is a half-shipped gate (L-058). Every
 | `S12.BACKUPS` | `database-backup-committed` |
 | `S12.DESIGNSRC` | `design-source-committed` |
 | `S12.GENERATED` | `generated-artifact-committed` |
-| `S13.TRAILERS` · `S13.OWNCOMMIT` · `S13.EVIDENCESHA` · `S13.AGREE` · `S13.UNSIGNEDCLAIM` | **→ TASK-228**, the §13 attestation checker. Findings specified there, not duplicated here |
+| `S13.TRAILERS` | `attestation-trailers-incomplete` |
+| `S13.OWNCOMMIT` | `attestation-not-on-task-commit` |
+| `S13.EVIDENCESHA` | `evidence-path-unpinned` |
+| `S13.AGREE` | `attestation-disagrees-with-sprint` |
+| `S13.UNSIGNEDCLAIM` | `attestation-unsigned-claim-only` |
+
+**§13's five names were deferred to TASK-228 and are now published here** (SPRINT-074 T2). They are
+emitted by `scripts/lib/check-attestation.sh` and each has a retained must-FAIL fixture in
+`evals/run-attestation-fixtures.sh`. Two of them carry a ruling worth reading before adopting them:
+
+- **`attestation-unsigned-claim-only` is reported at exit 0**, not as a gate failure. §14 says a
+  conformant report states a *level* and the findings preventing the next one — an unsigned commit
+  carrying perfect trailers has genuinely reached **Gated** and genuinely has not reached Attested.
+  That is a level, not a defect, and its fixture asserts the checker's **output** rather than its
+  status, because status alone cannot tell "reported honestly" from "silently passed" (L-103).
+- **`evidence-path-unpinned` is treated as preventing Attested**, though §13a words `@ <sha>` as
+  *strongly recommended* rather than required. Recorded as a ruling rather than defaulted into: the
+  register published it as a `build` rule, and §13's own worked example exists because a bare path in
+  the reference implementation would already be dead. An adopter clears it by adding the sha — which
+  is what keeps it out of the category §14 forbids.
+
+The checker reads §13's Conformance table for its **rule set and marks** at runtime; the assertion
+bodies are its own. `S13.NOINFER` and `S13.NOTAUTHOR` are absent above and are never evaluated — they
+are `implementation-directed`, excluded by the spec's own Mark column rather than by a skip list the
+author had to remember, and a fixture proves that re-marking a rule in the spec changes the checker's
+behaviour with no code edit.
 
 ## `scope-out` — 12 checkable rules, each with its reason
 

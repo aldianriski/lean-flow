@@ -187,6 +187,40 @@ else
   fi
 fi
 
+# --- 2f-bis. §13 attestation on HEAD, read from the spec rather than from this script -------------
+# The first checker here that learns its rule set from spec/STANDARD.md §13's Conformance table
+# instead of hard-coding it (SPRINT-074 T2, EPIC-004 D1). Run against HEAD so the repository is
+# measured against the standard it publishes, on every gate -- a checker that never fires on its own
+# repo is half-shipped (L-020).
+#
+# Cheap and always-on by the declared rule: it reads git objects that already exist and builds
+# nothing. Its FIXTURE HARNESS is the part that spins up throwaway repos, and that is what sits in
+# eval_harnesses_optin below (TD-016 -- cheap-and-git-free always-on, git-repo-building opt-in).
+#
+# Green on a commit that makes no attestation (absence is not a failure and is not approval) and
+# green on a well-formed one over an unsigned commit (that is Gated, an honestly reached level, not
+# a defect). It fails only on an attestation that contradicts itself or its own sprint record.
+# Covered by evals/run-attestation-fixtures.sh.
+at_script="scripts/lib/check-attestation.sh"
+if [ ! -f "$at_script" ]; then
+  bad "attestation: checker not found at $at_script"
+elif ! git rev-parse --verify HEAD >/dev/null 2>&1; then
+  note "attestation: skip -- no HEAD commit to read (§13 is defined over git objects)"
+else
+  at_out=$(sh "$at_script" . HEAD 2>&1); at_code=$?
+  printf '%s\n' "$at_out"
+  at_pass=$(printf '%s\n' "$at_out" | grep -cE '^PASS')
+  at_fails=$(printf '%s\n' "$at_out" | grep -cE '^FAIL')
+  pass=$((pass + at_pass))
+  if [ "$at_code" -ne 0 ]; then
+    if [ "$at_fails" -gt 0 ]; then
+      fail=$((fail + at_fails))
+    else
+      bad "attestation: checker exited $at_code without reporting a FAIL line"
+    fi
+  fi
+fi
+
 # --- 2g. A recorded completed run carries its rollup ---------------------------------------------
 # A headless sprint-bulk loop can end mid-Plan and still exit `success` -- 4 of 7 units on a
 # consumer's host, every commit correct, three tasks never begun and nothing written about them.
@@ -496,7 +530,13 @@ done
 # putting a cheap check behind a flag buys nothing while its false-negative is a corrupted merge
 # (leg 14 below, TD-020). Where the proxy and the cost disagree, cost wins.
 eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh"
-eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh"
+eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh"
+# run-attestation-fixtures.sh (SPRINT-074 T2, TASK-228) joins the opt-in set by the same rule: it
+# builds 6 throwaway repos via mktemp -d + git init, measured at ~2s on this host. Real git history
+# is not optional -- §13 is DEFINED over git objects (trailers, parent count, %G?), and a merge
+# commit and a resolving-vs-dead Evidence pin cannot be faked with hand-passed strings without
+# testing this harness instead of the checker. Note the split: the CHECKER itself is always-on at
+# leg 2f-bis above, because reading HEAD's existing objects builds nothing and is cheap.
 # run-worktree-base-fixtures.sh (SPRINT-070 T2, TD-054) joins the opt-in set by the same rule, and it
 # is the case where the rule costs something: the leg it guards -- a dispatched worktree silently
 # branching from origin/main -- went unnoticed for six sprints, which is an argument for always-on.
