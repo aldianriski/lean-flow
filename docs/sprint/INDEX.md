@@ -82,4 +82,4 @@ One line per archived sprint (newest first); files live in [`archive/`](archive/
 - SPRINT-071 — Cite, Not Restate — closed 2026-08-16 · 015d663 · 14 of 14 DoD (v1.45.0) · EPIC-003 CLOSED (skills cite not restate · spec 0.3.0 makes Gated checkable) · TD-060 filed
 - SPRINT-072 — Conformance Baseline — closed 2026-08-16 · 87954f2 · 17 of 17 DoD (v1.46.0) · EPIC-004 (all 96 spec rules classified · the checkers do not check the standard) · TD-061 filed
 - SPRINT-073 — The Spec as Rule Source — closed 2026-08-16 · e7ce99b · 15 of 15 DoD (v1.47.0 · spec 0.4.0) · EPIC-004 (the spec becomes the rule source · ADR-026) · TD-058 resolved · TD-062 filed
-- SPRINT-074 — The First Spec-Driven Checker — closed 2026-08-18 · <close_commit> · 15 of 15 DoD (v1.48.0 · spec 0.4.1) · EPIC-004 (first checker driven by the spec, not hard-coded · §13 attestation covered · Closed-when 4 ticked) · TD-037 resolved · TD-063 filed
+- SPRINT-074 — The First Spec-Driven Checker — closed 2026-08-18 · 6016738 · 15 of 15 DoD (v1.48.0 · spec 0.4.1) · EPIC-004 (first checker driven by the spec, not hard-coded · §13 attestation covered · Closed-when 4 ticked) · TD-037 resolved · TD-063 filed
