@@ -221,6 +221,31 @@ else
   fi
 fi
 
+# --- 2f-ter. The conformance engine, run against THIS repo -- informational, not yet gating -------
+# SPRINT-075 T2. "This repo becomes its own first consumer" -- so the engine runs here, against `.`,
+# on every gate, and its full report is relayed exactly like every other leg's. What differs from
+# leg 2f-bis: it does NOT add its PASS/FAIL counts into this gate's own pass/fail tally.
+#
+# Why not, when attestation above does: attestation only ever evaluates §13's five rules, and all
+# five have real assertions -- it is fully covered, so gating on it reports a real regression. This
+# engine sweeps EVERY section's rules, and T2 ships the driver only: 34 of 43 `build` dispositions
+# are still unbuilt after T4/T6 land their six this same sprint (docs/research/conformance-
+# dispositions.md). Gating THIS gate on that would turn qa-check.sh permanently red over tracked,
+# scheduled-for-later-sprints coverage gaps -- not a regression -- for as long as those dispositions
+# stay unbuilt, which is many sprints (§ Scope explicitly defers the remaining 34 past this one). A
+# rule-unimplemented finding is exactly the report's most useful content right now (DoD 3); the exit
+# code the engine itself hands back is the CI-usable signal once a consumer's coverage is adequate to
+# gate on -- this repo's own qa-check gets there once T4/T6 (and later families) have shrunk the gap
+# enough that the residue is worth blocking on, not before. Revisit as a follow-up once that's true.
+ce_script="scripts/lib/conformance-engine.sh"
+if [ ! -f "$ce_script" ]; then
+  bad "conformance engine: checker not found at $ce_script"
+else
+  ce_out=$(sh "$ce_script" . 2>&1); ce_code=$?
+  printf '%s\n' "$ce_out"
+  note "conformance engine: informational only this sprint (exit $ce_code, not counted toward pass/fail) -- see the comment above this leg for why"
+fi
+
 # --- 2g. A recorded completed run carries its rollup ---------------------------------------------
 # A headless sprint-bulk loop can end mid-Plan and still exit `success` -- 4 of 7 units on a
 # consumer's host, every commit correct, three tasks never begun and nothing written about them.
@@ -534,7 +559,12 @@ done
 # spec plus a few mktemp copies of it -- no git, no throwaway repos. It guards the ENGINE's rule
 # source, so its false negative is every rule silently unchecked at once (L-058): the cheapest
 # possible check standing in front of the most expensive possible miss.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh"
+#
+# run-conformance-engine-fixtures.sh (SPRINT-075 T2) joins by the same rule: no git, throwaway
+# directories only via mktemp -d, doctored spec copies via awk. It guards the engine's driver -- mark-
+# driven dispatch, the registry lookup, and the level/report arithmetic -- which is what leg 2f-ter
+# above runs on every gate (informationally; see that leg's own comment for why not yet gating).
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh"
 eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh"
 # run-attestation-fixtures.sh (SPRINT-074 T2, TASK-228) joins the opt-in set by the same rule: it
 # builds 6 throwaway repos via mktemp -d + git init, measured at ~2s on this host. Real git history

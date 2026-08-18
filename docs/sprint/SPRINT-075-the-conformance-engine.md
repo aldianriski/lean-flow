@@ -92,7 +92,10 @@ provably identical to what the attestation checker derives today.
       the gate's own completeness leg fails any harness in `evals/` that is left ungated (L-020).
 
 ### T2 — Build the engine core: registry, dispatch, report `[size: M · risk: med · class: execution · HITL]`
-Layers: `scripts/lib/` (the engine) · `scripts/qa-check.sh` · `evals/` (engine fixtures)
+Layers: `conformance.sh` (the standalone entry point at the repo root — **declared at execution**
+        (L-100): D1 settled "one implementation, two entry points", which needs a file here, and the
+        Plan named only the lib it delegates to) · `scripts/lib/` (the engine) · `scripts/qa-check.sh`
+        · `evals/` (engine fixtures)
 Depends-on: T1
 Cites: EPIC-004 D1 · D2 (settled at intake) · `spec/STANDARD.md` §14 (levels, marks, the
        no-percentage rule) · ADR-021
@@ -105,20 +108,57 @@ named findings — and a reader can tell from the output which rules were evalua
 and why.
 
 **DoD:**
-- [ ] Dispatch is **mark-driven**, not a hard-coded list — *Verify: re-mark a rule in a spec copy and
+- [x] Dispatch is **mark-driven**, not a hard-coded list — *Verify: re-mark a rule in a spec copy and
       the engine's behaviour changes with no code edit, the same fixture shape SPRINT-074 used to prove
       it for §13*
-- [ ] `judgment-only` and `implementation-directed` rules are **never evaluated against the repo** —
+      → proven in **both directions**, which one fixture alone would not do: `mark-driven-forward`
+      re-marks `S13.NOINFER` *mechanical* in a spec copy and the engine starts dispatching it;
+      `mark-driven-reverse` re-marks `S1.LAW2` *implementation-directed* and it stops. No code edit in
+      either. The rule set and marks come from `read-spec-rules.sh`; only the assertion bodies are the
+      engine's.
+- [x] `judgment-only` and `implementation-directed` rules are **never evaluated against the repo** —
       *Verify: neither appears as a verdict line; a fixture asserts it. These are the findings no
       adopter can ever clear (§14)*
-- [ ] A `mechanical` rule with no assertion reports `rule-unimplemented` — *Verify: retained must-FAIL
+      → `judgment-and-impl-directed-never-verdicts` asserts no `PASS`/`FAIL` line carries `S1.LAW1`
+      (judgment-only) or `S13.NOINFER` (implementation-directed); both appear only as notes. The live
+      run against this repo bears it out: **32 judgment-required + 6 excluded**, matching the spec's
+      own mark tally exactly, and §14's stated six implementation-directed rules. **The fixture itself
+      had to be repaired first** — its success path was a bare `grep && grep && echo` chain that
+      short-circuited to *silence* when a grep failed, so it could pass or vanish but never fail, and
+      it vanished under the very break it guards. Rewritten as an explicit arm that sets `fail=1`; a
+      case that cannot distinguish "passed" from "never ran" is not a check (L-103 · L-137).
+- [x] A `mechanical` rule with no assertion reports `rule-unimplemented` — *Verify: retained must-FAIL
       fixture. With 34 dispositions still unbuilt this will fire a lot, and that is correct: the gap is
       the report's most useful content this sprint*
-- [ ] The report states a **level** and the findings preventing the next one — *Verify: fixture*
-- [ ] **No score, grade or percentage appears anywhere in the output** — *Verify: a fixture greps the
+      → `rule-unimplemented-fires` (retained, must-FAIL, exit 1). Against this repo it fires **62
+      times** — every `mechanical` (49) and `split` (13) rule, since T2 ships the driver and no
+      assertions. That reconciles to 100 with the notes: `62 + 32 + 6 = 100`. Discrimination proven by
+      silencing the path (`bad` → `note`): **5 fixtures reddened**, including this one.
+- [x] The report states a **level** and the findings preventing the next one — *Verify: fixture*
+      → `level-line-states-blocked-level`, plus `level-bucket-survives-prior-failure` guarding the
+      subtler half — a Gated failure earlier in document order must not mask a later Structural one and
+      inflate the level. Live: `level: none -- Structural not yet reached. 43 finding(s) at Structural
+      prevent it`. **43 independently re-derived** from the spec as Structural × (`mechanical`|`split`)
+      — it agrees, and it is *not* the 43 `build` dispositions, which is a different set of the same
+      size (checked, because two equal numbers in one sprint invite exactly that confusion).
+- [x] **No score, grade or percentage appears anywhere in the output** — *Verify: a fixture greps the
       output for `%`, `score`, `grade` and a ratio shape and asserts absence. §14 forbids it
       normatively, so this is checked rather than trusted (L-058)*
-- [ ] Exit 0 clean / 1 findings, CI-usable — *Verify: fixture asserts both, on the same repo*
+      → `no-score-grade-percentage-or-ratio` asserts absence of all four. Covered on **both report
+      branches**, not just the reachable one: a second case exercises the `level: Attested` wording,
+      which only a clean spec reaches, so the forbidden text cannot hide in the branch this repo never
+      takes. The summary line states **counts** (`0 passed, 32 judgment-required, 6 excluded`), which
+      is what §14 requires in place of a ratio — a denominator here would average a deliberate
+      judgment-only boundary together with a real gap.
+- [x] Exit 0 clean / 1 findings, CI-usable — *Verify: fixture asserts both, on the same repo*
+      → `exit-0-clean` and `exit-1-findings`, both against the same target repo, differing only in the
+      spec they are pointed at — so the exit code is shown to track the findings and not the target.
+      Live against this repo: **exit 1** with 62 findings. `qa-check.sh` runs the engine on every gate
+      as its own first consumer, **informationally**: its findings are relayed but not counted into the
+      gate's tally, because 34 dispositions stay deliberately deferred past this sprint (§ Scope) and
+      gating on them would hold the gate red over scheduled work rather than a regression. The engine's
+      own exit code is the CI-usable signal an adopter gates on. **Follow-up at close: gate this repo
+      on it once coverage makes the residue worth blocking.**
 
 ### T3 — Run the engine against a repo that has never seen lean-flow `[size: M · risk: med · class: decision · HITL]`
 Layers: `evals/` (a foreign-repo harness) · the engine (only if the run exposes a defect)
@@ -197,7 +237,7 @@ consumer-facing, and what that does and does not commit lean-flow to.
 
 ### T6 — Cover the ownership-header family: `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` `[size: M · risk: med · class: execution · AFK]`
 Layers: the engine (assertions) · `evals/` (one retained fixture per named finding)
-Depends-on: T2
+Depends-on: T2, T4
 Cites: `docs/research/conformance-dispositions.md` § build (the five published names) ·
        EPIC-004 § Closed-when 2 · L-058 · TD-012
 The first *new* coverage, and chosen for what it enables rather than for being easy: these four rules

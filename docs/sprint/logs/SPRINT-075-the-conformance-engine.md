@@ -115,3 +115,89 @@ and the background wrapper's completion notification reported **exit 0 while the
 `QA EXIT=1`** — the wrapper's status, not the gate's. Caught by reading what the command was meant to
 produce rather than the channel reporting on it (L-045 · L-057 · L-059). The check and the action it
 gates stayed two separate calls, which is what left room to notice.
+
+### 2026-08-18 | progress | pre-dispatch preflight HALTED; T4→T6 order declared to clear it
+
+Running the preflight before dispatching T2 (declared base `15cb059`, matching live HEAD) returned
+**HALT** with two named findings, both genuine gaps rather than noise:
+
+```
+FAIL shared-file-unowned: evals/ ~ evals/run-gates-signed-fixtures.sh in T3 and T4 -- no Depends-on edge
+FAIL shared-file-unowned: evals/run-gates-signed-fixtures.sh ~ evals/ in T4 and T6 -- no Depends-on edge
+```
+
+**D3 ordered the shared files against T2 and never ordered T4 against T6.** Both touch `evals/` and
+the engine; T3 declares `evals/` too. D4 supplied the T6 → T3 edge, so that pair passed — the missing
+one was T4 ↔ T6, which then also left T3 ↔ T4 unreachable.
+
+Declared `T6 Depends-on: T2, T4`. **T4 before T6** because T4 migrates an *existing* family with
+published findings and retained fixtures, proving the engine against a known-good answer before T6
+adds coverage that has never had a checker; and because D3 already ordered the shared files as
+"T2 owns and lands first, T4 and T6 append", which reads as T4 then T6. Chain is now
+T2 → T4 → T6 → T3, which is also the sequential order the signed G2 chose.
+
+**Not logged as a `scope-change`:** nothing in scope moved. This records an execution order that D3
+and the G2 sequential ruling already implied but never wrote down in the markup the preflight reads —
+the same class of correction as T1's `Layers:` (L-100), one field over. The preflight is what turned
+an implicit order into a declared one, which is the check doing exactly its job.
+
+Re-run: **PREFLIGHT: CLEAR**, waves `T1=0 T2=1 T4=2 T5=2 T6=3 T3=4`.
+
+### 2026-08-18 | progress | T2 — the engine core: registry, mark-driven dispatch, and the report
+
+`conformance.sh` + `scripts/lib/conformance-engine.sh` read every section's rules through T1's reader
+and dispatch each by its **mark**. 6 of 6 DoD. Built by a dispatched execution-tier agent per the
+ADR-010 tier map; the coordinator verified, repaired one fixture, and committed.
+
+Against this repo the report reconciles exactly against the spec, checked from both ends:
+**62 `rule-unimplemented` + 32 judgment-required + 6 excluded = 100**, where the spec independently
+gives mechanical 49 + split 13 = 62 needing assertions, judgment-only 32, implementation-directed 6.
+`level: none — Structural not yet reached. 43 finding(s) at Structural prevent it`, and 43 re-derives
+from the spec as Structural × (`mechanical`|`split`). That 43 is **not** the 43 `build` dispositions —
+a different set of the same size, checked rather than assumed, because two equal numbers in one sprint
+is how a wrong one gets adopted.
+
+### 2026-08-18 | surprise | T2's fixtures had a case that could pass or vanish, but never fail
+
+The suite was 13-green on arrival. Seeding breaks (L-137) split them apart:
+
+- **Break B** — silence `rule-unimplemented` (`bad` → `note`), the L-058 false negative. **5 cases
+  reddened.** Strong.
+- **Break A** — remove the `judgment-only)` arm so those rules fall through to evaluation. Twelve
+  cases reported; the thirteenth — `judgment-and-impl-directed-never-verdicts`, the case that exists
+  precisely to catch this — **printed nothing at all**.
+
+Its success path was a bare chain:
+
+```sh
+grep -qE '...judgment-required' && grep -qE '...excluded by mark' && echo "PASS ..."
+```
+
+When a grep fails the chain short-circuits: no output, and `fail` never set. So the case could print
+PASS or print *nothing*, and had no path to FAIL. Under Break A the rules landed in the unclassified
+arm, neither grep matched, and the case evaporated — **silently, in the one scenario it guards**.
+Rewritten as an explicit `elif`/`else` that prints the finding and sets `fail=1`; re-seeding Break A
+now reddens it correctly.
+
+This is the same failure the repo already names in another register (L-103): a check whose negative
+result is indistinguishable from not having run. Worth noting *where* it hid — not in the engine, but
+in the fixture, and only in the branch a passing run never takes. **A green suite is evidence about
+the cases that ran, never about the ones that quietly did not.**
+
+### 2026-08-18 | progress | T2 — `Layers:` corrected again, and the qa-check wiring ruled informational
+
+`conformance.sh` at the repo root was undeclared: T2's `Layers:` named `scripts/lib/` and the Plan
+never anticipated a root entry point, though D1 ("one implementation, two entry points") requires one.
+Caught by the layers-observed leg, declared at execution (L-100) — the second such correction this
+sprint, after T1's `scripts/qa-check.sh`. Two in two tasks is the pattern L-100 predicts, not a
+planning defect: a `Layers:` written at promote cannot name the files implementation invents.
+
+**Ruling recorded rather than left implicit:** the engine runs inside `qa-check.sh` on every gate
+against this repo — "its own first consumer" — but its findings are **relayed, not counted** into the
+gate's tally. Gating now would hold `qa-check.sh` permanently red on 62 `rule-unimplemented` findings,
+34 of which § Scope explicitly defers past this sprint; that is scheduled work, not a regression, and
+a gate red for a known reason stops being read. The engine's own exit code remains the CI-usable
+signal an adopter gates on (DoD 6). **Follow-up filed at close:** gate this repo on the engine once
+coverage shrinks the residue enough to be worth blocking on.
+
+qa-check: **159 pass, 0 fail**.
