@@ -4,7 +4,7 @@ slug: the-conformance-engine
 epic: EPIC-004
 owner: Maintainer
 last_updated: 2026-08-18
-plan_commit: [sha — set at promote]
+plan_commit: 9693d79
 close_commit: [sha — set at close]
 status: active
 update_trigger: sprint execute/close events
