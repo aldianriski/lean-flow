@@ -19,3 +19,6 @@ graphify-out/
 .DS_Store
 Thumbs.db
 *.swp
+
+# ADLC handoff archive — the pack itself lives at docs/strategy/adlc/; the .zip duplicates it (§12)
+docs/roadmap/
