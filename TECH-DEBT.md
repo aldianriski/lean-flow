@@ -1,7 +1,6 @@
 ---
 owner: Maintainer
 last_updated: 2026-08-18
-__KEEP__2026-08-15
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -53,6 +52,12 @@ status: current
     mtime across the corpus the index is derived from rather than from `date`. Either is a checker
     change; which one is a judgement call about whether the stamp should track *the corpus* or *the
     regeneration event*.
+  - **Sibling, not a duplicate: TD-050.** Both live in `qa-check.sh`'s knowledge-metadata
+    section and both concern index freshness, so a ledger search reaches one from the other.
+    They are different debts: TD-050 is the gate's **runtime cost centre** (freshness is ~36%
+    of section 4), this row is a **false red** on correct code. A cure that stops byte-comparing
+    the stamped field would move both, which is an argument for pricing them together and not
+    for merging them.
   - **Not blocked on evidence, and must not be parked as if it were** (L-094): the class of fact that
     settles this is a **documented behaviour** (read `gen-index.sh`) plus a **judgement call** (which
     of the two cures), neither of which accumulates by waiting. The reason it is not fixed here is
@@ -110,6 +115,10 @@ status: current
   - Tracker: SPRINT-072 G2 Execution Log (the probe) · `docs/research/conformance-baseline.md`
     § Findings recorded for later sprints · **L-132** · L-058 · ADR-015 (soft caps report, and cannot
     be grandfathered)
+  - **Re-reviewed 2026-08-18 (SPRINT-075 promote, 3 sprints open) — held, trigger unfired.** SPRINT-074
+    added no `docs/research/` subdirectory, so the non-recursive glob was never asked a question it
+    could get wrong. It did reach `conformance-dispositions.md` correctly, reporting it over the soft
+    cap at 163 — evidence the glob works on the flat case, and none either way on the nested one.
 
 - **TD-060** severity: minor | status: open | created: Sprint-071
   - Summary: **nothing checks that a cross-reference inside `spec/STANDARD.md` resolves.** §13 referred
@@ -273,6 +282,15 @@ status: current
     inventory-and-baseline only and changes no checker architecture. **Unblock condition:** unchanged
     in substance, with a named successor — the engine sprint's G2 either consumes this contract or
     states why it does not need to.
+  - **Re-reviewed 2026-08-18 (SPRINT-075 promote) — EVIDENCE OBSERVED, and the row is stronger for it.**
+    SPRINT-074 produced three sightings of `Layers:` being matched differently by different readers in
+    one sprint: `check-layers-completeness.sh` flagged a `Cites:`/`Layers:` contradiction (correct), then
+    flagged `T1` appearing in a DoD as an undeclared **dependency** when the token named a *fixture's*
+    task inside a constructed SPRINT-915 (a false positive of the same family), while
+    `check-layers-observed.sh` read the same declaration against git and agreed with neither. All three
+    were resolved by editing the *declaration* to suit each matcher, which is precisely the behaviour
+    this row predicts. Not promoted to a vehicle here — TD-048's matcher work is still deliberately
+    unscheduled and the two should be priced together, not raced.
 
 - **TD-053** severity: minor | status: open | created: Sprint-063
   - Summary: **worktree-isolated dispatch places a full repo copy at `.claude/worktrees/<id>/`, inside
@@ -343,6 +361,9 @@ status: current
     it is in fact a correctly-sequenced one. **Unblock condition:** unchanged — and it should be read
     by the engine sprint's G2, since a conformance engine that walks a consumer's tree inherits
     exactly this false-positive class the moment a worktree exists anywhere under it.
+  - **Re-reviewed 2026-08-18 (SPRINT-075 promote) — held, trigger unfired.** SPRINT-074 dispatched no
+    worktrees (both tasks ran inline, coordinator-only), so no repo copy was placed inside the repo and
+    the exclusion path was never exercised. Age is not the trigger; recorded rather than skipped.
 
 - **TD-052** severity: medium | status: open | created: Sprint-062
   - Summary: **Nothing in `evals/` exercises skill *prose*, so a governance rule that lives as
@@ -557,6 +578,15 @@ status: current
     **Unblock condition:** unchanged. Noted for the reader: EPIC-004 will produce a second, consumer-
     facing reader of the same metadata, and if that engine needs checks this section narrowed away,
     that is the demonstration this row has been waiting for — it is not one yet.
+  - **Re-reviewed 2026-08-18 (SPRINT-075 promote) — held, and the cost is now felt rather than measured.**
+    SPRINT-074 ran the full gate **five times** across two tasks at ~3.5 min each, and its Retro logged
+    the consequence in as many words: *"a five-minute feedback loop on a two-line change ... discourages
+    the run-the-gate-alone discipline it exists to serve."* That is this row's cost showing up as a
+    behavioural pressure on a rule the repo cares about (L-120), not merely as seconds. Still held: the
+    split at SPRINT-061 showed there is **no cost centre inside section 4 to remove** — three comparable
+    thirds — so there is still no cure that does not cheapen a whole-corpus read ADR-009 wired
+    deliberately. See **TD-063**, filed at SPRINT-074 close against the same subsystem for a different
+    defect; price the two together.
 
 - **TD-049** severity: minor | status: open | created: Sprint-059
   - Summary: the night-run reaper (`scripts/night-run.sh`) parses the sprint file's DoD boxes and
@@ -610,6 +640,10 @@ status: current
     substance — but the engine sprint's G2 should check this row before it defines any DoD grammar,
     rather than discovering the reaper afterwards (L-124's shape: a rename's census enumerates
     *writers* and *readers*, and the reaper is a reader nobody lists).
+  - **Re-reviewed 2026-08-18 (SPRINT-075 promote) — held, trigger unfired.** No unattended run occurred
+    in SPRINT-074, so the reaper parsed nothing and the parity question went unasked. Its vehicle
+    (TASK-188) remains `state: blocked` by design: the trigger is opportunistic and scheduling a run to
+    manufacture one is what L-111 forbids.
 
 - **TD-048** severity: trivial | status: open | created: Sprint-058
   - Summary: `check-layers-completeness.sh` matches a `Layers:`/`Cites:` declaration against DoD prose
