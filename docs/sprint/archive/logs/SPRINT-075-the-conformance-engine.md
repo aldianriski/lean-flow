@@ -2,8 +2,8 @@
 sprint: 075
 slug: the-conformance-engine
 owner: Maintainer
-last_updated: 2026-08-18
-status: active
+last_updated: 2026-08-20
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -610,3 +610,106 @@ person optimising it meets the argument before the temptation.
 5. **Note for close — the Plan is at its cap.** § Retro has ~20 lines of headroom. T1/T2/T4/T5 evidence
    already moved to this Log; if the Retro needs more room, T6/T3's evidence blocks are the next to move
    under the same rule, not the cap.
+
+### 2026-08-20 | note | T6 and T3 DoD evidence moved here from the Plan
+
+The last leg of the move begun earlier today. With § Retro written the Plan stood at **438 of its
+400-line hard cap**; T1/T2/T4/T5 had already moved, and these two were named in this Log as the next
+under the same rule. Verbatim originals below; no DoD text or tick was altered by the move.
+
+---
+
+### T3 — Run the engine against a repo that has never seen lean-flow `[size: M · risk: med · class: decision · HITL]`
+Layers: `evals/run-foreign-repo-fixtures.sh` (the foreign-repo harness) ·
+        `scripts/lib/conformance-engine.sh` (the run DID expose a defect — the `GAP` class) ·
+        `evals/run-conformance-engine-fixtures.sh` (T2's suite, repointed at the new semantics) ·
+        `scripts/qa-check.sh` (harness registered) · `docs/adr/ADR-027-*.md` (refinement marker) —
+        declared at execution, L-100
+Depends-on: T2, T6
+Cites: EPIC-004 § Closed-when 1 · L-015 (the consumer surface) · L-016 (verify on the consumer path
+       when the repo cannot dogfood) · `docs/research/conformance-dispositions.md`
+The epic's headline claim is that an adopter gets a named answer. Nothing has tested it: all 43 `build`
+dispositions were judged against **this** repository's shape, by people who wrote the standard. This
+task is the first contact with a repository that never agreed to any of it.
+
+**Acceptance:** a throwaway repo with a README and nothing else gets a level, named findings, and no
+finding a reasonable owner would call meaningless.
+
+**DoD:**
+- [x] The engine runs against a repo built from scratch with none of our conventions — *Verify: the
+      harness builds it under `mktemp -d`; no lean-flow file is copied in*
+      → `evals/run-foreign-repo-fixtures.sh` builds `acme-widget` (README · src · one doc ·
+      package.json) with printf under `mktemp -d`. **No lean-flow file is copied in, and the harness
+      asserts that mechanically** (exactly 4 files), so a later edit that copies a template in fails
+      loudly instead of quietly measuring our own shape (L-015 · L-016).
+- [x] It emits a level and named findings, and **nothing** for `judgment-only` /
+      `implementation-directed` rules — *Verify: fixture asserts both halves*
+      → level line + 2 named findings; **0** verdict lines for the 33 judgment-only / 6
+      implementation-directed rules, which appear as notes only. *Read as "no VERDICT line" — §14 and
+      EPIC-004 D1 both require a conformant report to NAME its judgment-required items, so emitting
+      nothing at all would breach the epic while satisfying the word. Stated, not silently reinterpreted
+      (L-088).*
+- [x] **Every finding is triaged for actionability, and the verdict is recorded** — *Verify: a written
+      pass over the output classifying each finding as *actionable by that repo's owner* or *an
+      artefact of dispositions written against our own shape*. **A high artefact count is a finding
+      about `docs/research/conformance-dispositions.md`, and routes back there** — do not tune the engine to look
+      quiet (L-088: the criterion is the report being honest, not short)*
+      → **2 findings, both actionable, 0 artefacts** — table in the Log. Proven, not asserted:
+      applying exactly what they asked for takes the same repo to exit 0. **Recorded as weaker than it
+      looks** — at 6 of 62 rules implemented, the shape-bound dispositions (§2 placement, §6 tiers, §11
+      ledgers) are untouched, so the artefact question is barely asked yet, not answered.
+      **The run also changed the engine**: 56 of 58 FAIL lines were our own gaps, so a `GAP` class now
+      carries them off the adopter's level and exit code (owner ruling → ADR-027 refinement marker).
+- [x] EPIC-004 § Closed-when 1 is ticked or the reason it is not is written down — *Verify: the epic
+      row; a condition ticked without its evidence is the tick this sprint exists to avoid*
+
+      → ticked in the epic with its evidence, naming what the run does and does not establish.
+
+---
+
+### T6 — Cover the ownership-header family: `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` `[size: M · risk: med · class: execution · AFK]`
+Layers: `scripts/lib/conformance-engine.sh` (assertions) · `evals/run-ownership-header-fixtures.sh`
+        + `evals/fixtures/ownership-header/` (one retained fixture per named finding) ·
+        `scripts/qa-check.sh` (harness registered — the completeness leg fails an ungated harness) ·
+        `docs/research/conformance-dispositions.md` (four rules move `build` → covered) — L-100
+Depends-on: T2, T4
+Cites: EPIC-004 § Closed-when 2 · L-058 · TD-012 · `S7.PERSON` (§7 states the same role-vs-person
+       distinction as "mechanical against a role vocabulary, judged without one" — the reason this
+       task ships a vocabulary at all; cited, never touched). The § build register itself is
+       **touched**, so it is declared on `Layers:` above rather than here.
+The first *new* coverage, and chosen for what it enables rather than for being easy: these four rules
+apply to any repository containing documents, which is what makes the foreign-repo run report something instead of
+nothing. The five finding names are already published — this task consumes that contract, it does not
+choose it.
+
+**Acceptance:** a repo with a doc missing its ownership header gets told so, by name.
+
+**DoD:**
+- [x] All four rules are evaluated, firing the five **already-published** names — `owner-not-a-role` ·
+      `update-trigger-absent` · `ownership-header-missing` · `ownership-header-field-missing` ·
+      `agents-ownership-footer-missing` — *Verify: count assertions against the register's rows; a rule
+      silently skipped is a FAIL*
+      → four assert_* functions registered; 5 of 5 names fire. Reconciled against the register:
+      12 covered rule ids == its header, 39 `build` == its header. Full detail → Log, T6.
+- [x] **One retained must-FAIL fixture per named finding**, plus a PASS control — *Verify: the harness;
+      each case fails with its own name (L-058 · TD-012)*
+      → `evals/run-ownership-header-fixtures.sh`, **11 cases, all green** — one retained must-FAIL per
+      published name, plus PASS controls and two regression cases.
+- [x] `owner-not-a-role` does not fire on a legitimate role — *Verify: a PASS-control fixture using
+      `Maintainer`. This is the one rule here that can produce a false positive on correct input, since
+      distinguishing a role from a person is the judgment half of a `split` mark*
+      → PASS control `maintainer-is-a-role` green; 0 `owner-not-a-role` findings across this repo's
+      198 owner: values. **The Plan's parenthetical is imprecise and is not being reinterpreted to fit:
+      §14 marks `S1.LAW2` mechanical, not split** — the split it describes is §7's `S7.PERSON`. The
+      criterion (a PASS control using `Maintainer`) is met as written; the rationale beside it names the
+      wrong rule (L-136, at the smallest grain).
+- [x] The fixtures were shown to **discriminate**, not merely pass — *Verify: seed a deliberately
+      broken assertion and confirm the matching case reddens (L-137). Green on first run against
+      fixtures written alongside the code proves agreement, not coverage*
+      → **10 breaks seeded, 10 discriminated**, engine restored under a verified sha1. Two of them
+      found real defects rather than confirming the suite: the ADR exemption went unnamed on an
+      ADR-only repo, and `owner-role-must-match-whole-value` proved nothing until its fixture changed
+      from `Alice, Maintainer` to `Main`. Break table → Log, T6.
+
+
+---

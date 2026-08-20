@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-18
+last_updated: 2026-08-20
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -8,6 +8,84 @@ status: current
 # lean-flow — Changelog
 
 <!-- Prepend new sprints — newest first. Append-only; never edit past blocks. -->
+
+---
+
+## v1.49.0 — The Conformance Engine (2026-08-20)
+
+MINOR — SPRINT-075, **26 of 26 DoD**, EPIC-004's fourth member sprint and the largest Plan this repo
+has run. v1.48.0 shipped one checker that reads the standard. This turns that shape into an **engine**
+covering every section, and points it at a repository that never installed lean-flow.
+
+**What changed for you**
+
+- **`sh conformance.sh <repo-dir>` — a conformance report for any repository, from a clone alone.**
+  One implementation, two entry points (the repo-root script and this repo's own gate). The spec it
+  measures against ships beside it, so your repo does not need a copy; `--spec` overrides.
+- **The spec decides what is evaluated, not the code.** Every `## §N` Conformance table is read at
+  runtime through `scripts/lib/read-spec-rules.sh`. Re-mark a rule in your spec copy and the engine's
+  behaviour changes with no code edit — proven in both directions.
+- **Your report and our roadmap are now two different statements.** A rule the spec marks mechanical
+  that this engine cannot yet answer is a **`GAP`** line — still named, every time, never silently
+  skipped — but it no longer blocks your level or sets your exit code, and engine coverage is reported
+  on its own axis. Before this, a four-file repo with **two** real defects was told "level: none — 41
+  findings prevent Structural", because 39 of those findings were checkers we had not written.
+- **Six rules are answered by the engine**, where it shipped with none: §9's `gates_signed` pair
+  (migrated off its standalone script with its findings byte-identical), and the ownership-header family —
+  `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` — firing five published names:
+  `owner-not-a-role` · `update-trigger-absent` · `ownership-header-missing` ·
+  `ownership-header-field-missing` · `agents-ownership-footer-missing`.
+- **`owner:` is checked against a role vocabulary you can declare.** §14 marks the rule mechanical
+  "against a role vocabulary" and the standard publishes none, so the engine ships a small default and
+  reads **`.conformance-roles`** (one role per line) when you provide one — a declared file *replaces*
+  the default, so "only these roles" is sayable. Matching is whole-value: `Main` is not `Maintainer`.
+- **ADRs are exempt from §3's ownership header, and the report says so.** §4 ships an ADR template
+  whose frontmatter is knowledge metadata, not `owner:`/`last_updated:`/`update_trigger:` — so
+  reporting ADRs against §3 would tell you to break the standard's own template. The exemption is
+  named in the output with its file count, never applied silently.
+- **Exit code contract:** non-zero **exactly when a finding about your repository was printed**. Gaps,
+  judgment-required rules and implementation-directed rules never set it. You may gate CI on it;
+  lean-flow still ships no workflow file and owns no pipeline (**[ADR-027]**).
+- **Still no score, grade, or percentage** (§14) — counts only, on both axes. A ratio would improve
+  every time the standard declined to automate something.
+
+**Maintainer-facing**
+
+- **Executable code here is consumer-facing now, and ADR-008 says so.** **[ADR-027]** amends it rather
+  than superseding it — the hybrid decision is still live; only its maintainer-only premise is gone.
+  It also rules on ADR-008's CI sentence: *lean-flow does not own your pipeline*, **not** *lean-flow
+  emits nothing a pipeline can use*. EPIC-004 § Closed-when 1 and 5 both tick.
+- **The migration reproduced every finding string exactly and flipped the verdict label.** An unsigned
+  sprint rendered as `PASS … NOT SIGNED`, reaching `level: Attested`. The driver inferred "passed" from
+  "did not fail" — a note-only assertion counted as a pass. The five fixtures all asserted finding
+  *text*; a sixth now asserts the **label**. → **L-139**.
+- **Two censuses disagreeing by one caught a false negative.** §3's root-README exception was
+  implemented as `*/README.md`, which is not "the front-door" but every README at any depth — silently
+  dropping a nested doc with no header. A too-broad exclusion fails **green**. → **L-140**.
+- **The discrimination pass needed its own discrimination check.** Three seeded breaks whose `sed`
+  never matched reported the suite green; a green run behind a patch that never landed is not evidence.
+  The harness now reports `SEED-ERROR` on a no-op patch. 10 breaks seeded on the ownership suite, 10
+  discriminated — and two of them found real defects rather than confirming the suite. → **L-141**,
+  and **L-137** to count 2.
+- **A fixture named after the token its own assertion greps for.** The ADR case matched
+  `fixtures/ownership-header/` in the report's header line rather than a finding. L-108's documented
+  sub-case, verbatim. → **L-108 ×7**.
+- **A commit went through a red gate again**, one sprint after L-120 was promoted for exactly this.
+  The line was `qa-check > out; echo $?` — the runner reported **`echo`'s** status while the file said
+  `1 fail`. The promotion added the action form and still did not fire, because the shape was a
+  redirect rather than a pipe. → **L-120 ×4**, re-promoted with the durable form: *read the gate's own
+  `N pass, M fail` summary; any exit code arriving through a wrapper is evidence about the wrapper.*
+- **T6 made the gate look hung.** The first implementation spawned ~2,800 awk processes (a walk per
+  rule, an awk per field per doc). One cached walk and one awk per doc: 47s, verified
+  behaviour-identical by counts. Not taken further — one awk over all files drops a zero-byte file
+  silently, and trading a silent skip for wall-clock is the wrong trade here. → **TD-066**.
+- **The Plan hit its 400-line cap mid-close.** T1/T2/T4/T5 DoD evidence moved to the uncapped Execution
+  Log, which is the split ADR-014 exists for; the Plan keeps criterion, `*Verify:*` and a verdict.
+- **28 ownership gaps in our own docs** — reported by our own engine, relayed not gated. → **TD-064**.
+  §3 owes an explicit ADR row → **TASK-237**; the artefact triage wants re-running as coverage grows →
+  **TASK-238**; the dispositions register still counts §13's five under `build` → **TD-065**.
+
+[ADR-027]: docs/adr/ADR-027-executable-code-becomes-consumer-facing.md
 
 ---
 
@@ -79,58 +157,4 @@ a checker for §13 whose rule set comes from the spec at runtime rather than fro
 
 ---
 
-## v1.47.0 — The Spec as Rule Source (2026-08-16)
-
-MINOR — SPRINT-073, **15 of 15 DoD**, EPIC-004's second member sprint. **`spec/STANDARD.md` 0.3.0 →
-0.4.0.** The standard now tells you, in the file itself, which of its rules a tool can check — which is
-what makes "build a conformance checker from the spec" possible rather than aspirational.
-
-**What changed for you**
-
-- **Every normative rule carries its conformance level and whether it is checkable, in the spec.** Each
-  `## §N` ends with a **Conformance.** table listing that section's rules by a stable id (`S13.TRAILERS`,
-  `S2.F-CAP`, …), its level (Structural · Gated · Attested) and its mark. A new **§14** defines the
-  model. **Nothing existing was reworded, removed or renumbered** — the prose you pinned at 0.3.0 reads
-  identically; this adds a layer beside it (`+300 / −1`, and the one deletion is the version line).
-- **Four marks, and the middle two are not the same thing.** `mechanical` · `judgment-only` (**not
-  checkable in principle** — the standard is choosing a human) · `split` · `implementation-directed`. A
-  `judgment-only` rule is **not debt and never will be**; a `mechanical` rule with no checker is a gap
-  someone can close. Collapsing them reports the standard's deliberate boundaries as failures.
-- **Five rules must never be evaluated against your repository**, marked `implementation-directed` —
-  two of them §13's inference constraints (*a verifier may not conclude approval from an unsigned
-  trailer* · *author identity is not the attestation*). They bind a tool, not a repo. A checker reading
-  them as repo rules emits findings **you could never clear**.
-- **No percentage, no score, no grade — now stated normatively in §14**, so it binds your tools rather
-  than living in our notes. A ratio *improves* when the standard declines to automate something.
-- **Rule ids are stable across versions and are what a finding names**, so a report stays comparable as
-  the standard evolves. An id is retired, never reused. **A `?` mark is a real state** — two rules
-  (`S4.INDEX`, `S5.DISCARDLOG`) are stated but unclassified, and a tool reporting on them says so.
-- **`spec/STANDARD.md` carries no line cap, and §2 now says so** ([ADR-026]). If you were wondering why
-  the standard was absent from its own cap table: it is a ruling, not an oversight.
-
-**Maintainer-facing**
-
-- **The frozen baseline could not reproduce its own total.** SPRINT-072's `conformance-baseline.md`
-  states **96** rules while its `rules` column sums to **99** and its bucket columns to **98**. T1 halted
-  rather than pick one, and the owner ruling split the constraint: **transcribe the marks, re-derive the
-  count**. Re-derived from the spec: **98 classified + 2 unclassified**. Five divergences recorded in
-  `conformance-dispositions.md`. → **L-134**.
-- **Dispositions are 54, not 39** — 42 `build` (each naming the finding its check will fire) and 12
-  `scope-out` (each with its reason). Reconciled mechanically: no checkable rule is left undispositioned.
-- **A category expected to be large came out empty.** `scope-out` reason (c) — "mechanical but not worth
-  the false-positive rate" — has **zero** members; every candidate was already `judgment-only` and never
-  checkable. Uncounted, they would have been double-counted as scoped-out work. → **L-135**.
-- **TD-058 resolved after four sprints**, because T2 was ordered immediately downstream of the evidence
-  it needed rather than by priority.
-- **A cap cell will eat any digits you put in it.** `no numeric cap (ADR-026)` was parsed as a cap of
-  **26** — `FAIL cap spec/STANDARD.md (943 > 026)`. Caught only because the DoD required *running* the
-  checker. → **TD-062**.
-- **A commit went through a red gate**, because the line was `qa-check | tail && git commit` and `&&`
-  read `tail`'s status. Second sighting → **L-120 promoted** to `CLAUDE.md` edit-safety (c), which
-  already carried the caution and did not fire; the promotion adds the *action* form.
-
-[ADR-026]: docs/adr/ADR-026-standard-carries-no-line-cap.md
-
----
-
-_Older releases (**v1.46.0** and earlier) → [`CHANGELOG-1.46.0.md`](docs/changelog/CHANGELOG-1.46.0.md) → [`CHANGELOG-1.45.0.md`](docs/changelog/CHANGELOG-1.45.0.md) → [`CHANGELOG-1.44.0.md`](docs/changelog/CHANGELOG-1.44.0.md) → [`CHANGELOG-1.43.0.md`](docs/changelog/CHANGELOG-1.43.0.md) → [`CHANGELOG-1.42.0.md`](docs/changelog/CHANGELOG-1.42.0.md) → [`CHANGELOG-1.41.0.md`](docs/changelog/CHANGELOG-1.41.0.md) → [`CHANGELOG-1.40.0.md`](docs/changelog/CHANGELOG-1.40.0.md) → [`CHANGELOG-1.39.0.md`](docs/changelog/CHANGELOG-1.39.0.md) → [`CHANGELOG-1.38.0.md`](docs/changelog/CHANGELOG-1.38.0.md) → [`CHANGELOG-1.37.0.md`](docs/changelog/CHANGELOG-1.37.0.md) → [`CHANGELOG-1.36.0.md`](docs/changelog/CHANGELOG-1.36.0.md) → [`CHANGELOG-1.35.0.md`](docs/changelog/CHANGELOG-1.35.0.md) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._
+_Older releases (**v1.47.0** and earlier) → [`CHANGELOG-1.47.0.md`](docs/changelog/CHANGELOG-1.47.0.md) → [`CHANGELOG-1.46.0.md`](docs/changelog/CHANGELOG-1.46.0.md) → [`CHANGELOG-1.45.0.md`](docs/changelog/CHANGELOG-1.45.0.md) → [`CHANGELOG-1.44.0.md`](docs/changelog/CHANGELOG-1.44.0.md) → [`CHANGELOG-1.43.0.md`](docs/changelog/CHANGELOG-1.43.0.md) → [`CHANGELOG-1.42.0.md`](docs/changelog/CHANGELOG-1.42.0.md) → [`CHANGELOG-1.41.0.md`](docs/changelog/CHANGELOG-1.41.0.md) → [`CHANGELOG-1.40.0.md`](docs/changelog/CHANGELOG-1.40.0.md) → [`CHANGELOG-1.39.0.md`](docs/changelog/CHANGELOG-1.39.0.md) → [`CHANGELOG-1.38.0.md`](docs/changelog/CHANGELOG-1.38.0.md) → [`CHANGELOG-1.37.0.md`](docs/changelog/CHANGELOG-1.37.0.md) → [`CHANGELOG-1.36.0.md`](docs/changelog/CHANGELOG-1.36.0.md) → [`CHANGELOG-1.35.0.md`](docs/changelog/CHANGELOG-1.35.0.md) → [`CHANGELOG-1.34.0.md`](docs/changelog/CHANGELOG-1.34.0.md) → [`CHANGELOG-1.33.0.md`](docs/changelog/CHANGELOG-1.33.0.md) → [`CHANGELOG-1.32.0.md`](docs/changelog/CHANGELOG-1.32.0.md) → [`CHANGELOG-1.31.0.md`](docs/changelog/CHANGELOG-1.31.0.md) → [`CHANGELOG-1.30.0.md`](docs/changelog/CHANGELOG-1.30.0.md) → [`CHANGELOG-1.29.0.md`](docs/changelog/CHANGELOG-1.29.0.md) → [`CHANGELOG-1.27.3.md`](docs/changelog/CHANGELOG-1.27.3.md) → [`CHANGELOG-1.26.0.md`](docs/changelog/CHANGELOG-1.26.0.md) → [`CHANGELOG-1.25.2.md`](docs/changelog/CHANGELOG-1.25.2.md) → [`CHANGELOG-1.24.0.md`](docs/changelog/CHANGELOG-1.24.0.md) → [`CHANGELOG-1.23.0.md`](docs/changelog/CHANGELOG-1.23.0.md) → [`CHANGELOG-1.22.0.md`](docs/changelog/CHANGELOG-1.22.0.md) → [`CHANGELOG-1.21.0.md`](docs/changelog/CHANGELOG-1.21.0.md) → [`CHANGELOG-1.20.0.md`](docs/changelog/CHANGELOG-1.20.0.md) → [`CHANGELOG-1.19.0.md`](docs/changelog/CHANGELOG-1.19.0.md) → [`CHANGELOG-1.16.1.md`](docs/changelog/CHANGELOG-1.16.1.md) → [`CHANGELOG-1.14.2.md`](docs/changelog/CHANGELOG-1.14.2.md) → [`CHANGELOG-1.13.0.md`](docs/changelog/CHANGELOG-1.13.0.md) → [`CHANGELOG-1.12.0.md`](docs/changelog/CHANGELOG-1.12.0.md) → [`CHANGELOG-1.9.0.md`](docs/changelog/CHANGELOG-1.9.0.md) → [`CHANGELOG-1.7.1.md`](docs/changelog/CHANGELOG-1.7.1.md)._

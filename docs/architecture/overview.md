@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-14
+last_updated: 2026-08-20
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -45,20 +45,30 @@ docs/             architecture/ · development/ · deployment/ · adr/ · DECISI
                     mechanism outside docs/sprint/, SPRINT-062) · archive/ — a spent verdict moves
                     there once `status: superseded` AND nothing live cites it; it stays in the
                     generated index, marked (§11)
-scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launcher) · lib/ (extracted checkers)
-                                                maintainer tooling for the REPO itself (ADR-008)
+conformance.sh    the CONSUMER entry point — `sh conformance.sh <repo-dir>` reports any repo's
+                  conformance level + named findings (ADR-027; delegates to scripts/lib/)
+scripts/          qa-check.sh · gen-index.sh · night-run.sh (unattended launcher) · lib/ (extracted
+                  checkers + conformance-engine.sh + read-spec-rules.sh)          (ADR-008 · ADR-027)
 evals/            must-FAIL/must-SKIP fixtures + assertion scripts guarding a SHIPPED skill's
                   behavioural contract; lib/ · fixtures/                        (SPRINT-038)
 TODO.md · TECH-DEBT.md · README.md · CHANGELOG.md · AGENTS.md · SECURITY.md · LICENSE
 ```
 
-`scripts/` and `evals/` are both **maintainer-oriented** — they target *this* repo and no consumer
-invokes them. They are **not**, however, absent from an install: `plugin.json` declares no file
-manifest, so `plugin install` copies the whole repo and both directories land in the consumer's cache
-verbatim (verified against a real install, SPRINT-042). The distinction that matters for a
-consumer-facing check (L-015) is therefore *usable surface*, not presence on disk. They differ by
-*what they guard*: `scripts/` supports this repo (lint, index generation), `evals/` guards behaviour
-that ships inside a skill. The zero-API `evals/` harnesses run inside `qa-check.sh` — always-on ones
+`evals/` is **maintainer-oriented** — it targets *this* repo and no consumer invokes it. `scripts/`
+no longer is, and that changed deliberately: **ADR-027 amended ADR-008 to make executable code here
+consumer-facing.** `scripts/lib/conformance-engine.sh` and `read-spec-rules.sh` answer for *any*
+repository, reached through the root `conformance.sh`, and their exit code is a documented contract an
+adopter may gate CI on — while lean-flow still ships no workflow file and owns no pipeline. The rest of
+`scripts/` (qa-check · gen-index · night-run) remains this repo's own tooling.
+
+Neither directory is absent from an install: `plugin.json` declares no file manifest, so
+`plugin install` copies the whole repo and both land in the consumer's cache verbatim (verified
+against a real install, SPRINT-042). The distinction that matters for a
+consumer-facing check (L-015) is therefore *usable surface*, not presence on disk — and for the
+conformance engine that surface is now deliberate rather than incidental. `evals/` guards behaviour
+that ships inside a skill, and is the one that stays ours alone.
+
+The zero-API `evals/` harnesses run inside `qa-check.sh` — always-on ones
 on every run, the slow selftests under `QA_FULL=1` (TD-016); the paid behavioural fixtures stay a
 manual step (`evals/README.md`).
 

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-18
+last_updated: 2026-08-20
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -31,6 +31,67 @@ status: current
 ---
 
 ## Tech Debt
+
+- **TD-064** severity: minor | status: open | created: Sprint-075
+  - Summary: **28 of this repo's own docs fail the ownership-header rules the engine now checks** — 15
+    carry no frontmatter at all (`docs/qa/` ×3, `docs/strategy/adlc/` ×12) and 13 research docs declare
+    every field except `update_trigger:`. §3 makes the header mandatory on every doc and §1 LAW 3
+    requires the trigger, so these are real, named findings against the reference implementation.
+  - Evidence: `sh conformance.sh .` — 15 `ownership-header-missing`, 13
+    `ownership-header-field-missing`, 28 `update-trigger-absent` (the last is the union: a doc with no
+    header also has no trigger). Reconciled against an independent census of the same tree, which is
+    how a 14-vs-15 disagreement exposed a checker bug rather than a doc gap (→ L-140).
+  - Impact: low today, rising. `qa-check.sh` **relays** engine findings rather than counting them
+    (SPRINT-075 T2's ruling), so nothing is red and no gate is being ignored. The cost is that the
+    repo which publishes the standard does not satisfy this part of it, which is the gap an adopter
+    notices first — and it grows every time a doc lands without a header.
+  - Mitigation (hypothesis, not a plan — the filer's, written at close): add the four-field header to
+    the 15, and `update_trigger:` to the 13. Cheap and mechanical for `docs/qa/` and `docs/research/`.
+    **`docs/strategy/adlc/` is the judgement call**: EPIC-004 § Scope explicitly puts every ADLC
+    platform concept out of scope, and 12 of the 15 headerless docs live there — so the honest options
+    are *add headers to docs we have deliberately parked* or *decide that tree is not governed by §3
+    and say so where §3 can be read*. Re-derive before building a DoD on either.
+  - Sibling, not a duplicate: **TD-065**. Both are "the conformance corpus disagrees with itself", but
+    that row is a register miscount and this one is a real doc gap; a cure for either moves neither.
+
+- **TD-065** severity: trivial | status: open | created: Sprint-075
+  - Summary: **`docs/research/conformance-dispositions.md` still counts §13's five rules under
+    `build`**, though SPRINT-074 shipped `check-attestation.sh` covering them. § Covered today never
+    gained that row, so the register understates coverage by five.
+  - Evidence: § Covered today lists 12 rules / 5 checkers after SPRINT-075 T4 and T6; §13's
+    `S13.TRAILERS` · `S13.OWNCOMMIT` · `S13.EVIDENCESHA` · `S13.AGREE` · `S13.UNSIGNEDCLAIM` appear in
+    neither that table nor the engine's registry, while `check-attestation.sh` demonstrably answers
+    them. EPIC-004's § Closed-when 2 already records the same fact from the other side ("the `build`
+    remainder is 38 of 43, not 42").
+  - Impact: trivial in isolation — nothing reads these counts mechanically — but the register is the
+    thing a later sprint will price coverage work from, and it is wrong by five in the optimistic
+    direction. Named in the file itself at SPRINT-075 T6 rather than fixed in passing, because the
+    correction moves numbers three of its sections depend on.
+  - Mitigation (hypothesis, not a plan): one reconciliation pass over the register — add §13's row to
+    § Covered today, drop those five from `build`, re-derive `covered + build + scope-out = 63` by
+    counting rule ids in each table rather than editing the headers. Do it as its own change, not as a
+    rider on a coverage task, so the arithmetic is reviewable.
+
+- **TD-066** severity: minor | status: open | created: Sprint-075
+  - Summary: **the conformance engine takes ~47s on this repository, and the cost is process spawn.**
+    The §1/§3 assertions read 236 docs; the implementation is one cached tree walk plus one `awk` per
+    doc, which is already a ~12× improvement over the first version (~2,800 processes, a walk per rule
+    and an `awk` per field per doc, which made `qa-check.sh` look hung rather than slow).
+  - Evidence: `time sh scripts/lib/conformance-engine.sh .` → `real 46.9s · user 7.3s · sys 18.9s`.
+    The user/sys split is the finding: this is `fork`/`exec` overhead on Windows, not computation, and
+    the same work costs a few seconds where process creation is cheap. Behaviour was verified unchanged
+    across the optimisation by counts (15 / 13 / 28 before and after).
+  - Impact: it is a real tax on `qa-check.sh`, which an adopter never runs but this repo runs at every
+    gate — and the engine leg is now the slowest single leg. It gets worse linearly as coverage grows:
+    every family added walks the same doc set again unless it reuses the cache.
+  - Mitigation (hypothesis, not a plan — and one deliberately *rejected* variant is recorded with it):
+    the obvious next step is one `awk` over every file at once (~1 process instead of 236). **That was
+    rejected on purpose**: it needs a cross-file state machine and silently drops a zero-byte file,
+    because `awk` never reaches `FNR==1` for one — and a doc missing from the scan is a doc no rule
+    reports on, which is the silent skip this engine exists to prevent (L-058). If it is taken, it
+    needs a row-count reconciliation (rows emitted == files walked) as a named finding, not a comment.
+    The reasoning is written into `conformance-engine.sh` so the next person meets the argument before
+    the temptation.
 
 - **TD-063** severity: minor | status: open | created: Sprint-074
   - Summary: **`gen-index.sh --check` decides staleness with a byte compare that includes a field

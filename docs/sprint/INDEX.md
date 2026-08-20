@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-18
+last_updated: 2026-08-20
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -83,3 +83,4 @@ One line per archived sprint (newest first); files live in [`archive/`](archive/
 - SPRINT-072 — Conformance Baseline — closed 2026-08-16 · 87954f2 · 17 of 17 DoD (v1.46.0) · EPIC-004 (all 96 spec rules classified · the checkers do not check the standard) · TD-061 filed
 - SPRINT-073 — The Spec as Rule Source — closed 2026-08-16 · e7ce99b · 15 of 15 DoD (v1.47.0 · spec 0.4.0) · EPIC-004 (the spec becomes the rule source · ADR-026) · TD-058 resolved · TD-062 filed
 - SPRINT-074 — The First Spec-Driven Checker — closed 2026-08-18 · 6016738 · 15 of 15 DoD (v1.48.0 · spec 0.4.1) · EPIC-004 (first checker driven by the spec, not hard-coded · §13 attestation covered · Closed-when 4 ticked) · TD-037 resolved · TD-063 filed
+- SPRINT-075 — The Conformance Engine — closed 2026-08-20 · [sha — set at close] · 26 of 26 DoD (v1.49.0 · spec unchanged at 0.4.1) · EPIC-004 (one checker becomes the engine · engine gaps stop counting against the repo under test · ADR-027 · Closed-when 1 + 5 ticked) · TD-064/065/066 filed

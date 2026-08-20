@@ -3,10 +3,10 @@ sprint: 075
 slug: the-conformance-engine
 epic: EPIC-004
 owner: Maintainer
-last_updated: 2026-08-18
+last_updated: 2026-08-20
 plan_commit: 9693d79
 close_commit: [sha — set at close]
-status: active
+status: closed
 gates_signed: G1,G2 @ 203d202
 update_trigger: sprint execute/close events
 ---
@@ -66,18 +66,15 @@ provably identical to what the attestation checker derives today.
 - [x] §13's output is **unchanged** — *Verify: diff the reader's §13 rows against what
       `check-attestation.sh` derives today, mechanically. This is a refactor of a working parse; a
       behaviour change here is a regression, not an improvement*
-      → shipped parse lifted verbatim and diffed: **empty diff**, 7 rows each. The row anchor had to
-      widen to `[A-Z0-9-]+` or 26 rules would have been dropped silently. Log, T1.
+      → shipped parse lifted verbatim, **empty diff**, 7 rows each; the row anchor had to widen to `[A-Z0-9-]+` or 26 rules would have been dropped. Log, T1.
 - [x] An absent or unparseable table is a **named finding**, never an empty rule set — *Verify: a
       retained must-FAIL fixture pointing the reader at a spec with no tables reports
       `spec-table-unreadable`. A reader returning nothing checks nothing and exits clean, which is the
       false negative the whole engine would otherwise inherit (L-058)*
-      → `evals/run-spec-reader-fixtures.sh`, retained: **9 cases, 5 must-FAIL**, one per named finding,
-      shown to discriminate under seeded breaks (L-137). Log, T1.
+      → `run-spec-reader-fixtures.sh`: **9 cases, 5 must-FAIL**, shown to discriminate under seeded breaks. Log, T1.
 - [x] `check-attestation.sh` consumes the reader rather than keeping its own copy — *Verify:
       `evals/run-attestation-fixtures.sh` still green, all 16 assertions, unmodified*
-      → its 25-line parse is one call to the reader; **all 16 assertions green, harness file untouched**.
-      Registered in `qa-check.sh`'s always-on set (L-020). Log, T1.
+      → one reader call; **16 assertions green, harness untouched**; registered always-on (L-020). Log, T1.
 
 ### T2 — Build the engine core: registry, dispatch, report `[size: M · risk: med · class: execution · HITL]`
 Layers: `conformance.sh` (the standalone entry point at the repo root — **declared at execution**
@@ -103,8 +100,7 @@ and why.
 - [x] Dispatch is **mark-driven**, not a hard-coded list — *Verify: re-mark a rule in a spec copy and
       the engine's behaviour changes with no code edit, the same fixture shape SPRINT-074 used to prove
       it for §13*
-      → proven in BOTH directions with no code edit: re-marking `S13.NOINFER` mechanical makes the
-      engine dispatch it; re-marking `S1.LAW2` implementation-directed stops it. Log, T2.
+      → proven **both directions** with no code edit (`S13.NOINFER` on, `S1.LAW2` off). Log, T2.
 - [x] `judgment-only` and `implementation-directed` rules are **never evaluated against the repo** —
       *Verify: neither appears as a verdict line; a fixture asserts it. These are the findings no
       adopter can ever clear (§14)*
@@ -112,19 +108,15 @@ and why.
 - [x] A `mechanical` rule with no assertion reports `rule-unimplemented` — *Verify: retained must-FAIL
       fixture. With 34 dispositions still unbuilt this will fire a lot, and that is correct: the gap is
       the report's most useful content this sprint*
-      → retained must-FAIL case. **Re-pointed at T3's `GAP` class**: still named on every report, no
-      longer counted against the repo under test. Log, T2 · T3.
+      → retained must-FAIL case, **re-pointed at T3's `GAP` class**: still named, no longer counted against the repo. Log, T2 · T3.
 - [x] The report states a **level** and the findings preventing the next one — *Verify: fixture*
-      → `level: none -- Structural not yet reached. N finding(s) prevent it`, with the per-level
-      bucketing regression retained as its own case. Log, T2.
+      → `level: none -- Structural not yet reached. N finding(s) prevent it`, with the bucketing regression retained. Log, T2.
 - [x] **No score, grade or percentage appears anywhere in the output** — *Verify: a fixture greps the
       output for `%`, `score`, `grade` and a ratio shape and asserts absence. §14 forbids it
       normatively, so this is checked rather than trusted (L-058)*
-      → grepped for `%`, `score`, `grade` and a ratio shape on the largest run, **and** on the
-      `level: Attested` branch this repo never reaches. Log, T2.
+      → grepped on the largest run **and** on the `level: Attested` branch this repo never reaches. Log, T2.
 - [x] Exit 0 clean / 1 findings, CI-usable — *Verify: fixture asserts both, on the same repo*
-      → both asserted on the same repo. **Refined at T3**: the exit code answers for repository
-      findings only, never for engine gaps (ADR-027 marker). Log, T2 · T3.
+      → both asserted on one repo. **Refined at T3**: the exit code answers for repository findings only. Log, T2 · T3.
 
 ### T3 — Run the engine against a repo that has never seen lean-flow `[size: M · risk: med · class: decision · HITL]`
 Layers: `evals/run-foreign-repo-fixtures.sh` (the foreign-repo harness) ·
@@ -145,28 +137,20 @@ finding a reasonable owner would call meaningless.
 **DoD:**
 - [x] The engine runs against a repo built from scratch with none of our conventions — *Verify: the
       harness builds it under `mktemp -d`; no lean-flow file is copied in*
-      → `evals/run-foreign-repo-fixtures.sh` builds `acme-widget` (README · src · one doc ·
-      package.json) with printf under `mktemp -d`. **No lean-flow file is copied in, and the harness
-      asserts that mechanically** (exactly 4 files), so a later edit that copies a template in fails
-      loudly instead of quietly measuring our own shape (L-015 · L-016).
+      → a four-file repo under `mktemp -d`; **no lean-flow file copied in, asserted mechanically** (L-015 · L-016). Log, T3.
 - [x] It emits a level and named findings, and **nothing** for `judgment-only` /
       `implementation-directed` rules — *Verify: fixture asserts both halves*
       → level line + 2 named findings; **0** verdict lines for the 33 judgment-only / 6
-      implementation-directed rules, which appear as notes only. *Read as "no VERDICT line" — §14 and
-      EPIC-004 D1 both require a conformant report to NAME its judgment-required items, so emitting
-      nothing at all would breach the epic while satisfying the word. Stated, not silently reinterpreted
-      (L-088).*
+      implementation-directed rules. *Read as "no VERDICT line" — §14 and EPIC-004 D1 require a report to
+      NAME its judgment-required items. Stated, not silently reinterpreted (L-088).*
 - [x] **Every finding is triaged for actionability, and the verdict is recorded** — *Verify: a written
       pass over the output classifying each finding as *actionable by that repo's owner* or *an
       artefact of dispositions written against our own shape*. **A high artefact count is a finding
       about `docs/research/conformance-dispositions.md`, and routes back there** — do not tune the engine to look
       quiet (L-088: the criterion is the report being honest, not short)*
-      → **2 findings, both actionable, 0 artefacts** — table in the Log. Proven, not asserted:
-      applying exactly what they asked for takes the same repo to exit 0. **Recorded as weaker than it
-      looks** — at 6 of 62 rules implemented, the shape-bound dispositions (§2 placement, §6 tiers, §11
-      ledgers) are untouched, so the artefact question is barely asked yet, not answered.
-      **The run also changed the engine**: 56 of 58 FAIL lines were our own gaps, so a `GAP` class now
-      carries them off the adopter's level and exit code (owner ruling → ADR-027 refinement marker).
+      → **2 findings, both actionable, 0 artefacts** — and recorded as weaker than it looks: at 6 of 62
+      rules the shape-bound dispositions are untouched. Proven, not asserted — applying the prescribed fix
+      takes the repo to exit 0. **The run also changed the engine** (the `GAP` class). Detail → Log, T3.
 - [x] EPIC-004 § Closed-when 1 is ticked or the reason it is not is written down — *Verify: the epic
       row; a condition ticked without its evidence is the tick this sprint exists to avoid*
 
@@ -197,8 +181,7 @@ fixtures that guarded them still pass without being rewritten.
 - [x] Their named findings are reproduced **exactly** — *Verify: string-compare the engine's findings
       against the shipped checker's before deleting it. A renamed finding silently breaks a published
       contract (SPRINT-074 D2's reasoning, one family over)*
-      → deleted checker restored from git and run beside the engine over all five cases: `diff`
-      **IDENTICAL ×5**, verdict label included. Detail → Log, T4.
+      → deleted checker restored from git and diffed per case: **IDENTICAL ×5**, verdict label included. Log, T4.
 - [x] `check-gates-signed.sh` is deleted and `qa-check.sh` calls the engine instead — *Verify: the file
       is gone and the gate still reports the same verdicts*
       → file gone, `qa-check.sh`'s §9 leg calls the engine, same verdict on this repo's own sprint.
@@ -207,8 +190,7 @@ fixtures that guarded them still pass without being rewritten.
       `evals/run-gates-signed-fixtures.sh` green against the engine, including the load-bearing case
       where a **missing** field reads as NOT SIGNED rather than as approval. Deleting fixtures with the
       checker they guarded is TD-012 exactly*
-      → five original cases retained and green; repointed, not rewritten, against a reduced spec copy.
-      A **sixth** was added, not swapped in: `absent-is-not-labelled-a-pass`. Detail → Log, T4.
+      → five cases retained and green against a reduced spec copy; a **sixth** added, not swapped in. Log, T4.
 
 ### T5 — Amend or supersede ADR-008's maintainer-only scope `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/adr/` (new ADR) · `docs/DECISIONS.md` · `docs/adr/ADR-008-*.md` (status marker only) ·
@@ -230,16 +212,13 @@ consumer-facing, and what that does and does not commit lean-flow to.
 **DoD:**
 - [x] An ADR records the scope change and **rules explicitly on the CI sentence** — *Verify: the ADR
       names ADR-008's wording and says which reading now holds*
-      → [ADR-027](../adr/ADR-027-executable-code-becomes-consumer-facing.md) quotes the sentence and
-      rules: *lean-flow does not own your pipeline*, **not** *emits nothing a pipeline can use*. Both
-      halves stated. Detail → Log, T5.
+      → [ADR-027](../adr/ADR-027-executable-code-becomes-consumer-facing.md) quotes the sentence and rules on it; both halves stated. Log, T5.
 - [x] ADR-008 is marked amended/superseded, **never edited in place** — *Verify: the file; §4 is
       append-only for decided ADRs*
       → **amended, not superseded** — a `Scope amended by:` marker plus `related:`; no § Decision /
       Context / Consequences text altered, so §4's append-only rule holds.
 - [x] `docs/DECISIONS.md` gains its row — *Verify: the index*
-      → row added at the table head. Reconciled **27 rows == 27 `docs/adr/ADR-*.md` files** — the first
-      insert silently no-opped and only that disagreement caught it.
+      → row added; reconciled **27 rows == 27 ADR files** — the first insert silently no-opped and only that caught it.
 - [x] EPIC-004 § Closed-when 5 ticked — *Verify: the epic. It requires this be formally amended, "not
       silently outgrown", which is what four sprints of using the checkers consumer-ward already was*
       → ticked with its evidence in the epic; `docs/knowledge-index.md` regenerated (ADR-027 resolves
@@ -267,27 +246,20 @@ choose it.
       `update-trigger-absent` · `ownership-header-missing` · `ownership-header-field-missing` ·
       `agents-ownership-footer-missing` — *Verify: count assertions against the register's rows; a rule
       silently skipped is a FAIL*
-      → four assert_* functions registered; 5 of 5 names fire. Reconciled against the register:
-      12 covered rule ids == its header, 39 `build` == its header. Full detail → Log, T6.
+      → four `assert_*` registered, 5 of 5 names fire; register reconciled (12 covered ids · 39 `build`). Log, T6.
 - [x] **One retained must-FAIL fixture per named finding**, plus a PASS control — *Verify: the harness;
       each case fails with its own name (L-058 · TD-012)*
-      → `evals/run-ownership-header-fixtures.sh`, **11 cases, all green** — one retained must-FAIL per
-      published name, plus PASS controls and two regression cases.
+      → `evals/run-ownership-header-fixtures.sh`, **11 cases, all green**.
 - [x] `owner-not-a-role` does not fire on a legitimate role — *Verify: a PASS-control fixture using
       `Maintainer`. This is the one rule here that can produce a false positive on correct input, since
       distinguishing a role from a person is the judgment half of a `split` mark*
-      → PASS control `maintainer-is-a-role` green; 0 `owner-not-a-role` findings across this repo's
-      198 owner: values. **The Plan's parenthetical is imprecise and is not being reinterpreted to fit:
-      §14 marks `S1.LAW2` mechanical, not split** — the split it describes is §7's `S7.PERSON`. The
-      criterion (a PASS control using `Maintainer`) is met as written; the rationale beside it names the
-      wrong rule (L-136, at the smallest grain).
+      → PASS control green; 0 findings across 199 `owner:` values. **The Plan's parenthetical is
+      imprecise and is not reinterpreted to fit: §14 marks `S1.LAW2` mechanical, not split** — the split it
+      describes is §7's `S7.PERSON`. Criterion met as written (L-136, smallest grain).
 - [x] The fixtures were shown to **discriminate**, not merely pass — *Verify: seed a deliberately
       broken assertion and confirm the matching case reddens (L-137). Green on first run against
       fixtures written alongside the code proves agreement, not coverage*
-      → **10 breaks seeded, 10 discriminated**, engine restored under a verified sha1. Two of them
-      found real defects rather than confirming the suite: the ADR exemption went unnamed on an
-      ADR-only repo, and `owner-role-must-match-whole-value` proved nothing until its fixture changed
-      from `Alice, Maintainer` to `Main`. Break table → Log, T6.
+      → **10 breaks seeded, 10 discriminated**, engine restored under a verified sha1; two exposed real defects. Log, T6.
 
 ## Decisions (pre-locked)
 
@@ -369,12 +341,57 @@ choose it.
 | `docs/research/conformance-dispositions.md` | T4·T6 | § Covered today repointed off the deleted checker; four rules moved `build` → covered (**43 → 39**, **8 → 12**) | low | rule-id re-count in both tables |
 | `docs/epic/EPIC-004-conformance.md` | T5·T3 | § Closed-when 1 and 5 ticked with their evidence | low | review |
 
-**Not filled retrospectively:** T1 and T2's rows above were reconstructed from their commits and the
-Execution Log at close, since the table was left empty during their execution. Recorded so the next
-reader knows these two rows are secondhand while the rest were written by the task that made the change.
+**Note:** T1/T2 rows are secondhand — reconstructed at close from their commits and the Log, since the
+table was left empty during their execution.
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (STANDARD §10):
-     shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
-     After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Retrieval check** — no failure to find, and **one promoted rule that did not hold**. `L-120` was
+promoted one sprint ago for exactly this, and T4 was still committed through a red gate: the runner
+reported `exit 0` for `qa-check > out; echo $?` — `echo`'s status — while the file said `1 fail`. The
+promoted form said "two calls, read its exit code"; a redirect reads as capturing output, not gating
+an action. Re-promoted with the form that survives a wrapper: *read the gate's own `N pass, M fail`
+line* → **L-120 ×5**. **Fired when they mattered:** L-058 (gaps stay named, so separating gap from
+finding never became a silent skip) · L-137 (ten seeded breaks, two found real defects) · L-136 (the
+ADR's "12 checkers" re-derived to 11 before it froze) · L-100 (four `Layers:` corrections) · L-009.
+**Eighth sighting, still the corpus's most-repeated miss:** L-108 — a fixture named after the token
+its own assertion greps for, minutes after that sub-case was re-read.
+
+**Cost** — inline, coordinator-only; **zero sub-agents** (the session forbids the Agent tool). Four
+commits, 33 files. `qa-check.sh` ran **seven times** at ~5 min, of which the engine leg is 47s (→
+**TD-066**). Two runs were wasted measuring a tree that edits had already moved on from — a gate
+started before the edits finish measures something that no longer exists.
+
+**Worked**
+- **Two censuses, one subject.** Every count entering an artifact was derived twice. That caught the
+  `*/README.md` over-match (14 vs 15), a DECISIONS row that silently no-opped (26 vs 27), and the
+  ADR's checker count (12 vs 11). None was visible in a diff → **L-140**.
+- **Seeding breaks against an already-green suite** — ten breaks, ten discriminated, two exposing real
+  defects. A suite written beside its code agrees with it by construction → **L-137 ×2**.
+- **Running the tool on a subject whose answer we knew.** T3's value was that the report was *obviously*
+  wrong — 41 findings against a repo with two — which reading the code could not surface, because every
+  individual line was true → **L-141**.
+
+**Friction**
+- **The Plan hit its 400-line cap mid-close**, § Files Changed empty and § Retro unwritten. Resolved by
+  moving DoD evidence to the uncapped Log (ADR-014's split) rather than raising a spec number for every
+  adopter. Anticipate it at promote: **26 DoD does not fit a 400-line Plan at ~7 evidence lines each**,
+  and that arithmetic is doable before the sprint, not at its end.
+- **A migration proved itself with the check that could not see what it broke** — exact string equality
+  across five cases while the verdict label flipped underneath → **L-139**.
+- **The seeded-break pass reported green three times on patches that never landed**, and a timeout left
+  a break in the engine, caught only by an explicit `sha1sum` restore check.
+
+**Changed** — `rule-unimplemented` is no longer a finding about the repo under test but a `GAP`: named
+every time, off the level and exit code, coverage on its own axis. That overturned a sentence in
+**ADR-027**, accepted the same day, which now carries a refinement marker rather than an edit.
+Executable code here is formally consumer-facing; ADR-008 amended, not superseded. EPIC-004 §
+Closed-when **1 and 5** tick — the epic stands at **3 of 5** and does not close. **Coverage is 6 of 62
+checkable rules**, stated plainly because the headline could be read as "conformance is done": it is
+six rules with an assertion, and the register's `build` remainder is 39.
+
+**Filed** — Shipped → `CHANGELOG.md` **v1.49.0** (v1.47.0 rotated). Tech debt → **TD-064** (28 ownership
+gaps in our own docs) · **TD-065** (register still counts §13's five under `build`) · **TD-066** (the
+engine's spawn cost). Follow-ups → **TASK-237** (§3 owes an ADR row) · **TASK-238** (re-run the artefact
+triage once coverage reaches the shape-bound rules). Learnings → **L-139** · **L-140** · **L-141**, plus
+**L-120 ×5** (re-promoted) · **L-108 ×8** · **L-137 ×2** (promotion candidate next promote) · **L-100 ×4**.

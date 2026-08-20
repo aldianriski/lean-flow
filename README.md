@@ -311,6 +311,52 @@ Commit them, and your team — and their agents — start from the same map.
 
 ---
 
+## Check your repo against the standard
+
+The documentation standard lean-flow follows lives in [`spec/STANDARD.md`](spec/STANDARD.md), versioned
+independently of the plugin. One script tells you how your repository measures against it — **no install
+required**, and it works on a repo that has never heard of lean-flow:
+
+```sh
+sh conformance.sh /path/to/your-repo
+```
+
+You get a **conformance level**, the **named findings** preventing the next one, and the items the
+standard deliberately leaves to a human:
+
+```
+FAIL  ownership-header-missing: docs/architecture.md -- no YAML frontmatter block; §3 makes the
+      ownership header mandatory on every doc
+GAP   S2.F-FILE  -- rule-unimplemented: the spec marks this mechanical at level Structural and this
+      engine has no assertion for it yet ... it is a gap in THIS ENGINE, so it does not enter the
+      level below or the exit code
+      level: none -- Structural not yet reached. 2 finding(s) at Structural prevent it
+      coverage: 6 checkable rule(s) have an assertion in this engine; 56 are unchecked
+```
+
+Three things it will not do:
+
+- **No score, no grade, no percentage.** Counts only. A ratio would improve every time the standard
+  declined to automate something, which is backwards.
+- **Our gaps are not your findings.** A rule the standard states that the engine cannot yet check is a
+  `GAP` — always named, never silently skipped, but it never blocks your level or fails your build.
+  Coverage is reported as its own number so you can see what was actually checked.
+- **It never blocks.** Exit code is non-zero **exactly when a finding about your repository was
+  printed**, so you may gate CI on it if you want to — but lean-flow ships no workflow file and owns no
+  pipeline ([ADR-027](docs/adr/ADR-027-executable-code-becomes-consumer-facing.md)).
+
+**Two conventions you can set:** `--spec <path>` points it at your own vendored copy of the standard,
+and a `.conformance-roles` file (one role per line) declares the role vocabulary `owner:` is checked
+against — a declared file replaces the built-in default, so "only these roles" is sayable.
+
+Coverage is growing: **6 of the standard's rules** have an assertion in the engine today, with the
+rest reported as gaps by name. That number is printed by every run, so it never has to be taken on
+trust — and it is the engine's own count, not the repo's wider checker set.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
 ## Adapting to your repo
 
 Skills auto-discover at the repo root after install. There is **nothing to scaffold** — the skills
@@ -420,7 +466,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-08-18 · status: current · v1.48.0</sub>
+<sub>Doc owner: Maintainer · last updated 2026-08-20 · status: current · v1.49.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge
