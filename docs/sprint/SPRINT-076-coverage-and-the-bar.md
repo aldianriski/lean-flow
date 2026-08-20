@@ -4,7 +4,7 @@ slug: coverage-and-the-bar
 epic: EPIC-004
 owner: Maintainer
 last_updated: 2026-08-20
-plan_commit: [sha — set at promote]
+plan_commit: f6ae258
 close_commit: [sha — set at close]
 status: planned
 update_trigger: sprint execute/close events
