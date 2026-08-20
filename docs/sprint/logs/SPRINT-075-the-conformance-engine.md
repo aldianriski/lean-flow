@@ -201,3 +201,46 @@ signal an adopter gates on (DoD 6). **Follow-up filed at close:** gate this repo
 coverage shrinks the residue enough to be worth blocking on.
 
 qa-check: **159 pass, 0 fail**.
+
+### 2026-08-20 | progress | T4 — the §9 gates-signed family migrated into the engine
+
+The first consolidation. `scripts/lib/check-gates-signed.sh` is deleted and its two rules —
+`S9.GATESWELLFORMED` · `S9.GATESABSENT` — are now `assert_S9_*` functions inside the engine, dispatched
+from the spec's mark column like every other rule. `scripts/qa-check.sh`'s §9 leg calls the engine.
+EPIC-002 D3's four-times-deferred consolidation question is off the shelf for one family; the remaining
+ten follow per-family, each guarded by its own retained fixtures.
+
+**Exact reproduction was proven, not assumed.** The deleted checker was restored from git
+(`git show HEAD:scripts/lib/check-gates-signed.sh`) and run beside the engine against all five fixture
+cases: `diff` per case, **IDENTICAL ×5**. Only the path form is normalised, which the repo-dir
+interface necessarily changes. The published named-findings contract (L-058 · TD-012) survives the
+migration intact.
+
+The fixture harness is **repointed, not rewritten** — its diff swaps the target and adds a reduced-spec
+derivation; every case body survives. The reduction is load-bearing: handed the full spec, the other
+61 unimplemented ids fire against these throwaway fixture dirs and every "exit 0" case exits 1 for
+reasons this family does not own. The awk derivation carries only §9's two rows.
+
+qa-check: **159 pass, 0 fail** — re-verified green at commit time (exit 0).
+
+### 2026-08-20 | surprise | T4 — five green fixtures while the engine called an unsigned sprint PASS
+
+The migration reproduced every finding *string* exactly and still got the verdict wrong. All five
+original cases passed while the engine rendered a sprint with **no `gates_signed:` field** as `PASS` and
+reached `level: Attested` on it — the precise failure §9 exists to prevent, and the one L-099 wrote the
+field for.
+
+Root cause was in the driver, not the assertion. `S9.GATESABSENT` on an absent field emits *only a
+note*: §9 states it as "field absent ⇒ NOT SIGNED, never approval", so it may not report a pass. The
+engine had `last_bad` but no counterpart, so it inferred **passed** from **did not fail** — collapsing
+three outcomes into two and counting a note-only assertion as a pass. Fixed by adding `last_ok`, set
+by `ok()` alone, so "reported without a verdict" is its own state.
+
+Why the fixtures missed it: **all five asserted finding text, none asserted the verdict label.** The
+string-compare that proved DoD 2 is exactly the check that cannot see a flipped label — it was
+comparing the halves of the line that were right. A sixth case was **added, not swapped in** —
+`absent-is-not-labelled-a-pass` — asserting the label and the level line rather than the text.
+
+The general shape, one register over from L-103: **a check that compares the part you migrated cannot
+see the part you rewrote.** Reproducing a message verbatim is evidence about the message; the verdict
+it carries is a separate claim needing its own case.

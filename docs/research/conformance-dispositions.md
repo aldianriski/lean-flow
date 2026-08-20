@@ -38,7 +38,7 @@ one: a ratio would improve every time the standard declines to automate somethin
 |---|---|
 | `S2.F-CAP` · `S7.MEGA` · `S7.SPRINT400` | `check-doc-caps.sh` |
 | `S2.R-TEMPDIR` | `check-ephemeral-intake.sh` |
-| `S9.GATESWELLFORMED` · `S9.GATESABSENT` | `check-gates-signed.sh` |
+| `S9.GATESWELLFORMED` · `S9.GATESABSENT` | `conformance-engine.sh` *(migrated off `check-gates-signed.sh`, SPRINT-075 T4 — the first family consolidated into the engine; the named findings are unchanged)* |
 | `S11.EPIC` | `check-epic-archive.sh` |
 | `S11.RESEARCH` | `check-research-archive.sh` |
 

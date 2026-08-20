@@ -98,7 +98,10 @@ Layers: `conformance.sh` (the standalone entry point at the repo root — **decl
         · `evals/` (engine fixtures)
 Depends-on: T1
 Cites: EPIC-004 D1 · D2 (settled at intake) · `spec/STANDARD.md` §14 (levels, marks, the
-       no-percentage rule) · ADR-021
+       no-percentage rule) · ADR-021 · `read-spec-rules.sh` (T1's reader — **consumed, not
+       modified**, which is why it sits here and not in `Layers:`) · `S13.NOINFER` · `S1.LAW2`
+       (the two rule ids the mark-driven fixtures re-mark in a spec copy to prove dispatch reads the
+       Mark column each run)
 The engine is the §13 checker's dispatch loop with the rule set widened and the report generalised. Its
 whole correctness claim is that **the spec decides what gets evaluated** — so the mark column drives
 inclusion, and a rule the spec states but the engine cannot answer is reported rather than absent.
@@ -201,17 +204,40 @@ the remaining ten follow per-family, each guarded by its own fixtures.
 fixtures that guarded them still pass without being rewritten.
 
 **DoD:**
-- [ ] `S9.GATESWELLFORMED` and `S9.GATESABSENT` are evaluated by the engine — *Verify: both appear as
+- [x] `S9.GATESWELLFORMED` and `S9.GATESABSENT` are evaluated by the engine — *Verify: both appear as
       verdict lines against a sprint file*
-- [ ] Their named findings are reproduced **exactly** — *Verify: string-compare the engine's findings
+      → both dispatch and print against a real sprint file. Against this repo:
+      `PASS  gates-signed: docs/sprint/SPRINT-075-...md -- G1,G2 signed @ 203d202` (S9.GATESWELLFORMED)
+      and `gates-signed: ... -- not evaluated by S9.GATESABSENT: field present (see S9.GATESWELLFORMED)`
+      — the pair is **mutually exclusive by construction**, so each names the other rather than going
+      silent, and *absent* is distinguishable from *not run*. The absent branch is exercised by the
+      retained fixtures: `NOT SIGNED (no gates_signed: field)`, emitted as an unlabelled note, never a
+      PASS.
+- [x] Their named findings are reproduced **exactly** — *Verify: string-compare the engine's findings
       against the shipped checker's before deleting it. A renamed finding silently breaks a published
       contract (SPRINT-074 D2's reasoning, one family over)*
-- [ ] `check-gates-signed.sh` is deleted and `qa-check.sh` calls the engine instead — *Verify: the file
+      → the deleted checker was restored from git (`git show HEAD:scripts/lib/check-gates-signed.sh`)
+      and run against all five fixture cases beside the engine; `diff` per case: **IDENTICAL ×5**.
+      Only the path form is normalised, which the repo-dir interface necessarily changes. **The
+      comparison includes the leading `PASS`/`FAIL`/note label**, and that mattered — the first
+      migration reproduced the text while flipping the label (see the T4 review entry in the Log).
+- [x] `check-gates-signed.sh` is deleted and `qa-check.sh` calls the engine instead — *Verify: the file
       is gone and the gate still reports the same verdicts*
-- [ ] **The fixture harness is retained and repointed, not rewritten** — *Verify:
+      → the file is gone (`git status` shows ` D`), `qa-check.sh`'s §9 leg calls the engine, and the
+      gate reports the same verdict for this repo's own sprint: `PASS gates-signed:
+      docs/sprint/SPRINT-075-...md -- G1,G2 signed @ 203d202`. **qa-check: 159 pass, 0 fail.**
+- [x] **The fixture harness is retained and repointed, not rewritten** — *Verify:
       `evals/run-gates-signed-fixtures.sh` green against the engine, including the load-bearing case
       where a **missing** field reads as NOT SIGNED rather than as approval. Deleting fixtures with the
       checker they guarded is TD-012 exactly*
+      → all five original cases retained and green against the engine; the file is repointed, not
+      rewritten (its `git diff` swaps the target and adds the reduced-spec derivation, while every case
+      body survives). The engine is handed a **reduced spec copy** carrying only §9's two rows, derived
+      from the shipped spec by awk — otherwise the other 61 unimplemented ids would fire against these
+      throwaway fixture dirs and every "exit 0" case would exit 1 for reasons this family does not own.
+      **A sixth case was added, not swapped in** — `absent-is-not-labelled-a-pass`, asserting the
+      *verdict label* rather than the finding text: all five originals passed while the migration was
+      rendering an unsigned sprint as `PASS`.
 
 ### T5 — Amend or supersede ADR-008's maintainer-only scope `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/adr/` (new ADR) · `docs/DECISIONS.md` · `docs/adr/ADR-008-*.md` (status marker only)

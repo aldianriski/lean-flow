@@ -158,35 +158,6 @@ else
   fi
 fi
 
-# --- 2f. Gate sign-off recorded where an unattended run can read it ------------------------------
-# night-run Part 1 required batch G1/G2 to be "already signed off" and never said the sign-off had to
-# live in the sprint artifact, so a run reading only the sprint file saw nothing, re-ran both gates,
-# reached for AskUserQuestion (unregistered headless) and parked every task (SPRINT-057 T5, L-099).
-# The guarded failure is a MISSING field read as approval, so absence is reported rather than passed
-# over. Covered by evals/run-gates-signed-fixtures.sh.
-gs_script="scripts/lib/check-gates-signed.sh"
-if [ ! -f "$gs_script" ]; then
-  bad "gates signed: checker not found at $gs_script"
-else
-  gs_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
-  if [ -z "$gs_files" ]; then
-    note "gates signed: skip (missing): docs/sprint/SPRINT-*.md"
-  else
-    gs_out=$(sh "$gs_script" $gs_files 2>&1); gs_code=$?
-    printf '%s\n' "$gs_out"
-    gs_pass=$(printf '%s\n' "$gs_out" | grep -cE '^PASS')
-    gs_fails=$(printf '%s\n' "$gs_out" | grep -cE '^FAIL')
-    pass=$((pass + gs_pass))
-    if [ "$gs_code" -ne 0 ]; then
-      if [ "$gs_fails" -gt 0 ]; then
-        fail=$((fail + gs_fails))
-      else
-        bad "gates signed: checker exited $gs_code without reporting a FAIL line"
-      fi
-    fi
-  fi
-fi
-
 # --- 2f-bis. §13 attestation on HEAD, read from the spec rather than from this script -------------
 # The first checker here that learns its rule set from spec/STANDARD.md §13's Conformance table
 # instead of hard-coding it (SPRINT-074 T2, EPIC-004 D1). Run against HEAD so the repository is
@@ -221,29 +192,45 @@ else
   fi
 fi
 
-# --- 2f-ter. The conformance engine, run against THIS repo -- informational, not yet gating -------
+# --- 2f-ter. The conformance engine, run against THIS repo -- mostly informational, not yet gating -
 # SPRINT-075 T2. "This repo becomes its own first consumer" -- so the engine runs here, against `.`,
-# on every gate, and its full report is relayed exactly like every other leg's. What differs from
-# leg 2f-bis: it does NOT add its PASS/FAIL counts into this gate's own pass/fail tally.
+# on every gate, and its full report is relayed exactly like every other leg's. Almost all of that
+# report does NOT add its PASS/FAIL counts into this gate's own pass/fail tally.
 #
 # Why not, when attestation above does: attestation only ever evaluates §13's five rules, and all
 # five have real assertions -- it is fully covered, so gating on it reports a real regression. This
-# engine sweeps EVERY section's rules, and T2 ships the driver only: 34 of 43 `build` dispositions
-# are still unbuilt after T4/T6 land their six this same sprint (docs/research/conformance-
-# dispositions.md). Gating THIS gate on that would turn qa-check.sh permanently red over tracked,
-# scheduled-for-later-sprints coverage gaps -- not a regression -- for as long as those dispositions
-# stay unbuilt, which is many sprints (§ Scope explicitly defers the remaining 34 past this one). A
+# engine sweeps EVERY section's rules, and most are still unbuilt: 34 of 43 `build` dispositions
+# remain after T4/T6 land their six this same sprint (docs/research/conformance-dispositions.md).
+# Gating THIS gate on all of that would turn qa-check.sh permanently red over tracked, scheduled-
+# for-later-sprints coverage gaps -- not a regression -- for as long as those dispositions stay
+# unbuilt, which is many sprints (§ Scope explicitly defers the remaining 34 past this one). A
 # rule-unimplemented finding is exactly the report's most useful content right now (DoD 3); the exit
 # code the engine itself hands back is the CI-usable signal once a consumer's coverage is adequate to
 # gate on -- this repo's own qa-check gets there once T4/T6 (and later families) have shrunk the gap
 # enough that the residue is worth blocking on, not before. Revisit as a follow-up once that's true.
+#
+# The ONE exception (SPRINT-075 T4): S9.GATESWELLFORMED / S9.GATESABSENT are FULLY covered here --
+# real assertions, not a rule-unimplemented gap -- migrated off the now-deleted
+# scripts/lib/check-gates-signed.sh, which used to run as its own gating leg (night-run Part 1
+# required batch G1/G2 to be "already signed off" and never said the sign-off had to live in the
+# sprint artifact; a run reading only the sprint file saw nothing, re-ran both gates, reached for
+# AskUserQuestion (unregistered headless) and parked every task -- SPRINT-057 T5, L-099). Rather than
+# invoke the engine a second time just for two ids, this leg pulls their verdict lines out of the ONE
+# full run below and folds only those into the tally -- the guarded failure (a MISSING field read as
+# approval) still gates this script exactly as it did as a standalone checker.
+# Covered by evals/run-gates-signed-fixtures.sh, repointed at the engine.
 ce_script="scripts/lib/conformance-engine.sh"
 if [ ! -f "$ce_script" ]; then
   bad "conformance engine: checker not found at $ce_script"
 else
   ce_out=$(sh "$ce_script" . 2>&1); ce_code=$?
   printf '%s\n' "$ce_out"
-  note "conformance engine: informational only this sprint (exit $ce_code, not counted toward pass/fail) -- see the comment above this leg for why"
+  gs_lines=$(printf '%s\n' "$ce_out" | grep -E '^(PASS|FAIL)  gates-signed:')
+  gs_pass=$(printf '%s\n' "$gs_lines" | grep -cE '^PASS')
+  gs_fails=$(printf '%s\n' "$gs_lines" | grep -cE '^FAIL')
+  pass=$((pass + gs_pass))
+  fail=$((fail + gs_fails))
+  note "conformance engine: informational only this sprint except S9.GATESWELLFORMED/S9.GATESABSENT above (exit $ce_code overall; $gs_pass gates-signed PASS, $gs_fails gates-signed FAIL folded into this gate's own tally) -- see the comment above this leg for why the rest is not"
 fi
 
 # --- 2g. A recorded completed run carries its rollup ---------------------------------------------

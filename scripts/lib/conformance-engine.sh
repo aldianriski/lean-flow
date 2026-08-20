@@ -47,7 +47,13 @@ set -u
 
 fail=0
 last_bad=0
-ok()   { printf 'PASS  %s\n' "$1"; }
+# `last_ok` is the counterpart `last_bad` needed and did not have. Without it the driver inferred
+# "passed" from "did not fail", which silently counts a THIRD outcome as a pass: an assertion that
+# legitimately emits only notes. S9.GATESABSENT on an absent field is exactly that -- §9 states it as
+# "field absent => NOT SIGNED, never approval", so it may not report a pass, and the engine was
+# counting it as one and reaching `level: Attested` on an unsigned sprint (SPRINT-075 T4 review).
+last_ok=0
+ok()   { last_ok=1; printf 'PASS  %s\n' "$1"; }
 # `last_bad` is reset before each dispatch call and read right after -- `fail` alone cannot tell a
 # caller whether THIS call failed once a prior call has already set it (a boolean flag has no memory
 # of which call flipped it), which is what the per-level counters below need to know.
@@ -94,6 +100,117 @@ note "rule source: $spec -- $n_rules rules read across every section. Rule set a
 # insertion anchor a fixture can awk/sed after, the same convention as evals/lib/harness-common.sh's
 # anchor extraction.
 # registry:insert-point
+
+# --- §9 gates-signed family (SPRINT-075 T4) -------------------------------------------------------
+# Migrated from scripts/lib/check-gates-signed.sh (now deleted), which guarded a specific failure:
+# a MISSING `gates_signed:` field being treated as approval. An unattended run reads the sprint file
+# and nothing else, so a sign-off held only in a session transcript is invisible to it (L-099). Its
+# three states stay distinct across the two rule ids the spec's §9 table publishes for this field:
+#
+#   field absent               -> S9.GATESABSENT reports NOT SIGNED. Never a FAIL of this rule -- a
+#                                  sprint may legitimately sit unsigned between promote and the gate
+#                                  pass -- but never rendered as a pass either.
+#   field present, garbled     -> S9.GATESWELLFORMED FAILs. A record nobody can parse looks like
+#                                  evidence and is worse than none.
+#   field present, well-formed -> S9.GATESWELLFORMED PASSes, naming the gates and the commit.
+#
+# An unfilled template placeholder (`gates_signed: [G1,G2 @ <sha> ...]`) counts as ABSENT, not as a
+# value -- the template ships the field commented-out-by-placeholder, and without this an unfilled
+# template would bless a sprint nobody signed.
+
+# _s9_gates_fmv <file> -- the frontmatter value of `gates_signed:`; empty for both a genuinely absent
+# field and an unfilled template placeholder (both read as absence, never as a value).
+_s9_gates_fmv() {
+  v=$(awk -v k=gates_signed 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1")
+  case "$v" in "["*) v="" ;; esac
+  printf '%s' "$v"
+}
+
+# _s9_active_sprints <repo> -- docs/sprint/SPRINT-*.md paths, repo-relative, one per line. The glob is
+# NON-RECURSIVE (S9.LOGDIR: load-bearing) so docs/sprint/archive/ is excluded by construction; the
+# explicit path guard below is defence in depth, matching check-gates-signed.sh's stated scoping --
+# a closed sprint is history and its record is not re-litigated.
+_s9_active_sprints() {
+  for f in "$1"/docs/sprint/SPRINT-*.md; do
+    [ -f "$f" ] || continue
+    case "$f" in */archive/*) continue ;; esac
+    printf '%s\n' "docs/sprint/${f##*/}"
+  done
+}
+
+assert_S9_GATESWELLFORMED() {
+  repo=$1
+  files=$(_s9_active_sprints "$repo")
+  if [ -z "$files" ]; then
+    note "S9.GATESWELLFORMED  -- no active sprint files under docs/sprint/*.md (docs/sprint/archive/ is out of scope) -- nothing to verify"
+    return
+  fi
+  saved_ifs9=$IFS
+  IFS='
+'
+  for sp in $files; do
+    IFS=$saved_ifs9
+    gs=$(_s9_gates_fmv "$repo/$sp")
+    if [ -z "$gs" ]; then
+      note "gates-signed: $sp -- not evaluated by S9.GATESWELLFORMED: field absent or an unfilled template placeholder (see S9.GATESABSENT)"
+      IFS='
+'
+      continue
+    fi
+    gates=$(printf '%s' "$gs" | sed -n 's/^\([^@]*\)@.*/\1/p' | tr -d ' ')
+    sha=$(printf '%s' "$gs" | sed -n 's/^[^@]*@[ ]*\([0-9a-f]\{7,40\}\).*/\1/p')
+    if [ -z "$gates" ] || [ -z "$sha" ]; then
+      bad "gates-signed: $sp -- malformed gates_signed: '$gs' (want '<GATE>[,<GATE>] @ <sha>'); a record nobody can parse looks like evidence and is worse than none"
+      IFS='
+'
+      continue
+    fi
+    case "$gates" in
+      *[!G0-9,]*)
+        bad "gates-signed: $sp -- unrecognised gate token in '$gates' (want G1 / G2, comma-separated)"
+        IFS='
+'
+        continue
+        ;;
+    esac
+    ok "gates-signed: $sp -- $gates signed @ $sha"
+    IFS='
+'
+  done
+  IFS=$saved_ifs9
+}
+
+assert_S9_GATESABSENT() {
+  repo=$1
+  files=$(_s9_active_sprints "$repo")
+  if [ -z "$files" ]; then
+    note "S9.GATESABSENT      -- no active sprint files under docs/sprint/*.md (docs/sprint/archive/ is out of scope) -- nothing to verify"
+    return
+  fi
+  saved_ifs9=$IFS
+  IFS='
+'
+  for sp in $files; do
+    IFS=$saved_ifs9
+    gs=$(_s9_gates_fmv "$repo/$sp")
+    if [ -z "$gs" ]; then
+      # `note`, NOT `ok` -- and this is the whole rule, not a formatting preference. §9's row states
+      # S9.GATESABSENT as "field absent => NOT SIGNED, never approval", and the checker this migrated
+      # from used note() for the same reason its header spells out: absence is REPORTED, never a FAIL
+      # (a sprint legitimately sits unsigned between promote and the gate pass) and never a pass
+      # either. Emitting `PASS  ... NOT SIGNED ...` renders an unsigned sprint as approved to anything
+      # reading verdict labels, and carries it into the summary as a level the repo has not earned --
+      # which is the rendering the rule exists to forbid. The finding TEXT alone is not the contract;
+      # its verdict class is part of it (SPRINT-075 T4, caught in coordinator review).
+      note "gates-signed: $sp -- NOT SIGNED (no gates_signed: field). An unattended run must treat this as unsigned, never as approval"
+    else
+      note "gates-signed: $sp -- not evaluated by S9.GATESABSENT: field present (see S9.GATESWELLFORMED)"
+    fi
+    IFS='
+'
+  done
+  IFS=$saved_ifs9
+}
 # ==================================================================================================
 
 # ==================================================================================================
@@ -101,7 +218,7 @@ note "rule source: $spec -- $n_rules rules read across every section. Rule set a
 # while read` runs the loop in a subshell, where every bad() would set a `fail` the parent never sees
 # (a report disagreeing with its artifact -- this repo's own most-repeated failure class).
 # ==================================================================================================
-n_pass=0; n_judgment=0; n_impl=0; n_unclassified=0
+n_pass=0; n_judgment=0; n_impl=0; n_unclassified=0; n_reported=0
 struct_fail=0; gated_fail=0; attested_fail=0
 
 saved_ifs=$IFS
@@ -125,6 +242,7 @@ for row in $rules; do
       ;;
     mechanical|split)
       last_bad=0
+      last_ok=0
       if command -v "$fn" >/dev/null 2>&1; then
         "$fn" "$repo_abs"
       else
@@ -136,8 +254,14 @@ for row in $rules; do
           Gated)      gated_fail=$((gated_fail + 1)) ;;
           Attested)   attested_fail=$((attested_fail + 1)) ;;
         esac
-      else
+      elif [ "$last_ok" -eq 1 ]; then
         n_pass=$((n_pass + 1))
+      else
+        # Reported without a verdict: the assertion ran, said something, and deliberately claimed
+        # neither pass nor fail. Counted separately because folding it into either one misstates the
+        # report -- into `passed` it manufactures approval the rule refuses to give, and into a
+        # failure it blocks a level over something that is not a finding.
+        n_reported=$((n_reported + 1))
       fi
       ;;
     "?")
@@ -163,8 +287,15 @@ elif [ "$gated_fail" -gt 0 ]; then
 elif [ "$attested_fail" -gt 0 ]; then
   note "level: Gated -- $attested_fail finding(s) at Attested prevent Attested, the next level (see FAIL lines above)"
 else
-  note "level: Attested -- every dispatched rule passed"
+  # "No finding at any level" and "every rule passed" are not the same statement, and the second one
+  # is the dangerous paraphrase: a run where every dispatched rule reported without a verdict has no
+  # findings either, and calling that "passed" hands back approval nothing earned.
+  if [ "$n_pass" -gt 0 ]; then
+    note "level: Attested -- no finding at any level; $n_pass dispatched rule(s) passed"
+  else
+    note "level: Attested -- no finding at any level, but NO rule actually passed ($n_reported reported without a verdict). This states the absence of findings, not evidence of conformance"
+  fi
 fi
-note "counts: $n_pass passed, $n_judgment judgment-required, $n_impl excluded (implementation-directed)$([ "$n_unclassified" -gt 0 ] && printf ', %s unclassified' "$n_unclassified")"
+note "counts: $n_pass passed, $n_judgment judgment-required, $n_impl excluded (implementation-directed)$([ "$n_reported" -gt 0 ] && printf ', %s reported without a verdict' "$n_reported")$([ "$n_unclassified" -gt 0 ] && printf ', %s unclassified' "$n_unclassified")"
 
 exit $fail
