@@ -18,7 +18,9 @@ status: current
 
 ## Active Sprint
 
-_(no active sprint)_ — SPRINT-075 closed at **26 of 26 DoD**; the next sprint is formed by `/lean-doc-generator promote` from the Backlog below.
+> **SPRINT-076 — Coverage, and Whether the Bar Is Right** → [`docs/sprint/SPRINT-076-coverage-and-the-bar.md`](docs/sprint/SPRINT-076-coverage-and-the-bar.md) — EPIC-004's fifth member. Five tasks, 20 DoD: the fixture audit that closes § Closed-when 3 or says why it cannot (T1) · the §4 ADR family (T2) · §2's placement pair, chosen *because* it is the likeliest artefact source (T3) · a ruling on § Closed-when 2 with real numbers (T4) · §3's two unstated exceptions (T5). **Gates not yet signed** — `/orchestrator` runs G1+G2 first; `gates_signed:` is absent and its absence means NOT signed, never approval.
+>
+> **T4 is the one that must not run early.** It rules on whether the epic's remaining bar stands, and its whole value is deciding with T1/T2/T3's numbers in hand. Run it before them and it becomes the guess it exists to replace — and amending an exit condition to fit what got built is the failure L-088 names.
 
 ---
 
@@ -30,15 +32,104 @@ _(no active sprint)_ — SPRINT-075 closed at **26 of 26 DoD**; the next sprint 
 
 ### P1 — Next Phase Required
 
+- [ ] TASK-239 — Audit whether every shipped check has a retained must-FAIL fixture firing its named finding  [size: M] [risk: med] [HITL]
+      class:      decision
+      done-when:  a written pass over **every** check in `scripts/lib/` and every `assert_*` in the
+                  engine, classifying each as *has a retained must-FAIL fixture asserting its named
+                  finding* or *does not* — with the gap list named, not summarised. EPIC-004 §
+                  Closed-when 3 is then ticked with that evidence, or the reason it cannot be is
+                  written down. **A count is not the deliverable**: SPRINT-072 measured 22 harnesses ·
+                  98 cases · 46 findings and that told nobody whether *every* check has one
+      touches:    docs/research/ (the audit record) · evals/ (only if the audit finds a gap worth
+                  closing in this task) · docs/epic/EPIC-004-conformance.md (§ Closed-when 3)
+      depends-on: none
+      assumes:    the published named-findings set is the contract to audit against, not a list to
+                  re-derive (L-058 · TD-012). **The audit is a query over the corpus, so it gets a
+                  cross-check**: reconcile findings-with-fixtures + findings-without against the
+                  register's total, and expect the first number to be wrong (L-108 has eight sightings,
+                  every one caught by a second number disagreeing)
+      tracker:    EPIC-004 § Closed-when 3 · SPRINT-072 (the 22/98/46 measurement) · L-058 · TD-012
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-240 — Cover the §4 ADR family: `S4.ONEFILE` · `S4.APPEND` · `S4.INDEX` · `S4.SECTIONS` · `S4.NEGATIVE`  [size: M] [risk: med] [AFK]
+      class:      execution
+      done-when:  all five rules are evaluated by the engine, firing the five **already-published**
+                  names — `adr-path-noncanonical` · `adr-edited-after-decision` ·
+                  `decisions-index-missing-adr` · `adr-required-section-missing` ·
+                  `adr-no-negative-consequence` — each with **one retained must-FAIL fixture plus a
+                  PASS control**, and the suite shown to discriminate under seeded breaks with the seed
+                  verified to have landed
+      touches:    scripts/lib/conformance-engine.sh (assertions) · evals/run-adr-family-fixtures.sh +
+                  evals/fixtures/ · scripts/qa-check.sh (register the harness — the completeness leg
+                  fails an ungated one) · docs/research/conformance-dispositions.md (5 rules move
+                  `build` → covered)
+      depends-on: none
+      assumes:    **`S4.APPEND` is the one that cannot be answered from the tree alone** — "never edit a
+                  decided ADR" is a claim about history, so it reads `git log`, the way
+                  `check-attestation.sh` does. It is also the only Gated rule here; the other four are
+                  Structural. This repo's 27 ADRs are the test corpus, and **ADR-008 and ADR-027 both
+                  carry legitimate post-decision markers**, so the rule must pass on a marker and fail
+                  on an edited § Decision — that distinction is the task, not a detail
+      tracker:    `docs/research/conformance-dispositions.md` § build · spec §4 · EPIC-004 § Closed-when 2
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-241 — Cover §2's placement pair (`S2.F-FILE` · `S2.R-PLACEMENT`) and re-run the foreign-repo artefact triage against it  [size: M] [risk: med] [HITL]
+      class:      decision
+      done-when:  both rules are evaluated, firing `core-file-missing` and
+                  `file-outside-canonical-placement`, each with a retained must-FAIL fixture and a PASS
+                  control — **and** the foreign-repo harness is re-run and every new finding is
+                  triaged *actionable by that repo's owner* vs *artefact of dispositions written
+                  against our shape*, with the verdict recorded. A high artefact count is a finding
+                  about `conformance-dispositions.md` and routes back there; the engine is not tuned to
+                  look quiet
+      touches:    scripts/lib/conformance-engine.sh · evals/run-foreign-repo-fixtures.sh (extend the
+                  target) · evals/ fixtures · scripts/qa-check.sh ·
+                  docs/research/conformance-dispositions.md (only if artefacts are found)
+      depends-on: none
+      assumes:    **this pair was chosen because it is the most likely to produce artefacts, not the
+                  least** — SPRINT-075 T3's log named §2 placement as a prime shape-bound suspect, and
+                  its "0 artefacts" result was recorded as *barely asked* rather than answered. A
+                  result of "several artefacts" is a **success** for this task: it is the evidence
+                  TASK-242 needs. Closes TASK-238's trigger (coverage reaching the shape-bound rules)
+      tracker:    SPRINT-075 T3 · TASK-238 · EPIC-004 § Closed-when 1 · L-015 · L-016
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-242 — Rule on EPIC-004's Closed-when 2 with the coverage evidence in hand  [size: S] [risk: med] [HITL]
+      class:      decision
+      done-when:  a written ruling on whether *"every spec rule maps to a check, or is explicitly marked
+                  judgment-only"* stays as the epic's exit condition or is amended to the roadmap's
+                  looser Phase A exit (*"rules independently readable + conformance independently
+                  measurable"*). Either way it is **recorded, with its reason** — an ADR if the
+                  condition is amended, a Retro ruling if it stands. The epic's § Closed-when reflects
+                  the outcome
+      touches:    docs/epic/EPIC-004-conformance.md · docs/adr/ (only if the condition is amended) ·
+                  docs/DECISIONS.md (with an ADR)
+      depends-on: TASK-239, TASK-240, TASK-241
+      assumes:    **amending an exit condition to fit what was built is the failure L-088 names**, so
+                  this task exists to make that decision deliberately rather than by drift. It runs
+                  LAST and only with real numbers: coverage after this sprint, the artefact count from
+                  TASK-241, and the fixture gap list from TASK-239. If the honest answer is "the bar
+                  stands and EPIC-004 runs several more coverage sprints", that is a legitimate outcome
+                  and the task records it
+      tracker:    EPIC-004 § Closed-when 2 · docs/strategy/adlc/03-ADLC-ROADMAP.md Phase A · L-088
+      origin:     decomposer
+      state:      ready
+
 ### P2 — Quality / Polish
 
 - [ ] TASK-237 — Give §3 an explicit ADR row, the way it already names README and AGENTS.md  [size: S] [risk: low] [HITL]
       class:      decision
-      done-when:  `spec/STANDARD.md` §3 states that ADRs carry ADR-009 knowledge metadata instead of
-                  the four-field ownership header, alongside its existing README and AGENTS.md
-                  exceptions — and `conformance-engine.sh` cites that row rather than carrying the
-                  ruling only in its own comment. Spec PATCH, not MINOR: it writes down an exception
-                  adopters were already relying on, so nothing they satisfy today changes
+      done-when:  `spec/STANDARD.md` §3 states TWO things it currently leaves unwritten: (a) ADRs carry
+                  ADR-009 knowledge metadata instead of the four-field ownership header, alongside its
+                  existing README and AGENTS.md exceptions; and (b) **a strategy/exploratory tree is
+                  not a governed doc set** — input to decisions, not a doc under §3 — which is what
+                  `docs/strategy/adlc/` is by its own README. `conformance-engine.sh` then cites those
+                  rows rather than carrying either ruling only in a code comment, and stops reporting
+                  12 findings nobody intends to act on. Spec PATCH, not MINOR: both write down
+                  exceptions adopters already rely on, so nothing they satisfy today changes
       touches:    spec/STANDARD.md (§3) · spec/CHANGELOG.md · scripts/lib/conformance-engine.sh (the
                   comment citing the ruling) · docs/research/conformance-dispositions.md if the note
                   there needs re-pointing
@@ -48,7 +139,8 @@ _(no active sprint)_ — SPRINT-075 closed at **26 of 26 DoD**; the next sprint 
                   written*: today it lives in code plus a report line, which is the wrong home for a
                   statement about what the standard requires. **§4 ships the template that creates the
                   conflict**, so re-read §4's frontmatter block before wording §3's row
-      tracker:    SPRINT-075 T6 · spec/STANDARD.md §3 · §4 · ADR-009
+      tracker:    SPRINT-075 T6 · TD-064 (its docs/strategy/adlc/ half, ruled at SPRINT-076 promote) ·
+                  spec/STANDARD.md §3 · §4 · ADR-009
       origin:     close-retro
       state:      ready
 
