@@ -41,8 +41,12 @@ batch rather than being smuggled in beside coverage work.
 ## Plan
 
 ### T1 — Audit whether every shipped check has a retained must-FAIL fixture firing its named finding `[size: M · risk: med · class: decision · HITL]`
-Layers: `docs/research/` (the audit record) · `docs/epic/EPIC-004-conformance.md` (§ Closed-when 3) ·
-        `evals/` (only if the audit closes a gap it finds)
+Layers: `docs/research/fixture-coverage-audit.md` (the audit record) ·
+        `docs/epic/EPIC-004-conformance.md` (§ Closed-when 3) ·
+        `evals/run-gates-signed-fixtures.sh` + `evals/fixtures/gates-signed/` (the one gap the audit
+        found worth closing) · `TECH-DEBT.md` (TD-067, the defect writing that fixture exposed) ·
+        `docs/research/conformance-dispositions.md` (F1's scope-out off-by-one, folded in per the
+        G2 ruling)
 Depends-on: none
 Cites: EPIC-004 § Closed-when 3 · SPRINT-072 (the 22 harnesses · 98 cases · 46 findings measurement) ·
        L-058 · L-108 · TD-012
@@ -56,15 +60,15 @@ it, or the gap.
 see, from one document, whether a retained must-FAIL fixture asserts its named finding.
 
 **DoD:**
-- [ ] Every check is enumerated from disk, not from memory — *Verify: the enumeration is derived
+- [x] Every check is enumerated from disk, not from memory — *Verify: the enumeration is derived
       (`ls scripts/lib/check-*.sh` + `grep '^assert_' conformance-engine.sh`) and its count reconciled
       against the dispositions register's covered set; a disagreement is investigated, not rounded*
-- [ ] Each published finding name is classified **has a retained must-FAIL fixture** / **does not**,
+- [x] Each published finding name is classified **has a retained must-FAIL fixture** / **does not**,
       by name — *Verify: the gap list is explicit; "mostly covered" is not an outcome (L-058)*
-- [ ] The audit query is cross-checked — *Verify: with-fixture + without-fixture sums to the register's
+- [x] The audit query is cross-checked — *Verify: with-fixture + without-fixture sums to the register's
       total. L-108 has eight sightings and every one was caught by a second number disagreeing, never
       by recalling the rule*
-- [ ] EPIC-004 § Closed-when 3 is ticked with that evidence, **or** the reason it cannot be is written
+- [x] EPIC-004 § Closed-when 3 is ticked with that evidence, **or** the reason it cannot be is written
       into the epic — *Verify: the epic. A condition ticked without its evidence is what this epic
       exists to avoid*
 
@@ -228,6 +232,11 @@ from a comment.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/research/fixture-coverage-audit.md` | T1 | **new** — the audit record: 24 of 24 checks guarded, 16 of 19 finding identities, gap list named, and the two ways the audit's own query failed green before it was right | low | cross-check: 16 + 3 = 19 |
+| `evals/run-gates-signed-fixtures.sh` + `evals/fixtures/gates-signed/` | T1 | close the one repository-facing gap — `unrecognised-gate-token-fails`, a retained must-FAIL | low | harness green |
+| `TECH-DEBT.md` | T1 | **TD-067** — the token test accepts `G7`/`G99` while promising "want G1 / G2"; found by writing the fixture above | low | — |
+| `docs/epic/EPIC-004-conformance.md` | T1 | § Closed-when 3 **established, not ticked**, with the evidence and both reasons written in | low | — |
+| `docs/research/conformance-dispositions.md` | T1 | F1 folded in: § scope-out 12 → 11 (`S2.R-GROWTH` is `judgment-only`, never checkable) | low | 19 + 32 + 11 = 62 ✓ |
 | `spec/STANDARD.md` | T5 | §3 gains the **ADR exception** and the **exploratory-tree exception**; version 0.4.1 → 0.4.2. No rule added — §3 still publishes 3 | low | 100 rules still parse; §3's count unchanged |
 | `spec/CHANGELOG.md` | T5 | 0.4.2 entry, PATCH, stating why neither exception is a new obligation | low | — |
 | `scripts/lib/conformance-engine.sh` | T5 | implement the declared-exploratory exemption (`_own_governed_off`, a **declaration not a path**) and rewrite the ADR-exemption comment to **cite** §3 rather than carry the ruling | med | 3/3 seeded breaks · ownership harness |

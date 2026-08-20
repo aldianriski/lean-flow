@@ -390,3 +390,92 @@ One near-miss worth recording: the middle rewrite deleted the `_s2_named_paths` 
 the block it lived in, leaving the awk reading an **empty** exclusion set — which would have silently
 resurrected the two-rows-share-a-basename false positive. Caught by grepping for the variable's
 occurrence count (1, expected 2) rather than by the suite, which was green either way at that moment.
+
+### 2026-08-21 | progress | T1 — the fixture audit: 24 of 24 checks, 16 of 19 identities, and why the condition still does not tick
+
+**The deliverable is a list, and that was the whole point.** SPRINT-072 measured the corpus — 22
+harnesses · 98 cases · 46 named findings — and none of those numbers answers *"does **every** check
+have one"*. A count tells you how much guarding exists, never whether any particular check is guarded.
+Record → `docs/research/fixture-coverage-audit.md`.
+
+**Enumerated from disk**: `ls scripts/lib/check-*.sh` (11) + `grep '^assert_' conformance-engine.sh`
+(13) = **24 checks**. All 24 guarded.
+
+**The audit is itself a query, and it failed green twice before it was right** — both recorded in the
+record, because this is the class L-108 names and it does not stop being it when the query is an audit:
+
+1. **The first name-extraction reached 5 of 12 files.** `grep 'bad "<name>:'` matched only the
+   checkers using that exact message shape; the other seven emit through `printf 'FAIL …'` or carry
+   the name mid-message. The census looked clean while examining under half the corpus. **The finding
+   naming convention is not uniform across the 11 standalone checkers** — a fact about the corpus,
+   surfaced by the query that broke on it.
+2. **`reader-missing` read as guarded and is not.** A name-grep over `evals/` hit
+   `run-conformance-engine-fixtures.sh` — line 185, inside a **comment** explaining why a case for it
+   would prove nothing. The corpus documents its own finding names, so a grep over it eventually
+   matches prose *about* the thing. Caught by opening the hit rather than counting it.
+
+**The cross-check that DoD 3 asks for did its job.** Counting `bad "` prefixes gives **14**; itemising
+identities gives **19**, because `conformance:` covers four and `gates-signed:` covers three (two FAIL
+branches plus the note-only *NOT SIGNED* state). The two numbers disagreed, and the difference was
+exactly the five identities hiding behind two prefixes. Final: **16 guarded + 3 unguarded = 19** ✓.
+
+**One gap was repository-facing, so it was closed here** (DoD 2 allows `evals/` for exactly this):
+`gates-signed: unrecognised gate token` had no case while its sibling branch did — a regression that
+stopped rejecting bad gate tokens would have shipped green.
+
+**Writing that fixture found a second defect, which is the part worth keeping.** The first attempt
+used `G1,G7`, expecting rejection — **and the check passed it**. The token test is
+`case "$gates" in *[!G0-9,]*)`, which rejects characters *outside* `[G0-9,]` and so accepts `G7`,
+`G99`, `G0`, while its own finding text promises *"want G1 / G2"*. A sprint carrying
+`gates_signed: G7 @ <sha>` is reported as **signed**. The retained fixture uses `X2`, which the branch
+genuinely rejects, so it guards the branch that exists; tightening the test alters what a conformant
+report says about an adopter's file, which is a behaviour change outside T1's Layers → **TD-067**.
+
+**Two distinctions the condition's wording does not make, and one of them blocks the tick.**
+`S9.GATESABSENT` reports *NOT SIGNED* as a note and **never FAILs** — deliberately, since a sprint may
+legitimately sit unsigned between promote and the gate pass. *"A must-FAIL fixture that fails with its
+named finding"* is therefore **unsatisfiable** for it, and the property actually worth requiring is *a
+retained case asserts the named finding on input that must produce it*. Separately, **guarded ≠
+guarded on every run**: `run-attestation` (7 cases) and `run-layers-observed` (14) are **opt-in**, so
+21 cases — the two largest sets after the engine families — do not run at the gate.
+
+**DoD 4 — § Closed-when 3 NOT ticked, and the reason written into the epic.** Ticking would mean
+reading "check" as the unit and ignoring three identities, or reading the wording loosely enough to
+cover a rule that cannot FAIL. Amending an exit condition to fit what was built is the failure L-088
+names, and SPRINT-075 already refused this once. What remains is small, named and actionable: a
+**ruling** on whether invocation errors are in scope, and a **wording change** for the must-REPORT
+case. The condition has moved from *measured around* to *established*, which is what the task existed
+to do.
+
+**F1 folded in, per the G2 ruling.** `docs/research/conformance-dispositions.md` § scope-out claimed
+**12 checkable rules** and para (b) said **(5)**; `S2.R-GROWTH` is marked `judgment-only` in spec §2,
+so it was never in the checkable set the section partitions. Corrected to **11** and **(4)**, and the
+register now reconciles exactly against the engine: **19 covered + 32 build + 11 scope-out = 62**,
+which is what `conformance.sh` prints.
+
+**A third near-miss on an id, and the pattern is now worth naming.** TD-066 was already taken
+(SPRINT-075, and its subject is the engine's process-spawn cost — the very thing T5 hit, so T5's
+"second sighting" has a home there). Renumbered to **TD-067**. Earlier in this sprint the register
+first cited `TASK-241` for a follow-up, which is T3's own backlog twin. **Twice in one sprint the next
+free id was assumed instead of derived**, and both were caught only by looking. Promotion candidate at
+close: *an identifier for a new row is a query result — derive the maximum in use, never increment the
+one you happen to remember* (L-130's family, at the grain of ids rather than figures).
+
+### 2026-08-21 | surprise | T1 — an off-vocabulary tag drops a doc from the index, silently
+
+The gate caught `knowledge index STALE` after the audit record landed, which is the check working.
+Regenerating did **not** add the doc: `scripts/gen-index.sh` carries a **fixed** vocabulary
+(`TAGS="process docs tooling edit-safety sprint-model"` ·
+`DOMAINS="skills doc-standard governance knowledge sprint-model"`) and emits a tag section only for
+names in it. The audit record was written with `tags: [conformance, testing, governance]` and
+`domain: quality` — all plausible, none in the vocabulary — so it was parsed, indexed into the
+entries table, and then **dropped from every rendered section with no warning**.
+
+The failure mode is the one this repo keeps naming: the staleness check compares the file against a
+regeneration, so a doc missing from **both** is consistent and passes. Retagged `[tooling, process]` /
+`governance`, matching `conformance-dispositions.md`, and the entry now appears three times.
+
+Not fixed here — `gen-index.sh` is outside T1's Layers and the fix is a design call (warn on an
+unknown tag, or publish the vocabulary where an author writing frontmatter will see it; §7's glossary
+would be the natural home). Recorded for the close Retro rather than filed as debt on the spot, since
+the same pass is already carrying TD-067 and the promotion candidates.
