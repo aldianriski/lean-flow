@@ -549,6 +549,324 @@ assert_S3_AGENTS() {
 # ==================================================================================================
 
 # ==================================================================================================
+# §4 ADR family (SPRINT-076 T2) -- S4.ONEFILE · S4.APPEND · S4.INDEX · S4.SECTIONS · S4.NEGATIVE
+#
+# Five mechanical rules firing five finding names ALREADY PUBLISHED in
+# docs/research/conformance-dispositions.md § build. This task CONSUMES that contract; it does not
+# choose it (L-058).
+#
+#   S4.ONEFILE  -> adr-path-noncanonical
+#   S4.APPEND   -> adr-edited-after-decision        (the family's only Gated rule -- reads HISTORY)
+#   S4.INDEX    -> decisions-index-missing-adr
+#   S4.SECTIONS -> adr-required-section-missing
+#   S4.NEGATIVE -> adr-no-negative-consequence
+#
+# Four are Structural (answerable from the tree) and one is Gated (answerable only from the record),
+# so the level arithmetic separates them for free -- the driver buckets by the SPEC's level column,
+# never by anything this block asserts.
+#
+# --- what an "ADR" is here, and why the answer is not just a glob -----------------------------------
+# §4 states one file per ADR at `docs/adr/ADR-NNN-<slug>.md`. That is THREE claims, not one, and a
+# rule checking only the filename pattern passes both of the ones that actually corrupt an index: a
+# canonically-named ADR sitting somewhere else, and two files claiming the same number. All three are
+# reported under the single published name, each naming which sub-case it hit.
+
+# _adr_canonical <repo> -- repo-relative paths of files that ARE canonical ADRs, sorted. This is the
+# set the other four rules iterate: a file failing S4.ONEFILE is reported by that rule and then left
+# alone, rather than collecting a second and third finding from rules whose subject it is not.
+_adr_canonical() {
+  for f in "$1"/docs/adr/*.md; do
+    [ -f "$f" ] || continue
+    b=${f##*/}
+    case "$b" in
+      ADR-[0-9][0-9][0-9]-*.md) printf '%s\n' "docs/adr/$b" ;;
+    esac
+  done | LC_ALL=C sort
+}
+
+# _adr_section <name> -- reads a doc on stdin, prints the body of its `## <name>...` section.
+# Matched as a PREFIX of the heading text so `## Alternatives considered` answers to "Alternatives",
+# and anchored at position 1 so a heading merely CONTAINING the word is not mistaken for it (L-108:
+# anchor to a position, never to a bare substring).
+_adr_section() {
+  awk -v want="$1" '
+    /^## / { h = substr($0, 4); inside = (index(h, want) == 1); next }
+    inside { print }
+  '
+}
+
+assert_S4_ONEFILE() {
+  repo=$1
+  [ -d "$repo/docs/adr" ] || {
+    note "S4.ONEFILE          -- no docs/adr/ directory; whether this repo owes ADRs is §2's question, not this rule's -- nothing to verify"
+    return
+  }
+  n_ok=0
+  seen_nums=""
+  for f in "$repo"/docs/adr/*.md; do
+    [ -f "$f" ] || continue
+    b=${f##*/}
+    case "$b" in
+      ADR-[0-9][0-9][0-9]-?*.md) ;;
+      *)
+        bad "adr-path-noncanonical: docs/adr/$b -- §4 requires one file per ADR named ADR-NNN-<slug>.md (three-digit number, kebab-case slug). A file in docs/adr/ that is not one is either a mis-named ADR nothing will index, or a non-ADR document in the ADR set"
+        continue
+        ;;
+    esac
+    num=$(printf '%s' "$b" | cut -c1-7)
+    prev=$(printf '%s\n' "$seen_nums" | sed -n "s/^$num	//p")
+    if [ -n "$prev" ]; then
+      bad "adr-path-noncanonical: docs/adr/$b -- $num is already claimed by docs/adr/$prev. §4 is one file per ADR: two files sharing a number means the index, every cross-reference and every 'superseded by' pointer are ambiguous about which one they mean"
+      continue
+    fi
+    seen_nums="$seen_nums$num	$b
+"
+    n_ok=$((n_ok + 1))
+  done
+
+  # A canonically-named ADR outside docs/adr/ is the sub-case a docs/adr/-only glob cannot see -- and
+  # it is the one that silently escapes every other rule in this family, since they all iterate the
+  # canonical set. Pruned against the repo's own noise directories so an adopter's node_modules or a
+  # vendored copy does not turn one finding into a hundred.
+  # Scoped to the DOC TREE (docs/, minus docs/adr/) plus the repo root, not the whole checkout. §2
+  # places documentation under docs/, so an ADR-named file inside the doc tree but outside docs/adr/
+  # is unambiguously misplaced -- while one under evals/, tests/ or src/ is test data or a template,
+  # and adjudicating it means reporting a defect about a tree this rule was never given. Found by
+  # running against this repo rather than by review: the first draft walked the whole checkout and
+  # returned 12 findings, every one of them a fixture directory whose own docs/adr/ is canonical
+  # relative to its own root. An adopter with test fixtures gets the same noise (L-016 -- verify on
+  # the consumer path, not only on our dogfooding).
+  strays=$( { find "$repo/docs" -type f -name 'ADR-[0-9][0-9][0-9]-*.md' 2>/dev/null |
+                sed "s|^$repo/||" | grep -v '^docs/adr/'
+              for rf in "$repo"/ADR-[0-9][0-9][0-9]-*.md; do
+                [ -f "$rf" ] && printf '%s\n' "${rf##*/}"
+              done
+            } | LC_ALL=C sort -u)
+  if [ -n "$strays" ]; then
+    saved_ifs4=$IFS
+    IFS='
+'
+    for s in $strays; do
+      IFS=$saved_ifs4
+      bad "adr-path-noncanonical: $s -- an ADR-NNN-named file outside docs/adr/. §4 fixes the location as well as the name: an ADR the canonical path does not reach is invisible to the index rule, the append-only rule and every reader who looks where the standard says to look"
+      IFS='
+'
+    done
+    IFS=$saved_ifs4
+    return
+  fi
+
+  [ "$last_bad" -eq 1 ] && return
+  if [ "$n_ok" -eq 0 ]; then
+    note "S4.ONEFILE          -- docs/adr/ exists but holds no ADR-NNN-<slug>.md file -- nothing to verify"
+  else
+    ok "S4.ONEFILE          -- all $n_ok ADR(s) sit at a canonical one-file-per-ADR path"
+  fi
+}
+
+assert_S4_INDEX() {
+  repo=$1
+  adrs=$(_adr_canonical "$repo")
+  [ -n "$adrs" ] || {
+    note "S4.INDEX            -- no canonical ADR files to index -- nothing to verify"
+    return
+  }
+  # §2 places the index at docs/DECISIONS.md; a repo keeping it at the root is accepted rather than
+  # reported, because §4's claim is that the index EXISTS and is complete, not where it lives.
+  idx=""
+  for cand in docs/DECISIONS.md DECISIONS.md; do
+    [ -f "$repo/$cand" ] && { idx=$cand; break; }
+  done
+  if [ -z "$idx" ]; then
+    bad "decisions-index-missing-adr: no decision index found at docs/DECISIONS.md or DECISIONS.md -- §4 requires a thin index linking every ADR. Without one there is no single place that answers 'what has been decided here', which is the whole reason the ADRs are one-per-file"
+    return
+  fi
+  n_indexed=0
+  saved_ifs4=$IFS
+  IFS='
+'
+  for a in $adrs; do
+    IFS=$saved_ifs4
+    b=${a##*/}
+    # -F: the basename carries no regex metacharacters worth honouring, and treating it as a pattern
+    # is how a hyphenated slug would silently match the wrong row.
+    if grep -qF "$b" "$repo/$idx"; then
+      n_indexed=$((n_indexed + 1))
+    else
+      bad "decisions-index-missing-adr: $a -- $idx carries no row linking it. An index missing an entry is worse than no index: it reads as complete, so the decision it omits is one nobody knows to look for"
+    fi
+    IFS='
+'
+  done
+  IFS=$saved_ifs4
+  [ "$last_bad" -eq 1 ] && return
+  ok "S4.INDEX            -- all $n_indexed ADR(s) carry a row in $idx"
+}
+
+assert_S4_SECTIONS() {
+  repo=$1
+  adrs=$(_adr_canonical "$repo")
+  [ -n "$adrs" ] || {
+    note "S4.SECTIONS         -- no canonical ADR files -- nothing to verify"
+    return
+  }
+  n_complete=0
+  saved_ifs4=$IFS
+  IFS='
+'
+  for a in $adrs; do
+    IFS=$saved_ifs4
+    f="$repo/$a"
+    missing=""
+    # Status and Deciders are header BULLETS in §4's template, not headings; the other four are
+    # `## ` sections. Both spellings are accepted for each, so a repo that renders Status as a
+    # heading is not reported for a difference §4 does not make.
+    for s in Status Deciders; do
+      grep -qE "^- \*\*$s:?\*\*|^## $s" "$f" || missing="$missing, $s"
+    done
+    for s in Context Decision Consequences Alternatives; do
+      grep -qE "^## $s" "$f" || missing="$missing, $s"
+    done
+    if [ -n "$missing" ]; then
+      bad "adr-required-section-missing: $a -- ${missing#, }. §4 lists six required sections and each carries a distinct load: without Context the decision is unexplainable, without Alternatives it is unfalsifiable, and a reader cannot tell a considered call from an arbitrary one"
+    else
+      n_complete=$((n_complete + 1))
+    fi
+    IFS='
+'
+  done
+  IFS=$saved_ifs4
+  [ "$last_bad" -eq 1 ] && return
+  ok "S4.SECTIONS         -- all $n_complete ADR(s) carry Status · Deciders · Context · Decision · Consequences · Alternatives"
+}
+
+assert_S4_NEGATIVE() {
+  repo=$1
+  adrs=$(_adr_canonical "$repo")
+  [ -n "$adrs" ] || {
+    note "S4.NEGATIVE         -- no canonical ADR files -- nothing to verify"
+    return
+  }
+  n_neg=0
+  n_skipped=0
+  saved_ifs4=$IFS
+  IFS='
+'
+  for a in $adrs; do
+    IFS=$saved_ifs4
+    f="$repo/$a"
+    # An ADR with NO § Consequences at all is S4.SECTIONS' finding, and reporting it here too would
+    # bill one defect to two rules -- which inflates a report an adopter reads as a work list.
+    if ! grep -qE '^## Consequences' "$f"; then
+      n_skipped=$((n_skipped + 1))
+      IFS='
+'
+      continue
+    fi
+    if _adr_section Consequences < "$f" | grep -qi 'negative'; then
+      n_neg=$((n_neg + 1))
+    else
+      bad "adr-no-negative-consequence: $a -- § Consequences names no Negative. §4 requires at least one because no decision is cost-free: an ADR listing only upsides has not been examined, it has been advertised"
+    fi
+    IFS='
+'
+  done
+  IFS=$saved_ifs4
+  [ "$last_bad" -eq 1 ] && return
+  if [ "$n_neg" -eq 0 ]; then
+    note "S4.NEGATIVE         -- no ADR carries a § Consequences section to examine ($n_skipped reported by S4.SECTIONS instead) -- nothing to verify"
+  else
+    ok "S4.NEGATIVE         -- all $n_neg ADR(s) with a § Consequences section name at least one Negative$([ "$n_skipped" -gt 0 ] && printf ' (%s without one left to S4.SECTIONS)' "$n_skipped")"
+  fi
+}
+
+# --- S4.APPEND: the only rule here that reads the RECORD rather than the tree ----------------------
+# §4 marks it `mechanical *via git history*` at level Gated, and that placement is the point: a tree
+# can never show that a decided ADR was edited, because the edit leaves no trace in the file it
+# changed. Only history can answer, which is precisely what separates Gated from Structural (§14).
+#
+# What is compared is the § DECISION BODY at the deciding commit against the same section at HEAD.
+# Everything §4 explicitly permits after a decision -- marking it `deprecated`, marking it
+# `superseded by ADR-NNN`, adding a `Scope amended by:` bullet -- lands in the HEADER, leaving the
+# decision text itself untouched, so the permitted path passes without needing to be enumerated. This
+# repo is its own hardest case here: ADR-008 and ADR-027 both carry post-decision markers, and a rule
+# that reddens on them is unusable before it is ever pointed at an adopter.
+#
+# Net-effect semantics, stated rather than hidden: an edit later reverted reads as unedited. The
+# alternative -- walking every intermediate revision -- reports a defect that no longer exists in a
+# file whose current text is exactly what was decided.
+#
+# History that cannot answer is REPORTED, never guessed at, and the two ways it fails are kept
+# distinct because they mean different things to an adopter: a tarball has no record to consult, while
+# a shallow clone has one that was deliberately truncated (A3).
+assert_S4_APPEND() {
+  repo=$1
+  adrs=$(_adr_canonical "$repo")
+  [ -n "$adrs" ] || {
+    note "S4.APPEND           -- no canonical ADR files -- nothing to verify"
+    return
+  }
+  if ! git -C "$repo" rev-parse --git-dir >/dev/null 2>&1; then
+    note "S4.APPEND           -- history unavailable: $repo is not a git repository, so whether a decided ADR was edited cannot be answered. Reported rather than passed -- the absence of a record is not evidence that nothing happened"
+    return
+  fi
+  if [ "$(git -C "$repo" rev-parse --is-shallow-repository 2>/dev/null)" = "true" ]; then
+    note "S4.APPEND           -- history truncated: $repo is a shallow clone, so a deciding commit older than the fetch depth is unreachable. Distinct from having no repository at all, and reported rather than passed: a truncated history that reads as clean is the false negative this rule exists to prevent"
+    return
+  fi
+
+  n_clean=0
+  n_undecided=0
+  saved_ifs4=$IFS
+  IFS='
+'
+  for a in $adrs; do
+    IFS=$saved_ifs4
+    # Oldest-first, so the FIRST revision carrying an accepted status is the deciding one. A file
+    # that was proposed first and accepted later is measured from the acceptance, not from creation.
+    revs=$(git -C "$repo" log --reverse --format=%H -- "$a" 2>/dev/null)
+    if [ -z "$revs" ]; then
+      note "S4.APPEND           -- $a has no commit touching it (untracked or added since the last commit); nothing to compare against"
+      IFS='
+'
+      continue
+    fi
+    deciding=""
+    for r in $revs; do
+      if git -C "$repo" show "$r:$a" 2>/dev/null |
+         grep -qiE '^status: *accepted|^- \*\*Status:\*\* *accepted'; then
+        deciding=$r
+        break
+      fi
+    done
+    if [ -z "$deciding" ]; then
+      n_undecided=$((n_undecided + 1))
+      IFS='
+'
+      continue
+    fi
+    then_body=$(git -C "$repo" show "$deciding:$a" 2>/dev/null | _adr_section Decision)
+    now_body=$(_adr_section Decision < "$repo/$a")
+    if [ "$then_body" = "$now_body" ]; then
+      n_clean=$((n_clean + 1))
+    else
+      short=$(git -C "$repo" rev-parse --short "$deciding" 2>/dev/null)
+      bad "adr-edited-after-decision: $a -- § Decision differs from the text accepted at $short. §4 is append-only: a decided ADR is marked deprecated or superseded, never rewritten, because the record of what was decided is the only thing that makes the reasoning auditable later. A post-decision MARKER in the header is the supported path and does not trip this"
+    fi
+    IFS='
+'
+  done
+  IFS=$saved_ifs4
+  [ "$last_bad" -eq 1 ] && return
+  if [ "$n_clean" -eq 0 ]; then
+    note "S4.APPEND           -- no ADR has reached an accepted status yet ($n_undecided still proposed); there is no decision to have been edited"
+  else
+    ok "S4.APPEND           -- $n_clean ADR(s) unedited since their deciding commit$([ "$n_undecided" -gt 0 ] && printf ' (%s not yet accepted)' "$n_undecided")"
+  fi
+}
+# ==================================================================================================
+
+# ==================================================================================================
 # DRIVER -- iterated WITHOUT a pipe, matching check-attestation.sh's documented reason: `printf |
 # while read` runs the loop in a subshell, where every bad() would set a `fail` the parent never sees
 # (a report disagreeing with its artifact -- this repo's own most-repeated failure class).

@@ -45,7 +45,7 @@ from an oversight.
 **Stated as counts, never as a ratio (EPIC-004 D1).** There is no percentage here and there must not be
 one: a ratio would improve every time the standard declines to automate something.
 
-## Covered today (12 rules, 5 checkers)
+## Covered today (17 rules, 5 checkers)
 
 | Rule | Checker |
 |---|---|
@@ -53,10 +53,11 @@ one: a ratio would improve every time the standard declines to automate somethin
 | `S2.R-TEMPDIR` | `check-ephemeral-intake.sh` |
 | `S9.GATESWELLFORMED` · `S9.GATESABSENT` | `conformance-engine.sh` *(migrated off `check-gates-signed.sh`, SPRINT-075 T4 — the first family consolidated into the engine; the named findings are unchanged)* |
 | `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` | `conformance-engine.sh` *(SPRINT-075 T6 — the engine's first NEW coverage; five published findings, one retained must-FAIL fixture each)* |
+| `S4.ONEFILE` · `S4.APPEND` · `S4.INDEX` · `S4.SECTIONS` · `S4.NEGATIVE` | `conformance-engine.sh` *(SPRINT-076 T2 — the §4 ADR family; five published findings, one retained must-FAIL fixture each plus a PASS control. `S4.APPEND` is the family's only Gated rule and the engine's first to read git history rather than the tree)* |
 | `S11.EPIC` | `check-epic-archive.sh` |
 | `S11.RESEARCH` | `check-research-archive.sh` |
 
-## `build` — 39 rules, each with the finding its check will fire
+## `build` — 34 rules, each with the finding its check will fire
 
 A check specified without its finding name is a half-shipped gate (L-058). Every row ships with a
 **retained** must-FAIL fixture proving that exact string fires (TD-012).
@@ -67,11 +68,6 @@ A check specified without its finding name is a half-shipped gate (L-058). Every
 | `S2.F-TIER` | `tier-doc-set-incomplete` |
 | `S2.R-PLACEMENT` | `file-outside-canonical-placement` |
 | `S2.R-README` | `readme-ownership-footer-missing` |
-| `S4.ONEFILE` | `adr-path-noncanonical` |
-| `S4.APPEND` | `adr-edited-after-decision` |
-| `S4.INDEX` | `decisions-index-missing-adr` |
-| `S4.SECTIONS` | `adr-required-section-missing` |
-| `S4.NEGATIVE` | `adr-no-negative-consequence` |
 | `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` · `S6.MULTISVC` | `tier-doc-set-incomplete` *(one check, four tiers — the tier is a parameter, not four checkers)* |
 | `S9.TWOFILES` | `sprint-plan-over-hard-cap` · `sprint-log-missing` |
 | `S9.LOGDIR` | `sprint-log-outside-logs-dir` |
