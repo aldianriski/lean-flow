@@ -5,8 +5,9 @@ epic: EPIC-004
 owner: Maintainer
 last_updated: 2026-08-20
 plan_commit: f6ae258
+gates_signed: G1,G2 @ 641036f
 close_commit: [sha — set at close]
-status: planned
+status: active
 update_trigger: sprint execute/close events
 ---
 
@@ -72,7 +73,7 @@ Layers: `scripts/lib/conformance-engine.sh` (assertions) · `evals/run-adr-famil
         `evals/fixtures/adr-family/` · `scripts/qa-check.sh` (register the harness) ·
         `docs/research/conformance-dispositions.md` (five rules move `build` → covered)
 Depends-on: none
-Cites: `docs/research/conformance-dispositions.md` § build (the five published names) · spec §4 ·
+Cites: spec §4 · `check-attestation.sh` (the shape `S4.APPEND` reads history in) ·
        EPIC-004 § Closed-when 2 · L-058 · TD-012 · L-137 (the seeded-break method, and verifying the
        seed landed)
 
@@ -83,20 +84,20 @@ and the one family whose correctness this repo can check against itself immediat
 name against any repository.
 
 **DoD:**
-- [ ] All five rules are evaluated, firing the five **already-published** names —
+- [x] All five rules are evaluated, firing the five **already-published** names —
       `adr-path-noncanonical` · `adr-edited-after-decision` · `decisions-index-missing-adr` ·
       `adr-required-section-missing` · `adr-no-negative-consequence` — *Verify: count assertions against
       the register's rows; a rule silently skipped is a FAIL, not an empty result*
-- [ ] **`S4.APPEND` reads history, not the tree** — *Verify: it answers from `git log`, the way
+- [x] **`S4.APPEND` reads history, not the tree** — *Verify: it answers from `git log`, the way
       `check-attestation.sh` does, and reports `attestation`-style honestly when history is unavailable.
       It is also the only **Gated** rule here; the other four are Structural, so the level arithmetic
       must place it correctly*
-- [ ] **A post-decision marker passes; an edited § Decision fails** — *Verify: ADR-008 and ADR-027 both
+- [x] **A post-decision marker passes; an edited § Decision fails** — *Verify: ADR-008 and ADR-027 both
       carry legitimate `amended by` / refinement markers and must stay green. This distinction is the
       task, not a detail: a rule that fails on our own two correctly-amended ADRs is unusable*
-- [ ] One retained must-FAIL fixture per name, plus a PASS control — *Verify: `run-adr-family-fixtures.sh`,
+- [x] One retained must-FAIL fixture per name, plus a PASS control — *Verify: `run-adr-family-fixtures.sh`,
       registered in `qa-check.sh`'s always-on set (an ungated harness fails the completeness leg, L-020)*
-- [ ] The suite is shown to **discriminate** — *Verify: seed a break per assertion and confirm the
+- [x] The suite is shown to **discriminate** — *Verify: seed a break per assertion and confirm the
       matching case reddens; **verify each seed landed** (`cmp` against the pristine copy, restore under
       a checked hash). A no-op patch reports green and reads identical to a suite that works (L-137 ×2)*
 
@@ -222,6 +223,12 @@ from a comment.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/conformance-engine.sh` | T2 | +5 assertions for §4 (`S4.ONEFILE` · `S4.APPEND` · `S4.INDEX` · `S4.SECTIONS` · `S4.NEGATIVE`) firing the five already-published names. `S4.APPEND` is the engine's first rule to read git history rather than the tree | med | `run-adr-family-fixtures.sh` (12 cases) · 10/10 seeded breaks · 27-ADR corpus |
+| `evals/run-adr-family-fixtures.sh` | T2 | new retained harness — one must-FAIL per published name, a PASS control, and three git states for `S4.APPEND` (edit fails · marker passes · no-history and shallow reported honestly) | low | proven 12/12 RED before the assertions existed |
+| `evals/fixtures/adr-family/` | T2 | 9 retained fixture repos (TD-012: deleting fixtures with the prototype leaves the gate unguarded) | low | consumed by the harness above |
+| `scripts/qa-check.sh` | T2 | register the harness **always-on** — a deliberate, owner-ruled exception to TD-016's git-building→opt-in cost rule, with the reason recorded beside the list | low | gate leg `PASS eval harness run-adr-family-fixtures.sh` |
+| `docs/research/conformance-dispositions.md` | T2 | five §4 rules move `build` → covered; both section headers re-derived by counting **rule ids**, not rows | low | recount: 17 covered · 34 build |
+| `docs/sprint/logs/SPRINT-076-…md` | T2 | Execution Log opened at the gate (D2) and carrying T2's evidence | low | — |
 
 ## Retro
 
