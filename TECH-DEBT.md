@@ -80,6 +80,27 @@ status: current
     counting rule ids in each table rather than editing the headers. Do it as its own change, not as a
     rider on a coverage task, so the arithmetic is reviewable.
 
+
+- **TD-067** severity: minor | status: open | created: Sprint-076
+  - Summary: **`S9.GATESWELLFORMED` accepts any `G<digits>` token while its own message promises
+    "want G1 / G2".** The test is `case "$gates" in *[!G0-9,]*)`, which rejects characters *outside*
+    `[G0-9,]` and therefore passes `G7`, `G99` and `G0`. A sprint file carrying
+    `gates_signed: G7 @ <sha>` is reported as **signed**.
+  - Evidence: found by SPRINT-076 T1's fixture audit while writing the missing must-FAIL case for the
+    `unrecognised gate token` branch — the first fixture used `G1,G7`, expecting rejection, and the
+    check passed it. `docs/research/fixture-coverage-audit.md` § NOT guarded.
+  - Impact: low in practice, and precisely the shape that makes it worth a row. Nothing generates a
+    `G7`, so no live sprint is mis-reported today; but the gate exists to catch a *hand-edited or
+    machine-mangled* value, which is exactly where an out-of-range gate number would appear, and the
+    finding text tells a reader the check is stricter than it is. **The retained fixture now guards the
+    branch that exists** (`X2`, genuinely rejected), so tightening the test will not silently pass.
+  - Mitigation (hypothesis, not a plan): match the token list against the gates the standard actually
+    defines rather than a character class — and re-point the fixture at `G7` once it does, since that
+    is the case a reader expects the finding to be about. **Do it as its own change**: it alters what a
+    conformant report says about an existing adopter's file, which is a behaviour change and not
+    fixture work. Deliberately not folded into T1, whose declared Layers is the audit record.
+  - Sibling: **TD-064** (real doc gaps in this repo). Unrelated cause; both are "the reference
+    implementation disagrees with the standard it publishes".
 - **TD-066** severity: minor | status: open | created: Sprint-075
   - Summary: **the conformance engine takes ~47s on this repository, and the cost is process spawn.**
     The §1/§3 assertions read 236 docs; the implementation is one cached tree walk plus one `awk` per

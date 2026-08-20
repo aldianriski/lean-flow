@@ -148,7 +148,7 @@ are `implementation-directed`, excluded by the spec's own Mark column rather tha
 author had to remember, and a fixture proves that re-marking a rule in the spec changes the checker's
 behaviour with no code edit.
 
-## `scope-out` — 12 checkable rules, each with its reason
+## `scope-out` — 11 checkable rules, each with its reason
 
 Three distinct reasons, not interchangeable. **A rule scoped out is still a rule** — stated, marked, and
 simply not something *this engine* evaluates. An arrow (`→ X`) names the rule that already covers it; the
@@ -160,14 +160,20 @@ target is **not** itself scoped out.
 `S3.README` → `S2.R-README`. This is §8's problem at rule scale: the standard cross-references itself,
 and an engine ingesting every statement inflates its own denominator.
 
-**(b) Governs the standard document, not an adopter's repository (5).**
+**(b) Governs the standard document, not an adopter's repository (4).**
 `S2.R-CAPEXACT` (a cap cell is an integer) and `S2.R-DESIGN` (`DESIGN.md` is absent from the §2 table)
 both read **§2's own table**, which an adopter does not have. `S2.R-SKILLCAP` and `S2.R-SKELETON` govern
 `SKILL.md`, a Claude Code plugin artifact rather than a general repository concept — an adopter with no
-skills would collect findings for files they were never expected to have. `S2.R-GROWTH` is the
-split-never-squeeze rule, whose mechanical half is just `S2.F-CAP` firing. **This is the same failure
+skills would collect findings for files they were never expected to have. **This is the same failure
 `implementation-directed` prevents, one category out**: these *are* repo rules, just not *an arbitrary
 repo's* rules.
+
+**`S2.R-GROWTH` was listed here and is not a scope-out at all** (SPRINT-076 T1). The spec marks it
+**`judgment-only`** — *which sections move is judged* — so it was never in the checkable set this
+section partitions, and counting it made § scope-out claim 12 where the engine sees 11. Corrected, the
+register reconciles **exactly** against the engine: 19 covered + 32 build + 11 scope-out = **62**
+checkable rules, which is what `conformance.sh` reports. Found the way every sighting of this class is
+found — by a second number disagreeing, not by re-reading the prose (L-108).
 
 **(c) No checkable rule falls here — recorded because the category was expected to be large and is
 empty.** The §12 content categories (`S12.LEGAL` · `S12.FINANCIAL` · `S12.PERSONAL` · `S12.PRODLOGS` ·

@@ -144,13 +144,28 @@ each other · any telemetry, ever (the README promises none).
       remainder is **38 of 43**, not 42 — and that remainder is the engine's work, not another
       one-off checker's.
 - [ ] Each check has a retained must-FAIL fixture that fails with its named finding
-      — measured at SPRINT-072: the corpus is **22 harnesses (17 asserting) · 98 fixture cases · 46
-      distinct named findings**, and that set is the **contract any engine must preserve**, not a
-      target to re-derive (L-058 · TD-012). Whether *every* check has one is not yet established.
-      **SPRINT-074 added the 23rd harness** — `run-attestation-fixtures.sh`, one retained must-FAIL per
-      published §13 finding plus three guarding the *rule source* itself. It also demonstrated the
-      method this condition should be judged by: green-on-first-run proves nothing, so the **rejected
-      design was seeded** and the discriminating cases confirmed to fail (→ L-137)
+      — **ESTABLISHED at SPRINT-076 T1, and deliberately still open.** Measured at SPRINT-072 as
+      **22 harnesses (17 asserting) · 98 fixture cases · 46 distinct named findings** — the contract
+      any engine must preserve (L-058 · TD-012) — but a count never answers *"does **every** check
+      have one"*, which is why this row sat open for four sprints while the corpus grew.
+      **SPRINT-074 added the 23rd harness** (`run-attestation-fixtures.sh`) and demonstrated the
+      method: green-on-first-run proves nothing, so the rejected design is seeded and the
+      discriminating cases confirmed to fail (→ L-137).
+      **The answer is now a list, not a number** → `docs/research/fixture-coverage-audit.md`:
+      **24 of 24 checks guarded** (11 standalone checkers + 13 engine assertions, enumerated from
+      disk) and **16 of 19 finding identities**. The audit closed the one **repository-facing** gap it
+      found (`unrecognised gate token`, now a retained case) and turned up a real defect while doing
+      it — the token test accepts `G7`/`G99` though its finding text promises *"want G1 / G2"*
+      (**TD-067**).
+      **Why it is NOT ticked**, rather than the condition being read to fit what exists (L-088):
+      **(a)** three identities have no fixture — all *invocation errors* (`usage` ·
+      `repo directory not found` · `reader-missing`), and whether those are in scope for this
+      condition is **a ruling nobody has made**; making it inside the audit that benefits from it is
+      the drift this epic exists to avoid. **(b)** `S9.GATESABSENT` **cannot** satisfy the wording and
+      should not: it reports *NOT SIGNED* as a note and never FAILs, because a sprint may legitimately
+      sit unsigned between promote and the gate pass. The condition needs the wider property — *a
+      retained case asserts the named finding on input that must produce it* — which is a **wording
+      change, not a measurement**. Both residuals are small, named, and actionable.
 - [x] Attestation is verified from git trailers, per task, without trusting a self-report
       — **DONE at SPRINT-074 T2** (TASK-228). `scripts/lib/check-attestation.sh` verifies §13's five
       mechanical rules from `git log` trailers on the task's own commit, against any repository, from a

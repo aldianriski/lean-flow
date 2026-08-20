@@ -89,6 +89,22 @@ run_case_anywhere "placeholder-counts-as-absent" 0 "NOT SIGNED (no gates_signed:
 run_case_anywhere "malformed-fails" 1 "malformed gates_signed:" -- \
   sh "$engine" "$fx/malformed" --spec "$gs_spec"
 
+
+# --- case 3b (must-FAIL): parseable SHAPE, unrecognised gate TOKEN -------------------------------
+# The sibling branch of case 3, and it had no retained case until the SPRINT-076 T1 fixture audit went
+# looking (docs/research/fixture-coverage-audit.md). `G1,X2 @ <sha>` parses -- there is a gate list and
+# a sha, so `malformed` does not fire -- but `G7` is not a gate this standard defines. Without this
+# case a regression that stopped validating the token would ship GREEN, since every other gates-signed
+# case would still pass: exactly the silent false-negative L-058 is about, in the one branch of this
+# family that is repository-facing.
+# NOTE, found by the same audit and deliberately NOT fixed here: the token test is
+# `case "$gates" in *[!G0-9,]*)`, which rejects characters outside [G0-9,] but accepts any G-digit
+# combination -- so `G7` and `G99` pass while the message promises "want G1 / G2". This case uses
+# `X2`, which the branch genuinely rejects, so it guards the branch that exists. Tightening the check
+# is a behaviour change outside T1's declared Layers and is filed as TD-067.
+run_case_anywhere "unrecognised-gate-token-fails" 1 "unrecognised gate token in 'G1,X2'" -- \
+  sh "$engine" "$fx/bad-gate-token" --spec "$gs_spec"
+
 # --- case 4: well-formed -> PASS naming the gates and the commit --------------------------------
 run_case_anywhere "wellformed-passes" 0 "G1,G2 signed @ 1f0c012" -- \
   sh "$engine" "$fx/wellformed" --spec "$gs_spec"
