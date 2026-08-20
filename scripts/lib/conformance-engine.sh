@@ -866,6 +866,174 @@ assert_S4_APPEND() {
 }
 # ==================================================================================================
 
+
+# ==================================================================================================
+# §2 placement pair (SPRINT-076 T3) -- S2.F-FILE · S2.R-PLACEMENT
+#
+#   S2.F-FILE      -> core-file-missing
+#   S2.R-PLACEMENT -> file-outside-canonical-placement
+#
+# Chosen because they are the LIKELIEST to produce artefacts against a stranger's repository, not the
+# safest. SPRINT-075 T3's triage recorded zero artefacts and recorded itself as barely asked -- six of
+# 62 rules, none of them shape-bound. These two are the prime suspects, so covering them is what turns
+# the artefact question from open into answered (A4 -- and disconfirming A4 is a result, not a failure).
+#
+# --- the row source, and the two traps in parsing it ------------------------------------------------
+# §2's three tables are the data; the rules are its column families ("a row is a parameter set, not a
+# rule"). Rows are read from the SPEC at runtime, never hard-coded, so re-wording a Create cell changes
+# behaviour with no code edit (EPIC-004 D1).
+#
+# Trap 1: §2's own **Conformance** table lives inside §2 and after the `docs/` marker, so without a
+# guard its Rule cells parse as File cells and the engine invents 21 core files called `docs/S2.F-FILE`.
+# check-doc-caps.sh escapes this only by accident -- it discards any row with no integer in the Cap
+# cell. Guarded explicitly here rather than relying on the same luck.
+#
+# Trap 2: the Cap and Create columns sit at DIFFERENT indices in the docs tree (it carries a Tier
+# column) than in the root/.claude/spec tables. Same shape check-doc-caps.sh makes, for the same reason.
+#
+# NOTE -- this is the SECOND §2 table parser in the repo (check-doc-caps.sh owns the first, for the Cap
+# column). Two parsers reading one table is the drift TD-057 describes one level down; extracting a
+# shared `read-spec-files.sh` beside `read-spec-rules.sh` is the right shape and is out of T3's declared
+# Layers, so it is filed at close rather than smuggled in here.
+
+# _s2_rows <spec> -- `always|path` per §2 row with a LITERAL canonical path, plus its legacy path when
+# the row names one. Pattern rows (`ADR-NNN-<slug>.md`, `flows/<slug>.md`) are excluded: a pattern names
+# a family, and a family cannot be "missing".
+# Emits: <always:0|1>|<canonical-path>|<legacy-path-or-empty>
+_S2_ROWS_CACHE=""
+_s2_rows() {
+  [ -n "$_S2_ROWS_CACHE" ] && { printf '%s\n' "$_S2_ROWS_CACHE"; return; }
+  _S2_ROWS_CACHE=$(awk '
+    /^## §2/ { in2 = 1; next }
+    /^## §/  { in2 = 0 }
+    !in2     { next }
+    /^\*\*Conformance/        { in2 = 0; next }          # trap 1
+    /^\*\*Root files/         { pfx = "";         next }
+    /^\*\*AI context/         { pfx = ".claude/"; next }
+    /^\*\*`docs\/` tree\*\*/  { pfx = "docs/";    next }
+    /^\|/ {
+      if ($0 ~ /^\|[ ]*File[ ]*\|/) next
+      if ($0 ~ /^\|[-| ]*\|$/)      next
+      n = split($0, c, "|"); if (n < 5) next
+      file = c[2]
+      cre  = (pfx == "docs/") ? c[6] : c[5]              # trap 2
+      if (match(file, /`[^`]+`/)) path = substr(file, RSTART + 1, RLENGTH - 2); else next
+      if (path ~ /[<>*]/) next
+      # legacy path, where the row names one: *(was docs/ARCHITECTURE.md)*
+      legacy = ""
+      if (match(file, /\(was [^)]+\)/)) {
+        legacy = substr(file, RSTART + 5, RLENGTH - 6)
+        gsub(/[` ]/, "", legacy)
+      }
+      printf "%d|%s%s|%s\n", (cre ~ /always/) ? 1 : 0, pfx, path, legacy
+    }' "$1")
+  printf '%s\n' "$_S2_ROWS_CACHE"
+}
+
+# --- S2.F-FILE ------------------------------------------------------------------------------------
+# Evaluated ONLY against rows the spec marks unconditional -- a `Create ←` cell saying "always". Every
+# other row is tier-gated, and §2 routes tier DETECTION to S2.F-TIER, which §14 marks a split whose
+# detection half is judged (§6). So requiring a conditional row here would be this engine guessing a
+# tier the standard explicitly declines to infer, and telling a four-file JS library it owes
+# docs/database/erd.md. The discriminator is the spec's own word, not a list this file remembers.
+#
+# No legacy fallback, deliberately: §2 states that S2.R-PLACEMENT carries the legacy-path second-match
+# rule "which S2.F-FILE does not -- a repo on a legacy layout satisfies one and not the other, so they
+# are separable". Reading them the other way round collapses two separable rules into one.
+assert_S2_F_FILE() {
+  repo=$1
+  rows=$(_s2_rows "$spec" | grep '^1|')
+  if [ -z "$rows" ]; then
+    bad "core-file-missing: no unconditional rows parsed from §2 -- the table shape changed and this parser did not. An engine that silently derives an EMPTY required set reports every repository as conformant (L-058)"
+    return
+  fi
+  n_present=0
+  saved_ifs2=$IFS
+  IFS='
+'
+  for r in $rows; do
+    IFS=$saved_ifs2
+    p=$(printf '%s' "$r" | cut -d'|' -f2)
+    if [ -e "$repo/$p" ]; then
+      n_present=$((n_present + 1))
+    else
+      bad "core-file-missing: $p -- §2 marks this file's create trigger \"always\", so it is owed by every repository regardless of tier. Absent, the reader §2 names for it has nowhere to look"
+    fi
+    IFS='
+'
+  done
+  IFS=$saved_ifs2
+  [ "$last_bad" -eq 1 ] && return
+  ok "S2.F-FILE           -- all $n_present unconditional core file(s) present at their canonical §2 path"
+}
+
+# --- S2.R-PLACEMENT ---------------------------------------------------------------------------------
+# Fires on a doc the repo evidently HAS but filed somewhere §2 does not name -- neither the canonical
+# path nor the documented legacy one. That is what the published finding name says
+# (`file-outside-canonical-placement`) and it is the only reading under which §2's own parenthetical
+# holds: legacy paths are "matched second", i.e. TOLERATED by this rule, which is how a legacy-layout
+# repo satisfies R-PLACEMENT while failing F-FILE.
+#
+# Matched by BASENAME, which is what keeps it quiet on a stranger's tree: it cannot fire on a document
+# §2 never named, only on one whose filename §2 owns. A repo with no `overview.md` anywhere raises
+# nothing here -- that absence is F-FILE's finding, and billing one defect to two rules inflates a
+# report an adopter reads as a work list.
+assert_S2_R_PLACEMENT() {
+  repo=$1
+  rows=$(_s2_rows "$spec")
+  [ -n "$rows" ] || {
+    bad "file-outside-canonical-placement: no rows parsed from §2 -- the table shape changed and this parser did not (L-058)"
+    return
+  }
+  # Every path §2 names, canonical and legacy alike -- the exclusion set for the basename search below.
+  _s2_all_paths=$(printf '%s\n' "$rows" | cut -d'|' -f2,3 | tr '|' '\n' | grep -v '^$' | LC_ALL=C sort -u)
+  n_canon=0; n_legacy=0
+  saved_ifs2=$IFS
+  IFS='
+'
+  for r in $rows; do
+    IFS=$saved_ifs2
+    p=$(printf '%s' "$r" | cut -d'|' -f2)
+    lg=$(printf '%s' "$r" | cut -d'|' -f3)
+    if [ -e "$repo/$p" ]; then
+      n_canon=$((n_canon + 1))
+      IFS='
+'
+      continue
+    fi
+    # Matched SECOND: present, tolerated, and NAMED -- an accepted fallback applied silently is
+    # indistinguishable from a rule that never ran.
+    if [ -n "$lg" ] && [ -e "$repo/$lg" ]; then
+      n_legacy=$((n_legacy + 1))
+      note "S2.R-PLACEMENT      -- $lg matched second: §2 names it as the legacy path for $p. Tolerated, not silent; the canonical path is where a reader is told to look"
+      IFS='
+'
+      continue
+    fi
+    base=${p##*/}
+    canon_dir=${p%/*}
+    # Exclude every path §2 itself names -- canonical OR legacy, for ANY row. Two §2 rows can share a
+    # basename (`CHANGELOG.md` at the root and `spec/CHANGELOG.md`), and without this the root file,
+    # sitting exactly where its own row puts it, is reported as a misplaced copy of the other. Caught
+    # by the PASS control rather than by review: a rule that fires on a correctly-laid-out repo is
+    # unusable, and the must-FAIL cases all stayed green while it did.
+    found=$(find "$repo" \
+        \( -name .git -o -name node_modules -o -name vendor -o -name .venv -o -name dist -o -name build \) -prune -o \
+        -type f -name "$base" -print 2>/dev/null |
+      sed "s|^$repo/||" | grep -v "^$canon_dir/" |
+      grep -vxF "$_s2_all_paths" 2>/dev/null | LC_ALL=C sort | head -n 3)
+    if [ -n "$found" ]; then
+      where=$(printf '%s' "$found" | tr '\n' ' ')
+      bad "file-outside-canonical-placement: $p -- §2 places it here, and the repository has a file of that name at: ${where%% }. Neither the canonical path nor a legacy path §2 names, so a reader following the standard will not find it"
+    fi
+    IFS='
+'
+  done
+  IFS=$saved_ifs2
+  [ "$last_bad" -eq 1 ] && return
+  ok "S2.R-PLACEMENT      -- $n_canon §2 file(s) at their canonical path$([ "$n_legacy" -gt 0 ] && printf ', %s at a legacy path matched second' "$n_legacy")$([ "$n_canon" -eq 0 ] && printf ' (none of §2 core set present -- nothing is mis-placed, which is not the same as conformant)')"
+}
+# ==================================================================================================
 # ==================================================================================================
 # DRIVER -- iterated WITHOUT a pipe, matching check-attestation.sh's documented reason: `printf |
 # while read` runs the loop in a subshell, where every bad() would set a `fail` the parent never sees
@@ -882,7 +1050,14 @@ for row in $rules; do
   # shellcheck disable=SC2086
   set -- $row
   id=$1; level=$2; mark=$3
-  fn="assert_$(printf '%s' "$id" | tr '.' '_')"
+  # `.` AND `-` both map to `_`. The hyphen half was missing until SPRINT-076 T3, and it was a silent
+  # false negative of exactly the shape L-058 names: `S2.F-FILE` resolved to `assert_S2_F-FILE`, no
+  # such function was ever defined, and the driver reported `rule-unimplemented` with the assertion
+  # sitting right there in this file. Every rule covered before T3 happened to have no hyphen in its
+  # id, so nothing surfaced it. **21 of the spec's 100 ids carry a hyphen**, so this was waiting under
+  # a fifth of the rule set. Verified collision-free before changing: all 100 ids stay distinct under
+  # the two-character mangling, so no two rules can now resolve to one assertion.
+  fn="assert_$(printf '%s' "$id" | tr '.-' '__')"
   pid=$(printf '%-20s' "$id")
   case "$mark" in
     implementation-directed)

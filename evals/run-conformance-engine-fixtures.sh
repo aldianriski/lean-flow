@@ -28,11 +28,57 @@ work=$(mktemp -d) || { echo "FAIL harness: mktemp -d failed"; exit 2; }
 trap 'rm -rf "$work"' EXIT INT TERM
 
 # A throwaway target repo-dir -- the engine takes a directory, not necessarily a git repo (nothing
-# T2 ships needs git). One README is all any case here needs; the point of every case is the ENGINE's
-# dispatch and report, never the target's content.
+# T2 ships needs git). The point of every case here is the ENGINE's dispatch and report, never the
+# target's content.
+#
+# WHY IT CARRIES §2's CORE SET (SPRINT-076 T3). Until T3 a lone README was enough, because no
+# implemented rule had anything to say about a file's ABSENCE. `S2.F-FILE` does, and it is right to:
+# a bare directory genuinely lacks eight of the nine files §2 marks "always". So the cases below --
+# which assert that GAP lines do not set the exit code -- started failing on findings that were
+# correct. That is a fixture going stale under new coverage, not a regression, and quietening
+# `S2.F-FILE` to keep an old fixture green would be the tail wagging the dog (L-088).
+#
+# The set is derived from the SPEC, exactly as the engine derives it, so this cannot drift: a §2 row
+# whose `Create ←` cell stops saying "always" changes both sides in the same edit.
+core_set() {
+  awk '
+    /^## §2/ { in2 = 1; next }
+    /^## §/  { in2 = 0 }
+    !in2     { next }
+    /^\*\*Conformance/        { in2 = 0; next }
+    /^\*\*Root files/         { pfx = "";         next }
+    /^\*\*AI context/         { pfx = ".claude/"; next }
+    /^\*\*`docs\/` tree\*\*/  { pfx = "docs/";    next }
+    /^\|/ {
+      if ($0 ~ /^\|[ ]*File[ ]*\|/) next
+      if ($0 ~ /^\|[-| ]*\|$/)      next
+      n = split($0, c, "|"); if (n < 5) next
+      file = c[2]; cre = (pfx == "docs/") ? c[6] : c[5]
+      if (match(file, /`[^`]+`/)) p = substr(file, RSTART + 1, RLENGTH - 2); else next
+      if (p ~ /[<>*]/) next
+      if (cre ~ /always/) print pfx p
+    }' "$1"
+}
+write_core_set() {   # write_core_set <dir>
+  for p in $(core_set "$spec"); do
+    mkdir -p "$1/$(dirname "$p")" 2>/dev/null
+    # AGENTS.md is §3's thin-pointer EXCEPTION: it carries its ownership as a footer <sub> line, not
+    # a YAML block, precisely because a 6-line header would defeat a ~10-line pointer file. Writing
+    # it with a header made S3.AGENTS fire against a fixture that was supposed to be clean.
+    case "$p" in
+      AGENTS.md)
+        printf -- '# AGENTS\n\nSee `.claude/CLAUDE.md`.\n\n<sub>Doc owner: Maintainer · last updated: 2026-08-20 · status: current</sub>\n' > "$1/$p"
+        ;;
+      *)
+        printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-20\nupdate_trigger: When it changes\nstatus: current\n---\n\n# %s\n\nBody.\n' "${p##*/}" > "$1/$p"
+        ;;
+    esac
+  done
+}
+
 target="$work/target-repo"
 mkdir -p "$target"
-printf '# a repo that never installed lean-flow\n' > "$target/README.md"
+write_core_set "$target"
 
 # A second target that DOES have a real defect: one doc with no ownership header. Needed since
 # SPRINT-075 T3 separated engine gaps from repository findings -- before that, any spec with an
@@ -41,9 +87,8 @@ printf '# a repo that never installed lean-flow\n' > "$target/README.md"
 # blocked level or a non-zero exit now need an actual defect, which is the point.
 target_bad="$work/target-repo-with-a-defect"
 mkdir -p "$target_bad/docs"
-printf '# a repo that never installed lean-flow\n' > "$target_bad/README.md"
+write_core_set "$target_bad"
 printf '# Architecture\n\nNo ownership header, no update trigger.\n' > "$target_bad/docs/architecture.md"
-
 # --- case 1 (must-report): a mechanical rule with no assertion is NAMED as a gap ------------------
 # DoD 3, re-pointed at the gap class (SPRINT-075 T3). The contract this guards is unchanged and is the
 # whole of L-058: a rule the spec states and the engine cannot answer must never be silently absent.

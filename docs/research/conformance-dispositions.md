@@ -45,7 +45,7 @@ from an oversight.
 **Stated as counts, never as a ratio (EPIC-004 D1).** There is no percentage here and there must not be
 one: a ratio would improve every time the standard declines to automate something.
 
-## Covered today (17 rules, 5 checkers)
+## Covered today (19 rules, 5 checkers)
 
 | Rule | Checker |
 |---|---|
@@ -54,19 +54,50 @@ one: a ratio would improve every time the standard declines to automate somethin
 | `S9.GATESWELLFORMED` · `S9.GATESABSENT` | `conformance-engine.sh` *(migrated off `check-gates-signed.sh`, SPRINT-075 T4 — the first family consolidated into the engine; the named findings are unchanged)* |
 | `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` | `conformance-engine.sh` *(SPRINT-075 T6 — the engine's first NEW coverage; five published findings, one retained must-FAIL fixture each)* |
 | `S4.ONEFILE` · `S4.APPEND` · `S4.INDEX` · `S4.SECTIONS` · `S4.NEGATIVE` | `conformance-engine.sh` *(SPRINT-076 T2 — the §4 ADR family; five published findings, one retained must-FAIL fixture each plus a PASS control. `S4.APPEND` is the family's only Gated rule and the engine's first to read git history rather than the tree)* |
+| `S2.F-FILE` · `S2.R-PLACEMENT` | `conformance-engine.sh` *(SPRINT-076 T3 — §2's placement pair, chosen because it is the likeliest artefact source. The required set is derived from §2's own `Create ←` cells, never hard-coded. **See § Artefacts below** — this is the first covered rule that produces artefacts against a generic repository)* |
 | `S11.EPIC` | `check-epic-archive.sh` |
 | `S11.RESEARCH` | `check-research-archive.sh` |
 
-## `build` — 34 rules, each with the finding its check will fire
+
+## Artefacts — where a covered rule says something a stranger cannot act on
+
+**Recorded because measuring it was the point, not because it is comfortable.** SPRINT-075 T3's triage
+returned **0 artefacts** and said so honestly while recording itself as *barely asked*: six of 62 rules
+were covered and none was shape-bound. SPRINT-076 T3 covered the two dispositions judged **likeliest**
+to be shape-bound, and the number moved.
+
+**`S2.F-FILE` — 4 artefacts of 8 findings against a four-file JS library.** §2's unconditional set (the
+nine rows whose `Create ←` cell says "always") mixes two populations:
+
+| Row | Against a generic repository |
+|---|---|
+| `README.md` · `SECURITY.md` · `CHANGELOG.md` · `docs/architecture/overview.md` · `docs/development/setup.md` | **actionable** — repository-universal; an owner can act on each |
+| `AGENTS.md` · `TODO.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` | **artefact** — lean-flow's own loop surface. §2 defines `AGENTS.md` as a thin pointer to `.claude/CLAUDE.md`; `TODO.md` is the lean loop's backlog *mechanism*, and a repo on GitHub Issues already has a backlog |
+
+**Disposition (owner ruling, T3): the engine stays faithful to §2 and is NOT tuned to look quiet.** A
+checker that narrows a rule the standard states is deciding a question the standard owns, which is the
+inversion §3 and L-058 both name — and it would hide the finding this triage exists to produce. The
+real fix is a **spec** change: §2 distinguishing loop-specific rows from repository-universal ones, so
+the engine can read the distinction instead of inferring it. Filed as **TASK-243**.
+
+Retained mechanically, not just written down: `evals/run-foreign-repo-fixtures.sh` applies every
+*actionable* finding and asserts the remainder is **exactly** these four. When the spec is fixed, that
+case reddens and forces a re-triage rather than letting the artefacts quietly become permanent.
+
+**`S2.R-PLACEMENT` — 0 artefacts, and the bound that earned it.** It matches by **basename**, so it can
+only fire on a document whose filename §2 owns; a stranger's `notes/design-notes.md` raises nothing.
+The cost of that bound is a near-miss it cannot see: the JS library's `docs/architecture.md` is
+plausibly the same document as `docs/architecture/overview.md`, and only `S2.F-FILE` reports it — as an
+absence rather than a misplacement. Recorded as a known limit, not a defect: widening to fuzzy matching
+buys one better finding and an unbounded artefact surface.
+## `build` — 32 rules, each with the finding its check will fire
 
 A check specified without its finding name is a half-shipped gate (L-058). Every row ships with a
 **retained** must-FAIL fixture proving that exact string fires (TD-012).
 
 | Rule | Named finding |
 |---|---|
-| `S2.F-FILE` | `core-file-missing` |
 | `S2.F-TIER` | `tier-doc-set-incomplete` |
-| `S2.R-PLACEMENT` | `file-outside-canonical-placement` |
 | `S2.R-README` | `readme-ownership-footer-missing` |
 | `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` · `S6.MULTISVC` | `tier-doc-set-incomplete` *(one check, four tiers — the tier is a parameter, not four checkers)* |
 | `S9.TWOFILES` | `sprint-plan-over-hard-cap` · `sprint-log-missing` |

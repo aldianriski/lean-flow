@@ -87,43 +87,99 @@ fi
 # number mean anything.
 n_fail=$(printf '%s\n' "$out" | grep -c '^FAIL  ')
 n_gap=$(printf '%s\n' "$out" | grep -c '^GAP   ')
-if [ "$n_gap" -gt 0 ] && [ "$n_fail" -gt 0 ] &&
-   printf '%s\n' "$out" | grep -qE '^ +level: none -- Structural not yet reached\. '"$n_fail"' finding' &&
+# The level counts FAILING RULES, not finding LINES, and until T3 the two were the same number --
+# every covered rule emitted at most one finding. `core-file-missing` emits one line per missing file
+# (8 from a single rule), so asserting equality here started failing a correct report. Another
+# criterion going stale under new coverage rather than a regression (L-088), and the fix keeps what
+# the case was actually guarding: gaps must not enter the level.
+lvl=$(printf '%s\n' "$out" | sed -n 's/^ *level: none -- Structural not yet reached\. \([0-9]*\) finding.*/\1/p')
+if [ "$n_gap" -gt 0 ] && [ "$n_fail" -gt 0 ] && [ -n "$lvl" ] &&
+   [ "$lvl" -ge 1 ] && [ "$lvl" -le "$n_fail" ] &&
    printf '%s\n' "$out" | grep -q 'coverage:'; then
-  echo "PASS fixture(gaps-not-counted-against-the-stranger): $n_fail repository finding(s) drive the level; $n_gap engine gap(s) are reported on their own coverage axis"
+  echo "PASS fixture(gaps-not-counted-against-the-stranger): $lvl failing rule(s) across $n_fail finding line(s) drive the level; $n_gap engine gap(s) are held off it and reported on their own coverage axis"
 else
-  echo "FAIL fixture(gaps-not-counted-against-the-stranger): expected the level to count only the $n_fail FAIL line(s), with $n_gap gaps held separate -- got:"
-  printf '%s\n' "$out"; fail=1
+  echo "FAIL fixture(gaps-not-counted-against-the-stranger): expected a level counting failing rules (1..$n_fail) with $n_gap gaps held separate -- got:"
+  printf '%s
+' "$out"; fail=1
 fi
 
 # --- every finding is actionable BY THAT REPO'S OWNER ---------------------------------------------
 # DoD 3's mechanical half. The written triage lives in the sprint's Execution Log; what is retained
-# here is the property that triage established: every FAIL line names a file IN THE TARGET and a rule
-# whose fix is stated in the finding itself. A finding naming a path the stranger does not have is an
-# artefact of dispositions written against our shape -- and per the Plan it routes back to
-# conformance-dispositions.md rather than being tuned away here.
+# here is the property triage established.
+#
+# REVISED at SPRINT-076 T3, and the revision is the point. This case used to read "every FAIL names a
+# file the target actually HAS", which was true when every rule here reported on a document that
+# existed. `core-file-missing` names a file the target LACKS -- by definition -- so the old criterion
+# would have failed a correct finding. That is a criterion going stale under new coverage, not a
+# regression: logged as such rather than quietly re-read (L-088).
+#
+# The criterion that survives both shapes: a finding names a path the STANDARD owns. An
+# ownership-header finding names a file in the tree; a core-file finding names a §2 canonical path.
+# A finding naming neither is an artefact of dispositions written against our shape.
+s2_paths=$(awk '
+  /^## §2/ { in2 = 1; next }
+  /^## §/  { in2 = 0 }
+  !in2     { next }
+  /^\*\*Conformance/        { in2 = 0; next }
+  /^\*\*Root files/         { pfx = "";         next }
+  /^\*\*AI context/         { pfx = ".claude/"; next }
+  /^\*\*`docs\/` tree\*\*/  { pfx = "docs/";    next }
+  /^\|/ {
+    n = split($0, c, "|"); if (n < 5) next
+    if (match(c[2], /`[^`]+`/)) p = substr(c[2], RSTART + 1, RLENGTH - 2); else next
+    if (p ~ /[<>*]/) next
+    print pfx p
+  }' "$spec")
+
 unactionable=""
 for f in $(printf '%s\n' "$out" | sed -n 's/^FAIL  [a-z-]*: \([^ ]*\) .*/\1/p'); do
-  [ -e "$foreign/$f" ] || unactionable="$unactionable $f"
+  [ -e "$foreign/$f" ] && continue
+  printf '%s\n' "$s2_paths" | grep -qxF "$f" && continue
+  unactionable="$unactionable $f"
 done
 if [ -z "$unactionable" ]; then
-  echo "PASS fixture(findings-name-files-that-exist): every named finding points at a file the target actually has"
+  echo "PASS fixture(findings-name-a-path-the-standard-owns): every named finding points at a file the target has, or at a §2 canonical path it owes"
 else
-  echo "FAIL fixture(findings-name-files-that-exist): finding(s) name paths absent from the target --$unactionable"
+  echo "FAIL fixture(findings-name-a-path-the-standard-owns): finding(s) name paths that are neither in the target nor named by §2 --$unactionable"
   echo "  (per the Plan this is evidence about docs/research/conformance-dispositions.md, not a reason to quieten the engine)"
   fail=1
 fi
 
-# --- a stranger with nothing wrong must come out clean --------------------------------------------
-# The control for the case above: give the same repo the ownership header the two findings asked for
-# and the report must go green, or the findings were not actionable in the only sense that matters.
+# --- acting on the ACTIONABLE findings, and what is left over -------------------------------------
+# SPRINT-075's version applied every finding and asserted the repo went green. That control cannot
+# survive T3 honestly, because 4 of the 8 new findings are ARTEFACTS: §2's unconditional set mixes
+# repository-universal files (SECURITY.md, CHANGELOG.md) with lean-flow's own loop surface
+# (`TODO.md`, `AGENTS.md`, `.claude/CLAUDE.md`, `.claude/CONTEXT.md`). Telling a four-file JS library
+# it owes a Claude Code context file is our shape wearing their repo's name -- the exact failure this
+# harness was built to detect, now detected.
+#
+# Owner ruling (T3): the engine stays FAITHFUL to §2 as written and is not tuned to look quiet; the
+# artefact is recorded in the register and the real fix -- §2 distinguishing loop rows from universal
+# ones -- is filed as a follow-up. So this control applies only the ACTIONABLE findings and then
+# asserts the remainder is EXACTLY the four known artefacts.
+#
+# Retaining the count is what makes this more than a comment: when the spec is fixed, this case
+# reddens and forces a re-triage instead of the artefacts quietly becoming permanent.
 printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-20\nupdate_trigger: When the architecture changes\nstatus: current\n---\n\n# Architecture\n\nThe widget talks to the store.\n' > "$foreign/docs/architecture.md"
-out2=$(sh "$engine" "$foreign" --spec "$spec" 2>&1); rc2=$?
-if [ "$rc2" -eq 0 ] && ! printf '%s\n' "$out2" | grep -q '^FAIL  '; then
-  echo "PASS fixture(acting-on-the-findings-clears-them): applying exactly what the two findings asked for cleared both -- exit 0, no FAIL line"
+printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-20\nupdate_trigger: When the disclosure route changes\nstatus: current\n---\n\n# Security Policy\n\nReport vulnerabilities to security@acme.example.\n' > "$foreign/SECURITY.md"
+printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-20\nupdate_trigger: Every release\nstatus: current\n---\n\n# Changelog\n\n## 1.0.0\n\n- first release\n' > "$foreign/CHANGELOG.md"
+mkdir -p "$foreign/docs/architecture" "$foreign/docs/development"
+printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-20\nupdate_trigger: When the architecture changes\nstatus: current\n---\n\n# Overview\n\nThe widget talks to the store.\n' > "$foreign/docs/architecture/overview.md"
+printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-20\nupdate_trigger: When setup changes\nstatus: current\n---\n\n# Setup\n\n    npm i\n' > "$foreign/docs/development/setup.md"
+
+out2=$(sh "$engine" "$foreign" --spec "$spec" 2>&1)
+left=$(printf '%s\n' "$out2" | sed -n 's/^FAIL  \([a-z-]*\): \([^ ]*\) .*/\1: \2/p' | LC_ALL=C sort)
+expected='core-file-missing: .claude/CLAUDE.md
+core-file-missing: .claude/CONTEXT.md
+core-file-missing: AGENTS.md
+core-file-missing: TODO.md'
+if [ "$left" = "$expected" ]; then
+  echo "PASS fixture(actionable-findings-clear-leaving-only-the-4-known-artefacts): every actionable finding cleared; the remainder is exactly the four lean-flow-loop rows recorded in conformance-dispositions.md"
 else
-  echo "FAIL fixture(acting-on-the-findings-clears-them): the fix the findings prescribed did not clear them -- exit $rc2:"
-  printf '%s\n' "$out2" | grep '^FAIL  '
+  echo "FAIL fixture(actionable-findings-clear-leaving-only-the-4-known-artefacts): the remainder is not the recorded artefact set."
+  echo "  expected:"; printf '%s\n' "$expected" | sed 's/^/    /'
+  echo "  got:";      printf '%s\n' "$left"     | sed 's/^/    /'
+  echo "  (if the spec now distinguishes loop rows from universal ones, RE-TRIAGE and update this case -- do not just widen it)"
   fail=1
 fi
 

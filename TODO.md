@@ -152,6 +152,14 @@ status: current
                   shape* — with the verdict recorded. A high artefact count is a finding about
                   `docs/research/conformance-dispositions.md` and routes back there; the engine is not
                   tuned to look quiet
+                  **§2's third is DONE (SPRINT-076 T3) and the remaining two are what this row now
+                  waits on.** The re-run happened with `S2.F-FILE` · `S2.R-PLACEMENT` live and the
+                  number moved off zero: **4 artefacts of 8 new findings** — `AGENTS.md` · `TODO.md` ·
+                  `.claude/CLAUDE.md` · `.claude/CONTEXT.md`, all of them lean-flow's own loop surface
+                  rather than repository structure. Routed back to the register (§ Artefacts) exactly as
+                  this row requires, the engine left faithful rather than quietened, and the spec fix
+                  filed as TASK-243. So the METHOD is proven and the finding is real; what is unproven
+                  is the other two families
       touches:    evals/run-foreign-repo-fixtures.sh (extend the target if the new rules need one) ·
                   docs/research/conformance-dispositions.md (only if artefacts are found) · the
                   sprint Execution Log that runs it
@@ -160,10 +168,40 @@ status: current
                   strength of that number would be reading it backwards.** Only 6 of 62 checkable
                   rules had assertions, and none of them were the rules most likely to encode our own
                   directory shape — so the question was barely asked, not answered. The trigger is
-                  coverage reaching those families, not a schedule
-      tracker:    SPRINT-075 T3 · EPIC-004 § Closed-when 1 · L-015 · L-016
+                  coverage reaching those families, not a schedule.
+                  **Re-parked at SPRINT-076 T3 with a NARROWED condition, not discharged** — §2 is in
+                  and confirmed the suspicion; unblock when **§6's tier doc-sets** or **§11's ledger
+                  rules** are evaluated by the ENGINE (§11's two are covered today by standalone
+                  checkers, which never run against a foreign tree). Naming the remaining families is
+                  what keeps this a condition rather than a standing wish (L-094: the class of fact
+                  that closes it is a measurement, and it accumulates one family at a time)
+      tracker:    SPRINT-075 T3 · SPRINT-076 T3 (the §2 third) · EPIC-004 § Closed-when 1 · L-015 · L-016
       origin:     close-retro
       state:      blocked
+
+- [ ] TASK-243 — Mark which §2 rows are lean-flow-loop rows rather than repository-universal ones  [size: S] [risk: med] [HITL]
+      class:      decision
+      done-when:  §2 distinguishes, in a form a checker can READ, the rows every repository owes from
+                  the rows only a lean-flow/Claude-Code repo owes — so `S2.F-FILE` can stop telling a
+                  four-file JS library it needs `.claude/CONTEXT.md`. The engine reads that
+                  distinction instead of inferring it, `docs/research/conformance-dispositions.md`
+                  § Artefacts is updated with the new count, and
+                  `evals/run-foreign-repo-fixtures.sh`'s retained artefact-set case is **re-triaged**
+                  rather than merely widened
+      touches:    spec/STANDARD.md (§2) · spec/CHANGELOG.md · scripts/lib/conformance-engine.sh ·
+                  evals/run-foreign-repo-fixtures.sh · docs/research/conformance-dispositions.md
+      depends-on: none
+      assumes:    the fix belongs in the SPEC, not the checker — narrowing a rule the standard states
+                  is a checker deciding a question the standard owns, which is the inversion L-058
+                  keeps naming. **Whether this is a MINOR bump is the open call**: it changes what a
+                  conformant report says about an existing adopter, which is more than the PATCH
+                  wording-only bar TASK-237 uses. Four of the nine unconditional rows are affected
+                  (`AGENTS.md` · `TODO.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md`) — a figure
+                  derived at SPRINT-076 T3 and to be **re-derived** when this runs, never trusted from
+                  here (L-130)
+      tracker:    SPRINT-076 T3 · docs/research/conformance-dispositions.md § Artefacts · TASK-238
+      origin:     close-retro
+      state:      ready
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution
