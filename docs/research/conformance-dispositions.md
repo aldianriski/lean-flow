@@ -17,11 +17,11 @@ an undifferentiated middle. Rule ids are `spec/STANDARD.md` §14's; that file is
 the register. Split from `conformance-baseline.md` under §2's growth rule — split, never squeeze (L-131).
 
 **Counts, re-derived from the annotated spec, not from the baseline.** 100 candidates · **100
-classified** · **63 checkable** (49 `mechanical` + 14 `split`, counting a split's mechanical half) · **8
-covered** · **55 dispositioned here — 43 `build`, 12 `scope-out`**. The baseline's "39
+classified** · **63 checkable** (49 `mechanical` + 14 `split`, counting a split's mechanical half) · **12
+covered** · **51 dispositioned here — 39 `build`, 12 `scope-out`**. The baseline's "39
 uncovered-mechanical" predates the re-derivation and is superseded; see § Divergences.
 
-Reconciled mechanically, not by eye: 8 + 43 + 12 = 63, and **no checkable rule is left without a
+Reconciled mechanically, not by eye: 12 + 39 + 12 = 63, and **no checkable rule is left without a
 disposition** (`comm` of the checkable set against the union of the three sections returns empty).
 
 **Updated at SPRINT-074 T1**, which ruled the two rules that were still `?`: `S4.INDEX` →
@@ -29,34 +29,44 @@ Structural/mechanical, joining `build` below (+1 checkable, +1 `build`); `S5.DIS
 `implementation-directed`, which takes it **out** of the checkable set rather than into `scope-out` —
 that mark is not a disposition, and the distinction is the one §14 exists to hold.
 
+**Updated at SPRINT-075.** T4 migrated `S9.GATESWELLFORMED`/`S9.GATESABSENT` off their standalone
+checker into the engine — a change of *which file* answers, never of the count or the finding names.
+T6 then moved `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` from `build` into § Covered today:
+**covered 8 → 12, `build` 43 → 39**, and the identity still closes at 63. Both edits were reconciled
+by re-counting the rule ids in each table rather than by adjusting the header (L-105).
+
+**One divergence left standing, named rather than silently repaired.** SPRINT-074 shipped
+`check-attestation.sh` covering §13's five `build` rules, and § Covered today never gained that row —
+so this register still counts those five under `build`. That predates SPRINT-075 and is not this
+sprint's to fix on the way past: correcting it moves numbers three sections of this file depend on,
+which is a reconciliation pass, not a footnote. Flagged here so the next reader can tell a known gap
+from an oversight.
+
 **Stated as counts, never as a ratio (EPIC-004 D1).** There is no percentage here and there must not be
 one: a ratio would improve every time the standard declines to automate something.
 
-## Covered today (8 rules, 5 checkers)
+## Covered today (12 rules, 5 checkers)
 
 | Rule | Checker |
 |---|---|
 | `S2.F-CAP` · `S7.MEGA` · `S7.SPRINT400` | `check-doc-caps.sh` |
 | `S2.R-TEMPDIR` | `check-ephemeral-intake.sh` |
 | `S9.GATESWELLFORMED` · `S9.GATESABSENT` | `conformance-engine.sh` *(migrated off `check-gates-signed.sh`, SPRINT-075 T4 — the first family consolidated into the engine; the named findings are unchanged)* |
+| `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` | `conformance-engine.sh` *(SPRINT-075 T6 — the engine's first NEW coverage; five published findings, one retained must-FAIL fixture each)* |
 | `S11.EPIC` | `check-epic-archive.sh` |
 | `S11.RESEARCH` | `check-research-archive.sh` |
 
-## `build` — 43 rules, each with the finding its check will fire
+## `build` — 39 rules, each with the finding its check will fire
 
 A check specified without its finding name is a half-shipped gate (L-058). Every row ships with a
 **retained** must-FAIL fixture proving that exact string fires (TD-012).
 
 | Rule | Named finding |
 |---|---|
-| `S1.LAW2` | `owner-not-a-role` |
-| `S1.LAW3` | `update-trigger-absent` |
 | `S2.F-FILE` | `core-file-missing` |
 | `S2.F-TIER` | `tier-doc-set-incomplete` |
 | `S2.R-PLACEMENT` | `file-outside-canonical-placement` |
 | `S2.R-README` | `readme-ownership-footer-missing` |
-| `S3.SCHEMA` | `ownership-header-missing` · `ownership-header-field-missing` |
-| `S3.AGENTS` | `agents-ownership-footer-missing` |
 | `S4.ONEFILE` | `adr-path-noncanonical` |
 | `S4.APPEND` | `adr-edited-after-decision` |
 | `S4.INDEX` | `decisions-index-missing-adr` |

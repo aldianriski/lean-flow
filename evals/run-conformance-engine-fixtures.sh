@@ -34,12 +34,42 @@ target="$work/target-repo"
 mkdir -p "$target"
 printf '# a repo that never installed lean-flow\n' > "$target/README.md"
 
-# --- case 1 (must-FAIL): a mechanical rule with no assertion reports rule-unimplemented -----------
-# DoD 3. The real spec against the throwaway target: with zero assertions shipped by T2, every
-# mechanical/split rule is unimplemented, so this is not a contrived case -- it is the honest state
-# of the engine today, retained because T4/T6 will start shrinking it rather than eliminating it.
-run_case_anywhere "rule-unimplemented-fires" 1 "rule-unimplemented" -- \
+# A second target that DOES have a real defect: one doc with no ownership header. Needed since
+# SPRINT-075 T3 separated engine gaps from repository findings -- before that, any spec with an
+# unimplemented rule produced a "finding" and a blocked level against ANY target, so a repo with
+# nothing wrong could not be told apart from one with something wrong. The cases below that assert a
+# blocked level or a non-zero exit now need an actual defect, which is the point.
+target_bad="$work/target-repo-with-a-defect"
+mkdir -p "$target_bad/docs"
+printf '# a repo that never installed lean-flow\n' > "$target_bad/README.md"
+printf '# Architecture\n\nNo ownership header, no update trigger.\n' > "$target_bad/docs/architecture.md"
+
+# --- case 1 (must-report): a mechanical rule with no assertion is NAMED as a gap ------------------
+# DoD 3, re-pointed at the gap class (SPRINT-075 T3). The contract this guards is unchanged and is the
+# whole of L-058: a rule the spec states and the engine cannot answer must never be silently absent.
+# What changed is only where the fact is counted -- a GAP line says something about THIS ENGINE, so it
+# no longer sets the adopter's exit code or blocks the adopter's level.
+run_case_anywhere "rule-unimplemented-is-named" 0 "rule-unimplemented" -- \
   sh "$engine" "$target" --spec "$spec"
+
+# ...and the line carries the GAP label, not a FAIL one. Asserted separately from the text above for
+# the reason T4 learned the hard way: a substring assertion cannot see a relabelled verdict, and the
+# label IS the contract here -- FAIL would put our missing work back on the adopter's report.
+out=$(sh "$engine" "$target" --spec "$spec" 2>&1); rc=$?
+n_gap_lines=$(printf '%s\n' "$out" | grep -c '^GAP   ')
+n_fail_lines=$(printf '%s\n' "$out" | grep -c '^FAIL  ')
+if [ "$rc" -eq 0 ] && [ "$n_gap_lines" -gt 0 ] && [ "$n_fail_lines" -eq 0 ] &&
+   printf '%s\n' "$out" | grep -q 'coverage:'; then
+  echo "PASS fixture(gap-is-labelled-gap-and-does-not-set-exit): $n_gap_lines GAP line(s), 0 FAIL, exit 0, coverage line present"
+else
+  echo "FAIL fixture(gap-is-labelled-gap-and-does-not-set-exit): exit $rc, $n_gap_lines GAP, $n_fail_lines FAIL -- output:"
+  printf '%s\n' "$out"; fail=1
+fi
+
+# A repo WITH a defect must still exit 1 and name it -- the separation must not have made the engine
+# quiet, which is the failure mode the Plan warned about ("do not tune the engine to look quiet").
+run_case_anywhere "real-finding-still-fails" 1 "ownership-header-missing: docs/architecture.md" -- \
+  sh "$engine" "$target_bad" --spec "$spec"
 
 # --- case 2 (PASS control): judgment-only / implementation-directed never produce a verdict line --
 # DoD 2. S1.LAW1 (judgment-only) and S13.NOINFER (implementation-directed) are real rules in the
@@ -74,7 +104,7 @@ awk '
   { print }
 ' "$spec" > "$work/spec-remark-to-mechanical.md"
 out=$(sh "$engine" "$target" --spec "$work/spec-remark-to-mechanical.md" 2>&1); rc=$?
-if [ "$rc" -eq 1 ] && printf '%s\n' "$out" | grep -qE '^FAIL  S13\.NOINFER *-- rule-unimplemented'; then
+if printf '%s\n' "$out" | grep -qE '^GAP   S13\.NOINFER *-- rule-unimplemented'; then
   echo "PASS fixture(mark-driven-forward): re-marking S13.NOINFER mechanical made the engine dispatch it -- no code change"
 else
   echo "FAIL fixture(mark-driven-forward): exit $rc; S13.NOINFER did not flip to rule-unimplemented -- output:"
@@ -163,7 +193,10 @@ awk '
   /^## / { h = $0; sub(/^## [^0-9]*/, "", h); sec = h + 0 }
   sec == 1 || $0 !~ /^\| `S[0-9]/ { print }
 ' "$spec" > "$work/spec-section1-only.md"
-out=$(sh "$engine" "$target" --spec "$work/spec-section1-only.md" 2>&1); rc=$?
+# Run against the DEFECTIVE target: since T3 separated the axes, an unimplemented rule no longer
+# blocks a level, so a level line can only be exercised by a real finding. §1's S1.LAW3 (split,
+# Structural) has an assertion as of T6 and fires update-trigger-absent on the header-less doc.
+out=$(sh "$engine" "$target_bad" --spec "$work/spec-section1-only.md" 2>&1); rc=$?
 if [ "$rc" -eq 1 ] && printf '%s\n' "$out" | grep -qE 'level: none -- Structural not yet reached'; then
   echo "PASS fixture(level-line-states-blocked-level): level: none, naming Structural as not yet reached"
 else
@@ -211,8 +244,13 @@ awk '
   /^\| `S1\.LAW4` \|/ { print; print "| `S1.EXTRA` | Structural | `mechanical` | added by the fixture |"; next }
   { print }
 ' "$work/spec-clean.md" > "$work/spec-dirty.md"
-run_case_anywhere "exit-1-findings" 1 "rule-unimplemented" -- \
+# Exit 1 comes from a REPOSITORY finding, never from a gap (T3's separation). spec-dirty adds a
+# mechanical rule with no assertion, which is now a GAP and must leave the exit code alone; the
+# non-zero exit below is earned by S1.LAW3 firing on target_bad's header-less doc instead.
+run_case_anywhere "gap-alone-does-not-set-exit" 0 "rule-unimplemented" -- \
   sh "$engine" "$target" --spec "$work/spec-dirty.md"
+run_case_anywhere "exit-1-findings" 1 "update-trigger-absent: docs/architecture.md" -- \
+  sh "$engine" "$target_bad" --spec "$work/spec-section1-only.md"
 
 # Case 8's check ran only against the real spec, whose report never reaches the "level: Attested"
 # branch (something is always unimplemented there) -- so that branch's own wording was never
@@ -240,13 +278,20 @@ fi
 # on the very same report. Confirmed live: reverting to the before/after-$fail comparison reproduces
 # exactly this misreport ("level: Structural -- 1 finding(s) at Gated..." with LAW2/LAW3 both still
 # FAILing above it); restoring the per-call flag fixes it back to "level: none".
+#
+# REBUILT at T3: the original injected an UNIMPLEMENTED Gated rule to produce the earlier failure, and
+# an unimplemented rule is now a GAP that deliberately fails nothing -- so the case would have gone on
+# passing while testing nothing, the exact silent-decay this suite exists to prevent. It now injects a
+# rule that really fails: `S3.SCHEMA` re-marked Gated and placed before `S1.LAW3` in document order
+# (the id drives which assertion runs, the Level column drives which bucket counts it), run against the
+# defective target so both rules genuinely fail.
 awk '
-  /^\| `S1\.LAW2` \|/ { print "| `S1.TESTGATED` | Gated | `mechanical` | injected, unimplemented, fails first in document order |"; print; next }
+  /^\| `S1\.LAW3` \|/ { print "| `S3.SCHEMA` | Gated | `mechanical` | injected: a REAL failure, earlier in document order |"; print; next }
   { print }
 ' "$work/spec-section1-only.md" > "$work/spec-level-bucket.md"
-out=$(sh "$engine" "$target" --spec "$work/spec-level-bucket.md" 2>&1); rc=$?
+out=$(sh "$engine" "$target_bad" --spec "$work/spec-level-bucket.md" 2>&1); rc=$?
 if [ "$rc" -eq 1 ] &&
-   printf '%s\n' "$out" | grep -qE '^FAIL  S1\.LAW2' &&
+   printf '%s\n' "$out" | grep -qE '^FAIL  update-trigger-absent' &&
    printf '%s\n' "$out" | grep -qE 'level: none -- Structural not yet reached'; then
   echo "PASS fixture(level-bucket-survives-prior-failure): a Gated failure earlier in document order did not mask S1.LAW2's later Structural failure -- level correctly stays 'none', not inflated to 'Structural'"
 else

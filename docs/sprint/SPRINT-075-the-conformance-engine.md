@@ -62,34 +62,22 @@ provably identical to what the attestation checker derives today.
 - [x] The reader parses **every** `## §N` section that carries a Conformance block — *Verify: run it
       across all 13 and reconcile the per-section counts against §14's own table (`4·21·3·7·2·4·9·0·10·10·11·12·7 = 100`);
       a section returning zero rows when §14 says it has some is a FAIL, not an empty result*
-      → `sh scripts/lib/read-spec-rules.sh spec/STANDARD.md --reconcile` — **13 of 13 PASS, total 100
-      reconciled**, section by section, against §14's own counts row *read from the spec* rather than
-      hard-coded. §8 returns 0 and that is correct — §14 publishes 0 for it, and the reader consults
-      that count in every mode precisely so *has no rules* is distinguishable from *was dropped*.
+      → **13 of 13 sections PASS, 100 rules reconciled** against §14's own counts row. Log, T1.
 - [x] §13's output is **unchanged** — *Verify: diff the reader's §13 rows against what
       `check-attestation.sh` derives today, mechanically. This is a refactor of a working parse; a
       behaviour change here is a regression, not an improvement*
-      → the shipped parse was **lifted verbatim** out of the file (`sed -n '87,105p'` piped to `eval`,
-      never retyped) and run against the same spec; `diff` against the reader's `--section 13` output
-      is **empty**, 7 rows each. Load-bearing detail: the row anchor had to widen from `[A-Z]+` to
-      `[A-Z0-9-]+` or **26 rules would have been silently dropped** (all of §1, all of §2, one in §7,
-      whose ids carry digits or hyphens) — widened, then proven not to change §13.
+      → shipped parse lifted verbatim and diffed: **empty diff**, 7 rows each. The row anchor had to
+      widen to `[A-Z0-9-]+` or 26 rules would have been dropped silently. Log, T1.
 - [x] An absent or unparseable table is a **named finding**, never an empty rule set — *Verify: a
       retained must-FAIL fixture pointing the reader at a spec with no tables reports
       `spec-table-unreadable`. A reader returning nothing checks nothing and exits clean, which is the
       false negative the whole engine would otherwise inherit (L-058)*
-      → `evals/run-spec-reader-fixtures.sh`, **retained**: 9 cases, **5 must-FAIL, one per named
-      finding** — `spec-table-unreadable` (whole spec · and a section whose rows were stripped while
-      §14 still publishes 7 for it) · `section-rows-mismatch` · `spec-counts-unreadable` ·
-      `spec-not-found` — plus 3 PASS controls and a position-anchoring case. **Shown to discriminate,
-      not merely pass** (L-137): two breaks seeded, each reddening the right cases.
+      → `evals/run-spec-reader-fixtures.sh`, retained: **9 cases, 5 must-FAIL**, one per named finding,
+      shown to discriminate under seeded breaks (L-137). Log, T1.
 - [x] `check-attestation.sh` consumes the reader rather than keeping its own copy — *Verify:
       `evals/run-attestation-fixtures.sh` still green, all 16 assertions, unmodified*
-      → its 25-line parse block is now one call to the reader; **all 16 assertions green with the
-      harness file untouched** (`git status` shows no change to it), which is what makes this a
-      refactor rather than a rewrite. The checker keeps its own `spec-table-unreadable` wording, so
-      the published finding text is unchanged. Registered in `qa-check.sh`'s always-on harness set —
-      the gate's own completeness leg fails any harness in `evals/` that is left ungated (L-020).
+      → its 25-line parse is one call to the reader; **all 16 assertions green, harness file untouched**.
+      Registered in `qa-check.sh`'s always-on set (L-020). Log, T1.
 
 ### T2 — Build the engine core: registry, dispatch, report `[size: M · risk: med · class: execution · HITL]`
 Layers: `conformance.sh` (the standalone entry point at the repo root — **declared at execution**
@@ -101,7 +89,8 @@ Cites: EPIC-004 D1 · D2 (settled at intake) · `spec/STANDARD.md` §14 (levels,
        no-percentage rule) · ADR-021 · `read-spec-rules.sh` (T1's reader — **consumed, not
        modified**, which is why it sits here and not in `Layers:`) · `S13.NOINFER` · `S1.LAW2`
        (the two rule ids the mark-driven fixtures re-mark in a spec copy to prove dispatch reads the
-       Mark column each run)
+       Mark column each run) · **T3** (whose foreign-repo evidence refined two of the DoD below —
+       cited, not depended on: T2 shipped first and T3 amended it afterwards)
 The engine is the §13 checker's dispatch loop with the rule set widened and the report generalised. Its
 whole correctness claim is that **the spec decides what gets evaluated** — so the mark column drives
 inclusion, and a rule the spec states but the engine cannot answer is reported rather than absent.
@@ -114,57 +103,35 @@ and why.
 - [x] Dispatch is **mark-driven**, not a hard-coded list — *Verify: re-mark a rule in a spec copy and
       the engine's behaviour changes with no code edit, the same fixture shape SPRINT-074 used to prove
       it for §13*
-      → proven in **both directions**, which one fixture alone would not do: `mark-driven-forward`
-      re-marks `S13.NOINFER` *mechanical* in a spec copy and the engine starts dispatching it;
-      `mark-driven-reverse` re-marks `S1.LAW2` *implementation-directed* and it stops. No code edit in
-      either. The rule set and marks come from `read-spec-rules.sh`; only the assertion bodies are the
-      engine's.
+      → proven in BOTH directions with no code edit: re-marking `S13.NOINFER` mechanical makes the
+      engine dispatch it; re-marking `S1.LAW2` implementation-directed stops it. Log, T2.
 - [x] `judgment-only` and `implementation-directed` rules are **never evaluated against the repo** —
       *Verify: neither appears as a verdict line; a fixture asserts it. These are the findings no
       adopter can ever clear (§14)*
-      → `judgment-and-impl-directed-never-verdicts` asserts no `PASS`/`FAIL` line carries `S1.LAW1`
-      (judgment-only) or `S13.NOINFER` (implementation-directed); both appear only as notes. The live
-      run against this repo bears it out: **32 judgment-required + 6 excluded**, matching the spec's
-      own mark tally exactly, and §14's stated six implementation-directed rules. **The fixture itself
-      had to be repaired first** — its success path was a bare `grep && grep && echo` chain that
-      short-circuited to *silence* when a grep failed, so it could pass or vanish but never fail, and
-      it vanished under the very break it guards. Rewritten as an explicit arm that sets `fail=1`; a
-      case that cannot distinguish "passed" from "never ran" is not a check (L-103 · L-137).
+      → reported as notes, never as a verdict line; asserted on both rule kinds. Log, T2.
 - [x] A `mechanical` rule with no assertion reports `rule-unimplemented` — *Verify: retained must-FAIL
       fixture. With 34 dispositions still unbuilt this will fire a lot, and that is correct: the gap is
       the report's most useful content this sprint*
-      → `rule-unimplemented-fires` (retained, must-FAIL, exit 1). Against this repo it fires **62
-      times** — every `mechanical` (49) and `split` (13) rule, since T2 ships the driver and no
-      assertions. That reconciles to 100 with the notes: `62 + 32 + 6 = 100`. Discrimination proven by
-      silencing the path (`bad` → `note`): **5 fixtures reddened**, including this one.
+      → retained must-FAIL case. **Re-pointed at T3's `GAP` class**: still named on every report, no
+      longer counted against the repo under test. Log, T2 · T3.
 - [x] The report states a **level** and the findings preventing the next one — *Verify: fixture*
-      → `level-line-states-blocked-level`, plus `level-bucket-survives-prior-failure` guarding the
-      subtler half — a Gated failure earlier in document order must not mask a later Structural one and
-      inflate the level. Live: `level: none -- Structural not yet reached. 43 finding(s) at Structural
-      prevent it`. **43 independently re-derived** from the spec as Structural × (`mechanical`|`split`)
-      — it agrees, and it is *not* the 43 `build` dispositions, which is a different set of the same
-      size (checked, because two equal numbers in one sprint invite exactly that confusion).
+      → `level: none -- Structural not yet reached. N finding(s) prevent it`, with the per-level
+      bucketing regression retained as its own case. Log, T2.
 - [x] **No score, grade or percentage appears anywhere in the output** — *Verify: a fixture greps the
       output for `%`, `score`, `grade` and a ratio shape and asserts absence. §14 forbids it
       normatively, so this is checked rather than trusted (L-058)*
-      → `no-score-grade-percentage-or-ratio` asserts absence of all four. Covered on **both report
-      branches**, not just the reachable one: a second case exercises the `level: Attested` wording,
-      which only a clean spec reaches, so the forbidden text cannot hide in the branch this repo never
-      takes. The summary line states **counts** (`0 passed, 32 judgment-required, 6 excluded`), which
-      is what §14 requires in place of a ratio — a denominator here would average a deliberate
-      judgment-only boundary together with a real gap.
+      → grepped for `%`, `score`, `grade` and a ratio shape on the largest run, **and** on the
+      `level: Attested` branch this repo never reaches. Log, T2.
 - [x] Exit 0 clean / 1 findings, CI-usable — *Verify: fixture asserts both, on the same repo*
-      → `exit-0-clean` and `exit-1-findings`, both against the same target repo, differing only in the
-      spec they are pointed at — so the exit code is shown to track the findings and not the target.
-      Live against this repo: **exit 1** with 62 findings. `qa-check.sh` runs the engine on every gate
-      as its own first consumer, **informationally**: its findings are relayed but not counted into the
-      gate's tally, because 34 dispositions stay deliberately deferred past this sprint (§ Scope) and
-      gating on them would hold the gate red over scheduled work rather than a regression. The engine's
-      own exit code is the CI-usable signal an adopter gates on. **Follow-up at close: gate this repo
-      on it once coverage makes the residue worth blocking.**
+      → both asserted on the same repo. **Refined at T3**: the exit code answers for repository
+      findings only, never for engine gaps (ADR-027 marker). Log, T2 · T3.
 
 ### T3 — Run the engine against a repo that has never seen lean-flow `[size: M · risk: med · class: decision · HITL]`
-Layers: `evals/` (a foreign-repo harness) · the engine (only if the run exposes a defect)
+Layers: `evals/run-foreign-repo-fixtures.sh` (the foreign-repo harness) ·
+        `scripts/lib/conformance-engine.sh` (the run DID expose a defect — the `GAP` class) ·
+        `evals/run-conformance-engine-fixtures.sh` (T2's suite, repointed at the new semantics) ·
+        `scripts/qa-check.sh` (harness registered) · `docs/adr/ADR-027-*.md` (refinement marker) —
+        declared at execution, L-100
 Depends-on: T2, T6
 Cites: EPIC-004 § Closed-when 1 · L-015 (the consumer surface) · L-016 (verify on the consumer path
        when the repo cannot dogfood) · `docs/research/conformance-dispositions.md`
@@ -176,18 +143,34 @@ task is the first contact with a repository that never agreed to any of it.
 finding a reasonable owner would call meaningless.
 
 **DoD:**
-- [ ] The engine runs against a repo built from scratch with none of our conventions — *Verify: the
+- [x] The engine runs against a repo built from scratch with none of our conventions — *Verify: the
       harness builds it under `mktemp -d`; no lean-flow file is copied in*
-- [ ] It emits a level and named findings, and **nothing** for `judgment-only` /
+      → `evals/run-foreign-repo-fixtures.sh` builds `acme-widget` (README · src · one doc ·
+      package.json) with printf under `mktemp -d`. **No lean-flow file is copied in, and the harness
+      asserts that mechanically** (exactly 4 files), so a later edit that copies a template in fails
+      loudly instead of quietly measuring our own shape (L-015 · L-016).
+- [x] It emits a level and named findings, and **nothing** for `judgment-only` /
       `implementation-directed` rules — *Verify: fixture asserts both halves*
-- [ ] **Every finding is triaged for actionability, and the verdict is recorded** — *Verify: a written
+      → level line + 2 named findings; **0** verdict lines for the 33 judgment-only / 6
+      implementation-directed rules, which appear as notes only. *Read as "no VERDICT line" — §14 and
+      EPIC-004 D1 both require a conformant report to NAME its judgment-required items, so emitting
+      nothing at all would breach the epic while satisfying the word. Stated, not silently reinterpreted
+      (L-088).*
+- [x] **Every finding is triaged for actionability, and the verdict is recorded** — *Verify: a written
       pass over the output classifying each finding as *actionable by that repo's owner* or *an
       artefact of dispositions written against our own shape*. **A high artefact count is a finding
       about `docs/research/conformance-dispositions.md`, and routes back there** — do not tune the engine to look
       quiet (L-088: the criterion is the report being honest, not short)*
-- [ ] EPIC-004 § Closed-when 1 is ticked or the reason it is not is written down — *Verify: the epic
+      → **2 findings, both actionable, 0 artefacts** — table in the Log. Proven, not asserted:
+      applying exactly what they asked for takes the same repo to exit 0. **Recorded as weaker than it
+      looks** — at 6 of 62 rules implemented, the shape-bound dispositions (§2 placement, §6 tiers, §11
+      ledgers) are untouched, so the artefact question is barely asked yet, not answered.
+      **The run also changed the engine**: 56 of 58 FAIL lines were our own gaps, so a `GAP` class now
+      carries them off the adopter's level and exit code (owner ruling → ADR-027 refinement marker).
+- [x] EPIC-004 § Closed-when 1 is ticked or the reason it is not is written down — *Verify: the epic
       row; a condition ticked without its evidence is the tick this sprint exists to avoid*
 
+      → ticked in the epic with its evidence, naming what the run does and does not establish.
 ### T4 — Migrate the §9 gates-signed family into the engine `[size: M · risk: med · class: execution · HITL]`
 Layers: `scripts/lib/check-gates-signed.sh` (deleted) · `scripts/lib/conformance-engine.sh` (the
         engine — declared by PATH at execution, L-100: "the engine" is prose the layers-observed
@@ -209,38 +192,23 @@ fixtures that guarded them still pass without being rewritten.
 **DoD:**
 - [x] `S9.GATESWELLFORMED` and `S9.GATESABSENT` are evaluated by the engine — *Verify: both appear as
       verdict lines against a sprint file*
-      → both dispatch and print against a real sprint file. Against this repo:
-      `PASS  gates-signed: docs/sprint/SPRINT-075-...md -- G1,G2 signed @ 203d202` (S9.GATESWELLFORMED)
-      and `gates-signed: ... -- not evaluated by S9.GATESABSENT: field present (see S9.GATESWELLFORMED)`
-      — the pair is **mutually exclusive by construction**, so each names the other rather than going
-      silent, and *absent* is distinguishable from *not run*. The absent branch is exercised by the
-      retained fixtures: `NOT SIGNED (no gates_signed: field)`, emitted as an unlabelled note, never a
-      PASS.
+      → both dispatch and print against a real sprint file; the pair is mutually exclusive by
+      construction, so *absent* is distinguishable from *not run*. Detail → Log, T4.
 - [x] Their named findings are reproduced **exactly** — *Verify: string-compare the engine's findings
       against the shipped checker's before deleting it. A renamed finding silently breaks a published
       contract (SPRINT-074 D2's reasoning, one family over)*
-      → the deleted checker was restored from git (`git show HEAD:scripts/lib/check-gates-signed.sh`)
-      and run against all five fixture cases beside the engine; `diff` per case: **IDENTICAL ×5**.
-      Only the path form is normalised, which the repo-dir interface necessarily changes. **The
-      comparison includes the leading `PASS`/`FAIL`/note label**, and that mattered — the first
-      migration reproduced the text while flipping the label (see the T4 review entry in the Log).
+      → deleted checker restored from git and run beside the engine over all five cases: `diff`
+      **IDENTICAL ×5**, verdict label included. Detail → Log, T4.
 - [x] `check-gates-signed.sh` is deleted and `qa-check.sh` calls the engine instead — *Verify: the file
       is gone and the gate still reports the same verdicts*
-      → the file is gone (`git status` shows ` D`), `qa-check.sh`'s §9 leg calls the engine, and the
-      gate reports the same verdict for this repo's own sprint: `PASS gates-signed:
-      docs/sprint/SPRINT-075-...md -- G1,G2 signed @ 203d202`. **qa-check: 159 pass, 0 fail.**
+      → file gone, `qa-check.sh`'s §9 leg calls the engine, same verdict on this repo's own sprint.
+      qa-check: **159 pass, 0 fail**.
 - [x] **The fixture harness is retained and repointed, not rewritten** — *Verify:
       `evals/run-gates-signed-fixtures.sh` green against the engine, including the load-bearing case
       where a **missing** field reads as NOT SIGNED rather than as approval. Deleting fixtures with the
       checker they guarded is TD-012 exactly*
-      → all five original cases retained and green against the engine; the file is repointed, not
-      rewritten (its `git diff` swaps the target and adds the reduced-spec derivation, while every case
-      body survives). The engine is handed a **reduced spec copy** carrying only §9's two rows, derived
-      from the shipped spec by awk — otherwise the other 61 unimplemented ids would fire against these
-      throwaway fixture dirs and every "exit 0" case would exit 1 for reasons this family does not own.
-      **A sixth case was added, not swapped in** — `absent-is-not-labelled-a-pass`, asserting the
-      *verdict label* rather than the finding text: all five originals passed while the migration was
-      rendering an unsigned sprint as `PASS`.
+      → five original cases retained and green; repointed, not rewritten, against a reduced spec copy.
+      A **sixth** was added, not swapped in: `absent-is-not-labelled-a-pass`. Detail → Log, T4.
 
 ### T5 — Amend or supersede ADR-008's maintainer-only scope `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/adr/` (new ADR) · `docs/DECISIONS.md` · `docs/adr/ADR-008-*.md` (status marker only) ·
@@ -262,33 +230,31 @@ consumer-facing, and what that does and does not commit lean-flow to.
 **DoD:**
 - [x] An ADR records the scope change and **rules explicitly on the CI sentence** — *Verify: the ADR
       names ADR-008's wording and says which reading now holds*
-      → [ADR-027](../adr/ADR-027-executable-code-becomes-consumer-facing.md) quotes ADR-008's
-      sentence and rules: it means *lean-flow does not own your pipeline*, **not** *lean-flow emits
-      nothing a pipeline can use*. Both halves are stated — what it commits us to (exit code non-zero
-      **iff** a `FAIL` line printed, `rule-unimplemented` included; named findings; standalone entry
-      point from a clone) and what it does not (no workflow file, no action, no obligation to keep an
-      adopter's build green). Owner ruling, 2026-08-20. Exit semantics re-derived from `exit $fail`
-      rather than from the ADR draft (L-136).
+      → [ADR-027](../adr/ADR-027-executable-code-becomes-consumer-facing.md) quotes the sentence and
+      rules: *lean-flow does not own your pipeline*, **not** *emits nothing a pipeline can use*. Both
+      halves stated. Detail → Log, T5.
 - [x] ADR-008 is marked amended/superseded, **never edited in place** — *Verify: the file; §4 is
       append-only for decided ADRs*
-      → **amended, not superseded** — ADR-008 keeps `status: accepted` because its hybrid decision
-      (script for the mechanical rules, checklist for the judgment ones) is still live. The only touch
-      is a **marker**: a `Scope amended by: ADR-027` line under § Status and `related:` gaining ADR-027.
-      No § Decision / § Context / § Consequences text is altered — §4's append-only rule holds.
+      → **amended, not superseded** — a `Scope amended by:` marker plus `related:`; no § Decision /
+      Context / Consequences text altered, so §4's append-only rule holds.
 - [x] `docs/DECISIONS.md` gains its row — *Verify: the index*
-      → row added, newest-first, at the table head. Reconciled: **27 table rows == 27 `docs/adr/ADR-*.md`
-      files** — the first insert silently no-opped (CRLF), and only the count disagreement caught it.
+      → row added at the table head. Reconciled **27 rows == 27 `docs/adr/ADR-*.md` files** — the first
+      insert silently no-opped and only that disagreement caught it.
 - [x] EPIC-004 § Closed-when 5 ticked — *Verify: the epic. It requires this be formally amended, "not
       silently outgrown", which is what four sprints of using the checkers consumer-ward already was*
-      → ticked with its evidence in the epic, naming ADR-027, the amend-not-supersede choice, and the
-      unchanged ADR-011 / D3 *reports-never-blocks* stance. `docs/knowledge-index.md` regenerated —
-      ADR-027 resolves under **process · tooling · governance** (ADR-009 metadata SSOT).
+      → ticked with its evidence in the epic; `docs/knowledge-index.md` regenerated (ADR-027 resolves
+      under process · tooling · governance).
 
 ### T6 — Cover the ownership-header family: `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` `[size: M · risk: med · class: execution · AFK]`
-Layers: the engine (assertions) · `evals/` (one retained fixture per named finding)
+Layers: `scripts/lib/conformance-engine.sh` (assertions) · `evals/run-ownership-header-fixtures.sh`
+        + `evals/fixtures/ownership-header/` (one retained fixture per named finding) ·
+        `scripts/qa-check.sh` (harness registered — the completeness leg fails an ungated harness) ·
+        `docs/research/conformance-dispositions.md` (four rules move `build` → covered) — L-100
 Depends-on: T2, T4
-Cites: `docs/research/conformance-dispositions.md` § build (the five published names) ·
-       EPIC-004 § Closed-when 2 · L-058 · TD-012
+Cites: EPIC-004 § Closed-when 2 · L-058 · TD-012 · `S7.PERSON` (§7 states the same role-vs-person
+       distinction as "mechanical against a role vocabulary, judged without one" — the reason this
+       task ships a vocabulary at all; cited, never touched). The § build register itself is
+       **touched**, so it is declared on `Layers:` above rather than here.
 The first *new* coverage, and chosen for what it enables rather than for being easy: these four rules
 apply to any repository containing documents, which is what makes the foreign-repo run report something instead of
 nothing. The five finding names are already published — this task consumes that contract, it does not
@@ -297,18 +263,31 @@ choose it.
 **Acceptance:** a repo with a doc missing its ownership header gets told so, by name.
 
 **DoD:**
-- [ ] All four rules are evaluated, firing the five **already-published** names — `owner-not-a-role` ·
+- [x] All four rules are evaluated, firing the five **already-published** names — `owner-not-a-role` ·
       `update-trigger-absent` · `ownership-header-missing` · `ownership-header-field-missing` ·
       `agents-ownership-footer-missing` — *Verify: count assertions against the register's rows; a rule
       silently skipped is a FAIL*
-- [ ] **One retained must-FAIL fixture per named finding**, plus a PASS control — *Verify: the harness;
+      → four assert_* functions registered; 5 of 5 names fire. Reconciled against the register:
+      12 covered rule ids == its header, 39 `build` == its header. Full detail → Log, T6.
+- [x] **One retained must-FAIL fixture per named finding**, plus a PASS control — *Verify: the harness;
       each case fails with its own name (L-058 · TD-012)*
-- [ ] `owner-not-a-role` does not fire on a legitimate role — *Verify: a PASS-control fixture using
+      → `evals/run-ownership-header-fixtures.sh`, **11 cases, all green** — one retained must-FAIL per
+      published name, plus PASS controls and two regression cases.
+- [x] `owner-not-a-role` does not fire on a legitimate role — *Verify: a PASS-control fixture using
       `Maintainer`. This is the one rule here that can produce a false positive on correct input, since
       distinguishing a role from a person is the judgment half of a `split` mark*
-- [ ] The fixtures were shown to **discriminate**, not merely pass — *Verify: seed a deliberately
+      → PASS control `maintainer-is-a-role` green; 0 `owner-not-a-role` findings across this repo's
+      198 owner: values. **The Plan's parenthetical is imprecise and is not being reinterpreted to fit:
+      §14 marks `S1.LAW2` mechanical, not split** — the split it describes is §7's `S7.PERSON`. The
+      criterion (a PASS control using `Maintainer`) is met as written; the rationale beside it names the
+      wrong rule (L-136, at the smallest grain).
+- [x] The fixtures were shown to **discriminate**, not merely pass — *Verify: seed a deliberately
       broken assertion and confirm the matching case reddens (L-137). Green on first run against
       fixtures written alongside the code proves agreement, not coverage*
+      → **10 breaks seeded, 10 discriminated**, engine restored under a verified sha1. Two of them
+      found real defects rather than confirming the suite: the ADR exemption went unnamed on an
+      ADR-only repo, and `owner-role-must-match-whole-value` proved nothing until its fixture changed
+      from `Alice, Maintainer` to `Main`. Break table → Log, T6.
 
 ## Decisions (pre-locked)
 
@@ -373,6 +352,26 @@ choose it.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/read-spec-rules.sh` | T1 | new — the rule-source reader, §13's parse generalised to any `## §N` table so the spec, not code, holds the rule set | med | `run-spec-reader-fixtures.sh` |
+| `scripts/lib/check-attestation.sh` | T1 | its 25-line parse becomes one reader call — one parse, not twelve | med | `run-attestation-fixtures.sh` (16 assertions, unmodified) |
+| `conformance.sh` | T2 | new — the standalone entry point D1 requires, so an adopter runs it without installing the plugin | low | `run-conformance-engine-fixtures.sh` |
+| `scripts/lib/conformance-engine.sh` | T2·T4·T6·T3 | new at T2 (mark-driven driver + report); T4 folded in §9's two rules; T6 added the §1/§3 ownership family; T3 added the `GAP` class so engine gaps stop counting against the repo under test | high | engine · gates-signed · ownership · foreign-repo harnesses |
+| `scripts/lib/check-gates-signed.sh` | T4 | **deleted** — its two rules now live in the engine; the first family consolidated (EPIC-002 D3) | med | `run-gates-signed-fixtures.sh`, repointed not rewritten |
+| `evals/run-spec-reader-fixtures.sh` | T1 | new — 9 cases, 5 must-FAIL, one per named finding | low | seeded-break pass |
+| `evals/run-conformance-engine-fixtures.sh` | T2·T3 | new at T2; T3 repointed it at the gap/finding separation and rebuilt the level-bucket case, which the change had quietly made vacuous | med | seeded-break pass (4 breaks) |
+| `evals/run-gates-signed-fixtures.sh` | T4 | retained and repointed at the engine (TD-012); a **sixth** case added for the verdict *label*, which the migration flipped while reproducing the text | med | self |
+| `evals/run-ownership-header-fixtures.sh` + `evals/fixtures/ownership-header/` | T6 | new — 11 cases, one retained must-FAIL per published finding, PASS controls, and the nested-README regression | med | seeded-break pass (10 breaks, 10 discriminated) |
+| `evals/run-foreign-repo-fixtures.sh` | T3 | new — the epic's headline claim, tested: a repo built from nothing, no lean-flow file copied in, asserted mechanically | med | seeded-break pass (2 breaks) |
+| `scripts/qa-check.sh` | T1·T2·T4·T6·T3 | §9 leg calls the engine; four new harnesses registered always-on (an ungated harness fails the completeness leg, L-020) | med | the gate itself |
+| `docs/adr/ADR-027-*.md` | T5·T3 | new — executable code is consumer-facing; the CI sentence ruled. T3 evidence added a refinement marker rather than an edit (§4 append-only) | low | review |
+| `docs/adr/ADR-008-*.md` | T5 | status marker only — amended, not superseded; no decision text touched | low | review |
+| `docs/DECISIONS.md` · `docs/knowledge-index.md` | T5 | index row + regenerated knowledge index (ADR-009 metadata SSOT) | low | `qa-check.sh` index-freshness leg |
+| `docs/research/conformance-dispositions.md` | T4·T6 | § Covered today repointed off the deleted checker; four rules moved `build` → covered (**43 → 39**, **8 → 12**) | low | rule-id re-count in both tables |
+| `docs/epic/EPIC-004-conformance.md` | T5·T3 | § Closed-when 1 and 5 ticked with their evidence | low | review |
+
+**Not filled retrospectively:** T1 and T2's rows above were reconstructed from their commits and the
+Execution Log at close, since the table was left empty during their execution. Recorded so the next
+reader knows these two rows are secondhand while the rest were written by the task that made the change.
 
 ## Retro
 

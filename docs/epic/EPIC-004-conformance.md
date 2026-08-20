@@ -106,7 +106,26 @@ each other · any telemetry, ever (the README promises none).
 
 ## Closed when
 
-- [ ] A repo that has never run lean-flow gets a conformance report naming its level
+- [x] A repo that has never run lean-flow gets a conformance report naming its level
+      — **DONE at SPRINT-075 T3.** `evals/run-foreign-repo-fixtures.sh` builds `acme-widget` — a
+      four-file JS library — from nothing under `mktemp -d`, with **no lean-flow file copied in** (the
+      harness asserts that mechanically, so a later edit that copies a template in fails loudly rather
+      than quietly measuring our own shape). The engine, pointed at the shipped spec, returns a level,
+      two named findings, and notes for the 33 judgment-required and 6 implementation-directed rules.
+      Actionability was **proven, not asserted**: applying exactly what the two findings asked for takes
+      the same repo to exit 0 with no FAIL line, and that is a retained case.
+      **The run changed the engine, which is what it was for.** First contact returned 58 FAIL lines
+      under "level: none — 41 finding(s) prevent Structural" against a repo with **two** defects: 56 of
+      them were our own unimplemented rules, so the adopter's level moved with *our* roadmap rather than
+      with their tree. `rule-unimplemented` is now its own verdict class (`GAP`) — still named on every
+      report, so nothing is silently skipped (L-058) — held off the level arithmetic and the exit code,
+      with engine coverage stated on its own axis. ADR-027 carries a refinement marker for the
+      exit-code sentence this evidence overturned.
+      **What this does *not* claim:** with **6 of 62** checkable rules implemented, a stranger's report
+      is thin, and the dispositions most likely to be shape-bound (§2 placement, §6 tier doc-sets, §11
+      ledgers) have not been exercised against a foreign tree at all. The triage recorded **0
+      artefacts**, and that number is honest but early — the question is barely asked yet, and wants
+      re-running as coverage grows rather than being treated as settled here.
 - [ ] Every spec rule maps to a check, or is explicitly marked judgment-only in the spec
       — **SUBSTANTIALLY ADVANCED at SPRINT-073, still not ticked, and the remaining gap is now small
       and named.** The *"in the spec"* half is **done**: `spec/STANDARD.md` 0.4.0 marks every rule

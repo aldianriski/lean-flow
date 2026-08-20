@@ -551,7 +551,19 @@ done
 # directories only via mktemp -d, doctored spec copies via awk. It guards the engine's driver -- mark-
 # driven dispatch, the registry lookup, and the level/report arithmetic -- which is what leg 2f-ter
 # above runs on every gate (informationally; see that leg's own comment for why not yet gating).
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh"
+#
+# run-ownership-header-fixtures.sh (SPRINT-075 T6) joins by the same cost rule: no git, mktemp -d
+# fixture dirs and one awk-derived spec copy. It guards the engine's FIRST new coverage -- the §1/§3
+# ownership-header family -- whose five published finding names are a contract the engine must keep
+# firing exactly (L-058 · TD-012), and whose exclusion list is the part that fails GREEN when it is
+# wrong (a nested README dropped by a too-broad glob, caught only by a census disagreeing by one).
+#
+# run-foreign-repo-fixtures.sh (SPRINT-075 T3) joins by the same cost rule and guards the claim the
+# whole epic rests on: that a repository which never installed lean-flow gets an answer it can act on.
+# It is the only harness here whose target is built from nothing -- no lean-flow file is copied in --
+# and it asserts that property mechanically, because a future edit that copies a template in would
+# make the run measure our own shape wearing a stranger's name without failing anything (L-015 · L-016).
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh"
 eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh"
 # run-attestation-fixtures.sh (SPRINT-074 T2, TASK-228) joins the opt-in set by the same rule: it
 # builds 6 throwaway repos via mktemp -d + git init, measured at ~2s on this host. Real git history

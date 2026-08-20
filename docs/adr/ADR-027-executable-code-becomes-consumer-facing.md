@@ -11,6 +11,15 @@ related: [ADR-008, ADR-011, ADR-023, ADR-024]
 # ADR-027 — Executable code becomes consumer-facing; the exit code is the contract, the pipeline is not
 
 - **Status:** accepted (2026-08-20)
+- **Refined the same day by SPRINT-075 T3 evidence** — § Decision below states the exit code as
+  non-zero *"with `rule-unimplemented` gaps counted as FAIL"*. The first run against a repository that
+  never installed lean-flow showed why that is wrong: 56 of its 58 FAIL lines were **our** missing
+  assertions, and the adopter's level moved with **our** roadmap rather than with their tree. A gap is
+  now its own verdict class (`GAP`) — still named on every report, so nothing is silently skipped
+  (L-058) — that does not set the exit code or block a level. **Everything else here stands**: the
+  exit code is still a documented contract, still non-zero exactly when a finding *about the repository
+  under test* was printed, and lean-flow still owns no pipeline. Recorded as a marker, not an edit —
+  §4 is append-only, and a decision made before its evidence arrived is amended in the open.
 - **Deciders:** Maintainer
 - **Context driver:** EPIC-004 ships a conformance engine an adopter runs against *their* repo — ADR-008 admitted executable code on the opposite premise
 
