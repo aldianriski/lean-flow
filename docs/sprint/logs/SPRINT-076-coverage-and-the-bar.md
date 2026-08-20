@@ -176,3 +176,132 @@ not from an exit code — the run before it reported `[exited with code 0]` whil
 and the gate re-run with nothing else touching the working tree. A long check reads the tree for its
 whole duration, so the tree is not free to move underneath it — the same reasoning as L-042's staging
 rule, one level up: the artefact under measurement has to hold still.
+
+### 2026-08-20 | progress | T3 — §2's placement pair, and the artefact question finally answered
+
+Test-first again: 5 of the 6 rule cases proven RED before an assertion existed. The sixth
+(`no-placement-finding-on-documents-s2-never-named`) passed **vacuously** at that point — a rule that
+does not exist cannot raise a finding — and is recorded as a case that could not be red-first; the
+seeded-break pass is what earns it.
+
+**Spec-driven, not hard-coded.** The required set is derived at runtime from §2's own `Create ←`
+cells: the **nine** rows whose trigger says *"always"*. Every other row is tier-gated, and §2 routes
+tier DETECTION to `S2.F-TIER`, which §14 marks a split whose detection half is judged (§6) — so
+requiring a conditional row would be this engine guessing a tier the standard explicitly declines to
+infer. Two parser traps, both guarded: §2's own **Conformance** table sits inside §2 after the `docs/`
+marker and its Rule cells parse as File cells (`docs/S2.F-FILE` — 21 invented core files);
+`check-doc-caps.sh` escapes that only by accident, since it discards rows with no integer Cap. And
+Cap/Create sit at different column indices in the docs tree than in the root tables.
+
+**The spec reading for `S2.R-PLACEMENT`, stated because it was ambiguous.** §2's parenthetical says
+R-PLACEMENT carries the legacy-path second-match rule *"which `S2.F-FILE` does not — a repo on a
+legacy layout satisfies one and not the other"*. Only one reading makes that sentence true **and**
+matches the published finding name: legacy paths are **tolerated** by R-PLACEMENT (matched second,
+and named in the report rather than applied silently), while F-FILE is strict about the canonical
+path. R-PLACEMENT therefore fires on a doc at **neither** canonical nor legacy —
+`file-outside-canonical-placement`, exactly as the name says. A retained case asserts the separation
+directly, because a run where both rules agree has collapsed two rules the standard drew apart.
+
+**A latent engine defect under a fifth of the rule set.** Both new rules reported `rule-unimplemented`
+with their assertions sitting in the file. The driver builds the function name with `tr '.' '_'` — the
+dot is mapped, **the hyphen is not** — so `S2.F-FILE` looked for `assert_S2_F-FILE`. Every rule
+covered before T3 happened to have no hyphen in its id; **21 of the spec's 100 ids carry one**, so
+this was waiting under all of them, failing silently and green (L-058's shape). Verified
+collision-free before changing — all 100 ids stay distinct under `tr '.-' '__'` — and the seeded-break
+pass reverts the fix as a case, so the guard is retained rather than a one-time repair.
+
+**A false positive the PASS control caught and the must-FAIL cases could not.** R-PLACEMENT reported
+root `CHANGELOG.md` as a misplaced `spec/CHANGELOG.md`: two §2 rows share a basename, and the root
+file was sitting exactly where its own row puts it. All must-FAIL cases stayed green throughout — only
+the conformant-repo control reddened. The matcher now excludes every path §2 itself names, canonical
+or legacy, for any row.
+
+---
+
+**DoD 2 — the triage, one row per finding.** Stranger = the four-file `acme-widget` JS library, built
+from nothing. **10 findings: 6 actionable, 4 artefacts.**
+
+| # | Finding | Verdict |
+|---|---|---|
+| 1 | `update-trigger-absent: docs/architecture.md` | actionable (pre-existing, SPRINT-075) |
+| 2 | `ownership-header-missing: docs/architecture.md` | actionable (pre-existing, SPRINT-075) |
+| 3 | `core-file-missing: SECURITY.md` | **actionable** — a published library owes a disclosure route |
+| 4 | `core-file-missing: CHANGELOG.md` | **actionable** — a versioned npm package owes one |
+| 5 | `core-file-missing: docs/architecture/overview.md` | **actionable** — see the near-miss note below |
+| 6 | `core-file-missing: docs/development/setup.md` | **actionable** — arguably served by the README's `## Install`, but a real gap |
+| 7 | `core-file-missing: AGENTS.md` | **ARTEFACT** — §2 defines it as a thin pointer to `.claude/CLAUDE.md` |
+| 8 | `core-file-missing: TODO.md` | **ARTEFACT** — the lean loop's backlog *mechanism*; a repo on GitHub Issues has a backlog |
+| 9 | `core-file-missing: .claude/CLAUDE.md` | **ARTEFACT** — a Claude Code artifact |
+| 10 | `core-file-missing: .claude/CONTEXT.md` | **ARTEFACT** — same |
+
+**A4 is confirmed, and SPRINT-075's "0 artefacts" is now readable for what it said it was.** That run
+recorded itself as *barely asked* — six of 62 rules, none shape-bound. Asked properly, the number is
+**4 of 8 new findings**. The four share one property: they are lean-flow's own loop surface, not
+repository structure. §2's unconditional set mixes two populations and does not say which is which.
+
+**`S2.R-PLACEMENT` produced 0 artefacts, and the bound that earned it is recorded as a limit.** It
+matches by **basename**, so it cannot reach a document §2 never named — a stranger's
+`notes/design-notes.md` raises nothing. The cost: the library's `docs/architecture.md` is plausibly
+the same document as `docs/architecture/overview.md`, and only F-FILE reports it, as an absence rather
+than a misplacement. Widening to fuzzy matching buys one better finding and an unbounded artefact
+surface, so the near-miss stays a known limit.
+
+**DoD 3 — owner ruling: record it, ship faithful.** The engine is **not** tuned to look quiet. A
+checker that narrows a rule the standard states is deciding a question the standard owns — the
+inversion L-058 keeps naming — and it would hide the very finding this triage exists to produce. The
+register gains a **§ Artefacts** section carrying the table above; the real fix is a **spec** change
+(§2 marking loop rows apart from universal ones) filed as **TASK-243**. Retained mechanically, not
+just written: `run-foreign-repo-fixtures.sh` now applies every *actionable* finding and asserts the
+remainder is **exactly** those four, so when the spec is fixed the case reddens and forces a
+re-triage instead of the artefacts quietly becoming permanent.
+
+**Two of that harness's own criteria went stale under the new coverage — logged, not quietly re-read
+(L-088).** `findings-name-files-that-exist` asserted every FAIL names a file the target *has*, which
+`core-file-missing` cannot satisfy by definition; the surviving criterion is *names a path the
+standard owns* — in the tree, or a §2 canonical path. And `gaps-not-counted-against-the-stranger`
+equated the level's count with the FAIL-**line** count, true only while every rule emitted at most one
+finding; `core-file-missing` emits eight from one rule. The level counts failing **rules**. What both
+cases were actually guarding is unchanged and still asserted.
+
+**DoD 4 — TASK-238 re-parked, not discharged.** Its trigger names three families: §2 placement, §6
+tier doc-sets, §11 ledgers. T3 delivered **one**. The row records the §2 third as done with its result
+and narrows the unblock condition to the remaining two, noting that §11's pair is covered today by
+standalone checkers that never run against a foreign tree. Ticking it on one of three would be the
+drift L-088 names.
+
+**A near-miss on the task id, caught by a second look.** The register first said the spec fix was
+filed as `TASK-241`. TASK-241 is T3's **own** backlog twin — the ids in play are 237 (T5), 239–242
+(T1–T4) — so the follow-up would have pointed at itself. Corrected to TASK-243 after checking the
+maximum id actually in use rather than assuming the next number.
+
+**Seeded-break pass: 6 of 6 discriminate**, engine restored under a hash recorded independently
+beforehand (`f0a9cc3d…c089`). Guards added after T2's false green: the patch must change something,
+still parse, and still be a **targeted** break — all seven assertions present and the line count within
+one of pristine — so a demolition can no longer score as discrimination.
+
+**Coverage 11 → 13 of 62.** A5 predicted 13 (6 + 5 + 2) and it is re-derived here from the engine's own
+`coverage:` line at T3's close, as its DoD requires, rather than trusted from the Plan.
+
+### 2026-08-20 | progress | T3 — a third harness went stale, and the gate is the thing that said so
+
+`run-conformance-engine-fixtures.sh` reddened after T3 landed. Its driver fixtures were bare
+directories, so `S2.F-FILE` reported 8 missing core files against them — **correctly**. The two cases
+that broke (`rule-unimplemented-is-named` · `gap-is-labelled-gap-and-does-not-set-exit`) assert that
+GAP lines do not set the exit code; they had been able to assume no implemented rule would ever object
+to a directory's *contents*. Quietening the new rule to keep an old fixture green would be the tail
+wagging the dog, so the fixtures now carry §2's core set instead — derived from the spec by the same
+awk the engine uses, so a §2 row that stops saying "always" changes both sides in one edit.
+
+One further detail the run caught: written with a YAML header, `AGENTS.md` tripped `S3.AGENTS`. §3
+exempts it *because* it is a thin pointer — a 6-line block would defeat a ~10-line file — so it takes
+the footer `<sub>` form. 16 of 16 driver cases green.
+
+**Three harnesses needed a criterion revised by this one task** (foreign-repo ×2, driver ×2). That is
+the shape worth noticing, not the individual fixes: adding the engine's first rule about a file's
+ABSENCE invalidated assumptions that were invisible while every rule spoke only about files that
+exist. None of them was found by review; each was found by a gate that ran.
+
+**A soft cap crossed, reported not silently absorbed.** `docs/research/conformance-dispositions.md` is
+now **200 lines against a 130 soft cap** (it was already 173 before T3; § Artefacts added 27). Soft
+means report-at-governance-review, not a gate failure — flagged here for the promote/close doc-aging
+pass rather than pruned mid-task, since the register is the artefact T1 and T4 both read next.

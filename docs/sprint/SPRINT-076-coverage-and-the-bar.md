@@ -103,8 +103,10 @@ name against any repository.
 
 ### T3 — Cover §2's placement pair and re-run the foreign-repo artefact triage against it `[size: M · risk: med · class: decision · HITL]`
 Layers: `scripts/lib/conformance-engine.sh` · `evals/run-foreign-repo-fixtures.sh` (extend the target) ·
-        `evals/fixtures/` · `scripts/qa-check.sh` ·
-        `docs/research/conformance-dispositions.md` (only if artefacts are found)
+        `evals/run-s2-placement-fixtures.sh` (new; fixture repos built at runtime, so no
+        `evals/fixtures/` subtree) · `evals/run-conformance-engine-fixtures.sh` (its driver fixtures now
+        carry §2's core set) · `scripts/qa-check.sh` · `TODO.md` (TASK-238 re-parked ·
+        TASK-243 filed) · `docs/research/conformance-dispositions.md` (§ Artefacts — artefacts WERE found)
 Depends-on: none
 Cites: SPRINT-075 T3 · TASK-238 · EPIC-004 § Closed-when 1 · L-015 · L-016 · L-141
 
@@ -118,16 +120,16 @@ sit outside canonical placement — or we learn that those rules cannot say anyt
 which is equally a result.
 
 **DoD:**
-- [ ] Both rules are evaluated, firing `core-file-missing` and `file-outside-canonical-placement` —
+- [x] Both rules are evaluated, firing `core-file-missing` and `file-outside-canonical-placement` —
       *Verify: verdict lines against a real repo, plus retained must-FAIL fixtures and a PASS control*
-- [ ] The foreign-repo harness is re-run and **every new finding is triaged** *actionable by that repo's
+- [x] The foreign-repo harness is re-run and **every new finding is triaged** *actionable by that repo's
       owner* vs *artefact of dispositions written against our shape* — *Verify: the written pass, one
       row per finding, in the Execution Log*
-- [ ] **A high artefact count routes back to `conformance-dispositions.md`** — *Verify: if artefacts are
+- [x] **A high artefact count routes back to `conformance-dispositions.md`** — *Verify: if artefacts are
       found, the register's dispositions for those rules are revisited and the change recorded. The
       engine is NOT tuned to look quiet, and "several artefacts" is a success for this task, not a
       failure (L-088: the criterion is the report being honest, not short)*
-- [ ] TASK-238's trigger is discharged or explicitly re-parked with its condition — *Verify: TODO.md*
+- [x] TASK-238's trigger is discharged or explicitly re-parked with its condition — *Verify: TODO.md*
 
 ### T4 — Rule on EPIC-004's § Closed-when 2 with the coverage evidence in hand `[size: S · risk: med · class: decision · HITL]`
 Layers: `docs/epic/EPIC-004-conformance.md` · `docs/adr/` (only if the condition is amended) ·
@@ -223,6 +225,13 @@ from a comment.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/conformance-engine.sh` | T3 | +2 assertions for §2 (`S2.F-FILE` · `S2.R-PLACEMENT`), required set derived from §2's `Create ←` cells at runtime. **Plus a driver fix**: the assertion-name mangling dropped hyphens, so all 21 hyphenated rule ids resolved to a function that never existed and reported `rule-unimplemented` | med | `run-s2-placement-fixtures.sh` (7 cases) · 6/6 seeded breaks · foreign-repo run |
+| `evals/run-s2-placement-fixtures.sh` | T3 | new retained harness — must-FAIL per name, a conformant PASS control, the legacy-second-match case, and the case proving the two rules stay separable on a legacy layout | low | 5 of 6 rule cases proven RED first |
+| `evals/run-foreign-repo-fixtures.sh` | T3 | re-run the triage with the new rules; **two criteria that went stale** revised (a finding may name a path the repo *lacks*; the level counts failing rules, not finding lines), and the 4-artefact result retained as an assertion | med | 6/6 cases green |
+| `scripts/qa-check.sh` | T3 | register the S2 harness always-on (original cost rule — no git) | low | gate leg |
+| `docs/research/conformance-dispositions.md` | T3 | §2 pair `build` → covered (19 · 32); **new § Artefacts** recording 4 of 9 unconditional rows as loop-specific for a generic adopter | low | recount reconciles to 62 |
+| `TODO.md` | T3 | TASK-238 re-parked with a narrowed condition (§2 third done); **TASK-243 filed** for the §2 spec fix | low | — |
+| `evals/run-conformance-engine-fixtures.sh` | T3 | its driver fixtures were bare directories; `S2.F-FILE` correctly reported 8 missing core files against them, so they now carry §2's core set (derived from the spec, `AGENTS.md` in §3's footer form) | low | 16/16 cases green |
 | `scripts/lib/conformance-engine.sh` | T2 | +5 assertions for §4 (`S4.ONEFILE` · `S4.APPEND` · `S4.INDEX` · `S4.SECTIONS` · `S4.NEGATIVE`) firing the five already-published names. `S4.APPEND` is the engine's first rule to read git history rather than the tree | med | `run-adr-family-fixtures.sh` (12 cases) · 10/10 seeded breaks · 27-ADR corpus |
 | `evals/run-adr-family-fixtures.sh` | T2 | new retained harness — one must-FAIL per published name, a PASS control, and three git states for `S4.APPEND` (edit fails · marker passes · no-history and shallow reported honestly) | low | proven 12/12 RED before the assertions existed |
 | `evals/fixtures/adr-family/` | T2 | 9 retained fixture repos (TD-012: deleting fixtures with the prototype leaves the gate unguarded) | low | consumed by the harness above |
