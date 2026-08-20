@@ -305,3 +305,88 @@ exist. None of them was found by review; each was found by a gate that ran.
 now **200 lines against a 130 soft cap** (it was already 173 before T3; § Artefacts added 27). Soft
 means report-at-governance-review, not a gate failure — flagged here for the promote/close doc-aging
 pass rather than pruned mid-task, since the register is the artefact T1 and T4 both read next.
+
+### 2026-08-20 | progress | T5 — §3's two enforced-but-unwritten exceptions, and a fixture that proved nothing
+
+Both exceptions were being **enforced in code while absent from the standard**, which is the wrong way
+round: a rule a checker applies and the spec does not state is unreviewable, and an adopter reading §3
+could not have predicted either. Spec **0.4.1 → 0.4.2**, PATCH.
+
+**The ADR exception** was already ruled (SPRINT-075 T6) and already named in every report; T5 moved the
+*ruling* into §3 and rewrote the engine's comment to **cite** the standard. That direction is the
+point of the task — the checker stops being the place the question is settled.
+
+**The exploratory-tree exception is a declaration, not a path**, and that was the design call. §3 now
+says a tree is outside §3 when its own index/README frontmatter carries `governed: false`. Hard-coding
+`docs/strategy/` would have exempted only repositories that happen to use our directory names — the
+repo-specific leak a generic checker must never carry (L-015). Two properties make it safe to state
+rather than merely tolerate, and both are asserted: it is **opt-in** (silence still means governed, so
+nothing is exempted by accident) and **visible** (the declaration sits in the tree it exempts).
+
+**DoD 2 verified with the number the gate predicted.** Findings **56 → 32**, a drop of exactly **24
+across the 12 `docs/strategy/adlc/` docs** — 12 `ownership-header-missing` + 12
+`update-trigger-absent`. F4 at the G2 gate had flagged that the DoD names only the ownership half and
+that the true drop would be 24; it is 24. The remainder reconciles internally: **3** header-missing
+(all `docs/qa/`) + **13** field-missing (all `docs/research/`) = **16** `update-trigger-absent`, the
+union. Three numbers agreeing, which is the only check that has ever caught a miscount in this corpus.
+
+**A fixture that proved nothing, caught by the seeded break and nothing else.** The
+`governed-false-in-prose-does-not-exempt` case is the one that bounds the whole exception — without
+it, `governed: false` is a phrase anyone can type into a paragraph to silence a finding, and any doc
+*documenting* the exception (including §3 itself) would exempt its own tree. Its first draft wrote the
+prose as ``so `governed: false` ought to apply``, which never starts at column 0, so the regex missed
+it **with or without** the frontmatter bound. Seeding the bound away left the case GREEN: it was
+asserting nothing. Rewritten so the body carries a fenced `yaml` block with `governed: false` at
+column 0 — the realistic shape, since that is exactly how a doc explains the syntax — and the seed now
+reddens it.
+
+This is the **third** time in this sprint that a case looked green while testing nothing (T2's empty
+engine, T3's vacuous stranger control, this), and all three were found the same way: by breaking the
+thing on purpose and watching what failed to notice. Worth a promotion candidate at close — the
+existing rule says *seed a break per assertion*, and what earns its keep is narrower and sharper:
+**a fixture whose seed does not redden it is not a passing test, it is an absent one.**
+
+**DoD 4 — TD-064 halved by ruling, not by writing 12 headers**, and deliberately left **open**. Its
+own mitigation named the two honest options for the ADLC tree — add headers to docs we have
+deliberately parked, or decide the tree is not governed and say so where §3 can be read. The second
+was taken. The 3 `docs/qa/` files and 13 research docs remain a real finding and the row says so,
+rather than being closed wholesale on the strength of the half that was ruled away.
+
+**On the PATCH call (DoD 3), stated rather than glossed.** The DoD's reasoning is that neither
+exception adds an obligation, so no adopter is asked to re-read the standard — and §3 still publishes
+exactly 3 rules, which is the mechanical check on that claim. The tension worth recording: the
+exploratory exception *removes* an obligation, and a report that used to name a doc no longer does.
+Nothing an adopter satisfies today breaks, so PATCH holds as the DoD wrote it; the observation is
+logged rather than used to re-read a frozen criterion (L-088).
+
+### 2026-08-20 | surprise | T5 — the gate stopped finishing, and the cause was process count, not work
+
+Two gate runs were killed before printing their tally, and a third exceeded a ten-minute foreground
+limit. **Not a hang and not a hang-shaped bug** — the engine had become 20× slower, and the gate
+invokes it roughly fifty times across its harnesses.
+
+Measured rather than guessed, by timing each rule family in isolation against a **four-file**
+directory: `S1` 808 ms · `S3` 912 ms · `S4` 1,396 ms · **`S2` 11,253 ms**. The whole cost sat in one
+family, and inside it in one shape: `S2.R-PLACEMENT` ran a full `find` **per §2 row whose canonical
+path was absent**. Against a bare directory every one of the ~31 literal rows is absent, so a single
+run walked the tree 31 times. Caching the walk (one `find`, reused) took it to 18 s — still 18× the
+baseline, because the second version still spent a `while read` subshell plus two greps per row:
+**~124 process spawns to examine four files.** Process creation is the cost on this platform, not the
+scanning.
+
+Rewritten as **one awk pass** over (rows × file list), with existence tested as membership in the
+cached list rather than a `[ -e ]` per row: **29 s → 9.6 s** on the fixture dir, **77 s → 49 s** on
+this repo, and the gate finishes again — `QA-CHECK: 163 pass, 0 fail`.
+
+**This is the second sighting of the same shape.** SPRINT-075's ownership family spawned ~2,800 awk
+processes (a walk per rule, an awk per field per doc) and was fixed the same way. The engine's cost
+model is now explicit in the code comment so the third person does not rediscover it: **walk once,
+then decide in one pass.** Worth a promotion candidate at close (count 2).
+
+**Correctness was re-checked, not assumed, after each of the three rewrites** — a performance change
+that quietly alters a verdict is worse than a slow gate. `S2.F-FILE` and `S2.R-PLACEMENT` both still
+PASS against this repo with no `CHANGELOG.md` false positive, and all five engine harnesses are green.
+One near-miss worth recording: the middle rewrite deleted the `_s2_named_paths` assignment along with
+the block it lived in, leaving the awk reading an **empty** exclusion set — which would have silently
+resurrected the two-rows-share-a-basename false positive. Caught by grepping for the variable's
+occurrence count (1, expected 2) rather than by the suite, which was green either way at that moment.

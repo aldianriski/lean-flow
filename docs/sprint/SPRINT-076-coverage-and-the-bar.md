@@ -157,8 +157,11 @@ never as a convenience at close.
 
 ### T5 — Write §3's two unstated exceptions into the spec `[size: S · risk: low · class: decision · HITL]`
 Layers: `spec/STANDARD.md` (§3) · `spec/CHANGELOG.md` · `scripts/lib/conformance-engine.sh` (cite the
-        rows instead of carrying the rulings in comments) · `docs/research/conformance-dispositions.md`
-        (only if its note needs re-pointing)
+        rows instead of carrying the rulings in comments — **and implement the exploratory-tree
+        exemption**, which DoD 2's verification requires) · `TECH-DEBT.md` (TD-064's remaining half) ·
+        `docs/strategy/adlc/README.md` (the tree makes the declaration) ·
+        `evals/run-ownership-header-fixtures.sh` + `evals/fixtures/ownership-header/` (the exemption
+        is exercised, including a must-FAIL that it cannot be triggered from prose)
 Depends-on: none
 Cites: TASK-237 · TD-064 · SPRINT-075 T6 · spec §3 · §4 · ADR-009 · LAW 1
 
@@ -171,14 +174,14 @@ standard is the wrong way round.
 from a comment.
 
 **DoD:**
-- [ ] §3 states the **ADR** exception — *Verify: the spec; re-read §4's frontmatter block before wording
+- [x] §3 states the **ADR** exception — *Verify: the spec; re-read §4's frontmatter block before wording
       it, since §4 is what creates the conflict*
-- [ ] §3 states that a **strategy/exploratory tree is not a governed doc set** — *Verify: the spec, and
+- [x] §3 states that a **strategy/exploratory tree is not a governed doc set** — *Verify: the spec, and
       the engine's ownership findings against this repo drop by the 12 `docs/strategy/adlc/` docs*
-- [ ] Version bumped **PATCH**, not MINOR — *Verify: `spec/CHANGELOG.md`. Both write down exceptions
+- [x] Version bumped **PATCH**, not MINOR — *Verify: `spec/CHANGELOG.md`. Both write down exceptions
       adopters already rely on, so nothing they satisfy today changes; calling it MINOR would tell them
       to re-read a spec that gained no obligation (ADR-023)*
-- [ ] TD-064 is updated to its remaining half — *Verify: the ledger; the 3 `docs/qa/` files stay a real
+- [x] TD-064 is updated to its remaining half — *Verify: the ledger; the 3 `docs/qa/` files stay a real
       finding, and the row says so rather than being closed wholesale*
 
 ## Decisions (pre-locked)
@@ -225,6 +228,12 @@ from a comment.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `spec/STANDARD.md` | T5 | §3 gains the **ADR exception** and the **exploratory-tree exception**; version 0.4.1 → 0.4.2. No rule added — §3 still publishes 3 | low | 100 rules still parse; §3's count unchanged |
+| `spec/CHANGELOG.md` | T5 | 0.4.2 entry, PATCH, stating why neither exception is a new obligation | low | — |
+| `scripts/lib/conformance-engine.sh` | T5 | implement the declared-exploratory exemption (`_own_governed_off`, a **declaration not a path**) and rewrite the ADR-exemption comment to **cite** §3 rather than carry the ruling | med | 3/3 seeded breaks · ownership harness |
+| `docs/strategy/adlc/README.md` | T5 | the tree makes the declaration (`governed: false`) | low | 12 docs exempt, named on every report |
+| `evals/run-ownership-header-fixtures.sh` + `evals/fixtures/ownership-header/` | T5 | 3 retained cases: the exemption works and is named · it **cannot be triggered from prose** · silence still means governed | low | seeded-break caught the prose case proving nothing on its first draft |
+| `TECH-DEBT.md` | T5 | TD-064 halved by ruling, not by writing 12 headers; stays **open** for the 3 `docs/qa/` + 13 research docs | low | 3 · 13 · 16 reconcile |
 | `scripts/lib/conformance-engine.sh` | T3 | +2 assertions for §2 (`S2.F-FILE` · `S2.R-PLACEMENT`), required set derived from §2's `Create ←` cells at runtime. **Plus a driver fix**: the assertion-name mangling dropped hyphens, so all 21 hyphenated rule ids resolved to a function that never existed and reported `rule-unimplemented` | med | `run-s2-placement-fixtures.sh` (7 cases) · 6/6 seeded breaks · foreign-repo run |
 | `evals/run-s2-placement-fixtures.sh` | T3 | new retained harness — must-FAIL per name, a conformant PASS control, the legacy-second-match case, and the case proving the two rules stay separable on a legacy layout | low | 5 of 6 rule cases proven RED first |
 | `evals/run-foreign-repo-fixtures.sh` | T3 | re-run the triage with the new rules; **two criteria that went stale** revised (a finding may name a path the repo *lacks*; the level counts failing rules, not finding lines), and the 4-artefact result retained as an assertion | med | 6/6 cases green |
