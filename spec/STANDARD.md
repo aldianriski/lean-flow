@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-17
+last_updated: 2026-08-20
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.4.1
+version: 0.4.2
 status: current
 ---
 
@@ -293,6 +293,30 @@ ownership is still tracked — just at the foot, not the top.
 **AGENTS.md exception** — same rationale, extended: `AGENTS.md` is a ~10-line thin pointer file, and
 a 6-line YAML block would defeat that budget — so it too carries ownership as a footer `<sub>` line
 instead of a top header (`AGENTS.md.template`).
+
+**ADR exception** — an ADR carries the **ADR-009 knowledge metadata** block (`id` · `tags` · `domain` ·
+`status` · `related`) that §4's template ships, *instead of* the four fields above. The two blocks
+answer different questions — §3's is a lifecycle contract, §4's is a retrieval key — and an ADR is
+**append-only** once decided, so `last_updated` and `update_trigger` describe a lifecycle it does not
+have. Written down here because it was being enforced in code before it was stated: a checker
+reporting ADRs against §3 tells an adopter to break the standard's own template.
+
+**Exploratory-tree exception** — a tree the repository **declares exploratory** is *input to*
+decisions, not governed documentation, and §3 does not reach it. Declare it in the tree's own index
+or `README.md` frontmatter:
+
+```yaml
+governed: false   # exploratory input — §3 and LAW 3 do not apply to this tree
+```
+
+The declaration covers the tree and everything beneath it, including the declaring file. It is a
+**declaration, not a path**: a repository keeps strategy notes, spikes and research scratch wherever
+it keeps them, and a standard that fixed the directory name would exempt only repositories that
+happened to choose ours. Two properties make this safe to state rather than merely tolerate — it is
+**opt-in** (silence means governed, so nothing is exempted by accident) and it is **visible** (the
+declaration sits in the tree it exempts, where a reader looking at those docs will see it). What it
+does *not* license is parking a governed doc set behind the flag to silence a finding; that is
+`S1.LAW1`'s judgement, not a mechanical one.
 
 **Conformance.** §3's normative content is the **fenced schema block** above, which no line-shape
 census sees — it is one rule, not zero.

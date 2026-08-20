@@ -1,3 +1,10 @@
+---
+governed: false   # exploratory input — §3 and LAW 3 do not apply to this tree (spec 0.4.2)
+owner: Maintainer
+last_updated: 2026-08-20
+status: current
+---
+
 # Lean Flow ADLC — Development Handoff Pack
 
 This pack captures the approved strategic direction for evolving Lean Flow from a proven agentic workflow plugin into an **ADLC — Agentic Development Life Cycle** standard and future operating platform.

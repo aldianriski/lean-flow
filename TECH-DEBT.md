@@ -32,25 +32,33 @@ status: current
 
 ## Tech Debt
 
-- **TD-064** severity: minor | status: open | created: Sprint-075
-  - Summary: **28 of this repo's own docs fail the ownership-header rules the engine now checks** — 15
-    carry no frontmatter at all (`docs/qa/` ×3, `docs/strategy/adlc/` ×12) and 13 research docs declare
-    every field except `update_trigger:`. §3 makes the header mandatory on every doc and §1 LAW 3
-    requires the trigger, so these are real, named findings against the reference implementation.
-  - Evidence: `sh conformance.sh .` — 15 `ownership-header-missing`, 13
-    `ownership-header-field-missing`, 28 `update-trigger-absent` (the last is the union: a doc with no
-    header also has no trigger). Reconciled against an independent census of the same tree, which is
-    how a 14-vs-15 disagreement exposed a checker bug rather than a doc gap (→ L-140).
-  - Impact: low today, rising. `qa-check.sh` **relays** engine findings rather than counting them
-    (SPRINT-075 T2's ruling), so nothing is red and no gate is being ignored. The cost is that the
-    repo which publishes the standard does not satisfy this part of it, which is the gap an adopter
-    notices first — and it grows every time a doc lands without a header.
-  - Mitigation (hypothesis, not a plan — the filer's, written at close): add the four-field header to
-    the 15, and `update_trigger:` to the 13. Cheap and mechanical for `docs/qa/` and `docs/research/`.
-    **`docs/strategy/adlc/` is the judgement call**: EPIC-004 § Scope explicitly puts every ADLC
-    platform concept out of scope, and 12 of the 15 headerless docs live there — so the honest options
-    are *add headers to docs we have deliberately parked* or *decide that tree is not governed by §3
-    and say so where §3 can be read*. Re-derive before building a DoD on either.
+- **TD-064** severity: minor | status: open | created: Sprint-075 | updated: Sprint-076
+  - Summary: **~~28~~ 16 of this repo's own docs fail the ownership-header rules the engine checks** —
+    ~~15 carry no frontmatter at all (`docs/qa/` ×3, `docs/strategy/adlc/` ×12)~~ **3 carry none
+    (`docs/qa/`)** and 13 research docs declare every field except `update_trigger:`. §3 makes the
+    header mandatory on every doc and §1 LAW 3 requires the trigger, so these are real, named findings
+    against the reference implementation.
+  - **HALVED at SPRINT-076 T5, by ruling rather than by writing 12 headers.** The mitigation below
+    named two honest options for `docs/strategy/adlc/` — add headers to docs we have deliberately
+    parked, or *decide that tree is not governed by §3 and say so where §3 can be read*. The second
+    was taken: spec **0.4.2** states an **exploratory-tree exception**, and the tree declares
+    `governed: false` in its own README frontmatter. Findings dropped **56 → 32** (12
+    `ownership-header-missing` + 12 `update-trigger-absent`), and the exemption is **named on every
+    report** rather than applied silently. The exception is a **declaration, not a path** — hard-coding
+    `docs/strategy/` would have exempted only repositories that chose our directory names (L-015).
+  - Evidence: `sh conformance.sh .` — **3** `ownership-header-missing` (all `docs/qa/`), **13**
+    `ownership-header-field-missing` (all `docs/research/`), **16** `update-trigger-absent` (the union:
+    3 + 13). The three numbers reconcile against each other, which is the check that has caught every
+    miscount in this corpus (L-108).
+  - Impact: low today, rising, and now **smaller and sharper**. `qa-check.sh` **relays** engine
+    findings rather than counting them (SPRINT-075 T2's ruling), so nothing is red and no gate is being
+    ignored. What remains is not a judgement call: the 3 `docs/qa/` files and the 13 research docs are
+    ordinary governed docs that simply lack fields, and **this row deliberately stays open for them**
+    rather than being closed on the strength of the half that was ruled away.
+  - Mitigation (hypothesis, not a plan — the filer's, written at close): ~~add the four-field header to
+    the 15~~ **add it to the 3 remaining**, and `update_trigger:` to the 13. Cheap and mechanical for
+    both. ~~`docs/strategy/adlc/` is the judgement call~~ **— settled at SPRINT-076 T5, see above.**
+    Re-derive before building a DoD on either number.
   - Sibling, not a duplicate: **TD-065**. Both are "the conformance corpus disagrees with itself", but
     that row is a register miscount and this one is a real doc gap; a cure for either moves neither.
 

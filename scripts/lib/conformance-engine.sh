@@ -252,14 +252,17 @@ assert_S9_GATESABSENT() {
 #                         swallowed docs/strategy/adlc/README.md -- a nested doc, not a front-door.
 #                         Caught by an independent census disagreeing by exactly one (14 vs 15); a
 #                         too-broad exclusion fails GREEN, which is the L-058 shape.
-#   docs/adr/ADR-*.md  -- the UNSTATED third case, ruled at SPRINT-075 T6. §4 ships an ADR template
-#                         whose frontmatter is id/tags/domain/status/related -- the ADR-009 knowledge
-#                         metadata -- carrying no owner:/last_updated:/update_trigger:. Reporting ADRs
-#                         against §3 would tell an adopter to break the standard's own template, and
-#                         costs 27 findings on the reference implementation alone. The exemption is
-#                         NAMED in the report rather than applied silently, and the spec gap (§3 owes
-#                         an explicit ADR row, the way it spells out README and AGENTS.md) is filed as
-#                         a follow-up. A checker's silence is not where a spec question gets settled.
+#   docs/adr/ADR-*.md  -- §3's **ADR exception**, stated in the standard as of spec 0.4.2. §4 ships an
+#                         ADR template whose frontmatter is the ADR-009 knowledge metadata
+#                         (id/tags/domain/status/related), and a decided ADR is append-only, so §3's
+#                         last_updated/update_trigger describe a lifecycle it does not have. Ruled at
+#                         SPRINT-075 T6 and enforced here from then; SPRINT-076 T5 moved the RULING
+#                         into §3, so this comment now CITES the standard instead of carrying it. That
+#                         direction matters: a rule a checker applies and the spec does not state is
+#                         unreviewable, and a checker's silence is not where a spec question is settled.
+#   a declared exploratory tree -- §3's **exploratory-tree exception** (spec 0.4.2): a tree whose own
+#                         index/README frontmatter carries `governed: false`. Read from the SPEC's
+#                         rule, never from a path this file remembers -- see _own_governed_off.
 #   */templates/*, SKILL.md -- a template is an artefact a doc is generated FROM, and a SKILL.md is a
 #                         skill definition governed by §2's skill rows. Neither is a doc under §3.
 
@@ -295,6 +298,25 @@ _own_roles() {
   fi
 }
 
+# _own_governed_off <repo> -- directories the repository DECLARES exploratory, one per line,
+# repo-relative and with a trailing `/`. §3's exploratory-tree exception (spec 0.4.2): a tree is
+# exempt when its own index or README frontmatter carries `governed: false`, and the exemption covers
+# the tree, everything beneath it, and the declaring file itself.
+#
+# A DECLARATION, NOT A PATH -- deliberately. Hard-coding `docs/strategy/` here would exempt only
+# repositories that happen to use lean-flow's directory names, which is precisely the repo-specific
+# leak a generic checker must not carry (L-015). Opt-in, so silence still means governed: a tree that
+# says nothing is checked exactly as before, and nothing is exempted by accident.
+_own_governed_off() {
+  for idx in "$1"/docs/*/README.md "$1"/docs/*/INDEX.md "$1"/docs/*/*/README.md "$1"/docs/*/*/INDEX.md; do
+    [ -f "$idx" ] || continue
+    # Frontmatter only -- a `governed: false` mentioned in prose is discussion, not a declaration.
+    awk 'NR==1 && $0!="---"{exit} NR==1{next} $0=="---"{exit} /^governed:[ \t]*false([ \t]|#|$)/{found=1; exit} END{exit !found}' "$idx" || continue
+    d=${idx%/*}
+    printf '%s/\n' "${d#"$1"/}"
+  done
+}
+
 # _own_docs <repo> -- the doc set above, repo-relative, one per line, sorted. Cached: the three
 # assertions below each need it, and walking the tree once per rule was a third of the original cost.
 _OWN_DOCS_CACHE=""
@@ -302,6 +324,7 @@ _OWN_DOCS_DONE=0
 _own_docs() {
   if [ "$_OWN_DOCS_DONE" -eq 1 ]; then printf '%s' "$_OWN_DOCS_CACHE"; return; fi
   r=$1
+  _own_off=$(_own_governed_off "$r")
   _OWN_DOCS_CACHE=$({
     for c in TODO.md TECH-DEBT.md CHANGELOG.md CONTRIBUTING.md SECURITY.md \
              CLAUDE.md CONTEXT.md .claude/CLAUDE.md .claude/CONTEXT.md; do
@@ -314,11 +337,28 @@ _own_docs() {
         */templates/*)     continue ;;
         */SKILL.md)        continue ;;
       esac
+      skip=0
+      for off in $_own_off; do
+        case "$rel" in "$off"*) skip=1; break ;; esac
+      done
+      [ "$skip" -eq 1 ] && continue
       printf '%s\n' "$rel"
     done
   } | sort)
   _OWN_DOCS_DONE=1
   printf '%s' "$_OWN_DOCS_CACHE"
+}
+
+# _own_report_exemptions <repo> -- named, never silent. An exemption applied without saying so is
+# indistinguishable from a rule that never ran (L-103), and this one is a repository's own choice
+# rather than the standard's, so it earns a line naming the tree and the count it covers.
+_own_report_exemptions() {
+  off=$(_own_governed_off "$1")
+  [ -n "$off" ] || return
+  for d in $off; do
+    n=$(find "$1/$d" -type f -name '*.md' 2>/dev/null | wc -l | tr -d ' ')
+    note "S3.SCHEMA           -- $n doc(s) under $d exempt: the tree declares \`governed: false\` (§3's exploratory-tree exception, spec 0.4.2). A declaration, not a path -- and named here rather than applied silently"
+  done
 }
 
 # _own_adr_count <repo> -- how many ADRs the exemption above covered, so the report can name it.
@@ -426,7 +466,8 @@ assert_S3_SCHEMA() {
   # documents are ADRs has an empty doc set here, and reporting "no documents found" while silently
   # skipping 27 files states the opposite of what happened -- caught by the adr-exempt fixture, which
   # is the one case where the two paths differ (L-103).
-  [ "$nadr" -gt 0 ] && note "S3.SCHEMA           -- $nadr docs/adr/ADR-*.md exempt: §4's template carries ADR-009 knowledge metadata (id/tags/domain/status/related) instead of §3's header. Named, not silent -- §3 owes an explicit ADR row (SPRINT-075 T6)"
+  [ "$nadr" -gt 0 ] && note "S3.SCHEMA           -- $nadr docs/adr/ADR-*.md exempt: §4's template carries ADR-009 knowledge metadata (id/tags/domain/status/related) instead of §3's header. §3 states this exception in full as of spec 0.4.2 (SPRINT-076 T5); this line cites the standard rather than carrying the ruling"
+  _own_report_exemptions "$repo"
   _own_scan "$repo"
   if [ "$_OWN_N_DOCS" -eq 0 ]; then
     note "S3.SCHEMA           -- no documents found to evaluate (no docs/*.md outside the exemptions above, and no §2 core file present) -- nothing to verify. This states an empty doc set, not a pass"
@@ -900,6 +941,27 @@ assert_S4_APPEND() {
 # the row names one. Pattern rows (`ADR-NNN-<slug>.md`, `flows/<slug>.md`) are excluded: a pattern names
 # a family, and a family cannot be "missing".
 # Emits: <always:0|1>|<canonical-path>|<legacy-path-or-empty>
+# _repo_files <repo> -- every file in the tree, repo-relative, ONE walk, cached.
+#
+# PERFORMANCE, and it is a correctness story too. S2.R-PLACEMENT's first implementation ran a full
+# `find` PER §2 row whose canonical path was absent. Against a bare fixture directory every one of the
+# ~31 literal rows is absent, so a single engine run walked the tree 31 times: **29 seconds on a
+# four-file directory**, against ~1s before. The gate invokes the engine roughly fifty times across
+# its harnesses, which took it from ~4 minutes to over ten and got two runs killed before the tally
+# printed. One walk, cached, and the per-row test becomes a grep over a string already in memory.
+# (SPRINT-075 hit the identical shape in the ownership family -- ~2,800 awk processes, fixed the same
+# way. Second sighting; the engine's cost model is "walk once, then filter".)
+_REPO_FILES=""
+_REPO_FILES_DONE=0
+_repo_files() {
+  if [ "$_REPO_FILES_DONE" -eq 1 ]; then printf '%s' "$_REPO_FILES"; return; fi
+  _REPO_FILES=$(find "$1" \
+      \( -name .git -o -name node_modules -o -name vendor -o -name .venv -o -name dist -o -name build \) -prune -o \
+      -type f -print 2>/dev/null | sed "s|^$1/||")
+  _REPO_FILES_DONE=1
+  printf '%s' "$_REPO_FILES"
+}
+
 _S2_ROWS_CACHE=""
 _s2_rows() {
   [ -n "$_S2_ROWS_CACHE" ] && { printf '%s\n' "$_S2_ROWS_CACHE"; return; }
@@ -985,53 +1047,90 @@ assert_S2_R_PLACEMENT() {
     bad "file-outside-canonical-placement: no rows parsed from §2 -- the table shape changed and this parser did not (L-058)"
     return
   }
-  # Every path §2 names, canonical and legacy alike -- the exclusion set for the basename search below.
-  _s2_all_paths=$(printf '%s\n' "$rows" | cut -d'|' -f2,3 | tr '|' '\n' | grep -v '^$' | LC_ALL=C sort -u)
+
+  # ONE awk pass over (rows × file list), not a pipeline per row.
+  #
+  # The first implementation ran a `find` per §2 row whose canonical path was absent; the second
+  # replaced that with a cached file list but still spent a `while read` subshell plus two greps per
+  # row. Against a bare fixture directory every one of the ~31 literal rows is absent, so that is
+  # ~124 process spawns for a four-file tree -- 11 of the engine's 20 seconds, and the gate went from
+  # ~4 minutes to over ten, getting two runs killed before the tally printed. Process creation is the
+  # cost here, not the work, which is why the fix is fewer processes rather than less scanning.
+  # SPRINT-075 hit the identical shape in the ownership family (~2,800 awk processes) and fixed it the
+  # same way. Second sighting: this engine's cost model is **walk once, then decide in one pass**.
+  #
+  # Existence is membership in the cached file list rather than a `[ -e ]` per row -- same answer, no
+  # extra stat, and it keeps the whole decision inside the single awk.
+  # Every path §2 itself names, canonical and legacy alike. Two §2 rows can share a basename
+  # (`CHANGELOG.md` at the root and `spec/CHANGELOG.md`), and without this the root file -- sitting
+  # exactly where its own row puts it -- is reported as a misplaced copy of the other.
+  _s2_named_paths=$(printf '%s\n' "$rows" | cut -d'|' -f2,3 | tr '|' '\n' | grep -v '^$' | LC_ALL=C sort -u)
+
+  out=$(printf '%s\n' "$rows" | awk -v files="$(_repo_files "$repo")" -v named="$_s2_named_paths" '
+    BEGIN {
+      n = split(files, fa, "\n")
+      for (i = 1; i <= n; i++) {
+        if (fa[i] == "") continue
+        have[fa[i]] = 1
+        b = fa[i]; sub(/^.*\//, "", b)
+        byname[b] = byname[b] fa[i] "\n"
+      }
+      split(named, na, "\n")
+      for (i in na) if (na[i] != "") isnamed[na[i]] = 1
+    }
+    {
+      split($0, r, "|")
+      canon = r[2]; legacy = r[3]
+      if (canon == "") next
+      if (canon in have) { ncanon++; next }
+      if (legacy != "" && (legacy in have)) { nlegacy++; print "LEGACY\t" legacy "\t" canon; next }
+      base = canon; sub(/^.*\//, "", base)
+      dir  = canon; sub(/\/[^\/]*$/, "/", dir); if (dir == canon) dir = ""
+      hits = ""; k = 0
+      m = split(byname[base], cand, "\n")
+      for (i = 1; i <= m; i++) {
+        c = cand[i]
+        if (c == "") continue
+        if (c in isnamed) continue                      # another §2 row sitting where IT belongs
+        if (dir != "" && index(c, dir) == 1) continue   # under the canonical dir already
+        if (k++ >= 3) break
+        hits = hits (hits == "" ? "" : " ") c
+      }
+      if (hits != "") print "STRAY\t" canon "\t" hits
+    }
+    END { print "COUNT\t" ncanon+0 "\t" nlegacy+0 }
+  ')
+
   n_canon=0; n_legacy=0
   saved_ifs2=$IFS
   IFS='
 '
-  for r in $rows; do
+  for line in $out; do
     IFS=$saved_ifs2
-    p=$(printf '%s' "$r" | cut -d'|' -f2)
-    lg=$(printf '%s' "$r" | cut -d'|' -f3)
-    if [ -e "$repo/$p" ]; then
-      n_canon=$((n_canon + 1))
-      IFS='
-'
-      continue
-    fi
-    # Matched SECOND: present, tolerated, and NAMED -- an accepted fallback applied silently is
-    # indistinguishable from a rule that never ran.
-    if [ -n "$lg" ] && [ -e "$repo/$lg" ]; then
-      n_legacy=$((n_legacy + 1))
-      note "S2.R-PLACEMENT      -- $lg matched second: §2 names it as the legacy path for $p. Tolerated, not silent; the canonical path is where a reader is told to look"
-      IFS='
-'
-      continue
-    fi
-    base=${p##*/}
-    canon_dir=${p%/*}
-    # Exclude every path §2 itself names -- canonical OR legacy, for ANY row. Two §2 rows can share a
-    # basename (`CHANGELOG.md` at the root and `spec/CHANGELOG.md`), and without this the root file,
-    # sitting exactly where its own row puts it, is reported as a misplaced copy of the other. Caught
-    # by the PASS control rather than by review: a rule that fires on a correctly-laid-out repo is
-    # unusable, and the must-FAIL cases all stayed green while it did.
-    found=$(find "$repo" \
-        \( -name .git -o -name node_modules -o -name vendor -o -name .venv -o -name dist -o -name build \) -prune -o \
-        -type f -name "$base" -print 2>/dev/null |
-      sed "s|^$repo/||" | grep -v "^$canon_dir/" |
-      grep -vxF "$_s2_all_paths" 2>/dev/null | LC_ALL=C sort | head -n 3)
-    if [ -n "$found" ]; then
-      where=$(printf '%s' "$found" | tr '\n' ' ')
-      bad "file-outside-canonical-placement: $p -- §2 places it here, and the repository has a file of that name at: ${where%% }. Neither the canonical path nor a legacy path §2 names, so a reader following the standard will not find it"
-    fi
+    kind=${line%%	*}; rest=${line#*	}
+    a=${rest%%	*}; b=${rest#*	}
+    case "$kind" in
+      LEGACY)
+        note "S2.R-PLACEMENT      -- $a matched second: §2 names it as the legacy path for $b. Tolerated, not silent; the canonical path is where a reader is told to look"
+        ;;
+      STRAY)
+        bad "file-outside-canonical-placement: $a -- §2 places it here, and the repository has a file of that name at: $b. Neither the canonical path nor a legacy path §2 names, so a reader following the standard will not find it"
+        ;;
+      COUNT)
+        n_canon=$a; n_legacy=$b
+        ;;
+    esac
     IFS='
 '
   done
   IFS=$saved_ifs2
+
   [ "$last_bad" -eq 1 ] && return
-  ok "S2.R-PLACEMENT      -- $n_canon §2 file(s) at their canonical path$([ "$n_legacy" -gt 0 ] && printf ', %s at a legacy path matched second' "$n_legacy")$([ "$n_canon" -eq 0 ] && printf ' (none of §2 core set present -- nothing is mis-placed, which is not the same as conformant)')"
+  if [ "$n_canon" -eq 0 ]; then
+    note "S2.R-PLACEMENT      -- none of §2's core set is present; nothing is mis-placed, which is not the same as conformant"
+  else
+    ok "S2.R-PLACEMENT      -- $n_canon §2 file(s) at their canonical path$([ "$n_legacy" -gt 0 ] && printf ', %s at a legacy path matched second' "$n_legacy")"
+  fi
 }
 # ==================================================================================================
 # ==================================================================================================

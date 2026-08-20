@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-17
+last_updated: 2026-08-20
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,26 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.4.2 — 2026-08-20
+
+**PATCH — two exceptions §3 was already relying on are now written down.** Both were being enforced
+in code while absent from the standard, which is the wrong way round: a rule a checker applies and the
+spec does not state is unreviewable, and an adopter reading §3 could not have predicted either.
+Nothing an adopter satisfies today changes and no rule was added — §3 still publishes three — so this
+is not a version that asks anyone to re-read the standard (ADR-023).
+
+- **ADR exception (§3).** An ADR carries §4's ADR-009 knowledge metadata (`id` · `tags` · `domain` ·
+  `status` · `related`) instead of §3's four-field header. The blocks answer different questions, and
+  a decided ADR is append-only, so `last_updated`/`update_trigger` describe a lifecycle it does not
+  have. Reporting ADRs against §3 told an adopter to break the standard's own template — 27 findings
+  on the reference implementation alone. Ruled at SPRINT-075 T6 and named in the report from then;
+  stated here now, so the checker cites the standard rather than carrying the ruling in a comment.
+- **Exploratory-tree exception (§3).** A tree the repository **declares** exploratory — `governed:
+  false` in its own index/README frontmatter — is input to decisions, not governed documentation. A
+  **declaration, not a path**: fixing a directory name would exempt only repositories that chose ours.
+  Opt-in, so silence still means governed and nothing is exempted by accident; and visible, since the
+  declaration sits in the tree it exempts.
 
 ## 0.4.1 — 2026-08-17
 

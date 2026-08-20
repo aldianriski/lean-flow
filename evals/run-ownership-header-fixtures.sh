@@ -134,6 +134,36 @@ fi
 run_case_anywhere "nested-readme-is-not-exempt" 1 "ownership-header-missing: docs/sub/README.md" -- \
   sh "$engine" "$fx/nested-readme" --spec "$own_spec"
 
+
+# --- §3's exploratory-tree exception (spec 0.4.2, SPRINT-076 T5) ----------------------------------
+# A tree the repository DECLARES exploratory is outside §3. Two properties make that safe to state
+# rather than merely tolerate, and both are asserted here rather than assumed.
+#
+# (1) It works, and it says so. An exemption applied silently is indistinguishable from a rule that
+# never ran (L-103), so the report must name the tree and the count it covers.
+out=$(sh "$engine" "$fx/governed-off" --spec "$own_spec" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] && ! printf '%s\n' "$out" | grep -qE '^FAIL +(ownership-header|update-trigger)' &&
+   printf '%s\n' "$out" | grep -q 'exempt: the tree declares'; then
+  echo "PASS fixture(governed-false-exempts-and-is-named): the declared tree raised no ownership finding AND the exemption is stated in the report"
+else
+  echo "FAIL fixture(governed-false-exempts-and-is-named): expected exit 0, no ownership finding, and a named exemption -- got exit $rc:"
+  printf '%s\n' "$out" | grep -E '^FAIL |exempt'
+  fail=1
+fi
+
+# (2) It cannot be triggered from PROSE. This is the case that makes the exception safe to ship: the
+# declaration is a frontmatter field, so a doc merely DISCUSSING `governed: false` -- which any doc
+# explaining the exception will do, including this standard's own §3 -- must not exempt its tree.
+# Without this bound the exception is a phrase anyone can type into a paragraph to silence a finding,
+# which is the over-exemption that would make §3 unenforceable.
+run_case_anywhere "governed-false-in-prose-does-not-exempt" 1 "ownership-header-missing: docs/strategy/note.md" -- \
+  sh "$engine" "$fx/governed-prose" --spec "$own_spec"
+
+# (3) Opt-in: silence still means governed. Asserted by every other fixture in this file -- none of
+# them declares anything and all are still checked -- and named here so the property is not merely
+# incidental to how the fixtures happen to be written.
+echo "PASS fixture(silence-means-governed): the remaining $(ls -d "$fx"/*/ | wc -l | tr -d ' ') fixture trees declare nothing and are all still evaluated above"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "OWNERSHIP-HEADER FIXTURES: all green"
