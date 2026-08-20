@@ -189,8 +189,11 @@ finding a reasonable owner would call meaningless.
       row; a condition ticked without its evidence is the tick this sprint exists to avoid*
 
 ### T4 — Migrate the §9 gates-signed family into the engine `[size: M · risk: med · class: execution · HITL]`
-Layers: `scripts/lib/check-gates-signed.sh` (deleted) · the engine ·
-        `evals/run-gates-signed-fixtures.sh` (repointed, not rewritten) · `scripts/qa-check.sh`
+Layers: `scripts/lib/check-gates-signed.sh` (deleted) · `scripts/lib/conformance-engine.sh` (the
+        engine — declared by PATH at execution, L-100: "the engine" is prose the layers-observed
+        check cannot match) · `evals/run-gates-signed-fixtures.sh` (repointed, not rewritten) ·
+        `scripts/qa-check.sh` · `docs/research/conformance-dispositions.md` (§ Covered today repointed
+        off the deleted checker — the register is a consumer of this migration, L-020)
 Depends-on: T2
 Cites: EPIC-002 D3 (consolidation deferred here; its unblock condition met at SPRINT-074) ·
        EPIC-004 § Scope · TD-012 · L-058 · L-099 (why the field exists at all) · the two §9 rule ids
@@ -240,7 +243,11 @@ fixtures that guarded them still pass without being rewritten.
       rendering an unsigned sprint as `PASS`.
 
 ### T5 — Amend or supersede ADR-008's maintainer-only scope `[size: S · risk: low · class: decision · HITL]`
-Layers: `docs/adr/` (new ADR) · `docs/DECISIONS.md` · `docs/adr/ADR-008-*.md` (status marker only)
+Layers: `docs/adr/` (new ADR) · `docs/DECISIONS.md` · `docs/adr/ADR-008-*.md` (status marker only) ·
+        `docs/epic/EPIC-004-conformance.md` (§ Closed-when 5, which DoD 4 requires) ·
+        `docs/knowledge-index.md` (**generated** by `scripts/gen-index.sh`, never hand-edited — a new
+        ADR carries ADR-009 metadata, so the index goes stale the moment the file lands; declared at
+        execution, L-100, the third such correction this sprint)
 Depends-on: T2
 Cites: ADR-008 · EPIC-004 § Closed-when 5 · D2 · STANDARD §4
 ADR-008 admitted executable code on the premise that it guards *this* repo, and closed the CI question:
@@ -253,13 +260,29 @@ later sprint trips over.
 consumer-facing, and what that does and does not commit lean-flow to.
 
 **DoD:**
-- [ ] An ADR records the scope change and **rules explicitly on the CI sentence** — *Verify: the ADR
+- [x] An ADR records the scope change and **rules explicitly on the CI sentence** — *Verify: the ADR
       names ADR-008's wording and says which reading now holds*
-- [ ] ADR-008 is marked amended/superseded, **never edited in place** — *Verify: the file; §4 is
+      → [ADR-027](../adr/ADR-027-executable-code-becomes-consumer-facing.md) quotes ADR-008's
+      sentence and rules: it means *lean-flow does not own your pipeline*, **not** *lean-flow emits
+      nothing a pipeline can use*. Both halves are stated — what it commits us to (exit code non-zero
+      **iff** a `FAIL` line printed, `rule-unimplemented` included; named findings; standalone entry
+      point from a clone) and what it does not (no workflow file, no action, no obligation to keep an
+      adopter's build green). Owner ruling, 2026-08-20. Exit semantics re-derived from `exit $fail`
+      rather than from the ADR draft (L-136).
+- [x] ADR-008 is marked amended/superseded, **never edited in place** — *Verify: the file; §4 is
       append-only for decided ADRs*
-- [ ] `docs/DECISIONS.md` gains its row — *Verify: the index*
-- [ ] EPIC-004 § Closed-when 5 ticked — *Verify: the epic. It requires this be formally amended, "not
+      → **amended, not superseded** — ADR-008 keeps `status: accepted` because its hybrid decision
+      (script for the mechanical rules, checklist for the judgment ones) is still live. The only touch
+      is a **marker**: a `Scope amended by: ADR-027` line under § Status and `related:` gaining ADR-027.
+      No § Decision / § Context / § Consequences text is altered — §4's append-only rule holds.
+- [x] `docs/DECISIONS.md` gains its row — *Verify: the index*
+      → row added, newest-first, at the table head. Reconciled: **27 table rows == 27 `docs/adr/ADR-*.md`
+      files** — the first insert silently no-opped (CRLF), and only the count disagreement caught it.
+- [x] EPIC-004 § Closed-when 5 ticked — *Verify: the epic. It requires this be formally amended, "not
       silently outgrown", which is what four sprints of using the checkers consumer-ward already was*
+      → ticked with its evidence in the epic, naming ADR-027, the amend-not-supersede choice, and the
+      unchanged ADR-011 / D3 *reports-never-blocks* stance. `docs/knowledge-index.md` regenerated —
+      ADR-027 resolves under **process · tooling · governance** (ADR-009 metadata SSOT).
 
 ### T6 — Cover the ownership-header family: `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` `[size: M · risk: med · class: execution · AFK]`
 Layers: the engine (assertions) · `evals/` (one retained fixture per named finding)

@@ -3,7 +3,7 @@ id: ADR-008
 tags: [tooling]
 domain: governance
 status: accepted
-related: [ADR-009]
+related: [ADR-009, ADR-027]
 ---
 
 <!-- One ADR per file · append-only (never edit a decided ADR — mark it deprecated/superseded) · WHY only. -->
@@ -11,6 +11,10 @@ related: [ADR-009]
 # ADR-008 — Admit the first executable code: a hybrid QA check
 
 - **Status:** accepted (2026-06-21)
+- **Scope amended by:** [ADR-027](ADR-027-executable-code-becomes-consumer-facing.md) (2026-08-20)
+  — the hybrid decision below still governs; its *maintainer-only* premise does not. Executable
+  code here is now consumer-facing, and ADR-027 rules on the CI sentence in § Decision: it means
+  *lean-flow does not own your pipeline*, not *lean-flow emits nothing a pipeline can use*.
 - **Deciders:** Maintainer
 - **Context driver:** structural drift in a 14-skill / 14-template markdown plugin was catchable only by eye
 

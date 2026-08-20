@@ -244,3 +244,69 @@ comparing the halves of the line that were right. A sixth case was **added, not 
 The general shape, one register over from L-103: **a check that compares the part you migrated cannot
 see the part you rewrote.** Reproducing a message verbatim is evidence about the message; the verdict
 it carries is a separate claim needing its own case.
+
+### 2026-08-20 | decision | T5 — ADR-008 amended, not superseded; the CI sentence ruled
+
+Two owner rulings, both taken as popups rather than assumed from the Plan's framing.
+
+**Form: amend.** ADR-027 records the scope change; ADR-008 keeps `status: accepted` and gains a
+`Scope amended by:` marker plus `related: ADR-027`. Its actual decision — a dependency-free POSIX-sh
+script for the mechanical rules, a checklist for the judgment ones — is live and unrevisited, and
+superseding would demote a still-governing rule to history to restate it unchanged. §4's append-only
+constraint is satisfied by a marker; no § Decision / § Context / § Consequences text was touched.
+
+**Substance: the exit code is the contract, the pipeline is not.** ADR-008's *"wiring it into CI stays
+out of scope"* is broad enough to read two ways, and EPIC-004 § Scope promises adopters "CI-friendly
+exit codes". ADR-027 rules that the sentence means *lean-flow does not own your pipeline*, not
+*lean-flow emits nothing a pipeline can use* — and states both halves, so the next sprint inherits a
+boundary rather than an interpretation. Committed to: non-zero **iff** a `FAIL` line was printed,
+`rule-unimplemented` included. Not committed to: any workflow file, action, or obligation to keep an
+adopter's build green. ADR-011 and this epic's D3 (*reports, never blocks*) are untouched, and
+`qa-check.sh` still relays the engine's findings instead of gating on them (T2's ruling).
+
+**Both frozen figures were re-derived before they froze (L-136).** The ADR's blast radius first read
+"12 checkers"; `ls scripts/lib/check-*.sh | wc -l` returns **11** post-T4, and the draft was corrected
+before commit. The exit-code claim was read off `exit $fail` in the engine, not off the draft.
+
+**And the DECISIONS row was caught by the cross-check, not by review.** The first insert silently
+no-opped — a `perl -0pi` substitution against a CRLF file that matched nothing and exited 0. The
+reconcile that follows every table edit here (**rows == `docs/adr/ADR-*.md` files**) returned 26 vs 27.
+Re-done with awk: 27 == 27. A no-op edit and a successful edit are indistinguishable at the exit code;
+only the second number separates them (L-060's family, one tool over).
+
+### 2026-08-20 | note | the Plan is at 378 of its 400-line hard cap, with 8 DoD left to tick
+
+T6 and T3 still owe evidence for eight criteria. At the ~7 lines per criterion T4 and T5 averaged,
+finishing in the Plan breaches `S9.TWOFILES`' hard cap. **Convention for the rest of this sprint:**
+the Plan's DoD carries a one-to-two-line verdict and a pointer; the reasoning goes here, where ADR-014
+put it precisely because the Log is uncapped and the Plan is not. This is a formatting choice, not a
+reduction in evidence.
+
+### 2026-08-20 | surprise | the gate reported 3 failures and the harness reported exit 0 — T4 was committed on it
+
+`sh scripts/qa-check.sh > out 2>&1; echo "EXIT=$?"` — the exit code the runner reported back was
+**`echo`'s**, not the gate's. Two runs read as green; the first was `158 pass, 1 fail` and the second
+`156 pass, 3 fail`, both sitting in the output file the whole time. T4 was committed against the first.
+
+This is **L-120, verbatim and unfired** — "a check and the action it gates are two tool calls; one call
+makes the check advisory by construction". The rule names `gate | tail && commit` as the shape; the
+shape here was `gate > file; echo $?`, which is the same defect wearing a redirect: the last command in
+the chain succeeds, so the chain succeeds. The rule was loaded, correct, and did not reach the moment
+it was written for — the third time this family has been recorded that way. **The durable fix is to
+read the artifact, not the status**: the summary line `QA-CHECK: N pass, M fail` is what the gate
+produces, and `M` is the verdict. Any exit code arriving through a wrapper is evidence about the
+wrapper (L-045 · L-057 · L-060).
+
+Nothing shipped broken — all three findings were bookkeeping, and none was in the migrated code:
+
+1. **`knowledge index STALE`** — caused by ADR-027 landing mid-run; `scripts/gen-index.sh` regenerated.
+2. **`corpus dangling refs: ADR-008:ADR-027`** — the corpus is **git-tracked** files by design (an
+   untracked WIP research doc must not fail the gate, TASK-060), so ADR-008's new `related: ADR-027`
+   pointed outside the id universe until ADR-027 was staged. Self-clearing at the T5 commit; recorded
+   because it will recur on every ADR that lands with an inbound `related:` ref.
+3. **`layers observed: T4 changed docs/research/conformance-dispositions.md, scripts/lib/conformance-engine.sh
+   — never declared`** — real, and the same L-100 correction T1, T2 and T5 each needed. T4's `Layers:`
+   said *"the engine"*, which reads correctly to a human and matches nothing: **the layers check
+   compares paths, so a layer named in prose is an undeclared layer.** Corrected to the path.
+
+The T4 commit stands as history; the Plan-side corrections land with T5.

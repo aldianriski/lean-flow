@@ -143,6 +143,13 @@ each other · any telemetry, ever (the README promises none).
       **What this does *not* claim:** the reference implementation is unsigned (673+ commits, `%G? = N`),
       so it reaches Gated and not Attested — a fact about this repo's signing, not a gap in the
       verification, and the checker reproduces §13d's worked example unprompted rather than rounding up.
-- [ ] ADR-008's scope is formally amended or superseded, not silently outgrown
-      — unchanged; belongs with the engine sprint's design, where the packaging question (§ Open
-      questions) is also settled
+- [x] ADR-008's scope is formally amended or superseded, not silently outgrown
+      — **DONE at SPRINT-075 T5** ([ADR-027](../adr/ADR-027-executable-code-becomes-consumer-facing.md),
+      2026-08-20). **Amended, not superseded** — ADR-008's hybrid decision (script for the mechanical
+      rules, checklist for the judgment ones) is still live and unrevisited; only its *maintainer-only*
+      premise is replaced. The CI sentence is **ruled explicitly** rather than left readable both ways:
+      it means *lean-flow does not own your pipeline*, not *lean-flow emits nothing a pipeline can use*.
+      What that commits us to is the engine's exit code as a documented contract (non-zero iff a `FAIL`
+      line was printed, `rule-unimplemented` included); what it does not is any workflow file, action or
+      obligation to keep an adopter's build green — ADR-011 and this epic's D3 (*reports, never blocks*)
+      are untouched, and `qa-check.sh` still relays the engine's findings rather than gating on them.
