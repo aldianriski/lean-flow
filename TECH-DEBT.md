@@ -101,6 +101,32 @@ status: current
     fixture work. Deliberately not folded into T1, whose declared Layers is the audit record.
   - Sibling: **TD-064** (real doc gaps in this repo). Unrelated cause; both are "the reference
     implementation disagrees with the standard it publishes".
+
+- **TD-068** severity: minor | status: open | created: Sprint-076
+  - Summary: **an off-vocabulary tag drops a doc out of the generated knowledge index, silently.**
+    `scripts/gen-index.sh` renders a section only for names in a **fixed** vocabulary
+    (`TAGS="process docs tooling edit-safety sprint-model"` ·
+    `DOMAINS="skills doc-standard governance knowledge sprint-model"`). A doc whose frontmatter carries
+    anything else is parsed, entered into the internal entries table, and then **rendered nowhere** —
+    no warning, no exit code, nothing in the diff.
+  - Evidence: SPRINT-076 T1 wrote `docs/research/fixture-coverage-audit.md` with
+    `tags: [conformance, testing, governance]` · `domain: quality` — all plausible, none in the
+    vocabulary. `qa-check.sh` flagged `knowledge index STALE`, regenerating produced a **one-line diff
+    (`last_updated`)**, and the doc appeared in no section. Retagging `[tooling, process]` / `governance`
+    made it appear three times.
+  - Impact: low per occurrence, and the shape is what earns the row: **the staleness check cannot see
+    it.** That check compares the file against a fresh regeneration, and a doc missing from *both* is
+    consistent — so the gate is green precisely when the index is wrong. ADR-009 makes this index the
+    retrieval path for ADRs, research and learnings; a doc that is absent from it is findable only by
+    someone who already knows the path, which is the failure the index exists to prevent.
+  - Mitigation (hypothesis, not a plan — the filer's, written at close): have `gen-index.sh` **warn on
+    an unrecognised tag or domain** and exit non-zero, so an author learns at write-time rather than
+    never; and publish the vocabulary where a frontmatter author will look — §7's glossary in
+    `.claude/CONTEXT.md` is the natural home, since it is already the place canonical terms are fixed.
+    Both halves matter: warning alone tells you *something* is wrong, publishing alone still lets a
+    typo through.
+  - Sibling: **TD-067** (the gate-token check being looser than its message). Unrelated cause; both are
+    "a tool's report and its behaviour disagree, and the disagreement is silent".
 - **TD-066** severity: minor | status: open | created: Sprint-075
   - Summary: **the conformance engine takes ~47s on this repository, and the cost is process spawn.**
     The §1/§3 assertions read 236 docs; the implementation is one cached tree walk plus one `awk` per

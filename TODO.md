@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-18
+last_updated: 2026-08-21
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -18,9 +18,9 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-076 — Coverage, and Whether the Bar Is Right** → [`docs/sprint/SPRINT-076-coverage-and-the-bar.md`](docs/sprint/SPRINT-076-coverage-and-the-bar.md) — EPIC-004's fifth member. Five tasks, 20 DoD: the fixture audit that closes § Closed-when 3 or says why it cannot (T1) · the §4 ADR family (T2) · §2's placement pair, chosen *because* it is the likeliest artefact source (T3) · a ruling on § Closed-when 2 with real numbers (T4) · §3's two unstated exceptions (T5). **Gates not yet signed** — `/orchestrator` runs G1+G2 first; `gates_signed:` is absent and its absence means NOT signed, never approval.
->
-> **T4 is the one that must not run early.** It rules on whether the epic's remaining bar stands, and its whole value is deciding with T1/T2/T3's numbers in hand. Run it before them and it becomes the guess it exists to replace — and amending an exit condition to fit what got built is the failure L-088 names.
+> _None._ SPRINT-076 closed 2026-08-21 (EPIC-004's fifth member; 20 of 20 DoD).
+> Next: `/lean-doc-generator promote` from the groomed Backlog — EPIC-004 has two exit conditions open
+> and ~32 rules left to build, so the next member sprint is coverage work unless the epic is re-scoped.
 
 ---
 
@@ -203,6 +203,30 @@ status: current
       origin:     close-retro
       state:      ready
 
+
+- [ ] TASK-244 — Rule on §Closed-when 3's two residuals: invocation-error scope, and the must-REPORT wording  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  both residuals SPRINT-076 T1 established are ruled and the epic's § Closed-when 3
+                  reflects the outcome. **(a) Scope**: are the engine's three *invocation-error*
+                  identities (`conformance: usage` · `repo directory not found` · `reader-missing`) in
+                  scope for a condition about checks having fixtures, or are they explicitly excluded?
+                  **(b) Wording**: `S9.GATESABSENT` reports *NOT SIGNED* as a note and never FAILs by
+                  design, so *"a retained must-FAIL fixture that fails with its named finding"* is
+                  **unsatisfiable** for it — the property that actually holds across the corpus is *a
+                  retained case asserts the named finding on input that must produce it*. Either the
+                  condition adopts that wording or it states its exception
+      touches:    docs/epic/EPIC-004-conformance.md (§ Closed-when 3) ·
+                  docs/research/fixture-coverage-audit.md (the record it rules on) ·
+                  evals/run-conformance-engine-fixtures.sh (only if (a) rules the three IN scope)
+      depends-on: none
+      assumes:    **the measurement is already done and must not be redone** — 24 of 24 checks guarded,
+                  16 of 19 finding identities, gap list named
+                  (`docs/research/fixture-coverage-audit.md`). This task is *two rulings*, not an audit.
+                  Deliberately NOT taken inside SPRINT-076 T1: making a scope ruling inside the audit
+                  that benefits from it is the drift L-088 names, and T1 refused it for that reason
+      tracker:    SPRINT-076 T1 · EPIC-004 § Closed-when 3 · L-088
+      origin:     close-retro
+      state:      ready
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution
       done-when:  a real unattended run that stops mid-Plan leaves a rollup naming the untouched tasks

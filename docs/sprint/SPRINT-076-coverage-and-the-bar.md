@@ -3,11 +3,11 @@ sprint: 076
 slug: coverage-and-the-bar
 epic: EPIC-004
 owner: Maintainer
-last_updated: 2026-08-20
+last_updated: 2026-08-21
 plan_commit: f6ae258
 gates_signed: G1,G2 @ 641036f
 close_commit: [sha — set at close]
-status: active
+status: closed
 update_trigger: sprint execute/close events
 ---
 
@@ -260,6 +260,68 @@ from a comment.
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (STANDARD §10):
-     shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
-     After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->
+**20 of 20 DoD · 5 of 5 tasks · gate `162 pass, 0 fail`.** Engine coverage **6 → 13 of 62**. Two of
+EPIC-004's five exit conditions moved and **neither ticked** — which is the sprint's most accurate
+one-line summary, and the outcome the Plan named as legitimate before the evidence existed.
+
+**What this sprint was for, and whether it worked.** The theme was *judge the remaining bar rather than
+guess at it*. D4 ordered T4 last so it would rule with numbers; it did, on three figures each derived
+at execution rather than trusted from the Plan — coverage 19 of 62, artefacts 4 of 8, fixture identities
+16 of 19. **The ordering was load-bearing in a way the Plan did not anticipate**: T1 was declared
+`depends-on: none` and listed first, but it audits the corpus T2 and T3 extend, so run first its gap
+list would have been stale before T4 read it. Caught at the G2 gate and resequenced to
+`T2 → T3 → T5 → T1 → T4`.
+
+**The gate recon paid for itself before any code was written.** Four findings, three binding: the
+register's scope-out count was off by one (`S2.R-GROWTH` is `judgment-only` and was never checkable —
+corrected, and the register now reconciles *exactly* to 62); D3's ownership map missed T5 as a third
+writer of `conformance-engine.sh`; and T1's sequencing above. Assumptions A1/A2/A5 were verified at the
+gate rather than deferred, and A5's predicted **13** was re-derived at execution and matched.
+
+**The recurring theme, and it is not a happy one: three separate cases looked green while testing
+nothing.** A seeded break scored `DISCRIMINATES` against an **empty** engine file; a stranger control
+passed **vacuously** because its rule did not exist yet; a fixture bounding an exception to frontmatter
+wrote the trigger *in prose*, where the anchored pattern could never match. None was found by review —
+each was found by breaking the thing on purpose and noticing what failed to notice. → **L-142**, count
+3.
+
+**Three real defects, all found by running rather than reading.** The driver mapped `.`→`_` but not
+`-`, so **21 of 100 hyphenated rule ids** silently reported `rule-unimplemented` with their assertions
+present. `S9.GATESWELLFORMED` accepts `G7`/`G99` while promising *"want G1 / G2"* — found by *writing*
+the missing fixture (TD-067). And a placement scan walking the tree per spec row took the gate from ~4
+minutes to over ten, killing two runs before they printed a tally (L-144, second sighting).
+
+**What the artefact triage settled.** SPRINT-075 recorded *0 artefacts* and honestly called itself
+*barely asked*. Asked properly — against the two dispositions judged **likeliest** to be shape-bound —
+the number is **4 of 8**, and all four are lean-flow's own loop surface. The engine was left faithful
+rather than tuned quiet, the finding routed to the register, and a fixture now **asserts** the artefact
+set so it cannot silently grow (TASK-243 owns the spec fix).
+
+**Process notes worth keeping.** `Layers:` was corrected on four of five tasks (L-100 working as
+intended — a live declaration, not a frozen prediction). Two id collisions were near-misses caught only
+by looking (L-143). A gate whose pass count moved 163→162 at 0 fail turned out to be a soft cap
+crossing (L-145). And one mistake was mine to own: a `git stash` run to compare outputs **while a gate
+was reading the tree** invalidated that run, which was discarded and re-run.
+
+### Buckets routed (§10)
+
+| Bucket | Filed |
+|---|---|
+| **Shipped** | `CHANGELOG.md` → **v1.50.0** (MINOR); `plugin.json` + `marketplace.json` bumped in lockstep |
+| **Tech debt** | **TD-067** (gate-token check looser than its message) · **TD-068** (an off-vocabulary tag drops a doc from the generated index, and the staleness check cannot see it). **TD-064 halved by ruling** — 12 strategy docs exempted via spec 0.4.2, row left open for the 3 `docs/qa/` + 13 research docs |
+| **Follow-ups** | **TASK-243** (§2 marks loop rows apart from universal ones) · **TASK-244** (the two § Closed-when 3 rulings). **TASK-238 re-parked**, not discharged — its trigger names three families and this sprint delivered one |
+| **Learnings** | **L-142** (a seeded break that does not redden its case tested nothing) count 3 · **L-143** (an id is a query result) count 2 · **L-144** (process count is the dominant term) count 2 · **L-145** (a green gate whose pass count moved is a changed gate) count 1 |
+
+**Three learnings land at count ≥ 2 and are promotion candidates at the next promote** — L-142, L-143
+and L-144. Placement is the promote checkpoint's call (§10's placement test), not this Retro's.
+
+### Carried forward
+
+- **§ Closed-when 2 and 3 both open, deliberately**, each with a written reason rather than a softened
+  condition. Remaining: ~32 rules to build (four to five sprints) plus a ruling on the 11 `scope-out`s.
+- **Two soft caps for the next promote's doc-aging pass**: `docs/epic/EPIC-004-conformance.md` 201 > 200
+  and `docs/research/conformance-dispositions.md` 200 > 130. Both crossed by content this sprint
+  deliberately added, and both are artefacts the next sprint reads first — flagged rather than pruned
+  mid-task.
+- **21 fixture cases sit in opt-in harnesses** (`run-attestation` 7, `run-layers-observed` 14) and do
+  not run at the gate. Named in the audit; no action taken.
