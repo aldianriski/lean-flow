@@ -123,3 +123,25 @@ own measurements were annotated rather than edited, per §2's rule for a verdict
 It was already over at 201 before this sprint; recording the amendment with its prior text added 11.
 Left for close to route to §11's stated remedy (prune at the next promote governance review) rather
 than resolved here by deleting settled content this task did not author.
+
+### 2026-08-21 | run-complete | run · 9 of 9 DoD ticked
+Attended `sprint-bulk`, after the requested unattended run was refused at pre-flight for having no
+AFK-safe task in the Plan. Nothing parked, nothing unattempted, no blocker.
+
+| Task | DoD | Commit | State |
+|---|---|---|---|
+| T1 — §2 loop-row distinction | 5 of 5 | `19bfa8d` | ticked |
+| T2 — the two § Closed-when 3 rulings | 4 of 4 | `828e8fa` | ticked |
+
+**System-verify: `QA-CHECK: 154 pass, 0 fail`** against the integrated tree — read from the gate's own
+verdict line, run as its own call, not through a pipe (L-120).
+
+**Two soft-cap notes carried to close, neither introduced by a task's own growth alone:**
+`docs/epic/EPIC-004-conformance.md` 212 > 200 (was 201 pre-sprint; the amendment record added 11) and
+`docs/research/conformance-dispositions.md` 206 > 130 (**unchanged** — § Artefacts was rewritten to
+carry three result states in the space that previously held one, per T1 DoD 4's prune-don't-append).
+Both route to §11's stated remedy at the next promote governance review; TD-069 already owns the
+second. Not resolved here, because the register's cap decision is named in this sprint's § Out.
+
+**EPIC-004 now stands at 4 of 5 § Closed-when.** The one open condition is 2 — ~32 rules with no
+backlog tasks — which needs `/task-decomposer` before it can be planned, exactly as § Out predicted.
