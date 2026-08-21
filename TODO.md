@@ -18,9 +18,9 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-077 — The Decisions EPIC-004 Is Waiting On** → [`docs/sprint/SPRINT-077-the-decisions-epic-004-is-waiting-on.md`](docs/sprint/SPRINT-077-the-decisions-epic-004-is-waiting-on.md) — EPIC-004's sixth member. **Two tasks, 9 DoD**, and small on purpose: §2 gains a machine-readable loop-row vs repository-universal distinction (T1), and the two rulings § Closed-when 3 is waiting on are made (T2). **Gates not yet signed** — `/orchestrator` runs G1+G2 first; `gates_signed:` is absent and its absence means NOT signed, never approval.
->
-> **The epic's bulk is deliberately not here.** ~32 rules remain to build and they have **no backlog tasks at all**, so coverage work needs `/task-decomposer` before it can be planned. Padding this sprint with half-specified coverage would mix a decision sprint with a build sprint and delay both.
+> _(none — SPRINT-077 closed 2026-08-21. Next: `/task-decomposer` on EPIC-004's ~32 remaining
+> coverage rules (**TASK-245**), which is the epic's last open § Closed-when condition and has no
+> backlog tasks yet — so it needs intake before it can be promoted, not another `promote`.)_
 
 ---
 
@@ -31,6 +31,29 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-245 — Decompose EPIC-004's remaining coverage rules into buildable tasks  [size: M] [risk: low] [HITL]
+      class:      decision
+      done-when:  the ~32 `build` rules in `docs/research/conformance-dispositions.md` exist as
+                  `TASK-NNN` entries (or as a small number of grouped vertical slices), each with a
+                  `done-when` naming **the finding string its check must fire** — a check specified
+                  without its finding name is a half-shipped gate (L-058) — and enough are `state:
+                  ready` to form the next coverage sprint
+      touches:    TODO.md · docs/research/conformance-dispositions.md (only if a disposition changes
+                  on contact) · no code
+      depends-on: none
+      assumes:    **the count is a query result and gets re-derived at intake, not copied from here**
+                  (L-130). "~32" is SPRINT-076's figure for the `build` bucket and SPRINT-077 changed
+                  no disposition, so it should still hold — but the register is the source, not this
+                  row. Also: **grouping is a decision, not a formality.** 32 one-rule tasks would be
+                  a worse backlog than 6 grouped slices, and §6's four tier rules are already
+                  dispositioned as *one check, four tiers — the tier is a parameter, not four
+                  checkers*, which is the shape to look for elsewhere
+      tracker:    EPIC-004 § Closed-when 2 (the epic's last open condition) · SPRINT-076 T4's ruling
+                  that the bar stands · SPRINT-077 § Out (which names this as the next entry, and
+                  names `/task-decomposer` rather than `promote` as the skill that runs it)
+      origin:     close-retro
+      state:      ready
 
 ### P2 — Quality / Polish
 
@@ -48,7 +71,8 @@ status: current
                   `.claude/CLAUDE.md` · `.claude/CONTEXT.md`, all of them lean-flow's own loop surface
                   rather than repository structure. Routed back to the register (§ Artefacts) exactly as
                   this row requires, the engine left faithful rather than quietened, and the spec fix
-                  filed as TASK-243. So the METHOD is proven and the finding is real; what is unproven
+                  filed as TASK-243 — **delivered at SPRINT-077 T1 (spec 0.5.0); artefacts now 0 of 4**. So the
+                  METHOD is proven and the finding is real; what is unproven
                   is the other two families
       touches:    evals/run-foreign-repo-fixtures.sh (extend the target if the new rules need one) ·
                   docs/research/conformance-dispositions.md (only if artefacts are found) · the
@@ -108,7 +132,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-075's shipped changes are written up as **v1.49.0** in [`CHANGELOG.md`](CHANGELOG.md), and the MINOR bump landed with the close (all four manifests + README footer). §11's keep-current-plus-previous rule is satisfied: **v1.49.0 + v1.48.0** inline, with **v1.47.0 rotated** → [`docs/changelog/CHANGELOG-1.47.0.md`](docs/changelog/CHANGELOG-1.47.0.md) in the same commit. **The spec did not move this time** — `spec/STANDARD.md` stays at **0.4.1**, because the engine reads the standard rather than changing it; the one spec obligation this sprint surfaced (§3 owes an explicit ADR row) is filed as **TASK-237** rather than slipped in at close. **The plugin MINOR is for the engine**: `conformance.sh` + `scripts/lib/conformance-engine.sh` are a new consumer-facing capability, and `rule-unimplemented` becoming a `GAP` changes what an adopter's exit code means — which is why ADR-027 carries a refinement marker rather than a silent edit.
+_(no active sprint)_ — SPRINT-077's shipped changes are written up as **v1.51.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand at close (all four manifests + README footer). **The spec DID move this time**, which is the difference from SPRINT-075's close: `spec/STANDARD.md` goes to **0.5.0** because §2 reclassifies four rows from unconditional to substrate-conditional — an existing adopter's report loses up to four `core-file-missing` findings and their level can move without their tree changing, which is the line PATCH is not allowed to cross (§2's own row names *reclassified* as a bump trigger). The plugin MINOR is for the same reason on the consumer side: what `conformance.sh` reports about a stranger's repository changes. §11's keep-current-plus-previous rule wants **v1.51.0 + v1.50.0** inline with **v1.49.0 rotated** → `docs/changelog/CHANGELOG-1.49.0.md` — part of the retention pass, applied on owner approval.
 
 ---
 

@@ -4,7 +4,7 @@ slug: the-decisions-epic-004-is-waiting-on
 epic: EPIC-004
 owner: Maintainer
 last_updated: 2026-08-21
-status: active
+status: closed
 gates_signed: G1,G2 @ d004526
 plan_commit: c97d773
 close_commit: [sha — set at close]
@@ -140,7 +140,7 @@ _None._
 
 ## Execution Log
 
-> **Lives in its own file** — `docs/sprint/logs/SPRINT-077-the-decisions-epic-004-is-waiting-on.md`,
+> **Lives in its own file** — `docs/sprint/archive/logs/SPRINT-077-the-decisions-epic-004-is-waiting-on.md`,
 > rendered from `templates/sprint-log.md.template` and created lazily at the first entry. Append
 > there, never here: the Log grows with the work done, so keeping it out of this file is what stops it
 > consuming the 400-line budget the Plan needs (STANDARD §9 · ADR-014).
@@ -151,9 +151,67 @@ _None._
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `spec/STANDARD.md` | T1 | §2's four loop rows name their substrate instead of `always`; the split stated as a ruling (ADR-026 pattern). Version 0.5.0 | med | derivation 9→5; foreign-repo + s2-placement harnesses |
+| `spec/CHANGELOG.md` | T1 | 0.5.0 entry, MINOR argued not inherited from 0.4.2's PATCH test | low | read |
+| `docs/research/conformance-dispositions.md` | T1 | § Artefacts records 4-of-8 → 0-of-4 and both fixture re-triages; net-neutral at 206 lines | low | `check-doc-caps.sh` |
+| `evals/run-foreign-repo-fixtures.sh` | T1 | retained case re-triaged to an **empty**-remainder assertion (stronger; cannot absorb a new artefact quietly) | med | 6/6 green; reddens against pristine spec |
+| `evals/run-s2-placement-fixtures.sh` | T1 | must-FAIL victim derived from §2 instead of hard-coded `TODO.md`; seed asserts target existed before removal | med | 7/7 green; seeded defect reddens, control green |
+| `docs/epic/EPIC-004-conformance.md` | T2 | § Closed-when 3 ticked on rulings (a)+(b); prior wording preserved as an amendment record | med | read; §4 bar applied → Retro not ADR |
+| `docs/research/fixture-coverage-audit.md` | T2 | annotated with the ruling, measurements left unedited (§2's verdict rule) | low | `check-doc-caps.sh` 129 ≤ 130 |
 
 ## Retro
 
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
      shipped → CHANGELOG.md (root) · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
+
+**9 of 9 DoD · gate 154 pass / 0 fail · EPIC-004 to 4 of 5.** A two-task decision sprint that did what
+it said, and the two most useful things in it were not on the Plan.
+
+**What the sprint got right by being small.** D1 argued that padding this with coverage work would mix
+a decision sprint with a build sprint and delay both. That held: T1 and T2 each needed a real ruling,
+and neither would have got one inside a five-task sprint. The epic reaches 4 of 5 on nine DoD.
+
+**T1 needed no code, and finding that out was the design work.** The obvious implementation — give the
+root/`.claude/` tables the `Tier` column the `docs/` tree has — would have shifted columns in **three**
+positional §2 parsers. Two fail loudly; `check-doc-caps.sh` fails **silent**, reading `lean loop` as
+the Cap cell, finding no integer, and dropping every root and `.claude/` cap *while reporting PASS*.
+The shipped design re-words four `Create ←` cells instead, because the engine's discriminator already
+*is* the word `always` — so the spec moved and no code did. `qa-check.sh:577` had anticipated this in
+prose since SPRINT-076 and nobody had read it as a design instruction.
+
+**The G1 recon paid for itself, and the Plan's `Layers:` was wrong.** Two of those three parsers were
+undeclared. Declared per L-100 — and the gate caught the gap anyway, because the Layers correction had
+been written into the Execution Log but not into the § Plan line the checker actually reads. That is
+the one FAIL this sprint produced, and it was bookkeeping, not code.
+
+**The finding nobody planned: a retained fixture had already decayed to vacuous.**
+`run-s2-placement-fixtures.sh` hard-coded `TODO.md` as its must-FAIL seed. Once T1 reclassified that
+row, `build_conformant` stopped creating it, `rm -f` removed nothing, and the existence guard
+`[ -e … ] && fail` passed *because the file had never existed*. A case that tested nothing would have
+scored as a pass. L-142's promoted rule does not reach this: it guards **authoring-time** seeding, and
+this seed was authored correctly and decayed later. → **L-146**.
+
+**Where the bar was most at risk.** T2's ruling (b) re-words an exit condition while holding an audit
+that wants it ticked — L-088's exact shape, and this row had refused two looser readings on that ground
+at SPRINT-076. Handled by preservation rather than argument: the epic now carries the prior wording
+verbatim above the new. The supporting fact is that L-139 established the wider property at SPRINT-075,
+*before* this sprint needed it — a defence that would not exist had the wording been invented here.
+
+**Honest about what did not move.** § Closed-when 2 is untouched: ~32 rules, no backlog tasks. TD-067,
+TD-048/TD-057 all stand. `S2.F-TIER` being unimplemented means `AGENTS.md` now has no existence check
+for anyone — measured, bounded (caps are unaffected; the other three files are guarded elsewhere), and
+recorded rather than discovered later.
+
+### Buckets routed (STANDARD §10)
+
+| Bucket | Routed to |
+|---|---|
+| Shipped | `CHANGELOG.md` **v1.51.0** (MINOR — spec 0.5.0 changes what an adopter's report says) |
+| Tech debt | **TD-070** (three §2 table parsers, one contract, no shared reader) · **TD-069 updated** (EPIC-004 201 → 212) |
+| Follow-ups | **TASK-245** — decompose EPIC-004's ~32 remaining coverage rules (`origin: close-retro`) |
+| Learnings | **L-146** (a retained fixture decays to vacuous when the spec value it hard-codes is reclassified) · **L-111** bumped to count 2 |
+
+**Discharged, not filed:** TASK-243 (the spec fix — delivered by T1) and TASK-244 (the two residuals —
+delivered by T2). Neither ever had a Backlog row; both were cited in prose, and both are now closed in
+the epic that cited them.
      After close, the file moves → docs/sprint/archive/ + a one-line entry in docs/sprint/INDEX.md (§11). -->

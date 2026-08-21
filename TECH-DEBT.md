@@ -146,11 +146,11 @@ status: current
     §2's Growth rule forbids the obvious fix.** *Cap-hit → split into a tree, never squeeze.*
     `docs/research/conformance-dispositions.md` is **206 / 130** — a partition of all 62 checkable
     rules, so cutting 76 lines makes the register *incomplete*, not concise.
-    `docs/epic/EPIC-004-conformance.md` is **201 / 200** and gains **exactly one line per member
-    sprint**, so it will breach again at every promote from here.
+    `docs/epic/EPIC-004-conformance.md` is **212 / 200** (201 when filed) and gains **at least one line per member
+    sprint**, so it will breach again at every promote from here. **SPRINT-077 showed the growth is not only per-sprint rows**: recording an exit-condition amendment with its prior wording (L-088's required form) added 11 lines by itself, so option (c) — moving § Member sprints to `epic/INDEX.md` — does not on its own cure this file.
   - Evidence: reported by `check-doc-caps.sh` on **every run since at least SPRINT-075**, when
     TD-059's re-review recorded the register at **163**. It has tracked coverage since — 173 at
-    SPRINT-076 promote, 206 after T3's § Artefacts. Nothing consumed the report for four sprints.
+    SPRINT-076 promote, 206 after T3's § Artefacts. Nothing consumed the report for four sprints. **Re-measured at SPRINT-077 close: register unchanged at 206 (T1's § Artefacts rewrite carried three result states in the space that held one), epic 201 → 212.**
     **That is L-106's shape verbatim** (a soft breach printed every run while the governance review
     read doc-aging clean), which is why it is a row now rather than a fifth silent sighting.
   - Impact: low today, and the reason to file it is that **the cap has stopped carrying information
@@ -171,6 +171,36 @@ status: current
     out of the capped file. **Decide before the next coverage sprint** — each one adds rows to both.
   - Sibling: **TD-059**, whose re-review first recorded the register's breach, but whose subject is
     the non-recursive cap glob rather than these files. Curing either moves neither.
+- **TD-070** severity: minor | status: open | created: Sprint-077
+  - Summary: **§2's file tables have three independent parsers, each hard-coding the same column
+    offset, and nothing states the contract they share.** `scripts/lib/conformance-engine.sh`
+    (`_s2_rows`, `cre = (pfx=="docs/") ? c[6] : c[5]`), `scripts/lib/check-doc-caps.sh`
+    (`cap = (pfx=="docs/") ? c[5] : c[4]`) and `evals/run-s2-placement-fixtures.sh`
+    (`cre = (pfx=="docs/") ? c[6] : c[5]`) each re-derive §2's rows from scratch. The offset exists
+    only because the `docs/` tree carries a `Tier` column the root and `.claude/` tables do not.
+  - Evidence: surfaced at SPRINT-077 **G1 recon**, not by a check — the count was verified two ways
+    (`grep -ln '§2' scripts/`, then reading each parser). The engine's own comment has named the
+    problem since SPRINT-076 T3 (*"this is the SECOND §2 table parser in the repo … extracting a
+    shared `read-spec-files.sh` beside `read-spec-rules.sh` is the right shape"*) and deferred it as
+    out of that task's Layers. It is now three, and the third is a **fixture harness that re-derives
+    the required set exactly as the engine does** — so it would break identically rather than catch
+    the break, with only `n_req >= 5` between it and a silent wipeout the `docs/` rows alone satisfy.
+  - Impact: **the failure mode is a silent false negative in a gate, and SPRINT-077 came within one
+    design choice of it.** T1's obvious implementation — giving the root/`.claude/` tables the `Tier`
+    column — shifts every column by one. `check-doc-caps.sh` would then read `lean loop` as the Cap
+    cell, find no integer, and **drop every root and `.claude/` row from cap checking while reporting
+    PASS** (L-058). The shipped design avoided this by needing no column at all, which is luck about
+    this change, not a property of the next one. Any future §2 column edit re-arms it.
+  - Mitigation (hypothesis, not a plan — the filer's): extract `scripts/lib/read-spec-files.sh`
+    beside the existing `read-spec-rules.sh`, emitting `always|path|legacy|cap` per row, and have all
+    three call it. The precedent is already set and working: `read-spec-rules.sh` did exactly this
+    for §14's rule tables. The harness is the interesting case — it re-derives *deliberately*, to
+    prove the engine is not hard-coding, so it should keep an independent derivation but gain a case
+    asserting the two agree on the full row set rather than on `n_req >= 5`.
+  - Sibling: **TD-057** is the same *shape* one level over (`Layers:` feeding three checkers that
+    match it three different ways, contract unstated) but a different subject; curing either moves
+    neither. **TD-048** likewise. Related: **L-146**, the fixture that decayed to vacuous in this
+    same family.
 - **TD-066** severity: minor | status: open | created: Sprint-075
   - Summary: **the conformance engine takes ~47s on this repository, and the cost is process spawn.**
     The §1/§3 assertions read 236 docs; the implementation is one cached tree walk plus one `awk` per

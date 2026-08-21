@@ -3,7 +3,7 @@ sprint: 077
 slug: the-decisions-epic-004-is-waiting-on
 owner: Maintainer
 last_updated: 2026-08-21
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -124,7 +124,10 @@ It was already over at 201 before this sprint; recording the amendment with its 
 Left for close to route to §11's stated remedy (prune at the next promote governance review) rather
 than resolved here by deleting settled content this task did not author.
 
-### 2026-08-21 | run-complete | run · 9 of 9 DoD ticked
+### 2026-08-21 | run-complete | the attended run that replaced the refused night run
+run · 9 of 9 DoD ticked
+run · cost unavailable from inside the session · turns unavailable · wall-clock unavailable · 2 of 2 units · inline
+
 Attended `sprint-bulk`, after the requested unattended run was refused at pre-flight for having no
 AFK-safe task in the Plan. Nothing parked, nothing unattempted, no blocker.
 

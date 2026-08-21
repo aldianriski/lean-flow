@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-20
+last_updated: 2026-08-21
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -19,7 +19,7 @@ status: current
 ## Directory structure
 
 ```
-spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.1.0) · CHANGELOG.md
+spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.5.0) · CHANGELOG.md
                                 versioned independently of plugin.json — the SSOT (ADR-023)
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
 skills/           14 skills (auto-discovered at root)
