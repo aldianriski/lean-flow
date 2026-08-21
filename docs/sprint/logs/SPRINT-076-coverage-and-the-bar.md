@@ -479,3 +479,57 @@ Not fixed here — `gen-index.sh` is outside T1's Layers and the fix is a design
 unknown tag, or publish the vocabulary where an author writing frontmatter will see it; §7's glossary
 would be the natural home). Recorded for the close Retro rather than filed as debt on the spot, since
 the same pass is already carrying TD-067 and the promotion candidates.
+
+### 2026-08-21 | progress | T4 — the ruling: the bar stands, and it cost four to five more sprints to say so
+
+**Run last, with numbers, which was the whole design of D4.** Every one of the three was derived at
+execution rather than trusted from the Plan: **coverage 19 of 62** checkable rules map to a check (13
+in the engine — exactly A5's prediction, re-derived from the engine's own `coverage:` line);
+**4 artefacts of 8** new findings against a stranger (T3, confirming A4); **16 of 19 finding
+identities guarded**, 24 of 24 checks (T1).
+
+**Owner ruling: the bar stands. No amendment, therefore no ADR** — §4's three-part bar is about a
+decision that is hard to reverse, surprising, and a real trade-off, and *leaving a condition alone*
+is none of those. DoD 2's alternative branch applies: the Retro carries the ruling.
+
+**The reasoning, recorded because the alternative was available and defensible.** The clause has two
+halves. *"Or is explicitly marked judgment-only"* is **done** — 32 rules satisfy it outright, 6 more
+are excluded by mark. *"Maps to a check"* is at **19 of 62**, with **32** dispositioned `build` and
+**11** `scope-out`. A disposition is a decision to build, not a check; and the 11 scope-outs satisfy
+**neither** half, a residual this row has carried since SPRINT-073.
+
+Two ways to make it tick today were on the table and both were refused: counting dispositions as
+checks, and swapping in the roadmap's Phase A exit (*rules independently readable + conformance
+independently measurable*), which is arguably true now. The second is a **different claim**, not this
+one. Amending an exit condition to fit what got built is L-088's failure, and SPRINT-075 refused it
+once already.
+
+**What standing costs, stated so the choice is not free**: ~32 rules remain; this sprint shipped 7, so
+**four to five more coverage sprints**, plus a separate ruling on whether the 11 scope-outs get
+checked, re-marked, or accepted as a third state the condition's wording does not admit.
+
+**The Plan named this outcome as legitimate before the evidence existed, and it is the one that
+happened** — which is the only reason it reads as a ruling rather than a concession.
+
+**20 of 20 DoD.** Two of the five § Closed-when conditions moved this sprint: **3** from *measured
+around* to *established with a written reason for staying open*, and **2** from *undecided* to
+*ruled*. Neither ticked, and that is the honest state.
+
+### 2026-08-21 | progress | T4 — a soft cap crossed by one line, caught by the pass count moving
+
+The gate read `162 pass, 0 fail` where the previous run read `163 pass, 0 fail`. **Zero failures is not
+the same as nothing changed**, so the two pass lists were diffed rather than the green being accepted:
+`cap docs/epic/EPIC-004-conformance.md (190 <= 200)` had disappeared. T4's ruling took the epic to
+**201 lines against its 200 soft cap**, so the check moved from `PASS` to `OVER-CAP (soft)` — a report
+line, not a failure, exactly as §11 intends for a soft cap.
+
+Two soft caps are now outstanding for the promote/close doc-aging pass, both crossed by content this
+sprint deliberately added: **`docs/epic/EPIC-004-conformance.md` 201 > 200** (the T4 ruling and the T1
+evidence) and **`docs/research/conformance-dispositions.md` 200 > 130** (already 173 before T3's
+§ Artefacts). Neither is pruned mid-task: the epic's § Closed-when is the artefact the *next* sprint
+reads first, and the register is what T1 and T4 both reconciled against. Recorded so the next promote
+sees them as a decision rather than discovering them.
+
+Worth naming as method: **a green gate whose pass count moved is a changed gate.** The count is the
+cheap second number, and the diff of the two lists is the check — the same shape that has caught every
+other miscount in this sprint.

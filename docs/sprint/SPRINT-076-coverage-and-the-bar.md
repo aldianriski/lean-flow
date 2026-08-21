@@ -149,12 +149,12 @@ never as a convenience at close.
 **Acceptance:** a reader of the epic can tell whether the bar stands or moved, and why.
 
 **DoD:**
-- [ ] The ruling is written with the three numbers that inform it — *Verify: coverage after this sprint,
+- [x] The ruling is written with the three numbers that inform it — *Verify: coverage after this sprint,
       T3's artefact count, T1's fixture gap list. A ruling without them is the drift this task exists
       to prevent*
-- [ ] If the condition is **amended**, an ADR records it and `docs/DECISIONS.md` gains its row —
+- [x] If the condition is **amended**, an ADR records it and `docs/DECISIONS.md` gains its row —
       *Verify: §4's three-part bar is met, or no ADR is written and the Retro carries the ruling instead*
-- [ ] **"The bar stands and EPIC-004 runs more coverage sprints" is a legitimate outcome** and is
+- [x] **"The bar stands and EPIC-004 runs more coverage sprints" is a legitimate outcome** and is
       recorded as such if it is the honest answer — *Verify: the epic. Amending an exit condition to fit
       what was built is the failure L-088 names (SPRINT-075 already refused this once, on a DoD whose
       parenthetical was wrong)*
@@ -232,6 +232,7 @@ from a comment.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/epic/EPIC-004-conformance.md` | T4 | § Closed-when 2 **ruled: the bar stands**, with the three numbers that informed it. No ADR — nothing was amended, so §4's bar is not met; the Retro carries the ruling | med | the epic; 19/62 · 4/8 · 16/19 |
 | `docs/research/fixture-coverage-audit.md` | T1 | **new** — the audit record: 24 of 24 checks guarded, 16 of 19 finding identities, gap list named, and the two ways the audit's own query failed green before it was right | low | cross-check: 16 + 3 = 19 |
 | `evals/run-gates-signed-fixtures.sh` + `evals/fixtures/gates-signed/` | T1 | close the one repository-facing gap — `unrecognised-gate-token-fails`, a retained must-FAIL | low | harness green |
 | `TECH-DEBT.md` | T1 | **TD-067** — the token test accepts `G7`/`G99` while promising "want G1 / G2"; found by writing the fixture above | low | — |
