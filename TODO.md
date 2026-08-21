@@ -18,9 +18,9 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-076 closed 2026-08-21 (EPIC-004's fifth member; 20 of 20 DoD).
-> Next: `/lean-doc-generator promote` from the groomed Backlog — EPIC-004 has two exit conditions open
-> and ~32 rules left to build, so the next member sprint is coverage work unless the epic is re-scoped.
+> **SPRINT-077 — The Decisions EPIC-004 Is Waiting On** → [`docs/sprint/SPRINT-077-the-decisions-epic-004-is-waiting-on.md`](docs/sprint/SPRINT-077-the-decisions-epic-004-is-waiting-on.md) — EPIC-004's sixth member. **Two tasks, 9 DoD**, and small on purpose: §2 gains a machine-readable loop-row vs repository-universal distinction (T1), and the two rulings § Closed-when 3 is waiting on are made (T2). **Gates not yet signed** — `/orchestrator` runs G1+G2 first; `gates_signed:` is absent and its absence means NOT signed, never approval.
+>
+> **The epic's bulk is deliberately not here.** ~32 rules remain to build and they have **no backlog tasks at all**, so coverage work needs `/task-decomposer` before it can be planned. Padding this sprint with half-specified coverage would mix a decision sprint with a build sprint and delay both.
 
 ---
 
@@ -68,55 +68,6 @@ status: current
       tracker:    SPRINT-075 T3 · SPRINT-076 T3 (the §2 third) · EPIC-004 § Closed-when 1 · L-015 · L-016
       origin:     close-retro
       state:      blocked
-
-- [ ] TASK-243 — Mark which §2 rows are lean-flow-loop rows rather than repository-universal ones  [size: S] [risk: med] [HITL]
-      class:      decision
-      done-when:  §2 distinguishes, in a form a checker can READ, the rows every repository owes from
-                  the rows only a lean-flow/Claude-Code repo owes — so `S2.F-FILE` can stop telling a
-                  four-file JS library it needs `.claude/CONTEXT.md`. The engine reads that
-                  distinction instead of inferring it, `docs/research/conformance-dispositions.md`
-                  § Artefacts is updated with the new count, and
-                  `evals/run-foreign-repo-fixtures.sh`'s retained artefact-set case is **re-triaged**
-                  rather than merely widened
-      touches:    spec/STANDARD.md (§2) · spec/CHANGELOG.md · scripts/lib/conformance-engine.sh ·
-                  evals/run-foreign-repo-fixtures.sh · docs/research/conformance-dispositions.md
-      depends-on: none
-      assumes:    the fix belongs in the SPEC, not the checker — narrowing a rule the standard states
-                  is a checker deciding a question the standard owns, which is the inversion L-058
-                  keeps naming. **Whether this is a MINOR bump is the open call**: it changes what a
-                  conformant report says about an existing adopter, which is more than the PATCH
-                  wording-only bar TASK-237 uses. Four of the nine unconditional rows are affected
-                  (`AGENTS.md` · `TODO.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md`) — a figure
-                  derived at SPRINT-076 T3 and to be **re-derived** when this runs, never trusted from
-                  here (L-130)
-      tracker:    SPRINT-076 T3 · docs/research/conformance-dispositions.md § Artefacts · TASK-238
-      origin:     close-retro
-      state:      ready
-
-
-- [ ] TASK-244 — Rule on §Closed-when 3's two residuals: invocation-error scope, and the must-REPORT wording  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  both residuals SPRINT-076 T1 established are ruled and the epic's § Closed-when 3
-                  reflects the outcome. **(a) Scope**: are the engine's three *invocation-error*
-                  identities (`conformance: usage` · `repo directory not found` · `reader-missing`) in
-                  scope for a condition about checks having fixtures, or are they explicitly excluded?
-                  **(b) Wording**: `S9.GATESABSENT` reports *NOT SIGNED* as a note and never FAILs by
-                  design, so *"a retained must-FAIL fixture that fails with its named finding"* is
-                  **unsatisfiable** for it — the property that actually holds across the corpus is *a
-                  retained case asserts the named finding on input that must produce it*. Either the
-                  condition adopts that wording or it states its exception
-      touches:    docs/epic/EPIC-004-conformance.md (§ Closed-when 3) ·
-                  docs/research/fixture-coverage-audit.md (the record it rules on) ·
-                  evals/run-conformance-engine-fixtures.sh (only if (a) rules the three IN scope)
-      depends-on: none
-      assumes:    **the measurement is already done and must not be redone** — 24 of 24 checks guarded,
-                  16 of 19 finding identities, gap list named
-                  (`docs/research/fixture-coverage-audit.md`). This task is *two rulings*, not an audit.
-                  Deliberately NOT taken inside SPRINT-076 T1: making a scope ruling inside the audit
-                  that benefits from it is the drift L-088 names, and T1 refused it for that reason
-      tracker:    SPRINT-076 T1 · EPIC-004 § Closed-when 3 · L-088
-      origin:     close-retro
-      state:      ready
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution

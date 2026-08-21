@@ -43,22 +43,11 @@ failure L-108 names:
 
 ## The cross-check (DoD 3)
 
-Finding **identities**, not name prefixes: two prefixes cover several distinct findings each, and
-counting prefixes understates the total by five.
-
-| | |
-|---|---|
-| `bad "` prefixes in the engine | 14 |
-| `conformance:` expands to 4 identities | +3 |
-| `gates-signed:` carries 2 FAIL identities | +1 |
-| `gates-signed` note-only *NOT SIGNED* state | +1 |
-| **Total identities** | **19** |
-| Guarded | 16 |
-| Unguarded | 3 |
-| **16 + 3** | **19** ✓ |
-
-The two sums agree. They did not on the first pass — the prefix count said 14 and the itemised list
-said 19, and the difference is exactly the five identities hiding behind two prefixes.
+Finding **identities**, not name prefixes — two prefixes cover several findings each, so counting
+prefixes understates the total by five. Prefixes **14**; `conformance:` expands to 4 (**+3**);
+`gates-signed:` carries 2 FAIL branches (**+1**) plus the note-only *NOT SIGNED* state (**+1**) →
+**19 identities = 16 guarded + 3 unguarded** ✓. The two sums disagreed on the first pass (14 vs 19),
+and the difference was exactly the five identities hiding behind two prefixes.
 
 ## Every check, classified
 

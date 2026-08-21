@@ -64,6 +64,7 @@ each other · any telemetry, ever (the README promises none).
 | [SPRINT-074](../sprint/archive/SPRINT-074-first-spec-driven-checker.md) | The First Spec-Driven Checker | closed 2026-08-18 · `6016738` | **Answered D1 by building it: spec-driven is buildable, and the honest form is a split.** `scripts/lib/check-attestation.sh` reads §13's Conformance table **at runtime** for its rule set and marks; assertion bodies stay in code, because *"all three required together"* and *"the `Evidence:` value's shape"* are different code — and saying which half is which is the finding, since claiming both would be theatre. Three properties no hard-coder has, each fixture-guarded: a rule **added** to the spec reports `rule-unimplemented` rather than vanishing; an unparseable table reports `spec-table-unreadable` rather than checking nothing and exiting clean; and `implementation-directed` exclusion is **derived from the Mark column**, proven by re-marking a rule in a spec copy and watching the checker stop asserting it with no code edit. **The central question's premise was itself wrong** — §14 carries no per-rule table (it is the legend); the tables live in each section's `Conformance.` block (→ L-136). §13's five finding names published; **100 classified · 0 unclassified** at spec 0.4.1; TD-037 closed after 19 sprints. Not the engine — one checker, and it cost one uncleanable-finding bug caught only by running it against real history. |
 | [SPRINT-075](../sprint/archive/SPRINT-075-the-conformance-engine.md) | The Conformance Engine | closed 2026-08-20 · `2edc606` | **Turned one checker into an engine, and learned from a stranger that the report was measuring the wrong thing.** Every `## §N` Conformance table is now read at runtime through a shared reader, and dispatch is driven by the spec's Mark column — proven in both directions with no code edit. Six rules answer today: §9's `gates_signed` pair, **migrated off its standalone checker with its findings byte-identical** (EPIC-002 D3's four-times-deferred consolidation question, closed for one family), and the ownership-header family as the first *new* coverage. **The contribution that was not planned is the important one:** the first run against a repo that never installed lean-flow returned 58 FAIL lines against a repository with **two** defects, because 56 were our own unimplemented rules — so an adopter's level moved with *our* roadmap. `rule-unimplemented` is now a `GAP`: named on every report (L-058 untouched), off the level and the exit code, with engine coverage on its own axis. § Closed-when **1** and **5** tick. **What it did not do:** coverage is **6 of 62** checkable rules, so § Closed-when 2 and 3 stay open and the `build` remainder is 39. |
 | [SPRINT-076](../sprint/archive/SPRINT-076-coverage-and-the-bar.md) | Coverage, and Whether the Bar Is Right | closed 2026-08-21 · `74839bd` | **Doubled what the engine answers, and then ruled that doing so is not yet enough.** Coverage **6 → 13 of 62**: §4's ADR family (five rules, `S4.APPEND` the engine's first to read git history — a post-decision marker passes, a rewritten § Decision fails, verified against our own 27 ADRs including the two legitimately amended) and §2's placement pair, whose required set is derived from §2's own `Create ←` cells. Spec **0.4.2** writes down two exceptions §3 was already being checked against, cutting this repo's findings **56 → 32**. Fixed a latent defect under **21 of 100** rule ids (hyphens dropped from assertion-name resolution — a rule reported unimplemented with its assertion present) and a placement scan that had taken the gate past ten minutes. **The two contributions that were not code:** the artefact question, asked properly at last — **4 of 8** findings against a stranger are lean-flow's own loop surface, so A4 is confirmed and SPRINT-075's *0 artefacts* reads as the "barely asked" it called itself; and § Closed-when **3 established as a list** (24 of 24 checks guarded, 16 of 19 identities) after four sprints of being measured around. **What it did not do:** § Closed-when **2** was ruled and the **bar stands** — 19 of 62 map to a check, and both available ways to make it tick today were refused as amending a condition to fit what was built. Neither condition ticked; both now say why. |
+| [SPRINT-077](../sprint/SPRINT-077-the-decisions-epic-004-is-waiting-on.md) | The Decisions EPIC-004 Is Waiting On | active | _(completed at close)_ — the sprint that takes the exit condition which is a **decision** away rather than a quarter away. Two tasks: §2 gains a machine-readable **loop-row vs repository-universal** distinction, so `S2.F-FILE` stops telling a stranger it owes `.claude/CONTEXT.md` (the 4-of-8 artefact finding SPRINT-076 T3 measured and deliberately did not tune away); and the **two rulings** § Closed-when 3 is waiting on — whether the engine's three invocation-error identities are in scope, and the wording fix for `S9.GATESABSENT`, which reports without ever failing and so cannot satisfy "must-FAIL" as written. **Deliberately small (2 tasks, 9 DoD)**: the epic's remaining bulk is ~32 rules with no backlog tasks, which needs `/task-decomposer` before it can be planned at all. **Gates not yet signed.** |
 
 ## Decisions
 
@@ -149,11 +150,11 @@ each other · any telemetry, ever (the README promises none).
       roadmap's exit is a different claim, not this one, and amending an exit condition to fit what got
       built is the failure L-088 names — refused once already at SPRINT-075, on a DoD whose
       parenthetical was wrong.
-      **What standing costs, stated so the choice is not free.** Roughly **32 rules** remain to build.
-      SPRINT-076 shipped 7, so that is **four to five more coverage sprints**, plus a separate ruling on
-      whether the 11 `scope-out` rules are to be checked, re-marked, or accepted as a permanent third
-      state the condition's wording does not admit. **"The bar stands and EPIC-004 runs more coverage
-      sprints" was named in the Plan as a legitimate outcome, and it is the one that happened.**
+      **What standing costs, stated so the choice is not free.** ~**32 rules** remain; SPRINT-076
+      shipped 7, so **four to five more coverage sprints**, plus a separate ruling on whether the 11
+      `scope-out` rules are checked, re-marked, or accepted as a third state the wording does not
+      admit. **"The bar stands and EPIC-004 runs more coverage sprints" was named in the Plan as a
+      legitimate outcome before the evidence existed, and it is the one that happened.**
 - [ ] Each check has a retained must-FAIL fixture that fails with its named finding
       — **ESTABLISHED at SPRINT-076 T1, and deliberately still open.** Measured at SPRINT-072 as
       **22 harnesses (17 asserting) · 98 fixture cases · 46 distinct named findings** — the contract
@@ -170,13 +171,12 @@ each other · any telemetry, ever (the README promises none).
       (**TD-067**).
       **Why it is NOT ticked**, rather than the condition being read to fit what exists (L-088):
       **(a)** three identities have no fixture — all *invocation errors* (`usage` ·
-      `repo directory not found` · `reader-missing`), and whether those are in scope for this
-      condition is **a ruling nobody has made**; making it inside the audit that benefits from it is
-      the drift this epic exists to avoid. **(b)** `S9.GATESABSENT` **cannot** satisfy the wording and
-      should not: it reports *NOT SIGNED* as a note and never FAILs, because a sprint may legitimately
-      sit unsigned between promote and the gate pass. The condition needs the wider property — *a
-      retained case asserts the named finding on input that must produce it* — which is a **wording
-      change, not a measurement**. Both residuals are small, named, and actionable.
+      `repo directory not found` · `reader-missing`), and whether those are in scope is **a ruling
+      nobody has made**; making it inside the audit that benefits from it is the drift this epic
+      exists to avoid. **(b)** `S9.GATESABSENT` **cannot** satisfy the wording and should not: it
+      reports *NOT SIGNED* as a note and never FAILs, since a sprint may legitimately sit unsigned
+      between promote and the gate pass. The condition needs the wider property — *a retained case
+      asserts the named finding on input that must produce it* — a **wording change, not a measurement**. Both residuals are small, named and actionable → **TASK-244**.
 - [x] Attestation is verified from git trailers, per task, without trusting a self-report
       — **DONE at SPRINT-074 T2** (TASK-228). `scripts/lib/check-attestation.sh` verifies §13's five
       mechanical rules from `git log` trailers on the task's own commit, against any repository, from a

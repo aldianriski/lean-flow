@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-20
+last_updated: 2026-08-21
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -31,6 +31,19 @@ status: current
 ---
 
 ## Tech Debt
+
+> **Aging sweep — SPRINT-077 promote (2026-08-21).** 13 of 19 open rows are ≥3 sprints unaddressed:
+> TD-063 (3) · TD-062 (4) · TD-061 (5) · TD-060 (6) · TD-059 (7) · TD-057 (8) · TD-053 (14) ·
+> TD-052 (15) · TD-051 (16) · TD-050 (17) · TD-049 (18) · TD-048 (19) · TD-047 (20) · TD-045 (21).
+> **All held; none is `severity: high`, so nothing auto-escalates to Backlog P1.** Reviewed as a batch
+> rather than row-by-row because none gained new evidence this sprint — the sprint's work touched the
+> conformance engine, and the aged rows are matcher, glob and cap concerns whose triggers did not fire.
+> Two exceptions were handled individually and carry their own updates: **TD-064** (halved by ruling at
+> SPRINT-076 T5) and **TD-066** (gained L-144's promoted rule). **TD-037 deleted** — resolved at
+> SPRINT-074, three sprints elapsed (§11). **Standing concern this sweep is not resolving:** TD-048 and
+> TD-057 are the matcher pair, 19 and 8 sprints old, repeatedly deferred and explicitly priced together
+> in SPRINT-076's § Out. A batch deferred four times is a decision nobody has made — worth taking or
+> closing at the next promote rather than aging again.
 
 - **TD-064** severity: minor | status: open | created: Sprint-075 | updated: Sprint-076
   - Summary: **~~28~~ 16 of this repo's own docs fail the ownership-header rules the engine checks** —
@@ -127,6 +140,37 @@ status: current
     typo through.
   - Sibling: **TD-067** (the gate-token check being looser than its message). Unrelated cause; both are
     "a tool's report and its behaviour disagree, and the disagreement is silent".
+
+- **TD-069** severity: minor | status: open | created: Sprint-077
+  - Summary: **two governed docs exceed their §2 soft cap by growing the way they are meant to, and
+    §2's Growth rule forbids the obvious fix.** *Cap-hit → split into a tree, never squeeze.*
+    `docs/research/conformance-dispositions.md` is **206 / 130** — a partition of all 62 checkable
+    rules, so cutting 76 lines makes the register *incomplete*, not concise.
+    `docs/epic/EPIC-004-conformance.md` is **201 / 200** and gains **exactly one line per member
+    sprint**, so it will breach again at every promote from here.
+  - Evidence: reported by `check-doc-caps.sh` on **every run since at least SPRINT-075**, when
+    TD-059's re-review recorded the register at **163**. It has tracked coverage since — 173 at
+    SPRINT-076 promote, 206 after T3's § Artefacts. Nothing consumed the report for four sprints.
+    **That is L-106's shape verbatim** (a soft breach printed every run while the governance review
+    read doc-aging clean), which is why it is a row now rather than a fifth silent sighting.
+  - Impact: low today, and the reason to file it is that **the cap has stopped carrying information
+    here**. A number a document has exceeded for four sprints with no decision attached trains readers
+    to skip the line — so the next *genuine* breach arrives in a report they have learned to ignore.
+    The honest admission from this promote: the first attempt at doc-aging **shaved lines off both
+    files to get under**, which is precisely the squeeze the Growth rule prohibits, and it was
+    abandoned mid-pass once the epic came back to 201 on the next member row.
+  - Mitigation (hypothesis, not a plan — the filer's): **the choice is a real trade-off, so this is
+    ADR-grade rather than an edit.** *(a) Split* — move the register's § Artefacts (~32 lines) and
+    § Divergences (~20) into their own research docs. Cheap, still lands ~154, and separates a
+    partition from its exceptions, which are most useful read together. *(b) Raise the caps by ADR* —
+    the precedent this repo has already set three times for exactly this situation: **ADR-019**
+    (`TODO.md` → 320), **ADR-020** (research → 130), **ADR-026** (`STANDARD.md` → no numeric cap, on
+    the reasoning that the growth *is* the file doing its job). Both files here grow when the standard
+    or the epic does, which is (b)'s whole argument. *(c) Split the epic's § Member sprints into
+    `epic/INDEX.md`*, which already exists lazily for this purpose and would take the per-sprint line
+    out of the capped file. **Decide before the next coverage sprint** — each one adds rows to both.
+  - Sibling: **TD-059**, whose re-review first recorded the register's breach, but whose subject is
+    the non-recursive cap glob rather than these files. Curing either moves neither.
 - **TD-066** severity: minor | status: open | created: Sprint-075
   - Summary: **the conformance engine takes ~47s on this repository, and the cost is process spawn.**
     The §1/§3 assertions read 236 docs; the implementation is one cached tree walk plus one `awk` per
@@ -139,6 +183,19 @@ status: current
   - Impact: it is a real tax on `qa-check.sh`, which an adopter never runs but this repo runs at every
     gate — and the engine leg is now the slowest single leg. It gets worse linearly as coverage grows:
     every family added walks the same doc set again unless it reuses the cache.
+  - **L-144 → promoted here (SPRINT-077 promote).** The durable rule this row now carries, beyond its
+    own numbers: **when a check is slow, the dominant term is usually the number of PROCESSES it
+    starts, not the work it does — so walk once and decide in one pass.** Second sighting confirmed it
+    at SPRINT-076 T3/T5, where a rule running a `find` per spec row took a **four-file** directory from
+    ~1s to **29s**, and the gate from ~4 minutes to over ten with two runs killed before printing a
+    tally. Caching the walk fixed only half (29s → 18s) because the per-row test still spent a subshell
+    plus two greps — ~124 spawns to examine four files; one `awk` pass over (rows × cached list), with
+    existence tested as *membership* rather than a `stat` per row, reached 9.6s. **The diagnostic that
+    mattered: time each rule family in isolation against a TINY input** (`S1` 808ms · `S3` 912ms ·
+    `S4` 1,396ms · **`S2` 11,253ms** — one family held 55% of the cost). A large repo masks the
+    overhead behind real work; a four-file directory does not. Placed on this row rather than in
+    `CLAUDE.md` by §10's test: the only flows that can hit it are ones writing checkers in this repo,
+    and they read here.
   - Mitigation (hypothesis, not a plan — and one deliberately *rejected* variant is recorded with it):
     the obvious next step is one `awk` over every file at once (~1 process instead of 236). **That was
     rejected on purpose**: it needs a cross-file state machine and silently drops a zero-byte file,
@@ -885,119 +942,3 @@ status: current
     the G2 ruling behind it — `dispatch.md` publishes a dependency-free snippet, and pointing it at
     `scripts/lib/` would leak a maintainer-only path into a consumer-facing reference (L-015) — is
     unchanged and still correct. Neither side has moved since SPRINT-070. No vehicle in SPRINT-073.
-- **TD-037** severity: minor | status: resolved → SPRINT-074 T3 | created: Sprint-049
-  - Summary: attribution needs a commit to read, so **uncommitted work in progress is still tested
-    against the all-task union** — the exact weakness TD-035 was filed about, surviving on the one
-    path where nothing can be attributed.
-  - Impact: bounded and arguably acceptable. The collision TD-035 describes happens between
-    *committed* worktree branches at merge-back, and the coordinator's post-merge gate run sees
-    everything committed — that path is now per-task. What stays uncovered is a single session's
-    mid-flight edits, where "which task is this?" has no mechanical answer because the work has not
-    been committed yet. Filed as its own row rather than left inside TD-035's resolution note, because
-    that note is deleted three sprints after resolution (§11) and the residual would go with it.
-  - Mitigation (not yet done): possibly none warranted — "unattributable because uncommitted" may
-    simply be the honest boundary of a history-reading check. If it is ever worth closing, the lever
-    is the sprint's own open-DoD state (exactly one task is usually in flight), which is a guess
-    rather than a derivation and should be treated as one. **Do not narrow this by adding a rule that
-    infers the current task** without evidence that a real miss occurred — that is TD-031's pattern
-    starting over.
-  - **Re-reviewed 2026-08-09 (SPRINT-052 promote, 3 sprints open) — deferral reaffirmed, deliberately.**
-    The row's own trigger is *evidence of a real miss on the uncommitted path*, and none has appeared:
-    every miss the redesign has caught since (SPRINT-050 T2's undeclared out-of-scope trail) came
-    through the **committed** leg, which is the one attribution now covers. Acting now would mean
-    inferring the in-flight task from open-DoD state — a guess this row already names as a guess — and
-    guarding it would need its own negative test built against a failure nobody has observed. That is
-    TD-031's pattern exactly: narrowing a working guard under no pressure. Held, with the trigger
-    unchanged; a re-review that reaffirms is a decision, not a skipped line.
-  - **Re-reviewed 2026-08-09 (SPRINT-055 promote, 6 sprints open) — deferral reaffirmed again.** The
-    trigger is still unfired: no miss on the uncommitted path has been observed since. Age is not the
-    trigger and was never proposed as one, so the ruling is unchanged. Recorded rather than performed
-    silently, per the line above.
-  - **Re-scoped 2026-08-10 (SPRINT-058 promote, 9 sprints open) — held, on a corrected basis.** Two
-    things were wrong with the record, neither of them the ruling. **(a) The reaffirm above is too
-    broadly worded and reads as falsified.** A miss on the uncommitted path *was* observed —
-    SPRINT-055 T6 edited `TODO.md` as task work, the gate ran green while it sat uncommitted, and the
-    finding surfaced attributed to a task already pushed. That miss is TD-044's, not this row's: it
-    was the exclusion list holding a **close-time** reason during **execution**, an error of *phase
-    keying*. This row's claim is narrower and untouched by it — that WIP is tested against the
-    **all-task union** rather than per-task, because attribution needs a commit to read. Re-derived
-    from the source rather than from the row (L-104): `check-layers-observed.sh` now carries the
-    phase split and states in the same comment block that `is_excluded_committed` is deliberately
-    untouched and that the split "guesses nothing of the kind" this row warns against. So TD-044's
-    fix moved a different axis, and the union-attribution trigger remains genuinely unfired.
-    **(b) SPRINT-057's promote re-reviewed and reaffirmed this row and never wrote it here** — the
-    record lives only in that sprint's § Scope *Out* line. The rule directly above ("recorded rather
-    than performed silently") failed its own next instance, which is L-105's shape: a rule that is
-    correct and simply did not run at the moment it applied. **Ruling: held, trigger unchanged and
-    now stated precisely** — evidence of a miss attributable to the *union*, not to any miss on the
-    uncommitted path. Age remains not a trigger.
-  - **Re-reviewed 2026-08-10 (SPRINT-061 promote, 12 sprints open) — held, trigger unchanged.** The
-    precisely-stated trigger from SPRINT-058 remains unfired: no miss attributable to the *all-task
-    union* has been observed in SPRINT-059 or SPRINT-060. Fourth consecutive reaffirm, recorded
-    rather than performed silently. This row is now the ledger's clearest case that a re-review which
-    reaffirms is a decision — worth leaving as the worked example next time age is mistaken for evidence.
-  - **Re-reviewed 2026-08-14 (SPRINT-064 promote, 15 sprints open) — held, and this sprint finally gave it
-    a live sighting.** SPRINT-063's uncommitted close work (`docs/changelog/CHANGELOG-1.35.0.md`) was
-    reported by leg 15's path-2 union check as "changed but undeclared in any task's `Layers:`" — correct
-    by the letter of the check and useless in substance, since close-time work belongs to no task by
-    construction. It cleared the instant the COORD close commit landed. That is exactly the
-    "unattributable because uncommitted" shape this row describes, and its cost was a moment's confusion:
-    evidence **for** the row's own guess that no cure is warranted. **Unblock condition:** act only if a
-    path-2 report ever masks a real per-task collision, rather than merely inconveniencing a close.
-  - **Re-reviewed 2026-08-15 (SPRINT-067 promote, 18 sprints open) — held, trigger unchanged.** No
-    union-attributable miss in SPRINT-065/066; both ran sequential single-owner tasks where the union
-    and the task coincide, so the window this row describes barely opened. Sixth consecutive reaffirm,
-    recorded rather than performed silently — still the ledger's worked example that a re-review which
-    reaffirms is a decision.
-  - **Re-reviewed 2026-08-16 (SPRINT-070 promote, 3 sprints since last) — THE TRIGGER FIRED. This row
-    is now actionable, not deferred.** Its bar has always been *evidence of a real miss on the
-    uncommitted path*, deliberately reaffirmed four times for want of one. SPRINT-069 T3 produced it:
-    the sweep changed `.claude/CONTEXT.md`, `README.md` and `SECURITY.md`, all three declared by **T2**
-    and none by T3. `check-layers-observed.sh` ran mid-work and reported **151 pass / 0 fail** — the
-    union path accepting a sibling's declaration on T3's behalf, which is this row's defect stated
-    exactly. The identical check then FAILed the moment the work had a commit to attribute, naming all
-    three files against T3. Uncommitted: clean. Committed: three findings. Same tree, same checker.
-  - **What the evidence does and does not license.** It does not show damage: the committed leg caught
-    it minutes later, which is the boundary this row already called "arguably acceptable". What it
-    changes is that the masking is now **observed rather than reasoned about**, and it was observed on
-    the ordinary path — a coordinator running the gate to check its own WIP, which is how the gate is
-    used between commits all day. The row's standing warning survives intact and binds the cure:
-    **do not close this by inferring the in-flight task from open-DoD state.** That inference was a
-    guess when the row was filed and is still a guess; one observation of masking is not evidence that
-    a guess would have guessed right. Candidate directions worth pricing before any is chosen —
-    report the WIP leg as a named SKIP rather than a PASS (the TD-051 candidate-(c) shape, cheapest and
-    honest about what it did not check) · attribute WIP by staged-vs-unstaged rather than by task ·
-    accept the boundary and document it where a coordinator reads it.
-  - **Vehicle: TASK-218** (filed at the SPRINT-070 promote). **Unblock condition: met** — superseded by
-    the vehicle. What remains open is which cure, not whether one is warranted.
-  - **Re-reviewed 2026-08-16 (SPRINT-073 promote, 3 sprints since last) — held on a vehicle that is
-    ready and unscheduled, which is a different state from waiting on evidence.** Ledger search before
-    any decision (L-127): **TASK-218** is `state: ready`, P1, and already carries this row's standing
-    warning against inferring the in-flight task from open-DoD state. It was **not** pulled into
-    SPRINT-073: that sprint annotates `spec/STANDARD.md` and touches no checker, so including this
-    would mix two unrelated themes in one frozen Plan. Recorded rather than re-parked — the next
-    reviewer's question is *when to schedule it*, not *what would unblock it*.
-  - **RESOLVED 2026-08-18 (SPRINT-074 T3, via TASK-218) — the cure is the named SKIP, and the
-    two legs are still allowed to disagree.** Chosen from the three candidates this row itself
-    listed, none pre-selected, owner-ruled at the gate. The WIP leg no longer emits a bare `PASS`:
-    a tree with real uncommitted work now reports `SKIP … [WIP, unattributed]`, naming how many
-    files were union-checked, that per-task attribution needs a commit, and that the committed run
-    applies a stricter rule and **may FAIL where this leg does not**. The point is not to make the
-    legs agree — they cannot, since one has a commit to read and one does not — but to stop them
-    disagreeing *silently*, which is what SPRINT-069 T3 actually cost.
-  - **What was rejected, and why it is worth keeping written down.** *Staged-vs-unstaged*
-    attribution infers intent rather than deriving it, and it breaks precisely where it is needed:
-    L-042 prescribes `git add -p` for a shared file, so the staged set spans tasks **by design**
-    in the only case attribution matters for. *Document-the-boundary-only* leaves the output a
-    bare PASS, and the output is what a coordinator reads. The row's standing warning was honoured
-    in full — **nothing infers the in-flight task from open-DoD state**; the cure adds no
-    inference at all, it removes an overstatement.
-  - **Nothing was weakened.** A file declared by *no* task still FAILs from the WIP leg exactly as
-    before. And the SKIP counts files **after** exclusions, so a tree whose only uncommitted files
-    are excluded ones (an agent worktree, close-time bookkeeping) still earns a plain PASS — a
-    caveat that fired on every tree would be read as furniture and stop being read at all.
-  - **Guarded by a fixture that drives ONE tree through BOTH paths** (`case 7` in
-    `evals/run-layers-observed-fixtures.sh`): the same edit reports the named SKIP while
-    uncommitted and FAILs `T1:bar.txt` once committed, plus an explicit assertion that leg A emits
-    **no** `PASS` line. Verified as a real regression guard, not decoration — run against the
-    pre-change checker, all three leg-A assertions fail. Retained (TD-012).
