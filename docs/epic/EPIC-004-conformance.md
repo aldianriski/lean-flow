@@ -2,7 +2,7 @@
 epic: 004
 slug: conformance
 owner: Maintainer
-last_updated: 2026-08-20
+last_updated: 2026-08-21
 status: active
 member_sprints: [072, 073, 074, 075]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -155,28 +155,39 @@ each other · any telemetry, ever (the README promises none).
       `scope-out` rules are checked, re-marked, or accepted as a third state the wording does not
       admit. **"The bar stands and EPIC-004 runs more coverage sprints" was named in the Plan as a
       legitimate outcome before the evidence existed, and it is the one that happened.**
-- [ ] Each check has a retained must-FAIL fixture that fails with its named finding
-      — **ESTABLISHED at SPRINT-076 T1, and deliberately still open.** Measured at SPRINT-072 as
-      **22 harnesses (17 asserting) · 98 fixture cases · 46 distinct named findings** — the contract
-      any engine must preserve (L-058 · TD-012) — but a count never answers *"does **every** check
-      have one"*, which is why this row sat open for four sprints while the corpus grew.
-      **SPRINT-074 added the 23rd harness** (`run-attestation-fixtures.sh`) and demonstrated the
-      method: green-on-first-run proves nothing, so the rejected design is seeded and the
-      discriminating cases confirmed to fail (→ L-137).
-      **The answer is now a list, not a number** → `docs/research/fixture-coverage-audit.md`:
-      **24 of 24 checks guarded** (11 standalone checkers + 13 engine assertions, enumerated from
-      disk) and **16 of 19 finding identities**. The audit closed the one **repository-facing** gap it
-      found (`unrecognised gate token`, now a retained case) and turned up a real defect while doing
-      it — the token test accepts `G7`/`G99` though its finding text promises *"want G1 / G2"*
-      (**TD-067**).
-      **Why it is NOT ticked**, rather than the condition being read to fit what exists (L-088):
-      **(a)** three identities have no fixture — all *invocation errors* (`usage` ·
-      `repo directory not found` · `reader-missing`), and whether those are in scope is **a ruling
-      nobody has made**; making it inside the audit that benefits from it is the drift this epic
-      exists to avoid. **(b)** `S9.GATESABSENT` **cannot** satisfy the wording and should not: it
-      reports *NOT SIGNED* as a note and never FAILs, since a sprint may legitimately sit unsigned
-      between promote and the gate pass. The condition needs the wider property — *a retained case
-      asserts the named finding on input that must produce it* — a **wording change, not a measurement**. Both residuals are small, named and actionable → **TASK-244**.
+- [x] Each check has a retained fixture asserting its named finding on input that must produce it
+      — **TICKED at SPRINT-077 T2**, on the two rulings SPRINT-076 T1 refused to make inside the audit
+      that would have benefited from them.
+      **⚠ The wording changed. It used to read:** *"Each check has a retained **must-FAIL** fixture that
+      **fails** with its named finding."* Preserved rather than overwritten, because re-wording a
+      condition while holding an audit that wants it ticked is how a bar moves quietly (L-088) — this
+      row refused two looser readings at SPRINT-076 on that ground. Judge the change on the record.
+      **Measurement unchanged, re-derived not trusted** (A3 · L-130): `ls scripts/lib/check-*.sh` → 11,
+      `grep '^assert_' conformance-engine.sh` → 13 = **24 of 24 checks guarded**, as SPRINT-076
+      recorded; T1 added no assertion, which is what *no code edit* meant. → `fixture-coverage-audit.md`.
+      **Ruling (a) — the three invocation errors are OUT of scope.** `usage` · `repo directory not
+      found` · `reader-missing` fire **before any repository is evaluated**: they report that the tool
+      was called wrongly, not that a tree violates the standard. No §14 rule id, no Conformance-table
+      row, and no adopter can clear one by changing their repo. A condition about *checks* does not
+      reach them. Confirms **A4** — and the alternative was live: ruled in scope, this row would not
+      tick this sprint, named in advance as a legitimate outcome. Identities go **16 of 16**: the
+      denominator was wrong, not the numerator short.
+      **Ruling (b) — the condition adopts the wider property.** `S9.GATESABSENT` reports *NOT SIGNED*
+      as a **note** and never FAILs by design — a sprint may legitimately sit unsigned between promote
+      and the gate pass, so a FAIL would be false. The old wording was **unsatisfiable for it**: a
+      defect in the sentence, not a gap in the corpus. The property the corpus satisfies is *«a
+      retained case asserts the named finding on input that must produce it»*, must-FAIL being its
+      common case, not its definition. **Not invented to fit the tick** — L-139 established it at
+      SPRINT-075, when a `gates_signed` migration passed a byte-identical five-way finding-text diff
+      while silently mislabelling *absent* as a **pass**; the fix (`absent-is-not-labelled-a-pass`)
+      asserts the **verdict label** on input that must produce it, and would fail the old wording
+      despite being the strictest case in its family.
+      **Recorded as an amendment, not an ADR.** §4 wants hard-to-reverse **and** surprising **and** a
+      real trade-off: this is reversible (epic live, prior wording above), unsurprising (L-139 first),
+      and one-sided — the old sentence excluded a case *stricter* than those it admitted. Retro carries
+      it. **TASK-244 closed by this row.** TD-067 (the token test accepting `G7`/`G99` against its own
+      finding text) is untouched and stays open — a defect in a check, not in this condition.
+      untouched and stays open — it is a defect in a check, not in this condition.
 - [x] Attestation is verified from git trailers, per task, without trusting a self-report
       — **DONE at SPRINT-074 T2** (TASK-228). `scripts/lib/check-attestation.sh` verifies §13's five
       mechanical rules from `git log` trailers on the task's own commit, against any repository, from a

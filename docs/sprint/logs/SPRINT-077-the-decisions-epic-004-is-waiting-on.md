@@ -74,3 +74,52 @@ reading that four rows reclassified unconditional → conditional changes what a
 (§2's own `spec/STANDARD.md` row names *reclassified* as a bump trigger), unlike 0.4.2 which changed
 nothing an adopter satisfies. T2 → (a) exclude the three invocation errors; (b) adopt the wider
 property, recorded as an amendment naming the prior wording, Retro rather than ADR.
+
+### 2026-08-21 | progress | T1 shipped: the spec moved, no code did
+§2's four loop rows now name their substrate instead of saying `always`. **Zero code edit** — the
+engine's discriminator already *was* that word, so the required set fell from 9 to 5 by re-wording a
+table. Verified against a pristine baseline that no cap check was lost (63 PASS both sides); only
+`AGENTS.md` was engine-only, so the temporary exposure is one file's existence check until
+`S2.F-TIER` ships.
+
+**Re-derived, not copied (L-130):** `core-file-missing` 8 → 4 · artefacts 4 → **0** · whole report
+10 → 6. The four that vanished are exactly the four the register names, which is T1's acceptance.
+Worth recording that SPRINT-076's "4 of 8" was checked and found **correct** — the 10 I first measured
+is the whole-report total, a different denominator from the register's `S2.F-FILE`-scoped 8. The
+register was not stale and was not "corrected".
+
+**Both retained fixtures reddened as designed, and both were re-triaged rather than widened.**
+`run-foreign-repo-fixtures.sh` went back to SPRINT-075's stronger empty-remainder assertion, which
+cannot absorb a new artefact one row at a time. `run-s2-placement-fixtures.sh` exposed a second-order
+defect: its must-FAIL seed hard-coded `TODO.md`, so once that row was reclassified `build_conformant`
+stopped creating it, `rm -f` removed nothing, and the existence guard passed **vacuously** — a case
+that tested nothing would have scored as a pass (L-142). Its victim is now derived from §2's own
+unconditional set, and the seed asserts the target *existed* before removal. Discrimination proven by
+seeding the defect back: the case reddens, the sibling control stays green, restored under checked sha.
+
+Gate after T1: **153 pass, 1 fail** — and the fail was mine, `layers observed` reporting
+`run-s2-placement-fixtures.sh` changed but undeclared. The G1 finding had been written into this Log
+but never into the Plan's `Layers:`, which is what the checker reads. Declared per L-100; now PASS.
+
+### 2026-08-21 | progress | T2 shipped: § Closed-when 3 ticked, EPIC-004 at 4 of 5
+A3 re-derived before ruling on anything built from it (L-130): `ls scripts/lib/check-*.sh` → **11**,
+`grep '^assert_'` → **13**, so **24 of 24** checks guarded, unchanged since SPRINT-076. T1 added no
+assertion, which is what *no code edit* meant in practice.
+
+**(a)** The three invocation errors are out of scope — they fire before any repository is evaluated,
+carry no §14 rule id, and no adopter clears one by changing their tree. Identities read **16 of 16**:
+the denominator was wrong, not the numerator short. Confirms A4, and the alternative was live.
+**(b)** The condition adopts the wider property. The old wording was *unsatisfiable* for
+`S9.GATESABSENT` — a defect in the sentence, not a gap in the corpus — and L-139 had established the
+wider property at SPRINT-075, before this sprint wanted it.
+
+**The L-088 exposure was handled by preserving the prior wording in place**, so the amendment is
+auditable rather than invisible: the epic now says what the condition used to say, immediately above
+what it says now. Ruled **Retro, not ADR** on §4's three-part bar — reversible, unsurprising, and a
+one-sided trade-off (the old sentence excluded a case *stricter* than those it admitted). The audit's
+own measurements were annotated rather than edited, per §2's rule for a verdict a decision was built on.
+
+**Carried, not hidden:** `docs/epic/EPIC-004-conformance.md` is **212 lines against a 200 soft cap**.
+It was already over at 201 before this sprint; recording the amendment with its prior text added 11.
+Left for close to route to §11's stated remedy (prune at the next promote governance review) rather
+than resolved here by deleting settled content this task did not author.

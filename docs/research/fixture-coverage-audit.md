@@ -21,6 +21,8 @@ was **repository-facing and is closed here**; the three that remain are the engi
 invocation-error class. The gap list is named in full below — "mostly covered" is not an outcome
 (L-058).
 
+> **RULED at SPRINT-077 T2, in the epic where the rulings belong.** *(a)* The three invocation-error identities are **out of scope** — they fire before any repository is evaluated, carry no §14 rule id, and no adopter clears one by changing their tree; identities therefore read **16 of 16**, the denominator having been wrong rather than the numerator short. *(b)* The condition **adopts the wider property** — *a retained case asserts the named finding on input that must produce it* — which `S9.GATESABSENT` satisfies with a note. § Closed-when 3 is **ticked**, its prior wording preserved there.
+> **The measurements below stand unedited** (§2: a verdict a decision was built on is annotated, not rewritten) — only the reading of the remainder changed. TD-067 stays open.
 ## Method, and the two things it had to get right
 
 Enumerated **from disk, never from memory** — `ls scripts/lib/check-*.sh` (11) plus

@@ -57,17 +57,17 @@ infers it.
 four the register names.
 
 **DoD:**
-- [ ] §2 distinguishes loop rows from repository-universal rows in a form a checker reads —
+- [x] §2 distinguishes loop rows from repository-universal rows in a form a checker reads —
       *Verify: the engine derives the distinction from the spec, with no list in code; flipping a row
       in a spec copy changes behaviour with no code edit, the way `--spec` already proves for marks*
-- [ ] The artefact count is **re-derived, not copied** — *Verify: run the foreign-repo target and count.
+- [x] The artefact count is **re-derived, not copied** — *Verify: run the foreign-repo target and count.
       SPRINT-076 measured 4 of 8; that figure is a query result and gets re-run here (L-130 · L-143)*
-- [ ] `run-foreign-repo-fixtures.sh`'s retained artefact-set case is **re-triaged, not widened** —
+- [x] `run-foreign-repo-fixtures.sh`'s retained artefact-set case is **re-triaged, not widened** —
       *Verify: the case asserts the NEW remainder and the harness is green. It was written to redden
       exactly when this task lands, so silencing it instead of re-triaging defeats its purpose*
-- [ ] `conformance-dispositions.md` § Artefacts records the new count and what changed — *Verify: the
+- [x] `conformance-dispositions.md` § Artefacts records the new count and what changed — *Verify: the
       register. **Note TD-069**: it is already 206/130, so add a row and prune, do not just append*
-- [ ] The spec version is bumped and the bump **argued** — *Verify: `spec/CHANGELOG.md`. Unlike 0.4.2
+- [x] The spec version is bumped and the bump **argued** — *Verify: `spec/CHANGELOG.md`. Unlike 0.4.2
       this one CHANGES WHAT A REPORT SAYS about an existing adopter's tree, so PATCH is not obviously
       right; state the reading rather than inheriting the last one (ADR-023)*
 
@@ -90,15 +90,15 @@ wording is **unsatisfiable** for it.
 without re-opening the audit.
 
 **DoD:**
-- [ ] Ruling (a) is written with its reason — *Verify: the epic. Either the three are excluded as
+- [x] Ruling (a) is written with its reason — *Verify: the epic. Either the three are excluded as
       invocation errors, or they are in scope and get fixtures; "not really findings" without a
       recorded reason is the drift, not the ruling*
-- [ ] Ruling (b) is written, and the condition **either adopts the wider property or states its
+- [x] Ruling (b) is written, and the condition **either adopts the wider property or states its
       exception** — *Verify: the epic. The property the corpus actually satisfies is «a retained case
       asserts the named finding on input that must produce it»; must-FAIL is its common case*
-- [ ] § Closed-when 3 is **ticked, or the remaining gap is named** — *Verify: the epic. If (a) rules
+- [x] § Closed-when 3 is **ticked, or the remaining gap is named** — *Verify: the epic. If (a) rules
       the three in scope, it does not tick until they have fixtures — and that is a legitimate outcome*
-- [ ] Any wording change to a Closed-when condition is recorded as an **amendment with its reason** —
+- [x] Any wording change to a Closed-when condition is recorded as an **amendment with its reason** —
       *Verify: §4's three-part bar decides ADR vs Retro. **This is the task most exposed to L-088**:
       re-wording a condition while holding the audit that wants it ticked is exactly how a bar moves
       quietly. If the wording changes, the epic says what it used to say*
