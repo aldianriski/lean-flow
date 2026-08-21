@@ -465,26 +465,9 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 ---
 
 ## L-086 [tags: tooling] [status: promoted]: a permission rule can be present, correct, and completely inert — presence is not effect, so verify a rule *matched* and never that it exists.
-- **Second sighting, from OUTSIDE this repo (2026-08-09).** A consumer's field report — their own
-  SPRINT-131 on lean-flow 1.29.0, a different OS and shell — hit mechanisms (1) and (2) blind, in that
-  order, and lost a whole configuration to each. Workspace trust: **two records for one directory**, the
-  interactive session landing on the trusted key and the headless launcher on the untrusted one, so all
-  57 rules were ignored — and the remedy the CLI itself prints ("run interactively once and accept")
-  *provably cannot fix it*, because the interactive session resolves to the key that is already trusted.
-  Rule form: the natural extrapolation from our measured `Bash` rows, a path-scoped `Write(<abs>/**)`,
-  **denied**, while the bare tool name matched — so our measured table generalised in shape but not in
-  spelling, and no rows existed for `Read`/`Edit`/`Write` at all. What makes this a genuine recurrence
-  rather than a restatement: it is *independent* evidence, on hardware we do not control, for a learning
-  filed on one host and never re-tested (which is L-097's own warning applied to a learning instead of a
-  figure). The report's own consolidation is worth keeping — findings 1·2·3·8 are one principle, *a
-  control that is absent, misspelled, or dead is indistinguishable from one that is working*, because
-  the failure mode of a guard is silence — and its transferable technique is the **negative control**: a
-  deliberate must-deny action in the probe, without which "every call succeeded" and "the allowlist was
-  ignored entirely" produce identical output. Their probe caught two total-loss configurations for
-  $1.77 against a run estimated at $40–150.
 - **L-086 → promoted: `skills/orchestrator/references/night-run.md` Part 1** — the durable rule is the
   record now (§11 collapse, SPRINT-057 T1). Body: git; the three original mechanisms (workspace trust ·
-  rule form · command shape) plus the consumer's independent recurrence summarised above. Placed by
+  rule form · command shape) plus the consumer's independent recurrence (2026-08-09, a field report from outside this repo). Placed by
   §10's test: the flows that can hit it are night-run pre-flight (building an allowlist) and any
   headless run consuming one, and both read Part 1 — a `CONTEXT.md` rule would reach flows that cannot
   act on it, and `CLAUDE.md` is at 80/80. What actually lands there is the **method**, not the
