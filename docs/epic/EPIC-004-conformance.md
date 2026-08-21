@@ -128,21 +128,32 @@ each other · any telemetry, ever (the README promises none).
       artefacts**, and that number is honest but early — the question is barely asked yet, and wants
       re-running as coverage grows rather than being treated as settled here.
 - [ ] Every spec rule maps to a check, or is explicitly marked judgment-only in the spec
-      — **SUBSTANTIALLY ADVANCED at SPRINT-073, still not ticked, and the remaining gap is now small
-      and named.** The *"in the spec"* half is **done**: `spec/STANDARD.md` 0.4.0 marks every rule
-      in-file (§14), so the judgment-only rules satisfy this condition outright. What is left is the
-      other clause — *maps to a check* — for the **42** rules dispositioned `build`
-      (`docs/research/conformance-dispositions.md`). A disposition is a decision to build, not a check;
-      those land with the engine and with **TASK-228** for §13's five.
-      **Two smaller residuals, both explicit:** the **12** rules dispositioned `scope-out` neither map
-      to a check nor are marked judgment-only, so this condition may need re-reading once the engine
-      exists — flagged rather than quietly satisfied; and ~~**2** rules (`S4.INDEX`, `S5.DISCARDLOG`)
-      carry `?` and have no mark at all → **TASK-230**~~ **closed at SPRINT-074 T1** (spec 0.4.1:
-      **100 classified · 0 unclassified**; `S4.INDEX` → Structural/mechanical + `build`,
-      `S5.DISCARDLOG` → `implementation-directed`, the sixth to carry that mark).
-      **Progress at SPRINT-074:** §13's five `build` rules now map to a real check, so the `build`
-      remainder is **38 of 43**, not 42 — and that remainder is the engine's work, not another
-      one-off checker's.
+      — **RULED at SPRINT-076 T4, with evidence, and the bar STANDS.** This is the decision the sprint
+      was built to make deliberately rather than by drift, and the ruling is *no change to the
+      condition*: no ADR, because nothing was amended (§4's bar is not met by a decision to leave a
+      condition alone); the Retro carries it.
+      **The three numbers it was made with**, each derived at execution rather than trusted from the
+      Plan: **coverage 19 of 62** checkable rules map to a check — 13 of those answered by the engine,
+      which is exactly what assumption A5 predicted and what the engine's own `coverage:` line
+      re-derived; **4 artefacts of 8** new findings against a repository that never installed
+      lean-flow (T3, confirming A4 and moving the honest number off SPRINT-075's zero); and **16 of 19
+      finding identities guarded**, 24 of 24 checks (T1).
+      **Why it stands.** The clause has two halves and only one is met. The *"or is explicitly marked
+      judgment-only"* half is **done** — 32 rules satisfy it outright and 6 more are excluded by mark.
+      The *"maps to a check"* half is at **19 of 62**, with **32** rules dispositioned `build` and
+      **11** `scope-out`. A disposition is a decision to build, not a check, and the 11 scope-outs
+      satisfy *neither* half — a residual this row has flagged since SPRINT-073 and which is still
+      open. Reading 19 of 62 as "every rule" requires either counting dispositions as checks or
+      swapping in the roadmap's looser Phase A exit (*rules independently readable + conformance
+      independently measurable*, both arguably true today). **Both were considered and rejected**: the
+      roadmap's exit is a different claim, not this one, and amending an exit condition to fit what got
+      built is the failure L-088 names — refused once already at SPRINT-075, on a DoD whose
+      parenthetical was wrong.
+      **What standing costs, stated so the choice is not free.** Roughly **32 rules** remain to build.
+      SPRINT-076 shipped 7, so that is **four to five more coverage sprints**, plus a separate ruling on
+      whether the 11 `scope-out` rules are to be checked, re-marked, or accepted as a permanent third
+      state the condition's wording does not admit. **"The bar stands and EPIC-004 runs more coverage
+      sprints" was named in the Plan as a legitimate outcome, and it is the one that happened.**
 - [ ] Each check has a retained must-FAIL fixture that fails with its named finding
       — **ESTABLISHED at SPRINT-076 T1, and deliberately still open.** Measured at SPRINT-072 as
       **22 harnesses (17 asserting) · 98 fixture cases · 46 distinct named findings** — the contract
