@@ -16,24 +16,14 @@ SPRINT-073 T3. Every **mechanically checkable rule with no checker** carries one
 an undifferentiated middle. Rule ids are `spec/STANDARD.md` §14's; that file is the source, this one is
 the register. Split from `conformance-baseline.md` under §2's growth rule — split, never squeeze (L-131).
 
-**Counts, re-derived from the annotated spec, not from the baseline.** 100 candidates · **100
-classified** · **63 checkable** (49 `mechanical` + 14 `split`, counting a split's mechanical half) · **12
-covered** · **51 dispositioned here — 39 `build`, 12 `scope-out`**. The baseline's "39
-uncovered-mechanical" predates the re-derivation and is superseded; see § Divergences.
-
-Reconciled mechanically, not by eye: 12 + 39 + 12 = 63, and **no checkable rule is left without a
-disposition** (`comm` of the checkable set against the union of the three sections returns empty).
-
-**Updated at SPRINT-074 T1**, which ruled the two rules that were still `?`: `S4.INDEX` →
-Structural/mechanical, joining `build` below (+1 checkable, +1 `build`); `S5.DISCARDLOG` →
-`implementation-directed`, which takes it **out** of the checkable set rather than into `scope-out` —
-that mark is not a disposition, and the distinction is the one §14 exists to hold.
-
-**Updated at SPRINT-075.** T4 migrated `S9.GATESWELLFORMED`/`S9.GATESABSENT` off their standalone
-checker into the engine — a change of *which file* answers, never of the count or the finding names.
-T6 then moved `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` from `build` into § Covered today:
-**covered 8 → 12, `build` 43 → 39**, and the identity still closes at 63. Both edits were reconciled
-by re-counting the rule ids in each table rather than by adjusting the header (L-105).
+**Counts, re-derived from the section tables and reconciled against the engine — never copied forward.**
+100 candidates · **100 classified** · **62 checkable** · **19 covered** · **43 dispositioned here — 32
+`build`, 11 `scope-out`**. Reconciled mechanically, not by eye: 19 + 32 + 11 = **62**, which is what
+`conformance.sh` reports, and no checkable rule is left without a disposition.
+**Superseded figures removed at SPRINT-078's promote:** this block read *63 checkable · 12 covered · 39
+build · 12 scope-out* for two sprints after the tables below had moved past it — a second SSOT drifting
+from the rows it copied, which is the failure the header itself warns about. Per-sprint provenance for
+every move lives in the section tables, the sprint archive and git, and is not restated here.
 
 **One divergence left standing, named rather than silently repaired.** SPRINT-074 shipped
 `check-attestation.sh` covering §13's five `build` rules, and § Covered today never gained that row —
@@ -185,22 +175,10 @@ reader who expects to find them, not as dispositions.
 
 ## Divergences from `conformance-baseline.md` (routed here by T1)
 
-The baseline's § Coverage by section states 96 rules while its own `rules` column sums to 99 and its
-bucket columns to 98, and its **39 uncovered-mechanical** is superseded by the 55 above. Causes, all
-identified by SPRINT-073 T1 re-deriving from the spec:
-
-1. **§2 is 21, not 20** — `S2.R-PLACEMENT` carries the legacy-path second-match rule, separable from
-   `S2.F-FILE`.
-2. **§10 is 10, not 11** — *"doc-aging has two sources"* is data.
-3. **§11 is 11, not 12** — two rationale statements out, `S11.WHENITRUNS` in.
-4. **`S4.INDEX` and `S5.DISCARDLOG`** are rules the inventory never saw. Both were annotated `?` and
-   **were ruled at SPRINT-074 T1** — `S4.INDEX` Structural/mechanical (now a `build` row above),
-   `S5.DISCARDLOG` `implementation-directed`. No rule carries `?` at spec 0.4.1.
-5. **`implementation-directed` is 6 carried**, none pending, and **2** sit in §13, not 3. The spec's own
-   §13 prose said *three* at `:859` and `:874` while its table, §14 and this register all said two —
-   corrected at SPRINT-074 T1. The arithmetic settled it without a judgement call: §13 states 5
-   mechanical of 7, and 5+3=8.
-
-**The baseline is not edited to match.** `spec/STANDARD.md` §14 is the rule source now; a derived
-inventory that disagrees with it is the thing that is wrong, and the baseline stays as the frozen record
-of what SPRINT-072 measured. This file supersedes its coverage figures.
+**The baseline is not edited to match, and this file supersedes its coverage figures.**
+`spec/STANDARD.md` §14 is the rule source; a derived inventory that disagrees with it is the thing that
+is wrong, and `conformance-baseline.md` stays as the frozen record of what SPRINT-072 measured.
+**Compressed at SPRINT-078's promote** — the five itemised divergences (§2 is 21 not 20 · §10 is 10 not
+11 · §11 is 11 not 12 · the two `?` rules ruled at SPRINT-074 T1 · `implementation-directed` is 6 with 2
+in §13) were each settled at SPRINT-073/074 and are reflected in the tables above; the workings are in
+the sprint archive and git, and restating them here is a third copy of a reconciled number.

@@ -10,6 +10,9 @@ status: current
 > Filed automatically by the Sprint Close Retro (`TD-NNN` rows) · aged at Sprint Promote
 > (unaddressed ≥ 3 sprints → re-review; `severity: high` → auto-escalate to `TODO.md` Backlog P1) ·
 > resolved → `status: resolved → TASK-NNN`; **≥ 3 sprints later the row is deleted outright** (§11).
+> A row may also resolve **without** a task — `status: resolved → accepted (no task)`, the cost weighed
+> and knowingly kept — which runs the same deletion clock. Acceptance is a decision and carries its
+> reasoning plus a **Re-file fresh if** condition in the row; a row closed with neither is a silent drop.
 > The delay is deliberate — a just-resolved debt is still context at the next promote — and the
 > substance survives in `CHANGELOG.md`, the sprint archive and git, so what goes is a breadcrumb, not a
 > record. **IDs stay monotonic: a deleted row never frees its id.** `severity` ∈ trivial · minor · medium · high.
@@ -32,18 +35,20 @@ status: current
 
 ## Tech Debt
 
-> **Aging sweep — SPRINT-077 promote (2026-08-21).** 13 of 19 open rows are ≥3 sprints unaddressed:
-> TD-063 (3) · TD-062 (4) · TD-061 (5) · TD-060 (6) · TD-059 (7) · TD-057 (8) · TD-053 (14) ·
-> TD-052 (15) · TD-051 (16) · TD-050 (17) · TD-049 (18) · TD-048 (19) · TD-047 (20) · TD-045 (21).
-> **All held; none is `severity: high`, so nothing auto-escalates to Backlog P1.** Reviewed as a batch
-> rather than row-by-row because none gained new evidence this sprint — the sprint's work touched the
-> conformance engine, and the aged rows are matcher, glob and cap concerns whose triggers did not fire.
-> Two exceptions were handled individually and carry their own updates: **TD-064** (halved by ruling at
-> SPRINT-076 T5) and **TD-066** (gained L-144's promoted rule). **TD-037 deleted** — resolved at
-> SPRINT-074, three sprints elapsed (§11). **Standing concern this sweep is not resolving:** TD-048 and
-> TD-057 are the matcher pair, 19 and 8 sprints old, repeatedly deferred and explicitly priced together
-> in SPRINT-076's § Out. A batch deferred four times is a decision nobody has made — worth taking or
-> closing at the next promote rather than aging again.
+> **Aging sweep — SPRINT-078 promote (2026-08-21).** **14 of 19 open rows** are ≥3 sprints unaddressed:
+> TD-065 (3) · TD-066 (3) · TD-063 (4) · TD-062 (5) · TD-061 (6) · TD-060 (7) · TD-059 (8) ·
+> TD-053 (15) · TD-052 (16) · TD-051 (17) · TD-050 (18) · TD-049 (19) · TD-047 (21) · TD-045 (22).
+> **All held; none is `severity: high`, so nothing auto-escalates to Backlog P1.** Not aged (5):
+> TD-064 · TD-067 · TD-068 (2 each) · TD-069 · TD-070 (1 each). Reconciled: 14 + 5 = 19 open, plus the
+> two closed below = 21 rows on file.
+> **The standing concern the last sweep flagged was taken, not deferred a fifth time.** TD-048 and
+> TD-057 — the matcher pair, priced together in SPRINT-076's § Out — are **closed as accepted** at this
+> promote, each carrying its reasoning and a *Re-file fresh if* condition (see the rows). Deletion due
+> at Sprint-081 under §11's three-sprint clock.
+> **Correction to the previous sweep's arithmetic:** SPRINT-077's note claimed *"13 of 19"* while
+> listing **14** ids. The list was right and the count was wrong — recorded here rather than silently
+> repaired, since a census that miscounts its own enumeration is the failure L-108 tracks, and this one
+> survived a full sprint unread.
 
 - **TD-064** severity: minor | status: open | created: Sprint-075 | updated: Sprint-076
   - Summary: **~~28~~ 16 of this repo's own docs fail the ownership-header rules the engine checks** —
@@ -391,7 +396,17 @@ status: current
     touches no harness, so it is not a vehicle either. Search recorded so the next reviewer does not
     repeat it.
 
-- **TD-057** severity: minor | status: open | created: Sprint-069
+- **TD-057** severity: minor | status: resolved → accepted (no task) | created: Sprint-069 | closed: Sprint-078
+  - **Closed as accepted at SPRINT-078 promote**, with its pair [[TD-048]] and on the same ruling —
+    the two were "explicitly priced together in SPRINT-076's § Out", deferred four times, and the
+    ledger header escalated them to take-or-close at this promote. **What decides it is in the row
+    already:** *"Cost so far: four cycles in one sprint, zero bad artifacts — every finding was
+    correct."* Three matchers with three different semantics is a documentation gap, not a defect —
+    each answer is right for the question its checker asks, and the cost lands on the author's cycle
+    count, never on the artifact. Nine sprints of that cost has not motivated the fix, which is the
+    honest signal. **Re-file fresh if** a matcher disagreement ever yields an incorrect finding, or
+    if the `Layers:` contract has to be explained to a consumer outside this repo — the second is the
+    condition that would make writing it down worth a sprint, and it has not arrived.
   - Summary: **`Layers:` feeds three checkers that match it three different ways, and nothing states
     the contract.** The **pre-dispatch preflight** resolves directory globs — it reads T3's `docs/`
     against T1's `docs/adr/` and correctly reports `shared-file-owned-transitive`.
@@ -792,7 +807,18 @@ status: current
     (TASK-188) remains `state: blocked` by design: the trigger is opportunistic and scheduling a run to
     manufacture one is what L-111 forbids.
 
-- **TD-048** severity: trivial | status: open | created: Sprint-058
+- **TD-048** severity: trivial | status: resolved → accepted (no task) | created: Sprint-058 | closed: Sprint-078
+  - **Closed as accepted at SPRINT-078 promote**, on the ledger header's own escalation — *"a batch
+    deferred four times is a decision nobody has made — worth taking or closing at the next promote
+    rather than aging again."* Taking it was the alternative and was declined, so this records the
+    reasoning rather than a fifth deferral. The row is `severity: trivial`; its own Impact line says
+    the checker's direction of error is **the safe one** (it over-reports, costing a glance, where
+    the miss would cost a silent false PASS), and after 20 sprints no sighting has produced a wrong
+    artifact. Its own Mitigation already names the cheaper fix and it is not code: *"leave the parser
+    alone and let the DoD prose carry full paths, which is better writing anyway."* That is now the
+    convention. **Re-file fresh if** the matcher ever produces a *wrong* finding — a false PASS, or a
+    real overlap masked — rather than merely an extra author cycle; the widening this row declined
+    (basename-aware matching) is precisely what could cause that, which is why it stays declined.
   - Summary: `check-layers-completeness.sh` matches a `Layers:`/`Cites:` declaration against DoD prose
     **by token spelling, not by path identity**. A DoD that names a script by basename
     (``a bare `qa-check.sh` run``) is not satisfied by a declaration of `scripts/qa-check.sh`, so

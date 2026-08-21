@@ -18,9 +18,7 @@ status: current
 
 ## Active Sprint
 
-> _(none — SPRINT-077 closed 2026-08-21. Next: `/task-decomposer` on EPIC-004's ~32 remaining
-> coverage rules (**TASK-245**), which is the epic's last open § Closed-when condition and has no
-> backlog tasks yet — so it needs intake before it can be promoted, not another `promote`.)_
+> **SPRINT-078 — The Checks a Stranger Cannot See** → docs/sprint/SPRINT-078-the-checks-a-stranger-cannot-see.md
 
 ---
 
@@ -53,6 +51,152 @@ status: current
                   that the bar stands · SPRINT-077 § Out (which names this as the next entry, and
                   names `/task-decomposer` rather than `promote` as the skill that runs it)
       origin:     close-retro
+      state:      ready
+
+- [ ] TASK-246 — Cover §2/§6's tier doc-set rules in the engine  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  conformance-engine.sh answers S2.F-TIER · S6.BASE · S6.BACKEND · S6.MEDIUM ·
+                  S6.MULTISVC, all firing the single finding `tier-doc-set-incomplete` — one check,
+                  the tier a parameter, never four checkers. Required doc-set per tier derived from
+                  §2's own table cells (the S2.F-FILE pattern), never hard-coded. One retained
+                  must-FAIL fixture per tier + a PASS control that stays green when the fixture reddens
+      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
+                  docs/research/conformance-dispositions.md (move 5 rows build → covered)
+      depends-on: none
+      assumes:    §6's Conformance block exists and is machine-readable (verified at intake, 2026-08-21)
+      tracker:    EPIC-004 § Closed-when 2 · dispositions § build
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-247 — Cover §2's README ownership-footer rule in the engine  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  S2.R-README answered, firing `readme-ownership-footer-missing`; one retained
+                  must-FAIL fixture + a PASS control
+      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
+                  docs/research/conformance-dispositions.md
+      depends-on: none
+      assumes:    the footer's required shape is §3's ownership header, not a second definition —
+                  confirm against §3 before asserting, or the check contradicts S3.README's scope-out
+      tracker:    EPIC-004 § Closed-when 2 · dispositions § build
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-248 — Cover §9's sprint-file family in the engine  [size: M] [risk: med] [HITL]
+      class:      execution
+      done-when:  five rules answered with six findings — S9.TWOFILES → `sprint-plan-over-hard-cap` ·
+                  `sprint-log-missing`; S9.LOGDIR → `sprint-log-outside-logs-dir`; S9.PLANFROZEN →
+                  `plan-edited-after-freeze`; S9.SCOPECHANGE → `scope-change-logged-after-plan-edit`;
+                  S9.VERIFYCLAUSE → `dod-criterion-names-no-check`. Retained fixture per finding,
+                  each reddening while a sibling control stays green
+      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
+                  docs/research/conformance-dispositions.md
+      depends-on: none
+      assumes:    PLANFROZEN and SCOPECHANGE read git history against `plan_commit`, the S4.APPEND
+                  pattern — so both need a repo with real history in the fixture, not a tree alone
+      tracker:    EPIC-004 § Closed-when 2 · dispositions § build
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-249 — Cover §10's learning-governance rules in the engine  [size: M] [risk: med] [HITL]
+      class:      execution
+      done-when:  S10.FOURBUCKETS → `retro-bucket-unrouted`; S10.PROMOTION →
+                  `learning-recurred-unpromoted`; S10.TDAGING → `td-row-aged-unreviewed`;
+                  S10.PROMOTEREVIEW → `promote-checklist-absent`. Retained fixture per finding + controls
+      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
+                  docs/research/conformance-dispositions.md
+      depends-on: none
+      assumes:    S10.PROMOTION's trigger is the spec's own `count ≥ 2, promoted: no` threshold read
+                  from §10, not a number copied into the check (L-130)
+      tracker:    EPIC-004 § Closed-when 2 · dispositions § build
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-250 — Cover §11's ledger-retention rules in the engine  [size: M] [risk: low] [AFK]
+      class:      execution
+      done-when:  S11.TDDELETE → `resolved-td-row-past-retention`; S11.TODOCAP →
+                  `todo-over-cap-at-promote`; S11.LEARNINGS → `promoted-learning-not-collapsed`;
+                  S11.BACKLOG → `shipped-backlog-entry-retained`. Retained fixture per finding + controls
+      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
+                  docs/research/conformance-dispositions.md
+      depends-on: none
+      assumes:    a ledger's legend/header line is not a row — the census trap this repo has hit twice
+                  (L-108); anchor to position, and cross-check open+resolved against the total
+      tracker:    EPIC-004 § Closed-when 2 · dispositions § build
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-251 — Cover §11's archival rules in the engine  [size: M] [risk: low] [AFK]
+      class:      execution
+      done-when:  S11.SPRINT → `closed-sprint-not-archived` · `sprint-index-row-missing`;
+                  S11.LOGPAIR → `sprint-log-archived-apart-from-plan`; S11.CHANGELOG →
+                  `changelog-not-rotated-at-minor`; S11.WHENITRUNS →
+                  `retention-trigger-ran-in-wrong-phase`. Five findings, retained fixture each + controls
+      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
+                  docs/research/conformance-dispositions.md
+      depends-on: none
+      assumes:    S11.WHENITRUNS is phase-sensitive — it is L-105's temporal rule as a check, so the
+                  fixture must distinguish "ran in the wrong phase" from "did not run"
+      tracker:    EPIC-004 § Closed-when 2 · dispositions § build
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-252 — Cover §12's git-boundary rules in the engine  [size: M] [risk: med] [HITL]
+      class:      execution
+      done-when:  S12.SECRETS → `secret-committed`; S12.BACKUPS → `database-backup-committed`;
+                  S12.DESIGNSRC → `design-source-committed`; S12.GENERATED →
+                  `generated-artifact-committed`. Retained fixture per finding + a PASS control
+                  proving the check does NOT fire on a benign lookalike
+      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
+                  docs/research/conformance-dispositions.md
+      depends-on: none
+      assumes:    **false positives are the risk here, not false negatives** — the register's own (c)
+                  note refuses filename heuristics because flagging `contract.md` in a contract-testing
+                  repo is worse than no scan. The benign-lookalike control is the load-bearing fixture,
+                  and how far the detection goes is a G2 design call, not settled at intake
+      tracker:    EPIC-004 § Closed-when 2 · dispositions § build · dispositions § scope-out (c)
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-253 — Migrate §13's attestation checks into the engine and reconcile the register  [size: M] [risk: med] [HITL]
+      class:      execution
+      done-when:  `conformance.sh` run against a repository that never installed lean-flow emits all
+                  five §13 findings — `attestation-trailers-incomplete` · `attestation-not-on-task-commit`
+                  · `evidence-path-unpinned` · `attestation-disagrees-with-sprint` ·
+                  `attestation-unsigned-claim-only` — **byte-identical** to check-attestation.sh's
+                  output (the SPRINT-075 T4 gates_signed pattern, diffed not eyeballed), with
+                  `attestation-unsigned-claim-only` still reported at exit 0; existing retained
+                  fixtures still pass; and the register's header reconciles to
+                  **24 covered / 27 build / 11 scope-out = 62**
+      touches:    scripts/lib/conformance-engine.sh · scripts/lib/check-attestation.sh ·
+                  scripts/qa-check.sh · evals/run-attestation-fixtures.sh ·
+                  docs/research/conformance-dispositions.md
+      depends-on: none
+      assumes:    these five are **already built and fixture-guarded** — this is a migration, not a
+                  build. Verified at intake: all five strings live in check-attestation.sh + its
+                  fixtures, but `conformance.sh` execs only conformance-engine.sh, so a stranger's
+                  report has never contained them. The register flags the count divergence itself and
+                  declined to repair it in passing; this task is that reconciliation
+      tracker:    EPIC-004 § Closed-when 2 · dispositions § "One divergence left standing" · SPRINT-074 T2
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-254 — Rule on the 11 `scope-out` rules, which satisfy neither half of § Closed-when 2  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  each of the 11 is recorded as (a) checked, (b) re-marked `judgment-only` in
+                  spec/STANDARD.md, or (c) accepted as a third state — and if (c), §14's wording and
+                  § Closed-when 2's clause are updated to admit it, with the prior wording preserved
+                  in place (L-088). No rule left in the undifferentiated middle the register forbids
+      touches:    spec/STANDARD.md (§14 · affected § Conformance rows) ·
+                  docs/research/conformance-dispositions.md · docs/epic/EPIC-004-conformance.md ·
+                  possibly docs/adr/ADR-NNN
+      depends-on: none
+      assumes:    a spec change here is at least MINOR — re-marking a rule moves what an adopter's
+                  report says without their tree changing, the line PATCH may not cross (§2's own row).
+                  Ruling (c) likely wants an ADR; (a) and (b) likely do not
+      tracker:    EPIC-004 § Closed-when 2 ("plus a separate ruling on whether the 11 scope-out rules
+                  are checked, re-marked, or accepted as a third state the wording does not admit") ·
+                  open since SPRINT-073
+      origin:     decomposer
       state:      ready
 
 ### P2 — Quality / Polish
