@@ -146,20 +146,23 @@ else
 fi
 
 # --- acting on the ACTIONABLE findings, and what is left over -------------------------------------
-# SPRINT-075's version applied every finding and asserted the repo went green. That control cannot
-# survive T3 honestly, because 4 of the 8 new findings are ARTEFACTS: §2's unconditional set mixes
-# repository-universal files (SECURITY.md, CHANGELOG.md) with lean-flow's own loop surface
-# (`TODO.md`, `AGENTS.md`, `.claude/CLAUDE.md`, `.claude/CONTEXT.md`). Telling a four-file JS library
-# it owes a Claude Code context file is our shape wearing their repo's name -- the exact failure this
-# harness was built to detect, now detected.
+# HISTORY, kept because the sequence is the evidence. SPRINT-075 applied every finding and asserted
+# the repo went green. SPRINT-076 T3 could not keep that control honestly: 4 of the 8 core-file-missing
+# findings were ARTEFACTS, because §2's unconditional set mixed repository-universal files with
+# lean-flow's own loop surface (`TODO.md`, `AGENTS.md`, `.claude/CLAUDE.md`, `.claude/CONTEXT.md`).
+# Telling a four-file JS library it owes a Claude Code context file is our shape wearing their repo's
+# name. So the case was WEAKENED on purpose -- apply only the actionable findings, assert the
+# remainder is exactly those four -- and retained, so that fixing the spec would redden it and force
+# a re-triage rather than letting the artefacts quietly become permanent.
 #
-# Owner ruling (T3): the engine stays FAITHFUL to §2 as written and is not tuned to look quiet; the
-# artefact is recorded in the register and the real fix -- §2 distinguishing loop rows from universal
-# ones -- is filed as a follow-up. So this control applies only the ACTIONABLE findings and then
-# asserts the remainder is EXACTLY the four known artefacts.
+# SPRINT-077 T1 fixed the spec: §2 now names those four rows' substrate instead of saying `always`,
+# so the engine no longer derives them as unconditional. This case reddened exactly as designed and is
+# RE-TRIAGED here, not widened -- back to SPRINT-075's stronger form, which is now the honest one:
+# every finding is actionable, so applying all of them must leave NOTHING. Re-derived at execution,
+# not copied from the Plan (L-130): 8 core-file-missing -> 4, artefacts 4 -> 0, whole report 10 -> 6.
 #
-# Retaining the count is what makes this more than a comment: when the spec is fixed, this case
-# reddens and forces a re-triage instead of the artefacts quietly becoming permanent.
+# The assertion is deliberately `-z` rather than a list. A remainder list can be quietly extended one
+# row at a time; an empty-set assertion cannot absorb a new artefact without someone noticing.
 printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-20\nupdate_trigger: When the architecture changes\nstatus: current\n---\n\n# Architecture\n\nThe widget talks to the store.\n' > "$foreign/docs/architecture.md"
 printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-20\nupdate_trigger: When the disclosure route changes\nstatus: current\n---\n\n# Security Policy\n\nReport vulnerabilities to security@acme.example.\n' > "$foreign/SECURITY.md"
 printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-20\nupdate_trigger: Every release\nstatus: current\n---\n\n# Changelog\n\n## 1.0.0\n\n- first release\n' > "$foreign/CHANGELOG.md"
@@ -169,17 +172,14 @@ printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-20\nupdate_trigger: Whe
 
 out2=$(sh "$engine" "$foreign" --spec "$spec" 2>&1)
 left=$(printf '%s\n' "$out2" | sed -n 's/^FAIL  \([a-z-]*\): \([^ ]*\) .*/\1: \2/p' | LC_ALL=C sort)
-expected='core-file-missing: .claude/CLAUDE.md
-core-file-missing: .claude/CONTEXT.md
-core-file-missing: AGENTS.md
-core-file-missing: TODO.md'
-if [ "$left" = "$expected" ]; then
-  echo "PASS fixture(actionable-findings-clear-leaving-only-the-4-known-artefacts): every actionable finding cleared; the remainder is exactly the four lean-flow-loop rows recorded in conformance-dispositions.md"
+if [ -z "$left" ]; then
+  echo "PASS fixture(every-finding-is-actionable-and-clears): applying exactly what the report asked for takes the stranger's repo to no FAIL line; no artefact remains (SPRINT-077 T1)"
 else
-  echo "FAIL fixture(actionable-findings-clear-leaving-only-the-4-known-artefacts): the remainder is not the recorded artefact set."
-  echo "  expected:"; printf '%s\n' "$expected" | sed 's/^/    /'
-  echo "  got:";      printf '%s\n' "$left"     | sed 's/^/    /'
-  echo "  (if the spec now distinguishes loop rows from universal ones, RE-TRIAGE and update this case -- do not just widen it)"
+  echo "FAIL fixture(every-finding-is-actionable-and-clears): findings remain after applying every one of them."
+  echo "  remainder:"; printf '%s\n' "$left" | sed 's/^/    /'
+  echo "  (a remainder here is either a NEW artefact -- our shape leaking into a stranger's report, route it"
+  echo "   to conformance-dispositions.md § Artefacts -- or a finding whose fix above is incomplete. Triage"
+  echo "   which, and record it; do NOT relax this assertion into a remainder list to make it green.)"
   fail=1
 fi
 

@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-20
+last_updated: 2026-08-21
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.4.2
+version: 0.5.0
 status: current
 ---
 
@@ -55,10 +55,10 @@ gating → §6.
 | `SECURITY.md` | Anyone | ~80 | init (always) | auth model · secret policy · vulnerability-reporting change | — |
 | `CHANGELOG.md` | Reviewer | append-only | first release or sprint close (always-core — ADR-012 deviation) | sprint close · release | rotate at new MINOR → `docs/changelog/` (§11) |
 | `LICENSE` | Anyone | — | init (license chosen; private → proprietary notice) | license change (rare) | — |
-| `AGENTS.md` | AI tools | 12 (ADR-015) | init (always) — **thin pointer to `.claude/CLAUDE.md`, never duplicated instructions** | pointer targets move | — |
+| `AGENTS.md` | AI tools | 12 (ADR-015) | init (lean loop — an AI assistant reads this repo) — **thin pointer to `.claude/CLAUDE.md`, never duplicated instructions** | pointer targets move | — |
 | `.env.example` | Dev | — | init **safe-scaffold** (write-if-absent; names only, never values) | a new env var is introduced | — |
 | `.gitignore` | git | — | init **safe-scaffold** (write-if-absent; from the §12 boundary rule) | a new generated-artifact class appears | — |
-| `TODO.md` | Dev / AI | 320 soft (ADR-019) | init (always) | backlog change · sprint promote/close | §11 prune |
+| `TODO.md` | Dev / AI | 320 soft (ADR-019) | init (lean loop — work is tracked in-repo, not in an external issue tracker) | backlog change · sprint promote/close | §11 prune |
 | `TECH-DEBT.md` | Dev / AI | open rows only | first TD filed | close files TD · promote ages · debt resolved | §11 delete (3 sprints after resolved) |
 
 **`spec/` — the standard itself, where a repo publishes one:**
@@ -88,8 +88,29 @@ around the rules, and the rule count is what shows it.
 
 | File | Reader | Cap | Create ← | Update ← | Archive |
 |---|---|---|---|---|---|
-| `CLAUDE.md` | AI assistant | 80 | init (always) | project shape / workflow / anti-patterns change | — |
-| `CONTEXT.md` | AI assistant | 150 (ADR-017) | init (always) | vocabulary / patterns / conventions change | — |
+| `CLAUDE.md` | AI assistant | 80 | init (lean loop — an AI assistant reads this repo) | project shape / workflow / anti-patterns change | — |
+| `CONTEXT.md` | AI assistant | 150 (ADR-017) | init (lean loop — an AI assistant reads this repo) | vocabulary / patterns / conventions change | — |
+
+**Loop rows vs repository-universal rows, stated here so the split is a ruling and not an oversight
+(the ADR-026 pattern).** Four rows above — `AGENTS.md`, `TODO.md`, `.claude/CLAUDE.md`,
+`.claude/CONTEXT.md` — are the **lean loop's own surface**, not obligations of every repository. Their
+`Create ←` cells therefore name their substrate (*an AI assistant reads this repo* · *work is tracked
+in-repo*) instead of saying `always`, exactly as §6 gates its substrate-conditional rows: **skipped,
+not owed, when the substrate is absent**. A repository that tracks work in GitHub Issues already has a
+backlog and does not owe `TODO.md`; one with no AI assistant does not owe an assistant's context files.
+
+**The distinction is machine-readable by construction, not by annotation.** A checker's required set is
+derived from the `Create ←` cell itself — the word `always` is the discriminator — so a row moving
+between the two populations changes what every tool reports **with no code edit**, and no tool carries
+a list of loop files it must be taught to update. That is the same mechanism `--spec` already proves
+for §14's Mark column. It is also why the fix for this belongs here rather than in a checker: a checker
+that narrows a rule the standard states is deciding a question the standard owns.
+
+**Measured, not assumed.** Against a four-file JS library that never installed lean-flow, `S2.F-FILE`
+raised 8 `core-file-missing` findings, **4 of them these rows** — findings the repository's owner could
+not act on. Post-ruling the same run raises 4, all actionable. These rows stay fully governed for a
+repo that *does* run the loop: their caps are unaffected (a cap is read from the `Cap` cell, not the
+`Create ←` cell), and their presence is owed via §6's tier gate once the substrate is detected.
 
 **`docs/` tree** (tier column per §6; legacy lean paths in parentheses stay matched second):
 

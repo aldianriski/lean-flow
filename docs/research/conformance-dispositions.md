@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-17
+last_updated: 2026-08-21
 update_trigger: A rule's disposition changes, or spec/STANDARD.md gains or reclassifies a rule
 status: current
 id: conformance-dispositions
@@ -54,42 +54,42 @@ one: a ratio would improve every time the standard declines to automate somethin
 | `S9.GATESWELLFORMED` · `S9.GATESABSENT` | `conformance-engine.sh` *(migrated off `check-gates-signed.sh`, SPRINT-075 T4 — the first family consolidated into the engine; the named findings are unchanged)* |
 | `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` | `conformance-engine.sh` *(SPRINT-075 T6 — the engine's first NEW coverage; five published findings, one retained must-FAIL fixture each)* |
 | `S4.ONEFILE` · `S4.APPEND` · `S4.INDEX` · `S4.SECTIONS` · `S4.NEGATIVE` | `conformance-engine.sh` *(SPRINT-076 T2 — the §4 ADR family; five published findings, one retained must-FAIL fixture each plus a PASS control. `S4.APPEND` is the family's only Gated rule and the engine's first to read git history rather than the tree)* |
-| `S2.F-FILE` · `S2.R-PLACEMENT` | `conformance-engine.sh` *(SPRINT-076 T3 — §2's placement pair, chosen because it is the likeliest artefact source. The required set is derived from §2's own `Create ←` cells, never hard-coded. **See § Artefacts below** — this is the first covered rule that produces artefacts against a generic repository)* |
+| `S2.F-FILE` · `S2.R-PLACEMENT` | `conformance-engine.sh` *(SPRINT-076 T3 — §2's placement pair, chosen because it is the likeliest artefact source. The required set is derived from §2's own `Create ←` cells, never hard-coded. **See § Artefacts** — the 4 it produced against a generic repo were fixed at the spec by SPRINT-077 T1, and the count is now 0)*
 | `S11.EPIC` | `check-epic-archive.sh` |
 | `S11.RESEARCH` | `check-research-archive.sh` |
 
 
 ## Artefacts — where a covered rule says something a stranger cannot act on
 
-**Recorded because measuring it was the point, not because it is comfortable.** SPRINT-075 T3's triage
-returned **0 artefacts** and said so honestly while recording itself as *barely asked*: six of 62 rules
-were covered and none was shape-bound. SPRINT-076 T3 covered the two dispositions judged **likeliest**
-to be shape-bound, and the number moved.
+**Recorded because measuring it was the point, not because it is comfortable.** SPRINT-075 T3 returned **0 artefacts** and called itself *barely asked*; SPRINT-076 T3 covered the two rules likeliest to be shape-bound and the number moved; SPRINT-077 T1 fixed the cause. All three states are kept — the sequence is the evidence.
 
-**`S2.F-FILE` — 4 artefacts of 8 findings against a four-file JS library.** §2's unconditional set (the
-nine rows whose `Create ←` cell says "always") mixes two populations:
+**`S2.F-FILE` — 4 artefacts of 8 findings (SPRINT-076 T3) → 0 of 4 (SPRINT-077 T1).** §2's
+unconditional set mixed two populations:
 
 | Row | Against a generic repository |
 |---|---|
 | `README.md` · `SECURITY.md` · `CHANGELOG.md` · `docs/architecture/overview.md` · `docs/development/setup.md` | **actionable** — repository-universal; an owner can act on each |
-| `AGENTS.md` · `TODO.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` | **artefact** — lean-flow's own loop surface. §2 defines `AGENTS.md` as a thin pointer to `.claude/CLAUDE.md`; `TODO.md` is the lean loop's backlog *mechanism*, and a repo on GitHub Issues already has a backlog |
+| `AGENTS.md` · `TODO.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` | **was artefact** — lean-flow's own loop surface. §2 defines `AGENTS.md` as a thin pointer to `.claude/CLAUDE.md`; `TODO.md` is the lean loop's backlog *mechanism*, and a repo on GitHub Issues already has a backlog |
 
-**Disposition (owner ruling, T3): the engine stays faithful to §2 and is NOT tuned to look quiet.** A
-checker that narrows a rule the standard states is deciding a question the standard owns, which is the
-inversion §3 and L-058 both name — and it would hide the finding this triage exists to produce. The
-real fix is a **spec** change: §2 distinguishing loop-specific rows from repository-universal ones, so
-the engine can read the distinction instead of inferring it. Filed as **TASK-243**.
+**Disposition (owner ruling, SPRINT-076 T3): the engine stays faithful to §2 and is NOT tuned to look
+quiet** — a checker that narrows a rule the standard states is deciding a question the standard owns
+(the inversion §3 and L-058 both name), and it would hide the finding the triage exists to produce. The
+fix was therefore a **spec** change (TASK-243), delivered by **SPRINT-077 T1** at spec **0.5.0**: §2's
+four loop rows name their substrate instead of saying `always`, so the engine derives the distinction
+rather than inferring it — no code edit anywhere.
 
-Retained mechanically, not just written down: `evals/run-foreign-repo-fixtures.sh` applies every
-*actionable* finding and asserts the remainder is **exactly** these four. When the spec is fixed, that
-case reddens and forces a re-triage rather than letting the artefacts quietly become permanent.
+**Re-derived at T1, not copied (L-130):** `core-file-missing` 8 → **4**, artefacts 4 → **0**, whole
+report 10 → 6 lines; the four that vanished are exactly the four above. Both retained fixtures reddened
+as designed and were **re-triaged, not widened**: `run-foreign-repo-fixtures.sh` back to asserting an
+**empty** remainder (stronger — it cannot absorb a new artefact quietly), and
+`run-s2-placement-fixtures.sh`, whose must-FAIL seed hard-coded `TODO.md`, now derives its victim from
+§2's own unconditional set and asserts the target existed before removal; that guard had been passing
+vacuously (L-142).
 
-**`S2.R-PLACEMENT` — 0 artefacts, and the bound that earned it.** It matches by **basename**, so it can
-only fire on a document whose filename §2 owns; a stranger's `notes/design-notes.md` raises nothing.
-The cost of that bound is a near-miss it cannot see: the JS library's `docs/architecture.md` is
-plausibly the same document as `docs/architecture/overview.md`, and only `S2.F-FILE` reports it — as an
-absence rather than a misplacement. Recorded as a known limit, not a defect: widening to fuzzy matching
-buys one better finding and an unbounded artefact surface.
+**`S2.R-PLACEMENT` — 0 artefacts.** It matches by **basename**, so it only fires on a document whose
+filename §2 owns; a stranger's `notes/design-notes.md` raises nothing. The cost is a near-miss it cannot
+see — `docs/architecture.md` is plausibly `docs/architecture/overview.md`, and only `S2.F-FILE` reports
+it, as an absence rather than a misplacement. A known limit, not a defect.
 ## `build` — 32 rules, each with the finding its check will fire
 
 A check specified without its finding name is a half-shipped gate (L-058). Every row ships with a

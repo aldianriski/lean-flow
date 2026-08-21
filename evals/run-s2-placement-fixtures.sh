@@ -90,12 +90,19 @@ build_conformant() {
 }
 
 # --- must-FAIL: a missing unconditional core file -------------------------------------------------
+# The victim is DERIVED from REQ, never hard-coded. This case used to name TODO.md, which SPRINT-077
+# T1 reclassified into §2's lean-loop population -- so build_conformant stopped creating it, the `rm`
+# removed nothing, and the existence guard below passed *vacuously* on a seed that had not been
+# applied to anything. A must-FAIL case that cannot fail scores as a pass (L-142), so the guard now
+# asserts the target EXISTED before removal, which is the half that was missing.
 miss="$work/core-missing"
 build_conformant "$miss"
-rm -f "$miss/TODO.md"
-[ -e "$miss/TODO.md" ] && { echo "FAIL harness: the core-missing seed did not apply"; exit 2; }
+victim=$(printf '%s\n' "$REQ" | head -1)
+[ -f "$miss/$victim" ] || { echo "FAIL harness: core-missing seed target '$victim' was never built"; exit 2; }
+rm -f "$miss/$victim"
+[ -e "$miss/$victim" ] && { echo "FAIL harness: the core-missing seed did not apply"; exit 2; }
 
-run_case_anywhere "core-file-missing-fires" 1 "core-file-missing: TODO.md" -- \
+run_case_anywhere "core-file-missing-fires" 1 "core-file-missing: $victim" -- \
   sh "$engine" "$miss" --spec "$s2_spec"
 
 # --- must-FAIL: a core doc the repo HAS, filed where §2 does not name -----------------------------

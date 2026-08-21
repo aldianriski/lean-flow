@@ -4,7 +4,8 @@ slug: the-decisions-epic-004-is-waiting-on
 epic: EPIC-004
 owner: Maintainer
 last_updated: 2026-08-21
-status: planned
+status: active
+gates_signed: G1,G2 @ d004526
 plan_commit: c97d773
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -37,7 +38,8 @@ correctly blocked — its trigger needs §6 or §11 coverage, which this sprint 
 
 ### T1 — Mark which §2 rows are lean-flow-loop rows rather than repository-universal ones `[size: S · risk: med · class: decision · HITL]`
 Layers: `spec/STANDARD.md` (§2) · `spec/CHANGELOG.md` · `scripts/lib/conformance-engine.sh` ·
-        `evals/run-foreign-repo-fixtures.sh` · `docs/research/conformance-dispositions.md` (§ Artefacts)
+        `evals/run-foreign-repo-fixtures.sh` · `evals/run-s2-placement-fixtures.sh` (added at G1 — see Log) ·
+        `docs/research/conformance-dispositions.md` (§ Artefacts)
 Depends-on: none
 Cites: SPRINT-076 T3 (the triage that measured it) · the four loop rows named as examples,
        cited not touched — `AGENTS.md` · `TODO.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` ·

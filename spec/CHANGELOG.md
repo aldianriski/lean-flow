@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-20
+last_updated: 2026-08-21
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,40 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.5.0 — 2026-08-21
+
+**MINOR — §2 stops telling every repository it owes the lean loop's own files.** Four rows are
+**reclassified** from unconditional to substrate-conditional: `AGENTS.md`, `TODO.md`,
+`.claude/CLAUDE.md`, `.claude/CONTEXT.md`. No rule is added or removed — §2 still publishes 21 — and
+no checker changed, because the distinction is read from the table rather than coded.
+
+**Why MINOR and not PATCH, stated rather than inherited from 0.4.2.** 0.4.2 was PATCH on an explicit
+test: *nothing an adopter satisfies today changes.* That test fails here in the direction that matters.
+Four obligations are **lifted**, so an existing adopter's report loses up to four `core-file-missing`
+findings and their conformance level can move without their tree changing at all. §2's own
+`spec/STANDARD.md` row names the trigger in as many words — *a rule is added, amended **or
+reclassified***. A version that changes what a report says about an unchanged repository is one an
+adopter must re-read §2 to understand, which is the line PATCH is not allowed to cross. The relaxation
+being *in the adopter's favour* does not make it invisible: a lifted obligation is still a changed
+contract, and a tool pinned to 0.4.x will disagree with one pinned to 0.5.0 about the same tree.
+
+- **The rows now name their substrate** — *an AI assistant reads this repo* · *work is tracked in-repo*
+  — instead of saying `always`, exactly as §6 gates its substrate-conditional rows: **skipped, not
+  owed, when the substrate is absent**. A repository tracking work in GitHub Issues already has a
+  backlog; one with no AI assistant does not owe an assistant's context files.
+- **Machine-readable by construction.** The required set is derived from the `Create ←` cell itself, so
+  a row moving between populations changes every tool's output with **no code edit**, and no tool holds
+  a list of loop files it must be taught to update — the mechanism `--spec` already proves for §14's
+  Mark column. This is also why the fix belongs in the standard: a checker that narrows a rule the
+  standard states is deciding a question the standard owns (§3 · L-058).
+- **Measured, not asserted.** Against a four-file JS library that never installed lean-flow,
+  `S2.F-FILE` raised 8 `core-file-missing` findings, **4 of them artefacts its owner could not act on**.
+  Post-change: **4 findings, 0 artefacts**; whole report 10 → 6 lines. Recorded in
+  `docs/research/conformance-dispositions.md` § Artefacts.
+- **Unchanged for a repo that does run the loop.** Caps are read from the `Cap` cell, not `Create ←`,
+  so all four keep their line caps; their presence is owed via §6's tier gate once the substrate is
+  detected.
 
 ## 0.4.2 — 2026-08-20
 
