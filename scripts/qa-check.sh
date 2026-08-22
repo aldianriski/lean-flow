@@ -158,49 +158,34 @@ else
   fi
 fi
 
-# --- 2f-bis. §13 attestation on HEAD, read from the spec rather than from this script -------------
-# The first checker here that learns its rule set from spec/STANDARD.md §13's Conformance table
-# instead of hard-coding it (SPRINT-074 T2, EPIC-004 D1). Run against HEAD so the repository is
-# measured against the standard it publishes, on every gate -- a checker that never fires on its own
-# repo is half-shipped (L-020).
+# --- 2f-bis. §13 attestation -- now READ OUT OF the engine run below, not run separately ----------
+# SPRINT-078 T1. This leg used to invoke scripts/lib/check-attestation.sh as its own process. That
+# file is gone: its five assertions moved into scripts/lib/conformance-engine.sh, finding text
+# unchanged, following the §9 gates-signed precedent (SPRINT-075 T4) exactly.
 #
-# Cheap and always-on by the declared rule: it reads git objects that already exist and builds
-# nothing. Its FIXTURE HARNESS is the part that spins up throwaway repos, and that is what sits in
-# eval_harnesses_optin below (TD-016 -- cheap-and-git-free always-on, git-repo-building opt-in).
+# WHY IT MOVED. The assertions were correct and fixture-guarded, and no adopter could reach them:
+# check-attestation.sh was wired here and nowhere else, while conformance.sh -- the one entry point a
+# stranger knows about -- execs the engine alone. Five working rules behind a door only this
+# repository has is indistinguishable, from outside, from five rules nobody wrote.
 #
-# Green on a commit that makes no attestation (absence is not a failure and is not approval) and
-# green on a well-formed one over an unsigned commit (that is Gated, an honestly reached level, not
-# a defect). It fails only on an attestation that contradicts itself or its own sprint record.
-# Covered by evals/run-attestation-fixtures.sh.
-at_script="scripts/lib/check-attestation.sh"
-if [ ! -f "$at_script" ]; then
-  bad "attestation: checker not found at $at_script"
-elif ! git rev-parse --verify HEAD >/dev/null 2>&1; then
-  note "attestation: skip -- no HEAD commit to read (§13 is defined over git objects)"
-else
-  at_out=$(sh "$at_script" . HEAD 2>&1); at_code=$?
-  printf '%s\n' "$at_out"
-  at_pass=$(printf '%s\n' "$at_out" | grep -cE '^PASS')
-  at_fails=$(printf '%s\n' "$at_out" | grep -cE '^FAIL')
-  pass=$((pass + at_pass))
-  if [ "$at_code" -ne 0 ]; then
-    if [ "$at_fails" -gt 0 ]; then
-      fail=$((fail + at_fails))
-    else
-      bad "attestation: checker exited $at_code without reporting a FAIL line"
-    fi
-  fi
-fi
+# WHY THIS LEG STILL EXISTS RATHER THAN JUST DELETING IT. The engine's report is informational here
+# (see 2f-ter); §13's five were GATING as a standalone checker. Migrating and saying nothing would
+# have quietly dropped a gate that fires today -- a coverage loss wearing a migration's clothes. So
+# the §13 verdict lines are pulled out of the ONE engine run below and folded into this gate's tally,
+# exactly as gates-signed is, and the gating this repo had yesterday is the gating it has now.
+#
+# The extraction lives in 2f-ter with the run that produces it; this comment is the record of why.
 
 # --- 2f-ter. The conformance engine, run against THIS repo -- mostly informational, not yet gating -
 # SPRINT-075 T2. "This repo becomes its own first consumer" -- so the engine runs here, against `.`,
 # on every gate, and its full report is relayed exactly like every other leg's. Almost all of that
 # report does NOT add its PASS/FAIL counts into this gate's own pass/fail tally.
 #
-# Why not, when attestation above does: attestation only ever evaluates §13's five rules, and all
-# five have real assertions -- it is fully covered, so gating on it reports a real regression. This
-# engine sweeps EVERY section's rules, and most are still unbuilt: 34 of 43 `build` dispositions
-# remain after T4/T6 land their six this same sprint (docs/research/conformance-dispositions.md).
+# Why not for most of it: this engine sweeps EVERY section's rules, and most are still unbuilt --
+# 27 of 43 `build` dispositions remain once SPRINT-078 lands its eleven
+# (docs/research/conformance-dispositions.md). The two families that ARE folded in below are folded
+# in because they are FULLY covered, so a red line from either is a real regression rather than an
+# unbuilt disposition.
 # Gating THIS gate on all of that would turn qa-check.sh permanently red over tracked, scheduled-
 # for-later-sprints coverage gaps -- not a regression -- for as long as those dispositions stay
 # unbuilt, which is many sprints (§ Scope explicitly defers the remaining 34 past this one). A
@@ -209,7 +194,7 @@ fi
 # gate on -- this repo's own qa-check gets there once T4/T6 (and later families) have shrunk the gap
 # enough that the residue is worth blocking on, not before. Revisit as a follow-up once that's true.
 #
-# The ONE exception (SPRINT-075 T4): S9.GATESWELLFORMED / S9.GATESABSENT are FULLY covered here --
+# THE FIRST EXCEPTION (SPRINT-075 T4): S9.GATESWELLFORMED / S9.GATESABSENT are FULLY covered here --
 # real assertions, not a rule-unimplemented gap -- migrated off the now-deleted
 # scripts/lib/check-gates-signed.sh, which used to run as its own gating leg (night-run Part 1
 # required batch G1/G2 to be "already signed off" and never said the sign-off had to live in the
@@ -219,6 +204,11 @@ fi
 # full run below and folds only those into the tally -- the guarded failure (a MISSING field read as
 # approval) still gates this script exactly as it did as a standalone checker.
 # Covered by evals/run-gates-signed-fixtures.sh, repointed at the engine.
+#
+# THE SECOND EXCEPTION (SPRINT-078 T1): §13's five, on exactly the same terms and by exactly the same
+# mechanism -- migrated off the now-deleted scripts/lib/check-attestation.sh, verdict lines pulled out
+# of this one run rather than invoking the engine again. See 2f-bis above for why that migration
+# happened at all. Covered by evals/run-attestation-fixtures.sh, repointed at the engine.
 ce_script="scripts/lib/conformance-engine.sh"
 if [ ! -f "$ce_script" ]; then
   bad "conformance engine: checker not found at $ce_script"
@@ -230,7 +220,21 @@ else
   gs_fails=$(printf '%s\n' "$gs_lines" | grep -cE '^FAIL')
   pass=$((pass + gs_pass))
   fail=$((fail + gs_fails))
-  note "conformance engine: informational only this sprint except S9.GATESWELLFORMED/S9.GATESABSENT above (exit $ce_code overall; $gs_pass gates-signed PASS, $gs_fails gates-signed FAIL folded into this gate's own tally) -- see the comment above this leg for why the rest is not"
+  # THE SECOND fully-covered family, folded in for the same reason (SPRINT-078 T1). §13's five rules
+  # all have real assertions -- they arrived here fully covered rather than growing into it -- so
+  # gating on them reports a real regression, not an unbuilt disposition. Before T1 they gated from
+  # their own process; folding them in is what keeps that true after the migration.
+  #
+  # Matched by SHAPE, not by substring: anchored at line start, `PASS`/`FAIL`, the two-space column
+  # the engine emits, then a §13 id in ROW POSITION. A bare grep for `attestation` would also ingest
+  # this file's own comments about attestation and any finding whose prose mentions the word -- the
+  # self-describing-corpus trap, one level up from where read-spec-rules.sh guards against it (L-108).
+  at_lines=$(printf '%s\n' "$ce_out" | grep -E '^(PASS|FAIL)  S13\.[A-Z]+ ')
+  at_pass=$(printf '%s\n' "$at_lines" | grep -cE '^PASS')
+  at_fails=$(printf '%s\n' "$at_lines" | grep -cE '^FAIL')
+  pass=$((pass + at_pass))
+  fail=$((fail + at_fails))
+  note "conformance engine: informational except the two FULLY-COVERED families -- S9.GATESWELLFORMED/S9.GATESABSENT and §13's five (exit $ce_code overall; $gs_pass gates-signed PASS / $gs_fails FAIL and $at_pass §13 PASS / $at_fails §13 FAIL folded into this gate's own tally) -- see the comment above this leg for why the rest is not"
 fi
 
 # --- 2g. A recorded completed run carries its rollup ---------------------------------------------

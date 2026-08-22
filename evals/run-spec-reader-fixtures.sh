@@ -31,8 +31,9 @@ run_case_anywhere "reconciles-with-section-14" 0 "reconciled" -- \
   sh "$reader" "$spec" --reconcile
 
 # --- case 2 (PASS control): §13 still yields the rows its shipped consumer expects -----------------
-# check-attestation.sh consumes this reader instead of its own copy of the parse. If §13's rows ever
-# stop matching, that checker's whole rule set changes silently.
+# conformance-engine.sh consumes this reader instead of carrying its own copy of the parse (it took
+# over §13 from the deleted check-attestation.sh at SPRINT-078 T1). If §13's rows ever stop matching,
+# the engine's whole §13 rule set changes silently.
 out=$(sh "$reader" "$spec" --section 13 2>&1); rc=$?
 n13=$(printf '%s\n' "$out" | grep -c '^S13\.')
 if [ "$rc" -eq 0 ] && [ "$n13" -eq 7 ] &&

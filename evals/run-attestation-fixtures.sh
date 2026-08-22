@@ -1,6 +1,7 @@
 #!/bin/sh
-# run-attestation-fixtures.sh -- must-FAIL fixtures for scripts/lib/check-attestation.sh
-# (SPRINT-074 T2, TASK-228).
+# run-attestation-fixtures.sh -- must-FAIL fixtures for §13's five rules, now asserted by
+# scripts/lib/conformance-engine.sh (SPRINT-074 T2, TASK-228; repointed off the deleted
+# scripts/lib/check-attestation.sh at SPRINT-078 T1).
 #
 # One case per NAMED finding, because a gate's worst failure is the silent false negative and an
 # unnamed FAIL tells a rollup nothing about which leg tripped (L-058). These are RETAINED, not
@@ -41,16 +42,50 @@ set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 repo_root=$(CDPATH= cd -- "$here/.." && pwd)
-checker="$repo_root/scripts/lib/check-attestation.sh"
+engine="$repo_root/scripts/lib/conformance-engine.sh"
 spec="$repo_root/spec/STANDARD.md"
 . "$here/lib/harness-common.sh"
 
-[ -f "$checker" ] || { echo "FAIL harness: checker not found at $checker"; exit 2; }
-[ -f "$spec" ]    || { echo "FAIL harness: spec not found at $spec"; exit 2; }
+[ -f "$engine" ] || { echo "FAIL harness: engine not found at $engine"; exit 2; }
+[ -f "$spec" ]   || { echo "FAIL harness: spec not found at $spec"; exit 2; }
 
 fail=0
 work=$(mktemp -d) || { echo "FAIL harness: mktemp -d failed"; exit 2; }
 trap 'chmod -R u+w "$work" 2>/dev/null; rm -rf "$work"' EXIT
+
+# --- why a REDUCED spec, not the shipped one --------------------------------------------------------
+# SPRINT-078 T1, repointing this suite off the deleted check-attestation.sh. That checker only ever
+# evaluated §13, so pointing it at the real spec was safe. The ENGINE dispatches EVERY rule the spec
+# publishes, so handing it spec/STANDARD.md would fire ~44 still-`rule-unimplemented` ids against these
+# throwaway fixture repos and drown every assertion here in findings this family does not own. The
+# spec handed to the engine is therefore a REDUCED COPY keeping only §13's rows -- derived from the
+# shipped spec via awk, never hand-authored, so it cannot drift from the table it claims to be
+# (run-gates-signed-fixtures.sh's discipline, and this suite now follows it for the same reason).
+#
+# The fixture repos are UNCHANGED from the checker era: each already builds a git repo with the
+# trailers and sprint file the case needs, which is exactly what a repo-dir argument wants. What
+# changed is the invocation -- `<repo> <rev>` became `<repo> --spec <reduced> --rev <rev>`.
+s13_spec="$work/spec-s13-only.md"
+awk '
+  /^\| `S13\.[A-Z]/ { print; next }
+  $0 !~ /^\| `S[0-9]/ { print }
+' "$spec" > "$s13_spec"
+# [|] not \| -- GNU grep's BRE reads \| as ALTERNATION, which would match nearly every line via the
+# empty left branch rather than a literal pipe (read-spec-rules.sh's house technique, L-108's sibling).
+n_kept=$(grep -c '^[|] *`S13\.' "$s13_spec")
+[ "$n_kept" -eq 7 ] || { echo "FAIL harness: reduced spec carries $n_kept S13 rows, expected exactly 7 (5 mechanical + 2 implementation-directed)"; exit 2; }
+n_other=$(grep -c '^[|] *`S\([0-9]\|1[0-24]\)\.' "$s13_spec")
+[ "$n_other" -eq 0 ] || { echo "FAIL harness: reduced spec still carries $n_other non-§13 rule rows; the engine would dispatch rules this suite does not own"; exit 2; }
+
+# att <repo-dir> [rev] [extra engine args...] -- the engine, scoped to §13, standing in for the old
+# `sh "$checker" <repo> <rev>`. Trailing arguments are FORWARDED, which is load-bearing: cases 7-9
+# override the spec, and an `att` that swallowed them would run all three against the §13 copy and
+# report green for the wrong reason. The engine's parser takes the LAST --spec, so an override wins.
+att() {
+  _d=$1; shift
+  if [ "$#" -gt 0 ]; then _r=$1; shift; else _r=HEAD; fi
+  sh "$engine" "$_d" --spec "$s13_spec" --rev "$_r" "$@"
+}
 
 # Fixed fixture identity and signing explicitly OFF -- never the host's git config. A host with
 # commit.gpgsign=true would otherwise sign the fixtures and silently invert the unsigned case, which
@@ -106,12 +141,18 @@ good_sha=$(git -C "$base" rev-parse HEAD 2>/dev/null)
 # The DoD row that matters most: reporting otherwise is the theatre a conformance level exists to
 # prevent (ADR-025 · §13c). Exit 0 is correct -- Gated is a level reached, not a defect.
 run_case_anywhere "unsigned-reports-gated" 0 "attestation-unsigned-claim-only" -- \
-  sh "$checker" "$base" "$good_sha"
-run_case_anywhere "unsigned-level-line-says-gated" 0 "level: Gated (not Attested)" -- \
-  sh "$checker" "$base" "$good_sha"
+  att "$base" "$good_sha"
+# The level line still refuses to say Attested -- the assertion that had to survive the migration
+# intact. check-attestation.sh phrased it `level: Gated (not Attested)` from a §13-only ladder of its
+# own; the engine publishes one ladder for the whole sweep and phrases the same fact as a hold rung.
+# The wording moved, the claim did not, and this case is what proves that rather than assuming it.
+run_case_anywhere "unsigned-level-line-says-gated" 0 "level: Gated -- 1 finding(s) at Attested prevent Attested" -- \
+  att "$base" "$good_sha"
+run_case_anywhere "unsigned-hold-is-not-a-failure" 0 "None is a failure" -- \
+  att "$base" "$good_sha"
 # ... and never the other way round. A regression that rounded Gated up to Attested would pass both
 # assertions above while failing this one.
-out=$(sh "$checker" "$base" "$good_sha" 2>&1)
+out=$(att "$base" "$good_sha" 2>&1)
 case "$out" in
   *"level: Attested"*) echo "FAIL fixture(unsigned-never-attested): reported Attested over an unsigned commit"; fail=1 ;;
   *) echo "PASS fixture(unsigned-never-attested): Attested never claimed without a good signature" ;;
@@ -138,7 +179,7 @@ fi
 # Structural sibling of the above, anchored to a DEFINITION position rather than the substring: both
 # ids appear in the checker's comments (explaining the exclusion), and a substring grep would read
 # that prose as an assertion (L-108).
-if grep -qE '^assert_S13_(NOINFER|NOTAUTHOR)\(\)' "$checker"; then
+if grep -qE '^assert_S13_(NOINFER|NOTAUTHOR)\(\)' "$engine"; then
   echo "FAIL fixture(no-impl-directed-assertion): the checker defines an assertion for an implementation-directed rule"; fail=1
 else
   echo "PASS fixture(no-impl-directed-assertion): no assert_S13_NOINFER / assert_S13_NOTAUTHOR is defined"
@@ -146,7 +187,7 @@ fi
 
 # --- case 2: a commit with no trailers at all -- reported, never read as approval -----------------
 run_case_anywhere "no-claim-is-not-approval" 0 "no attestation claimed" -- \
-  sh "$checker" "$base" "$sign_sha"
+  att "$base" "$sign_sha"
 
 # --- case 3: attestation-trailers-incomplete ------------------------------------------------------
 inc="$work/incomplete"
@@ -159,7 +200,7 @@ printf 'x\n' > "$inc/f.txt"
 } > "$work/m2"
 commit_msg "$inc" "$work/m2"
 run_case_anywhere "trailers-incomplete" 1 "attestation-trailers-incomplete" -- \
-  sh "$checker" "$inc" HEAD
+  att "$inc"
 
 # --- case 4: attestation-not-on-task-commit (the merge) -------------------------------------------
 mrg="$work/merge"
@@ -182,7 +223,7 @@ if [ "$(git -C "$mrg" log -1 --format=%P | wc -w | tr -d ' ')" -lt 2 ]; then
   echo "FAIL harness: could not build a merge commit in $mrg"; fail=1
 else
   run_case_anywhere "not-on-task-commit" 1 "attestation-not-on-task-commit" -- \
-    sh "$checker" "$mrg" HEAD
+    att "$mrg"
 fi
 
 # --- case 5: evidence-path-unpinned (bare path, no @ <sha>) ---------------------------------------
@@ -197,7 +238,7 @@ printf 'x\n' > "$unp/f.txt"
 } > "$work/m7"
 commit_msg "$unp" "$work/m7"
 run_case_anywhere "evidence-unpinned" 1 "evidence-path-unpinned" -- \
-  sh "$checker" "$unp" HEAD
+  att "$unp"
 
 # --- case 5b: pinned, but the pin does not resolve -- a pin that does not resolve is not a pin -----
 dead="$work/deadpin"
@@ -211,7 +252,7 @@ printf 'x\n' > "$dead/f.txt"
 } > "$work/m8"
 commit_msg "$dead" "$work/m8"
 run_case_anywhere "evidence-pin-dead" 1 "evidence-path-unpinned" -- \
-  sh "$checker" "$dead" HEAD
+  att "$dead"
 
 # --- case 6: attestation-disagrees-with-sprint ----------------------------------------------------
 dis="$work/disagree"
@@ -228,30 +269,45 @@ printf 'one\n' >> "$dis/f.txt"
 } > "$work/m10"
 commit_msg "$dis" "$work/m10"
 run_case_anywhere "disagrees-with-sprint" 1 "attestation-disagrees-with-sprint" -- \
-  sh "$checker" "$dis" HEAD
+  att "$dis"
 
 # --- case 7: spec-table-unreadable ----------------------------------------------------------------
 # The case without which the whole spec-driven design degrades silently: a checker that cannot read
 # its rule source would otherwise assert nothing and exit clean (L-058).
 printf '# not a standard\n\nNo conformance tables here.\n' > "$work/empty-spec.md"
 run_case_anywhere "spec-table-unreadable" 1 "spec-table-unreadable" -- \
-  sh "$checker" "$base" "$good_sha" --spec "$work/empty-spec.md"
+  att "$base" "$good_sha" --spec "$work/empty-spec.md"
 
 # --- case 8: rule-unimplemented -- D1's actual test -----------------------------------------------
-# A SIXTH mechanical rule is added to §13's table in a copy of the real spec. No code changes. The
-# checker must notice the rule it has no assertion for and report it as a gap. If this case fails,
-# the checker is not reading the spec whatever its header claims.
+# A SIXTH mechanical rule is added to §13's table in a copy of the reduced spec. No code changes. The
+# engine must notice the rule it has no assertion for and report it. If this case fails, the engine is
+# not reading the spec whatever its header claims.
+#
+# THE EXIT CODE CHANGED HERE, AND ONLY HERE (SPRINT-078 T1). check-attestation.sh reported an
+# unimplemented rule as a FAIL and exited 1. The engine rules it a GAP that deliberately enters
+# neither the level nor the exit code, because a `rule-unimplemented` is a statement about THIS ENGINE
+# and never about the repository under test -- the ruling SPRINT-075 T3 was created to make, after a
+# first run against a stranger's repo returned 58 FAIL lines of which 56 were our own missing
+# assertions. The finding is still NAMED, every time, which is the part L-058 cares about; what it no
+# longer does is set an adopter's exit code over our roadmap. So the assertion below moves from "exit
+# 1" to "exit 0 AND the gap is named on a GAP line" -- strictly more specific than what it replaced,
+# because it now also pins WHICH line class carries it.
 awk '
   /^\| `S13\.UNSIGNEDCLAIM` \|/ {
     print
-    print "| `S13.NEWRULE` | Attested | mechanical | a rule this checker has never heard of |"
+    print "| `S13.NEWRULE` | Attested | mechanical | a rule this engine has never heard of |"
     next
   }
   { print }
-' "$spec" > "$work/spec-plus-rule.md"
+' "$s13_spec" > "$work/spec-plus-rule.md"
 grep -q 'S13.NEWRULE' "$work/spec-plus-rule.md" || { echo "FAIL harness: could not inject a rule into the spec copy"; fail=1; }
-run_case_anywhere "rule-unimplemented" 1 "rule-unimplemented" -- \
-  sh "$checker" "$base" "$good_sha" --spec "$work/spec-plus-rule.md"
+out=$(att "$base" "$good_sha" --spec "$work/spec-plus-rule.md" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -qE '^GAP   S13\.NEWRULE .*rule-unimplemented'; then
+  echo "PASS fixture(rule-unimplemented): a rule added to the spec is named as an engine gap -- no code change, and it does not set the adopter's exit code"
+else
+  echo "FAIL fixture(rule-unimplemented): exit $rc; expected 0 with a GAP line naming S13.NEWRULE -- output:"
+  printf '%s\n' "$out"; fail=1
+fi
 
 # --- case 9: the exclusion is DERIVED from the Mark column, not remembered ------------------------
 # S13.TRAILERS is re-marked implementation-directed in a copy of the real spec. The checker must stop
@@ -260,8 +316,8 @@ run_case_anywhere "rule-unimplemented" 1 "rule-unimplemented" -- \
 awk '
   /^\| `S13\.TRAILERS` \|/ { print "| `S13.TRAILERS` | — | **implementation-directed** | re-marked by the fixture |"; next }
   { print }
-' "$spec" > "$work/spec-remarked.md"
-out=$(sh "$checker" "$base" "$good_sha" --spec "$work/spec-remarked.md" 2>&1); rc=$?
+' "$s13_spec" > "$work/spec-remarked.md"
+out=$(att "$base" "$good_sha" --spec "$work/spec-remarked.md" 2>&1); rc=$?
 if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -q 'S13.TRAILERS *-- excluded by mark' &&
    ! printf '%s\n' "$out" | grep -qE '^PASS  S13\.TRAILERS'; then
   echo "PASS fixture(mark-derived-exclusion): re-marking a rule in the spec stopped the checker asserting it -- no code change"

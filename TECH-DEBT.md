@@ -80,7 +80,7 @@ status: current
   - Sibling, not a duplicate: **TD-065**. Both are "the conformance corpus disagrees with itself", but
     that row is a register miscount and this one is a real doc gap; a cure for either moves neither.
 
-- **TD-065** severity: trivial | status: open | created: Sprint-075
+- **TD-065** severity: trivial | status: resolved (SPRINT-078 T1) | created: Sprint-075
   - Summary: **`docs/research/conformance-dispositions.md` still counts §13's five rules under
     `build`**, though SPRINT-074 shipped `check-attestation.sh` covering them. § Covered today never
     gained that row, so the register understates coverage by five.
@@ -97,6 +97,15 @@ status: current
     § Covered today, drop those five from `build`, re-derive `covered + build + scope-out = 63` by
     counting rule ids in each table rather than editing the headers. Do it as its own change, not as a
     rider on a coverage task, so the arithmetic is reviewable.
+  - **Resolved at SPRINT-078 T1**, and the caveat above is the one thing that did not hold: the fix
+    rode along with the migration that made it true, because moving the five *into the engine* is what
+    turned "the register understates coverage" into "the register was right and the engine had not
+    caught up". Counts re-derived by counting ids in each section table, never by editing a header:
+    **24 covered · 27 `build` · 11 scope-out = 62**, cross-checked against the engine's own dispatchable
+    count (18 with an assertion + 44 GAP). The row that never existed now exists, and the standing
+    footnote that described the gap is replaced by one describing the closure.
+  - Note the drift this row itself carried: the mitigation above said `= 63`, a figure superseded two
+    sprints before this row was read. A debt row is a frozen artifact like any other (L-130).
 
 
 - **TD-067** severity: minor | status: open | created: Sprint-076

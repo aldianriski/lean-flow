@@ -72,18 +72,43 @@ note() { printf '      %s\n' "$1"; }
 # coverage gets its own line in the report instead (owner ruling, SPRINT-075 T3).
 last_gap=0
 gap()  { last_gap=1; n_gap=$((n_gap + 1)); printf 'GAP   %s\n' "$1"; }
+# `hold` is a FOURTH verdict class, and the one §13 could not migrate without (SPRINT-078 T1). It
+# reads exactly like a note -- same indented line, no verdict prefix -- and it additionally records
+# that the rule named something PREVENTING the next level without FAILING.
+#
+# The case that forced it: `attestation-unsigned-claim-only`. §13c says a well-formed attestation over
+# an unsigned commit has genuinely reached Gated and genuinely has not reached Attested. That is a
+# level, not a defect, so it must not touch the exit code -- but it is also, in §14's own words, the
+# named finding preventing the next level, so a report that swallows it and prints `level: Attested`
+# certifies precisely what §13 exists to refuse. The checker this family migrated from had a §13-only
+# level ladder of its own and said `level: Gated (not Attested) -- preventing finding:
+# attestation-unsigned-claim-only`; this engine publishes ONE level line, so the distinction had to
+# move into the ladder rather than travel with the family.
+#
+# Without it the migration would have been a silent downgrade: same finding text, same exit code, and
+# a headline promoting every unsigned attestation to Attested.
+last_hold=0
+hold() { last_hold=1; note "$1"; }
 
 # --- arguments ---------------------------------------------------------------------------------
 repo=""; spec=""
+# `--rev` exists because §13's rules are defined over a COMMIT, not over the working tree, and the
+# checker they migrated from (SPRINT-078 T1) took the commit-ish as a required argument. Defaulting to
+# HEAD keeps the common case a one-word invocation; keeping the override is what stops the migration
+# quietly costing an adopter the ability to attest a commit that is not HEAD -- and it is what lets
+# the retained §13 fixtures go on targeting the exact commits they were built around. Rules that read
+# the working tree ignore it entirely.
+rev="HEAD"
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --spec) shift; spec=${1:-} ;;
-    -h|--help) printf 'usage: sh conformance-engine.sh <repo-dir> [--spec <STANDARD.md>]\n'; exit 0 ;;
+    --rev)  shift; rev=${1:-HEAD} ;;
+    -h|--help) printf 'usage: sh conformance-engine.sh <repo-dir> [--spec <STANDARD.md>] [--rev <commit-ish>]\n'; exit 0 ;;
     *) [ -n "$repo" ] || repo=$1 ;;
   esac
   shift
 done
-[ -n "$repo" ] || { bad "conformance: usage -- sh conformance-engine.sh <repo-dir> [--spec <STANDARD.md>]"; exit 1; }
+[ -n "$repo" ] || { bad "conformance: usage -- sh conformance-engine.sh <repo-dir> [--spec <STANDARD.md>] [--rev <commit-ish>]"; exit 1; }
 [ -d "$repo" ] || { bad "conformance: repo directory not found: $repo"; exit 1; }
 repo_abs=$(CDPATH= cd -- "$repo" && pwd)
 
@@ -113,6 +138,228 @@ note "rule source: $spec -- $n_rules rules read across every section. Rule set a
 # insertion anchor a fixture can awk/sed after, the same convention as evals/lib/harness-common.sh's
 # anchor extraction.
 # registry:insert-point
+
+# --- §13 attestation family (SPRINT-078 T1) -------------------------------------------------------
+# Migrated from scripts/lib/check-attestation.sh (deleted this task), following the §9 gates-signed
+# precedent exactly: the rule set was already the spec's, the assertion bodies move verbatim, and the
+# finding text is unchanged -- established by diffing both tools' §13 lines before the old file was
+# removed, never by reading them side by side (D2 · D3).
+#
+# WHY THE MIGRATION IS THE WHOLE POINT. These five assertions have worked and been fixture-guarded
+# since SPRINT-074, and no adopter has ever seen one: check-attestation.sh was reachable only from
+# scripts/qa-check.sh, this repository's own gate, while conformance.sh -- the consumer entry point --
+# execs this engine alone. Five rules that fire correctly and are unreachable from the only door a
+# stranger knows about are, from that stranger's side, indistinguishable from five rules nobody wrote.
+#
+# THE ONE REPORT-SHAPE CHANGE, stated rather than discovered later: check-attestation.sh closed with a
+# §13-specific `level:` line of its own. It does not migrate -- this engine publishes ONE level line
+# for the whole sweep, and §13's five rules are all Attested-level, so their findings already reach it
+# through `attested_fail`. A second level line scoped to one section would state a level for a subset,
+# which is exactly the "level as a score for part of the tree" reading §14 forbids. The per-rule lines
+# below are byte-identical; the closing line is the engine's.
+#
+# THE GUARD THAT CHECK-ATTESTATION.SH DID NOT NEED. That script took a `<commit-ish>` and refused to
+# run without a git repository -- correct for a checker only ever pointed at this repo's HEAD. The
+# engine is pointed at anything, including the throwaway NON-git fixture directories its own harness
+# builds, so the same refusal here would turn every existing engine fixture red over a git repository
+# nobody asked for. §13 is defined over git objects: where there are none, these rules are NOT
+# EVALUATED and say so. That is a note, never a pass and never a finding -- a directory that is not a
+# git repository has not violated §13, and reporting that it has would be a finding no adopter can
+# clear (§14), while passing it would be approval nothing earned.
+
+_ATT_DONE=0
+_ATT_REASON=""       # non-empty => §13 is not evaluable here, and this says why
+_ATT_SHA=""; _ATT_SHORT=""
+_ATT_SIGNER=""; _ATT_GATE=""; _ATT_EV=""
+_ATT_GSIG=""; _ATT_NPARENTS=0
+_ATT_EVPATH=""; _ATT_EVPIN=""
+_ATT_PRESENT=0
+
+# _att_fmv_stdin <key> -- the frontmatter value of <key> read from stdin. The file-taking sibling
+# `_s9_gates_fmv` cannot serve here: §13b reads its record out of a GIT BLOB at a pinned sha, which
+# has no path in the working tree to hand it. Same parse, different source; the near-duplicate is
+# deliberate rather than refactored mid-migration, because D2 makes this task a move and a shared
+# frontmatter reader is a change. Filed at close.
+_att_fmv_stdin() {
+  awk -v k="$1" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}'
+}
+
+# Gate names compared as a SET, not as a string: `Gate: G2,G1` and a record of `G1, G2` state the same
+# fact, and a textual comparison would report a disagreement that is not one.
+_att_norm_gates() {
+  printf '%s' "$1" | tr -d '[:space:]' | tr ',' '\n' | sed '/^$/d' | sort | tr '\n' ',' | sed 's/,$//'
+}
+
+# ONE pass over the git objects, cached -- five assertions read the same six facts, and the engine's
+# cost model is "walk once, then filter" (the lesson S2.R-PLACEMENT paid 29 seconds for).
+#
+# Deliberately absent from this block: %an %ae %cn %ce. Author and committer identity are never read,
+# because §13e says they are not the attestation -- S13.NOTAUTHOR is honoured BY CONSTRUCTION here,
+# never evaluated against the repository under test. That is why it needs no assertion and why the
+# spec's own Mark column, not a skip list in this file, is what excludes it.
+_att_scan() {
+  [ "$_ATT_DONE" -eq 1 ] && return 0
+  _ATT_DONE=1
+  _att_repo=$1
+
+  if ! command -v git >/dev/null 2>&1; then
+    _ATT_REASON="git is not available on this host, and §13 is defined over git objects"
+    return 0
+  fi
+  if ! git -C "$_att_repo" rev-parse --git-dir >/dev/null 2>&1; then
+    _ATT_REASON="$_att_repo is not a git repository, and §13 is defined over git objects"
+    return 0
+  fi
+  _ATT_SHA=$(git -C "$_att_repo" rev-parse --verify "$rev^{commit}" 2>/dev/null) || _ATT_SHA=""
+  if [ -z "$_ATT_SHA" ]; then
+    _ATT_REASON="'$rev' names no commit in this repository, and §13 is defined over git objects"
+    return 0
+  fi
+  _ATT_SHORT=$(printf '%s' "$_ATT_SHA" | cut -c1-7)
+
+  _ATT_SIGNER=$(git -C "$_att_repo" log -1 --format='%(trailers:key=Gate-Signed-By,valueonly)' "$_ATT_SHA" | sed '/^[[:space:]]*$/d')
+  _ATT_GATE=$(git   -C "$_att_repo" log -1 --format='%(trailers:key=Gate,valueonly)'           "$_ATT_SHA" | sed '/^[[:space:]]*$/d')
+  _ATT_EV=$(git     -C "$_att_repo" log -1 --format='%(trailers:key=Evidence,valueonly)'       "$_ATT_SHA" | sed '/^[[:space:]]*$/d')
+  _ATT_GSIG=$(git   -C "$_att_repo" log -1 --format='%G?' "$_ATT_SHA")
+  _att_parents=$(git -C "$_att_repo" log -1 --format='%P' "$_ATT_SHA")
+  _ATT_NPARENTS=$(printf '%s' "$_att_parents" | wc -w | tr -d ' ')
+
+  # `Evidence: <path> @ <sha>` -- split once, reused by S13.EVIDENCESHA and S13.AGREE.
+  _ATT_EVPATH=$(printf '%s' "$_ATT_EV" | sed -n 's/^[[:space:]]*\(.*[^[:space:]]\)[[:space:]]*@.*/\1/p')
+  _ATT_EVPIN=$(printf  '%s' "$_ATT_EV" | sed -n 's/.*@[[:space:]]*\([0-9a-f]\{7,40\}\).*/\1/p')
+  [ -n "$_ATT_EVPATH" ] || _ATT_EVPATH=$(printf '%s' "$_ATT_EV" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+
+  # How many of the three trailers are present -- S13.TRAILERS decides on this, and the other
+  # assertions consult it so they never report a second finding about a trailer that is simply absent.
+  _ATT_PRESENT=0
+  [ -n "$_ATT_SIGNER" ] && _ATT_PRESENT=$((_ATT_PRESENT + 1))
+  [ -n "$_ATT_GATE" ]   && _ATT_PRESENT=$((_ATT_PRESENT + 1))
+  [ -n "$_ATT_EV" ]     && _ATT_PRESENT=$((_ATT_PRESENT + 1))
+  return 0
+}
+
+# _att_unevaluable <id> -- the shared "no git objects to read" note, padded here so the id column lines
+# up with every other line this engine prints. Returns 0 when it fired, so each assertion can `&& return`.
+_att_unevaluable() {
+  [ -n "$_ATT_REASON" ] || return 1
+  note "$(printf '%-20s' "$1")-- not evaluated: $_ATT_REASON. Not a finding: a tree with no commits has not violated §13, and reporting one would be a finding no adopter can clear (§14)"
+  return 0
+}
+
+assert_S13_TRAILERS() {
+  _att_scan "$1"
+  _att_unevaluable "S13.TRAILERS" && return
+  if [ "$_ATT_PRESENT" -eq 0 ]; then
+    note "S13.TRAILERS        -- no attestation claimed (none of the three trailers present). Reported, never read as approval"
+    return
+  fi
+  if [ "$_ATT_PRESENT" -lt 3 ]; then
+    _att_missing=""
+    [ -n "$_ATT_SIGNER" ] || _att_missing="$_att_missing Gate-Signed-By:"
+    [ -n "$_ATT_GATE" ]   || _att_missing="$_att_missing Gate:"
+    [ -n "$_ATT_EV" ]     || _att_missing="$_att_missing Evidence:"
+    bad "S13.TRAILERS        -- attestation-trailers-incomplete: missing$_att_missing. §13a requires all three together; a Gate: without a Gate-Signed-By: asserts a gate applied and declines to say who approved it, which is weaker than saying nothing"
+    return
+  fi
+  ok "S13.TRAILERS        -- all three trailers present together"
+}
+
+assert_S13_OWNCOMMIT() {
+  _att_scan "$1"
+  _att_unevaluable "S13.OWNCOMMIT" && return
+  [ "$_ATT_PRESENT" -gt 0 ] || { note "S13.OWNCOMMIT       -- not evaluated: no attestation claimed on $_ATT_SHORT"; return; }
+  if [ "$_ATT_NPARENTS" -gt 1 ]; then
+    bad "S13.OWNCOMMIT       -- attestation-not-on-task-commit: $_ATT_SHORT is a merge commit ($_ATT_NPARENTS parents). §13a puts the trailers on the task's own commit, not the merge"
+    return
+  fi
+  _att_touched=$(git -C "$1" show --format= --name-only "$_ATT_SHA" 2>/dev/null | sed '/^[[:space:]]*$/d' | wc -l | tr -d ' ')
+  if [ "$_att_touched" -eq 0 ]; then
+    bad "S13.OWNCOMMIT       -- attestation-not-on-task-commit: $_ATT_SHORT changes no files, so it is a separate approval commit rather than the commit that implements the work (§13a)"
+    return
+  fi
+  ok "S13.OWNCOMMIT       -- task's own commit ($_ATT_NPARENTS parent, $_att_touched file(s) changed)"
+}
+
+assert_S13_EVIDENCESHA() {
+  _att_scan "$1"
+  _att_unevaluable "S13.EVIDENCESHA" && return
+  [ -n "$_ATT_EV" ] || { note "S13.EVIDENCESHA     -- not evaluated: no Evidence: trailer to read"; return; }
+  if [ -z "$_ATT_EVPIN" ]; then
+    bad "S13.EVIDENCESHA     -- evidence-path-unpinned: 'Evidence: $_ATT_EV' carries no '@ <sha>'. The path is not immutable even though the trailer is; planning records get archived and renamed, and a bare path silently stops resolving (§13a)"
+    return
+  fi
+  if ! git -C "$1" cat-file -e "$_ATT_EVPIN:$_ATT_EVPATH" 2>/dev/null; then
+    bad "S13.EVIDENCESHA     -- evidence-path-unpinned: '$_ATT_EVPATH' does not resolve at $_ATT_EVPIN ('git show $_ATT_EVPIN:$_ATT_EVPATH' fails). A pin that does not resolve is not a pin"
+    return
+  fi
+  ok "S13.EVIDENCESHA     -- Evidence: pinned and resolving ($_ATT_EVPATH @ $_ATT_EVPIN)"
+}
+
+# Where the sprint-level record is READ, and why it is two places rather than one. `gates_signed:
+# <GATES> @ <sha>` names the commit the gates were signed AT, so the field naming that sha is
+# necessarily written in a LATER commit than the one it names. An Evidence: pin at the signing sha
+# therefore resolves to a version of the sprint file that does not yet carry the record -- which is
+# the normal, correct state of the first attested commit of every sprint, not a violation. Demanding
+# the record at the pin would make that commit impossible to comply with, and a finding no adopter
+# can clear is exactly what §14 forbids. So: read at the pin, fall back to the attesting commit's own
+# tree (the repository state when the claim was made), and NAME which one answered. Absent from both
+# is still a FAIL -- the trailer would be carrying a fact nothing in the repository records.
+# Found by running this checker against this repository's own T1 commit rather than reasoned out.
+assert_S13_AGREE() {
+  _att_scan "$1"
+  _att_unevaluable "S13.AGREE" && return
+  { [ -n "$_ATT_GATE" ] && [ -n "$_ATT_EV" ]; } || { note "S13.AGREE           -- not evaluated: needs both Gate: and Evidence: to compare"; return; }
+  if [ -n "$_ATT_EVPIN" ]; then _att_at=$_ATT_EVPIN; else _att_at=$_ATT_SHA; fi
+  _att_blob=$(git -C "$1" show "$_att_at:$_ATT_EVPATH" 2>/dev/null) || _att_blob=""
+  if [ -z "$_att_blob" ]; then
+    note "S13.AGREE           -- not evaluated: the Evidence: target is unreadable at $_att_at; that is S13.EVIDENCESHA's finding, not a disagreement"
+    return
+  fi
+  _att_recorded=$(printf '%s\n' "$_att_blob" | _att_fmv_stdin gates_signed)
+  case "$_att_recorded" in "["*) _att_recorded="" ;; esac
+  _att_readat="the Evidence: pin $_att_at"
+  if [ -z "$_att_recorded" ] && [ "$_att_at" != "$_ATT_SHA" ]; then
+    _att_blob=$(git -C "$1" show "$_ATT_SHA:$_ATT_EVPATH" 2>/dev/null) || _att_blob=""
+    _att_recorded=$(printf '%s\n' "$_att_blob" | _att_fmv_stdin gates_signed)
+    case "$_att_recorded" in "["*) _att_recorded="" ;; esac
+    _att_readat="the attesting commit $_ATT_SHORT (the pin $_att_at predates the record, as it must)"
+  fi
+  if [ -z "$_att_recorded" ]; then
+    bad "S13.AGREE           -- attestation-disagrees-with-sprint: '$_ATT_EVPATH' records no gates_signed: at the Evidence: pin $_att_at nor at the attesting commit $_ATT_SHORT, so the commit carries a sprint-level fact nothing in the repository records (§13b)"
+    return
+  fi
+  _att_recgates=$(_att_norm_gates "$(printf '%s' "$_att_recorded" | sed -n 's/^\([^@]*\)@.*/\1/p')")
+  [ -n "$_att_recgates" ] || _att_recgates=$(_att_norm_gates "$_att_recorded")
+  _att_trgates=$(_att_norm_gates "$_ATT_GATE")
+  if [ "$_att_recgates" != "$_att_trgates" ]; then
+    bad "S13.AGREE           -- attestation-disagrees-with-sprint: trailer says 'Gate: $_att_trgates', the record at '$_ATT_EVPATH' says '$_att_recgates' (read at $_att_readat). §13b requires the two to agree -- the trailer carries the sprint-level fact, it does not restate it differently"
+    return
+  fi
+  ok "S13.AGREE           -- trailer and sprint record agree ($_att_trgates), read at $_att_readat"
+}
+
+# The one finding in this engine that is reported, named, and deliberately NOT a failure. An unsigned
+# commit carrying perfect trailers has genuinely reached Gated and genuinely has not reached Attested,
+# and §14 says a report states that as a LEVEL, never as a defect. It therefore `hold`s rather than
+# fails: the line reads exactly like a note and never touches the exit code, while `attested_hold`
+# stops the level line stepping over it and printing Attested. Note alone would have been the silent
+# downgrade the hold class was added to prevent -- see `hold` at the top of this file.
+#
+# Its fixture asserts the OUTPUT, not the status, because that is the only way to tell "reported
+# honestly" from "silently passed" (L-103).
+#
+# This wording is also where S13.NOINFER is demonstrated rather than asserted: it says what the
+# repository STATES and stops there, refusing to conclude that the named person approved anything.
+assert_S13_UNSIGNEDCLAIM() {
+  _att_scan "$1"
+  _att_unevaluable "S13.UNSIGNEDCLAIM" && return
+  [ "$_ATT_PRESENT" -gt 0 ] || { note "S13.UNSIGNEDCLAIM   -- not evaluated: no attestation claimed on $_ATT_SHORT"; return; }
+  if [ "$_ATT_GSIG" = "G" ]; then
+    ok "S13.UNSIGNEDCLAIM   -- commit signature is good (%G? = G); the trailer's contents are covered by it"
+    return
+  fi
+  hold "S13.UNSIGNEDCLAIM   -- attestation-unsigned-claim-only: %G? = $_ATT_GSIG (no good signature). The repository STATES that '$_ATT_SIGNER' approved '$_ATT_GATE' and points at '$_ATT_EVPATH'; a verifier may NOT conclude from this that the named person approved anything (§13c)"
+}
 
 # --- §9 gates-signed family (SPRINT-075 T4) -------------------------------------------------------
 # Migrated from scripts/lib/check-gates-signed.sh (now deleted), which guarded a specific failure:
@@ -1140,6 +1387,7 @@ assert_S2_R_PLACEMENT() {
 # ==================================================================================================
 n_pass=0; n_judgment=0; n_impl=0; n_unclassified=0; n_reported=0; n_dispatchable=0
 struct_fail=0; gated_fail=0; attested_fail=0
+struct_hold=0; gated_hold=0; attested_hold=0
 
 saved_ifs=$IFS
 IFS='
@@ -1171,6 +1419,7 @@ for row in $rules; do
       last_bad=0
       last_ok=0
       last_gap=0
+      last_hold=0
       n_dispatchable=$((n_dispatchable + 1))
       if command -v "$fn" >/dev/null 2>&1; then
         "$fn" "$repo_abs"
@@ -1196,6 +1445,15 @@ for row in $rules; do
         # report -- into `passed` it manufactures approval the rule refuses to give, and into a
         # failure it blocks a level over something that is not a finding.
         n_reported=$((n_reported + 1))
+        # ...unless it HELD: a rule that named something preventing the next level without failing.
+        # Still not a pass and still not a failure -- but the level line below may not step over it.
+        if [ "$last_hold" -eq 1 ]; then
+          case "$level" in
+            Structural) struct_hold=$((struct_hold + 1)) ;;
+            Gated)      gated_hold=$((gated_hold + 1)) ;;
+            Attested)   attested_hold=$((attested_hold + 1)) ;;
+          esac
+        fi
       fi
       ;;
     "?")
@@ -1220,6 +1478,18 @@ elif [ "$gated_fail" -gt 0 ]; then
   note "level: Structural -- $gated_fail finding(s) at Gated prevent Gated, the next level (see FAIL lines above)"
 elif [ "$attested_fail" -gt 0 ]; then
   note "level: Gated -- $attested_fail finding(s) at Attested prevent Attested, the next level (see FAIL lines above)"
+# The HOLD rungs (SPRINT-078 T1). A held finding prevents its level without being a failure, so it
+# cannot be read off the FAIL lines and it does not move the exit code -- which is exactly why the
+# ladder has to consult it explicitly. `attestation-unsigned-claim-only` is the case: skip these three
+# branches and the report certifies Attested over an attestation nobody signed. Ordered AFTER the
+# failure rungs because a failure is the stronger statement about the same level; ordered by level for
+# the same reason the failure rungs are.
+elif [ "$struct_hold" -gt 0 ]; then
+  note "level: none -- Structural not yet reached. $struct_hold finding(s) at Structural prevent it. None is a failure: each names a level honestly reached and not exceeded, so the exit code stands (§14)"
+elif [ "$gated_hold" -gt 0 ]; then
+  note "level: Structural -- $gated_hold finding(s) at Gated prevent Gated, the next level. None is a failure: each names a level honestly reached and not exceeded, so the exit code stands (§14)"
+elif [ "$attested_hold" -gt 0 ]; then
+  note "level: Gated -- $attested_hold finding(s) at Attested prevent Attested, the next level. None is a failure: each names a level honestly reached and not exceeded, so the exit code stands (§14)"
 else
   # "No finding at any level" and "every rule passed" are not the same statement, and the second one
   # is the dangerous paraphrase: a run where every dispatched rule reported without a verdict has no

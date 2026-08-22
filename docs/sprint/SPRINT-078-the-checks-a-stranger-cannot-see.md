@@ -35,7 +35,10 @@ section, so it does not move silently.
 ## Plan
 
 ### T1 — Migrate §13's attestation checks into the engine `[size: M · risk: med · class: execution · HITL]`
-Layers: scripts/lib/conformance-engine.sh · scripts/lib/check-attestation.sh · scripts/qa-check.sh · evals/run-attestation-fixtures.sh · docs/research/conformance-dispositions.md
+Layers: `scripts/lib/conformance-engine.sh` · `scripts/lib/check-attestation.sh` (deleted) ·
+        `scripts/qa-check.sh` · `evals/run-attestation-fixtures.sh` ·
+        `evals/run-spec-reader-fixtures.sh` · `docs/research/conformance-dispositions.md` ·
+        `docs/QA.md` · `TECH-DEBT.md`
 Depends-on: none
 Cites: spec/STANDARD.md §13 Conformance table · `conformance.sh` (the consumer entry point — read, not modified) · `S13.NOINFER` · `S13.NOTAUTHOR` (excluded by Mark; demonstrated, never asserted) · docs/research/conformance-dispositions.md § build · SPRINT-075 T4 (the `gates_signed` migration precedent)
 The checks exist and are guarded; what is missing is reach. Migrating them the way `gates_signed` moved
@@ -47,15 +50,15 @@ five §13 findings, and their text is byte-identical to what `check-attestation.
 repository.
 
 **DoD:**
-- [ ] The engine answers §13's five rules, dispatched from §13's Conformance table at runtime — *Verify: `sh conformance.sh <foreign-repo>` names all five findings*
-- [ ] Finding text byte-identical to `check-attestation.sh`'s — *Verify: `diff` of both tools' output on one repo returns empty; diffed, never eyeballed*
-- [ ] `attestation-unsigned-claim-only` still reported at exit 0, not as a gate failure — *Verify: the run's own exit code is 0 with that finding present in its output*
-- [ ] Existing retained attestation fixtures pass unchanged — *Verify: `sh evals/run-attestation-fixtures.sh` verdict line (`N pass, M fail`; M is the verdict)*
-- [ ] `S13.NOINFER` / `S13.NOTAUTHOR` stay excluded by the spec's Mark column, not by a skip list — *Verify: re-mark one in a spec copy; engine behaviour changes with no code edit*
-- [ ] Register reconciles to 24 covered / 27 build / 11 scope-out = 62 — *Verify: re-derive by counting rule ids in each section table, never by editing the header*
+- [x] The engine answers §13's five rules, dispatched from §13's Conformance table at runtime — *Verify: `sh conformance.sh <foreign-repo>` names all five findings*
+- [x] Finding text byte-identical to `check-attestation.sh`'s — *Verify: `diff` of the text portion of both tools' §13 lines on one repo returns empty; diffed, never eyeballed. Corrected 2026-08-22 — the full outputs differ in scope and id padding and can never be equal (see Execution Log)*
+- [x] `attestation-unsigned-claim-only` still reported at exit 0, not as a gate failure — *Verify: the run's own exit code is 0 with that finding present in its output*
+- [x] Existing retained attestation fixtures pass unchanged — *Verify: `sh evals/run-attestation-fixtures.sh` verdict line (`N pass, M fail`; M is the verdict)*
+- [x] `S13.NOINFER` / `S13.NOTAUTHOR` stay excluded by the spec's Mark column, not by a skip list — *Verify: re-mark one in a spec copy; engine behaviour changes with no code edit*
+- [x] Register reconciles to 24 covered / 27 build / 11 scope-out = 62 — *Verify: re-derive by counting rule ids in each section table, never by editing the header*
 
 ### T2 — Cover §2/§6's tier doc-set family `[size: S · risk: low · class: execution · AFK]`
-Layers: scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh · docs/research/conformance-dispositions.md
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `docs/research/conformance-dispositions.md`
 Depends-on: T1
 Cites: spec/STANDARD.md §2 (the `Create ←` cells) · spec/STANDARD.md §6 Conformance table — `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` · `S6.MULTISVC` · docs/research/conformance-dispositions.md § build
 Five rules, one finding, one check — the register already dispositioned this as *the tier is a
@@ -66,7 +69,7 @@ becoming a hard-coded list that drifts from the table it copies.
 `tier-doc-set-incomplete` naming the missing file — and a conformant repo at that tier gets nothing.
 
 **DoD:**
-- [ ] One check answers `S2.F-TIER` · `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` · `S6.MULTISVC` — *Verify: the engine's own `coverage:` line moves 24 → 29*
+- [ ] One check answers `S2.F-TIER` · `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` · `S6.MULTISVC` — *Verify: the engine's own `coverage:` line moves 18 → 23 (corrected 2026-08-22 — see Execution Log)*
 - [ ] The required doc-set per tier is derived from §2's `Create ←` cells — *Verify: add a row to a spec copy; the required set changes with no code edit*
 - [ ] `tier-doc-set-incomplete` fires for each of the four tiers — *Verify: one retained must-FAIL fixture per tier, each asserting the finding string*
 - [ ] Each fixture reddens while a sibling control stays green — *Verify: run the harness with the seed applied and again without it*
@@ -74,7 +77,7 @@ becoming a hard-coded list that drifts from the table it copies.
 - [ ] Each seed's victim is derived, not hard-coded, and its existence asserted **before** removal — *Verify: the fixture fails loudly if the file was never there (L-146)*
 
 ### T3 — Cover §2's README ownership-footer rule `[size: S · risk: low · class: execution · AFK]`
-Layers: scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh · docs/research/conformance-dispositions.md
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `docs/research/conformance-dispositions.md`
 Depends-on: T2
 Cites: spec/STANDARD.md §2 (`S2.R-README`) · spec/STANDARD.md §3 (the ownership header) · `S3.README` (the scope-out this check must not contradict) · docs/research/conformance-dispositions.md § scope-out (a)
 One rule, one finding. Its trap is definitional rather than mechanical: `S3.README` is scoped out
@@ -85,7 +88,7 @@ disagree and turn a scope-out into a silent gap.
 `readme-ownership-footer-missing`; one whose README carries §3's header gets nothing.
 
 **DoD:**
-- [ ] `S2.R-README` answered, firing `readme-ownership-footer-missing` — *Verify: the engine's `coverage:` line moves 29 → 30*
+- [ ] `S2.R-README` answered, firing `readme-ownership-footer-missing` — *Verify: the engine's `coverage:` line moves 23 → 24 (corrected 2026-08-22 — see Execution Log)*
 - [ ] The required shape is §3's ownership header, read from §3 — *Verify: `S3.README`'s scope-out reason (*restates a rule checked elsewhere*) still holds with the check in place*
 - [ ] Retained must-FAIL fixture + a PASS control — *Verify: harness verdict line, control green while the fixture reddens*
 
@@ -130,6 +133,15 @@ disagree and turn a scope-out into a silent gap.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/conformance-engine.sh` | T1 | +§13's five assertions, dispatched from the spec's own table; new `--rev`; new `hold` verdict class + three ladder rungs, without which the single level line would certify Attested over an unsigned attestation | med | `run-attestation-fixtures.sh` 17/0 · seeded `hold`→`note` reddened exactly 3 cases, 14 controls green |
+| `scripts/lib/check-attestation.sh` | T1 | **deleted** — its rule set was already the spec's and its bodies moved verbatim; keeping it would leave two implementations of one rule set to hold byte-identical forever (D2, gates-signed precedent) | med | finding text diffed against the engine's §13 lines before removal — empty |
+| `scripts/qa-check.sh` | T1 | 2f-bis stops invoking the deleted checker; 2f-ter pulls §13's verdict lines out of the one engine run into this gate's tally, so the gating that existed yesterday still exists | med | gate verdict line |
+| `evals/run-attestation-fixtures.sh` | T1 | repointed at the engine with an awk-derived §13-only `--spec`; `att()` forwards trailing args so cases 7–9 still override the spec; two expectations updated with reasons recorded | low | 17 pass, 0 fail |
+| `evals/run-spec-reader-fixtures.sh` | T1 | comment named the deleted checker as this reader's consumer; it is the engine now | low | all green |
+| `docs/research/conformance-dispositions.md` | T1 | §13's five moved `build`→Covered; counts re-derived by counting ids (24/27/11=62); the *"19 + 32 + 11 = 62, which is what conformance.sh reports"* phrasing that seeded three bad DoD rows replaced with what the tool actually prints | low | ids counted per section table, cross-checked against the engine's 18+44=62 |
+| `docs/QA.md` | T1 | the §13 row described a file that no longer exists; rewritten for the engine, incl. the `hold` and GAP semantics an adopter now sees | low | — |
+| `TECH-DEBT.md` | T1 | TD-065 resolved — the register no longer understates coverage by five | low | counts re-derived, not read off a header |
+| `docs/sprint/logs/SPRINT-078-…md` | T1 | created lazily at the first entry (two `scope-change` records) | low | — |
 
 ## Retro
 

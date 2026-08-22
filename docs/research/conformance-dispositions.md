@@ -17,25 +17,34 @@ an undifferentiated middle. Rule ids are `spec/STANDARD.md` §14's; that file is
 the register. Split from `conformance-baseline.md` under §2's growth rule — split, never squeeze (L-131).
 
 **Counts, re-derived from the section tables and reconciled against the engine — never copied forward.**
-100 candidates · **100 classified** · **62 checkable** · **19 covered** · **43 dispositioned here — 32
-`build`, 11 `scope-out`**. Reconciled mechanically, not by eye: 19 + 32 + 11 = **62**, which is what
-`conformance.sh` reports, and no checkable rule is left without a disposition.
+100 candidates · **100 classified** · **62 checkable** · **24 covered** · **38 dispositioned here — 27
+`build`, 11 `scope-out`**. Reconciled mechanically, not by eye: 24 + 27 + 11 = **62**, and no checkable
+rule is left without a disposition.
+
+**What `conformance.sh` reports, and what it does not.** 62 is the figure it prints — its `coverage:`
+line publishes two counts summing to it. **24 is not one of them.** That line counts rules with an
+assertion *in the engine* and reads **18**; the six-rule difference is the four checkers that still
+live outside it (`check-doc-caps.sh` ×3 · `check-ephemeral-intake.sh` · `check-epic-archive.sh` ·
+`check-research-archive.sh`). Written out because the earlier phrasing here — *"19 + 32 + 11 = 62,
+which is what `conformance.sh` reports"* — reads as if the covered count were the reported one, and
+SPRINT-078 promoted three DoD rows built on exactly that misreading (Execution Log, 2026-08-22). Two
+numbers, two questions: **how many rules the standard makes checkable** (62, whoever checks them) and
+**how many this engine answers** (18, and climbing as the outboard checkers migrate).
 **Superseded figures removed at SPRINT-078's promote:** this block read *63 checkable · 12 covered · 39
 build · 12 scope-out* for two sprints after the tables below had moved past it — a second SSOT drifting
 from the rows it copied, which is the failure the header itself warns about. Per-sprint provenance for
 every move lives in the section tables, the sprint archive and git, and is not restated here.
 
-**One divergence left standing, named rather than silently repaired.** SPRINT-074 shipped
-`check-attestation.sh` covering §13's five `build` rules, and § Covered today never gained that row —
-so this register still counts those five under `build`. That predates SPRINT-075 and is not this
-sprint's to fix on the way past: correcting it moves numbers three sections of this file depend on,
-which is a reconciliation pass, not a footnote. Flagged here so the next reader can tell a known gap
-from an oversight.
+**The §13 divergence is closed (SPRINT-078 T1), not merely re-described.** SPRINT-074 shipped
+`check-attestation.sh` covering §13's five `build` rules and § Covered today never gained the row, so
+for four sprints this register understated coverage by five and said so in a standing footnote
+(TD-065). T1 migrated those five into the engine and moved the row, which is what let the counts above
+close: 19 → 24 covered, 32 → 27 `build`.
 
 **Stated as counts, never as a ratio (EPIC-004 D1).** There is no percentage here and there must not be
 one: a ratio would improve every time the standard declines to automate something.
 
-## Covered today (19 rules, 5 checkers)
+## Covered today (24 rules, 5 checkers)
 
 | Rule | Checker |
 |---|---|
@@ -45,8 +54,35 @@ one: a ratio would improve every time the standard declines to automate somethin
 | `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` | `conformance-engine.sh` *(SPRINT-075 T6 — the engine's first NEW coverage; five published findings, one retained must-FAIL fixture each)* |
 | `S4.ONEFILE` · `S4.APPEND` · `S4.INDEX` · `S4.SECTIONS` · `S4.NEGATIVE` | `conformance-engine.sh` *(SPRINT-076 T2 — the §4 ADR family; five published findings, one retained must-FAIL fixture each plus a PASS control. `S4.APPEND` is the family's only Gated rule and the engine's first to read git history rather than the tree)* |
 | `S2.F-FILE` · `S2.R-PLACEMENT` | `conformance-engine.sh` *(SPRINT-076 T3 — §2's placement pair, chosen because it is the likeliest artefact source. The required set is derived from §2's own `Create ←` cells, never hard-coded. **See § Artefacts** — the 4 it produced against a generic repo were fixed at the spec by SPRINT-077 T1, and the count is now 0)*
+| `S13.TRAILERS` · `S13.OWNCOMMIT` · `S13.EVIDENCESHA` · `S13.AGREE` · `S13.UNSIGNEDCLAIM` | `conformance-engine.sh` *(SPRINT-078 T1 — migrated off the deleted `check-attestation.sh`, findings byte-identical, verified by diff before the old file was removed. The five retained must-FAIL fixtures moved with them. `S13.UNSIGNEDCLAIM` is the engine's only `hold`: it prevents Attested without failing, which the level ladder had to learn in order not to certify an unsigned attestation)*|
 | `S11.EPIC` | `check-epic-archive.sh` |
 | `S11.RESEARCH` | `check-research-archive.sh` |
+
+**§13's five findings, and the two rulings worth reading before adopting them.** Names published at
+SPRINT-074 T2 (TASK-228), emitted by `scripts/lib/conformance-engine.sh` since SPRINT-078 T1, each with
+a retained must-FAIL fixture in `evals/run-attestation-fixtures.sh`:
+`attestation-trailers-incomplete` · `attestation-not-on-task-commit` · `evidence-path-unpinned` ·
+`attestation-disagrees-with-sprint` · `attestation-unsigned-claim-only`.
+
+- **`attestation-unsigned-claim-only` is reported at exit 0**, not as a gate failure. §14 says a
+  conformant report states a *level* and the findings preventing the next one — an unsigned commit
+  carrying perfect trailers has genuinely reached **Gated** and genuinely has not reached Attested.
+  That is a level, not a defect, and its fixture asserts the engine's **output** rather than its
+  status, because status alone cannot tell "reported honestly" from "silently passed" (L-103). The
+  migration is where this stopped being free: the engine's single level ladder only ever demoted on
+  FAILs, so carrying the finding across as a plain note would have printed `level: Attested` over an
+  attestation nobody signed. Hence the `hold` class — prevents a level, never fails.
+- **`evidence-path-unpinned` is treated as preventing Attested**, though §13a words `@ <sha>` as
+  *strongly recommended* rather than required. Recorded as a ruling rather than defaulted into: the
+  register published it as a `build` rule, and §13's own worked example exists because a bare path in
+  the reference implementation would already be dead. An adopter clears it by adding the sha — which
+  is what keeps it out of the category §14 forbids.
+
+The engine reads §13's Conformance table for its **rule set and marks** at runtime; the assertion
+bodies are its own. `S13.NOINFER` and `S13.NOTAUTHOR` are never evaluated — they are
+`implementation-directed`, excluded by the spec's own Mark column rather than by a skip list the author
+had to remember, and a fixture proves that re-marking a rule in the spec changes behaviour with no code
+edit.
 
 
 ## Artefacts — where a covered rule says something a stranger cannot act on
@@ -80,7 +116,7 @@ vacuously (L-142).
 filename §2 owns; a stranger's `notes/design-notes.md` raises nothing. The cost is a near-miss it cannot
 see — `docs/architecture.md` is plausibly `docs/architecture/overview.md`, and only `S2.F-FILE` reports
 it, as an absence rather than a misplacement. A known limit, not a defect.
-## `build` — 32 rules, each with the finding its check will fire
+## `build` — 27 rules, each with the finding its check will fire
 
 A check specified without its finding name is a half-shipped gate (L-058). Every row ships with a
 **retained** must-FAIL fixture proving that exact string fires (TD-012).
@@ -111,32 +147,6 @@ A check specified without its finding name is a half-shipped gate (L-058). Every
 | `S12.BACKUPS` | `database-backup-committed` |
 | `S12.DESIGNSRC` | `design-source-committed` |
 | `S12.GENERATED` | `generated-artifact-committed` |
-| `S13.TRAILERS` | `attestation-trailers-incomplete` |
-| `S13.OWNCOMMIT` | `attestation-not-on-task-commit` |
-| `S13.EVIDENCESHA` | `evidence-path-unpinned` |
-| `S13.AGREE` | `attestation-disagrees-with-sprint` |
-| `S13.UNSIGNEDCLAIM` | `attestation-unsigned-claim-only` |
-
-**§13's five names were deferred to TASK-228 and are now published here** (SPRINT-074 T2). They are
-emitted by `scripts/lib/check-attestation.sh` and each has a retained must-FAIL fixture in
-`evals/run-attestation-fixtures.sh`. Two of them carry a ruling worth reading before adopting them:
-
-- **`attestation-unsigned-claim-only` is reported at exit 0**, not as a gate failure. §14 says a
-  conformant report states a *level* and the findings preventing the next one — an unsigned commit
-  carrying perfect trailers has genuinely reached **Gated** and genuinely has not reached Attested.
-  That is a level, not a defect, and its fixture asserts the checker's **output** rather than its
-  status, because status alone cannot tell "reported honestly" from "silently passed" (L-103).
-- **`evidence-path-unpinned` is treated as preventing Attested**, though §13a words `@ <sha>` as
-  *strongly recommended* rather than required. Recorded as a ruling rather than defaulted into: the
-  register published it as a `build` rule, and §13's own worked example exists because a bare path in
-  the reference implementation would already be dead. An adopter clears it by adding the sha — which
-  is what keeps it out of the category §14 forbids.
-
-The checker reads §13's Conformance table for its **rule set and marks** at runtime; the assertion
-bodies are its own. `S13.NOINFER` and `S13.NOTAUTHOR` are absent above and are never evaluated — they
-are `implementation-directed`, excluded by the spec's own Mark column rather than by a skip list the
-author had to remember, and a fixture proves that re-marking a rule in the spec changes the checker's
-behaviour with no code edit.
 
 ## `scope-out` — 11 checkable rules, each with its reason
 
@@ -161,9 +171,9 @@ repo's* rules.
 **`S2.R-GROWTH` was listed here and is not a scope-out at all** (SPRINT-076 T1). The spec marks it
 **`judgment-only`** — *which sections move is judged* — so it was never in the checkable set this
 section partitions, and counting it made § scope-out claim 12 where the engine sees 11. Corrected, the
-register reconciles **exactly** against the engine: 19 covered + 32 build + 11 scope-out = **62**
-checkable rules, which is what `conformance.sh` reports. Found the way every sighting of this class is
-found — by a second number disagreeing, not by re-reading the prose (L-108).
+register reconciles **exactly** against the engine's dispatchable set: 24 covered + 27 `build` +
+11 scope-out = **62** checkable rules (24 and 27 as of SPRINT-078 T1). Found the way every sighting of
+this class is found — by a second number disagreeing, not by re-reading the prose (L-108).
 
 **(c) No checkable rule falls here — recorded because the category was expected to be large and is
 empty.** The §12 content categories (`S12.LEGAL` · `S12.FINANCIAL` · `S12.PERSONAL` · `S12.PRODLOGS` ·
