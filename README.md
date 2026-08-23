@@ -345,13 +345,18 @@ Three things it will not do:
   printed**, so you may gate CI on it if you want to — but lean-flow ships no workflow file and owns no
   pipeline ([ADR-027](docs/adr/ADR-027-executable-code-becomes-consumer-facing.md)).
 
-**Two conventions you can set:** `--spec <path>` points it at your own vendored copy of the standard,
-and a `.conformance-roles` file (one role per line) declares the role vocabulary `owner:` is checked
-against — a declared file replaces the built-in default, so "only these roles" is sayable.
+**Three conventions you can set, all optional:** `--spec <path>` points it at your own vendored copy of
+the standard; `--rev <commit-ish>` chooses the commit §13's attestation rules read (default `HEAD`);
+and two declared files let a repository state facts the standard says are *judged*, not detected —
+`.conformance-roles` (one role per line) declares the role vocabulary `owner:` is checked against, and
+`.conformance-tier` (one token: `base` · `backend` · `medium` · `multi-service`) declares your §6 tier.
+A declared file replaces the built-in default, so "only these roles" is sayable. Undeclared, the tier
+rules still check **Base** — §6 makes that every dev repo's by trigger — and the rest tell you which
+fact is missing instead of guessing one.
 
-Coverage is growing: **6 of the standard's rules** have an assertion in the engine today, with the
-rest reported as gaps by name. That number is printed by every run, so it never has to be taken on
-trust — and it is the engine's own count, not the repo's wider checker set.
+Coverage is growing: **24 of the standard's 62 checkable rules** have an assertion in the engine today,
+with the rest reported as gaps by name. That number is printed by every run, so it never has to be taken
+on trust — and it is the engine's own count, not the repo's wider checker set.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
