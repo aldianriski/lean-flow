@@ -133,6 +133,14 @@ assert_absent "s9-dod-names-no-check-control-verify" "$d" "dod-criterion-names-n
 d="$work/verify-ok2"; mkdir -p "$d"; sprint_plan "$d" "" '- [x] a thing  ✓ proved by the run above'; sprint_log "$d"
 assert_absent "s9-dod-names-no-check-control-evidence" "$d" "dod-criterion-names-no-check"
 
+# The control the family was missing, and the reason the phantom shipped (SPRINT-080 T0): both
+# controls above hand the rule a Plan that HAS a ticked box, so neither could ever exercise the
+# zero-tick path. A freshly-promoted sprint has no ticks at all, and `$(grep ...)` matching nothing
+# inside a heredoc still yields one empty line -- so the rule reported an evidence-less criterion
+# against a Plan containing none. This case pins the state every sprint passes through.
+d="$work/verify-ok3"; mkdir -p "$d"; sprint_plan "$d" "" '- [ ] a thing not done yet'; sprint_log "$d"
+assert_absent "s9-dod-names-no-check-control-zero-ticks" "$d" "dod-criterion-names-no-check"
+
 # --- S9.PLANFROZEN: § Plan edited after the freeze with nothing accounting for it -----------------
 # Needs real history: the rule diffs § Plan at plan_commit against the working tree.
 d="$work/frozen"; mkdir -p "$d"

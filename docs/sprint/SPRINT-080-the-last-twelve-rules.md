@@ -178,7 +178,9 @@ this sprint says why.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| | | | | |
+| `scripts/lib/conformance-engine.sh` | T0 | Guard `S9.VERIFYCLAUSE` against the empty-heredoc phantom: read ticks into `$ticked`, `continue` when empty (WHY: an empty `$(...)` in a heredoc yields one empty line, so the rule fired on every unticked Plan and its note branch was dead code) | med | `run-sprint-family-fixtures.sh` 24/24 · discrimination vs unfixed engine |
+| `evals/run-sprint-family-fixtures.sh` | T0 | Add retained control `s9-dod-names-no-check-control-zero-ticks` (WHY: both existing controls hand the rule a ticked Plan, so neither could reach the zero-tick path that shipped the bug) | low | reddens on the unfixed engine, sibling stays green |
+| `docs/sprint/logs/SPRINT-080-the-last-twelve-rules.md` | T0 | Execution Log created lazily at first entry; baseline + two `scope-change` entries (WHY: ADR-014 · the frozen-Plan rule) | low | n/a |
 
 ## Retro
 

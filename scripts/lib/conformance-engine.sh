@@ -2034,6 +2034,17 @@ assert_S9_VERIFYCLAUSE() {
     # legitimately have none, and a false positive here is a false negative about the contract.
     # A TICKED box is different: the template requires `- [x] ... - <what proved it>`, so a claim of
     # done that names no evidence is checkable without judging whether a check exists.
+    # READ THE TICKS FIRST, AND SKIP THE PLAN WHEN THERE ARE NONE (SPRINT-080 T0).
+    # An empty command substitution inside a heredoc still yields ONE EMPTY LINE -- a `grep` matching
+    # nothing feeds the loop below a single "" rather than nothing at all. That phantom matches
+    # neither evidence form, so it fell through to `bad` and reported an evidence-less criterion on a
+    # Plan with ZERO ticked boxes -- every sprint between promote and its first tick. It also made the
+    # n_named==0 branch below unreachable, since `bad` returns before it: the branch written for
+    # exactly this case was dead code. Guarded here rather than inside the loop, because the loop
+    # cannot tell a real empty criterion from the phantom (L-058 -- a false positive here is a false
+    # negative about the contract).
+    ticked=$(grep '^- \[x\]' "$repo/$p" 2>/dev/null)
+    [ -n "$ticked" ] || continue
     while IFS= read -r line; do
       case "$line" in
         *'*Verify:'*) n_named=$((n_named + 1)); continue ;;
@@ -2042,7 +2053,7 @@ assert_S9_VERIFYCLAUSE() {
       crit=$(printf '%s' "$line" | cut -c7-96)
       bad "dod-criterion-names-no-check: $p -- ticked criterion names no evidence: \"$crit\". §9 wants a criterion to name how it was verified; a ticked box with neither a *Verify:* clause nor a stated proof is a claim with nothing behind it"
     done <<EOF
-$(grep '^- \[x\]' "$repo/$p" 2>/dev/null)
+$ticked
 EOF
   done
   [ "$last_bad" -eq 1 ] && return
