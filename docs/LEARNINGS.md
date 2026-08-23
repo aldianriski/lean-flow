@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-21
+last_updated: 2026-08-23
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -22,13 +22,45 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-141**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-150**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
 
 ---
+## L-150 [tags: process] [status: active]: **An expensive verification loop does not just cost its runtime — it deforms the work around it, and the detour costs more than the check.** `qa-check.sh` reached ~11 minutes this sprint. To avoid one cycle, SPRINT-078 committed T2 and T3 as a single `sprint(078) T2+T3` commit; `check-layers-observed.sh` attributes a commit to **exactly one** task and correctly reported it as attributable to none. Un-picking that — reconstructing the post-T2 state of six files from snapshots, hand-reverting the T3 doc edits, re-deriving the register to 29+22+11=62 rather than editing it to that — cost roughly **twice** the cycle it saved, plus two further full gate runs. **The cheap path existed the entire time and went unused.** Every leg of that 11-minute gate is a standalone script: `check-layers-observed.sh` answers the exact question in **4 seconds**. The aggregate gate was treated as the only way to verify anything, so the unit of verification became the slowest thing available, and the response to a slow unit was to batch — which is what made the failure expensive rather than cheap. **Two rules follow.** Iterate against the *specific* check and run the aggregate once, at the end; and when a verification step gets slow enough that you start routing around it, treat the routing itself as the signal — the batching impulse is a measurement of the check's cost, arriving before anyone thinks to time it.
+- seen: Sprint-078 (T2+T3 batched into one commit; ~11 min saved, ~25 min spent splitting it back)
+- count: 1
+- promoted: no
+- related: L-147 (nothing measures the assertion that made the gate slow) · TD-071 (the standing row for the gate's cost) · L-120 (read the verdict the gate prints — which is what the standalone leg gives you in 4s)
+
+---
+
+## L-149 [tags: process] [status: active]: **A commit message's last paragraph is trailer territory, so any `Token: value` line there is a machine-readable CLAIM, not a note about the work.** SPRINT-078 T1 shipped the §13 attestation family into the conformance engine and wired its verdict lines into `qa-check.sh`'s tally. Its own commit message closed with a status line reading `Gate: 164 pass, 0 fail.` — which git parses as a **trailer**. §13a requires `Gate:`, `Gate-Signed-By:` and `Evidence:` *together*, precisely because a `Gate:` alone asserts that a gate applied and declines to say who approved it, which is weaker than saying nothing. So the commit claimed an attestation it could not support, and the very check it was shipping caught it on the next gate run: `attestation-trailers-incomplete: missing Gate-Signed-By: Evidence:`. **The catch is the evidence, not the embarrassment.** Those five rules had fixture coverage since SPRINT-074 and had never fired on this repository — `conformance.sh` could not reach them, and the gate's attestation leg had only ever seen clean commits. The first thing the migration did was fail a live commit. Had T1 migrated the assertions and skipped the gate wiring — the half most easily waved through as "just a migration" — this would have passed. **Fixed by amending rather than fixing forward**: §13 reads HEAD, so a later commit turns the gate green while leaving a false attestation in history, which is the theatre §13 exists to prevent; green-because-we-moved-past-it is not fixed. **The general shape: a repository that adds a rule about its own commit metadata has made its commit messages executable, and the habit of ending with a summary line is now a source of assertions.**
+- seen: Sprint-078 (T1's own commit, caught by T1's own check on the next gate run)
+- count: 1
+- promoted: no
+- related: L-058 (the named-finding bar this accidentally satisfied on real input) · L-103 (assert the output, not the status)
+
+---
+
+## L-148 [tags: sprint-model] [status: active]: **A declaration is only as good as its consumer's parser, and a declaration the parser cannot read fails GREEN — invisibly, until the first file changes.** SPRINT-078's three `Layers:` lines were promoted without backticks. `check-layers-observed.sh` reads declared tokens with `grep -oE '` + "`" + `[^` + "`" + `]+` + "`" + `'` — **backtick-quoted only** — so the union of declared tokens was **empty**, and every file the sprint touched, *including the five the Plan explicitly named*, reported as `changed but undeclared`. SPRINT-077's lines are backticked; the correct shape was one directory away in the archive. **The timing is the whole lesson.** Between promote and the first edit there is nothing to compare, so a declaration guarding zero files is indistinguishable from one guarding everything: the check passes, the sprint file looks complete, and the defect is latent by construction. It surfaced only once T1 changed eight files at once — at which point it reads as eight failures rather than one malformed line. **Two rules follow.** A field a checker consumes should be rendered at promote in the form that checker reads, not in a form a human finds equivalent; and a reader that derives an **empty** set from a non-empty source must say so as a named finding rather than returning the empty set — which is L-058 applied to a checker's own input, one level in from where `read-spec-rules.sh` already applies it to the spec.
+- seen: Sprint-078 (promote; surfaced at T1's first gate run as eight false "undeclared" findings)
+- count: 1
+- promoted: no
+- related: L-058 (a reader returning nothing checks nothing) · L-100 · L-110 (both about `Layers:` drifting in content; this one is about it being unparseable) · L-108 (matched by shape, not substring — the sibling failure, in the other direction)
+
+---
+
+## L-147 [tags: tooling] [status: active]: **A rule promoted into prose next to the code it governs still does not fire — because nothing MEASURES the thing it protects, so the regression is invisible until a downstream check times out.** L-144 was promoted after two sightings of the same shape (a per-row process spawn blowing up a checker's wall clock). Its rule is written as a comment *directly above* the code SPRINT-078 T2 then violated, the engine's stated cost model is *"walk once, then filter"*, and the author had read that file closely enough to extend it — and the third sighting happened anyway: resolving each §2 row's tier rank from a `while read` loop took the engine **13s → 18s** on a four-file repository, which across ~60 gate invocations pushed `qa-check.sh` from ~5 minutes to over ten and killed two runs. **What is missing is not another sentence.** L-144's own text names the diagnostic that works — *time each rule family in isolation against a tiny input* — but a diagnostic is a technique someone must think to run, and nobody runs it while adding an assertion that looks obviously cheap. There is no check that times a new assertion against the previous engine, so the cost lands with **no signal at the point of authorship** and surfaces as a timeout several tasks downstream, where it reads as "the gate got slow" rather than "T2 did this". **The general shape: when a promoted rule keeps recurring, the placement is not the problem — the absence of a measurement is.** A rule can only fire on someone who is already looking; a check fires on everyone. Placement (§10) answers *where do the people who can hit this read*; it has no answer for *what if they read it and it still does not bind*. That case needs a number, produced automatically, that changes when the rule is broken.
+- seen: Sprint-078 (T2, 13s → 18s; gate past its ten-minute ceiling, two runs killed)
+- count: 1
+- promoted: no
+- related: L-144 (the walk-once rule this failed to enforce — now count 3, promoted, and still recurring) · TD-071 (the gate's cost scaling, filed this sprint)
+
+---
+
 ## L-146 [tags: tooling] [status: active]: **A retained must-FAIL fixture can decay into a vacuous pass without anyone touching it — when the value it hard-codes stops meaning what it meant, the seed removes nothing and the guard confirms nothing.** SPRINT-077 T1 reclassified `TODO.md` in `spec/STANDARD.md` §2 from unconditional to substrate-conditional. `evals/run-s2-placement-fixtures.sh` built a conformant repo from the spec's *derived* unconditional set, then removed a **hard-coded** `TODO.md` to prove `core-file-missing` fires. After the reclassification `build_conformant` no longer created that file, so `rm -f` deleted nothing — and the seed's own guard, `[ -e "$miss/TODO.md" ] && fail`, **passed because the file had never existed**. The case ran, asserted, and proved nothing. It surfaced only because the engine then reported no finding and the *assertion* failed loudly; had the assertion been a shape a missing file could still satisfy, this would have been a silent false-negative in a gate, which is L-058's worst case arriving by decay rather than by authoring. **L-142's promoted rule does not reach this and that is the point:** it guards the moment a break is *seeded* — parse, targeted, reddens-while-a-sibling-stays-green — and this seed was authored correctly and passed all three when written. The decay happened later, in a different file, in a commit whose author had no reason to look at a fixture harness. **Two rules follow.** First, a fixture that depends on a value the spec owns must **derive** it, never restate it — the victim here is now `printf '%s\n' "$REQ" | head -1`, so a reclassification moves the fixture with the spec instead of past it. Second, an existence guard must assert the **transition**, not the end state: `[ -f X ] || fail` *before* removing, as well as `[ -e X ] && fail` after — "it is gone" is satisfied by "it was never there", and only the pair distinguishes them. **The general shape: a guard that checks a postcondition a no-op also satisfies is not a guard**, and retained fixtures are exactly where that goes unnoticed, because nothing re-verifies them on the schedule the things they watch actually change.
 - seen: Sprint-077 (T1, `run-s2-placement-fixtures.sh` seeding a file its own builder had stopped creating)
 - count: 1
@@ -45,10 +77,10 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 ---
 
 ## L-144 [tags: tooling] [status: promoted]: **When a check is slow, the dominant term is usually the number of PROCESSES it starts, not the amount of work it does — so the fix is to walk once and decide in one pass.** SPRINT-076 T3 added a rule that ran a full `find` per spec row whose canonical path was absent. Against a **four-file** fixture directory every one of ~31 rows is absent, so a single engine run walked the tree 31 times: **29 seconds, against ~1 second before**. The gate invokes the engine ~50 times across its harnesses, so it went from ~4 minutes to over ten and two runs were killed before printing a tally. Caching the walk fixed only half of it (29s → 18s) because the per-row test still spent a subshell plus two greps — **~124 process spawns to examine four files**. Rewriting it as one `awk` pass over (rows × cached file list), with existence tested as *membership in the list* rather than a `stat` per row, took it to 9.6s. **The diagnostic that mattered was timing each rule family in isolation against a tiny input**: `S1` 808ms · `S3` 912ms · `S4` 1,396ms · **`S2` 11,253ms**. One family held 55% of the cost, and a tiny input is what makes that visible — on a large repo the real work masks the overhead. Second sighting of the identical shape (SPRINT-075's ownership family spawned ~2,800 awk processes and was fixed the same way), which is what makes it a rule rather than an anecdote.
-- seen: Sprint-075 (ownership family, ~2,800 awk processes) · Sprint-076 (T3/T5, a `find` per spec row; gate stopped finishing)
-- count: 2
-- promoted: yes → TECH-DEBT.md TD-066
-- related: TD-066 (the standing row for this engine's cost) · L-108 (measure, then act on the number)
+- seen: Sprint-075 (ownership family, ~2,800 awk processes) · Sprint-076 (T3/T5, a `find` per spec row; gate stopped finishing) · Sprint-078 (T2, tier rank resolved per row in a shell loop; 13s → 18s, gate past ten minutes — the THIRD sighting, and the first AFTER promotion)
+- count: 3
+- promoted: yes → TECH-DEBT.md TD-066 — **and it recurred anyway (Sprint-078).** The rule is prose beside the code it governs; what is missing is a measurement, not a placement → L-147
+- related: TD-066 (the standing row for this engine's cost) · L-108 (measure, then act on the number) · L-147 (why a promoted rule keeps recurring: nothing measures it)
 
 ---
 

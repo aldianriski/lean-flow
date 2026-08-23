@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-21
+last_updated: 2026-08-23
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -49,6 +49,14 @@ status: current
 > listing **14** ids. The list was right and the count was wrong — recorded here rather than silently
 > repaired, since a census that miscounts its own enumeration is the failure L-108 tracks, and this one
 > survived a full sprint unread.
+>
+> **Close-time reconciliation — SPRINT-078 close (2026-08-23).** The sweep above is a *promote-time*
+> record and is left as written; the file has moved since. **TD-065 resolved** (T1 migrated §13 into
+> the engine, which is what let the register's counts close), and **TD-071** (the gate's cost scaling
+> with coverage) and **TD-072** (two readers for one §3 footer shape) were filed at this close. The
+> ledger now holds **23 rows — 20 open, 3 not-open** (TD-048 · TD-057 accepted at promote, TD-065
+> resolved this sprint). Recorded here rather than by editing the sweep, so the next promote ages
+> against a census that matches the file instead of re-deriving one that does not.
 
 - **TD-064** severity: minor | status: open | created: Sprint-075 | updated: Sprint-076
   - Summary: **~~28~~ 16 of this repo's own docs fail the ownership-header rules the engine checks** —
@@ -185,8 +193,56 @@ status: current
     out of the capped file. **Decide before the next coverage sprint** — each one adds rows to both.
   - Sibling: **TD-059**, whose re-review first recorded the register's breach, but whose subject is
     the non-recursive cap glob rather than these files. Curing either moves neither.
+- **TD-071** severity: minor | status: open | created: Sprint-078
+  - Summary: **`qa-check.sh`'s cost scales with the coverage EPIC-004 exists to add.** The gate reaches
+    **78 engine invocation sites** across its harnesses, and **16 of them hand the engine the full
+    `spec/STANDARD.md`** — dispatching all 62 rules against a fixture directory that cares about two or
+    three. Every rule the epic covers therefore multiplies across those sixteen. The gate ran ~5
+    minutes before this sprint and ~11.5 minutes after it (696s · 707s measured), and two runs were
+    killed at a ten-minute ceiling mid-sprint.
+  - Evidence: counted statically, then confirmed against wall clock. `run-conformance-engine-fixtures.sh`
+    30 invocations (16 full spec, 11 reduced) · `run-ownership-header-fixtures.sh` 15 (all reduced) ·
+    `run-adr-family-fixtures.sh` 13 (all reduced) · `run-attestation-fixtures.sh` 13 (all reduced since
+    SPRINT-078 T1) · `run-gates-signed-fixtures.sh` 8 (all reduced) · others 9. Four harnesses already
+    solve this with an awk-derived per-family reduced spec; the pattern is established and simply has
+    not been applied to the largest one.
+  - Impact: the direction is what makes it debt rather than a fact. A gate that gets slower in
+    proportion to coverage penalises the epic's own goal, and an 11-minute pre-commit check gets routed
+    around — SPRINT-078 batched two tasks into one commit to avoid one cycle and paid roughly twice
+    that un-picking the result (L-150). The routing is the cost, not the runtime.
+  - Mitigation (hypothesis, not a plan): reduce the ~14 family cases in
+    `run-conformance-engine-fixtures.sh` to per-family specs — two of the sixteen genuinely need the
+    full sweep (`rule-unimplemented-is-named` and `gap-is-labelled-gap-and-does-not-set-exit` are
+    *about* it) — and consider a `QA_FAST=1` tier so the pre-commit gate is not the same cost as the
+    pre-close one. Deliberately not done inside SPRINT-078: it touches cases that sprint did not write,
+    and changing them while adding coverage makes "slow suite" and "changed suite" indistinguishable.
+  - Sibling: **TD-066** is this engine's standing cost row and **L-144** its promoted rule (now count 3).
+    Distinct subject: TD-066/L-144 are about a *single run* being slow; this is about the *number* of
+    runs and the breadth each one sweeps. Fixing either moves the other, neither cures it. Related:
+    **L-147** (nothing measures a new assertion's cost) · **L-150** (the routing-around).
+
+- **TD-072** severity: trivial | status: open | created: Sprint-078
+  - Summary: **The §3 ownership footer is now read two ways, and only one of them is spec-derived.**
+    SPRINT-078 T3's `assert_S2_R_README` parses the required field labels out of §3's own `<sub>`
+    example at runtime, so re-wording §3 moves the check with it (fixture-proven). The older sibling
+    `assert_S3_AGENTS` still matches a **hard-coded** pattern,
+    `^<sub>.*[Dd]oc owner:.*status:.*</sub>` — the same footer, a different and frozen idea of its
+    shape.
+  - Evidence: both live in `scripts/lib/conformance-engine.sh`. A second, smaller instance of the same
+    family: `_att_fmv_stdin` (T1) and `_s9_gates_fmv` are the same frontmatter parse over different
+    sources — a git blob versus a file path — and the near-duplicate was written deliberately rather
+    than refactored, because T1's ruling (D2) made that task a *move* and a shared reader would have
+    been a *change*.
+  - Impact: trivial today — the two footer readers agree on the current §3 wording. The exposure is
+    that they cannot disagree *loudly*: re-word §3 and `S2.R-README` follows while `S3.AGENTS`
+    silently keeps checking the old shape, which is a spec/checker divergence of exactly the kind
+    `S3.README`'s scope-out was arranged to prevent.
+  - Mitigation (hypothesis, not a plan): give both rules one spec-derived footer reader; fold the two
+    frontmatter parses into one that takes its source as an argument. Both are small and neither
+    belongs on a coverage task.
+
 - **TD-070** severity: minor | status: open | created: Sprint-077
-  - Summary: **§2's file tables have three independent parsers, each hard-coding the same column
+  - Summary: **§2's file tables have FIVE independent parsers (three at filing, five since SPRINT-078), each hard-coding the same column
     offset, and nothing states the contract they share.** `scripts/lib/conformance-engine.sh`
     (`_s2_rows`, `cre = (pfx=="docs/") ? c[6] : c[5]`), `scripts/lib/check-doc-caps.sh`
     (`cap = (pfx=="docs/") ? c[5] : c[4]`) and `evals/run-s2-placement-fixtures.sh`
@@ -215,6 +271,22 @@ status: current
     match it three different ways, contract unstated) but a different subject; curing either moves
     neither. **TD-048** likewise. Related: **L-146**, the fixture that decayed to vacuous in this
     same family.
+  - **Grew to FIVE at SPRINT-078 (T2).** The tier family needed §2's Tier column, which no existing
+    parser emitted, so it added `_s2_tier_rows` to `scripts/lib/conformance-engine.sh` — a *fourth*
+    parser, in the same file as the first — and `base_tier_set` to
+    `evals/run-conformance-engine-fixtures.sh`, a *fifth*. Both re-derive the same rows with the same
+    hard-coded `c[6]`-vs-`c[5]` offset this row describes.
+  - The fifth one **immediately proved the row's point**, and cheaply: `base_tier_set` expanded §6's
+    `deployment/{deployment,rollback}-guide` with a `sed` that split on the comma alone, yielding
+    `deployment/deployment` and `rollback-guide`. That silently un-subtracted a substrate-conditional
+    row and put it back in the owed set. It surfaced only because the harness's answer disagreed with
+    the engine's `skipped not owed` line — two independent derivations of one table, caught by the
+    disagreement rather than by review (L-108). A shared reader would have had one expansion to get
+    right, and the fixture's independence — which is genuinely worth keeping, per the mitigation above
+    — should be independence of the *assertion*, not of the parse.
+  - Severity held at `minor` rather than escalated: nothing here is wrong today, and the extraction
+    still wants its own task rather than a rider on a coverage sprint. But the count is now five and
+    the growth is not slowing — each new rule family that needs a §2 column adds one.
 - **TD-066** severity: minor | status: open | created: Sprint-075
   - Summary: **the conformance engine takes ~47s on this repository, and the cost is process spawn.**
     The §1/§3 assertions read 236 docs; the implementation is one cached tree walk plus one `awk` per

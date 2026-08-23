@@ -3,8 +3,8 @@ sprint: 078
 slug: the-checks-a-stranger-cannot-see
 epic: EPIC-004
 owner: Maintainer
-last_updated: 2026-08-21
-status: active
+last_updated: 2026-08-23
+status: closed
 plan_commit: d9ec0ce
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -154,4 +154,60 @@ disagree and turn a scope-out into a silent gap.
 ## Retro
 
 <!-- Written at close. Route the buckets to durable homes (STANDARD §10):
-     shipped → CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md. -->
+## Retro
+
+**Routed** — Shipped → `CHANGELOG.md` **v1.52.0** · Tech debt → **TD-071** (the gate's cost scaling
+with coverage) · **TD-072** (two readers for one §3 footer shape); **TD-070 extended** three → five §2
+parsers, **TD-065 resolved** · Follow-ups → **TASK-255** (§2 owes Multi-service's three docs) ·
+**TASK-256** (`DECISIONS.md` addressable) · Learnings → **L-147** · **L-148** · **L-149** · **L-150**,
+and **L-144 bumped to count 3**.
+
+**Retrieval check** — no prior `L-NNN` or ADR was contradicted, and one was *found and still missed*:
+**L-144** is promoted, its rule is a comment directly above the code T2 violated, and the regression
+happened anyway. That is not a retrieval miss — it is a **binding** miss, and it is why L-147 exists.
+The retrieval that did work: `assert_S2_F_FILE`'s own comment settled T2's central design question
+(the engine may not infer a tier) before it was asked, and the `gates_signed` precedent gave T1 its
+whole shape.
+
+**Cost** — inline, single context, **no sub-agents dispatched** (standing instruction). Roughly one
+working session end to end, and the shape is the finding: about two-thirds of elapsed time was spent
+*waiting on this repo's own verification* — six full `qa-check.sh` runs at 5–12 min (two killed at a
+ten-minute ceiling), five `run-conformance-engine-fixtures.sh` runs at 4–6 min, ~25 engine runs at
+11–66s. Authoring, reading and editing were the minority term. Cost per unit **delivered**: 3 tasks,
+15 DoD, 11 rules covered, 14 retained fixtures.
+
+**Worked**
+- **Migrating beat building.** T1 moved five existing assertions and bought more coverage per line of
+  new assertion code than anything else in the backlog — and the migration's *wiring* half, the part
+  most easily waved through, is what caught a live violation on its first run.
+- **Seeding every green suite.** Four seeds, three of which reddened exactly the cases carrying their
+  claim while siblings stayed green; the fourth was **rejected by its own guards** for rewriting three
+  lines. The L-146 guard was itself tested by seeding `write_base_tier` to a no-op — and the fixture
+  beneath it still reported PASS, which is the failure L-146 describes, reproduced live.
+- **The second number, every time.** Three findings this sprint were caught only by a disagreeing
+  count: the engine's 13 vs the register's 19 (which invalidated three DoD), the harness's brace
+  expansion vs the engine's `skipped not owed` line, and a row-wide id match returning 63 against the
+  engine's 62.
+- **Asking at the frontier.** Two popup rounds carried six decisions; every one of them changed what
+  was built. A4's failure surfaced *at the gate*, before code, which is the only place it was cheap.
+
+**Friction**
+- **The Plan's frozen text was wrong four times** — three DoD verify-methods and A4 — all the L-130
+  family, all authored at promote by someone who could not yet run the query. Each cost a
+  `scope-change` entry mid-flight.
+- **`Layers:` declared nothing** and failed green until the first file changed (→ L-148).
+- **An 11-minute gate deformed the work.** Batching T2+T3 into one commit to save one cycle cost
+  roughly twice that to un-pick (→ L-150, TD-071). The 4-second standalone checker existed all along.
+- **A perf regression shipped unnoticed** because nothing times a new assertion (→ L-147).
+- **Three tool-level own-goals** worth naming because they are avoidable: a ~14KB heredoc truncated
+  silently, `perl` failed twice on `$#`/`\Q…\E` (once reporting *"changed lines: 0"* — a false-success
+  shape), and the same padding off-by-one was fixed locally instead of centrally and promptly recurred.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **A rule that keeps recurring after promotion needs a measurement, not a better placement** — L-147,
+  filed. If it recurs a fourth time, the promotion mechanism itself is the subject, not the rule.
+- **A spec that names documents its own table does not carry** is now sighted twice in one sprint
+  (Multi-service's three docs; `DECISIONS.md` inside a pattern row). Not yet filed as a learning —
+  TASK-255 and TASK-256 fix the instances. If a third appears, the general shape is worth an `L-NNN`:
+  a cross-referencing standard can promise a doc set no checker can address, and the promise reads as
+  coverage.

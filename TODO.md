@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-21
+last_updated: 2026-08-23
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -18,7 +18,12 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-078 — The Checks a Stranger Cannot See** → docs/sprint/SPRINT-078-the-checks-a-stranger-cannot-see.md
+> _(none — SPRINT-078 closed 2026-08-23. **EPIC-004 stays open**: § Closed-when 2 has two halves and
+> this sprint did the coverage one (19 → 30 of 62 checkable rules). The other half is **TASK-254**, the
+> ruling on the 11 `scope-out` rules — a decision, not a build. Nine `state: ready` Backlog tasks are
+> promotable, of which **TASK-248 … TASK-252** are the remaining §9–§12 coverage slices and
+> **TASK-255 · TASK-256** are this close's follow-ups: two §2 gaps `S6.MULTISVC` and `S6.MEDIUM` ran
+> into and reported rather than guessed at.)_
 
 ---
 
@@ -29,6 +34,43 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-255 — Give §2 rows for Multi-service's three docs  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when:  `spec/STANDARD.md` §2's `docs/` tree carries a row for each doc §6's Multi-service
+                  row names — service registry · cross-service dependency map · global decisions index
+                  — with a Tier cell an engine can match, or §6 is amended to stop naming docs §2 does
+                  not carry. Either way `S6.MULTISVC` stops reporting `tier-doc-set-underivable` and
+                  starts answering the question §6 asks
+      touches:    spec/STANDARD.md (§2 · §6) · spec/CHANGELOG.md · scripts/lib/conformance-engine.sh
+                  (only if the finding changes) · docs/research/conformance-dispositions.md
+      depends-on: none
+      assumes:    **the gap is real and was verified two ways at SPRINT-078 T2** — a case-insensitive
+                  sweep of §2 for all three names returns nothing, and enumerating §2's distinct Tier
+                  cell values yields `base · backend/integration · backend, or overview cap-split ·
+                  medium+ · API exists · auth exists · DB exists · lean loop · as needed · ephemeral`,
+                  with no multi-service value. Re-derive at intake anyway; §2 may have moved
+      tracker:    SPRINT-078 T2 · its Execution Log § "A4 does not hold"
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-256 — Make §2's `DECISIONS.md` addressable by a checker  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  `docs/DECISIONS.md` is reachable from §2's table as a literal path, so `S6.MEDIUM`
+                  can assert it. Today the only row naming it is
+                  `` `adr/ADR-NNN-<slug>.md` + `DECISIONS.md` index (both under `docs/`) `` — a
+                  **pattern** row, and every §2 parser takes the File cell's first backticked token and
+                  discards rows containing `<`/`>`/`*`. So Medium's entire doc set reads as families
+                  and the tier reports "not evaluated" rather than checking anything
+      touches:    spec/STANDARD.md (§2 docs tree — likely splitting the row in two) · spec/CHANGELOG.md
+                  · docs/research/conformance-dispositions.md
+      depends-on: none
+      assumes:    splitting the row is preferable to teaching five parsers to read a second token —
+                  which is TD-070's subject and should not be pre-empted here. **Confirm at intake**:
+                  if TD-070's shared `read-spec-files.sh` lands first, this may be free
+      tracker:    SPRINT-078 T2 · the `S6.MEDIUM` family note
+      origin:     close-retro
+      state:      ready
 
 - [ ] TASK-245 — Decompose EPIC-004's remaining coverage rules into buildable tasks  [size: M] [risk: low] [HITL]
       class:      decision
@@ -51,34 +93,6 @@ status: current
                   that the bar stands · SPRINT-077 § Out (which names this as the next entry, and
                   names `/task-decomposer` rather than `promote` as the skill that runs it)
       origin:     close-retro
-      state:      ready
-
-- [ ] TASK-246 — Cover §2/§6's tier doc-set rules in the engine  [size: S] [risk: low] [AFK]
-      class:      execution
-      done-when:  conformance-engine.sh answers S2.F-TIER · S6.BASE · S6.BACKEND · S6.MEDIUM ·
-                  S6.MULTISVC, all firing the single finding `tier-doc-set-incomplete` — one check,
-                  the tier a parameter, never four checkers. Required doc-set per tier derived from
-                  §2's own table cells (the S2.F-FILE pattern), never hard-coded. One retained
-                  must-FAIL fixture per tier + a PASS control that stays green when the fixture reddens
-      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
-                  docs/research/conformance-dispositions.md (move 5 rows build → covered)
-      depends-on: none
-      assumes:    §6's Conformance block exists and is machine-readable (verified at intake, 2026-08-21)
-      tracker:    EPIC-004 § Closed-when 2 · dispositions § build
-      origin:     decomposer
-      state:      ready
-
-- [ ] TASK-247 — Cover §2's README ownership-footer rule in the engine  [size: S] [risk: low] [AFK]
-      class:      execution
-      done-when:  S2.R-README answered, firing `readme-ownership-footer-missing`; one retained
-                  must-FAIL fixture + a PASS control
-      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
-                  docs/research/conformance-dispositions.md
-      depends-on: none
-      assumes:    the footer's required shape is §3's ownership header, not a second definition —
-                  confirm against §3 before asserting, or the check contradicts S3.README's scope-out
-      tracker:    EPIC-004 § Closed-when 2 · dispositions § build
-      origin:     decomposer
       state:      ready
 
 - [ ] TASK-248 — Cover §9's sprint-file family in the engine  [size: M] [risk: med] [HITL]
@@ -154,29 +168,6 @@ status: current
                   repo is worse than no scan. The benign-lookalike control is the load-bearing fixture,
                   and how far the detection goes is a G2 design call, not settled at intake
       tracker:    EPIC-004 § Closed-when 2 · dispositions § build · dispositions § scope-out (c)
-      origin:     decomposer
-      state:      ready
-
-- [ ] TASK-253 — Migrate §13's attestation checks into the engine and reconcile the register  [size: M] [risk: med] [HITL]
-      class:      execution
-      done-when:  `conformance.sh` run against a repository that never installed lean-flow emits all
-                  five §13 findings — `attestation-trailers-incomplete` · `attestation-not-on-task-commit`
-                  · `evidence-path-unpinned` · `attestation-disagrees-with-sprint` ·
-                  `attestation-unsigned-claim-only` — **byte-identical** to check-attestation.sh's
-                  output (the SPRINT-075 T4 gates_signed pattern, diffed not eyeballed), with
-                  `attestation-unsigned-claim-only` still reported at exit 0; existing retained
-                  fixtures still pass; and the register's header reconciles to
-                  **24 covered / 27 build / 11 scope-out = 62**
-      touches:    scripts/lib/conformance-engine.sh · scripts/lib/check-attestation.sh ·
-                  scripts/qa-check.sh · evals/run-attestation-fixtures.sh ·
-                  docs/research/conformance-dispositions.md
-      depends-on: none
-      assumes:    these five are **already built and fixture-guarded** — this is a migration, not a
-                  build. Verified at intake: all five strings live in check-attestation.sh + its
-                  fixtures, but `conformance.sh` execs only conformance-engine.sh, so a stranger's
-                  report has never contained them. The register flags the count divergence itself and
-                  declined to repair it in passing; this task is that reconciliation
-      tracker:    EPIC-004 § Closed-when 2 · dispositions § "One divergence left standing" · SPRINT-074 T2
       origin:     decomposer
       state:      ready
 
@@ -276,7 +267,7 @@ status: current
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-077's shipped changes are written up as **v1.51.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand at close (all four manifests + README footer). **The spec DID move this time**, which is the difference from SPRINT-075's close: `spec/STANDARD.md` goes to **0.5.0** because §2 reclassifies four rows from unconditional to substrate-conditional — an existing adopter's report loses up to four `core-file-missing` findings and their level can move without their tree changing, which is the line PATCH is not allowed to cross (§2's own row names *reclassified* as a bump trigger). The plugin MINOR is for the same reason on the consumer side: what `conformance.sh` reports about a stranger's repository changes. §11's keep-current-plus-previous rule wants **v1.51.0 + v1.50.0** inline with **v1.49.0 rotated** → `docs/changelog/CHANGELOG-1.49.0.md` — part of the retention pass, applied on owner approval.
+_(no active sprint)_ — SPRINT-078's shipped changes are written up as **v1.52.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only). Coverage 19 → 30 of 62; `.conformance-tier` is the one new consumer-facing surface.
 
 ---
 
