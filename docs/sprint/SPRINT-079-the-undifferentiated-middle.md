@@ -87,9 +87,9 @@ stopped naming docs §2 does not carry.
 - [x] `conformance-dispositions.md` updated only if a disposition actually changed  ✓ **no disposition changed**, so the register is untouched — `S6.MULTISVC` was never dispositioned `build` or `scope-out`; it was a covered rule whose finding was about the standard. Counts still reconcile: 30 covered + 21 build = 51
 
 ### T3 — Make §2's `DECISIONS.md` addressable by a checker `[size: S · risk: low · class: execution · AFK]`
-Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/research/conformance-dispositions.md`
+Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/research/conformance-dispositions.md` · `evals/run-conformance-engine-fixtures.sh` · `docs/architecture/overview.md`
 Depends-on: T2
-Cites: SPRINT-078 T2's `S6.MEDIUM` family note · TD-070 (the shared `read-spec-files.sh` question) · §2's docs tree · `docs/DECISIONS.md` · `DECISIONS.md`
+Cites: SPRINT-078 T2's `S6.MEDIUM` family note · TD-070 (the shared `read-spec-files.sh` question) · §2's docs tree · `docs/DECISIONS.md` · `DECISIONS.md` · `scripts/lib/read-spec-files.sh` (TD-070's proposed extraction — checked for, does not exist)
 
 `docs/DECISIONS.md` is reachable only inside a **pattern** row — `` `adr/ADR-NNN-<slug>.md` + `DECISIONS.md` index `` — and every §2 parser takes the File cell's first backticked token and discards
 rows containing `<`/`>`/`*`. So Medium's whole doc set reads as families and the tier reports *not
@@ -99,10 +99,10 @@ evaluated* rather than checking anything.
 assert it.
 
 **DoD:**
-- [ ] **Confirm at intake whether TD-070's shared `read-spec-files.sh` has landed** — if it has, this may be free and the task shrinks or closes — *Verify: check the five parsers TD-070 names before editing the spec*
-- [ ] §2's row is split so `DECISIONS.md` stands as its own literal path (the assumed route — splitting the row beats teaching five parsers a second token, which is TD-070's subject and is not pre-empted here)
-- [ ] `S6.MEDIUM` evaluates rather than reporting *not evaluated* — *Verify: `sh conformance.sh .` shows the tier's doc set derived, with `DECISIONS.md` in it*
-- [ ] `spec/CHANGELOG.md` updated at the right level
+- [x] **Confirm at intake whether TD-070's shared `read-spec-files.sh` has landed** — if it has, this may be free and the task shrinks or closes — *Verify: check the five parsers TD-070 names before editing the spec*  ✓ **not landed** — TD-070 is `status: open` and `scripts/lib/read-spec-files.sh` is absent (checked for the file, not taken from the row). So T3 is not free and proceeds with the split
+- [x] §2's row is split so `DECISIONS.md` stands as its own literal path (the assumed route — splitting the row beats teaching five parsers a second token, which is TD-070's subject and is not pre-empted here)  ✓ split into a family row (`adr/ADR-NNN-<slug>.md`, which stays a family — §4 makes *no ADRs* correct, not incomplete) and a literal `DECISIONS.md` row. Column counts preserved, +1 line, both sites re-read
+- [x] `S6.MEDIUM` evaluates rather than reporting *not evaluated* — *Verify: `sh conformance.sh .` shows the tier's doc set derived, with `DECISIONS.md` in it*  ✓ **and it needed a second half the DoD did not name.** §2 says don't pre-create `DECISIONS.md` before the first entry, so a plain literal row would demand it from a Medium repo with no decisions — a false positive. §6's Medium row now marks it **substrate-conditional** (stem written extensionless, because `_tier_is_conditional` strips the extension — written `` `DECISIONS.md` `` it would silently never match). Scratch Medium repo: *cannot address* → *substrate-conditional, skipped not owed (§6): `docs/DECISIONS.md`*. Our own repo declares no tier, so `sh conformance.sh .` here shows only no-regression (FAIL 34 · GAP 27 · coverage 51) — L-016
+- [x] `spec/CHANGELOG.md` updated at the right level  ✓ spec **0.8.0 MINOR** on 0.5.0's test — a Medium adopter sees a doc set derived where none was, with `docs/DECISIONS.md` named in it. No rule added, so classification stays 100 and checkable stays 51
 
 ### T4 — Cover §9's sprint-file family in the engine `[size: M · risk: med · class: execution · HITL]`
 Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md`

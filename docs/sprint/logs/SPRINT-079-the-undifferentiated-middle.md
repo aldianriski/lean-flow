@@ -222,3 +222,93 @@ nothing to do with verification.
 **The rule that follows:** commit a task before starting the next one, even when its aggregate check is
 still running — the per-task legs are what gate the commit (owner ruling, this sprint), and the
 aggregate is a close-time step. Waiting on the aggregate is what made the trees overlap.
+
+### 2026-08-23 | progress | T3 — `DECISIONS.md` addressable, and gated so it cannot fire falsely
+
+**DoD 1 answered first, mechanically.** TD-070's shared `read-spec-files.sh` has **not** landed
+(`status: open`, and the file is absent), so T3 is not free and proceeds with the row split. Confirmed
+by checking for the file rather than taking the row's word for it.
+
+**The row is split, not rewritten.** `adr/ADR-NNN-<slug>.md` stays a family — §4 makes "no ADRs" correct
+rather than incomplete — and `DECISIONS.md` becomes its own literal path, which is what makes it
+addressable to all five §2 parsers.
+
+**The half that is not obvious: it had to be substrate-gated, or the fix would fire falsely.** §2 line
+216 says *don't pre-create `DECISIONS.md` … until the first real entry exists*, so a Medium repo that
+has taken no qualifying decision does not owe it. A plain literal row would have made `S6.MEDIUM`
+demand it from a correct repository. §6's Medium row now names it after the words
+**substrate-conditional** — the same mechanism `auth exists` and `DB exists` use — and the engine reads
+the stem from §6's own text with **no code change**, which is the spec-driven property holding.
+
+**One mechanical detail decided the wording.** `_tier_is_conditional` matches a stem against the path
+**extension-stripped** (`docs/DECISIONS.md` → `DECISIONS`), which is why every existing stem in §6 is
+extensionless. Written as `` `DECISIONS.md` `` the stem would never have matched and the gate would
+have fired anyway — the fix would have looked applied and done nothing (L-148's shape). Also: every
+backticked token *after* the phrase becomes a stem, so `adr/` and `flows/` stay before it.
+
+**Before / after on a scratch Medium repo** (our own declares no tier, so it cannot reach this branch):
+- **before** — *not evaluated: every §2 row at Medium names a FAMILY … §6's own doc set also names
+  `DECISIONS.md`, which §2 carries only inside a pattern row's File cell and this engine therefore
+  **cannot address***
+- **after** — *substrate-conditional, skipped not owed (§6): `docs/DECISIONS.md`* + *no unconditional
+  doc is owed at Medium once §6's substrate-conditional rows are set aside*
+
+The doc set is derived and `DECISIONS.md` is named in it. No regression on our own tree: FAIL 34,
+GAP 27, coverage 51, all unchanged.
+
+**A retained fixture replaced for the second time this sprint.** `tier-medium-family` asserted that
+*every* §2 row at Medium names a family — true only while the defect existed. It becomes
+`tier-medium-decisions-addressable`, which asserts **two** halves that can break independently: the
+engine names `docs/DECISIONS.md`, and it does **not** demand it from a repo with no decisions.
+
+### 2026-08-23 | surprise | `S4.INDEX` silently passes when the index is missing
+
+**Found while establishing whether the tier rule could safely set `DECISIONS.md` aside** — the whole
+substrate-conditional design rests on something else asserting the file, and it turned out nothing does.
+
+§4's Conformance row specifies `S4.INDEX` as *mechanical — `DECISIONS.md` **exists** and carries a row
+for every `docs/adr/ADR-NNN-<slug>.md`*. Against a scratch repo holding one ADR and **no** index, the
+engine emits **no `S4.INDEX` line at all**: not a PASS, not a FAIL, not a GAP. Add the index and it
+reports `PASS  S4.INDEX -- all 1 ADR(s) carry a row in docs/DECISIONS.md`. So the "carries a row"
+half is implemented and the **"exists" half is not**, and a repository with 28 ADRs and no index would
+be reported clean.
+
+**Why it went unseen:** every repository the check has ever run against — this one, and every fixture —
+already had a `DECISIONS.md`. The absent case was never exercised, which is exactly the silent
+false-negative L-058 exists to prevent, one level in from where it usually bites.
+
+**Not fixed here, and the reason is scope rather than convenience.** It is a defect in a *check*, not in
+the row T3 owns; fixing it means an engine assertion plus its own must-FAIL fixture, and T3's acceptance
+is met without it. **Filed for the close Retro as a `TD-NNN`**, and named in spec 0.8.0's entry so it is
+visible to a reader of the standard rather than only to us. It does not weaken T3: the tier rule setting
+`DECISIONS.md` aside is correct either way, and this makes the follow-up more valuable, not less.
+
+### 2026-08-23 | surprise | CORRECTION — `S4.INDEX` does not silently pass; my query was wrong
+
+**The entry above is wrong and is left standing, because the mistake is the more useful record.** It
+claimed `S4.INDEX` emits *no line at all* against a repo with ADRs and no index. It does emit one:
+
+```
+FAIL  decisions-index-missing-adr: no decision index found at docs/DECISIONS.md or DECISIONS.md
+```
+
+The existence half **is** implemented. I searched the output for `S4\.INDEX`, got nothing, and read
+that empty result as a fact about the engine rather than about my query — **L-108 exactly**, and the
+cross-check rule I had been citing all session: *a query whose result you act on immediately gets a
+second query that must agree.* I ran one query and wrote the conclusion into two durable artifacts
+(this log and spec 0.8.0's entry) before anything disagreed with it. The disagreement, when it came,
+came from reading the code — not from re-running the search.
+
+**There is still a real defect, and it is the thing that fooled me.** That FAIL line carries **no rule
+id**, while the same rule's PASS line does (`PASS S4.INDEX -- all 28 ADR(s) carry a row …`). Because a
+failing assertion returns before its PASS line, **a failing rule can be entirely un-attributable in the
+report.** An adopter reading `FAIL decisions-index-missing-adr: …` cannot tell which rule to look up,
+and neither could I.
+
+**Systemic, not local:** 23 of the engine's 54 `bad`/`ok` verdict lines name a finding without a rule
+id. The dispatch-loop lines carry `$pid`; the per-item lines inside assertions do not.
+
+**Scope ruling (owner: "fix it and continue, no defect left in sprint if still inline").** Fixed in this
+sprint as **T6**, added to the Plan by amendment. The spec 0.8.0 entry was corrected in place rather
+than appended to — it had not been committed, and publishing a claim known to be false would be worse
+than editing an unpublished block.

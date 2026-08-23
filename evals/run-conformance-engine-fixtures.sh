@@ -581,19 +581,29 @@ else
   echo "FAIL fixture(tier-below-not-owed): exit $rc -- output:"; printf '%s\n' "$out"; fail=1
 fi
 
-# --- Medium: rows exist and every one names a FAMILY ---------------------------------------------
+# --- Medium: DECISIONS.md is addressable, and substrate-gated so it cannot fire falsely ----------
+# SPRINT-079 T3 REPLACED the `tier-medium-family` case that lived here. It asserted that every §2 row
+# at Medium names a FAMILY -- true only while `DECISIONS.md` was reachable solely inside a pattern
+# row's File cell, which is the defect T3 fixed. Splitting that row gives Medium a LITERAL row, so
+# the old assertion is now false and the case would fail rather than decay quietly (L-146).
+# Two claims, because the fix has two halves that can break independently:
+#   (a) the engine ADDRESSES docs/DECISIONS.md -- it names it instead of saying it cannot;
+#   (b) it does NOT demand it from a Medium repo that has taken no qualifying decision. §2 says
+#       don't pre-create it before the first real entry, so an unconditional assertion here would be
+#       a false positive -- and a false positive is a false negative about the contract (L-108).
 t_med="$work/tier-medium"
 tier_repo "$t_med" medium
 out=$(sh "$engine" "$t_med" --spec "$spec" 2>&1); rc=$?
-if printf '%s\n' "$out" | grep -q 'S6.MEDIUM .*names a FAMILY' &&
+if printf '%s\n' "$out" | grep -q 'S6.MEDIUM .*substrate-conditional, skipped not owed.*docs/DECISIONS.md' &&
+   ! printf '%s\n' "$out" | grep -q 'S6.MEDIUM .*cannot address' &&
    ! printf '%s\n' "$out" | grep -q 'S6.MEDIUM .*tier-doc-set-incomplete' &&
    ! printf '%s\n' "$out" | grep -q 'S6.MEDIUM .*tier-doc-set-underivable'; then
-  echo "PASS fixture(tier-medium-family): Medium's rows are families -- reported as such, never as missing files, and never as a hole in the spec"
+  echo "PASS fixture(tier-medium-decisions-addressable): docs/DECISIONS.md is named and substrate-gated -- addressable, and not demanded of a repo with no decisions"
 else
-  echo "FAIL fixture(tier-medium-family): exit $rc -- output:"; printf '%s\n' "$out"; fail=1
+  echo "FAIL fixture(tier-medium-decisions-addressable): exit $rc -- output:"; printf '%s\n' "$out"; fail=1
 fi
-
 # --- Multi-service: §2 carries the tier's rows, so the finding is about the REPO ------------------
+
 # SPRINT-079 T2 REPLACED the case that used to live here. It asserted `tier-doc-set-underivable` --
 # "§6 names a doc set §2 carries not one row for" -- which was a finding about the STANDARD that no
 # adopter could ever clear. T2 closed that hole (two §2 rows + the rank-4 mapping the Tier cell had

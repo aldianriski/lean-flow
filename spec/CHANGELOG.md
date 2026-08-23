@@ -9,6 +9,39 @@ status: current
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
 
+## 0.8.0 — 2026-08-23
+
+**MINOR — `DECISIONS.md` becomes a §2 row a checker can address, and is substrate-gated so it cannot
+fire falsely.** §2 carried it only inside a **pattern** row —
+`` `adr/ADR-NNN-<slug>.md` + `DECISIONS.md` index (both under `docs/`) `` — and every §2 parser takes
+the File cell's first backticked token and discards rows containing `<`/`>`/`*`. So Medium's entire doc
+set read as families, and the tier reported *not evaluated … §2 carries it only inside a pattern row's
+File cell and this engine therefore cannot address it*.
+
+**The row is split, not rewritten.** `adr/ADR-NNN-<slug>.md` stays a family — a repo with no ADRs has
+taken no qualifying decision, which §4 makes correct rather than incomplete — and `DECISIONS.md` stands
+as its own literal path.
+
+**And §6 marks it substrate-conditional, which is the half that matters.** §2 says *don't pre-create
+`DECISIONS.md` … until the first real entry exists*, so a Medium repo that has taken no decision does
+not owe it. An unconditional row would have made the tier rule fire on a correct repository — a false
+positive, which is a false negative about the contract. Medium's row now names it after the words
+**substrate-conditional**, the same mechanism `auth exists` and `DB exists` already use, and the engine
+reads the stem from §6's own text with **no code change**.
+
+**Why MINOR on 0.5.0's test:** an adopter declaring `medium` sees a doc set derived where none was
+before, and `docs/DECISIONS.md` named in it. No rule is added — a §2 row is a parameter set, not a
+rule — so classification stands at **100** and checkable at **51**.
+
+**A defect found while doing this, and deliberately not fixed here.** When an assertion FAILS, its
+finding line does not name the rule that raised it. `S4.INDEX` against a repo holding ADRs and no
+index correctly reports `decisions-index-missing-adr: no decision index found …` — the check works —
+but the line carries no `S4.INDEX` prefix, while the same rule's PASS line does. Since a failing rule
+returns before its PASS line, **a failing rule can be entirely un-attributable in the report**. It is
+systemic rather than local: 23 of the engine's 54 verdict lines name a finding without its rule id.
+Reported rather than absorbed, because it is a defect in the report's shape and not in this row.
+
+
 ## 0.7.0 — 2026-08-23
 
 **MINOR — §2 carries rows for the tier doc set §6 names, so Multi-service stops being a hole in the
