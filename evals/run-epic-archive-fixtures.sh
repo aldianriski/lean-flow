@@ -36,7 +36,7 @@ run_case_anywhere "premature" 1 \
 # --- case 2: eligible and still sitting in docs/epic/ -> FAIL -----------------------------------
 # The recorded shape: EPIC-001, closed and fully ticked, unmoved for five sprints.
 run_case_anywhere "eligible-unarchived" 1 \
-  "is closed with every § Closed when condition met but still sits in docs/epic/" -- \
+  "is closed with every § Closed when condition met" -- \
   sh "$checker" "$fx/eligible-unarchived"
 
 # --- case 3: archived with NO exit conditions at all -> FAIL ------------------------------------
@@ -48,7 +48,7 @@ run_case_anywhere "no-conditions" 1 \
 
 # --- case 4: correctly archived -> exit 0 (control) ----------------------------------------------
 run_case_anywhere "properly-archived" 0 \
-  "archived correctly (2 condition(s), all met, status closed)" -- \
+  "archived correctly (2 condition(s), all met, status closed" -- \
   sh "$checker" "$fx/properly-archived"
 
 # --- case 5: live epic with work left -> exit 0 (control) ---------------------------------------
@@ -57,6 +57,25 @@ run_case_anywhere "live-open" 0 \
   "correctly live (status 'active', 1 of 2 condition(s) open)" -- \
   sh "$checker" "$fx/live-open"
 
+
+# --- case 6: archived while a member sprint is still open -> FAIL --------------------------------
+# §11's trigger is a genuine TWO-PART test and this checker enforced only the second half until
+# SPRINT-080 T4. This is the silent direction: every exit condition ticked, so a conditions-only rule
+# waves it through while a sprint that belongs to the epic is still running. §11 names exactly this
+# -- "never archive on member-sprint count alone -- an epic whose last sprint closed with exit
+# conditions unmet is unfinished, not done, and archiving it hides that".
+run_case_anywhere "archived-member-open" 1 \
+  "archived while member sprint(s) 906 are still open" -- \
+  sh "$checker" "$fx/archived-member-open"
+
+# --- case 7: closed and fully ticked, but a member sprint is open -> exit 0 (control) -------------
+# The state that was previously unrepresentable, and the false positive that fired on EPIC-004 at
+# SPRINT-080 T4: the epic is finished, the sprint that finished it is not. Demanding the move here
+# would ask for an archive §11 forbids. Without this control, case 6 is satisfied by a checker that
+# simply refuses every epic naming an open member.
+run_case_anywhere "closed-member-open" 0 \
+  "correctly NOT yet archived" -- \
+  sh "$checker" "$fx/closed-member-open"
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "EPIC-ARCHIVE FIXTURES: all green"; else echo "EPIC-ARCHIVE FIXTURES: at least one FAIL"; fi
 exit $fail

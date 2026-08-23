@@ -132,9 +132,9 @@ with a retained fixture **and a benign-lookalike control**, which is the load-be
 - [x] Rows migrate; **`build` reaches 0** and coverage reads **45 checkable / 6 unchecked** — *Verify: the engine's `coverage:` line reads exactly that, `45 + 6 = 51`; the 6 (`S2.F-CAP` · `S2.R-TEMPDIR` · `S7.MEGA` · `S7.SPRINT400` · `S11.EPIC` · `S11.RESEARCH`) are each shown covered by a named standalone checker in `conformance-coverage.md`, and the register's § `build` is empty. **Criterion amended by owner ruling at G2** — it read "51 of 51 via the engine's `coverage:` line", which no amount of correct work could satisfy, because that line counts only in-engine assertions (L-088 · L-136)*
 
 ### T4 — Rule § Closed-when 2, and close EPIC-004 if it ticks `[size: S · risk: low · class: decision · HITL]`
-Layers: `docs/epic/EPIC-004-conformance.md` · `docs/research/conformance-dispositions.md` · `docs/adr/`
+Layers: `docs/epic/EPIC-004-conformance.md` · `docs/research/conformance-dispositions.md` · `docs/adr/` · `scripts/lib/check-epic-archive.sh` · `evals/run-epic-archive-fixtures.sh` · `evals/fixtures/epic-archive/` *(added at execution, owner-approved — Cites said "run, never edited", and running it is what found the defect; L-100)*
 Depends-on: T3
-Cites: EPIC-004 § Closed-when 2 (its SPRINT-079 wording, and the prior wording preserved beneath it) · L-088 · SPRINT-076 T4's ruling that the bar stands · `check-epic-archive.sh` (run, never edited)
+Cites: EPIC-004 § Closed-when 2 (its SPRINT-079 wording, and the prior wording preserved beneath it) · L-088 · SPRINT-076 T4's ruling that the bar stands *(the checker moved to `Layers:` — running it is what found the defect, and it is now edited)*
 
 The condition has refused three looser readings across SPRINT-075/076/077 and was amended once, on
 the record. **It is ruled here on the same terms — evidence first, and the answer is allowed to be
@@ -145,12 +145,12 @@ is missing. If it ticks and the other four hold, EPIC-004 is closed; if not, the
 this sprint says why.
 
 **DoD:**
-- [ ] Coverage re-derived from the **engine**, not from this Plan or the register — *Verify: `sh conformance.sh .` prints `coverage:` and the two counts sum to 51*
-- [ ] Both halves of the condition checked separately: *maps to a check* **and** *explicitly marked in the spec* — the second was met at SPRINT-079 and is re-verified, not assumed
-- [ ] **No amendment to the condition to make it tick.** If it does not tick, that is the outcome and it is recorded — refused at SPRINT-075 and SPRINT-076 on exactly this ground (L-088)
-- [ ] The other four conditions re-checked, not carried forward on trust — *Verify: `check-epic-archive.sh` reports 0 of 5 open before any close*
-- [ ] If closed: `status: closed` on the epic, its INDEX row kept, and archival proposed under §11 — *Verify: §11 archives an epic only when every member sprint is closed **and** every condition is `[x]`, never on sprint count*
-- [ ] If **not** closed: § Closed-when 2 records what remains and SPRINT-081's shape is named in § Out
+- [x] Coverage re-derived from the **engine**, not from this Plan or the register — *Verify: `sh conformance.sh .` prints `coverage: 45 checkable rule(s) have an assertion in this engine; 6 are unchecked`, and 45 + 6 = **51***
+- [x] Both halves of the condition checked separately: *maps to a check* **and** *explicitly marked in the spec* — the second was met at SPRINT-079 and is re-verified, not assumed — *Verify: **(a) 51** map to a check — 45 in-engine plus 6 standalone, and each of those six checkers was run at this ruling to confirm it exists and emits verdict lines rather than merely holding a register row. **(b) 49** are marked, re-counted position-anchored from the spec: 32 `judgment-only` · 7 `restated` · 6 `implementation-directed` · 4 `standard-directed` — exactly the four marks the row names, no fifth. 51 + 49 = **100***
+- [x] **No amendment to the condition to make it tick.** — *Verify: the row's wording is byte-unchanged by this sprint; the only edit replaces the stale "30 of 51 covered" standing line with the evidence. It ticked on the evidence, which is the outcome this task was allowed to not reach*
+- [x] The other four conditions re-checked, not carried forward on trust — *Verify: `check-epic-archive.sh` reported `0 of 5 condition(s) open` with the epic still `active`, before any close was written; conditions 1, 3, 4 and 5 re-read at this ruling and each still carries its evidence*
+- [x] If closed: `status: closed` on the epic, its INDEX row kept, and archival proposed under §11 — *Verify: `status: closed` set, INDEX row untouched, and archival **proposed rather than performed** — §11 archives an epic only when every member sprint is closed **and** every condition is `[x]`, and **SPRINT-080 is itself a member and is still open**. `check-epic-archive.sh` now says so in those words. Archival executes at this sprint's close, which also resolves the §2 cap breach per D3*
+- [x] If **not** closed: § Closed-when 2 records what remains and SPRINT-081's shape is named in § Out — *Verify: not applicable — the condition ticked, so this branch did not run. Recorded rather than deleted, because it was live until the evidence was in* ✓
 
 
 ### T5 — Fix TD-073, because D4's trip-wire fired `[size: S · risk: med · class: execution · AFK]`
@@ -236,6 +236,9 @@ the engine's report unchanged, and TD-073 is resolved or explicitly re-filed.
 | `evals/run-sprint-family-fixtures.sh` | T3 | `lookalike_repo` + 11 retained cases (WHY: the controls are the load-bearing half here — every one is a shape a heuristic would flag) | low | harness 67 pass / 0 fail, 6m45s |
 | `docs/research/conformance-dispositions.md` | T3 | § `build` emptied, kept as a record with why an empty bucket is not "everything is checked" | low | 0 rows; engine `coverage:` 45 + 6 = 51 |
 | `docs/research/conformance-coverage.md` | T3 | Row recording the two-signal rule, the refused thresholds, and the six controls | low | table intact |
+| `docs/epic/EPIC-004-conformance.md` | T4 | § Closed-when 2 ticked with its evidence; `status: closed`; the stale "30 of 51" standing line replaced (WHY: the condition ticked on re-derived counts, 51 map to a check + 49 marked = 100) | med | `check-epic-archive.sh` 0 of 5 open before the close was written |
+| `scripts/lib/check-epic-archive.sh` | T4 | Implement §11's **missing second half** — read `member_sprints`, split open from unverifiable, normalise both id formats (WHY: §11 calls it "a genuine two-part test" and only one half was enforced) | med | 7/7 fixtures; seeded revert reddens exactly the two new cases |
+| `evals/run-epic-archive-fixtures.sh` · `evals/fixtures/epic-archive/` | T4 | Two new retained cases for the member half; two existing assertions trimmed to their stable prefix (WHY: the message text grew, which disarmed them — L-152) | low | harness `all green` |
 
 ## Retro
 

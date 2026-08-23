@@ -3,7 +3,7 @@ epic: 004
 slug: conformance
 owner: Maintainer
 last_updated: 2026-08-23
-status: active
+status: closed
 member_sprints: [072, 073, 074, 075, 076, 077, 078, 079, 080]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
@@ -131,7 +131,7 @@ each other · any telemetry, ever (the README promises none).
       ledgers) have not been exercised against a foreign tree at all. The triage recorded **0
       artefacts**, and that number is honest but early — the question is barely asked yet, and wants
       re-running as coverage grows rather than being treated as settled here.
-- [ ] Every spec rule maps to a check, or is **explicitly marked in the spec as not evaluated against a
+- [x] Every spec rule maps to a check, or is **explicitly marked in the spec as not evaluated against a
       repository** (`judgment-only` · `implementation-directed` · `restated` · `standard-directed`)
       **⚠ The wording changed at SPRINT-079 T1. It used to read:** *"…or is explicitly marked
       **judgment-only** in the spec."* Preserved rather than overwritten (L-088) — this row refused two
@@ -156,7 +156,27 @@ each other · any telemetry, ever (the README promises none).
       It is accepted because the alternative is a standard telling adopters it owes them eleven checks
       it decided never to write, and because **classification is unchanged at 100**: nothing left the
       standard, only the set a tool evaluates against a tree. Recorded as **ADR-028**.
-      **Where it stands: 30 of 51 covered, 21 `build` remaining, 0 undifferentiated.** The residual this
+      **TICKED at SPRINT-080 T4 — 51 of 51, and no amendment was made to reach it.** The row
+      refused two looser readings at SPRINT-076 and re-worded itself twice on the record; it is
+      ruled here on the same terms, and the wording it is judged against is the one above,
+      unchanged by this sprint. Both halves re-derived rather than carried forward:
+      **(a) maps to a check — 51.** The engine's own `coverage:` line reads **45 checkable have
+      an assertion; 6 unchecked**, and the 6 (`S2.F-CAP` · `S2.R-TEMPDIR` · `S7.MEGA` ·
+      `S7.SPRINT400` · `S11.EPIC` · `S11.RESEARCH`) are covered by standalone checkers
+      (`check-doc-caps.sh` · `check-ephemeral-intake.sh` · `check-epic-archive.sh` ·
+      `check-research-archive.sh`), each verified at this ruling to **exist and emit verdict
+      lines** rather than merely holding a register row. 45 + 6 = 51.
+      **(b) explicitly marked — 49**, read position-anchored from the spec: 32 `judgment-only` ·
+      7 `restated` · 6 `implementation-directed` · 4 `standard-directed` — exactly the four marks
+      this row names, and no fifth. Not assumed from SPRINT-079: re-counted here.
+      **51 + 49 = 100**, the full classified set. Every rule now satisfies one half or the other.
+      The last twelve landed as `TASK-250` (§11 ledger retention), `TASK-251` (§11 archival) and
+      `TASK-252` (§12's git boundary), and the register's § `build` bucket is **empty**.
+      **What this still does not claim.** 45 of the checks live in the engine and 6 outside it, so
+      "maps to a check" is a statement about coverage, not about depth: the §12 four in particular
+      report 0 shape-matches against this repository, so their content confirmations are exercised
+      only on fixtures. The foreign-repo triage that condition 1 called *honest but early* is
+      still early, and is now worth re-running against 45 rules rather than 6.
       row has flagged since SPRINT-073 is gone. What is left is coverage, and SPRINT-080 is where the
       21 land.
 - [x] Each check has a retained fixture asserting its named finding on input that must produce it

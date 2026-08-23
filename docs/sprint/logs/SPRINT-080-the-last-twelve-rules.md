@@ -342,3 +342,68 @@ from a register which never partitioned its rules. It also records what empty do
 `45 + 6 = 51`, where the 6 are covered by standalone checkers — the amendment ruled at G2, because
 the frozen criterion asked for `51 of 51` from a line that counts only in-engine assertions and could
 never print it (L-088 · L-136).
+
+### 2026-08-23 | scope-change | T4 edits `check-epic-archive.sh`, which its Cites said to run and never edit
+
+**What broke.** Ruling § Closed-when 2 meant closing the epic, and closing it made the gate red:
+`check-epic-archive.sh` FAILs the moment an epic is `status: closed` with every condition met, and
+demands the move to `docs/epic/archive/`. But **SPRINT-080 is itself a member sprint and is still
+open**, and §11's trigger is *"every member sprint closed **and** the epic's Closed-when conditions
+all `[x]`"* — a test its own Conformance row calls **"a genuine TWO-PART test"** in those words.
+
+**The checker read `member_sprints` zero times.** It enforced one half. That is wrong in both
+directions: it demanded an archive §11 forbids (the false positive that fired here), and it would
+accept an epic archived while a member sprint was still running — the silent case §11 explicitly
+warns about, *"never archive on member-sprint count alone"*.
+
+**Impact.** The correct state — *epic finished, the sprint that finished it not yet closed* — was
+**unrepresentable**. Neither leaving the epic open nor archiving it early is honest.
+
+**Ruling.** Owner-approved (AskUserQuestion, 2026-08-23): close the epic and fix the missing half.
+T4's `Layers:` now names the checker and its harness; its `Cites:` had said *run, never edited*, and
+running it is exactly what found the defect (L-100).
+
+### 2026-08-23 | progress | T4 — § Closed-when 2 ticks, EPIC-004 closes, and the checker gains its second half
+
+**The condition ticked on the evidence, with no amendment.** It had refused two looser readings at
+SPRINT-076 and re-worded itself twice on the record; it was ruled here on the same terms and its
+wording is byte-unchanged by this sprint. Both halves re-derived rather than carried forward:
+
+| half | count | how |
+|---|---|---|
+| maps to a check | **51** | 45 in-engine (the engine's own `coverage:` line) + 6 standalone — and each of those six checkers was **run** at this ruling, not merely looked up in the register |
+| explicitly marked | **49** | position-anchored from the spec: 32 `judgment-only` · 7 `restated` · 6 `implementation-directed` · 4 `standard-directed` — exactly the four marks the row names, no fifth |
+| | **100** | the full classified set |
+
+`check-epic-archive.sh` reported **`0 of 5 condition(s) open`** with the epic still `active`, before
+any close was written — which is the order DoD 4 asked for.
+
+**The epic is closed and deliberately NOT archived.** §11's second half has not fired, because
+SPRINT-080 is a member and is open. Archival executes at this sprint's close, which is also what
+resolves the §2 cap breach D3 deferred — the file grew 216 → 236 adding the evidence the DoD required.
+
+**Three defects found while fixing one.**
+1. **The missing half itself** — `member_sprints` never read.
+2. **Two id formats coexist.** EPIC-001/002 write `[SPRINT-025, SPRINT-026]`; EPIC-004 writes
+   `[072, 073]`. Globbing the raw token built `SPRINT-SPRINT-025-*` and reported **three correctly
+   archived epics** as having open members. Normalised, and both shapes stay legal.
+3. **"Unfindable member" is not "open member."** The first draft treated a member with no Plan as not
+   closed. That is the conservative reading, and it blocks archival on a fact nobody can establish —
+   an adopter who prunes old sprints could never archive again — and it broke two **retained**
+   fixtures whose epics name sprints they never modelled. Split: `open` gates, `unknown` is **named
+   on the report** and does not, which is how `S11.WHENITRUNS` already handles a sprint it cannot
+   phase (L-058 — never silently skipped).
+
+**L-152 arrived on schedule.** Growing the finding text disarmed **two retained assertions** that
+matched the old sentence's tail — behaviour unchanged, guards silently satisfied. Caught because they
+went red, not because anyone remembered; both trimmed to the stable prefix so the next reword does not
+repeat it.
+
+**And the edit-safety trap fired twice in one task.** A line-range replacement dropped the `opn=` and
+`tot=` assignments while inserting the new branch, so the second loop would have read the first
+loop's values — caught only by re-reading the whole block (L-009). Then an errored `awk` wrote the
+fixture harness **empty**, which `sh -n` accepts; restored from the pre-edit copy (L-142's
+"errored `sed` wrote an empty file" shape, verbatim).
+
+**Fixtures: 5 → 7, all green.** Discrimination: reverting the member half reddens **exactly** the two
+new cases and leaves `premature` and `properly-archived` green; restore hash-verified.
