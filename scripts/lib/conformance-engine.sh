@@ -139,6 +139,323 @@ note "rule source: $spec -- $n_rules rules read across every section. Rule set a
 # anchor extraction.
 # registry:insert-point
 
+# --- §2/§6 tier doc-set family (SPRINT-078 T2) ----------------------------------------------------
+# FIVE RULES, ONE CHECK, THE TIER A PARAMETER. `S2.F-TIER` · `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` ·
+# `S6.MULTISVC` are the same question asked at four scopes plus §2's statement of it, and the register
+# dispositioned them that way before a line was written: *the tier is a parameter, not four checkers*.
+#
+# WHAT §6 ACTUALLY MARKS, and why it decides the whole shape. All four rules are `split -- detection
+# judged`. Satisfaction ("given the tier, is its doc set present?") is mechanical; DETECTION ("is this
+# repo multi-dev, sustained, or architecturally forked?") is a human call the standard explicitly
+# declines to automate. This engine is already on record refusing to guess it: assert_S2_F_FILE's own
+# comment rules that requiring a tier-gated row would be "this engine guessing a tier the standard
+# explicitly declines to infer, and telling a four-file JS library it owes docs/database/erd.md".
+#
+# So the tier is DECLARED, not detected -- `.conformance-tier`, one token, exactly the shape
+# `.conformance-roles` already uses for §1's role vocabulary. Undeclared is not a failure and not a
+# pass: Base is still checked, because §6's trigger for Base is *every dev repo* and needs no
+# detection, and the other three say they were not evaluated and why. A repo that declares gets its
+# full cumulative set checked.
+#
+# WHERE THE REQUIRED SET COMES FROM. §2's own docs-tree table, read at runtime -- the Tier cell says
+# which tier owes the row, so adding a row to §2 changes the required set with no code edit here.
+# What this file supplies is the VOCABULARY that reads a Tier cell against §6's four tiers (below),
+# the same division of labour as the role vocabulary: the spec owns the data, the engine owns the
+# words it reads the data with.
+#
+# ROWS DELIBERATELY NOT OWED BY ANY TIER:
+#   `always` rows        -- S2.F-FILE's, and it fires `core-file-missing` for them. Counting one
+#                           absence under two findings is precisely the double-counting § scope-out
+#                           (a) exists to prevent.
+#   `auth exists` · `DB exists` -- SUBSTRATE-gated, not tier-gated. §6 says substrate-conditional rows
+#                           are "skipped, not owed, when the substrate is absent", and no tier implies
+#                           a database. Reported as skipped, never as missing.
+#   `lean loop` · `as needed` · `ephemeral` -- not tier rows at all.
+
+_TIER_RANK_base=1
+_TIER_RANK_backend=2
+_TIER_RANK_medium=3
+_TIER_RANK_multisvc=4
+
+# _tier_rank_of_cell <tier-cell-text> -- §2's Tier cell to a §6 tier rank, 0 = owed by no tier.
+# `API exists` ranks with backend deliberately: §6's Backend row names `api/openapi.yaml` in its own
+# doc set, and a repo that "exposes an API" is the same fact as the substrate being present. auth and
+# DB have no such tier statement anywhere in §6, which is why they stay at 0.
+_tier_rank_of_cell() {
+  case "$1" in
+    *medium*)                              printf '3' ;;
+    *backend*|*"API exists"*)              printf '2' ;;
+    *base*)                                printf '1' ;;
+    *)                                     printf '0' ;;
+  esac
+}
+
+# _tier_declared <repo> -- the declared tier token, normalised; empty when undeclared. First
+# non-blank, non-comment line only: a tier is one fact, and reading further would invent a repo at
+# two tiers at once.
+_tier_declared() {
+  [ -f "$1/.conformance-tier" ] || { printf ''; return; }
+  _t=$(grep -v '^[[:space:]]*#' "$1/.conformance-tier" | grep -v '^[[:space:]]*$' | head -1 \
+       | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')
+  case "$_t" in
+    base)                                  printf 'base' ;;
+    backend|integration|backend/integration) printf 'backend' ;;
+    medium|complex|medium/complex|medium+) printf 'medium' ;;
+    multi-service|multiservice|multisvc)   printf 'multisvc' ;;
+    "")                                    printf '' ;;
+    *)                                     printf 'UNKNOWN:%s' "$_t" ;;
+  esac
+}
+
+_tier_rank_of_name() {
+  case "$1" in
+    base) printf '1' ;; backend) printf '2' ;; medium) printf '3' ;; multisvc) printf '4' ;;
+    *)    printf '0' ;;
+  esac
+}
+
+_tier_label() {
+  case "$1" in
+    1) printf 'Base' ;; 2) printf 'Backend / integration' ;; 3) printf 'Medium / complex' ;;
+    4) printf 'Multi-service' ;; *) printf 'unknown' ;;
+  esac
+}
+
+# _s2_tier_rows <spec> -- `<rank>|<path>` for every docs-tree row with a LITERAL path that some tier
+# owes. Pattern rows (`flows/<slug>.md`) are excluded for the same reason _s2_rows excludes them: a
+# pattern names a family, and a family cannot be "missing". `always` rows are excluded because
+# S2.F-FILE owns them.
+#
+# Trap 1 and trap 2 from _s2_rows apply here verbatim and are guarded the same way: §2's own
+# Conformance table lives inside §2 (its Rule cells would parse as File cells), and the docs tree
+# carries a Tier column the root tables do not, so Create sits at a different index.
+_S2_TIER_CACHE=""
+_S2_TIER_DONE=0
+_s2_tier_rows() {
+  [ "$_S2_TIER_DONE" -eq 1 ] && { printf '%s\n' "$_S2_TIER_CACHE"; return; }
+  _S2_TIER_DONE=1
+  # The RANK is resolved inside this one awk pass, not by a shell function per row. That is not
+  # tidiness: the first cut called _tier_rank_of_cell from a `while read` loop, ten times over ~20
+  # rows per run, and cost the engine 38% of its wall clock on a four-file repository -- the harness
+  # invokes it about sixty times, which took the gate past ten minutes. Same lesson S2.R-PLACEMENT
+  # paid 29 seconds for and the ownership family paid ~2,800 awk processes for: walk once, then
+  # filter. Third sighting; the cost model is not optional.
+  _S2_TIER_CACHE=$(awk '
+    /^## §2/ { in2 = 1; next }
+    /^## §/  { in2 = 0 }
+    !in2     { next }
+    /^\*\*Conformance/        { in2 = 0; next }
+    /^\*\*`docs\/` tree\*\*/  { intree = 1; next }
+    /^\*\*/                   { intree = 0 }
+    !intree { next }
+    /^\|/ {
+      if ($0 ~ /^\|[ ]*File[ ]*\|/) next
+      if ($0 ~ /^\|[-| ]*\|$/)      next
+      n = split($0, c, "|"); if (n < 7) next
+      file = c[2]; tier = c[3]; cre = c[6]
+      if (match(file, /`[^`]+`/)) p = substr(file, RSTART + 1, RLENGTH - 2); else next
+      if (cre ~ /always/) next
+      # §2 Tier cell -> §6 tier rank; 0 = owed by no tier. `API exists` ranks with backend because §6
+      # names api/openapi.yaml in the Backend doc set -- "exposes an API" and "the substrate is
+      # present" are the same fact. auth and DB have no such tier statement anywhere in §6, so they
+      # stay at 0 and are reported as substrate-gated rather than owed.
+      rank = 0
+      if      (tier ~ /medium/)                    rank = 3
+      else if (tier ~ /backend/ || tier ~ /API exists/) rank = 2
+      else if (tier ~ /base/)                      rank = 1
+      if (rank == 0) next
+      # A PATTERN row (`flows/<slug>.md`) names a family, and a family cannot be "missing" -- but it
+      # is emitted and MARKED rather than dropped, because "this tier has no rows at all" and "this
+      # tier has only families" are different facts, and only the first is a hole in the standard.
+      print rank "\t" "docs/" p "\t" ((p ~ /[<>*]/) ? "pattern" : "literal")
+    }' "$1")
+  printf '%s\n' "$_S2_TIER_CACHE"
+}
+
+# _tier_rows_at <spec> <rank> <literal|pattern> -- the paths owed by EXACTLY that tier, of one kind.
+# Not cumulative: each rule answers for its own row of §6's table, and folding lower tiers in would
+# make S6.MEDIUM re-report every finding S6.BASE already named. A grep over a string already in
+# memory, never a walk (see the cost note above).
+_tier_rows_at() {
+  _s2_tier_rows "$1" | awk -F'	' -v r="$2" -v k="$3" '$1 == r && $3 == k { print $2 }'
+}
+
+
+# _tier_substrate_stems <spec> <rank> -- the paths §6's OWN tier row marks substrate-conditional,
+# read from the text after the words "substrate-conditional" in that row's Doc set cell.
+#
+# WHY §6 AND NOT §2's Create CELL. Both describe a condition and they do not agree: §2 writes
+# `development/coding-standards`'s trigger as a bare "init", while §6 lists that exact file among the
+# rows that are "skipped, not owed" without code. §6's tier table is the statement OF the tier doc
+# sets -- §2's Tier column only assigns rows to them -- so where the two differ about what a tier owes,
+# §6 is the one being asked. Reading §2's Create prose for condition words instead was tried and
+# rejected: it makes `product/requirements.md` conditional (its cell says "or first sanitized PRD
+# lands ... skipped on an existing repo whose AI-context files already ARE the spec") when §6 lists it
+# in the Base minimum unconditionally, which would empty the one tier set that has teeth.
+#
+# `{a,b}` in a stem is expanded -- §6 writes `deployment/{deployment,rollback}-guide` for two files.
+_TIER_STEMS_CACHE=""
+_TIER_STEMS_RANK=""
+_tier_substrate_stems() {
+  # Cached per rank: five rules ask the same question of a fixed spec, and the answer costs an awk
+  # plus a shell loop each time. Same cost model as _s2_tier_rows above -- walk once, then filter.
+  [ "$_TIER_STEMS_RANK" = "$2" ] && { printf '%s\n' "$_TIER_STEMS_CACHE"; return; }
+  _TIER_STEMS_RANK=$2
+  _TIER_STEMS_CACHE=$(
+    awk -v want="$2" '
+      /^## /{h=$0; sub(/^## [^0-9]*/,"",h); sec=h+0}
+      sec != 6 { next }
+      /^\| \*\*Base\*\*/                    { r=1 }
+      /^\| \*\*Backend/                     { r=2 }
+      /^\| \*\*Medium/                      { r=3 }
+      /^\| \*\*Multi-service\*\*/           { r=4 }
+      /^\|/ && r == want+0 {
+        i = index($0, "substrate-conditional")
+        if (i == 0) { r=0; next }
+        t = substr($0, i)
+        while (match(t, /`[^`]+`/)) { print substr(t, RSTART+1, RLENGTH-2); t = substr(t, RSTART+RLENGTH) }
+        r = 0
+      }
+    ' "$1" | while read -r _s; do
+      case "$_s" in
+        *"{"*)
+          _pre=${_s%%\{*}; _mid=${_s#*\{}; _alts=${_mid%%\}*}; _post=${_mid#*\}}
+          _old=$IFS; IFS=','
+          for _a in $_alts; do IFS=$_old; printf '%s%s%s\n' "$_pre" "$_a" "$_post"; IFS=','; done
+          IFS=$_old ;;
+        *) printf '%s\n' "$_s" ;;
+      esac
+    done
+  )
+  printf '%s\n' "$_TIER_STEMS_CACHE"
+}
+
+# _tier_is_conditional <stems> <docs-relative-path> -- does a §2 row match one of §6's stems? Matched
+# on the path with `docs/` and any extension stripped, so `docs/testing/testing-guide.md` meets
+# `testing/testing-guide`, and a trailing `/` on a stem covers the tree beneath it (`database/`).
+# Also matched on BASENAME, because §6 writes `authentication` for `architecture/authentication.md`.
+_tier_is_conditional() {
+  _cstems=$1; _cpath=$2
+  _cnorm=${_cpath#docs/}; _cnorm=${_cnorm%.*}
+  _cbase=${_cnorm##*/}
+  for _st in $_cstems; do
+    case "$_st" in
+      */) case "$_cnorm/" in "$_st"*) return 0 ;; esac ;;
+      *)  [ "$_cnorm" = "$_st" ] && return 0
+          [ "$_cbase" = "$_st" ] && return 0 ;;
+    esac
+  done
+  return 1
+}
+# _tier_assert <id> <rule-rank> <repo> -- the ONE check. Every one of the five rules is this function
+# with a different rank; §2's `S2.F-TIER` passes the DECLARED rank, because §2 states the rule
+# generically ("tier satisfaction is mechanical") rather than for one tier. The id is padded here, so
+# a caller passes the bare rule id and the report's columns cannot drift apart per call site.
+_tier_assert() {
+  _tid=$(printf '%-20s' "$1"); _trank=$2; _trepo=$3
+  _tdecl=$(_tier_declared "$_trepo")
+  _tlabel=$(_tier_label "$_trank")
+
+  case "$_tdecl" in
+    UNKNOWN:*)
+      bad "$_tid-- tier-declaration-unreadable: .conformance-tier says '${_tdecl#UNKNOWN:}', which is not one of §6's four tiers (base · backend · medium · multi-service). A declaration nobody can read is worse than none: it looks like an answer and selects no doc set (L-058)"
+      return ;;
+  esac
+
+  _tdrank=$(_tier_rank_of_name "$_tdecl")
+  if [ -z "$_tdecl" ]; then
+    # Undeclared. Base needs no detection -- §6's trigger for it is *every dev repo* -- so it is the
+    # one rule that still answers. The other three decline, and say which fact is missing.
+    if [ "$_trank" -ne 1 ]; then
+      note "$_tid-- not evaluated: this repository declares no tier (no .conformance-tier), and §6 marks tier detection JUDGED, not mechanical. $_tlabel's doc set is owed only once someone rules the repo is at that tier; guessing it here would report files against a repo that never owed them"
+      return
+    fi
+  elif [ "$_tdrank" -lt "$_trank" ]; then
+    note "$_tid-- not evaluated: this repository declares tier '$_tdecl', below $_tlabel. §6 moves a repo up a tier by EVENT, not by ceremony, so a lower-tier repo does not owe this row's docs"
+    return
+  fi
+
+  _trows=$(_tier_rows_at "$spec" "$_trank" literal)
+  _tpats=$(_tier_rows_at "$spec" "$_trank" pattern)
+  if [ -z "$_trows" ]; then
+    if [ -n "$_tpats" ]; then
+      # Rows exist; every one of them names a FAMILY. `docs/adr/ADR-NNN-<slug>.md` and
+      # `docs/flows/<slug>.md` cannot be "missing" the way a named file can -- a repo with no ADRs has
+      # taken no qualifying decision, which §4 makes correct rather than incomplete. Distinguished from
+      # the branch below because the two say opposite things about the STANDARD: this one says the spec
+      # describes the tier and the description is not file-shaped, that one says the spec is silent.
+      _tpats=$(printf '%s' "$_tpats" | tr '
+' ' ')   # one line per rule: a note that wraps is two rules to a parser
+      note "$_tid-- not evaluated: every §2 row at $_tlabel names a FAMILY ($_tpats), and a family cannot be missing. §6's own $_tlabel doc set also names \`DECISIONS.md\`, which §2 carries only inside a pattern row's File cell and this engine therefore cannot address -- filed rather than guessed at"
+      return
+    fi
+    # No row at all. An empty required set passes every repository -- the false negative
+    # assert_S2_F_FILE's own guard refuses. Here it is not a parse failure but a real hole in the
+    # standard: §6 names Multi-service's three docs (service registry · cross-service dependency map ·
+    # global decisions index) and §2's table carries a row for none of them, so "reduces to S2.F-FILE"
+    # has nothing to reduce to. Named where a reader meets it (SPRINT-078 T2, owner-ruled).
+    bad "$_tid-- tier-doc-set-underivable: §6 names a doc set for $_tlabel that §2's table carries not one row for, so no required set can be derived from the spec. §6 says every tier's satisfaction half reduces to S2.F-FILE; for this tier there is nothing to reduce to. This is a finding about the STANDARD, not about this repository"
+    return
+  fi
+
+  _tstems=$(_tier_substrate_stems "$spec" "$_trank")
+  _tmissing=0; _tpresent=0; _tskipped=""
+  for _p in $_trows; do
+    if _tier_is_conditional "$_tstems" "$_p"; then
+      _tskipped="$_tskipped $_p"
+      continue
+    fi
+    if [ -e "$_trepo/$_p" ]; then
+      _tpresent=$((_tpresent + 1))
+    else
+      _tmissing=$((_tmissing + 1))
+      bad "$_tid-- tier-doc-set-incomplete: $_p -- §6 places this file in $_tlabel's unconditional doc set and this repository ${_tdecl:+declares tier '$_tdecl'}${_tdecl:-is a dev repo, which §6 makes Base by trigger}, so it is owed. Absent, the reader §2 names for it has nowhere to look"
+    fi
+  done
+
+  # The skipped rows are NAMED, never silently dropped: §6 says a substrate-conditional row is
+  # "skipped, not owed" when the substrate is absent, and whether the substrate is present is judged.
+  # Saying which rows were set aside is what lets a human rule on them; saying nothing would make a
+  # skip indistinguishable from a pass.
+  [ -n "$_tskipped" ] && note "$_tid-- substrate-conditional, skipped not owed (§6):$_tskipped. Each is owed only once its substrate exists, which §6 leaves to judgement"
+  [ "$_tmissing" -gt 0 ] && return
+  if [ "$_tpresent" -eq 0 ]; then
+    note "$_tid-- no unconditional doc is owed at $_tlabel once §6's substrate-conditional rows are set aside. States that nothing was checkable here, never that the tier passed"
+    return
+  fi
+  ok "$_tid-- all $_tpresent unconditional $_tlabel doc(s) present at their canonical §2 path"
+}
+
+# The five wrappers. Each is the tier, and nothing else -- which is the point the register made when
+# it dispositioned this family as one check rather than four.
+assert_S6_BASE()     { _tier_assert "S6.BASE"     1 "$1"; }
+assert_S6_BACKEND()  { _tier_assert "S6.BACKEND"  2 "$1"; }
+assert_S6_MEDIUM()   { _tier_assert "S6.MEDIUM"   3 "$1"; }
+assert_S6_MULTISVC() { _tier_assert "S6.MULTISVC" 4 "$1"; }
+
+# §2's own statement of the rule, and it answers the half §6's four rules do NOT. §14 marks it
+# `split -- tier satisfaction is mechanical (reduces to S2.F-FILE); tier detection is judged (§6)`.
+# Satisfaction is exactly what S6.BASE .. S6.MULTISVC above just reported, per tier. Repeating it here
+# for the declared tier was the first shape tried and it was wrong: a backend repo missing
+# `docs/api/openapi.yaml` collected the identical finding twice, under two rule ids, which is the
+# double-counting § scope-out (a) of the register exists to prevent -- one constraint, one report.
+#
+# So this rule answers the DECLARATION: is the judged half recorded at all, and legibly? That is
+# mechanical, it is §2's to ask, and nothing else asks it.
+assert_S2_F_TIER() {
+  _fdecl=$(_tier_declared "$1")
+  case "$_fdecl" in
+    UNKNOWN:*)
+      bad "$(printf '%-20s' 'S2.F-TIER')-- tier-declaration-unreadable: .conformance-tier says '${_fdecl#UNKNOWN:}', which is not one of §6's four tiers (base · backend · medium · multi-service). A declaration nobody can read is worse than none: it looks like an answer and selects no doc set (L-058)"
+      return ;;
+  esac
+  if [ -z "$_fdecl" ]; then
+    note "$(printf '%-20s' 'S2.F-TIER')-- no tier declared (.conformance-tier absent), so only Base was evaluated above -- §6 makes Base every dev repo's by trigger and the other three need the judged half. Not a finding: §2 routes detection to §6, which marks it judged, and a repo is not obliged to write the ruling down. Declaring it is what turns three unevaluated rules into three checked ones"
+    return
+  fi
+  ok "$(printf '%-20s' 'S2.F-TIER')-- tier declared as '$_fdecl' (.conformance-tier), so §6's judged half is recorded and S6.BASE .. S6.MULTISVC above could evaluate satisfaction against it"
+}
+
 # --- §13 attestation family (SPRINT-078 T1) -------------------------------------------------------
 # Migrated from scripts/lib/check-attestation.sh (deleted this task), following the §9 gates-signed
 # precedent exactly: the rule set was already the spec's, the assertion bodies move verbatim, and the

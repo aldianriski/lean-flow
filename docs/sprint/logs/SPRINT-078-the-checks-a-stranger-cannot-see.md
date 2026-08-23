@@ -160,3 +160,77 @@ is a live declaration, not a Plan amendment — L-100). **Learning candidate:** 
 consumed by a checker with a parse, so promote should render it in the form that checker reads — or
 the checker should report an unreadable declaration as a named finding rather than as an empty set,
 which is L-058 applied to its own input.
+
+### 2026-08-22 | scope-change | T2's DoD 3 named one finding string; the four tiers honestly need three
+
+**What broke.** DoD 3 froze *"`tier-doc-set-incomplete` fires for each of the four tiers"*. Building it
+against §2's actual table showed the four tiers are not alike, and forcing one string on them would
+have meant either inventing findings or suppressing real differences:
+
+| Tier | §2 rows | Finding |
+|---|---|---|
+| Base | 2 literal paths (`product/requirements.md` · `product/acceptance-criteria.md`) | `tier-doc-set-incomplete` |
+| Backend | 3 literal paths | `tier-doc-set-incomplete` |
+| Medium | 2 rows, **both families** (`adr/ADR-NNN-<slug>.md` · `flows/<slug>.md`) | a named note — a family cannot be *missing*; a repo with no ADRs has taken no qualifying decision, which §4 makes correct |
+| Multi-service | **none** | `tier-doc-set-underivable` (the ruling taken at G2) |
+
+**Impact.** Four tiers, four retained must-FAIL fixtures, three finding strings. The DoD's substance —
+every tier has a fixture asserting the finding it actually fires — is met and strengthened; only the
+assumption that one string covers four tiers is dropped. A fourth string, `tier-declaration-unreadable`,
+guards the declaration itself.
+
+**Re-confirm G2.** This follows directly from the two rulings already signed (declared tier ·
+`tier-doc-set-underivable`); nothing new is being decided, it is the frozen text catching up.
+
+### 2026-08-22 | progress | T2 complete — the tier is a parameter, and the parameter is declared
+
+Coverage **18 → 23**. Ten retained fixtures added; the engine-fixture suite is **26 pass, 0 fail**.
+
+**Where the required set comes from, and the §2/§6 disagreement it exposed.** §2's Tier column assigns
+rows; §6's tier table states the doc sets. They do not agree — §2 gives
+`development/coding-standards` a bare `init` trigger while §6 lists that exact file among the rows
+*"skipped, not owed"* without code. Reading §2's `Create ←` prose for condition words was tried first
+and rejected: it makes `product/requirements.md` conditional (its cell says *"skipped on an existing
+repo whose AI-context files already ARE the spec"*) and empties the one tier set with teeth. §6's
+clause is the subtraction, §2's Tier column the assignment. The result reproduces §6's Base row
+exactly: two owed, four skipped-and-named.
+
+**This repo now reports two findings against itself, and they are correct.** lean-flow has neither
+`docs/product/requirements.md` nor `docs/product/acceptance-criteria.md`, and
+`docs/architecture/overview.md` § *Base-tier docs this repo deliberately does not have* records the
+exemption with its reason. §6 owes them of *every dev repo*; §2's Create cell is where the escape is
+written. The engine reports what §6 says and leaves the exemption to the human who wrote it down —
+which is the same shape as `S2.F-FILE` and does not touch `qa-check.sh`, whose engine leg is
+informational except the two fully-covered families.
+
+**Not trusted on green.** Two seeded breaks, each guarded (`cmp` · `sh -n` · line count identical · 23
+assertions before and after · 2 changed lines · restore verified against `sha256 1625bc9a…`):
+- `_tier_is_conditional` forced to always-true (everything reads as substrate-conditional) → reddened
+  `tier-base-incomplete`, `tier-backend-incomplete`, `tier-set-is-spec-derived`; 23 controls green.
+- the `declared rank < rule rank` guard disabled (the tier stops being a parameter) → reddened
+  `tier-below-not-owed` and `tier-backend-control`; 24 controls green.
+
+**And the L-146 guard was itself tested.** Seeding `write_base_tier` to a no-op — so the derived victim
+was never written — made the harness say so loudly *while the fixture underneath it still reported
+PASS*. That is the failure L-146 describes, reproduced: without the guard, a case whose victim never
+existed scores as a must-FAIL that fired.
+
+### 2026-08-22 | surprise | T2 cost the engine 38% of its wall clock, and the gate paid for it
+
+The tier family's first cut resolved each §2 row's tier rank by calling a shell function from a
+`while read` loop — ten times per run over ~20 rows, plus an un-cached awk pipeline per rule for §6's
+substrate clause. On a four-file repository the engine went **13s → 18s**, and `qa-check.sh` invokes it
+around sixty times: the gate went from roughly five minutes to over ten and had to be killed twice.
+
+Fixed by moving rank resolution **inside the single awk pass** and caching the substrate stems per
+rank. The engine now runs that repo in **11s — faster than before T2 existed**, while answering six
+more rules.
+
+This is the **third** sighting of the same lesson in this one file: `S2.R-PLACEMENT` paid 29 seconds on
+a four-file directory for a `find` per row, the ownership family paid ~2,800 awk processes, and now
+this. The engine's stated cost model is *walk once, then filter*, it is written in a comment directly
+above the code that violated it, and it did not fire. **Learning candidate:** the rule is stated as
+prose next to one hot path rather than as a check anyone runs — a new assertion is never timed against
+the previous engine, so a regression is only visible once the gate blows its timeout, several tasks
+downstream of the cause.
+

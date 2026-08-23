@@ -59,6 +59,60 @@ core_set() {
       if (cre ~ /always/) print pfx p
     }' "$1"
 }
+# base_tier_set <spec> -- the docs §6 makes every dev repo owe that are NOT already `always` rows.
+# Derived exactly as the engine derives it -- §2's Tier column for the assignment, §6's own
+# substrate-conditional clause for the subtraction -- so a spec edit moves both sides together and
+# this cannot drift into testing the harness's idea of the table (SPRINT-078 T2).
+base_tier_set() {
+  _sub=$(awk '
+    /^## /{h=$0; sub(/^## [^0-9]*/,"",h); sec=h+0}
+    sec==6 && /^\| \*\*Base\*\*/ {
+      i = index($0, "substrate-conditional"); if (i == 0) next
+      t = substr($0, i)
+      while (match(t, /`[^`]+`/)) { print substr(t, RSTART+1, RLENGTH-2); t = substr(t, RSTART+RLENGTH) }
+    }' "$1" | while read -r _st; do
+      # Brace expansion, done the way the engine does it -- `deployment/{deployment,rollback}-guide`
+      # is TWO paths, each keeping the prefix AND the suffix. A cheaper sed that split on the comma
+      # alone produced `deployment/deployment` and `rollback-guide`, which silently un-subtracted
+      # deployment-guide and put a substrate-conditional row back into the owed set. Caught by this
+      # helper's output disagreeing with the engine's `skipped not owed` line, which is the second
+      # number this repo keeps being saved by.
+      case "$_st" in
+        *"{"*) _p=${_st%%\{*}; _m=${_st#*\{}; _a=${_m%%\}*}; _s=${_m#*\}}
+               _o=$IFS; IFS=','
+               for _x in $_a; do IFS=$_o; printf '%s%s%s\n' "$_p" "$_x" "$_s"; IFS=','; done
+               IFS=$_o ;;
+        *)     printf '%s\n' "$_st" ;;
+      esac
+    done)
+  awk '
+    /^## §2/ { in2=1; next }  /^## §/ { in2=0 }  !in2 { next }
+    /^\*\*Conformance/       { in2=0; next }
+    /^\*\*`docs\/` tree\*\*/ { intree=1; next }
+    /^\*\*/                  { intree=0 }
+    !intree { next }
+    /^\|/ {
+      if ($0 ~ /^\|[ ]*File[ ]*\|/) next
+      if ($0 ~ /^\|[-| ]*\|$/) next
+      n=split($0,c,"|"); if (n<7) next
+      file=c[2]; tier=c[3]; cre=c[6]
+      if (match(file, /`[^`]+`/)) p=substr(file,RSTART+1,RLENGTH-2); else next
+      if (p ~ /[<>*]/) next
+      if (cre ~ /always/) next
+      if (tier !~ /base/) next
+      print "docs/" p
+    }' "$1" | while read -r _p; do
+      _n=${_p#docs/}; _n=${_n%.*}; _b=${_n##*/}; _skip=0
+      for _s in $_sub; do
+        case "$_s" in
+          */) case "$_n/" in "$_s"*) _skip=1 ;; esac ;;
+          *) [ "$_n" = "$_s" ] && _skip=1; [ "$_b" = "$_s" ] && _skip=1 ;;
+        esac
+      done
+      [ "$_skip" -eq 0 ] && printf '%s\n' "$_p"
+    done
+}
+
 write_core_set() {   # write_core_set <dir>
   for p in $(core_set "$spec"); do
     mkdir -p "$1/$(dirname "$p")" 2>/dev/null
@@ -75,10 +129,24 @@ write_core_set() {   # write_core_set <dir>
     esac
   done
 }
+# write_doc <path-under-dir> <dir> -- one conformant doc with §3's ownership header.
+write_doc() {
+  mkdir -p "$2/$(dirname "$1")" 2>/dev/null
+  printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-20\nupdate_trigger: When it changes\nstatus: current\n---\n\n# %s\n\nBody.\n' "${1##*/}" > "$2/$1"
+}
+
+# write_base_tier <dir> -- the §6-Base docs that are NOT `always` rows. Added at SPRINT-078 T2 for
+# the same reason write_core_set grew §2's core set at SPRINT-076 T3: a new rule started having
+# something to say about these files' absence, and a fixture that goes stale under new coverage is
+# fixed by teaching the fixture, never by quietening the rule (L-088).
+write_base_tier() {
+  for p in $(base_tier_set "$spec"); do write_doc "$p" "$1"; done
+}
 
 target="$work/target-repo"
 mkdir -p "$target"
 write_core_set "$target"
+write_base_tier "$target"
 
 # A second target that DOES have a real defect: one doc with no ownership header. Needed since
 # SPRINT-075 T3 separated engine gaps from repository findings -- before that, any spec with an
@@ -88,6 +156,7 @@ write_core_set "$target"
 target_bad="$work/target-repo-with-a-defect"
 mkdir -p "$target_bad/docs"
 write_core_set "$target_bad"
+write_base_tier "$target_bad"
 printf '# Architecture\n\nNo ownership header, no update trigger.\n' > "$target_bad/docs/architecture.md"
 # --- case 1 (must-report): a mechanical rule with no assertion is NAMED as a gap ------------------
 # DoD 3, re-pointed at the gap class (SPRINT-075 T3). The contract this guards is unchanged and is the
@@ -342,6 +411,160 @@ if [ "$rc" -eq 1 ] &&
 else
   echo "FAIL fixture(level-bucket-survives-prior-failure): exit $rc -- output:"
   printf '%s\n' "$out"; fail=1
+fi
+
+
+# ==================================================================================================
+# §2/§6 TIER DOC-SET FAMILY (SPRINT-078 T2) -- one retained must-FAIL fixture per tier, each asserting
+# THAT TIER'S named finding, plus a sibling control that must stay green.
+#
+# The four tiers do not all fire the same finding, and pretending they did would have been the easy
+# lie. `tier-doc-set-incomplete` is Base's and Backend's, because those two have literal-path rows in
+# §2 that a repo can be missing. Medium's rows are all FAMILIES (`adr/ADR-NNN-<slug>.md`,
+# `flows/<slug>.md`) and a family cannot be missing. Multi-service has no §2 row at all, which is a
+# hole in the standard and fires `tier-doc-set-underivable`. So: four tiers, four retained fixtures,
+# three finding strings -- see the sprint's Execution Log for the DoD correction this forced.
+# ==================================================================================================
+
+tier_repo() {   # tier_repo <dir> [tier-token]
+  mkdir -p "$1"; write_core_set "$1"; write_base_tier "$1"
+  [ "$#" -ge 2 ] && printf '%s\n' "$2" > "$1/.conformance-tier"
+  return 0
+}
+
+# --- Base: must-FAIL, and its control ------------------------------------------------------------
+# No declaration on purpose: §6's trigger for Base is *every dev repo*, so Base is the one tier that
+# must answer without one. A regression that made Base wait for a declaration would pass every other
+# case in this file.
+t_base="$work/tier-base-missing"
+tier_repo "$t_base"
+# THE VICTIM IS DERIVED, AND ITS EXISTENCE IS ASSERTED BEFORE IT IS REMOVED (L-146). A hard-coded
+# `rm -f docs/product/requirements.md` would keep this case green after §2 renamed or dropped the row:
+# the file would simply never have been there, the removal would be a no-op, and the "must-FAIL"
+# assertion would pass for a reason that has nothing to do with the rule. `rm -f` cannot tell those
+# apart, which is why the check is here and not in the flags.
+base_victim=$(base_tier_set "$spec" | head -1)
+[ -n "$base_victim" ] || { echo "FAIL harness(tier-base-incomplete): §6's Base tier derived an EMPTY unconditional set, so there is nothing to remove and this case would pass vacuously"; fail=1; }
+[ -f "$t_base/$base_victim" ] || { echo "FAIL harness(tier-base-incomplete): derived victim '$base_victim' was never written, so removing it proves nothing (L-146)"; fail=1; }
+rm -- "$t_base/$base_victim"
+[ -e "$t_base/$base_victim" ] && { echo "FAIL harness(tier-base-incomplete): '$base_victim' survived removal"; fail=1; }
+run_case_anywhere "tier-base-incomplete" 1 "tier-doc-set-incomplete: $base_victim" -- \
+  sh "$engine" "$t_base" --spec "$spec"
+
+t_base_ok="$work/tier-base-complete"
+tier_repo "$t_base_ok"
+out=$(sh "$engine" "$t_base_ok" --spec "$spec" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] && ! printf '%s\n' "$out" | grep -q 'tier-doc-set-incomplete'; then
+  echo "PASS fixture(tier-base-control): a complete Base doc set reports no tier finding, exit 0"
+else
+  echo "FAIL fixture(tier-base-control): exit $rc with a tier finding on a complete Base set -- output:"; printf '%s\n' "$out"; fail=1
+fi
+
+# --- the substrate rows are SKIPPED, not owed ----------------------------------------------------
+# §6's own words. The control above already lacks `docs/testing/testing-guide.md` and every other
+# substrate-conditional row -- write_base_tier deliberately does not write them -- so the case is
+# simply that their absence produced no finding, and that they were NAMED rather than silently
+# dropped. A skip nobody can see is indistinguishable from a pass.
+if printf '%s\n' "$out" | grep -q 'substrate-conditional, skipped not owed' &&
+   ! printf '%s\n' "$out" | grep -q 'tier-doc-set-incomplete: docs/testing/testing-guide.md'; then
+  echo "PASS fixture(tier-substrate-skipped): substrate-conditional rows named as skipped, never as missing"
+else
+  echo "FAIL fixture(tier-substrate-skipped): a substrate-conditional row was reported missing, or the skip was silent -- output:"; printf '%s\n' "$out"; fail=1
+fi
+
+
+# --- Backend: must-FAIL, control, and the tier-below case ----------------------------------------
+t_be="$work/tier-backend-missing"
+tier_repo "$t_be" backend
+# Backend's victim is derived too, though nothing is removed here: tier_repo never writes Backend's
+# docs, so the absence is the fixture's initial state rather than an edit. The path is still read from
+# the spec, so a §2 rename moves the assertion with it instead of leaving it asserting a string the
+# standard no longer uses.
+be_victim=$(awk '
+  /^## §2/{in2=1;next} /^## §/{in2=0} !in2{next}
+  /^\*\*Conformance/{in2=0;next}
+  /^\*\*`docs\/` tree\*\*/{t=1;next} /^\*\*/{t=0} !t{next}
+  /^\|/ { n=split($0,c,"|"); if (n<7) next
+    f=c[2]; tier=c[3]; cre=c[6]
+    if (match(f,/`[^`]+`/)) p=substr(f,RSTART+1,RLENGTH-2); else next
+    if (p ~ /[<>*]/) next
+    if (cre ~ /always/) next
+    if (tier !~ /API exists/) next
+    print "docs/" p; exit }' "$spec")
+[ -n "$be_victim" ] || { echo "FAIL harness(tier-backend-incomplete): no Backend-tier row derived from §2, so this case would assert nothing"; fail=1; be_victim="docs/api/openapi.yaml"; }
+[ -e "$t_be/$be_victim" ] && { echo "FAIL harness(tier-backend-incomplete): '$be_victim' exists in the fixture, so its absence cannot be what the finding reports"; fail=1; }
+run_case_anywhere "tier-backend-incomplete" 1 "tier-doc-set-incomplete: $be_victim" -- \
+  sh "$engine" "$t_be" --spec "$spec"
+
+t_be_ok="$work/tier-backend-complete"
+tier_repo "$t_be_ok" backend
+write_doc "docs/architecture/data-flow.md"    "$t_be_ok"
+write_doc "docs/architecture/integrations.md" "$t_be_ok"
+write_doc "docs/api/openapi.yaml"             "$t_be_ok"
+out=$(sh "$engine" "$t_be_ok" --spec "$spec" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] && ! printf '%s\n' "$out" | grep -q 'tier-doc-set-incomplete'; then
+  echo "PASS fixture(tier-backend-control): a complete Backend doc set reports no tier finding, exit 0"
+else
+  echo "FAIL fixture(tier-backend-control): exit $rc -- output:"; printf '%s\n' "$out"; fail=1
+fi
+
+# A repo BELOW a tier does not owe that tier's docs. This is the case that would catch a check which
+# quietly made every tier cumulative-downward -- it would report Backend's docs against a Base repo,
+# which is precisely the "telling a four-file JS library it owes docs/database/erd.md" failure the
+# engine is on record refusing.
+t_low="$work/tier-declared-base"
+tier_repo "$t_low" base
+out=$(sh "$engine" "$t_low" --spec "$spec" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] &&
+   printf '%s\n' "$out" | grep -q "S6.BACKEND .*not evaluated: this repository declares tier 'base', below Backend" &&
+   ! printf '%s\n' "$out" | grep -q 'tier-doc-set-incomplete: docs/api/openapi.yaml'; then
+  echo "PASS fixture(tier-below-not-owed): a Base repo is not asked for Backend's doc set"
+else
+  echo "FAIL fixture(tier-below-not-owed): exit $rc -- output:"; printf '%s\n' "$out"; fail=1
+fi
+
+# --- Medium: rows exist and every one names a FAMILY ---------------------------------------------
+t_med="$work/tier-medium"
+tier_repo "$t_med" medium
+out=$(sh "$engine" "$t_med" --spec "$spec" 2>&1); rc=$?
+if printf '%s\n' "$out" | grep -q 'S6.MEDIUM .*names a FAMILY' &&
+   ! printf '%s\n' "$out" | grep -q 'S6.MEDIUM .*tier-doc-set-incomplete' &&
+   ! printf '%s\n' "$out" | grep -q 'S6.MEDIUM .*tier-doc-set-underivable'; then
+  echo "PASS fixture(tier-medium-family): Medium's rows are families -- reported as such, never as missing files, and never as a hole in the spec"
+else
+  echo "FAIL fixture(tier-medium-family): exit $rc -- output:"; printf '%s\n' "$out"; fail=1
+fi
+
+# --- Multi-service: the standard itself has the hole ---------------------------------------------
+t_ms="$work/tier-multisvc"
+tier_repo "$t_ms" multi-service
+run_case_anywhere "tier-multisvc-underivable" 1 "tier-doc-set-underivable" -- \
+  sh "$engine" "$t_ms" --spec "$spec"
+
+# --- an unreadable declaration is a finding, never a silent fallback to Base ---------------------
+t_bad="$work/tier-bogus"
+tier_repo "$t_bad" not-a-tier
+run_case_anywhere "tier-declaration-unreadable" 1 "tier-declaration-unreadable" -- \
+  sh "$engine" "$t_bad" --spec "$spec"
+
+# --- DoD 2: the required set comes from §2's table, not from this engine -------------------------
+# A base-tier row is ADDED to a copy of the real spec. No code changes. The engine must start
+# requiring it. If this case fails, the required set is hard-coded whatever the comments claim --
+# the same test SPRINT-074 used on §13's Mark column, applied to §2's Tier column.
+awk '
+  /^\| `product\/acceptance-criteria\.md` \|/ {
+    print
+    print "| `product/glossary.md` | base | Dev | 100 | init | the vocabulary changes |"
+    next
+  }
+  { print }
+' "$spec" > "$work/spec-plus-base-row.md"
+grep -q 'product/glossary.md' "$work/spec-plus-base-row.md" || { echo "FAIL harness: could not inject a §2 base row"; fail=1; }
+out=$(sh "$engine" "$t_base_ok" --spec "$work/spec-plus-base-row.md" 2>&1); rc=$?
+if [ "$rc" -eq 1 ] && printf '%s\n' "$out" | grep -q 'tier-doc-set-incomplete: docs/product/glossary.md'; then
+  echo "PASS fixture(tier-set-is-spec-derived): a row added to §2 changed the required set with no code edit"
+else
+  echo "FAIL fixture(tier-set-is-spec-derived): exit $rc; the required set did not follow the spec -- output:"; printf '%s\n' "$out"; fail=1
 fi
 
 echo "----------------------------------------"

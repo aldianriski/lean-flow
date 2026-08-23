@@ -58,7 +58,8 @@ repository.
 - [x] Register reconciles to 24 covered / 27 build / 11 scope-out = 62 — *Verify: re-derive by counting rule ids in each section table, never by editing the header*
 
 ### T2 — Cover §2/§6's tier doc-set family `[size: S · risk: low · class: execution · AFK]`
-Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `docs/research/conformance-dispositions.md`
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` ·
+        `docs/research/conformance-dispositions.md` · `docs/QA.md`
 Depends-on: T1
 Cites: spec/STANDARD.md §2 (the `Create ←` cells) · spec/STANDARD.md §6 Conformance table — `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` · `S6.MULTISVC` · docs/research/conformance-dispositions.md § build
 Five rules, one finding, one check — the register already dispositioned this as *the tier is a
@@ -69,15 +70,16 @@ becoming a hard-coded list that drifts from the table it copies.
 `tier-doc-set-incomplete` naming the missing file — and a conformant repo at that tier gets nothing.
 
 **DoD:**
-- [ ] One check answers `S2.F-TIER` · `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` · `S6.MULTISVC` — *Verify: the engine's own `coverage:` line moves 18 → 23 (corrected 2026-08-22 — see Execution Log)*
-- [ ] The required doc-set per tier is derived from §2's `Create ←` cells — *Verify: add a row to a spec copy; the required set changes with no code edit*
-- [ ] `tier-doc-set-incomplete` fires for each of the four tiers — *Verify: one retained must-FAIL fixture per tier, each asserting the finding string*
-- [ ] Each fixture reddens while a sibling control stays green — *Verify: run the harness with the seed applied and again without it*
-- [ ] Each seeded artifact still parses and is a targeted break — *Verify: `sh -n` clean, assertion count unchanged, line count within one of pristine (L-142)*
-- [ ] Each seed's victim is derived, not hard-coded, and its existence asserted **before** removal — *Verify: the fixture fails loudly if the file was never there (L-146)*
+- [x] One check answers `S2.F-TIER` · `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` · `S6.MULTISVC` — *Verify: the engine's own `coverage:` line moves 18 → 23 (corrected 2026-08-22 — see Execution Log)*
+- [x] The required doc-set per tier is derived from §2's `Create ←` cells — *Verify: add a row to a spec copy; the required set changes with no code edit*
+- [x] `tier-doc-set-incomplete` fires for each of the four tiers — *Verify: one retained must-FAIL fixture per tier, each asserting the finding string. **Corrected 2026-08-22** — the four tiers fire THREE strings, not one: `tier-doc-set-incomplete` (Base · Backend), `tier-doc-set-underivable` (Multi-service — §2 carries no row), and Medium's family note (its rows are all families; a family cannot be missing). Four tiers, four retained fixtures, three strings — see Execution Log*
+- [x] Each fixture reddens while a sibling control stays green — *Verify: run the harness with the seed applied and again without it*
+- [x] Each seeded artifact still parses and is a targeted break — *Verify: `sh -n` clean, assertion count unchanged, line count within one of pristine (L-142)*
+- [x] Each seed's victim is derived, not hard-coded, and its existence asserted **before** removal — *Verify: the fixture fails loudly if the file was never there (L-146)*
 
 ### T3 — Cover §2's README ownership-footer rule `[size: S · risk: low · class: execution · AFK]`
-Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `docs/research/conformance-dispositions.md`
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` ·
+        `docs/research/conformance-dispositions.md` · `docs/QA.md`
 Depends-on: T2
 Cites: spec/STANDARD.md §2 (`S2.R-README`) · spec/STANDARD.md §3 (the ownership header) · `S3.README` (the scope-out this check must not contradict) · docs/research/conformance-dispositions.md § scope-out (a)
 One rule, one finding. Its trap is definitional rather than mechanical: `S3.README` is scoped out
@@ -142,6 +144,9 @@ disagree and turn a scope-out into a silent gap.
 | `docs/QA.md` | T1 | the §13 row described a file that no longer exists; rewritten for the engine, incl. the `hold` and GAP semantics an adopter now sees | low | — |
 | `TECH-DEBT.md` | T1 | TD-065 resolved — the register no longer understates coverage by five | low | counts re-derived, not read off a header |
 | `docs/sprint/logs/SPRINT-078-…md` | T1 | created lazily at the first entry (two `scope-change` records) | low | — |
+| `scripts/lib/conformance-engine.sh` | T2 | +the tier family: `.conformance-tier` declaration · required set from §2's Tier column · substrate subtraction from §6's own clause · family-vs-silent-spec split | med | 10 retained fixtures; 2 seeded breaks reddened exactly their cases |
+| `evals/run-conformance-engine-fixtures.sh` | T2 | +`base_tier_set`/`write_base_tier` (spec-derived, so it cannot drift) and 10 tier cases; victims derived and asserted present before removal (L-146) | low | 26 pass, 0 fail |
+| `docs/research/conformance-dispositions.md` | T2 | tier family `build`→Covered (29/22/11=62); `.conformance-tier` documented as a consumer surface (L-015) | low | ids re-counted per section |
 
 ## Retro
 
