@@ -152,6 +152,28 @@ this sprint says why.
 - [ ] If closed: `status: closed` on the epic, its INDEX row kept, and archival proposed under §11 — *Verify: §11 archives an epic only when every member sprint is closed **and** every condition is `[x]`, never on sprint count*
 - [ ] If **not** closed: § Closed-when 2 records what remains and SPRINT-081's shape is named in § Out
 
+
+### T5 — Fix TD-073, because D4's trip-wire fired `[size: S · risk: med · class: execution · AFK]`
+Layers: `scripts/lib/conformance-engine.sh` · `TECH-DEBT.md`
+Depends-on: T1
+Cites: D4 (§ Out — the trip-wire, not a deferral) · TD-073 · TD-075 · L-144 · L-097 · **T2** · **T3** *(cited, not depended on — T5 unblocks them by clearing the trip-wire; the dependency runs the other way)*
+
+**Not in the promoted Plan; required by it.** D4 pre-locked the ruling — *"if the harness passes ~10
+minutes, stop and fix TD-073 before adding the rest"* — and T1 took it to **9m23s** for 38 cases, with
+T2 and T3 due to add roughly twenty more. Ran between T1 and T2 for that reason; the number is out of
+order because the trigger was.
+
+**Acceptance:** the harness is comfortably back under the trip-wire with every case still green and
+the engine's report unchanged, and TD-073 is resolved or explicitly re-filed.
+
+**DoD:**
+- [x] Root cause measured, not guessed — *Verify: timed in isolation against a tiny input per L-144. 100 × `$(printf|tr)` = 9,176ms · 100 × `$(printf '%-20s')` = 1,909ms · a whole engine run = 10,859ms. The driver's own per-rule bookkeeping was the entire runtime; the spec reader is 150ms for all 100 rules*
+- [x] TD-073's stated cause was **tested, not assumed** — *Verify: the shipped-vs-reduced spec question it names is worth only ~2.2s of 10.9s. Neither of its two proposed mitigations was needed, and the row records that it was wrong rather than being quietly rewritten*
+- [x] Equivalence proven before the swap — *Verify: both transforms compared over all 100 ids, zero mismatches, including the 21 hyphen-bearing ids that produced a silent false negative the last time this mangling changed*
+- [x] Engine report **byte-identical** — *Verify: `diff` over two repositories, 116 and 144 report lines; a speedup that moves a verdict is a regression*
+- [x] Trip-wire cleared with headroom — *Verify: harness 9m24s → 3m20s, same 38 cases, `all green`*
+- [x] The half that did not get fixed is filed, not dropped — *Verify: TD-075, the git-free cases still parked behind `QA_FULL`; TD-073's own Re-file clause named it in advance*
+
 ## Owner-action checklist
 - [ ] **Reinstall the plugin if the session is still on 1.48.0 skills** — the repo shipped 1.53.0 this sprint (L-021).
 
@@ -204,6 +226,8 @@ this sprint says why.
 | `evals/run-sprint-family-fixtures.sh` | T1 | 13 retained cases incl. the spec-read mechanism case and controls encoding both rejected designs (WHY: TD-012 · L-140 — retain the over-matched case, do not treat it as a fixed bug) | low | harness tally 38 pass / 0 fail |
 | `docs/research/conformance-dispositions.md` | T1 | § `build` 12 → 8 rows; heading count corrected with it | low | register/coverage reconcile |
 | `docs/research/conformance-coverage.md` | T1 | New row for the four, recording the derived thresholds and both defects real input caught | low | engine `coverage:` 37 + 14 = 51 |
+| `scripts/lib/conformance-engine.sh` | T5 | Driver bookkeeping made spawn-free — `fn=`/`pid=` by parameter expansion (WHY: two command substitutions + an external `tr` per rule were the entire runtime, 11.1s of a 10.9s run) | med | equivalence over all 100 ids, 0 mismatches; report byte-identical on 2 repos; harness 9m24s → 3m20s |
+| `TECH-DEBT.md` | T5 | TD-073 → resolved with its wrong cause kept and corrected; TD-075 filed for the surviving half (WHY: TD-073's own Re-file clause named the split) | low | id derived from ledger max 074, not remembered (L-143) |
 
 ## Retro
 

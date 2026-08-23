@@ -2441,6 +2441,18 @@ for row in $rules; do
   # shellcheck disable=SC2086
   set -- $row
   id=$1; level=$2; mark=$3
+  # SPAWN-FREE, and that is the whole of TD-073 (SPRINT-080). These two lines used to be
+  # `fn="assert_$(printf '%s' "$id" | tr '.-' '__')"` and `pid=$(printf '%-20s' "$id")` -- two command
+  # substitutions plus an external `tr` on EVERY rule. Measured on this host: 100 iterations of the
+  # first cost 9,176ms and of the second 1,909ms, against a whole-engine run of 10,859ms. The driver's
+  # own bookkeeping WAS the runtime; the spec reader is 150ms for all 100 rules and the assertions are
+  # noise beside it. L-144 again, one level below where it was found: the dominant term is the number
+  # of processes started, not the work done -- and here the processes did no work at all.
+  #
+  # Rewritten with parameter expansion only. Equivalence was proven over all 100 ids before the swap,
+  # both transforms, zero mismatches -- including the 21 ids carrying a hyphen, which is the exact set
+  # that produced a silent false negative when the mangling last changed (see the note below).
+  #
   # `.` AND `-` both map to `_`. The hyphen half was missing until SPRINT-076 T3, and it was a silent
   # false negative of exactly the shape L-058 names: `S2.F-FILE` resolved to `assert_S2_F-FILE`, no
   # such function was ever defined, and the driver reported `rule-unimplemented` with the assertion
@@ -2448,8 +2460,14 @@ for row in $rules; do
   # id, so nothing surfaced it. **21 of the spec's 100 ids carry a hyphen**, so this was waiting under
   # a fifth of the rule set. Verified collision-free before changing: all 100 ids stay distinct under
   # the two-character mangling, so no two rules can now resolve to one assertion.
-  fn="assert_$(printf '%s' "$id" | tr '.-' '__')"
-  pid=$(printf '%-20s' "$id")
+  _fnid=$id
+  case $_fnid in *.*) _fnid="${_fnid%%.*}_${_fnid#*.}" ;; esac
+  while :; do
+    case $_fnid in *-*) _fnid="${_fnid%%-*}_${_fnid#*-}" ;; *) break ;; esac
+  done
+  fn="assert_$_fnid"
+  pid=$id
+  while [ ${#pid} -lt 20 ]; do pid="$pid "; done
   # The rule under assertion, for _cur_rid's attribution (T6). Set here rather than inside each
   # assertion so a NEW assertion inherits it without its author having to remember.
   _cur_rid=$id

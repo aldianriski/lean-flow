@@ -170,3 +170,52 @@ on this log rather than preceding them, which is the order the frozen-Plan rule 
 **Worth noting for the Retro:** `layers observed` found the undeclared spec edit that this log had
 already confessed in prose. The prose was not a substitute for the declaration, and only the
 mechanical check treated it as missing.
+
+### 2026-08-23 | progress | T5 — TD-073 fixed, and its stated cause was wrong
+
+D4's trip-wire fired at the end of T1 (9m23s / 38 cases), so TD-073 was fixed before T2 added any
+case. Ran out of numeric order because the trigger was, and declared as `### T5` because the fix
+edits `TECH-DEBT.md` — coordinator-exempt at **close**, but reported during execution since TD-044's
+phase split, which is correct and caught it.
+
+**The row's stated cause did not survive measurement.** TD-073 said the cost was *"every case runs
+the whole engine against the SHIPPED spec, ~15s each"*, and proposed either reducing the spec or
+splitting the family. Timing per L-144's own diagnostic — each part in isolation against a **tiny**
+input, which is what makes overhead visible — said otherwise:
+
+| measured on this host | |
+|---|---|
+| 100 × `fn="assert_$(printf '%s' "$id" \| tr '.-' '__')"` | **9,176 ms** |
+| 100 × `pid=$(printf '%-20s' "$id")` | **1,909 ms** |
+| `read-spec-rules.sh`, all 100 rules | 150 ms |
+| **one whole engine run** | **10,859 ms** |
+
+The driver's own per-rule bookkeeping **was** the engine's runtime. Two command substitutions and an
+external `tr`, on every one of 100 rules, doing no work that a parameter expansion could not. The
+shipped-spec question TD-073 named is worth about **2.2s of 10.9s** — real, but not the term that
+mattered, and neither proposed mitigation was needed. The `sys`/`user` split said so before any
+theory did: **11.2s system against 4.3s user** is process creation, not computation.
+
+**Fix:** both lines rewritten with parameter expansion only — no subshell, no external binary.
+Equivalence proven over all 100 ids *before* the swap, both transforms, **zero mismatches**,
+including the 21 hyphen-bearing ids that produced a silent false negative the last time this mangling
+changed. Engine output verified **byte-identical** on two repositories (116 and 144 report lines): a
+speedup that moves a verdict is a regression, not an optimisation.
+
+**Result: 9m24s → 3m20s** for the same 38 cases, all green — 65% faster, trip-wire cleared with room
+for T2 and T3. Engine cost on a fixture-sized repo roughly halves; this repository's own report ~24%
+faster. The gate should benefit more than either, since it invokes the engine dozens of times.
+
+**Ledger.** TD-073 → `resolved`, with the wrong cause **kept as written** and the correction appended
+— being wrong is the instructive part, and rewriting the summary would hide that a plausible,
+well-argued hypothesis went untested for a sprint. TD-075 filed for the half that did **not** get
+fixed: the ten git-free cases still parked behind `QA_FULL`. TD-073's own *Re-file fresh if* clause
+predicted exactly that split. New id derived from the ledger maximum (074), not incremented from
+memory (L-143).
+
+**Retro candidate.** L-144 has now recurred a fourth time, one level below where it was last found —
+in the *driver* rather than in an assertion — and L-147 already says why: the rule is prose, and
+nothing **measures** the thing it protects. This sprint has now paid that cost twice (T1's harness
+scaling, T5's root cause). A cost regression check that times the engine against a fixed tiny input
+and fails on a threshold read from somewhere would have caught both at authorship. That is TD-071's
+subject and it is now overdue rather than theoretical.

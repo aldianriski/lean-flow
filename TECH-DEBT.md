@@ -73,6 +73,29 @@ status: current
 > **Deletion clock:** TD-048 · TD-057 · TD-065 all closed at Sprint-078, so 2 sprints — due at
 > **Sprint-081**, not this promote.
 
+- **TD-075** severity: minor | status: open | created: Sprint-080
+  - Summary: **Ten of `run-sprint-family-fixtures.sh`'s cases need no git at all, and are parked
+    behind `QA_FULL=1` alongside the ones that do — so guards for rules that run on every default
+    gate are quieter than the rules they guard.** Split off TD-073, which is resolved: this is the
+    half of it that survived the cost fix, and TD-073's own *Re-file fresh if* clause named this row
+    in advance — *"only the opt-in parking remains, and it is a different row."*
+  - Evidence: TD-016's rule is *cheap-and-git-free always-on, git-repo-building opt-in*, and it is
+    applied per FILE, so one git-using case in a family parks the whole file. The git-free cases here
+    are the caps, the log directory, the verify clause, and the §10 promotion/aging reads — plus the
+    four §11 ledger-retention cases added at SPRINT-080 T1, which read `TECH-DEBT.md`, `TODO.md` and
+    `docs/LEARNINGS.md` from the tree and touch no history at all.
+  - Impact: `S9.VERIFYCLAUSE` is the worked example and it is not hypothetical. It shipped with a
+    defect that fired on **every** unticked Plan (SPRINT-080 T0), and its guards sat behind an opt-in
+    flag while the rule itself ran on every gate. The defect surfaced from a manual baseline run at
+    G2, not from the suite that existed to catch it.
+  - Mitigation *(hypothesis, not a plan)*: the obvious move is a git-free sibling file, and it was
+    refused at SPRINT-079 T4/T5 on the grounds that one family belongs in one file. That reason still
+    holds and the refusal may still be right. **What changed is the price:** at 3m20s for 38 cases the
+    whole harness may now simply be cheap enough to run always-on, which would dissolve the split
+    rather than resolve it. Measure before choosing.
+  - **Revisit-if** the harness is proposed for the always-on set, or a second family-with-history is
+    added and inherits the same parking.
+
 - **TD-074** severity: minor | status: open | created: Sprint-079
   - Summary: **`S10.FOURBUCKETS` asserts only that a close reached *none* of the four durable homes,
     which is the weakest claim §10's rule admits.** §10 routes each Retro bucket to a home
@@ -95,7 +118,7 @@ status: current
   - **Re-file fresh if** the Retro's bucket structure changes shape, which would make the parse either
     trivial or impossible and settle this either way.
 
-- **TD-073** severity: minor | status: open | created: Sprint-079
+- **TD-073** severity: minor | status: resolved → SPRINT-080 (no task — fixed under the trip-wire D4 set) | created: Sprint-079 | closed: Sprint-080
   - Summary: **`evals/run-sprint-family-fixtures.sh` is the most expensive harness in the set (~5 min
     for 23 cases), and the cost is not the git repos — it is that every case runs the whole engine
     against the SHIPPED spec, ~15s each.** `run-attestation-fixtures.sh` takes the other side of the
@@ -114,7 +137,25 @@ status: current
     split the family so the git-free cases rejoin the always-on set, and/or reduce the spec each case
     is run against. The split was refused at T4/T5 on the grounds that one family belongs in one file;
     that is a real reason and it may simply lose to (b) above.
-  - **Re-file fresh if** the engine's per-run cost drops enough that the shipped-spec choice stops
+  - **RESOLVED at SPRINT-080, and the summary above was wrong about the cause — kept as written,
+    because being wrong is the instructive part.** Neither mitigation was needed. The shipped spec was
+    never dominating: the whole runtime was the DRIVER'S OWN BOOKKEEPING. Two lines ran per rule,
+    `fn="assert_$(printf '%s' "$id" | tr '.-' '__')"` and `pid=$(printf '%-20s' "$id")` — two command
+    substitutions plus an external `tr`, on all 100 rules. Timed in isolation on this host against a
+    tiny input, exactly as L-144 prescribes: **100 × the first = 9,176ms · 100 × the second = 1,909ms
+    · a whole engine run = 10,859ms.** The bookkeeping *was* the engine. The spec reader is 150ms for
+    all 100 rules, and the assertions are noise beside it.
+  - **Fix:** both rewritten with parameter expansion only, no subshell and no external binary.
+    Equivalence proven over all 100 ids before the swap — both transforms, zero mismatches, including
+    the 21 hyphen-bearing ids that produced a silent false negative the last time this mangling
+    changed. Engine output verified **byte-identical** on two repositories (116 and 144 report lines):
+    a speedup that moves a verdict is a regression, not an optimisation.
+  - **Measured result:** the harness runs **9m24s → 3m20s** for the same 38 cases, all green — 65%
+    faster, and the trip-wire D4 set is cleared with room for T2 and T3. Per-run engine cost on a
+    fixture-sized repo roughly halves; this repository's own report is ~24% faster.
+  - **What did NOT get resolved, and is now its own row:** impact (b) above — the ten git-free cases
+    still parked behind `QA_FULL`. This row's own *Re-file fresh if* clause called that shot: *"at
+    which point only the opt-in parking remains, and it is a different row."* → **TD-075**.
     dominating — at which point only the opt-in parking remains, and it is a different row.
 
 - **TD-064** severity: minor | status: open | created: Sprint-075 | updated: Sprint-076
