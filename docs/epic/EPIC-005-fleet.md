@@ -2,7 +2,7 @@
 epic: 005
 slug: fleet
 owner: Maintainer
-last_updated: 2026-08-10
+last_updated: 2026-08-23
 status: proposed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -51,17 +51,48 @@ telemetry of any kind · running an org's CI for them.
   rule lives where its reader does not read it.
 
 ## Open questions
+<!-- Ruled 2026-08-23. Two closed by reading (L-094: a documented behaviour is closed by reading, not
+     by waiting for a signal), one closed by ruling, one routed to a named gate with its options
+     stated — never left as a bare TBD. -->
 
-- How does fleet state stay git-native without a database — a manifest repo, per-repo pins, or
-  something else? → the epic's first real design fork; a `/prototype` if it cannot be settled on
-  paper, and a `/council` if it turns out to be ADR-grade.
-- What does "delivery across the fleet" report — DoD completion, conformance level, or both? → decide
-  once EPIC-004 shows what a single-repo report actually looks like.
-- Does a fleet imply multiple *humans* signing gates, and does the attestation format from EPIC-003
-  already carry that? → check before designing anything new; per-commit identity may cover it for free.
-- Is monorepo (many teams, one checkout) served by this epic or by scaling `stream:`? → an unanswered
-  admission test; ruling it early prevents building fleet mechanics for a case `stream:` already fits.
-
+- ~~How does fleet state stay git-native without a database — a manifest repo, per-repo pins, or
+  something else?~~ **Still open, but no longer blocking: routed to the first member sprint's G2 with
+  an ADR, and the options are named rather than deferred.** This is a judgement call, so it closes by
+  ruling; it is ADR-grade (hard-to-reverse, surprising, a real trade-off) so it does not get ruled
+  here in passing. The candidates: **(a) per-repo pin file** — each repo declares its own standard
+  version, so it answers *"which version am I on"* from a clone alone, with no network and no second
+  checkout; **(b) manifest repo** holding the roll-up as authority; **(c) both, with the manifest as a
+  derived cache and the pin as authority.** The leading candidate is (c) on EPIC-004's own precedent —
+  its decisive ruling was that a report is derived from the repo under test, never from our roadmap,
+  and a manifest-as-authority repeats the mistake one level up. `/prototype` if it cannot be settled
+  on paper; `/council` if the G2 finds the trade-off genuinely balanced.
+- ~~What does "delivery across the fleet" report — DoD completion, conformance level, or both?~~
+  **CLOSED by reading — EPIC-004 has now shown what a single-repo report is.** It is a **conformance
+  level + the named findings preventing the next level + the judgment-required items**, with
+  explicitly no percentage, no score and no grade (EPIC-004's own open-question ruling, and §14 now
+  carries the no-percentage rule normatively). The fleet report is those same three elements per repo
+  and introduces no fourth. The reason the prohibition matters more here, not less: a percentage
+  averages a deliberate judgment-only boundary together with a real gap, so across N repos it would
+  rank them by how much of the standard declines to automate — exactly backwards, and far more
+  tempting to build on a fleet view than on one repo.
+- ~~Does a fleet imply multiple *humans* signing gates, and does the attestation format from EPIC-003
+  already carry that?~~ **CLOSED by reading §13 — it carries it for free, as this row suspected.**
+  `Gate-Signed-By:` is specified as *"One line per approver; repeat the trailer for more than one"*,
+  so multi-approver sign-off needs no new format. Two further §13 properties do fleet work unasked:
+  the contract is stated for *"someone with your repository and nothing else"*, which is exactly a
+  fleet auditor's position; and §13c's claim-vs-proof boundary means an unsigned trailer is an
+  assertion by whoever wrote the commit — so a fleet that wants **proof** rather than a claim needs
+  commit signing, which is a repo policy this epic can require but must not reinvent. **No new
+  attestation work is admitted to this epic.**
+- ~~Is monorepo (many teams, one checkout) served by this epic or by scaling `stream:`?~~ **RULED:
+  `stream:`, not Fleet.** The admission test turns on what Fleet's mechanics actually operate on —
+  *separate git histories*. Pinning, rollout and cross-repo reporting each degenerate to a no-op in one
+  checkout with one history and one pin, while `stream:` already runs one active sprint per stream in a
+  single tree with a cross-stream overlap rule. Admitting monorepo would mean building fleet mechanics
+  for a case that has a working mechanism, which is the "forcing the abstraction" failure
+  `03-ADLC-ROADMAP.md § H` warns about. **Consequence recorded:** if a monorepo need arises that
+  `stream:` genuinely cannot serve, that is evidence the `stream:` model is wrong — it reopens
+  `stream:`, not this epic.
 ## Closed when
 
 - [ ] Two or more repos are pinned to one standard version and upgraded together
