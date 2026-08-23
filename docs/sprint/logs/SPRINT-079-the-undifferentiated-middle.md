@@ -117,3 +117,37 @@ split "reads its rule set from the spec" from "assertion bodies stay in code".
   "at least MINOR". A5 was confirmed at G2 by reading that test rather than by assuming a floor.
 
 Nothing was ticked before this ruling, and § Plan was not edited before it.
+
+### 2026-08-23 | progress | T1 done — the eleven are marked, and the middle is gone
+
+**Ruled (c): a third state, admitted in the spec.** Both classes kept their reasons; what was wrong was
+the **place**. §14 gains `restated` (7) and `standard-directed` (4), spec **0.5.0 → 0.6.0 MINOR** on
+the spec's own test (*does anything an adopter satisfies today change?* — it does: their report loses
+eleven `rule-unimplemented` lines and gains eleven named exclusions).
+
+**§14 handed over the ruling rather than my inventing one.** It already says §8 contributes **0**
+because *"it restates seven rules under a second name, inflating any denominator that ingests it"* —
+and the register independently called class (a) *"§8's problem at rule scale."* So `restated` is an
+established principle applied consistently, not new machinery. `standard-directed` is
+`implementation-directed` one category out, which is the register's own phrase.
+
+**Measured, at each step rather than at the end:**
+- 11 Mark cells rewritten — verified as *exactly* 11 changed lines, 993 → 993 line count, and column
+  count preserved on every edited row (a fused table row is L-009's named failure).
+- Engine: one `case` arm per mark + counters. `GAP 38 → 27`, `FAIL unchanged at 34`, **0**
+  `unrecognized mark` lines. `coverage: 24 + 27 = 51`, and with the 6 outboard checkers
+  **51 = 30 covered + 21 build, 0 scope-out.**
+- Three retained fixtures (`mark-restated` · `mark-standard-directed` · `no-unrecognized-mark`), all
+  passing.
+- **Discrimination proven, and the first attempt at proving it was itself wrong.** Deleting only the
+  `restated)` label orphaned its body and the engine stopped parsing — 0 of everything, which would
+  have scored as a redden for the wrong reason (L-142 exactly). Re-seeded by removing the whole 7-line
+  arm: the copy still **parses**, case 4c reddens with 7 `unrecognized mark` lines where it asserts 0,
+  and the `standard-directed` sibling control stays green at 4.
+
+**Nothing was ruled (a) checked**, so § `build` is unchanged at 21 and T4/T5's rule set did not move —
+**A2 held**, which is why the sprint could sequence this first without risking rework downstream.
+
+`docs/DECISIONS.md` carries **ADR-028**; the epic's § Closed-when 2 is amended with its prior wording
+preserved in place, and the cost — a smaller checkable set makes our own exit condition easier — is
+written into the row rather than left for a reader to notice.

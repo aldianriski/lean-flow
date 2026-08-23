@@ -17,9 +17,12 @@ an undifferentiated middle. Rule ids are `spec/STANDARD.md` §14's; that file is
 the register. Split from `conformance-baseline.md` under §2's growth rule — split, never squeeze (L-131).
 
 **Counts, re-derived from the section tables and reconciled against the engine — never copied forward.**
-100 candidates · **100 classified** · **62 checkable** · **30 covered** · **32 dispositioned here — 21
-`build`, 11 `scope-out`**. Reconciled mechanically, not by eye: 30 + 21 + 11 = **62**, and no checkable
-rule is left without a disposition.
+100 candidates · **100 classified** · **51 checkable** · **30 covered** · **21 `build`** · **0
+`scope-out`**. Reconciled mechanically: 30 + 21 = **51**, matching the engine's own `coverage:` line
+(24 with an assertion + 27 gaps).
+**Checkable went 62 → 51 at SPRINT-079 T1 and the eleven did not vanish — they were marked.** A
+disposition written here cannot reach the engine, which dispatches on `spec/STANDARD.md`'s Mark column;
+all eleven now carry `restated` (7) or `standard-directed` (4) there. Record → § `scope-out` below.
 **Counting them: the Rule column, not the row.** These figures are re-derived by counting rule ids in
 each section table's **first cell**. Scoping to the row instead over-counts, and did: the § Covered row
 for `S2.R-README` explains in its own note that it keeps `S3.README`'s scope-out true, so a row-wide
@@ -82,40 +85,38 @@ A check specified without its finding name is a half-shipped gate (L-058). Every
 | `S12.DESIGNSRC` | `design-source-committed` |
 | `S12.GENERATED` | `generated-artifact-committed` |
 
-## `scope-out` — 11 checkable rules, each with its reason
+## `scope-out` — dissolved at SPRINT-079 T1; the record
 
-Three distinct reasons, not interchangeable. **A rule scoped out is still a rule** — stated, marked, and
-simply not something *this engine* evaluates. An arrow (`→ X`) names the rule that already covers it; the
-target is **not** itself scoped out.
+**This bucket no longer exists, and its eleven rules are now marked in the spec.** The section is kept
+as the record of why, because the ruling is more useful beside the classification it replaced than in
+git alone.
 
-**(a) Restates a rule checked elsewhere — checking both double-counts one constraint (7).**
-`S7.ORPHAN` → `S3.SCHEMA` · `S7.PERSON` → `S1.LAW2` · `S7.OUTSIDE` → `S2.F-FILE` · `S7.LEDGER` → §11 ·
-`S2.F-ARCHIVE` → §11's ledger · `S9.GATESINFILE` → the same field as `S9.GATESWELLFORMED` ·
-`S3.README` → `S2.R-README`. This is §8's problem at rule scale: the standard cross-references itself,
-and an engine ingesting every statement inflates its own denominator.
+**What it held, and where each rule went** — the two classes were already correct; what was wrong was
+the *place*. A disposition written here cannot reach the engine, which dispatches on
+`spec/STANDARD.md`'s Mark column, so all eleven reported to every adopter as `rule-unimplemented`:
+*checks the standard owes you and has not written yet*. Seven are checked under another id; four
+cannot be checked against any adopter's tree.
 
-**(b) Governs the standard document, not an adopter's repository (4).**
-`S2.R-CAPEXACT` (a cap cell is an integer) and `S2.R-DESIGN` (`DESIGN.md` is absent from the §2 table)
-both read **§2's own table**, which an adopter does not have. `S2.R-SKILLCAP` and `S2.R-SKELETON` govern
-`SKILL.md`, a Claude Code plugin artifact rather than a general repository concept — an adopter with no
-skills would collect findings for files they were never expected to have. **This is the same failure
-`implementation-directed` prevents, one category out**: these *are* repo rules, just not *an arbitrary
-repo's* rules.
+- **→ `restated` (7)** — the constraint is carried by another rule, named beside it: `S7.ORPHAN` →
+  `S3.SCHEMA` · `S7.PERSON` → `S1.LAW2` · `S7.OUTSIDE` → `S2.F-FILE` · `S7.LEDGER` → §11 ·
+  `S2.F-ARCHIVE` → §11's ledger · `S9.GATESINFILE` → `S9.GATESWELLFORMED` · `S3.README` →
+  `S2.R-README`. This was recorded here as *"§8's problem at rule scale"*, and it got §8's answer:
+  §8 contributes 0 for exactly this reason.
+- **→ `standard-directed` (4)** — governs the standard document, not a repository: `S2.R-CAPEXACT` and
+  `S2.R-DESIGN` read §2's own table, which an adopter does not have; `S2.R-SKILLCAP` and
+  `S2.R-SKELETON` govern `SKILL.md`, a plugin artifact. Recorded here as *"the same failure
+  `implementation-directed` prevents, one category out"* — which is the mark it became.
 
-**`S2.R-GROWTH` was listed here and is not a scope-out at all** (SPRINT-076 T1). The spec marks it
-**`judgment-only`** — *which sections move is judged* — so it was never in the checkable set this
-section partitions, and counting it made § scope-out claim 12 where the engine sees 11. Corrected, the
-register reconciles **exactly** against the engine's dispatchable set: 30 covered + 21 `build` +
-11 scope-out = **62** checkable rules (30 and 21 as of SPRINT-078 T3). Found the way every sighting of
-this class is found — by a second number disagreeing, not by re-reading the prose (L-108).
+**`S2.R-GROWTH` was listed here and was never a scope-out** (SPRINT-076 T1) — the spec marks it
+`judgment-only`, so it was never in the checkable set this section partitioned. Kept because the
+correction is the useful part: counting it made this section claim 12 where the engine saw 11, and it
+was found by a second number disagreeing rather than by re-reading the prose (L-108).
 
-**(c) No checkable rule falls here — recorded because the category was expected to be large and is
-empty.** The §12 content categories (`S12.LEGAL` · `S12.FINANCIAL` · `S12.PERSONAL` · `S12.PRODLOGS` ·
-`S12.MEETINGNOTES` · `S12.DRAFTS`) and `S2.R-LAW1INIT` are all marked **`judgment-only`**, so they were
-never in the checkable set and need no disposition. A filename heuristic exists for each and is
+**Class (c) was empty and stays empty.** The §12 content categories (`S12.LEGAL` · `S12.FINANCIAL` ·
+`S12.PERSONAL` · `S12.PRODLOGS` · `S12.MEETINGNOTES` · `S12.DRAFTS`) and `S2.R-LAW1INIT` are all
+`judgment-only` and were never in the checkable set. A filename heuristic exists for each and is
 deliberately not built: a scan flagging `contract.md` in a repo about contract testing is worse than no
-scan. **Revisit-if** an adopter reports a real miss one of them would have caught. Listed here for the
-reader who expects to find them, not as dispositions.
+scan. **Revisit-if** an adopter reports a real miss one of them would have caught.
 
 ## Divergences from `conformance-baseline.md` (routed here by T1)
 

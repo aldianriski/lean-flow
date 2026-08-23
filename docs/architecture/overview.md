@@ -19,7 +19,7 @@ status: current
 ## Directory structure
 
 ```
-spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.5.0) · CHANGELOG.md
+spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.6.0) · CHANGELOG.md
                                 versioned independently of plugin.json — the SSOT (ADR-023)
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
 skills/           14 skills (auto-discovered at root)

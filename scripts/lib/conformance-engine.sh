@@ -1808,6 +1808,7 @@ assert_S2_R_PLACEMENT() {
 # (a report disagreeing with its artifact -- this repo's own most-repeated failure class).
 # ==================================================================================================
 n_pass=0; n_judgment=0; n_impl=0; n_unclassified=0; n_reported=0; n_dispatchable=0
+n_restated=0; n_stddir=0
 struct_fail=0; gated_fail=0; attested_fail=0
 struct_hold=0; gated_hold=0; attested_hold=0
 
@@ -1836,6 +1837,20 @@ for row in $rules; do
     judgment-only)
       n_judgment=$((n_judgment + 1))
       note "$pid -- judgment-required (mark: judgment-only, level: $level). Not checkable in principle -- the standard is choosing a human, and this is not debt (§14)"
+      ;;
+    restated)
+      # §14: the constraint IS checked -- under the rule id named beside this one. Reporting it as a
+      # gap would tell an adopter we owe them a check we have deliberately declined to write, and
+      # counting it would state one constraint twice. This is §8's answer applied one level down.
+      n_restated=$((n_restated + 1))
+      note "$pid -- excluded by mark: restated (level: $level). The constraint is carried by another rule and checked under that id; asserting it here would state one constraint twice and inflate the denominator (§14)"
+      ;;
+    standard-directed)
+      # §14: governs THIS document (or the plugin shipping it), never an adopter's tree. Same failure
+      # implementation-directed prevents, one category out -- these are repository rules, just not an
+      # arbitrary repository's.
+      n_stddir=$((n_stddir + 1))
+      note "$pid -- excluded by mark: standard-directed (level: $level). Governs this standard document or the plugin that ships it, never an adopter's repository; evaluating it would emit a finding no adopter can clear (§14)"
       ;;
     mechanical|split)
       last_bad=0
@@ -1936,6 +1951,6 @@ if [ "$n_gap" -gt 0 ]; then
 else
   note "coverage: all $n_dispatchable checkable rule(s) have an assertion in this engine"
 fi
-note "counts: $n_pass passed, $n_judgment judgment-required, $n_impl excluded (implementation-directed), $n_gap unchecked (engine gap)$([ "$n_reported" -gt 0 ] && printf ', %s reported without a verdict' "$n_reported")$([ "$n_unclassified" -gt 0 ] && printf ', %s unclassified' "$n_unclassified")"
+note "counts: $n_pass passed, $n_judgment judgment-required, $n_impl excluded (implementation-directed), $n_restated excluded (restated -- checked under another id), $n_stddir excluded (standard-directed), $n_gap unchecked (engine gap)$([ "$n_reported" -gt 0 ] && printf ', %s reported without a verdict' "$n_reported")$([ "$n_unclassified" -gt 0 ] && printf ', %s unclassified' "$n_unclassified")"
 
 exit $fail

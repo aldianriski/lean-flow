@@ -248,6 +248,58 @@ else
   printf '%s\n' "$out"; fail=1
 fi
 
+
+# --- case 4a (PASS control, the `restated` mark, SPRINT-079 T1) -----------------------------------
+# `restated` says the constraint is carried by ANOTHER rule and checked under that id -- so the rule
+# must be excluded by mark, never reported as a gap someone can close. S1.LAW2 is mechanical and
+# unimplemented in the real spec, so before this arm existed it fell to the `*)` catch-all and said
+# `unrecognized mark`, which reads to an adopter as a defect in the standard. Both halves are
+# asserted: the named exclusion appears AND the catch-all wording does not.
+awk '
+  /^\| `S1\.LAW2` \|/ { print "| `S1.LAW2` | Structural | **restated** | re-marked by the fixture |"; next }
+  { print }
+' "$spec" > "$work/spec-remark-to-restated.md"
+out=$(sh "$engine" "$target" --spec "$work/spec-remark-to-restated.md" 2>&1)
+if printf '%s\n' "$out" | grep -qE 'S1\.LAW2 *-- excluded by mark: restated' &&
+   ! printf '%s\n' "$out" | grep -qE 'S1\.LAW2 *-- (unrecognized mark|rule-unimplemented)' &&
+   ! printf '%s\n' "$out" | grep -qE '^(PASS|FAIL)  S1\.LAW2'; then
+  echo "PASS fixture(mark-restated): re-marking S1.LAW2 restated excluded it by name -- not a gap, not unrecognized"
+else
+  echo "FAIL fixture(mark-restated): S1.LAW2 did not report as excluded-by-mark restated -- output:"
+  printf '%s\n' "$out"; fail=1
+fi
+
+# --- case 4b (PASS control, the `standard-directed` mark, SPRINT-079 T1) --------------------------
+# Same claim for the second mark added at 0.6.0. Kept as its own case rather than folded into 4a:
+# they are two independent `case` arms, and one arm deleted while the other survives must redden
+# exactly one line here (L-058 -- a finding per check, not a check per family).
+awk '
+  /^\| `S1\.LAW2` \|/ { print "| `S1.LAW2` | Structural | **standard-directed** | re-marked by the fixture |"; next }
+  { print }
+' "$spec" > "$work/spec-remark-to-stddirected.md"
+out=$(sh "$engine" "$target" --spec "$work/spec-remark-to-stddirected.md" 2>&1)
+if printf '%s\n' "$out" | grep -qE 'S1\.LAW2 *-- excluded by mark: standard-directed' &&
+   ! printf '%s\n' "$out" | grep -qE 'S1\.LAW2 *-- (unrecognized mark|rule-unimplemented)' &&
+   ! printf '%s\n' "$out" | grep -qE '^(PASS|FAIL)  S1\.LAW2'; then
+  echo "PASS fixture(mark-standard-directed): re-marking S1.LAW2 standard-directed excluded it by name"
+else
+  echo "FAIL fixture(mark-standard-directed): S1.LAW2 did not report as excluded-by-mark standard-directed -- output:"
+  printf '%s\n' "$out"; fail=1
+fi
+
+# --- case 4c (must-FAIL: no rule may fall to the catch-all, SPRINT-079 T1) ------------------------
+# The regression this pair exists to prevent. Against the SHIPPED spec, every mark value must have an
+# arm: a single `unrecognized mark` line means the spec introduced a mark the engine cannot name, and
+# an adopter's report then advertises our own inconsistency. This is the case that would have failed
+# the moment T1's eleven re-marks landed without the arms -- which is precisely the half-shipped
+# state the scope-change ruling refused (TD-001, L-007).
+out=$(sh "$engine" "$target" --spec "$spec" 2>&1)
+if ! printf '%s\n' "$out" | grep -qE 'unrecognized mark'; then
+  echo "PASS fixture(no-unrecognized-mark): every mark value in the shipped spec has an engine arm"
+else
+  echo "FAIL fixture(no-unrecognized-mark): the shipped spec carries a mark the engine cannot name --"
+  printf '%s\n' "$out" | grep -E 'unrecognized mark' | sed 's/^/    /'; fail=1
+fi
 # --- case 5 (must-FAIL + PASS, the registry actually calls a registered assertion) -----------------
 # Cases 1-4 only exercise the "no assertion found" branch. This case proves the OTHER branch: when
 # `assert_<id>` IS defined, the driver calls it and its own verdict (not a generic rule-unimplemented)

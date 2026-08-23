@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-21
+last_updated: 2026-08-23
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,46 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.6.0 — 2026-08-23
+
+**MINOR — the conformance model gains two marks, and eleven rules stop being reported as gaps they
+were never going to be.** §14 adds **`restated`** (7 rules) and **`standard-directed`** (4). No rule is
+added, removed or reclassified out of the standard: **100 classified stands**, and every one of the
+eleven is still stated, still marked, still readable. What changes is the set a tool evaluates against
+a repository — **checkable goes 62 → 51**.
+
+**The defect this fixes.** Both categories were already *described* — §14 says §8 "restates seven rules
+under a second name, inflating any denominator that ingests it", and the reference implementation's
+disposition register carried the same finding at rule scale plus a four-rule class that reads §2's own
+table. But a description is not a mark, and the engine dispatches on the Mark column. So all eleven
+carried `mechanical`, and every conformance report — including one run against a repository that never
+installed lean-flow — listed them as `rule-unimplemented`: *checks the standard owes you and has not
+written yet*. Seven of them are checked, under another id. Four can never be checked against any
+adopter's tree. Saying so is the fix.
+
+**`restated` — the constraint is carried by another rule.** `S7.ORPHAN` → `S3.SCHEMA` · `S7.PERSON` →
+`S1.LAW2` · `S7.OUTSIDE` → `S2.F-FILE` · `S7.LEDGER` → §11 · `S2.F-ARCHIVE` → §11's ledger ·
+`S9.GATESINFILE` → `S9.GATESWELLFORMED` · `S3.README` → `S2.R-README`. This is **§8's answer applied
+one level down**: §8 contributes 0 for exactly this reason, and these seven do the same thing across
+sections rather than within one. Each names its covering rule, so *covered elsewhere* is a report line,
+not a footnote.
+
+**`standard-directed` — governs this document, not a repository.** `S2.R-CAPEXACT` and `S2.R-DESIGN`
+read §2's own table, which an adopter does not have. `S2.R-SKILLCAP` and `S2.R-SKELETON` govern
+`SKILL.md`, a plugin artifact — an adopter with no skills would collect findings for files they were
+never expected to have. The same failure `implementation-directed` prevents, one category out.
+
+**Why MINOR and not PATCH, on 0.5.0's own test: *does anything an adopter satisfies today change?***
+It does. An adopter's report loses eleven `rule-unimplemented` lines and gains eleven named exclusions.
+No tree changes and no level moves — the reference implementation's FAIL count is unchanged at 34 —
+but what the report *says* about their repository changes, which is the line PATCH may not cross.
+
+**The cost, stated rather than buried.** A smaller checkable set makes any exit condition resting on
+coverage arithmetic easier to satisfy. That is real, it is why this is recorded as an ADR rather than a
+tidy-up, and it is accepted because the alternative is a standard that tells adopters it owes them
+eleven checks it has decided never to write.
+
 
 ## 0.5.0 — 2026-08-21
 

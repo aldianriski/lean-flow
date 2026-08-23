@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-21
+last_updated: 2026-08-23
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.5.0
+version: 0.6.0
 status: current
 ---
 
@@ -269,10 +269,10 @@ by the rows.
 | `S2.F-CREATE` | Gated | judgment-only — a create *trigger* is an event; no tool observes that it happened |
 | `S2.F-UPDATE` | Gated | judgment-only — same shape as `S2.F-CREATE` |
 | `S2.F-TIER` | Gated | split — tier *satisfaction* is mechanical (reduces to `S2.F-FILE`); tier *detection* is judged (§6) |
-| `S2.F-ARCHIVE` | Structural | mechanical — the `Archive` cell delegates to §11's ledger |
+| `S2.F-ARCHIVE` | Structural | restated — the `Archive` cell delegates to §11's ledger |
 | `S2.R-PLACEMENT` | Structural | mechanical — canonical placement; legacy paths matched second |
 | `S2.R-GROWTH` | Structural | judgment-only — *cap-hit → split, never squeeze*; which sections move is judged |
-| `S2.R-CAPEXACT` | Structural | mechanical — a cap a checker reads is an integer, not `~10` |
+| `S2.R-CAPEXACT` | Structural | standard-directed — a cap a checker reads is an integer, not `~10` |
 | `S2.R-LAW1INIT` | Structural | judgment-only — the mandatory minimum is scaffolded at init; beyond it, create-lazily |
 | `S2.R-TEMPDIR` | Structural | mechanical — temp-dir artifacts are never referenced from durable docs |
 | `S2.R-README` | Structural | mechanical *on the invariants* — the anti-SSOT rule and the footer ownership line |
@@ -280,11 +280,11 @@ by the rows.
 | `S2.R-TPLLOAD` | Gated | judgment-only — read the template before generating; divergence → template wins, surfaced |
 | `S2.R-CODEFIRST` | Gated | judgment-only — before any new file, ask whether it can live in a code comment |
 | `S2.R-LAZY` | Gated | judgment-only — create only when there is something concrete to write |
-| `S2.R-DESIGN` | Structural | mechanical — `DESIGN.md` is non-core and never listed in the §2 table |
-| `S2.R-SKILLCAP` | Structural | split — `≤ ~140` is mechanical; policing "executable artifact" honestly is not |
+| `S2.R-DESIGN` | Structural | standard-directed — `DESIGN.md` is non-core and never listed in the §2 table |
+| `S2.R-SKILLCAP` | Structural | standard-directed — governs `SKILL.md`, a plugin artifact rather than a repository concept |
 | `S2.R-DISCLOSE` | Structural | judgment-only — inline what every path needs, disclose what only some reach |
 | `S2.R-COMPLETION` | Gated | judgment-only — write the bound you would accept as proof, not the activity |
-| `S2.R-SKELETON` | Structural | mechanical — 6 frontmatter fields in order; canonical section order |
+| `S2.R-SKELETON` | Structural | standard-directed — 6 frontmatter fields in order; canonical section order |
 
 **21 rules** — 6 families + 15 standalone. `Reader` is **data**, not a rule: it names an audience and no
 repository can violate it. *(One more than the SPRINT-072 inventory's 20: `S2.R-PLACEMENT` carries the
@@ -345,7 +345,7 @@ census sees — it is one rule, not zero.
 | Rule | Level | Mark |
 |---|---|---|
 | `S3.SCHEMA` | Structural | mechanical — the four fields present on every doc; the *Flag if* conditions read from the same block |
-| `S3.README` | Structural | mechanical — README carries a footer `<sub>` line instead of a YAML header |
+| `S3.README` | Structural | restated — `S2.R-README` asserts the footer `<sub>` shape; §3 states the rule, §2 carries the check |
 | `S3.AGENTS` | Structural | mechanical — `AGENTS.md` likewise |
 
 **3 rules.** §3 is the most mechanical section in the standard: every rule is a field read.
@@ -470,13 +470,13 @@ prohibitions. An engine ingesting it as fresh rules double-counts them under a s
 | Rule | Level | Mark | Restates |
 |---|---|---|---|
 | `S7.HOW` | Structural | judgment-only | `S5.FILTER` |
-| `S7.ORPHAN` | Structural | mechanical | `S3.SCHEMA` |
-| `S7.PERSON` | Structural | split — mechanical against a role vocabulary, judged without one | `S1.LAW2` |
+| `S7.ORPHAN` | Structural | restated | `S3.SCHEMA` |
+| `S7.PERSON` | Structural | restated — the role-vocabulary question belongs to `S1.LAW2`; asserting it here states one constraint twice | `S1.LAW2` |
 | `S7.MEGA` | Structural | mechanical | `S2.F-CAP` |
 | `S7.SPRINT400` | Structural | mechanical — hard cap | `S9.TWOFILES` |
 | `S7.STALE` | Gated | judgment-only | — *(new here)* |
-| `S7.OUTSIDE` | Structural | mechanical — set membership vs §2 | `S2.F-FILE` |
-| `S7.LEDGER` | Structural | mechanical | §11 |
+| `S7.OUTSIDE` | Structural | restated — set membership vs §2 | `S2.F-FILE` |
+| `S7.LEDGER` | Structural | restated | §11 |
 | `S7.CAPRAISE` | Gated | judgment-only — a cap moves only by ADR, and only after a measured diet | — *(new here)* |
 
 **9 rules, 2 of them new.** The `Response` column is **data** — the remedy, not the obligation.
@@ -559,7 +559,7 @@ answer; the field or the git object is.
 | `S9.LOGDIR` | Structural | mechanical | path shape — load-bearing, the sprint glob is non-recursive |
 | `S9.GATESWELLFORMED` | Gated | mechanical | the `gates_signed:` frontmatter field |
 | `S9.GATESABSENT` | Gated | mechanical | field absent ⇒ **NOT SIGNED**, never approval |
-| `S9.GATESINFILE` | Gated | mechanical | the same field — a session transcript is unreadable to any tool, which is the point |
+| `S9.GATESINFILE` | Gated | restated | the same field — a session transcript is unreadable to any tool, which is the point |
 | `S9.GATESMALFORMED` | — | **implementation-directed** | constrains the *reader*: report it, never default either way |
 | `S9.PLANFROZEN` | Gated | split | mechanical via git (did § Plan change after `plan_commit`?); whether a change was legitimate is not |
 | `S9.SCOPECHANGE` | Gated | split | the two commits' order is mechanical; "was this a scope shift?" is not |
@@ -945,6 +945,8 @@ its own — it is the legend, and evaluating it against a repository is a catego
 | `judgment-only` | **not checkable in principle** — the standard is choosing a human | **no. This is not debt** |
 | `split` | mechanical on one half, judged on the other | only the mechanical half is |
 | `implementation-directed` | constrains a **tool's behaviour or inference**, not a repository | **no — and never evaluate it against an adopter** |
+| `restated` | states a constraint **another rule already carries** — the covering rule is named beside it | **no. It is checked, under the other id** |
+| `standard-directed` | constrains **this document**, or the plugin that ships it, rather than any repository | **no — and never evaluate it against an adopter** |
 
 **`judgment-only` and "mechanical but unchecked" are not the same thing, and collapsing them is the
 error this model exists to prevent.** A rule marked `judgment-only` will never have a checker, because
@@ -966,6 +968,34 @@ load-bearing ones: *a verifier may not conclude approval from an unsigned traile
 is not the attestation* are rules about **what a tool may infer**. A conformance engine that ingests
 them as repository rules must either drop them — losing the entire claim-vs-proof boundary §13 exists to
 state — or emit findings **no adopter can ever clear**.
+
+**`restated` and `standard-directed` exist because a rule can be neither checkable against an adopter
+nor a matter of judgment.** Both were added at spec 0.6.0, and both name a state the model previously
+had no word for — so eleven rules sat outside every category, and a conformance engine reading only the
+`mechanical` mark reported all eleven as *unchecked gaps someone can close*. They are not.
+
+**`restated` — seven rules, each naming the rule that carries its constraint.** `S7.ORPHAN` →
+`S3.SCHEMA` · `S7.PERSON` → `S1.LAW2` · `S7.OUTSIDE` → `S2.F-FILE` · `S7.LEDGER` → §11 ·
+`S2.F-ARCHIVE` → §11's ledger · `S9.GATESINFILE` → the same field as `S9.GATESWELLFORMED` ·
+`S3.README` → `S2.R-README`. **This is §8's problem at rule scale, and it gets §8's answer.** §8
+contributes **0** to the counts below precisely because it restates seven constraints under a second
+name and any denominator ingesting it double-counts them; these seven do the same thing one level
+down, across sections rather than within one. The constraint *is* checked — under the other id — so a
+`restated` rule is neither a gap nor judgment: it is **covered elsewhere**, and a report says which.
+
+**`standard-directed` — four rules that govern this document, not a repository.** `S2.R-CAPEXACT` (a
+cap cell is an integer) and `S2.R-DESIGN` (`DESIGN.md` is absent from the §2 table) both read **§2's
+own table**, which an adopter does not have. `S2.R-SKILLCAP` and `S2.R-SKELETON` govern `SKILL.md`, a
+plugin artifact rather than a general repository concept — an adopter with no skills would collect
+findings for files they were never expected to have. This is the same failure `implementation-directed`
+prevents, **one category out**: these *are* repository rules, just not *an arbitrary repository's*.
+
+**What this changes, stated plainly rather than buried.** Eleven rules leave the *checkable* set, so it
+goes **62 → 51**. That makes §10's coverage arithmetic — and any exit condition resting on it — easier
+to satisfy, which is a real cost and the reason this is an ADR rather than a tidy-up. It is accepted
+because the alternative is worse in the direction that matters: a report that tells an adopter the
+standard owes them eleven checks it has decided never to write. **Classification is unchanged at 100** —
+nothing was reclassified out of the standard, only out of the set a tool evaluates against a tree.
 
 **Reading a rule id.** `S<section>.<key>` — `S13.TRAILERS` is §13's three-trailer rule. Ids are stable
 across spec versions and are what a finding names, so a report stays comparable as the standard evolves.

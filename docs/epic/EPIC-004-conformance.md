@@ -130,33 +130,34 @@ each other · any telemetry, ever (the README promises none).
       ledgers) have not been exercised against a foreign tree at all. The triage recorded **0
       artefacts**, and that number is honest but early — the question is barely asked yet, and wants
       re-running as coverage grows rather than being treated as settled here.
-- [ ] Every spec rule maps to a check, or is explicitly marked judgment-only in the spec
-      — **RULED at SPRINT-076 T4, with evidence, and the bar STANDS.** This is the decision the sprint
-      was built to make deliberately rather than by drift, and the ruling is *no change to the
-      condition*: no ADR, because nothing was amended (§4's bar is not met by a decision to leave a
-      condition alone); the Retro carries it.
-      **The three numbers it was made with**, each derived at execution rather than trusted from the
-      Plan: **coverage 19 of 62** checkable rules map to a check — 13 of those answered by the engine,
-      which is exactly what assumption A5 predicted and what the engine's own `coverage:` line
-      re-derived; **4 artefacts of 8** new findings against a repository that never installed
-      lean-flow (T3, confirming A4 and moving the honest number off SPRINT-075's zero); and **16 of 19
-      finding identities guarded**, 24 of 24 checks (T1).
-      **Why it stands.** The clause has two halves and only one is met. The *"or is explicitly marked
-      judgment-only"* half is **done** — 32 rules satisfy it outright and 6 more are excluded by mark.
-      The *"maps to a check"* half is at **19 of 62**, with **32** rules dispositioned `build` and
-      **11** `scope-out`. A disposition is a decision to build, not a check, and the 11 scope-outs
-      satisfy *neither* half — a residual this row has flagged since SPRINT-073 and which is still
-      open. Reading 19 of 62 as "every rule" requires either counting dispositions as checks or
-      swapping in the roadmap's looser Phase A exit (*rules independently readable + conformance
-      independently measurable*, both arguably true today). **Both were considered and rejected**: the
-      roadmap's exit is a different claim, not this one, and amending an exit condition to fit what got
-      built is the failure L-088 names — refused once already at SPRINT-075, on a DoD whose
-      parenthetical was wrong.
-      **What standing costs, stated so the choice is not free.** ~**32 rules** remain; SPRINT-076
-      shipped 7, so **four to five more coverage sprints**, plus a separate ruling on whether the 11
-      `scope-out` rules are checked, re-marked, or accepted as a third state the wording does not
-      admit. **"The bar stands and EPIC-004 runs more coverage sprints" was named in the Plan as a
-      legitimate outcome before the evidence existed, and it is the one that happened.**
+- [ ] Every spec rule maps to a check, or is **explicitly marked in the spec as not evaluated against a
+      repository** (`judgment-only` · `implementation-directed` · `restated` · `standard-directed`)
+      **⚠ The wording changed at SPRINT-079 T1. It used to read:** *"…or is explicitly marked
+      **judgment-only** in the spec."* Preserved rather than overwritten (L-088) — this row refused two
+      looser readings at SPRINT-076 and re-worded itself once at SPRINT-077, both times on the record.
+      **Judge this one on the same terms, because it does make the condition easier to satisfy.**
+      **Why the literal wording was already wrong, and had been since SPRINT-074.** `judgment-only` was
+      never the only exclusion mark — `implementation-directed` has excluded six rules since 0.4.x, and
+      SPRINT-076 T4's own ruling text counts them as satisfying this clause (*"32 rules satisfy it
+      outright and **6 more are excluded by mark**"*). So the practice had already generalised past the
+      sentence; what changed is that the sentence now says what it has been read as. That is the
+      argument *for* — and it is not sufficient on its own, because the amendment also admits two marks
+      created in the same task. Both facts belong here.
+      **What T1 actually did.** The eleven `scope-out` rules satisfied neither half, and the reason was
+      **placement, not classification**: their dispositions lived in `docs/research/`, which the engine
+      cannot read, so every adopter's report listed all eleven as `rule-unimplemented` — checks the
+      standard owes and has not written. Seven are checked under another id (`restated`, §8's own
+      answer one level down); four cannot be checked against any adopter's tree (`standard-directed`,
+      `implementation-directed` one category out). Both marks now live in §14 with an engine arm each
+      and retained fixtures, so the exclusion is **named on every report** rather than silent (L-058).
+      **The cost, stated not buried.** Checkable goes **62 → 51**, so this condition needs 21 more
+      rules rather than 32 — measurably easier, by a change made inside the epic that wants it ticked.
+      It is accepted because the alternative is a standard telling adopters it owes them eleven checks
+      it decided never to write, and because **classification is unchanged at 100**: nothing left the
+      standard, only the set a tool evaluates against a tree. Recorded as **ADR-028**.
+      **Where it stands: 30 of 51 covered, 21 `build` remaining, 0 undifferentiated.** The residual this
+      row has flagged since SPRINT-073 is gone. What is left is coverage, and SPRINT-080 is where the
+      21 land.
 - [x] Each check has a retained fixture asserting its named finding on input that must produce it
       — **TICKED at SPRINT-077 T2**, on the two rulings SPRINT-076 T1 refused to make inside the audit
       that would have benefited from them.
