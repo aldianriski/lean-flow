@@ -33,103 +33,6 @@ status: current
 
 ### P1 — Next Phase Required
 
-- [x] TASK-255 — Give §2 rows for Multi-service's three docs  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  `spec/STANDARD.md` §2's `docs/` tree carries a row for each doc §6's Multi-service
-                  row names — service registry · cross-service dependency map · global decisions index
-                  — with a Tier cell an engine can match, or §6 is amended to stop naming docs §2 does
-                  not carry. Either way `S6.MULTISVC` stops reporting `tier-doc-set-underivable` and
-                  starts answering the question §6 asks
-      touches:    spec/STANDARD.md (§2 · §6) · spec/CHANGELOG.md · scripts/lib/conformance-engine.sh
-                  (only if the finding changes) · docs/research/conformance-dispositions.md
-      depends-on: none
-      assumes:    **the gap is real and was verified two ways at SPRINT-078 T2** — a case-insensitive
-                  sweep of §2 for all three names returns nothing, and enumerating §2's distinct Tier
-                  cell values yields `base · backend/integration · backend, or overview cap-split ·
-                  medium+ · API exists · auth exists · DB exists · lean loop · as needed · ephemeral`,
-                  with no multi-service value. Re-derive at intake anyway; §2 may have moved
-      tracker:    SPRINT-078 T2 · its Execution Log § "A4 does not hold"
-      origin:     close-retro
-      state:      ready
-
-- [x] TASK-256 — Make §2's `DECISIONS.md` addressable by a checker  [size: S] [risk: low] [AFK]
-      class:      execution
-      done-when:  `docs/DECISIONS.md` is reachable from §2's table as a literal path, so `S6.MEDIUM`
-                  can assert it. Today the only row naming it is
-                  `` `adr/ADR-NNN-<slug>.md` + `DECISIONS.md` index (both under `docs/`) `` — a
-                  **pattern** row, and every §2 parser takes the File cell's first backticked token and
-                  discards rows containing `<`/`>`/`*`. So Medium's entire doc set reads as families
-                  and the tier reports "not evaluated" rather than checking anything
-      touches:    spec/STANDARD.md (§2 docs tree — likely splitting the row in two) · spec/CHANGELOG.md
-                  · docs/research/conformance-dispositions.md
-      depends-on: none
-      assumes:    splitting the row is preferable to teaching five parsers to read a second token —
-                  which is TD-070's subject and should not be pre-empted here. **Confirm at intake**:
-                  if TD-070's shared `read-spec-files.sh` lands first, this may be free
-      tracker:    SPRINT-078 T2 · the `S6.MEDIUM` family note
-      origin:     close-retro
-      state:      ready
-
-- [x] TASK-245 — Decompose EPIC-004's remaining coverage rules into buildable tasks  [size: M] [risk: low] [HITL]
-      class:      decision
-      done-when:  the ~32 `build` rules in `docs/research/conformance-dispositions.md` exist as
-                  `TASK-NNN` entries (or as a small number of grouped vertical slices), each with a
-                  `done-when` naming **the finding string its check must fire** — a check specified
-                  without its finding name is a half-shipped gate (L-058) — and enough are `state:
-                  ready` to form the next coverage sprint
-      touches:    TODO.md · docs/research/conformance-dispositions.md (only if a disposition changes
-                  on contact) · no code
-      depends-on: none
-      assumes:    **the count is a query result and gets re-derived at intake, not copied from here**
-                  (L-130). "~32" is SPRINT-076's figure for the `build` bucket and SPRINT-077 changed
-                  no disposition, so it should still hold — but the register is the source, not this
-                  row. Also: **grouping is a decision, not a formality.** 32 one-rule tasks would be
-                  a worse backlog than 6 grouped slices, and §6's four tier rules are already
-                  dispositioned as *one check, four tiers — the tier is a parameter, not four
-                  checkers*, which is the shape to look for elsewhere
-      tracker:    EPIC-004 § Closed-when 2 (the epic's last open condition) · SPRINT-076 T4's ruling
-                  that the bar stands · SPRINT-077 § Out (which names this as the next entry, and
-                  names `/task-decomposer` rather than `promote` as the skill that runs it)
-      origin:     close-retro
-      state:      done — **DISCHARGED at SPRINT-079's promote, not shipped.** Its `done-when` asks the
-                  `build` rules to exist as `TASK-NNN` entries. Re-derived from the register at promote
-                  (its own `assumes:` said to, and was right): **21** `build` rules, not "~32" — and
-                  TASK-248…252 map onto them **1:1**, id for id — §9 ×5 · §10 ×4 · §11-ledger ×4 ·
-                  §11-archival ×4 · §12 ×4 = 21. The grouping call this row flagged as "a decision, not
-                  a formality" was taken the way it predicted: five grouped vertical slices, not 21
-                  one-rule tasks. Nothing left to decompose. Swept from the Backlog at SPRINT-079's
-                  close under §11
-
-- [x] TASK-248 — Cover §9's sprint-file family in the engine  [size: M] [risk: med] [HITL]
-      class:      execution
-      done-when:  five rules answered with six findings — S9.TWOFILES → `sprint-plan-over-hard-cap` ·
-                  `sprint-log-missing`; S9.LOGDIR → `sprint-log-outside-logs-dir`; S9.PLANFROZEN →
-                  `plan-edited-after-freeze`; S9.SCOPECHANGE → `scope-change-logged-after-plan-edit`;
-                  S9.VERIFYCLAUSE → `dod-criterion-names-no-check`. Retained fixture per finding,
-                  each reddening while a sibling control stays green
-      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
-                  docs/research/conformance-dispositions.md
-      depends-on: none
-      assumes:    PLANFROZEN and SCOPECHANGE read git history against `plan_commit`, the S4.APPEND
-                  pattern — so both need a repo with real history in the fixture, not a tree alone
-      tracker:    EPIC-004 § Closed-when 2 · dispositions § build
-      origin:     decomposer
-      state:      ready
-
-- [x] TASK-249 — Cover §10's learning-governance rules in the engine  [size: M] [risk: med] [HITL]
-      class:      execution
-      done-when:  S10.FOURBUCKETS → `retro-bucket-unrouted`; S10.PROMOTION →
-                  `learning-recurred-unpromoted`; S10.TDAGING → `td-row-aged-unreviewed`;
-                  S10.PROMOTEREVIEW → `promote-checklist-absent`. Retained fixture per finding + controls
-      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
-                  docs/research/conformance-dispositions.md
-      depends-on: none
-      assumes:    S10.PROMOTION's trigger is the spec's own `count ≥ 2, promoted: no` threshold read
-                  from §10, not a number copied into the check (L-130)
-      tracker:    EPIC-004 § Closed-when 2 · dispositions § build
-      origin:     decomposer
-      state:      ready
-
 - [ ] TASK-250 — Cover §11's ledger-retention rules in the engine  [size: M] [risk: low] [AFK]
       class:      execution
       done-when:  S11.TDDELETE → `resolved-td-row-past-retention`; S11.TODOCAP →
@@ -173,25 +76,6 @@ status: current
                   repo is worse than no scan. The benign-lookalike control is the load-bearing fixture,
                   and how far the detection goes is a G2 design call, not settled at intake
       tracker:    EPIC-004 § Closed-when 2 · dispositions § build · dispositions § scope-out (c)
-      origin:     decomposer
-      state:      ready
-
-- [x] TASK-254 — Rule on the 11 `scope-out` rules, which satisfy neither half of § Closed-when 2  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  each of the 11 is recorded as (a) checked, (b) re-marked `judgment-only` in
-                  spec/STANDARD.md, or (c) accepted as a third state — and if (c), §14's wording and
-                  § Closed-when 2's clause are updated to admit it, with the prior wording preserved
-                  in place (L-088). No rule left in the undifferentiated middle the register forbids
-      touches:    spec/STANDARD.md (§14 · affected § Conformance rows) ·
-                  docs/research/conformance-dispositions.md · docs/epic/EPIC-004-conformance.md ·
-                  possibly docs/adr/ADR-NNN
-      depends-on: none
-      assumes:    a spec change here is at least MINOR — re-marking a rule moves what an adopter's
-                  report says without their tree changing, the line PATCH may not cross (§2's own row).
-                  Ruling (c) likely wants an ADR; (a) and (b) likely do not
-      tracker:    EPIC-004 § Closed-when 2 ("plus a separate ruling on whether the 11 scope-out rules
-                  are checked, re-marked, or accepted as a third state the wording does not admit") ·
-                  open since SPRINT-073
       origin:     decomposer
       state:      ready
 
