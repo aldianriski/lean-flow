@@ -234,3 +234,125 @@ prose next to one hot path rather than as a check anyone runs — a new assertio
 the previous engine, so a regression is only visible once the gate blows its timeout, several tasks
 downstream of the cause.
 
+### 2026-08-22 | progress | T3 complete — coverage 19 → 30 of 62, the sprint's Theme met
+
+`S2.R-README` answered; the engine's `coverage:` line moves **23 → 24**, and the register closes at
+**30 covered · 21 `build` · 11 scope-out = 62**.
+
+**Only one of the rule's two invariants is mechanical, and the report says so.** §2 marks it
+*mechanical on the invariants — the anti-SSOT rule and the footer ownership line*. The footer is
+checkable and is checked. The anti-SSOT half (*"not a second copy of `CONTEXT.md` or
+`architecture/overview.md`"*) is a judgement about content: any heuristic — does the README repeat
+their headings? — fires on every repo whose README legitimately summarises its own architecture, which
+is what a front-door is for. Named as judged, alongside the PASS, so a reader cannot mistake the pass
+for covering both.
+
+**The required shape is parsed from §3's own `<sub>` example**, and that is what keeps `S3.README`'s
+scope-out honest. The register scopes `S3.README` out *because it restates `S2.R-README`*; had this
+check invented its own footer shape, §3 would state one shape and §2 check another, and a scope-out
+would have quietly become a gap. Proven by re-wording §3's example in a spec copy to add a `steward:`
+field — the check began requiring it with no code edit.
+
+**Two fixture defects found and fixed, both the same shape as T1's.** `write_core_set` was writing
+README.md with a **YAML header** — the very shape §3's README exception forbids — so the moment this
+rule shipped, five previously-green cases went red against fixtures that were never conformant. And
+the new cases *appended* a footer onto that file rather than replacing it, which for the partial-footer
+case meant the engine read the complete footer first and the case tested nothing. Both fixed in the
+fixture, never in the rule (L-088), with `strip_footer` asserting the footer exists before removing it
+(L-146).
+
+**Seeded.** Hard-coding the field set instead of reading §3 reddened exactly `readme-shape-from-spec`
+while 29 controls stayed green. Guards: `cmp` · `sh -n` · line count +1 · 24 assertions unchanged ·
+restore verified against `sha256 f61c53d6…`. A first attempt at the same seed was **rejected by the
+guards** — a `sed` replacement expanded to three lines, and a break that rewrites three lines is a
+demolition, not a discrimination (L-142).
+
+**Also corrected: the counting recipe the DoD prescribes.** Re-deriving the register by matching rule
+ids anywhere in a table row returned **31 covered / 63 total**. The 31st was `S3.README` — mentioned in
+the `S2.R-README` row's own note, explaining the scope-out it preserves. Counting the **Rule column**
+returns 30, and three routes now agree on 62 (register 30+21+11 · engine 24 in-engine + 38 GAP · 30−24
+= the 6 outboard checkers). Recorded in the register's header so the next reader inherits the recipe
+rather than the mistake.
+
+### 2026-08-22 | surprise | the gate's cost scales with coverage, which is the epic's whole goal
+
+Measured while chasing T2's regression, and worth filing separately from it because the regression was
+a bug and this is not. `qa-check.sh` reaches **78 static engine invocation sites** across its harnesses:
+
+| Harness | invocations | spec handed to the engine |
+|---|---|---|
+| `run-conformance-engine-fixtures.sh` | 30 | **16 full**, 11 reduced |
+| `run-ownership-header-fixtures.sh` | 15 | all reduced |
+| `run-adr-family-fixtures.sh` | 13 | all reduced |
+| `run-attestation-fixtures.sh` | 13 | all reduced (§13-only, T1) |
+| `run-gates-signed-fixtures.sh` | 8 | all reduced |
+| others | 9 | mixed |
+
+A **full**-spec invocation dispatches all 62 rules against a fixture directory that usually cares about
+two or three. Every rule EPIC-004 adds therefore multiplies across those 16 sites — the gate gets
+slower in direct proportion to the coverage the epic exists to add, which is the wrong direction for
+the thing that has to run before every commit.
+
+Two of the sixteen genuinely need the whole spec (`rule-unimplemented-is-named` and
+`gap-is-labelled-gap-and-does-not-set-exit` are *about* the full sweep). The rest are family cases that
+could take a reduced copy, exactly as the ownership, ADR, gates-signed and now attestation harnesses
+already do — the pattern is established in four files and simply has not been applied here.
+
+**Follow-up for close (TD candidate):** reduce the 14 family cases in
+`run-conformance-engine-fixtures.sh` to per-family specs, and consider a `QA_FAST=1` tier so the
+pre-commit gate is not the same cost as the pre-close one. Not done in this sprint: it touches cases
+this sprint did not write, and doing it while adding coverage would make a slow suite and a changed
+suite indistinguishable.
+
+### 2026-08-22 | scope-change | T2 DoD 2 named the wrong §2 column; corrected, claim unchanged
+
+The frozen text read *"derived from §2's `Create ←` cells"*. Building it showed the work splits across
+three sources, and the Create cell is the smallest of them:
+
+- **§2's `Tier` column** assigns a row to a tier (`base` · `backend/integration` · `medium+` ·
+  `API exists`). This is the assignment the DoD was reaching for.
+- **§2's `Create ←` cell** supplies only the `always` exclusion — those rows belong to `S2.F-FILE`,
+  which fires `core-file-missing` for them, and counting one absence under two findings is the
+  double-count § scope-out (a) exists to prevent.
+- **§6's own substrate-conditional clause** supplies the subtraction, because §2 and §6 disagree about
+  which rows are conditional and §6's table is the statement of the tier doc sets.
+
+The DoD's *claim* — the required set comes from the spec at runtime, not from code — is unchanged and
+is what the `tier-set-is-spec-derived` fixture proves: a base-tier row added to a spec copy made the
+engine require it with no code edit. Only the column named in the text was wrong.
+
+Recorded rather than quietly re-read (L-088). Third correction to this Plan's frozen text in one
+sprint, all the same family: a value or structural claim about another document, written at promote by
+someone who could not yet run the query (L-130 · L-136).
+
+### 2026-08-22 | surprise | the migrated §13 check caught its own shipping commit
+
+The gate run after T2/T3 came back **165 pass, 1 fail**, and the finding was
+`attestation-trailers-incomplete: missing Gate-Signed-By: Evidence:` against this repository's own
+HEAD — T1's commit.
+
+**The cause was T1's commit message.** It closed with a status line reading `Gate: 164 pass, 0 fail.`,
+which git parses as a **trailer**, not as prose. So the commit claimed a §13 attestation — *a gate
+applied* — while naming neither who approved it nor what the evidence was. §13a requires all three
+together precisely because a `Gate:` alone asserts a gate and declines to say who signed it, which is
+weaker than saying nothing. The rule fired correctly on real input.
+
+**Why this is the sprint's best evidence rather than an embarrassment.** CLAUDE.md's bar for a gate is
+that it be *exercised once on input that must FAIL, each failing with its named finding*. Those five
+rules had fixture coverage since SPRINT-074 and had never once fired on this repository, because
+`conformance.sh` could not reach them and `qa-check.sh`'s attestation leg only ever saw commits that
+happened to be clean. The first thing the migration did — with §13's verdict lines newly folded into
+the gate's tally, which was the half of T1 that could most easily have been dropped as "just a
+migration" — was catch a live violation in the commit that shipped it. Had T1 migrated the assertions
+and left the gate wiring alone, this commit would have passed.
+
+**Fixed** by amending T1 (unpushed, 23 ahead of origin) to reword the line as prose. Amending rather
+than fixing forward on purpose: §13 reads HEAD, so a later commit would have turned the gate green
+while leaving a commit in history that falsely claims a gate attestation — which is the attestation
+theatre §13 exists to prevent, and green-because-we-moved-past-it is not the same as fixed. The amend
+also restored the `Co-Authored-By` trailer T1 had dropped and 14 of the previous 15 commits carry.
+
+**Learning candidate:** a commit message's last line is trailer territory. Any `Token: value` line
+there is a machine-readable claim, and this repo now has a rule that reads three specific tokens — so
+a summary line shaped like `Gate: …`, `Evidence: …` or `Gate-Signed-By: …` is not a note about the
+work, it is an assertion about approval. Worth a line wherever commit conventions are recorded.

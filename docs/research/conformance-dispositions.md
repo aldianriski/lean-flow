@@ -17,19 +17,26 @@ an undifferentiated middle. Rule ids are `spec/STANDARD.md` §14's; that file is
 the register. Split from `conformance-baseline.md` under §2's growth rule — split, never squeeze (L-131).
 
 **Counts, re-derived from the section tables and reconciled against the engine — never copied forward.**
-100 candidates · **100 classified** · **62 checkable** · **29 covered** · **33 dispositioned here — 22
-`build`, 11 `scope-out`**. Reconciled mechanically, not by eye: 29 + 22 + 11 = **62**, and no checkable
+100 candidates · **100 classified** · **62 checkable** · **30 covered** · **32 dispositioned here — 21
+`build`, 11 `scope-out`**. Reconciled mechanically, not by eye: 30 + 21 + 11 = **62**, and no checkable
 rule is left without a disposition.
+**Counting them: the Rule column, not the row.** These figures are re-derived by counting rule ids in
+each section table's **first cell**. Scoping to the row instead over-counts, and did: the § Covered row
+for `S2.R-README` explains in its own note that it keeps `S3.README`'s scope-out true, so a row-wide
+match reads `S3.README` as a 31st covered rule and the total lands at 63. Caught by that 63 disagreeing
+with the engine's 62 — the second-number habit again, on the very query this file's own maintenance
+instructions prescribe. L-108 one level in: the register is self-describing too, and its cells discuss
+rules other than their own subject.
 
 **What `conformance.sh` reports, and what it does not.** 62 is the figure it prints — its `coverage:`
-line publishes two counts summing to it. **29 is not one of them.** That line counts rules with an
-assertion *in the engine* and reads **23**; the six-rule difference is the four checkers that still
+line publishes two counts summing to it. **30 is not one of them.** That line counts rules with an
+assertion *in the engine* and reads **24**; the six-rule difference is the four checkers that still
 live outside it (`check-doc-caps.sh` ×3 · `check-ephemeral-intake.sh` · `check-epic-archive.sh` ·
 `check-research-archive.sh`). Written out because the earlier phrasing here — *"19 + 32 + 11 = 62,
 which is what `conformance.sh` reports"* — reads as if the covered count were the reported one, and
 SPRINT-078 promoted three DoD rows built on exactly that misreading (Execution Log, 2026-08-22). Two
 numbers, two questions: **how many rules the standard makes checkable** (62, whoever checks them) and
-**how many this engine answers** (23, and climbing as the outboard checkers migrate).
+**how many this engine answers** (24, and climbing as the outboard checkers migrate).
 **Superseded figures removed at SPRINT-078's promote:** this block read *63 checkable · 12 covered · 39
 build · 12 scope-out* for two sprints after the tables below had moved past it — a second SSOT drifting
 from the rows it copied, which is the failure the header itself warns about. Per-sprint provenance for
@@ -44,7 +51,7 @@ close: 19 → 24 covered, 32 → 27 `build`.
 **Stated as counts, never as a ratio (EPIC-004 D1).** There is no percentage here and there must not be
 one: a ratio would improve every time the standard declines to automate something.
 
-## Covered today (29 rules, 5 checkers)
+## Covered today (30 rules, 5 checkers)
 
 | Rule | Checker |
 |---|---|
@@ -56,6 +63,7 @@ one: a ratio would improve every time the standard declines to automate somethin
 | `S2.F-FILE` · `S2.R-PLACEMENT` | `conformance-engine.sh` *(SPRINT-076 T3 — §2's placement pair, chosen because it is the likeliest artefact source. The required set is derived from §2's own `Create ←` cells, never hard-coded. **See § Artefacts** — the 4 it produced against a generic repo were fixed at the spec by SPRINT-077 T1, and the count is now 0)*
 | `S13.TRAILERS` · `S13.OWNCOMMIT` · `S13.EVIDENCESHA` · `S13.AGREE` · `S13.UNSIGNEDCLAIM` | `conformance-engine.sh` *(SPRINT-078 T1 — migrated off the deleted `check-attestation.sh`, findings byte-identical, verified by diff before the old file was removed. The five retained must-FAIL fixtures moved with them. `S13.UNSIGNEDCLAIM` is the engine's only `hold`: it prevents Attested without failing, which the level ladder had to learn in order not to certify an unsigned attestation)*|
 | `S2.F-TIER` · `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` · `S6.MULTISVC` | `conformance-engine.sh` *(SPRINT-078 T2 — one check, the tier a parameter, as this register dispositioned it. Three finding strings, not one: `tier-doc-set-incomplete` (Base · Backend) · `tier-doc-set-underivable` (Multi-service, where §2 carries no row) · `tier-declaration-unreadable`. `S2.F-TIER` answers the DECLARATION half so one absence is never reported twice. Ten retained fixtures)*|
+| `S2.R-README` | `conformance-engine.sh` *(SPRINT-078 T3 — the footer half only. §2 marks the rule mechanical on TWO invariants and the anti-SSOT half is a judgement about content, so it is named in the report rather than faked. The required field labels are parsed from §3's own `<sub>` example, which is what keeps `S3.README`'s scope-out — *restates a rule checked elsewhere* — true rather than turning it into a gap. Four retained fixtures incl. a partial-footer case)*|
 | `S11.EPIC` | `check-epic-archive.sh` |
 | `S11.RESEARCH` | `check-research-archive.sh` |
 
@@ -147,14 +155,13 @@ vacuously (L-142).
 filename §2 owns; a stranger's `notes/design-notes.md` raises nothing. The cost is a near-miss it cannot
 see — `docs/architecture.md` is plausibly `docs/architecture/overview.md`, and only `S2.F-FILE` reports
 it, as an absence rather than a misplacement. A known limit, not a defect.
-## `build` — 22 rules, each with the finding its check will fire
+## `build` — 21 rules, each with the finding its check will fire
 
 A check specified without its finding name is a half-shipped gate (L-058). Every row ships with a
 **retained** must-FAIL fixture proving that exact string fires (TD-012).
 
 | Rule | Named finding |
 |---|---|
-| `S2.R-README` | `readme-ownership-footer-missing` |
 | `S9.TWOFILES` | `sprint-plan-over-hard-cap` · `sprint-log-missing` |
 | `S9.LOGDIR` | `sprint-log-outside-logs-dir` |
 | `S9.PLANFROZEN` | `plan-edited-after-freeze` |
@@ -200,8 +207,8 @@ repo's* rules.
 **`S2.R-GROWTH` was listed here and is not a scope-out at all** (SPRINT-076 T1). The spec marks it
 **`judgment-only`** — *which sections move is judged* — so it was never in the checkable set this
 section partitions, and counting it made § scope-out claim 12 where the engine sees 11. Corrected, the
-register reconciles **exactly** against the engine's dispatchable set: 29 covered + 22 `build` +
-11 scope-out = **62** checkable rules (29 and 22 as of SPRINT-078 T2). Found the way every sighting of
+register reconciles **exactly** against the engine's dispatchable set: 30 covered + 21 `build` +
+11 scope-out = **62** checkable rules (30 and 21 as of SPRINT-078 T3). Found the way every sighting of
 this class is found — by a second number disagreeing, not by re-reading the prose (L-108).
 
 **(c) No checkable rule falls here — recorded because the category was expected to be large and is

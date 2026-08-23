@@ -71,7 +71,7 @@ becoming a hard-coded list that drifts from the table it copies.
 
 **DoD:**
 - [x] One check answers `S2.F-TIER` · `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` · `S6.MULTISVC` — *Verify: the engine's own `coverage:` line moves 18 → 23 (corrected 2026-08-22 — see Execution Log)*
-- [x] The required doc-set per tier is derived from §2's `Create ←` cells — *Verify: add a row to a spec copy; the required set changes with no code edit*
+- [x] The required doc-set per tier is derived from §2's table at runtime — *Verify: add a row to a spec copy; the required set changes with no code edit (fixture `tier-set-is-spec-derived`). **Corrected 2026-08-22** — the frozen text named §2's `Create ←` cells; the per-tier ASSIGNMENT is §2's **Tier** column, the `Create ←` cell supplies only the `always` exclusion (those rows are `S2.F-FILE`'s), and the substrate subtraction comes from §6's own clause. Same claim, right columns — see Execution Log*
 - [x] `tier-doc-set-incomplete` fires for each of the four tiers — *Verify: one retained must-FAIL fixture per tier, each asserting the finding string. **Corrected 2026-08-22** — the four tiers fire THREE strings, not one: `tier-doc-set-incomplete` (Base · Backend), `tier-doc-set-underivable` (Multi-service — §2 carries no row), and Medium's family note (its rows are all families; a family cannot be missing). Four tiers, four retained fixtures, three strings — see Execution Log*
 - [x] Each fixture reddens while a sibling control stays green — *Verify: run the harness with the seed applied and again without it*
 - [x] Each seeded artifact still parses and is a targeted break — *Verify: `sh -n` clean, assertion count unchanged, line count within one of pristine (L-142)*
@@ -90,9 +90,9 @@ disagree and turn a scope-out into a silent gap.
 `readme-ownership-footer-missing`; one whose README carries §3's header gets nothing.
 
 **DoD:**
-- [ ] `S2.R-README` answered, firing `readme-ownership-footer-missing` — *Verify: the engine's `coverage:` line moves 23 → 24 (corrected 2026-08-22 — see Execution Log)*
-- [ ] The required shape is §3's ownership header, read from §3 — *Verify: `S3.README`'s scope-out reason (*restates a rule checked elsewhere*) still holds with the check in place*
-- [ ] Retained must-FAIL fixture + a PASS control — *Verify: harness verdict line, control green while the fixture reddens*
+- [x] `S2.R-README` answered, firing `readme-ownership-footer-missing` — *Verify: the engine's `coverage:` line moves 23 → 24 (corrected 2026-08-22 — see Execution Log)*
+- [x] The required shape is §3's ownership header, read from §3 — *Verify: `S3.README`'s scope-out reason (*restates a rule checked elsewhere*) still holds with the check in place*
+- [x] Retained must-FAIL fixture + a PASS control — *Verify: harness verdict line, control green while the fixture reddens*
 
 ## Decisions (pre-locked)
 
@@ -147,6 +147,9 @@ disagree and turn a scope-out into a silent gap.
 | `scripts/lib/conformance-engine.sh` | T2 | +the tier family: `.conformance-tier` declaration · required set from §2's Tier column · substrate subtraction from §6's own clause · family-vs-silent-spec split | med | 10 retained fixtures; 2 seeded breaks reddened exactly their cases |
 | `evals/run-conformance-engine-fixtures.sh` | T2 | +`base_tier_set`/`write_base_tier` (spec-derived, so it cannot drift) and 10 tier cases; victims derived and asserted present before removal (L-146) | low | 26 pass, 0 fail |
 | `docs/research/conformance-dispositions.md` | T2 | tier family `build`→Covered (29/22/11=62); `.conformance-tier` documented as a consumer surface (L-015) | low | ids re-counted per section |
+| `scripts/lib/conformance-engine.sh` | T3 | +`S2.R-README`: footer field labels parsed from §3's own `<sub>` example, matched at a line position; the anti-SSOT half named as judged rather than faked | low | 4 retained fixtures; seeding a hard-coded field set reddened only the spec-derivation case |
+| `evals/run-conformance-engine-fixtures.sh` | T3 | fixture READMEs now carry §3's footer (they were shipping the shape §3 forbids); +4 readme cases, footer stripped-with-guard rather than appended | low | 30 pass, 0 fail |
+| `docs/research/conformance-dispositions.md` · `docs/QA.md` | T3 | `S2.R-README` `build`→Covered (30/21/11=62); the counting recipe corrected to the Rule column after a row-wide match read 63 | low | three routes agree on 62 |
 
 ## Retro
 

@@ -116,12 +116,18 @@ base_tier_set() {
 write_core_set() {   # write_core_set <dir>
   for p in $(core_set "$spec"); do
     mkdir -p "$1/$(dirname "$p")" 2>/dev/null
-    # AGENTS.md is §3's thin-pointer EXCEPTION: it carries its ownership as a footer <sub> line, not
-    # a YAML block, precisely because a 6-line header would defeat a ~10-line pointer file. Writing
-    # it with a header made S3.AGENTS fire against a fixture that was supposed to be clean.
+    # AGENTS.md and README.md are §3's TWO stated exceptions: each carries its ownership as a footer
+    # <sub> line rather than a YAML block -- AGENTS.md because a 6-line header would defeat a ~10-line
+    # pointer file, README.md because a top metadata table renders badly on the front-door. Writing
+    # AGENTS.md with a header made S3.AGENTS fire against a fixture meant to be clean (SPRINT-075 T6);
+    # README.md was still being written with one, and S2.R-README caught it the moment it shipped
+    # (SPRINT-078 T3). Twice now the fixture, not the rule, was what needed teaching (L-088).
     case "$p" in
       AGENTS.md)
         printf -- '# AGENTS\n\nSee `.claude/CLAUDE.md`.\n\n<sub>Doc owner: Maintainer · last updated: 2026-08-20 · status: current</sub>\n' > "$1/$p"
+        ;;
+      README.md)
+        printf -- '# Project\n\nFront door.\n\n<sub>Doc owner: Maintainer · last updated: 2026-08-20 · status: current</sub>\n' > "$1/$p"
         ;;
       *)
         printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-20\nupdate_trigger: When it changes\nstatus: current\n---\n\n# %s\n\nBody.\n' "${p##*/}" > "$1/$p"
@@ -565,6 +571,87 @@ if [ "$rc" -eq 1 ] && printf '%s\n' "$out" | grep -q 'tier-doc-set-incomplete: d
   echo "PASS fixture(tier-set-is-spec-derived): a row added to §2 changed the required set with no code edit"
 else
   echo "FAIL fixture(tier-set-is-spec-derived): exit $rc; the required set did not follow the spec -- output:"; printf '%s\n' "$out"; fail=1
+fi
+
+
+# ==================================================================================================
+# §2's README OWNERSHIP FOOTER (SPRINT-078 T3) -- one retained must-FAIL fixture and a PASS control.
+# ==================================================================================================
+
+# The footer this fixture writes is DERIVED from §3's own example, not typed here. A hard-coded
+# footer would keep passing after §3 re-worded the shape -- the control would go on proving that the
+# engine accepts a string the standard no longer asks for (L-146's sibling: a fixture that stops
+# testing what it names).
+readme_footer() {
+  awk '
+    /^## /{h=$0; sub(/^## [^0-9]*/,"",h); sec=h+0}
+    sec != 3 { next }
+    /README exception/ { inx = 1 }
+    inx && match($0, /<sub>[^<]*<\/sub>/) { print substr($0, RSTART, RLENGTH); exit }
+  ' "$1" | sed 's/…/Maintainer/; s/…/2026-08-20/; s/…/current/'
+}
+
+t_rm="$work/readme-no-footer"
+mkdir -p "$t_rm"; write_core_set "$t_rm"; write_base_tier "$t_rm"
+# The victim's EXISTENCE is asserted before it is removed (L-146). write_core_set now writes the
+# footer -- it must, since §3 requires it of every front-door and a fixture that ships a
+# non-conformant README makes every other case in this file report a finding it never meant to
+# create. So the absence this case needs is an EDIT, and an edit that silently no-ops would leave a
+# must-FAIL fixture passing because the file never had a footer to lose.
+grep -qE '^<sub>.*</sub>' "$t_rm/README.md" || { echo "FAIL harness(readme-footer-missing): the fixture README carries no footer to remove, so this case would pass vacuously (L-146)"; fail=1; }
+grep -vE '^<sub>.*</sub>' "$t_rm/README.md" > "$t_rm/README.tmp" && mv "$t_rm/README.tmp" "$t_rm/README.md"
+grep -qE '^<sub>.*</sub>' "$t_rm/README.md" && { echo "FAIL harness(readme-footer-missing): the footer survived removal"; fail=1; }
+run_case_anywhere "readme-footer-missing" 1 "readme-ownership-footer-missing" -- \
+  sh "$engine" "$t_rm" --spec "$spec"
+
+# PASS control: the same repo with §3's own footer appended.
+# strip_footer <dir> -- remove README.md's footer line, asserting it was there (L-146). Both cases
+# below replace the footer write_core_set now writes, and an append-without-strip would leave the
+# complete footer as the FIRST <sub> line -- which is the one the engine reads -- so the partial case
+# would have been testing a complete footer.
+strip_footer() {
+  grep -qE '^<sub>.*</sub>' "$1/README.md" || { echo "FAIL harness(strip_footer): no footer in $1/README.md to replace"; fail=1; }
+  grep -vE '^<sub>.*</sub>' "$1/README.md" > "$1/README.tmp" && mv "$1/README.tmp" "$1/README.md"
+}
+
+t_rm_ok="$work/readme-with-footer"
+mkdir -p "$t_rm_ok"; write_core_set "$t_rm_ok"; write_base_tier "$t_rm_ok"
+strip_footer "$t_rm_ok"
+rf=$(readme_footer "$spec")
+[ -n "$rf" ] || { echo "FAIL harness(readme-footer-control): could not derive §3's footer example, so the control would prove nothing"; fail=1; }
+printf '\n%s\n' "$rf" >> "$t_rm_ok/README.md"
+out=$(sh "$engine" "$t_rm_ok" --spec "$spec" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -qE '^PASS  S2\.R-README' &&
+   ! printf '%s\n' "$out" | grep -q 'readme-ownership-footer-missing'; then
+  echo "PASS fixture(readme-footer-control): §3's own footer shape satisfies §2's rule, exit 0"
+else
+  echo "FAIL fixture(readme-footer-control): exit $rc -- output:"; printf '%s\n' "$out"; fail=1
+fi
+
+# A PARTIAL footer records less than it appears to, and must not pass. This is the case that separates
+# "has a <sub> line" from "carries the ownership": the first is trivially satisfiable by any footnote.
+t_rm_part="$work/readme-partial-footer"
+mkdir -p "$t_rm_part"; write_core_set "$t_rm_part"; write_base_tier "$t_rm_part"
+strip_footer "$t_rm_part"
+printf '\n<sub>Doc owner: Maintainer</sub>\n' >> "$t_rm_part/README.md"
+run_case_anywhere "readme-footer-partial" 1 "readme-ownership-footer-missing" -- \
+  sh "$engine" "$t_rm_part" --spec "$spec"
+
+# The required shape is READ FROM §3 -- re-word §3's example in a spec copy and the check follows it,
+# with no code edit. This is what keeps S3.README's scope-out ("restates a rule checked elsewhere")
+# true: one shape, stated once, checked once.
+awk '
+  /^## /{h=$0; sub(/^## [^0-9]*/,"",h); sec=h+0}
+  sec == 3 && /README exception/ { inx = 1 }
+  inx && /<sub>/ { sub(/<sub>[^<]*<\/sub>/, "<sub>Doc owner: … · last updated: … · status: … · steward: …</sub>"); inx = 0 }
+  { print }
+' "$spec" > "$work/spec-readme-reworded.md"
+grep -q 'steward' "$work/spec-readme-reworded.md" || { echo "FAIL harness(readme-shape-from-spec): could not re-word §3's footer example"; fail=1; }
+out=$(sh "$engine" "$t_rm_ok" --spec "$work/spec-readme-reworded.md" 2>&1); rc=$?
+if [ "$rc" -eq 1 ] && printf '%s\n' "$out" | grep -q 'readme-ownership-footer-missing.*steward'; then
+  echo "PASS fixture(readme-shape-from-spec): adding a field to §3's example made §2's check require it -- no code edit"
+else
+  echo "FAIL fixture(readme-shape-from-spec): exit $rc; the required shape did not follow §3 -- output:"; printf '%s\n' "$out"; fail=1
 fi
 
 echo "----------------------------------------"

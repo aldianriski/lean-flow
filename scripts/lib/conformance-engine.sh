@@ -139,6 +139,111 @@ note "rule source: $spec -- $n_rules rules read across every section. Rule set a
 # anchor extraction.
 # registry:insert-point
 
+# --- §2's README ownership footer (SPRINT-078 T3) -------------------------------------------------
+# `S2.R-README` is marked `mechanical *on the invariants* -- the anti-SSOT rule and the footer
+# ownership line`. TWO invariants, and only one of them is mechanical:
+#
+#   the footer ownership line -- §3's README exception states its exact shape, so it is checkable and
+#                               is what this assertion answers.
+#   the anti-SSOT rule        -- "not a second copy of CONTEXT.md (vocabulary) or
+#                               architecture/overview.md (structure), which the README links to". That
+#                               is a judgement about content, and the split is reported rather than
+#                               faked: a heuristic here (does the README repeat headings from those
+#                               files?) would fire on every repo whose README legitimately summarises
+#                               its own architecture, which is what a front-door is for.
+#
+# WHY THE SHAPE IS READ FROM §3 AND NOT WRITTEN HERE. `S3.README` is scoped out in the register for
+# one reason -- *restates a rule checked elsewhere*, the arrow pointing at `S2.R-README`. If this
+# assertion invented its own idea of the footer, the two rules would disagree and a scope-out would
+# quietly become a gap: §3 would state a shape nothing checks while §2 checked a different one. So the
+# field labels come from §3's own worked example, parsed at runtime. Re-word §3's example and this
+# check follows it.
+#
+# The sibling `assert_S3_AGENTS` matches the same footer with a hard-coded pattern. Not unified here:
+# it belongs to a rule this task does not own, and changing a shipped assertion to share a helper is a
+# change rather than a move. Filed at close alongside the read-spec-files.sh extraction (TD).
+
+_README_FIELDS_CACHE=""
+_README_FIELDS_DONE=0
+
+# _readme_footer_fields <spec> -- the field LABELS §3's README exception names, one per line
+# (`Doc owner` · `last updated` · `status`). Read from the `<sub>...</sub>` example in §3's own prose,
+# which is the only place the standard states the shape.
+_readme_footer_fields() {
+  [ "$_README_FIELDS_DONE" -eq 1 ] && { printf '%s\n' "$_README_FIELDS_CACHE"; return; }
+  _README_FIELDS_DONE=1
+  _README_FIELDS_CACHE=$(awk '
+    /^## /{h=$0; sub(/^## [^0-9]*/,"",h); sec=h+0}
+    sec != 3 { next }
+    /README exception/ { inx = 1 }
+    inx && match($0, /<sub>[^<]*<\/sub>/) {
+      s = substr($0, RSTART + 5, RLENGTH - 11)
+      n = split(s, parts, "·")
+      for (i = 1; i <= n; i++) {
+        lab = parts[i]
+        sub(/:.*$/, "", lab)
+        gsub(/^[ \t`]+|[ \t`]+$/, "", lab)
+        if (lab != "") print lab
+      }
+      exit
+    }
+    /^\*\*AGENTS\.md exception\*\*/ { inx = 0 }
+  ' "$1")
+  printf '%s\n' "$_README_FIELDS_CACHE"
+}
+
+assert_S2_R_README() {
+  _rrepo=$1
+  _rid=$(printf '%-20s' 'S2.R-README')
+  if [ ! -f "$_rrepo/README.md" ]; then
+    # Whether a repo OWES a README is §2's `S2.F-FILE` question (the row is marked "init (always)"),
+    # and it fires `core-file-missing` for it. Reporting the absence twice under two rule ids is the
+    # double-count § scope-out (a) exists to prevent -- one constraint, one report.
+    note "$_rid-- no README.md at the repo root; whether one is owed is S2.F-FILE's question, which reports it. Nothing to verify here"
+    return
+  fi
+
+  _rfields=$(_readme_footer_fields "$spec")
+  if [ -z "$_rfields" ]; then
+    bad "$_rid-- readme-ownership-footer-missing: §3's README exception no longer states a <sub> footer example this engine can parse, so the required shape could not be derived. A check that silently derives an EMPTY required shape accepts any README at all (L-058) -- reported instead"
+    return
+  fi
+
+  # The footer is matched at a LINE POSITION (`^<sub>` … `</sub>`), never as a substring anywhere in
+  # the file. A README that quotes the footer format while explaining it -- which the standard's own
+  # README does -- would otherwise satisfy the rule by talking about it (L-108).
+  _rline=$(grep -E '^<sub>.*</sub>' "$_rrepo/README.md" | head -1)
+  if [ -z "$_rline" ]; then
+    bad "$_rid-- readme-ownership-footer-missing: README.md has no footer <sub>…</sub> line. §3 exempts the front-door from the YAML header because a top metadata table renders badly, not from ownership: it still carries $(printf '%s' "$_rfields" | tr '\n' ' ' | sed 's/ $//') as a small footer line"
+    return
+  fi
+
+  _rmissing=""
+  # Split on NEWLINE, not on whitespace: §3's labels contain spaces (`Doc owner`, `last updated`), and
+  # default word-splitting would turn three fields into five words. It happened to still catch a
+  # missing field, which is exactly the kind of accident that survives review -- the loop would have
+  # reported `owner` and `updated` as the missing things, naming tokens the standard never uses.
+  _rsaved_ifs=$IFS
+  IFS='
+'
+  for _f in $_rfields; do
+    IFS=$_rsaved_ifs
+    printf '%s' "$_rline" | grep -qi -- "$_f" || _rmissing="$_rmissing '$_f'"
+    IFS='
+'
+  done
+  IFS=$_rsaved_ifs
+  if [ -n "$_rmissing" ]; then
+    bad "$_rid-- readme-ownership-footer-missing: README.md's footer line omits:$_rmissing. §3's README exception names every field it must carry, and a partial footer records less than it appears to"
+    return
+  fi
+
+  # The anti-SSOT half is NAMED, not silently dropped -- §2 marks this rule mechanical on BOTH
+  # invariants, and a PASS that quietly covered one of them would overstate what was checked.
+  note "$_rid-- the anti-SSOT half of this rule (\"not a second copy of CONTEXT.md or architecture/overview.md\") is a judgement about content and is not evaluated here; the footer half is"
+  ok "$_rid-- README.md carries its ownership as a footer <sub> line with every field §3 names"
+}
+
 # --- §2/§6 tier doc-set family (SPRINT-078 T2) ----------------------------------------------------
 # FIVE RULES, ONE CHECK, THE TIER A PARAMETER. `S2.F-TIER` · `S6.BASE` · `S6.BACKEND` · `S6.MEDIUM` ·
 # `S6.MULTISVC` are the same question asked at four scopes plus §2's statement of it, and the register
