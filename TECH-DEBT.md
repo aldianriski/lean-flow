@@ -163,7 +163,21 @@ status: current
   - Sibling: **TD-067** (the gate-token check being looser than its message). Unrelated cause; both are
     "a tool's report and its behaviour disagree, and the disagreement is silent".
 
-- **TD-069** severity: minor | status: open | created: Sprint-077
+- **TD-069** severity: minor | status: open | created: Sprint-077 | updated: Sprint-079
+  - **HALF RESOLVED at SPRINT-079's promote — the register was split, the epic was ruled deferred.**
+    `conformance-dispositions.md` **230 → 128**: §§ Covered today + Artefacts moved verbatim to a new
+    sibling `docs/research/conformance-coverage.md` (**124**), along the line the register's own title
+    draws — it answers *what gets built and what is scoped out*, the sibling answers *what is covered
+    now*. Split, not squeezed: both halves were verified byte-identical to the pristine copy with
+    `cmp`, so nothing was cut to fit. This is the split SPRINT-078's close specified and deferred
+    "so a closing sprint does not edit a task it did not own"; TASK-238's `touches:` now names the
+    moved section. `evals/run-foreign-repo-fixtures.sh` was the one live citer and is repointed.
+    **What stays open is the epic half.** `EPIC-004-conformance.md` is **214 / 200** (one more line
+    from this promote's member row, exactly as this row forecast) and was ruled **deferred** rather
+    than trimmed — it exits via §11 archive once § Closed-when 2 ticks, the same reasoning that
+    leaves `loop-hygiene-prd.md` in place. **Re-file the register half fresh if** `conformance-coverage.md`
+    breaches: it lands at 124/130 and gains roughly a line per rule covered, so §6's tree split is
+    due inside two sprints. Recorded at SPRINT-079 promote (D3/D4 of that Plan).
   - Summary: **two governed docs exceed their §2 soft cap by growing the way they are meant to, and
     §2's Growth rule forbids the obvious fix.** *Cap-hit → split into a tree, never squeeze.*
     `docs/research/conformance-dispositions.md` is **230 / 130** (206 when filed) — a partition of all 62 checkable

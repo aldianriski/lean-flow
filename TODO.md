@@ -18,12 +18,13 @@ status: current
 
 ## Active Sprint
 
-> _(none — SPRINT-078 closed 2026-08-23. **EPIC-004 stays open**: § Closed-when 2 has two halves and
-> this sprint did the coverage one (19 → 30 of 62 checkable rules). The other half is **TASK-254**, the
-> ruling on the 11 `scope-out` rules — a decision, not a build. Nine `state: ready` Backlog tasks are
-> promotable, of which **TASK-248 … TASK-252** are the remaining §9–§12 coverage slices and
-> **TASK-255 · TASK-256** are this close's follow-ups: two §2 gaps `S6.MULTISVC` and `S6.MEDIUM` ran
-> into and reported rather than guessed at.)_
+> **SPRINT-079 — The Undifferentiated Middle** → [docs/sprint/SPRINT-079-the-undifferentiated-middle.md](docs/sprint/SPRINT-079-the-undifferentiated-middle.md)
+>
+> _Five tasks — **T1 TASK-254** (rule the 11 `scope-out` rules, EPIC-004 § Closed-when 2's other half)
+> · **T2 TASK-255 · T3 TASK-256** (the two §2 gaps SPRINT-078 reported) · **T4 TASK-248 · T5 TASK-249**
+> (§9 + §10 coverage, 30 → 39 of 62). T1 runs first because its ruling can add to the `build` set T4/T5
+> draw from. **TASK-250 · 251 · 252** held for SPRINT-080, which then closes EPIC-004 — deliberate, per
+> TD-071 and L-150 (the ~11-min gate is the sprint's cost constraint)._
 
 ---
 
@@ -72,7 +73,7 @@ status: current
       origin:     close-retro
       state:      ready
 
-- [ ] TASK-245 — Decompose EPIC-004's remaining coverage rules into buildable tasks  [size: M] [risk: low] [HITL]
+- [x] TASK-245 — Decompose EPIC-004's remaining coverage rules into buildable tasks  [size: M] [risk: low] [HITL]
       class:      decision
       done-when:  the ~32 `build` rules in `docs/research/conformance-dispositions.md` exist as
                   `TASK-NNN` entries (or as a small number of grouped vertical slices), each with a
@@ -93,7 +94,14 @@ status: current
                   that the bar stands · SPRINT-077 § Out (which names this as the next entry, and
                   names `/task-decomposer` rather than `promote` as the skill that runs it)
       origin:     close-retro
-      state:      ready
+      state:      done — **DISCHARGED at SPRINT-079's promote, not shipped.** Its `done-when` asks the
+                  `build` rules to exist as `TASK-NNN` entries. Re-derived from the register at promote
+                  (its own `assumes:` said to, and was right): **21** `build` rules, not "~32" — and
+                  TASK-248…252 map onto them **1:1**, id for id — §9 ×5 · §10 ×4 · §11-ledger ×4 ·
+                  §11-archival ×4 · §12 ×4 = 21. The grouping call this row flagged as "a decision, not
+                  a formality" was taken the way it predicted: five grouped vertical slices, not 21
+                  one-rule tasks. Nothing left to decompose. Swept from the Backlog at SPRINT-079's
+                  close under §11
 
 - [ ] TASK-248 — Cover §9's sprint-file family in the engine  [size: M] [risk: med] [HITL]
       class:      execution
@@ -210,7 +218,8 @@ status: current
                   METHOD is proven and the finding is real; what is unproven
                   is the other two families
       touches:    evals/run-foreign-repo-fixtures.sh (extend the target if the new rules need one) ·
-                  docs/research/conformance-dispositions.md (only if artefacts are found) · the
+                  docs/research/conformance-coverage.md § Artefacts (only if artefacts are found — the
+                  section moved there at SPRINT-079's promote, when the register was split) · the
                   sprint Execution Log that runs it
       depends-on: none
       assumes:    **SPRINT-075 T3's "0 artefacts" is honest but early, and re-promoting this on the
@@ -226,7 +235,15 @@ status: current
                   that closes it is a measurement, and it accumulates one family at a time)
       tracker:    SPRINT-075 T3 · SPRINT-076 T3 (the §2 third) · EPIC-004 § Closed-when 1 · L-015 · L-016
       origin:     close-retro
-      state:      blocked
+      state:      ready
+                  **UNBLOCKED at SPRINT-079's promote.** The condition read "§6's tier doc-sets **or**
+                  §11's ledger rules are evaluated by the ENGINE" — SPRINT-078 T2 put the tier family
+                  there (`assert_S6_BASE` … `assert_S6_MULTISVC`, one check with the tier a parameter),
+                  so the first disjunct is met. Re-derived at promote from the engine source, not read
+                  off SPRINT-078's summary. Not pulled into SPRINT-079: the triage wants coverage past
+                  the shape-bound families, and §11's ledger rules land in SPRINT-080 (TASK-250/251) —
+                  running it after those is the stronger measurement, and the trigger stays a condition
+                  rather than a schedule (L-094)
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution

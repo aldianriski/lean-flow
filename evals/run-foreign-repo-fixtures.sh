@@ -178,7 +178,7 @@ else
   echo "FAIL fixture(every-finding-is-actionable-and-clears): findings remain after applying every one of them."
   echo "  remainder:"; printf '%s\n' "$left" | sed 's/^/    /'
   echo "  (a remainder here is either a NEW artefact -- our shape leaking into a stranger's report, route it"
-  echo "   to conformance-dispositions.md § Artefacts -- or a finding whose fix above is incomplete. Triage"
+  echo "   to conformance-coverage.md § Artefacts -- or a finding whose fix above is incomplete. Triage"
   echo "   which, and record it; do NOT relax this assertion into a remainder list to make it green.)"
   fail=1
 fi
