@@ -47,8 +47,25 @@ update_trigger: sprint execute/close events
 
 ## Plan
 
+### T0 — Repair `S9.VERIFYCLAUSE`, which fires on every unticked Plan `[size: S · risk: med · class: execution · HITL]`
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-sprint-family-fixtures.sh`
+Depends-on: none
+
+**Inserted mid-sprint, owner-approved**, after the G2 baseline run reported
+`dod-criterion-names-no-check` against this Plan — which has zero ticked boxes. Recorded as a
+`scope-change` in the Execution Log **before** this section was added; § Plan was byte-identical
+until the gate required the declaration (L-100).
+
+**Acceptance:** the phantom criterion is gone, the unreachable note branch executes, and the
+zero-tick state carries a retained control.
+
+**DoD:**
+- [x] Cause identified rather than symptom-patched — *Verify: an empty `$(...)` in a heredoc yields one empty line; the loop ran once on a grep matching zero lines*
+- [x] Retained control for the zero-tick state — *Verify: `s9-dod-names-no-check-control-zero-ticks`*
+- [x] Shown to discriminate — *Verify: reddens against the unfixed engine while its sibling stays PASS; restore hash-verified*
+
 ### T1 — Cover §11's ledger-retention rules `[size: M · risk: low · class: execution · AFK]`
-Layers: `scripts/lib/conformance-engine.sh` · `evals/run-sprint-family-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md`
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-sprint-family-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md` · `spec/STANDARD.md` *(added at execution — the §11 exception clause the G2 ruling chose lives in the spec so the check derives its markers; L-100: a live declaration, not a frozen prediction)*
 Depends-on: none
 Cites: the register's § `build` (§11's four ledger rows) · §11's Conformance table · L-058 · L-108 · TD-012 · `S11.TDDELETE` · `S11.TODOCAP` · `S11.LEARNINGS` · `S11.BACKLOG` · `TECH-DEBT.md` (read as input, never edited by this task)
 
@@ -61,13 +78,13 @@ before any fixture is written — which is how SPRINT-079 found three defects in
 produce it, and a control proving it stays silent on the compliant shape.
 
 **DoD:**
-- [ ] The four ids and their findings are re-derived from the register, not copied from this Plan — *Verify: the § `build` §11 rows*
-- [ ] **Each rule is run against this repository before its fixture is written**, and what it says is recorded — *Verify: `S11.LEARNINGS` must find L-144 (a promoted entry deliberately uncollapsed, with a recorded exception) and `S11.TDDELETE` must find TD-048/057/065 are 2 sprints from deletion, not past it; both are live states this ledger is in today*
-- [ ] **A false-positive boundary per rule, each fixed by a control.** `S11.LEARNINGS` must not fire on an entry whose exception is recorded; `S11.TDDELETE` must not fire before 3 sprints; `S11.TODOCAP` reads §2's cap rather than a number written here (L-097); `S11.BACKLOG` must not fire on a Backlog entry for work that never shipped
-- [ ] Every threshold read from the spec, none written into the checker — *Verify: change it in a scratch spec copy and watch the check follow, with no code edit*
-- [ ] Retained fixture + control per finding — *Verify: the harness prints its own tally*
-- [ ] Shown to **discriminate**: seed a targeted break per rule, confirm it lands (`cmp`, 0 line delta), still **parses**, reddens its own case, and leaves a sibling green (L-137 · L-142)
-- [ ] Rows migrate register → coverage doc; counts reconcile to **51** — *Verify: the engine's own `coverage:` line, not this Plan's arithmetic*
+- [x] The four ids and their findings are re-derived from the register, not copied from this Plan — *Verify: the § `build` §11 rows* ✓ re-read at execution; the four ledger rows are `S11.TDDELETE`/`S11.TODOCAP`/`S11.LEARNINGS`/`S11.BACKLOG` with the findings as shipped
+- [x] **Each rule is run against this repository before its fixture is written**, and what it says is recorded — *Verify: as stated* ✓ and it found TWO defects in the checks, not the repo (39 conformant entries, then an `[status: active]` entry). Both predictions hold: `S11.LEARNINGS` finds L-144 and clears it on its recorded exception; `S11.TDDELETE` reports TD-048/057/065 at 2 sprints, not past 3
+- [x] **A false-positive boundary per rule, each fixed by a control.** ✓ eight controls: pointer forms (a) and (b), the recorded exception, an `[status: active]` entry quoting the promoted marker, a row resolved last sprint, an open row of any age, a short TODO, and a § Changelog release note outside § Backlog
+- [x] Every threshold read from the spec, none written into the checker — *Verify: change it in a scratch spec copy and watch the check follow, with no code edit* ✓ `s11-td-threshold-read`: loosening §11's delay 3→2 in a scratch spec flips the SAME repository from PASS to `resolved-td-row-past-retention`
+- [x] Retained fixture + control per finding — *Verify: the harness prints its own tally* ✓ `SPRINT-FAMILY FIXTURES: all green`, 38 pass / 0 fail (24 → 38 cases)
+- [x] Shown to **discriminate**: seed a targeted break per rule, confirm it lands (`cmp`, 0 line delta), still **parses**, reddens its own case, and leaves a sibling green (L-137 · L-142) ✓ four seeds, all 0-line-delta and parsing — the two *rejected designs* plus a TDDELETE off-by-one and a BACKLOG scope removal; each reddens **only** its own case, restore hash-verified each time. The fourth seed initially did **not** redden, which exposed a vacuous control; it was rebuilt and retained
+- [x] Rows migrate register → coverage doc; counts reconcile to **51** — *Verify: the engine's own `coverage:` line, not this Plan's arithmetic* ✓ engine reads `37 checkable have an assertion; 14 unchecked` = 51; register § `build` 12 → 8
 
 ### T2 — Cover §11's archival rules `[size: M · risk: low · class: execution · AFK]`
 Layers: `scripts/lib/conformance-engine.sh` · `evals/run-sprint-family-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md`
@@ -181,6 +198,12 @@ this sprint says why.
 | `scripts/lib/conformance-engine.sh` | T0 | Guard `S9.VERIFYCLAUSE` against the empty-heredoc phantom: read ticks into `$ticked`, `continue` when empty (WHY: an empty `$(...)` in a heredoc yields one empty line, so the rule fired on every unticked Plan and its note branch was dead code) | med | `run-sprint-family-fixtures.sh` 24/24 · discrimination vs unfixed engine |
 | `evals/run-sprint-family-fixtures.sh` | T0 | Add retained control `s9-dod-names-no-check-control-zero-ticks` (WHY: both existing controls hand the rule a ticked Plan, so neither could reach the zero-tick path that shipped the bug) | low | reddens on the unfixed engine, sibling stays green |
 | `docs/sprint/logs/SPRINT-080-the-last-twelve-rules.md` | T0 | Execution Log created lazily at first entry; baseline + two `scope-change` entries (WHY: ADR-014 · the frozen-Plan rule) | low | n/a |
+| `scripts/lib/conformance-engine.sh` | T1 | Four §11 ledger-retention assertions + `_s11_sprint_max` / `_s11_note` / `_s11_collapse_markers` (WHY: §11's ledger half was 4 of the register's 12 `build` rules) | med | 4 must-FAIL + 8 controls; 4 seeded breaks each reddening only its own case |
+| `scripts/lib/conformance-engine.sh` | T1 | `_s2_cap_for` takes an optional column and a **leading** integer (WHY: `TODO.md` is a root-table row — Cap at c[4] — and its cell `320 soft (ADR-019)` read as `320019` under the old all-digits `gsub`) | med | probed against both table shapes: 400 and 320 |
+| `spec/STANDARD.md` | T1 | §11 LEARNINGS row gains the **Deliberate non-collapse is recorded** exception clause (WHY: the G2 ruling — the check derives its markers from the spec instead of hard-coding them). Not a new rule: §11 still states 11, table still 11 rows | med | `s11-promoted-not-collapsed-control-exception`; denominator still 51 |
+| `evals/run-sprint-family-fixtures.sh` | T1 | 13 retained cases incl. the spec-read mechanism case and controls encoding both rejected designs (WHY: TD-012 · L-140 — retain the over-matched case, do not treat it as a fixed bug) | low | harness tally 38 pass / 0 fail |
+| `docs/research/conformance-dispositions.md` | T1 | § `build` 12 → 8 rows; heading count corrected with it | low | register/coverage reconcile |
+| `docs/research/conformance-coverage.md` | T1 | New row for the four, recording the derived thresholds and both defects real input caught | low | engine `coverage:` 37 + 14 = 51 |
 
 ## Retro
 

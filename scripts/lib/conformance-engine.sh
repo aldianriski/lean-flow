@@ -1860,7 +1860,7 @@ _sprint_plans() {   # <repo> -> one path per active Plan, repo-relative
 # hard-coding the figure is the lesser of the two costs, and it is recorded rather than slipped in:
 # the row's case for a shared read-spec-files.sh gets stronger by exactly one caller.
 _s2_cap_for() {
-  awk -v want="$2" '
+  awk -v want="$2" -v col="${3:-5}" '
     /^## §2/ { in2 = 1; next }
     /^## §/  { in2 = 0 }
     !in2 { next }
@@ -1868,7 +1868,8 @@ _s2_cap_for() {
     /^\|/ {
       n = split($0, c, "|"); if (n < 7) next
       if (index(c[2], want) == 0) next
-      cap = c[5]; gsub(/[^0-9]/, "", cap)
+      cap = c[col]
+      sub(/^[^0-9]*/, "", cap); sub(/[^0-9].*$/, "", cap)
       if (cap != "") { print cap; exit }
     }' "$1"
 }
@@ -2225,6 +2226,201 @@ $(cat "$repo/$log")"
   done
   [ "$last_bad" -eq 1 ] && return
   [ "$n_ok" -gt 0 ] && ok "S10.PROMOTEREVIEW   -- $n_ok promote record(s) carry all three governance checklist lines"
+}
+
+# ==================================================================================================
+# §11 -- LEDGER RETENTION (SPRINT-080 T1). Four rules that read a repository's OWN ledgers, which is
+# why every one was run against this repository before its fixture was written (D2): a fixture is
+# built to the shape its author already has in mind, and real input is not.
+#
+# Every threshold is READ FROM THE SPEC, never written here -- the retention delay from §11's own
+# S11.TDDELETE row, the TODO cap from §2's row, the collapse-exception markers from §11's exception
+# clause. A figure a checker hard-codes is a second SSOT that drifts from the row it copied the
+# moment the standard moves (L-097 - L-130).
+#
+# None of the four iterates with `while read` over a command substitution in a heredoc: an empty
+# substitution there yields one EMPTY LINE, not nothing, which is the phantom T0 fixed in
+# S9.VERIFYCLAUSE this same sprint. They split on IFS instead, where an empty string yields no
+# iterations at all.
+# ==================================================================================================
+
+# _s11_sprint_max <repo> -- the highest sprint number the repo has EVER issued (active + archive).
+# "N sprints ago" needs a scale and the archive holds most of it; counting only active sprints would
+# make every closed sprint invisible and every resolved row look brand new.
+_s11_sprint_max() {
+  { ls "$1/docs/sprint" 2>/dev/null; ls "$1/docs/sprint/archive" 2>/dev/null; } |
+    sed -n 's/^SPRINT-\([0-9][0-9]*\)-.*\.md$/\1/p' | sed 's/^0*//' | sort -n | tail -1
+}
+
+# _s11_note <spec> <rule-id> -- the Note cell of §11's Conformance row for one rule.
+_s11_note() {
+  awk -v want="$2" '
+    /^## §11/ { in11 = 1; next }
+    /^## §/   { in11 = 0 }
+    !in11 { next }
+    /^\|/ {
+      n = split($0, c, "|"); if (n < 6) next
+      t = c[2]; gsub(/[` ]/, "", t)
+      if (t != want) next
+      print c[5]; exit
+    }' "$1"
+}
+
+# _s11_collapse_markers <spec> -- the backticked phrases in §11's deliberate-non-collapse clause.
+# Derived, not restated: rewording the clause in the spec moves this check with it and needs no code
+# edit, which is the property the DoD asks to see demonstrated. Scoped to the sentence after its own
+# lead-in, because the LEARNINGS row carries other backticked spans that are not markers (L-108).
+_s11_collapse_markers() {
+  awk '
+    /^## §11/ { in11 = 1 }
+    /^## §12/ { in11 = 0 }
+    !in11 { next }
+    /^\| `docs\/LEARNINGS\.md`/ {
+      i = index($0, "Deliberate non-collapse is recorded")
+      if (i == 0) next
+      s = substr($0, i)
+      while (match(s, /`[^`]+`/)) {
+        print substr(s, RSTART + 1, RLENGTH - 2)
+        s = substr(s, RSTART + RLENGTH)
+      }
+      exit
+    }' "$1"
+}
+
+assert_S11_TDDELETE() {
+  repo=$1
+  led="$repo/TECH-DEBT.md"
+  [ -f "$led" ] || { note "S11.TDDELETE        -- no TECH-DEBT.md -- the ledger this rule retires rows from does not exist here"; return; }
+  thr=$(_s11_note "$spec" "S11.TDDELETE" | sed -n 's/.*[>=≥] *\([0-9][0-9]*\) *sprints.*/\1/p')
+  [ -n "$thr" ] || { bad "spec-table-unreadable: §11's S11.TDDELETE row states no '>= N sprints' delay, so no row's age can be judged against it"; return; }
+  cur=$(_s11_sprint_max "$repo")
+  [ -n "$cur" ] || { note "S11.TDDELETE        -- no SPRINT-NNN files, so 'N sprints ago' has no scale in this repository -- not judged"; return; }
+  # Anchored at the row's own opening, never a substring: this ledger's legend and several row bodies
+  # discuss resolved rows in prose, and a grep for `status: resolved` alone counts the LEGEND LINE as
+  # a row -- the exact miss L-108 records against a TECH-DEBT census, in this same file.
+  rows=$(grep '^- \*\*TD-' "$led" 2>/dev/null)
+  n_over=0
+  _oifs=$IFS; IFS='
+'
+  for ln in $rows; do
+    IFS=$_oifs
+    tid=$(printf '%s' "$ln" | sed -n 's/^- \*\*\(TD-[0-9][0-9]*\)\*\*.*/\1/p')
+    [ -n "$tid" ] || { IFS='
+'; continue; }
+    case "$ln" in *'status: resolved'*) ;; *) IFS='
+'; continue ;; esac
+    cl=$(printf '%s' "$ln" | sed -n 's/.*closed: *[Ss]print-0*\([0-9][0-9]*\).*/\1/p')
+    [ -n "$cl" ] || cl=$(printf '%s' "$ln" | sed -n 's/.*resolved[^(]*([Ss]print-0*\([0-9][0-9]*\).*/\1/p')
+    if [ -n "$cl" ]; then
+      age=$((cur - cl))
+      if [ "$age" -ge "$thr" ]; then
+        bad "resolved-td-row-past-retention: $tid resolved at SPRINT-$cl, $age sprints before the current SPRINT-$cur -- §11 deletes the row once it is $thr sprints old. The substance already lives in CHANGELOG.md, the sprint archive and git; ids stay monotonic, so deleting never frees $tid for reuse"
+        n_over=$((n_over + 1))
+      fi
+    fi
+    IFS='
+'
+  done
+  IFS=$_oifs
+  [ "$n_over" -eq 0 ] && ok "S11.TDDELETE        -- no resolved TECH-DEBT row has reached §11's $thr-sprint deletion trigger (current SPRINT-$cur)"
+}
+
+assert_S11_TODOCAP() {
+  repo=$1
+  f="$repo/TODO.md"
+  [ -f "$f" ] || { note "S11.TODOCAP         -- no TODO.md -- §2 makes it substrate-conditional, so its absence is not a breach"; return; }
+  # Column 4: TODO.md sits in §2's ROOT table, which has no Tier column, so its Cap is one cell left
+  # of a docs-tree row's. Read as a LEADING integer, because this cell reads "320 soft (ADR-019)" and
+  # taking every digit in it yields 320019 -- L-130's shape, inside a parser.
+  cap=$(_s2_cap_for "$spec" "TODO.md" 4)
+  [ -n "$cap" ] || { bad "spec-table-unreadable: §2 states no numeric cap for TODO.md, so 'over its cap' has nothing to compare against"; return; }
+  n=$(awk 'END{print NR}' "$f")
+  if [ "$n" -gt "$cap" ]; then
+    bad "todo-over-cap-at-promote: TODO.md is $n lines against §2's cap of $cap -- §11 flags this in the promote governance review and prunes it with the user, never silently"
+  else
+    ok "S11.TODOCAP         -- TODO.md is $n lines, within §2's cap of $cap"
+  fi
+}
+
+assert_S11_LEARNINGS() {
+  repo=$1
+  f="$repo/docs/LEARNINGS.md"
+  [ -f "$f" ] || { note "S11.LEARNINGS       -- no docs/LEARNINGS.md -- nothing to collapse"; return; }
+  mk=$(_s11_collapse_markers "$spec")
+  [ -n "$mk" ] || { bad "spec-table-unreadable: §11 states no deliberate-non-collapse markers, so an entry held back on purpose cannot be told from one overdue -- and reporting both alike is a finding no adopter can clear"; return; }
+  # ONE awk pass over the corpus. A per-entry shell loop with two greps apiece is the exact shape that
+  # took a sibling family from ~1s to 29s: the dominant term is processes started, not work done (L-144).
+  out=$(awk -v markers="$mk" '
+    function emit(   i, clean) {
+      if (id == "" || !promoted || collapsed) return
+      clean = 1
+      for (i = 1; i <= nm; i++) if (index(body, M[i]) == 0) clean = 0
+      if (!clean) print id
+    }
+    BEGIN { nm = split(markers, M, "\n") }
+    /^## L-[0-9]+ / {
+      emit()
+      id = $2
+      # POSITION-ANCHORED, not a substring scan of the line. A heading here runs to several hundred
+      # words and routinely QUOTES the markers -- L-114 is [status: active] whose narrative contains
+      # the literal string [status: promoted], and an unanchored test read it as a promoted entry and
+      # reported it. That is L-108 exactly: a self-describing corpus, where a grep eventually matches
+      # prose about the search. The metadata is the segment before the first "]:", so split there and
+      # judge status on that half only.
+      _mi   = index($0, "]:")
+      _meta = (_mi > 0 ? substr($0, 1, _mi + 1) : $0)
+      _rest = (_mi > 0 ? substr($0, _mi + 2)    : "")
+      promoted  = (_meta ~ /\[status: promoted\]/)
+      # TWO stored forms satisfy the §11 action "collapse it to a pointer line -- `L-NNN → promoted:
+      # <where>`", and checking only the first reported 39 CONFORMANT entries on this repository --
+      # the artefact triage this task owes, by the SPRINT-076 T3 method. Form (a): the HEADING is
+      # itself the pointer. Form (b): the heading keeps a one-line gist and the pointer is the first
+      # body bullet, which is the literal §11 shape, id and all. Form (b) is anchored to the id of the
+      # entry being scanned, which is what keeps it a structural test -- a neighbouring pointer quoted
+      # in prose cannot satisfy it (L-108). L-144 has neither form: it still carries the PRE-collapse
+      # field `promoted: yes → …`, which is why it is the one entry the exception clause speaks for.
+      collapsed = (_rest ~ /^[ \t]*→[ \t]*promoted:/)
+      ptr = id " → promoted:"
+      body = ""
+      next
+    }
+    { body = body "\n" $0; if (ptr != "" && index($0, ptr) > 0) collapsed = 1 }
+    END { emit() }
+  ' "$f")
+  if [ -n "$out" ]; then
+    for e in $out; do
+      bad "promoted-learning-not-collapsed: $e is [status: promoted] but still carries its body and records no deliberate-non-collapse exception -- §11 collapses a promoted entry to 'L-NNN → promoted: <where>', because the durable rule is the record now"
+    done
+  else
+    ok "S11.LEARNINGS       -- every [status: promoted] entry is collapsed to its pointer, or records its non-collapse per §11's exception clause"
+  fi
+}
+
+assert_S11_BACKLOG() {
+  repo=$1
+  f="$repo/TODO.md"
+  [ -f "$f" ] || { note "S11.BACKLOG         -- no TODO.md -- there is no Backlog to retain anything in"; return; }
+  # SPLIT rule: whether an entry counts as "shipped/promoted" is judged, and this half does not judge
+  # it. The MECHANICAL half is §11's own words -- "no shipped-in-SPRINT breadcrumb comments left in
+  # TODO.md" -- so what is detected is the BREADCRUMB: a line ANNOUNCING the shipping, not a task that
+  # merely cites a sprint. Anchored to a list item or an HTML comment and scoped to § Backlog, because
+  # § Active Sprint names a sprint on every healthy repo and task bodies quote sprint ids constantly.
+  # An unanchored corpus grep would report this file's prose about itself (L-108).
+  out=$(awk '
+    /^## / { inb = ($0 ~ /Backlog/); next }
+    !inb { next }
+    /^[ \t]*(-|<!--)/ {
+      low = tolower($0)
+      if (low ~ /shipped|delivered/ && low ~ /sprint-[0-9]/) printf "%d\n", NR
+    }
+  ' "$f")
+  if [ -n "$out" ]; then
+    for l in $out; do
+      bad "shipped-backlog-entry-retained: TODO.md:$l is a shipped-in-SPRINT breadcrumb left in § Backlog -- §11 removes a shipped entry outright (propose→approve); its durable homes are root CHANGELOG.md and docs/sprint/archive/, so a pointer left here is a breadcrumb rather than a record"
+    done
+  else
+    ok "S11.BACKLOG         -- § Backlog carries no shipped-in-SPRINT breadcrumb (the mechanical half; whether an entry is shipped stays judged)"
+  fi
 }
 # ==================================================================================================
 # ==================================================================================================

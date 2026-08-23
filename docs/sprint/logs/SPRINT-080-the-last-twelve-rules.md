@@ -79,3 +79,94 @@ grain: a structural claim about another artefact, frozen without being queried.
 `conformance-coverage.md`; and the register's § `build` is empty. T1/T2's *"counts reconcile to 51"*
 stands as written — 51 is the **denominator**, which both `33+18` and `45+6` satisfy. T4's
 *"the two counts sum to 51"* was already correct and is unchanged.
+
+### 2026-08-23 | progress | T1 — §11's four ledger-retention rules, and two defects real input found
+
+**Shipped.** `S11.TDDELETE` → `resolved-td-row-past-retention` · `S11.TODOCAP` →
+`todo-over-cap-at-promote` · `S11.LEARNINGS` → `promoted-learning-not-collapsed` · `S11.BACKLOG` →
+`shipped-backlog-entry-retained`. Ids and findings re-derived from the register's § `build` §11 rows,
+not copied from the Plan: 12 rows there, the four §11 ledger ones are these.
+
+**D2 paid for itself twice — both defects were in the check, not the repository.**
+
+*First draft: 39 findings, every one on a conformant entry.* §11's action is *"collapse it to a
+pointer line — `L-NNN → promoted: <where>`"*, and this corpus satisfies it in **two** stored forms:
+**(a)** the heading itself is the pointer (`L-143`, `L-142`); **(b)** the heading keeps a one-line
+gist and the pointer is the first body bullet — `- **L-137 → promoted: … ** — the durable rule is the
+record now` — which is §11's literal shape, id and all. The draft recognised only (a), so 39 entries
+using (b) were reported. Fixed by testing for both, with (b) anchored to *the scanned entry's own id*
+so a neighbour's pointer quoted in prose cannot satisfy it.
+
+*Second draft: one finding, on `L-114` — which is `[status: active]`.* Its heading is a several-
+hundred-word narrative that **quotes the literal string `[status: promoted]`**, and the status test
+was an unanchored substring scan of the whole line. This is L-108 arriving inside code written by
+someone who had just cited L-108 in the comment above it. Fixed by splitting the heading at its first
+`]:` and judging status on the metadata half only.
+
+**Result on this repository: all four PASS**, and the DoD's two predictions both hold —
+`S11.TDDELETE` reports TD-048/057/065 have **not** reached the trigger (resolved at SPRINT-078, 2
+sprints back, against a delay of 3), and `S11.LEARNINGS` identifies **L-144** as the one promoted
+entry still carrying its body, then clears it on the exception recorded at `LEARNINGS.md:114`.
+
+**Cross-check, per the rule that a query acted on immediately needs a second that agrees.** An
+independent metadata-anchored census: **91 active + 41 promoted + 1 superseded = 133 = the heading
+count.** The naive corpus grep said **43** promoted; the gap of two is exactly the prose
+contamination the second draft tripped on. Coverage `33 → 37` in-engine, unchecked `18 → 14`, and
+`37 + 14 = 51` — the denominator is unmoved, so **A2 holds**.
+
+**Every threshold read from the spec, none written in the checker.** The retention delay is parsed
+from §11's own `S11.TDDELETE` row; the TODO cap from §2's row; the collapse-exception markers from
+§11's exception clause. Demonstrated rather than asserted: against a scratch spec with the delay
+loosened `3 → 2`, the *same repository* and *unchanged code* flip from `PASS S11.TDDELETE` to
+`FAIL resolved-td-row-past-retention` (`s11-td-threshold-read`).
+
+**Two spec/parser changes this task required, both recorded.** (1) §11's LEARNINGS row gains a
+**Deliberate non-collapse is recorded** clause — the exception form the G2 ruling chose, stated in
+the spec so the check *derives* the markers instead of hard-coding them. It is an exception clause of
+an existing action, not a further rule: §11 still states **11 rules** and its conformance table still
+has 11 rows. (2) `_s2_cap_for` gained an optional column argument and now takes a **leading** integer
+rather than every digit in the cell — `TODO.md` sits in §2's root table (Cap at c[4], not c[5]) and
+its cell reads `320 soft (ADR-019)`, which the old `gsub` would have read as **320019**. Generalised
+rather than duplicated, so TD-070's parser count stays at six.
+
+**Layers correction (L-100).** T1's declared `Layers:` did not name `spec/STANDARD.md`; the exception
+clause put it there. Declared here, not defended.
+
+**Retained fixtures: 13 new cases, 37 → 38 total.** Four must-FAIL, the spec-read mechanism case, and
+eight controls — including the two that encode the defects above (`control-form-b` for the 39, and
+`control-prose` for L-114), retained as fixtures rather than treated as fixed bugs (L-140).
+
+### 2026-08-23 | surprise | D4's trip-wire is live — the harness reached 9m26s
+
+`run-sprint-family-fixtures.sh` went **5m41s (24 cases) → 9m26s (37 cases)**, which is D4's *"passes
+~10 minutes"* condition arriving one task earlier than the Out section expected. The scaling is
+roughly linear in cases, so T2's five findings and T3's four-plus-four would land it near **15
+minutes**.
+
+D4 already rules this — *"stop and fix TD-073 before adding the rest. A cost that doubles mid-sprint
+stops being debt and becomes this sprint's problem"* — so it is not re-opened here, only recorded as
+having fired. **TD-073 is the next action, before T2 adds cases.** Root cause is known and named in
+L-144: every case runs the whole engine against the shipped spec, so cost is dominated by engine
+invocations, not by the assertions themselves.
+
+### 2026-08-23 | scope-change | § Plan gains a `### T0` section, because a gate required the declaration
+
+**What broke.** The pre-commit gate came back **`QA-CHECK: 159 pass, 1 fail`** — its own printed
+verdict, not the wrapper's exit code, which was **0**. A textbook L-120 split: reading the status
+would have committed through a red gate.
+
+The finding is `layers observed`, and it is correct on both halves: `spec/STANDARD.md` was changed
+but named in no task's `Layers:`, and T0's two files were *"changed by a task that never declared
+it"* — T0 was approved and logged, but it had no `### T0` section for the checker to read.
+
+**Impact.** None shipped: the gate caught it before the commit. It does mean the earlier claim that
+§ Plan stayed byte-identical held only until the gate demanded otherwise.
+
+**Ruling.** L-100 governs — `Layers:` is a live declaration corrected per task, not a frozen
+prediction to defend. So `spec/STANDARD.md` is declared on T1 with its reason inline, and T0 is
+recorded in § Plan with its own Layers and DoD. Both edits follow the `scope-change` entries already
+on this log rather than preceding them, which is the order the frozen-Plan rule asks for.
+
+**Worth noting for the Retro:** `layers observed` found the undeclared spec edit that this log had
+already confessed in prose. The prose was not a substitute for the declaration, and only the
+mechanical check treated it as missing.

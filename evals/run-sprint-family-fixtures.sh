@@ -308,6 +308,135 @@ commit_msg "$d" "sprint(900): close"
 close_the_sprint "$d"
 assert_absent "s10-retro-bucket-unrouted-control" "$d" "retro-bucket-unrouted"
 
+
+echo "=== §11 ledger-retention fixtures (SPRINT-080 T1) ==="
+
+# Every case below builds a repo that carries a SPRINT-900 Plan, because "N sprints ago" needs a
+# scale to be judged against -- _s11_sprint_max reads it from docs/sprint/. A ledger fixture with no
+# sprint numbering is a different (and correct) verdict: not judged.
+
+# ledger_repo <dir> -- a minimal conformant repo: one active sprint, a short TODO with an empty
+# Backlog, an empty TECH-DEBT ledger and a LEARNINGS file with one collapsed promoted entry.
+# Built conformant so each case below breaks exactly ONE thing, which is what makes the case a
+# discrimination rather than a demolition (L-142).
+ledger_repo() {
+  mkdir -p "$1/docs"
+  sprint_plan "$1" "" '- [ ] a thing'; sprint_log "$1"
+  printf '# TODO\n\n## Active Sprint\n\n> **SPRINT-900 --- Fixture** -> docs/sprint/SPRINT-900-fixture.md\n\n## Backlog\n\n- [ ] TASK-001 --- a thing to do\n' > "$1/TODO.md"
+  printf -- '---\nowner: Maintainer\nlast_updated: 2026-01-01\nstatus: current\nupdate_trigger: debt filed or resolved\n---\n\n# TECH-DEBT\n\n> resolved rows are deleted 3 sprints later.\n' > "$1/TECH-DEBT.md"
+  printf -- '---\nowner: Maintainer\nlast_updated: 2026-01-01\nstatus: current\nupdate_trigger: a learning is confirmed or promoted\n---\n\n# Learnings\n\n## L-001 [tags: process] [status: promoted]: → promoted: CLAUDE.md § Anti-Patterns\n\n- count: 2\n' > "$1/docs/LEARNINGS.md"
+}
+
+# --- S11.TDDELETE: a resolved row older than the spec's own retention delay --------------------
+# closed at Sprint-880 against a current Sprint-900 is 20 sprints, past any plausible delay. The
+# THRESHOLD is not written here: the check reads ">= N sprints" out of §11's own S11.TDDELETE row,
+# and the scratch-spec case below proves that by moving it.
+d="$work/tddelete"; mkdir -p "$d"; ledger_repo "$d"
+printf -- '- **TD-001** severity: minor | status: resolved → TASK-009 | created: Sprint-870 | closed: Sprint-880\n' >> "$d/TECH-DEBT.md"
+assert_finding "s11-td-past-retention" "$d" "resolved-td-row-past-retention"
+
+# Control: resolved LAST sprint. §11 delays deliberately -- a just-resolved debt is still context at
+# the next promote -- so firing here would report a repository doing exactly the right thing.
+d="$work/tddelete-ok"; mkdir -p "$d"; ledger_repo "$d"
+printf -- '- **TD-001** severity: minor | status: resolved → TASK-009 | created: Sprint-870 | closed: Sprint-899\n' >> "$d/TECH-DEBT.md"
+assert_absent "s11-td-past-retention-control-recent" "$d" "resolved-td-row-past-retention"
+
+# Control: an OPEN row of any age. The trigger is `resolved`, not age alone.
+d="$work/tddelete-ok2"; mkdir -p "$d"; ledger_repo "$d"
+printf -- '- **TD-002** severity: major | status: open | created: Sprint-800\n' >> "$d/TECH-DEBT.md"
+assert_absent "s11-td-past-retention-control-open" "$d" "resolved-td-row-past-retention"
+
+# --- The threshold is READ, not written: move it in a scratch spec and the verdict follows -------
+# This is the DoD's mechanism test, and it is the whole reason the delay is parsed out of §11 rather
+# than typed into the checker. Same repository, same code -- only the spec changes.
+d="$work/tddelete-spec"; mkdir -p "$d"; ledger_repo "$d"
+printf -- '- **TD-001** severity: minor | status: resolved → TASK-009 | created: Sprint-870 | closed: Sprint-898\n' >> "$d/TECH-DEBT.md"
+assert_absent "s11-td-threshold-read-baseline" "$d" "resolved-td-row-past-retention"
+scratch_spec="$work/spec-loosened.md"
+sed 's/`resolved` ≥ 3 sprints ⇒ the row is gone/`resolved` ≥ 2 sprints ⇒ the row is gone/' "$spec" > "$scratch_spec"
+if cmp -s "$spec" "$scratch_spec"; then
+  echo "FAIL fixture(s11-td-threshold-read): the scratch spec is byte-identical to the shipped one -- the seed did not land, so a green result below would prove nothing (L-137)"
+  fail=1
+else
+  _o=$(sh "$engine" "$d" --spec "$scratch_spec" 2>&1)
+  if printf '%s\n' "$_o" | grep -qF "resolved-td-row-past-retention"; then
+    echo "PASS fixture(s11-td-threshold-read): lowering §11's delay to 2 in a SCRATCH SPEC made the same repository fire, with no code edit"
+  else
+    echo "FAIL fixture(s11-td-threshold-read): the delay is not being read from the spec -- the same repo did not change verdict when §11 did"
+    fail=1
+  fi
+fi
+
+# --- S11.TODOCAP: over §2's cap for TODO.md -----------------------------------------------------
+# The cap is read from §2's ROOT-table row, whose cell says "320 soft (ADR-019)". Padding to a size
+# that clears whatever that row says, rather than to a number written here (L-146: a fixture that
+# restates a value the spec owns decays the moment the spec moves).
+d="$work/todocap"; mkdir -p "$d"; ledger_repo "$d"
+i=0; while [ "$i" -lt 400 ]; do printf 'padding line %s\n' "$i" >> "$d/TODO.md"; i=$((i + 1)); done
+assert_finding "s11-todo-over-cap" "$d" "todo-over-cap-at-promote"
+
+d="$work/todocap-ok"; mkdir -p "$d"; ledger_repo "$d"
+assert_absent "s11-todo-over-cap-control" "$d" "todo-over-cap-at-promote"
+
+# --- S11.BACKLOG: a shipped-in-SPRINT breadcrumb left in § Backlog -------------------------------
+d="$work/backlog"; mkdir -p "$d"; ledger_repo "$d"
+printf -- '- ~~TASK-002~~ --- shipped in SPRINT-880, kept here for reference\n' >> "$d/TODO.md"
+assert_finding "s11-shipped-backlog-retained" "$d" "shipped-backlog-entry-retained"
+
+# Control, and the load-bearing one: § Active Sprint names a sprint on EVERY healthy repo, and task
+# bodies cite sprint ids constantly. An unanchored corpus grep would report both. ledger_repo already
+# carries the pointer; this adds a task that cites a sprint in its own body.
+d="$work/backlog-ok"; mkdir -p "$d"; ledger_repo "$d"
+printf -- '      tracker:    SPRINT-870 --- the design this task implements was shipped there\n' >> "$d/TODO.md"
+# ...and a § Changelog release note, which is where a shipped line legitimately lives. Without
+# this line the control passes VACUOUSLY: every other candidate sits inside § Backlog already,
+# so deleting the section scoping changes no verdict and the scoping goes untested. Caught by
+# seeding exactly that break and watching the case stay GREEN -- a break that does not redden
+# its case has tested nothing (L-142).
+printf -- '
+## Changelog (current sprint only)
+
+- shipped TASK-002 in SPRINT-880 --- the release note, in its own section
+' >> "$d/TODO.md"
+assert_absent "s11-shipped-backlog-retained-control" "$d" "shipped-backlog-entry-retained"
+
+# --- S11.LEARNINGS: a promoted entry still carrying its body, with no exception recorded ---------
+learn_entry() {  # <dir> <heading-tail> [body-lines...]
+  shift_dir=$1; shift
+  printf '\n## L-002 [tags: tooling] [status: promoted]: %s\n' "$1" >> "$shift_dir/docs/LEARNINGS.md"
+  shift
+  for b in "$@"; do printf -- '%s\n' "$b" >> "$shift_dir/docs/LEARNINGS.md"; done
+}
+
+d="$work/learnings"; mkdir -p "$d"; ledger_repo "$d"
+learn_entry "$d" '**A full record still sitting where a pointer belongs.** Several sentences of evidence that the durable rule is supposed to have replaced, kept verbatim.' '- count: 2' '- promoted: yes → CLAUDE.md § Anti-Patterns'
+assert_finding "s11-promoted-not-collapsed" "$d" "promoted-learning-not-collapsed"
+
+# Control (a): the heading IS the pointer -- the shorter of the two stored forms.
+d="$work/learnings-ok-a"; mkdir -p "$d"; ledger_repo "$d"
+printf '\n## L-002 [tags: tooling] [status: promoted]: → promoted: CLAUDE.md § Anti-Patterns\n- count: 2\n' >> "$d/docs/LEARNINGS.md"
+assert_absent "s11-promoted-not-collapsed-control-form-a" "$d" "promoted-learning-not-collapsed"
+
+# Control (b): a one-line gist in the heading with the pointer as the first body bullet. This is the
+# form 39 conformant entries in THIS repository use, and the form the first draft of the check
+# reported as a violation -- which is why it is retained rather than treated as a fixed bug (L-140).
+d="$work/learnings-ok-b"; mkdir -p "$d"; ledger_repo "$d"
+learn_entry "$d" 'a one-line gist of the durable rule.' '- **L-002 → promoted: `CLAUDE.md` § Anti-Patterns** --- the durable rule is the record now (§11 collapse).' '- count: 2'
+assert_absent "s11-promoted-not-collapsed-control-form-b" "$d" "promoted-learning-not-collapsed"
+
+# Control (c): uncollapsed ON PURPOSE, with §11's exception recorded. The markers are read out of the
+# spec, so this control also pins that the clause and the checker still agree.
+d="$work/learnings-ok-c"; mkdir -p "$d"; ledger_repo "$d"
+learn_entry "$d" '**A full record deliberately held back.** The durable rule has not taken hold yet and the body is the evidence a later entry cites.' '- count: 3' '- promoted: yes → CLAUDE.md § Anti-Patterns' '- **§11 collapse deliberately NOT applied** --- ruled on the record. **Re-collapse when** the recurrence has a durable home.'
+assert_absent "s11-promoted-not-collapsed-control-exception" "$d" "promoted-learning-not-collapsed"
+
+# Control (d): an ACTIVE entry whose narrative quotes the promoted marker. This is the case that was
+# actually wrong in the first draft -- L-114 in this repository is [status: active] and its body text
+# contains the literal string the status test was grepping for, so an unanchored test reported it.
+# Retained because a false positive here is a false negative about the contract (L-108 · L-140).
+d="$work/learnings-ok-d"; mkdir -p "$d"; ledger_repo "$d"
+printf '\n## L-003 [tags: process] [status: active]: **A long narrative that discusses promotion.** Entries reaching [status: promoted] are collapsed, and grepping for `promoted: yes` returns zero on a healthy corpus.\n- count: 1\n- promoted: no\n' >> "$d/docs/LEARNINGS.md"
+assert_absent "s11-promoted-not-collapsed-control-prose" "$d" "promoted-learning-not-collapsed"
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "SPRINT-FAMILY FIXTURES: all green"
