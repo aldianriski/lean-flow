@@ -5,7 +5,7 @@ epic: EPIC-004
 owner: Maintainer
 last_updated: 2026-08-23
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: d692b93
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
