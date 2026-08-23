@@ -17,9 +17,9 @@ an undifferentiated middle. Rule ids are `spec/STANDARD.md` §14's; that file is
 the register. Split from `conformance-baseline.md` under §2's growth rule — split, never squeeze (L-131).
 
 **Counts, re-derived from the section tables and reconciled against the engine — never copied forward.**
-100 candidates · **100 classified** · **51 checkable** · **35 covered** · **16 `build`** · **0
-`scope-out`**. Reconciled mechanically: 35 + 16 = **51**, matching the engine's own `coverage:` line
-(29 with an assertion + 22 gaps).
+100 candidates · **100 classified** · **51 checkable** · **39 covered** · **12 `build`** · **0
+`scope-out`**. Reconciled mechanically: 39 + 12 = **51**, matching the engine's own `coverage:` line
+(33 with an assertion + 18 gaps).
 **Checkable went 62 → 51 at SPRINT-079 T1 and the eleven did not vanish — they were marked.** A
 disposition written here cannot reach the engine, which dispatches on `spec/STANDARD.md`'s Mark column;
 all eleven now carry `restated` (7) or `standard-directed` (4) there. Record → § `scope-out` below.
@@ -56,17 +56,13 @@ one: a ratio would improve every time the standard declines to automate somethin
 
 **§ Covered today and § Artefacts moved → [`conformance-coverage.md`](conformance-coverage.md)** at
 SPRINT-079's promote (§2 Growth rule, 230 > 130). The counts stay here, where they reconcile.
-## `build` — 16 rules, each with the finding its check will fire
+## `build` — 12 rules, each with the finding its check will fire
 
 A check specified without its finding name is a half-shipped gate (L-058). Every row ships with a
 **retained** must-FAIL fixture proving that exact string fires (TD-012).
 
 | Rule | Named finding |
 |---|---|
-| `S10.FOURBUCKETS` | `retro-bucket-unrouted` |
-| `S10.PROMOTION` | `learning-recurred-unpromoted` |
-| `S10.TDAGING` | `td-row-aged-unreviewed` |
-| `S10.PROMOTEREVIEW` | `promote-checklist-absent` |
 | `S11.TDDELETE` | `resolved-td-row-past-retention` |
 | `S11.TODOCAP` | `todo-over-cap-at-promote` |
 | `S11.CHANGELOG` | `changelog-not-rotated-at-minor` |

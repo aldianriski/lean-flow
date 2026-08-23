@@ -397,3 +397,44 @@ moves breaks these cases — which is the point.
 **Every finding has a control**, including two for `dod-criterion-names-no-check` (the rule admits two
 evidence forms, and passing only one leaves the other unguarded) and the pair that separates *the Plan
 moved* from *the Plan moved unaccounted*.
+
+### 2026-08-23 | progress | T5 — §10's learning-governance family
+
+Four rules. Engine coverage **29 → 33**; GAP 22 → 18. Register § `build` 16 → 12, coverage 35 → 39.
+
+**Every threshold and counter is read, never written.** `_s10_threshold` pulls *count ≥ 2* from §10's
+own prose — §10 is the section stating that a figure inside a criterion is remembered rather than
+measured, so hard-coding `2` in the checker *for that rule* would be the failure demonstrating itself
+(L-097 · L-130). The sprint counter for TD aging comes from the active Plan's frontmatter; guessing it
+from the highest TD row would make the ledger date itself.
+
+**`S10.PROMOTION` counts promotion state position-anchored**, per §11's own instruction and L-108 —
+and the fixture makes that difference a case rather than a comment: a control whose entry is already
+`[status: promoted]` at the same count must stay silent, which a substring scan would fail. On the real
+ledger the gap is 42 by substring against 41 anchored.
+
+**Three of the four needed a false-positive boundary**, and each got a control fixing it:
+- **`S10.TDAGING`** reads the ledger's **header region** for the aging sweep rather than demanding a
+  per-row `updated:` field — §10 asks for a re-review *prompt*, and the sweep is one note about many
+  rows. Anchored to the region, not to the sweep's wording, so a re-phrased sweep does not read as an
+  absent one. Two controls: an aged row the sweep names, and a row younger than three.
+- **`S10.FOURBUCKETS`** fails only when a close reached **none** of the four homes. A bucket can be
+  legitimately empty — a sprint that incurred no debt files no `TD-NNN` — so demanding all four would
+  fail a correct close. Reaching none is unambiguous, and the control fixes that boundary at one.
+- **`S10.PROMOTEREVIEW`** accepts either the plan-lock commit message or the log's promote entry,
+  because §10 fixes the checklist's **content** and not its location; demanding one home would fail a
+  repository that used the other — a finding about our convention rather than about the standard.
+
+**The engine exited mid-report on its own repository, and the cause is worth keeping.** `sprint: 079`
+→ `$(( 079 - 075 ))` is **not a subtraction**: a leading zero makes it an *octal* literal and `079` has
+no octal reading, so the shell aborts with *value too great for base*. The report simply stopped after
+`S10.REDERIVE` — no error line in the output, no `coverage:` line, and the four §10 rules absent
+entirely. **I first read that absence as "the assertions are not registered"** — the same L-108 shape as
+the `S4.INDEX` mistake earlier this sprint, and caught this time by checking stderr rather than
+re-reading the code. Sprint numbers are zero-padded by this standard's own convention, so any adopter
+following it would have hit this. `_dec` strips the padding and carries the explanation.
+
+**Cross-check worth recording:** `S10.TDAGING` independently derives **16** aged rows — the same figure
+the promote governance scan produced by hand, from entirely different code. Two derivations agreeing is
+what the cross-check rule asks for, and it is the first time this sprint that a check and a manual scan
+have been able to confirm each other.

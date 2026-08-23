@@ -2052,6 +2052,169 @@ EOF
     ok "S9.VERIFYCLAUSE     -- all $n_named ticked criterion(s) name their evidence"
   fi
 }
+
+# --- §10's learning-governance family (SPRINT-079 T5) ---------------------------------------------
+
+# _s10_threshold <spec> -- the promotion threshold from §10's own prose ("**count >= 2**"), never a
+# number written here. §10 is the section that says a figure inside a criterion is remembered rather
+# than measured; hard-coding 2 in the checker for that rule would be the failure demonstrating itself
+# (L-097 - L-130).
+_s10_threshold() {
+  awk '/^## §10/{in10=1} /^## §11/{in10=0} !in10{next}
+       match($0, /count *(>=|\xe2\x89\xa5) *[0-9]+/) {
+         s = substr($0, RSTART, RLENGTH); gsub(/[^0-9]/, "", s); if (s != "") { print s; exit } }' "$1"
+}
+
+# _dec <n> -- a decimal integer from a possibly zero-padded one. `$(( 079 - 075 ))` is a shell error,
+# not a subtraction: a leading zero makes it an OCTAL literal and 079 has no octal reading. Sprint
+# numbers are zero-padded by this standard's own convention (SPRINT-079), so every arithmetic on one
+# has to strip the padding first. Found by the engine exiting mid-report on its own repository.
+_dec() { _d=$(printf '%s' "$1" | sed 's/^0*//'); [ -n "$_d" ] || _d=0; printf '%s' "$_d"; }
+
+assert_S10_FOURBUCKETS() {
+  repo=$1
+  plans=$(_sprint_plans "$repo")
+  [ -n "$plans" ] || { note "S10.FOURBUCKETS     -- no sprint Plan under docs/sprint/ -- nothing to verify"; return; }
+  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || {
+    note "S10.FOURBUCKETS     -- history unavailable: §10 routes the buckets IN the close commit, so without history there is nothing to read"
+    return
+  }
+  n_closed=0
+  for p in $plans; do
+    [ "$(_fm "$repo/$p" status)" = "closed" ] || continue
+    cc=$(_fm_real "$repo/$p" close_commit)
+    [ -n "$cc" ] || { bad "retro-bucket-unrouted: $p is status: closed but records no close_commit, so where its Retro routed cannot be read. A close nobody can locate is a Retro nobody can audit"; continue; }
+    git -C "$repo" rev-parse --verify "$cc^{commit}" >/dev/null 2>&1 || continue
+    n_closed=$((n_closed + 1))
+    touched=$(git -C "$repo" show --name-only --format= "$cc" 2>/dev/null)
+    hit=""
+    for f in CHANGELOG.md TECH-DEBT.md TODO.md docs/LEARNINGS.md; do
+      printf '%s\n' "$touched" | grep -qx "$f" && hit="$hit $f"
+    done
+    # NONE of the four is the finding, not "fewer than four". A bucket can be legitimately empty --
+    # a sprint that incurred no debt files no TD-NNN -- so demanding all four would fail a correct
+    # close, the same false-positive class §2's create-lazily rows raise. A close that routed to
+    # NOTHING is unambiguous: the Retro was written and left in the sprint file, which is exactly
+    # what §10's "don't leave them in the sprint file" forbids.
+    if [ -z "$hit" ]; then
+      bad "retro-bucket-unrouted: $p -- its close commit $cc touched none of CHANGELOG.md, TECH-DEBT.md, TODO.md or docs/LEARNINGS.md. §10 routes each Retro bucket to a durable home; a Retro that reached none of them stayed in the sprint file, where nothing reads it again"
+    else
+      note "S10.FOURBUCKETS     -- $p routed to:$hit. Which buckets had content is judged, so the check reads that the close reached a durable home, never that all four were owed"
+    fi
+  done
+  [ "$last_bad" -eq 1 ] && return
+  if [ "$n_closed" -eq 0 ]; then
+    note "S10.FOURBUCKETS     -- no closed sprint under docs/sprint/ (the glob is non-recursive, so an archived sprint is closed history and not re-checked). States that nothing was checkable, never that the rule passed"
+  else
+    ok "S10.FOURBUCKETS     -- $n_closed closed sprint(s), each routing its Retro to a durable home"
+  fi
+}
+
+assert_S10_PROMOTION() {
+  repo=$1
+  led="docs/LEARNINGS.md"
+  [ -f "$repo/$led" ] || { note "S10.PROMOTION       -- no $led -- a repository keeping no learnings ledger has no promotion rule to break"; return; }
+  thr=$(_s10_threshold "$spec"); [ -n "$thr" ] || thr=2
+  # Position-anchored, per §11's own instruction and L-108: promotion state is counted by the heading's
+  # `[status: promoted]` field, NOT by a substring. This corpus is self-describing -- an entry whose
+  # prose QUOTES `[status: promoted]` while explaining the collapse reads as promoted to a substring
+  # scan, and does here: 42 by substring against 41 anchored.
+  n_flag=0
+  while IFS= read -r blk; do
+    [ -n "$blk" ] || continue
+    n_flag=$((n_flag + 1))
+    bad "learning-recurred-unpromoted: $led $blk -- §10 promotes a learning at count >= $thr into a durable rule and marks it; a second occurrence left as a ledger line is the rot this rule exists to stop"
+  done <<EOF
+$(awk -v thr="$thr" '
+    /^## L-[0-9]+ / {
+      if (id != "" && cnt >= thr && prom == "no") print id
+      id=""; cnt=0; prom=""
+      if ($0 !~ /\[status: promoted\]/) { match($0, /L-[0-9]+/); id = substr($0, RSTART, RLENGTH) }
+      next
+    }
+    id != "" && /^- count: /    { cnt = $3 + 0 }
+    id != "" && /^- promoted: / { prom = $3 }
+    END { if (id != "" && cnt >= thr && prom == "no") print id }
+  ' "$repo/$led")
+EOF
+  [ "$n_flag" -gt 0 ] && return
+  ok "S10.PROMOTION       -- no learning sits at count >= $thr unpromoted (threshold read from §10, not written here)"
+}
+
+assert_S10_TDAGING() {
+  repo=$1
+  led="TECH-DEBT.md"
+  [ -f "$repo/$led" ] || { note "S10.TDAGING         -- no root $led -- no ledger to age"; return; }
+  # The sprint counter comes from the active Plan's own frontmatter. Without one there is no "now" to
+  # measure against, and guessing it from the highest TD row would make the ledger date itself.
+  cur=""
+  for p in $(_sprint_plans "$repo"); do cur=$(_fm "$repo/$p" sprint); break; done
+  case "$cur" in ''|*[!0-9]*) note "S10.TDAGING         -- no active sprint frontmatter to read a sprint counter from, so \"unaddressed >= 3 sprints\" has no origin. Reported rather than passed"; return ;; esac
+  # A row is REVIEWED if its id appears in the ledger's header region -- the block before the first
+  # row, which is where the aging sweep records what it held and why. Read that way rather than by
+  # demanding a per-row `updated:` field, because the sweep is a per-promote note about many rows and
+  # §10 asks for a re-review PROMPT, not a per-row edit. Anchored to the region, not to the sweep's
+  # wording, so a re-phrased sweep does not read as an absent one (L-108).
+  first=$(grep -n '^- \*\*TD-[0-9]' "$repo/$led" | head -1 | cut -d: -f1)
+  [ -n "$first" ] || { note "S10.TDAGING         -- $led holds no TD rows -- nothing to age"; return; }
+  hdr=$(head -n $((first - 1)) "$repo/$led")
+  n_aged=0; n_flagged=0
+  while IFS= read -r row; do
+    [ -n "$row" ] || continue
+    tid=$(printf '%s' "$row" | grep -oE 'TD-[0-9]+' | head -1)
+    case "$row" in *'status: open'*) : ;; *) continue ;; esac
+    born=$(printf '%s' "$row" | sed -n 's/.*created: Sprint-\([0-9]*\).*/\1/p')
+    seen=$(printf '%s' "$row" | sed -n 's/.*updated: Sprint-\([0-9]*\).*/\1/p')
+    [ -n "$seen" ] && born=$seen
+    case "$born" in ''|*[!0-9]*) continue ;; esac
+    age=$(( $(_dec "$cur") - $(_dec "$born") ))
+    [ "$age" -ge 3 ] || continue
+    n_aged=$((n_aged + 1))
+    if printf '%s\n' "$hdr" | grep -qF "$tid"; then continue; fi
+    n_flagged=$((n_flagged + 1))
+    bad "td-row-aged-unreviewed: $tid is $age sprints unaddressed and no aging sweep in $led names it. §10 makes >= 3 sprints a re-review prompt; a row nothing re-reviews is a cost nobody is deciding to keep"
+  done <<EOF
+$(grep '^- \*\*TD-[0-9]' "$repo/$led")
+EOF
+  [ "$n_flagged" -gt 0 ] && return
+  ok "S10.TDAGING         -- $n_aged open row(s) at >= 3 sprints, each named in the ledger's aging sweep"
+}
+
+assert_S10_PROMOTEREVIEW() {
+  repo=$1
+  plans=$(_sprint_plans "$repo")
+  [ -n "$plans" ] || { note "S10.PROMOTEREVIEW   -- no active sprint Plan -- nothing to verify"; return; }
+  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || {
+    note "S10.PROMOTEREVIEW   -- history unavailable: the checklist is recorded at promote, and without history there is no promote record to read"
+    return
+  }
+  n_ok=0
+  for p in $plans; do
+    pc=$(_fm_real "$repo/$p" plan_commit)
+    [ -n "$pc" ] || { note "S10.PROMOTEREVIEW   -- $p records no plan_commit, so the promote record cannot be located. Not a pass"; continue; }
+    git -C "$repo" rev-parse --verify "$pc^{commit}" >/dev/null 2>&1 || continue
+    log="docs/sprint/logs/${p##*/}"
+    # MECHANICAL HALF ONLY (§10 marks this `split`): the checklist's PRESENCE is readable; that it was
+    # honestly run is not. Two records are accepted because §10 fixes the checklist's content and not
+    # its location -- the plan-lock commit message, and the Execution Log's promote entry. Demanding
+    # one specific home would fail repositories that record it in the other, which is a finding about
+    # our convention rather than about the standard.
+    body=$(git -C "$repo" log -1 --format='%B' "$pc" 2>/dev/null)
+    [ -f "$repo/$log" ] && body="$body
+$(cat "$repo/$log")"
+    miss=""
+    printf '%s\n' "$body" | grep -qiE 'L-promotion' || miss="$miss L-promotion"
+    printf '%s\n' "$body" | grep -qiE 'TD[ -]aging|tech[ -]debt aging' || miss="$miss TD-aging"
+    printf '%s\n' "$body" | grep -qiE 'doc[ -]aging' || miss="$miss doc-aging"
+    if [ -z "$miss" ]; then
+      n_ok=$((n_ok + 1))
+    else
+      bad "promote-checklist-absent: $p -- the promote record at $pc names no:$miss. §10 requires the governance scan emitted as an explicit checklist rather than silent prose, because that is what stops the review being skipped unnoticed"
+    fi
+  done
+  [ "$last_bad" -eq 1 ] && return
+  [ "$n_ok" -gt 0 ] && ok "S10.PROMOTEREVIEW   -- $n_ok promote record(s) carry all three governance checklist lines"
+}
 # ==================================================================================================
 # ==================================================================================================
 # DRIVER -- iterated WITHOUT a pipe, matching check-attestation.sh's documented reason: `printf |

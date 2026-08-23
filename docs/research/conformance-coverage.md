@@ -18,7 +18,7 @@ the register answers *what gets built and what is scoped out*, this answers *wha
 `scope-out`) and it is not restated here — a count copied into a second file drifts from the one it
 copied (L-108 · L-136). The rows below are the enumeration behind *covered*, never a second source for it.
 
-## Covered today (35 rules, 5 checkers)
+## Covered today (39 rules, 5 checkers)
 
 | Rule | Checker |
 |---|---|
@@ -26,6 +26,7 @@ copied (L-108 · L-136). The rows below are the enumeration behind *covered*, ne
 | `S2.R-TEMPDIR` | `check-ephemeral-intake.sh` |
 | `S9.GATESWELLFORMED` · `S9.GATESABSENT` | `conformance-engine.sh` *(migrated off `check-gates-signed.sh`, SPRINT-075 T4 — the first family consolidated into the engine; the named findings are unchanged)* |
 | `S9.TWOFILES` · `S9.LOGDIR` · `S9.PLANFROZEN` · `S9.SCOPECHANGE` · `S9.VERIFYCLAUSE` | `conformance-engine.sh` *(SPRINT-079 T4; fixtures in `evals/run-sprint-family-fixtures.sh` — PLANFROZEN and SCOPECHANGE are defined over git history, so the family has its own git-backed harness)* |
+| `S10.FOURBUCKETS` · `S10.PROMOTION` · `S10.TDAGING` · `S10.PROMOTEREVIEW` | `conformance-engine.sh` *(SPRINT-079 T5; fixtures in `evals/run-sprint-family-fixtures.sh` — FOURBUCKETS reads the close commit and PROMOTEREVIEW the promote record, so the family shares §9's git-backed harness)* |
 | `S1.LAW2` · `S1.LAW3` · `S3.SCHEMA` · `S3.AGENTS` | `conformance-engine.sh` *(SPRINT-075 T6 — the engine's first NEW coverage; five published findings, one retained must-FAIL fixture each)* |
 | `S4.ONEFILE` · `S4.APPEND` · `S4.INDEX` · `S4.SECTIONS` · `S4.NEGATIVE` | `conformance-engine.sh` *(SPRINT-076 T2 — the §4 ADR family; five published findings, one retained must-FAIL fixture each plus a PASS control. `S4.APPEND` is the family's only Gated rule and the engine's first to read git history rather than the tree)* |
 | `S2.F-FILE` · `S2.R-PLACEMENT` | `conformance-engine.sh` *(SPRINT-076 T3 — §2's placement pair, chosen because it is the likeliest artefact source. The required set is derived from §2's own `Create ←` cells, never hard-coded. **See § Artefacts** — the 4 it produced against a generic repo were fixed at the spec by SPRINT-077 T1, and the count is now 0)*

@@ -126,9 +126,9 @@ Five rules, six findings. Two of them (`PLANFROZEN`, `SCOPECHANGE`) read git his
 - [x] The covered rows move from `conformance-dispositions.md` § `build` → `conformance-coverage.md` § Covered today, and both files' counts reconcile to 62 — *Verify: `sh scripts/lib/check-doc-caps.sh` and the engine's own `coverage:` line*  ✓ migrated — register § `build` 21 → 16, coverage § Covered today 30 → 35, both under cap. **The criterion said "reconcile to 62" and that figure was invalidated by T1 in this same sprint** (checkable 62 → 51 when the eleven were marked). Corrected rather than silently reinterpreted (L-088): they reconcile to **51** — 35 + 16, matching the engine's own `coverage: 29 + 22`
 
 ### T5 — Cover §10's learning-governance rules in the engine `[size: M · risk: med · class: execution · HITL]`
-Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md`
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-sprint-family-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md`
 Depends-on: T4
-Cites: the register's § `build` (the four §10 rows) · §10's Conformance table · L-130 · L-058 · `S10.FOURBUCKETS` · `S10.PROMOTION` · `S10.TDAGING` · `S10.PROMOTEREVIEW`
+Cites: the register's § `build` (the four §10 rows) · §10's Conformance table · L-130 · L-058 · `S10.FOURBUCKETS` · `S10.PROMOTION` · `S10.TDAGING` · `S10.PROMOTEREVIEW` · T1 (it moved the checkable denominator this task's counts reconcile against; not depended on)
 
 Four rules. `S10.PROMOTION`'s trigger is the spec's own `count ≥ 2, promoted: no` threshold **read from
 §10**, never a number copied into the check — and `promoted: yes` is never the stored form, so it counts
@@ -139,11 +139,11 @@ by `[status: promoted]`, position-anchored.
 `promote-checklist-absent` — each with a retained fixture and a sibling control.
 
 **DoD:**
-- [ ] `S10.PROMOTION` reads its threshold from §10, not from a literal in the engine — *Verify: change the spec's threshold in a copy and watch the check follow with no code edit (the SPRINT-074 property)*
-- [ ] `S10.PROMOTION` counts promotion state **position-anchored** by `[status: promoted]` — *Verify: this repo's own corpus, where a substring scan reads 42 and the anchored scan reads 41 (L-114's heading quotes the format while explaining it); the check must read 41 and reconcile 41 + 87 active + 1 superseded = 129*
-- [ ] All four findings fire on input that must produce them, retained fixture each — *Verify: `sh evals/run-conformance-engine-fixtures.sh`, reading the printed tally*
-- [ ] Discrimination shown as in T4 — seeded break reddens its case, sibling control stays green, seed verified landed and still parsing
-- [ ] Covered rows migrate to `conformance-coverage.md`; counts reconcile to 62
+- [x] `S10.PROMOTION` reads its threshold from §10, not from a literal in the engine — *Verify: change the spec's threshold in a copy and watch the check follow with no code edit (the SPRINT-074 property)*  ✓ `_s10_threshold` reads *count ≥ 2* from §10's own prose. §10 is the section stating a figure inside a criterion is remembered rather than measured — hard-coding `2` in the checker **for that rule** would be the failure demonstrating itself (L-097 · L-130)
+- [x] `S10.PROMOTION` counts promotion state **position-anchored** by `[status: promoted]` — *Verify: this repo's own corpus, where a substring scan reads 42 and the anchored scan reads 41 (L-114's heading quotes the format while explaining it); the check must read 41 and reconcile 41 + 87 active + 1 superseded = 129*  ✓ anchored on the heading's `[status: promoted]` field. Made a **case**, not a comment: a control whose entry is already promoted at the same count must stay silent, which a substring scan fails. Discrimination proven — removing the anchor takes it 0 → 1 on that control (seed parses, 0 line delta)
+- [x] All four findings fire on input that must produce them, retained fixture each — *Verify: `sh evals/run-conformance-engine-fixtures.sh`, reading the printed tally*  ✓ all four fire — **SPRINT-FAMILY FIXTURES: all green**, now 23 cases (10 for §10: 4 must-FAIL + 6 controls). **Three needed a false-positive boundary**: TDAGING reads the ledger's header region rather than demanding a per-row `updated:`; FOURBUCKETS fails only on a close reaching *none* of the four homes, since a bucket can be legitimately empty; PROMOTEREVIEW accepts either the plan-lock message or the log's promote entry, because §10 fixes the checklist's content, not its location
+- [x] Discrimination shown as in T4 — seeded break reddens its case, sibling control stays green, seed verified landed and still parsing  ✓ seed C removes the anchored promotion read — lands (0 line delta), still parses, and reddens `s10-learning-unpromoted-control-promoted` (0 → 1) while every sibling stays green
+- [x] Covered rows migrate to `conformance-coverage.md`; counts reconcile to 62  ✓ register § `build` 16 → 12, coverage § Covered today 35 → 39, both under cap. Reconciles to **51** (not the 62 the criterion was written against — T1 moved the denominator, corrected as in T4): 39 + 12 = 51, matching the engine's `coverage: 33 + 18`
 
 ### T6 — Make every FAIL line name the rule that raised it `[size: M · risk: med · class: execution · HITL]`
 Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh`

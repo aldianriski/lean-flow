@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
-# run-sprint-family-fixtures.sh -- retained fixtures for §9's sprint-file family (SPRINT-079 T4):
-# S9.TWOFILES · S9.LOGDIR · S9.PLANFROZEN · S9.SCOPECHANGE · S9.VERIFYCLAUSE, six findings.
+# run-sprint-family-fixtures.sh -- retained fixtures for the two families defined over git history:
+# §9 sprint-file (SPRINT-079 T4) and §10 learning-governance (T5). §9: S9.TWOFILES · S9.LOGDIR ·
+# S9.PLANFROZEN · S9.SCOPECHANGE · S9.VERIFYCLAUSE, six findings. §10: FOURBUCKETS · PROMOTION ·
+# TDAGING · PROMOTEREVIEW, four findings.
 #
 # WHY ITS OWN HARNESS. run-conformance-engine-fixtures.sh states in its header that it needs no git,
 # and two of these rules are defined over history -- PLANFROZEN diffs § Plan against `plan_commit`,
@@ -180,6 +182,123 @@ assert_finding "s9-scope-change-after-edit" "$d" "scope-change-logged-after-plan
 # Control: the entry committed BEFORE the edit. Same two commits, opposite order -- which is the
 # whole of what this rule measures, so proving the order is what flips it is the assertion.
 assert_absent "s9-scope-change-after-edit-control" "$work/frozen-ok" "scope-change-logged-after-plan-edit"
+
+echo "=== §10 governance-family fixtures ==="
+
+# §10's four rules join this harness rather than the engine suite for the same reason §9's did: two of
+# them are defined over history (FOURBUCKETS reads the close commit, PROMOTEREVIEW reads the promote
+# record), and the engine suite states in its header that it needs no git.
+
+learn_entry() {  # <dir> <count> <heading-status>
+  mkdir -p "$1/docs"
+  { printf -- '---\n'
+    printf 'owner: Maintainer\nlast_updated: 2026-01-01\nupdate_trigger: a learning lands\nstatus: current\n'
+    printf -- '---\n\n# Learnings\n\n---\n'
+    printf '## L-001 [tags: process] [status: %s]: a thing that happened\n' "$3"
+    printf -- '- seen: Sprint-001 - Sprint-002\n'
+    printf -- '- count: %s\n' "$2"
+    printf -- '- promoted: no\n'
+  } > "$1/docs/LEARNINGS.md"
+}
+
+td_ledger() {  # <dir> <created-sprint> [any third arg = the sweep names it]
+  { printf -- '---\n'
+    printf 'owner: Maintainer\nlast_updated: 2026-01-01\nupdate_trigger: debt filed\nstatus: current\n'
+    printf -- '---\n\n# Tech Debt\n\n'
+    if [ "$#" -ge 3 ]; then printf '> Aging sweep -- SPRINT-900 promote. Held, with reasons: TD-001.\n\n'; fi
+    printf -- '- **TD-001** severity: minor | status: open | created: Sprint-%s\n' "$2"
+    printf '  - Summary: a cost somebody is carrying.\n'
+  } > "$1/TECH-DEBT.md"
+}
+
+close_the_sprint() {  # <dir> -- stamp status: closed + close_commit for HEAD
+  _cc=$(git -C "$1" rev-parse --short HEAD)
+  _f="$1/docs/sprint/SPRINT-900-fixture.md"
+  sed -i 's/^status: active$/status: closed/' "$_f"
+  awk -v c="$_cc" '/^update_trigger:/ { print "close_commit: " c } { print }' "$_f" > "$1/.tmp.md"
+  mv "$1/.tmp.md" "$_f"
+}
+
+# --- S10.PROMOTION: a recurrence left unpromoted --------------------------------------------------
+d="$work/promo"; mkdir -p "$d"; sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"; learn_entry "$d" 2 active
+assert_finding "s10-learning-unpromoted" "$d" "learning-recurred-unpromoted"
+
+# Control (a): a one-off is context, not law -- §10 says don't promote on a single occurrence, and
+# without this the check could be firing on every entry rather than on recurrences.
+d="$work/promo-ok1"; mkdir -p "$d"; sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"; learn_entry "$d" 1 active
+assert_absent "s10-learning-unpromoted-control-oneoff" "$d" "learning-recurred-unpromoted"
+
+# Control (b): the SAME count, already promoted. This is the case a substring scan gets wrong. The
+# corpus is self-describing -- an entry whose prose quotes the promoted marker while explaining the
+# collapse reads as promoted to a substring scan -- so state is read from the heading field,
+# position-anchored (L-108). On the real ledger that difference is 42 by substring against 41 anchored.
+d="$work/promo-ok2"; mkdir -p "$d"; sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"; learn_entry "$d" 2 promoted
+assert_absent "s10-learning-unpromoted-control-promoted" "$d" "learning-recurred-unpromoted"
+
+# --- S10.TDAGING: an aged row no sweep names -----------------------------------------------------
+# The Plan's frontmatter says sprint 900, so a row created at Sprint-800 is far past §10's three.
+d="$work/aging"; mkdir -p "$d"; sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"; td_ledger "$d" 800
+assert_finding "s10-td-aged-unreviewed" "$d" "td-row-aged-unreviewed"
+
+# Control (a): the same aged row, named in the ledger's aging sweep. §10 asks for a re-review PROMPT,
+# not a per-row edit, so a row the sweep held is a cost somebody decided to keep.
+d="$work/aging-ok1"; mkdir -p "$d"; sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"; td_ledger "$d" 800 swept
+assert_absent "s10-td-aged-unreviewed-control-swept" "$d" "td-row-aged-unreviewed"
+
+# Control (b): a row younger than three sprints and unswept. Without it the must-FAIL above cannot
+# distinguish "fires on aged rows" from "fires on every open row".
+d="$work/aging-ok2"; mkdir -p "$d"; sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"; td_ledger "$d" 899
+assert_absent "s10-td-aged-unreviewed-control-young" "$d" "td-row-aged-unreviewed"
+
+# --- S10.PROMOTEREVIEW: a promote record naming no checklist --------------------------------------
+d="$work/review"; mkdir -p "$d"
+git -C "$d" init -q >/dev/null 2>&1
+sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"
+commit_msg "$d" "sprint(900): plan locked"
+pc=$(git -C "$d" rev-parse --short HEAD)
+sprint_plan "$d" "$pc" '- [ ] a thing'; sprint_log "$d"
+commit_msg "$d" "sprint(900): record plan_commit"
+assert_finding "s10-promote-checklist-absent" "$d" "promote-checklist-absent"
+
+# Control: the same shape whose plan-lock commit carries the three lines. §10 fixes the checklist's
+# CONTENT and not its location -- the record may be the commit message or the log's promote entry --
+# so demanding one home would fail a repository that used the other.
+d="$work/review-ok"; mkdir -p "$d"
+git -C "$d" init -q >/dev/null 2>&1
+sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"
+{ printf 'sprint(900): plan locked\n\n'
+  printf 'L-promotion: none\n'
+  printf 'TD aging: none\n'
+  printf 'doc-aging: none\n'
+} > "$work/pmsg"
+git -C "$d" add -A >/dev/null 2>&1
+git -C "$d" -c user.name='Fixture Bot' -c user.email='fixture@example.com' \
+  -c commit.gpgsign=false commit -q -F "$work/pmsg" >/dev/null 2>&1
+pc=$(git -C "$d" rev-parse --short HEAD)
+sprint_plan "$d" "$pc" '- [ ] a thing'; sprint_log "$d"
+assert_absent "s10-promote-checklist-absent-control" "$d" "promote-checklist-absent"
+
+# --- S10.FOURBUCKETS: a close that routed to nothing ----------------------------------------------
+d="$work/buckets"; mkdir -p "$d"
+git -C "$d" init -q >/dev/null 2>&1
+sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"
+commit_msg "$d" "sprint(900): plan locked"
+printf 'the Retro stayed in the sprint file\n' > "$d/scratch.txt"
+commit_msg "$d" "sprint(900): close"
+close_the_sprint "$d"
+assert_finding "s10-retro-bucket-unrouted" "$d" "retro-bucket-unrouted"
+
+# Control: the same close, reaching ONE durable home. Deliberately not all four -- a bucket can be
+# legitimately empty (a sprint that incurred no debt files no TD-NNN), so demanding four would fail a
+# correct close. Reaching NONE is the unambiguous case, and this control fixes that boundary.
+d="$work/buckets-ok"; mkdir -p "$d"
+git -C "$d" init -q >/dev/null 2>&1
+sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"
+commit_msg "$d" "sprint(900): plan locked"
+printf '# Changelog\n\n## v1 -- what this sprint shipped\n' > "$d/CHANGELOG.md"
+commit_msg "$d" "sprint(900): close"
+close_the_sprint "$d"
+assert_absent "s10-retro-bucket-unrouted-control" "$d" "retro-bucket-unrouted"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
