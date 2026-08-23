@@ -280,3 +280,65 @@ and the CHANGELOG seed was a no-op `sed` that would have scored as a pass.
 **Harness: 38 → 56 cases, and 9m24s → 5m06s.** More than twice the cases in a bit over half the
 time, which is T5's fix showing up where the trip-wire was set. Coverage `37 → 41` in-engine,
 unchecked `14 → 10`, `41 + 10 = 51`. Register § `build` **8 → 4** — only §12 remains.
+
+### 2026-08-23 | progress | T3 — §12's git boundary, and the controls that came first
+
+**Shipped.** `S12.SECRETS` → `secret-committed` · `S12.BACKUPS` → `database-backup-committed` ·
+`S12.DESIGNSRC` → `design-source-committed` · `S12.GENERATED` → `generated-artifact-committed`.
+Ids and findings re-derived from the register; **reason (c) read before the first detector was
+written**, not after — a scan flagging `contract.md` in a contract-testing repo is *"worse than no
+scan"*, and that sentence is what produced the design rather than being cited to justify it.
+
+**The rule: two signals that agree.** A finding needs a **shape** (extension · filename · path) *and*
+a **confirmation** read from the file's content or its git state. One signal alone is the heuristic
+§12 refused, which is why its other six categories stay `judgment-only`.
+
+| rule | shape | confirmation |
+|---|---|---|
+| `S12.SECRETS` | `.env` (never `.env.example`) · `*.pem` · `id_rsa` · `service-account.json` | a non-placeholder assignment · a `PRIVATE KEY` block · a `"private_key"` field |
+| `S12.BACKUPS` | `*.sql` · `*.dump` · `*.bak` | a dump-tool preamble the file writes about itself |
+| `S12.DESIGNSRC` | `.psd` · `.ai` · `.sketch` · video | **not** under the asset directories §12 names |
+| `S12.GENERATED` | §12c's classes, read from the spec | the path is **tracked** — ignored is the compliant state |
+
+**What was refused, and why it is recorded rather than merely decided.** **Size thresholds**, for both
+BACKUPS and DESIGNSRC. §12 says *"large"* and *"small"* and states **no number anywhere**; a figure
+written into the checker would be a threshold the standard never set, drifting from a spec that has
+nothing to drift from (L-097 · L-130) — and "large" is exactly the judgement §14 says not to fake.
+Replaced by signals §12 *does* state: a dump-tool banner, and the asset directories it names by path.
+**Bare filename matching** refused throughout.
+
+**The controls were built first, and that ordering did real work.** `lookalike_repo` was committed
+before any detector existed: `.env.example`, a `.pem` holding only a public **CERTIFICATE**, a small
+fake `db/seed.sql`, `public/hero.mp4`, a shared `.vscode/extensions.json`, and an **untracked**
+`dist/`. Every one is a shape a filename heuristic flags. Each detector was then written to clear a
+concrete file rather than judged against one afterwards, and each now reports a **non-zero
+shape-match examined and cleared** — which is what distinguishes a control that is reached from one
+that passes because nothing got that far.
+
+**One design trap, caught before it shipped.** §12c names its classes and its single
+`MAY be committed` carve-out **in one sentence**, with the carve-out appearing *before* the
+permission. The first reader trimmed at `"MAY be committed"` and therefore **kept**
+`.vscode/extensions.json` in the prohibited set — the rule would have fired on the one file §12
+explicitly allows. Replaced with an explicit **subtraction**, and the subtraction was verified
+load-bearing (the allowed token is provably a member of the class list) rather than assumed. An
+exclusion is judged by what it lets through, never by where it sits in a sentence (L-140). Both
+halves of §12c's personal-vs-shared VS Code split are now retained cases.
+
+**A4 confirmed by measurement: lean-flow is clean on all four.** With an honest caveat recorded on
+the DoD — three of the four report **0 shape-matches examined**, meaning this tree holds no
+candidates at all, so our own repository cannot exercise the content confirmation. That verification
+happens on the lookalike repo instead, which is L-016's rule: when the substrate is absent, verify on
+the consumer path rather than reading "didn't fire here" as either broken or fine.
+
+**Discrimination (L-137 · L-142): four seeded breaks, each removing exactly one confirmation.** Every
+one reddens **only its own finding** on the lookalike repo and leaves the other three silent;
+0-line-delta, still parsing, restore hash-verified each time.
+
+**Harness 56 → 67 cases, 5m06s → 6m45s** — still well inside D4's trip-wire, which T5 bought.
+
+**`build` reaches 0.** The register's bucket is **emptied and kept**, with a note that an empty bucket
+is a fact about the standard's state and that a reader finding the heading gone could not tell that
+from a register which never partitioned its rules. It also records what empty does **not** mean:
+`45 + 6 = 51`, where the 6 are covered by standalone checkers — the amendment ruled at G2, because
+the frozen criterion asked for `51 of 51` from a line that counts only in-engine assertions and could
+never print it (L-088 · L-136).

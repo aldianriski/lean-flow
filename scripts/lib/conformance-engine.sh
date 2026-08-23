@@ -2650,6 +2650,222 @@ assert_S11_WHENITRUNS() {
   [ "$last_bad" -eq 1 ] && return
   ok "S11.WHENITRUNS      -- $n_ok archived sprint(s) archived at or after their own close_commit; $n_unread could not be phased (no close_commit recorded, or the commit is unreachable) and are reported as unread rather than passed"
 }
+
+# ==================================================================================================
+# §12 -- THE GIT BOUNDARY (SPRINT-080 T3). Four rules, and the most dangerous four in the epic.
+#
+# DETECTION SCOPE, RULED AT G2 AND RECORDED HERE WITH WHAT IT REFUSED.
+# The register is explicit that a filename heuristic flagging `contract.md` in a repo about contract
+# testing "is worse than no scan", which is why §12's six content categories are judgment-only. These
+# four are the shape-detectable ones and they inherit that warning rather than escaping it. So a
+# finding needs TWO signals that agree: a SHAPE (extension / filename / path) and a CONFIRMATION read
+# from the file's content or its git state. One signal alone is the heuristic the register refused.
+#
+# REFUSED, deliberately:
+#   - SIZE THRESHOLDS, for both BACKUPS and DESIGNSRC. §12 says "large" and "small" and states no
+#     number anywhere. A figure written into this file would be a second SSOT drifting from a spec
+#     that never had it (L-097 - L-130), and "large" is exactly the judgement §14 says not to fake.
+#     Replaced by signals the spec DOES state: a dump-tool preamble, and the asset directories §12
+#     names by path.
+#   - BARE FILENAME MATCHING everywhere. `contract.md`, `.env.example`, `seed.sql`, `public/hero.mp4`
+#     and a tracked `.vscode/extensions.json` are all benign shapes an adopter may legitimately hold,
+#     and each is a retained control below.
+#
+# Every lookalike control was BUILT BEFORE its detector, so the detector was designed to clear a
+# concrete benign file rather than judged against one afterwards.
+# ==================================================================================================
+
+# _s12_tracked <repo> -- tracked paths only. §12 constrains what is COMMITTED, not what happens to sit
+# in a working tree, so an ignored build directory is not a finding and a tracked one is.
+_s12_tracked() {
+  git -C "$1" ls-files 2>/dev/null
+}
+
+# _s12_generated_classes <spec> -- the §12c .gitignore classes, read from the spec's own sentence.
+# Derived rather than restated: adding a class to §12c moves this check with no code edit (L-146).
+#
+# The MAY-commit carve-out is named in this SAME sentence and BEFORE the permission, so it is emitted
+# here too and subtracted by the caller against _s12_generated_allowed. Positional truncation was the
+# first attempt and it silently kept the allowed path, which would have made the spec's one explicit
+# permission fire as a finding -- an exclusion is checked by what it lets through, not by where it
+# sits in a sentence (L-140).
+_s12_generated_classes() {
+  awk '
+    /^\*\*c\. Generated\/temporary excludes/ { inc = 1 }
+    inc {
+      buf = buf " " $0
+      if ($0 ~ /actually requires/) inc = 0
+    }
+    END {
+      while (match(buf, /`[^`]+`/)) {
+        t = substr(buf, RSTART + 1, RLENGTH - 2)
+        if (t != "" && t != ".gitignore") print t
+        buf = substr(buf, RSTART + RLENGTH)
+      }
+    }' "$1"
+}
+
+# _s12_generated_allowed <spec> -- the token §12c explicitly permits ("... MAY be committed").
+_s12_generated_allowed() {
+  awk '
+    /MAY be committed/ {
+      s = substr($0, 1, index($0, "MAY be committed"))
+      while (match(s, /`[^`]+`/)) {
+        last = substr(s, RSTART + 1, RLENGTH - 2)
+        s = substr(s, RSTART + RLENGTH)
+      }
+      if (last != "") print last
+    }' "$1"
+}
+
+# _s12_matches_class <path> <class> -- POSIX glob semantics for the three class shapes §12c uses:
+# a directory prefix (`dist/`), an extension glob (`*.log`), or a literal path (`.DS_Store`).
+_s12_matches_class() {
+  case "$2" in
+    */)   case "$1" in "$2"*|*/"$2"*) return 0 ;; esac ;;
+    \**)  case "$1" in $2|*/$2) return 0 ;; esac ;;
+    *)    case "$1" in "$2"|*/"$2") return 0 ;; esac ;;
+  esac
+  return 1
+}
+
+assert_S12_SECRETS() {
+  repo=$1
+  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || { note "S12.SECRETS         -- not a git repository: §12 is about what is COMMITTED, and an untracked tree has committed nothing"; return; }
+  n_seen=0
+  for f in $(_s12_tracked "$repo"); do
+    b=${f##*/}
+    hit=""
+    case "$b" in
+      # `.env.example` / `.env.sample` / `.env.template` are the canonical benign shape and the reason
+      # this is a case-by-case match rather than a `.env*` glob. A placeholder file is the CORRECT
+      # artifact to commit -- flagging it teaches adopters to distrust the report.
+      .env|.env.local|.env.production|.env.development|.env.staging) hit=env ;;
+      *.pem|*.key) hit=pem ;;
+      id_rsa|id_dsa|id_ecdsa|id_ed25519) hit=pem ;;
+      service-account.json|serviceaccount.json) hit=sa ;;
+    esac
+    [ -n "$hit" ] || continue
+    [ -f "$repo/$f" ] || continue
+    n_seen=$((n_seen + 1))
+    case "$hit" in
+      env)
+        # CONFIRMATION: an assignment carrying a real-looking value. A committed `.env` of empty keys
+        # or `<placeholders>` is a template someone named badly, not a leaked secret.
+        if awk -F= '
+             /^[[:space:]]*#/ { next }
+             /^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=/ {
+               v = substr($0, index($0, "=") + 1)
+               gsub(/^[[:space:]]*["\x27]?|["\x27]?[[:space:]]*$/, "", v)
+               if (v == "") next
+               lv = tolower(v)
+               if (lv ~ /^<.*>$/ || lv ~ /changeme|your[-_]|placeholder|example|xxx+|todo|\.\.\./) next
+               found = 1
+             }
+             END { exit(found ? 0 : 1) }' "$repo/$f"; then
+          bad "secret-committed: $f carries at least one assignment with a real value -- §12 puts credentials in a secret manager, never in git. Even a private repo is treated as potentially exposed, and history keeps the value after the file is deleted"
+        fi
+        ;;
+      pem)
+        # CONFIRMATION: a PRIVATE key block. A `.pem` holding only a CERTIFICATE is a public artifact
+        # that a TLS-verifying client legitimately ships, and the lookalike control pins that.
+        if grep -q 'PRIVATE KEY' "$repo/$f" 2>/dev/null; then
+          bad "secret-committed: $f contains a PRIVATE KEY block -- §12 puts credentials in a secret manager. A public certificate in the same file shape is fine; a private key is the thing that must never be committed"
+        fi
+        ;;
+      sa)
+        if grep -q '"private_key"' "$repo/$f" 2>/dev/null; then
+          bad "secret-committed: $f is a service-account file carrying a \"private_key\" field -- §12 puts credentials in a secret manager. This one key is usually enough to reach production infrastructure"
+        fi
+        ;;
+    esac
+  done
+  [ "$last_bad" -eq 1 ] && return
+  ok "S12.SECRETS         -- no tracked file pairs a credential SHAPE with credential CONTENT ($n_seen shape-match(es) examined and cleared on content)"
+}
+
+assert_S12_BACKUPS() {
+  repo=$1
+  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || { note "S12.BACKUPS         -- not a git repository: nothing is committed"; return; }
+  n_seen=0
+  for f in $(_s12_tracked "$repo"); do
+    case "$f" in *.sql|*.dump|*.bak) ;; *) continue ;; esac
+    [ -f "$repo/$f" ] || continue
+    n_seen=$((n_seen + 1))
+    # CONFIRMATION: a DUMP-TOOL PREAMBLE. §12 says in its own words that "small FAKE seed files are
+    # fine in-repo", so the discriminator cannot be the extension and must not be a size -- §12 states
+    # no number, and inventing one here would be a threshold the standard never set (L-097). What a
+    # real dump has and a hand-written seed does not is the generator's own banner.
+    if grep -qiE 'PostgreSQL database dump|MySQL dump|SQLite format|Dumped from database version|pg_dump|mysqldump|Server version.*Database:' "$repo/$f" 2>/dev/null; then
+      bad "database-backup-committed: $f carries a database dump preamble -- §12 keeps backups in backup storage. A small FAKE seed file is fine in-repo and is not this: the file names its own generator, so it is an export of a real database"
+    fi
+  done
+  [ "$last_bad" -eq 1 ] && return
+  ok "S12.BACKUPS         -- no tracked .sql/.dump carries a dump-tool preamble ($n_seen examined; §12 permits small fake seed files, which these are)"
+}
+
+assert_S12_DESIGNSRC() {
+  repo=$1
+  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || { note "S12.DESIGNSRC       -- not a git repository: nothing is committed"; return; }
+  # The asset directories are §12's own words -- "only assets the app actually uses go in `public/` or
+  # `src/assets/`" -- so the permitted PATH is read from the spec rather than listed here.
+  allow=$(awk '/only assets the app actually uses go in/ {
+                 s = $0
+                 while (match(s, /`[^`]+`/)) { print substr(s, RSTART + 1, RLENGTH - 2); s = substr(s, RSTART + RLENGTH) }
+               }' "$spec")
+  n_seen=0
+  for f in $(_s12_tracked "$repo"); do
+    case "$f" in
+      *.ai|*.psd|*.sketch|*.fig|*.xd|*.mp4|*.mov|*.avi|*.mkv) ;;
+      *) continue ;;
+    esac
+    n_seen=$((n_seen + 1))
+    # CONFIRMATION IS THE PATH, not a size. §12 says "large" and gives no number, and a threshold
+    # written here would be a figure the standard never set. What §12 DOES state is where a legitimate
+    # asset lives, so a design-source extension INSIDE an asset directory is the permitted case and
+    # outside it is the source-of-truth the design tool should hold.
+    inside=0
+    for a in $allow; do
+      case "$f" in "$a"*|*/"$a"*) inside=1; break ;; esac
+    done
+    [ "$inside" -eq 1 ] && continue
+    bad "design-source-committed: $f is an editable design source outside the asset directories §12 names ($(printf '%s' "$allow" | tr '\n' ' ')) -- §12 keeps originals in the design tool and lets only the assets the app actually uses into the repo. Size was deliberately NOT used: §12 says \"large\" and states no number"
+  done
+  [ "$last_bad" -eq 1 ] && return
+  if [ -z "$allow" ]; then
+    bad "spec-table-unreadable: §12 names no asset directory, so a design source inside one cannot be told from one outside it -- and reporting both alike is a finding no adopter can clear"
+  else
+    ok "S12.DESIGNSRC       -- no editable design source outside the asset directories §12 names ($n_seen examined)"
+  fi
+}
+
+assert_S12_GENERATED() {
+  repo=$1
+  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || { note "S12.GENERATED       -- not a git repository: §12c is about what is COMMITTED, and an untracked build directory is exactly the compliant state"; return; }
+  classes=$(_s12_generated_classes "$spec")
+  [ -n "$classes" ] || { bad "spec-table-unreadable: §12c names no .gitignore classes, so nothing reproducible can be recognised"; return; }
+  allowed=$(_s12_generated_allowed "$spec")
+  # The carve-out is SUBTRACTED, not positionally trimmed. `.vscode/extensions.json` is named in the
+  # same sentence as the classes and BEFORE the permission, so trimming at "MAY be committed" keeps
+  # it -- which would fire on the one file §12c explicitly allows. An exclusion is judged by what it
+  # lets through (L-140), and the retained control below is a tracked extensions.json.
+  n_hit=0
+  for f in $(_s12_tracked "$repo"); do
+    skip=0
+    for a in $allowed; do
+      case "$f" in "$a"|*/"$a") skip=1; break ;; esac
+    done
+    [ "$skip" -eq 1 ] && continue
+    for c in $classes; do
+      if _s12_matches_class "$f" "$c"; then
+        bad "generated-artifact-committed: $f is tracked and matches §12c's '$c' class -- §12 keeps anything reproducible by a command out of the repo. Present-but-ignored is the compliant state and is not reported; this file is COMMITTED"
+        n_hit=$((n_hit + 1))
+        break
+      fi
+    done
+  done
+  [ "$n_hit" -eq 0 ] && ok "S12.GENERATED       -- no tracked file matches a §12c reproducible class ($(printf '%s' "$classes" | wc -w | tr -d ' ') classes read from the spec, $(printf '%s' "$allowed" | wc -w | tr -d ' ') explicitly permitted)"
+}
 # ==================================================================================================
 # ==================================================================================================
 # DRIVER -- iterated WITHOUT a pipe, matching check-attestation.sh's documented reason: `printf |

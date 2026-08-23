@@ -595,6 +595,78 @@ git -C "$d" mv docs/sprint/archive/logs/SPRINT-900-fixture.md docs/sprint/logs/S
 commit_msg "$d" "the close never archived anything"
 assert_finding "s11-notrun-is-not-wrong-phase-a" "$d" "closed-sprint-not-archived"
 assert_absent  "s11-notrun-is-not-wrong-phase-b" "$d" "retention-trigger-ran-in-wrong-phase"
+
+echo "=== §12 git-boundary fixtures (SPRINT-080 T3) ==="
+
+# THE CONTROLS WERE BUILT BEFORE THE DETECTORS (T3 DoD). Each is a benign file whose SHAPE a filename
+# heuristic would flag -- the failure mode the register calls "worse than no scan". They are the
+# load-bearing half of this family, so `lookalike_repo` is built first and every must-FAIL case below
+# is that same repo plus exactly one prohibited file.
+lookalike_repo() {
+  d=$1
+  mkdir -p "$d/public" "$d/db" "$d/.vscode" "$d/dist"
+  git -C "$d" init -q >/dev/null 2>&1
+  printf 'DATABASE_URL=postgres://user:<your-password>@localhost/db\nAPI_KEY=\nSTRIPE_KEY=sk_test_changeme\n' > "$d/.env.example"
+  printf -- '-----BEGIN CERTIFICATE-----\nMIIBoTCCAUegAwIBAgIUexample\n-----END CERTIFICATE-----\n' > "$d/server-cert.pem"
+  printf -- '-- seed data for local development\nINSERT INTO users (name, email) VALUES ('"'"'Example User'"'"', '"'"'user@example.test'"'"');\n' > "$d/db/seed.sql"
+  printf 'fake bytes for a hero asset the app renders\n' > "$d/public/hero.mp4"
+  printf '{ "recommendations": ["dbaeumer.vscode-eslint"] }\n' > "$d/.vscode/extensions.json"
+  printf 'reproducible output, deliberately not tracked\n' > "$d/dist/bundle.js"
+  printf 'dist/\n' > "$d/.gitignore"
+  commit_msg "$d" "benign lookalikes and nothing prohibited"
+}
+
+d="$work/s12-ok"; mkdir -p "$d"; lookalike_repo "$d"
+assert_absent "s12-control-env-example"   "$d" "secret-committed"
+assert_absent "s12-control-fake-seed"     "$d" "database-backup-committed"
+assert_absent "s12-control-used-asset"    "$d" "design-source-committed"
+assert_absent "s12-control-vscode-shared" "$d" "generated-artifact-committed"
+
+# --- S12.SECRETS: a real .env, and a private key in a .pem ---------------------------------------
+d="$work/s12-env"; mkdir -p "$d"; lookalike_repo "$d"
+printf 'DATABASE_URL=postgres://svc:hunter2@db.prod.internal/main\nSTRIPE_KEY=sk_live_51H8xQ2eZvKYlo2C\n' > "$d/.env"
+commit_msg "$d" "commit a real .env"
+assert_finding "s12-secret-env" "$d" "secret-committed"
+
+# The .env control that matters most: a file NAMED .env holding only placeholders is a template
+# someone named badly, not a leaked credential. Shape alone would fire; shape AND content does not.
+d="$work/s12-env-placeholder"; mkdir -p "$d"; lookalike_repo "$d"
+printf 'DATABASE_URL=<your-database-url>\nAPI_KEY=\nSECRET=changeme\n' > "$d/.env"
+commit_msg "$d" "commit a .env of placeholders only"
+assert_absent "s12-control-env-placeholders" "$d" "secret-committed"
+
+d="$work/s12-pem"; mkdir -p "$d"; lookalike_repo "$d"
+printf -- '-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAexamplekeymaterial\n-----END RSA PRIVATE KEY-----\n' > "$d/deploy.pem"
+commit_msg "$d" "commit a private key"
+assert_finding "s12-secret-private-key" "$d" "secret-committed"
+
+# --- S12.BACKUPS: a real dump, distinguished from the fake seed by its generator banner -----------
+d="$work/s12-dump"; mkdir -p "$d"; lookalike_repo "$d"
+printf -- '--\n-- PostgreSQL database dump\n--\n-- Dumped from database version 15.3\n\nCOPY public.users (id, email) FROM stdin;\n1\tada@real-customer.com\n' > "$d/production-dump.sql"
+commit_msg "$d" "commit a production dump"
+assert_finding "s12-database-backup" "$d" "database-backup-committed"
+
+# --- S12.DESIGNSRC: an editable source outside the asset directories §12 names --------------------
+d="$work/s12-psd"; mkdir -p "$d/design"; lookalike_repo "$d"
+printf 'fake photoshop bytes\n' > "$d/design/homepage-v7.psd"
+commit_msg "$d" "commit an editable design source"
+assert_finding "s12-design-source" "$d" "design-source-committed"
+
+# --- S12.GENERATED: a TRACKED build directory ----------------------------------------------------
+# Present-but-ignored is the compliant state and the lookalike repo already pins it; this case tracks
+# the same shape, which is the only difference §12 cares about.
+d="$work/s12-dist"; mkdir -p "$d"; lookalike_repo "$d"
+rm -f "$d/.gitignore"
+printf 'reproducible output, now committed\n' > "$d/dist/bundle.js"
+commit_msg "$d" "track the build output"
+assert_finding "s12-generated-artifact" "$d" "generated-artifact-committed"
+
+# The personal-vs-shared VS Code split, which §12c states in one sentence and which an exclusion
+# trimmed positionally would get backwards.
+d="$work/s12-vscode-personal"; mkdir -p "$d"; lookalike_repo "$d"
+printf '{ "editor.fontSize": 13 }\n' > "$d/.vscode/settings.json"
+commit_msg "$d" "commit personal editor settings"
+assert_finding "s12-generated-vscode-settings" "$d" "generated-artifact-committed"
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "SPRINT-FAMILY FIXTURES: all green"

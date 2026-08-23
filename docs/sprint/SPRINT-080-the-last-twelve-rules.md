@@ -111,7 +111,7 @@ phase** from **did not run**, which are different states and only one is a findi
 ### T3 — Cover §12's git-boundary rules `[size: M · risk: med · class: execution · HITL]`
 Layers: `scripts/lib/conformance-engine.sh` · `evals/run-sprint-family-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md`
 Depends-on: T2
-Cites: the register's § `build` (§12's four rows) and its § `scope-out` reason (c) · §12's never-commit table · L-058 · L-146 · `S12.SECRETS` · `S12.BACKUPS` · `S12.DESIGNSRC` · `S12.GENERATED` · `.env.example` · `contract.md` (the benign lookalikes the controls are built from) · T1
+Cites: the register's § `build` (§12's four rows) and its § `scope-out` reason (c) · §12's never-commit table · L-058 · L-146 · `S12.SECRETS` · `S12.BACKUPS` · `S12.DESIGNSRC` · `S12.GENERATED` · `.env.example` · `contract.md` (the benign lookalikes the controls are built from) · T1 · `db/seed.sql` · `public/hero.mp4` · `.vscode/extensions.json` · `.vscode/settings.json` *(fixture contents built inside the harness, never files of this repository)* · `S2.F-CAP` · `S2.R-TEMPDIR` · `S7.MEGA` · `S7.SPRINT400` · `S11.EPIC` · `S11.RESEARCH` *(the six covered by standalone checkers — named in the amended coverage criterion, checked by neither this task nor the engine)*
 
 **The false-positive family, and the register says so in its own words:** a filename heuristic that
 flags `contract.md` in a repo about contract testing *"is worse than no scan"*. §12's six content
@@ -124,12 +124,12 @@ here.**
 with a retained fixture **and a benign-lookalike control**, which is the load-bearing one.
 
 **DoD:**
-- [ ] Ids and findings re-derived; the register's reason (c) read before designing, not after
-- [ ] **The benign-lookalike control exists per rule and is written FIRST** — a `.env.example`, a small fake seed file, an asset the app actually uses, a checked-in artifact a build legitimately needs. *Verify: each control passes against a repo that contains the lookalike and nothing prohibited*
-- [ ] Detection scope ruled at G2 and **recorded with its reason** — extension · path · content · size, and what was refused. A rule that silently over-reaches is worse than one that under-reaches here
-- [ ] **Run against this repository** — *Verify: lean-flow must come back clean on all four, and if it does not, the finding is triaged as real-or-artefact before the check ships (the SPRINT-076 T3 method)*
-- [ ] Retained fixture per finding + the lookalike control; discrimination shown as in T1
-- [ ] Rows migrate; **`build` reaches 0** and coverage reads **51 of 51** — *Verify: the engine's `coverage:` line*
+- [x] Ids and findings re-derived; the register's reason (c) read before designing, not after — *Verify: the § `build` §12 rows re-read at execution; reason (c) — a scan flagging `contract.md` in a contract-testing repo is "worse than no scan" — read before the first detector was written, and it is what produced the two-signal rule*
+- [x] **The benign-lookalike control exists per rule and is written FIRST** — *Verify: `lookalike_repo` was built and committed before any detector existed, holding `.env.example`, a `.pem` with only a public CERTIFICATE, a small fake `db/seed.sql`, `public/hero.mp4`, a shared `.vscode/extensions.json` and an untracked `dist/`. Each rule then reports a **non-zero shape-match examined and cleared**, so the controls are reached rather than passing vacuously*
+- [x] Detection scope ruled at G2 and **recorded with its reason** — *Verify: recorded in the engine's §12 header. **Two signals must agree** — shape (extension · filename · path) plus a confirmation from content or git state. **Refused:** size thresholds for BACKUPS and DESIGNSRC (§12 says "large"/"small" and states no number; a figure here is a threshold the standard never set — L-097), and bare filename matching throughout*
+- [x] **Run against this repository** — *Verify: lean-flow is clean on all four. Honest caveat recorded: three report **0 shape-matches examined**, so this tree has no candidates and cannot exercise the content confirmation — that is done on the lookalike repo, per L-016's consumer-path rule*
+- [x] Retained fixture per finding + the lookalike control; discrimination shown as in T1 — *Verify: 11 new cases (56 → 67), six of them controls; harness `all green`, 67 pass / 0 fail. Four seeded breaks, each removing exactly one confirmation, 0-line-delta and still parsing: each reddens **only** its own finding on the lookalike repo and leaves the other three silent; restore hash-verified*
+- [x] Rows migrate; **`build` reaches 0** and coverage reads **45 checkable / 6 unchecked** — *Verify: the engine's `coverage:` line reads exactly that, `45 + 6 = 51`; the 6 (`S2.F-CAP` · `S2.R-TEMPDIR` · `S7.MEGA` · `S7.SPRINT400` · `S11.EPIC` · `S11.RESEARCH`) are each shown covered by a named standalone checker in `conformance-coverage.md`, and the register's § `build` is empty. **Criterion amended by owner ruling at G2** — it read "51 of 51 via the engine's `coverage:` line", which no amount of correct work could satisfy, because that line counts only in-engine assertions (L-088 · L-136)*
 
 ### T4 — Rule § Closed-when 2, and close EPIC-004 if it ticks `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/epic/EPIC-004-conformance.md` · `docs/research/conformance-dispositions.md` · `docs/adr/`
@@ -232,6 +232,10 @@ the engine's report unchanged, and TD-073 is resolved or explicitly re-filed.
 | `evals/run-sprint-family-fixtures.sh` | T2 | `close_at` helper + 18 retained cases (WHY: `close_commit` appended past the frontmatter is invisible to `_fm_real`, which made a must-FAIL silent AND its control vacuous in the same run) | low | harness 56 pass / 0 fail, 5m06s |
 | `CHANGELOG.md` | T2 | Add the §11 link line to `docs/changelog/` (WHY: a **real** finding — 38 rotated files with no pointer from the only file a reader opens; rotation without it hides the record rather than compressing it) | low | `S11.CHANGELOG` PASS |
 | `docs/research/conformance-dispositions.md` · `conformance-coverage.md` | T2 | § `build` 8 → 4; coverage row recording the two history-defined rules and the narrow phase scope | low | engine `coverage:` 41 + 10 = 51 |
+| `scripts/lib/conformance-engine.sh` | T3 | Four §12 assertions + `_s12_tracked` / `_s12_generated_classes` / `_s12_generated_allowed` / `_s12_matches_class`; scope + refusals recorded in the section header (WHY: the register calls a bare filename heuristic worse than no scan, so a finding needs a shape AND a confirmation) | med | 11 cases, 6 controls built first; 4 seeded breaks each reddening one finding only |
+| `evals/run-sprint-family-fixtures.sh` | T3 | `lookalike_repo` + 11 retained cases (WHY: the controls are the load-bearing half here — every one is a shape a heuristic would flag) | low | harness 67 pass / 0 fail, 6m45s |
+| `docs/research/conformance-dispositions.md` | T3 | § `build` emptied, kept as a record with why an empty bucket is not "everything is checked" | low | 0 rows; engine `coverage:` 45 + 6 = 51 |
+| `docs/research/conformance-coverage.md` | T3 | Row recording the two-signal rule, the refused thresholds, and the six controls | low | table intact |
 
 ## Retro
 

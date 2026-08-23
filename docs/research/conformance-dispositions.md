@@ -56,17 +56,29 @@ one: a ratio would improve every time the standard declines to automate somethin
 
 **§ Covered today and § Artefacts moved → [`conformance-coverage.md`](conformance-coverage.md)** at
 SPRINT-079's promote (§2 Growth rule, 230 > 130). The counts stay here, where they reconcile.
-## `build` — 4 rules, each with the finding its check will fire
+## `build` — **empty.** Every rule this bucket held now has a check
 
-A check specified without its finding name is a half-shipped gate (L-058). Every row ships with a
-**retained** must-FAIL fixture proving that exact string fires (TD-012).
+A check specified without its finding name is a half-shipped gate (L-058), and every rule that passed
+through here shipped with a **retained** must-FAIL fixture proving that exact string fires (TD-012).
 
-| Rule | Named finding |
-|---|---|
-| `S12.SECRETS` | `secret-committed` |
-| `S12.BACKUPS` | `database-backup-committed` |
-| `S12.DESIGNSRC` | `design-source-committed` |
-| `S12.GENERATED` | `generated-artifact-committed` |
+**Emptied at SPRINT-080** — the last twelve went out as `TASK-250` (§11 ledger retention: `S11.TDDELETE` ·
+`S11.TODOCAP` · `S11.LEARNINGS` · `S11.BACKLOG`), `TASK-251` (§11 archival: `S11.SPRINT` ·
+`S11.LOGPAIR` · `S11.CHANGELOG` · `S11.WHENITRUNS`, five findings) and `TASK-252` (§12's git
+boundary: `S12.SECRETS` · `S12.BACKUPS` · `S12.DESIGNSRC` · `S12.GENERATED`). Where each landed, with
+its findings and its controls → [`conformance-coverage.md`](conformance-coverage.md).
+
+**The section is kept rather than deleted.** An empty bucket is a fact about this standard's state —
+nothing is owed and unwritten — and a reader who finds the heading gone cannot tell that from a
+register that never partitioned its rules. It fills again the moment §14 marks a new rule
+`mechanical` or `split` with no assertion behind it, which the engine reports as `rule-unimplemented`
+rather than leaving to this file to notice.
+
+**Empty here is not "everything is checked."** 51 rules are checkable and 45 have an assertion *in the
+engine*; the other 6 — `S2.F-CAP` · `S2.R-TEMPDIR` · `S7.MEGA` · `S7.SPRINT400` · `S11.EPIC` ·
+`S11.RESEARCH` — are covered by standalone checkers and are listed as covered in
+`conformance-coverage.md`, which is why the engine's own `coverage:` line reads **45 / 6** and not
+51 / 0. The remaining 49 of the spec's 100 rules are `judgment-only`, `implementation-directed`,
+`restated` or `standard-directed`, and none of them is debt (§14).
 
 ## `scope-out` — dissolved at SPRINT-079 T1; the record
 
