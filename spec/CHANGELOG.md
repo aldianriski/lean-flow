@@ -9,6 +9,35 @@ status: current
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
 
+## 0.7.0 — 2026-08-23
+
+**MINOR — §2 carries rows for the tier doc set §6 names, so Multi-service stops being a hole in the
+standard.** §6 has named three Multi-service documents since it was written — *service registry ·
+cross-service dependency map · global decisions index* — and §2's `docs/` tree carried a row for **none
+of them**. A conformance engine deriving a tier's required set from §2 therefore had nothing to derive,
+and reported `tier-doc-set-underivable`: a finding about **the standard**, which no adopter could ever
+clear by changing their repository.
+
+**Two rows added, one claim withdrawn.**
+`architecture/service-registry.md` and `architecture/service-dependencies.md` join §2's tree at Tier
+`multi-service`. The third — *global decisions index* — is **not a new document**: it is Medium's
+`DECISIONS.md` at umbrella scope. Tier doc sets are **exact-rank increments**, not a cumulative
+restatement, so a Multi-service repo already owes `DECISIONS.md` through Medium and naming it again
+here owed it twice. §6's row says so now, and names a pair rather than three.
+
+**Why MINOR on 0.5.0's test — *does anything an adopter satisfies today change?*** It does, in both
+directions. A repo declaring `multi-service` stops seeing an unclearable finding about the standard and
+starts seeing two named files it can create; the same repo now owes two documents it did not before.
+No rule is added — a §2 row is a **parameter set, not a rule** (SPRINT-072), so classification stands
+at **100** and checkable stands at **51**.
+
+**Verified on the path that exercises it, because this repository cannot dogfood it** (L-016): a
+scratch umbrella repo declaring `multi-service` reported `tier-doc-set-underivable` before and
+`tier-doc-set-incomplete` naming both files after — and creating exactly those two files takes it to
+*"all 2 unconditional Multi-service doc(s) present at their canonical §2 path"*. Actionability proven,
+not asserted.
+
+
 ## 0.6.0 — 2026-08-23
 
 **MINOR — the conformance model gains two marks, and eleven rules stop being reported as gaps they

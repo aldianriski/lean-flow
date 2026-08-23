@@ -365,7 +365,12 @@ _s2_tier_rows() {
       # present" are the same fact. auth and DB have no such tier statement anywhere in §6, so they
       # stay at 0 and are reported as substrate-gated rather than owed.
       rank = 0
-      if      (tier ~ /medium/)                    rank = 3
+      # multi-service is tested FIRST, not appended: it is the most specific tier, and a cell that
+      # ever names two (`medium+, multi-service`) is owed at the higher one. Added SPRINT-079 T2 --
+      # before it, §2 carried no row any tier-4 test could match, so S6.MULTISVC reported
+      # tier-doc-set-underivable and adding the rows alone would have fixed nothing visible.
+      if      (tier ~ /multi-service/)             rank = 4
+      else if (tier ~ /medium/)                    rank = 3
       else if (tier ~ /backend/ || tier ~ /API exists/) rank = 2
       else if (tier ~ /base/)                      rank = 1
       if (rank == 0) next

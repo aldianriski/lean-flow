@@ -151,3 +151,74 @@ established principle applied consistently, not new machinery. `standard-directe
 `docs/DECISIONS.md` carries **ADR-028**; the epic's § Closed-when 2 is amended with its prior wording
 preserved in place, and the cost — a smaller checkable set makes our own exit condition easier — is
 written into the row rather than left for a reader to notice.
+
+### 2026-08-23 | progress | T2 — §2 gains the Multi-service rows, and one of the three was never a new doc
+
+**Two mechanical facts found before designing, either of which would have made a plausible fix
+invisible.** Both were read out of the engine rather than assumed (L-130 — SPRINT-074 froze a wrong
+structural claim about exactly this kind of question):
+
+1. **`_tier_rows_at` matches `$1 == r` — exact rank, not cumulative.** Each tier rule asserts only the
+   rows added *at* its own rank; the cumulative feel of §6's `+` comes from all four rules firing for a
+   repo that declares rank ≥ N. So Multi-service does **not** re-own Medium's rows.
+2. **The Tier→rank mapping had no rank 4 at all** — `medium`→3, `backend`/`API exists`→2, `base`→1,
+   everything else→0 and skipped. Adding §2 rows alone would have changed nothing an adopter could see:
+   the parser would have dropped them and `tier-doc-set-underivable` would have kept firing. The
+   Backlog row anticipated this (`conformance-engine.sh` — *"only if the finding changes"*), so the
+   engine was already in T2's `Layers:` and no scope-change was needed.
+
+**Fact 1 is what re-shaped the task.** §6 named *three* Multi-service docs, but the third — *global
+decisions index* — is Medium's `DECISIONS.md` at umbrella scope, already owed at rank 3. Naming it
+again owed it twice. So T2 adds **two** rows and withdraws the third claim, rather than adding three.
+That is T1's `restated` insight one level down, arrived at independently by reading the rank code.
+
+**Verified on the consumer path, because this repository cannot dogfood it (L-016).** lean-flow ships
+no `.conformance-tier`, so `S6.MULTISVC` here reports *"not evaluated: declares no tier"* and the
+branch T2 fixes is unreachable from our own tree — a green run against this repo would have proven
+nothing. A scratch umbrella repo declaring `multi-service`:
+
+- **before** — `FAIL S6.MULTISVC -- tier-doc-set-underivable` (a finding about the STANDARD)
+- **after** — `FAIL S6.MULTISVC -- tier-doc-set-incomplete: docs/architecture/service-registry.md` ×2
+- **cleared** — creating exactly those two files → `PASS S6.MULTISVC -- all 2 unconditional
+  Multi-service doc(s) present at their canonical §2 path`
+
+**The first before/after run was empty and that was a broken query, not a result** (L-108): the pristine
+engine was invoked from a scratch path with no `read-spec-rules.sh` beside it, so it failed the
+reader-missing guard rather than reporting anything. Re-run with the reader alongside, it printed the
+`underivable` finding as expected.
+
+**A retained fixture was replaced, not deleted.** `tier-multisvc-underivable` asserted the very finding
+T2 eliminates; left alone it would have gone red, and quietly weakened it would be L-146's vacuous
+pass. It becomes `tier-multisvc-incomplete` (must-FAIL, naming the file) plus `tier-multisvc-clears`
+(the PASS control proving the finding is actionable) — the must-FAIL bar holds, the finding it names is
+just the right one now.
+
+**`Layers:` corrected on both tasks, and the correction is the expected cost, not a defect** (L-100).
+T1 gained `evals/…-fixtures.sh` · `docs/DECISIONS.md` · `docs/architecture/overview.md`; T2 gained the
+same fixtures file and `overview.md`. Neither was predictable at promote — the fixture file follows
+from *how* the check got guarded, the ADR index from whether an ADR was warranted, and the overview
+from the spec version string moving. Declared before committing, so `check-layers-observed.sh` can
+attribute each file per task rather than only against the all-task union.
+
+### 2026-08-23 | surprise | T1 and T2 were nearly committed as one, which the attributor treats as a FAIL
+
+`check-layers-observed.sh` attributes a commit to **exactly one** task — a `Task:` trailer first, then a
+`sprint(NNN) Tn:` subject, then `sprint(NNN):` → COORD, else **UNATTRIBUTED, its own named FAIL**. So a
+combined T1+T2 commit would have reddened the close gate, and attributing it wholly to T1 (whose
+`Layers:` happens to cover every path T2 touched) would have passed the check by mislabelling T2's work.
+
+**This is L-150's failure, reached from the other direction.** SPRINT-078 batched two tasks into one
+commit to avoid a gate cycle and paid roughly twice the saving to un-pick it. Here nothing was batched
+deliberately — T2 simply started while T1's gate was still running, and the tree accumulated both.
+
+**It cost minutes rather than the half-hour L-150 records, and the reason is worth keeping.** Every
+edit in this session was made against a pristine copy saved first, for verification — so the T1-final
+state of all four shared files already existed on disk (`S.T2.pristine.md` · `C.T2.pristine.md` ·
+`E.T2.pristine.sh` · `fx.T2.pristine.sh`), as did the T1-final sprint file, and the log split cleanly at
+the T2 heading. Restore, commit T1 with `Task: T1`, restore T2, commit T2. **The habit kept for
+correctness paid for itself in recoverability** — which is an argument for snapshotting that has
+nothing to do with verification.
+
+**The rule that follows:** commit a task before starting the next one, even when its aggregate check is
+still running — the per-task legs are what gate the commit (owner ruling, this sprint), and the
+aggregate is a close-time step. Waiting on the aggregate is what made the trees overlap.

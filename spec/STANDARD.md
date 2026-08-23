@@ -2,7 +2,7 @@
 owner: Maintainer
 last_updated: 2026-08-23
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.6.0
+version: 0.7.0
 status: current
 ---
 
@@ -122,6 +122,8 @@ repo that *does* run the loop: their caps are unaffected (a cap is read from the
 | `architecture/data-flow.md` | backend, or overview cap-split | Dev | 120 | a non-trivial data path exists | that flow changes |
 | `architecture/authentication.md` | auth exists | Dev | 120 | auth is introduced | authn/authz architecture changes |
 | `architecture/integrations.md` | backend/integration | Dev | 120 | first external integration | an integration is added / changed |
+| `architecture/service-registry.md` | multi-service | Dev / ops | 120 | a second deployable service ships | a service is added · retired · renamed |
+| `architecture/service-dependencies.md` | multi-service | Dev / ops | 120 | with service-registry | a cross-service call path is added / removed |
 | `adr/ADR-NNN-<slug>.md` + `DECISIONS.md` index (both under `docs/`) | medium+ | Team | per file, append-only | a qualifying decision (§4) | new ADR → index row |
 | `database/erd.md` (Mermaid) | DB exists | Dev | 120 | the schema's first entities land | a migration changes entities / relations |
 | `database/schema.md` | DB exists | Dev | 150 | with erd | a migration lands |
@@ -428,7 +430,7 @@ Discard log: `"Skipped: '[detail]' explains HOW → add as a comment in [file]."
 | **Base** | every dev repo | the TemiDev mandatory minimum: root set (§2) · `product/{requirements,acceptance-criteria}` · `architecture/overview` · `development/setup` — plus **substrate-conditional** rows that are skipped, not owed, when the substrate is absent: `development/coding-standards` + `testing/testing-guide` (**has code**) · `deployment/{deployment,rollback}-guide` (**publishes an artifact**) · `database/` (DB) · `authentication` (auth). Gate per substrate, never on a repo label — a docs repo that publishes still deploys |
 | **Backend / integration** | repo exposes an API or external integrations | + `api/openapi.yaml` (placement rule) · `architecture/integrations.md` |
 | **Medium / complex** | multi-dev, sustained, or architecturally forked | + `adr/` + `DECISIONS.md` · `flows/` (CHANGELOG is already always-core — ADR-012) |
-| **Multi-service** | several deployable services / repos | + service registry · cross-service dependency map · global decisions index — per-service repos each carry their own Base+ set; the umbrella repo owns the cross-cutting three |
+| **Multi-service** | several deployable services / repos | + `architecture/service-registry.md` · `architecture/service-dependencies.md` — per-service repos each carry their own Base+ set; the umbrella repo owns the cross-cutting pair. **The "global decisions index" this row used to name as a third doc is Medium's `DECISIONS.md` at umbrella scope, not a new file** — tier doc sets are exact-rank increments, so naming it here owed it twice (SPRINT-079 T2) |
 
 A repo **moves up a tier by event, not by ceremony** — the trigger appearing (first API, second dev,
 second service) is the create-event for that tier's docs. Moving down never deletes: docs stay until

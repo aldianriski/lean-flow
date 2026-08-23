@@ -593,11 +593,33 @@ else
   echo "FAIL fixture(tier-medium-family): exit $rc -- output:"; printf '%s\n' "$out"; fail=1
 fi
 
-# --- Multi-service: the standard itself has the hole ---------------------------------------------
+# --- Multi-service: §2 carries the tier's rows, so the finding is about the REPO ------------------
+# SPRINT-079 T2 REPLACED the case that used to live here. It asserted `tier-doc-set-underivable` --
+# "§6 names a doc set §2 carries not one row for" -- which was a finding about the STANDARD that no
+# adopter could ever clear. T2 closed that hole (two §2 rows + the rank-4 mapping the Tier cell had
+# no branch for), so the old case would now fail rather than decay quietly into a vacuous pass. It is
+# replaced, not deleted: the must-FAIL bar still holds, the finding it names is simply the right one.
 t_ms="$work/tier-multisvc"
 tier_repo "$t_ms" multi-service
-run_case_anywhere "tier-multisvc-underivable" 1 "tier-doc-set-underivable" -- \
+run_case_anywhere "tier-multisvc-incomplete" 1 "tier-doc-set-incomplete: docs/architecture/service-registry.md" -- \
   sh "$engine" "$t_ms" --spec "$spec"
+
+# --- Multi-service PASS control: the finding is actionable, not merely named ----------------------
+# The other half of the same claim (SPRINT-075 T3's discipline): creating exactly what the findings
+# asked for must clear them. A must-FAIL case alone cannot tell a real check from one that always
+# fires, and an unclearable finding is the failure this task existed to fix.
+mkdir -p "$t_ms/docs/architecture"
+for f in service-registry service-dependencies; do
+  printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-23\nupdate_trigger: a service changes\nstatus: current\n---\n\n# %s\n' "$f" > "$t_ms/docs/architecture/$f.md"
+done
+out=$(sh "$engine" "$t_ms" --spec "$spec" 2>&1)
+if printf '%s\n' "$out" | grep -q 'S6.MULTISVC .*all 2 unconditional Multi-service doc' &&
+   ! printf '%s\n' "$out" | grep -q 'S6.MULTISVC .*tier-doc-set-'; then
+  echo "PASS fixture(tier-multisvc-clears): creating the two docs the findings named takes S6.MULTISVC to a pass"
+else
+  echo "FAIL fixture(tier-multisvc-clears): S6.MULTISVC did not clear after its findings were satisfied -- output:"
+  printf '%s\n' "$out"; fail=1
+fi
 
 # --- an unreadable declaration is a finding, never a silent fallback to Base ---------------------
 t_bad="$work/tier-bogus"

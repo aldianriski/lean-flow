@@ -66,9 +66,9 @@ since SPRINT-073. This runs first in the sprint because its outcome is an input 
 - [x] The ruling is filed as an ADR **or** recorded Retro-only, with §4's three-part bar stated against it — *Verify: (c) is hard-to-reverse and surprising and a real trade-off; (a)/(b) likely are not*  ✓ **ADR-028** (id derived from the max on disk, not remembered — L-143), indexed in `docs/DECISIONS.md`. §4's bar stated in the row: hard-to-reverse (moves every adopter's report + the denominator) · surprising (the dispositions were invisible to the engine for six sprints) · a real trade-off (a smaller checkable set makes our own exit condition easier)
 
 ### T2 — Give §2 rows for Multi-service's three docs `[size: S · risk: low · class: decision · HITL]`
-Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/research/conformance-dispositions.md` · `scripts/lib/conformance-engine.sh`
+Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/research/conformance-dispositions.md` · `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `docs/architecture/overview.md`
 Depends-on: T1
-Cites: SPRINT-078 T2 § "A4 does not hold" (its Execution Log) · §6's Multi-service row · §2's docs tree · `S6.MULTISVC`
+Cites: SPRINT-078 T2 § "A4 does not hold" (its Execution Log) · §6's Multi-service row · §2's docs tree · `S6.MULTISVC` · `architecture/service-registry.md` · `architecture/service-dependencies.md` · `DECISIONS.md` (named as §2 rows, never touched as files)
 
 §6 names three documents — service registry · cross-service dependency map · global decisions index —
 that §2 carries no row for, so `S6.MULTISVC` cannot derive a doc set and reports
@@ -80,11 +80,11 @@ question — either because §2 gained the three rows with a Tier cell an engine
 stopped naming docs §2 does not carry.
 
 **DoD:**
-- [ ] The gap is **re-derived at intake, not trusted from the Backlog row** — *Verify: a case-insensitive sweep of §2 for all three names, plus an enumeration of §2's distinct Tier cell values, reproduces the two-way finding SPRINT-078 recorded (L-130 — §2 may have moved since)*
-- [ ] Either §2 carries a row per named doc with a matchable Tier cell, **or** §6 is amended to stop naming them — the choice recorded with its reason
-- [ ] `spec/CHANGELOG.md` records the change at the right level — *Verify: a §2/§6 edit that moves an adopter's report is at least MINOR*
-- [ ] `S6.MULTISVC`'s behaviour changes as intended — *Verify: `sh conformance.sh .` and the tier fixtures; the finding string is gone and the tier is evaluated*
-- [ ] `conformance-dispositions.md` updated only if a disposition actually changed
+- [x] The gap is **re-derived at intake, not trusted from the Backlog row** — *Verify: a case-insensitive sweep of §2 for all three names, plus an enumeration of §2's distinct Tier cell values, reproduces the two-way finding SPRINT-078 recorded (L-130 — §2 may have moved since)*  ✓ re-derived: all three names occur **exactly once in the whole spec**, all on line 431 (§6's own row), and a §2-scoped sweep returns 0 — two angles agreeing. §2's Tier vocabulary enumerated: no multi-service value existed
+- [x] Either §2 carries a row per named doc with a matchable Tier cell, **or** §6 is amended to stop naming them — the choice recorded with its reason  ✓ **both**, and the split is the finding: two rows added (`architecture/service-registry.md` · `architecture/service-dependencies.md`, Tier `multi-service`), and §6 amended to withdraw the third — *global decisions index* is Medium's `DECISIONS.md` at umbrella scope. `_tier_rows_at` matches `$1 == r`, **exact rank**, so naming it here owed it twice
+- [x] `spec/CHANGELOG.md` records the change at the right level — *Verify: a §2/§6 edit that moves an adopter's report is at least MINOR*  ✓ spec **0.7.0 MINOR** on 0.5.0's stated test — an adopter declaring `multi-service` both loses an unclearable finding and gains two owed documents, so PATCH cannot carry it. No rule added: a §2 row is a parameter set (SPRINT-072), so classification stays 100 and checkable stays 51
+- [x] `S6.MULTISVC`'s behaviour changes as intended — *Verify: `sh conformance.sh .` and the tier fixtures; the finding string is gone and the tier is evaluated*  ✓ **verified on the consumer path, because this repo cannot reach the branch** (L-016): lean-flow declares no tier, so `sh conformance.sh .` here reports *not evaluated* both before and after — it confirms no regression (FAIL steady at 34, GAP 27, coverage 51) and nothing more. A scratch umbrella repo declaring `multi-service` went `tier-doc-set-underivable` → `tier-doc-set-incomplete` ×2 → **PASS** once the two files existed. Fixtures: `tier-multisvc-incomplete` + `tier-multisvc-clears`, harness all green (34 pass)
+- [x] `conformance-dispositions.md` updated only if a disposition actually changed  ✓ **no disposition changed**, so the register is untouched — `S6.MULTISVC` was never dispositioned `build` or `scope-out`; it was a covered rule whose finding was about the standard. Counts still reconcile: 30 covered + 21 build = 51
 
 ### T3 — Make §2's `DECISIONS.md` addressable by a checker `[size: S · risk: low · class: execution · AFK]`
 Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/research/conformance-dispositions.md`
