@@ -84,19 +84,11 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 
 ---
 
-## L-143 [tags: process] [status: promoted]: **An identifier for a new row is a query result — derive the maximum in use; never increment the one you happen to remember.** Twice in SPRINT-076 the next free id was assumed and was wrong. The register was written citing **TASK-241** for a follow-up; TASK-241 is that very task's own backlog twin, so the row would have pointed at itself. A tech-debt row was filed as **TD-066**, which already existed — and its subject was the engine's process-spawn cost, the exact problem another task in the same sprint was fixing, so the collision also hid a genuine cross-reference. Both were caught by looking rather than by any check: nothing in the ledger or the tracker rejects a duplicate id, and a second row with the same number reads as an edit to the first. **The reason the guard does not fire on its own is that picking an id feels like formatting, not like querying** — which is precisely L-130's observation about figures frozen into artifacts, one grain down. The derivation is one command (`grep -oE 'TD-[0-9]+' | sort -u | tail -1`), and it has to run **at the moment of writing**, because the id is then copied into commit messages, cross-references and other documents where correcting it is no longer cheap.
-- seen: Sprint-076 (T3, `TASK-241` citing its own twin · T1, `TD-066` colliding with an existing row)
-- count: 2
-- promoted: yes → .claude/CLAUDE.md § Behavioral Guidelines + CONTEXT.md § Gates
-- related: L-130 (a value in a frozen artifact is a query result) · L-136 (a structural claim about another document is one too) · L-108
+## L-143 [tags: process] [status: promoted]: → promoted: .claude/CLAUDE.md § Behavioral Guidelines + CONTEXT.md § Gates
 
 ---
 
-## L-142 [tags: tooling] [status: promoted]: **A seeded break that does not redden its case has not tested the code — it has tested nothing, and it scores as a pass.** L-137 established that a suite green on its first run has not been shown to discriminate, so seed a break and confirm the right case fails. SPRINT-076 ran that pass three times and **all three found a case proving nothing**, which is the failure mode L-137's own procedure does not catch. (a) A seed used `s|…|…|` while its target line contained a pipe; `sed` errored, wrote an **empty** file, every guard accepted it — `cmp` saw a difference so the seed had "landed", and `sh -n` accepted it because **an empty script is valid shell** — the suite went red for the wrong reason and the case scored `DISCRIMINATES`. (b) A control asserting a rule stays quiet passed **vacuously**, because the rule did not exist yet. (c) A fixture bounding an exception to frontmatter wrote the trigger phrase *inline in prose*, where the anchored pattern could never match it — so the case stayed green **with or without** the bound it existed to guard. **Three guards follow, and they are cheap:** the seeded artifact must still *parse* **and** still be a **targeted** break (assertion count unchanged, line count within one of pristine — a demolition is not a discrimination); the case must **redden** while a sibling control stays **green**, or the seed hit something broader than the assertion; and a case that cannot be red before the code exists is recorded as *earned by the seeded pass*, not by being written first. **The general form: verification code is code, and the pass that proves your tests discriminate needs to prove that it does.**
-- seen: Sprint-076 (T2, an empty engine scoring DISCRIMINATES · T3, a vacuous stranger control · T5, a prose fixture the bound could never match)
-- count: 3
-- promoted: yes → .claude/CLAUDE.md § Anti-Patterns (the must-FAIL bullet)
-- related: L-137 (seed the rejected design — this is its failure mode) · L-058 (the guard that never fires) · L-108 (match by shape, not substring)
+## L-142 [tags: tooling] [status: promoted]: → promoted: .claude/CLAUDE.md § Anti-Patterns (the must-FAIL bullet)
 
 ---
 
@@ -320,11 +312,7 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 
 ---
 
-## L-111 [tags: sprint-model] [status: active]: **A task's acceptance criterion can depend on a decision no gate has taken yet — the Plan freezes at promote, but some decisions are only made at G2 or later, and a criterion resting on one of them is unreachable before anyone notices.** SPRINT-060 T5's acceptance required "a real unattended run that stops mid-Plan", and its DoD named the vehicle: a night run over T2–T4. The **run mode** was ruled at G2 — interactive, correctly, because four of five tasks were HITL — and that ruling silently foreclosed the vehicle. By the time T5 was reached it was the only open task, so any run would *park* it (`parked-hitl`) rather than leave it `unattempted`: different states, and only the second exercises the thing. Neither G1 nor G2 caught it, because both gates read the criterion for *clarity* and never asked what it depends on that is not yet decided. The failure is the temporal sibling of L-105 one level in: L-105 asks when a **guard** fires relative to what it guards; this asks when a **criterion** becomes checkable relative to the decisions it rests on. Both are invisible to a review that reads what a line says rather than when it can be true. The cheap counter at G2, where the mode and dispatch shape are actually chosen: for each task, ask *does this acceptance depend on anything I am deciding right now — and if I decide it the other way, is the criterion still reachable?* Cost when missed is bounded but real — the sprint closed 4 of 5 and the task carried, which is the honest outcome and not a free one.
-- seen: Sprint-060 · Sprint-077 (a night run requested against a Plan whose two tasks were both `class: decision · HITL` — zero AFK-safe work, so an execute-only run would have parked 2 of 2 and exited `0 of 9`; refused at pre-flight and re-run attended)
-- count: 2
-- promoted: yes → .claude/CONTEXT.md § Gates (the criterion-reachability paragraph, beside L-105)
-- related: L-105 (a guard is placed in time, not only in text — the guard-side sibling) · L-088 (do not reinterpret a DoD execution invalidated — what stopped this being papered over) · L-100 (a `Layers:` declaration is corrected by the work)
+## L-111 [tags: sprint-model] [status: promoted]: → promoted: .claude/CONTEXT.md § Gates (the criterion-reachability paragraph, beside L-105)
 
 ---
 

@@ -166,9 +166,9 @@ status: current
 - **TD-069** severity: minor | status: open | created: Sprint-077
   - Summary: **two governed docs exceed their §2 soft cap by growing the way they are meant to, and
     §2's Growth rule forbids the obvious fix.** *Cap-hit → split into a tree, never squeeze.*
-    `docs/research/conformance-dispositions.md` is **206 / 130** — a partition of all 62 checkable
+    `docs/research/conformance-dispositions.md` is **230 / 130** (206 when filed) — a partition of all 62 checkable
     rules, so cutting 76 lines makes the register *incomplete*, not concise.
-    `docs/epic/EPIC-004-conformance.md` is **212 / 200** (201 when filed) and gains **at least one line per member
+    `docs/epic/EPIC-004-conformance.md` is **213 / 200** (201 when filed, 212 at SPRINT-077) and gains **at least one line per member
     sprint**, so it will breach again at every promote from here. **SPRINT-077 showed the growth is not only per-sprint rows**: recording an exit-condition amendment with its prior wording (L-088's required form) added 11 lines by itself, so option (c) — moving § Member sprints to `epic/INDEX.md` — does not on its own cure this file.
   - Evidence: reported by `check-doc-caps.sh` on **every run since at least SPRINT-075**, when
     TD-059's re-review recorded the register at **163**. It has tracked coverage since — 173 at
@@ -193,6 +193,19 @@ status: current
     out of the capped file. **Decide before the next coverage sprint** — each one adds rows to both.
   - Sibling: **TD-059**, whose re-review first recorded the register's breach, but whose subject is
     the non-recursive cap glob rather than these files. Curing either moves neither.
+  - **SPRINT-078 close (2026-08-23): both figures moved again, in the predicted direction.**
+    `conformance-dispositions.md` **206 → 230 / 130** (the tier family's `.conformance-tier` note and
+    the corrected counting recipe) and `EPIC-004-conformance.md` **212 → 213 / 200** (one member row,
+    exactly the "at least one line per sprint" this row forecast). The forecast holding is itself the
+    evidence: this is not a breach that a tidy-up fixes, it is a file doing its job.
+  - **The register's own split is now specified but still unspent.** SPRINT-078's § Scope named it —
+    move § Artefacts to its own file — and flagged the blocker: **TASK-238 cites that section**, so it
+    cannot move silently. Offered at this close and **deferred by the owner** to keep a closing sprint
+    from editing a task it did not own. Unchanged otherwise: *split, never squeeze* (L-131), and
+    cutting 100 lines from a partition of all 62 rules makes it incomplete rather than concise.
+  - Severity held at `minor`: nothing is wrong, nothing is lost, and both files are read by humans who
+    are not stopped by the length. What the row is actually tracking is that **the decision keeps being
+    deferrable** — five sprints now. It is worth one promote's attention before a sixth.
 - **TD-071** severity: minor | status: open | created: Sprint-078
   - Summary: **`qa-check.sh`'s cost scales with the coverage EPIC-004 exists to add.** The gate reaches
     **78 engine invocation sites** across its harnesses, and **16 of them hand the engine the full
