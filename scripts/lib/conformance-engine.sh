@@ -2422,6 +2422,234 @@ assert_S11_BACKLOG() {
     ok "S11.BACKLOG         -- § Backlog carries no shipped-in-SPRINT breadcrumb (the mechanical half; whether an entry is shipped stays judged)"
   fi
 }
+
+# ==================================================================================================
+# §11 -- ARCHIVAL (SPRINT-080 T2). Four rules, five findings. Two are defined over HISTORY, not the
+# tree: whether a log moved WITH its Plan, and whether a close-time trigger fired at close.
+# ==================================================================================================
+
+# _s11_archived_plans <repo> -- one repo-relative path per archived Plan.
+_s11_archived_plans() {
+  [ -d "$1/docs/sprint/archive" ] || return 0
+  for _ap in "$1"/docs/sprint/archive/SPRINT-*.md; do
+    [ -f "$_ap" ] || continue
+    printf '%s\n' "docs/sprint/archive/${_ap##*/}"
+  done
+}
+
+# _s11_archived_at <repo> <archive-path> -- the commit in which <archive-path> FIRST APPEARED, i.e.
+# the commit that performed the archive.
+#
+# NOT `log -1 --follow`, which was the first draft and was wrong: that returns the NEWEST commit to
+# touch the path, so an archived Plan resolved to a later release commit and its log to a later
+# labelling commit -- neither of them the archive. It reported 24 sprints as split pairs, none of
+# which were. Oldest-first `--diff-filter=A` names the appearance instead, which is the event §11
+# actually constrains.
+_s11_archived_at() {
+  git -C "$1" log --diff-filter=A --format='%H' -- "$2" 2>/dev/null | tail -1
+}
+
+# _s11_log_predated_archive <repo> <commit> <basename> -- was the live log present in the archive
+# commit's PARENT? Only then does "archive the pair together" bind.
+#
+# §11's logs/ sibling arrived with ADR-014 at SPRINT-047, so every sprint archived before it had no
+# separate log to move, and its archived log was written later by that one-time migration. Comparing
+# commits without this guard reports a decade of correct closes as split pairs -- a finding no
+# adopter could act on, about a file that did not exist when the rule they are being judged against
+# would have applied.
+_s11_log_predated_archive() {
+  git -C "$1" cat-file -e "$2^:docs/sprint/logs/$3" 2>/dev/null
+}
+
+assert_S11_SPRINT() {
+  repo=$1
+  # FINDING ONE: a closed sprint still sitting in the live directory.
+  n_live=0
+  for p in $(_sprint_plans "$repo"); do
+    st=$(_fm "$repo/$p" status)
+    case "$st" in
+      closed) bad "closed-sprint-not-archived: $p is status: closed but still in docs/sprint/ -- §11 moves a closed sprint to docs/sprint/archive/ at close. Left here it keeps answering the globs that look for ACTIVE work, so every check reading 'the current sprint' reads a finished one" ;;
+      *) n_live=$((n_live + 1)) ;;
+    esac
+  done
+  # FINDING TWO: an archived sprint with no INDEX row. Separable from the first ON PURPOSE (L-058):
+  # an unarchived sprint and a missing index row are different repairs -- one moves a file, the other
+  # writes a line -- and one report line covering both tells the reader neither.
+  idx="$repo/docs/sprint/INDEX.md"
+  arch=$(_s11_archived_plans "$repo")
+  if [ -n "$arch" ]; then
+    if [ ! -f "$idx" ]; then
+      bad "sprint-index-row-missing: docs/sprint/INDEX.md does not exist while docs/sprint/archive/ holds archived sprint(s) -- §11 creates it lazily at the first archive, and without it the archive is a directory nobody has an index into"
+    else
+      n_row=0; n_miss=0
+      _oifs=$IFS; IFS='
+'
+      for a in $arch; do
+        IFS=$_oifs
+        base=${a##*/}
+        # SPRINT-NNN. `${base%%-*}` stops at the FIRST hyphen and yields the bare word "SPRINT",
+        # which matched no INDEX row and reported all 79 archived sprints as missing one. Caught by
+        # running the rule against this repository before writing its fixture (D2) -- the finding
+        # count was the tell, not the logic: a rule firing on every row is reporting itself.
+        _srest=${base#SPRINT-}; sid="SPRINT-${_srest%%-*}"
+        if grep -q "^- $sid " "$idx" 2>/dev/null; then
+          n_row=$((n_row + 1))
+        else
+          bad "sprint-index-row-missing: $sid is archived but docs/sprint/INDEX.md carries no '- $sid ' row -- §11 pairs the move with one index line, and the row is the durable pointer the file is only the detail"
+          n_miss=$((n_miss + 1))
+        fi
+        IFS='
+'
+      done
+      IFS=$_oifs
+      [ "$n_miss" -eq 0 ] && ok "S11.SPRINT          -- $n_row archived sprint(s), each with its INDEX row; $n_live live Plan(s), none closed"
+    fi
+  else
+    [ "$last_bad" -eq 1 ] || note "S11.SPRINT          -- nothing archived yet -- §11 creates the archive at the first close, so its absence is not a breach"
+  fi
+}
+
+assert_S11_LOGPAIR() {
+  repo=$1
+  arch=$(_s11_archived_plans "$repo")
+  [ -n "$arch" ] || { note "S11.LOGPAIR         -- nothing archived yet -- there is no pair to split"; return; }
+  has_git=0
+  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 && has_git=1
+  n_pair=0; n_nolog=0; n_unjudged=0
+  _oifs=$IFS; IFS='
+'
+  for a in $arch; do
+    IFS=$_oifs
+    base=${a##*/}
+    stray="docs/sprint/logs/$base"
+    archlog="docs/sprint/archive/logs/$base"
+    if [ -f "$repo/$stray" ]; then
+      # The Plan moved and its log did not. Readable from the TREE alone, so it is reported whether or
+      # not history is available -- and it is the common shape, because the two files sit in different
+      # directories and only one of them is what the closer is looking at.
+      bad "sprint-log-archived-apart-from-plan: ${base%.md} -- the Plan is archived but its log is still at $stray. §11 archives the pair together because it is ONE record: the Retro was written from that log, and stranding it across the archive boundary leaves the evidence behind the conclusion"
+      IFS='
+'; continue
+    fi
+    if [ ! -f "$repo/$archlog" ]; then
+      # No log anywhere. §11 creates the log LAZILY at the first Execution Log entry (ADR-014), so a
+      # sprint that never logged has none to archive -- absence here is not a split pair, and treating
+      # it as one would fail every sprint that closed without an entry.
+      n_nolog=$((n_nolog + 1)); IFS='
+'; continue
+    fi
+    if [ "$has_git" -eq 1 ]; then
+      # Both archived. The remaining question is whether they moved TOGETHER -- §11 says "same
+      # commit", and two archives a week apart satisfy every tree-shaped test while still having
+      # stranded the evidence in between.
+      cp_plan=$(_s11_archived_at "$repo" "$a")
+      if [ -n "$cp_plan" ] && _s11_log_predated_archive "$repo" "$cp_plan" "$base"; then
+        # The live log existed when the Plan moved, so the pair was there to be moved together and
+        # §11 binds. Without this guard the check judges sprints that had no separate log to move.
+        cp_log=$(_s11_archived_at "$repo" "$archlog")
+        if [ -n "$cp_log" ] && [ "$cp_plan" != "$cp_log" ]; then
+          bad "sprint-log-archived-apart-from-plan: ${base%.md} -- the live log existed when the Plan was archived at ${cp_plan%${cp_plan#???????}}, but the log only reached the archive at ${cp_log%${cp_log#???????}}. §11 requires the same commit: the pair is one record, and between those two commits a reader finds a Retro whose evidence is not beside it"
+          IFS='
+'; continue
+        fi
+      else
+        # No live log at archive time -- nothing to split. Counted separately so the report never
+        # implies these were verified.
+        n_unjudged=$((n_unjudged + 1))
+        IFS='
+'; continue
+      fi
+    fi
+    n_pair=$((n_pair + 1))
+    IFS='
+'
+  done
+  IFS=$_oifs
+  [ "$last_bad" -eq 1 ] && return
+  if [ "$has_git" -eq 1 ]; then
+    ok "S11.LOGPAIR         -- $n_pair pair(s) archived together in one commit; $n_nolog never opened a log (§11 creates it lazily); $n_unjudged predate the logs/ sibling, so there was no pair to split and they are not counted as passing"
+  else
+    ok "S11.LOGPAIR         -- $n_pair pair(s) archived side by side; $n_nolog never opened a log. History unavailable, so the same-commit half was not read"
+  fi
+}
+
+assert_S11_CHANGELOG() {
+  repo=$1
+  cl="$repo/CHANGELOG.md"
+  [ -f "$cl" ] || { note "S11.CHANGELOG       -- no root CHANGELOG.md -- nothing to rotate"; return; }
+  # DISTINCT MINOR SERIES held inline, newest first. Counting BLOCKS would fail a repo that shipped
+  # three patches in one minor, which §11 explicitly permits -- the unit it names is the MINOR.
+  minors=$(grep -oE '^## \[?v?[0-9]+\.[0-9]+\.[0-9]+' "$cl" 2>/dev/null | sed -e 's/^## \[\?v\?//' | awk -F. '{print $1 "." $2}' | awk '!seen[$0]++')
+  n_minor=0
+  [ -n "$minors" ] && n_minor=$(printf '%s\n' "$minors" | wc -l | tr -d ' ')
+  rotdir="$repo/docs/changelog"
+  n_rot=0
+  if [ -d "$rotdir" ]; then
+    for _r in "$rotdir"/*.md; do [ -f "$_r" ] && n_rot=$((n_rot + 1)); done
+  fi
+  n_bad=0
+  # INVARIANT ONE -- current + previous inline, nothing older.
+  if [ "$n_minor" -gt 2 ]; then
+    bad "changelog-not-rotated-at-minor: CHANGELOG.md holds $n_minor minor series inline ($(printf '%s' "$minors" | tr '\n' ' ')) -- §11 keeps current + previous and moves older blocks verbatim to docs/changelog/CHANGELOG-<version>.md. The root file is the one a reader opens first, and it stops being readable long before it stops being correct"
+    n_bad=$((n_bad + 1))
+  fi
+  # INVARIANT TWO -- the link line. §11 says the older blocks move "+ one link line", and it is the
+  # half that makes rotation lossless rather than merely tidy: without it the rotated history is
+  # unreachable from the only file anyone opens. Reported under the same finding because the register
+  # names ONE for this rule, with the message saying WHICH invariant failed.
+  if [ "$n_rot" -gt 0 ] && ! grep -q 'docs/changelog' "$cl" 2>/dev/null; then
+    bad "changelog-not-rotated-at-minor: docs/changelog/ holds $n_rot rotated file(s) and CHANGELOG.md carries no link line to them -- §11 pairs the move with one pointer. Rotation without it does not compress the record, it hides it: the root file is the only entry point, and from it the older history cannot be reached at all"
+    n_bad=$((n_bad + 1))
+  fi
+  [ "$n_bad" -eq 0 ] && ok "S11.CHANGELOG       -- $n_minor minor series inline (current + previous) and $n_rot rotated file(s) reachable by a link line"
+}
+
+assert_S11_WHENITRUNS() {
+  repo=$1
+  # SPLIT (§11 marks it so): the PHASE a retention action ran in is mechanical from history; whether
+  # the RIGHT trigger fired is judged and is never decided here.
+  #
+  # Scoped to the one close-time trigger with an unambiguous mechanical boundary: the sprint archive.
+  # §11 executes it "during close", and a sprint's own close_commit is recorded in its frontmatter, so
+  # "archived before it was closed" is a fact about two commits and needs no interpretation. The
+  # scan-based triggers are deliberately NOT phase-checked -- promote is a window rather than a
+  # commit, and a rotation landing just outside it is a finding no adopter could act on (§14).
+  #
+  # NOT-RUN IS NOT THIS FINDING. A sprint never archived is `closed-sprint-not-archived` under
+  # S11.SPRINT; here it is simply absent from the phase question. The two states need different
+  # repairs -- one is "do the thing", the other is "you did it at the wrong moment" -- and a check
+  # that reported them alike would emit a finding nobody can act on.
+  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || {
+    note "S11.WHENITRUNS      -- history unavailable: a phase is a position in history, so without it there is nothing to read. Not a pass"
+    return
+  }
+  arch=$(_s11_archived_plans "$repo")
+  [ -n "$arch" ] || { note "S11.WHENITRUNS      -- no archived sprint, so no close-time retention has run yet -- absence is not a wrong phase"; return; }
+  n_ok=0; n_unread=0
+  _oifs=$IFS; IFS='
+'
+  for a in $arch; do
+    IFS=$_oifs
+    cc=$(_fm_real "$repo/$a" close_commit)
+    ac=$(_s11_archived_at "$repo" "$a")
+    if [ -z "$cc" ] || [ -z "$ac" ] || ! git -C "$repo" rev-parse --verify "$cc^{commit}" >/dev/null 2>&1; then
+      n_unread=$((n_unread + 1)); IFS='
+'; continue
+    fi
+    # The archive must not PRECEDE the close it belongs to. `merge-base --is-ancestor cc ac` is true
+    # when the close is an ancestor of the archive, i.e. the archive came at or after it.
+    if git -C "$repo" merge-base --is-ancestor "$cc" "$ac" 2>/dev/null; then
+      n_ok=$((n_ok + 1))
+    else
+      bad "retention-trigger-ran-in-wrong-phase: ${a##*/} was archived at ${ac%${ac#???????}}, which does not descend from its own close_commit ${cc%${cc#???????}} -- §11 runs the sprint archive DURING close. Archived earlier, the file left the live directory while the sprint was still open, so everything reading 'the active sprint' stopped seeing it before it finished"
+    fi
+    IFS='
+'
+  done
+  IFS=$_oifs
+  [ "$last_bad" -eq 1 ] && return
+  ok "S11.WHENITRUNS      -- $n_ok archived sprint(s) archived at or after their own close_commit; $n_unread could not be phased (no close_commit recorded, or the commit is unreachable) and are reported as unread rather than passed"
+}
 # ==================================================================================================
 # ==================================================================================================
 # DRIVER -- iterated WITHOUT a pipe, matching check-attestation.sh's documented reason: `printf |

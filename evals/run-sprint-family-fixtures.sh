@@ -219,12 +219,20 @@ td_ledger() {  # <dir> <created-sprint> [any third arg = the sweep names it]
   } > "$1/TECH-DEBT.md"
 }
 
+# close_at <file> <dir> -- stamp status: closed + close_commit INTO THE FRONTMATTER of <file>.
+# The frontmatter is the point: appending `close_commit:` to the END of the file leaves it
+# outside the header _fm_real reads, so the value is invisible and the rule reports the sprint
+# as unphaseable rather than judging it. That is how the S11.WHENITRUNS must-FAIL case failed to
+# fire AND its control passed vacuously in the same run -- both were reading nothing (L-142).
+close_at() {  # <file> <dir>
+  _cc=$(git -C "$2" rev-parse --short HEAD)
+  sed -i 's/^status: active$/status: closed/' "$1"
+  awk -v c="$_cc" '/^update_trigger:/ { print "close_commit: " c } { print }' "$1" > "$2/.tmp.md"
+  mv "$2/.tmp.md" "$1"
+}
+
 close_the_sprint() {  # <dir> -- stamp status: closed + close_commit for HEAD
-  _cc=$(git -C "$1" rev-parse --short HEAD)
-  _f="$1/docs/sprint/SPRINT-900-fixture.md"
-  sed -i 's/^status: active$/status: closed/' "$_f"
-  awk -v c="$_cc" '/^update_trigger:/ { print "close_commit: " c } { print }' "$_f" > "$1/.tmp.md"
-  mv "$1/.tmp.md" "$_f"
+  close_at "$1/docs/sprint/SPRINT-900-fixture.md" "$1"
 }
 
 # --- S10.PROMOTION: a recurrence left unpromoted --------------------------------------------------
@@ -437,6 +445,156 @@ assert_absent "s11-promoted-not-collapsed-control-exception" "$d" "promoted-lear
 d="$work/learnings-ok-d"; mkdir -p "$d"; ledger_repo "$d"
 printf '\n## L-003 [tags: process] [status: active]: **A long narrative that discusses promotion.** Entries reaching [status: promoted] are collapsed, and grepping for `promoted: yes` returns zero on a healthy corpus.\n- count: 1\n- promoted: no\n' >> "$d/docs/LEARNINGS.md"
 assert_absent "s11-promoted-not-collapsed-control-prose" "$d" "promoted-learning-not-collapsed"
+
+echo "=== §11 archival fixtures (SPRINT-080 T2) ==="
+
+# archive_repo <dir> -- a git repo with one CLOSED sprint properly archived: Plan and log moved in
+# ONE commit, an INDEX row, and a two-minor CHANGELOG with its link line. Conformant on all five
+# findings, so each case below breaks exactly one thing (L-142).
+archive_repo() {
+  d=$1
+  mkdir -p "$d/docs/sprint/logs" "$d/docs/sprint/archive/logs" "$d/docs/changelog"
+  git -C "$d" init -q >/dev/null 2>&1
+  sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"
+  printf '# Changelog\n\n> older → [docs/changelog/](docs/changelog/)\n\n## v2.1.0 --- current (2026-01-02)\n\n## v2.0.0 --- previous (2026-01-01)\n' > "$d/CHANGELOG.md"
+  printf '# stale\n' > "$d/docs/changelog/CHANGELOG-1.9.0.md"
+  commit_msg "$d" "sprint(900): plan locked"
+  cc=$(git -C "$d" rev-parse HEAD)
+  # close: record close_commit, then archive Plan AND log in one commit
+  close_at "$d/docs/sprint/SPRINT-900-fixture.md" "$d"
+  commit_msg "$d" "sprint(900): record close_commit"
+  git -C "$d" mv docs/sprint/SPRINT-900-fixture.md docs/sprint/archive/SPRINT-900-fixture.md >/dev/null 2>&1
+  git -C "$d" mv docs/sprint/logs/SPRINT-900-fixture.md docs/sprint/archive/logs/SPRINT-900-fixture.md >/dev/null 2>&1
+  printf -- '---\nowner: M\nlast_updated: 2026-01-01\nstatus: current\nupdate_trigger: a sprint is archived\n---\n\n# Index\n\n- SPRINT-900 --- Fixture --- closed 2026-01-02 · %s\n' "$cc" > "$d/docs/sprint/INDEX.md"
+  commit_msg "$d" "sprint(900): close --- archive the pair, index the row"
+}
+
+d="$work/arch-ok"; mkdir -p "$d"; archive_repo "$d"
+assert_absent "s11-archive-control-not-archived"  "$d" "closed-sprint-not-archived"
+assert_absent "s11-archive-control-index-row"     "$d" "sprint-index-row-missing"
+assert_absent "s11-archive-control-logpair"       "$d" "sprint-log-archived-apart-from-plan"
+assert_absent "s11-archive-control-changelog"     "$d" "changelog-not-rotated-at-minor"
+assert_absent "s11-archive-control-whenitruns"    "$d" "retention-trigger-ran-in-wrong-phase"
+
+# --- S11.SPRINT finding 1: a closed sprint still in the live directory --------------------------
+d="$work/arch-live"; mkdir -p "$d"; archive_repo "$d"
+git -C "$d" mv docs/sprint/archive/SPRINT-900-fixture.md docs/sprint/SPRINT-900-fixture.md >/dev/null 2>&1
+commit_msg "$d" "put the closed sprint back in the live directory"
+assert_finding "s11-closed-not-archived" "$d" "closed-sprint-not-archived"
+
+# --- S11.SPRINT finding 2: archived, but no INDEX row. SEPARABLE from the first on purpose ------
+# The two are different repairs -- one moves a file, one writes a line -- so this case leaves the
+# archive intact and removes only the row, proving the findings do not share a trigger (L-058).
+d="$work/arch-noindex"; mkdir -p "$d"; archive_repo "$d"
+grep -v '^- SPRINT-900 ' "$d/docs/sprint/INDEX.md" > "$d/docs/sprint/INDEX.tmp" && mv "$d/docs/sprint/INDEX.tmp" "$d/docs/sprint/INDEX.md"
+commit_msg "$d" "drop the index row, leave the archive alone"
+assert_finding "s11-index-row-missing" "$d" "sprint-index-row-missing"
+assert_absent  "s11-index-row-missing-separable" "$d" "closed-sprint-not-archived"
+
+# --- S11.LOGPAIR (a): the Plan moved and the log did not. Tree-readable, the common shape ---------
+d="$work/arch-strand"; mkdir -p "$d"; archive_repo "$d"
+git -C "$d" mv docs/sprint/archive/logs/SPRINT-900-fixture.md docs/sprint/logs/SPRINT-900-fixture.md >/dev/null 2>&1
+commit_msg "$d" "strand the log outside the archive"
+assert_finding "s11-logpair-stranded" "$d" "sprint-log-archived-apart-from-plan"
+
+# --- S11.LOGPAIR (b): both archived, but in DIFFERENT commits ------------------------------------
+# Needs real history: two archives a week apart satisfy every tree-shaped test while still leaving a
+# window where the Retro cites evidence that is not beside it.
+d="$work/arch-split"; mkdir -p "$d"
+mkdir -p "$d/docs/sprint/logs" "$d/docs/sprint/archive/logs" "$d/docs/changelog"
+git -C "$d" init -q >/dev/null 2>&1
+sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"
+printf '# Changelog\n\n> older → [docs/changelog/](docs/changelog/)\n\n## v2.1.0 --- current\n' > "$d/CHANGELOG.md"
+commit_msg "$d" "sprint(900): plan locked"
+close_at "$d/docs/sprint/SPRINT-900-fixture.md" "$d"
+commit_msg "$d" "sprint(900): record close_commit"
+git -C "$d" mv docs/sprint/SPRINT-900-fixture.md docs/sprint/archive/SPRINT-900-fixture.md >/dev/null 2>&1
+printf -- '---\nowner: M\nlast_updated: 2026-01-01\nstatus: current\nupdate_trigger: a sprint is archived\n---\n\n# Index\n\n- SPRINT-900 --- Fixture --- closed 2026-01-02 · deadbee\n' > "$d/docs/sprint/INDEX.md"
+commit_msg "$d" "sprint(900): archive the PLAN only --- the log stays live"
+git -C "$d" mv docs/sprint/logs/SPRINT-900-fixture.md docs/sprint/archive/logs/SPRINT-900-fixture.md >/dev/null 2>&1
+commit_msg "$d" "sprint(900): archive the log, a commit later"
+assert_finding "s11-logpair-different-commits" "$d" "sprint-log-archived-apart-from-plan"
+
+# Control: a sprint archived BEFORE the logs/ sibling existed has no pair to split. Without this
+# guard the rule reported 24 correct closes in this repository, because their archived logs were
+# written by ADR-014's one-time migration rather than by their own close (L-140: retain the case).
+d="$work/arch-nolog-predate"; mkdir -p "$d"
+mkdir -p "$d/docs/sprint/archive/logs" "$d/docs/changelog"
+git -C "$d" init -q >/dev/null 2>&1
+sprint_plan "$d" "" '- [ ] a thing'
+printf '# Changelog\n\n> older → [docs/changelog/](docs/changelog/)\n\n## v2.1.0 --- current\n' > "$d/CHANGELOG.md"
+commit_msg "$d" "sprint(900): plan locked --- no logs/ sibling exists yet"
+close_at "$d/docs/sprint/SPRINT-900-fixture.md" "$d"
+commit_msg "$d" "sprint(900): record close_commit"
+git -C "$d" mv docs/sprint/SPRINT-900-fixture.md docs/sprint/archive/SPRINT-900-fixture.md >/dev/null 2>&1
+printf -- '---\nowner: M\nlast_updated: 2026-01-01\nstatus: current\nupdate_trigger: a sprint is archived\n---\n\n# Index\n\n- SPRINT-900 --- Fixture --- closed 2026-01-02 · deadbee\n' > "$d/docs/sprint/INDEX.md"
+commit_msg "$d" "sprint(900): archive the Plan --- there was never a separate log"
+printf '# migrated later\n' > "$d/docs/sprint/archive/logs/SPRINT-900-fixture.md"
+commit_msg "$d" "migration: backfill archived logs long after the fact"
+assert_absent "s11-logpair-control-predates-logs-dir" "$d" "sprint-log-archived-apart-from-plan"
+
+# --- S11.CHANGELOG, invariant one: more than current + previous held inline ----------------------
+# Three MINOR series, not three blocks: §11's unit is the minor, and a repo shipping three patches
+# inside one minor is conformant. Counting blocks would fail it.
+d="$work/arch-cl3"; mkdir -p "$d"; archive_repo "$d"
+printf '\n## v1.9.0 --- far too old to still be here (2025-01-01)\n' >> "$d/CHANGELOG.md"
+commit_msg "$d" "leave a third minor inline"
+assert_finding "s11-changelog-three-minors" "$d" "changelog-not-rotated-at-minor"
+
+# Control: three BLOCKS inside two minors is conformant, and this is the boundary that separates
+# "counts minors" from "counts headings".
+d="$work/arch-cl-patches"; mkdir -p "$d"; archive_repo "$d"
+printf '\n## v2.1.1 --- a patch in the current minor (2026-01-03)\n' >> "$d/CHANGELOG.md"
+commit_msg "$d" "add a patch release inside the current minor"
+assert_absent "s11-changelog-control-patches-in-minor" "$d" "changelog-not-rotated-at-minor"
+
+# --- S11.CHANGELOG, invariant two: rotated files with no link line ------------------------------
+# The half this repository was actually failing when the rule was first run against it: 38 rotated
+# files and no pointer from the only file a reader opens.
+d="$work/arch-cl-nolink"; mkdir -p "$d"; archive_repo "$d"
+grep -v 'docs/changelog/' "$d/CHANGELOG.md" > "$d/CHANGELOG.tmp" && mv "$d/CHANGELOG.tmp" "$d/CHANGELOG.md"
+commit_msg "$d" "remove the link line, keep the rotated files"
+assert_finding "s11-changelog-no-link-line" "$d" "changelog-not-rotated-at-minor"
+
+# Control: no rotation has happened yet, so no link line is owed. Without this the rule would fire on
+# every young repository, which is a finding about age rather than about conformance.
+d="$work/arch-cl-norot"; mkdir -p "$d"; archive_repo "$d"
+rm -f "$d/docs/changelog/CHANGELOG-1.9.0.md"
+grep -v 'docs/changelog/' "$d/CHANGELOG.md" > "$d/CHANGELOG.tmp" && mv "$d/CHANGELOG.tmp" "$d/CHANGELOG.md"
+commit_msg "$d" "nothing rotated yet"
+assert_absent "s11-changelog-control-nothing-rotated" "$d" "changelog-not-rotated-at-minor"
+
+# --- S11.WHENITRUNS: archived BEFORE its own close --------------------------------------------
+# The phase question, and the only close-time trigger with an unambiguous mechanical boundary. Here
+# the archive commit does not descend from close_commit, so the Plan left the live directory while
+# the sprint was still open.
+d="$work/arch-phase"; mkdir -p "$d"
+mkdir -p "$d/docs/sprint/logs" "$d/docs/sprint/archive/logs" "$d/docs/changelog"
+git -C "$d" init -q >/dev/null 2>&1
+sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"
+printf '# Changelog\n\n> older → [docs/changelog/](docs/changelog/)\n\n## v2.1.0 --- current\n' > "$d/CHANGELOG.md"
+commit_msg "$d" "sprint(900): plan locked"
+git -C "$d" mv docs/sprint/SPRINT-900-fixture.md docs/sprint/archive/SPRINT-900-fixture.md >/dev/null 2>&1
+git -C "$d" mv docs/sprint/logs/SPRINT-900-fixture.md docs/sprint/archive/logs/SPRINT-900-fixture.md >/dev/null 2>&1
+printf -- '---\nowner: M\nlast_updated: 2026-01-01\nstatus: current\nupdate_trigger: a sprint is archived\n---\n\n# Index\n\n- SPRINT-900 --- Fixture --- closed 2026-01-02 · deadbee\n' > "$d/docs/sprint/INDEX.md"
+commit_msg "$d" "archive the sprint EARLY, while it is still open"
+ec=$(git -C "$d" rev-parse HEAD)
+printf '\n# a later, unrelated commit\n' >> "$d/CHANGELOG.md"
+commit_msg "$d" "sprint(900): close --- recorded AFTER the archive already happened"
+close_at "$d/docs/sprint/archive/SPRINT-900-fixture.md" "$d"
+commit_msg "$d" "sprint(900): record close_commit, later than the archive"
+assert_finding "s11-retention-wrong-phase" "$d" "retention-trigger-ran-in-wrong-phase"
+
+# The DoD's load-bearing distinction: DID NOT RUN is a different state, and only one of the two is
+# this finding. A closed sprint never archived must report closed-sprint-not-archived (S11.SPRINT)
+# and must NOT report a wrong phase -- the repairs differ ("do it" vs "you did it at the wrong
+# moment"), and a check conflating them emits a finding nobody can act on.
+d="$work/arch-notrun"; mkdir -p "$d"; archive_repo "$d"
+git -C "$d" mv docs/sprint/archive/SPRINT-900-fixture.md docs/sprint/SPRINT-900-fixture.md >/dev/null 2>&1
+git -C "$d" mv docs/sprint/archive/logs/SPRINT-900-fixture.md docs/sprint/logs/SPRINT-900-fixture.md >/dev/null 2>&1
+commit_msg "$d" "the close never archived anything"
+assert_finding "s11-notrun-is-not-wrong-phase-a" "$d" "closed-sprint-not-archived"
+assert_absent  "s11-notrun-is-not-wrong-phase-b" "$d" "retention-trigger-ran-in-wrong-phase"
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "SPRINT-FAMILY FIXTURES: all green"

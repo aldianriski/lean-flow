@@ -56,17 +56,13 @@ one: a ratio would improve every time the standard declines to automate somethin
 
 **§ Covered today and § Artefacts moved → [`conformance-coverage.md`](conformance-coverage.md)** at
 SPRINT-079's promote (§2 Growth rule, 230 > 130). The counts stay here, where they reconcile.
-## `build` — 8 rules, each with the finding its check will fire
+## `build` — 4 rules, each with the finding its check will fire
 
 A check specified without its finding name is a half-shipped gate (L-058). Every row ships with a
 **retained** must-FAIL fixture proving that exact string fires (TD-012).
 
 | Rule | Named finding |
 |---|---|
-| `S11.CHANGELOG` | `changelog-not-rotated-at-minor` |
-| `S11.SPRINT` | `closed-sprint-not-archived` · `sprint-index-row-missing` |
-| `S11.LOGPAIR` | `sprint-log-archived-apart-from-plan` |
-| `S11.WHENITRUNS` | `retention-trigger-ran-in-wrong-phase` |
 | `S12.SECRETS` | `secret-committed` |
 | `S12.BACKUPS` | `database-backup-committed` |
 | `S12.DESIGNSRC` | `design-source-committed` |

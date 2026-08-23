@@ -87,7 +87,7 @@ produce it, and a control proving it stays silent on the compliant shape.
 - [x] Rows migrate register → coverage doc; counts reconcile to **51** — *Verify: the engine's own `coverage:` line, not this Plan's arithmetic* ✓ engine reads `37 checkable have an assertion; 14 unchecked` = 51; register § `build` 12 → 8
 
 ### T2 — Cover §11's archival rules `[size: M · risk: low · class: execution · AFK]`
-Layers: `scripts/lib/conformance-engine.sh` · `evals/run-sprint-family-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md`
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-sprint-family-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md` · `CHANGELOG.md` *(added at execution — the rule found a real missing link line and this task repaired it; L-100)*
 Depends-on: T1
 Cites: the register's § `build` (§11's four archival rows) · §11's Conformance table · ADR-014 · L-105 · L-058 · `S11.SPRINT` · `S11.LOGPAIR` · `S11.CHANGELOG` · `S11.WHENITRUNS`
 
@@ -100,13 +100,13 @@ phase** from **did not run**, which are different states and only one is a findi
 `changelog-not-rotated-at-minor`; `S11.WHENITRUNS` → `retention-trigger-ran-in-wrong-phase`.
 
 **DoD:**
-- [ ] Ids and findings re-derived from the register — *Verify: the § `build` §11 rows*
-- [ ] **Run against this repository first**, where SPRINT-079's retention just executed — *Verify: `S11.LOGPAIR` must PASS on a Plan and log archived in one commit (`75a4fbd`), and `S11.CHANGELOG` must PASS on a root carrying exactly current + previous*
-- [ ] `S11.WHENITRUNS` distinguishes **wrong phase** from **not run** — *Verify: two fixtures, one per state; a check that conflates them reports a finding nobody can act on*
-- [ ] `S11.SPRINT`'s two findings are separable — an unarchived sprint and a missing INDEX row are different repairs and must not share one line (L-058)
-- [ ] Retained fixture + control per finding; git-backed where the rule is defined over history
-- [ ] Discrimination shown as in T1
-- [ ] Rows migrate; counts reconcile to **51**
+- [x] Ids and findings re-derived from the register — *Verify: the § `build` §11 rows* ✓ re-read at execution; four rows, five findings (S11.SPRINT carries two)
+- [x] **Run against this repository first**, where SPRINT-079's retention just executed — *Verify: `S11.LOGPAIR` PASSes on the pair archived in one commit (`75a4fbd`, both renames) ✓ and `S11.CHANGELOG` confirms the root carries exactly `1.53` + `1.52` inline ✓. It also found a **real** gap the DoD did not predict: 38 rotated files and **no link line**, repaired here*
+- [x] `S11.WHENITRUNS` distinguishes **wrong phase** from **not run** — *Verify: two retained cases. `s11-retention-wrong-phase` fires when the archive does not descend from its own `close_commit`; `s11-notrun-is-not-wrong-phase-a/b` prove a never-archived close reports `closed-sprint-not-archived` and stays **silent** on the phase finding*
+- [x] `S11.SPRINT`'s two findings are separable — an unarchived sprint and a missing INDEX row are different repairs and must not share one line (L-058) — *Verify: `s11-index-row-missing-separable` removes only the row, leaves the archive intact, and gets the index finding **without** the archive finding*
+- [x] Retained fixture + control per finding; git-backed where the rule is defined over history — *Verify: 18 new cases (38 → 56), ten of them controls; `s11-logpair-different-commits` and `s11-retention-wrong-phase` build real history. Harness `all green`, 56 pass / 0 fail*
+- [x] Discrimination shown as in T1 — *Verify: four seeded breaks, each 0-line-delta and still parsing, probed against **two** conformant repos. Each reddens exactly one and leaves the other green. Two seeds initially failed to redden and were rebuilt rather than accepted (L-142)*
+- [x] Rows migrate; counts reconcile to **51** — *Verify: engine reads `41 checkable have an assertion; 10 unchecked` = 51; register § `build` 8 → 4*
 
 ### T3 — Cover §12's git-boundary rules `[size: M · risk: med · class: execution · HITL]`
 Layers: `scripts/lib/conformance-engine.sh` · `evals/run-sprint-family-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md`
@@ -228,6 +228,10 @@ the engine's report unchanged, and TD-073 is resolved or explicitly re-filed.
 | `docs/research/conformance-coverage.md` | T1 | New row for the four, recording the derived thresholds and both defects real input caught | low | engine `coverage:` 37 + 14 = 51 |
 | `scripts/lib/conformance-engine.sh` | T5 | Driver bookkeeping made spawn-free — `fn=`/`pid=` by parameter expansion (WHY: two command substitutions + an external `tr` per rule were the entire runtime, 11.1s of a 10.9s run) | med | equivalence over all 100 ids, 0 mismatches; report byte-identical on 2 repos; harness 9m24s → 3m20s |
 | `TECH-DEBT.md` | T5 | TD-073 → resolved with its wrong cause kept and corrected; TD-075 filed for the surviving half (WHY: TD-073's own Re-file clause named the split) | low | id derived from ledger max 074, not remembered (L-143) |
+| `scripts/lib/conformance-engine.sh` | T2 | Four §11 archival assertions, five findings; `_s11_archived_at` + `_s11_log_predated_archive` (WHY: §11's archival half was 4 of the register's remaining 8 `build` rules) | med | 18 cases, 10 controls; 4 seeded breaks each reddening one probe repo only |
+| `evals/run-sprint-family-fixtures.sh` | T2 | `close_at` helper + 18 retained cases (WHY: `close_commit` appended past the frontmatter is invisible to `_fm_real`, which made a must-FAIL silent AND its control vacuous in the same run) | low | harness 56 pass / 0 fail, 5m06s |
+| `CHANGELOG.md` | T2 | Add the §11 link line to `docs/changelog/` (WHY: a **real** finding — 38 rotated files with no pointer from the only file a reader opens; rotation without it hides the record rather than compressing it) | low | `S11.CHANGELOG` PASS |
+| `docs/research/conformance-dispositions.md` · `conformance-coverage.md` | T2 | § `build` 8 → 4; coverage row recording the two history-defined rules and the narrow phase scope | low | engine `coverage:` 41 + 10 = 51 |
 
 ## Retro
 

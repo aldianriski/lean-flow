@@ -9,6 +9,9 @@ status: current
 
 <!-- Prepend new sprints — newest first. Append-only; never edit past blocks. -->
 
+> **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
+> each new MINOR and reachable only from here (STANDARD §11).
+
 ---
 
 ## v1.53.0 — The Undifferentiated Middle (2026-08-23)

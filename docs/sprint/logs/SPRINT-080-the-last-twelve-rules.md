@@ -219,3 +219,64 @@ nothing **measures** the thing it protects. This sprint has now paid that cost t
 scaling, T5's root cause). A cost regression check that times the engine against a fixed tiny input
 and fails on a threshold read from somewhere would have caught both at authorship. That is TD-071's
 subject and it is now overdue rather than theoretical.
+
+### 2026-08-23 | progress | T2 — §11's archival rules, and two more artefacts real input caught
+
+**Shipped.** `S11.SPRINT` → `closed-sprint-not-archived` · `sprint-index-row-missing` ·
+`S11.LOGPAIR` → `sprint-log-archived-apart-from-plan` · `S11.CHANGELOG` →
+`changelog-not-rotated-at-minor` · `S11.WHENITRUNS` → `retention-trigger-ran-in-wrong-phase`.
+Four rules, five findings, re-derived from the register rather than from the Plan.
+
+**D2 again, and again the first draft was wrong about this repository rather than the reverse.**
+
+*Artefact one — 79 findings, one per archived sprint.* `sid=${base%%-*}` stops at the **first**
+hyphen, so every `SPRINT-045-gate-precision.md` resolved to the bare word `SPRINT`, matched no INDEX
+row, and reported the entire archive as unindexed. The tell was the count, not the logic: a rule that
+fires on every row is reporting itself.
+
+*Artefact two — 24 sprints reported as split Plan/log pairs.* The draft compared
+`git log -1 --follow` for each file, which returns the **newest commit to touch** the path — for
+SPRINT-045 that was a later release commit for the Plan and a later labelling commit for the log,
+neither of them the archive. Replaced with oldest-first `--diff-filter=A`, the commit each file
+*first appeared* at its archive path, which is the event §11 constrains.
+
+*And a third thing, which is not an artefact.* Even with the correct commit, pre-`logs/` sprints
+still differ — `logs/` arrived with **ADR-014 at SPRINT-047**, so earlier sprints had no separate log
+to move and their archived logs were written by that one-time migration. Judging them reports a
+decade of correct closes against a rule about a file that did not exist. So the same-commit half now
+binds only when the live log existed in the archive commit's **parent**, and the report counts those
+sprints separately rather than as passes.
+
+**One real finding, and it was repaired.** `S11.CHANGELOG` reported that `docs/changelog/` holds
+**38 rotated files** and root `CHANGELOG.md` carried **no link line** to them. §11 pairs the move
+with one pointer, and without it rotation does not compress the record — it hides it, since the root
+file is the only entry point. Triaged as real (not artefact) and fixed by adding the pointer.
+`CHANGELOG.md` is declared on T2's `Layers:` accordingly (L-100).
+
+**Result on this repository: all four PASS**, and the counts reconcile against the archive three
+ways — `S11.SPRINT` 79 archived each with a row; `S11.LOGPAIR` **32 + 46 + 1 = 79**;
+`S11.WHENITRUNS` **76 + 3 = 79**. The 32 pairs plus the 1 predating equal the 33 archived logs on
+disk, which is the second query the first one needed.
+
+**`S11.WHENITRUNS` is deliberately narrow, and the narrowness is the design.** Only the sprint
+archive is phase-checked, against the sprint's own `close_commit` — two commits, no interpretation.
+The scan-based triggers are **not** phase-checked: promote is a window rather than a commit, and a
+rotation landing just outside it would be a finding no adopter could act on (§14). **Not-run is a
+different state and stays under S11.SPRINT**, pinned by two retained cases.
+
+**A fixture bug worth recording, because it failed in both directions at once.** The
+`S11.WHENITRUNS` must-FAIL case did not fire *and* its control passed — both were reading nothing,
+because `close_commit` was appended to the **end** of the sprint file rather than into the
+frontmatter `_fm_real` reads. A green control that is green for the wrong reason is exactly L-142's
+shape, and only the must-FAIL failing made it visible. Fixed with a `close_at` helper that writes
+into the header; the existing `close_the_sprint` now delegates to it.
+
+**Discrimination (L-137 · L-142): four seeded breaks against TWO conformant probe repos** — one with
+a normal pair, one with the migration shape. Each seed reddens exactly one repo and leaves the other
+green; restore hash-verified each time. **Two seeds initially failed to redden and were rebuilt
+rather than accepted**: the LOGPAIR guard needed the migration-shaped repo to be exercised at all,
+and the CHANGELOG seed was a no-op `sed` that would have scored as a pass.
+
+**Harness: 38 → 56 cases, and 9m24s → 5m06s.** More than twice the cases in a bit over half the
+time, which is T5's fix showing up where the trip-wire was set. Coverage `37 → 41` in-engine,
+unchecked `14 → 10`, `41 + 10 = 51`. Register § `build` **8 → 4** — only §12 remains.
