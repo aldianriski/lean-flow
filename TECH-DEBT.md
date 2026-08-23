@@ -63,6 +63,15 @@ status: current
 > the epic at 215/200, **TD-070** gains a *sixth* §2 parser, **TD-071** gains a fifth eval harness.
 > The ledger now holds **25 rows — 22 open, 3 not-open**. Nothing was resolved this sprint.
 > against a census that matches the file instead of re-deriving one that does not.
+>
+> **Aging sweep — SPRINT-080 promote (2026-08-23).** **16 of 22 open rows** are ≥3 sprints
+> unaddressed: TD-064 (4) · TD-067 (4) · TD-068 (4) · TD-066 (5) · TD-063 (6) · TD-062 (7) ·
+> TD-061 (8) · TD-060 (9) · TD-059 (10) · TD-053 (17) · TD-052 (18) · TD-051 (19) · TD-050 (20) ·
+> TD-049 (21) · TD-047 (23) · TD-045 (24). **All held; none is `severity: high`, so nothing
+> auto-escalates to Backlog P1.** Not aged (6): TD-069 · TD-070 · TD-071 · TD-073 · TD-074 (1 each) ·
+> TD-072 (2). Reconciled: 16 + 6 = 22 open, plus the three not-open = 25 rows on file.
+> **Deletion clock:** TD-048 · TD-057 · TD-065 all closed at Sprint-078, so 2 sprints — due at
+> **Sprint-081**, not this promote.
 
 - **TD-074** severity: minor | status: open | created: Sprint-079
   - Summary: **`S10.FOURBUCKETS` asserts only that a close reached *none* of the four durable homes,

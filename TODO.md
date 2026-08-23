@@ -18,10 +18,13 @@ status: current
 
 ## Active Sprint
 
-> _(none — SPRINT-079 closed 2026-08-23, 34 of 34 DoD. **EPIC-004 stays open**: § Closed-when 2 is
-> the last condition and its residual is gone — the eleven `scope-out` rules are marked in the spec —
-> but the coverage half reads **39 of 51**. The remaining **12 `build` rules are TASK-250 · TASK-251 ·
-> TASK-252, exactly**, so SPRINT-080 is the epic-closing sprint and needs no new decomposition.)_
+> **SPRINT-080 — The Last Twelve Rules** → [docs/sprint/SPRINT-080-the-last-twelve-rules.md](docs/sprint/SPRINT-080-the-last-twelve-rules.md)
+>
+> _Four tasks — **T1 TASK-250** (§11 ledger-retention) · **T2 TASK-251** (§11 archival) ·
+> **T3 TASK-252** (§12 git-boundary) · **T4** rule § Closed-when 2 and close EPIC-004 if it ticks.
+> The three coverage tasks are **exactly** the register's remaining 12 `build` rules, verified by
+> diff at promote. Coverage 39 → 51 of 51. Fully sequential — all four share the engine, the fixture
+> harness and both register docs._
 
 ---
 
