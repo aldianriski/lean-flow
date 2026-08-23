@@ -3,7 +3,7 @@ sprint: 080
 slug: the-last-twelve-rules
 owner: Maintainer
 last_updated: 2026-08-23
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 

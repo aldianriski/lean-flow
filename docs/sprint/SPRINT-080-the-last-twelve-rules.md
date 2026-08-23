@@ -4,7 +4,7 @@ slug: the-last-twelve-rules
 epic: EPIC-004
 owner: Maintainer
 last_updated: 2026-08-23
-status: active
+status: closed
 plan_commit: ad4932d
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -242,15 +242,70 @@ the engine's report unchanged, and TD-073 is resolved or explicitly re-filed.
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (STANDARD §10):
-     shipped → CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md. -->
-
 **Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+
+**No contradiction, and one uncomfortable pattern: the rules were found, loaded, and still did not
+fire until a number disagreed.** L-108 (match by shape, not substring) was cited *in a comment above
+the line that then violated it* — `S11.LEARNINGS`'s first draft grepped a whole heading for
+`[status: promoted]` and reported an entry that is `[status: active]` and merely quotes the string.
+L-144 recurred a **fourth** time, one level below where it was last found: in the engine's own driver
+rather than in an assertion. L-152 fired exactly as written — growing a finding's text silently
+disarmed two retained assertions that matched the old sentence's tail. L-009 and L-142 each fired
+once, inside T4, within minutes of each other.
+
+Every one of these was caught by **a second number disagreeing** or by a case going red — never by
+recalling the rule. That is the sprint's real finding about itself.
 
 **Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents).
 
+**Inline, single context, no dispatch** — session policy forbade sub-agents, so the orchestrator's
+"every Implement step dispatches" rule was overridden and stated rather than silently skipped. Six
+task commits plus one integration commit. The dominant cost was **waiting on checks, not writing
+them**: the engine at ~11s per run against ~50 invocations per gate, a ~13-minute aggregate gate run
+before T5 and repeatedly after, and a fixture harness that peaked at 9m24s. T5 cut the harness to
+3m20s and the engine by roughly half; the aggregate gate still dominates and is TD-071's subject.
+
 **Worked**
+
+- **D2 — run each rule against this repository before writing its fixture.** It found **six**
+  defects, and every one was in the check rather than in the tree: 39 conformant LEARNINGS entries
+  reported, an `[status: active]` entry reported as promoted, 79 archived sprints reported as
+  unindexed, 24 correct closes reported as split pairs, and §12c's one explicit carve-out about to be
+  reported as a violation. A fixture is built to the shape its author already has in mind; real input
+  is not.
+- **Building the benign lookalike FIRST** (T3). Six controls — `.env.example`, a `.pem` holding only
+  a public certificate, a fake seed, a used asset, a shared `extensions.json`, a placeholder-only
+  `.env` — written before any detector, so each detector was designed to clear a concrete file rather
+  than judged against one afterwards. Each rule now reports a **non-zero shape-match examined and
+  cleared**, which is what separates a control that is reached from one that passes vacuously.
+- **Reading the gate's own printed verdict line, never the wrapper's status** (L-120). It caught a
+  red gate at wrapper **exit 0** three separate times this sprint.
+- **Measuring before fixing** (T5). TD-073's stated cause did not survive one timing run.
 
 **Friction**
 
+- **The trip-wire fired one task earlier than § Out expected**, and the estimate that set it was
+  wrong about *what* was expensive, not just how expensive.
+- **Frozen criteria that could not be satisfied.** T3's DoD named the engine's `coverage:` line as
+  proof of "51 of 51", a line that counts only in-engine assertions and can never print it. Amended
+  by owner ruling. This is the third sprint in four to find one.
+- **A concurrent writer in the same tree.** Six files changed by a parallel session mid-sprint. Two
+  commits had already been staged with `git add -A` before it was noticed — both verified clean, but
+  only by luck of timing.
+
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+
+1. **A rule cited in the comment above the line that violates it is not a guard — it is decoration.**
+   Four sightings this sprint, all of loaded, correctly-placed rules. What caught every one was an
+   independent second number or a red case. Candidate: for any rule whose failure mode is *green*,
+   the promotion is not finished until something **measures** the thing it protects. L-147 already
+   says this about cost; this sprint says it about correctness too.
+2. **A control is only a control once it is reached.** Two vacuous controls shipped and were caught
+   only because a sibling must-FAIL failed: §11's `S11.BACKLOG` scoping (every candidate already sat
+   inside the scoped section) and `S11.WHENITRUNS` (both cases read a `close_commit` written past the
+   frontmatter). Candidate: a control must report **what it examined**, not merely that it stayed
+   silent — the shape T3's four §12 rules adopted.
+3. **An epic's own close is a two-part event and tooling assumed one.** `check-epic-archive.sh`
+   enforced half of a test §11 calls "a genuine two-part test", making the correct state — epic
+   finished, the sprint finishing it still open — unrepresentable.
+

@@ -22,13 +22,37 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-154**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-157**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
 
 ---
+## L-157 [tags: tooling] [status: active]: **When a spec calls something a two-part test, a checker that implements one half passes every day and fails in exactly the case the second half exists for — and the half that is missing is invisible, because the half that is present works.** §11's archival row states its trigger as *"every member sprint closed **and** the epic's Closed-when conditions all `[x]`"*, and its Conformance row spells out *"a genuine **two-part** test"* in those words. `check-epic-archive.sh` read `member_sprints` **zero times** across five sprints of green gates. It was wrong in both directions at once: it **demanded** an archive §11 forbids (SPRINT-080 closed EPIC-004 while SPRINT-080 itself was an open member, and the checker immediately failed the gate), and it would have **accepted** an epic archived while a member sprint ran — which is the silent case §11 names in its own text, *"never archive on member-sprint count alone"*. **What makes this hard to see in review:** the implemented half is correct, its findings are well-worded, and its fixtures are green — five of them, all passing, none exercising the absent half. The check reads as finished because everything it does, it does properly. **The diagnostic: for any rule whose spec text contains "and", write the truth table before the code and confirm a fixture exists for each row.** Two conditions have four states and this checker could only ever distinguish two. Distinct from L-058 (a gate with no must-FAIL at all) — here the must-FAIL fixtures existed and were good; the *predicate* was half-written.
+- seen: Sprint-080 (T4; found by closing an epic the checker then refused to let sit)
+- count: 1
+- promoted: no
+- related: L-058 (the guard whose failure mode is silence) · L-105 (a guard placed in time) · ADR-014
+
+---
+
+## L-156 [tags: tooling] [status: active]: **A control that stays silent has not proved anything until it proves it was REACHED — "no finding" and "never examined" are the same output.** SPRINT-080 shipped two controls that passed vacuously and caught both only because a sibling must-FAIL went red. `S11.BACKLOG`'s § Backlog scoping was untestable because every candidate line already sat inside the scoped section, so deleting the scope changed no verdict. `S11.WHENITRUNS`'s must-FAIL **and** its control both read a `close_commit` that had been appended past the frontmatter the reader parses — both were reading nothing, and the control's green was indistinguishable from a correct exclusion. **The fix is a shape, not more diligence: make the passing verdict report its own denominator.** §12's four rules now print *"N shape-match(es) examined and cleared on content"*, and a control that reports **0 examined** is visibly untested rather than quietly green — which is how SPRINT-080 knew its own repository could not exercise the §12 content confirmations at all and that the lookalike fixtures were doing that work. **The general form: a negative assertion needs a positive witness.** L-142 guards the moment a break is seeded; this guards the moment a control is written, where nothing is broken and nothing looks wrong.
+- seen: Sprint-080 (T2 and T3; two vacuous controls in one sprint)
+- count: 1
+- promoted: no
+- related: L-142 (a break that does not redden its case has tested nothing) · L-146 (a retained fixture decaying into a vacuous pass) · L-058
+
+---
+
+## L-155 [tags: process] [status: active]: **A promoted rule quoted in the comment directly above the line that breaks it is decoration, not a guard — and this sprint broke four of them while citing three by name.** `S11.LEARNINGS`'s first draft grepped an entire heading for `[status: promoted]` and reported an entry that is `[status: active]` and merely *quotes* the string — under a comment citing **L-108**, the rule against exactly that. L-144 recurred a **fourth** time, one level below its last sighting, in the engine's own driver. L-152 fired as written when growing a finding's text disarmed two retained assertions. L-009 and L-142 each fired inside a single task. **Every one was caught by a second number disagreeing or by a case going red. Not one was caught by recalling the rule** — including the ones whose text was on screen. **L-147 already says this about cost** — *"when a promoted rule keeps recurring, the placement is not the problem — the absence of a measurement is"* — and SPRINT-080 says the same about **correctness**: placement answers *where do the people who can hit this read*, and has no answer for *what if they read it and it still does not bind*. **So a promotion is not finished when the rule is written where it will be read; it is finished when something automatic changes state if the rule is broken.** The concrete test: for each promoted rule, name the check that would go red — and if there is none, the promotion is a note.
+- seen: Sprint-080 (four promoted rules broken in one sprint, three of them cited in the breaking code)
+- count: 1
+- promoted: no
+- related: L-147 (the measurement, not the placement) · L-108 · L-144 · L-152 · L-009 · L-142 · TD-071
+
+---
+
 ## L-154 [tags: tooling] [status: active]: **A zero-padded integer is an OCTAL literal in shell arithmetic, so `$(( 079 - 075 ))` is an error rather than a subtraction — and the failure is a silent truncation, not a message.** SPRINT-079 T5 read the sprint counter from the active Plan's frontmatter (`sprint: 079`) to age tech-debt rows. The shell aborted the whole engine with *value too great for base* on **stderr**, and stdout simply stopped after the last rule it had already printed: no error line in the report, no `coverage:` line at the end, and the four §10 rules absent entirely. **The absence is what makes it dangerous** — a report that ends early looks exactly like a report on a repository with fewer rules, and the exit code is non-zero either way because findings were already printed. **I read the missing rules as "the assertions are not registered" and went looking in the wrong file**, which is L-108's shape a second time in the same session; what actually resolved it was reading stderr rather than re-reading the code. Zero-padding is this standard's own convention (`SPRINT-079`, `TD-072`, `ADR-028`), so any adopter following it hits this the moment a checker does arithmetic on an id. **The general rule: an id is a string until you prove otherwise, and the proof is stripping the padding at the boundary where it becomes a number.** Sibling of L-120 — there the status came from the wrong reporter, here the report ends and says nothing about why.
 - seen: Sprint-079 (T5; the engine exited mid-report on its own repository)
 - count: 1

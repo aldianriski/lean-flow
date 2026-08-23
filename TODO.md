@@ -18,13 +18,9 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-080 — The Last Twelve Rules** → [docs/sprint/SPRINT-080-the-last-twelve-rules.md](docs/sprint/SPRINT-080-the-last-twelve-rules.md)
->
-> _Four tasks — **T1 TASK-250** (§11 ledger-retention) · **T2 TASK-251** (§11 archival) ·
-> **T3 TASK-252** (§12 git-boundary) · **T4** rule § Closed-when 2 and close EPIC-004 if it ticks.
-> The three coverage tasks are **exactly** the register's remaining 12 `build` rules, verified by
-> diff at promote. Coverage 39 → 51 of 51. Fully sequential — all four share the engine, the fixture
-> harness and both register docs._
+> _No active sprint._ SPRINT-080 closed 2026-08-23 and **EPIC-004 closed with it** — the standard is
+> checkable end to end: 51 of 51 rules map to a check or carry an explicit non-evaluated mark, and the
+> register's § `build` bucket is empty. Next sprint promotes from the Backlog below.
 
 ---
 
@@ -35,54 +31,6 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
-
-- [ ] TASK-250 — Cover §11's ledger-retention rules in the engine  [size: M] [risk: low] [AFK]
-      class:      execution
-      done-when:  S11.TDDELETE → `resolved-td-row-past-retention`; S11.TODOCAP →
-                  `todo-over-cap-at-promote`; S11.LEARNINGS → `promoted-learning-not-collapsed`;
-                  S11.BACKLOG → `shipped-backlog-entry-retained`. Retained fixture per finding + controls
-      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
-                  docs/research/conformance-dispositions.md
-      depends-on: none
-      assumes:    a ledger's legend/header line is not a row — the census trap this repo has hit twice
-                  (L-108); anchor to position, and cross-check open+resolved against the total
-      tracker:    EPIC-004 § Closed-when 2 · dispositions § build
-      origin:     decomposer
-      state:      ready
-
-- [ ] TASK-251 — Cover §11's archival rules in the engine  [size: M] [risk: low] [AFK]
-      class:      execution
-      done-when:  S11.SPRINT → `closed-sprint-not-archived` · `sprint-index-row-missing`;
-                  S11.LOGPAIR → `sprint-log-archived-apart-from-plan`; S11.CHANGELOG →
-                  `changelog-not-rotated-at-minor`; S11.WHENITRUNS →
-                  `retention-trigger-ran-in-wrong-phase`. Five findings, retained fixture each + controls
-      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
-                  docs/research/conformance-dispositions.md
-      depends-on: none
-      assumes:    S11.WHENITRUNS is phase-sensitive — it is L-105's temporal rule as a check, so the
-                  fixture must distinguish "ran in the wrong phase" from "did not run"
-      tracker:    EPIC-004 § Closed-when 2 · dispositions § build
-      origin:     decomposer
-      state:      ready
-
-- [ ] TASK-252 — Cover §12's git-boundary rules in the engine  [size: M] [risk: med] [HITL]
-      class:      execution
-      done-when:  S12.SECRETS → `secret-committed`; S12.BACKUPS → `database-backup-committed`;
-                  S12.DESIGNSRC → `design-source-committed`; S12.GENERATED →
-                  `generated-artifact-committed`. Retained fixture per finding + a PASS control
-                  proving the check does NOT fire on a benign lookalike
-      touches:    scripts/lib/conformance-engine.sh · evals/run-conformance-engine-fixtures.sh ·
-                  docs/research/conformance-dispositions.md
-      depends-on: none
-      assumes:    **false positives are the risk here, not false negatives** — the register's own (c)
-                  note refuses filename heuristics because flagging `contract.md` in a contract-testing
-                  repo is worse than no scan. The benign-lookalike control is the load-bearing fixture,
-                  and how far the detection goes is a G2 design call, not settled at intake
-      tracker:    EPIC-004 § Closed-when 2 · dispositions § build · dispositions § scope-out (c)
-      origin:     decomposer
-      state:      ready
-
-### P2 — Quality / Polish
 
 - [ ] TASK-238 — Re-run the foreign-repo artefact triage once coverage is past the shape-bound rules  [size: S] [risk: low] [HITL]
       class:      decision

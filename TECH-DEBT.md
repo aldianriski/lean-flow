@@ -73,6 +73,28 @@ status: current
 > **Deletion clock:** TD-048 · TD-057 · TD-065 all closed at Sprint-078, so 2 sprints — due at
 > **Sprint-081**, not this promote.
 
+- **TD-076** severity: minor | status: open | created: Sprint-080
+  - Summary: **Controls across the existing check families report only silence, so a control that is
+    never REACHED is indistinguishable from one that correctly excluded something.** SPRINT-080
+    shipped two vacuous controls and caught both only because a sibling must-FAIL went red; §12's
+    four rules were then written to print their own denominator (*"N shape-match(es) examined and
+    cleared on content"*), and the older families were not retrofitted.
+  - Evidence: `S11.BACKLOG`'s § Backlog scoping could not be exercised by its control at all — every
+    candidate line already sat inside the scoped section, so deleting the scope changed no verdict,
+    and the seeded break stayed green. `S11.WHENITRUNS`'s must-FAIL *and* its control both read a
+    `close_commit` written past the frontmatter `_fm_real` parses: both were reading nothing, in
+    opposite directions, in the same run.
+  - Impact: every `assert_absent`-style control in `run-sprint-family-fixtures.sh`,
+    `run-conformance-engine-fixtures.sh` and the standalone harnesses is currently trusted on its
+    silence. The failure is **green**, so nothing in a diff or a report shows it — L-058's shape one
+    level in, arriving at the control rather than at the check.
+  - Mitigation *(hypothesis, not a plan)*: give each rule's PASS line a denominator, as §12's four
+    now do, and have `assert_absent` optionally require it to be non-zero. Cheaper alternative: a
+    one-off audit that seeds a break per control and lists the ones that stay green — which is the
+    measurement L-155 argues every promoted rule needs anyway.
+  - **Revisit-if** a third vacuous control is found, or when L-155/L-156 reach `count: 2` at a
+    promote review.
+
 - **TD-075** severity: minor | status: open | created: Sprint-080
   - Summary: **Ten of `run-sprint-family-fixtures.sh`'s cases need no git at all, and are parked
     behind `QA_FULL=1` alongside the ones that do — so guards for rules that run on every default
