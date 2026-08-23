@@ -326,12 +326,12 @@ standard deliberately leaves to a human:
 
 ```
 FAIL  ownership-header-missing: docs/architecture.md -- no YAML frontmatter block; §3 makes the
-      ownership header mandatory on every doc
+      ownership header mandatory on every doc (S3.SCHEMA)
 GAP   S2.F-FILE  -- rule-unimplemented: the spec marks this mechanical at level Structural and this
       engine has no assertion for it yet ... it is a gap in THIS ENGINE, so it does not enter the
       level below or the exit code
       level: none -- Structural not yet reached. 2 finding(s) at Structural prevent it
-      coverage: 6 checkable rule(s) have an assertion in this engine; 56 are unchecked
+      coverage: 33 checkable rule(s) have an assertion in this engine; 18 are unchecked
 ```
 
 Three things it will not do:
@@ -354,7 +354,7 @@ A declared file replaces the built-in default, so "only these roles" is sayable.
 rules still check **Base** — §6 makes that every dev repo's by trigger — and the rest tell you which
 fact is missing instead of guessing one.
 
-Coverage is growing: **24 of the standard's 62 checkable rules** have an assertion in the engine today,
+Coverage is growing: **33 of the standard's 51 checkable rules** have an assertion in the engine today,
 with the rest reported as gaps by name. That number is printed by every run, so it never has to be taken
 on trust — and it is the engine's own count, not the repo's wider checker set.
 
@@ -471,7 +471,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-08-23 · status: current · v1.52.0</sub>
+<sub>Doc owner: Maintainer · last updated 2026-08-23 · status: current · v1.53.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge

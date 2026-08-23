@@ -4,7 +4,7 @@ slug: the-undifferentiated-middle
 epic: EPIC-004
 owner: Maintainer
 last_updated: 2026-08-23
-status: active
+status: closed
 gates_signed: G1,G2 @ 2aea242
 plan_commit: d692b93
 close_commit: [sha — set at close]
@@ -105,7 +105,7 @@ assert it.
 - [x] `spec/CHANGELOG.md` updated at the right level  ✓ spec **0.8.0 MINOR** on 0.5.0's test — a Medium adopter sees a doc set derived where none was, with `docs/DECISIONS.md` named in it. No rule added, so classification stays 100 and checkable stays 51
 
 ### T4 — Cover §9's sprint-file family in the engine `[size: M · risk: med · class: execution · HITL]`
-Layers: `scripts/lib/conformance-engine.sh` · `evals/run-sprint-family-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md`
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-sprint-family-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md` · `scripts/qa-check.sh`
 Depends-on: T1
 Cites: the register's § `build` (the five §9 rows and their findings) · §9's Conformance table · L-058 · L-142 · TD-012 · `S9.TWOFILES` · `S9.LOGDIR` · `S9.PLANFROZEN` · `S9.SCOPECHANGE` · `S9.VERIFYCLAUSE` · `S4.APPEND` · `evals/run-attestation-fixtures.sh` · `run-attestation-fixtures.sh` (the git-fixture idiom this follows — read, never touched)
 
@@ -230,19 +230,74 @@ still discriminate.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| | | | | |
+| `spec/STANDARD.md` | T1·T2·T3 | §14 gains two marks; 11 rules re-marked; §2 gains 3 rows; §6 amended ×2. 0.5.0 → 0.8.0 | Med | engine fixtures · `conformance.sh` |
+| `spec/CHANGELOG.md` | T1·T2·T3 | one entry per version, each stating the MINOR test it met | Low | — |
+| `scripts/lib/conformance-engine.sh` | T1·T2·T4·T5·T6 | 2 mark arms · rank-4 tier mapping · 9 assertions · rule attribution · `_dec` · `_s2_cap_for` | Med | 3 harnesses, all green |
+| `evals/run-sprint-family-fixtures.sh` | T4·T5 | new git-backed harness, 23 cases (10 must-FAIL + 13 controls) | Low | self |
+| `evals/run-conformance-engine-fixtures.sh` | T1·T2·T3·T6 | 2 fixtures replaced, not deleted; 5 added | Low | self |
+| `scripts/qa-check.sh` | close | register the new harness opt-in (it was shipped unwired — the gate caught it) | Low | the gate's own leg |
+| `docs/research/conformance-coverage.md` | promote·T4·T5 | new sibling; §§ Covered today + Artefacts moved verbatim; 30 → 39 covered | Low | `check-doc-caps.sh` |
+| `docs/research/conformance-dispositions.md` | promote·T1·T4·T5 | 230 → 120 by split; `scope-out` dissolved; `build` 21 → 12 | Low | `check-doc-caps.sh` |
+| `docs/adr/ADR-028-*.md` · `docs/DECISIONS.md` | T1 | the two-marks decision + its index row | Low | `check-adr-family` |
+| `docs/epic/EPIC-004-conformance.md` | promote·T1 | member row; § Closed-when 2 amended, prior wording preserved | Low | `check-epic-archive.sh` |
+| `README.md` | close | 3 stale conformance facts refreshed — an installer was being shown an older engine's output | Low | read against a live run |
+| `docs/LEARNINGS.md` · `TECH-DEBT.md` · `TODO.md` · `CHANGELOG.md` | close | the four Retro buckets | Low | — |
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (STANDARD §10):
-     shipped → CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md. -->
+**Shipped** → [`CHANGELOG.md`](../../CHANGELOG.md) **v1.53.0**, MINOR by hand (feature sprint;
+`/release-patch` is PATCH-only). All four manifests bumped in lockstep — the check caught two
+(`.codex-plugin`, `.kimi-plugin`) that a manual bump would have missed.
 
-**Retrieval check** — did we fail to find, or contradict, a prior `L-NNN`/ADR this sprint?
+**Tech debt** → **TD-073** (the sprint-family harness is the most expensive in the set, and ten of its
+23 cases need no git yet are parked behind `QA_FULL` with the 13 that do) · **TD-074**
+(`S10.FOURBUCKETS` asserts only *reached none of four*, deliberately, because demanding all four fails
+a correct close). Three existing rows moved rather than being duplicated: **TD-069** gains
+`conformance-coverage.md` at 126/130, **TD-070** a sixth §2 parser, **TD-071** a fifth harness.
 
-**Cost** — what this sprint cost to run, and in what shape (inline · coordinator + N agents).
+**Follow-ups** → **none filed, and that is the finding.** The register's remaining 12 `build` rules are
+already `TASK-250` · `TASK-251` · `TASK-252`, exactly — no residue. `TASK-245` was closed as discharged
+at promote and `TASK-238` unblocked there. Manufacturing a task to look thorough would be the opposite
+of it.
+
+**Learnings** → **L-151** (a disposition outside the artifact the tool reads is not a disposition) ·
+**L-152** (a change to a report's line shape silently disarms guards that assert a finding's absence) ·
+**L-153** (two rules from one sentence are split by the question each answers) · **L-154** (a
+zero-padded integer is an octal literal). **L-108 bumped to count 10** — twice this session an empty
+grep over a tool's *output* was read as a fact about the tool.
+
+**Retrieval check** — **yes, twice, and both are recorded.** (a) `S4.INDEX` was written up as silently
+passing when it does not, and the claim reached two durable artifacts before anything disagreed; the log
+keeps the wrong entry beside its correction, and the spec 0.8.0 block was corrected in place, having
+never been committed. (b) The §10 rules were read as unregistered when the engine had aborted. Both are
+L-108, whose promoted rule was in context throughout — which is why the bump is worth more than the
+entries.
+
+**Cost** — inline, single agent, no dispatch. Six tasks over one session. The dominant cost was **not**
+the work: the aggregate gate ran three times at 11–13 min, and one of those runs was wasted entirely
+because it read the engine mid-`cp` while T2 was being written and returned a red verdict about a tree
+that never existed. Per-task legs cost ~25s each. That ratio is the whole argument for the owner's
+mid-sprint ruling to gate on the specific check and run the aggregate once at close.
 
 **Worked**
+- **Running each new check against this repository immediately.** It found a contradiction between two
+  §9 rules, an octal abort in §10, and eleven false gaps in T1 — none of which a fixture would have
+  surfaced, because fixtures are built to the shape the author already has in mind.
+- **Snapshotting before every edit.** Kept for verification, it paid off somewhere else entirely: when
+  T1 and T2 had to be split into separate commits for per-task attribution, the T1-final state of all
+  four shared files already existed on disk. Minutes instead of L-150's half-hour.
+- **The repo's own checks catching this sprint's mistakes** — an unwired harness, two stale manifests,
+  three `Cites`/`Layers` contradictions, a Plan amendment that needed a scope-change ruling.
 
 **Friction**
+- Three edit-mechanic slips (an `awk -v` Windows path that deleted a line, an `awk` missing `FS` that
+  rebuilt three table rows with 22 columns, an index row inserted between header and separator). Every
+  one was caught by the check run immediately after, never by care.
+- Waiting on the aggregate gate before committing T1 is what let T1 and T2 accumulate in one tree.
 
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- **A new check's first run on real input finds defects in the check, not in the repository.** Three
+  instances this sprint (T1's eleven false gaps, T4's contradicting pair, T5's octal abort) and one
+  last sprint (SPRINT-078 T1's own commit). Not filed as an `L-NNN` yet — it is one occurrence short of
+  being a pattern rather than a run of luck, and L-007 already covers *exercise on real input*; what
+  would be new is *what you find is your own check*. Re-surface at SPRINT-080's close.

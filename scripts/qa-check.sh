@@ -582,7 +582,7 @@ done
 # so a §2 row that stops saying "always" changes the engine and this harness together, and neither
 # can drift from the other silently.
 eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh"
-eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh"
+eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh"
 # run-attestation-fixtures.sh (SPRINT-074 T2, TASK-228) joins the opt-in set by the same rule: it
 # builds 6 throwaway repos via mktemp -d + git init, measured at ~2s on this host. Real git history
 # is not optional -- §13 is DEFINED over git objects (trailers, parent count, %G?), and a merge
@@ -604,6 +604,21 @@ eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-p
 # "fixtures/system-verify/") joins the always-on set: it's dependency-free POSIX sh over 5 static
 # fixture logs, no git, no mktemp, measured at ~0.66s on this host -- well inside the cheap-and-git-free
 # rule above, not the throwaway-repo cost TD-016 gated behind QA_FULL.
+# run-sprint-family-fixtures.sh (SPRINT-079 T4/T5) joins the opt-in set by the same rule, and like
+# run-worktree-base-fixtures.sh it is a case where the rule costs something. It builds ~8 throwaway
+# repos via mktemp -d + git init, and its two git-defined families cannot be made git-free:
+# S9.PLANFROZEN diffs § Plan against `plan_commit`, S9.SCOPECHANGE reads the ORDER of two commits,
+# S10.FOURBUCKETS reads the close commit and S10.PROMOTEREVIEW the promote record. Hand-passed shas
+# would test the harness rather than the checks.
+# Costed rather than assumed: ~5 min for 23 cases on this host -- and the cost is NOT the git repos,
+# it is that every case runs the whole engine against the SHIPPED spec (~15s each). That was a
+# deliberate trade (a §9 or §10 row that moves breaks these cases, which is the point) and it is what
+# makes this the most expensive harness in the set. run-attestation-fixtures.sh takes the other side,
+# handing the engine a reduced spec to stay at ~2s. Filed as TD-073 rather than silently accepted.
+# The rule's cost here is that TEN of the 23 cases need no git at all (the caps, the log directory,
+# the verify clause, the promotion and aging reads) and are parked behind QA_FULL alongside the 13
+# that do. Splitting the family across two harnesses is the alternative; it loses to keeping one
+# family in one file, which is why the split is named in TD-073 rather than done here.
 # Harnesses deliberately NOT gated at all (neither always-on nor opt-in). Empty is a valid state --
 # but a paid/non-deterministic harness is excluded by being NAMED here with a reason, never by being
 # left out of the lists above.

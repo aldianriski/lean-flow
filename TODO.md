@@ -18,13 +18,10 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-079 — The Undifferentiated Middle** → [docs/sprint/SPRINT-079-the-undifferentiated-middle.md](docs/sprint/SPRINT-079-the-undifferentiated-middle.md)
->
-> _Five tasks — **T1 TASK-254** (rule the 11 `scope-out` rules, EPIC-004 § Closed-when 2's other half)
-> · **T2 TASK-255 · T3 TASK-256** (the two §2 gaps SPRINT-078 reported) · **T4 TASK-248 · T5 TASK-249**
-> (§9 + §10 coverage, 30 → 39 of 62). T1 runs first because its ruling can add to the `build` set T4/T5
-> draw from. **TASK-250 · 251 · 252** held for SPRINT-080, which then closes EPIC-004 — deliberate, per
-> TD-071 and L-150 (the ~11-min gate is the sprint's cost constraint)._
+> _(none — SPRINT-079 closed 2026-08-23, 34 of 34 DoD. **EPIC-004 stays open**: § Closed-when 2 is
+> the last condition and its residual is gone — the eleven `scope-out` rules are marked in the spec —
+> but the coverage half reads **39 of 51**. The remaining **12 `build` rules are TASK-250 · TASK-251 ·
+> TASK-252, exactly**, so SPRINT-080 is the epic-closing sprint and needs no new decomposition.)_
 
 ---
 
@@ -36,7 +33,7 @@ status: current
 
 ### P1 — Next Phase Required
 
-- [ ] TASK-255 — Give §2 rows for Multi-service's three docs  [size: S] [risk: low] [HITL]
+- [x] TASK-255 — Give §2 rows for Multi-service's three docs  [size: S] [risk: low] [HITL]
       class:      decision
       done-when:  `spec/STANDARD.md` §2's `docs/` tree carries a row for each doc §6's Multi-service
                   row names — service registry · cross-service dependency map · global decisions index
@@ -55,7 +52,7 @@ status: current
       origin:     close-retro
       state:      ready
 
-- [ ] TASK-256 — Make §2's `DECISIONS.md` addressable by a checker  [size: S] [risk: low] [AFK]
+- [x] TASK-256 — Make §2's `DECISIONS.md` addressable by a checker  [size: S] [risk: low] [AFK]
       class:      execution
       done-when:  `docs/DECISIONS.md` is reachable from §2's table as a literal path, so `S6.MEDIUM`
                   can assert it. Today the only row naming it is
@@ -103,7 +100,7 @@ status: current
                   one-rule tasks. Nothing left to decompose. Swept from the Backlog at SPRINT-079's
                   close under §11
 
-- [ ] TASK-248 — Cover §9's sprint-file family in the engine  [size: M] [risk: med] [HITL]
+- [x] TASK-248 — Cover §9's sprint-file family in the engine  [size: M] [risk: med] [HITL]
       class:      execution
       done-when:  five rules answered with six findings — S9.TWOFILES → `sprint-plan-over-hard-cap` ·
                   `sprint-log-missing`; S9.LOGDIR → `sprint-log-outside-logs-dir`; S9.PLANFROZEN →
@@ -119,7 +116,7 @@ status: current
       origin:     decomposer
       state:      ready
 
-- [ ] TASK-249 — Cover §10's learning-governance rules in the engine  [size: M] [risk: med] [HITL]
+- [x] TASK-249 — Cover §10's learning-governance rules in the engine  [size: M] [risk: med] [HITL]
       class:      execution
       done-when:  S10.FOURBUCKETS → `retro-bucket-unrouted`; S10.PROMOTION →
                   `learning-recurred-unpromoted`; S10.TDAGING → `td-row-aged-unreviewed`;
@@ -179,7 +176,7 @@ status: current
       origin:     decomposer
       state:      ready
 
-- [ ] TASK-254 — Rule on the 11 `scope-out` rules, which satisfy neither half of § Closed-when 2  [size: S] [risk: low] [HITL]
+- [x] TASK-254 — Rule on the 11 `scope-out` rules, which satisfy neither half of § Closed-when 2  [size: S] [risk: low] [HITL]
       class:      decision
       done-when:  each of the 11 is recorded as (a) checked, (b) re-marked `judgment-only` in
                   spec/STANDARD.md, or (c) accepted as a third state — and if (c), §14's wording and

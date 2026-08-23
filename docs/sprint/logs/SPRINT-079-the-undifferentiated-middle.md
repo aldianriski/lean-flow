@@ -438,3 +438,24 @@ following it would have hit this. `_dec` strips the padding and carries the expl
 the promote governance scan produced by hand, from entirely different code. Two derivations agreeing is
 what the cross-check rule asks for, and it is the first time this sprint that a check and a manual scan
 have been able to confirm each other.
+
+### 2026-08-23 | close | the close gate caught three things, two of them this session's own work
+
+`QA-CHECK: 167 pass, 2 fail` on the first run over the written close.
+
+- **`README footer version (footer=1.52.0, plugin.json=1.53.0)`** — the version bump reached four
+  manifests and missed the README's ownership footer. A leg exists for exactly this, and found it.
+- **`layers observed: … changed but undeclared: scripts/qa-check.sh`** — registering the new harness was
+  a close-time edit no task declared. Declared under **T4**, which is the task that shipped the harness
+  unwired; attributing it to the close would have hidden whose gap it was.
+- **`retro-bucket-unrouted: … status: closed but records no close_commit` (S10.FOURBUCKETS)** — **T5's
+  own check, firing on this sprint's close, hours after being written.** Not a defect: `close_commit`
+  cannot exist before the commit that creates it, so the window between `status: closed` and the
+  recorded sha is genuinely unauditable and the rule says so. It is the same shape as `plan_commit` at
+  promote, and it clears when the follow-up commit patches the sha in. **The check found the one state
+  the close passes through where its own claim cannot be verified** — which is a better first outing
+  than a fixture could have given it.
+
+**Earlier in the same close, the gate caught a fourth**: `run-sprint-family-fixtures.sh` was *"in evals/
+but neither gated nor explicitly excluded"* — T4 shipped a harness and never registered it (L-020,
+shipped ≠ wired). Registered opt-in under TD-016's rule, priced in TD-073.

@@ -56,7 +56,57 @@ status: current
 > with coverage) and **TD-072** (two readers for one §3 footer shape) were filed at this close. The
 > ledger now holds **23 rows — 20 open, 3 not-open** (TD-048 · TD-057 accepted at promote, TD-065
 > resolved this sprint). Recorded here rather than by editing the sweep, so the next promote ages
+>
+> **Close-time reconciliation — SPRINT-079 close (2026-08-23).** **TD-073** and **TD-074** filed (the
+> sprint-family harness's cost, and `S10.FOURBUCKETS`'s deliberately weak assertion). Three existing
+> rows moved rather than being duplicated: **TD-069** gains `conformance-coverage.md` at 126/130 and
+> the epic at 215/200, **TD-070** gains a *sixth* §2 parser, **TD-071** gains a fifth eval harness.
+> The ledger now holds **25 rows — 22 open, 3 not-open**. Nothing was resolved this sprint.
 > against a census that matches the file instead of re-deriving one that does not.
+
+- **TD-074** severity: minor | status: open | created: Sprint-079
+  - Summary: **`S10.FOURBUCKETS` asserts only that a close reached *none* of the four durable homes,
+    which is the weakest claim §10's rule admits.** §10 routes each Retro bucket to a home
+    (`CHANGELOG.md` · `TECH-DEBT.md` · `TODO.md` · `docs/LEARNINGS.md`), and the honest check is *every
+    bucket that HAD content was routed*. That needs the Retro parsed to know which buckets had content,
+    so the shipped check reports which homes the close commit touched and fails only when it touched
+    none.
+  - Evidence: the rule fires on a close that routed nothing at all and stays silent on a close that
+    routed to one home — both proven by retained fixtures (`s10-retro-bucket-unrouted` and its
+    control). A close that routed Shipped but silently dropped three filed learnings passes today.
+  - Impact: low, and deliberately chosen over the alternative. Demanding all four would fail a
+    correct close — a sprint that incurred no debt files no `TD-NNN` — which is the false-positive
+    class §2's create-lazily rows raise, and a false positive here is a false negative about the
+    contract. The weak check is right until the Retro is parseable; it is filed because *weak by
+    ruling* and *weak by oversight* read identically in six months.
+  - Mitigation *(hypothesis, not a plan — re-derive before building on it, L-091)*: the Retro's four
+    bucket headings are fixed by the SPRINT template, so "this bucket has content" may be readable
+    without natural-language parsing. If so the check strengthens from *reached none* to *reached
+    every home whose bucket is non-empty*, with the empty-bucket case still silent.
+  - **Re-file fresh if** the Retro's bucket structure changes shape, which would make the parse either
+    trivial or impossible and settle this either way.
+
+- **TD-073** severity: minor | status: open | created: Sprint-079
+  - Summary: **`evals/run-sprint-family-fixtures.sh` is the most expensive harness in the set (~5 min
+    for 23 cases), and the cost is not the git repos — it is that every case runs the whole engine
+    against the SHIPPED spec, ~15s each.** `run-attestation-fixtures.sh` takes the other side of the
+    same trade, handing the engine a reduced spec to stay at ~2s. Both choices are defensible and only
+    one of them is priced.
+  - Evidence: measured at SPRINT-079's close, and it is what took the full gate past its previous
+    ceiling — the close run printed `169 pass, 1 fail` after roughly 13 minutes with this harness
+    opt-in and therefore **not even running**. Under `QA_FULL=1` it adds ~5 min on top.
+  - Impact: two costs, and the second is the one that matters. (a) The gate gets slower, which is
+    TD-071's subject and this feeds it. (b) TD-016's rule — *cheap-and-git-free always-on,
+    git-repo-building opt-in* — is correct and puts the whole file behind `QA_FULL`, so **ten of the
+    23 cases that need no git at all** (the caps, the log directory, the verify clause, the promotion
+    and aging reads) are parked alongside the 13 that do. Those ten guard rules that run on every
+    default gate, so the guards are quieter than the things they guard.
+  - Mitigation *(hypothesis, not a plan)*: two independent moves, and they are not alternatives —
+    split the family so the git-free cases rejoin the always-on set, and/or reduce the spec each case
+    is run against. The split was refused at T4/T5 on the grounds that one family belongs in one file;
+    that is a real reason and it may simply lose to (b) above.
+  - **Re-file fresh if** the engine's per-run cost drops enough that the shipped-spec choice stops
+    dominating — at which point only the opt-in parking remains, and it is a different row.
 
 - **TD-064** severity: minor | status: open | created: Sprint-075 | updated: Sprint-076
   - Summary: **~~28~~ 16 of this repo's own docs fail the ownership-header rules the engine checks** —
@@ -164,6 +214,11 @@ status: current
     "a tool's report and its behaviour disagree, and the disagreement is silent".
 
 - **TD-069** severity: minor | status: open | created: Sprint-077 | updated: Sprint-079
+  - **SPRINT-079: the register half stayed fixed and a new file joined the watch.** The split held —
+    `conformance-dispositions.md` is **120 / 130** after §9's and §10's rows migrated out — but its
+    sibling `conformance-coverage.md` is **126 / 130** and gains a line per rule covered, so it
+    breaches as the remaining 12 `build` rules land. The epic is **215 / 200**, one line further on
+    from this sprint's member row, exactly as this row forecast.
   - **HALF RESOLVED at SPRINT-079's promote — the register was split, the epic was ruled deferred.**
     `conformance-dispositions.md` **230 → 128**: §§ Covered today + Artefacts moved verbatim to a new
     sibling `docs/research/conformance-coverage.md` (**124**), along the line the register's own title
@@ -220,7 +275,10 @@ status: current
   - Severity held at `minor`: nothing is wrong, nothing is lost, and both files are read by humans who
     are not stopped by the length. What the row is actually tracking is that **the decision keeps being
     deferrable** — five sprints now. It is worth one promote's attention before a sixth.
-- **TD-071** severity: minor | status: open | created: Sprint-078
+- **TD-071** severity: minor | status: open | created: Sprint-078 | updated: Sprint-079
+  - **SPRINT-079 added a fifth eval harness** (`run-sprint-family-fixtures.sh`), and it is the most
+    expensive in the set at ~5 min — see **TD-073**, which prices it and names why. It is opt-in, so
+    the default gate does not pay it today; the close run still took ~13 minutes without it.
   - Summary: **`qa-check.sh`'s cost scales with the coverage EPIC-004 exists to add.** The gate reaches
     **78 engine invocation sites** across its harnesses, and **16 of them hand the engine the full
     `spec/STANDARD.md`** — dispatching all 62 rules against a fixture directory that cares about two or
@@ -268,7 +326,11 @@ status: current
     frontmatter parses into one that takes its source as an argument. Both are small and neither
     belongs on a coverage task.
 
-- **TD-070** severity: minor | status: open | created: Sprint-077
+- **TD-070** severity: minor | status: open | created: Sprint-077 | updated: Sprint-079
+  - **SPRINT-079 T4 added the SIXTH parser** — `_s2_cap_for` in the engine, reading §2's Cap cell
+    so the sprint file's 400 is not hard-coded in a checker (L-097). Adding it rather than writing
+    the figure was the lesser cost, and it is recorded rather than slipped in: this row's case for a
+    shared `read-spec-files.sh` is now stronger by exactly one caller.
   - Summary: **§2's file tables have FIVE independent parsers (three at filing, five since SPRINT-078), each hard-coding the same column
     offset, and nothing states the contract they share.** `scripts/lib/conformance-engine.sh`
     (`_s2_rows`, `cre = (pfx=="docs/") ? c[6] : c[5]`), `scripts/lib/check-doc-caps.sh`
