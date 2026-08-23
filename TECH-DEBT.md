@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-23
+last_updated: 2026-08-24
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -72,6 +72,51 @@ status: current
 > TD-072 (2). Reconciled: 16 + 6 = 22 open, plus the three not-open = 25 rows on file.
 > **Deletion clock:** TD-048 · TD-057 · TD-065 all closed at Sprint-078, so 2 sprints — due at
 > **Sprint-081**, not this promote.
+>
+> **Aging sweep — SPRINT-081 promote (2026-08-23).** **17 of 24 open rows** are ≥3 sprints
+> unaddressed: TD-045 (25) · TD-047 (24) · TD-049 (22) · TD-050 (21) · TD-051 (20) · TD-052 (19) ·
+> TD-053 (18) · TD-059 (11) · TD-060 (10) · TD-061 (9) · TD-062 (8) · TD-063 (7) · TD-066 (6) ·
+> TD-064 (5) · TD-067 (5) · TD-068 (5) · TD-072 (3). **All held; none is `severity: high`, so
+> nothing auto-escalates to Backlog P1** — the strongest row on file is `medium` (TD-051 · TD-052 ·
+> TD-061 · TD-062). Not aged (7): TD-069 · TD-070 · TD-071 · TD-074 (2 each) · TD-075 · TD-076 ·
+> TD-077 (1 each). Reconciled: 17 + 7 = 24 open, plus TD-073 not-open = **25 rows on file**.
+> **TD-064 is aged and is being addressed in this sprint** (TASK-257) — the first aged row in some
+> time to leave by being fixed rather than by being held.
+> **Deletion clock EXECUTED:** TD-048 · TD-057 · TD-065 were all closed at Sprint-078 and are three
+> sprints old at this promote, so the three rows are **deleted here** (§11 · `S11.TDDELETE`) — 174
+> lines. Their substance lives in `CHANGELOG.md`, the sprint archive and git, which is the whole
+> reason §11 deletes rather than tombstones. **Ids stay monotonic: 048 · 057 · 065 are not reused.**
+> Next clock: TD-073 (closed Sprint-080) is due at **Sprint-083**, not before.
+> **New this promote: TD-077**, filed by a pre-EPIC-005 audit rather than by a sprint close — §6's
+> Base tier doc-set has no way to declare a *reasoned* exemption, which is what caps this
+> repository's own conformance level at `none` alongside TD-064's sixteen headers.
+
+- **TD-077** severity: minor | status: open | created: Sprint-080
+  - Summary: **§6's Base tier doc-set has no way to declare a *reasoned* exemption, so a repository
+    that ruled a doc unnecessary reports an unclearable finding forever.** `S6.BASE` owes every dev
+    repo `docs/product/requirements.md` and `docs/product/acceptance-criteria.md`. This repository
+    ruled both **exempt with stated reasons** at SPRINT-054 T1 and recorded the ruling in
+    `docs/architecture/overview.md` § *Base-tier docs this repo deliberately does not have*. The
+    engine cannot read that file, so the ruling behaves exactly as if it had never been taken —
+    **L-151's shape a fifth time**, and the same one ADR-028 fixed for the eleven `scope-out` rules
+    by moving the disposition into the artifact the tool reads.
+  - Evidence: `sh conformance.sh .` → two `tier-doc-set-incomplete` findings and
+    `level: none -- Structural not yet reached. 3 finding(s) at Structural prevent it`. The other two
+    Structural rules are TD-064's sixteen headers, which are writable; **these two are not clearable
+    by writing anything**, because the ruling is that the docs should not exist.
+  - Impact: **consumer-facing, not only ours** (L-015). §2's `CONTRIBUTING.md` / `CODE_OF_CONDUCT.md`
+    exemptions work because the *standard's own* condition (team ≥ 2, or on request) never fires, and
+    the engine skips them correctly. A **local** reasoned exemption has no such mechanism: any adopter
+    whose requirements live in an AI-context file, a ticket tracker or a product wiki collects two
+    permanent findings and a capped level with no declaration available to them. `.conformance-tier`
+    was created at SPRINT-078 for precisely this class — a judged property the engine cannot infer —
+    and is the standing precedent.
+  - Options (a ruling, not yet a build): **(a)** extend the `.conformance-tier` declaration pattern to
+    per-doc exemptions carrying a reason string, named on every report so the exemption is never
+    silent (L-058); **(b)** amend §6 to make the Base rows condition-gated the way §2's team-gated
+    rows already are. Both are spec changes, and **ADR-grade if either adds a declaration file or a §2
+    row**. Until one is taken, this repository's own conformance level is capped by a decision it
+    already made and recorded.
 
 - **TD-076** severity: minor | status: open | created: Sprint-080
   - Summary: **Controls across the existing check families report only silence, so a control that is
@@ -209,34 +254,6 @@ status: current
     Re-derive before building a DoD on either number.
   - Sibling, not a duplicate: **TD-065**. Both are "the conformance corpus disagrees with itself", but
     that row is a register miscount and this one is a real doc gap; a cure for either moves neither.
-
-- **TD-065** severity: trivial | status: resolved (SPRINT-078 T1) | created: Sprint-075
-  - Summary: **`docs/research/conformance-dispositions.md` still counts §13's five rules under
-    `build`**, though SPRINT-074 shipped `check-attestation.sh` covering them. § Covered today never
-    gained that row, so the register understates coverage by five.
-  - Evidence: § Covered today lists 12 rules / 5 checkers after SPRINT-075 T4 and T6; §13's
-    `S13.TRAILERS` · `S13.OWNCOMMIT` · `S13.EVIDENCESHA` · `S13.AGREE` · `S13.UNSIGNEDCLAIM` appear in
-    neither that table nor the engine's registry, while `check-attestation.sh` demonstrably answers
-    them. EPIC-004's § Closed-when 2 already records the same fact from the other side ("the `build`
-    remainder is 38 of 43, not 42").
-  - Impact: trivial in isolation — nothing reads these counts mechanically — but the register is the
-    thing a later sprint will price coverage work from, and it is wrong by five in the optimistic
-    direction. Named in the file itself at SPRINT-075 T6 rather than fixed in passing, because the
-    correction moves numbers three of its sections depend on.
-  - Mitigation (hypothesis, not a plan): one reconciliation pass over the register — add §13's row to
-    § Covered today, drop those five from `build`, re-derive `covered + build + scope-out = 63` by
-    counting rule ids in each table rather than editing the headers. Do it as its own change, not as a
-    rider on a coverage task, so the arithmetic is reviewable.
-  - **Resolved at SPRINT-078 T1**, and the caveat above is the one thing that did not hold: the fix
-    rode along with the migration that made it true, because moving the five *into the engine* is what
-    turned "the register understates coverage" into "the register was right and the engine had not
-    caught up". Counts re-derived by counting ids in each section table, never by editing a header:
-    **24 covered · 27 `build` · 11 scope-out = 62**, cross-checked against the engine's own dispatchable
-    count (18 with an assertion + 44 GAP). The row that never existed now exists, and the standing
-    footnote that described the gap is replaced by one describing the closure.
-  - Note the drift this row itself carried: the mitigation above said `= 63`, a figure superseded two
-    sprints before this row was read. A debt row is a frozen artifact like any other (L-130).
-
 
 - **TD-067** severity: minor | status: open | created: Sprint-076
   - Summary: **`S9.GATESWELLFORMED` accepts any `G<digits>` token while its own message promises
@@ -638,64 +655,6 @@ status: current
     touches no harness, so it is not a vehicle either. Search recorded so the next reviewer does not
     repeat it.
 
-- **TD-057** severity: minor | status: resolved → accepted (no task) | created: Sprint-069 | closed: Sprint-078
-  - **Closed as accepted at SPRINT-078 promote**, with its pair [[TD-048]] and on the same ruling —
-    the two were "explicitly priced together in SPRINT-076's § Out", deferred four times, and the
-    ledger header escalated them to take-or-close at this promote. **What decides it is in the row
-    already:** *"Cost so far: four cycles in one sprint, zero bad artifacts — every finding was
-    correct."* Three matchers with three different semantics is a documentation gap, not a defect —
-    each answer is right for the question its checker asks, and the cost lands on the author's cycle
-    count, never on the artifact. Nine sprints of that cost has not motivated the fix, which is the
-    honest signal. **Re-file fresh if** a matcher disagreement ever yields an incorrect finding, or
-    if the `Layers:` contract has to be explained to a consumer outside this repo — the second is the
-    condition that would make writing it down worth a sprint, and it has not arrived.
-  - Summary: **`Layers:` feeds three checkers that match it three different ways, and nothing states
-    the contract.** The **pre-dispatch preflight** resolves directory globs — it reads T3's `docs/`
-    against T1's `docs/adr/` and correctly reports `shared-file-owned-transitive`.
-    **`check-layers-completeness.sh`** matches DoD/Acceptance prose by **token spelling** (TD-048's
-    subject): `evals/` does not satisfy a DoD naming `run-doc-caps-fixtures.sh`, nor does
-    `scripts/qa-check.sh` satisfy prose saying `qa-check.sh`. **`check-layers-observed.sh`** matches
-    **actual changed paths per attributed task**: a glob never satisfies attribution for a specific
-    file, and a file declared by a *sibling* task does not count.
-  - Impact: SPRINT-069 T3 needed **four** `Layers:` corrections in one sprint — `AGENTS.md`,
-    `scripts/qa-check.sh`, three root files caught by attribution, and one basename token — while its
-    declaration was never wrong in the ordinary sense. Its globs were chosen deliberately, because a
-    citation sweep's file set is re-derived at execution and a path list written at promote goes
-    stale. So the author satisfies the gate that runs *before* dispatch and then discovers the other
-    two contracts one FAIL at a time, mid-sprint, against a frozen Plan. Distinct from L-100
-    (declarations corrected as implementation *invents* files): here the files were known, and the
-    correction was forced by matcher semantics. Cost so far: four cycles in one sprint, zero bad
-    artifacts — every finding was correct.
-  - Mitigation (**not yet derived**, L-091): do **not** reach for "make the two checkers glob-aware"
-    as the obvious fix — `check-layers-observed.sh`'s per-task attribution is deliberate (TD-035: a
-    file declared by ANY task once satisfied the check for ALL tasks, which is what corrupted
-    SPRINT-041's merge), and widening it back toward globs risks reintroducing exactly that. The open
-    question is whether the contract should be **documented** (state the intersection all three
-    accept, so an author writes to the strictest), **narrowed** (ban globs in `Layers:`, which
-    collides with the re-derived-set case this row is about), or **unified** (one matcher all three
-    share). Establish first which of the three consumers is the one that should move.
-  - Tracker: SPRINT-069 Execution Log (the four corrections) · TD-048 (its token-spelling half) ·
-    TD-035 (why per-task attribution is deliberate) · L-126
-  - **Re-reviewed 2026-08-16 (SPRINT-072 promote, 3 sprints open) — first aging re-review; held, and
-    the vehicle is now visible.** No new sighting this cycle: SPRINT-071 produced no `Layers:`
-    correction at all, and SPRINT-070's single one was a genuine miss rather than a matcher
-    disagreement. What changed is downstream — **EPIC-004's spec-driven engine has to read `Layers:`
-    as a rule source**, and an engine cannot resolve a declaration whose contract is the undocumented
-    *intersection* of three matchers. That makes this row a likely prerequisite of the engine sprint
-    rather than an independent cleanup. Deliberately **not** pulled into SPRINT-072, which is
-    inventory-and-baseline only and changes no checker architecture. **Unblock condition:** unchanged
-    in substance, with a named successor — the engine sprint's G2 either consumes this contract or
-    states why it does not need to.
-  - **Re-reviewed 2026-08-18 (SPRINT-075 promote) — EVIDENCE OBSERVED, and the row is stronger for it.**
-    SPRINT-074 produced three sightings of `Layers:` being matched differently by different readers in
-    one sprint: `check-layers-completeness.sh` flagged a `Cites:`/`Layers:` contradiction (correct), then
-    flagged `T1` appearing in a DoD as an undeclared **dependency** when the token named a *fixture's*
-    task inside a constructed SPRINT-915 (a false positive of the same family), while
-    `check-layers-observed.sh` read the same declaration against git and agreed with neither. All three
-    were resolved by editing the *declaration* to suit each matcher, which is precisely the behaviour
-    this row predicts. Not promoted to a vehicle here — TD-048's matcher work is still deliberately
-    unscheduled and the two should be priced together, not raced.
-
 - **TD-053** severity: minor | status: open | created: Sprint-063
   - Summary: **worktree-isolated dispatch places a full repo copy at `.claude/worktrees/<id>/`, inside
     the repo, and `find`-based checkers walk into it.** `check-ephemeral-intake.sh` excludes fixture
@@ -1048,94 +1007,6 @@ status: current
     in SPRINT-074, so the reaper parsed nothing and the parity question went unasked. Its vehicle
     (TASK-188) remains `state: blocked` by design: the trigger is opportunistic and scheduling a run to
     manufacture one is what L-111 forbids.
-
-- **TD-048** severity: trivial | status: resolved → accepted (no task) | created: Sprint-058 | closed: Sprint-078
-  - **Closed as accepted at SPRINT-078 promote**, on the ledger header's own escalation — *"a batch
-    deferred four times is a decision nobody has made — worth taking or closing at the next promote
-    rather than aging again."* Taking it was the alternative and was declined, so this records the
-    reasoning rather than a fifth deferral. The row is `severity: trivial`; its own Impact line says
-    the checker's direction of error is **the safe one** (it over-reports, costing a glance, where
-    the miss would cost a silent false PASS), and after 20 sprints no sighting has produced a wrong
-    artifact. Its own Mitigation already names the cheaper fix and it is not code: *"leave the parser
-    alone and let the DoD prose carry full paths, which is better writing anyway."* That is now the
-    convention. **Re-file fresh if** the matcher ever produces a *wrong* finding — a false PASS, or a
-    real overlap masked — rather than merely an extra author cycle; the widening this row declined
-    (basename-aware matching) is precisely what could cause that, which is why it stays declined.
-  - Summary: `check-layers-completeness.sh` matches a `Layers:`/`Cites:` declaration against DoD prose
-    **by token spelling, not by path identity**. A DoD that names a script by basename
-    (``a bare `qa-check.sh` run``) is not satisfied by a declaration of `scripts/qa-check.sh`, so
-    SPRINT-058 T2 had to declare the same file twice — `scripts/qa-check.sh` **and** bare
-    `qa-check.sh` — on one `Cites:` line, and the same for `templates/RESEARCH.md.template` against
-    its full `skills/lean-doc-generator/templates/…` path.
-  - Impact: cosmetic today, and the checker's direction of error is the safe one — it over-reports,
-    which costs a glance, where the miss would cost a silent false PASS (the sibling checker states
-    that trade explicitly). The concern is behavioural and small: the fix a task author reaches for
-    is to paste the second spelling, which trains the habit of satisfying the parser rather than
-    declaring the file. A `Layers:` line carrying two spellings of one path also reads as two files
-    to a human skimming the Plan, which is the surface the overlap map is drawn from.
-  - Mitigation (**not yet derived**, L-091): the obvious move is basename-aware matching — treat a
-    bare `x.sh` in prose as satisfied by any declared token ending `/x.sh`. **Re-derive before
-    building**: that widening could mask a genuine overlap between two same-named files in different
-    directories, which is precisely the case the overlap map exists to catch, and this repo has
-    several (`evals/run-*-fixtures.sh` vs `scripts/lib/check-*.sh` share no basenames today, but
-    nothing prevents it). Cheaper alternative worth pricing first: leave the parser alone and let the
-    DoD prose carry full paths, which is better writing anyway. Do not act on one sighting (TD-031's
-    pattern).
-  - **Re-reviewed 2026-08-10 (SPRINT-061 promote, 3 sprints open) — held, trigger unchanged.** The
-    row's own trigger is a *second* sighting; SPRINT-059 and SPRINT-060 produced none, so age is the
-    only thing that has moved and the row already says age is not the trigger. Recorded here rather
-    than in the sprint's § Scope Out, per the rule SPRINT-058 found failing its own next instance.
-  - **Re-reviewed 2026-08-14 (SPRINT-064 promote, 6 sprints open) — held, trigger unchanged.** SPRINT-063
-    exercised `Layers:`/`Cites:` four times across T1 and T3, and every finding was correct — including a
-    genuine catch (`docs/architecture/overview.md` · `docs/DECISIONS.md` · `DOCS_Guide.md` undeclared in
-    T1's Layers). No false positive from basename matching appeared in four opportunities: weak evidence
-    in the row's favour, and recorded as weak rather than dressed up. **Unblock condition:** a false
-    positive that costs a real edit — not a theoretical one, and not another sprint of quiet.
-  - **Re-reviewed 2026-08-15 (SPRINT-067 promote, 3 sprints since last) — held, and the checker banked
-    another genuine catch.** SPRINT-066's promote render was caught declaring a file in `Layers:` while
-    escaping it in `Cites:` — a correct finding that cost a real fix, the opposite direction from the
-    false positive this row waits on. Zero FPs across SPRINT-065/066's `Layers:`/`Cites:` exercises
-    (several per sprint, including two mid-task amendments). **Unblock condition:** unchanged.
-  - **Three sightings in one sprint, 2026-08-16 (SPRINT-069) — all three still correct findings, and
-    that is the point.** (a) At promote: a DoD spelling `qa-check.sh` bare was not satisfied by a
-    `Cites:` of `scripts/qa-check.sh`. (b) At G2: same shape again on the same file. (c) At
-    system-verify: a DoD naming `run-doc-caps-fixtures.sh` by basename was not satisfied by a
-    `Layers:` of `evals/`. Each cost one gate cycle and a re-word; none was a false positive, so this
-    row's trivial severity holds. What the cluster adds is **frequency data**: the mismatch is not
-    rare, it fires whenever prose and declaration are written at different moments by different
-    hands, and it is now the token-spelling half of the wider convention problem filed as **TD-057**.
-    **Unblock condition:** unchanged — a genuine false positive, or TD-057's resolution subsuming it.
-  - **Re-reviewed 2026-08-16 (SPRINT-071 promote, 4 sprints since last) — held, trigger still has not
-    fired.** SPRINT-070 produced exactly one `Layers:` correction (`scripts/qa-check.sh` on T2), and
-    checked rather than assumed: it was a **genuine miss**, not a false positive — the file really was
-    edited and really was undeclared, so the checker was right and the declaration was wrong. That is
-    the fourth consecutive sprint where the checker's catches were all true positives, which continues
-    to argue in the row's favour rather than against it. Noted for the next reviewer so the streak is
-    not mistaken for evidence of a defect: **a checker that keeps being right is not accumulating a
-    case for its own removal.** **Unblock condition:** unchanged — a genuine false positive, or
-    TD-057's resolution subsuming it. Longest-open aged row at 4 sprints; if TD-057 is not addressed
-    by SPRINT-074's promote, re-review this one on its own merits rather than deferring to it again.
-  - **Re-reviewed 2026-08-16 (SPRINT-074 promote, 3 sprints since last) — THE TRIGGER FIRED, and it
-    fired as the stronger of the two conditions.** Ledger search first (L-127): TD-057 is unaddressed,
-    so the previous note's instruction applies — judge this row on its own merits. Doing so, the
-    unblock condition *"a genuine false positive"* is **met**, at SPRINT-073 T2. The `Cites:` line
-    declared `` `scripts/lib/check-doc-caps.sh` `` and the gate still emitted *"DoD/Acceptance implies
-    `check-doc-caps.sh`, absent from Layers"*, because the DoD prose used the bare basename. **The file
-    was declared. The checker did not recognise the declaration.** That is not over-reporting an
-    undeclared file; it is failing to match a correct one, which is the false positive four sprints of
-    true-positive catches had not produced.
-    **And the predicted behavioural cost landed with it.** The row warned that *"the fix a task author
-    reaches for is to paste the second spelling, which trains the habit of satisfying the parser rather
-    than declaring the file."* The author reached for exactly that — the `Cites:` line was rewritten to
-    the bare basename to make the gate pass, and the full path (the more useful declaration for a human
-    reading the Plan) was **removed**. The prediction is now observed, not hypothesised.
-    **Still `severity: trivial` and deliberately not auto-escalated** — only `high` escalates, and the
-    cost remains a glance plus a habit. **Not vehicled into SPRINT-074**, which pulls TASK-218 for the
-    adjacent `check-layers-observed.sh` WIP path; mixing two matcher changes in one sprint would make
-    either regression hard to attribute. **Its own Mitigation still binds the successor:** do not simply
-    widen to basename-aware matching — that could mask a genuine overlap between two same-named files in
-    different directories, which is the case the overlap map exists to catch. Price the cheaper
-    alternative first (require full paths in DoD prose, which is better writing anyway).
 
 - **TD-047** severity: minor | status: open | created: Sprint-057
   - Summary: `night-run.md` is **414 lines** and carries five Parts plus a pre-flight checklist that

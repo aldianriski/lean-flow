@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-23
+last_updated: 2026-08-24
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -18,9 +18,15 @@ status: current
 
 ## Active Sprint
 
-> _No active sprint._ SPRINT-080 closed 2026-08-23 and **EPIC-004 closed with it** — the standard is
-> checkable end to end: 51 of 51 rules map to a check or carry an explicit non-evaluated mark, and the
-> register's § `build` bucket is empty. Next sprint promotes from the Backlog below.
+> **SPRINT-081 — Clean Slate** → [docs/sprint/SPRINT-081-clean-slate.md](docs/sprint/SPRINT-081-clean-slate.md)
+>
+> _Three tasks — **T1 TASK-257** (the sixteen ownership headers, TD-064) · **T2 TASK-258** (rule the
+> reasoned Base-tier exemption, TD-077) · **T3 TASK-238** (foreign-repo artefact triage re-run,
+> EPIC-004 § Closed-when 1's follow-through). **T3 depends on T2** — a dependency neither backlog row
+> carried, found at promote: `S6.BASE` is shape-bound, so re-running the triage before the exemption
+> ruling would measure a mechanism about to change (D1). T1 and T2 clear the two rules that hold this
+> repository at `level: none` against its own standard. Spends EPIC-004's residue rather than carrying
+> it into EPIC-005, whose first member sprint is **SPRINT-082**._
 
 ---
 
@@ -76,6 +82,47 @@ status: current
                   the shape-bound families, and §11's ledger rules land in SPRINT-080 (TASK-250/251) —
                   running it after those is the stronger measurement, and the trigger stays a condition
                   rather than a schedule (L-094)
+
+- [ ] TASK-257 — Write the sixteen ownership headers this repo's own docs are missing  [size: S] [risk: low] [AFK]
+      class:      mechanical-ingest
+      done-when:  `sh conformance.sh .` reports **zero** `ownership-header-missing` ·
+                  `ownership-header-field-missing` · `update-trigger-absent` findings, and `S1.LAW3`
+                  and `S3.SCHEMA` no longer appear among the rules preventing Structural. Each trigger
+                  written is the doc's **real** one — §1 LAW 3's mechanical half is mere presence, but
+                  a trigger that can never fire is the doc ageing silently under a header claiming
+                  otherwise, which is the failure LAW 3 exists to stop
+      touches:    docs/qa/QA-001…QA-003 (no frontmatter at all — full four-field header) ·
+                  docs/research/ ×13 (header present, `update_trigger:` absent) · TECH-DEBT.md
+                  (TD-064 → resolved)
+      depends-on: none
+      assumes:    the counts are TD-064's and are **re-derived at execution, never carried from this
+                  row**: 3 `ownership-header-missing` + 13 `ownership-header-field-missing` = 16
+                  `update-trigger-absent`, the three reconciling against each other (L-108 · L-130 —
+                  a figure frozen into a DoD is a query result). If the numbers have moved, the
+                  movement is itself the finding
+      tracker:    TD-064 · SPRINT-075 (filed) · SPRINT-076 T5 (halved by ruling, not by writing)
+      origin:     manual
+      state:      ready
+
+- [ ] TASK-258 — Rule how a repository declares a *reasoned* Base-tier doc exemption  [size: M] [risk: med] [HITL]
+      class:      decision
+      done-when:  the ruling lives in the artifact the **engine** reads, and `sh conformance.sh .`
+                  either stops emitting the two `tier-doc-set-incomplete` findings or names them as an
+                  explicit exclusion — never silently dropped (L-058). If the ruling adds a declaration
+                  file or a §2 row it is ADR-grade and the ADR lands with it
+      touches:    spec/STANDARD.md §6 (and §2 if a row is added) · scripts/lib/conformance-engine.sh ·
+                  evals/ fixtures for whichever arm is built · docs/architecture/overview.md
+                  § Base-tier docs this repo deliberately does not have (which currently holds the
+                  ruling alone, where no tool can reach it) · TECH-DEBT.md (TD-077)
+      depends-on: none
+      assumes:    the two candidate arms are TD-077's — **(a)** extend `.conformance-tier`'s
+                  declaration pattern to per-doc exemptions carrying a reason string · **(b)** make
+                  §6's Base rows condition-gated the way §2's team-gated rows already are. Neither is
+                  pre-selected: this row exists to force the choice, not to record one already taken
+      tracker:    TD-077 · ADR-028 (the precedent — a disposition moved into the artifact the tool
+                  reads) · L-151 · SPRINT-054 T1 (where the two exemptions were ruled)
+      origin:     manual
+      state:      ready
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution

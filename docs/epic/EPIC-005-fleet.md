@@ -2,7 +2,7 @@
 epic: 005
 slug: fleet
 owner: Maintainer
-last_updated: 2026-08-23
+last_updated: 2026-08-24
 status: proposed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -49,6 +49,18 @@ telemetry of any kind · running an org's CI for them.
 - **D2** — Delegation policy is declared per repo and read by the run, not held by a coordinator
   process. A coordinator is a service by another name, and L-099 already showed what happens when a
   rule lives where its reader does not read it.
+- **D3** — The second and further repositories that prove § Closed-when 1 and 2 are **synthesised
+  fixture repos**, built the way EPIC-004's foreign-repo harness builds `acme-widget`: created under
+  `mktemp -d` with **no lean-flow file copied in**, asserted mechanically so a later edit that copies
+  a template in fails loudly rather than quietly measuring our own shape. **Ruled 2026-08-23, at the
+  pre-epic audit rather than at a member G2**, because two of the four exit conditions name a second
+  repository and were unreachable until one was identified — a criterion resting on a decision nobody
+  has taken yet is L-111's trap, and this one had no vehicle at all. **What it buys and what it does
+  not:** fixtures are reproducible, gate-runnable and free of external dependency, so pinning ·
+  upgrade · cross-repo reporting can each be exercised end to end. They cannot prove **adoption
+  friction**, which only a real repository supplies. That limit is named here rather than discovered
+  at close: a member sprint that needs friction evidence pins a real repo *in addition*, never as a
+  substitute for the reproducible case.
 
 ## Open questions
 <!-- Ruled 2026-08-23. Two closed by reading (L-094: a documented behaviour is closed by reading, not
