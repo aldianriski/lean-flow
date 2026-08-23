@@ -105,9 +105,9 @@ assert it.
 - [x] `spec/CHANGELOG.md` updated at the right level  ✓ spec **0.8.0 MINOR** on 0.5.0's test — a Medium adopter sees a doc set derived where none was, with `docs/DECISIONS.md` named in it. No rule added, so classification stays 100 and checkable stays 51
 
 ### T4 — Cover §9's sprint-file family in the engine `[size: M · risk: med · class: execution · HITL]`
-Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md`
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-sprint-family-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md`
 Depends-on: T1
-Cites: the register's § `build` (the five §9 rows and their findings) · §9's Conformance table · L-058 · L-142 · TD-012 · `S9.TWOFILES` · `S9.LOGDIR` · `S9.PLANFROZEN` · `S9.SCOPECHANGE` · `S9.VERIFYCLAUSE` · `S4.APPEND`
+Cites: the register's § `build` (the five §9 rows and their findings) · §9's Conformance table · L-058 · L-142 · TD-012 · `S9.TWOFILES` · `S9.LOGDIR` · `S9.PLANFROZEN` · `S9.SCOPECHANGE` · `S9.VERIFYCLAUSE` · `S4.APPEND` · `evals/run-attestation-fixtures.sh` · `run-attestation-fixtures.sh` (the git-fixture idiom this follows — read, never touched)
 
 Five rules, six findings. Two of them (`PLANFROZEN`, `SCOPECHANGE`) read git history against
 `plan_commit` — the `S4.APPEND` shape — so their fixtures need a repo with real history, not a tree.
@@ -118,12 +118,12 @@ Five rules, six findings. Two of them (`PLANFROZEN`, `SCOPECHANGE`) read git his
 **retained** fixture that reddens on input that must produce it, while a sibling control stays green.
 
 **DoD:**
-- [ ] The five rule ids and six finding strings are re-derived from the register, and from T1's ruling if it changed the set — *Verify: the § `build` §9 rows, after T1*
-- [ ] Each of the six findings fires from the engine on input that must produce it — *Verify: `sh evals/run-conformance-engine-fixtures.sh`, read the tally it **prints**, not a wrapper's status (L-120)*
-- [ ] `PLANFROZEN` and `SCOPECHANGE` fixtures build a repo with **real git history**, not a tree alone — *Verify: the fixture creates commits and the assertion fails without them*
-- [ ] Every fixture is **retained**, one per finding (TD-012) — *Verify: `evals/` holds them after the task, not just during*
-- [ ] The suite is shown to **discriminate**: seed the rejected shape (or break each assertion in turn), confirm the case reddens while a sibling control stays green, and confirm the seed **landed and still parses** — *Verify: `cmp` against a pristine copy, assertion count unchanged, line count within one (L-137 · L-142)*
-- [ ] The covered rows move from `conformance-dispositions.md` § `build` → `conformance-coverage.md` § Covered today, and both files' counts reconcile to 62 — *Verify: `sh scripts/lib/check-doc-caps.sh` and the engine's own `coverage:` line*
+- [x] The five rule ids and six finding strings are re-derived from the register, and from T1's ruling if it changed the set — *Verify: the § `build` §9 rows, after T1*  ✓ re-derived from § `build`; T1 changed none of them (nothing was ruled *checked*), so the set is the five the register named
+- [x] Each of the six findings fires from the engine on input that must produce it — *Verify: `sh evals/run-conformance-engine-fixtures.sh`, read the tally it **prints**, not a wrapper's status (L-120)*  ✓ all six fire — `evals/run-sprint-family-fixtures.sh` prints **SPRINT-FAMILY FIXTURES: all green**, 13 cases (6 must-FAIL + 7 controls). Its own harness: two of these rules are defined over git history and the engine suite states in its header that it needs none
+- [x] `PLANFROZEN` and `SCOPECHANGE` fixtures build a repo with **real git history**, not a tree alone — *Verify: the fixture creates commits and the assertion fails without them*  ✓ both build real repos via `git init` + commits, following the `run-attestation-fixtures.sh` idiom — a tree alone cannot express *the Plan changed after this commit* or *this entry was written after that edit*
+- [x] Every fixture is **retained**, one per finding (TD-012) — *Verify: `evals/` holds them after the task, not just during*  ✓ retained, and **every finding has a control** — two for `dod-criterion-names-no-check` (the rule admits two evidence forms; passing one would leave the other unguarded) and the pair separating *the Plan moved* from *the Plan moved unaccounted*
+- [x] The suite is shown to **discriminate**: seed the rejected shape (or break each assertion in turn), confirm the case reddens while a sibling control stays green, and confirm the seed **landed and still parses** — *Verify: `cmp` against a pristine copy, assertion count unchanged, line count within one (L-137 · L-142)*  ✓ **two targeted seeds, each landing (0 line delta) and still parsing.** Seed A removes the lazy-log substrate guard: shipped engine reports 0 `sprint-log-missing` on a tick-less sprint, seeded reports 1 — the control reddens. Seed B removes PLANFROZEN's scope-change accounting: 0 → 1 `plan-edited-after-freeze` against our own amended Plan, while sibling `S9.SCOPECHANGE` stays **green**
+- [x] The covered rows move from `conformance-dispositions.md` § `build` → `conformance-coverage.md` § Covered today, and both files' counts reconcile to 62 — *Verify: `sh scripts/lib/check-doc-caps.sh` and the engine's own `coverage:` line*  ✓ migrated — register § `build` 21 → 16, coverage § Covered today 30 → 35, both under cap. **The criterion said "reconcile to 62" and that figure was invalidated by T1 in this same sprint** (checkable 62 → 51 when the eleven were marked). Corrected rather than silently reinterpreted (L-088): they reconcile to **51** — 35 + 16, matching the engine's own `coverage: 29 + 22`
 
 ### T5 — Cover §10's learning-governance rules in the engine `[size: M · risk: med · class: execution · HITL]`
 Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh` · `docs/research/conformance-dispositions.md` · `docs/research/conformance-coverage.md`

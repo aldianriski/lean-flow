@@ -17,9 +17,9 @@ an undifferentiated middle. Rule ids are `spec/STANDARD.md` §14's; that file is
 the register. Split from `conformance-baseline.md` under §2's growth rule — split, never squeeze (L-131).
 
 **Counts, re-derived from the section tables and reconciled against the engine — never copied forward.**
-100 candidates · **100 classified** · **51 checkable** · **30 covered** · **21 `build`** · **0
-`scope-out`**. Reconciled mechanically: 30 + 21 = **51**, matching the engine's own `coverage:` line
-(24 with an assertion + 27 gaps).
+100 candidates · **100 classified** · **51 checkable** · **35 covered** · **16 `build`** · **0
+`scope-out`**. Reconciled mechanically: 35 + 16 = **51**, matching the engine's own `coverage:` line
+(29 with an assertion + 22 gaps).
 **Checkable went 62 → 51 at SPRINT-079 T1 and the eleven did not vanish — they were marked.** A
 disposition written here cannot reach the engine, which dispatches on `spec/STANDARD.md`'s Mark column;
 all eleven now carry `restated` (7) or `standard-directed` (4) there. Record → § `scope-out` below.
@@ -56,18 +56,13 @@ one: a ratio would improve every time the standard declines to automate somethin
 
 **§ Covered today and § Artefacts moved → [`conformance-coverage.md`](conformance-coverage.md)** at
 SPRINT-079's promote (§2 Growth rule, 230 > 130). The counts stay here, where they reconcile.
-## `build` — 21 rules, each with the finding its check will fire
+## `build` — 16 rules, each with the finding its check will fire
 
 A check specified without its finding name is a half-shipped gate (L-058). Every row ships with a
 **retained** must-FAIL fixture proving that exact string fires (TD-012).
 
 | Rule | Named finding |
 |---|---|
-| `S9.TWOFILES` | `sprint-plan-over-hard-cap` · `sprint-log-missing` |
-| `S9.LOGDIR` | `sprint-log-outside-logs-dir` |
-| `S9.PLANFROZEN` | `plan-edited-after-freeze` |
-| `S9.SCOPECHANGE` | `scope-change-logged-after-plan-edit` |
-| `S9.VERIFYCLAUSE` | `dod-criterion-names-no-check` |
 | `S10.FOURBUCKETS` | `retro-bucket-unrouted` |
 | `S10.PROMOTION` | `learning-recurred-unpromoted` |
 | `S10.TDAGING` | `td-row-aged-unreviewed` |

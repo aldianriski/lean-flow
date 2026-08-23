@@ -1831,6 +1831,227 @@ assert_S2_R_PLACEMENT() {
     ok "S2.R-PLACEMENT      -- $n_canon §2 file(s) at their canonical path$([ "$n_legacy" -gt 0 ] && printf ', %s at a legacy path matched second' "$n_legacy")"
   fi
 }
+
+# --- §9's sprint-file family (SPRINT-079 T4) ------------------------------------------------------
+# Five rules, six findings. They share one input -- the ACTIVE sprint Plan and its Execution Log --
+# so the discovery is factored out rather than repeated per assertion.
+#
+# THE GLOB IS NON-RECURSIVE, AND THAT IS LOAD-BEARING (§9, S9.LOGDIR). `docs/sprint/SPRINT-*.md`
+# deliberately does not reach `docs/sprint/logs/` or `docs/sprint/archive/`: an archived sprint is
+# closed history and must not be re-checked, and the log is uncapped by design, so a recursive glob
+# would cap and schema-check the very file ADR-014 split out to escape the cap.
+_sprint_plans() {   # <repo> -> one path per active Plan, repo-relative
+  [ -d "$1/docs/sprint" ] || return 0
+  for _sp in "$1"/docs/sprint/SPRINT-*.md; do
+    [ -f "$_sp" ] || continue
+    printf '%s\n' "docs/sprint/${_sp##*/}"
+  done
+}
+
+# _fm <file> <key> -- a frontmatter value, empty when absent. An unfilled template placeholder
+# (`[sha — set at promote]`) is ABSENCE, not a value -- §9 says so of gates_signed and the same
+# reading is the only safe one for plan_commit: a placeholder that parsed as a sha would send every
+# git query to a ref that does not exist and report the resulting silence as clean.
+# _s2_cap_for <spec> <File-cell fragment> -- the integer in that §2 docs-tree row's Cap cell.
+# Read rather than written: 400 hard-coded here is a second SSOT that drifts from the row it copied
+# the moment §2 moves (L-097 - L-130). Docs-tree rows carry the extra Tier column, so Cap is c[5].
+#
+# THIS IS THE SIXTH INDEPENDENT §2 PARSER (TD-070 counted five at SPRINT-078). Adding it rather than
+# hard-coding the figure is the lesser of the two costs, and it is recorded rather than slipped in:
+# the row's case for a shared read-spec-files.sh gets stronger by exactly one caller.
+_s2_cap_for() {
+  awk -v want="$2" '
+    /^## §2/ { in2 = 1; next }
+    /^## §/  { in2 = 0 }
+    !in2 { next }
+    /^\*\*Conformance/ { in2 = 0; next }
+    /^\|/ {
+      n = split($0, c, "|"); if (n < 7) next
+      if (index(c[2], want) == 0) next
+      cap = c[5]; gsub(/[^0-9]/, "", cap)
+      if (cap != "") { print cap; exit }
+    }' "$1"
+}
+
+_fm() {
+  awk -v k="$2" 'NR==1 && $0 != "---" { exit } NR==1 { next } $0 == "---" { exit }
+    $0 ~ "^" k ":" { sub("^" k ":[ ]*", ""); print; exit }' "$1"
+}
+_fm_real() {   # <file> <key> -- the value only when it is not a bracketed placeholder
+  _v=$(_fm "$1" "$2")
+  case "$_v" in ""|\[*) printf '' ;; *) printf '%s' "$_v" ;; esac
+}
+
+assert_S9_TWOFILES() {
+  repo=$1
+  plans=$(_sprint_plans "$repo")
+  [ -n "$plans" ] || { note "S9.TWOFILES         -- no active sprint Plan under docs/sprint/ -- nothing to verify. A repository between sprints is not in violation"; return; }
+  n_ok=0
+  for p in $plans; do
+    n=$(wc -l < "$repo/$p" | tr -d ' ')
+    # 400 is read from §2's cap cell for this row, not written here -- a figure a checker hard-codes
+    # is a second SSOT that drifts from the row it copied (L-097, L-130).
+    cap=$(_s2_cap_for "$spec" "sprint/SPRINT-NNN-<slug>.md")
+    [ -n "$cap" ] || cap=400
+    [ "$n" -gt "$cap" ] && bad "sprint-plan-over-hard-cap: $p is $n lines against §2's $cap hard -- the Plan's budget is what bounds how many tasks a sprint may hold, so a breach here is not cosmetic"
+    log="docs/sprint/logs/${p##*/}"
+    if [ -f "$repo/$log" ]; then
+      n_ok=$((n_ok + 1)); continue
+    fi
+    # The log is created LAZILY at the first entry (§9), so its absence is only a finding once the
+    # sprint has done work. A ticked DoD box is that substrate, and it is mechanical: a Plan with no
+    # tick has nothing to have logged. Without this the check would fire on every sprint in the gap
+    # between promote and the first task -- a finding about correct behaviour.
+    if grep -q '^- \[x\]' "$repo/$p" 2>/dev/null; then
+      bad "sprint-log-missing: $log -- $p has ticked DoD, so work has happened and the Execution Log is owed. The Log is the append-only record the Retro is written from; work with no log leaves the Retro sourced from memory"
+    else
+      note "S9.TWOFILES         -- $p has no ticked DoD, so its Execution Log is not yet owed (§9 creates it lazily at the first entry)"
+      n_ok=$((n_ok + 1))
+    fi
+  done
+  [ "$last_bad" -eq 1 ] && return
+  ok "S9.TWOFILES         -- $n_ok active sprint Plan(s) within cap, each with its Execution Log or not yet owing one"
+}
+
+assert_S9_LOGDIR() {
+  repo=$1
+  [ -d "$repo/docs/sprint" ] || { note "S9.LOGDIR           -- no docs/sprint/ -- nothing to verify"; return; }
+  found=0
+  # A log parked BESIDE the Plan rather than under logs/ is the specific failure §9 names, because
+  # the sprint-file checks glob docs/sprint/*.md non-recursively: a same-directory sibling gets
+  # capped and schema-checked as if it were a Plan, which is exactly what ADR-014's split avoids.
+  for f in "$repo"/docs/sprint/*-log.md "$repo"/docs/sprint/*Execution-Log*.md; do
+    [ -f "$f" ] || continue
+    found=1
+    bad "sprint-log-outside-logs-dir: docs/sprint/${f##*/} -- an Execution Log beside the Plan instead of under docs/sprint/logs/. The sprint glob is non-recursive, so a same-directory log is capped and schema-checked as a Plan (§9 - ADR-014)"
+  done
+  [ "$found" -eq 1 ] && return
+  ok "S9.LOGDIR           -- no Execution Log sits beside a Plan; logs/ is the only log location"
+}
+
+# _plan_section -- § Plan from a sprint file on stdin, up to the NEXT `## ` heading. Owner-action is
+# optional in the template ("Omit if none"), so the end marker is the next heading of any name, never
+# a named one: anchoring to `## Owner-action` would silently read the whole rest of the file on a
+# sprint that omitted it, and two Plans would then differ over a Retro edit (L-108 -- match by
+# position, not by a token that may not be there).
+_plan_section() { awk '/^## Plan$/ { inp = 1; next } inp && /^## / { exit } inp { print }'; }
+
+assert_S9_PLANFROZEN() {
+  repo=$1
+  plans=$(_sprint_plans "$repo")
+  [ -n "$plans" ] || { note "S9.PLANFROZEN       -- no active sprint Plan -- nothing to verify"; return; }
+  if ! git -C "$repo" rev-parse --git-dir >/dev/null 2>&1; then
+    note "S9.PLANFROZEN       -- history unavailable: $repo is not a git repository, so whether § Plan changed after its freeze cannot be answered. Reported rather than passed -- the absence of a record is not evidence that nothing happened"
+    return
+  fi
+  n_frozen=0; n_accounted=0
+  for p in $plans; do
+    pc=$(_fm_real "$repo/$p" plan_commit)
+    if [ -z "$pc" ]; then
+      note "S9.PLANFROZEN       -- $p records no plan_commit (absent, or still the promote-time placeholder), so there is no freeze point to measure against. Not a pass: an unmeasurable Plan is not a frozen one"
+      continue
+    fi
+    if ! git -C "$repo" rev-parse --verify "$pc^{commit}" >/dev/null 2>&1; then
+      bad "plan-edited-after-freeze: $p records plan_commit $pc, which is not a commit in this repository. A freeze point nobody can resolve cannot be compared against, and a record that looks like evidence and is not is worse than none (§9)"
+      continue
+    fi
+    was=$(git -C "$repo" show "$pc:$p" 2>/dev/null | _plan_section)
+    now=$(_plan_section < "$repo/$p")
+    if [ "$was" = "$now" ]; then
+      n_frozen=$((n_frozen + 1)); continue
+    fi
+    # § Plan CHANGED. That alone is not the finding: §9 permits a mid-sprint shift, provided it is
+    # logged as a scope-change entry. So the mechanical question this rule can actually answer is
+    # whether the change is ACCOUNTED FOR -- does the log carry such an entry at all. Reporting FAIL
+    # on a properly-amended Plan would be a finding no adopter could clear, since the amendment was
+    # the correct action (the same false-positive class §2's create-lazily rows raise).
+    #
+    # The split with S9.SCOPECHANGE is real and not a duplication: this asks DOES AN ENTRY EXIST,
+    # that one asks WAS IT WRITTEN FIRST. An entry added after the edit satisfies this rule and
+    # fails that one, which is exactly the case §9's "before" is there to catch.
+    log="docs/sprint/logs/${p##*/}"
+    if [ -f "$repo/$log" ] && grep -qi '| *scope-change *|' "$repo/$log"; then
+      n_accounted=$((n_accounted + 1))
+      note "S9.PLANFROZEN       -- $p: § Plan differs from its state at plan_commit $pc, and $log carries a scope-change entry accounting for it. §9 permits the amendment; whether the shift itself was right is judged, not decided here"
+    else
+      bad "plan-edited-after-freeze: $p -- § Plan differs from its state at plan_commit $pc and $log carries no scope-change entry. §9 freezes the Plan at promote; an unaccounted edit is a Plan nobody agreed to, and the DoD it changes is one nobody re-confirmed"
+    fi
+  done
+  [ "$last_bad" -eq 1 ] && return
+  [ $((n_frozen + n_accounted)) -gt 0 ] && ok "S9.PLANFROZEN       -- $n_frozen Plan(s) unchanged since plan_commit, $n_accounted amended with a scope-change entry accounting for it"
+}
+
+assert_S9_SCOPECHANGE() {
+  repo=$1
+  plans=$(_sprint_plans "$repo")
+  [ -n "$plans" ] || { note "S9.SCOPECHANGE      -- no active sprint Plan -- nothing to verify"; return; }
+  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || {
+    note "S9.SCOPECHANGE      -- history unavailable: $repo is not a git repository, so the order of the two commits cannot be read"
+    return
+  }
+  n_checked=0
+  for p in $plans; do
+    pc=$(_fm_real "$repo/$p" plan_commit)
+    [ -n "$pc" ] || continue
+    git -C "$repo" rev-parse --verify "$pc^{commit}" >/dev/null 2>&1 || continue
+    log="docs/sprint/logs/${p##*/}"
+    # Every commit after the freeze that actually changed § Plan. A commit touching the file for a
+    # DoD tick or a Files Changed row is NOT a Plan edit, so the diff is taken on the SECTION, never
+    # on the file -- otherwise every sprint would report a scope change on its first tick.
+    prev="$pc"
+    for c in $(git -C "$repo" log --reverse --format=%H "$pc..HEAD" -- "$p" 2>/dev/null); do
+      a=$(git -C "$repo" show "$prev:$p" 2>/dev/null | _plan_section)
+      b=$(git -C "$repo" show "$c:$p" 2>/dev/null | _plan_section)
+      prev=$c
+      [ "$a" = "$b" ] && continue
+      n_checked=$((n_checked + 1))
+      # The log AS OF that commit must already carry a scope-change entry. Reading today's log would
+      # accept one written afterwards, which is precisely the order §9 forbids: the entry exists to
+      # be written BEFORE the Plan is edited, so that the reason survives the edit.
+      if git -C "$repo" show "$c:$log" 2>/dev/null | grep -qi '| *scope-change *|'; then
+        continue
+      fi
+      short=$(git -C "$repo" rev-parse --short "$c" 2>/dev/null)
+      bad "scope-change-logged-after-plan-edit: $p -- § Plan changed at $short with no scope-change entry in $log as of that commit. §9 puts the entry first so the reason survives the edit; logged afterwards it is a justification written knowing the outcome"
+    done
+  done
+  [ "$last_bad" -eq 1 ] && return
+  if [ "$n_checked" -eq 0 ]; then
+    note "S9.SCOPECHANGE      -- no § Plan edit after freeze in any active sprint, so there is no ordering to check. States that nothing was checkable, never that the rule passed"
+  else
+    ok "S9.SCOPECHANGE      -- $n_checked § Plan edit(s) after freeze, each with its scope-change entry already in the log at that commit"
+  fi
+}
+
+assert_S9_VERIFYCLAUSE() {
+  repo=$1
+  plans=$(_sprint_plans "$repo")
+  [ -n "$plans" ] || { note "S9.VERIFYCLAUSE     -- no active sprint Plan -- nothing to verify"; return; }
+  n_named=0
+  for p in $plans; do
+    # ONLY TICKED CRITERIA. §9 says a criterion names its check "where a mechanical check exists" --
+    # so demanding a *Verify:* clause on every criterion would fire on judgment criteria that
+    # legitimately have none, and a false positive here is a false negative about the contract.
+    # A TICKED box is different: the template requires `- [x] ... - <what proved it>`, so a claim of
+    # done that names no evidence is checkable without judging whether a check exists.
+    while IFS= read -r line; do
+      case "$line" in
+        *'*Verify:'*) n_named=$((n_named + 1)); continue ;;
+        *'✓'*)        n_named=$((n_named + 1)); continue ;;
+      esac
+      crit=$(printf '%s' "$line" | cut -c7-96)
+      bad "dod-criterion-names-no-check: $p -- ticked criterion names no evidence: \"$crit\". §9 wants a criterion to name how it was verified; a ticked box with neither a *Verify:* clause nor a stated proof is a claim with nothing behind it"
+    done <<EOF
+$(grep '^- \[x\]' "$repo/$p" 2>/dev/null)
+EOF
+  done
+  [ "$last_bad" -eq 1 ] && return
+  if [ "$n_named" -eq 0 ]; then
+    note "S9.VERIFYCLAUSE     -- no ticked DoD criteria in any active sprint yet -- nothing to verify"
+  else
+    ok "S9.VERIFYCLAUSE     -- all $n_named ticked criterion(s) name their evidence"
+  fi
+}
 # ==================================================================================================
 # ==================================================================================================
 # DRIVER -- iterated WITHOUT a pipe, matching check-attestation.sh's documented reason: `printf |

@@ -350,3 +350,50 @@ read *"this repository declares tier 'medium'medium"* — `${v:+a}${v:-b}` emits
 `v` is set, because `:-` yields the value rather than the fallback. A garbled verdict line is the same
 family as an un-attributable one: it is the finding an adopter has to act on. One-line fix, 0 garbled
 lines after.
+
+### 2026-08-23 | progress | T4 — §9's sprint-file family, and the check caught this very sprint
+
+Five rules, six findings. Coverage **24 → 29** in the engine; GAP 27 → 22.
+
+**Two rules needed a false-positive guard the DoD did not name**, both the same shape T3 hit:
+- **`sprint-log-missing`** — §9 creates the Execution Log *lazily at the first entry*, so its absence
+  before any work is correct. The substrate is a **ticked DoD box**: a Plan with no tick has nothing to
+  have logged. Without this the check would fire on every sprint in the gap between promote and its
+  first task — a finding about correct behaviour.
+- **`dod-criterion-names-no-check`** — §9 says a criterion names its check *"where a mechanical check
+  exists"*, so demanding a `*Verify:*` clause on every criterion would fire on judgment criteria that
+  legitimately have none. Scoped to **ticked** criteria, where the template already requires
+  `- [x] … ✓ <what proved it>`: a claim of done that names no evidence is checkable without judging
+  whether a check exists.
+
+**The cap is read, not written.** `_s2_cap_for` pulls 400 from §2's own row — a figure hard-coded here
+is a second SSOT that drifts from the row it copied (L-097 · L-130). **This is the sixth independent §2
+parser**, and it is recorded rather than slipped in: TD-070 counted five at SPRINT-078, and its case for
+a shared `read-spec-files.sh` is now stronger by exactly one caller.
+
+**§7's own table says the cap belongs here.** `S7.SPRINT400`'s fourth column points at `S9.TWOFILES`,
+so the register's `build` row is right and `check-doc-caps.sh` is the outboard stand-in.
+
+**The first run against this repository found a defect in my own design.** `S9.PLANFROZEN` reported
+**FAIL** on SPRINT-079 — § Plan *did* change after `d692b93` (T1's DoD amendment, T6's addition) — while
+`S9.SCOPECHANGE` reported **PASS**, *5 § Plan edit(s) after freeze, each with its scope-change entry
+already in the log at that commit*. Both edits were properly logged first, and the pair contradicted
+itself: an unclearable finding against an amendment §9 explicitly permits.
+
+**Fixed by splitting the two rules along the line §9 actually draws.** `S9.PLANFROZEN` asks *does an
+entry exist at all* — an amended Plan with a scope-change entry is reported as accounted for, not failed.
+`S9.SCOPECHANGE` asks *was it written first*, reading the log **as of that commit** rather than today's,
+because reading today's would accept an entry composed after the fact — which is the order §9's *before*
+exists to catch. An entry added later satisfies the first and fails the second; that is a real split,
+not a duplication.
+
+**Its own harness, `evals/run-sprint-family-fixtures.sh`.** PLANFROZEN and SCOPECHANGE are defined over
+history, and `run-conformance-engine-fixtures.sh` states in its header that it needs no git — bolting
+git on would falsify its own contract and add minutes to a suite already past six. The repo's convention
+for a git-backed family is a sibling file. It runs against the **shipped** spec rather than a reduced
+copy, because every case asserts on a named finding string rather than an exit code, so a §9 row that
+moves breaks these cases — which is the point.
+
+**Every finding has a control**, including two for `dod-criterion-names-no-check` (the rule admits two
+evidence forms, and passing only one leaves the other unguarded) and the pair that separates *the Plan
+moved* from *the Plan moved unaccounted*.
