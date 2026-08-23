@@ -42,8 +42,8 @@ update_trigger: sprint execute/close events
 
 ## Plan
 
-### T1 — Rule on the 11 `scope-out` rules `[size: S · risk: low · class: decision · HITL]`
-Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/research/conformance-dispositions.md` · `docs/epic/EPIC-004-conformance.md` · `docs/adr/`
+### T1 — Rule on the 11 `scope-out` rules `[size: M · risk: low · class: decision · HITL]`
+Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `docs/research/conformance-dispositions.md` · `docs/epic/EPIC-004-conformance.md` · `docs/adr/` · `scripts/lib/conformance-engine.sh`
 Depends-on: none
 Cites: EPIC-004 § Closed-when 2 (*"plus a separate ruling on whether the 11 `scope-out` rules are checked, re-marked, or accepted as a third state the wording does not admit"*) · SPRINT-076 T4's ruling that the bar stands · the register's § `scope-out` section · L-088 · T4 · T5
 
@@ -59,7 +59,9 @@ since SPRINT-073. This runs first in the sprint because its outcome is an input 
 - [ ] The 11 ids are **re-derived** from `conformance-dispositions.md` § `scope-out`, never copied from this Plan — *Verify: the ruled ids reconcile against 30 covered + 21 build + 11 scope-out = 62, and the register's § `scope-out` prose is the source (it is prose, not a table — a row-shaped query returns 0 here, L-108)*
 - [ ] Each of the 11 records its disposition **with its reason**, in the register and in the spec row it governs
 - [ ] Any ruled **(a) checked** joins § `build` with its finding name, and § Out says whether it lands this sprint or in SPRINT-080 — *Verify: the register's build count changes and still reconciles to 62*
-- [ ] Any ruled **(b) re-marked** changes that rule's Mark cell in `spec/STANDARD.md` and lands at least a MINOR in `spec/CHANGELOG.md` — *Verify: `sh conformance.sh .` stops asserting it with **no engine code edit**, which is the spec-driven property SPRINT-074 established*
+- [ ] Any ruled **(b) re-marked** changes that rule's Mark cell in `spec/STANDARD.md` and lands in `spec/CHANGELOG.md` at the level the spec's own test gives — *Verify: PATCH iff nothing an adopter satisfies today changes; otherwise MINOR (the test 0.5.0 states for itself)*
+- [ ] The re-marked rule **stops being asserted with no engine code edit** — *Verify: `--spec` against a scratch copy; this half is the spec-driven property SPRINT-074 established and it holds*
+- [ ] The engine **names the exclusion** rather than reporting `unrecognized mark` — one `case` arm per new mark value in `scripts/lib/conformance-engine.sh`, each with a retained fixture — *Verify: `sh conformance.sh .` prints a named exclusion line for every one of the 11, and none reports `unrecognized mark` or `rule-unimplemented`*
 - [ ] If **(c)** is taken, §14's wording and § Closed-when 2 admit the third state with the **prior wording preserved in place** — *Verify: the superseded sentence is still readable in the condition (L-088; this row refused two looser readings at SPRINT-076 on exactly that ground)*
 - [ ] The ruling is filed as an ADR **or** recorded Retro-only, with §4's three-part bar stated against it — *Verify: (c) is hard-to-reverse and surprising and a real trade-off; (a)/(b) likely are not*
 
