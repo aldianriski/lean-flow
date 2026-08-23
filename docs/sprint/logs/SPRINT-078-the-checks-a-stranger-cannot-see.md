@@ -356,3 +356,44 @@ also restored the `Co-Authored-By` trailer T1 had dropped and 14 of the previous
 there is a machine-readable claim, and this repo now has a rule that reads three specific tokens — so
 a summary line shaped like `Gate: …`, `Evidence: …` or `Gate-Signed-By: …` is not a note about the
 work, it is an assertion about approval. Worth a line wherever commit conventions are recorded.
+
+### 2026-08-23 | scope-change | T2 and T3 were committed together; split into one commit per task
+
+**What broke.** To save a gate cycle I committed T2 and T3 as a single `sprint(078) T2+T3` commit.
+`check-layers-observed.sh` attributes a commit to **exactly one** task — by a `Task: T<n>` trailer, or
+a `sprint(NN) T<n>:` subject, or a merge/parenthetical form — and `T2+T3` matches none of them. Its
+rule 6 then does what it was written to do: an unattributable commit is **reported, never absorbed**,
+because defaulting it to "coordinator" would pass its files silently. Gate: 163 pass, 1 fail.
+
+Worth noting *when* it surfaced. The earlier run had the tree dirty, so the checker's WIP leg applied
+— which bounds files against the union of all tasks' `Layers:` and cannot attribute anything. Only
+once the work was committed did the stricter per-task leg run. The checker documents exactly this
+phase split (TD-044, SPRINT-056 T3) and says the cure is to stop the two legs disagreeing *silently*;
+here they disagreed loudly and one commit apart, which is the design working.
+
+**Impact.** The substance was never in question — both tasks declare every file they touched, and
+`Task: T2,T3` would not have helped (it attributes to the literal string `T2,T3`, matching no
+declaration, and fails differently). Owner ruled: split it.
+
+`git add -p` is unavailable in this environment, so the split was done by **reconstruction**, verified
+rather than assumed:
+- `conformance-engine.sh` — an exact pre-T3 snapshot existed. Confirmed every one of the 105 lines
+  between it and the final file is T3's README work, and all are additions.
+- `run-conformance-engine-fixtures.sh` — rebuilt by removing T3's three delimited additions (the
+  README case block, `readme_footer`/`strip_footer`, the `README.md` arm in `write_core_set`).
+  Confirmed against the T1 commit that every remaining change is T2's, and that the twelve tier-case
+  references survive.
+- register · `QA.md` · Plan · Log — T3's edits reverted individually; the post-T2 register was
+  re-derived to **29 + 22 + 11 = 62** rather than edited to it, and the Log split on an entry boundary
+  so chronology is preserved (`cmp` confirmed T2 only *appends* to what T1 committed).
+
+**Re-confirm G2.** Nothing in the design moves; this is history hygiene. Both commits now carry a
+`Task:` trailer — the checker's rule 1, *"the convention going forward, unambiguous"* — rather than
+relying on the subject pattern.
+
+**Two learnings from the same slip.** (a) Batching tasks into one commit to save a verification cycle
+trades a cheap check for an expensive reconstruction; the gate cycle it saved was ~11 minutes and the
+split cost more. (b) The 11-minute gate is what made batching tempting in the first place — which is
+the § *gate's cost scales with coverage* entry above, arriving as a cause rather than an observation.
+The cheap move existed all along: `check-layers-observed.sh` runs standalone in **4 seconds**, so the
+specific check can be iterated directly and the full gate run once at the end.
