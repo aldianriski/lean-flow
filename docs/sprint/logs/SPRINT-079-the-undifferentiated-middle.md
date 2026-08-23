@@ -312,3 +312,41 @@ id. The dispatch-loop lines carry `$pid`; the per-item lines inside assertions d
 sprint as **T6**, added to the Plan by amendment. The spec 0.8.0 entry was corrected in place rather
 than appended to — it had not been committed, and publishing a claim known to be false would be worse
 than editing an unpublished block.
+
+### 2026-08-23 | scope-change | T6 added to the Plan by amendment — owner ruling
+
+*"fix it and continue, no defect left in sprint if still inline."* The un-attributed FAIL line is fixed
+in this sprint rather than filed. Added as **T6** rather than folded into T3: `check-layers-observed.sh`
+attributes a commit to exactly one task, and the two have different subjects (§2/§6 rows vs the report's
+shape). Sprint DoD **28 → 34**. § Plan edited only after this entry.
+
+### 2026-08-23 | progress | T6 — every finding names its rule, appended not prepended
+
+**The design turns on a hazard that is easy to miss.** The obvious fix is to prefix the rule id, matching
+the dispatch loop's own `$pid` shape. Three retained fixtures assert the **absence** of a finding *at
+line start* — `! grep -qE '^FAIL +ownership-header'` (×2) and
+`! grep -qE '^FAIL +file-outside-canonical-placement'` — and a fourth, in the foreign-repo harness,
+matches `^FAIL  [a-z-]+: `. A prefix satisfies all four unconditionally: they would go green because the
+line no longer matches, not because the defect is gone. **That is L-146's vacuous pass, and the fix would
+have manufactured four of them.** Appending `(S4.INDEX)` breaks no pattern, positive or negative, and
+leaves the finding first — the order an adopter reads and acts on.
+
+**Verified, not assumed:** all four patterns were re-run against a repo seeded to produce each finding,
+and all four still match. That is the DoD line this task exists for — a change that silently disarms an
+existing guard is worse than the defect it fixes.
+
+**Result:** 0 un-attributed FAIL lines across a 12-finding run, up from every per-item finding being
+un-attributable. `_cur_rid` is set by the driver before dispatch, so a *new* assertion inherits
+attribution without its author remembering to add it. No subshell in `bad`/`ok` — they run once per
+finding per file, and a `$( )` there is the per-row spawn that has cost this engine its wall clock three
+times (L-144).
+
+**`ok()` was ruled, not left ambiguous** (DoD 3): fixed the same way. The suffix carries no breakage risk
+for PASS lines either, and leaving half the verdict lines attributable would have been the same defect
+with a smaller blast radius.
+
+**A second defect found in the same family and fixed inline.** Every `tier-doc-set-incomplete` finding
+read *"this repository declares tier 'medium'medium"* — `${v:+a}${v:-b}` emits **both** branches when
+`v` is set, because `:-` yields the value rather than the fallback. A garbled verdict line is the same
+family as an un-attributable one: it is the finding an adopter has to act on. One-line fix, 0 garbled
+lines after.

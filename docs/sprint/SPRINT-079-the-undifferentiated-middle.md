@@ -145,6 +145,37 @@ by `[status: promoted]`, position-anchored.
 - [ ] Discrimination shown as in T4 — seeded break reddens its case, sibling control stays green, seed verified landed and still parsing
 - [ ] Covered rows migrate to `conformance-coverage.md`; counts reconcile to 62
 
+### T6 — Make every FAIL line name the rule that raised it `[size: M · risk: med · class: execution · HITL]`
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-conformance-engine-fixtures.sh`
+Depends-on: T3
+Cites: T3's Execution Log entry and its correction · `S4.INDEX` · `DECISIONS.md` · L-108 · L-058 · L-146 · T2 (its fixture replacement is the sibling precedent; not depended on)
+
+**Added by amendment at T3, on the owner's ruling** (*"fix it and continue, no defect left in sprint if
+still inline"*). Found while T3 established whether the tier rule could safely set `DECISIONS.md`
+aside: **23 of the engine's 54 `bad`/`ok` verdict lines name a finding without a rule id.** The
+dispatch loop's lines carry `$pid`; the per-item lines inside assertions do not — and since a failing
+assertion returns *before* its `ok` line, a failing rule can be entirely un-attributable. It cost a
+wrong diagnosis in this very sprint: a grep by rule id returned nothing and was read as *the check does
+not fire* when the check fires correctly under a different line shape.
+
+**Approach: append the id, never prepend it.** Three retained fixtures assert the **absence** of a
+finding at line start (`! grep -qE '^FAIL +ownership-header'` and siblings). Prefixing would satisfy
+those negations unconditionally and convert real failures into vacuous passes — the exact hazard L-146
+records. A trailing `(S3.HEADER)` breaks no pattern, positive or negative, and keeps the finding first,
+which is the order an adopter reads.
+
+**Acceptance:** no `FAIL` line the engine emits about a repository is un-attributable — each names its
+rule, either by leading id or trailing marker — and the negative assertions in the retained harnesses
+still discriminate.
+
+**DoD:**
+- [x] `bad()` appends the dispatching rule's id when the message does not already lead with one; invocation errors (`conformance:` — out of scope per SPRINT-077 T2) keep their shape — *Verify: `sh -n`, then a run showing `decisions-index-missing-adr` carrying `(S4.INDEX)`*  ✓ `_cur_rid` set by the driver before dispatch, so a NEW assertion inherits attribution without its author remembering. `decisions-index-missing-adr: … (S4.INDEX)`. Invocation errors keep their shape. No subshell in `bad`/`ok` — they run per finding per file, and a `$( )` there is L-144's per-row spawn
+- [x] Re-derived, not copied: the count of un-attributed verdict lines is measured again before and after, and the after is **0** for `bad` — *Verify: the same scan that produced 23, re-run*  ✓ measured on **output**, which is where the defect lives — the call sites are unchanged by design, the fix being at the helper. Before: every per-item finding un-attributable. After: **0 of 12** on one run and **0 of 11** in the fixture, across findings from several different assertions
+- [x] `ok()` is ruled explicitly rather than left ambiguous — fixed too, or scoped out with its reason recorded  ✓ **fixed too, not scoped out.** The suffix carries no breakage risk for PASS lines either, and leaving half the verdict lines attributable would be the same defect with a smaller blast radius
+- [x] **The three negative assertions still discriminate** — seed a real failure each would catch and confirm each reddens — *Verify: they must not pass vacuously (L-146); this is the DoD line the task exists for*  ✓ **all four** re-run against a repo seeded to produce each finding: `^FAIL +ownership-header` · `^FAIL +(ownership-header|update-trigger)` · `^FAIL +file-outside-canonical-placement` · `^FAIL  [a-z-]+: ` all still match. A prefix would have satisfied every one of those negations unconditionally — four manufactured vacuous passes (L-146), which is why the id is appended
+- [x] A retained fixture asserts the invariant itself: every `FAIL` line about a repository names a rule — *Verify: it reddens when one `bad` call is stripped of its id, while a sibling control stays green*  ✓ `every-fail-names-its-rule` (requires >3 findings from several assertions, so one fixed call site cannot pass it) + `suffix-preserves-negations`. **Discrimination proven:** seeding `_cur_rid=""` — 0 line delta, still parses — reddens the invariant at 9 of 12 un-attributed while the negations control stays green
+- [x] Full engine fixture harness green, and `conformance.sh .` FAIL/GAP counts unchanged (34 / 27) — this is a report-shape change, not a coverage change  ✓ **all four affected harnesses green** — engine · ownership-header · s2-placement · foreign-repo, each exit 0. `conformance.sh .` unchanged at FAIL 34 / GAP 27 / coverage 51: a report-shape change, not a coverage change
+
 ## Owner-action checklist
 - [ ] **Reinstall the plugin before executing** — this session primed at base-dir **1.48.0** against repo **1.52.0**. The `lean-doc-generator` procedure was diffed and is identical (CRLF only), but no other skill was checked, and `/orchestrator` drives this Plan (L-021).
 

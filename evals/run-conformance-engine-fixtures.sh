@@ -738,6 +738,47 @@ else
   echo "FAIL fixture(readme-shape-from-spec): exit $rc; the required shape did not follow §3 -- output:"; printf '%s\n' "$out"; fail=1
 fi
 
+# --- SPRINT-079 T6: every FAIL line about a repository names the rule that raised it -------------
+# The invariant, asserted over a repo built to produce findings from SEVERAL different assertions at
+# once -- one finding would prove only that one call site was fixed. A line qualifies if it either
+# LEADS with a rule id (the dispatch loop's own shape) or ENDS with a `(Sn.KEY)` marker.
+#
+# Why this case exists: 23 of 54 verdict lines carried a finding with no rule id, and a failing
+# assertion returns before its `ok` line -- so a failing rule could be entirely un-attributable. It
+# cost a wrong diagnosis in the sprint that fixed it: a grep by rule id over a report returned nothing
+# and was read as "the check does not fire" (L-108). A report an adopter cannot trace back to a rule
+# is a report they cannot act on.
+t_att="$work/attribution"
+mkdir -p "$t_att/docs/architecture" "$t_att/docs/adr" "$t_att/src"
+printf '# r\n'                   > "$t_att/README.md"
+printf '# no frontmatter\n'      > "$t_att/docs/architecture/overview.md"
+printf -- '---\nid: ADR-001\n---\n# ADR-001\n' > "$t_att/docs/adr/ADR-001-d.md"
+printf '# stray\n'               > "$t_att/src/erd.md"
+out=$(sh "$engine" "$t_att" --spec "$spec" 2>&1)
+n_fail_att=$(printf '%s\n' "$out" | grep -c '^FAIL' || true)
+n_unattr=$(printf '%s\n' "$out" | grep '^FAIL' | grep -vE '^FAIL  S[0-9]' | grep -cE -v '\(S[0-9]+\.[A-Z0-9-]+\)$' || true)
+if [ "$n_fail_att" -gt 3 ] && [ "$n_unattr" -eq 0 ]; then
+  echo "PASS fixture(every-fail-names-its-rule): $n_fail_att finding(s) from several assertions, 0 un-attributed"
+else
+  echo "FAIL fixture(every-fail-names-its-rule): $n_unattr of $n_fail_att FAIL line(s) name no rule (and >3 findings were required, to prove more than one call site) -- output:"
+  printf '%s\n' "$out" | grep '^FAIL' | sed 's/^/    /'; fail=1
+fi
+
+# --- T6 control: the negative assertions the SUFFIX form exists to preserve ----------------------
+# Three retained fixtures elsewhere assert the ABSENCE of a finding at line start. Prefixing the rule
+# id would have satisfied those negations unconditionally -- a vacuous pass (L-146). This case proves
+# the patterns still MATCH a real finding, which is what makes their negation meaningful.
+miss=""
+printf '%s\n' "$out" | grep -qE '^FAIL +ownership-header' || miss="$miss ownership-header"
+printf '%s\n' "$out" | grep -qE '^FAIL +file-outside-canonical-placement' || miss="$miss file-outside-canonical-placement"
+printf '%s\n' "$out" | grep -qE '^FAIL  [a-z-]+: ' || miss="$miss lowercase-finding-at-line-start"
+if [ -z "$miss" ]; then
+  echo "PASS fixture(suffix-preserves-negations): every line-start pattern the retained harnesses negate still matches a real finding"
+else
+  echo "FAIL fixture(suffix-preserves-negations): no longer matched:$miss -- the negations in run-ownership-header/run-s2-placement/run-foreign-repo would now pass vacuously"
+  fail=1
+fi
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "CONFORMANCE ENGINE FIXTURES: all green"

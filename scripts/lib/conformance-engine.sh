@@ -47,6 +47,28 @@ set -u
 
 fail=0
 n_gap=0
+# --- rule attribution on verdict lines (SPRINT-079 T6) -------------------------------------------
+# `_cur_rid` is the id of the rule currently being asserted, set by the DRIVER before it dispatches
+# and cleared after. Every verdict line that does not already LEAD with a rule id gets that id
+# appended, so no finding about a repository is un-attributable.
+#
+# WHY APPENDED AND NOT PREPENDED, which would have matched the dispatch loop's own `$pid` shape.
+# Three retained fixtures assert the ABSENCE of a finding at line start -- e.g.
+# `! grep -qE '^FAIL +ownership-header'` in run-ownership-header-fixtures.sh, and siblings in
+# run-s2-placement-fixtures.sh. A prefix satisfies those negations unconditionally, turning real
+# failures into vacuous passes: the fixture would go green because the line no longer matches, not
+# because the defect is gone (L-146). A suffix breaks no pattern, positive or negative, and keeps the
+# finding first -- which is the order an adopter reads and acts on.
+#
+# WHY THIS EXISTS AT ALL. 23 of 54 verdict lines named a finding with no rule id. The dispatch loop's
+# lines carry `$pid`; the per-item lines inside assertions did not -- and a failing assertion returns
+# BEFORE its `ok` line, so a failing rule could be entirely un-attributable. It cost a wrong diagnosis
+# in this sprint: a grep by rule id over a report returned nothing and was read as "the check does not
+# fire", when the check fires correctly under a different line shape (L-108).
+#
+# No subshell: these run once per finding per file, and a `$( )` here is the per-row process spawn
+# that has cost this engine its wall clock three times (L-144).
+_cur_rid=""
 last_bad=0
 # `last_ok` is the counterpart `last_bad` needed and did not have. Without it the driver inferred
 # "passed" from "did not fail", which silently counts a THIRD outcome as a pass: an assertion that
@@ -54,11 +76,11 @@ last_bad=0
 # "field absent => NOT SIGNED, never approval", so it may not report a pass, and the engine was
 # counting it as one and reaching `level: Attested` on an unsigned sprint (SPRINT-075 T4 review).
 last_ok=0
-ok()   { last_ok=1; printf 'PASS  %s\n' "$1"; }
+ok()   { last_ok=1; case "$1" in S[0-9]*|conformance:*) printf 'PASS  %s\n' "$1" ;; *) if [ -n "$_cur_rid" ]; then printf 'PASS  %s (%s)\n' "$1" "$_cur_rid"; else printf 'PASS  %s\n' "$1"; fi ;; esac; }
 # `last_bad` is reset before each dispatch call and read right after -- `fail` alone cannot tell a
 # caller whether THIS call failed once a prior call has already set it (a boolean flag has no memory
 # of which call flipped it), which is what the per-level counters below need to know.
-bad()  { fail=1; last_bad=1; printf 'FAIL  %s\n' "$1"; }
+bad()  { fail=1; last_bad=1; case "$1" in S[0-9]*|conformance:*) printf 'FAIL  %s\n' "$1" ;; *) if [ -n "$_cur_rid" ]; then printf 'FAIL  %s (%s)\n' "$1" "$_cur_rid"; else printf 'FAIL  %s\n' "$1"; fi ;; esac; }
 note() { printf '      %s\n' "$1"; }
 # `gap` is a THIRD verdict class, and the distinction it draws is the one SPRINT-075 T3 was created to
 # find. A `rule-unimplemented` is a statement about THIS ENGINE, never about the repository under test.
@@ -519,7 +541,10 @@ _tier_assert() {
       _tpresent=$((_tpresent + 1))
     else
       _tmissing=$((_tmissing + 1))
-      bad "$_tid-- tier-doc-set-incomplete: $_p -- §6 places this file in $_tlabel's unconditional doc set and this repository ${_tdecl:+declares tier '$_tdecl'}${_tdecl:-is a dev repo, which §6 makes Base by trigger}, so it is owed. Absent, the reader §2 names for it has nowhere to look"
+      # `${v:+a}${v:-b}` emits BOTH when v is set -- `:-` yields the VALUE, not the fallback -- so
+      # this read "declares tier 'medium'medium" on every finding. Computed once instead (T6).
+      if [ -n "$_tdecl" ]; then _twho="declares tier '$_tdecl'"; else _twho="is a dev repo, which §6 makes Base by trigger"; fi
+      bad "$_tid-- tier-doc-set-incomplete: $_p -- §6 places this file in $_tlabel's unconditional doc set and this repository $_twho, so it is owed. Absent, the reader §2 names for it has nowhere to look"
     fi
   done
 
@@ -1834,6 +1859,9 @@ for row in $rules; do
   # the two-character mangling, so no two rules can now resolve to one assertion.
   fn="assert_$(printf '%s' "$id" | tr '.-' '__')"
   pid=$(printf '%-20s' "$id")
+  # The rule under assertion, for _cur_rid's attribution (T6). Set here rather than inside each
+  # assertion so a NEW assertion inherits it without its author having to remember.
+  _cur_rid=$id
   case "$mark" in
     implementation-directed)
       n_impl=$((n_impl + 1))
