@@ -1,0 +1,4 @@
+{
+  "name": "fixture-runs-gate",
+  "scripts": { "test": "sh scripts/qa-check.sh && bun test" }
+}

@@ -1,0 +1,2 @@
+# fixture: a declared gate that rung 1 will silently outrank.
+sh scripts/qa-check.sh

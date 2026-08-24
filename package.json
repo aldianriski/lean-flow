@@ -1,0 +1,18 @@
+{
+  "name": "lean-flow",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "sh scripts/qa-check.sh && bun test",
+    "test:unit": "bun test",
+    "gate": "sh scripts/qa-check.sh",
+    "conformance": "sh conformance.sh ."
+  },
+  "engines": {
+    "bun": ">=1.3.0"
+  }
+}

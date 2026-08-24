@@ -1,0 +1,10 @@
+# Bun configuration for the lean-flow reference engine (EPIC-014).
+#
+# Deliberately minimal: no plugins, no preload, no framework. V3 §2 asks for the smallest
+# foundation that runs `bun test` and one command -- anything more is a dependency this
+# workspace has not yet earned (the laziness ladder, CLAUDE.md).
+
+[test]
+# Domain and component tests must stay fast enough to run on every change (V3 §6 Layer 1-2).
+# A test that needs longer than this is an adapter/integration test and says so by failing here.
+timeout = 5000

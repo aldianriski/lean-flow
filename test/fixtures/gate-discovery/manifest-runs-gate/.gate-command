@@ -1,0 +1,2 @@
+# fixture: a declared gate that rung 1 outranks but does NOT bypass.
+sh scripts/qa-check.sh

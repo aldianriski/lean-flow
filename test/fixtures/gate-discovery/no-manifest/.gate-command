@@ -1,0 +1,2 @@
+# fixture: the pre-manifest state -- rungs 1-3 miss, rung 4 answers.
+sh scripts/qa-check.sh

@@ -298,3 +298,47 @@ against** — `0 FAIL · level: Gated · 45 checkable with an assertion · 6 GAP
 on disk. The earlier 6-FAIL capture remains on the record above as what the state actually was; using it
 as the comparand would have let T2 introduce a regression and still "match baseline", which is the
 failure mode a baseline exists to stop.
+
+### 2026-08-24 | progress | T2 — the workspace lands, and the predicted hazard happens exactly as predicted
+
+`package.json` · `tsconfig.base.json` + `tsconfig.json` · `bunfig.toml` · `apps/cli/` · `test/` ·
+ADR-035. **Zero dependencies** — Bun runs TypeScript directly, so there is no install, no
+`node_modules` and no lockfile. That is a consumer decision, not a taste one (L-015): `plugin.json`
+declares no `files` manifest, so anything added here lands in every consumer's cache.
+
+**DoD-4, the reason this task was tiered G: discovery now stops at rung 1 and never reaches
+`.gate-command`.** Walked all four rungs by hand, before and after. It is safe *only* because
+`scripts.test` is `sh scripts/qa-check.sh && bun test`. Had it been the obvious `bun test`, System
+verify would have silently re-pointed at a suite covering almost nothing and still printed a verdict —
+the exact silent false negative ADR-033 was written to stop, arriving one sprint after it, through a
+JSON field rather than through anything that looks like governance.
+
+**The guard is a bun test, not another shell harness.** The must-FAIL fixture
+(`manifest-bypasses-gate/`, `"test": "echo ok"` beside a `.gate-command`) plus two controls, one of
+which differs in exactly one field so a pass proves discrimination rather than "returns false
+sometimes". Building it in Shell would have added to the surface EPIC-014 exists to retire.
+
+**Both seeded-break proofs held** — the CLI suite (a dropped `-v` reddened its own test, 6 siblings
+green) and the guard itself (`bypassed: false` reddened the must-FAIL case, both controls green,
+12 pass / 1 fail). Each restored `cmp`-identical.
+
+**A guard-of-the-guard was itself broken, which is worth more than the proof it was checking.** The
+"does the seeded file still parse?" step used `bun build --no-bundle … --outdir`, which printed
+*"Transpiled file in 3ms"* and then failed writing output (`EEXIST: failed to write file '""'`). Read
+as a parse failure, it reported **NO** on a file `bun test` had just executed successfully. That is
+L-045 exactly — *a command's self-report is evidence about the reporter, never the artifact* — and it
+would have blocked a valid discrimination proof, or worse, been "fixed" by weakening the seed. Replaced
+with a check that actually loads the module (`import` + `typeof`).
+
+**Conformance unmoved: `0 FAIL · 6 GAP · level: Gated`**, identical to the baseline. The three new
+top-level trees moved nothing — which is what the G1 finding asked and what `qa-check`'s tally could
+not have answered (TD-081).
+
+**Consumer path traced by parsing, not grepping.** `grep -c hooks` on `plugin.json` returned 1 — on the
+word inside the *description* (L-108's substring trap). Parsed: no `hooks` key, no `files` manifest.
+So no install, no build, no Bun needed to use the skills; but the cache does now carry six more
+entries, and that is stated rather than folded into "unchanged".
+
+**Left open deliberately:** DoD-10 names `sh scripts/qa-check.sh`, not run this session by standing
+owner instruction. Same treatment as T1 DoD-5 — the substance is verified elsewhere, the gate verdict
+is absent, and absence is not a pass.

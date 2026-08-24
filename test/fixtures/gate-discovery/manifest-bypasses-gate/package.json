@@ -1,0 +1,4 @@
+{
+  "name": "fixture-bypasses-gate",
+  "scripts": { "test": "echo ok" }
+}
