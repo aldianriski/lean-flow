@@ -759,7 +759,19 @@ assert_S13_TRAILERS() {
   _att_scan "$1"
   _att_unevaluable "S13.TRAILERS" && return
   if [ "$_ATT_PRESENT" -eq 0 ]; then
-    note "S13.TRAILERS        -- no attestation claimed (none of the three trailers present). Reported, never read as approval"
+    # HOLDS, and does not merely note (SPRINT-081 T4). §13 is explicit that "Attested is not reachable
+    # by trailers alone" and that reaching it "requires commit signing"; a repository claiming NOTHING
+    # has produced none of the evidence the level is defined by, so it has not reached it.
+    #
+    # Before this, only `S13.UNSIGNEDCLAIM` held -- an attestation CLAIMED and unsigned. A repository
+    # claiming nothing produced no hold at any level, fell through every rung of the ladder and printed
+    # `level: Attested`. The incentive was exactly inverted: claim honestly and unsigned -> held at
+    # Gated; claim nothing at all -> Attested. Silent by construction, and precisely the theatre §13
+    # says a conformance level exists to prevent.
+    #
+    # A hold, not a failure: §14 says a report states a level honestly reached and not exceeded, so
+    # this never touches the exit code. Not claiming an attestation is not a breach of anything.
+    hold "S13.TRAILERS        -- attestation-absent: none of the three trailers is present, so this repository claims no attestation and has not reached Attested. Reported, never read as approval -- and never as a defect either: §13 makes the claim optional, it is the LEVEL that is capped at Gated, not the repository that is at fault (§14)"
     return
   fi
   if [ "$_ATT_PRESENT" -lt 3 ]; then

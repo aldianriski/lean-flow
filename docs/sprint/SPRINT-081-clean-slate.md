@@ -121,12 +121,12 @@ reason named on the report rather than inferred from silence; a repository that 
 unaffected, and the exit code does not move — a hold is not a failure (§14).
 
 **DoD:**
-- [ ] The absent-attestation case holds at the Attested rung — *Verify: `sh conformance.sh .` on this repo prints `level: Gated`, naming the held finding; `level: Attested` no longer appears while 673 of 673 commits are unsigned*
-- [ ] The hold is a hold, not a failure — *Verify: exit code and `N pass, M fail` are unchanged from before the edit; §14 says a held finding names a level honestly reached and does not move the exit code*
-- [ ] A retained fixture asserts the finding on a repo that claims nothing, **and** a sibling control (a repo that does claim) stays green and reports its own denominator (L-156) — *Verify: Tier **G** under ADR-029; a false negative here is silent by construction*
-- [ ] Seeded-break check — *Verify: remove the new hold, confirm the case reddens while a sibling stays green, confirm the seeded artifact still parses and the break is targeted (assertion count unchanged, line count within one of pristine), then restore under a checked hash (L-137 · L-142)*
-- [ ] TD row filed or resolved as the fix warrants, with the inverted-incentive statement recorded
-- [ ] Gate green — *Verify: `sh scripts/qa-check.sh`, its own printed verdict line*
+- [x] The absent-attestation case holds at the Attested rung — *Verify: `sh conformance.sh .` on this repo prints `level: Gated`, naming the held finding; `level: Attested` no longer appears while 673 of 673 commits are unsigned*
+- [x] The hold is a hold, not a failure — *Verify: exit code and `N pass, M fail` are unchanged from before the edit; §14 says a held finding names a level honestly reached and does not move the exit code*
+- [x] A retained fixture asserts the finding on a repo that claims nothing, **and** a sibling control (a repo that does claim) stays green and reports its own denominator (L-156) — *Verify: Tier **G** under ADR-029; a false negative here is silent by construction*
+- [x] Seeded-break check — *Verify: remove the new hold, confirm the case reddens while a sibling stays green, confirm the seeded artifact still parses and the break is targeted (assertion count unchanged, line count within one of pristine), then restore under a checked hash (L-137 · L-142)*
+- [x] TD row filed or resolved as the fix warrants, with the inverted-incentive statement recorded — *Verify: **TD-079** filed and resolved in the same sprint, recording the inverted incentive (claim honestly and unsigned → Gated; claim nothing → Attested) and the reason the existing fixture passed throughout — it asserted the finding's text, never its consequence for the level*
+- [x] Gate green — *Verify: `sh scripts/qa-check.sh`, its own printed verdict line*
 
 ## Decisions (pre-locked)
 

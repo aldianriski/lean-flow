@@ -349,3 +349,40 @@ nothing behind it — and it is worth a Retro line rather than a mid-sprint fix:
 comparing the spec's `version:` against the newest block in `spec/CHANGELOG.md` would catch the missing
 changelog entry, though not the missing *bump*, since nothing can tell an amended rule from a typo
 without reading the diff. Naming what a check could and could not do is the honest half of filing it.
+
+### 2026-08-24 | progress | T4 — the ladder stops certifying Attested on an unsigned tree
+
+One branch, `note` → `hold`, in `assert_S13_TRAILERS`' absent-attestation case. This repository now
+reports **`level: Gated`**, naming `attestation-absent`, where it read `Attested` an hour ago — with
+**exit 0 and 0 FAIL lines**, because a hold is not a failure: §14 says a report states a level honestly
+reached and not exceeded, and declining to claim an attestation breaches nothing. TD-079 filed and
+resolved in the same sprint.
+
+**The fixture that should have caught this existed, and passed for its whole life.**
+`no-claim-is-not-approval` asserted the finding's *text* — `no attestation claimed` — and never asked
+what that finding did to the level. Three new level-aware cases now sit beside it, mirroring the shape
+case 1 already used for the *claimed-and-unsigned* path: the two facts are different and must reach the
+same level. The fourth reports its own denominator (`1 level line examined, 0 of them Attested`) so a
+case that was never reached is visibly untested rather than quietly green (L-156).
+
+**The seeded break proved exactly that criticism.** Reverting the hold reddened all three new cases —
+and `no-claim-is-not-approval` **stayed green**, because the finding's wording is unchanged by the
+seed. That is the clearest possible statement of the defect class, and it is why TD-079 records the
+generalisation rather than the instance: *a fixture that asserts a finding's wording is not asserting
+its consequence.* All four `unsigned-` sibling controls stayed green throughout.
+
+Seed guards, all four: applied (`cmp`), parses (`sh -n`), targeted (3111 lines in and out, 169
+`bad`/`note`/`ok`/`hold` calls unchanged, anchored `hold` call sites 2 → 1, diff exactly 2 lines),
+restored under a checked `sha256`.
+
+**A substring trap on the way past, worth the line because it nearly became a claim.** Counting hold
+sites with `grep -c 'hold "'` returns **3**, not 2 — `_s10_threshold "` contains `hold "`. The earlier
+diagnosis happened to read the two matches individually and identify the false one, so the conclusion
+*"exactly one hold call site"* was right; but it was right by inspection, not by the count. The metric
+above is anchored (`^ *hold "`) so the number is trustworthy without the reading.
+
+**And a bookkeeping error of my own**, recorded because the sprint file is the artifact people trust:
+the `*Verify:*` clause for the TD-row criterion was appended to the **seeded-break** line — an
+off-by-one from reading a `sed -n` range display as absolute line numbers. Both lines are now correct.
+Caught by re-reading the structure after the edit, which is the only thing that catches it: every
+line-count and grep check stayed clean while the wrong criterion carried the wrong evidence (L-009).

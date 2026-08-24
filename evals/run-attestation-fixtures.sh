@@ -186,8 +186,31 @@ else
 fi
 
 # --- case 2: a commit with no trailers at all -- reported, never read as approval -----------------
-run_case_anywhere "no-claim-is-not-approval" 0 "no attestation claimed" -- \
+# SPRINT-081 T4 CHANGED WHAT THIS CASE ASSERTS, and the old string is the reason. It read
+# `no attestation claimed`, which the engine emitted as a plain NOTE -- so a repository claiming
+# nothing produced no hold at any level, fell through every rung, and printed `level: Attested` on an
+# unsigned tree. §13 says the opposite in as many words: "Attested is not reachable by trailers alone"
+# and reaching it "requires commit signing". The incentive was inverted -- claim honestly and unsigned
+# -> held at Gated; claim NOTHING -> Attested. This case passed throughout, because asserting the
+# finding's TEXT never asked what the finding did to the level.
+run_case_anywhere "no-claim-is-not-approval" 0 "attestation-absent" -- \
   att "$base" "$sign_sha"
+# The three assertions the old case was missing. Same shape as case 1's, deliberately: a repo that
+# claims nothing and a repo that claims unsigned are different facts that must reach the SAME level.
+run_case_anywhere "no-claim-level-line-says-gated" 0 "level: Gated -- 1 finding(s) at Attested prevent Attested" -- \
+  att "$base" "$sign_sha"
+run_case_anywhere "no-claim-hold-is-not-a-failure" 0 "None is a failure" -- \
+  att "$base" "$sign_sha"
+# ... and never the other way round, with the denominator stated so a case that was never reached is
+# visibly untested rather than quietly green (L-156).
+out=$(att "$base" "$sign_sha" 2>&1); rc=$?
+n_lvl=$(printf '%s\n' "$out" | grep -c '^ *level:')
+n_att=$(printf '%s\n' "$out" | grep -c 'level: Attested')
+if [ "$rc" -eq 0 ] && [ "$n_lvl" -eq 1 ] && [ "$n_att" -eq 0 ]; then
+  echo "PASS fixture(no-claim-never-attested): $n_lvl level line examined, $n_att of them Attested, exit $rc"
+else
+  echo "FAIL fixture(no-claim-never-attested): $n_lvl level line(s), $n_att Attested, exit $rc -- a tree claiming no attestation was certified at the top level -- output:"; printf '%s\n' "$out"; fail=1
+fi
 
 # --- case 3: attestation-trailers-incomplete ------------------------------------------------------
 inc="$work/incomplete"

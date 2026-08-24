@@ -91,6 +91,33 @@ status: current
 > Base tier doc-set has no way to declare a *reasoned* exemption, which is what caps this
 > repository's own conformance level at `none` alongside TD-064's sixteen headers.
 
+- **TD-079** severity: minor | status: resolved → SPRINT-081 T4 (no task — found and fixed inside the sprint that exposed it) | created: Sprint-081 | closed: Sprint-081
+  - Summary: **the level ladder certified `Attested` on a repository that claimed no attestation at
+    all.** §13 says the opposite in as many words — *"Attested is not reachable by trailers alone"*, and
+    reaching it *"requires commit signing, which it does not yet do"* — yet a tree with none of the
+    three trailers printed the top level. **The incentive was exactly inverted: claim an attestation
+    honestly and leave it unsigned → held at Gated; claim nothing at all → Attested.**
+  - Evidence: the whole engine had **one** `hold` call site, `S13.UNSIGNEDCLAIM`, which fires only when
+    an attestation *is* claimed and the commit is unsigned. `S13.TRAILERS`' absent-attestation branch
+    emitted a plain `note`, so no rung of the ladder was held, and the report fell through to the
+    `else` branch. Latent while this repo sat at `level: none`; **live the moment SPRINT-081 T2 cleared
+    the last Structural finding**, which is how it was found.
+  - Impact: consumer-facing and the worst kind — a silent over-claim. Any adopter with zero findings and
+    no attestation was told they had reached the level the standard reserves for provable, signed human
+    approval. §13's worked example is deliberately written on the unsigned case precisely so the
+    standard does not overstate its own author's conformance; the engine was undoing that in its last
+    line.
+  - Fixed: the absent-attestation branch now `hold`s. A hold, never a failure — §14 says a report states
+    a level honestly reached and not exceeded, and declining to claim an attestation breaches nothing —
+    so the exit code does not move. This repo reports `level: Gated`, naming `attestation-absent`.
+  - **The fixture that should have caught it existed and passed throughout.** `no-claim-is-not-approval`
+    asserted the finding's *text* and never asked what the finding did to the *level* — proven by the
+    seeded break, under which that case stayed green while the three new level-aware cases reddened.
+    Filed here because the lesson generalises past this rule: **a fixture that asserts a finding's
+    wording is not asserting its consequence.**
+  - Sibling: **TD-076** (controls that report only silence). Same family — an assertion that cannot
+    distinguish the case it names from a case it never reached.
+
 - **TD-078** severity: minor | status: open | created: Sprint-081
   - Summary: **`QA-TESTCASE.md.template` ships with no §3 ownership header, yet renders into
     `docs/qa/` — a tree the engine governs.** Every adopter who renders it collects an `S3.SCHEMA`
