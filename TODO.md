@@ -30,6 +30,30 @@ _(none — SPRINT-081 closed 2026-08-24. Next: **SPRINT-082**, EPIC-005's first 
 
 ### P1 — Next Phase Required
 
+- [ ] TASK-260 — Run Phase C: the harness delta research side-car  [size: M] [risk: low] [AFK]
+      class:      execution
+      done-when:  `docs/research/harness-delta.md` exists as a decision doc (ADR-009 frontmatter, ≤130)
+                  ruling each of `05-HARNESS-RESEARCH-BRIEF.md`'s four candidates — reconstructible
+                  Lean-controlled dispatch · independent dispatch replay · reversible effect lifecycle ·
+                  programmatic mechanical batching — as **keep / reject / defer**, each against the
+                  delta over lean-flow's existing surface rather than standalone merit (L-017), and
+                  each naming which layer would own it. `05`'s explicit non-goals are re-asserted, not
+                  re-litigated
+      touches:    docs/research/harness-delta.md (new) · docs/knowledge-index.md (generated)
+      depends-on: none
+      assumes:    **unstarted and unblocked — verified, not assumed.** A census for the four candidate
+                  names returns zero hits across `docs/`, `spec/` and `skills/`;
+                  `harness-engineering-adaptation.md` is a different question and predates the strategy
+                  pack. This is the **side-car lane**: research only, collides with no implementation
+                  file, and `03` Phase C forbids opening an epic from it (*"No new epic until evidence
+                  identifies the real delta"*). It is EPIC-008's named input (D4) — `RunEnvelope`,
+                  `Dispatch` and `Effect` trace their provenance here — so it is the long pole for the
+                  whole of Lane 2's tail
+      tracker:    03-ADLC-ROADMAP.md Phase C · 05-HARNESS-RESEARCH-BRIEF.md · EPIC-008 D1/D4 ·
+                  docs/research/adlc-epic-sequencing.md F4
+      origin:     manual
+      state:      ready
+
 - [ ] TASK-259 — Exercise the absent-attestation hold against a foreign repo that has commits  [size: S] [risk: low] [AFK]
       class:      execution
       done-when:  the foreign-repo harness runs a target with real git history and no §13 trailers, and

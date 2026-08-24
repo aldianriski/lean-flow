@@ -21,15 +21,26 @@ one human — there are zero occurrences of multi-repo, monorepo, org-level or c
 `skills/`, `.claude/` and `README.md`, and the standard's own team≥2 gate has never fired
 (`docs/research/platform-readiness-audit.md` F6).
 
-It runs **last and depends on EPIC-003 + EPIC-004**, and that ordering is the point. A fleet needs
-something to pin (a versioned spec) and something to report (a conformance answer). Building fleet
-mechanics before either exists would mean inventing both badly, inside the harder problem.
+It is the **last foundation epic before the ADLC platform layers**, and depends on EPIC-003 + EPIC-004.
+That ordering is the point: a fleet needs something to pin (a versioned spec) and something to report (a
+conformance answer). Building fleet mechanics before either exists would mean inventing both badly,
+inside the harder problem. *(Reworded 2026-08-24 — "it runs last" was written when Fleet was the final
+epic on the board; EPIC-006 · 007 · 008 and the platform register now follow it. Foundation-last, not
+roadmap-last.)*
 
 ## Scope
 
 **In:** standard-version pinning per repo · a rollout/upgrade path when the standard moves ·
-cross-repo conformance and delivery reporting · delegation policy across repos (budget and capability
-per agent) · fleet state that stays git-native.
+cross-repo conformance and delivery reporting · **delegation policy declared per repository/workspace
+and applied per Run** · fleet state that stays git-native.
+
+> **Delegation policy binds to the repository and is applied to a Run — never to a named agent.**
+> Reworded 2026-08-24 from *"budget and capability per agent"*, which quietly assumed the agent is the
+> durable thing. It is not: a Claude worker, Hermes, OpenClaw or a human can each execute the same Run,
+> and a policy attached to whichever one ran would have to be rewritten every time the worker changed.
+> The shape is `repo policy → maximum capability/budget → Run → Worker`, which is also what the future
+> per-run capability model needs, so the mechanism is built once. D2 already said policy is *read by the
+> run*; this makes the subject of the policy match.
 
 **Out (explicitly not):** a hosted service, dashboard or control plane · a database (the README
 promises plain markdown, no database, no lock-in — and that promise is load-bearing for adoption) ·

@@ -11,8 +11,16 @@ update_trigger: a member sprint closes, or a decision lands that changes the out
 # EPIC-008 — Run Protocol
 
 > **Outcome:** a portable contract between a work system and an execution runtime, whose object shapes
-> are each derived from an event that actually happened — so the same Work Item at the same repo
-> revision reconstructs the same lean-controlled dispatch, through more than one runtime.
+> each trace to something already observed or already authoritative — so that the same Work Item, over
+> the same **authoritative input snapshot**, under the same workflow contract and the same runtime
+> policy, reconstructs the same lean-controlled dispatch, through more than one runtime.
+
+**"Authoritative input snapshot", not "repo revision".** A Git SHA is the *first reference
+implementation* of the concept, not the concept. An ADLC Work Item does not necessarily have a
+repository: a proposal's snapshot is its Drive document versions plus the CRM opportunity version; a
+design's is a Figma version plus a requirements version; a research item's is its source set and
+retrieval boundary. A protocol that says *repo revision* has decided that ADLC is software delivery,
+which is the one thing the domain model explicitly denies.
 
 ## Why this, why now
 
@@ -33,8 +41,9 @@ sources to one — `docs/research/adlc-epic-sequencing.md` F1, owner ruling 2026
 ## Scope
 
 **In:** the protocol objects that survive D1 — candidates are `WorkItem` · `RunEnvelope` · `RunEvent` ·
-`Evidence` · `Decision` · `Gate` · `Effect` · `ConformanceResult` · the reconstructible-dispatch proof ·
-independent versioning with its own changelog · a compatibility rule for when the protocol moves.
+`Evidence` · `Decision` · `Gate` · `Effect` · `ConformanceResult` · **`ActorRef`** · **`ArtifactRef`**,
+plus a `workflow_ref` into EPIC-007's contract · the reconstructible-dispatch proof · independent
+versioning with its own changelog · a compatibility rule for when the protocol moves.
 
 **Out (explicitly not):** **byte-identical model-request reproduction** — `03` and
 `05-HARNESS-RESEARCH-BRIEF.md § Non-Goals` both refuse it, and the claim this epic *does* make is stated
@@ -50,19 +59,47 @@ carries its guardrail; a protocol that quietly enables it would defeat that guar
 
 ## Decisions
 
-- **D1** — **Emission first; every object is derived from a recorded event.** The guard that makes this
-  checkable rather than rhetorical: an object with no observed event shape behind it in EPIC-006's
-  records is **marked speculative and excluded from v1**. Without that clause the ruling is a preference
-  and the eight-object list from `03` walks in unchallenged.
+- **D1** — **Every shipped object traces to an observed event *or* to an existing authoritative
+  artifact/contract. No object is admitted because an architecture diagram listed it.** *(Revised
+  2026-08-24. The first wording — "every object derives from a recorded event" — was too strict to be
+  true: it is right about events and wrong about everything else. Not every protocol object is an
+  event. `WorkItem` comes from the Standard's task model, `WorkflowContract` from EPIC-007,
+  `ConformanceResult` from EPIC-004/005, `RunEnvelope` and `Effect` from dispatch plus the Phase C
+  harness research. Under the old rule each would have been "speculative" for want of an event that was
+  never going to exist, and the rule would have been quietly ignored — a guard nobody can satisfy is a
+  guard nobody applies.)* The provenance every object must name:
+
+  | Object | Traces to |
+  |---|---|
+  | `RunEvent` · `Evidence` · `Gate` | **EPIC-006** — observed events |
+  | `WorkItem` | the **Standard** / task model |
+  | `WorkflowContract` (`workflow_ref`) | **EPIC-007** |
+  | `ConformanceResult` | **EPIC-004 / 005** |
+  | `RunEnvelope` · `Dispatch` · `Effect` | dispatch + **Phase C** harness-delta research |
+  | `ActorRef` · `ArtifactRef` | the domain model's existing identity and artifact distinctions |
+
+  An object that can name none of these columns is excluded from v1 and recorded as excluded.
+- **D5 — `ActorRef` and `ArtifactRef` are candidate objects, and they are not IAM.** The domain model
+  already has a Worker, a gate signer, an evidence producer, an owner and an authority — but no unified
+  way for an event to say **who or what produced this**. `ActorRef` is that, at the smallest useful size
+  (`{type: human|worker|service|automation|external, id}`), and nothing more: a full identity model is
+  EPIC-010's, where a dashboard actually needs to assign and approve. `ArtifactRef` exists because ADLC
+  output is not always code — `git://` · `drive://` · `figma://` · `s3://` · `crm://` · `custom://` —
+  and the domain model already distinguishes Artifact from Evidence, so the protocol needs the reference
+  primitive or it will grow a software-shaped one by default.
 - **D2** — Not a workflow engine (`03 § 4`). The protocol describes runs; it does not schedule or drive
   them. Anything that would need a queue, a scheduler or a service belongs to Phase F or the Control
   Plane, where `00 § 5.4`'s graduated-infrastructure rule admits it on proven need.
 - **D3** — Versioned independently, with its own changelog — ADR-023's precedent (`spec/` versioned
   separately from `plugin.json`), for the same reason: a consumer must be able to pin it.
-- **D4** — Depends on EPIC-006 (event shapes), EPIC-005 (a `ConformanceResult` that has crossed more than
-  one repo), and Phase C's `harness-delta.md` research, whose four candidates — reconstructible dispatch,
-  independent replay, reversible effects, mechanical batching — are this epic's input, not its scope.
-  Phase C is **unstarted and unblocked**, so it is the long pole nobody has started.
+- **D4** — Depends on EPIC-006 (event shapes), **EPIC-007 (the workflow contract)**, EPIC-005 (a
+  `ConformanceResult` that has crossed more than one repo), and Phase C's `harness-delta.md` research,
+  whose four candidates — reconstructible dispatch, independent replay, reversible effects, mechanical
+  batching — are this epic's input, not its scope. Phase C is **unstarted and unblocked**, so it is the
+  long pole nobody has started. **The EPIC-007 dependency is not optional bookkeeping:** § Closed-when
+  says *"same workflow contract"*, so without it this epic would mint a second representation of a
+  workflow beside EPIC-007's and the two would diverge on first contact. The protocol carries a
+  `workflow_ref` into EPIC-007's contract; it does not restate its schema.
 
 ## Open questions
 
@@ -79,10 +116,16 @@ carries its guardrail; a protocol that quietly enables it would defeat that guar
 
 ## Closed when
 
-- [ ] Every shipped object traces to at least one event shape observed in EPIC-006's records; unobserved
-      candidates are marked speculative and excluded from v1 — asserted per object, not in aggregate
-- [ ] The reconstructible-dispatch proof runs: same Work Item + same repo revision + same workflow
-      contract → the same lean-controlled dispatch
+- [ ] Every shipped object **names its provenance column from D1's table** — an observed EPIC-006 event,
+      or a named authoritative artifact/contract. An object that can name neither is excluded from v1
+      and recorded as excluded — asserted per object, not in aggregate
+- [ ] The reconstructible-dispatch proof runs: same Work Item + same **authoritative input snapshot** +
+      same workflow contract + same runtime policy → the same lean-controlled dispatch
+- [ ] **The input-snapshot concept is not repository-shaped** — a Git SHA is the reference
+      implementation, and the protocol admits at least one non-repository snapshot form (document
+      versions · a design version · a retrieval boundary) without a schema change
+- [ ] **`workflow_ref` resolves into EPIC-007's contract** — the protocol restates no part of that
+      schema, verified by there being exactly one workflow representation across the two epics
 - [ ] The reproducibility claim is stated in words and explicitly disclaims model-request reproducibility
 - [ ] The protocol is independently versioned with its own changelog
 - [ ] ADR-013 (b) run-state resume is still out of scope — asserted at close, not assumed

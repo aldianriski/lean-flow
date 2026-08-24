@@ -17,7 +17,9 @@ destination cannot yet be named is fog (`/task-decomposer --fog`) until it can.
 **Sequencing, lanes and the gated register** → [`docs/research/adlc-epic-sequencing.md`](../research/adlc-epic-sequencing.md).
 It maps the remaining ADLC roadmap phases onto epics, assigns the two parallel lanes and their shared-file
 owner, and holds the admission condition for each future epic that is deliberately *not* a file yet
-(EPIC-009 · 010 · 011 · 012 · 013, and Phase H, which reserves no id).
+(EPIC-009 · 010 · 011 · 012 · 013 — plus Phase H and Outcome Feedback, which reserve no id). The live
+phase ordering it implements is `03-ADLC-ROADMAP.md` § **Roadmap Amendment** (2026-08-24), which
+supersedes that document's earlier § Roadmap Adjustment block and the strategy README's sequence.
 
 - [EPIC-008](EPIC-008-run-protocol.md) — Run Protocol: portable work-system ↔ runtime contract, objects derived from recorded events — proposed 2026-08-24 · Lane 2 · gated on 006 (+ 005, Phase C)
 - [EPIC-007](EPIC-007-workflow-packs.md) — Workflow Packs: expertise reusable without the plugin — proposed 2026-08-24 · Lane 2 · pulled ahead of Phase D; buys decision-gate condition 6

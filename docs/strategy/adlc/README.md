@@ -103,6 +103,16 @@ After the original six documents, continue with:
 
 ### Updated Platform Sequence
 
+> **SUPERSEDED 2026-08-24 — see `03-ADLC-ROADMAP.md` § Roadmap Amendment for the live sequence.** Kept
+> verbatim below because the amendment's reasoning is only legible against what it replaced. Two things
+> this ordering got wrong once the ADLC layers were separated: it put the Run Protocol before event
+> emission (Phase D's objects are *derived* from observed events, not the reverse), and it placed
+> Memory/Cost before dashboard observability while `03`'s own adjustment block placed it after the
+> gateway — a contradiction inside the pack, now ruled as EPIC-011, after Connected Workspace and
+> before the Gateway.
+
+*(superseded)*
+
 ```text
 EPIC-004 Conformance
         ↓
@@ -120,5 +130,10 @@ Runtime Gateway + Multi-Worker
         ↓
 Managed ADLC
 ```
+
+**Live sequence (2026-08-24).** Foundation closed (003 · 004). Now, in parallel: Lane 1 **EPIC-005
+Fleet**; Lane 2 **EPIC-006 Run Evidence → EPIC-007 Workflow Packs → EPIC-008 Run Protocol**; side-car
+**Phase C Harness Delta** research. Then **EPIC-009 Local Shadow Observability** (read-only, pre-gate),
+the **Platform Decision Gate**, and only then EPIC-010 → 011 → 012 → 013.
 
 Do not implement the full dashboard or native runtime before the protocol and connected-plugin phase prove their real event/data requirements.

@@ -66,6 +66,14 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
 - **D4** — Tier under ADR-029 is declared per member task at G2, not assumed epic-wide. The pack
   *contract check* is Tier **G** if it gates conformance; the pack documents themselves are Tier **P**.
   Default up when unsure.
+- **D5 — The contract must be domain-neutral, and the risk is structural rather than careless.** All
+  four packs D1 admits are software workflows, so every proof of the contract will come from software —
+  and a schema proven only against software silently acquires `repo` · `commit` · `branch` · `tests` ·
+  `PR` as mandatory concepts. The ADLC domain model already states a Work Item may be analysis,
+  research, a proposal, a design, hiring or a business-process change. **This epic does not invent a
+  non-software workflow to prove the point** — that is Phase H's job and inventing one here would be
+  the imagination move the roadmap warns against. It proves the weaker, sufficient thing: the contract
+  does not *force* software terminology (exit condition below).
 
 ## Open questions
 
@@ -92,3 +100,9 @@ adapters and the gateway (Phase F) · the Run Protocol (EPIC-008) · non-softwar
 - [ ] No pack owns a model identity; routing is still ADR-010's roles — asserted, not assumed
 - [ ] Decision-gate condition *"≥2 runtime/workflow variations prove abstraction pressure"* is recorded
       as satisfied, or explicitly ruled not-satisfied-by-packs-alone with the reason
+- [ ] **The pack contract is domain-neutral: no software-specific field is mandatory unless the pack
+      itself is a software workflow.** `repo` · `commit` · `branch` · `tests` · `PR` may appear in a
+      software pack and must not appear in the contract's required set. **Verified by construction, not
+      by inspection** — a non-software pack skeleton (declaration only, no procedure) validates against
+      the contract with every required field satisfiable; if it cannot, the contract is software-shaped
+      and the finding names the field

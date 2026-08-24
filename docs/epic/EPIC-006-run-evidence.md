@@ -98,6 +98,26 @@ not adopted, and stays outside this epic.
 - **D4** — This epic re-enters work ADR-013 (c) rejected, so it **starts** by superseding it, never by
   assuming it. The re-entry basis is a changed *consumer class*, stated as such; ADR-013's guardrail
   against a run-state resume path survives the supersession intact.
+- **D5 — Semantic events only; "every execution point emits" is not "every tool call emits."** What is
+  recorded is an **ADLC lifecycle fact** — `RunStarted` · `DispatchCreated` · `GateRequested` ·
+  `GateSigned` · `VerificationFailed` · `RevisionStarted` · `VerificationPassed` · `RunParked` ·
+  `RunCompleted`. Not tool calls, not reads, not shell commands, not model chatter. Without this line
+  the § Scope phrase *"emission at the loop's execution points"* reads as a logging system, and a
+  logging system is what ADR-013 (c) was right to reject — re-entering the decision does not re-open
+  that part of it.
+- **D6 — Records are data-minimised by construction, and this binds from the first record written.**
+  A record **must not** contain raw chain-of-thought, secrets, API keys, credentials, unnecessary PII,
+  full tool results, or prompt history. It carries a **reference** instead: an artifact URI, a content
+  digest, a summary, a named finding (`artifact_ref: test-result://… · sha256: …`, never the 5 MB log).
+  **Why it binds on day one rather than at review:** these records live in the repository, git history
+  is append-only, and EPIC-009 exists to project them into a reader. A secret written into a record is
+  a secret in the history of every clone, and the epic that would notice is two epics away. Redaction
+  retrofitted is redaction that already failed.
+- **D7 — Correlation identity is part of the format; portability is not.** A record carries enough to be
+  grouped and ordered — `event_id` · `local_run_id` · `source_work_item_ref` · `sequence` · `timestamp` ·
+  `event_type` — and **nothing here is the Run Protocol.** This epic produces a *measurement format*;
+  EPIC-008 derives a *portable contract* from what it observes. Collapsing the two would make D2
+  circular: the protocol cannot be derived from events whose shape the protocol already fixed.
 
 ## Open questions
 
@@ -120,4 +140,9 @@ not adopted, and stays outside this epic.
 - [ ] Each of § 3's ~25 metrics is either computed from records or explicitly marked unreachable with its reason
 - [ ] Two or more real sprints' records exist, and the metric definitions survived contact with them
 - [ ] Nothing is transmitted — asserted mechanically, the way EPIC-004's foreign-repo harness asserts no lean-flow file was copied in
+- [ ] **No record carries a forbidden payload class (D6)** — asserted mechanically over the records a
+      real run produced, not reviewed by eye; the check names which class it found, and a run that
+      produces zero records fails it rather than passing vacuously
+- [ ] **Every record is a lifecycle fact, not runtime chatter (D5)** — the emitted event types are
+      exactly the declared set, and adding one is a decision, not a side effect of instrumenting a skill
 - [ ] Phase D can derive its `RunEvent` shape from recorded events rather than from imagination

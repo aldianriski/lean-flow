@@ -392,7 +392,13 @@ At that point platform infrastructure is no longer speculative.
 
 The Platform Era must not begin with a full dashboard.
 
-Preferred order:
+> **SUPERSEDED 2026-08-24 by the owner alignment pass — see § Roadmap Amendment below.** The ordering
+> in this block put Run Protocol before Plugin Event Emission, which contradicts Phase D of this same
+> document (*objects "must be designed from event shapes that occur"*), the pack README's read order,
+> and EPIC-006 D2. It is kept verbatim rather than rewritten, because the amendment's reasoning is only
+> legible against what it replaced.
+
+Preferred order *(superseded)*:
 
 ```text
 ADLC Run Protocol
@@ -424,3 +430,60 @@ This adjustment preserves the current plugin as a permanent Local/Edge mode whil
 The first dashboard milestone is **observability**, not orchestration.
 
 The first gateway milestone is **protocol transport + bounded execution**, not a distributed autonomous company runtime.
+
+---
+
+# Roadmap Amendment — 2026-08-24 (owner alignment pass)
+
+Supersedes the ordering in § Roadmap Adjustment above. Three things changed, and the reason each
+changed is a fact the original could not have had.
+
+**1. Emission comes before Protocol.** Phase D of this document already says its objects *"must be
+designed from event shapes that occur"*; the adjustment block contradicted it. Emission (EPIC-006) is
+a **measurement format**; the Protocol (EPIC-008) is a **portable contract** derived from it. Keeping
+them distinct is the point — designing the contract first is this document's own named anti-goal
+(*workflow engine before stable workflow semantics*).
+
+**2. Phase B and emission run in parallel; Phase E moves ahead of Phase D.** EPIC-005 and EPIC-006 have
+no dependency in either direction. Phase E (Workflow Packs) depends only on the closed Standard and
+satisfies the *"≥2 runtime **or workflow** variations"* half of § 5's decision gate, so listing it after
+Phase D left a gate condition blocking with no blocker of its own.
+
+**3. Observability is split from Connected Work, and only the first runs before the gate.** A local,
+read-only shadow observer over emitted records is an **experiment that learns what a dashboard needs**;
+a Connected Workspace that creates and assigns Work Items is a control plane. `06 § 3` says not to jump
+to Managed Mode; this applies the same rule one stage earlier.
+
+```text
+FOUNDATION      EPIC-003 Standard ✅ · EPIC-004 Conformance ✅
+
+NOW (parallel)  Lane 1   EPIC-005 Fleet ─────────────────────────▶ fleet proof
+                Lane 2   EPIC-006 Evidence ─▶ EPIC-007 Packs ─▶ EPIC-008 Protocol
+                side-car Phase C Harness Delta ─────────────────▶ feeds EPIC-008
+
+PRE-GATE        EPIC-009 Local Shadow Observability
+                  read-only · no control authority · no central dependency
+
+PLATFORM GATE   Standard ✅ · Conformance ✅ · Fleet 005 · Visibility 006
+                  · Workflow 007 · Protocol 008   — ALL MET
+                       ↓
+PLATFORM ERA    EPIC-010 Connected Workspace (+ identity/authority)
+                       ↓
+                EPIC-011 Context / Cost Policy
+                       ↓
+                EPIC-012 Runtime Adapters + Gateway
+                  admitted only with a concrete second-runtime need
+                       ↓
+                EPIC-013 Managed ADLC
+                       ↓
+                demand-driven workflow expansion  →  Outcome Feedback (when measurable)
+```
+
+**Memory / Context / Cost placement is ruled here.** The block above placed it *after* the gateway; the
+pack README placed it *before* dashboard observability. Neither: it sits **after Connected Workspace and
+before the Gateway**, as EPIC-011. Ruled by the owner at this pass — a judgement call, closed by ruling
+rather than by waiting for a measurement.
+
+**Not in the amendment, deliberately.** Phase C is still research, not an epic. Phase H still reserves
+no id. Nothing below EPIC-013 is admitted by this ordering — each future epic keeps its own admission
+condition (`docs/research/adlc-epic-sequencing.md` § Register).
