@@ -106,6 +106,59 @@ describe("architecture fitness — the test-file exemption is narrow", () => {
   });
 });
 
+describe("architecture fitness — false NEGATIVES independent review found", () => {
+  // A guard that misses a real violation is worse than no guard: it certifies. All three of these
+  // were reported clean by the first implementation.
+  test("BLOCKER: a CommonJS require() of another layer is an edge", () => {
+    expect(importsOf('const x = require("../../apps/cli/src/main.ts");'))
+      .toContain("../../apps/cli/src/main.ts");
+  });
+
+  test("BLOCKER: a wide multi-line import cannot outrun the matcher", () => {
+    // The first implementation capped the import/from gap at 200 characters, so a Prettier-wrapped
+    // import with ~15+ named bindings vanished entirely. This one is 40 bindings, ~320 chars.
+    const wide = "import {" + String.fromCharCode(10) +
+      Array.from({ length: 40 }, (_, i) => "  name" + i + ",").join(String.fromCharCode(10)) +
+      String.fromCharCode(10) + '} from "../../../apps/cli/src/main.ts";';
+    expect(importsOf(wide)).toContain("../../../apps/cli/src/main.ts");
+  });
+
+  test("every import form the codebase uses is still detected after the rewrite", () => {
+    const src = ['import { a } from "./a.ts";', 'export { b } from "./b.ts";',
+      'import "./c.ts";', 'const d = await import("./d.ts");',
+      'const e = require("./e.ts");'].join(String.fromCharCode(10));
+    expect(importsOf(src).sort()).toEqual(["./a.ts", "./b.ts", "./c.ts", "./d.ts", "./e.ts"]);
+  });
+});
+
+describe("architecture fitness — false POSITIVES, and the untested branch review exposed", () => {
+  test("MAJOR: prose inside a template literal is not an edge", () => {
+    // A help string or docstring whose embedded line begins with `import ... from "..."`. The
+    // first implementation copied string bodies through unchanged and counted this as a real edge.
+    const src = "const h = `Usage notes:" + String.fromCharCode(10) +
+      'import the settings from "apps/cli/src/config.ts" manually`;';
+    expect(importsOf(src)).toEqual([]);
+  });
+
+  test("a string containing // does not truncate the scan — the branch Seed D left unproven", () => {
+    // Independent review disabled string handling entirely and NOTHING in the suite reddened: the
+    // quote branch shipped with zero discrimination proof. Without it, the // inside a URL reads as
+    // a line comment and swallows the rest of the line, so the import after it disappears.
+    const src = 'const u = "http://example.com";' + String.fromCharCode(10) + 'import { a } from "./x.ts";';
+    expect(importsOf(src)).toEqual(["./x.ts"]);
+  });
+
+  test("a /* inside a string does not open a comment", () => {
+    const src = 'const g = "/* not a comment";' + String.fromCharCode(10) + 'import { a } from "./y.ts";';
+    expect(importsOf(src)).toEqual(["./y.ts"]);
+  });
+
+  test("an escaped quote does not end the string early", () => {
+    const src = 'const q = "she said \\"import x from y\\" loudly";' + String.fromCharCode(10) + 'import { a } from "./z.ts";';
+    expect(importsOf(src)).toEqual(["./z.ts"]);
+  });
+});
+
 describe("architecture fitness — layer assignment is explicit", () => {
   test("an unrecognised path is `unassigned`, never silently treated as domain", () => {
     // Defaulting an unknown path INTO a layer would apply that layer's rules to files nobody

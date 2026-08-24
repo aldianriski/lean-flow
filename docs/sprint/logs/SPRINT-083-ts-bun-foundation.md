@@ -522,3 +522,75 @@ about `layerOf` may already be addressed.
 
 **Left open deliberately:** DoD-5 names `sh scripts/qa-check.sh`, not run this session (standing owner
 instruction). Same treatment as T1 DoD-5 and T2 DoD-10.
+
+### 2026-08-24 | scope-change | T3 revise — two BLOCKER false negatives; the guard could be defeated by ordinary code
+
+Independent review of `c9d3156` (fresh scoped reviewer, run against a pristine `git archive` of that
+commit rather than the live worktree — it noticed T4 had already patched `layers.ts` and excluded it).
+
+**BLOCKER 1 — `require()` was invisible.** A domain file doing
+`require("../../../apps/cli/src/main.ts")` — an unambiguous `domain-imports-app` violation — was
+reported `{ violations: [], edgesExamined: 0 }`. Fully clean.
+
+**BLOCKER 2 — a wide multi-line import vanished.** `IMPORT_RE` capped the gap between `import` and
+`from` at 200 characters. A Prettier-wrapped import with ~15+ named bindings exceeds that and matched
+none of the three patterns. Not contrived — that is ordinary formatted code.
+
+**Both are false NEGATIVES, which is the failure that matters here.** A guard that misses does not stay
+silent; it *certifies*. The suite was green in both cases.
+
+**MAJOR — prose inside a template literal counted as a real edge.** `stripNonCode` copied string bodies
+through unchanged, so a help string whose embedded line began with `import … from "…"` produced a
+phantom dependency. The reviewer noted this was a landmine for exactly the docstrings T4 was about to
+write.
+
+**Fixed by tokenising, not by patching the regexes a third time.** `scan()` now walks the source once
+and replaces every string with an **opaque marker**, so import matching runs over a skeleton where no
+string content survives. Prose cannot look like code; code cannot be mistaken for prose. `require()`
+joins the pattern set, and no pattern carries a length cap.
+
+**The finding I value most is the one I did not make: the reviewer's own Seed D.** It disabled string
+handling entirely — one line, still parsing — and **the suite reported 32 pass / 0 fail. Completely
+non-discriminating.** That branch of the state machine shipped with *zero* proof, and it is
+load-bearing: without it, the `//` inside `"http://example.com"` reads as a line comment and swallows
+the rest of the line. I had proved the line-comment branch (Seed B) and the block-comment branch
+(Seed C) and never thought to break the third. **Re-running Seed D now reddens 14 tests.**
+
+Regression tests added for every finding: `require()` · a 40-binding multi-line import · template-
+literal prose · a URL containing `//` · a `/*` inside a string · an escaped quote. 52 pass / 0 fail.
+
+**Correction to an earlier entry, made here because the log is append-only.** The seed table above
+records "line-comment strip broken → 30 pass / 1 fail". Independent reproduction gives **31 pass / 1
+fail**, and 31/1 is the only arithmetically consistent result for a 32-test suite with one failure. The
+30 was copy-pasted from the row above it. The conclusion stands — that seed does discriminate — but the
+evidence figure was wrong, which is precisely the report-and-artifact-disagree class this sprint has
+been chasing all day, appearing in my own evidence table.
+
+**Also noted by review, and accepted rather than fixed:** at `c9d3156` the "this repository is clean"
+test examined only **2 files / 2 edges**, because `packages/` did not exist yet — a much weaker claim
+than its name suggests. T4 has since taken it to 4 files / 4 edges. It is still small, and the honest
+statement is that no rule has yet been exercised against a real violation in this repository's own
+code — only against fixtures.
+
+### 2026-08-24 | surprise | T3 revise — the fix put a NUL byte in a source file and git flagged it binary
+
+The tokeniser marked redacted strings with `\u0000`, and a **literal** NUL byte ended up in
+`layers.ts` rather than the escape sequence. `git diff --cached --stat` reported
+`test/architecture/layers.ts | Bin 7091 -> 8826 bytes` — **git had reclassified a TypeScript source
+file as binary.** The suite was green throughout; `bun` does not care. What breaks is everything a
+human or a reviewer uses: no line diff, no `grep`, no blame, and the independent reviewer that found
+the blockers above could not have read the fix.
+
+Two failed attempts are recorded because each was a wrong diagnosis: a regex replace over the NUL, then
+an index splice — both reported success and left the byte in place (`Bun.file().text()` round-tripped
+it). Caught each time by re-counting the bytes rather than trusting the script's own report (L-045).
+
+**Fixed by removing the need for a control character at all.** The marker is now plain ASCII
+(`@@STR<n>@@`), which is safe for the same reason the mechanism works: string *bodies* never reach the
+skeleton, so nothing in real source can collide with it. Simpler, greppable, and diffable —
+`55 insertions(+), 18 deletions(-)` where there had been `Bin`.
+
+**The marker change was itself caught by the suite**, which is the point of having one: swapping the
+skeleton's marker without updating the matching regex left the two disagreeing, and 14 tests went red
+immediately. Seed D re-run after the change still reddens 14, so the coverage the reviewer's finding
+bought is intact. 52 pass / 0 fail, 0 NUL bytes.

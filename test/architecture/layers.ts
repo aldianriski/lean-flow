@@ -68,13 +68,32 @@ export function isInfrastructure(spec: string): boolean {
     ["fs", "path", "child_process", "os", "net", "http", "https"].includes(spec);
 }
 
+export interface Scan {
+  readonly skeleton: string;
+  readonly strings: readonly string[];
+}
+
+/** Marker delimiter for a redacted string — a character no source file contains. */
+const MARK_L = "@@STR";
+const MARK_R = "@@";
+
 /**
- * Strip block comments, line comments and string literals, so only real code is scanned.
- * Order matters: strings first would eat comment markers inside strings and vice versa, so this
- * walks the text once with a tiny state machine instead of running independent regexes.
+ * Split source into code, comments and string literals in ONE pass, replacing every string with an
+ * opaque marker. Import scanning then runs over a skeleton in which no string CONTENT survives, so
+ * prose can never look like code and code can never be mistaken for prose.
+ *
+ * Three defects found by independent review of the first implementation drove this shape, and all
+ * three were false readings of text:
+ *   - `require()` was invisible, so a genuine cross-layer dependency read as clean (false negative)
+ *   - a multi-line import wider than a fixed 200-character regex window vanished (false negative)
+ *   - a backtick literal whose embedded line began with `import … from "…"` counted as a real edge
+ *     (false positive) — a landmine for exactly the docstrings this repo writes
+ *
+ * Patching the regexes a third time was the wrong move: the text needed tokenising, not matching.
  */
-export function stripNonCode(src: string): string {
-  let out = "";
+export function scan(src: string): Scan {
+  let skeleton = "";
+  const strings: string[] = [];
   let i = 0;
   while (i < src.length) {
     const two = src.slice(i, i + 2);
@@ -86,35 +105,53 @@ export function stripNonCode(src: string): string {
       i += 2;
     } else if (src[i] === '"' || src[i] === "'" || src[i] === "`") {
       const q = src[i];
-      out += q; // keep the quote so import-from syntax still parses
       i++;
       let body = "";
       while (i < src.length && src[i] !== q) {
-        if (src[i] === "\\") i++;
-        body += src[i] ?? "";
-        i++;
+        if (src[i] === "\\") {
+          body += src[i];
+          i++;
+        }
+        if (i < src.length) {
+          body += src[i];
+          i++;
+        }
       }
-      out += body + q;
       i++;
+      skeleton += MARK_L + String(strings.length) + MARK_R;
+      strings.push(body);
     } else {
-      out += src[i];
+      skeleton += src[i];
       i++;
     }
   }
-  return out;
+  return { skeleton, strings };
 }
 
-const IMPORT_RE = /(?:^|\n)\s*(?:import|export)[\s\S]{0,200}?from\s*["'`]([^"'`]+)["'`]/g;
-const BARE_IMPORT_RE = /(?:^|\n)\s*import\s*["'`]([^"'`]+)["'`]/g;
-const DYNAMIC_RE = /\bimport\s*\(\s*["'`]([^"'`]+)["'`]\s*\)/g;
+/** The code with comments removed and every string reduced to an opaque marker. */
+export function stripNonCode(src: string): string {
+  return scan(src).skeleton;
+}
+
+const MARK = "@@STR(\\d+)@@";
+
+// No length cap anywhere: a wrapped multi-line import must not be able to outrun the matcher.
+const IMPORT_RE = new RegExp("(?:^|[;{}\\n])\\s*(?:import|export)\\b[^;]*?\\bfrom\\s*" + MARK, "g");
+const BARE_IMPORT_RE = new RegExp("(?:^|[;{}\\n])\\s*import\\s*" + MARK, "g");
+const DYNAMIC_RE = new RegExp("\\bimport\\s*\\(\\s*" + MARK, "g");
+/** CommonJS. Invisible to the first implementation, so a real violation read as clean. */
+const REQUIRE_RE = new RegExp("\\brequire\\s*\\(\\s*" + MARK, "g");
 
 export function importsOf(src: string): string[] {
-  const code = stripNonCode(src);
+  const { skeleton, strings } = scan(src);
   const found: string[] = [];
-  for (const re of [IMPORT_RE, BARE_IMPORT_RE, DYNAMIC_RE]) {
+  for (const re of [IMPORT_RE, BARE_IMPORT_RE, DYNAMIC_RE, REQUIRE_RE]) {
     re.lastIndex = 0;
     let m: RegExpExecArray | null;
-    while ((m = re.exec(code)) !== null) if (m[1]) found.push(m[1]);
+    while ((m = re.exec(skeleton)) !== null) {
+      const v = strings[Number(m[1])];
+      if (v !== undefined) found.push(v);
+    }
   }
   return found;
 }
