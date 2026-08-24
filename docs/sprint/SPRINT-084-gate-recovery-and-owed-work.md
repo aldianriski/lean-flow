@@ -4,7 +4,7 @@ slug: gate-recovery-and-owed-work
 owner: Maintainer
 last_updated: 2026-08-24
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: af7e517
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
