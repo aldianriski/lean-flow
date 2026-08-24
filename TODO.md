@@ -50,92 +50,6 @@ _(none — SPRINT-081 closed 2026-08-24. Next: **SPRINT-082**, EPIC-005's first 
       origin:     close-retro
       state:      ready
 
-- [ ] TASK-238 — Re-run the foreign-repo artefact triage once coverage is past the shape-bound rules  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when:  the T3 triage is repeated against a from-scratch repo with §2's placement rules, §6's
-                  tier doc-sets and §11's ledger rules implemented, and each finding is classified
-                  *actionable by that repo's owner* or *an artefact of dispositions written against our
-                  shape* — with the verdict recorded. A high artefact count is a finding about
-                  `docs/research/conformance-dispositions.md` and routes back there; the engine is not
-                  tuned to look quiet
-                  **§2's third is DONE (SPRINT-076 T3) and the remaining two are what this row now
-                  waits on.** The re-run happened with `S2.F-FILE` · `S2.R-PLACEMENT` live and the
-                  number moved off zero: **4 artefacts of 8 new findings** — `AGENTS.md` · `TODO.md` ·
-                  `.claude/CLAUDE.md` · `.claude/CONTEXT.md`, all of them lean-flow's own loop surface
-                  rather than repository structure. Routed back to the register (§ Artefacts) exactly as
-                  this row requires, the engine left faithful rather than quietened, and the spec fix
-                  filed as TASK-243 — **delivered at SPRINT-077 T1 (spec 0.5.0); artefacts now 0 of 4**. So the
-                  METHOD is proven and the finding is real; what is unproven
-                  is the other two families
-      touches:    evals/run-foreign-repo-fixtures.sh (extend the target if the new rules need one) ·
-                  docs/research/conformance-coverage.md § Artefacts (only if artefacts are found — the
-                  section moved there at SPRINT-079's promote, when the register was split) · the
-                  sprint Execution Log that runs it
-      depends-on: none
-      assumes:    **SPRINT-075 T3's "0 artefacts" is honest but early, and re-promoting this on the
-                  strength of that number would be reading it backwards.** Only 6 of 62 checkable
-                  rules had assertions, and none of them were the rules most likely to encode our own
-                  directory shape — so the question was barely asked, not answered. The trigger is
-                  coverage reaching those families, not a schedule.
-                  **Re-parked at SPRINT-076 T3 with a NARROWED condition, not discharged** — §2 is in
-                  and confirmed the suspicion; unblock when **§6's tier doc-sets** or **§11's ledger
-                  rules** are evaluated by the ENGINE (§11's two are covered today by standalone
-                  checkers, which never run against a foreign tree). Naming the remaining families is
-                  what keeps this a condition rather than a standing wish (L-094: the class of fact
-                  that closes it is a measurement, and it accumulates one family at a time)
-      tracker:    SPRINT-075 T3 · SPRINT-076 T3 (the §2 third) · EPIC-004 § Closed-when 1 · L-015 · L-016
-      origin:     close-retro
-      state:      ready
-                  **UNBLOCKED at SPRINT-079's promote.** The condition read "§6's tier doc-sets **or**
-                  §11's ledger rules are evaluated by the ENGINE" — SPRINT-078 T2 put the tier family
-                  there (`assert_S6_BASE` … `assert_S6_MULTISVC`, one check with the tier a parameter),
-                  so the first disjunct is met. Re-derived at promote from the engine source, not read
-                  off SPRINT-078's summary. Not pulled into SPRINT-079: the triage wants coverage past
-                  the shape-bound families, and §11's ledger rules land in SPRINT-080 (TASK-250/251) —
-                  running it after those is the stronger measurement, and the trigger stays a condition
-                  rather than a schedule (L-094)
-
-- [ ] TASK-257 — Write the sixteen ownership headers this repo's own docs are missing  [size: S] [risk: low] [AFK]
-      class:      mechanical-ingest
-      done-when:  `sh conformance.sh .` reports **zero** `ownership-header-missing` ·
-                  `ownership-header-field-missing` · `update-trigger-absent` findings, and `S1.LAW3`
-                  and `S3.SCHEMA` no longer appear among the rules preventing Structural. Each trigger
-                  written is the doc's **real** one — §1 LAW 3's mechanical half is mere presence, but
-                  a trigger that can never fire is the doc ageing silently under a header claiming
-                  otherwise, which is the failure LAW 3 exists to stop
-      touches:    docs/qa/QA-001…QA-003 (no frontmatter at all — full four-field header) ·
-                  docs/research/ ×13 (header present, `update_trigger:` absent) · TECH-DEBT.md
-                  (TD-064 → resolved)
-      depends-on: none
-      assumes:    the counts are TD-064's and are **re-derived at execution, never carried from this
-                  row**: 3 `ownership-header-missing` + 13 `ownership-header-field-missing` = 16
-                  `update-trigger-absent`, the three reconciling against each other (L-108 · L-130 —
-                  a figure frozen into a DoD is a query result). If the numbers have moved, the
-                  movement is itself the finding
-      tracker:    TD-064 · SPRINT-075 (filed) · SPRINT-076 T5 (halved by ruling, not by writing)
-      origin:     manual
-      state:      ready
-
-- [ ] TASK-258 — Rule how a repository declares a *reasoned* Base-tier doc exemption  [size: M] [risk: med] [HITL]
-      class:      decision
-      done-when:  the ruling lives in the artifact the **engine** reads, and `sh conformance.sh .`
-                  either stops emitting the two `tier-doc-set-incomplete` findings or names them as an
-                  explicit exclusion — never silently dropped (L-058). If the ruling adds a declaration
-                  file or a §2 row it is ADR-grade and the ADR lands with it
-      touches:    spec/STANDARD.md §6 (and §2 if a row is added) · scripts/lib/conformance-engine.sh ·
-                  evals/ fixtures for whichever arm is built · docs/architecture/overview.md
-                  § Base-tier docs this repo deliberately does not have (which currently holds the
-                  ruling alone, where no tool can reach it) · TECH-DEBT.md (TD-077)
-      depends-on: none
-      assumes:    the two candidate arms are TD-077's — **(a)** extend `.conformance-tier`'s
-                  declaration pattern to per-doc exemptions carrying a reason string · **(b)** make
-                  §6's Base rows condition-gated the way §2's team-gated rows already are. Neither is
-                  pre-selected: this row exists to force the choice, not to record one already taken
-      tracker:    TD-077 · ADR-028 (the precedent — a disposition moved into the artifact the tool
-                  reads) · L-151 · SPRINT-054 T1 (where the two exemptions were ruled)
-      origin:     manual
-      state:      ready
-
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution
       done-when:  a real unattended run that stops mid-Plan leaves a rollup naming the untouched tasks
@@ -175,7 +89,7 @@ _(none — SPRINT-081 closed 2026-08-24. Next: **SPRINT-082**, EPIC-005's first 
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-078's shipped changes are written up as **v1.52.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only). Coverage 19 → 30 of 62; `.conformance-tier` is the one new consumer-facing surface.
+_(no active sprint)_ — SPRINT-081's shipped changes are written up as **v1.55.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only). `level: none` → `Gated`; the one new consumer-facing surface is `.conformance-exempt` (ADR-031), and v1.53.0 rotated to `docs/changelog/`.
 
 ---
 
