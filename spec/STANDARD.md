@@ -2,7 +2,7 @@
 owner: Maintainer
 last_updated: 2026-08-24
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.9.0
+version: 0.10.0
 status: current
 ---
 
@@ -1037,6 +1037,11 @@ across §1–§13:
 | classified | 4 | 21 | 3 | 7 | 2 | 4 | 9 | **0** | 10 | 10 | 11 | 12 | 7 | **100** |
 | unclassified | | | | 0 | 0 | | | | | | | | | **0** |
 
+**§14 and §15 publish no rule rows** and are absent from this table for opposite-looking but identical
+reasons: §14 is the legend, and §15 governs this document's release rather than any artifact. §15 says
+so in its own Conformance block, and will publish rows when the fleet pin rule gives it one an adopter
+can be evaluated against.
+
 §8 contributes **0** — it is a projection of rules stated elsewhere, and an engine ingesting it
 double-counts seven constraints under a second name.
 
@@ -1044,3 +1049,59 @@ These counts are derived from the tables above and are the figure to cite. They 
 `96 / 39 / 45 / 6` figures in the reference implementation's SPRINT-072 baseline, which stated 96 while
 its own rows summed to 99 and its own columns to 98. **The spec is the rule source; a derived inventory
 that disagrees with it is the thing that is wrong.**
+
+---
+
+## §15 — Versioning (what a version number of this document means)
+
+§2 says to *"bump per `spec/CHANGELOG.md`"* and never said what a bump means. Nine versions shipped
+under that silence — `0.1.0` → `0.9.0` in eight days, every one of them MINOR, because MINOR was the
+only outcome the absent rule could produce. This section states the semantics, and it exists now rather
+than later because **pinning is downstream of it**: a fleet that pins repos to a standard version and
+upgrades them together cannot define an upgrade path without knowing what an upgrade is permitted to
+break.
+
+**The question a version answers is an adopter's, not an author's.** For a specification whose consumers
+are repositories being checked, the only change that is felt is one that moves a verdict. So:
+
+| Bump | The change | What an adopter experiences |
+|---|---|---|
+| **MAJOR** | a repository that conformed at level L **would now fail** at L — a rule added that binds at or below a level already claimed, a rule tightened, a level's bar raised · **or** a rule id is removed or renumbered | re-run and re-clear findings before upgrading; the pin does not move by itself |
+| **MINOR** | a rule, mark, level or section **added** whose findings bind only at a level the repository has not claimed; a new template; a classification made stricter *on paper* without moving any verdict | upgrade is safe at the level they hold; new ground appears above them |
+| **PATCH** | wording, a clarified example, a corrected cross-reference, a typo — **no rule's meaning moves** | nothing to do |
+
+**The test is mechanical in principle and is stated as one question:** *run the previous version's
+checks and this version's checks over the same unchanged repository — does any verdict change from pass
+to fail?* If yes, MAJOR. That test is the rule; a reading of the diff's intent is not.
+
+**Reclassification is the case that looks safe and is not.** Moving a rule from `judgment-only` to
+`mechanical` writes a checker where none existed, and a repository that was never evaluated on it can
+newly fail. That is MAJOR by the test above even though no rule text changed — which is why the test
+reads verdicts and not prose.
+
+**`0.x` and the `1.0.0` condition.** This document is below `1.0.0` and the condition for leaving is
+**not** a feature count or a date: `1.0.0` lands when the standard has been shown to govern **a
+repository that is not the one that wrote it** — two or more repositories pinned to one version and
+upgraded together. A standard that has only ever governed its own author has not demonstrated the
+property the number would claim. Until then `0.x` MINOR bumps carry the MAJOR meaning above, because
+pre-`1.0` semver has no MAJOR to spend; an adopter reads the CHANGELOG entry, which says which it was.
+
+**Version streams are independent, and each declares the range it implements.** This document,
+the plugin that ships it, and any protocol or workflow-pack contract built on it each move on their own
+number — a specification that could only be adopted at the tool's version would not be separable, which
+is the extraction ADR-018 made. What keeps independence from becoming ambiguity is a **declared
+compatibility range** on the dependent artifact (`standard: ">=0.9 <1.0"`), never a maintained table
+elsewhere: the declaration travels with the thing it constrains and can be read from a clone alone.
+**Where an adopting repository declares its own pin is deliberately not specified here** — that is a
+fleet mechanism, and specifying it before the mechanism exists would freeze a shape nobody has built.
+
+**Conformance. §15 publishes no rule rows at this version, and the absence is a decision rather than an
+omission.** Everything above governs **this document and the artifacts that ship it** — never a
+repository under test — so every rule it will eventually carry is `standard-directed` and none of them
+is checkable against an adopter's tree (§14). Publishing them is therefore worth nothing to an adopter
+today, and costs a change to the engine's rule source, which reads a fixed §1–§13 range.
+
+**They are published in one pass, not two, when the fleet pin rule lands** — that rule is the first
+§15 constraint an *adopting repository* can be evaluated against, and it is deliberately unspecified
+above. Until then this section is normative prose that a human release decision reads, and §14's counts
+stay at **100 classified · 51 checkable**, unchanged by this section's arrival.

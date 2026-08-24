@@ -9,6 +9,33 @@ status: current
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
 
+## 0.10.0 — 2026-08-24
+
+**MINOR — §15 states what a version number of this document means.** §2 said to *"bump per
+`spec/CHANGELOG.md`"* and never said what a bump was. Nine versions shipped under that silence —
+`0.1.0` → `0.9.0` in eight days, every one MINOR, because MINOR was the only outcome an absent rule
+could produce. §15 replaces the silence with a test an author cannot argue with: **run the previous
+version's checks and this version's checks over the same unchanged repository — if any verdict moves
+pass → fail, the bump is MAJOR.** Reclassifying a rule from `judgment-only` to `mechanical` is MAJOR
+under that test even though no rule text changed, which is the case that looks safe and is not.
+
+**The `1.0.0` condition is now stated and is not a date or a feature count:** `1.0.0` lands when this
+standard has been shown to govern **a repository that is not the one that wrote it** — two or more
+pinned to one version and upgraded together. Until then `0.x` MINOR carries MAJOR meaning, because
+pre-`1.0` semver has no MAJOR to spend, and the entry here says which it was.
+
+**Version streams are independent, with a declared compatibility range on the dependent artifact**
+(`standard: ">=0.9 <1.0"`) rather than a compatibility table held elsewhere — the declaration travels
+with the thing it constrains and reads from a clone alone. **Where an adopting repository declares its
+own pin is deliberately unspecified**: that is a fleet mechanism, and freezing its shape before it is
+built is the trap this standard names elsewhere.
+
+§15 publishes **no rule rows** at this version and says why in its own Conformance block — every
+constraint it carries is `standard-directed`, so none is checkable against an adopter, and the rows land
+in one pass when the fleet pin rule gives §15 a rule an adopting repository can be evaluated against.
+**§14's counts are unchanged — 100 classified · 51 checkable** — and no existing finding moves for any
+repository. Full reasoning → ADR-032.
+
 ## 0.9.0 — 2026-08-24
 
 **MINOR — §6 gains a reasoned doc exemption: a repository may rule a tier doc unnecessary and say

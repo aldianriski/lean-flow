@@ -62,6 +62,19 @@ telemetry of any kind · running an org's CI for them.
   at close: a member sprint that needs friction evidence pins a real repo *in addition*, never as a
   substitute for the reproducible case.
 
+- **D4** — **Version semantics are a prerequisite of this epic, and were missing from it.**
+  § Closed-when 1 requires two or more repos *"pinned to one standard version and **upgraded
+  together**"* — an upgrade path is undefinable without a rule for what an upgrade may break, and no
+  such rule existed while `spec/` shipped nine consecutive MINOR bumps in eight days. **Ruled 2026-08-24
+  at the roadmap-sequencing pass** (the same pre-epic position as D3, and for the same reason: a
+  criterion resting on an undecided rule is L-111's trap): a bump reports a **moved verdict**, `1.0.0`
+  is earned by governing a repository that is not ours — which is *this epic's own first exit
+  condition* — and dependent artifacts declare a compatibility range rather than share a number.
+  → **[ADR-032](../adr/ADR-032-version-semantics-and-stream-independence.md)** · `spec/` §15 · spec
+  0.10.0. **What it deliberately leaves to this epic:** *where an adopting repository declares its pin*
+  is unspecified in §15, because that is the mechanism the first open question below chooses. §15's
+  rule rows land with it, in one engine change rather than two.
+
 ## Open questions
 <!-- Ruled 2026-08-23. Two closed by reading (L-094: a documented behaviour is closed by reading, not
      by waiting for a signal), one closed by ruling, one routed to a named gate with its options
