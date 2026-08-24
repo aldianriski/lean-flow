@@ -398,3 +398,47 @@ correctly gating the side-effecting block · **D2 intact — no `.sh` file appea
 `overview.md` 147/150 against the cap declared at `spec/STANDARD.md:121`.
 
 Conformance unmoved: `0 FAIL · level: Gated`.
+
+### 2026-08-24 | progress | T3 — the dependency direction becomes a test; three seeds prove it discriminates
+
+`test/architecture/layers.ts` (rule engine) · `test/architecture/dependency-direction.test.ts` ·
+`test/fixtures/architecture/` (6 trees, retained). **32 pass / 0 fail.**
+
+**Five rules, each a data entry with its own finding name** — `domain-imports-app` ·
+`domain-imports-infrastructure` · `contracts-imports-adapter` · `contracts-imports-app` ·
+`adapter-imports-app`. Adding a rule is an entry, not a branch (V3 §2.1's O). Layer assignment is
+explicit: an unrecognised path is `unassigned`, never silently domain — defaulting it *in* would apply
+a layer's rules to files nobody classified, defaulting it *out* would exempt them, and both are silent.
+
+**T2's blocker set this task's design.** The guard reads source text, so it matches by **shape**: block
+comments, line comments and string literals are stripped by a single-pass state machine *before*
+imports are read. Independent regexes would have been the same mistake one level down — a
+commented-out import registering as a real edge, or a mention inside a string counting as a dependency.
+
+**Three independent seeded breaks, each reddening exactly its own case with every sibling green:**
+
+| Seed | Reddened | Result |
+|---|---|---|
+| `domain-imports-infrastructure` rule disabled | only that MUST-FAIL fixture | 30 pass / 1 fail |
+| line-comment stripping disabled | only the `stripNonCode` test | 30 / 1 |
+| block-comment stripping disabled | only the multi-line block-comment test | 31 / 1 |
+
+Each verified to **land** (`cmp` against pristine), still **parse**, and be **targeted** (line delta 0);
+each restored `cmp`-identical.
+
+**A fourth seed silently failed to apply, and the landed-check caught it.** A `sed` whose pattern did
+not match left the file untouched; the suite reported **31 pass / 0 fail** — which is exactly what a
+non-discriminating suite reports. Without the `cmp` landed-check that would have been recorded as a
+successful discrimination proof. This is L-137 verbatim, on its first opportunity to happen here.
+
+**Seed B taught something about the tests themselves, and it is recorded rather than smoothed over.**
+Disabling line-comment stripping did *not* redden "a commented-out import is not an edge" — because the
+anchored import regex already refuses `// import` (it requires `import` at line start). That test
+passes for a different reason than its name suggests. Stripping is only load-bearing for a **multi-line
+block comment** whose inner line begins with `import`, so that case was added and then proven by seed C.
+Two independent defences is fine; believing the wrong one is doing the work is not.
+
+**Note for T4 — a `Layers:` prediction that execution dissolved (L-100).** T4's Layers says it will
+"register the package" in the fitness suite. It will not need to: `checkLayers` walks `packages/`
+recursively, so `packages/standard` is registered **by existing**. The T3→T4 shared-file dependency the
+G2 overlap map recorded therefore does not materialise. Recorded here rather than silently skipped.
