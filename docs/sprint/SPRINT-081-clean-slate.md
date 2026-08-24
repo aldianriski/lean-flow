@@ -81,9 +81,9 @@ never silently dropped (L-058).
 - [x] Gate green — *Verify: `sh scripts/qa-check.sh`, its own printed verdict line*
 
 ### T3 — Re-run the foreign-repo artefact triage at current coverage `[size: S · risk: low · class: decision · HITL]`
-Layers: `evals/run-foreign-repo-fixtures.sh` · `docs/research/conformance-coverage.md`
+Layers: `evals/run-foreign-repo-fixtures.sh` · `docs/research/conformance-coverage.md` · `docs/research/logs/conformance-coverage.md` (added at execution — L-100; the parent sat at 129 of 130 lines, so §2's `research/logs/` sibling is where round 4 belongs)
 Depends-on: T2
-Cites: EPIC-004 § Closed-when 1 · SPRINT-075 T3 · SPRINT-076 T3 · TASK-238 · L-015 · L-016 · `S6.BASE`
+Cites: EPIC-004 § Closed-when 1 · SPRINT-075 T3 · SPRINT-076 T3 · TASK-238 · L-015 · L-016 · `S6.BASE` · T1 (cited only — the three Backlog rows are pruned together at close; T3 does not depend on T1)
 
 EPIC-004's first exit condition called its own `0 artefacts` result *honest but early* — it was taken
 at **6 of 62** checkable rules, none of them the families most likely to encode our own directory
@@ -98,11 +98,11 @@ verdict is recorded — with a high artefact count routed back to the register r
 the engine quiet.
 
 **DoD:**
-- [ ] The harness still asserts no lean-flow file was copied in — *Verify: the mechanical assertion SPRINT-075 built, re-run; a later edit that copies a template in must fail loudly rather than quietly measure our own shape*
-- [ ] Every finding is classified, none left unrouted — *Verify: counts reconcile — actionable + artefact = total findings, cross-checked against the report's own FAIL tally (L-108)*
-- [ ] Artefacts, if any, are routed to `docs/research/conformance-coverage.md` § Artefacts — *Verify: the engine is left faithful; any fix is filed as a spec task, never as a tuning of the checker*
-- [ ] The verdict is recorded whichever way it falls — *Verify: `0 artefacts` at 45 rules is a real result and says so; it is no longer the "barely asked" of SPRINT-075*
-- [ ] TASK-238 closed, or re-parked with a **narrowed** condition naming the class of fact that would close it (L-094)
+- [x] The harness still asserts no lean-flow file was copied in — *Verify: the mechanical assertion SPRINT-075 built, re-run; a later edit that copies a template in must fail loudly rather than quietly measure our own shape*
+- [x] Every finding is classified, none left unrouted — *Verify: counts reconcile — actionable + artefact = total findings, cross-checked against the report's own FAIL tally (L-108)* **[0 artefacts of 9 findings; reconciled three ways — per-rule tally 4+2+1+1+1 = 9 = FAIL count, 5 distinct rules agreeing with the harness, no unattributed remainder]**
+- [x] Artefacts, if any, are routed to `docs/research/conformance-coverage.md` § Artefacts — *Verify: the engine is left faithful; any fix is filed as a spec task, never as a tuning of the checker*
+- [x] The verdict is recorded whichever way it falls — *Verify: `0 artefacts` at 45 rules is a real result and says so; it is no longer the "barely asked" of SPRINT-075*
+- [x] TASK-238 closed, or re-parked with a **narrowed** condition naming the class of fact that would close it (L-094) — *Verify: CLOSED, not re-parked. The condition it was parked on (a measurement, once the shape-bound families reached the engine) is discharged: all three are live, re-derived from engine source, and the triage ran against them returning 9 findings, 9 actionable, 0 artefacts. Its Backlog row is pruned at sprint close with T1's and T2's, where the §11 backlog rule expects that to happen*
 
 ### T4 — Stop the level ladder certifying Attested on a tree that claims no attestation `[size: S · risk: med · class: execution · HITL]`
 Layers: `scripts/lib/conformance-engine.sh` · `evals/run-attestation-fixtures.sh` · `TECH-DEBT.md`

@@ -386,3 +386,80 @@ the `*Verify:*` clause for the TD-row criterion was appended to the **seeded-bre
 off-by-one from reading a `sed -n` range display as absolute line numbers. Both lines are now correct.
 Caught by re-reading the structure after the edit, which is the only thing that catches it: every
 line-count and grep check stayed clean while the wrong criterion carried the wrong evidence (L-009).
+
+### 2026-08-24 | progress | T3 — the triage re-run at 45 rules: 9 findings, 9 actionable, 0 artefacts
+
+`TASK-238` · EPIC-004 § Closed-when 1. **A3 re-derived from the engine source before anything else**,
+the way SPRINT-079's promote re-derived the §6 disjunct rather than reading it off a summary: all three
+shape-bound families are genuine assertions, not registrations — `assert_S6_{BASE,BACKEND,MEDIUM,MULTISVC}`
+(4), `assert_S11_*` (8), `assert_S2_F_FILE` + `assert_S2_R_PLACEMENT`. Cross-checked against the
+engine's own `coverage:` line: **45 `assert_` functions defined, 45 reported.**
+
+**Verdict: 9 findings across 5 rules, 9 actionable, 0 artefacts.** Reconciled three ways because the
+comfortable number is the one to distrust — per-rule tally 4+2+1+1+1 = 9 = the report's own FAIL count;
+5 distinct rules, agreeing with the harness's independently computed *"5 failing rule(s) across 9
+finding line(s)"*; no finding left unattributed. **My first rule count said 8**, from grepping finding
+*slugs* rather than rule ids — caught by the disagreement with the harness's number, not by re-reading
+my own query. That is the cross-check rule doing exactly the job it was promoted for.
+
+**`0 artefacts` now means something.** At 6 of 62 rules it was a number nobody had earned, and EPIC-004
+said so in its own exit condition — *honest but early*. At 45, across the three families most likely to
+leak our directory shape, it is a measurement. That distinction is why the row was parked on a
+**condition** rather than a date (L-094), and the condition is what discharged it.
+
+**The finding worth keeping is about T2, and only T3 could see it.** The two `S6.BASE` rows on the
+stranger's report are exactly the pair T2 made answerable. Before T2 a stranger whose requirements live
+in a ticket tracker collected two permanent findings clearable only by writing two docs they had judged
+unnecessary; they can now declare a reasoned exemption and have it named with its reason. **The finding
+did not go away and should not — what changed is that it became answerable by a decision rather than
+only by a document.** lean-flow could not have learned this by dogfooding, because it fixed its own two
+rows in the same sprint. That is L-016's asymmetry exactly, caught on the consumer path.
+
+**Where the round went, and why the parent doc did not grow.** `conformance-coverage.md` stood at **129
+of 130 lines**, so Round 4 went to `docs/research/logs/conformance-coverage.md` — §2's `research/logs/`
+row, created lazily on a second measurement round, uncapped by design (ADR-014's mechanism applied
+outside `docs/sprint/`). Rounds 1–3 are **not copied** into it; they stay in the parent, because a
+figure copied into a second place drifts from the one it copied (L-108). The parent gained a single
+pointer line and now sits at exactly 130.
+
+**TASK-238 is CLOSED, not re-parked.** The question it guarded has been asked properly and answered.
+Its Backlog row is pruned at sprint close alongside T1's and T2's, which is where `S11.BACKLOG` expects
+that to happen.
+
+Three things this round explicitly does **not** claim, recorded so a later reader does not over-read
+it: 6 engine gaps remain unchecked and say nothing about a stranger; `S2.R-PLACEMENT` still cannot see
+a near-miss (`docs/architecture.md` vs `docs/architecture/overview.md`), a limit carried from Round 3;
+and the stranger has **no git history**, so T4's new `attestation-absent` hold never fires for it. A
+git-backed adopter carrying no trailers does collect that line — held at Gated, exit code unmoved —
+and that case is untested against a foreign repo. It is Round 5's question if anyone asks it.
+
+### 2026-08-24 | run-complete | run · 25 of 25 DoD ticked
+
+**SPRINT-081, four tasks, all green.** Gate `161 pass, 0 fail`. Conformance `level: Gated`, one held
+finding (`attestation-absent`) naming honestly what this repository has not claimed.
+
+| Task | DoD | Outcome |
+|---|---|---|
+| T1 `TASK-257` | 6 of 6 | 16 ownership headers; `S1.LAW3` + `S3.SCHEMA` cleared; TD-064 resolved, TD-078 filed |
+| T2 `TASK-258` | 8 of 8 | `.conformance-exempt` + ADR-031 + spec 0.9.0; TD-077 resolved |
+| T4 (added) | 6 of 6 | the level ladder stops certifying Attested on an unsigned tree; TD-079 filed and resolved |
+| T3 `TASK-238` | 5 of 5 | triage re-run at 45 rules: 9 findings, 9 actionable, **0 artefacts**; TASK-238 closed |
+
+Nothing parked, nothing unattempted, no blocker. The Plan grew by one task mid-sprint (T4, owner-ruled,
+scope-change logged before § Plan was edited) so the denominator moved 19 → 25.
+
+**This repository now passes its own standard's Structural bar**, which is what the theme asked for —
+`level: none` → `Gated`, and the one thing still between it and Attested is commit signing, which §13
+says in as many words and which nobody has claimed otherwise.
+
+**The pattern this run kept meeting, for the Retro.** Every gate failure but one was a defect in *how
+the Plan described its own verification*, never in the work: four criteria ticked without a `*Verify:*`
+clause, four `Layers:`/`Cites:` declarations that execution invented and the Plan could not have known
+(L-100), and three annotations of mine that manufactured findings by putting backticked file-shaped
+tokens into prose the layers checker reads as declarations. The checks were right every time. The
+recurring authoring miss is worth an `L-NNN`, and TD-078/TD-079 already carry two halves of the same
+family: a template that ships a doc which cannot pass, and a fixture that asserts a finding's wording
+rather than its consequence.
+
+Next: `/lean-doc-generator close` — Retro, four-bucket routing, `close_commit`, Backlog pruning for
+TASK-238/257/258, and the version bump (feature sprint → MINOR by hand; `/release-patch` is PATCH-only).

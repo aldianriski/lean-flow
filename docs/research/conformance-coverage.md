@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-23
+last_updated: 2026-08-24
 update_trigger: A rule gains or loses a checker, or an artefact triage runs against a foreign repo
 status: current
 id: conformance-coverage
@@ -98,6 +98,7 @@ dropped: a skip nobody can see is indistinguishable from a pass.
 
 ## Artefacts — where a covered rule says something a stranger cannot act on
 
+**Round 4 (SPRINT-081 T3) and every later round live in [`logs/conformance-coverage.md`](logs/conformance-coverage.md)** — the series split to its uncapped sibling at 129 of 130 lines (§2 `research/logs/`). Verdict at 45 rules: **9 findings, 9 actionable, 0 artefacts**, reconciled three ways.
 **Recorded because measuring it was the point, not because it is comfortable.** SPRINT-075 T3 returned **0 artefacts** and called itself *barely asked*; SPRINT-076 T3 covered the two rules likeliest to be shape-bound and the number moved; SPRINT-077 T1 fixed the cause. All three states are kept — the sequence is the evidence.
 
 **`S2.F-FILE` — 4 artefacts of 8 findings (SPRINT-076 T3) → 0 of 4 (SPRINT-077 T1).** §2's
