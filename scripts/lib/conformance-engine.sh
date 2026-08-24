@@ -317,6 +317,44 @@ _tier_rank_of_cell() {
   esac
 }
 
+# _exempt_reason <repo> <path> -- the declared reason a doc is not owed HERE, from `.conformance-exempt`.
+# Prints the reason and returns 0 when the path is declared WITH one; prints nothing and returns 1 when
+# the path is not declared at all; prints nothing and returns 2 when it is declared with NO reason.
+#
+# Three return states, not two, because they are three different facts and the caller says something
+# different about each. Collapsing "declared without a reason" into "not declared" would make the
+# reason-less row silently ineffective, and collapsing it into "declared" would let a bare path switch
+# a Structural finding off -- which is the loophole §6's reasoned-exemption rule exists to refuse.
+#
+# One row per line, `<path> -- <reason>`, `#` comments and blanks skipped. Unlike `.conformance-tier`
+# this reads EVERY row: a tier is one fact about the repo, an exemption set is one fact per doc.
+# The path is matched whole, never as a prefix: a substring match would let `docs/` exempt the tree.
+_exempt_reason() {
+  [ -f "$1/.conformance-exempt" ] || return 1
+  _xfound=0; _xreason=''
+  while IFS= read -r _xline || [ -n "$_xline" ]; do
+    _xline=$(printf '%s' "$_xline" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')
+    [ -z "$_xline" ] && continue
+    case "$_xline" in '#'*) continue ;; esac
+    _xpath=$(printf '%s' "$_xline" | sed 's/[[:space:]]*--.*$//' | sed 's/[[:space:]]*$//')
+    [ "$_xpath" = "$2" ] || continue
+    _xfound=1
+    case "$_xline" in
+      # Strip through the FIRST `--` by parameter expansion, never by a `[^-]*` regex: a path
+      # routinely contains a single hyphen (`acceptance-criteria.md`) and the regex stops at it, so
+      # the separator is never reached and the path is emitted as part of its own reason. Caught on
+      # real input -- `requirements.md` has no hyphen and read correctly, which is exactly how a
+      # fixture using only that path would have gone green over the bug (L-142).
+      *--*) _xreason=$(printf '%s' "${_xline#*--}" | sed 's/^[[:space:]]*//') ;;
+      *)    _xreason='' ;;
+    esac
+    break
+  done < "$1/.conformance-exempt"
+  [ "$_xfound" -eq 1 ] || return 1
+  [ -n "$_xreason" ] || return 2
+  printf '%s' "$_xreason"; return 0
+}
+
 # _tier_declared <repo> -- the declared tier token, normalised; empty when undeclared. First
 # non-blank, non-comment line only: a tier is one fact, and reading further would invent a repo at
 # two tiers at once.
@@ -536,6 +574,25 @@ _tier_assert() {
     if _tier_is_conditional "$_tstems" "$_p"; then
       _tskipped="$_tskipped $_p"
       continue
+    fi
+    # §6's reasoned exemption. Consulted only for an ABSENT doc: a repo that declares a doc exempt and
+    # then writes it anyway has not lied about anything, and reporting the present file as excluded
+    # would be noise. Order matters against the substrate branch above -- a substrate-conditional row
+    # is not owed by anyone and needs no local ruling, so it never reaches here.
+    if [ ! -e "$_trepo/$_p" ]; then
+      _xr=$(_exempt_reason "$_trepo" "$_p"); _xrc=$?
+      if [ "$_xrc" -eq 0 ]; then
+        # NAMED, never silently dropped (§6) -- with the reason, because the reason is the whole
+        # difference between a ruling and a switched-off finding, and a reader cannot judge one it
+        # cannot see (L-058).
+        note "$_tid-- exempt by declaration (.conformance-exempt): $_p -- $_xr. §6 lets a repository rule a doc unnecessary and say why; this is that ruling, reported rather than dropped. It says nothing about what any other repository owes"
+        continue
+      elif [ "$_xrc" -eq 2 ]; then
+        # A bare path is not a ruling. Same shape as `tier-declaration-unreadable`: a declaration
+        # nobody can read is worse than none, because it looks like an answer. The doc stays owed --
+        # the finding below still fires -- so this row ADDS a finding rather than replacing one.
+        bad "$_tid-- exemption-reason-missing: $_p is declared in .conformance-exempt with no reason after \`--\`. §6 requires an exemption to state why the doc is not owed here; without one it is the finding turned off, not a decision, so the doc is still owed"
+      fi
     fi
     if [ -e "$_trepo/$_p" ]; then
       _tpresent=$((_tpresent + 1))

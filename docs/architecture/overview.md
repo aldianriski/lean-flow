@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-21
+last_updated: 2026-08-24
 update_trigger: Skill/component added, the loop changed, or an integration point changed
 status: current
 ---
@@ -19,7 +19,7 @@ status: current
 ## Directory structure
 
 ```
-spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.8.0) · CHANGELOG.md
+spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.9.0) · CHANGELOG.md
                                 versioned independently of plugin.json — the SSOT (ADR-023)
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
 skills/           14 skills (auto-discovered at root)
@@ -99,6 +99,15 @@ scaffolding a fresh repo by `/lean-doc-generator init`.
 Ruled at SPRINT-054 T1. Each row below is an **exemption with a reason**, not an oversight — the point
 of writing them down is that a future reader (or `init` run) can tell the two apart. Substrate-gated
 rows are excluded: they are skipped, not owed (STANDARD §6), and are not listed here.
+
+> **The two `docs/product/` rulings live in [`.conformance-exempt`](../../.conformance-exempt), which
+> is where the engine reads them** (§6's reasoned exemption · [ADR-031](../adr/ADR-031-reasoned-doc-exemptions-are-declared.md)).
+> Until SPRINT-081 T2 they lived *only* in this table, and a conformance run cannot read a prose table
+> in an architecture doc — so the ruling behaved exactly as if it had never been taken, and capped this
+> repository at `level: none` for a decision it had already made (TD-077 · L-151). The rows below are
+> kept as the **narrative** of why; the declaration file is the SSOT the tool parses, and a change of
+> mind belongs there first. The two `§2`-gated rows are different in kind — they need no declaration,
+> because the *standard's own* condition never fires for a single-maintainer repo.
 
 | Absent | Why | Revisit when |
 |---|---|---|

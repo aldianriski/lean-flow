@@ -54,7 +54,7 @@ derived from what would actually change it, not a placeholder that satisfies a g
 - [x] Gate green — *Verify: `sh scripts/qa-check.sh` read as its own printed `N pass, M fail` verdict line, run as its own call, never through a wrapper's status (L-120)*
 
 ### T2 — Rule how a repository declares a *reasoned* Base-tier doc exemption `[size: M · risk: med · class: decision · HITL]`
-Layers: `spec/STANDARD.md` · `scripts/lib/conformance-engine.sh` · `evals/` · `docs/architecture/overview.md` · `TECH-DEBT.md`
+Layers: `spec/STANDARD.md` · `spec/CHANGELOG.md` · `scripts/lib/conformance-engine.sh` · `evals/` · `docs/architecture/overview.md` · `TECH-DEBT.md` · `.conformance-exempt` · `docs/adr/ADR-031-reasoned-doc-exemptions-are-declared.md` · `docs/DECISIONS.md` · `README.md` · `docs/knowledge-index.md` (the last five added at execution — L-100; the Plan could not name the ADR it had not yet decided to write, nor the declaration file the arm choice produced)
 Depends-on: none
 Cites: §6 · §2 · §14 · ADR-028 · TD-077 · L-151 · SPRINT-054 T1 · `docs/product/requirements.md` · `acceptance-criteria.md` · `CONTEXT.md`
 
@@ -71,14 +71,14 @@ stops emitting the two `tier-doc-set-incomplete` findings or names them as an ex
 never silently dropped (L-058).
 
 **DoD:**
-- [ ] The two arms are stated and one is chosen on the record — *Verify: (a) extend `.conformance-tier`'s declaration pattern to per-doc exemptions carrying a reason string · (b) condition-gate §6's Base rows the way §2's team-gated rows already are. The rejected arm is written down with why, not dropped*
-- [ ] If the chosen arm adds a declaration file or a §2 row, the ADR lands with it — *Verify: §4's three-part bar applied explicitly; ADR-028 is the live precedent for a disposition moved into the artifact the tool reads*
-- [ ] The spec carries the mechanism, not a checker — *Verify: re-mark the rule in a scratch spec copy and confirm the engine changes verdict with no code edit, the property SPRINT-074 established*
-- [ ] A retained fixture asserts the named finding on input that must produce it, **and** a sibling control stays green — *Verify: the control reports its own denominator so a case that was never reached is visibly untested rather than quietly green (L-156); Tier **G** applies here — this is the conformance engine, where a false negative is silent by construction (ADR-029)*
-- [ ] Seeded-break check on the new assertion — *Verify: seed the rejected design, confirm the case reddens while a sibling stays green, confirm the seeded artifact still parses and the break is targeted (assertion count unchanged, line count within one of pristine), then restore under a checked hash (L-137 · L-142)*
-- [ ] `docs/architecture/overview.md` § Base-tier docs is updated to point at the mechanism rather than to hold the ruling alone
-- [ ] TD-077 → `status: resolved`
-- [ ] Gate green — *Verify: `sh scripts/qa-check.sh`, its own printed verdict line*
+- [x] The two arms are stated and one is chosen on the record — *Verify: (a) extend `.conformance-tier`'s declaration pattern to per-doc exemptions carrying a reason string · (b) condition-gate §6's Base rows the way §2's team-gated rows already are. The rejected arm is written down with why, not dropped*
+- [x] If the chosen arm adds a declaration file or a §2 row, the ADR lands with it — *Verify: §4's three-part bar applied explicitly; ADR-028 is the live precedent for a disposition moved into the artifact the tool reads*
+- [x] The spec carries the mechanism, not a checker — *Verify: re-mark the rule in a scratch spec copy and confirm the engine changes verdict with no code edit, the property SPRINT-074 established*
+- [x] A retained fixture asserts the named finding on input that must produce it, **and** a sibling control stays green — *Verify: the control reports its own denominator so a case that was never reached is visibly untested rather than quietly green (L-156); Tier **G** applies here — this is the conformance engine, where a false negative is silent by construction (ADR-029)*
+- [x] Seeded-break check on the new assertion — *Verify: seed the rejected design, confirm the case reddens while a sibling stays green, confirm the seeded artifact still parses and the break is targeted (assertion count unchanged, line count within one of pristine), then restore under a checked hash (L-137 · L-142)*
+- [x] `docs/architecture/overview.md` § Base-tier docs is updated to point at the mechanism rather than to hold the ruling alone — *Verify: the section opens with a pointer to `.conformance-exempt` as the artifact the engine reads, citing ADR-031, and keeps the four rows as narrative; the two §2-gated rows are distinguished as needing no declaration*
+- [x] TD-077 → `status: resolved` — *Verify: the row header reads `status: resolved → TASK-258 (SPRINT-081 T2)` with `closed: Sprint-081`, and the row records both the chosen arm and the measurement that rejected arm (b)*
+- [x] Gate green — *Verify: `sh scripts/qa-check.sh`, its own printed verdict line*
 
 ### T3 — Re-run the foreign-repo artefact triage at current coverage `[size: S · risk: low · class: decision · HITL]`
 Layers: `evals/run-foreign-repo-fixtures.sh` · `docs/research/conformance-coverage.md`
@@ -103,6 +103,30 @@ the engine quiet.
 - [ ] Artefacts, if any, are routed to `docs/research/conformance-coverage.md` § Artefacts — *Verify: the engine is left faithful; any fix is filed as a spec task, never as a tuning of the checker*
 - [ ] The verdict is recorded whichever way it falls — *Verify: `0 artefacts` at 45 rules is a real result and says so; it is no longer the "barely asked" of SPRINT-075*
 - [ ] TASK-238 closed, or re-parked with a **narrowed** condition naming the class of fact that would close it (L-094)
+
+### T4 — Stop the level ladder certifying Attested on a tree that claims no attestation `[size: S · risk: med · class: execution · HITL]`
+Layers: `scripts/lib/conformance-engine.sh` · `evals/run-attestation-fixtures.sh` · `TECH-DEBT.md`
+Depends-on: T2
+Cites: §13 · §14 · `S13.UNSIGNEDCLAIM` · `S13.TRAILERS` · ADR-029 · L-058 · T3 (ordered before it, not dependent on it — T4 changes a line every report carries, so the triage must run after)
+
+**Added mid-sprint at T2's execution, owner-approved — see the Execution Log `scope-change` entry.**
+T2 cleared the last Structural finding and the report then read `level: Attested`, which §13 states is
+unreachable here in as many words. The engine holds a repository at Gated when an attestation is
+*claimed and unsigned*, and holds it nowhere at all when **none is claimed** — so claiming nothing
+outranks claiming honestly. Latent while this repo sat at `level: none`; live the moment T2 landed.
+Sequenced before T3 for D1's reason: it changes a line every report carries.
+
+**Acceptance:** a repository carrying none of §13's three trailers is capped at `Gated`, with the
+reason named on the report rather than inferred from silence; a repository that does carry them is
+unaffected, and the exit code does not move — a hold is not a failure (§14).
+
+**DoD:**
+- [ ] The absent-attestation case holds at the Attested rung — *Verify: `sh conformance.sh .` on this repo prints `level: Gated`, naming the held finding; `level: Attested` no longer appears while 673 of 673 commits are unsigned*
+- [ ] The hold is a hold, not a failure — *Verify: exit code and `N pass, M fail` are unchanged from before the edit; §14 says a held finding names a level honestly reached and does not move the exit code*
+- [ ] A retained fixture asserts the finding on a repo that claims nothing, **and** a sibling control (a repo that does claim) stays green and reports its own denominator (L-156) — *Verify: Tier **G** under ADR-029; a false negative here is silent by construction*
+- [ ] Seeded-break check — *Verify: remove the new hold, confirm the case reddens while a sibling stays green, confirm the seeded artifact still parses and the break is targeted (assertion count unchanged, line count within one of pristine), then restore under a checked hash (L-137 · L-142)*
+- [ ] TD row filed or resolved as the fix warrants, with the inverted-incentive statement recorded
+- [ ] Gate green — *Verify: `sh scripts/qa-check.sh`, its own printed verdict line*
 
 ## Decisions (pre-locked)
 
@@ -144,6 +168,14 @@ the engine quiet.
 | `docs/knowledge-index.md` | T1 | Regenerated — T1 wrote a newer `last_updated` onto three docs, so the index went stale by date. Content unmoved; the index reads ADR-009 metadata, never `update_trigger:` | low | `qa-check.sh` → `knowledge index` row |
 | `TECH-DEBT.md` | T1 | TD-064 → `resolved` with its evidence reconciled a fourth way (206 + 16 = 222); **TD-078 filed** — the QA-TESTCASE template ships no §3 header, which is the *cause* of TD-064's `docs/qa/` third and ships unfixed to every consumer | low | ledger 25 → 26 rows, ids descending, max re-derived not assumed |
 | `docs/sprint/logs/SPRINT-081-clean-slate.md` | coordinator | Execution Log created lazily at the first entry (§9 · ADR-014) | low | `conformance.sh` → `S9.TWOFILES` |
+| `spec/STANDARD.md` §6 | T2 | States the **reasoned exemption** rule — per doc, reason mandatory, named on every report, local and never a change to what others owe. The rule, not the filename: declaration files are engine vocabulary by existing convention | med | re-mark test — a scratch-spec edit changes the verdict with no code edit |
+| `scripts/lib/conformance-engine.sh` | T2 | `_exempt_reason` (three return states: declared-with-reason · not declared · declared-without) wired into `_tier_assert`, consulted only for an absent doc | med | 7 retained fixtures + 2 seeded breaks |
+| `.conformance-exempt` | T2 | **New declaration file.** Carries SPRINT-054 T1's two rulings where the engine reads them — previously in `overview.md`, where it behaved as if never taken (TD-077 · L-151) | med | `conformance.sh` names both exemptions with their reasons |
+| `evals/run-conformance-engine-fixtures.sh` | T2 | 7 retained cases: reason-less must-FAIL + its still-owed half · reasoned control reporting its own denominator · hyphen regression · whole-path match · inert-when-absent · present-doc | low | each shown to discriminate under a seeded break |
+| `docs/adr/ADR-031-…md` · `docs/DECISIONS.md` | T2 | The decision + its index row; arm (b) rejected on a measurement, not a preference | low | `S4.INDEX` |
+| `docs/architecture/overview.md` | T2 | § Base-tier docs now points at the declaration file as SSOT and keeps the table as narrative | low | read-through |
+| `README.md` | T2 | Third declared file documented for adopters (L-015); **coverage figure corrected 33 → 45**, which the engine has been printing for some time | low | engine's own `coverage:` line |
+| `TECH-DEBT.md` | T2 | TD-077 → resolved, with the rejected arm and the measurement recorded | low | ledger row count |
 
 ## Retro
 

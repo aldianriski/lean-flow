@@ -659,6 +659,119 @@ fi
 
 
 # ==================================================================================================
+# §6 REASONED EXEMPTION (SPRINT-081 T2, TD-077) -- a repository may rule a Base doc unnecessary and
+# say why. Tier G under ADR-029: this is the conformance engine, where a false negative is silent by
+# construction, so the must-FAIL case, its control, and the discrimination proof are all required.
+#
+# THE FAILURE THIS FAMILY EXISTS TO CATCH is the exemption that silences a Structural finding without
+# saying anything -- a bare path switching a rule off. That is why the reason-less row is a FINDING
+# and not merely ignored, and why the accepted exemption is NAMED in the output with its reason: an
+# exclusion nobody can see is indistinguishable from a pass (L-058).
+# ==================================================================================================
+
+# Both victims are DERIVED from the spec and their existence asserted before removal (L-146). The
+# second one is derived to contain a HYPHEN, deliberately: the first implementation read the reason
+# with `sed 's/^[^-]*--.*//'`, which stops at the hyphen INSIDE `acceptance-criteria.md` and emitted
+# the path as part of its own reason. `requirements.md` has no hyphen and rendered correctly, so a
+# family that tested only the head of the list would have gone green over a live bug (L-142). Caught
+# on real input, then pinned here.
+x_victim=$(base_tier_set "$spec" | head -1)
+x_hyphen=$(base_tier_set "$spec" | while read -r _p; do case "${_p##*/}" in *-*) printf '%s\n' "$_p"; break ;; esac; done)
+[ -n "$x_victim" ] || { echo "FAIL harness(exempt): §6's Base tier derived an EMPTY unconditional set, so every case below would pass vacuously"; fail=1; }
+[ -n "$x_hyphen" ] || { echo "FAIL harness(exempt): no unconditional Base row has a hyphen in its basename, so the reason-parsing regression cannot be pinned here -- do not delete this guard, re-derive a victim"; fail=1; }
+[ "$x_victim" != "$x_hyphen" ] || { echo "FAIL harness(exempt): the plain and hyphenated victims resolved to the SAME path, so the two cases test one thing"; fail=1; }
+
+# --- must-FAIL: a declared path with NO reason is a finding, and the doc is STILL owed ------------
+t_xnr="$work/exempt-no-reason"
+tier_repo "$t_xnr"
+[ -f "$t_xnr/$x_victim" ] || { echo "FAIL harness(exempt-reason-missing): derived victim '$x_victim' was never written, so removing it proves nothing (L-146)"; fail=1; }
+rm -- "$t_xnr/$x_victim"
+printf '%s\n' "$x_victim" > "$t_xnr/.conformance-exempt"     # a bare path: no `--`, no reason
+run_case_anywhere "exempt-reason-missing" 1 "exemption-reason-missing: $x_victim" -- \
+  sh "$engine" "$t_xnr" --spec "$spec"
+
+# The other half of that claim, and the one a careless implementation gets wrong: a reason-less row
+# must not ALSO suppress the doc. If it did, the bare path would still have switched the finding off
+# and the new finding would just be noise beside it.
+out=$(sh "$engine" "$t_xnr" --spec "$spec" 2>&1)
+if printf '%s\n' "$out" | grep -q "tier-doc-set-incomplete: $x_victim"; then
+  echo "PASS fixture(exempt-reason-missing-still-owed): a reason-less row ADDS a finding, it does not replace one"
+else
+  echo "FAIL fixture(exempt-reason-missing-still-owed): a bare path suppressed the tier finding -- the exemption is a switch, not a ruling -- output:"; printf '%s\n' "$out"; fail=1
+fi
+
+# --- PASS control: a reasoned exemption is accepted, and NAMED with its reason --------------------
+# The control reports its own DENOMINATOR (L-156): how many exemption rows it declared and how many
+# the engine named back. A control that says only "no finding" cannot distinguish "the exemption was
+# accepted" from "the case was never reached at all".
+t_xok="$work/exempt-reasoned"
+tier_repo "$t_xok"
+rm -- "$t_xok/$x_victim" "$t_xok/$x_hyphen"
+x_declared=2
+{ printf '# a comment line, skipped\n\n'
+  printf '%s -- owned elsewhere; a second copy would be a second SSOT\n' "$x_victim"
+  printf '%s -- dependent on the row above and exempt for exactly as long\n' "$x_hyphen"
+} > "$t_xok/.conformance-exempt"
+out=$(sh "$engine" "$t_xok" --spec "$spec" 2>&1); rc=$?
+x_named=$(printf '%s\n' "$out" | grep -c 'exempt by declaration')
+if [ "$rc" -eq 0 ] &&
+   [ "$x_named" -eq "$x_declared" ] &&
+   ! printf '%s\n' "$out" | grep -q "tier-doc-set-incomplete: $x_victim" &&
+   ! printf '%s\n' "$out" | grep -q "tier-doc-set-incomplete: $x_hyphen" &&
+   printf '%s\n' "$out" | grep -q "exempt by declaration (.conformance-exempt): $x_hyphen -- dependent on the row above"; then
+  echo "PASS fixture(exempt-reasoned-control): $x_named of $x_declared declared exemption(s) accepted and named with their reasons, exit 0"
+else
+  echo "FAIL fixture(exempt-reasoned-control): exit $rc, $x_named of $x_declared exemption(s) named -- output:"; printf '%s\n' "$out"; fail=1
+fi
+
+# The hyphen regression, asserted as its own line so it cannot be lost inside the control's `&&`
+# chain. The reason must come back WITHOUT the path repeated inside it.
+if printf '%s\n' "$out" | grep -q "exempt by declaration (.conformance-exempt): $x_hyphen -- $x_hyphen"; then
+  echo "FAIL fixture(exempt-reason-hyphen): the reason for '$x_hyphen' repeated its own path -- the `--` separator was matched inside the filename"; fail=1
+else
+  echo "PASS fixture(exempt-reason-hyphen): a hyphenated path's reason is read from the separator, not from the first hyphen"
+fi
+
+# --- must-FAIL: the path is matched WHOLE, never as a prefix --------------------------------------
+# `docs/` in the declaration must not exempt everything beneath it. A prefix match here would let one
+# row switch off the entire tier -- the blanket exemption §6 refuses, arrived at by accident.
+t_xpfx="$work/exempt-prefix"
+tier_repo "$t_xpfx"
+rm -- "$t_xpfx/$x_victim"
+printf 'docs/ -- a blanket exemption, which must not work\n' > "$t_xpfx/.conformance-exempt"
+run_case_anywhere "exempt-not-a-prefix" 1 "tier-doc-set-incomplete: $x_victim" -- \
+  sh "$engine" "$t_xpfx" --spec "$spec"
+
+# --- PASS control: no declaration file at all changes nothing -------------------------------------
+# The mechanism must be inert for the repositories that never opt into it -- most of them.
+t_xnone="$work/exempt-absent"
+tier_repo "$t_xnone"
+rm -- "$t_xnone/$x_victim"
+out=$(sh "$engine" "$t_xnone" --spec "$spec" 2>&1); rc=$?
+if [ "$rc" -eq 1 ] &&
+   printf '%s\n' "$out" | grep -q "tier-doc-set-incomplete: $x_victim" &&
+   ! printf '%s\n' "$out" | grep -q 'exempt by declaration' &&
+   ! printf '%s\n' "$out" | grep -q 'exemption-reason-missing'; then
+  echo "PASS fixture(exempt-absent-control): with no .conformance-exempt the tier finding is unchanged and no exemption line appears"
+else
+  echo "FAIL fixture(exempt-absent-control): exit $rc; the exemption machinery fired on a repo that declared nothing -- output:"; printf '%s\n' "$out"; fail=1
+fi
+
+# --- PASS control: a doc that EXISTS is never reported as exempt ----------------------------------
+# The declaration is consulted only for an absent doc. A repo that declares an exemption and then
+# writes the file anyway has not lied, and reporting the present file as excluded would be noise.
+t_xboth="$work/exempt-but-present"
+tier_repo "$t_xboth"
+printf '%s -- declared exempt, but the file is here anyway\n' "$x_victim" > "$t_xboth/.conformance-exempt"
+out=$(sh "$engine" "$t_xboth" --spec "$spec" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] && ! printf '%s\n' "$out" | grep -q 'exempt by declaration'; then
+  echo "PASS fixture(exempt-present-not-reported): a present doc is counted present, never announced as exempt"
+else
+  echo "FAIL fixture(exempt-present-not-reported): exit $rc; a doc that exists was reported as exempt -- output:"; printf '%s\n' "$out"; fail=1
+fi
+
+
+# ==================================================================================================
 # §2's README OWNERSHIP FOOTER (SPRINT-078 T3) -- one retained must-FAIL fixture and a PASS control.
 # ==================================================================================================
 

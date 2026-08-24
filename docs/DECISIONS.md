@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-031](adr/ADR-031-reasoned-doc-exemptions-are-declared.md) | A reasoned doc exemption is **declared** in `.conformance-exempt` with a mandatory reason, never condition-gated in §6 — condition-gating would drop the check for every adopter to serve one | accepted | 2026-08-24 |
 | [ADR-029](adr/ADR-029-tiered-verification-ceremony.md) | Verification ceremony tiers by failure visibility (G guard · X executable · P prose) — the full fixture/discrimination discipline concentrates on guards | accepted | 2026-08-23 |
 | [ADR-030](adr/ADR-030-epic-files-split-their-series.md) | Epic files split their append-only series into an uncapped `docs/epic/logs/` sibling (ADR-014's mechanism, third application) rather than raising the 200 cap | accepted | 2026-08-23 |
 | [ADR-028](adr/ADR-028-two-marks-for-rules-no-adopter-can-clear.md) | Two marks for rules no adopter can clear: §14 gains `restated` (7 rules whose constraint another rule checks -- §8's answer one level down) and `standard-directed` (4 that govern this document, not a repository). Eleven rules stop reporting as `rule-unimplemented`; checkable 62 -> 51, classification unchanged at 100 | accepted | 2026-08-23 |

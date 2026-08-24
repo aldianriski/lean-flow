@@ -119,7 +119,7 @@ status: current
     in the shipped artifact. Closing TD-064 does not move this, which is exactly why it is filed
     separately rather than as a reopening.
 
-- **TD-077** severity: minor | status: open | created: Sprint-080
+- **TD-077** severity: minor | status: resolved → TASK-258 (SPRINT-081 T2) | created: Sprint-080 | closed: Sprint-081
   - Summary: **§6's Base tier doc-set has no way to declare a *reasoned* exemption, so a repository
     that ruled a doc unnecessary reports an unclearable finding forever.** `S6.BASE` owes every dev
     repo `docs/product/requirements.md` and `docs/product/acceptance-criteria.md`. This repository
@@ -145,6 +145,20 @@ status: current
     rows already are. Both are spec changes, and **ADR-grade if either adds a declaration file or a §2
     row**. Until one is taken, this repository's own conformance level is capped by a decision it
     already made and recorded.
+  - **Resolved at SPRINT-081 T2 by arm (a), owner-ruled: `.conformance-exempt`** — a root declaration
+    file, one row per line, `<path> -- <reason>`, joining `.conformance-roles` and `.conformance-tier`
+    as the third declared file. §6 states the rule, the engine owns the vocabulary, README documents it
+    for adopters; **ADR-031** carries the decision. A reason is mandatory (a bare path fires
+    `exemption-reason-missing` and the doc *stays owed*), every accepted exemption is named on the
+    report with its reason, and the path is matched whole so `docs/` cannot exempt a tree.
+  - **Arm (b) was rejected on a measurement, not a preference.** Seeded into a scratch spec, making the
+    two rows substrate-conditional makes both findings vanish for a repository that declares *nothing*,
+    and the engine then reports "no unconditional doc is owed at Base" — the whole tier goes vacuous.
+    The analogy also fails: every substrate-conditional row gates on a material fact (has code ·
+    publishes an artifact · has a DB · has auth), and "has requirements" is not one. Recorded rather
+    than dropped, as the task required.
+  - Follow-on, filed not fixed: clearing this repository's last Structural finding revealed that the
+    level ladder prints `Attested` for a tree claiming no attestation at all — see **SPRINT-081 T4**.
 
 - **TD-076** severity: minor | status: open | created: Sprint-080
   - Summary: **Controls across the existing check families report only silence, so a control that is

@@ -209,3 +209,143 @@ then agreed. Predicting first is what makes the green meaningful: a gate that go
 nobody could explain is indistinguishable from a gate that stopped looking.
 
 **T1 complete: 6 of 6 DoD ticked.** Sprint total 6 of 19.
+
+### 2026-08-24 | scope-change | T4 added — the level ladder certifies Attested on an unsigned tree
+
+**What broke.** T2's declaration cleared this repository's last Structural finding, and the report then
+read **`level: Attested`**. §13 of the standard says the opposite in as many words: *"Reaching Attested
+on this repository requires commit signing, which it does not yet do"* — 673 of 673 commits unsigned —
+and *"Attested is not reachable by trailers alone."* So the engine now certifies the top conformance
+level against its own standard's explicit text, on this repo and on any adopter's.
+
+**Root cause, derived not guessed.** The ladder consults six counters; the whole engine contains
+**exactly one `hold` call site**, `S13.UNSIGNEDCLAIM`, which fires only when an attestation *is*
+claimed and the commit is unsigned. A repository that claims **nothing** produces no hold at any level,
+so it falls through every rung to the `else` branch and prints Attested. The incentive is inverted:
+**claim an attestation honestly and unsigned → held at Gated; claim none at all → Attested.** Silent by
+construction, and exactly the theatre §13 says a conformance level exists to prevent.
+
+**Impact.** Latent before this sprint — the repo sat at `level: none`, so the branch was unreachable
+and nothing pointed at it. T2 is what made it live, which is why it is being fixed here rather than
+filed: closing SPRINT-081 as scoped would ship a reference implementation whose own report overstates
+its conformance, and the standard's §13 example is deliberately written to avoid that exact lesson.
+
+**Re-confirm G2.** New task **T4**, owner-approved, sequenced **after T2 and before T3** — the same
+reasoning as D1. T4 adds a reported line to every repository's output, so running the foreign-repo
+artefact triage before it would measure a report about to change. T4 touches
+`scripts/lib/conformance-engine.sh`, shared with T2, so the ordering is also the ownership order.
+**Tier G** under ADR-029, inheriting T2's bar: retained fixture on input that must produce the finding,
+a sibling control reporting its own denominator, and a seeded-break proof.
+
+Out of T2's scope and out of the frozen Scope's *"Gated and Attested are not in scope"* — that clause
+is hereby amended for this one defect, which is a **misstatement about the level**, not an attempt to
+raise it. The repo will cap at **Gated**, not climb.
+
+### 2026-08-24 | progress | T2 — `.conformance-exempt` shipped; the rejected arm rejected on a measurement
+
+`TASK-258` · TD-077 · **ADR-031**. Owner chose arm **(a1)**: a root declaration file, one row per line,
+`<path> -- <reason>`, joining `.conformance-roles` and `.conformance-tier` as the third declared file.
+
+**A discovery reshaped the spec edit.** `.conformance-tier` appears **nowhere** in `spec/STANDARD.md` —
+zero occurrences, checked two ways — and neither does `.conformance-roles`. They are documented together
+in README as *"two declared files let a repository state facts the standard says are judged, not
+detected."* So the convention already existed and is deliberate: **the spec states which facts are
+judged, the engine owns the declaration vocabulary, the README documents it for adopters.** That
+settled a question the Plan had left open and made DoD 3 answerable on its own terms — §6 gains the
+*rule* (a reasoned exemption is permitted, needs a reason, is named on every report, is local and never
+a change to what others owe), not the filename.
+
+**Arm (b) was rejected on a measurement, which is the part worth keeping.** Seeded into a scratch spec,
+condition-gating the two Base rows makes both findings **disappear for a repository that declares
+nothing**, and the engine then reports *"no unconditional doc is owed at Base"* — the entire tier goes
+vacuous. Argued at G2, demonstrated here. The analogy also fails on inspection: every
+substrate-conditional row gates on a *material* fact (has code · publishes an artifact · has a DB · has
+auth), and "has requirements" is not one — every dev repo has requirements; the only question is whether
+they live *here, as a doc*, which is a local judgement and belongs in a declaration.
+
+**A bug in my own code, caught on real input.** The first reason-parser used
+`sed 's/^[^-]*--[[:space:]]*//'`, which stops at the hyphen **inside** `acceptance-criteria.md` and
+emitted the path as part of its own reason. `requirements.md` has no hyphen and rendered perfectly — so
+a fixture family that used only the head of the derived list would have gone green over a live defect.
+Fixed with parameter expansion through the first `--`, and the fixture now derives a **hyphenated**
+victim on purpose, with a harness guard that fails loudly if no such row exists rather than quietly
+testing one thing twice (L-142).
+
+**DoD 3, the literal test.** Re-marking `S6.BASE` to `judgment-only` in a scratch spec took it from 2
+FAIL lines to `judgment-required`, **with no code edit** — the SPRINT-074 property, intact. Seeding arm
+(b) into §6's own row changed the required set the same way. The spec carries the mechanism.
+
+### 2026-08-24 | progress | T2 seeded-break: the fixtures discriminate, proven twice
+
+Seven new cases went green on their first run, which by L-142 establishes nothing — fixtures and code
+written in one session agree by construction. Two targeted breaks, each guarded:
+
+| Seed | Break | Reddened | Siblings |
+|---|---|---|---|
+| **B1** | accept a reason-less row (`return 2` → `return 0`) | `exempt-reason-missing` **and** `exempt-reason-missing-still-owed` | 5 stayed green |
+| **B2** | match the declared path as a **prefix** | `exempt-not-a-prefix` | 6 stayed green |
+
+Each seed was checked before it was trusted: it **applied** (`cmp` against a pristine copy), it still
+**parsed** (`sh -n`), and it was **targeted** — line count identical to pristine, `bad`/`note`/`ok`/`hold`
+call count identical at 169, diff exactly 2 lines. Restored from the pristine copy under a checked
+`sha256` both times.
+
+**The first seed attempt failed to apply, and the guard is why that is known.** `sed 's|…||…|'` against
+a pattern containing `||` broke on its own delimiter; the `cmp` check caught it immediately. Without it
+the suite would have run against unmodified code, gone green, and been recorded as a passed
+discrimination proof — which is L-137's exact failure and indistinguishable from success.
+
+A third seed took the **spec** side: arm (b), the rejected design, applied to a scratch copy (1046 lines
+in and out, 2 lines changed) and shown to silence both findings. That one is not a fixture break — it is
+the alternative design, priced.
+
+### 2026-08-24 | progress | T2 gate green — `161 pass, 0 fail`; T2 complete, 8 of 8
+
+Five findings on the first T2 gate run, all authored by this task, none in the mechanism itself:
+
+- **`adr-no-negative-consequence`** — ADR-031's § Consequences listed only benefits, and §4 requires at
+  least one Negative. The right response was not a token line: the honest negative is that **the
+  standard now has a sanctioned way to make a finding go away, and nothing checks whether the reason is
+  any good.** The engine verifies a reason is *present*, never *sound* — that half is judged by design.
+  A repository can write `-- we do not want to` and get a clean report. Three more went in with it
+  (a third declared file is a third thing to know exists; reports grow by a line per exemption; a
+  renamed doc silently loses its exemption). The check earned its keep: writing the negatives sharpened
+  the decision rather than decorating it.
+- **`dod-criterion-names-no-check` ×2** — T2's DoD 6 and 7 carried no `*Verify:*` clause, the same shape
+  T1's DoD 5 hit. Both now state what was checked. Third and fourth sighting this sprint of criteria
+  written at promote without their evidence; that is a pattern for the Retro, not a coincidence.
+- **`layers observed`** — five files changed that no task declared: `.conformance-exempt`, the ADR,
+  `DECISIONS.md`, `README.md`, `knowledge-index.md`. All are L-100's case in its purest form — the Plan
+  could not name the ADR before the decision to write one, nor the declaration file before the arm was
+  chosen. Declared, with that noted on the line.
+- **`layers completeness` on T4** — T4's prose references T3 while `Depends-on:` says T2. Correct as
+  written: T4 does not depend on T3, it is *ordered before* it. Declared on `Cites:` with the reason,
+  which is the escape the checker names for exactly this case.
+
+**A structure-adjacent edit went wrong twice before it went right.** Adding ADR-031's row to
+`DECISIONS.md` first landed between ADR-029 and ADR-030, then *above the table separator*, which would
+have broken the table while every line-count and grep check stayed clean — L-009's exact shape. Caught
+by re-reading the whole structure after each attempt and by asserting two invariants that a
+line-oriented check would miss: 31 ADR rows and exactly 1 separator. Noted also that ADR-029/030 were
+already inverted in that table before this sprint; left alone rather than quietly reordered.
+
+**T2 complete: 8 of 8 DoD ticked.** Sprint total 14 of 25 — the denominator moved because T4 was added
+mid-sprint, so 14/25 is not behind 6/19, it is 6 more tasks' worth of boxes against a larger Plan.
+
+The report now reads **`level: Attested`** in plain sight, which is T4's subject and no longer a latent
+branch nobody could reach.
+
+### 2026-08-24 | surprise | the spec bump nothing checks for
+
+Caught **after** the gate went green, not by it: §2's own row for `spec/STANDARD.md` states the trigger
+*"a rule is added, amended or reclassified — bump per `spec/CHANGELOG.md`"*, and T2 added a rule to §6.
+The standard was still stamped `version: 0.8.0`. Bumped to **0.9.0** (MINOR — additive, no rule
+renumbered, no existing finding changed for a repository that declares nothing), with the changelog
+entry carrying the rejected arm and its measurement, and `overview.md`'s tree line moved 0.8.0 → 0.9.0.
+
+**No mechanical check enforces this**, which is why a fully green gate said nothing about it. That is
+the same class of gap this whole sprint keeps meeting — a rule the standard states about itself with
+nothing behind it — and it is worth a Retro line rather than a mid-sprint fix: a `S2` assertion
+comparing the spec's `version:` against the newest block in `spec/CHANGELOG.md` would catch the missing
+changelog entry, though not the missing *bump*, since nothing can tell an amended rule from a typo
+without reading the diff. Naming what a check could and could not do is the honest half of filing it.

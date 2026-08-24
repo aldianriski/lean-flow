@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-23
+last_updated: 2026-08-24
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,29 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.9.0 — 2026-08-24
+
+**MINOR — §6 gains a reasoned doc exemption: a repository may rule a tier doc unnecessary and say
+why.** Base's unconditional rows are owed by every dev repo, so a repository that had ruled one
+unnecessary — with reasons, written down — still collected a finding it could never clear, because
+the ruling lived where no tool could read it. §6 now states the rule: an exemption is **per doc**,
+carries a **mandatory reason**, is **named on every report** with that reason, and is **local** —
+it says nothing about what any other repository owes.
+
+The declaration itself is `.conformance-exempt`, joining `.conformance-roles` and
+`.conformance-tier` as the third declared file. As with those two, the standard states which facts
+are judged and the implementation owns the declaration vocabulary; the reader-facing documentation
+is the tool's, not the standard's.
+
+**Why not condition-gate the rows instead** (the rejected alternative, measured rather than
+argued): making `product/{requirements,acceptance-criteria}` substrate-conditional silences both
+findings for a repository that declares *nothing*, and the engine then reports *no unconditional
+doc is owed at Base* — the whole tier goes vacuous. Every substrate-conditional row gates on a
+**material** fact (has code · publishes an artifact · has a DB · has auth); "has requirements" is
+not one. Full reasoning → ADR-031.
+
+No rule is renumbered and no existing finding changes for a repository that declares nothing.
 
 ## 0.8.0 — 2026-08-23
 

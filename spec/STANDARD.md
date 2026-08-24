@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-23
+last_updated: 2026-08-24
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.8.0
+version: 0.9.0
 status: current
 ---
 
@@ -450,6 +450,26 @@ mechanical and reduces to `S2.F-FILE`. Four tiers, four splits.
 
 **4 rules.** *Moves up by event, not ceremony* is **rationale** for how detection behaves, not a
 separate obligation.
+
+**Reasoned exemption.** A tier's *unconditional* rows are owed by every repo at that tier — that is what
+makes them unconditional, and a repo that simply has not written one is incomplete, not exempt. But a
+repository may **rule a specific doc unnecessary and say why**, and that ruling is a fact about the
+repository which no tool can infer. Three constraints make it a declaration rather than a loophole:
+
+- **Per doc, with a reason.** An exemption names one path and states why the doc is not owed *here*.
+  A blanket exemption, or one with no reason, is not a ruling — it is the finding turned off. An
+  exemption row carrying no reason is itself reported.
+- **Named on every report.** An accepted exemption is stated in the output as an explicit exclusion,
+  with its reason, never silently dropped. A reader must be able to see what was set aside and judge
+  the reason; an exclusion nobody can see is indistinguishable from a pass.
+- **Local, never a change to the standard.** Exempting a doc says nothing about what other repositories
+  owe. This is the difference from a **substrate-conditional** row, which is the *standard* declaring a
+  doc is owed only once its substrate exists (has code · publishes an artifact · has a DB · has auth) —
+  a material fact, gated for everyone. A doc whose absence is a local judgement call has no such
+  substrate, and condition-gating it in this table would drop the check for every adopter to serve one.
+
+The exemption is **declared**, in the same class as the tier itself: a fact the standard marks judged
+and the repository states. Declaring it is what turns an unclearable finding into a recorded decision.
 
 ---
 

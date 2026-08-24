@@ -347,14 +347,18 @@ Three things it will not do:
 
 **Three conventions you can set, all optional:** `--spec <path>` points it at your own vendored copy of
 the standard; `--rev <commit-ish>` chooses the commit §13's attestation rules read (default `HEAD`);
-and two declared files let a repository state facts the standard says are *judged*, not detected —
-`.conformance-roles` (one role per line) declares the role vocabulary `owner:` is checked against, and
-`.conformance-tier` (one token: `base` · `backend` · `medium` · `multi-service`) declares your §6 tier.
+and three declared files let a repository state facts the standard says are *judged*, not detected —
+`.conformance-roles` (one role per line) declares the role vocabulary `owner:` is checked against,
+`.conformance-tier` (one token: `base` · `backend` · `medium` · `multi-service`) declares your §6 tier,
+and `.conformance-exempt` (one row per line, `<path> -- <reason>`) declares a tier doc you have **ruled
+unnecessary and can say why** — the reason is required, every accepted exemption is printed back to you
+with it, and a row without one is reported while the doc stays owed
+([ADR-031](docs/adr/ADR-031-reasoned-doc-exemptions-are-declared.md)).
 A declared file replaces the built-in default, so "only these roles" is sayable. Undeclared, the tier
 rules still check **Base** — §6 makes that every dev repo's by trigger — and the rest tell you which
 fact is missing instead of guessing one.
 
-Coverage is growing: **33 of the standard's 51 checkable rules** have an assertion in the engine today,
+Coverage is growing: **45 of the standard's 51 checkable rules** have an assertion in the engine today,
 with the rest reported as gaps by name. That number is printed by every run, so it never has to be taken
 on trust — and it is the engine's own count, not the repo's wider checker set.
 

@@ -1,0 +1,16 @@
+# §6 reasoned exemptions — docs this repository has ruled unnecessary, with why.
+#
+# One row per line: <path> -- <reason>.  A row with no reason after `--` is reported as
+# `exemption-reason-missing` and the doc stays owed: a bare path is the finding turned off, not a
+# ruling.  Every accepted exemption is NAMED on the report with its reason, never silently dropped.
+#
+# An exemption is local. It says this doc is not owed HERE and nothing about what any other
+# repository owes — which is why it lives in this file rather than as a change to §6's table.
+#
+# Ruled at SPRINT-054 T1; moved here at SPRINT-081 T2 (TD-077), because the ruling previously lived
+# in docs/architecture/overview.md where the engine could not read it and therefore behaved exactly
+# as if it had never been taken.
+
+docs/product/requirements.md -- what it would hold is owned elsewhere and a third copy would be a second SSOT, which LAW 4 forbids: .claude/CONTEXT.md carries the roster, loop, gates and modes (what the product is) and .claude/CLAUDE.md the design principles and DoD (what it must satisfy). Revisit when a feature PRD is sanitized into a durable requirement, or the AI-context files stop being the spec
+
+docs/product/acceptance-criteria.md -- §2 triggers this doc *with* requirements.md, so it is a dependent row: its condition is unmet for exactly as long as the row above is exempt. Revisit with requirements.md
