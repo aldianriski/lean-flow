@@ -97,7 +97,7 @@ Verify discovers, and a wrong discovery is silent by construction).
 **DoD:**
 <!-- The conformance-baseline pair below was added by the G1 pass, AFTER promote froze this Plan at
      88d31d8. Logged as a `scope-change` in the Execution Log before this edit, per § Red flags. -->
-- [ ] **Baseline captured BEFORE the first new tree lands**: this repository's conformance `level:` and its full finding set are recorded in the Execution Log — *Verify: the recorded baseline names the level and the finding count; "it was Gated" from memory is not a baseline*
+- [x] **Baseline captured BEFORE the first new tree lands** — ✓ `0 FAIL · level: Gated · 45 checkable with an assertion · 6 GAP`, recorded in the Execution Log with no new tree on disk. The earlier 6-FAIL capture is also on the record; the *Gated* one is the comparand, since matching a degraded baseline would let a regression pass — *Verify: the recorded baseline names the level and the finding count; "it was Gated" from memory is not a baseline*
 - [ ] `bun test` runs green on an empty-but-real suite, and `bun` version + strict TS settings are recorded — *Verify: `bun test` exits 0 and `tsconfig.base.json` sets `strict: true`*
 - [ ] One minimal CLI command runs — *Verify: `bun apps/cli/src/main.ts --version` prints and exits 0*
 - [ ] **Gate discovery still resolves to a real gate after the manifest lands** — *Verify: walk rungs 1→4 by hand and record which rung answers and with what command; the answer must be a command that gates this repo. If rung 1 now answers, `package.json`'s test script must itself invoke `sh scripts/qa-check.sh`*

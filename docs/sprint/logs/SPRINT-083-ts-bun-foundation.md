@@ -271,3 +271,30 @@ a correction its reader cannot reach is not a correction).
 **Re-confirm G2.** No task added, removed or re-scoped. Bounded revise used: one retry, both axes.
 Conformance FAIL count 6 → 3; the three that remain are §11 retention items the rules themselves say
 are pruned *with the owner*.
+
+### 2026-08-24 | progress | §11 retention applied — conformance 6 FAIL → 0, level none → Gated
+
+Owner authorised all three §11 items at the T1/T2 checkpoint. Each is an action §11 routes to the owner
+rather than one a run may take silently, which is why they were surfaced instead of swept up.
+
+- **TODO.md pruned** — `TASK-261…265` removed outright (no shipped-in comments, §11). SPRINT-082 shipped
+  them as T1–T5, yet they still sat in the Backlog as `state: ready`, where a later promote could have
+  re-promoted finished work. 403 → **240 lines**, under the 320 cap. Verified before applying: 13 → 8
+  task rows (exactly the five), `state:` lines 8 = task rows 8 (1:1, so no entry fused — L-009), three
+  `### P` headings intact. Survivors: 267–270 (this sprint) · 266 (082's owed review) · 260 · 259 · 188.
+- **SPRINT-082 archived** — `docs/sprint/archive/` and its log to `docs/sprint/archive/logs/` in the
+  same commit, plus an `INDEX.md` line naming what it contributed. Left in place it kept answering the
+  globs that look for *active* work, so every check reading "the current sprint" was reading a finished
+  one.
+- **CHANGELOG rotated** — `v1.54.0` moved verbatim to `docs/changelog/CHANGELOG-1.54.0.md`; root keeps
+  current + previous (1.56.0, 1.55.0). Body verified `cmp`-verbatim, 143 → 111 lines.
+
+**Result: 6 FAIL → 0, `level: none` → `Gated`.** The single remaining finding is `attestation-absent`
+at the Attested rung — commit signing, which §13 states is optional and explicitly *not* a defect; it
+caps the level, it does not fault the repository.
+
+**T2's baseline is therefore re-taken here, and this is the one its closing assertion measures
+against** — `0 FAIL · level: Gated · 45 checkable with an assertion · 6 GAP`, captured with no new tree
+on disk. The earlier 6-FAIL capture remains on the record above as what the state actually was; using it
+as the comparand would have let T2 introduce a regression and still "match baseline", which is the
+failure mode a baseline exists to stop.
