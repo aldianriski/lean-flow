@@ -5,7 +5,7 @@ epic: 014
 owner: Maintainer
 last_updated: 2026-08-24
 status: active
-plan_commit:
+plan_commit: 88d31d8
 close_commit:
 update_trigger: sprint execute/close events
 ---
