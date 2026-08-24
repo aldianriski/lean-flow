@@ -18,10 +18,8 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-083 — TS/Bun Foundation** → [docs/sprint/SPRINT-083-ts-bun-foundation.md](docs/sprint/SPRINT-083-ts-bun-foundation.md)
-
-_**EPIC-014**'s first member sprint (`epic: 014`). EPIC-005's first member sprint now follows
-EPIC-014, not SPRINT-082 — owner ruling 2026-08-24, recorded in `docs/epic/INDEX.md`._
+_(none — SPRINT-083 closed 2026-08-24, 26 of 26. Next: **EPIC-014**'s second member sprint —
+V3 Sprint B, the Markdown AST Standard parser + Shell parity (H05/H06).)_
 
 ---
 
@@ -120,6 +118,33 @@ EPIC-014, not SPRINT-082 — owner ruling 2026-08-24, recorded in `docs/epic/IND
       state:      ready
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-272 — Make the gate finish: profile `qa-check.sh`, then split it  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — this is the conformance/QA gate itself; a false negative here is
+                  silent by construction, and an unrunnable gate is a false negative on every run)
+      done-when:  `sh scripts/qa-check.sh` prints its `QA-CHECK: N pass, M fail` verdict line
+                  inside a single ordinary invocation, on the DEFAULT profile. **Profiled before
+                  split**: the dominant term is measured and named — per-leg timings recorded, in the
+                  style L-144 prescribes — and the split (if a split is what the measurement supports)
+                  is justified by that number rather than by where the run appeared to stall. The
+                  heavy legs remain reachable, not deleted. Retained fixture: a run that would exceed
+                  the fast leg's budget is reported as such rather than silently truncated
+      touches:    scripts/qa-check.sh · scripts/lib/conformance-engine.sh (measurement only) ·
+                  possibly a fast/standard profile split (V3 §22 · H17)
+      depends-on: none
+      assumes:    **the regression is measured, not inferred** — three runs killed in one session at
+                  122 / 123 / 263 lines, the last with 162 PASS and 0 FAIL, none reaching the verdict
+                  line, all on the default profile with `QA_FULL` unset. **Profile before splitting**
+                  is not ceremony: TD-073's stated cause was wrong, and the real cost turned out to be
+                  the driver's own per-rule bookkeeping rather than the workload everyone assumed —
+                  a split chosen before measuring would likely have optimised the wrong half.
+                  Out of scope: deleting any check · lowering coverage to make the number fit ·
+                  building the full `fast`/`standard`/`full` profile system (that is H17)
+      tracker:    TD-084 · TD-071 · TD-073 · L-144 · L-120 · ADR-021 · V3 §22
+      origin:     close-retro
+      state:      ready
+
 
 - [ ] TASK-271 — Align ADR-034 and ADR-036 to the ADR template  [size: S] [risk: low] [HITL]
       class:      execution

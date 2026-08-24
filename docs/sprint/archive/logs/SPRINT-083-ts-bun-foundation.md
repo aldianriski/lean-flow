@@ -594,3 +594,44 @@ skeleton, so nothing in real source can collide with it. Simpler, greppable, and
 skeleton's marker without updating the matching regex left the two disagreeing, and 14 tests went red
 immediately. Seed D re-run after the change still reddens 14, so the coverage the reviewer's finding
 bought is intact. 52 pass / 0 fail, 0 NUL bytes.
+
+### 2026-08-24 | close | SPRINT-083 closed — 26 of 26, four on a recorded ruling rather than a verdict
+
+**The gate found five FAILs, and all five were mine.** Running it was not ceremony: four DoD pointed at
+it, and it caught `knowledge index STALE` · `corpus metadata` (I invented `domain: spec`/`engine` and
+`tag: architecture` against a canonical five-tag / five-domain vocabulary) · `corpus dangling refs`
+(`EPIC-014/015` in a `related:` field, which resolves against corpus ids) · `README footer version`
+(four manifests bumped, footer missed) · and `L-NNN citation unresolved` across 51 references.
+
+**The fifth is the instructive one, because I nearly filed it as pre-existing.** It listed citations in
+`skills/` and `templates/` — files this sprint never touched — so authorship reasoning said *not mine*.
+It was mine: a **NUL byte in `docs/LEARNINGS.md`** made `grep` treat the file as binary, so the
+checker's `lheadids` came back **empty** and every citation failed to resolve. Running the resolution
+pipeline directly (`lheadids` count: **1**, a blank line) pointed straight at me; reasoning about which
+files I had edited pointed away. **The input I broke was not among the files the finding named.**
+
+**L-163 fired a second time in the same session, inside its own entry.** The learning about literal
+control characters contained a literal control character, in the sentence describing the problem. Three
+removal scripts reported honestly and left the byte in place; `tr -d` — a different tool, not a fourth
+variant of the same one — removed it, verified by a byte delta of exactly **−1** and `grep -oE` going
+from **1** back to **143** headings.
+
+**The gate then could not finish.** Three runs, three kills: 122 lines (background, reaped), 123
+(background, reaped), and **263 lines / 162 PASS / 0 FAIL across 13 legs** at the 10-minute foreground
+limit, killed during the ownership-header walk over 222 docs. `QA_FULL` was unset in all three, so this
+is the **default** profile. No `QA-CHECK: N pass, M fail` line was ever printed.
+
+**Owner ruling (2026-08-24): the four DoD naming the gate are ticked on partial evidence, named rather
+than implied** — 162 PASS / 0 FAIL over 13 legs, plus independently *completed* runs of
+`sh conformance.sh .` (**0 FAIL · level: Gated**, exit 0), `check-doc-caps.sh`, `check-manifest-lockstep.sh`
+(4 manifests at 1.57.0) and `bun test` (**52 pass / 0 fail**). The sprint file records for each tick
+that the gate's own verdict line was never printed. This is a ruling on evidence, not a pass.
+
+**Filed, because "slow" became "unrunnable" and that is a different fact:** **TD-084** (`severity:
+high` — an unrunnable gate produces neither pass nor fail, so ADR-021's rule degrades to owner
+judgement on every run) and **TASK-272** (profile *before* splitting — TD-073's stated cause was wrong
+and the real cost was the driver's own bookkeeping, so a split chosen before measuring would likely
+optimise the wrong half).
+
+Closed at **26 of 26**. EPIC-014 remains `active`: 8 of 8 Closed-when conditions still open, which is
+correct — a member sprint closing is not an epic closing.

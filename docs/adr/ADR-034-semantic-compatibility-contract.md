@@ -1,7 +1,7 @@
 ---
 id: ADR-034
 tags: [process, tooling]
-domain: spec
+domain: doc-standard
 status: accepted
 related: [ADR-028, ADR-036, ADR-024, ADR-027, ADR-023, ADR-015, ADR-021]
 ---

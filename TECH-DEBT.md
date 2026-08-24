@@ -110,6 +110,33 @@ status: current
 > **New this promote: TD-082**, filed against a §2 soft-cap breach that has no exemption route by
 > design — the ledger row *is* the reasoned carry, because ADR-015 rule 2 forbids the alternative.
 
+- **TD-084** severity: **high** | status: open | created: Sprint-083
+  - Summary: **`scripts/qa-check.sh` can no longer run to completion.** Three runs in one session were
+    killed before printing their verdict line — at a 5-minute limit, at a 10-minute limit, and twice as
+    a reaped background job. This is a **different failure from TD-071/TD-073**, which price the gate's
+    cost as it scales: those say *expensive*, this says *unrunnable*. A gate that cannot finish emits no
+    `QA-CHECK: N pass, M fail`, so every DoD that names it becomes unverifiable — four did in this
+    sprint, and closing required an owner ruling on partial evidence instead of a verdict.
+  - Evidence: run 1 killed at 122 lines · run 2 killed at 123 · run 3 reached **263 lines, 162 PASS,
+    0 FAIL** across 13 legs and was killed during the ownership-header walk, which visits all 222 docs.
+    The conformance leg alone exceeded 5 minutes when measured separately (`sh conformance.sh .`
+    completes at ~5-6 min, exit 0). `QA_FULL` was **not** set in any of the three, so this is the
+    *default* profile, not the opt-in heavy one.
+  - Impact: **high, and it compounds in the worst direction.** ADR-021 makes a named check's FAIL block
+    a silent DoD tick — but an *unrunnable* check produces neither pass nor fail, so the rule it powers
+    degrades to owner judgement every time. The workaround this sprint used (run `conformance.sh`,
+    `check-doc-caps.sh` and `check-manifest-lockstep.sh` separately, then reason over the union) is
+    exactly the "read the verdict from a wrapper rather than the gate" shape L-120 warns about, and it
+    will be reached for again because it worked.
+  - Mitigation *(hypothesis, not a plan — re-derive before a DoD rests on it)*: the two candidates are
+    (a) split the gate into a fast leg and a full leg so the fast one always finishes, which is what
+    V3 §22's `fast`/`standard`/`full` profiles are for — this debt is a direct argument for
+    bringing H17 forward; and (b) profile it first, because TD-073's lesson was that the *stated* cause
+    was wrong and the real cost was the driver's own bookkeeping. **Do not act on (a) before (b).**
+  - **Re-file fresh if** a profile shows the dominant term is not what (b) finds, or if the gate starts
+    completing again without anyone having changed it — that would mean the limit was environmental and
+    the debt is mis-stated.
+
 - **TD-083** severity: minor | status: open | created: Sprint-083
   - Summary: **The architecture fitness suite has never fired on a real violation in this repository's
     own code — only on fixtures.** `checkLayers('.')` examines **4 files / 4 edges**. Five rules are

@@ -1,7 +1,7 @@
 ---
 id: ADR-035
-tags: [architecture, tooling]
-domain: engine
+tags: [tooling, process]
+domain: governance
 status: accepted
 related: [ADR-034, ADR-033, ADR-027, ADR-023, ADR-012, ADR-008]
 ---
