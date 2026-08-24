@@ -427,8 +427,22 @@ skills/           14 skills — /flow conductor + 12 stages + /council (auto-dis
   council/                    opt-in agent decision aid
 .claude/          CLAUDE.md (shape) · CONTEXT.md (vocab · loop · gates · roster — SSOT)
 docs/             architecture/ · development/ · deployment/ · DECISIONS.md · LEARNINGS.md · adr/ · sprint/
+
+  ── the TypeScript/Bun reference engine (EPIC-014, from v1.57.0) ────────────────
+package.json      root workspace, ZERO dependencies — Bun runs TypeScript directly,
+tsconfig*.json    so there is no install step and no node_modules
+bunfig.toml
+apps/cli/         the `leanflow` CLI (pre-release — no commands implemented yet)
+packages/         domain + application
+test/             architecture fitness + gate-discovery guards, and their fixtures
+  ────────────────────────────────────────────────────────────────────────────────
 TODO.md · TECH-DEBT.md · README.md · CHANGELOG.md · AGENTS.md · SECURITY.md · LICENSE
 ```
+
+**You do not need Bun.** The engine is being built family by family under a strangler migration
+(ADR-035); until a family cuts over, the Shell implementation stays authoritative and every skill
+works exactly as before. The tree above ships in the plugin cache because `plugin.json` declares no
+file manifest — it is inert weight, not a dependency.
 
 </details>
 

@@ -216,8 +216,78 @@ is T3's, which is G).
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `docs/adr/ADR-034-*.md` (new) | T1 | freeze the semantic surface before any TS exists — a comparand written after the fact is not one | med | read-through vs V3 §25's two lists |
+| `evals/fixtures/compat/rule-ids-v0.10.0.txt` (new) | T1 | the frozen rule surface, retained and regenerable | low | `cmp` vs `read-spec-rules.sh` |
+| `docs/adr/ADR-036-*.md` (new) | T1 revise | supersede ADR-034's Severity row — §4 is append-only, so a decided ADR is superseded, never rewritten | med | `S4.APPEND` clean |
+| `package.json` (new) | T2 | root workspace; `scripts.test` **must** invoke the real gate — first rung-1 hit in this repo's history | **high** | `test/gate-discovery/` must-FAIL + 2 controls |
+| `tsconfig.base.json` · `tsconfig.json` · `bunfig.toml` (new) | T2 | strict TS, zero dependencies, no framework | low | `bun test` |
+| `apps/cli/src/main.ts` + test (new) | T2 | one runnable command; `parse`/`run` split so the side-effect boundary starts at the writer | low | 7 tests + seeded break |
+| `docs/adr/ADR-035-*.md` (new) | T2 | the toolchain decision and its five costs | med | template-aligned at revise |
+| `test/gate-discovery/` + 4 fixtures (new) | T2 | guard that a *discovered* gate still runs the *declared* one | **high** | must-FAIL + 2 controls + regression for the substring bypass |
+| `test/architecture/layers.ts` (new) | T3 | the inward-dependency rule as a test; tokenises source rather than regex-matching it | **high** | 5 must-FAIL fixtures, 4 seeded breaks |
+| `test/architecture/dependency-direction.test.ts` (new) | T3 | one named assertion per rule + shape-not-substring cases | **high** | 52-test suite |
+| `test/fixtures/architecture/` — 6 trees (new) | T3/T4 | one must-FAIL per rule, a clean control, and the narrow test-file exemption | med | each fails with **its own** finding |
+| `packages/standard/src/model.ts` + test (new) | T4 | the Standard's vocabulary typed — **six** marks, nullable level | med | RED recorded before GREEN |
+| `docs/architecture/overview.md` | T2 | the where-things-live map carries the new tree; D4's ruling recorded | low | 147/150 cap |
+| `TODO.md` · `TECH-DEBT.md` · `CHANGELOG.md` · `docs/sprint/INDEX.md` | §11 | retention: prune shipped tasks, archive SPRINT-082, rotate v1.54.0 | low | conformance 6 FAIL → 0 |
+| `docs/research/…V3.md` | §11 | ownership header added (it was committed without one) | low | `S1.LAW3` · `S3.SCHEMA` clean |
 
 ## Retro
 
-_(written at close)_
+**Retrieval check** — no prior `L-NNN` or ADR was contradicted or missed, and that is not the useful
+finding. **L-108 was retrieved, applied, and cited twice in this session's own commit messages — and
+still hit three times**, once inside the guard written to prevent it. L-045, L-130, L-137 and L-100 all
+fired on work that had them loaded. The corpus was reachable and correct; being loaded prevented
+nothing. **Machinery and independent review caught every one; recall caught none.** That is the same
+sentence SPRINT-082's Retro wrote, which makes it a property of the loop rather than of a bad week.
+
+**Cost** — cost, turns and wall-clock **unavailable**: attended interactive session, no per-run
+metering (stated rather than omitted, ADR-016). Shape: **inline implementation + three dispatched
+scoped reviewers** (D7 as amended). Delivered: 4 tasks · 26 DoD · 3 ADRs · 52 tests · 13 retained
+fixture trees · 5 seeded-break proofs, one of them the reviewer's.
+
+**Worked**
+
+- **The reviewers earned their cost, unambiguously.** All three found something; **two found
+  blockers**. T2's guard gave a false PASS on a gate command merely *mentioned* inside an `echo`;
+  T3's missed `require()` entirely and lost any import wider than 200 characters. Both are false
+  *negatives* — the failure that certifies rather than stays silent — and both suites were green.
+- **The conformance baseline G1 forced into T2 paid for itself before T2 wrote a line of code.** Six
+  findings, four of them introduced by this session, **none visible to `qa-check`'s tally** (TD-081) —
+  and `qa-check` was not being run. It also corrected a figure I had asserted twice: the repo was at
+  `level: none`, not `Gated`.
+- **Test-first was real, not claimed.** T4's RED is on the record (`Cannot find module './model.ts'`,
+  0 pass / 1 fail) because the tests were written and run before the module existed.
+- **Tokenising instead of patching the regex a third time.** T3's rewrite fixed two blockers and a
+  false positive at once, because it changed the *method* rather than the pattern.
+
+**Friction**
+
+- **Three ADRs written without re-reading their template** — an anti-pattern CLAUDE.md names outright.
+  Caught by review on ADR-035 only; ADR-034 and ADR-036 carry it still (→ TASK-271).
+- **Heredoc escaping corrupted a file four separate times** (a literal newline inside a string, twice;
+  a NUL byte; a mangled test body). Each was caught, none by intent — the pattern is that shell-quoted
+  code written into a file is a different discipline from writing code, and this session kept treating
+  them as one. Switching to the Write tool and to `bun` scripts fixed it late rather than early.
+- **A source file became binary and the suite did not care** (L-163). Everything a *reader* needs was
+  destroyed while everything a *runner* needs was fine.
+- **The gate is slow enough to distort the loop** — a full conformance run exceeded a 5-minute timeout
+  and had to be backgrounded. Already TD-071/TD-073's subject; noted again because it changed how this
+  sprint was executed, not just how long it took.
+
+**A reachability observation about this sprint's own DoD, recorded because it is the very thing
+SPRINT-082 T3 shipped G2 to catch.** Four tasks each closed with *"`sh scripts/qa-check.sh` reports
+0 fail"*. That check EXISTS, RUNS and REACHES — but what it reaches is docs and governance, **not the
+TypeScript this sprint wrote**. Green there proves no governance regression; it proves nothing about
+`packages/` or `apps/`. The criteria are kept and were flagged at G2 rather than discovered at close,
+but a foundation sprint whose four closing criteria all point away from its own deliverable is worth
+naming out loud.
+
+**Pattern candidates** (→ `docs/LEARNINGS.md`)
+- **L-162** — a frozen criterion can carry its own antidote: T4's DoD froze V3's four marks *beside*
+  the instruction to check the spec instead of V3.
+- **L-163** — one control character reclassifies a source file as binary; tests stay green, review dies.
+- **L-164** — the branch you never thought to break is the branch with no coverage, and your own seeds
+  cannot find it because they are drawn from the same incomplete list.
+
+Sightings appended to **L-108** (×3) · **L-045** (×2) · **L-137** · **L-130** · **L-100**.

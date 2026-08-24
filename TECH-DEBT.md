@@ -110,6 +110,29 @@ status: current
 > **New this promote: TD-082**, filed against a §2 soft-cap breach that has no exemption route by
 > design — the ledger row *is* the reasoned carry, because ADR-015 rule 2 forbids the alternative.
 
+- **TD-083** severity: minor | status: open | created: Sprint-083
+  - Summary: **The architecture fitness suite has never fired on a real violation in this repository's
+    own code — only on fixtures.** `checkLayers('.')` examines **4 files / 4 edges**. Five rules are
+    asserted against six fixture trees and all of them pass against the live tree, but the live tree is
+    two source files and two colocated tests. The guard is proven to *discriminate* (four seeded breaks,
+    one of them found by independent review); it is not yet proven to *matter here*.
+  - Evidence: at `c9d3156` independent review measured **2 files / 2 edges** — `packages/` did not
+    exist yet — and observed that "this repository is clean" read as a far stronger claim than "two
+    trivial files pass". T4 took it to 4/4. Both numbers are reported by the suite itself, which is why
+    the weakness is visible at all (L-156's denominator rule doing its job).
+  - Impact: low now, rising. The risk is a **false sense of coverage** at exactly the moment it starts
+    to matter: EPIC-014's next sprints add a parser, a registry and adapters, and the first genuine
+    inward-dependency violation will appear in code, not in a fixture. A suite that has only ever seen
+    fixtures may have layer-assignment or specifier-resolution defects that fixtures cannot expose —
+    `targetLayer` in particular resolves relative specifiers by substring, which fixtures exercise
+    only in the shapes the author imagined (L-164).
+  - Mitigation *(hypothesis, not a plan — re-derive before a DoD rests on it)*: nothing to build. The
+    debt closes by itself as `packages/` grows, provided someone re-reads the denominator when it
+    does. The cheap check is to record `filesExamined`/`edgesExamined` at each EPIC-014 sprint close
+    and notice if the guard's reach is not growing with the tree.
+  - **Re-file fresh if** the count is still in single digits when the first rule family migrates, or if
+    a real violation is ever found by review rather than by the suite.
+
 - **TD-082** severity: minor | status: open | created: Sprint-083
   - Summary: **`docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` is 3,039 lines against
     §2's 130 soft cap — a 23× breach with no exemption route, by design.** It is the authoritative

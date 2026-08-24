@@ -56,7 +56,7 @@ publishing packages to npm · the execution/workflow stream (**EPIC-015**).
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [SPRINT-083](../sprint/SPRINT-083-ts-bun-foundation.md) | TS/Bun Foundation — contract freeze · workspace · fitness tests · Standard domain model | active · promoted 2026-08-24 | _(completed at close)_ |
+| [SPRINT-083](../sprint/archive/SPRINT-083-ts-bun-foundation.md) | TS/Bun Foundation | closed 2026-08-24 · `CLOSESHA` | **Froze the comparand before building the thing it measures.** Rule surface pinned at **100** ids, derived not inherited — the circulating 51 (checkable) and 79 (a *disproved* query whose regex stopped at a hyphen, missing exactly 21 §2 ids) are both reconciled, `79 + 21 = 100`. **The Finding-ID half could not be frozen and is a named gap**: the Shell engine emits findings through 4+ message shapes as free text, and three extractions returned 4 / 14 / 78 — which is the sharpest argument for the migration this epic has. Workspace stands up with **zero dependencies** (Bun runs TS directly, so nothing lands in a consumer's cache), and its manifest is this repo's **first rung-1 gate-discovery hit**, outranking `.gate-command` — safe only because `scripts.test` invokes the real gate, now guarded. The dependency direction became 5 mechanical rules over 6 retained fixture trees, and the Standard's vocabulary is typed at **six** marks, not V3's four. ADR-034 · ADR-035 · ADR-036 |
 
 Planned shape after 083 (V3 §42 — **not** promoted, and each re-derived at its own promote): Standard
 parser + Shell parity → first conformance vertical slice + targeted CLI → full orchestrator + first
@@ -91,19 +91,26 @@ migrated families → QA core → eval migration + binary → authority cutover 
 
 ## Open questions
 
-- **Where does the TS workspace live relative to the plugin root?** `apps/` + `packages/` at repo root
-  meets the Claude Code plugin spec's root-level component discovery, and adds STANDARD §2 rows. →
-  **SPRINT-083 G2; ADR-grade if it adds a §2 row** (ADR-023's precedent).
+- ~~Where does the TS workspace live relative to the plugin root?~~ **ANSWERED — SPRINT-083 G2 (D4):**
+  `apps/` · `packages/` · `test/` at repo root, and **no §2 rows are owed, so no placement ADR**. §2 is a
+  *documentation* lifecycle standard (ADR-012) covering Root files · `spec/` · `.claude/` · `docs/`,
+  with no code-tree rows at all; `scripts/`, `evals/` and `skills/` already sit outside it. Read from
+  §2 itself rather than defaulted. One constraint came with it: **no directory may be named `*-plugin`**.
 - **Which rule families migrate first?** → a **measurement, so it accumulates** (L-094): profile the
   Shell engine for runtime and process-spawn cost first. V3 §43 forbids ordering by section number.
   Do not freeze the order before the profile exists (L-130).
 - **Does the TS engine ever become a consumer-installable dependency, or stay internal?** → a
   **judgement call, closed by ruling** (L-094) — ruled at the H24/H25 cutover sprint, never parked
   waiting for a measurable signal that cannot arrive.
-- **What is the real frozen rule-ID denominator?** Three sources disagree today —
-  `scripts/lib/read-spec-rules.sh` emits **100** unique IDs, the `Sn.NAME` grep shape matches **79**,
-  and EPIC-004 closed on **51 of 51 rules**. → **SPRINT-083 T1 derives it**; no number written here is
-  carried forward into the contract (L-130 · L-108).
+- ~~What is the real frozen rule-ID denominator?~~ **ANSWERED — ADR-034: it is 100.** All three
+  circulating numbers are reconciled: **51** is *checkable* (`mechanical 40 + split 11`, agreeing
+  independently with EPIC-004's `45 in-engine + 6 standalone`), **49** is explicitly-marked
+  non-evaluated, `51 + 49 = 100`; and **79 is a disproved query** whose regex stops at a hyphen,
+  missing exactly the 21 hyphenated §2 ids — `79 + 21 = 100`, zero false positives.
+- **NEW, opened by T1: when does the Finding-ID surface get frozen?** It is **not enumerable** from the
+  Shell engine (4+ emission shapes, ids as free text). ADR-034 records it as a named gap closing at
+  **H07/H08**, where findings become typed data. Until then a family can pass rule parity while a
+  finding id drifts undetected — accepted, not solved.
 
 ## Closed when
 

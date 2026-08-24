@@ -121,6 +121,29 @@ EPIC-014, not SPRINT-082 — owner ruling 2026-08-24, recorded in `docs/epic/IND
 
 ### P1 — Next Phase Required
 
+- [ ] TASK-271 — Align ADR-034 and ADR-036 to the ADR template  [size: S] [risk: low] [HITL]
+      class:      execution
+      tier:       P (ADR-029 — prose formatting; G1 and a read-through)
+      done-when:  both ADRs use `ADR.md.template`'s shapes — a single-paragraph
+                  `**Positive:** / **Negative (trade-offs accepted):**` § Consequences and an
+                  `| Option | Why rejected |` table for § Alternatives — matching ADR-033 and ADR-035.
+                  **§ Decision in both must stay byte-identical** to the accepted text: both are
+                  `status: accepted` and §4 is append-only, so a rewrite there trips S4.APPEND
+      touches:    docs/adr/ADR-034-semantic-compatibility-contract.md ·
+                  docs/adr/ADR-036-severity-is-introduced-not-preserved.md
+      depends-on: none
+      assumes:    **the deviation is confirmed, not suspected** — independent review flagged it on
+                  ADR-035 and the same root cause covers all three: they were written without
+                  re-reading the template, which CLAUDE.md names as an anti-pattern outright.
+                  ADR-035 was realigned during SPRINT-083's T2 revise; these two were deliberately
+                  left, because a bounded revise is one retry and cosmetic drift did not earn an
+                  expansion of it. Out of scope: rewriting any § Decision · re-litigating either
+                  decision's content
+      tracker:    SPRINT-083 T2 revise · ADR.md.template · CLAUDE.md § Anti-Patterns
+      origin:     close-retro
+      state:      ready
+
+
 - [ ] TASK-266 — Run the owed independent review of SPRINT-082's governance changes  [size: S] [risk: med] [HITL]
       class:      decision
       done-when:  T1, T2, T3 and T5's changes have had an independent scoped review pass recorded as a

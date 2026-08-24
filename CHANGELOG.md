@@ -13,6 +13,47 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
+## v1.57.0 — TS/Bun Foundation (2026-08-24)
+
+MINOR — SPRINT-083, **22 of 26 DoD**, EPIC-014's first member sprint. The reference engine gets a
+comparand and a home, before anything migrates. **Consumer-facing: nothing you must do.** The plugin
+still needs no Bun, no install and no build step — but with no `files` manifest, `plugin install`
+copies the whole repo, so your cache now also carries `package.json`, `tsconfig*.json`,
+`bunfig.toml`, `apps/` and `test/`. Inert weight, stated rather than glossed.
+
+**Two epics opened** from `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md`'s 40-task set,
+split by substrate: **EPIC-014 Reference Engine** (TS/Bun, strangler migration, authority cutover) and
+**EPIC-015 Execution Autonomy** (continuation contract, overnight, J0/J1/J2). EPIC-014 is sequenced
+ahead of EPIC-005 by owner ruling.
+
+**ADR-034 — the semantic compatibility contract.** What the migration must preserve (rule id · finding
+id · verdict vocabulary · inclusion/exclusion · hold · full-run level · exit meaning) and what it must
+not (byte-identical stdout). The rule surface is frozen at **100** ids with a retained, `cmp`-verified
+snapshot; the three circulating counts are reconciled rather than picked between — 51 is *checkable*
+(40 mechanical + 11 split), 49 is explicitly-marked non-evaluated, and **79 is a disproved query** whose
+pattern stopped at a hyphen and missed exactly 21 §2 ids.
+
+**The Finding-ID surface could not be frozen, and that is recorded as a named gap** — the Shell engine
+emits findings through four-plus message shapes as free text, so it is not mechanically enumerable.
+It closes at H07/H08 when findings become typed data. This is the sharpest argument for the migration.
+
+**ADR-035 — TypeScript on Bun becomes the reference engine**, with `spec/STANDARD.md` unchanged and
+normative. Zero dependencies, no `version` field (a fifth number beside the four lockstep manifests
+would be a second SSOT), and `package.json`'s `test` script **must** invoke the repository gate — the
+manifest is this repo's first rung-1 gate-discovery hit and outranks `.gate-command` (ADR-033), so a
+script that skipped the gate would silently re-point System verify.
+
+**ADR-036 — severity is *introduced* by the migration, not preserved by it.** Supersedes ADR-034's
+Severity row, which had frozen a target-state vocabulary the current engine does not have. The general
+rule it states: every row of a compatibility contract must point at an artifact the *current* system
+has.
+
+Also: the dependency direction is now five mechanical rules over six retained fixture trees; the
+Standard's vocabulary is typed at **six** marks (V3's sketch had four — `restated` and
+`standard-directed` were missing); and §11 retention ran — shipped tasks pruned, SPRINT-082 archived,
+`v1.54.0` rotated — taking conformance from 6 FAIL to **0** and `level: none` back to **Gated**.
+
+---
 ## v1.56.0 — Foundation Hardening (2026-08-24)
 
 MINOR — SPRINT-082, **38 of 38 DoD**. Three proof boundaries where lean-flow read *absence of evidence*
@@ -55,57 +96,3 @@ failure, a security issue, or consumer evidence.
 (TASK-266) — its own routing refused to let the work self-certify. TD-081 filed: `qa-check` prints two
 verdicts and only the tally is read.
 
----
-## v1.55.0 — Clean Slate (2026-08-24)
-
-MINOR — SPRINT-081, **25 of 25 DoD**. **lean-flow now passes its own standard's Structural bar**:
-`level: none` → **`Gated`**. The only thing between it and Attested is commit signing, which §13 says
-in as many words.
-
-**A repository can now declare a *reasoned* doc exemption.** §6's Base tier owes every dev repo
-`docs/product/requirements.md` and `docs/product/acceptance-criteria.md`. An adopter whose requirements
-live in a ticket tracker, a product wiki or an AI-context file collected two permanent findings with no
-way to say so. The new root **`.conformance-exempt`** — one row per line, `<path> -- <reason>` — is that
-way, joining `.conformance-roles` and `.conformance-tier` as the **third declared file**. A reason is
-mandatory: a bare path fires `exemption-reason-missing` **and the doc stays owed**, so the declaration
-cannot be used as an off-switch. Every accepted exemption is printed back with its reason, and the path
-is matched whole so `docs/` cannot exempt a tree. Spec **0.8.0 → 0.9.0**; the decision is
-**[ADR-031](docs/adr/ADR-031-reasoned-doc-exemptions-are-declared.md)**.
-
-The alternative — condition-gating §6's Base rows — was **rejected on a measurement, not a preference**.
-Seeded into a scratch spec it silences both findings for a repository that declares *nothing*, and the
-engine then reports *"no unconditional doc is owed at Base"*: the whole tier goes vacuous. Every
-substrate-conditional row gates on a **material** fact (has code · publishes an artifact · has a DB ·
-has auth), and "has requirements" is not one.
-
-**A conformance report no longer certifies `Attested` on a tree that claims no attestation.** The level
-ladder held a repository at Gated when an attestation was *claimed and unsigned*, and held it nowhere at
-all when **none was claimed** — so claiming nothing outranked claiming honestly, and any adopter with
-zero findings was told they had reached the level the standard reserves for provable, signed human
-approval. Now an absent attestation is a **hold**: named as `attestation-absent`, capping the level at
-Gated, and never a failure — §14 says a report states a level honestly reached, and declining to attest
-breaches nothing. **The exit code does not move.**
-
-**Sixteen ownership headers**, and with them the two rules that had held this repository below
-Structural: `S1.LAW3` and `S3.SCHEMA` both PASS across all 222 docs. Three `docs/qa/` cases gained a
-full four-field header; thirteen `docs/research/` docs gained a real `update_trigger:` — each derived
-from what would actually change that doc, because a trigger that can never fire is the doc ageing
-silently under a header claiming otherwise.
-
-**The foreign-repo artefact triage, asked properly at last.** EPIC-004 called its own `0 artefacts`
-result *honest but early* — taken at 6 of 62 rules, none of them the families likeliest to encode
-lean-flow's own directory shape. Re-run at **45**, across all three: **9 findings, 9 actionable, 0
-artefacts**, reconciled three ways. The two `S6.BASE` rows on a stranger's report are exactly the pair
-this release made answerable — the finding did not go away, it became answerable by a **decision**
-rather than only by a document.
-
-**Consumer-facing:** `.conformance-exempt` is new surface and is documented in the README. The README's
-coverage figure was **stale at 33** against an engine printing 45; corrected.
-
-Filed: TD-078 (the QA test-case template ships no ownership header, so every adopter who renders it
-collects a finding), TD-080 (§2 states the standard's own version-bump trigger and nothing enforces it).
-Resolved: TD-064, TD-077, TD-079. Learnings: **L-158** (a fixture that asserts a finding's *wording* is
-not asserting its *consequence*), **L-159** (a defect can hide in a branch your own repository has never
-been in a state to reach).
-
----
