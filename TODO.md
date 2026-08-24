@@ -18,7 +18,9 @@ status: current
 
 ## Active Sprint
 
-_(none — SPRINT-081 closed 2026-08-24. Next: **SPRINT-082**, EPIC-005's first member sprint.)_
+> **SPRINT-082 — Foundation Hardening** → [docs/sprint/SPRINT-082-foundation-hardening.md](docs/sprint/SPRINT-082-foundation-hardening.md)
+
+_Standalone — carries no `epic:` stamp (D4). EPIC-005's first member sprint follows this one._
 
 ---
 
