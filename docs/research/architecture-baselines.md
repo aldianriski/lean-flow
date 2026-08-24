@@ -1,6 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-07-17
+update_trigger: Question revisited, or a new architecture/SDLC baseline changes the no-adoption verdict
 status: current
 id: architecture-baselines
 tags: [process]

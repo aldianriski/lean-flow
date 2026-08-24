@@ -32,7 +32,7 @@ implementation is unsigned by known fact, not by oversight.
 ## Plan
 
 ### T1 — Write the sixteen ownership headers this repo's own docs are missing `[size: S · risk: low · class: mechanical-ingest · AFK]`
-Layers: `docs/qa/QA-001-prime-entry-detection.md` · `docs/qa/QA-002-intake-to-plan-pipeline.md` · `docs/qa/QA-003-orchestrator-gates-and-check.md` · `docs/research/` · `TECH-DEBT.md`
+Layers: `docs/qa/QA-001-prime-entry-detection.md` · `docs/qa/QA-002-intake-to-plan-pipeline.md` · `docs/qa/QA-003-orchestrator-gates-and-check.md` · `docs/research/` · `TECH-DEBT.md` · `docs/knowledge-index.md` (added at execution — L-100; regenerating it is downstream of any `last_updated` this task writes)
 Depends-on: none
 Cites: `spec/STANDARD.md` §1 LAW 3 · §3 · TD-064 · `conformance.sh` · `S1.LAW3` · `S3.SCHEMA` · `S6.BASE`
 
@@ -46,12 +46,12 @@ derived from what would actually change it, not a placeholder that satisfies a g
 `S3.SCHEMA` appears among the rules preventing `Structural`.
 
 **DoD:**
-- [ ] Re-derive the counts before writing anything — *Verify: `sh conformance.sh .` reports 3 `ownership-header-missing` + 13 `ownership-header-field-missing` = 16 `update-trigger-absent`, the three reconciling against each other (L-108). A different number is the finding, not a nuisance; record it and re-scope*
-- [ ] `docs/qa/QA-001…QA-003` carry the full four-field header — *Verify: `sh scripts/lib/check-doc-caps.sh` still PASSes each, and `conformance.sh` drops all 3 `ownership-header-missing`*
-- [ ] The 13 `docs/research/` docs gain a real `update_trigger:` — *Verify: `conformance.sh` drops all 13 `ownership-header-field-missing`; spot-read three triggers and confirm each names an event that can actually occur*
-- [ ] `S1.LAW3` and `S3.SCHEMA` are gone from the Structural-blocking set — *Verify: the `level:` line names one remaining rule, `S6.BASE`, and no longer three*
-- [ ] TD-064 → `status: resolved`, with its evidence line reconciled one last time
-- [ ] Gate green — *Verify: `sh scripts/qa-check.sh` read as its own printed `N pass, M fail` verdict line, run as its own call, never through a wrapper's status (L-120)*
+- [x] Re-derive the counts before writing anything — *Verify: `sh conformance.sh .` reports 3 `ownership-header-missing` + 13 `ownership-header-field-missing` = 16 `update-trigger-absent`, the three reconciling against each other (L-108). A different number is the finding, not a nuisance; record it and re-scope*
+- [x] `docs/qa/QA-001…QA-003` carry the full four-field header — *Verify: `sh scripts/lib/check-doc-caps.sh` still PASSes each, and `conformance.sh` drops all 3 `ownership-header-missing`* **[ruled at execution — the caps-checker half of this clause cannot reach the QA tree (§2 states no cap for it, so the checker derives none); ticked on the conformance half, owner-approved. See Execution Log]**
+- [x] The 13 `docs/research/` docs gain a real `update_trigger:` — *Verify: `conformance.sh` drops all 13 `ownership-header-field-missing`; spot-read three triggers and confirm each names an event that can actually occur*
+- [x] `S1.LAW3` and `S3.SCHEMA` are gone from the Structural-blocking set — *Verify: the `level:` line names one remaining rule, `S6.BASE`, and no longer three*
+- [x] TD-064 → `status: resolved`, with its evidence line reconciled one last time — *Verify: the row header reads `status: resolved → TASK-257 (SPRINT-081 T1)` with `closed: Sprint-081`, and its Evidence bullet now carries the post-fix reconciliation — `206 + 16 = 222` from the other side, `0` of all three findings, FAIL set 34 → 2, `level:` 3 findings → 1. Ledger 25 → 26 rows (TD-078 filed alongside), ids still descending*
+- [x] Gate green — *Verify: `sh scripts/qa-check.sh` read as its own printed `N pass, M fail` verdict line, run as its own call, never through a wrapper's status (L-120)*
 
 ### T2 — Rule how a repository declares a *reasoned* Base-tier doc exemption `[size: M · risk: med · class: decision · HITL]`
 Layers: `spec/STANDARD.md` · `scripts/lib/conformance-engine.sh` · `evals/` · `docs/architecture/overview.md` · `TECH-DEBT.md`
@@ -139,7 +139,11 @@ the engine quiet.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `docs/qa/QA-001…QA-003` (×3) | T1 | Full four-field §3 ownership header prepended — they carried none at all, which is the `ownership-header-missing` third of TD-064 | low | `conformance.sh` → `S3.SCHEMA` PASS, all 222 docs |
+| `docs/research/` (×13) | T1 | `update_trigger:` added, each derived from what would actually change that doc — a trigger that cannot fire is the failure §1 LAW 3 exists to stop | low | `conformance.sh` → `S1.LAW3` PASS, all 222 docs |
+| `docs/knowledge-index.md` | T1 | Regenerated — T1 wrote a newer `last_updated` onto three docs, so the index went stale by date. Content unmoved; the index reads ADR-009 metadata, never `update_trigger:` | low | `qa-check.sh` → `knowledge index` row |
+| `TECH-DEBT.md` | T1 | TD-064 → `resolved` with its evidence reconciled a fourth way (206 + 16 = 222); **TD-078 filed** — the QA-TESTCASE template ships no §3 header, which is the *cause* of TD-064's `docs/qa/` third and ships unfixed to every consumer | low | ledger 25 → 26 rows, ids descending, max re-derived not assumed |
+| `docs/sprint/logs/SPRINT-081-clean-slate.md` | coordinator | Execution Log created lazily at the first entry (§9 · ADR-014) | low | `conformance.sh` → `S9.TWOFILES` |
 
 ## Retro
 

@@ -1,6 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-08-10
+update_trigger: Its parent loop-hygiene-prd.md is archived under §11, taking this detail file with it
 status: superseded
 id: loop-hygiene-findings
 tags: [process, docs, tooling]

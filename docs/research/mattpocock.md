@@ -1,6 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-08-09
+update_trigger: A new scan of mattpocock/skills runs, or a filed keeper ships
 status: current
 id: mattpocock-adaptation
 tags: [process, tooling]

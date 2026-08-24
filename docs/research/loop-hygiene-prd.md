@@ -1,6 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-08-10
+update_trigger: Nothing live cites it any more, at which point §11 moves it to docs/research/archive/
 status: superseded
 id: loop-hygiene-prd
 tags: [process, docs, tooling]

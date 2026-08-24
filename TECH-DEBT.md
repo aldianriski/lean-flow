@@ -91,6 +91,34 @@ status: current
 > Base tier doc-set has no way to declare a *reasoned* exemption, which is what caps this
 > repository's own conformance level at `none` alongside TD-064's sixteen headers.
 
+- **TD-078** severity: minor | status: open | created: Sprint-081
+  - Summary: **`QA-TESTCASE.md.template` ships with no §3 ownership header, yet renders into
+    `docs/qa/` — a tree the engine governs.** Every adopter who renders it collects an `S3.SCHEMA`
+    finding the moment the file lands, for doing exactly what the template told them to do. This is
+    the *cause* of TD-064's `docs/qa/` third: QA-001…003 lacked headers because the template they were
+    rendered from has none to give.
+  - Evidence: found at SPRINT-081 T1 while writing the three headers by hand — the fix worked, and
+    then the question was where the gap came from. Census of the template tree: **6 of 35 lack a
+    leading `---`** (`AGENTS` · `BUG` · `CODE_OF_CONDUCT` · `DESIGN` · `QA-TESTCASE` · `README`).
+    `README.md.template` is **not** a defect — §3 states the README exception in full (ownership moves
+    to a footer line, because a top YAML block renders as an ugly metadata table). The other four are
+    **untriaged**, and that is the point of this row: some are probably legitimate (intake scaffolding
+    that never lands in a governed tree) and some probably are not. Nobody has ruled.
+  - Impact: **consumer-facing, and it is ours that is the reference implementation** (L-015). Our own
+    three instances are fixed, which means the symptom is gone from this repo while the cause ships
+    unchanged in every `plugin install`. That asymmetry is the reason this is a row rather than a
+    footnote — dogfooding cured the half we can see, and the half the consumer meets is untouched
+    (L-016: verify on the consumer path, never read "clean here" as "clean there").
+  - Mitigation (hypothesis, not a plan — the filer's): triage the four undecided templates against one
+    test — *does what this renders land somewhere §3 governs?* — then add the four-field header to
+    those that do, with a `[CUSTOMIZE]` trigger placeholder in the template's own idiom. Cheap. The
+    judgement is the triage, not the typing. Deliberately **not** folded into T1, whose declared scope
+    is three instances and thirteen fields; widening it would have fixed the template by expedience
+    rather than by the ruling above.
+  - Sibling: **TD-064** (now resolved). That row was the symptom in this repo; this one is the cause
+    in the shipped artifact. Closing TD-064 does not move this, which is exactly why it is filed
+    separately rather than as a reopening.
+
 - **TD-077** severity: minor | status: open | created: Sprint-080
   - Summary: **§6's Base tier doc-set has no way to declare a *reasoned* exemption, so a repository
     that ruled a doc unnecessary reports an unclearable finding forever.** `S6.BASE` owes every dev
@@ -225,7 +253,7 @@ status: current
     which point only the opt-in parking remains, and it is a different row."* → **TD-075**.
     dominating — at which point only the opt-in parking remains, and it is a different row.
 
-- **TD-064** severity: minor | status: open | created: Sprint-075 | updated: Sprint-076
+- **TD-064** severity: minor | status: resolved → TASK-257 (SPRINT-081 T1) | created: Sprint-075 | updated: Sprint-076 | closed: Sprint-081
   - Summary: **~~28~~ 16 of this repo's own docs fail the ownership-header rules the engine checks** —
     ~~15 carry no frontmatter at all (`docs/qa/` ×3, `docs/strategy/adlc/` ×12)~~ **3 carry none
     (`docs/qa/`)** and 13 research docs declare every field except `update_trigger:`. §3 makes the
@@ -243,6 +271,12 @@ status: current
     `ownership-header-field-missing` (all `docs/research/`), **16** `update-trigger-absent` (the union:
     3 + 13). The three numbers reconcile against each other, which is the check that has caught every
     miscount in this corpus (L-108).
+    **Re-derived at SPRINT-081 T1 before writing anything, per this row's own closing instruction: all
+    three numbers were unmoved.** A fourth reconciliation confirmed it from the other side — `S1.LAW3`
+    and `S3.SCHEMA` each reported **206** clean docs before, and each reports **222** after, and
+    206 + 16 = 222 exactly. Post-fix: `0` of all three findings, both rules `PASS`, the FAIL set
+    **34 → 2** and the `level:` line down from **3 finding(s)** to **1** — the remainder being `S6.BASE`,
+    which is TD-077's and not clearable by writing anything.
   - Impact: low today, rising, and now **smaller and sharper**. `qa-check.sh` **relays** engine
     findings rather than counting them (SPRINT-075 T2's ruling), so nothing is red and no gate is being
     ignored. What remains is not a judgement call: the 3 `docs/qa/` files and the 13 research docs are

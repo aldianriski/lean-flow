@@ -1,6 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-07-10
+update_trigger: The upstream four-tier doctrine changes, or ADR-010 revises what lean-flow adopts from it
 status: current
 id: model-purpose
 tags: [tooling]

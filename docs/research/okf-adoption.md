@@ -1,6 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-07-10
+update_trigger: Question revisited, or an OKF spec release changes the keep-current verdict
 status: current
 id: okf-adoption
 tags: [docs, tooling]

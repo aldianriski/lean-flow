@@ -1,3 +1,10 @@
+---
+owner: Maintainer
+last_updated: 2026-08-24
+update_trigger: The case is re-run (Last run / Result updated in place), or the /task-decomposer -> /triage -> promote pipeline changes
+status: current
+---
+
 <!-- QA test-case instance — see docs/qa/README.md. Update Last run / Result in place each run. -->
 
 # QA-002 — intake-to-plan pipeline yields a sprint with DoD

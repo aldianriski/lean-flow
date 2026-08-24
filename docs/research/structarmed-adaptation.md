@@ -1,6 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-07-10
+update_trigger: The structarmed repository changes, or a rejected row becomes a keeper against lean-flow's current surface
 status: current
 id: structarmed-adaptation
 tags: [process]

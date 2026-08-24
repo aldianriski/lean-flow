@@ -1,3 +1,10 @@
+---
+owner: Maintainer
+last_updated: 2026-08-24
+update_trigger: The case is re-run (Last run / Result updated in place), or /prime's read order or health-report shape changes
+status: current
+---
+
 <!-- QA test-case instance — see docs/qa/README.md. Update Last run / Result in place each run. -->
 
 # QA-001 — prime detects the loop's context slots on a fresh repo

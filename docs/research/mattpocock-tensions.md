@@ -1,6 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-08-09
+update_trigger: A closed tension is reopened by new evidence, or the parent mattpocock.md records a new one
 status: current
 id: mattpocock-tensions
 tags: [process, docs]

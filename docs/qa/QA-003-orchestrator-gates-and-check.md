@@ -1,3 +1,10 @@
+---
+owner: Maintainer
+last_updated: 2026-08-24
+update_trigger: The case is re-run (Last run / Result updated in place), or /orchestrator's gates or scripts/qa-check.sh change
+status: current
+---
+
 <!-- QA test-case instance — see docs/qa/README.md. Update Last run / Result in place each run. -->
 
 # QA-003 — orchestrator gates, then the structural QA check stays green

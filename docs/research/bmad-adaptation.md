@@ -1,6 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-07-02
+update_trigger: A new BMAD-METHOD release changes the scan, or a rejected row becomes a keeper against lean-flow's current surface
 status: current
 id: bmad-adaptation
 tags: [process]

@@ -1,6 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-08-09
+update_trigger: A scan-3 keeper ships or is rejected, or the parent mattpocock.md is re-scanned
 status: current
 id: mattpocock-scan3-keepers
 tags: [process, tooling]

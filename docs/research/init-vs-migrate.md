@@ -1,6 +1,7 @@
 ---
 owner: Maintainer
 last_updated: 2026-07-10
+update_trigger: The decision is revisited, or /lean-doc-generator init changes what it scaffolds
 status: current
 id: init-vs-migrate
 tags: [process]
