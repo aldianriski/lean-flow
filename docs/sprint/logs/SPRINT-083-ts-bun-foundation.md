@@ -442,3 +442,83 @@ Two independent defences is fine; believing the wrong one is doing the work is n
 "register the package" in the fitness suite. It will not need to: `checkLayers` walks `packages/`
 recursively, so `packages/standard` is registered **by existing**. The T3→T4 shared-file dependency the
 G2 overlap map recorded therefore does not materialise. Recorded here rather than silently skipped.
+
+### 2026-08-24 | scope-change | T4 — the DoD's own vocabulary is wrong, and its own Verify clause caught it
+
+**What broke.** T4's DoD-2 reads: *"`RuleMark` admits exactly `mechanical` · `split` · `judgment-only` ·
+`implementation-directed`, and `ConformanceLevel` exactly `structural` · `gated` · `attested`."* Those
+four marks are **V3 §9's TypeScript sketch**. `spec/STANDARD.md` §14 — the normative source — defines
+**six**:
+
+| Mark | Why it exists |
+|---|---|
+| `mechanical` · `judgment-only` · `split` · `implementation-directed` | V3 §9 has these |
+| **`restated`** (7 rules) | states a constraint another rule already carries; checked under the other id |
+| **`standard-directed`** (4 rules) | constrains *this document* or the plugin, not any repository |
+
+ADR-028 added the last two precisely because a `mechanical` mark had been reporting all eleven as
+*"unchecked gaps someone can close"*, which they are not. A domain model omitting them would re-create
+the defect EPIC-004's final sprint closed. **`ConformanceLevel` is right at three — but six rules carry
+no level at all** (`—`), which V3's type cannot express.
+
+**This is L-130 firing on this sprint's own Plan.** A value written into a frozen artifact is a query
+result, read later by someone who cannot re-derive it. The four marks were copied from a summary
+written *outside* this repository rather than derived from the spec inside it. Verified: the reader
+emits 6 distinct marks over 100 rules (`mechanical` 40 · `judgment-only` 32 · `split` 11 · `restated` 7 ·
+`implementation-directed` 6 · `standard-directed` 4), and §14's own table names exactly those six.
+
+**What is notable is that the criterion contained its own antidote.** DoD-2's Verify clause already
+said *"cross-checked against `spec/STANDARD.md`'s own vocabulary, **not** against V3's summary of it"*,
+and the task's `assumes:` row said the same. The instruction that catches the error and the error itself
+were frozen into the same criterion at promote. Following the Verify clause is what surfaced it.
+
+**Impact.** DoD-2's enumeration is corrected to §14's six marks plus an absent-level case. No task added,
+removed or re-scoped; the model gets two more union members and an optional level. T1, T2, T3 untouched.
+
+**Re-confirm G2.** The correction follows the criterion's own stated method, so no new decision is
+introduced — recorded here because the Plan text changes and a frozen criterion may not be quietly
+re-read to fit what was built (L-088).
+
+### 2026-08-24 | progress | T4 — the Standard's vocabulary, typed; and T3's guard fails on real code
+
+`packages/standard/src/model.ts` + `model.test.ts`. **45 pass / 0 fail** across the whole suite.
+
+**Genuinely test-first, and the RED is on the record rather than asserted.** `model.test.ts` was
+written and run before `model.ts` existed: RED as `Cannot find module './model.ts'` — 0 pass / 1 fail —
+then GREEN at 9 pass / 0 fail. A test written after the code cannot be *shown* to have failed, which is
+why the DoD asked for the step and not just the outcome.
+
+**Six marks, not four** (see the `scope-change` above). `restated` and `standard-directed` are in the
+model because ADR-028 added them to stop eleven rules reporting as *"unchecked gaps someone can
+close"*. `level` is nullable because six rules carry none — forcing one would place them somewhere the
+Standard deliberately does not. `makeRuleId` admits hyphens, which is the same 21-id fact that produced
+the phantom 79 in T1.
+
+**T4 exercising T3's guard found a real defect in it, within minutes of T3 shipping.** The fitness
+suite failed on this repository:
+
+```
+domain-imports-infrastructure  packages/standard/src/model.test.ts  bun:test
+```
+
+**The guard was wrong, not the code.** V3 §16 prescribes exactly that colocated layout — a feature owns
+`evaluate-rule.ts` beside `evaluate-rule.test.ts` — and a test legitimately reaches for its runner.
+`layerOf` classified any `packages/**` path as domain, including tests.
+
+Fixed by **filename**, not by directory, and the difference is the whole point: exempting the directory
+would have exempted production code sitting beside a test. A new fixture `test-file-exemption/` pins
+both halves — the colocated test is exempt, and a **production file beside it is still fully caught**.
+
+**Proven by seeding the wider exemption**, which is the mistake a hurried fix would make: widening it
+from filename to `/src/` reddened **8 tests** — all five must-FAIL fixtures plus both boundary tests —
+because a directory-wide exemption guts the guard entirely. Restored `cmp`-identical, 45 / 0.
+
+**This is the sprint's own thesis landing on itself.** T3 exists because a convention loses to a
+deadline; T4 is the first real code it saw, and it was wrong about it. Better here than in the sprint
+that migrates a rule family.
+
+**Note:** T3's independent reviewer is reading commit `c9d3156`, which predates this fix. Its findings
+about `layerOf` may already be addressed.
+
+**Left open deliberately:** DoD-5 names `sh scripts/qa-check.sh`, not run this session (standing owner
+instruction). Same treatment as T1 DoD-5 and T2 DoD-10.

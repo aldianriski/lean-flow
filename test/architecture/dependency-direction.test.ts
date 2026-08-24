@@ -83,6 +83,29 @@ describe("architecture fitness — shape, not substring", () => {
   });
 });
 
+describe("architecture fitness — the test-file exemption is narrow", () => {
+  // Found by T4 exercising T3's guard on real code: packages/standard/src/model.test.ts imports
+  // bun:test and was reported as domain-imports-infrastructure. V3 §16 prescribes exactly that
+  // colocated layout, so the guard was wrong, not the code. The exemption is by FILENAME only --
+  // this fixture proves it did not become a blanket hole for the directory.
+  test("a colocated *.test.ts may import its runner and infrastructure", () => {
+    const r = checkLayers(join(FIXTURES, "test-file-exemption"));
+    expect(r.violations.map((v) => v.from)).not.toContain("packages/standard/src/model.test.ts");
+  });
+
+  test("MUST-FAIL: a PRODUCTION file beside it is still fully checked", () => {
+    const r = checkLayers(join(FIXTURES, "test-file-exemption"));
+    expect(r.violations).toEqual([
+      { finding: "domain-imports-infrastructure", from: "packages/standard/src/model.ts", specifier: "node:fs" },
+    ]);
+  });
+
+  test("layerOf classifies a colocated test file as test, not domain", () => {
+    expect(layerOf("packages/standard/src/model.test.ts")).toBe("test");
+    expect(layerOf("packages/standard/src/model.ts")).toBe("domain");
+  });
+});
+
 describe("architecture fitness — layer assignment is explicit", () => {
   test("an unrecognised path is `unassigned`, never silently treated as domain", () => {
     // Defaulting an unknown path INTO a layer would apply that layer's rules to files nobody

@@ -38,6 +38,13 @@ export interface Report {
 /** Path → layer. Deliberately explicit: an unrecognised path is `unassigned`, never silently "domain". */
 export function layerOf(rel: string): Layer {
   const p = rel.split(sep).join("/");
+  // A colocated test file is NOT domain code. V3 §16 asks for exactly this layout -- a feature owns
+  // `evaluate-rule.ts` beside `evaluate-rule.test.ts` -- and a test legitimately reaches across
+  // layers to reach its subject and its runner. Found by T4: `packages/standard/src/model.test.ts`
+  // importing `bun:test` was reported as `domain-imports-infrastructure`, a false positive on the
+  // layout the Standard's own reference architecture prescribes. The exemption is by FILENAME, so a
+  // production file in the same directory is still fully checked (fixture: `test-file-exemption/`).
+  if (p.endsWith(".test.ts") || p.endsWith(".spec.ts")) return "test";
   if (p.startsWith("apps/")) return "app";
   if (p.startsWith("test/")) return "test";
   if (p.startsWith("packages/contracts/")) return "contracts";
