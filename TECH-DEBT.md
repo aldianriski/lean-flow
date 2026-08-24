@@ -91,6 +91,53 @@ status: current
 > Base tier doc-set has no way to declare a *reasoned* exemption, which is what caps this
 > repository's own conformance level at `none` alongside TD-064's sixteen headers.
 
+> **Aging sweep — SPRINT-083 promote (2026-08-24).** **22 of 25 open rows** are ≥3 sprints
+> unaddressed: TD-045 (27) · TD-047 (26) · TD-049 (24) · TD-050 (23) · TD-051 (22) · TD-052 (21) ·
+> TD-053 (20) · TD-059 (13) · TD-060 (12) · TD-061 (11) · TD-062 (10) · TD-063 (9) · TD-066 (8) ·
+> TD-067 (7) · TD-068 (7) · TD-069 (6) · TD-070 (6) · TD-071 (5) · TD-072 (5) · TD-074 (4) ·
+> TD-075 (3) · TD-076 (3). **All held — note-and-carry, owner sign-off at this promote. None is
+> `severity: high`, so nothing auto-escalates to Backlog P1**; the strongest aged row is `medium`
+> (TD-051 · TD-052 · TD-061 · TD-062). Not aged (3): TD-078 · TD-080 (2 each) · TD-081 (1, and the
+> only other `medium` on file). Reconciled: 22 + 3 = **25 open**, plus 3 resolved-not-yet-deleted
+> = **28 rows on file**.
+> **The aged fraction is now 88% and has climbed every sweep** — 14/19 (S-078) → 16/22 (S-080) →
+> 17/24 (S-081) → 22/25. Held again is a defensible call each time and the trend is not a finding
+> anyone has taken; it is named here so the next sweep inherits the number rather than the habit.
+> **Deletion clock EXECUTED:** TD-073 (closed Sprint-080) is three sprints old at this promote and
+> its row is **deleted here** (§11 · `S11.TDDELETE`) — 40 lines. Its substance lives in
+> `CHANGELOG.md`, the sprint archive and git. **Ids stay monotonic: 073 is not reused.**
+> Next clock: TD-064 · TD-077 · TD-079 (all closed Sprint-081) are due at **Sprint-084**, not before.
+> **New this promote: TD-082**, filed against a §2 soft-cap breach that has no exemption route by
+> design — the ledger row *is* the reasoned carry, because ADR-015 rule 2 forbids the alternative.
+
+- **TD-082** severity: minor | status: open | created: Sprint-083
+  - Summary: **`docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` is 3,039 lines against
+    §2's 130 soft cap — a 23× breach with no exemption route, by design.** It is the authoritative
+    development handoff EPIC-014, EPIC-015 and SPRINT-083 are all sliced from, so it is not drift:
+    it is a large input doing its job. But `doc-caps-grandfathered.txt` states in as many words *"Do
+    not add a soft-cap row"* (ADR-015 rule 2, enforced since SPRINT-060 T2 with retained must-FAIL
+    fixtures), and `.conformance-exempt` governs §6's doc-set, not §2's caps. The sanctioned route
+    for a soft breach is the promote governance review — which reports it again every promote and
+    resolves nothing on its own. **This row is the reasoned carry, because the alternative is
+    forbidden.**
+  - Evidence: `sh scripts/lib/check-doc-caps.sh` prints
+    `OVER-CAP (soft): docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md (3039 > 130)
+    [§2 soft] -- prune at the next promote governance review (§11)`. Owner ruled *carry, do not
+    prune* at SPRINT-083's promote; the mechanism they were offered (`.conformance-exempt`) turned
+    out to be the wrong reader for this check, which is how the row came to exist.
+  - Impact: low today, and it compounds in one specific way — every future promote's governance
+    review re-surfaces a breach nobody intends to fix, which is exactly the shape of warning that
+    trains a reviewer to skim the cap line. The §7 four-tier scaffold has a real answer (cap-hit →
+    split into a tree) that nothing has been spent on.
+  - Mitigation *(hypothesis, not a plan — re-derive before a DoD rests on it)*: the doc's durable
+    residue is §27's H01–H40 task set plus the standards in §30 · §34 · §35 · §48–§52; the
+    architecture and rationale are now carried by EPIC-014 and EPIC-015. So a §7 split into
+    `docs/research/hardening-v3/` — or a prune to the task table once every H-row has been sliced
+    into a sprint — would close it without losing what later sprints read.
+  - **Re-file fresh if** the doc outlives EPIC-014 and EPIC-015 with H-rows still unsliced, or if a
+    second handoff doc of this size arrives — at which point the absence of a soft-cap exemption
+    route is the row's subject, not this one file.
+
 - **TD-081** severity: medium | status: open | created: Sprint-082
   - Summary: **`qa-check.sh` prints two verdicts and only one is the tally, so `0 fail` does not mean
     the conformance engine found nothing.** Line 237 states the leg is *"informational except the two
@@ -298,46 +345,6 @@ status: current
     every home whose bucket is non-empty*, with the empty-bucket case still silent.
   - **Re-file fresh if** the Retro's bucket structure changes shape, which would make the parse either
     trivial or impossible and settle this either way.
-
-- **TD-073** severity: minor | status: resolved → SPRINT-080 (no task — fixed under the trip-wire D4 set) | created: Sprint-079 | closed: Sprint-080
-  - Summary: **`evals/run-sprint-family-fixtures.sh` is the most expensive harness in the set (~5 min
-    for 23 cases), and the cost is not the git repos — it is that every case runs the whole engine
-    against the SHIPPED spec, ~15s each.** `run-attestation-fixtures.sh` takes the other side of the
-    same trade, handing the engine a reduced spec to stay at ~2s. Both choices are defensible and only
-    one of them is priced.
-  - Evidence: measured at SPRINT-079's close, and it is what took the full gate past its previous
-    ceiling — the close run printed `169 pass, 1 fail` after roughly 13 minutes with this harness
-    opt-in and therefore **not even running**. Under `QA_FULL=1` it adds ~5 min on top.
-  - Impact: two costs, and the second is the one that matters. (a) The gate gets slower, which is
-    TD-071's subject and this feeds it. (b) TD-016's rule — *cheap-and-git-free always-on,
-    git-repo-building opt-in* — is correct and puts the whole file behind `QA_FULL`, so **ten of the
-    23 cases that need no git at all** (the caps, the log directory, the verify clause, the promotion
-    and aging reads) are parked alongside the 13 that do. Those ten guard rules that run on every
-    default gate, so the guards are quieter than the things they guard.
-  - Mitigation *(hypothesis, not a plan)*: two independent moves, and they are not alternatives —
-    split the family so the git-free cases rejoin the always-on set, and/or reduce the spec each case
-    is run against. The split was refused at T4/T5 on the grounds that one family belongs in one file;
-    that is a real reason and it may simply lose to (b) above.
-  - **RESOLVED at SPRINT-080, and the summary above was wrong about the cause — kept as written,
-    because being wrong is the instructive part.** Neither mitigation was needed. The shipped spec was
-    never dominating: the whole runtime was the DRIVER'S OWN BOOKKEEPING. Two lines ran per rule,
-    `fn="assert_$(printf '%s' "$id" | tr '.-' '__')"` and `pid=$(printf '%-20s' "$id")` — two command
-    substitutions plus an external `tr`, on all 100 rules. Timed in isolation on this host against a
-    tiny input, exactly as L-144 prescribes: **100 × the first = 9,176ms · 100 × the second = 1,909ms
-    · a whole engine run = 10,859ms.** The bookkeeping *was* the engine. The spec reader is 150ms for
-    all 100 rules, and the assertions are noise beside it.
-  - **Fix:** both rewritten with parameter expansion only, no subshell and no external binary.
-    Equivalence proven over all 100 ids before the swap — both transforms, zero mismatches, including
-    the 21 hyphen-bearing ids that produced a silent false negative the last time this mangling
-    changed. Engine output verified **byte-identical** on two repositories (116 and 144 report lines):
-    a speedup that moves a verdict is a regression, not an optimisation.
-  - **Measured result:** the harness runs **9m24s → 3m20s** for the same 38 cases, all green — 65%
-    faster, and the trip-wire D4 set is cleared with room for T2 and T3. Per-run engine cost on a
-    fixture-sized repo roughly halves; this repository's own report is ~24% faster.
-  - **What did NOT get resolved, and is now its own row:** impact (b) above — the ten git-free cases
-    still parked behind `QA_FULL`. This row's own *Re-file fresh if* clause called that shot: *"at
-    which point only the opt-in parking remains, and it is a different row."* → **TD-075**.
-    dominating — at which point only the opt-in parking remains, and it is a different row.
 
 - **TD-064** severity: minor | status: resolved → TASK-257 (SPRINT-081 T1) | created: Sprint-075 | updated: Sprint-076 | closed: Sprint-081
   - Summary: **~~28~~ 16 of this repo's own docs fail the ownership-header rules the engine checks** —

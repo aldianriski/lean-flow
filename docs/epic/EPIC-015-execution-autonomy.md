@@ -1,0 +1,125 @@
+---
+epic: 015
+slug: execution-autonomy
+owner: Maintainer
+last_updated: 2026-08-24
+status: proposed
+member_sprints: []
+update_trigger: a member sprint closes, or a decision lands that changes the outcome
+---
+
+# EPIC-015 — Execution Autonomy
+
+> **Outcome:** an approved sprint Plan runs to a **named terminal state** without per-task human
+> confirmation — delegated judgment (J1) executes inside the pre-authorized envelope, authority
+> decisions (J2) park — and every run reports `DELIVERED` / `PARTIAL` / `FAILED` with the evidence
+> behind that verdict.
+
+## Why this, why now
+
+Task completion is being read as run completion. `sprint-bulk` pauses between tasks the owner already
+authorized, `overnight` is not the discoverable name of the mode that exists, the authority classes the
+loop already behaves as if it has (mechanical · delegated · human) are nowhere declared, and a run's
+outcome is a prose rollup rather than a typed verdict. Each is cheap alone; together they are why an
+approved Plan still needs a human sitting beside it.
+
+It spans sprints because the authority model (J0/J1/J2) has to be declared and *proven* — including a
+**seeded J2 control**, since a natural J2 park cannot be scheduled — before the envelope, the repair
+loop and the run-outcome vocabulary can rest on it, and because V3 §56's two dogfoods are integration
+boundaries, not steps inside a task.
+
+### It supersedes SPRINT-082's freeze — owner ruling, 2026-08-24
+
+SPRINT-082 T5 wrote *"the core execution architecture is FROZEN"* into
+`docs/research/adlc-epic-sequencing.md`, admitting further workflow change only on a measured defect ·
+measured cost · repeated workflow failure · security issue · consumer evidence. That freeze was written
+before V3 existed. The owner ruled that **V3 supersedes it**: the freeze re-arms after V3's integrated
+dogfood (V3 §56/§58), not after SPRINT-082.
+
+> **Owner-action — the ruling is not in force until it is written where the admission decision reads
+> it.** `adlc-epic-sequencing.md` is the file consulted when an epic is proposed; a ruling recorded only
+> here, or only in a commit message, governs nothing (**L-151**, four sightings — this epic would
+> otherwise *be* that failure). The amendment is deferred solely because SPRINT-082's close holds
+> uncommitted WIP in that file (L-042). See § Open questions.
+
+## Scope
+
+**In:** the sprint-bulk continuation contract and its five terminal states · `overnight` registered as
+the canonical mode with its aliases · the J0/J1/J2 authority classes · the pre-authorized AFK envelope
+with one recorded approval · bounded unattended Gauntlet repair · generator budget awareness · a
+reusable unattended capability profile · typed run outcomes (V3 H27–H31, H35–H37).
+
+**Out (explicitly not):** **H32 · H33 · H34 — already shipped in SPRINT-082** (T1 risk-aware
+`no-gate-discovered` + declared gate rung/ADR-033 · T2 risk-based review depth · T3 Verify
+reachability). This epic *exercises* them in dogfood and re-implements none of them. Also out: any new
+agent definition, hook or reviewer role · a critic swarm · turning the bounded revise into an unbounded
+loop · push/deploy/external destructive authorization · a scheduler or queue service · run-state resume
+(ADR-013 (b) was deferred, and EPIC-006 carries its guardrail) · the reference-engine migration
+(**EPIC-014**).
+
+## Member sprints
+<!-- Contribution rows live in docs/epic/logs/EPIC-015-execution-autonomy.md per ADR-030, created
+     lazily at the first member close. -->
+
+_None promoted._ The first member sprint is gated on the freeze amendment below, and is deliberately
+sequenced after **SPRINT-083** so that the two epics do not contend for `skills/orchestrator/**` and
+`scripts/` in the same window.
+
+## Decisions
+
+- **D1** — **V3 supersedes SPRINT-082's freeze** (owner ruling 2026-08-24). Binding only once written
+  into `adlc-epic-sequencing.md` — see § Why this, and the owner-action in § Open questions.
+- **D2** — **H32/H33/H34 are shipped, not re-opened.** They are verified by SPRINT-082's retained
+  fixtures and re-exercised by V3 §56's dogfoods. Re-implementing them would create a second definition
+  of risk beside the classifier SPRINT-082 T1 defined — the second SSOT LAW 4 forbids.
+- **D3** — **J2 stays human, and absence is never consent.** Headless has no ask channel; a missing
+  channel, a denial or a timeout is a BLOCK, never a default-yes, and never reasoned out by the run
+  (`orchestrator/references/night-run.md` Part 0). This epic widens what J1 may do; it does not narrow
+  J2.
+- **D4** — **Every new autonomy behaviour is ADR-029 Tier G.** A false negative in a continuation
+  contract, an authority classification or a park is silent by construction: the run reports success and
+  the omission leaves no trace. Retained must-FAIL fixture + sibling control + a seeded-break
+  discrimination proof, per task.
+- **D5** — **The seeded J2 control is required, not a fallback.** V3 §56 Dogfood 2 asks for one J2 park
+  *or* a seeded control; a natural park cannot be scheduled, and TASK-188 is the standing evidence that
+  waiting for one to occur foreclosed the criterion once already (L-111). Seed it.
+- **D6** — **Coordinates with EPIC-014 at the QA-profile boundary.** V3 §23 routes final integration to
+  a `STANDARD` System Verify — a profile EPIC-014 H17 defines. Until it exists, this epic's System
+  Verify step names today's `sh scripts/qa-check.sh` and is re-pointed at cutover, never forked.
+
+## Open questions
+
+- **The freeze amendment** — `adlc-epic-sequencing.md` § *The core execution architecture is FROZEN*
+  must record that V3 supersedes it and that the freeze re-arms after V3 §56's dogfoods. →
+  **owner-action, blocked on SPRINT-082's close** releasing that file (it is modified, uncommitted, in
+  another session). Unblock condition: `git status` shows the file clean.
+- **Does `overnight` become the canonical mode name in `spec/STANDARD.md`, or only in the skills?** →
+  a **judgement call, closed by ruling** (L-094) at the first member sprint's G2 — ADR-grade only if it
+  adds a §2 row.
+- **What is the repair budget?** V3 says "bounded" and SPRINT-082 kept exactly one retry. Whether
+  unattended repair inherits that ceiling or earns its own → a **measurement** (L-094): it accumulates
+  from EPIC-006's records. Do not freeze a number before they exist (L-130).
+- **Does the run-outcome vocabulary belong to this epic or to EPIC-008's Run Protocol?** V3 §11 says
+  build only what hardening needs and that EPIC-008 still owns the portable protocol. → ruled at the
+  member sprint that ships H37, so the two do not mint competing `RunSummary` shapes.
+
+## Closed when
+
+- [ ] `sprint-bulk` does not pause between already-authorized tasks, and a run ends **only** at
+      `PLAN_EXHAUSTED` · `AUTHORITY_BOUNDARY` · `HARD_FAILURE` · `BUDGET_STOP` · `USER_STOP`
+- [ ] **`overnight` is the canonical mode name**, discoverable in `/orchestrator` and `/flow`, with
+      `night-run` · `unattended` · `sprint-bulk unattended` resolving to it as aliases
+- [ ] **J0 / J1 / J2 are declared per task**, J1 executes unattended inside the approved envelope, and a
+      **J2 parks** — proven by a *seeded* J2 control, not only by a naturally occurring one (D5)
+- [ ] **One recorded pre-launch approval** covers goal · scope · acceptance · design · verification · J1
+      delegation · capabilities · repair policy · budget · stop conditions, with no repeated J0/J1
+      confirmation during the run
+- [ ] **Bounded unattended repair runs**: a concrete J1 critic finding → repair → re-review → continue,
+      with the retry ceiling still exactly what ADR-022 admits
+- [ ] Every run emits `DELIVERED` / `PARTIAL` / `FAILED` **plus** DoD, tasks attempted/completed, parks,
+      repair cycles, verification state, warnings and terminal reason
+- [ ] **Dogfood 1** (continuous attended `sprint-bulk`, no per-task confirmation) and **Dogfood 2**
+      (overnight with ≥1 J1 decision, ≥1 repair, and a J2 park or seeded control) both ran on this
+      repository, each naming what proved it
+- [ ] **The freeze is re-armed** in `adlc-epic-sequencing.md` after the dogfoods pass (V3 §58) — this
+      epic does not close leaving the execution architecture unfrozen
