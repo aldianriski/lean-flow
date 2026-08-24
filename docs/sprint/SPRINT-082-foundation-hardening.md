@@ -4,7 +4,7 @@ slug: foundation-hardening
 owner: Maintainer
 last_updated: 2026-08-24
 status: active
-plan_commit:
+plan_commit: 45d510b
 close_commit:
 update_trigger: sprint execute/close events
 ---
