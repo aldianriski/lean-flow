@@ -4,6 +4,7 @@ slug: foundation-hardening
 owner: Maintainer
 last_updated: 2026-08-24
 status: active
+gates_signed: G1,G2 @ 4d3274a
 plan_commit: 45d510b
 close_commit:
 update_trigger: sprint execute/close events
@@ -155,6 +156,7 @@ hardening and names what admits a further change, and the file is within its §2
 - **D3** — **The declared gate rung may be ADR-grade; rule it at G2.** Applying Part 0's existing charter to a case that slipped through needs no ADR. But if the rung introduces a *new consumer-facing declaration file*, that is precisely what ADR-031 was written for (`.conformance-exempt`), and the same reasoning applies. Decide once the rung's shape is fixed — do not default either way.
 - **D4** — **No `epic:` stamp.** This sprint advances none of EPIC-005/006/007/008; it is a standalone hardening sprint that precedes EPIC-005's first member sprint.
 - **D5** — **The 20 aged `TD-NNN` rows are noted and carried,** not re-reviewed here. None is `severity: high`, so nothing auto-escalates to Backlog P1. Owner ruling at this promote.
+- **D6** — **Run mode is attended/interactive** (ruled at G2, signed `4d3274a`). All five tasks are HITL, so an unattended run has no vehicle. The consequence is T4's, and is recorded here rather than left implicit: the **unattended-PARK branch is unreachable by the dogfood** and is proven by T1's retained fixture instead; T4 exercises the attended owner-ruling branch. This is L-111 discharged at the moment the criterion became checkable, not discovered at T4.
 
 ## Assumptions
 
