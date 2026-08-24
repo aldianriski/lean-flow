@@ -67,7 +67,7 @@ Layers: `skills/orchestrator/references/review-scoping.md` (skip table · scale-
      recorded outcome, so a fixture had nothing to assert on. Owner ruled the recorded-outcome
      mechanism; acceptance unchanged. -->
 Depends-on: T1 (the risk classifier)
-Cites: ADR-021 · ADR-022 · `spec/STANDARD.md` (the worked example of a high-consequence "docs" change)
+Cites: ADR-021 · ADR-022 · `spec/STANDARD.md` (the worked example of a high-consequence "docs" change) · T3 (whose checker corrected this task's Verify: clause)
 
 The skip table's first row exempts `docs / config / trivial` from any agent pass on the strength of what
 kind of file changed. One line of `spec/STANDARD.md`, an ADR that binds implementation, or a permission
@@ -83,7 +83,8 @@ README typo still resolves to self-review only.
 - [x] `docs / config / trivial` is no longer an automatic exemption; spec/STANDARD semantics, an implementation-binding ADR, and a workflow or protocol contract each draw an independent scoped reviewer — ✓ skip-table row 1 now reads *low-impact diff*; proven distinct by fixture `governance-self-reviewed-fails` (`sh evals/run-review-depth-fixtures.sh`)
 - [x] Auth and permission config still routes to `/security-review` as its own uncontaminated pass — ✓ the skip-table row is unchanged and § Two dimensions routes it explicitly
 - [x] `/code-review`'s fan-out stays reserved for large or high-risk diffs — ✓ § Scale depth untouched; the new table's last row routes there
-- [x] The Standards-vs-Spec axes and the one-bounded-revise ceiling are unchanged — *Verify: `sh evals/run-dispatch-preflight-fixtures.sh` and the retained `evals/fixtures/revise-loop/` case still pass*
+- [x] The Standards-vs-Spec axes and the one-bounded-revise ceiling are unchanged — *Verify: `sh evals/run-dispatch-preflight-fixtures.sh`* — ✓ all green
+- [x] The retained revise-loop fixture's contract is untouched — ✓ **judgment tick, and it says so**: that fixture is a manual attended exercise ("not run by any script", its README), so no mechanical method reaches it and none is claimed. Corrected by T3's own checker, which caught the original clause dressing a manual method as a mechanical one
 - [x] The Review step records what actually fired — a Part 4 `review · Tn · <depth> · behaviour:<class> · governance:<class>` line — because a routing decision nothing writes down cannot be checked (added by the T2 scope-change) — ✓ `night-run.md` Part 4 defines the line; `sh scripts/lib/check-review-depth.sh` reads it, wired into `qa-check.sh` against live logs
 - [x] Retained must-FAIL fixture: a high-governance-impact `.md` recorded as `self-review` fails with its own named finding, so an extension can no longer buy the cheap path — ✓ `review-depth-governance-self-reviewed` (`sh evals/run-review-depth-fixtures.sh`)
 - [x] Retained must-FAIL fixture: an **unclassified** review record followed by self-review fails — the marker's absence is not a claim of low impact, matching T1's `no-gate-risk-unmarked` reasoning — ✓ `review-depth-unclassified` (`sh evals/run-review-depth-fixtures.sh`)
@@ -92,7 +93,7 @@ README typo still resolves to self-review only.
 - [x] `sh scripts/qa-check.sh` reports `0 fail` — ✓ printed verdict `QA-CHECK: 173 pass, 0 fail`, 0 FAIL rows anywhere, review-depth leg reached the live log
 
 ### T3 — Add a verification-reachability test to G2 `[size: S · risk: low · class: decision · HITL]`
-Layers: `skills/orchestrator/SKILL.md` (G2 checklist) · `skills/orchestrator/references/review-scoping.md` (§ ADR-021 evidence boundary) · `evals/fixtures/` (new, retained)
+Layers: `skills/orchestrator/SKILL.md` (G2 checklist) · `skills/orchestrator/references/review-scoping.md` (§ ADR-021 evidence boundary) · `scripts/lib/check-verify-reaches.sh` · `evals/run-verify-reaches-fixtures.sh` · `evals/fixtures/verify-reaches/` · `scripts/qa-check.sh` (wiring)
 Depends-on: T2 (shared files — see D1)
 Cites: L-136 · L-156 · L-157 · L-119 · ADR-021 · `check-doc-caps.sh` · `CLAUDE.md` (both cited as the worked example, neither touched)
 
@@ -107,13 +108,13 @@ one that can is G2, which does not read it there.
 recorded as not-valid-proof at G2, while a correctly scoped checker passes unchanged.
 
 **DoD:**
-- [ ] G2 asks, for every mechanical `Verify:`, whether the mechanism EXISTS · RUNS in the target environment · REACHES the claimed artifact or behaviour · and whether its PASS actually PROVES the criterion
-- [ ] A method whose scope excludes the claimed target is recorded as not-valid-proof rather than accepted
-- [ ] Judgment verification stays legitimate where no mechanical method exists; the test never forces a checker into being merely to make a criterion mechanical
-- [ ] Retained fixture: a criterion whose checker runs clean but never examines its named target is caught
-- [ ] Retained control: a correctly scoped checker passes, reporting its denominator (L-156)
-- [ ] Seeded-break proof: reverting the rule reddens the fixture while the control stays green; the seeded file still parses and the break is targeted, not a demolition (L-142)
-- [x] `sh scripts/qa-check.sh` reports `0 fail` — ✓ printed verdict `QA-CHECK: 173 pass, 0 fail`, 0 FAIL rows anywhere, review-depth leg reached the live log
+- [x] G2 asks, for every mechanical `Verify:`, whether the mechanism EXISTS · RUNS in the target environment · REACHES the claimed artifact or behaviour · and whether its PASS actually PROVES the criterion — ✓ `orchestrator/SKILL.md` § G2 four-question item + `review-scoping.md` § ADR-021 boundary
+- [x] A method whose scope excludes the claimed target is recorded as not-valid-proof rather than accepted — ✓ finding `verify-does-not-reach-target`; fixture `unreachable-target-fails`
+- [x] Judgment verification stays legitimate where no mechanical method exists; the test never forces a checker into being merely to make a criterion mechanical — ✓ fixture `judgment-only-passes` counts such clauses and never fails them
+- [x] Retained fixture: a criterion whose checker runs clean but never examines its named target is caught — ✓ `unreachable-target` + `mixed-one-bad` + `prose-mentions-path` (8 cases, `sh evals/run-verify-reaches-fixtures.sh`)
+- [x] Retained control: a correctly scoped checker passes, reporting its denominator (L-156) — ✓ `reachable-target-passes` asserts a NON-zero denominator, so the control cannot pass vacuously
+- [x] Seeded-break proof: reverting the rule reddens the fixture while the control stays green; the seeded file still parses and the break is targeted, not a demolition (L-142) — ✓ 3 seeds (REACHES · EXISTS · comment-stripping), each landed/parsing/targeted at 121 lines, restored under a checked `sha256`; the third exposed an unguarded clause and `prose-mentions-path` was added to close it
+- [x] `sh scripts/qa-check.sh` reports `0 fail` — ✓ printed verdict `QA-CHECK: 175 pass, 0 fail`, 0 FAIL rows anywhere; the verify-reaches leg ran against this repository live Plan and reported its denominator
 
 ### T4 — Dogfood the three boundaries as one flow `[size: S · risk: low · class: execution · HITL]`
 Layers: `docs/sprint/logs/SPRINT-082-foundation-hardening.md` · whichever of T1–T3's artifacts the run exercises
@@ -135,7 +136,7 @@ proved it.
 - [ ] The run completes and each branch it reached is logged with its evidence, in the rollup's own vocabulary (`test | check | fixture | review | owner-ruling`)
 - [ ] No new specialist agent, no new workflow stage, bounded revise still exactly one retry, the external comparand ladder intact, System Verify still the final integrated gate
 - [ ] Any defect discovered is filed as its own `TD-NNN` or `TASK-NNN` rather than absorbed into this sprint
-- [x] `sh scripts/qa-check.sh` reports `0 fail` — ✓ printed verdict `QA-CHECK: 173 pass, 0 fail`, 0 FAIL rows anywhere, review-depth leg reached the live log
+- [ ] `sh scripts/qa-check.sh` reports `0 fail` — *Verify: the printed verdict line*
 
 ### T5 — Freeze the core execution architecture pending Run Evidence `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/research/adlc-epic-sequencing.md` (gated register + a compaction pass)
@@ -155,7 +156,7 @@ hardening and names what admits a further change, and the file is within its §2
 - [ ] The freeze is written as an admission condition alongside the EPIC-009…013 rows
 - [ ] The admission triggers name all three classes of fact so none is parked forever (L-094): a measured defect · a measured cost · a repeated workflow failure · a security issue · consumer evidence
 - [ ] Gauntlet components are named as existing architecture, not future backlog; future optimisation routes to EPIC-006's metrics; no "workflow optimisation" epic is opened
-- [x] `sh scripts/qa-check.sh` reports `0 fail` — ✓ printed verdict `QA-CHECK: 173 pass, 0 fail`, 0 FAIL rows anywhere, review-depth leg reached the live log
+- [ ] `sh scripts/qa-check.sh` reports `0 fail` — *Verify: the printed verdict line*
 
 ## Decisions (pre-locked)
 

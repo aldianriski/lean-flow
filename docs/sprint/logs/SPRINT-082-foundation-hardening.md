@@ -144,3 +144,66 @@ independent pass has not. This session cannot dispatch one (the operating instru
 forbids calling the Agent tool unless the owner asks), so the Review step is **owed and owner-triggered**.
 Recorded as a blocker rather than resolved by writing a line that would be false — the first thing this
 rule protects is the honesty of its own record.
+
+### 2026-08-24 | progress | T3 — reachability, and it caught this sprint on first contact
+
+G2 now asks four questions of every mechanical `Verify:` — **EXISTS · RUNS · REACHES · PROVES**. Two are
+mechanical and are screened by `scripts/lib/check-verify-reaches.sh` (EXISTS: the named script is in the
+repo; REACHES: it textually references the target the criterion claims). RUNS and PROVES stay human, and
+the checker's header says so — a checker implying it settled all four would be the same over-claim it
+exists to catch, one level up.
+
+Manual verification stays legitimate. A criterion with no mechanical method is a judgment tick that says
+so, and `judgment-only` is the fixture that keeps it that way: manufacturing a checker to make a
+criterion *look* mechanical is the failure this rule names, not its remedy.
+
+**It found a live defect in this sprint's own Plan on its first run.** T2's DoD read
+*"Verify: `sh evals/run-dispatch-preflight-fixtures.sh` and the retained `evals/fixtures/revise-loop/`
+case still pass"*. That harness never references `revise-loop`, and nothing does — the fixture is a
+**manual attended exercise** by design ("not run by any script", its README). So a manual method had
+been dressed as a mechanical one, in a box ticked one commit earlier. Split into a mechanical clause and
+an explicit judgment tick.
+
+Worth separating two things I briefly conflated: `revise-loop` is **not** an orphaned or unguarded
+fixture — it is correctly filed in the paid/manual class. The defect was the claim about it, not its
+status.
+
+**Discrimination proof (Tier G), and the gap it exposed.** Seeding the REACHES branch reddened only
+`unreachable-target-fails`; seeding EXISTS reddened only `method-absent-fails`; the control held under
+both. A third seed removed the **comment-stripping** line — and the suite stayed green, because I had
+just removed the offending token from the fixture's own comments. A load-bearing guard clause with no
+fixture behind it is L-058 exactly, and it would have shipped looking proven. Added
+`prose-mentions-path`: a stand-in checker whose *prose* names the target while its code never touches
+it. With it, the third seed reddens.
+
+That failure fired for real first: the family's original must-FAIL went **green** because the fixture
+script's explanatory comment mentioned the unreachable path, so the checker matched prose *about* the
+target instead of code reaching it (L-108, the self-describing-corpus shape). The checker now strips
+comments; the fixtures keep the no-token discipline anyway, so they stay honest if that stripping is
+ever relaxed.
+
+Live-wired against `docs/sprint/SPRINT-*.md`, not fixtures alone. This repository's own Plan reports
+**0 confirmed targets** — a vacuous green — which is precisely why the positive path lives in
+`reachable-target` and why the denominator is printed rather than assumed (L-156).
+
+### 2026-08-24 | surprise | T3 — an unrestricted `sed` ticked three tasks that had not been done
+
+While ticking T3's DoD I ran a `sed` whose pattern matched the gate criterion in **T3, T4 and T5** —
+their text is identical — with no line range. All three took the evidence line from the T1+T2 gate run:
+`✓ printed verdict QA-CHECK: 173 pass, 0 fail`. T4 and T5 had not been started.
+
+Three boxes claiming completion, each citing a real run that was not theirs. Caught by arithmetic, not
+by reading: T3 reported `ticked 7, open 0` when its own gate had not run yet, and that number could not
+be right.
+
+Reverted all three; T3's was re-ticked only after its own gate. Worth recording rather than quietly
+fixing, for two reasons. It is the **exact failure this sprint is about** — a ticked box whose evidence
+does not belong to it, indistinguishable from a satisfied one by anyone reading later — produced by the
+author of the rule, in the artifact the rule governs, minutes after shipping it. And the mechanism is
+narrower than "be careful": a whole-file `sed` on a **repeated** criterion line is a cross-task edit
+wearing the shape of a single-task one, which is L-009's family (a structure-adjacent edit that looks
+clean and fuses neighbours) arriving through the checkbox rather than the table row.
+
+The guard that caught it is one the sprint already relies on: **read the count back and reconcile it
+against what you know happened.** No new rule proposed — the existing cross-check clause covers this,
+and it fired.

@@ -309,6 +309,35 @@ else
   fi
 fi
 
+# --- 2c-bis. A mechanical Verify: must reach the criterion it claims (SPRINT-082 T3) -------------
+# S9.VERIFYCLAUSE asks whether a ticked criterion NAMES a method; it passes on a method that cannot
+# examine its own subject, and unreachable reads exactly like satisfied (L-136 x4). This screens the
+# two mechanical halves -- EXISTS and REACHES -- against LIVE Plans. RUNS and PROVES stay G2's.
+# Covered by evals/run-verify-reaches-fixtures.sh, which also carries the positive path: this
+# repository's own Plan confirms 0 targets, so its green here is vacuous by itself (L-156).
+vr_script="scripts/lib/check-verify-reaches.sh"
+if [ ! -f "$vr_script" ]; then
+  bad "verify reaches: checker not found at $vr_script"
+else
+  vr_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
+  if [ -z "$vr_files" ]; then
+    note "verify reaches: skip -- no active sprint Plan"
+  else
+    vr_out=$(sh "$vr_script" $vr_files 2>&1); vr_code=$?
+    printf '%s\n' "$vr_out"
+    vr_pass=$(printf '%s\n' "$vr_out" | grep -cE '^PASS')
+    vr_fails=$(printf '%s\n' "$vr_out" | grep -cE '^FAIL')
+    pass=$((pass + vr_pass))
+    if [ "$vr_code" -ne 0 ]; then
+      if [ "$vr_fails" -gt 0 ]; then
+        fail=$((fail + vr_fails))
+      else
+        bad "verify reaches: checker exited $vr_code without reporting a FAIL line"
+      fi
+    fi
+  fi
+fi
+
 # --- 3. Frontmatter / ownership presence ------------------------------------
 has_field() { grep -qE "^$2:" "$1"; }
 
@@ -616,7 +645,7 @@ done
 # guards §2's placement pair, whose required set is derived from the spec's own `Create ←` cells --
 # so a §2 row that stops saying "always" changes the engine and this harness together, and neither
 # can drift from the other silently.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh"
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh"
 eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh"
 # run-attestation-fixtures.sh (SPRINT-074 T2, TASK-228) joins the opt-in set by the same rule: it
 # builds 6 throwaway repos via mktemp -d + git init, measured at ~2s on this host. Real git history

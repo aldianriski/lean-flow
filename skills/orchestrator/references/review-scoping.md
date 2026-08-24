@@ -180,6 +180,16 @@ the task itself named, run as written. What only reports: everything else in thi
 each `done-when` notes its verification method where a mechanical one exists; a task naming none
 remains a judgment tick, and says so.
 
+**Naming a method is not the same as reaching the criterion.** A named check that never examines its
+subject passes green and proves nothing — and *unreachable* is indistinguishable from *satisfied* by
+anyone reading the tick afterwards. So G2 asks four questions of every mechanical `Verify:`, not one:
+**EXISTS · RUNS · REACHES · PROVES** (`SKILL.md` § G2). A method whose scope excludes the claimed target
+is recorded as **not-valid-proof**, never accepted; and where nothing mechanical reaches it, the
+criterion stays a judgment tick that says so — manufacturing a checker to make a criterion *look*
+mechanical is the failure this rule names, not its remedy. EXISTS and REACHES are pre-screened by
+`scripts/lib/check-verify-reaches.sh`; RUNS and PROVES stay human, and the checker says so rather than
+implying it settled all four.
+
 When the diff **touches tests**, the test-quality standard (`skills/tdd/references/test-standard.md`) is
 the floor to raise — the 12-point checklist + the 70/20/10 pyramid — plus a **regression gate**: the
 tests match the task's risk tier and ALL existing tests still pass (zero regressions) before it ticks done.
