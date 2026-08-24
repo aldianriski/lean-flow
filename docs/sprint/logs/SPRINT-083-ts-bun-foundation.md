@@ -110,3 +110,86 @@ use, and it caught something both times it was applied:**
 Judgment/manual verification left as legitimate where no mechanical method exists (the test does not
 force a checker into being): T2's four-rung discovery walk, T1's denominator ruling, and T3's
 seeded-break targeting are all human judgements and are recorded as such.
+
+### 2026-08-24 | scope-change | T1 — DoD-4's method is falsified; the Finding-ID half becomes a named gap
+
+**What broke.** DoD-4 read: *"Finding IDs are enumerated from the live engine, not from memory — Verify:
+the list is produced by a command recorded in the ADR, and a second, differently-shaped query agrees on
+the count."* The criterion is sound. **The premise underneath it is false: no such command exists.**
+
+`conformance-engine.sh` emits findings through at least **four** distinct message shapes, with the id
+as free text at a position that varies by call site:
+
+```
+bad "conformance: <id> -- …"      bad "$_rid-- <id>: …"
+bad "S13.TRAILERS   -- <id>: …"   bad "<id>: $p -- …"
+```
+
+Three successive anchored extractions returned **4**, then **14**, then a wide net of **78** tokens
+mixing real ids (`adr-edited-after-decision` · `changelog-not-rotated-at-minor` · `core-file-missing`)
+with prose (`append-only` · `comma-separated` · `cost-free`). **Every wrong answer was caught only by a
+disagreeing second query** — the 14 was falsified by checking one id known from SPRINT-082's own logs,
+`dod-criterion-names-no-check`, which is in the engine and which the anchor missed. Without that
+check the contract would have frozen a confidently incomplete list, and nothing downstream would have
+noticed until a cutover.
+
+**Why this is a scope-change and not a quiet re-read.** DoD-4 could be satisfied *verbally* by recording
+one of the falsified commands and its number. That is precisely the L-088 failure — re-reading a
+criterion to fit what was built. The criterion went stale because execution disproved its premise, so
+it gets an owner ruling, not a reinterpretation.
+
+**Impact.** T1 freezes the **rule-ID** surface (denominator **100**, derived and reconciled two
+independent ways) and records the **Finding-ID** surface as a named gap closing at H07/H08, where
+findings become typed data rather than strings. No task is added or removed. **The accepted cost is
+stated in ADR-034 rather than buried:** until H07/H08 a family can pass rule parity while a finding id
+drifts undetected.
+
+**Alternatives rejected, each because it collides with a standing ruling:** editing the engine to
+self-report (D2 forbids touching Shell this sprint) · harvesting from the fixture corpus (runs the eval
+suites this session is not running) · hand-reconciling 78 tokens (a judgement call, not the *command*
+the criterion asks for).
+
+**Re-confirm G2.** Owner ruled 2026-08-24: *freeze Rule IDs now, defer Finding IDs.* The Plan edit
+follows this entry.
+
+**This is a finding about the migration, not only about the task.** A compatibility contract that cannot
+enumerate half its own surface is the stringly-typed failure V3 §19 names, and it is the clearest
+evidence yet for the typed `FindingId` EPIC-014 exists to build.
+
+### 2026-08-24 | progress | T1 complete — 5 of 5; rule surface frozen at 100
+
+`docs/adr/ADR-034-semantic-compatibility-contract.md` · `evals/fixtures/compat/rule-ids-v0.10.0.txt`
+(100 rows / 100 unique ids, regeneration `cmp`-identical) · `docs/DECISIONS.md` · regenerated
+`docs/knowledge-index.md`.
+
+**The denominator was derived, and all three circulating numbers are now accounted for** — which was the
+point, because an unexplained remainder is where a wrong denominator hides. **100** is the contract's
+(`51 + 49 = 100`) · **51** is *checkable* (`mechanical 40 + split 11`, agreeing independently with
+EPIC-004's `45 in-engine + 6 standalone`) · **79** is disproved: the `S[0-9]+\.[A-Z][A-Z0-9]+` shape
+stops at a hyphen and misses exactly the 21 hyphenated §2 ids, `79 + 21 = 100`, zero false positives.
+Two independent routes agree on 51, which is what makes 100 safe to freeze.
+
+**Not verified, and recorded rather than ticked past (ADR-021):** DoD-5 names
+`sh scripts/qa-check.sh` and the gate **was not run** — standing owner instruction this session to skip
+qa-check/eval scripts, since EPIC-014 replaces them. The criterion's substance (DECISIONS.md row,
+regenerated index) was verified directly. **The gate verdict is absent, and absence is not a pass.**
+
+### 2026-08-24 | park | T1 — review parked: governance:high, no independent reviewer (D7)
+
+`review-scoping.md` § Skip table routes a **governance-impact diff, any size** — explicitly naming *"an
+ADR that binds implementation"* — to **one scoped `sonnet` reviewer**, and says in as many words:
+**"never the self-review floor, whatever the file extension."** ADR-034 binds EPIC-014's entire parity
+approach, so T1 is squarely in that row.
+
+**D7 ruled implementation inline with no sub-agents**, which leaves no reviewer that did not write the
+code. The rule does not offer self-review as a degraded option here, so T1's review is **parked**, not
+downgraded — recording a self-pass as if it satisfied this row is the silent false-negative the rule was
+written to stop.
+
+**This is the second sighting of the same collision.** SPRINT-082 T5 parked on identical grounds
+(`governance:high`, no independent reviewer this session) and its close filed **TASK-266** to discharge
+the owed review. It will recur on T2, T3 and T4 — all Tier G, all governance- or behaviour-impacting —
+so it is surfaced now as a sprint-wide question rather than discovered four times.
+
+**Unblock condition:** either one scoped reviewer per governance-impact task, or a recorded owner ruling
+accepting self-review for this sprint (the shape TASK-266 exists to close for 082).

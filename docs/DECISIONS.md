@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-034](adr/ADR-034-semantic-compatibility-contract.md) | What the reference-engine migration must preserve (rule id · finding id · severity · inclusion · hold · full-run level · exit meaning) and what it must not (stdout bytes); rule-ID denominator derived as **100**, Finding-ID surface a named gap until H07/H08 | accepted | 2026-08-24 |
 | [ADR-033](adr/ADR-033-gate-discovery-declared-rung.md) | Gate discovery gains a last-ranked declared rung (`.gate-command`), and `no-gate-discovered` routes on the change's **risk class** rather than closing on "nothing to block on" — material work parks or draws a recorded ruling, and the rollup line carries the class so a checker can read it | accepted | 2026-08-24 |
 | [ADR-032](adr/ADR-032-version-semantics-and-stream-independence.md) | A version number reports a **moved verdict** (pass → fail under the same repo), not authorial significance; `1.0.0` is earned when the standard governs a repo that is not ours; the four streams are independent and declare their compatibility range | accepted | 2026-08-24 |
 | [ADR-031](adr/ADR-031-reasoned-doc-exemptions-are-declared.md) | A reasoned doc exemption is **declared** in `.conformance-exempt` with a mandatory reason, never condition-gated in §6 — condition-gating would drop the check for every adopter to serve one | accepted | 2026-08-24 |
