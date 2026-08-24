@@ -91,6 +91,29 @@ status: current
 > Base tier doc-set has no way to declare a *reasoned* exemption, which is what caps this
 > repository's own conformance level at `none` alongside TD-064's sixteen headers.
 
+- **TD-080** severity: minor | status: open | created: Sprint-081
+  - Summary: **§2 states the standard's own update trigger and nothing enforces it.** The
+    `spec/STANDARD.md` row reads *"a rule is added, amended or reclassified — bump per
+    `spec/CHANGELOG.md`"*. SPRINT-081 T2 added a rule to §6 and the standard stayed stamped
+    `version: 0.8.0` through a **fully green gate**; it was caught by reading §2, not by tooling.
+  - Evidence: `sh scripts/qa-check.sh` printed `161 pass, 0 fail` on a tree whose spec carried a new
+    §6 rule and an unchanged version. Bumped to `0.9.0` by hand at T2, with the changelog entry
+    written at the same time.
+  - Impact: low but consumer-facing in a specific way — an adopter pins a spec version and re-reads it
+    when the number moves. A rule added without a bump is a change they have no signal for, and
+    `--spec <path>` makes vendoring an old copy a supported workflow, so the version is load-bearing
+    rather than decorative.
+  - Mitigation (hypothesis, not a plan — the filer's): an `S2` assertion comparing the spec's
+    `version:` against the newest `## <version>` block in `spec/CHANGELOG.md` would catch a **missing
+    changelog entry** for a declared version, and a version present in neither. **It would not catch
+    the missing bump itself** — nothing can distinguish an amended rule from a typo without reading
+    the diff, and §2's trigger is a judgement. Naming what the check *cannot* do is the honest half:
+    the mechanical half is real and worth having, and calling it enforcement of §2's trigger would be
+    the overstatement this ledger exists to avoid.
+  - Sibling: **TD-078** (a template that ships a doc which cannot pass its own standard). Both are the
+    reference implementation disagreeing with the standard it publishes, in opposite directions — one
+    ships a defect, this one ships an unstated change.
+
 - **TD-079** severity: minor | status: resolved → SPRINT-081 T4 (no task — found and fixed inside the sprint that exposed it) | created: Sprint-081 | closed: Sprint-081
   - Summary: **the level ladder certified `Attested` on a repository that claimed no attestation at
     all.** §13 says the opposite in as many words — *"Attested is not reachable by trailers alone"*, and

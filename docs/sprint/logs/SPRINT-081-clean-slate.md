@@ -433,7 +433,9 @@ and the stranger has **no git history**, so T4's new `attestation-absent` hold n
 git-backed adopter carrying no trailers does collect that line — held at Gated, exit code unmoved —
 and that case is untested against a foreign repo. It is Round 5's question if anyone asks it.
 
-### 2026-08-24 | run-complete | run · 25 of 25 DoD ticked
+### 2026-08-24 | run-complete | SPRINT-081 finished the Plan it grew
+run · 25 of 25 DoD ticked
+run · cost unavailable from inside the session · turns unavailable · ~2h of the wall clock was gate time alone (9 × `qa-check.sh` at ~14 min) · 4 of 4 units · inline, no sub-agents dispatched
 
 **SPRINT-081, four tasks, all green.** Gate `161 pass, 0 fail`. Conformance `level: Gated`, one held
 finding (`attestation-absent`) naming honestly what this repository has not claimed.

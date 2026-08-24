@@ -3,7 +3,7 @@ sprint: 081
 slug: clean-slate
 owner: Maintainer
 last_updated: 2026-08-24
-status: active
+status: closed
 plan_commit: ddd9081
 update_trigger: sprint execute/close events
 ---
@@ -179,4 +179,61 @@ unaffected, and the exit code does not move — a hold is not a failure (§14).
 
 ## Retro
 
-_(written at close)_
+
+**Retrieval check** — no prior `L-NNN` or ADR was missed or contradicted. The reverse: the sprint's
+worst near-misses were caught *by* promoted rules firing as designed — L-137's cmp guard on a seed that
+silently failed to apply, L-108's second query on a rule count that disagreed with the harness, L-009's
+re-read on a table row inserted above its separator. **ADR-028 was the live precedent T2 followed** (a
+disposition moved into the artifact the tool reads) and ADR-031 cites it as such.
+
+**Cost** — inline, single session, no sub-agents dispatched (owner ruled inline over dispatch at G2,
+overriding the orchestrator's default). Four tasks, 25 DoD, 4 commits. The dominant cost was **not** the
+work: `scripts/qa-check.sh` runs ~13–15 minutes and was run **nine** times, roughly two hours of wall
+clock, of which about half was spent re-running it against findings this session had authored in the
+sprint file rather than in the code. Cost per unit delivered: ~2 gate runs per task, against a floor of
+1. Recorded plainly because the series is the point — the next promote can size a batch knowing a
+four-task sprint on this repo costs an afternoon of gate time alone.
+
+**Worked**
+- **Deriving every id from the ledger maximum, never from memory** (L-143). Three ids issued this
+  sprint — TD-078, TD-079, ADR-031 — each cross-checked two ways, and the `ADR-900`/`TASK-90x` fixture
+  ids in `evals/` would have poisoned a naive `tail -1` on two of them.
+- **Reading a checker's source instead of re-running it against a guess.** The `layers completeness`
+  finding was diagnosed by reading `grep -qxF` on line 145 and understanding it as an exact whole-token
+  match; no number of re-runs would have shown why `scripts/lib/check-doc-caps.sh` on a `Cites:` line
+  could not satisfy an implied bare `check-doc-caps.sh`.
+- **Predicting a gate result before running it.** Before the last T1 run the expected outcome was stated
+  from the checker's rules and then confirmed. A green that arrives after a change nobody can explain is
+  indistinguishable from a check that stopped looking.
+- **Pricing the rejected design rather than arguing it.** Arm (b) was seeded into a scratch spec and
+  measured: both findings vanish for a repo declaring nothing, and the tier reports "no unconditional
+  doc is owed at Base". That is a stronger record than any amount of G2 prose, and it is what ADR-031
+  carries.
+
+**Friction**
+- **Nearly every gate failure this sprint was in the Plan's *description of its own verification*, not
+  in the work.** Four criteria ticked with no `*Verify:*` clause; five `Layers:`/`Cites:` declarations
+  execution invented and the Plan could not have named (L-100, working as intended); and — the sharp one
+  — **three findings manufactured by my own explanatory annotations**, because a backticked file-shaped
+  token in a task's prose is read by `check-layers-completeness.sh` as a declaration obligation. Adding
+  `` `check-doc-caps.sh` `` to explain a ruling created an undeclared-file finding; adding it to
+  `Cites:` then created a Cites/Layers contradiction. **The sprint file is a parsed artifact, and prose
+  added to it has mechanical consequences.** Cheap to detect, cheap to fix, and it cost about an hour.
+- **`qa-check.sh` at ~14 minutes makes the edit→verify loop the bottleneck**, which is what turns a
+  one-line annotation mistake into a 15-minute penalty. TD-073 already priced the harness that dominates
+  it and was resolved at SPRINT-080; this is the residue.
+- **The spec version bump has no check behind it.** §2 states the trigger in its own row and a fully
+  green gate said nothing about the standard still being stamped `0.8.0` after a rule was added to §6.
+  Caught by reading §2, not by tooling → **TD-080**.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **L-158** — a fixture that asserts a finding's *wording* is not asserting its *consequence*.
+  `no-claim-is-not-approval` passed for its entire life while the bug it names shipped, and the seeded
+  break proved it: reverting the hold reddened three new level-aware cases and left that one green.
+- **L-159** — a defect can hide in a branch your own repository cannot enter. The level ladder's `else`
+  arm had never been reached here, because this repo had never had zero findings; clearing an unrelated
+  Structural finding is what exposed it. L-016's sibling: not "we cannot dogfood this feature", but "we
+  have never been in the state that reaches this code".
+- **L-136 bumped** (structural claim about another document frozen into a Plan) — T1's DoD named a
+  checker whose scope cannot reach `docs/qa/`. Third artifact kind for the same grain: a figure
+  (SPRINT-071), a document's contents (SPRINT-074), now **a checker's scope**.

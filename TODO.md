@@ -18,15 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-081 — Clean Slate** → [docs/sprint/SPRINT-081-clean-slate.md](docs/sprint/SPRINT-081-clean-slate.md)
->
-> _Three tasks — **T1 TASK-257** (the sixteen ownership headers, TD-064) · **T2 TASK-258** (rule the
-> reasoned Base-tier exemption, TD-077) · **T3 TASK-238** (foreign-repo artefact triage re-run,
-> EPIC-004 § Closed-when 1's follow-through). **T3 depends on T2** — a dependency neither backlog row
-> carried, found at promote: `S6.BASE` is shape-bound, so re-running the triage before the exemption
-> ruling would measure a mechanism about to change (D1). T1 and T2 clear the two rules that hold this
-> repository at `level: none` against its own standard. Spends EPIC-004's residue rather than carrying
-> it into EPIC-005, whose first member sprint is **SPRINT-082**._
+_(none — SPRINT-081 closed 2026-08-24. Next: **SPRINT-082**, EPIC-005's first member sprint.)_
 
 ---
 
@@ -37,6 +29,26 @@ status: current
 ### P0 — Critical / Blocking
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-259 — Exercise the absent-attestation hold against a foreign repo that has commits  [size: S] [risk: low] [AFK]
+      class:      execution
+      done-when:  the foreign-repo harness runs a target with real git history and no §13 trailers, and
+                  the assertion records what an adopter actually sees — `attestation-absent` named,
+                  `level: Gated`, exit code unmoved. Whichever way it falls is the result; a surprise
+                  here is a finding about T4, not a nuisance
+      touches:    evals/run-foreign-repo-fixtures.sh (the current stranger is git-less by construction,
+                  so this needs a second target or an added `git init` + one commit) ·
+                  docs/research/logs/conformance-coverage.md § Round 5
+      depends-on: none
+      assumes:    **the gap is real and was named at the moment it was created, not discovered later.**
+                  SPRINT-081 T4 added the hold and T3 could not exercise it: the stranger is built from
+                  four `printf`s with no `git init`, so §13 reports `not evaluated` and the new branch
+                  never runs against a foreign tree. It IS exercised against this repository and by
+                  `run-attestation-fixtures.sh`, so this is coverage of the *consumer path*, not of the
+                  rule (L-016) — the one thing dogfooding structurally cannot check here
+      tracker:    SPRINT-081 T4 · T3 · TD-079 · L-159 · docs/research/logs/conformance-coverage.md
+      origin:     close-retro
+      state:      ready
 
 - [ ] TASK-238 — Re-run the foreign-repo artefact triage once coverage is past the shape-bound rules  [size: S] [risk: low] [HITL]
       class:      decision
