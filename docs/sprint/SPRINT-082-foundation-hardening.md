@@ -3,7 +3,7 @@ sprint: 082
 slug: foundation-hardening
 owner: Maintainer
 last_updated: 2026-08-24
-status: active
+status: closed
 gates_signed: G1,G2 @ 4d3274a
 plan_commit: 45d510b
 close_commit:
@@ -186,6 +186,53 @@ hardening and names what admits a further change, and the file is within its §2
 |------|------|--------------|------|------|
 | _(filled during execution)_ | | | | |
 
+
 ## Retro
 
-_(written at close)_
+**Retrieval check** — no prior `L-NNN` or ADR was contradicted or missed. The opposite: L-136, L-156,
+L-158, L-108, L-058 and L-142 were all *retrieved and applied* before the work, and four of them then
+fired anyway on this sprint's own output. That is the useful signal — the corpus was reachable and
+correct, and being loaded did not prevent the failures it describes. Machinery caught what recall did not.
+
+**Cost** — cost, turns and wall-clock are **unavailable**: attended interactive session with no per-run
+metering. Stated rather than omitted (ADR-016). Shape: `inline`, coordinator-only, no agents dispatched.
+Delivered: 5 tasks · 38 DoD · 3 new checkers · 25 fixtures across 3 families · 9 must-FAIL · 8 seeded
+breaks · 1 ADR · 1 TD. What the series can honestly record from this run is the *shape*, not the price.
+
+**Worked**
+- **Three corrections, one shape.** T1, T2 and T3 each closed a place where *absence of evidence* was
+  read as *evidence of absence*. Framing them as one shape is why T2 could consume T1's classifier
+  instead of inventing a second definition of risk.
+- **Wiring the checkers against live artifacts, not only fixtures.** Two of the three new checkers run
+  over this repo's own Plan and Log. That is what made them catch real defects in this sprint's work
+  within minutes of shipping.
+- **Reporting denominators.** Every new checker prints what it examined. `verify reaches ... (0 claimed
+  targets confirmed)` is what revealed that this repository's green was vacuous and that the positive
+  path had to live in a fixture (L-156, applied rather than rediscovered).
+- **Seeded-break proofs earned their cost twice.** Once as intended, and once by exposing a load-bearing
+  guard clause with no fixture behind it — a gap no amount of reading would have surfaced.
+
+**Friction**
+- **The rule bit its authors, repeatedly and correctly.** T2's routing forbade T1–T3 from self-review;
+  T3's checker found T2's Verify clause naming an unreachable target; an unranged `sed` forged evidence
+  in three tasks. Each was caught by machinery or arithmetic, none by review.
+- **`Layers:` was corrected three times** (T1, T2, T3). Not a defect — L-100 predicts exactly this — but
+  three times in one sprint suggests promote cannot usefully predict Layers for tasks whose shape is
+  decided mid-task, and the cost is a gate failure each time.
+- **The gate is slow enough to distort the loop.** Full runs took long enough that work continued around
+  them, which is how the stale-run confusion arose mid-sprint. Related to TD-073.
+- **`0 fail` is not one verdict.** Filed as TD-081. Nearly mis-read as a defect in the gate before
+  checking; it is documented behaviour, and the hazard is the reporting.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **L-160** — a criterion foreclosed by a *repair* an earlier task in the same Plan makes (L-111 mirrored).
+- **L-161** — a whole-file `sed` on a criterion line that repeats across tasks forges evidence.
+- **L-108 eleventh sighting** — the corpus describes itself even when it is a shell script; and removing
+  the token that caused a bug can silently remove the only test for the fix.
+
+**Left open, deliberately**
+- **The independent review of T1–T3 and T5 is owed** (`governance:high` under T2's own rule). Filed as a
+  follow-up, not closed. The sprint's own routing refused to let this work self-certify, and honouring
+  that refusal at close is the only reading consistent with having shipped it.
+- **QA/evals gating skipped** for the sprint's remainder by owner ruling, pending a wholesale replacement
+  that has no scope, date or ADR yet. Recorded in the Execution Log with its cost.

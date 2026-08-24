@@ -18,9 +18,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-082 — Foundation Hardening** → [docs/sprint/SPRINT-082-foundation-hardening.md](docs/sprint/SPRINT-082-foundation-hardening.md)
-
-_Standalone — carries no `epic:` stamp (D4). EPIC-005's first member sprint follows this one._
+_(none — SPRINT-082 closed 2026-08-24. Next: **SPRINT-083**, EPIC-005's first member sprint.)_
 
 ---
 
@@ -101,6 +99,27 @@ _Standalone — carries no `epic:` stamp (D4). EPIC-005's first member sprint fo
       state:      ready
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-266 — Run the owed independent review of SPRINT-082's governance changes  [size: S] [risk: med] [HITL]
+      class:      decision
+      done-when:  T1, T2, T3 and T5's changes have had an independent scoped review pass recorded as a
+                  `review · Tn · scoped-reviewer · behaviour:material · governance:high` line, or an
+                  owner ruling accepting self-review is recorded in its place. Either outcome closes it;
+                  an empty record does not
+      touches:    docs/sprint/archive/logs/SPRINT-082-foundation-hardening.md (or a successor log)
+      depends-on: none
+      assumes:    **the sprint's own rule generated this, and refusing to wave it through is the point.**
+                  SPRINT-082 T2 shipped routing where `governance:high` cannot take the self-review
+                  floor. T1/T2/T3/T5 are all `behaviour:material · governance:high` — they change rules
+                  other work is measured against — so under that rule none of them earned the cheap
+                  path. The session that built them could not dispatch an independent reviewer, so the
+                  review **parked** and **no `review ·` line was written**: the line records what fired,
+                  and writing `self-review` would have been false *and* would have reddened
+                  `check-review-depth.sh`. Closing the sprint with the record honestly empty, and the
+                  gap filed here, is the only reading consistent with having shipped the rule
+      tracker:    SPRINT-082 T2 · T4 (parked branch) · review-scoping.md § Two dimensions
+      origin:     close-retro
+      state:      ready
 
 - [ ] TASK-263 — Add a verification-reachability test to G2  [size: S] [risk: low] [HITL]
       class:      decision
@@ -278,7 +297,7 @@ _Standalone — carries no `epic:` stamp (D4). EPIC-005's first member sprint fo
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-081's shipped changes are written up as **v1.55.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only). `level: none` → `Gated`; the one new consumer-facing surface is `.conformance-exempt` (ADR-031), and v1.53.0 rotated to `docs/changelog/`.
+_(no active sprint)_ — SPRINT-082's shipped changes are written up as **v1.56.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only). Consumer-facing surfaces: the root `.gate-command` declaration (ADR-033) and review depth keyed on consequence rather than file extension.
 
 ---
 
