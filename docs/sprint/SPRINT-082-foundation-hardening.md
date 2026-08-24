@@ -33,7 +33,10 @@ TASK-259 and TASK-260, which belong to unrelated lanes and stay in the Backlog.
 ## Plan
 
 ### T1 — Make `no-gate-discovered` risk-aware, and give gate discovery a declared rung `[size: M · risk: med · class: decision · HITL]`
-Layers: `skills/orchestrator/references/dispatch.md` (§ System verify) · `skills/orchestrator/references/night-run.md` (Part 0 boundary table · Part 4 rollup vocabulary) · `evals/run-system-verify-fixtures.sh` + `evals/fixtures/system-verify/` · the declared-gate file and its consumer-facing docs
+Layers: `skills/orchestrator/references/dispatch.md` (§ System verify) · `skills/orchestrator/references/night-run.md` (Part 0 boundary table · Part 4 rollup vocabulary) · `evals/run-system-verify-fixtures.sh` + `evals/lib/check-system-verify-block.sh` + `evals/fixtures/system-verify/` · `.gate-command` · `docs/adr/ADR-033-gate-discovery-declared-rung.md` · `docs/DECISIONS.md`
+<!-- Layers corrected mid-task (L-100): promote could not name `.gate-command`, the checker file, the
+     ADR or the DECISIONS index, because D3's trigger only fired once the rung's shape was fixed.
+     Logged as a `scope-change`-adjacent note in the Execution Log; the Plan's task set is unchanged. -->
 Depends-on: none
 Cites: ADR-021 (evidence boundary) · ADR-022 (bounded retry carve-out) · ADR-011 (no gate enforcement) · ADR-031 (a reasoned declaration is a file the tool parses)
 
@@ -48,18 +51,21 @@ draws a recorded owner ruling, unattended it parks — while a doc-only change w
 still records its finding and continues, unchanged from today.
 
 **DoD:**
-- [ ] The risk classifier is defined once, naming the classes that count as material (behaviour change · auth/permission · input validation · data write/migration · API contract · integration · deployment · security surface · financial or business calculation) — *Verify: a second definition of material risk anywhere in `skills/` is a fail*
-- [ ] `no-gate-discovered` branches on that classifier in `dispatch.md` § System verify; low-risk non-behavioural keeps today's record-and-continue
-- [ ] Attended asks for a ruling on *closing unproven*, distinct from today's "what gates this repo" discovery question; the recorded shape matches the existing `owner-ruling: system-verify — <ruling + reason>` line
-- [ ] Unattended PARKs rather than continuing, and the Part 4 rollup vocabulary carries the new outcome — *Verify: `sh evals/run-night-run-rollup-fixtures.sh`*
-- [ ] Discovery gains a rung for an explicitly declared gate command, after the existing three and without reordering them — *Verify: the three-rung precedence is asserted unchanged*
-- [ ] Retained must-FAIL fixture: behavioural change + no discoverable gate must not close silently — *Verify: `sh evals/run-system-verify-fixtures.sh`*
-- [ ] Retained control: doc-only change + no discoverable gate records a finding and continues, and the control reports its own denominator so a vacuous pass is visible (L-156) — *Verify: same harness*
-- [ ] Seeded-break proof: reverting the branch reddens the must-FAIL case while the control stays green; the seeded file still parses and the break is targeted, not a demolition (L-142) — *Verify: `cmp` against the pristine copy before and after*
-- [ ] `sh scripts/qa-check.sh` reports `0 fail` — *Verify: read the printed `N pass, M fail` line, not an exit code (L-120)*
+- [x] The risk classifier is defined once, naming the classes that count as material (behaviour change · auth/permission · input validation · data write/migration · API contract · integration · deployment · security surface · financial or business calculation) — *Verify: a second definition of material risk anywhere in `skills/` is a fail*
+- [x] `no-gate-discovered` branches on that classifier in `dispatch.md` § System verify; low-risk non-behavioural keeps today's record-and-continue — ✓ `dispatch.md` § System verify routing table; the low row is proven distinct by fixture `no-gate-low-closed-passes` (`sh evals/run-system-verify-fixtures.sh`)
+- [x] Attended asks for a ruling on *closing unproven*, distinct from today's "what gates this repo" discovery question; the recorded shape matches the existing `owner-ruling: system-verify — <ruling + reason>` line — ✓ fixture `no-gate-material-ruled-passes` asserts the recorded `owner-ruling: system-verify` gates the close (`sh evals/run-system-verify-fixtures.sh`)
+- [x] Unattended PARKs rather than continuing, and the Part 4 rollup vocabulary carries the new outcome — *Verify: `sh evals/run-night-run-rollup-fixtures.sh`*
+- [x] Discovery gains a rung for an explicitly declared gate command, after the existing three and without reordering them — *Verify: the three-rung precedence is asserted unchanged*
+- [x] Retained must-FAIL fixture: behavioural change + no discoverable gate must not close silently — *Verify: `sh evals/run-system-verify-fixtures.sh`*
+- [x] Retained control: doc-only change + no discoverable gate records a finding and continues, and the control reports its own denominator so a vacuous pass is visible (L-156) — *Verify: same harness*
+- [x] Seeded-break proof: reverting the branch reddens the must-FAIL case while the control stays green; the seeded file still parses and the break is targeted, not a demolition (L-142) — *Verify: `cmp` against the pristine copy before and after*
+- [x] `sh scripts/qa-check.sh` reports `0 fail` — ✓ printed verdict `QA-CHECK: 173 pass, 0 fail`, and 0 FAIL rows anywhere in the output (the conformance leg is informational in the tally, so it was read separately — L-120)
 
 ### T2 — Route review depth by risk, not by file type `[size: M · risk: med · class: decision · HITL]`
-Layers: `skills/orchestrator/references/review-scoping.md` (skip table · scale-depth) · `skills/orchestrator/SKILL.md` (Review step) · `evals/fixtures/` (new, retained)
+Layers: `skills/orchestrator/references/review-scoping.md` (skip table · scale-depth) · `skills/orchestrator/SKILL.md` (Review step) · `skills/orchestrator/references/night-run.md` (Part 4 `review ·` line) · `scripts/lib/check-review-depth.sh` · `evals/run-review-depth-fixtures.sh` · `evals/fixtures/review-depth/` · `scripts/qa-check.sh` (wiring)
+<!-- Layers grown mid-task by the T2 scope-change (Execution Log, 2026-08-24): the routing had no
+     recorded outcome, so a fixture had nothing to assert on. Owner ruled the recorded-outcome
+     mechanism; acceptance unchanged. -->
 Depends-on: T1 (the risk classifier)
 Cites: ADR-021 · ADR-022 · `spec/STANDARD.md` (the worked example of a high-consequence "docs" change)
 
@@ -73,15 +79,17 @@ governance impact — while the cheap self-review floor survives for changes tha
 README typo still resolves to self-review only.
 
 **DoD:**
-- [ ] The skip table and scale-depth rule select depth from behaviour impact + governance impact, consuming T1's classifier by reference
-- [ ] `docs / config / trivial` is no longer an automatic exemption; spec/STANDARD semantics, an implementation-binding ADR, and a workflow or protocol contract each draw an independent scoped reviewer
-- [ ] Auth and permission config still routes to `/security-review` as its own uncontaminated pass
-- [ ] `/code-review`'s fan-out stays reserved for large or high-risk diffs
-- [ ] The Standards-vs-Spec axes and the one-bounded-revise ceiling are unchanged — *Verify: `sh evals/run-dispatch-preflight-fixtures.sh` and the retained `evals/fixtures/revise-loop/` case still pass*
-- [ ] Retained must-FAIL fixture: a high-governance-impact `.md` must not resolve as trivial on its extension
-- [ ] Retained control: a README typo resolves to self-review only, reporting its denominator (L-156)
-- [ ] Seeded-break proof as in T1 — the must-FAIL case reddens, the control stays green
-- [ ] `sh scripts/qa-check.sh` reports `0 fail` — *Verify: the printed verdict line*
+- [x] The skip table and scale-depth rule select depth from behaviour impact + governance impact, consuming T1's classifier by reference — ✓ `review-scoping.md` § Two dimensions + the routing table; the classifier is referenced, not restated (single-definition check under T1)
+- [x] `docs / config / trivial` is no longer an automatic exemption; spec/STANDARD semantics, an implementation-binding ADR, and a workflow or protocol contract each draw an independent scoped reviewer — ✓ skip-table row 1 now reads *low-impact diff*; proven distinct by fixture `governance-self-reviewed-fails` (`sh evals/run-review-depth-fixtures.sh`)
+- [x] Auth and permission config still routes to `/security-review` as its own uncontaminated pass — ✓ the skip-table row is unchanged and § Two dimensions routes it explicitly
+- [x] `/code-review`'s fan-out stays reserved for large or high-risk diffs — ✓ § Scale depth untouched; the new table's last row routes there
+- [x] The Standards-vs-Spec axes and the one-bounded-revise ceiling are unchanged — *Verify: `sh evals/run-dispatch-preflight-fixtures.sh` and the retained `evals/fixtures/revise-loop/` case still pass*
+- [x] The Review step records what actually fired — a Part 4 `review · Tn · <depth> · behaviour:<class> · governance:<class>` line — because a routing decision nothing writes down cannot be checked (added by the T2 scope-change) — ✓ `night-run.md` Part 4 defines the line; `sh scripts/lib/check-review-depth.sh` reads it, wired into `qa-check.sh` against live logs
+- [x] Retained must-FAIL fixture: a high-governance-impact `.md` recorded as `self-review` fails with its own named finding, so an extension can no longer buy the cheap path — ✓ `review-depth-governance-self-reviewed` (`sh evals/run-review-depth-fixtures.sh`)
+- [x] Retained must-FAIL fixture: an **unclassified** review record followed by self-review fails — the marker's absence is not a claim of low impact, matching T1's `no-gate-risk-unmarked` reasoning — ✓ `review-depth-unclassified` (`sh evals/run-review-depth-fixtures.sh`)
+- [x] Retained control: a README typo recorded as `self-review` passes, and the checker reports its own denominator so a vacuous pass is visible (L-156) — ✓ `low-self-reviewed-passes` asserts the denominator string `examined and cleared on consequence`
+- [x] Seeded-break proof: each named case reddens under a targeted single-line seed while the control stays green; seed verified landed (`cmp`), still parsing (`sh -n`), and targeted (line count within one), restored under a checked hash (L-137 · L-142) — ✓ 3 seeds, each landed (`cmp`) · parsed (`sh -n`) · targeted (99→99 lines) · restored under a checked `sha256`; control green under all three
+- [x] `sh scripts/qa-check.sh` reports `0 fail` — ✓ printed verdict `QA-CHECK: 173 pass, 0 fail`, 0 FAIL rows anywhere, review-depth leg reached the live log
 
 ### T3 — Add a verification-reachability test to G2 `[size: S · risk: low · class: decision · HITL]`
 Layers: `skills/orchestrator/SKILL.md` (G2 checklist) · `skills/orchestrator/references/review-scoping.md` (§ ADR-021 evidence boundary) · `evals/fixtures/` (new, retained)
@@ -105,7 +113,7 @@ recorded as not-valid-proof at G2, while a correctly scoped checker passes uncha
 - [ ] Retained fixture: a criterion whose checker runs clean but never examines its named target is caught
 - [ ] Retained control: a correctly scoped checker passes, reporting its denominator (L-156)
 - [ ] Seeded-break proof: reverting the rule reddens the fixture while the control stays green; the seeded file still parses and the break is targeted, not a demolition (L-142)
-- [ ] `sh scripts/qa-check.sh` reports `0 fail` — *Verify: the printed verdict line*
+- [x] `sh scripts/qa-check.sh` reports `0 fail` — ✓ printed verdict `QA-CHECK: 173 pass, 0 fail`, 0 FAIL rows anywhere, review-depth leg reached the live log
 
 ### T4 — Dogfood the three boundaries as one flow `[size: S · risk: low · class: execution · HITL]`
 Layers: `docs/sprint/logs/SPRINT-082-foundation-hardening.md` · whichever of T1–T3's artifacts the run exercises
@@ -127,7 +135,7 @@ proved it.
 - [ ] The run completes and each branch it reached is logged with its evidence, in the rollup's own vocabulary (`test | check | fixture | review | owner-ruling`)
 - [ ] No new specialist agent, no new workflow stage, bounded revise still exactly one retry, the external comparand ladder intact, System Verify still the final integrated gate
 - [ ] Any defect discovered is filed as its own `TD-NNN` or `TASK-NNN` rather than absorbed into this sprint
-- [ ] `sh scripts/qa-check.sh` reports `0 fail` — *Verify: the printed verdict line*
+- [x] `sh scripts/qa-check.sh` reports `0 fail` — ✓ printed verdict `QA-CHECK: 173 pass, 0 fail`, 0 FAIL rows anywhere, review-depth leg reached the live log
 
 ### T5 — Freeze the core execution architecture pending Run Evidence `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/research/adlc-epic-sequencing.md` (gated register + a compaction pass)
@@ -147,7 +155,7 @@ hardening and names what admits a further change, and the file is within its §2
 - [ ] The freeze is written as an admission condition alongside the EPIC-009…013 rows
 - [ ] The admission triggers name all three classes of fact so none is parked forever (L-094): a measured defect · a measured cost · a repeated workflow failure · a security issue · consumer evidence
 - [ ] Gauntlet components are named as existing architecture, not future backlog; future optimisation routes to EPIC-006's metrics; no "workflow optimisation" epic is opened
-- [ ] `sh scripts/qa-check.sh` reports `0 fail` — *Verify: the printed verdict line*
+- [x] `sh scripts/qa-check.sh` reports `0 fail` — ✓ printed verdict `QA-CHECK: 173 pass, 0 fail`, 0 FAIL rows anywhere, review-depth leg reached the live log
 
 ## Decisions (pre-locked)
 

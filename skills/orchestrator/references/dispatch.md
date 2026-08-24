@@ -475,12 +475,50 @@ runs nothing, or runs the wrong thing, and reports a false PASS. Discover in thi
 first hit: **(1)** the host's package manifest — a `test` / `check` / `verify` script (`package.json`
 "scripts", `pyproject.toml`, `Cargo.toml`, etc., whichever the repo's manifest actually is); **(2)** a
 `Makefile` or `justfile` target of the same names; **(3)** the test step of a CI config in the repo
-(`.github/workflows/*`, etc.) — read its command, don't re-derive one. Nothing found → **attended**:
-ask the owner what gates this repo; **unattended**: never silently skip — emit the `no-gate-discovered`
-rollup line (night-run.md Part 4) and continue to close, since there is nothing to block on.
-**lean-flow's own repo dogfoods this as `sh scripts/qa-check.sh`** — stated here only as the discovery
-*output* one host happens to produce, never as a path a consumer's skill should assume or inherit
-(L-015): a different host discovers a different command through the same three steps.
+(`.github/workflows/*`, etc.) — read its command, don't re-derive one; **(4)** a `.gate-command` file
+at the repo root — its first non-blank, non-`#` line is the command, run from the root.
+
+**Why rung 4 exists, and why it is last.** The first three read artifacts a repo keeps for other
+reasons, which is what makes them trustworthy — nobody writes a `package.json` to satisfy this pass.
+But all three can miss on a repo that genuinely has a gate, and then the discovery order reports *no
+gate* about a repo that runs one on every commit. That is not hypothetical: **lean-flow itself is such
+a repo** — no package manifest, no `Makefile`, no `justfile`, no CI workflow, while `sh
+scripts/qa-check.sh` gates every commit. Until SPRINT-082 this file claimed lean-flow "dogfoods this as
+`sh scripts/qa-check.sh`", which was true of the repository and false of the procedure: the command
+existed and the discovery order could not reach it (ADR-033). Rung 4 is last because a declaration is
+the weakest evidence here — it is written *for* this pass and can go stale against a repo that later
+grows a real manifest, so anything discoverable wins over it.
+
+A `.gate-command` that is present but declares nothing readable is **`gate-declaration-unreadable`**
+and does **not** count as a discovered gate — a declaration nobody can read is worse than none,
+because it looks like an answer (ADR-031's reasoning · L-058). Absence of the file is not a finding.
+
+**Nothing found on any rung** → the run is in the `no-gate-discovered` case, and **what happens next
+depends on the change's risk class, not on the mere absence of a gate** — see below. Any command that
+*is* discovered is still stated as the discovery *output* one host happens to produce, never as a path
+a consumer's skill should assume or inherit (L-015): a different host discovers a different command
+through the same four rungs.
+
+**`no-gate-discovered` is not a verdict of "nothing to block on" — that reading was the defect.**
+Absence of evidence was being read as evidence of absence: a behavioural change could close having
+proved nothing, leaving no trace that nothing had been proved. Route on the risk class of what the run
+actually changed:
+
+| Risk class of the change | Attended | Unattended |
+|---|---|---|
+| **low / non-behavioural** (docs, comments, pure rename) | record the finding, continue to close — unchanged | record the finding, continue to close — unchanged |
+| **material** (behaviour change · auth/permission · input validation · data write or migration · API contract · integration · deployment · security surface · financial or business calculation) | ask for a **recorded owner ruling on closing unproven** — not the discovery question "what gates this repo", which asks the owner to supply a gate rather than to accept its absence | **PARK the close** (Part 0 boundary table). "Is this proven enough to close?" is a *decision*, and the execute-only charter already parks decisions — this applies that charter to a case that slipped through it, rather than inventing new policy |
+
+**The classifier is declared once**, in the table above, and is the single definition of *material* for
+this pass and for Review's depth routing — two definitions of risk in one repo would be a second SSOT
+that drifts from the one it copied. **When the class is genuinely unclear, it is material**: defaulting
+down is what produces the silent close this rule exists to stop.
+
+**The rollup line carries the class, because a verdict a checker cannot read is not enforceable.**
+`no-gate-discovered(low)` / `no-gate-discovered(material)` — the parenthesis matching `FAIL(...)`'s
+existing shape (night-run.md Part 4). An **unmarked** `no-gate-discovered` followed by a close is
+`no-gate-risk-unmarked`: the marker's absence must never be read as *low*, for the same reason absence
+of an ask channel is never consent.
 
 **Verdict semantics.** PASS → one rollup line, run continues to close. FAIL → **blocks the silent
 close** (ADR-021): surface the FAIL and its named finding, never tick past it quietly. Attended → get

@@ -48,8 +48,35 @@ run_case_anywhere "parked-unattended-passes" 0 "no close event yet" -- \
   sh "$checker" "$fx/parked-unattended/docs/sprint/logs/SPRINT-932-parked-unattended.md"
 
 # --- case 4: system-verify PASS, closed normally -> PASS -----------------------------------------
-run_case_anywhere "wellformed-pass-passes" 0 "nothing to block on" -- \
+run_case_anywhere "wellformed-pass-passes" 0 "the gate ran and was green" -- \
   sh "$checker" "$fx/wellformed-pass/docs/sprint/logs/SPRINT-933-wellformed-pass.md"
+
+# --- the no-gate-discovered family (SPRINT-082 T1 · ADR-033) ------------------------------------
+# Before T1, every one of these five logs was reported PASS by the same short-circuit ("PASS /
+# no-gate-discovered verdict -- nothing to block on"), which is why the family needed both a
+# must-FAIL and a control that differ ONLY in the marker: a rule that stopped the silent close by
+# blocking every gate-less repo would be a worse rule, and only case 7 can tell the two apart.
+
+# --- case 6: material change, no gate, closed anyway, no ruling -> FAIL, named -------------------
+run_case_anywhere "no-gate-material-closed-fails" 1 "system-verify-no-gate-material-silently-closed" -- \
+  sh "$checker" "$fx/no-gate-material-closed/docs/sprint/logs/SPRINT-940-no-gate-material-closed.md"
+
+# --- case 7: doc-only change, no gate, closed -> PASS (the control: cheap path preserved) --------
+run_case_anywhere "no-gate-low-closed-passes" 0 "cheap path preserved" -- \
+  sh "$checker" "$fx/no-gate-low-closed/docs/sprint/logs/SPRINT-941-no-gate-low-closed.md"
+
+# --- case 8: material, no gate, close PARKED (no close event) -> PASS ---------------------------
+run_case_anywhere "no-gate-material-parked-passes" 0 "correctly parked" -- \
+  sh "$checker" "$fx/no-gate-material-parked/docs/sprint/logs/SPRINT-942-no-gate-material-parked.md"
+
+# --- case 9: material, no gate, closed WITH a recorded owner ruling -> PASS (attended path) ------
+run_case_anywhere "no-gate-material-ruled-passes" 0 "recorded owner ruling" -- \
+  sh "$checker" "$fx/no-gate-material-ruled/docs/sprint/logs/SPRINT-943-no-gate-material-ruled.md"
+
+# --- case 10: bare no-gate-discovered, no class, closed -> FAIL, named ---------------------------
+# The marker's absence is not a claim of low risk.
+run_case_anywhere "no-gate-unmarked-closed-fails" 1 "no-gate-risk-unmarked" -- \
+  sh "$checker" "$fx/no-gate-unmarked-closed/docs/sprint/logs/SPRINT-944-no-gate-unmarked-closed.md"
 
 # --- case 5: an ARCHIVED log carrying the exact silently-closed shape -> skipped, exit 0 ---------
 # Location-scoped, matching night-run-rollup/gates-signed/sprint-close's own archive convention: a

@@ -480,16 +480,39 @@ merge-back** — supplementary to the header count above, never a new task state
 line:
 
 ```
-system-verify · PASS | FAIL(<named finding>) | no-gate-discovered · <gate command>
+system-verify · PASS | FAIL(<named finding>) | no-gate-discovered(low|material) · <gate command>
 ```
 
-`PASS` and `no-gate-discovered` let the run proceed to close. `FAIL` blocks the silent close (ADR-021)
+`PASS` lets the run proceed to close. **`no-gate-discovered` carries the change's risk class in the
+same parenthesis `FAIL(...)` already uses**, and the class is what decides the outcome
+(dispatch.md § System verify): `no-gate-discovered(low)` proceeds to close as before, while
+`no-gate-discovered(material)` **parks the close** unattended — "is this proven enough to close?" is a
+decision, and Part 0 already parks decisions. An **unmarked** `no-gate-discovered` followed by a close
+is `no-gate-risk-unmarked`: the marker's absence is not a claim of low risk, exactly as an absent ask
+channel is not consent. Where no gate was discovered the `<gate command>` field reads
+`no gate declared`. `FAIL` blocks the silent close (ADR-021)
 — attended, the owner's ruling is recorded immediately below in the one shape dispatch.md § System
 verify defines (`owner-ruling: system-verify — <ruling + reason>`) before the run proceeds to close;
 unattended, the close itself parks (`parked-hitl`, naming this line) with no ruling line yet, since
 Part 0 blocks the close before a human is present to rule. **Morning-after case**: when the owner
 reviews a parked FAIL the next morning and rules on it, the same `owner-ruling:` line is appended to
 the log at that point — the shape does not change with who's watching, only whether it exists yet.
+
+**A review pass adds one line per task**, beneath its task's state line — supplementary to the header
+count, never a new task state, same as the retry and system-verify lines:
+
+```
+review · Tn · self-review | scoped-reviewer | code-review | security-review · behaviour:low|material · governance:low|high
+```
+
+**Why the depth is recorded at all.** Review depth is chosen from the change's *consequence*
+(`review-scoping.md` § Two dimensions), and a routing decision nothing writes down cannot be checked
+afterwards — the cheap path would be self-certifying. The line names both dimensions because either one
+alone can demand depth: a zero-behaviour change to spec semantics is `behaviour:low · governance:high`,
+and that combination is exactly the one an extension-keyed rule used to wave through. `self-review`
+recorded against `governance:high` or `behaviour:material` is a finding; an **unclassified** record
+followed by `self-review` is `review-depth-unclassified`, on the same reasoning as
+`no-gate-risk-unmarked` — a missing marker is not a claim that the change was trivial.
 
 **Per-criterion evidence (TASK-209) adds one block of lines, once, after the per-task state lines**
 — supplementary to the header count above, extending the N-of-M the same way the retry and

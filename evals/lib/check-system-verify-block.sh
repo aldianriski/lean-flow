@@ -28,7 +28,26 @@
 #     branch.)
 #   FAIL line, `close` event, owner-ruling -> PASS. Attended: surfaced, owner ruled, then closed.
 #   FAIL line, `close` event, no ruling    -> FAIL system-verify-fail-silently-closed.
-#   PASS / no-gate-discovered line only    -> PASS. Nothing to block on.
+#   PASS line only                         -> PASS. The gate ran and was green.
+#
+# --- the no-gate-discovered family (SPRINT-082 T1) ------------------------------------------------
+# `no-gate-discovered` used to short-circuit to PASS here on the reasoning "nothing to block on". That
+# read absence of evidence as evidence of absence: a BEHAVIOURAL change could close having proved
+# nothing, and the log carried no trace that nothing had been proved. dispatch.md § System verify now
+# routes on the change's risk class, and the rollup line carries that class so this checker can read
+# it -- a verdict a checker cannot read is not enforceable, which is the whole reason the marker
+# exists rather than living in the run's head.
+#
+#   no-gate-discovered(low), close         -> PASS. Unchanged behaviour: cheap path preserved.
+#   no-gate-discovered(material), no close -> PASS. Correctly parked (the unattended shape).
+#   no-gate-discovered(material), close,
+#     with an owner-ruling                 -> PASS. Attended: the owner ruled on closing unproven.
+#   no-gate-discovered(material), close,
+#     no owner-ruling                      -> FAIL system-verify-no-gate-material-silently-closed.
+#   no-gate-discovered UNMARKED, close     -> FAIL no-gate-risk-unmarked. The marker's absence is not
+#     a claim of low risk. Defaulting an unmarked line to `low` would reinstate the exact silent close
+#     this family exists to stop, and would do it invisibly -- the same reasoning that makes an absent
+#     ask channel a BLOCK rather than a default-yes (night-run.md Part 0).
 #
 # Usage: sh check-system-verify-block.sh <sprint-log.md> [<sprint-log.md> ...]
 # Archived logs are skipped by path (docs/sprint/archive/) -- closed history is not re-litigated, same
@@ -53,21 +72,43 @@ for lg in "$@"; do
     continue
   fi
 
-  if ! grep -qE '^system-verify · FAIL\(' "$lg" 2>/dev/null; then
-    ok "system-verify block $lg (PASS / no-gate-discovered verdict -- nothing to block on)"
+  has_close=0; grep -qE '^### .*\| *close *\|' "$lg" 2>/dev/null && has_close=1
+  has_ruling=0; grep -qE '^owner-ruling: *system-verify' "$lg" 2>/dev/null && has_ruling=1
+
+  # -- FAIL first: it is the stronger signal, and a log carrying both a FAIL and a no-gate line
+  # (two runs, one sprint) must be judged on the FAIL.
+  if grep -qE '^system-verify · FAIL\(' "$lg" 2>/dev/null; then
+    if [ "$has_close" -eq 0 ]; then
+      ok "system-verify block $lg (FAIL recorded, no close event yet -- correctly still blocking)"
+    elif [ "$has_ruling" -eq 1 ]; then
+      ok "system-verify block $lg (FAIL recorded, close gated by a recorded owner ruling)"
+    else
+      bad "system-verify-fail-silently-closed: $lg carries a 'system-verify · FAIL(...)' line and a '| close |' event with no recorded owner ruling -- the FAIL was surfaced and then closed over anyway"
+    fi
     continue
   fi
 
-  if ! grep -qE '^### .*\| *close *\|' "$lg" 2>/dev/null; then
-    ok "system-verify block $lg (FAIL recorded, no close event yet -- correctly still blocking)"
+  # -- the no-gate-discovered family (SPRINT-082 T1 · ADR-033) -------------------------------------
+  if grep -qE '^system-verify · no-gate-discovered' "$lg" 2>/dev/null; then
+    if grep -qE '^system-verify · no-gate-discovered\(material\)' "$lg" 2>/dev/null; then
+      if [ "$has_close" -eq 0 ]; then
+        ok "system-verify block $lg (no-gate-discovered(material), no close event yet -- correctly parked)"
+      elif [ "$has_ruling" -eq 1 ]; then
+        ok "system-verify block $lg (no-gate-discovered(material), close gated by a recorded owner ruling)"
+      else
+        bad "system-verify-no-gate-material-silently-closed: $lg records 'no-gate-discovered(material)' and a '| close |' event with no recorded owner ruling -- a material change closed having proved nothing, and the absence of a gate is not a verdict that there was nothing to prove"
+      fi
+    elif grep -qE '^system-verify · no-gate-discovered\(low\)' "$lg" 2>/dev/null; then
+      ok "system-verify block $lg (no-gate-discovered(low) -- cheap path preserved, nothing material to block on)"
+    elif [ "$has_close" -eq 1 ]; then
+      bad "no-gate-risk-unmarked: $lg records a bare 'no-gate-discovered' with no (low|material) class and a '| close |' event -- the marker's absence is not a claim of low risk, so this cannot be read as the cheap path"
+    else
+      ok "system-verify block $lg (no-gate-discovered unmarked, no close event yet -- nothing closed over)"
+    fi
     continue
   fi
 
-  if grep -qE '^owner-ruling: *system-verify' "$lg" 2>/dev/null; then
-    ok "system-verify block $lg (FAIL recorded, close gated by a recorded owner ruling)"
-  else
-    bad "system-verify-fail-silently-closed: $lg carries a 'system-verify · FAIL(...)' line and a '| close |' event with no recorded owner ruling -- the FAIL was surfaced and then closed over anyway"
-  fi
+  ok "system-verify block $lg (PASS verdict -- the gate ran and was green)"
 done
 
 exit "$fail"

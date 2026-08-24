@@ -85,7 +85,7 @@ Operates on the active sprint file `docs/sprint/SPRINT-NNN-<slug>.md` (its Plan 
 
 Run checks in a **fresh, isolated context** (a reviewer who didn't write the code catches more) and **scope every pass to
 the diff + its blast radius** — never the whole repo (the fan-out re-scan is the biggest token sink). A **skip table** +
-**scale-depth** rule decide what fires: docs/trivial → self-review only · small/med → one scoped `sonnet` reviewer · large/high-risk → `/code-review` · behaviour change → `/run` + `/verify` · auth/input/secrets → `/security-review` · bug → `/diagnose`.
+**scale-depth** rule decide what fires — keyed on **consequence, never file type**: low behaviour *and* low governance impact → self-review only · governance impact at any size (spec/STANDARD semantics · an implementation-binding ADR · a workflow or protocol contract) → one scoped `sonnet` reviewer, whatever the extension · small/med → one scoped `sonnet` reviewer · large/high-risk → `/code-review` · behaviour change → `/run` + `/verify` · auth/input/secrets → `/security-review` · bug → `/diagnose`. The material-risk classes are defined **once** in `references/dispatch.md` § System verify and consumed here; unclear ⇒ material.
 
 A pass's worst finding **per axis** feeds **one bounded builder retry** — automatic in attended modes, one retry per
 pass, re-reviewed once; whatever is still open goes to the owner (the revise loop). Unattended, it fires only under

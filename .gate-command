@@ -1,0 +1,21 @@
+# The command that gates this repository — read by /orchestrator's System verify pass
+# (skills/orchestrator/references/dispatch.md § System verify) as discovery rung 4, after the three
+# rungs that read a package manifest, a Makefile/justfile target, and a CI config.
+#
+# Rung 4 exists because the first three can all miss on a repository that genuinely has a gate. This
+# one does: it ships no package manifest, no Makefile, no justfile and no CI workflow, so every
+# earlier rung returns nothing while `sh scripts/qa-check.sh` runs on every commit. Before this file
+# existed, the procedure that claims to discover the gate could not find it — and dispatch.md said in
+# as many words that lean-flow "dogfoods this as `sh scripts/qa-check.sh`", which was true of the
+# repository and false of the discovery order (SPRINT-082 T1 · ADR-033).
+#
+# Shape: the first line that is neither blank nor a `#` comment is the command, run from the repo
+# root. Same convention as `.conformance-tier`. A file that is present but declares nothing readable
+# is reported as `gate-declaration-unreadable` and does NOT count as a discovered gate: a declaration
+# nobody can read is worse than none, because it looks like an answer (ADR-031's reasoning, L-058).
+#
+# Absence is not a failure — it means rungs 1–3 are the whole discovery order for this repo, and if
+# they also miss, the run is in the `no-gate-discovered` case and its risk class decides what happens
+# next (dispatch.md § System verify).
+
+sh scripts/qa-check.sh

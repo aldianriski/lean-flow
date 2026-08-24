@@ -274,6 +274,41 @@ else
   fi
 fi
 
+# --- 2b. Review depth follows consequence, not file type (SPRINT-082 T2) ----
+# review-scoping.md § Two dimensions re-keyed review depth onto consequence. This is the enforcement
+# half: a `self-review` recorded against governance:high or behaviour:material is a finding, and an
+# unclassified record cannot buy the cheap path. Run against LIVE logs, not only fixtures -- a guard
+# that only ever sees evals/fixtures/ has not been shown to reach this repository at all.
+# Covered by evals/run-review-depth-fixtures.sh.
+rd_script="scripts/lib/check-review-depth.sh"
+if [ ! -f "$rd_script" ]; then
+  bad "review depth: checker not found at $rd_script"
+else
+  # Logs are DERIVED from their Plan, for the same two reasons as the night-run block above: ADR-014
+  # allows exactly one sprint glob in this file, and deriving keeps the Plan and its log one record.
+  rd_files=""
+  for rd_sp in $(ls docs/sprint/SPRINT-*.md 2>/dev/null); do
+    rd_lg="docs/sprint/logs/$(basename "$rd_sp")"
+    [ -f "$rd_lg" ] && rd_files="$rd_files $rd_lg"
+  done
+  if [ -z "$rd_files" ]; then
+    note "review depth: skip -- no Execution Log alongside an active sprint"
+  else
+    rd_out=$(sh "$rd_script" $rd_files 2>&1); rd_code=$?
+    printf '%s\n' "$rd_out"
+    rd_pass=$(printf '%s\n' "$rd_out" | grep -cE '^PASS')
+    rd_fails=$(printf '%s\n' "$rd_out" | grep -cE '^FAIL')
+    pass=$((pass + rd_pass))
+    if [ "$rd_code" -ne 0 ]; then
+      if [ "$rd_fails" -gt 0 ]; then
+        fail=$((fail + rd_fails))
+      else
+        bad "review depth: checker exited $rd_code without reporting a FAIL line"
+      fi
+    fi
+  fi
+fi
+
 # --- 3. Frontmatter / ownership presence ------------------------------------
 has_field() { grep -qE "^$2:" "$1"; }
 
@@ -581,7 +616,7 @@ done
 # guards §2's placement pair, whose required set is derived from the spec's own `Create ←` cells --
 # so a §2 row that stops saying "always" changes the engine and this harness together, and neither
 # can drift from the other silently.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh"
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh"
 eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh"
 # run-attestation-fixtures.sh (SPRINT-074 T2, TASK-228) joins the opt-in set by the same rule: it
 # builds 6 throwaway repos via mktemp -d + git init, measured at ~2s on this host. Real git history

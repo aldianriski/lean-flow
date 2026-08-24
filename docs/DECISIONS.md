@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-033](adr/ADR-033-gate-discovery-declared-rung.md) | Gate discovery gains a last-ranked declared rung (`.gate-command`), and `no-gate-discovered` routes on the change's **risk class** rather than closing on "nothing to block on" — material work parks or draws a recorded ruling, and the rollup line carries the class so a checker can read it | accepted | 2026-08-24 |
 | [ADR-032](adr/ADR-032-version-semantics-and-stream-independence.md) | A version number reports a **moved verdict** (pass → fail under the same repo), not authorial significance; `1.0.0` is earned when the standard governs a repo that is not ours; the four streams are independent and declare their compatibility range | accepted | 2026-08-24 |
 | [ADR-031](adr/ADR-031-reasoned-doc-exemptions-are-declared.md) | A reasoned doc exemption is **declared** in `.conformance-exempt` with a mandatory reason, never condition-gated in §6 — condition-gating would drop the check for every adopter to serve one | accepted | 2026-08-24 |
 | [ADR-029](adr/ADR-029-tiered-verification-ceremony.md) | Verification ceremony tiers by failure visibility (G guard · X executable · P prose) — the full fixture/discrimination discipline concentrates on guards | accepted | 2026-08-23 |

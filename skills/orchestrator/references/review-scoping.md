@@ -83,11 +83,49 @@ Don't fire every pass on every change. Decide per diff:
 
 | Condition | Action |
 |---|---|
-| docs / config / trivial diff | self-review checklist only — no agent pass |
+| **low-impact diff** — no behaviour impact **and** no governance impact (§ Two dimensions) | self-review checklist only — no agent pass |
+| **governance-impact diff, any size** — spec/STANDARD semantics · an ADR that binds implementation · a workflow or protocol contract · CI or deployment behaviour | **one** scoped `sonnet` reviewer — never the self-review floor, whatever the file extension |
 | no auth / input / secret / data-exposure surface touched | skip `/security-review` |
 | behaviour unchanged (rename / pure refactor / comment) | skip `/verify` |
 | files already read this session | skip `Explore` recon — context is already loaded |
 | small / medium diff | **one** scoped `sonnet` reviewer — not `/code-review`'s fan-out (§ Scale depth) |
+
+### Two dimensions — why the first row is not `docs / config / trivial`
+
+It used to be. That row exempted a diff from every agent pass on the strength of **what kind of file
+changed**, which is a proxy for consequence and a bad one. One line of `spec/STANDARD.md`, an ADR that
+binds implementation, a permission config, or a protocol contract can carry more consequence than fifty
+lines of ordinary implementation — and every one of them reads as "docs" or "config". The cheap path was
+being handed out by file extension, so the changes least examined were sometimes the ones that governed
+everything else. **A false negative here is silent by construction:** a governance change waved through
+as trivial leaves no record that review never happened.
+
+Depth follows **consequence**, along two dimensions, and a diff needs *both* to be low before it earns
+the self-review floor:
+
+- **Behaviour impact** — does the running system do something different? This is the **material** class
+  defined once in `dispatch.md` § System verify (behaviour change · auth/permission · input validation ·
+  data write or migration · API contract · integration · deployment · security surface · financial or
+  business calculation). That definition is **consumed, not restated**: two definitions of risk in one
+  repo would be a second SSOT that drifts from the one it copied.
+- **Governance impact** — does the change alter a rule, contract or decision that *other* work is
+  measured against? Spec and standard semantics, an ADR binding implementation, a workflow or protocol
+  contract, a gate's own definition. A diff can be zero-behaviour and high-governance; that combination
+  is exactly what the old row missed.
+
+| Change | Minimum review |
+|---|---|
+| README typo · ordinary docs clarification | self-review |
+| spec / STANDARD semantics · an ADR that binds implementation | independent scoped reviewer |
+| workflow or protocol contract · a gate's own definition | independent scoped reviewer |
+| auth / permission / secrets config | `/security-review` as its own uncontaminated pass |
+| deployment or CI behaviour | independent scoped reviewer |
+| small code behaviour change | independent scoped reviewer |
+| large or high-risk (broad blast radius · core abstraction) | full `/code-review` fan-out (§ Scale depth) |
+
+**When the class is genuinely unclear, it is material** — the same default `dispatch.md` sets, for the
+same reason: defaulting down is what produces the silent pass this routing exists to stop. Escalating a
+truly trivial diff costs one cheap `sonnet` pass; skipping a governance change costs the guarantee.
 
 Keep `/security-review` a **separate uncontaminated pass** — but only when there *is* a security
 surface. Folding it into a general review when there's no surface just burns tokens; running it in the
