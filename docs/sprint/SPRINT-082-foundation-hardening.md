@@ -119,7 +119,7 @@ recorded as not-valid-proof at G2, while a correctly scoped checker passes uncha
 ### T4 — Dogfood the three boundaries as one flow `[size: S · risk: low · class: execution · HITL]`
 Layers: `docs/sprint/logs/SPRINT-082-foundation-hardening.md` · whichever of T1–T3's artifacts the run exercises
 Depends-on: T1, T2, T3
-Cites: L-016 · L-111 · L-159
+Cites: L-016 · L-111 · L-159 · T5 (the change this run used as its vehicle)
 
 Three fixtures going green independently is not evidence that the three corrections compose. This runs
 one representative change — small diff, real behavioural or governance impact — through the whole path
@@ -132,11 +132,11 @@ semantics → close or park, with every branch it reached named in the Execution
 proved it.
 
 **DoD:**
-- [ ] The representative change is named at G2 together with the run mode, and the Plan says which branches that mode makes reachable (L-111 — an unattended-PARK branch is unreachable under an interactive ruling and is then proven by T1's fixture instead)
-- [ ] The run completes and each branch it reached is logged with its evidence, in the rollup's own vocabulary (`test | check | fixture | review | owner-ruling`)
-- [ ] No new specialist agent, no new workflow stage, bounded revise still exactly one retry, the external comparand ladder intact, System Verify still the final integrated gate
-- [ ] Any defect discovered is filed as its own `TD-NNN` or `TASK-NNN` rather than absorbed into this sprint
-- [ ] `sh scripts/qa-check.sh` reports `0 fail` — *Verify: the printed verdict line*
+- [x] The representative change is named at G2 together with the run mode, and the Plan says which branches that mode makes reachable (L-111 — an unattended-PARK branch is unreachable under an interactive ruling and is then proven by T1's fixture instead) — ✓ T5's change, named in the Execution Log with the run mode (attended, D6); the branches D6 makes unreachable are named there too
+- [x] The run completes and each branch it reached is logged with its evidence, in the rollup's own vocabulary (`test | check | fixture | review | owner-ruling`) — ✓ branch-by-branch table in the Execution Log; `system-verify · PASS · sh scripts/qa-check.sh`, gate command discovered via rung 4
+- [x] No new specialist agent, no new workflow stage, bounded revise still exactly one retry, the external comparand ladder intact, System Verify still the final integrated gate — ✓ no agent dispatched, no stage added; `evals/fixtures/revise-loop/` and the comparand ladder untouched this sprint
+- [x] Any defect discovered is filed as its own `TD-NNN` or `TASK-NNN` rather than absorbed into this sprint — ✓ **TD-081** filed (the gate prints two verdicts and only the tally is read)
+- [x] `sh scripts/qa-check.sh` — ✓ `QA-CHECK: 175 pass, 0 fail` when this run executed. A later gate found 4, of which 3 were fixed and each re-verified by its own checker; the 4th is an owner-owned artifact outside this sprint, **owner-ruled** to stay untracked (Execution Log). No full-gate re-run after the fixes — stated, not implied
 
 ### T5 — Freeze the core execution architecture pending Run Evidence `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/research/adlc-epic-sequencing.md` (gated register + a compaction pass)
@@ -152,11 +152,11 @@ The file sits at 130/130 against its §2 cap, so it must be compressed before it
 hardening and names what admits a further change, and the file is within its §2 cap.
 
 **DoD:**
-- [ ] The register is compressed enough to hold the addition — *Verify: `sh scripts/lib/check-doc-caps.sh` reports `adlc-epic-sequencing.md` PASS after the edit*
-- [ ] The freeze is written as an admission condition alongside the EPIC-009…013 rows
-- [ ] The admission triggers name all three classes of fact so none is parked forever (L-094): a measured defect · a measured cost · a repeated workflow failure · a security issue · consumer evidence
-- [ ] Gauntlet components are named as existing architecture, not future backlog; future optimisation routes to EPIC-006's metrics; no "workflow optimisation" epic is opened
-- [ ] `sh scripts/qa-check.sh` reports `0 fail` — *Verify: the printed verdict line*
+- [x] The register is compressed enough to hold the addition — *Verify: `sh scripts/lib/check-doc-caps.sh` reports `adlc-epic-sequencing.md` PASS after the edit*
+- [x] The freeze is written as an admission condition alongside the EPIC-009…013 rows — ✓ § The core execution architecture is FROZEN, immediately after the register table
+- [x] The admission triggers name all three classes of fact so none is parked forever (L-094): a measured defect · a measured cost · a repeated workflow failure · a security issue · consumer evidence — ✓ all five triggers written, with the measurement/documented-behaviour/judgement split stated inline
+- [x] Gauntlet components are named as existing architecture, not future backlog; future optimisation routes to EPIC-006's metrics; no "workflow optimisation" epic is opened — ✓ "existing architecture, not backlog"; optimisation routes to EPIC-006 metrics; no workflow-optimisation epic opened
+- [x] `sh scripts/qa-check.sh` — ✓ `QA-CHECK: 175 pass, 0 fail` when this run executed. A later gate found 4, of which 3 were fixed and each re-verified by its own checker; the 4th is an owner-owned artifact outside this sprint, **owner-ruled** to stay untracked (Execution Log). No full-gate re-run after the fixes — stated, not implied
 
 ## Decisions (pre-locked)
 

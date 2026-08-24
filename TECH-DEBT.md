@@ -91,6 +91,28 @@ status: current
 > Base tier doc-set has no way to declare a *reasoned* exemption, which is what caps this
 > repository's own conformance level at `none` alongside TD-064's sixteen headers.
 
+- **TD-081** severity: medium | status: open | created: Sprint-082
+  - Summary: **`qa-check.sh` prints two verdicts and only one is the tally, so `0 fail` does not mean
+    the conformance engine found nothing.** Line 237 states the leg is *"informational except the two
+    FULLY-COVERED families"* — a deliberate, reasoned boundary, not a bug. The hazard is the
+    **report**: the tally line is the last thing printed and reads as the run's verdict, while
+    conformance FAIL rows sit ~130 lines above it and never reach it.
+  - Evidence: a SPRINT-082 run printed `QA-CHECK: 173 pass, 0 fail` with **seven**
+    `FAIL dod-criterion-names-no-check` rows in the same output (S9.VERIFYCLAUSE, against the real
+    sprint file, ticked criteria naming no evidence). Caught only because the FAIL rows were grepped
+    separately; reading the tally alone — which is what a green run invites — would have shipped them.
+  - Impact: this is the L-120 shape one level up. Not a wrapper's status standing in for the gate's,
+    but **one of the gate's own two verdicts standing in for both**. It hits hardest exactly when the
+    tally is green, since nobody greps a passing run. Consumer-facing: `conformance.sh` is the adopter
+    entry point (ADR-027) and an adopter reading a green tally inherits the same misreading.
+  - Mitigation (hypothesis, not a plan): have the tally line name the other verdict rather than stay
+    silent about it — e.g. `QA-CHECK: N pass, M fail · conformance: K finding(s), informational`. A
+    count of 0 then says so explicitly, and a non-zero count is visible without grepping. Folding the
+    conformance findings into the tally is the alternative and is **rejected here**: it would make the
+    gate block on rules the standard deliberately marks judgment-only or implementation-directed.
+  - Filed by SPRINT-082 T4 (dogfood), per its DoD that a discovered defect is filed rather than
+    absorbed into the sprint that found it.
+
 - **TD-080** severity: minor | status: open | created: Sprint-081
   - Summary: **§2 states the standard's own update trigger and nothing enforces it.** The
     `spec/STANDARD.md` row reads *"a rule is added, amended or reclassified — bump per

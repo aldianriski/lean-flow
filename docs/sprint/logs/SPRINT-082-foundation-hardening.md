@@ -207,3 +207,127 @@ clean and fuses neighbours) arriving through the checkbox rather than the table 
 The guard that caught it is one the sprint already relies on: **read the count back and reconcile it
 against what you know happened.** No new rule proposed — the existing cross-check clause covers this,
 and it fired.
+
+### 2026-08-24 | scope-change | T4 — the dogfood's vehicle is T5's change, and T1 closed one of its branches
+
+**Two changes, both discovered by asking what T4 can actually reach.**
+
+**(a) The vehicle.** T4 needs "one representative change — small diff, behavioural or governance
+impact". Inventing a synthetic diff would dogfood the flow against something nobody would otherwise
+ship, which is the weaker test. T5's change — compress the gated register, add the freeze — is real,
+small, and `governance:high`. So T4 runs T5 through the flow under observation. The Plan declares
+`T5 depends-on T4`; in practice they are one pass, T4 being the observation of T5's execution.
+No acceptance changes on either task, and no D-row is affected.
+
+**(b) T1 closed the branch T4 was written to exercise.** T4's `assumes:` recorded that the
+`no-gate-discovered` path "IS dogfoodable here, contrary to first expectation", because this repository
+had no discoverable gate. **T1 added `.gate-command`, and rung 4 now discovers `sh scripts/qa-check.sh`.**
+Rungs 1–3 still miss (0 hits), but the repo is no longer gate-less — so the dogfood reaches
+`system-verify · PASS`, never `no-gate-discovered`.
+
+That is the fix working, not a problem: the branch closed because the defect it guarded was repaired.
+But the criterion resting on it was written three tasks ago against a state this sprint then changed —
+**L-111's shape with the polarity reversed.** L-111 is a criterion foreclosed by a decision taken later;
+this is a criterion foreclosed by a *repair* taken later, and it is just as invisible. The diagnostic
+generalises: at G2, ask not only *"does this acceptance depend on a decision I am about to take"* but
+*"does it depend on a broken state an earlier task in this same Plan is about to fix?"*
+
+**Re-confirm G2:** not required. The `no-gate-discovered` family stays proven where it always was —
+T1's five retained fixtures, which is where an unattended-PARK branch was already going to be proven
+under D6's attended ruling. T4 names the branches it actually reaches and does not claim that one.
+
+### 2026-08-24 | progress | T4 — the dogfood run, branch by branch
+
+One representative change: T5's — compress the gated register, add the freeze. Small diff, real
+governance impact, and a change that was going to be made anyway rather than a synthetic one.
+
+| Step | Reached | What proved it |
+|---|---|---|
+| **G1 Scope** | yes | goal restated · size S · blast radius one file · out-of-scope named (no new epic, no roadmap resequencing) |
+| **G2 Design** | yes | approach + WHY recorded; the §2 cap was the design constraint, not an afterthought |
+| **G2 reachability (T3)** | yes | T5's criterion names `check-doc-caps.sh` for `adlc-epic-sequencing.md`; the checker derives its caps from §2 and §2 **does** state a `docs/research/` cap, so the method REACHES its target — the opposite of L-136's case, confirmed rather than assumed |
+| **Implement** | yes | register compressed 130 → 130 with the freeze added; `PASS cap (130 <= 130)` |
+| **Risk-based review (T2)** | **PARKED** | classified `behaviour:low · governance:high` — an admission condition other work is measured against. Under § Two dimensions that cannot take the self-review floor, and this session cannot dispatch an independent reviewer. Parked, not self-certified |
+| **Bounded revise** | not reached | no review fired, so no finding to revise. Correctly not exercised rather than faked |
+| **System verify** | yes | discovery ran all four rungs live: 1–3 returned 0 hits, rung 4 read `.gate-command` → `sh scripts/qa-check.sh`. First end-to-end proof that T1's rung works as a *discovery step*, not just as prose |
+| **`no-gate-discovered`** | **not reachable** | T1 closed it — see the scope-change above. Proven by T1's five retained fixtures instead |
+| **Close / park** | park | the run does not close: the review branch is parked and the sprint stays `active` |
+
+**T5 · parked-hitl** — review parked: `governance:high` requires an independent scoped reviewer, and none
+is available in this session. Unblock condition: the owner dispatches a scoped reviewer, runs
+`/code-review`, or records a ruling accepting self-review for this change.
+
+**No `review ·` line is written for T5**, and that is the point rather than an omission. The line records
+what actually fired; nothing did. Writing `self-review` would be false *and* would fail
+`check-review-depth.sh` — the checker and the honest record agree, which is the first evidence that T2's
+two halves compose rather than merely coexisting.
+
+**What this run actually demonstrated.** Two of the three corrections fired on a real change: T3's
+reachability question was answerable at G2 and came back *reachable* (a case the fixtures could not
+supply, since this repository's own Plan reports 0 confirmed targets), and T1's discovery rung resolved a
+real gate command through the documented order. T2's correction fired by **refusing** — it declined to
+let a governance change self-certify, which is the behaviour it was built for, and the refusal is the
+evidence. A run where every branch goes green would have proved less.
+
+### 2026-08-24 | run-complete | T4/T5 pass finished
+
+run · 2 of 2 DoD-bearing tasks executed (T4 observation · T5 change)
+
+system-verify · PASS · sh scripts/qa-check.sh
+
+The gate command was **discovered**, not assumed: rungs 1–3 returned 0 hits and rung 4 read
+`.gate-command`. Verdict read from the line the gate prints (`QA-CHECK: 175 pass, 0 fail`) and
+cross-read against FAIL rows anywhere in the output, because this repository's conformance leg is
+informational in the tally and a clean tally alone would not show its findings (L-120).
+
+T5 · parked-hitl · review parked: `governance:high`, no independent reviewer available this session
+
+**The run does not close.** One branch is parked, so the sprint stays `active` and the close is the
+owner's. That is the designed outcome, not a stall.
+
+### 2026-08-24 | run-complete | rollup corrected to the Part 4 shape
+
+The previous entry wrote `run · 2 of 2 DoD-bearing tasks executed`, which is not the shape Part 4
+defines — so `check-night-run-rollup.sh` reported the run as having no header at all. Corrected here
+rather than edited above: this log is append-only, and a corrected entry is the mechanism (ADR-014).
+
+Caught by the gate, not by review. The wording read fine and counted the right things; it simply was
+not the format a checker can assert on — which is the same lesson as T2's, arriving through the
+bookkeeping instead of the routing.
+
+run · 38 of 38 DoD ticked
+
+system-verify · PASS · sh scripts/qa-check.sh
+
+run · cost n/a · turns n/a · wall n/a · 5 of 5 units · inline
+
+**The three `n/a`s are stated, not omitted** (ADR-016). This was an attended interactive session with no
+per-run metering available to it, so cost, turns and wall-clock cannot be recovered honestly. Writing a
+plausible number would corrupt the very series the calibration row exists to build — the one a future
+promote reads to size a batch. `5 of 5 units · inline` is real and is the part that carries information.
+
+### 2026-08-24 | park | T5 review parked, and the owner ruled on the remaining gate finding
+
+**owner-ruling: qa-check — the `layers-observed` finding against
+`docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` is accepted and the file stays untracked.**
+It is an owner-authored 3,039-line handoff that entered the tree during this sprint, belongs to no task
+here, and declaring it under T5 would mis-attribute it to the freeze — the exact mis-attribution these
+five tasks were built to prevent. Ruled rather than absorbed.
+
+**owner-ruling: process — QA and evals gating is skipped for the remainder of this sprint**, on the
+owner's stated intent to replace the QA/evals process wholesale (V3 proposes moving the reference
+evaluator off Bash/Awk to TypeScript + Bun). Recorded with its cost, because a ruling without its
+downside is a decision nobody can re-examine: the replacement is an intent with no scope, date or ADR
+yet, so between now and then the guards this sprint just built are the ones running, and skipping their
+gate is how a guard gap outlives the plan that was going to close it. The owner is never gated (ADR-021);
+what the rule requires is that the override be *recorded*, and this is that record.
+
+**What was actually verified before the skip.** The final full gate (gate8) printed
+`QA-CHECK: 173 pass, 4 fail`. Three were fixed and each re-verified by running its own checker directly:
+`check-night-run-rollup.sh` → PASS (both findings), `check-layers-completeness.sh` → clean. The fourth is
+the V3 file above, ruled. No full-gate re-run was completed after the fixes; that is stated rather than
+implied, and it is why T4/T5's gate criteria are amended to cite the ruling instead of a green tally they
+no longer have.
+
+**T5 · parked-hitl** — the independent review of `governance:high` work remains owed and unblocked only
+by the owner. Carried into the Retro as an open follow-up rather than closed silently.
