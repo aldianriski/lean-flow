@@ -68,39 +68,30 @@ exists to stop. `test/gate-discovery/` guards it with a retained must-FAIL fixtu
 
 ## Consequences
 
-**Positive.**
+**Positive:** findings, rules and results become typed data, which closes ADR-034's named Finding-ID
+gap at H07/H08 — that gap exists precisely because the Shell engine's error vocabulary is unenumerable.
+Markdown is parsed by AST rather than by position-dependent regex; one domain result renders to text
+*and* JSON with no second evaluation path (V3 §12); and tests move in-process, off the per-case
+full-engine invocation that dominates `evals/` today.
 
-- Findings, rules and results become typed data; the Finding-ID surface becomes enumerable, closing
-  ADR-034's named gap at H07/H08.
-- Markdown is parsed by AST rather than by regex, so the parser stops being a pile of position-
-  dependent expressions.
-- One domain result can render to text *and* JSON with no second evaluation path (V3 §12).
-- Tests move in-process, off the per-case full-engine invocation that dominates `evals/` today.
-
-**Negative.**
-
-- **A second language in a repo whose whole identity is "no build step."** Every future maintainer
-  needs Bun to run the engine, even though the plugin itself still needs nothing.
-- **A long window with two semantic engines.** The strangler is correct and it means Shell and
-  TypeScript both describe conformance until the last family cuts over. ADR-034's Finding-ID gap lives
-  exactly in that window.
-- **Gate discovery is now load-bearing on a JSON field.** Anyone editing `scripts.test` can disarm
-  System verify without touching a skill, a gate, or any file that looks like governance.
-- **The zero-dependency stance will come under pressure** — the first genuinely useful library (a
-  Markdown AST parser at H05) tests it, and `packages/standard` may have to take one. This ADR does
-  not pretend otherwise; it says the bar is *consumer impact*, not purity.
-- **Reversal is expensive.** Deleting the TS tree is easy today and gets harder every family; after
-  authority cutover (H24/H25) it is not a reversal but a re-migration.
+**Negative (trade-offs accepted):** a second language in a repo whose identity is "no build step" —
+every future maintainer needs Bun to run the engine, though the plugin itself still needs nothing. The
+strangler means two semantic engines coexist until the last family cuts over, and ADR-034's Finding-ID
+gap lives in exactly that window. **Gate discovery is now load-bearing on a JSON field**: anyone editing
+`scripts.test` can disarm System verify without touching a skill, a gate, or anything that looks like
+governance — SPRINT-083 T2's guard catches the case where the discovered command does not invoke the
+declared one, and independent review showed the first version of that guard could itself be fooled by a
+script that merely *printed* the gate's name. The zero-dependency stance will come under pressure at
+H05, where a Markdown AST parser is the first genuinely useful library; the bar is consumer impact, not
+purity. And reversal is expensive: deleting the TS tree is easy today, harder every family, and after
+authority cutover (H24/H25) it is a re-migration rather than a reversal.
 
 ## Alternatives considered
 
-- **Keep Shell and refactor it.** Rejected on T1's evidence: the defect is not tidiness, it is that
-  semantics live in message strings. Refactoring shell does not produce a typed `FindingId`.
-- **Rewrite rather than strangle.** Rejected — a rewrite has no comparand, which is exactly what
-  ADR-034 exists to prevent (V3 §26/§44).
-- **Node + tsc instead of Bun.** Rejected for this stage: it requires an install, a build step and
-  `node_modules` in every consumer's plugin cache. Bun runs the tree as-is, which is what keeps the
-  zero-dependency commitment above honest.
-- **Put the workspace under a subdirectory to avoid the rung-1 hit.** Rejected as hiding the problem
-  rather than solving it: the manifest would still exist, a future tool would still find it, and the
-  guard that now catches a gate-bypassing script would not have been written.
+| Option | Why rejected |
+|---|---|
+| Keep Shell and refactor it | The defect is not tidiness — semantics live inside message strings. SPRINT-083 T1 could not enumerate the engine's own finding ids through four-plus emission shapes; refactoring shell does not produce a typed `FindingId` |
+| Rewrite rather than strangle | A rewrite has no comparand, which is the exact failure ADR-034 exists to prevent (V3 §26/§44) |
+| Node + `tsc` instead of Bun | Requires an install, a build step and `node_modules` in every consumer's plugin cache, since `plugin.json` declares no `files` manifest. Bun runs the tree as-is, which is what makes the zero-dependency commitment real rather than aspirational |
+| Put the workspace under a subdirectory to dodge the rung-1 hit | Hides the problem instead of solving it: the manifest still exists, a future tool still finds it, and the guard that now catches a gate-bypassing script would never have been written |
+| Defer the toolchain until a family is ready to migrate | The workspace is the comparand's home. Standing it up after the first migration begins means the first family is built without the fitness tests that keep the dependency direction honest |

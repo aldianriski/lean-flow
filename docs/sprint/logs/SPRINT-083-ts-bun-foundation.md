@@ -342,3 +342,59 @@ entries, and that is stated rather than folded into "unchanged".
 **Left open deliberately:** DoD-10 names `sh scripts/qa-check.sh`, not run this session by standing
 owner instruction. Same treatment as T1 DoD-5 — the substance is verified elsewhere, the gate verdict
 is absent, and absence is not a pass.
+
+### 2026-08-24 | surprise | T2 revise — the guard against substring matching was itself a substring match
+
+Independent review of `71d5168` (fresh scoped reviewer, D7 as amended) returned a **BLOCKER**, and it
+is the defect this session had already named twice.
+
+**`bypassesDeclaredGate` used `command.includes(declared)`.** The reviewer constructed and ran:
+
+```json
+"test": "echo 'not running sh scripts/qa-check.sh, just printing' && exit 0"
+```
+
+The declared command appears as literal text inside an `echo` argument, is never executed, and the
+guard reported `bypassed: false`. **A false PASS in the guard whose only purpose is to prevent a false
+PASS.** This is L-108 — *match by shape, not substring* — written into a guard during a session that
+cited that same rule twice in its own commit messages (the `grep -c hooks` false positive an hour
+earlier, and the `79` rule count in T1). Being loaded did not prevent it; the machinery caught it.
+Nothing in the suite could have: the only fixture covered the exact `"test": "echo ok"` shape, so the
+attack had no test to fail.
+
+**Fixed by shape:** `invokes()` strips quoted spans *before* splitting on shell separators, then
+requires a resulting segment to **begin** with the declared command. Quote-stripping precedes splitting
+deliberately — otherwise `echo 'a && sh scripts/qa-check.sh'` splits into a segment that begins with
+the declared command and the bypass returns. Retained fixture `manifest-mentions-gate/` plus four
+regression cases (either-order invocation · single-quoted · double-quoted · separator-inside-quotes ·
+prefix `qa-check.sh.bak`).
+
+**Discrimination proven against the original bug, not an invented one:** restoring `includes()` verbatim
+reddens the new MUST-FAIL case, 16 pass / 1 fail, while the *older* must-FAIL fixture stays green —
+which is precisely why it never caught this. Restored `cmp`-identical; 17 pass / 0 fail.
+
+**MAJOR, also upheld — rungs 2/3 diverge from dispatch.md's spec.** It says rungs 2 and 3 read the
+actual Makefile/justfile target and CI test step; this implementation only detects that the rung hit
+and returned a bare `command: null`. Now an explicit `extractable: false`, because *"no gate"* and
+*"I could not read the gate"* are different facts and conflating them is how a guard reports safety it
+never established. Behaviour stays conservative — unknown is bypassed, never safe. Latent here (no
+Makefile, justfile or CI dir), and now stated rather than accidental.
+
+**MINOR, upheld:** a real I/O failure reading `.gate-command` would have thrown and aborted the whole
+walk; now caught, because a guard that crashes reports nothing.
+
+**MINOR, upheld:** ADR-035's Consequences/Alternatives did not follow `ADR.md.template` (single-paragraph
+`**Positive:** / **Negative (trade-offs accepted):**` and an `| Option | Why rejected |` table). Realigned
+with § Decision verified `cmp`-identical to the accepted text, since ADR-035 is `status: accepted` and
+§4 is append-only. **Follow-up, not done here:** ADR-034 and ADR-036 carry the same deviation — same
+root cause, that I wrote three ADRs without re-reading their template, which CLAUDE.md names as an
+anti-pattern outright.
+
+**What the reviewer confirmed clean**, stated so a vacuous pass is visible: rung order against
+dispatch.md:472-490 · `bun test` 13/13 at the time · an *independent* seeded break (removing
+`examined.push(4)`) reddening only its own control · `check-manifest-lockstep.sh` genuinely excluding a
+root `package.json` (4 manifests, all 1.56.0) · no `version` field consumed anywhere · `import.meta.main`
+correctly gating the side-effecting block · **D2 intact — no `.sh` file appears in the diff at all** ·
+`overview.md` 147/150 against the cap declared at `spec/STANDARD.md:121`.
+
+Conformance unmoved: `0 FAIL · level: Gated`.

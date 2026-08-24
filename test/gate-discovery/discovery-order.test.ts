@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { join } from "node:path";
-import { bypassesDeclaredGate, discoverGate } from "./discover.ts";
+import { bypassesDeclaredGate, discoverGate, invokes } from "./discover.ts";
 
 const FIXTURES = join(import.meta.dir, "..", "fixtures", "gate-discovery");
 const REPO = join(import.meta.dir, "..", "..");
@@ -55,5 +55,35 @@ describe("gate discovery — this repository", () => {
     const r = bypassesDeclaredGate(REPO);
     expect(r.declared).toBe("sh scripts/qa-check.sh");
     expect(r.bypassed).toBe(false);
+  });
+});
+
+describe("gate discovery — mentioning the gate is not running it", () => {
+  // REGRESSION, retained. Independent review of SPRINT-083 T2 broke the first implementation with
+  // exactly this input: `bypassesDeclaredGate` used `command.includes(declared)`, so a script that
+  // printed the gate's name inside an `echo` and never ran it reported `bypassed: false` -- a false
+  // PASS in the guard whose only job is to prevent a false PASS (L-108: match by shape, not substring).
+  test("MUST-FAIL: a script that only PRINTS the declared command is still caught", () => {
+    const r = bypassesDeclaredGate(join(FIXTURES, "manifest-mentions-gate"));
+    expect(r.discovered).toContain("echo");
+    expect(r.bypassed).toBe(true);
+  });
+
+  test("a segment that genuinely invokes the gate is recognised, in either order", () => {
+    expect(invokes("sh scripts/qa-check.sh && bun test", "sh scripts/qa-check.sh")).toBe(true);
+    expect(invokes("bun test && sh scripts/qa-check.sh", "sh scripts/qa-check.sh")).toBe(true);
+    expect(invokes("sh scripts/qa-check.sh", "sh scripts/qa-check.sh")).toBe(true);
+  });
+
+  test("the declared command inside quotes never counts as an invocation", () => {
+    expect(invokes("echo 'sh scripts/qa-check.sh' && exit 0", "sh scripts/qa-check.sh")).toBe(false);
+    expect(invokes('echo "sh scripts/qa-check.sh"', "sh scripts/qa-check.sh")).toBe(false);
+    // A separator INSIDE the quotes must not manufacture a segment that begins with the command --
+    // this is why quoted spans are stripped before splitting, not after.
+    expect(invokes("echo 'a && sh scripts/qa-check.sh'", "sh scripts/qa-check.sh")).toBe(false);
+  });
+
+  test("a prefix match is not an invocation — a different script that starts the same way", () => {
+    expect(invokes("sh scripts/qa-check.sh.bak", "sh scripts/qa-check.sh")).toBe(false);
   });
 });

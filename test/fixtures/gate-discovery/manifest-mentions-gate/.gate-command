@@ -1,0 +1,2 @@
+# fixture: the declared gate this manifest only PRETENDS to run.
+sh scripts/qa-check.sh

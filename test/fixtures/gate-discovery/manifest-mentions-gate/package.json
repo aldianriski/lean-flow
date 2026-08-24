@@ -1,0 +1,6 @@
+{
+  "name": "fixture-mentions-gate",
+  "scripts": {
+    "test": "echo 'not running sh scripts/qa-check.sh, just printing' && exit 0"
+  }
+}
