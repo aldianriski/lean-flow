@@ -193,3 +193,81 @@ so it is surfaced now as a sprint-wide question rather than discovered four time
 
 **Unblock condition:** either one scoped reviewer per governance-impact task, or a recorded owner ruling
 accepting self-review for this sprint (the shape TASK-266 exists to close for 082).
+
+### 2026-08-24 | surprise | T2 DoD-1 — the baseline immediately caught four defects, three of them mine
+
+**Correction to two entries above, which the append-only rule requires be made here rather than by
+editing them (§9):** they state this repository sits at `level: Gated`. **It does not — it is
+`level: none`.** I read "Gated" off `TODO.md`'s changelog note, which recorded SPRINT-081 *raising* it
+to Gated; it has since fallen back. The G1 finding those entries carry is unaffected — if anything it
+is stronger — but the figure was wrong and is corrected here.
+
+**Baseline, captured before any new tree lands** (`sh conformance.sh .`):
+
+```
+level: none -- Structural not yet reached. 6 finding(s) at Structural prevent it
+coverage: 45 checkable rules have an assertion; 6 unchecked (GAP)
+counts: 28 passed · 32 judgment-required · 6 excluded (implementation-directed)
+        · 7 excluded (restated) · 4 excluded (standard-directed) · 6 engine-gap · 11 no verdict
+FAIL x6, GAP x6, PASS x30
+```
+
+**The G1 ruling that added this step paid for itself before T2 wrote a line of code.** Four of the six
+FAILs were introduced by *this session*, and **none of them would have been visible**: TD-081 records
+that conformance FAIL rows never reach `qa-check`'s tally, and `qa-check` was not being run anyway.
+
+- `update-trigger-absent` + `ownership-header-missing` — **mine.** The promote commit added
+  `docs/research/…V3.md` with no frontmatter. I had flagged that committing it needed handling and then
+  committed it without doing so. Fixed: ownership header added, body verified byte-identical (`cmp`).
+- `adr-no-negative-consequence` — **mine.** ADR-034 § Consequences listed only upsides; §4 requires a
+  Negative because no decision is cost-free. Fixed.
+- `todo-over-cap-at-promote` — **mine** (403 vs 320; my 93 lines took it over). Unfixed: §11 says this
+  is pruned *with the owner*, never silently.
+- `changelog-not-rotated-at-minor` · `closed-sprint-not-archived` — SPRINT-082's close; §11 retention
+  is propose→approve and was not applied. Not mine to take.
+
+### 2026-08-24 | progress | T1 reviewed independently — every number held, one real defect
+
+Reviewer: fresh scoped `sonnet` over commit `5bd330f` only, under D7 as amended. **It did not write the
+code.**
+
+**Spec axis — all numeric claims independently re-derived and confirmed exactly:** 100 = 51 + 49 ·
+51 = mechanical 40 + split 11 · 49 = 32 + 7 + 6 + 4 · 79 misses exactly the 21 hyphenated §2 ids with
+zero residue in either direction · EPIC-004's independent `45 + 6 = 51` · snapshot `cmp`-identical.
+These are the load-bearing facts and they are solid.
+
+**Spec axis — one MAJOR, upheld.** ADR-034's **Severity** row froze `note`/`warn`/`hold`/`fail`, which
+is V3 §9's *target-state TypeScript type* — not what the engine being preserved does (`ok()`→`PASS` ·
+`bad()`→`FAIL` · `gap()`→`GAP`, `note()` untagged and reused by `hold()`). **`warn` exists nowhere in
+the implementation, and "severity" does not occur in `spec/STANDARD.md` at all.** Six rows point at a
+real referent; that one pointed at nothing — and it is the row a differential-parity harness leans on
+hardest. Reviewer also noted the "at least four emission shapes" claim is a true *floor* (it counted
+5–6), so that stands.
+
+**Standards axis — two minor, both upheld.** (a) DoD-5 was ticked while its own evidence said the named
+check had not run; the letter of ADR-021 keeps that box open, so it is **unticked**. (b) ADR-034's
+`related:` omitted ADR-024 (levels) and ADR-027 (exit meaning) though two frozen rows restate them.
+
+### 2026-08-24 | scope-change | T1 revise — the fix tripped S4.APPEND, which is the rule working
+
+**What broke.** The bounded revise corrected the Severity row **in place**, inside ADR-034 § Decision.
+The next conformance run returned a new FAIL: `adr-edited-after-decision` — *"§4 is append-only: a
+decided ADR is marked deprecated or superseded, never rewritten, because the record of what was decided
+is the only thing that makes the reasoning auditable later."* The guard fired on the same session that
+wrote the ADR, which is the shortest possible feedback loop and exactly what it is for.
+
+**A second, self-inflicted slip on the way to fixing it, recorded because the artifact briefly held
+it:** the first restore spliced the accepted file's line offsets onto the *current* file, duplicating
+the Finding-ID block. Caught by re-reading the section markers rather than trusting the splice
+(L-009). Rebuilt from section boundaries instead of line numbers; § Decision verified `cmp`-identical
+to the accepted text, duplicate-block count back to 1.
+
+**Impact.** ADR-034 § Decision stands exactly as decided, wrong Severity row included. The correction
+is **ADR-036**, which supersedes that one row and states the general rule the defect revealed: *every
+row of a compatibility contract must point at an artifact the current system has.* A marker in
+ADR-034 § Consequences and its `related:` entry route a reader of the old file to the new one (L-151 —
+a correction its reader cannot reach is not a correction).
+
+**Re-confirm G2.** No task added, removed or re-scoped. Bounded revise used: one retry, both axes.
+Conformance FAIL count 6 → 3; the three that remain are §11 retention items the rules themselves say
+are pruned *with the owner*.

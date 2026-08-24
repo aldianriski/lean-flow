@@ -1,3 +1,14 @@
+---
+owner: Maintainer
+last_updated: 2026-08-24
+update_trigger: A hardening task (H01-H40) is sliced into a sprint, or a ruling supersedes one of its sections
+status: current
+id: lean-flow-pre-epic-foundation-hardening-v3
+tags: [process, tooling, architecture]
+domain: governance
+related: [EPIC-014, EPIC-015, ADR-034, adlc-epic-sequencing]
+---
+
 # Lean Flow — Pre-Epic Foundation Hardening V3
 
 > **Status:** Authoritative development handoff for the next foundation-hardening pass.  

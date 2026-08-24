@@ -65,7 +65,7 @@ task adds a check that the snapshot is current.*
 - [x] The rule-ID denominator is **derived**, and the three disagreeing counts (100 / 79 / 51) are each accounted for — ✓ **100** is the contract's (`51 + 49 = 100`); **51** is *checkable* (`mechanical 40 + split 11`, agreeing independently with EPIC-004's `45 in-engine + 6 standalone`, ADR-028); **79** is a **disproved query** — the `S[0-9]+\.[A-Z][A-Z0-9]+` shape stops at a hyphen and misses exactly the 21 hyphenated §2 ids, `79 + 21 = 100`, zero false positives. Each source command is in the ADR
 - [x] A snapshot of the frozen rule IDs is committed under `evals/fixtures/compat/`, stamped with `spec/STANDARD.md`'s `version:` (0.10.0 today) — ✓ `evals/fixtures/compat/rule-ids-v0.10.0.txt`, 100 rows / 100 unique ids; regeneration verified `cmp`-identical. Carries the reader's three columns (id · level · mark), not ids alone, since level and mark are themselves frozen and a bare id list could not detect a reclassification
 - [x] ~~Finding IDs are enumerated from the live engine, not from memory~~ → **superseded by owner ruling 2026-08-24; see the `scope-change` entry in the Execution Log.** The premise was false: no such command exists (four emission shapes; three extractions returned 4 / 14 / 78, the 14 falsified by `dod-criterion-names-no-check`). Replaced by: **the Finding-ID surface is recorded in ADR-034 as a NAMED GAP** with its reason, its closing point (H07/H08, where findings become typed data) and its accepted cost — *Verify: ADR-034 § The Finding-ID surface is a NAMED GAP states all three; a contract implying both surfaces are pinned is a fail*
-- [x] `docs/DECISIONS.md` and the generated `docs/knowledge-index.md` carry ADR-034 — ✓ verified **directly**: DECISIONS.md row added (34 ADR rows, newest-first order intact) and `sh scripts/gen-index.sh` regenerated the index, which now carries 2 `ADR-034` references. **The named check `sh scripts/qa-check.sh` was NOT RUN** — standing owner instruction this session to skip qa-check/eval scripts, since EPIC-014 replaces them. Recorded, not ticked past silently (ADR-021): the substance above is proven, the gate verdict is *absent*, and absence is not a pass
+- [ ] `docs/DECISIONS.md` and the generated `docs/knowledge-index.md` carry ADR-034 — **substance verified, box deliberately OPEN.** DECISIONS.md row added (34 ADR rows, newest-first intact) and `sh scripts/gen-index.sh` regenerated the index (2 `ADR-034` references). But the criterion's named check `sh scripts/qa-check.sh` **was not run** (standing owner instruction to skip it this session). *Was ticked-with-caveat; independent review called that against the letter of ADR-021 and the reviewer was right — a box whose named check is absent stays open. Re-tick when the gate runs, or on a recorded owner ruling that the substance suffices.*
 
 ### T2 — Stand up the TS/Bun workspace without disarming gate discovery `[size: M · risk: med · class: execution · HITL]`
 Layers: `package.json` (new, root) · `tsconfig.base.json` · `bunfig.toml` · `apps/cli/src/main.ts` · `.gitignore` · `docs/adr/ADR-035-typescript-bun-reference-engine.md` (new) · `docs/architecture/overview.md` (§ Directory structure) · `docs/DECISIONS.md` · `docs/knowledge-index.md` (generated)
@@ -179,12 +179,15 @@ is T3's, which is G).
   unattended branch; T2's rung-walk, T1's denominator ruling and T3's seeded-break judgement are all
   *decisions*, which Part 0's execute-only charter parks rather than runs. An unattended run would have
   parked most of the Plan.
-- **D7 — RULED at G2 (2026-08-24): implementation runs INLINE; no sub-agents are dispatched.** The
-  skill's default is to hand each Implement step to a `general-purpose` sub-agent with its procedure
-  skill; this session carries a standing instruction not to call the Agent tool unbidden, and the owner
-  confirmed inline. **The cost is real and is stated rather than papered over:** Review has no
-  fresh-context reviewer, so it is a *structured self-pass* — the reviewer wrote the code. Each task's
-  Review line says so explicitly, and no task may report an independent review it did not get.
+- **D7 — RULED at G2, AMENDED at T1 (2026-08-24): implementation runs INLINE; REVIEW is dispatched.**
+  *Original ruling: inline implementation, no sub-agents at all.* T1 proved that half of it
+  unshippable: `review-scoping.md` § Skip table routes a **governance-impact diff of any size** — it
+  names *"an ADR that binds implementation"* explicitly — to one scoped reviewer, and states **"never
+  the self-review floor, whatever the file extension."** Every task here is Tier G, so the original D7
+  would have parked all four reviews. **Amended (owner, 2026-08-24):** implementation stays inline;
+  each governance- or behaviour-impacting task's review goes to **one fresh scoped reviewer that did
+  not write the code**. T1's parked review is discharged under the amendment. No task may report an
+  independent review it did not get.
 - **D6** — **Tiers per ADR-029, declared beside `class:` and defaulted up:** T1 **P** · T2 **G** ·
   T3 **G** · T4 **X**. Re-tier on discovery if something turns out to guard.
 

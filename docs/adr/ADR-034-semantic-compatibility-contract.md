@@ -3,7 +3,7 @@ id: ADR-034
 tags: [process, tooling]
 domain: spec
 status: accepted
-related: [ADR-028, ADR-023, ADR-015, ADR-021]
+related: [ADR-028, ADR-036, ADR-024, ADR-027, ADR-023, ADR-015, ADR-021]
 ---
 
 # ADR-034 — What the reference-engine migration must preserve, and what it must not
@@ -109,6 +109,23 @@ surface, and **must say so** rather than implying both are pinned.
   rule set.
 - 79 is recorded as a *disproved* query, so the next reader who greps that shape has the reconciliation
   rather than a fourth plausible number.
+
+**Negative — what this costs, stated because no decision is cost-free (§4).**
+
+- **The freeze can be wrong and will still be obeyed.** A frozen surface is read later by people who
+  cannot cheaply re-derive it. If `read-spec-rules.sh` itself misreads the spec, this ADR launders that
+  error into a contract, and every parity test downstream agrees with it by construction. The snapshot
+  makes the error *detectable* (regenerate and diff) but not *self-correcting*.
+- **It privileges today's rule shape.** Freezing rule ID, level and mark commits the migration to the
+  Standard's current three-column model. A future §-restructure that legitimately renames or merges
+  rules now costs a recorded behaviour-change ruling rather than an edit.
+- **The named Finding-ID gap is a real hole for two sprints, not a formality.** Between now and H07/H08
+  a rule family can pass parity while a finding id silently drifts, and nothing detects it.
+- **Version-stamping the snapshot adds a maintenance step that will be forgotten.** Nothing enforces a
+  new snapshot on a `spec/STANDARD.md` bump, so the first stale snapshot will look exactly like a current one.
+- **The Severity row of § Decision is WRONG and is superseded by ADR-036** — it froze V3 §9's target-state
+  vocabulary rather than the engine's actual `PASS`/`FAIL`/`GAP`. §4 is append-only, so the row stands as
+  decided and ADR-036 carries the correction. Read them together.
 
 ## Alternatives considered
 
