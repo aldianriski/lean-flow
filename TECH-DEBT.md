@@ -109,6 +109,32 @@ status: current
 > Next clock: TD-064 · TD-077 · TD-079 (all closed Sprint-081) are due at **Sprint-084**, not before.
 > **New this promote: TD-082**, filed against a §2 soft-cap breach that has no exemption route by
 > design — the ledger row *is* the reasoned carry, because ADR-015 rule 2 forbids the alternative.
+>
+> **Aging sweep — SPRINT-084 promote (2026-08-24).** **24 of 28 open rows** are ≥3 sprints
+> unaddressed: TD-045 (28) · TD-047 (27) · TD-049 (25) · TD-050 (24) · TD-051 (23) · TD-052 (22) ·
+> TD-053 (21) · TD-059 (14) · TD-060 (13) · TD-061 (12) · TD-062 (11) · TD-063 (10) · TD-066 (9) ·
+> TD-067 (8) · TD-068 (8) · TD-069 (7) · TD-070 (7) · TD-071 (6) · TD-072 (6) · TD-074 (5) ·
+> TD-075 (4) · TD-076 (4) · TD-078 (3) · TD-080 (3). **All held — note-and-carry, owner sign-off at
+> this promote.** Not aged (4): TD-081 (2) · TD-082 · TD-083 · TD-084 (1 each). Reconciled:
+> 24 + 4 = **28 open**, and with the three deletions below **28 rows on file** — the ledger now
+> carries no resolved row at all.
+> **`severity: high` — TD-084 does not hold.** It is the ledger's only `high`, and the auto-escalation
+> the aging rule prescribes had already happened at SPRINT-083's close (Backlog P1, `TASK-272`). That
+> task is promoted as **this sprint's T1**, so the row is being worked rather than carried. The
+> strongest *held* row remains `medium` (TD-051 · TD-052 · TD-061 · TD-062, plus the unaged TD-081).
+> **The aged fraction is 86% (24/28)** — 14/19 (S-078) → 16/22 (S-080) → 17/24 (S-081) → 22/25
+> (S-083) → 24/28. It fell two points only because three rows were *filed*, not because any was
+> addressed; the aged **count** rose 22 → 24. The last sweep asked that the next one inherit the
+> number rather than the habit, so: the trend is unbroken, and no sweep since S-078 has closed an
+> aged row.
+> **Deletion clock EXECUTED:** TD-064 · TD-077 · TD-079 (all closed Sprint-081) are three sprints old
+> at this promote and their rows are **deleted here** (§11 · `S11.TDDELETE`) — 104 lines. Their
+> substance lives in `CHANGELOG.md`, the sprint archive and git. **Ids stay monotonic: 064 · 077 · 079
+> are not reused.** Next clock: **none pending** — no row on file is `status: resolved`, so the clock
+> restarts at whichever row resolves next.
+> **New this promote: none.** The §2 soft-cap breach is still TD-082's reasoned carry; its evidence
+> line quotes 3,039 lines and `check-doc-caps.sh` now prints **3,050** — the doc grew 11 lines since
+> the row froze. Recorded, not re-litigated: the carry ruling is unaffected by the drift.
 
 - **TD-084** severity: **high** | status: open | created: Sprint-083
   - Summary: **`scripts/qa-check.sh` can no longer run to completion.** Three runs in one session were
@@ -233,33 +259,6 @@ status: current
     reference implementation disagreeing with the standard it publishes, in opposite directions — one
     ships a defect, this one ships an unstated change.
 
-- **TD-079** severity: minor | status: resolved → SPRINT-081 T4 (no task — found and fixed inside the sprint that exposed it) | created: Sprint-081 | closed: Sprint-081
-  - Summary: **the level ladder certified `Attested` on a repository that claimed no attestation at
-    all.** §13 says the opposite in as many words — *"Attested is not reachable by trailers alone"*, and
-    reaching it *"requires commit signing, which it does not yet do"* — yet a tree with none of the
-    three trailers printed the top level. **The incentive was exactly inverted: claim an attestation
-    honestly and leave it unsigned → held at Gated; claim nothing at all → Attested.**
-  - Evidence: the whole engine had **one** `hold` call site, `S13.UNSIGNEDCLAIM`, which fires only when
-    an attestation *is* claimed and the commit is unsigned. `S13.TRAILERS`' absent-attestation branch
-    emitted a plain `note`, so no rung of the ladder was held, and the report fell through to the
-    `else` branch. Latent while this repo sat at `level: none`; **live the moment SPRINT-081 T2 cleared
-    the last Structural finding**, which is how it was found.
-  - Impact: consumer-facing and the worst kind — a silent over-claim. Any adopter with zero findings and
-    no attestation was told they had reached the level the standard reserves for provable, signed human
-    approval. §13's worked example is deliberately written on the unsigned case precisely so the
-    standard does not overstate its own author's conformance; the engine was undoing that in its last
-    line.
-  - Fixed: the absent-attestation branch now `hold`s. A hold, never a failure — §14 says a report states
-    a level honestly reached and not exceeded, and declining to claim an attestation breaches nothing —
-    so the exit code does not move. This repo reports `level: Gated`, naming `attestation-absent`.
-  - **The fixture that should have caught it existed and passed throughout.** `no-claim-is-not-approval`
-    asserted the finding's *text* and never asked what the finding did to the *level* — proven by the
-    seeded break, under which that case stayed green while the three new level-aware cases reddened.
-    Filed here because the lesson generalises past this rule: **a fixture that asserts a finding's
-    wording is not asserting its consequence.**
-  - Sibling: **TD-076** (controls that report only silence). Same family — an assertion that cannot
-    distinguish the case it names from a case it never reached.
-
 - **TD-078** severity: minor | status: open | created: Sprint-081
   - Summary: **`QA-TESTCASE.md.template` ships with no §3 ownership header, yet renders into
     `docs/qa/` — a tree the engine governs.** Every adopter who renders it collects an `S3.SCHEMA`
@@ -287,47 +286,6 @@ status: current
   - Sibling: **TD-064** (now resolved). That row was the symptom in this repo; this one is the cause
     in the shipped artifact. Closing TD-064 does not move this, which is exactly why it is filed
     separately rather than as a reopening.
-
-- **TD-077** severity: minor | status: resolved → TASK-258 (SPRINT-081 T2) | created: Sprint-080 | closed: Sprint-081
-  - Summary: **§6's Base tier doc-set has no way to declare a *reasoned* exemption, so a repository
-    that ruled a doc unnecessary reports an unclearable finding forever.** `S6.BASE` owes every dev
-    repo `docs/product/requirements.md` and `docs/product/acceptance-criteria.md`. This repository
-    ruled both **exempt with stated reasons** at SPRINT-054 T1 and recorded the ruling in
-    `docs/architecture/overview.md` § *Base-tier docs this repo deliberately does not have*. The
-    engine cannot read that file, so the ruling behaves exactly as if it had never been taken —
-    **L-151's shape a fifth time**, and the same one ADR-028 fixed for the eleven `scope-out` rules
-    by moving the disposition into the artifact the tool reads.
-  - Evidence: `sh conformance.sh .` → two `tier-doc-set-incomplete` findings and
-    `level: none -- Structural not yet reached. 3 finding(s) at Structural prevent it`. The other two
-    Structural rules are TD-064's sixteen headers, which are writable; **these two are not clearable
-    by writing anything**, because the ruling is that the docs should not exist.
-  - Impact: **consumer-facing, not only ours** (L-015). §2's `CONTRIBUTING.md` / `CODE_OF_CONDUCT.md`
-    exemptions work because the *standard's own* condition (team ≥ 2, or on request) never fires, and
-    the engine skips them correctly. A **local** reasoned exemption has no such mechanism: any adopter
-    whose requirements live in an AI-context file, a ticket tracker or a product wiki collects two
-    permanent findings and a capped level with no declaration available to them. `.conformance-tier`
-    was created at SPRINT-078 for precisely this class — a judged property the engine cannot infer —
-    and is the standing precedent.
-  - Options (a ruling, not yet a build): **(a)** extend the `.conformance-tier` declaration pattern to
-    per-doc exemptions carrying a reason string, named on every report so the exemption is never
-    silent (L-058); **(b)** amend §6 to make the Base rows condition-gated the way §2's team-gated
-    rows already are. Both are spec changes, and **ADR-grade if either adds a declaration file or a §2
-    row**. Until one is taken, this repository's own conformance level is capped by a decision it
-    already made and recorded.
-  - **Resolved at SPRINT-081 T2 by arm (a), owner-ruled: `.conformance-exempt`** — a root declaration
-    file, one row per line, `<path> -- <reason>`, joining `.conformance-roles` and `.conformance-tier`
-    as the third declared file. §6 states the rule, the engine owns the vocabulary, README documents it
-    for adopters; **ADR-031** carries the decision. A reason is mandatory (a bare path fires
-    `exemption-reason-missing` and the doc *stays owed*), every accepted exemption is named on the
-    report with its reason, and the path is matched whole so `docs/` cannot exempt a tree.
-  - **Arm (b) was rejected on a measurement, not a preference.** Seeded into a scratch spec, making the
-    two rows substrate-conditional makes both findings vanish for a repository that declares *nothing*,
-    and the engine then reports "no unconditional doc is owed at Base" — the whole tier goes vacuous.
-    The analogy also fails: every substrate-conditional row gates on a material fact (has code ·
-    publishes an artifact · has a DB · has auth), and "has requirements" is not one. Recorded rather
-    than dropped, as the task required.
-  - Follow-on, filed not fixed: clearing this repository's last Structural finding revealed that the
-    level ladder prints `Attested` for a tree claiming no attestation at all — see **SPRINT-081 T4**.
 
 - **TD-076** severity: minor | status: open | created: Sprint-080
   - Summary: **Controls across the existing check families report only silence, so a control that is
@@ -395,42 +353,6 @@ status: current
     every home whose bucket is non-empty*, with the empty-bucket case still silent.
   - **Re-file fresh if** the Retro's bucket structure changes shape, which would make the parse either
     trivial or impossible and settle this either way.
-
-- **TD-064** severity: minor | status: resolved → TASK-257 (SPRINT-081 T1) | created: Sprint-075 | updated: Sprint-076 | closed: Sprint-081
-  - Summary: **~~28~~ 16 of this repo's own docs fail the ownership-header rules the engine checks** —
-    ~~15 carry no frontmatter at all (`docs/qa/` ×3, `docs/strategy/adlc/` ×12)~~ **3 carry none
-    (`docs/qa/`)** and 13 research docs declare every field except `update_trigger:`. §3 makes the
-    header mandatory on every doc and §1 LAW 3 requires the trigger, so these are real, named findings
-    against the reference implementation.
-  - **HALVED at SPRINT-076 T5, by ruling rather than by writing 12 headers.** The mitigation below
-    named two honest options for `docs/strategy/adlc/` — add headers to docs we have deliberately
-    parked, or *decide that tree is not governed by §3 and say so where §3 can be read*. The second
-    was taken: spec **0.4.2** states an **exploratory-tree exception**, and the tree declares
-    `governed: false` in its own README frontmatter. Findings dropped **56 → 32** (12
-    `ownership-header-missing` + 12 `update-trigger-absent`), and the exemption is **named on every
-    report** rather than applied silently. The exception is a **declaration, not a path** — hard-coding
-    `docs/strategy/` would have exempted only repositories that chose our directory names (L-015).
-  - Evidence: `sh conformance.sh .` — **3** `ownership-header-missing` (all `docs/qa/`), **13**
-    `ownership-header-field-missing` (all `docs/research/`), **16** `update-trigger-absent` (the union:
-    3 + 13). The three numbers reconcile against each other, which is the check that has caught every
-    miscount in this corpus (L-108).
-    **Re-derived at SPRINT-081 T1 before writing anything, per this row's own closing instruction: all
-    three numbers were unmoved.** A fourth reconciliation confirmed it from the other side — `S1.LAW3`
-    and `S3.SCHEMA` each reported **206** clean docs before, and each reports **222** after, and
-    206 + 16 = 222 exactly. Post-fix: `0` of all three findings, both rules `PASS`, the FAIL set
-    **34 → 2** and the `level:` line down from **3 finding(s)** to **1** — the remainder being `S6.BASE`,
-    which is TD-077's and not clearable by writing anything.
-  - Impact: low today, rising, and now **smaller and sharper**. `qa-check.sh` **relays** engine
-    findings rather than counting them (SPRINT-075 T2's ruling), so nothing is red and no gate is being
-    ignored. What remains is not a judgement call: the 3 `docs/qa/` files and the 13 research docs are
-    ordinary governed docs that simply lack fields, and **this row deliberately stays open for them**
-    rather than being closed on the strength of the half that was ruled away.
-  - Mitigation (hypothesis, not a plan — the filer's, written at close): ~~add the four-field header to
-    the 15~~ **add it to the 3 remaining**, and `update_trigger:` to the 13. Cheap and mechanical for
-    both. ~~`docs/strategy/adlc/` is the judgement call~~ **— settled at SPRINT-076 T5, see above.**
-    Re-derive before building a DoD on either number.
-  - Sibling, not a duplicate: **TD-065**. Both are "the conformance corpus disagrees with itself", but
-    that row is a register miscount and this one is a real doc gap; a cure for either moves neither.
 
 - **TD-067** severity: minor | status: open | created: Sprint-076
   - Summary: **`S9.GATESWELLFORMED` accepts any `G<digits>` token while its own message promises

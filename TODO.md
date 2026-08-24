@@ -18,104 +18,18 @@ status: current
 
 ## Active Sprint
 
-_(none — SPRINT-083 closed 2026-08-24, 26 of 26. Next: **EPIC-014**'s second member sprint —
-V3 Sprint B, the Markdown AST Standard parser + Shell parity (H05/H06).)_
+> **SPRINT-084 — Gate Recovery and Owed Work** → [docs/sprint/SPRINT-084-gate-recovery-and-owed-work.md](docs/sprint/SPRINT-084-gate-recovery-and-owed-work.md)
+
+_Not EPIC-014's Sprint B._ V3 Sprint B (Markdown AST parser + Shell parity, H05/H06) has **no Backlog
+tasks** — EPIC-014 states the post-083 shape is *"not promoted, and each re-derived at its own
+promote."* Slicing it is `/task-decomposer --epic EPIC-014`, and it is the natural next promote once
+the gate prints a verdict line again.
 
 ---
 
 ## Backlog
 
 <!-- Groomed by /triage. Only `ready` tasks are promotable. -->
-
-### P0 — Critical / Blocking
-
-<!-- TASK-267…270 are SPRINT-083's T1…T4. Full detail lives in the sprint file; these are the
-     Backlog rows promote pulled from. -->
-
-- [ ] TASK-267 — Freeze the semantic compatibility contract  [size: M] [risk: med] [HITL]
-      class:      decision
-      tier:       P (ADR-029 — prose plus a generated snapshot; it ships no checker. Re-tier to G
-                  if it adds a check that the snapshot is current)
-      done-when:  the migration's semantic surface is frozen as an ADR — Rule ID · Finding ID ·
-                  Severity · rule inclusion/exclusion · Hold semantics · full-run level · exit
-                  meaning — with byte-exact stdout explicitly disclaimed, and a regenerable snapshot
-                  of the frozen rule IDs committed under `evals/fixtures/compat/`
-      touches:    docs/adr/ADR-034-semantic-compatibility-contract.md (new) ·
-                  evals/fixtures/compat/ (new, retained) · docs/DECISIONS.md · docs/knowledge-index.md
-      depends-on: none
-      assumes:    **the denominator is derived here, never inherited.** Three sources disagree:
-                  `scripts/lib/read-spec-rules.sh` emits **100** unique rule IDs, the `Sn.NAME` grep
-                  shape matches **79**, EPIC-004 closed on **51 of 51**. At most one is the
-                  contract's. A number frozen into an artifact is a query result read later by
-                  someone who cannot re-derive it (L-130), and the 79 is the substring-shaped count
-                  L-108 warns about. Out of scope: freezing stdout · migrating any rule
-      tracker:    V3 §25 · V3 §44 · EPIC-014 D3 · ADR-023 · L-130 · L-108
-      origin:     manual
-      state:      ready
-
-- [ ] TASK-268 — Stand up the TS/Bun workspace without disarming gate discovery  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — defaulted *up*: the workspace alone is X, but this changes what
-                  System verify discovers, and a wrong discovery is silent by construction)
-      done-when:  `bun test` runs, one CLI command executes, the dependency boundary is documented —
-                  and after the manifest lands, gate discovery still resolves to a command that
-                  actually gates this repository, proven by walking the rungs rather than assuming.
-                  Retained must-FAIL fixture: a manifest whose discovered command does not run the
-                  real gate is caught. Control: the pre-manifest rung-4 resolution still works
-      touches:    package.json (new, root) · tsconfig.base.json · bunfig.toml · apps/cli/src/main.ts ·
-                  .gitignore · docs/adr/ADR-035-typescript-bun-reference-engine.md (new) ·
-                  docs/architecture/overview.md (§ Directory structure)
-      depends-on: none
-      assumes:    **the hazard is verified, not hypothetical.** `dispatch.md:488` states rung 4
-                  (`.gate-command`) is last because "anything discoverable wins over it", and
-                  `.gate-command`'s own comment predicts this failure by name — "it can go stale
-                  against a repo that later grows a real manifest". A root `package.json` creates a
-                  rung-1 hit that outranks the declaration and re-points System verify at a `bun
-                  test` covering nothing. Out of scope: any Shell edit · dashboard code · a
-                  framework CLI stack · npm publish
-      tracker:    V3 §2 · V3 §7 · V3 §8 · ADR-033 · EPIC-014 D1/D6 · L-015
-      origin:     manual
-      state:      ready
-
-- [ ] TASK-269 — Make the dependency direction mechanically enforced  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — a guard; a false negative lets every later sprint cross the
-                  Clean-Architecture boundary silently, and the whole epic rests on it)
-      done-when:  each rule in V3 §8's allowed direction has a named assertion; a retained must-FAIL
-                  fixture per rule reddens with that rule's own identifier; a control passes and
-                  reports how many edges it examined; and the suite is shown to **discriminate** by
-                  a seeded break that reddens its case while a sibling control stays green
-      touches:    test/architecture/dependency-direction.test.ts (new) ·
-                  test/fixtures/architecture/ (new, retained) · package.json (test script)
-      depends-on: TASK-268 (intra-batch — Plan order, not an external blocker)
-      assumes:    **a suite green on its first run has not been shown to discriminate.** Fixtures and
-                  code written in one session agree by construction, so the seed must be verified to
-                  land (`cmp` against pristine, restored under a checked hash), must still parse, and
-                  must be targeted — a demolition is not a discrimination (L-137 · L-142).
-                  Out of scope: a general-purpose linter · scoring SOLID mechanically
-      tracker:    V3 §2.1 · V3 §8 · V3 §35 · V3 §50 · EPIC-014 D4 · L-058 · L-137 · L-142
-      origin:     manual
-      state:      ready
-
-- [ ] TASK-270 — Type the Standard domain model, test-first  [size: S] [risk: low] [HITL]
-      class:      execution
-      tier:       X (ADR-029 — typed structure with tests; it guards nothing on its own. Its
-                  enforcement is TASK-269's, which is G)
-      done-when:  `StandardDocument` · `StandardSection` · `StandardRule` · `RuleId` ·
-                  `ConformanceLevel` · `RuleMark` · `SourceLocation` exist, each introduced by a
-                  behaviour-named test that went red first, with the red-before-green step recorded
-                  per type; the model imports nothing from `apps/`, Bun or any adapter; and no
-                  parser, evaluator or CLI rendering entered it
-      touches:    packages/standard/src/model.ts (new) · packages/standard/src/model.test.ts (new) ·
-                  test/architecture/dependency-direction.test.ts (register the package)
-      depends-on: TASK-268, TASK-269 (intra-batch — Plan order, not an external blocker)
-      assumes:    **the vocabulary is cross-checked against `spec/STANDARD.md` itself, not against
-                  V3's summary of it** — V3 §9 is a conceptual sketch written outside this repo, and
-                  a mark or level it names that the Standard does not carry would enter the domain
-                  model as fact. Out of scope: parsing (SPRINT-084) · any conformance behaviour
-      tracker:    V3 §4 · V3 §5 · V3 §9 · V3 §33 · V3 §48 · EPIC-014 D5
-      origin:     manual
-      state:      ready
 
 ### P1 — Next Phase Required
 

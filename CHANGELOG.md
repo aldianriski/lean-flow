@@ -15,7 +15,9 @@ status: current
 ---
 ## v1.57.0 — TS/Bun Foundation (2026-08-24)
 
-MINOR — SPRINT-083, **22 of 26 DoD**, EPIC-014's first member sprint. The reference engine gets a
+MINOR — SPRINT-083, **26 of 26 DoD** — 22 carried a gate verdict; the remaining four closed on an
+owner ruling over partial evidence, because TD-084 stopped `qa-check.sh` printing one at all.
+EPIC-014's first member sprint. The reference engine gets a
 comparand and a home, before anything migrates. **Consumer-facing: nothing you must do.** The plugin
 still needs no Bun, no install and no build step — but with no `files` manifest, `plugin install`
 copies the whole repo, so your cache now also carries `package.json`, `tsconfig*.json`,
