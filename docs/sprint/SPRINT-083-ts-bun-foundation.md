@@ -5,6 +5,7 @@ epic: 014
 owner: Maintainer
 last_updated: 2026-08-24
 status: active
+gates_signed: G1,G2 @ 2dd1edb
 plan_commit: 88d31d8
 close_commit:
 update_trigger: sprint execute/close events
@@ -67,7 +68,11 @@ task adds a check that the snapshot is current.*
 - [ ] `docs/DECISIONS.md` and the generated `docs/knowledge-index.md` carry ADR-034 — *Verify: `sh scripts/qa-check.sh` reports 0 fail*
 
 ### T2 — Stand up the TS/Bun workspace without disarming gate discovery `[size: M · risk: med · class: execution · HITL]`
-Layers: `package.json` (new, root) · `tsconfig.base.json` · `bunfig.toml` · `apps/cli/src/main.ts` · `.gitignore` · `docs/adr/ADR-035-typescript-bun-reference-engine.md` (new) · `docs/architecture/overview.md` (§ Directory structure) · `spec/STANDARD.md` §2 **only if** G2 rules new rows are owed
+Layers: `package.json` (new, root) · `tsconfig.base.json` · `bunfig.toml` · `apps/cli/src/main.ts` · `.gitignore` · `docs/adr/ADR-035-typescript-bun-reference-engine.md` (new) · `docs/architecture/overview.md` (§ Directory structure) · `docs/DECISIONS.md` · `docs/knowledge-index.md` (generated)
+<!-- Layers corrected at G2 (L-100, a live declaration — not a scope-change): ADR-035 requires a
+     DECISIONS.md row and an index regeneration, which promote's draft omitted. `spec/STANDARD.md` §2
+     is REMOVED from this list — D4 ruled no §2 rows are owed, so the conditional path is closed. -->
+Owns (shared-file map): `package.json` — creates it; T3 appends afterwards. Second on `docs/DECISIONS.md` + `docs/knowledge-index.md`, after T1.
 Depends-on: none
 Cites: V3 §2 · V3 §7 · V3 §8 · ADR-033 (gate discovery rungs) · ADR-031 · ADR-006 · L-015
 
@@ -90,6 +95,9 @@ discovery order, not by assuming rung 4 still wins.
 Verify discovers, and a wrong discovery is silent by construction).
 
 **DoD:**
+<!-- The conformance-baseline pair below was added by the G1 pass, AFTER promote froze this Plan at
+     88d31d8. Logged as a `scope-change` in the Execution Log before this edit, per § Red flags. -->
+- [ ] **Baseline captured BEFORE the first new tree lands**: this repository's conformance `level:` and its full finding set are recorded in the Execution Log — *Verify: the recorded baseline names the level and the finding count; "it was Gated" from memory is not a baseline*
 - [ ] `bun test` runs green on an empty-but-real suite, and `bun` version + strict TS settings are recorded — *Verify: `bun test` exits 0 and `tsconfig.base.json` sets `strict: true`*
 - [ ] One minimal CLI command runs — *Verify: `bun apps/cli/src/main.ts --version` prints and exits 0*
 - [ ] **Gate discovery still resolves to a real gate after the manifest lands** — *Verify: walk rungs 1→4 by hand and record which rung answers and with what command; the answer must be a command that gates this repo. If rung 1 now answers, `package.json`'s test script must itself invoke `sh scripts/qa-check.sh`*
@@ -98,6 +106,7 @@ Verify discovers, and a wrong discovery is silent by construction).
 - [ ] The dependency boundary is documented and `docs/architecture/overview.md` § Directory structure carries the new tree — *Verify: read-through; the where-things-live map is the only tree (CLAUDE.md)*
 - [ ] **Consumer behaviour is unchanged** — installing the plugin still needs no Bun, no build step, and no new file — *Verify on the consumer path, not by dogfooding (L-015 · L-016): trace a fresh `plugin install` and name what it now downloads that it did not before*
 - [ ] ADR-035 records the toolchain decision (EPIC-014 D1) with its trade-off and what would reverse it
+- [ ] **The conformance report is unmoved against the baseline, or every difference is named and ruled** — *Verify: re-run the engine and diff level + findings against the captured baseline. Do NOT read this off `qa-check`'s tally: TD-081 records that conformance FAIL rows never reach it, so a green `0 fail` is not evidence here (L-120 — read the verdict the check itself prints)*
 - [ ] `sh scripts/qa-check.sh` reports 0 fail — *Verify: read the verdict line the gate prints (`QA-CHECK: N pass, M fail`), as its own call, not through a pipe or a wrapper (L-120)*
 
 ### T3 — Make the dependency direction mechanically enforced `[size: M · risk: med · class: execution · HITL]`
@@ -156,12 +165,26 @@ is T3's, which is G).
 - **D3** — **Two ADRs are owed, and they are different decisions.** ADR-034 = what semantic surface is
   frozen for migration (T1). ADR-035 = TypeScript/Bun as the reference engine (T2, EPIC-014 D1). Neither
   absorbs the other.
-- **D4** — **Whether `apps/` · `packages/` · `test/` owe `spec/STANDARD.md` §2 rows is ruled at G2, and
-  not defaulted either way.** If they do, that is an ADR-grade change (ADR-023's precedent) and T2
-  carries it; if they do not, T2 says why in one line. Do not discover this at close.
-- **D5** — **Run mode is undecided and is ruled at G2.** All four tasks are HITL as filed, which would
-  foreclose any unattended branch — the L-111 trap SPRINT-082 D6 discharged explicitly. If G2 rules
-  interactive, say so here and name what that makes unreachable.
+- **D4 — RULED at G2 (2026-08-24): no §2 rows are owed, and therefore no ADR for placement.** §2 is a
+  *documentation* lifecycle standard (ADR-012) and enumerates exactly four scopes — **Root files** ·
+  **`spec/`** · **AI context (`.claude/`)** · **the `docs/` tree**. It carries **no code-tree rows at
+  all**, and this repository already runs `scripts/`, `evals/` and `skills/` outside it, which is the
+  standing precedent. Read from §2 itself rather than defaulted either way, as this row required.
+  **Constraint that came with the answer (from A4):** no new directory may be named `*-plugin` —
+  `check-manifest-lockstep.sh` globs `.*-plugin/*.json` and enrols a matching directory automatically.
+  **Second constraint:** the new trees add no `.md`, so nothing lands in an undefined-cap state.
+- **D5 — RULED at G2 (2026-08-24): the run mode is `attended` / interactive.** All four tasks are HITL
+  as filed, so an unattended run has no vehicle — the same finding SPRINT-082 D6 recorded. **What this
+  forecloses, named here rather than discovered later (L-111):** nothing in this Plan depends on an
+  unattended branch; T2's rung-walk, T1's denominator ruling and T3's seeded-break judgement are all
+  *decisions*, which Part 0's execute-only charter parks rather than runs. An unattended run would have
+  parked most of the Plan.
+- **D7 — RULED at G2 (2026-08-24): implementation runs INLINE; no sub-agents are dispatched.** The
+  skill's default is to hand each Implement step to a `general-purpose` sub-agent with its procedure
+  skill; this session carries a standing instruction not to call the Agent tool unbidden, and the owner
+  confirmed inline. **The cost is real and is stated rather than papered over:** Review has no
+  fresh-context reviewer, so it is a *structured self-pass* — the reviewer wrote the code. Each task's
+  Review line says so explicitly, and no task may report an independent review it did not get.
 - **D6** — **Tiers per ADR-029, declared beside `class:` and defaulted up:** T1 **P** · T2 **G** ·
   T3 **G** · T4 **X**. Re-tier on discovery if something turns out to guard.
 
