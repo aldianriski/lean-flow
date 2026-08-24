@@ -7,7 +7,7 @@ last_updated: 2026-08-24
 status: closed
 gates_signed: G1,G2 @ 2dd1edb
 plan_commit: 88d31d8
-close_commit:
+close_commit: 3332857
 update_trigger: sprint execute/close events
 ---
 
