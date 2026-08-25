@@ -4,6 +4,7 @@ slug: guards-that-cannot-fire
 owner: Maintainer
 last_updated: 2026-08-25
 status: active
+gates_signed: G1,G2 @ 835e744
 plan_commit: 5ada67e
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -122,10 +123,12 @@ the case that motivated the work, which currently exits 0.
 - [ ] **TD-085's remaining reach closes with TD-092** — *Verify: both rows are dispositioned at close; they are one surface, and closing one while leaving the other open would misreport the state*
 
 ## Owner-action checklist
-- [ ] **Reinstall the plugin** — carried forward unaddressed from SPRINT-084 and SPRINT-085, now a
-      third sprint. This promote ran base-dir **1.55.0** against a **1.58.0** repo. `lean-doc-generator`
-      was verified *content*-identical across that gap (CRLF vs LF only), so this promote is unaffected —
-      but SPRINT-086 will use `/orchestrator` and `/task-decomposer`, and neither carries that check (L-021).
+- [x] **Reinstall the plugin** — ✓ done 2026-08-25, before the first task started. `/plugin` reports
+      1.58.0 and `/orchestrator`'s own invocation header now reads
+      `…/lean-flow/1.58.0/skills/orchestrator` against a 1.58.0 repo — **verified from the base-dir
+      version the skill prints, not from `/plugin`'s report** (L-021 names that report as the thing not
+      to trust). Carried unaddressed through SPRINT-084 and SPRINT-085; this run is the first since
+      SPRINT-083 executing procedures that match the repo.
 
 ## Decisions (pre-locked)
 
