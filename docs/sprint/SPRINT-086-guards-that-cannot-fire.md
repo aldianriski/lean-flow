@@ -64,7 +64,7 @@ or dissolved — and the ranking T2 acts on is either confirmed or corrected by 
 ### T2 — Cut the gate's spawn count so it completes under load `[size: M · risk: med · class: execution · HITL]`
 Layers: `scripts/qa-check.sh` § leg 12 · the `evals/run-*.sh` harnesses it drives — **retargeted mid-sprint from `conformance-engine.sh`; see the `scope-change` entry 2026-08-25**, T1 proved leg 12 (396.3s of 492s) and the engine sweep (`QA_FULL=1` only) are disjoint, so the frozen target could not reach this task's own Acceptance (L-100 · L-088)
 Depends-on: T1
-Cites: TASK-284 · TD-090 · TD-084 · L-144 · L-120 · § Round 5 · SPRINT-084 T1 (the mechanism, proven)
+Cites: TASK-284 · TD-090 · TD-084 · L-144 · L-120 · § Round 5 · § Round 6 (T1's verdict, which retargeted this task) · SPRINT-084 T1 (the mechanism, proven) · `S6.MULTISVC` (the rule id the Tier G seed perturbed — **read and seeded, never a file this task owns**)
 
 The gate blocked SPRINT-085's close for a full session. The characterisation is narrower than
 "unrunnable": it **completes on a clean process table and fails after accumulated session load**, which
