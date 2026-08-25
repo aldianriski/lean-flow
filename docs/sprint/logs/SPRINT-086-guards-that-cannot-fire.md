@@ -187,3 +187,67 @@ fewer fixtures, which is precisely the false economy DoD 2 exists to block.
 **Owner ruling:** retarget, recorded here rather than absorbed. DoD 1's reinterpretation is an
 ADR-021 surfaced ruling, not a silent re-read — it will be ticked against leg 12's families, with this
 entry as the record of why the words say "families T1 confirms" and the work is in `evals/`.
+
+### 2026-08-25 | blocker | I committed a live reviewer's seeded break into a shipped guard — L-042, caught only by the outside pass
+**The independent T4 reviewer's first finding was not about T4.** It was that `main` — at that moment,
+`822b67b` — shipped `scripts/lib/check-review-depth.sh` with the `consequence` anchor replaced by
+`XXconsequence` in **18 places**. The shipped guard returned **PASS, exit 0** on SPRINT-086's own live
+log: a `governance:high` task with no review line, reported clean. The exact TD-085/TD-092 false
+negative this sprint exists to close, reopened by the commit that was supposed to be about T2.
+
+**Root cause is mine and it is a rule I had loaded.** I dispatched the T4 reviewer as a plain agent
+with **no worktree isolation**, so it ran in the main working tree. It seeded `consequence` →
+`XXconsequence` to reproduce T4's discrimination proof — correct reviewer behaviour, and exactly what
+the brief asked for. Then I ran `git add -A && git commit` for the scope-change while that seed was
+in flight. **L-042 verbatim**: staging a shared file while another task has WIP in it contaminates at
+the *commit* phase and mis-attributes history. The remedy is recorded in CLAUDE.md — `git add -p` +
+verify `git diff --cached` — and I used `git add -A` three times today without reading the staged diff.
+Twice it was harmless because only my own files were dirty. The third time an agent was live in the tree.
+
+**It compounded, in the way this repo's edit-safety rules predict.** The reviewer, tidying up, ran
+`git checkout -- <file>` — which restores from HEAD, and HEAD was already poisoned. So the cleanup
+*reproduced* the corruption and then correctly reported a clean tree. Two independent, individually
+reasonable actions produced a shipped guard that fails green with no dirty file to notice.
+
+**Nothing in the normal loop would have caught it.** The commit's own message was about T2. `git status`
+was clean. The sprint file was untouched. The one instrument that saw it was the **independent reviewer
+running the shipped checker against real input** — which is L-165's thesis observed again: what catches
+these is an outside pass or a disagreeing second number, never the author re-reading their own work.
+Worth noting the reviewer was dispatched *because* T4's own new schema classified T4 as
+`governance:high` and routed it to one. The guard T4 wrote is what caught the corruption of the guard
+T4 wrote.
+
+**Restored from `302a222` and verified rather than assumed:** 0 occurrences · byte-identical to the
+known-good blob · `sh -n` clean · 12 fixtures green / 0 red · the guard again FAILs this log with both
+named findings. The restore commit staged the file **by name**, with `git diff --cached` read before
+committing.
+
+**Standing correction for the rest of this run:** every review/analysis agent is dispatched
+worktree-isolated, and no `git add -A` while any agent is live.
+
+### 2026-08-25 | progress | T4 independent review — one blocker (mine), one major, one nit; revise pass dispatched
+**Standards axis — major, and genuine.** The anchor is correct in refusing prose, but it is
+zero-tolerance: four benign transcription drifts each produce a **silent false negative** on
+`governance:high` work — a double space, capitalised field names, a trailing space, and leading
+indentation inside a list or blockquote. Each verified against the real checker, not argued. This line
+is hand-written by agents into narrative markdown, so drift is the expected case rather than the exotic
+one. One bounded revise pass dispatched (worktree-isolated), briefed to keep the match anchored and
+whole-line while normalising whitespace and case, with a retained must-FAIL fixture per drift class and
+a negative control proving prose about the schema still does not match.
+
+**Spec axis — clean, and checked by running things.** The wiring T4's DoD 1 claims is present at all
+three points. The reviewer **reproduced T4's discrimination proof exactly** against T4's own commit —
+seed at line 170, `cmp` differing at byte 11519, `sh -n` clean, 216 = 216 lines, cases 11+12 reddening,
+all 10 siblings green including both low/low controls. The fixtures are **retained on disk** (TD-012),
+not deleted with the prototype.
+
+**Reachability — confirmed firing on real content**, not merely present: `qa-check.sh:321` wires the
+checker against every `docs/sprint/logs/` file matching a live `SPRINT-*.md`, which currently includes
+this log; the `*/archive/*` skip does not block it because live logs are not archived.
+
+**Over-firing — the control is load-bearing, not vacuous**, verified by re-running it through the
+seeded-anchor scenario. One nit: a fenced code block containing a *concrete-valued* example line would
+trip the checker — unreachable today, because every real doc reference uses the `Tn` / `low|material`
+placeholders the anchored regex cannot match, and the gate only feeds it `docs/sprint/logs/` files.
+
+review · T4 · independent-scoped-reviewer · behaviour:material · governance:high
