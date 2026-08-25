@@ -204,3 +204,31 @@ like a log file, which `isFile` excludes and Shell's `[ -f ]` agrees on) has no 
 seed evidence exists only in a commit message rather than in the tree.
 
 consequence · pre-T1 · behaviour:low · governance:low
+
+### 2026-08-25 | progress | T8 re-reviewed clean, merged, DoD ticked 3/3
+
+The revise fixed `check-research-archive.sh`'s `live_citer()` with a single anchored filter line, in
+the same chain position as its existing exclusions. Re-review by the same reviewer that refuted DoD 1:
+**all three attacks survived.** Five lookalike citer placements (`worktrees-backup`, `worktreesX`,
+`docs/worktrees/`, root-level `worktrees/`, non-root-nested `lib/.claude/worktrees/`) each correctly
+kept their doc alive; real worktree citers at shallow and deep nesting were correctly excluded;
+seed/restore reproduced byte-identically against `sha256 b070c808…`. The enumeration was re-run over
+the revised tree, this time drilling into `_sprint_plans()` and `_s12_tracked()` which the first pass
+had not: **no third vulnerable checker exists.**
+
+Merged as `7ee21b1`. File sets were disjoint from main's own commits — checked before merging rather
+than discovered during it. Fixtures then re-run **in the integrated tree**, not trusted from the
+worktree they were written in: `EPHEMERAL-INTAKE FIXTURES: all green` and `RESEARCH-ARCHIVE FIXTURES:
+all green`, both verdict lines read directly.
+
+**The reviewer flagged that it could not find TD-100 anywhere in the tree** — correct, and exactly the
+right instinct: it verified the filing existed rather than accepting "filed as TD-100" on trust. The
+explanation is structural, not a missing row. TD-100 lives on `main` at `8dbc549`; T8's branch forked
+from `2eee4d3`, so it was invisible from where the reviewer stood. Confirmed by `git log -S`. Worth
+keeping in mind when briefing worktree-isolated reviewers: a coordinator's bookkeeping commits are not
+in their world, so anything they must verify has to be given to them or merged first.
+
+**T8 DoD 3/3 ticked.** One of TD-095's three sites remains open by design (TD-100, the engine).
+
+consequence · T8 · behaviour:material · governance:low
+review · T8 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low

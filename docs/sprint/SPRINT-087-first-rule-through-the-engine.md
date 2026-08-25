@@ -160,9 +160,9 @@ FAILs and pushed a run over its own budget.
 `.claude/worktrees/`**, and no real finding is swallowed with it.
 
 **DoD:**
-- [ ] No finding under `.claude/worktrees/` in a run with one present — *Verify: run the gate with a worktree live and read its printed verdict*
-- [ ] A retained fixture proves the exclusion **does not swallow a real finding** at a similar path — *Verify: a must-FAIL case at a path that merely resembles the excluded one*
-- [ ] The exclusion sits in **path discovery**, beside the existing `*/archive/*` convention — *Verify: not bolted onto individual checkers, or the next checker inherits the bug*
+- [x] No finding under `.claude/worktrees/` in a run with one present — *Verify: run the gate with a worktree live and read its printed verdict*
+- [x] A retained fixture proves the exclusion **does not swallow a real finding** at a similar path — *Verify: a must-FAIL case at a path that merely resembles the excluded one*
+- [x] The exclusion sits in **path discovery**, beside the existing `*/archive/*` convention — *Verify: not bolted onto individual checkers, or the next checker inherits the bug*
 
 ## Owner-action checklist
 - [x] **Choose the first rule family at G2** — cheap + representative per H10 (ruled at intake); V3 §43's
@@ -220,7 +220,11 @@ FAILs and pushed a run over its own budget.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `scripts/lib/check-ephemeral-intake.sh` | T8 | Exclude `.claude/worktrees/` at path discovery — the gate was charging for the worktree-dispatch pattern this repo prescribes (TD-095) | low | `evals/run-ephemeral-intake-fixtures.sh` (4 cases, incl. retained lookalike control) |
+| `scripts/lib/check-research-archive.sh` | T8 | Same exclusion in `live_citer()` — a worktree copy counted as a live citer, so a superseded doc cited by nothing real passed. **Silent false negative, found by independent review, not by the author** | med | `evals/run-research-archive-fixtures.sh` (7 cases, incl. retained lookalike citer) |
+| `evals/run-ephemeral-intake-fixtures.sh` | T8 | Wire the two retained worktree fixtures | low | self |
+| `evals/run-research-archive-fixtures.sh` | T8 | Wire the two retained citer fixtures | low | self |
+| `evals/fixtures/{ephemeral-intake,research-archive}/worktree-*/` | T8 | Retained must-FAIL + lookalike controls, kept deliberately — deleting fixtures with the prototype leaves the guard unguarded (TD-012) | low | consumed by both harnesses |
 
 ## Retro
 
