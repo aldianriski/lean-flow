@@ -18,15 +18,16 @@ status: current
 
 ## Active Sprint
 
-_(none — SPRINT-086 closed 2026-08-25, 17 of 18, system-verify `183 pass, 0 fail`. All three guards now
-reach their own subject: the budget guard **fired on live traffic** at 461s and named its skipped
-harnesses instead of dying mute, and the review-depth guard caught a corrupted checker on `main` that
-every other signal called clean. **TD-085 · TD-091 · TD-092 resolved.** **TD-090 was lowered to `medium`
-and re-raised to `high` within the hour**, by its own written re-raise condition — the close's own
-verification run hit **454s > 450s with no worktrees present**, so the gate sits ~1% under its budget
-and a sprint's close output is enough to push it over. Next: **EPIC-014 Sprint C** (H07–H11), which needs
-`/task-decomposer --epic` first — its tasks are undecomposed, and `TASK-280/281/282` stay gated on
-them existing.)_
+> **SPRINT-087 — The First Rule Through the Engine** → [docs/sprint/SPRINT-087-first-rule-through-the-engine.md](docs/sprint/SPRINT-087-first-rule-through-the-engine.md)
+
+EPIC-014's **third member sprint** (`epic: EPIC-014`) — V3 Sprint C, targeting the epic's **second
+§ Closed-when condition**: targeted and full conformance running in TS, with a partial invocation never
+emitting a global level. **Feature-first, and the Plan's shape is that rule**: H07 (result domain),
+H08 (registry) and H09 (ports) are *layers*, so none is a task — every task crosses all three (D5).
+Carries the three carry-forwards that unblock the moment the CLI exists (`ok:false → exit 1` ·
+permission-denied ≠ `spec-not-found` · N findings, not one) and the gate's worktree-scanning defect
+(TD-095). **The first rule family is chosen at G2, not here** — cheap + representative per H10, with
+V3 §43's expensive-first ranking governing families 2..n.
 
 ---
 
