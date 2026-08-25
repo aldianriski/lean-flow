@@ -512,3 +512,43 @@ Integrated suite **`175 pass, 0 fail`** across 15 files. Sprint DoD **22 ticked 
 
 consequence · T4 · behaviour:material · governance:low
 review · T4 · independent-adversarial-reviewer (worktree-isolated) · re-reviewed once · clean · behaviour:material · governance:low
+
+### 2026-08-26 | progress | T5 — exit mapping proven over every SpecFinding, and a reach limit found
+
+`runSection`'s inline `return 1` extracted into a named exported `specReadExitCode()`, typed structurally
+on `{ ok: boolean }` so one rule covers both `SpecReadResult` and `MarksReadResult`, and tested at
+runtime (TD-101) against all five `SpecFinding` values using the **domain's own constructors and
+fixtures**, not hand-rolled literals. Commit `e706db8`. **DoD not ticked — review pending.**
+
+Much of DoD 1 and all of DoD 2 were **already satisfied by T4** and T5 said so plainly rather than
+manufacturing work: `--section 99` → exit 1 against the live oracle, `--section 8` → exit 0. It added
+the coverage T4's `--section` path could not reach.
+
+**Seed 2 is the one worth naming.** It gives `runSection` an early `if (rows.length === 0) return 1`,
+and reddens **exactly one** test — the §8 control — while the §99 fail test and the mapping-level §8
+test both stay green. That proves DoD 2 is load-bearing *at this boundary specifically*: a mapping that
+exited 1 on everything would satisfy DoD 1 completely while silently breaking DoD 2. The two criteria
+have to be tested against each other, which is precisely why §8 is written into the Plan as its own DoD
+rather than folded into the first.
+
+**The reach limit, disclosed rather than papered over.** Only **2 of 5** `SpecFinding` values are
+reachable through any current CLI invocation: `--rule` never touches the spec reader, and nothing wires
+`--reconcile` or marks-checking in. So three findings were proved at the mapping function, not against
+the Shell oracle end-to-end. I verified this independently — `reconcile()` and `marksInStandard()` have
+**zero production callers**, only their own definitions.
+
+Filed as **TD-103**, and the reason it earns a row is not that it is wrong. § Scope defers H12+, so
+domain work landing ahead of its CLI surface is the plan working. But **L-020 is explicit that shipping
+is not wiring**, and nothing else tracks that these two are owed a consumer. T7 widened `reconcile` from
+one finding to N this sprint and T2 built the typed marks reader this sprint; both were independently
+reviewed, and neither has ever been *used*. Their correctness is first exercised at H12, by someone who
+did not write them.
+
+Also worth carrying forward: T5 found this sprint's `Layers: \`apps/cli/src\`` token has **no trailing
+slash**, so `check-layers-observed.sh`'s directory-prefix match never fires for nested files — the WIP
+leg reports them "changed but undeclared" until the commit lands and COORD attribution sweeps it up.
+L-148's shape again (a declaration whose consumer's parser cannot read it); the other session owns that
+checker and has been told.
+
+consequence · T5 · behaviour:material · governance:low
+review · T5 · independent-adversarial-reviewer (worktree-isolated) · behaviour:material · governance:low

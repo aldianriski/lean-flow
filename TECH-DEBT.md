@@ -152,6 +152,34 @@ status: current
 > at **3050 > 130**, still TD-082's reasoned carry; the figure moved 3,050 → 3,050 since the last
 > sweep, so the carry ruling is unaffected.
 
+- **TD-103** severity: minor | status: open | created: Sprint-087
+  - Summary: **Two domain capabilities shipped in SPRINT-087 have no consumer — `reconcile()` and
+    `marksInStandard()` have zero production callers**, so neither is reachable from any CLI invocation
+    and neither is exercised end-to-end. The CLI's invocation kinds are `version` · `help` · `rule` ·
+    `section` · `unknown`; there is no `--reconcile` and no marks path.
+  - Evidence: `grep -rn 'reconcile(\|marksInStandard(' --include='*.ts' apps/ packages/` excluding tests
+    returns only the two function *definitions*. Independently surfaced by SPRINT-087 T5, which found
+    that **only 2 of 5 `SpecFinding` values are reachable through any CLI invocation** — `--rule` never
+    touches the spec reader — so `spec-counts-unreadable`, `section-rows-mismatch` and
+    `marks-table-unreadable` could only be proved at the mapping function, never against the Shell
+    oracle end-to-end. T2's own reviewer had separately noted `marksInStandard` had zero callers.
+  - **This is deliberate staging, not an oversight — which is exactly why it needs a row.** § Scope
+    defers H12+ (the full conformance orchestrator) out of this sprint, so the domain work landing ahead
+    of its CLI surface is the plan working as intended. But **L-020 is explicit that shipping is not
+    wiring**: a behaviour written only in its own file is half-shipped, and nothing else tracks that
+    these two are owed a consumer.
+  - Impact: the correctness of work done *this* sprint is first exercised at H12, far from where it was
+    written and by someone who did not write it. T7 widened `reconcile` from one finding to N and proved
+    it against the oracle **in tests**; if that widening is wrong at the boundary, the cost lands at
+    cutover. Same for T2's typed `MarksReadResult`. Neither is likely wrong — both were independently
+    reviewed — but neither has been *used*.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): when H12 wires the
+    orchestrator, wire these two first and keep the boundary assertions T5 wrote at the mapping level,
+    promoting them to end-to-end oracle comparisons. Do not delete the mapping-level tests when the
+    end-to-end ones arrive — they cover inputs the CLI cannot yet produce.
+  - **Re-file fresh if** the CLI gains `--reconcile` or a marks path — the finding then inverts into
+    "are the end-to-end assertions actually comparing against Shell", which is a different check.
+
 - **TD-101** severity: **high** | status: open | created: Sprint-087
   - Summary: **Nothing in this repository type-checks TypeScript, so every guarantee stated as "enforced
     by a TYPE" is enforced only in an editor.** The gate is `sh scripts/qa-check.sh && bun test`;
