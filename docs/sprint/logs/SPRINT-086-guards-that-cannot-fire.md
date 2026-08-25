@@ -301,3 +301,38 @@ rather than absorbed into a tick.
 
 **T4's DoD 5 stays open deliberately** — TD-085 and TD-092 are dispositioned at the close Retro, per
 repo convention, not mid-task. The work closing both is done; the bookkeeping is a close-time act.
+
+### 2026-08-25 | progress | T2 — leg 12 cut by adopting the pattern its own siblings already used; DoD 3 left unmet, on purpose
+**First, the failure that nearly cost the task.** T2 stopped mid-run saying it would "wait for the
+background gate run to complete", and the harness recorded it **completed** — with **zero commits on
+its branch**. Verbatim SPRINT-085 T5's shape. Caught the same way that one was: by checking the
+artifact (`git log main..HEAD`, empty) instead of the report. The coordinator's brief to T1 carried an
+explicit ban on long background waits and **the brief to T2 did not** — that omission is the
+coordinator's, and it is the second time today a rule was correctly known and not applied at the point
+it mattered. The agent was **resumed rather than restarted**, preserving ~241k tokens of sound work.
+
+**The fix is small and slightly embarrassing in a useful way.**
+`evals/run-conformance-engine-fixtures.sh` was the one harness in the repo that had **never adopted the
+spec-reduction pattern its own siblings already use** (`run-adr-family-fixtures.sh` ·
+`run-ownership-header-fixtures.sh` · `run-s2-placement-fixtures.sh`) — and which **three cases inside
+that same file** already used for one section. 25 of its 38 engine calls dispatched the full ~100-row
+spec to check **six** rule ids. It now builds one reduced spec by the same section-preserving technique,
+carrying a self-guard that FAILs if the reduction anchor ever drifts from the shipped spec.
+
+**196.1s → 143.2s / 163.7s** (two samples), ~32–53s off leg 12. The cross-check that makes the number
+usable: a per-harness sweep of all 26 always-on harnesses summed to **400.7s, within 1.1% of TD-090's
+cited 396.3s** — an independent corroboration of the row's own figure, arrived at by a different route.
+§ Round 7 appended (pure append, 0 deletions).
+
+**"No check deleted" was verified by the coordinator, not accepted.** The runtime before/after capture
+was killed mid-run, so it was established statically from three angles that agree: **50 unique fixture
+names before and after, zero removed, zero added**, assertion count unchanged. Recorded as static
+evidence rather than described as if the runtime diff had been observed.
+
+**DoD 3 is UNMET and was not substituted.** T2's under-load run was killed before producing a verdict.
+A clean-table run would have satisfied the sentence and proved nothing — that case already passes
+today, which is the entire premise of TD-090's load-dependent characterisation. Reported plainly by the
+agent and carried here as an open criterion. It is closable only from a genuinely loaded session.
+
+consequence · T2 · behaviour:material · governance:low
+review · T2 · self-reviewed · behaviour:material · governance:low
