@@ -17,7 +17,14 @@
 #
 # A "live" citer is anything outside the historical record: docs/sprint/archive/ and docs/changelog/
 # are closed history and cite by nature, and docs/knowledge-index.md is generated from frontmatter,
-# so none of the three keeps a doc alive.
+# so none of the three keeps a doc alive. `.claude/worktrees/` is excluded the same way (TD-095's
+# false-negative sibling): it holds full repo checkouts from the dispatch protocol, and a bare
+# `grep -rl` walks straight into them. Counting a worktree copy as a citer is a SILENT false
+# negative, worse than TD-095's false positives -- a superseded doc genuinely cited by nothing live
+# would misreport "still cited, correctly left in place" instead of the FAIL that says move it to
+# archive/. Anchored with `^` at the repo-relative path start (shape, not a bare substring match on
+# "worktrees") so a real citer at a path that merely CONTAINS that word -- e.g. docs/worktrees/ -- is
+# still counted; see evals/fixtures/research-archive/worktree-*.
 #
 # Usage: sh check-research-archive.sh <repo-root>
 # Prints one PASS/FAIL line per doc considered; exits 1 if any FAIL line was printed, 0 otherwise.
@@ -42,6 +49,7 @@ live_citer() { # <basename> <self-relative-path>
     grep -v "^docs/changelog/" |
     grep -v "^docs/knowledge-index.md$" |
     grep -v "^evals/fixtures/" |
+    grep -v "^\.claude/worktrees/" |
     grep -vxF "$_self" |
     head -n1
 }

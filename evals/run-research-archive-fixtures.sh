@@ -56,6 +56,24 @@ run_case_anywhere "superseded-cited-in-place" 0 \
   "superseded but still cited by docs/research/consumer.md -- correctly left in place" -- \
   sh "$checker" "$fx/superseded-cited-in-place"
 
+# --- case 6: superseded, only a worktree copy "cites" it -> FAIL (TD-095's false-negative sibling) -
+# The load-bearing case: a full repo checkout under `.claude/worktrees/agent-*/` is not a live citer.
+# Before the fix, live_citer() matched the worktree copy's text and this incorrectly reported PASS
+# ("still cited, correctly left in place") -- a SILENT false negative masking a doc that should have
+# moved to archive/. After the fix it must FAIL.
+run_case_anywhere "worktree-only-citer" 1 \
+  "is superseded and cited by nothing live but still sits in docs/research/" -- \
+  sh "$checker" "$fx/worktree-only-citer"
+
+# --- case 7: superseded, cited from a path that merely CONTAINS "worktrees" -> exit 0 (must-PASS
+# control, not a demolition) -------------------------------------------------------------------
+# `docs/worktrees/notes.md` is a real, tracked citer -- not under `.claude/worktrees/`. Proves the
+# exclusion is anchored to the exact path segment, not a bare substring: a substring-only exclusion
+# would wrongly swallow this genuine citer too.
+run_case_anywhere "worktree-lookalike-citer" 0 \
+  "superseded but still cited by docs/worktrees/notes.md -- correctly left in place" -- \
+  sh "$checker" "$fx/worktree-lookalike-citer"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "RESEARCH-ARCHIVE FIXTURES: all green"; else echo "RESEARCH-ARCHIVE FIXTURES: at least one FAIL"; fi
 exit $fail
