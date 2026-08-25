@@ -291,6 +291,18 @@ status: current
     shape as TD-095/TD-100**: the tooling penalises the concurrency the repo tells you to use. A task
     that goes red under a parallel wave and green on a re-run alone will read as a flake and be
     re-run, which is the wrong lesson.
+  - **Third sighting refines the mechanism — and it is worse than "another agent was running".** SPRINT-087
+    T7 hit it with `bun test packages/standard` **alone**: no other agent, no external load. 99 tests
+    across 10 files, and bun runs test *files* in parallel — so several files spawn shell oracles at the
+    same moment and contend with each other. Isolated single-file runs of the same test pass in 7–11 s.
+    **The suite is its own load generator**, which means the failure needs no external cause and can fire
+    on any developer's machine running the documented command. This also retro-explains an unidentified
+    `150 pass, 1 fail` seen at T2's merge that did not reproduce on two immediate re-runs.
+  - **Two agents independently declined to re-run until green**, which is the behaviour this row exists to
+    protect: T7 reported the timeout rather than quietly retrying, and the coordinator logged the T2-merge
+    failure as *unidentified* rather than attributing it to this row on signature alone. Matching a
+    signature is not an identification, and a re-run destroys the evidence — capture the failing test name
+    **before** re-running.
   - Root cause is **not** the assertions: a slow shell spawn measured against a fixed default, with
     contention as the multiplier. L-144's per-invocation-overhead finding, one layer up in the runner.
   - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): set the per-test timeout

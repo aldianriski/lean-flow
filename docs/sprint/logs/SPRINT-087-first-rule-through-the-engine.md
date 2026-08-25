@@ -397,3 +397,34 @@ the re-run destroys the evidence.
 
 consequence · T2 · behaviour:material · governance:low
 review · T2 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low
+
+### 2026-08-25 | progress | T7 — `reconcile` carries every mismatching section; TD-098's mechanism refined
+
+The defect was real and **self-documented**: `reconcile()` carried a comment stating it "surfaces the
+FIRST section (lowest number) that disagrees… a deliberate, reported TS/Shell difference (deliverable
+d)". SPRINT-085 knew and deferred it under EPIC-014 D2's rule that a difference be ruled rather than
+absorbed; T7 closed it. Widened `SpecReadFail` with an optional `mismatches?: readonly SectionCount[]`
+and changed the loop to collect every disagreeing row. `finding` stays the single string
+`"section-rows-mismatch"` and the verdict stays `ok: false`, so ADR-034 D3's frozen surface is
+untouched. Commit `fc9510e`. **DoD not ticked — review pending.**
+
+The seed that mattered reverts `reconcile` to the exact pre-T7 single-finding shape; only the new
+two-mismatch test reddened, with the §2-only single-mismatch control staying green. That control is the
+point — a one-mismatch fixture passes whether the bug is present or absent, which is why DoD 1 words
+itself as *"one mismatch proves nothing here"*.
+
+**TD-098's mechanism is now materially better understood, and the news is worse.** T7 hit the timeout
+running `bun test packages/standard` **alone** — no other agent, no external load. Bun runs test *files*
+in parallel, so several files spawn shell oracles simultaneously and contend with each other; isolated
+single-file runs of the same test pass in 7–11 s. **The suite is its own load generator.** The failure
+therefore needs no external cause and can fire on any machine running the documented command. It also
+retro-explains the unidentified `150 pass, 1 fail` at T2's merge — I had reached for "the peer session
+is load", which was true but probably not the cause.
+
+Worth recording as process, not just fact: **two agents independently declined to re-run until green.**
+T7 reported the timeout rather than quietly retrying, and I logged the T2-merge failure as
+*unidentified* rather than attributing it on signature alone. Both are the behaviour TD-098 exists to
+protect, and neither is what the path of least resistance suggests.
+
+consequence · T7 · behaviour:material · governance:low
+review · T7 · independent-adversarial-reviewer (worktree-isolated) · behaviour:material · governance:low
