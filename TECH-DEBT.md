@@ -152,6 +152,51 @@ status: current
 > at **3050 > 130**, still TD-082's reasoned carry; the figure moved 3,050 → 3,050 since the last
 > sweep, so the carry ruling is unaffected.
 
+- **TD-097** severity: medium | status: open | created: Sprint-087
+  - Summary: **`check-verify-reaches.sh` reports a present script as absent, and cannot see the corpus
+    that would have exposed it.** Its EXISTS test resolves the extracted token with `[ -f "$scr" ]`
+    relative to CWD (line ~89), so a Verify clause naming a script by **basename** — the repo's
+    dominant convention — fails as *"does not exist in this repository"* even when the file is present.
+  - Evidence: SPRINT-087 T4 DoD 1 names `read-spec-rules.sh --section N`. The gate emits
+    `verify-method-absent`, yet `scripts/lib/read-spec-rules.sh` exists, offers `--section`, and
+    `ADR-034` §64 records a working `sh scripts/lib/read-spec-rules.sh …` invocation. Three independent
+    queries agree the file is present. **The finding text is factually false**, which is worse than a
+    bare FAIL: it sends the reader to write a script that is already there.
+  - Impact: **it fires only on the active sprint, which is why it looked clean for five sprints.**
+    Line ~55 (`case "$sp" in */archive/*) continue`) exempts archived sprints, and archived Verify
+    clauses contain **17 bare-basename references** — `conformance.sh` ×8, `check-manifest-lockstep.sh`
+    ×3, `check-doc-caps.sh` ×3, `check-epic-archive.sh` ×2, `qa-check.sh` ×1 — every one of which would
+    trip this. The convention and the guard have disagreed since the guard shipped (Sprint-082 T3); the
+    disagreement was invisible because the only files it inspects are the ones not yet archived.
+  - **This is a false positive on a Tier G guard, the same class as TD-095** — a gate charging for a
+    pattern the repository itself practises. Noisy rather than silent, hence `medium`.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): resolve a bare basename
+    against the known script roots (`scripts/`, `scripts/lib/`, `evals/`) before declaring absence, and
+    separate the two findings — *unresolvable reference* is not *method absent*. Re-point the archive
+    exemption at a retained fixture so the basename case is exercised rather than exempted.
+  - **Re-file fresh if** the Verify-clause convention changes to require fully-qualified paths — the
+    finding then becomes correct and this row becomes a docs fix instead.
+
+- **TD-096** severity: minor | status: open | created: Sprint-087
+  - Summary: **SPRINT-087 attributes the six marks to ADR-036 in four places; they are `spec/STANDARD.md`
+    §14's.** ADR-036 freezes the *verdict vocabulary* — `PASS` · `FAIL` · `GAP` — and rules severity out
+    as new behaviour arriving at H15. It names no marks at all.
+  - Evidence: A5 reads *"The six marks are frozen by ADR-036. Confirm: ADR-036 § Decision"*; § Decision
+    contains three verdicts and no mark vocabulary. The same attribution repeats in § Scope "Out", D6,
+    and T2's DoD 3. The count itself is correct — §14 defines exactly six: `mechanical` ·
+    `judgment-only` · `split` · `implementation-directed` · `restated` · `standard-directed`.
+  - Impact: **bounded, and bounded by luck rather than design.** T2 DoD 3's `Verify:` clause already
+    names *"the Standard's own"* mark set, so the check reaches §14 and stays provable — the criterion
+    is satisfiable as written. What breaks is the reader: an implementer following the citation lands on
+    an ADR that cannot answer the question (L-151). This is the failure ADR-036 itself codifies one
+    section later — *"point at the artifact; a row that can point at nothing is a design intention
+    wearing a contract's clothes"* — reproduced inside the sprint that cites it.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): repoint all four sites to
+    `spec/STANDARD.md` §14 and re-confirm A5 against it. Deferred deliberately at SPRINT-087 G1 — ruled
+    a citation defect, not a scope change, because no criterion becomes unreachable.
+  - **Re-file fresh if** the mark set changes arity — the "six" is load-bearing in T2's DoD, which
+    asserts *a seventh mark cannot appear silently*.
+
 - **TD-095** severity: medium | status: open | created: Sprint-086
   - Summary: **`qa-check.sh` scans agent worktrees under `.claude/worktrees/`**, treating each as repo
     content. Six live worktrees meant six full repo copies walked — enough to emit false FAILs *and*

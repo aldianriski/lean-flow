@@ -165,7 +165,7 @@ FAILs and pushed a run over its own budget.
 - [ ] The exclusion sits in **path discovery**, beside the existing `*/archive/*` convention — *Verify: not bolted onto individual checkers, or the next checker inherits the bug*
 
 ## Owner-action checklist
-- [ ] **Choose the first rule family at G2** — cheap + representative per H10 (ruled at intake); V3 §43's
+- [x] **Choose the first rule family at G2** — cheap + representative per H10 (ruled at intake); V3 §43's
       expensive-first ranking governs families 2..n. The evidence is in hand: § Round 5/6 profile.
 
 ## Decisions (pre-locked)
@@ -182,6 +182,18 @@ FAILs and pushed a run over its own budget.
   cutover is H24/H25, several sprints out (D2 — strangler, never rewrite).
 - **D6** — **No new ADR is owed.** The hard calls are taken: ADR-034 (frozen surface), ADR-035 (zero
   deps), ADR-036 (six marks), ADR-029 (tiers), EPIC-014 D8 (this engine is Tier G).
+- **D7** — **The first rule family is F12, `spec/STANDARD.md` §12's git boundary** —
+  `S12.SECRETS` · `S12.BACKUPS` · `S12.DESIGNSRC` · `S12.GENERATED`. **Selected on the Owner-action's
+  own criterion — *cheap + representative* — not on V3 §43's expensive-first ranking**, which § Scope
+  assigns to families 2..n and which would have chosen the opposite end (F11 at 84.7 s, F6 at 72.1 s).
+  *Cheap:* 2,240 ms real-scale, 8th of 12 in the Round 5 profile. *Representative:* four rules, so
+  registry dispatch is exercised across four evaluators and T3's stated failure mode — a shape that
+  works for one rule and not a family — can actually surface; and Structural level against one
+  filesystem port, so T1 is not forced to grow a second adapter. Runners-up and why not: **F1** (§2
+  README footer) is cheapest at 592 ms but carries a *single* rule, which cannot exercise dispatch at
+  all; **F3** (§13 attestation) is the most representative for T2's classification — §14 marks two of
+  its rules `implementation-directed` — but needs a git-history port, widening T1 beyond this sprint's
+  root task. Evidence: `docs/research/logs/qa-gate-timing.md` § Round 5, both tables.
 
 ## Assumptions
 
