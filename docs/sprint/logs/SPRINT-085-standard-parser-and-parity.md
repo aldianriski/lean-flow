@@ -104,3 +104,34 @@ evidence about the reporter.** Restarted with the stall's cause named: no long b
 Monitor waits (a full `conformance.sh .` is ~5–6 minutes), bounded foreground steps only, and an
 instruction to write up whatever it genuinely measured — including "I measured none" — rather than
 produce a complete-looking round with an unstated denominator.
+
+### 2026-08-25 | progress | T5 — § Round 5 lands, and names a dominant family Round 4 never saw
+Restarted run delivered: **226 insertions, 0 deletions** to `docs/research/logs/qa-gate-timing.md`
+(zero deletions is correct, not suspicious — Round 4 had already moved `last_updated` to today, so
+the append touched nothing). All 45 mechanical/split rules profiled, grouped into the engine's own 12
+family sections, measured **two ways**: a tiny-input isolation on a 12-item purpose-built fixture repo
+with xtrace-counted spawns, and a real-scale run against this repository.
+
+Real-scale dominance: **F11 §11 retention 84.7s · F6 §4 ADR 72.1s · F5 §1 ownership (`S1.LAW2`) 56.0s ·
+F9 §10 (`S10.TDAGING`) 37.4s** — four families, **89%** of a 281.2s total. The other eight are named
+individually rather than folded into a remainder, summing to 30.9s.
+
+**Reconciliation, which is what makes the numbers usable:** the 12 families sum to 281,166.6ms, matching
+the 45-rule dispatch total exactly; full-engine wall clock is 287,406ms — a **6.2s / 2.2% gap**,
+attributed to non-dispatched rule notes, the spec read, and this round's own instrumentation.
+
+**Open gap, reported rather than resolved:** `S11.LOGPAIR` + `S11.WHENITRUNS` cost **76.1s** combined,
+confirmed by an isolated rerun — and Round 4 never named them, its own arithmetic implying **≤4s** for
+its entire unnamed remainder. The engine is byte-identical since Round 4's commit and the archived
+corpus barely moved (120→122 files), so the two rounds disagree and neither is obviously wrong. Recorded
+in § Caveats as a live discrepancy. That is the honest state: a second measurement disagreeing with the
+first is exactly the signal the cross-check rule exists to produce, and papering it over would discard
+the finding.
+
+Migration order **not frozen** — the Recommendation names candidates on §43's *expensive today* and
+*high spawn count* axes and states outright that the choice is Sprint C's G2 call (V3 §43 · D6).
+
+**Process note:** this is the restarted run. The first ended after ~21 minutes and ~200k tokens having
+written **nothing**, while reporting it was watching a background job — see the `blocker` entry above.
+The restart's only substantive change was forbidding long background waits and requiring bounded
+foreground steps.

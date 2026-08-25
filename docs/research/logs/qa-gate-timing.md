@@ -389,3 +389,229 @@ a one-line pointer fix (the doc's § Options table, § Findings, and § Recommen
 new row/finding to stay honest about what changed and why), so per this task's own instruction it is
 **not edited here** — left for a promote-time ruling on whether to add an Option E and revise the
 verdict, or to fold this round's summary into the doc's Findings as a superseding entry.
+
+---
+
+## Round 5 — per-rule-family cost: tiny-input floor and real-scale attribution (SPRINT-085 T5, 2026-08-25)
+
+Round 4 names itself a **floor**: it measured `qa-check.sh`'s own legs and named only 10 of the
+engine's ~45 dispatchable rules individually (`_own_scan`/S1.LAW2 and `assert_S4_APPEND` with spawn
+counts; S10.TDAGING, S4.ONEFILE, S4.SECTIONS, S4.NEGATIVE, S6.BASE, S11.SPRINT, S11.TDDELETE, S4.INDEX
+by wall-clock only), leaving "~4s" of its own leg total attributed to "all other ~35 dispatched rules"
+without individually measuring them. EPIC-014's open question forbids freezing Sprint C's
+rule-family migration order before a profile exists (V3 §43 · L-130), and §43 explicitly forbids
+ordering by section number — this round closes the rest of that profile: **all 45 mechanical/split
+rules**, grouped into the 12 rule families the engine's own section-comment headers define, timed both
+against a **tiny purpose-built fixture** (L-144/L-147's own prescribed diagnostic — isolate
+per-invocation overhead from workload) and against **this repository at real scale**, with the two
+reconciled against each other and against Round 4's numbers.
+
+**Method — three passes, in order, none touching the shipped file.**
+
+**(1) A 12-item tiny fixture repo**, built fresh under `docs/research/logs/`'s companion scratch area
+(not part of this repository — a throwaway git repo in the OS temp dir), sized to exercise every
+family's loop at least once without approaching real-repo scale: 2 ADRs (3 total revisions across
+them), 3 ownership-headed docs, 2 `LEARNINGS.md` entries, 2 `TECH-DEBT.md` rows, 1 active sprint file
++ paired log, 1 archived sprint + paired log, 16 git-tracked files total, 5 commits. Exact counts
+recorded here because several families' real-scale cost is `item-count × per-item spawns`, and a tiny
+input's value depends on knowing what "tiny" was.
+
+**(2) Per-rule timing**, both against the tiny fixture and against this repository: a temp-directory
+copy of `scripts/lib/conformance-engine.sh` (never the shipped file — Round 2/3's copy method, not
+Round 4's instrument-and-revert) with three added lines wrapping the DRIVER's `"$fn" "$repo_abs"`
+dispatch call in `date +%s%N` timestamps, appended to a log file keyed by rule id. `sh -n` clean; `diff`
+against the shipped file is a **pure 3-line addition, 0 removed**. Tiny-fixture run: 2 samples. Real-repo
+run: 1 sample (Round 4's own precedent for the real-scale attribution pass — "run once against this
+repository"), after a first attempt was discarded: a foreground invocation was killed at a 2-minute tool
+ceiling, and a background relaunch left the killed process's own file handle still appending to the
+same path, contaminating 19 of 45 rule ids with doubled entries before the file was rotated aside
+(`timing_real.CONTAMINATED.tsv`, kept, not reported from) and a clean single run taken.
+
+**(3) Spawn counts**, empirically, not by static reading alone (Round 4 mixed both; this round leads
+with the measured one). A second temp copy adds `##RULE-START <id>##` / `##RULE-END <id>##` markers
+around the same dispatch call, run once against the tiny fixture under `sh -x` (this host's `sh` is
+bash 5.2 in POSIX mode, confirmed by `--version`; xtrace nests command substitutions as `++`, so a
+subprocess launched from inside `$(...)` gets its own traced line — verified by inspecting a raw
+segment before trusting the counts). Lines between markers are counted when their first token names an
+external binary (`git awk sed grep find wc cut tr sort head tail dirname basename mktemp date cat xargs
+uniq comm rev ls`); shell builtins (`[`, `printf`, `case`, `command -v`) are excluded. Cross-checked
+against source reading for the two families this round singles out below (S11.LOGPAIR/WHENITRUNS) —
+the two methods agree in order of magnitude.
+
+### Tiny-input isolation, per family (avg of 2 samples; families = the engine's own section-comment
+groupings)
+
+| Family (§, rule ids) | avg time | spawns (tiny) | implied ms/spawn |
+|---|---:|---:|---:|
+| F6 — §4 ADR governance (S4.ONEFILE/INDEX/SECTIONS/NEGATIVE/APPEND) | 2360.3 ms | 42 | 56.2 |
+| F8 — §9 sprint-file (S9.TWOFILES/LOGDIR/PLANFROZEN/SCOPECHANGE/VERIFYCLAUSE) | 1868.9 ms | 26 | 71.9 |
+| F9 — §10 learning-governance (S10.FOURBUCKETS/PROMOTION/TDAGING/PROMOTEREVIEW) | 1264.2 ms | 22 | 57.5 |
+| F11 — §11b (S11.SPRINT/LOGPAIR/CHANGELOG/WHENITRUNS) | 1259.8 ms | 16 | 78.7 |
+| F3 — §13 attestation (S13.TRAILERS/OWNCOMMIT/EVIDENCESHA/AGREE/UNSIGNEDCLAIM) | 1154.0 ms | 16 | 72.1 |
+| F12 — §12 git boundary (S12.SECRETS/BACKUPS/DESIGNSRC/GENERATED) | 1146.1 ms | 15 | 76.4 |
+| F5 — §1/§3 ownership-header (S3.SCHEMA/S1.LAW2/S1.LAW3/S3.AGENTS) | 1138.8 ms | 17 | 67.0 |
+| F7 — §2 core-file (S2.F-FILE/S2.R-PLACEMENT) | 1104.8 ms | 15 | 73.7 |
+| F10 — §11a (S11.TDDELETE/TODOCAP/LEARNINGS/BACKLOG) | 874.9 ms | 16 | 54.7 |
+| F2 — §2/§6 tier doc-set (S6.BASE/BACKEND/MEDIUM/MULTISVC, S2.F-TIER) | 827.2 ms | 5 | 165.4* |
+| F4 — §9 gates-signed (S9.GATESWELLFORMED/GATESABSENT) | 367.8 ms | 5 | 73.6 |
+| F1 — §2 README footer (S2.R-README) | 309.9 ms | 6 | 51.6 |
+| **sum of families** | **13,676.7 ms** | **201** | |
+| **full-engine wall clock (tiny fixture, 100-rule spec)** | **16,150 / 16,813 ms** (2 samples) | | |
+
+\* F2's per-spawn figure is inflated by a measurement artifact recorded under Caveats — S6.BACKEND,
+S6.MEDIUM and S6.MULTISVC produced **zero** external spawns on this fixture (no `.conformance-tier`
+declared, so each takes an early `note`-and-return branch) yet still cost 85–96 ms of measured wall
+time apiece.
+
+**Reconciliation (tiny input).** 13,676.7 ms of dispatched-rule time against a 16,150–16,813 ms total —
+a 2,474–3,136 ms gap. Accounted for, not folded in: ~55 non-dispatched rules' `note()` calls (judgment
+/excluded/restated marks), the spec read (~150 ms per the driver's own TD-073 comment), two `cd`/`pwd`
+resolutions, and — the largest identified piece — **this round's own instrumentation**: 2 `date`
+spawns × 45 dispatched rules = 90 extra process forks, at Round 4's own measured 21.1 ms bare-fork
+floor ≈ 1.9 s. That alone accounts for 61–77% of the gap.
+
+### Real-scale attribution, per family (this repository, single clean run, full 100-rule spec)
+
+| Family | real-scale time | rank |
+|---|---:|:--|
+| F11 — §11b (S11.SPRINT/LOGPAIR/CHANGELOG/**WHENITRUNS**) | **84,715.6 ms** | 1st — not named by Round 4 |
+| F6 — §4 ADR governance | **72,134.5 ms** | 2nd — matches Round 4's `_own_scan`+`S4.APPEND` axis |
+| F5 — §1/§3 ownership-header (**S1.LAW2**) | **56,017.5 ms** | 3rd |
+| F9 — §10 learning-governance (**S10.TDAGING**) | **37,443.8 ms** | 4th |
+| F2 — §2/§6 tier doc-set | 12,075.2 ms | 5th |
+| F10 — §11a | 6,467.3 ms | 6th |
+| F8 — §9 sprint-file | 5,314.8 ms | 7th |
+| F12 — §12 git boundary | 2,240.4 ms | 8th |
+| F3 — §13 attestation | 1,624.4 ms | 9th |
+| F7 — §2 core-file | 1,430.1 ms | 10th |
+| F4 — §9 gates-signed | 1,110.9 ms | 11th |
+| F1 — §2 README footer | 592.0 ms | 12th |
+| **sum of all 12 families (= all 45 dispatched rules, exact partition)** | **281,166.6 ms** | |
+| **full-engine wall clock (this repo, single run, exit 0)** | **287,406 ms** | |
+
+**Reconciliation (real scale).** 281,166.6 ms of dispatched-rule time against 287,406 ms total — a
+6,239.4 ms (2.2%) gap, smaller in proportion than the tiny-input gap, consistent with per-rule dispatch
+overhead being a roughly fixed cost that shrinks as a share once real work dominates. Attributed to the
+same categories as above (non-dispatched notes, spec read, this round's 90-spawn instrumentation
+overhead, final report/coverage lines) — not individually re-measured at real scale, since the tiny-input
+pass already isolates and bounds that overhead.
+
+**The two dominant real-scale rules inside F11 were verified in isolation**, because they are the
+biggest departure from Round 4's picture (below): re-running the same instrumented copy with the spec
+filtered to *only* `S11.LOGPAIR` and `S11.WHENITRUNS` (`QAT_ONLY` env filter added to the temp copy, same
+pure-addition-diff discipline) against this repository gave `S11.LOGPAIR: 31,947.1 ms`,
+`S11.WHENITRUNS: 44,137.7 ms` — 76,084.8 ms isolated vs. 75,578.1 ms embedded in the full 45-rule run,
+agreeing within 0.7%. Not a scheduling artifact of dispatch order.
+
+### Findings
+
+- **The dominant families differ by which axis you measure.** At **tiny-input** scale (per-invocation
+  floor), **F6 — §4 ADR governance is dominant at 2,360.3 ms / 42 spawns**, with F8 (§9 sprint-file,
+  1,868.9 ms/26 spawns) and F9 (§10 learning-governance, 1,264.2 ms/22 spawns) next. At **real scale**
+  on this repository, the ranking inverts at the top: **F11 — §11b is now dominant at 84,715.6 ms**,
+  ahead of F6 (72,134.5 ms), F5/§1-§3 ownership (56,017.5 ms, almost entirely `S1.LAW2`/`_own_scan`),
+  and F9/§10 learning-governance (37,443.8 ms, almost entirely `S10.TDAGING`). These four families sum
+  to **250,311.4 ms — 89% of the real-scale total** — the other eight sum to 30,855.2 ms (11%), named
+  individually in the table above rather than folded into "the rest."
+- **F11 (§11 retention family, specifically `S11.LOGPAIR` at 26,971.4 ms and `S11.WHENITRUNS` at
+  48,606.5 ms) is this round's central new finding — a high-repeated-process-spawning family V3 §43's
+  own criterion 3 names, previously unattributed by Round 4.** Both loop over
+  `_s11_archived_plans` — 83 archived sprint plans in this repository — and both call multiple `git`
+  subprocesses (`rev-parse`, `log`, `merge-base --is-ancestor` for WHENITRUNS; two `_s11_archived_at`
+  lookups plus `_s11_log_predated_archive` for LOGPAIR) **per archived sprint**
+  (`scripts/lib/conformance-engine.sh:2581–2723`), the identical one-process-per-item shape L-144 names,
+  at git's ~150–250 ms real-scale per-spawn cost (Round 4's own figure) rather than awk/sed/grep's
+  ~55–80 ms (this round's tiny-input figures above) — which is *why* two rules with modest item counts
+  (83, not hundreds) still cost tens of seconds each.
+- **This is not fully reconciled against Round 4, and that gap is reported rather than resolved.**
+  Round 4's own arithmetic (176.6 s leg total − 57.16 s `_own_scan` − 29.39 s `S4.APPEND` = "~90 s"
+  remaining, of which its 8 named rules summed to ~86.0 s) implies **≤4 s for all ~35 other dispatched
+  rules combined** — including S11.LOGPAIR and S11.WHENITRUNS. This round measures those two rules
+  alone, on the same code (`git diff 81a31fe HEAD -- scripts/lib/conformance-engine.sh` touching
+  `_s11_archived_at`/`assert_S11_LOGPAIR`/`assert_S11_WHENITRUNS`/`_s11_archived_plans`/
+  `_s11_log_predated_archive` is **empty** — byte-identical since Round 4's own commit) and on a nearly
+  unchanged corpus (120 archived files at Round 4's commit `81a31fe`, 122 now), at **76,084.8 ms
+  combined — roughly 19× Round 4's implied ceiling for its entire unnamed remainder.** Two isolation
+  reruns above rule out a dispatch-order artifact. The most likely explanation, stated as inference: 
+  Round 4's "~4 s" was never itself an individual measurement of the remaining ~35 rules — it was the
+  arithmetic remainder of one leg-total figure minus ten explicitly-timed rules, and Round 4's own text
+  already flags its own accounting as naming "only some" families and its spawn counts as "a lower
+  bound." This round's task was explicitly to close that gap (see task brief); it closes two more of
+  the previously-unnamed rules and finds them large, rather than confirming Round 4's implied ceiling.
+  Left unresolved and named as a caveat, not papered over.
+- **Below process-spawn count, there is a second, smaller mechanism: a per-rule dispatch floor of
+  ~85–96 ms even at ZERO external spawns**, visible on the tiny fixture where `S6.BACKEND`, `S6.MEDIUM`
+  and `S6.MULTISVC` each cost 85–96 ms of measured time while the empirical spawn counter recorded
+  **zero** forks for all three (verified by inspecting the raw `sh -x` trace segment directly — every
+  line inside the boundary is a shell builtin: `[`, `case`, `printf`). A synthetic control (a
+  builtin-only function called 100× in a tight loop) measured 0.4 ms/call, ruling out bash function-call
+  overhead itself as the explanation — the ~90 ms is specific to these three calls, not a general bash
+  floor. Not chased further this round (out of scope for an S-size task); named here rather than
+  silently absorbed into F2's per-spawn average, which is why F2's implied ms/spawn (165.4) is flagged
+  with an asterisk above rather than trusted at face value.
+- **The engine's stated caching ("walk once, then filter") holds up empirically, not just as a design
+  comment.** The xtrace-based spawn counter recorded **zero new spawns** for `S6.BACKEND`/`MEDIUM`/
+  `MULTISVC` after `S6.BASE`'s first call populates `_s2_tier_rows`'s cache, and zero new spawns for
+  `S13.OWNCOMMIT`/`EVIDENCESHA`/`AGREE`/`UNSIGNEDCLAIM` after `S13.TRAILERS`'s first call populates
+  `_att_scan`'s cache — all 16 of F3's spawns and all but 5 of F2's happen exactly once, on the first
+  rule that needs them, exactly as the source comments (`scripts/lib/conformance-engine.sh:405–407`,
+  `:702–708`) claim.
+- **Round 4's individually-named rules broadly reproduce, with normal run-to-run variance, not a
+  contradiction.** `S1.LAW2` 54.8 s here vs. 57.16 s there (−4%); `S4.APPEND` 27.9 s vs. 29.39 s (−5%);
+  `S4.INDEX` 2.4 s vs. 2.8 s (−14%) — all within the kind of spread Round 1's own caveat already named.
+  `S10.TDAGING` (35.2 s vs. 27.7 s, +27%), `S4.SECTIONS` (19.9 s vs. 15.2 s, +31%), `S4.NEGATIVE`
+  (13.4 s vs. 7.6 s, +76%), `S6.BASE` (11.4 s vs. 6.5 s, +75%), `S11.SPRINT` (8.3 s vs. 5.7 s, +45%) and
+  `S11.TDDELETE` (6.0 s vs. 4.3 s, +40%) drifted up more than that — plausibly ordinary host/corpus
+  variance rather than anything structural, since none of these touch the F11 code path this round
+  flags as genuinely new; not chased further, recorded honestly as drift rather than smoothed away.
+
+### Recommendation (round 5)
+
+**Do not choose Sprint C's first family here — that stays V3 §43's call, made at Sprint C's own G2.**
+What this round adds to that decision: on **expensive-today** and **high-repeated-process-spawning**
+(§43 criteria 1 and 3), the strongest real-scale candidates are, in descending order, **F11's §11
+retention pair** (`S11.LOGPAIR` + `S11.WHENITRUNS`, 76.1 s combined, ~83 git-spawns-per-item over 83
+archived sprints — this round's own finding, previously unnamed), **F6's §4 ADR family** (72.1 s,
+already Round 4's leading candidate and confirmed again here), **`S1.LAW2`/§1's ownership scan** (54.8 s,
+already migrated to a single cached awk-per-doc shape, so its remaining cost is closer to a corpus-size
+floor than a spawn-count defect), and **`S10.TDAGING`/§10** (35.2–27.7 s across two measurements). §43's
+other two criteria — future dashboard relevance and representative architecture needs — are outside
+what a timing measurement can answer and are left to Sprint C's own G2 discussion, as V3 §43 requires.
+This round's tiny-input table is offered as the complementary per-invocation-floor view for whichever
+family is chosen, since real-scale cost and per-invocation cost do not rank the same families first.
+
+### Caveats recorded at the time
+
+- **Every absolute number in this round is host-specific** (Windows 11 / git-bash — `sh` resolved to
+  bash 5.2.37 in POSIX mode, confirmed by direct check), the same caveat Rounds 1–4 carry forward.
+- **The tiny fixture is a purpose-built throwaway repo, not the retained eval corpus.** Its exact item
+  counts are recorded above so the tiny-input table is reproducible and interpretable rather than a
+  black box; it is not committed to this repository and was built and discarded in the OS temp
+  directory.
+- **The real-scale run is a single sample**, not two — matching Round 4's own precedent for its
+  real-repo attribution pass, not Rounds 1–3's two-sample standard. A first attempt was discarded after
+  discovering contamination from an orphaned killed process still appending to the same log path;
+  the reported numbers come from the clean rerun only, and the contaminated file was rotated aside
+  rather than edited or silently merged in.
+- **Real-scale spawn counts are not individually re-counted for all 12 families this round** — only the
+  tiny-input spawn counts are empirical for every family; the real-scale spawn counts implied by
+  Round 4's own git-cost figure (~150–260 ms/spawn) and this round's own source-reading are given only
+  for the two families this round singles out (S11.LOGPAIR/WHENITRUNS) and for the families Round 4
+  already spawn-counted (`_own_scan`, `S4.APPEND`). Named as a gap rather than silently assumed
+  complete.
+- **The Round 4 vs. Round 5 discrepancy on `S11.LOGPAIR`/`S11.WHENITRUNS` (≤4 s implied vs. 76.1 s
+  measured) is reported, not resolved.** Code is byte-identical since Round 4's commit and the archived
+  corpus is nearly unchanged (120 → 122 files); the likely explanation is that Round 4's "~4 s" figure
+  was an arithmetic remainder rather than an individual measurement, but this round did not go back and
+  re-instrument Round 4's exact method at Round 4's exact commit to settle it definitively — flagged as
+  the honest limit of this round's evidence, per this task's own "a gap you cannot explain is the
+  finding" instruction.
+- **This round modified nothing in `scripts/`, `evals/`, `packages/`, `apps/`, or `test/`.** All three
+  instrumented copies (per-rule timing, xtrace spawn-marker, and the `QAT_ONLY`-filtered isolation copy)
+  live under a scratch temp directory outside this repository; each `diff` against the shipped
+  `scripts/lib/conformance-engine.sh` was verified as a pure, small addition (3 lines for the timing
+  copy) before being trusted, and the shipped file itself was never touched. `sh scripts/lib/check-doc-caps.sh` was run clean before this round's edit.
+- **The "~85–96 ms zero-spawn floor" finding (S6.BACKEND/MEDIUM/MULTISVC) is reported and not explained
+  beyond ruling out bash function-call overhead as the cause.** Left as an open, named observation
+  rather than a resolved mechanism — consistent with this file's own practice of recording what was
+  seen even when the why is incomplete.

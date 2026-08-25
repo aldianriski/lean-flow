@@ -124,10 +124,10 @@ legs and named only some engine families.
 families named with their numbers.
 
 **DoD:**
-- [ ] Each rule family is timed **in isolation against a tiny input**, so per-invocation overhead is not masked by workload — *Verify: the recorded method, per L-144/L-147's prescribed diagnostic*
-- [ ] § Round 5 matches Rounds 1–4's established shape and edits none of them — *Verify: `git diff` shows insertions only, apart from the frontmatter `last_updated` its own update_trigger requires*
-- [ ] The dominant families are named with numbers, and the remainder is accounted for rather than folded into "the rest" — *Verify: the round's own totals reconcile against a full-engine run*
-- [ ] Ordering is **not** frozen here — *Verify: the round recommends, and explicitly leaves the first-family choice to Sprint C's G2 (V3 §43)*
+- [x] Each rule family is timed **in isolation against a tiny input**, so per-invocation overhead is not masked by workload — *Verify: the recorded method, per L-144/L-147's prescribed diagnostic*
+- [x] § Round 5 matches Rounds 1–4's established shape and edits none of them — *Verify: `git diff` shows insertions only, apart from the frontmatter `last_updated` its own update_trigger requires*
+- [x] The dominant families are named with numbers, and the remainder is accounted for rather than folded into "the rest" — *Verify: the round's own totals reconcile against a full-engine run*
+- [x] Ordering is **not** frozen here — *Verify: the round recommends, and explicitly leaves the first-family choice to Sprint C's G2 (V3 §43)*
 
 ### T6 — Close `check-review-depth.sh`'s absence blind spot `[size: M · risk: med · class: execution · HITL]`
 Layers: `scripts/lib/check-review-depth.sh` · `evals/run-review-depth-fixtures.sh` · possibly `scripts/qa-check.sh` (leg 2b wiring)
