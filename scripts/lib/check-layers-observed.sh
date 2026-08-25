@@ -116,6 +116,12 @@ is_governance_commit() {   # <sha> -> 0 if EVERY changed file is a governance ar
     _any=1
     case "$_gf" in
       TODO.md|TECH-DEBT.md|CHANGELOG.md|docs/LEARNINGS.md) ;;
+      # ASSUMPTION, stated because it is load-bearing and unenforced: both trees are doc-only by
+      # convention -- every file under them is `.md` today except docs/research/storm/report-
+      # template.html. The prefix is safe only while that holds. If an executable or a checker ever
+      # lands under either tree, a real code change could ride along beside it in one commit and be
+      # exempted. Narrow these arms (or add a guard) at that point, not before -- tightening now
+      # would only add noise, and noise is what this change exists to remove.
       docs/epic/*|docs/research/*) ;;
       *) return 1 ;;
     esac
