@@ -17,6 +17,15 @@
 # with governance:high work and no review record. Case 8 is governance, case 9 is behaviour -- kept as
 # separate fixtures on purpose, same reasoning as the governance/material split above.
 #
+# Cases 11-13 (TD-092, SPRINT-086 T4) guard the SAME absence branch reached through the ATTENDED
+# carrier. Case 8/9's rollup line (`^Tn · <state> · ...`) is night-run.md Part 4's unattended
+# contract; every sprint this repository runs is attended, and SPRINT-084's own live log proved the
+# rollup branch unreachable there (T6's own surprise entry). The `consequence · Tn · behaviour:X ·
+# governance:Y` line (review-scoping.md § Two dimensions) is the structured carrier attended entries
+# now write. Case 11 is governance, case 12 is behaviour, case 13 is the load-bearing low/low control
+# -- without it, a checker that FAILs on any `consequence ·` line lacking a `review ·` line, whatever
+# it classifies, would be indistinguishable from one that routes on consequence.
+#
 # Dependency-free POSIX sh, no git needed. Run bare: sh evals/run-review-depth-fixtures.sh
 set -u
 
@@ -85,6 +94,21 @@ run_case_anywhere "absent-review-behaviour-material-fails" 1 "review-depth-mater
 # --- case 10: no arguments -> the denominator note, never a silent pass ---------------------------
 run_case_anywhere "no-input-reports-nothing-verified" 0 "nothing verified" -- \
   sh "$checker"
+
+# --- case 11: attended schema, consequence line names governance:high, no review line -> FAIL -----
+# TD-092's motivating shape: SPRINT-084's own live log carries this exact pattern (see § Round of
+# proof in the sprint's Execution Log) and used to exit 0 because it has no `^Tn ·` rollup line at
+# all -- attended entries never write one.
+run_case_anywhere "attended-absent-governance-high-fails" 1 "review-depth-governance-absent" -- \
+  sh "$checker" "$fx/attended-absent-review-governance-high/docs/sprint/logs/SPRINT-958-attended-absent-governance.md"
+
+# --- case 12: attended schema, consequence line names behaviour:material, no review line -> FAIL --
+run_case_anywhere "attended-absent-behaviour-material-fails" 1 "review-depth-material-absent" -- \
+  sh "$checker" "$fx/attended-absent-review-behaviour-material/docs/sprint/logs/SPRINT-959-attended-absent-material.md"
+
+# --- case 13: attended schema, consequence line names low/low, no review line -> PASS (control) ---
+run_case_anywhere "attended-consequence-low-passes" 0 "nothing to verify" -- \
+  sh "$checker" "$fx/attended-consequence-low-passes/docs/sprint/logs/SPRINT-960-attended-low.md"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "REVIEW-DEPTH FIXTURES: all green"; else echo "REVIEW-DEPTH FIXTURES: at least one FAIL"; fi

@@ -67,6 +67,36 @@
 # rollup line ever saying so, and no dependency-free shell script can see that. What this closes is the
 # blind spot TD-085 named: when the record DOES say so, the checker no longer looks away.
 #
+# --- TD-092: the rollup line above is the UNATTENDED carrier only ---------------------------------
+# `^T[0-9]+ · <state> · ...` is night-run.md Part 4's frozen contract, written by an unattended run.
+# Every sprint this repository actually runs is attended, and attended entries are
+# `### DATE | event | Tn -- summary` headers with the classification stated in prose -- so the rollup
+# check above was proven correct and unreachable in the same session (SPRINT-085 T6's own surprise
+# entry; SPRINT-084's live log reproduced the miss on itself). Tested directly, not assumed: copying
+# SPRINT-084's archived log to a live path still printed `no review line -- nothing to verify`, exit 0,
+# with real `governance:high` work in the file.
+#
+# The fix is a schema, not a better pattern (matching the classification stated in prose is the exact
+# substring-heuristic shape that produced TD-085's siblings and fails green -- L-108). Attended entries
+# now carry a second structured carrier, defined once in `review-scoping.md` § Two dimensions and
+# written at the moment review depth is decided -- independent of whether a review then fires, which is
+# what makes it reachable even when the review itself is never logged:
+#
+#   consequence · Tn · behaviour:low|material · governance:low|high
+#
+# Unlike the rollup line, this schema needs no backtick-quoting discipline to stay un-matchable by
+# prose -- its own fixed field positions ARE the anchor. It is matched as a *whole line*
+# (`^consequence · T[0-9]+ · behaviour:(low|material) · governance:(low|high)$`), not a prefix, so a
+# sentence that happens to start a line with the word "consequence" still cannot trip it.
+#
+#   no `review ·` line anywhere for Tn, but a `consequence · Tn · ...` line for Tn records
+#   `governance:high`                    -> FAIL review-depth-governance-absent (same named finding
+#                                            as the rollup branch -- one failure class, two carriers).
+#   no `review ·` line anywhere for Tn, but a `consequence · Tn · ...` line for Tn records
+#   `behaviour:material`                 -> FAIL review-depth-material-absent.
+#   consequence line records low/low and no review line                -> nothing to verify (correct;
+#                                                                          the cheap path earned it).
+#
 # --- Ruling: the archive-skip half (TD-085's other named gap) -------------------------------------
 # RULED: archived paths stay unread by this checker; recording a review INTO an archived log is what's
 # forbidden, not the skip itself. `*/archive/*` is a shared convention across three checkers
@@ -118,6 +148,26 @@ for lg in "$@"; do
     esac
   done <<EOF
 $(grep -E '^T[0-9]+ · ' "$lg" 2>/dev/null)
+EOF
+
+  # TD-092 absence check: the attended-mode carrier. Each `consequence ·` line is matched as a whole
+  # line, not a prefix, so this cannot be tripped by a paragraph that merely opens with the word.
+  while IFS= read -r cline; do
+    [ -n "$cline" ] || continue
+    ctid=$(printf '%s' "$cline" | sed -E 's/^consequence · (T[0-9]+) ·.*/\1/')
+    grep -qE "^review · $ctid · " "$lg" 2>/dev/null && continue
+    case "$cline" in
+      *' governance:high'*)
+        bad "review-depth-governance-absent: $lg $ctid's consequence line records governance:high and no review · line was ever appended for $ctid -- review was owed and silence is not a clean record"
+        filefail=1 ;;
+    esac
+    case "$cline" in
+      *' behaviour:material'*)
+        bad "review-depth-material-absent: $lg $ctid's consequence line records behaviour:material and no review · line was ever appended for $ctid -- review was owed and silence is not a clean record"
+        filefail=1 ;;
+    esac
+  done <<EOF
+$(grep -E '^consequence · T[0-9]+ · behaviour:(low|material) · governance:(low|high)$' "$lg" 2>/dev/null)
 EOF
 
   if ! grep -qE '^review · ' "$lg" 2>/dev/null; then

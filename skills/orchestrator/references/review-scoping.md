@@ -127,6 +127,25 @@ the self-review floor:
 same reason: defaulting down is what produces the silent pass this routing exists to stop. Escalating a
 truly trivial diff costs one cheap `sonnet` pass; skipping a governance change costs the guarantee.
 
+**Record the classification structurally, at this lookup, before deciding what fires (TD-092).** This
+routing decision used to leave only one trace — the `review · Tn · <depth> · behaviour:… ·
+governance:…` line (night-run.md Part 4), and that line is written *only if a review then happens*.
+Every sprint this repository runs is attended, and an attended entry's classification otherwise lives
+in prose next to it — which `check-review-depth.sh` correctly refuses to match (a markdown corpus
+discusses its own formats; a substring scan over prose fails green, L-108). So append one more line to
+the Execution Log the moment this table is consulted for a task, independent of what depth is chosen —
+self-review, a scoped reviewer, or nothing dispatched at all:
+
+```
+consequence · Tn · behaviour:low|material · governance:low|high
+```
+
+This is the carrier `check-review-depth.sh`'s absence branch reads for attended entries — a task whose
+consequence is recorded here as `governance:high` or `behaviour:material` and never gets a matching
+`review ·` line FAILs named (`review-depth-governance-absent` / `review-depth-material-absent`),
+exactly as the unattended `Tn · <state> ·` rollup line already does for a night run. Always append it,
+even on the self-review floor — the low/low case is the control that proves the schema doesn't over-fire.
+
 Keep `/security-review` a **separate uncontaminated pass** — but only when there *is* a security
 surface. Folding it into a general review when there's no surface just burns tokens; running it in the
 same session as the code review when there *is* one contaminates the context. The skip table picks the

@@ -92,6 +92,11 @@ A pass's worst finding **per axis** feeds **one bounded builder retry** — auto
 pass, re-reviewed once; whatever is still open goes to the owner (the revise loop). Unattended, it fires only under
 **ADR-022's mechanical-trigger carve-out** (named-check FAIL + declared repo policy; judgment findings always park).
 
+**Record the skip-table lookup itself, not only its outcome** — append `consequence · Tn · behaviour:… ·
+governance:…` to the Execution Log the moment the table above is consulted, whatever depth is then chosen
+(TD-092). Otherwise a governance/material task whose review never gets logged is unreachable to
+`check-review-depth.sh` in attended mode, which is every mode this repo runs.
+
 Full routing · skip table · the Standards-vs-Spec axes · the revise loop · adversarial floor · self-review checklist → `${CLAUDE_SKILL_DIR}/references/review-scoping.md`.
 
 ## Red flags
