@@ -12,6 +12,10 @@
 # record would be indistinguishable from one that routes on consequence -- and the correction would
 # have swapped a silent pass for a blanket block. Cases 1 and 4 differ in exactly one token.
 # Case 5 guards the checker's per-line reading: one log, several tasks, one violation.
+# Cases 8-9 (TD-085, SPRINT-085 T6) guard the absence branch: a file with ZERO `review ·` lines used
+# to read as "nothing to verify" unconditionally, which is exactly what let SPRINT-082 close 38 of 38
+# with governance:high work and no review record. Case 8 is governance, case 9 is behaviour -- kept as
+# separate fixtures on purpose, same reasoning as the governance/material split above.
 #
 # Dependency-free POSIX sh, no git needed. Run bare: sh evals/run-review-depth-fixtures.sh
 set -u
@@ -63,7 +67,22 @@ else
   fail=1
 fi
 
-# --- case 7: no arguments -> the denominator note, never a silent pass ---------------------------
+# --- case 8: no review line at all, rollup line names governance:high -> FAIL, named -------------
+# TD-085's absence branch: the old checker read zero `review ·` lines as "nothing to verify" and
+# exited 0, which is exactly what SPRINT-082 (38 of 38) and SPRINT-084's own live log did with
+# governance:high work on the books. The fixture's own narrative discusses governance impact in plain
+# sentences on purpose and never spells the marker as backtick-quoted data outside the one rollup line
+# this asserts on, so a naive whole-file substring scan for the words would false-positive here first.
+run_case_anywhere "absent-review-governance-high-fails" 1 "review-depth-governance-absent" -- \
+  sh "$checker" "$fx/absent-review-governance-high/docs/sprint/logs/SPRINT-956-absent-governance.md"
+
+# --- case 9: no review line at all, rollup line names behaviour:material -> FAIL, named -----------
+# The behaviour half of the absence branch, kept separate from case 8 the same way the original
+# self-review pair split governance from behaviour: either dimension alone must trip this.
+run_case_anywhere "absent-review-behaviour-material-fails" 1 "review-depth-material-absent" -- \
+  sh "$checker" "$fx/absent-review-behaviour-material/docs/sprint/logs/SPRINT-957-absent-material.md"
+
+# --- case 10: no arguments -> the denominator note, never a silent pass ---------------------------
 run_case_anywhere "no-input-reports-nothing-verified" 0 "nothing verified" -- \
   sh "$checker"
 

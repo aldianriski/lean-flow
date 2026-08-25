@@ -23,7 +23,8 @@
 # NOT whether the review was any good, and not whether the classification was correct. The guarded
 # failure is a review depth that contradicts the consequence recorded beside it:
 #
-#   no `review ·` line at all            -> nothing to verify (pre-dates this record, or not yet run).
+#   no `review ·` line at all            -> see TD-085 below: FAIL if a task's own rollup line names
+#                                           governance:high/behaviour:material, else nothing to verify.
 #   depth other than self-review         -> PASS. An independent pass fired; this check has no opinion
 #                                           on which one, that is § Scale depth's job.
 #   self-review + behaviour:low
@@ -33,6 +34,48 @@
 #   self-review + either class missing   -> FAIL review-depth-unclassified. A missing marker is not a
 #     claim that the change was trivial -- same reasoning as `no-gate-risk-unmarked` (ADR-033): absence
 #     read as consent is how the defect returns silently, for every run that simply forgot the marker.
+#
+# --- TD-085: the absence branch itself was the blind spot -----------------------------------------
+# The block above only ever grades a `review ·` line that EXISTS. A governance:high/behaviour:material
+# task that closes with no `review ·` line at all used to fall straight through to "nothing to verify"
+# and exit 0 -- SPRINT-082 closed 38 of 38 that way, and SPRINT-084's own live log reproduced it on
+# itself. "No review line" is not evidence of "nothing owed"; it is silence, and silence about a
+# governance/material task is exactly the shape `review-depth-unclassified` already refuses one line
+# up (a missing marker is not a claim of low impact).
+#
+# The one other place a task's consequence class gets written down, independent of a `review ·` line,
+# is its own rollup/state line -- `Tn · <state> · <unblock condition / next action>`, the format
+# night-run.md Part 4 already defines and freezes. Real precedent for exactly this shape recording a
+# classification while review was owed and not yet done:
+#   docs/sprint/archive/logs/SPRINT-082-foundation-hardening.md:283
+#     T5 · parked-hitl · review parked: `governance:high`, no independent reviewer available this session
+#
+#   no `review ·` line anywhere for Tn, but a `Tn · <state> · ...` line for Tn backtick-quotes
+#   `governance:high`                    -> FAIL review-depth-governance-absent.
+#   no `review ·` line anywhere for Tn, but a `Tn · <state> · ...` line for Tn backtick-quotes
+#   `behaviour:material`                 -> FAIL review-depth-material-absent.
+#   no `review ·` line and no rollup line naming either class, for any Tn
+#                                         -> nothing to verify (genuinely no evidence to act on).
+#
+# The rollup line is matched anchored at column 1 (`^T[0-9]+ · `), same discipline as `^review · `,
+# because sprint logs discuss both markers in prose constantly -- a paragraph explaining *why* a task
+# is governance:high is not a record that it IS, and must not match. The backtick-quoting requirement
+# is a second anchor on top of the line anchor: real usage always writes the literal value quoted
+# (`` `governance:high` ``), never bare, when recording it as data rather than discussing the concept.
+#
+# This is a heuristic, not an oracle -- a task can be governance:high with neither a review line nor a
+# rollup line ever saying so, and no dependency-free shell script can see that. What this closes is the
+# blind spot TD-085 named: when the record DOES say so, the checker no longer looks away.
+#
+# --- Ruling: the archive-skip half (TD-085's other named gap) -------------------------------------
+# RULED: archived paths stay unread by this checker; recording a review INTO an archived log is what's
+# forbidden, not the skip itself. `*/archive/*` is a shared convention across three checkers
+# (check-system-verify-block.sh, check-night-run-rollup.sh, this one) -- making archived paths readable
+# by name would be a convention change touching all three, out of this task's Layers, and would still
+# leave the other two blind to whatever this one newly reads. The cheaper, sufficient fix: a review
+# owed on a task belongs on the LIVE log, appended before the sprint archives -- never appended to the
+# archive copy afterward, which is what put SPRINT-082's four review lines somewhere this checker (by
+# design, matching its siblings) will never look. Filed here rather than left implicit.
 #
 # Usage: sh check-review-depth.sh <sprint-log.md> [<sprint-log.md> ...]
 # Archived logs are skipped by path (docs/sprint/archive/) -- closed history is not re-litigated, same
@@ -52,15 +95,39 @@ for lg in "$@"; do
   [ -f "$lg" ] || { bad "review depth: file not found: $lg"; continue; }
   case "$lg" in */archive/*) continue ;; esac
 
+  filefail=0
+
+  # TD-085 absence check: a task's own rollup line can record `governance:high` /
+  # `behaviour:material` while no `review ·` line was ever appended for it -- review owed, and the
+  # record is silent rather than clean. Runs for every task with a rollup line, whether or not the
+  # file holds review lines for OTHER tasks, so a partially-reviewed log can't hide the one task that
+  # wasn't.
+  while IFS= read -r rline; do
+    [ -n "$rline" ] || continue
+    rtid=$(printf '%s' "$rline" | sed -E 's/^(T[0-9]+) ·.*/\1/')
+    grep -qE "^review · $rtid · " "$lg" 2>/dev/null && continue
+    case "$rline" in
+      *'`governance:high`'*)
+        bad "review-depth-governance-absent: $lg $rtid's rollup line records \`governance:high\` and no review · line was ever appended for $rtid -- review was owed and silence is not a clean record"
+        filefail=1 ;;
+    esac
+    case "$rline" in
+      *'`behaviour:material`'*)
+        bad "review-depth-material-absent: $lg $rtid's rollup line records \`behaviour:material\` and no review · line was ever appended for $rtid -- review was owed and silence is not a clean record"
+        filefail=1 ;;
+    esac
+  done <<EOF
+$(grep -E '^T[0-9]+ · ' "$lg" 2>/dev/null)
+EOF
+
   if ! grep -qE '^review · ' "$lg" 2>/dev/null; then
-    note "review depth: $lg has no review line -- nothing to verify"
+    [ "$filefail" -eq 0 ] && note "review depth: $lg has no review line -- nothing to verify"
     continue
   fi
 
   # Examine each self-review record on its own line: one log holds many tasks, and a governance
   # violation on T3 must not be masked by an honest self-review on T1 (the whole-file grep that would
   # do exactly that is the bug this loop exists to avoid).
-  filefail=0
   while IFS= read -r line; do
     [ -n "$line" ] || continue
     tid=$(printf '%s' "$line" | sed -E 's/^review · ([^ ]+) ·.*/\1/')
