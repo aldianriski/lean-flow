@@ -1,10 +1,12 @@
 import { describe, expect, test } from "bun:test";
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { tokenize } from "./tokenizer.ts";
-import { formatRuleRow, rulesInSection, sectionsOf, toStandardRule } from "./spec-reader.ts";
+import { allRules, formatRuleRow, rulesInSection, sectionsOf, toStandardRule } from "./spec-reader.ts";
 
 const SPEC_PATH = fileURLToPath(new URL("../../../spec/STANDARD.md", import.meta.url));
+const SHELL_READER_PATH = fileURLToPath(new URL("../../../scripts/lib/read-spec-rules.sh", import.meta.url));
 
 // A helper, not a describe-level `const` -- computing this outside a `test()` callback runs it at
 // collection time. A throw there surfaces as bun's own "Unhandled error between tests" / "N error"
@@ -154,5 +156,82 @@ describe("toStandardRule — lifts a raw row into the H04 domain model", () => {
   test("a mark the Standard does not define throws -- that is a parse defect, not a value to paper over", () => {
     const row = { id: "S1.X", level: "Attested", mark: "automatic", loc: { file: "f.md", line: 1 } };
     expect(() => toStandardRule(row, 1, "f.md")).toThrow();
+  });
+});
+
+// SPRINT-085 T2 -- full-document parity. `loadAllRows`/`loadShellRows` are helpers, not describe-level
+// `const`s, for the same reason `loadS13Rows` above is one: a throw at collection time drops the whole
+// block silently instead of reddening one test.
+function loadAllRows() {
+  const doc = tokenize(readFileSync(SPEC_PATH, "utf8"), SPEC_PATH);
+  return allRules(doc);
+}
+
+/** The independent oracle: `read-spec-rules.sh`, run fresh, never a copied-in literal. */
+function loadShellRows(): string[] {
+  const out = execFileSync("sh", [SHELL_READER_PATH, SPEC_PATH], { encoding: "utf8" });
+  return out.split("\n").filter((l) => l !== "");
+}
+
+describe("allRules -- full-document parity against read-spec-rules.sh (SPRINT-085 T2)", () => {
+  test("emits exactly 100 rows -- §14's own published total (ADR-034's frozen denominator)", () => {
+    // Independent source of truth: the literal from ADR-034 / §14's `classified` row, not
+    // recomputed the way the code counts (tdd anti-tautology rule).
+    expect(loadAllRows().length).toBe(100);
+  });
+
+  test("rows are in strict document order across section boundaries, not just within one section", () => {
+    const rows = loadAllRows();
+    for (let i = 1; i < rows.length; i++) {
+      expect(rows[i].loc.line).toBeGreaterThan(rows[i - 1].loc.line);
+    }
+  });
+
+  test("agrees with the shell reader ROW BY ROW -- a mismatch names its row (EPIC-014 Closed-when: never in aggregate)", () => {
+    const actual = loadAllRows().map(formatRuleRow);
+    const expected = loadShellRows();
+
+    // The aggregate check first, but it alone would satisfy neither this test's name nor the DoD --
+    // two readers can agree on a total while disagreeing on every row's content or order.
+    expect(actual.length).toBe(expected.length);
+
+    // Row-by-row: the loop's own thrown message names the 0-indexed row and both sides' text, so the
+    // failure is attributable from the message alone, with no need to re-run anything to find it.
+    for (let i = 0; i < expected.length; i++) {
+      if (actual[i] !== expected[i]) {
+        throw new Error(
+          `row ${i} differs (0-indexed, document order) -- TS: ${JSON.stringify(actual[i])} ` +
+            `shell: ${JSON.stringify(expected[i])}`,
+        );
+      }
+    }
+  });
+
+  test("S13.NOINFER: 2 prose+row mentions in the document, admitted exactly once as a rule " +
+    "(reproduces position-anchored-not-substring)", () => {
+    const raw = readFileSync(SPEC_PATH, "utf8");
+    const nMentions = (raw.match(/S13\.NOINFER/g) ?? []).length;
+    const admitted = loadAllRows().filter((r) => r.id === "S13.NOINFER");
+
+    expect(nMentions).toBe(2); // §13's own table row + §14's prose explaining implementation-directed
+    expect(admitted.length).toBe(1);
+    expect(formatRuleRow(admitted[0])).toBe("S13.NOINFER — implementation-directed");
+  });
+
+  test("a positive witness for 'no prose mention was ingested' (L-156): report the denominator, " +
+    "not just the zero", () => {
+    // The candidate population this check actually examined: every backtick-quoted, rule-id-shaped
+    // token anywhere in the raw document -- inside real table id cells AND inside prose. A check that
+    // asserts "none leaked" without this number could be vacuously passing over an empty search.
+    const raw = readFileSync(SPEC_PATH, "utf8");
+    const candidates = raw.match(/`S\d+\.[A-Z][A-Z0-9-]*`/g) ?? [];
+    const admittedCount = loadAllRows().length;
+
+    // The denominator is the witness: candidates examined must be a real, non-trivial population...
+    expect(candidates.length).toBeGreaterThan(0);
+    // ...and strictly more than what was admitted, which is the proof the discriminator filtered
+    // something real rather than every candidate happening to already be a legitimate row.
+    expect(candidates.length).toBeGreaterThan(admittedCount);
+    expect(admittedCount).toBe(100);
   });
 });

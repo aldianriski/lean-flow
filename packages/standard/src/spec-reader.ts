@@ -83,37 +83,60 @@ function primaryToken(raw: string, fallback: string): string {
 }
 
 /**
+ * The `(id, level, mark)` rows found in a single section's own table blocks, filtered to ids whose
+ * own section number agrees with `section.number` -- the belt-and-braces guard `rulesInSection`'s doc
+ * comment describes. Shared by `rulesInSection` (one window) and `allRules` (every window, in
+ * document order) so the two can never drift apart on how a row is read.
+ */
+function rulesInWindow(section: Section): RuleRow[] {
+  const rows: RuleRow[] = [];
+
+  for (const block of section.blocks) {
+    if (block.type !== "table") continue;
+
+    for (const row of block.rows) {
+      const idCell = (row.cells[0] ?? "").trim();
+      const m = ID_CELL_RE.exec(idCell);
+      if (!m) continue;
+      if (Number(m[2]) !== section.number) continue;
+
+      rows.push({
+        id: m[1],
+        level: primaryToken(row.cells[1] ?? "", "--"),
+        mark: primaryToken(row.cells[2] ?? "", "?"),
+        loc: row.loc,
+      });
+    }
+  }
+
+  return rows;
+}
+
+/**
  * The `(id, level, mark)` rows of section `sectionNumber`'s Conformance table(s), in document order.
  * Only tables inside that section's own window are examined -- see the module header.
  */
 export function rulesInSection(doc: BlockDocument, sectionNumber: number): readonly RuleRow[] {
   const rows: RuleRow[] = [];
-
   for (const section of sectionsOf(doc)) {
     if (section.number !== sectionNumber) continue;
-
-    for (const block of section.blocks) {
-      if (block.type !== "table") continue;
-
-      for (const row of block.rows) {
-        const idCell = (row.cells[0] ?? "").trim();
-        const m = ID_CELL_RE.exec(idCell);
-        if (!m) continue;
-        // The id's own section must match the window's -- guards a mislabelled row the same way the
-        // shell's `sec == want` bucket check does (belt-and-braces: `sectionsOf` already scoped this
-        // block to `sectionNumber`'s window, so this can only fire on a hand-crafted fixture).
-        if (Number(m[2]) !== sectionNumber) continue;
-
-        rows.push({
-          id: m[1],
-          level: primaryToken(row.cells[1] ?? "", "--"),
-          mark: primaryToken(row.cells[2] ?? "", "?"),
-          loc: row.loc,
-        });
-      }
-    }
+    rows.push(...rulesInWindow(section));
   }
+  return rows;
+}
 
+/**
+ * Every rule row in the whole document, in document order -- the no-`--section` mode of
+ * `read-spec-rules.sh`. Mirrors the shell reader's `sec > 0` gate: a block sitting before the first
+ * numbered `## §N` heading (frontmatter, title, an unnumbered `## ` heading) belongs to no section
+ * and is never a source of rows, even if a table happens to sit there.
+ */
+export function allRules(doc: BlockDocument): readonly RuleRow[] {
+  const rows: RuleRow[] = [];
+  for (const section of sectionsOf(doc)) {
+    if (section.number <= 0) continue;
+    rows.push(...rulesInWindow(section));
+  }
   return rows;
 }
 

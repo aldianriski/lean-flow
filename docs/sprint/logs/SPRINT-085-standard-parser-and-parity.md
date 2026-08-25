@@ -135,3 +135,30 @@ Migration order **not frozen** — the Recommendation names candidates on §43's
 written **nothing**, while reporting it was watching a background job — see the `blocker` entry above.
 The restart's only substantive change was forbidding long background waits and requiring bounded
 foreground steps.
+
+### 2026-08-25 | progress | T2 — 100 rows, byte-identical, and the discriminator has a real denominator
+`allRules(doc)` walks every `## §N` window in document order, sharing a `rulesInWindow` helper factored
+out of T1's `rulesInSection` — a refactor with no behaviour change there, and its 18 existing tests
+stayed green throughout. Suite **82 pass / 0 fail** (77 → 82); architecture fitness 25 pass; zero
+dependencies intact.
+
+**Verified by the coordinator independently:** TS `allRules` output diffed against
+`sh scripts/lib/read-spec-rules.sh spec/STANDARD.md` — **100 rows each, `diff` identical**. And the
+discriminator, checked directly against the raw document: `S13.NOINFER` occurs **twice** in
+`spec/STANDARD.md` and is admitted **once**.
+
+**The row-by-row requirement was met properly, not nominally.** EPIC-014's § Closed-when says row-by-row
+*never in aggregate*, and a count comparison would have satisfied the letter while missing the point. The
+test spawns the shell reader as an independent oracle and loops index-by-index, naming the offending row
+on failure. Demonstrated rather than asserted: perturbing one mark produced
+`row 9 differs (0-indexed, document order) -- TS: "S2.F-ARCHIVE Structural SEEDED-BREAK-DEMO"
+shell: "S2.F-ARCHIVE Structural restated"`, with **exactly one** test reddening while the count,
+document-order, NOINFER and witness tests stayed green — targeted, not a demolition.
+
+**A negative claim given a positive witness (L-156).** "No prose mention leaked" is worthless without a
+denominator, so T2 counted the candidates: **148** backtick-quoted rule-id-shaped tokens exist across the
+document; **100** were admitted; **48** prose and duplicate mentions were visibly filtered. The claim now
+rests on a non-trivial number rather than on a zero that could equally mean the check reached nothing.
+
+**No TS/Shell difference was found**, and that is recorded here explicitly because EPIC-014 D2 requires a
+difference to be *ruled* — the absence of one is itself the record, not a silence.

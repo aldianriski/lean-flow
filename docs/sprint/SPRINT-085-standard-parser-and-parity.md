@@ -73,10 +73,10 @@ ingests them as rules.
 `scripts/lib/read-spec-rules.sh` row-by-row — never in aggregate.
 
 **DoD:**
-- [ ] All 100 rows emitted in document order — *Verify: row count against §14's published total, and the full row set diffed against the Shell reader*
-- [ ] Agreement is asserted **row-by-row, not in aggregate** — *Verify: the assertion names the differing row when it fails; a bare count comparison does not satisfy this (EPIC-014 § Closed-when wording)*
-- [ ] `S13.NOINFER` occurs twice in the Standard and is admitted exactly once, as a rule — *Verify: reproduce `position-anchored-not-substring`'s numbers from `evals/run-spec-reader-fixtures.sh`*
-- [ ] Any TS/Shell difference is **ruled, never absorbed** — *Verify: each difference is recorded in the Execution Log with its ruling, or there are none and the log says so (EPIC-014 D2)*
+- [x] All 100 rows emitted in document order — *Verify: row count against §14's published total, and the full row set diffed against the Shell reader*
+- [x] Agreement is asserted **row-by-row, not in aggregate** — *Verify: the assertion names the differing row when it fails; a bare count comparison does not satisfy this (EPIC-014 § Closed-when wording)*
+- [x] `S13.NOINFER` occurs twice in the Standard and is admitted exactly once, as a rule — *Verify: reproduce `position-anchored-not-substring`'s numbers from `evals/run-spec-reader-fixtures.sh`*
+- [x] Any TS/Shell difference is **ruled, never absorbed** — *Verify: each difference is recorded in the Execution Log with its ruling, or there are none and the log says so (EPIC-014 D2)*
 
 ### T3 — Match the Shell reader's error semantics on the malformed corpus `[size: M · risk: med · class: execution · HITL]`
 Layers: `packages/standard/src` (error model + findings) · its colocated tests
