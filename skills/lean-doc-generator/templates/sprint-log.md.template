@@ -23,3 +23,11 @@ update_trigger: an Execution Log entry is appended
 
 ### YYYY-MM-DD | [event] | [one-line summary]
 [detail — what changed and why it matters. Name the task (Tn) it belongs to.]
+
+<!-- Every task's entry carries a structured consequence classification (TD-092) — a fixed, whole-line
+     record, not the classification stated in prose above it. Written at the moment review depth is
+     decided (`review-scoping.md` § Two dimensions), whatever depth follows — this is what makes
+     `check-review-depth.sh` reach a task whose review was never logged, not only one whose review was
+     logged badly. If an independent pass then fires, its own `review · Tn · <depth> · behaviour:… ·
+     governance:…` line (night-run.md Part 4) supersedes this one as the record of what happened. -->
+consequence · Tn · behaviour:low|material · governance:low|high
