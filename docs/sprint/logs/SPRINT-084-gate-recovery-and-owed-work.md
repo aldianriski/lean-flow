@@ -110,3 +110,35 @@ discusses the `review ·` format at length: `grep -nE '^review · '` over the li
 none of the prose above accidentally matches the anchored pattern (L-108). The record and the checker
 disagree in the safe direction here, but only by luck of line-wrapping — SPRINT-066's archive log already
 contains a wrapped line that *does* match at column 0.
+
+### 2026-08-25 | progress | T5 — harness-delta.md written, reviewed, revised once, re-reviewed clean
+`docs/research/harness-delta.md` (101 lines, ≤130, ADR-009 frontmatter) rules `05`'s four candidates.
+Final: **A keep** (no mechanism derives a canonical dispatch brief from durable inputs) · **B defer**
+(blocked on A shipping — `worktree-base-guard.sh` proves the compare pattern at SHA scope only) ·
+**C defer** (no genuinely *unowned* repeat effect on record) · **D defer**.
+
+**The review changed a ruling, which is the point of having run it.** First draft ruled D **reject** on
+the claim that all six of `05`'s experiment classes were already shipped as local batch and there was
+"no unmatched remainder". Independent review found that false: only 2 of 6 are matched (rule inventory ·
+cross-reference validation); **repo census, general dependency scans, fixture scans and coverage mapping
+are unmatched**. D moved reject → defer, gated on running `05`'s own prescribed loop-vs-batch measurement.
+
+**A stale figure, caught the way CLAUDE.md says these get caught.** The draft wrote "`qa-check.sh`'s 11
+`check-*.sh`". Disk has **12**. The 11 matches what `fixture-coverage-audit.md` recorded at SPRINT-077,
+before `check-verify-reaches.sh` shipped — copied from an older doc rather than counted. This is L-130/
+L-136 exactly: a value entering a frozen artifact is a query result, and authoring feels like planning
+rather than querying, so the guard does not fire on its own. Corrected by re-deriving from disk, and the
+correction is stated in the doc so the next reader sees the provenance.
+
+**A negative claim with a missing witness.** C's evidence asserted no `L-NNN` at count ≥2 for an unowned
+live effect. `L-044` (Windows worktree handle-lock, seen Sprint-025 + Sprint-026, count 2) is exactly that
+category and went unmentioned. The revise surfaces it and *argues* the ruling: L-044 has an owner and a
+named dispose procedure (`dispatch.md:456-459`) that needs retrying, not an effect with no owner — so C's
+own bar is still unmet. Defer stands, now earned rather than asserted by omission.
+
+Re-reviewed narrowly on the changed content only. Verdict **clean**: the coverage-mapping flip is the
+better-supported call (`fixture-coverage-audit.md` is a *manual* audit that missed 7 of 12 checkers on its
+first pass — evidence against an automated equivalent, not for one), and "all defer" is earned because
+each carries a distinct falsifiable unblock condition rather than a shared hedge.
+
+`check-doc-caps.sh` printed `PASS cap docs/research/harness-delta.md (101 <= 130) [§2]`. Index regenerated.

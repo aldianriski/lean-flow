@@ -128,11 +128,11 @@ the whole of Lane 2's tail. `03` Phase C forbids opening an epic from it.
 ruling each of `05`'s four candidates keep / reject / defer.
 
 **DoD:**
-- [ ] Each of the four candidates is ruled keep / reject / defer — *Verify: four rulings, none absent*
-- [ ] Each is judged on the **delta over lean-flow's existing surface**, not standalone merit — *Verify: each ruling names what we already have first (L-017)*
-- [ ] Each names which layer would own it — *Verify: a layer per keeper*
-- [ ] `05`'s explicit non-goals are re-asserted, not re-litigated — *Verify: the non-goals appear as constraints, not as open questions*
-- [ ] The doc is ≤130 lines with ADR-009 frontmatter, and the index is regenerated — *Verify: `sh scripts/lib/check-doc-caps.sh` and `sh scripts/gen-index.sh`*
+- [x] Each of the four candidates is ruled keep / reject / defer — *Verify: four rulings, none absent*
+- [x] Each is judged on the **delta over lean-flow's existing surface**, not standalone merit — *Verify: each ruling names what we already have first (L-017)*
+- [x] Each names which layer would own it — *Verify: a layer per keeper*
+- [x] `05`'s explicit non-goals are re-asserted, not re-litigated — *Verify: the non-goals appear as constraints, not as open questions*
+- [x] The doc is ≤130 lines with ADR-009 frontmatter, and the index is regenerated — *Verify: `sh scripts/lib/check-doc-caps.sh` and `sh scripts/gen-index.sh`*
 
 ## Owner-action checklist
 - [ ] **Reinstall the plugin before trusting any skill procedure** — this session primed at base-dir **1.55.0** against a **1.57.0** repo. `lean-doc-generator` was verified byte-identical between the two, so this promote is unaffected; every other skill this sprint invokes is not covered by that check (L-021).
