@@ -331,3 +331,58 @@ no longer have.
 
 **T5 · parked-hitl** — the independent review of `governance:high` work remains owed and unblocked only
 by the owner. Carried into the Retro as an open follow-up rather than closed silently.
+
+---
+
+### 2026-08-25 | progress | The owed independent reviews, run under SPRINT-084 T2
+
+SPRINT-082 closed with its Review step **parked**, not skipped: T1/T2/T3/T5 are all
+`behaviour:material · governance:high`, the session that built them could not dispatch an independent
+reviewer, and writing `self-review` would have been false *and* would have reddened the checker T2 had
+just added. That debt was carried as `TASK-266` and is discharged here. Appended to closed history
+because this is where SPRINT-082's record lives; the entries above are untouched.
+
+Four independent scoped reviewers, one per task, each pinned to the shipped refs rather than the working
+tree. **All four returned findings.**
+
+review · T1 · scoped-reviewer · behaviour:material · governance:high
+review · T2 · scoped-reviewer · behaviour:material · governance:high
+review · T3 · scoped-reviewer · behaviour:material · governance:high
+review · T5 · scoped-reviewer · behaviour:material · governance:high
+
+**These four lines are not mechanically verifiable, and that is stated rather than implied.**
+`check-review-depth.sh:53` skips `*/archive/*` by design, so running it against this file reports green
+by never reading it. SPRINT-084 T2's DoD named that checker as its verification method; the clause is
+recorded **not-applicable** rather than ticked on a vacuous green (SPRINT-084 log, `scope-change`,
+2026-08-25). The blindness itself is filed as debt at SPRINT-084's close.
+
+**T1 — `check-system-verify-block.sh`, two findings.** `has_close` and `has_ruling` are whole-file greps
+with no positional link to the `system-verify ·` line they gate, so in any log carrying more than one
+entry an earlier ruling satisfies a later unresolved FAIL. Reproduced live on two adversarial logs, both
+returning `PASS` exit 0 — the silent-close shape the task exists to stop, inside the mechanism built to
+stop it (L-105: placed in text, not in time). The 10 retained fixtures never exercise a two-entry log.
+Separately, the checker is **never wired into `qa-check.sh`** against live logs — only its own fixture
+harness runs it — while T2's sibling checker in the same commit *is* live-wired, under a comment stating
+the very principle T1's omission violates.
+
+**T2 — `check-review-depth.sh`, the blind spot is absence.** Verified live: a `governance:high` task with
+**no** `review ·` line at all prints `no review line -- nothing to verify` and exits **0**. The checker
+grades only lines that exist, so it polices mis-recorded review but not unrecorded review — which is
+precisely what SPRINT-082 itself did, closing 38 of 38 with zero review lines on the record. None of the
+5 must-FAIL fixtures cover "absent line + governance:high". Combined with the archive skip above, there
+is no point in a task's lifecycle where this guard could have caught SPRINT-082's own case.
+
+**T3 — `check-verify-reaches.sh`, two false-REACHES, both reproduced.** REACHES is decided by a plain
+`grep -qF` substring test over the script's non-comment text, with no notion of *how* the target is used.
+A script that **excludes** the claimed path (`-path './docs/beta/*' -prune`) is certified as reaching it;
+and `src/db` matches a script touching only `src/dbtools/` on a prefix collision. Both are the case the
+task's own Acceptance names as the thing to catch. Latent rather than live only because this repo's Plan
+currently reports 0 confirmed targets — a vacuous pass in the denominator sense (L-156).
+
+**T5 — the freeze is unreachable by its consumer.** The commit claimed it was "written where admission
+reads it". Checked exhaustively: `/lean-doc-generator` § Epic, `EPIC.md.template`, `orchestrator` G1/G2,
+`CONTEXT.md`'s epic definition and `qa-check.sh` contain no reference to the freeze or its register. The
+only path is a human incidentally reading a descriptive pointer at `docs/epic/INDEX.md:17`. An agent
+following `/lean-doc-generator epic` as instructed ships an epic violating the freeze with nothing in the
+loop opening the file it lives in — L-151 exactly, in the sprint that promoted its neighbours. The
+unfreeze condition is reachable (five OR-ed triggers, four mapping to live repo machinery).
