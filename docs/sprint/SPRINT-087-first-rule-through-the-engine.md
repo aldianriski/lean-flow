@@ -105,10 +105,10 @@ this engine can give, because it reads exactly like a real pass.
 level**; an unknown rule or section fails loudly.
 
 **DoD:**
-- [ ] `--section N` selects that section's rules and no others — *Verify: compared against `read-spec-rules.sh --section N`, which already answers this question*
-- [ ] A partial invocation carries **no global level at all** — *Verify: the absence is a property of the **result**, not of the printer; a renderer-only guard fails this, because § Closed-when 6 requires one domain result feeding both renderers*
-- [ ] Unknown rule or section **fails loudly** — *Verify: a named finding and a non-zero exit; an empty result is the failure being prevented*
-- [ ] **Tier G**: one retained must-FAIL fixture per branch — *Verify: each names a distinct finding*
+- [x] `--section N` selects that section's rules and no others — *Verify: compared against `read-spec-rules.sh --section N`, which already answers this question*
+- [x] A partial invocation carries **no global level at all** — *Verify: the absence is a property of the **result**, not of the printer; a renderer-only guard fails this, because § Closed-when 6 requires one domain result feeding both renderers*
+- [x] Unknown rule or section **fails loudly** — *Verify: a named finding and a non-zero exit; an empty result is the failure being prevented*
+- [x] **Tier G**: one retained must-FAIL fixture per branch — *Verify: each names a distinct finding*
 
 ### T5 — Map `ok:false` to exit 1 at the process boundary `[size: S · risk: med · class: execution · HITL]`
 Layers: `apps/cli/src` (exit mapping) · colocated tests

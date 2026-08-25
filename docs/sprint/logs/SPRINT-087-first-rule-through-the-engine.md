@@ -467,3 +467,48 @@ Sprint DoD now **18 ticked / 11 open**. Knowledge index regenerated for the two 
 
 consequence · T7 · behaviour:material · governance:low
 review · T7 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low
+
+### 2026-08-25 | progress | T4 re-reviewed clean, merged, DoD ticked 4/4
+
+`--section N` matches the oracle at §1, §8, §9, §12, §13, §14 and §99 — id set *and* order — with §8's
+legitimate zero rows staying distinct from §99's named failure. §14 FAILs on both sides, which is
+inherited SPRINT-085 behaviour (the reader tabulates §1..§13 only) and correct under DoD 1's bar of
+matching the oracle rather than of being independently sensible.
+
+**DoD 2 produced the strongest proof in this sprint.** Baking `globalLevel` into `classifySection`'s
+return reddens the structural checks while **all 28 CLI tests stay green — including both printer-only
+"never contains a `level:` line" assertions.** That does not merely show the code works; it demonstrates
+the criterion's own premise, that a renderer-only guard misses this defect entirely. DoD 2 asked for
+exactly that and got it.
+
+Review found the claim outran the enforcement: the comment said no field *could* occupy the key, but the
+object was extensible and TD-101 leaves the interface enforcing nothing at runtime. `Object.freeze` was
+added at revise — making the claim true rather than softening the wording, since freezing is the only
+runtime lever available here.
+
+**My own hypothesis about the freeze test was refuted, and the refutation is the useful part.** T4
+disclosed that its `toThrow` assertion stayed green under the DoD 2 seed, because assigning to an
+existing property of a frozen object throws regardless. I inferred the test might therefore be vacuous
+and asked the reviewer to delete the `Object.freeze` wrapper and report what reddened. It reddens
+**1 of 6** — the `isFrozen` assertion catches it. So the test is meaningful and only the `toThrow` half
+is redundant against that defect class, exactly as narrowly as the builder had described it. **The
+builder's self-description was accurate and my generalisation from it was not** — worth recording,
+because the failure mode I was reaching for is real and common, and reaching for it was still wrong here.
+The experiment was worth running: it was informative either way.
+
+Two further claims verified rather than accepted: `Object.freeze` is **shallow** — `report.outcomes` can
+still be pushed to — but the comment scopes itself correctly and the sole production consumer only
+iterates it, so this is not a second overclaim; and freezing a previously-mutable return **did not break
+a consumer**, established by enumerating all four files referencing `classifySection` and confirming
+every access is read-only.
+
+`--section abc` exits **2** where Shell exits **1**. Kept — T1 established exit 2 for CLI-argument
+failures before this task, and ADR-027/034 freeze the *evaluation-result* exit meaning, which T4 reuses
+verbatim. Now **recorded as a deliberate divergence** at the exit-mapping site per EPIC-014 D2, modelled
+on ADR-036, so the H24/H25 cutover harness does not read it as a regression. It was previously absorbed;
+D2 requires ruled.
+
+Integrated suite **`175 pass, 0 fail`** across 15 files. Sprint DoD **22 ticked / 7 open**.
+
+consequence · T4 · behaviour:material · governance:low
+review · T4 · independent-adversarial-reviewer (worktree-isolated) · re-reviewed once · clean · behaviour:material · governance:low
