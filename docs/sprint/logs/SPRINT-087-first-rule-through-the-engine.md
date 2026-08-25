@@ -232,3 +232,31 @@ in their world, so anything they must verify has to be given to them or merged f
 
 consequence · T8 · behaviour:material · governance:low
 review · T8 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low
+
+### 2026-08-25 | surprise | TD-098 was wrong — I filed a load-dependent failure as a standing one
+
+T1's revise reported the whole workspace at `127 pass, 0 fail`, which contradicts the `2 fail` I filed
+as TD-098 earlier today. Re-measured on **the same commit** (`1123671`, T1 still unmerged, tree clean):
+**`26 pass, 0 fail`**, whole file **9.31 s**. My original measurement was `24 pass, 2 fail` at
+**16.51 s** — taken while three worktrees were live and two agents were building.
+
+The two `reconcile` tests do not fail at rest. They fail **under contention**, because they spawn
+`read-spec-rules.sh` and the spawn crosses bun:test's 5000 ms default only when the host is loaded.
+
+**The correction matters more than the fact.** I wrote "the TS suite is red at baseline" into a durable
+ledger row and then cited it in a commit message as a standing tax on T2/T3/T4/T7 — a figure another
+reader would have inherited and acted on without being able to re-derive it. That is **L-130's exact
+shape, committed by the author while actively applying the guard elsewhere in the same session**: I
+had just cross-checked the TD id, the mark count and the `read-spec-rules.sh` claim, and still filed a
+one-measurement conclusion as a fact. The gap is that *measuring it myself* felt like verification, and
+"I measured it" is not "I measured it twice". Row corrected in place, both measurements kept side by
+side rather than the wrong one deleted.
+
+**The corrected finding is more interesting than the original.** The suite is reliable for a single
+sequential task and unreliable exactly when several tasks build in parallel — the dispatch pattern
+`dispatch.md` recommends and this sprint used. That is the **same perverse shape as TD-095/TD-100**:
+the tooling penalises the concurrency the repo prescribes. And its failure mode is a trap — a task that
+reddens under a parallel wave and greens on re-run reads as a flake, so the re-run "fixes" it and the
+real signal is discarded.
+
+consequence · pre-T1 · behaviour:low · governance:low

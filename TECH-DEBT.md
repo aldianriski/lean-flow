@@ -210,27 +210,36 @@ status: current
     absent are indistinguishable to this reader, and any new grammar inherits that unless fixed.
 
 - **TD-098** severity: medium | status: open | created: Sprint-087
-  - Summary: **The TS suite is red at baseline on this host — 2 of 26 `spec-reader.test.ts` tests time
-    out — so "did my change break anything" cannot be answered by reading the pass/fail line.** Both
-    are `reconcile` tests that spawn `scripts/lib/read-spec-rules.sh` and exceed **bun:test's 5000 ms
-    default**; measured at 6558 ms and 5006 ms.
-  - Evidence: verified on the **clean base commit `2eee4d3`**, working tree clean, with none of
-    SPRINT-087 T1's changes present: `bun test packages/standard/src/spec-reader.test.ts` →
-    **`24 pass, 2 fail`**. T1 independently reported the same two via `git stash`. Two agents, two
-    methods, same result.
-  - Impact: **it taxes every remaining task in this sprint.** T1, T2, T3, T4, T7 all touch
-    `packages/standard/src` and all run this suite; each must now distinguish its own failures from a
-    standing pair, which is precisely the judgement a red baseline makes unreliable. The cost is not
-    the two tests — it is that a green run stops being the signal it is supposed to be. T1 already paid
-    a variant of this toll, raising its own oracle tests to a 20 s timeout for the same root cause.
-  - Root cause is **not** the assertions: it is a slow shell spawn measured against a fixed default.
-    Same shape as L-144's per-invocation-overhead finding, one layer up in the test runner.
-  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): raise the per-test timeout
-    for oracle-spawning tests to a figure derived from the measured spawn cost, rather than leaving the
-    5000 ms default to decide. Do **not** silence by deleting or skipping — these are parity tests, and
-    a skipped parity test is the false-assurance shape ADR-036 and L-058 both warn about.
-  - **Re-file fresh if** the oracle scripts get materially faster — the arithmetic (spawn cost vs
-    runner default) is the whole finding, and it is host-specific.
+  - Summary: **Two `spec-reader.test.ts` `reconcile` tests go red *under concurrent load*, not at rest
+    — and the load they need is exactly the parallel worktree dispatch this repo prescribes.** Both
+    spawn `scripts/lib/read-spec-rules.sh` and exceed **bun:test's 5000 ms default** when the host is
+    contended; both pass comfortably when it is not.
+  - Evidence — **two measurements on the same commit, deliberately kept side by side**:
+    - Under load (three agent worktrees live, two agents running): `bun test
+      packages/standard/src/spec-reader.test.ts` → **`24 pass, 2 fail`**, the two at 6558 ms and
+      5006 ms, whole file 16.51 s. T1 independently reproduced the same pair via `git stash`.
+    - At rest, same commit, T1 still unmerged: **`26 pass, 0 fail`**, whole file **9.31 s**.
+  - **This row was filed as "red at baseline" and that was wrong.** The first measurement was taken
+    while three worktrees and two agents were live, and the conclusion "the suite is red" was written
+    into this row as unconditional. A second measurement at rest contradicted it. Corrected here rather
+    than left standing, because the original figure was already load-bearing: it was cited in a commit
+    message as a standing tax on T2/T3/T4/T7. **L-130's own shape, committed by the guard's author
+    while applying the guard** — a value entering a durable artifact is a query result and earns a
+    second query, and "I measured it myself" is not the same as "I measured it twice".
+  - Impact, restated correctly: the suite is not unreliable *at rest*, so it remains a usable signal
+    for a single sequential task. It becomes unreliable precisely when several tasks build in parallel
+    — which is the dispatch pattern `dispatch.md` recommends and this sprint used. **Same perverse
+    shape as TD-095/TD-100**: the tooling penalises the concurrency the repo tells you to use. A task
+    that goes red under a parallel wave and green on a re-run alone will read as a flake and be
+    re-run, which is the wrong lesson.
+  - Root cause is **not** the assertions: a slow shell spawn measured against a fixed default, with
+    contention as the multiplier. L-144's per-invocation-overhead finding, one layer up in the runner.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): set the per-test timeout
+    for oracle-spawning tests from the measured spawn cost **with a contention margin**, not from the
+    5000 ms default. Do **not** silence by deleting or skipping — these are parity tests, and a skipped
+    parity test is the false-assurance shape ADR-036 and L-058 both warn about.
+  - **Re-file fresh if** the oracle scripts get materially faster, or the runner default changes — the
+    arithmetic (spawn cost × contention vs runner default) is the whole finding, and it is host-specific.
 
 - **TD-097** severity: medium | status: open | created: Sprint-087
   - Summary: **`check-verify-reaches.sh` reports a present script as absent, and cannot see the corpus
