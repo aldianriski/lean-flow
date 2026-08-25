@@ -251,3 +251,53 @@ trip the checker — unreachable today, because every real doc reference uses th
 placeholders the anchored regex cannot match, and the gate only feeds it `docs/sprint/logs/` files.
 
 review · T4 · independent-scoped-reviewer · behaviour:material · governance:high
+
+### 2026-08-25 | progress | T3 — the budget guard fires in both lateness paths, and the old bug is now a fixture
+**Path (a):** default 900s → **450s**, arithmetic stated inline (`600s ceiling - 150s headroom`). Not
+left as a comment anyone can drift away from — a **new mechanical self-check**
+(`scripts/lib/check-qa-budget-default.sh`) runs as a gate leg and FAILs
+`qa-budget-default-exceeds-ceiling` if the shipped default ever climbs back to the ceiling.
+
+**Path (b):** `qb_checkpoint()` threaded through **22 sites across legs 2–12**, not just leg 12's
+harness loop, with its own finding `qa-check-budget-exceeded-early`. **Proven on this host rather than
+argued from the code:** a bare gate run took **9m12s** with leg 12 not starting until ~84% of output —
+so legs 1–11 alone can burn the whole budget before the old leg-12-only check is ever reached. That is
+the second lateness path demonstrated, which is what made "fix one and the other stays open" concrete.
+
+**The discrimination is stronger than the DoD asked for.** Path (b)'s case 2 does not merely seed a
+break — it **retains TD-084's original silent shape as a fixture**: with the checkpoints seeded away
+the run dies mute, no budget verdict printed, exactly as it did in SPRINT-085's blocker. The bug is
+pinned, not just guarded against, so a future regression reproduces a *named* fixture rather than a
+fresh mystery.
+
+**A live environment bug found while building its own fixture.** The path-(b) fixture needs `QA_FULL=1`,
+and that flag **leaked into the inner `qa-check.sh` invocations it exercises**, silently bypassing the
+budget check by contract — CLAUDE.md edit-safety trap (d), the same inheritance shape as the
+`MSYS_NO_PATHCONV` incident that once produced a red gate on correct code and survived two wrong
+diagnoses. Scoped with `env -u QA_FULL`. Worth recording: the trap fired inside the task whose subject
+is guards that do not fire.
+
+**Ownership honoured:** `scripts/qa-check.sh` staged **per-hunk** with an empty `git diff` verified
+after staging — the T3→T2 chain, and precisely the discipline the coordinator failed at earlier today.
+
+consequence · T3 · behaviour:material · governance:low
+review · T3 · self-reviewed · behaviour:material · governance:low
+
+### 2026-08-25 | progress | T4 revise — drift tolerated, anchor unchanged; and T4's DoD 2 ruled, not silently ticked
+The revise normalises each candidate line through `awk` (trim · collapse whitespace runs · case-fold
+field names) **before** applying the unchanged whole-line anchor. The anchor was not loosened, which is
+the whole point: normalisation cannot turn a sentence *about* the schema into an exact match, and the
+`drift-prose-mention-passes` control — the same drift spellings embedded mid-sentence — confirms L-108
+stays closed. Four drift classes, one retained must-FAIL fixture each; suite **12 → 17, all green**.
+
+**T4's DoD 2 was ticked on an ADR-021 surfaced ruling.** As literally worded it is **unsatisfiable**:
+SPRINT-084's log exits 0 unmodified and always will, because the schema postdates it and no historical
+log can carry a line that did not exist when it was written. Retrofitting one into the past entry would
+have satisfied the words by editing the evidence — the shape L-088 forbids. It was met in a stronger
+form instead: **SPRINT-086's own live attended log** was reported FAIL with both named findings while
+T4's review was outstanding, and PASSes now that the `review ·` line is appended. Live traffic caught
+in real time is better proof than a retrofitted historical file, and the difference is recorded here
+rather than absorbed into a tick.
+
+**T4's DoD 5 stays open deliberately** — TD-085 and TD-092 are dispositioned at the close Retro, per
+repo convention, not mid-task. The work closing both is done; the bookkeeping is a close-time act.
