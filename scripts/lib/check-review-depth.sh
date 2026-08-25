@@ -152,6 +152,25 @@ EOF
 
   # TD-092 absence check: the attended-mode carrier. Each `consequence ·` line is matched as a whole
   # line, not a prefix, so this cannot be tripped by a paragraph that merely opens with the word.
+  #
+  # SPRINT-086 T4 revise: the line is hand-written by agents into narrative markdown, so benign
+  # transcription drift (an extra space, a capitalised field name, a trailing space, list/blockquote
+  # indentation) is the EXPECTED case, and the old single fixed-string anchor treated every one of
+  # those as "no consequence line here" -- a silent false negative on exactly the governance:high /
+  # behaviour:material work this branch exists to catch. Each candidate line is normalised (leading
+  # /trailing whitespace stripped, internal whitespace runs collapsed to one space, `behaviour`/
+  # `governance` field-name casing folded to lower) BEFORE the anchor is applied. The anchor itself
+  # does not loosen -- normalisation cannot turn a longer sentence that merely mentions the schema
+  # into an exact whole-line match, so prose about the format still cannot trip it (L-108).
+  cnorm=$(awk '{
+    line = $0
+    gsub(/^[ \t]+/, "", line)
+    gsub(/[ \t]+$/, "", line)
+    gsub(/[ \t]+/, " ", line)
+    gsub(/[Bb][Ee][Hh][Aa][Vv][Ii][Oo][Uu][Rr]/, "behaviour", line)
+    gsub(/[Gg][Oo][Vv][Ee][Rr][Nn][Aa][Nn][Cc][Ee]/, "governance", line)
+    print line
+  }' "$lg" 2>/dev/null)
   while IFS= read -r cline; do
     [ -n "$cline" ] || continue
     ctid=$(printf '%s' "$cline" | sed -E 's/^consequence · (T[0-9]+) ·.*/\1/')
@@ -167,7 +186,7 @@ EOF
         filefail=1 ;;
     esac
   done <<EOF
-$(grep -E '^consequence · T[0-9]+ · behaviour:(low|material) · governance:(low|high)$' "$lg" 2>/dev/null)
+$(printf '%s\n' "$cnorm" | grep -E '^consequence · T[0-9]+ · behaviour:(low|material) · governance:(low|high)$')
 EOF
 
   if ! grep -qE '^review · ' "$lg" 2>/dev/null; then

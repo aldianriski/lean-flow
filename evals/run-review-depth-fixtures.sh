@@ -26,6 +26,16 @@
 # -- without it, a checker that FAILs on any `consequence ·` line lacking a `review ·` line, whatever
 # it classifies, would be indistinguishable from one that routes on consequence.
 #
+# Cases 14-18 (SPRINT-086 T4 revise) guard the same carrier against BENIGN FORMATTING DRIFT an
+# independent review found: this line is hand-written by agents into narrative markdown, so
+# transcription drift is the expected case, not the exception, and the original fixed-string anchor
+# treated every one of the four drift shapes below as "no consequence line here" -- a silent false
+# negative on exactly the governance:high/behaviour:material work the branch exists to catch. Each
+# is its own fixture so a future change that re-tightens the anchor reddens the specific class it
+# broke, not a bundled catch-all. Case 18 is the negative control: the schema string embedded inside
+# an ordinary sentence, spelled with the SAME drift the other four exercise, must still not match --
+# without it, tolerating drift and reintroducing L-108's substring match would be indistinguishable.
+#
 # Dependency-free POSIX sh, no git needed. Run bare: sh evals/run-review-depth-fixtures.sh
 set -u
 
@@ -109,6 +119,29 @@ run_case_anywhere "attended-absent-behaviour-material-fails" 1 "review-depth-mat
 # --- case 13: attended schema, consequence line names low/low, no review line -> PASS (control) ---
 run_case_anywhere "attended-consequence-low-passes" 0 "nothing to verify" -- \
   sh "$checker" "$fx/attended-consequence-low-passes/docs/sprint/logs/SPRINT-960-attended-low.md"
+
+# --- case 14: drift -- double space inside the consequence line -> FAIL, named (SPRINT-086 T4 revise)
+run_case_anywhere "drift-spacing-governance-absent-fails" 1 "review-depth-governance-absent" -- \
+  sh "$checker" "$fx/drift-spacing-governance-absent/docs/sprint/logs/SPRINT-961-drift-spacing.md"
+
+# --- case 15: drift -- capitalised field names (`Behaviour:` / `Governance:`) -> FAIL, named --------
+run_case_anywhere "drift-casing-material-absent-fails" 1 "review-depth-material-absent" -- \
+  sh "$checker" "$fx/drift-casing-material-absent/docs/sprint/logs/SPRINT-962-drift-casing.md"
+
+# --- case 16: drift -- trailing space after the line, defeating the `$` anchor -> FAIL, named -------
+run_case_anywhere "drift-trailing-space-governance-absent-fails" 1 "review-depth-governance-absent" -- \
+  sh "$checker" "$fx/drift-trailing-space-governance-absent/docs/sprint/logs/SPRINT-963-drift-trailing-space.md"
+
+# --- case 17: drift -- leading indentation (list/blockquote), defeating the `^` anchor -> FAIL ------
+run_case_anywhere "drift-indentation-material-absent-fails" 1 "review-depth-material-absent" -- \
+  sh "$checker" "$fx/drift-indentation-material-absent/docs/sprint/logs/SPRINT-964-drift-indentation.md"
+
+# --- case 18: negative control -- the schema, drifted, embedded in a sentence -> PASS (must NOT match)
+# Load-bearing for cases 14-17: proves tolerating drift did not loosen the anchor into a substring
+# match (L-108). Without this, a checker that matched the schema anywhere in a longer line would
+# pass every case above too.
+run_case_anywhere "drift-prose-mention-passes" 0 "nothing to verify" -- \
+  sh "$checker" "$fx/drift-prose-mention-passes/docs/sprint/logs/SPRINT-965-drift-prose-mention.md"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "REVIEW-DEPTH FIXTURES: all green"; else echo "REVIEW-DEPTH FIXTURES: at least one FAIL"; fi
