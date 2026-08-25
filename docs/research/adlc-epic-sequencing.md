@@ -118,6 +118,16 @@ reading, a *judgement call* by ruling — because gating on "a measurable signal
 two forever. Until one fires, optimisation ideas route to **EPIC-006**'s metrics as questions to measure,
 not work to schedule, and **no "workflow optimisation" epic is opened** — the loop this freeze stops.
 
+**Amended 2026-08-25 — V3 supersedes this freeze (owner ruling, 2026-08-24).** The freeze was written
+before V3 existed, so it froze an architecture V3 was already committed to changing. It is therefore
+**not in force for V3's execution-autonomy scope**, which is admitted as an epic (**EPIC-015**) rather
+than through the five conditions above. Everything outside that named scope stays frozen on the
+original terms — the loop this freeze stops is still stopped. **The freeze re-arms once V3 §56's two
+dogfoods pass** (V3 §58): not after SPRINT-082, and not at EPIC-015's promote. Re-arming is EPIC-015's
+final § Closed-when condition, so that epic cannot close leaving the execution architecture unfrozen.
+Recorded **here** rather than only in EPIC-015 or a commit message, because this is the file consulted
+when an epic is proposed — a ruling its reader cannot reach governs nothing (L-151).
+
 ## Out of scope / open questions
 
 - **Platform repository boundary** — where dashboard/gateway/adapters live *as source*, undecided and owed

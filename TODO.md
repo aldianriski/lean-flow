@@ -218,6 +218,133 @@ V3 §43's expensive-first ranking governing families 2..n.
       origin:     close-retro
       state:      ready
 
+<!-- EPIC-015 — Execution Autonomy · first member sprint slice. Stream 2, parallel to EPIC-014.
+     Admitted 2026-08-25: the freeze amendment closed and the after-SPRINT-083 sequencing gate is met
+     (docs/epic/INDEX.md). Shared file with EPIC-014 is `.claude/CONTEXT.md` — single owner + commit
+     order ruled at G2, never a parallel build. -->
+
+- [ ] TASK-292 — Declare J0/J1/J2 authority on every task, and prove a J2 parks  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 · EPIC-015 D4 — a misclassified authority is silent by construction:
+                  the run reports success, and a decision taken without asking leaves no trace)
+      done-when:  every task in a promoted Plan carries a `J0` / `J1` / `J2` declaration; an unattended
+                  run executes J1 inside the approved envelope without asking, and a **seeded** J2
+                  parks with its unblock condition recorded. The seed is required, not a fallback
+                  (D5) — a natural J2 cannot be scheduled, and waiting for one foreclosed this
+                  criterion once already (TASK-188 · L-111). Retained must-FAIL fixture: a J2 task
+                  that does **not** park, failing with its named finding while a sibling J1 control
+                  stays green
+      touches:    skills/orchestrator/references/night-run.md (Part 0 authority table) ·
+                  skills/orchestrator/SKILL.md (G2 declaration) · templates/SPRINT.md.template ·
+                  .claude/CONTEXT.md § Task entry shape (**shared with EPIC-014 — owner at G2**) ·
+                  a retained fixture pair
+      depends-on: none — the foundation the envelope, the repair loop and the run vocabulary all rest
+                  on (epic § Why this)
+      assumes:    the three classes already describe how the loop behaves (mechanical · delegated ·
+                  human); this **declares** them, it does not invent them. D3 binds — J2 stays human
+                  and absence is never consent: a missing ask channel, a denial or a timeout is a
+                  BLOCK, never a default-yes
+      tracker:    EPIC-015 § Closed-when 3 · D3 · D4 · D5 · V3 H29
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-293 — Stop sprint-bulk pausing between already-authorized tasks  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 · D4 — a continuation contract that stops early reports the same
+                  `success` as one that ran the Plan out; the omission is invisible)
+      done-when:  a `sprint-bulk` run moves task to task without re-confirming work the owner already
+                  approved, and ends **only** at one of `PLAN_EXHAUSTED` · `AUTHORITY_BOUNDARY` ·
+                  `HARD_FAILURE` · `BUDGET_STOP` · `USER_STOP` — the terminal reason named in the
+                  rollup. Retained must-FAIL fixture: a run that halts with no terminal state,
+                  failing with its named finding while a sibling clean-exhaustion control passes
+      touches:    skills/orchestrator/SKILL.md (the sprint-bulk loop) ·
+                  skills/orchestrator/references/night-run.md · scripts/night-run.sh ·
+                  .claude/CONTEXT.md § Modes (**shared with EPIC-014 — owner at G2**)
+      depends-on: TASK-292 — a run may only continue past a task once that task's authority class is
+                  declared; without J0/J1/J2 "already authorized" has no definition
+      assumes:    ADR-016's rollup stays the launcher's job, not the run's — this task changes when
+                  the run stops, never who writes the record of it
+      tracker:    EPIC-015 § Closed-when 1 · V3 H27 · ADR-016
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-294 — Make `overnight` the canonical mode name, with the current names as aliases  [size: S] [risk: low] [HITL]
+      class:      execution
+      tier:       G (ADR-029 · D4 — an alias that silently resolves to the wrong mode runs the wrong
+                  gate set, and the run looks normal either way)
+      done-when:  `/orchestrator` and `/flow` both discover `overnight` as the mode name, and
+                  `night-run` · `unattended` · `sprint-bulk unattended` each resolve to it — proven by
+                  a fixture per alias, each reaching the same mode. Retained must-FAIL: an unknown
+                  mode string fails loudly rather than falling through to a default
+      touches:    skills/orchestrator/SKILL.md · skills/flow/SKILL.md ·
+                  skills/orchestrator/references/night-run.md · .claude/CONTEXT.md § Modes
+                  (**shared with EPIC-014 — owner at G2**) · README (consumer-visible rename, L-015)
+      depends-on: TASK-293 — the mode is named after the contract it runs, not before it
+      assumes:    the rename is additive for consumers: every existing trigger keeps working as an
+                  alias, so no installed workflow breaks (L-015 consumer check)
+      tracker:    EPIC-015 § Closed-when 2 · V3 H28 · open question — whether `overnight` also
+                  becomes a `spec/STANDARD.md` §2 row is a **judgement call closed by ruling** at G2
+                  (L-094), ADR-grade only if it adds a row
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-295 — Record one pre-launch approval that covers the whole envelope  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 · D4 — an envelope that silently widens is the failure mode; nothing in
+                  the run reports having exceeded an approval it never re-read)
+      done-when:  one recorded approval covers goal · scope · acceptance · design · verification · J1
+                  delegation · capabilities · repair policy · budget · stop conditions, and a run
+                  consuming it re-confirms **no** J0/J1 mid-flight. The approval is written where the
+                  run reads it — the sprint frontmatter, not the launching transcript (L-099 · L-151).
+                  Retained must-FAIL: an approval missing one of the ten dimensions is rejected at
+                  pre-flight and names which one
+      touches:    skills/orchestrator/references/night-run.md (Part 1a pre-flight) ·
+                  templates/SPRINT.md.template (frontmatter) · skills/orchestrator/SKILL.md
+      depends-on: TASK-292 — the envelope is expressed in J-classes, so it cannot be written before
+                  they exist
+      assumes:    pre-flight remains the gate that refuses an unpromoted Plan (Part 1a); this task
+                  widens what pre-flight checks, never where it sits
+      tracker:    EPIC-015 § Closed-when 4 · V3 H30 · L-099 · L-151
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-296 — Run bounded unattended repair on one J1 finding  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 · D4 — an unbounded or silently-skipped repair both end in a green run)
+      done-when:  a concrete J1 critic finding drives repair → re-review → continue, with the retry
+                  ceiling **exactly** what ADR-022 admits and no more; a second failure escalates
+                  rather than looping. Retained must-FAIL: a repair that exceeds the ceiling fails
+                  with its named finding while a within-ceiling sibling passes
+      touches:    skills/orchestrator/references/review-scoping.md § The revise loop ·
+                  skills/orchestrator/references/night-run.md · scripts/night-run.sh
+      depends-on: TASK-292 · TASK-293
+      assumes:    the ceiling is **not** re-decided here. Whether unattended repair inherits ADR-022's
+                  single retry or earns its own is a **measurement** that accumulates from EPIC-006's
+                  records (L-094); freezing a number before those exist is L-130. This task ships the
+                  loop at the ceiling ADR-022 already admits
+      tracker:    EPIC-015 § Closed-when 5 · V3 H31 · ADR-022
+      origin:     decomposer
+      state:      blocked
+
+- [ ] TASK-297 — Emit a typed run outcome with the evidence behind it  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 · D4)
+      done-when:  every run emits `DELIVERED` / `PARTIAL` / `FAILED` **plus** DoD counts, tasks
+                  attempted/completed, parks, repair cycles, verification state, warnings and terminal
+                  reason. Retained must-FAIL: a run ending mid-Plan that reports `DELIVERED` fails
+                  with its named finding while a genuinely-exhausted sibling passes
+      touches:    skills/orchestrator/references/night-run.md · scripts/night-run.sh ·
+                  templates/sprint-log.md.template
+      depends-on: TASK-293 — the outcome is a function of the terminal state
+      assumes:    **open question, ruled at this task's G2, not assumed here:** whether the
+                  run-outcome vocabulary belongs to EPIC-015 or to EPIC-008's Run Protocol. V3 §11
+                  says build only what hardening needs and leaves EPIC-008 owning the portable
+                  protocol — so the ruling must land before a `RunSummary` shape is minted, or the two
+                  epics mint competing ones
+      tracker:    EPIC-015 § Closed-when 6 · V3 H37 · EPIC-008
+      origin:     decomposer
+      state:      needs-info
+
 ### P3 — Long-term
 
 > Rejected work lives in **`.out-of-scope/`** — each file carries its own reasoning, revisit-if and

@@ -2,7 +2,7 @@
 epic: 015
 slug: execution-autonomy
 owner: Maintainer
-last_updated: 2026-08-24
+last_updated: 2026-08-25
 status: proposed
 member_sprints: []
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
@@ -36,11 +36,12 @@ measured cost · repeated workflow failure · security issue · consumer evidenc
 before V3 existed. The owner ruled that **V3 supersedes it**: the freeze re-arms after V3's integrated
 dogfood (V3 §56/§58), not after SPRINT-082.
 
-> **Owner-action — the ruling is not in force until it is written where the admission decision reads
-> it.** `adlc-epic-sequencing.md` is the file consulted when an epic is proposed; a ruling recorded only
-> here, or only in a commit message, governs nothing (**L-151**, four sightings — this epic would
-> otherwise *be* that failure). The amendment is deferred solely because SPRINT-082's close holds
-> uncommitted WIP in that file (L-042). See § Open questions.
+> **Owner-action — DONE 2026-08-25.** The ruling was not in force until written where the admission
+> decision reads it: `adlc-epic-sequencing.md` is the file consulted when an epic is proposed, so a
+> ruling recorded only here, or only in a commit message, governs nothing (**L-151** — this epic would
+> otherwise *be* that failure). The amendment had been deferred solely because SPRINT-082's close held
+> uncommitted WIP in that file (L-042); that close landed and the file went clean, so the amendment is
+> now written into its § *The core execution architecture is FROZEN*. **D1 is binding.**
 
 ## Scope
 
@@ -61,14 +62,20 @@ loop · push/deploy/external destructive authorization · a scheduler or queue s
 <!-- Contribution rows live in docs/epic/logs/EPIC-015-execution-autonomy.md per ADR-030, created
      lazily at the first member close. -->
 
-_None promoted._ The first member sprint is gated on the freeze amendment below, and is deliberately
-sequenced after **SPRINT-083** so that the two epics do not contend for `skills/orchestrator/**` and
-`scripts/` in the same window.
+_None promoted, and no longer gated._ The freeze amendment that blocked the first member sprint
+**closed 2026-08-25** (§ Open questions), so this epic is admissible. Its other condition — sequenced
+after **SPRINT-083** so the two epics do not contend for `skills/orchestrator/**` and `scripts/` in the
+same window — is also met: SPRINT-083 closed 2026-08-24. The gate was set at that sprint, **not** at
+EPIC-014's close, so running as a **second stream alongside EPIC-014 is admitted**. The one genuinely
+shared file is `.claude/CONTEXT.md` (this epic rewrites § Modes and § Unattended; EPIC-014 touches
+§ Sprint model at cutover) — it takes a single owner and a commit order at G2, never a parallel build.
 
 ## Decisions
 
-- **D1** — **V3 supersedes SPRINT-082's freeze** (owner ruling 2026-08-24). Binding only once written
-  into `adlc-epic-sequencing.md` — see § Why this, and the owner-action in § Open questions.
+- **D1** — **V3 supersedes SPRINT-082's freeze** (owner ruling 2026-08-24). **Binding since
+  2026-08-25**, when the amendment was written into `adlc-epic-sequencing.md` § *The core execution
+  architecture is FROZEN*. The freeze re-arms after V3 §56's dogfoods, never at this epic's promote —
+  which is why re-arming is the last § Closed-when condition rather than an assumption.
 - **D2** — **H32/H33/H34 are shipped, not re-opened.** They are verified by SPRINT-082's retained
   fixtures and re-exercised by V3 §56's dogfoods. Re-implementing them would create a second definition
   of risk beside the classifier SPRINT-082 T1 defined — the second SSOT LAW 4 forbids.
@@ -89,10 +96,11 @@ sequenced after **SPRINT-083** so that the two epics do not contend for `skills/
 
 ## Open questions
 
-- **The freeze amendment** — `adlc-epic-sequencing.md` § *The core execution architecture is FROZEN*
-  must record that V3 supersedes it and that the freeze re-arms after V3 §56's dogfoods. →
-  **owner-action, blocked on SPRINT-082's close** releasing that file (it is modified, uncommitted, in
-  another session). Unblock condition: `git status` shows the file clean.
+- ~~**The freeze amendment**~~ — **CLOSED 2026-08-25.** The unblock condition (`git status` shows
+  `adlc-epic-sequencing.md` clean) was met once SPRINT-082's close committed; the amendment is written
+  into that file's § *The core execution architecture is FROZEN*, recording that V3 supersedes the
+  freeze for V3's execution-autonomy scope only, and that it re-arms after V3 §56's two dogfoods.
+  **This epic is now admissible** — the first member sprint is no longer gated on it.
 - **Does `overnight` become the canonical mode name in `spec/STANDARD.md`, or only in the skills?** →
   a **judgement call, closed by ruling** (L-094) at the first member sprint's G2 — ADR-grade only if it
   adds a §2 row.
