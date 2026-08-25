@@ -4,7 +4,7 @@ import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync 
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readSpecAllFromDisk } from "./spec-file-reader.ts";
+import { readSpecAllFromDisk, readSpecSectionFromDisk } from "./spec-file-reader.ts";
 
 const SPEC_PATH = fileURLToPath(new URL("../../../spec/STANDARD.md", import.meta.url));
 const SHELL_READER_PATH = fileURLToPath(new URL("../../../scripts/lib/read-spec-rules.sh", import.meta.url));
@@ -172,6 +172,46 @@ describe("readSpecAllFromDisk -- spec-not-found vs permission-denied stay DISTIN
     expect(result.rows.length).toBe(100); // §14's own published total (ADR-034), same oracle spec-reader.test.ts uses
 
     const shell = runShellReader([SPEC_PATH]);
+    expect(shell.code).toBe(0);
+  });
+});
+
+describe("readSpecSectionFromDisk — §N against the real Standard (SPRINT-087 T4, DoD 1)", () => {
+  test("§9's rows, in document order, identical to `read-spec-rules.sh spec/STANDARD.md --section 9`", () => {
+    const result = readSpecSectionFromDisk(SPEC_PATH, 9);
+    if (!result.ok) throw new Error(`expected success, got finding ${result.finding}: ${result.message}`);
+    // Independent source of truth: the real oracle, spawned fresh, never a copied literal.
+    const shell = runShellReader([SPEC_PATH, "--section", "9"]);
+    expect(shell.code).toBe(0);
+    const oracleIds = shell.stdout
+      .split("\n")
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0)
+      .map((l) => l.split(/\s+/)[0]);
+    expect(result.rows.map((r) => r.id)).toEqual(oracleIds);
+  });
+
+  // DoD 3: an out-of-range section (no such §N in the spec at all) fails loudly with a NAMED finding,
+  // matching Shell for the same input -- never a silent empty result.
+  test("an out-of-range section (§99) is a named finding, matching Shell, not a silent empty result", () => {
+    const result = readSpecSectionFromDisk(SPEC_PATH, 99);
+    if (result.ok) throw new Error("expected a failure result");
+    expect(result.finding).toBe("spec-table-unreadable");
+
+    const shell = runShellReader([SPEC_PATH, "--section", "99"]);
+    expect(shell.code).not.toBe(0);
+    expect(shell.stderr).toContain("spec-table-unreadable");
+  });
+
+  // Sibling control: §8 legitimately has ZERO rows (published as 0 in §14's own counts) -- this must
+  // stay a SUCCESS, not the §99 failure above, or absence and emptiness collapse back into one thing
+  // (SPRINT-085 T3's whole point).
+  test("CONTROL: §8's legitimate zero rows still succeed, distinct from §99's failure", () => {
+    const result = readSpecSectionFromDisk(SPEC_PATH, 8);
+    if (!result.ok) throw new Error(`expected success, got finding ${result.finding}: ${result.message}`);
+    expect(result.rows).toEqual([]);
+
+    const shell = runShellReader([SPEC_PATH, "--section", "8"]);
     expect(shell.code).toBe(0);
   });
 });
