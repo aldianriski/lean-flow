@@ -90,7 +90,46 @@ note() { printf '      %s\n' "$1"; }
 #
 # Merge commits contribute no files here (`git diff-tree` on a merge lists none). That is correct
 # rather than a gap: the underlying commits are in the same range and are attributed individually.
-attribute() {   # <sha> -> "T<n>" | "COORD" | "UNATTRIBUTED"
+# A commit whose ENTIRE file set is governance bookkeeping belongs to no sprint task -- backlog
+# grooming, epic authoring, debt filing, research. Before this, such a commit landing while a sprint
+# was active reported as `attributable to no task`: correct by the letter, useless in practice, and
+# it fires exactly when parallel work makes the gate most worth reading. Governance normally lands
+# BETWEEN sprints, outside any plan_commit..HEAD window, which is why this went unseen until two
+# workstreams overlapped.
+#
+# Detected by CONTENT, never by subject prefix: this repo carries 15+ prefixes and `plan(` covers 6
+# of 895 commits, while feat/fix/docs/chore are ordinary work that must stay attributed -- and a
+# message-based rule would be gameable by writing a different subject.
+#
+# ALL-OR-NOTHING is the safety property, and the retained fixture pair exists to hold it: one code
+# file anywhere in the commit keeps the WHOLE commit attributed, so a src/ edit cannot ride along
+# beside a TODO.md tweak. Note the arms below fall through (`;;`) rather than returning early --
+# returning on the first governance file would silently make this ANY-of instead of ALL-of, which is
+# the mutation `governance leg B` is built to redden.
+#
+# Deliberately narrower than is_excluded_closetime, which excludes these PATHS outright at close:
+# here the path is never excluded, only a commit that touches nothing else (TD-044, in reverse). An
+# empty commit is NOT governance (_any stays 0), so it still falls through to UNATTRIBUTED.
+is_governance_commit() {   # <sha> -> 0 if EVERY changed file is a governance artifact
+  _any=0
+  for _gf in $(git diff-tree --no-commit-id --name-only -r "$1" 2>/dev/null); do
+    _any=1
+    case "$_gf" in
+      TODO.md|TECH-DEBT.md|CHANGELOG.md|docs/LEARNINGS.md) ;;
+      # ASSUMPTION, stated because it is load-bearing and unenforced: both trees are doc-only by
+      # convention -- every file under them is `.md` today except docs/research/storm/report-
+      # template.html. The prefix is safe only while that holds. If an executable or a checker ever
+      # lands under either tree, a real code change could ride along beside it in one commit and be
+      # exempted. Narrow these arms (or add a guard) at that point, not before -- tightening now
+      # would only add noise, and noise is what this change exists to remove.
+      docs/epic/*|docs/research/*) ;;
+      *) return 1 ;;
+    esac
+  done
+  [ "$_any" = 1 ]
+}
+
+attribute() {   # <sha> -> "T<n>" | "COORD" | "GOVERNANCE" | "UNATTRIBUTED"
   a_t=$(git log -1 --format='%(trailers:key=Task,valueonly)' "$1" 2>/dev/null | tr -d ' \r\n')
   case "$a_t" in T[0-9]*) printf '%s' "$a_t"; return ;; esac
   a_s=$(git log -1 --format='%s' "$1" 2>/dev/null)
@@ -100,6 +139,9 @@ attribute() {   # <sha> -> "T<n>" | "COORD" | "UNATTRIBUTED"
         -e 's/.*(SPRINT-[0-9]\{1,\}[ ]\{1,\}\(T[0-9]\{1,\}\)).*/\1/p' | head -n1)
   [ -n "$a_m" ] && { printf '%s' "$a_m"; return; }
   printf '%s' "$a_s" | grep -qE '^sprint\([0-9]+\):' && { printf 'COORD'; return; }
+  # Consulted LAST, deliberately: a `sprint(NNN) T1:` commit that happens to touch only TODO.md is
+  # still T1's work and must stay attributed to T1. Only a commit no task claims reaches here.
+  is_governance_commit "$1" && { printf 'GOVERNANCE'; return; }
   printf 'UNATTRIBUTED'
 }
 
@@ -304,7 +346,7 @@ for sp in "$@"; do
     for f in $(git diff-tree --no-commit-id --name-only -r "$c" 2>/dev/null); do
       is_excluded_committed "$f" && continue
       case "$who" in
-        COORD) ;;
+        COORD|GOVERNANCE) ;;
         UNATTRIBUTED) unattr="$unattr $(git rev-parse --short "$c" 2>/dev/null):$f" ;;
         *) who_toks=$(printf '%s\n' "$decls" | awk -v w="$who" '$1==w{print $2}' | tr '\n' ' ')
            covers "$who_toks" "$f" || miss_attr="$miss_attr $who:$f" ;;
