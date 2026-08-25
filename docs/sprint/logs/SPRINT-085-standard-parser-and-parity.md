@@ -265,3 +265,40 @@ reconcile tests, stayed green. Restored, SHA-256 matched.
    construction and the defect class cannot arise. TS is structurally stronger here, not blind.
    **Ruled on the guard's stated purpose, not on an empirical test** — stating the basis because the two
    are not the same evidence, and a later reader may want the experiment run.
+
+### 2026-08-25 | blocker | System-verify cannot produce a verdict in this session — halted, not worked around
+The Plan is exhausted (**26 of 26 DoD**, ten commits, tree clean), but step 6's system-verify has failed
+three times and **never printed a `QA-CHECK:` line**. Halting here rather than assembling a verdict from
+parts.
+
+| Attempt | Budget | Died at | Cause |
+|---|---|---|---|
+| 1 | 900s (default) | 204 lines, in leg 12 | hit the **600s command ceiling** |
+| 2 | 420s | 117 lines | **fork exhaustion** — `0xC0000142`, `Resource temporarily unavailable` |
+| 3 | 450s | 100 lines | fork exhaustion again, despite a clean 200/200 probe immediately before |
+
+**Two separate findings, and conflating them would lose both.**
+
+**(a) The budget guard cannot fire in this environment — an absent guard wearing the shape of a present
+one (L-105).** `QA_BUDGET_SECONDS` defaults to **900s**; the command ceiling here is **600s**. The guard
+can only trip after fifteen minutes in a place where nothing survives ten, so it never runs. SPRINT-084
+T1 shipped it precisely so an over-budget gate would name its skipped harnesses instead of dying mute —
+and its own FAIL text reads *"rather than left to run past an external timeout with no verdict line
+(TD-084)"*, which is verbatim what attempt 1 then did. The threshold was chosen without checking it
+against the ceiling it exists to beat. **Attempts 2 and 3 lowered it below the ceiling and it still
+never fired**, because fork exhaustion killed the run before the eval-harness loop reached its check —
+so the guard is late in *two* independent ways.
+
+**(b) The gate's spawn count now exceeds what this host sustains under load.** Round 5 measured the
+engine at thousands of spawns; this session additionally ran eleven agents. Each attempt died earlier
+than the last (204 → 117 → 100) on a cumulatively degraded process table, and a fork-health probe
+passing *before* a run does not predict surviving one. This is **TD-090's subject arriving sooner than
+filed** — leg 12 at ~81% of the run, grown further by T6's two new fixtures and T4's four new tests.
+
+**What was NOT done, deliberately.** Every component check passed when run on its own during execution,
+and 90/90 unit tests are green — it would be easy to assemble those into a claimed verdict. TD-084 names
+that exact move (*"run the checkers separately, then reason over the union"*) as the L-120 shape, and
+predicted it would be reached for again **because it works**. It is not being reached for. A sprint that
+closes green against a verdict nobody printed is the failure this whole line of work exists to stop.
+
+**State: all work committed and verified per task; the close is BLOCKED on system-verify alone.**
