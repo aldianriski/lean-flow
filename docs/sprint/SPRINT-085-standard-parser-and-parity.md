@@ -55,10 +55,10 @@ Markdown library to reach for, and the consumer's no-toolchain guarantee (D6) re
 rather than by matching lines.
 
 **DoD:**
-- [ ] A typed block tree covers the constructs the Standard uses — ATX headings, pipe tables, fenced code, paragraphs — each carrying a source location — *Verify: a test asserts a heading, a table and a fence are distinct typed nodes with correct positions*
-- [ ] §13's window is identified structurally (which table sits inside which `## §N`), not by line arithmetic — *Verify: a fixture where a table appears before §13 and must not be attributed to it*
-- [ ] TS emits §13's 7 rows identical to the Shell reader's — *Verify: diff TS output against `scripts/lib/read-spec-rules.sh --section 13`, byte-compared on the row set*
-- [ ] **Tier G**: branches are enumerated **from the code, not from memory**, and each carries its own seeded break — *Verify: a branch inventory derived from the tokenizer's own switch/state points, one seeded break per branch, each reddening its case while a sibling control stays green (L-164)*
+- [x] A typed block tree covers the constructs the Standard uses — ATX headings, pipe tables, fenced code, paragraphs — each carrying a source location — *Verify: a test asserts a heading, a table and a fence are distinct typed nodes with correct positions*
+- [x] §13's window is identified structurally (which table sits inside which `## §N`), not by line arithmetic — *Verify: a fixture where a table appears before §13 and must not be attributed to it*
+- [x] TS emits §13's 7 rows identical to the Shell reader's — *Verify: diff TS output against `scripts/lib/read-spec-rules.sh --section 13`, byte-compared on the row set*
+- [x] **Tier G**: branches are enumerated **from the code, not from memory**, and each carries its own seeded break — *Verify: a branch inventory derived from the tokenizer's own switch/state points, one seeded break per branch, each reddening its case while a sibling control stays green (L-164)*
 
 ### T2 — Reach full-document parity on the real Standard, row by row `[size: M · risk: med · class: execution · HITL]`
 Layers: `packages/standard/src` (section walk + rule-row extraction) · its colocated tests
@@ -142,10 +142,10 @@ log does the same** — so this sprint would close through the same hole if it i
 `review ·` line is reported as a FAIL with a named finding, not as a `nothing to verify` note.
 
 **DoD:**
-- [ ] Absent-line + `governance:high` FAILs with its own named finding — *Verify: a retained must-FAIL fixture asserting that finding string*
-- [ ] Absent-line + `behaviour:material` FAILs with its own named finding — *Verify: a second retained must-FAIL fixture, one per branch*
-- [ ] The archive-skip half is **ruled explicitly**, either way — *Verify: the ruling is recorded in the Execution Log; leaving it implicit is what this task exists to stop*
-- [ ] **Tier G**: the suite is shown to discriminate — *Verify: seed a break that makes the absence branch pass; the new cases redden while the existing 5 stay green*
+- [x] Absent-line + `governance:high` FAILs with its own named finding — *Verify: a retained must-FAIL fixture asserting that finding string*
+- [x] Absent-line + `behaviour:material` FAILs with its own named finding — *Verify: a second retained must-FAIL fixture, one per branch*
+- [x] The archive-skip half is **ruled explicitly**, either way — *Verify: the ruling is recorded in the Execution Log; leaving it implicit is what this task exists to stop*
+- [x] **Tier G**: the suite is shown to discriminate — *Verify: seed a break that makes the absence branch pass; the new cases redden while the existing 5 stay green* — **ticked on an ADR-021 surfaced ruling, not silently:** the proof is real (2 named findings · 2 retained must-FAIL fixtures · seed reddens 8+9 while 7 siblings stay green), but the guard does **not** reach SPRINT-084's attended log, tested directly. Owner accepted the branch proven and ruled the schema gap to debt. See log, `surprise` 2026-08-25
 
 ### T7 — Rule on `qa-gate-timing.md`'s superseded recommendation `[size: S · risk: low · class: decision · HITL]`
 Layers: `docs/research/qa-gate-timing.md` · `docs/knowledge-index.md` (generated)
