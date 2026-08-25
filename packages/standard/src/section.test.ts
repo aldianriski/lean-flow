@@ -77,9 +77,32 @@ describe("classifySection's result — DoD 2: no global conformance level, ever"
     const report = classifySection(12, [ruleOf("S12.X", "judgment-only", 12)], registry, { calls: [] });
     expect("globalLevel" in report).toBe(false);
   });
+
+  // Reviewer finding 1 (SPRINT-087 T4 revise): "no field COULD occupy globalLevel" was overclaimed --
+  // the object is a plain, extensible, non-frozen literal until this test's own subject exists.
+  // TD-101 (no `tsc`) means the interface is documentation, not enforcement, so `classifySection`
+  // freezes its return value -- this asserts that enforcement directly, not just its typed shape.
+  test("the report is FROZEN -- attaching a globalLevel at runtime throws, never silently succeeds", () => {
+    const registry = createRegistry<FakePort>();
+    const report = classifySection(9, [ruleOf("S9.A", "mechanical", 9)], registry, { calls: [] });
+
+    expect(Object.isFrozen(report)).toBe(true);
+    expect(() => {
+      (report as unknown as { globalLevel: string }).globalLevel = "Attested";
+    }).toThrow(TypeError);
+    // The throw must actually have prevented the write -- belt-and-braces against a mock/proxy that
+    // throws but still mutates (not the case here, but the assertion should not just trust the throw).
+    expect("globalLevel" in report).toBe(false);
+  });
 });
 
 // --- Tier G evidence (SPRINT-087 T4; ADR-029 -- classifySection is part of a Tier G engine) --------
+//
+// This file has SIX tests (confirmed by `bun test packages/standard/src/section.test.ts` -> "Ran 6
+// tests" pre-seed) -- stated explicitly because an earlier revision of this block miscounted its own
+// denominator as "6" when the file then held 5 (reviewer finding 2, SPRINT-087 T4 revise). The seed
+// below was RE-RUN after the freeze fix (reviewer finding 1) added the 6th test, so every count here
+// is fresh against the CURRENT file, not carried over from before that test existed.
 //
 // Every hash below is `git show <ref>:<path> | sha256sum` -- the SHA-256 of the LF blob git itself
 // stores, normalization-independent regardless of local `core.autocrlf` (L-169: two earlier T-tasks
@@ -90,30 +113,37 @@ describe("classifySection's result — DoD 2: no global conformance level, ever"
 //
 // Seed (DoD 2, the load-bearing one -- "make the partial run emit a global level anyway"):
 //   `classifySection`'s return literal changed from
-//     `{ section, outcomes: rules.map(...) }`
+//     `Object.freeze({ section, outcomes: rules.map(...) })`
 //   to
-//     `{ section, outcomes: rules.map(...), globalLevel: "Attested" }`.
-//   Landed: confirmed via `cmp` against a pristine copy saved before editing (differed at byte 2970,
-//   line 48 -- the exact edited line).
-//   File still parses: `bun test packages/standard/src/section.test.ts` ran to completion (30 pass
-//   + 3 fail across both files in that run, never an error-out-of-file, which is what a demolition
-//   -- not a discrimination -- would have produced).
-//   Targeted: exactly 1 line changed (the return statement), 49 -> 49 lines.
-//   Reddened EXACTLY 3 of 6 tests in this file: "the report carries NO globalLevel key at all",
-//   "still no globalLevel key on an all-excluded report" (both DoD 2 assertions, as expected), AND
+//     `Object.freeze({ section, outcomes: rules.map(...), globalLevel: "Attested" })`.
+//   Landed: confirmed via `git diff -- packages/standard/src/section.ts`, which showed EXACTLY one
+//   changed line (the return statement) and nothing else -- a cleaner landedness check than a raw
+//   `cmp` here, since this repo's `core.autocrlf=true` makes a byte-offset `cmp` against a plain `cp`
+//   copy unreliable across a checkout/edit cycle (the same class of trap L-169 names; `git diff`
+//   normalizes line endings the same way on both sides, so it does not inherit that trap).
+//   File still parses: `bun test packages/standard/src/section.test.ts` ran to completion (2 pass +
+//   4 fail, never an error-out-of-file, which is what a demolition -- not a discrimination -- would
+//   have produced).
+//   Targeted: exactly 1 line changed (the return statement).
+//   Reddened EXACTLY 4 of 6 tests in this file: "the report carries NO globalLevel key at all",
+//   "still no globalLevel key on an all-excluded report" (both DoD 2 assertions, as expected);
 //   "an empty rule list classifies to an empty report -- not an error" (an extra, CORRECT catch --
 //   that test's `toEqual({ section, outcomes: [] })` is exact-shape, so it also detects an added key;
 //   not a false attribution, since the added field really is present in every `classifySection` call
-//   after the seed, including the empty-rules one).
+//   after the seed, including the empty-rules one); AND "the report is FROZEN -- attaching a
+//   globalLevel at runtime throws..." -- its OWN `toThrow(TypeError)` assertion still passed (writing
+//   to an existing property of a frozen object still throws, seed or no seed), but its final
+//   `"globalLevel" in report` check correctly caught the seed's pre-existing key -- a genuine catch,
+//   not a false attribution: the seed really does put `globalLevel` on the object before freezing it.
 //   Stayed GREEN (named sibling controls): the two `describe("classifySection — dispatches...")`
-//   tests that DO inspect shape but not `globalLevel` specifically ("a mix of ... classifies...",
-//   "classifies in the exact order given") -- confirming the seed adds a field rather than breaking
-//   dispatch itself. In `apps/cli/src/main.test.ts`, run in the SAME pass: all 28 tests stayed green,
-//   INCLUDING the two DoD 2 "never contains a 'level:' line" printer-only checks -- this is the
-//   proof the task brief asked for: a renderer-only guard does NOT catch this seed; only the
+//   tests that inspect dispatch/ordering but never the exact key set or `globalLevel` ("a mix of ...
+//   classifies...", "classifies in the exact order given") -- confirming the seed adds a field rather
+//   than breaking dispatch itself. In `apps/cli/src/main.test.ts`, run in the SAME pass: all 28 tests
+//   stayed green, INCLUDING the two DoD 2 "never contains a 'level:' line" printer-only checks -- this
+//   is the proof the task brief asked for: a renderer-only guard does NOT catch this seed; only the
 //   structural `"globalLevel" in report` check does.
-//   Restored: `git checkout -- packages/standard/src/section.ts`, then
-//   `git show :packages/standard/src/section.ts | sha256sum` compared byte-identical to the
-//   pre-seed capture below, and `cmp` against the pristine copy agreed too.
+//   Restored: `git checkout -- packages/standard/src/section.ts`, then `git diff -- ...` reported
+//   nothing, and `git show :packages/standard/src/section.ts | sha256sum` reproduced the pre-seed
+//   hash below exactly.
 //   Pristine hash: git show :packages/standard/src/section.ts | sha256sum
-//     -> 973d70a13dd3bea070c5537996fecb0fb1bd71cb77f4547f104eb1f9ce44c2ce (49 lines)
+//     -> d8a6279002486b6fd84e968a98e304fe10534997fc230ad24f1ede7acc516cfe (66 lines)

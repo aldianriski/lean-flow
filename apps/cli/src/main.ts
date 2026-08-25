@@ -105,13 +105,27 @@ const SECTION_ARG_RE = /^[1-9]\d*$/;
 /**
  * `--section`'s own case (SPRINT-087 T4), split out for the same reason `runRule` is: one case per
  * `Invocation` kind. A TARGETED run -- it evaluates §`sectionArg`'s rules and NO others (DoD 1), and
- * it never prints a global conformance level (DoD 2): `classifySection`'s `SectionReport` has no
- * field a level could occupy, so there is nothing here to print even by mistake. An unreadable
- * section -- malformed argument, or a section number the spec does not define -- fails loudly with a
- * named finding and a non-zero exit, never a silent empty report (DoD 3).
+ * it never prints a global conformance level (DoD 2): `classifySection`'s `SectionReport` carries no
+ * `globalLevel` field today, and is FROZEN (`packages/standard/src/section.ts`) so one cannot be
+ * attached after the fact either -- there is nothing here to print even by mistake, and nothing a
+ * careless future call site could add. An unreadable section -- malformed argument, or a section
+ * number the spec does not define -- fails loudly with a named finding and a non-zero exit, never a
+ * silent empty report (DoD 3).
  */
 function runSection(sectionArg: string, repoDir: string, write: (s: string) => void): number {
   if (!SECTION_ARG_RE.test(sectionArg)) {
+    // RULED TS/Shell divergence (EPIC-014 D2), not an absorbed one: Shell's `read-spec-rules.sh
+    // spec/STANDARD.md --section abc` exits 1 (verified live). This exits 2. Deliberate, not a parity
+    // defect: exit 1 here is `exitCodeFor`'s frozen EVALUATION-RESULT meaning (ADR-027/ADR-034 --
+    // non-zero iff a real FAIL verdict), reused verbatim two lines below for the spec-read failure.
+    // A malformed `--section` value never reaches evaluation at all -- it is a CLI-ARGUMENT-PARSING
+    // usage error, the same boundary T1 already drew exit 2 for (`not a rule id`, `rule-unimplemented`
+    // -- both before this diff). Shell has no separate usage-error channel from its own findings
+    // channel, so its single exit-1 vocabulary covers both; this engine's does not, and keeping T1's
+    // convention here is what keeps `--rule`'s and `--section`'s CLI-boundary exit codes consistent
+    // WITH EACH OTHER, which matters more than matching Shell's exit code for an input Shell treats as
+    // just another finding. Recorded so a future H24/H25 parity harness reads this as intentional
+    // (ADR-036 §3's own model: a stated divergence, not a silent one it would flag as a regression).
     write(`leanflow: not a section number: ${sectionArg}`);
     return 2;
   }
