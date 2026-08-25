@@ -220,6 +220,11 @@ FAILs and pushed a run over its own budget.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `packages/standard/src/result.ts` | T1 | Result domain — `Finding` · `RuleEvaluation` · `ConformanceResult` · `exitCodeFor`, no CLI strings. Carries `findings: readonly Finding[]` (widened at revise; see log) | med | `result.test.ts` · `test/architecture/dependency-direction.test.ts` |
+| `packages/standard/src/registry.ts` | T1 | `Map`-backed `register`/`resolve`/`dispatch` — no procedural switch, so a new evaluator needs no dispatch-site edit | med | `registry.test.ts`; proven by review adding a third evaluator through the real CLI |
+| `packages/standard/src/rules/sprint-log-outside-logs-dir.ts` (+`.fake.ts`) | T1 | The tracer rule `S9.LOGDIR` and its `SprintDirPort` seam + in-memory fake | med | `sprint-log-outside-logs-dir.test.ts` (7 seeds recorded in-file) |
+| `packages/standard/src/adapters/fs-sprint-dir.ts` | T1 | Real Bun adapter; its `.isFile()` filter is the seam's load-bearing asymmetry (a *directory* named like a log file) | med | `fs-sprint-dir.test.ts` · seam test vs live oracle |
+| `apps/cli/src/main.ts` | T1 | `--rule` wiring; prints one line per finding | low | `main.test.ts` |
 | `scripts/lib/check-ephemeral-intake.sh` | T8 | Exclude `.claude/worktrees/` at path discovery — the gate was charging for the worktree-dispatch pattern this repo prescribes (TD-095) | low | `evals/run-ephemeral-intake-fixtures.sh` (4 cases, incl. retained lookalike control) |
 | `scripts/lib/check-research-archive.sh` | T8 | Same exclusion in `live_citer()` — a worktree copy counted as a live citer, so a superseded doc cited by nothing real passed. **Silent false negative, found by independent review, not by the author** | med | `evals/run-research-archive-fixtures.sh` (7 cases, incl. retained lookalike citer) |
 | `evals/run-ephemeral-intake-fixtures.sh` | T8 | Wire the two retained worktree fixtures | low | self |

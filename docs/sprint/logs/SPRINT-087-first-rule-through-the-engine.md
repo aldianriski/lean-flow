@@ -260,3 +260,43 @@ reddens under a parallel wave and greens on re-run reads as a flake, so the re-r
 real signal is discarded.
 
 consequence · pre-T1 · behaviour:low · governance:low
+
+### 2026-08-25 | progress | T1 re-reviewed clean, merged; wave 1 complete at 8/8 DoD
+
+Re-review confirmed all three actioned items. The reviewer re-ran **seed 7** — the one that reverts
+`evaluate()` to the exact rejected comma-joined design — and got precisely the two cardinality tests
+reddening with 16 siblings green, then spot-checked seed 6 independently and matched the recorded
+evidence block exactly. Cardinality verified live at **N=3**, beyond the N=2 the builder tested. The
+absence-vs-emptiness question was asked directly and answered: `findings: []` is disambiguated by
+`verdict`, and this evaluator has no "checked nothing due to failure" state, so the widening does not
+reintroduce SPRINT-085's ambiguity.
+
+Merged as `25f5c6e`; disjointness checked before merging, not discovered during it. Full suite in the
+**integrated** tree: **`127 pass, 0 fail`** across 12 files.
+
+**Two secondary findings, neither refuting a DoD, both filed.**
+
+**TD-101 (high) — nothing in this repository type-checks TypeScript.** The gate is
+`qa-check.sh && bun test`; `bun` strips types without checking them. No `tsc` anywhere, and **no
+`typescript` entry in `package.json` at all** — while `tsconfig.json` and `tsconfig.base.json` both
+exist. Configuration for a checker that cannot run. Confirmed independently after the reviewer executed
+a scratch file assigning a bare string to `findings: readonly Finding[]` without complaint.
+
+This one reaches backwards. `EPIC-014` line 60 records SPRINT-085 as closing with *"absence vs
+emptiness is enforced by a **TYPE**, not a convention"* — and **T4 DoD 2 in this very sprint leans on
+that same guarantee**. A type no gate evaluates is L-105's family: an absent guard wearing the shape of
+a present one, in its most dangerous variant, because the record already describes it as the *strong*
+form. ADR-035 forbids dependencies, so whether a type-checker counts as one is a decision to rule, not
+a detail to settle inside a task.
+
+**TD-102 (minor) — TS and Shell order findings differently.** Shell exhausts glob 1 before glob 2; TS
+sorts alphabetically. Same count, membership and name, so DoD 4's wording holds and no shipped test
+asserts order. Recorded rather than fixed — EPIC-014 D2 requires every difference to be *ruled, never
+absorbed*, and this entry is that ruling. It becomes active at the H24/H25 cutover, when diffing whole
+outputs is the obvious way to prove equality.
+
+**Wave 1 complete: T1 5/5, T8 3/3.** Both Tier G, both independently reviewed, both revised once, both
+re-reviewed. In both cases the reviewer found something the author did not, having run fewer tests.
+
+consequence · T1 · behaviour:material · governance:low
+review · T1 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low
