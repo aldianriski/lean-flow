@@ -39,6 +39,23 @@ run_case_anywhere "clean" 0 \
   "no committed BUG-*.md reports" -- \
   sh "$checker" "$fx/clean"
 
+# --- case 3: a BUG report inside a simulated agent worktree checkout -> exit 0 (TD-095) -----------
+# `.claude/worktrees/agent-fake123/docs/BUG-ghost.md` simulates the dispatch protocol's own worktree
+# copies, the shape SPRINT-086's under-load run tripped on (5 of 7 FAILs were fixture files inside
+# `.claude/worktrees/agent-*`, none of which is repo content). Retained so the exclusion this checker
+# now applies never regresses silently.
+run_case_anywhere "worktree-excluded" 0 \
+  "no committed BUG-*.md reports" -- \
+  sh "$checker" "$fx/worktree-excluded"
+
+# --- case 4: a BUG report at a path that merely CONTAINS "worktrees" -> exit 1 (must-FAIL control) -
+# `docs/worktrees/BUG-real.md` is NOT under `.claude/worktrees/` -- it is a real, tracked path that
+# happens to share the substring. This is the load-bearing DoD-2 case: a substring-only exclusion
+# would wrongly swallow this finding; the anchored `^\.claude/worktrees/` exclusion must not.
+run_case_anywhere "worktree-lookalike" 1 \
+  "docs/worktrees/BUG-real.md is a committed BUG report" -- \
+  sh "$checker" "$fx/worktree-lookalike"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "EPHEMERAL-INTAKE FIXTURES: all green"; else echo "EPHEMERAL-INTAKE FIXTURES: at least one FAIL"; fi
 exit $fail

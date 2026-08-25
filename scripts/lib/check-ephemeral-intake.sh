@@ -27,9 +27,18 @@ fail=0
 # `BUG-*.md` is the report; `BUG.md.template` is the blank form that generates one and is a legitimate
 # committed file -- the glob distinguishes them without needing an exception. Fixture trees are
 # excluded: they exist to hold exactly the violation this checker looks for.
+#
+# `.claude/worktrees/` is also excluded here, in this same path-discovery step (TD-095): the dispatch
+# protocol this repo prescribes checks out full repo copies under `.claude/worktrees/agent-*/`, and a
+# raw `find "$root"` walks straight into them -- SPRINT-086's under-load run reported 5 of its 7 FAILs
+# as ephemeral-intake findings on fixture files living inside those copies, none of which is repo
+# content. Anchored with `^` at the repo-relative path start (shape, not a bare substring match on
+# "worktrees") so a legitimately tracked path that merely CONTAINS that word -- e.g.
+# `docs/worktrees/BUG-real.md` -- is still caught; see evals/fixtures/ephemeral-intake/worktree-*.
 found=$(find "$root" -type f -name 'BUG-*.md' 2>/dev/null |
   sed "s#^$root/##" |
   grep -v '^evals/fixtures/' |
+  grep -v '^\.claude/worktrees/' |
   sort)
 
 if [ -n "$found" ]; then
