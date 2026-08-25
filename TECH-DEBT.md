@@ -136,6 +136,22 @@ status: current
 > line quotes 3,039 lines and `check-doc-caps.sh` now prints **3,050** — the doc grew 11 lines since
 > the row froze. Recorded, not re-litigated: the carry ruling is unaffected by the drift.
 
+> **Aging sweep — SPRINT-086 promote (2026-08-25).** **27 of 37 open rows** are ≥3 sprints
+> unaddressed: TD-083 (3) · TD-082 (3) · TD-081 (4) · TD-080 (5) · TD-078 (5) · TD-076 (6) ·
+> TD-075 (6) · TD-074 (7) · TD-071 (8) · TD-072 (8) · TD-069 (9) · TD-070 (9) · TD-067 (10) ·
+> TD-068 (10) · TD-066 (11) · TD-063 (12) · TD-062 (13) · TD-061 (14) · TD-060 (15) · TD-059 (16) ·
+> TD-053 (23) · TD-052 (24) · TD-051 (25) · TD-050 (26) · TD-049 (27) · TD-047 (29) · TD-045 (30).
+> **Owner ruling: recorded and carried, no per-row re-review this promote** — a 27-row litigation
+> would be larger than the sprint standing behind it. Recorded rather than skipped, because an aging
+> sweep that stops being written is indistinguishable from one with nothing to report.
+> **Escalated instead: all four `severity: high` rows**, by the ledger's own rule and not by
+> preference — TD-090 · TD-091 · TD-092 · TD-085 → `TASK-284` · `TASK-285` · `TASK-286` (TD-092 and
+> TD-085 are one surface and take one task; splitting them would put two tasks in one file).
+> Next clock: **TD-084** resolved at Sprint-084, deletable at Sprint-087 — not yet due.
+> **§2 soft-cap breach unchanged** — `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md`
+> at **3050 > 130**, still TD-082's reasoned carry; the figure moved 3,050 → 3,050 since the last
+> sweep, so the carry ruling is unaffected.
+
 - **TD-091** severity: **high** | status: open | created: Sprint-085
   - Summary: **`scripts/lib/qa-budget-check.sh` cannot fire in this environment — an absent guard
     wearing the shape of a present one (L-105).** `QA_BUDGET_SECONDS` defaults to **900s** while the

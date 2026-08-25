@@ -18,11 +18,15 @@ status: current
 
 ## Active Sprint
 
-_(none — SPRINT-085 closed 2026-08-25, 26 of 26. It closed **EPIC-014's first § Closed-when condition**
-whole: the Standard is parsed by AST to a typed model and agrees with `read-spec-rules.sh` row-by-row on
-all 100 rows and on every retained malformed case. Next: **EPIC-014**'s third member sprint — V3 Sprint C
-(H07–H11), whose first rule family is deliberately **not** chosen yet and is that sprint's own G2 call
-(V3 §43 · L-130).)_
+> **SPRINT-086 — Guards That Cannot Fire** → [docs/sprint/SPRINT-086-guards-that-cannot-fire.md](docs/sprint/SPRINT-086-guards-that-cannot-fire.md)
+
+**Standalone — no `epic:` stamp**, the instrument sprint before EPIC-014's Sprint C. Three shipped
+guards are correct, proven, and cannot fire on the traffic they were built for: the gate does not
+finish under load (TD-090), the budget guard that should report that cannot trip before the run dies
+(TD-091), and the review-depth guard anchors on a log shape no sprint here emits (TD-092 · TD-085).
+All four `severity: high` rows escalated to P1 by the ledger's own rule. **Sprint C is not promoted** —
+H07–H11 are undecomposed and `TASK-280/281/282` are gated on them existing, so promoting those would
+freeze criteria nothing could make reachable (L-111).
 
 ---
 
@@ -31,6 +35,76 @@ all 100 rows and on every retained malformed case. Next: **EPIC-014**'s third me
 <!-- Groomed by /triage. Only `ready` tasks are promotable. -->
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-284 — Cut the gate's spawn count so it completes under load  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — this is the QA gate itself; a false negative here is silent by
+                  construction, and a gate that cannot finish emits no verdict at all)
+      done-when:  `sh scripts/qa-check.sh` prints its `QA-CHECK:` verdict line on a **loaded** process
+                  table — the condition it currently fails on — with the dominant rule families' spawn
+                  counts reduced and **no check deleted and no coverage lowered**. The proof is a run
+                  that completes after the session has already done substantial agent work, not a run
+                  on a pristine table, because the pristine case already passes
+      touches:    scripts/lib/conformance-engine.sh · scripts/lib/ (the families named by § Round 5) ·
+                  scripts/qa-check.sh only if wiring moves
+      depends-on: TASK-283
+      assumes:    **the ranking must not be acted on before TASK-283 settles it.** Round 5 names F11
+                  §11 retention 84.7s · F6 §4 ADR 72.1s · F5 §1 ownership 56.0s · F9 §10 37.4s as 89%
+                  of 281.2s — but `S11.LOGPAIR` + `S11.WHENITRUNS` inside F11 are exactly the pair
+                  Round 4 and Round 5 disagree on **19×**, so the top-ranked family rests on the
+                  disputed number. Acting first is the L-130 shape the epic's open question guards.
+                  The mechanism is established and is *not* in dispute: SPRINT-084 T1 cut leg 4
+                  271.5s → 23.6s by spawn count alone, with coverage intact
+      tracker:    TD-090 · TD-084 (the resolved row this recurrence narrows) · L-144 · L-120 ·
+                  docs/research/logs/qa-gate-timing.md § Round 5
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-285 — Make the budget guard able to fire before the thing it guards  [size: S] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — a guard whose whole job is converting a mute death into a named report)
+      done-when:  `qa-budget-check.sh` trips **within** the command ceiling and reports its skipped
+                  harnesses, proven on a deliberately over-budget run. Both lateness paths are closed:
+                  the default is below the ceiling **and** the check is reached before fork exhaustion
+                  can kill the run. One retained must-FAIL fixture per path, each failing with its own
+                  named finding, plus the discrimination proof ADR-029 requires of Tier G
+      touches:    scripts/lib/qa-budget-check.sh · scripts/qa-check.sh (where the check is invoked) ·
+                  its retained fixture
+      depends-on: none
+      assumes:    **the guard is not merely mistuned — it is late in two independent ways**, and a fix
+                  that closes one leaves the other open. (1) `QA_BUDGET_SECONDS` defaults to 900s under
+                  a 600s ceiling, so it cannot trip before an external timeout. (2) Lowered to 420s and
+                  450s it *still* never fired, because fork exhaustion killed the run before the
+                  eval-harness loop reached the check. Verified live across three SPRINT-085 attempts.
+                  Out of scope: fixing what makes the gate slow — that is TASK-284
+      tracker:    TD-091 · TD-084 · L-105 · SPRINT-085 blocker entry
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-286 — Give attended log entries a structured consequence classification  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — `check-review-depth.sh` is a QA-gate checker; its failure mode here is
+                  the silent false negative, already produced twice on the record)
+      done-when:  a live **attended** sprint log carrying `governance:high` or `behaviour:material`
+                  work with no review line is reported as a **FAIL with a named finding**. Proven on
+                  the case that motivated the work: SPRINT-084's own log, at a live path, currently
+                  exits 0 — it must not. One retained must-FAIL fixture per branch and the Tier G
+                  discrimination proof. **This closes TD-085's remaining reach as well as TD-092** —
+                  they are one surface, and the task must not be split into two that edit one file
+      touches:    the sprint-log entry schema (`sprint-log.md.template` + the skills that append to
+                  it) · scripts/lib/check-review-depth.sh · evals/run-review-depth-fixtures.sh
+      depends-on: none
+      assumes:    **the fix is a schema, not a better pattern, and that was ruled — not assumed.**
+                  SPRINT-085 T6's detector is correct and proven for the branch it covers; it anchors
+                  on the `^Tn · ` rollup line, which is night-run Part 4's **unattended** contract,
+                  while every sprint in this repository is attended. Matching a classification stated
+                  in prose was refused explicitly: a substring heuristic over self-describing markdown
+                  is the shape that produced TD-085's siblings and fails green (L-108). Out of scope:
+                  re-opening the archive-skip ruling — SPRINT-085 T6 ruled it (keep the skip; forbid
+                  recording a review into an archived log) and that ruling stands
+      tracker:    TD-092 · TD-085 · L-166 · L-108 · SPRINT-085 T6 surprise entry
+      origin:     close-retro
+      state:      ready
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution
