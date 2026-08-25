@@ -732,6 +732,80 @@ run_case_anywhere "both-paths leg B (committed: the same edit now FAILs)" 1 \
   "T1:bar.txt" -- \
   sh -c "cd \"$c7\" && sh \"$checker\" docs/sprint/SPRINT-915-bothpaths.md"
 
+
+# ================================================================================================
+# case 9: GOVERNANCE COMMITS (TASK-298). A PAIR. Leg A proves a commit belonging to no sprint task --
+# backlog grooming, epic authoring -- no longer reports as `attributable to no task`. Leg B is the
+# retained must-FAIL holding the ALL-OR-NOTHING property: one code file anywhere in the commit keeps
+# the WHOLE commit attributed, so a src/ edit cannot ride along behind bookkeeping. If leg B ever
+# goes green, is_governance_commit() has become ANY-of instead of ALL-of and real code is hiding.
+#
+# Motivating case is real: commit 39eedb8 on main (epic authoring + backlog decomposition, belonging
+# to no sprint) red SPRINT-087 with exactly this finding while SPRINT-087 was mid-flight.
+#
+# NOTE the `printf '%s\n'` form below. Writing `printf '- [ ] ...'` makes printf read the leading `-`
+# as an option flag; it errors, the file is never modified, and BOTH legs then pass for the wrong
+# reason -- leg A never touching the multi-file branch, leg B collapsing to a code-only commit that
+# passes via UNATTRIBUTED. That vacuum is not hypothetical: it is what the first version of this
+# fixture did, and it survived a seeded mutation without reddening.
+# ================================================================================================
+c9="$work/governance-commits"
+mkdir -p "$c9/docs/sprint" "$c9/docs/epic" "$c9/src"
+cat > "$c9/docs/sprint/SPRINT-930-governance.md" <<'EOF'
+---
+sprint: 930
+slug: governance
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-930 — Governance (constructed fixture)
+
+## Plan
+
+### T1 — edit the declared source file
+Layers: `src/declared.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] src/declared.txt updated
+EOF
+printf '%s\n' 'x' > "$c9/src/declared.txt"
+printf '%s\n' 'y' > "$c9/src/sneaky.txt"
+printf '%s\n' '# todo' > "$c9/TODO.md"
+printf '%s\n' '# epic' > "$c9/docs/epic/EPIC-001-thing.md"
+git -C "$c9" init -q
+lock_plan "$c9" 'docs/sprint/SPRINT-930-governance.md'
+
+# --- leg A: a MULTI-FILE commit touching ONLY governance artifacts -- must PASS. Multi-file on
+# purpose: a single-file commit would pass even under an ANY-of implementation, proving nothing.
+printf '%s\n' '- [ ] TASK-500 groomed' >> "$c9/TODO.md"
+printf '%s\n' 'outcome' >> "$c9/docs/epic/EPIC-001-thing.md"
+commit_all "$c9" 'plan(epics): author an epic and groom the backlog'
+gov_a_files=$(git -C "$c9" diff-tree --no-commit-id --name-only -r HEAD | tr '\n' ' ')
+case "$gov_a_files" in
+  *TODO.md*docs/epic/*|*docs/epic/*TODO.md*) echo "PASS fixture(governance leg A precondition): commit really carries both files ($gov_a_files)" ;;
+  *) echo "FAIL fixture(governance leg A precondition): expected TODO.md AND docs/epic/* in the commit, got '$gov_a_files' -- the fixture is vacuous"; fail=1 ;;
+esac
+run_case_anywhere "governance leg A (governance-only commit is not undeclared)" 0 \
+  "layers observed" -- \
+  sh -c "cd \"$c9\" && sh \"$checker\" docs/sprint/SPRINT-930-governance.md"
+
+# --- leg B (RETAINED MUST-FAIL): same shape, but one code file rides along -- must still FAIL and
+# must NAME the code file. TODO.md sorts BEFORE src/ in git's tree order, so an ANY-of implementation
+# returns governance on the first file and hides the code -- which is exactly what this reddens.
+printf '%s\n' '- [ ] TASK-501 groomed' >> "$c9/TODO.md"
+printf '%s\n' 'z2' >> "$c9/src/sneaky.txt"
+commit_all "$c9" 'plan(backlog): groom -- with a code file riding along'
+gov_b_files=$(git -C "$c9" diff-tree --no-commit-id --name-only -r HEAD | tr '\n' ' ')
+case "$gov_b_files" in
+  *TODO.md*src/sneaky.txt*) echo "PASS fixture(governance leg B precondition): commit really mixes bookkeeping and code ($gov_b_files)" ;;
+  *) echo "FAIL fixture(governance leg B precondition): expected TODO.md THEN src/sneaky.txt, got '$gov_b_files' -- the fixture is vacuous"; fail=1 ;;
+esac
+run_case_anywhere "governance leg B (code riding along still FAILs)" 1 \
+  "src/sneaky.txt" -- \
+  sh -c "cd \"$c9\" && sh \"$checker\" docs/sprint/SPRINT-930-governance.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-OBSERVED FIXTURES: all green"; else echo "LAYERS-OBSERVED FIXTURES: at least one FAIL"; fi
 exit $fail
