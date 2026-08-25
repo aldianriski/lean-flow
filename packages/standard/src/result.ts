@@ -5,15 +5,18 @@
 // strings. `test/architecture/dependency-direction.test.ts` enforces that mechanically: a domain
 // string leak (a `node:`/`bun:` import, or reaching for `process.argv`) fails it.
 //
-// `Verdict` mirrors the Shell oracle's own three-state vocabulary (scripts/lib/conformance-engine.sh's
-// `ok`/`bad`/`note`) rather than inventing a fourth. `hold` and `gap` exist in the Shell engine too
-// (SPRINT-078/080) but no evaluator in this package needs them yet -- adding a state nothing produces
-// would be exactly the untested-branch trap CLAUDE.md warns against (a guard keyed to a shape the
-// system never emits).
+// `Verdict` mirrors the Shell oracle's own vocabulary (scripts/lib/conformance-engine.sh's
+// `ok`/`bad`/`note`/`gap`) rather than inventing new states. `hold` exists in the Shell engine too
+// (SPRINT-078) but no evaluator in this package needs it yet -- adding a state nothing produces would
+// be exactly the untested-branch trap CLAUDE.md warns against (a guard keyed to a shape the system
+// never emits). `gap` is the SPRINT-087 T2 exception: `classify.ts`'s classification of an unregistered
+// `mechanical`/`split` rule DOES produce it now (mirroring `gap()`'s own `rule-unimplemented`), so it
+// stops being a shape nothing emits and starts being one this package must report -- never silently
+// as an empty pass, which is the exact false-assurance T2 exists to refuse.
 
 import type { RuleId } from "./model.ts";
 
-export type Verdict = "pass" | "fail" | "note";
+export type Verdict = "pass" | "fail" | "note" | "gap";
 
 /** A named, human-readable finding -- what an evaluation points at when it is not a clean pass. */
 export interface Finding {
@@ -49,8 +52,9 @@ export interface ConformanceResult {
 
 /**
  * Mirrors the Shell oracle's own exit meaning (scripts/lib/conformance-engine.sh: `bad()` sets
- * `fail=1`, `exit $fail` at the end) -- any `fail` verdict makes the run exit non-zero; `pass`/`note`
- * never do, on their own.
+ * `fail=1`, `gap()` does not, `exit $fail` at the end) -- any `fail` verdict makes the run exit
+ * non-zero; `pass`/`note`/`gap` never do, on their own. A GAP is a statement about this engine's own
+ * coverage, not a finding about the repository, so it must never move the exit code (§14).
  */
 export function exitCodeFor(result: ConformanceResult): number {
   return result.evaluations.some((e) => e.verdict === "fail") ? 1 : 0;

@@ -155,10 +155,16 @@ export function formatRuleRow(row: RuleRow): string {
 
 /**
  * The named findings this reader can raise -- mirrors `read-spec-rules.sh`'s own vocabulary.
- * `spec-counts-unreadable` and `section-rows-mismatch` are SPRINT-085 T4's additions, extending this
- * union rather than a parallel finding type -- see `reconcile` below.
+ * `spec-counts-unreadable` and `section-rows-mismatch` are SPRINT-085 T4's additions, and
+ * `marks-table-unreadable` is SPRINT-087 T2's (`marksInStandard`, below), each extending this union
+ * rather than a parallel finding type -- see `reconcile` and `marksInStandard`.
  */
-export type SpecFinding = "spec-table-unreadable" | "spec-not-found" | "spec-counts-unreadable" | "section-rows-mismatch";
+export type SpecFinding =
+  | "spec-table-unreadable"
+  | "spec-not-found"
+  | "spec-counts-unreadable"
+  | "section-rows-mismatch"
+  | "marks-table-unreadable";
 
 export interface SpecReadOk {
   readonly ok: true;
@@ -224,6 +230,63 @@ export function expectedCountsOf(doc: BlockDocument): ReadonlyMap<number, number
     }
   }
   return null;
+}
+
+/** `marksInStandard`'s success shape -- `marks` is always non-empty (see the function below). */
+export interface MarksReadOk {
+  readonly ok: true;
+  readonly marks: readonly string[];
+}
+
+/**
+ * Absence and emptiness stay distinguishable at the TYPE level, same reasoning as `SpecReadResult`:
+ * the failure variant carries no `marks` field to mistake for an empty-but-successful read.
+ */
+export type MarksReadResult = MarksReadOk | SpecReadFail;
+
+/**
+ * §14's own "Marks" legend table (`| Mark | Meaning | Is it work? |`) -- the SIX mark names §14
+ * itself defines, read independently of `model.ts`'s `RULE_MARKS` so the two can be compared rather
+ * than one mirroring the other (SPRINT-087 T2 DoD 3: "the mark set in code is compared against the
+ * Standard's own, so a seventh mark cannot appear silently"). Each row's first cell is a backticked
+ * mark name (`` `mechanical` ``, `` `judgment-only` ``, ...), stripped the same way `primaryToken`
+ * strips a rule row's cells.
+ *
+ * Refuses the SAME L-058 false negative `readSection`/`readAll`/`reconcile` already refuse, below:
+ * a table that matches the header but yields zero backticked marks, or no matching table at all, is a
+ * named `marks-table-unreadable` finding -- never a silently returned `[]` that a caller could read as
+ * "the Standard has no marks" instead of "this reader found nothing". The first cut of this function
+ * returned `readonly string[]` directly and documented the empty case as "a genuine parse defect for
+ * the caller to surface" -- prose, not a type, and every sibling reader in this file already rejects
+ * that shape (reviewer finding, SPRINT-087 T2 revise).
+ */
+export function marksInStandard(doc: BlockDocument, specPath: string): MarksReadResult {
+  for (const section of sectionsOf(doc)) {
+    if (section.number !== 14) continue;
+    for (const block of section.blocks) {
+      if (block.type !== "table") continue;
+      const header = block.header.cells.map((c) => c.trim());
+      if (header[0] !== "Mark" || header[1] !== "Meaning") continue;
+
+      const marks: string[] = [];
+      for (const row of block.rows) {
+        const cell = (row.cells[0] ?? "").trim();
+        const m = /^`([a-z-]+)`$/.exec(cell);
+        if (m) marks.push(m[1]);
+      }
+      if (marks.length > 0) return { ok: true, marks };
+    }
+  }
+
+  return {
+    ok: false,
+    finding: "marks-table-unreadable",
+    message:
+      `read-spec-rules: marks-table-unreadable -- no §14 Marks table ` +
+      `(\`| Mark | Meaning | Is it work? |\`) with at least one backticked mark name was found in ` +
+      `${specPath}. A reader that returns nothing checks nothing and exits clean; that is reported ` +
+      `here instead (L-058)`,
+  };
 }
 
 /**
