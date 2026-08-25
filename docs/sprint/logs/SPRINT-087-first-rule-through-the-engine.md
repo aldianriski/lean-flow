@@ -365,3 +365,35 @@ a real regression.
 
 consequence · T6 · behaviour:material · governance:low
 review · T6 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low
+
+### 2026-08-25 | progress | T2 re-reviewed clean, merged, DoD ticked 4/4
+
+Re-review cleared all six attacks. Two worth recording. **Absence was verified by construction, not by
+trusting the type** — the reviewer built each of the four failure cases and inspected the live returned
+keys: `["ok","finding","message"]`, with no `marks` key present on any failure. That runtime proof is
+what TD-101 makes necessary; the `MarksReadOk | SpecReadFail` union is a *type*, and nothing in this
+repo evaluates types. Second, my worry that the new fixture mutates the real `spec/STANDARD.md` was
+**unfounded** — the strip is in-memory (`readFileSync` → split → slice → `tokenize`), `writeFileSync`
+is never called on `SPEC_PATH`, and the fixture's filename is a synthetic label. Worth having checked:
+a Tier G test that wrote to the SSOT would have been severe and would have read as a spec change.
+
+The revise also moved the L-058 guarantee **out of the test and into the function**. A guarantee living
+in a test protects only the caller who happens to run that test; `marksInStandard()` had zero
+production callers, which is exactly why fixing it now was cheap and later would not have been.
+
+Merged; disjointness checked first. Sprint DoD now **16 ticked / 13 open**.
+
+**An unresolved observation, recorded rather than smoothed over.** The first integrated run after
+merging read **`150 pass, 1 fail`**; two immediate re-runs read `151 pass, 0 fail`. I could not capture
+which test failed — it did not reproduce, and the failure line was gone by the time I grepped for it.
+
+I had told myself "no agents are running", and that was **wrong**: my subagents had finished, but the
+peer session `lean-flow-0e` is actively working in this same repository, which is load I discounted
+because it was not *my* load. The signature matches TD-098 (intermittent, timing-sensitive, oracle-
+spawning), but **matching a signature is not an identification**, and TD-098's own warning is that a
+re-run which greens is indistinguishable from a fix. So this is logged as unidentified, not as the
+known flake. If it recurs, the next sighting should capture the failing test name before re-running —
+the re-run destroys the evidence.
+
+consequence · T2 · behaviour:material · governance:low
+review · T2 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low

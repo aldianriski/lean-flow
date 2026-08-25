@@ -71,10 +71,10 @@ result read as a clean one.
 crashes nor silently passes.
 
 **DoD:**
-- [ ] Unknown **mechanical** rule → `GAP` — *Verify: a fixture whose rule id is absent from the registry reports GAP, not an empty pass*
-- [ ] **Judgment-only** → `excluded/judgment-required`; **implementation-directed** → `excluded` — *Verify: one fixture per class, each asserting its own outcome string*
-- [ ] The mapping is driven by **ADR-036's six marks**, not a re-derived vocabulary — *Verify: the mark set in code is compared against the Standard's own, so a seventh mark cannot appear silently*
-- [ ] **Tier G**: each class reddens its own case while siblings stay green — *Verify: per-class seed, `cmp`-verified, restored under a hash*
+- [x] Unknown **mechanical** rule → `GAP` — *Verify: a fixture whose rule id is absent from the registry reports GAP, not an empty pass*
+- [x] **Judgment-only** → `excluded/judgment-required`; **implementation-directed** → `excluded` — *Verify: one fixture per class, each asserting its own outcome string*
+- [x] The mapping is driven by **ADR-036's six marks**, not a re-derived vocabulary — *Verify: the mark set in code is compared against the Standard's own, so a seventh mark cannot appear silently*
+- [x] **Tier G**: each class reddens its own case while siblings stay green — *Verify: per-class seed, `cmp`-verified, restored under a hash*
 
 ### T3 — Migrate the first rule family whole, rule by rule `[size: M · risk: med · class: execution · HITL]`
 Layers: `packages/standard/src` (the chosen family's evaluators · any ports they need) · colocated tests · `evals/` fixtures
