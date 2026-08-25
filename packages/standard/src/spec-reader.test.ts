@@ -162,10 +162,16 @@ describe("marksInStandard — §14's own Marks legend table (SPRINT-087 T2)", ()
       "| `judgment-only` | not checkable | no |",
     ].join("\n");
     const doc = tokenize(src, "f.md");
-    expect(marksInStandard(doc)).toEqual(["mechanical", "judgment-only"]);
+    const result = marksInStandard(doc, "f.md");
+    if (!result.ok) throw new Error(`expected success, got finding ${result.finding}: ${result.message}`);
+    expect(result.marks).toEqual(["mechanical", "judgment-only"]);
   });
 
-  test("an unrelated table in §14 (e.g. the Levels table) is not mistaken for the Marks table", () => {
+  // SPRINT-087 T2 revise (reviewer finding 1): an unrelated table, a table-less §14, and a §14 whose
+  // Marks table itself has no valid rows must ALL be the SAME named `marks-table-unreadable` finding
+  // -- never a silently returned `[]` a caller could read as "the Standard defines zero marks" instead
+  // of "this reader found nothing". Mirrors `readSection`/`readAll`'s own refusal, immediately below.
+  test("an unrelated table in §14 (e.g. the Levels table) is not mistaken for the Marks table -- named finding, not []", () => {
     const src = [
       "## §14 — Conformance model",
       "",
@@ -174,19 +180,40 @@ describe("marksInStandard — §14's own Marks legend table (SPRINT-087 T2)", ()
       "| **Structural** | the file tree | paths |",
     ].join("\n");
     const doc = tokenize(src, "f.md");
-    expect(marksInStandard(doc)).toEqual([]);
+    const result = marksInStandard(doc, "f.md");
+    if (result.ok) throw new Error("expected a failure result");
+    expect(result.finding).toBe("marks-table-unreadable");
+    expect("marks" in result).toBe(false); // absence, not an empty list -- same D7 shape as SpecReadFail
   });
 
-  test("no §14 at all returns [], not a thrown error", () => {
+  test("no §14 at all -- named finding, not [] and not a thrown error", () => {
     const doc = tokenize("## §1 — Not §14\n\n| Rule |\n|---|\n| `S1.X` |", "f.md");
-    expect(marksInStandard(doc)).toEqual([]);
+    const result = marksInStandard(doc, "f.md");
+    if (result.ok) throw new Error("expected a failure result");
+    expect(result.finding).toBe("marks-table-unreadable");
+  });
+
+  test("§14 HAS the Marks table but every row is malformed (no backticked mark) -- still the named finding", () => {
+    const src = [
+      "## §14 — Conformance model",
+      "",
+      "| Mark | Meaning | Is it work? |",
+      "|---|---|---|",
+      "| mechanical (no backticks) | a tool can decide it | yes |",
+    ].join("\n");
+    const doc = tokenize(src, "f.md");
+    const result = marksInStandard(doc, "f.md");
+    if (result.ok) throw new Error("expected a failure result");
+    expect(result.finding).toBe("marks-table-unreadable");
   });
 
   // Against the REAL spec/STANDARD.md: an independent literal, hand-verified against §14's own
   // printed table (not recomputed the way `RULE_MARKS` in model.ts lists them -- tdd anti-tautology).
   test("the real Standard's §14 table names exactly these 6 marks, in this order", () => {
     const doc = tokenize(readFileSync(SPEC_PATH, "utf8"), SPEC_PATH);
-    expect(marksInStandard(doc)).toEqual([
+    const result = marksInStandard(doc, SPEC_PATH);
+    if (!result.ok) throw new Error(`expected success, got finding ${result.finding}: ${result.message}`);
+    expect(result.marks).toEqual([
       "mechanical",
       "judgment-only",
       "split",

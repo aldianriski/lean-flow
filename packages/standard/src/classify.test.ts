@@ -118,7 +118,9 @@ describe("classifyRule — a seventh mark cannot appear silently (DoD 3)", () =>
     // copied-in literal (tdd anti-tautology rule). If §14 ever grows a 7th mark, this reddens before
     // classifyRule's silent fallthrough would.
     const doc = tokenize(readFileSync(SPEC_PATH, "utf8"), SPEC_PATH);
-    const fromStandard = marksInStandard(doc);
+    const result = marksInStandard(doc, SPEC_PATH);
+    if (!result.ok) throw new Error(`expected success, got finding ${result.finding}: ${result.message}`);
+    const fromStandard = result.marks;
 
     expect(fromStandard.length).toBeGreaterThan(0); // denominator -- a vacuous [] must not pass silently
     expect(new Set(fromStandard)).toEqual(new Set(RULE_MARKS));
@@ -131,7 +133,34 @@ describe("classifyRule — a seventh mark cannot appear silently (DoD 3)", () =>
     const s14 = sectionsOf(doc).find((s) => s.number === 14);
     const tableCount = (s14?.blocks ?? []).filter((b) => b.type === "table").length;
     expect(tableCount).toBeGreaterThan(1); // §14 really does have more than one table
-    expect(marksInStandard(doc)).not.toContain("Level"); // the Levels table's header cell, not a mark
+    const result = marksInStandard(doc, SPEC_PATH);
+    if (!result.ok) throw new Error(`expected success, got finding ${result.finding}: ${result.message}`);
+    expect(result.marks).not.toContain("Level"); // the Levels table's header cell, not a mark
+  });
+
+  // SPRINT-087 T2 revise (reviewer finding 1): the real Standard's §14 Marks table stripped entirely
+  // must be the SAME named `marks-table-unreadable` finding as the synthetic fixtures in
+  // spec-reader.test.ts prove -- exercised here against the REAL document, not a hand-built one, so
+  // this is the "real artifact" half of the guard (CLAUDE.md's guard-motivating-case bar).
+  test("the real Standard with its §14 Marks table stripped: named finding, not a silent []", () => {
+    // Drops the header row AND the delimiter row directly below it -- the tokenizer (tokenizer.ts)
+    // only recognises a table when a header-shaped line is immediately followed by a delimiter row
+    // (`isDelimiterRow`), so removing both leaves the table's former BODY rows with no header above
+    // them; they fall through to `paragraph` blocks instead, which `marksInStandard` never inspects.
+    const realSpec = readFileSync(SPEC_PATH, "utf8");
+    const lines = realSpec.split(/\r\n|\r|\n/);
+    const headerIdx = lines.findIndex((l) => l.trim() === "| Mark | Meaning | Is it work? |");
+    expect(headerIdx).toBeGreaterThan(-1); // the strip target actually exists in the real document
+    const stripped = [...lines.slice(0, headerIdx), ...lines.slice(headerIdx + 2)];
+    const strippedText = stripped.join("\n");
+    // Harness guard: the strip must actually remove the Marks table header, or this case is not
+    // testing what it claims.
+    expect(strippedText).not.toContain("| Mark | Meaning | Is it work? |");
+
+    const doc = tokenize(strippedText, "spec-no-marks.md");
+    const result = marksInStandard(doc, "spec-no-marks.md");
+    if (result.ok) throw new Error("expected a failure result");
+    expect(result.finding).toBe("marks-table-unreadable");
   });
 });
 
@@ -144,9 +173,21 @@ describe("classifyRule — a seventh mark cannot appear silently (DoD 3)", () =>
 // 141/141 every seed but #7, which swaps one statement for another of equal line count, also 141/141;
 // model.ts's #8 is 95 -> 96, a targeted addition, not a demolition), confirmed reddening ONLY its named
 // case(s) while every sibling test in the SAME run stayed green, then RESTORED and confirmed
-// byte-identical via `sha256sum` this session:
-//   classify.ts pristine: 382bcfb56cf545049d6d8f0228ab677a486a2cbbdd9786cc5761d5a8926157bd (141 lines)
-//   model.ts    pristine: fed514245b277de345f6a5ed74621cf64a8d8cc1a8689b9560c7ca8f561342a6 (95 lines)
+// byte-identical this session.
+//
+// SPRINT-087 T2 revise (reviewer finding 2): the FIRST cut of this block recorded two hashes taken
+// under two DIFFERENT normalizations without saying so -- classify.ts's via `sha256sum` on the
+// (already-LF) working-tree file, model.ts's via `sha256sum` on the CRLF working tree (this checkout
+// has `core.autocrlf=true`) -- so the pair looked checkable but did not reproduce on a stock Windows
+// clone. Fixed convention, stated once: every hash below is `git show <ref>:<path> | sha256sum`, i.e.
+// the SHA-256 of the LF blob git itself stores -- normalization-independent, reproducible on ANY
+// checkout regardless of local `core.autocrlf`, and requiring no local file at all:
+//   classify.ts: git show 18e326a:packages/standard/src/classify.ts | sha256sum
+//     -> 382bcfb56cf545049d6d8f0228ab677a486a2cbbdd9786cc5761d5a8926157bd (141 lines)
+//   model.ts:    git show 18e326a:packages/standard/src/model.ts    | sha256sum
+//     -> 08228ebc84d8a21e776ed1a8eb448f68215b92888593deebeece4f36dd6e775a (95 lines)
+// (18e326a is the commit both files were last written in; neither changed in this revise, so the same
+// two commands against HEAD reproduce the same two hashes.)
 //
 //   1. judgment-only branch's reason flipped ("judgment-only" -> "implementation-directed")
 //      -- reddened EXACTLY "judgment-only -> excluded/judgment-required..." / 10 other tests green
