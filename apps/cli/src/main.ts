@@ -75,8 +75,12 @@ function runRule(ruleIdRaw: string, repoDir: string, write: (s: string) => void)
   }
 
   const prefix = evaluation.verdict === "fail" ? "FAIL " : evaluation.verdict === "pass" ? "PASS " : "note ";
-  const name = evaluation.finding ? `${evaluation.finding.name}: ` : "";
-  write(`${prefix} ${ruleId} -- ${name}${evaluation.detail}`);
+  write(`${prefix} ${ruleId} -- ${evaluation.detail}`);
+  // One line PER finding -- mirrors the Shell oracle's own one-`bad()`-per-offense loop, so a
+  // consumer grepping the CLI's output for the named finding sees the same COUNT Shell would.
+  for (const finding of evaluation.findings) {
+    write(`  - ${finding.name}: ${finding.detail}`);
+  }
   return exitCodeFor({ evaluations: [evaluation] });
 }
 

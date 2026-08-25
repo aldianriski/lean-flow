@@ -42,32 +42,47 @@ export function isMisplacedLogName(name: string): boolean {
   return name.endsWith(".md") && name.includes("Execution-Log");
 }
 
+/**
+ * One `Finding` per offending file -- mirrors the Shell oracle's own `bad()` LOOP (`assert_S9_LOGDIR`
+ * calls it once per glob match), not one finding summarising all of them. SPRINT-087 T1 revise: the
+ * first cut comma-joined every misplaced name into a SINGLE finding, which agreed with Shell on the
+ * named finding and the exit meaning but silently disagreed on CARDINALITY -- exactly the kind of
+ * TS/Shell difference EPIC-014 D2 requires to be RULED, not absorbed into a string. Two misplaced
+ * files must read back as two findings, not one finding mentioning two files.
+ */
+function findingFor(name: string): Finding {
+  return {
+    name: SPRINT_LOG_OUTSIDE_LOGS_DIR,
+    detail:
+      `an Execution Log beside the Plan instead of under docs/sprint/logs/: ${name}. The sprint glob ` +
+      `is non-recursive, so a same-directory log is capped and schema-checked as a Plan (§9 - ADR-014)`,
+  };
+}
+
 export function evaluate(port: SprintDirPort): RuleEvaluation {
   if (!port.hasSprintDir()) {
     return {
       ruleId: RULE_ID,
       verdict: "note",
-      finding: null,
+      findings: [],
       detail: "no docs/sprint/ -- nothing to verify",
     };
   }
 
   const misplaced = port.listSprintDirEntries().filter(isMisplacedLogName).slice().sort();
   if (misplaced.length > 0) {
-    const finding: Finding = {
-      name: SPRINT_LOG_OUTSIDE_LOGS_DIR,
-      detail:
-        `an Execution Log beside the Plan instead of under docs/sprint/logs/: ${misplaced.join(", ")}. ` +
-        `The sprint glob is non-recursive, so a same-directory log is capped and schema-checked as a ` +
-        `Plan (§9 - ADR-014)`,
+    return {
+      ruleId: RULE_ID,
+      verdict: "fail",
+      findings: misplaced.map(findingFor),
+      detail: `${misplaced.length} Execution Log(s) beside the Plan instead of under docs/sprint/logs/: ${misplaced.join(", ")}`,
     };
-    return { ruleId: RULE_ID, verdict: "fail", finding, detail: finding.detail };
   }
 
   return {
     ruleId: RULE_ID,
     verdict: "pass",
-    finding: null,
+    findings: [],
     detail: "no Execution Log sits beside a Plan; logs/ is the only log location",
   };
 }

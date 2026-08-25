@@ -38,20 +38,36 @@ describe("evaluate — the three verdicts, against the in-memory fake", () => {
   test("no docs/sprint/ at all: note, not a finding — a repo between sprints has not violated anything", () => {
     const r = evaluate(new InMemorySprintDirPort(null));
     expect(r.verdict).toBe("note");
-    expect(r.finding).toBeNull();
+    expect(r.findings).toEqual([]);
   });
 
   test("docs/sprint/ exists, nothing misplaced: pass", () => {
     const r = evaluate(new InMemorySprintDirPort(["SPRINT-001-x.md"]));
     expect(r.verdict).toBe("pass");
-    expect(r.finding).toBeNull();
+    expect(r.findings).toEqual([]);
   });
 
-  test("a misplaced log: fail, named sprint-log-outside-logs-dir, naming the offending file", () => {
+  test("a misplaced log: fail, ONE finding, named sprint-log-outside-logs-dir, naming the offending file", () => {
     const r = evaluate(new InMemorySprintDirPort(["SPRINT-001-x.md", "SPRINT-001-x-log.md"]));
     expect(r.verdict).toBe("fail");
-    expect(r.finding?.name).toBe(SPRINT_LOG_OUTSIDE_LOGS_DIR);
-    expect(r.finding?.detail).toContain("SPRINT-001-x-log.md");
+    expect(r.findings).toHaveLength(1);
+    expect(r.findings[0]?.name).toBe(SPRINT_LOG_OUTSIDE_LOGS_DIR);
+    expect(r.findings[0]?.detail).toContain("SPRINT-001-x-log.md");
+  });
+
+  // Finding 1 (SPRINT-087 T1 revise): the Shell oracle's `assert_S9_LOGDIR` calls `bad()` once PER
+  // glob match, so TWO misplaced files must read back as TWO findings — never one finding naming
+  // both, which is exactly what the first cut of this evaluator did (comma-joining), silently
+  // absorbing a cardinality difference EPIC-014 D2 requires to be ruled, not hidden in a string.
+  test("TWO misplaced logs: fail, TWO findings — cardinality, not just names, must match", () => {
+    const r = evaluate(
+      new InMemorySprintDirPort(["SPRINT-001-x.md", "SPRINT-001-x-log.md", "SPRINT-Execution-Log-002.md"]),
+    );
+    expect(r.verdict).toBe("fail");
+    expect(r.findings).toHaveLength(2);
+    expect(r.findings.every((f) => f.name === SPRINT_LOG_OUTSIDE_LOGS_DIR)).toBe(true);
+    expect(r.findings.map((f) => f.detail).join("\n")).toContain("SPRINT-001-x-log.md");
+    expect(r.findings.map((f) => f.detail).join("\n")).toContain("SPRINT-Execution-Log-002.md");
   });
 });
 
@@ -76,7 +92,7 @@ describe("evaluate — the SAME evaluator against both port implementations (DoD
     const fromReal = evaluate(real);
 
     expect(fromReal.verdict).toBe(fromFake.verdict);
-    expect(fromReal.finding?.name).toBe(fromFake.finding?.name);
+    expect(fromReal.findings.map((f) => f.name)).toEqual(fromFake.findings.map((f) => f.name));
   });
 
   test("fake and real Bun adapter agree on the clean scenario", () => {
@@ -89,6 +105,28 @@ describe("evaluate — the SAME evaluator against both port implementations (DoD
 
     expect(fromReal.verdict).toBe(fromFake.verdict);
     expect(fromReal.verdict).toBe("pass");
+  });
+
+  // Finding 2 (reviewer): the two tests above use plain FILES on both sides, so nothing proves the
+  // fake and the real adapter would ever DIVERGE — a wrapper that always agrees is not a proven seam.
+  // The differentiating case: a DIRECTORY literally named like a misplaced log
+  // (`docs/sprint/SPRINT-001-x-log.md/`, a directory, not a file). `FsSprintDirPort.isFile()` must
+  // exclude it -- and Shell's own `[ -f ]` guard in `assert_S9_LOGDIR` agrees (verified below, DoD 4).
+  // The in-memory fake has no notion of "this entry is a directory" at all — it has no filesystem to
+  // consult, so every name it is given is implicitly a file. That asymmetry IS the seam: the two
+  // implementations only ever have to agree on inputs that represent the SAME real-world state, and
+  // this test proves the real adapter's is-a-file guard is actually load-bearing, not vestigial.
+  test("a DIRECTORY named like a misplaced log is excluded by the real adapter — the differentiating case", () => {
+    const repo = mkdtempSync(join(tmpdir(), "s9-logdir-seam-dirname-"));
+    mkdirSync(join(repo, "docs", "sprint", "SPRINT-001-x-log.md"), { recursive: true }); // a DIRECTORY
+    writeFileSync(join(repo, "docs", "sprint", "SPRINT-001-a.md"), "# plan");
+
+    const real = new FsSprintDirPort(repo);
+    expect(real.listSprintDirEntries()).not.toContain("SPRINT-001-x-log.md");
+
+    const fromReal = evaluate(real);
+    expect(fromReal.verdict).toBe("pass");
+    expect(fromReal.findings).toEqual([]);
   });
 });
 
@@ -134,7 +172,7 @@ describe("TS agrees with the live Shell oracle on S9.LOGDIR (DoD 4)", () => {
 
     const ts = evaluate(new FsSprintDirPort(repo));
     expect(ts.verdict).toBe("fail");
-    expect(ts.finding?.name).toBe(SPRINT_LOG_OUTSIDE_LOGS_DIR);
+    expect(ts.findings[0]?.name).toBe(SPRINT_LOG_OUTSIDE_LOGS_DIR);
   }, ORACLE_TIMEOUT_MS);
 
   test("PASS: same exit meaning (a PASS line, no finding)", () => {
@@ -150,7 +188,7 @@ describe("TS agrees with the live Shell oracle on S9.LOGDIR (DoD 4)", () => {
 
     const ts = evaluate(new FsSprintDirPort(repo));
     expect(ts.verdict).toBe("pass");
-    expect(ts.finding).toBeNull();
+    expect(ts.findings).toEqual([]);
   }, ORACLE_TIMEOUT_MS);
 
   test("NOTE: no docs/sprint/ at all — neither side reports a finding", () => {
@@ -164,7 +202,7 @@ describe("TS agrees with the live Shell oracle on S9.LOGDIR (DoD 4)", () => {
 
     const ts = evaluate(new FsSprintDirPort(repo));
     expect(ts.verdict).toBe("note");
-    expect(ts.finding).toBeNull();
+    expect(ts.findings).toEqual([]);
   }, ORACLE_TIMEOUT_MS);
 
   test("the *Execution-Log* glob shape agrees too, not just *-log.md", () => {
@@ -177,6 +215,80 @@ describe("TS agrees with the live Shell oracle on S9.LOGDIR (DoD 4)", () => {
 
     const ts = evaluate(new FsSprintDirPort(repo));
     expect(ts.verdict).toBe("fail");
-    expect(ts.finding?.name).toBe(SPRINT_LOG_OUTSIDE_LOGS_DIR);
+    expect(ts.findings[0]?.name).toBe(SPRINT_LOG_OUTSIDE_LOGS_DIR);
+  }, ORACLE_TIMEOUT_MS);
+
+  // Finding 1 (reviewer): the four tests above each use exactly ONE misplaced file, so "same named
+  // finding, same exit meaning" passed even in the first (buggy, comma-joining) cut of `evaluate()`.
+  // This is the test that actually exercises CARDINALITY: reproduced by hand first —
+  //   `sh scripts/lib/conformance-engine.sh <dir> | grep LOGDIR` on a dir with SPRINT-001-x-log.md
+  //   AND SPRINT-Execution-Log-002.md prints exactly TWO `FAIL sprint-log-outside-logs-dir` lines,
+  //   one per file, each with its own detail — never one line naming both.
+  // TS must report the same COUNT, not just the same name.
+  test("TWO simultaneously misplaced logs: Shell emits TWO FAIL lines, TS emits TWO findings — same COUNT", () => {
+    const repo = mkdtempSync(join(tmpdir(), "s9-logdir-oracle-two-"));
+    mkdirSync(join(repo, "docs", "sprint"), { recursive: true });
+    writeFileSync(join(repo, "docs", "sprint", "SPRINT-001-x.md"), "# plan");
+    writeFileSync(join(repo, "docs", "sprint", "SPRINT-001-x-log.md"), "log");
+    writeFileSync(join(repo, "docs", "sprint", "SPRINT-Execution-Log-002.md"), "log");
+
+    const shell = runShellEngine(repo);
+    const shellFailLines = logdirLines(shell.stdout).filter((l) => l.startsWith("FAIL"));
+    // The independent oracle's OWN count -- not recomputed the way TS counts (tdd anti-tautology).
+    expect(shellFailLines).toHaveLength(2);
+    expect(shellFailLines.join("\n")).toContain("SPRINT-001-x-log.md");
+    expect(shellFailLines.join("\n")).toContain("SPRINT-Execution-Log-002.md");
+
+    const ts = evaluate(new FsSprintDirPort(repo));
+    expect(ts.verdict).toBe("fail");
+    expect(ts.findings).toHaveLength(shellFailLines.length); // the cardinality claim itself
+    expect(ts.findings.every((f) => f.name === SPRINT_LOG_OUTSIDE_LOGS_DIR)).toBe(true);
+  }, ORACLE_TIMEOUT_MS);
+
+  // Finding 2 (reviewer), oracle half: Shell's `[ -f ]` guard in `assert_S9_LOGDIR` must agree with
+  // `FsSprintDirPort`'s `.isFile()` filter that a DIRECTORY named like a misplaced log is not one.
+  // Reproduced by hand first: `sh scripts/lib/conformance-engine.sh <dir> | grep LOGDIR` on a dir
+  // whose docs/sprint/ contains ONLY a directory named `SPRINT-001-x-log.md` (plus an ordinary Plan)
+  // prints `PASS  S9.LOGDIR ...`, never a FAIL — confirming Shell's `[ -f ]` and TS's `isFile()` treat
+  // the same real-world state (a directory, not a file) identically.
+  test("a DIRECTORY named like a misplaced log: PASS on both sides, not a FAIL", () => {
+    const repo = mkdtempSync(join(tmpdir(), "s9-logdir-oracle-dirname-"));
+    mkdirSync(join(repo, "docs", "sprint", "SPRINT-001-x-log.md"), { recursive: true }); // a DIRECTORY
+    writeFileSync(join(repo, "docs", "sprint", "SPRINT-001-a.md"), "# plan");
+
+    const shell = runShellEngine(repo);
+    const shellLines = logdirLines(shell.stdout);
+    expect(shellLines.some((l) => l.startsWith("FAIL"))).toBe(false);
+    expect(shellLines.some((l) => l.startsWith("PASS"))).toBe(true);
+
+    const ts = evaluate(new FsSprintDirPort(repo));
+    expect(ts.verdict).toBe("pass");
+    expect(ts.findings).toEqual([]);
   }, ORACLE_TIMEOUT_MS);
 });
+
+// --- Tier G evidence (SPRINT-087 T1; RE-RUN at the T1 revise against the FINAL `findings`-array
+// code, 18 tests in this file) ------------------------------------------------------------------
+// `evaluate()` and `isMisplacedLogName()` in ./sprint-log-outside-logs-dir.ts are Tier G (CLAUDE.md
+// ADR-029): a false negative here is silent by construction, same as the Shell assertion it mirrors.
+// Seven branches were enumerated from the FINISHED (post-revise) code, not the plan — the widening
+// itself added one (#7, the cardinality regression). Each seed: a targeted one-line break, confirmed
+// LANDED (`cmp` against a pristine copy saved before seeding), confirmed still parsing and line-count-
+// stable (88/88 before and after every seed), confirmed reddening ONLY its own case while every sibling
+// test stayed green, then RESTORED and confirmed byte-identical via `sha256sum`
+// (`13332423d5c2d655ac7dcb481f16958b712856c965dc9b29b6e1b682ec7db2b4` before every seed and after
+// every restore, this session):
+//   1. `-log.md` suffix check (`endsWith` -> `startsWith`)               -- 5 reddened / 13 green
+//   2. `Execution-Log` substring typo'd (`"Execution-Logg"`)             -- 4 reddened / 14 green
+//   3. NOTE branch's verdict flipped to `"pass"`                         -- 2 reddened / 16 green
+//   4. FAIL threshold off-by-one (`misplaced.length > 0` -> `> 1`)       -- 3 reddened / 15 green
+//   5. PASS branch's verdict flipped to `"note"`                        -- 5 reddened / 13 green
+//   6. Over-matching false positive (Execution-Log's `&&` -> `||`)      -- 11 reddened / 7 green
+//   7. Cardinality regression: `findings: misplaced.map(findingFor)` reverted to the REJECTED design,
+//      `findings: [findingFor(misplaced.join(", "))]` (one comma-joined finding, Finding 1's original
+//      defect) -- reddened EXACTLY the two cardinality tests (the "TWO misplaced logs" unit test and
+//      the "TWO simultaneously misplaced logs" live-oracle test) / 16 green, proving those two tests
+//      are what actually catch a regression back to the design the reviewer flagged.
+// No seed left the file in a state `cmp` disagreed with the pristine copy on restore. This block
+// records that the exercise was performed as described — the commit history alone does not carry
+// that evidence forward.

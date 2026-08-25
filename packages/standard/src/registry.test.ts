@@ -6,7 +6,7 @@ import type { RuleEvaluation } from "./result.ts";
 type FakePort = { readonly label: string };
 
 function passing(label: string): RuleEvaluation {
-  return { ruleId: makeRuleId("S9.LOGDIR"), verdict: "pass", finding: null, detail: label };
+  return { ruleId: makeRuleId("S9.LOGDIR"), verdict: "pass", findings: [], detail: label };
 }
 
 describe("createRegistry — dispatch through a map, never a switch", () => {

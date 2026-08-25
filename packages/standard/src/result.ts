@@ -22,12 +22,23 @@ export interface Finding {
   readonly detail: string;
 }
 
-/** One rule's evaluation against a repository (or, for `note`, a statement that nothing applied). */
+/**
+ * One rule's evaluation against a repository (or, for `note`, a statement that nothing applied).
+ *
+ * `findings` is an ARRAY, not one-or-null (SPRINT-087 T1 revise). The Shell oracle loops its own
+ * glob and calls `bad()` once PER offending file (scripts/lib/conformance-engine.sh's
+ * `assert_S9_LOGDIR`); a single comma-joined `Finding` here would silently absorb that cardinality
+ * difference into a string, which EPIC-014 D2 forbids -- every TS/Shell difference is RULED, never
+ * absorbed. `[]` for `pass` and for an uninformative `note`; length >= 1 for `fail`. `verdict ===
+ * "fail"` and `findings.length > 0` travel together -- an evaluator's own contract, not enforced by
+ * a type (the domain has no way to express "non-empty exactly when fail" more cheaply than a comment
+ * without adding a discriminated union nothing yet needs -- YAGNI, per this repo's own laziness
+ * ladder).
+ */
 export interface RuleEvaluation {
   readonly ruleId: RuleId;
   readonly verdict: Verdict;
-  /** Set on `fail` (a defect worth grepping for); `null` for `pass` and for an uninformative `note`. */
-  readonly finding: Finding | null;
+  readonly findings: readonly Finding[];
   readonly detail: string;
 }
 

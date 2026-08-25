@@ -106,4 +106,18 @@ describe("leanflow --rule (SPRINT-087 T1 tracer bullet)", () => {
     expect(run({ kind: "rule", ruleId: "S9.LOGDIR", repoDir: repo }, write)).toBe(0);
     expect(lines.join("\n")).toContain("PASS");
   });
+
+  // SPRINT-087 T1 revise, Finding 1: the CLI prints ONE line PER finding, not one line naming both
+  // -- the same cardinality the result domain now carries end-to-end (result.ts's `findings` array).
+  test("TWO misplaced logs print TWO finding lines, not one line naming both", () => {
+    const repo = mkdtempSync(join(tmpdir(), "cli-rule-two-"));
+    mkdirSync(join(repo, "docs", "sprint"), { recursive: true });
+    writeFileSync(join(repo, "docs", "sprint", "SPRINT-001-x-log.md"), "log");
+    writeFileSync(join(repo, "docs", "sprint", "SPRINT-Execution-Log-002.md"), "log");
+
+    const { lines, write } = capture();
+    expect(run({ kind: "rule", ruleId: "S9.LOGDIR", repoDir: repo }, write)).toBe(1);
+    const findingLines = lines.filter((l) => l.includes("sprint-log-outside-logs-dir"));
+    expect(findingLines).toHaveLength(2);
+  });
 });

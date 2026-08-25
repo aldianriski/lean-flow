@@ -8,8 +8,8 @@ describe("exitCodeFor — mirrors the Shell oracle's `exit $fail`", () => {
   test("any fail verdict makes the run exit non-zero, even alongside passes", () => {
     const result: ConformanceResult = {
       evaluations: [
-        { ruleId: RID, verdict: "pass", finding: null, detail: "ok" },
-        { ruleId: RID, verdict: "fail", finding: { name: "x", detail: "d" }, detail: "d" },
+        { ruleId: RID, verdict: "pass", findings: [], detail: "ok" },
+        { ruleId: RID, verdict: "fail", findings: [{ name: "x", detail: "d" }], detail: "d" },
       ],
     };
     expect(exitCodeFor(result)).toBe(1);
@@ -18,8 +18,8 @@ describe("exitCodeFor — mirrors the Shell oracle's `exit $fail`", () => {
   test("all pass/note exits zero", () => {
     const result: ConformanceResult = {
       evaluations: [
-        { ruleId: RID, verdict: "pass", finding: null, detail: "ok" },
-        { ruleId: RID, verdict: "note", finding: null, detail: "n/a" },
+        { ruleId: RID, verdict: "pass", findings: [], detail: "ok" },
+        { ruleId: RID, verdict: "note", findings: [], detail: "n/a" },
       ],
     };
     expect(exitCodeFor(result)).toBe(0);
