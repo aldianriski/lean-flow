@@ -3,10 +3,10 @@ sprint: 086
 slug: guards-that-cannot-fire
 owner: Maintainer
 last_updated: 2026-08-25
-status: active
+status: closed
 gates_signed: G1,G2 @ 835e744
 plan_commit: 5ada67e
-close_commit: [sha — set at close]
+close_commit: [sha — set in the follow-up commit]
 update_trigger: sprint execute/close events
 ---
 
@@ -181,8 +181,61 @@ the case that motivated the work, which currently exits 0.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `scripts/lib/check-review-depth.sh` | T4 | Absence branch for **attended** logs, keyed on a new `consequence ·` carrier; normalised then anchored so drift is caught but prose is not | Med | 17 fixtures green; two independent discrimination proofs, one reproduced by the reviewer |
+| `evals/run-review-depth-fixtures.sh` | T4 | 9 → 17 cases: 2 attended branches, 4 drift classes, 2 controls | Low | Run as its own call; 17 green / 0 red |
+| `evals/fixtures/review-depth/attended-*` ·`drift-*` | T4 | 8 retained fixture trees (TD-012) | Low | Each named in the suite |
+| `skills/orchestrator/references/review-scoping.md` | T4 | Defines the schema at the decision point — where the skip table is consulted | Med | Consumer-facing; the emit rule lives with the decision, not the checker |
+| `skills/orchestrator/SKILL.md` | T4 | § Review points at it, so the coordinator's own job description carries it | Med | L-020 wiring: not buried in a reference doc alone |
+| `…/templates/sprint-log.md.template` | T4 | Documents the carrier's shape for every consumer repo | Low | Consumer-facing |
+| `scripts/qa-check.sh` | T3 · T2 | Budget default 900→450 with the arithmetic inline; `qb_checkpoint()` at 22 sites across legs 2–12; new budget-default leg | Med | **Fired live**: 461s run named its 3 skipped harnesses instead of dying mute |
+| `scripts/lib/check-qa-budget-default.sh` | T3 | **New** — mechanical self-check so the default cannot drift back above the ceiling | Med | 3 cases, harness carries its own discrimination assertion |
+| `evals/run-qa-budget-default-fixtures.sh` | T3 | Path (a) must-FAIL corpus | Low | 3 green, `qa-budget-default-exceeds-ceiling` |
+| `evals/run-qa-budget-position-fixtures.sh` | T3 | Path (b) must-FAIL corpus — **case 2 retains TD-084's silent shape** | Low | 3 green, `qa-check-budget-exceeded-early` |
+| `evals/run-conformance-engine-fixtures.sh` | T2 | Adopts the spec-reduction its own siblings already used: 25 of 38 engine calls stop dispatching the full spec to check 6 rule ids | Med | 196.1s → 143.2s/163.7s; 50 fixture names before **and** after, zero removed |
+| `docs/research/logs/qa-gate-timing.md` | T1 · T2 | § Round 6 (the verdict) + § Round 7 (leg 12 per-harness profile) | Low | Pure appends, 0 deletions, Rounds 1–5 untouched |
 
 ## Retro
 
-_(written at close)_
+**Retrieval check** — no prior `L-NNN`/ADR was contradicted, and several were reached for correctly:
+L-108 caught A6's self-matching grep, L-100 authorised three `Layers:` corrections rather than
+defending a frozen prediction, and L-088 stopped T2's stale DoD 1 being quietly re-read. **But the
+sprint's dominant retrieval fact is the opposite one**, and it is the finding worth keeping: **five
+times a rule was loaded, correct, on screen — and did not fire at the moment it governed.** L-042 while
+I ran `git add -A` over a live agent's tree · L-020 while T4's schema was wired into every file that
+documents it and none that emits it · the background-wait ban present in T1's brief and absent from
+T2's · and the layers-declaration rule three times over, after being shown the pattern twice. Every one
+was caught by an **outside instrument or a disagreeing second number**, never by recall.
+
+**Cost** — coordinator + 6 dispatched agents (T1 · T3 · T4 · T4-review · T4-revise · T2, plus one T2
+resume), ≈1.32M subagent tokens, 8 full gate runs. Delivered: 17 of 18 DoD, 22 commits. **Per unit
+delivered ≈330k.** Two distortions worth recording for the next promote: T2 consumed ~500k across two
+attempts because the first stopped mid-task having committed nothing, and the **review half found the
+only defect that would have shipped** — a corrupted guard on `main` that every other signal called clean.
+
+**Worked**
+- **Sequencing T2 behind T1 by evidence.** T1's verdict retargeted T2 from the conformance engine to
+  leg 12; without it T2 would have optimised work costing the default gate 1.9–5s while its own
+  Acceptance demanded that gate survive load.
+- **Classifying consequence *before* deciding whether to review.** T4's own schema marked T4
+  `governance:high`, which routed it to an independent reviewer — and that reviewer found the shipped
+  corruption. The guard caught the corruption of the guard.
+- **Refusing to substitute a passing proof.** T2 reported DoD 3 unmet rather than running the gate on a
+  clean table, which would have satisfied the sentence and proved nothing.
+- **Retaining bugs as fixtures, not just guarding against them.** T3's path-(b) case 2 reproduces
+  TD-084's mute death; a future regression now reddens a *named* case instead of presenting as a mystery.
+- **Resuming rather than restarting T2** — ~241k tokens of sound work preserved after it stalled.
+
+**Friction**
+- **I shipped a broken guard to `main`** by running `git add -A` while a non-isolated review agent had a
+  seeded break in the tree, then its `git checkout --` restored from the HEAD I had poisoned. → L-168.
+- **T2 stopped mid-task claiming to wait on a background job**, harness reported success, branch had
+  zero commits — SPRINT-085 T5's shape, and the ban was in T1's brief but not T2's.
+- **Three gate runs failed on findings my own DoD-tick prose introduced.** → L-167.
+- **The gate scans agent worktrees** — six repo copies, false FAILs, and enough cost to trip the budget
+  guard. It penalises the dispatch pattern this repo prescribes. → TD-095 · TASK-287.
+
+**Pattern candidate** (surfaced → `docs/LEARNINGS.md`)
+- **L-167** — enriching a *frozen* DoD tick with evidence introduces references the Plan never declared.
+- **L-168** — a reviewer must be worktree-isolated, because verifying a guard means seeding breaks in
+  the tree it is reviewing.
+- **L-165 → count 2** and **L-166 → count 2**, both now promotion candidates at the next promote.

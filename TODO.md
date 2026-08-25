@@ -18,15 +18,15 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-086 — Guards That Cannot Fire** → [docs/sprint/SPRINT-086-guards-that-cannot-fire.md](docs/sprint/SPRINT-086-guards-that-cannot-fire.md)
-
-**Standalone — no `epic:` stamp**, the instrument sprint before EPIC-014's Sprint C. Three shipped
-guards are correct, proven, and cannot fire on the traffic they were built for: the gate does not
-finish under load (TD-090), the budget guard that should report that cannot trip before the run dies
-(TD-091), and the review-depth guard anchors on a log shape no sprint here emits (TD-092 · TD-085).
-All four `severity: high` rows escalated to P1 by the ledger's own rule. **Sprint C is not promoted** —
-H07–H11 are undecomposed and `TASK-280/281/282` are gated on them existing, so promoting those would
-freeze criteria nothing could make reachable (L-111).
+_(none — SPRINT-086 closed 2026-08-25, 17 of 18, system-verify `183 pass, 0 fail`. All three guards now
+reach their own subject: the budget guard **fired on live traffic** at 461s and named its skipped
+harnesses instead of dying mute, and the review-depth guard caught a corrupted checker on `main` that
+every other signal called clean. **TD-085 · TD-091 · TD-092 resolved.** **TD-090 was lowered to `medium`
+and re-raised to `high` within the hour**, by its own written re-raise condition — the close's own
+verification run hit **454s > 450s with no worktrees present**, so the gate sits ~1% under its budget
+and a sprint's close output is enough to push it over. Next: **EPIC-014 Sprint C** (H07–H11), which needs
+`/task-decomposer --epic` first — its tasks are undecomposed, and `TASK-280/281/282` stay gated on
+them existing.)_
 
 ---
 
@@ -36,73 +36,27 @@ freeze criteria nothing could make reachable (L-111).
 
 ### P1 — Next Phase Required
 
-- [ ] TASK-284 — Cut the gate's spawn count so it completes under load  [size: M] [risk: med] [HITL]
+- [ ] TASK-287 — Stop the QA gate scanning agent worktrees  [size: S] [risk: low] [HITL]
       class:      execution
-      tier:       G (ADR-029 — this is the QA gate itself; a false negative here is silent by
-                  construction, and a gate that cannot finish emits no verdict at all)
-      done-when:  `sh scripts/qa-check.sh` prints its `QA-CHECK:` verdict line on a **loaded** process
-                  table — the condition it currently fails on — with the dominant rule families' spawn
-                  counts reduced and **no check deleted and no coverage lowered**. The proof is a run
-                  that completes after the session has already done substantial agent work, not a run
-                  on a pristine table, because the pristine case already passes
-      touches:    scripts/lib/conformance-engine.sh · scripts/lib/ (the families named by § Round 5) ·
-                  scripts/qa-check.sh only if wiring moves
-      depends-on: TASK-283
-      assumes:    **the ranking must not be acted on before TASK-283 settles it.** Round 5 names F11
-                  §11 retention 84.7s · F6 §4 ADR 72.1s · F5 §1 ownership 56.0s · F9 §10 37.4s as 89%
-                  of 281.2s — but `S11.LOGPAIR` + `S11.WHENITRUNS` inside F11 are exactly the pair
-                  Round 4 and Round 5 disagree on **19×**, so the top-ranked family rests on the
-                  disputed number. Acting first is the L-130 shape the epic's open question guards.
-                  The mechanism is established and is *not* in dispute: SPRINT-084 T1 cut leg 4
-                  271.5s → 23.6s by spawn count alone, with coverage intact
-      tracker:    TD-090 · TD-084 (the resolved row this recurrence narrows) · L-144 · L-120 ·
-                  docs/research/logs/qa-gate-timing.md § Round 5
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-285 — Make the budget guard able to fire before the thing it guards  [size: S] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — a guard whose whole job is converting a mute death into a named report)
-      done-when:  `qa-budget-check.sh` trips **within** the command ceiling and reports its skipped
-                  harnesses, proven on a deliberately over-budget run. Both lateness paths are closed:
-                  the default is below the ceiling **and** the check is reached before fork exhaustion
-                  can kill the run. One retained must-FAIL fixture per path, each failing with its own
-                  named finding, plus the discrimination proof ADR-029 requires of Tier G
-      touches:    scripts/lib/qa-budget-check.sh · scripts/qa-check.sh (where the check is invoked) ·
-                  its retained fixture
+      tier:       G (ADR-029 — a change to the gate's own path discovery; getting it wrong either
+                  re-admits the noise or silently excludes real repo content)
+      done-when:  a full `sh scripts/qa-check.sh` run with at least one live agent worktree present
+                  reports **no findings whose path lies under `.claude/worktrees/`**, and a retained
+                  fixture proves the exclusion does not also swallow a real finding at a similar path.
+                  The exclusion is placed in the gate's path discovery, alongside the existing
+                  `*/archive/*` convention, not bolted onto individual checkers
+      touches:    scripts/qa-check.sh (path discovery) · possibly scripts/lib/ checkers that glob
+                  independently · a retained fixture
       depends-on: none
-      assumes:    **the guard is not merely mistuned — it is late in two independent ways**, and a fix
-                  that closes one leaves the other open. (1) `QA_BUDGET_SECONDS` defaults to 900s under
-                  a 600s ceiling, so it cannot trip before an external timeout. (2) Lowered to 420s and
-                  450s it *still* never fired, because fork exhaustion killed the run before the
-                  eval-harness loop reached the check. Verified live across three SPRINT-085 attempts.
-                  Out of scope: fixing what makes the gate slow — that is TASK-284
-      tracker:    TD-091 · TD-084 · L-105 · SPRINT-085 blocker entry
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-286 — Give attended log entries a structured consequence classification  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — `check-review-depth.sh` is a QA-gate checker; its failure mode here is
-                  the silent false negative, already produced twice on the record)
-      done-when:  a live **attended** sprint log carrying `governance:high` or `behaviour:material`
-                  work with no review line is reported as a **FAIL with a named finding**. Proven on
-                  the case that motivated the work: SPRINT-084's own log, at a live path, currently
-                  exits 0 — it must not. One retained must-FAIL fixture per branch and the Tier G
-                  discrimination proof. **This closes TD-085's remaining reach as well as TD-092** —
-                  they are one surface, and the task must not be split into two that edit one file
-      touches:    the sprint-log entry schema (`sprint-log.md.template` + the skills that append to
-                  it) · scripts/lib/check-review-depth.sh · evals/run-review-depth-fixtures.sh
-      depends-on: none
-      assumes:    **the fix is a schema, not a better pattern, and that was ruled — not assumed.**
-                  SPRINT-085 T6's detector is correct and proven for the branch it covers; it anchors
-                  on the `^Tn · ` rollup line, which is night-run Part 4's **unattended** contract,
-                  while every sprint in this repository is attended. Matching a classification stated
-                  in prose was refused explicitly: a substring heuristic over self-describing markdown
-                  is the shape that produced TD-085's siblings and fails green (L-108). Out of scope:
-                  re-opening the archive-skip ruling — SPRINT-085 T6 ruled it (keep the skip; forbid
-                  recording a review into an archived log) and that ruling stands
-      tracker:    TD-092 · TD-085 · L-166 · L-108 · SPRINT-085 T6 surprise entry
+      assumes:    **the defect is measured, not inferred.** SPRINT-086's under-load run reported 7
+                  FAILs, **5 of them `ephemeral-intake` findings on fixture files inside
+                  `.claude/worktrees/agent-*`** — not repo content. That same run tripped the budget
+                  guard at 461s > 450s; with the worktrees removed and nothing else changed the next
+                  run came in **under budget and clean at 183 pass / 0 fail**. So this costs both
+                  correctness and time. Out of scope: changing where worktrees live, or whether to use
+                  them — `dispatch.md` prescribes worktree-isolated parallel builds and that stands;
+                  the gate is what must stop charging for it
+      tracker:    TD-095 · L-168 · SPRINT-086 close · `dispatch.md` § Worktree dispatch protocol
       origin:     close-retro
       state:      ready
 
@@ -176,27 +130,6 @@ freeze criteria nothing could make reachable (L-111).
       origin:     close-retro
       state:      ready
 
-- [ ] TASK-283 — Resolve the Round 4 / Round 5 disagreement on `S11.LOGPAIR` + `S11.WHENITRUNS`  [size: S] [risk: low] [AFK]
-      class:      execution
-      tier:       P (ADR-029 — a measurement record; a defect is visible on first read)
-      done-when:  a **§ Round 6** in `docs/research/logs/qa-gate-timing.md` states which of the two
-                  rounds is wrong and why, with the disagreement either reproduced or dissolved. The
-                  numbers are **19× apart** on byte-identical code, so exactly one of them is a
-                  measurement artefact and saying which is the deliverable
-      touches:    docs/research/logs/qa-gate-timing.md (append-only — never edit a past round)
-      depends-on: none
-      assumes:    **the class of fact that closes this is a measurement (L-094)**, so it genuinely
-                  parks until someone measures — unlike a documented behaviour or a judgement call,
-                  which park forever behind that phrasing. The two rounds: Round 5 measured the pair
-                  at **76.1s** combined, confirmed by an isolated rerun; Round 4 never named them and
-                  its own arithmetic implies **≤4s** for its entire unnamed remainder. The engine is
-                  byte-identical between the rounds and the archived corpus moved 120→122 files, so
-                  neither round is obviously wrong. Out of scope: acting on either figure — TD-090's
-                  ranking must not be re-ordered on a number this task exists to check
-      tracker:    SPRINT-085 T5 · TD-090 · docs/research/qa-gate-timing.md § Caveats
-      origin:     close-retro
-      state:      ready
-
 ### P3 — Long-term
 
 > Rejected work lives in **`.out-of-scope/`** — each file carries its own reasoning, revisit-if and
@@ -217,7 +150,7 @@ freeze criteria nothing could make reachable (L-111).
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-085's shipped changes are written up as **v1.58.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only). Consumer-facing surface: `check-review-depth.sh` now FAILs named on a *missing* review line instead of passing it as `nothing to verify` — a gate that got stricter, so a consumer repo previously closing clean may now see a named FAIL. The TS reference engine is **not** consumer-facing yet: it has no CLI until H11, and `package.json` still declares zero dependencies, so the no-toolchain install guarantee is unchanged.
+_(no active sprint)_ — SPRINT-086's shipped changes are written up as **v1.59.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only). Consumer-facing surfaces: the attended **consequence** schema (new field in `sprint-log.md.template` + `orchestrator/SKILL.md` + `review-scoping.md`), a **stricter** review-depth gate that now FAILs on a missing review line for `governance:high`/`behaviour:material` work, and the QA budget default lowered **900s → 450s** so an over-budget run reports and names its skipped harnesses instead of dying past an external timeout.
 
 ---
 

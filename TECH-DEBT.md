@@ -152,7 +152,24 @@ status: current
 > at **3050 > 130**, still TD-082's reasoned carry; the figure moved 3,050 → 3,050 since the last
 > sweep, so the carry ruling is unaffected.
 
-- **TD-091** severity: **high** | status: open | created: Sprint-085
+- **TD-095** severity: medium | status: open | created: Sprint-086
+  - Summary: **`qa-check.sh` scans agent worktrees under `.claude/worktrees/`**, treating each as repo
+    content. Six live worktrees meant six full repo copies walked — enough to emit false FAILs *and*
+    to push the run over its own budget.
+  - Evidence: SPRINT-086's under-load run reported **7 FAILs, 5 of them `ephemeral-intake` findings on
+    fixture files inside `.claude/worktrees/agent-*`** — none of which is repo content. The same run
+    tripped the budget guard at **461s > 450s**; with the worktrees removed and nothing else changed
+    the next run came in **under budget and clean**. That pair of runs is the measurement.
+  - Impact: it penalises the dispatch pattern this repository **prescribes** — `dispatch.md` recommends
+    worktree-isolated parallel builds, and the gate charges for them. The failure is a false *positive*,
+    so it is noisy rather than silent, which is why this is `medium` and not `high`. The real cost is
+    that it makes a green gate depend on remembering to tidy up first.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): exclude `.claude/worktrees/`
+    in the gate's path discovery, the same way `*/archive/*` is already excluded by three checkers.
+    → `TASK-287`.
+  - **Re-file fresh if** worktrees move out of `.claude/` — the exclusion would then name a stale path.
+
+- **TD-091** severity: **high** | status: **resolved** → TASK-285 (Sprint-086 T3) | created: Sprint-085
   - Summary: **`scripts/lib/qa-budget-check.sh` cannot fire in this environment — an absent guard
     wearing the shape of a present one (L-105).** `QA_BUDGET_SECONDS` defaults to **900s** while the
     command ceiling is **600s**, so the guard can only trip after fifteen minutes somewhere nothing
@@ -171,7 +188,7 @@ status: current
     of the two lateness paths open.
   - **Re-file fresh if** the command ceiling changes — the 900/600 arithmetic is the whole finding.
 
-- **TD-092** severity: **high** | status: open | created: Sprint-085
+- **TD-092** severity: **high** | status: **resolved** → TASK-286 (Sprint-086 T4) | created: Sprint-085
   - Summary: **Nothing structured records a task's consequence classification in attended mode**, so
     `check-review-depth.sh`'s new absence branch cannot reach any sprint this repository actually runs.
   - Evidence: SPRINT-085 T6 shipped the fix for TD-085 with two named findings, two retained must-FAIL
@@ -216,7 +233,7 @@ status: current
     approval rather than drifted into.
   - **Re-file fresh if** `EPIC-014` passes ~180 lines — the headroom argument expires there.
 
-- **TD-085** severity: **high** | status: open | created: Sprint-084
+- **TD-085** severity: **high** | status: **resolved** → TASK-286 (Sprint-086 T4, same surface as TD-092 — D3) | created: Sprint-084
   - Summary: **`check-review-depth.sh` cannot see the failure it exists to prevent.** It grades only
     `review ·` lines that are *present*, so a `governance:high` task closing with **no review line at
     all** exits 0 with a `nothing to verify` note. It also skips `*/archive/*` by design, so a review
@@ -301,7 +318,7 @@ status: current
   - **Re-file fresh if** the regex is widened without re-running Round 4: that round's conclusion would
     then rest on a matcher nobody re-measured.
 
-- **TD-090** severity: **high** | status: open | created: Sprint-084 | **raised to `high` at Sprint-085 close**
+- **TD-090** severity: **high** | status: open | created: Sprint-084 | `high` (085 close) → `medium` (086 close) → **`high` again, same day, by its own re-raise condition**
   - Summary: **`qa-check.sh` leg 12 (eval harnesses) is now the gate's dominant cost** — 396.3s of a
     492s run, ~81%.
   - Evidence: `docs/research/logs/qa-gate-timing.md` § Round 4, measured post-fix. It was never the
@@ -326,6 +343,32 @@ status: current
     F9 §10 37.4s. `docs/research/logs/qa-gate-timing.md` § Round 5.
   - **Escalated by the ledger's own rule, not by preference** — `severity: high` auto-escalates to
     `TODO.md` Backlog P1 at the next promote.
+  - **Sprint-086 close — materially better, not cured; `high` → `medium` by owner ruling.** The failure
+    changed character in two ways that matter more than the remaining seconds. **(1) It no longer dies
+    mute**: T3's guard now trips inside the ceiling and *names its skipped harnesses*, so an over-budget
+    run produces a verdict line instead of a silent death — which was TD-084's actual harm. **(2) It no
+    longer fails under load**: the gate completed on a table carrying 6 worktrees, 7 agent dispatches
+    and 4 prior full runs — 226 lines, verdict printed — where SPRINT-085's three attempts died at
+    204 / 117 / 100 without printing.
+  - **The remaining cost is smaller than it looked, and part of it was never this row's.** T2 cut leg 12
+    by 32–53s (196.1s → 143.2s/163.7s on `run-conformance-engine-fixtures.sh`). The over-budget run then
+    measured **461s > 450s** — but with the agent worktrees removed and nothing else changed, the next
+    run came in **under budget and clean at 183 pass / 0 fail**. So a large share of today's excess was
+    the gate scanning six repo copies, which is now **TD-095**, not this row.
+  - Lowered to `medium` so it stops auto-escalating to P1 every promote while the genuine remainder is
+    small and bounded. **Re-raise to `high` if** a run without worktrees present exceeds the budget.
+  - **RE-RAISED to `high` the same day, by that condition, within the hour it was written.** The close's
+    own verification run — **no worktrees present** — hit **454s against the 450s budget** and tripped
+    the guard, skipping three harnesses. The condition was set deliberately and met immediately; honouring
+    it rather than re-reading it is the whole point of writing a re-raise condition down (L-088).
+  - **The sharper finding is *why*, and it is worse than "slow".** The run that came in clean was
+    `183 pass / 0 fail` **before** this close wrote its own output; the run that tripped was the same
+    tree **plus** this sprint's close content — two long `LEARNINGS` entries, four TD rows, and a
+    `docs/sprint/INDEX.md` row of ~4,000 characters. The gate sits **~1% under its own budget**, so
+    **a sprint's own close output is enough to push it over**. That is a feedback loop: the more the
+    repo records, the likelier the gate truncates, and the record is the thing this repo values most.
+  - **Re-file fresh if** the budget is raised rather than the cost reduced — that converts a measured
+    ceiling into a moving one and the loop above stops being visible.
 
 - **TD-084** severity: **high** | status: **resolved** → TASK-272 (Sprint-084 T1) | created: Sprint-083
   - Summary: **`scripts/qa-check.sh` can no longer run to completion.** Three runs in one session were
