@@ -13,6 +13,44 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
+## v1.58.0 — Standard Parser and Shell Parity (2026-08-25)
+
+MINOR — SPRINT-085, **26 of 26 DoD** — closed at `QA-CHECK: 183 pass, 0 fail`. EPIC-014's **first
+§ Closed-when condition, closed whole**. **Consumer-facing: one gate got stricter.**
+`check-review-depth.sh` now FAILs with a named finding when a task records `governance:high` or
+`behaviour:material` and carries **no** review line at all — previously that passed as
+`no review line -- nothing to verify`, exit 0. A consumer repo that closed clean may now see a named
+FAIL; that is the fix working. The TS engine below is **not** consumer-reachable — it has no CLI until
+H11 and `package.json` still declares zero dependencies, so the no-toolchain install guarantee holds.
+
+**The Standard is read by a parser now, not by a regex.** A hand-written block tokenizer (headings,
+pipe tables, fenced code, paragraphs — each with a source location, zero imports, because ADR-035
+leaves no Markdown library to reach for) feeds a reader that finds rules by asking *which table sits
+inside which `## §N` window*. It emits all **100** rows in document order and agrees with
+`scripts/lib/read-spec-rules.sh` **row-by-row, never in aggregate** — the assertion names the offending
+row, and was demonstrated by perturbing one mark until exactly one test reddened. The discriminator
+that proves a structural parse beat a substring match: `S13.NOINFER` appears **twice** in the Standard
+and is admitted **once**. Given a denominator rather than a bare zero (L-156): **148** rule-id-shaped
+tokens exist in the document, 100 admitted, 48 prose and duplicate mentions filtered.
+
+**Absence and emptiness are now different answers, enforced by a type.** `SpecReadFail` carries no
+`rows` field *at all*, so a caller cannot confuse "checked nothing and found a finding" with "checked
+and found zero". An unreadable table is a named finding with a non-zero exit; §8 — which genuinely has
+no rules — exits **0 silently**, because §14 publishes 0 for it. `--reconcile` reproduces the
+per-section count table and the mismatch FAIL, which is the only thing that tells a silently-dropped
+section apart from a legitimately empty one. Parity is held against the **9 retained fixtures the Shell
+reader already answers to**, with the Shell reader spawned as a live oracle inside the TS tests rather
+than its output frozen as a literal — so parity cannot rot silently.
+
+**A guard was fixed, and then shown not to reach the case that motivated it.** `check-review-depth.sh`'s
+absence branch is real — two named findings, two retained must-FAIL fixtures, and a seeded break that
+reddens exactly those cases while seven siblings stay green. Pointed at the log that motivated it, it
+still passes: the detector anchors on the *unattended* rollup contract, and every sprint here is
+attended. Accepted for the branch it proves and the gap filed (TD-092 · L-166) rather than papered
+over. Also: the conformance engine profiled per rule family (§ Round 5 — 281.2s, 89% in four families),
+and `qa-gate-timing.md`'s recommendation **amended, not superseded**, with its coverage-reduction
+ruling explicitly left standing.
+
 ## v1.57.1 — Gate Recovery and Owed Work (2026-08-25)
 
 PATCH — SPRINT-084, **19 of 19 DoD** — closed at `QA-CHECK: 176 pass, 3 fail`, with two FAILs ruled
@@ -92,47 +130,4 @@ Also: the dependency direction is now five mechanical rules over six retained fi
 Standard's vocabulary is typed at **six** marks (V3's sketch had four — `restated` and
 `standard-directed` were missing); and §11 retention ran — shipped tasks pruned, SPRINT-082 archived,
 `v1.54.0` rotated — taking conformance from 6 FAIL to **0** and `level: none` back to **Gated**.
-
----
-## v1.56.0 — Foundation Hardening (2026-08-24)
-
-MINOR — SPRINT-082, **38 of 38 DoD**. Three proof boundaries where lean-flow read *absence of evidence*
-as *evidence of absence*, closed as one shape. Consumer-facing: a new root `.gate-command` declaration,
-and review depth that no longer keys on file extension.
-
-**`no-gate-discovered` routes on risk** ([ADR-033](docs/adr/ADR-033-gate-discovery-declared-rung.md)).
-It used to continue to close on the reasoning "nothing to block on", so a behavioural change could close
-having proved nothing and leave no trace that nothing was proved. Low/non-behavioural work is unchanged;
-**material work draws a recorded owner ruling attended and parks unattended** — not new policy, but
-night-run Part 0's existing execute-only charter applied to a case that slipped past it. The rollup line
-now carries the class (`no-gate-discovered(low|material)`), because a verdict a checker cannot read is
-not enforceable; an unmarked line followed by a close is `no-gate-risk-unmarked`.
-
-**Gate discovery gains a fourth rung — `.gate-command`, ranked last.** A declaration is the weakest
-evidence available, so anything discoverable beats it. It exists because *this* repository had no
-discoverable gate at all — no manifest, Makefile, justfile or CI — while `dispatch.md` claimed it
-dogfooded discovery as `sh scripts/qa-check.sh`: true of the repo, false of the procedure.
-
-**Review depth follows consequence, not file type.** The skip table no longer exempts
-`docs / config / trivial`. Depth is chosen from **behaviour impact + governance impact**, and a diff
-needs both low to earn the self-review floor — so spec/STANDARD semantics, an implementation-binding
-ADR, or a workflow contract draw an independent reviewer whatever their extension. The material classes
-are defined once and consumed, never restated.
-
-**G2 asks whether a check REACHES what it claims.** Four questions per mechanical `Verify:` —
-EXISTS · RUNS · REACHES · PROVES. The first two are screened by `scripts/lib/check-verify-reaches.sh`;
-the rest stay human, and the checker says so. It found a live defect in this sprint's own Plan on its
-first run.
-
-**The freeze.** The core execution architecture is declared frozen in
-`docs/research/adlc-epic-sequencing.md`'s gated register — the file read when an epic is proposed.
-Further workflow change is admitted only on a measured defect, a measured cost, a repeated workflow
-failure, a security issue, or consumer evidence.
-
-**Verification:** 3 new checkers wired against live artifacts (not fixtures alone) · 25 fixtures across
-3 families · 9 must-FAIL · 8 seeded breaks, each verified landed, parsing, targeted and hash-restored.
-
-**Known open:** the independent review of this sprint's own `governance:high` changes is **owed**
-(TASK-266) — its own routing refused to let the work self-certify. TD-081 filed: `qa-check` prints two
-verdicts and only the tally is read.
 

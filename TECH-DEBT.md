@@ -136,6 +136,70 @@ status: current
 > line quotes 3,039 lines and `check-doc-caps.sh` now prints **3,050** — the doc grew 11 lines since
 > the row froze. Recorded, not re-litigated: the carry ruling is unaffected by the drift.
 
+- **TD-091** severity: **high** | status: open | created: Sprint-085
+  - Summary: **`scripts/lib/qa-budget-check.sh` cannot fire in this environment — an absent guard
+    wearing the shape of a present one (L-105).** `QA_BUDGET_SECONDS` defaults to **900s** while the
+    command ceiling is **600s**, so the guard can only trip after fifteen minutes somewhere nothing
+    survives ten.
+  - Evidence: SPRINT-085's blocker entry. The guard was shipped by Sprint-084 T1 *specifically* so an
+    over-budget gate would name its skipped harnesses instead of dying mute — its own FAIL text reads
+    *"rather than left to run past an external timeout with no verdict line (TD-084)"*, which is
+    verbatim what attempt 1 then did. **Late in two independent ways**: attempts 2 and 3 lowered the
+    budget below the ceiling and it *still* never fired, because fork exhaustion killed the run before
+    the eval-harness loop reached the check.
+  - Impact: the one mechanism that converts "gate died mute" into "gate named what it skipped" is
+    inert, so the failure it exists to soften presents as a bare timeout — which is exactly how a
+    close came to be blocked with no verdict and no diagnosis.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): lower the default **and**
+    move the check earlier than the eval-harness loop. Both halves are needed; either alone leaves one
+    of the two lateness paths open.
+  - **Re-file fresh if** the command ceiling changes — the 900/600 arithmetic is the whole finding.
+
+- **TD-092** severity: **high** | status: open | created: Sprint-085
+  - Summary: **Nothing structured records a task's consequence classification in attended mode**, so
+    `check-review-depth.sh`'s new absence branch cannot reach any sprint this repository actually runs.
+  - Evidence: SPRINT-085 T6 shipped the fix for TD-085 with two named findings, two retained must-FAIL
+    fixtures and a full discrimination proof — all real. Then, **tested directly rather than assumed**,
+    SPRINT-084's own log copied to a live path still printed `no review line -- nothing to verify`,
+    exit **0**. The detector anchors on `^Tn · ` rollup lines, which are night-run Part 4's
+    *unattended* contract; **every sprint in this repository is attended**, and attended entries state
+    the classification in prose.
+  - Impact: TD-085 is fixed for the branch it proves and open for the shape we produce. Matching prose
+    was refused deliberately — that is the substring-heuristic shape that *created* TD-085's siblings
+    and fails green (L-108) — so the fix is a schema, not a better regex.
+  - Mitigation (hypothesis): give attended log entries a structured classification carrier, so
+    "governance:high work with no review line" becomes observable to a dependency-free checker at all.
+  - **Re-file fresh if** unattended runs become the norm — the guard would then reach its subject and
+    only the attended gap would remain.
+
+- **TD-093** severity: minor | status: open | created: Sprint-085
+  - Summary: **`/release-patch` has no step that bumps the README footer version the gate lints**, so
+    every release leaves a drift the QA gate catches a sprint later.
+  - Evidence: caught at SPRINT-085's close as the single gate FAIL — `README footer version
+    (footer=1.57.0, plugin.json=1.57.1)`, drift introduced by release `5f495c1`. **Second occurrence**:
+    `5bd4b1d` is titled *"sprint(082): bump README footer to v1.56.0 (missed in the close)"*.
+    `skills/release-patch/SKILL.md` contains no mention of the footer at all.
+  - Impact: small and self-correcting — the gate does catch it — but it charges the cost to the *next*
+    sprint's close, where it reads as an unrelated failure, and it consumed a full gate re-run here.
+  - Mitigation (hypothesis): the fix must stay **generic**. `/release-patch` is consumer-facing, and
+    hardcoding this repo's footer convention is precisely the L-015 leak; the shape is closer to
+    "bump every version reference the project's own gate lints" than to "edit README.md line 492".
+  - **Re-file fresh if** a third occurrence lands before the fix — that would argue for the gate
+    failing at *release* time rather than at the following close.
+
+- **TD-094** severity: trivial | status: open | created: Sprint-085
+  - Summary: **ADR-030's epic-log split has never been executed.** Contribution rows are supposed to
+    live in `docs/epic/logs/EPIC-NNN-<slug>.md`, created lazily at the first member sprint's close;
+    that directory does not exist and both member rows sit in `EPIC-014`'s own table.
+  - Evidence: `docs/epic/logs/` absent at SPRINT-085's close, which is EPIC-014's second member close.
+    ADR-030 § the split — *"created lazily at the first member sprint's close"*.
+  - Impact: none yet, and that is why it is `trivial` — the epic is at **134 of 200** lines, so the cap
+    pressure ADR-030 exists to relieve has not arrived. It becomes real as members accumulate.
+  - Mitigation (hypothesis): perform the split deliberately at a promote, moving both existing rows
+    together, rather than as a side effect of a close. Ruled this way at SPRINT-085's close on owner
+    approval rather than drifted into.
+  - **Re-file fresh if** `EPIC-014` passes ~180 lines — the headroom argument expires there.
+
 - **TD-085** severity: **high** | status: open | created: Sprint-084
   - Summary: **`check-review-depth.sh` cannot see the failure it exists to prevent.** It grades only
     `review ·` lines that are *present*, so a `governance:high` task closing with **no review line at
@@ -221,7 +285,7 @@ status: current
   - **Re-file fresh if** the regex is widened without re-running Round 4: that round's conclusion would
     then rest on a matcher nobody re-measured.
 
-- **TD-090** severity: minor | status: open | created: Sprint-084
+- **TD-090** severity: **high** | status: open | created: Sprint-084 | **raised to `high` at Sprint-085 close**
   - Summary: **`qa-check.sh` leg 12 (eval harnesses) is now the gate's dominant cost** — 396.3s of a
     492s run, ~81%.
   - Evidence: `docs/research/logs/qa-gate-timing.md` § Round 4, measured post-fix. It was never the
@@ -233,6 +297,19 @@ status: current
     this degrades visibly rather than silently.
   - **Re-file fresh if** a profile shows leg 12's cost is not spawn-count-shaped — the fix that worked
     twice would then not transfer.
+  - **Sprint-085 close — raised `minor` → `high`, and the characterisation is narrower than it looks.**
+    The gate blocked a close for a full session: three attempts, none printing a `QA-CHECK:` line, each
+    dying earlier than the last (204 → 117 → 100 lines) on a cumulatively degraded process table.
+    But it then completed **twice on the first try** in a fresh session (222 lines, verdict printed,
+    `183 pass, 0 fail`). So this is **not** TD-084's *unrunnable* recurring — it is **load-dependent**:
+    the gate finishes on a clean process table and cannot finish after ~11 subagents and 3 gate runs.
+    That distinction is the actionable part, and it is why a fork-health probe returning 200/200 clean
+    immediately before an attempt still did not predict surviving it.
+  - Round 5 supplies the profile the original row asked for: **281.2s across the engine's own 12
+    families, 89% in four** — F11 §11 retention 84.7s · F6 §4 ADR 72.1s · F5 §1 ownership 56.0s ·
+    F9 §10 37.4s. `docs/research/logs/qa-gate-timing.md` § Round 5.
+  - **Escalated by the ledger's own rule, not by preference** — `severity: high` auto-escalates to
+    `TODO.md` Backlog P1 at the next promote.
 
 - **TD-084** severity: **high** | status: **resolved** → TASK-272 (Sprint-084 T1) | created: Sprint-083
   - Summary: **`scripts/qa-check.sh` can no longer run to completion.** Three runs in one session were

@@ -18,13 +18,11 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-085 — Standard Parser and Shell Parity** → [docs/sprint/SPRINT-085-standard-parser-and-parity.md](docs/sprint/SPRINT-085-standard-parser-and-parity.md)
-
-EPIC-014's second member sprint (`epic: EPIC-014`), closing the epic's **first § Closed-when condition**
-whole: the Standard parsed by AST to a typed model, matching `read-spec-rules.sh` row-by-row on the real
-document and on every retained malformed case. Carries three tasks outside the epic slice — the profile
-Sprint C needs before it can order rule families (V3 §43 · L-130), the high-severity review-depth blind
-spot SPRINT-084 found, and one superseded-doc ruling.
+_(none — SPRINT-085 closed 2026-08-25, 26 of 26. It closed **EPIC-014's first § Closed-when condition**
+whole: the Standard is parsed by AST to a typed model and agrees with `read-spec-rules.sh` row-by-row on
+all 100 rows and on every retained malformed case. Next: **EPIC-014**'s third member sprint — V3 Sprint C
+(H07–H11), whose first rule family is deliberately **not** chosen yet and is that sprint's own G2 call
+(V3 §43 · L-130).)_
 
 ---
 
@@ -33,52 +31,6 @@ spot SPRINT-084 found, and one superseded-doc ruling.
 <!-- Groomed by /triage. Only `ready` tasks are promotable. -->
 
 ### P1 — Next Phase Required
-
-- [ ] TASK-273 — Close `check-review-depth.sh`'s absence blind spot  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — a `check-*.sh` in the QA gate; a false negative here is silent by
-                  construction, and this row exists because the guard already produced one)
-      done-when:  a live sprint log carrying a `governance:high` (or `behaviour:material`) task with
-                  **no** `review ·` line is reported as a **FAIL with a named finding**, not as a
-                  `nothing to verify` note. One retained must-FAIL fixture per branch (absent-line +
-                  governance:high · absent-line + behaviour:material), each failing with its own named
-                  finding, plus the discrimination proof ADR-029 requires of Tier G. The archive-skip
-                  half is ruled separately and explicitly — either archived paths become readable when
-                  passed by name, or recording a review there is forbidden — but it is **ruled**, not
-                  left implicit
-      touches:    scripts/lib/check-review-depth.sh · evals/run-review-depth-fixtures.sh ·
-                  possibly scripts/qa-check.sh (leg 2b wiring)
-      depends-on: none
-      assumes:    **the defect is reproduced, not inferred** — SPRINT-084 T2 ran it live: a log with a
-                  `governance:high · behaviour:material` task and no `review ·` line prints
-                  `no review line -- nothing to verify` and exits **0**. SPRINT-082 did exactly this and
-                  closed 38 of 38 with zero review lines on the record; SPRINT-084's own live log does
-                  the same. Escalated to P1 by the ledger's own rule (`severity: high` → auto-P1), not
-                  by preference. Out of scope: re-litigating whether archived history should be
-                  re-read — that is the ruling this task must *make*, not assume
-      tracker:    TD-085 · L-165 · L-105 · SPRINT-082 T2 · SPRINT-084 T2
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-274 — Rule on `qa-gate-timing.md`'s superseded recommendation  [size: S] [risk: low] [HITL]
-      class:      decision
-      tier:       P (ADR-029 — a research decision doc; a defect is visible on first read)
-      done-when:  `docs/research/qa-gate-timing.md`'s standing Recommendation is either amended or
-                  marked superseded with a pointer to § Round 4, so a reader cannot act on a conclusion
-                  the measurement overturned. Whichever way it is ruled, the doc stops asserting a
-                  recommendation that the evidence below it contradicts
-      touches:    docs/research/qa-gate-timing.md · docs/knowledge-index.md (generated)
-      depends-on: none
-      assumes:    **the supersession is specific, not general.** The doc's Recommendation ("Option C
-                  stands... no sub-part of section 4 worth cutting") correctly ruled out
-                  *coverage reduction* as a lever and was never wrong about that. It never tested
-                  *spawn-count reduction*, which is where SPRINT-084 T1's actual cure came from
-                  (271.5s → 23.6s with no coverage removed). So this is a scope correction, not a
-                  reversal. Deliberately left for a promote-time ruling rather than edited mid-sprint,
-                  because rewriting a decision doc to match a result is how the record stops being one
-      tracker:    docs/research/logs/qa-gate-timing.md § Round 4 · TD-090 · SPRINT-084 T1
-      origin:     close-retro
-      state:      ready
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution
@@ -99,111 +51,76 @@ spot SPRINT-084 found, and one superseded-doc ruling.
       origin:     close-retro
       state:      blocked
 
-- [ ] TASK-275 — Tokenize the Standard to a typed block tree, proven end-to-end on §13  [size: M] [risk: med] [HITL]
+- [ ] TASK-280 — Map `ok:false` to exit 1 when H11's CLI lands  [size: S] [risk: med] [HITL]
       class:      execution
-      tier:       G (EPIC-014 D8 — the parser is named Tier G there; a parser that silently drops a
-                  rule is a false negative the whole engine inherits)
-      done-when:  the TS reader emits §13's **7 rows** as `(id, level, mark)`, identical to
-                  `sh scripts/lib/read-spec-rules.sh spec/STANDARD.md --section 13`, and derives them by
-                  **querying a typed block tree** — asking which table sits inside which `## §N` window —
-                  rather than by matching lines. A hand-written block tokenizer covering only what the
-                  Standard uses: ATX headings, pipe tables, fenced code, paragraphs, each carrying a
-                  source location. Branches are enumerated **from the code, not from memory**, and each
-                  carries its own seeded break (L-164 came from the layer directly below this one)
-      touches:    packages/standard (parser + block model, extending the existing domain model) ·
-                  its colocated tests · test/fixtures as needed
-      depends-on: none
-      assumes:    H04 is delivered — `packages/standard/src/model.ts` exists from SPRINT-083, verified
-                  on disk rather than read off the epic's member row. **Zero dependencies is binding**
-                  (ADR-035; `package.json` carries no `dependencies` key), so no Markdown library is
-                  available and the tokenizer is hand-written. Out of scope: CommonMark completeness —
-                  nested lists, blockquotes, setext headings, inline emphasis and lazy continuation are
-                  deliberately unmodelled, because every extra branch is one more that must be proven
-      tracker:    EPIC-014 · V3 H05 · ADR-035 · L-164
-      origin:     decomposer
+      tier:       G (EPIC-014 D8 — the exit meaning is ADR-034 D3's frozen surface)
+      done-when:  the TS CLI exits **1** for every `SpecReadFail` and **0** for every `SpecReadOk`,
+                  including the legitimate zero-row section, asserted against the Shell reader's exit
+                  as an independent oracle rather than against a copied literal
+      touches:    packages/standard (CLI entry, H11) · its colocated tests
+      depends-on: none (blocked in practice until H11's CLI exists)
+      assumes:    **the domain half is already correct and must not be re-litigated.** SPRINT-085 T3
+                  ruled `ok:false` vs exit 0/1 *not* a TS/Shell difference: ADR-034 D3 freezes exit
+                  *meaning*, and `ok:false` carries that meaning faithfully — but the domain layer has
+                  **no process boundary**, so nothing has yet mapped it to an exit code. The mapping is
+                  where the meaning is lost if it is skipped
+      tracker:    SPRINT-085 T3 carry-forward 1 · ADR-034 D3 · EPIC-014 V3 H11
+      origin:     close-retro
       state:      ready
 
-- [ ] TASK-276 — Reach full-document parity on the real Standard, row by row  [size: M] [risk: med] [HITL]
+- [ ] TASK-281 — Stop a permission-denied spec from reporting `spec-not-found`  [size: S] [risk: med] [HITL]
       class:      execution
-      tier:       G (EPIC-014 D8)
-      done-when:  the TS reader emits **all 100 rows** in document order and agrees with
-                  `read-spec-rules.sh` **row-by-row, never in aggregate** (EPIC-014's § Closed-when
-                  wording is explicit on this), and reproduces the `position-anchored-not-substring`
-                  result: `S13.NOINFER` occurs **twice** in the Standard and is admitted **once**, as a
-                  rule. That case is the discriminator that proves a structural parse beat a regex —
-                  §14 and §8 both name other sections' rule ids in prose, and a substring match ingests
-                  them as rules (L-108)
-      touches:    packages/standard (section walk + rule-row extraction) · its colocated tests
-      depends-on: TASK-275
-      assumes:    the comparand is `<id> <level> <mark>`, read from `read-spec-rules.sh`'s own usage
-                  block, and **100** is the frozen denominator settled by ADR-034 (`51` checkable +
-                  `49` marked non-evaluated; the circulating `79` is a disproved query whose regex
-                  stopped at a hyphen, missing exactly the 21 hyphenated §2 ids). Any Shell/TS
-                  difference found here is **ruled, never absorbed** (EPIC-014 D2) — which is why this
-                  is HITL despite a mechanically checkable acceptance
-      tracker:    EPIC-014 · V3 H05/H06 · ADR-034 · L-108
-      origin:     decomposer
+      tier:       G (EPIC-014 D8 — a wrongly *named* finding is the failure this repo prices highest)
+      done-when:  an unreadable-but-present spec produces a finding distinct from `spec-not-found`,
+                  matching whatever the Shell reader does, with a retained must-FAIL fixture per branch
+      touches:    packages/standard (H11 CLI — the layer that touches the filesystem) · its tests
+      depends-on: none (blocked in practice until H11's CLI exists)
+      assumes:    **this is not a shipped defect and the task must not be written as if it were.**
+                  `specNotFound()` in production is a *pure constructor with no filesystem access*, so
+                  the domain never decides when to emit it; the over-broad catch lives only in T3's
+                  test stand-in. What this task fixes is the decision H11 will otherwise make by
+                  accident. Out of scope: changing the domain constructor
+      tracker:    SPRINT-085 T3 carry-forward 2 · EPIC-014 V3 H11
+      origin:     close-retro
       state:      ready
 
-- [ ] TASK-277 — Match the Shell reader's error semantics on the malformed corpus  [size: M] [risk: med] [HITL]
+- [ ] TASK-282 — Carry every `--reconcile` finding, not just the first  [size: S] [risk: low] [HITL]
       class:      execution
       tier:       G (EPIC-014 D8)
-      done-when:  for the retained cases `spec-table-unreadable-whole`, `spec-table-unreadable-section`,
-                  `spec-not-found` and `zero-rule-section-is-not-a-finding`, the TS reader agrees with
-                  the Shell reader on the **named finding and the exit meaning**, not merely on rows.
-                  An unreadable table is a *named finding on stderr with a non-zero exit*, never an
-                  empty rule set — a reader that returns nothing checks nothing and exits clean, which
-                  is the false negative the whole engine would inherit (L-058). A zero-rule section
-                  (§8) exits **0 silently**, because §14 publishes 0 for it: absence and emptiness are
-                  different answers and must stay distinguishable
-      touches:    packages/standard (error model + findings) · its colocated tests
-      depends-on: TASK-275
-      assumes:    the parity corpus **already exists and is retained** — `evals/run-spec-reader-fixtures.sh`
-                  holds 9 green cases, confirmed by running it as its own call, so no new fixture corpus
-                  is owed and these tasks assert against the comparand the Shell engine is already held
-                  to. Out of scope: inventing new malformed shapes beyond the retained set
-      tracker:    EPIC-014 · V3 H06 · L-058
-      origin:     decomposer
+      done-when:  a `--reconcile` run over a spec with **two or more** mismatching sections surfaces
+                  every mismatch, matching the Shell reader's enumeration, with a fixture that has
+                  more than one mismatch — the case a single-finding shape cannot pass
+      touches:    packages/standard (result shape, H07) · its colocated tests
+      depends-on: none (lands naturally at H07, when findings become typed data)
+      assumes:    **accepted deliberately at SPRINT-085 T4, not overlooked.** Shell prints several
+                  findings per run; TS surfaces the first mismatching section. The **verdict and the
+                  finding name are identical**, so ADR-034 D3's frozen surface is intact and this is
+                  cosmetic *today*. It stops being cosmetic at H07, where a result carrying N findings
+                  is the natural shape — the point of filing it is that Sprint C should not inherit
+                  the collapse silently
+      tracker:    SPRINT-085 T4 carry-forward · ADR-034 D3 · EPIC-014 V3 H07
+      origin:     close-retro
       state:      ready
 
-- [ ] TASK-278 — Reproduce `--reconcile` against §14's published counts  [size: S] [risk: low] [HITL]
-      class:      execution
-      tier:       G (EPIC-014 D8)
-      done-when:  the TS reader reproduces the per-section count table and the mismatch **FAIL**,
-                  agreeing with the Shell reader on `reconciles-with-section-14`, `section-rows-mismatch`
-                  and `spec-counts-unreadable`. A section returning zero rows while §14's own counts say
-                  it has some is a **FAIL, not an empty result** — that comparison is the only way a
-                  silently-dropped section is distinguishable from a section that legitimately has none
-      touches:    packages/standard (reconcile mode) · its colocated tests
-      depends-on: TASK-276
-      assumes:    §14 is the published-counts source and stays the comparand; this migrates a **mode**
-                  of the existing reader, not a new capability. Out of scope: changing what §14
-                  publishes, or reconciling anything beyond per-section rule counts
-      tracker:    EPIC-014 · V3 H06
-      origin:     decomposer
-      state:      ready
-
-- [ ] TASK-279 — Profile `conformance-engine.sh` per rule family → § Round 5  [size: S] [risk: low] [AFK]
+- [ ] TASK-283 — Resolve the Round 4 / Round 5 disagreement on `S11.LOGPAIR` + `S11.WHENITRUNS`  [size: S] [risk: low] [AFK]
       class:      execution
       tier:       P (ADR-029 — a measurement record; a defect is visible on first read)
-      done-when:  per-rule-family runtime and process-spawn counts for the conformance engine are
-                  appended as **§ Round 5** to `docs/research/logs/qa-gate-timing.md`, matching Rounds
-                  1–4's established shape (per-unit table · Findings · Recommendation · Caveats), with
-                  the dominant families **named with their numbers** and the measurement method stated.
-                  Seeds V3 §43's migration matrix columns (Rule · Shell · TS · Parity · Authority) so
-                  the first family to migrate is chosen on evidence
+      done-when:  a **§ Round 6** in `docs/research/logs/qa-gate-timing.md` states which of the two
+                  rounds is wrong and why, with the disagreement either reproduced or dissolved. The
+                  numbers are **19× apart** on byte-identical code, so exactly one of them is a
+                  measurement artefact and saying which is the deliverable
       touches:    docs/research/logs/qa-gate-timing.md (append-only — never edit a past round)
       depends-on: none
-      assumes:    **Round 4 is a partial answer, not the answer.** SPRINT-084 T1 measured `qa-check.sh`
-                  legs and named only some conformance-engine families, flagging its own spawn counts
-                  as a **floor**; EPIC-014's open question requires the family order not be frozen
-                  before a profile exists (V3 §43 · L-130), and §43 forbids ordering by section number.
-                  Method is established: time each family in isolation against a tiny input so
-                  per-invocation overhead is not masked by workload (L-144 · L-147). Out of scope:
-                  *acting* on the profile — choosing the first family is Sprint C's G2 call, not this
-                  task's, and freezing an order here would repeat the mistake the question guards
-      tracker:    EPIC-014 open question · V3 §43 · L-130 · L-144 · docs/research/logs/qa-gate-timing.md § Round 4
-      origin:     decomposer
+      assumes:    **the class of fact that closes this is a measurement (L-094)**, so it genuinely
+                  parks until someone measures — unlike a documented behaviour or a judgement call,
+                  which park forever behind that phrasing. The two rounds: Round 5 measured the pair
+                  at **76.1s** combined, confirmed by an isolated rerun; Round 4 never named them and
+                  its own arithmetic implies **≤4s** for its entire unnamed remainder. The engine is
+                  byte-identical between the rounds and the archived corpus moved 120→122 files, so
+                  neither round is obviously wrong. Out of scope: acting on either figure — TD-090's
+                  ranking must not be re-ordered on a number this task exists to check
+      tracker:    SPRINT-085 T5 · TD-090 · docs/research/qa-gate-timing.md § Caveats
+      origin:     close-retro
       state:      ready
 
 ### P3 — Long-term
@@ -226,7 +143,7 @@ spot SPRINT-084 found, and one superseded-doc ruling.
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-082's shipped changes are written up as **v1.56.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only). Consumer-facing surfaces: the root `.gate-command` declaration (ADR-033) and review depth keyed on consequence rather than file extension.
+_(no active sprint)_ — SPRINT-085's shipped changes are written up as **v1.58.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only). Consumer-facing surface: `check-review-depth.sh` now FAILs named on a *missing* review line instead of passing it as `nothing to verify` — a gate that got stricter, so a consumer repo previously closing clean may now see a named FAIL. The TS reference engine is **not** consumer-facing yet: it has no CLI until H11, and `package.json` still declares zero dependencies, so the no-toolchain install guarantee is unchanged.
 
 ---
 

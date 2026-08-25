@@ -4,10 +4,10 @@ slug: standard-parser-and-parity
 epic: EPIC-014
 owner: Maintainer
 last_updated: 2026-08-25
-status: active
+status: closed
 gates_signed: G1,G2 @ 3a789fa
 plan_commit: 10d2931
-close_commit: [sha — set at close]
+close_commit: [sha — set in the follow-up commit]
 update_trigger: sprint execute/close events
 ---
 
@@ -217,8 +217,60 @@ or marked superseded with a pointer to the rounds that overturned it.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `packages/standard/src/tokenizer.ts` | T1 | Hand-written block tokenizer — heading · table · fence · paragraph, each with a source location. Hand-written because ADR-035 fixes the workspace at zero dependencies | Med | 10 branches enumerated from the finished code, each seeded, each reddened its own case |
+| `packages/standard/src/tokenizer.test.ts` | T1 | Colocated tests for the block model | Low | Part of the 90-pass suite |
+| `packages/standard/src/spec-reader.ts` | T1–T4 | Structural section windowing + rule-row extraction (T1/T2), typed `SpecReadOk \| SpecReadFail` error model (T3), `reconcile()` + `SectionCount` (T4) | Med | Diffed against `read-spec-rules.sh`; 7 branches seeded at T1, 2 at T3, 1 at T4 |
+| `packages/standard/src/spec-reader.test.ts` | T1–T4 | Colocated tests; the Shell reader is spawned as an **independent oracle** rather than its output copied in as a literal | Low | 90 pass / 0 fail; row-by-row loop names the offending row |
+| `scripts/lib/check-review-depth.sh` | T6 | Absence now FAILs named (`review-depth-governance-absent`, `review-depth-material-absent`) instead of noting `nothing to verify`. Archive-skip ruling recorded in the checker's own header | Med | 9 of 9 fixtures; seeding the anchor reddened exactly cases 8+9, 7 siblings green |
+| `evals/run-review-depth-fixtures.sh` | T6 | +2 retained must-FAIL cases, one per branch | Low | 9 of 9 green |
+| `evals/fixtures/…/SPRINT-956-absent-governance.md` | T6 | Retained must-FAIL fixture (governance branch) | Low | Case 8 |
+| `evals/fixtures/…/SPRINT-957-absent-material.md` | T6 | Retained must-FAIL fixture (material branch) | Low | Case 9 |
+| `docs/research/logs/qa-gate-timing.md` | T5 | § Round 5 appended (226 insertions, 0 deletions) — 45 rules across the engine's own 12 families, measured two ways | Low | Families sum to 281,166.6ms vs 287,406ms wall clock — a 2.2% reconciled gap |
+| `docs/research/qa-gate-timing.md` | T7 | Recommendation **amended, not superseded**; Option E (reduce spawn count, not coverage) added; coverage-reduction ruling explicitly left standing | Low | `check-doc-caps.sh` → `PASS cap (130 <= 130)`; index verified unchanged |
+| `README.md` | close | Footer version 1.57.0 → 1.57.1 — **pre-existing drift** from release `5f495c1`, not sprint work | Low | `qa-check.sh` leg 6 flipped PASS |
 
 ## Retro
 
-_(written at close)_
+**Retrieval check** — no prior `L-NNN`/ADR was contradicted or missed. The opposite happened twice, and
+both are worth the line: T2's negative claim was given a **positive witness** on L-156's instruction
+(148 rule-id-shaped tokens exist, 100 admitted, 48 filtered — so "no prose leaked" rests on a
+denominator rather than on a zero that could equally mean the check reached nothing), and T5's stalled
+agent was caught by **checking the artifact rather than the report** (L-045 · L-120), which is the same
+shape that produced SPRINT-084's own sighting. Rules were reached for, not merely present.
+
+**Cost** — coordinator + 7 task agents + 4 review passes, plus 3 failed system-verify attempts in the
+execution session and 2 successful ones at close. Delivered: 26 of 26 DoD across 7 tasks, 11 commits.
+The distortion worth recording for the next promote is that **~1.5 sessions of the cost bought 0 of the
+DoD** — one T5 agent burned ~200k tokens and ~21 minutes writing nothing, and the close was blocked for
+a whole session on a gate that would not finish. Neither was task work.
+
+**Worked**
+- **Spawning the Shell reader as a live oracle inside the TS tests**, instead of freezing its output as
+  a literal. Parity cannot rot: if the Shell reader changes, the TS tests fail rather than drift.
+- **Enumerating branches from the finished code rather than from memory** (T1's 17). It directly found
+  the defect L-164 predicts — a seeded break that reported 0 fail because the error surfaced as bun's
+  "Unhandled error between tests" and silently dropped two tests instead of failing them.
+- **Making the distinction a TYPE rather than a convention** — `SpecReadFail` carries no `rows` field at
+  all, so a caller *cannot* confuse "checked nothing" with "checked and found zero". L-058's failure
+  mode is now unrepresentable rather than merely documented.
+- **Reporting the Round 4 / Round 5 disagreement instead of smoothing it.** A second measurement
+  disagreeing with the first is exactly the signal the cross-check rule exists to produce.
+- **Halting the close rather than assembling a verdict from green parts.** TD-084 named that move and
+  predicted it would be reached for *because it works*; it wasn't.
+
+**Friction**
+- **The gate could not produce a verdict for an entire session.** Three attempts, none printing a
+  `QA-CHECK:` line, each dying earlier than the last. → TD-090 (raised to `high`).
+- **The budget guard shipped to prevent exactly that could not fire** — a 900s default under a 600s
+  ceiling, and late again behind fork exhaustion. → TD-091.
+- **An agent reported success having written nothing**, and the harness reported it `completed`.
+- **T6's guard does not reach the case that motivated it** — it anchors on the *unattended* `^Tn · `
+  contract while every sprint here is attended. Accepted as an ADR-021 surfaced ruling. → TD-092, L-166.
+- **A release-step gap surfaced at close, not at release** — nothing bumps the README footer the gate
+  lints, so the drift lands a sprint later. Second occurrence. → TD-093.
+
+**Pattern candidate** (surfaced → `docs/LEARNINGS.md`)
+- **L-166** — a guard keyed to a shape the system does not produce is an absent guard. T6's detector is
+  correct, proven, and blind to every sprint this repo actually runs, because its anchor belongs to the
+  unattended contract and all our sprints are attended. L-105's *shape* sibling: that rule asks when a
+  guard fires, this one asks whether the thing it matches on is ever emitted.
