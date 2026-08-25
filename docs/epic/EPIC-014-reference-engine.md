@@ -2,9 +2,9 @@
 epic: 014
 slug: reference-engine
 owner: Maintainer
-last_updated: 2026-08-24
+last_updated: 2026-08-25
 status: active
-member_sprints: [SPRINT-083]
+member_sprints: [SPRINT-083, SPRINT-085]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -57,6 +57,7 @@ publishing packages to npm · the execution/workflow stream (**EPIC-015**).
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
 | [SPRINT-083](../sprint/archive/SPRINT-083-ts-bun-foundation.md) | TS/Bun Foundation | closed 2026-08-24 · `3332857` | **Froze the comparand before building the thing it measures.** Rule surface pinned at **100** ids, derived not inherited — the circulating 51 (checkable) and 79 (a *disproved* query whose regex stopped at a hyphen, missing exactly 21 §2 ids) are both reconciled, `79 + 21 = 100`. **The Finding-ID half could not be frozen and is a named gap**: the Shell engine emits findings through 4+ message shapes as free text, and three extractions returned 4 / 14 / 78 — which is the sharpest argument for the migration this epic has. Workspace stands up with **zero dependencies** (Bun runs TS directly, so nothing lands in a consumer's cache), and its manifest is this repo's **first rung-1 gate-discovery hit**, outranking `.gate-command` — safe only because `scripts.test` invokes the real gate, now guarded. The dependency direction became 5 mechanical rules over 6 retained fixture trees, and the Standard's vocabulary is typed at **six** marks, not V3's four. ADR-034 · ADR-035 · ADR-036 |
+| [SPRINT-085](../sprint/SPRINT-085-standard-parser-and-parity.md) | Standard Parser and Shell Parity | **active** — promoted 2026-08-25 | _(completed at close)_ Slice: H05 AST parser + H06 differential parity, targeting § Closed-when 1 whole. Asserts against the **9 retained `run-spec-reader-fixtures.sh` cases** rather than a new corpus, so TS is held to the comparand Shell already answers to; the `position-anchored-not-substring` case (100 rows; `S13.NOINFER` present twice, admitted once) is the discriminator that a structural parse beat a regex. Hand-written tokenizer — ADR-035's zero-dependency property leaves no Markdown library to reach for. |
 
 Planned shape after 083 (V3 §42 — **not** promoted, and each re-derived at its own promote): Standard
 parser + Shell parity → first conformance vertical slice + targeted CLI → full orchestrator + first

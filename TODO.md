@@ -18,14 +18,13 @@ status: current
 
 ## Active Sprint
 
-> _None._ SPRINT-084 closed 2026-08-25 → [docs/sprint/SPRINT-084-gate-recovery-and-owed-work.md](docs/sprint/SPRINT-084-gate-recovery-and-owed-work.md)
+> **SPRINT-085 — Standard Parser and Shell Parity** → [docs/sprint/SPRINT-085-standard-parser-and-parity.md](docs/sprint/SPRINT-085-standard-parser-and-parity.md)
 
-**Next promote is EPIC-014's V3 Sprint B**, and its blocking condition is now met. Sprint B (Markdown
-AST parser + Shell parity, H05/H06) has **no Backlog tasks** — EPIC-014 states the post-083 shape is
-*"not promoted, and each re-derived at its own promote."* Slicing it is `/task-decomposer --epic
-EPIC-014`. It was held because the strangler method rests on *measured* parity and the gate could not
-print a verdict line; **SPRINT-084 T1 restored that** (`QA-CHECK: 176 pass, 3 fail`, 492s), so the
-condition that deferred it no longer holds.
+EPIC-014's second member sprint (`epic: EPIC-014`), closing the epic's **first § Closed-when condition**
+whole: the Standard parsed by AST to a typed model, matching `read-spec-rules.sh` row-by-row on the real
+document and on every retained malformed case. Carries three tasks outside the epic slice — the profile
+Sprint C needs before it can order rule families (V3 §43 · L-130), the high-severity review-depth blind
+spot SPRINT-084 found, and one superseded-doc ruling.
 
 ---
 
