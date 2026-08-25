@@ -162,3 +162,45 @@ Commit `47e2f2b` on `worktree-agent-a27df2927375f6c6f`. **DoD not yet ticked —
 
 consequence · T8 · behaviour:material · governance:low
 review · T8 · independent-adversarial-reviewer (worktree-isolated) · behaviour:material · governance:low
+
+### 2026-08-25 | progress | Both wave-1 reviews returned — one DoD refuted, one divergence found
+
+Two independent worktree-isolated reviewers, one per Tier G task. **Both found things their author did
+not, which is the entire content of L-165** — and in both cases the author had run more tests than the
+reviewer did.
+
+**T8 — DoD 1 REFUTED.** T8 claimed `check-ephemeral-intake.sh` was the only checker doing unscoped
+tree-wide discovery. The reviewer re-derived the enumeration by a different method and found two more,
+both reproduced in isolated fixtures, and I confirmed both by reading the code directly rather than
+accepting either account:
+- `check-research-archive.sh:39` — `live_citer()` greps `$root`, filtering only archive, changelog,
+  knowledge-index and fixtures. A worktree copy counts as a live citer, so a superseded doc cited by
+  nothing real reports **PASS**. A **silent false negative** — the opposite and worse direction from
+  the false positives T8 fixed.
+- `conformance-engine.sh:1722–1731` — `_repo_files()` prunes six directories, not `.claude/worktrees`.
+  Emits `file-outside-canonical-placement` naming a `.claude/worktrees/` path, which violates T8's DoD
+  1 wording literally.
+
+Revise dispatched for the first only. The second is **knowingly deferred to TD-100**: the engine is the
+live oracle T1/T3/T5 spawn inside their parity tests and A4 fixes it as the never-edited comparand.
+Fixing it mid-sprint would move the reference every parity test is measured against — a silent change
+to the artifact that proves correctness. DoD 2 and the Tier G seed/restore **survived** attack: five
+lookalike paths and two real worktree depths all resolved correctly.
+
+**T1 — a real TS/Shell divergence, in cardinality.** DoD 1, 2 and 5 survived; the reviewer wired a
+third evaluator through the real CLI with one `register()` call and zero dispatch-site edits, a
+stronger proof than the shipped unit tests. But Shell's `assert_S9_LOGDIR` calls `bad()` **once per
+misplaced file** while TS returns a single `RuleEvaluation`, comma-joining both filenames into one
+finding. Every shipped test uses exactly one misplaced file, so nothing caught it.
+
+DoD 4's literal wording — same named finding, same exit meaning — survives. **EPIC-014 D2 does not:**
+every TS/Shell difference is to be *ruled*, never absorbed, and a comma-join absorbs a structural
+divergence behind a string. Revise dispatched to widen the result to N findings. This is not local
+cleanup — T7 needs the same widening for `--reconcile`, and T2/T3/T4 all build on whatever shape T1
+leaves. T1's stated purpose is that the shape is right *before* anything is widened onto it.
+
+Two smaller findings folded into the same retry: the port's differentiating case (a *directory* named
+like a log file, which `isFile` excludes and Shell's `[ -f ]` agrees on) has no test, and the Tier G
+seed evidence exists only in a commit message rather than in the tree.
+
+consequence · pre-T1 · behaviour:low · governance:low

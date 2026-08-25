@@ -152,6 +152,34 @@ status: current
 > at **3050 > 130**, still TD-082's reasoned carry; the figure moved 3,050 → 3,050 since the last
 > sweep, so the carry ruling is unaffected.
 
+- **TD-100** severity: medium | status: open | created: Sprint-087
+  - Summary: **`conformance-engine.sh`'s `_repo_files()` walks agent worktrees, so the engine can emit a
+    finding that names a `.claude/worktrees/` path.** Lines 1722–1731 prune `.git`, `node_modules`,
+    `vendor`, `.venv`, `dist`, `build` — not `.claude/worktrees`. The cached walk feeds roughly fifty
+    engine assertions, so every one of them inherits it.
+  - Evidence: reproduced by SPRINT-087's independent T8 reviewer in an isolated fixture. A conformant
+    repo missing `docs/architecture/overview.md` yields exactly one FAIL (`core-file-missing`) with
+    `S2.R-PLACEMENT` clean. Add a copy at `.claude/worktrees/agent-fake/docs/architecture/overview.md`
+    and `S2.R-PLACEMENT` additionally FAILs with `file-outside-canonical-placement: … the repository has
+    a file of that name at: .claude/worktrees/agent-fake/docs/architecture/overview.md`. Confirmed
+    independently by reading the prune list directly.
+  - **This is TD-095's third site, and the reason it is filed rather than fixed.** SPRINT-087 T8 closed
+    the `check-ephemeral-intake.sh` site and, at revise, `check-research-archive.sh`. This one is
+    deliberately left: the engine is the **live oracle** T1, T3 and T5 spawn inside their parity tests,
+    and sprint assumption A4 fixes it as the comparand that is never edited. Editing it mid-sprint
+    would move the reference every parity test is measured against — a silent change to the thing
+    proving correctness. The defect is real, visible, and knowingly deferred.
+  - Impact: a real agent worktree is a full repo checkout, so it contains canonical files by
+    definition — which makes this fire precisely when the prescribed worktree-dispatch pattern is in
+    use, the same perverse incentive TD-095 named. Failure direction is a false *positive* (a phantom
+    FAIL), so it is noisy rather than silent; `medium`, not `high`.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): add `.claude/worktrees` to
+    the `-prune` list, with a retained fixture proving a lookalike path is still walked. **Sequence it
+    after the Shell engine loses authority** (EPIC-014 H24/H25 cutover), or take it in a sprint whose
+    tasks do not spawn the engine as an oracle.
+  - **Re-file fresh if** worktrees move out of `.claude/` — the prune entry would name a stale path,
+    the same condition TD-095 carries.
+
 - **TD-099** severity: medium | status: open | created: Sprint-087
   - Summary: **`check-review-depth.sh` silently ignores a malformed consequence line instead of naming
     it, so a `governance:high` declaration its parser cannot read passes GREEN.** The classification is
