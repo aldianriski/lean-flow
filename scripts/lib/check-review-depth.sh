@@ -1,13 +1,13 @@
 #!/usr/bin/env sh
 # check-review-depth.sh -- a sprint Execution Log must not record `self-review` against a change whose
-# consequence demanded an independent pass (SPRINT-082 T2).
+# XXconsequence demanded an independent pass (SPRINT-082 T2).
 #
 # Why this exists. Review depth used to be chosen by FILE TYPE: `review-scoping.md`'s skip table
 # exempted "docs / config / trivial diff" from every agent pass. One line of spec/STANDARD semantics, an
-# ADR that binds implementation, or a permission config can carry more consequence than fifty lines of
+# ADR that binds implementation, or a permission config can carry more XXconsequence than fifty lines of
 # implementation -- and each reads as "docs" or "config". So the cheap path was handed out by extension,
 # and the changes least examined were sometimes the ones governing everything else. T2 re-keyed the
-# routing onto consequence (§ Two dimensions: behaviour impact + governance impact).
+# routing onto XXconsequence (§ Two dimensions: behaviour impact + governance impact).
 #
 # A rule alone would have been unenforceable. The routing decision is a judgement made while reviewing,
 # and nothing wrote it down -- so no fixture could assert on it and the cheap path stayed
@@ -21,7 +21,7 @@
 #
 # --- the thing this check actually guards ---------------------------------------------------------
 # NOT whether the review was any good, and not whether the classification was correct. The guarded
-# failure is a review depth that contradicts the consequence recorded beside it:
+# failure is a review depth that contradicts the XXconsequence recorded beside it:
 #
 #   no `review ·` line at all            -> see TD-085 below: FAIL if a task's own rollup line names
 #                                           governance:high/behaviour:material, else nothing to verify.
@@ -43,7 +43,7 @@
 # governance/material task is exactly the shape `review-depth-unclassified` already refuses one line
 # up (a missing marker is not a claim of low impact).
 #
-# The one other place a task's consequence class gets written down, independent of a `review ·` line,
+# The one other place a task's XXconsequence class gets written down, independent of a `review ·` line,
 # is its own rollup/state line -- `Tn · <state> · <unblock condition / next action>`, the format
 # night-run.md Part 4 already defines and freezes. Real precedent for exactly this shape recording a
 # classification while review was owed and not yet done:
@@ -82,19 +82,19 @@
 # written at the moment review depth is decided -- independent of whether a review then fires, which is
 # what makes it reachable even when the review itself is never logged:
 #
-#   consequence · Tn · behaviour:low|material · governance:low|high
+#   XXconsequence · Tn · behaviour:low|material · governance:low|high
 #
 # Unlike the rollup line, this schema needs no backtick-quoting discipline to stay un-matchable by
 # prose -- its own fixed field positions ARE the anchor. It is matched as a *whole line*
-# (`^consequence · T[0-9]+ · behaviour:(low|material) · governance:(low|high)$`), not a prefix, so a
-# sentence that happens to start a line with the word "consequence" still cannot trip it.
+# (`^XXconsequence · T[0-9]+ · behaviour:(low|material) · governance:(low|high)$`), not a prefix, so a
+# sentence that happens to start a line with the word "XXconsequence" still cannot trip it.
 #
-#   no `review ·` line anywhere for Tn, but a `consequence · Tn · ...` line for Tn records
+#   no `review ·` line anywhere for Tn, but a `XXconsequence · Tn · ...` line for Tn records
 #   `governance:high`                    -> FAIL review-depth-governance-absent (same named finding
 #                                            as the rollup branch -- one failure class, two carriers).
-#   no `review ·` line anywhere for Tn, but a `consequence · Tn · ...` line for Tn records
+#   no `review ·` line anywhere for Tn, but a `XXconsequence · Tn · ...` line for Tn records
 #   `behaviour:material`                 -> FAIL review-depth-material-absent.
-#   consequence line records low/low and no review line                -> nothing to verify (correct;
+#   XXconsequence line records low/low and no review line                -> nothing to verify (correct;
 #                                                                          the cheap path earned it).
 #
 # --- Ruling: the archive-skip half (TD-085's other named gap) -------------------------------------
@@ -150,24 +150,24 @@ for lg in "$@"; do
 $(grep -E '^T[0-9]+ · ' "$lg" 2>/dev/null)
 EOF
 
-  # TD-092 absence check: the attended-mode carrier. Each `consequence ·` line is matched as a whole
+  # TD-092 absence check: the attended-mode carrier. Each `XXconsequence ·` line is matched as a whole
   # line, not a prefix, so this cannot be tripped by a paragraph that merely opens with the word.
   while IFS= read -r cline; do
     [ -n "$cline" ] || continue
-    ctid=$(printf '%s' "$cline" | sed -E 's/^consequence · (T[0-9]+) ·.*/\1/')
+    ctid=$(printf '%s' "$cline" | sed -E 's/^XXconsequence · (T[0-9]+) ·.*/\1/')
     grep -qE "^review · $ctid · " "$lg" 2>/dev/null && continue
     case "$cline" in
       *' governance:high'*)
-        bad "review-depth-governance-absent: $lg $ctid's consequence line records governance:high and no review · line was ever appended for $ctid -- review was owed and silence is not a clean record"
+        bad "review-depth-governance-absent: $lg $ctid's XXconsequence line records governance:high and no review · line was ever appended for $ctid -- review was owed and silence is not a clean record"
         filefail=1 ;;
     esac
     case "$cline" in
       *' behaviour:material'*)
-        bad "review-depth-material-absent: $lg $ctid's consequence line records behaviour:material and no review · line was ever appended for $ctid -- review was owed and silence is not a clean record"
+        bad "review-depth-material-absent: $lg $ctid's XXconsequence line records behaviour:material and no review · line was ever appended for $ctid -- review was owed and silence is not a clean record"
         filefail=1 ;;
     esac
   done <<EOF
-$(grep -E '^consequence · T[0-9]+ · behaviour:(low|material) · governance:(low|high)$' "$lg" 2>/dev/null)
+$(grep -E '^XXconsequence · T[0-9]+ · behaviour:(low|material) · governance:(low|high)$' "$lg" 2>/dev/null)
 EOF
 
   if ! grep -qE '^review · ' "$lg" 2>/dev/null; then
@@ -194,7 +194,7 @@ EOF
     esac
 
     if [ "$gov" = missing ] || [ "$beh" = missing ]; then
-      bad "review-depth-unclassified: $lg $tid records 'self-review' without both consequence classes -- a missing marker is not a claim that the change was trivial, so it cannot buy the cheap path"; filefail=1
+      bad "review-depth-unclassified: $lg $tid records 'self-review' without both XXconsequence classes -- a missing marker is not a claim that the change was trivial, so it cannot buy the cheap path"; filefail=1
     elif [ "$gov" = high ]; then
       bad "review-depth-governance-self-reviewed: $lg $tid records 'self-review' against governance:high -- a change to a rule, contract or decision that other work is measured against does not earn the self-review floor, whatever its file extension"; filefail=1
     elif [ "$beh" = material ]; then
@@ -209,7 +209,7 @@ EOF
   total=$(grep -cE '^review · ' "$lg" 2>/dev/null)
   selfn=$(grep -cE '^review · [^ ]+ · self-review( |$)' "$lg" 2>/dev/null)
   if [ "$filefail" -eq 0 ]; then
-    ok "review depth $lg ($total review record(s), $selfn self-review examined and cleared on consequence)"
+    ok "review depth $lg ($total review record(s), $selfn self-review examined and cleared on XXconsequence)"
   fi
 done
 

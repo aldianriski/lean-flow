@@ -148,3 +148,42 @@ T4's diff, adversarially briefed, before its DoD were ticked. Its `review ·` li
 The pleasing part: **T4's own guard is what forced T4's author to be reviewed.** Had the classification
 gone unrecorded, the routing decision would have left no trace and the review would simply not have
 happened — which is the exact silent false negative § Two dimensions describes.
+
+### 2026-08-25 | scope-change | T2 retargeted from the conformance engine to leg 12 — logged before § Plan is edited
+**What broke.** T2's Acceptance requires `qa-check.sh` to print a verdict on a **loaded** process
+table — the *default* profile. Its DoD 1 requires cutting spawn counts "in the families T1 confirms as
+dominant". At promote both readings pointed the same way, because Round 5's ranking was the only
+profile anyone had. **T1 dissolved that premise.** The two are disjoint by target *and* by profile:
+
+| | default profile (what T2's Acceptance targets) | `QA_FULL=1` |
+|---|---|---|
+| leg 12 — 29 zero-API eval harnesses | **396.3s of 492s (~81%)** | + 3 `selftest-assert-*` behind the flag |
+| conformance engine sweep | 7-rule reduced spec, **1.9–5s** | **281.2s** ← Round 5's F11/F6/F5/F9 ranking lives here |
+
+So DoD 1 as written targets work that costs the default gate **1.9–5s**, while DoD 3 demands the
+default gate survive load, where the cost is leg 12. **Satisfying DoD 1 literally cannot achieve
+DoD 3.** This is L-088 exactly — a criterion frozen at promote whose premise a later measurement
+removed. The tempting move is to re-read DoD 1's words until they cover leg 12; that is the failure
+the rule names, so it was surfaced instead.
+
+**Impact.** T2's `Layers:` moves off `conformance-engine.sh` and onto leg 12's machinery
+(`scripts/qa-check.sh` § leg 12 + the `evals/run-*.sh` harnesses it drives). `Layers:` is a *live
+declaration corrected per task, not a frozen prediction to defend* (L-100), so this is the expected
+cost of declaring before the work — logged, declared, continue.
+
+**Ownership map re-ruled.** The retarget puts T2 into `evals/`, which is T4's tree. **No WIP
+collision: T4 is merged and committed**, so T2 branches from a tree containing it and any conflict is
+a merge conflict, not contaminated staging (L-042's hazard is a plain `git add` over *uncommitted*
+work). T2 must not modify `evals/run-review-depth-fixtures.sh`'s **assertions** — T4's 12 cases and
+both controls are retained fixtures under TD-012 and deleting or weakening them to make the leg
+cheaper would be the exact trade the sprint forbids. `scripts/qa-check.sh` remains the T3→T2
+single-owner chain, unchanged.
+
+**G2 re-confirmed on the changed part only.** Approach still "cut spawn count, delete no check". The
+constraint that mattered at G2 — *no check deleted, no coverage lowered* — becomes **more** load-bearing
+here, not less: leg 12 *is* the retained-fixture corpus, so the cheapest way to make it fast is to run
+fewer fixtures, which is precisely the false economy DoD 2 exists to block.
+
+**Owner ruling:** retarget, recorded here rather than absorbed. DoD 1's reinterpretation is an
+ADR-021 surfaced ruling, not a silent re-read — it will be ticked against leg 12's families, with this
+entry as the record of why the words say "families T1 confirms" and the work is in `evals/`.

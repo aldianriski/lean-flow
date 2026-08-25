@@ -62,7 +62,7 @@ or dissolved — and the ranking T2 acts on is either confirmed or corrected by 
 - [x] Round 4 and Round 5 are left unedited — *Verify: `git diff` touches only appended lines (ADR-014 append-only)* ✓ coordinator-verified independently: `@@ -617,0 +618,148 @@` — a pure append at EOF, **0** deleted or modified lines
 
 ### T2 — Cut the gate's spawn count so it completes under load `[size: M · risk: med · class: execution · HITL]`
-Layers: `scripts/lib/conformance-engine.sh` · the `scripts/lib/` checkers in the families T1 confirms · `scripts/qa-check.sh` (only if wiring moves)
+Layers: `scripts/qa-check.sh` § leg 12 · the `evals/run-*.sh` harnesses it drives — **retargeted mid-sprint from `conformance-engine.sh`; see the `scope-change` entry 2026-08-25**, T1 proved leg 12 (396.3s of 492s) and the engine sweep (`QA_FULL=1` only) are disjoint, so the frozen target could not reach this task's own Acceptance (L-100 · L-088)
 Depends-on: T1
 Cites: TASK-284 · TD-090 · TD-084 · L-144 · L-120 · § Round 5 · SPRINT-084 T1 (the mechanism, proven)
 
@@ -76,7 +76,7 @@ nothing deleted. Only the target is, and T1 settles that.
 table — the condition it currently fails on — with no check deleted and no coverage lowered.
 
 **DoD:**
-- [ ] Spawn counts are cut in the families T1 confirms as dominant — *Verify: per-family spawn counts re-measured against § Round 5's figures, appended as a round rather than edited in*
+- [ ] Spawn counts are cut in the families T1 confirms as dominant — *Verify: per-family spawn counts re-measured, appended as a round rather than edited in* — **reinterpreted by owner ruling (ADR-021), recorded in the `scope-change` entry**: T1 confirmed the dominant cost of the *default* profile is **leg 12 (396.3s of 492s)**, not Round 5's F11/F6/F5/F9 (which cost 1.9–5s there and 281.2s only under `QA_FULL=1`). Ticked against leg 12's harnesses. Not a silent re-read — DoD 3 was unachievable via the frozen target
 - [ ] **No check deleted, no coverage lowered** — *Verify: the check inventory before and after is diffed and identical; a quieter gate is the shape of a check that stopped running (observed: 183 → 168 at SPRINT-085's close, which reconciled exactly)*
 - [ ] The gate completes **under load**, not only on a clean table — *Verify: a run issued after substantial agent work in the same session prints its verdict line; a pristine-table run does not satisfy this because it already passes*
 - [ ] **Tier G**: the discrimination proof — *Verify: seed a break that makes a moved check silently not run; the suite reddens while a sibling control stays green (L-142 · L-137: confirm the seed landed by `cmp`, restore under a checked hash)*
