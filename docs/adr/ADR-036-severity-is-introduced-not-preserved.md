@@ -68,35 +68,24 @@ cutover, when the harness built on it disagrees with reality.
 
 ## Consequences
 
-**Positive.**
+**Positive:** The parity harness has a comparand that exists, so severity comparison can actually be
+implemented. The `WARN`-does-not-fail change is pre-listed rather than discovered as a parity failure at
+H20. And ADR-034's history stays intact and auditable: what was decided, and what was later found wrong,
+are both on the record in the order they happened, which is exactly why §4 is append-only.
 
-- The parity harness has a comparand that exists, so severity comparison can actually be implemented.
-- The `WARN`-does-not-fail change is pre-listed rather than discovered as a parity failure at H20.
-- ADR-034's history stays intact and auditable: what was decided, and what was later found wrong, are
-  both on the record in the order they happened, which is exactly why §4 is append-only.
-
-**Negative.**
-
-- **Two ADRs now describe one contract, and a reader who finds only ADR-034 gets the wrong answer.**
-  Mitigated by the marker in ADR-034 § Consequences and its `related:` entry — mitigated, not removed.
-- **The correction is narrow and the class of defect is not.** Six rows were checked against real
-  referents *after* review raised one; nothing prevents the same leak in a future contract except the
-  rule stated above, which is prose, not a check.
-- Severity being unfrozen means that until H15 there is **no** contract governing verdict granularity
-  beyond `PASS`/`FAIL`/`GAP` — a genuine hole, accepted because inventing one now would repeat the
-  exact error this ADR corrects.
+**Negative (trade-offs accepted):** Two ADRs now describe one contract, and a reader who finds only
+ADR-034 gets the wrong answer — mitigated by the marker in ADR-034 § Consequences and its `related:`
+entry, but mitigated, not removed. The correction is narrow and the class of defect is not: six rows
+were checked against real referents *after* review raised one, and nothing prevents the same leak in a
+future contract except the rule stated above, which is prose, not a check. And severity being unfrozen
+means that until H15 there is **no** contract governing verdict granularity beyond `PASS`/`FAIL`/`GAP`
+— a genuine hole, accepted because inventing one now would repeat the exact error this ADR corrects.
 
 ## Alternatives considered
 
-- **Edit ADR-034's Severity row in place.** Rejected — and attempted: it tripped
-  `adr-edited-after-decision` (`S4.APPEND`), which is the rule working. A decided ADR is superseded,
-  never rewritten, because the record of what was decided is what makes the reasoning auditable.
-- **Mark ADR-034 `superseded` in full and reissue it.** Rejected as disproportionate: six of seven rows
-  were verified correct by the same review. Superseding a whole contract to fix one row would discard
-  the verified parts and the audit trail with them.
-- **Freeze severity as `PASS`/`FAIL`/`GAP` and call the H15 model a breaking change.** Rejected: it is
-  the same category error in the other direction — treating a vocabulary the migration is *designed* to
-  replace as a contract it must preserve.
-- **Leave severity out of the contract entirely, with no ruling.** Rejected: silence is what let the
-  target-state list in unchallenged. An element deliberately not frozen must say so, or the next
-  contract author freezes a sketch again.
+| Option | Why rejected |
+|---|---|
+| Edit ADR-034's Severity row in place | Rejected — and attempted: it tripped `adr-edited-after-decision` (`S4.APPEND`), which is the rule working. A decided ADR is superseded, never rewritten, because the record of what was decided is what makes the reasoning auditable |
+| Mark ADR-034 `superseded` in full and reissue it | Disproportionate: six of seven rows were verified correct by the same review. Superseding a whole contract to fix one row would discard the verified parts and the audit trail with them |
+| Freeze severity as `PASS`/`FAIL`/`GAP` and call the H15 model a breaking change | It is the same category error in the other direction — treating a vocabulary the migration is *designed* to replace as a contract it must preserve |
+| Leave severity out of the contract entirely, with no ruling | Silence is what let the target-state list in unchallenged. An element deliberately not frozen must say so, or the next contract author freezes a sketch again |

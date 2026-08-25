@@ -98,45 +98,33 @@ surface, and **must say so** rather than implying both are pinned.
 
 ## Consequences
 
-- Differential parity work has an authoritative comparand for rules from today, and a dated snapshot
-  that `cmp` proves regenerable.
-- A parity harness comparing stdout bytes is out of contract and must be rejected at review.
-- **Between now and H07/H08 a family can pass rule parity while a finding id drifts, undetected.** That
-  is the accepted cost of the ruling above and is why the gap is named in the contract rather than left
-  to be discovered during a cutover.
-- The snapshot is version-stamped, so a `spec/STANDARD.md` bump does not silently invalidate it — a new
-  version means a new snapshot and an explicit diff, which is ADR-023's pinning logic applied to the
-  rule set.
-- 79 is recorded as a *disproved* query, so the next reader who greps that shape has the reconciliation
-  rather than a fourth plausible number.
+**Positive:** Differential parity work has an authoritative comparand for rules from today, and a dated
+snapshot that `cmp` proves regenerable. A parity harness comparing stdout bytes is out of contract and
+must be rejected at review. The snapshot is version-stamped, so a `spec/STANDARD.md` bump does not
+silently invalidate it — a new version means a new snapshot and an explicit diff, which is ADR-023's
+pinning logic applied to the rule set. And 79 is recorded as a *disproved* query, so the next reader who
+greps that shape has the reconciliation rather than a fourth plausible number.
 
-**Negative — what this costs, stated because no decision is cost-free (§4).**
-
-- **The freeze can be wrong and will still be obeyed.** A frozen surface is read later by people who
-  cannot cheaply re-derive it. If `read-spec-rules.sh` itself misreads the spec, this ADR launders that
-  error into a contract, and every parity test downstream agrees with it by construction. The snapshot
-  makes the error *detectable* (regenerate and diff) but not *self-correcting*.
-- **It privileges today's rule shape.** Freezing rule ID, level and mark commits the migration to the
-  Standard's current three-column model. A future §-restructure that legitimately renames or merges
-  rules now costs a recorded behaviour-change ruling rather than an edit.
-- **The named Finding-ID gap is a real hole for two sprints, not a formality.** Between now and H07/H08
-  a rule family can pass parity while a finding id silently drifts, and nothing detects it.
-- **Version-stamping the snapshot adds a maintenance step that will be forgotten.** Nothing enforces a
-  new snapshot on a `spec/STANDARD.md` bump, so the first stale snapshot will look exactly like a current one.
-- **The Severity row of § Decision is WRONG and is superseded by ADR-036** — it froze V3 §9's target-state
-  vocabulary rather than the engine's actual `PASS`/`FAIL`/`GAP`. §4 is append-only, so the row stands as
-  decided and ADR-036 carries the correction. Read them together.
+**Negative (trade-offs accepted):** The freeze can be wrong and will still be obeyed — a frozen surface
+is read later by people who cannot cheaply re-derive it, and if `read-spec-rules.sh` itself misreads the
+spec, this ADR launders that error into a contract that every parity test downstream agrees with by
+construction; the snapshot makes the error *detectable* (regenerate and diff) but not *self-correcting*.
+It privileges today's rule shape: freezing rule ID, level and mark commits the migration to the
+Standard's current three-column model, so a future §-restructure that legitimately renames or merges
+rules now costs a recorded behaviour-change ruling rather than an edit. **Between now and H07/H08 a
+family can pass rule parity while a finding id drifts, undetected** — that is the accepted cost of the
+ruling above, and the named Finding-ID gap is a real hole for two sprints, not a formality, since nothing
+detects the drift. Version-stamping the snapshot adds a maintenance step that will be forgotten: nothing
+enforces a new snapshot on a `spec/STANDARD.md` bump, so the first stale snapshot will look exactly like
+a current one. And **the Severity row of § Decision is WRONG and is superseded by ADR-036** — it froze
+V3 §9's target-state vocabulary rather than the engine's actual `PASS`/`FAIL`/`GAP`; §4 is append-only,
+so the row stands as decided and ADR-036 carries the correction. Read them together.
 
 ## Alternatives considered
 
-- **Freeze 51 (the checkable set) instead of 100.** Rejected: it ties the frozen surface to today's
-  implementation coverage, so mechanizing a `judgment-only` rule would *enlarge* the contract, and a
-  rule's ID could move as its mark changed. ADR-028 already separated classification (100, unchanged)
-  from evaluation scope (51); this follows that split.
-- **Freeze byte-identical stdout.** Rejected: it fails on improvements and passes on layout-preserving
-  regressions — the inverse of what a parity test is for (V3 §25).
-- **Defer the whole contract until the TS engine exists.** Rejected: that is the failure this ADR
-  exists to prevent. A comparand written after the fact is not a comparand.
-- **Block T1 until the Finding-ID surface is enumerable.** Rejected: it would hold the entire epic
-  behind a Shell-engine change that D2 forbids, to pin a surface that becomes typed data two sprints
-  from now.
+| Option | Why rejected |
+|---|---|
+| Freeze 51 (the checkable set) instead of 100 | It ties the frozen surface to today's implementation coverage, so mechanizing a `judgment-only` rule would *enlarge* the contract, and a rule's ID could move as its mark changed. ADR-028 already separated classification (100, unchanged) from evaluation scope (51); this follows that split |
+| Freeze byte-identical stdout | It fails on improvements and passes on layout-preserving regressions — the inverse of what a parity test is for (V3 §25) |
+| Defer the whole contract until the TS engine exists | That is the failure this ADR exists to prevent. A comparand written after the fact is not a comparand |
+| Block T1 until the Finding-ID surface is enumerable | It would hold the entire epic behind a Shell-engine change that D2 forbids, to pin a surface that becomes typed data two sprints from now |
