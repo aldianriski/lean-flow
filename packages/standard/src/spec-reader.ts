@@ -145,6 +145,124 @@ export function formatRuleRow(row: RuleRow): string {
   return `${row.id} ${row.level} ${row.mark}`;
 }
 
+// --- SPRINT-085 T3: error semantics parity with `read-spec-rules.sh` -------------------------------
+//
+// Rows were the easy half. The failure this reader refuses to have is returning nothing and exiting
+// clean -- a reader that checks nothing passes everything, and the whole engine inherits the false
+// negative (L-058). `SpecReadResult` makes that refusal a TYPE, not a convention someone can forget
+// to check: the failure variant carries no `rows` field at all, so "no rows" and "an empty rule set"
+// can never be confused the way two `[]` returns could be at a call site.
+
+/** The two named findings this reader can raise -- mirrors `read-spec-rules.sh`'s own vocabulary. */
+export type SpecFinding = "spec-table-unreadable" | "spec-not-found";
+
+export interface SpecReadOk {
+  readonly ok: true;
+  readonly rows: readonly RuleRow[];
+}
+
+export interface SpecReadFail {
+  readonly ok: false;
+  readonly finding: SpecFinding;
+  readonly message: string;
+}
+
+/**
+ * Absence and emptiness stay distinguishable at the TYPE level. `SpecReadOk.rows` can legitimately be
+ * `[]` (a section §14's own count says has none -- §8 today), but `SpecReadFail` has no `rows` field
+ * to mistake for one -- a caller cannot accidentally read a failure as "zero rows".
+ */
+export type SpecReadResult = SpecReadOk | SpecReadFail;
+
+/**
+ * Pure constructor for the `spec-not-found` finding. No filesystem access here -- this stays domain
+ * (V3 §2.1; `test/architecture/dependency-direction.test.ts` enforces it mechanically). The caller is
+ * whatever actually attempts to read `specPath` off disk (an adapter in Sprint C's H07; a
+ * `*.test.ts` helper here, following T2's pattern of keeping `readFileSync` in test files only) and
+ * calls this when that attempt fails -- mirroring `read-spec-rules.sh`'s `[ -f "$spec" ]` guard.
+ */
+export function specNotFound(specPath: string): SpecReadFail {
+  return {
+    ok: false,
+    finding: "spec-not-found",
+    message: `read-spec-rules: spec-not-found -- ${specPath}`,
+  };
+}
+
+/**
+ * §14's own per-section counts (the `classified` row, §1..§13), read independently of the rows
+ * themselves -- exactly as `read-spec-rules.sh`'s `expected` does. That independence is the point: a
+ * dropped section's rows and its expected count come from two separate reads of the document, so they
+ * can disagree instead of one silently mirroring the other. `null` if §14 carries no `classified` row
+ * at all (the shell's `spec-counts-unreadable` case -- T4's concern, not this one's).
+ */
+export function expectedCountsOf(doc: BlockDocument): ReadonlyMap<number, number> | null {
+  for (const section of sectionsOf(doc)) {
+    if (section.number !== 14) continue;
+    for (const block of section.blocks) {
+      if (block.type !== "table") continue;
+      for (const row of block.rows) {
+        if ((row.cells[0] ?? "").trim() !== "classified") continue;
+
+        const counts = new Map<number, number>();
+        for (let s = 1; s <= 13; s++) {
+          const cleaned = (row.cells[s] ?? "").replace(/[*`\s]/g, "");
+          counts.set(s, cleaned === "" ? 0 : Number(cleaned));
+        }
+        return counts;
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Reads §`sectionNumber`'s Conformance rows, refusing the L-058 false negative: zero rows is a named
+ * `spec-table-unreadable` finding UNLESS §14's own count says the section legitimately has none
+ * (`zero-rule-section-is-not-a-finding` -- §8 today). Mirrors `read-spec-rules.sh --section N`'s
+ * exemption exactly: only narrowing to one section can consult that count -- see `readAll` below for
+ * why a whole-document sweep never gets the same exemption.
+ */
+export function readSection(doc: BlockDocument, sectionNumber: number, specPath: string): SpecReadResult {
+  const rows = rulesInSection(doc, sectionNumber);
+  if (rows.length > 0) return { ok: true, rows };
+
+  const expected = expectedCountsOf(doc);
+  const expectedForSection = expected?.get(sectionNumber);
+  if (expected !== null && expectedForSection === 0) {
+    return { ok: true, rows: [] }; // legitimately none -- exits 0 silently, matching the shell
+  }
+
+  const expSay = expected === null || expectedForSection === undefined ? "no published count" : String(expectedForSection);
+  return {
+    ok: false,
+    finding: "spec-table-unreadable",
+    message:
+      `read-spec-rules: spec-table-unreadable -- no §${sectionNumber} Conformance rows parsed from ` +
+      `${specPath}, but §14 publishes ${expSay} for it. A reader that returns nothing checks nothing ` +
+      `and exits clean; that is reported here instead (L-058)`,
+  };
+}
+
+/**
+ * Reads every section's rows, document order -- the no-`--section` mode. Zero rows is ALWAYS a
+ * finding here, with no §14 exemption: the shell reader only ever consults `expected` when `$section`
+ * is set (its own header comment says so), because a whole-document sweep has no single section
+ * number to look up against §14's per-section table.
+ */
+export function readAll(doc: BlockDocument, specPath: string): SpecReadResult {
+  const rows = allRules(doc);
+  if (rows.length > 0) return { ok: true, rows };
+
+  return {
+    ok: false,
+    finding: "spec-table-unreadable",
+    message:
+      `read-spec-rules: spec-table-unreadable -- no Conformance rows parsed from ${specPath}. A reader ` +
+      `that returns nothing checks nothing and exits clean; that is reported here instead (L-058)`,
+  };
+}
+
 /**
  * Best-effort lift of a raw row into the domain model (`model.ts`, H04). A level the Standard's own
  * vocabulary does not define (`isConformanceLevel` false -- the six `implementation-directed` /

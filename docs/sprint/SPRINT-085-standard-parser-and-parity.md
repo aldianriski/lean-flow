@@ -90,10 +90,10 @@ clean — a reader that checks nothing passes everything, and the whole engine i
 exit meaning**, not merely on rows.
 
 **DoD:**
-- [ ] `spec-table-unreadable-whole` and `-section` produce that named finding on stderr with a non-zero exit — *Verify: run each fixture's input through TS and compare finding name and exit to the Shell reader's*
-- [ ] `spec-not-found` produces its named finding, not an empty rule set — *Verify: the same comparison*
-- [ ] `zero-rule-section-is-not-a-finding`: §8 exits **0 silently**, because §14 publishes 0 for it — *Verify: absence and emptiness stay distinguishable; a zero-row section must not be reported as a failure*
-- [ ] **Tier G**: each case is a retained must-FAIL with its own named finding, and the suite is shown to discriminate — *Verify: seed a break that makes an unreadable table return empty-and-clean; the case reddens while a sibling control stays green*
+- [x] `spec-table-unreadable-whole` and `-section` produce that named finding on stderr with a non-zero exit — *Verify: run each fixture's input through TS and compare finding name and exit to the Shell reader's*
+- [x] `spec-not-found` produces its named finding, not an empty rule set — *Verify: the same comparison*
+- [x] `zero-rule-section-is-not-a-finding`: §8 exits **0 silently**, because §14 publishes 0 for it — *Verify: absence and emptiness stay distinguishable; a zero-row section must not be reported as a failure*
+- [x] **Tier G**: each case is a retained must-FAIL with its own named finding, and the suite is shown to discriminate — *Verify: seed a break that makes an unreadable table return empty-and-clean; the case reddens while a sibling control stays green*
 
 ### T4 — Reproduce `--reconcile` against §14's published counts `[size: S · risk: low · class: execution · HITL]`
 Layers: `packages/standard/src` (reconcile mode) · its colocated tests

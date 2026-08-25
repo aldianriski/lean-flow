@@ -1,9 +1,21 @@
 import { describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tokenize } from "./tokenizer.ts";
-import { allRules, formatRuleRow, rulesInSection, sectionsOf, toStandardRule } from "./spec-reader.ts";
+import {
+  allRules,
+  formatRuleRow,
+  readAll,
+  readSection,
+  rulesInSection,
+  sectionsOf,
+  specNotFound,
+  toStandardRule,
+  type SpecReadResult,
+} from "./spec-reader.ts";
 
 const SPEC_PATH = fileURLToPath(new URL("../../../spec/STANDARD.md", import.meta.url));
 const SHELL_READER_PATH = fileURLToPath(new URL("../../../scripts/lib/read-spec-rules.sh", import.meta.url));
@@ -233,5 +245,132 @@ describe("allRules -- full-document parity against read-spec-rules.sh (SPRINT-08
     // something real rather than every candidate happening to already be a legitimate row.
     expect(candidates.length).toBeGreaterThan(admittedCount);
     expect(admittedCount).toBe(100);
+  });
+});
+
+// SPRINT-085 T3 -- error semantics parity. Rows were the easy half: `read-spec-rules.sh`'s own header
+// names the failure this reader refuses to have -- returning nothing and exiting clean (L-058). For
+// each of the four retained malformed cases, TS must agree with Shell on the NAMED FINDING and the
+// EXIT MEANING, not merely on rows.
+//
+// Every fixture's input is built the SAME WAY `evals/run-spec-reader-fixtures.sh` builds its own --
+// read from there, never re-typed from memory -- and the shell reader is run FRESH via
+// `execFileSync` as an independent oracle (same pattern as `loadShellRows` above), so the comparison
+// is real rather than approximate. `readFileSync`/`writeFileSync`/`execFileSync` stay in this
+// `*.test.ts` file only, matching T2's pattern -- the architecture test exempts colocated test files
+// but not `spec-reader.ts` itself (domain, no filesystem).
+
+/** Runs the real `read-spec-rules.sh`, fresh, and reports its exit code + stderr -- never a literal. */
+function runShellReader(args: readonly string[]): { readonly code: number; readonly stdout: string; readonly stderr: string } {
+  try {
+    const stdout = execFileSync("sh", [SHELL_READER_PATH, ...args], { encoding: "utf8" });
+    return { code: 0, stdout, stderr: "" };
+  } catch (e) {
+    const err = e as { status?: number; stdout?: string; stderr?: string };
+    return { code: err.status ?? 1, stdout: err.stdout ?? "", stderr: err.stderr ?? "" };
+  }
+}
+
+/** A fresh temp dir per call -- fixtures never share a file, so one test's write can't leak into another's read. */
+function freshTmpFile(name: string): string {
+  return join(mkdtempSync(join(tmpdir(), "sr3-")), name);
+}
+
+/**
+ * Mirrors `evals/run-spec-reader-fixtures.sh` case 5's `awk` transform exactly: strip every §13 table
+ * row (`| \`S13.*\` | ...`) from inside §13's own window, leaving §14's published count (7) untouched
+ * -- so the emitted rows and the expected count disagree, which is the case this fixture exists to
+ * produce.
+ */
+function stripSection13Rows(specText: string): string {
+  const lines = specText.split(/\r\n|\r|\n/);
+  let inS13 = false;
+  const out: string[] = [];
+  for (const line of lines) {
+    if (/^## §13 /.test(line)) inS13 = true;
+    if (/^## §14 /.test(line)) inS13 = false;
+    if (inS13 && /^\| *`S13\./.test(line)) continue;
+    out.push(line);
+  }
+  return out.join("\n");
+}
+
+/**
+ * A thin stand-in for the adapter Sprint C's H07 will ship: attempts the read, and on failure maps it
+ * to the domain's OWN `spec-not-found` constructor rather than inventing a second finding shape here.
+ * `spec-reader.ts` itself never calls `readFileSync` -- only this test file does (T2's pattern).
+ * Callers of this helper always pass a path known not to exist -- it is not a general-purpose loader.
+ */
+function attemptReadMissingSpec(path: string): SpecReadResult {
+  try {
+    readFileSync(path, "utf8");
+  } catch {
+    return specNotFound(path);
+  }
+  throw new Error(`test setup error: ${path} unexpectedly exists`);
+}
+
+describe("readAll / readSection -- error semantics parity with read-spec-rules.sh (SPRINT-085 T3)", () => {
+  test("spec-table-unreadable-whole: no Conformance tables anywhere -- named finding, non-zero exit, both sides", () => {
+    // Built exactly as case 4's `printf '# not a standard\n\nNo conformance tables here.\n'`.
+    const content = "# not a standard\n\nNo conformance tables here.\n";
+
+    const doc = tokenize(content, "empty-spec.md");
+    const tsResult = readAll(doc, "empty-spec.md");
+    if (tsResult.ok) throw new Error("expected a failure result");
+    expect(tsResult.finding).toBe("spec-table-unreadable");
+
+    const path = freshTmpFile("empty-spec.md");
+    writeFileSync(path, content);
+    const shell = runShellReader([path]);
+    expect(shell.code).not.toBe(0);
+    expect(shell.stderr).toContain("spec-table-unreadable");
+  });
+
+  test("spec-table-unreadable-section: §13's rows stripped from the real spec, §14 still says 7 -- named finding, non-zero exit, both sides", () => {
+    const realSpec = readFileSync(SPEC_PATH, "utf8");
+    const stripped = stripSection13Rows(realSpec);
+    // Harness guard mirroring case 5's own: the strip must actually remove §13's rows, or this case
+    // is not testing what it claims.
+    const nLeft = (stripped.match(/^\| *`S13\./gm) ?? []).length;
+    expect(nLeft).toBe(0);
+
+    const doc = tokenize(stripped, "spec-no-s13.md");
+    const tsResult = readSection(doc, 13, "spec-no-s13.md");
+    if (tsResult.ok) throw new Error("expected a failure result");
+    expect(tsResult.finding).toBe("spec-table-unreadable");
+
+    const path = freshTmpFile("spec-no-s13.md");
+    writeFileSync(path, stripped);
+    const shell = runShellReader([path, "--section", "13"]);
+    expect(shell.code).not.toBe(0);
+    expect(shell.stderr).toContain("spec-table-unreadable");
+  });
+
+  test("spec-not-found: a path that does not exist -- named finding, non-zero exit, NOT an empty rule set, both sides", () => {
+    const missing = freshTmpFile("no-such-spec.md"); // directory created, file never written
+
+    const tsResult = attemptReadMissingSpec(missing);
+    if (tsResult.ok) throw new Error("expected a failure result");
+    expect(tsResult.finding).toBe("spec-not-found");
+    // Absence is not emptiness: the failure variant carries no `rows` field to mistake for `[]` --
+    // asserted at the type level too (`SpecReadFail` in spec-reader.ts has no `rows` member).
+    expect("rows" in tsResult).toBe(false);
+
+    const shell = runShellReader([missing]);
+    expect(shell.code).not.toBe(0);
+    expect(shell.stderr).toContain("spec-not-found");
+  });
+
+  test("zero-rule-section-is-not-a-finding: §8 exits 0 silently -- §14 publishes 0 for it, both sides", () => {
+    const doc = tokenize(readFileSync(SPEC_PATH, "utf8"), SPEC_PATH);
+    const tsResult = readSection(doc, 8, SPEC_PATH);
+    if (!tsResult.ok) throw new Error(`expected success, got finding ${tsResult.finding}: ${tsResult.message}`);
+    expect(tsResult.rows).toEqual([]); // legitimately empty, not absent -- no finding, no throw
+
+    const shell = runShellReader([SPEC_PATH, "--section", "8"]);
+    expect(shell.code).toBe(0);
+    expect(shell.stdout).toBe("");
+    expect(shell.stderr).toBe("");
   });
 });

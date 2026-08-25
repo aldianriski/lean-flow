@@ -193,3 +193,41 @@ the wrong call for a different reason than the one that decided it.
 Verified by the coordinator: `check-doc-caps.sh` prints `PASS cap docs/research/qa-gate-timing.md
 (130 <= 130)` — exactly at the cap after two trimming passes — and `docs/knowledge-index.md` is
 genuinely unchanged (`git diff --quiet`), matching the claim that only `last_updated` moved.
+
+### 2026-08-25 | progress | T3 — absence and emptiness kept apart by TYPE, not by convention
+All four retained malformed cases now match the Shell reader on **named finding and exit meaning**:
+`spec-table-unreadable` (whole and section) · `spec-not-found` · and §8 exiting **0 silently** because
+§14 publishes 0 for it. Suite **86 pass / 0 fail** (82 → 86), architecture fitness 25 pass, zero
+dependencies intact. Each fixture's input was reconstructed the way
+`evals/run-spec-reader-fixtures.sh` builds it, and the Shell reader was spawned **as an independent
+oracle inside the test** rather than its expected output being copied in as a literal.
+
+**The design choice that makes this stick:** `SpecReadResult = SpecReadOk | SpecReadFail`, where
+`SpecReadOk.rows` may legitimately be `[]` and `SpecReadFail` **carries no `rows` field at all**. A
+caller therefore *cannot* mistake "checked nothing and found a finding" for "checked and found zero" —
+the distinction L-058 is about is enforced by the type rather than by everyone remembering it. The §14
+zero-exemption is taken only when narrowed to one section, mirroring the shell's own `[ -n "$section" ]`
+gate; a whole-document sweep never takes it, since there is no single section to look up.
+
+**Tier G: two isolated seeds, one per failure branch.** `readSection`'s failure branch forced to
+`ok:true, rows:[]` reddened `spec-table-unreadable-section` alone; `readAll`'s forced the same way
+reddened `spec-table-unreadable-whole` alone. Both were 1-line targeted diffs (283 vs 282), both left
+every sibling green (21 pass / 1 fail each time), both restored and re-verified `cmp`-identical under a
+matching hash. The seeded failure was chosen to be *the exact false negative* — empty-and-clean — rather
+than an arbitrary break.
+
+**Three TS/Shell differences were reported rather than absorbed (EPIC-014 D2), and are ruled here:**
+
+1. **Exit representation** — TS returns `ok: boolean`; Shell exits 0/1. **Not a difference.** ADR-034 D3
+   freezes *exit meaning*, and `ok:false` is that meaning faithfully carried; the domain layer has no
+   process boundary, and the CLI that owns exit codes is H11, in Sprint C. **Carry-forward:** Sprint C
+   must map `ok:false → exit 1` explicitly, or the meaning is lost at the boundary.
+2. **`FAIL  ` line prefix omitted** — **Not a difference.** ADR-034 D3 states in as many words that
+   whitespace, wrap and non-semantic log order are *not* frozen. The prefix is the Shell driver's own
+   log convention, not a semantic of the reader.
+3. **`spec-not-found` trigger breadth** — the test helper catches any read failure (so it would also
+   catch permission-denied), where Shell's guard is existence only. **Not a shipped difference:**
+   `specNotFound()` in production is a *pure constructor with no filesystem access*, so the domain never
+   decides when to emit it. The breadth lives only in the test stand-in. **But it names a real decision
+   Sprint C owes:** a permission-denied spec must not report `spec-not-found`, because a wrongly-*named*
+   finding is precisely the failure mode this repo treats as most expensive. Recorded for H11.
