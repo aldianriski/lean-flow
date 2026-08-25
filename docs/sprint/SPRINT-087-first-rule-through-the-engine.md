@@ -145,8 +145,8 @@ Cites: TASK-282 · ADR-034 D3 · SPRINT-085 T4 carry-forward
 mismatch, matching the Shell reader's enumeration.
 
 **DoD:**
-- [ ] A fixture with **more than one** mismatch is fully reported — *Verify: the case a single-finding shape cannot pass; one mismatch proves nothing here*
-- [ ] The verdict and finding names still match Shell — *Verify: ADR-034 D3's frozen surface is unchanged by the widening*
+- [x] A fixture with **more than one** mismatch is fully reported — *Verify: the case a single-finding shape cannot pass; one mismatch proves nothing here*
+- [x] The verdict and finding names still match Shell — *Verify: ADR-034 D3's frozen surface is unchanged by the widening*
 
 ### T8 — Stop the QA gate scanning agent worktrees `[size: S · risk: low · class: execution · HITL]`
 Layers: `scripts/qa-check.sh` (path discovery) · any `scripts/lib/` checker that globs independently · a retained fixture

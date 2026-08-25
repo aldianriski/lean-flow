@@ -428,3 +428,42 @@ protect, and neither is what the path of least resistance suggests.
 
 consequence · T7 · behaviour:material · governance:low
 review · T7 · independent-adversarial-reviewer (worktree-isolated) · behaviour:material · governance:low
+
+### 2026-08-25 | progress | T7 re-reviewed clean, merged, DoD ticked 2/2
+
+Five attacks, none refuted. Two went past the brief and are worth recording because they proved things
+T7's own tests did not. The reviewer built a **4-section fixture with sections stripped out of order**
+(T7 used two, in order) and confirmed membership, count and ordering all agree with Shell — then
+established *why* ordering is safe here structurally: both engines walk a fixed `1..13` loop, so
+TD-102's ordering divergence cannot arise in this function, unlike `RuleEvaluation.findings` where order
+tracks discovery. And it measured `reconcile()` directly at 20,000 iterations, pre- and post-widening,
+on both the no-mismatch and 4-mismatch paths: overlapping ranges, no regression. The dominant cost is
+`rulesInSection` re-running `sectionsOf(doc)` for each of 13 calls — identical before and after, and
+untouched by T7.
+
+**Absence-vs-emptiness held, verified by construction.** Only the `section-rows-mismatch` branch sets
+`mismatches`, and only inside `if (mismatches.length > 0)`; no path returns `mismatches: []`, and a
+probe confirmed the key is genuinely omitted rather than `undefined`-valued. One durable note, not a
+finding against T7 as shipped: `mismatches?` is optional across the whole `SpecReadFail` interface
+rather than narrowed to its finding via a discriminated union, so nothing stops a *future* producer
+attaching `mismatches: []` to a different failure. With TD-101 in force that invariant is held by
+discipline alone. It holds today because no other producer exists — worth a debt row if H07 adds any.
+
+**Two learnings filed while fresh** (`/insights` rather than waiting for close):
+- **L-169** (count **2**, promotion candidate) — a Tier G evidence block that records a hash without
+  naming its method is not reproducible, and an unreproducible proof of reproducibility is worse than
+  none because it looks checkable. Both sightings are this sprint, T2 and T7, and both cost a reviewer
+  real time reconciling a mismatch that meant nothing. The Tier G discipline's own evidence trail
+  failing the standard the discipline exists to enforce.
+- **L-170** (count 1) — an ad-hoc `grep -r` walks the agent worktrees. Deriving the next `L-NNN` returned
+  **L-999** against a real maximum of **L-168**: SPRINT-013's deliberate dangling-reference negative-test
+  token, read out of three live worktrees. **TD-095's class at a third site, and the first that is not a
+  checker** — the gate was taught to exclude worktrees, the engine still walks them (TD-100), and here it
+  hit a hand-written query whose answer was about to become a durable identifier. Caught only by the
+  L-105-family rule that a value entering a durable artifact earns a second query; the id would have been
+  wrong by 831, and nothing downstream rejects an out-of-range one.
+
+Sprint DoD now **18 ticked / 11 open**. Knowledge index regenerated for the two new entries.
+
+consequence · T7 · behaviour:material · governance:low
+review · T7 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low
