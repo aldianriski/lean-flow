@@ -152,6 +152,65 @@ status: current
 > at **3050 > 130**, still TD-082's reasoned carry; the figure moved 3,050 → 3,050 since the last
 > sweep, so the carry ruling is unaffected.
 
+- **TD-101** severity: **high** | status: open | created: Sprint-087
+  - Summary: **Nothing in this repository type-checks TypeScript, so every guarantee stated as "enforced
+    by a TYPE" is enforced only in an editor.** The gate is `sh scripts/qa-check.sh && bun test`;
+    `bun run`/`bun test` **strip** types without checking them. There is no `tsc` invocation in
+    `package.json`, in `qa-check.sh`, or anywhere else — and **no `typescript` entry at all**, so the
+    checker is not merely unwired, it is absent. `tsconfig.json` and `tsconfig.base.json` both exist:
+    configuration for a checker that cannot run.
+  - Evidence: found by SPRINT-087's independent T1 re-reviewer, which executed a scratch file assigning
+    a bare string to `findings: readonly Finding[]` and a number to `detail: string` — `bun run`
+    accepted both silently. Confirmed independently: `grep -rn 'tsc' package.json scripts/qa-check.sh`
+    returns nothing, and `package.json` carries no `typescript` key.
+  - **Impact — this retroactively weakens a closed sprint's headline claim.** `EPIC-014` line 60
+    records SPRINT-085 as closing with *"Absence vs emptiness is enforced by a **TYPE**, not a
+    convention: `SpecReadFail` carries no `rows` field at all, so 'checked nothing' cannot be read as
+    'found zero' (L-058)"*. That enforcement is real in an IDE and **absent from every automated path**.
+    SPRINT-087 T4 DoD 2 then leans on the same guarantee — *"the absence is a property of the result,
+    not of the printer"*. A type that no gate evaluates is **L-105's family exactly: an absent guard
+    wearing the shape of a present one**, and it is the more dangerous variant, because the sprint
+    record already describes it as the strong form of the guarantee.
+  - Second-order: the T1 re-reviewer also constructed `{verdict: "pass", findings: [aFinding]}` and
+    `{verdict: "fail", findings: []}` — both well-typed, since nothing ties the two fields in a
+    discriminated union. That contradiction is disclaimed in a code comment, but the comment's
+    phrasing undersells it: not only is it "not enforced by a type", nothing else enforces it either.
+  - **ADR-035 is the tension and must be ruled, not assumed.** It forbids dependencies; whether a
+    type-checker counts as one, or belongs in a `devDependencies` key this project does not yet have,
+    is a decision — not a detail to settle inside a task. Adding `typescript` silently would breach a
+    binding ADR; leaving it is shipping a reference engine whose types are decorative. Candidates
+    include a `devDependencies` carve-out ruled by ADR amendment, Bun's own type-check facility if it
+    can run without a package dependency, or downgrading every "enforced by a TYPE" claim in the record
+    to what is actually enforced.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): **rule the ADR-035 question
+    first**, then wire whatever wins into `qa-check.sh` so the gate fails on a type error, then add a
+    retained must-FAIL fixture (a deliberate type error that the gate must catch). Until then, treat
+    "enforced by a TYPE" in any sprint record as an unverified claim.
+  - **Re-file fresh if** a type-checker is wired in — the finding then becomes "the claims predate the
+    check", a documentation fix rather than a gate gap.
+
+- **TD-102** severity: minor | status: open | created: Sprint-087
+  - Summary: **TS and Shell emit the same findings in a different ORDER.** Shell's `assert_S9_LOGDIR`
+    exhausts its first glob (`*-log.md`) before its second (`*Execution-Log*.md`); the TS evaluator
+    sorts alphabetically. Same count, same membership, same finding name — reversed sequence.
+  - Evidence: reproduced live by SPRINT-087's T1 re-reviewer with `ZZZ-x-log.md` (glob 1) and
+    `AAA-Execution-Log-001.md` (glob 2). Shell prints `ZZZ…` then `AAA…`; TS prints `AAA…` then
+    `ZZZ…`. Both emit exactly two findings.
+  - Impact: **latent, and it does not falsify anything asserted today.** DoD 4 words the parity claim as
+    *"the same named finding and the same exit meaning"* — order is not named, and no shipped test
+    asserts on it (`toHaveLength`, `.every`, `.includes` only). It bites later: any consumer that diffs
+    the two engines' rendered output line-by-line, or that assumes "the first violation Shell reports"
+    carries meaning, sees a spurious divergence from ordering alone. That consumer arrives at the
+    H24/H25 authority cutover, which is when a whole-output diff is the obvious way to prove equality.
+  - **Recorded rather than fixed, deliberately** — EPIC-014 D2 requires every TS/Shell difference to be
+    *ruled, never absorbed*. This is the ruling: known, bounded, not load-bearing for any current
+    criterion, and owed a decision before positional parity is assumed by anything downstream.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): either sort both sides to a
+    declared canonical order, or state in the parity contract that findings are a **set**, not a
+    sequence — and assert that explicitly in the tests so the choice cannot be silently relied upon.
+  - **Re-file fresh if** any consumer starts diffing rendered output positionally — the finding
+    escalates from latent to active the moment ordering carries meaning.
+
 - **TD-100** severity: medium | status: open | created: Sprint-087
   - Summary: **`conformance-engine.sh`'s `_repo_files()` walks agent worktrees, so the engine can emit a
     finding that names a `.claude/worktrees/` path.** Lines 1722–1731 prune `.git`, `node_modules`,

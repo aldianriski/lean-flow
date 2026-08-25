@@ -52,11 +52,11 @@ on purpose — the point is that the *shape* is right before anything is widened
 same exit meaning** as the Shell engine.
 
 **DoD:**
-- [ ] A `Finding` / `RuleEvaluation` / `ConformanceResult` domain exists with **no CLI strings inside it** — *Verify: the existing dependency-direction fitness test covers the new module; a domain string leak fails it*
-- [ ] The registry resolves `rule id → evaluator` **without a procedural switch carrying rule bodies** (H08) — *Verify: adding a second evaluator requires no edit to the dispatch site; demonstrated by adding one in a test*
-- [ ] One repository port has **both** a real Bun adapter and an in-memory fake — *Verify: the same evaluator passes against both, so the port is a seam and not a wrapper*
-- [ ] TS and Shell agree on the rule's **named finding and exit meaning** — *Verify: the Shell engine spawned as a live oracle **inside** the test, never a copied literal, so parity cannot rot silently*
-- [ ] **Tier G**: branches enumerated from the finished code, each seeded, each reddening its own case while a sibling control stays green — *Verify: seed verified landed by `cmp`, restored under a checked hash, artifact still parses and the break is targeted*
+- [x] A `Finding` / `RuleEvaluation` / `ConformanceResult` domain exists with **no CLI strings inside it** — *Verify: the existing dependency-direction fitness test covers the new module; a domain string leak fails it*
+- [x] The registry resolves `rule id → evaluator` **without a procedural switch carrying rule bodies** (H08) — *Verify: adding a second evaluator requires no edit to the dispatch site; demonstrated by adding one in a test*
+- [x] One repository port has **both** a real Bun adapter and an in-memory fake — *Verify: the same evaluator passes against both, so the port is a seam and not a wrapper*
+- [x] TS and Shell agree on the rule's **named finding and exit meaning** — *Verify: the Shell engine spawned as a live oracle **inside** the test, never a copied literal, so parity cannot rot silently*
+- [x] **Tier G**: branches enumerated from the finished code, each seeded, each reddening its own case while a sibling control stays green — *Verify: seed verified landed by `cmp`, restored under a checked hash, artifact still parses and the break is targeted*
 
 ### T2 — Resolve every rule class to GAP, excluded, or judgment-required `[size: M · risk: med · class: execution · HITL]`
 Layers: `packages/standard/src` (result domain · registry classification) · colocated tests · `test/fixtures`
