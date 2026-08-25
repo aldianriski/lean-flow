@@ -1,0 +1,106 @@
+---
+sprint: 085
+slug: standard-parser-and-parity
+owner: Maintainer
+last_updated: 2026-08-25
+status: active
+update_trigger: an Execution Log entry is appended
+---
+
+# SPRINT-085 — Execution Log
+
+> Append-only companion to [`../SPRINT-085-standard-parser-and-parity.md`](../SPRINT-085-standard-parser-and-parity.md). Uncapped by design:
+> this file grows with the work done, which is exactly why it is not inside the Plan's 400-line
+> budget (STANDARD §9 · ADR-014). **Never edit a past entry** — correct it with a new one.
+>
+> The Plan is frozen at promote. A mid-sprint pivot that shifts scope is logged here as a
+> `scope-change` entry — what broke · impact · re-confirm G2 — **before** § Plan is edited.
+
+### 2026-08-25 | progress | Batch G1+G2 signed @ 3a789fa; waves sequenced
+G1 took the **fast path for T1–T5 only** — those carry `origin: decomposer` and met the intake grill
+this session — and the **full checklist for T6/T7**, which carry `origin: close-retro` and never did.
+No `L`. A1–A6 were each confirmed against a source at promote (files on disk, a usage block, a fixture
+run), so no unconfirmed `assumes:` blocked G2.
+
+Ownership map: **`packages/standard/src` is a single-owner chain T1→T2→T3→T4, sequential.** T5, T6 and
+T7 sole-own their trees. Recorded because the names invite a collision that does not exist:
+`docs/research/logs/qa-gate-timing.md` (T5) and `docs/research/qa-gate-timing.md` (T7) are **different
+files**. Preflight: cycle PASS · base-ref PASS · waves 0={T1,T5,T6} 1={T2,T3,T7} 2={T4}.
+
+### 2026-08-25 | progress | T1 — the tokenizer reads §13, and the TS rows are byte-identical to Shell's
+`packages/standard/src/tokenizer.ts` (four block types — heading · table · fence · paragraph — each with
+a source location, zero imports) and `spec-reader.ts` (structural section windowing + rule-row
+extraction, importing only the tokenizer and H04's model). **Zero dependencies intact**: `package.json`
+still has no `dependencies` key. Full suite **77 pass / 0 fail**; architecture fitness 25 pass.
+
+**Acceptance verified by the coordinator independently**, not read off the agent's report: TS output for
+§13 diffed against `sh scripts/lib/read-spec-rules.sh spec/STANDARD.md --section 13` — **7 rows,
+identical, `diff` exit 0**, including the two `— implementation-directed` rows whose level column is an
+em-dash rather than a level.
+
+**Tier G discrimination: 17 branches, enumerated from the finished code rather than from memory** —
+10 in the tokenizer (blank-line skip · fence open · fence close vs unterminated · heading · table start ·
+row continuation · paragraph stops at fence/heading/table · delimiter pipe guard) and 7 in the reader.
+Each seeded, verified landed by `cmp`, targeted at zero line-count change, reddened its own case while
+siblings stayed green, restored under a hash.
+
+**Two findings from that pass, both worth more than the branches they came from.** (a) One seeded break
+initially reported **0 fail** — the test file computed `rulesInSection` at `describe`-collection time, so
+the thrown error surfaced as bun's *"Unhandled error between tests"* and silently dropped two tests from
+the count rather than failing them. A break that does not redden its case has tested nothing and scores
+as a pass — L-142's shape, found because the branch inventory forced a per-branch check instead of a
+suite-level one. (b) Two branches turned out to be exercised by the **real** Standard, not only by
+fixtures: §13 carries a second table (trailer formats) whose backticked cells are id-shaped but are not
+rule ids, so the id-exact-match guard is load-bearing on real content.
+
+### 2026-08-25 | progress | T6 — absence stops reading as "nothing to verify" (TD-085)
+`check-review-depth.sh` now FAILs named when a task records `governance:high` or `behaviour:material`
+and **no** `review ·` line exists for it: `review-depth-governance-absent` and
+`review-depth-material-absent`, two retained must-FAIL fixtures, one per branch. Detection is anchored
+to the `^Tn · ` rollup-line position (night-run.md Part 4's frozen contract), and both fixtures discuss
+the concepts in plain prose deliberately, to prove the anchor is not tripped by discussion (L-108).
+Suite **9 of 9 green**, the original 5 unchanged. `qa-check.sh` untouched — the checker's `ok/bad/note`
+output contract did not move, so leg 2b needed no rewiring. Discrimination proven by seeding
+`^T[0-9]+ ·` → `^X[0-9]+ ·`: exactly cases 8 and 9 reddened, all 7 siblings including the
+`low-self-reviewed-passes` control stayed green; restored, `sha256` matched.
+
+**Archive skip — ruled, not left implicit** (the DoD required a ruling either way): **keep the skip, and
+forbid recording a review *into* an archived log instead.** `*/archive/*` exclusion is a convention
+shared by three checkers, so making archived paths readable would be a cross-checker change outside
+T6's `Layers:` and would still leave the other two blind. The cheaper rule is that a review owed on a
+task lands on the **live** log before the sprint archives — which is exactly how SPRINT-082's four
+review lines became permanently unreadable. Recorded in the checker's own header, not only here.
+
+### 2026-08-25 | surprise | T6's guard does not reach the case that motivated it — accepted, and the reason is a schema gap
+Tested directly rather than assumed: SPRINT-084's own log, copied to a live (non-archive) path, still
+prints `no review line -- nothing to verify`, **exit 0**. That log is the evidence TD-085 cites.
+
+The cause is structural. The new detector anchors on `^Tn · ` rollup lines — night-run Part 4's
+**unattended** contract. SPRINT-084 was an *attended* run, and its entries are
+`### DATE | event | Tn — summary` with the classification stated in prose. **Every sprint in this
+repository is attended.** So the guard fires on the shape it can prove and misses the shape we actually
+produce.
+
+The deeper finding is one layer below T6's brief: **nothing structured records a task's consequence
+classification in attended mode.** The `review ·` line is the only structured carrier, and it exists
+only once a review has happened — which makes "governance:high work with no review line" genuinely
+unobservable to a dependency-free checker. Matching a classification stated in prose was refused
+explicitly: that is the substring-heuristic shape that *produced* TD-085's siblings, and it fails green.
+
+**Owner ruling: accept T6 for the branch it proves, record the limitation here rather than in the
+checker's claims, and file the schema gap as debt at close.** Ticking T6's DoD on this basis is an
+ADR-021 surfaced ruling, not a silent tick — the fixtures, the named findings and the discrimination
+proof are all real; the reach is narrower than the motivating case, and saying so is the point.
+
+### 2026-08-25 | blocker | T5 ended having written nothing; restarted with a bounded scope
+The T5 agent stopped after ~200k tokens and ~21 minutes, its final message reporting that it was
+"watching for the real-repo reconciliation run to finish". The harness reported the task `completed`.
+**`docs/research/logs/qa-gate-timing.md` was unchanged** — `git diff --numstat` empty, file still ending
+at § Round 4. Nothing was watching anything, and no § Round 5 existed.
+
+Caught by checking the artifact instead of the report — the same L-045/L-120 shape that produced
+SPRINT-084's own sighting, here in an agent's self-report rather than a shell wrapper. **A report is
+evidence about the reporter.** Restarted with the stall's cause named: no long background runs or
+Monitor waits (a full `conformance.sh .` is ~5–6 minutes), bounded foreground steps only, and an
+instruction to write up whatever it genuinely measured — including "I measured none" — rather than
+produce a complete-looking round with an unstated denominator.
