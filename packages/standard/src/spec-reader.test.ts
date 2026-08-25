@@ -542,6 +542,43 @@ describe("reconcile -- `--reconcile` mode parity with read-spec-rules.sh (SPRINT
     expect(shell.stderr + shell.stdout).toContain("section-rows-mismatch");
   });
 
+  test("two mismatching sections are BOTH surfaced, not just the lowest-numbered one (SPRINT-087 T7)", () => {
+    // A single stripped row proves nothing here -- the pre-T7 shape (one `SpecReadFail` with no
+    // `mismatches` field) also reports `finding: "section-rows-mismatch"` for exactly one bad section,
+    // so it would pass a one-mismatch fixture by construction. This fixture strips a row out of TWO
+    // different sections (§1 and §2) so only a widened, multi-finding shape can report both.
+    const realSpec = readFileSync(SPEC_PATH, "utf8");
+    const short = stripFirstRow(stripFirstRow(realSpec, "S2\\.F-CAP"), "S1\\.LAW1");
+    expect(/^\| *`S2\.F-CAP` *\|/m.test(short)).toBe(false);
+    expect(/^\| *`S1\.LAW1` *\|/m.test(short)).toBe(false);
+
+    const doc = tokenize(short, "spec-short-s1-s2.md");
+    const tsResult = reconcile(doc, "spec-short-s1-s2.md");
+    if (tsResult.ok) throw new Error("expected a failure result");
+    // ADR-034 D3: the Finding ID and verdict surface is frozen -- widening HOW MANY mismatches are
+    // carried must not change WHAT the single finding is called, or that this run is non-ok.
+    expect(tsResult.finding).toBe("section-rows-mismatch");
+
+    expect(tsResult.mismatches).toBeDefined();
+    const bySection = new Map(tsResult.mismatches!.map((m) => [m.section, m]));
+    // Count AND membership, not merely "some finding exists" -- both sections, not only §1 (the
+    // lowest-numbered, which is all the pre-T7 shape could ever report).
+    expect([...bySection.keys()].sort((a, b) => a - b)).toEqual([1, 2]);
+    expect(bySection.get(1)).toEqual({ section: 1, got: bySection.get(1)!.expected - 1, expected: bySection.get(1)!.expected });
+    expect(bySection.get(2)).toEqual({ section: 2, got: bySection.get(2)!.expected - 1, expected: bySection.get(2)!.expected });
+
+    // Independent oracle, spawned fresh, never a copied literal: Shell prints one `FAIL §N
+    // section-rows-mismatch` line PER disagreeing section (line-oriented report) -- both must appear,
+    // matching the TS `mismatches` set's membership exactly.
+    const path = freshTmpFile("spec-short-s1-s2.md");
+    writeFileSync(path, short);
+    const shell = runShellReader([path, "--reconcile"]);
+    expect(shell.code).not.toBe(0);
+    const shellOut = shell.stderr + shell.stdout;
+    expect(shellOut).toMatch(/FAIL\s+§1\s+section-rows-mismatch/);
+    expect(shellOut).toMatch(/FAIL\s+§2\s+section-rows-mismatch/);
+  });
+
   test("spec-counts-unreadable: §14's `classified` row is gone -- named finding, non-ok, both sides", () => {
     const realSpec = readFileSync(SPEC_PATH, "utf8");
     const noCounts = stripClassifiedRow(realSpec);
@@ -567,3 +604,33 @@ describe("reconcile -- `--reconcile` mode parity with read-spec-rules.sh (SPRINT
     expect(s8).toEqual({ section: 8, got: 0, expected: 0 });
   });
 });
+
+// --- SPRINT-087 T7 Tier G seed evidence -------------------------------------------------------------
+//
+// Base commit efe5147. Pristine `spec-reader.ts` (T7's starting point, HEAD):
+//   sha256 202d1ec6f41ce648a304319f164b08905957a3de65dd0d8aff3b03c5d8fa2cec
+//   (git show efe5147:packages/standard/src/spec-reader.ts | sha256sum)
+// Fixed `spec-reader.ts` (this task's change, widened `reconcile`/`SpecReadFail.mismatches`):
+//   sha256 fb89f70f8fea0519b466a55752d8b3d60874bf98dc728de94ebe6ad070eca497
+//
+// Seed: reverted `reconcile`'s body to the pre-T7 single-finding shape (SPRINT-085 T4's original --
+// capture the FIRST mismatching section only, drop the `mismatches` field from the returned
+// `SpecReadFail` entirely). 437 -> 434 lines (within the L-142 one-line band; not a demolition).
+// `cmp` confirmed the seed landed and differed from the fixed file at byte 18307 / line 392.
+//
+// Result: `bun test packages/standard/src/spec-reader.test.ts` --
+//   31 pass / 1 fail (208 expect() calls). The ONE case that reddened was this file's new
+//   "two mismatching sections are BOTH surfaced, not just the lowest-numbered one (SPRINT-087 T7)"
+//   test, failing exactly where expected -- `expect(tsResult.mismatches).toBeDefined()` received
+//   `undefined` -- because the seeded revert never sets that field. Every sibling reconcile test
+//   stayed green, in particular the named control "section-rows-mismatch: §2 short one row of its
+//   published count -- named finding, non-ok, both sides" (SPRINT-085 T4's original one-mismatch
+//   fixture), which the pre-T7 shape already satisfied and continues to satisfy unchanged.
+//
+// Restored the fixed file from a backup copy taken before seeding; `sha256sum` on the restored file
+// matched the fixed hash above exactly (fb89f70f...), confirming the seed did not leak. Re-ran
+// `bun test packages/standard` after restoring: 99 pass / 0 fail (one earlier run of the full 10-file
+// suite timed out this new test at the 5s default under concurrent subprocess load spawning
+// `sh read-spec-rules.sh`; a second immediate re-run, and every isolated run of this file alone,
+// passed clean -- read as environment contention across parallel test files, not a defect in the
+// widened `reconcile`, since the isolated file consistently completes in ~7-11s).
