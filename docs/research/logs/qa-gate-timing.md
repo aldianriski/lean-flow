@@ -763,3 +763,122 @@ does not pre-empt.
   target/profile only, not independently timed per-harness this round** — out of scope: this task
   needed to know whether leg 12 and the engine sweep overlap, not to profile leg 12 itself. TD-090
   remains the open record for that.
+
+## Round 7 — leg 12's own composition, timed per-harness; the dominant harness cut by spawn count (SPRINT-086 T2, 2026-08-25)
+
+Round 6 left leg 12's internal composition unprofiled (out of its own scope). This round supplies that
+profile — the one TD-090 named as the next investigation's starting point — and acts on the harness it
+finds dominant, by the SAME mechanism Round 4 proved: cut process-spawn count, delete nothing.
+
+**Method.** Each of the 26 `eval_harnesses_always` scripts was run as its own call
+(`sh "evals/$h" >/dev/null 2>&1`, timed by `date +%s%N` immediately before/after), on this host,
+single sample per harness, sequentially rather than through `qa-check.sh`'s own loop — isolating
+harness cost from leg 12's own (cheap) dispatch overhead. This is a NEW measurement, not a re-run of a
+prior round's method.
+
+### Per-harness timing, this host, single sample (pre-fix)
+
+| Harness | ms | Harness | ms |
+|---|---:|---|---:|
+| run-conformance-engine-fixtures.sh | **196,130** | run-ownership-header-fixtures.sh | 13,306 |
+| run-foreign-repo-fixtures.sh | 37,917 | run-s2-placement-fixtures.sh | 13,179 |
+| run-adr-family-fixtures.sh | 29,971 | run-dispatch-preflight-fixtures.sh | 11,676 |
+| run-layers-completeness-fixtures.sh | 22,811 | run-review-depth-fixtures.sh | 10,757 |
+| run-doc-caps-fixtures.sh | 21,453 | run-verify-reaches-fixtures.sh | 8,284 |
+| run-spec-reader-fixtures.sh | 6,879 | run-gates-signed-fixtures.sh | 5,356 |
+| run-qa-budget-default-fixtures.sh | 2,604 | run-manifest-lockstep-fixtures.sh | 2,234 |
+| run-sprint-close-fixtures.sh | 2,165 | run-count-claims-fixtures.sh | 2,224 |
+| run-skill-freshness-fixtures.sh | 2,030 | run-research-archive-fixtures.sh | 2,058 |
+| run-epic-archive-fixtures.sh | 1,805 | run-system-verify-fixtures.sh | 2,766 |
+| run-task-origin-fixtures.sh | 1,114 | run-worktree-usability-fixtures.sh | 1,006 |
+| run-night-run-rollup-fixtures.sh | 901 | run-qa-budget-fixtures.sh | 888 |
+| run-sprint-log-layout-fixtures.sh | 729 | run-ephemeral-intake-fixtures.sh | 423 |
+
+**Sum: 400,666 ms (400.7s)** — within 1.1% of TD-090's 396.3s (different host session, same order of
+magnitude; not claimed as a re-derivation of that figure, just a cross-check that this sweep is
+measuring the same thing). `run-conformance-engine-fixtures.sh` alone is **49.0%** of leg 12 and larger
+than the next TWO harnesses combined (foreign-repo 37.9s + adr-family 30.0s = 67.9s).
+
+**Root cause, read from the source, then confirmed empirically.** The harness makes 38 `sh "$engine" …`
+calls; 25 pass the FULL ~100-row spec. A single such call, timed directly against a near-empty target
+(`sh scripts/lib/conformance-engine.sh <tiny-dir> --spec spec/STANDARD.md`), costs **8,546 ms** — the
+driver's per-rule dispatch loop is already spawn-free (TD-073), but each of the ~50 dispatchable rows
+still calls its `assert_<id>` function, and the fixed per-call cost scales with how many rows are in
+the spec, confirmed by an xtrace spawn count (212 external-command lines for one full-spec call).
+Three OTHER harnesses that also drive the engine (`run-adr-family-fixtures.sh`,
+`run-ownership-header-fixtures.sh`, `run-s2-placement-fixtures.sh`) already hand it a spec REDUCED to
+only the rows their cases need — their own header comments name this as deliberate, cost-motivated
+design. `run-conformance-engine-fixtures.sh` was the one harness in the codebase that had not adopted
+that established pattern for ~19 of its 38 calls (the tier-doc-set family, the reasoned-exemption
+family, and the README-ownership-footer family — all of which check only 6 rule ids:
+`S2.F-TIER` · `S2.R-README` · `S6.BASE/BACKEND/MEDIUM/MULTISVC`).
+
+**Fix.** `evals/run-conformance-engine-fixtures.sh` now builds one reduced spec (`spec_s2s6`) once,
+using the SAME section-preserving awk technique the file's own cases 7/9/10 already use for one
+section (`sec == N || $0 !~ /^\| \`S[0-9]/` — drops rule ROWS outside the kept set, leaves every
+non-rule line, including §2's own file-listing table that the tier logic reads, untouched) — extended
+here to an explicit 6-id keep-list rather than whole sections, since whole-section §2 alone still
+carries ~20 unrelated rule rows. 18 direct `--spec "$spec"` call sites plus 2 downstream spec-copy
+builds (`spec-plus-base-row.md`, `spec-readme-reworded.md`) now read `$spec_s2s6` instead. No fixture,
+target, or assertion was touched; only which OTHER rules ride along on a call these cases never read.
+
+**Verified byte-identical.** Full harness output before/after: 45 lines, 43 PASS / 0 FAIL both times,
+`diff` clean (`diff rc=0`). Isolated single-call check (same tiny target, `--spec spec_s2s6` vs. full
+`--spec`) reproduces the exact same S6.\*/S2.F-TIER/tier-doc-set-\*/exempt-\* lines, only §3's
+`S3.SCHEMA` note and unrelated §2 rows (never asserted by these cases) drop out.
+
+**Timing, after fix, two samples, same host/session:** 143,230 ms and 163,691 ms (43 PASS / 0 FAIL
+both times) — a **17–27% reduction** for this harness alone (196,130 ms → 143,230–163,691 ms), i.e.
+**32,400–52,900 ms** off leg 12. Applying the more conservative (slower) sample to the Round-7 sweep
+total by substitution (the other 25 harnesses are unchanged — confirmed by `git diff` touching only
+this one file): 400,666 − 196,130 + 163,691 = **368,227 ms**, vs. the faster sample: **347,766 ms**.
+Both are **derived by substitution, not by re-running the full 26-harness sweep after the fix** — a
+second full sweep was not run this round (see Caveats).
+
+### Tier G discrimination proof
+
+Seeded a single-token break in the new keep-list regex (`S6\.MULTISVC` → `S6\.MULTISVCX`, one line,
+verified by `cmp` against the pre-seed copy — differs at exactly one line, 923=923 lines both files,
+`sh -n` still parses). Re-ran the full harness: **2 of 43 named cases reddened** —
+`tier-multisvc-incomplete` and `tier-multisvc-clears` (the must-FAIL case and its own PASS control for
+the id that was dropped) — while the other **41 case names, in the same order, stayed green**
+(`diff` of the extracted `PASS/FAIL fixture(...)/harness(...)` name lists shows exactly those two lines
+changed, nothing else). Restored from the pre-seed copy, verified byte-identical by `cmp` AND matching
+`sha256sum` (`2922819d…` both before-seed and after-restore), then re-ran the harness a third time:
+back to 43 PASS / 0 FAIL, `diff` against the original pre-fix baseline output clean.
+
+### Caveats recorded at the time
+
+- **Single sample for the pre-fix 26-harness sweep and for the isolated single-call profile**; two
+  samples for the post-fix harness timing (143.2s, 163.7s) showing real run-to-run variance on this
+  host under whatever background load existed at measurement time — consistent with this log's
+  standing observation that this host's timings drift run to run.
+- **No end-to-end `sh scripts/qa-check.sh` run was completed this round.** A background run was
+  started to (a) capture the gate's own post-fix `QA-CHECK: N pass, M fail` line and (b) serve as the
+  "issued after substantial agent work in the same session" under-load demonstration DoD 3 asks for,
+  but it was stopped before completion when a coordinator correction arrived mid-run instructing no
+  further long background waits — the run was killed, and its output was written to a file that was
+  also removed as part of a scratch-file cleanup, so nothing from that attempt is usable evidence. **DoD
+  3 (completion under load) is therefore NOT demonstrated this round** — only the harness-level
+  before/after and the discrimination proof are. This is recorded here rather than left implicit,
+  per this doc's own practice of naming a gap instead of smoothing over it.
+- **The leg-12 total after the fix (368.2s / 347.8s) is arithmetic (sweep total − old harness sample +
+  new harness sample), not a re-measured sweep** — the other 25 harnesses were not re-timed this round
+  because they are byte-unchanged (`git diff` confirms only `evals/run-conformance-engine-fixtures.sh`
+  was touched); re-summing an unchanged set was judged not to need re-running, but this is a derived
+  figure and is named as such rather than presented as a fresh sweep total.
+- **19 of the harness's 38 `sh "$engine"` calls still pass the full spec** (case 1's gap-labelling pair,
+  case 2's S1.LAW1/S13.NOINFER pair, cases 4c and 8 which the file's own comments document as
+  STRUCTURALLY requiring the full spec, and the attribution case) — left untouched this round as lower
+  value (smaller individual cost, some entangled with cross-cutting invariants the full spec exists to
+  exercise) rather than pursued for a marginally larger number. Named as unclaimed remaining headroom
+  in this harness, not silently exhausted.
+- **Other harnesses above the ~10s mark** (`run-foreign-repo-fixtures.sh` 37.9s, `run-adr-family-
+  fixtures.sh` 30.0s already spec-reduced and git-bound, `run-layers-completeness-fixtures.sh` 22.8s,
+  `run-doc-caps-fixtures.sh` 21.5s) were profiled for engine-call count only (foreign-repo and
+  adr-family), not fixed this round — foreign-repo's 6 calls all check cross-cutting, full-spec-
+  dependent invariants (documented in its own header as exercising "all 43 build dispositions") and
+  adr-family already reduces its spec to §4 alone, so neither offered the same low-risk win.
+  `run-layers-completeness-fixtures.sh` was profiled far enough to find a real candidate (nested
+  per-token `grep` loops inside `scripts/lib/check-layers-completeness.sh`, ~4 spawns/token) but not
+  acted on this round — untouched, not ruled out.

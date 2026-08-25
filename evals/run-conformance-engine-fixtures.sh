@@ -27,6 +27,28 @@ fail=0
 work=$(mktemp -d) || { echo "FAIL harness: mktemp -d failed"; exit 2; }
 trap 'rm -rf "$work"' EXIT INT TERM
 
+# spec_s2s6 (SPRINT-086 T2, TD-090): a spawn-count fix, not a coverage cut. The tier + reasoned-
+# exemption + README-footer families below (~19 of this file's `sh "$engine"` calls) dispatch the
+# FULL spec (~100 rule rows) on every call to check FIVE rule ids' output (S2.F-TIER · S2.R-README ·
+# S6.BASE/BACKEND/MEDIUM/MULTISVC) -- the other ~45 dispatchable rows cost real wall-clock (the
+# driver's per-rule dispatch is spawn-free since TD-073, but each mechanical/split row still calls its
+# assert_<id> function, and SOME of those spawn) for zero effect on what these cases check. This spec
+# COPY drops every OTHER section's RULE row (`| \`Sx.y\` |`) and keeps every non-rule line untouched --
+# the exact reduction technique cases 7/9/10 below already use for one section; this is the same
+# mechanism for two. §2's FILE-listing table (what `core_set`/`base_tier_set` read) is NOT a rule row
+# and survives regardless, so the tier machinery's derivation is unaffected -- verified empirically:
+# `sh "$engine" <tier fixture> --spec spec_s2s6` reports byte-identical S2.F-TIER/S2.R-README/S6.*/
+# tier-doc-set-*/exempt-* lines to the full-spec run, only S3.SCHEMA and unrelated §2 rows (never
+# asserted by these cases) drop out. Nothing here narrows a fixture, an assertion, or a target -- only
+# which OTHER rules ride along on a call these cases never read.
+spec_s2s6="$work/spec-s2s6.md"
+awk '
+  /^\| `(S2\.F-TIER|S2\.R-README|S6\.BASE|S6\.BACKEND|S6\.MEDIUM|S6\.MULTISVC)`/ { print; next }
+  /^\| `S[0-9]/ { next }
+  { print }
+' "$spec" > "$spec_s2s6"
+grep -qE '^\| `S2\.F-TIER`' "$spec_s2s6" || { echo "FAIL harness: spec_s2s6 lost S2.F-TIER -- reduction anchor drifted from the shipped spec"; fail=1; }
+
 # A throwaway target repo-dir -- the engine takes a directory, not necessarily a git repo (nothing
 # T2 ships needs git). The point of every case here is the ENGINE's dispatch and report, never the
 # target's content.
@@ -507,11 +529,11 @@ base_victim=$(base_tier_set "$spec" | head -1)
 rm -- "$t_base/$base_victim"
 [ -e "$t_base/$base_victim" ] && { echo "FAIL harness(tier-base-incomplete): '$base_victim' survived removal"; fail=1; }
 run_case_anywhere "tier-base-incomplete" 1 "tier-doc-set-incomplete: $base_victim" -- \
-  sh "$engine" "$t_base" --spec "$spec"
+  sh "$engine" "$t_base" --spec "$spec_s2s6"
 
 t_base_ok="$work/tier-base-complete"
 tier_repo "$t_base_ok"
-out=$(sh "$engine" "$t_base_ok" --spec "$spec" 2>&1); rc=$?
+out=$(sh "$engine" "$t_base_ok" --spec "$spec_s2s6" 2>&1); rc=$?
 if [ "$rc" -eq 0 ] && ! printf '%s\n' "$out" | grep -q 'tier-doc-set-incomplete'; then
   echo "PASS fixture(tier-base-control): a complete Base doc set reports no tier finding, exit 0"
 else
@@ -552,14 +574,14 @@ be_victim=$(awk '
 [ -n "$be_victim" ] || { echo "FAIL harness(tier-backend-incomplete): no Backend-tier row derived from §2, so this case would assert nothing"; fail=1; be_victim="docs/api/openapi.yaml"; }
 [ -e "$t_be/$be_victim" ] && { echo "FAIL harness(tier-backend-incomplete): '$be_victim' exists in the fixture, so its absence cannot be what the finding reports"; fail=1; }
 run_case_anywhere "tier-backend-incomplete" 1 "tier-doc-set-incomplete: $be_victim" -- \
-  sh "$engine" "$t_be" --spec "$spec"
+  sh "$engine" "$t_be" --spec "$spec_s2s6"
 
 t_be_ok="$work/tier-backend-complete"
 tier_repo "$t_be_ok" backend
 write_doc "docs/architecture/data-flow.md"    "$t_be_ok"
 write_doc "docs/architecture/integrations.md" "$t_be_ok"
 write_doc "docs/api/openapi.yaml"             "$t_be_ok"
-out=$(sh "$engine" "$t_be_ok" --spec "$spec" 2>&1); rc=$?
+out=$(sh "$engine" "$t_be_ok" --spec "$spec_s2s6" 2>&1); rc=$?
 if [ "$rc" -eq 0 ] && ! printf '%s\n' "$out" | grep -q 'tier-doc-set-incomplete'; then
   echo "PASS fixture(tier-backend-control): a complete Backend doc set reports no tier finding, exit 0"
 else
@@ -572,7 +594,7 @@ fi
 # engine is on record refusing.
 t_low="$work/tier-declared-base"
 tier_repo "$t_low" base
-out=$(sh "$engine" "$t_low" --spec "$spec" 2>&1); rc=$?
+out=$(sh "$engine" "$t_low" --spec "$spec_s2s6" 2>&1); rc=$?
 if [ "$rc" -eq 0 ] &&
    printf '%s\n' "$out" | grep -q "S6.BACKEND .*not evaluated: this repository declares tier 'base', below Backend" &&
    ! printf '%s\n' "$out" | grep -q 'tier-doc-set-incomplete: docs/api/openapi.yaml'; then
@@ -593,7 +615,7 @@ fi
 #       a false positive -- and a false positive is a false negative about the contract (L-108).
 t_med="$work/tier-medium"
 tier_repo "$t_med" medium
-out=$(sh "$engine" "$t_med" --spec "$spec" 2>&1); rc=$?
+out=$(sh "$engine" "$t_med" --spec "$spec_s2s6" 2>&1); rc=$?
 if printf '%s\n' "$out" | grep -q 'S6.MEDIUM .*substrate-conditional, skipped not owed.*docs/DECISIONS.md' &&
    ! printf '%s\n' "$out" | grep -q 'S6.MEDIUM .*cannot address' &&
    ! printf '%s\n' "$out" | grep -q 'S6.MEDIUM .*tier-doc-set-incomplete' &&
@@ -612,7 +634,7 @@ fi
 t_ms="$work/tier-multisvc"
 tier_repo "$t_ms" multi-service
 run_case_anywhere "tier-multisvc-incomplete" 1 "tier-doc-set-incomplete: docs/architecture/service-registry.md" -- \
-  sh "$engine" "$t_ms" --spec "$spec"
+  sh "$engine" "$t_ms" --spec "$spec_s2s6"
 
 # --- Multi-service PASS control: the finding is actionable, not merely named ----------------------
 # The other half of the same claim (SPRINT-075 T3's discipline): creating exactly what the findings
@@ -622,7 +644,7 @@ mkdir -p "$t_ms/docs/architecture"
 for f in service-registry service-dependencies; do
   printf -- '---\nowner: Maintainer\nlast_updated: 2026-08-23\nupdate_trigger: a service changes\nstatus: current\n---\n\n# %s\n' "$f" > "$t_ms/docs/architecture/$f.md"
 done
-out=$(sh "$engine" "$t_ms" --spec "$spec" 2>&1)
+out=$(sh "$engine" "$t_ms" --spec "$spec_s2s6" 2>&1)
 if printf '%s\n' "$out" | grep -q 'S6.MULTISVC .*all 2 unconditional Multi-service doc' &&
    ! printf '%s\n' "$out" | grep -q 'S6.MULTISVC .*tier-doc-set-'; then
   echo "PASS fixture(tier-multisvc-clears): creating the two docs the findings named takes S6.MULTISVC to a pass"
@@ -635,7 +657,7 @@ fi
 t_bad="$work/tier-bogus"
 tier_repo "$t_bad" not-a-tier
 run_case_anywhere "tier-declaration-unreadable" 1 "tier-declaration-unreadable" -- \
-  sh "$engine" "$t_bad" --spec "$spec"
+  sh "$engine" "$t_bad" --spec "$spec_s2s6"
 
 # --- DoD 2: the required set comes from §2's table, not from this engine -------------------------
 # A base-tier row is ADDED to a copy of the real spec. No code changes. The engine must start
@@ -648,7 +670,7 @@ awk '
     next
   }
   { print }
-' "$spec" > "$work/spec-plus-base-row.md"
+' "$spec_s2s6" > "$work/spec-plus-base-row.md"
 grep -q 'product/glossary.md' "$work/spec-plus-base-row.md" || { echo "FAIL harness: could not inject a §2 base row"; fail=1; }
 out=$(sh "$engine" "$t_base_ok" --spec "$work/spec-plus-base-row.md" 2>&1); rc=$?
 if [ "$rc" -eq 1 ] && printf '%s\n' "$out" | grep -q 'tier-doc-set-incomplete: docs/product/glossary.md'; then
@@ -688,12 +710,12 @@ tier_repo "$t_xnr"
 rm -- "$t_xnr/$x_victim"
 printf '%s\n' "$x_victim" > "$t_xnr/.conformance-exempt"     # a bare path: no `--`, no reason
 run_case_anywhere "exempt-reason-missing" 1 "exemption-reason-missing: $x_victim" -- \
-  sh "$engine" "$t_xnr" --spec "$spec"
+  sh "$engine" "$t_xnr" --spec "$spec_s2s6"
 
 # The other half of that claim, and the one a careless implementation gets wrong: a reason-less row
 # must not ALSO suppress the doc. If it did, the bare path would still have switched the finding off
 # and the new finding would just be noise beside it.
-out=$(sh "$engine" "$t_xnr" --spec "$spec" 2>&1)
+out=$(sh "$engine" "$t_xnr" --spec "$spec_s2s6" 2>&1)
 if printf '%s\n' "$out" | grep -q "tier-doc-set-incomplete: $x_victim"; then
   echo "PASS fixture(exempt-reason-missing-still-owed): a reason-less row ADDS a finding, it does not replace one"
 else
@@ -712,7 +734,7 @@ x_declared=2
   printf '%s -- owned elsewhere; a second copy would be a second SSOT\n' "$x_victim"
   printf '%s -- dependent on the row above and exempt for exactly as long\n' "$x_hyphen"
 } > "$t_xok/.conformance-exempt"
-out=$(sh "$engine" "$t_xok" --spec "$spec" 2>&1); rc=$?
+out=$(sh "$engine" "$t_xok" --spec "$spec_s2s6" 2>&1); rc=$?
 x_named=$(printf '%s\n' "$out" | grep -c 'exempt by declaration')
 if [ "$rc" -eq 0 ] &&
    [ "$x_named" -eq "$x_declared" ] &&
@@ -740,14 +762,14 @@ tier_repo "$t_xpfx"
 rm -- "$t_xpfx/$x_victim"
 printf 'docs/ -- a blanket exemption, which must not work\n' > "$t_xpfx/.conformance-exempt"
 run_case_anywhere "exempt-not-a-prefix" 1 "tier-doc-set-incomplete: $x_victim" -- \
-  sh "$engine" "$t_xpfx" --spec "$spec"
+  sh "$engine" "$t_xpfx" --spec "$spec_s2s6"
 
 # --- PASS control: no declaration file at all changes nothing -------------------------------------
 # The mechanism must be inert for the repositories that never opt into it -- most of them.
 t_xnone="$work/exempt-absent"
 tier_repo "$t_xnone"
 rm -- "$t_xnone/$x_victim"
-out=$(sh "$engine" "$t_xnone" --spec "$spec" 2>&1); rc=$?
+out=$(sh "$engine" "$t_xnone" --spec "$spec_s2s6" 2>&1); rc=$?
 if [ "$rc" -eq 1 ] &&
    printf '%s\n' "$out" | grep -q "tier-doc-set-incomplete: $x_victim" &&
    ! printf '%s\n' "$out" | grep -q 'exempt by declaration' &&
@@ -763,7 +785,7 @@ fi
 t_xboth="$work/exempt-but-present"
 tier_repo "$t_xboth"
 printf '%s -- declared exempt, but the file is here anyway\n' "$x_victim" > "$t_xboth/.conformance-exempt"
-out=$(sh "$engine" "$t_xboth" --spec "$spec" 2>&1); rc=$?
+out=$(sh "$engine" "$t_xboth" --spec "$spec_s2s6" 2>&1); rc=$?
 if [ "$rc" -eq 0 ] && ! printf '%s\n' "$out" | grep -q 'exempt by declaration'; then
   echo "PASS fixture(exempt-present-not-reported): a present doc is counted present, never announced as exempt"
 else
@@ -799,7 +821,7 @@ grep -qE '^<sub>.*</sub>' "$t_rm/README.md" || { echo "FAIL harness(readme-foote
 grep -vE '^<sub>.*</sub>' "$t_rm/README.md" > "$t_rm/README.tmp" && mv "$t_rm/README.tmp" "$t_rm/README.md"
 grep -qE '^<sub>.*</sub>' "$t_rm/README.md" && { echo "FAIL harness(readme-footer-missing): the footer survived removal"; fail=1; }
 run_case_anywhere "readme-footer-missing" 1 "readme-ownership-footer-missing" -- \
-  sh "$engine" "$t_rm" --spec "$spec"
+  sh "$engine" "$t_rm" --spec "$spec_s2s6"
 
 # PASS control: the same repo with §3's own footer appended.
 # strip_footer <dir> -- remove README.md's footer line, asserting it was there (L-146). Both cases
@@ -817,7 +839,7 @@ strip_footer "$t_rm_ok"
 rf=$(readme_footer "$spec")
 [ -n "$rf" ] || { echo "FAIL harness(readme-footer-control): could not derive §3's footer example, so the control would prove nothing"; fail=1; }
 printf '\n%s\n' "$rf" >> "$t_rm_ok/README.md"
-out=$(sh "$engine" "$t_rm_ok" --spec "$spec" 2>&1); rc=$?
+out=$(sh "$engine" "$t_rm_ok" --spec "$spec_s2s6" 2>&1); rc=$?
 if [ "$rc" -eq 0 ] && printf '%s\n' "$out" | grep -qE '^PASS  S2\.R-README' &&
    ! printf '%s\n' "$out" | grep -q 'readme-ownership-footer-missing'; then
   echo "PASS fixture(readme-footer-control): §3's own footer shape satisfies §2's rule, exit 0"
@@ -832,7 +854,7 @@ mkdir -p "$t_rm_part"; write_core_set "$t_rm_part"; write_base_tier "$t_rm_part"
 strip_footer "$t_rm_part"
 printf '\n<sub>Doc owner: Maintainer</sub>\n' >> "$t_rm_part/README.md"
 run_case_anywhere "readme-footer-partial" 1 "readme-ownership-footer-missing" -- \
-  sh "$engine" "$t_rm_part" --spec "$spec"
+  sh "$engine" "$t_rm_part" --spec "$spec_s2s6"
 
 # The required shape is READ FROM §3 -- re-word §3's example in a spec copy and the check follows it,
 # with no code edit. This is what keeps S3.README's scope-out ("restates a rule checked elsewhere")
@@ -842,7 +864,7 @@ awk '
   sec == 3 && /README exception/ { inx = 1 }
   inx && /<sub>/ { sub(/<sub>[^<]*<\/sub>/, "<sub>Doc owner: … · last updated: … · status: … · steward: …</sub>"); inx = 0 }
   { print }
-' "$spec" > "$work/spec-readme-reworded.md"
+' "$spec_s2s6" > "$work/spec-readme-reworded.md"
 grep -q 'steward' "$work/spec-readme-reworded.md" || { echo "FAIL harness(readme-shape-from-spec): could not re-word §3's footer example"; fail=1; }
 out=$(sh "$engine" "$t_rm_ok" --spec "$work/spec-readme-reworded.md" 2>&1); rc=$?
 if [ "$rc" -eq 1 ] && printf '%s\n' "$out" | grep -q 'readme-ownership-footer-missing.*steward'; then
