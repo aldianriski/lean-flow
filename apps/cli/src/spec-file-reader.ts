@@ -41,8 +41,16 @@
 // hit, rather than a second copy of that judgment living here.
 
 import { readFileSync, statSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { tokenize } from "../../../packages/standard/src/tokenizer.ts";
-import { readAll, specNotFound, type SpecReadResult } from "../../../packages/standard/src/spec-reader.ts";
+import { readAll, readSection, specNotFound, type SpecReadResult } from "../../../packages/standard/src/spec-reader.ts";
+
+// SPRINT-087 T4: this engine's own copy of the Standard it enforces -- resolved relative to the
+// ENGINE's own source location, never to a `--section`/`--rule` invocation's `repo-dir` argument.
+// `repo-dir` says WHERE to check (the port an evaluator runs against); it has never said WHICH spec
+// to check against -- there is exactly one spec/STANDARD.md, shipped beside this engine (ADR-023),
+// the same one `spec-reader.test.ts` and `classify.test.ts` already resolve this same way.
+export const BUNDLED_SPEC_PATH = fileURLToPath(new URL("../../../spec/STANDARD.md", import.meta.url));
 
 type ReadAttempt = { readonly kind: "not-found" } | { readonly kind: "content"; readonly content: string };
 
@@ -81,4 +89,20 @@ export function readSpecAllFromDisk(specPath: string): SpecReadResult {
 
   const doc = tokenize(read.content, specPath);
   return readAll(doc, specPath);
+}
+
+/**
+ * Reads `specPath` off disk and evaluates only `sectionNumber`'s Conformance rows -- the
+ * `--section N` boundary (SPRINT-087 T4). Same not-found/unreadable classification as
+ * `readSpecAllFromDisk`; the only difference is which pure reader it hands the tokenized document to
+ * (`readSection`, not `readAll`), which is also where the §14 zero-rows exemption (the legitimate
+ * empty §8) and the no-exemption "unknown section" failure both already live -- this function adds
+ * no judgment of its own about what counts as a valid section.
+ */
+export function readSpecSectionFromDisk(specPath: string, sectionNumber: number): SpecReadResult {
+  const read = attemptRead(specPath);
+  if (read.kind === "not-found") return specNotFound(specPath);
+
+  const doc = tokenize(read.content, specPath);
+  return readSection(doc, sectionNumber, specPath);
 }

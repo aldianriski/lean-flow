@@ -12,13 +12,18 @@
 import { makeRuleId, type RuleId } from "../../../packages/standard/src/model.ts";
 import { createBuiltInRegistry } from "../../../packages/standard/src/rules/built-in.ts";
 import { FsSprintDirPort } from "../../../packages/standard/src/adapters/fs-sprint-dir.ts";
-import { exitCodeFor } from "../../../packages/standard/src/result.ts";
+import { exitCodeFor, type RuleEvaluation } from "../../../packages/standard/src/result.ts";
+import { toStandardRule } from "../../../packages/standard/src/spec-reader.ts";
+import { outcomeName } from "../../../packages/standard/src/classify.ts";
+import { classifySection } from "../../../packages/standard/src/section.ts";
+import { readSpecSectionFromDisk, BUNDLED_SPEC_PATH } from "./spec-file-reader.ts";
 
 /** Adapter-independent description of what one invocation asked for. */
 export type Invocation =
   | { kind: "version" }
   | { kind: "help" }
   | { kind: "rule"; ruleId: string; repoDir: string }
+  | { kind: "section"; section: string; repoDir: string }
   | { kind: "unknown"; args: readonly string[] };
 
 /**
@@ -33,6 +38,11 @@ export function parse(argv: readonly string[]): Invocation {
     return { kind: "rule", ruleId: argv[ruleIdx + 1] as string, repoDir: argv[ruleIdx + 2] ?? "." };
   }
 
+  const sectionIdx = argv.indexOf("--section");
+  if (sectionIdx !== -1 && argv[sectionIdx + 1] !== undefined) {
+    return { kind: "section", section: argv[sectionIdx + 1] as string, repoDir: argv[sectionIdx + 2] ?? "." };
+  }
+
   if (argv.length === 0 || argv.some((a) => a === "--help" || a === "-h")) return { kind: "help" };
   return { kind: "unknown", args: argv };
 }
@@ -43,10 +53,13 @@ const VERSION_LINE =
 const HELP_LINE = [
   VERSION_LINE,
   "",
-  "usage: leanflow [--version] [--help] [--rule <rule-id> [repo-dir]]",
+  "usage: leanflow [--version] [--help] [--rule <rule-id> [repo-dir]] [--section <N> [repo-dir]]",
   "",
   "  --rule S9.LOGDIR .   evaluate ONE rule against repo-dir (default: .)",
   "                       the only rule wired so far (EPIC-014 H07's tracer bullet)",
+  "  --section 9 .        evaluate every rule spec/STANDARD.md's §9 defines, against repo-dir",
+  "                       a TARGETED run -- it never prints a global conformance level, because",
+  "                       it never checked every rule the spec defines (SPRINT-087 T4)",
   "",
   "The reference engine is being built family by family under a strangler migration",
   "(EPIC-014). Until a family cuts over, the authoritative implementation is Shell:",
@@ -84,6 +97,73 @@ function runRule(ruleIdRaw: string, repoDir: string, write: (s: string) => void)
   return exitCodeFor({ evaluations: [evaluation] });
 }
 
+/** A bare positive integer, no sign, no leading zero, no decimal -- mirrors `makeRuleId`'s own
+ * format-first validation style for `--rule`. Anything else is not even a candidate section number,
+ * so it is refused here rather than reaching `Number(...)` and producing `NaN`-shaped garbage. */
+const SECTION_ARG_RE = /^[1-9]\d*$/;
+
+/**
+ * `--section`'s own case (SPRINT-087 T4), split out for the same reason `runRule` is: one case per
+ * `Invocation` kind. A TARGETED run -- it evaluates §`sectionArg`'s rules and NO others (DoD 1), and
+ * it never prints a global conformance level (DoD 2): `classifySection`'s `SectionReport` carries no
+ * `globalLevel` field today, and is FROZEN (`packages/standard/src/section.ts`) so one cannot be
+ * attached after the fact either -- there is nothing here to print even by mistake, and nothing a
+ * careless future call site could add. An unreadable section -- malformed argument, or a section
+ * number the spec does not define -- fails loudly with a named finding and a non-zero exit, never a
+ * silent empty report (DoD 3).
+ */
+function runSection(sectionArg: string, repoDir: string, write: (s: string) => void): number {
+  if (!SECTION_ARG_RE.test(sectionArg)) {
+    // RULED TS/Shell divergence (EPIC-014 D2), not an absorbed one: Shell's `read-spec-rules.sh
+    // spec/STANDARD.md --section abc` exits 1 (verified live). This exits 2. Deliberate, not a parity
+    // defect: exit 1 here is `exitCodeFor`'s frozen EVALUATION-RESULT meaning (ADR-027/ADR-034 --
+    // non-zero iff a real FAIL verdict), reused verbatim two lines below for the spec-read failure.
+    // A malformed `--section` value never reaches evaluation at all -- it is a CLI-ARGUMENT-PARSING
+    // usage error, the same boundary T1 already drew exit 2 for (`not a rule id`, `rule-unimplemented`
+    // -- both before this diff). Shell has no separate usage-error channel from its own findings
+    // channel, so its single exit-1 vocabulary covers both; this engine's does not, and keeping T1's
+    // convention here is what keeps `--rule`'s and `--section`'s CLI-boundary exit codes consistent
+    // WITH EACH OTHER, which matters more than matching Shell's exit code for an input Shell treats as
+    // just another finding. Recorded so a future H24/H25 parity harness reads this as intentional
+    // (ADR-036 §3's own model: a stated divergence, not a silent one it would flag as a regression).
+    write(`leanflow: not a section number: ${sectionArg}`);
+    return 2;
+  }
+  const section = Number(sectionArg);
+
+  const specResult = readSpecSectionFromDisk(BUNDLED_SPEC_PATH, section);
+  if (!specResult.ok) {
+    write(`leanflow: ${specResult.finding} -- ${specResult.message}`);
+    return 1; // ok:false -> exit 1 (ADR-034 D3), same as every other SpecReadFail in this engine
+  }
+
+  const rules = specResult.rows.map((row) => toStandardRule(row, section, BUNDLED_SPEC_PATH));
+  const registry = createBuiltInRegistry();
+  const port = new FsSprintDirPort(repoDir);
+  const report = classifySection(section, rules, registry, port);
+
+  const evaluations: RuleEvaluation[] = [];
+  for (const outcome of report.outcomes) {
+    if (outcome.kind === "excluded") {
+      write(`note  ${outcome.ruleId} -- ${outcomeName(outcome)}: ${outcome.detail}`);
+      continue;
+    }
+    const { evaluation } = outcome;
+    evaluations.push(evaluation);
+    const prefix =
+      evaluation.verdict === "fail" ? "FAIL " : evaluation.verdict === "pass" ? "PASS " : evaluation.verdict === "gap" ? "gap  " : "note ";
+    write(`${prefix} ${evaluation.ruleId} -- ${evaluation.detail}`);
+    for (const finding of evaluation.findings) {
+      write(`  - ${finding.name}: ${finding.detail}`);
+    }
+  }
+
+  // DoD 2, deliberately: NO summary/`level:` line follows. `report` (above) carries no field a level
+  // could occupy, and this renderer adds none of its own -- a targeted run states what it checked,
+  // never a claim about the whole spec it did not (§14; SPRINT-087 T4's whole reason to exist).
+  return exitCodeFor({ evaluations });
+}
+
 /**
  * Render an invocation. Returns the exit code rather than calling `process.exit`, so a test can
  * assert the code without terminating the runner.
@@ -98,6 +178,8 @@ export function run(inv: Invocation, write: (s: string) => void): number {
       return 0;
     case "rule":
       return runRule(inv.ruleId, inv.repoDir, write);
+    case "section":
+      return runSection(inv.section, inv.repoDir, write);
     case "unknown":
       write(`leanflow: unknown argument(s): ${inv.args.join(" ")}`);
       write(HELP_LINE);
