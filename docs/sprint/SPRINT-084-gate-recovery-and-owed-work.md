@@ -62,7 +62,7 @@ on the DEFAULT profile, and the per-leg timings that justified the fix are recor
 ### T2 — Run the owed independent review of SPRINT-082's governance changes `[size: S · risk: med · class: decision · HITL]`
 Layers: `docs/sprint/archive/logs/SPRINT-082-foundation-hardening.md` (or a successor log)
 Depends-on: none
-Cites: SPRINT-082 T2 · T4 (parked branch) · `orchestrator/references/review-scoping.md` § Two dimensions
+Cites: SPRINT-082 T1 · T2 · T3 · T5 (the four reviewed; cited, not depended on — this sprint's own T1/T3/T5 are unrelated) · T4 (parked branch) · `check-review-depth.sh` (named as T2's verify method; read and run, never edited) · `orchestrator/references/review-scoping.md` § Two dimensions
 
 SPRINT-082 shipped routing where `governance:high` cannot take the self-review floor, and its own
 T1/T2/T3/T5 are all `behaviour:material · governance:high`. The session that built them could not

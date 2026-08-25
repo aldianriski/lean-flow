@@ -226,3 +226,34 @@ sixth**. My figure came from an agent report neither of us had derived — the i
 recommendation ("Option C stands... no sub-part of section 4 worth cutting") correctly ruled out
 coverage-reduction as a lever but never tested spawn-count reduction, which is where the cure came from.
 Left for a promote-time ruling rather than rewritten mid-sprint.
+
+### 2026-08-25 | progress | System-verify: `QA-CHECK: 176 pass, 3 fail` → owner ruling splits the three
+Run once against the integrated tree after the final commit, as its own call, verdict read from the line
+the gate itself prints (L-120). **The gate that could not finish now finishes** — this is the first
+system-verify in this repository since SPRINT-083 to produce a verdict line at all, which is the whole
+point of T1 going first.
+
+Three FAILs, all standing against **already-ticked** DoD — ADR-021's exact situation, so none was ticked
+past silently. The owner ruled them **split by character, not treated alike**:
+
+**(1) `layers completeness` on T2 — FIXED, using the checker's own documented remedy.** The checker says:
+*"if the prose only cites it rather than touching it, declare it on a Cites: line."* That is exactly true
+here — T2 **ran** `check-review-depth.sh` and referenced SPRINT-082's T1/T2/T3/T5; it edited neither. Both
+declared on `Cites:`. This is completing metadata, not rewriting a criterion.
+*Sub-finding worth its own note:* the first attempt failed. `check-layers-completeness.sh:145` matches
+with `grep -qxF` — an **exact whole-token** match — and the implied token is the *bare filename*, so a
+`Cites:` entry carrying the full path (`scripts/lib/check-review-depth.sh`) never matched and the FAIL
+stood. Caught by re-running the checker rather than assuming the edit worked. Path form is load-bearing
+in a matcher documented only as "declare it on a Cites: line".
+
+**(2)+(3) `verify-does-not-reach-target` ×2 on T5 — RULED, deliberately NOT edited.** T5's DoD row names
+**two** scripts in one `Verify:` clause (`check-doc-caps.sh` **and** `gen-index.sh`); the checker pairs
+them as target/method, so each reads as unreachable from the other. Both scripts genuinely ran and passed
+— the criterion is met; only the reachability metadata cannot model a two-method clause.
+The checker offers a remedy here too (*"state the criterion as a judgment tick"*), and it was **declined**:
+editing a frozen Plan's criterion text after the fact so a gate turns green is the L-088 shape —
+*never re-read the words to fit what was built* — and it stays that shape even when the checker suggests
+it. A recorded override plus a debt row is the honest close; a green tally bought by rewording is not.
+
+**Close state: 176 pass, 2 fail, both ruled and both filed as debt.** Stated plainly rather than rounded
+to green.
