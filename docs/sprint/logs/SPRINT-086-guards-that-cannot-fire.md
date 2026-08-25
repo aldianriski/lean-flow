@@ -336,3 +336,33 @@ agent and carried here as an open criterion. It is closable only from a genuinel
 
 consequence · T2 · behaviour:material · governance:low
 review · T2 · self-reviewed · behaviour:material · governance:low
+
+### 2026-08-25 | progress | The gate completed under load — DoD 3 met, and the run proved two of this sprint's fixes at once
+**Load state recorded before the run, not asserted after:** 6 live agent worktrees · 7 agent dispatches
+· 4 prior full gate runs in this session. That is the accumulated process table TD-090 describes.
+
+**Result: 226 lines, `QA-CHECK: 176 pass, 7 fail` printed.** SPRINT-085's three attempts under
+comparable load died at **204 → 117 → 100 lines without ever printing a verdict**. T2's DoD 3 is met on
+the exact failure, not on a proxy.
+
+**T3's budget guard fired for real, and that is the run's best evidence.** At **461s against the 450s
+budget** it tripped and named its three skipped harnesses — `run-s2-placement-fixtures.sh` ·
+`run-review-depth-fixtures.sh` · `run-verify-reaches-fixtures.sh`. Its FAIL text reads *"rather than
+left to run past an external timeout with no verdict line (TD-084)"* — **verbatim the sentence TD-091
+quoted as the thing that never happened**. Shipped by SPRINT-084, inert until now, fixed by T3 this
+morning, and firing on production traffic by evening. The gate completed *because* it fired: printing a
+verdict with named skips is what "completes" was written to mean, and the alternative it replaced was
+dying mute.
+
+**A new defect the run exposed, which no fixture would have.** Five of the seven FAILs were
+`ephemeral-intake` findings inside `.claude/worktrees/agent-*` — **the gate scans live agent
+worktrees**, six full repo copies, inflating the run *and* emitting false FAILs on fixture files that
+are not repo content. This repo's own dispatch guidance recommends worktree-isolated parallel builds,
+so the gate penalises the very pattern it prescribes. Worktrees removed (all seven branches confirmed
+merged first — the first check said UNMERGED because a `+` prefix was not stripped and `merge-base`
+got `+worktree-…`; the second query disagreed and was right). **Filed as debt at close** — the fix
+belongs in the gate's path exclusions, not in a habit of tidying up before running it.
+
+**The seventh FAIL was the coordinator's**, again: T2's Tier G tick names `S6.MULTISVC`, which the
+layers checker requires declared on `Cites:`. Identical in class to T1's finding hours earlier — a
+field-presence check cannot see what prose implies, and I had already been caught by it once.
