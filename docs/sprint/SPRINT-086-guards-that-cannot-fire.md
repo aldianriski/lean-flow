@@ -64,7 +64,7 @@ or dissolved — and the ranking T2 acts on is either confirmed or corrected by 
 ### T2 — Cut the gate's spawn count so it completes under load `[size: M · risk: med · class: execution · HITL]`
 Layers: `scripts/qa-check.sh` § leg 12 · the `evals/run-*.sh` harnesses it drives — **retargeted mid-sprint from `conformance-engine.sh`; see the `scope-change` entry 2026-08-25**, T1 proved leg 12 (396.3s of 492s) and the engine sweep (`QA_FULL=1` only) are disjoint, so the frozen target could not reach this task's own Acceptance (L-100 · L-088)
 Depends-on: T1
-Cites: TASK-284 · TD-090 · TD-084 · L-144 · L-120 · § Round 5 · § Round 6 (T1's verdict, which retargeted this task) · SPRINT-084 T1 (the mechanism, proven) · `S6.MULTISVC` (the rule id the Tier G seed perturbed — **read and seeded, never a file this task owns**)
+Cites: TASK-284 · TD-090 · TD-084 · L-144 · L-120 · **T3** (whose budget guard is what let this run print a verdict — cited, not depended on; T2 depends only on T1) · § Round 5 · § Round 6 (T1's verdict, which retargeted this task) · SPRINT-084 T1 (the mechanism, proven) · `S6.MULTISVC` (the rule id the Tier G seed perturbed — **read and seeded, never a file this task owns**)
 
 The gate blocked SPRINT-085's close for a full session. The characterisation is narrower than
 "unrunnable": it **completes on a clean process table and fails after accumulated session load**, which
@@ -82,7 +82,7 @@ table — the condition it currently fails on — with no check deleted and no c
 - [x] **Tier G**: the discrimination proof — *Verify: seed a break that makes a moved check silently not run; the suite reddens while a sibling control stays green (L-142 · L-137: confirm the seed landed by `cmp`, restore under a checked hash)* ✓ seeded `S6.MULTISVC` → `MULTISVCX` in the new keep-list; `cmp`-verified landed, 923=923 lines, still parses. **Exactly 2 of 43 cases reddened, 41 stayed green.** Restored, `cmp` + `sha256` identical, third run back to 43/0. Coordinator confirmed no seed survived the merge
 
 ### T3 — Make the budget guard fire before the thing it guards `[size: S · risk: med · class: execution · HITL]`
-Layers: `scripts/lib/qa-budget-check.sh` · `scripts/qa-check.sh` (the invocation point) · its retained fixture
+Layers: `scripts/lib/qa-budget-check.sh` · `scripts/lib/check-qa-budget-default.sh` (**new — created by this task**; Layers corrected per L-100) · `scripts/qa-check.sh` (the invocation point) · its retained fixtures
 Depends-on: none
 Cites: TASK-285 · TD-091 · TD-084 · L-105 · SPRINT-085 blocker entry
 
@@ -102,7 +102,7 @@ inside the command ceiling and before fork exhaustion.
 - [x] **Tier G**: the suite is shown to discriminate — *Verify: seed each path's guard away in turn; that path's case reddens while its sibling and a control stay green* ✓ each seed verified landed by `cmp`, parsed by `sh -n`, restored under `sha256sum -c`. Stronger than asked: path (b)'s **case 2 is a retained fixture that reproduces TD-084's original silent shape** with the checkpoints seeded away — the bug is pinned, not merely guarded against
 
 ### T4 — Give attended log entries a structured consequence classification `[size: M · risk: med · class: execution · HITL]`
-Layers: the sprint-log entry schema (`sprint-log.md.template` + the skills that append to it) · `scripts/lib/check-review-depth.sh` · `evals/run-review-depth-fixtures.sh`
+Layers: the sprint-log entry schema — `sprint-log.md.template` · `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/review-scoping.md` (**named explicitly; "the skills that append to it" was prose a checker cannot resolve** — L-100 correction) · `scripts/lib/check-review-depth.sh` · `evals/run-review-depth-fixtures.sh`
 Depends-on: none
 Cites: TASK-286 · TD-092 · TD-085 · L-166 · L-108 · SPRINT-085 T6 `surprise` entry
 
