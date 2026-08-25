@@ -145,6 +145,35 @@ export function formatRuleRow(row: RuleRow): string {
   return `${row.id} ${row.level} ${row.mark}`;
 }
 
+/**
+ * §14's own "Marks" legend table (`| Mark | Meaning | Is it work? |`) -- the SIX mark names §14
+ * itself defines, read independently of `model.ts`'s `RULE_MARKS` so the two can be compared rather
+ * than one mirroring the other (SPRINT-087 T2 DoD 3: "the mark set in code is compared against the
+ * Standard's own, so a seventh mark cannot appear silently"). Each row's first cell is a backticked
+ * mark name (`` `mechanical` ``, `` `judgment-only` ``, ...), stripped the same way `primaryToken`
+ * strips a rule row's cells. Returns `[]` if §14 has no such table -- a genuine parse defect for the
+ * caller to surface, not this function's job to paper over.
+ */
+export function marksInStandard(doc: BlockDocument): readonly string[] {
+  for (const section of sectionsOf(doc)) {
+    if (section.number !== 14) continue;
+    for (const block of section.blocks) {
+      if (block.type !== "table") continue;
+      const header = block.header.cells.map((c) => c.trim());
+      if (header[0] !== "Mark" || header[1] !== "Meaning") continue;
+
+      const marks: string[] = [];
+      for (const row of block.rows) {
+        const cell = (row.cells[0] ?? "").trim();
+        const m = /^`([a-z-]+)`$/.exec(cell);
+        if (m) marks.push(m[1]);
+      }
+      return marks;
+    }
+  }
+  return [];
+}
+
 // --- SPRINT-085 T3: error semantics parity with `read-spec-rules.sh` -------------------------------
 //
 // Rows were the easy half. The failure this reader refuses to have is returning nothing and exiting

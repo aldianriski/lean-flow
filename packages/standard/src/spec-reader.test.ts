@@ -9,6 +9,7 @@ import {
   allRules,
   formatRuleRow,
   formatSectionCount,
+  marksInStandard,
   readAll,
   readSection,
   reconcile,
@@ -147,6 +148,52 @@ describe("sectionsOf — section numbering", () => {
     // demonstrated by the row landing in the unnumbered section (number 0), not §1.
     expect(rulesInSection(doc, 1)).toEqual([]);
     expect(sectionsOf(doc).map((s) => s.number)).toEqual([1, 0]);
+  });
+});
+
+describe("marksInStandard — §14's own Marks legend table (SPRINT-087 T2)", () => {
+  test("a synthetic §14 with the Marks table returns exactly its backticked mark names, in order", () => {
+    const src = [
+      "## §14 — Conformance model",
+      "",
+      "| Mark | Meaning | Is it work? |",
+      "|---|---|---|",
+      "| `mechanical` | a tool can decide it | a check either exists or is a gap |",
+      "| `judgment-only` | not checkable | no |",
+    ].join("\n");
+    const doc = tokenize(src, "f.md");
+    expect(marksInStandard(doc)).toEqual(["mechanical", "judgment-only"]);
+  });
+
+  test("an unrelated table in §14 (e.g. the Levels table) is not mistaken for the Marks table", () => {
+    const src = [
+      "## §14 — Conformance model",
+      "",
+      "| Level | Evidence | Reads |",
+      "|---|---|---|",
+      "| **Structural** | the file tree | paths |",
+    ].join("\n");
+    const doc = tokenize(src, "f.md");
+    expect(marksInStandard(doc)).toEqual([]);
+  });
+
+  test("no §14 at all returns [], not a thrown error", () => {
+    const doc = tokenize("## §1 — Not §14\n\n| Rule |\n|---|\n| `S1.X` |", "f.md");
+    expect(marksInStandard(doc)).toEqual([]);
+  });
+
+  // Against the REAL spec/STANDARD.md: an independent literal, hand-verified against §14's own
+  // printed table (not recomputed the way `RULE_MARKS` in model.ts lists them -- tdd anti-tautology).
+  test("the real Standard's §14 table names exactly these 6 marks, in this order", () => {
+    const doc = tokenize(readFileSync(SPEC_PATH, "utf8"), SPEC_PATH);
+    expect(marksInStandard(doc)).toEqual([
+      "mechanical",
+      "judgment-only",
+      "split",
+      "implementation-directed",
+      "restated",
+      "standard-directed",
+    ]);
   });
 });
 
