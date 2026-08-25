@@ -1,10 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { parse, run } from "./main.ts";
+import { parse, run, specReadExitCode } from "./main.ts";
+import { tokenize } from "../../../packages/standard/src/tokenizer.ts";
+import { marksInStandard, readSection, reconcile, specNotFound } from "../../../packages/standard/src/spec-reader.ts";
 
 const SHELL_READER_PATH = fileURLToPath(new URL("../../../scripts/lib/read-spec-rules.sh", import.meta.url));
 const SPEC_PATH = fileURLToPath(new URL("../../../spec/STANDARD.md", import.meta.url));
@@ -282,6 +284,99 @@ describe("leanflow --section (SPRINT-087 T4)", () => {
     const { lines, write } = capture();
     expect(run({ kind: "section", section: "8", repoDir: "." }, write)).toBe(0);
     expect(lines).toEqual([]);
+  });
+});
+
+// SPRINT-087 T5 -- the process-boundary exit mapping itself, tested directly against ALL FIVE current
+// `SpecFinding` values (`packages/standard/src/spec-reader.ts`'s `SpecFinding` union), not only the ones
+// `--section` can reach today. `runSection` can only ever PRODUCE `spec-not-found`/`spec-table-unreadable`
+// (its own call chain never reaches `reconcile`/`marksInStandard` -- nothing in this CLI wires
+// `--reconcile` or a marks-check yet, so `spec-counts-unreadable`/`section-rows-mismatch`/
+// `marks-table-unreadable` are not reachable through ANY `Invocation` shape today; `--rule` never touches
+// the spec reader at all). `specReadExitCode` does not care: it switches on `.ok`, never `.finding`, so
+// it maps every one of the five identically -- proven here at RUNTIME (TD-101: nothing here type-checks
+// TypeScript, so the union's exhaustiveness is asserted, never assumed from the type alone) against real
+// values the domain's own constructors produce, not hand-rolled literals shaped to match by hand.
+describe("specReadExitCode -- the exit-code MAPPING itself, every SpecFinding (SPRINT-087 T5, DoD 1)", () => {
+  const SPEC_PATH = fileURLToPath(new URL("../../../spec/STANDARD.md", import.meta.url));
+  const realSpecText = readFileSync(SPEC_PATH, "utf8");
+
+  /** Mirrors packages/standard/src/spec-reader.test.ts's own fixture transform, verbatim (never a
+   * second, drifting copy of the anchored-match discipline that transform already earns). */
+  function stripFirstRow(specText: string, idLiteral: string): string {
+    const anchor = new RegExp(`^\\| *\`${idLiteral}\` *\\|`);
+    const lines = specText.split(/\r\n|\r|\n/);
+    let dropped = false;
+    const out: string[] = [];
+    for (const line of lines) {
+      if (!dropped && anchor.test(line)) {
+        dropped = true;
+        continue;
+      }
+      out.push(line);
+    }
+    return out.join("\n");
+  }
+  function stripClassifiedRow(specText: string): string {
+    return specText
+      .split(/\r\n|\r|\n/)
+      .filter((line) => !/^\| *classified *\|/.test(line))
+      .join("\n");
+  }
+
+  test("spec-not-found (the pure domain constructor) exits 1", () => {
+    expect(specReadExitCode(specNotFound("/no/such/spec.md"))).toBe(1);
+  });
+
+  test("spec-table-unreadable (an out-of-range §N against the real Standard) exits 1", () => {
+    const doc = tokenize(realSpecText, SPEC_PATH);
+    const result = readSection(doc, 999, SPEC_PATH);
+    if (result.ok) throw new Error("expected a failure result");
+    expect(result.finding).toBe("spec-table-unreadable");
+    expect(specReadExitCode(result)).toBe(1);
+  });
+
+  test("spec-counts-unreadable (§14's classified row stripped) exits 1", () => {
+    const noCounts = stripClassifiedRow(realSpecText);
+    const doc = tokenize(noCounts, "spec-no-counts.md");
+    const result = reconcile(doc, "spec-no-counts.md");
+    if (result.ok) throw new Error("expected a failure result");
+    expect(result.finding).toBe("spec-counts-unreadable");
+    expect(specReadExitCode(result)).toBe(1);
+  });
+
+  test("section-rows-mismatch (a row short of §2's published count) exits 1", () => {
+    const short = stripFirstRow(realSpecText, "S2\\.F-CAP");
+    const doc = tokenize(short, "spec-short-s2.md");
+    const result = reconcile(doc, "spec-short-s2.md");
+    if (result.ok) throw new Error("expected a failure result");
+    expect(result.finding).toBe("section-rows-mismatch");
+    expect(specReadExitCode(result)).toBe(1);
+  });
+
+  test("marks-table-unreadable (no §14 at all) exits 1", () => {
+    const doc = tokenize("## §1 — Not §14\n\n| Rule |\n|---|\n| `S1.X` |", "f.md");
+    const result = marksInStandard(doc, "f.md");
+    if (result.ok) throw new Error("expected a failure result");
+    expect(result.finding).toBe("marks-table-unreadable");
+    expect(specReadExitCode(result)).toBe(1);
+  });
+
+  // --- DoD 2 at the mapping level: SpecReadOk exits 0, INCLUDING the legitimate zero-row case ---------
+  test("SpecReadOk with real rows (§9) exits 0", () => {
+    const doc = tokenize(realSpecText, SPEC_PATH);
+    const result = readSection(doc, 9, SPEC_PATH);
+    if (!result.ok) throw new Error(`expected success, got ${result.finding}`);
+    expect(result.rows.length).toBeGreaterThan(0);
+    expect(specReadExitCode(result)).toBe(0);
+  });
+
+  test("SpecReadOk with §8's legitimate ZERO rows still exits 0 -- absence and emptiness stay distinct here too", () => {
+    const doc = tokenize(realSpecText, SPEC_PATH);
+    const result = readSection(doc, 8, SPEC_PATH);
+    if (!result.ok) throw new Error(`expected success, got ${result.finding}`);
+    expect(result.rows).toEqual([]);
+    expect(specReadExitCode(result)).toBe(0);
   });
 });
 

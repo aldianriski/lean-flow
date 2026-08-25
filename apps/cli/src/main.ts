@@ -97,6 +97,28 @@ function runRule(ruleIdRaw: string, repoDir: string, write: (s: string) => void)
   return exitCodeFor({ evaluations: [evaluation] });
 }
 
+/**
+ * The process-boundary exit mapping (SPRINT-087 T5; ADR-027/ADR-034 D3): 0 for `ok:true` -- INCLUDING
+ * the legitimate zero-row §8 case, since `SpecReadOk.rows` can be `[]` and still be a success; this
+ * function never looks at `rows`, so it cannot re-introduce the absence-vs-emptiness confusion
+ * `SpecReadResult`'s own TYPE already refuses (a `SpecReadFail` carries no `rows` field to mistake for
+ * one) -- 1 for `ok:false`, regardless of WHICH `SpecFinding` string it carries.
+ *
+ * Checks only the `.ok` discriminant, never `.finding`: exhaustive over
+ * `packages/standard/src/spec-reader.ts`'s `SpecFinding` union (`spec-not-found`,
+ * `spec-table-unreadable`, `spec-counts-unreadable`, `section-rows-mismatch`, `marks-table-unreadable`)
+ * BY CONSTRUCTION, not by enumerating cases that could fall out of sync as that union grows -- a sixth
+ * finding added tomorrow needs no edit here. Typed structurally (`{ readonly ok: boolean }`) rather than
+ * importing `SpecReadResult`/`MarksReadResult` by name, so the same one rule covers both result shapes
+ * that module exports, not two copies of it. TD-101: nothing here type-checks TypeScript, so this
+ * exhaustiveness claim is asserted at RUNTIME in main.test.ts against all five current `SpecFinding`
+ * values (via the domain's own constructors/fixtures, never a hand-rolled literal) plus both
+ * `SpecReadOk` shapes -- never left as a type-only guarantee.
+ */
+export function specReadExitCode(result: { readonly ok: boolean }): 0 | 1 {
+  return result.ok ? 0 : 1;
+}
+
 /** A bare positive integer, no sign, no leading zero, no decimal -- mirrors `makeRuleId`'s own
  * format-first validation style for `--rule`. Anything else is not even a candidate section number,
  * so it is refused here rather than reaching `Number(...)` and producing `NaN`-shaped garbage. */
@@ -134,7 +156,7 @@ function runSection(sectionArg: string, repoDir: string, write: (s: string) => v
   const specResult = readSpecSectionFromDisk(BUNDLED_SPEC_PATH, section);
   if (!specResult.ok) {
     write(`leanflow: ${specResult.finding} -- ${specResult.message}`);
-    return 1; // ok:false -> exit 1 (ADR-034 D3), same as every other SpecReadFail in this engine
+    return specReadExitCode(specResult); // ok:false -> exit 1 (ADR-034 D3), via the shared mapping (T5)
   }
 
   const rules = specResult.rows.map((row) => toStandardRule(row, section, BUNDLED_SPEC_PATH));
