@@ -152,6 +152,58 @@ status: current
 > at **3050 > 130**, still TD-082's reasoned carry; the figure moved 3,050 → 3,050 since the last
 > sweep, so the carry ruling is unaffected.
 
+- **TD-099** severity: medium | status: open | created: Sprint-087
+  - Summary: **`check-review-depth.sh` silently ignores a malformed consequence line instead of naming
+    it, so a `governance:high` declaration its parser cannot read passes GREEN.** The classification is
+    matched with an anchored full-line pattern — `^consequence · T[0-9]+ · behaviour:(low|material) ·
+    governance:(low|high)$`. Any task key that is not literally `T<digits>` fails to match and is
+    treated as though no classification were written at all.
+  - Evidence: SPRINT-087's Execution Log carries three gate entries. Two are keyed `pre-T1` — one of
+    them recording **`governance:high`** — and one is keyed `T4`. Only the `T4` line was seen: the gate
+    emitted `review-depth-governance-absent` for it. Verified empirically rather than read off the
+    regex: delete the `T4` line, leaving a file that still contains a `pre-T1 · governance:high` line,
+    and the checker reports **`PASS  review depth … (1 review record(s), 0 self-review examined)`**.
+  - Impact: **the failure direction is the bad one.** A well-formed key FAILs loudly and gets fixed; a
+    malformed key passes in silence and is never noticed. Which of the two a governance:high task gets
+    is decided by whether its key happens to match a regex — not by whether review was actually owed.
+    This is the guard's own subject matter: it exists so that "review was owed and silence is not a
+    clean record" cannot happen, and it has that exact hole one level in, in its own input.
+  - **This is L-148 verbatim, one layer up.** L-148 records a `Layers:` declaration promoted without
+    backticks that `check-layers-observed.sh` read as an *empty* set, passing green over every file the
+    sprint touched. Its stated prescription is that **a reader deriving an empty set from a non-empty
+    source must say so as a named finding rather than returning the empty set** — which is precisely
+    what this checker does not do. The lesson was recorded, promoted, and then reproduced in a
+    different guard.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): emit a named finding when a
+    line begins `consequence · ` but does not match the full pattern — *malformed*, distinct from
+    *absent* — rather than letting the anchored match fall through to silence. Consider the same
+    treatment for `^review · `. A retained fixture with a deliberately malformed key is the control.
+  - **Re-file fresh if** the consequence-line grammar changes — the finding is that malformed and
+    absent are indistinguishable to this reader, and any new grammar inherits that unless fixed.
+
+- **TD-098** severity: medium | status: open | created: Sprint-087
+  - Summary: **The TS suite is red at baseline on this host — 2 of 26 `spec-reader.test.ts` tests time
+    out — so "did my change break anything" cannot be answered by reading the pass/fail line.** Both
+    are `reconcile` tests that spawn `scripts/lib/read-spec-rules.sh` and exceed **bun:test's 5000 ms
+    default**; measured at 6558 ms and 5006 ms.
+  - Evidence: verified on the **clean base commit `2eee4d3`**, working tree clean, with none of
+    SPRINT-087 T1's changes present: `bun test packages/standard/src/spec-reader.test.ts` →
+    **`24 pass, 2 fail`**. T1 independently reported the same two via `git stash`. Two agents, two
+    methods, same result.
+  - Impact: **it taxes every remaining task in this sprint.** T1, T2, T3, T4, T7 all touch
+    `packages/standard/src` and all run this suite; each must now distinguish its own failures from a
+    standing pair, which is precisely the judgement a red baseline makes unreliable. The cost is not
+    the two tests — it is that a green run stops being the signal it is supposed to be. T1 already paid
+    a variant of this toll, raising its own oracle tests to a 20 s timeout for the same root cause.
+  - Root cause is **not** the assertions: it is a slow shell spawn measured against a fixed default.
+    Same shape as L-144's per-invocation-overhead finding, one layer up in the test runner.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): raise the per-test timeout
+    for oracle-spawning tests to a figure derived from the measured spawn cost, rather than leaving the
+    5000 ms default to decide. Do **not** silence by deleting or skipping — these are parity tests, and
+    a skipped parity test is the false-assurance shape ADR-036 and L-058 both warn about.
+  - **Re-file fresh if** the oracle scripts get materially faster — the arithmetic (spawn cost vs
+    runner default) is the whole finding, and it is host-specific.
+
 - **TD-097** severity: medium | status: open | created: Sprint-087
   - Summary: **`check-verify-reaches.sh` reports a present script as absent, and cannot see the corpus
     that would have exposed it.** Its EXISTS test resolves the extracted token with `[ -f "$scr" ]`
