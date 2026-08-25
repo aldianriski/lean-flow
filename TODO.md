@@ -345,6 +345,37 @@ V3 §43's expensive-first ranking governing families 2..n.
       origin:     decomposer
       state:      needs-info
 
+- [ ] TASK-298 — Teach the layers checker that a sibling active sprint is not undeclared work  [size: S] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — this IS the attribution guard. Widening an exclusion is exactly how a
+                  guard acquires a silent false negative: too broad and real undeclared work walks
+                  through under cover of "another sprint owns it")
+      done-when:  with **two active sprint files present**, each sprint's attribution is scoped to
+                  itself — a file or commit that a *sibling active sprint's* `Layers:` declares no
+                  longer reports as `undeclared` / `attributable to no task` against this one, while
+                  every genuinely undeclared path still does. Proven on a **real two-active-sprint
+                  tree**, not fixtures alone (L-166: fixtures prove the branch works, only the real
+                  artifact proves it is reachable). Retained must-FAIL + sibling control: a path
+                  declared by NO sprint still fails with its named finding while the sibling-declared
+                  path passes. Seeded-break discrimination proof, seed verified landed by `cmp` and
+                  restored under a checked hash, artifact still parses, break targeted not demolition
+      touches:    scripts/lib/check-layers-observed.sh (the `is_excluded` family + the per-sprint
+                  loop) · possibly scripts/qa-check.sh (it passes every `docs/sprint/SPRINT-*.md`) ·
+                  evals/fixtures/layers-observed/** (new retained fixture pair) ·
+                  evals/run-layers-observed-fixtures.sh
+      depends-on: none — it is the prerequisite for promoting any stream 2, so it cannot sit inside one
+      assumes:    **measured, not inferred.** `qa-check.sh:1013` does `ls docs/sprint/SPRINT-*.md` and
+                  hands all of them to a checker that loops `for sp in "$@"` with zero stream
+                  awareness, so attribution is repo-wide per sprint. Demonstrated live: commit
+                  `39eedb8` (governance work, no sprint) reds SPRINT-087 with `commit attributable to
+                  no task and not coordinator bookkeeping`. Reproduced independently by the session
+                  executing SPRINT-087. `.claude/CONTEXT.md` § Sprint model already specifies streams
+                  — the SSOT describes what the gate never learned (L-020, shipped != wired)
+      tracker:    L-020 · L-166 · L-165/L-168 (isolated reviewer) · CONTEXT.md § Sprint model ·
+                  blocks promoting EPIC-015 as stream 2
+      origin:     manual
+      state:      ready
+
 ### P3 — Long-term
 
 > Rejected work lives in **`.out-of-scope/`** — each file carries its own reasoning, revisit-if and
