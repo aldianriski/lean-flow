@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-10
+last_updated: 2026-08-25
 update_trigger: a measurement round is appended
 status: active
 id: qa-gate-timing-log
@@ -203,3 +203,189 @@ problem, the honest options are structural — caching the index digest between 
 whole-corpus integrity check costs proportional to the corpus — not a narrowing of what is checked.
 TD-050 stays open on its behavioural concern; what closes is the expectation that splitting it further
 would reveal a target.
+
+---
+
+## Round 4 — process-spawn count, not corpus size, is the dominant term (SPRINT-084 T1, 2026-08-25)
+
+TD-084 could not be acted on before this round: `sh scripts/qa-check.sh` no longer completed at all
+(three prior sessions killed at a 5min limit, a 10min limit, and a reaped background job — none
+reaching the `QA-CHECK: N pass, M fail` line), so Round 3's per-section method could not simply be
+re-run. This round re-derives Round 2/3's "section 4" finding from scratch on the current, much larger
+script (23 always-on harnesses vs. Round 2's 14; 79 corpus files vs. an unrecorded but smaller count;
+143 LEARNINGS entries), and adds the half Round 1–3 did not need at their scale: a **tiny-input
+isolation**, per L-144/L-147's own prescribed diagnostic, run before any fix was chosen (TD-084's own
+mitigation clause: *"do not act on (a) before (b)"*).
+
+**Method — two passes, in order.** (1) An `awk` transform inserted one `date +%s%N` emitter after each
+`# --- N.` section marker directly into the shipped `qa-check.sh` (matching Round 2/3's approach in
+spirit; unlike them, done on the file itself rather than a temp-directory copy, verified pure-addition
+by `sh -n` and restored to a byte-verified prior state via `cp` immediately after each timed run — SHA-256
+`0139…7531` is the file as delivered, both instrumented runs reverted to it). Two full runs taken: one
+against the **pre-fix** script (killed before finishing — figures below are the last section boundary
+reached, extrapolated for the unreached remainder), one against the **post-fix** script (completed).
+(2) Independently, `scripts/lib/conformance-engine.sh`'s own rule-dispatch loop was instrumented the same
+way and run once against this repository, to attribute the informational-sweep leg's cost to individual
+rule families rather than treat it as a blob (the exact mistake Round 2 names L-107 for, one level down).
+
+### Tiny-input isolation (the half this round adds)
+
+Before touching any code, each spawn type used by the two dominant loops (below) was timed 100× against
+a throwaway one-line file, on this host, isolated from any real corpus — the identical diagnostic
+TD-073's own fix used (`fn=$(printf … | tr …)`, 9,176ms/100 calls) and the one L-144/L-147 name as the
+one that actually distinguishes a measurement from a guess:
+
+| Call | 100× wall-clock | per-call |
+|---|---:|---:|
+| `awk '{print $1}' <1-line file>` | 5,496 ms | 55.0 ms |
+| `sed -n '1p' <1-line file>` | 3,610 ms | 36.1 ms |
+| `grep -q … <1-line file>` | 3,798 ms | 38.0 ms |
+| bare `$(printf 'x')` (process-creation floor, no work) | 2,110 ms | 21.1 ms |
+
+**This is the finding, before any real-repo number is even read**: on this host, creating a subprocess
+costs 20–55ms **regardless of what it does** — over half of even a trivial `awk`/`sed`/`grep` call is the
+`fork`/`exec` itself (Windows/git-bash, not the underlying work). Any loop that spawns one process per
+corpus item is bounded below by `items × ~25ms`, independent of item size — exactly TD-073's conclusion,
+reproduced independently here rather than assumed from precedent.
+
+### Per-item spawn counts at real scale, and what they cost
+
+| Site | Spawn shape (pre-fix) | Spawn count | Measured cost | Implied per-spawn |
+|---|---|---:|---:|---:|
+| `scripts/gen-index.sh` (LEARNINGS loop) | `grep` then 2×`sed` per `## L-NNN` heading | 143 × 2 = 286 | — | — |
+| `scripts/gen-index.sh` (corpus loop) | 3×`fmv`(awk) per corpus file | 79 × 3 = 237 | — | — |
+| `scripts/gen-index.sh` **total** | | **523** | **97.6s** | **187ms** |
+| `qa-check.sh` §4 (`resids`, 1 `fmv`/research file) | 1 `fmv`(awk)/file, 79 files | 79 | 5.0s (isolated) | 63ms |
+| `qa-check.sh` §4a (LEARNINGS metadata) | 1 `grep` + conditional `sed`/id, 143 ids | ~150–280 | 60.0s (isolated) | ~250ms |
+| `qa-check.sh` §4a (refs membership) | 1 `grep -qx`/ref, ~100 refs | 100 | 11.0s (isolated) | 110ms |
+| `qa-check.sh` §4b (corpus refs+metadata) | 1 reftoks `awk` + 4×`fmv` + membership `grep`s, 79 files | ~395+ | 93.0s (isolated) | ~235ms |
+| `qa-check.sh` §4's own code, **total** | | **~700–850** (floor 717; upper bound not exactly countable — data-dependent membership checks) | **169s** (isolated, sum of the four rows above) | ~215ms |
+| conformance-engine.sh `_own_scan` (first call, S1.LAW2) | 1 `awk`/doc, 222 docs | 222 | 57.16s | 257ms |
+| conformance-engine.sh `assert_S4_APPEND` | `git log`/`show`/`rev-parse` per ADR/revision, 36 ADRs, 63 revisions | ~167 | 29.39s | ~176ms |
+
+The per-spawn figures at real scale (110–260ms) run **higher** than the tiny-input floor (20–55ms) —
+expected: these calls read real files of varying size and compete with the rest of the gate for I/O,
+where the tiny-input isolation measures the unavoidable minimum with the workload subtracted out. Both
+numbers matter for different reasons: the floor proves the mechanism is spawn count, not work; the
+real-scale figure is what a fix has to beat.
+
+### Before/after per-leg wall-clock (s) — current script, matched to `qa-check.sh`'s own `# --- N.` markers
+
+| Leg | Before | After |
+|---|---:|---:|
+| 1. Line caps | 15.7 | 8.9 |
+| 2 – 3 (all, combined) | ~22.1 | ~14.7 |
+| **2f-ter. Conformance engine, informational sweep vs. real repo** | **176.6** | **1.9–5** |
+| **4. Knowledge metadata (gen-index + corpus + LEARNINGS)** | **271.5** | **23.6** |
+| 5 – 9 (all, combined) | ~4.8 | ~3.7 |
+| 10. L-NNN citation lint | 15.4 | 11.7 |
+| 11. Active-sprint task schema | 3.7 | 1.9 |
+| **12. Eval harnesses (23 → 24, one new)** | not reached (killed mid-leg) | **396.3** |
+| 13 – 15 (all, combined) | not reached | ~12.4 |
+| **Full run (this instrumented sample)** | **~900s, extrapolated** (never completed; see Caveats) | **476s, completes** |
+| **Full run (separate clean verification sample, uninstrumented)** | — | **492s** — printed `QA-CHECK: 176 pass, 4 fail` |
+
+### Findings
+
+- **The dominant term is named and it is not corpus size, section identity, or check count — it is
+  external process-spawn count, at 20–260ms per spawn on this host.** Two legs (4 and 2f-ter) held 448s
+  of the ~900s extrapolated pre-fix total (>50%). The four sites individually spawn-counted above sum to
+  **~1,690** process spawns (gen-index 523 + qa-check.sh §4 ~700–850 + `_own_scan` 222 + `assert_S4_APPEND`
+  ~167) doing work a single cached pass per item could do in one spawn each — and that is a FLOOR, not
+  the whole picture: leg 2f-ter's remaining ~90s (176.6s minus `_own_scan`'s 57.2s and `assert_S4_APPEND`'s
+  29.4s) comes from other conformance-engine families (`S10.TDAGING` 27.7s, `S4.ONEFILE` 16.2s,
+  `S4.SECTIONS` 15.2s, `S4.NEGATIVE` 7.6s, `S6.BASE` 6.5s, `S11.SPRINT` 5.7s, `S11.TDDELETE` 4.3s,
+  `S4.INDEX` 2.8s — timed by the same per-rule instrumentation but not individually spawn-counted this
+  round, named here rather than folded silently into "the rest"). This generalises Round 2's "section 4
+  is not a blob, it's three comparable thirds" one level further: none of the three thirds had a
+  *computational* cost centre either — all three were the same mechanism (one-process-per-item) at
+  different call sites, and neither is leg 2f-ter's remainder.
+- **This is at minimum the fifth and sixth sighting of this exact shape in this codebase, not the third
+  and fourth.** L-144 itself documents two by name — SPRINT-075's ownership family (sighting 1, ~2,800
+  awk processes) and SPRINT-076's `S2.R-PLACEMENT` (sighting 2, a `find` per spec row) — but L-147 names
+  a third (a tier-rank resolution loop, 13s→18s on a four-file repo) and L-155 a fourth (the engine's own
+  dispatch driver, fixed as TD-073: two command substitutions plus an external `tr`, per rule, spawn-free
+  after the fix). `scripts/gen-index.sh` and `qa-check.sh` §4's own code — fixed this round — are a fifth
+  and sixth appearance, both undiscovered until this task because the gate never lived long enough to be
+  profiled past leg 4.
+- **Round 3's "no cure is proposed" no longer holds, but not for a reason Round 3 could have found.**
+  Round 3 correctly ruled out narrowing *what* is checked (the coverage-reduction axis) — every lever on
+  that axis really was small or ADR-009-protected, exactly as it concluded. What Round 3's method could
+  not see is a second, orthogonal axis: *how many processes* the SAME check spawns to do the SAME work.
+  Section 4 (now §4) still reads the whole corpus; it just no longer spawns 700+ processes to do it.
+  271.5s → 23.6s with **zero reduction in what is verified** (§10's coverage-reduction fixture family
+  was not touched, and the same real defects were confirmed still caught before/after — see this
+  sprint's own T1 report).
+- **The conformance-engine informational sweep (leg 2f-ter, 176.6s pre-fix) was cut on the OTHER axis —
+  scope, not spawn count** — by handing it a reduced spec (the 2 rules + 7 rules that actually gate,
+  of ~100 total) on the default profile, deferring the full ~90-rule sweep to `QA_FULL=1`. This is
+  distinct from the §4 fix and is the one place this round's cure IS a narrowing — but of an
+  *informational* sweep whose own header comment already states almost none of it enters the gate's
+  tally, not of a coverage guarantee.
+- **Leg 12 (eval harnesses, 396.3s) is now the single largest leg in the gate — ~83% of this round's
+  instrumented post-fix sample (476s), ~81% of the separate clean-verification sample (492s).** This
+  round does not attribute leg 12's cost the way it attributes legs 4 and 2f-ter (that
+  would be a seventh sighting to chase, and was out of this task's measured scope: leg 12 was never the
+  historically-stalling leg — TD-084's own killed runs died inside leg 2f-ter/leg 4's territory, never
+  reaching leg 12). Recording this explicitly so the next investigation does not start from zero: if the
+  gate's runtime is revisited again, leg 12 — not section/leg 4 — is where Round 2's method (measure
+  per-harness, don't treat the leg as a blob) should be pointed next.
+
+### Recommendation (round 4)
+
+**The cure Round 1–3 could not find exists, was on a different axis than any of them tested, and has
+been applied to the two dominant legs.** `docs/research/qa-gate-timing.md`'s standing recommendation
+("Option C stands; nothing is moved... no sub-part of section 4 worth cutting") is **materially
+superseded** by this round on its central claim — see the note below; this log records that fact but
+does not rewrite the decision doc. For any future investigation of gate runtime: **isolate spawn count
+from work size before accepting "the corpus is just big" as an explanation** — the tiny-input table
+above is the cheap test that would have found this three rounds ago, and it costs under 20 seconds to
+run. Leg 12 is the named next target if this is ever revisited; this round did not touch it.
+
+### Caveats recorded at the time
+
+- **The pre-fix "~900s" full-run figure is extrapolated, not measured end-to-end.** No pre-fix run of
+  the current script ever completed (that is TD-084 itself) — the pre-fix per-leg figures above are each
+  independently measured (legs 1–11 from an instrumented run killed mid-leg-12 at the 10-minute tool
+  ceiling; leg 12's pre-fix cost is inferred from the post-fix measurement of the same 23 harnesses,
+  since none of this round's fixes touched leg 12 or any harness's own logic) and then summed. Should not
+  be quoted to the second, in Round 1's own words.
+- **The two post-fix full-run samples disagree by 16s (476s instrumented vs. 492s clean) for the same
+  reason Round 1's samples did** — separate process invocations, separate filesystem-cache state, and
+  (for leg 12 specifically) 23–24 independent harnesses whose own git/mktemp costs vary run to run.
+  Neither figure should be read as more precise than the other; both are cited above rather than
+  averaged, so neither reads as falsely exact.
+- **This round instrumented the SHIPPED file directly, then reverted it, rather than working from a
+  temp-directory copy the way Rounds 2–3 did.** Verified by `sh -n` after instrumenting and by `cp`
+  from a saved pristine snapshot afterward (not a diff-based revert), so the residual risk is different
+  in kind from Round 2/3's "a copy is not the artifact" caveat — here the artifact WAS instrumented,
+  temporarily, and the claim is that the revert is exact rather than that the code path was never
+  touched. Confirmed for the coordinator's own re-run: `sh scripts/qa-check.sh` and
+  `scripts/lib/conformance-engine.sh` were both re-verified byte-identical to their delivered state
+  after every timed run in this round.
+- **Every absolute number in this round is host-specific.** Measured on Windows 11 / git-bash, the same
+  environment as Rounds 1–3 — but this round's *central claim* (spawn count dominates) is specifically
+  about `fork`/`exec` cost on this platform, which is known to run far higher than native Linux process
+  creation. The MECHANISM generalises (spawn count is always a term); the 20–260ms figures likely do not
+  to a Linux CI runner, where the same fixes would still help but by a smaller margin.
+- **The tiny-input isolation used a 1-line throwaway file, not the zero-byte case §4's own comments warn
+  a single cross-file awk pass can silently drop.** This round's fixes stayed at one-process-per-FILE
+  (never one process for a whole corpus), the same precedented boundary the ownership family and
+  `S2.R-PLACEMENT` already drew, for exactly that reason — not re-litigated here, cited.
+- **Leg 2f-ter's post-fix figure (1.9–5s) and leg 4's (23.6s) both include real work, not just fewer
+  spawns** — leg 2f-ter's reduced-spec run still dispatches and evaluates the 9 rules that gate; leg 4
+  still reads all 79 corpus files and 143 LEARNINGS entries once each. Neither figure is "nothing ran".
+- **Nothing in `docs/adr/`, `docs/research/*.md` (outside this log), or `evals/run-foreign-repo-fixtures.sh`
+  was touched by this round or by T1** — confirmed by a concurrent T4 session actively editing the latter
+  two; this round's own edit is scoped to this file only, append-only.
+
+### Note for the decision doc (`docs/research/qa-gate-timing.md`)
+
+Its Recommendation section states *"Option C stands; nothing is moved... there is no sub-part of
+section 4 worth cutting."* That conclusion was correct on the axis it tested (coverage reduction) and
+is now **outdated on an axis it never tested** (spawn-count reduction) — Option C's own three rounds
+never asked "does the same check need this many processes," only "is there less to check." This is not
+a one-line pointer fix (the doc's § Options table, § Findings, and § Recommendation would all need a
+new row/finding to stay honest about what changed and why), so per this task's own instruction it is
+**not edited here** — left for a promote-time ruling on whether to add an Option E and revise the
+verdict, or to fold this round's summary into the doc's Findings as a superseding entry.

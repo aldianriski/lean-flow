@@ -173,3 +173,56 @@ rows) which Round 4's sweep cannot see: its regex `^FAIL  [a-z-]*: ` matches the
 convention, and these use `S<N>.<CODE>`. So a coverage sweep reported clean over findings it could not
 match — L-108's shape again, in the sweep rather than in a guard. Left unrouted because it is outside
 T4's `Layers:`; belongs in the close buckets, not absorbed here.
+
+### 2026-08-25 | progress | T1 — the gate finishes: ~900s never-completing → 492s with a printed verdict
+**Profiled before fixing, because TD-084 said so in as many words** (*"Do not act on (a) before (b)"*).
+The measurement overturned the assumption: the dominant term is **process-spawn count on this host**,
+not corpus size, section identity, or check count. A tiny-input isolation — each spawn type timed 100×
+against a 1-line file, run *before* any fix was chosen — put the bare process-creation floor at **21.1ms**
+and the range at 20–55ms; at real scale the same spawns cost 110–260ms each. Both numbers are recorded
+because they answer different questions: the floor proves the *mechanism* is spawn count with workload
+subtracted out; the real-scale figure prices it. Had a split been chosen before measuring, it would have
+optimised the wrong half — TD-073's exact mistake, avoided here by following its own lesson.
+
+| Leg | Before | After |
+|---|---:|---:|
+| 4 · knowledge metadata (gen-index + corpus + LEARNINGS) | **271.5s** | 23.6s |
+| 2f-ter · conformance engine informational sweep | **176.6s** | 1.9s |
+| 1 · line caps | 15.7s | 8.9s |
+| 10 · L-NNN citation lint | 15.4s | 11.7s |
+| 12 · eval harnesses | not reached (killed) | **396.3s** ← now dominant |
+| total | ~900s extrapolated, never completed | **492s, completes** |
+
+Spawn counts behind it: `gen-index.sh` 523 · `qa-check.sh` §4 ~700–850 · `_own_scan` 222 ·
+`assert_S4_APPEND` ~167 — recorded as a **floor**, not a whole-leg account, with the remaining
+conformance-engine families named rather than folded into "the rest".
+
+**Nothing deleted, nothing downgraded.** Every heavy leg stays reachable under `QA_FULL=1` — verified:
+the default profile hands the engine a reduced spec (S9.GATESWELLFORMED/GATESABSENT + S13, the only
+families whose verdict folds into the tally today), and the full informational sweep plus the four opt-in
+selftest harnesses run under the flag.
+
+**Retained fixture + discrimination proof (Tier G).** New `scripts/lib/qa-budget-check.sh` and
+`evals/run-qa-budget-fixtures.sh`: a run that would exceed the budget is **reported and its skipped
+harnesses named**, rather than dying past an external timeout with no verdict line — TD-084's failure
+mode closed at the root. Seeded the over-budget comparison inverted: `cmp` confirmed the seed landed,
+`sh -n` parsed, line count 38=38 (targeted), the case reddened while both sibling controls stayed green,
+then restored. Verified by the coordinator on its own call: 4 of 4 PASS including an explicit
+`harness: qa-budget-check discriminates` assertion.
+
+**A real flaky test was found and fixed while building it** — case 1 asserted an exact `OK 0 300`, which
+tips to `OK 1 300` when a wall-clock second falls between the harness's `date +%s` and the function's own.
+It surfaced as the whole-gate verdict flipping 175/176 across otherwise identical runs. Fixed with a
+pattern match, re-verified 8 consecutive green runs. A guard that changes its own answer between runs is
+worse than no guard.
+
+**Coordinator's sighting count was wrong and the task corrected it.** I recorded this as the third and
+fourth sighting of the spawn-count shape; L-144/L-147/L-155 already document **four** priors (ownership
+family · `S2.R-PLACEMENT` · a tier-rank loop · TD-073's own driver fix), making these the **fifth and
+sixth**. My figure came from an agent report neither of us had derived — the identifier-and-figure rule
+(L-143 · L-130) applies to counts cited in a log exactly as it does to ids in a register.
+
+**Companion decision doc superseded, stated not edited.** `docs/research/qa-gate-timing.md`'s standing
+recommendation ("Option C stands... no sub-part of section 4 worth cutting") correctly ruled out
+coverage-reduction as a lever but never tested spawn-count reduction, which is where the cure came from.
+Left for a promote-time ruling rather than rewritten mid-sprint.

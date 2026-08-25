@@ -40,7 +40,7 @@ check to make a number fit · re-litigating either ADR's § Decision content · 
 ## Plan
 
 ### T1 — Make the gate finish: profile `qa-check.sh`, then split it `[size: M · risk: med · class: execution · HITL]`
-Layers: `scripts/qa-check.sh` · `scripts/lib/conformance-engine.sh` (measurement only) · possibly a fast/standard profile split
+Layers: `scripts/qa-check.sh` · `scripts/lib/conformance-engine.sh` (measurement only) · `scripts/gen-index.sh` (its own per-item spawn cost turned out to be a third of leg 4's, discovered mid-profiling, not predicted at plan) · `scripts/lib/qa-budget-check.sh` (new) · `evals/run-qa-budget-fixtures.sh` (new) -- live declaration updated post-measurement per L-100, not a frozen prediction
 Depends-on: none
 Cites: TD-084 · TD-071 · TD-073 · L-144 · L-120 · ADR-021 · V3 §22
 
@@ -53,11 +53,11 @@ assumed; a split chosen before measuring would likely have optimised the wrong h
 on the DEFAULT profile, and the per-leg timings that justified the fix are recorded.
 
 **DoD:**
-- [ ] Per-leg timings recorded in the style L-144 prescribes; the dominant term named — *Verify: the recorded timing table, against a tiny input so overhead is not masked*
-- [ ] The fix is justified by that measurement, not by where the run appeared to stall — *Verify: the DoD names the measured number it rests on*
-- [ ] `sh scripts/qa-check.sh` prints `QA-CHECK: N pass, M fail` in one ordinary invocation — *Verify: run it as its own call and read the printed verdict line, never a wrapper's exit code (L-120)*
-- [ ] The heavy legs remain reachable, not deleted — *Verify: each still runs under its explicit profile/flag*
-- [ ] Retained fixture: a run that would exceed the fast leg's budget is reported as such rather than silently truncated — *Verify: the fixture reddens on a seeded over-budget run while a sibling control stays green*
+- [x] Per-leg timings recorded in the style L-144 prescribes; the dominant term named — *Verify: the recorded timing table, against a tiny input so overhead is not masked*
+- [x] The fix is justified by that measurement, not by where the run appeared to stall — *Verify: the DoD names the measured number it rests on*
+- [x] `sh scripts/qa-check.sh` prints `QA-CHECK: N pass, M fail` in one ordinary invocation — *Verify: run it as its own call and read the printed verdict line, never a wrapper's exit code (L-120)*
+- [x] The heavy legs remain reachable, not deleted — *Verify: each still runs under its explicit profile/flag*
+- [x] Retained fixture: a run that would exceed the fast leg's budget is reported as such rather than silently truncated — *Verify: the fixture reddens on a seeded over-budget run while a sibling control stays green*
 
 ### T2 — Run the owed independent review of SPRINT-082's governance changes `[size: S · risk: med · class: decision · HITL]`
 Layers: `docs/sprint/archive/logs/SPRINT-082-foundation-hardening.md` (or a successor log)
@@ -76,7 +76,7 @@ accepting self-review recorded in its place. Either closes it; an empty record d
 
 **DoD:**
 - [x] An independent reviewer is dispatched per task, or the owner rules self-review acceptable — *Verify: the ruling or the dispatch is recorded, not narrated*
-- [x] The outcome is written as a `review ·` line in the log — *Verify: `sh scripts/lib/check-review-depth.sh` stays green on the result* — **verify n/a, recorded not vacuous:** the checker skips `*/archive/*` (line 53) so it cannot read this record; the four lines were instead shape-verified by hand against its own anchored pattern (`grep -cE '^review · [^ ]+ · scoped-reviewer · behaviour:material · governance:high$'` → 4). See log, scope-change + surprise 2026-08-25
+- [x] The outcome is written as a `review ·` line in the log — *Verify: `sh scripts/lib/check-review-depth.sh` stays green on the result* — **verify NOT APPLICABLE, recorded rather than vacuously passed:** the checker skips archived paths by design (its line 53) so it cannot read this record; the four lines were instead shape-verified by hand against its own anchored pattern (`grep -cE '^review · [^ ]+ · scoped-reviewer · behaviour:material · governance:high$'` → 4). See log, scope-change + surprise 2026-08-25
 - [x] No task is left with an empty record — *Verify: four tasks, four lines or one explicit ruling covering them*
 
 ### T3 — Align ADR-034 and ADR-036 to the ADR template `[size: S · risk: low · class: execution · HITL]`
@@ -111,9 +111,9 @@ path** — the one thing dogfooding structurally cannot check here (L-016).
 the assertion records what an adopter actually sees.
 
 **DoD:**
-- [ ] A foreign target with real commits and no §13 trailers exists — *Verify: a second target, or `git init` + one commit added to the existing stranger*
-- [ ] The assertion names `attestation-absent`, `level: Gated`, and an unmoved exit code — *Verify: the harness output, read directly*
-- [ ] Round 5 is appended to `conformance-coverage.md` — *Verify: the round records the result whichever way it fell; a surprise here is a finding about T4, not a nuisance*
+- [x] A foreign target with real commits and no §13 trailers exists — *Verify: a second target, or `git init` + one commit added to the existing stranger*
+- [x] The assertion names `attestation-absent`, `level: Gated`, and an unmoved exit code — *Verify: the harness output, read directly*
+- [x] Round 5 is appended to `conformance-coverage.md` — *Verify: the round records the result whichever way it fell; a surprise here is a finding about T4, not a nuisance*
 
 ### T5 — Run Phase C: the harness delta research side-car `[size: M · risk: low · class: execution · AFK]`
 Layers: `docs/research/harness-delta.md` (new) · `docs/knowledge-index.md` (generated)

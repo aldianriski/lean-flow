@@ -13,6 +13,16 @@ set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 cd "$ROOT" || exit 2
 
+# START_TS/QA_BUDGET_SECONDS: TD-084's forward guard (scripts/lib/qa-budget-check.sh). Captured
+# before any leg runs so the budget covers the WHOLE default-profile invocation, not just leg 12.
+# 900s (15min) chosen with real headroom over this run's own measured total (SPRINT-084 T1: legs 1-11
+# ~100s post-fix, leg 12 ~150-250s -- so a healthy run finishes in single-digit minutes); the point of
+# this guard is catching a REGRESSION back toward TD-084's multi-minutes-per-leg shape, not shaving
+# the common case. Override with QA_BUDGET_SECONDS for a slower host or a deliberately tighter check.
+START_TS=$(date +%s)
+QA_BUDGET_SECONDS=${QA_BUDGET_SECONDS:-900}
+. "$ROOT/scripts/lib/qa-budget-check.sh"
+
 fail=0
 pass=0
 note() { printf '      %s\n' "$1"; }
@@ -209,11 +219,39 @@ fi
 # mechanism -- migrated off the now-deleted scripts/lib/check-attestation.sh, verdict lines pulled out
 # of this one run rather than invoking the engine again. See 2f-bis above for why that migration
 # happened at all. Covered by evals/run-attestation-fixtures.sh, repointed at the engine.
+# --- TD-084 profiling (SPRINT-084 T1): this leg's own informational sweep measured at 176.6s on
+# this host -- the engine dispatching ~90 still-mostly-`rule-unimplemented` rules against the whole
+# real repo, for a report almost none of which (per the comment above) enters this gate's own tally.
+# Only S9.GATESWELLFORMED/GATESABSENT and §13's five rules are folded in below; the rest is read, not
+# graded, exactly as documented above. So on the DEFAULT profile this leg hands the engine a REDUCED
+# spec -- built the same way run-gates-signed-fixtures.sh and run-attestation-fixtures.sh already
+# build theirs (an awk-derived copy of spec/STANDARD.md keeping only the rows this leg folds in),
+# never hand-authored -- which dispatches exactly the rules whose verdict matters here and skips the
+# ~90 that do not. The FULL informational sweep against the real corpus stays reachable, not deleted,
+# under QA_FULL=1 (constraint: heavy legs remain reachable under an explicit flag).
 ce_script="scripts/lib/conformance-engine.sh"
 if [ ! -f "$ce_script" ]; then
   bad "conformance engine: checker not found at $ce_script"
 else
-  ce_out=$(sh "$ce_script" . 2>&1); ce_code=$?
+  if [ "${QA_FULL:-0}" = "1" ]; then
+    ce_out=$(sh "$ce_script" . 2>&1); ce_code=$?
+    ce_mode="full spec -- QA_FULL=1"
+  else
+    ce_spec_full="spec/STANDARD.md"
+    if [ -f "$ce_spec_full" ]; then
+      ce_reduced=$(mktemp)
+      awk '
+        /^\| `S9\.GATESWELLFORMED`/ || /^\| `S9\.GATESABSENT`/ || /^\| `S13\.[A-Z]/ { print; next }
+        $0 !~ /^\| `S[0-9]/ { print }
+      ' "$ce_spec_full" > "$ce_reduced"
+      ce_out=$(sh "$ce_script" . --spec "$ce_reduced" 2>&1); ce_code=$?
+      rm -f "$ce_reduced"
+      ce_mode="reduced spec (S9.GATESWELLFORMED/GATESABSENT + S13 only) -- default profile; set QA_FULL=1 for the full informational sweep"
+    else
+      ce_out=$(sh "$ce_script" . 2>&1); ce_code=$?
+      ce_mode="full spec -- $ce_spec_full not found, could not reduce"
+    fi
+  fi
   printf '%s\n' "$ce_out"
   gs_lines=$(printf '%s\n' "$ce_out" | grep -E '^(PASS|FAIL)  gates-signed:')
   gs_pass=$(printf '%s\n' "$gs_lines" | grep -cE '^PASS')
@@ -234,7 +272,7 @@ else
   at_fails=$(printf '%s\n' "$at_lines" | grep -cE '^FAIL')
   pass=$((pass + at_pass))
   fail=$((fail + at_fails))
-  note "conformance engine: informational except the two FULLY-COVERED families -- S9.GATESWELLFORMED/S9.GATESABSENT and §13's five (exit $ce_code overall; $gs_pass gates-signed PASS / $gs_fails FAIL and $at_pass §13 PASS / $at_fails §13 FAIL folded into this gate's own tally) -- see the comment above this leg for why the rest is not"
+  note "conformance engine: informational except the two FULLY-COVERED families -- S9.GATESWELLFORMED/S9.GATESABSENT and §13's five (exit $ce_code overall; $gs_pass gates-signed PASS / $gs_fails FAIL and $at_pass §13 PASS / $at_fails §13 FAIL folded into this gate's own tally) -- see the comment above this leg for why the rest is not; ran against $ce_mode"
 fi
 
 # --- 2g. A recorded completed run carries its rollup ---------------------------------------------
@@ -364,9 +402,17 @@ fi
 # --- 4. Knowledge metadata: index freshness + dangling refs + completeness (ADR-009) --
 # Covers the whole corpus: LEARNINGS (in-file `## L-NNN` entries) + per-file frontmatter on
 # docs/adr/*.md and docs/research/*.md. Vocab (tags/domains) sourced from gen-index.sh (single origin).
-
-# frontmatter field extractor (first match in the leading --- block)
-fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
+#
+# TD-084 profiling (SPRINT-084 T1): this leg measured at 271.5s on this host, the single largest leg
+# in the whole gate -- bigger than the conformance-engine's own informational sweep (leg 2f-ter,
+# 176.6s). 97.6s of it was `gen-index.sh --check` (fixed separately, see that file -- now ~18s); the
+# rest was THIS leg's own per-item process spawns: one `grep` per L-NNN heading (143) plus a `sed` per
+# shape match, one `grep -qx` per learnings ref (~100) against the id universe, and per corpus file
+# (~79) up to five spawns (`fmv` x4 + a reftoks `awk`). None of those loops does per-item WORK that
+# needs a fresh process -- every one of them is the L-144 shape this repo has fixed twice before
+# (conformance-engine.sh's ownership family, its S2.R-PLACEMENT) and gen-index.sh a third time this
+# task: walk once, validate in one pass. Same technique here -- one process per FILE READ (79, unavoidable
+# without the cross-file FNR pitfall those two comments name), zero per validation.
 
 if [ -f scripts/gen-index.sh ]; then
   if sh scripts/gen-index.sh --check >/dev/null 2>&1
@@ -379,52 +425,118 @@ fi
 corpus_files=$(git ls-files -- docs/adr docs/research 2>/dev/null | grep -E '^docs/adr/ADR-[0-9]+.*\.md$|^docs/research/[^/]+\.md$')
 [ -n "$corpus_files" ] || corpus_files=$(ls docs/adr/ADR-*.md docs/research/*.md 2>/dev/null)
 
+# ONE awk read per corpus file (id/domain/status/tags/reftoks together, not one `fmv` call each) into
+# a tab-separated cache; the resids used to build the id universe fall out of the SAME pass instead of
+# a second walk. reftoks bracket-parsing (`related: [L-042, L-100]` -> "L-042 L-100") is done inside
+# awk rather than piped through `grep -oE | tr | tr`, for the same reason.
+resids=""
+corpus_cache=""
+for f in $corpus_files; do
+  [ -f "$f" ] || continue
+  b=$(basename "$f")
+  row=$(awk '
+    NR==1 && $0!="---"{exit}
+    NR==1{next}
+    $0=="---"{exit}
+    $0~"^id:"     {v=$0; sub("^id:[ ]*","",v);     id=v}
+    $0~"^domain:" {v=$0; sub("^domain:[ ]*","",v); dom=v}
+    $0~"^status:" {v=$0; sub("^status:[ ]*","",v); st=v}
+    $0~"^tags:"   {v=$0; sub("^tags:[ ]*","",v);   tg=v}
+    /^(related|supersedes|superseded-by):/ {
+      line=$0
+      while (match(line, /\[[^]]*\]/)) {
+        inner=substr(line, RSTART+1, RLENGTH-2)
+        gsub(/,/, " ", inner)
+        reftoks=reftoks " " inner
+        line=substr(line, RSTART+RLENGTH)
+      }
+    }
+    END{printf "%s\t%s\t%s\t%s\t%s\n", id, dom, st, tg, reftoks}
+  ' "$f")
+  IFS='	' read -r c_id c_dom c_st c_tg c_reftoks <<EOF
+$row
+EOF
+  case "$f" in */research/*) [ -n "$c_id" ] && resids="$resids
+$c_id" ;; esac
+  corpus_cache="$corpus_cache$b	$c_id	$c_dom	$c_st	$c_tg	$c_reftoks
+"
+done
+
 # id universe (everything a related/supersedes ref may point at)
 lids=$(grep -oE '^## L-[0-9]+' docs/LEARNINGS.md 2>/dev/null | grep -oE 'L-[0-9]+' | sort -u)
 adrids=$(printf '%s\n' $corpus_files | grep '/adr/' | grep -oE 'ADR-[0-9]+' | sort -u)
-resids=$(for f in $corpus_files; do case "$f" in */research/*) [ -f "$f" ] && fmv "$f" id;; esac; done | sort -u)
+resids=$(printf '%s\n' "$resids" | sort -u)
 allids=$(printf '%s\n%s\n%s\n' "$lids" "$adrids" "$resids" | sort -u | grep -v '^$')
 
-# 4a. LEARNINGS in-file refs + metadata shape (unchanged rules)
+# 4a. LEARNINGS in-file refs + metadata shape (unchanged rules; one awk pass each, not one spawn/id)
 if [ -f docs/LEARNINGS.md ]; then
   refs=$(grep -iE '^- (related|supersedes|superseded-by):' docs/LEARNINGS.md | grep -oE '(L|ADR)-[0-9]+' | sort -u)
-  dangling=""
-  for r in $refs; do printf '%s\n' "$allids" | grep -qx "$r" || dangling="$dangling $r"; done
+  dangling=$(printf '%s\n' "$refs" | awk -v allids="$allids" '
+    BEGIN{n=split(allids,a,"\n"); for(i=1;i<=n;i++) if(a[i]!="") idset[a[i]]=1}
+    $0!="" && !($0 in idset) {printf " %s", $0}
+  ')
   if [ -z "$dangling" ]; then ok "learnings refs resolve (no dangling related/supersedes)"
   else bad "learnings dangling refs:$dangling"; fi
 
   KNOWN=$(grep -E '^TAGS=' scripts/gen-index.sh 2>/dev/null | sed -E 's/^TAGS="?([^"]*)"?/\1/')
-  badmeta=""
-  for id in $(grep -oE '^## L-[0-9]+' docs/LEARNINGS.md | grep -oE 'L-[0-9]+'); do
-    hl=$(grep -E "^## $id[ []" docs/LEARNINGS.md | head -n1)
-    if ! printf '%s' "$hl" | grep -qE '\[tags: [^]]+\] \[status: (active|promoted|superseded)\]'
-    then badmeta="$badmeta $id(shape)"; continue; fi
-    t=$(printf '%s' "$hl" | sed -E 's/.*\[tags: ([^]]*)\].*/\1/')
-    for one in $t; do printf '%s' "$KNOWN" | grep -qw "$one" || badmeta="$badmeta $id(tag:$one)"; done
-  done
+  badmeta=$(awk -v known="$KNOWN" '
+    BEGIN{n=split(known,ka," "); for(i=1;i<=n;i++) if(ka[i]!="") tagset[ka[i]]=1}
+    /^## L-[0-9]+ \[tags:/ {
+      id=$0; sub(/^## /,"",id); sub(/ .*/,"",id)
+      if ($0 !~ /\[tags: [^]]+\] \[status: (active|promoted|superseded)\]/) { printf " %s(shape)", id; next }
+      tg=$0; sub(/.*\[tags: /,"",tg); sub(/\].*/,"",tg)
+      m=split(tg, arr, " ")
+      for (i=1;i<=m;i++) { t=arr[i]; if (t!="" && !(t in tagset)) printf " %s(tag:%s)", id, t }
+    }
+  ' docs/LEARNINGS.md)
   if [ -z "$badmeta" ]; then ok "learnings metadata complete (tags+status, known vocab)"
   else bad "learnings metadata:$badmeta"; fi
 fi
 
-# 4b. ADR + research frontmatter: dangling refs + completeness
+# 4b. ADR + research frontmatter: dangling refs + completeness -- ONE awk pass over the cache built
+# above (no re-reading of files, no per-item grep/fmv spawn).
 KNOWN_TAGS=$(grep -E '^TAGS=' scripts/gen-index.sh 2>/dev/null | sed -E 's/^TAGS="?([^"]*)"?/\1/')
 KNOWN_DOMAINS=$(grep -E '^DOMAINS=' scripts/gen-index.sh 2>/dev/null | sed -E 's/^DOMAINS="?([^"]*)"?/\1/')
 KNOWN_STATUS="accepted current superseded deprecated"
+c4b_result=$(printf '%s' "$corpus_cache" | awk -F'\t' -v allids="$allids" -v ktags="$KNOWN_TAGS" -v kdoms="$KNOWN_DOMAINS" -v kstat="$KNOWN_STATUS" '
+  BEGIN{
+    n=split(allids,a,"\n"); for(i=1;i<=n;i++) if(a[i]!="") idset[a[i]]=1
+    n=split(ktags,ta," ");  for(i=1;i<=n;i++) if(ta[i]!="") tagset[ta[i]]=1
+    n=split(kdoms,da," ");  for(i=1;i<=n;i++) if(da[i]!="") domset[da[i]]=1
+    n=split(kstat,sa," ");  for(i=1;i<=n;i++) if(sa[i]!="") statset[sa[i]]=1
+  }
+  NF==0 {next}
+  {
+    b=$1; id=$2; dom=$3; st=$4; tgraw=$5; reftoks=$6
+    m=split(reftoks, rt, " ")
+    for(i=1;i<=m;i++){ r=rt[i]; if(r!="" && !(r in idset)) print "DANG\t" b ":" r }
+    if (id=="")  print "META\t" b "(id)"
+    if (dom=="") print "META\t" b "(domain)"
+    if (st=="")  print "META\t" b "(status)"
+    tg=tgraw; gsub(/[][,]/, "", tg)
+    if (tg=="")  print "META\t" b "(tags)"
+    m=split(tg, ta2, " ")
+    for(i=1;i<=m;i++){ t=ta2[i]; if(t!="" && !(t in tagset)) print "META\t" b "(tag:" t ")" }
+    if (dom!="" && !(dom in domset)) print "META\t" b "(domain:" dom ")"
+    if (st!=""  && !(st  in statset)) print "META\t" b "(status:" st ")"
+  }
+')
 cdang=""; cmeta=""
-for f in $corpus_files; do
-  [ -f "$f" ] || continue
-  b=$(basename "$f")
-  reftoks=$(awk 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} /^(related|supersedes|superseded-by):/{print}' "$f" \
-            | grep -oE '\[[^]]*\]' | tr -d '[]' | tr ',' ' ')
-  for r in $reftoks; do [ -n "$r" ] && { printf '%s\n' "$allids" | grep -qx "$r" || cdang="$cdang $b:$r"; }; done
-  id=$(fmv "$f" id);     [ -n "$id" ]  || cmeta="$cmeta $b(id)"
-  dom=$(fmv "$f" domain); [ -n "$dom" ] || cmeta="$cmeta $b(domain)"
-  st=$(fmv "$f" status);  [ -n "$st" ]  || cmeta="$cmeta $b(status)"
-  tags=$(fmv "$f" tags | tr -d '[],'); [ -n "$tags" ] || cmeta="$cmeta $b(tags)"
-  for one in $tags; do printf '%s' "$KNOWN_TAGS" | grep -qw "$one" || cmeta="$cmeta $b(tag:$one)"; done
-  [ -z "$dom" ] || printf '%s' "$KNOWN_DOMAINS" | grep -qw "$dom" || cmeta="$cmeta $b(domain:$dom)"
-  [ -z "$st" ]  || printf '%s' "$KNOWN_STATUS"  | grep -qw "$st"  || cmeta="$cmeta $b(status:$st)"
+saved_ifs7=$IFS
+IFS='
+'
+for rline in $c4b_result; do
+  IFS=$saved_ifs7
+  [ -n "$rline" ] || { IFS='
+'; continue; }
+  case "$rline" in
+    DANG*) cdang="$cdang ${rline#DANG	}" ;;
+    META*) cmeta="$cmeta ${rline#META	}" ;;
+  esac
+  IFS='
+'
 done
+IFS=$saved_ifs7
 if [ -z "$cdang" ]; then ok "corpus refs resolve (ADR/research related/supersedes)"
 else bad "corpus dangling refs:$cdang"; fi
 if [ -z "$cmeta" ]; then ok "corpus metadata complete (id+tags+domain+status, known vocab)"
@@ -645,7 +757,10 @@ done
 # guards §2's placement pair, whose required set is derived from the spec's own `Create ←` cells --
 # so a §2 row that stops saying "always" changes the engine and this harness together, and neither
 # can drift from the other silently.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh"
+# run-qa-budget-fixtures.sh (SPRINT-084 T1, TD-084) joins the always-on set by the original cost
+# rule: no git, no mktemp, three calls to a sourced function against synthetic timestamps -- measured
+# well under a second. It guards this leg's own budget mechanism below, not a repository property.
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh"
 eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh"
 # run-attestation-fixtures.sh (SPRINT-074 T2, TASK-228) joins the opt-in set by the same rule: it
 # builds 6 throwaway repos via mktemp -d + git init, measured at ~2s on this host. Real git history
@@ -695,7 +810,27 @@ if [ "${QA_FULL:-0}" = "1" ]; then
 else
   note "eval harnesses: bare run -- opt-in selftests skipped (set QA_FULL=1 to run them)"
 fi
+budget_tripped=0
 for h in $eval_harnesses; do
+  # TD-084 forward guard: this loop is the likeliest place a future regression reproduces the
+  # multi-minutes-per-item shape (TD-073 was exactly this, once, in run-sprint-family-fixtures.sh).
+  # Checked BEFORE each harness so an overrun is caught between cases, not only after the last one --
+  # and once tripped, remaining harnesses are named as skipped rather than silently run past the
+  # budget, so the loop still reaches the Summary and prints a real verdict line either way (L-120).
+  if [ "$budget_tripped" -eq 0 ]; then
+    qb_out=$(qa_budget_check "$START_TS" "$QA_BUDGET_SECONDS" "${QA_FULL:-0}")
+    case "$qb_out" in
+      OVER*)
+        budget_tripped=1
+        qb_elapsed=$(printf '%s' "$qb_out" | cut -d' ' -f2)
+        bad "qa-check-budget-exceeded: ${qb_elapsed}s elapsed exceeds the ${QA_BUDGET_SECONDS}s default-profile budget, reached at eval harness '$h'. Remaining harnesses in this leg are skipped and named below rather than left to run past an external timeout with no verdict line (TD-084). Set QA_BUDGET_SECONDS to raise the budget, or QA_FULL=1 to lift it for a full run"
+        ;;
+    esac
+  fi
+  if [ "$budget_tripped" -eq 1 ]; then
+    note "eval harness $h: skipped -- default-profile budget already exceeded (see qa-check-budget-exceeded above)"
+    continue
+  fi
   hp="evals/$h"
   if [ ! -f "$hp" ]; then
     bad "eval harness $h: script not found at $hp"

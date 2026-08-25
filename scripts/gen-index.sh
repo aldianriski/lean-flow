@@ -20,33 +20,67 @@ DOMAINS="skills doc-standard governance knowledge sprint-model"
 grep -q '<!-- INDEX:START' "$OUT" && grep -q '<!-- INDEX:END' "$OUT" || {
   echo "gen-index: INDEX markers not found in $OUT" >&2; exit 2; }
 
-# extract a frontmatter field value (first match inside the leading --- block)
-fm() { # <file> <field>
-  awk -v f="$2" '
-    NR==1 && $0!="---"{exit} NR==1{next}
-    $0=="---"{exit}
-    $0 ~ "^"f":"{sub("^"f":[ ]*","");print;exit}' "$1"
-}
 listwords() { printf '%s' "$1" | tr -d '[],'; }  # "[a, b]" -> "a b"
+
+# _split_row <row> -- sets $_row_id/$_row_tg/$_row_dm from a "id|tags|domain" row. A FUNCTION,
+# deliberately: `set --` inside one only replaces THIS function's own positional parameters (POSIX
+# scoping), restored on return -- called at top level instead, it would silently overwrite the
+# SCRIPT's own $1 (this script's own "--check" argument), which is read again after this loop, near
+# the bottom of the file. That exact mistake was caught only by re-running --check after the rewrite
+# and seeing it silently take the write path instead of reporting stale/current.
+_split_row() {
+  _sr_ifs=$IFS; IFS='|'
+  set -- $1
+  IFS=$_sr_ifs
+  _row_id=${1:-}; _row_tg=${2:-}; _row_dm=${3:-}
+}
 
 entries=$(mktemp)  # rows: <src>\t<id>\t<link>\t<space-tags>\t<domain>
 
-grep -E '^## L-[0-9]+ \[tags:' "$LEARN" 2>/dev/null | while IFS= read -r line; do
-  id=$(printf '%s' "$line" | sed -E 's/^## (L-[0-9]+) .*/\1/')
-  tg=$(printf '%s' "$line" | sed -E 's/.*\[tags: ([^]]*)\].*/\1/')
-  printf '%s\t%s\t%s\t%s\t%s\n' learn "$id" "LEARNINGS.md" "$tg" "-" >> "$entries"
-done
+# SPAWN-FREE (L-144 shape, same as scripts/lib/conformance-engine.sh's ownership family and its
+# driver): the previous version ran a `grep` producing N heading lines, then TWO `sed` processes per
+# line -- for the 143 LEARNINGS entries on this repo, 286 external processes on this host alone.
+# Everything a heading line needs (id, tags) is extractable with the string ops awk already has, in
+# one pass over the file. Measured: 15s (this loop's own share) -> well under a second.
+awk '
+  /^## L-[0-9]+ \[tags:/ {
+    id = $0; sub(/^## /, "", id); sub(/ .*/, "", id)
+    tg = $0; sub(/.*\[tags: /, "", tg); sub(/\].*/, "", tg)
+    printf "learn\t%s\tLEARNINGS.md\t%s\t-\n", id, tg
+  }
+' "$LEARN" >> "$entries"
 
 # docs/research/archive/ is included deliberately (SPRINT-055 T3): a superseded verdict is usually
 # the WHY-trail for whatever replaced it, so dropping it from the index at archive time would make
 # the trail findable only by knowing the path. Archived entries are marked so the index does not
 # present a spent verdict as current.
+#
+# SPAWN-FREE per file: the previous version called `fm` (its own awk process) three times per file --
+# id, tags, domain -- 3 x ~79 corpus files = 237 processes. One combined awk pass per file extracts
+# all three from the one frontmatter block it already has to read. Still one process PER FILE
+# (not one process for the whole corpus): a single cross-file awk needs a state machine and can
+# silently drop a zero-byte file at FNR==1, which is the failure this repo's ownership family
+# deliberately avoided the same way (scripts/lib/conformance-engine.sh, `_own_docs`/`_own_scan`
+# comment). "|" is the row delimiter here (not tab) because it is what the rest of this codebase's
+# reduced-row emitters use (`_s2_rows` in conformance-engine.sh) and cannot collide with an id, tag
+# word or domain value in this vocabulary.
 for f in "$ROOT"/docs/adr/ADR-*.md "$ROOT"/docs/research/*.md "$ROOT"/docs/research/archive/*.md; do
   [ -f "$f" ] || continue
-  id=$(fm "$f" id); [ -n "$id" ] || continue
+  row=$(awk '
+    NR==1 && $0!="---"{exit}
+    NR==1{next}
+    $0=="---"{exit}
+    $0~"^id:"{v=$0; sub("^id:[ ]*","",v); id=v}
+    $0~"^tags:"{v=$0; sub("^tags:[ ]*","",v); tg=v}
+    $0~"^domain:"{v=$0; sub("^domain:[ ]*","",v); dm=v}
+    END{printf "%s|%s|%s", id, tg, dm}
+  ' "$f")
+  _split_row "$row"
+  id=$_row_id; tg_raw=$_row_tg; dm=$_row_dm
+  [ -n "$id" ] || continue
   case "$f" in */research/archive/*) id="$id (archived)" ;; esac
-  tg=$(listwords "$(fm "$f" tags)")
-  dm=$(fm "$f" domain); [ -n "$dm" ] || dm="-"
+  tg=$(listwords "$tg_raw")
+  [ -n "$dm" ] || dm="-"
   link=$(printf '%s' "$f" | sed -E "s#^$ROOT/docs/##")
   case "$f" in */adr/*) src=adr ;; *) src=research ;; esac
   printf '%s\t%s\t%s\t%s\t%s\n' "$src" "$id" "$link" "$tg" "$dm" >> "$entries"
