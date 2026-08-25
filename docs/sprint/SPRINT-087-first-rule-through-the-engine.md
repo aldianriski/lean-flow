@@ -132,9 +132,9 @@ Cites: TASK-281 · SPRINT-085 T3 carry-forward 2 · EPIC-014 D8
 matching whatever the Shell reader does.
 
 **DoD:**
-- [ ] Permission-denied produces its own named finding — *Verify: compared against Shell's behaviour for the same input*
-- [ ] `specNotFound()` stays a **pure constructor with no filesystem access** — *Verify: the domain still decides nothing about *when* to emit it; that decision lives at the boundary*
-- [ ] One retained must-FAIL fixture per branch — *Verify: distinct findings asserted*
+- [x] Permission-denied produces its own named finding — *Verify: compared against Shell's behaviour for the same input*
+- [x] `specNotFound()` stays a **pure constructor with no filesystem access** — *Verify: the domain still decides nothing about *when* to emit it; that decision lives at the boundary*
+- [x] One retained must-FAIL fixture per branch — *Verify: distinct findings asserted*
 
 ### T7 — Carry every `--reconcile` finding, not just the first `[size: S · risk: low · class: execution · HITL]`
 Layers: `packages/standard/src` (result shape) · colocated tests

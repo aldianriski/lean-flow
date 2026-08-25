@@ -329,3 +329,39 @@ Full suite `130 pass, 0 fail`. Commit `f8ef4aa`. **DoD not ticked — review pen
 
 consequence · T6 · behaviour:material · governance:low
 review · T6 · independent-adversarial-reviewer (worktree-isolated) · behaviour:material · governance:low
+
+### 2026-08-25 | progress | T6 re-reviewed clean, merged, DoD ticked 3/3
+
+Re-review survived all four attacks, including the one that worried me most. The revise replaced
+reactive error-code classification with `statSync(specPath).isFile()` checked **before** any read — a
+positive mirror of Shell's `-f` guard rather than a guess at which error code each failure produces —
+which fixes the class rather than the instance, but calls `stat` on a path whose read is denied. If
+`statSync` were itself blocked by the DENY ACE, the code would report not-found and **silently regress
+the exact defect T6 exists to fix**, while the suite stayed green. The reviewer built an independent
+probe (not the shipped fixture) and established why it does not: on Windows, `DENY(R)` blocks content
+read but **not** metadata read, so `statSync` succeeds and the permission-denied path is reached
+correctly.
+
+Cleanup verified on the failing path, not just the happy one: a forced mid-test failure still removed
+the DENY ACE and its directory, with no swallowed error. Sixteen litter directories from earlier runs
+were purged.
+
+**One gap is disclosed rather than assumed.** Dangling-symlink parity is untested — `ln -s` lacks
+symlink privilege on this host, and the reviewer independently confirmed it with a *different tool*
+(PowerShell `New-Item -ItemType SymbolicLink`, same privilege error). The claim that `statSync` agrees
+with `-f` there rests on both resolving through the OS's shared `stat()`, not on a live comparison, and
+is recorded that way in the code. That is the correct handling of an unprovable claim: state the limit,
+do not let a green suite imply coverage it does not have.
+
+Merged as a merge commit; disjointness checked first. Integrated suite: **`131 pass, 0 fail`**.
+
+**A live sighting of TD-098, and it behaved exactly as the corrected row predicts.** The first
+integrated run after merging read **`130 pass, 1 fail`** while T2's reviewer was running concurrently;
+re-run at rest, twice, it read `131 pass, 0 fail`. This is the trap TD-098 names — red under a parallel
+wave, green on re-run, so the re-run reads as a fix and the signal is discarded. The re-run was
+legitimate here **only because the failure was identified before it was dismissed**. Had I reasoned
+"probably the known flake" and moved on, the procedure would have been indistinguishable from ignoring
+a real regression.
+
+consequence · T6 · behaviour:material · governance:low
+review · T6 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low
