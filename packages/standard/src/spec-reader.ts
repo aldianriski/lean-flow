@@ -181,6 +181,15 @@ export interface SpecReadFail {
   readonly ok: false;
   readonly finding: SpecFinding;
   readonly message: string;
+  /**
+   * EVERY mismatching §1..§13 section, not just the first -- populated only by `reconcile`'s
+   * `section-rows-mismatch` finding (SPRINT-087 T7), mirroring `RuleEvaluation.findings` (T1): the
+   * Shell oracle's `--reconcile` prints one `FAIL §N section-rows-mismatch` line per disagreeing
+   * section, so a single-mismatch shape here would silently absorb that cardinality into "the first
+   * one found" -- the same EPIC-014 D2 rule T1 already applied to `RuleEvaluation`. `undefined` for
+   * every other finding/caller, same convention as `SpecReadOk.sections`.
+   */
+  readonly mismatches?: readonly SectionCount[];
 }
 
 /**
@@ -358,12 +367,14 @@ export interface SectionCount {
  * order) and `sections` (the per-section table) when all 13 agree; `ok: false` with a named finding
  * otherwise.
  *
- * The shell script can print SEVERAL findings at once (one per mismatched section, plus a total-
- * mismatch line) because it is a line-oriented report; a single `SpecReadResult` carries only one
- * `finding`. This function surfaces the FIRST section (lowest number) that disagrees, which is enough
- * to satisfy `--reconcile`'s own point -- a dropped section is visible -- and is a deliberate,
- * reported TS/Shell difference (deliverable d), not an attempt to cram a multi-finding report into a
- * single-finding type.
+ * The shell script can print SEVERAL findings at once -- one `FAIL §N section-rows-mismatch` line PER
+ * mismatched section -- because it is a line-oriented report. SPRINT-087 T4 shipped this surfacing
+ * only the FIRST section (lowest number) that disagreed, collapsing that cardinality into "the first
+ * one found"; T7 fixes it, mirroring `RuleEvaluation.findings` (T1) rather than reinventing the
+ * pattern: `finding` stays the single named `"section-rows-mismatch"` id (ADR-034 D3 froze the Finding
+ * ID and verdict surface -- widening HOW MANY is carried must not change WHAT they are called), and
+ * every disagreeing section is additionally carried on `mismatches`, in section order, so a caller can
+ * enumerate exactly what Shell enumerates instead of learning about only the lowest-numbered one.
  */
 export function reconcile(doc: BlockDocument, specPath: string): SpecReadResult {
   const expected = expectedCountsOf(doc);
@@ -378,21 +389,24 @@ export function reconcile(doc: BlockDocument, specPath: string): SpecReadResult 
   }
 
   const sections: SectionCount[] = [];
-  let mismatch: SectionCount | null = null;
+  const mismatches: SectionCount[] = [];
   for (let s = 1; s <= 13; s++) {
     const row: SectionCount = { section: s, got: rulesInSection(doc, s).length, expected: expected.get(s) ?? 0 };
     sections.push(row);
-    if (mismatch === null && row.got !== row.expected) mismatch = row;
+    if (row.got !== row.expected) mismatches.push(row);
   }
 
-  if (mismatch !== null) {
+  if (mismatches.length > 0) {
     return {
       ok: false,
       finding: "section-rows-mismatch",
       message:
-        `read-spec-rules: section-rows-mismatch -- §${mismatch.section} read ${mismatch.got}, §14 says ` +
-        `${mismatch.expected}. A section short of its own published count is a dropped rule set, not an ` +
-        `empty one (L-058)`,
+        `read-spec-rules: section-rows-mismatch -- ` +
+        mismatches
+          .map((m) => `§${m.section} read ${m.got}, §14 says ${m.expected}`)
+          .join("; ") +
+        `. A section short of its own published count is a dropped rule set, not an empty one (L-058)`,
+      mismatches,
     };
   }
 
