@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-24
+last_updated: 2026-08-25
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,44 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+## v1.57.1 — Gate Recovery and Owed Work (2026-08-25)
+
+PATCH — SPRINT-084, **19 of 19 DoD** — closed at `QA-CHECK: 176 pass, 3 fail`, with two FAILs ruled
+rather than edited away and both filed as debt. **Consumer-facing: nothing changed, and that is why
+this is a PATCH.** No `skills/`, `spec/`, `conformance.sh` or manifest file moved — a consumer
+installing 1.57.1 gets byte-identical behaviour to 1.57.0. Under ADR-032 a version reports moved
+behaviour, not the author's sense of significance, so the new capability here (a QA-budget guard, a
+second foreign-repo fixture target) is maintainer tooling and does not earn a MINOR.
+
+**The gate runs again.** `qa-check.sh` had stopped completing — three runs killed without ever printing
+a verdict line, which made every DoD naming it unverifiable and forced SPRINT-083 to close four of its
+own on an owner ruling (TD-084, now resolved). It was profiled **before** it was fixed, as TD-084
+demanded, and the measurement overturned the assumption everyone held: the dominant cost is
+**process-spawn count on this host**, not corpus size or check count. A tiny-input isolation put the
+bare process-creation floor at 21.1ms against 110–260ms at real scale; `gen-index.sh` alone was 523
+spawns. Leg 4 went **271.5s → 23.6s**, the conformance sweep **176.6s → 1.9s**, the whole run **~900s
+never finishing → 492s**. **No check was deleted and no coverage lowered** — every heavy leg is still
+reachable under `QA_FULL=1`. New `scripts/lib/qa-budget-check.sh` means an over-budget run is now
+*reported with its skipped harnesses named* rather than dying past an external timeout with no verdict.
+
+**The owed reviews were run instead of ruled away, and found six defects.** SPRINT-082 shipped the rule
+that `governance:high` work cannot take the self-review floor, then correctly *parked* its own reviews
+because no independent reviewer could be dispatched. Discharging that debt turned up silent
+false-negatives in three shipped guards — a checker that satisfies a later unresolved failure with an
+earlier ruling and is never wired into the gate; one that grades only the review lines that exist, so
+work with *no* review line passes; one that certifies a script which *excludes* the path it claims to
+check — plus an architecture freeze unreachable by the flow meant to obey it. All filed as TD-085…090.
+
+**Also:** ADR-034/036 realigned to the ADR template with § Decision byte-identical; the absent-attestation
+hold exercised against a foreign repo with real git history (consumer-path coverage dogfooding cannot
+provide); `docs/research/harness-delta.md` ruling Phase C's four candidates, where independent review
+moved one from *reject* to *defer* after finding only 2 of 6 experiment classes actually covered.
+
+**Learning (`L-165`):** six guard defects, one shape between them, and **not one caught by anyone
+recalling the rule that governs it** — every one surfaced by an independent pass or by a second number
+disagreeing, with those rules loaded and on screen throughout.
 
 ---
 ## v1.57.0 — TS/Bun Foundation (2026-08-24)

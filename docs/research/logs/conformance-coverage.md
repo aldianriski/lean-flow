@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-24
+last_updated: 2026-08-25
 update_trigger: a measurement round is appended
 status: active
 id: conformance-coverage-log

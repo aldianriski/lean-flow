@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-24
+last_updated: 2026-08-25
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---

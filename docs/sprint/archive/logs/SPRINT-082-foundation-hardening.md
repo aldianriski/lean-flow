@@ -2,7 +2,7 @@
 sprint: 082
 slug: foundation-hardening
 owner: Maintainer
-last_updated: 2026-08-24
+last_updated: 2026-08-25
 status: active
 update_trigger: an Execution Log entry is appended
 ---
