@@ -376,6 +376,36 @@ V3 §43's expensive-first ranking governing families 2..n.
       origin:     manual
       state:      ready
 
+- [ ] TASK-299 — Scope layers attribution per stream, by commit ownership not by path  [size: M] [risk: high] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — this IS the attribution guard, and the first attempt at it shipped a
+                  false negative that an independent reviewer caught and the author did not)
+      done-when:  with two active sprint files, each sprint's attribution is scoped to itself, AND a
+                  commit belonging to THIS sprint that touches a path only a SIBLING declared still
+                  FAILs — cross-stream overlap is what CONTEXT.md says must be coordinated, so hiding
+                  it is worse than the noise it replaces. Proven on a real two-active-sprint tree
+                  (L-166), retained must-FAIL + sibling control, seeded-break discrimination, and an
+                  independent worktree-isolated reviewer dispatched against a COMMITTED branch
+      touches:    scripts/lib/check-layers-observed.sh (attribution, not the exclusion list) ·
+                  evals/run-layers-observed-fixtures.sh
+      depends-on: none — but it BLOCKS promoting any stream 2
+      assumes:    **the naive design is already refuted, do not rebuild it.** Attempt 1 excluded any
+                  path a sibling sprint declared. An independent review produced three repros where
+                  that silently swallowed real defects: (1) a commit by THIS sprint's own T1 touching
+                  a sibling-declared path never reached the per-task `miss_attr` check; (2) a sibling
+                  declaring a directory token (`scripts/`) swallowed every undeclared file beneath it,
+                  unbounded; (3) the same on the WIP leg, where the skip landed before `n_wip` and
+                  turned a dirty tree into a bare PASS. In each, main's checker correctly FAILs and
+                  the new one PASSed. The fix direction: exclude only when the commit **belongs** to
+                  the sibling — its sprint number is readable from the `sprint(NNN)` subject — never
+                  from the path alone. And the **WIP leg likely gets no sibling scoping at all**:
+                  uncommitted work carries no attribution, so there is no honest way to tell which
+                  stream made it, and reporting it is correct
+      tracker:    reverted from TASK-298 · L-165/L-168 (the review that caught it) · L-166 ·
+                  CONTEXT.md § Sprint model · blocks EPIC-015 stream 2
+      origin:     manual
+      state:      ready
+
 ### P3 — Long-term
 
 > Rejected work lives in **`.out-of-scope/`** — each file carries its own reasoning, revisit-if and
