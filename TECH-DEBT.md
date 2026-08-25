@@ -136,7 +136,105 @@ status: current
 > line quotes 3,039 lines and `check-doc-caps.sh` now prints **3,050** — the doc grew 11 lines since
 > the row froze. Recorded, not re-litigated: the carry ruling is unaffected by the drift.
 
-- **TD-084** severity: **high** | status: open | created: Sprint-083
+- **TD-085** severity: **high** | status: open | created: Sprint-084
+  - Summary: **`check-review-depth.sh` cannot see the failure it exists to prevent.** It grades only
+    `review ·` lines that are *present*, so a `governance:high` task closing with **no review line at
+    all** exits 0 with a `nothing to verify` note. It also skips `*/archive/*` by design, so a review
+    recorded where a closed sprint's record actually lives is never read.
+  - Evidence: reproduced live in Sprint-084 T2. A log carrying a `governance:high · behaviour:material`
+    task and no `review ·` line prints `no review line -- nothing to verify`, **exit 0**. SPRINT-082 did
+    exactly this and closed **38 of 38** with zero `review ·` lines on the record. Run against the
+    archive log now holding four valid lines: prints nothing, exit 0 — green because the file was never
+    opened. None of the 5 must-FAIL fixtures covers absent-line + `governance:high`.
+  - Impact: **the guard's own subject is its blind spot.** Between absence-blindness and the archive
+    skip there is no point in a task's lifecycle — active or archived — where it could have caught
+    SPRINT-082's case, or Sprint-084's own (its live log reports `nothing to verify` while its tasks
+    carry `governance:high` work). L-105's shape: correctly placed in text, absent in time.
+  - Mitigation *(hypothesis, re-derive before a DoD rests on it)*: assert presence, not only validity —
+    a `governance:high` task in a live log with no `review ·` line is a FAIL, not a note; one must-FAIL
+    fixture per branch. The archive skip is a separate ruling: closed history is deliberately not
+    re-litigated, so the fix may be to forbid *recording* a review there rather than to start reading it.
+  - **Re-file fresh if** the absence branch ships but the archive skip is left, or vice versa.
+
+- **TD-086** severity: minor | status: open | created: Sprint-084
+  - Summary: **`check-system-verify-block.sh` masks a later unresolved FAIL with an earlier ruling, and
+    never runs against live logs.** `has_close` and `has_ruling` are whole-file greps with no positional
+    link to the `system-verify ·` line they gate.
+  - Evidence: Sprint-084 T2's independent review reproduced it on two adversarial logs — a day-1 FAIL
+    *with* its ruling followed by a day-2 unresolved FAIL *without* one returns `PASS`, **exit 0**, in
+    both orderings. The 10 retained fixtures never exercise a two-entry log. Separately the checker
+    appears nowhere in `qa-check.sh`; only its own fixture harness runs it — while T2's sibling checker
+    from the same commit *is* live-wired, under a comment stating the principle this omission violates
+    (*"a guard that only ever sees `evals/fixtures/` has not been shown to reach this repository"*).
+  - Impact: the silent close ADR-033 exists to stop, occurring inside the mechanism built to stop it.
+    Latent only because no sprint log has yet carried two `system-verify ·` entries — plausible as soon
+    as a sprint spans two dispatch sessions before closing.
+  - **Re-file fresh if** the positional fix lands without live-wiring: the masking bug could then still
+    never surface through `qa-check.sh`.
+
+- **TD-087** severity: minor | status: open | created: Sprint-084
+  - Summary: **`check-verify-reaches.sh` certifies targets it never reaches, and cannot model a
+    two-method `Verify:` clause.** REACHES is a plain `grep -qF` substring test over the script's
+    non-comment text, with no notion of *how* the target is used.
+  - Evidence: two shapes reproduced in Sprint-084 T2's review. (a) **Exclusion idiom** — a script whose
+    only mention of the path *prunes* it is reported `confirmed reachable`. (b) **Prefix collision** —
+    target `src/db` matches a script touching only `src/dbtools/`. Both are what T3's own Acceptance
+    names as the thing to catch. Separately, Sprint-084's own T5 DoD names two scripts in one clause and
+    the checker pairs them as target/method, so each reads as unreachable from the other — two FAILs
+    against a criterion that genuinely passed, ruled at close rather than papered over.
+  - Impact: a false positive on a substring is a false negative on the contract (L-108). (a)/(b) stay
+    latent because the live corpus reports **0 confirmed targets** — a vacuous pass in the denominator
+    sense (L-156); the two-method case is live now.
+  - Mitigation *(hypothesis)*: match on use rather than mention (at minimum reject a target whose only
+    occurrence sits inside an exclusion construct), anchor to path boundaries, and either support an
+    N-method clause or emit one distinct finding for it instead of N mutual failures.
+  - **Re-file fresh if** the two-method case is fixed without (a)/(b) — that closes the visible symptom
+    and leaves both silent ones.
+
+- **TD-088** severity: minor | status: open | created: Sprint-084
+  - Summary: **SPRINT-082's execution-architecture freeze is unreachable by the consumer that must obey
+    it.** Its commit claimed it was "written where admission reads it"; it is not.
+  - Evidence: Sprint-084 T2's review checked every plausible consumer at the pinned ref and found no
+    reference to the freeze or its gated register in `skills/lean-doc-generator/SKILL.md` § Epic,
+    `EPIC.md.template`, `skills/orchestrator/SKILL.md` G1/G2, `.claude/CONTEXT.md`'s epic definition, or
+    `scripts/qa-check.sh`. The only path is a human incidentally reading a descriptive pointer at
+    `docs/epic/INDEX.md:17`.
+  - Impact: **L-151 exactly**, in the sprint that promoted its neighbours. An agent running
+    `/lean-doc-generator epic` precisely as instructed ships an epic violating the freeze with nothing in
+    the loop ever opening the file the freeze lives in. EPIC-015 engaged the freeze one commit later —
+    evidence it can be found by the author who just wrote it, not that the mechanism reaches an
+    independent later session.
+  - **Re-file fresh if** the freeze is lifted before this is wired: the reachability defect outlives the
+    particular freeze.
+
+- **TD-089** severity: minor | status: open | created: Sprint-084
+  - Summary: **The conformance-coverage sweep reports clean over findings it cannot match.** Round 4's
+    actionable-findings regex matches the bare-kebab finding convention; findings emitted under the
+    `S<N>.<CODE>` convention are invisible to it.
+  - Evidence: surfaced incidentally by Sprint-084 T4 while building an unrelated precondition — the
+    original stranger's *fully remediated* state still carries **2 unnamed FAIL lines** (`S2.R-README`
+    footer · `S6.BASE` two doc rows) the sweep does not see. Recorded unrouted in § Round 5 because it
+    fell outside T4's `Layers:`.
+  - Impact: L-108's shape in a **sweep** rather than a guard — a measurement asserting "0 artefacts
+    remain" over a corpus it only partly examined. The claim that an adopter's findings all clear is
+    weaker than the round states.
+  - **Re-file fresh if** the regex is widened without re-running Round 4: that round's conclusion would
+    then rest on a matcher nobody re-measured.
+
+- **TD-090** severity: minor | status: open | created: Sprint-084
+  - Summary: **`qa-check.sh` leg 12 (eval harnesses) is now the gate's dominant cost** — 396.3s of a
+    492s run, ~81%.
+  - Evidence: `docs/research/logs/qa-gate-timing.md` § Round 4, measured post-fix. It was never the
+    historically-stalling leg and sat outside Sprint-084 T1's measured scope, so it is named rather than
+    chased. The gate completes, so this is *expensive*, not *unrunnable* — the TD-071/TD-084 distinction
+    now pointing the other way.
+  - Impact: the next investigation starts here rather than from zero. `scripts/lib/qa-budget-check.sh`
+    (shipped Sprint-084 T1) means an over-budget run is reported and its skipped harnesses named, so
+    this degrades visibly rather than silently.
+  - **Re-file fresh if** a profile shows leg 12's cost is not spawn-count-shaped — the fix that worked
+    twice would then not transfer.
+
+- **TD-084** severity: **high** | status: **resolved** → TASK-272 (Sprint-084 T1) | created: Sprint-083
   - Summary: **`scripts/qa-check.sh` can no longer run to completion.** Three runs in one session were
     killed before printing their verdict line — at a 5-minute limit, at a 10-minute limit, and twice as
     a reaped background job. This is a **different failure from TD-071/TD-073**, which price the gate's

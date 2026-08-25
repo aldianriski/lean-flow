@@ -3,7 +3,7 @@ sprint: 084
 slug: gate-recovery-and-owed-work
 owner: Maintainer
 last_updated: 2026-08-25
-status: active
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 

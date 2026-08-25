@@ -2,8 +2,8 @@
 sprint: 084
 slug: gate-recovery-and-owed-work
 owner: Maintainer
-last_updated: 2026-08-24
-status: active
+last_updated: 2026-08-25
+status: closed
 plan_commit: af7e517
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -188,4 +188,56 @@ ruling each of `05`'s four candidates keep / reject / defer.
 
 ## Retro
 
-_(written at close)_
+**Retrieval check — yes, twice, and both were figures rather than rules.** Neither was a failure to find
+a governing rule; both were a *citation asserted from memory instead of derived*. (a) The coordinator
+recorded T1's spawn-count regression as the "third and fourth sighting"; L-144/L-147/L-155 already
+document **four** priors, making these the fifth and sixth — the task caught it and corrected upward.
+(b) T5's draft wrote "11 `check-*.sh`", copied from a SPRINT-077 doc; disk has **12**. Both belong to the
+frozen-artifact-is-a-query-result family (L-130 · L-136 · L-143), landing on a grain that family had not
+yet been stated to cover: **a count cited in prose**. Weak evidence for a knowledge-graph view — nothing
+was hard to *find*; both were simply never looked up.
+
+**Cost** — coordinator (Opus, inline) + **11 dispatched agents** (Sonnet): 5 builders, 6 reviewers, two
+of them resumed for a bounded revise rather than respawned. **≈1.92M subagent tokens for 5 tasks
+delivered ≈ 383k per task delivered** (per unit *delivered* — nothing was abandoned). The review half was
+≈45% of spend (≈866k across 6 reviewers) and returned six defects plus one changed ruling: the most
+expensive component, and the only one that found anything the builders had missed.
+
+**Worked**
+- **Dispatching the owed reviews instead of ruling them away.** Four for four returned findings — three
+  shipped guards plus one unreachable decision. The self-review ruling was available, would have closed
+  T2 legitimately, and would have found none of them.
+- **Profiling before fixing, because the debt row said so.** The dominant term was process-spawn count,
+  not corpus size — the assumption everyone held. TD-073's lesson held a second time.
+- **Pinning reviewers to shipped refs.** T1 edited `qa-check.sh` throughout; unpinned reviewers would
+  have reviewed a moving target and written `review ·` lines about code that no longer existed.
+- **Coordinator-only commits.** Eleven agents, disjoint `Layers:`, zero index races and zero cross-task
+  contamination — L-042's failure never had an opening.
+- **Reading the artifact, never the report.** Every claim that mattered was re-derived independently;
+  three times the artifact and the report disagreed.
+
+**Friction**
+- **A wrapper reported success for a gate that never ran.** `$TMPDIR` was unset, the redirect died on
+  `Permission denied`, `;` let the following `echo` print *"gate finished, output captured"*, and the
+  harness surfaced **that** as exit 0. Caught only by going to look for the output file. L-120/L-045
+  verbatim, in the coordinator's own hands, during the sprint about exactly this.
+- **The gate was raced against an in-flight agent.** Running the full gate while T4 edited `evals/`
+  produced a fifth FAIL that was pure artefact — one wasted 8-minute cycle.
+- **A remedy applied without reading the matcher did not take.** `check-layers-completeness.sh:145`
+  matches with `grep -qxF` against the **bare filename**; a `Cites:` entry carrying the full path never
+  matched and the FAIL stood. Re-running the checker caught it; assuming the edit worked would not have.
+- **Two DoD were unreachable as written.** T2's named verify skips archived paths by design; T5's names
+  two scripts in one `Verify:` clause that the checker pairs against each other. Both froze at promote,
+  and neither was checkable at the moment it was written — L-111's shape, surfacing at close not G2.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **Six defects, one shape, zero caught by recall** — filed as `L-165`. Every guard defect this sprint
+  (substring where shape was meant · whole-file grep where position was meant · a decision filed where
+  its consumer cannot reach it) was found by an independent pass or by a second number disagreeing.
+  **Not one was found by anyone recalling the rule that governs it**, and those rules were loaded,
+  correct, and on screen. L-155's own thesis, observed six more times, arguing its own conclusion: the
+  missing thing is not another sentence but a check that changes state.
+- **A gate that cannot finish is not a slow gate — it is an absent one that hides its own backlog.** The
+  moment `qa-check.sh` reached its verdict line it reported FAILs true for sprints and invisible because
+  the run never got that far. Restoring an instrument *surfaces* debt rather than creating it; budget the
+  close for what the instrument will find.

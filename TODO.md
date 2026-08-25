@@ -18,12 +18,14 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-084 — Gate Recovery and Owed Work** → [docs/sprint/SPRINT-084-gate-recovery-and-owed-work.md](docs/sprint/SPRINT-084-gate-recovery-and-owed-work.md)
+> _None._ SPRINT-084 closed 2026-08-25 → [docs/sprint/SPRINT-084-gate-recovery-and-owed-work.md](docs/sprint/SPRINT-084-gate-recovery-and-owed-work.md)
 
-_Not EPIC-014's Sprint B._ V3 Sprint B (Markdown AST parser + Shell parity, H05/H06) has **no Backlog
-tasks** — EPIC-014 states the post-083 shape is *"not promoted, and each re-derived at its own
-promote."* Slicing it is `/task-decomposer --epic EPIC-014`, and it is the natural next promote once
-the gate prints a verdict line again.
+**Next promote is EPIC-014's V3 Sprint B**, and its blocking condition is now met. Sprint B (Markdown
+AST parser + Shell parity, H05/H06) has **no Backlog tasks** — EPIC-014 states the post-083 shape is
+*"not promoted, and each re-derived at its own promote."* Slicing it is `/task-decomposer --epic
+EPIC-014`. It was held because the strangler method rests on *measured* parity and the gate could not
+print a verdict line; **SPRINT-084 T1 restored that** (`QA-CHECK: 176 pass, 3 fail`, 492s), so the
+condition that deferred it no longer holds.
 
 ---
 
@@ -33,118 +35,49 @@ the gate prints a verdict line again.
 
 ### P1 — Next Phase Required
 
-- [ ] TASK-272 — Make the gate finish: profile `qa-check.sh`, then split it  [size: M] [risk: med] [HITL]
+- [ ] TASK-273 — Close `check-review-depth.sh`'s absence blind spot  [size: M] [risk: med] [HITL]
       class:      execution
-      tier:       G (ADR-029 — this is the conformance/QA gate itself; a false negative here is
-                  silent by construction, and an unrunnable gate is a false negative on every run)
-      done-when:  `sh scripts/qa-check.sh` prints its `QA-CHECK: N pass, M fail` verdict line
-                  inside a single ordinary invocation, on the DEFAULT profile. **Profiled before
-                  split**: the dominant term is measured and named — per-leg timings recorded, in the
-                  style L-144 prescribes — and the split (if a split is what the measurement supports)
-                  is justified by that number rather than by where the run appeared to stall. The
-                  heavy legs remain reachable, not deleted. Retained fixture: a run that would exceed
-                  the fast leg's budget is reported as such rather than silently truncated
-      touches:    scripts/qa-check.sh · scripts/lib/conformance-engine.sh (measurement only) ·
-                  possibly a fast/standard profile split (V3 §22 · H17)
+      tier:       G (ADR-029 — a `check-*.sh` in the QA gate; a false negative here is silent by
+                  construction, and this row exists because the guard already produced one)
+      done-when:  a live sprint log carrying a `governance:high` (or `behaviour:material`) task with
+                  **no** `review ·` line is reported as a **FAIL with a named finding**, not as a
+                  `nothing to verify` note. One retained must-FAIL fixture per branch (absent-line +
+                  governance:high · absent-line + behaviour:material), each failing with its own named
+                  finding, plus the discrimination proof ADR-029 requires of Tier G. The archive-skip
+                  half is ruled separately and explicitly — either archived paths become readable when
+                  passed by name, or recording a review there is forbidden — but it is **ruled**, not
+                  left implicit
+      touches:    scripts/lib/check-review-depth.sh · evals/run-review-depth-fixtures.sh ·
+                  possibly scripts/qa-check.sh (leg 2b wiring)
       depends-on: none
-      assumes:    **the regression is measured, not inferred** — three runs killed in one session at
-                  122 / 123 / 263 lines, the last with 162 PASS and 0 FAIL, none reaching the verdict
-                  line, all on the default profile with `QA_FULL` unset. **Profile before splitting**
-                  is not ceremony: TD-073's stated cause was wrong, and the real cost turned out to be
-                  the driver's own per-rule bookkeeping rather than the workload everyone assumed —
-                  a split chosen before measuring would likely have optimised the wrong half.
-                  Out of scope: deleting any check · lowering coverage to make the number fit ·
-                  building the full `fast`/`standard`/`full` profile system (that is H17)
-      tracker:    TD-084 · TD-071 · TD-073 · L-144 · L-120 · ADR-021 · V3 §22
+      assumes:    **the defect is reproduced, not inferred** — SPRINT-084 T2 ran it live: a log with a
+                  `governance:high · behaviour:material` task and no `review ·` line prints
+                  `no review line -- nothing to verify` and exits **0**. SPRINT-082 did exactly this and
+                  closed 38 of 38 with zero review lines on the record; SPRINT-084's own live log does
+                  the same. Escalated to P1 by the ledger's own rule (`severity: high` → auto-P1), not
+                  by preference. Out of scope: re-litigating whether archived history should be
+                  re-read — that is the ruling this task must *make*, not assume
+      tracker:    TD-085 · L-165 · L-105 · SPRINT-082 T2 · SPRINT-084 T2
       origin:     close-retro
       state:      ready
 
-
-- [ ] TASK-271 — Align ADR-034 and ADR-036 to the ADR template  [size: S] [risk: low] [HITL]
-      class:      execution
-      tier:       P (ADR-029 — prose formatting; G1 and a read-through)
-      done-when:  both ADRs use `ADR.md.template`'s shapes — a single-paragraph
-                  `**Positive:** / **Negative (trade-offs accepted):**` § Consequences and an
-                  `| Option | Why rejected |` table for § Alternatives — matching ADR-033 and ADR-035.
-                  **§ Decision in both must stay byte-identical** to the accepted text: both are
-                  `status: accepted` and §4 is append-only, so a rewrite there trips S4.APPEND
-      touches:    docs/adr/ADR-034-semantic-compatibility-contract.md ·
-                  docs/adr/ADR-036-severity-is-introduced-not-preserved.md
-      depends-on: none
-      assumes:    **the deviation is confirmed, not suspected** — independent review flagged it on
-                  ADR-035 and the same root cause covers all three: they were written without
-                  re-reading the template, which CLAUDE.md names as an anti-pattern outright.
-                  ADR-035 was realigned during SPRINT-083's T2 revise; these two were deliberately
-                  left, because a bounded revise is one retry and cosmetic drift did not earn an
-                  expansion of it. Out of scope: rewriting any § Decision · re-litigating either
-                  decision's content
-      tracker:    SPRINT-083 T2 revise · ADR.md.template · CLAUDE.md § Anti-Patterns
-      origin:     close-retro
-      state:      ready
-
-
-- [ ] TASK-266 — Run the owed independent review of SPRINT-082's governance changes  [size: S] [risk: med] [HITL]
+- [ ] TASK-274 — Rule on `qa-gate-timing.md`'s superseded recommendation  [size: S] [risk: low] [HITL]
       class:      decision
-      done-when:  T1, T2, T3 and T5's changes have had an independent scoped review pass recorded as a
-                  `review · Tn · scoped-reviewer · behaviour:material · governance:high` line, or an
-                  owner ruling accepting self-review is recorded in its place. Either outcome closes it;
-                  an empty record does not
-      touches:    docs/sprint/archive/logs/SPRINT-082-foundation-hardening.md (or a successor log)
+      tier:       P (ADR-029 — a research decision doc; a defect is visible on first read)
+      done-when:  `docs/research/qa-gate-timing.md`'s standing Recommendation is either amended or
+                  marked superseded with a pointer to § Round 4, so a reader cannot act on a conclusion
+                  the measurement overturned. Whichever way it is ruled, the doc stops asserting a
+                  recommendation that the evidence below it contradicts
+      touches:    docs/research/qa-gate-timing.md · docs/knowledge-index.md (generated)
       depends-on: none
-      assumes:    **the sprint's own rule generated this, and refusing to wave it through is the point.**
-                  SPRINT-082 T2 shipped routing where `governance:high` cannot take the self-review
-                  floor. T1/T2/T3/T5 are all `behaviour:material · governance:high` — they change rules
-                  other work is measured against — so under that rule none of them earned the cheap
-                  path. The session that built them could not dispatch an independent reviewer, so the
-                  review **parked** and **no `review ·` line was written**: the line records what fired,
-                  and writing `self-review` would have been false *and* would have reddened
-                  `check-review-depth.sh`. Closing the sprint with the record honestly empty, and the
-                  gap filed here, is the only reading consistent with having shipped the rule
-      tracker:    SPRINT-082 T2 · T4 (parked branch) · review-scoping.md § Two dimensions
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-260 — Run Phase C: the harness delta research side-car  [size: M] [risk: low] [AFK]
-      class:      execution
-      done-when:  `docs/research/harness-delta.md` exists as a decision doc (ADR-009 frontmatter, ≤130)
-                  ruling each of `05-HARNESS-RESEARCH-BRIEF.md`'s four candidates — reconstructible
-                  Lean-controlled dispatch · independent dispatch replay · reversible effect lifecycle ·
-                  programmatic mechanical batching — as **keep / reject / defer**, each against the
-                  delta over lean-flow's existing surface rather than standalone merit (L-017), and
-                  each naming which layer would own it. `05`'s explicit non-goals are re-asserted, not
-                  re-litigated
-      touches:    docs/research/harness-delta.md (new) · docs/knowledge-index.md (generated)
-      depends-on: none
-      assumes:    **unstarted and unblocked — verified, not assumed.** A census for the four candidate
-                  names returns zero hits across `docs/`, `spec/` and `skills/`;
-                  `harness-engineering-adaptation.md` is a different question and predates the strategy
-                  pack. This is the **side-car lane**: research only, collides with no implementation
-                  file, and `03` Phase C forbids opening an epic from it (*"No new epic until evidence
-                  identifies the real delta"*). It is EPIC-008's named input (D4) — `RunEnvelope`,
-                  `Dispatch` and `Effect` trace their provenance here — so it is the long pole for the
-                  whole of Lane 2's tail
-      tracker:    03-ADLC-ROADMAP.md Phase C · 05-HARNESS-RESEARCH-BRIEF.md · EPIC-008 D1/D4 ·
-                  docs/research/adlc-epic-sequencing.md F4
-      origin:     manual
-      state:      ready
-
-- [ ] TASK-259 — Exercise the absent-attestation hold against a foreign repo that has commits  [size: S] [risk: low] [AFK]
-      class:      execution
-      done-when:  the foreign-repo harness runs a target with real git history and no §13 trailers, and
-                  the assertion records what an adopter actually sees — `attestation-absent` named,
-                  `level: Gated`, exit code unmoved. Whichever way it falls is the result; a surprise
-                  here is a finding about T4, not a nuisance
-      touches:    evals/run-foreign-repo-fixtures.sh (the current stranger is git-less by construction,
-                  so this needs a second target or an added `git init` + one commit) ·
-                  docs/research/logs/conformance-coverage.md § Round 5
-      depends-on: none
-      assumes:    **the gap is real and was named at the moment it was created, not discovered later.**
-                  SPRINT-081 T4 added the hold and T3 could not exercise it: the stranger is built from
-                  four `printf`s with no `git init`, so §13 reports `not evaluated` and the new branch
-                  never runs against a foreign tree. It IS exercised against this repository and by
-                  `run-attestation-fixtures.sh`, so this is coverage of the *consumer path*, not of the
-                  rule (L-016) — the one thing dogfooding structurally cannot check here
-      tracker:    SPRINT-081 T4 · T3 · TD-079 · L-159 · docs/research/logs/conformance-coverage.md
+      assumes:    **the supersession is specific, not general.** The doc's Recommendation ("Option C
+                  stands... no sub-part of section 4 worth cutting") correctly ruled out
+                  *coverage reduction* as a lever and was never wrong about that. It never tested
+                  *spawn-count reduction*, which is where SPRINT-084 T1's actual cure came from
+                  (271.5s → 23.6s with no coverage removed). So this is a scope correction, not a
+                  reversal. Deliberately left for a promote-time ruling rather than edited mid-sprint,
+                  because rewriting a decision doc to match a result is how the record stops being one
+      tracker:    docs/research/logs/qa-gate-timing.md § Round 4 · TD-090 · SPRINT-084 T1
       origin:     close-retro
       state:      ready
 
