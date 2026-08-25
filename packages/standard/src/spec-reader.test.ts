@@ -8,8 +8,10 @@ import { tokenize } from "./tokenizer.ts";
 import {
   allRules,
   formatRuleRow,
+  formatSectionCount,
   readAll,
   readSection,
+  reconcile,
   rulesInSection,
   sectionsOf,
   specNotFound,
@@ -372,5 +374,122 @@ describe("readAll / readSection -- error semantics parity with read-spec-rules.s
     expect(shell.code).toBe(0);
     expect(shell.stdout).toBe("");
     expect(shell.stderr).toBe("");
+  });
+});
+
+// SPRINT-085 T4 -- `--reconcile` mode parity. Migrating a MODE the shell reader already owns, not
+// adding a capability: TS must reproduce the per-section count table AND the mismatch FAIL, agreeing
+// with Shell on all three retained reconcile fixtures (`evals/run-spec-reader-fixtures.sh` cases 1, 6,
+// 7). The shell reader is spawned FRESH via `execFileSync` as an independent oracle in every case
+// below -- never a copied-in expected literal (hard constraint 3) -- and every fixture's input is
+// built the SAME transform `evals/run-spec-reader-fixtures.sh` uses (hard constraint: hard-coded
+// literals are a T3-style anti-pattern this file already avoids).
+
+/** Parses a `PASS  §N  M rules` line from `--reconcile`'s own stdout -- the independent oracle's shape. */
+function parseShellReconcileTable(stdout: string): ReadonlyMap<number, number> {
+  const counts = new Map<number, number>();
+  for (const line of stdout.split("\n")) {
+    const m = /^PASS\s+§(\d+)\s+(\d+) rules$/.exec(line.trim());
+    if (m) counts.set(Number(m[1]), Number(m[2]));
+  }
+  return counts;
+}
+
+/**
+ * Mirrors `evals/run-spec-reader-fixtures.sh` case 6's `awk` transform exactly: drops the FIRST row
+ * whose id cell matches `idLiteral` (e.g. `` `S2.F-CAP` ``), leaving §14's published count untouched --
+ * so the emitted rows and the expected count disagree for that section.
+ */
+function stripFirstRow(specText: string, idLiteral: string): string {
+  const anchor = new RegExp(`^\\| *\`${idLiteral}\` *\\|`);
+  const lines = specText.split(/\r\n|\r|\n/);
+  let dropped = false;
+  const out: string[] = [];
+  for (const line of lines) {
+    if (!dropped && anchor.test(line)) {
+      dropped = true;
+      continue;
+    }
+    out.push(line);
+  }
+  return out.join("\n");
+}
+
+/** Mirrors case 7's `awk '!/^[|] *classified *[|]/'` -- drops §14's own `classified` counts row. */
+function stripClassifiedRow(specText: string): string {
+  return specText
+    .split(/\r\n|\r|\n/)
+    .filter((line) => !/^\| *classified *\|/.test(line))
+    .join("\n");
+}
+
+describe("reconcile -- `--reconcile` mode parity with read-spec-rules.sh (SPRINT-085 T4)", () => {
+  test("reconciles-with-section-14: the real Standard's per-section table matches Shell's, both ok, both §1..§13", () => {
+    const doc = tokenize(readFileSync(SPEC_PATH, "utf8"), SPEC_PATH);
+    const tsResult = reconcile(doc, SPEC_PATH);
+    if (!tsResult.ok) throw new Error(`expected success, got finding ${tsResult.finding}: ${tsResult.message}`);
+    expect(tsResult.sections).toBeDefined();
+
+    const shell = runShellReader([SPEC_PATH, "--reconcile"]);
+    expect(shell.code).toBe(0);
+    expect(shell.stdout).toContain("reconciled");
+
+    const shellTable = parseShellReconcileTable(shell.stdout);
+    expect(shellTable.size).toBe(13); // the oracle actually printed a per-section table, not an empty one
+
+    for (const row of tsResult.sections!) {
+      expect(row.got).toBe(shellTable.get(row.section));
+      expect(formatSectionCount(row)).toBe(`§${row.section} ${shellTable.get(row.section)} rules`);
+    }
+
+    // The total, read two independent ways: TS's own row count, and the sum of TS's per-section table.
+    expect(tsResult.rows.length).toBe(100);
+    expect(tsResult.sections!.reduce((sum, r) => sum + r.got, 0)).toBe(100);
+  });
+
+  test("section-rows-mismatch: §2 short one row of its published count -- named finding, non-ok, both sides", () => {
+    const realSpec = readFileSync(SPEC_PATH, "utf8");
+    const short = stripFirstRow(realSpec, "S2\\.F-CAP");
+    // Harness guard: the strip must actually remove the ROW (id as its own table cell), by the SAME
+    // anchored pattern the reader itself matches against -- not a bare substring, which would also
+    // match §7's `S7.MEGA` row and §2's own prose, both of which legitimately still mention the id.
+    expect(/^\| *`S2\.F-CAP` *\|/m.test(short)).toBe(false);
+
+    const doc = tokenize(short, "spec-short-s2.md");
+    const tsResult = reconcile(doc, "spec-short-s2.md");
+    if (tsResult.ok) throw new Error("expected a failure result");
+    expect(tsResult.finding).toBe("section-rows-mismatch");
+    expect("rows" in tsResult).toBe(false); // absence, not an empty/short table -- same D7 line as T3
+
+    const path = freshTmpFile("spec-short-s2.md");
+    writeFileSync(path, short);
+    const shell = runShellReader([path, "--reconcile"]);
+    expect(shell.code).not.toBe(0);
+    expect(shell.stderr + shell.stdout).toContain("section-rows-mismatch");
+  });
+
+  test("spec-counts-unreadable: §14's `classified` row is gone -- named finding, non-ok, both sides", () => {
+    const realSpec = readFileSync(SPEC_PATH, "utf8");
+    const noCounts = stripClassifiedRow(realSpec);
+    expect(noCounts).not.toContain("| classified |");
+
+    const doc = tokenize(noCounts, "spec-no-counts.md");
+    const tsResult = reconcile(doc, "spec-no-counts.md");
+    if (tsResult.ok) throw new Error("expected a failure result");
+    expect(tsResult.finding).toBe("spec-counts-unreadable");
+
+    const path = freshTmpFile("spec-no-counts.md");
+    writeFileSync(path, noCounts);
+    const shell = runShellReader([path, "--reconcile"]);
+    expect(shell.code).not.toBe(0);
+    expect(shell.stderr).toContain("spec-counts-unreadable");
+  });
+
+  test("a section legitimately at 0 (§8) reconciles as a PASS row, not a mismatch", () => {
+    const doc = tokenize(readFileSync(SPEC_PATH, "utf8"), SPEC_PATH);
+    const tsResult = reconcile(doc, SPEC_PATH);
+    if (!tsResult.ok) throw new Error(`expected success, got finding ${tsResult.finding}`);
+    const s8 = tsResult.sections!.find((r) => r.section === 8);
+    expect(s8).toEqual({ section: 8, got: 0, expected: 0 });
   });
 });

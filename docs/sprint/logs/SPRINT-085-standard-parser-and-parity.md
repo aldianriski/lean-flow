@@ -231,3 +231,37 @@ than an arbitrary break.
    decides when to emit it. The breadth lives only in the test stand-in. **But it names a real decision
    Sprint C owes:** a permission-denied spec must not report `spec-not-found`, because a wrongly-*named*
    finding is precisely the failure mode this repo treats as most expensive. Recorded for H11.
+
+### 2026-08-25 | progress | T4 — `--reconcile` migrated; the Plan is exhausted at 26 of 26
+`reconcile()`, `SectionCount` and `formatSectionCount()` added, with `SpecReadOk` extended by an
+optional `sections` field **rather than a parallel result shape** — a second result type for one domain
+is what D7 warns against, and T3's `SpecReadOk | SpecReadFail` vocabulary was extended instead of
+duplicated. Suite **90 pass / 0 fail** (86 → 90); architecture 25 pass; zero dependencies intact.
+
+Per-section counts match the Shell reader exactly: §1=4 · §2=21 · §3=3 · §4=7 · §5=2 · §6=4 · §7=9 ·
+§8=**0** · §9=10 · §10=10 · §11=11 · §12=12 · §13=7 — **total 100**, agreeing with §14's published
+figure and with T2's row count derived independently. §8 at zero is the case that matters: it is a
+*legitimate* zero, and reconcile is the only thing that distinguishes it from a silently-dropped section.
+
+**Tier G:** seeded `mismatch === null && row.got !== row.expected` → `&& false`, i.e. the exact
+false negative (a count mismatch passing silently). `cmp` showed exactly line 322 differing at 360/360
+lines — targeted. `section-rows-mismatch` reddened alone; all 25 siblings, including the other three
+reconcile tests, stayed green. Restored, SHA-256 matched.
+
+**Two TS/Shell differences reported (D2), ruled here:**
+
+1. **Shell can print several findings per run; TS surfaces the first mismatching section.** Shell's
+   `--reconcile` is a line-oriented report, TS returns the single-finding `SpecReadResult`. The
+   **verdict is identical** and the **finding name is identical** — what differs is completeness of
+   enumeration, so ADR-034 D3's frozen surface (Rule ID · Finding ID · exit meaning) is intact.
+   **Accepted, with a carry-forward:** this stops being cosmetic at **H07**, where findings become
+   typed data and a result carrying *N* findings is the natural shape. Sprint C should not inherit the
+   single-finding collapse silently.
+2. **Shell's `unbucketed-rows` check has no TS analogue.** Examined rather than accepted, because "a
+   guard the other engine has and we don't" is the shape of a false negative. It is not: the guard's own
+   text reads *"a row matching no section is a row the anchor should never have matched (L-108)"* — it
+   is a **self-check on the Shell's regex over-matching**, comparing raw matches against bucketed ones.
+   TS collects rows only from inside a `## §N` window, so raw and bucketed are the same set by
+   construction and the defect class cannot arise. TS is structurally stronger here, not blind.
+   **Ruled on the guard's stated purpose, not on an empirical test** — stating the basis because the two
+   are not the same evidence, and a later reader may want the experiment run.

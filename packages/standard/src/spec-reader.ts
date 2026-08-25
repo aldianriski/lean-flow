@@ -153,12 +153,22 @@ export function formatRuleRow(row: RuleRow): string {
 // to check: the failure variant carries no `rows` field at all, so "no rows" and "an empty rule set"
 // can never be confused the way two `[]` returns could be at a call site.
 
-/** The two named findings this reader can raise -- mirrors `read-spec-rules.sh`'s own vocabulary. */
-export type SpecFinding = "spec-table-unreadable" | "spec-not-found";
+/**
+ * The named findings this reader can raise -- mirrors `read-spec-rules.sh`'s own vocabulary.
+ * `spec-counts-unreadable` and `section-rows-mismatch` are SPRINT-085 T4's additions, extending this
+ * union rather than a parallel finding type -- see `reconcile` below.
+ */
+export type SpecFinding = "spec-table-unreadable" | "spec-not-found" | "spec-counts-unreadable" | "section-rows-mismatch";
 
 export interface SpecReadOk {
   readonly ok: true;
   readonly rows: readonly RuleRow[];
+  /**
+   * §1..§13's read-vs-published counts -- populated only by `reconcile` (T4's `--reconcile` mode);
+   * `undefined` for `readSection`/`readAll`. An optional field on the EXISTING `SpecReadOk`, not a new
+   * result shape, per hard constraint 2: `reconcile` still returns `SpecReadResult`.
+   */
+  readonly sections?: readonly SectionCount[];
 }
 
 export interface SpecReadFail {
@@ -261,6 +271,74 @@ export function readAll(doc: BlockDocument, specPath: string): SpecReadResult {
       `read-spec-rules: spec-table-unreadable -- no Conformance rows parsed from ${specPath}. A reader ` +
       `that returns nothing checks nothing and exits clean; that is reported here instead (L-058)`,
   };
+}
+
+// --- SPRINT-085 T4: `--reconcile` mode parity with `read-spec-rules.sh` ----------------------------
+//
+// Rows (T2) and error semantics (T3) were the reader's two easier halves. `--reconcile` extends T3's
+// refusal one level up: a section returning ZERO rows while §14's own counts say it has some is a
+// FAIL, not an empty result -- the only way a silently-dropped section is distinguishable from a
+// section that legitimately has none (§8). This is a MIGRATED MODE, not a new capability -- the shell
+// reader has owned it since SPRINT-075 T1; this only reproduces it in TS.
+
+/** One §N's read-vs-published row count -- the per-section line `--reconcile` prints. */
+export interface SectionCount {
+  readonly section: number;
+  readonly got: number;
+  readonly expected: number;
+}
+
+/**
+ * Reproduces `read-spec-rules.sh --reconcile`: reads §14's own per-section counts independently of
+ * the rows, then compares each of §1..§13 against what `rulesInSection` actually finds. Returns the
+ * EXISTING `SpecReadResult` shape (hard constraint 2) -- `ok: true` with `rows` (every rule, document
+ * order) and `sections` (the per-section table) when all 13 agree; `ok: false` with a named finding
+ * otherwise.
+ *
+ * The shell script can print SEVERAL findings at once (one per mismatched section, plus a total-
+ * mismatch line) because it is a line-oriented report; a single `SpecReadResult` carries only one
+ * `finding`. This function surfaces the FIRST section (lowest number) that disagrees, which is enough
+ * to satisfy `--reconcile`'s own point -- a dropped section is visible -- and is a deliberate,
+ * reported TS/Shell difference (deliverable d), not an attempt to cram a multi-finding report into a
+ * single-finding type.
+ */
+export function reconcile(doc: BlockDocument, specPath: string): SpecReadResult {
+  const expected = expectedCountsOf(doc);
+  if (expected === null) {
+    return {
+      ok: false,
+      finding: "spec-counts-unreadable",
+      message:
+        `read-spec-rules: spec-counts-unreadable -- §14 has no \`classified\` counts row in ${specPath}. ` +
+        `Without it a dropped section is indistinguishable from a section with no rules`,
+    };
+  }
+
+  const sections: SectionCount[] = [];
+  let mismatch: SectionCount | null = null;
+  for (let s = 1; s <= 13; s++) {
+    const row: SectionCount = { section: s, got: rulesInSection(doc, s).length, expected: expected.get(s) ?? 0 };
+    sections.push(row);
+    if (mismatch === null && row.got !== row.expected) mismatch = row;
+  }
+
+  if (mismatch !== null) {
+    return {
+      ok: false,
+      finding: "section-rows-mismatch",
+      message:
+        `read-spec-rules: section-rows-mismatch -- §${mismatch.section} read ${mismatch.got}, §14 says ` +
+        `${mismatch.expected}. A section short of its own published count is a dropped rule set, not an ` +
+        `empty one (L-058)`,
+    };
+  }
+
+  return { ok: true, rows: allRules(doc), sections };
+}
+
+/** `§N  M rules`, one per section, the shape `read-spec-rules.sh --reconcile`'s PASS lines print. */
+export function formatSectionCount(row: SectionCount): string {
+  return `§${row.section} ${row.got} rules`;
 }
 
 /**

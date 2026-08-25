@@ -107,9 +107,9 @@ silently-dropped section is distinguishable from a section that legitimately has
 all three reconcile fixtures.
 
 **DoD:**
-- [ ] The per-section count table matches the Shell reader's — *Verify: `reconciles-with-section-14` reproduced*
-- [ ] A section returning zero rows while §14 says it has some is a **FAIL, not an empty result** — *Verify: `section-rows-mismatch` reproduced*
-- [ ] Unreadable counts produce `spec-counts-unreadable` — *Verify: that fixture reproduced*
+- [x] The per-section count table matches the Shell reader's — *Verify: `reconciles-with-section-14` reproduced*
+- [x] A section returning zero rows while §14 says it has some is a **FAIL, not an empty result** — *Verify: `section-rows-mismatch` reproduced*
+- [x] Unreadable counts produce `spec-counts-unreadable` — *Verify: that fixture reproduced*
 
 ### T5 — Profile `conformance-engine.sh` per rule family → § Round 5 `[size: S · risk: low · class: execution · AFK]`
 Layers: `docs/research/logs/qa-gate-timing.md` (append-only)
