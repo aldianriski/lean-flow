@@ -56,10 +56,10 @@ deliverable, and it is cheap compared with optimising the wrong family.
 or dissolved — and the ranking T2 acts on is either confirmed or corrected by name.
 
 **DoD:**
-- [ ] The disagreement is reproduced under both rounds' conditions, or the difference in conditions is named — *Verify: § Round 6 states the method for each, so a reader can tell a real change from a measurement artefact*
-- [ ] One round is named as wrong, with its cause — *Verify: the round's text names it; "both are plausible" does not satisfy this, since T2's target selection depends on the answer*
-- [ ] The family ranking T2 will act on is restated post-verdict — *Verify: the ranking either matches Round 5's or names the rows that moved*
-- [ ] Round 4 and Round 5 are left unedited — *Verify: `git diff` touches only appended lines (ADR-014 append-only)*
+- [x] The disagreement is reproduced under both rounds' conditions, or the difference in conditions is named — *Verify: § Round 6 states the method for each, so a reader can tell a real change from a measurement artefact* ✓ reproduced a **third** time by an independently-built mechanism (`--spec` reduction, 66.85s) against Round 5's two figures (75.6s embedded · 76.1s `QAT_ONLY`-isolated), on code unchanged since `a5feb8a` — before either round ran
+- [x] One round is named as wrong, with its cause — *Verify: the round's text names it; "both are plausible" does not satisfy this, since T2's target selection depends on the answer* ✓ **Round 4**, and the cause is structural: its "≤4s" was an *arithmetic residual* for ~35 unnamed rules, never a measurement of the pair. Round 4's own §Method (2) instrumented the identical dispatch loop and could have named them. "Both are plausible" is explicitly ruled out in the text, not merely avoided
+- [x] The family ranking T2 will act on is restated post-verdict — *Verify: the ranking either matches Round 5's or names the rows that moved* ✓ unchanged from Round 5 — F11 84.7s › F6 72.1s › F5 56.0s › F9 37.4s, 89% of the real-scale total; **strengthened, not corrected**
+- [x] Round 4 and Round 5 are left unedited — *Verify: `git diff` touches only appended lines (ADR-014 append-only)* ✓ coordinator-verified independently: `@@ -617,0 +618,148 @@` — a pure append at EOF, **0** deleted or modified lines
 
 ### T2 — Cut the gate's spawn count so it completes under load `[size: M · risk: med · class: execution · HITL]`
 Layers: `scripts/lib/conformance-engine.sh` · the `scripts/lib/` checkers in the families T1 confirms · `scripts/qa-check.sh` (only if wiring moves)

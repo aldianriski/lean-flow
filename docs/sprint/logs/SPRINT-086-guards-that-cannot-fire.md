@@ -74,3 +74,77 @@ any edit.
 **Noted against this run's own subject:** wave 0 dispatches three agents, and TD-090 *is* that the
 gate cannot finish under accumulated session load. System-verify at close will likely need a fresh
 process table — the same condition that beat the blocker at SPRINT-085's close.
+
+### 2026-08-25 | progress | T1 — Round 4 is the wrong one, and leg 12 is not the engine sweep
+**§ Round 6 appended: 148 insertions, 0 deletions.** Coordinator-verified independently rather than
+read off the agent's report — `@@ -617,0 +618,148 @@`, a pure append at EOF with **zero** deleted or
+modified lines, so Rounds 1–5 are untouched (ADR-014). The first verification attempt `cmp`-ed
+`git show HEAD~1:<file>` against the on-disk file and reported the *whole file* changed; that
+contradicted `git diff --stat`'s "0 deletions", and the disagreement was the tell — git-show emits
+1448 CRs against the worktree's 2252. Line endings, not content. The same trap that made the plugin
+cache look wholly different from the repo earlier today.
+
+**Verdict: Round 4.** Its implied **≤4s** was never a measurement of `S11.LOGPAIR` + `S11.WHENITRUNS` —
+it is an **arithmetic residual** (`176.6s − 57.16s _own_scan − 29.39s S4.APPEND − ~86.0s across 8 named
+rules`) covering **~35 unnamed rules combined**, of which the pair is an unmeasured subset. Round 4's
+own §Method (2) instrumented the *identical* rule-dispatch loop Round 5 later used, so the capability
+to name these two rules was present in its own run and simply went unreported. Round 4's text had even
+flagged itself as partial ("only some" families named, spawn counts "a lower bound").
+
+**Reproduced a third time, by a third mechanism.** `--spec` reduction (the lever `qa-check.sh`'s own
+leg 2f-ter already uses, independent of Round 5's `QAT_ONLY` env filter): **66,850.8 ms**, against
+Round 5's 75.6s embedded / 76.1s isolated — **16.7×** Round 4's implied ceiling, on code unchanged
+since `a5feb8a`, which predates both rounds. Three measurements, two independently-built isolation
+mechanisms, one order of magnitude from Round 4.
+
+**The leg-12 question is settled, and the answer matters more than the S11 verdict.** They are
+**disjoint by target and by profile**: every eval harness that invokes the engine builds its own
+throwaway `mktemp` repo and none targets this repository, while the engine's full-spec sweep against
+this repo (Round 5's 281.2s) runs **only under `QA_FULL=1`** — a profile the 492s run TD-090 measured
+does not set. That run's own leg 2f-ter uses the **7-rule reduced spec at 1.9–5s**. So
+`396.3 + 281.2 = 677.5s` does not fit in 492s precisely because neither figure contains the other.
+Neither round is wrong about its own number.
+
+**Ranking restated: unchanged from Round 5, strengthened rather than corrected** — F11 §11 retention
+84.7s › F6 §4 ADR 72.1s › F5 §1 ownership 56.0s › F9 §10 37.4s, 89% of the real-scale total. T1
+**declined to choose T2's target**, correctly: that is a G2 call under V3 §43 and its scope forbade it.
+
+**One gap named rather than smoothed.** Round 4's leg 2f-ter total (176.6s) and Round 5's full-engine
+wall clock for what should be the same operation (287.4s) disagree by **63%** on comparable corpora —
+ruled *out* as an alternative explanation for the S11 gap (a uniform 1.63× scale of a genuine 4s would
+land near 6.5s, not 66–76s), but left open and flagged for whoever next re-measures leg 2f-ter.
+
+### 2026-08-25 | surprise | T4's guard was blind to this very sprint's log — the coordinator, not T4, was the missing half
+T4 shipped correctly: schema, 12 green fixtures, discrimination proven. Then the finished checker was
+pointed at **SPRINT-086's own Execution Log** — a live, attended log for a sprint carrying
+`governance:high` work — and printed `no review line -- nothing to verify`, **exit 0**. The same string
+and the same exit code the whole TD-085 → TD-092 line of work exists to eliminate.
+
+**The cause is not in T4's diff.** The schema is wired into the template and the two skill files that
+*describe* when to emit it, but the thing that actually *emits* it for this sprint is the coordinator,
+who writes the Execution Log — and the coordinator had written three entries without it. T4 built the
+carrier; nobody had put anything in it. **L-020's shape one level up**: the capability was wired into
+every file that documents it and into none that produces the traffic.
+
+Worth naming plainly: this is the *third* consecutive sighting of one pattern — SPRINT-085 T6's guard
+anchored to a shape no sprint emits, T4's schema emitted by nobody, and both found only by running the
+finished guard against **the real artifact it was built for** rather than against a fixture. Fixtures
+prove a branch works; only the motivating case proves the branch is reachable.
+
+**Fixed here, by the coordinator, from this entry onward** — consequence lines for the work so far,
+appended rather than backdated into the entries above (append-only; never edit a past entry):
+
+consequence · T1 · behaviour:low · governance:low
+review · T1 · self-reviewed · behaviour:low · governance:low
+consequence · T4 · behaviour:material · governance:high
+
+T1 takes the self-review floor legitimately: a measurement round appended to a research log changes no
+shipped behaviour and no spec, ADR or protocol contract. **T4 does not, and the guard it wrote is what
+says so** — it changed a shipped QA checker (`behaviour:material`) *and* two workflow-contract files,
+`skills/orchestrator/SKILL.md` and `references/review-scoping.md` (`governance:high`). The skip table
+routes governance impact at any size to an independent scoped reviewer, so one was dispatched against
+T4's diff, adversarially briefed, before its DoD were ticked. Its `review ·` line lands when it reports.
+
+The pleasing part: **T4's own guard is what forced T4's author to be reviewed.** Had the classification
+gone unrecorded, the routing decision would have left no trace and the review would simply not have
+happened — which is the exact silent false negative § Two dimensions describes.
