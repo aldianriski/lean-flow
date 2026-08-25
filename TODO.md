@@ -60,6 +60,93 @@ them existing.)_
       origin:     close-retro
       state:      ready
 
+- [ ] TASK-288 — Evaluate one rule end-to-end, TS agreeing with Shell  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (EPIC-014 D8 — the conformance engine; a rule that silently evaluates to nothing
+                  is a false negative the whole engine inherits)
+      done-when:  one mechanical rule run through the TS path produces the **same named finding and
+                  the same exit meaning** as the Shell engine, with the Shell engine spawned as a
+                  **live oracle inside the test** rather than its output copied in as a literal. The
+                  path crosses every layer: a `Finding` / `RuleEvaluation` / `ConformanceResult`
+                  domain, a registry holding exactly one evaluator, one repository port with a real
+                  Bun adapter *and* an in-memory fake, and `--rule <id>` on the CLI. **No CLI strings
+                  inside the domain** (H07), enforced by the existing dependency-direction fitness test
+      touches:    packages/standard (result domain · registry · first port) · apps/cli (`--rule`) ·
+                  colocated tests · test/architecture
+      depends-on: none
+      assumes:    **the workspace exists and was checked on disk, not read off the epic** —
+                  `packages/standard/src/` carries model · tokenizer · spec-reader from SPRINT-083/085,
+                  `apps/cli/src/main.ts` exists, and `test/architecture/` already enforces the
+                  dependency direction over `packages/standard` and `packages/contracts`. Zero
+                  dependencies stays binding (ADR-035). **The Shell engine keeps authority** — this is
+                  strangler, not cutover (EPIC-014 D2); nothing here deletes or demotes Shell. Out of
+                  scope: more than one rule, and any global conformance level
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-289 — Resolve every rule class to GAP, excluded, or judgment-required  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (EPIC-014 D8 — a misclassified rule reports as checked when nothing checked it)
+      done-when:  an **unknown mechanical** rule resolves to `GAP`; a **judgment-only** rule to
+                  `excluded/judgment-required`; an **implementation-directed** rule to `excluded` —
+                  each with its own named outcome and a retained must-FAIL fixture. An unknown rule id
+                  must neither crash nor silently pass, and the Tier G discrimination proof shows each
+                  class reddening its own case while the siblings stay green
+      touches:    packages/standard (result domain · registry classification) · colocated tests ·
+                  test/fixtures
+      depends-on: TASK-288
+      assumes:    **the vocabulary is already typed and must not be re-derived** — ADR-036 fixed the
+                  Standard's marks at **six**, not V3's four (`restated` and `standard-directed` were
+                  the two ADR-028 added to stop eleven rules reporting as "unchecked gaps someone can
+                  close"). This task maps those marks to outcomes; it does not invent a vocabulary.
+                  Out of scope: changing what any mark means, and the `Hold` semantics that land with
+                  the QA profiles later in the epic
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-290 — Migrate the first rule family whole, rule by rule  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (EPIC-014 D8)
+      done-when:  every rule in the chosen family agrees with the Shell engine **rule-by-rule, never
+                  in aggregate** — the assertion names the differing rule when it fails — with a
+                  retained must-FAIL and a sibling control per rule. Any TS/Shell difference is
+                  **ruled, never absorbed** (EPIC-014 D2), and the family is **named individually** at
+                  the end, never "most of it". This is the reference pattern later families copy
+      touches:    packages/standard (evaluators for the chosen family · any ports they need) ·
+                  colocated tests · evals fixtures
+      depends-on: TASK-288 · TASK-289
+      assumes:    **the family is chosen at G2, not here, and the criterion was ruled at intake.**
+                  H10 asks for a *representative cheap* family because this is the pattern-proving
+                  slice; V3 §43 ranks by *expensive-today / high-spawn*, which the Round 5/6 profile
+                  says is F11 §11 retention (84.7s) · F6 §4 ADR (72.1s) · F5 §1 ownership (56.0s) ·
+                  F9 §10 (37.4s) — also the most complex. **Owner ruling: cheap + representative
+                  governs THIS family; §43's expensive-first governs families 2..n**, where the cost
+                  actually recovers. The profile is in hand, so the L-130 bar (do not freeze an order
+                  before evidence) is satisfied either way. Out of scope: migrating a second family,
+                  and any authority cutover
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-291 — Target by section, and refuse to claim a level from a partial run  [size: S] [risk: med] [HITL]
+      class:      execution
+      tier:       G (EPIC-014 D8 — a partial run that reports a global level is a false *assurance*,
+                  the most expensive shape of wrong answer this engine can produce)
+      done-when:  `--section N` targets that section's rules; a **partial invocation emits no global
+                  conformance level at all** (EPIC-014 § Closed-when 2, verbatim); and an unknown rule
+                  or section **fails loudly** — a named finding and a non-zero exit, never an empty
+                  result. One retained must-FAIL fixture per branch
+      touches:    apps/cli (`--section`, partial-invocation guard, unknown-target handling) ·
+                  packages/standard (whatever the guard reads) · colocated tests
+      depends-on: TASK-288
+      assumes:    **"no global level" is a property of the result, not of the printer** — if the guard
+                  lives only in the renderer, a JSON consumer later reads a level nobody meant to
+                  publish, and EPIC-014 § Closed-when 6 requires one domain result feeding both
+                  renderers. The absence/emptiness discipline SPRINT-085 T3 established by TYPE
+                  (`SpecReadFail` carries no `rows` field at all) is the shape to follow. Out of
+                  scope: the full conformance orchestrator (H12) and the JSON renderer
+      origin:     decomposer
+      state:      ready
+
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution
       done-when:  a real unattended run that stops mid-Plan leaves a rollup naming the untouched tasks
