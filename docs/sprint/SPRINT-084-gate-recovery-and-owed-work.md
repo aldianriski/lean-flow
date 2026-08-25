@@ -75,9 +75,9 @@ correctly, because writing `self-review` would have been false *and* would have 
 accepting self-review recorded in its place. Either closes it; an empty record does not.
 
 **DoD:**
-- [ ] An independent reviewer is dispatched per task, or the owner rules self-review acceptable — *Verify: the ruling or the dispatch is recorded, not narrated*
-- [ ] The outcome is written as a `review ·` line in the log — *Verify: `sh scripts/lib/check-review-depth.sh` stays green on the result*
-- [ ] No task is left with an empty record — *Verify: four tasks, four lines or one explicit ruling covering them*
+- [x] An independent reviewer is dispatched per task, or the owner rules self-review acceptable — *Verify: the ruling or the dispatch is recorded, not narrated*
+- [x] The outcome is written as a `review ·` line in the log — *Verify: `sh scripts/lib/check-review-depth.sh` stays green on the result* — **verify n/a, recorded not vacuous:** the checker skips `*/archive/*` (line 53) so it cannot read this record; the four lines were instead shape-verified by hand against its own anchored pattern (`grep -cE '^review · [^ ]+ · scoped-reviewer · behaviour:material · governance:high$'` → 4). See log, scope-change + surprise 2026-08-25
+- [x] No task is left with an empty record — *Verify: four tasks, four lines or one explicit ruling covering them*
 
 ### T3 — Align ADR-034 and ADR-036 to the ADR template `[size: S · risk: low · class: execution · HITL]`
 Layers: `docs/adr/ADR-034-semantic-compatibility-contract.md` · `docs/adr/ADR-036-severity-is-introduced-not-preserved.md`
@@ -93,9 +93,9 @@ accepted):**` § Consequences and an `| Option | Why rejected |` § Alternatives
 ADR-033 and ADR-035.
 
 **DoD:**
-- [ ] `templates/ADR.md.template` is read before either file is opened — *Verify: the template's section order is what the edit matches*
-- [ ] § Consequences and § Alternatives match the template's shapes in both files — *Verify: diff their section shapes against ADR-033/ADR-035*
-- [ ] § Decision in both stays **byte-identical** to the accepted text — *Verify: `git diff` shows no change inside § Decision; both are `status: accepted` and §4 is append-only, so a rewrite trips S4.APPEND*
+- [x] `templates/ADR.md.template` is read before either file is opened — *Verify: the template's section order is what the edit matches*
+- [x] § Consequences and § Alternatives match the template's shapes in both files — *Verify: diff their section shapes against ADR-033/ADR-035*
+- [x] § Decision in both stays **byte-identical** to the accepted text — *Verify: `git diff` shows no change inside § Decision; both are `status: accepted` and §4 is append-only, so a rewrite trips S4.APPEND*
 
 ### T4 — Exercise the absent-attestation hold against a foreign repo that has commits `[size: S · risk: low · class: execution · AFK]`
 Layers: `evals/run-foreign-repo-fixtures.sh` · `docs/research/logs/conformance-coverage.md` § Round 5
