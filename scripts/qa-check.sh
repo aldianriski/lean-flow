@@ -13,14 +13,18 @@ set -u
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 cd "$ROOT" || exit 2
 
-# START_TS/QA_BUDGET_SECONDS: TD-084's forward guard (scripts/lib/qa-budget-check.sh). Captured
-# before any leg runs so the budget covers the WHOLE default-profile invocation, not just leg 12.
-# 900s (15min) chosen with real headroom over this run's own measured total (SPRINT-084 T1: legs 1-11
-# ~100s post-fix, leg 12 ~150-250s -- so a healthy run finishes in single-digit minutes); the point of
-# this guard is catching a REGRESSION back toward TD-084's multi-minutes-per-leg shape, not shaving
-# the common case. Override with QA_BUDGET_SECONDS for a slower host or a deliberately tighter check.
+# START_TS/QA_BUDGET_SECONDS: TD-084's forward guard (scripts/lib/qa-budget-check.sh), repositioned
+# by TD-091/SPRINT-086 T3. Captured before any leg runs so the budget covers the WHOLE
+# default-profile invocation, not just leg 12.
+#
+# The default is stated AGAINST the ceiling it exists to beat, not against this repo's own measured
+# runtime (SPRINT-085's blocker, lateness path (a)): the command ceiling in this environment is 600s
+# (confirmed live -- attempt 1's 900s default only tripped the EXTERNAL ceiling, mid-leg-12, with no
+# internal verdict). Arithmetic, so the next reader can re-check this value against the ceiling
+# rather than trust a runtime estimate that drifts as legs change: 600s ceiling - 150s headroom =
+# 450s. Override with QA_BUDGET_SECONDS for a slower host or a deliberately tighter check.
 START_TS=$(date +%s)
-QA_BUDGET_SECONDS=${QA_BUDGET_SECONDS:-900}
+QA_BUDGET_SECONDS=${QA_BUDGET_SECONDS:-450}  # 600s ceiling - 150s headroom = 450s (TD-091)
 . "$ROOT/scripts/lib/qa-budget-check.sh"
 
 fail=0
@@ -28,6 +32,46 @@ pass=0
 note() { printf '      %s\n' "$1"; }
 ok()   { pass=$((pass + 1)); printf 'PASS  %s\n' "$1"; }
 bad()  { fail=$((fail + 1)); printf 'FAIL  %s\n' "$1"; }
+
+# qa-budget-default self-check (SPRINT-086 T3, TD-091): the invariant the arithmetic above states in
+# prose, checked mechanically on every run against scripts/lib/check-qa-budget-default.sh -- a comment
+# can go stale silently; this cannot (retained fixture: evals/run-qa-budget-default-fixtures.sh).
+qbd_script="scripts/lib/check-qa-budget-default.sh"
+if [ ! -f "$qbd_script" ]; then
+  bad "qa-budget-default: checker not found at $qbd_script"
+else
+  qbd_out=$(sh "$qbd_script" "scripts/qa-check.sh" 600 2>&1); qbd_rc=$?
+  qbd_msg=$(printf '%s\n' "$qbd_out" | sed -E 's/^(PASS|FAIL) //')
+  if [ "$qbd_rc" -eq 0 ]; then ok "$qbd_msg"; else bad "$qbd_msg"; fi
+fi
+
+# qb_checkpoint (SPRINT-086 T3, TD-091, lateness path (b)): qa_budget_check's ORIGINAL placement --
+# only inside the eval-harness loop at leg 12 -- fires too late under load. SPRINT-085 lowered the
+# budget below the ceiling and it STILL never fired: fork exhaustion killed the run at 100-117 output
+# lines while leg 12 does not begin until ~184 on a clean run, so the loop's own check was never
+# reached (confirmed live in THIS repo: a bare run just took 9m12s wall-clock, ~84% of its 218 lines
+# printed before leg 12 even starts). These checkpoints reuse the SAME sourced function at leg
+# boundaries THROUGHOUT legs 2-11, so an over-budget run is caught wherever the overrun actually
+# accumulates -- not only after it's too late to matter. Deliberately a HARD exit, not a soft skip
+# like leg 12's own loop below: TD-084's stated goal is "stops running further skippable work", and
+# at this point NOTHING past the checkpoint is safe to keep running under the same pressure that
+# tripped it. The name carries "-early" so a reader (and the fixtures) can tell this checkpoint fired
+# from leg 12's own, later one.
+qb_early_tripped=0
+qb_checkpoint() { # <leg-label>
+  [ "$qb_early_tripped" -eq 1 ] && return 0
+  qb_out=$(qa_budget_check "$START_TS" "$QA_BUDGET_SECONDS" "${QA_FULL:-0}")
+  case "$qb_out" in
+    OVER*)
+      qb_early_tripped=1
+      qb_elapsed=$(printf '%s' "$qb_out" | cut -d' ' -f2)
+      bad "qa-check-budget-exceeded-early: ${qb_elapsed}s elapsed exceeds the ${QA_BUDGET_SECONDS}s default-profile budget, reached at checkpoint '$1' -- BEFORE leg 12's eval-harness loop. Every leg from here on, including all eval harnesses, is skipped and reported here rather than run past an external timeout with no verdict line (TD-084, TD-091). Set QA_BUDGET_SECONDS to raise the budget, or QA_FULL=1 to lift it for a full run"
+      printf '\n----------------------------------------\n'
+      printf 'QA-CHECK: %s pass, %s fail\n' "$pass" "$fail"
+      exit 1
+      ;;
+  esac
+}
 
 # --- 1. Line caps (STANDARD section 2) ------------------------------------
 cap() { # <file> <maxlines>
@@ -50,6 +94,7 @@ printf '%s\n' "$doccaps"
 pass=$((pass + $(printf '%s\n' "$doccaps" | grep -c '^PASS' || true)))
 [ "$doccaps_rc" -eq 0 ] || fail=$((fail + $(printf '%s\n' "$doccaps" | grep -c '^FAIL' || true)))
 
+qb_checkpoint "leg 2: count consistency"
 # --- 2. Count consistency (claims-vs-disk) ----------------------------------
 # Delegates to a retained checker (scripts/lib/check-count-claims.sh, itself covered by
 # evals/run-count-claims-fixtures.sh). Extracted at SPRINT-055 T1: the block was inline and bound to
@@ -74,6 +119,7 @@ else
   fi
 fi
 
+qb_checkpoint "leg 2b: epic retention"
 # --- 2b. Epic retention (STANDARD section 11, both directions) -------------------------------
 # The §11 epic-archive row shipped with the epic layer and `close` never executed it, so the rule
 # had never run once: EPIC-001 sat closed and fully ticked in docs/epic/ across five sprints with
@@ -99,6 +145,7 @@ else
   fi
 fi
 
+qb_checkpoint "leg 2c: research retention"
 # --- 2c. Research retention (STANDARD section 11) ---------------------------------------------
 # close's compaction sweep pointed at an "or archive" target §11 never defined (SPRINT-055 T3).
 # Delegates to scripts/lib/check-research-archive.sh, covered by evals/run-research-archive-
@@ -122,6 +169,7 @@ else
   fi
 fi
 
+qb_checkpoint "leg 2d: ephemeral intake"
 # --- 2d. Ephemeral intake artifacts (STANDARD section 2 temp-dir rule) -------------------------
 # A BUG-<slug>.md report is temp-dir intake scaffolding, never committed (SPRINT-055 T4). §2 used to
 # describe the report's CONTENT as "routed away at /triage" and say nothing about the file, so
@@ -145,6 +193,7 @@ else
   fi
 fi
 
+qb_checkpoint "leg 2e: task origin"
 # --- 2e. Task origin (G1 fast-path provenance) --------------------------------------------------
 # G1 fast-paths a "decomposer-approved task"; until SPRINT-055 T6 no field recorded whether a task
 # had met the intake grill, so the clause was unverifiable prose and a close-Retro follow-up looked
@@ -168,6 +217,7 @@ else
   fi
 fi
 
+qb_checkpoint "leg 2f-bis: §13 attestation"
 # --- 2f-bis. §13 attestation -- now READ OUT OF the engine run below, not run separately ----------
 # SPRINT-078 T1. This leg used to invoke scripts/lib/check-attestation.sh as its own process. That
 # file is gone: its five assertions moved into scripts/lib/conformance-engine.sh, finding text
@@ -186,6 +236,7 @@ fi
 #
 # The extraction lives in 2f-ter with the run that produces it; this comment is the record of why.
 
+qb_checkpoint "leg 2f-ter: conformance engine sweep"
 # --- 2f-ter. The conformance engine, run against THIS repo -- mostly informational, not yet gating -
 # SPRINT-075 T2. "This repo becomes its own first consumer" -- so the engine runs here, against `.`,
 # on every gate, and its full report is relayed exactly like every other leg's. Almost all of that
@@ -275,6 +326,7 @@ else
   note "conformance engine: informational except the two FULLY-COVERED families -- S9.GATESWELLFORMED/S9.GATESABSENT and §13's five (exit $ce_code overall; $gs_pass gates-signed PASS / $gs_fails FAIL and $at_pass §13 PASS / $at_fails §13 FAIL folded into this gate's own tally) -- see the comment above this leg for why the rest is not; ran against $ce_mode"
 fi
 
+qb_checkpoint "leg 2g: recorded-run rollup"
 # --- 2g. A recorded completed run carries its rollup ---------------------------------------------
 # A headless sprint-bulk loop can end mid-Plan and still exit `success` -- 4 of 7 units on a
 # consumer's host, every commit correct, three tasks never begun and nothing written about them.
@@ -312,6 +364,7 @@ else
   fi
 fi
 
+qb_checkpoint "leg 2b(review-depth): review depth"
 # --- 2b. Review depth follows consequence, not file type (SPRINT-082 T2) ----
 # review-scoping.md § Two dimensions re-keyed review depth onto consequence. This is the enforcement
 # half: a `self-review` recorded against governance:high or behaviour:material is a finding, and an
@@ -347,6 +400,7 @@ else
   fi
 fi
 
+qb_checkpoint "leg 2c-bis: mechanical Verify"
 # --- 2c-bis. A mechanical Verify: must reach the criterion it claims (SPRINT-082 T3) -------------
 # S9.VERIFYCLAUSE asks whether a ticked criterion NAMES a method; it passes on a method that cannot
 # examine its own subject, and unreachable reads exactly like satisfied (L-136 x4). This screens the
@@ -376,6 +430,7 @@ else
   fi
 fi
 
+qb_checkpoint "leg 3: frontmatter/ownership"
 # --- 3. Frontmatter / ownership presence ------------------------------------
 has_field() { grep -qE "^$2:" "$1"; }
 
@@ -399,6 +454,7 @@ else
   note "skip (missing): README.md"
 fi
 
+qb_checkpoint "leg 4: knowledge metadata / corpus walk"
 # --- 4. Knowledge metadata: index freshness + dangling refs + completeness (ADR-009) --
 # Covers the whole corpus: LEARNINGS (in-file `## L-NNN` entries) + per-file frontmatter on
 # docs/adr/*.md and docs/research/*.md. Vocab (tags/domains) sourced from gen-index.sh (single origin).
@@ -542,6 +598,7 @@ else bad "corpus dangling refs:$cdang"; fi
 if [ -z "$cmeta" ]; then ok "corpus metadata complete (id+tags+domain+status, known vocab)"
 else bad "corpus metadata:$cmeta"; fi
 
+qb_checkpoint "leg 5: TODO.md hygiene"
 # --- 5. TODO.md hygiene: no shipped-task breadcrumb comments (D1, SPRINT-024) ----------
 # Scoped to HTML comment lines only — live task prose (done-when/decision fields) legitimately
 # references sprint/changelog numbers and must never false-positive.
@@ -553,6 +610,7 @@ else
   note "skip (missing): TODO.md"
 fi
 
+qb_checkpoint "leg 6: README footer version lint"
 # --- 6. README footer version lint (footer vX.Y.Z == plugin.json version) --
 if [ -f README.md ] && [ -f .claude-plugin/plugin.json ]; then
   footer=$(grep -E '^<sub>.*status:.*v[0-9]+\.[0-9]+\.[0-9]+</sub>$' README.md | tail -n1)
@@ -589,6 +647,7 @@ else
   fi
 fi
 
+qb_checkpoint "leg 7: TD aging"
 # --- 7. TD aging: open TD >=3 sprints behind Active Sprint, no re-review ----
 if [ -f TODO.md ]; then
   active=$(awk '/^## Active Sprint/{f=1;next} /^## /{f=0} f' TODO.md)
@@ -613,6 +672,7 @@ else
   note "skip (missing): TODO.md"
 fi
 
+qb_checkpoint "leg 8: temp-tracker lint"
 # --- 8. Temp-tracker lint: TODO.md tracker: lines ---------------------------
 if [ -f TODO.md ]; then
   trkbad=$(grep -E '^ *tracker:' TODO.md | while IFS= read -r tl; do
@@ -628,6 +688,7 @@ else
   note "skip (missing): TODO.md"
 fi
 
+qb_checkpoint "leg 9: QA.md hygiene"
 # --- 9. QA.md hygiene: no hand-written live cap snapshot --------------------
 # Checked over a sliding 2-line window so a prose-wrapped "currently ... NN/MM" (the
 # clause split across a line break) is still caught, not just a same-line match.
@@ -639,6 +700,7 @@ else
   note "skip (missing): docs/QA.md"
 fi
 
+qb_checkpoint "leg 10: L-NNN citation lint"
 # --- 10. L-NNN citation lint: skills/ cites must resolve or be labeled -----
 # Every L-0[0-9][0-9] cited under skills/ must (a) exist as a docs/LEARNINGS.md entry heading,
 # (b) fall inside the LEARNINGS.md Retired-ids ledger range, or (c) have "promoted" on the
@@ -664,6 +726,7 @@ else
   note "skip (missing): docs/LEARNINGS.md"
 fi
 
+qb_checkpoint "leg 11: active-sprint task schema"
 # --- 11. Active-sprint task schema: class + autonomy + Depends-on mandatory (TASK-110) -----
 # Every `### Tn` Plan block in an ACTIVE sprint (status: active) must carry: class: (one of the
 # three values) + an autonomy tag (HITL|AFK) in its header meta · a `Depends-on:` line ·
@@ -704,6 +767,7 @@ PLANEOF
   check_block
 done
 
+qb_checkpoint "leg 12: eval-harness preamble"
 # --- 12. Zero-API eval harnesses wired into the gate (TD-013, split TD-016/SPRINT-042 T4) ---
 # TD-012 retained fixtures + assertion scripts for shipped snippets/checks, but nothing ran them
 # automatically -- TD-013 named that gap. Only the zero-API harnesses belong here: qa-check is fast
@@ -760,8 +824,17 @@ done
 # run-qa-budget-fixtures.sh (SPRINT-084 T1, TD-084) joins the always-on set by the original cost
 # rule: no git, no mktemp, three calls to a sourced function against synthetic timestamps -- measured
 # well under a second. It guards this leg's own budget mechanism below, not a repository property.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh"
-eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh"
+# run-qa-budget-default-fixtures.sh (SPRINT-086 T3, TD-091) joins the always-on set by the same
+# rule: no git, one mktemp -d, pure text (sed/grep) against copies of this script -- no real
+# qa-check.sh execution. It guards lateness path (a): the default budget vs the command ceiling.
+eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh"
+eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh"
+# run-qa-budget-position-fixtures.sh (SPRINT-086 T3, TD-091) joins the opt-in set by the cost rule,
+# not the git rule -- it builds no repos, but it DOES invoke real copies of qa-check.sh (bounded by
+# `timeout`) to prove where the budget checkpoint is actually reached, which this repo's own
+# legs 1-11 alone can cost minutes under load (measured live: a bare run took 9m12s here, leg 12
+# starting at ~84% of its output). Opt-in because the always-on set stays cheap-and-git-free by the
+# rule above, and this harness is neither.
 # run-attestation-fixtures.sh (SPRINT-074 T2, TASK-228) joins the opt-in set by the same rule: it
 # builds 6 throwaway repos via mktemp -d + git init, measured at ~2s on this host. Real git history
 # is not optional -- §13 is DEFINED over git objects (trailers, parent count, %G?), and a merge
