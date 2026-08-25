@@ -162,3 +162,34 @@ rests on a non-trivial number rather than on a zero that could equally mean the 
 
 **No TS/Shell difference was found**, and that is recorded here explicitly because EPIC-014 D2 requires a
 difference to be *ruled* — the absence of one is itself the record, not a silence.
+
+### 2026-08-25 | progress | T7 — ruled **amended, not superseded**, and the reasoning is the deliverable
+`docs/research/qa-gate-timing.md` corrected in place, `status: current` kept. The choice mattered:
+ADR-020's `superseded ⇒ FROZEN` convention is for a **spent** verdict whose only future is archival.
+This one is not spent — its own `update_trigger` ("a new measurement changes the recommendation") is
+precisely what fired, and the question is demonstrably live (TD-090's leg 12 at ~396s is unprofiled, and
+Rounds 4 and 5 disagree with nothing resolving them). Freezing it would have stranded an open
+investigation; amending keeps one live home for the next round.
+
+**The supersession is scoped, not wholesale** — which was the constraint most likely to be got wrong.
+The coverage-reduction ruling **stands** and is stated as standing (*"The proposed lever — coverage
+reduction — is the wrong one; that ruling stands"*). What changed is that a lever the doc never
+considered turned out to be the answer: Option **E — reduce spawn count, not coverage** is added,
+marked found-and-applied at Round 4 and incomplete per Round 5. Option C is annotated *superseded by its
+own success*, "not because the caution was wrong".
+
+**The Round 4 / Round 5 disagreement is carried into the doc in three places** rather than smoothed
+into a single number: Verdict, Findings and Recommendation, with the instruction *"Treat the
+spawn-count cost picture as open"* and an explicit refusal to let it read as closed a second time.
+Round 5's ranked candidates and TD-090 are named as the actionable next step **without one being
+chosen** — that stays Sprint C's G2 call (V3 §43 · D6).
+
+**Citing set checked before ruling, not after:** every live reference to this doc
+(`knowledge-index.md`, L-106, two archived sprints, `spec/STANDARD.md`, this sprint) points at
+*structural* facts — its size, its log split, its existence — and **none depends on the Recommendation's
+substance**. Nothing is stranded by the amendment. Had any depended on it, `superseded` would have been
+the wrong call for a different reason than the one that decided it.
+
+Verified by the coordinator: `check-doc-caps.sh` prints `PASS cap docs/research/qa-gate-timing.md
+(130 <= 130)` — exactly at the cap after two trimming passes — and `docs/knowledge-index.md` is
+genuinely unchanged (`git diff --quiet`), matching the claim that only `last_updated` moved.

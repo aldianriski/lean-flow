@@ -160,9 +160,9 @@ Sequenced after T5 so the ruling is made with Round 5 in hand, not against a hal
 or marked superseded with a pointer to the rounds that overturned it.
 
 **DoD:**
-- [ ] The Recommendation is amended or marked superseded, with a pointer to § Round 4 and § Round 5 — *Verify: read the doc; a reader cannot act on the stale conclusion*
-- [ ] The scope of the supersession is stated precisely — coverage-reduction was ruled out correctly and is **not** reversed — *Verify: the amendment distinguishes the two levers rather than reversing the doc wholesale*
-- [ ] The index is regenerated if metadata changed — *Verify: `sh scripts/gen-index.sh`*
+- [x] The Recommendation is amended or marked superseded, with a pointer to § Round 4 and § Round 5 — *Verify: read the doc; a reader cannot act on the stale conclusion*
+- [x] The scope of the supersession is stated precisely — coverage-reduction was ruled out correctly and is **not** reversed — *Verify: the amendment distinguishes the two levers rather than reversing the doc wholesale*
+- [x] The index is regenerated if metadata changed — *Verify: `sh scripts/gen-index.sh`*
 
 ## Owner-action checklist
 - [ ] **Reinstall the plugin** — carried forward unaddressed from SPRINT-084. This session primed at base-dir **1.55.0** against a **1.57.1** repo. `lean-doc-generator` was verified byte-identical across that gap so this promote is unaffected, but no other skill is covered by that check (L-021).
