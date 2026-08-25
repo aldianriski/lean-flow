@@ -300,3 +300,32 @@ re-reviewed. In both cases the reviewer found something the author did not, havi
 
 consequence · T1 · behaviour:material · governance:low
 review · T1 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low
+
+### 2026-08-25 | progress | T6 — permission-denied reports `spec-table-unreadable`, not `spec-not-found`
+
+New boundary adapter `apps/cli/src/spec-file-reader.ts`; `packages/standard/src` untouched, as DoD 2
+requires. `attemptRead()` branches **only** on `code === "ENOENT"` → the domain's existing pure
+`specNotFound()`; every other failure becomes "present but nothing readable" and feeds empty content
+into `readAll()`, which already classifies zero rows as `spec-table-unreadable`. No new domain logic —
+it reuses the path an empty-but-readable spec takes.
+
+**The premise in the task title turned out to be half wrong, and finding that out was the work.** Shell
+never reported `spec-not-found` for a permission-denied spec: `read-spec-rules.sh`'s `[ -f "$spec" ]`
+passes for an unreadable regular file, `awk` then fails with stderr swallowed (`2>/dev/null`), zero
+rows result, and the oracle says `spec-table-unreadable`. The conflation was on the TS side only.
+Verified by running the real script against a genuinely denied file rather than reasoning from its
+source.
+
+**Two platform findings that would each have produced a silently vacuous pass.**
+`chmod 000` **does not deny read** on this Windows/git-bash host — verified live (`ls -la` showed
+`r--r--r--`, `cat` succeeded at exit 0). A real denial needed `icacls <file> /deny` with an explicit
+NTFS DENY ACE, which wins over the inherited ALLOW. Had the fixture used `chmod`, the permission-denied
+test would have asserted a branch it never reached and passed. Second: Bun/Node surface the denial as
+**`EPERM`, not the POSIX-canonical `EACCES`** — so the adapter's "is it ENOENT" shape is load-bearing;
+an allow-list of `EACCES` would have mis-classified every case on this platform. Both were caught only
+because the fixture's denial was checked *before* anything was built on it.
+
+Full suite `130 pass, 0 fail`. Commit `f8ef4aa`. **DoD not ticked — review pending.**
+
+consequence · T6 · behaviour:material · governance:low
+review · T6 · independent-adversarial-reviewer (worktree-isolated) · behaviour:material · governance:low
