@@ -90,3 +90,99 @@ round and Round 1, and it is the whole reason the row was parked on a *condition
   new `attestation-absent` hold never fires for it. A git-backed adopter carrying no trailers *does*
   now collect that line — held at Gated, never failed, exit code unmoved. Untested against a foreign
   repo *with* commits; that is Round 5's question if anyone asks it.
+
+## Round 5 — does the absent-attestation hold actually fire on a foreign repo with real commits? (SPRINT-084 T4 · 2026-08-25)
+
+**The question Round 4 named and did not answer.** SPRINT-081 T4 added the `attestation-absent` hold;
+T3 could not exercise it, because the stranger it had to work with is four `printf`s with no
+`git init` — §13 reports `not evaluated` for a tree with no git-dir, which is a *different* branch
+from the hold and proves nothing about it. The rule is exercised against this repository and by
+`run-attestation-fixtures.sh`'s hand-built throwaway repos; neither is the **consumer path** L-016
+names — an adopter's tree, never one we shaped to already agree with the standard.
+
+**A second target, not `git init` on the existing one.** `evals/run-foreign-repo-fixtures.sh` gained
+`acme-widget-vcs` alongside the original `acme-widget`, built to the *same* fully-remediated shape
+(plus two files the original's own remediation block does not add — a README ownership footer and
+§6's Base doc set — see below) and then turned into a real one-commit git repository with a plain
+`chore:` message carrying none of `Gate-Signed-By:` / `Gate:` / `Evidence:`. Kept separate so the
+original target's own four assertions — the four-file invariant, the actionable-findings sweep, the
+every-finding-clears remediation — stay exercised exactly as Round 4 left them, undisturbed by git
+history or two more remediation files landing on top.
+
+**Why the target had to reach full remediation first, not just "no lean-flow convention."**
+`conformance-engine.sh`'s level line checks `struct_fail` / `gated_fail` / `attested_fail` **before**
+it ever consults a hold — one unrelated `FAIL` anywhere and the report never reaches far enough down
+the ladder to say `level: Gated`, regardless of what §13 found. Building `acme-widget-vcs` at the
+original stranger's remediation state and running the engine on it (still pre-`git init`) surfaced
+two `FAIL` lines the original's own narrower regex-based sweep does not catch and so has carried,
+unnoticed, since Round 4: `S2.R-README` (`readme-ownership-footer-missing`) and `S6.BASE`
+(`tier-doc-set-incomplete` ×2, `docs/product/requirements.md` and `acceptance-criteria.md`). **Not
+filed here** — `docs/research/conformance-dispositions.md` and `TECH-DEBT.md` are outside T4's
+declared `Layers:`, and this round only fixed the two on `acme-widget-vcs` (needed for its own
+precondition, see below) — recorded as a surfaced-but-unrouted finding for whoever next touches
+either file: the original `acme-widget` target's `every-finding-is-actionable-and-clears` assertion
+has read `-z "$left"` as PASS since Round 4 while these two `FAIL` lines sat in its own output,
+because its extraction regex (`^FAIL  [a-z-]*: `) only matches the bare-kebab-id `bad()` calling
+convention and silently skips the `S<N>.<CODE>` one both of these use.
+
+### The result
+
+**Both DoD legs hold, measured directly.**
+
+1. `attestation-absent` fires. `S13.TRAILERS` reports `attestation-absent: none of the three
+   trailers is present, so this repository claims no attestation and has not reached Attested` against
+   the real HEAD commit.
+2. The level line reads `level: Gated -- 1 finding(s) at Attested prevent Attested, the next level.
+   None is a failure...` — never `level: Attested`, which is exactly the false certification L-159
+   caught this same branch making on *this* repository before SPRINT-081 T2 cleared it.
+3. **Exit code unmoved — proven as an A/B on the byte-identical tree, not asserted from the code
+   alone.** `acme-widget-vcs` was measured twice: once **before** `git init` (§13 falls through to
+   `not evaluated` on every rule, so nothing enters `struct_hold`/`gated_hold`/`attested_hold`, and the
+   ladder's final `else` fires — `level: Attested`, over a tree making no claim at all, the exact
+   Round-4-footnoted risk) and once **after** the one real commit (the hold fires, `level: Gated`). The
+   only variable between the two runs is the presence of git history; every file on disk is identical.
+   `rc_before` = 0, `rc_after` = 0 — equal, and both zero. The hold moved the *level* claim from a false
+   `Attested` to an honest `Gated`; it moved the exit code nowhere, matching the engine's own comment at
+   `conformance-engine.sh` §13 (`hold()` calls `note()` only — `bad()`, the only site that sets
+   `fail=1`, is never reached on this path).
+
+No surprise landed here: the hold fires exactly as SPRINT-081 T4 designed it, at the level and exit
+code the code already claimed for itself. What Round 5 adds is that this is now **measured on a
+foreign tree with real history**, not read off the code or off this repository's own commits.
+
+### Discrimination proof (Tier G, ADR-029)
+
+`evals/run-foreign-repo-fixtures.sh` is an eval harness, Tier G by name. The two new `run_case_anywhere`
+assertions were seeded, not trusted on a first green run: `attestation-absent-against-real-history`'s
+expected substring was swapped for `attestation-not-real-seeded-break` (guaranteed absent from the
+engine's real output), and the suite re-run.
+
+- **Seed landed** — `cmp` against a pristine copy differed at byte 17984 / line 246, the exact edited
+  line.
+- **Parses** — `sh -n` clean.
+- **Targeted** — line count unchanged (276 = 276 pristine); assertion-label count unchanged (10 = 10:
+  8 literal `fixture(...)` echoes + 2 `run_case_anywhere` calls).
+- **Reddened, sibling green** — `FAIL fixture(attestation-absent-against-real-history)` was the only
+  new failure. Its sibling in the same block, `attestation-absent-caps-at-gated`, stayed `PASS`,
+  as did `attestation-absent-precondition`, `attestation-absent-exit-code-unmoved`, and all six
+  pre-existing assertions from Round 4's target — proving the seed was localized, not a suite-wide
+  break masquerading as a targeted one.
+- **Restored** — edit reverted; `cmp` against the pristine copy reports byte-identical, `sha256sum`
+  matches (`9f538915fba8...`), and a final re-run is all-green (10/10).
+
+### What this round does not claim
+
+- **The two `S6.BASE` doc rows and the `S2.R-README` footer were added to `acme-widget-vcs` only.**
+  The original `acme-widget` target is untouched (per D-above) and so still carries the same two
+  unnamed `FAIL` lines Round 5 found while building this target's precondition state. Not routed to
+  `docs/research/conformance-dispositions.md` or `TECH-DEBT.md` — both outside T4's `Layers:` — so
+  this stays a named-but-unrouted finding in this log until someone with those files in scope acts
+  on it.
+- **Only the `attestation-absent` branch is exercised here.** `attestation-unsigned-claim-only`,
+  `attestation-trailers-incomplete`, `attestation-not-on-task-commit`, `evidence-path-unpinned` and
+  `attestation-disagrees-with-sprint` are already covered by `run-attestation-fixtures.sh`'s five
+  hand-built cases; this round adds the one branch that suite cannot reach (a *foreign* tree) and does
+  not re-derive the other four there.
+- **One commit, one target.** Not a claim about every shape a foreign repository's history could take
+  (merge commits, multiple contributors, a rewritten history) — only that the specific gap Round 4
+  named (no git at all) is closed.

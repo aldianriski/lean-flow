@@ -142,3 +142,34 @@ first pass — evidence against an automated equivalent, not for one), and "all 
 each carries a distinct falsifiable unblock condition rather than a shared hedge.
 
 `check-doc-caps.sh` printed `PASS cap docs/research/harness-delta.md (101 <= 130) [§2]`. Index regenerated.
+
+### 2026-08-25 | progress | T4 — the absent-attestation hold fires against a foreign repo with real history
+Added a **second** target (`acme-widget-vcs`) alongside the existing git-less stranger rather than
+`git init`-ing the original: the original's four-file invariant, actionable-findings sweep and
+every-finding-clears remediation are already green, and layering history plus remediation files onto it
+would have silently changed what those assertions measure. The new target is built to the same
+fully-remediated shape, `git init`-ed, and committed once with a plain `chore:` message carrying none of
+§13's three trailers.
+
+Harness read directly, its own call — **10 of 10 PASS**, including the three the DoD names:
+`attestation-absent` reported · `level: Gated -- 1 finding(s) at Attested prevent Attested` ·
+**exit code unmoved**, asserted as an A/B on the byte-identical tree: `0` before git history existed
+(§13 `not evaluated`, falling through to a false `level: Attested`) and `0` after the hold fires. That
+assertion is better than the DoD asked for — it pins the **L-159 bug shape** in the "before" state and
+shows the hold corrects the *level claim* while never touching the exit code.
+
+This is consumer-path coverage, the thing dogfooding structurally cannot check here (L-016): the rule was
+already exercised against *this* repository, never against a foreign tree.
+
+**Discrimination proof (Tier G):** seeded a substring swap on `attestation-absent-against-real-history`;
+`cmp` confirmed the seed landed (line 246), `sh -n` parsed clean, line count unchanged (276=276) and
+assertion count unchanged (10=10) — a targeted break, not a demolition. The seeded case reddened while
+its sibling `attestation-absent-caps-at-gated` and all 8 pre-existing assertions stayed green. Restored
+and verified byte-identical by `cmp` **and** `sha256sum`.
+
+**Surprise, recorded unrouted.** Building the precondition surfaced that the *original* stranger's
+fully-remediated state still carries **2 unnamed FAIL lines** (`S2.R-README` footer · `S6.BASE` two doc
+rows) which Round 4's sweep cannot see: its regex `^FAIL  [a-z-]*: ` matches the bare-kebab finding
+convention, and these use `S<N>.<CODE>`. So a coverage sweep reported clean over findings it could not
+match — L-108's shape again, in the sweep rather than in a guard. Left unrouted because it is outside
+T4's `Layers:`; belongs in the close buckets, not absorbed here.
