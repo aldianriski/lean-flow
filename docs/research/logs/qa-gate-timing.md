@@ -615,3 +615,151 @@ family is chosen, since real-scale cost and per-invocation cost do not rank the 
   beyond ruling out bash function-call overhead as the cause.** Left as an open, named observation
   rather than a resolved mechanism — consistent with this file's own practice of recording what was
   seen even when the why is incomplete.
+
+---
+
+## Round 6 — the S11 pair reproduces a third way; leg 12 and the engine sweep are disjoint (SPRINT-086 T1, 2026-08-25)
+
+Two disagreements were referred here at promote. **(1)** Round 4's arithmetic implies ≤4s for its
+entire unnamed dispatched-rule remainder, of which `S11.LOGPAIR` + `S11.WHENITRUNS` are an unmeasured
+subset; Round 5 measured those two rules alone at 76.1s combined, twice (embedded in a 45-rule run and
+isolated via a `QAT_ONLY` env filter, agreeing within 0.7%). **(2)** TD-090 (Round 4) reports leg 12
+(eval harnesses) at 396.3s of a 492s run; Round 5 reports "the conformance engine" at 281.2s
+(dispatched-rule sum) / 287.4s (wall clock) real-scale. Both are settled below, neither by re-running
+either round's method verbatim (already done twice each) but by a **third, independently-implemented
+check** on each: for (1), a `--spec`-reduction rerun (the mechanism `qa-check.sh`'s own leg 2f-ter
+uses, not Round 5's `QAT_ONLY` filter); for (2), reading what leg 12's own harnesses actually invoke.
+
+**Method (1) — spec-reduced isolation, third method, this repository, single sample.** Built a 2-row
+spec file (`awk '/^\| \`S11\.LOGPAIR\`/ || /^\| \`S11\.WHENITRUNS\`/ { print; next } $0 !~ /^\| \`S[0-9]/
+{ print }' spec/STANDARD.md`, output verified to contain exactly those two `S`-prefixed rows) under the
+scratch temp dir, outside the repo. Confirmed no commit has touched `scripts/lib/conformance-engine.sh`
+since `a5feb8a` (SPRINT-081) — well before both Round 4 (SPRINT-084) and Round 5 (SPRINT-085), so the
+code both rounds measured is still the code measured here. Ran `sh scripts/lib/conformance-engine.sh .
+--spec <reduced-spec>` once against this repository, timed by `date +%s%N` immediately before and after
+the call (not internal instrumentation — nothing in `scripts/` or `evals/` was touched, read-only run).
+
+**Method (2) — read what leg 12 dispatches.** `qa-check.sh`'s `eval_harnesses_always` (24 harnesses) was
+read in full; the 9 that reference `conformance-engine.sh` (`run-conformance-engine-fixtures.sh`,
+`run-adr-family-fixtures.sh`, `run-foreign-repo-fixtures.sh`, `run-gates-signed-fixtures.sh`,
+`run-ownership-header-fixtures.sh`, `run-s2-placement-fixtures.sh`, `run-spec-reader-fixtures.sh`,
+`run-sprint-family-fixtures.sh`, plus opt-in `run-attestation-fixtures.sh`) were grepped for their
+target: every one builds its own `mktemp -d` throwaway git repo and points the engine at that, never at
+this repository. Separately, `scripts/qa-check.sh:225-260` (leg 2f-ter's own source) was read: on the
+default profile (no `QA_FULL`) it hands the engine a **7-rule reduced spec**
+(`S9.GATESWELLFORMED`/`S9.GATESABSENT` + `S13`'s five) against target `.` (this repo), costing the
+1.9–5s Round 4 already measured post-fix; the **full** ~100-row spec against `.` only runs under
+`QA_FULL=1` — a profile setting, not the default 492s run TD-090 cites.
+
+### (1) S11.LOGPAIR + S11.WHENITRUNS, three independent measurements
+
+| Method | `S11.LOGPAIR` | `S11.WHENITRUNS` | combined | vs. Round 4's implied ≤4s |
+|---|---:|---:|---:|---:|
+| Round 5 — embedded in full 45-rule dispatch | — | — | 75,578.1 ms | ~19× |
+| Round 5 — isolated, `QAT_ONLY` env filter | 31,947.1 ms | 44,137.7 ms | 76,084.8 ms | ~19× |
+| **Round 6 — isolated, `--spec` reduction (this round)** | — | — | **66,850.8 ms** | **~16.7×** |
+
+Round 6's figure is a single external wall-clock sample around the whole `sh … --spec …` call (process
+start to exit), not a per-rule breakdown, so it is not directly comparable line-for-line to Round 5's
+per-rule split — it is comparable to Round 5's **combined** figure, which it reproduces within 12%
+(66.9s vs. 76.1s), inside the run-to-run drift band this log's own rounds already establish (Round 5
+recorded `S4.NEGATIVE` swinging 76% and `S6.BASE` 75% between Round 4 and Round 5 on unrelated rules).
+Output was read, not just timed: both rules dispatched and reported `PASS`, scanning 85 archived
+sprints, consistent with Round 5's 83 and Round 4's smaller pre-growth corpus — no coverage or dispatch
+anomaly in this reduced-spec path.
+
+### (2) leg 12 (TD-090) vs. the conformance-engine real-scale sweep (Round 5) — composition
+
+| Quantity | What it measures | Target | Profile | In the 492s run TD-090 cites? |
+|---|---|---|---|---|
+| leg 12, 396.3s (TD-090) | 24 always-on eval harnesses; 9 touch the engine, each against **throwaway `mktemp` fixture repos** | fixture repos, never this repo | default (`QA_FULL` unset) | **yes** — this is what TD-090 measured |
+| conformance engine, 281.2s sum / 287.4s wall (Round 5) | one direct full-spec (~100-row) engine invocation | `.` (this repository) | full spec — only reachable via `QA_FULL=1` or a standalone call | **no** — the 492s run's own leg 2f-ter costs 1.9–5s on the reduced 7-rule spec |
+
+### Findings
+
+- **The S11.LOGPAIR/WHENITRUNS disagreement reproduces a third time, by a third method, and does not
+  dissolve.** 66.85s (this round, `--spec` reduction) sits with Round 5's two figures (75.6s embedded,
+  76.1s `QAT_ONLY`-isolated) and against Round 4's implied ≤4s for its *entire* unnamed ~35-rule
+  remainder — three measurements, two independently-built isolation mechanisms, one order of magnitude
+  apart from Round 4's figure, on code unchanged since before either round ran.
+- **Round 4 is the wrong one, and the cause is named: its "~4s" was never a measurement of these two
+  rules — it is an arithmetic residual that omitted them from what got individually reported.** Round
+  4's own §Method (2) instrumented the *identical* rule-dispatch loop Round 5 later used to name
+  `S11.LOGPAIR`/`S11.WHENITRUNS` explicitly — the capability to see these two rules was present in Round
+  4's own run. Round 4's write-up named 10 of ~45 dispatched rules from that instrumentation and folded
+  everything else into "176.6s leg total − 57.16s `_own_scan` − 29.39s `S4.APPEND` = ~90s, of which 8
+  named rules summed to ~86.0s" — leaving "≤4s" as what was left over for the unnamed remainder,
+  *including* these two, never as a claim about them specifically. Round 4's own text already flagged
+  this as partial ("only some" families named, spawn counts "a lower bound") — this round's contribution
+  is confirming, by an independent measurement, that the omitted remainder was not small.
+- **"Both are plausible" is ruled out, not just avoided**: Round 4's 176.6s leg-total figure is not in
+  dispute (see next finding) — only its *decomposition*, specifically the unstated assumption that the
+  ten named rules plus `_own_scan`/`S4.APPEND` accounted for nearly all of the leg, which three
+  measurements now show is false for this pair alone.
+- **leg 12 and the conformance-engine real-scale sweep do not measure overlapping work — they are
+  disjoint by target, and disjoint by profile.** Every eval harness that invokes the engine builds its
+  own throwaway `mktemp` repo; none targets this repository. The engine's full-spec sweep against this
+  repository (Round 5's 281.2s/287.4s) only runs under `QA_FULL=1`, a profile the 492s run TD-090
+  measured does not set — that run's own leg 2f-ter uses the 7-rule reduced spec, at 1.9–5s. `396.3 +
+  281.2 = 677.5s`, which does not fit inside a 492s run — consistent with the two figures never having
+  been part of the same run rather than one containing the other. Neither round's number is wrong; they
+  describe non-overlapping executions under different settings.
+- **A secondary, genuinely unreconciled gap is named rather than smoothed over.** Round 4's leg 2f-ter
+  pre-fix total (176.6s, one sample, full spec, this repo, measured externally via `qa-check.sh`'s own
+  section markers — confirmed a complete measurement, not extrapolated: the pre-fix run was killed
+  *mid-leg-12*, after 2f-ter had already finished) and Round 5's full-engine wall clock for what should
+  be the same operation (287.4s, one sample, same code, comparable corpus) disagree by 110.8s (63%).
+  This is ruled OUT as an alternative explanation for the S11-pair disagreement — a uniform 1.63× scale
+  of a genuine ~4s Round-4 figure would land near 6.5s, not the 66–76s measured three times — but it is
+  a real, separate gap between two single-sample totals that this task did not chase further (out of
+  scope: T1 settles the named disagreement and the leg-12/engine overlap question, not every total in
+  the log). Flagged for whoever next re-measures leg 2f-ter's full-spec cost end to end.
+
+### Restated ranking (post-verdict)
+
+**Unchanged from Round 5, strengthened, not corrected.** The verdict above confirms Round 5's numbers
+rather than revising them, so the family ranking T2 inherits is Round 5's own, restated by name:
+
+1. F11 — §11 retention (`S11.LOGPAIR` + `S11.WHENITRUNS`) — 84,715.6 ms
+2. F6 — §4 ADR governance — 72,134.5 ms
+3. F5 — §1/§3 ownership-header (`S1.LAW2`) — 56,017.5 ms
+4. F9 — §10 learning-governance (`S10.TDAGING`) — 37,443.8 ms
+
+(top four = 89% of the real-scale total; the remaining eight families sum to 30,855.2 ms / 11%, per
+Round 5's table — unchanged here, not re-measured this round.)
+
+leg 12 (TD-090) is **not part of this ranking** — it costs the gate through a different mechanism
+(many small process spawns across eval-harness fixture repos, not one large sweep against this
+repository) and TD-090 already names it as its own, separately-tracked next-investigation target,
+untouched by this verdict.
+
+### Recommendation (round 6)
+
+**The disagreement is settled: Round 4's implied ≤4s was an unreported arithmetic remainder, not a
+measurement, and Round 5's 76.1s stands — reconfirmed by a third method at 66.9s.** The leg-12-vs-engine
+question is settled the same way: they are not double-counted, because they are not the same work under
+the same conditions. Per this task's scope, **no target is chosen here** — T2's first family is a G2
+call under V3 §43, which this round supplies evidence for (Round 5's ranking, now cross-checked) and
+does not pre-empt.
+
+### Caveats recorded at the time
+
+- **This round's own S11-pair rerun is a single sample**, matching Round 4/5's own precedent for a
+  real-scale isolation pass (not the two-sample standard of Rounds 1–3). Host-specific, same
+  Windows 11 / git-bash environment as every prior round.
+- **The `--spec`-reduction method times the whole external process, not per-rule dispatch** — it is a
+  genuine third, independently-implemented mechanism (the same reduction technique `qa-check.sh`'s own
+  leg 2f-ter uses for its default-profile 7-rule spec, applied here to 2 rows instead), but it answers
+  "do these two rules combined cost order-of-magnitude more than Round 4's implied ceiling," not "what is
+  each rule's individual share" — Round 5 already answered the latter and is not re-derived here.
+- **The 176.6s vs. 287.4s leg-total gap (Finding, above) is reported and not resolved** — named as an
+  open item for a future round, in this log's own established practice of recording a gap rather than
+  papering over it, consistent with Round 5's identical treatment of its own unresolved gap against
+  Round 4.
+- **Nothing in `scripts/`, `evals/`, or `spec/` was modified by this round.** The reduced spec file
+  lives under the OS scratch temp directory, outside this repository. `conformance-engine.sh` and
+  `qa-check.sh` were read only — no instrument-and-revert was needed because neither was touched.
+- **Leg 12's own internal composition (which of its 24 harnesses dominate the 396.3s) was read for
+  target/profile only, not independently timed per-harness this round** — out of scope: this task
+  needed to know whether leg 12 and the engine sweep overlap, not to profile leg 12 itself. TD-090
+  remains the open record for that.
