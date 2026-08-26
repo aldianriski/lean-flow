@@ -3,7 +3,7 @@ sprint: 090
 slug: run-evidence-vehicle
 epic: EPIC-015
 owner: Maintainer
-last_updated: 2026-08-26
+last_updated: 2026-08-27
 status: active
 gates_signed: G1,G2 @ e1e3141
 approval_envelope: goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ e1e3141
@@ -57,9 +57,9 @@ seconds is appended to this task's declared log and committed by the run itself,
 asked at any point.
 
 **DoD:**
-- [ ] The measurement is appended and **committed by the unattended run** — *Verify: the commit exists, its timestamp falls inside the run window, and the diff against the log is additions-only (`git diff --numstat` shows 0 deletions); a block written by hand afterwards proves nothing (L-007)*
-- [ ] **No confirmation was requested** for this task — *Verify: headless has no ask channel, so an ask would have BLOCKED rather than proceeded; a completed T1 is itself the evidence, and the run log carries no prompt*
-- [ ] The block records the gate's **own printed verdict line**, transcribed — *Verify: the appended text contains a literal `QA-CHECK: N pass, M fail` line matching the run's system-verify output, never a paraphrase and never a piped exit status (L-120)*
+- [x] The measurement is appended and **committed by the unattended run** — *Verify: the commit exists, its timestamp falls inside the run window, and the diff against the log is additions-only (`git diff --numstat` shows 0 deletions); a block written by hand afterwards proves nothing (L-007)*
+- [x] **No confirmation was requested** for this task — *Verify: headless has no ask channel, so an ask would have BLOCKED rather than proceeded; a completed T1 is itself the evidence, and the run log carries no prompt*
+- [x] The block records the gate's **own printed verdict line**, transcribed — *Verify: the appended text contains a literal `QA-CHECK: N pass, M fail` line matching the run's system-verify output, never a paraphrase and never a piped exit status (L-120)*
 
 ### T2 — Rule where TD-095's worktree exclusion belongs `[size: S · risk: med · class: decision · HITL · J2]`
 Layers: `TECH-DEBT.md` · `scripts/lib/` (whichever checker the ruling names)
@@ -77,9 +77,9 @@ park (SPRINT-089 D3 forbids the reverse move, and it forbids this one by the sam
 disjoint AFK work rather than halting on it.
 
 **DoD:**
-- [ ] The run **parks** T2 rather than asking, deciding, or working around it — *Verify: a park line inside the step-4 rollup block naming T2, and no commit touching this task's Layers inside the run window*
-- [ ] The park records an **unblock condition** — *Verify: the line states what would make T2 actionable (an owner ruling), not merely that it was skipped*
-- [ ] The rollup's **terminal state matches its per-task lines** — *Verify: `scripts/lib/check-night-run-rollup.sh` plus a read of the state against the lines; a run ending with a park is not `PLAN_EXHAUSTED` (SPRINT-088 shipped exactly that error)*
+- [x] The run **parks** T2 rather than asking, deciding, or working around it — *Verify: a park line inside the step-4 rollup block naming T2, and no commit touching this task's Layers inside the run window*
+- [x] The park records an **unblock condition** — *Verify: the line states what would make T2 actionable (an owner ruling), not merely that it was skipped*
+- [x] The rollup's **terminal state matches its per-task lines** — *Verify: `scripts/lib/check-night-run-rollup.sh` plus a read of the state against the lines; a run ending with a park is not `PLAN_EXHAUSTED` (SPRINT-088 shipped exactly that error)*
 
 ## Owner-action checklist
 - [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed; the run reads this file and nothing else (L-099).
@@ -134,6 +134,8 @@ disjoint AFK work rather than halting on it.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `docs/research/logs/qa-gate-timing.md` | T1 | Round 9 appended — transcribes this run's own gate verdict line and elapsed, which is the evidence SPRINT-089 T2 needs | low | `git diff --numstat` = 46/0 at `7cc19fb`; literal verdict line grep = 1 |
+| `docs/sprint/logs/SPRINT-090-run-evidence-vehicle.md` | coordinator | Execution Log entries + the Part 4 rollup block (never assigned to a task — SKILL.md § sprint-bulk step 2) | low | rollup · authority · review-depth checkers all PASS |
+| `docs/sprint/SPRINT-090-run-evidence-vehicle.md` | coordinator | six Plan DoD ticked; the two Owner-action boxes deliberately left for the owner | low | tick census 6 ticked / 2 unticked, reconciled against the rollup header |
 
 ## Retro

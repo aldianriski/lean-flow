@@ -2,7 +2,7 @@
 sprint: 090
 slug: run-evidence-vehicle
 owner: Maintainer
-last_updated: 2026-08-26
+last_updated: 2026-08-27
 status: active
 update_trigger: an Execution Log entry is appended
 ---
@@ -169,3 +169,126 @@ replacement:
 
 **The calibration row was considered for T1 and rejected**: Part 4 states the launcher's reaper writes
 it, so a task doing the same would collide with the mechanism under test.
+
+### 2026-08-27 | execute | T1 — Round 9 appended and committed by the run at `7cc19fb`
+
+The run executed T1 without asking, under the envelope pinned at `e1e3141`. Facts, not claims:
+
+- **Gate invoked as its own call**, no pipe and no redirect, and its **own printed verdict line** read
+  off stdout rather than an exit status (L-120): `QA-CHECK: 201 pass, 0 fail`, 321s, rc 0, window
+  `2026-08-26T16:56:14Z` → `17:01:35Z`, tree `08f103e` with `status --porcelain` empty.
+- **Committed by the run**: `7cc19fb`, authored `2026-08-27T00:04:29+07:00` (`2026-08-26T17:04:29Z`) —
+  inside the run window. `git diff --numstat` = **46 additions, 0 deletions**, additions-only as DoD 1
+  requires. `git diff --cached` was read before the commit; nothing else rode along.
+- **No confirmation was asked at any point.** This session is flagged non-interactive; had T1 reached
+  for an ask it would have BLOCKED, not proceeded.
+
+**Routing, stated rather than assumed.** T1 is `class: mechanical-ingest`, which dispatches by default.
+It was executed **inline** for one reason: T1's raw material is the verdict line and elapsed seconds of
+*this coordinator's own system-verify invocation*. A dispatched agent could not transcribe a
+measurement it did not make, so it would have had to re-run the gate — a second ~320s run and a second
+substrate charge to produce a number already on this screen. Transcribing the coordinator's own
+measurement is coordinator work.
+
+consequence · T1 · behaviour:low · governance:low
+
+*(The matching `review · T1 · …` line lives in the rollup block below, which is where Part 4 defines
+it. It was briefly written here as well; a cross-check of the checker's own record count against a
+`grep` caught the duplicate before commit, which is the whole reason that habit exists — a structured
+field asserted twice is a count nobody can trust, and this log has already lost two tags to exactly
+that family of error.)*
+
+**Why `governance:low`, when the tag withdrawn at promote said `governance:high`.** That tag was written
+for the *previous* T1, which regenerated `docs/knowledge-index.md` — an ADR-009 SSOT artifact, honestly
+governance-bearing. The replacement T1 appends to an append-only research log that no checker reads and
+no rule cites. The class did not get quietly downgraded; the task underneath it was replaced, and this
+paragraph exists so a reader comparing the two tags sees why rather than inferring a softening.
+
+### 2026-08-27 | surprise | the knowledge index goes STALE at local midnight, with no content change
+
+Immediately after T1's edit, `sh scripts/gen-index.sh --check` exited **1** — which appeared to refute
+T1's gate-neutrality, the very property that made T1 runnable unattended. It does not. The cause is the
+clock.
+
+`gen-index.sh` line 118 sets `today=$(date +%F)` and line 120 stamps `last_updated: $today` into the
+candidate it `cmp`s against the committed index. The index carries `last_updated: 2026-08-26`; local
+time crossed into `2026-08-27` at `00:00 +07:00`, four minutes before T1's commit. **So the index goes
+stale at every local midnight regardless of whether any indexed file changed.**
+
+Established by four agreeing queries rather than by reading the script alone:
+
+1. `docs/knowledge-index.md` carries `last_updated: 2026-08-26`; `date +%F` returns `2026-08-27`.
+2. Substituting *only* today's date into the committed index reproduces a one-line diff — line 3, the
+   `last_updated:` field — and nothing else.
+3. **T1's file is not an input at all.** The glob at line 67 is `docs/research/*.md`, non-recursive, so
+   `docs/research/logs/` is excluded; the log's own `id: qa-gate-timing-log` appears **0** times in the
+   index, which it would not if it were being read. T1's gate-neutrality claim **holds, measured**.
+4. **A discriminating control**, because 1–3 are all consistent with some other cause: `--check` was
+   re-run with a `PATH`-shimmed `date` returning `2026-08-26`. Real date → **FAIL**; shimmed yesterday →
+   **PASS**. One variable changed, verdict flipped.
+
+**Why this matters beyond today.** `scripts/night-run.sh` refuses to fire unless the gate exits 0
+(TD-110), and a run's close-time system-verify runs the same gate. An **overnight** run is by
+construction the shape that crosses local midnight — so this defect can refuse a launch, or redden a
+close, for a tree nobody touched, and the named finding points at the knowledge index rather than at
+the clock. Both directions were seen inside this single run: the gate was `201 pass, 0 fail` at
+`23:56` local and `200 pass, 1 fail` at `00:07`, with one commit of 46 pure additions to a file the
+index does not read in between.
+
+**Not filed as a TD, and the reason is the ownership map, not an oversight.** `TECH-DEBT.md` is T2's
+declared `Layers:` entry, and T2's DoD 1 requires *no commit touching this task's Layers inside the run
+window*. Filing the row would have broken the criterion this run exists to demonstrate. Recorded here
+instead, for the owner to file alongside their T2 ruling. This is D3 working as written — a defect found
+during the run is a finding, not a repair — and it is the second time in this sprint that the honest
+move was to leave a guard red rather than to make it green.
+
+**Also observed, not acted on:** the two § Owner-action checklist boxes are unticked while both fields
+they describe are present and valid in the frontmatter. Ticking a box that records an owner's own act is
+not the run's to do.
+
+### 2026-08-27 | run-complete | T1 executed, T2 parked, close parked on a red system-verify
+
+T2 was **parked, not asked, not decided, and not worked around**. Where TD-095's worktree exclusion
+belongs — shared path discovery versus each checker — is a design ruling with a live trade-off, exactly
+the class an execute-only charter may not take.
+
+**Part 0 step 4 re-check performed twice** — at the T1→T2 boundary and again at exit. T2's unblock
+condition names an *owner ruling*; no task in this Plan produces one, so it was not actionable at either
+boundary and survives the run. Recording the re-check rather than only its outcome, because Part 2 notes
+this is precisely the bookkeeping step runs drop.
+
+**This run was invoked directly, not through `scripts/night-run.sh`, so the reaper did not fire.** The
+promote-time note above deferred the calibration row to the reaper; that reasoning assumed a
+launcher-fired run. Part 4 is explicit that without the launcher there is no guarantee the block gets
+written — so the run writes it here itself, degrade rule included.
+
+run · 6 of 6 DoD ticked
+terminal · AUTHORITY_BOUNDARY · T2 is J2 and parked awaiting an owner ruling; the close is parked on a red system-verify (clock-rollover index staleness, TD-110 class)
+T1 · done · Round 9 appended and committed at 7cc19fb
+T2 · parked-hitl · owner ruling required: does TD-095's worktree exclusion belong in shared path discovery (one place to forget) or in each checker (many places to forget)? Round 8 measured the surviving half at 42.8s without attributing it to specific legs, so the ruling needs either that attribution or an explicit decision to rule without it. Not actionable by any task in this Plan.
+system-verify · FAIL(gen-index: knowledge index STALE — caused by local midnight rollover, not by any change in this run; see the surprise entry above) · sh scripts/qa-check.sh
+review · T1 · self-review · behaviour:low · governance:low
+
+Per-criterion evidence (TASK-209):
+
+T1.1 · ticked · check — `git diff --numstat` on 7cc19fb = 46 additions / 0 deletions; commit stamped 2026-08-26T17:04:29Z, inside the 16:56:14Z→17:11Z run window
+T1.2 · ticked · review — no ask was issued; the session is flagged non-interactive, so an ask would have BLOCKED rather than proceeded, and a completed T1 is itself the evidence
+T1.3 · ticked · check — `grep -c '^QA-CHECK: 201 pass, 0 fail$'` on the appended block = 1, transcribed from the gate's own stdout
+T2.1 · ticked · check — the `T2 · parked-hitl` line above, plus `git log --since=2026-08-26T16:50Z -- TECH-DEBT.md scripts/lib/` returning empty: no commit touched T2's Layers in the run window
+T2.2 · ticked · review — the park line states an owner ruling, and what that ruling needs, rather than recording a skip
+T2.3 · ticked · check — `scripts/lib/check-night-run-rollup.sh` PASS, plus the read it requires: one `done` and one `parked-hitl` per-task line, which is `AUTHORITY_BOUNDARY` and not `PLAN_EXHAUSTED`
+
+run · cost unavailable · ~22 turns · ~15 min · 1 of 2 units · inline
+
+**Read that row with three stated gaps, per Part 4's degrade rule.** *Cost* is genuinely unavailable:
+the run was not fired through the launcher, so there is no `result` event to transcribe, and estimating
+it would manufacture a series figure. *Turns* is counted from this session's transcript, not read off a
+harness, and is marked `~` for that reason. *Wall-clock* is a **lower bound** — measured from the first
+timestamped action, the initial gate invocation; the pre-flight reads preceding it are not timestamped.
+*Units* is `1 of 2` deliberately: T2 was resolved by parking, which is the correct outcome and not a
+completion, and inflating it to `2 of 2` would corrupt the series the next promote sizes a batch from.
+
+**`6 of 6 DoD` and `1 of 2 units` are not in conflict** — they count different things, and Part 4 warns
+against conflating them. M is this Plan's **6** DoD criteria; the two § Owner-action checklist boxes are
+not Plan DoD and are excluded from the count. T2's three criteria are satisfied *by the run parking it
+correctly*, which is what T2 was written to test.
