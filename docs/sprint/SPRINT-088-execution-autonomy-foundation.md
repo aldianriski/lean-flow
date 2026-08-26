@@ -6,6 +6,7 @@ epic: EPIC-015
 owner: Maintainer
 last_updated: 2026-08-26
 status: active
+gates_signed: G1,G2 @ 1502e00
 plan_commit: 757b2a8
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -37,7 +38,7 @@ never re-implemented (EPIC-015 D2).
 ### T1 — Declare J0/J1/J2 authority on every task, and prove a J2 parks `[size: M · risk: med · class: execution · HITL]`
 Layers: `skills/orchestrator/references/night-run.md` (Part 0 authority table) · `skills/orchestrator/SKILL.md` (the G2 declaration) · `skills/lean-doc-generator/templates/SPRINT.md.template` · `.claude/CONTEXT.md` § Task entry shape · a retained fixture pair
 Depends-on: none
-Cites: TASK-292 · EPIC-015 § Closed-when 3 · D3 · D4 · D5 · V3 H29 · L-111
+Cites: TASK-292 · EPIC-015 § Closed-when 3 · D3 · D4 · D5 · V3 H29 · L-111 · T2 · T4
 
 The foundation the rest of the epic rests on. The three classes already describe how the loop
 behaves — mechanical, delegated, human — so this **declares** them rather than inventing them. It is
@@ -107,7 +108,7 @@ no J0/J1 mid-flight.
 - [ ] **Tier G**: retained must-FAIL + sibling control, seeded-break discrimination — *Verify: hash convention stated and used consistently (L-169)*
 
 ## Owner-action checklist
-- [ ] Sign the batch **G1 + G2** for T1–T4 before execution begins, and record it as `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. **The field is absent until then, and its absence means NOT signed** — an unattended run reads this file and nothing else (L-099).
+- [x] Sign the batch **G1 + G2** for T1–T4 before execution begins, and record it as `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. **The field is absent until then, and its absence means NOT signed** — an unattended run reads this file and nothing else (L-099).
 
 ## Decisions (pre-locked)
 - **D1** — **`.claude/CONTEXT.md` is single-owned by T1 for this sprint.** T1, T2 and T3 all touch it (§ Task entry shape, § Modes), and EPIC-014's stream touches § Sprint model at cutover. Commit order is T1 → T2 → T3, each staging per-hunk (`git add -p`) with `git diff --cached` verified — never a plain `git add` over the other stream's WIP (L-042 · L-037).
