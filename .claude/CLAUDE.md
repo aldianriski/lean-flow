@@ -49,7 +49,7 @@ resumes it. Every skill is also usable standalone. See `.claude/CONTEXT.md` for 
 ## Definition of Done
 - [ ] Acceptance criteria met
 - [ ] `.claude/CONTEXT.md` + README updated if the skill roster or the loop changed
-- [ ] plugin.json + marketplace.json versions stay equal (lockstep)
+- [ ] **All FOUR versioned manifests** stay equal (lockstep) — `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json` — **plus the README footer**, which no lockstep check covers. This line read "plugin.json + marketplace.json" for two releases and *both* under-bumped: a DoD that enumerates a subset is read as exhaustive, and the enumeration is the thing people follow (v1.60.0 missed both siblings and the footer; v1.61.0 missed the siblings again while quoting that very sentence). Derive the set with `grep -l '"version"' .*-plugin/*.json`, never from this list.
 - [ ] Line caps respected: SKILL.md ≤ ~140 (procedure + scaffolding; artifacts → `references/`, uncounted — ADR-006) · CLAUDE.md ≤ 80
 - [ ] **Consumer-facing surface checked** — generic skills/templates stay self-contained + adaptable (no leaked `scripts/…` path); README + CHANGELOG reflect any user-visible change (L-015)
 - [ ] **Wiring check** — a new capability is wired into every related job (entry routing · dispatch/reviewer brief · `/flow` conductor · CONTEXT SSOT) and *fires* end-to-end, not just present in its own file (L-020)
