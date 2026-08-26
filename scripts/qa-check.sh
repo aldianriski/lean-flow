@@ -844,7 +844,18 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # committed data. The generalisable half: a checker that VALIDATES a field is easy to remember to
 # test; the code that PRODUCES it gets forgotten, because its output looks like data rather than a
 # claim. check-night-run-rollup.sh only ever asserted the terminal line's SHAPE.
-eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh"
+# run-git-availability-fixtures.sh (SPRINT-089 T1) joins the always-on set as a DELIBERATE
+# exception to the cheap-and-git-free rule, and the exception is the point. It guards the
+# conformance engine's git-availability branch -- twelve assertions gate on it -- which was
+# shipping UNGUARDED IN BOTH DIRECTIONS: two seeded breaks were run against the existing
+# fixture set and neither reddened, because run-conformance-engine-fixtures.sh drives non-git
+# targets whose branch emits only `note` lines no case asserts on, and run-attestation-
+# fixtures.sh builds real repos so it never takes the negative path. A guard for an ALWAYS-ON
+# code path that itself runs only under QA_FULL would not have caught the defect it exists for.
+# Costed rather than assumed: ~2.1s, cheaper than thirteen harnesses already in this set. It
+# touches git but does not BUILD repos in the TD-016 sense -- one `git init`, ~95ms, no commit
+# (an inited-but-empty repo already answers `rev-parse --git-dir`, which is the whole probe).
+eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh"
 eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh"
 # run-qa-budget-position-fixtures.sh (SPRINT-086 T3, TD-091) joins the opt-in set by the cost rule,
 # not the git rule -- it builds no repos, but it DOES invoke real copies of qa-check.sh (bounded by
