@@ -18,18 +18,21 @@ status: current
 
 ## Active Sprint
 
-> **No active sprint.** `main`/SPRINT-087 and `autonomy`/SPRINT-088 both closed 2026-08-26. One active
-> sprint per stream, one pointer each (CONTEXT.md § Sprint model); the `stream:` keys stay on both
-> closed files as the record of the repo's first parallel pairing, which
-> `check-layers-observed.sh` (TASK-299) scoped attribution for on real input.
+> **One active sprint.** Single stream — SPRINT-087/088's `stream:` keys stay on those closed files as
+> the record of the repo's first parallel pairing, but this sprint is not part of a stream and omits
+> the field (CONTEXT.md § Sprint model).
 
-_(no active sprint)_ — SPRINT-088's shipped changes are written up in [`CHANGELOG.md`](CHANGELOG.md)
-as an unreleased block; it is a **feature** sprint, so the version bump is MINOR **by hand**, not
-`/release-patch`. It closed at **13 of 16 Plan DoD**: three criteria (T1 DoD 2/3, T4 DoD 3) require a
-real unattended run and are carried by **TASK-301**, not ticked — the Plan is entirely `HITL`, which
-Part 1 pre-flight forbids a run against, so no run against *that* Plan could ever have supplied them.
+> **SPRINT-089 — Prove the Unattended Run** → [docs/sprint/SPRINT-089-prove-the-unattended-run.md](docs/sprint/SPRINT-089-prove-the-unattended-run.md)
 
-Next: `/lean-doc-generator promote` to form a sprint from the groomed Backlog.
+EPIC-015's **second member sprint** (`epic: EPIC-015`), targeting § Closed-when **1, 3, 4**. SPRINT-088
+built the whole autonomy apparatus and proved none of it end to end; this closes that gap in the only
+order that works. **T1 first** — the gate must be able to finish before a run that runs the gate can be
+trusted to finish (TD-090, `high` since Sprint-084, and SPRINT-088 took observed runs to 634s against a
+450s budget). **T2 then supplies the evidence** SPRINT-088's three carried DoD require: a J1 executing
+unattended inside the recorded envelope, and a **seeded** J2 that parks. The proof vehicle's shape is
+deliberately **left to G2** — freezing it here would repeat L-111 in the sprint written to escape it.
+**G1/G2 are NOT yet signed** — `gates_signed:` is absent from that file and its absence means not
+signed, never approval.
 
 ---
 
