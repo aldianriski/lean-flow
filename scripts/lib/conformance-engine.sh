@@ -82,6 +82,23 @@ ok()   { last_ok=1; case "$1" in S[0-9]*|conformance:*) printf 'PASS  %s\n' "$1"
 # of which call flipped it), which is what the per-level counters below need to know.
 bad()  { fail=1; last_bad=1; case "$1" in S[0-9]*|conformance:*) printf 'FAIL  %s\n' "$1" ;; *) if [ -n "$_cur_rid" ]; then printf 'FAIL  %s (%s)\n' "$1" "$_cur_rid"; else printf 'FAIL  %s\n' "$1"; fi ;; esac; }
 note() { printf '      %s\n' "$1"; }
+
+# `git rev-parse --git-dir` is spawned once per TARGET, not once per rule that asks. Twelve
+# assertions ask the same question of the same tree, and on a fork-expensive host that is
+# eleven redundant process spawns per engine invocation -- against ~98 invocations across the
+# always-on eval set. Memoised, not removed: every caller still gets the same answer, and a
+# different target re-queries because the cache is KEYED on the path (assert_S13_* passes
+# `$_att_repo`, the rest pass `$repo`, and they are not always the same tree). Cutting spawn
+# count while deleting no check is the mechanism Rounds 4 and 7 both proved (SPRINT-089 T1).
+_ENGINE_GITREPO_KEY=""
+_ENGINE_GITREPO_VAL=1
+_is_git_repo() {
+  if [ "$1" != "$_ENGINE_GITREPO_KEY" ]; then
+    _ENGINE_GITREPO_KEY=$1
+    if git -C "$1" rev-parse --git-dir >/dev/null 2>&1; then _ENGINE_GITREPO_VAL=0; else _ENGINE_GITREPO_VAL=1; fi
+  fi
+  return $_ENGINE_GITREPO_VAL
+}
 # `gap` is a THIRD verdict class, and the distinction it draws is the one SPRINT-075 T3 was created to
 # find. A `rule-unimplemented` is a statement about THIS ENGINE, never about the repository under test.
 # Reported as FAIL it entered the adopter's level arithmetic and set the adopter's exit code, so the
@@ -715,7 +732,7 @@ _att_scan() {
     _ATT_REASON="git is not available on this host, and §13 is defined over git objects"
     return 0
   fi
-  if ! git -C "$_att_repo" rev-parse --git-dir >/dev/null 2>&1; then
+  if ! _is_git_repo "$_att_repo"; then
     _ATT_REASON="$_att_repo is not a git repository, and §13 is defined over git objects"
     return 0
   fi
@@ -1615,7 +1632,7 @@ assert_S4_APPEND() {
     note "S4.APPEND           -- no canonical ADR files -- nothing to verify"
     return
   }
-  if ! git -C "$repo" rev-parse --git-dir >/dev/null 2>&1; then
+  if ! _is_git_repo "$repo"; then
     note "S4.APPEND           -- history unavailable: $repo is not a git repository, so whether a decided ADR was edited cannot be answered. Reported rather than passed -- the absence of a record is not evidence that nothing happened"
     return
   fi
@@ -2010,7 +2027,7 @@ assert_S9_PLANFROZEN() {
   repo=$1
   plans=$(_sprint_plans "$repo")
   [ -n "$plans" ] || { note "S9.PLANFROZEN       -- no active sprint Plan -- nothing to verify"; return; }
-  if ! git -C "$repo" rev-parse --git-dir >/dev/null 2>&1; then
+  if ! _is_git_repo "$repo"; then
     note "S9.PLANFROZEN       -- history unavailable: $repo is not a git repository, so whether § Plan changed after its freeze cannot be answered. Reported rather than passed -- the absence of a record is not evidence that nothing happened"
     return
   fi
@@ -2055,7 +2072,7 @@ assert_S9_SCOPECHANGE() {
   repo=$1
   plans=$(_sprint_plans "$repo")
   [ -n "$plans" ] || { note "S9.SCOPECHANGE      -- no active sprint Plan -- nothing to verify"; return; }
-  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || {
+  _is_git_repo "$repo" || {
     note "S9.SCOPECHANGE      -- history unavailable: $repo is not a git repository, so the order of the two commits cannot be read"
     return
   }
@@ -2156,7 +2173,7 @@ assert_S10_FOURBUCKETS() {
   repo=$1
   plans=$(_sprint_plans "$repo")
   [ -n "$plans" ] || { note "S10.FOURBUCKETS     -- no sprint Plan under docs/sprint/ -- nothing to verify"; return; }
-  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || {
+  _is_git_repo "$repo" || {
     note "S10.FOURBUCKETS     -- history unavailable: §10 routes the buckets IN the close commit, so without history there is nothing to read"
     return
   }
@@ -2265,7 +2282,7 @@ assert_S10_PROMOTEREVIEW() {
   repo=$1
   plans=$(_sprint_plans "$repo")
   [ -n "$plans" ] || { note "S10.PROMOTEREVIEW   -- no active sprint Plan -- nothing to verify"; return; }
-  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || {
+  _is_git_repo "$repo" || {
     note "S10.PROMOTEREVIEW   -- history unavailable: the checklist is recorded at promote, and without history there is no promote record to read"
     return
   }
@@ -2583,7 +2600,7 @@ assert_S11_LOGPAIR() {
   arch=$(_s11_archived_plans "$repo")
   [ -n "$arch" ] || { note "S11.LOGPAIR         -- nothing archived yet -- there is no pair to split"; return; }
   has_git=0
-  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 && has_git=1
+  _is_git_repo "$repo" && has_git=1
   n_pair=0; n_nolog=0; n_unjudged=0
   _oifs=$IFS; IFS='
 '
@@ -2688,7 +2705,7 @@ assert_S11_WHENITRUNS() {
   # S11.SPRINT; here it is simply absent from the phase question. The two states need different
   # repairs -- one is "do the thing", the other is "you did it at the wrong moment" -- and a check
   # that reported them alike would emit a finding nobody can act on.
-  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || {
+  _is_git_repo "$repo" || {
     note "S11.WHENITRUNS      -- history unavailable: a phase is a position in history, so without it there is nothing to read. Not a pass"
     return
   }
@@ -2800,7 +2817,7 @@ _s12_matches_class() {
 
 assert_S12_SECRETS() {
   repo=$1
-  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || { note "S12.SECRETS         -- not a git repository: §12 is about what is COMMITTED, and an untracked tree has committed nothing"; return; }
+  _is_git_repo "$repo" || { note "S12.SECRETS         -- not a git repository: §12 is about what is COMMITTED, and an untracked tree has committed nothing"; return; }
   n_seen=0
   for f in $(_s12_tracked "$repo"); do
     b=${f##*/}
@@ -2855,7 +2872,7 @@ assert_S12_SECRETS() {
 
 assert_S12_BACKUPS() {
   repo=$1
-  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || { note "S12.BACKUPS         -- not a git repository: nothing is committed"; return; }
+  _is_git_repo "$repo" || { note "S12.BACKUPS         -- not a git repository: nothing is committed"; return; }
   n_seen=0
   for f in $(_s12_tracked "$repo"); do
     case "$f" in *.sql|*.dump|*.bak) ;; *) continue ;; esac
@@ -2875,7 +2892,7 @@ assert_S12_BACKUPS() {
 
 assert_S12_DESIGNSRC() {
   repo=$1
-  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || { note "S12.DESIGNSRC       -- not a git repository: nothing is committed"; return; }
+  _is_git_repo "$repo" || { note "S12.DESIGNSRC       -- not a git repository: nothing is committed"; return; }
   # The asset directories are §12's own words -- "only assets the app actually uses go in `public/` or
   # `src/assets/`" -- so the permitted PATH is read from the spec rather than listed here.
   allow=$(awk '/only assets the app actually uses go in/ {
@@ -2910,7 +2927,7 @@ assert_S12_DESIGNSRC() {
 
 assert_S12_GENERATED() {
   repo=$1
-  git -C "$repo" rev-parse --git-dir >/dev/null 2>&1 || { note "S12.GENERATED       -- not a git repository: §12c is about what is COMMITTED, and an untracked build directory is exactly the compliant state"; return; }
+  _is_git_repo "$repo" || { note "S12.GENERATED       -- not a git repository: §12c is about what is COMMITTED, and an untracked build directory is exactly the compliant state"; return; }
   classes=$(_s12_generated_classes "$spec")
   [ -n "$classes" ] || { bad "spec-table-unreadable: §12c names no .gitignore classes, so nothing reproducible can be recognised"; return; }
   allowed=$(_s12_generated_allowed "$spec")
