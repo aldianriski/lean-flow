@@ -18,22 +18,18 @@ status: current
 
 ## Active Sprint
 
-> **One active stream.** `main`/SPRINT-087 closed 2026-08-26; `autonomy` continues below. One active
-> sprint per stream, one pointer each (CONTEXT.md § Sprint model). Attribution is scoped per stream by
-> commit ownership (`check-layers-observed.sh`, TASK-299) — the 087/088 overlap exercised it on real
-> input, and the `stream:` keys stay on both files as the record of that pairing.
+> **No active sprint.** `main`/SPRINT-087 and `autonomy`/SPRINT-088 both closed 2026-08-26. One active
+> sprint per stream, one pointer each (CONTEXT.md § Sprint model); the `stream:` keys stay on both
+> closed files as the record of the repo's first parallel pairing, which
+> `check-layers-observed.sh` (TASK-299) scoped attribution for on real input.
 
-> **`autonomy` · SPRINT-088 — Execution Autonomy Foundation** → [docs/sprint/SPRINT-088-execution-autonomy-foundation.md](docs/sprint/SPRINT-088-execution-autonomy-foundation.md)
+_(no active sprint)_ — SPRINT-088's shipped changes are written up in [`CHANGELOG.md`](CHANGELOG.md)
+as an unreleased block; it is a **feature** sprint, so the version bump is MINOR **by hand**, not
+`/release-patch`. It closed at **13 of 16 Plan DoD**: three criteria (T1 DoD 2/3, T4 DoD 3) require a
+real unattended run and are carried by **TASK-301**, not ticked — the Plan is entirely `HITL`, which
+Part 1 pre-flight forbids a run against, so no run against *that* Plan could ever have supplied them.
 
-EPIC-015's **first member sprint** (`epic: EPIC-015`, `stream: autonomy`), targeting § Closed-when
-**1–4**. The authority model first — J0/J1/J2 declared per task, with a **seeded** J2 park, because the
-envelope is expressed in J-classes and the continuation contract has no definition of "already
-authorized" without them. Then `sprint-bulk` continuing past already-authorized tasks and ending only at
-one of five named terminal states; `overnight` made the canonical mode name after the contract it runs;
-and one pre-launch approval written into the sprint frontmatter, where an unattended run can actually
-read it. **G1/G2 are NOT yet signed** — `gates_signed:` is absent from that file and its absence means
-not signed, never approval. Deferred: bounded repair (TASK-296) and typed run outcomes (TASK-297, gated
-on the EPIC-008 `RunSummary` ruling).
+Next: `/lean-doc-generator promote` to form a sprint from the groomed Backlog.
 
 ---
 

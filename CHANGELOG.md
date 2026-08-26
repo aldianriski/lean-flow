@@ -13,10 +13,12 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
-## SPRINT-088 — Execution Autonomy Foundation (in progress, 2026-08-26)
+## SPRINT-088 — Execution Autonomy Foundation (closed 2026-08-26)
 
-Unreleased (bundles into the next version). EPIC-015's first member sprint — the authority model the
-rest of the epic rests on:
+Unreleased (bundles into the next version — **feature sprint, so MINOR by hand**, not `/release-patch`).
+EPIC-015's first member sprint, closed at **13 of 16 DoD** and reported as such: three criteria need a
+real unattended run and are carried by `TASK-301`, not ticked. Completes **§ Closed-when 2** of eight.
+The authority model the rest of the epic rests on:
 
 | Shipped | What |
 |---|---|
@@ -28,6 +30,17 @@ rest of the epic rests on:
 is the launcher's mode-signal pre-flight, which previously demanded the literal word `unattended` and
 now also accepts `overnight` and `night-run` — without that, adopting the new canonical name would
 have been rejected by the tool while the docs said it was supported.
+
+**Guards added** (all wired into `qa-check.sh`, five retained harnesses, 49 assertions):
+`check-authority.sh` · `check-approval-envelope.sh` · `resolve-run-mode.sh` ·
+`run-reap-terminal-fixtures.sh` (new coverage for the terminal-state derivation, which previously had
+none) · extended `check-night-run-rollup.sh`.
+
+**Found and fixed by an independent Tier G review**, after 39 assertions and 11 seeded breaks had all
+gone green: the terminal-state derivation reported `PLAN_EXHAUSTED` over `blocked` tasks (it handled
+two of six task states), and a `J2` task parked and then executed anyway was accepted as honoured.
+Both are corrected; a J2 park now needs an `owner-ruling · Tn ·` line to resolve it. Debt filed:
+`TD-106` · `TD-107` · `TD-108`. Learnings: `L-173` · `L-174`.
 
 ---
 ## v1.60.0 — The First Rule Through the Engine (2026-08-26)

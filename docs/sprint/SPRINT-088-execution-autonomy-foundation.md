@@ -5,7 +5,7 @@ stream: autonomy
 epic: EPIC-015
 owner: Maintainer
 last_updated: 2026-08-26
-status: active
+status: closed
 gates_signed: G1,G2 @ 1502e00
 approval_envelope: goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ 1b14d61
 plan_commit: 757b2a8
@@ -143,3 +143,55 @@ no J0/J1 mid-flight.
 | `scripts/qa-check.sh` | T1 | leg 14-bis + always-on harness list — wiring, without which the guard is half-shipped (L-020) | med | gate run |
 
 ## Retro
+
+**Closed at 13 of 16 Plan DoD.** Not green, and deliberately not reported as green: three criteria
+(T1 DoD 2/3, T4 DoD 3) require a real unattended run and are carried to **TASK-301**, not ticked. A
+sprint that closes green against criteria nobody re-agreed to is the failure L-088 names.
+
+**Retrieval check** — no prior `L-NNN` or ADR was contradicted. Two were *confirmed the hard way*:
+`L-165` (independent review) and `L-166` (point the guard at its motivating case) were both **already
+promoted into CLAUDE.md and loaded throughout**, and both still described defects that shipped — each
+gains a third sighting. `L-137`'s promoted rule (a suite green on its first run has not been shown to
+discriminate) fired correctly and caught a seeded break that never applied. `L-111` was cited *by the
+Plan itself* and the Plan still repeated it (below). No retrieval miss; a **placement** result instead:
+these rules were found, read, and insufficient on their own.
+
+**Cost** — unavailable. Run inline (coordinator + 1 dispatched reviewer); no harness `result` event was
+captured, so cost and turns cannot be stated. Wall-clock and token figures omitted rather than
+estimated. Recorded as a gap so the series is not silently missing a row.
+
+**Worked**
+- **Pointing each guard at the real corpus, not just fixtures.** Three defects surfaced this way and
+  every one had passed its full fixture suite first.
+- **The seeded-break protocol's layered guards.** `cmp` caught a patch that never applied; `sh -n`
+  caught a seeded break that applied as garbage which `cmp`, the line count *and* the verdict count all
+  accepted. Each guard caught what a sibling missed — the argument for keeping all of them.
+- **Cross-checking every id before use.** `TASK-301` (raw max said 908, fixtures) and `L-173/174` (raw
+  max said 999, L-170's own worked example) were both wrong on the first query and right on the second.
+- **The independent isolated reviewer**, which is the single highest-yield step in the sprint.
+
+**Friction**
+- **Three DoD were unreachable the moment the Plan froze** — they require an unattended run, and every
+  task is `HITL`, which Part 1 pre-flight forbids. Discovered at the end, when preparing the run.
+- **A gate red since promote** went unread until this session; the Plan was frozen over a FAIL.
+- **v1.60.0 shipped incomplete** (two manifests + README footer), and SPRINT-087 closed "29 of 29"
+  green over it.
+- **Two `qa-check` verdicts were misread as exit codes** before the printed verdict line was used —
+  the L-120 trap, twice, with the rule loaded.
+- **An append-only log was edited twice** (both recorded), because a derived artifact had been produced
+  by defective code.
+
+**Pattern candidates** → filed
+- **`L-174`** — a checker that *validates* a field gets a harness; the code that *produces* it does not,
+  because its output looks like data rather than a claim. `--reap` had zero coverage.
+- **`L-173`** — a definition that disagrees with itself gets implemented twice, and the looser reading
+  wins because it needs no extra code.
+- **`L-165` → count 3**, **`L-166` → count 3** — both already promoted, both still insufficient alone.
+
+**The finding worth carrying furthest.** `L-111` says a criterion is reachable only after the decisions
+it rests on are taken. This sprint **cited L-111 inside the very DoD that violated it**: T1's DoD 3
+names TASK-188 as standing evidence that SPRINT-060 foreclosed exactly this criterion, and then T1,
+T2 and T4 wrote three more criteria requiring an unattended run into an all-`HITL` Plan. Quoting a rule
+in a criterion does not apply it. **The check that would have caught it is mechanical and cheap:** at
+promote, for every DoD naming a run mode, confirm the Plan's own task classes permit that mode. That is
+a candidate for the next promote's governance checklist, not a discipline reminder.
