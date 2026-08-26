@@ -261,6 +261,36 @@ on the EPIC-008 `RunSummary` ruling).
       origin:     manual
       state:      ready
 
+
+- [ ] TASK-301 — Seed a run-evidence sprint so the unattended DoD have a vehicle  [size: M] [risk: med] [AFK]
+      class:      execution
+      authority:  J1
+      done-when:  a small purpose-built Plan carrying at least one **AFK / J1** task and one **seeded
+                  J2** task is promoted and gate-signed, then run headless once — producing (a) a J1
+                  task executed unattended inside the approved envelope with no confirmation, (b) a
+                  seeded J2 that PARKS with its unblock condition recorded, and (c) a run that consumed
+                  the `approval_envelope:` without re-confirming any J0/J1 mid-flight. Those three
+                  artifacts close SPRINT-088 T1 DoD 2/3 and T4 DoD 3, which cannot close without them
+      touches:    a new docs/sprint/SPRINT-NNN (the seeded Plan) · docs/sprint/logs/ · no skill or
+                  guard code — the machinery already exists and shipped in SPRINT-088
+      depends-on: SPRINT-088's guards (shipped: check-authority.sh · check-approval-envelope.sh ·
+                  resolve-run-mode.sh · the terminal-state reaper) — none of which needs changing
+      assumes:    none — every mechanism this exercises is already built and fixture-guarded. The only
+                  thing missing is a Plan an unattended run is ALLOWED to execute
+      tracker:    SPRINT-088 Execution Log 2026-08-26 (the pre-flight blocker) · L-111 · D5 ·
+                  TASK-188 (the same failure one sprint earlier) · closes SPRINT-088 T1 DoD 2/3 + T4 DoD 3
+      origin:     manual
+      state:      ready
+
+      **Why this exists, so nobody re-derives it.** SPRINT-088 wrote three DoD requiring a real
+      unattended run into a Plan whose every task is `HITL`. Part 1 pre-flight item 3 requires every
+      task to be AFK-class, so a run against that Plan parks 4 of 4 and delivers nothing — the criteria
+      were unreachable the moment the Plan froze. The HITL declarations are correct for med-risk Tier G
+      work; the error was pairing them with acceptance that requires their absence. **Do not "fix" this
+      by re-declaring SPRINT-088's tasks AFK** — that would be reshaping a task to dodge a gate. Seed a
+      separate Plan instead, which is what D5 already requires for the J2 park and is equally true of
+      the J1 execution.
+
 ### P3 — Long-term
 
 > Rejected work lives in **`.out-of-scope/`** — each file carries its own reasoning, revisit-if and
