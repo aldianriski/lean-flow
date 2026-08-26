@@ -37,7 +37,7 @@ could; ~36 forks per engine call stay unclaimed).
 ### T1 — Regenerate the knowledge index `[size: S · risk: low · class: mechanical-ingest · AFK · J1]`
 Layers: `docs/knowledge-index.md`
 Depends-on: none
-Cites: TASK-301 · SPRINT-089 T2 · CONTEXT.md § Continuous learning governance
+Cites: TASK-301 · SPRINT-089 T2 · CONTEXT.md § Continuous learning governance · `scripts/gen-index.sh` · `scripts/qa-check.sh` · `qa-check.sh` (all RUN by this task, none written — declared on Cites: per check-layers-completeness.sh's own remedy)
 
 The honest AFK/J1 task. It qualifies on every clause of the definition rather than by assertion:
 **additive** (regenerates a derived artifact, adds no new claim), **reversible** (one `git revert`, and

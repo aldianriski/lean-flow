@@ -32,7 +32,7 @@ Two hazards were found **before the Plan froze**, which is the only place they a
    satisfy DoD 1 vacuously while looking green. Now `gen-index.sh --check` (exit 1 = stale, no write).
    Verified stale, index untouched.
 
-consequence · T1 · behaviour:low · governance:high
+*(This promote entry carries no `consequence · Tn ·` line — the original was premature and is withdrawn in the scope-change entry below.)*
 
 ### 2026-08-26 | blocker | pre-flight item 3 forbids the Plan shape the machinery is built for — ruled, not patched
 
@@ -99,3 +99,34 @@ claim and the artifact disagreed, and `check-authority.sh` stayed red through th
 to clear it. Two lessons, and the second is the durable one: a *quotation* of a machine-readable tag is
 indistinguishable from the tag unless it is positionally disarmed — and **stating that you disarmed it
 is not disarming it.** The guard was the only thing that knew the difference.
+
+### 2026-08-26 | scope-change | T1 must CITE what it runs; and a premature review-depth tag withdrawn
+
+Pre-flight's gate run surfaced two more bookkeeping defects in this Plan, both mine, both caught by
+guards rather than by re-reading the rules that govern them.
+
+**(a) `layers completeness` — T1's prose names tools it does not touch.** T1's DoD cites
+`scripts/gen-index.sh` and `scripts/qa-check.sh`; its `Layers:` declares only `docs/knowledge-index.md`.
+The checker's own remedy is explicit: *"if the prose only cites it rather than touching it, declare it
+on a `Cites:` line"*. That is exactly the case — T1 **runs** both and **writes** neither.
+
+*What broke:* nothing in scope; T1's intent, acceptance and blast radius are unchanged.
+*Impact:* the gate cannot go green while a declared task's prose references undeclared paths.
+*Re-confirm G2:* approach and acceptance unchanged — two names move onto `Cites:`, nothing else.
+Logged here before § Plan is edited, per the frozen-Plan rule.
+
+**(b) `review-depth-governance-absent` — T1's consequence line was written too early.** The promote
+entry above tagged `consequence · T1 · behaviour:low · governance:high`, and the checker correctly
+objected that a `governance:high` task carries no `review · T1 · …` line. It is the **same class of
+error as the T2 tag withdrawn above**: a consequence line records the moment *review depth for a task's
+execution* is decided, and T1 has not executed. Recording it at promote asserts a decision nobody took.
+
+The withdrawn line, indented so it is legible without being counted at column 1:
+
+    consequence · T1 · behaviour:low · governance:high   [WITHDRAWN 2026-08-26 — premature]
+
+**Both tags were mine, and both were premature in the same direction: claiming, in machine-readable
+form, that something about the run had already happened.** That is now three findings from one
+pre-flight, and none was caught by recalling a rule — the review-depth schema, the authority checker
+and the layers checker each found their own. The pattern is [[L-176]]'s, one level up: a structured
+field written at *planning* time is read as a *record of execution*, because the schema has no tense.
