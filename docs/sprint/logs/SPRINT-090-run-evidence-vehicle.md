@@ -292,3 +292,28 @@ completion, and inflating it to `2 of 2` would corrupt the series the next promo
 against conflating them. M is this Plan's **6** DoD criteria; the two § Owner-action checklist boxes are
 not Plan DoD and are excluded from the count. T2's three criteria are satisfied *by the run parking it
 correctly*, which is what T2 was written to test.
+
+### 2026-08-27 | verify | final system-verify on the committed tree — the close is parked against a MEASURED red gate
+
+Appended *after* the rollup on purpose: it verifies the tree the rollup's own commit (`e8ad125`)
+produced, and that ordering is unavoidable. This is the terminal record; a further gate run would only
+re-verify bookkeeping, and the finding is date-caused, so it will not clear until the index is
+regenerated on `2026-08-27` or later.
+
+The gate's **own printed lines**, at `e8ad125`:
+
+- verdict: `QA-CHECK: 202 pass, 1 fail`, 313s
+- the single FAIL, in full: `FAIL  knowledge index STALE (run: sh scripts/gen-index.sh)`
+
+Two things this settles that the rollup's `system-verify ·` line could only assert:
+
+1. **There is exactly one FAIL and it is the named one.** The close is parked on a measured finding,
+   not a predicted one.
+2. **The bookkeeping commit introduced no new failure.** The pass count moved `200 → 202` — the two
+   additional PASSes are the rollup and review-depth checkers, which now have records to verify where
+   before they had none. The fail count did not move.
+
+For the reader reconciling the three figures in this log: `201 pass, 0 fail` (`08f103e`, 23:56 local,
+before midnight) · `200 pass, 1 fail` (`7cc19fb`, 00:07, after midnight) · `202 pass, 1 fail`
+(`e8ad125`, 00:2x). Each was true when printed; the fail is the clock, and the pass count tracks how
+many records existed for the guards to check.
