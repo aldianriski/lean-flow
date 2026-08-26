@@ -116,6 +116,14 @@ is_governance_commit() {   # <sha> -> 0 if EVERY changed file is a governance ar
     _any=1
     case "$_gf" in
       TODO.md|TECH-DEBT.md|CHANGELOG.md|docs/LEARNINGS.md) ;;
+      # GENERATED, and listed here for the same reason it is already excluded twice below (see
+      # is_excluded_committed and is_excluded): it is regenerated whenever ANY metadata-carrying doc
+      # changes, so it rides along with essentially every real governance commit -- LEARNINGS routing
+      # at close, ADR writes, research. Omitting it made the classifier miss the very commits it
+      # exists to catch: 7fb32ca (docs/LEARNINGS.md + docs/knowledge-index.md) was reported as
+      # `attributable to no task` on a live run. A derived view is not a coordination concern, which
+      # is the same argument the two exclusions below already make.
+      docs/knowledge-index.md) ;;
       # ASSUMPTION, stated because it is load-bearing and unenforced: both trees are doc-only by
       # convention -- every file under them is `.md` today except docs/research/storm/report-
       # template.html. The prefix is safe only while that holds. If an executable or a checker ever
@@ -127,6 +135,34 @@ is_governance_commit() {   # <sha> -> 0 if EVERY changed file is a governance ar
     esac
   done
   [ "$_any" = 1 ]
+}
+
+# Which SPRINT a commit belongs to, read from its subject. Mirrors attribute()'s patterns but keeps
+# the sprint number rather than the task token. Returns "" when the subject names no sprint.
+#
+# This is the axis stream scoping must use. An earlier attempt scoped by PATH -- skipping anything a
+# sibling sprint's Layers: declared -- and an independent review produced three cases where that
+# silently swallowed real defects: a commit by THIS sprint's own task touching a sibling-declared
+# path never reached the per-task check; a sibling declaring a directory token (`scripts/`) swallowed
+# every undeclared file beneath it; and the same on the WIP leg. Ownership cannot do any of that,
+# because it never consults a path: a commit saying `sprint(920)` is sprint 920's work no matter
+# which files it touches.
+commit_sprint() {   # <sha> -> "<NNN>" | ""
+  _cs=$(git log -1 --format='%s' "$1" 2>/dev/null)
+  # ANCHORED PATTERNS ONLY -- deliberately narrower than attribute()'s set, which also accepts an
+  # unanchored `.*(SPRINT-NNN Tn).*`. That third form is safe for finding a TASK but catastrophic for
+  # deciding OWNERSHIP, because it matches PROSE: a commit whose subject merely mentions another
+  # sprint ("port the fix already applied over there (SPRINT-921 T2)") was read as belonging to 921,
+  # skipped from 920's check entirely, and its real undeclared file surfaced against the WRONG sprint
+  # under a task number that does not exist. Verified as a live defect on this branch before the fix.
+  # This is L-108's family -- a guard matched by substring rather than by shape, failing GREEN.
+  #
+  # Consequence of narrowing, and it is the correct direction: a commit using only the parenthetical
+  # form is never skipped, so it stays attributed and may over-report. Noise is visible; a swallow is
+  # not.
+  printf '%s' "$_cs" | sed -n \
+    -e 's/^sprint(\([0-9]\{1,\}\)).*/\1/p' \
+    -e 's/^merge(\([0-9]\{1,\}\)).*/\1/p' | head -n1
 }
 
 attribute() {   # <sha> -> "T<n>" | "COORD" | "GOVERNANCE" | "UNATTRIBUTED"
@@ -320,6 +356,29 @@ for sp in "$@"; do
   # where no attribution is possible.
   decls=$(task_decls "$plan")
 
+  # ---- STREAM SCOPING by OWNERSHIP (TASK-299). The sprint NUMBERS of the other active sprints in
+  # this same invocation. A commit naming one of them is that stream's work and is not this sprint's
+  # undeclared change; a commit naming a CLOSED sprint's number is not a sibling and stays attributed.
+  # Deliberately NOT applied to the WIP leg below: uncommitted work carries no attribution, so there
+  # is no honest way to tell which stream made it, and reporting it is the correct behaviour.
+  # Compared by NUMBER, not by path. Two sprint files declaring the same `sprint:` -- a copy-paste
+  # template error at promote, or the same file passed twice under different path spellings -- would
+  # otherwise make a sprint its OWN sibling, and every one of its own `sprint(NNN) Tn:` commits would
+  # be skipped. That is a total guard bypass, not a narrow miss, and it was verified live before this
+  # guard existed: both sprint files reported PASS while a real undeclared file sat in the tree.
+  # Skipping the path check alone is NOT enough, which is why the number is what gets compared.
+  my_sprint=$(fmv "$sp" sprint)
+  sibling_sprints=""
+  for _osp in "$@"; do
+    [ "$_osp" = "$sp" ] && continue
+    [ -f "$_osp" ] || continue
+    case "$_osp" in */archive/*) continue ;; esac
+    _on=$(fmv "$_osp" sprint)
+    [ -n "$_on" ] || continue
+    [ "$_on" = "$my_sprint" ] && continue
+    sibling_sprints="$sibling_sprints $_on"
+  done
+
   # A declared token ending in "/" is a DIRECTORY prefix covering every path beneath it (SPRINT-055
   # T1). Before that, such a token was accepted and matched nothing, so it read as a declaration
   # while guarding zero files -- exactly the silent false-negative L-058 is about; T1's own 24-file
@@ -342,6 +401,12 @@ for sp in "$@"; do
   # ---- path 1: COMMITTED changes -- attributed, checked PER TASK -----------------------------
   miss_attr=""; unattr=""
   for c in $(git rev-list "$plan_commit..HEAD" 2>/dev/null); do
+    # Skipped WHOLE, per commit -- never per file. A per-file test is what let the path-based design
+    # leak: the unit of ownership is the commit, so the unit of exclusion must be too.
+    c_sprint=$(commit_sprint "$c")
+    if [ -n "$c_sprint" ]; then
+      case " $sibling_sprints " in *" $c_sprint "*) continue ;; esac
+    fi
     who=$(attribute "$c")
     for f in $(git diff-tree --no-commit-id --name-only -r "$c" 2>/dev/null); do
       is_excluded_committed "$f" && continue

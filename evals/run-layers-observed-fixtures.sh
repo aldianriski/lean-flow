@@ -806,6 +806,233 @@ run_case_anywhere "governance leg B (code riding along still FAILs)" 1 \
   "src/sneaky.txt" -- \
   sh -c "cd \"$c9\" && sh \"$checker\" docs/sprint/SPRINT-930-governance.md"
 
+
+# ================================================================================================
+# case 10: STREAM SCOPING BY OWNERSHIP (TASK-299). Five legs. Leg A is the feature; legs B, C and D
+# are REGRESSION cases reconstructing the three repros an independent review used to refute the
+# earlier PATH-based design, so that design cannot be rebuilt silently. Leg E pins the closed-sprint
+# boundary. Each leg gets its OWN repo: a FAIL committed in one leg would otherwise contaminate the
+# next leg's verdict.
+# ================================================================================================
+mk_two_sprint() {   # <dir> <sibling's declared token>
+  _d=$1; _sib=$2
+  mkdir -p "$_d/docs/sprint" "$_d/scripts"
+  cat > "$_d/docs/sprint/SPRINT-920-stream-one.md" <<EOF
+---
+sprint: 920
+slug: stream-one
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-920 — Stream One (constructed fixture)
+
+## Plan
+
+### T1 — edit stream one's own file
+Layers: \`alpha.txt\`
+Depends-on: none
+
+**DoD:**
+- [ ] alpha.txt updated
+EOF
+  cat > "$_d/docs/sprint/SPRINT-921-stream-two.md" <<EOF
+---
+sprint: 921
+slug: stream-two
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-921 — Stream Two (constructed fixture)
+
+## Plan
+
+### T1 — edit stream two's own file
+Layers: \`$_sib\`
+Depends-on: none
+
+**DoD:**
+- [ ] the declared token is edited
+EOF
+  printf '%s\n' 'a' > "$_d/alpha.txt"
+  printf '%s\n' 'b' > "$_d/beta.txt"
+  printf '%s\n' 'g' > "$_d/gamma.txt"
+  printf '%s\n' 'echo hi' > "$_d/scripts/sneaky.sh"
+  git -C "$_d" init -q
+  commit_all "$_d" 'plan locked'
+  _sha=$(git -C "$_d" rev-parse HEAD)
+  for _f in docs/sprint/SPRINT-920-stream-one.md docs/sprint/SPRINT-921-stream-two.md; do
+    sed "s/PLAN_COMMIT_PLACEHOLDER/$_sha/" "$_d/$_f" > "$_d/$_f.tmp" && mv "$_d/$_f.tmp" "$_d/$_f"
+  done
+  commit_all "$_d" 'record plan_commit sha'
+}
+both="docs/sprint/SPRINT-920-stream-one.md docs/sprint/SPRINT-921-stream-two.md"
+
+# --- leg A (THE FEATURE): the SIBLING's own commit, checked against stream one -- must PASS.
+c10a="$work/own-sibling-commit"; mk_two_sprint "$c10a" 'beta.txt'
+printf '%s\n' 'b2' >> "$c10a/beta.txt"
+commit_all "$c10a" 'sprint(921) T1: stream two edits its own declared file'
+run_case_anywhere "ownership leg A (sibling's OWN commit is not this sprint's work)" 0 \
+  "layers observed" -- \
+  sh -c "cd \"$c10a\" && sh \"$checker\" $both"
+
+# --- leg B (REGRESSION, reviewer repro 1): THIS sprint's own task touches a SIBLING-DECLARED path.
+# The path-based design skipped it and returned PASS. Ownership must still FAIL and name the task.
+c10b="$work/own-self-commit-sibling-path"; mk_two_sprint "$c10b" 'beta.txt'
+printf '%s\n' 'b2' >> "$c10b/beta.txt"
+commit_all "$c10b" 'sprint(920) T1: stream ONE wrongly edits the sibling-declared file'
+run_case_anywhere "ownership leg B (own task on sibling-declared path still FAILs)" 1 \
+  "T1:beta.txt" -- \
+  sh -c "cd \"$c10b\" && sh \"$checker\" $both"
+
+# --- leg C (REGRESSION, reviewer repro 2): sibling declares a DIRECTORY token. The path-based design
+# let that swallow every undeclared file beneath it. Ownership never reads a path, so it must FAIL.
+c10c="$work/own-directory-token"; mk_two_sprint "$c10c" 'scripts/'
+printf '%s\n' 'echo changed' >> "$c10c/scripts/sneaky.sh"
+commit_all "$c10c" 'sprint(920) T1: stream ONE edits under the sibling-declared directory'
+run_case_anywhere "ownership leg C (sibling directory token swallows nothing)" 1 \
+  "T1:scripts/sneaky.sh" -- \
+  sh -c "cd \"$c10c\" && sh \"$checker\" $both"
+
+# --- leg D (REGRESSION, reviewer repro 3): UNCOMMITTED edit to a sibling-declared file. The WIP leg
+# gets no sibling scoping at all -- uncommitted work carries no attribution, so reporting is correct.
+c10d="$work/own-wip-sibling-path"; mk_two_sprint "$c10d" 'beta.txt'
+printf '%s\n' 'b2' >> "$c10d/beta.txt"
+run_case_anywhere "ownership leg D (uncommitted sibling-path edit is still reported)" 1 \
+  "beta.txt" -- \
+  sh -c "cd \"$c10d\" && sh \"$checker\" $both"
+
+# --- leg E (BOUNDARY): a commit naming a CLOSED/unknown sprint number is NOT a sibling, so it stays
+# attributed. Without this, "skip anything with a sprint number" would pass and prove nothing.
+c10e="$work/own-closed-sprint"; mk_two_sprint "$c10e" 'beta.txt'
+printf '%s\n' 'g2' >> "$c10e/gamma.txt"
+commit_all "$c10e" 'sprint(899) T1: a sprint that is not active here'
+run_case_anywhere "ownership leg E (unknown sprint number is not a sibling)" 1 \
+  "gamma.txt" -- \
+  sh -c "cd \"$c10e\" && sh \"$checker\" $both"
+
+
+# ================================================================================================
+# case 9b: the GENERATED index rides along with governance (TASK-299 follow-on). docs/knowledge-
+# index.md is regenerated whenever any metadata-carrying doc changes, so it accompanies essentially
+# every real governance commit. Omitting it from the governance set made the classifier miss the very
+# commits it exists to catch -- 7fb32ca (docs/LEARNINGS.md + docs/knowledge-index.md) was reported as
+# `attributable to no task` on a live run of the real repo. Leg B keeps all-or-nothing honest.
+# ================================================================================================
+c9b="$work/governance-with-index"
+mkdir -p "$c9b/docs/sprint" "$c9b/src"
+cat > "$c9b/docs/sprint/SPRINT-931-index.md" <<'EOF'
+---
+sprint: 931
+slug: index
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-931 — Index (constructed fixture)
+
+## Plan
+
+### T1 — edit the declared source file
+Layers: `src/declared.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] src/declared.txt updated
+EOF
+mkdir -p "$c9b/docs"
+printf '%s\n' 'x' > "$c9b/src/declared.txt"
+printf '%s\n' 'y' > "$c9b/src/rider.txt"
+printf '%s\n' '# learnings' > "$c9b/docs/LEARNINGS.md"
+printf '%s\n' '# index' > "$c9b/docs/knowledge-index.md"
+git -C "$c9b" init -q
+lock_plan "$c9b" 'docs/sprint/SPRINT-931-index.md'
+
+# --- leg A: LEARNINGS + the regenerated index -- must PASS (this is the real-world shape)
+printf '%s\n' '- L-999 something' >> "$c9b/docs/LEARNINGS.md"
+printf '%s\n' '- regenerated' >> "$c9b/docs/knowledge-index.md"
+commit_all "$c9b" 'docs(learnings): file L-999 and regenerate the index'
+idx_files=$(git -C "$c9b" diff-tree --no-commit-id --name-only -r HEAD | tr '\n' ' ')
+case "$idx_files" in
+  *LEARNINGS.md*knowledge-index.md*|*knowledge-index.md*LEARNINGS.md*) echo "PASS fixture(governance-with-index precondition): commit carries both ($idx_files)" ;;
+  *) echo "FAIL fixture(governance-with-index precondition): expected LEARNINGS.md AND knowledge-index.md, got '$idx_files' -- vacuous"; fail=1 ;;
+esac
+run_case_anywhere "governance-with-index leg A (LEARNINGS + generated index is governance)" 0 \
+  "layers observed" -- \
+  sh -c "cd \"$c9b\" && sh \"$checker\" docs/sprint/SPRINT-931-index.md"
+
+# --- leg B: same shape plus a code file -- all-or-nothing must still FAIL and name the code file
+printf '%s\n' '- L-998 another' >> "$c9b/docs/LEARNINGS.md"
+printf '%s\n' '- regenerated again' >> "$c9b/docs/knowledge-index.md"
+printf '%s\n' 'z' >> "$c9b/src/rider.txt"
+commit_all "$c9b" 'docs(learnings): file L-998 -- with a code file riding along'
+run_case_anywhere "governance-with-index leg B (code riding along still FAILs)" 1 \
+  "src/rider.txt" -- \
+  sh -c "cd \"$c9b\" && sh \"$checker\" docs/sprint/SPRINT-931-index.md"
+
+
+# --- leg F (REGRESSION, review pass 3 defect 1): a subject that merely MENTIONS a sibling sprint in
+# prose must NOT transfer ownership. commit_sprint() originally reused attribute()'s unanchored
+# `.*(SPRINT-NNN Tn).*` pattern; a commit reading "port the fix already applied over there
+# (SPRINT-921 T2)" was read as sprint 921's work, skipped from 920 entirely, and its real undeclared
+# file surfaced against the WRONG sprint under a task number that does not exist. L-108's family: a
+# guard matched by substring instead of by shape, failing GREEN.
+c10f="$work/own-prose-mention"; mk_two_sprint "$c10f" 'beta.txt'
+printf '%s\n' 'g2' >> "$c10f/gamma.txt"
+commit_all "$c10f" 'port the fix already applied over there (SPRINT-921 T2)'
+# BOTH sprint files are passed, and the assertion names SPRINT-920's OWN line. Both details are
+# load-bearing. With only one file, sibling_sprints is empty and the bug cannot fire at all -- the leg
+# would pass under the seeded mutation and prove nothing. And asserting merely on "gamma.txt" is
+# equally vacuous, because the seeded version DOES print that string, just on the wrong sprint's line
+# (as `T2:gamma.txt` under SPRINT-921, a task that does not exist). Only the presence of a FAIL on
+# SPRINT-920's own line distinguishes fixed from broken.
+run_case_anywhere "ownership leg F (prose mention of a sibling transfers nothing)" 1 \
+  "SPRINT-920-stream-one.md layers observed: changed by a task that never declared it" -- \
+  sh -c "cd \"$c10f\" && sh \"$checker\" docs/sprint/SPRINT-920-stream-one.md docs/sprint/SPRINT-921-stream-two.md"
+
+# --- leg G (REGRESSION, review pass 3 defect 2): two active sprints declaring the SAME `sprint:`
+# number must not make either its own sibling. Before the fix both files reported PASS while a real
+# undeclared file sat in the tree -- a total guard bypass, reachable by a copy-paste template error
+# at promote. The number, not the path, is what must be compared.
+c10g="$work/own-duplicate-number"
+mkdir -p "$c10g/docs/sprint"
+for _slug in dup-a dup-b; do
+  cat > "$c10g/docs/sprint/SPRINT-940-$_slug.md" <<EOF
+---
+sprint: 940
+slug: $_slug
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-940 — $_slug (constructed fixture)
+
+## Plan
+
+### T1 — edit the declared file
+Layers: \`alpha.txt\`
+Depends-on: none
+
+**DoD:**
+- [ ] alpha.txt updated
+EOF
+done
+printf '%s\n' 'a' > "$c10g/alpha.txt"
+printf '%s\n' 'g' > "$c10g/gamma.txt"
+git -C "$c10g" init -q
+commit_all "$c10g" 'plan locked'
+_g_sha=$(git -C "$c10g" rev-parse HEAD)
+for _f in docs/sprint/SPRINT-940-dup-a.md docs/sprint/SPRINT-940-dup-b.md; do
+  sed "s/PLAN_COMMIT_PLACEHOLDER/$_g_sha/" "$c10g/$_f" > "$c10g/$_f.tmp" && mv "$c10g/$_f.tmp" "$c10g/$_f"
+done
+commit_all "$c10g" 'record plan_commit sha'
+printf '%s\n' 'g2' >> "$c10g/gamma.txt"
+commit_all "$c10g" 'sprint(940) T1: genuinely this sprint own undeclared work'
+run_case_anywhere "ownership leg G (duplicate sprint number is not a sibling)" 1 \
+  "T1:gamma.txt" -- \
+  sh -c "cd \"$c10g\" && sh \"$checker\" docs/sprint/SPRINT-940-dup-a.md docs/sprint/SPRINT-940-dup-b.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-OBSERVED FIXTURES: all green"; else echo "LAYERS-OBSERVED FIXTURES: at least one FAIL"; fi
 exit $fail
