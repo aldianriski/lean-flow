@@ -114,9 +114,19 @@ function runRule(ruleIdRaw: string, repoDir: string, write: (s: string) => void)
  * exhaustiveness claim is asserted at RUNTIME in main.test.ts against all five current `SpecFinding`
  * values (via the domain's own constructors/fixtures, never a hand-rolled literal) plus both
  * `SpecReadOk` shapes -- never left as a type-only guarantee.
+ *
+ * SPRINT-087 T5 revise (reviewer finding 2): `result.ok ? 0 : 1` treats ANY truthy `.ok` as success --
+ * `{ ok: "false" }` (a truthy STRING that reads as false) would have silently exited 0, the exact
+ * false-assurance shape this boundary exists to prevent. The `{ readonly ok: boolean }` annotation
+ * enforces nothing at runtime (TD-101, again), so the guard has to. `=== true` makes only the strict
+ * boolean `true` a pass; every other shape -- a truthy non-boolean, a falsy non-boolean, `{}` with no
+ * `ok` at all -- fails SAFE to exit 1 rather than passing on a technicality. Unreachable through any real
+ * constructor today (every one returns a literal boolean), but asserted anyway in main.test.ts so the
+ * guard is proven, not decorative -- a future reader cannot tell "defensive" from "dead" without a test
+ * that would redden if the check were removed.
  */
 export function specReadExitCode(result: { readonly ok: boolean }): 0 | 1 {
-  return result.ok ? 0 : 1;
+  return result.ok === true ? 0 : 1;
 }
 
 /** A bare positive integer, no sign, no leading zero, no decimal -- mirrors `makeRuleId`'s own

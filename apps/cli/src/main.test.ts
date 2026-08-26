@@ -1,12 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse, run, specReadExitCode } from "./main.ts";
+import { readSpecSectionFromDisk } from "./spec-file-reader.ts";
 import { tokenize } from "../../../packages/standard/src/tokenizer.ts";
-import { marksInStandard, readSection, reconcile, specNotFound } from "../../../packages/standard/src/spec-reader.ts";
+import { marksInStandard, readSection, reconcile } from "../../../packages/standard/src/spec-reader.ts";
 
 const SHELL_READER_PATH = fileURLToPath(new URL("../../../scripts/lib/read-spec-rules.sh", import.meta.url));
 const SPEC_PATH = fileURLToPath(new URL("../../../spec/STANDARD.md", import.meta.url));
@@ -297,9 +298,44 @@ describe("leanflow --section (SPRINT-087 T4)", () => {
 // it maps every one of the five identically -- proven here at RUNTIME (TD-101: nothing here type-checks
 // TypeScript, so the union's exhaustiveness is asserted, never assumed from the type alone) against real
 // values the domain's own constructors produce, not hand-rolled literals shaped to match by hand.
+//
+// DoD 1's own Verify clause reads "Shell spawned as the oracle, NOT a copied literal" -- an honest count
+// against that bar, revised after review (SPRINT-087 T5 revise, reviewer finding 1):
+//   - spec-table-unreadable: ORACLE-VERIFIED, but by the pre-existing --section 99 CLI test above (T4's),
+//     which spawns `read-spec-rules.sh SPEC_PATH --section 99` and compares exit codes. The direct
+//     mapping test below for this finding is a SECOND, literal-based check of the pure function alone --
+//     redundant with the oracle for THIS finding, kept because it is the same shape as the other four and
+//     removing it would make the block read as four kinds of test instead of one.
+//   - spec-not-found: ORACLE-VERIFIED, below -- a genuinely missing path is fed to BOTH
+//     `readSpecSectionFromDisk` (this engine's own adapter) and the real `read-spec-rules.sh`, and both
+//     exit codes are asserted to agree, the same shape as the §99 test.
+//   - spec-counts-unreadable, section-rows-mismatch, marks-table-unreadable: LITERAL-VERIFIED ONLY,
+//     against real domain-constructed values, NOT the Shell oracle. No `Invocation` this CLI accepts
+//     today reaches `reconcile()` or `marksInStandard()` -- nothing wires `--reconcile` or a marks-check
+//     into `parse()`/`run()` -- so there is no end-to-end path to spawn the oracle against for these
+//     three. That gap is real, is NOT this task's to close (adding CLI flags to reach them is new
+//     surface, not exit-mapping), and is filed as TD-103 for whichever task wires `--reconcile`/marks
+//     into the CLI (H12) to close by adding the same oracle-comparison shape then.
+//
+// Net: 2/5 findings oracle-verified end-to-end (spec-not-found, spec-table-unreadable -- the two
+// reachable through this CLI today), 3/5 mapping-verified only (unreachable through any CLI invocation
+// today, TD-103).
 describe("specReadExitCode -- the exit-code MAPPING itself, every SpecFinding (SPRINT-087 T5, DoD 1)", () => {
   const SPEC_PATH = fileURLToPath(new URL("../../../spec/STANDARD.md", import.meta.url));
   const realSpecText = readFileSync(SPEC_PATH, "utf8");
+
+  /** Spawns the real Shell oracle against an ARBITRARY spec path (unlike `runShellSectionReader`, which
+   * is pinned to the real `spec/STANDARD.md`) -- needed here because `spec-not-found`'s oracle comparison
+   * must run the SAME missing path through both sides, never `SPEC_PATH`. */
+  function runShellReaderAgainstPath(path: string, section: number): { readonly code: number; readonly stderr: string } {
+    try {
+      execFileSync("sh", [SHELL_READER_PATH, path, "--section", String(section)], { encoding: "utf8" });
+      return { code: 0, stderr: "" };
+    } catch (e) {
+      const err = e as { status?: number; stderr?: string };
+      return { code: err.status ?? 1, stderr: err.stderr ?? "" };
+    }
+  }
 
   /** Mirrors packages/standard/src/spec-reader.test.ts's own fixture transform, verbatim (never a
    * second, drifting copy of the anchored-match discipline that transform already earns). */
@@ -324,11 +360,37 @@ describe("specReadExitCode -- the exit-code MAPPING itself, every SpecFinding (S
       .join("\n");
   }
 
-  test("spec-not-found (the pure domain constructor) exits 1", () => {
-    expect(specReadExitCode(specNotFound("/no/such/spec.md"))).toBe(1);
+  // ORACLE-VERIFIED (1 of 2 reachable findings): a genuinely missing spec path is fed to BOTH this
+  // engine's own adapter (`readSpecSectionFromDisk`, which every `--section` invocation calls) and the
+  // real `read-spec-rules.sh`, THE SAME PATH on both sides -- never a copied literal (DoD 1's own Verify
+  // clause). This is reachable end-to-end in principle (a corrupted/deleted bundled spec would hit this
+  // exact path through `run()`); it is exercised directly at the adapter here, rather than through
+  // `parse()`/`run()`, only because `BUNDLED_SPEC_PATH` is a fixed constant `Invocation` has no field to
+  // override -- the read attempt and the exit mapping are the real production functions, unmodified.
+  test("spec-not-found: a genuinely missing spec path, oracle-verified against the SAME path", () => {
+    const dir = mkdtempSync(join(tmpdir(), "cli-t5-specnotfound-"));
+    try {
+      const missing = join(dir, "no-such-spec.md"); // never written
+
+      const result = readSpecSectionFromDisk(missing, 9);
+      if (result.ok) throw new Error("expected a failure result");
+      expect(result.finding).toBe("spec-not-found");
+      const cliExit = specReadExitCode(result);
+
+      const oracle = runShellReaderAgainstPath(missing, 9);
+      // Printed side-by-side so both exit codes are visible in the evidence, not just the assertion:
+      console.log(`spec-not-found oracle comparison: CLI exit=${cliExit}, Shell exit=${oracle.code}`);
+      expect(oracle.code).not.toBe(0);
+      expect(oracle.stderr).toContain("spec-not-found");
+      expect(cliExit).toBe(1);
+      // Both sides agree: neither is 0 -- the CLI's mapping and the Shell oracle concur on THIS path.
+      expect(cliExit === 0).toBe(oracle.code === 0);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
-  test("spec-table-unreadable (an out-of-range §N against the real Standard) exits 1", () => {
+  test("spec-table-unreadable (an out-of-range §N against the real Standard) exits 1 -- redundant with the --section 99 CLI/oracle test above; see the block comment", () => {
     const doc = tokenize(realSpecText, SPEC_PATH);
     const result = readSection(doc, 999, SPEC_PATH);
     if (result.ok) throw new Error("expected a failure result");
@@ -336,7 +398,9 @@ describe("specReadExitCode -- the exit-code MAPPING itself, every SpecFinding (S
     expect(specReadExitCode(result)).toBe(1);
   });
 
-  test("spec-counts-unreadable (§14's classified row stripped) exits 1", () => {
+  // MAPPING-LEVEL ONLY (TD-103): no `Invocation` this CLI accepts reaches `reconcile()` -- see the block
+  // comment above the describe.
+  test("spec-counts-unreadable (§14's classified row stripped) exits 1 -- mapping-level only, not CLI-reachable (TD-103)", () => {
     const noCounts = stripClassifiedRow(realSpecText);
     const doc = tokenize(noCounts, "spec-no-counts.md");
     const result = reconcile(doc, "spec-no-counts.md");
@@ -345,7 +409,8 @@ describe("specReadExitCode -- the exit-code MAPPING itself, every SpecFinding (S
     expect(specReadExitCode(result)).toBe(1);
   });
 
-  test("section-rows-mismatch (a row short of §2's published count) exits 1", () => {
+  // MAPPING-LEVEL ONLY (TD-103): same reason -- `reconcile()` is unreachable through any CLI Invocation.
+  test("section-rows-mismatch (a row short of §2's published count) exits 1 -- mapping-level only, not CLI-reachable (TD-103)", () => {
     const short = stripFirstRow(realSpecText, "S2\\.F-CAP");
     const doc = tokenize(short, "spec-short-s2.md");
     const result = reconcile(doc, "spec-short-s2.md");
@@ -354,7 +419,9 @@ describe("specReadExitCode -- the exit-code MAPPING itself, every SpecFinding (S
     expect(specReadExitCode(result)).toBe(1);
   });
 
-  test("marks-table-unreadable (no §14 at all) exits 1", () => {
+  // MAPPING-LEVEL ONLY (TD-103): `marksInStandard()` is likewise unreachable through any CLI Invocation
+  // -- nothing wires a marks-check in.
+  test("marks-table-unreadable (no §14 at all) exits 1 -- mapping-level only, not CLI-reachable (TD-103)", () => {
     const doc = tokenize("## §1 — Not §14\n\n| Rule |\n|---|\n| `S1.X` |", "f.md");
     const result = marksInStandard(doc, "f.md");
     if (result.ok) throw new Error("expected a failure result");
@@ -377,6 +444,39 @@ describe("specReadExitCode -- the exit-code MAPPING itself, every SpecFinding (S
     if (!result.ok) throw new Error(`expected success, got ${result.finding}`);
     expect(result.rows).toEqual([]);
     expect(specReadExitCode(result)).toBe(0);
+  });
+
+  // --- SPRINT-087 T5 revise (reviewer finding 2): the TOTALITY guard -- `{ readonly ok: boolean }`
+  // enforces nothing at runtime (TD-101), so malformed input must fail SAFE, never silently pass. Every
+  // real constructor in this codebase returns a literal boolean, so none of these shapes is reachable
+  // through a real `SpecReadResult`/`MarksReadResult` today -- asserted anyway, because a guard with no
+  // test proving it fires is indistinguishable from dead code to a future reader, who could delete it as
+  // defensive noise. `as any` below is deliberate: these are intentionally NOT well-typed `SpecReadResult`
+  // values, and TS would otherwise flag the literal at the call site (which would prove nothing, since
+  // TD-101 already established nothing here type-checks at build time anyway).
+  test("a truthy STRING ok ('false', reading as false to a human) fails safe to exit 1, not 0 -- the false-assurance shape this guard exists to prevent", () => {
+    expect(specReadExitCode({ ok: "false" } as any)).toBe(1);
+  });
+
+  test("a truthy non-boolean ok ('yes') fails safe to exit 1, not 0", () => {
+    expect(specReadExitCode({ ok: "yes" } as any)).toBe(1);
+  });
+
+  test("a truthy numeric ok (1) fails safe to exit 1, not 0", () => {
+    expect(specReadExitCode({ ok: 1 } as any)).toBe(1);
+  });
+
+  test("an object with no ok field at all fails safe to exit 1", () => {
+    expect(specReadExitCode({} as any)).toBe(1);
+  });
+
+  test("ok:true genuinely means success even alongside an unrelated field -- the guard does not over-fire on a well-formed value", () => {
+    expect(specReadExitCode({ ok: true, finding: "spec-not-found" } as any)).toBe(0);
+  });
+
+  test("null/undefined throw loudly rather than silently mapping to either exit code", () => {
+    expect(() => specReadExitCode(null as any)).toThrow();
+    expect(() => specReadExitCode(undefined as any)).toThrow();
   });
 });
 
@@ -430,3 +530,48 @@ describe("specReadExitCode -- the exit-code MAPPING itself, every SpecFinding (S
 // directly for this task) and was not itself seeded -- its own branches are guarded by
 // spec-reader.test.ts/spec-file-reader.test.ts's existing Tier G coverage (T2/T3/T6/T7), which this
 // task's DoD 1/3 tests reuse as an oracle rather than re-litigate.
+
+// --- Tier G evidence (SPRINT-087 T5; DoD 3) ----------------------------------------------------------
+//
+// specReadExitCode -- the artifact T5 actually introduced -- gets its own 2 targeted seeds, one per
+// DoD it proves, run AFTER the reviewer's revise (finding 2's `=== true` guard is already in the
+// pristine baseline both seeds are measured against). Same discipline as T4's block above: LANDED
+// (confirmed via `git diff --stat` showing the change), confirmed the file still PARSES (`bun test`
+// ran to completion), confirmed reddening ONLY the named case(s) while every sibling stayed green, then
+// RESTORED and confirmed byte-identical.
+//
+// Hash convention (kept from the original run, per the reviewer's note on L-169): `git hash-object
+// apps/cli/src/main.ts` compared against `git rev-parse :apps/cli/src/main.ts` (the staged blob's own
+// SHA-1) -- judged MORE robust than `git show <ref>:<path> | sha256sum` because `git hash-object`
+// applies the same clean-filter/CRLF normalization a commit would, rather than relying on comparing two
+// independently-piped shas by discipline alone.
+//
+// Baseline (this task's finished, staged state, post-revise): both hashes 41 tests, 41 pass, 0 fail.
+//   git hash-object apps/cli/src/main.ts        -> f4b307035df63b917a96638bc885270e487d81b5
+//   git rev-parse :apps/cli/src/main.ts         -> f4b307035df63b917a96638bc885270e487d81b5
+//
+//   1. DoD 1 (every SpecReadFail exits 1) defeated: `specReadExitCode` body swapped from
+//      `result.ok === true ? 0 : 1` to an unconditional `return 0`. Reddened EXACTLY 11 of 41: the 5
+//      direct-SpecFinding mapping tests, the spec-not-found oracle test, the pre-existing --section 99
+//      CLI/oracle test (T4's), and 4 of the 6 revise-added malformed-input tests -- every one that
+//      asserts `toBe(1)` ("false" string, "yes" string, numeric 1, empty object) plus the
+//      null/undefined-throws test (an unconditional `return 0` never reaches the `.ok` property access
+//      that would have thrown). 30 stayed green: both §8 zero-row tests (mapping-level and CLI-level --
+//      ok:true was never touched by this seed, so both correctly still read 0), the "ok:true genuinely
+//      means success" test (also unaffected, same reason), and every other test in the file. Proves DoD 1
+//      is genuinely load-bearing across all 5 findings PLUS the malformed-input guard, not just the two
+//      CLI-reachable ones.
+//   2. DoD 2 (§8's legitimate zero rows still exit 0) defeated: `runSection` given an early
+//      `if (specResult.rows.length === 0) return 1;` immediately before the rows are mapped to rules --
+//      the exact "mistakes emptiness for absence" bug DoD 2 exists to rule out. Reddened EXACTLY 1 of 41:
+//      "CONTROL: §8's legitimate zero rows exit 0, no output, distinct from §99's failure" (expected 0,
+//      got 1). 40 stayed green, including the §99 fail test (unaffected -- §99 never reaches this line;
+//      it fails earlier, at the `!specResult.ok` check) and the MAPPING-level §8 zero-row test (which
+//      calls `readSection`+`specReadExitCode` directly, bypassing `runSection` entirely, so this seed
+//      cannot touch it) -- proving DoD 2's absence-vs-emptiness distinction is enforced specifically at
+//      the CLI boundary (`runSection`), not merely inherited for free from the reader underneath it.
+//
+// Both seeds restored; `git hash-object apps/cli/src/main.ts` reproduced f4b307035df63b917a96638bc885270e487d81b5
+// after each restore, matching `git rev-parse :apps/cli/src/main.ts` -- confirmed identical to the
+// staged baseline both times, and `bun test apps/cli/src/main.test.ts` returned to 41 pass / 0 fail
+// after each restore.
