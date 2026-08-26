@@ -155,10 +155,21 @@ fixed for the DoD count, and for the same reason: a run's own sense of "I am fin
 what is unreliable when it ends early, so the process wrapper that outlives it records the ending.
 This changes *when a run stops*, never *who records it*. Format and placement → Part 4.
 
-**Unattempted tasks and the terminal state are independent.** `PLAN_EXHAUSTED` asserts every task was
-*reached*, not that every task succeeded — a Plan whose tasks all parked still exhausted. A rollup
-carrying `unattempted` lines under `PLAN_EXHAUSTED` is a contradiction and means the count and the
-state disagree; trust the count, which is derived, over the state, which is asserted.
+**`PLAN_EXHAUSTED` means every task reached a `done` state — nothing weaker.** The six Part 4 task
+states are not interchangeable here: `done` is the only *resolved* one. `parked-hitl` and `blocked`
+mean work remains that needs a human → `AUTHORITY_BOUNDARY`. `stalled` and `denied-tool` mean the run
+could not proceed past a step → `HARD_FAILURE`. `unattempted` means a task was never reached →
+`BUDGET_STOP`. A rollup carrying **any** non-`done` task line under `PLAN_EXHAUSTED` is a
+contradiction, and the state is the half that is wrong: the per-task lines are facts about what
+happened, the terminal state is a claim derived from them.
+
+> **This paragraph previously said the opposite** — that `PLAN_EXHAUSTED` "asserts every task was
+> reached, not that every task succeeded", so a Plan whose tasks all parked "still exhausted". That
+> contradicted the table two lines above it, which calls `PLAN_EXHAUSTED` *"the only clean ending"*,
+> and the reaper implemented the loose reading: it special-cased `unattempted` and `parked-hitl` and
+> let `blocked`, `stalled` and `denied-tool` fall through to a clean verdict. SPRINT-088's own rollup
+> then reported `PLAN_EXHAUSTED` over three `blocked` tasks. A definition that disagrees with itself
+> gets implemented twice, and the looser half wins because it is the one that needs no extra code.
 
 ## Part 1a — Entry path (you were asked to *start* a night run)
 

@@ -120,6 +120,21 @@ fi
 run_case_anywhere "active-still-enforced" 1 "authority-undeclared:" -- \
   sh "$checker" "$fx/missing-class/SPRINT-901-fx.md"
 
+# --- case 7 (must-FAIL): a J2 PARKED and then EXECUTED anyway, with no ruling --------------------
+# The silent bypass, and the case the first version of this checker could not see: it tested only for
+# an ABSENT park record, so any park record -- however stale, however ignored -- read as proof of
+# legitimacy. Parking a step and then working it is exactly what Part 0 step 6 forbids. Found by an
+# INDEPENDENT reviewer, not by the eight fixtures that already guarded this file (L-165).
+run_case_anywhere "j2-park-bypass-is-refused" 1 "authority-j2-park-bypassed:" -- \
+  sh "$checker" "$fx/j2-bypassed/SPRINT-906-fx.md"
+
+# --- case 7b (control): a park a human actually RESOLVED is accepted -----------------------------
+# Load-bearing: without it, case 7 would also be satisfied by a checker that refused every J2
+# execution outright, which would make a legitimate unblock unrepresentable and get the check switched
+# off within a week. The `owner-ruling · Tn · ` line is what makes the difference visible at all.
+run_case_anywhere "j2-park-ruled-is-accepted" 0 "authority-j2-honoured:" -- \
+  sh "$checker" "$fx/control-j2-ruled/SPRINT-907-fx.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "AUTHORITY FIXTURES: all green"

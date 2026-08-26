@@ -87,6 +87,13 @@ else
   fail=1
 fi
 
+# --- case 7 (must-FAIL): a pin too short to name anything ----------------------------------------
+# `@ a` is hex, so the alphabet check passes -- and it matches an enormous share of any repository's
+# history, pinning essentially nothing while looking exactly like a pin. Git abbreviates to 7 for a
+# reason. Found by an independent reviewer; the alphabet check alone had looked sufficient.
+run_case_anywhere "short-pin-fails" 1 "hex character(s)" -- \
+  sh "$checker" "$fx/short-pin/SPRINT-938-fx.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "APPROVAL-ENVELOPE FIXTURES: all green"; else echo "APPROVAL-ENVELOPE FIXTURES: FAILURES above"; fi
 exit $fail

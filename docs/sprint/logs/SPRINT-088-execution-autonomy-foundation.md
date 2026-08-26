@@ -314,19 +314,6 @@ T3 · done · 4 of 4 DoD
 T4 · blocked · 3 of 4 DoD; DoD 3 needs a run that CONSUMES the envelope, and this session wrote it — unblock: one overnight run against this Plan
 
 
-### 2026-08-26 | run-complete | run exited — rollup emitted by the launcher
-
-```
-run · 12 of 17 DoD ticked
-terminal · PLAN_EXHAUSTED · every task reached a resolved state
-```
-
-Calibration row (Part 4), transcribed from the harness result event:
-
-```
-run · cost unavailable · ? turns · unavailable · 1 of 4 units · inline
-```
-
 ### 2026-08-26 | surprise | the reaper carried a defect of mine, found by running it for real
 
 Logged after the rollup above because that is when it happened: producing the rollup is what exposed
@@ -429,3 +416,79 @@ that an agent arriving with it copy-pasteable is exactly how the prepare half ge
 action on an unchecked pre-flight item is to report what is blocking.
 
 consequence · T1 · behaviour:low · governance:low
+
+### 2026-08-26 | run-complete | run exited — rollup emitted by the launcher
+
+```
+run · 14 of 17 DoD ticked
+terminal · AUTHORITY_BOUNDARY · 3 task(s) parked or blocked for a human; the rest completed around them
+```
+
+Calibration row (Part 4), transcribed from the harness result event:
+
+```
+run · cost unavailable · ? turns · unavailable · 2 of 4 units · inline
+```
+
+### 2026-08-26 | surprise | independent Tier G review found 4 defects, 2 HIGH — both in guards I had "proven"
+
+An isolated worktree reviewer (L-165 · L-168) was dispatched over `303961d..HEAD`. It returned four
+findings. **I reproduced all four before acting on any of them**; every one was real.
+
+**#1 HIGH — the reaper reported `PLAN_EXHAUSTED` over three `blocked` tasks, on real committed data.**
+The derivation special-cased only two of Part 4's six task states — `unattempted` and `parked-hitl` —
+so a task carrying `blocked`, `stalled` or `denied-tool` satisfied "has a line about it" and fell
+through to *"the only clean ending"*. **This sprint's own rollup was the proof**: `terminal ·
+PLAN_EXHAUSTED` with T1, T2 and T4 all logged `· blocked ·`, and my retro entry beside it asserting
+that verdict was correct. The root cause was a **document that disagreed with itself** — Part 0b's
+table called `PLAN_EXHAUSTED` "the only clean ending" while the paragraph below said it "asserts every
+task was *reached*, not that every task succeeded". A definition with two readings gets implemented
+twice, and the looser one wins because it needs no extra code. Both the prose and the derivation are
+now exhaustive over all six states.
+
+**#2 HIGH — a J2 task parked and then executed anyway PASSED.** The check tested only for an *absent*
+park record, so any park record — however stale, however ignored — counted as proof of legitimacy.
+That is precisely the bypass `night-run.md` Part 0 step 6 forbids, and precisely what the checker's own
+docstring says it exists to catch. Fixed by requiring an `owner-ruling · Tn · ` line to resolve a park;
+a park plus an execution plus no ruling is now `authority-j2-park-bypassed`. The control case matters
+as much as the must-FAIL: without it, a checker that refused *every* J2 execution would also pass, and
+a legitimate human unblock would be unrepresentable.
+
+**#3 MEDIUM — the mode-signal gate is an unanchored substring scan**, so *"do NOT run this
+unattended"* satisfies it. Filed as **TD-108** rather than fixed: the leg is documented as the
+mechanically-checkable subset, the exact `--mode` path added at T3 already refuses unrecognised
+strings, and negation-aware substring matching is a natural-language problem in a shell-glob costume.
+
+**#4 MEDIUM — a one-character hex pin was accepted** on the approval envelope. `@ a` is hex, matches a
+huge share of any history, and pins nothing while looking exactly like a pin. Now floored at 7, git's
+own abbreviation length.
+
+**The reviewer also named the structural gap, which is the most useful thing it said:** `--reap` had
+**zero** fixture coverage — `grep -r -- --reap evals/` returned nothing — while carrying the Tier G
+derivation that decides how an entire run is reported. Every *validator* in this sprint had a harness;
+the *emitter* had none. `check-night-run-rollup.sh` only ever asserted the terminal line's **shape**,
+so it could not tell whether the named state was the right one, and nothing else was looking. New
+harness `evals/run-reap-terminal-fixtures.sh`, 7 cases over all five branches plus precedence.
+
+**Seed L is the one that matters:** restoring the exact defect that shipped reddens
+`blocked-is-authority-boundary`, `stalled-is-hard-failure` and `denied-is-hard-failure` while all four
+controls stay green — so the suite that now exists **would have caught it**. Landed (`cmp`), parsed
+(`sh -n`), targeted (469/469 lines, 2 lines changed). Convention: `sha256sum` over the raw working
+file — pristine `fc1ce7c14df46efa`, restored `fc1ce7c14df46efa`, `cmp` byte-identical.
+
+**What this says about the sprint's own evidence.** T1–T4 shipped with 39 retained assertions and 11
+seeded breaks, all green, and the seeded-break protocol had already caught three of my errors. It
+still missed two HIGH defects, one of which was visible in a committed artifact I had personally cited
+as passing. **Nothing I ran found them; a reader comparing the state list against the code found both
+within the hour.** That is L-165 stated as precisely as this repo could hope to state it, and it is now
+evidence rather than doctrine. The corrected rollup reads `terminal · AUTHORITY_BOUNDARY · 3 task(s)
+parked or blocked` — the honest verdict, which the defect had been hiding.
+
+Suites now: 49 retained assertions across five harnesses, all green.
+
+review · T1 · independent-isolated · behaviour:material · governance:high
+review · T2 · independent-isolated · behaviour:material · governance:high
+review · T3 · independent-isolated · behaviour:material · governance:high
+review · T4 · independent-isolated · behaviour:material · governance:high
+
+consequence · T2 · behaviour:material · governance:high

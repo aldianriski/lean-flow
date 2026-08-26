@@ -97,14 +97,24 @@ for sp in "$@"; do
     [ "$cls" = "J2" ] || continue
     [ -f "$log" ] || continue   # nothing has run; the honoured half is not yet checkable
 
-    # Both anchored at column 1, the shapes night-run.md Part 4 and the log template actually emit.
+    # All anchored at column 1, the shapes night-run.md Part 4 and the log template actually emit.
     parked=$(awk -v t="$tid" '$0 ~ "^"t" · parked" {n++} END{print n+0}' "$log")
     executed=$(awk -v t="$tid" '$0 ~ "^consequence · "t" · " {n++} END{print n+0}' "$log")
+    # A human resolving a park says so, in one shape, on its own line. Without this there is NO way to
+    # tell a legitimate unblock from a silent bypass, because both leave a park record and an
+    # execution record side by side.
+    ruled=$(awk -v t="$tid" '$0 ~ "^owner-ruling · "t" · " {n++} END{print n+0}' "$log")
 
     if [ "$parked" -eq 0 ] && [ "$executed" -gt 0 ]; then
       printf 'FAIL  %s\n' "authority-j2-not-parked: $sp $tid is declared J2 but its Execution Log carries an execution record and no park record. A J2 step is human-reserved: it parks with its unblock condition, it is never asked, decided, or worked around (night-run.md Part 0 § Park protocol)" >> "$out"
+    elif [ "$parked" -gt 0 ] && [ "$executed" -gt 0 ] && [ "$ruled" -eq 0 ]; then
+      # The silent bypass. Parking and then doing it anyway is EXACTLY what Part 0 step 6 forbids, and
+      # the first version of this check could not see it: it tested only for an ABSENT park record, so
+      # any park record -- however stale, however ignored -- was taken as proof of legitimacy. Caught
+      # by an independent reviewer, not by any of the nine fixtures guarding this file (L-165).
+      printf 'FAIL  %s\n' "authority-j2-park-bypassed: $sp $tid is declared J2 and its Execution Log carries BOTH a park record and an execution record, with no \`owner-ruling · $tid · <ruling>\` line resolving the park. Parking a step and then working it anyway is the bypass Part 0 step 6 forbids; a stale park record is not authority. If a human did unblock it, record that ruling -- an unrecorded unblock is indistinguishable from a bypass" >> "$out"
     else
-      printf 'PASS  %s\n' "authority-j2-honoured: $sp $tid parked ($parked park record(s), $executed execution record(s))" >> "$out"
+      printf 'PASS  %s\n' "authority-j2-honoured: $sp $tid ($parked park record(s), $executed execution record(s), $ruled owner ruling(s))" >> "$out"
     fi
   done
 done

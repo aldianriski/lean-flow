@@ -202,6 +202,27 @@ status: current
   - **Re-file fresh if** `Verify:` clauses become required to carry a path — the collision is between
     what a clause may write and what the resolver accepts, and constraining either dissolves it.
 
+- **TD-108** severity: minor | status: open | created: Sprint-088
+  - Summary: **`night-run.sh`'s mode-signal pre-flight is an unanchored substring scan over the whole
+    command line, so a NEGATED mention satisfies it.** A prompt containing *"please do NOT run this
+    unattended"* passes the gate exactly as a genuine declaration does, and the finding text claims a
+    property (*"the command carries a trigger word"*) that is true while the intent is the opposite.
+  - Evidence: `scripts/night-run.sh` — `case "$allargs$run_mode" in *unattended*|*overnight*|*night-run*)`.
+    Verified against the literal case logic by an independent reviewer during SPRINT-088's Tier G
+    review. Pre-existing in shape (the check was `*unattended*` before T3); T3 widened the alternation
+    to keep the `overnight` rename additive and inherited the weakness rather than introducing it.
+  - **Why it is `minor` and not `high`.** This leg is explicitly documented as *"the mechanically-
+    checkable subset only"*, with the judgement items handled by human pre-flight (Part 1), and the
+    explicit `--mode` path added at T3 **is** exact: it resolves through
+    `scripts/lib/resolve-run-mode.sh`, which refuses an unrecognised string rather than defaulting.
+    So a caller who declares the mode properly is already outside this defect.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): make `--mode` the
+    load-bearing signal and demote the prompt scan to a fallback that only *warns*. **Do not attempt
+    negation-aware substring matching** — that is a natural-language problem wearing a shell-glob
+    costume, and every rule added to it will have its own counterexample.
+  - **Re-file fresh if** `--mode` becomes mandatory — the defect dissolves the moment the weak signal
+    stops being load-bearing.
+
 - **TD-107** severity: medium | status: open | created: Sprint-088
   - Summary: **TASK-299's implementation landed on `main` inside SPRINT-087's window without being a
     task in any Plan, so `check-layers-observed.sh` correctly reports commits attributable to no task

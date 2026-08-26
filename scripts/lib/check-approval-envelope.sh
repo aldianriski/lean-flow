@@ -70,6 +70,12 @@ for sp in "$@"; do
   case "$env_sha" in
     ''|*[!0-9a-f]*) bad "approval envelope: $sp -- approval_envelope: pin '$env_sha' is not a hex sha; a pin that names nothing is not a pin"
                     continue ;;
+    # Length matters as much as alphabet, which the first version missed: `@ a` is hex, and matches an
+    # enormous fraction of any repository's history, so it pins essentially nothing while looking
+    # exactly like a pin. Git's own abbreviation floor is 7. Caught by an independent reviewer.
+    ?|??|???|????|?????|??????)
+                    bad "approval envelope: $sp -- approval_envelope: pin '$env_sha' is only ${#env_sha} hex character(s); git abbreviates to 7 for a reason, and a prefix this short matches a large share of history. An approval that could name thousands of commits pins none of them"
+                    continue ;;
   esac
 
   missing=""
