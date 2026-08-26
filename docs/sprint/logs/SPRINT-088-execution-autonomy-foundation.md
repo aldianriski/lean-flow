@@ -362,3 +362,25 @@ alternative — two `run-complete` blocks, one from broken code — would also h
 single-entry assumption the rollup checker relies on.
 
 consequence · T2 · behaviour:material · governance:high
+
+### 2026-08-26 | progress | ruling recorded — `overnight` is canonical in the skills, not in `spec/STANDARD.md`
+
+EPIC-015 carries an open question: *"Does `overnight` become the canonical mode name in
+`spec/STANDARD.md`, or only in the skills? → a judgement call, closed by ruling at the first member
+sprint's G2 — ADR-grade only if it adds a §2 row."*
+
+**T3 answered it by action and I had not written the answer down**, which is L-151 in its purest form:
+a decision whose reader cannot reach it governs nothing, and it fails silently because the decider
+watched themselves decide. Recording it here, where the close Retro reads.
+
+**Ruling: skills only.** `overnight` is canonical in `/orchestrator`, `/flow`, `night-run.md`,
+`.claude/CONTEXT.md` and `README.md`. **`spec/STANDARD.md` is untouched** — verified, not assumed:
+`git diff 757b2a8..HEAD -- spec/` is empty.
+
+**Why.** The standard is a *documentation* lifecycle standard (ADR-012) covering root files, `spec/`,
+`.claude/` and the `docs/` tree. A run mode is execution vocabulary, not a document lifecycle, so it
+has no §2 row to add — the same reasoning that kept the whole TS tree out of §2 at SPRINT-083 G2 (D4).
+**No §2 row means not ADR-grade**, by the epic's own stated test, so no ADR is owed either. Both halves
+of that test were checked rather than the conclusion assumed.
+
+consequence · T3 · behaviour:low · governance:low
