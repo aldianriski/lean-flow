@@ -98,12 +98,22 @@ disjoint AFK work rather than halting on it.
   *Ruled by the owner 2026-08-26, recorded here because the run reads this file and nothing else
   (L-099 · L-151).* Part 1 item 3 says *"every task in the run is AFK-class"*, while `TASK-301`
   requires a seeded J2 and CONTEXT.md states `J2 ⇒ HITL` — so a declared J2 fails pre-flight by the
-  letter, and this Plan could never fire. **The strict reading makes three shipped mechanisms
-  unreachable code**: `check-authority.sh`'s HONOURED assertion (a J2 task that executed instead of
-  parking), the `AUTHORITY_BOUNDARY` terminal state, and Part 0 step 2's park record — all of which
-  are written for a J2 **task in a Plan**, not merely a J2 *step* met mid-procedure. `check-authority.sh`
-  passes this Plan with `T2 J2` today. The intended reading is therefore the one the machinery
-  implements, and the wording is the defect.
+  letter, and this Plan could never fire.
+  **CORRECTED 2026-08-27 after independent review — this argument was overstated as first written.**
+  It claimed the strict reading makes *three* shipped mechanisms unreachable. It makes **one**:
+  `check-authority.sh`'s HONOURED assertion, which fires only on a task whose header meta is literally
+  `J2`. The other two are reachable with no declared J2 anywhere — `AUTHORITY_BOUNDARY` is defined at
+  `night-run.md:148` as "all of it is J2 **or blocked behind a park**", and `:89` parks an ordinary
+  **J1** on a critic judgment finding.
+  **And the counter-argument, which the original never weighed:** `AFK-safe` (`:46` — additive +
+  reversible + already-approved-in-scope) and `J2` (`:58` — approval · judgement · lossy ·
+  scope-changing) are defined as **opposites in the same document**, so item 3 read against its own
+  vocabulary is internally consistent as the *strict* reading.
+  **So D4 is a judgement between two defensible readings, not a forced conclusion.** It is still
+  plausibly right — a maximal-strict reading forecloses every unattended run, which cannot be the
+  intent, and SPRINT-088 is that precedent — but **it should not be cited as settled precedent in the
+  stronger form**, and the owner ruled on the overstated version. `check-authority.sh` does pass this
+  Plan with `T2 J2` today, which remains a fact in its favour.
   **Not fixed here, deliberately.** SPRINT-089 § Scope defers re-opening SPRINT-088's machinery, so
   amending `night-run.md` would be a scope-change rather than this task's work. Filed as **TD-109**.
   This is [[L-173]]'s shape exactly — a contract that disagrees with itself, where the looser reading

@@ -323,13 +323,20 @@ status: current
   - Evidence: SPRINT-090 was seeded per `TASK-301` with `T1 J1` + `T2 J2`. `check-authority.sh` passes
     it (`PASS authority-declared: … T2 J2`), and the run refuses it under item 3 read strictly. The two
     shipped artifacts disagree about the same Plan.
-  - **Why the strict reading cannot be the intended one — three mechanisms become unreachable code.**
+  - **Why the strict reading is doubtful — ONE mechanism becomes unreachable code, not three.**
+    *(Corrected 2026-08-27 after independent review; the row as first filed claimed three.)*
     `check-authority.sh`'s **HONOURED** assertion detects *"a J2 task that carries an EXECUTION record
-    while carrying no PARK record"* — a state only a J2 **task in a Plan** can enter. The
-    `AUTHORITY_BOUNDARY` terminal state names a run that stopped at an authority limit. Part 0 step 2
-    writes a park record for a planned unit and step 3 continues *"disjoint AFK work"*, which
-    presupposes a non-AFK sibling in the same Plan. Under the strict reading none of these can ever
-    fire, which is the L-166 shape (a guard keyed to a state the system may not emit).
+    while carrying no PARK record"* — a state only a J2 **task in a Plan** can enter, so under the
+    strict reading it can never fire (the L-166 shape: a guard keyed to a state the system may not
+    emit). The two other mechanisms originally cited are **reachable without any declared J2**:
+    `AUTHORITY_BOUNDARY` is defined at `night-run.md:148` as *"all of it is J2 **or blocked behind a
+    park**"*, and `:89` parks an ordinary **J1** on a critic judgment finding.
+  - **The counter-argument, recorded because the first version of this row omitted it.** `AFK-safe`
+    (`night-run.md:46` — additive + reversible + already-approved-in-scope) and `J2` (`:58` — approval ·
+    judgement · lossy/destructive · scope-changing) are defined as **opposites in the same document**.
+    Read against that vocabulary, item 3's *"every task is AFK-class"* is internally consistent as the
+    **strict** reading. So this row records a **genuine ambiguity between two defensible readings**,
+    not a one-sided wording bug — which makes the ruling that resolves it more load-bearing, not less.
   - Impact: **this is the second time the same acceptance has been foreclosed.** SPRINT-088 wrote three
     DoD requiring an unattended run into an all-`HITL` Plan (L-111, carried by `TASK-301`); the fix was
     a purpose-built Plan, and that Plan is blocked by a *different* clause with the same effect. A

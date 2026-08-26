@@ -232,3 +232,50 @@ reaper had no way to know which Plan the run was pointed at, because the trigger
 sprint files do not. Filed as **TD-112**.
 
 consequence · T2 · behaviour:material · governance:high
+
+### 2026-08-27 | surprise | independent review of T2 — the D4 justification overclaimed 2 of 3
+
+Dispatched worktree-isolated over `08f103e..920e883` + `e1e3141` + `0e2ae9d`, because T2's consequence
+is `behaviour:material · governance:high` and `check-review-depth.sh` was blocking the close.
+
+**Verdict: would not block the close on integrity grounds** — settings changes safely scoped, all four
+TD rows real and independently reproduced, and **no case found where a true, inconvenient fact was
+suppressed to clear a gate**. It reproduced TD-112 from scratch: reconstructed the reaper's raw
+un-indented lines, appended them at column 1 to a copy of the pre-fix log, and watched
+`check-night-run-rollup.sh` **PASS** the false rollup.
+
+**But it sent one thing back, and it is mine.** D4's load-bearing claim — *"the strict reading makes
+**three** shipped mechanisms unreachable code"* — holds for **one**, not three. Verified directly
+against `night-run.md`:
+
+| Cited mechanism | Actually |
+|---|---|
+| `check-authority.sh` HONOURED | **genuinely unreachable** under the strict reading — fires only on a task whose header meta is literally `J2` |
+| `AUTHORITY_BOUNDARY` | **reachable without a J2 task** — line 148 defines it as "all of it is J2 **or blocked behind a park**" |
+| Part 0 step 2's park record | **reachable without a J2 task** — line 89's `Revise-loop retry — critic judgment finding` parks an ordinary **J1** |
+
+**And the reviewer found the argument that cuts the other way, which I had not weighed.** `AFK-safe` is
+defined at line 46 as *additive + reversible + already-approved-in-scope*; `J2` at line 58 as
+*approval · judgement · lossy/destructive · scope-changing*. Those are exact opposites, so item 3's
+"every task is AFK-class", read against the document's **own vocabulary**, is internally consistent as
+the **strict** reading. D4 may still be the right call — a maximal-strict reading forecloses every
+unattended run, which cannot be the intent (SPRINT-088 is the precedent) — but it is a **judgement
+between two defensible readings**, not the near-forced conclusion I presented it as.
+
+**This matters because the owner ruled on my argument.** Flagged for re-derivation rather than quietly
+patched; D4 and TD-109 are corrected below to state one mechanism and to name the counter-argument.
+
+**Second finding, also mine.** The commit `a5c15a0` cites *"13 references in the run log"* for envelope
+consumption. That figure is true of the **stream-json harness log**, which lives in a session scratchpad
+and **is not in the repository** — so no future reader can check it, and the reviewer counting the
+Execution Log instead got a different number and flagged it. A governance-material claim resting on an
+artifact outside the repo is [[L-151]] again: evidence filed where its reader cannot reach it. The
+verifiable substitute is already recorded — the envelope is pinned in SPRINT-090's frontmatter and
+`check-approval-envelope.sh` PASSes it.
+
+Related and named rather than smoothed: *"0 AskUserQuestion events across 41 tool calls"* is a
+session-transcript claim with **no repository artifact** behind it. Not shown false; not independently
+verifiable either. The repo-checkable half of that DoD is that T1 completed at all — headless has no
+ask channel, so an ask would have blocked rather than proceeded.
+
+review · T2 · isolated-subagent · behaviour:material · governance:high

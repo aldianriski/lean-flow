@@ -368,3 +368,25 @@ midnight-staleness defect; the stream that owned `TECH-DEBT.md` filed it as TD-1
 00:14 park as its evidence. The ownership map worked — and then the same shared file produced exactly
 the cross-stream collision `sprint-bulk` step 2 warns about, on a file no *task* in either Plan was
 concurrently editing.
+
+### 2026-08-27 | scope-change | D4's justification corrected — one unreachable mechanism, not three
+
+An independent review of SPRINT-089 T2 found D4's load-bearing claim overstated. D4 argued the strict
+reading of pre-flight item 3 makes **three** shipped mechanisms unreachable; only **one** does.
+`AUTHORITY_BOUNDARY` is defined at `night-run.md:148` as "all of it is J2 **or blocked behind a park**",
+and `:89` parks an ordinary **J1** on a critic judgment finding — so both are reachable with no declared
+J2 task anywhere. Only `check-authority.sh`'s HONOURED assertion genuinely requires one.
+
+The review also supplied the counter-argument D4 never weighed: `AFK-safe` (`:46` — additive +
+reversible + already-approved-in-scope) and `J2` (`:58` — approval · judgement · lossy · scope-changing)
+are defined as opposites **in the same document**, so item 3 read against its own vocabulary is
+internally consistent as the strict reading.
+
+*What broke:* nothing executed on the wrong basis — the run had already completed, and its evidence
+stands independently. *Impact:* D4 is a **judgement between two defensible readings**, not the forced
+conclusion it was written as; it should not be cited as settled precedent in that stronger form.
+*Re-confirm G2:* no design or acceptance changes; the correction is to the recorded rationale only.
+
+Corrected in place rather than appended-around, because a wrong rationale left standing outlives the
+line it explains and would be quoted by the next run. **The owner ruled on the overstated version and
+should re-derive if they intend D4 as precedent** — surfaced, not smoothed.
