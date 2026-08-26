@@ -3,8 +3,8 @@ sprint: 089
 slug: prove-the-unattended-run
 epic: EPIC-015
 owner: Maintainer
-last_updated: 2026-08-26
-status: active
+last_updated: 2026-08-27
+status: closed
 gates_signed: G1,G2 @ db656ff
 plan_commit: 5f0682b
 close_commit: [sha — set at close]
@@ -127,3 +127,53 @@ unblock condition recorded.
 | `docs/knowledge-index.md` | T2 | Regenerated to clear the gate TD-110 blocks the run from clearing | low | `gen-index.sh --check` |
 
 ## Retro
+
+**Theme of the sprint: the machinery was proven, and proving it took five attempts to reach the
+starting line.** T1's headline cut missed its target and is recorded as missing it. T2's run happened,
+and every claim about it was verified against artifacts rather than the run's own report. What the
+sprint actually bought is the map of everything standing between a promoted Plan and an executed one.
+
+**Shipped** → `CHANGELOG.md` v1.61.0 (MINOR, by hand — feature sprint, `/release-patch` is PATCH-only).
+
+**What went right**
+- **The first real unattended run.** A `J1` executed with no confirmation, a **seeded** `J2` parked with
+  its unblock condition, the envelope was consumed, and the run's own rollup named
+  `AUTHORITY_BOUNDARY` correctly. EPIC-015 § Closed-when **3 and 4** complete.
+- **The run handled a defect nobody designed for.** It hit a red system-verify caused by midnight index
+  staleness and **parked its close** rather than repairing — exactly as `repair-policy: none` and D3
+  require. The contract held on a case outside its authors' imagination.
+- **A Tier G coverage hole closed.** The engine's git-availability branch — twelve gating assertions —
+  had *zero* discriminating coverage in either direction. Two seeded breaks reddened nothing. It now
+  has 15 assertions that redden in disjoint sets with controls green.
+- **Round 8 caught a false conclusion before it was drawn**: a 288s gate run reads as "TD-090 cured",
+  but the host was 1.92–2.20× faster than the reference on byte-identical code. Ticking it would have
+  cleared a load-dependent debt on a fast afternoon.
+
+**What went wrong, and it is the same shape every time**
+- **Five foreclosures of one acceptance**, in five different layers, none found by reading the
+  procedure (→ **L-179**). The author read Part 1's checklist item by item, concluded no green-gate
+  precondition existed, said so — and `night-run.sh:339` enforces one.
+- **Four premature or mis-scoped machine-readable fields**, each caught by a different guard and none
+  by the author (→ **L-177**). A schema has no tense, so a plan's claim about a task reads as testimony
+  that it happened.
+- **A checker passed a false rollup** because it asserts shape and never agreement (→ **L-178**), one
+  sprint after [[L-174]] recorded that exact property of that exact checker.
+- **An independent reviewer found the author's own reasoning defect**: D4's justification overclaimed
+  2 of 3 mechanisms, and the counter-argument (`AFK-safe` and `J2` defined as opposites) was never
+  weighed. The owner had already ruled on the overstated version.
+
+**The honest ledger.** Of every defect found this sprint, **not one was caught by recalling a rule that
+governed it** — every single one came from a guard firing, a disagreeing second number, or an
+independent pass. Rules that were loaded, correct, and on screen: L-045, L-088, L-108 (twice), L-120,
+L-151, L-166, L-174. That is now the fourth consecutive sprint reporting this, and it is the strongest
+available argument for the guard-and-reviewer discipline over the read-the-rules one.
+
+**Tech debt** → **TD-109** (pre-flight vs a declared J2) · **TD-110** (the launcher's green-gate
+catch-22) · **TD-111** (midnight index staleness) · **TD-112** (the reaper's false rollup, passed by its
+checker). All `high`. TD-090 restated host-normalized; TD-095 split on measurement.
+
+**Follow-ups** → `TASK-303` · `TASK-304` · `TASK-305` · `TASK-306`, all `origin: close-retro`.
+
+**Learnings** → **L-175** (a wall-clock criterion measures the host) · **L-176** (append-only binds the
+prose, not the machine fields) · **L-177** (a schema has no tense) · **L-178** (presence is not
+agreement) · **L-179** (some capabilities can only be estimated by attempting them).

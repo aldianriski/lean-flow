@@ -4,7 +4,7 @@ slug: run-evidence-vehicle
 epic: EPIC-015
 owner: Maintainer
 last_updated: 2026-08-27
-status: active
+status: closed
 gates_signed: G1,G2 @ e1e3141
 approval_envelope: goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ e1e3141
 plan_commit: b7437de
@@ -82,8 +82,8 @@ disjoint AFK work rather than halting on it.
 - [x] The rollup's **terminal state matches its per-task lines** — *Verify: `scripts/lib/check-night-run-rollup.sh` plus a read of the state against the lines; a run ending with a park is not `PLAN_EXHAUSTED` (SPRINT-088 shipped exactly that error)*
 
 ## Owner-action checklist
-- [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed; the run reads this file and nothing else (L-099).
-- [ ] Record the `approval_envelope:` covering all ten dimensions, pinned to a sha. Absence is not approval, and a bracketed placeholder counts as absent.
+- [x] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed; the run reads this file and nothing else (L-099).
+- [x] Record the `approval_envelope:` covering all ten dimensions, pinned to a sha. Absence is not approval, and a bracketed placeholder counts as absent.
 
 ## Decisions (pre-locked)
 - **D1** — **T1 and T2 are disjoint.** No shared file, no `depends-on`. T2 parking therefore cannot
@@ -149,3 +149,38 @@ disjoint AFK work rather than halting on it.
 | `docs/sprint/SPRINT-090-run-evidence-vehicle.md` | coordinator | six Plan DoD ticked; the two Owner-action boxes deliberately left for the owner | low | tick census 6 ticked / 2 unticked, reconciled against the rollup header |
 
 ## Retro
+
+**A Plan that existed to be executed, and was.** Both tasks resolved as designed: `T1` (AFK/J1) ran
+unattended and committed its work with no confirmation asked; `T2` (HITL/J2) **parked**, recording the
+owner ruling it needs. Terminal state `AUTHORITY_BOUNDARY`, `1 of 2 units` landed — which is the
+correct reading of a run that completes one task and parks another, not a partial failure.
+
+**What this Plan proved, for SPRINT-089 T2 and EPIC-015 § Closed-when 3 · 4**
+- A `J1` task executes inside a recorded envelope with **no confirmation** — headless has no ask
+  channel, so an ask would have blocked rather than proceeded.
+- A **seeded** `J2` parks rather than being asked, decided, or worked around — `check-authority.sh`
+  reports `1 park, 0 execution, 0 owner-ruling`, and **0 commits touched T2's Layers** in the window.
+- The rollup's terminal state matches its per-task lines, verified by reading them against each other
+  and not only by the shape checker — which is precisely how the reaper's contradicting rollup
+  (**TD-112**) was caught.
+
+**What it cost to make this Plan runnable at all.** T1 was rewritten once, mid-sprint: its first form
+regenerated a deliberately stale index, and `night-run.sh` refuses to fire unless the gate is green —
+so the run could not start until the work it existed to do was already done (**TD-110**). The
+replacement had to be **gate-neutral**, a property measured by probe rather than argued. Before that,
+the Plan's declared `J2` failed pre-flight by the letter (**TD-109**), and `sprint-bulk` step 0 would
+have asked which of two active sprints to run, in a channel with no ask.
+
+**The run found what its authors had not.** It parked its close on a red system-verify caused by
+midnight index staleness (**TD-111**) — a gate that reddens on an untouched tree as the clock rolls
+over. It parked rather than repairing, because `repair-policy` granted nothing. That is the contract
+working on a case outside its design.
+
+**D4 is not settled precedent.** Its justification overclaimed two of three mechanisms and was
+corrected after independent review; the counter-argument (`AFK-safe` and `J2` defined as opposites in
+the same document) supports the *strict* reading. Routed to `TASK-306` for a ruling that can be
+inherited.
+
+**Buckets** — this Plan's findings are filed against SPRINT-089, which owns the epic slice: tech debt
+**TD-109/110/111/112**, follow-ups **TASK-303–306**, learnings **L-177/178/179**. Shipped content:
+`docs/research/logs/qa-gate-timing.md` § Round 9, appended by the run itself.

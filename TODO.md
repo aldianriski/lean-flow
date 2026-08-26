@@ -18,21 +18,23 @@ status: current
 
 ## Active Sprint
 
-> **One active sprint.** Single stream — SPRINT-087/088's `stream:` keys stay on those closed files as
-> the record of the repo's first parallel pairing, but this sprint is not part of a stream and omits
-> the field (CONTEXT.md § Sprint model).
+_(no active sprint)_ — **SPRINT-089** (Prove the Unattended Run) and **SPRINT-090** (Run-Evidence
+Vehicle) both closed 2026-08-27 and are archived; their shipped changes are written up as **v1.61.0**
+in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only).
 
-> **SPRINT-089 — Prove the Unattended Run** → [docs/sprint/SPRINT-089-prove-the-unattended-run.md](docs/sprint/SPRINT-089-prove-the-unattended-run.md)
+The epic's **first real unattended run** happened: a `J1` executed headless inside the recorded
+envelope with no confirmation, and a **seeded** `J2` parked with its unblock condition — EPIC-015
+§ Closed-when **3 and 4** complete. § Closed-when **1 stays open**: the run ended at
+`AUTHORITY_BOUNDARY` correctly, but the launcher's reaper published a false `PLAN_EXHAUSTED` into a
+different sprint's log and the shape checker passed it (**TD-112** → `TASK-303`).
 
-EPIC-015's **second member sprint** (`epic: EPIC-015`), targeting § Closed-when **1, 3, 4**. SPRINT-088
-built the whole autonomy apparatus and proved none of it end to end; this closes that gap in the only
-order that works. **T1 first** — the gate must be able to finish before a run that runs the gate can be
-trusted to finish (TD-090, `high` since Sprint-084, and SPRINT-088 took observed runs to 634s against a
-450s budget). **T2 then supplies the evidence** SPRINT-088's three carried DoD require: a J1 executing
-unattended inside the recorded envelope, and a **seeded** J2 that parks. The proof vehicle's shape is
-deliberately **left to G2** — freezing it here would repeat L-111 in the sprint written to escape it.
-**G1/G2 are NOT yet signed** — `gates_signed:` is absent from that file and its absence means not
-signed, never approval.
+**Four `high` debt rows came out of it**, all with a follow-up filed: `TD-109` (pre-flight forbids the
+declared `J2` its own machinery is built for) · `TD-110` (the launcher will not fire on a red gate, so
+no Plan repairing a gate FAIL can ever run) · `TD-111` (the index goes stale at midnight, reddening
+that gate on an untouched tree) · `TD-112`. Consumer-facing: a new **always-on** eval harness
+(30 → 31) guarding the conformance engine's git-availability branch, and an expanded
+`.claude/settings.json` permission surface (66 rules, both shells).
+
 
 ---
 
@@ -41,6 +43,80 @@ signed, never approval.
 <!-- Groomed by /triage. Only `ready` tasks are promotable. -->
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-303 — Teach the rollup checker to compare agreement, and the reaper which Plan it ran  [size: M] [risk: high] [HITL]
+      class:      execution
+      authority:  J2
+      done-when:  `check-night-run-rollup.sh` FAILs a rollup whose `terminal ·` state contradicts the
+                  per-task lines in the same file (a `parked` line under `PLAN_EXHAUSTED` is the
+                  motivating case, and the SPRINT-089 artifact is the retained fixture), **and** the
+                  reaper writes into the Plan the run was actually pointed at rather than inferring one
+      touches:    scripts/lib/check-night-run-rollup.sh · scripts/night-run.sh · evals/run-night-run-rollup-fixtures.sh
+      depends-on: none
+      assumes:    none — the false artifact is committed and reproducible (SPRINT-089 log, quoted)
+      tracker:    TD-112 · L-178 · L-174 (the same class, one sprint earlier, different route)
+      origin:     close-retro
+      state:      ready
+
+      **Tier G, and the discrimination bar applies twice.** The checker is a guard; so is the reaper,
+      which PRODUCES the field. L-174 named exactly this asymmetry and its fix still shipped a defect,
+      because fixtures were written for the derivation and the bug moved upstream to which file the
+      derivation is handed. Point the new fixture at the real committed artifact (L-166), not only at
+      a synthetic one.
+
+- [ ] TASK-304 — Stop stamping a wall-clock date into the generated knowledge index  [size: S] [risk: med] [HITL]
+      class:      execution
+      authority:  J2
+      done-when:  the index does not go stale from the passage of time alone — `gen-index.sh --check`
+                  returns 0 on an unchanged tree across a midnight boundary, and the generator's
+                  "Idempotent" claim is true of the whole file rather than only the marked region
+      touches:    scripts/gen-index.sh · docs/knowledge-index.md
+      depends-on: none
+      assumes:    none — reproduced live: the sole diff after rollover was `last_updated: 2026-08-26` → `2026-08-27`
+      tracker:    TD-111
+      origin:     close-retro
+      state:      ready
+
+      A daily false FAIL in the gate is the noise that trains a reader to skim the failure list, and
+      combined with TD-110 it converts into a **refused overnight launch** — the mode most likely to
+      cross midnight is the one this epic is about.
+
+- [ ] TASK-305 — Make the launcher's gate precondition visible, and rule on declared exceptions  [size: S] [risk: med] [HITL]
+      class:      decision
+      authority:  J2
+      done-when:  Part 1's checklist states the green-gate precondition where the checklist is read,
+                  **and** an owner ruling is recorded on whether a run may fire against a *named,
+                  pre-approved* failing check (never a blanket `--force`)
+      touches:    skills/orchestrator/references/night-run.md · scripts/night-run.sh (only if the ruling says so)
+      depends-on: none
+      assumes:    none — `night-run.sh:339` dies on any non-zero gate exit; `grep -n bypass` is empty
+      tracker:    TD-110 · L-179
+      origin:     close-retro
+      state:      ready
+
+      The wording half is cheap. The ruling half is not: the gate's whole job is refusing to run on a
+      red tree, so permitting gate-repair work trades a guard for a convenience, and that is a decision
+      rather than a fix.
+
+- [ ] TASK-306 — Rule pre-flight item 3's wording against a declared J2  [size: S] [risk: med] [HITL]
+      class:      decision
+      authority:  J2
+      done-when:  item 3 says what the machinery does — either a declared `J2` that parks satisfies it,
+                  or it does not and `TASK-301`'s Plan shape is invalid — with the ruling recorded where
+                  the checklist is read, and `AFK-safe`/`J2` reconciled so the two are no longer
+                  defined as opposites while one is said to permit the other
+      touches:    skills/orchestrator/references/night-run.md · .claude/CONTEXT.md (only if the ruling moves the vocabulary)
+      depends-on: none
+      assumes:    none
+      tracker:    TD-109 · SPRINT-090 D4
+      origin:     close-retro
+      state:      ready
+
+      **SPRINT-090's D4 ruled the permissive reading and its justification was later corrected: only
+      ONE of three cited mechanisms is genuinely unreachable under the strict reading, and `AFK-safe`
+      (`:46`) and `J2` (`:58`) are defined as opposites in the same document, which cuts the other way.**
+      So this is a genuine ambiguity between two defensible readings, and D4 must not be inherited as
+      settled precedent — re-derive before relying on it.
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution
@@ -147,63 +223,6 @@ signed, never approval.
       tracker:   SPRINT-087 close sweep · TD-086 · TD-087 · TD-089 · TD-097 · TD-105
       origin:    close-retro
       state:     ready
-- [ ] TASK-301 — Seed a run-evidence sprint so the unattended DoD have a vehicle  [size: M] [risk: med] [AFK]
-      class:      execution
-      authority:  J1
-      done-when:  a small purpose-built Plan carrying at least one **AFK / J1** task and one **seeded
-                  J2** task is promoted and gate-signed, then run headless once — producing (a) a J1
-                  task executed unattended inside the approved envelope with no confirmation, (b) a
-                  seeded J2 that PARKS with its unblock condition recorded, and (c) a run that consumed
-                  the `approval_envelope:` without re-confirming any J0/J1 mid-flight. Those three
-                  artifacts close SPRINT-088 T1 DoD 2/3 and T4 DoD 3, which cannot close without them
-      touches:    a new docs/sprint/SPRINT-NNN (the seeded Plan) · docs/sprint/logs/ · no skill or
-                  guard code — the machinery already exists and shipped in SPRINT-088
-      depends-on: SPRINT-088's guards (shipped: check-authority.sh · check-approval-envelope.sh ·
-                  resolve-run-mode.sh · the terminal-state reaper) — none of which needs changing
-      assumes:    none — every mechanism this exercises is already built and fixture-guarded. The only
-                  thing missing is a Plan an unattended run is ALLOWED to execute
-      tracker:    SPRINT-088 Execution Log 2026-08-26 (the pre-flight blocker) · L-111 · D5 ·
-                  TASK-188 (the same failure one sprint earlier) · closes SPRINT-088 T1 DoD 2/3 + T4 DoD 3
-      origin:     manual
-      state:      ready
-
-      **Why this exists, so nobody re-derives it.** SPRINT-088 wrote three DoD requiring a real
-      unattended run into a Plan whose every task is `HITL`. Part 1 pre-flight item 3 requires every
-      task to be AFK-class, so a run against that Plan parks 4 of 4 and delivers nothing — the criteria
-      were unreachable the moment the Plan froze. The HITL declarations are correct for med-risk Tier G
-      work; the error was pairing them with acceptance that requires their absence. **Do not "fix" this
-      by re-declaring SPRINT-088's tasks AFK** — that would be reshaping a task to dodge a gate. Seed a
-      separate Plan instead, which is what D5 already requires for the J2 park and is equally true of
-      the J1 execution.
-
-
-- [ ] TASK-302 — Cut the gate's dominant cost so a close stops tripping its own budget  [size: M] [risk: med] [HITL]
-      class:      execution
-      authority:  J1
-      done-when:  a default `qa-check.sh` run completes inside the 450s budget with no
-                  `qa-check-budget-exceeded` FAIL and no harness skipped, measured on a clean process
-                  table AND under load; the measurement is recorded as a new Round in
-                  `docs/research/logs/qa-gate-timing.md`, and TD-090's re-raise condition is either
-                  cleared or restated against the new figure
-      touches:    scripts/qa-check.sh (leg 12) · evals/ harnesses · docs/research/logs/qa-gate-timing.md
-      depends-on: none
-      assumes:    none — TD-090 already carries Round 4's measurement (leg 12 = 396.3s of 492s, ~81%)
-                  and SPRINT-086 T2's 196.1s → 143.2s partial win. **Profile before fixing** is the
-                  standing instruction on this row (TD-084's rule, which held twice); do not choose a
-                  split before measuring which term dominates now
-      tracker:    TD-090 (`severity: high`, created Sprint-084, twice re-raised) · TD-084 · SPRINT-086 T2 ·
-                  auto-escalated to P1 at SPRINT-089 promote by the aging rule
-      origin:     manual
-      state:      ready
-
-      **Escalated by rule, not by preference.** Promote-time TD aging says `severity: high` →
-      auto-escalate to Backlog P1. TD-090 has been `high` since Sprint-084, was lowered to `medium` at
-      086's close and **re-raised the same day by its own written re-raise condition**, and had never
-      reached the Backlog at all — so the rule has been silently not firing for four sprints.
-      **SPRINT-088 made it worse**: three new always-on harnesses were added and observed gate runs
-      went 450s → 510s → 634s against a 450s budget, tripping `qa-check-budget-exceeded` on three of
-      four runs. Every future sprint pays this before it does any work of its own.
-
 ### P3 — Long-term
 
 > Rejected work lives in **`.out-of-scope/`** — each file carries its own reasoning, revisit-if and
@@ -211,7 +230,6 @@ signed, never approval.
 > pointer lines that used to sit here were breadcrumbs to those files, pruned under §11's TODO cap on
 > the same reasoning §11 uses for shipped Backlog entries — the durable home is the `.out-of-scope/`
 > file, plus git. Ids stay monotonic: 006 · 007 · 040 · 047 · 120 · 148 are not reused.
-
 ---
 
 ## Tech Debt

@@ -2,8 +2,8 @@
 sprint: 089
 slug: prove-the-unattended-run
 owner: Maintainer
-last_updated: 2026-08-26
-status: active
+last_updated: 2026-08-27
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
