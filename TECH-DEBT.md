@@ -173,6 +173,60 @@ status: current
 > serve better than four separate fixes, which is a decomposition question for the owner rather than a
 > sweep ruling.
 
+- **TD-106** severity: medium | status: open | created: Sprint-088
+  - Summary: **`check-verify-reaches.sh` reports a script that exists as absent, because it tests the
+    name it extracted as a literal path from the repo root.** Line 89 is `if [ ! -f "$scr" ]`, so a
+    `Verify:` clause naming a script *bare* — without a directory — resolves against `./`, misses
+    `scripts/lib/`, and emits `verify-method-absent: … names X, which does not exist in this
+    repository`. The message is a statement of fact and the fact is false.
+  - Evidence: `SPRINT-087-first-rule-through-the-engine.md:109` names `read-spec-rules.sh` bare. The
+    file exists at `scripts/lib/read-spec-rules.sh` (mode 755, 9559 bytes). The gate nonetheless
+    reports it absent. Both halves checked directly, not inferred from the finding text.
+  - **Why it is worse than a false positive.** The other direction is the real exposure: the check
+    exists so a criterion claiming a mechanical method cannot pass with nothing behind it. A resolver
+    that only matches root-relative paths says nothing about any bare name — it cannot distinguish
+    *absent* from *un-pathed*, so a genuinely missing method named bare produces the same output as a
+    present one. The finding that fires today is the visible half of a guard blind in both
+    directions (L-058 · L-166).
+  - Impact: a real FAIL in `qa-check.sh`, so it holds the gate red for a closed sprint nobody is
+    editing, and a standing red trains a reader to skim past the leg.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): resolve a bare name
+    against the known script directories (`scripts/`, `scripts/lib/`, `evals/`) before declaring it
+    absent, failing only when no candidate resolves. Retain a must-FAIL fixture for a genuinely
+    absent method **and** a control fixture naming a real script bare that must stay green — the
+    control is load-bearing, since it is the case that is wrong today.
+  - **Sixth member of the checker-accuracy cluster** (TD-086 · TD-087 · TD-089 · TD-097 · TD-105) that
+    the SPRINT-078 sweep note already called large enough to fold into one task. **TASK-300 asks
+    exactly that question and was written against five; it is six.** Route this row through TASK-300's
+    decomposition ruling rather than fixing it standalone.
+  - **Re-file fresh if** `Verify:` clauses become required to carry a path — the collision is between
+    what a clause may write and what the resolver accepts, and constraining either dissolves it.
+
+- **TD-107** severity: medium | status: open | created: Sprint-088
+  - Summary: **TASK-299's implementation landed on `main` inside SPRINT-087's window without being a
+    task in any Plan, so `check-layers-observed.sh` correctly reports commits attributable to no task
+    — and the Backlog still lists the work as unstarted.** Unlike TD-106, **the checker is right**;
+    the debt is the untracked work it found.
+  - Evidence: `689b1f9` · `0a18900` · `a287805` · `90f74d7`, all ancestors of HEAD, touching
+    `scripts/lib/check-layers-observed.sh` and `evals/run-layers-observed-fixtures.sh` (7 commit:path
+    pairs in the finding). `0a18900`'s subject — *"scope stream attribution by commit ownership, not
+    by path"* — is TASK-299's title almost verbatim. `TODO.md` still carries **TASK-299 …
+    `state: ready`**, i.e. groomed and promotable, for work already shipped.
+  - **This is the decompose → build slide the orchestrator red flag names**, caught by a gate rather
+    than at the point of build: a Backlog task that never entered a sprint nonetheless produced four
+    commits on `main`. `TODO.md` § Active Sprint even cites TASK-299 as the mechanism the 087/088
+    overlap exercised — so the work was known, used and relied upon, and only its *record* is missing.
+  - Impact: two ledgers disagree with the tree. The gate stays red on a closed sprint; a future
+    `promote` may re-promote TASK-299 and build it twice; and SPRINT-087's § Files Changed
+    under-reports what its window shipped.
+  - Mitigation (hypothesis, re-derive first): reconcile the record, not the code — mark TASK-299 done
+    with its four commits named, and rule whether SPRINT-087's Plan gains a retrospective task or the
+    commits are declared coordinator bookkeeping. **Do not "fix" this by widening the checker's
+    bookkeeping exemption** — that dissolves the finding by making the guard blind, which is the
+    failure this row exists to record.
+  - **Re-file fresh if** TASK-299 is closed with its commits attributed — the row is about a missing
+    record, so supplying the record ends it.
+
 - **TD-105** severity: medium | status: open | created: Sprint-087
   - Summary: **The Plan-freeze checks treat DoD ticking — the execution loop's own prescribed action —
     as an unaccounted Plan edit, so a sprint that runs cleanly fails the gate while a sprint that
