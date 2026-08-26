@@ -60,4 +60,42 @@ untouched and filed as **TD-109** (`severity: high`) instead. Noted there: item 
 checklist line that `night-run.sh` does not enforce, so the defect currently costs a *refused* launch
 rather than a wrong one — a checker built from the strict wording would make it a hard block.
 
-consequence · T2 · behaviour:material · governance:high
+*(This entry records SPRINT-089 T2's work, not a task of this sprint, so it carries no
+`consequence · Tn ·` line — see the correction entry below.)*
+
+### 2026-08-26 | surprise | the guard caught a FALSE machine-readable claim in this very log
+
+The entry above originally ended `consequence · T2 · behaviour:material · governance:high`, meaning
+*SPRINT-089's* T2. In **this** log `T2` means SPRINT-090's T2, and `check-authority.sh` counts
+`^consequence · <tid> · ` as an **execution record**. So the line asserted that SPRINT-090's T2 — the
+task that exists to be parked — had already been executed, with no park record beside it. The checker
+duly failed: `authority-j2-not-parked`.
+
+**That was fabricated evidence sitting in the record before the run, and it was mine.** Not deliberately,
+but the distinction does not matter to a guard reading the file at 3am.
+
+**Why the line was CORRECTED rather than superseded by a new entry.** This log's own rule is
+append-only — *never edit a past entry, correct it with a new one* — and that rule is right for prose.
+It cannot work for a **machine-readable counter**: a later entry cannot decrement `executed`, and the
+only two append-only shapes that would clear the FAIL are `T2 · parked · …` and `owner-ruling · T2 · …`,
+**both of which would assert something that has not happened** — a park the run never performed, or a
+human unblock nobody gave. Manufacturing either to get a guard green is precisely the bypass
+`authority-j2-park-bypassed` exists to catch. So the false tag was removed, and this entry records
+exactly what was changed and why. Deviation from append-only, disclosed rather than quiet.
+
+**Generalisable, and it is the sharper half:** an append-only convention protects a *narrative*. Where
+the same file also carries **structured fields a guard consumes**, "correct it with a new entry" can be
+unavailable — and the pressure at that moment is to append the shape that makes the guard green. That
+pressure points at fabrication. Filed as a learning candidate rather than left in this log alone.
+
+The withdrawn line read, indented here so it is legible without being counted — the checker anchors at
+column 1, and a guard must never read an *explanation* of a tag as the tag itself (L-108):
+
+    consequence · T2 · behaviour:material · governance:high   [WITHDRAWN 2026-08-26]
+
+**Second correction, same paragraph, worth more than the first.** The withdrawal above was itself first
+written flush at column 1, with prose beside it claiming it was "deliberately NOT at column 1". The
+claim and the artifact disagreed, and `check-authority.sh` stayed red through the fix that was supposed
+to clear it. Two lessons, and the second is the durable one: a *quotation* of a machine-readable tag is
+indistinguishable from the tag unless it is positionally disarmed — and **stating that you disarmed it
+is not disarming it.** The guard was the only thing that knew the difference.
