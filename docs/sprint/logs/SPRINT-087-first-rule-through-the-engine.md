@@ -552,3 +552,43 @@ checker and has been told.
 
 consequence · T5 · behaviour:material · governance:low
 review · T5 · independent-adversarial-reviewer (worktree-isolated) · behaviour:material · governance:low
+
+### 2026-08-26 | progress | T5 re-reviewed clean, merged, DoD ticked 3/3
+
+Both findings independently confirmed closed. The oracle comparison is **genuine, not theatre** — the
+reviewer verified a real `sh` subprocess against a genuinely missing path, real captured stderr, both
+sides consuming the *same* path variable, and the governing assertion comparing two independently
+derived values rather than a literal with a spawn beside it. That mattered because the fix remedied the
+reviewer's own finding, and the failure mode there is a test that satisfies the letter of a finding and
+none of its intent.
+
+`specReadExitCode` is now total: only a strict boolean `true` means success. `{ ok: "false" }` — a
+truthy string that reads as false — previously returned **0**. Unreachable today, since every one of
+the eight real construction sites uses a literal boolean, but with TD-101 in force the annotation
+enforced nothing. **The false-assurance shape this task exists to prevent, sitting inside the function
+meant to prevent it.**
+
+**The arithmetic dispute resolved in the builder's favour, and I was half right.** I flagged that seed 1's
+itemisation summed to 12 against a claimed 11. The reviewer re-ran it: **11/41 is correct**; the prose
+mislabels 4 tests as 5, because `spec-not-found`'s mapping-level test was *converted* into the oracle
+test rather than kept alongside it. So the total was right and the explanation was wrong — the opposite
+of the usual failure, and only distinguishable by re-running. Fourth evidence-block arithmetic problem
+this sprint; L-169's family.
+
+Sprint DoD **25 ticked / 4 open** — only T3 remains.
+
+**A near-miss worth more than the tick, filed as L-171.** On its resumed turn the harness placed T5's
+reviewer in **T3's worktree**, which T3 was actively building in with **15 uncommitted staged files**.
+The reviewer seeded breaks in `apps/cli/src/main.ts` inside that tree, noticed the unrelated staged
+entries and a stray `_test_out2.txt`, deliberately left them alone, and verified `git status` before and
+after. Nothing was lost — **but nothing in the protocol arranged that; the reviewer's own care did.** A
+single `git add -A` (precisely L-168's gesture) or a tidy-up `git checkout .` would have swept fifteen
+files of another agent's work into an unrelated operation or reverted them.
+
+L-168 says dispatch every reviewer worktree-isolated. **This is its unstated second half: verify the
+worktree is *unshared*.** And the failure would have been worse than L-168's original — there the
+corruption at least lived in a diff; here the victim is uncommitted work with no diff to inspect and no
+commit to recover from. I verified T3's 15 files are intact and `apps/cli` correctly restored.
+
+consequence · T5 · behaviour:material · governance:low
+review · T5 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low

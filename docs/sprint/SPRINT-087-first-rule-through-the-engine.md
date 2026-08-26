@@ -119,9 +119,9 @@ Cites: TASK-280 · ADR-034 D3 · SPRINT-085 T3 carry-forward 1
 the legitimate zero-row section, asserted against the Shell reader's exit as an independent oracle.
 
 **DoD:**
-- [ ] Every `SpecReadFail` exits 1; every `SpecReadOk` exits 0 — *Verify: Shell spawned as the oracle, not a copied literal*
-- [ ] The **legitimate zero-row section still exits 0** — *Verify: §8 reproduced; absence and emptiness must stay distinguishable at the boundary too*
-- [ ] **Tier G**: a seeded mis-mapping reddens its case — *Verify: sibling control stays green*
+- [x] Every `SpecReadFail` exits 1; every `SpecReadOk` exits 0 — *Verify: Shell spawned as the oracle, not a copied literal*
+- [x] The **legitimate zero-row section still exits 0** — *Verify: §8 reproduced; absence and emptiness must stay distinguishable at the boundary too*
+- [x] **Tier G**: a seeded mis-mapping reddens its case — *Verify: sibling control stays green*
 
 ### T6 — Stop a permission-denied spec reporting `spec-not-found` `[size: S · risk: med · class: execution · HITL]`
 Layers: `apps/cli/src` (the layer that touches the filesystem) · colocated tests · fixtures
