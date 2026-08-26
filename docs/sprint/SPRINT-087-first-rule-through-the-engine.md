@@ -88,10 +88,10 @@ only works for one rule fails — which is why it happens here, on a family chos
 and every difference is ruled rather than absorbed.
 
 **DoD:**
-- [ ] The family is **chosen at G2 and the choice is recorded with its reason** — *Verify: a D-row names the family and which criterion selected it; an unrecorded pick is the L-151 shape*
-- [ ] Every rule in it agrees with Shell **rule-by-rule** — *Verify: the assertion names the differing rule on failure; a bare count comparison does not satisfy this (EPIC-014 § Closed-when wording)*
-- [ ] A retained must-FAIL **and a sibling control per rule** — *Verify: the suite lists them individually; "most of the family" does not satisfy this*
-- [ ] Any TS/Shell difference is **ruled, never absorbed** — *Verify: each difference recorded in the Execution Log with its ruling, or the log states there were none (D2)*
+- [x] The family is **chosen at G2 and the choice is recorded with its reason** — *Verify: a D-row names the family and which criterion selected it; an unrecorded pick is the L-151 shape*
+- [x] Every rule in it agrees with Shell **rule-by-rule** — *Verify: the assertion names the differing rule on failure; a bare count comparison does not satisfy this (EPIC-014 § Closed-when wording)*
+- [x] A retained must-FAIL **and a sibling control per rule** — *Verify: the suite lists them individually; "most of the family" does not satisfy this*
+- [x] Any TS/Shell difference is **ruled, never absorbed** — *Verify: each difference recorded in the Execution Log with its ruling, or the log states there were none (D2)*
 
 ### T4 — Target by section, and refuse to claim a level from a partial run `[size: S · risk: med · class: execution · HITL]`
 Layers: `apps/cli/src` (`--section`, partial-invocation guard, unknown-target handling) · `packages/standard/src` (whatever carries the guard) · colocated tests
@@ -225,6 +225,12 @@ FAILs and pushed a run over its own budget.
 | `packages/standard/src/rules/sprint-log-outside-logs-dir.ts` (+`.fake.ts`) | T1 | The tracer rule `S9.LOGDIR` and its `SprintDirPort` seam + in-memory fake | med | `sprint-log-outside-logs-dir.test.ts` (7 seeds recorded in-file) |
 | `packages/standard/src/adapters/fs-sprint-dir.ts` | T1 | Real Bun adapter; its `.isFile()` filter is the seam's load-bearing asymmetry (a *directory* named like a log file) | med | `fs-sprint-dir.test.ts` · seam test vs live oracle |
 | `apps/cli/src/main.ts` | T1 | `--rule` wiring; prints one line per finding | low | `main.test.ts` |
+| `packages/standard/src/rules/s12-{secrets,backups,designsrc,generated}.ts` | T3 | F12's four mechanical evaluators, each transliterated from its own `assert_S12_*` shell function | med | colocated `.test.ts`, each with a must-FAIL + sibling control, parity vs the live engine |
+| `packages/standard/src/rules/git-boundary-port.ts` (+`.fake.ts`) | T3 | **One shared port for the family** — T1's per-rule shape did not survive four rules with two data needs | med | `git-boundary-spec.test.ts` · exercised by all four rule suites |
+| `packages/standard/src/adapters/fs-git-boundary.ts` | T3 | Real Bun adapter behind the shared port | med | same evaluator run against adapter and fake |
+| `packages/standard/src/rules/f12-registry.ts` | T3 | Family registry via `built-in.ts`'s documented seam; `registry.ts` untouched | med | `f12-registry.test.ts`. **No production caller yet — TD-103** |
+| `apps/cli/src/main.ts` · `spec-file-reader.ts` | T4 · T5 · T6 | `--section` targeting, partial-invocation guard, `specReadExitCode`, permission-denied boundary | med | `main.test.ts` · `spec-file-reader.test.ts` |
+| `packages/standard/src/{classify,section,spec-reader}.ts` | T2 · T4 · T7 | Mark→outcome classification · frozen `SectionReport` · N-mismatch `reconcile` | med | colocated suites; oracle spawned live |
 | `scripts/lib/check-ephemeral-intake.sh` | T8 | Exclude `.claude/worktrees/` at path discovery — the gate was charging for the worktree-dispatch pattern this repo prescribes (TD-095) | low | `evals/run-ephemeral-intake-fixtures.sh` (4 cases, incl. retained lookalike control) |
 | `scripts/lib/check-research-archive.sh` | T8 | Same exclusion in `live_citer()` — a worktree copy counted as a live citer, so a superseded doc cited by nothing real passed. **Silent false negative, found by independent review, not by the author** | med | `evals/run-research-archive-fixtures.sh` (7 cases, incl. retained lookalike citer) |
 | `evals/run-ephemeral-intake-fixtures.sh` | T8 | Wire the two retained worktree fixtures | low | self |

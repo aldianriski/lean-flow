@@ -635,3 +635,40 @@ task.
 
 consequence · T3 · behaviour:material · governance:low
 review · T3 · independent-adversarial-reviewer (worktree-isolated) · behaviour:material · governance:low
+
+### 2026-08-26 | progress | T3 re-reviewed clean, merged, DoD ticked 4/4 — Plan exhausted at 29/29
+
+The inverse seed settled the question the fix turned on. A PASS control that stays green proves nothing
+on its own — a trivially unrelated control does the same. So the rule was made to flag **every** `.pem`
+regardless of content: **exactly the two new pem controls reddened**, and nothing else. Repeated on the
+`sa` shape: **exactly the two new sa controls reddened**. Both pairs genuinely pin the content
+distinction rather than decorating it. The claimed seed also reconciled exactly — 3 of 25 reddening,
+membership as stated, and the sa tests staying green for the *right* reason (that seed never touches the
+`sa` branch), which the sa-targeted mutation independently confirmed rather than assumed.
+
+`s12-secrets.ts` itself was untouched this round — verified by diff, not accepted — so the earlier
+clears (the `.ai`/`.psd` shared-quirk ruling, `S12.DESIGNSRC`'s location-discriminating control,
+`registry.ts` byte-untouched) hold by construction.
+
+**Sprint Plan exhausted: 29 of 29 DoD ticked, 0 open.** Eight tasks, all Tier G, all independently
+reviewed worktree-isolated, **all eight revised once** after review found something the author had not.
+Not one task cleared its first review.
+
+**Integrated suite: `264 pass, 2 fail` across 266 tests in 21 files, ~220 s.** Both failures named and
+identified — TD-098's `reconcile` timeouts at bun's 5000 ms default. Three consecutive runs gave
+**6 → 2 → 2** failures, every one a timeout, **zero assertion failures**. The variance is load, and the
+suite is now large enough to be its own load generator, exactly as TD-098's corrected mechanism predicts.
+Recorded with test names this time rather than a signature match — which also retro-explains the
+unidentified `150 pass, 1 fail` at T2's merge.
+
+Filed **TD-104**, distinct from TD-098 and in the worse direction. T3's oracle helper hard-codes
+`timeout: 15_000` at four call sites for an operation the reviewer measured at **18.795 s** — a limit
+already smaller than the thing it bounds, at rest. TD-098 is a *default* nobody chose, exceeded only
+under contention; this is a constant somebody **chose**, already below the measured cost when written.
+The difference matters for the next reader: a too-small default reads as an oversight, while an explicit
+constant reads as considered, so they will hunt for a slowdown instead of questioning the number. All
+eight of T3's parity tests depend on it, so the family's parity evidence degrades into flakes rather
+than failing cleanly.
+
+consequence · T3 · behaviour:material · governance:low
+review · T3 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low

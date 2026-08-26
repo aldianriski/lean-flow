@@ -152,6 +152,33 @@ status: current
 > at **3050 > 130**, still TD-082's reasoned carry; the figure moved 3,050 → 3,050 since the last
 > sweep, so the carry ruling is unaffected.
 
+- **TD-104** severity: medium | status: open | created: Sprint-087
+  - Summary: **T3's oracle helper hard-codes a 15,000 ms timeout for an operation measured at ~18,800 ms
+    — the limit is already smaller than the thing it bounds, at rest.** Every `runShellEngine` call in
+    `s12-{secrets,backups,designsrc,generated}.test.ts` spawns the full
+    `scripts/lib/conformance-engine.sh` with `execFileSync(..., { timeout: 15_000 })`.
+  - Evidence: SPRINT-087's T3 reviewer measured the engine directly — `time sh conformance-engine.sh
+    <emptydir>` → **18.795 s real** — and watched the helper begin timing out during its own session,
+    first one test, then 6 of 25. Confirmed independently: the `timeout: 15_000` constant is present at
+    four call sites. The tests pass today only because their fixtures are far smaller than the empty-dir
+    baseline that was measured; nothing keeps that true.
+  - **Distinct from TD-098, and in the more dangerous direction.** TD-098 is bun:test's *default* 5000 ms
+    being exceeded under contention — a limit nobody chose, exceeded only when loaded. This is a limit
+    somebody **chose**, and it was already below the measured cost of the operation when it was written.
+    A default that is too small reads as an oversight; an explicit constant reads as a considered
+    decision, so the next person to see it time out will look for the slowdown rather than at the number.
+  - Impact: **the whole F12 family's parity evidence rests on it.** All eight of T3's oracle-parity tests
+    use this helper, so as the spec or engine grows, the parity claim degrades into flakes rather than
+    failing cleanly — and a parity test that times out proves nothing while looking like infrastructure
+    noise. The sprint's own full suite is now **266 tests across 21 files at 220–270 s**, up from 175
+    tests, so the trend is against this constant, not with it.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): derive the timeout from the
+    measured spawn cost with a contention margin rather than picking a round number, and **share one
+    constant** across the four call sites so it cannot drift per file. Consider spawning the engine once
+    per suite rather than per test — eight full-engine spawns for four rules is most of the runtime.
+  - **Re-file fresh if** the engine gets materially faster or the parity tests stop spawning it whole —
+    the arithmetic (measured cost vs chosen limit) is the entire finding.
+
 - **TD-103** severity: minor | status: open | created: Sprint-087
   - Summary: **Two domain capabilities shipped in SPRINT-087 have no consumer — `reconcile()` and
     `marksInStandard()` have zero production callers**, so neither is reachable from any CLI invocation
