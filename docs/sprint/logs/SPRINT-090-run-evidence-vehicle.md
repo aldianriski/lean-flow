@@ -130,3 +130,42 @@ form, that something about the run had already happened.** That is now three fin
 pre-flight, and none was caught by recalling a rule — the review-depth schema, the authority checker
 and the layers checker each found their own. The pattern is [[L-176]]'s, one level up: a structured
 field written at *planning* time is read as a *record of execution*, because the schema has no tense.
+
+### 2026-08-26 | scope-change | T1 replaced — the launcher cannot fire to do work that makes its own gate green
+
+**The run was fired and REFUSED**, which is itself the evidence: `DEAD-ON-ARRIVAL: pre-flight gate
+scripts/qa-check.sh failed: QA-CHECK: 200 pass, 1 fail`.
+
+`scripts/night-run.sh` line 339 runs the gate and dies unless it exits 0. There is **no bypass flag**.
+T1's whole job was to clear the one FAIL (`knowledge index STALE`) — so the run could not start until
+the work it existed to do was already done.
+
+**The general form, which outlives this sprint: no Plan whose task REPAIRS a gate FAIL can be run
+unattended.** An unattended run can only do work the gate is indifferent to, or work that adds beyond
+what the gate requires. That may well be intentional — automating "fix your own gate" is a bad idea —
+but it is undocumented, and Part 1's prose checklist does not list a green gate among its items, so the
+constraint is invisible until the launcher refuses. Filed as **TD-110**.
+
+**This is the FIFTH foreclosure of one acceptance**, each by a different mechanism: an all-`HITL` Plan
+(L-111 / SPRINT-088) · pre-flight item 3 vs a declared J2 (TD-109) · `sprint-bulk` step 0's
+"ask which sprint" with no ask channel · and now the launcher's gate precondition. Each was found only
+by attempting the next step, never by reading the procedure — which is the pattern worth keeping.
+
+**T1 replaced with gate-neutral work.** *What broke:* T1's chosen work was structurally unrunnable
+unattended; the sprint's goal and acceptance are unchanged. *Impact:* T1's Layers, prose and DoD are
+rewritten; T2 is untouched. *Re-confirm G2:* the J1 task must still satisfy AFK-safe on every clause,
+and it does — additive, reversible, already-approved-in-scope, and now also **gate-neutral**.
+
+**The index was regenerated interactively** instead, because that work is genuinely owed and clearing
+it is what makes the gate green. Two facts were measured rather than assumed before choosing the
+replacement:
+- `gen-index.sh` reads `docs/adr/ADR-*.md` and `docs/research/*.md` — the glob is **non-recursive**, so
+  `docs/research/logs/` is excluded. Verified by probe: appending to the logs sibling left
+  `gen-index.sh --check` at exit 0.
+- A first substring check appeared to show the log *was* indexed (`grep -c qa-gate-timing` returned 2).
+  That was a **false positive**: two files share the name — `docs/research/qa-gate-timing.md` (indexed)
+  and `docs/research/logs/qa-gate-timing.md` (not). Caught by testing the behaviour instead of the
+  name, which is L-108 landing again on the same day it was cited twice.
+
+**The calibration row was considered for T1 and rejected**: Part 4 states the launcher's reaper writes
+it, so a task doing the same would collide with the mechanism under test.

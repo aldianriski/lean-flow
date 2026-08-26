@@ -202,6 +202,43 @@ status: current
   - **Re-file fresh if** `Verify:` clauses become required to carry a path — the collision is between
     what a clause may write and what the resolver accepts, and constraining either dissolves it.
 
+- **TD-110** severity: **high** | status: open | created: Sprint-089
+  - Summary: **`night-run.sh` refuses to fire unless `qa-check.sh` exits 0, so no Plan whose task
+    REPAIRS a gate FAIL can ever be run unattended.** The work that would make the gate green is the
+    work the run exists to do, and the run cannot start until it is already done.
+  - Evidence: SPRINT-090 T1 was seeded to regenerate a deliberately stale `docs/knowledge-index.md`.
+    Pre-flight was otherwise complete — gates signed, ten-dimension envelope pinned, allowlist scoped,
+    `check-authority.sh` and `check-approval-envelope.sh` both PASS — and the launcher returned
+    `DEAD-ON-ARRIVAL: pre-flight gate scripts/qa-check.sh failed: QA-CHECK: 200 pass, 1 fail`. The one
+    FAIL was the staleness T1 existed to clear. `scripts/night-run.sh:339`, no bypass flag.
+  - **Why it stayed invisible until the launcher refused.** Part 1's prose checklist does not list a
+    green gate among its items — charter, trigger, task classes, `gates_signed:`, open `assumes:`,
+    allowlist, exit path. The precondition lives only in the launcher's code, so reading the procedure
+    cannot find it. The author here checked the checklist, concluded a green gate was not required,
+    said so, and was wrong: a rule read from documentation rather than from the artifact that enforces
+    it (the L-045 family, at the level of a precondition rather than a result).
+  - Impact: it silently narrows what unattended runs may ever be used for — only work the gate is
+    indifferent to, or work that adds beyond what the gate requires. That may well be the intended
+    design (automating "fix your own gate" is a bad idea), but an intended constraint nobody wrote
+    down is indistinguishable from a defect at the moment it bites, and it cost a vehicle Plan designed
+    in good faith.
+  - **This is the FIFTH foreclosure of one acceptance**, each by a different mechanism and each found
+    only by attempting the next step: an all-`HITL` Plan (L-111 · SPRINT-088) · pre-flight item 3
+    against a declared `J2` (TD-109) · `sprint-bulk` step 0's *"more than one active → ask which
+    sprint"* with no ask channel · and this. None was found by reading the procedure.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): **state the precondition in
+    Part 1** so it is visible where the checklist is read, and decide separately whether the launcher
+    should accept a *declared, pre-approved* failing check — a named exception pinned in the envelope,
+    never a blanket `--force`. The second half is a design ruling, not a wording fix: the gate's whole
+    job is refusing to run on a red tree, and weakening it to permit gate-repair work trades a guard
+    for a convenience.
+  - Worked around at SPRINT-090 by replacing T1 with **gate-neutral** work (a dated measurement
+    appended to `docs/research/logs/qa-gate-timing.md`), not by touching the launcher — SPRINT-089
+    § Scope defers re-opening SPRINT-088's machinery.
+  - **Re-file fresh if** the gate precondition moves out of `night-run.sh` into the checklist or a
+    separate pre-flight script — the line reference above would then name a stale location, and the
+    invisibility half of this row would already be fixed.
+
 - **TD-109** severity: **high** | status: open | created: Sprint-089
   - Summary: **Part 1 pre-flight item 3 forbids the very Plan shape the autonomy machinery is built
     for.** It reads *"every task in the run is AFK-class — none needs a human mid-execution"*, while
