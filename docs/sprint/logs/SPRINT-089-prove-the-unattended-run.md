@@ -145,3 +145,44 @@ HEAD is empty).
 half (42.8s here, 82–94s normalized) is measured but unattributed to specific legs; `TASK-287` unbuilt.
 
 consequence · T1 · behaviour:material · governance:high
+
+### 2026-08-27 | run-complete | T2 complete — the unattended run happened, and every claim was verified against artifacts
+
+**SPRINT-090 ran headless and delivered the evidence SPRINT-088 could not.** Two commits by the run
+itself: `7cc19fb` (T1's Round 9 append, 00:04) and `e8ad125` (rollup + DoD ticks, 00:14). Terminal state
+`AUTHORITY_BOUNDARY`. Rollup: `run · 6 of 6 DoD ticked`, `T1 · done`, `T2 · parked-hitl`.
+
+**Verified against artifacts, never against the run's own report** — the run is a reporter, and an
+exit code or a ticked box is evidence about the reporter (L-045 · L-057):
+
+| SPRINT-089 T2 DoD | Independent check |
+|---|---|
+| J1 executes unattended, no confirmation | `7cc19fb`, 46 additions / 0 deletions, inside the window; **0 `AskUserQuestion` tool_use events** in 41 tool calls |
+| Seeded J2 parks with an unblock condition | `T2 · parked-hitl` naming the ruling required; `check-authority.sh`: **1 park, 0 execution, 0 owner-ruling** |
+| Run consumes the envelope, no J0/J1 re-confirm | envelope read from frontmatter (13 references in the run log); no confirmation sought for T1 |
+| Rollup's terminal state matches its per-task lines | `AUTHORITY_BOUNDARY` over one `done` + one `parked-hitl` — **not** `PLAN_EXHAUSTED`; `check-night-run-rollup.sh` PASS |
+| DoD checked against task classes before firing | done at pre-flight; it is what surfaced **TD-109** |
+
+Scope was honoured in both directions: **0** commits touched T2's Layers (`TECH-DEBT.md`,
+`scripts/lib/`), and **0** touched SPRINT-089, which the trigger forbade.
+
+**The run found a defect nobody had anticipated, and handled it correctly.** It parked its own close on
+a red system-verify and named the cause. The cause is real: `gen-index.sh` writes `last_updated:` into
+the index frontmatter, so the index goes stale **at every midnight regardless of content** — the sole
+diff was `2026-08-26` → `2026-08-27`. Filed as **TD-111**. With TD-110's green-gate precondition that
+means *an unattended run can be refused by the clock alone*, and the mode most likely to cross midnight
+is the one this whole epic is about. The autonomy contract behaved exactly as written on a case its
+authors never considered: `repair-policy` granted nothing, so it parked instead of repairing.
+
+**Two corrections to what this session reported earlier, both the same error.** First, "pre-flight does
+not require a green gate" — Part 1's prose does not, `night-run.sh:339` does; I read the checklist
+instead of the code that enforces it. Second, "the run ticked its DoD without committing them" — that
+was a **mid-flight snapshot**; the bookkeeping commit landed ten minutes later. Both were snapshots
+mistaken for final states, which is the same shape as the defects the guards caught all day.
+
+**Five foreclosures, one acceptance.** All-`HITL` Plan (L-111) · pre-flight item 3 vs a declared J2
+(TD-109) · `sprint-bulk` step 0's unanswerable "which sprint" · the launcher's green-gate precondition
+(TD-110) · midnight staleness (TD-111). **Not one was found by reading the procedure** — every one
+surfaced by attempting the next step. That is the sprint's real result.
+
+consequence · T2 · behaviour:material · governance:high

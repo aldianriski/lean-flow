@@ -70,15 +70,15 @@ unattended inside the recorded envelope with no confirmation, and a **seeded** J
 unblock condition recorded.
 
 **DoD:**
-- [ ] A **J1 task executes unattended inside the approved envelope with no confirmation** — *Verify: exercised on a real run, not asserted (L-007); closes SPRINT-088 T1 DoD 2*
-- [ ] A **seeded J2 parks**, recording its unblock condition — *Verify: the seed is required, not a fallback (D5); closes SPRINT-088 T1 DoD 3*
-- [ ] The run **consumes** the `approval_envelope:` and re-confirms no J0/J1 mid-flight — *Verify: writing an envelope is not consuming one; closes SPRINT-088 T4 DoD 3*
-- [ ] The run's rollup names a **terminal state that matches its per-task lines** — *Verify: `scripts/lib/check-night-run-rollup.sh` plus a read of the state against the lines; SPRINT-088 shipped a rollup claiming `PLAN_EXHAUSTED` over three `blocked` tasks and the shape check alone did not catch it*
-- [ ] Every DoD above is checked against **the Plan's own task classes before the run is fired** — *Verify: Part 1 pre-flight item 3; this is the check whose absence made three of SPRINT-088's criteria unreachable at freeze*
+- [x] A **J1 task executes unattended inside the approved envelope with no confirmation** — *Verify: exercised on a real run, not asserted (L-007); closes SPRINT-088 T1 DoD 2*
+- [x] A **seeded J2 parks**, recording its unblock condition — *Verify: the seed is required, not a fallback (D5); closes SPRINT-088 T1 DoD 3*
+- [x] The run **consumes** the `approval_envelope:` and re-confirms no J0/J1 mid-flight — *Verify: writing an envelope is not consuming one; closes SPRINT-088 T4 DoD 3*
+- [x] The run's rollup names a **terminal state that matches its per-task lines** — *Verify: `scripts/lib/check-night-run-rollup.sh` plus a read of the state against the lines; SPRINT-088 shipped a rollup claiming `PLAN_EXHAUSTED` over three `blocked` tasks and the shape check alone did not catch it*
+- [x] Every DoD above is checked against **the Plan's own task classes before the run is fired** — *Verify: Part 1 pre-flight item 3; this is the check whose absence made three of SPRINT-088's criteria unreachable at freeze*
 
 ## Owner-action checklist
-- [ ] Sign the batch **G1 + G2** for T1–T2 before execution begins, and record it as `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. **The field is absent until then, and its absence means NOT signed** — an unattended run reads this file and nothing else (L-099).
-- [ ] Before T2 fires anything, record the `approval_envelope:` covering all ten dimensions. Absence is not approval, and the shipped template's placeholder counts as absent.
+- [x] Sign the batch **G1 + G2** for T1–T2 before execution begins, and record it as `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. **The field is absent until then, and its absence means NOT signed** — an unattended run reads this file and nothing else (L-099).
+- [x] Before T2 fires anything, record the `approval_envelope:` covering all ten dimensions. Absence is not approval, and the shipped template's placeholder counts as absent. **Recorded on `SPRINT-090` (`… @ e1e3141`), which is the Plan that actually fired** — an envelope authorises a *run*, and SPRINT-089 was never run unattended, so its own frontmatter correctly has none (`check-approval-envelope.sh` reports it as a `note`, not a FAIL).
 
 ## Decisions (pre-locked)
 - **D1** — **T1 before T2, and the dependency is real rather than thematic.** A run whose own
@@ -120,6 +120,10 @@ unblock condition recorded.
 | `scripts/lib/conformance-engine.sh` | T1 | Memoise the git probe, 6 spawns → 1 per invocation; `_SEEN` flag closes the empty-key landmine an independent review found | **Tier G** | `run-git-availability-fixtures.sh` (15 assertions), both-direction seeded discrimination |
 | `evals/run-git-availability-fixtures.sh` | T1 | NEW — guards the engine's git-availability branch, which had zero discriminating coverage in either direction | **Tier G** | self; seeds redden in disjoint sets, controls green |
 | `scripts/qa-check.sh` | T1 | Wire the new guard always-on (30 → 31), with the cheap-and-git-free exception reasoned at the list | low | gate run `195 pass, 0 fail` |
-| `TECH-DEBT.md` | T1 | TD-090 re-raise condition restated host-normalized; TD-095 split on measurement | low | arithmetic reproducible from a named anchor |
+| `TECH-DEBT.md` | T1 · T2 | TD-090 restated host-normalized; TD-095 split on measurement; TD-109/110/111 filed from pre-flight and the run | low | arithmetic reproducible from a named anchor |
+| `docs/sprint/SPRINT-090-*.md` + log | T2 | NEW — the seeded run vehicle: one AFK/J1 executed, one J2 parked | med | one real headless run, `AUTHORITY_BOUNDARY` |
+| `.claude/settings.json` | T2 | Scope the run's capabilities — exact-file check rules + PowerShell set | low | 66 rules, parsed not eyeballed |
+| `docs/LEARNINGS.md` | T1 · T2 | L-175 (host-dependent criteria) · L-176 (append-only vs machine fields) | low | tag vocab checked |
+| `docs/knowledge-index.md` | T2 | Regenerated to clear the gate TD-110 blocks the run from clearing | low | `gen-index.sh --check` |
 
 ## Retro

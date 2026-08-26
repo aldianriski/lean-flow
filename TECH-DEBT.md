@@ -202,6 +202,39 @@ status: current
   - **Re-file fresh if** `Verify:` clauses become required to carry a path — the collision is between
     what a clause may write and what the resolver accepts, and constraining either dissolves it.
 
+- **TD-111** severity: **high** | status: open | created: Sprint-089
+  - Summary: **`docs/knowledge-index.md` goes STALE at every midnight regardless of content, so the gate
+    reddens on a tree nobody touched — and `night-run.sh` then refuses to fire (TD-110). An unattended
+    run can be blocked by the clock alone.**
+  - Evidence: SPRINT-090's unattended run parked its own close on a red system-verify at 00:14 on
+    2026-08-27. Regenerating the index produced **exactly one** changed line — `3c3`,
+    `last_updated: 2026-08-26` → `2026-08-27`. No rule, ADR, research doc or learning had changed;
+    the run's own commits touched none of the indexed globs. The date stamp alone flipped it.
+  - **`gen-index.sh` claims idempotence and is not.** Its header (line 4) reads *"Idempotent; rewrites
+    only between the `<!-- INDEX:START -->` / `<!-- INDEX:END -->` markers"* — true *within* a day and
+    false *across* one, because it also writes `last_updated:` into the index frontmatter, which sits
+    OUTSIDE those markers. The claim is accurate about the marked region and wrong about the file, and
+    the untrue half is the half a caller depends on.
+  - Impact, and it compounds rather than adds: **(1)** the gate carries a standing false FAIL from
+    midnight until somebody regenerates, so `QA-CHECK` is red for reasons unrelated to the tree —
+    the noise that trains a reader to skim the failure list. **(2)** With TD-110, the launcher's green-gate
+    precondition converts that into a **refused launch**: an overnight run, which is the whole point of
+    the mode, is the run most likely to cross midnight and least likely to have a human to regenerate.
+    **(3)** A run that crosses midnight *mid-flight* — as this one did — finds its own system-verify red
+    at close through no fault of its work, which is precisely what happened here.
+  - What the run did with it is the good news, and it is worth stating as evidence rather than as
+    consolation: it **parked the close** rather than repairing, exactly as the envelope's
+    `repair-policy` (none granted) and SPRINT-090 D3 require, and named the cause in its rollup.
+    The autonomy contract behaved correctly on a defect nobody had anticipated.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): the honest fix is to stop
+    writing a wall-clock date into a *derived* artifact — `last_updated:` on a generated file records
+    when the generator ran, not when the knowledge changed, so it carries no information a reader can
+    act on while creating a daily false positive. Alternatives are to derive it from the newest
+    contributing source's date, or to exclude the frontmatter from the staleness comparison. Which one
+    is a design ruling; the first is smallest and deletes rather than adds.
+  - **Re-file fresh if** the staleness check moves off `gen-index.sh --check` — the comparison, not the
+    generator, is what makes the date load-bearing.
+
 - **TD-110** severity: **high** | status: open | created: Sprint-089
   - Summary: **`night-run.sh` refuses to fire unless `qa-check.sh` exits 0, so no Plan whose task
     REPAIRS a gate FAIL can ever be run unattended.** The work that would make the gate green is the
