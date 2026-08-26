@@ -1,9 +1,10 @@
 ---
 sprint: 087
 slug: first-rule-through-the-engine
+stream: main
 epic: EPIC-014
 owner: Maintainer
-last_updated: 2026-08-25
+last_updated: 2026-08-26
 status: active
 plan_commit: 3c14a37
 close_commit: [sha — set at close]
@@ -166,7 +167,7 @@ FAILs and pushed a run over its own budget.
 
 ## Owner-action checklist
 - [x] **Choose the first rule family at G2** — cheap + representative per H10 (ruled at intake); V3 §43's
-      expensive-first ranking governs families 2..n. The evidence is in hand: § Round 5/6 profile.
+      expensive-first ranking governs families 2..n. The evidence is in hand: § Round 5/6 profile. — *Verify: recorded as **D7** in § Decisions, naming the family (F12, §12's git boundary) and the criterion that selected it (cheap + representative, not V3 §43's expensive-first ranking), with the Round 5 figures behind it; T3 DoD 1 requires the D-row and was verified against it.*
 
 ## Decisions (pre-locked)
 

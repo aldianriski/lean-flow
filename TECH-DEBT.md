@@ -151,6 +151,27 @@ status: current
 > **§2 soft-cap breach unchanged** — `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md`
 > at **3050 > 130**, still TD-082's reasoned carry; the figure moved 3,050 → 3,050 since the last
 > sweep, so the carry ruling is unaffected.
+>
+> **Aging sweep — SPRINT-087 close (2026-08-26).** Run at **close**, not promote: 087's promote
+> predates this session and the gate named **TD-086 · TD-087 · TD-088 · TD-089** as ≥3 sprints
+> unaddressed with no sweep naming them. Reviewed individually rather than tallied, and one finding
+> came out of doing so.
+> **All four are one cohort** — every one created at Sprint-084, all `severity: minor`, and three of
+> the four (086 · 087 · 088) are findings from **Sprint-084 T2's independent review**. They are the
+> un-actioned output of a single review pass, carried three sprints as a block. That is worth naming:
+> the review did its job and nothing consumed the result.
+> **TD-087 and TD-097 are the same script, and should be fixed together.** TD-087 is
+> `check-verify-reaches.sh`'s **REACHES** half (a plain `grep -qF` substring test that certifies
+> targets it never reaches, and cannot model a two-method `Verify:` clause); TD-097, filed this sprint,
+> is its **EXISTS** half (a bare basename resolved against CWD, so a present script reports absent).
+> Two defects in one checker, filed three sprints apart, neither aware of the other until this sweep.
+> Whoever takes one should take both — and note the archive exemption means a fixture placed under
+> `*/archive/*` is never examined.
+> **Disposition: all four carried, none escalated.** All are `minor`, none blocks EPIC-014, and none
+> has a re-raise condition that has fired. TD-086 · TD-087 · TD-089 are checker-accuracy defects in the
+> same family as TD-097/TD-105 — a cluster now large enough that a single "gate accuracy" task would
+> serve better than four separate fixes, which is a decomposition question for the owner rather than a
+> sweep ruling.
 
 - **TD-105** severity: **high** | status: open | created: Sprint-087
   - Summary: **The Plan-freeze checks treat DoD ticking — the execution loop's own prescribed action —

@@ -701,3 +701,46 @@ verdict is both readable and complete. **Close stays blocked until that verdict 
 ruled** (ADR-021).
 
 consequence · pre-close · behaviour:low · governance:low
+
+### 2026-08-26 | progress | Close gate ruled — 17 findings, 10 of them false
+
+The truncated runs were misleading in both directions. `QA_FULL=1` with full capture gives **17 FAILs**,
+not the 3 that two budget-limited runs reported: the 450s budget had been skipping most harnesses, so
+the earlier "3 fail" was not a smaller problem but a **shorter look**. Owner ruled each finding
+(ADR-021); none is tolerated silently.
+
+**False positives — 10 of 17.**
+- **9 × plan-freeze** (`plan-edited-after-freeze` + 8 × `scope-change-logged-after-plan-edit`). § Plan is
+  **byte-identical** to `plan_commit 3c14a37` once checkbox state is normalised — 28 ticks, zero text
+  changes, no task, criterion or `Verify:` clause touched. The check fires on *Plan differs AND no
+  scope-change entry*; DoD boxes live inside § Plan and the loop mandates ticking them, so it reduces to
+  *"every sprint must contain a scope-change entry."* Anchored counts: **087 has 0, 086 has 1** — 086
+  passed because it had a scope change, 087 fails because it never needed one. Filed **TD-105 (high)**:
+  the only ways to clear it are to log a scope change that did not happen, falsifying the record the
+  check protects, or to stay red.
+- **1 × `verify-method-absent`** — TD-097, the bare-basename resolution defect. `read-spec-rules.sh`
+  exists and was run repeatedly this sprint.
+
+**Fixed here.**
+- `dod-criterion-names-no-check` — the ticked Owner-action named no evidence. It now cites **D7**, which
+  is where T3's DoD 1 required the ruling to live anyway.
+- `td-row-aged-unreviewed` ×4 — sweep run at **close** rather than promote, and the rows were read
+  rather than tallied. Two findings came out of that: all four are one cohort (Sprint-084 vintage, all
+  `minor`, three of them the un-actioned output of a single Sprint-084 T2 review — *the review did its
+  job and nothing consumed the result*), and **TD-087 is `check-verify-reaches.sh`'s REACHES half while
+  TD-097, filed this sprint, is its EXISTS half** — two defects in one checker, three sprints apart,
+  neither aware of the other until the sweep read both. Carried, not escalated, with the pairing
+  recorded so whoever fixes one takes both.
+
+**Carried by ruling.**
+- `todo-over-cap-at-promote` (441 vs 320) — inherited, and the other session is adding to TODO.md now.
+  Flagged to them that it fires at *promote*, which is the operation they are about to perform.
+- `learning-recurred-unpromoted` (L-169) — **owned by the other session**, which is promoting it. Not
+  touched here deliberately: promotion edits shared files (`CLAUDE.md`, `docs/LEARNINGS.md`) and two
+  sessions doing it independently is the collision L-042 describes.
+
+`stream: main` added to frontmatter so EPIC-015 can promote as stream 2 — CONTEXT § Sprint model
+requires one key per stream once more than one sprint is active.
+
+consequence · pre-close · behaviour:low · governance:high
+review · pre-close · owner-ruled per finding (ADR-021) · behaviour:low · governance:high
