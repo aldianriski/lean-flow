@@ -592,3 +592,46 @@ commit to recover from. I verified T3's 15 files are intact and `apps/cli` corre
 
 consequence · T5 · behaviour:material · governance:low
 review · T5 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low
+
+### 2026-08-26 | progress | T3 reviewed — the "not a difference" ruling held; a claimed control does not exist
+
+The attack most likely to have hidden a real divergence **survived**. T3 ruled that
+`extractAllowedAssetDirs` picking up `.ai`/`.psd` as spurious "allowed dirs" is a quirk **shared** with
+Shell rather than a TS defect. The reviewer extracted Shell's `assert_S12_DESIGNSRC` awk verbatim, ran
+it against the live spec, and got byte-for-byte identical output. Confirmed — and worth noting that a
+wrong "not a difference" call is precisely how EPIC-014 D2's *absorbed* failure mode happens, so this
+one deserved the independent check it got.
+
+Also confirmed: parity failures name the specific rule rather than a bare count, the engine is spawned
+live per test, `registry.ts` remains byte-untouched (five reviews now), and `S12.DESIGNSRC`'s "same
+extension INSIDE public/" control genuinely discriminates on **location** rather than passing trivially.
+
+**The finding: `s12-secrets.ts` claims a control that does not exist.** Breaking the PEM check
+(`content.includes("PRIVATE KEY")`) reddens exactly **one** test — a combined cardinality test that
+merely happens to include an `id_rsa` fixture. There is no dedicated FAIL and no sibling PASS control
+for the pem/key shape's *public certificate vs private key* distinction, and none for the `sa` shape;
+only `env` has a full pair. **Both Shell's comment and T3's own TS comment state "the lookalike control
+pins that."** The claim is in the code; the control is not in the tests.
+
+This does not breach DoD 3's literal wording — one must-FAIL and one control per rule *id* is present,
+four of each. It is being fixed anyway, because it is **T4's overclaim defect in a second location**,
+and worse here: an explicit statement that the distinction is already pinned is exactly what stops the
+next reader checking.
+
+**A third unwired capability, and the pattern is now the finding.** `createF12Registry()` has zero
+production callers — `main.ts` hardcodes `createBuiltInRegistry()`, so `--rule S12.*` and `--section 12`
+are unreachable and **none of T3's four evaluators can be executed by anyone**. Recorded under TD-103
+alongside T2's `marksInStandard()` and T7's widened `reconcile()`.
+
+Filed **L-172**, and the reason it is not just another L-020 sighting: **L-020 is already promoted** —
+*shipping ≠ wiring* sits in CLAUDE.md's Definition of Done as an explicit "Wiring check", present in
+every brief this sprint — and it missed all three. The cause is structural, not careless. The check is a
+**per-task** DoD item and each task's scope was correctly the domain layer; T3's `Layers:` is
+`packages/standard/src` and its DoD has no wiring item, so T3 satisfied its DoD *completely* while
+leaving 1,765 lines unreachable. **No task owned the gap because the gap is between tasks.** The durable
+form is about placement: ask once at sprint close, across the whole Plan — *what did this sprint add
+that nothing can yet call?* Eight tasks and eleven review passes could not answer that from inside a
+task.
+
+consequence · T3 · behaviour:material · governance:low
+review · T3 · independent-adversarial-reviewer (worktree-isolated) · behaviour:material · governance:low

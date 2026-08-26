@@ -173,6 +173,18 @@ status: current
     it against the oracle **in tests**; if that widening is wrong at the boundary, the cost lands at
     cutover. Same for T2's typed `MarksReadResult`. Neither is likely wrong — both were independently
     reviewed — but neither has been *used*.
+  - **A third instance landed in the same sprint, found by T3's reviewer.** `createF12Registry()` — the
+    whole §12 family migrated by T3 — also has **zero production callers**: `apps/cli/src/main.ts`
+    hardcodes `createBuiltInRegistry()` in both `runRule` and `runSection`, so **`--rule S12.*` and
+    `--section 12` are unreachable** and none of the four new evaluators can be run by anyone. Same
+    deliberate staging (T3's Layers are `packages/standard/src` only and its DoD carries no wiring
+    item), same consequence: **the sprint's largest single piece of work — four rules, a shared port, a
+    real adapter, a fake and a registry, 1,765 lines — has never been executed by a consumer.**
+  - **The pattern is what matters, not the three instances.** Every capability this sprint added to the
+    domain arrived without a consumer, and each was noticed separately, late, by a different reviewer.
+    Nothing in the sprint's own DoD would have caught it: the tasks were scoped to the domain and each
+    met its scope. **L-020's "shipping is not wiring" is the rule, and this row is the evidence that a
+    per-task DoD cannot enforce it** — only something looking across the sprint can.
   - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): when H12 wires the
     orchestrator, wire these two first and keep the boundary assertions T5 wrote at the mapping level,
     promoting them to end-to-end oracle comparisons. Do not delete the mapping-level tests when the
