@@ -192,7 +192,7 @@ stage-skills each also run **standalone** (none require another); `/council` is 
 | **plan** | `/lean-doc-generator` | docs / ADRs / sprint promote + close (WHY & WHERE only) — **ships its own templates + standard** |
 | | `/task-decomposer` | intent / ticket / PRD → `TASK-NNN` backlog entries (tracer-bullet slices; or a **fog-map** for foggy work too big to plan) |
 | | `/triage` | re-prioritise + state the backlog; route rejects to `.out-of-scope/` |
-| **build** | `/orchestrator` | gate-driven execution — `quick` · `mvp` · `sprint-bulk` |
+| **build** | `/orchestrator` | gate-driven execution — `quick` · `mvp` · `sprint-bulk` · `overnight` |
 | | `/prototype` | throwaway code to answer one design question (logic TUI / web UI variants) |
 | | `/tdd` | build NEW behaviour test-first — vertical-slice red-green-refactor |
 | **maintain** | `/diagnose` | 6-phase systematic debugging with a regression test |
@@ -236,9 +236,13 @@ finding. Not a human gate (nothing to approve); it just refuses to fan out work 
 (feature work, medium+, G1+G2) · `sprint-bulk` (auto-loop the Active Sprint task list, G1+G2 once) —
 full mode/gate contract → [`.claude/CONTEXT.md`](.claude/CONTEXT.md) (SSOT).
 
-**Unattended runs (night-run)** — a promoted sprint can be executed headless while you sleep:
-`claude -p "/orchestrator sprint-bulk unattended" --permission-mode dontAsk --allowedTools "<scoped list>"`,
-fired by cron / Task Scheduler. The charter is **execute-only** — the run executes a Plan a human already
+**Unattended runs (`overnight`)** — a promoted sprint can be executed headless while you sleep:
+`claude -p "/orchestrator overnight" --permission-mode dontAsk --allowedTools "<scoped list>"`,
+fired by cron / Task Scheduler. `overnight` is the **canonical** name — it names the contract the mode
+runs, not the script that launches it — and the older `night-run` · `unattended` · `sprint-bulk
+unattended` all still work, so nothing you have already scripted breaks. An **unrecognised** mode
+string is refused rather than quietly defaulted. The charter is **execute-only** — the run executes a
+Plan a human already
 approved and decides nothing new. Two rules make that safe. **Unattended is declared, never inferred**
 (no signal → it behaves interactively). And **absence ≠ consent**: a headless session has *no ask
 channel at all* — `AskUserQuestion` isn't registered there and `dontAsk` auto-denies anything that would

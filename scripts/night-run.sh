@@ -16,6 +16,9 @@
 # Launcher options (all optional):
 #   --wait-seconds N   Observation window before the verdict (default 150 = ~2.5 min)
 #   --poll-seconds N   How often to poll during the window (default 5)
+#   --mode NAME        Declare the run mode: overnight (canonical), or the aliases night-run /
+#                       unattended / "sprint-bulk unattended". An unrecognised value is a
+#                       pre-flight DOA -- never defaulted (night-run.md Part 0)
 #   --log FILE         Where the fired command's stdout+stderr is captured
 #                       (default: ./night-run-<timestamp>.log in the current directory)
 #
@@ -40,6 +43,7 @@ set -u
 wait_seconds=150
 poll_seconds=5
 logfile=""
+run_mode=""
 reap=1
 
 # --- the reaper -------------------------------------------------------------
@@ -205,9 +209,10 @@ while [ $# -gt 0 ]; do
     --wait-seconds) shift; wait_seconds=${1:-}; shift ;;
     --poll-seconds) shift; poll_seconds=${1:-}; shift ;;
     --log) shift; logfile=${1:-}; shift ;;
+    --mode) shift; run_mode=${1:-}; shift ;;
     --no-reap) reap=0; shift ;;
     --) shift; break ;;
-    *) die_doa "unrecognized launcher option: $1 (expected --wait-seconds/--poll-seconds/--log/--no-reap, then -- <command>)" ;;
+    *) die_doa "unrecognized launcher option: $1 (expected --wait-seconds/--poll-seconds/--log/--mode/--no-reap, then -- <command>)" ;;
   esac
 done
 
@@ -215,6 +220,23 @@ done
 
 case "$wait_seconds" in ''|*[!0-9]*) die_doa "--wait-seconds must be a positive integer, got: '$wait_seconds'" ;; esac
 case "$poll_seconds" in ''|*[!0-9]*) die_doa "--poll-seconds must be a positive integer, got: '$poll_seconds'" ;; esac
+
+# --- resolve the run mode, if one was declared (SPRINT-088 T3) ----------------
+# `overnight` is canonical; `night-run`, `unattended` and `sprint-bulk unattended` are aliases, so an
+# installed consumer's existing trigger keeps working (L-015 · L-016). An UNRECOGNISED string is a
+# pre-flight DOA and is never defaulted to the canonical mode -- Part 0's rule is that the mode is
+# declared, never inferred, because a wrong guess is unsafe in both directions. Failing here, before
+# anything is launched, is the whole point: the alternative is a typo silently starting an unattended
+# run.
+# --mode stays OPTIONAL so every existing invocation keeps working unchanged; the rename adds a way
+# to declare the mode, it does not add a requirement.
+if [ -n "$run_mode" ]; then
+  nr_mode_resolver="$(dirname -- "$0")/lib/resolve-run-mode.sh"
+  [ -f "$nr_mode_resolver" ] || die_doa "--mode given but the resolver is missing at $nr_mode_resolver"
+  run_mode_canonical=$(sh "$nr_mode_resolver" "$run_mode" 2>/dev/null) \
+    || die_doa "unrecognized --mode '$run_mode' -- not defaulted to a mode, because a mode signal is declared and never inferred (night-run.md Part 0). Known: overnight (canonical) | night-run | unattended | 'sprint-bulk unattended'"
+  printf 'run mode: %s (declared as %s)\n' "$run_mode_canonical" "$run_mode"
+fi
 
 target=$1
 allargs="$*"
@@ -232,9 +254,16 @@ case " $allargs " in
     die_doa "--dangerously-skip-permissions is forbidden for an unattended run (night-run.md Part 0 contract)" ;;
 esac
 
-case "$allargs" in
-  *unattended*) ;;
-  *) die_doa "mode signal missing -- the command does not carry the word 'unattended' anywhere (night-run.md Part 0)" ;;
+# The mode signal may be carried by ANY of the accepted trigger names, not just `unattended`.
+# `overnight` became canonical at SPRINT-088 T3 and this check is exactly where the rename could have
+# stopped being additive: a consumer who updated their trigger to the new canonical name would have
+# been rejected by the launcher for not saying the OLD word. Found by tracing the consumer path
+# (L-016), not by dogfooding -- this repo's own triggers all still said `unattended`, so nothing here
+# would have failed. `--mode` (resolved above) satisfies it too, since declaring the mode explicitly
+# is a stronger signal than mentioning it in the prompt.
+case "$allargs$run_mode" in
+  *unattended*|*overnight*|*night-run*) ;;
+  *) die_doa "mode signal missing -- the command carries none of 'overnight' (canonical), 'unattended' or 'night-run', and no --mode was declared (night-run.md Part 0)" ;;
 esac
 
 perm_mode=""

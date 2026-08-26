@@ -81,6 +81,8 @@ A HITL step is **parked** (record → continue disjoint AFK → clean halt via `
 | `mvp` | G1 + G2 | feature work, medium+, multi-step |
 | `sprint-bulk` | G1+G2 once | auto-loop the Active Sprint task list |
 
+**`overnight`** is the **canonical** name for the unattended headless run — named after the contract it runs, not the launching script. Aliases `night-run` · `unattended` · `sprint-bulk unattended` all still resolve to it (`scripts/lib/resolve-run-mode.sh`), so no installed trigger breaks; an unrecognised mode string is **refused, never defaulted**.
+
 **Continuation contract** (`orchestrator/references/night-run.md` Part 0b) — a run **does not pause between tasks the owner already approved**: a `J1` task is one the recorded approval covers, so re-confirming it re-asks a settled question. It ends at **exactly one of five terminal states**, named in the rollup — `PLAN_EXHAUSTED` · `AUTHORITY_BOUNDARY` · `HARD_FAILURE` · `BUDGET_STOP` · `USER_STOP`; anything else is a stop nobody declared. The **launcher** writes the state, as it already writes the DoD count (ADR-016): this changes *when* a run stops, never *who* records it.
 
 ## Model tiers (dispatch discipline · ADR-010)

@@ -1,7 +1,7 @@
 ---
 name: orchestrator
 description: Use when starting, resuming, or completing any development task or sprint. Drives a gate-driven loop — quick, mvp, and sprint-bulk modes — with a G1 Scope gate and a G2 Design gate before any commit. Self-contained, no specialist agents. Do not use for debugging — use /diagnose; or for converting raw intent into tasks — use /task-decomposer.
-argument-hint: "[quick | mvp | sprint-bulk] [task-or-description]"
+argument-hint: "[quick | mvp | sprint-bulk | overnight] [task-or-description]"
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Agent, Task
 user-invocable: true
 version: "0.2.0"
@@ -19,6 +19,7 @@ self-approve. No specialist agents: gates are inline checklists and review is a 
 | `quick` | G1 | single task, small, low risk |
 | `mvp` | G1 + G2 | feature work, medium+, multi-step |
 | `sprint-bulk` | G1+G2 once | auto-loop the Active Sprint task list |
+| `overnight` | G1+G2 pre-signed | **canonical name** for the unattended headless run of a promoted Plan — `sprint-bulk` under the Part 0 authority contract and the Part 0b continuation contract. **Aliases, all still accepted:** `night-run` · `unattended` · `sprint-bulk unattended` |
 
 **Intake routing — a mode keyword selects the mode, it never bypasses these routing checks.** Run them on every invocation, named mode or not:
 - No tracked task → run `/task-decomposer` first, then return here.

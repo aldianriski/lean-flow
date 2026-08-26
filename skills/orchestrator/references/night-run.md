@@ -17,9 +17,17 @@ an unacceptable risk unattended). This file is the operational procedure, not a 
 What the run may do when nobody is watching. Everything below Part 0 is procedure; this part is the
 rule the procedure serves.
 
-**Mode signal — declared, never inferred.** The trigger prompt carries the word `unattended`
-(`claude -p "/orchestrator sprint-bulk unattended" …`). No signal → the run treats itself as
-interactive. There is no reliable in-session test for "is a human watching", and a wrong guess is
+**The mode is named `overnight`.** That is the canonical name — it names the **contract** the mode
+runs (Part 0's authority classes, Part 0b's continuation contract), not the script that launches it.
+`night-run`, `unattended` and `sprint-bulk unattended` remain accepted **aliases**: the rename is
+additive, and an installed consumer's existing trigger keeps working unchanged (L-015 · L-016).
+Resolution is mechanical — `scripts/lib/resolve-run-mode.sh`, reached by `night-run.sh --mode`.
+
+**Mode signal — declared, never inferred.** The trigger prompt carries one of those names
+(`claude -p "/orchestrator overnight" …`, or the older `… sprint-bulk unattended`). No signal → the
+run treats itself as interactive. An **unrecognised** string is refused outright and never defaulted
+to `overnight`: the same rule one level down, since a typo'd mode silently starting an unattended run
+is the same error class as reading a missing answer as consent. There is no reliable in-session test for "is a human watching", and a wrong guess is
 unsafe in *both* directions — a false AFK self-approves, a false HITL stalls — so it is an explicit
 input, never a deduction.
 

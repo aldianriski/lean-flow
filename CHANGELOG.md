@@ -13,6 +13,23 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
+## SPRINT-088 — Execution Autonomy Foundation (in progress, 2026-08-26)
+
+Unreleased (bundles into the next version). EPIC-015's first member sprint — the authority model the
+rest of the epic rests on:
+
+| Shipped | What |
+|---|---|
+| **Authority classes `J0` / `J1` / `J2`** | declared per task in the sprint header meta, at G2. `J0` needs no approval (run bookkeeping) · `J1` is delegated in advance by a recorded pre-launch approval and runs unattended **inside that envelope only** · `J2` is human-reserved and **parks**. Declared, never inferred — an **absent** class reads as `J2`, the safe end. Guarded by `scripts/lib/check-authority.sh` (qa-check leg 14-bis) |
+| **Continuation contract** | a run does **not** pause between tasks the owner already approved, and ends at exactly one of five named terminal states — `PLAN_EXHAUSTED` · `AUTHORITY_BOUNDARY` · `HARD_FAILURE` · `BUDGET_STOP` · `USER_STOP` — recorded in the rollup by the launcher (`night-run.md` Part 0b) |
+| **`overnight` is the canonical mode name** | **user-visible.** It names the contract the mode runs, not the launching script. `night-run` · `unattended` · `sprint-bulk unattended` **all still work** — the rename is additive and no existing trigger breaks. An **unrecognised** mode string is refused, never defaulted to `overnight`. New: `night-run.sh --mode <name>`, resolved by `scripts/lib/resolve-run-mode.sh` |
+
+**Consumer note:** nothing you have already scripted needs changing. The one behaviour that *widened*
+is the launcher's mode-signal pre-flight, which previously demanded the literal word `unattended` and
+now also accepts `overnight` and `night-run` — without that, adopting the new canonical name would
+have been rejected by the tool while the docs said it was supported.
+
+---
 ## v1.60.0 — The First Rule Through the Engine (2026-08-26)
 
 MINOR — SPRINT-087, **29 of 29 DoD** — closed at `QA-CHECK: 210 pass, 2 fail`, both counted failures

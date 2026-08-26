@@ -215,3 +215,43 @@ artifact is this sprint's own run-complete rollup, which does not exist until th
 They tick together with T1's DoD 2/3 after T4.
 
 consequence · T2 · behaviour:material · governance:high
+
+### 2026-08-26 | progress | T3 — `overnight` canonical, aliases preserved; 4 of 4 DoD
+
+**Shipped.** `overnight` is the canonical mode name across `/orchestrator` (mode table +
+`argument-hint`), `/flow`, `night-run.md` Part 0, `.claude/CONTEXT.md` § Modes, `README.md` and a
+`CHANGELOG.md` unreleased block. Mechanical resolution is new: `scripts/lib/resolve-run-mode.sh`,
+reached by `night-run.sh --mode`, guarded by `evals/run-run-mode-fixtures.sh` (14 assertions) and
+wired into `qa-check.sh`'s always-on set (3s, no git, no mktemp).
+
+**Named after the contract, not the script** — `overnight` names what Part 0 and Part 0b define; the
+old names all pointed at `night-run.sh`. Every one of them keeps working.
+
+**The consumer-path trace found a real break, which is the whole reason DoD 4 is worded the way it
+is.** `night-run.sh`'s mode-signal pre-flight refused any command not carrying the literal word
+`unattended`. So a consumer who adopted the new canonical name would have been rejected **by the
+launcher** while every doc said `overnight` was supported: additive in prose, breaking in the tool.
+This repo's own triggers all still say `unattended`, so **dogfooding would never have surfaced it** —
+exactly L-016's claim, and the first time here it has paid out on a rename rather than a feature. The
+gate now accepts `overnight` · `night-run` · `unattended` or an explicit `--mode`, and the negative
+control `launcher-still-refuses-no-signal` is what proves it was *widened* rather than switched off.
+
+**An unrecognised mode is refused, never defaulted.** `overnite` does not become `overnight`. That is
+Part 0's declared-never-inferred rule one level down: a typo silently starting an unattended run is
+the same error class as reading a missing answer as consent. The **load-bearing** assertion is not the
+exit code but the **empty stdout** — a resolver that printed the default *and* exited non-zero would
+pass an exit-code-only test while handing `m=$(resolve-run-mode.sh "$typo")` a usable value.
+
+**Tier G proof (D4).** Three seeds, disjoint, each landed (`cmp`), parsing (`sh -n`), targeted
+(53/53 and 447/447 lines, 1 line changed): F′ (unresolved finding written to stdout) → 2 cases;
+G (one alias dropped) → 2, *including* its launcher-level twin, which shows the two layers are wired
+rather than merely coexisting; H (launcher mode gate deleted) → 1. `empty-is-refused` correctly stayed
+green under F′ — it takes a different branch — which is a precision signal, not a gap. Convention:
+`sha256sum` over the raw working file. `resolve-run-mode.sh` pristine/restored `8c93ef59486ce4b2`;
+`night-run.sh` pristine/restored `2e7e6bcf3fbbfe6c`; both `cmp` byte-identical.
+
+**Size held.** `S` was re-derived at G1 against the real surface (~79 mode-name occurrences, 15 files)
+and survived contact, because aliasing kept the change additive — no call site had to be rewritten.
+The one thing `S` did not predict was the launcher pre-flight, and that was one line.
+
+consequence · T3 · behaviour:material · governance:high
