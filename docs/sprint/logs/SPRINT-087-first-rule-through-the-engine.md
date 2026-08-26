@@ -672,3 +672,32 @@ than failing cleanly.
 
 consequence · T3 · behaviour:material · governance:low
 review · T3 · independent-adversarial-reviewer · re-reviewed once · clean · behaviour:material · governance:low
+
+### 2026-08-26 | surprise | I ran the close gate through a pipe — L-120, promoted, loaded, unfired
+
+Running system-verify before close I invoked `sh scripts/qa-check.sh 2>&1 | tail -25`. Two things
+followed, both of which the rule names explicitly.
+
+**The exit code was `tail`'s, not the gate's.** The harness reported **exit 0** while the gate's own
+printed line read **`QA-CHECK: 193 pass, 3 fail`**. Had I read the status instead of the verdict, a red
+gate would have cleared a sprint close — the precise substitution L-120 describes: *"`gate | tail &&
+commit` reads `tail`'s status… the number to read is the one the gate **prints**."*
+
+**And the pipe destroyed the evidence.** `tail -25` kept 25 lines, so only **2** of the 3 FAIL lines
+survived; the third scrolled past unrecorded. I could see the gate was red and could not enumerate why —
+which is worse than either failure alone, because a verdict you cannot itemise cannot be ruled on under
+ADR-021.
+
+**This is the third promoted rule this sprint to be loaded, correct, and unfired** — after L-020's
+wiring check (missed three unwired capabilities, → L-172) and L-042's staging discipline in its L-171
+form. In every case the rule was in context and the failure still happened. That is L-165's claim
+restated from the inside: *nothing the author can run finds these; what finds them is a second look at a
+different scope, or a disagreeing second number.* Here the disagreeing number was `3 fail` against
+`2 FAIL lines` — the gate's own arithmetic contradicting my capture, which is the only reason the
+truncation surfaced at all.
+
+Re-run correctly as `QA_FULL=1 sh scripts/qa-check.sh > <file> 2>&1` — no pipe, nothing skipped, so the
+verdict is both readable and complete. **Close stays blocked until that verdict is read and its findings
+ruled** (ADR-021).
+
+consequence · pre-close · behaviour:low · governance:low

@@ -195,6 +195,18 @@ FAILs and pushed a run over its own budget.
   its rules `implementation-directed` — but needs a git-history port, widening T1 beyond this sprint's
   root task. Evidence: `docs/research/logs/qa-gate-timing.md` § Round 5, both tables.
 
+- **D8** — **The port shape is per-FAMILY, not per-rule — and this is recorded here rather than as an
+  ADR, deliberately.** T1 proved one port per rule; T3 found that shape did not survive four rules with
+  two distinct data needs (git-tracked content for `S12.SECRETS`/`BACKUPS`, spec-derived config for
+  `DESIGNSRC`/`GENERATED`). F12 therefore has **one shared `GitBoundaryPort`** with one real adapter and
+  one fake, plus its own registry factory `f12-registry.ts`; `registry.ts`'s dispatch is untouched and
+  stays switch-free (T1 D2, confirmed byte-identical across five review passes).
+  **Why no ADR** (owner ruling at close): STANDARD §4 requires hard-to-reverse **and** surprising **and**
+  a real trade-off. It is partly hard-to-reverse and there is a real trade-off, but it **is not
+  surprising** — `built-in.ts`'s own header comment predicted this exact case in writing *before* T3
+  reached it: *"a second rule family with a DIFFERENT port would need its own registry."* T3 used a seam
+  the codebase had already documented, so this records a shape that was anticipated, not a decision that
+  was surprising. **D6 stands.** Families 2..n inherit the pattern from here and from that comment.
 ## Assumptions
 
 - **A1** — **The workspace exists.** *Confirm: `packages/standard/src/{model,tokenizer,spec-reader}.ts`
