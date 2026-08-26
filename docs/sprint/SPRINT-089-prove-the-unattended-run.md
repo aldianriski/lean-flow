@@ -55,7 +55,7 @@ the same wall. **Profile before fixing** — TD-084's instruction, which has now
 - [x] TD-090's re-raise condition is **cleared or restated against the new figure** — *Verify: a debt row whose trigger still references a superseded number is a guard that cannot fire*
 
 ### T2 — Seed a Plan an unattended run may execute, and run it once for real `[size: M · risk: high · class: execution · HITL · J1]`
-Layers: a seeded Plan (shape ruled at G2) · `docs/sprint/logs/` · `scripts/night-run.sh` (only if the exercise finds a defect) · `scripts/lib/check-night-run-rollup.sh` (read, not edited — the rollup verdict is checked with it) · no guard code — SPRINT-088 shipped it all
+Layers: a seeded Plan (shape ruled at G2) · `docs/sprint/logs/` · `scripts/night-run.sh` (only if the exercise finds a defect) · `scripts/lib/check-night-run-rollup.sh` (read, not edited — the rollup verdict is checked with it) · no guard code — SPRINT-088 shipped it all · `.claude/settings.json` (declared mid-task — Part 1 pre-flight derives the allowlist from four sources and requires it written into settings, so capability scoping is this task's work; L-100) · `TECH-DEBT.md` (TD-109, the pre-flight contradiction this task's DoD 5 surfaced)
 Depends-on: T1
 Cites: TASK-301 · EPIC-015 § Closed-when 1 · 3 · 4 · D5 · L-111 · L-007 · TASK-188 · T4 (SPRINT-088's T4, whose DoD 3 this closes — not a task of this sprint)
 

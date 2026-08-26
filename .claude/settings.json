@@ -21,6 +21,11 @@
       "Bash(sh evals/:*)",
       "Bash(sh scripts/:*)",
 
+      "Bash(sh scripts/lib/check-night-run-rollup.sh:*)",
+      "Bash(sh scripts/lib/check-authority.sh:*)",
+      "Bash(sh scripts/lib/check-approval-envelope.sh:*)",
+      "Bash(sh scripts/lib/check-layers-observed.sh:*)",
+
       "Bash(git status:*)",
       "Bash(git log:*)",
       "Bash(git show:*)",
@@ -53,7 +58,24 @@
       "Bash(mkdir:*)",
       "Bash(chmod:*)",
       "Bash(printf:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+
+      "PowerShell(git add:*)",
+      "PowerShell(git commit:*)",
+      "PowerShell(git status:*)",
+      "PowerShell(git log:*)",
+      "PowerShell(git show:*)",
+      "PowerShell(git diff:*)",
+      "PowerShell(git rev-parse:*)",
+      "PowerShell(git rev-list:*)",
+      "PowerShell(git ls-files:*)",
+      "PowerShell(git branch:*)",
+      "PowerShell(sh scripts/qa-check.sh:*)",
+      "PowerShell(sh scripts/gen-index.sh:*)",
+      "PowerShell(sh scripts/lib/check-night-run-rollup.sh:*)",
+      "PowerShell(sh scripts/lib/check-authority.sh:*)",
+      "PowerShell(sh scripts/lib/check-approval-envelope.sh:*)",
+      "PowerShell(sh scripts/lib/check-layers-observed.sh:*)"
     ]
   }
 }
