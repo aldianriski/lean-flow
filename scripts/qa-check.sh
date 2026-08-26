@@ -827,7 +827,12 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # run-qa-budget-default-fixtures.sh (SPRINT-086 T3, TD-091) joins the always-on set by the same
 # rule: no git, one mktemp -d, pure text (sed/grep) against copies of this script -- no real
 # qa-check.sh execution. It guards lateness path (a): the default budget vs the command ceiling.
-eval_harnesses_always="run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh"
+# run-authority-fixtures.sh (SPRINT-088 T1, TASK-292) joins the always-on set by the original
+# cheap-and-git-free rule: no git, no mktemp, pure POSIX sh over four static fixture sprint files --
+# measured well under a second. It is Tier G by this sprint's D4, and its two must-FAIL cases each
+# pair the offender with a well-formed SIBLING in the same file, so a regression that reddens
+# everything fails it as loudly as one that reddens nothing (L-142).
+eval_harnesses_always="run-authority-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh"
 eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh"
 # run-qa-budget-position-fixtures.sh (SPRINT-086 T3, TD-091) joins the opt-in set by the cost rule,
 # not the git rule -- it builds no repos, but it DOES invoke real copies of qa-check.sh (bounded by
@@ -991,6 +996,41 @@ else
       lc_find=$(printf '%s\n' "$lc_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
       [ -n "$lc_find" ] || lc_find="no FAIL line in output -- checker exited $lc_code without reporting one"
       bad "layers completeness: $lc_find"
+    fi
+  fi
+fi
+
+# --- 14-bis. Authority class declared per task, and a J2 task not executed (SPRINT-088 T1) --------
+# night-run.md Part 0 § Authority classes defines J0/J1/J2. The classes describe behaviour the loop
+# already had; what was missing was any place a run could READ them and any check they were written
+# at all. Two assertions of different kinds: DECLARED is checkable at promote, before anything runs;
+# HONOURED is only checkable after a run and is the one whose false negative is invisible -- the run
+# reports success, the DoD is ticked, and nothing records that a human was skipped.
+# A MISSING class is a FAIL, never a default-to-J0: Part 0's invariant is that an unasked question is
+# a BLOCK, so the safe end is J2. Delegates to the retained checker (scripts/lib/check-authority.sh,
+# itself covered by evals/run-authority-fixtures.sh).
+au_script="scripts/lib/check-authority.sh"
+if [ ! -f "$au_script" ]; then
+  bad "authority: checker not found at $au_script"
+else
+  au_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
+  if [ -z "$au_files" ]; then
+    note "authority: skip (missing): docs/sprint/SPRINT-*.md"
+  else
+    au_out=$(sh "$au_script" $au_files 2>&1); au_code=$?
+    if [ "$au_code" -eq 0 ]; then
+      au_n=$(printf '%s\n' "$au_out" | grep -cE '^PASS')
+      # Zero verified is a SKIP, never a PASS (TD-042): a green line over an empty input set cannot
+      # fail, so it says nothing -- the L-058 family in its purest form.
+      if [ "$au_n" -eq 0 ]; then
+        note "authority: SKIP (0 task-checks verified -- nothing in scope)"
+      else
+        ok "authority ($au_n task-check(s): class declared, and any J2 task held rather than executed)"
+      fi
+    else
+      au_find=$(printf '%s\n' "$au_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
+      [ -n "$au_find" ] || au_find="no FAIL line in output -- checker exited $au_code without reporting one"
+      bad "authority: $au_find"
     fi
   fi
 fi

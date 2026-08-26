@@ -35,10 +35,10 @@ never re-implemented (EPIC-015 D2).
 
 ## Plan
 
-### T1 — Declare J0/J1/J2 authority on every task, and prove a J2 parks `[size: M · risk: med · class: execution · HITL]`
-Layers: `skills/orchestrator/references/night-run.md` (Part 0 authority table) · `skills/orchestrator/SKILL.md` (the G2 declaration) · `skills/lean-doc-generator/templates/SPRINT.md.template` · `.claude/CONTEXT.md` § Task entry shape · a retained fixture pair
+### T1 — Declare J0/J1/J2 authority on every task, and prove a J2 parks `[size: M · risk: med · class: execution · HITL · J1]`
+Layers: `skills/orchestrator/references/night-run.md` (Part 0 authority table) · `skills/orchestrator/SKILL.md` (the G2 declaration) · `skills/lean-doc-generator/templates/SPRINT.md.template` · `.claude/CONTEXT.md` § Task entry shape · a retained fixture pair — resolved in execution to `scripts/lib/check-authority.sh` · `evals/run-authority-fixtures.sh` · `evals/fixtures/authority/**` · `scripts/qa-check.sh` (the wiring; L-100 correction, logged)
 Depends-on: none
-Cites: TASK-292 · EPIC-015 § Closed-when 3 · D3 · D4 · D5 · V3 H29 · L-111 · T2 · T4
+Cites: TASK-292 · EPIC-015 § Closed-when 3 · D3 · D4 · D5 · V3 H29 · L-111 · T2 · T4 · `TECH-DEBT.md` (cited, not touched — TD-012's retain-fixtures rule; this task marks no debt resolved)
 
 The foundation the rest of the epic rests on. The three classes already describe how the loop
 behaves — mechanical, delegated, human — so this **declares** them rather than inventing them. It is
@@ -49,13 +49,13 @@ definition of "already authorized" without them.
 asking and **parks** a seeded J2 with its unblock condition recorded.
 
 **DoD:**
-- [ ] Every task in a promoted Plan carries a `J0` / `J1` / `J2` declaration — *Verify: a sprint file missing one fails its schema check with a named finding*
+- [x] Every task in a promoted Plan carries a `J0` / `J1` / `J2` declaration — *Verify: a sprint file missing one fails its schema check with a named finding* ✓ `scripts/lib/check-authority.sh` (the method this clause named but did not identify — resolved at T1's design step per the G2 reachability ruling). Fails with `authority-undeclared`, wired into `qa-check.sh` leg 14-bis. SPRINT-088's own four tasks now declare `J1`; checker exits 0 over them
 - [ ] A J1 task executes unattended inside the approved envelope with no confirmation — *Verify: exercised on a real run, not asserted (L-007)*
 - [ ] A **seeded** J2 parks, recording its unblock condition — *Verify: the seed is required, not a fallback (D5); TASK-188 is standing evidence that waiting for a natural park foreclosed this criterion once already (L-111)*
-- [ ] **Tier G**: retained must-FAIL — a J2 task that does NOT park fails with its named finding while a sibling J1 control stays green — *Verify: seeded-break discrimination; seed verified landed by `cmp`, artifact still parses, break targeted, restored under a hash whose convention is stated and used consistently (L-169)*
-- [ ] Pointed at its own motivating case, not fixtures alone — *Verify: L-166 — a fixture proves a branch works, only the real artifact proves it is reachable*
+- [x] **Tier G**: retained must-FAIL — a J2 task that does NOT park fails with its named finding while a sibling J1 control stays green — *Verify: seeded-break discrimination; seed verified landed by `cmp`, artifact still parses, break targeted, restored under a hash whose convention is stated and used consistently (L-169)* ✓ `evals/run-authority-fixtures.sh`, 9 assertions, retained. Both must-FAIL cases pair the offender with a green sibling *in the same file*. Three seeds, disjoint case sets: A (undeclared defaults to J0) → 3 cases; B (honoured half inverted) → 2; C (closed-sprint scoping removed) → 1; all three controls green throughout. Each landed (`cmp`), parsed (`sh -n`), targeted (116/116 lines, 5/5 verdict printfs, 1 line changed). Convention: `sha256sum` over the raw working file — pristine `8ee7106d7acbbe1e`, restored `8ee7106d7acbbe1e`, `cmp` byte-identical
+- [x] Pointed at its own motivating case, not fixtures alone — *Verify: L-166 — a fixture proves a branch works, only the real artifact proves it is reachable* ✓ run against `docs/sprint/SPRINT-088-…md` itself *before* the classes were added: 4 × `authority-undeclared`, exit 1. The debt this row cites is a Plan with no J-class, and this Plan was one. After declaring `J1` on T1–T4 the same invocation exits 0 — the branch is reachable on the real artifact, not only in `fixtures/`
 
-### T2 — Stop sprint-bulk pausing between already-authorized tasks `[size: M · risk: med · class: execution · HITL]`
+### T2 — Stop sprint-bulk pausing between already-authorized tasks `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/SKILL.md` (the sprint-bulk loop) · `skills/orchestrator/references/night-run.md` · `scripts/night-run.sh` · `.claude/CONTEXT.md` § Modes
 Depends-on: T1
 Cites: TASK-293 · EPIC-015 § Closed-when 1 · V3 H27 · ADR-016
@@ -72,7 +72,7 @@ exit names one of the five terminal states.
 - [ ] A run ends **only** at `PLAN_EXHAUSTED` · `AUTHORITY_BOUNDARY` · `HARD_FAILURE` · `BUDGET_STOP` · `USER_STOP`, with the terminal reason in the rollup — *Verify: ADR-016's rollup stays the launcher's job; this changes when a run stops, never who records it*
 - [ ] **Tier G**: retained must-FAIL — a run halting with no terminal state fails with its named finding while a clean-exhaustion control passes — *Verify: seeded-break discrimination, hash convention stated (L-169)*
 
-### T3 — Make `overnight` the canonical mode name, with today's names as aliases `[size: S · risk: low · class: execution · HITL]`
+### T3 — Make `overnight` the canonical mode name, with today's names as aliases `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/flow/SKILL.md` · `skills/orchestrator/references/night-run.md` · `.claude/CONTEXT.md` § Modes · `README.md`
 Depends-on: T2
 Cites: TASK-294 · EPIC-015 § Closed-when 2 · V3 H28 · L-015 · L-016
@@ -89,7 +89,7 @@ still reaches it.
 - [ ] **Tier G**: retained must-FAIL — an unknown mode string fails loudly rather than falling through to a default — *Verify: seeded-break discrimination, sibling control green*
 - [ ] The rename is **additive** for consumers: no installed trigger breaks — *Verify: traced on the consumer path, never inferred from this repo's dogfooding (L-016)*
 
-### T4 — Record one pre-launch approval that covers the whole envelope `[size: M · risk: med · class: execution · HITL]`
+### T4 — Record one pre-launch approval that covers the whole envelope `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/references/night-run.md` (Part 1a pre-flight) · `skills/lean-doc-generator/templates/SPRINT.md.template` (frontmatter) · `skills/orchestrator/SKILL.md`
 Depends-on: T1
 Cites: TASK-295 · EPIC-015 § Closed-when 4 · V3 H30 · L-099 · L-151
@@ -132,6 +132,13 @@ no J0/J1 mid-flight.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `skills/orchestrator/references/night-run.md` | T1 | Part 0 § Authority classes — defines J0/J1/J2 and derives each from the existing boundary table, so the run has somewhere to *read* a class from | med | `run-authority-fixtures.sh` |
+| `skills/orchestrator/SKILL.md` | T1 | G2 declares the class per task — the gate is where it is knowable and frozen | low | judgment (prose) |
+| `skills/lean-doc-generator/templates/SPRINT.md.template` | T1 | header meta carries the class, so every future sprint is born declaring it | low | judgment (prose) |
+| `.claude/CONTEXT.md` | T1 | § Task entry shape gains `authority:` — the SSOT consumers read | low | `check-doc-caps.sh` (140/150) |
+| `scripts/lib/check-authority.sh` | T1 | **new** — the mechanical half: class declared, and a J2 task held rather than executed | **high** | `run-authority-fixtures.sh`, 3 seeded breaks |
+| `evals/run-authority-fixtures.sh` | T1 | **new** — 9 retained assertions; each must-FAIL pairs the offender with a green sibling (TD-012 · L-142) | **high** | self (seeded-break proven) |
+| `evals/fixtures/authority/**` | T1 | **new** — 4 fixture sprints + 2 Execution Logs; dirs named by shape, never after a token their own assertion greps for (L-108) | low | `run-authority-fixtures.sh` |
+| `scripts/qa-check.sh` | T1 | leg 14-bis + always-on harness list — wiring, without which the guard is half-shipped (L-020) | med | gate run |
 
 ## Retro

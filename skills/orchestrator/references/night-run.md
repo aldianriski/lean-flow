@@ -38,6 +38,36 @@ table below still resolves:
 > **AFK-safe** = additive **+** reversible **+** already-approved-in-scope
 > **HITL** = approval · judgement · lossy/destructive · scope-changing
 
+**Authority classes — J0 · J1 · J2.** The derivation rule above says *what* a step is; the J-class
+says *whose authority it runs on*. They are the same distinction named from the other side, which is
+why this **declares** the classes rather than inventing them — every row of the boundary table below
+already sorts into one, and none moved when they were named.
+
+| Class | Authority | Unattended behaviour | Derivation |
+|---|---|---|---|
+| **J0** | none required — nothing is being decided | executes | additive **+** reversible **+** decides nothing. **Run bookkeeping**: Execution Log append, DoD tick, close Retro auto-file. A J0 act needs no Plan and no envelope, which is exactly why it needs no approval |
+| **J1** | **delegated in advance**, by a recorded pre-launch approval naming the envelope | executes **without asking**, inside that envelope only | already-approved-in-scope, where the approval is a *written artifact the run can read* — not a remembered agreement. **A Plan task the approval covers** — this is the "already-authorized task" EPIC-015 § Closed-when 1 has a run continue past. Also pre-signed G1/G2 and the ADR-022 revise-loop carve-out (mechanical trigger **+** declared policy) |
+| **J2** | **reserved to the human**, never delegable | **parks** — records the unblock condition and continues disjoint AFK work | approval · judgement · lossy/destructive · scope-changing. Every ⛔ row |
+
+**J1 is the only class the envelope can widen, and it can never widen into J2.** That is the whole
+point of separating it from J0: J0 needs no approval, J2 cannot receive one, and J1 is exactly the
+band where a recorded approval changes what a run may do. An envelope that appears to authorize a J2
+step has been misread — re-read it as J2 and park (D3: absence ≠ consent, and neither is a broad
+grant).
+
+**A class is declared, never inferred** — same discipline as the mode signal above. A task carrying
+no J-class is **J2**, not J0: the default is the safe end, because an undeclared class is an unasked
+question, and Part 0's invariant is that an unasked question is a BLOCK. Declaring is the promote/G2
+job (`orchestrator/SKILL.md` § G2); reading it is the run's.
+
+**How it relates to `HITL`/`AFK` — a one-way implication, not independence.** `HITL`/`AFK` describes
+*this run's staffing* (is a human acting?); the J-class is a property of *the task* (whose authority
+does it need?). So **`J2` ⇒ `HITL` always** — a human-reserved step cannot be staffed any other way —
+but **`HITL` does not imply `J2`**: a J1 task run with a human present is still J1, and stays J1 when
+the same Plan is later run unattended. That asymmetry is the point of declaring the class separately.
+Reading `HITL` as "therefore J2" would make every attended sprint unable to produce a J1 at all,
+which is the mistake that makes the class look redundant.
+
 **Boundary table** (the rule's worked output — not its definition):
 
 | Step | Unattended | Why |
