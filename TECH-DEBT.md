@@ -575,6 +575,24 @@ status: current
     in the gate's path discovery, the same way `*/archive/*` is already excluded by three checkers.
     → `TASK-287`.
   - **Re-file fresh if** worktrees move out of `.claude/` — the exclusion would then name a stale path.
+  - **Sprint-089 T1 — this row SPLITS, and only one half is fixed.** Round 8 measured the pair
+    deliberately *before* pruning twelve live worktrees, so the comparison exists rather than being
+    foreclosed: two full default runs, same tree, worktrees present vs absent.
+    - **The false-FAIL half is FIXED.** Both runs reported `QA-CHECK: 193 pass, 0 fail` — identical.
+      SPRINT-086's under-load run produced **5 false `ephemeral-intake` FAILs** on fixture files inside
+      `.claude/worktrees/agent-*`; v1.60.0's two-checker fix (SPRINT-087) holds under **twelve**
+      worktrees, double the six that exposed it. The noisy half of this row is closed.
+    - **The cost half is NOT fixed.** The worktrees still cost **42.8s — 13% of the run, ~3.6s each**
+      (330.8s present vs 288.0s absent), which is **82–94s on the reference host** under Round 8's
+      calibration. That is on its own enough to explain SPRINT-086's 461s-to-under-budget swing on
+      worktree removal. `TASK-287`'s path-discovery exclusion is **still unbuilt**, so the Mitigation
+      line above remains a hypothesis rather than a shipped change.
+    - **The measurement replaces the hypothesis for the COST claim only**, per L-091: the 42.8s figure
+      is measured, the *cause* (which legs still walk them) is not yet attributed and should be
+      profiled before `TASK-287` picks an exclusion point.
+    - Severity left at `medium`: the surviving half is a cost, not a false verdict, and it degrades
+      visibly. But note the interaction — with the gate ~19–29% over budget on the reference host
+      (TD-090), 82–94s of worktree scanning is the difference between finishing and truncating.
 
 - **TD-091** severity: **high** | status: **resolved** → TASK-285 (Sprint-086 T3) | created: Sprint-085
   - Summary: **`scripts/lib/qa-budget-check.sh` cannot fire in this environment — an absent guard
@@ -776,6 +794,36 @@ status: current
     repo records, the likelier the gate truncates, and the record is the thing this repo values most.
   - **Re-file fresh if** the budget is raised rather than the cost reduced — that converts a measured
     ceiling into a moving one and the loop above stops being visible.
+  - **Sprint-089 T1 — the re-raise condition is RESTATED, because the old one measured the weather.**
+    Round 8 (`docs/research/logs/qa-gate-timing.md`) found this host running **1.92–2.20× faster** than
+    the one Round 7 measured, on **byte-identical** code (`run-conformance-engine-fixtures.sh` and
+    `conformance-engine.sh` both unchanged since `2c8ae21`, verified with `git hash-object` against
+    `git rev-parse <ref>:<path>`). The tree that measured **454s** there measures **288.0s** here, and
+    nothing was fixed in between. The previous condition — *"a run without worktrees present exceeds
+    the budget"* — is therefore **not a property of this repository at all**: it was met on one host and
+    missed on another from the same bytes, so it would clear this row on whichever machine happened to
+    run it. That is a guard whose verdict is decided by the weather.
+  - **The condition now, and it is reproducible anywhere.** Derive the host ratio from a named
+    calibration anchor, then compare the *scaled* figure against the budget:
+    1. Time `sh evals/run-conformance-engine-fixtures.sh` — the anchor, chosen because its bytes are
+       provably unchanged since `2c8ae21`, so it measures the HOST and not the repo.
+    2. `ratio = 143.2 / <measured seconds>`; 143.2s is the anchor's reference-host figure (Round 7,
+       post-fix, the slower of its two samples).
+    3. Time a default `sh scripts/qa-check.sh` with **no worktrees present**, reading the verdict line
+       the gate itself prints, never a piped status (L-120).
+    4. **Re-raise to `high` if `run_seconds × ratio > 450`.**
+    On the day's figures that reads `288.0 × 1.92 = 553s > 450` — **still over, still `high`, NOT
+    cleared.** Recorded as arithmetic anyone can re-run rather than as a number to be trusted.
+  - **Still spawn-count-shaped, so the earlier `Re-file fresh if` trigger does NOT fire.** Leg 12 is
+    **76.2%** of the run (219.3s of 288.0s) against the ~81% previously assumed, and the engine's own
+    cost is dominated by forks — 41 per full-spec call, while spec *parsing* is only 170ms of ~2050ms
+    (8%). The mechanism that worked in Rounds 4 and 7 still transfers.
+  - **Partially paid down, and the amount is stated rather than rounded up.** Sprint-089 T1 memoised the
+    engine's git probe, 6 spawns per invocation → 1 (`8fd5c4f` · `54cd86d`). The **wall-clock share of
+    that win is not claimed**: 4.7s on the dominant harness sits inside ~17s of run-to-run variance on
+    this host, and one sample cannot resolve it. The deterministic 6→1 spawn reduction is what is
+    evidenced. The remaining ~36 forks per call are unclaimed headroom, named here rather than silently
+    exhausted.
 
 - **TD-084** severity: **high** | status: **resolved** → TASK-272 (Sprint-084 T1) | created: Sprint-083
   - Summary: **`scripts/qa-check.sh` can no longer run to completion.** Three runs in one session were
