@@ -971,6 +971,68 @@ run_case_anywhere "governance-with-index leg B (code riding along still FAILs)" 
   "src/rider.txt" -- \
   sh -c "cd \"$c9b\" && sh \"$checker\" docs/sprint/SPRINT-931-index.md"
 
+
+# --- leg F (REGRESSION, review pass 3 defect 1): a subject that merely MENTIONS a sibling sprint in
+# prose must NOT transfer ownership. commit_sprint() originally reused attribute()'s unanchored
+# `.*(SPRINT-NNN Tn).*` pattern; a commit reading "port the fix already applied over there
+# (SPRINT-921 T2)" was read as sprint 921's work, skipped from 920 entirely, and its real undeclared
+# file surfaced against the WRONG sprint under a task number that does not exist. L-108's family: a
+# guard matched by substring instead of by shape, failing GREEN.
+c10f="$work/own-prose-mention"; mk_two_sprint "$c10f" 'beta.txt'
+printf '%s\n' 'g2' >> "$c10f/gamma.txt"
+commit_all "$c10f" 'port the fix already applied over there (SPRINT-921 T2)'
+# BOTH sprint files are passed, and the assertion names SPRINT-920's OWN line. Both details are
+# load-bearing. With only one file, sibling_sprints is empty and the bug cannot fire at all -- the leg
+# would pass under the seeded mutation and prove nothing. And asserting merely on "gamma.txt" is
+# equally vacuous, because the seeded version DOES print that string, just on the wrong sprint's line
+# (as `T2:gamma.txt` under SPRINT-921, a task that does not exist). Only the presence of a FAIL on
+# SPRINT-920's own line distinguishes fixed from broken.
+run_case_anywhere "ownership leg F (prose mention of a sibling transfers nothing)" 1 \
+  "SPRINT-920-stream-one.md layers observed: changed by a task that never declared it" -- \
+  sh -c "cd \"$c10f\" && sh \"$checker\" docs/sprint/SPRINT-920-stream-one.md docs/sprint/SPRINT-921-stream-two.md"
+
+# --- leg G (REGRESSION, review pass 3 defect 2): two active sprints declaring the SAME `sprint:`
+# number must not make either its own sibling. Before the fix both files reported PASS while a real
+# undeclared file sat in the tree -- a total guard bypass, reachable by a copy-paste template error
+# at promote. The number, not the path, is what must be compared.
+c10g="$work/own-duplicate-number"
+mkdir -p "$c10g/docs/sprint"
+for _slug in dup-a dup-b; do
+  cat > "$c10g/docs/sprint/SPRINT-940-$_slug.md" <<EOF
+---
+sprint: 940
+slug: $_slug
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-940 — $_slug (constructed fixture)
+
+## Plan
+
+### T1 — edit the declared file
+Layers: \`alpha.txt\`
+Depends-on: none
+
+**DoD:**
+- [ ] alpha.txt updated
+EOF
+done
+printf '%s\n' 'a' > "$c10g/alpha.txt"
+printf '%s\n' 'g' > "$c10g/gamma.txt"
+git -C "$c10g" init -q
+commit_all "$c10g" 'plan locked'
+_g_sha=$(git -C "$c10g" rev-parse HEAD)
+for _f in docs/sprint/SPRINT-940-dup-a.md docs/sprint/SPRINT-940-dup-b.md; do
+  sed "s/PLAN_COMMIT_PLACEHOLDER/$_g_sha/" "$c10g/$_f" > "$c10g/$_f.tmp" && mv "$c10g/$_f.tmp" "$c10g/$_f"
+done
+commit_all "$c10g" 'record plan_commit sha'
+printf '%s\n' 'g2' >> "$c10g/gamma.txt"
+commit_all "$c10g" 'sprint(940) T1: genuinely this sprint own undeclared work'
+run_case_anywhere "ownership leg G (duplicate sprint number is not a sibling)" 1 \
+  "T1:gamma.txt" -- \
+  sh -c "cd \"$c10g\" && sh \"$checker\" docs/sprint/SPRINT-940-dup-a.md docs/sprint/SPRINT-940-dup-b.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-OBSERVED FIXTURES: all green"; else echo "LAYERS-OBSERVED FIXTURES: at least one FAIL"; fi
 exit $fail

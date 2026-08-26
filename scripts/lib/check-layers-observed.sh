@@ -149,10 +149,20 @@ is_governance_commit() {   # <sha> -> 0 if EVERY changed file is a governance ar
 # which files it touches.
 commit_sprint() {   # <sha> -> "<NNN>" | ""
   _cs=$(git log -1 --format='%s' "$1" 2>/dev/null)
+  # ANCHORED PATTERNS ONLY -- deliberately narrower than attribute()'s set, which also accepts an
+  # unanchored `.*(SPRINT-NNN Tn).*`. That third form is safe for finding a TASK but catastrophic for
+  # deciding OWNERSHIP, because it matches PROSE: a commit whose subject merely mentions another
+  # sprint ("port the fix already applied over there (SPRINT-921 T2)") was read as belonging to 921,
+  # skipped from 920's check entirely, and its real undeclared file surfaced against the WRONG sprint
+  # under a task number that does not exist. Verified as a live defect on this branch before the fix.
+  # This is L-108's family -- a guard matched by substring rather than by shape, failing GREEN.
+  #
+  # Consequence of narrowing, and it is the correct direction: a commit using only the parenthetical
+  # form is never skipped, so it stays attributed and may over-report. Noise is visible; a swallow is
+  # not.
   printf '%s' "$_cs" | sed -n \
     -e 's/^sprint(\([0-9]\{1,\}\)).*/\1/p' \
-    -e 's/^merge(\([0-9]\{1,\}\)).*/\1/p' \
-    -e 's/.*(SPRINT-\([0-9]\{1,\}\)[ ]\{1,\}T[0-9]\{1,\}).*/\1/p' | head -n1
+    -e 's/^merge(\([0-9]\{1,\}\)).*/\1/p' | head -n1
 }
 
 attribute() {   # <sha> -> "T<n>" | "COORD" | "GOVERNANCE" | "UNATTRIBUTED"
@@ -351,13 +361,22 @@ for sp in "$@"; do
   # undeclared change; a commit naming a CLOSED sprint's number is not a sibling and stays attributed.
   # Deliberately NOT applied to the WIP leg below: uncommitted work carries no attribution, so there
   # is no honest way to tell which stream made it, and reporting it is the correct behaviour.
+  # Compared by NUMBER, not by path. Two sprint files declaring the same `sprint:` -- a copy-paste
+  # template error at promote, or the same file passed twice under different path spellings -- would
+  # otherwise make a sprint its OWN sibling, and every one of its own `sprint(NNN) Tn:` commits would
+  # be skipped. That is a total guard bypass, not a narrow miss, and it was verified live before this
+  # guard existed: both sprint files reported PASS while a real undeclared file sat in the tree.
+  # Skipping the path check alone is NOT enough, which is why the number is what gets compared.
+  my_sprint=$(fmv "$sp" sprint)
   sibling_sprints=""
   for _osp in "$@"; do
     [ "$_osp" = "$sp" ] && continue
     [ -f "$_osp" ] || continue
     case "$_osp" in */archive/*) continue ;; esac
     _on=$(fmv "$_osp" sprint)
-    [ -n "$_on" ] && sibling_sprints="$sibling_sprints $_on"
+    [ -n "$_on" ] || continue
+    [ "$_on" = "$my_sprint" ] && continue
+    sibling_sprints="$sibling_sprints $_on"
   done
 
   # A declared token ending in "/" is a DIRECTORY prefix covering every path beneath it (SPRINT-055
