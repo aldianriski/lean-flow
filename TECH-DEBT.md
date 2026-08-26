@@ -202,6 +202,41 @@ status: current
   - **Re-file fresh if** `Verify:` clauses become required to carry a path — the collision is between
     what a clause may write and what the resolver accepts, and constraining either dissolves it.
 
+- **TD-109** severity: **high** | status: open | created: Sprint-089
+  - Summary: **Part 1 pre-flight item 3 forbids the very Plan shape the autonomy machinery is built
+    for.** It reads *"every task in the run is AFK-class — none needs a human mid-execution"*, while
+    `CONTEXT.md` states `J2 ⇒ HITL always`. A Plan carrying a declared `J2` task therefore fails
+    pre-flight **by the letter**, and `TASK-301` requires exactly such a Plan.
+  - Evidence: SPRINT-090 was seeded per `TASK-301` with `T1 J1` + `T2 J2`. `check-authority.sh` passes
+    it (`PASS authority-declared: … T2 J2`), and the run refuses it under item 3 read strictly. The two
+    shipped artifacts disagree about the same Plan.
+  - **Why the strict reading cannot be the intended one — three mechanisms become unreachable code.**
+    `check-authority.sh`'s **HONOURED** assertion detects *"a J2 task that carries an EXECUTION record
+    while carrying no PARK record"* — a state only a J2 **task in a Plan** can enter. The
+    `AUTHORITY_BOUNDARY` terminal state names a run that stopped at an authority limit. Part 0 step 2
+    writes a park record for a planned unit and step 3 continues *"disjoint AFK work"*, which
+    presupposes a non-AFK sibling in the same Plan. Under the strict reading none of these can ever
+    fire, which is the L-166 shape (a guard keyed to a state the system may not emit).
+  - Impact: **this is the second time the same acceptance has been foreclosed.** SPRINT-088 wrote three
+    DoD requiring an unattended run into an all-`HITL` Plan (L-111, carried by `TASK-301`); the fix was
+    a purpose-built Plan, and that Plan is blocked by a *different* clause with the same effect. A
+    contradiction that survives two sprints of people reading around it is a wording defect, not a
+    misreading.
+  - Ruled at SPRINT-090 D4 rather than patched: item 3 means *no task needs a human to be **reached***,
+    and a declared `J2` that parks by design satisfies it. The ruling is recorded in the sprint file
+    because the run reads that and nothing else (L-099 · L-151). **The wording itself is untouched** —
+    SPRINT-089 § Scope defers re-opening SPRINT-088's machinery.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): reword item 3 to
+    *"every task is either AFK-class or a declared `J2` the run will park"*, and say so beside the
+    park protocol so the two are read together. Whether the checklist should instead **require** a
+    seeded J2 for any run claiming to exercise the park path is the sharper question, and is a design
+    ruling rather than a wording fix.
+  - **Re-file fresh if** pre-flight gains a mechanical checker: today item 3 is a human checklist line
+    that `night-run.sh` does not enforce (`grep -nE 'AFK|authority' scripts/night-run.sh` finds only a
+    comment), so the contradiction currently costs a *refused* launch rather than a wrong one. A
+    checker built from the strict wording would convert it into a hard block, and this row would then
+    describe a different, worse failure.
+
 - **TD-108** severity: minor | status: open | created: Sprint-088
   - Summary: **`night-run.sh`'s mode-signal pre-flight is an unanchored substring scan over the whole
     command line, so a NEGATED mention satisfies it.** A prompt containing *"please do NOT run this

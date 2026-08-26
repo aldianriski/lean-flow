@@ -86,6 +86,21 @@ disjoint AFK work rather than halting on it.
   is a question this repo actually owes an answer to.
 - **D3** — **A defect found during the run is a finding, not a repair.** The charter is execute-only.
   If the run misbehaves, that is SPRINT-089 T2's evidence and is recorded, not patched mid-flight.
+- **D4** — **Pre-flight item 3 reads "no task needs a human to be REACHED", not "no task may be J2".**
+  *Ruled by the owner 2026-08-26, recorded here because the run reads this file and nothing else
+  (L-099 · L-151).* Part 1 item 3 says *"every task in the run is AFK-class"*, while `TASK-301`
+  requires a seeded J2 and CONTEXT.md states `J2 ⇒ HITL` — so a declared J2 fails pre-flight by the
+  letter, and this Plan could never fire. **The strict reading makes three shipped mechanisms
+  unreachable code**: `check-authority.sh`'s HONOURED assertion (a J2 task that executed instead of
+  parking), the `AUTHORITY_BOUNDARY` terminal state, and Part 0 step 2's park record — all of which
+  are written for a J2 **task in a Plan**, not merely a J2 *step* met mid-procedure. `check-authority.sh`
+  passes this Plan with `T2 J2` today. The intended reading is therefore the one the machinery
+  implements, and the wording is the defect.
+  **Not fixed here, deliberately.** SPRINT-089 § Scope defers re-opening SPRINT-088's machinery, so
+  amending `night-run.md` would be a scope-change rather than this task's work. Filed as **TD-109**.
+  This is [[L-173]]'s shape exactly — a contract that disagrees with itself, where the looser reading
+  wins silently because it needs no extra code — so the reading is *ruled and written down* rather
+  than assumed, which is the whole point of that learning.
 
 ## Assumptions
 - **A1** — `scripts/gen-index.sh` is deterministic, and the index is **stale at pre-flight**, so T1 has

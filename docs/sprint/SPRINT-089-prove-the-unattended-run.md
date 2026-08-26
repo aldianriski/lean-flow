@@ -34,7 +34,7 @@ SPRINT-088 shipped: the machinery is not in question here, only whether it works
 ## Plan
 
 ### T1 — Cut the gate's dominant cost so a close stops tripping its own budget `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/qa-check.sh` (leg 12) · `evals/` harnesses · `docs/research/logs/qa-gate-timing.md` · `scripts/lib/conformance-engine.sh` (declared mid-task — the profile found the dominant cost inside the engine, not inside a harness; L-100) · `TECH-DEBT.md` (DoD 5 restates TD-090's re-raise condition, so the ledger is this task's own output, not governance drive-by)
+Layers: `scripts/qa-check.sh` (leg 12) · `evals/` harnesses · `docs/research/logs/qa-gate-timing.md` · `scripts/lib/conformance-engine.sh` (declared mid-task — the profile found the dominant cost inside the engine, not inside a harness; L-100) · `TECH-DEBT.md` (DoD 5 restates TD-090's re-raise condition, so the ledger is this task's own output, not governance drive-by) · `docs/LEARNINGS.md` (L-175 is T1's own finding, captured per /insights rather than deferred to close)
 Depends-on: none
 Cites: TASK-302 · TD-090 · TD-084 · SPRINT-086 T2 · EPIC-015 § Closed-when 1
 
