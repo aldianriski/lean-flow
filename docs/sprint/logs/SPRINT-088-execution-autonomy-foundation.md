@@ -384,3 +384,48 @@ has no §2 row to add — the same reasoning that kept the whole TS tree out of 
 of that test were checked rather than the conclusion assumed.
 
 consequence · T3 · behaviour:low · governance:low
+
+### 2026-08-26 | blocker | the overnight run cannot fire against this Plan — pre-flight item 3 blocks
+
+Asked to prepare (not fire) the overnight trigger that would close T1's DoD 2/3 and T4's DoD 3. Ran
+Part 1's mechanical pre-flight first. It **blocks**, and the command was not written.
+
+| Pre-flight item | Result |
+|---|---|
+| Plan promoted (`plan_commit`) | PASS |
+| Active sprint, § Plan frozen | PASS |
+| **Every task AFK-class — none needs a human mid-execution** | **BLOCK — 4 of 4 are `HITL`** |
+| `gates_signed:` in frontmatter | PASS `G1,G2 @ 1502e00` |
+| `approval_envelope:` recorded | PASS, 10 dimensions @ `1b14d61` |
+| Zero open `assumes:` / `needs-info` | PASS |
+
+**What firing anyway would produce.** Every one of T1–T4 is `HITL`, and Part 0 says a HITL step is
+**parked**, never asked or worked around. So the run would park 4 of 4, deliver nothing, and write a
+rollup reading `terminal · AUTHORITY_BOUNDARY · 4 task(s) parked`. It would not execute a J1 and it
+would not produce the evidence the three open DoD ask for.
+
+**This is L-111, and it has landed on the task that cites L-111.** T1's DoD 3 names TASK-188 as
+"standing evidence that waiting for a natural park foreclosed this criterion once already" — SPRINT-060
+promoted a criterion needing an unattended run alongside four HITL tasks, G2 correctly ruled the run
+interactive, and that foreclosed the only vehicle. **SPRINT-088 did the same thing to itself**: it
+wrote three DoD requiring a real unattended run into a Plan whose every task is HITL. The criteria were
+unreachable the moment the Plan froze, and neither G1 nor G2 caught it — both read the criteria for
+clarity, neither for what they rest on that is already decided.
+
+**Why the HITL declarations are not the error.** They are correct: these are med-risk Tier G guard
+changes that needed gate sign-off and owner rulings mid-flight, and this session proved it by needing
+exactly those rulings. The error is pairing *correct* HITL tasks with acceptance criteria that require
+their absence.
+
+**What would actually satisfy the three DoD** — recorded so the next promote does not re-derive it:
+a **seeded** sprint is the vehicle, not this one. D5 already says the J2 park must be seeded rather
+than awaited; the same is true of the J1 execution. That means a small purpose-built Plan carrying at
+least one **AFK / J1** task (executes unattended inside the envelope) and one **seeded J2** task (must
+park), promoted and gate-signed, then run headless once. That is a task, not a command — it is not in
+SPRINT-088's scope and cannot be smuggled in as one.
+
+**Not fired, and no command handed over.** Part 2 is explicit that the trigger is the last step and
+that an agent arriving with it copy-pasteable is exactly how the prepare half gets skipped. The correct
+action on an unchecked pre-flight item is to report what is blocking.
+
+consequence · T1 · behaviour:low · governance:low
