@@ -317,3 +317,54 @@ For the reader reconciling the three figures in this log: `201 pass, 0 fail` (`0
 before midnight) · `200 pass, 1 fail` (`7cc19fb`, 00:07, after midnight) · `202 pass, 1 fail`
 (`e8ad125`, 00:2x). Each was true when printed; the fail is the clock, and the pass count tracks how
 many records existed for the guards to check.
+
+### 2026-08-27 | blocker | a CONCURRENT stream wrote to T2's declared Layer — the tick stands, the proof clause does not
+
+**Surfaced rather than absorbed, and this run does not re-rule it.** SPRINT-089's stream was running in
+parallel and landed two commits *inside* this run's window. One of them writes `TECH-DEBT.md`, which is
+T2's declared `Layers:` entry — the exact file T2's DoD 1 requires no commit to touch.
+
+Ordering, which is the whole of it (`%cI`, local +07:00):
+
+| Commit | Time | Stream | Touches T2's Layers? |
+|---|---|---|---|
+| `e8ad125` | 00:14:41 | **this run** — T2 parked, DoD ticked, rollup written | no |
+| `a5c15a0` | 00:19:31 | SPRINT-089 | **yes** — `TECH-DEBT.md`, filing TD-111 |
+| `18a1dbd` | 00:20:05 | SPRINT-089 | no — regenerates `docs/knowledge-index.md` |
+
+**The tick was valid when it was made.** At `e8ad125` nothing had touched `TECH-DEBT.md` in the window;
+the clause was satisfied and verified as such. It was invalidated five minutes later by a stream this
+run was instructed not to touch and did not touch.
+
+**What is still true, and what is not.** DoD 1's criterion is *"the run parks T2 rather than asking,
+deciding, or working around it"*. That is unambiguously true and independently evidenced: `scripts/lib/`
+— T2's other declared Layer, and the one a work-around would have to edit — was **never** touched by any
+commit in the window, and TD-111 rules on the knowledge-index staleness, **not** on where TD-095's
+worktree exclusion belongs. T2's question is untouched and still owed. What is no longer literally
+satisfiable is the *second half of the named Verify clause*, whose single-stream assumption a concurrent
+sprint broke.
+
+**The distinction being drawn, because it is the one that gets fudged:** this is not a re-reading of a
+criterion to fit what was built (L-088 forbids that, and it would be the easy move here). The criterion
+is unchanged and met; one of its two proxies stopped isolating its target. G2's reachability rule already
+names that outcome — *a method whose scope excludes the target is recorded as not-valid-proof, not
+accepted* — so it is recorded, and **flagged for the owner to confirm** rather than silently held.
+
+**Left ticked, deliberately, and the reasoning is auditable above.** Unticking a criterion that is true
+would misreport the run just as surely as holding a tick that is false.
+
+**Part 0 step 4 re-check, third pass — one park's condition WAS met by another stream:**
+
+- **T2** — unchanged. The owner ruling on TD-095 is still owed; TD-111 is a different question.
+- **The parked close** — its blocker is cleared. `18a1dbd` regenerated the index, and
+  `sh scripts/gen-index.sh --check` now exits **0**. Stated precisely: the *named finding's own check*
+  passes; the **full gate was not re-run**, because it would not change this run's terminal state, and
+  no green verdict is claimed on an unmeasured gate. The close nonetheless **stays parked** — closing a
+  sprint whose J2 design ruling is still outstanding is a judgement, and it is outside this run's
+  instruction, which was to run the Plan to a rollup line.
+
+**Terminal state unchanged: `AUTHORITY_BOUNDARY`.** Two independent runs, minutes apart, found the same
+midnight-staleness defect; the stream that owned `TECH-DEBT.md` filed it as TD-111 and cites this run's
+00:14 park as its evidence. The ownership map worked — and then the same shared file produced exactly
+the cross-stream collision `sprint-bulk` step 2 warns about, on a file no *task* in either Plan was
+concurrently editing.
