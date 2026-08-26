@@ -146,7 +146,7 @@ half (42.8s here, 82–94s normalized) is measured but unattributed to specific 
 
 consequence · T1 · behaviour:material · governance:high
 
-### 2026-08-27 | run-complete | T2 complete — the unattended run happened, and every claim was verified against artifacts
+### 2026-08-27 | progress | T2 complete — the unattended run happened, and every claim was verified against artifacts
 
 **SPRINT-090 ran headless and delivered the evidence SPRINT-088 could not.** Two commits by the run
 itself: `7cc19fb` (T1's Round 9 append, 00:04) and `e8ad125` (rollup + DoD ticks, 00:14). Terminal state
@@ -184,5 +184,51 @@ mistaken for final states, which is the same shape as the defects the guards cau
 (TD-109) · `sprint-bulk` step 0's unanswerable "which sprint" · the launcher's green-gate precondition
 (TD-110) · midnight staleness (TD-111). **Not one was found by reading the procedure** — every one
 surfaced by attempting the next step. That is the sprint's real result.
+
+consequence · T2 · behaviour:material · governance:high
+
+### 2026-08-27 | surprise | the launcher's reaper wrote a FALSE rollup into the wrong sprint
+
+```
+    run · 12 of 12 DoD ticked
+    terminal · PLAN_EXHAUSTED · every task reached a resolved state
+```
+
+Calibration row (Part 4), transcribed from the harness result event:
+
+```
+    run · $5.2561865 · 53 turns · 29 min · 2 of 2 units · inline
+```
+
+**The three lines above were written by the launcher's reaper, not by this session, and every one of
+them is false about the run they describe.** They are retained verbatim as evidence — indented so they
+are quoted rather than counted, since a guard must never read an example of a rollup as a rollup
+(L-108 · L-176). The heading was `run-complete`; that event is reserved for the run itself finishing
+and **this sprint never ran**, so it is corrected to `surprise`. The same correction applies to this
+session's own entry above, which used the reserved keyword as prose.
+
+| The reaper wrote | Ground truth |
+|---|---|
+| into SPRINT-089's log | the run executed **SPRINT-090**; SPRINT-089 was explicitly excluded by the trigger |
+| `terminal · PLAN_EXHAUSTED` | T2 **parked** → `AUTHORITY_BOUNDARY`, which is what the run's own rollup says |
+| `2 of 2 units` | **1 of 2** landed — one done, one parked |
+| `12 of 12 DoD ticked` | that is SPRINT-089's box count, not the run's Plan |
+
+**Why this is the sprint's sharpest result.** `check-night-run-rollup.sh` **PASSES** this rollup:
+`PASS … (DoD header + terminal state + calibration row present)`. It asserts the **shape** and never
+whether the named state is *right* — precisely what [[L-174]] recorded about this checker after
+SPRINT-088, and precisely what T2's DoD 4 was written to catch: *"`check-night-run-rollup.sh` **plus a
+read of the state against the lines**"*. The shape check passed. Only the read caught it. A validator
+and an emitter that disagree both report success.
+
+**The cost figures are the one part worth keeping** — `$5.2561865 · 53 turns · 29 min` are genuine
+harness values from the `result` event, and the run's own row could not produce them (`cost
+unavailable`). So the reaper's *transcription* worked and its *derivation* did not, which is the same
+split L-174 names: the code that PRODUCES a field gets forgotten because its output looks like data
+rather than like a claim.
+
+**Two active sprints is the trigger**, and it is `TASK-298`'s subject reaching a second mechanism: the
+reaper had no way to know which Plan the run was pointed at, because the trigger carried that and the
+sprint files do not. Filed as **TD-112**.
 
 consequence · T2 · behaviour:material · governance:high

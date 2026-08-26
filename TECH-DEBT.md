@@ -202,6 +202,49 @@ status: current
   - **Re-file fresh if** `Verify:` clauses become required to carry a path — the collision is between
     what a clause may write and what the resolver accepts, and constraining either dissolves it.
 
+- **TD-112** severity: **high** | status: open | created: Sprint-089
+  - Summary: **With two active sprints, the launcher's reaper wrote its rollup into the sprint the run
+    did NOT execute, and derived a terminal state from that file rather than from the run — reporting
+    `PLAN_EXHAUSTED` over a run that parked a J2.** `check-night-run-rollup.sh` **PASSES** it.
+  - Evidence, from the run this sprint fired (2026-08-27, SPRINT-090):
+
+    | The reaper wrote (into `logs/SPRINT-089-…`) | Ground truth |
+    |---|---|
+    | `terminal · PLAN_EXHAUSTED · every task reached a resolved state` | T2 **parked** → `AUTHORITY_BOUNDARY` |
+    | `run · 2 of 2 units` | **1 of 2** landed — one done, one parked |
+    | `run · 12 of 12 DoD ticked` | SPRINT-089's box count, not the executed Plan's |
+
+    The run's **own** rollup, in `logs/SPRINT-090-…`, is correct on all three. Both artifacts exist in
+    the repository, disagreeing, and the checker passes the false one.
+  - **The checker cannot catch this and was never going to.** It asserts the rollup's *shape* —
+    `PASS … (DoD header + terminal state + calibration row present)` — never whether the named state is
+    right. That is verbatim what **L-174** recorded of this same checker after SPRINT-088, where a
+    rollup claimed `PLAN_EXHAUSTED` over three `blocked` tasks. **The defect class recurred through a
+    different route within one sprint of being written down**, which is the part worth keeping: the
+    fix then was fixtures for the *derivation*; those fixtures pass, because the derivation is now
+    correct **about the file it is given** and the bug moved upstream to *which file it is given*.
+  - Root cause, and it is structural rather than a slip: **the reaper has no way to know which Plan the
+    run was pointed at.** That fact lives in the trigger string (`… run SPRINT-090 ONLY …`), which the
+    launcher passes through verbatim and never parses; the sprint *files* carry no "this run is mine"
+    marker. With one active sprint the ambiguity is invisible. With two it resolves silently and
+    wrongly. `TASK-298`'s subject — a sibling active sprint — reaching a second mechanism.
+  - Impact: **a silent false negative in the direction that matters.** A parked run reads as cleanly
+    exhausted, in a machine-readable field, in a file a morning reader trusts precisely because a
+    checker passed it. It also **contaminates the wrong sprint's record**: SPRINT-089 was explicitly
+    excluded by the trigger and still received a rollup describing work it never did.
+  - The transcription half worked: `$5.2561865 · 53 turns · 29 min` are genuine `result`-event figures
+    the run's own row could not produce (`cost unavailable`). So the reaper's *reading* of the harness
+    is sound and its *derivation* is not — L-174's split, again.
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): the reaper should be told
+    its target Plan explicitly rather than inferring it (a `--sprint <path>` the trigger already knows),
+    and `check-night-run-rollup.sh` should compare the terminal state against the per-task lines **in
+    the same file** rather than only asserting all three shapes are present. The second half is the one
+    that generalises: a validator that checks presence and never agreement will pass any well-formed
+    lie.
+  - **Re-file fresh if** the repo returns to a single active sprint permanently — the ambiguity would
+    stop firing, and this row would then describe a latent defect rather than an observed one, which is
+    a different severity.
+
 - **TD-111** severity: **high** | status: open | created: Sprint-089
   - Summary: **`docs/knowledge-index.md` goes STALE at every midnight regardless of content, so the gate
     reddens on a tree nobody touched — and `night-run.sh` then refuses to fire (TD-110). An unattended
