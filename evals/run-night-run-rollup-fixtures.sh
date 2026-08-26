@@ -35,7 +35,7 @@ run_case_anywhere "missing-calibration-fails" 1 "carries no Part 4 calibration r
   sh "$checker" "$fx/missing-calibration/docs/sprint/logs/SPRINT-921-missing-calibration.md"
 
 # --- case 3: both present -> PASS ---------------------------------------------------------------
-run_case_anywhere "wellformed-passes" 0 "DoD header + calibration row present" -- \
+run_case_anywhere "wellformed-passes" 0 "DoD header + terminal state + calibration row present" -- \
   sh "$checker" "$fx/wellformed/docs/sprint/logs/SPRINT-922-wellformed.md"
 
 # --- case 4: no completed run yet -> reported, exit 0, never a FAIL ------------------------------
@@ -51,6 +51,46 @@ run_case_anywhere "midflight-does-not-fire" 0 "no completed-run entry yet" -- \
 # `run-complete` rename this exact log turned the gate red mid-SPRINT-064 (TASK-211).
 run_case_anywhere "task-level-complete-does-not-arm" 0 "no completed-run entry yet" -- \
   sh "$checker" "$fx/task-level-complete-does-not-arm/docs/sprint/logs/SPRINT-924-task-level-complete-does-not-arm.md"
+
+# --- case 6 (must-FAIL): completed run, no terminal state (SPRINT-088 T2, Part 0b) ---------------
+# The continuation contract's guarded failure, one level up from case 1's. Case 1 catches a run that
+# does not say how much of the Plan it finished; this catches one that does not say why it stopped
+# being the thing that finishes it. A run can be `9 of 9` and still have stopped for a reason worth
+# reading, which is why a full DoD count does not satisfy this and the fixture is deliberately 9-of-9.
+run_case_anywhere "missing-terminal-fails" 1 "carries no 'terminal · <STATE> · <reason>' line" -- \
+  sh "$checker" "$fx/missing-terminal/docs/sprint/logs/SPRINT-925-missing-terminal.md"
+
+# --- case 6b (must-FAIL): parseable terminal line, unrecognised STATE -----------------------------
+# The sibling branch, and the one a regression would ship green: `terminal · FINISHED · ...` has the
+# shape and carries no meaning. Without this case a checker that stopped validating the token would
+# pass every other case here -- the silent false-negative L-058 is about. Same reasoning the
+# gates-signed family already applied to `G1,X2` (its bad-gate-token case).
+run_case_anywhere "bad-terminal-token-fails" 1 "carries no 'terminal · <STATE> · <reason>' line" -- \
+  sh "$checker" "$fx/bad-terminal-token/docs/sprint/logs/SPRINT-926-bad-terminal-token.md"
+
+# --- case 6c: the neighbouring cases still fail for their OWN reason, not for the new one ---------
+# Adding a required field to a checker silently converts every existing must-FAIL fixture into one
+# that fails for two reasons, at which point none of them isolates anything. `missing-calibration`
+# and `missing-rollup` were each given a valid terminal line for exactly this reason; these two
+# assertions are what stop that from rotting back.
+out=$(sh "$checker" "$fx/missing-calibration/docs/sprint/logs/SPRINT-921-missing-calibration.md" 2>&1)
+if printf '%s\n' "$out" | grep -q 'carries no Part 4 calibration row' &&
+   ! printf '%s\n' "$out" | grep -q "carries no 'terminal · "; then
+  echo "PASS fixture(calibration-case-stays-isolated): fails on the calibration row alone, not on the terminal state"
+else
+  echo "FAIL fixture(calibration-case-stays-isolated): the calibration fixture no longer isolates its own failure -- output:"
+  printf '%s\n' "$out"
+  fail=1
+fi
+out=$(sh "$checker" "$fx/missing-rollup/docs/sprint/logs/SPRINT-920-missing-rollup.md" 2>&1)
+if printf '%s\n' "$out" | grep -q "carries no 'run · N of M DoD ticked' header" &&
+   ! printf '%s\n' "$out" | grep -q "carries no 'terminal · "; then
+  echo "PASS fixture(dod-header-case-stays-isolated): fails on the DoD header alone, not on the terminal state"
+else
+  echo "FAIL fixture(dod-header-case-stays-isolated): the DoD-header fixture no longer isolates its own failure -- output:"
+  printf '%s\n' "$out"
+  fail=1
+fi
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "NIGHT-RUN-ROLLUP FIXTURES: all green"; else echo "NIGHT-RUN-ROLLUP FIXTURES: at least one FAIL"; fi

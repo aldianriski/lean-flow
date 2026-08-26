@@ -116,9 +116,47 @@ reap() {
     esac
   fi
 
+  # --- terminal state (Part 0b) -------------------------------------------------------------------
+  # Derived HERE, in the launcher, for exactly the reason ADR-016 put the DoD count here: a run's own
+  # sense of "I am finished" is what is least reliable when it ends early. The wrapper wrote the exit
+  # code to $rp_log.exit before invoking this reaper, so the status is on disk and needs no new
+  # parameter.
+  #
+  # The order below is load-bearing, not stylistic:
+  #   non-zero exit    -> HARD_FAILURE. A failed process explains the stop; nothing later can override.
+  #   any unattempted  -> BUDGET_STOP. Tasks were never REACHED. Part 4 already defines `unattempted`
+  #                       as "just an exhausted turn" -- a turn ceiling is a budget, so this is the
+  #                       honest label. It ranks ABOVE parks: if some tasks were never reached, the
+  #                       run was not bounded by authority, whatever else also happened.
+  #   any parked-hitl  -> AUTHORITY_BOUNDARY. Every task was reached; what remains needs a human.
+  #   otherwise        -> PLAN_EXHAUSTED. The only clean ending.
+  # USER_STOP is NOT derivable here -- an external kill never reaches this code path at all; it is
+  # the die_doa() path's to report. Naming it in the table without emitting it here would be a state
+  # nothing can ever produce, so it is named as out-of-scope rather than silently absent (L-166).
+  rp_ec=$(cat "$rp_log.exit" 2>/dev/null || printf '')
+  rp_unatt=0
+  for tn in $(awk '/^### T[0-9]+ /{t=$2} /^- \[ \]/{if(t!=""){print t; t=""}}' "$rp_sprint" 2>/dev/null); do
+    tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -q "^$tn · " || rp_unatt=$((rp_unatt + 1))
+  done
+  rp_parked=$(tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -cE '^T[0-9]+ · parked-hitl · ' 2>/dev/null || printf '0')
+  case "$rp_ec" in
+    ''|0) rp_term_ok=1 ;;
+    *)    rp_term_ok=0 ;;
+  esac
+  if [ "$rp_term_ok" -eq 0 ]; then
+    rp_term="HARD_FAILURE"; rp_term_why="wrapped process exited with status $rp_ec"
+  elif [ "$rp_unatt" -gt 0 ]; then
+    rp_term="BUDGET_STOP"; rp_term_why="$rp_unatt task(s) never reached — turn/budget ceiling with Plan remaining"
+  elif [ "$rp_parked" -gt 0 ]; then
+    rp_term="AUTHORITY_BOUNDARY"; rp_term_why="$rp_parked task(s) parked for a human; the rest completed around them"
+  else
+    rp_term="PLAN_EXHAUSTED"; rp_term_why="every task reached a resolved state"
+  fi
+
   {
     printf '\n### %s | run-complete | run exited — rollup emitted by the launcher\n\n' "$(date +%Y-%m-%d)"
     printf '```\nrun · %s of %s DoD ticked\n' "$rp_done" "$rp_total"
+    printf 'terminal · %s · %s\n' "$rp_term" "$rp_term_why"
     # A task with an open DoD that the run wrote no rollup line for was never spoken about
     # at all. That is `unattempted` -- stated as the fact it is (no line exists), never
     # guessed at: a task the run DID report as blocked/parked/denied already has its line

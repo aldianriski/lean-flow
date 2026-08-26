@@ -166,3 +166,52 @@ author picks the scope. Only pointing it at the real corpus does. The retained f
 `closed-out-of-scope/` exists now so the next person does not have to rediscover it from a gate run.
 
 consequence · T1 · behaviour:material · governance:high
+
+### 2026-08-26 | progress | T2 — the continuation contract and five terminal states; 1 of 3 DoD
+
+**Shipped.** `night-run.md` **Part 0b** (new — the contract: no pause between already-authorized
+tasks, and the five terminal states with their morning actions) · Part 4 (the `terminal · <STATE> ·
+<reason>` line in the rollup block) · `orchestrator/SKILL.md` step 4 · `.claude/CONTEXT.md` § Modes ·
+`scripts/night-run.sh` `reap()` (derives and emits the state) · `check-night-run-rollup.sh` +
+`run-night-run-rollup-fixtures.sh` (5 → 9 assertions).
+
+**Part 0b is separate from Part 0 on purpose.** They guard different failures: Part 0 says what a run
+may *do*, Part 0b says when it may *stop*. A run can respect every authority boundary and still halt
+after task one — obeying Part 0 perfectly and wasting the night.
+
+**The derivation order in `reap()` is load-bearing and is documented as such.** non-zero exit →
+`HARD_FAILURE`; any `unattempted` → `BUDGET_STOP` (Part 4 already defines `unattempted` as "just an
+exhausted turn", and a turn ceiling is a budget) ranked **above** parks, because if tasks were never
+reached the run was not bounded by authority whatever else happened; any `parked-hitl` →
+`AUTHORITY_BOUNDARY`; otherwise `PLAN_EXHAUSTED`. The exit code needed no new parameter — the wrapper
+already writes it to `$logfile.exit` before invoking the reaper.
+
+**`USER_STOP` is named as out-of-scope for the reaper rather than left silently unemitted.** An
+external kill never reaches that code path; it is `die_doa()`'s to report. A state named in the
+contract that nothing can ever produce is L-166's shape, so the gap is written down where the reader
+of the derivation will hit it.
+
+**Scope checked BEFORE writing this time**, which is T1's lesson applied rather than re-learned: all
+four Execution Logs carrying a `run-complete` entry live under `docs/sprint/archive/logs/`, which the
+checker already skips by path — so the new requirement reddens **no live artifact**. That also means
+its motivating case is not in the corpus yet: the real artifact is **this run's own terminal rollup**,
+written after T4. Stated rather than claimed as satisfied.
+
+**Tier G proof (D4).** Two seeds, each landed (`cmp`), parsing (`sh -n`), targeted (73/73 lines, 3/3
+verdict calls, 1 line changed): D (terminal requirement removed) reddened 2 cases; E (state token no
+longer validated, shape only) reddened 1 — **a strict subset**, which is the interesting result: the
+nesting shows the token assertion does independent work rather than duplicating the presence check.
+Controls green throughout. Convention: `sha256sum` over the raw working file — pristine
+`5497faa8bc5ebf62`, restored `5497faa8bc5ebf62`, `cmp` byte-identical.
+
+**A second-order guard, added because adding a required field to a shared checker is quietly
+destructive:** every pre-existing must-FAIL fixture (`missing-rollup`, `missing-calibration`) would
+now fail for *two* reasons, at which point neither isolates the failure it is named for. Both were
+given a valid `terminal ·` line, and two new assertions (`*-stays-isolated`) fail if that ever rots
+back. A suite where every case fails for every reason discriminates nothing.
+
+**DoD 1 and 2 are not ticked yet** — both say *"exercised on a real run"*, and the honest real
+artifact is this sprint's own run-complete rollup, which does not exist until the Plan is exhausted.
+They tick together with T1's DoD 2/3 after T4.
+
+consequence · T2 · behaviour:material · governance:high

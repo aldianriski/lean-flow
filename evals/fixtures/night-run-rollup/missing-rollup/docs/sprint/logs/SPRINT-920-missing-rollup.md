@@ -14,3 +14,4 @@ update_trigger: an Execution Log entry is appended
 T3 · blocked · waiting on the upstream schema
 
 run · $12.00 · 40 turns · 30 min · 2 of 5 units · inline
+terminal · PLAN_EXHAUSTED · every task reached a resolved state

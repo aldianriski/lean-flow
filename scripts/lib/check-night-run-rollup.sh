@@ -49,9 +49,14 @@ for lg in "$@"; do
     continue
   fi
 
-  hdr=0; cal=0
+  hdr=0; cal=0; term=0
   grep -qE '^run · [0-9]+ of [0-9]+ DoD ticked' "$lg" 2>/dev/null && hdr=1
   grep -qE '^run · .* · .* · .* · [0-9]+ of [0-9]+ units · ' "$lg" 2>/dev/null && cal=1
+  # Anchored at column 1 and restricted to the five states the contract defines (Part 0b). An
+  # unrecognised state must NOT satisfy this: `terminal · FINISHED · ...` parses as a terminal line
+  # and means nothing, which is the malformed-record failure -- a record nobody can act on looks like
+  # evidence and is worse than none (the gates-signed family's own ruling).
+  grep -qE '^terminal · (PLAN_EXHAUSTED|AUTHORITY_BOUNDARY|HARD_FAILURE|BUDGET_STOP|USER_STOP) · ' "$lg" 2>/dev/null && term=1
 
   if [ "$hdr" -eq 0 ]; then
     bad "night-run rollup: $lg records a completed run but carries no 'run · N of M DoD ticked' header -- a run that finished part of the Plan is indistinguishable from one that finished all of it (Part 4)"
@@ -59,7 +64,10 @@ for lg in "$@"; do
   if [ "$cal" -eq 0 ]; then
     bad "night-run rollup: $lg records a completed run but carries no Part 4 calibration row (run · cost · turns · wall · N of M units · shape) -- the series it feeds is what lets the next promote size a batch"
   fi
-  [ "$hdr" -eq 1 ] && [ "$cal" -eq 1 ] && ok "night-run rollup $lg (DoD header + calibration row present)"
+  if [ "$term" -eq 0 ]; then
+    bad "night-run rollup: $lg records a completed run but carries no 'terminal · <STATE> · <reason>' line naming one of PLAN_EXHAUSTED | AUTHORITY_BOUNDARY | HARD_FAILURE | BUDGET_STOP | USER_STOP -- a run that stopped for a reason nobody declared is indistinguishable from one that finished (Part 0b). The count says how much of the Plan is done; the state says why the run stopped being the thing that does it"
+  fi
+  [ "$hdr" -eq 1 ] && [ "$cal" -eq 1 ] && [ "$term" -eq 1 ] && ok "night-run rollup $lg (DoD header + terminal state + calibration row present)"
 done
 
 exit "$fail"

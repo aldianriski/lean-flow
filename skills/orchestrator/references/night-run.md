@@ -117,6 +117,41 @@ not decide what the Plan should be, and it does not dispose of what the Plan pro
 6. **Never work around the park** — rewriting, splitting, or narrowing a task so it dodges the gate is
    itself scope-changing, and therefore HITL. Park it as-is.
 
+## Part 0b — The continuation contract (when a run may stop)
+
+Part 0 says what a run may *do*. This says when it may **stop**. They are separate failures: a run
+that respects every authority boundary and still halts after task one has obeyed Part 0 and wasted
+the night.
+
+**A run does not pause between tasks the owner already approved.** A J1 task is, by definition, one
+the recorded pre-launch approval covers (Part 0 § Authority classes) — so re-confirming it asks a
+question that was already answered, into a channel that cannot answer. Finishing a task is not a
+decision point: commit it, tick its DoD, append the Log entry, and **take the next task without
+pause**. The pause between already-authorized tasks is the single reason an approved Plan still needs
+a human sitting beside it.
+
+**A run ends at exactly one of five terminal states, and names it.** Anything else is a stop nobody
+declared — the failure that reads as success, because a turn that simply ends carries
+`subtype: success` and no error (Part 4).
+
+| Terminal state | Meaning | Morning action |
+|---|---|---|
+| `PLAN_EXHAUSTED` | every task reached a resolved state — the only *clean* ending | close, or re-fire for what parked |
+| `AUTHORITY_BOUNDARY` | work remains, but all of it is J2 or blocked behind a park | take the named human step; the rest already completed around it |
+| `HARD_FAILURE` | a step failed in a way the run cannot proceed past (a red gate, a broken tree) | read the named finding; fix before re-firing |
+| `BUDGET_STOP` | a declared budget ceiling was reached with Plan remaining | raise the ceiling or re-fire; the Plan is unchanged |
+| `USER_STOP` | a human interrupted | resume at will |
+
+**The state goes in the rollup, and the launcher writes it** — the same division ADR-016 already
+fixed for the DoD count, and for the same reason: a run's own sense of "I am finished" is exactly
+what is unreliable when it ends early, so the process wrapper that outlives it records the ending.
+This changes *when a run stops*, never *who records it*. Format and placement → Part 4.
+
+**Unattempted tasks and the terminal state are independent.** `PLAN_EXHAUSTED` asserts every task was
+*reached*, not that every task succeeded — a Plan whose tasks all parked still exhausted. A rollup
+carrying `unattempted` lines under `PLAN_EXHAUSTED` is a contradiction and means the count and the
+state disagree; trust the count, which is derived, over the state, which is asserted.
+
 ## Part 1a — Entry path (you were asked to *start* a night run)
 
 Everything from Part 1 on assumes a promoted Plan already exists. This part covers the case where it
@@ -473,8 +508,14 @@ wrong — *always*, headed by the line that says how much of the Plan is actuall
 
 ```
 run · <N> of <M> DoD ticked
+terminal · <PLAN_EXHAUSTED | AUTHORITY_BOUNDARY | HARD_FAILURE | BUDGET_STOP | USER_STOP> · <one-line reason>
 Tn · state (done | blocked | parked-hitl | denied-tool | stalled | unattempted) · unblock condition / next action
 ```
+
+**The `terminal ·` line is required on every completed-run rollup** (Part 0b). Its absence is not a
+claim that the run ended cleanly — it is the same silence the DoD count exists to break, one level up:
+the count says how much of the Plan is done, the terminal state says *why the run stopped being the
+thing that does it*. A run can be `12 of 12` and still have stopped for a reason worth reading.
 
 **Why the header line exists.** The `sprint-bulk` loop is run by the *model*, and nothing outside it
 checks that the Plan was exhausted. When the model ends a turn after finishing a task, the headless

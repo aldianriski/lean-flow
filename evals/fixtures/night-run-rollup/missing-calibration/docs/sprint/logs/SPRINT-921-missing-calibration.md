@@ -12,4 +12,5 @@ update_trigger: an Execution Log entry is appended
 ### 2026-08-10 | run-complete | run exited
 
 run · 2 of 9 DoD ticked
+terminal · BUDGET_STOP · 1 task(s) never reached
 T3 · unattempted · run ended before this task was started
