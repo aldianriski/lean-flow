@@ -48,11 +48,11 @@ the same wall. **Profile before fixing** — TD-084's instruction, which has now
 `qa-check-budget-exceeded` FAIL and **no harness skipped**, on a clean process table and under load.
 
 **DoD:**
-- [ ] The dominant term is **measured before anything is changed**, and recorded as a new Round in `docs/research/logs/qa-gate-timing.md` — *Verify: the Round names the term and its share; a fix chosen before the measurement is TD-084's named anti-move*
-- [ ] A default run completes **inside 450s with zero harnesses skipped** — *Verify: `scripts/qa-check.sh` prints its own verdict line with no `qa-check-budget-exceeded` FAIL; read the printed verdict, never a piped status (L-120)*
-- [ ] The same holds **under load**, not only on an idle host — *Verify: TD-090's own re-raise condition is load-dependent, so an idle-only measurement cannot clear it*
-- [ ] **No coverage was traded for time** — *Verify: harness inventory compared name-by-name against the pre-change list, equal count and equal names (SPRINT-086 T2's method: 50 fixture names, zero removed)*
-- [ ] TD-090's re-raise condition is **cleared or restated against the new figure** — *Verify: a debt row whose trigger still references a superseded number is a guard that cannot fire*
+- [x] The dominant term is **measured before anything is changed**, and recorded as a new Round in `docs/research/logs/qa-gate-timing.md` — *Verify: the Round names the term and its share; a fix chosen before the measurement is TD-084's named anti-move*
+- [x] A default run completes **inside 450s with zero harnesses skipped** — *Verify: `scripts/qa-check.sh` prints its own verdict line with no `qa-check-budget-exceeded` FAIL; read the printed verdict, never a piped status (L-120)*
+- [x] The same holds **under load**, not only on an idle host — *Verify: TD-090's own re-raise condition is load-dependent, so an idle-only measurement cannot clear it*
+- [x] **No coverage was traded for time** — *Verify: harness inventory compared name-by-name against the pre-change list, equal count and equal names (SPRINT-086 T2's method: 50 fixture names, zero removed)*
+- [x] TD-090's re-raise condition is **cleared or restated against the new figure** — *Verify: a debt row whose trigger still references a superseded number is a guard that cannot fire*
 
 ### T2 — Seed a Plan an unattended run may execute, and run it once for real `[size: M · risk: high · class: execution · HITL · J1]`
 Layers: a seeded Plan (shape ruled at G2) · `docs/sprint/logs/` · `scripts/night-run.sh` (only if the exercise finds a defect) · `scripts/lib/check-night-run-rollup.sh` (read, not edited — the rollup verdict is checked with it) · no guard code — SPRINT-088 shipped it all
@@ -116,6 +116,10 @@ unblock condition recorded.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `docs/research/logs/qa-gate-timing.md` | T1 | Round 8 — profile before fixing; found the gate's cost host-dependent, not cured | low | append-only, +171/−0 |
+| `scripts/lib/conformance-engine.sh` | T1 | Memoise the git probe, 6 spawns → 1 per invocation; `_SEEN` flag closes the empty-key landmine an independent review found | **Tier G** | `run-git-availability-fixtures.sh` (15 assertions), both-direction seeded discrimination |
+| `evals/run-git-availability-fixtures.sh` | T1 | NEW — guards the engine's git-availability branch, which had zero discriminating coverage in either direction | **Tier G** | self; seeds redden in disjoint sets, controls green |
+| `scripts/qa-check.sh` | T1 | Wire the new guard always-on (30 → 31), with the cheap-and-git-free exception reasoned at the list | low | gate run `195 pass, 0 fail` |
+| `TECH-DEBT.md` | T1 | TD-090 re-raise condition restated host-normalized; TD-095 split on measurement | low | arithmetic reproducible from a named anchor |
 
 ## Retro

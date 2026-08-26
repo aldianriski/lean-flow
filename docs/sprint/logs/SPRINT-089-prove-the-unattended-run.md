@@ -121,3 +121,27 @@ a leaked key passes the gate. Added as case 6; it reddens under seed B.
 review · T1 · isolated-subagent · behaviour:material · governance:high
 
 consequence · T1 · behaviour:material · governance:high
+
+### 2026-08-26 | progress | T1 complete — gate green at 195 pass, 0 fail, and the guard caught its own author
+
+All five T1 DoD ticked. Final verification run: **289.3s**, 31 harnesses, **zero skipped**, zero budget
+trips, verdict read from the line the gate prints (L-120).
+
+**What T1 actually delivered, stated without rounding.** The headline cut did NOT reach its 83s target
+and is not presented as though it did. What landed: a deterministic 6→1 spawn reduction in the engine's
+git probe whose *wall-clock* share is unresolvable against ~17s of host variance; a new always-on guard
+costing back roughly what the memoisation saved, leaving net gate time flat at ~288s. The durable wins
+are elsewhere — a Tier G coverage hole closed, a latent silent-direction defect fixed, and a debt row
+that can no longer be cleared by running it on a fast machine.
+
+**The guard caught its own motivating case, on real input.** `check-layers-observed.sh` reported
+`commit attributable to no task` against this session's own commits — not a fixture. Two real
+corrections followed: `conformance-engine.sh` was undeclared (L-100), and three commits carried no task
+attribution at all, which would have left this sprint's history unauditable at close. Messages were
+rewritten to carry `Task: T1` trailers; content verified untouched (tree diff against the pre-rewrite
+HEAD is empty).
+
+**Unclaimed headroom, named rather than exhausted:** ~36 forks per engine call remain; TD-095's cost
+half (42.8s here, 82–94s normalized) is measured but unattributed to specific legs; `TASK-287` unbuilt.
+
+consequence · T1 · behaviour:material · governance:high
