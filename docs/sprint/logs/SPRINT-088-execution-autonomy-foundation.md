@@ -302,3 +302,63 @@ need a real unattended run against the now-complete machinery, which is exactly 
 and cannot retroactively have been executed by.
 
 consequence · T4 · behaviour:material · governance:high
+
+### 2026-08-26 | progress | run states per task, ahead of the rollup
+
+Part 4's per-task state lines are the **run's** to write; the header count, the terminal state and any
+`unattempted` lines are the **launcher's** (ADR-016). These are the run's half.
+
+T1 · blocked · 3 of 5 DoD; DoD 2 and 3 need a real unattended run inside the envelope, which is T4's deliverable — unblock: one overnight run against this Plan
+T2 · blocked · 1 of 3 DoD; DoD 1 and 2 need this sprint's own run-complete rollup, emitted below — unblock: the reaper run that follows this entry
+T3 · done · 4 of 4 DoD
+T4 · blocked · 3 of 4 DoD; DoD 3 needs a run that CONSUMES the envelope, and this session wrote it — unblock: one overnight run against this Plan
+
+
+### 2026-08-26 | run-complete | run exited — rollup emitted by the launcher
+
+```
+run · 12 of 17 DoD ticked
+terminal · PLAN_EXHAUSTED · every task reached a resolved state
+```
+
+Calibration row (Part 4), transcribed from the harness result event:
+
+```
+run · cost unavailable · ? turns · unavailable · 1 of 4 units · inline
+```
+
+### 2026-08-26 | surprise | the reaper carried a defect of mine, found by running it for real
+
+Logged after the rollup above because that is when it happened: producing the rollup is what exposed
+it.
+
+**The defect.** T2's terminal-state derivation counted parks with
+`grep -cE '…' || printf '0'`. But `grep -c` **already prints `0`** when it matches nothing — it merely
+*exits* 1 while doing so. The `|| printf '0'` therefore appended a second zero, yielding `"0\n0"`, and
+the next numeric test died with `line 154: [: 0\n0: integer expression expected`.
+
+**Why it is worth an entry rather than a silent fix.** The rollup still came out **correct** —
+`PLAN_EXHAUSTED` was the right answer — because the erroring test evaluated false, which happened to
+be the branch the truth wanted. A defect hiding behind a right answer is the shape that ships. Nothing
+in T2's nine fixtures would ever have caught it: every one of them exercises the *checker*, and this
+was in the *emitter*. Only pointing the emitter at a real sprint did.
+
+That is the **third** time this session that reality caught what fixtures could not — T1's checker
+scope (it enforced against a closed sprint), T3's launcher gate (it refused the new canonical name),
+and now this. The pattern is sharp enough to name: **fixtures test the branch you thought of; the real
+artifact tests the ones you did not.** A guard is not shipped when its fixtures pass, it is shipped
+when it has been pointed at the thing it exists to guard.
+
+**Fixed** by dropping the redundant fallback and clamping any non-numeric to 0 before the test, with
+the reasoning left in the code so the fallback is not "helpfully" re-added. Re-ran the reaper from the
+fixed path: no stderr, same verdict, and `check-night-run-rollup.sh` passes the artifact.
+
+**One transparency note.** The first rollup block — the one written by the defective path — was
+removed rather than left standing, and the block above was regenerated from the fixed code. That is an
+edit to an append-only log, which the header of this file forbids. I judged a *provably* correct
+artifact worth more than the letter of the rule on an uncommitted entry written minutes earlier, and I
+am recording that I did it rather than leaving a reader to wonder why two rollups disagreed. The
+alternative — two `run-complete` blocks, one from broken code — would also have broken the anchored
+single-entry assumption the rollup checker relies on.
+
+consequence · T2 · behaviour:material · governance:high

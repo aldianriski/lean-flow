@@ -142,7 +142,13 @@ reap() {
   for tn in $(awk '/^### T[0-9]+ /{t=$2} /^- \[ \]/{if(t!=""){print t; t=""}}' "$rp_sprint" 2>/dev/null); do
     tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -q "^$tn · " || rp_unatt=$((rp_unatt + 1))
   done
-  rp_parked=$(tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -cE '^T[0-9]+ · parked-hitl · ' 2>/dev/null || printf '0')
+  # `grep -c` already PRINTS 0 when it matches nothing -- it just exits 1 while doing so. An
+  # `|| printf '0'` here therefore appends a SECOND zero and yields "0\n0", which blows up the numeric
+  # test below with `integer expression expected`. Caught by running this reaper against a real
+  # sprint, not by any fixture: the erroring test simply evaluated false, so the rollup still came out
+  # correct and the defect would have shipped behind a right answer.
+  rp_parked=$(tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -cE '^T[0-9]+ · parked-hitl · ')
+  case "$rp_parked" in ''|*[!0-9]*) rp_parked=0 ;; esac
   case "$rp_ec" in
     ''|0) rp_term_ok=1 ;;
     *)    rp_term_ok=0 ;;
