@@ -2,9 +2,9 @@
 epic: 015
 slug: execution-autonomy
 owner: Maintainer
-last_updated: 2026-08-25
+last_updated: 2026-08-26
 status: proposed
-member_sprints: []
+member_sprints: [SPRINT-088]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -62,7 +62,11 @@ loop · push/deploy/external destructive authorization · a scheduler or queue s
 <!-- Contribution rows live in docs/epic/logs/EPIC-015-execution-autonomy.md per ADR-030, created
      lazily at the first member close. -->
 
-_None promoted, and no longer gated._ The freeze amendment that blocked the first member sprint
+| Sprint | Theme | Status | What it contributed to the outcome |
+|---|---|---|---|
+| [SPRINT-088](../sprint/SPRINT-088-execution-autonomy-foundation.md) | Execution Autonomy Foundation | **active** — promoted 2026-08-26 | _(completed at close)_ Slice: V3 H27–H30, targeting § Closed-when **1–4**. The authority model first, because the envelope is expressed in J-classes and the continuation contract has no definition of "already authorized" without them. Then continuation with five named terminal states, `overnight` as the canonical mode named after the contract it runs, and one pre-launch approval written where the run reads it. **This repo's first parallel stream** (`stream: autonomy`), running beside EPIC-014 rather than after it — admissible because the two surfaces are disjoint, verified token-by-token at promote, and because TASK-299 taught the gate to scope attribution by commit ownership. Deferred: bounded repair (TASK-296), typed outcomes (TASK-297, gated on the EPIC-008 `RunSummary` ruling), both dogfoods and the freeze re-arm. |
+
+_First member sprint promoted 2026-08-26._ The freeze amendment that blocked it
 **closed 2026-08-25** (§ Open questions), so this epic is admissible. Its other condition — sequenced
 after **SPRINT-083** so the two epics do not contend for `skills/orchestrator/**` and `scripts/` in the
 same window — is also met: SPRINT-083 closed 2026-08-24. The gate was set at that sprint, **not** at
