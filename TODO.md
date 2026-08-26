@@ -58,91 +58,6 @@ Next: `/lean-doc-generator promote` to form a sprint from the groomed Backlog.
       origin:     close-retro
       state:      blocked
 
-- [ ] TASK-292 — Declare J0/J1/J2 authority on every task, and prove a J2 parks  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 · EPIC-015 D4 — a misclassified authority is silent by construction:
-                  the run reports success, and a decision taken without asking leaves no trace)
-      done-when:  every task in a promoted Plan carries a `J0` / `J1` / `J2` declaration; an unattended
-                  run executes J1 inside the approved envelope without asking, and a **seeded** J2
-                  parks with its unblock condition recorded. The seed is required, not a fallback
-                  (D5) — a natural J2 cannot be scheduled, and waiting for one foreclosed this
-                  criterion once already (TASK-188 · L-111). Retained must-FAIL fixture: a J2 task
-                  that does **not** park, failing with its named finding while a sibling J1 control
-                  stays green
-      touches:    skills/orchestrator/references/night-run.md (Part 0 authority table) ·
-                  skills/orchestrator/SKILL.md (G2 declaration) · templates/SPRINT.md.template ·
-                  .claude/CONTEXT.md § Task entry shape (**shared with EPIC-014 — owner at G2**) ·
-                  a retained fixture pair
-      depends-on: none — the foundation the envelope, the repair loop and the run vocabulary all rest
-                  on (epic § Why this)
-      assumes:    the three classes already describe how the loop behaves (mechanical · delegated ·
-                  human); this **declares** them, it does not invent them. D3 binds — J2 stays human
-                  and absence is never consent: a missing ask channel, a denial or a timeout is a
-                  BLOCK, never a default-yes
-      tracker:    EPIC-015 § Closed-when 3 · D3 · D4 · D5 · V3 H29
-      origin:     decomposer
-      state:      ready
-
-- [ ] TASK-293 — Stop sprint-bulk pausing between already-authorized tasks  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 · D4 — a continuation contract that stops early reports the same
-                  `success` as one that ran the Plan out; the omission is invisible)
-      done-when:  a `sprint-bulk` run moves task to task without re-confirming work the owner already
-                  approved, and ends **only** at one of `PLAN_EXHAUSTED` · `AUTHORITY_BOUNDARY` ·
-                  `HARD_FAILURE` · `BUDGET_STOP` · `USER_STOP` — the terminal reason named in the
-                  rollup. Retained must-FAIL fixture: a run that halts with no terminal state,
-                  failing with its named finding while a sibling clean-exhaustion control passes
-      touches:    skills/orchestrator/SKILL.md (the sprint-bulk loop) ·
-                  skills/orchestrator/references/night-run.md · scripts/night-run.sh ·
-                  .claude/CONTEXT.md § Modes (**shared with EPIC-014 — owner at G2**)
-      depends-on: TASK-292 — a run may only continue past a task once that task's authority class is
-                  declared; without J0/J1/J2 "already authorized" has no definition
-      assumes:    ADR-016's rollup stays the launcher's job, not the run's — this task changes when
-                  the run stops, never who writes the record of it
-      tracker:    EPIC-015 § Closed-when 1 · V3 H27 · ADR-016
-      origin:     decomposer
-      state:      ready
-
-- [ ] TASK-294 — Make `overnight` the canonical mode name, with the current names as aliases  [size: S] [risk: low] [HITL]
-      class:      execution
-      tier:       G (ADR-029 · D4 — an alias that silently resolves to the wrong mode runs the wrong
-                  gate set, and the run looks normal either way)
-      done-when:  `/orchestrator` and `/flow` both discover `overnight` as the mode name, and
-                  `night-run` · `unattended` · `sprint-bulk unattended` each resolve to it — proven by
-                  a fixture per alias, each reaching the same mode. Retained must-FAIL: an unknown
-                  mode string fails loudly rather than falling through to a default
-      touches:    skills/orchestrator/SKILL.md · skills/flow/SKILL.md ·
-                  skills/orchestrator/references/night-run.md · .claude/CONTEXT.md § Modes
-                  (**shared with EPIC-014 — owner at G2**) · README (consumer-visible rename, L-015)
-      depends-on: TASK-293 — the mode is named after the contract it runs, not before it
-      assumes:    the rename is additive for consumers: every existing trigger keeps working as an
-                  alias, so no installed workflow breaks (L-015 consumer check)
-      tracker:    EPIC-015 § Closed-when 2 · V3 H28 · open question — whether `overnight` also
-                  becomes a `spec/STANDARD.md` §2 row is a **judgement call closed by ruling** at G2
-                  (L-094), ADR-grade only if it adds a row
-      origin:     decomposer
-      state:      ready
-
-- [ ] TASK-295 — Record one pre-launch approval that covers the whole envelope  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 · D4 — an envelope that silently widens is the failure mode; nothing in
-                  the run reports having exceeded an approval it never re-read)
-      done-when:  one recorded approval covers goal · scope · acceptance · design · verification · J1
-                  delegation · capabilities · repair policy · budget · stop conditions, and a run
-                  consuming it re-confirms **no** J0/J1 mid-flight. The approval is written where the
-                  run reads it — the sprint frontmatter, not the launching transcript (L-099 · L-151).
-                  Retained must-FAIL: an approval missing one of the ten dimensions is rejected at
-                  pre-flight and names which one
-      touches:    skills/orchestrator/references/night-run.md (Part 1a pre-flight) ·
-                  templates/SPRINT.md.template (frontmatter) · skills/orchestrator/SKILL.md
-      depends-on: TASK-292 — the envelope is expressed in J-classes, so it cannot be written before
-                  they exist
-      assumes:    pre-flight remains the gate that refuses an unpromoted Plan (Part 1a); this task
-                  widens what pre-flight checks, never where it sits
-      tracker:    EPIC-015 § Closed-when 4 · V3 H30 · L-099 · L-151
-      origin:     decomposer
-      state:      ready
-
 - [ ] TASK-296 — Run bounded unattended repair on one J1 finding  [size: M] [risk: med] [HITL]
       class:      execution
       tier:       G (ADR-029 · D4 — an unbounded or silently-skipped repair both end in a green run)
@@ -209,7 +124,9 @@ Next: `/lean-doc-generator promote` to form a sprint from the groomed Backlog.
       tracker:    L-020 · L-166 · L-165/L-168 (isolated reviewer) · CONTEXT.md § Sprint model ·
                   blocks promoting EPIC-015 as stream 2
       origin:     manual
-      state:      ready
+      state:      needs-info   # SPRINT-088 promote: looks SUPERSEDED — TASK-299 shipped the
+                  # commit-ownership approach and its tracker reads "reverted from TASK-298".
+                  # Routed to /triage to rule kept-vs-out-of-scope rather than deleted silently.
 
 - [ ] TASK-300 — Decide whether the five gate-accuracy defects are one task or five  [size: S] [risk: low] [HITL]
       class:      decision
@@ -227,37 +144,6 @@ Next: `/lean-doc-generator promote` to form a sprint from the groomed Backlog.
       tracker:   SPRINT-087 close sweep · TD-086 · TD-087 · TD-089 · TD-097 · TD-105
       origin:    close-retro
       state:     ready
-- [ ] TASK-299 — Scope layers attribution per stream, by commit ownership not by path  [size: M] [risk: high] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — this IS the attribution guard, and the first attempt at it shipped a
-                  false negative that an independent reviewer caught and the author did not)
-      done-when:  with two active sprint files, each sprint's attribution is scoped to itself, AND a
-                  commit belonging to THIS sprint that touches a path only a SIBLING declared still
-                  FAILs — cross-stream overlap is what CONTEXT.md says must be coordinated, so hiding
-                  it is worse than the noise it replaces. Proven on a real two-active-sprint tree
-                  (L-166), retained must-FAIL + sibling control, seeded-break discrimination, and an
-                  independent worktree-isolated reviewer dispatched against a COMMITTED branch
-      touches:    scripts/lib/check-layers-observed.sh (attribution, not the exclusion list) ·
-                  evals/run-layers-observed-fixtures.sh
-      depends-on: none — but it BLOCKS promoting any stream 2
-      assumes:    **the naive design is already refuted, do not rebuild it.** Attempt 1 excluded any
-                  path a sibling sprint declared. An independent review produced three repros where
-                  that silently swallowed real defects: (1) a commit by THIS sprint's own T1 touching
-                  a sibling-declared path never reached the per-task `miss_attr` check; (2) a sibling
-                  declaring a directory token (`scripts/`) swallowed every undeclared file beneath it,
-                  unbounded; (3) the same on the WIP leg, where the skip landed before `n_wip` and
-                  turned a dirty tree into a bare PASS. In each, main's checker correctly FAILs and
-                  the new one PASSed. The fix direction: exclude only when the commit **belongs** to
-                  the sibling — its sprint number is readable from the `sprint(NNN)` subject — never
-                  from the path alone. And the **WIP leg likely gets no sibling scoping at all**:
-                  uncommitted work carries no attribution, so there is no honest way to tell which
-                  stream made it, and reporting it is correct
-      tracker:    reverted from TASK-298 · L-165/L-168 (the review that caught it) · L-166 ·
-                  CONTEXT.md § Sprint model · blocks EPIC-015 stream 2
-      origin:     manual
-      state:      ready
-
-
 - [ ] TASK-301 — Seed a run-evidence sprint so the unattended DoD have a vehicle  [size: M] [risk: med] [AFK]
       class:      execution
       authority:  J1
@@ -286,6 +172,34 @@ Next: `/lean-doc-generator promote` to form a sprint from the groomed Backlog.
       by re-declaring SPRINT-088's tasks AFK** — that would be reshaping a task to dodge a gate. Seed a
       separate Plan instead, which is what D5 already requires for the J2 park and is equally true of
       the J1 execution.
+
+
+- [ ] TASK-302 — Cut the gate's dominant cost so a close stops tripping its own budget  [size: M] [risk: med] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  a default `qa-check.sh` run completes inside the 450s budget with no
+                  `qa-check-budget-exceeded` FAIL and no harness skipped, measured on a clean process
+                  table AND under load; the measurement is recorded as a new Round in
+                  `docs/research/logs/qa-gate-timing.md`, and TD-090's re-raise condition is either
+                  cleared or restated against the new figure
+      touches:    scripts/qa-check.sh (leg 12) · evals/ harnesses · docs/research/logs/qa-gate-timing.md
+      depends-on: none
+      assumes:    none — TD-090 already carries Round 4's measurement (leg 12 = 396.3s of 492s, ~81%)
+                  and SPRINT-086 T2's 196.1s → 143.2s partial win. **Profile before fixing** is the
+                  standing instruction on this row (TD-084's rule, which held twice); do not choose a
+                  split before measuring which term dominates now
+      tracker:    TD-090 (`severity: high`, created Sprint-084, twice re-raised) · TD-084 · SPRINT-086 T2 ·
+                  auto-escalated to P1 at SPRINT-089 promote by the aging rule
+      origin:     manual
+      state:      ready
+
+      **Escalated by rule, not by preference.** Promote-time TD aging says `severity: high` →
+      auto-escalate to Backlog P1. TD-090 has been `high` since Sprint-084, was lowered to `medium` at
+      086's close and **re-raised the same day by its own written re-raise condition**, and had never
+      reached the Backlog at all — so the rule has been silently not firing for four sprints.
+      **SPRINT-088 made it worse**: three new always-on harnesses were added and observed gate runs
+      went 450s → 510s → 634s against a 450s budget, tripping `qa-check-budget-exceeded` on three of
+      four runs. Every future sprint pays this before it does any work of its own.
 
 ### P3 — Long-term
 
