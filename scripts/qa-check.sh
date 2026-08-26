@@ -837,7 +837,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # one of those stops at a pre-flight DOA before anything is launched or waited on -- measured at 3s on
 # this host. Its launcher-level cases are the load-bearing ones: the resolver could be perfect and the
 # rename still break at night-run.sh's own mode-signal gate, which is exactly what it did until T3.
-eval_harnesses_always="run-authority-fixtures.sh run-run-mode-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh"
+eval_harnesses_always="run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh"
 eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh"
 # run-qa-budget-position-fixtures.sh (SPRINT-086 T3, TD-091) joins the opt-in set by the cost rule,
 # not the git rule -- it builds no repos, but it DOES invoke real copies of qa-check.sh (bounded by
@@ -1036,6 +1036,39 @@ else
       au_find=$(printf '%s\n' "$au_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
       [ -n "$au_find" ] || au_find="no FAIL line in output -- checker exited $au_code without reporting one"
       bad "authority: $au_find"
+    fi
+  fi
+fi
+
+# --- 14-ter. Pre-launch approval envelope, where an unattended run can read it (SPRINT-088 T4) ----
+# Gates say the Plan is sound; the envelope says the run may proceed inside these bounds without
+# asking. Different grants -- signing G1/G2 does not imply one. The guarded failure is an envelope
+# that SILENTLY WIDENS: a run exceeds an approval it never re-read and nothing reports it, which is
+# invisible by construction. An ABSENT envelope is a note, never a FAIL (a sprint sits legitimately
+# unapproved between promote and pre-flight) and never a PASS. Only a malformed or INCOMPLETE one
+# fails -- and it names which dimension is missing, because "incomplete" is not actionable.
+# Delegates to scripts/lib/check-approval-envelope.sh, covered by
+# evals/run-approval-envelope-fixtures.sh.
+ae_script="scripts/lib/check-approval-envelope.sh"
+if [ ! -f "$ae_script" ]; then
+  bad "approval envelope: checker not found at $ae_script"
+else
+  ae_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
+  if [ -z "$ae_files" ]; then
+    note "approval envelope: skip (missing): docs/sprint/SPRINT-*.md"
+  else
+    ae_out=$(sh "$ae_script" $ae_files 2>&1); ae_code=$?
+    if [ "$ae_code" -eq 0 ]; then
+      ae_n=$(printf '%s\n' "$ae_out" | grep -cE '^PASS')
+      if [ "$ae_n" -eq 0 ]; then
+        note "approval envelope: SKIP (0 approvals verified -- nothing in scope, or none recorded yet)"
+      else
+        ok "approval envelope ($ae_n sprint(s) with a complete, pinned envelope)"
+      fi
+    else
+      ae_find=$(printf '%s\n' "$ae_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
+      [ -n "$ae_find" ] || ae_find="no FAIL line in output -- checker exited $ae_code without reporting one"
+      bad "approval envelope: $ae_find"
     fi
   fi
 fi

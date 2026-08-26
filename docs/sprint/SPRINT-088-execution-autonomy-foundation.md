@@ -7,6 +7,7 @@ owner: Maintainer
 last_updated: 2026-08-26
 status: active
 gates_signed: G1,G2 @ 1502e00
+approval_envelope: goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ 1b14d61
 plan_commit: 757b2a8
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -90,7 +91,7 @@ still reaches it.
 - [x] The rename is **additive** for consumers: no installed trigger breaks — *Verify: traced on the consumer path, never inferred from this repo's dogfooding (L-016)* ✓ **and the trace found a real break.** `night-run.sh`'s mode-signal pre-flight demanded the literal word `unattended`, so a consumer adopting the new canonical name would have been refused *by the launcher* while the docs said it was supported — additive in prose, breaking in the tool. Widened to accept `overnight` · `night-run` · `unattended` or an explicit `--mode`; the negative control (`launcher-still-refuses-no-signal`) proves the gate was widened and not switched off. This repo's own triggers all still said `unattended`, so dogfooding would never have surfaced it
 
 ### T4 — Record one pre-launch approval that covers the whole envelope `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `skills/orchestrator/references/night-run.md` (Part 1a pre-flight) · `skills/lean-doc-generator/templates/SPRINT.md.template` (frontmatter) · `skills/orchestrator/SKILL.md`
+Layers: `skills/orchestrator/references/night-run.md` (Part 1a pre-flight) · `skills/lean-doc-generator/templates/SPRINT.md.template` (frontmatter) · `skills/orchestrator/SKILL.md` — corrected in execution (L-100) to add `scripts/lib/check-approval-envelope.sh` · `evals/run-approval-envelope-fixtures.sh` · `evals/fixtures/approval-envelope/**` · `scripts/qa-check.sh` (leg 14-ter + harness list) and this sprint's own frontmatter, the motivating case
 Depends-on: T1
 Cites: TASK-295 · EPIC-015 § Closed-when 4 · V3 H30 · L-099 · L-151
 
@@ -102,10 +103,10 @@ frontmatter — not in the launching transcript, which an unattended run cannot 
 no J0/J1 mid-flight.
 
 **DoD:**
-- [ ] One approval covers goal · scope · acceptance · design · verification · J1 delegation · capabilities · repair policy · budget · stop conditions — *Verify: a fixture approval missing one dimension is rejected at pre-flight and names which one*
-- [ ] It lives in the sprint frontmatter, not the transcript — *Verify: L-099 · L-151 — a ruling its reader cannot reach governs nothing*
+- [x] One approval covers goal · scope · acceptance · design · verification · J1 delegation · capabilities · repair policy · budget · stop conditions — *Verify: a fixture approval missing one dimension is rejected at pre-flight and names which one* ✓ `scripts/lib/check-approval-envelope.sh`, wired as `qa-check.sh` leg 14-ter. Fixture `missing-budget` is refused and the finding **names it** (`does not cover: budget`) rather than reporting a bare "malformed" — the requirement is the naming, since "your approval is incomplete" is not actionable at 3am. Dimensions match as whole tokens, so `out-of-scope` does not satisfy `scope` and `budget-ceiling` does not satisfy `budget` (L-108); the `substring-trap` fixture names both gaps. Also refused: no pin, and a pin that is not a sha — an approval with no sha approves a moving target
+- [x] It lives in the sprint frontmatter, not the transcript — *Verify: L-099 · L-151 — a ruling its reader cannot reach governs nothing* ✓ `approval_envelope:` is read from frontmatter only, by the same flat parser `gates_signed:` uses. **Absence is reported as NOT APPROVED and is neither a FAIL nor a PASS** — a sprint sits legitimately unapproved between promote and pre-flight, but it must never be *rendered* as approval (the labelled-verdict regression the gates-signed family already hit, L-103). The shipped template's own bracketed placeholder counts as absent, so the artifact that creates every sprint cannot bless one. Recorded on this sprint at `@ 1b14d61`
 - [ ] A run consuming it re-confirms no J0/J1 mid-flight — *Verify: exercised on a real run*
-- [ ] **Tier G**: retained must-FAIL + sibling control, seeded-break discrimination — *Verify: hash convention stated and used consistently (L-169)*
+- [x] **Tier G**: retained must-FAIL + sibling control, seeded-break discrimination — *Verify: hash convention stated and used consistently (L-169)* ✓ `evals/run-approval-envelope-fixtures.sh`, 7 assertions, retained. Control `complete-passes` is the sibling that stays green. Three seeds, each landed (`cmp`), parsed (`sh -n`), targeted (90/90 lines, 1 line changed): I (dimensions matched as substrings) → 1 case; J (completeness never reports a gap) → 2, a superset of I; K (absent rendered as a PASS) → 1, disjoint from both. Seed K raises the verdict-call count 2 → 3, which *is* the seeded change — converting a note into a verdict — not drift. Convention: `sha256sum` over the raw working file — pristine `44a132acf5ff77d6`, restored `44a132acf5ff77d6`, `cmp` byte-identical
 
 ## Owner-action checklist
 - [x] Sign the batch **G1 + G2** for T1–T4 before execution begins, and record it as `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. **The field is absent until then, and its absence means NOT signed** — an unattended run reads this file and nothing else (L-099).

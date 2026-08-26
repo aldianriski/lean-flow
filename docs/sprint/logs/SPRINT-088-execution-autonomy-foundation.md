@@ -255,3 +255,50 @@ and survived contact, because aliasing kept the change additive — no call site
 The one thing `S` did not predict was the launcher pre-flight, and that was one line.
 
 consequence · T3 · behaviour:material · governance:high
+
+### 2026-08-26 | progress | T4 — the pre-launch approval envelope; 3 of 4 DoD
+
+**Shipped.** `approval_envelope:` in the sprint frontmatter, covering ten dimensions and pinned to the
+sha it approves · `scripts/lib/check-approval-envelope.sh` (qa-check leg 14-ter) ·
+`evals/run-approval-envelope-fixtures.sh` (7 assertions) · `night-run.md` Part 1a **step 4b** ·
+`SPRINT.md.template` frontmatter · `orchestrator/SKILL.md` § G2. Recorded on this sprint at
+`@ 1b14d61` — the motivating case, not a fixture (L-166).
+
+**Gates and the envelope are different grants, and that is the design.** G1/G2 say *this Plan is
+sound*; the envelope says *this run may proceed inside these bounds without asking*. Signing the
+gates does not imply an envelope, which is why step 4b sits after step 4 rather than inside it.
+
+**Ten named dimensions rather than `approved: yes`.** The failure is an envelope that *silently
+widens* — a run exceeds an approval it never re-read and nothing reports having done so. A bare yes
+records no boundary at all, so it cannot detect that; a named list makes each boundary explicit and,
+critically, makes a gap **nameable**. The checker reports *which* dimension is missing, because "your
+approval is incomplete" is not actionable at 3am and "your approval does not state a budget" is.
+
+**Whole-token matching, and it earned its keep immediately.** Dimensions are matched between
+separators, never as substrings — so `out-of-scope` does not satisfy `scope`, and `budget-ceiling`
+does not satisfy `budget`. That is L-108 in a place it would have bitten hard: an envelope is
+prose-adjacent, so a naive substring match would be satisfied by the very words describing what is
+*excluded*. The `substring-trap` fixture names both gaps.
+
+**The load-bearing NON-failure is absence.** A sprint sits legitimately unapproved between promote and
+pre-flight, so an absent envelope is a note — never a FAIL, which would redden every live sprint, and
+never a PASS, which is the labelled-verdict regression the gates-signed family already hit when its
+text survived a migration and its verdict class flipped (L-103). The assertion checks the **label**,
+not only the text and the exit code. The shipped template's own bracketed placeholder counts as
+absent, so the artifact that creates every sprint cannot bless one.
+
+**Tier G proof (D4).** Three seeds, each landed (`cmp`), parsing (`sh -n`), targeted (90/90 lines, 1
+line changed): I (dimensions matched as substrings) → 1 case; J (completeness never reports a gap) →
+2, a **superset** of I; K (absent rendered as a PASS) → 1, **disjoint** from both. Seed K raises the
+verdict-call count from 2 to 3 — that *is* the seeded change, converting a note into a verdict, not
+drift, and it is stated here rather than left to look like an inconsistency. Convention: `sha256sum`
+over the raw working file — pristine `44a132acf5ff77d6`, restored `44a132acf5ff77d6`, `cmp`
+byte-identical.
+
+**DoD 3 is not ticked.** *"A run consuming it re-confirms no J0/J1 mid-flight"* needs a run that
+**reads** the envelope; this session **wrote** it. Writing and consuming are different events and I
+will not tick one with evidence of the other. It is the same open class as T1's DoD 2/3 — all of them
+need a real unattended run against the now-complete machinery, which is exactly what this sprint built
+and cannot retroactively have been executed by.
+
+consequence · T4 · behaviour:material · governance:high

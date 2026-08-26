@@ -179,7 +179,31 @@ process, where there is no ask channel to halt into.
 | 2 | the Backlog is ungroomed, or nothing is `state: ready` | `/triage` | human sign-off |
 | 3 | no active sprint holds the work | `/lean-doc-generator promote` | governance checklist sign-off |
 | 4 | a sprint exists but G1/G2 are unsigned | `sprint-bulk` steps 1–2, interactively | human G1 + G2 |
+| 4b | G1/G2 are signed but no **approval envelope** is recorded | write `approval_envelope:` into the sprint frontmatter | human approval of all ten dimensions |
 | 5 | all of the above are green | Part 1 pre-flight → Part 2 trigger | — |
+
+**The approval envelope (step 4b).** Gates say *this Plan is sound*; the envelope says *this run may
+proceed inside these bounds without asking*. They are different grants, which is why signing G1/G2
+does not imply one. It is a single frontmatter field covering **ten** dimensions —
+`goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy ·
+budget · stop-conditions` — pinned to the sha it approves:
+
+```
+approval_envelope: goal · scope · … · stop-conditions @ <sha>
+```
+
+**Why ten named dimensions and not `approved: yes`.** The failure is an envelope that *silently
+widens*: a run exceeds an approval it never re-read, and nothing reports having done so. A bare yes
+records no boundary, so it cannot detect that. A named list makes each boundary explicit and makes a
+gap **nameable** — `check-approval-envelope.sh` reports *which* dimension is missing, because "your
+approval is incomplete" is not actionable at 3am and "your approval does not state a budget" is.
+**And it is pinned**: an approval with no sha approves a moving target.
+
+**Frontmatter, never the transcript** — the run reads the sprint file and nothing else. An approval
+held in the launching conversation governs nothing, and fails silently, because the owner watched
+themselves give it (L-099 · L-151). **Absence is not approval**, and the shipped template's own
+bracketed placeholder counts as absent — otherwise the artifact that creates every sprint would bless
+every sprint.
 
 A step whose gate the human declines **stops the launch**. Report what's outstanding and let them
 decide; do not narrow, re-slice, or defer the work to get past it (that's scope-changing → HITL, and

@@ -7,6 +7,7 @@ owner: [role — not personal name]
 last_updated: YYYY-MM-DD
 status: planned | active | closed
 gates_signed: [G1,G2 @ <sha> — set when the batch gates are signed; OMIT until they are. Absence means NOT signed]
+approval_envelope: [goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ <sha> — the pre-launch approval an unattended run consumes. All TEN dimensions, or the envelope can silently widen along the one you left out. OMIT until approved; absence means NOT approved, and this bracketed placeholder counts as absent]
 plan_commit: [sha — set at promote]
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
