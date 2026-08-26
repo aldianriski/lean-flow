@@ -882,3 +882,174 @@ back to 43 PASS / 0 FAIL, `diff` against the original pre-fix baseline output cl
   `run-layers-completeness-fixtures.sh` was profiled far enough to find a real candidate (nested
   per-token `grep` loops inside `scripts/lib/check-layers-completeness.sh`, ~4 spawns/token) but not
   acted on this round — untouched, not ruled out.
+
+## Round 8 — the host is the variable: leg 12 re-profiled, and the budget criterion found host-dependent (SPRINT-089 T1, 2026-08-26)
+
+TD-090 has been `high` since Sprint-084 and was re-raised the same day it was lowered. This Round is
+TD-084's instruction applied literally — **profile before fixing** — and the profile changed the
+question. Nothing in `scripts/qa-check.sh` or `evals/` was modified before or during this Round.
+
+**Method.** Three parts, all on this host, this session. (1) The same per-harness sweep Round 7 used:
+each `eval_harnesses_always` script run as its own call, timed by `date +%s%N` immediately before and
+after, sequential, outside the gate's own loop. The harness list was **derived from `qa-check.sh`
+itself** rather than retyped (30 always-on + 9 opt-in = 39, cross-checked both directions against
+`evals/` on disk: 39 = 39, zero missing, zero unlisted). (2) Three full default-profile runs, each
+issued as its own call, each verdict read from the line the gate itself prints (L-120) rather than
+from a piped status. (3) A calibration anchor against Round 7.
+
+### Per-harness timing, this host, single sample, PRE-CHANGE
+
+| Harness | ms |
+|---|---:|
+| run-conformance-engine-fixtures.sh | 74528 |
+| run-foreign-repo-fixtures.sh | 22008 |
+| run-layers-completeness-fixtures.sh | 17430 |
+| run-adr-family-fixtures.sh | 15507 |
+| run-doc-caps-fixtures.sh | 14555 |
+| run-ownership-header-fixtures.sh | 9823 |
+| run-dispatch-preflight-fixtures.sh | 7916 |
+| run-reap-terminal-fixtures.sh | 7095 |
+| run-s2-placement-fixtures.sh | 6170 |
+| run-review-depth-fixtures.sh | 5640 |
+| run-spec-reader-fixtures.sh | 4999 |
+| run-gates-signed-fixtures.sh | 4705 |
+| run-authority-fixtures.sh | 3922 |
+| run-verify-reaches-fixtures.sh | 3260 |
+| run-run-mode-fixtures.sh | 2801 |
+| run-approval-envelope-fixtures.sh | 2638 |
+| run-research-archive-fixtures.sh | 2007 |
+| run-system-verify-fixtures.sh | 1767 |
+| run-manifest-lockstep-fixtures.sh | 1617 |
+| run-night-run-rollup-fixtures.sh | 1497 |
+| run-sprint-close-fixtures.sh | 1477 |
+| run-epic-archive-fixtures.sh | 1372 |
+| run-skill-freshness-fixtures.sh | 1277 |
+| run-count-claims-fixtures.sh | 1254 |
+| run-qa-budget-default-fixtures.sh | 947 |
+| run-task-origin-fixtures.sh | 800 |
+| run-worktree-usability-fixtures.sh | 760 |
+| run-ephemeral-intake-fixtures.sh | 620 |
+| run-qa-budget-fixtures.sh | 483 |
+| run-sprint-log-layout-fixtures.sh | 436 |
+
+**Sum: 219,311 ms (219.3s)** across 30 harnesses, **264 assertions, 0 FAIL, 0 non-zero exits**.
+Round 7's comparable sweep was **400.7s across 26**. `run-conformance-engine-fixtures.sh` is still the
+dominant single harness at **74.5s = 34.0%** of the leg, down from **49.0%** in Round 7 — the leg is
+both cheaper and flatter than when it was last profiled.
+
+### Three full runs
+
+| Run | Elapsed | Gate's own verdict line | Budget trips | Harnesses skipped |
+|---|---:|---|---:|---:|
+| with 12 agent worktrees present | 330.8s | `QA-CHECK: 193 pass, 0 fail` | 0 | 0 |
+| without worktrees | **288.0s** | `QA-CHECK: 193 pass, 0 fail` | 0 | 0 |
+| under load (3rd consecutive run) | 288.6s | `QA-CHECK: 193 pass, 0 fail` | 0 | 0 |
+
+### Finding 1 — the improvement is the HOST, not the repository
+
+The obvious reading of a 288s run against a 450s budget is that TD-090 is cured. It is not, and the
+check that shows this is a calibration anchor rather than an argument.
+
+`evals/run-conformance-engine-fixtures.sh` and `scripts/lib/conformance-engine.sh` are **byte-identical
+to the commit Round 7 measured post-fix** (`2c8ae21`), verified with `git hash-object <path>` against
+`git rev-parse 2c8ae21:<path>` — the normalization-aware convention, used alone and not mixed with any
+other, because this working tree is CRLF while the committed blobs are LF (L-169).
+
+| Same bytes | Round 7 host | This host | Ratio |
+|---|---:|---:|---:|
+| `run-conformance-engine-fixtures.sh` | 143.230s / 163.691s | 74.528s | **1.92 – 2.20** |
+
+Normalizing the runs above onto the reference host:
+
+| Run | This host | Reference host |
+|---|---:|---:|
+| without worktrees | 288.0s | **553 – 632s** |
+| under load | 288.6s | 555 – 634s |
+| with worktrees | 330.8s | 636 – 727s |
+
+**Independently corroborated.** SPRINT-088 observed the gate at 450 → 510 → **634s**. The normalized
+upper bound here is **632–634s**, derived from entirely different data (one harness's timing on
+identical bytes). Two numbers from different sources agreeing to within a second is what makes this a
+measurement rather than a hypothesis.
+
+**On the reference host the gate is still 19–29% over its budget.** The equivalent target on this host
+is 288.0s → **204.9s, a cut of 83.1s**.
+
+### Finding 2 — A1 is confirmed in SHARE and refuted in ABSOLUTE
+
+The sprint's A1 assumed leg 12 is still dominant at "~81% of a 492s run", and explicitly declined to
+inherit the figure. Both halves of that caution were warranted:
+
+- **Share: holds.** Leg 12 is 219.3s of the 288.0s run = **76.2%**, against A1's ~81%.
+- **Absolute: stale.** 219.3s, not 396.3s — and against a 288.0s run, not a 492s one.
+
+TD-090's **`Re-file fresh if` a profile shows leg 12's cost is not spawn-count-shaped** is therefore
+**NOT triggered**: the cost is still concentrated in leg 12 and still spawn-shaped, so the mechanism
+that worked in Rounds 4 and 7 still transfers.
+
+### Finding 3 — TD-095 splits in two, and only one half is fixed
+
+The with/without pair was measured **before** pruning, so the comparison exists rather than being
+foreclosed. Twelve worktrees, all fully merged into `main` with no real uncommitted content (the one
+`status --porcelain` modification was CRLF-only, `git diff --stat` empty), cost **42.8s — 13% of the
+run, ~3.6s each**.
+
+- **False-FAIL half: FIXED.** Both runs report `193 pass, 0 fail`. SPRINT-086's under-load run produced
+  **5 false `ephemeral-intake` FAILs** on fixture files inside `.claude/worktrees/agent-*`; v1.60.0's
+  two-checker fix (SPRINT-087) holds under a heavier worktree load than the one that exposed it.
+- **Cost half: NOT fixed.** 42.8s on this host is **82–94s normalized** — on its own enough to explain
+  SPRINT-086's 461s-to-under-budget swing on worktree removal. `TASK-287`'s path-discovery exclusion is
+  still unbuilt, and TD-095's mitigation line is still a hypothesis rather than a shipped change.
+
+### Finding 4 — the acceptance criterion does not discriminate
+
+DoD 2 and DoD 3 are stated in **absolute seconds** ("inside the 450s budget") against a host whose
+speed varies by a factor of ~2 between sessions measuring identical bytes. On this host the criterion
+passed **before any work was done**; on the reference host the same tree fails it. A criterion whose
+verdict is decided by which machine-hour it runs in is not discriminating between a fast gate and a
+slow one — it is reporting the weather.
+
+This is the G2 reachability check's **PROVES** question failing: the method EXISTS, RUNS, and REACHES
+the artifact, and its PASS still does not make the criterion true. Recorded here rather than resolved,
+because re-reading a frozen DoD to fit what was measured is the move L-088 forbids; the ruling is the
+owner's.
+
+### Under load — what was and was not demonstrated
+
+The third run was issued after this session had already completed a 30-harness sweep and two full gate
+runs, i.e. the **cumulative-degradation** condition, which is the shape of the original SPRINT-085
+failure (three attempts dying progressively at 204 → 117 → 100 lines without printing a verdict).
+It came in at **288.6s against the clean run's 288.0s — a 0.6s difference, no degradation at all.**
+
+**Named as a weaker load than the historical failure condition**, not smoothed over: SPRINT-085's
+table carried ~11 subagents plus 3 gate runs; this one carried 3 gate runs and a sweep, with no
+subagents dispatched. On the evidence here this host does not reproduce cumulative degradation; that
+is a statement about this host, not a refutation of TD-090's load-dependence claim.
+
+### Recommendation (round 8)
+
+1. **Do not clear TD-090 on this host's numbers.** Its re-raise condition ("a run without worktrees
+   present exceeds the budget") was met on the reference host, and a fast-host pass does not clear it.
+2. **Restate TD-090's condition in host-normalized terms**, against a named calibration anchor, so the
+   next reader can reproduce the verdict instead of re-measuring the weather.
+3. **The cut is still warranted** — 19–29% on the reference host. Round 7 already scouted the targets
+   and left them named: 19 of 38 full-spec engine calls in the dominant harness, and the nested
+   per-token `grep` loops in `scripts/lib/check-layers-completeness.sh` (~4 spawns/token, 17.4s here).
+4. **File TD-095's cost half with this measurement**, replacing its hypothesis line.
+
+### Caveats recorded at the time
+
+- **Single sample per harness** in the sweep, and a single sample for this host's calibration anchor
+  against Round 7's two. The ratio is therefore a range (1.92–2.20), and every normalized figure in
+  this Round is presented as a range rather than a point.
+- **The calibration anchor is one harness, not the whole gate.** It is the best available anchor
+  because its bytes are provably unchanged, but it assumes the host speedup applies uniformly to legs
+  1–11 as well. That is not verified; a leg with a different I/O-to-CPU mix could scale differently.
+- **No change was made this Round**, so there is no post-change measurement, no discrimination proof,
+  and no inventory comparison to report — those belong to whatever cut follows the owner's ruling. The
+  pre-change inventory (30 always-on names) is frozen for that comparison.
+- **The reference host is itself a reconstruction.** Round 7's session is not re-runnable; its figures
+  are taken from this log as recorded.
+- **The 12 worktrees were removed after the pair was measured** and are not recoverable for re-measurement.
+  All were fully merged with no real uncommitted content, verified by two agreeing queries
+  (`merge-base --is-ancestor` and `rev-list --count main..sha` = 0 for all twelve) before removal.
