@@ -9,7 +9,7 @@ status: closed
 gates_signed: G1,G2 @ 1502e00
 approval_envelope: goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ 1b14d61
 plan_commit: 757b2a8
-close_commit: [sha — set at close]
+close_commit: dc3690a
 update_trigger: sprint execute/close events
 ---
 
