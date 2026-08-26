@@ -744,3 +744,41 @@ requires one key per stream once more than one sprint is active.
 
 consequence · pre-close · behaviour:low · governance:high
 review · pre-close · owner-ruled per finding (ADR-021) · behaviour:low · governance:high
+
+### 2026-08-26 | surprise | I read "17 FAILs" off a log the gate never counted — the verdict is 2
+
+The completed `QA_FULL=1` run prints **`QA-CHECK: 210 pass, 2 fail`** while its log carries **18 FAIL
+lines**. I chased that gap expecting a counting defect, found `qa-check.sh` adds a leg's failures only
+when its exit code is non-zero (`[ "$rc" -eq 0 ] || fail=$((fail + fails))`), and was one step from
+filing a severe "the gate undercounts its own failures" bug.
+
+**It does not.** Line 266 of its own output says so: *"conformance engine: informational except the two
+FULLY-COVERED families … folded into this gate's own tally."* Sixteen of the eighteen are engine output,
+informational **by design and by documented intent**, and every one sits inside the engine block. The two
+that count sit outside it:
+
+- **`verify-method-absent`** — TD-097's false positive; `read-spec-rules.sh` exists and was run
+  repeatedly this sprint.
+- **`layers observed`** — the other session's TASK-298/299 commits plus their `.claude/CLAUDE.md` edit
+  promoting L-169. They confirmed independently that this one is theirs and correct.
+
+**Zero counted failures are attributable to SPRINT-087's work.**
+
+**Two corrections follow, both mine.** First, I reported "the close gate is red with 17 FAILs" to the
+owner and asked for a ruling on that basis. The ruling stands and the fixes were worth doing, but the
+premise was wrong. Second, **TD-105 was filed `high` on the claim that it "blocks close for any clean
+sprint" — it does not**, because those findings never reach the tally. Corrected in place to `medium`
+with both the original claim and the correction kept visible. The underlying defect is real and
+unchanged: a clean sprint still emits nine findings a maintainer dismisses by hand at every close, and
+the inverted incentive stands.
+
+**The shape is the same one I have been auditing all sprint, committed twice by me in durable artifacts**
+— TD-098 first, now TD-105. Both times I generalised from a partial view: there, one measurement under
+load; here, a truncated log read before the gate's own explanatory line. **What caught both was a
+disagreeing second number**, not re-reading the rule — the 26/0 rerun, and 18 FAIL lines against a
+verdict of 2. That is L-165's claim holding for the coordinator exactly as it held for eight builders.
+
+The cheap habit that would have prevented both: **read the artifact's own summary line before counting
+its parts.** I had `210 pass, 2 fail` on screen and counted `grep -c '^FAIL'` instead.
+
+consequence · pre-close · behaviour:low · governance:high

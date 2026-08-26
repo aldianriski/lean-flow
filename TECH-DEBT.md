@@ -173,7 +173,7 @@ status: current
 > serve better than four separate fixes, which is a decomposition question for the owner rather than a
 > sweep ruling.
 
-- **TD-105** severity: **high** | status: open | created: Sprint-087
+- **TD-105** severity: medium | status: open | created: Sprint-087
   - Summary: **The Plan-freeze checks treat DoD ticking — the execution loop's own prescribed action —
     as an unaccounted Plan edit, so a sprint that runs cleanly fails the gate while a sprint that
     changed scope passes.** `plan-edited-after-freeze` fires when § Plan differs from `plan_commit`
@@ -193,7 +193,14 @@ status: current
     penalises sprints that did not — and the only ways to clear it are to log a scope-change that did
     not happen (falsifying the record the check protects) or to leave the close gate red. Neither is
     acceptable, and the first is actively worse than the defect.
-  - Impact: **blocks close for any clean sprint.** SPRINT-087 finished 29/29 DoD with no scope shift and
+  - Impact: **noisy, not blocking — corrected after filing.** These findings come from the conformance
+    engine, whose output `qa-check.sh` treats as **informational** except two fully-covered families, so
+    they never entered the gate tally: the real verdict was `210 pass, 2 fail`, neither of them this.
+    **The row was first filed `high` on the belief that it blocked close; that was wrong**, concluded
+    from a truncated run before the informational note was read. Severity corrected to `medium`. The
+    defect itself is unchanged and still worth fixing — a clean sprint still reads as nine findings that
+    a maintainer must dismiss by hand every close, and the inverted incentive below is unaffected.
+    SPRINT-087 finished 29/29 DoD with no scope shift and
     cannot present a green gate. Sprints that closed before this were carrying at least one
     scope-change entry, which is why it has not surfaced until now — the same latency shape as TD-097
     (a guard whose defect is masked by the ordinary case happening to satisfy it).
