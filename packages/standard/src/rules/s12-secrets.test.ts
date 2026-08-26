@@ -115,6 +115,62 @@ describe("evaluate — the three verdicts, against the in-memory fake", () => {
     expect(r.findings).toHaveLength(2);
     expect(r.findings.every((f) => f.name === SECRET_COMMITTED)).toBe(true);
   });
+
+  // The pem/key shape's OWN dedicated pair (reviewer finding, SPRINT-087 T3 revise): the cardinality
+  // test above happens to include an id_rsa fixture, but nothing pinned the shape's own claim -- this
+  // rule's finding TEXT itself asserts "A public certificate in the same file shape is fine" -- so a
+  // dedicated FAIL (a real private key) and a sibling PASS control (a public CERTIFICATE, the exact
+  // lookalike the claim names) are required to make that claim true rather than merely asserted.
+  test("pem/key FAIL: a real private key is caught, ONE finding named secret-committed", () => {
+    const r = evaluate(
+      new InMemoryGitBoundaryPort({
+        files: { "id_rsa": "-----BEGIN OPENSSH PRIVATE KEY-----\nabc123\n-----END OPENSSH PRIVATE KEY-----\n" },
+      }),
+    );
+    expect(r.verdict).toBe("fail");
+    expect(r.findings).toHaveLength(1);
+    expect(r.findings[0]?.name).toBe(SECRET_COMMITTED);
+    expect(r.findings[0]?.detail).toContain("id_rsa");
+  });
+
+  test("pem/key PASS control: a PUBLIC CERTIFICATE in the same .pem shape is never a finding", () => {
+    const r = evaluate(
+      new InMemoryGitBoundaryPort({
+        files: { "server.pem": "-----BEGIN CERTIFICATE-----\nMIIDXTCCAkWgAwIBAgIJAJC1Hi\n-----END CERTIFICATE-----\n" },
+      }),
+    );
+    expect(r.verdict).toBe("pass");
+    expect(r.findings).toEqual([]);
+  });
+
+  // The sa shape's OWN dedicated pair (same reviewer finding): a service-account file carrying a
+  // "private_key" field is a FAIL; the SAME shape without one -- a public-fields-only service-account
+  // descriptor -- is a sibling PASS control on the identical axis.
+  test('sa FAIL: a service-account file carrying "private_key" is caught, ONE finding', () => {
+    const r = evaluate(
+      new InMemoryGitBoundaryPort({
+        files: {
+          "service-account.json": '{"type":"service_account","private_key":"-----BEGIN PRIVATE KEY-----\\nabc\\n-----END PRIVATE KEY-----\\n"}',
+        },
+      }),
+    );
+    expect(r.verdict).toBe("fail");
+    expect(r.findings).toHaveLength(1);
+    expect(r.findings[0]?.name).toBe(SECRET_COMMITTED);
+    expect(r.findings[0]?.detail).toContain("service-account.json");
+  });
+
+  test('sa PASS control: a service-account file with NO "private_key" field is never a finding', () => {
+    const r = evaluate(
+      new InMemoryGitBoundaryPort({
+        files: {
+          "service-account.json": '{"type":"service_account","project_id":"demo","client_email":"svc@demo.iam.gserviceaccount.com"}',
+        },
+      }),
+    );
+    expect(r.verdict).toBe("pass");
+    expect(r.findings).toEqual([]);
+  });
 });
 
 // --- DoD 3: the port is a SEAM, not a wrapper ------------------------------------------------------
@@ -205,6 +261,58 @@ describe("TS agrees with the live Shell oracle on S12.SECRETS (DoD 4)", () => {
   test("PASS control: a .env carrying only placeholders is caught by neither side", () => {
     const repo = freshGitRepo("s12-secrets-oracle-pass-");
     track(repo, ".env", "API_KEY=<your-key-here>\nDEBUG=changeme\n");
+
+    const shell = runShellEngine(repo);
+    const shellLines = secretsLines(shell.stdout);
+    expect(shellLines.some((l) => l.startsWith("FAIL"))).toBe(false);
+    expect(shellLines.some((l) => l.startsWith("PASS"))).toBe(true);
+
+    const ts = evaluate(new FsGitBoundaryPort(repo));
+    expect(ts.verdict).toBe("pass");
+    expect(ts.findings).toEqual([]);
+  }, ORACLE_TIMEOUT_MS);
+
+  // The pem/key shape's OWN live-oracle pair (reviewer finding, SPRINT-087 T3 revise): the existing
+  // FAIL/PASS pair above never exercises a `.pem`/`.key`/id_rsa file at all -- and this shape's finding
+  // TEXT explicitly claims "A public certificate in the same file shape is fine", so that claim needs
+  // its own discriminating pair against the LIVE oracle, not just the fake-port pair above.
+  test("pem/key FAIL: a real private key is caught by both sides, same named finding", () => {
+    const repo = freshGitRepo("s12-secrets-oracle-pem-fail-");
+    track(repo, "id_rsa", "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAA\n-----END OPENSSH PRIVATE KEY-----\n");
+
+    const shell = runShellEngine(repo);
+    const shellLines = secretsLines(shell.stdout);
+    expect(shellLines.some((l) => l.startsWith("FAIL"))).toBe(true);
+    expect(shellLines.join("\n")).toContain(SECRET_COMMITTED);
+
+    const ts = evaluate(new FsGitBoundaryPort(repo));
+    expect(ts.verdict).toBe("fail");
+    expect(ts.findings[0]?.name).toBe(SECRET_COMMITTED);
+  }, ORACLE_TIMEOUT_MS);
+
+  // The sibling control: the exact lookalike the FAIL case's own finding text names -- a `.pem` holding
+  // ONLY a public certificate, no PRIVATE KEY block. Must PASS on both sides, proving the FAIL case
+  // discriminates on the KEY-vs-CERTIFICATE distinction, not merely on the `.pem` extension.
+  test("pem/key PASS control: a PUBLIC CERTIFICATE .pem is caught by neither side", () => {
+    const repo = freshGitRepo("s12-secrets-oracle-pem-pass-");
+    track(repo, "server.pem", "-----BEGIN CERTIFICATE-----\nMIIDXTCCAkWgAwIBAgIJAJC1Hi\n-----END CERTIFICATE-----\n");
+
+    const shell = runShellEngine(repo);
+    const shellLines = secretsLines(shell.stdout);
+    expect(shellLines.some((l) => l.startsWith("FAIL"))).toBe(false);
+    expect(shellLines.some((l) => l.startsWith("PASS"))).toBe(true);
+
+    const ts = evaluate(new FsGitBoundaryPort(repo));
+    expect(ts.verdict).toBe("pass");
+    expect(ts.findings).toEqual([]);
+  }, ORACLE_TIMEOUT_MS);
+
+  // The sa shape's missing sibling control (reviewer finding): the FAIL case is already covered by the
+  // must-FAIL fixture above (a service-account.json carrying "private_key"); this is its negative
+  // control on the SAME axis -- the identical shape, no "private_key" field.
+  test('sa PASS control: a service-account.json with NO "private_key" field is caught by neither side', () => {
+    const repo = freshGitRepo("s12-secrets-oracle-sa-pass-");
+    track(repo, "service-account.json", '{"type":"service_account","project_id":"demo","client_email":"svc@demo.iam.gserviceaccount.com"}\n');
 
     const shell = runShellEngine(repo);
     const shellLines = secretsLines(shell.stdout);
