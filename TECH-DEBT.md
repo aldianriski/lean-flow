@@ -152,6 +152,38 @@ status: current
 > at **3050 > 130**, still TD-082's reasoned carry; the figure moved 3,050 → 3,050 since the last
 > sweep, so the carry ruling is unaffected.
 
+- **TD-105** severity: **high** | status: open | created: Sprint-087
+  - Summary: **The Plan-freeze checks treat DoD ticking — the execution loop's own prescribed action —
+    as an unaccounted Plan edit, so a sprint that runs cleanly fails the gate while a sprint that
+    changed scope passes.** `plan-edited-after-freeze` fires when § Plan differs from `plan_commit`
+    **and** the Execution Log carries no `scope-change` entry. DoD checkboxes live inside § Plan, and
+    `orchestrator/SKILL.md` step 4 instructs *"tick its DoD `[x]`"* on every task — so § Plan always
+    differs by the end of any sprint, and the condition collapses to **"every sprint must contain at
+    least one scope-change entry."**
+  - Evidence: SPRINT-087's § Plan is **byte-identical** to its state at `plan_commit 3c14a37` once
+    checkbox state is normalised (`sed 's/^- \[x\]/- [ ]/'` on both, `diff` empty) — **28 ticks, zero
+    text changes**, no task, criterion or `Verify:` clause touched. It nonetheless produced
+    `plan-edited-after-freeze` **plus 8 × `scope-change-logged-after-plan-edit`**, one per tick commit —
+    **9 of the run's 17 FAILs.** Anchored counts of real entries (`^### … | scope-change |`):
+    **SPRINT-087 = 0, SPRINT-086 = 1.** 086 passed *because it had a scope change*; 087 fails *because
+    it never needed one*.
+  - **The incentive is inverted, which is what makes this `high`.** The check exists so a mid-sprint
+    scope shift cannot be slipped in silently. As implemented it rewards sprints that shifted scope and
+    penalises sprints that did not — and the only ways to clear it are to log a scope-change that did
+    not happen (falsifying the record the check protects) or to leave the close gate red. Neither is
+    acceptable, and the first is actively worse than the defect.
+  - Impact: **blocks close for any clean sprint.** SPRINT-087 finished 29/29 DoD with no scope shift and
+    cannot present a green gate. Sprints that closed before this were carrying at least one
+    scope-change entry, which is why it has not surfaced until now — the same latency shape as TD-097
+    (a guard whose defect is masked by the ordinary case happening to satisfy it).
+  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): compare § Plan with
+    **checkbox state normalised**, so a tick is not a diff; then a genuine text change still demands its
+    `scope-change` entry and the check does what it was written to do. Retain a must-FAIL fixture for a
+    real text edit **and** a control fixture that ticks every box and must stay green — the control is
+    the load-bearing one, since it is the case that is wrong today.
+  - **Re-file fresh if** DoD checkboxes move out of § Plan — the collision is between what the checker
+    diffs and where the template puts the boxes, and relocating either dissolves it.
+
 - **TD-104** severity: medium | status: open | created: Sprint-087
   - Summary: **T3's oracle helper hard-codes a 15,000 ms timeout for an operation measured at ~18,800 ms
     — the limit is already smaller than the thing it bounds, at rest.** Every `runShellEngine` call in
