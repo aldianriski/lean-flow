@@ -59,7 +59,7 @@ asking and **parks** a seeded J2 with its unblock condition recorded.
 ### T2 — Stop sprint-bulk pausing between already-authorized tasks `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/SKILL.md` (the sprint-bulk loop) · `skills/orchestrator/references/night-run.md` · `scripts/night-run.sh` · `.claude/CONTEXT.md` § Modes — corrected in execution (L-100) to add `scripts/lib/check-night-run-rollup.sh` · `evals/run-night-run-rollup-fixtures.sh` · `evals/fixtures/night-run-rollup/**`, the guard for the terminal-state requirement
 Depends-on: T1
-Cites: TASK-293 · EPIC-015 § Closed-when 1 · V3 H27 · ADR-016
+Cites: TASK-293 · EPIC-015 § Closed-when 1 · V3 H27 · ADR-016 · T3 · T4 (cited, not depended on — the DoD evidence names the run order T1 → T2 → T3 → T4; T3 and T4 depend on this task, not the reverse)
 
 A run that pauses between tasks the owner already approved is why an approved Plan still needs a
 human sitting beside it. The contract is that a run ends **only** at a named terminal state —
