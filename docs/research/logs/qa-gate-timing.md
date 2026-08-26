@@ -1053,3 +1053,49 @@ is a statement about this host, not a refutation of TD-090's load-dependence cla
 - **The 12 worktrees were removed after the pair was measured** and are not recoverable for re-measurement.
   All were fully merged with no real uncommitted content, verified by two agreeing queries
   (`merge-base --is-ancestor` and `rev-list --count main..sha` = 0 for all twelve) before removal.
+
+---
+
+## Round 9 — one dated sample, transcribed by an unattended run (SPRINT-090 T1, 2026-08-27)
+
+**This round records numbers and draws no conclusion.** It is a transcription performed by the
+unattended run of SPRINT-090, whose T1 is `class: mechanical-ingest · J1` precisely because it opens
+no question and rules on nothing. The measurement is the run's own system-verify invocation, recorded
+as the run made it. Nothing here is attributed, compared for cause, or offered against any open TD.
+
+**The gate's own printed verdict line**, transcribed rather than paraphrased and never taken from a
+wrapper's exit status (L-120):
+
+```
+QA-CHECK: 201 pass, 0 fail
+```
+
+| Field | Value |
+|---|---|
+| Command | `sh scripts/qa-check.sh` — bare, no `QA_FULL`, issued as its own call with no pipe and no redirect |
+| Elapsed | **321s** wall-clock |
+| Run window | `2026-08-26T16:56:14Z` → `2026-08-26T17:01:35Z` (local `2026-08-26 23:56` → `2026-08-27 00:01`, UTC+7) |
+| Exit code | 0 |
+| Tree | `08f103e`, `git status --porcelain` empty at invocation |
+| Host | Windows 11 / git-bash, this repo — the same host as Rounds 4–8 |
+| Concurrent load | none — first gate run of the session, no sub-agents dispatched, no sweep |
+
+**Prior figure recorded for the reader's convenience, explicitly not attributed:** Round 8's clean run
+on this host measured 288.0s. The 33s difference between that figure and this one is recorded as an
+observation and **not** explained here — this round ran no with/without pair, changed nothing in the
+tree between samples, and holds a single sample, so it cannot separate a real change from the
+session-to-session host variance Round 8 measured at a factor of ~2.
+
+**No verdict is offered on the 450s budget**, and the arithmetic comparison is deliberately left where
+Round 8 put it: Finding 4 recorded that an absolute-seconds criterion on this host is host-dependent
+and that ruling on it belongs to the owner (L-088 forbids re-reading a frozen DoD to fit a
+measurement). This round adds a data point to that series and nothing else.
+
+### Caveats
+
+- **Single sample**, no repeat, no pair. Every caution Round 8 recorded about single-sample figures on
+  this host applies unchanged.
+- **Pass count is not comparable to earlier rounds without care** — the tally reflects whatever checks
+  the tree carried on the day. `201 pass` is a fact about `08f103e`, not a series figure.
+- **The 33s delta above is an observation, not a finding.** Naming it as a finding would be analysis,
+  which is exactly the work this task's authority class excludes.
