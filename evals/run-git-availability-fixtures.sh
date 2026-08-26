@@ -128,6 +128,25 @@ assert_lacks "git-claims-no-unavailability" "not a git repository" "$out_git"
 assert_has "control-readme-passes-nongit" "PASS  S2.R-README" "$out_nongit"
 assert_has "control-readme-passes-git"    "PASS  S2.R-README" "$out_git"
 
+# --- case 6: THE HARM CASE -- a real committed secret must still be caught ----------------------
+# Cases 1-5 prove the branch FLIPS. This one proves what flipping COSTS, and it is the case an
+# independent Tier G reviewer contributed: a repository with a genuine PRIVATE KEY block committed to
+# history. With the probe correct, S12.SECRETS reports `secret-committed` as a FAIL. With the probe
+# wedged at "not a repository", that FAIL silently downgrades to a `note` and a leaked private key
+# passes the gate. That is the exact silent-false-negative shape L-058 is about, and a fixture that
+# demonstrates the harm outranks one that only demonstrates the mechanism.
+leak="$work/leak"
+mkdir -p "$leak"
+printf '%s' "$readme" > "$leak/README.md"
+printf -- '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQfake\n-----END PRIVATE KEY-----\n' > "$leak/leaked.pem"
+git -C "$leak" init -q >/dev/null 2>&1 &&
+  git -C "$leak" add -A >/dev/null 2>&1 &&
+  git -C "$leak" -c user.email=fixture@example.invalid -c user.name=fixture commit -qm init >/dev/null 2>&1 || {
+    echo "FAIL harness: could not build the committed-secret fixture repo"; fail=1; }
+out_leak=$(sh "$engine" "$leak" --spec "$rspec" 2>&1)
+assert_has  "leak-secret-is-caught"        "FAIL  secret-committed: leaked.pem contains a PRIVATE KEY block" "$out_leak"
+assert_lacks "leak-not-downgraded-to-note" "S12.SECRETS         -- not a git repository"                     "$out_leak"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "GIT-AVAILABILITY FIXTURES: all green"; else echo "GIT-AVAILABILITY FIXTURES: FAILURES ABOVE"; fi
 exit $fail

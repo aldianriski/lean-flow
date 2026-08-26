@@ -84,16 +84,30 @@ bad()  { fail=1; last_bad=1; case "$1" in S[0-9]*|conformance:*) printf 'FAIL  %
 note() { printf '      %s\n' "$1"; }
 
 # `git rev-parse --git-dir` is spawned once per TARGET, not once per rule that asks. Twelve
-# assertions ask the same question of the same tree, and on a fork-expensive host that is
-# eleven redundant process spawns per engine invocation -- against ~98 invocations across the
-# always-on eval set. Memoised, not removed: every caller still gets the same answer, and a
-# different target re-queries because the cache is KEYED on the path (assert_S13_* passes
-# `$_att_repo`, the rest pass `$repo`, and they are not always the same tree). Cutting spawn
-# count while deleting no check is the mechanism Rounds 4 and 7 both proved (SPRINT-089 T1).
+# assertions ask the same question of the same tree, and on a fork-expensive host that is eleven
+# redundant process spawns per engine invocation -- against ~98 invocations across the always-on
+# eval set. Memoised, not removed: every caller still gets the same answer. Cutting spawn count
+# while deleting no check is the mechanism Rounds 4 and 7 both proved (SPRINT-089 T1).
+#
+# The key is DEFENSIVE, NOT EXERCISED, and saying so precisely matters. Every one of the twelve
+# sites is reached from the single dispatch loop below as `"$fn" "$repo_abs"`, and `repo_abs` is
+# computed once per process -- so `$_att_repo` and `$repo` are always the SAME string today. An
+# earlier version of this comment claimed they "are not always the same tree"; that was wrong, and
+# an independent Tier G reviewer caught it. Keying still earns its place: it makes the memo correct
+# for a future second caller rather than correct by a coincidence of the current call graph.
+#
+# `_ENGINE_GITREPO_SEEN` is not redundant with the key. Without it, the FIRST call with an empty
+# argument compares equal to the empty initial key, reads as a cache HIT on a value nothing
+# computed, and returns "not a repository" without ever invoking git -- a wrong answer in the
+# SILENT direction. Unreachable today (`repo_abs` cannot be empty: `[ -n "$repo" ]` plus `cd && pwd`)
+# and fixed anyway, because a Tier G helper that is safe only by its callers' current habits is a
+# landmine for the next caller. Found by the same independent review, not by the author.
+_ENGINE_GITREPO_SEEN=0
 _ENGINE_GITREPO_KEY=""
 _ENGINE_GITREPO_VAL=1
 _is_git_repo() {
-  if [ "$1" != "$_ENGINE_GITREPO_KEY" ]; then
+  if [ "$_ENGINE_GITREPO_SEEN" = 0 ] || [ "$1" != "$_ENGINE_GITREPO_KEY" ]; then
+    _ENGINE_GITREPO_SEEN=1
     _ENGINE_GITREPO_KEY=$1
     if git -C "$1" rev-parse --git-dir >/dev/null 2>&1; then _ENGINE_GITREPO_VAL=0; else _ENGINE_GITREPO_VAL=1; fi
   fi
