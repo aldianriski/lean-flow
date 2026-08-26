@@ -2,8 +2,8 @@
 sprint: 087
 slug: first-rule-through-the-engine
 owner: Maintainer
-last_updated: 2026-08-25
-status: active
+last_updated: 2026-08-26
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 

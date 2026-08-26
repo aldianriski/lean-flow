@@ -5,7 +5,7 @@ stream: main
 epic: EPIC-014
 owner: Maintainer
 last_updated: 2026-08-26
-status: active
+status: closed
 plan_commit: 3c14a37
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -252,4 +252,44 @@ FAILs and pushed a run over its own budget.
 
 ## Retro
 
-_(written at close)_
+**Retrieval check — failed, three times, and that is this sprint's most durable finding.** Three
+**promoted** rules were loaded, correct, and did not fire. **L-020** (*shipping ≠ wiring*, in CLAUDE.md's
+DoD as an explicit Wiring check) missed **three** capabilities shipped with zero callers → **L-172**.
+**L-120** (*read the verdict the gate prints, never a status through a wrapper*) — I ran the close gate as
+`qa-check.sh | tail -25`, which took `tail`'s exit 0 over the gate's `3 fail` **and** truncated the
+evidence. **L-168** (*isolate reviewers*) held only by a reviewer's own care when the harness placed it in
+T3's **active** worktree holding 15 uncommitted files → **L-171**. Twice more I wrote a wrong conclusion
+into a durable row — TD-098 and TD-105 — while actively applying the cross-check rule elsewhere. **Every
+one was caught by a disagreeing second number, never by recalling the rule.**
+
+**Cost** — coordinator + **16 agent dispatches** (8 builders, 8 worktree-isolated reviewers), plus 8
+revise rounds and 8 re-reviews. Two agents died mid-work (one API error, one 600 s stall); **both
+retained their work on disk** and were resumed rather than redone (L-060). One died mid-seed, which is
+the case that can leave a corrupted guard — it had completed its cycle, verified independently before
+trusting it.
+
+**Worked**
+- **Adversarial review, worktree-isolated: 8 of 8 tasks revised after review. Not one cleared first
+  pass** — and in every case the reviewer had run *fewer* tests than the author. L-165 as measurement.
+- **The inverse seed.** A control that stays green proves nothing; breaking the rule *in the direction
+  the control claims to guard* proves it. Settled T4's freeze and T3's four lookalike controls.
+- **Reading rows instead of tallying them.** The aging sweep found TD-087 and TD-097 are the REACHES and
+  EXISTS halves of one script, filed three sprints apart, neither aware of the other.
+- **Declining to re-run until green** — T7 reported its timeout rather than retrying; the unidentified
+  `150/1` was logged as unidentified rather than pinned on TD-098's signature.
+
+**Friction**
+- **Four evidence blocks did not reconcile** — two mixed hash conventions (→ L-169, now promoted), one
+  wrong denominator, one off-by-one itemisation. Each cost a reviewer real time.
+- **The gate's informational-vs-counted split.** 18 FAIL lines, verdict `210 pass, 2 fail`; I reported
+  "17 FAILs" to the owner before reading the gate's own explanatory line.
+- **Suite growth**: 175 → 266 tests, 220–270 s; the conformance engine exceeded **5 minutes** against the
+  real repo. TD-098's flake now needs no external load — the suite is its own load generator.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **L-172** (count 1) — a per-task DoD cannot enforce a property that lives *between* tasks.
+- **L-171** (count 1) — "worktree-isolated" is not "in its own worktree".
+- **New, unfiled, count 1:** *read an artifact's own summary line before counting its parts.* I had
+  `210 pass, 2 fail` on screen and ran `grep -c '^FAIL'` instead, then reported the wrong number to the
+  owner and filed TD-105 at the wrong severity on it. Worth an `L-NNN` only if it recurs.
+

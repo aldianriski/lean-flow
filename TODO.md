@@ -18,21 +18,10 @@ status: current
 
 ## Active Sprint
 
-> **Two streams.** One active sprint per stream, one pointer each (CONTEXT.md § Sprint model). Cross-stream
-> file overlap is coordinated, never parallel-built — the two Plans below were checked token-by-token at
-> promote and share no declared path. Attribution is scoped per stream by commit ownership
-> (`check-layers-observed.sh`, TASK-299), which this pairing exercises on real input for the first time.
-
-> **`main` · SPRINT-087 — The First Rule Through the Engine** → [docs/sprint/SPRINT-087-first-rule-through-the-engine.md](docs/sprint/SPRINT-087-first-rule-through-the-engine.md)
-
-EPIC-014's **third member sprint** (`epic: EPIC-014`) — V3 Sprint C, targeting the epic's **second
-§ Closed-when condition**: targeted and full conformance running in TS, with a partial invocation never
-emitting a global level. **Feature-first, and the Plan's shape is that rule**: H07 (result domain),
-H08 (registry) and H09 (ports) are *layers*, so none is a task — every task crosses all three (D5).
-Carries the three carry-forwards that unblock the moment the CLI exists (`ok:false → exit 1` ·
-permission-denied ≠ `spec-not-found` · N findings, not one) and the gate's worktree-scanning defect
-(TD-095). **The first rule family is chosen at G2, not here** — cheap + representative per H10, with
-V3 §43's expensive-first ranking governing families 2..n.
+> **One active stream.** `main`/SPRINT-087 closed 2026-08-26; `autonomy` continues below. One active
+> sprint per stream, one pointer each (CONTEXT.md § Sprint model). Attribution is scoped per stream by
+> commit ownership (`check-layers-observed.sh`, TASK-299) — the 087/088 overlap exercised it on real
+> input, and the `stream:` keys stay on both files as the record of that pairing.
 
 > **`autonomy` · SPRINT-088 — Execution Autonomy Foundation** → [docs/sprint/SPRINT-088-execution-autonomy-foundation.md](docs/sprint/SPRINT-088-execution-autonomy-foundation.md)
 
@@ -226,6 +215,22 @@ on the EPIC-008 `RunSummary` ruling).
       origin:     manual
       state:      ready
 
+- [ ] TASK-300 — Decide whether the five gate-accuracy defects are one task or five  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when: a recorded ruling says whether TD-086 · TD-087 · TD-089 · TD-097 · TD-105 are fixed
+                  as one "gate accuracy" task or separately, and the chosen shape is filed — not a fix,
+                  a decomposition call
+      touches:   TECH-DEBT.md · TODO.md (no code)
+      depends-on: none
+      assumes:   **the cluster is real, not an artifact of one sprint noticing things.** All five are
+                  accuracy defects in the checkers that gate this repo, and two of them —
+                  TD-087 (REACHES half) and TD-097 (EXISTS half) — are the *same script*,
+                  `check-verify-reaches.sh`, filed three sprints apart with neither aware of the other
+                  until SPRINT-087's close sweep read both rows together. That pairing is the evidence
+                  the cluster is a cluster; the rest is judgement.
+      tracker:   SPRINT-087 close sweep · TD-086 · TD-087 · TD-089 · TD-097 · TD-105
+      origin:    close-retro
+      state:     ready
 - [ ] TASK-299 — Scope layers attribution per stream, by commit ownership not by path  [size: M] [risk: high] [HITL]
       class:      execution
       tier:       G (ADR-029 — this IS the attribution guard, and the first attempt at it shipped a
