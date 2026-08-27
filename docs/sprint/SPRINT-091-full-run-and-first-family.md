@@ -56,7 +56,7 @@ TypeScript, so this is the floor they stand on, not a cleanup.
 
 ### T2 — Derive the conversion's real headroom `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `docs/research/logs/qa-gate-timing.md`
-Depends-on: T3
+Depends-on: T3, T9
 Cites: TD-090 · qa-gate-timing Rounds 5–8 · L-130 · `conformance-engine.sh` `scripts/lib/conformance-engine.sh` (timed as the Shell comparand, never modified) · `S9.LOGDIR`
 Tier **G**. No later DoD may carry a performance number that does not trace to this Round. The claim
 that a TS in-process traversal costs ~ms where the Shell spawn costs 8.5s is **unmeasured**, and
@@ -85,9 +85,9 @@ what lets a fixture repo be answered in one in-process call instead of one proce
 **Acceptance:** a flagless conformance invocation answers a whole repository, matching Shell row-by-row.
 
 **DoD:**
-- [ ] Every rule the parser admits is traversed and dispatched by its §14 mark — *Verify: row-by-row against `scripts/lib/conformance-engine.sh` spawned live as an oracle, never a copied literal*
-- [ ] A rule with no registered evaluator reports as a NAMED gap — *Verify: seed one out of the registry; exactly that row reddens and the rest stay green*
-- [ ] Dispatch stays open-closed — *Verify: the traversal adds no switch; registration remains at each rule's own call site*
+- [x] Every rule the parser admits is traversed and dispatched by its §14 mark — ✓ `bun apps/cli/src/main.ts .` traverses all **100** rows and dispatches S9.LOGDIR plus the four F12 rules for real (Round 11's defect, fixed). Proven **row-by-row against two live-spawned oracles, neither a copied literal**: every TS row against `read-spec-rules.sh` (no flag, document order) and against `conformance-engine.sh`'s own `mark:` annotations — **0 mismatches**, each naming the offending id on failure rather than a count. The first-pass proof compared category **totals** and was **STRUCK by review** as L-108 a second time in this sprint (the reviewer built the two-rules-swapped counter-example and ran it); replaced under the bounded retry. Discrimination proven: `S2.F-ARCHIVE` seeded `restated`→`judgment-only` on the TS side only, reddened naming exactly that row while the second oracle and every sibling stayed green, restored byte-for-byte under ONE stated convention (`git hash-object`, `c3d2baff…` before and after)
+- [x] A rule with no registered evaluator reports as a NAMED gap — ✓ the gap text carries **both** rule id and mark (`rule-unimplemented: the spec marks S12.BACKUPS mechanical…`). Recorded honestly: the **builder never performed the seed-out**, having tested only a rule that was already gapped — the **reviewer did it live**, deregistering `S12_BACKUPS_ID` so exactly that row reddened to a named gap while S9.LOGDIR · S12.SECRETS · DESIGNSRC · GENERATED stayed green, then restoring and hash-verifying (`git hash-object` == `git rev-parse HEAD:<path>`)
+- [x] Dispatch stays open-closed — ✓ `composeFamilies` is a loop over `BoundDispatcher[]`, never a switch; `classify.ts`'s switch is on the closed 6-value `mark` enum and was **extracted, not modified** (the coordinator flagged behaviour-preservation as an agrees-by-construction risk; the reviewer REFUTED it independently, every branch textually unchanged); `built-in.ts` and `f12-registry.ts` untouched, and a "third family, zero code changes" test passes. **Strengthened under retry:** a duplicate id now **throws**, naming the id and both families' positions, closing the one place this seam broke the codebase's own throw-loud rule — before F5 · F2 · F1 · F7 plug into it
 
 ### T4 — Hold semantics and full-run level arithmetic `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `packages/standard/src/`
@@ -105,7 +105,7 @@ forgotten because its output looks like data rather than a claim. Level arithmet
 
 ### T5 — Accept a caller-supplied spec path `[size: S · risk: med · class: execution · HITL · J1]`
 Layers: `apps/cli/src/`
-Depends-on: T1, T3
+Depends-on: T1, T3, T9
 Cites: SPRINT-087 (spec-not-found vs permission-denied)
 Tier **G** by defaulting up (ADR-029): a silently-ignored spec path would make every fixture assertion
 vacuous while the suite stayed green — a false negative by construction. Fixture harnesses hand the
@@ -169,6 +169,39 @@ ADR-037 rejects in writing.
 - [x] The `RuleId` brand actually holds — ✓ seeded `makeRuleId("S9.Z")` → `"S9.Z"` in one element of a two-element expectation: **exactly 1 error, at that site**, while the sibling `makeRuleId("S9.A")` in the same expression stayed green; restored byte-for-byte, `git hash-object` `59d11d58…` before seed and after restore (one convention, stated — L-169), and `tsc` back to 0
 - [x] Union narrowing is fixed at the read sites, not silenced — ✓ 115 added lines across 9 files carry **0** `as` casts, **0** `any`, **0** non-null `!`, **0** `@ts-ignore`; the fixes bind-and-guard, use `?.` to narrow union *and* undefined together, and construct branded ids in fixtures rather than widening the assertions
 - [x] The suite is unchanged — ✓ 266 pass, 0 fail, 784 expect() calls, identical to the pre-change baseline
+
+### T9 — Compose families in `--section` too, so T2 has a valid comparand `[size: S · risk: med · class: execution · HITL · J1]`
+Layers: `apps/cli/src/`
+Depends-on: T3
+Cites: TD-090 · SPRINT-091 Round 10/11 (the struck measurement) · L-108 · L-130
+Tier **G** by defaulting up (ADR-029). Added mid-sprint by owner ruling — see the Execution Log's
+`scope-change`. T3 wired the **flagless** run; `runSection()` still hardcodes `createBuiltInRegistry()`,
+so `--section 12` answers `rule-unimplemented` for all four F12 rules while Shell evaluates them. That
+is the exact comparand Round 10 measured and Round 11 struck. Left as-is, T2 reproduces the struck
+defect a third time.
+
+**Acceptance:** `--section N` dispatches every family the flagless run does, for the same repo.
+
+**DoD:**
+- [ ] `--section 12` evaluates all four F12 rules for real — *Verify: per-rule VERDICTS diffed against `scripts/lib/conformance-engine.sh` spawned live, never a line count (L-108 — this is the defect being repaired, not merely a risk)*
+- [ ] `--section` and the flagless run agree per rule on the same repo — *Verify: differential over the sections that have registered evaluators; a mismatch names the offending rule id*
+- [ ] `--section` still emits NO global level — *Verify: SPRINT-087 T4's frozen-result property still holds; seed an attempt and confirm it throws*
+
+### T10 — ADR-038 for the composed multi-family dispatch seam `[size: S · risk: low · class: decision · HITL · J1]`
+Layers: `docs/adr/ADR-038-composed-multi-family-rule-dispatch.md` · `docs/DECISIONS.md` · `docs/knowledge-index.md`
+Depends-on: T3
+Cites: ADR-035 · EPIC-014 D2 · SPRINT-091 T3 review (finding 2)
+Tier **P** (prose — ADR-029): G1 plus a read-through. Added mid-sprint by owner ruling. The seam is
+what F5 · F2 · F1 · F7 all plug into, and its three rejected alternatives currently exist only inside
+one commit message — invisible to the family author who will not read this git log.
+
+**Acceptance:** the seam's decision, its alternatives and its one constraint are discoverable without
+reading git history.
+
+**DoD:**
+- [ ] ADR-038 records the chosen seam and all three rejected alternatives with reasons
+- [ ] It states the duplicate-id constraint the T3 retry added, as a rule future families must satisfy
+- [ ] `docs/DECISIONS.md` carries its row and the knowledge index is regenerated — *Verify: `sh scripts/gen-index.sh --check` (note TD-113: run it in the main tree, where its `cmp -s` is not defeated by CRLF)*
 
 ## Owner-action checklist
 - [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099).

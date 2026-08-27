@@ -685,3 +685,69 @@ could erode much of the apparent win.
 its Plan, not *rewriting which invocation its acceptance is measured on* — that is a scope change to a
 frozen DoD, which is HITL by ADR-021 and the L-088 rule against quietly reinterpreting a DoD execution
 invalidated. Wave 3 does not start until it is answered.
+
+### 2026-08-27 | scope-change | owner ruled on T2's comparand and the seam ADR; T9 and T10 added
+
+**What broke.** Two questions the Plan could not answer for itself, both surfaced to the owner as a
+single frontier round and both answered.
+
+**(1) T2's comparand.** Round 11 recorded T2's re-derivation as blocked on T3 "which wires real
+dispatch". T3 landed and T2 is *still* blocked: the flagless run dispatches for real, but `runSection()`
+is byte-for-byte unchanged, so `--section 12` — the exact invocation Round 10's struck measurement used
+— still answers `rule-unimplemented` for all four F12 rules. Resuming T2 on its own Plan text would
+reproduce the struck defect a **third** time, with fresh numbers that look plausible.
+**Owner ruling: extend `--section` to compose families.** Chosen over re-deriving against the flagless
+run because it keeps T2's frozen DoD true *as written* — T2 measures the invocation its own Plan names,
+so no DoD is reinterpreted and L-088 does not bite. The rejected option would have measured a different
+invocation shape whose per-invocation cost includes traversing 95 rules it only gaps.
+
+**(2) The seam ADR.** The reviewer recommended one: `bindRegistry`/`BoundDispatcher`/`composeFamilies`
+is the shape every remaining EPIC-014 family plugs into, and its three rejected alternatives currently
+live only in one commit message, invisible to the future family author who will not read this git log.
+**Owner ruling: raise it now, this sprint.**
+
+**Impact on the frozen Plan.** Two tasks added and two `Depends-on:` edges amended — recorded here
+*before* § Plan is edited, per the standing rule.
+
+- **T9** — extend `--section` to compose families. `Layers: apps/cli/src/`, `Depends-on: T3`.
+- **T10** — ADR-038 for the composed multi-family dispatch seam. Tier **P**.
+- **T5** gains `Depends-on: T9`, and **T2** gains `Depends-on: T9`.
+
+The two edges are **not bookkeeping** — they are what the preflight needs to keep `apps/cli/src/`
+single-owned. T9, T5 and T2 would otherwise be three tasks declaring the same tree in the same wave
+with no ordering between them, which is precisely the unowned-overlap hazard the shared-file check
+exists to catch. Preflight re-run after the edit, never re-read from prose (D5).
+
+**Why not fold T9 into T2 instead.** Considered and rejected: T2's `Layers:` would have to grow
+`apps/cli/src/`, putting T2 and T5 in the same wave both declaring it with no edge between them — the
+same FAIL, moved. A separate task with an explicit edge is the honest shape.
+
+**Task count is now 10, and G1 sized an 11-task Plan `L` and split it.** Stated rather than glossed:
+these two are S and Tier P/X respectively, T9 is ~2 lines, and both are consequences of work already
+done rather than new frontier. The split G1 made was at the T7/T8 seam for *engine* work; this is not a
+re-expansion of that. If the owner reads it otherwise, T10 is the one to defer — it is the only one
+that is not a precondition of something already in the Plan.
+
+### 2026-08-27 | surprise | the coordinator corrupted the Plan while ticking T3's DoD; a count caught it
+
+**Recorded because it is this sprint's fourth format/edit failure and the first one the coordinator
+committed.** Ticking T3's three DoD by **line number** (`sed -i '87s|.*|…'`) overwrote the `**DoD:**`
+header and left a duplicate, still-unticked third DoD below the three ticks. The line numbers had been
+read from an earlier `sed -n` display that was misaligned by one.
+
+**Every cheap check stayed clean.** Line count 229 → 229. Task-block count 8 → 8. `grep` for the DoD
+text still matched. The file *looked* right. What caught it was the **checkbox census refusing to
+reconcile**: 18 open + 10 ticked = 28 before, but 16 + 13 = **29** after — a total that must not change
+when three boxes are merely flipped. Tracking down the extra box found the destroyed header.
+
+This is **L-009 exactly** — a structure-adjacent edit that fuses or destroys neighbouring entries while
+grep and line caps stay clean — and it is also the cross-check rule paying for itself: the count was run
+because the number was about to enter a rollup, not because anything looked wrong.
+
+**Fix and the actual lesson.** The file was restored from a pre-edit copy (`git diff` clean against
+HEAD, verified), then re-ticked with **content-anchored** replacement — `awk` matching each DoD's own
+opening text, with an `END` guard that exits non-zero unless exactly **3** substitutions occurred. The
+guard is the point: a content match that silently replaces 2 of 3 is the same silent-green failure in a
+new costume. Post-edit census reconciles at 15 open + 13 ticked = **28**, 8 DoD headers, 229 lines.
+**Line-number addressing into a structured document is the defect; the misread display was only the
+trigger.**
