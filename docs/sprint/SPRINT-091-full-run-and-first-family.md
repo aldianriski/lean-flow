@@ -55,7 +55,7 @@ TypeScript, so this is the floor they stand on, not a cleanup.
 - [ ] The type-checker dependency is declared, not assumed present
 
 ### T2 — Derive the conversion's real headroom `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: docs/research/logs/qa-gate-timing.md · instrumented temp copies, never shipped files
+Layers: docs/research/logs/qa-gate-timing.md
 Depends-on: none
 Cites: TD-090 · qa-gate-timing Rounds 5–8 · L-130
 Tier **G**. No later DoD may carry a performance number that does not trace to this Round. The claim
@@ -76,7 +76,7 @@ freezing an estimate into an acceptance threshold is the failure L-130 records.
      so a fabricated or absent measurement surfaces the moment T-anything cites it. -->
 
 ### T3 — Full Standard traversal in TS, at parity with the Shell full run `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: apps/cli · packages/standard (traversal · mark-driven dispatch) · tests
+Layers: apps/cli/src · packages/standard/src · tests
 Depends-on: T1
 Cites: EPIC-014 H12 · § Closed-when 2 · SPRINT-087 (registry) · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified)
 Tier **G**. The CLI today answers only `--rule` and `--section`; there is no whole-spec run. Traversal is
@@ -90,7 +90,7 @@ what lets a fixture repo be answered in one in-process call instead of one proce
 - [ ] Dispatch stays open-closed — *Verify: the traversal adds no switch; registration remains at each rule's own call site*
 
 ### T4 — Hold semantics and full-run level arithmetic `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: packages/standard (result domain · level arithmetic) · tests
+Layers: packages/standard/src · tests
 Depends-on: T3
 Cites: EPIC-014 H12 · SPRINT-087 T4 · L-058 · `scripts/lib/conformance-engine.sh` (parity oracle)
 Tier **G**. Split from T3 deliberately: SPRINT-087's lesson is that code which *produces* a verdict gets
@@ -104,8 +104,8 @@ forgotten because its output looks like data rather than a claim. Level arithmet
 - [ ] A partial invocation still emits NO global level — *Verify: seed one in; only the structural checks redden, per SPRINT-087's frozen-result property*
 
 ### T5 — Accept a caller-supplied spec path `[size: S · risk: med · class: execution · HITL · J1]`
-Layers: apps/cli · tests
-Depends-on: T1
+Layers: apps/cli/src · tests
+Depends-on: T1, T3
 Cites: SPRINT-087 (spec-not-found vs permission-denied)
 Tier **G** by defaulting up (ADR-029): a silently-ignored spec path would make every fixture assertion
 vacuous while the suite stayed green — a false negative by construction. Fixture harnesses hand the
@@ -119,8 +119,8 @@ landing here first.
 - [ ] A nonexistent path fails loudly and stays distinct from an unreadable one — *Verify: two cases, two different named outcomes*
 
 ### T6 — Migrate S4.ONEFILE · S4.INDEX · S4.SECTIONS · S4.NEGATIVE `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: packages/standard/src/rules · evals/fixtures (retained, never replaced) · tests
-Depends-on: T1
+Layers: packages/standard/src/rules · evals/fixtures · tests
+Depends-on: T1, T4
 Cites: EPIC-014 H13 · D2 strangler · L-142 · L-169 · `scripts/lib/conformance-engine.sh` (parity oracle)
 Tier **G**. The four file/text §4 rules. F6 was chosen on measured cost across both axes — see D1.
 
@@ -133,7 +133,7 @@ Tier **G**. The four file/text §4 rules. F6 was chosen on measured cost across 
 - [ ] Every seeded break is verified to have landed, under ONE stated hash convention — *Verify: never two methods in one evidence block (L-169)*
 
 ### T7 — Migrate S4.APPEND behind a real git port `[size: M · risk: high · class: execution · HITL · J1]`
-Layers: packages/standard/src/rules · adapters · tests
+Layers: packages/standard/src/rules · packages/standard/src/adapters · tests
 Depends-on: T6
 Cites: EPIC-014 H13 · SPRINT-087 (port + fake pattern) · L-166 · `scripts/lib/conformance-engine.sh` (parity oracle)
 Tier **G**. §4's only git-defined rule, split out because it needs a port the other four do not. Its
@@ -165,13 +165,17 @@ the system emits is an absent guard that clears every proof above it.
   the parity relocation and its ADR moved to SPRINT-092 with the conversion they serve.
 - **D4** — **The type checker lands first.** Seven TS tasks on a toolchain that evaluates no types would
   satisfy type-level DoD with unchecked code (TD-101, `high` and unrouted for four sprints).
-- **D5** — **Overlap-ownership map, restated for the seven-task Plan — not inherited from the eleven.**
-  The split removed both contended files' other owners: `scripts/qa-check.sh` is now touched by **T1
-  alone**, and `docs/research/logs/qa-gate-timing.md` by **T2 alone**. **No file in this Plan is touched
-  by more than one task**, so no commit order is owed and no per-hunk staging is required. Should any
-  task's `Layers:` grow during execution (L-100 makes that expected, not a failure), this map is
-  re-derived before the first shared commit, never assumed still true — a stale ownership map is worse
-  than none, because it names an order for tasks that are no longer in the Plan (L-042/L-037).
+- **D5** — **Overlap-ownership map, derived by the pre-dispatch preflight — not by reading.** An
+  earlier hand-derived version of this row claimed no file was touched by more than one task; the
+  preflight named four pairs it had missed and HALTed (Execution Log, `surprise`). What is true:
+  `scripts/qa-check.sh` → **T1 alone**; `docs/research/logs/qa-gate-timing.md` → **T2 alone**;
+  `apps/cli/src` → **T3 then T5**; `packages/standard/src` → **T3 → T4**; `packages/standard/src/rules`
+  → **T6 → T7**. Every shared path carries a `Depends-on:` edge, so each is single-owned in order and
+  none is parallel-built. Shared paths stage per-hunk (`git add -p` + verify `git diff --cached`), never
+  a plain `git add` over another task's WIP (L-042/L-037). **`Layers:` is machine input, not prose** —
+  a parenthetical annotation tokenises to its bare prefix and silently widens the declared blast radius,
+  which is what produced four of the five preflight FAILs. If a task's `Layers:` grows during execution
+  (L-100 makes that expected), re-run the preflight before the next commit; do not re-read this row.
 
 ## Assumptions
 

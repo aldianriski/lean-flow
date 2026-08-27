@@ -59,3 +59,41 @@ and G2 were both unsigned at the time of this entry (`gates_signed:` absent), so
 being revoked — the batch simply had not been signed yet.
 
 consequence · T0 · behaviour:low · governance:high
+
+### 2026-08-27 | surprise | pre-dispatch preflight HALTed; D5's ownership map was wrong
+
+**What happened.** Step 3's pre-dispatch preflight (extracted from `dispatch.md` and run against this
+Plan) returned **5 FAIL · PREFLIGHT: HALT**, so no wave was dispatched. Scope is unchanged — this is a
+declaration defect, not a pivot, which is why it is logged as `surprise` rather than `scope-change`.
+
+**D5 was restated wrongly at the split, by me, in the same sentence that warned against exactly this.**
+The corrected map claimed *"no file in this Plan is touched by more than one task"*. It is false, and
+the preflight named four pairs I had not seen. The claim was derived by eye from the `Layers:` lines
+immediately after removing T8–T11; the mechanical check disagreed, and the mechanical check is right.
+The general shape is the one this repo keeps recording: **the map was re-derived by reading, and
+reading is what fails — every overlap here was found by a disagreeing tool, none by re-reading the
+declaration** (L-165's family).
+
+**Two distinct causes, only one of them a real design conflict.**
+1. **A tokenisation defect I introduced.** T3 and T4 declare `packages/standard (traversal · mark-driven
+   dispatch)` and `packages/standard (result domain · level arithmetic)`. The preflight's tokeniser
+   reduces those parenthetical annotations to bare **`packages/`** — a prefix that contains every rule
+   file — so T3/T4 collided with T6/T7 on a subtree they do not actually share. The annotation was for
+   human readers and silently widened the declared blast radius. **A `Layers:` entry is machine input,
+   not prose.**
+2. **A genuine overlap.** T3 (flagless full run) and T5 (caller-supplied spec path) both edit
+   `apps/cli` — the same argument parsing. No dependency edge existed between them, and the preflight
+   is correct to refuse to parallel-build them.
+
+**Fix applied.** Parentheticals removed from `Layers:` so declarations tokenise to the real subtrees,
+and two `Depends-on:` edges added — each justified on its merits, not to silence the checker:
+`T5 → T3` (both edit the CLI's argument surface; traversal lands before the spec flag) and
+`T6 → T4` (a rule evaluator returns a `RuleEvaluation`, which is the result domain T4 settles). Those
+two edges also transitively order T3↔T6, T3↔T7 and T4↔T7.
+
+**Cost, stated plainly:** parallelism drops. The wave rank was `T1=0 T2=0 T3=1 T4=2 T5=1 T6=1 T7=2`
+and becomes a longer chain. That is the correct trade — the preflight exists because a parallel build
+over a shared file contaminates at the commit phase (L-042/L-037), and a faster wave that corrupts a
+merge is not faster.
+
+consequence · T0 · behaviour:low · governance:high
