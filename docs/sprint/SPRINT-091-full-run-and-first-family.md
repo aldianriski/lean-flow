@@ -49,15 +49,15 @@ TypeScript, so this is the floor they stand on, not a cleanup.
 **Acceptance:** the gate fails on a type error that it currently accepts in silence.
 
 **DoD:**
-- [ ] A type check runs inside the gate — *Verify: the gate's own printed verdict line names it; not a wrapper's exit status (L-120)*
-- [ ] It FAILS on TD-101's exact recorded case — *Verify: a bare string assigned to a readonly Finding[], and a number to a string field; both currently pass*
-- [ ] A sibling control stays green — *Verify: correct code in the same file passes, so the check discriminates rather than reddening everything (L-142)*
-- [ ] The type-checker dependency is declared, not assumed present
+- [x] A type check runs inside the gate — ✓ the gate's OWN printed line, read from its output with no wrapper between: `PASS  typecheck: tsc --noEmit clean (0 errors)`, sitting between legs 11 and 12. Corroborated by the independent reviewer's own end-to-end gate run (exit 0)
+- [x] It FAILS on TD-101's exact recorded case — ✓ seeded verbatim (`findings: "not an array"` against `readonly Finding[]`, `detail: 42` against `string`): gate printed `FAIL typecheck: tsc --noEmit exited 1 with 3 error(s)` and its verdict line read `QA-CHECK: 211 pass, 14 fail`. It also caught the branded `RuleId` rejecting a bare string — TD-101's impact paragraph proven, not argued. Independently reproduced by the reviewer
+- [x] A sibling control stays green — ✓ seed removed, same gate: `PASS  typecheck: tsc --noEmit clean (0 errors)`. The leg discriminates rather than reddening everything (L-142). A third branch was added under the bounded retry — a crashed checker now reports as a **checker** failure, not as `0 error(s)` — proven against the shipped logic with two controls
+- [x] The type-checker dependency is declared, not assumed present — ✓ `typescript@7.0.2` + `@types/bun` in `package.json` `devDependencies` with `bun.lock` committed; `node_modules/` gitignored and invisible to `git status`. An absent toolchain **FAILs rather than skips** (ADR-037's ruling as code), verified by the reviewer renaming the binary away
 
 ### T2 — Derive the conversion's real headroom `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: docs/research/logs/qa-gate-timing.md
-Depends-on: none
-Cites: TD-090 · qa-gate-timing Rounds 5–8 · L-130
+Depends-on: T3
+Cites: TD-090 · qa-gate-timing Rounds 5–8 · L-130 · `conformance-engine.sh` `scripts/lib/conformance-engine.sh` (timed as the Shell comparand, never modified) · `S9.LOGDIR`
 Tier **G**. No later DoD may carry a performance number that does not trace to this Round. The claim
 that a TS in-process traversal costs ~ms where the Shell spawn costs 8.5s is **unmeasured**, and
 freezing an estimate into an acceptance threshold is the failure L-130 records.
@@ -65,10 +65,10 @@ freezing an estimate into an acceptance threshold is the failure L-130 records.
 **Acceptance:** a new Round exists, and every later performance figure derives from it.
 
 **DoD:**
-- [ ] The ADR-family harness's cost is split between git-repo construction and engine invocation — **judgment tick, and it says so**: measured by instrumented copy, never read from source; no checker can tell a real measurement from an invented one
-- [ ] A TS-vs-Shell per-invocation comparison on one fixture target, using the already-migrated §12 family — **judgment tick**: it is a *proxy* (§4 is not yet migrated) and must be labelled one in the Round itself
-- [ ] The derived ceiling is stated as a **range, not a point** — **judgment tick**; this host's timings drift run-to-run, which is why every prior Round reports ranges
-- [ ] Caveats recorded, including sample counts — **judgment tick**
+- [x] The ADR-family harness's cost is split between git-repo construction and engine invocation — ✓ **survives independent review**: the reviewer re-implemented the instrumentation with a differently-built timer and measured engine share at **89.6%** and **88.2%** (12 PASS / 0 FAIL both runs), corroborating direction and magnitude. Read as a magnitude, not a percentage to the point — Round 11 records that wrapper overhead (~0.77–1.03s of `date` forks) is unquantified and `non-engine` is derived by subtraction
+- [ ] A TS-vs-Shell per-invocation comparison on one fixture target — **STRUCK by review, not met.** The TS CLI wires `createBuiltInRegistry()`, which registers only `S9.LOGDIR`; the F12 registry is never connected, so `--section 12` emits `rule-unimplemented` gaps for all four mechanical rules. The measured 141–161ms was spec-parse plus stub prints — **Shell's real work against TS's no-op**, not a ratio. The agreement check that should have caught it counted `S12.` lines, which both engines print per row regardless of verdict (L-108). **Blocked on T3**, which wires real dispatch; re-derivation must diff per-rule verdicts before timing anything (Round 11)
+- [ ] The derived ceiling is stated as a **range, not a point** — **STRUCK, not met.** The arithmetic and range construction were sound (extremes correctly paired for a quotient), but the input was the invalid ratio above, so 4.3–4.9s / ≈15–17s / "roughly 5%" are all withdrawn. **No SPRINT-092 acceptance criterion may cite a conversion saving until this is re-derived** — this is L-130 caught one step before it froze
+- [x] Caveats recorded, including sample counts — ✓ three samples per figure in Round 10; Round 11 adds the ones Round 10 missed (unquantified wrapper overhead, `non-engine` as a subtraction, and the corrected "unchanged bytes" claim — `conformance-engine.sh` changed twice in the window, including a **perf** commit, so the Round 7 → Round 10 delta is not attributable to the host)
 
 <!-- T2 carries NO mechanical criterion, and that is declared rather than disguised (G2 reachability).
      Inventing a checker to make a measurement task look mechanical is the failure, not the fix. What

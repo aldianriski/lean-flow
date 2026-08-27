@@ -792,6 +792,14 @@ else
   tsc_errs=$(printf '%s\n' "$tsc_out" | grep -cE 'error TS')
   if [ "$tsc_code" -eq 0 ]; then
     ok "typecheck: tsc --noEmit clean (0 errors)"
+  elif [ "$tsc_errs" -eq 0 ]; then
+    # Nonzero exit with NO `error TS` diagnostic means the CHECKER failed, not the code under it:
+    # a crashed or corrupted binary, a missing runtime, an unreadable tsconfig. Reporting that as
+    # "0 error(s)" would describe a broken checker as a nearly-clean failure. An exit code is
+    # evidence about the REPORTER, never about the artifact (L-045 - L-057), so the two are named
+    # apart. Found by the independent Tier G review of this leg, reproduced by corrupting the
+    # binary; the leg already FAILed correctly, only its diagnostic misdescribed why.
+    bad "typecheck: THE CHECKER ITSELF FAILED -- tsc exited $tsc_code without printing a single 'error TS' diagnostic (crashed binary, missing runtime, or unreadable config). This is NOT a verdict on the code. Its output began: $(printf '%s' "$tsc_out" | tr '\n' ' ' | cut -c1-200)"
   else
     bad "typecheck: tsc --noEmit exited $tsc_code with $tsc_errs error(s) -- first: $(printf '%s\n' "$tsc_out" | grep -m1 -E 'error TS')"
   fi

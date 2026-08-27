@@ -336,3 +336,185 @@ guard defect was found by an independent pass and none by the author recalling t
 Recorded rather than worked around: ticking T1 with the gate red would be committing through a failing
 check, and appending a `review` line for a review that did not happen would be a false record of
 exactly the kind this log exists to prevent.
+
+### 2026-08-27 | progress | T2 complete — Round 10, and A4 is DISPROVEN
+
+consequence · T2 · behaviour:low · governance:high
+
+Round 10 is in `docs/research/logs/qa-gate-timing.md`. Three findings, one of which corrects this
+sprint's own assumption and one of which corrects something the author told the owner out loud.
+
+**A4 is disproven — do NOT re-declare it in SPRINT-092.** A4 held that the ADR-family harness's
+git-repo construction was its dominant term (~27s of ~30s) and would *survive* conversion, leaving only
+a small engine term to remove. Measured over three samples: **engine invocation is 88–89%; all git-repo
+construction, fixture setup and assertions together are ~2.3s.** The inverse of what was assumed. The
+G1-split note said A4 "is re-declared in SPRINT-092" — it must instead be re-declared **as disproven**,
+with Round 10 as the evidence, or 092 inherits a false premise about its own headline task.
+
+**The error's origin was a reading, not a measurement.** `qa-check.sh`'s comment says the harness
+*"BUILDS GIT REPOSITORIES — three of them"* and, separately, *"It costs 27s."* Two adjacent true
+statements read as one causal claim. That reading was then repeated to the owner as fact during this
+sprint's intake. **A cost attribution inherited from prose sitting beside a number is not a
+measurement**, and this is the same shape as Round 6's finding, where an arithmetic residual was read as
+a claim about two named rules.
+
+**The proxy needed a second measurement to be worth anything.** First attempt compared TS and Shell on a
+near-empty directory and got ~2.9× — but that measures *startup*, not workload. Given real content,
+Shell's cost rises 3× (398 → 1,200ms) while TS's is flat (135 → 141ms), giving **~7.3–8.6×**. Both
+figures are reported so the gap between them is on the record; the flat TS curve is the migration's
+actual thesis, visible in two numbers.
+
+**Ceiling for SPRINT-092's conversion: ≈15–17s off a ~20s harness, roughly 5% of the gate** — a
+ceiling built on a proxy ratio, labelled as one, and to be *measured* rather than restated at T9/T11.
+
+**An instrumented run that failed for the wrong reason was recorded, not retried away.** The first
+instrumented copy died resolving `lib/harness-common.sh` from outside `evals/` — 0 PASS, 0 FAIL, rc=1,
+150ms. A harness failing for the wrong reason still produces a number that looks like a measurement
+(L-142), so the valid runs were only trusted after checking they returned 12 PASS / 0 FAIL / rc=0.
+
+**ADR-037's owed figure is in the Round:** the typecheck leg costs **196–261ms** on a ~300s gate.
+ADR-037 accepted "the gate gets slower" as a real trade-off against TD-090; it was accepted at a price
+roughly three orders of magnitude above what it cost.
+
+### 2026-08-27 | progress | T8 independently reviewed — clean, and the review did real work
+
+review · T8 · independent-adversarial-reviewer · behaviour:material · governance:high
+
+Dispatched worktree-isolated per L-168, because adversarial verification *writes* — it seeds breaks in
+the tree it reviews, and a non-isolated reviewer plus any `git add -A` ships a corrupted guard inside an
+unrelated commit. Scoped to commit `cfffaab` and its blast radius, never the repo.
+
+**Verdict: clean — no behaviour-changing defect.** What makes that verdict worth having is the method,
+not the result:
+
+- **A differential harness**, written by the reviewer, importing pre-commit and post-commit `tokenize()`
+  side by side: **24 named edge cases + 5,000 seeded fuzz trials over an 8-line grammar (LF and CRLF),
+  0 mismatches.** The three restructured loops were also shown to be exact **De Morgan negations** of
+  the original compound `while` conditions — proved on paper *and* exercised.
+- **The reviewer seeded its own regression** (inverting `!rowLine.includes("|")`) and confirmed the
+  retained suite reddens on it (11 pass, 1 fail, wrong block-type sequence), then restored and verified
+  clean. That answers a question the author's own green run cannot: **the suite is not vacuous for this
+  exact bug class.**
+- The "0 assertions introduced" claim was **re-derived independently**, not taken from the commit.
+
+**One nuance worth carrying forward:** the reviewer found the added `undefined` guards in
+`git-boundary-spec.ts`, `spec-reader.ts` and `git-boundary-port.fake.ts` are **unreachable dead code** —
+non-optional regex capture groups in a successful match are never `undefined`, and the fake's index read
+is constrained by its own `Record<string, string>` type. They are type-level satisfaction, not behaviour
+changes. That is the right outcome (the alternative, a reachable silent-skip, would have been the real
+defect), but it means those three guards can never fire and should not be mistaken for runtime
+protection.
+
+Also confirmed: `RuleId`'s brand is compile-time only, so `String(makeRuleId(x))` and `makeRuleId(x)` are
+byte-identical at runtime — the fixture changes tightened the types without weakening a single assertion.
+
+### 2026-08-27 | progress | review record for the T0 coordinator entries
+
+review · T0 · owner-ruling · behaviour:low · governance:high
+
+**Correcting a record rather than editing one** (this log is append-only). Several entries above are
+tagged `consequence · T0 · …` — the G1 split, the preflight HALT, the ADR-035 blocker and the T8 scope
+ruling. **`T0` is not a task in the Plan**; it was used for coordinator-level events that belong to no
+single `Tn`, and the effect was to create a phantom task the review checker then reported as owing a
+review. The classification itself was right — those decisions *are* `governance:high`.
+
+Each of them was independently ruled by the **owner**, not by the author: the split point, the amendment
+of ADR-035, how the 59 type errors were absorbed, and the authorisation of isolated reviewers. An owner
+ruling is an independent pass in the sense this check guards — the author did not self-certify any of
+them. **Follow-up for the close Retro:** coordinator-level log events need either their own tag or an
+explicit convention, because `T0` currently reads to the checker as an undeclared task.
+
+### 2026-08-27 | progress | T1 independently reviewed — one real finding, fixed under the bounded retry
+
+review · T1 · independent-adversarial-reviewer · behaviour:material · governance:high
+
+Dispatched worktree-isolated (L-168), scoped to commits `b5ece54` and `9adb922` plus ADR-037. The leg is
+a **guard**, so the brief pointed the reviewer at the one failure that matters — a false negative:
+reporting PASS while type errors exist, or being unreachable so it never runs.
+
+**No false negative found.** Seven checks came back clean, and two of them answer questions the author
+could not answer about their own work:
+- **The leg cannot be silently skipped.** `qb_checkpoint()` does a hard `exit 1` on a budget trip, so it
+  terminates the gate rather than skipping later legs. Leg 11b sits unconditionally between the leg-11
+  and leg-12 checkpoints. There is no path where it is passed over while the gate still reports overall
+  PASS — which was the sharpest false-negative hypothesis in the brief.
+- **The `$?` capture is genuinely tsc's.** Assignment-only command substitution, no pipe, and the script
+  sets only `set -u`, so no `set -e` interaction. The L-120 trap is not present here.
+- Error counting is accurate: TypeScript 7 prints exactly one line per diagnostic in captured output and
+  emits no `Found N errors` summary — tested at 1, 2, 3 and 10 errors.
+- `sh -n` clean, `eol: lf` confirmed, no CRLF contamination.
+- The reviewer independently reproduced the must-FAIL/control pair, and its background full-gate run
+  completed **exit 0** with `PASS typecheck` sitting correctly between legs 11 and 12 — end-to-end
+  integration confirmed by someone other than the author.
+
+**One real finding, and it is now fixed (the bounded builder retry, attended mode).** When `tsc` exits
+nonzero while printing **no `error TS` diagnostic** — a crashed or corrupted binary, a missing runtime,
+an unreadable config — the leg still FAILed correctly, but its message read
+`exited 127 with 0 error(s) -- first: ` with an empty field. It described a **broken checker** as a
+zero-count **code** failure. Confirmed by the reviewer by corrupting the binary.
+
+That is the L-045 / L-057 shape exactly: *an exit code is evidence about the reporter, never about the
+artifact*. The leg now separates the two, and says which one it is looking at.
+
+**Discrimination proof for the fix.** The branch logic was **extracted from the shipped file** (not
+re-typed) and driven with three stubs: clean → `PASS`; two real diagnostics → `FAIL … 2 error(s) …
+first: …`; exit 127 with no diagnostic → `FAIL typecheck: THE CHECKER ITSELF FAILED …`. Two controls and
+the new branch, each producing its own distinct verdict. Real tree re-checked after the edit: exit 0,
+0 errors, PASS.
+
+**Carried, not fixed:** the absent-toolchain test checks the bare name `node_modules/.bin/tsc`. On this
+Windows/git-bash host MSYS resolves that to `tsc.exe` at the syscall level (the reviewer verified this
+directly, and that the true-absent case still FAILs). On a POSIX shell without that resolution it would
+misreport "absent" — a **false FAIL, never the false PASS** this leg exists to prevent. Left alone
+deliberately: hardening it is not this task's scope, and the failure direction is the safe one. Worth a
+`TD` row at close.
+
+**Also confirmed by the reviewer, independently of the ADR's own text:** `package.json`'s
+`devDependencies` and `bun.lock` *are* git-tracked and do reach a consumer, while `node_modules/` does
+not — and no plugin-lifecycle hook was found that would auto-run an install. That is consistent with
+ADR-037's argument and with the caveat ADR-037 states about its own unverified premise.
+
+### 2026-08-27 | surprise | T2's review STRUCK its central figures — Round 11 corrects them
+
+review · T2 · independent-adversarial-reviewer · behaviour:low · governance:high
+
+**The review invalidated Round 10's headline comparison before it could reach SPRINT-092's acceptance
+criteria.** That is the outcome an independent Tier G pass exists to produce, and it is worth recording
+that no amount of author re-reading would have produced it.
+
+**The defect (CONFIRMED, verified again by the author before acting on it).** `runSection()` builds its
+registry with `createBuiltInRegistry()`, which registers exactly **one** rule — `S9.LOGDIR`. The F12
+registry is never wired into the CLI. So `bun apps/cli/src/main.ts --section 12 .` emits
+`gap … rule-unimplemented` for all four mechanical §12 rules, while Shell genuinely evaluates them
+(`PASS S12.SECRETS -- … 0 shape-match(es) examined and cleared on content`). **The 141–161ms was
+spec-parse plus twelve stub prints.** The "7.3–8.6×" was Shell's real work against TS's no-op, and the
+entire derived ceiling — 4.3–4.9s, ≈15–17s, "roughly 5%" — is struck.
+
+**The self-indictment, stated plainly because it is the useful part.** Round 10's agreement check
+counted lines matching `S12.` and found 12 on each side. That check **cannot fail**: both engines print
+one line per spec row whatever the verdict. Diffing verdicts shows all four mechanical rules disagreeing.
+This is **L-108 — a substring match standing in for a claim about shape** — and the author had written
+that exact warning into the reviewer's own brief (*"that is a COUNT, not an agreement"*) and then shipped
+the count. The rule was loaded, correctly stated, and unfired. **L-165's content, reproduced live.**
+
+**A second correction the review forced.** Round 10 attributed the harness's 29,971ms → 18,191ms drop to
+host speed "on unchanged bytes". The harness is unmodified, but `scripts/lib/conformance-engine.sh`
+changed **twice** in that window — including `298c1e1 perf(engine): memoise the git-repo probe — 6 spawns
+per invocation become 1`. Verified by the author: blob hashes `ef811a3eb9c91cca` → `a5e618a5dc33eee7`
+(`git show <ref>:<path> | sha256sum`, one convention). **A performance commit landed inside a window
+whose entire delta was attributed to the host.** Round 8 used byte-identity for exactly this reason;
+Round 10 did not.
+
+**What survived, independently reproduced rather than merely defended:** engine dominance (the reviewer
+re-implemented the instrumentation and got 89.6% / 88.2%), the A4 disproof (non-engine ~1.8–2.0s), the
+12-call count, and §(3)'s range-construction method. One framing was conceded — calling the A4 error "a
+reading failure" was uncharitable; `qa-check.sh`'s comment does juxtapose the two claims causally.
+
+**T2 is re-opened: 2 of its 4 DoD are struck and un-ticked.** The proxy is **blocked on T3**, which wires
+real dispatch. Re-derivation must diff **per-rule verdicts** before timing, and must count git spawns on
+both sides — the reviewer notes `FsGitBoundaryPort.trackedFiles()` calls `isGitRepo()` uncached, so four
+real evaluators would pay 8 git spawns against Shell's 4, which could erode much of the apparent win.
+
+**Consequence for SPRINT-092: no acceptance criterion may cite a conversion saving.** There is no valid
+measurement of one today. This is L-130 — a figure entering a frozen artifact unverified — caught one
+step before it froze, by the review rather than by the author.
