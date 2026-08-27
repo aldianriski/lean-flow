@@ -518,3 +518,37 @@ real evaluators would pay 8 git spawns against Shell's 4, which could erode much
 **Consequence for SPRINT-092: no acceptance criterion may cite a conversion saving.** There is no valid
 measurement of one today. This is L-130 — a figure entering a frozen artifact unverified — caught one
 step before it froze, by the review rather than by the author.
+
+### 2026-08-27 | surprise | three format contracts bit in a row; `Layers:` declarations were invisible
+
+consequence · T0 · behaviour:low · governance:high
+review · T0 · owner-ruling · behaviour:low · governance:high
+
+**`check-layers-observed.sh` was reporting T1's and T8's files as undeclared while their `Layers:` lines
+named them.** Cause: line 340 builds its union from **backtick-quoted** tokens only. Every `Layers:`
+line in this Plan wrote bare paths, so the checker parsed **zero declared tokens** and every changed
+file read as undeclared. The archived sprints get this right — `` `packages/standard/src` (annotation) ``
+— paths inside backticks, annotations outside. All eight lines are corrected.
+
+This also **half-corrects an earlier entry in this log.** The preflight HALT was diagnosed as
+"parenthetical annotations tokenise to a bare prefix". The real defect was the missing backticks; with
+them, the archived format carries annotations without harm. The earlier diagnosis produced a working
+fix for the wrong reason, which is its own kind of failure and is recorded rather than left standing.
+
+**Three instances of one failure mode, in a single stretch of work:**
+1. `T1b` as a task id — every guard matches `^### T[0-9]+`, so the block would have parsed as **no task
+   at all**. Caught *before* writing it, by reading the pattern.
+2. `sprint(091) T1+T2:` as a commit subject — the attributor matches `sprint(NNN) T<digits>:` and stops
+   at the `+`, so that commit was **attributable to no task**. Caught by the gate, after committing.
+3. Bare paths in `Layers:` and in `Cites:` — both unions are backtick-delimited, so both declarations
+   were **invisible**. Caught by the gate, after two rounds of wrong diagnosis.
+
+**The generalisation, and it is not "be careful":** *an identifier or declaration format is an
+interface with every guard that parses it, and every one of these fails **silently and green** — the
+guard does not error, it simply finds nothing and reports clean on what it did reach.* Instance 1 was
+caught only because the pattern was read first; 2 and 3 were caught only because a checker disagreed.
+**Learning candidate → `/insights`**, and a strong one: this is L-058's family reached through
+formatting rather than through logic, three times in one sprint.
+
+After the fix: layers completeness 16 pass / 0 fail, `PREFLIGHT: CLEAR`, waves `T1=0 T8=1 T3=2 T2=3
+T4=3 T5=3 T6=4 T7=5`.

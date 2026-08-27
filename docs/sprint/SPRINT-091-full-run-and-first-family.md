@@ -39,7 +39,7 @@ QA severity/profiles/scheduler (H15–H20) · the binary build (H22) · authorit
 ## Plan
 
 ### T1 — Wire a type checker into the gate `[size: S · risk: med · class: execution · HITL · J1]`
-Layers: package.json · scripts/qa-check.sh · tsconfig.base.json · bun.lock · docs/adr/ADR-037-dev-only-type-checker-admitted.md · docs/adr/ADR-035-typescript-bun-reference-engine.md · docs/DECISIONS.md · docs/knowledge-index.md
+Layers: `package.json` · `scripts/qa-check.sh` · `tsconfig.base.json` · `bun.lock` · `docs/adr/ADR-037-dev-only-type-checker-admitted.md` · `docs/adr/ADR-035-typescript-bun-reference-engine.md` · `docs/DECISIONS.md` · `docs/knowledge-index.md`
 Depends-on: none
 Cites: TD-101 · EPIC-014 D4 · L-105
 Tier **G**. The repo states guarantees as "enforced by a TYPE" while no automated path evaluates one —
@@ -55,7 +55,7 @@ TypeScript, so this is the floor they stand on, not a cleanup.
 - [x] The type-checker dependency is declared, not assumed present — ✓ `typescript@7.0.2` + `@types/bun` in `package.json` `devDependencies` with `bun.lock` committed; `node_modules/` gitignored and invisible to `git status`. An absent toolchain **FAILs rather than skips** (ADR-037's ruling as code), verified by the reviewer renaming the binary away
 
 ### T2 — Derive the conversion's real headroom `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: docs/research/logs/qa-gate-timing.md
+Layers: `docs/research/logs/qa-gate-timing.md`
 Depends-on: T3
 Cites: TD-090 · qa-gate-timing Rounds 5–8 · L-130 · `conformance-engine.sh` `scripts/lib/conformance-engine.sh` (timed as the Shell comparand, never modified) · `S9.LOGDIR`
 Tier **G**. No later DoD may carry a performance number that does not trace to this Round. The claim
@@ -76,7 +76,7 @@ freezing an estimate into an acceptance threshold is the failure L-130 records.
      so a fabricated or absent measurement surfaces the moment T-anything cites it. -->
 
 ### T3 — Full Standard traversal in TS, at parity with the Shell full run `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: apps/cli/src · packages/standard/src · tests
+Layers: `apps/cli/src` · `packages/standard/src` · tests
 Depends-on: T1, T8
 Cites: EPIC-014 H12 · § Closed-when 2 · SPRINT-087 (registry) · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified)
 Tier **G**. The CLI today answers only `--rule` and `--section`; there is no whole-spec run. Traversal is
@@ -90,7 +90,7 @@ what lets a fixture repo be answered in one in-process call instead of one proce
 - [ ] Dispatch stays open-closed — *Verify: the traversal adds no switch; registration remains at each rule's own call site*
 
 ### T4 — Hold semantics and full-run level arithmetic `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: packages/standard/src · tests
+Layers: `packages/standard/src` · tests
 Depends-on: T3
 Cites: EPIC-014 H12 · SPRINT-087 T4 · L-058 · `scripts/lib/conformance-engine.sh` (parity oracle)
 Tier **G**. Split from T3 deliberately: SPRINT-087's lesson is that code which *produces* a verdict gets
@@ -104,7 +104,7 @@ forgotten because its output looks like data rather than a claim. Level arithmet
 - [ ] A partial invocation still emits NO global level — *Verify: seed one in; only the structural checks redden, per SPRINT-087's frozen-result property*
 
 ### T5 — Accept a caller-supplied spec path `[size: S · risk: med · class: execution · HITL · J1]`
-Layers: apps/cli/src · tests
+Layers: `apps/cli/src` · tests
 Depends-on: T1, T3
 Cites: SPRINT-087 (spec-not-found vs permission-denied)
 Tier **G** by defaulting up (ADR-029): a silently-ignored spec path would make every fixture assertion
@@ -119,7 +119,7 @@ landing here first.
 - [ ] A nonexistent path fails loudly and stays distinct from an unreadable one — *Verify: two cases, two different named outcomes*
 
 ### T6 — Migrate S4.ONEFILE · S4.INDEX · S4.SECTIONS · S4.NEGATIVE `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: packages/standard/src/rules · evals/fixtures · tests
+Layers: `packages/standard/src/rules` · `evals/fixtures` · tests
 Depends-on: T1, T4
 Cites: EPIC-014 H13 · D2 strangler · L-142 · L-169 · `scripts/lib/conformance-engine.sh` (parity oracle)
 Tier **G**. The four file/text §4 rules. F6 was chosen on measured cost across both axes — see D1.
@@ -133,7 +133,7 @@ Tier **G**. The four file/text §4 rules. F6 was chosen on measured cost across 
 - [ ] Every seeded break is verified to have landed, under ONE stated hash convention — *Verify: never two methods in one evidence block (L-169)*
 
 ### T7 — Migrate S4.APPEND behind a real git port `[size: M · risk: high · class: execution · HITL · J1]`
-Layers: packages/standard/src/rules · packages/standard/src/adapters · tests
+Layers: `packages/standard/src/rules` · `packages/standard/src/adapters` · tests
 Depends-on: T6
 Cites: EPIC-014 H13 · SPRINT-087 (port + fake pattern) · L-166 · `scripts/lib/conformance-engine.sh` (parity oracle)
 Tier **G**. §4's only git-defined rule, split out because it needs a port the other four do not. Its
@@ -148,7 +148,7 @@ the system emits is an absent guard that clears every proof above it.
 - [ ] The shallow-clone branch is pointed at the artifact that motivated it and shown REACHABLE — *Verify: not merely working on a fixture (L-166)*
 
 ### T8 — Bring the TypeScript tree to zero type errors `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: packages/standard/src/tokenizer.ts · packages/standard/src/tokenizer.test.ts · packages/standard/src/spec-reader.ts · packages/standard/src/spec-reader.test.ts · packages/standard/src/section.test.ts · packages/standard/src/model.test.ts · packages/standard/src/rules/git-boundary-spec.ts · packages/standard/src/rules/git-boundary-port.fake.ts · apps/cli/src/main.test.ts · apps/cli/src/spec-file-reader.test.ts
+Layers: `packages/standard/src/tokenizer.ts` · `packages/standard/src/tokenizer.test.ts` · `packages/standard/src/spec-reader.ts` · `packages/standard/src/spec-reader.test.ts` · `packages/standard/src/section.test.ts` · `packages/standard/src/model.test.ts` · `packages/standard/src/rules/git-boundary-spec.ts` · `packages/standard/src/rules/git-boundary-port.fake.ts` · `apps/cli/src/main.test.ts` · `apps/cli/src/spec-file-reader.test.ts`
 Depends-on: T1
 Cites: TD-101 · ADR-037 · SPRINT-085 (the branded `RuleId` guarantee) · L-120
 Tier **G**. **Runs at wave 1, despite sitting last in this file** — it is numbered T8 because every
