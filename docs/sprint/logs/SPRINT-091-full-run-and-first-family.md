@@ -216,3 +216,33 @@ non-blocking — is the un-failable check ADR-037 has just finished rejecting in
 **Unblock condition:** an owner ruling on how the 59 are absorbed. **Held, not reverted:** ADR-037,
 `docs/DECISIONS.md`, the dev-only install, and the `allowImportingTsExtensions` config fix are all on
 disk and uncommitted, pending that ruling.
+
+### 2026-08-27 | scope-change | T8 added for the 59 type errors; T1's gate leg waits for it
+
+**Owner ruling (2026-08-27):** ship the config fix and the checker now, wire the gate leg **blocking**,
+and fix the 59 real type errors as their own task. Recorded here, not in the transcript (L-099).
+
+**Plan edit.** A new **T8** — bring the TypeScript tree to zero type errors. SPRINT-091 becomes **8
+tasks / 28 DoD**, which is exactly the historical ceiling G1 split this Plan down from. Accepted
+knowingly: T8 is concentrated (59% of its work in one module) rather than spread across the Plan, and
+the alternative is a gate leg that either reds on pre-existing debt or cannot fail.
+
+**Named T8, not T1b, and the reason is a near-miss worth recording.** The obvious name was `T1b`. Every
+guard in this repo matches task blocks with `^### T[0-9]+` — the sprint schema check
+(`qa-check.sh:756`), `check-layers-completeness.sh`, and the dispatch preflight all use that exact
+pattern. **A `T1b` block would have parsed as no task at all**: no schema check, no Layers/Depends-on
+completeness check, no wave rank, no shared-file ownership — silently, with every guard still reporting
+green on the other seven. That is L-058's family (a check that cannot fail says nothing) reached by an
+innocuous naming choice. Caught by reading the pattern before writing the block rather than after.
+**Learning candidate → `/insights`:** an id convention is an interface with every guard that parses it.
+
+**Dependency impact.** T8 fixes code T3 then builds on, and both touch `packages/standard/src` and
+`apps/cli/src`. `T3 Depends-on:` gains **T8**, which transitively orders T4–T7 behind it. T8 itself
+depends only on T1 (the checker must exist before its output can be driven to zero). **T8 therefore
+runs at wave 1 while sitting last in the file** — the block says so in its own text, because file order
+is not execution order and a reader should not have to infer that.
+
+**Preflight is re-run after this edit, not assumed.** The last CLEAR was computed against a seven-task
+graph that no longer exists.
+
+consequence · T8 · behaviour:material · governance:high

@@ -77,7 +77,7 @@ freezing an estimate into an acceptance threshold is the failure L-130 records.
 
 ### T3 — Full Standard traversal in TS, at parity with the Shell full run `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: apps/cli/src · packages/standard/src · tests
-Depends-on: T1
+Depends-on: T1, T8
 Cites: EPIC-014 H12 · § Closed-when 2 · SPRINT-087 (registry) · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified)
 Tier **G**. The CLI today answers only `--rule` and `--section`; there is no whole-spec run. Traversal is
 what lets a fixture repo be answered in one in-process call instead of one process per case.
@@ -146,6 +146,29 @@ the system emits is an absent guard that clears every proof above it.
 - [ ] Parity with Shell including the marker-passes and shallow-clone cases
 - [ ] Real adapter plus in-memory fake, per SPRINT-087's port pattern
 - [ ] The shallow-clone branch is pointed at the artifact that motivated it and shown REACHABLE — *Verify: not merely working on a fixture (L-166)*
+
+### T8 — Bring the TypeScript tree to zero type errors `[size: M · risk: med · class: execution · HITL · J1]`
+Layers: packages/standard/src/tokenizer.ts · packages/standard/src · apps/cli/src
+Depends-on: T1
+Cites: TD-101 · ADR-037 · SPRINT-085 (the branded `RuleId` guarantee) · L-120
+Tier **G**. **Runs at wave 1, despite sitting last in this file** — it is numbered T8 because every
+guard here matches `^### T[0-9]+` and a `T1b` block would have been silently skipped by the schema
+check, the layers check and the preflight alike. Read the wave computation, not the file order.
+
+Turning the checker on revealed **59 real type errors in ten files** — 35 of them (59%) in
+`tokenizer.ts` and its test. Several are modelling failures rather than strictness noise: a
+discriminated union not narrowed at its read sites, and `'string' is not assignable to 'RuleId'`
+recurring, which means the brand SPRINT-085 recorded as a guarantee is not holding. T1's gate leg
+cannot be wired blocking until this is green, and wiring it non-blocking is the un-failable check
+ADR-037 rejects in writing.
+
+**Acceptance:** `tsc --noEmit` exits 0 over the whole workspace, and the suite still passes.
+
+**DoD:**
+- [ ] Zero type errors remain — *Verify: read `tsc`'s OWN exit code and its own printed error count, never a status handed back through a pipe (L-120)*
+- [ ] The `RuleId` brand actually holds — *Verify: a bare string in a `RuleId` position is rejected, while a properly branded value passes — the must-FAIL and its sibling control (L-142)*
+- [ ] Union narrowing is fixed at the read sites, not silenced — *Verify: no `as` assertion or `any` is introduced to clear an error; `git diff` shows narrowing, and a seeded re-break reddens the same case*
+- [ ] The suite is unchanged — *Verify: 266 pass, 0 fail, matching the pre-change baseline exactly*
 
 ## Owner-action checklist
 - [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099).
