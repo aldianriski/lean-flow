@@ -187,7 +187,7 @@ describe("readSpecSectionFromDisk — §N against the real Standard (SPRINT-087 
       .split("\n")
       .map((l) => l.trim())
       .filter((l) => l.length > 0)
-      .map((l) => l.split(/\s+/)[0]);
+      .map((l) => l.split(/\s+/)[0] ?? "");
     expect(result.rows.map((r) => r.id)).toEqual(oracleIds);
   });
 

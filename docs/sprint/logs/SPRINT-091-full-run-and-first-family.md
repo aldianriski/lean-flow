@@ -246,3 +246,47 @@ is not execution order and a reader should not have to infer that.
 graph that no longer exists.
 
 consequence · T8 · behaviour:material · governance:high
+
+### 2026-08-27 | progress | T8 complete — the TypeScript tree type-checks, 59 → 0
+
+consequence · T8 · behaviour:material · governance:high
+
+**`tsc --noEmit` exits 0 with 0 errors.** Path: 139 total → 80 were a config gap
+(`allowImportingTsExtensions`, landed with T1's groundwork) → **59 real**, now zero.
+
+**Where they were, and what they actually were.** One root cause dominated: `noUncheckedIndexedAccess`
+types every index read as `T | undefined`, and this codebase indexes inside bounds-checked loops where
+the guard proves range but the *type* does not carry that proof. `tokenizer.ts` alone held 20 of the
+59. Three loops there were restructured to bind-and-narrow once per iteration; its 12 tests pass
+unchanged, so the restructure preserved behaviour rather than merely satisfying the checker.
+
+**Not all of it was index noise, and the exceptions are the interesting part.** Regex capture groups
+are `string | undefined` even when non-optional, which reached `spec-reader.ts`'s rule-id extraction —
+narrowed there so a future regex edit that drops a group becomes a compile error rather than an
+`undefined` id entering a frozen result. And the **branded `RuleId`** appeared repeatedly: fixtures and
+expectations were comparing branded values against bare string literals. Those were fixed by
+constructing valid ids in the fixtures (`makeRuleId(...)`) rather than by widening the assertions —
+widening would have tested *less* than the code promises, which is how a brand stops meaning anything.
+
+**Discrimination proof (Tier G).** Seeded `makeRuleId("S9.Z")` → `"S9.Z"` in **one element of a
+two-element expectation**, so the other element is a sibling control inside the same expression.
+Result: **exactly one error, at the seeded site**; the control produced none. Seed verified to have
+landed before trusting it (differs from pristine, line count unchanged at 157 — targeted, not a
+demolition). Restored and verified byte-for-byte: `git hash-object` = `59d11d5877f045f87a896f651c3577b54d88032b`
+both before the seed and after the restore, `cmp` identical, `tsc` back to 0. **One hash convention,
+named** (`git hash-object` on the working file) — never mixed with a blob hash in the same block (L-169).
+
+**Narrowed, not silenced — measured rather than asserted.** The 115 added lines across nine files
+contain **0** `as` casts, **0** `any`, **0** non-null `!`, **0** `@ts-ignore`. Every fix is a real
+narrowing: bind-and-guard, `?.` comparison (which narrows the discriminated union *and* excludes
+undefined in one step), or a properly constructed branded value.
+
+**Line endings handled explicitly, not incidentally.** Six of the nine files are CRLF in the working
+tree while three are LF. Edits matched against an LF-normalised copy and were written back in each
+file's **original** ending, so the diffs carry only the intended change (6/1, 10/3, 10/3 on the source
+files) and no line-ending churn. An earlier attempt failed its anchor for exactly this reason and wrote
+nothing, which is the correct failure mode.
+
+**Still true, and still the point:** `bun test` reported 266 pass / 0 fail *before* any of this, on the
+tree carrying all 59 errors. It reports 266 pass / 0 fail now. The suite could not tell the difference —
+which is the entire argument for the checker TD-101 asked for.

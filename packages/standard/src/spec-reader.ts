@@ -98,10 +98,16 @@ function rulesInWindow(section: Section): RuleRow[] {
       const idCell = (row.cells[0] ?? "").trim();
       const m = ID_CELL_RE.exec(idCell);
       if (!m) continue;
-      if (Number(m[2]) !== section.number) continue;
+      // Both groups are non-optional in ID_CELL_RE; `exec` types them `string | undefined`
+      // anyway. Narrowing here means a future regex edit that drops a group is a compile error
+      // rather than an `undefined` id silently entering a frozen result.
+      const idToken = m[1];
+      const sectionToken = m[2];
+      if (idToken === undefined || sectionToken === undefined) continue;
+      if (Number(sectionToken) !== section.number) continue;
 
       rows.push({
-        id: m[1],
+        id: idToken,
         level: primaryToken(row.cells[1] ?? "", "--"),
         mark: primaryToken(row.cells[2] ?? "", "?"),
         loc: row.loc,
@@ -281,7 +287,8 @@ export function marksInStandard(doc: BlockDocument, specPath: string): MarksRead
       for (const row of block.rows) {
         const cell = (row.cells[0] ?? "").trim();
         const m = /^`([a-z-]+)`$/.exec(cell);
-        if (m) marks.push(m[1]);
+        const mark = m?.[1];
+        if (mark !== undefined) marks.push(mark);
       }
       if (marks.length > 0) return { ok: true, marks };
     }

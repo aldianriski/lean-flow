@@ -35,12 +35,15 @@ describe("classifySection — dispatches every rule handed to it, in order (DoD 
     const report = classifySection(9, rules, registry, port);
     expect(report.section).toBe(9);
     expect(report.outcomes).toHaveLength(3);
-    expect(report.outcomes[0]).toEqual({
+    const [first, second, third] = report.outcomes;
+    expect(first).toEqual({
       kind: "evaluated",
       evaluation: { ruleId: makeRuleId("S9.A"), verdict: "pass", findings: [], detail: "ok" },
     });
-    expect(report.outcomes[1].kind === "evaluated" && report.outcomes[1].evaluation.verdict).toBe("gap");
-    expect(report.outcomes[2].kind).toBe("excluded");
+    // Narrow to the variant before reading its own field, rather than indexing twice and asserting.
+    if (second?.kind !== "evaluated") throw new Error("expected outcome 1 to be evaluated");
+    expect(second.evaluation.verdict).toBe("gap");
+    expect(third?.kind).toBe("excluded");
   });
 
   test("classifies in the exact order given -- never re-sorted or re-derived from the registry", () => {
@@ -49,7 +52,12 @@ describe("classifySection — dispatches every rule handed to it, in order (DoD 
     const rules = [ruleOf("S9.Z", "judgment-only", 9), ruleOf("S9.A", "judgment-only", 9)];
 
     const report = classifySection(9, rules, registry, port);
-    expect(report.outcomes.map((o) => (o.kind === "excluded" ? o.ruleId : "?"))).toEqual(["S9.Z", "S9.A"]);
+    // The expectation is built with makeRuleId so it carries the SAME branded type the report
+    // does -- widening the assertion instead would test less than the code promises.
+    expect(report.outcomes.map((o) => (o.kind === "excluded" ? o.ruleId : "?"))).toEqual([
+      makeRuleId("S9.Z"),
+      makeRuleId("S9.A"),
+    ]);
   });
 
   test("an empty rule list classifies to an empty report -- not an error", () => {

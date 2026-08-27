@@ -4,6 +4,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { makeRuleId } from "./model.ts";
 import { tokenize } from "./tokenizer.ts";
 import {
   allRules,
@@ -55,7 +56,12 @@ describe("rulesInSection — §13 against the real Standard, structurally", () =
       expect(row.loc.line).toBeGreaterThan(0);
     }
     // Rows are in document order, so their line numbers strictly increase.
-    for (let i = 1; i < rows.length; i++) expect(rows[i].loc.line).toBeGreaterThan(rows[i - 1].loc.line);
+    for (let i = 1; i < rows.length; i++) {
+      const cur = rows[i];
+      const prev = rows[i - 1];
+      if (cur === undefined || prev === undefined) throw new Error(`missing row at ${i}`);
+      expect(cur.loc.line).toBeGreaterThan(prev.loc.line);
+    }
   });
 });
 
@@ -228,7 +234,7 @@ describe("toStandardRule — lifts a raw row into the H04 domain model", () => {
   test("a recognised level and mark round-trip", () => {
     const row = { id: "S13.TRAILERS", level: "Attested", mark: "mechanical", loc: { file: "f.md", line: 5 } };
     expect(toStandardRule(row, 13, "f.md")).toEqual({
-      id: "S13.TRAILERS",
+      id: makeRuleId("S13.TRAILERS"),
       section: 13,
       mark: "mechanical",
       level: "Attested",
@@ -271,7 +277,10 @@ describe("allRules -- full-document parity against read-spec-rules.sh (SPRINT-08
   test("rows are in strict document order across section boundaries, not just within one section", () => {
     const rows = loadAllRows();
     for (let i = 1; i < rows.length; i++) {
-      expect(rows[i].loc.line).toBeGreaterThan(rows[i - 1].loc.line);
+      const cur = rows[i];
+      const prev = rows[i - 1];
+      if (cur === undefined || prev === undefined) throw new Error(`missing row at ${i}`);
+      expect(cur.loc.line).toBeGreaterThan(prev.loc.line);
     }
   });
 
@@ -303,7 +312,9 @@ describe("allRules -- full-document parity against read-spec-rules.sh (SPRINT-08
 
     expect(nMentions).toBe(2); // §13's own table row + §14's prose explaining implementation-directed
     expect(admitted.length).toBe(1);
-    expect(formatRuleRow(admitted[0])).toBe("S13.NOINFER — implementation-directed");
+    const onlyAdmitted = admitted[0];
+    if (onlyAdmitted === undefined) throw new Error("expected exactly one admitted row");
+    expect(formatRuleRow(onlyAdmitted)).toBe("S13.NOINFER — implementation-directed");
   });
 
   test("a positive witness for 'no prose mention was ingested' (L-156): report the denominator, " +
@@ -512,8 +523,12 @@ describe("reconcile -- `--reconcile` mode parity with read-spec-rules.sh (SPRINT
     expect(shellTable.size).toBe(13); // the oracle actually printed a per-section table, not an empty one
 
     for (const row of tsResult.sections!) {
-      expect(row.got).toBe(shellTable.get(row.section));
-      expect(formatSectionCount(row)).toBe(`§${row.section} ${shellTable.get(row.section)} rules`);
+      // A missing key is a real failure of this comparison, not something to paper over with a
+      // default -- so it throws by name rather than silently comparing against undefined.
+      const shellCount = shellTable.get(row.section);
+      if (shellCount === undefined) throw new Error(`shell table has no §${row.section}`);
+      expect(row.got).toBe(shellCount);
+      expect(formatSectionCount(row)).toBe(`§${row.section} ${shellCount} rules`);
     }
 
     // The total, read two independent ways: TS's own row count, and the sum of TS's per-section table.

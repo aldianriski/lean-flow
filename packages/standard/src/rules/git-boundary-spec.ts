@@ -32,8 +32,9 @@ export function extractGeneratedClasses(specText: string): readonly string[] {
   const re = /`([^`]+)`/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(buf))) {
+    // `exec` types every capture group as `string | undefined`, even a non-optional one.
     const t = m[1];
-    if (t !== "" && t !== ".gitignore") tokens.push(t);
+    if (t !== undefined && t !== "" && t !== ".gitignore") tokens.push(t);
   }
   return tokens;
 }
@@ -52,7 +53,10 @@ export function extractGeneratedAllowed(specText: string): readonly string[] {
     let last = "";
     const re = /`([^`]+)`/g;
     let m: RegExpExecArray | null;
-    while ((m = re.exec(s))) last = m[1];
+    while ((m = re.exec(s))) {
+      const g = m[1];
+      if (g !== undefined) last = g;
+    }
     if (last !== "") out.push(last);
   }
   return out;
@@ -69,7 +73,10 @@ export function extractAllowedAssetDirs(specText: string): readonly string[] {
     if (!line.includes(marker)) continue;
     const re = /`([^`]+)`/g;
     let m: RegExpExecArray | null;
-    while ((m = re.exec(line))) out.push(m[1]);
+    while ((m = re.exec(line))) {
+      const g = m[1];
+      if (g !== undefined) out.push(g);
+    }
   }
   return out;
 }

@@ -96,7 +96,12 @@ export function tokenize(source: string, file: string): BlockDocument {
   let i = 0;
 
   while (i < lines.length) {
+    // `noUncheckedIndexedAccess` types an index read as `string | undefined`. The loop guard proves
+    // this is in range, but the type does not carry that proof -- so narrow once, here, and every use
+    // of `line` below is a plain `string`. A non-null assertion would silence the checker instead of
+    // satisfying it, and this file is Tier G.
     const line = lines[i];
+    if (line === undefined) break;
 
     if (line.trim() === "") {
       i++;
@@ -111,12 +116,14 @@ export function tokenize(source: string, file: string): BlockDocument {
       i++;
       let closed = false;
       while (i < lines.length) {
-        if (FENCE_CLOSE_RE.test(lines[i])) {
+        const fenceLine = lines[i];
+        if (fenceLine === undefined) break;
+        if (FENCE_CLOSE_RE.test(fenceLine)) {
           closed = true;
           i++;
           break;
         }
-        content.push(lines[i]);
+        content.push(fenceLine);
         i++;
       }
       blocks.push({ type: "fence", lang, content, closed, loc });
@@ -124,21 +131,29 @@ export function tokenize(source: string, file: string): BlockDocument {
     }
 
     const heading = HEADING_RE.exec(line);
-    if (heading) {
+    // Both groups are non-optional in HEADING_RE, but `exec` types every group as
+    // `string | undefined`; narrow rather than assert, so a future regex edit that drops a group
+    // is a type error here instead of a runtime one.
+    const headingHashes = heading?.[1];
+    const headingText = heading?.[2];
+    if (heading && headingHashes !== undefined && headingText !== undefined) {
       const loc: SourceLocation = { file, line: i + 1 };
-      blocks.push({ type: "heading", depth: heading[1].length, text: heading[2].trim(), loc });
+      blocks.push({ type: "heading", depth: headingHashes.length, text: headingText.trim(), loc });
       i++;
       continue;
     }
 
-    if (line.includes("|") && i + 1 < lines.length && isDelimiterRow(lines[i + 1])) {
+    const delimiterLine = lines[i + 1];
+    if (line.includes("|") && delimiterLine !== undefined && isDelimiterRow(delimiterLine)) {
       const loc: SourceLocation = { file, line: i + 1 };
       const header: TableRow = { cells: splitRow(line), loc };
-      const align = splitRow(lines[i + 1]);
+      const align = splitRow(delimiterLine);
       i += 2;
       const rows: TableRow[] = [];
-      while (i < lines.length && lines[i].trim() !== "" && lines[i].includes("|")) {
-        rows.push({ cells: splitRow(lines[i]), loc: { file, line: i + 1 } });
+      for (;;) {
+        const rowLine = lines[i];
+        if (rowLine === undefined || rowLine.trim() === "" || !rowLine.includes("|")) break;
+        rows.push({ cells: splitRow(rowLine), loc: { file, line: i + 1 } });
         i++;
       }
       blocks.push({ type: "table", header, align, rows, loc });
@@ -149,14 +164,21 @@ export function tokenize(source: string, file: string): BlockDocument {
     // it never swallows a heading, table or fence that follows it without a blank line between.
     const loc: SourceLocation = { file, line: i + 1 };
     const paraLines: string[] = [];
-    while (
-      i < lines.length &&
-      lines[i].trim() !== "" &&
-      !FENCE_OPEN_RE.test(lines[i]) &&
-      !HEADING_RE.test(lines[i]) &&
-      !(lines[i].includes("|") && i + 1 < lines.length && isDelimiterRow(lines[i + 1]))
-    ) {
-      paraLines.push(lines[i]);
+    for (;;) {
+      const paraLine = lines[i];
+      if (paraLine === undefined) break;
+      const nextLine = lines[i + 1];
+      const startsTable =
+        paraLine.includes("|") && nextLine !== undefined && isDelimiterRow(nextLine);
+      if (
+        paraLine.trim() === "" ||
+        FENCE_OPEN_RE.test(paraLine) ||
+        HEADING_RE.test(paraLine) ||
+        startsTable
+      ) {
+        break;
+      }
+      paraLines.push(paraLine);
       i++;
     }
     // Safety net, not a normal path: every branch above already consumes at least one line when it

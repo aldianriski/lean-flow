@@ -22,13 +22,16 @@ describe("tokenize — the four constructs come back as distinct, correctly-posi
     const [heading, table, fence] = doc.blocks;
     expect(heading).toEqual({ type: "heading", depth: 2, text: "§1 — Title", loc: { file: "f.md", line: 1 } });
 
-    if (table.type !== "table") throw new Error("expected table");
+
+    // `?.` narrows the discriminated union AND excludes undefined in one comparison, so no
+    // assertion is needed to reach the variant's own fields below.
+    if (table?.type !== "table") throw new Error("expected table");
     expect(table.loc).toEqual({ file: "f.md", line: 3 });
     expect(table.header.cells).toEqual(["Rule", "Level"]);
     expect(table.align).toEqual(["---", "---"]);
     expect(table.rows).toEqual([{ cells: ["`S1.FOO`", "Attested"], loc: { file: "f.md", line: 5 } }]);
 
-    if (fence.type !== "fence") throw new Error("expected fence");
+    if (fence?.type !== "fence") throw new Error("expected fence");
     expect(fence).toEqual({
       type: "fence",
       lang: "yaml",
@@ -51,16 +54,18 @@ describe("tokenize — fenced code is a hard boundary (constraint 5)", () => {
     const src = ["```md", "## this looks like a heading but is example text", "```"].join("\n");
     const doc = tokenize(src, "f.md");
     expect(doc.blocks.map((b) => b.type)).toEqual(["fence"]);
-    if (doc.blocks[0].type !== "fence") throw new Error("expected fence");
-    expect(doc.blocks[0].content).toEqual(["## this looks like a heading but is example text"]);
+    const fenceOnly = doc.blocks[0];
+    if (fenceOnly?.type !== "fence") throw new Error("expected fence");
+    expect(fenceOnly.content).toEqual(["## this looks like a heading but is example text"]);
   });
 
   test("a table-shaped block inside a fence is NOT parsed as a table", () => {
     const src = ["```md", "| a | b |", "|---|---|", "| 1 | 2 |", "```"].join("\n");
     const doc = tokenize(src, "f.md");
     expect(doc.blocks.map((b) => b.type)).toEqual(["fence"]);
-    if (doc.blocks[0].type !== "fence") throw new Error("expected fence");
-    expect(doc.blocks[0].content).toEqual(["| a | b |", "|---|---|", "| 1 | 2 |"]);
+    const fenceTable = doc.blocks[0];
+    if (fenceTable?.type !== "fence") throw new Error("expected fence");
+    expect(fenceTable.content).toEqual(["| a | b |", "|---|---|", "| 1 | 2 |"]);
   });
 
   test("an unterminated fence runs to EOF and is reported as unclosed, not silently dropped", () => {

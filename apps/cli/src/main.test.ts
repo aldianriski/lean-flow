@@ -182,7 +182,7 @@ describe("leanflow --section (SPRINT-087 T4)", () => {
       .split("\n")
       .map((l) => l.trim())
       .filter((l) => l.length > 0)
-      .map((l) => l.split(/\s+/)[0]);
+      .map((l) => l.split(/\s+/)[0] ?? "");
 
     expect(ruleIdsOf(lines)).toEqual(oracleIds);
   });

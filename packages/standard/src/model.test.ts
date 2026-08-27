@@ -68,9 +68,11 @@ describe("makeRuleId — a rule id is validated, not merely a string", () => {
   test("accepts the shapes the Standard actually uses, including hyphenated §2 ids", () => {
     // The hyphenated ids are exactly the 21 that a naive S[0-9]+\.[A-Z][A-Z0-9]+ grep missed,
     // producing the phantom "79 rules" this sprint disproved (ADR-034).
-    expect(makeRuleId("S1.LAW1")).toBe("S1.LAW1");
-    expect(makeRuleId("S2.F-ARCHIVE")).toBe("S2.F-ARCHIVE");
-    expect(makeRuleId("S11.TDDELETE")).toBe("S11.TDDELETE");
+    // `String(...)` widens the brand for comparison without an assertion; the point of these
+    // three is that a valid id round-trips to its own text, which is exactly what is asserted.
+    expect(String(makeRuleId("S1.LAW1"))).toBe("S1.LAW1");
+    expect(String(makeRuleId("S2.F-ARCHIVE"))).toBe("S2.F-ARCHIVE");
+    expect(String(makeRuleId("S11.TDDELETE"))).toBe("S11.TDDELETE");
   });
 
   test("rejects a malformed id rather than passing it through as a string", () => {

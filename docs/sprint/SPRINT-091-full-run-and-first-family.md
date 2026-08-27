@@ -165,10 +165,10 @@ ADR-037 rejects in writing.
 **Acceptance:** `tsc --noEmit` exits 0 over the whole workspace, and the suite still passes.
 
 **DoD:**
-- [ ] Zero type errors remain — *Verify: read `tsc`'s OWN exit code and its own printed error count, never a status handed back through a pipe (L-120)*
-- [ ] The `RuleId` brand actually holds — *Verify: a bare string in a `RuleId` position is rejected, while a properly branded value passes — the must-FAIL and its sibling control (L-142)*
-- [ ] Union narrowing is fixed at the read sites, not silenced — *Verify: no `as` assertion or `any` is introduced to clear an error; `git diff` shows narrowing, and a seeded re-break reddens the same case*
-- [ ] The suite is unchanged — *Verify: 266 pass, 0 fail, matching the pre-change baseline exactly*
+- [x] Zero type errors remain — ✓ `tsc`'s own exit code **0** and its own count **0**, read from its own output with no pipe between (139 → 80 config → 59 real → 0)
+- [x] The `RuleId` brand actually holds — ✓ seeded `makeRuleId("S9.Z")` → `"S9.Z"` in one element of a two-element expectation: **exactly 1 error, at that site**, while the sibling `makeRuleId("S9.A")` in the same expression stayed green; restored byte-for-byte, `git hash-object` `59d11d58…` before seed and after restore (one convention, stated — L-169), and `tsc` back to 0
+- [x] Union narrowing is fixed at the read sites, not silenced — ✓ 115 added lines across 9 files carry **0** `as` casts, **0** `any`, **0** non-null `!`, **0** `@ts-ignore`; the fixes bind-and-guard, use `?.` to narrow union *and* undefined together, and construct branded ids in fixtures rather than widening the assertions
+- [x] The suite is unchanged — ✓ 266 pass, 0 fail, 784 expect() calls, identical to the pre-change baseline
 
 ## Owner-action checklist
 - [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099).

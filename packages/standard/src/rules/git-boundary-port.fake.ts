@@ -34,7 +34,12 @@ export class InMemoryGitBoundaryPort implements GitBoundaryPort {
 
   readTrackedFile(path: string): string | null {
     const files = this.scenario.files ?? {};
-    return Object.prototype.hasOwnProperty.call(files, path) ? files[path] : null;
+    if (!Object.prototype.hasOwnProperty.call(files, path)) return null;
+    // The own-property check proves presence, but an index read is still typed
+    // `string | undefined`. Narrow rather than assert, and keep the two checks distinct so a
+    // present-but-empty value stays "" while only a genuinely absent path becomes null.
+    const contents = files[path];
+    return contents === undefined ? null : contents;
   }
 
   allowedAssetDirs(): readonly string[] {
