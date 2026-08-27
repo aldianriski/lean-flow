@@ -1444,3 +1444,90 @@ comparison that measured nothing on the TS side.
 - **Nothing shipped was modified.** `GIT_TRACE` log files and the section-reduced spec copy were written
   under this worktree's root and the session scratch directory, then deleted; `git status` is clean at
   the time of this edit (verified, this file is the only tracked change).
+
+### Addendum — the denominator is load-dependent, not just stale; A1's 8.5s traced; a caveat rescoped
+
+An independent review of this Round is back. **No figure above is struck** — the reviewer built a
+genuine must-FAIL fixture confirming all four §12 mechanical rules FAIL identically on both engines with
+matching finding names, TS still faster (1.38–2.89×), so §(1)–§(4) stand. Two things needed fixing,
+found by that review and confirmed independently here, never taken on the reviewer's word alone.
+
+**Gate denominator — measured in this session, not inherited, and found load-dependent rather than
+merely stale.** §(4) cited Round 8/9's 288–331s. Two of this session's own samples, taken today:
+
+| Sample | Method | Result | Concurrent load |
+|---|---|---:|---|
+| A (background, this session) | `sh scripts/qa-check.sh`, tee'd; duration read from the OS file-creation → last-write timestamps of the task's own output file (`CreationTime` 23:29:37 → `LastWriteTime` 23:36:26) — no internal `time` wrapper was used for this one, named as a weaker method than sample B | **~409s**, completed, no truncation, `QA-CHECK: 214 pass, 3 fail` | not independently quantified; this session's own work only, run before the foreground sample |
+| B (foreground, this session) | `time sh scripts/qa-check.sh`, wall-clock `real` read directly | **498.978s** (8m18.978s), **exit 1** — hit `qa-check-budget-exceeded: 460s elapsed exceeds the 450s default-profile budget, reached at eval harness 'run-s2-placement-fixtures.sh'`, 6 harnesses skipped (`s2-placement`, `review-depth`, `verify-reaches`, `qa-budget`, `qa-budget-default`, `git-availability`), `QA-CHECK: 208 pass, 4 fail` | coordinator's concurrent orchestration — five worktree-isolated agents including this one, per the coordinator's own report of the same window |
+
+**Second query, as required before trusting sample A's timestamp-derived duration**: it lands inside the
+coordinator's own independently-measured light-load range (387.97s, 408.86s, both completing) — a
+different measurer, a different method (`time` on the coordinator's side), same tree, same commit,
+agreeing to within 21s of the nearer figure. Sample B independently reproduces the coordinator's own
+truncation finding in **shape** (budget-exceeded at the same harness, `run-s2-placement-fixtures.sh`,
+under concurrent load) and in **order of magnitude** (460s/499s here vs. 469s/533s there) — two
+measurers, two processes, the same failure mode.
+
+**The finding this changes: "the gate takes N seconds" is not well-defined without stating load, and past
+a threshold the run does not produce a total at all — it truncates.** Four data points, each kept
+separate rather than blended into one range, per this addendum's own discipline:
+
+| Condition | Wall clock | Completes? |
+|---|---:|---|
+| Rounds 8/9 (inherited, now stale — do not cite going forward without this addendum) | 288–331s | yes |
+| Light load (coordinator, two samples; corroborated by session sample A) | 387.97 – 408.86s (~409s) | yes |
+| Five concurrent worktree agents (coordinator's sample; session sample B) | 460–469s at budget checkpoint, 499–533s wall | **no — truncates, 6 harnesses skipped** |
+
+**Saving in seconds (9.5–13.6s, §(4)) is the figure to carry forward — it does not depend on which of
+the rows above is "the" gate time.** It is still a measurement made under this session's own light-load
+conditions (§(3)'s five samples), not a zero-load constant, so it is not claimed as perfectly
+load-invariant either — named rather than assumed.
+
+**Percentage, restated as conditional, never as one headline:**
+- Against the light-load denominator (387.97–408.86s, the only row both completing AND independently
+  corroborated twice): 9.5/408.86 – 13.6/387.97 = **≈2.3 – 3.5%** of the gate. This supersedes §(4)'s
+  "roughly 3–5%", which used the now-stale Round 8/9 denominator.
+- Against the concurrent-load row: **not computed.** A percentage-of-total presumes a total; a truncated
+  run has none. Stating a percentage there would manufacture precision the run itself never produced.
+- **No single percentage is the headline of this Round.** A reader who needs one number should be pointed
+  at the seconds figure, not a percentage that is silently conditioned on a load level never stated
+  beside it — which is the exact L-130 shape this addendum exists to interrupt before SPRINT-092 inherits
+  it.
+
+**A1's 8.5s, traced — never taken from the reviewer's citation, re-derived from the source.** Round 7
+(this file, ~line 804): *"A single such call, timed directly against a near-empty target (`sh
+scripts/lib/conformance-engine.sh <tiny-dir> --spec spec/STANDARD.md`), costs 8,546 ms."* Read in full
+context (Round 7 §"Root cause"): this is `run-conformance-engine-fixtures.sh`'s own diagnostic — the FULL
+bundled `spec/STANDARD.md` (~100 rows, ~50 dispatchable) against a **near-empty/tiny** target, and Round 7
+attributes the cost to the fixed per-row dispatch loop scaling with **row count**, not to any content
+scanned (confirmed by Round 7's own xtrace: 212 external-command lines for one full-spec call — dispatch
+overhead, not I/O over real content). Verified independently against `evals/run-adr-family-fixtures.sh`
+itself (lines 45–91): it builds `adr_spec` by keeping only `S4.*` rows (`n_kept -eq 7`, enforced by the
+harness's own guard) and every `sh "$engine" … --spec "$adr_spec"` call in the file passes that reduced
+7-row spec — **never** the full bundled spec. **No invocation on the ADR-family conversion path has the
+shape the 8.5s figure measures.** The invocations that ARE on that path: Round 10 §1's reduced-spec
+engine calls, 17.55–18.72s over 12 calls = **1.46–1.56s/call**; this Round's own §12-reduced-spec call
+(§(3) above) at **1.08–1.20s**, one invocation. Both are real per-invocation Shell costs on a
+conversion-shaped call, both roughly 6–8× smaller than 8.5s. **A1 as worded compares a TS invocation to
+an invocation shape that does not occur on the path A1 is about.** The correct Shell comparand for A1's
+own claim is the ~1.1–1.6s reduced-spec range, not 8.5s — this is the number the sprint file's correction
+to A1 should cite, sourced to this Round rather than to a recollection of Round 7.
+
+**Caveat correction.** An earlier caveat in this Round's own text reads: *"the environment's own worktree
+isolation refused the `git init` call outright."* That is scoped wrong and is corrected here by addition,
+not by editing that bullet: the refusal is for git operations targeting a path **outside** this
+worktree — confirmed by every git command in §(1)/§(2)/§(4) above succeeding when it targeted paths
+inside the worktree (`D:/Project/lean-flow/.claude/worktrees/agent-ae5cbd0f4ab7d75b1/…`), and by the
+independent reviewer building a working must-FAIL fixture **inside** the worktree for the discrimination
+proof cited at the top of this addendum. It is not a standing limit on building fixtures in future
+Rounds — only on placing them outside this worktree's own tree.
+
+**Caveats on this addendum itself.**
+- Sample A's duration is filesystem-timestamp-derived, not a `time`-wrapped measurement — weaker than
+  sample B and than the coordinator's own two figures, which is why it is corroborating evidence for the
+  light-load row rather than a primary figure in its own right.
+- Neither session sample isolates exactly what else was running at the moment each was taken; "five
+  concurrent worktree agents" is the coordinator's own report of the window, not independently measured
+  by this session.
+- This addendum does not re-run the gate a third time (instructed not to — contention with the same
+  concurrent agents would not produce a cleaner number, only a third truncated or near-truncated one).
