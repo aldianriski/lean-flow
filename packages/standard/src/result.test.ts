@@ -59,4 +59,36 @@ describe("exitCodeFor — mirrors the Shell oracle's `exit $fail`", () => {
     };
     expect(exitCodeFor(result)).toBe(1);
   });
+
+  // SPRINT-091 T4: `hold` joins the Verdict union (level.ts's full-run arithmetic). Mirrors `hold()`
+  // in scripts/lib/conformance-engine.sh, which does NOT set `fail=1` either -- a hold is a level
+  // honestly reached and not exceeded (§14, §13c), never a defect, so it must never move the exit
+  // code -- the DoD 2 distinction ("hold is distinguished from fail, never collapsed") proven at the
+  // exit-code layer, alongside level.test.ts's proof at the level-arithmetic layer.
+  test("a hold verdict never fails the run on its own -- distinguished from fail (DoD 2)", () => {
+    const result: ConformanceResult = {
+      evaluations: [{ ruleId: RID, verdict: "hold", findings: [], detail: "attestation-absent" }],
+    };
+    expect(exitCodeFor(result)).toBe(0);
+  });
+
+  test("a hold alongside passes still exits zero -- only `fail` moves the exit code", () => {
+    const result: ConformanceResult = {
+      evaluations: [
+        { ruleId: RID, verdict: "pass", findings: [], detail: "ok" },
+        { ruleId: RID, verdict: "hold", findings: [], detail: "attestation-absent" },
+      ],
+    };
+    expect(exitCodeFor(result)).toBe(0);
+  });
+
+  test("a hold does not mask a real fail elsewhere in the same run -- and a fail does not read back as a hold", () => {
+    const result: ConformanceResult = {
+      evaluations: [
+        { ruleId: RID, verdict: "hold", findings: [], detail: "attestation-absent" },
+        { ruleId: RID, verdict: "fail", findings: [{ name: "x", detail: "d" }], detail: "d" },
+      ],
+    };
+    expect(exitCodeFor(result)).toBe(1);
+  });
 });

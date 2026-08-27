@@ -32,7 +32,14 @@
 // the id and both families' positions in the list -- the moment two claim the same id.
 //
 // --- what this deliberately does NOT do --------------------------------------------------------------
-// No level arithmetic and no hold semantics -- EPIC-014 H12 splits that to T4 on purpose (SPRINT-087's
+// No level arithmetic and no hold semantics HERE -- SPRINT-091 T4 landed both in `./level.ts`, on a
+// SEPARATE `FullRunReport` produced only by an explicit `attachLevel(rules, report)` call.
+// `TraversalReport` must stay level-free, and that is a HARDER constraint now than when T3 wrote this
+// file: SPRINT-091 T9 rerouted the CLI's `--section` off `section.ts`'s `SectionReport` onto
+// `classifyAll`, so a PARTIAL invocation returns THIS shape too. A level field added here would be
+// inherited by `--section` and would publish a whole-spec level for a run that checked one section --
+// breaking SPRINT-087's frozen-result property and T9's DoD 3 at once, while passing every test either
+// task wrote. Do not add one; give a new result type the field instead, as `level.ts` does. (SPRINT-087's
 // own lesson: code that PRODUCES a verdict gets forgotten because its output looks like data rather
 // than a claim). `classify.ts`'s existing verdict vocabulary (`pass`/`fail`/`note`/`gap`) passes
 // through untouched. `TraversalReport` mirrors `section.ts`'s `SectionReport` for the same reason its

@@ -6,17 +6,24 @@
 // string leak (a `node:`/`bun:` import, or reaching for `process.argv`) fails it.
 //
 // `Verdict` mirrors the Shell oracle's own vocabulary (scripts/lib/conformance-engine.sh's
-// `ok`/`bad`/`note`/`gap`) rather than inventing new states. `hold` exists in the Shell engine too
-// (SPRINT-078) but no evaluator in this package needs it yet -- adding a state nothing produces would
-// be exactly the untested-branch trap CLAUDE.md warns against (a guard keyed to a shape the system
-// never emits). `gap` is the SPRINT-087 T2 exception: `classify.ts`'s classification of an unregistered
-// `mechanical`/`split` rule DOES produce it now (mirroring `gap()`'s own `rule-unimplemented`), so it
-// stops being a shape nothing emits and starts being one this package must report -- never silently
-// as an empty pass, which is the exact false-assurance T2 exists to refuse.
+// `ok`/`bad`/`note`/`gap`/`hold`) rather than inventing new states. `gap` is the SPRINT-087 T2
+// exception: `classify.ts`'s classification of an unregistered `mechanical`/`split` rule DOES produce
+// it now (mirroring `gap()`'s own `rule-unimplemented`), so it stops being a shape nothing emits and
+// starts being one this package must report -- never silently as an empty pass, which is the exact
+// false-assurance T2 exists to refuse.
+//
+// `hold` joins the union at SPRINT-091 T4 (EPIC-014 H12, full-run level arithmetic): `level.ts`'s
+// ladder must bucket a held rule by level exactly as Shell's own `hold()` does (last_hold=1, never
+// last_bad=1 -- SPRINT-078), so the arithmetic that CONSUMES this verdict needs it to exist even
+// though no EVALUATOR in this package emits it yet (§13's migration is out of this sprint's scope).
+// That is not the untested-branch trap the comment above used to warn against: the branch IS
+// exercised, in `level.test.ts`, against outcomes the Shell oracle is independently spawned to
+// confirm on a real repository (T4's own DoD 1) -- the thing missing is a PRODUCER, not a CONSUMER
+// or a test.
 
 import type { RuleId } from "./model.ts";
 
-export type Verdict = "pass" | "fail" | "note" | "gap";
+export type Verdict = "pass" | "fail" | "note" | "gap" | "hold";
 
 /** A named, human-readable finding -- what an evaluation points at when it is not a clean pass. */
 export interface Finding {
@@ -52,9 +59,11 @@ export interface ConformanceResult {
 
 /**
  * Mirrors the Shell oracle's own exit meaning (scripts/lib/conformance-engine.sh: `bad()` sets
- * `fail=1`, `gap()` does not, `exit $fail` at the end) -- any `fail` verdict makes the run exit
- * non-zero; `pass`/`note`/`gap` never do, on their own. A GAP is a statement about this engine's own
- * coverage, not a finding about the repository, so it must never move the exit code (§14).
+ * `fail=1`, `gap()`/`hold()` do not, `exit $fail` at the end) -- any `fail` verdict makes the run exit
+ * non-zero; `pass`/`note`/`gap`/`hold` never do, on their own. A GAP is a statement about this
+ * engine's own coverage, not a finding about the repository, so it must never move the exit code
+ * (§14). A HOLD is a level honestly reached and not exceeded, not a defect (§14, §13c) -- distinct
+ * from `fail` in this exact way, never collapsed into it (SPRINT-091 T4 DoD 2).
  */
 export function exitCodeFor(result: ConformanceResult): number {
   return result.evaluations.some((e) => e.verdict === "fail") ? 1 : 0;
