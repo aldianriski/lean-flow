@@ -173,6 +173,50 @@ status: current
 > serve better than four separate fixes, which is a decomposition question for the owner rather than a
 > sweep ruling.
 
+- **TD-117** severity: **high** | status: open | created: Sprint-091
+  - Summary: **Under concurrent load the gate exceeds its own 450s budget, SKIPS six eval harnesses, and
+    reports a FAIL — so the practice this repo mandates for Tier G review degrades the gate that
+    validates it.** `scripts/qa-check.sh:27` sets `QA_BUDGET_SECONDS=${QA_BUDGET_SECONDS:-450}` (600s
+    ceiling − 150s headroom, TD-091). Past it, the run stops and names what it skipped.
+  - Evidence (2026-08-27, same commit, clean tree, two independent observers):
+
+    | Condition | Wall | Budget checkpoint | Verdict |
+    |---|---|---|---|
+    | idle | 387.97s / 408.86s | not reached | completes, all harnesses run |
+    | 5 concurrent worktree agents (coordinator) | 533s | 469s | `qa-check-budget-exceeded`, **6 harnesses skipped** |
+    | concurrent agents (T2 builder, independently) | 499s | 460s | same, same harness, 6 skipped |
+
+    Both truncations tripped at the *same* harness (`run-s2-placement-fixtures.sh`) and skipped the same
+    six, including `run-verify-reaches-fixtures.sh` and `run-qa-budget-fixtures.sh`.
+  - **Why `high`, and why it is not the same row as TD-113.** TD-113 is about a *fresh worktree*
+    (line endings, absent `node_modules/`); this is the **main tree** under CPU contention, and the fix
+    is different — a budget/parallelism policy, not `.gitattributes` or a toolchain install. What makes
+    it `high` is the interaction: CLAUDE.md **requires** every Tier G change to get an outside reviewer
+    dispatched worktree-isolated (L-168), and this sprint ran up to five such agents at once. The
+    mandated practice is itself what pushes the gate over its budget.
+  - **The failure mode is coverage reduction that reads as a single FAIL.** The run is not silent — it
+    names each skipped harness — but the verdict line says `N pass, 1 fail`, and a reader who has been
+    told to expect known false FAILs (TD-113) has every reason to skim past it. That is the documented
+    path by which a real failure gets waved through.
+  - Also note the *unloaded* figure is already 388–409s against a 450s budget — **86–91% of ceiling
+    before any contention**. Every family EPIC-014 migrates adds gate work before it removes any, so
+    this trips more often, not less, until the conversion lands.
+  - Fix direction (not a ruling): cap dispatch concurrency when a gate run is expected; or raise the
+    budget with the ceiling raised to match; or make the skipped-harness list its own named FAIL
+    distinct from a real check failure, so truncation can never be read as one red check.
+
+- **TD-118** severity: minor | status: open | created: Sprint-091
+  - Summary: **`S4.NEGATIVE` is a bare substring match for "negative" in both engines**, so an ADR whose
+    Consequences say *"no negatives identified"* — the exact thing the rule exists to catch — PASSES.
+  - `packages/standard/src/rules/s4-negative.ts` uses `/negative/i.test(body)`; `conformance-engine.sh`
+    uses `grep -qi 'negative'`. Found by the SPRINT-091 T6 reviewer, which also confirmed by test that
+    **both engines behave identically here** — so it is *not* a parity defect and did not block T6.
+  - It is L-108's shape living inside a rule rather than inside a query: a substring standing in for a
+    claim about meaning. Fixing it is a **§4 semantics** change, not a migration task — it would alter
+    what the rule accepts on real repositories and therefore needs a ruling under ADR-034's frozen
+    surface, exactly as the `ADR-001-.md` empty-slug divergence did.
+  - Route it whenever §4 semantics are next opened; do not fold it into a migration task.
+
 - **TD-115** severity: medium | status: open | created: Sprint-091
   - Summary: **`attachLevel(rules, report)` will happily attach a whole-spec conformance level to a
     PARTIAL run.** It checks only `rules.length === outcomes.length`; nothing establishes that

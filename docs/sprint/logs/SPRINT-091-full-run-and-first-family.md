@@ -911,3 +911,63 @@ T6=4 T11=4 · T5=5 T7=5`.
 second time. The distinction remains that the split was made at the T7/T8 seam over *engine* work,
 while T9, T10 and T11 are each small consequences of work already done — but the honest reading is that
 this sprint has re-expanded to its pre-split size, and the owner should know that without counting.
+
+### 2026-08-27 | progress | T2 complete — Round 12 re-derives the ratio, and the denominator went stale under us
+
+consequence · T2 · behaviour:none · governance:high — review: independent-adversarial, worktree-isolated
+
+**T2's two struck DoD are re-derived and ticked.** The headline moved a long way: **2.34×–3.44×**, not
+the struck 7.3–8.6×. Round 10 measured Shell's real work against TS's no-op; Round 12 measured real work
+against real work, on the comparand the owner ruled (`--section 12`, the invocation T2's own frozen Plan
+names), which T9 made valid.
+
+**The method held this time, and the ordering is what made it hold.** Verdicts were diffed *before*
+anything was timed — 12/12 §12 rules agreeing against a live-spawned oracle — and the required second
+query (an independent grep for candidate secret/backup/design shapes, returning only the rules' own
+source files) is what separates a genuine "0 examined" from the masked no-op that killed Round 10. **The
+reviewer then closed Round 12's own remaining gap** by building a real must-FAIL fixture: all four
+mechanical rules FAIL on *both* engines with byte-identical finding names and paths, TS still faster
+(1.38–2.89×). The ratio is not measuring emptiness.
+
+**The T3 reviewer's prediction was right, and T2 confirmed it against its own incentive.** TS pays **12**
+git spawns to Shell's **5** — `FsGitBoundaryPort.isGitRepo()` runs twice per rule, uncached, while Shell
+memoised its probe in `298c1e1`. Measured with `GIT_TRACE` to a file path (`GIT_TRACE=1` is silenced by
+`isGitRepo()`'s `stdio:["ignore",…]`), cross-checked against a source-reading prediction made *before*
+running, agreeing exactly on both sides. TS wins **despite** paying 2.4× the spawns — which strengthens
+the finding rather than eroding it, and flags real forward cost for families still to migrate.
+
+**L-130 fired at execution, which is the half of that rule that usually goes unpaid.** Round 12's
+percentage rested on a 288–331 s gate inherited from Rounds 8/9. The reviewer measured **387.97 s** and
+**408.86 s**. So the saving is **≈2.3–3.5%**, not "roughly 3–5%". The figure was correct when written and
+wrong by the time it was acted on — nobody mis-derived anything.
+
+**Then it got worse, and the worse version is the useful one.** Measuring the denominator, the
+coordinator's own run **truncated**: `FAIL qa-check-budget-exceeded: 469s elapsed exceeds the 450s
+default-profile budget`, six eval harnesses skipped, 533 s wall. The T2 builder independently reproduced
+it — 460 s / 499 s, **same harness**, same six skipped. Cause: five worktree-isolated agents running
+concurrently, which is *this coordinator's own orchestration*. Three earlier runs on the same tree read
+`217 pass, 0 fail` with **zero** skips (verified by grepping each saved output), so every commit this
+session was gated against a complete run.
+
+**The conclusion Round 12 now carries: "the gate takes N seconds" is not well-defined without stating
+host load, and past a threshold the number stops meaning anything because the run truncates rather than
+finishing.** The **saving in seconds (9.5–13.6 s) is the primary result** because it is load-independent;
+the percentage appears only beside its denominator and its load condition. A bare "roughly N%" is exactly
+the shape that goes stale and gets acted on later by someone who cannot re-derive it. **Filed as TD-117
+(high)** — the interaction is that CLAUDE.md *requires* worktree-isolated Tier G review, and that
+mandated practice is what pushes the gate over its own budget. Unloaded it already sits at 86–91% of
+ceiling.
+
+**A1 is corrected, not merely confirmed — its own baseline was wrong.** A1 read *"materially cheaper per
+invocation than the **8.5 s** Shell spawn."* Traced to Round 7, 8.5 s is the engine against the *full
+~100-row bundled spec on a near-empty target* — a fixed per-row dispatch cost. **No invocation on the
+conversion path has that shape:** the ADR-family harness's own guard enforces exactly 7 `S4.*` rows per
+call, and real conversion-path costs are 1.46–1.56 s (Round 10) and 1.08–1.20 s (Round 12) — **6–8×
+smaller than the number the assumption rested on.** A1's correct comparand is ~1.1–1.6 s. Recorded rather
+than quietly re-scoped, because the premise was itself a query result nobody re-derived — L-130 one level
+*above* the failure T2 was written to prevent.
+
+**TD-118** also filed: `S4.NEGATIVE` is a bare substring match for "negative" in *both* engines, so an ADR
+saying "no negatives identified" passes. The engines **agree**, so it is not a parity defect and did not
+block T6 — it is L-108's shape living inside a rule rather than inside a query, and changing it is a §4
+semantics ruling under ADR-034, not a migration task.

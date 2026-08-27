@@ -57,7 +57,7 @@ TypeScript, so this is the floor they stand on, not a cleanup.
 ### T2 — Derive the conversion's real headroom `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `docs/research/logs/qa-gate-timing.md`
 Depends-on: T3, T9
-Cites: TD-090 · qa-gate-timing Rounds 5–8 · L-130 · `conformance-engine.sh` `scripts/lib/conformance-engine.sh` (timed as the Shell comparand, never modified) · `S9.LOGDIR`
+Cites: TD-090 · qa-gate-timing Rounds 5–8 · L-130 · `conformance-engine.sh` `scripts/lib/conformance-engine.sh` (timed as the Shell comparand, never modified) · `S9.LOGDIR` · `S12.GENERATED` (rule ids named in evidence; file-shaped to the layers parser)
 Tier **G**. No later DoD may carry a performance number that does not trace to this Round. The claim
 that a TS in-process traversal costs ~ms where the Shell spawn costs 8.5s is **unmeasured**, and
 freezing an estimate into an acceptance threshold is the failure L-130 records.
@@ -66,8 +66,8 @@ freezing an estimate into an acceptance threshold is the failure L-130 records.
 
 **DoD:**
 - [x] The ADR-family harness's cost is split between git-repo construction and engine invocation — ✓ **survives independent review**: the reviewer re-implemented the instrumentation with a differently-built timer and measured engine share at **89.6%** and **88.2%** (12 PASS / 0 FAIL both runs), corroborating direction and magnitude. Read as a magnitude, not a percentage to the point — Round 11 records that wrapper overhead (~0.77–1.03s of `date` forks) is unquantified and `non-engine` is derived by subtraction
-- [ ] A TS-vs-Shell per-invocation comparison on one fixture target — **STRUCK by review, not met.** The TS CLI wires `createBuiltInRegistry()`, which registers only `S9.LOGDIR`; the F12 registry is never connected, so `--section 12` emits `rule-unimplemented` gaps for all four mechanical rules. The measured 141–161ms was spec-parse plus stub prints — **Shell's real work against TS's no-op**, not a ratio. The agreement check that should have caught it counted `S12.` lines, which both engines print per row regardless of verdict (L-108). **Blocked on T3**, which wires real dispatch; re-derivation must diff per-rule verdicts before timing anything (Round 11)
-- [ ] The derived ceiling is stated as a **range, not a point** — **STRUCK, not met.** The arithmetic and range construction were sound (extremes correctly paired for a quotient), but the input was the invalid ratio above, so 4.3–4.9s / ≈15–17s / "roughly 5%" are all withdrawn. **No SPRINT-092 acceptance criterion may cite a conversion saving until this is re-derived** — this is L-130 caught one step before it froze
+- [x] A TS-vs-Shell per-invocation comparison on one fixture target — ✓ **re-derived in Round 12 after the strike, on the comparand the owner ruled** (`--section 12`, the invocation this Plan names, once T9 wired it for real). Method order was mandatory and honoured: **verdicts before timing** — 12/12 §12 rules agree against a live-spawned `scripts/lib/conformance-engine.sh`, with an exact numeric match on `S12.GENERATED`; the required second query (an independent grep for candidate secret/backup/design shapes, returning only the rules' own source files) established that "0 examined" is a genuine empty result rather than the masked no-op that killed Round 10. **The reviewer went further and closed Round 12's own gap**: a real must-FAIL fixture makes all four mechanical rules FAIL on *both* engines with byte-identical finding names and paths, and TS stays faster throughout (1.38–2.89×) — so the ratio is not measuring emptiness. Measured: TS 348–461 ms vs Shell 1080–1198 ms → **2.34×–3.44×**, roughly a third of the struck 7.3–8.6×
+- [x] The derived ceiling is stated as a **range, not a point** — ✓ harness 19.9–21.0 s → **7.4–10.4 s**, saving **9.5–13.6 s**, extremes correctly paired at every step (re-derived independently by the reviewer to the decimal). **The percentage was caught stale at execution and is now conditional, not a headline.** Round 12 first cited a 288–331 s gate from Rounds 8/9; the reviewer measured **387.97 s / 408.86 s**, and the coordinator and builder each independently reproduced a *truncation* under concurrent load (469 s→533 s and 460 s→499 s, both hitting the 450 s budget at the same harness and skipping six). So: the **saving in seconds is the primary, load-independent figure**; the percentage is **≈2.3–3.5%** and is stated only beside its denominator and load condition, because a bare "roughly N%" is exactly the shape that goes stale and gets acted on by someone who cannot re-derive it (L-130, caught at execution rather than at authoring)
 - [x] Caveats recorded, including sample counts — ✓ three samples per figure in Round 10; Round 11 adds the ones Round 10 missed (unquantified wrapper overhead, `non-engine` as a subtraction, and the corrected "unchanged bytes" claim — `conformance-engine.sh` changed twice in the window, including a **perf** commit, so the Round 7 → Round 10 delta is not attributable to the host)
 
 <!-- T2 carries NO mechanical criterion, and that is declared rather than disguised (G2 reachability).
@@ -261,8 +261,18 @@ touched.
 
 ## Assumptions
 
-- **A1** — A TS in-process traversal is materially cheaper per invocation than the 8.5s Shell spawn.
-  **UNMEASURED.** *Confirm: T2, before any later DoD carries a number (L-130).*
+- **A1** — A TS in-process traversal is materially cheaper per invocation than the Shell spawn.
+  **CONFIRMED — but NARROWER than this line was written, and its own baseline was wrong.** Round 12 +
+  addendum: on the same target with both engines dispatching real work, TS costs 348–461 ms against
+  Shell's 1080–1198 ms — **2.34×–3.44×**, extremes paired for a quotient. Materially cheaper, yes;
+  an order of magnitude, no. **The "8.5s Shell spawn" this line originally named does not exist on the
+  conversion path** — traced to Round 7, it is the engine against the *full ~100-row bundled spec on a
+  near-empty target*, a fixed per-row dispatch cost. The ADR-family harness never uses that shape: its
+  own guard enforces exactly 7 `S4.*` rows per call, and the real conversion-path costs are 1.46–1.56 s
+  (Round 10) and 1.08–1.20 s (Round 12) — **6–8× smaller than the figure this assumption was resting
+  on.** A1's correct Shell comparand is ~1.1–1.6 s. Recorded rather than quietly re-scoped: the premise
+  was a query result nobody re-derived, which is the L-130 failure one level above the one T2 was
+  written to prevent. *Confirmed: T2 Round 12 + addendum.*
 - **A2** — 74% of leg 12 (295.9s of 400.7s) is harnesses spawning the Shell engine. *Confirm: Round 7's
   per-harness sweep plus the intake attribution query, which agreed. Re-confirmation belonged to T11 and
   left with the split — it is re-declared in SPRINT-092, not silently dropped.*
