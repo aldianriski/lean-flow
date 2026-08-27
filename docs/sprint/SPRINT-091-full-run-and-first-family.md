@@ -39,7 +39,7 @@ QA severity/profiles/scheduler (H15–H20) · the binary build (H22) · authorit
 ## Plan
 
 ### T1 — Wire a type checker into the gate `[size: S · risk: med · class: execution · HITL · J1]`
-Layers: package.json · scripts/qa-check.sh · tsconfig
+Layers: package.json · scripts/qa-check.sh · tsconfig.base.json · bun.lock · docs/adr/ADR-037-dev-only-type-checker-admitted.md · docs/adr/ADR-035-typescript-bun-reference-engine.md · docs/DECISIONS.md · docs/knowledge-index.md
 Depends-on: none
 Cites: TD-101 · EPIC-014 D4 · L-105
 Tier **G**. The repo states guarantees as "enforced by a TYPE" while no automated path evaluates one —
@@ -148,7 +148,7 @@ the system emits is an absent guard that clears every proof above it.
 - [ ] The shallow-clone branch is pointed at the artifact that motivated it and shown REACHABLE — *Verify: not merely working on a fixture (L-166)*
 
 ### T8 — Bring the TypeScript tree to zero type errors `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: packages/standard/src/tokenizer.ts · packages/standard/src · apps/cli/src
+Layers: packages/standard/src/tokenizer.ts · packages/standard/src/tokenizer.test.ts · packages/standard/src/spec-reader.ts · packages/standard/src/spec-reader.test.ts · packages/standard/src/section.test.ts · packages/standard/src/model.test.ts · packages/standard/src/rules/git-boundary-spec.ts · packages/standard/src/rules/git-boundary-port.fake.ts · apps/cli/src/main.test.ts · apps/cli/src/spec-file-reader.test.ts
 Depends-on: T1
 Cites: TD-101 · ADR-037 · SPRINT-085 (the branded `RuleId` guarantee) · L-120
 Tier **G**. **Runs at wave 1, despite sitting last in this file** — it is numbered T8 because every

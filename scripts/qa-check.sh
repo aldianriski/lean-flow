@@ -767,6 +767,36 @@ PLANEOF
   check_block
 done
 
+# --- 11b. TypeScript type check (TD-101, ADR-037) --------------------------------------------
+# ADR-035 deferred type checking with a consumer-facing rationale; ADR-037 amends that clause --
+# zero-dependency binds what a CONSUMER runs, not what a maintainer checks with -- and admits a
+# dev-only, gitignored checker. Until this leg existed, every guarantee this repo states as
+# "enforced by a TYPE" was enforced only in an editor: bun strips types without checking them, so
+# 266 tests passed green on a tree carrying 59 real type errors (TD-101, SPRINT-091 T8).
+#
+# Placed BEFORE leg 12 deliberately. Leg 12 is the gate's dominant cost (TD-090); a type error
+# should surface in ~0.2s rather than after five minutes of eval harnesses.
+#
+# An absent toolchain FAILS, it does not skip. A check that silently passes when its checker is
+# missing is indistinguishable from a passing check and is the exact defect TD-101 names -- an
+# absent guard wearing the shape of a present one (L-105 - L-058). ADR-037 rejects the no-op
+# variant in writing, so this branch is the ADR's decision expressed as code.
+#
+# tsc's OWN exit status is read from a command substitution, never through a pipe -- a pipe would
+# hand back the pipe's status and this leg would report the wrong verdict while looking correct
+# (L-120). The error count is re-derived from tsc's own output so the verdict line carries it.
+if [ ! -x node_modules/.bin/tsc ] && [ ! -f node_modules/.bin/tsc ]; then
+  bad "typecheck: no type checker at node_modules/.bin/tsc -- run 'bun install'. This FAILS rather than skipping on purpose: a skip is indistinguishable from a pass, which is the defect this leg exists to remove (TD-101 - ADR-037)"
+else
+  tsc_out=$(node_modules/.bin/tsc --noEmit 2>&1); tsc_code=$?
+  tsc_errs=$(printf '%s\n' "$tsc_out" | grep -cE 'error TS')
+  if [ "$tsc_code" -eq 0 ]; then
+    ok "typecheck: tsc --noEmit clean (0 errors)"
+  else
+    bad "typecheck: tsc --noEmit exited $tsc_code with $tsc_errs error(s) -- first: $(printf '%s\n' "$tsc_out" | grep -m1 -E 'error TS')"
+  fi
+fi
+
 qb_checkpoint "leg 12: eval-harness preamble"
 # --- 12. Zero-API eval harnesses wired into the gate (TD-013, split TD-016/SPRINT-042 T4) ---
 # TD-012 retained fixtures + assertion scripts for shipped snippets/checks, but nothing ran them

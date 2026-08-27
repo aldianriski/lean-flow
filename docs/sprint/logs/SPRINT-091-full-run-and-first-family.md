@@ -290,3 +290,49 @@ nothing, which is the correct failure mode.
 **Still true, and still the point:** `bun test` reported 266 pass / 0 fail *before* any of this, on the
 tree carrying all 59 errors. It reports 266 pass / 0 fail now. The suite could not tell the difference —
 which is the entire argument for the checker TD-101 asked for.
+
+### 2026-08-27 | progress | T1's gate leg is wired and proven; Layers corrected per L-100
+
+consequence · T1 · behaviour:material · governance:high
+
+**Leg 11b is in `scripts/qa-check.sh`**, placed before leg 12 on purpose: leg 12 is the gate's dominant
+cost (TD-090), so a type error should surface in ~0.2s rather than after five minutes of harnesses.
+Measured cost of the leg itself: **196–217 ms** across samples — TypeScript 7's native compiler, which
+is why the figure is not the seconds ADR-037's trade-off paragraph anticipated. To be recorded in the
+timing log beside T2's Round, as ADR-037 requires.
+
+**An absent toolchain FAILS rather than skipping.** That branch is ADR-037's ruling expressed as code:
+a check that silently passes when its checker is missing is indistinguishable from a passing check, and
+is the exact defect TD-101 names. `tsc`'s own exit status is read from a command substitution, never
+through a pipe (L-120), and the error count is re-derived from its own output for the verdict line.
+
+**Proven live against the real gate, both directions.**
+- **Must-FAIL:** TD-101's recorded case seeded verbatim (`findings: "not an array"` against
+  `readonly Finding[]`, `detail: 42` against `string`). The gate printed
+  `FAIL typecheck: tsc --noEmit exited 1 with 3 error(s)` and its verdict line read
+  `QA-CHECK: 211 pass, 14 fail`. All three errors named, including a bonus catch — the branded `RuleId`
+  rejecting a bare string, which is TD-101's impact paragraph proven rather than argued.
+- **Sibling control:** seed removed, same gate run: `PASS typecheck: tsc --noEmit clean (0 errors)`.
+
+**`Layers:` corrected for T1 and T8, not defended (L-100).** `check-layers-observed.sh` named 16 files
+changed by tasks that never declared them — T8's ten (the test files, `spec-reader.ts`, the two
+`git-boundary` files) and T1's six (`bun.lock`, both ADRs, `DECISIONS.md`, `package.json`,
+`tsconfig.base.json`). A promote-time declaration cannot name files the implementation invents; the
+declarations now say what the work actually touched. Preflight re-run after the edit: **CLEAR**.
+
+**BLOCKED — 12 review-depth FAILs, and they are correct.** The gate reports, once per logged task:
+`review-depth-governance-absent … review was owed and silence is not a clean record`. Every entry in
+this log records `governance:high` and most record `behaviour:material`, and **no `review · Tn · …`
+line has ever been appended, because no review pass has been run.** The gate is right.
+
+The obstruction is a standing conflict, not an oversight. `.claude/CLAUDE.md` requires that **every
+Tier G change gets an outside reviewer, dispatched worktree-isolated** (L-165 ×2 · L-168), and
+`orchestrator` § Review routes governance-impact work to a scoped reviewer in a fresh isolated context.
+**This session operates under an instruction not to dispatch sub-agents unless the owner asks.** A
+self-review by the author is precisely what L-165 records as insufficient — across two sprints every
+guard defect was found by an independent pass and none by the author recalling the rule.
+
+**Unblock condition:** an owner decision on how review is obtained for this sprint's Tier G work.
+Recorded rather than worked around: ticking T1 with the gate red would be committing through a failing
+check, and appending a `review` line for a review that did not happen would be a false record of
+exactly the kind this log exists to prevent.
