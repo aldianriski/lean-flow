@@ -596,3 +596,92 @@ blocked re-measurement depends on it. It was also handed the design problem T3 a
 `GitBoundaryPort`, and DoD 3 forbids resolving that with a switch. `built-in.ts`'s own header predicted
 this seam and deferred it. The builder owns no sprint-file writes: it returns its Log entry in its
 report (SPRINT-063's two-copies failure), and the coordinator writes here.
+
+### 2026-08-27 | progress | T3 independently reviewed — three findings, and the gate disagreed with itself
+
+review · T3 · independent-adversarial-reviewer (worktree-isolated) · behaviour:high · governance:high
+
+**All three DoD are substantively TRUE, re-derived independently rather than accepted.** The reviewer
+rebuilt the proofs rather than reading the builder's: it constructed the real row-by-row mark diff for
+all 100 rules against `read-spec-rules.sh` (0 mismatches) and against `conformance-engine.sh`'s own
+live-spawned mark annotations for the 55 rows carrying them (0 mismatches), and it performed DoD 2's
+seed-one-out live — which **the builder never actually did**, having tested only a rule that was
+already gapped. Three findings, one bounded retry fired.
+
+**Finding 1 — DoD 1's shipped proof is weaker than the DoD as written. CONFIRMED, and it is L-108 for
+the second time in this sprint.** The test compares aggregate mark-category **totals** parsed from
+Shell's `counts:` line, plus true per-rule verdicts for 6 of 100 rows. The reviewer built the
+counter-example and ran it: swap two rules between `implementation-directed` and `restated` and both
+assertions still pass while both rows are wrong. Round 11 struck Round 10 for exactly this — a count
+standing in for a claim about shape — and the coordinator's dispatch brief for T3 quoted that entry as
+ground truth. **The rule was loaded, correctly stated, and unfired, in the very task briefed on it.**
+The cheap oracle that gives the exact row-by-row answer (`read-spec-rules.sh`) is named in T3's own
+`Cites:` and went unused. L-165's content again: no author re-reading produced this; an independent
+pass did.
+
+**Finding 2 — the composed seam silently shadows a duplicate rule id. CONFIRMED design gap.**
+`composeFamilies` is first-family-wins with no collision detection — tested as behaviour, guarded
+nowhere. It is the single place in the diff that breaks this codebase's otherwise-universal
+name-yourself-loudly rule (`gap()` names itself; `BoundDispatcher.dispatch` throws rather than
+returning `undefined`). Scenario: during a strangler handoff F5 registers `S3.SCHEMA` while an
+earlier-listed family still holds it — the second evaluator becomes dead code forever, no test failure,
+no warning. **This seam is what F5 · F2 · F1 · F7 all plug into**, so it is closed now rather than
+after. Retried.
+
+**Finding 3 — ADR-023 is miscited, and the coordinator verified it independently.** `main.ts:246`
+cites ADR-023 for "the Standard ships beside the engine, never vendored". ADR-023 is *"CONTEXT.md
+becomes a consumer of the extracted spec"* — governance/docs, no such language. `grep -rl 'beside the
+engine\|vendored' docs/adr/` returns **nothing**. The same miscitation pre-exists at
+`spec-file-reader.ts:51` from SPRINT-087 T4 and was inherited, not introduced. Both fixed in the retry;
+recorded here so the pre-existing one is not silently swept up with T3's.
+
+**The gate disagreed with itself across an environment boundary — a new `high` debt row.** The reviewer
+reported `QA-CHECK: 213 pass, 1 fail` against the coordinator's `214 pass, 0 fail`, on the *same
+commit* and a clean tree. Both numbers are correct: `gen-index.sh --check` uses a byte-exact `cmp -s`,
+`.gitattributes` pins `*.sh eol=lf` but nothing for `*.md`, and `core.autocrlf=true` — so a **fresh
+worktree** materialises `docs/knowledge-index.md` as CRLF while regeneration always emits LF. `git
+diff` shows zero content difference. Neither file is touched by `4e5b320`. Filed **TD-113 (high)**: the
+population most exposed to this false FAIL is exactly the worktree-isolated Tier G reviewers whose job
+is to trust the gate. **This is L-067/L-081 — diff the environments before the code — and it was caught
+only because two numbers disagreed.** Also filed **TD-114 (medium)**: `run-foreign-repo-fixtures.sh`,
+the harness whose whole subject is a repo that has never seen lean-flow, never invokes the TS engine at
+all — L-166's shape, and the reason it surfaced is that it was the natural place to look for coverage
+of T3's foreign-repo fix.
+
+**REFUTED, and worth recording as refuted:** the `classify.ts` extraction is behaviour-preserving (the
+coordinator flagged it as an agrees-by-construction risk — the reviewer proved it independently, every
+branch textually unchanged); `sectionNumberOfRuleId` throws loudly on any id outside `^S(\d+)\.` and no
+id in the Standard breaks it; the gap text is genuinely NAMED, carrying both rule id and mark; and the
+`BUNDLED_SPEC_PATH` fix is correct and live-reachable, proved by revert-and-redden.
+
+**Held out of the retry deliberately, not forgotten:** `runSection()`/`--section`, `evals/`, and the
+`gen-index.sh` CRLF issue. A bounded retry is bounded; the first is a scope question (below), the other
+two are outside T3's `Layers:` and now carry debt rows.
+
+### 2026-08-27 | blocker | T2 is NOT unblocked by T3 — wave 3 must not assume it is
+
+**Round 11 recorded T2's re-derivation as "blocked on T3, which wires real dispatch." T3 has landed and
+T2 is still blocked.** T3 wired the **flagless** full run; `runSection()` is byte-for-byte unchanged and
+still hardcodes `createBuiltInRegistry()`, so `bun apps/cli/src/main.ts --section 12 <repo>` continues
+to emit `rule-unimplemented` for all four F12 rules. Verified live by the reviewer, not inferred.
+
+**Why this matters more than a leftover:** Round 10's struck measurement was taken specifically on
+`--section 12`. That comparand is *untouched*. **If T2 resumes on the invocation its own log names, it
+reproduces the struck defect a third time** — Shell's real work against TS's no-op, with a fresh set of
+numbers that look plausible.
+
+What T3 *did* deliver is a valid comparand of a different shape: the flagless run dispatches all five
+wired rules for real, confirmed live. So T2 is not blocked on capability any more — it is blocked on a
+**decision** T2 cannot take for itself: re-derive against the flagless full run (a different invocation
+shape than its own Plan text names, and one whose per-invocation cost includes traversing 95 rules it
+will gap), or extend `--section` to compose families the way the flagless path now does (~2 lines by
+the builder's estimate, but scope T3's DoD does not cover and the coordinator declined to widen at
+retry). Either way the re-derivation must diff **per-rule verdicts before timing anything**, and count
+git spawns on both sides — the reviewer's standing note that `FsGitBoundaryPort.trackedFiles()` calls
+`isGitRepo()` uncached still stands, and four real evaluators paying 8 git spawns against Shell's 4
+could erode much of the apparent win.
+
+**Surfaced to the owner rather than decided here.** T2 is `J1`, but its authority covers *executing*
+its Plan, not *rewriting which invocation its acceptance is measured on* — that is a scope change to a
+frozen DoD, which is HITL by ADR-021 and the L-088 rule against quietly reinterpreting a DoD execution
+invalidated. Wave 3 does not start until it is answered.

@@ -173,6 +173,48 @@ status: current
 > serve better than four separate fixes, which is a decomposition question for the owner rather than a
 > sweep ruling.
 
+- **TD-113** severity: **high** | status: open | created: Sprint-091
+  - Summary: **The repository gate FAILs in a fresh git worktree on a clean tree, for line endings
+    alone — and worktree-isolated dispatch is this repo's standing rule for every Tier G review.**
+    `scripts/gen-index.sh --check` compares with a raw `cmp -s`, which is byte-exact and therefore
+    line-ending sensitive. `.gitattributes` pins `*.sh eol=lf` but says nothing about `*.md`, and
+    `core.autocrlf=true` on this host, so a fresh checkout materialises `docs/knowledge-index.md` with
+    CRLF while `gen-index.sh` always regenerates it with LF. `cmp` sees a difference; `git diff` sees
+    **none**.
+  - Evidence (SPRINT-091 T3, 2026-08-27): the same commit `4e5b320`, same clean tree, two environments:
+
+    | Environment | Gate's own verdict line |
+    |---|---|
+    | main worktree | `QA-CHECK: 214 pass, 0 fail` |
+    | fresh `git worktree` checkout | `QA-CHECK: 213 pass, 1 fail` — `FAIL knowledge index STALE` |
+
+    Neither `docs/knowledge-index.md` nor `scripts/gen-index.sh` is touched by that commit. The
+    staleness is not real.
+  - **Why `high` rather than cosmetic.** CLAUDE.md requires every Tier G change to get an outside
+    reviewer *dispatched worktree-isolated* (L-168), and `references/night-run.md` dispatches the same
+    way. So the population most exposed to this false FAIL is precisely the reviewers whose job is to
+    trust the gate. A gate that reds on correct code in the environment it is most often read in
+    trains its readers to discount it — the failure mode L-058 names from the other direction.
+  - This is the L-067/L-081 family exactly: *when a check differs between two contexts, diff the
+    environments before the code.* It cost this sprint's reviewer a root-cause detour, and it was
+    caught only because the reviewer's number **disagreed** with the coordinator's.
+  - Fix direction (not a ruling): normalise before comparing, or pin `*.md eol=lf` in `.gitattributes`,
+    or have `--check` compare content rather than bytes. Whichever is chosen must be proven in a fresh
+    worktree, not in the main tree — the main tree is where it already passes.
+
+- **TD-114** severity: medium | status: open | created: Sprint-091
+  - Summary: **`evals/run-foreign-repo-fixtures.sh` — the harness whose entire subject is "a repo that
+    has never seen lean-flow" — never invokes the TypeScript engine at all.** It spawns only Shell.
+  - Found by the SPRINT-091 T3 reviewer while testing whether that harness reached T3's
+    `FsGitBoundaryPort`/`BUNDLED_SPEC_PATH` fix. It does not and cannot: grepping the harness for
+    `leanflow`, `apps/cli` and `bun run` returns nothing.
+  - **The shape is L-166's.** The fix T3 made is exactly the foreign-repo case — an arbitrary target
+    repo has no `spec/STANDARD.md` of its own — and the harness named for that case is structurally
+    unable to examine it. A guard pointed at a shape the system never hands it is an absent guard that
+    still reports green, and its name is what makes it look covered.
+  - Consequence today is bounded: Shell holds authority (SPRINT-091 D3), so the harness is not *wrong*
+    about the engine that currently answers. It becomes load-bearing the moment TS takes any authority
+    — which is EPIC-014's whole direction. Route it before a cutover, not after.
 - **TD-106** severity: medium | status: open | created: Sprint-088
   - Summary: **`check-verify-reaches.sh` reports a script that exists as absent, because it tests the
     name it extracted as a literal path from the repo root.** Line 89 is `if [ ! -f "$scr" ]`, so a
