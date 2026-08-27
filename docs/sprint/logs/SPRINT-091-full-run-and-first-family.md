@@ -820,3 +820,94 @@ checker` on code that `bunx tsc --noEmit` compiles clean. Its gate read `212 pas
 main tree's `216 pass, 0 fail`, with **none** of the four attributable to its diff. The pair is worse
 than either alone: a reviewer already told to expect one known false FAIL will read the second as more
 of the same, which is precisely how a real failure gets waved through.
+
+### 2026-08-27 | progress | T4 and T9 complete and reviewed; the T9 suite was blind and now discriminates
+
+consequence · T4 · behaviour:high · governance:high — review: independent-adversarial, worktree-isolated
+consequence · T9 · behaviour:high · governance:high — review: independent-adversarial, worktree-isolated
+
+**T9's review found the sprint's most important defect so far, and it was invisible to everything.** It
+seeded Round 11's exact struck bug back into `runSection` — `createBuiltInRegistry()` alone, F12
+unregistered — and ran the suite: **55/55 passed.** The committed tests were blind to a re-introduction
+of the very defect T9 exists to remove. That bug has now surfaced **four times in one sprint** (Round
+10's measurement · Round 11 striking it · T3 leaving `--section` behind · T9 fixing it) and nothing
+would have stopped a fifth. This is CLAUDE.md's Tier G rule — *a suite that goes green on its first run
+has not been shown to discriminate* — failing on the single most safety-critical line in the task.
+
+Closed under the bounded retry: five tests driven through the CLI path, a PASS-loop over all four F12
+rules plus **one retained must-FAIL fixture per rule** (a committed `.env` secret · a real `pg_dump`
+preamble · a `.psd` outside the asset dirs · a tracked `dist/` artifact), every assertion a per-rule
+**verdict word matched by shape** against a live-spawned oracle — never a count, never an
+`rule-unimplemented`-absence substring check, which is the L-108 shape that started this whole chain.
+
+**The discrimination was reproduced by the coordinator in the main tree rather than accepted on
+report** — the finding was precisely that a suite can report green while blind, so a report saying "it
+reddens" is the one claim that cannot be taken on trust. Seeded content-anchored:
+`9c2c35deb9a8…` → `84e48abc9221…` (325 → 325 lines, `tsc --noEmit` exit 0) → restored `9c2c35deb9a8…`,
+equal to `git rev-parse HEAD:apps/cli/src/main.ts`; one convention throughout. Under the seed: **55
+pass, 5 fail**, exactly the five new tests naming themselves, every pre-existing test green including
+all `--section 9` / S9.LOGDIR controls.
+
+**A near-miss worth recording against the coordinator.** The first seed attempt addressed the dispatch
+line by **number** and destroyed the `const rules` declaration above it. `tsc` rejected it — so L-142's
+requirement that *a seeded artifact must still parse* is what caught it. That is the **second**
+line-number-addressing defect this sprint, both committed by the coordinator, the first having
+corrupted this Plan's own `**DoD:**` header. The guard that saves it is a different guard each time;
+the defect is the addressing mode.
+
+**T4's review: two confirmed findings, neither blocking, both routed.**
+
+- **Finding C → carried into T11.** Three ternary chains in `apps/cli/src/main.ts` render a verdict and
+  fall through anything that is not `fail`/`pass`(/`gap`) to the literal `note `. `hold` joined
+  `Verdict` in T4, so the moment any evaluator emits one it prints **identically to a plain note** —
+  destroying the hold-vs-fail distinction T4's DoD 2 exists to protect, in the one place a human reads
+  it. `exitCodeFor` and `classify.ts` are both correct; it is the untouched consumer that is wrong
+  (L-166's shape). Zero test coverage for a hold verdict today.
+- **Finding D → TD-115.** `attachLevel` checks only `rules.length === outcomes.length`, so it will
+  level a *partial* run; `level.test.ts` itself calls it with a one-rule subset. The hazard the module
+  header actually worried about is genuinely closed, but its claim of being "structurally unreachable"
+  overstates the guarantee: unguarded by **convention**, not by construction — the exact distinction
+  `section.ts`'s header insists on. Filed rather than silently ticked.
+- **REFUTED, and worth recording as refuted:** the ladder port is faithful — the reviewer diffed
+  `computeLevel`'s six rungs against `conformance-engine.sh` lines 3098–3115 and found rung order and
+  level strings an exact match; and the "1 of 25 tests reddened" figure is not thin — the reviewer
+  seeded a *second*, more aggressive wrong ordering that reddened 3 of 25, showing the suite is not
+  discriminating by luck on one design.
+
+**TD-116** also filed: every F12 finding sub-line prints its own name twice (`- secret-committed:
+secret-committed: …`). Pre-existing, reproduces through the flagless run, cosmetic — but this epic's
+parity verification compares **reason text**, not just verdict words, so it is noise inside the signal
+later differentials read.
+
+### 2026-08-27 | scope-change | owner ruled T11 in, and T4's HOLD case accepted as weaker-than-written
+
+**Two questions surfaced to the owner as one frontier round; both answered.**
+
+**(1) T4's level arithmetic is half-shipped.** `attachLevel` matches Shell but **nothing calls it** —
+the reviewer confirmed zero non-test references outside `packages/standard/src/`, and `runFull()`, the
+flagless run the capability targets, never imports `level.ts`. So `leanflow <repo-dir>` prints no level
+at all. That is L-020 verbatim: *a behaviour written only in its own file is half-shipped*. T4 did not
+err — `apps/cli/src/` was T9's for the whole of wave 3, and T4 was explicitly forbidden it. That
+constraint is now gone. **Owner ruling: add T11 and wire it this sprint**, rather than defer to
+SPRINT-092 or file it as debt — a debt row for something one small task finishes now is how the
+spec-only-debt trap (TD-001 · L-007) starts. T11 also carries finding C, because it is the same file.
+
+**(2) T4's HOLD evidence.** DoD 1 asks for a differential "including at least one HOLD case". No
+registered evaluator produces a `hold` — independently re-verified across S9.LOGDIR and all four F12
+rules — so the HOLD case's TS side is hand-built to match Shell's live `level: Gated`. The reviewer's
+judgment, which the owner accepted: this is **the DoD's own wording promising something unsatisfiable
+until a §13 evaluator lands**, not a builder shortfall. **Owner ruling: accept, ticked with the
+limitation written into the DoD text itself** — the same treatment T3's struck totals check got. The
+alternatives were an amended DoD, or holding T4 until a §13 evaluator exists, which would defer T4 out
+of the sprint entirely for a criterion nothing in scope can satisfy.
+
+**Impact on the frozen Plan:** T11 added (`Layers: apps/cli/src/`, `Depends-on: T4, T9`); **T5 gains
+`Depends-on: T11`**, because T5, T9 and T11 all declare `apps/cli/src/` and would otherwise share it
+with no ordering — the unowned-overlap hazard, the same reason T9's own edges were added. Preflight
+re-run, never re-read from prose: `PREFLIGHT: CLEAR`, waves `T1=0 T8=1 T3=2 · T4=3 T9=3 T10=3 · T2=4
+T6=4 T11=4 · T5=5 T7=5`.
+
+**Task count is now 11 — exactly the size G1 sized `L` and split.** Stated rather than glossed, for the
+second time. The distinction remains that the split was made at the T7/T8 seam over *engine* work,
+while T9, T10 and T11 are each small consequences of work already done — but the honest reading is that
+this sprint has re-expanded to its pre-split size, and the owner should know that without counting.

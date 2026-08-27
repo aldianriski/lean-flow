@@ -92,20 +92,20 @@ what lets a fixture repo be answered in one in-process call instead of one proce
 ### T4 — Hold semantics and full-run level arithmetic `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `packages/standard/src/`
 Depends-on: T3
-Cites: EPIC-014 H12 · SPRINT-087 T4 · L-058 · `scripts/lib/conformance-engine.sh` (parity oracle)
+Cites: EPIC-014 H12 · SPRINT-087 T4 · L-058 · `scripts/lib/conformance-engine.sh` (parity oracle) · T9 (rerouted --section onto this task's shape; no dependency either way) · T11 (carries this task's CLI-side consequences)
 Tier **G**. Split from T3 deliberately: SPRINT-087's lesson is that code which *produces* a verdict gets
 forgotten because its output looks like data rather than a claim. Level arithmetic is exactly that code.
 
 **Acceptance:** the full-run level matches Shell's, and a partial run still refuses to publish one.
 
 **DoD:**
-- [ ] Full-run level matches Shell across fixture repos including at least one HOLD case — *Verify: differential, per repo*
-- [ ] Hold is distinguished from fail, never collapsed — *Verify: a HOLD fixture and a FAIL fixture resolve to different outcomes*
-- [ ] A partial invocation still emits NO global level — *Verify: seed one in; only the structural checks redden, per SPRINT-087's frozen-result property*
+- [x] Full-run level matches Shell across fixture repos including at least one HOLD case — ✓ **MET, and recorded WEAKER-THAN-WRITTEN by owner ruling, not glossed.** True engine-vs-engine differentials on §12, both engines spawned live: clean repo → Shell `level: Attested` exit 0, TS `Attested` exit 0; committed secret → Shell `level: none` exit 1, TS `none` exit 1. **The HOLD case is not a differential**: no registered evaluator produces a `hold` (independently re-verified across S9.LOGDIR and all four F12 rules — `pass`/`fail`/`note` only), so its TS side is hand-built to match Shell's live `level: Gated` on §13. The reviewer's ruling, which the owner accepted: this is the **DoD's own wording promising something unsatisfiable until a §13 evaluator lands**, not a builder shortfall. No later work may cite this case as engine parity
+- [x] Hold is distinguished from fail, never collapsed — ✓ at the arithmetic layer, and independently re-derived: the reviewer diffed `computeLevel`'s six-rung chain against `scripts/lib/conformance-engine.sh` lines 3098–3115 and found the rung order and level strings an **exact** match. Discrimination is real and not luck on one design — the builder's seeded reordering reddened exactly its 1 named test of 25 with the sibling control green (reproduced by the reviewer), and a *second*, more aggressive wrong ordering seeded by the reviewer reddened 3 of 25. **Carried forward to T11:** the distinction holds in the arithmetic but is **destroyed at the CLI**, where three ternaries render `hold` as `note`
+- [x] A partial invocation still emits NO global level — ✓ the level lives on a new frozen `FullRunReport`, produced only by an explicit `attachLevel`; `TraversalReport` and `SectionReport` are both structurally level-less and `"level" in classifyAll(…)` is false for **any** rule subset — which is the invariant that now matters, since T9 rerouted `--section` onto that very shape. Recorded limit (reviewer finding D): `attachLevel` itself checks only `rules.length === outcomes.length`, so it is unguarded **by convention, not by construction** — the module header's "structurally unreachable" overstates its own guarantee. Filed as TD-115 rather than silently ticked
 
 ### T5 — Accept a caller-supplied spec path `[size: S · risk: med · class: execution · HITL · J1]`
 Layers: `apps/cli/src/`
-Depends-on: T1, T3, T9
+Depends-on: T1, T3, T9, T11
 Cites: SPRINT-087 (spec-not-found vs permission-denied)
 Tier **G** by defaulting up (ADR-029): a silently-ignored spec path would make every fixture assertion
 vacuous while the suite stayed green — a false negative by construction. Fixture harnesses hand the
@@ -173,7 +173,7 @@ ADR-037 rejects in writing.
 ### T9 — Compose families in `--section` too, so T2 has a valid comparand `[size: S · risk: med · class: execution · HITL · J1]`
 Layers: `apps/cli/src/`
 Depends-on: T3
-Cites: TD-090 · SPRINT-091 Round 10/11 (the struck measurement) · L-108 · L-130 · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified) · T2 (this task unblocks it; the dependency runs the other way)
+Cites: TD-090 · SPRINT-091 Round 10/11 (the struck measurement) · L-108 · L-130 · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified) · T2 (this task unblocks it; the dependency runs the other way) · T4 (its shape is what --section now returns; no dependency either way) · `packages/standard/src/traverse.ts` (the shared shape — read, never modified by this task)
 Tier **G** by defaulting up (ADR-029). Added mid-sprint by owner ruling — see the Execution Log's
 `scope-change`. T3 wired the **flagless** run; `runSection()` still hardcodes `createBuiltInRegistry()`,
 so `--section 12` answers `rule-unimplemented` for all four F12 rules while Shell evaluates them. That
@@ -183,9 +183,9 @@ defect a third time.
 **Acceptance:** `--section N` dispatches every family the flagless run does, for the same repo.
 
 **DoD:**
-- [ ] `--section 12` evaluates all four F12 rules for real — *Verify: per-rule VERDICTS diffed against `scripts/lib/conformance-engine.sh` spawned live, never a line count (L-108 — this is the defect being repaired, not merely a risk)*
-- [ ] `--section` and the flagless run agree per rule on the same repo — *Verify: differential over the sections that have registered evaluators; a mismatch names the offending rule id*
-- [ ] `--section` still emits NO global level — *Verify: the frozen-result property SPRINT-087 established still holds; seed an attempt and confirm it throws*
+- [x] `--section 12` evaluates all four F12 rules for real — ✓ per-rule VERDICTS against a live-spawned `scripts/lib/conformance-engine.sh`, never a count. The reviewer went past the builder's single fixture and built **four**, each forcing a different F12 rule to FAIL independently — SECRETS · BACKUPS · DESIGNSRC · GENERATED, all FAIL/FAIL with matching reason text, plus a fifth forcing all four at once (exit 1 both sides). Coordinator-verified in the main tree: `grep -c rule-unimplemented` over `--section 12` output returns **0**
+- [x] `--section` and the flagless run agree per rule on the same repo — ✓ `(rule-id, verdict)` pairs from `--section 9` + `--section 12`, combined and sorted, diff **byte-identical** against the flagless run's pairs for the same ids (`diff` exit 0, 22/22 rows), gap agreement included. Rebuilt independently by the reviewer rather than trusted, with the row count reconciled against the §9 + §12 counts as the required second query
+- [x] `--section` still emits NO global level — ✓ the report `--section` now returns is frozen; attaching `globalLevel` throws (`not extensible`) while a plain-object sibling control does not. **MET-BUT-WEAKER-THAN-WRITTEN per the reviewer**: it held by *design* only once T4 put the level on a separate shape — until then it held merely because T4 had not landed. The constraint is now written into `traverse.ts` itself, where the next family author reads it, rather than living only in a commit message
 
 ### T10 — ADR-038 for the composed multi-family dispatch seam `[size: S · risk: low · class: decision · HITL · J1]`
 Layers: `docs/adr/ADR-038-composed-multi-family-rule-dispatch.md` · `docs/DECISIONS.md` · `docs/knowledge-index.md`
@@ -203,6 +203,31 @@ reading git history.
 - [x] It states the duplicate-id constraint the T3 retry added, as a rule future families must satisfy — ✓ stated in Decision as a rule, not as a bug report: *"a rule id belongs to exactly one family, and the seam enforces it loudly rather than by convention"*, with the strangler-handoff failure it prevents. Its Negative discloses the real limit — the check is **dynamic**, scoped to whatever list a call site composes, not a static guarantee across the codebase
 - [x] `docs/DECISIONS.md` carries its row — ✓ **judgment tick, and it stays one.** Row present, newest-first above ADR-037, confirmed by the reviewer reading the file. `scripts/gen-index.sh` was checked and does **not** reference `DECISIONS.md` at all, so naming it as this criterion's method would have been an unreachable `Verify:` reading exactly like a satisfied one (L-136) — which is what the original single bundled criterion did, and what the gate caught
 - [x] The knowledge index is regenerated — ✓ `sh scripts/gen-index.sh --check` prints its own line `PASS  gen-index: knowledge index current` in the main tree, reproduced independently by the reviewer. ADR-038 indexed under **process · tooling · governance**, beside ADR-035 and ADR-037. Coordinator correction at merge-back: `domain:` arrived as `doc-standard` and was changed to `governance` — a wrong domain files the ADR under the wrong heading, defeating the one thing it exists for
+
+### T11 — Wire the full-run level into the CLI, and render `hold` distinctly `[size: S · risk: med · class: execution · HITL · J1]`
+Layers: `apps/cli/src/`
+Depends-on: T4, T9
+Cites: L-020 · L-007 · L-166 · SPRINT-091 T4 review (findings C and E) · `packages/standard/src/level.ts` (consumed, never modified) · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified)
+Tier **G**. Added mid-sprint by owner ruling — see the Execution Log's `scope-change`. T4's level
+arithmetic matches Shell but **nothing calls it**: no non-test reference to `attachLevel` exists outside
+`packages/standard/src/`, so `leanflow <repo-dir>` prints no level at all. A behaviour written only in
+its own file is half-shipped (L-020). T4 could not wire it — `apps/cli/src/` was T9's during wave 3 —
+and that constraint is now gone.
+
+Carries the T4 review's finding **C** because it is the same file: three ternary chains in
+`apps/cli/src/main.ts` render a verdict, and each falls through anything that is not
+`fail`/`pass`(/`gap`) to the literal `note `. `hold` joined `Verdict` in T4. The moment any evaluator
+emits one it will print **identically to a plain note**, destroying the hold-vs-fail distinction T4's
+DoD 2 exists to protect, in the one place a human reads it — L-166's shape, in a consumer nobody
+touched.
+
+**Acceptance:** a flagless run prints a level matching Shell's, and `hold` is distinguishable from
+`note` at every render site.
+
+**DoD:**
+- [ ] `leanflow <repo-dir>` prints a level line that matches Shell's — *Verify: differential against `scripts/lib/conformance-engine.sh` spawned live, per repo, comparing the level VALUE and not merely the presence of a line*
+- [ ] `--section` still prints NO level — *Verify: the partial path stays level-free; seed an attempt to print one and confirm the guard holds (SPRINT-087's frozen-result property, T9's DoD 3)*
+- [ ] `hold` renders distinctly from `note` at **every** render site — *Verify: one test per render site, each FAILING before the fix — a site fixed without a failing case is an unguarded site*
 
 ## Owner-action checklist
 - [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099).

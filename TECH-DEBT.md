@@ -173,6 +173,35 @@ status: current
 > serve better than four separate fixes, which is a decomposition question for the owner rather than a
 > sweep ruling.
 
+- **TD-115** severity: medium | status: open | created: Sprint-091
+  - Summary: **`attachLevel(rules, report)` will happily attach a whole-spec conformance level to a
+    PARTIAL run.** It checks only `rules.length === outcomes.length`; nothing establishes that
+    `rules` is the whole Standard. `level.test.ts` itself calls it with a one-rule subset and gets
+    back a leveled `FullRunReport`.
+  - Found by the SPRINT-091 T4 adversarial reviewer (finding D). **The specific hazard the module
+    header worried about is genuinely closed** -- a level field on `TraversalReport`, inherited by
+    `--section` -- and that was verified. What is overstated is the header's broader claim that
+    nothing "short of a NEW call to `attachLevel` can attach one... structurally unreachable":
+    `attachLevel` is unguarded **by convention, not by construction**, which is exactly the
+    distinction `section.ts`'s own header insists on ("no call site does this today" vs "no call
+    site CAN"). `Object.freeze` on `FullRunReport` is real and does throw on post-construction
+    mutation -- it simply cannot police a wrong `rules` argument at construction time.
+  - Not blocking T4: no caller does this, and T11 wires the only production call site. It becomes
+    live the moment a second call site exists -- which every remaining EPIC-014 family brings
+    closer. Fix direction (not a ruling): have the full-run entry point be the only thing that can
+    produce the input `attachLevel` accepts, so a subset is unrepresentable rather than merely
+    unattempted.
+
+- **TD-116** severity: minor | status: open | created: Sprint-091
+  - Summary: **Every F12 finding sub-line prints its own name twice** -- `- secret-committed:
+    secret-committed: .env carries...` -- for all four §12 rules.
+  - Found by the SPRINT-091 T9 adversarial reviewer while diffing reason strings rather than
+    verdict words alone. Confirmed **pre-existing**: it reproduces through the flagless run too and
+    is untouched by T9's diff. T9 is what newly exposes it on the `--section` path.
+  - Cosmetic -- verdicts and exit codes are unaffected. Worth fixing because DoD-level parity
+    verification in this epic compares **reason text**, not just the verdict word, so a doubled
+    prefix is noise inside the very signal later differentials read.
+
 - **TD-113** severity: **high** | status: open | created: Sprint-091
   - Summary: **The repository gate FAILs in a fresh git worktree on a clean tree, for line endings
     alone — and worktree-isolated dispatch is this repo's standing rule for every Tier G review.**
