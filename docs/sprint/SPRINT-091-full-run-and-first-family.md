@@ -13,24 +13,27 @@ update_trigger: sprint execute/close events
 # SPRINT-091 — Full Run and the First Family
 
 > **Theme:** SPRINT-087 put one rule through the TS engine and proved the path works. This sprint makes
-> the engine able to run *whole*, migrates the first rule family chosen on measured cost rather than
-> section number, and carries the slice through to the thing the owner actually feels: one eval harness
-> that no longer spawns a 3,142-line Shell engine on every gate run. It opens with a type checker,
-> because ten TypeScript tasks built on a toolchain that cannot check types would satisfy their own
-> type-level acceptance with unchecked code (TD-101).
+> the engine able to run *whole*, and migrates the first rule family **complete** — chosen on measured
+> cost rather than section number. It opens with a type checker, because seven TypeScript tasks built
+> on a toolchain that cannot check types would satisfy their own type-level acceptance with unchecked
+> code (TD-101). **Split from an eleven-task Plan at G1** (see the Execution Log's `scope-change`): the
+> harness conversion this engine work exists to enable is SPRINT-092's, and travels with the measured
+> delta that proves it rather than trailing an over-long sprint.
 
 ## Scope
 
 **In:** a type check wired into the gate · full Standard traversal in TS with mark-driven dispatch, gap
 and hold reporting and full-run level arithmetic, at parity with the Shell engine · a caller-supplied
-spec path · the **F6 §4 ADR-governance family** migrated whole (five rules) · TS fixture factories ·
-`run-adr-family-fixtures.sh` converted to `bun:test` and removed from the always-on eval leg · §4
-differential parity relocated to the opt-in profile under an ADR · a measured before/after.
+spec path · the **F6 §4 ADR-governance family** migrated whole (all five rules, S4.APPEND included).
 
-**Out (deferred):** every other rule family — F5, F2, F1, F7 and the 196s dominant harness they unlock
-are the *next* slice, not this one · QA severity/profiles/scheduler (H15–H20) · the binary build (H22) ·
-authority cutover and Shell deletion (H24–H26) · any edit to `spec/STANDARD.md`'s normative content ·
-EPIC-015's execution-autonomy surface.
+**Out (deferred) — the split half first, so it is not mistaken for abandoned:** TS fixture factories ·
+`run-adr-family-fixtures.sh` converted to `bun:test` and dropped from the always-on eval leg · §4
+differential parity relocated to the opt-in profile under an ADR · the measured before/after. These are
+`TASK-313`–`TASK-316`, still `state: ready` in the Backlog, and promote as **SPRINT-092** once this
+sprint closes. **No gate gets faster in this sprint** — that is the deferred half, and saying so here is
+the point. Also out: every other rule family (F5, F2, F1, F7 and the 196s dominant harness they unlock) ·
+QA severity/profiles/scheduler (H15–H20) · the binary build (H22) · authority cutover and Shell deletion
+(H24–H26) · any edit to `spec/STANDARD.md`'s normative content · EPIC-015's execution-autonomy surface.
 
 ## Plan
 
@@ -61,29 +64,34 @@ freezing an estimate into an acceptance threshold is the failure L-130 records.
 **Acceptance:** a new Round exists, and every later performance figure derives from it.
 
 **DoD:**
-- [ ] The ADR-family harness's cost is split between git-repo construction and engine invocation — *Verify: measured by instrumented copy, never read from source*
-- [ ] A TS-vs-Shell per-invocation comparison on one fixture target, using the already-migrated §12 family — *Verify: named explicitly as a proxy, since §4 is not yet migrated*
-- [ ] The derived ceiling on what converting this harness can save is stated as a range, not a point
-- [ ] Caveats recorded, including sample counts
+- [ ] The ADR-family harness's cost is split between git-repo construction and engine invocation — **judgment tick, and it says so**: measured by instrumented copy, never read from source; no checker can tell a real measurement from an invented one
+- [ ] A TS-vs-Shell per-invocation comparison on one fixture target, using the already-migrated §12 family — **judgment tick**: it is a *proxy* (§4 is not yet migrated) and must be labelled one in the Round itself
+- [ ] The derived ceiling is stated as a **range, not a point** — **judgment tick**; this host's timings drift run-to-run, which is why every prior Round reports ranges
+- [ ] Caveats recorded, including sample counts — **judgment tick**
+
+<!-- T2 carries NO mechanical criterion, and that is declared rather than disguised (G2 reachability).
+     Inventing a checker to make a measurement task look mechanical is the failure, not the fix. What
+     guards T2 instead is downstream: no later DoD may carry a figure that does not trace to its Round,
+     so a fabricated or absent measurement surfaces the moment T-anything cites it. -->
 
 ### T3 — Full Standard traversal in TS, at parity with the Shell full run `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: apps/cli · packages/standard (traversal · mark-driven dispatch) · tests
 Depends-on: T1
-Cites: EPIC-014 H12 · § Closed-when 2 · SPRINT-087 (registry)
+Cites: EPIC-014 H12 · § Closed-when 2 · SPRINT-087 (registry) · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified)
 Tier **G**. The CLI today answers only `--rule` and `--section`; there is no whole-spec run. Traversal is
 what lets a fixture repo be answered in one in-process call instead of one process per case.
 
 **Acceptance:** a flagless conformance invocation answers a whole repository, matching Shell row-by-row.
 
 **DoD:**
-- [ ] Every rule the parser admits is traversed and dispatched by its §14 mark — *Verify: row-by-row against conformance-engine.sh spawned live as an oracle, never a copied literal*
+- [ ] Every rule the parser admits is traversed and dispatched by its §14 mark — *Verify: row-by-row against `scripts/lib/conformance-engine.sh` spawned live as an oracle, never a copied literal*
 - [ ] A rule with no registered evaluator reports as a NAMED gap — *Verify: seed one out of the registry; exactly that row reddens and the rest stay green*
 - [ ] Dispatch stays open-closed — *Verify: the traversal adds no switch; registration remains at each rule's own call site*
 
 ### T4 — Hold semantics and full-run level arithmetic `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: packages/standard (result domain · level arithmetic) · tests
 Depends-on: T3
-Cites: EPIC-014 H12 · SPRINT-087 T4 · L-058
+Cites: EPIC-014 H12 · SPRINT-087 T4 · L-058 · `scripts/lib/conformance-engine.sh` (parity oracle)
 Tier **G**. Split from T3 deliberately: SPRINT-087's lesson is that code which *produces* a verdict gets
 forgotten because its output looks like data rather than a claim. Level arithmetic is exactly that code.
 
@@ -97,10 +105,11 @@ forgotten because its output looks like data rather than a claim. Level arithmet
 ### T5 — Accept a caller-supplied spec path `[size: S · risk: med · class: execution · HITL · J1]`
 Layers: apps/cli · tests
 Depends-on: T1
-Cites: SPRINT-087 (spec-not-found vs permission-denied) · T9
+Cites: SPRINT-087 (spec-not-found vs permission-denied)
 Tier **G** by defaulting up (ADR-029): a silently-ignored spec path would make every fixture assertion
 vacuous while the suite stayed green — a false negative by construction. Fixture harnesses hand the
-engine doctored specs, so the conversion at T9 cannot happen without this.
+engine doctored specs, so the harness conversion deferred to SPRINT-092 cannot happen without this
+landing here first.
 
 **Acceptance:** the engine evaluates the spec it is handed, and says so when it cannot.
 
@@ -111,7 +120,7 @@ engine doctored specs, so the conversion at T9 cannot happen without this.
 ### T6 — Migrate S4.ONEFILE · S4.INDEX · S4.SECTIONS · S4.NEGATIVE `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: packages/standard/src/rules · evals/fixtures (retained, never replaced) · tests
 Depends-on: T1
-Cites: EPIC-014 H13 · D2 strangler · L-142 · L-169
+Cites: EPIC-014 H13 · D2 strangler · L-142 · L-169 · `scripts/lib/conformance-engine.sh` (parity oracle)
 Tier **G**. The four file/text §4 rules. F6 was chosen on measured cost across both axes — see D1.
 
 **Acceptance:** four §4 rules evaluate in TS and agree with Shell on the retained fixtures.
@@ -125,7 +134,7 @@ Tier **G**. The four file/text §4 rules. F6 was chosen on measured cost across 
 ### T7 — Migrate S4.APPEND behind a real git port `[size: M · risk: high · class: execution · HITL · J1]`
 Layers: packages/standard/src/rules · adapters · tests
 Depends-on: T6
-Cites: EPIC-014 H13 · SPRINT-087 (port + fake pattern) · L-166
+Cites: EPIC-014 H13 · SPRINT-087 (port + fake pattern) · L-166 · `scripts/lib/conformance-engine.sh` (parity oracle)
 Tier **G**. §4's only git-defined rule, split out because it needs a port the other four do not. Its
 shallow-clone branch is the L-166 risk: a branch that works on a fixture but is unreachable on anything
 the system emits is an absent guard that clears every proof above it.
@@ -137,61 +146,6 @@ the system emits is an absent guard that clears every proof above it.
 - [ ] Real adapter plus in-memory fake, per SPRINT-087's port pattern
 - [ ] The shallow-clone branch is pointed at the artifact that motivated it and shown REACHABLE — *Verify: not merely working on a fixture (L-166)*
 
-### T8 — ADR and git-repo fixture factories `[size: S · risk: low · class: execution · AFK · J1]`
-Layers: test factories · §4 tests
-Depends-on: T7
-Cites: EPIC-014 H14
-Tier **X**. The §4 cases build repeated fixture state inline; a factory removes the duplication without
-acquiring any opinion about verdicts.
-
-**Acceptance:** §4 cases build state through a factory, and no test learns its expected verdict from one.
-
-**DoD:**
-- [ ] The §4 cases build fixtures through the factory instead of inline construction
-- [ ] The factory exposes no assertion vocabulary at all — *Verify: a must-FAIL proving a verdict-deciding factory is rejected*
-
-### T9 — Convert the ADR-family harness to bun:test and drop it from the always-on leg `[size: M · risk: high · class: execution · HITL · J1]`
-Layers: evals/ · scripts/qa-check.sh (leg 12) · test/
-Depends-on: T3, T4, T5, T6, T7, T8
-Cites: EPIC-014 H21 (slice pulled forward) · D5 feature-first · TD-090 · L-120
-Tier **G**. The payoff task and the risk concentration — six dependencies and the only one that edits
-the shipped gate. Everything before it exists so this can happen honestly.
-
-**Acceptance:** the gate no longer spawns the Shell engine for §4, and no case was lost doing it.
-
-**DoD:**
-- [ ] Every case the shell harness asserted has a bun:test equivalent — *Verify: case-name FOR case-name, diffed to an identical list; "most" is not a result (D2)*
-- [ ] The harness is removed from the always-on eval set
-- [ ] The gate's own PRINTED verdict line is read as the check — *Verify: run the gate as its own call; never a piped or redirected status (L-120)*
-
-### T10 — Relocate §4 differential parity to the opt-in profile `[size: S · risk: med · class: decision · HITL · J1]`
-Layers: evals/ · scripts/qa-check.sh · docs/adr/
-Depends-on: T9
-Cites: EPIC-014 D2 · ADR-029
-Tier **G**, with the ADR body Tier **P**. Parity must survive the speed win, or the strangler has been
-abandoned rather than advanced. Shell keeps §4 authority; this is not a cutover.
-
-**Acceptance:** parity still runs and still asserts row-by-row — just not on every gate run.
-
-**DoD:**
-- [ ] A parity harness still spawns Shell live and still asserts §4 row-by-row, now in the opt-in set
-- [ ] An ADR records the trade-off — the §4 drift window between full-profile runs — and names the moments parity MUST run: promote, close, and any full-profile run
-- [ ] The ADR states explicitly that Shell RETAINS §4 authority under D2
-
-### T11 — Measure the delta and settle what §4's conversion bought `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: docs/research/logs/qa-gate-timing.md · TECH-DEBT.md
-Depends-on: T2, T9, T10
-Cites: TD-090 · EPIC-014 § Closed-when 7 · SPRINT-089 T1 (recording a missed target as missed)
-Tier **G**. A conversion whose saving is asserted rather than measured has not been shown to save
-anything.
-
-**Acceptance:** the delta is measured, compared against T2's ceiling, and any shortfall is named.
-
-**DoD:**
-- [ ] A new Round records gate before/after on the same host, same profile, same semantic coverage
-- [ ] The measured delta is compared against T2's derived ceiling — *Verify: a shortfall is NAMED, not smoothed (SPRINT-089 T1's precedent)*
-- [ ] TD-090 is updated with what this conversion did and did not buy
-
 ## Owner-action checklist
 - [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099).
 
@@ -202,26 +156,35 @@ anything.
   an always-on harness (30.0s, already spec-reduced to §4, so five rules convert it whole). **F11 was
   rejected despite ranking 1st** (84.7s) — its only harness is opt-in, so migrating it would move the
   default gate by zero seconds. Ordering by section number is forbidden (V3 §43).
-- **D2** — **The slice carries through to a converted harness and a measured delta**, not stopping at the
-  family — EPIC-014 D5 rejects a sprint framed only as a technical layer with no working behaviour.
-- **D3** — **§4 differential parity relocates to the opt-in profile; Shell RETAINS §4 authority.**
-  Not a cutover (epic D2). **→ ADR at T10**, which owes the drift-window trade-off and when parity runs.
-- **D4** — **The type checker lands first.** Ten TS tasks on a toolchain that evaluates no types would
+- **D2** — **This sprint delivers working behaviour, not a layer** (EPIC-014 D5). The engine runs whole
+  *and* one family evaluates in TS at parity — a capability, not scaffolding. The conversion that turns
+  that capability into a faster gate is SPRINT-092's, deliberately paired with the measurement that
+  proves it: shipping a saving and its evidence apart is how an unmeasured claim gets recorded as fact.
+- **D3** — **Shell RETAINS §4 authority throughout this sprint.** Nothing here is a cutover (epic D2);
+  the parity relocation and its ADR moved to SPRINT-092 with the conversion they serve.
+- **D4** — **The type checker lands first.** Seven TS tasks on a toolchain that evaluates no types would
   satisfy type-level DoD with unchecked code (TD-101, `high` and unrouted for four sprints).
-- **D5** — **Overlap-ownership map.** `scripts/qa-check.sh` is touched by **T1, T9 and T10** — single
-  owner, commit order **T1 → T9 → T10**, staged per-hunk, never a plain `git add` over another task's
-  WIP (L-042/L-037). `docs/research/logs/qa-gate-timing.md` is touched by **T2 then T11**, in that order.
+- **D5** — **Overlap-ownership map, restated for the seven-task Plan — not inherited from the eleven.**
+  The split removed both contended files' other owners: `scripts/qa-check.sh` is now touched by **T1
+  alone**, and `docs/research/logs/qa-gate-timing.md` by **T2 alone**. **No file in this Plan is touched
+  by more than one task**, so no commit order is owed and no per-hunk staging is required. Should any
+  task's `Layers:` grow during execution (L-100 makes that expected, not a failure), this map is
+  re-derived before the first shared commit, never assumed still true — a stale ownership map is worse
+  than none, because it names an order for tasks that are no longer in the Plan (L-042/L-037).
 
 ## Assumptions
 
 - **A1** — A TS in-process traversal is materially cheaper per invocation than the 8.5s Shell spawn.
   **UNMEASURED.** *Confirm: T2, before any later DoD carries a number (L-130).*
 - **A2** — 74% of leg 12 (295.9s of 400.7s) is harnesses spawning the Shell engine. *Confirm: Round 7's
-  per-harness sweep plus the intake attribution query, which agreed; re-confirmed at T11.*
+  per-harness sweep plus the intake attribution query, which agreed. Re-confirmation belonged to T11 and
+  left with the split — it is re-declared in SPRINT-092, not silently dropped.*
 - **A3** — S4.APPEND is §4's only git-defined rule. *Confirm: re-derive from the family's rule list at
   G2 rather than inheriting this line.*
-- **A4** — The ADR-family harness's git-repo construction (~27s of its 30s) survives conversion, so only
-  the engine-spawn term is removed. *Confirm: T2 measures the split; T9's expected saving derives from it.*
+
+<!-- A4 (the ADR-family harness's git-repo construction survives conversion) left with T9 at the G1
+     split and is re-declared in SPRINT-092, where the conversion it constrains actually happens. An
+     assumption is owned by the task it binds; carrying it here would leave it unconfirmable. -->
 
 ## Execution Log
 
