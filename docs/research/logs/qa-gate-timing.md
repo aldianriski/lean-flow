@@ -1099,3 +1099,202 @@ measurement). This round adds a data point to that series and nothing else.
   the tree carried on the day. `201 pass` is a fact about `08f103e`, not a series figure.
 - **The 33s delta above is an observation, not a finding.** Naming it as a finding would be analysis,
   which is exactly the work this task's authority class excludes.
+
+---
+
+## Round 10 — the ADR-family harness split, and a TS/Shell per-invocation proxy (SPRINT-091 T2, 2026-08-27)
+
+EPIC-014's parked open question forbids freezing a migration order before a profile exists (V3 §43 ·
+L-130). Rounds 5–8 profiled the engine and leg 12; this Round profiles the **one harness SPRINT-092 is
+scheduled to convert**, and puts a number on what converting it can buy. Its purpose is to make sure no
+later DoD carries a figure nobody derived.
+
+**Nothing shipped was modified.** The harness was measured through an instrumented **temp copy** (a
+wrapper function around each `sh "$engine"` call site, 9 added lines, `sh -n` clean). A first attempt
+ran the copy from outside `evals/` and it died at line 35 resolving `lib/harness-common.sh` — **0 PASS,
+0 FAIL, rc=1, 150ms**. That is recorded rather than quietly retried, because a harness that fails for
+the wrong reason produces a timing number that looks like a measurement (L-142). The valid runs return
+**12 PASS / 0 FAIL / rc=0**, identical to the shipped harness, so the instrumentation did not perturb
+behaviour.
+
+### (1) `run-adr-family-fixtures.sh` — where its time actually goes
+
+| Sample | total | engine (12 calls) | non-engine | engine share |
+|---|---:|---:|---:|---:|
+| 1 | 20,987 ms | 18,716 ms | 2,271 ms | 89% |
+| 2 | 20,186 ms | 17,804 ms | 2,382 ms | 88% |
+| 3 | 19,878 ms | 17,550 ms | 2,328 ms | 88% |
+
+Shipped harness, uninstrumented, same session: **18,191 ms**, 12 PASS / 0 FAIL.
+
+**Finding 1 — A4 was wrong, and so was the reading that produced it.** SPRINT-091's assumption A4 held
+that this harness's **git-repo construction** was the dominant term (~27s of ~30s) and would *survive* a
+TS conversion, leaving only a small engine term to remove. Measured, it is the inverse: **engine
+invocation is 88–89%; all git-repo construction, fixture setup and assertions together are ~2.3s.**
+
+The error's origin is worth naming because it is a reading failure, not a measurement failure.
+`qa-check.sh`'s own comment says the harness *"BUILDS GIT REPOSITORIES — three of them"* and, separately,
+*"It costs 27s."* Two adjacent true statements were read as one causal claim. Nothing in that comment
+ever attributed the 27s to the repos. **A cost attribution inherited from prose beside a number is not a
+measurement** — the same shape as this log's Round 6 finding, where an arithmetic residual was read as a
+claim about two specific rules.
+
+### (2) TS vs Shell, per invocation — an explicit **proxy**
+
+§4 is not migrated (that is SPRINT-091 T6/T7), so §4 cannot be compared directly. **F12 (§12 git
+boundary) is the stand-in** — migrated at SPRINT-087, and the only family with both engines available.
+Both were pointed at the **same target** and asked for the **same section**.
+
+| Target | Shell (`--spec` §12-reduced, 12 rows) | TS (`--section 12`) | ratio |
+|---|---:|---:|---:|
+| Near-empty directory | 385–398 ms | 135–252 ms | ~2.9× |
+| **This repository (real content)** | **1,175–1,211 ms** | **141–161 ms** | **~7.3–8.6×** |
+
+Output agreement checked before the timings were trusted: both emit **12 `S12.` lines** on this
+repository. A speed comparison between engines that disagree is worthless.
+
+**Finding 2 — the near-empty target measures startup, not workload, and understates the win.** On an
+empty directory Shell has almost nothing to do, so the 2.9× is mostly process startup. Given real
+content, Shell's cost rises 3× (398 → 1,200 ms) while TS's is flat (135 → 141 ms): **TS's cost is
+dominated by its own startup and barely moves with workload, which is the whole thesis of the
+migration.** The 7.3–8.6× figure is the one to carry; the 2.9× is reported so the difference between
+them is on the record.
+
+### (3) Derived ceiling for converting this harness — a **range**, not a point
+
+Engine term 17.6–18.7 s, reduced by 7.3–8.6× → **2.0–2.6 s**; non-engine term ~2.3 s is unchanged.
+
+| Quantity | Range |
+|---|---|
+| Harness today | 19.9 – 21.0 s |
+| Harness after conversion (est.) | **4.3 – 4.9 s** |
+| **Saving** | **≈ 15 – 17 s** |
+
+Against a gate observed at ~288–330 s on this host, that is **roughly 5%** — for one harness of the six
+that spawn the engine. **This is the ceiling, not a forecast**, and SPRINT-092's T9/T11 must measure the
+realised figure rather than restate this one.
+
+### (4) The typecheck leg's cost (ADR-037 owes this Round a figure)
+
+`node_modules/.bin/tsc --noEmit` over the workspace: **196 ms, 217 ms, 261 ms** (3 samples). ADR-037
+accepted "the gate gets slower" as a trade-off against TD-090; the realised cost is **~0.2 s on a
+~300 s gate**, because TypeScript 7 is the native compiler. The trade-off was accepted at a price far
+above what it turned out to cost.
+
+### Caveats
+
+- **Three samples** for each harness figure and each engine comparison; single sample for the
+  uninstrumented shipped harness. This host's timings drift run to run (Rounds 7–8), so every figure is
+  a range.
+- **§12 is a proxy for §4 and the two are not the same workload.** §12 scans tracked files; §4 reads ADR
+  bodies *and* git history. The 7.3–8.6× may not transfer. **The ceiling in (3) is therefore an estimate
+  built on a proxy ratio, and is labelled as one everywhere it is used.**
+- **The conversion is assumed to remove process spawns, not merely re-implement them.** If the converted
+  harness still spawns one TS process per case, each pays TS's ~140 ms startup (12 × 140 ms ≈ 1.7 s) and
+  the saving lands near the bottom of the range.
+- **This host is faster today than in Round 7** — the same harness measured 29,971 ms there and
+  18,191 ms here, on unchanged bytes. Consistent with Round 8's host-dependence finding; cross-Round
+  comparisons of absolute figures remain unsafe.
+- **No change was made to any shipped file this Round**, so there is no post-change measurement and no
+  discrimination proof to report — those belong to SPRINT-092's conversion.
+
+---
+
+## Round 11 — Round 10's TS/Shell ratio is INVALID; the correction (SPRINT-091 T2 review, 2026-08-27)
+
+Round 10 was reviewed by an independent Tier G pass, worktree-isolated, before its figures could be
+frozen into SPRINT-092's acceptance criteria. **Its central comparison does not survive.** This Round
+strikes what is wrong, keeps what was independently reproduced, and states what must happen before the
+struck figures can be re-derived. Following Round 6's precedent: a Round that corrects an earlier one,
+rather than an edit to it.
+
+### STRUCK — §(2)'s 7.3–8.6× and every figure in §(3)
+
+**The TS side of the comparison performed no evaluation at all.** `apps/cli/src/main.ts`'s
+`runSection()` builds its registry with `createBuiltInRegistry()`, which registers exactly **one** rule
+(`S9.LOGDIR`). The §12 family's real registry (`packages/standard/src/rules/f12-registry.ts`, backed by
+`FsGitBoundaryPort`) **is never wired into the CLI**. Verified two ways — by reading both files, and by
+running the command:
+
+| Rule | TS `--section 12` | Shell `--spec` §12-reduced |
+|---|---|---|
+| `S12.SECRETS` | `gap … rule-unimplemented … no evaluator registered` | `PASS … 0 shape-match(es) examined and cleared on content` |
+| `S12.BACKUPS` · `S12.DESIGNSRC` · `S12.GENERATED` | same `gap` | genuinely evaluated |
+
+So `141–161 ms` is spec-parse plus twelve stub prints. **The ratio was Shell's real work measured
+against TS's no-op**, not a migration multiplier. Everything derived from it in §(3) — the 2.0–2.6 s
+post-conversion engine term, the 4.3–4.9 s harness-after figure, the ≈15–17 s saving and the "roughly
+5% of the gate" — is **struck**, not merely caveated. Round 10's own caveat ("§12 may not transfer to
+§4") described a much smaller problem than the one that existed.
+
+**How the agreement check failed, which is the part worth keeping.** Round 10 verified agreement by
+counting lines matching `S12.` and finding 12 on each side. That check passes *because both engines
+print one line per spec row regardless of verdict* — it can never fail. Diffing the **verdicts**, as the
+reviewer did, shows all four mechanical rules disagreeing. This is **L-108 exactly — a match by
+substring standing in for a claim about shape** — and the sharpest detail is that Round 10's author had
+written that very warning into the reviewer's brief ("that is a COUNT, not an agreement") and shipped
+the count anyway. A rule loaded, correctly stated, and unfired; caught by an independent pass, which is
+L-165's own content.
+
+**A further reason the struck figure was optimistic in both directions:** the reviewer notes
+`FsGitBoundaryPort.trackedFiles()` calls `isGitRepo()` with no caching, so four real evaluators would
+pay 8 `execFileSync` git spawns against Shell's 4. Wiring the real evaluators in could erode much of the
+apparent advantage. Unmeasured; recorded so the re-derivation looks for it.
+
+### CORRECTED — "on unchanged bytes" is false
+
+Round 10 attributed the ADR-family harness moving 29,971 ms (Round 7) → 18,191 ms (Round 10) to host
+speed, "on unchanged bytes". The harness file is indeed unmodified (single commit `70e856e`), but
+**`scripts/lib/conformance-engine.sh` — which does the actual work — changed twice in that window**,
+including `298c1e1 perf(engine): memoise the git-repo probe — 6 spawns per invocation become 1`, landed
+2026-08-26. Blob hashes, one convention (`git show <ref>:<path> | sha256sum`): `ef811a3eb9c91cca` at
+`298c1e1` versus `a5e618a5dc33eee7` at `fe4a536`.
+
+A **performance** commit landed inside the window whose delta was attributed entirely to the host. Round
+8 used a byte-identity check for exactly this reason and Round 10 did not. The 1.65× cross-Round ratio
+is also below Round 8's 1.92–2.20× host ratio; Round 10 called that "consistent" without reconciling the
+gap. **Neither the host attribution nor the ratio should be relied on.**
+
+### CORRECTED — wrapper overhead is unquantified, and `non-engine` is a subtraction
+
+Round 10's instrumentation forks two `date +%s%N` per engine call. Measured by the reviewer on this
+host: **24 forks ≈ 0.77–1.03 s**. Round 10's instrumented totals also run **~2.16 s (10–12%) above** its
+own uninstrumented sample, a gap it never reconciles — unlike Round 9, which explicitly declined to
+attribute a 33 s delta. Because `non-engine = total − Σengine`, unaccounted overhead lands silently in
+the non-engine residual, which is itself only ~2.3 s. **The 88–89% figure should be read as a magnitude,
+not a percentage to the point.**
+
+### SURVIVES — independently reproduced
+
+- **Engine dominance holds.** The reviewer re-implemented the instrumentation independently (log-file
+  timer rather than the original wrapper) and measured engine share at **89.6%** and **88.2%** across
+  two runs, 12 PASS / 0 FAIL both times. The direction and magnitude are corroborated by a second,
+  differently-built instrument.
+- **The A4 disproof stands.** Non-engine time — all git-repo construction, fixture setup and assertions
+  — independently measured at **~1.8–2.0 s**, nowhere near the assumed "~27 s of ~30 s". A4 remains
+  **disproven**, and SPRINT-092 must not inherit it.
+- **12 is the true engine-call count.** Every invocation is a literal `sh "$engine"`; no command
+  substitution, pipeline or helper-function form exists in the harness or in `evals/lib/harness-common.sh`.
+- **§(3)'s arithmetic method was sound** — the range correctly pairs extremes for a quotient
+  (17.6/8.6 = 2.0, 18.7/7.3 = 2.6) rather than best-with-best. Only its input was invalid.
+- **One framing conceded.** Round 10 called the A4 error "a reading failure, not a measurement failure".
+  The reviewer reads `qa-check.sh`'s comment as genuinely juxtaposing "it BUILDS GIT REPOSITORIES" and
+  "It costs 27s" as cause and effect. The measurement conclusion is unaffected; the *blame* was
+  uncharitable, and that is recorded here rather than left standing.
+
+### What must happen before the struck figures can be re-derived
+
+The comparison is **not repeatable today**. It requires the TS CLI to dispatch real evaluators — which
+is SPRINT-091 **T3**'s work (full traversal + registry wiring). Until then:
+
+- **No SPRINT-092 acceptance criterion may cite a conversion saving.** There is currently no valid
+  measurement of one. This is the L-130 failure caught one step before it froze.
+- The re-derivation must diff **per-rule verdicts**, never line counts, before timing anything.
+- It must record the git-spawn count on both sides, given the uncached `isGitRepo()` finding above.
+
+### Caveats
+
+- The struck figures are left visible in Round 10 rather than deleted, so the correction is legible and
+  the error is not silently erased. **Round 10 §(2) and §(3) must not be cited without this Round.**
+- Cold-cache, first-run and different-host configurations remain untested; whether git construction ever
+  dominates in those conditions is unknown, not disproven.
