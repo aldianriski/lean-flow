@@ -20,7 +20,6 @@ import { bindRegistry } from "../../../packages/standard/src/registry.ts";
 import { exitCodeFor, type RuleEvaluation } from "../../../packages/standard/src/result.ts";
 import { sectionNumberOfRuleId, toStandardRule } from "../../../packages/standard/src/spec-reader.ts";
 import { outcomeName } from "../../../packages/standard/src/classify.ts";
-import { classifySection } from "../../../packages/standard/src/section.ts";
 import { classifyAll, composeFamilies } from "../../../packages/standard/src/traverse.ts";
 import { readSpecAllFromDisk, readSpecSectionFromDisk, BUNDLED_SPEC_PATH } from "./spec-file-reader.ts";
 
@@ -152,14 +151,50 @@ export function specReadExitCode(result: { readonly ok: boolean }): 0 | 1 {
 const SECTION_ARG_RE = /^[1-9]\d*$/;
 
 /**
- * `--section`'s own case (SPRINT-087 T4), split out for the same reason `runRule` is: one case per
- * `Invocation` kind. A TARGETED run -- it evaluates §`sectionArg`'s rules and NO others (DoD 1), and
- * it never prints a global conformance level (DoD 2): `classifySection`'s `SectionReport` carries no
- * `globalLevel` field today, and is FROZEN (`packages/standard/src/section.ts`) so one cannot be
- * attached after the fact either -- there is nothing here to print even by mistake, and nothing a
- * careless future call site could add. An unreadable section -- malformed argument, or a section
- * number the spec does not define -- fails loudly with a named finding and a non-zero exit, never a
- * silent empty report (DoD 3).
+ * Builds ONE whole-repository dispatch function spanning every registered family, for a given
+ * `repoDir` (SPRINT-091 T3 introduced this composition inside `runFull`; T9 lifts it out so
+ * `runSection` dispatches through the SAME list rather than a second, narrower one). Family
+ * registration stays at EACH family's own call site (`../../../packages/standard/src/rules/
+ * built-in.ts`'s `createBuiltInRegistry`, `f12-registry.ts`'s `createF12Registry`) -- this function
+ * only PAIRS each registry with its own concrete port and hands the result to `bindRegistry`
+ * (`registry.ts`), then `composeFamilies` (`traverse.ts`) merges them into ONE dispatch function.
+ * Appending a family here is the one place EPIC-014's remaining families (F5/F2/F1/F7) plug in for
+ * BOTH invocation shapes; nothing in `traverse.ts`/`classify.ts`, and neither call site below, gains
+ * a new case for it.
+ *
+ * `FsGitBoundaryPort`'s second argument is the spec its §12 rules read PROSE from (allowed asset
+ * dirs, generated-file classes) -- defaults to `<repoDir>/spec/STANDARD.md` (this repo's own gate,
+ * checking itself), which does not exist for an arbitrary repo-dir under test. No ADR governs this
+ * specific placement (checked; none does -- see the T3 retry report). The convention is
+ * `check-attestation.sh`'s (SPRINT-074 T2), reused verbatim by `conformance-engine.sh`'s own header
+ * ("the engine resolves spec/STANDARD.md relative to ITSELF, not to the repo under test... which
+ * has no reason to vendor a copy of the standard it is being measured against") and by this
+ * engine's own spec reader (`apps/cli/src/spec-file-reader.ts`'s `BUNDLED_SPEC_PATH`) -- the Standard
+ * ships beside the engine, never vendored by the repo being measured.
+ */
+function composedDispatch(repoDir: string): (id: RuleId) => RuleEvaluation | undefined {
+  return composeFamilies([
+    bindRegistry(createBuiltInRegistry(), new FsSprintDirPort(repoDir)),
+    bindRegistry(createF12Registry(), new FsGitBoundaryPort(repoDir, BUNDLED_SPEC_PATH)),
+  ]);
+}
+
+/**
+ * `--section`'s own case (SPRINT-087 T4; SPRINT-091 T9 wires it through `composedDispatch` above --
+ * the SAME composed multi-family dispatch `runFull` uses -- rather than `classifySection`
+ * (`packages/standard/src/section.ts`), which is single-port and would leave `createF12Registry`'s
+ * evaluators unreachable exactly as Round 10/11 of this sprint's Execution Log found: `--section 12`
+ * answering `rule-unimplemented` for all four §12 rules while Shell evaluated them for real). Split
+ * out for the same reason `runRule` is: one case per `Invocation` kind. A TARGETED run -- it
+ * evaluates §`sectionArg`'s rules and NO others (DoD 1: `rules` below is narrowed to `section`'s own
+ * rows before dispatch ever runs), and it never prints a global conformance level (DoD 2):
+ * `classifyAll`'s `TraversalReport` (`traverse.ts`) carries no `globalLevel` field today, and is
+ * FROZEN so one cannot be attached after the fact either -- the same structural guarantee
+ * `classifySection`'s `SectionReport` gave, not a property of this renderer choosing not to print
+ * one. This renderer reads only `report.outcomes`, which both report shapes carry identically, so
+ * swapping the underlying classifier changes nothing else here. An unreadable section -- malformed
+ * argument, or a section number the spec does not define -- fails loudly with a named finding and a
+ * non-zero exit, never a silent empty report (DoD 3).
  */
 function runSection(sectionArg: string, repoDir: string, write: (s: string) => void): number {
   if (!SECTION_ARG_RE.test(sectionArg)) {
@@ -187,9 +222,7 @@ function runSection(sectionArg: string, repoDir: string, write: (s: string) => v
   }
 
   const rules = specResult.rows.map((row) => toStandardRule(row, section, BUNDLED_SPEC_PATH));
-  const registry = createBuiltInRegistry();
-  const port = new FsSprintDirPort(repoDir);
-  const report = classifySection(section, rules, registry, port);
+  const report = classifyAll(rules, composedDispatch(repoDir));
 
   const evaluations: RuleEvaluation[] = [];
   for (const outcome of report.outcomes) {
@@ -220,12 +253,9 @@ function runSection(sectionArg: string, repoDir: string, write: (s: string) => v
  * flagless TS invocation and a flagless Shell one ask the IDENTICAL question of the IDENTICAL
  * repository -- the parity oracle DoD 1 names.
  *
- * Family registration stays at EACH family's own call site (`../../../packages/standard/src/rules/
- * built-in.ts`'s `createBuiltInRegistry`, `f12-registry.ts`'s `createF12Registry`) -- this list only
- * PAIRS each registry with its own concrete port and hands the result to `bindRegistry`
- * (`registry.ts`), then `composeFamilies` (`traverse.ts`) merges them into ONE dispatch function.
- * Appending a family here is the one place EPIC-014's remaining families (F5/F2/F1/F7) plug in;
- * nothing above this list, and nothing in `traverse.ts`/`classify.ts`, gains a new case for it (DoD 3).
+ * Dispatches through `composedDispatch` (above `runSection`, SPRINT-091 T9) -- the SAME
+ * whole-repository, multi-family composition `runSection` now uses too, never a second list (DoD 3
+ * of both tasks: appending a family is the one place EPIC-014's remaining families plug in).
  *
  * No `level:` line here -- T4 owns full-run level arithmetic, deliberately split out (EPIC-014 H12).
  * `TraversalReport` carries no field a level could occupy (`traverse.ts`, frozen the same way
@@ -241,21 +271,7 @@ function runFull(repoDir: string, write: (s: string) => void): number {
 
   const rules = specResult.rows.map((row) => toStandardRule(row, sectionNumberOfRuleId(row.id), BUNDLED_SPEC_PATH));
 
-  // `FsGitBoundaryPort`'s second argument is the spec its §12 rules read PROSE from (allowed asset
-  // dirs, generated-file classes) -- defaults to `<repoDir>/spec/STANDARD.md` (this repo's own gate,
-  // checking itself), which does not exist for an arbitrary repo-dir under test. No ADR governs this
-  // specific placement (checked; none does -- see the T3 retry report). The convention is
-  // `check-attestation.sh`'s (SPRINT-074 T2), reused verbatim by `conformance-engine.sh`'s own header
-  // ("the engine resolves spec/STANDARD.md relative to ITSELF, not to the repo under test... which
-  // has no reason to vendor a copy of the standard it is being measured against") and by this
-  // engine's own spec reader (`apps/cli/src/spec-file-reader.ts`'s `BUNDLED_SPEC_PATH`) -- the Standard
-  // ships beside the engine, never vendored by the repo being measured.
-  const dispatch = composeFamilies([
-    bindRegistry(createBuiltInRegistry(), new FsSprintDirPort(repoDir)),
-    bindRegistry(createF12Registry(), new FsGitBoundaryPort(repoDir, BUNDLED_SPEC_PATH)),
-  ]);
-
-  const report = classifyAll(rules, dispatch);
+  const report = classifyAll(rules, composedDispatch(repoDir));
 
   const evaluations: RuleEvaluation[] = [];
   for (const outcome of report.outcomes) {
