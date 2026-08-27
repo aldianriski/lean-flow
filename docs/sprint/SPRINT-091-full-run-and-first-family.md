@@ -76,7 +76,7 @@ freezing an estimate into an acceptance threshold is the failure L-130 records.
      so a fabricated or absent measurement surfaces the moment T-anything cites it. -->
 
 ### T3 — Full Standard traversal in TS, at parity with the Shell full run `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `apps/cli/src` · `packages/standard/src` · tests
+Layers: `apps/cli/src/` · `packages/standard/src/`
 Depends-on: T1, T8
 Cites: EPIC-014 H12 · § Closed-when 2 · SPRINT-087 (registry) · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified)
 Tier **G**. The CLI today answers only `--rule` and `--section`; there is no whole-spec run. Traversal is
@@ -90,7 +90,7 @@ what lets a fixture repo be answered in one in-process call instead of one proce
 - [ ] Dispatch stays open-closed — *Verify: the traversal adds no switch; registration remains at each rule's own call site*
 
 ### T4 — Hold semantics and full-run level arithmetic `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `packages/standard/src` · tests
+Layers: `packages/standard/src/`
 Depends-on: T3
 Cites: EPIC-014 H12 · SPRINT-087 T4 · L-058 · `scripts/lib/conformance-engine.sh` (parity oracle)
 Tier **G**. Split from T3 deliberately: SPRINT-087's lesson is that code which *produces* a verdict gets
@@ -104,7 +104,7 @@ forgotten because its output looks like data rather than a claim. Level arithmet
 - [ ] A partial invocation still emits NO global level — *Verify: seed one in; only the structural checks redden, per SPRINT-087's frozen-result property*
 
 ### T5 — Accept a caller-supplied spec path `[size: S · risk: med · class: execution · HITL · J1]`
-Layers: `apps/cli/src` · tests
+Layers: `apps/cli/src/`
 Depends-on: T1, T3
 Cites: SPRINT-087 (spec-not-found vs permission-denied)
 Tier **G** by defaulting up (ADR-029): a silently-ignored spec path would make every fixture assertion
@@ -119,7 +119,7 @@ landing here first.
 - [ ] A nonexistent path fails loudly and stays distinct from an unreadable one — *Verify: two cases, two different named outcomes*
 
 ### T6 — Migrate S4.ONEFILE · S4.INDEX · S4.SECTIONS · S4.NEGATIVE `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `packages/standard/src/rules` · `evals/fixtures` · tests
+Layers: `packages/standard/src/rules/` · `evals/fixtures/`
 Depends-on: T1, T4
 Cites: EPIC-014 H13 · D2 strangler · L-142 · L-169 · `scripts/lib/conformance-engine.sh` (parity oracle)
 Tier **G**. The four file/text §4 rules. F6 was chosen on measured cost across both axes — see D1.
@@ -133,7 +133,7 @@ Tier **G**. The four file/text §4 rules. F6 was chosen on measured cost across 
 - [ ] Every seeded break is verified to have landed, under ONE stated hash convention — *Verify: never two methods in one evidence block (L-169)*
 
 ### T7 — Migrate S4.APPEND behind a real git port `[size: M · risk: high · class: execution · HITL · J1]`
-Layers: `packages/standard/src/rules` · `packages/standard/src/adapters` · tests
+Layers: `packages/standard/src/rules/` · `packages/standard/src/adapters/`
 Depends-on: T6
 Cites: EPIC-014 H13 · SPRINT-087 (port + fake pattern) · L-166 · `scripts/lib/conformance-engine.sh` (parity oracle)
 Tier **G**. §4's only git-defined rule, split out because it needs a port the other four do not. Its

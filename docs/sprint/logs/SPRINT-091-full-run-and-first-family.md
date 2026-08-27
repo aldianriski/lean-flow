@@ -552,3 +552,47 @@ formatting rather than through logic, three times in one sprint.
 
 After the fix: layers completeness 16 pass / 0 fail, `PREFLIGHT: CLEAR`, waves `T1=0 T8=1 T3=2 T2=3
 T4=3 T5=3 T6=4 T7=5`.
+
+### 2026-08-27 | progress | wave 2 opens: A3 confirmed, preflight re-run, T3 dispatched
+
+consequence · T3 · behaviour:high · governance:high
+review · T3 · planned: independent adversarial reviewer, worktree-isolated
+
+**Resume, not a fresh sprint.** `gates_signed: G1,G2 @ f24abde` stands. T1 and T8 are complete; T2 is
+re-opened with 2 of 4 DoD struck and blocked on T3. The preflight was re-run rather than read off D5,
+per D5's own instruction that a grown `Layers:` invalidates the prose row: `PREFLIGHT: CLEAR`, base-ref
+matches live HEAD `7d71749`, waves `T1=0 T8=1 T3=2 T2=3 T4=3 T5=3 T6=4 T7=5`. **Wave 2 is T3 alone**,
+and it is the critical path — T2's re-derivation, T4 and T5 all sit behind it.
+
+**A3 is CONFIRMED, re-derived rather than inherited** (its own `Confirm:` clause required exactly
+that). Two queries that had to agree, per the cross-check rule:
+`sh scripts/lib/read-spec-rules.sh spec/STANDARD.md --section 4` returns **7 rows** — `S4.BAR` (Gated,
+judgment-only) · `S4.ONEFILE` · `S4.APPEND` (Gated, **mechanical via git history**) · `S4.INDEX` ·
+`S4.SECTIONS` · `S4.NEGATIVE` (Structural, mechanical) · `S4.NOINVENT` (Gated, judgment-only). The
+independent second number: `--reconcile` against §14's own counts table prints `PASS  §4    7 rules`.
+**S4.APPEND is §4's only git-defined rule** — the sole row whose mark names git. This also reconciles
+§ Scope's "all five rules": five mechanical, two judgment-only, and the judgment pair is not migrated.
+
+*Recorded because a query error nearly stood:* the first attempt ran `read-spec-rules.sh` with no spec
+argument and returned **zero** `S4.` rows. Zero is exactly what a genuinely empty section returns, so
+had it been acted on it would have read as a finding about the spec rather than about the invocation.
+It was caught by the second query disagreeing, which is the point of the rule (L-105 family).
+
+**Review depth for T3, logged at the moment the skip table was consulted** (TD-092 — the outcome alone
+is unreachable to `check-review-depth.sh`). T3 is Tier G, `class: execution`, size M, risk med;
+behaviour impact **high** (a whole-repository traversal that does not exist today) and governance
+impact **high** (it is the conformance engine — a guard whose false negative is silent by
+construction). Both the skip table's governance arm and CLAUDE.md's standing Tier G rule land on the
+same depth: **an independent adversarial reviewer, dispatched worktree-isolated** (L-168 — adversarial
+verification writes, so a non-isolated reviewer plus any `git add -A` ships a corrupted guard inside an
+unrelated commit). Not a self-pass: across the last two sprints every guard defect here was caught by
+an independent pass or a disagreeing second number, and **none** by recalling the governing rule.
+
+**Dispatch note.** The builder was briefed with Round 11's defect as ground truth — `runSection()`
+wires `createBuiltInRegistry()`, which registers only `S9.LOGDIR`, while `createF12Registry()`'s four
+rules are never connected — and told that wiring real dispatch is T3's core job precisely because T2's
+blocked re-measurement depends on it. It was also handed the design problem T3 actually turns on:
+`Registry<TPort>` is single-port, a whole-spec traversal must cross `SprintDirPort` and
+`GitBoundaryPort`, and DoD 3 forbids resolving that with a switch. `built-in.ts`'s own header predicted
+this seam and deferred it. The builder owns no sprint-file writes: it returns its Log entry in its
+report (SPRINT-063's two-copies failure), and the coordinator writes here.
