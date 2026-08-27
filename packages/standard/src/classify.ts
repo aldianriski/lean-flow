@@ -19,7 +19,7 @@
 // DoD 2 closed off.
 
 import type { Registry } from "./registry.ts";
-import type { StandardRule } from "./model.ts";
+import type { RuleId, StandardRule } from "./model.ts";
 import type { RuleEvaluation } from "./result.ts";
 
 /** §14: why a mark's rule is never dispatched against a repository at all. */
@@ -75,14 +75,21 @@ function gap(rule: StandardRule): EvaluatedRule {
 }
 
 /**
- * Resolves one §14-marked rule to its named outcome: dispatch through `registry` for the two
- * checkable marks (`mechanical`/`split` -- GAP when nothing is registered), or `excluded` for the four
- * that are never evaluated against a repository at all. `port` is only ever touched when a `mechanical`
- * or `split` rule actually has a registered evaluator -- the four excluded marks never reach `port` or
- * `registry.dispatch` at all, even if an evaluator happens to be registered under their id (§14:
+ * The mark-driven core, dispatch-AGNOSTIC (SPRINT-091 T3): resolves one §14-marked rule to its named
+ * outcome by calling a plain `dispatch(id)` function for the two checkable marks (`mechanical`/`split`
+ * -- GAP when it returns `undefined`), or `excluded` for the four that are never evaluated against a
+ * repository at all. `dispatch` is only ever CALLED when a `mechanical`/`split` rule reaches this
+ * branch -- the four excluded marks never call it, even if it happens to resolve their id (§14:
  * "never evaluate it against an adopter").
+ *
+ * Split out from `classifyRule` below so a WHOLE-SPEC traversal (`traverse.ts`, EPIC-014 H12) can
+ * drive this EXACT mark logic through a dispatch function composed across SEVERAL families with
+ * different port shapes (`registry.ts`'s `BoundDispatcher`), without a second copy of this switch --
+ * the switch itself is unchanged from SPRINT-087 T2; only its dispatch step was generalised from
+ * `registry.dispatch(id, port)` (one port) to a bare `(id) => RuleEvaluation | undefined` (any number
+ * of ports, already bound by the caller).
  */
-export function classifyRule<TPort>(rule: StandardRule, registry: Registry<TPort>, port: TPort): RuleOutcome {
+export function classifyRuleVia(rule: StandardRule, dispatch: (id: RuleId) => RuleEvaluation | undefined): RuleOutcome {
   switch (rule.mark) {
     case "judgment-only":
       return excluded(
@@ -112,7 +119,7 @@ export function classifyRule<TPort>(rule: StandardRule, registry: Registry<TPort
       );
     case "mechanical":
     case "split": {
-      const evaluation = registry.dispatch(rule.id, port);
+      const evaluation = dispatch(rule.id);
       return evaluation ? { kind: "evaluated", evaluation } : gap(rule);
     }
     default: {
@@ -125,6 +132,18 @@ export function classifyRule<TPort>(rule: StandardRule, registry: Registry<TPort
       throw new Error(`classifyRule: unrecognized mark ${JSON.stringify(unrecognized)} for ${rule.id}`);
     }
   }
+}
+
+/**
+ * Resolves one §14-marked rule to its named outcome, dispatching through ONE `registry` bound to ONE
+ * `port` -- the single-family shape every existing caller (`classifySection`, this file's own tests)
+ * already uses, and whose behaviour is unchanged by T3's refactor. Now a thin wrapper over
+ * `classifyRuleVia` above: `registry.dispatch(id, port)` closed into a bare `(id) => ...` function is
+ * exactly what `registry.ts`'s own `bindRegistry` does for cross-family composition, so this call site
+ * demonstrates the single-family case of the same seam rather than a separate mechanism.
+ */
+export function classifyRule<TPort>(rule: StandardRule, registry: Registry<TPort>, port: TPort): RuleOutcome {
+  return classifyRuleVia(rule, (id) => registry.dispatch(id, port));
 }
 
 /**

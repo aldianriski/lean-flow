@@ -5,7 +5,7 @@ import { RULE_MARKS, makeRuleId, type RuleMark, type StandardRule } from "./mode
 import { createRegistry } from "./registry.ts";
 import { marksInStandard, sectionsOf } from "./spec-reader.ts";
 import { tokenize } from "./tokenizer.ts";
-import { classifyRule, outcomeName, type RuleOutcome } from "./classify.ts";
+import { classifyRule, classifyRuleVia, outcomeName, type RuleOutcome } from "./classify.ts";
 
 // `readFileSync` stays in this `*.test.ts` file only, matching spec-reader.test.ts's own pattern --
 // classify.ts itself never touches the filesystem (domain layer, V3 §2.1).
@@ -50,6 +50,55 @@ describe("classifyRule — mechanical/split dispatch through the registry (DoD 1
     const registry = createRegistry<FakePort>();
     const outcome = classifyRule(ruleOf("split"), registry, { calls: [] });
     expect(outcome.kind === "evaluated" && outcome.evaluation.verdict).toBe("gap");
+  });
+});
+
+// --- SPRINT-091 T3: classifyRuleVia -- the dispatch-agnostic core a whole-spec traversal drives ------
+describe("classifyRuleVia — identical mark logic, driven by a PLAIN dispatch function (no Registry/port)", () => {
+  test("dispatches through the given function for mechanical/split, exactly like classifyRule", () => {
+    const calls: string[] = [];
+    const outcome = classifyRuleVia(ruleOf("mechanical"), (id) => {
+      calls.push(id);
+      return { ruleId: id, verdict: "pass", findings: [], detail: "ok" };
+    });
+    expect(outcome).toEqual({
+      kind: "evaluated",
+      evaluation: { ruleId: makeRuleId("S1.X"), verdict: "pass", findings: [], detail: "ok" },
+    });
+    expect(calls).toEqual([makeRuleId("S1.X")]);
+  });
+
+  test("a dispatch function returning undefined still reports GAP, never a silent pass", () => {
+    const outcome = classifyRuleVia(ruleOf("mechanical"), () => undefined);
+    expect(outcome.kind === "evaluated" && outcome.evaluation.verdict).toBe("gap");
+  });
+
+  test("the four excluded marks never call dispatch at all -- same refusal as classifyRule", () => {
+    let called = false;
+    for (const mark of ["judgment-only", "implementation-directed", "restated", "standard-directed"] as const) {
+      const outcome = classifyRuleVia(ruleOf(mark), () => {
+        called = true;
+        return undefined;
+      });
+      expect(outcome.kind).toBe("excluded");
+    }
+    expect(called).toBe(false);
+  });
+
+  // classifyRule is now a thin wrapper: `registry.dispatch(id, port)` closed over ONE port is the
+  // single-family instance of the exact seam `registry.ts`'s `bindRegistry` uses for MANY families.
+  // This proves the wrapping introduced no behavioural drift between the two entry points.
+  test("classifyRule(rule, registry, port) agrees with classifyRuleVia(rule, id => registry.dispatch(id, port)) on every mark", () => {
+    const registry = createRegistry<FakePort>();
+    registry.register(makeRuleId("S1.X"), () => ({ ruleId: makeRuleId("S1.X"), verdict: "fail", findings: [], detail: "d" }));
+    const port: FakePort = { calls: [] };
+
+    for (const mark of RULE_MARKS) {
+      const rule = ruleOf(mark);
+      const viaRegistry = classifyRule(rule, registry, port);
+      const viaPlainDispatch = classifyRuleVia(rule, (id) => registry.dispatch(id, port));
+      expect(viaRegistry).toEqual(viaPlainDispatch);
+    }
   });
 });
 

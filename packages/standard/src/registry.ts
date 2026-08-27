@@ -39,3 +39,48 @@ export function createRegistry<TPort>(): Registry<TPort> {
     },
   };
 }
+
+// --- SPRINT-091 T3: composing MULTIPLE families across DIFFERENT port shapes ------------------------
+//
+// `Registry<TPort>` is single-port by design (above): one family, one port shape, proven by
+// `registry.test.ts`'s own second-evaluator test. A WHOLE-SPEC traversal (EPIC-014 H12) must dispatch
+// across families whose ports do NOT share a shape -- `SprintDirPort` for S9, `GitBoundaryPort` for
+// F12, more as later families land -- and `../rules/built-in.ts`'s own header predicted exactly this
+// ("a second rule family with a DIFFERENT port would need its own registry -- not modelled here").
+// That second port now exists; this is the seam it deferred.
+//
+// `BoundDispatcher` erases `TPort` by CLOSING one already-typechecked `Registry<TPort>` over one
+// already-constructed `TPort` instance -- never by widening `Registry` itself to accept `unknown`
+// (which would let a mismatched port compile against the wrong family's evaluators). `bindRegistry`
+// is the ONLY place a registry and a port are paired this way; every family still registers its own
+// evaluators at ITS OWN call site (`built-in.ts`, `f12-registry.ts`, ...), completely unaware that
+// erasure exists. A whole-spec traversal (`traverse.ts`) then holds a LIST of these, one per family,
+// and asks each "do you own this id" (`has`, a plain `Map.has` underneath -- no port touched, so
+// membership tests are free of side effects) before ever calling `dispatch`. Composing the list is a
+// loop, not a switch: adding family N+1 is appending one more `bindRegistry(...)` call at the
+// traversal's OWN composition site (`apps/cli/src/main.ts`), never a new case in `traverse.ts` or here.
+export interface BoundDispatcher {
+  /** True if THIS family's registry has an evaluator for `id` -- resolved without touching the port. */
+  has(id: RuleId): boolean;
+  /** Dispatches against this family's own bound port. Only valid when `has(id)` is true; a caller
+   *  that skips the check gets a loud throw, never a silent `undefined` standing in for "not mine". */
+  dispatch(id: RuleId): RuleEvaluation;
+}
+
+/** Binds one family's `Registry<TPort>` to one concrete `port`, erasing `TPort` for cross-family
+ *  composition. The pairing happens exactly once, here, at the call site that already knows both
+ *  the family's registry AND its real port -- never inferred or re-derived downstream. */
+export function bindRegistry<TPort>(registry: Registry<TPort>, port: TPort): BoundDispatcher {
+  return {
+    has(id) {
+      return registry.resolve(id) !== undefined;
+    },
+    dispatch(id) {
+      const evaluation = registry.dispatch(id, port);
+      if (evaluation === undefined) {
+        throw new Error(`BoundDispatcher.dispatch: ${id} has no registered evaluator -- caller must check has() first`);
+      }
+      return evaluation;
+    },
+  };
+}

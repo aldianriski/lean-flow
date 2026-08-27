@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { makeRuleId } from "./model.ts";
-import { createRegistry } from "./registry.ts";
+import { bindRegistry, createRegistry } from "./registry.ts";
 import type { RuleEvaluation } from "./result.ts";
 
 type FakePort = { readonly label: string };
@@ -41,5 +41,60 @@ describe("createRegistry — dispatch through a map, never a switch", () => {
     registry.register(makeRuleId("S9.LOGDIR"), () => passing("v1"));
     registry.register(makeRuleId("S9.LOGDIR"), () => passing("v2"));
     expect(registry.dispatch(makeRuleId("S9.LOGDIR"), { label: "x" })?.detail).toBe("v2");
+  });
+});
+
+// --- SPRINT-091 T3: bindRegistry -- the type-erasure seam a whole-spec traversal composes over ------
+type OtherPort = { readonly tag: string };
+
+describe("bindRegistry — erases TPort so registries with DIFFERENT port shapes can be composed", () => {
+  test("has() reports true for a registered id WITHOUT touching the port", () => {
+    let touched = false;
+    const registry = createRegistry<FakePort>();
+    registry.register(makeRuleId("S9.LOGDIR"), () => {
+      touched = true;
+      return passing("x");
+    });
+    const bound = bindRegistry(registry, { label: "never touched" });
+
+    expect(bound.has(makeRuleId("S9.LOGDIR"))).toBe(true);
+    expect(touched).toBe(false); // membership alone must never invoke the evaluator
+  });
+
+  test("has() reports false for an id nothing registers", () => {
+    const bound = bindRegistry(createRegistry<FakePort>(), { label: "x" });
+    expect(bound.has(makeRuleId("S9.LOGDIR"))).toBe(false);
+  });
+
+  test("dispatch() calls the bound evaluator against the bound port, with no port argument at the call site", () => {
+    const registry = createRegistry<FakePort>();
+    registry.register(makeRuleId("S9.LOGDIR"), (port) => passing(`bound:${port.label}`));
+    const bound = bindRegistry(registry, { label: "hi" });
+
+    expect(bound.dispatch(makeRuleId("S9.LOGDIR")).detail).toBe("bound:hi");
+  });
+
+  test("dispatch() on an id nothing registers throws loudly rather than returning undefined silently", () => {
+    const bound = bindRegistry(createRegistry<FakePort>(), { label: "x" });
+    expect(() => bound.dispatch(makeRuleId("S9.LOGDIR"))).toThrow(/has no registered evaluator/);
+  });
+
+  // The load-bearing proof for T3's central design problem: TWO registries with COMPLETELY DIFFERENT
+  // port shapes (FakePort vs OtherPort) each bind to their OWN `BoundDispatcher`, indistinguishable
+  // from the composing caller's point of view -- neither carries any residual type information a
+  // caller could branch on, which is exactly what lets `traverse.ts` hold a plain
+  // `readonly BoundDispatcher[]` of them.
+  test("two registries with UNRELATED port shapes both erase to the identical BoundDispatcher interface", () => {
+    const a = createRegistry<FakePort>();
+    a.register(makeRuleId("S9.LOGDIR"), (port) => passing(`a:${port.label}`));
+    const b = createRegistry<OtherPort>();
+    b.register(makeRuleId("S1.LAW2"), (port) => ({ ruleId: makeRuleId("S1.LAW2"), verdict: "fail", findings: [], detail: `b:${port.tag}` }));
+
+    const dispatchers = [bindRegistry(a, { label: "L" }), bindRegistry(b, { tag: "T" })];
+
+    expect(dispatchers[0]?.has(makeRuleId("S9.LOGDIR"))).toBe(true);
+    expect(dispatchers[0]?.has(makeRuleId("S1.LAW2"))).toBe(false);
+    expect(dispatchers[1]?.has(makeRuleId("S1.LAW2"))).toBe(true);
+    expect(dispatchers[1]?.dispatch(makeRuleId("S1.LAW2")).detail).toBe("b:T");
   });
 });

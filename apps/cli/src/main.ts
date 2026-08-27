@@ -2,8 +2,10 @@
 //
 // SPRINT-083 T2 shipped the smallest thing that proves the workspace runs: argument parsing and two
 // informational flags. SPRINT-087 T1 adds the first rule -- one, `--rule <id> [repo-dir]` -- as the
-// tracer bullet through the TS engine (EPIC-014 H07). Not `conformance`/`qa-check` wholesale: those
-// stay Shell's until a whole family cuts over (the strangler migration, EPIC-014 D2).
+// tracer bullet through the TS engine (EPIC-014 H07). SPRINT-091 T3 adds the flagless FULL run --
+// `leanflow <repo-dir>`, no flag -- mirroring `sh conformance.sh <repo-dir>`'s own one-argument
+// invocation shape (EPIC-014 H12). Not `qa-check` wholesale: that stays Shell's until every family
+// cuts over (the strangler migration, EPIC-014 D2).
 //
 // Clean Architecture direction (V3 §2.1): this file is the outermost layer. It may import
 // application packages; nothing may import it. test/architecture/dependency-direction.test.ts
@@ -11,12 +13,16 @@
 
 import { makeRuleId, type RuleId } from "../../../packages/standard/src/model.ts";
 import { createBuiltInRegistry } from "../../../packages/standard/src/rules/built-in.ts";
+import { createF12Registry } from "../../../packages/standard/src/rules/f12-registry.ts";
 import { FsSprintDirPort } from "../../../packages/standard/src/adapters/fs-sprint-dir.ts";
+import { FsGitBoundaryPort } from "../../../packages/standard/src/adapters/fs-git-boundary.ts";
+import { bindRegistry } from "../../../packages/standard/src/registry.ts";
 import { exitCodeFor, type RuleEvaluation } from "../../../packages/standard/src/result.ts";
-import { toStandardRule } from "../../../packages/standard/src/spec-reader.ts";
+import { sectionNumberOfRuleId, toStandardRule } from "../../../packages/standard/src/spec-reader.ts";
 import { outcomeName } from "../../../packages/standard/src/classify.ts";
 import { classifySection } from "../../../packages/standard/src/section.ts";
-import { readSpecSectionFromDisk, BUNDLED_SPEC_PATH } from "./spec-file-reader.ts";
+import { classifyAll, composeFamilies } from "../../../packages/standard/src/traverse.ts";
+import { readSpecAllFromDisk, readSpecSectionFromDisk, BUNDLED_SPEC_PATH } from "./spec-file-reader.ts";
 
 /** Adapter-independent description of what one invocation asked for. */
 export type Invocation =
@@ -24,6 +30,7 @@ export type Invocation =
   | { kind: "help" }
   | { kind: "rule"; ruleId: string; repoDir: string }
   | { kind: "section"; section: string; repoDir: string }
+  | { kind: "full"; repoDir: string }
   | { kind: "unknown"; args: readonly string[] };
 
 /**
@@ -43,26 +50,36 @@ export function parse(argv: readonly string[]): Invocation {
     return { kind: "section", section: argv[sectionIdx + 1] as string, repoDir: argv[sectionIdx + 2] ?? "." };
   }
 
+  // The flagless full run (T3): exactly ONE argument, and it is not itself a flag -- mirrors
+  // `sh conformance.sh <repo-dir>`'s own single positional argument. Two or more arguments (e.g.
+  // `conformance .`, an existing test's own case) stay `unknown`: only a lone, non-flag token is
+  // unambiguous enough to read as "the repo to check", never a typo'd or partial flag invocation.
+  if (argv.length === 1 && argv[0] !== undefined && !argv[0].startsWith("-")) {
+    return { kind: "full", repoDir: argv[0] };
+  }
+
   if (argv.length === 0 || argv.some((a) => a === "--help" || a === "-h")) return { kind: "help" };
   return { kind: "unknown", args: argv };
 }
 
 const VERSION_LINE =
-  "leanflow (lean-flow reference engine) -- pre-release, one rule implemented via --rule";
+  "leanflow (lean-flow reference engine) -- pre-release, whole-spec traversal via a flagless invocation";
 
 const HELP_LINE = [
   VERSION_LINE,
   "",
-  "usage: leanflow [--version] [--help] [--rule <rule-id> [repo-dir]] [--section <N> [repo-dir]]",
+  "usage: leanflow [--version] [--help] [--rule <rule-id> [repo-dir]] [--section <N> [repo-dir]] [repo-dir]",
   "",
   "  --rule S9.LOGDIR .   evaluate ONE rule against repo-dir (default: .)",
-  "                       the only rule wired so far (EPIC-014 H07's tracer bullet)",
   "  --section 9 .        evaluate every rule spec/STANDARD.md's §9 defines, against repo-dir",
   "                       a TARGETED run -- it never prints a global conformance level, because",
   "                       it never checked every rule the spec defines (SPRINT-087 T4)",
+  "  .                    (no flag) evaluate EVERY rule the spec defines, dispatched by its §14",
+  "                       mark -- a rule with no evaluator registered anywhere reports a named",
+  "                       gap, never a silent skip (SPRINT-091 T3). No global level yet (T4)",
   "",
   "The reference engine is being built family by family under a strangler migration",
-  "(EPIC-014). Until a family cuts over, the authoritative implementation is Shell:",
+  "(EPIC-014). Until every family cuts over, the authoritative implementation is Shell:",
   "  sh conformance.sh .      conformance report",
   "  sh scripts/qa-check.sh   the repository gate",
 ].join("\n");
@@ -197,6 +214,66 @@ function runSection(sectionArg: string, repoDir: string, write: (s: string) => v
 }
 
 /**
+ * The flagless FULL run (SPRINT-091 T3, EPIC-014 H12): `leanflow <repo-dir>`, no `--rule`/`--section`
+ * -- every rule the parser admits, across every section, dispatched by its §14 mark. Mirrors
+ * `sh conformance.sh <repo-dir>`'s own invocation shape (a single positional repo-dir, no flag), so a
+ * flagless TS invocation and a flagless Shell one ask the IDENTICAL question of the IDENTICAL
+ * repository -- the parity oracle DoD 1 names.
+ *
+ * Family registration stays at EACH family's own call site (`../../../packages/standard/src/rules/
+ * built-in.ts`'s `createBuiltInRegistry`, `f12-registry.ts`'s `createF12Registry`) -- this list only
+ * PAIRS each registry with its own concrete port and hands the result to `bindRegistry`
+ * (`registry.ts`), then `composeFamilies` (`traverse.ts`) merges them into ONE dispatch function.
+ * Appending a family here is the one place EPIC-014's remaining families (F5/F2/F1/F7) plug in;
+ * nothing above this list, and nothing in `traverse.ts`/`classify.ts`, gains a new case for it (DoD 3).
+ *
+ * No `level:` line here -- T4 owns full-run level arithmetic, deliberately split out (EPIC-014 H12).
+ * `TraversalReport` carries no field a level could occupy (`traverse.ts`, frozen the same way
+ * `section.ts`'s `SectionReport` is) and this renderer prints none of its own: a rule with no
+ * evaluator registered ANYWHERE prints a named `gap` (DoD 2), never a level-bearing verdict.
+ */
+function runFull(repoDir: string, write: (s: string) => void): number {
+  const specResult = readSpecAllFromDisk(BUNDLED_SPEC_PATH);
+  if (!specResult.ok) {
+    write(`leanflow: ${specResult.finding} -- ${specResult.message}`);
+    return specReadExitCode(specResult);
+  }
+
+  const rules = specResult.rows.map((row) => toStandardRule(row, sectionNumberOfRuleId(row.id), BUNDLED_SPEC_PATH));
+
+  // `FsGitBoundaryPort`'s second argument is the spec its §12 rules read PROSE from (allowed asset
+  // dirs, generated-file classes) -- defaults to `<repoDir>/spec/STANDARD.md` (this repo's own gate,
+  // checking itself), which does not exist for an arbitrary repo-dir under test. ADR-023 / this
+  // engine's own spec reader already draw the line: the Standard is shipped BESIDE the engine, never
+  // vendored by the repo being measured (mirrors `sh conformance-engine.sh`'s own header: "the engine
+  // resolves spec/STANDARD.md relative to ITSELF, not to the repo under test").
+  const dispatch = composeFamilies([
+    bindRegistry(createBuiltInRegistry(), new FsSprintDirPort(repoDir)),
+    bindRegistry(createF12Registry(), new FsGitBoundaryPort(repoDir, BUNDLED_SPEC_PATH)),
+  ]);
+
+  const report = classifyAll(rules, dispatch);
+
+  const evaluations: RuleEvaluation[] = [];
+  for (const outcome of report.outcomes) {
+    if (outcome.kind === "excluded") {
+      write(`note  ${outcome.ruleId} -- ${outcomeName(outcome)}: ${outcome.detail}`);
+      continue;
+    }
+    const { evaluation } = outcome;
+    evaluations.push(evaluation);
+    const prefix =
+      evaluation.verdict === "fail" ? "FAIL " : evaluation.verdict === "pass" ? "PASS " : evaluation.verdict === "gap" ? "gap  " : "note ";
+    write(`${prefix} ${evaluation.ruleId} -- ${evaluation.detail}`);
+    for (const finding of evaluation.findings) {
+      write(`  - ${finding.name}: ${finding.detail}`);
+    }
+  }
+
+  return exitCodeFor({ evaluations });
+}
+
+/**
  * Render an invocation. Returns the exit code rather than calling `process.exit`, so a test can
  * assert the code without terminating the runner.
  */
@@ -212,6 +289,8 @@ export function run(inv: Invocation, write: (s: string) => void): number {
       return runRule(inv.ruleId, inv.repoDir, write);
     case "section":
       return runSection(inv.section, inv.repoDir, write);
+    case "full":
+      return runFull(inv.repoDir, write);
     case "unknown":
       write(`leanflow: unknown argument(s): ${inv.args.join(" ")}`);
       write(HELP_LINE);

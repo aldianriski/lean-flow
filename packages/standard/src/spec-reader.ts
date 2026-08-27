@@ -442,3 +442,21 @@ export function toStandardRule(row: RuleRow, sectionNumber: number, file: string
   const level: ConformanceLevel | null = isConformanceLevel(row.level) ? row.level : null;
   return { id, section: sectionNumber, mark, level, source: { file, line: row.loc.line } };
 }
+
+/**
+ * The section number embedded in a rule id's OWN text (`S12.SECRETS` -> 12) -- the same digits
+ * `rulesInWindow`'s `ID_CELL_RE` already captures and cross-checks against the enclosing heading
+ * (above). Exists because `allRules()`'s `RuleRow` carries no `section` field of its own: `rulesInSection`
+ * always has ONE section number to hand `toStandardRule` (its own caller passed it in), but a
+ * whole-document traversal (SPRINT-091 T3, `allRules`/`readAll`) walks every section's rows in a
+ * single pass and has no single number to reuse for all of them -- this recovers it per-row from the
+ * id text itself, which every admitted row already carries by construction (`ID_CELL_RE` never
+ * matches a cell that isn't `` `S<digits>.<REST>` ``).
+ */
+export function sectionNumberOfRuleId(id: string): number {
+  const m = /^S(\d+)\./.exec(id);
+  if (!m || m[1] === undefined) {
+    throw new Error(`sectionNumberOfRuleId: not a rule id (no leading "S<digits>."): ${JSON.stringify(id)}`);
+  }
+  return Number(m[1]);
+}

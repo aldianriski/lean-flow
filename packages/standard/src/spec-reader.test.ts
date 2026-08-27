@@ -15,6 +15,7 @@ import {
   readSection,
   reconcile,
   rulesInSection,
+  sectionNumberOfRuleId,
   sectionsOf,
   specNotFound,
   toStandardRule,
@@ -250,6 +251,41 @@ describe("toStandardRule — lifts a raw row into the H04 domain model", () => {
   test("a mark the Standard does not define throws -- that is a parse defect, not a value to paper over", () => {
     const row = { id: "S1.X", level: "Attested", mark: "automatic", loc: { file: "f.md", line: 1 } };
     expect(() => toStandardRule(row, 1, "f.md")).toThrow();
+  });
+});
+
+// --- SPRINT-091 T3: sectionNumberOfRuleId -- recovers a whole-document row's section from its OWN id
+describe("sectionNumberOfRuleId — the section digits embedded in a rule id's own text", () => {
+  test("a plain single-digit section id", () => {
+    expect(sectionNumberOfRuleId("S9.LOGDIR")).toBe(9);
+  });
+
+  test("a two-digit section id", () => {
+    expect(sectionNumberOfRuleId("S12.SECRETS")).toBe(12);
+  });
+
+  test("a hyphenated id (21 of the 100 rules carry one) still resolves from the leading digits only", () => {
+    expect(sectionNumberOfRuleId("S2.F-ARCHIVE")).toBe(2);
+  });
+
+  test("agrees with allRules()'s OWN section assignment for every one of the real spec's 100 rows", () => {
+    // Cross-check (CLAUDE.md's "a query whose result you act on gets a second query that must
+    // agree"): rederiving each row's section from its id text must match sectionsOf()'s own window
+    // assignment for every real row, not just the three hand-picked cases above.
+    const doc = tokenize(readFileSync(SPEC_PATH, "utf8"), SPEC_PATH);
+    let checked = 0;
+    for (const section of sectionsOf(doc)) {
+      if (section.number <= 0) continue;
+      for (const row of rulesInSection(doc, section.number)) {
+        expect(sectionNumberOfRuleId(row.id)).toBe(section.number);
+        checked++;
+      }
+    }
+    expect(checked).toBe(100); // the same published denominator allRules() itself is checked against
+  });
+
+  test("a non-rule-id string throws rather than silently returning NaN or 0", () => {
+    expect(() => sectionNumberOfRuleId("not-a-rule-id")).toThrow();
   });
 });
 

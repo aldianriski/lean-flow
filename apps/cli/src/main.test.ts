@@ -5,9 +5,15 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse, run, specReadExitCode } from "./main.ts";
-import { readSpecSectionFromDisk } from "./spec-file-reader.ts";
+import { readSpecAllFromDisk, readSpecSectionFromDisk, BUNDLED_SPEC_PATH } from "./spec-file-reader.ts";
 import { tokenize } from "../../../packages/standard/src/tokenizer.ts";
-import { marksInStandard, readSection, reconcile } from "../../../packages/standard/src/spec-reader.ts";
+import { marksInStandard, readSection, reconcile, sectionNumberOfRuleId, toStandardRule } from "../../../packages/standard/src/spec-reader.ts";
+import { createBuiltInRegistry } from "../../../packages/standard/src/rules/built-in.ts";
+import { createF12Registry } from "../../../packages/standard/src/rules/f12-registry.ts";
+import { FsSprintDirPort } from "../../../packages/standard/src/adapters/fs-sprint-dir.ts";
+import { FsGitBoundaryPort } from "../../../packages/standard/src/adapters/fs-git-boundary.ts";
+import { bindRegistry } from "../../../packages/standard/src/registry.ts";
+import { classifyAll, composeFamilies } from "../../../packages/standard/src/traverse.ts";
 
 const SHELL_READER_PATH = fileURLToPath(new URL("../../../scripts/lib/read-spec-rules.sh", import.meta.url));
 const SPEC_PATH = fileURLToPath(new URL("../../../spec/STANDARD.md", import.meta.url));
@@ -286,6 +292,236 @@ describe("leanflow --section (SPRINT-087 T4)", () => {
     expect(run({ kind: "section", section: "8", repoDir: "." }, write)).toBe(0);
     expect(lines).toEqual([]);
   });
+});
+
+// --- SPRINT-091 T3: the flagless FULL run (EPIC-014 H12) ---------------------------------------------
+//
+// Acceptance: "a flagless conformance invocation answers a whole repository, matching Shell row-by-row."
+// Round 11 of this sprint's own log struck an earlier agreement check for counting `S12.` LINES, which
+// both engines print once per spec row REGARDLESS of verdict -- a check that cannot fail (L-108). Every
+// comparison below diffs VERDICTS or independently-derived CATEGORY COUNTS, never a raw line count.
+describe("leanflow full run (SPRINT-091 T3) — parse() recognises the flagless invocation", () => {
+  test("a single non-flag argument is the flagless full run", () => {
+    expect(parse(["."])).toEqual({ kind: "full", repoDir: "." });
+    expect(parse(["/tmp/some-repo"])).toEqual({ kind: "full", repoDir: "/tmp/some-repo" });
+  });
+
+  test("a single FLAG-shaped argument is never read as a full run (falls through to help/unknown)", () => {
+    expect(parse(["-x"])).toEqual({ kind: "unknown", args: ["-x"] });
+    expect(parse(["-h"])).toEqual({ kind: "help" });
+  });
+
+  // Sibling control, pre-existing behaviour unchanged: TWO bare arguments still read as unknown, never
+  // a full run with the first one silently picked as repo-dir.
+  test("CONTROL: two bare arguments stay unknown, exactly as before this task", () => {
+    expect(parse(["conformance", "."])).toEqual({ kind: "unknown", args: ["conformance", "."] });
+  });
+
+  // Sibling control: a bare `[]` still reads as help -- T3 does not touch this pre-existing behaviour.
+  test("CONTROL: zero arguments still read as help, not as a full run against the cwd", () => {
+    expect(parse([])).toEqual({ kind: "help" });
+  });
+});
+
+const ENGINE_PATH = fileURLToPath(new URL("../../../scripts/lib/conformance-engine.sh", import.meta.url));
+const FULL_ORACLE_TIMEOUT_MS = 25_000;
+
+/** Runs the real `conformance-engine.sh <repo-dir>` -- no `--section`, the FULL run -- fresh, never a
+ * copied literal, exactly mirroring `s12-secrets.test.ts`'s own `runShellEngine` pattern. */
+function runShellEngine(repoDir: string): { readonly code: number; readonly stdout: string } {
+  try {
+    const stdout = execFileSync("sh", [ENGINE_PATH, repoDir], { encoding: "utf8", timeout: 20_000 });
+    return { code: 0, stdout };
+  } catch (e) {
+    const err = e as { status?: number; stdout?: string };
+    return { code: err.status ?? 1, stdout: err.stdout ?? "" };
+  }
+}
+
+/** The verdict line for exactly ONE rule id, on either engine's output -- matched by SHAPE, never a
+ * substring (a `S12.SECRETS` search must not also match `S12.SECRETSAUX` if that ever existed).
+ * Shell's own driver (`conformance-engine.sh`'s `ok()`/`bad()`) prints the id as the SECOND token on
+ * a clean pass (`"PASS  S9.LOGDIR            -- ..."`) but appends it parenthesised at the END on a
+ * named failure (`"FAIL  sprint-log-outside-logs-dir: ... (S9.LOGDIR)"`, `_cur_rid`'s own format) --
+ * both forms are matched here, exactly, never a looser "contains the id anywhere" search. */
+function verdictLineFor(stdout: string, ruleId: string): string | undefined {
+  return stdout.split("\n").find((l) => {
+    const trimmed = l.trim();
+    return trimmed.split(/\s+/)[1] === ruleId || trimmed.endsWith(`(${ruleId})`);
+  });
+}
+function verdictWord(line: string | undefined): string | undefined {
+  return line?.trim().split(/\s+/)[0];
+}
+
+function freshGitRepo(prefix: string): string {
+  const repo = mkdtempSync(join(tmpdir(), prefix));
+  execFileSync("git", ["-C", repo, "init", "-q"]);
+  execFileSync("git", ["-C", repo, "config", "user.email", "test@test.local"]);
+  execFileSync("git", ["-C", repo, "config", "user.name", "test"]);
+  return repo;
+}
+function track(repo: string, relPath: string, content: string): void {
+  const full = join(repo, relPath);
+  mkdirSync(join(full, ".."), { recursive: true });
+  writeFileSync(full, content);
+  execFileSync("git", ["-C", repo, "add", relPath]);
+}
+
+describe("leanflow full run — DoD 1: every rule the parser admits is traversed and dispatched by its mark", () => {
+  const capture = () => {
+    const lines: string[] = [];
+    return { lines, write: (s: string) => lines.push(s) };
+  };
+
+  test("prints exactly 100 verdict/note/gap lines -- ADR-034's own frozen denominator, never fewer", () => {
+    const { lines, write } = capture();
+    run({ kind: "full", repoDir: "." }, write);
+    const verdictLines = lines.filter((l) => /^(PASS |FAIL |gap  |note )/.test(l));
+    expect(verdictLines).toHaveLength(100);
+  });
+
+  // The row SET itself is already proven byte-for-byte against read-spec-rules.sh in
+  // spec-reader.test.ts's "allRules -- full-document parity" block (100/100, in document order) --
+  // reused here (readSpecAllFromDisk is the same reader this CLI's runFull calls), never re-derived.
+  // What THIS test proves independently is the MARK-CLASSIFICATION decision for every one of those
+  // 100 rows, cross-checked against the live Shell oracle's OWN independently-computed category
+  // counts (its `counts:` line) -- never a raw line count (L-108: Round 10's struck mistake).
+  test("mark-classification counts agree with the live Shell oracle, category by category", () => {
+    const repo = mkdtempSync(join(tmpdir(), "cli-full-marks-"));
+    const shell = runShellEngine(repo);
+    const m =
+      /counts: (\d+) passed, (\d+) judgment-required, (\d+) excluded \(implementation-directed\), (\d+) excluded \(restated[^)]*\), (\d+) excluded \(standard-directed\), (\d+) unchecked \(engine gap\)/.exec(
+        shell.stdout,
+      );
+    if (!m) throw new Error(`could not parse Shell's own 'counts:' line out of:\n${shell.stdout}`);
+    const judgment = Number(m[2]);
+    const impl = Number(m[3]);
+    const restated = Number(m[4]);
+    const stddir = Number(m[5]);
+
+    const specResult = readSpecAllFromDisk(BUNDLED_SPEC_PATH);
+    expect(specResult.ok).toBe(true);
+    if (!specResult.ok) return;
+    const rules = specResult.rows.map((row) => toStandardRule(row, sectionNumberOfRuleId(row.id), BUNDLED_SPEC_PATH));
+    const dispatch = composeFamilies([
+      bindRegistry(createBuiltInRegistry(), new FsSprintDirPort(repo)),
+      bindRegistry(createF12Registry(), new FsGitBoundaryPort(repo, BUNDLED_SPEC_PATH)),
+    ]);
+    const report = classifyAll(rules, dispatch);
+    expect(report.outcomes).toHaveLength(100);
+
+    const excluded = report.outcomes.filter((o) => o.kind === "excluded");
+    const judgmentTs = excluded.filter((o) => o.kind === "excluded" && o.reason === "judgment-only").length;
+    const otherExcludedTs = excluded.length - judgmentTs;
+    const dispatchableTs = report.outcomes.length - excluded.length; // mechanical + split (ADR-034's 51)
+
+    // Independently derived on the Shell side too, from its OWN four category counts -- never a
+    // number this test invents, and never one either engine's dispatch COVERAGE can move (these four
+    // counts come purely from the MARK column, before either engine decides whether it has an
+    // evaluator for a mechanical/split rule).
+    expect(judgmentTs).toBe(judgment);
+    expect(otherExcludedTs).toBe(impl + restated + stddir);
+    expect(dispatchableTs).toBe(100 - (judgment + impl + restated + stddir));
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  test("DoD 2: a mechanical rule with no evaluator ANYWHERE reports a NAMED gap, never a silent pass", () => {
+    const { lines, write } = capture();
+    run({ kind: "full", repoDir: "." }, write);
+    // S1.LAW2 is used elsewhere in this same file (the --rule describe block) as a known, real,
+    // currently-unregistered mechanical rule -- reused here rather than re-declared.
+    const line = lines.find((l) => / S1\.LAW2 /.test(l) || l.trim().split(/\s+/)[1] === "S1.LAW2");
+    expect(line).toBeDefined();
+    expect(line).toContain("gap");
+    expect(line).toContain("rule-unimplemented");
+  });
+
+  test("an excluded rule (judgment-only) is reported by name, never dispatched, never PASS/FAIL/gap", () => {
+    const { lines, write } = capture();
+    run({ kind: "full", repoDir: "." }, write);
+    expect(lines.join("\n")).toContain("note  S9.JUDGMENTTICK -- excluded/judgment-required");
+  });
+
+  test("the full run prints NO global 'level:' line -- T4's job, deliberately not T3's", () => {
+    const { lines, write } = capture();
+    run({ kind: "full", repoDir: "." }, write);
+    for (const line of lines) expect(line).not.toMatch(/^\s*level:/);
+  });
+});
+
+// --- Round 11's fix, proven directly: a registered evaluator is REACHABLE through the CLI's flagless
+// dispatch path, not merely correct when called in isolation (which f12-registry.test.ts/section.ts's
+// own tests already proved -- what was MISSING before this task was CLI wiring, not evaluator logic).
+describe("leanflow full run — CLI-reachable dispatch, live Shell parity per rule (Round 11's own defect, fixed)", () => {
+  const capture = () => {
+    const lines: string[] = [];
+    return { lines, write: (s: string) => lines.push(s) };
+  };
+
+  test("S9.LOGDIR dispatches for REAL through the flagless CLI path: PASS on a clean repo, matching Shell", () => {
+    const repo = freshGitRepo("cli-full-s9-pass-");
+    mkdirSync(join(repo, "docs", "sprint"), { recursive: true });
+    writeFileSync(join(repo, "docs", "sprint", "SPRINT-001-x.md"), "# plan");
+
+    const { lines, write } = capture();
+    run({ kind: "full", repoDir: repo }, write);
+    const tsLine = lines.find((l) => l.trim().split(/\s+/)[1] === "S9.LOGDIR");
+    expect(verdictWord(tsLine)).toBe("PASS");
+
+    const shell = runShellEngine(repo);
+    expect(verdictWord(verdictLineFor(shell.stdout, "S9.LOGDIR"))).toBe("PASS");
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  test("S9.LOGDIR dispatches for REAL through the flagless CLI path: FAIL on a misplaced log, matching Shell", () => {
+    const repo = freshGitRepo("cli-full-s9-fail-");
+    mkdirSync(join(repo, "docs", "sprint"), { recursive: true });
+    writeFileSync(join(repo, "docs", "sprint", "SPRINT-001-x-log.md"), "log");
+
+    const { lines, write } = capture();
+    run({ kind: "full", repoDir: repo }, write);
+    const tsLine = lines.find((l) => l.trim().split(/\s+/)[1] === "S9.LOGDIR");
+    expect(verdictWord(tsLine)).toBe("FAIL");
+    expect(lines.join("\n")).toContain("sprint-log-outside-logs-dir");
+
+    const shell = runShellEngine(repo);
+    expect(verdictWord(verdictLineFor(shell.stdout, "S9.LOGDIR"))).toBe("FAIL");
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  test("all four S12 rules dispatch for REAL through the flagless CLI path: PASS on a clean git repo, matching Shell", () => {
+    const repo = freshGitRepo("cli-full-s12-pass-");
+    track(repo, "README.md", "# hi\n");
+
+    const { lines, write } = capture();
+    run({ kind: "full", repoDir: repo }, write);
+    const shell = runShellEngine(repo);
+
+    for (const ruleId of ["S12.SECRETS", "S12.BACKUPS", "S12.DESIGNSRC", "S12.GENERATED"]) {
+      const tsLine = lines.find((l) => l.trim().split(/\s+/)[1] === ruleId);
+      expect(verdictWord(tsLine)).toBe("PASS");
+      expect(verdictWord(verdictLineFor(shell.stdout, ruleId))).toBe("PASS");
+    }
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  // The retained must-FAIL fixture (CLAUDE.md's Tier G bar): a REAL leaked credential, dispatched
+  // through the FULL CLI path this time, not `evaluate()` called directly.
+  test("S12.SECRETS FAILs for REAL through the flagless CLI path on a committed secret, matching Shell", () => {
+    const repo = freshGitRepo("cli-full-s12-fail-");
+    track(
+      repo,
+      "service-account.json",
+      '{"type":"service_account","private_key":"-----BEGIN PRIVATE KEY-----\\nMIIEvQ...\\n-----END PRIVATE KEY-----\\n"}\n',
+    );
+
+    const { lines, write } = capture();
+    const code = run({ kind: "full", repoDir: repo }, write);
+    expect(code).toBe(1);
+    const tsLine = lines.find((l) => l.trim().split(/\s+/)[1] === "S12.SECRETS");
+    expect(verdictWord(tsLine)).toBe("FAIL");
+    expect(lines.join("\n")).toContain("secret-committed");
+
+    const shell = runShellEngine(repo);
+    expect(verdictWord(verdictLineFor(shell.stdout, "S12.SECRETS"))).toBe("FAIL");
+  }, FULL_ORACLE_TIMEOUT_MS);
 });
 
 // SPRINT-087 T5 -- the process-boundary exit mapping itself, tested directly against ALL FIVE current
