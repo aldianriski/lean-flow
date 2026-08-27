@@ -250,3 +250,59 @@ describe("§4 parity — TS evaluators vs the LIVE Shell oracle, on the RETAINED
     expect(shellVerdictFor(shellOut, "S4.NEGATIVE")).toBe("pass");
   }, ORACLE_TIMEOUT_MS);
 });
+
+// --- The empty-slug case: an INTENDED TS/Shell divergence, RULED by the owner (T6 retry) ------------
+//
+// `docs/adr/ADR-001-.md` -- a canonical NUMBER prefix, but an EMPTY slug -- exposes that the Shell
+// oracle is internally inconsistent with ITSELF: `assert_S4_ONEFILE`'s own glob
+// (scripts/lib/conformance-engine.sh:1450) is `ADR-[0-9][0-9][0-9]-?*.md` -- `?*` requires ONE OR MORE
+// slug characters -- while `_adr_canonical` (scripts/lib/conformance-engine.sh:1422), the function
+// S4.INDEX/S4.SECTIONS/S4.NEGATIVE all iterate through, uses `ADR-[0-9][0-9][0-9]-*.md` -- a bare `*`,
+// allowing ZERO. So Shell reports S4.ONEFILE=FAIL (correctly judging the file non-canonical) and then
+// S4.INDEX/S4.SECTIONS/S4.NEGATIVE=PASS on the SAME file it just rejected -- three rules silently
+// re-admitting what a fourth just threw out.
+//
+// `ADR_CANONICAL_NAME_RE` (`adr-family.ts`) is used ONE way, everywhere, by construction --
+// `/^ADR-\d{3}-.+\.md$/`'s `.+` requires >=1 slug character, matching ONEFILE's OWN stricter glob. So
+// TS reports S4.ONEFILE=fail (AGREES with Shell) and S4.INDEX/S4.SECTIONS/S4.NEGATIVE=note (DISAGREES
+// with Shell's PASS on all three -- TS never re-admits a file its own S4.ONEFILE just rejected).
+//
+// ADR-034 freezes rule inclusion/exclusion, so this could not be ticked silently once found. Owner's
+// ruling (coordinator, SPRINT-091 T6 retry): TS STAYS consistent; the divergence is an INTENDED
+// behaviour change, and Shell's own two-glob inconsistency is filed as a Shell defect for the eventual
+// cutover -- NOT fixed here (`scripts/lib/conformance-engine.sh` stays outside every task's Layers,
+// and the owner's ruling explicitly does not fix Shell in this sprint). The two tests below each pin
+// ONE side of the divergence independently -- neither asserts TS and Shell agree here, because they do
+// not, deliberately -- so the next person to run a §4 differential meets this as documented and
+// expected, never as a fresh mystery.
+describe("§4 EMPTY-SLUG divergence — an INTENDED TS/Shell disagreement, ruled by the owner (retained fixture)", () => {
+  const fixtureDir = join(FIXTURES_ROOT, "empty-slug");
+
+  test("TS: S4.ONEFILE=fail (noncanonical name); S4.INDEX/SECTIONS/NEGATIVE=note (not canonical -- nothing to check)", () => {
+    const scenario = loadFixtureScenario(fixtureDir);
+    const port = new InMemoryAdrFamilyPort(scenario);
+
+    const onefile = evaluateOnefile(port);
+    expect(onefile.verdict).toBe("fail");
+    expect(onefile.findings).toHaveLength(1);
+    expect(onefile.findings[0]?.detail).toContain("docs/adr/ADR-001-.md");
+
+    // `ADR_CANONICAL_NAME_RE` requires >=1 slug character (matches ONEFILE's OWN stricter glob), so
+    // `ADR-001-.md` is excluded from `canonicalAdrs()` -- these three see NO canonical ADR at all,
+    // never the file S4.ONEFILE just rejected re-admitted as canonical (Shell's own inconsistency).
+    expect(evaluateIndex(port).verdict).toBe("note");
+    expect(evaluateSections(port).verdict).toBe("note");
+    expect(evaluateNegative(port).verdict).toBe("note");
+  });
+
+  // Ground truth, re-derived LIVE against the real oracle -- NOT asserted equal to TS above, because
+  // they disagree, deliberately. This is the Shell-side half of the divergence this fixture exists to
+  // document: the same tree, three rules re-admitting what the fourth just rejected.
+  test("Shell (ground truth, re-derived live): ONEFILE=FAIL but INDEX/SECTIONS/NEGATIVE=PASS on the SAME file -- the Shell-side inconsistency this fixture documents", () => {
+    const shellOut = runShellEngine(fixtureDir);
+    expect(shellVerdictFor(shellOut, "S4.ONEFILE")).toBe("fail");
+    expect(shellVerdictFor(shellOut, "S4.INDEX")).toBe("pass");
+    expect(shellVerdictFor(shellOut, "S4.SECTIONS")).toBe("pass");
+    expect(shellVerdictFor(shellOut, "S4.NEGATIVE")).toBe("pass");
+  }, ORACLE_TIMEOUT_MS);
+});
