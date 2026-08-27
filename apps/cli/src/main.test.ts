@@ -590,6 +590,100 @@ describe("leanflow full run — CLI-reachable dispatch, live Shell parity per ru
   }, FULL_ORACLE_TIMEOUT_MS);
 });
 
+// --- T9's own regression coverage: --section 12 must keep dispatching F12, not just the day it landed
+//
+// The independent reviewer of T9 (commit 621bc32) seeded the EXACT struck defect back into a worktree
+// copy -- reverted `runSection` to dispatch through `createBuiltInRegistry()` alone, F12 unregistered,
+// byte-for-byte Round 11's own struck bug -- and ran this whole file: 55/55 still passed. Nothing here
+// would have caught a silent re-introduction; the only things that did were ad-hoc live-oracle commands
+// run by hand, never captured as a test. This block closes that gap, mirroring the flagless run's own
+// "CLI-reachable dispatch" block above but through `--section 12` specifically -- the exact invocation
+// shape Round 10/11 measured and T9 fixed.
+//
+// Every assertion is a PER-RULE VERDICT against a live-spawned `conformance-engine.sh`, never a line
+// count and never "rule-unimplemented absent from a substring" -- the L-108 shape that struck Round 10
+// and would have hidden the reviewer's seeded regression from a weaker check. The strong form (DoD 1's
+// own "cannot pass vacuously" bar): four retained must-FAIL fixtures, one per F12 rule, each forcing a
+// REAL FAIL through `--section 12` -- `gap` is never `"FAIL"`, so `toBe("FAIL")` reddens the instant F12
+// drops out of `--section`'s composed dispatch, which is exactly what the reviewer's seed produced.
+describe("leanflow --section 12 — CLI-reachable F12 dispatch, live Shell parity per rule (T9's own regression coverage)", () => {
+  const capture = () => {
+    const lines: string[] = [];
+    return { lines, write: (s: string) => lines.push(s) };
+  };
+
+  test("all four S12 rules dispatch for REAL through --section 12: PASS on a clean git repo, matching Shell", () => {
+    const repo = freshGitRepo("cli-section12-pass-");
+    track(repo, "README.md", "# hi\n");
+
+    const { lines, write } = capture();
+    run({ kind: "section", section: "12", repoDir: repo }, write);
+    const shell = runShellEngine(repo);
+
+    for (const ruleId of ["S12.SECRETS", "S12.BACKUPS", "S12.DESIGNSRC", "S12.GENERATED"]) {
+      const tsLine = lines.find((l) => l.trim().split(/\s+/)[1] === ruleId);
+      expect(verdictWord(tsLine)).toBe("PASS");
+      expect(verdictWord(verdictLineFor(shell.stdout, ruleId))).toBe("PASS");
+    }
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  test("S12.SECRETS FAILs for REAL through --section 12 on a committed secret, matching Shell", () => {
+    const repo = freshGitRepo("cli-section12-secrets-fail-");
+    track(repo, ".env", "DB_PASSWORD=hunter2-actual-value\n");
+
+    const { lines, write } = capture();
+    const code = run({ kind: "section", section: "12", repoDir: repo }, write);
+    expect(code).toBe(1);
+    const tsLine = lines.find((l) => l.trim().split(/\s+/)[1] === "S12.SECRETS");
+    expect(verdictWord(tsLine)).toBe("FAIL");
+
+    const shell = runShellEngine(repo);
+    expect(verdictWord(verdictLineFor(shell.stdout, "S12.SECRETS"))).toBe("FAIL");
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  test("S12.BACKUPS FAILs for REAL through --section 12 on a real pg_dump export, matching Shell", () => {
+    const repo = freshGitRepo("cli-section12-backups-fail-");
+    track(repo, "prod-dump.sql", "-- PostgreSQL database dump\n-- Dumped from database version 14.2\n");
+
+    const { lines, write } = capture();
+    const code = run({ kind: "section", section: "12", repoDir: repo }, write);
+    expect(code).toBe(1);
+    const tsLine = lines.find((l) => l.trim().split(/\s+/)[1] === "S12.BACKUPS");
+    expect(verdictWord(tsLine)).toBe("FAIL");
+
+    const shell = runShellEngine(repo);
+    expect(verdictWord(verdictLineFor(shell.stdout, "S12.BACKUPS"))).toBe("FAIL");
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  test("S12.DESIGNSRC FAILs for REAL through --section 12 on a design source outside the asset dirs, matching Shell", () => {
+    const repo = freshGitRepo("cli-section12-designsrc-fail-");
+    track(repo, "design/mockup.psd", "binary-ish content\n");
+
+    const { lines, write } = capture();
+    const code = run({ kind: "section", section: "12", repoDir: repo }, write);
+    expect(code).toBe(1);
+    const tsLine = lines.find((l) => l.trim().split(/\s+/)[1] === "S12.DESIGNSRC");
+    expect(verdictWord(tsLine)).toBe("FAIL");
+
+    const shell = runShellEngine(repo);
+    expect(verdictWord(verdictLineFor(shell.stdout, "S12.DESIGNSRC"))).toBe("FAIL");
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  test("S12.GENERATED FAILs for REAL through --section 12 on a tracked dist/ artifact, matching Shell", () => {
+    const repo = freshGitRepo("cli-section12-generated-fail-");
+    track(repo, "dist/bundle.js", "console.log(1);\n");
+
+    const { lines, write } = capture();
+    const code = run({ kind: "section", section: "12", repoDir: repo }, write);
+    expect(code).toBe(1);
+    const tsLine = lines.find((l) => l.trim().split(/\s+/)[1] === "S12.GENERATED");
+    expect(verdictWord(tsLine)).toBe("FAIL");
+
+    const shell = runShellEngine(repo);
+    expect(verdictWord(verdictLineFor(shell.stdout, "S12.GENERATED"))).toBe("FAIL");
+  }, FULL_ORACLE_TIMEOUT_MS);
+});
+
 // SPRINT-087 T5 -- the process-boundary exit mapping itself, tested directly against ALL FIVE current
 // `SpecFinding` values (`packages/standard/src/spec-reader.ts`'s `SpecFinding` union), not only the ones
 // `--section` can reach today. `runSection` can only ever PRODUCE `spec-not-found`/`spec-table-unreadable`
