@@ -8,15 +8,18 @@
     "exactOptionalPropertyTypes": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
-
     "target": "ESNext",
     "module": "Preserve",
     "moduleResolution": "bundler",
-    "lib": ["ESNext"],
-    "types": ["bun"],
-
+    "lib": [
+      "ESNext"
+    ],
+    "types": [
+      "bun"
+    ],
     "noEmit": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "allowImportingTsExtensions": true
   }
 }

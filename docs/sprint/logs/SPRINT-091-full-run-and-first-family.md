@@ -97,3 +97,122 @@ over a shared file contaminates at the commit phase (L-042/L-037), and a faster 
 merge is not faster.
 
 consequence · T0 · behaviour:low · governance:high
+
+### 2026-08-27 | blocker | T1 contradicts ADR-035's zero-dependency clause; halted for an owner ruling
+
+consequence · T1 · behaviour:material · governance:high
+
+**Blocked before any edit.** T1 asks for a type-checker dependency to be *declared*. **ADR-035
+§ "What the workspace deliberately does NOT have" already decided the opposite**, in terms that name
+this exact thing:
+
+> **Zero dependencies.** Bun executes TypeScript directly, so there is no install step and no
+> `node_modules`. This is the consumer-facing decision (L-015): `plugin install` copies the repo
+> verbatim, so **any** dependency here would land in every consumer's cache. **Type *checking* needs
+> `typescript` and is deferred until something needs it.**
+
+So the missing checker is a **recorded decision with a consumer-facing rationale**, not an oversight.
+
+**Two records disagree and neither reaches the other.** `TD-101` calls the absence *"an absent guard
+wearing the shape of a present one"* and never cites ADR-035; ADR-035 calls it a deliberate deferral
+and predates TD-101. Whoever filed TD-101 did not reach the ADR that governs it — **L-151's family**,
+and the reason the conflict survived intake, promote and G2 unnoticed.
+
+**This is a G2 miss, named as one.** G2 recorded *"no ADR owed this sprint — nothing in T1–T7 is
+hard-to-reverse-and-surprising."* That was wrong: T1 reverses a standing ADR. The G2 checklist asks
+whether a task *creates* a hard-to-reverse decision; it does not ask whether a task **contradicts one
+already recorded**, and nothing mechanical checks a Plan against the ADR corpus. **Learning candidate
+→ `/insights`:** a design gate that only looks forward cannot see a decision it is undoing.
+
+**One fact established before escalating, because it changes the answer.** ADR-035's stated mechanism
+is that a dependency lands in every consumer's cache. `.gitignore:2` ignores `node_modules/`, and
+`git status` does not see it (verified by probe). `plugin install` fetches the marketplace repo, and a
+gitignored directory is not in that repo — so **for a dev-only, gitignored dependency the stated
+mechanism appears not to bind.** What *would* ship is a `devDependencies` entry and a lockfile, neither
+of which installs anything on a consumer who never runs `bun install`. **Stated as evidence, not as a
+verdict:** `plugin install`'s copy semantics were not verified from inside this repo, and ADR-035's
+authors may have had grounds not recorded there.
+
+**Why this is not mine to decide.** T1 is declared `J1` — delegated *inside the recorded envelope*.
+Reversing an ADR that G2 explicitly said was not in play is outside that envelope, and ADR-035 itself
+sets the bar for revisiting as **"consumer impact, not purity"** while noting reversal *"is expensive:
+deleting the TS tree is easy today, harder every family."* An owner ruling is required.
+
+**Unblock condition:** an owner ruling on whether ADR-035's zero-dependency clause is amended to admit
+a dev-only gitignored type checker. Until then T1 does not proceed. **T2 is unblocked and disjoint**
+(wave 0, `docs/research/logs/qa-gate-timing.md` alone) and can run without touching this question.
+
+**Explicitly rejected as a workaround:** gating the type check on `tsc` being present so it no-ops when
+absent. That satisfies the literal DoD while producing exactly the failure TD-101 exists to name — a
+check that cannot fail, reporting green (L-105). Dodging the gate is scope-changing, and scope-changing
+is itself HITL.
+
+### 2026-08-27 | scope-change | owner ruled ADR-035 amended; T1 grows to carry the amendment
+
+**Owner ruling (2026-08-27):** amend ADR-035's zero-dependency clause to admit a **dev-only, gitignored
+type checker**, then run T1. Recorded here because the launching transcript is not what a later reader
+parses (L-099 · L-151).
+
+**Grounds, as ruled.** ADR-035's stated mechanism is that *any* dependency lands in every consumer's
+cache; `.gitignore:2` ignores `node_modules/` and `plugin install` fetches the marketplace repo, so the
+mechanism does not bind a gitignored devDependency. ADR-035's own revisit bar is **"consumer impact,
+not purity"**, and it explicitly anticipated the stance coming under pressure. The caveat stands and is
+not being waved away: `plugin install`'s copy semantics were not verified from inside this repo, and
+the ruling is taken on that stated basis rather than on a measurement.
+
+**Scope impact.** T1 was "wire a type checker into the gate". It now also carries **an amendment to
+ADR-035** — a governance artifact, ADR-029 Tier **P**, in a task otherwise Tier **G**. This widens T1's
+`Layers:` to include `docs/adr/` and the amendment must itself satisfy **S4.APPEND**, the §4 rule
+governing post-decision markers — which T7 migrates later in this same sprint. The Plan is edited after
+this entry, not before.
+
+**Not re-opened:** the zero-dependency stance for **runtime** dependencies. This admits a dev-only
+checker and nothing else; `packages/contracts` and the engine stay dependency-free, and D6 (the
+consumer must not be required to install Bun) is untouched.
+
+consequence · T1 · behaviour:material · governance:high
+
+### 2026-08-27 | surprise | the checker turned on and the tree does not type-check — 59 real errors
+
+consequence · T1 · behaviour:material · governance:high
+
+**ADR-037 landed, `typescript@7.0.2` + `@types/bun` installed dev-only, `node_modules` confirmed
+gitignored and invisible to `git status`. Then the checker ran, and the finding is larger than TD-101
+described.**
+
+`bunx tsc --noEmit` exits **1** with **139 error lines**. Split by cause, because the two halves have
+very different weight:
+
+| Cause | Count | Nature |
+|---|---:|---|
+| `TS5097` — `.ts` import extensions | **80** | **Config gap, not defects.** Bun permits `.ts` specifiers; `tsc` requires `allowImportingTsExtensions`. One line in `tsconfig.base.json` clears all 80 |
+| Real type errors | **59** | Genuine. `TS2532`×17 · `TS2345`×16 · `TS2769`×9 · `TS18048`×8 · `TS2339`×6 · `TS2322`×3 |
+
+**The 59 are concentrated, not diffuse** — `tokenizer.ts` (20) plus `tokenizer.test.ts` (15) is **35 of
+59 (59%)**; then `spec-reader` +test (9), `section.test` (6), `git-boundary-spec` (3), `model.test` (3),
+and three singles. Ten files total.
+
+**Not all of them are index-guard noise.** Several name modelling failures rather than strictness
+pedantry: `Property 'content' does not exist on type 'HeadingBlock'`, `Property 'rows' does not exist on
+type 'FenceBlock'`, `Property 'evaluation' does not exist on type 'ExcludedRule'` — a discriminated
+union that is not being narrowed where it is read. And `Argument of type 'string' is not assignable to
+parameter of type 'RuleId'` appears repeatedly: **the branded `RuleId` discipline SPRINT-085 recorded as
+a guarantee is not holding**, which is precisely TD-101's stated impact reaching further than TD-101 knew.
+
+**The single most useful fact from this task, recorded plainly:** `bun test` reports **266 pass, 0 fail,
+784 expect() calls** on the *same tree* that carries 59 type errors. A fully green suite and a tree that
+does not type-check, simultaneously. That is TD-101's thesis demonstrated rather than argued, and it is
+the strongest available evidence that the deferral in ADR-035 had a real cost.
+
+**Verified safe before proposing anything:** `allowImportingTsExtensions: true` was added and the full
+suite re-run — 266 pass, 0 fail, unchanged. The config half carries no risk.
+
+**Why T1 halts again rather than continuing.** T1 is `[size: S]`, scoped "wire a type checker into the
+gate". Wiring a *blocking* leg now would red the gate on 59 pre-existing errors — committing through a
+failing check, which is a named red flag. Fixing all 59 across ten files is not an `S`; it is plausibly
+a sprint. Neither branch is inside what G1/G2 signed, and the third option — wiring the leg
+non-blocking — is the un-failable check ADR-037 has just finished rejecting in writing.
+
+**Unblock condition:** an owner ruling on how the 59 are absorbed. **Held, not reverted:** ADR-037,
+`docs/DECISIONS.md`, the dev-only install, and the `allowImportingTsExtensions` config fix are all on
+disk and uncommitted, pending that ruling.

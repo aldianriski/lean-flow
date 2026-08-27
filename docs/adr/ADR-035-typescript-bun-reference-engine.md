@@ -3,12 +3,16 @@ id: ADR-035
 tags: [tooling, process]
 domain: governance
 status: accepted
-related: [ADR-034, ADR-033, ADR-027, ADR-023, ADR-012, ADR-008]
+related: [ADR-037, ADR-034, ADR-033, ADR-027, ADR-023, ADR-012, ADR-008]
 ---
 
 # ADR-035 — TypeScript on Bun becomes the reference engine; the Standard stays Markdown
 
 - **Status:** accepted (2026-08-24)
+- **Scope amended by:** [ADR-037](ADR-037-dev-only-type-checker-admitted.md) (2026-08-27)
+  — the decision below still governs. Its **Zero dependencies** clause is narrowed: it binds what a
+  consumer runs, not what a maintainer checks with, so a dev-only gitignored type checker is admitted.
+  Runtime dependencies and D6 (no consumer toolchain) are unchanged.
 - **Deciders:** Maintainer
 - **Context driver:** a markdown-and-skills plugin is growing a compiled toolchain. That is
   hard-to-reverse, surprising to anyone who knows this repo, and buys real things at a real price —
