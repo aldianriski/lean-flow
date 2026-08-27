@@ -1298,3 +1298,149 @@ is SPRINT-091 **T3**'s work (full traversal + registry wiring). Until then:
   the error is not silently erased. **Round 10 §(2) and §(3) must not be cited without this Round.**
 - Cold-cache, first-run and different-host configurations remain untested; whether git construction ever
   dominates in those conditions is unknown, not disproven.
+
+---
+
+## Round 12 — the ratio, re-derived on real dispatch: 2.3–3.4×, not 7.3–8.6× (SPRINT-091 T2, 2026-08-27)
+
+SPRINT-091 T9 (`621bc32`, `438eba7`) rewired `runSection()` through `composedDispatch`, so `--section 12`
+now dispatches the F12 registry (`FsGitBoundaryPort`) for real, not just `S9.LOGDIR`. Round 11 forbids
+re-deriving §(2)/§(3) until that happens; this Round is the re-derivation, in the order Round 11 requires
+— verdicts, then spawns, then time — on the same target Round 10 used (this repository, 816 tracked
+files, `git -C … ls-files | wc -l`) and the same invocation this task's own Plan text names (`--section
+12`).
+
+### (1) Verdict diff, first — 12/12 agree, checked by content not by count
+
+`bun apps/cli/src/main.ts --section 12 .` against Shell's `conformance-engine.sh . --spec <reduced>`,
+where the reduced spec keeps every `S12.*` row (all 12, not just the four mechanical ones) so both sides
+answer the identical rule set `--section 12` does — built by section boundary (`## §12 —` … `## §13 —`),
+the same technique Round 6 used, not a rule-id allowlist that could silently narrow the set.
+
+| Rule | TS | Shell | Agree? |
+|---|---|---|---|
+| `S12.BOUNDARY`/`LEGAL`/`FINANCIAL`/`PERSONAL`/`PRODLOGS`/`MEETINGNOTES`/`DRAFTS` (7) | judgment-required note | judgment-required note | yes |
+| `S12.WIRING` | excluded note | excluded note | yes |
+| `S12.SECRETS` | PASS — no shape-content pair | PASS — 0 examined | yes |
+| `S12.BACKUPS` | PASS — no dump-tool preamble | PASS — 0 examined | yes |
+| `S12.DESIGNSRC` | PASS — no editable design source outside asset dirs | PASS — 0 examined | yes |
+| `S12.GENERATED` | PASS — 11 classes read, 1 permitted | PASS — 11 classes read, 1 permitted | yes, **exact number match** |
+
+**Second query, run before trusting the "0 examined" rows**: independently `git ls-files | grep -iE
+'\.(sql|dump|bak|ai|psd)$|backup|dump'` (2 hits) and a second grep for `.env`/`id_rsa`/`service-account`
+shapes (0 hits). The 2 backup/dump hits are `packages/standard/src/rules/s12-backups.{ts,test.ts}` — the
+rule's OWN source files, matched on the substring "backup" in their filename, not a real `.sql`/`.bak`
+artifact. This is the L-108 discipline applied to the fixture itself, not just to the agreement check:
+"0 examined" is confirmed a true empty result on this target, not a masked skip. All four mechanical
+rules genuinely evaluated real content on both sides — this is not the Round 10 shape.
+
+### (2) Git-spawn count, per side — TS pays 12, Shell pays 5
+
+**Method.** `GIT_TRACE=<absolute path>` (a file path, not `=1`) forces git to write its trace
+independently of the child process's own stdio configuration — needed because
+`FsGitBoundaryPort.isGitRepo()` spawns with `stdio: ["ignore","ignore","ignore"]`, which silences
+`GIT_TRACE=1`'s stderr output for that call but not a file sink. Confirmed empty vs. non-empty log
+before trusting the count. Nothing in `scripts/`, `evals/`, `packages/`, or `apps/` was modified; the
+trace-log files and the reduced-spec file were written under this session's scratch dir and the
+worktree's own root, then deleted before this edit (`git status` clean, confirmed below).
+
+| Side | Spawns | Breakdown |
+|---|---:|---|
+| TS (`--section 12`) | **12** | 4 rules × (`isGitRepo()` guard + `isGitRepo()` again inside `trackedFiles()` + 1 `ls-files`) — `isGitRepo()` is called twice per rule and cached nowhere |
+| Shell (`--spec`, 12 rows) | **5** | 1 `rev-parse --git-dir` (memoized by `_is_git_repo`'s key-based cache, `298c1e1`) + 4 × `ls-files` (`_s12_tracked` is NOT memoized — one spawn per rule) |
+
+**Second query.** Two independent counts agree on each side: (a) total trace-log lines ÷ 2 (each spawn
+emits exactly 2 lines — verified against a single bare `git rev-parse` call before trusting the
+convention) — TS 24÷2=12, Shell 10÷2=5; (b) a source-reading prediction made BEFORE running the trace
+(`isGitRepo` called explicitly once per rule plus once more inside `trackedFiles()`, times 4 rules = 12;
+Shell's `_is_git_repo` memoized so only its first call spawns, plus 4 unmemoized `_s12_tracked` calls =
+5) — matches the empirical count exactly on both sides.
+
+TS pays **12 vs Shell's 5** — 2.4× the spawn count, confirming the T3 reviewer's un-quantified note from
+Round 11 was directionally right and worse than its own rough "8 vs 4": the redundant in-port
+`isGitRepo()` call doubles TS's own guard cost before Shell's memoization is even accounted for.
+
+### (3) Timing — 5 live samples each side, same target, same section
+
+`time` on the whole process (bash builtin measuring real wall-clock directly — no `date`-fork
+instrumentation overhead to reconcile, unlike Round 10's wrapper).
+
+| Sample | TS `--section 12` (ms) | Shell `--spec` 12-row (ms) |
+|---|---:|---:|
+| 1 | 461 | 1121 |
+| 2 | 357 | 1153 |
+| 3 | 348 | 1155 |
+| 4 | 373 | 1080 |
+| 5 | 384 | 1198 |
+| **min / max / avg** | **348 / 461 / 384.6** | **1080 / 1198 / 1141.4** |
+
+**Ratio (Shell ÷ TS), extremes correctly paired for a quotient** (Round 11 confirmed this pairing
+sound — smallest ratio pairs the smaller numerator with the larger denominator and vice versa):
+
+min = 1080/461 = **2.34×** · max = 1198/348 = **3.44×** · avg/avg = 1141.4/384.6 = **2.97×**
+
+**This is the range to carry: ≈ 2.3 – 3.4×**, not Round 10's struck 7.3–8.6×. The 12-vs-5 spawn gap in
+§(2) is consistent with why: on real work, Shell's memoized `isGitRepo` plus git's own per-spawn floor
+(Round 4's 20–260 ms real-scale figure) closes much of the gap a spawn-free TS process would otherwise
+open.
+
+### (4) Derived ceiling for the ADR-family harness — a range, on the corrected ratio
+
+§4 is still not wired to TS (T6/T7); §12 remains the only cross-engine comparand, so it is used again as
+the stand-in for the ADR-family harness's engine term, **exactly Round 10's method, inheriting Round
+10 §1's split** (not struck, not re-measured this Round): engine 17.55–18.72 s, non-engine 2.27–2.38 s,
+harness-today 19.9–21.0 s. **Sanity-checked, not re-derived**: one uninstrumented run of the shipped
+`run-adr-family-fixtures.sh` this session measured **17.6 s** total — inside this log's own established
+host-variance band (Rounds 7–8), so Round 10's split is treated as still current rather than re-verified
+line-by-line.
+
+| Quantity | Range |
+|---|---|
+| Harness engine term (inherited, Round 10 §1) | 17.55 – 18.72 s |
+| Harness non-engine term (inherited, Round 10 §1) | 2.27 – 2.38 s |
+| Harness today (inherited, Round 10 §1) | 19.9 – 21.0 s |
+| Ratio (this Round, §3) | 2.34 – 3.44× |
+| **Harness after conversion (est.)** | **7.4 – 10.4 s** |
+| **Saving** | **≈ 9.5 – 13.6 s** |
+
+Against a gate observed at ~288–331 s on this host (Round 8's 288.0–330.8 s, Round 9's single 321 s
+sample), that is **≈ 2.9 – 4.7%, roughly 3–5%** — down from Round 10's struck "roughly 5%" computed on a
+comparison that measured nothing on the TS side.
+
+### Caveats
+
+- **§12 is still a proxy for §4, not §4 itself** — Round 10's caveat is unresolved by this Round: §12
+  scans tracked files, §4 reads ADR bodies and git history; the 2.3–3.4× may not transfer, and neither
+  did the struck 7.3–8.6×. The ceiling in §(4) is an estimate built on a proxy ratio and is labelled as
+  one everywhere it is used, same discipline as Round 10.
+- **5 samples per side, one host, one session.** Every range above is a range because of that, not
+  because more samples were unavailable — consistent with this log's standing practice (Rounds 1, 4–8)
+  of not quoting a single-sample figure as a point estimate.
+- **Shell's timing variance was wider on the 4-row-only reduced spec (1089–1536 ms, an earlier
+  intermediate measurement) than on the matched 12-row spec used for §(3) (1080–1198 ms)** — narrower and
+  used here because it is the apples-to-apples comparison; the wider intermediate figure is not carried
+  forward and is named only so a reader who reconstructs this session's raw output does not mistake it
+  for the reported range.
+- **`node_modules/` absence, checked, confirmed not a factor**: this worktree has none (per this task's
+  own environment note), but `apps/cli`/`packages/standard` declare zero runtime dependencies (root
+  `package.json`'s only entries are `devDependencies`: `@types/bun`, `typescript`) and every import
+  in `main.ts` is a relative `.ts` path Bun resolves directly — the five TS samples show no anomalous
+  first-run spike consistent with a missing-`node_modules` penalty. Shell never depended on
+  `node_modules`. This axis of "may itself be unrepresentative" is checked and ruled out; the host-speed
+  axis (Rounds 7–8) is not checked here and remains an open caveat as it has for every prior Round.
+  `bunx tsc --noEmit` (the gate's typecheck leg, per this task's own environment note) is unrelated to
+  either timed path — neither engine invokes `tsc`.
+- **Bun's own process-startup cost is included in the TS figures, not isolated.** If a converted harness
+  spawns one Bun process per CASE rather than once per whole run, that startup cost repeats and erodes
+  the ratio further — Round 10's identical caveat, restated because it was never measured either then or
+  now, not because this Round adds evidence for or against it.
+- **A synthetic must-FAIL fixture was attempted and abandoned, not silently skipped.** To strengthen
+  §(1)'s agreement proof beyond an all-PASS real target, a throwaway `git init` fixture with a deliberate
+  secret file was attempted under this session's scratch directory; the environment's own worktree
+  isolation refused the `git init` call outright (git operations targeting a path outside this worktree
+  are blocked here). The DoD's "one fixture target" is satisfied literally by this repository as the
+  target; a violation-triggering second fixture is named here as unclaimed remaining verification, not
+  claimed as done.
+- **Nothing shipped was modified.** `GIT_TRACE` log files and the section-reduced spec copy were written
+  under this worktree's root and the session scratch directory, then deleted; `git status` is clean at
+  the time of this edit (verified, this file is the only tracked change).
