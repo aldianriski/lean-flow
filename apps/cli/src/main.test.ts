@@ -8,12 +8,6 @@ import { parse, run, specReadExitCode } from "./main.ts";
 import { readSpecAllFromDisk, readSpecSectionFromDisk, BUNDLED_SPEC_PATH } from "./spec-file-reader.ts";
 import { tokenize } from "../../../packages/standard/src/tokenizer.ts";
 import { marksInStandard, readSection, reconcile, sectionNumberOfRuleId, toStandardRule } from "../../../packages/standard/src/spec-reader.ts";
-import { createBuiltInRegistry } from "../../../packages/standard/src/rules/built-in.ts";
-import { createF12Registry } from "../../../packages/standard/src/rules/f12-registry.ts";
-import { FsSprintDirPort } from "../../../packages/standard/src/adapters/fs-sprint-dir.ts";
-import { FsGitBoundaryPort } from "../../../packages/standard/src/adapters/fs-git-boundary.ts";
-import { bindRegistry } from "../../../packages/standard/src/registry.ts";
-import { classifyAll, composeFamilies } from "../../../packages/standard/src/traverse.ts";
 
 const SHELL_READER_PATH = fileURLToPath(new URL("../../../scripts/lib/read-spec-rules.sh", import.meta.url));
 const SPEC_PATH = fileURLToPath(new URL("../../../spec/STANDARD.md", import.meta.url));
@@ -368,6 +362,79 @@ function track(repo: string, relPath: string, content: string): void {
   execFileSync("git", ["-C", repo, "add", relPath]);
 }
 
+// --- T3 retry, DoD 1 finding 1: a genuine PER-RULE mark diff, never an aggregate count -------------
+//
+// Round 10 of this sprint's own log was struck for counting `S12.` LINES (a check that cannot fail --
+// both engines print one line per row regardless of verdict, L-108). The FIRST attempt at this test
+// counted mark-CATEGORY TOTALS instead of lines -- one level up, but the reviewer built a concrete
+// counter-example that still passes it: swap TWO rules between `implementation-directed` and
+// `restated` and both totals are unchanged while both individual rows are wrong. The fix is to diff
+// every row's mark BY ID, never a count of any kind, and to name the offending id on mismatch.
+
+/** Every `(id, mark)` pair from a fresh `read-spec-rules.sh` full-document run (NO `--section`,
+ *  document order) -- the exact oracle DoD 1 names, spawned live, never a copied literal. Row SHAPE
+ *  is `id level mark` (`formatRuleRow`'s own format, already proven byte-for-byte against this same
+ *  reader in `spec-reader.test.ts`'s "allRules -- full-document parity" block); only `id` and `mark`
+ *  are needed here. */
+function shellRowMarks(): ReadonlyMap<string, string> {
+  const stdout = execFileSync("sh", [SHELL_READER_PATH, SPEC_PATH], { encoding: "utf8" });
+  const marks = new Map<string, string>();
+  for (const line of stdout.split("\n")) {
+    const trimmed = line.trim();
+    if (trimmed === "") continue;
+    const parts = trimmed.split(/\s+/);
+    const id = parts[0];
+    const mark = parts[2];
+    if (id !== undefined && mark !== undefined) marks.set(id, mark);
+  }
+  return marks;
+}
+
+/** Every `(id, mark)` pair recoverable from a live `conformance-engine.sh` FULL run's own per-row
+ *  text -- a SECOND, independently-computed oracle (DoD 1 names `conformance-engine.sh` explicitly).
+ *  Only rows the driver's DISPATCH loop annotates with a `mark: <value>` fragment carry one: the four
+ *  excluded categories (`note "$pid -- excluded by mark: <mark> (level: ...)"` /
+ *  `note "$pid -- judgment-required (mark: judgment-only, level: ...)"`) -- mechanical/split rows
+ *  print PASS/FAIL/GAP with no mark annotation at all, so this map is necessarily a SUBSET of the 100
+ *  (the excluded rows), never a re-derivation of the full row-by-row set `shellRowMarks` already
+ *  covers. Id extraction mirrors `verdictLineFor`'s own two-shape discipline: an excluded/note line's
+ *  FIRST token (after `.trim()`) is the padded rule id itself (`note()` prints 6 spaces then the
+ *  message, which starts with the id) -- never the aggregate `counts:`/`coverage:` lines, which do
+ *  not start with a real rule id token and are excluded by the `ID_TOKEN_RE` guard below. */
+const ID_TOKEN_RE = /^S\d+\.[A-Z][A-Z0-9-]*$/;
+function shellMarkAnnotations(repoDir: string): ReadonlyMap<string, string> {
+  const shell = runShellEngine(repoDir);
+  const marks = new Map<string, string>();
+  for (const line of shell.stdout.split("\n")) {
+    const trimmed = line.trim();
+    const markMatch = /\bmark: ([a-z][a-z-]*)/.exec(trimmed);
+    if (!markMatch) continue;
+    const markValue = markMatch[1];
+    if (markValue === undefined) continue;
+    const idToken = trimmed.split(/\s+/)[0];
+    if (idToken === undefined || !ID_TOKEN_RE.test(idToken)) continue;
+    marks.set(idToken, markValue);
+  }
+  return marks;
+}
+
+/**
+ * The comparison itself: every `tsRule.mark` against `oracleMarks.get(tsRule.id)`, naming EACH
+ * mismatching id (never a count, never "N differ") -- the fix DoD 1's counter-example demanded. A
+ * `tsRule` whose id is absent from `oracleMarks` is skipped (expected for `shellMarkAnnotations`,
+ * whose map is deliberately a subset); a genuinely missing id is caught separately by the
+ * 100-row-count assertions each test already carries.
+ */
+function diffMarks(tsRules: readonly { readonly id: string; readonly mark: string }[], oracleMarks: ReadonlyMap<string, string>): string[] {
+  const mismatches: string[] = [];
+  for (const rule of tsRules) {
+    const oracleMark = oracleMarks.get(rule.id);
+    if (oracleMark === undefined) continue;
+    if (oracleMark !== rule.mark) mismatches.push(`${rule.id}: TS says "${rule.mark}", oracle says "${oracleMark}"`);
+  }
+  return mismatches;
+}
+
 describe("leanflow full run — DoD 1: every rule the parser admits is traversed and dispatched by its mark", () => {
   const capture = () => {
     const lines: string[] = [];
@@ -384,45 +451,44 @@ describe("leanflow full run — DoD 1: every rule the parser admits is traversed
   // The row SET itself is already proven byte-for-byte against read-spec-rules.sh in
   // spec-reader.test.ts's "allRules -- full-document parity" block (100/100, in document order) --
   // reused here (readSpecAllFromDisk is the same reader this CLI's runFull calls), never re-derived.
-  // What THIS test proves independently is the MARK-CLASSIFICATION decision for every one of those
-  // 100 rows, cross-checked against the live Shell oracle's OWN independently-computed category
-  // counts (its `counts:` line) -- never a raw line count (L-108: Round 10's struck mistake).
-  test("mark-classification counts agree with the live Shell oracle, category by category", () => {
-    const repo = mkdtempSync(join(tmpdir(), "cli-full-marks-"));
-    const shell = runShellEngine(repo);
-    const m =
-      /counts: (\d+) passed, (\d+) judgment-required, (\d+) excluded \(implementation-directed\), (\d+) excluded \(restated[^)]*\), (\d+) excluded \(standard-directed\), (\d+) unchecked \(engine gap\)/.exec(
-        shell.stdout,
-      );
-    if (!m) throw new Error(`could not parse Shell's own 'counts:' line out of:\n${shell.stdout}`);
-    const judgment = Number(m[2]);
-    const impl = Number(m[3]);
-    const restated = Number(m[4]);
-    const stddir = Number(m[5]);
-
+  test("PER-RULE mark diff against read-spec-rules.sh, all 100 rows, by id -- a mismatch names its rule", () => {
     const specResult = readSpecAllFromDisk(BUNDLED_SPEC_PATH);
     expect(specResult.ok).toBe(true);
     if (!specResult.ok) return;
     const rules = specResult.rows.map((row) => toStandardRule(row, sectionNumberOfRuleId(row.id), BUNDLED_SPEC_PATH));
-    const dispatch = composeFamilies([
-      bindRegistry(createBuiltInRegistry(), new FsSprintDirPort(repo)),
-      bindRegistry(createF12Registry(), new FsGitBoundaryPort(repo, BUNDLED_SPEC_PATH)),
-    ]);
-    const report = classifyAll(rules, dispatch);
-    expect(report.outcomes).toHaveLength(100);
+    expect(rules).toHaveLength(100);
 
-    const excluded = report.outcomes.filter((o) => o.kind === "excluded");
-    const judgmentTs = excluded.filter((o) => o.kind === "excluded" && o.reason === "judgment-only").length;
-    const otherExcludedTs = excluded.length - judgmentTs;
-    const dispatchableTs = report.outcomes.length - excluded.length; // mechanical + split (ADR-034's 51)
+    const oracleMarks = shellRowMarks();
+    expect(oracleMarks.size).toBe(100); // same denominator on both sides, independently counted
 
-    // Independently derived on the Shell side too, from its OWN four category counts -- never a
-    // number this test invents, and never one either engine's dispatch COVERAGE can move (these four
-    // counts come purely from the MARK column, before either engine decides whether it has an
-    // evaluator for a mechanical/split rule).
-    expect(judgmentTs).toBe(judgment);
-    expect(otherExcludedTs).toBe(impl + restated + stddir);
-    expect(dispatchableTs).toBe(100 - (judgment + impl + restated + stddir));
+    const mismatches = diffMarks(rules, oracleMarks);
+    if (mismatches.length > 0) {
+      throw new Error(`${mismatches.length} of 100 row(s) disagree with read-spec-rules.sh:\n${mismatches.join("\n")}`);
+    }
+  });
+
+  // A second, independently-computed oracle -- DoD 1 names `conformance-engine.sh` by name, and this
+  // is the live-spawned driver itself (not its reader), cross-checking the 49 excluded rows whose own
+  // dispatch-loop text carries a `mark:` annotation. Deliberately a SUBSET of the 100 (mechanical/
+  // split rows carry no mark annotation in Shell's PASS/FAIL/GAP lines) -- `shellMarkAnnotations`'s own
+  // header explains why, so the size assertion below states that rather than assuming 100.
+  test("PER-RULE mark diff against the live conformance-engine.sh driver's own annotations, by id", () => {
+    const specResult = readSpecAllFromDisk(BUNDLED_SPEC_PATH);
+    expect(specResult.ok).toBe(true);
+    if (!specResult.ok) return;
+    const rules = specResult.rows.map((row) => toStandardRule(row, sectionNumberOfRuleId(row.id), BUNDLED_SPEC_PATH));
+
+    const repo = mkdtempSync(join(tmpdir(), "cli-full-marks-engine-"));
+    const oracleMarks = shellMarkAnnotations(repo);
+    // A positive witness (L-156): the subset actually examined is real and non-trivial, never a
+    // vacuous pass over zero rows found.
+    expect(oracleMarks.size).toBeGreaterThan(0);
+    expect(oracleMarks.size).toBeLessThan(100);
+
+    const mismatches = diffMarks(rules, oracleMarks);
+    if (mismatches.length > 0) {
+      throw new Error(`${mismatches.length} row(s) disagree with the live conformance-engine.sh driver:\n${mismatches.join("\n")}`);
+    }
   }, FULL_ORACLE_TIMEOUT_MS);
 
   test("DoD 2: a mechanical rule with no evaluator ANYWHERE reports a NAMED gap, never a silent pass", () => {

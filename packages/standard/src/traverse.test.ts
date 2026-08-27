@@ -70,14 +70,56 @@ describe("composeFamilies — a plain list, no switch on rule id or mark (DoD 3)
     expect(dispatch(makeRuleId("S9.LOGDIR"))).toBeUndefined();
   });
 
-  test("the FIRST family that claims an id wins, if two somehow both do (defensive, not a real shape)", () => {
+  // Reviewer finding 2 (T3 retry): first-wins-with-no-detection was the one place in this seam that
+  // broke the codebase's own universal rule that an ambiguity fails LOUD (`gap()` names itself,
+  // `BoundDispatcher.dispatch` throws for an id it doesn't own). Two families claiming the SAME id is
+  // never silently resolved to "whichever was listed first" -- it throws, naming the id and BOTH
+  // families' positions, so a duplicate registration surfaces the moment a real traversal reaches it
+  // rather than becoming permanently dead code discoverable only by reading every registry by eye.
+  test("TWO families claiming the SAME id throws, naming the id -- never a silent first-wins", () => {
     const registryA = createRegistry<PortA>();
     registryA.register(makeRuleId("S9.LOGDIR"), () => ({ ruleId: makeRuleId("S9.LOGDIR"), verdict: "pass", findings: [], detail: "first" }));
     const registryB = createRegistry<PortB>();
     registryB.register(makeRuleId("S9.LOGDIR"), () => ({ ruleId: makeRuleId("S9.LOGDIR"), verdict: "fail", findings: [], detail: "second" }));
 
     const dispatch = composeFamilies([bindRegistry(registryA, { a: "x" }), bindRegistry(registryB, { b: "y" })]);
-    expect(dispatch(makeRuleId("S9.LOGDIR"))?.detail).toBe("first");
+    expect(() => dispatch(makeRuleId("S9.LOGDIR"))).toThrow(/S9\.LOGDIR.*MORE THAN ONE family/);
+  });
+
+  // Sibling control: a DIFFERENT id, claimed by only ONE of the same two families, still dispatches
+  // normally -- the duplicate-detection above must not turn every lookup into a throw, only a
+  // genuinely ambiguous one.
+  test("CONTROL: a different id, claimed by only one of the same two families, still dispatches normally", () => {
+    const registryA = createRegistry<PortA>();
+    registryA.register(makeRuleId("S9.LOGDIR"), () => ({ ruleId: makeRuleId("S9.LOGDIR"), verdict: "pass", findings: [], detail: "a-only" }));
+    const registryB = createRegistry<PortB>();
+    registryB.register(makeRuleId("S12.SECRETS"), () => ({ ruleId: makeRuleId("S12.SECRETS"), verdict: "pass", findings: [], detail: "b-only" }));
+
+    const dispatch = composeFamilies([bindRegistry(registryA, { a: "x" }), bindRegistry(registryB, { b: "y" })]);
+    expect(dispatch(makeRuleId("S9.LOGDIR"))?.detail).toBe("a-only");
+    expect(dispatch(makeRuleId("S12.SECRETS"))?.detail).toBe("b-only");
+  });
+
+  // THREE families, only two of which collide on one id -- proves the check names the RIGHT pair
+  // (positions 0 and 2), not merely "a collision exists somewhere", and that the third, uninvolved
+  // family's own id is unaffected.
+  test("a collision between families at positions 0 and 2 (not adjacent) is still caught and named correctly", () => {
+    type PortC = { readonly c: string };
+    const registryA = createRegistry<PortA>();
+    registryA.register(makeRuleId("S9.LOGDIR"), () => ({ ruleId: makeRuleId("S9.LOGDIR"), verdict: "pass", findings: [], detail: "a" }));
+    const registryB = createRegistry<PortB>();
+    registryB.register(makeRuleId("S12.SECRETS"), () => ({ ruleId: makeRuleId("S12.SECRETS"), verdict: "pass", findings: [], detail: "b" }));
+    const registryC = createRegistry<PortC>();
+    registryC.register(makeRuleId("S9.LOGDIR"), () => ({ ruleId: makeRuleId("S9.LOGDIR"), verdict: "fail", findings: [], detail: "c" }));
+
+    const dispatch = composeFamilies([
+      bindRegistry(registryA, { a: "x" }),
+      bindRegistry(registryB, { b: "y" }),
+      bindRegistry(registryC, { c: "z" }),
+    ]);
+    expect(() => dispatch(makeRuleId("S9.LOGDIR"))).toThrow(/S9\.LOGDIR.*positions 0 and 2 of 3/);
+    // The uninvolved family's own id is untouched by the check.
+    expect(dispatch(makeRuleId("S12.SECRETS"))?.detail).toBe("b");
   });
 });
 

@@ -48,8 +48,13 @@ import { readAll, readSection, specNotFound, type SpecReadResult } from "../../.
 // SPRINT-087 T4: this engine's own copy of the Standard it enforces -- resolved relative to the
 // ENGINE's own source location, never to a `--section`/`--rule` invocation's `repo-dir` argument.
 // `repo-dir` says WHERE to check (the port an evaluator runs against); it has never said WHICH spec
-// to check against -- there is exactly one spec/STANDARD.md, shipped beside this engine (ADR-023),
-// the same one `spec-reader.test.ts` and `classify.test.ts` already resolve this same way.
+// to check against -- there is exactly one spec/STANDARD.md, shipped beside this engine. Corrected
+// SPRINT-091 T3 retry: this cited ADR-023 ("CONTEXT.md becomes a consumer of the extracted spec" --
+// governance/docs, no such language anywhere in it), which was miscited from the start and never
+// caught. No ADR governs this specific placement (checked: grepped every ADR for "beside the engine"
+// and "vendored", zero hits). The convention is `check-attestation.sh`'s own (SPRINT-074 T2), reused
+// verbatim by `conformance-engine.sh`'s header -- the same one `spec-reader.test.ts` and
+// `classify.test.ts` already resolve this same way.
 export const BUNDLED_SPEC_PATH = fileURLToPath(new URL("../../../spec/STANDARD.md", import.meta.url));
 
 type ReadAttempt = { readonly kind: "not-found" } | { readonly kind: "content"; readonly content: string };

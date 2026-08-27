@@ -243,10 +243,13 @@ function runFull(repoDir: string, write: (s: string) => void): number {
 
   // `FsGitBoundaryPort`'s second argument is the spec its §12 rules read PROSE from (allowed asset
   // dirs, generated-file classes) -- defaults to `<repoDir>/spec/STANDARD.md` (this repo's own gate,
-  // checking itself), which does not exist for an arbitrary repo-dir under test. ADR-023 / this
-  // engine's own spec reader already draw the line: the Standard is shipped BESIDE the engine, never
-  // vendored by the repo being measured (mirrors `sh conformance-engine.sh`'s own header: "the engine
-  // resolves spec/STANDARD.md relative to ITSELF, not to the repo under test").
+  // checking itself), which does not exist for an arbitrary repo-dir under test. No ADR governs this
+  // specific placement (checked; none does -- see the T3 retry report). The convention is
+  // `check-attestation.sh`'s (SPRINT-074 T2), reused verbatim by `conformance-engine.sh`'s own header
+  // ("the engine resolves spec/STANDARD.md relative to ITSELF, not to the repo under test... which
+  // has no reason to vendor a copy of the standard it is being measured against") and by this
+  // engine's own spec reader (`apps/cli/src/spec-file-reader.ts`'s `BUNDLED_SPEC_PATH`) -- the Standard
+  // ships beside the engine, never vendored by the repo being measured.
   const dispatch = composeFamilies([
     bindRegistry(createBuiltInRegistry(), new FsSprintDirPort(repoDir)),
     bindRegistry(createF12Registry(), new FsGitBoundaryPort(repoDir, BUNDLED_SPEC_PATH)),
