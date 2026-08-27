@@ -78,16 +78,16 @@ freezing an estimate into an acceptance threshold is the failure L-130 records.
 ### T3 — Full Standard traversal in TS, at parity with the Shell full run `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `apps/cli/src/` · `packages/standard/src/`
 Depends-on: T1, T8
-Cites: EPIC-014 H12 · § Closed-when 2 · SPRINT-087 (registry) · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified)
+Cites: EPIC-014 H12 · § Closed-when 2 · SPRINT-087 (registry) · `scripts/lib/conformance-engine.sh` · `scripts/lib/read-spec-rules.sh` (parity oracles — spawned, never modified)
 Tier **G**. The CLI today answers only `--rule` and `--section`; there is no whole-spec run. Traversal is
 what lets a fixture repo be answered in one in-process call instead of one process per case.
 
 **Acceptance:** a flagless conformance invocation answers a whole repository, matching Shell row-by-row.
 
 **DoD:**
-- [x] Every rule the parser admits is traversed and dispatched by its §14 mark — ✓ `bun apps/cli/src/main.ts .` traverses all **100** rows and dispatches S9.LOGDIR plus the four F12 rules for real (Round 11's defect, fixed). Proven **row-by-row against two live-spawned oracles, neither a copied literal**: every TS row against `read-spec-rules.sh` (no flag, document order) and against `conformance-engine.sh`'s own `mark:` annotations — **0 mismatches**, each naming the offending id on failure rather than a count. The first-pass proof compared category **totals** and was **STRUCK by review** as L-108 a second time in this sprint (the reviewer built the two-rules-swapped counter-example and ran it); replaced under the bounded retry. Discrimination proven: `S2.F-ARCHIVE` seeded `restated`→`judgment-only` on the TS side only, reddened naming exactly that row while the second oracle and every sibling stayed green, restored byte-for-byte under ONE stated convention (`git hash-object`, `c3d2baff…` before and after)
+- [x] Every rule the parser admits is traversed and dispatched by its §14 mark — ✓ `bun apps/cli/src/main.ts .` traverses all **100** rows and dispatches S9.LOGDIR plus the four F12 rules for real (Round 11's defect, fixed). Proven **row-by-row against two live-spawned oracles, neither a copied literal**: every TS row against `scripts/lib/read-spec-rules.sh` (no flag, document order) and against `scripts/lib/conformance-engine.sh`'s own `mark:` annotations — **0 mismatches**, each naming the offending id on failure rather than a count. The first-pass proof compared category **totals** and was **STRUCK by review** as L-108 a second time in this sprint (the reviewer built the two-rules-swapped counter-example and ran it); replaced under the bounded retry. Discrimination proven: `S2.F-ARCHIVE` seeded `restated`→`judgment-only` on the TS side only, reddened naming exactly that row while the second oracle and every sibling stayed green, restored byte-for-byte under ONE stated convention (`git hash-object`, `c3d2baff…` before and after)
 - [x] A rule with no registered evaluator reports as a NAMED gap — ✓ the gap text carries **both** rule id and mark (`rule-unimplemented: the spec marks S12.BACKUPS mechanical…`). Recorded honestly: the **builder never performed the seed-out**, having tested only a rule that was already gapped — the **reviewer did it live**, deregistering `S12_BACKUPS_ID` so exactly that row reddened to a named gap while S9.LOGDIR · S12.SECRETS · DESIGNSRC · GENERATED stayed green, then restoring and hash-verifying (`git hash-object` == `git rev-parse HEAD:<path>`)
-- [x] Dispatch stays open-closed — ✓ `composeFamilies` is a loop over `BoundDispatcher[]`, never a switch; `classify.ts`'s switch is on the closed 6-value `mark` enum and was **extracted, not modified** (the coordinator flagged behaviour-preservation as an agrees-by-construction risk; the reviewer REFUTED it independently, every branch textually unchanged); `built-in.ts` and `f12-registry.ts` untouched, and a "third family, zero code changes" test passes. **Strengthened under retry:** a duplicate id now **throws**, naming the id and both families' positions, closing the one place this seam broke the codebase's own throw-loud rule — before F5 · F2 · F1 · F7 plug into it
+- [x] Dispatch stays open-closed — ✓ `composeFamilies` is a loop over `BoundDispatcher[]`, never a switch; `packages/standard/src/classify.ts`'s switch is on the closed 6-value `mark` enum and was **extracted, not modified** (the coordinator flagged behaviour-preservation as an agrees-by-construction risk; the reviewer REFUTED it independently, every branch textually unchanged); `packages/standard/src/rules/built-in.ts` and `packages/standard/src/rules/f12-registry.ts` untouched, and a "third family, zero code changes" test passes. **Strengthened under retry:** a duplicate id now **throws**, naming the id and both families' positions, closing the one place this seam broke the codebase's own throw-loud rule — before F5 · F2 · F1 · F7 plug into it
 
 ### T4 — Hold semantics and full-run level arithmetic `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `packages/standard/src/`
@@ -173,7 +173,7 @@ ADR-037 rejects in writing.
 ### T9 — Compose families in `--section` too, so T2 has a valid comparand `[size: S · risk: med · class: execution · HITL · J1]`
 Layers: `apps/cli/src/`
 Depends-on: T3
-Cites: TD-090 · SPRINT-091 Round 10/11 (the struck measurement) · L-108 · L-130
+Cites: TD-090 · SPRINT-091 Round 10/11 (the struck measurement) · L-108 · L-130 · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified) · T2 (this task unblocks it; the dependency runs the other way)
 Tier **G** by defaulting up (ADR-029). Added mid-sprint by owner ruling — see the Execution Log's
 `scope-change`. T3 wired the **flagless** run; `runSection()` still hardcodes `createBuiltInRegistry()`,
 so `--section 12` answers `rule-unimplemented` for all four F12 rules while Shell evaluates them. That
@@ -185,7 +185,7 @@ defect a third time.
 **DoD:**
 - [ ] `--section 12` evaluates all four F12 rules for real — *Verify: per-rule VERDICTS diffed against `scripts/lib/conformance-engine.sh` spawned live, never a line count (L-108 — this is the defect being repaired, not merely a risk)*
 - [ ] `--section` and the flagless run agree per rule on the same repo — *Verify: differential over the sections that have registered evaluators; a mismatch names the offending rule id*
-- [ ] `--section` still emits NO global level — *Verify: SPRINT-087 T4's frozen-result property still holds; seed an attempt and confirm it throws*
+- [ ] `--section` still emits NO global level — *Verify: the frozen-result property SPRINT-087 established still holds; seed an attempt and confirm it throws*
 
 ### T10 — ADR-038 for the composed multi-family dispatch seam `[size: S · risk: low · class: decision · HITL · J1]`
 Layers: `docs/adr/ADR-038-composed-multi-family-rule-dispatch.md` · `docs/DECISIONS.md` · `docs/knowledge-index.md`
@@ -201,7 +201,8 @@ reading git history.
 **DoD:**
 - [ ] ADR-038 records the chosen seam and all three rejected alternatives with reasons
 - [ ] It states the duplicate-id constraint the T3 retry added, as a rule future families must satisfy
-- [ ] `docs/DECISIONS.md` carries its row and the knowledge index is regenerated — *Verify: `sh scripts/gen-index.sh --check` (note TD-113: run it in the main tree, where its `cmp -s` is not defeated by CRLF)*
+- [ ] `docs/DECISIONS.md` carries its row — **judgment tick, stated as one**: no mechanical method in this repo reads that table's rows, and inventing a checker so the criterion merely *looks* mechanical is the failure ADR-021/L-136 name, not the fix
+- [ ] The knowledge index is regenerated — *Verify: `sh scripts/gen-index.sh --check`, whose scope is exactly `docs/knowledge-index.md` and nothing else (run it in the MAIN TREE — TD-113: its `cmp -s` is defeated by CRLF in a fresh worktree)*
 
 ## Owner-action checklist
 - [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099).

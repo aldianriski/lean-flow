@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-038](adr/ADR-038-composed-multi-family-rule-dispatch.md) | Composed multi-family rule dispatch: `bindRegistry`/`composeFamilies` bind each typed single-port registry into one whole-spec dispatch surface — a loop over `BoundDispatcher`s, never a switch; a rule id belongs to exactly one family, enforced by a loud throw naming both families on collision | accepted | 2026-08-27 |
 | [ADR-037](adr/ADR-037-dev-only-type-checker-admitted.md) | Dev-only type checker admitted; zero-dependency binds runtime, not the toolchain | accepted | 2026-08-27 |
 | [ADR-036](adr/ADR-036-severity-is-introduced-not-preserved.md) | Severity is **introduced** by the migration, not preserved by it — supersedes ADR-034's Severity row; every row of a compatibility contract must point at an artifact the *current* system has | accepted | 2026-08-24 |
 | [ADR-035](adr/ADR-035-typescript-bun-reference-engine.md) | TypeScript on Bun becomes the **reference engine**; `spec/STANDARD.md` stays normative Markdown. Zero dependencies, no `version` field, and `scripts.test` **must** invoke the real gate — the manifest is this repo's first rung-1 discovery hit and outranks `.gate-command` | accepted | 2026-08-24 |
