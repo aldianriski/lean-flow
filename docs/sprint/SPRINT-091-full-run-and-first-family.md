@@ -190,7 +190,7 @@ defect a third time.
 ### T10 — ADR-038 for the composed multi-family dispatch seam `[size: S · risk: low · class: decision · HITL · J1]`
 Layers: `docs/adr/ADR-038-composed-multi-family-rule-dispatch.md` · `docs/DECISIONS.md` · `docs/knowledge-index.md`
 Depends-on: T3
-Cites: ADR-035 · EPIC-014 D2 · SPRINT-091 T3 review (finding 2)
+Cites: ADR-035 · EPIC-014 D2 · SPRINT-091 T3 review (finding 2) · `scripts/gen-index.sh` (verification method — run, never modified)
 Tier **P** (prose — ADR-029): G1 plus a read-through. Added mid-sprint by owner ruling. The seam is
 what F5 · F2 · F1 · F7 all plug into, and its three rejected alternatives currently exist only inside
 one commit message — invisible to the family author who will not read this git log.
@@ -199,10 +199,10 @@ one commit message — invisible to the family author who will not read this git
 reading git history.
 
 **DoD:**
-- [ ] ADR-038 records the chosen seam and all three rejected alternatives with reasons
-- [ ] It states the duplicate-id constraint the T3 retry added, as a rule future families must satisfy
-- [ ] `docs/DECISIONS.md` carries its row — **judgment tick, stated as one**: no mechanical method in this repo reads that table's rows, and inventing a checker so the criterion merely *looks* mechanical is the failure ADR-021/L-136 name, not the fix
-- [ ] The knowledge index is regenerated — *Verify: `sh scripts/gen-index.sh --check`, whose scope is exactly `docs/knowledge-index.md` and nothing else (run it in the MAIN TREE — TD-113: its `cmp -s` is defeated by CRLF in a fresh worktree)*
+- [x] ADR-038 records the chosen seam and all three rejected alternatives with reasons — ✓ `docs/adr/ADR-038-composed-multi-family-rule-dispatch.md`, Alternatives table: per-rule port provider · registry-of-registries · composite/context port, each with its reason. **Independently reviewed**: every factual claim re-verified against the source (both registry files absent from `4e5b320`/`dabf037` `--stat`; `composeFamilies` confirmed to scan all families with no early break; `bindRegistry` confirmed to have exactly one call site)
+- [x] It states the duplicate-id constraint the T3 retry added, as a rule future families must satisfy — ✓ stated in Decision as a rule, not as a bug report: *"a rule id belongs to exactly one family, and the seam enforces it loudly rather than by convention"*, with the strangler-handoff failure it prevents. Its Negative discloses the real limit — the check is **dynamic**, scoped to whatever list a call site composes, not a static guarantee across the codebase
+- [x] `docs/DECISIONS.md` carries its row — ✓ **judgment tick, and it stays one.** Row present, newest-first above ADR-037, confirmed by the reviewer reading the file. `scripts/gen-index.sh` was checked and does **not** reference `DECISIONS.md` at all, so naming it as this criterion's method would have been an unreachable `Verify:` reading exactly like a satisfied one (L-136) — which is what the original single bundled criterion did, and what the gate caught
+- [x] The knowledge index is regenerated — ✓ `sh scripts/gen-index.sh --check` prints its own line `PASS  gen-index: knowledge index current` in the main tree, reproduced independently by the reviewer. ADR-038 indexed under **process · tooling · governance**, beside ADR-035 and ADR-037. Coordinator correction at merge-back: `domain:` arrived as `doc-standard` and was changed to `governance` — a wrong domain files the ADR under the wrong heading, defeating the one thing it exists for
 
 ## Owner-action checklist
 - [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099).

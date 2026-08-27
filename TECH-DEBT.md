@@ -198,6 +198,17 @@ status: current
   - This is the L-067/L-081 family exactly: *when a check differs between two contexts, diff the
     environments before the code.* It cost this sprint's reviewer a root-cause detour, and it was
     caught only because the reviewer's number **disagreed** with the coordinator's.
+  - **A SECOND, INDEPENDENT CAUSE of the same symptom, found the same day (SPRINT-091 T9).** A
+    fresh worktree has no `node_modules/` -- it is gitignored, and nothing in the dispatch
+    protocol installs one -- so the gate's typecheck leg FAILs with `no type checker at
+    node_modules/.bin/tsc` on code that type-checks clean via `bunx tsc --noEmit`. T9's worktree
+    gate read `QA-CHECK: 212 pass, 4 fail` where the main tree read `216 pass, 0 fail`; **none of
+    the four were attributable to its diff.** Two unrelated mechanisms, one symptom: *the gate is
+    not runnable as-specified in the environment this repo mandates for Tier G review.*
+  - **Why the pair is worse than either alone.** A reviewer who has been told to expect one known
+    false FAIL will reasonably treat a second as noise of the same kind. That is the exact
+    reasoning that lets a REAL failure through, and it is not a hypothetical: three of this
+    sprint's worktree agents each had to spend effort proving their FAILs were not theirs.
   - Fix direction (not a ruling): normalise before comparing, or pin `*.md eol=lf` in `.gitattributes`,
     or have `--check` compare content rather than bytes. Whichever is chosen must be proven in a fresh
     worktree, not in the main tree — the main tree is where it already passes.

@@ -751,3 +751,72 @@ guard is the point: a content match that silently replaces 2 of 3 is the same si
 new costume. Post-edit census reconciles at 15 open + 13 ticked = **28**, 8 DoD headers, 229 lines.
 **Line-number addressing into a structured document is the defect; the misread display was only the
 trigger.**
+
+### 2026-08-27 | progress | T10 complete — ADR-038, reviewed clean; T9 landed and unblocks T2
+
+consequence · T10 · behaviour:none · governance:high
+review · T10 · scoped-reviewer (read-only, not isolated — Tier P seeds nothing) · CLEAN
+
+**T10 (ADR-038) is complete and independently reviewed.** The reviewer re-verified every factual claim
+against source rather than against the ADR's own narrative: `built-in.ts` and `f12-registry.ts` absent
+from both `4e5b320` and `dabf037` `--stat`; `composeFamilies` confirmed to scan all families with no
+early break and to name both positions on collision; `bindRegistry` confirmed to have exactly one call
+site; `classify.ts`'s switch confirmed to be on the closed mark enum. It also re-ran
+`sh scripts/gen-index.sh --check` itself. **No blocking defects, and it looked specifically for the two
+failure modes this sprint has already shipped** — a wrong domain and a miscited ADR — finding neither.
+
+**Two coordinator corrections at merge-back, both caught by reading, neither by the agent.**
+(i) `domain:` arrived as `doc-standard`; its siblings ADR-035 (the TS reference engine) and ADR-037
+(the type checker) are both `governance`. A wrong domain files the ADR under the wrong index heading —
+which defeats the single thing T10's Acceptance asks for. Corrected before commit. (ii) ADR-023's
+appearance in `related:` was checked rather than assumed: ADR-035 itself lists ADR-023 in `related:`,
+so the convention is followed, and ADR-023 is **not** cited in prose for the "ships beside the engine"
+claim it does not carry — the miscitation T3's retry removed did not creep back.
+
+**The gate caught an L-136 violation in the coordinator's own DoD text.** T10's third DoD, as written
+at the scope-change, bundled *two* targets — `docs/DECISIONS.md` carries its row **and** the knowledge
+index is regenerated — under *one* named method, `gen-index.sh --check`. That script writes exactly
+`docs/knowledge-index.md`; `grep DECISIONS scripts/gen-index.sh` returns **nothing**. So half the
+criterion named a method that could never examine it, and *an unreachable criterion reads exactly like
+a satisfied one*. Split: the index half keeps the mechanical check, the DECISIONS.md half is now a
+**judgment tick that says it is one** — which the G2 Reachability bullet explicitly calls legitimate,
+against inventing a checker to make it merely look mechanical. Recorded plainly because the rule was
+written into this repo's own gate by the same role that then violated it.
+
+**T9 is complete and merged; `--section` dispatches for real.** `runSection()` now shares
+`composedDispatch(repoDir)` with `runFull` — one composition list, not two. Verified by the coordinator
+in the main tree independently of the builder: `bun apps/cli/src/main.ts --section 12 .` prints real
+PASS verdicts for all four F12 rules and `grep -c rule-unimplemented` over that output returns **0**.
+
+The builder's evidence carries the discrimination proof this sprint has twice had to demand, and it is
+worth recording in full because it is the shape that was missing both times: DoD 1's parity was proven
+*and then broken on purpose* — dropping F12 from the composition reddens all four rules against the
+same live oracle while `--section 9`'s S9.LOGDIR stays green; DoD 2's byte-identical 22/22 diff was
+broken by re-introducing the duplicated dispatch this task exists to prevent, and the diff named
+exactly the four F12 ids while every S9 row stayed unchanged. Both seeds parsed (`tsc` clean while
+seeded), were targeted (325 lines, unchanged), and restored byte-identical under **one** stated
+convention. **Three-way hash agreement on the merge itself:** the builder's proven file, the working
+tree, and `git rev-parse HEAD:apps/cli/src/main.ts` all read `9c2c35deb9a8…` — so the bytes committed
+are the bytes proven, not merely the bytes reported.
+
+**T2 is now genuinely unblocked**, on the invocation its own frozen Plan text names, which was the
+whole point of the owner's ruling. Its re-derivation must still diff per-rule verdicts before timing
+anything, and count git spawns on both sides (`FsGitBoundaryPort.trackedFiles()` calls `isGitRepo()`
+uncached — the T3 reviewer's standing note).
+
+**A cross-task hazard, caught at merge-back and sent to T4 while it was still building.** T9 rerouted
+`--section` off `classifySection`'s `SectionReport` onto `classifyAll`'s `TraversalReport` — the *same
+shape the full run returns*. T4 is concurrently adding full-run level arithmetic. **A level field added
+to `TraversalReport` would be inherited by a partial invocation**, silently breaking both T9's DoD 3
+and SPRINT-087 T4's frozen-result property, and it would pass every test either task wrote. The two
+tasks are file-disjoint — which is all the preflight's shared-file check can see — but they are not
+*semantically* disjoint, and nothing mechanical was ever going to catch that. T4 was told: the level
+must not live on a shape a partial run can return, and a renderer that declines to print one is
+explicitly not the fix (`section.ts`'s own header rejects it — the field must not exist).
+
+**TD-113 extended rather than duplicated.** T9's worktree surfaced a *second, independent* cause of the
+same symptom: a fresh worktree has no `node_modules/`, so the gate's typecheck leg FAILs with `no type
+checker` on code that `bunx tsc --noEmit` compiles clean. Its gate read `212 pass, 4 fail` against the
+main tree's `216 pass, 0 fail`, with **none** of the four attributable to its diff. The pair is worse
+than either alone: a reviewer already told to expect one known false FAIL will read the second as more
+of the same, which is precisely how a real failure gets waved through.
