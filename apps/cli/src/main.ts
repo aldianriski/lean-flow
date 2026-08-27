@@ -21,6 +21,7 @@ import { exitCodeFor, type RuleEvaluation } from "../../../packages/standard/src
 import { sectionNumberOfRuleId, toStandardRule } from "../../../packages/standard/src/spec-reader.ts";
 import { outcomeName } from "../../../packages/standard/src/classify.ts";
 import { classifyAll, composeFamilies } from "../../../packages/standard/src/traverse.ts";
+import { attachLevel } from "../../../packages/standard/src/level.ts";
 import { readSpecAllFromDisk, readSpecSectionFromDisk, BUNDLED_SPEC_PATH } from "./spec-file-reader.ts";
 
 /** Adapter-independent description of what one invocation asked for. */
@@ -75,7 +76,8 @@ const HELP_LINE = [
   "                       it never checked every rule the spec defines (SPRINT-087 T4)",
   "  .                    (no flag) evaluate EVERY rule the spec defines, dispatched by its §14",
   "                       mark -- a rule with no evaluator registered anywhere reports a named",
-  "                       gap, never a silent skip (SPRINT-091 T3). No global level yet (T4)",
+  "                       gap, never a silent skip (SPRINT-091 T3), and closes with a global",
+  "                       'level:' line, §14's own priority ladder (SPRINT-091 T11)",
   "",
   "The reference engine is being built family by family under a strangler migration",
   "(EPIC-014). Until every family cuts over, the authoritative implementation is Shell:",
@@ -87,8 +89,21 @@ const HELP_LINE = [
  * `--rule`'s own case, split out of `run` so the switch stays one line per `Invocation` kind and
  * this file never grows a second rule-dispatch mechanism beside the registry (DoD 2 -- the ONLY
  * thing a new rule touches is `../../../packages/standard/src/rules/built-in.ts`, never here).
+ *
+ * `dispatchRule` defaults to the real, production wiring (`createBuiltInRegistry` bound to a real
+ * `FsSprintDirPort`) -- the optional parameter exists ONLY so `main.test.ts` can inject a fake
+ * evaluation through this SAME render path (SPRINT-091 T11, DoD 3): no evaluator anywhere in
+ * `packages/standard/src` emits a `hold` verdict yet (T4's own review), so proving this site renders
+ * `hold` distinctly from `note` needs a seam here, never a change to `packages/standard/src` (outside
+ * this task's Layers).
  */
-function runRule(ruleIdRaw: string, repoDir: string, write: (s: string) => void): number {
+export function runRule(
+  ruleIdRaw: string,
+  repoDir: string,
+  write: (s: string) => void,
+  dispatchRule: (ruleId: RuleId, repoDir: string) => RuleEvaluation | undefined = (id, dir) =>
+    createBuiltInRegistry().dispatch(id, new FsSprintDirPort(dir)),
+): number {
   let ruleId: RuleId;
   try {
     ruleId = makeRuleId(ruleIdRaw);
@@ -97,13 +112,24 @@ function runRule(ruleIdRaw: string, repoDir: string, write: (s: string) => void)
     return 2;
   }
 
-  const evaluation = createBuiltInRegistry().dispatch(ruleId, new FsSprintDirPort(repoDir));
+  const evaluation = dispatchRule(ruleId, repoDir);
   if (!evaluation) {
     write(`leanflow: rule-unimplemented -- no evaluator registered for ${ruleId}`);
     return 2;
   }
 
-  const prefix = evaluation.verdict === "fail" ? "FAIL " : evaluation.verdict === "pass" ? "PASS " : "note ";
+  // SPRINT-091 T11 (T4 review, finding C): `hold` joined `Verdict` in T4 but this ternary fell
+  // through it to the literal "note ", collapsing the hold-vs-note distinction result.ts's own
+  // `exitCodeFor` doc protects. `hold` now renders as its OWN word, distinct from both `note` and
+  // `fail` -- never moving the exit code (below), exactly as `fail` alone does.
+  const prefix =
+    evaluation.verdict === "fail"
+      ? "FAIL "
+      : evaluation.verdict === "pass"
+        ? "PASS "
+        : evaluation.verdict === "hold"
+          ? "HOLD "
+          : "note ";
   write(`${prefix} ${ruleId} -- ${evaluation.detail}`);
   // One line PER finding -- mirrors the Shell oracle's own one-`bad()`-per-offense loop, so a
   // consumer grepping the CLI's output for the named finding sees the same COUNT Shell would.
@@ -195,8 +221,19 @@ function composedDispatch(repoDir: string): (id: RuleId) => RuleEvaluation | und
  * swapping the underlying classifier changes nothing else here. An unreadable section -- malformed
  * argument, or a section number the spec does not define -- fails loudly with a named finding and a
  * non-zero exit, never a silent empty report (DoD 3).
+ *
+ * `buildDispatch` defaults to the real `composedDispatch` above -- the optional parameter exists ONLY
+ * so `main.test.ts` can inject a fake dispatch through this SAME render path (SPRINT-091 T11, DoD 3:
+ * a `hold` verdict, which no evaluator anywhere emits yet). Injecting a dispatch, never a level, keeps
+ * this seam orthogonal to DoD 2 above -- see the `hold`-under-a-seeded-dispatch regression test in
+ * `main.test.ts`, which proves DoD 2 holds even when a `hold` outcome IS present.
  */
-function runSection(sectionArg: string, repoDir: string, write: (s: string) => void): number {
+export function runSection(
+  sectionArg: string,
+  repoDir: string,
+  write: (s: string) => void,
+  buildDispatch: (repoDir: string) => (id: RuleId) => RuleEvaluation | undefined = composedDispatch,
+): number {
   if (!SECTION_ARG_RE.test(sectionArg)) {
     // RULED TS/Shell divergence (EPIC-014 D2), not an absorbed one: Shell's `read-spec-rules.sh
     // spec/STANDARD.md --section abc` exits 1 (verified live). This exits 2. Deliberate, not a parity
@@ -222,7 +259,7 @@ function runSection(sectionArg: string, repoDir: string, write: (s: string) => v
   }
 
   const rules = specResult.rows.map((row) => toStandardRule(row, section, BUNDLED_SPEC_PATH));
-  const report = classifyAll(rules, composedDispatch(repoDir));
+  const report = classifyAll(rules, buildDispatch(repoDir));
 
   const evaluations: RuleEvaluation[] = [];
   for (const outcome of report.outcomes) {
@@ -232,8 +269,19 @@ function runSection(sectionArg: string, repoDir: string, write: (s: string) => v
     }
     const { evaluation } = outcome;
     evaluations.push(evaluation);
+    // SPRINT-091 T11 (T4 review, finding C): `hold` rendered identically to `note` here before this
+    // diff -- see `runRule`'s own comment above for why that matters and result.ts's `exitCodeFor` doc
+    // for why `hold` still never moves the exit code below.
     const prefix =
-      evaluation.verdict === "fail" ? "FAIL " : evaluation.verdict === "pass" ? "PASS " : evaluation.verdict === "gap" ? "gap  " : "note ";
+      evaluation.verdict === "fail"
+        ? "FAIL "
+        : evaluation.verdict === "pass"
+          ? "PASS "
+          : evaluation.verdict === "hold"
+            ? "HOLD "
+            : evaluation.verdict === "gap"
+              ? "gap  "
+              : "note ";
     write(`${prefix} ${evaluation.ruleId} -- ${evaluation.detail}`);
     for (const finding of evaluation.findings) {
       write(`  - ${finding.name}: ${finding.detail}`);
@@ -242,7 +290,10 @@ function runSection(sectionArg: string, repoDir: string, write: (s: string) => v
 
   // DoD 2, deliberately: NO summary/`level:` line follows. `report` (above) carries no field a level
   // could occupy, and this renderer adds none of its own -- a targeted run states what it checked,
-  // never a claim about the whole spec it did not (§14; SPRINT-087 T4's whole reason to exist).
+  // never a claim about the whole spec it did not (§14; SPRINT-087 T4's whole reason to exist). This
+  // holds even when a `hold` outcome is present above (T11) -- `report` is STILL a level-less
+  // `TraversalReport` (traverse.ts's own frozen guarantee), and `hold` only changed how ONE line
+  // renders, never what this function computes or attaches.
   return exitCodeFor({ evaluations });
 }
 
@@ -257,12 +308,23 @@ function runSection(sectionArg: string, repoDir: string, write: (s: string) => v
  * whole-repository, multi-family composition `runSection` now uses too, never a second list (DoD 3
  * of both tasks: appending a family is the one place EPIC-014's remaining families plug in).
  *
- * No `level:` line here -- T4 owns full-run level arithmetic, deliberately split out (EPIC-014 H12).
- * `TraversalReport` carries no field a level could occupy (`traverse.ts`, frozen the same way
- * `section.ts`'s `SectionReport` is) and this renderer prints none of its own: a rule with no
- * evaluator registered ANYWHERE prints a named `gap` (DoD 2), never a level-bearing verdict.
+ * A `level:` line NOW closes this run (SPRINT-091 T11 -- T4's `level.ts` landed the arithmetic, but
+ * nothing called it until this task; L-020). `report` (`classifyAll`'s own `TraversalReport`) stays
+ * level-less -- `attachLevel(rules, report)` builds a SEPARATE, sibling `FullRunReport` (level.ts's
+ * own contract: same `rules`/`report` pair that produced each other) and ONLY this function calls it;
+ * `runSection` above never does (DoD 2 -- the partial path stays level-free by construction, not
+ * convention: `attachLevel` is simply never reached from there). Printed on its own, closing line,
+ * anchored so a reader/test finds it via `trimStart().startsWith("level:")` -- never a substring
+ * match: per-rule lines above can themselves contain "level:" mid-sentence (an excluded rule's own
+ * wording, classify.ts), which is the exact L-108 shape T4 hit and fixed the same way in level.test.ts.
+ * `buildDispatch` defaults to the real `composedDispatch` -- see `runSection`'s own comment for why
+ * the seam exists (SPRINT-091 T11, DoD 3).
  */
-function runFull(repoDir: string, write: (s: string) => void): number {
+export function runFull(
+  repoDir: string,
+  write: (s: string) => void,
+  buildDispatch: (repoDir: string) => (id: RuleId) => RuleEvaluation | undefined = composedDispatch,
+): number {
   const specResult = readSpecAllFromDisk(BUNDLED_SPEC_PATH);
   if (!specResult.ok) {
     write(`leanflow: ${specResult.finding} -- ${specResult.message}`);
@@ -271,7 +333,7 @@ function runFull(repoDir: string, write: (s: string) => void): number {
 
   const rules = specResult.rows.map((row) => toStandardRule(row, sectionNumberOfRuleId(row.id), BUNDLED_SPEC_PATH));
 
-  const report = classifyAll(rules, composedDispatch(repoDir));
+  const report = classifyAll(rules, buildDispatch(repoDir));
 
   const evaluations: RuleEvaluation[] = [];
   for (const outcome of report.outcomes) {
@@ -281,13 +343,26 @@ function runFull(repoDir: string, write: (s: string) => void): number {
     }
     const { evaluation } = outcome;
     evaluations.push(evaluation);
+    // SPRINT-091 T11 (T4 review, finding C): same fix as `runRule`/`runSection` -- `hold` gets its own
+    // word, never falling through to `note`.
     const prefix =
-      evaluation.verdict === "fail" ? "FAIL " : evaluation.verdict === "pass" ? "PASS " : evaluation.verdict === "gap" ? "gap  " : "note ";
+      evaluation.verdict === "fail"
+        ? "FAIL "
+        : evaluation.verdict === "pass"
+          ? "PASS "
+          : evaluation.verdict === "hold"
+            ? "HOLD "
+            : evaluation.verdict === "gap"
+              ? "gap  "
+              : "note ";
     write(`${prefix} ${evaluation.ruleId} -- ${evaluation.detail}`);
     for (const finding of evaluation.findings) {
       write(`  - ${finding.name}: ${finding.detail}`);
     }
   }
+
+  const full = attachLevel(rules, report);
+  write(`level: ${full.level}`);
 
   return exitCodeFor({ evaluations });
 }

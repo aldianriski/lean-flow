@@ -4,10 +4,12 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { parse, run, specReadExitCode } from "./main.ts";
+import { parse, run, runFull, runRule, runSection, specReadExitCode } from "./main.ts";
 import { readSpecAllFromDisk, readSpecSectionFromDisk, BUNDLED_SPEC_PATH } from "./spec-file-reader.ts";
 import { tokenize } from "../../../packages/standard/src/tokenizer.ts";
 import { marksInStandard, readSection, reconcile, sectionNumberOfRuleId, toStandardRule } from "../../../packages/standard/src/spec-reader.ts";
+import type { RuleId } from "../../../packages/standard/src/model.ts";
+import type { RuleEvaluation } from "../../../packages/standard/src/result.ts";
 
 const SHELL_READER_PATH = fileURLToPath(new URL("../../../scripts/lib/read-spec-rules.sh", import.meta.url));
 const SPEC_PATH = fileURLToPath(new URL("../../../spec/STANDARD.md", import.meta.url));
@@ -508,10 +510,17 @@ describe("leanflow full run — DoD 1: every rule the parser admits is traversed
     expect(lines.join("\n")).toContain("note  S9.JUDGMENTTICK -- excluded/judgment-required");
   });
 
-  test("the full run prints NO global 'level:' line -- T4's job, deliberately not T3's", () => {
+  // SPRINT-091 T11 supersedes this block's earlier claim: T3/T4 deliberately left the full run
+  // level-less (T4 owned only the arithmetic, in `level.ts`, uncalled); T11 is the task that wires
+  // `attachLevel` into `runFull` and closes the run with exactly ONE 'level:' line, anchored (never a
+  // substring: per-rule lines above can themselves contain "level:" mid-sentence -- the excluded-mark
+  // wording `outcomeName` produces -- which is exactly the L-108 shape T4 hit and fixed the same way).
+  test("the full run closes with EXACTLY ONE global 'level:' line, anchored -- never zero, never a substring hit", () => {
     const { lines, write } = capture();
     run({ kind: "full", repoDir: "." }, write);
-    for (const line of lines) expect(line).not.toMatch(/^\s*level:/);
+    const levelLines = lines.filter((l) => l.trimStart().startsWith("level:"));
+    expect(levelLines).toHaveLength(1);
+    expect(levelLines[0]).toBe(lines[lines.length - 1]); // the CLOSING line, matching Shell's own shape
   });
 });
 
@@ -588,6 +597,150 @@ describe("leanflow full run — CLI-reachable dispatch, live Shell parity per ru
     const shell = runShellEngine(repo);
     expect(verdictWord(verdictLineFor(shell.stdout, "S12.SECRETS"))).toBe("FAIL");
   }, FULL_ORACLE_TIMEOUT_MS);
+});
+
+// ====================================================================================================
+// SPRINT-091 T11, DoD 1: the flagless CLI's own printed 'level:' line VALUE matches Shell's, spawned
+// live, per repo. Shell is restricted via `--spec` to §12 alone (`level.test.ts`'s own DoD 1 pattern,
+// reused here through the REAL CLI (`run()`), not through `computeLevel` directly, so this proves the
+// WIRING, not just the arithmetic T4 already proved). TS's own `runFull` always reads the FULL real
+// bundled spec, unrestricted -- but every rule beyond the five this engine actually dispatches
+// (S9.LOGDIR + the four S12 rules) reports `gap`, which `computeLevel` gives ZERO weight (level.ts's
+// own header comment), so TS's printed level is mathematically determined by exactly the same rules
+// Shell is restricted to below. Neither fixture repo creates docs/sprint/, so S9.LOGDIR reports `note`
+// on both (weightless -- confirmed against sprint-log-outside-logs-dir.ts's own `!port.hasSprintDir()`
+// branch), keeping the §12-only restriction a valid stand-in for the full five-rule universe.
+// ====================================================================================================
+describe("leanflow full run — DoD 1: the printed 'level:' line VALUE matches Shell's, differential per repo", () => {
+  const capture = () => {
+    const lines: string[] = [];
+    return { lines, write: (s: string) => lines.push(s) };
+  };
+
+  const REAL_SPEC_TEXT = readFileSync(SPEC_PATH, "utf8");
+  const specDir = mkdtempSync(join(tmpdir(), "cli-level-spec-"));
+
+  function extractRealSection(fullSpecText: string, startHeading: string, endHeading: string): string {
+    const start = fullSpecText.indexOf(startHeading);
+    if (start === -1) throw new Error(`extractRealSection: ${JSON.stringify(startHeading)} not found -- has spec/STANDARD.md moved?`);
+    const rest = fullSpecText.slice(start);
+    const end = rest.indexOf(endHeading);
+    if (end === -1) {
+      throw new Error(`extractRealSection: ${JSON.stringify(endHeading)} not found after ${JSON.stringify(startHeading)} -- has spec/STANDARD.md moved?`);
+    }
+    return rest.slice(0, end);
+  }
+
+  const s12SpecPath = join(specDir, "s12-only.md");
+  writeFileSync(s12SpecPath, extractRealSection(REAL_SPEC_TEXT, "## §12", "## §13"));
+
+  function runShellEngineRestricted(repoDir: string, specPath: string): { readonly code: number; readonly stdout: string } {
+    try {
+      const stdout = execFileSync("sh", [ENGINE_PATH, repoDir, "--spec", specPath], { encoding: "utf8", timeout: 15_000 });
+      return { code: 0, stdout };
+    } catch (e) {
+      const err = e as { status?: number; stdout?: string };
+      return { code: err.status ?? 1, stdout: err.stdout ?? "" };
+    }
+  }
+
+  /** Anchored on the LINE, never a substring (L-108): both engines' per-rule lines can contain the
+   *  substring "level:" mid-sentence, which `.includes` would catch first. */
+  function levelValueOf(lines: readonly string[]): string {
+    const line = lines.find((l) => l.trimStart().startsWith("level:"));
+    if (line === undefined) throw new Error(`no 'level:' line found in:\n${lines.join("\n")}`);
+    const match = /^level:\s*(\S+)/.exec(line.trimStart());
+    if (match?.[1] === undefined) throw new Error(`could not parse a level VALUE out of: ${line}`);
+    return match[1];
+  }
+
+  test("a clean repo (nothing §12 forbids): both sides print level: Attested", () => {
+    const repo = freshGitRepo("cli-level-clean-");
+    track(repo, "README.md", "# clean\n");
+
+    const shell = runShellEngineRestricted(repo, s12SpecPath);
+    expect(levelValueOf(shell.stdout.split("\n"))).toBe("Attested");
+
+    const { lines, write } = capture();
+    run({ kind: "full", repoDir: repo }, write);
+    expect(levelValueOf(lines)).toBe(levelValueOf(shell.stdout.split("\n")));
+    expect(levelValueOf(lines)).toBe("Attested");
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  test("a committed real-looking secret: both sides drop to level: none", () => {
+    const repo = freshGitRepo("cli-level-fail-");
+    track(repo, ".env", "STRIPE_SECRET_KEY=sk_live_51H8x9K2eZvKYlo2C\n");
+
+    const shell = runShellEngineRestricted(repo, s12SpecPath);
+    expect(levelValueOf(shell.stdout.split("\n"))).toBe("none");
+
+    const { lines, write } = capture();
+    run({ kind: "full", repoDir: repo }, write);
+    expect(levelValueOf(lines)).toBe(levelValueOf(shell.stdout.split("\n")));
+    expect(levelValueOf(lines)).toBe("none");
+  }, FULL_ORACLE_TIMEOUT_MS);
+});
+
+// ====================================================================================================
+// SPRINT-091 T11, DoD 3: `hold` renders distinctly from `note` at EVERY render site. No evaluator
+// anywhere in `packages/standard/src` emits `hold` yet (T4's own review finding), so each site is
+// driven through its OWN real render path (`runRule`/`runSection`/`runFull`, now exported with an
+// injectable dispatch defaulting to production wiring -- see each function's own comment in main.ts)
+// with a fake dispatch standing in for a future hold-emitting evaluator. One test per site, per the
+// task's own bar: a site fixed without a failing case first is a site not shown to be guarded.
+// ====================================================================================================
+describe("leanflow hold rendering (SPRINT-091 T11, DoD 3) — 'hold' is distinguishable from 'note' at every render site", () => {
+  const capture = () => {
+    const lines: string[] = [];
+    return { lines, write: (s: string) => lines.push(s) };
+  };
+
+  const heldEvaluation = (ruleId: RuleId): RuleEvaluation => ({
+    ruleId,
+    verdict: "hold",
+    findings: [],
+    detail: "test-seeded hold -- no real evaluator emits this yet (T4's own review)",
+  });
+
+  test("--rule: a held rule prints HOLD, never collapsing into note", () => {
+    const { lines, write } = capture();
+    const code = runRule("S9.LOGDIR", ".", write, (ruleId) => heldEvaluation(ruleId));
+    expect(code).toBe(0); // hold never moves the exit code (result.ts's own exitCodeFor doc)
+    const line = lines.find((l) => l.trim().split(/\s+/)[1] === "S9.LOGDIR");
+    expect(line).toBeDefined();
+    expect(verdictWord(line)).toBe("HOLD");
+    expect(verdictWord(line)).not.toBe("note");
+  });
+
+  test("--section: a held rule prints HOLD, never collapsing into note", () => {
+    const { lines, write } = capture();
+    const code = runSection("9", ".", write, (_repoDir) => (id) => heldEvaluation(id));
+    expect(code).toBe(0);
+    const line = lines.find((l) => l.trim().split(/\s+/)[1] === "S9.LOGDIR");
+    expect(line).toBeDefined();
+    expect(verdictWord(line)).toBe("HOLD");
+    expect(verdictWord(line)).not.toBe("note");
+  });
+
+  test("flagless full run: a held rule prints HOLD, never collapsing into note", () => {
+    const { lines, write } = capture();
+    const code = runFull(".", write, (_repoDir) => (id) => heldEvaluation(id));
+    expect(code).toBe(0);
+    const line = lines.find((l) => l.trim().split(/\s+/)[1] === "S9.LOGDIR");
+    expect(line).toBeDefined();
+    expect(verdictWord(line)).toBe("HOLD");
+    expect(verdictWord(line)).not.toBe("note");
+  });
+
+  // DoD 2's own regression net, strengthened: DoD 2 says --section stays level-free BY CONSTRUCTION
+  // (runSection never calls attachLevel, full stop) -- this proves that guard holds even ADVERSARIALLY,
+  // with a hold outcome actually present in the traversal, not merely absent from today's evaluators.
+  test("DoD 2 still holds under a seeded hold outcome: --section prints no 'level:' line even with a HOLD present", () => {
+    const { lines, write } = capture();
+    runSection("9", ".", write, (_repoDir) => (id) => heldEvaluation(id));
+    expect(lines.some((l) => l.trim().split(/\s+/)[1] === "S9.LOGDIR" && verdictWord(l) === "HOLD")).toBe(true);
+    for (const line of lines) expect(line).not.toMatch(/^\s*level:/);
+  });
 });
 
 // --- T9's own regression coverage: --section 12 must keep dispatching F12, not just the day it landed
