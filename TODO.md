@@ -18,23 +18,25 @@ status: current
 
 ## Active Sprint
 
-_(no active sprint)_ — **SPRINT-089** (Prove the Unattended Run) and **SPRINT-090** (Run-Evidence
-Vehicle) both closed 2026-08-27 and are archived; their shipped changes are written up as **v1.61.0**
-in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only).
+> **One active sprint.** Single stream — this sprint is not part of a stream and omits the `stream:`
+> field (CONTEXT.md § Sprint model).
 
-The epic's **first real unattended run** happened: a `J1` executed headless inside the recorded
-envelope with no confirmation, and a **seeded** `J2` parked with its unblock condition — EPIC-015
-§ Closed-when **3 and 4** complete. § Closed-when **1 stays open**: the run ended at
-`AUTHORITY_BOUNDARY` correctly, but the launcher's reaper published a false `PLAN_EXHAUSTED` into a
-different sprint's log and the shape checker passed it (**TD-112** → `TASK-303`).
+> **SPRINT-091 — Full Run and the First Family** → [docs/sprint/SPRINT-091-full-run-and-first-family.md](docs/sprint/SPRINT-091-full-run-and-first-family.md)
 
-**Four `high` debt rows came out of it**, all with a follow-up filed: `TD-109` (pre-flight forbids the
-declared `J2` its own machinery is built for) · `TD-110` (the launcher will not fire on a red gate, so
-no Plan repairing a gate FAIL can ever run) · `TD-111` (the index goes stale at midnight, reddening
-that gate on an untouched tree) · `TD-112`. Consumer-facing: a new **always-on** eval harness
-(30 → 31) guarding the conformance engine's git-availability branch, and an expanded
-`.claude/settings.json` permission surface (66 rules, both shells).
+EPIC-014's **fourth member sprint** (`epic: EPIC-014`), targeting § Closed-when **2**. SPRINT-087 proved
+one rule through the engine; this makes the engine able to run *whole*, migrates the **F6 §4
+ADR-governance** family — chosen on measured cost across **both** axes, never by section number
+(V3 §43) — and carries the slice through to one eval harness that no longer spawns the 3,142-line Shell
+engine on every gate run. **T1 is the type checker**: ten TypeScript tasks on a toolchain that evaluates
+no types would satisfy their own type-level DoD with unchecked code (**TD-101**, `high` and unrouted for
+four sprints, escalated at this promote).
+**G1/G2 are NOT yet signed** — `gates_signed:` is absent from that file, and its absence means not
+signed, never approval.
 
+Carried from the previous pair: EPIC-015 § Closed-when **1** stays open — the reaper published a false
+`PLAN_EXHAUSTED` and the shape checker passed it (**TD-112** → `TASK-303`). SPRINT-089/090's full
+post-close writeup lives in [`CHANGELOG.md`](CHANGELOG.md) v1.61.0, their archived sprint files, and
+EPIC-015 § Member sprints.
 
 ---
 
@@ -223,6 +225,182 @@ that gate on an untouched tree) · `TD-112`. Consumer-facing: a new **always-on*
       tracker:   SPRINT-087 close sweep · TD-086 · TD-087 · TD-089 · TD-097 · TD-105
       origin:    close-retro
       state:     ready
+
+- [ ] TASK-307 — Derive the conversion's real headroom before any threshold is frozen  [size: S] [risk: low] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  a new Round in docs/research/logs/qa-gate-timing.md records (a) run-adr-family-
+                  fixtures.sh's cost split between git-repo construction and engine invocation,
+                  measured by instrumented copy rather than read from source; (b) a per-invocation
+                  TS-vs-Shell comparison on the same fixture target using the already-migrated §12
+                  family, explicitly named as a proxy; (c) the derived ceiling on what converting this
+                  harness can save. No later task's DoD carries a performance number that does not
+                  trace to this Round
+      touches:    docs/research/logs/qa-gate-timing.md · instrumented temp copies, never shipped files
+      depends-on: none
+      assumes:    none — A4 (a TS in-process traversal costs ~ms where the Shell spawn costs 8.5s) is
+                  UNMEASURED, and this task exists to kill it as an assumption before it reaches a
+                  frozen artifact (L-130)
+      tracker:    EPIC-014 H13 · TD-090 · qa-gate-timing Rounds 5-8
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-308 — Full Standard traversal in TS, at parity with the Shell full run  [size: M] [risk: med] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  a full conformance invocation with no rule/section flag traverses every rule the
+                  parser admits, dispatching by §14 mark; asserted row-by-row against
+                  conformance-engine.sh spawned live as an oracle, never a copied literal; a rule with
+                  no registered evaluator reports as a NAMED gap, never silently omitted — proven by
+                  seeding a rule out of the registry and confirming exactly that row reddens
+      touches:    apps/cli · packages/standard (traversal + mark-driven dispatch) · tests
+      depends-on: none
+      assumes:    the registry's Map dispatch stays open-closed (SPRINT-087 proved this), so no
+                  evaluator edits are needed to add traversal
+      tracker:    EPIC-014 H12 · § Closed-when 2
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-309 — Hold semantics and full-run level arithmetic  [size: M] [risk: med] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  the full-run conformance level matches Shell's across fixture repos including at least
+                  one HOLD case; a partial (single-rule or single-section) invocation still emits NO
+                  global level, re-proven by seeding one in and confirming only the structural checks
+                  redden; hold-vs-fail is distinguished, never collapsed
+      touches:    packages/standard (result domain · level arithmetic) · tests
+      depends-on: TASK-308
+      assumes:    none — SPRINT-087 froze "no global level on a partial run" as a property of the
+                  frozen result rather than of the printer, and this task must not regress it
+      tracker:    EPIC-014 H12 · § Closed-when 2
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-310 — Accept a caller-supplied spec path on the TS CLI  [size: S] [risk: med] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  a caller-supplied spec path is evaluated against instead of the shipped Standard; a
+                  doctored spec that drops one rule row provably changes the result (seeded, with a
+                  sibling control left unchanged); a nonexistent path fails loudly and stays
+                  distinguished from an unreadable one, per SPRINT-087's spec-not-found vs
+                  permission-denied precedent
+      touches:    apps/cli · tests
+      depends-on: none
+      assumes:    fixture harnesses hand the engine doctored specs — verified at intake: adr-family
+                  reduces its spec to §4, and three other harnesses do the same by design
+      tracker:    EPIC-014 H11/H13 · prerequisite for the harness conversion
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-311 — Migrate S4.ONEFILE · S4.INDEX · S4.SECTIONS · S4.NEGATIVE  [size: M] [risk: med] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  four evaluators registered at their own call sites with no edit to dispatch; per-rule
+                  parity against Shell on the retained fixtures; each retained must-FAIL reddens with
+                  its OWN named finding while its sibling control stays green; every seeded break is
+                  verified to have landed, under ONE stated hash convention (L-169)
+      touches:    packages/standard/src/rules · evals/fixtures (retained, never replaced) · tests
+      depends-on: none
+      assumes:    these four are file/text-based and need no git port — S4.APPEND is split out for
+                  exactly that reason
+      tracker:    EPIC-014 H13 · F6 §4 ADR governance · D2 strangler
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-312 — Migrate S4.APPEND behind a real git port  [size: M] [risk: high] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  S4.APPEND reaches parity with Shell including the marker-passes and shallow-clone
+                  cases; a real Bun adapter plus an in-memory fake, per SPRINT-087's port pattern; the
+                  shallow-clone branch is pointed at the artifact that motivated it and shown REACHABLE,
+                  not merely working on a fixture (L-166)
+      touches:    packages/standard/src/rules · adapters · tests
+      depends-on: TASK-311
+      assumes:    S4.APPEND is the only §4 rule defined over git objects — derived from the family's
+                  rule list at intake, to be re-confirmed at G2 rather than inherited from this line
+      tracker:    EPIC-014 H13 · F6 · the family's only git-bound rule
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-313 — ADR and git-repo fixture factories in TypeScript  [size: S] [risk: low] [AFK]
+      class:      execution
+      authority:  J1
+      done-when:  the §4 cases build their fixtures through a factory instead of inline construction; a
+                  test's expected verdict comes from the engine and never from the factory — enforced by
+                  the factory exposing no assertion vocabulary at all, with a must-FAIL proving a
+                  verdict-deciding factory is rejected
+      touches:    test factories · §4 tests
+      depends-on: TASK-312
+      assumes:    durable spec — H14's guardrail is "factory creates state, factory does not decide
+                  expected verdict"; no file paths or line numbers named here, they go stale
+      tracker:    EPIC-014 H14
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-314 — Convert the ADR-family harness to bun:test and drop it from the always-on leg  [size: M] [risk: high] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  every case the shell harness asserted has a bun:test equivalent, matched case-name FOR
+                  case-name and diffed to an identical list — never "most" (D2); the harness is removed
+                  from the always-on eval set in qa-check.sh; the gate's own PRINTED verdict line is
+                  read directly as the check, never a piped or redirected status (L-120)
+      touches:    evals/ · scripts/qa-check.sh leg 12 · test/
+      depends-on: TASK-308, TASK-309, TASK-310, TASK-311, TASK-312, TASK-313
+      assumes:    git-repo construction cost survives the conversion and only the engine-spawn term is
+                  removed — TASK-307 quantifies which, and this task's expected saving derives from that
+                  Round rather than from an estimate
+      tracker:    EPIC-014 H21 (slice pulled forward) · D5 feature-first · TD-090
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-315 — Relocate §4 differential parity to the opt-in profile, with an ADR naming when parity must run  [size: S] [risk: med] [HITL]
+      class:      decision
+      authority:  J1
+      done-when:  a parity harness still spawns the Shell engine live and still asserts §4 row-by-row,
+                  now sitting in the opt-in eval set; an ADR records the trade-off (a §4 drift window
+                  between full-profile runs) and names the moments parity MUST run — promote, close, and
+                  any full-profile run; the ADR states explicitly that Shell RETAINS §4 authority under
+                  D2, since this is not a cutover
+      touches:    evals/ · scripts/qa-check.sh · docs/adr/
+      depends-on: TASK-314
+      assumes:    owner ruled this shape at intake — parity moves to opt-in rather than staying
+                  always-on or leaving the gate entirely
+      tracker:    EPIC-014 D2 · ADR-029 Tier G + Tier P
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-316 — Measure the delta and settle what §4's conversion bought  [size: S] [risk: low] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  a new Round records the gate before/after on the same host, same profile and same
+                  semantic coverage; the measured delta is compared against TASK-307's derived ceiling
+                  and any SHORTFALL IS NAMED rather than smoothed, following SPRINT-089 T1's precedent
+                  of recording a missed target as missed; TD-090 is updated with what this conversion
+                  did and did not buy
+      touches:    docs/research/logs/qa-gate-timing.md · TECH-DEBT.md
+      depends-on: TASK-314, TASK-315
+      assumes:    none
+      tracker:    TD-090 · EPIC-014 § Closed-when 7 · qa-gate-timing
+      origin:     decomposer
+      state:      ready
+
+- [ ] TASK-317 — Wire a type checker into the gate so "enforced by a type" means something  [size: S] [risk: med] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  a type check runs inside the gate and FAILS on a real type error — proven by the exact
+                  case TD-101 recorded (a bare string assigned to a readonly Finding[], and a number
+                  assigned to a string field), which the current gate accepts silently; a type-checker
+                  dependency is declared rather than assumed present; the checker's OWN printed verdict
+                  is read as the result, never a wrapper's exit status (L-120)
+      touches:    package.json · scripts/qa-check.sh · tsconfig
+      depends-on: none
+      assumes:    none — TD-101 recorded the reproducing case and confirmed independently that no type
+                  check is invoked anywhere and no type-checker dependency is declared at all
+      tracker:    TD-101 (high, open since Sprint-087, never routed to the Backlog) · EPIC-014 D4 ·
+                  L-105 (an absent guard wearing the shape of a present one)
+      origin:     manual
+      state:      ready
+
 ### P3 — Long-term
 
 > Rejected work lives in **`.out-of-scope/`** — each file carries its own reasoning, revisit-if and

@@ -749,42 +749,6 @@ status: current
       visibly. But note the interaction — with the gate ~19–29% over budget on the reference host
       (TD-090), 82–94s of worktree scanning is the difference between finishing and truncating.
 
-- **TD-091** severity: **high** | status: **resolved** → TASK-285 (Sprint-086 T3) | created: Sprint-085
-  - Summary: **`scripts/lib/qa-budget-check.sh` cannot fire in this environment — an absent guard
-    wearing the shape of a present one (L-105).** `QA_BUDGET_SECONDS` defaults to **900s** while the
-    command ceiling is **600s**, so the guard can only trip after fifteen minutes somewhere nothing
-    survives ten.
-  - Evidence: SPRINT-085's blocker entry. The guard was shipped by Sprint-084 T1 *specifically* so an
-    over-budget gate would name its skipped harnesses instead of dying mute — its own FAIL text reads
-    *"rather than left to run past an external timeout with no verdict line (TD-084)"*, which is
-    verbatim what attempt 1 then did. **Late in two independent ways**: attempts 2 and 3 lowered the
-    budget below the ceiling and it *still* never fired, because fork exhaustion killed the run before
-    the eval-harness loop reached the check.
-  - Impact: the one mechanism that converts "gate died mute" into "gate named what it skipped" is
-    inert, so the failure it exists to soften presents as a bare timeout — which is exactly how a
-    close came to be blocked with no verdict and no diagnosis.
-  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): lower the default **and**
-    move the check earlier than the eval-harness loop. Both halves are needed; either alone leaves one
-    of the two lateness paths open.
-  - **Re-file fresh if** the command ceiling changes — the 900/600 arithmetic is the whole finding.
-
-- **TD-092** severity: **high** | status: **resolved** → TASK-286 (Sprint-086 T4) | created: Sprint-085
-  - Summary: **Nothing structured records a task's consequence classification in attended mode**, so
-    `check-review-depth.sh`'s new absence branch cannot reach any sprint this repository actually runs.
-  - Evidence: SPRINT-085 T6 shipped the fix for TD-085 with two named findings, two retained must-FAIL
-    fixtures and a full discrimination proof — all real. Then, **tested directly rather than assumed**,
-    SPRINT-084's own log copied to a live path still printed `no review line -- nothing to verify`,
-    exit **0**. The detector anchors on `^Tn · ` rollup lines, which are night-run Part 4's
-    *unattended* contract; **every sprint in this repository is attended**, and attended entries state
-    the classification in prose.
-  - Impact: TD-085 is fixed for the branch it proves and open for the shape we produce. Matching prose
-    was refused deliberately — that is the substring-heuristic shape that *created* TD-085's siblings
-    and fails green (L-108) — so the fix is a schema, not a better regex.
-  - Mitigation (hypothesis): give attended log entries a structured classification carrier, so
-    "governance:high work with no review line" becomes observable to a dependency-free checker at all.
-  - **Re-file fresh if** unattended runs become the norm — the guard would then reach its subject and
-    only the attended gap would remain.
-
 - **TD-093** severity: minor | status: open | created: Sprint-085
   - Summary: **`/release-patch` has no step that bumps the README footer version the gate lints**, so
     every release leaves a drift the QA gate catches a sprint later.
@@ -812,26 +776,6 @@ status: current
     together, rather than as a side effect of a close. Ruled this way at SPRINT-085's close on owner
     approval rather than drifted into.
   - **Re-file fresh if** `EPIC-014` passes ~180 lines — the headroom argument expires there.
-
-- **TD-085** severity: **high** | status: **resolved** → TASK-286 (Sprint-086 T4, same surface as TD-092 — D3) | created: Sprint-084
-  - Summary: **`check-review-depth.sh` cannot see the failure it exists to prevent.** It grades only
-    `review ·` lines that are *present*, so a `governance:high` task closing with **no review line at
-    all** exits 0 with a `nothing to verify` note. It also skips `*/archive/*` by design, so a review
-    recorded where a closed sprint's record actually lives is never read.
-  - Evidence: reproduced live in Sprint-084 T2. A log carrying a `governance:high · behaviour:material`
-    task and no `review ·` line prints `no review line -- nothing to verify`, **exit 0**. SPRINT-082 did
-    exactly this and closed **38 of 38** with zero `review ·` lines on the record. Run against the
-    archive log now holding four valid lines: prints nothing, exit 0 — green because the file was never
-    opened. None of the 5 must-FAIL fixtures covers absent-line + `governance:high`.
-  - Impact: **the guard's own subject is its blind spot.** Between absence-blindness and the archive
-    skip there is no point in a task's lifecycle — active or archived — where it could have caught
-    SPRINT-082's case, or Sprint-084's own (its live log reports `nothing to verify` while its tasks
-    carry `governance:high` work). L-105's shape: correctly placed in text, absent in time.
-  - Mitigation *(hypothesis, re-derive before a DoD rests on it)*: assert presence, not only validity —
-    a `governance:high` task in a live log with no `review ·` line is a FAIL, not a note; one must-FAIL
-    fixture per branch. The archive skip is a separate ruling: closed history is deliberately not
-    re-litigated, so the fix may be to forbid *recording* a review there rather than to start reading it.
-  - **Re-file fresh if** the absence branch ships but the archive skip is left, or vice versa.
 
 - **TD-086** severity: minor | status: open | created: Sprint-084
   - Summary: **`check-system-verify-block.sh` masks a later unresolved FAIL with an earlier ruling, and
@@ -979,33 +923,6 @@ status: current
     this host, and one sample cannot resolve it. The deterministic 6→1 spawn reduction is what is
     evidenced. The remaining ~36 forks per call are unclaimed headroom, named here rather than silently
     exhausted.
-
-- **TD-084** severity: **high** | status: **resolved** → TASK-272 (Sprint-084 T1) | created: Sprint-083
-  - Summary: **`scripts/qa-check.sh` can no longer run to completion.** Three runs in one session were
-    killed before printing their verdict line — at a 5-minute limit, at a 10-minute limit, and twice as
-    a reaped background job. This is a **different failure from TD-071/TD-073**, which price the gate's
-    cost as it scales: those say *expensive*, this says *unrunnable*. A gate that cannot finish emits no
-    `QA-CHECK: N pass, M fail`, so every DoD that names it becomes unverifiable — four did in this
-    sprint, and closing required an owner ruling on partial evidence instead of a verdict.
-  - Evidence: run 1 killed at 122 lines · run 2 killed at 123 · run 3 reached **263 lines, 162 PASS,
-    0 FAIL** across 13 legs and was killed during the ownership-header walk, which visits all 222 docs.
-    The conformance leg alone exceeded 5 minutes when measured separately (`sh conformance.sh .`
-    completes at ~5-6 min, exit 0). `QA_FULL` was **not** set in any of the three, so this is the
-    *default* profile, not the opt-in heavy one.
-  - Impact: **high, and it compounds in the worst direction.** ADR-021 makes a named check's FAIL block
-    a silent DoD tick — but an *unrunnable* check produces neither pass nor fail, so the rule it powers
-    degrades to owner judgement every time. The workaround this sprint used (run `conformance.sh`,
-    `check-doc-caps.sh` and `check-manifest-lockstep.sh` separately, then reason over the union) is
-    exactly the "read the verdict from a wrapper rather than the gate" shape L-120 warns about, and it
-    will be reached for again because it worked.
-  - Mitigation *(hypothesis, not a plan — re-derive before a DoD rests on it)*: the two candidates are
-    (a) split the gate into a fast leg and a full leg so the fast one always finishes, which is what
-    V3 §22's `fast`/`standard`/`full` profiles are for — this debt is a direct argument for
-    bringing H17 forward; and (b) profile it first, because TD-073's lesson was that the *stated* cause
-    was wrong and the real cost was the driver's own bookkeeping. **Do not act on (a) before (b).**
-  - **Re-file fresh if** a profile shows the dominant term is not what (b) finds, or if the gate starts
-    completing again without anyone having changed it — that would mean the limit was environmental and
-    the debt is mis-stated.
 
 - **TD-083** severity: minor | status: open | created: Sprint-083
   - Summary: **The architecture fitness suite has never fired on a real violation in this repository's
