@@ -1078,3 +1078,61 @@ split has re-expanded past its pre-split size. T12, like T9–T11 before it, is 
 already done rather than new engine scope — but the count is the count, and the owner should not have to
 derive it.
 
+---
+
+### 2026-08-29 | progress | T12 complete — the §4 family is reachable, and the fix was proven against the defect itself
+
+consequence · T12 · behaviour:material · governance:high — review: independent-adversarial, worktree-isolated
+
+**T12 is complete, reviewed, and all 3 DoD CONFIRMED.** Two `bindRegistry` entries in
+`composedDispatch` — `createF4Registry()` with `FsAdrFamilyPort`, `createS4AppendRegistry()` with
+`createFsAdrAppendPort` — exactly the wiring `s4-append-registry.ts` and `fs-adr-append.ts` each
+predicted in their own headers ("reported, not performed, here"). Nothing under
+`packages/standard/src/` was touched; the four cited exports were consumed verbatim.
+
+**The reviewer did the one thing that turns a passing test into evidence: it reproduced the defect.**
+Rather than confirming the new tests go green, it checked `apps/cli/src/main.ts` out at `e5d59ce^` and
+ran the old code against the same repro directory — **zero FAIL lines, `level: Attested`** — then
+re-ran post-fix and got `FAIL S4.INDEX` / `level: none`. The fix is anchored to the behaviour it
+removes, not merely to a suite that agrees with it (L-045 · L-166).
+
+**One DoD is recorded as weaker than its own wording, on the reviewer's initiative.** DoD 2 asks for the
+printed level VALUE to match Shell's. It does — both `level: none` — but Shell reaches `none`
+independently via S2.F-FILE (×5) and S6.BASE (×2), families TS has not migrated, so Shell would print
+`none` on that fixture whether or not §4 worked at all. **The level match is over-determined and is not,
+by itself, evidence that §4 now contributes.** What *is* unconfounded is the per-rule S4.INDEX FAIL↔FAIL
+agreement, plus the fact that on the TS side S4.INDEX is the sole Structural FAIL, making the
+Attested→none flip cleanly attributable. Ticked on the per-rule proof, with the level half written down
+as the weaker of the two. A criterion that reads satisfied for the wrong reason is precisely what L-136
+is about, and the builder's own commit had already flagged it honestly rather than claiming the match.
+
+**Discrimination proven twice, from two different directions.** The builder cut the F4 bind; the
+reviewer independently cut the **S4.APPEND** bind and got 71 pass / 1 fail — the one failure being that
+family's own sibling control. Different seed, same conclusion, which is worth more than the same seed
+run twice. One hash convention throughout (`git hash-object`, cross-checked against
+`git rev-parse HEAD:<path>`): `9f65b268…` → `9516797e…` → `9f65b268…`, 423 lines at every step, `tsc`
+clean under the seed.
+
+**The timeout change was scrutinised specifically, because it is the shape that passes review by looking
+like plumbing.** Four pre-existing tests gained `FULL_ORACLE_TIMEOUT_MS` as a third `test()` argument.
+The reviewer diffed all four: **zero assertion text changed**, and the constant is pre-existing (present
+at `e5d59ce^`, added by an earlier task) rather than introduced here. Test-count delta cross-checked two
+ways — the commit's claim of 6 new (251 → 257) and an independent `grep -c` on the test file (66 → 72)
+agreeing.
+
+**Cost measured rather than estimated, and filed as TD-120 (medium).** Wiring §4 in costs a flagless
+full run **0.689s → 6.948s**, and `--section 4` **0.187s → 6.861s**: S4.APPEND spawns ~2 uncached git
+processes per ADR, ≈78 spawns across this repo's 38 ADRs. That is correct behaviour billed at the wrong
+price, not a defect — the alternative was the laundering. **A gate-discovery correction belongs with it:**
+the reviewer read `qa-check.sh`, found no `bun test` leg, and concluded the gate is unaffected. Half
+right. `qa-check.sh`'s own 450s budget is indeed untouched (TD-117 unaffected), but the *discovered*
+gate is **rung 1** — `package.json`'s `"test": "sh scripts/qa-check.sh && bun test"`, which outranks
+`.gate-command`'s narrower declaration by ADR-033 — so the TS suite is gated and already carries this
+cost. The bill that matters arrives at the H24–H26 cutover, which is why TD-120 says fix it *before*
+authority moves, not after.
+
+**TD-120 also carries a second, smaller duplication** found by the same review: `composedDispatch`
+constructs `FsAdrFamilyPort` twice per invocation, once directly and once inside
+`createFsAdrAppendPort`, doubling the `docs/adr/` tree walk. It grows with tree size rather than ADR
+count, so it is a different curve from the git spawns and would not have shown up in this measurement.
+

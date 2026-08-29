@@ -205,6 +205,35 @@ status: current
     budget with the ceiling raised to match; or make the skipped-harness list its own named FAIL
     distinct from a real check failure, so truncation can never be read as one red check.
 
+- **TD-120** severity: medium | status: open | created: Sprint-091
+  - Summary: **S4.APPEND spawns ~2 uncached git processes per ADR, so wiring §4 into the CLI (T12) cost
+    a flagless full run ~6.3s on this repo's 38 ADRs — a ~10x wall-clock increase.** Measured by the
+    T12 reviewer: `--section 4` 0.187s → 6.861s; flagless full run 0.689s → 6.948s. Root cause read
+    from source and consistent with the timing: `FsAdrHistoryPort.revisionsTouching` and
+    `readAtRevision` (`packages/standard/src/adapters/fs-adr-history.ts`) each spawn per ADR (`git log`
+    + `git show`), ≈78 spawns for 38 ADRs at Windows spawn overhead.
+  - **This is correct behaviour billed at the wrong price, not a defect.** T12 had to land: before it,
+    the five §4 evaluators were unreachable and a real S4.INDEX violation was laundered to
+    `level: Attested`. The cost is the price of the rule actually running.
+  - Second, smaller duplication in the same path: `composedDispatch`
+    (`apps/cli/src/main.ts`) constructs `FsAdrFamilyPort` twice per invocation — once directly for the
+    F4 registry, once again inside `createFsAdrAppendPort`, which does its own
+    `new FsAdrFamilyPort(repoRoot)` (`packages/standard/src/adapters/fs-adr-append.ts`). That doubles
+    the `docs/adr/` tree walk per run. Negligible beside the git spawns here, but it grows with tree
+    size rather than with ADR count, so it is a different curve on a large repo.
+  - **Why medium and not minor: the bill arrives at the cutover, not now.** The discovered gate is
+    rung 1, `package.json`'s `"test": "sh scripts/qa-check.sh && bun test"` — which OUTRANKS
+    `.gate-command`'s narrower `sh scripts/qa-check.sh` (ADR-033) — so the TS suite is already gated
+    and already carries this. `qa-check.sh`'s own 450s internal budget is untouched, since it invokes
+    no `bun test` leg; TD-117 is unaffected today. But EPIC-014 H24–H26 hand §4 authority from Shell
+    to TS, and the sprint has measured TS paying 12 git spawns to Shell's 5 with `isGitRepo()`
+    uncached (Round 12) — Shell memoised its own probe in `8fd5c4f`/`54cd86d` for exactly this reason.
+  - Fix by memoising the history port's per-ADR git reads (one `git log` over `docs/adr/` rather than
+    one per file), and by threading a single `FsAdrFamilyPort` through both registries. Do it BEFORE
+    the H24–H26 cutover, not after: once TS holds authority, this lands directly on the gate that
+    TD-117 already puts at 86–91% of its ceiling. Retain a timing assertion so the regression cannot
+    return silently — and per L-130, state the measurement's host load beside any figure it carries.
+
 - **TD-119** severity: minor | status: open | created: Sprint-091
   - Summary: **`check-layers-completeness.sh` matches `Cites:` tokens against the `Layers:` line by
     SUBSTRING, so a declaration is contradicted by any longer path that merely contains it.** A task
