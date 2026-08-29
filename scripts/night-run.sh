@@ -21,6 +21,13 @@
 #                       pre-flight DOA -- never defaulted (night-run.md Part 0)
 #   --log FILE         Where the fired command's stdout+stderr is captured
 #                       (default: ./night-run-<timestamp>.log in the current directory)
+#   --sprint FILE       Declare which sprint Plan this run targets (e.g.
+#                       docs/sprint/SPRINT-090-....md). Optional but recommended whenever more
+#                       than one sprint may carry `status: active` at once -- without it the
+#                       reaper falls back to scanning for the sole active Plan and REFUSES (writes
+#                       nothing) if it finds zero or more than one, rather than guessing (TD-112:
+#                       SPRINT-089's reaper once guessed and wrote a false rollup into the wrong
+#                       sprint's log). Must name a file that exists and carries `status: active`.
 #
 # Everything after `--` is executed verbatim, detached, exactly as given -- this script
 # does not build the command for you; see night-run.md Part 2 for how to build it.
@@ -44,6 +51,7 @@ wait_seconds=150
 poll_seconds=5
 logfile=""
 run_mode=""
+sprint_arg=""
 reap=1
 
 # --- the reaper -------------------------------------------------------------
@@ -65,20 +73,48 @@ reap=1
 
 # Locate the active sprint's Plan file. Shared by the launcher (to record how long the
 # Execution Log already was before firing) and by the reaper, so both agree on the target.
+#
+# TD-112 / SPRINT-093 T1: this used to return the FIRST `status: active` file the glob found and
+# stop looking. SPRINT-089's reaper hit exactly that with two sprints active at once (SPRINT-089 and
+# SPRINT-090, sorted before it): it silently wrote into SPRINT-089's Plan and log, computed
+# `terminal · PLAN_EXHAUSTED` from THAT file's empty task-state history, and the false rollup was
+# internally consistent with the wrong input it was reading -- the cross-write, not a broken
+# derivation. Guessing among more than one candidate is exactly the failure this whole file's
+# discipline forbids (the mode signal, the J-class, the allowlist -- all "declared, never inferred").
+# So: exactly one match is resolved; zero or more than one is refused, same as an unrecognised
+# --mode is refused rather than defaulted (night-run.md Part 0). The caller (find_sprint's return 1)
+# already treats "not found" as "nothing to reap" -- ambiguity now shares that same safe failure
+# instead of silently picking one.
 find_sprint() {
   fs_root=$1
   [ -n "$fs_root" ] || return 1
+  fs_match=""
+  fs_count=0
   for f in "$fs_root"/docs/sprint/SPRINT-*.md; do
     [ -f "$f" ] || continue
     grep -q '^status: active' "$f" 2>/dev/null || continue
-    printf '%s' "$f"; return 0
+    fs_count=$((fs_count + 1))
+    fs_match=$f
   done
-  return 1
+  [ "$fs_count" -eq 1 ] || return 1
+  printf '%s' "$fs_match"
+  return 0
 }
 
 reap() {
-  rp_log=$1; rp_root=$2; rp_started=$3; rp_base=${4:-0}
-  rp_sprint=$(find_sprint "$rp_root") || return 0
+  # 5th positional: the sprint Plan path RESOLVED BY THE LAUNCHER before firing (declared, not
+  # re-inferred here) -- see `--sprint` below and the `resolved_sprint` computation near the fire
+  # site. Empty means the launcher didn't resolve one either (no --sprint given and find_sprint's
+  # scan came back ambiguous or empty); fall back to a direct scan so a bare `--reap` invocation
+  # (manual testing, or an older caller) still behaves as before -- now carrying the ambiguity fix
+  # above either way.
+  rp_log=$1; rp_root=$2; rp_started=$3; rp_base=${4:-0}; rp_sprint_arg=${5:-}
+  if [ -n "$rp_sprint_arg" ]; then
+    rp_sprint=$rp_sprint_arg
+    [ -f "$rp_sprint" ] || return 0
+  else
+    rp_sprint=$(find_sprint "$rp_root") || return 0
+  fi
 
   rp_logdoc="$rp_root/docs/sprint/logs/$(basename "$rp_sprint")"
   # No Execution Log means the run never opened one -- it did nothing worth a rollup, and
@@ -206,7 +242,7 @@ reap() {
 }
 
 if [ "${1:-}" = "--reap" ]; then
-  reap "${2:-}" "${3:-}" "${4:-}" "${5:-0}"
+  reap "${2:-}" "${3:-}" "${4:-}" "${5:-0}" "${6:-}"
   exit 0
 fi
 
@@ -232,13 +268,23 @@ while [ $# -gt 0 ]; do
     --poll-seconds) shift; poll_seconds=${1:-}; shift ;;
     --log) shift; logfile=${1:-}; shift ;;
     --mode) shift; run_mode=${1:-}; shift ;;
+    --sprint) shift; sprint_arg=${1:-}; shift ;;
     --no-reap) reap=0; shift ;;
     --) shift; break ;;
-    *) die_doa "unrecognized launcher option: $1 (expected --wait-seconds/--poll-seconds/--log/--mode/--no-reap, then -- <command>)" ;;
+    *) die_doa "unrecognized launcher option: $1 (expected --wait-seconds/--poll-seconds/--log/--mode/--sprint/--no-reap, then -- <command>)" ;;
   esac
 done
 
 [ $# -gt 0 ] || die_doa "no command given -- usage: sh scripts/night-run.sh [options] -- <command> [args...]"
+
+# --- resolve the declared sprint target, if one was given (TD-112 / SPRINT-093 T1) -----------------
+# Validated BEFORE anything is launched, same discipline as --mode: a declared target that does not
+# exist or is not active is a pre-flight DOA, never silently ignored in favour of the scan fallback.
+if [ -n "$sprint_arg" ]; then
+  [ -f "$sprint_arg" ] || die_doa "--sprint '$sprint_arg' not found"
+  grep -q '^status: active' "$sprint_arg" 2>/dev/null \
+    || die_doa "--sprint '$sprint_arg' does not have status: active -- refusing to target a Plan that is not the active one"
+fi
 
 case "$wait_seconds" in ''|*[!0-9]*) die_doa "--wait-seconds must be a positive integer, got: '$wait_seconds'" ;; esac
 case "$poll_seconds" in ''|*[!0-9]*) die_doa "--poll-seconds must be a positive integer, got: '$poll_seconds'" ;; esac
@@ -367,27 +413,39 @@ pre_commit=""
 case "$allargs" in *sprint-bulk*) ;; *) reap=0 ;; esac
 started=$(date +%s 2>/dev/null || printf '')
 
+# Resolve ONCE which sprint this run targets, and use that same resolution for both the
+# logdoc_base measurement below and the reap() call at exit -- both must agree on the target, which
+# is the whole point of TD-112's fix (SPRINT-089's reaper disagreed with itself about nothing; it
+# simply never had a target signal at all and re-scanned into ambiguity). `--sprint` is the declared
+# signal; absent that, fall back to the same scan find_sprint() now performs safely (refuses
+# ambiguity rather than guessing).
+resolved_sprint=""
+if [ "$reap" = "1" ]; then
+  if [ -n "$sprint_arg" ]; then
+    resolved_sprint=$sprint_arg
+  else
+    resolved_sprint=$(find_sprint "$repo_root" || printf '')
+  fi
+fi
+
 # How long the Execution Log already is. The reaper compares only what the run APPENDS
 # past this mark against its own rollup lines -- see the note in reap().
 logdoc_base=0
-if [ "$reap" = "1" ]; then
-  base_sprint=$(find_sprint "$repo_root" || printf '')
-  if [ -n "$base_sprint" ]; then
-    base_doc="$repo_root/docs/sprint/logs/$(basename "$base_sprint")"
-    [ -f "$base_doc" ] && logdoc_base=$(awk 'END{print NR}' "$base_doc" 2>/dev/null)
-  fi
+if [ -n "$resolved_sprint" ]; then
+  base_doc="$repo_root/docs/sprint/logs/$(basename "$resolved_sprint")"
+  [ -f "$base_doc" ] && logdoc_base=$(awk 'END{print NR}' "$base_doc" 2>/dev/null)
 fi
 
 (
   NR_LOG="$logfile" NR_EC="$ecfile" NR_SELF="$0" NR_ROOT="$repo_root" \
-  NR_REAP="$reap" NR_START="$started" NR_BASE="$logdoc_base" nohup sh -c '
+  NR_REAP="$reap" NR_START="$started" NR_BASE="$logdoc_base" NR_SPRINT="$resolved_sprint" nohup sh -c '
     "$@" >"$NR_LOG" 2>&1 </dev/null
     printf "%s" "$?" >"$NR_EC"
     # Emitted here, after the exit code is recorded, so it runs on EVERY exit -- clean
     # finish, early end-of-turn, or non-zero. This is the whole point: the failure being
     # guarded against is a run that ends mid-Plan and reports success (night-run.md Part 4).
     if [ "$NR_REAP" = "1" ]; then
-      sh "$NR_SELF" --reap "$NR_LOG" "$NR_ROOT" "$NR_START" "$NR_BASE" >/dev/null 2>&1 || true
+      sh "$NR_SELF" --reap "$NR_LOG" "$NR_ROOT" "$NR_START" "$NR_BASE" "$NR_SPRINT" >/dev/null 2>&1 || true
     fi
   ' sh "$@" &
   echo $! >"$pidfile"

@@ -20,7 +20,16 @@
 #   completed, no DoD header    -> FAIL. This is the exact 4-of-7 case.
 #   completed, no calibration   -> FAIL, separately named: both field-report runs finished without
 #                                  writing theirs, and both rows were reconstructed by a human.
-#   completed, both present     -> PASS.
+#   terminal contradicts a
+#     per-task line             -> FAIL, separately named (SPRINT-093 T1). The shape checks above
+#                                  never read whether the *content* agrees with itself -- this is
+#                                  exactly the gap SPRINT-089's committed rollup exploited:
+#                                  `terminal · PLAN_EXHAUSTED` sat next to a task the run's own log
+#                                  called `parked-hitl`, and the three checks above all still passed,
+#                                  because none of them compares the terminal line against the
+#                                  per-task lines beside it. See "the agreement check" below.
+#   completed, both present,
+#     terminal agrees           -> PASS.
 #
 # Usage: sh check-night-run-rollup.sh <sprint-log.md> [<sprint-log.md> ...]
 # Archived logs are skipped by path (docs/sprint/archive/) -- closed history is not re-litigated.
@@ -67,7 +76,64 @@ for lg in "$@"; do
   if [ "$term" -eq 0 ]; then
     bad "night-run rollup: $lg records a completed run but carries no 'terminal · <STATE> · <reason>' line naming one of PLAN_EXHAUSTED | AUTHORITY_BOUNDARY | HARD_FAILURE | BUDGET_STOP | USER_STOP -- a run that stopped for a reason nobody declared is indistinguishable from one that finished (Part 0b). The count says how much of the Plan is done; the state says why the run stopped being the thing that does it"
   fi
-  [ "$hdr" -eq 1 ] && [ "$cal" -eq 1 ] && [ "$term" -eq 1 ] && ok "night-run rollup $lg (DoD header + terminal state + calibration row present)"
+
+  # --- the agreement check (SPRINT-093 T1) -----------------------------------------------------
+  # Everything above asserts SHAPE: that a header/calibration/terminal line exists somewhere. None
+  # of them read whether the terminal line's claim is consistent with the per-task lines sitting
+  # right beside it -- which is exactly how SPRINT-089's false `PLAN_EXHAUSTED` rollup passed this
+  # checker with a task logged `· parked-hitl ·` in the very same file.
+  #
+  # The matrix comes directly from night-run.md Part 0b's own paragraph ("`PLAN_EXHAUSTED` means
+  # every task reached a `done` state -- nothing weaker"), which maps each of the six Part 4 task
+  # states to exactly one terminal state:
+  #   done                    -> (needs no line at all -- Part 4: "done tasks need no per-task line")
+  #   parked-hitl | blocked   -> AUTHORITY_BOUNDARY
+  #   stalled | denied-tool   -> HARD_FAILURE
+  #   unattempted             -> BUDGET_STOP
+  # A terminal line naming a DIFFERENT state than the one a present per-task line maps to is a
+  # contradiction, and per that same paragraph "the state is the half that is wrong" -- so this
+  # FAILs the terminal line's claim, never the per-task line's.
+  #
+  # HARD_FAILURE and USER_STOP are deliberately NOT asserted against, in either direction. Both can
+  # be produced by something this checker cannot see from the log text alone: HARD_FAILURE also
+  # fires on a bare non-zero process exit (night-run.sh's reap(), the wrapped-process-exit branch),
+  # which can land after a task already logged `done`, `parked-hitl` or `unattempted` -- so a
+  # HARD_FAILURE next to any of those is not necessarily wrong. USER_STOP is an external interrupt
+  # (night-run.sh: "an external kill never reaches this code path at all") and can land mid-task in
+  # any state. night-run.md's contract is silent on what per-task states those two rule OUT, so
+  # nothing is asserted for them here rather than guessing at a rule the doc does not state.
+  agree_bad=0
+  if [ "$term" -eq 1 ]; then
+    term_state=$(grep -oE '^terminal · (PLAN_EXHAUSTED|AUTHORITY_BOUNDARY|HARD_FAILURE|BUDGET_STOP|USER_STOP) ·' "$lg" 2>/dev/null \
+      | head -n1 | sed -E 's/^terminal · ([A-Z_]+) ·.*/\1/')
+    case "$term_state" in
+      PLAN_EXHAUSTED)
+        bad_line=$(grep -E '^T[0-9]+ · (blocked|parked-hitl|stalled|denied-tool|unattempted) · ' "$lg" 2>/dev/null | head -n1)
+        if [ -n "$bad_line" ]; then
+          agree_bad=1
+          bad "night-run rollup: $lg claims terminal · PLAN_EXHAUSTED but carries a non-done per-task line -- '$bad_line' -- Part 0b: PLAN_EXHAUSTED means every task reached a done state, nothing weaker; this is the SPRINT-089 shape exactly"
+        fi
+        ;;
+      AUTHORITY_BOUNDARY)
+        bad_line=$(grep -E '^T[0-9]+ · (stalled|denied-tool|unattempted) · ' "$lg" 2>/dev/null | head -n1)
+        if [ -n "$bad_line" ]; then
+          agree_bad=1
+          bad "night-run rollup: $lg claims terminal · AUTHORITY_BOUNDARY but carries a per-task line Part 0b maps elsewhere (stalled/denied-tool -> HARD_FAILURE, unattempted -> BUDGET_STOP) -- '$bad_line'"
+        fi
+        ;;
+      BUDGET_STOP)
+        bad_line=$(grep -E '^T[0-9]+ · (blocked|parked-hitl|stalled|denied-tool) · ' "$lg" 2>/dev/null | head -n1)
+        if [ -n "$bad_line" ]; then
+          agree_bad=1
+          bad "night-run rollup: $lg claims terminal · BUDGET_STOP but carries a per-task line Part 0b maps elsewhere (blocked/parked-hitl -> AUTHORITY_BOUNDARY, stalled/denied-tool -> HARD_FAILURE) -- '$bad_line'"
+        fi
+        ;;
+      HARD_FAILURE|USER_STOP) : ;;  # contract silent on what these two rule out -- left unasserted
+    esac
+  fi
+
+  [ "$hdr" -eq 1 ] && [ "$cal" -eq 1 ] && [ "$term" -eq 1 ] && [ "$agree_bad" -eq 0 ] \
+    && ok "night-run rollup $lg (DoD header + terminal state + calibration row present, and agrees with its per-task lines)"
 done
 
 exit "$fail"
