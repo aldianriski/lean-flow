@@ -28,13 +28,21 @@ import { classifyAll, composeFamilies } from "../../../packages/standard/src/tra
 import { attachLevel } from "../../../packages/standard/src/level.ts";
 import { readSpecAllFromDisk, readSpecSectionFromDisk, BUNDLED_SPEC_PATH } from "./spec-file-reader.ts";
 
-/** Adapter-independent description of what one invocation asked for. */
+/**
+ * Adapter-independent description of what one invocation asked for. `specPath` (SPRINT-091 T5) is
+ * optional and present ONLY on `section`/`full` -- the two kinds whose own render path reads a spec
+ * document off disk (`readSpecSectionFromDisk`/`readSpecAllFromDisk` in `runSection`/`runFull` below).
+ * `rule` deliberately carries no `specPath`: `runRule`'s dispatch never opens a spec file at all (it
+ * goes straight from a validated `RuleId` to a registry lookup), so a field it would never read would
+ * be dead weight on the type, not a real seam -- YAGNI per CLAUDE.md's laziness ladder. `--spec` is
+ * still accepted and parsed correctly ahead of `--rule` (below), it just has nothing to attach it to.
+ */
 export type Invocation =
   | { kind: "version" }
   | { kind: "help" }
   | { kind: "rule"; ruleId: string; repoDir: string }
-  | { kind: "section"; section: string; repoDir: string }
-  | { kind: "full"; repoDir: string }
+  | { kind: "section"; section: string; repoDir: string; specPath?: string | undefined }
+  | { kind: "full"; repoDir: string; specPath?: string | undefined }
   | { kind: "unknown"; args: readonly string[] };
 
 /**
@@ -44,25 +52,55 @@ export type Invocation =
 export function parse(argv: readonly string[]): Invocation {
   if (argv.some((a) => a === "--version" || a === "-v")) return { kind: "version" };
 
-  const ruleIdx = argv.indexOf("--rule");
-  if (ruleIdx !== -1 && argv[ruleIdx + 1] !== undefined) {
-    return { kind: "rule", ruleId: argv[ruleIdx + 1] as string, repoDir: argv[ruleIdx + 2] ?? "." };
+  // SPRINT-091 T5: `--spec <path>` is extracted FIRST, independent of position, so it composes with
+  // EVERY shape below rather than being special-cased inside each one. Deliberately orthogonal to
+  // repo-dir (spec-file-reader.ts's own header, restated at every site that reads it): `repo-dir` says
+  // WHERE to check, `--spec` says WHAT to check against, and the two have never been the same
+  // argument -- `--spec other.md --rule S9.LOGDIR .` and `--rule S9.LOGDIR . --spec other.md` parse
+  // identically. Left `undefined` (never defaulted here) when absent -- `runSection`/`runFull` below
+  // own the actual default-to-`BUNDLED_SPEC_PATH` decision, at the one place that also owns the read
+  // attempt, rather than this pure parser baking a filesystem constant into every `Invocation` it
+  // produces (and see each's own comment for why `undefined`, not the constant, is threaded through so
+  // `main.test.ts`'s existing `toEqual` literals -- which never mention `specPath` -- keep passing:
+  // `toEqual` treats an explicit `undefined` property as equivalent to an absent one).
+  //
+  // A malformed `--spec` (present with no value following it) is deliberately NOT extracted here:
+  // `specPath` stays `undefined` and the bare `--spec` token is left in place for the rest of this
+  // function to see, so it falls through every remaining branch exactly as an unrecognised token
+  // would and lands on `unknown` below -- the SAME convention `--rule`/`--section` already use for
+  // their own missing-value case (T1's boundary: a malformed flag is an unknown invocation, exit 2,
+  // never a bespoke error class). Inventing a distinct "malformed --spec" error class would be new
+  // surface for a shape this file already has one answer for.
+  let specPath: string | undefined;
+  let rest = argv;
+  const specIdx = argv.indexOf("--spec");
+  if (specIdx !== -1 && argv[specIdx + 1] !== undefined) {
+    specPath = argv[specIdx + 1];
+    rest = [...argv.slice(0, specIdx), ...argv.slice(specIdx + 2)];
   }
 
-  const sectionIdx = argv.indexOf("--section");
-  if (sectionIdx !== -1 && argv[sectionIdx + 1] !== undefined) {
-    return { kind: "section", section: argv[sectionIdx + 1] as string, repoDir: argv[sectionIdx + 2] ?? "." };
+  const ruleIdx = rest.indexOf("--rule");
+  if (ruleIdx !== -1 && rest[ruleIdx + 1] !== undefined) {
+    return { kind: "rule", ruleId: rest[ruleIdx + 1] as string, repoDir: rest[ruleIdx + 2] ?? "." };
+  }
+
+  const sectionIdx = rest.indexOf("--section");
+  if (sectionIdx !== -1 && rest[sectionIdx + 1] !== undefined) {
+    return { kind: "section", section: rest[sectionIdx + 1] as string, repoDir: rest[sectionIdx + 2] ?? ".", specPath };
   }
 
   // The flagless full run (T3): exactly ONE argument, and it is not itself a flag -- mirrors
   // `sh conformance.sh <repo-dir>`'s own single positional argument. Two or more arguments (e.g.
   // `conformance .`, an existing test's own case) stay `unknown`: only a lone, non-flag token is
   // unambiguous enough to read as "the repo to check", never a typo'd or partial flag invocation.
-  if (argv.length === 1 && argv[0] !== undefined && !argv[0].startsWith("-")) {
-    return { kind: "full", repoDir: argv[0] };
+  // Checked against `rest` (post `--spec` extraction), not `argv` -- `--spec other.md .` is ONE
+  // effective positional argument, not two, exactly as `--rule`/`--section` above already see `rest`
+  // rather than the raw `argv` that still carries the two `--spec` tokens.
+  if (rest.length === 1 && rest[0] !== undefined && !rest[0].startsWith("-")) {
+    return { kind: "full", repoDir: rest[0], specPath };
   }
 
-  if (argv.length === 0 || argv.some((a) => a === "--help" || a === "-h")) return { kind: "help" };
+  if (rest.length === 0 || rest.some((a) => a === "--help" || a === "-h")) return { kind: "help" };
   return { kind: "unknown", args: argv };
 }
 
@@ -82,6 +120,10 @@ const HELP_LINE = [
   "                       mark -- a rule with no evaluator registered anywhere reports a named",
   "                       gap, never a silent skip (SPRINT-091 T3), and closes with a global",
   "                       'level:' line, §14's own priority ladder (SPRINT-091 T11)",
+  "  --spec <path>        evaluate against A DIFFERENT spec than the bundled Standard -- composes",
+  "                       with --section/the flagless run (never with --rule, which reads no spec",
+  "                       document at all); orthogonal to repo-dir (WHAT to check against, never",
+  "                       WHERE); defaults to the bundled spec/STANDARD.md when omitted (SPRINT-091 T5)",
   "",
   "The reference engine is being built family by family under a strangler migration",
   "(EPIC-014). Until every family cuts over, the authoritative implementation is Shell:",
@@ -218,11 +260,25 @@ const SECTION_ARG_RE = /^[1-9]\d*$/;
  * `AdrFamilyPort & AdrHistoryPort` S4.APPEND alone needs, since it is §4's one Gated/history-reading
  * rule -- T7's own module header). Both constructors are reused verbatim, unmodified, exactly as
  * `createBuiltInRegistry`/`createF12Registry` are above -- this function's job is composition only.
+ *
+ * SPRINT-091 T5: `specPath` -- defaulting to `BUNDLED_SPEC_PATH`, so a caller who never mentions
+ * `--spec` gets byte-identical wiring to every invocation before this task -- now flows into
+ * `FsGitBoundaryPort`'s own second argument too, not only into `runSection`/`runFull`'s own
+ * `readSpecSectionFromDisk`/`readSpecAllFromDisk` calls (the design decision T5's task brief asked to
+ * be written down here, deliberately, rather than left implicit): `FsGitBoundaryPort`'s second
+ * argument is the spec §12's rules read PROSE from (allowed asset dirs, generated-file classes,
+ * `fs-git-boundary.ts`'s own header) -- a DIFFERENT reading of the SAME document `readSpecAllFromDisk`
+ * turns into rule ROWS above it. A caller-supplied `--spec` that governed which rule rows exist but
+ * silently left §12's prose-reading rules still evaluating against the BUNDLED copy would be exactly
+ * the half-wired seam this sprint already hit twice (T11's `hold` render sites, T12's F4/S4.APPEND
+ * composition) -- a spec swapped for the rows but not the prose two rows down would let a doctored
+ * `--section 12` fixture prove nothing about §12 itself, only about rows outside it. So ONE `specPath`
+ * threads through EVERY spec-consuming port this function composes, never two.
  */
-function composedDispatch(repoDir: string): (id: RuleId) => RuleEvaluation | undefined {
+function composedDispatch(repoDir: string, specPath: string = BUNDLED_SPEC_PATH): (id: RuleId) => RuleEvaluation | undefined {
   return composeFamilies([
     bindRegistry(createBuiltInRegistry(), new FsSprintDirPort(repoDir)),
-    bindRegistry(createF12Registry(), new FsGitBoundaryPort(repoDir, BUNDLED_SPEC_PATH)),
+    bindRegistry(createF12Registry(), new FsGitBoundaryPort(repoDir, specPath)),
     bindRegistry(createF4Registry(), new FsAdrFamilyPort(repoDir)),
     bindRegistry(createS4AppendRegistry(), createFsAdrAppendPort(repoDir)),
   ]);
@@ -250,12 +306,23 @@ function composedDispatch(repoDir: string): (id: RuleId) => RuleEvaluation | und
  * a `hold` verdict, which no evaluator anywhere emits yet). Injecting a dispatch, never a level, keeps
  * this seam orthogonal to DoD 2 above -- see the `hold`-under-a-seeded-dispatch regression test in
  * `main.test.ts`, which proves DoD 2 holds even when a `hold` outcome IS present.
+ *
+ * `specPath` (SPRINT-091 T5) -- defaulting to `BUNDLED_SPEC_PATH`, so a caller who never passes
+ * `--spec` reads the identical document every invocation before this task read -- is threaded to BOTH
+ * places this function itself reads a spec off disk: the read attempt below (`readSpecSectionFromDisk`,
+ * DoD 1 -- a caller-supplied spec is evaluated INSTEAD of the shipped Standard, never alongside it) and
+ * `buildDispatch(repoDir, specPath)`, so a family requiring its own spec access (`composedDispatch`'s
+ * own `FsGitBoundaryPort`, see its header for the full reasoning) sees the SAME document this function
+ * just read rows from. Positioned AFTER `buildDispatch` -- a NEW trailing parameter, not inserted
+ * before it -- so every existing `runSection(section, repoDir, write, fakeDispatch)` call site in
+ * `main.test.ts` (T11's `hold` seam) keeps compiling unchanged with `specPath` silently defaulting.
  */
 export function runSection(
   sectionArg: string,
   repoDir: string,
   write: (s: string) => void,
-  buildDispatch: (repoDir: string) => (id: RuleId) => RuleEvaluation | undefined = composedDispatch,
+  buildDispatch: (repoDir: string, specPath: string) => (id: RuleId) => RuleEvaluation | undefined = composedDispatch,
+  specPath: string = BUNDLED_SPEC_PATH,
 ): number {
   if (!SECTION_ARG_RE.test(sectionArg)) {
     // RULED TS/Shell divergence (EPIC-014 D2), not an absorbed one: Shell's `read-spec-rules.sh
@@ -275,14 +342,14 @@ export function runSection(
   }
   const section = Number(sectionArg);
 
-  const specResult = readSpecSectionFromDisk(BUNDLED_SPEC_PATH, section);
+  const specResult = readSpecSectionFromDisk(specPath, section);
   if (!specResult.ok) {
     write(`leanflow: ${specResult.finding} -- ${specResult.message}`);
     return specReadExitCode(specResult); // ok:false -> exit 1 (ADR-034 D3), via the shared mapping (T5)
   }
 
-  const rules = specResult.rows.map((row) => toStandardRule(row, section, BUNDLED_SPEC_PATH));
-  const report = classifyAll(rules, buildDispatch(repoDir));
+  const rules = specResult.rows.map((row) => toStandardRule(row, section, specPath));
+  const report = classifyAll(rules, buildDispatch(repoDir, specPath));
 
   const evaluations: RuleEvaluation[] = [];
   for (const outcome of report.outcomes) {
@@ -342,21 +409,27 @@ export function runSection(
  * wording, classify.ts), which is the exact L-108 shape T4 hit and fixed the same way in level.test.ts.
  * `buildDispatch` defaults to the real `composedDispatch` -- see `runSection`'s own comment for why
  * the seam exists (SPRINT-091 T11, DoD 3).
+ *
+ * `specPath` (SPRINT-091 T5) -- same default, same threading, same reasoning as `runSection`'s own
+ * comment above (DoD 1: a caller-supplied spec is evaluated INSTEAD of the shipped Standard); a
+ * trailing parameter here too, so every existing `runFull(repoDir, write, fakeDispatch)` call site
+ * keeps compiling with `specPath` silently defaulting to `BUNDLED_SPEC_PATH`.
  */
 export function runFull(
   repoDir: string,
   write: (s: string) => void,
-  buildDispatch: (repoDir: string) => (id: RuleId) => RuleEvaluation | undefined = composedDispatch,
+  buildDispatch: (repoDir: string, specPath: string) => (id: RuleId) => RuleEvaluation | undefined = composedDispatch,
+  specPath: string = BUNDLED_SPEC_PATH,
 ): number {
-  const specResult = readSpecAllFromDisk(BUNDLED_SPEC_PATH);
+  const specResult = readSpecAllFromDisk(specPath);
   if (!specResult.ok) {
     write(`leanflow: ${specResult.finding} -- ${specResult.message}`);
     return specReadExitCode(specResult);
   }
 
-  const rules = specResult.rows.map((row) => toStandardRule(row, sectionNumberOfRuleId(row.id), BUNDLED_SPEC_PATH));
+  const rules = specResult.rows.map((row) => toStandardRule(row, sectionNumberOfRuleId(row.id), specPath));
 
-  const report = classifyAll(rules, buildDispatch(repoDir));
+  const report = classifyAll(rules, buildDispatch(repoDir, specPath));
 
   const evaluations: RuleEvaluation[] = [];
   for (const outcome of report.outcomes) {
@@ -405,9 +478,13 @@ export function run(inv: Invocation, write: (s: string) => void): number {
     case "rule":
       return runRule(inv.ruleId, inv.repoDir, write);
     case "section":
-      return runSection(inv.section, inv.repoDir, write);
+      // `inv.specPath` -- `string | undefined` (T5's parser never defaults it, see `parse`'s own
+      // comment) -- passed straight through to `runSection`'s own trailing default parameter: TS
+      // treats an explicit `undefined` argument at a defaulted parameter position the same as
+      // omitting it, so `undefined` here still resolves to `BUNDLED_SPEC_PATH` inside `runSection`.
+      return runSection(inv.section, inv.repoDir, write, composedDispatch, inv.specPath);
     case "full":
-      return runFull(inv.repoDir, write);
+      return runFull(inv.repoDir, write, composedDispatch, inv.specPath);
     case "unknown":
       write(`leanflow: unknown argument(s): ${inv.args.join(" ")}`);
       write(HELP_LINE);
