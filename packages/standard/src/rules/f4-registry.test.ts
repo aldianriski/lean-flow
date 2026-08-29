@@ -7,7 +7,12 @@ import { classifySection } from "../section.ts";
 import { readSection, toStandardRule } from "../spec-reader.ts";
 import { tokenize } from "../tokenizer.ts";
 import { composeFamilies } from "../traverse.ts";
-import { InMemoryAdrFamilyPort } from "./adr-family-port.fake.ts";
+// SPRINT-092 T1 (gap closed on coordinator review): this file asserts 13 `.verdict` outcomes through
+// the composed §4 dispatcher, which makes it a §4 case by DoD 1's own reading, not infrastructure --
+// fixtures build through the shared factory, same as every other §4 test file. See
+// s4-onefile.test.ts's own comment and `test/fixtures/adr-family-factory.ts`'s header for why the
+// factory cannot decide a verdict (EPIC-014 H14).
+import { adrFamilyPort } from "../../../../test/fixtures/adr-family-factory.ts";
 import { createF4Registry } from "./f4-registry.ts";
 import { createBuiltInRegistry } from "./built-in.ts";
 import { InMemorySprintDirPort } from "./sprint-log-outside-logs-dir.fake.ts";
@@ -17,7 +22,7 @@ import { InMemoryGitBoundaryPort } from "./git-boundary-port.fake.ts";
 describe("createF4Registry — all four tree-answerable S4 rules resolve out of the box", () => {
   test("S4.ONEFILE, S4.INDEX, S4.SECTIONS, S4.NEGATIVE each dispatch to their own evaluator", () => {
     const registry = createF4Registry();
-    const port = new InMemoryAdrFamilyPort({ adrDirFiles: {} });
+    const port = adrFamilyPort({ adrDirFiles: {} });
 
     expect(registry.dispatch(makeRuleId("S4.ONEFILE"), port)?.verdict).toBe("note");
     expect(registry.dispatch(makeRuleId("S4.INDEX"), port)?.verdict).toBe("note");
@@ -77,7 +82,7 @@ describe("classifySection(4, ...) — T6 evaluators, over the REAL §4 rows", ()
     expect(rules).toHaveLength(7); // independent count: `read-spec-rules.sh --section 4` also prints 7 rows
 
     const registry = createF4Registry();
-    const port = new InMemoryAdrFamilyPort({
+    const port = adrFamilyPort({
       adrDirFiles: { "ADR-001-a-real-decision.md": COMPLETE_ADR },
       indexFile: { path: "docs/DECISIONS.md", text: "ADR-001-a-real-decision.md\n" },
     });
@@ -117,7 +122,7 @@ describe("F4 composed with S9 and F12 through bindRegistry/composeFamilies (ADR-
       createF12Registry(),
       new InMemoryGitBoundaryPort({ files: {}, allowedAssetDirs: [], generatedClasses: [], generatedAllowedExclusions: [] }),
     );
-    const f4 = bindRegistry(createF4Registry(), new InMemoryAdrFamilyPort({ adrDirFiles: {} }));
+    const f4 = bindRegistry(createF4Registry(), adrFamilyPort({ adrDirFiles: {} }));
     return composeFamilies([s9, f12, f4]);
   }
 
@@ -144,7 +149,7 @@ describe("F4 composed with S9 and F12 through bindRegistry/composeFamilies (ADR-
   // registry claiming one of F4's OWN ids, standing in for the strangler-handoff scenario ADR-038's
   // Decision names (a rule moving between families mid-migration, briefly claimed by both).
   test("a duplicate id across F4 and another REAL family throws, naming both positions", () => {
-    const f4 = bindRegistry(createF4Registry(), new InMemoryAdrFamilyPort({ adrDirFiles: {} }));
+    const f4 = bindRegistry(createF4Registry(), adrFamilyPort({ adrDirFiles: {} }));
 
     const impostor = createRegistry<undefined>();
     impostor.register(makeRuleId("S4.ONEFILE"), () => ({
@@ -162,7 +167,7 @@ describe("F4 composed with S9 and F12 through bindRegistry/composeFamilies (ADR-
   // CONTROL: the SAME two families, a DIFFERENT id only F4 owns -- must dispatch normally, proving the
   // collision above is about THIS id, not a break in composeFamilies itself.
   test("CONTROL: a different F4 id, claimed by only F4, still dispatches normally alongside the impostor", () => {
-    const f4 = bindRegistry(createF4Registry(), new InMemoryAdrFamilyPort({ adrDirFiles: {} }));
+    const f4 = bindRegistry(createF4Registry(), adrFamilyPort({ adrDirFiles: {} }));
 
     const impostor = createRegistry<undefined>();
     impostor.register(makeRuleId("S4.ONEFILE"), () => ({

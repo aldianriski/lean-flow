@@ -1,4 +1,7 @@
 import { describe, expect, test } from "bun:test";
+// SPRINT-092 T1 (coordinator review): deliberately OUT of the factory migration -- this file asserts
+// `canonicalAdrs(...)` return values, never a `.verdict`, so the verdict-blindness guardrail has
+// nothing here to guard. Left on the direct fake construction it already used.
 import { InMemoryAdrFamilyPort } from "./adr-family-port.fake.ts";
 import {
   canonicalAdrs,
