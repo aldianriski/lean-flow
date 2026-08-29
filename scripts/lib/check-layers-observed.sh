@@ -76,7 +76,18 @@ note() { printf '      %s\n' "$1"; }
 # Both dissolve once the real question is asked: WHO changed it. A commit is attributed to a task by,
 # in order:
 #   1. a `Task: T<n>` git trailer                     -- the convention going forward, unambiguous
-#   2. subject `sprint(NN) T<n>: ...`                 -- sequential inline execution (SPRINT-047/048)
+#   2. subject `sprint(NN) T<n>: ...`                 -- sequential inline execution (SPRINT-047/048),
+#      OR `sprint(NN) T<n> <qualifier>: ...` where <qualifier> is a space-then-letter-led run of
+#      [A-Za-z0-9 ] with NO embedded `T<digit>` (SPRINT-093 T7 widening). Accepted because
+#      `sprint(092) T1 revise:` names T1 exactly as unambiguously as `sprint(092) T1:` does -- the
+#      qualifier is prose about the commit (a re-pass, a numbered re-pass), never a second task
+#      reference. The embedded-`T<digit>` ban is the load-bearing half: it is what keeps
+#      `sprint(093) T1 and T2:` / `sprint(093) T1-T3:` falling through to rule 6 UNATTRIBUTED rather
+#      than silently resolving to T1 -- an ambiguous set must be reported, never guessed (same defect
+#      class SPRINT-093 T1 fixed in find_sprint()). A qualifier starting with a digit is rejected too
+#      (requires a LETTER first), so `sprint(093) T1 0:` cannot be misread as a numeric task-id
+#      variant. `sprint(093) Task 5:` and `sprint(093) TODO:` are untouched by this rule -- neither
+#      has `T` immediately followed by a digit, so both still fall through exactly as before.
 #   3. subject `merge(...): T<n> ...`                 -- coordinator merge-back of an agent branch
 #   4. subject `... (SPRINT-NNN T<n>)`                -- trailing parenthetical (SPRINT-042/046)
 #   5. subject `sprint(NN): ...` with no task id      -- COORDINATOR bookkeeping, exempt by role
@@ -174,6 +185,17 @@ attribute() {   # <sha> -> "T<n>" | "COORD" | "GOVERNANCE" | "UNATTRIBUTED"
         -e 's/^merge([^)]*):[ ]*\(T[0-9]\{1,\}\)[^0-9].*/\1/p' \
         -e 's/.*(SPRINT-[0-9]\{1,\}[ ]\{1,\}\(T[0-9]\{1,\}\)).*/\1/p' | head -n1)
   [ -n "$a_m" ] && { printf '%s' "$a_m"; return; }
+  # Rule 2's qualifier widening (SPRINT-093 T7): `sprint(NN) T<n> <qualifier>: ...` where <qualifier>
+  # is a space-then-letter-led run of [A-Za-z0-9 ]. Extracted and validated in two separate greps
+  # rather than folded into the sed pipeline above, because the validation is a REJECTION the sed
+  # capture-group approach cannot express: a qualifier containing its own embedded `T<digit>` (`T1
+  # and T2:`, `T1-T3:`) must fall through to UNATTRIBUTED rather than resolve to the first task, and
+  # that requires inspecting the captured qualifier text itself, not just matching a shape.
+  a_qt=$(printf '%s' "$a_s" | sed -n 's/^sprint([0-9]\{1,\})[ ]\{1,\}\(T[0-9]\{1,\}\)[ ]\{1,\}[A-Za-z][A-Za-z0-9 ]*:.*/\1/p')
+  if [ -n "$a_qt" ]; then
+    a_qr=$(printf '%s' "$a_s" | sed -n 's/^sprint([0-9]\{1,\})[ ]\{1,\}T[0-9]\{1,\}[ ]\{1,\}\([A-Za-z][A-Za-z0-9 ]*\):.*/\1/p')
+    printf '%s' "$a_qr" | grep -qE 'T[0-9]' || { printf '%s' "$a_qt"; return; }
+  fi
   printf '%s' "$a_s" | grep -qE '^sprint\([0-9]+\):' && { printf 'COORD'; return; }
   # Consulted LAST, deliberately: a `sprint(NNN) T1:` commit that happens to touch only TODO.md is
   # still T1's work and must stay attributed to T1. Only a commit no task claims reaches here.

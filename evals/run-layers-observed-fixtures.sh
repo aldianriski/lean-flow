@@ -1033,6 +1033,220 @@ run_case_anywhere "ownership leg G (duplicate sprint number is not a sibling)" 1
   "T1:gamma.txt" -- \
   sh -c "cd \"$c10g\" && sh \"$checker\" docs/sprint/SPRINT-940-dup-a.md docs/sprint/SPRINT-940-dup-b.md"
 
+# ================================================================================================
+# case 11: RULE 2 QUALIFIER WIDENING (SPRINT-093 T7) -- `sprint(NN) T<n> <qualifier>: ...` names its
+# task exactly as unambiguously as the bare-colon form, so a commit using it must PASS like any other
+# well-declared task commit. Both qualifier shapes exercised are the real coordinator-authored
+# subjects that motivated the widening (`T1 revise` / `T2 revise 2`), not invented shapes.
+# ================================================================================================
+c11="$work/qualifier-widening"
+mkdir -p "$c11/docs/sprint"
+cat > "$c11/docs/sprint/SPRINT-950-qualifier.md" <<'EOF'
+---
+sprint: 950
+slug: qualifier
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-950 — Qualifier Widening (constructed fixture)
+
+## Plan
+
+### T1 — edit foo.txt
+Layers: `foo.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] foo.txt updated
+
+### T2 — edit bar.txt
+Layers: `bar.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] bar.txt updated
+EOF
+printf 'a\n' > "$c11/foo.txt"
+printf 'b\n' > "$c11/bar.txt"
+git -C "$c11" init -q
+lock_plan "$c11" 'docs/sprint/SPRINT-950-qualifier.md'
+printf 'a2\n' >> "$c11/foo.txt"
+commit_all "$c11" 'sprint(950) T1 revise: fix the input-side description (comments only)'
+printf 'b2\n' >> "$c11/bar.txt"
+commit_all "$c11" 'sprint(950) T2 revise 2: require positive evidence for the staleness check'
+
+run_case_anywhere "qualifier-widening (bare + numbered qualifier both attribute and PASS)" 0 \
+  "layers observed (all changed files declared" -- \
+  sh -c "cd \"$c11\" && sh \"$checker\" docs/sprint/SPRINT-950-qualifier.md"
+
+# ================================================================================================
+# case 12: AMBIGUOUS QUALIFIER MUST NOT SILENTLY RESOLVE (SPRINT-093 T7). `sprint(NN) T1 and T2: ...`
+# and `sprint(NN) T1-T3: ...` each NAME more than one task in the subject -- accepting either as T1
+# would be the exact defect class SPRINT-093 T1 fixed in find_sprint(): an ambiguous set silently
+# resolved to its first member. Both must fall through to UNATTRIBUTED, reported by name, same as any
+# other subject the parser cannot resolve. A THIRD commit in the same sprint, using the unambiguous
+# qualifier form, is the sibling control (L-142): it must stay attributed and never be named in a
+# FAIL line, proving the checker discriminates rather than merely rejecting anything unfamiliar.
+# ================================================================================================
+c12="$work/ambiguous-qualifier"
+mkdir -p "$c12/docs/sprint"
+cat > "$c12/docs/sprint/SPRINT-951-ambiguous.md" <<'EOF'
+---
+sprint: 951
+slug: ambiguous
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-951 — Ambiguous Qualifier (constructed fixture)
+
+## Plan
+
+### T1 — edit alpha.txt
+Layers: `alpha.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] alpha.txt updated
+
+### T2 — edit beta.txt
+Layers: `beta.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] beta.txt updated
+
+### T3 — edit gamma.txt
+Layers: `gamma.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] gamma.txt updated
+EOF
+printf 'a\n' > "$c12/alpha.txt"
+printf 'b\n' > "$c12/beta.txt"
+printf 'g\n' > "$c12/gamma.txt"
+git -C "$c12" init -q
+lock_plan "$c12" 'docs/sprint/SPRINT-951-ambiguous.md'
+printf 'a2\n' >> "$c12/alpha.txt"
+commit_all "$c12" 'sprint(951) T1 and T2: touch alpha.txt'
+printf 'b2\n' >> "$c12/beta.txt"
+commit_all "$c12" 'sprint(951) T1-T3: touch beta.txt'
+printf 'g2\n' >> "$c12/gamma.txt"
+commit_all "$c12" 'sprint(951) T3 revise: touch gamma.txt'
+
+run_case_anywhere "ambiguous-qualifier ('T1 and T2:' falls through to unattributed)" 1 \
+  "commit attributable to no task and not coordinator bookkeeping:" -- \
+  sh -c "cd \"$c12\" && sh \"$checker\" docs/sprint/SPRINT-951-ambiguous.md"
+run_case_anywhere "ambiguous-qualifier (names alpha.txt)" 1 \
+  "alpha.txt" -- \
+  sh -c "cd \"$c12\" && sh \"$checker\" docs/sprint/SPRINT-951-ambiguous.md"
+run_case_anywhere "ambiguous-qualifier ('T1-T3:' falls through, names beta.txt)" 1 \
+  "beta.txt" -- \
+  sh -c "cd \"$c12\" && sh \"$checker\" docs/sprint/SPRINT-951-ambiguous.md"
+
+out12=$(cd "$c12" && sh "$checker" docs/sprint/SPRINT-951-ambiguous.md 2>&1)
+case "$out12" in
+  *"gamma.txt"*)
+    echo "FAIL fixture(ambiguous-qualifier sibling control): gamma.txt (T3's correctly-qualified 'revise:' commit) unexpectedly appears in a FAIL line -- got:"
+    printf '%s\n' "$out12"
+    fail=1
+    ;;
+  *)
+    echo "PASS fixture(ambiguous-qualifier sibling control): T3 revise: gamma.txt stayed attributed, never named in a FAIL line"
+    ;;
+esac
+
+# ================================================================================================
+# case 13: THE QUALIFIER WIDENING DOES NOT INHERIT RULE 5's COORD EXEMPTION, EITHER DIRECTION.
+# `sprint(NN) T1 revise: ...` still must DECLARE the files it touches like any other task commit --
+# it is not a backdoor into the bookkeeping exemption reserved for the bare `sprint(NN): ...` form.
+# And the reverse stays true unaffected: a genuine bare bookkeeping commit in the SAME sprint keeps
+# its exemption, proving the two rules were not merged into one pattern.
+# ================================================================================================
+c13="$work/qualifier-not-coord"
+mkdir -p "$c13/docs/sprint"
+cat > "$c13/docs/sprint/SPRINT-952-coord-boundary.md" <<'EOF'
+---
+sprint: 952
+slug: coord-boundary
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-952 — Qualifier vs COORD Boundary (constructed fixture)
+
+## Plan
+
+### T1 — edit alpha.txt
+Layers: `alpha.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] alpha.txt updated
+EOF
+printf 'a\n' > "$c13/alpha.txt"
+git -C "$c13" init -q
+lock_plan "$c13" 'docs/sprint/SPRINT-952-coord-boundary.md'
+printf 'd\n' > "$c13/delta.txt"          # <-- undeclared by anyone
+commit_all "$c13" 'sprint(952) T1 revise: touch delta.txt'
+printf 'bookkeeping\n' >> "$c13/TODO.md"
+commit_all "$c13" 'sprint(952): ordinary coordinator bookkeeping'
+
+run_case_anywhere "qualifier-not-coord (T1 revise: on an undeclared file still FAILs)" 1 \
+  "changed by a task that never declared it:" -- \
+  sh -c "cd \"$c13\" && sh \"$checker\" docs/sprint/SPRINT-952-coord-boundary.md"
+run_case_anywhere "qualifier-not-coord (names T1 and delta.txt)" 1 \
+  "T1:delta.txt" -- \
+  sh -c "cd \"$c13\" && sh \"$checker\" docs/sprint/SPRINT-952-coord-boundary.md"
+
+out13=$(cd "$c13" && sh "$checker" docs/sprint/SPRINT-952-coord-boundary.md 2>&1)
+case "$out13" in
+  *"TODO.md"*)
+    echo "FAIL fixture(qualifier-not-coord): bare 'sprint(952):' bookkeeping commit's TODO.md edit unexpectedly appears in a FAIL line -- COORD exemption broke -- got:"
+    printf '%s\n' "$out13"
+    fail=1
+    ;;
+  *)
+    echo "PASS fixture(qualifier-not-coord): bare bookkeeping commit stayed COORD-exempt, untouched by the widening"
+    ;;
+esac
+
+# ================================================================================================
+# case 14: THE REAL MOTIVATING COMMITS (SPRINT-093 T7, L-166) -- ab75b2c (sprint(092) T1 revise:) and
+# a12b64a (sprint(093) T2 revise:) are the actual commits that prompted this widening, plus two more
+# real qualifier commits found in this repo's own history (4611f8e, 8464714). Run against attribute()
+# AS SHIPPED IN THIS FILE, against these shas AS THEY SIT IN THIS REPO'S OWN HISTORY -- not a
+# throwaway repo, not a paraphrase of the subject. The functions are EXTRACTED (awk, by shape) rather
+# than hand-copied, so this proves the shipped code resolves these commits, not a re-implementation
+# that could silently drift from it. Bounded to is_governance_commit()..attribute() -- the main
+# per-sprint-file loop below that range needs sprint-file arguments this case doesn't supply, and
+# (load-bearing) starts past the bare-invocation guard, whose `exit 0` would otherwise terminate this
+# whole harness the moment it was sourced with the harness's own zero args.
+# ================================================================================================
+funcs_only="$work/attribute-funcs.sh"
+{ printf 'set -u\n'; awk '/^is_governance_commit\(\) \{/{f=1} f{print} /^attribute\(\) \{/{a=1} a && /^}$/{exit}' "$checker"; } > "$funcs_only"
+if ! sh -n "$funcs_only" >/dev/null 2>&1; then
+  echo "FAIL harness: extracted attribute()/is_governance_commit() functions do not parse"
+  fail=1
+else
+  real_check() {   # <label> <sha> <want>
+    _label=$1; _sha=$2; _want=$3
+    _got=$(cd "$repo_root" && . "$funcs_only" && attribute "$_sha")
+    if [ "$_got" = "$_want" ]; then
+      echo "PASS fixture(real-commit $_label): $_sha attributes to $_got"
+    else
+      echo "FAIL fixture(real-commit $_label): $_sha attributed to '$_got', expected '$_want'"
+      fail=1
+    fi
+  }
+  real_check "ab75b2c: sprint(092) T1 revise:" ab75b2ca5f95cd2897d617746d23a71baf27f7ee T1
+  real_check "a12b64a: sprint(093) T2 revise:" a12b64a0c6f475c32cbad811161f9ab245453394 T2
+  real_check "4611f8e: sprint(093) T1 revise 3:" 4611f8eff12a2869bba6ffcef900e9c1b1e561cf T1
+  real_check "8464714: sprint(093) T1 revise 2:" 8464714318cc9037cae05abb89f6a0e158e107e9 T1
+fi
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-OBSERVED FIXTURES: all green"; else echo "LAYERS-OBSERVED FIXTURES: at least one FAIL"; fi
 exit $fail
