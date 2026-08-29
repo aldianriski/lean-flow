@@ -68,6 +68,20 @@ no J-class is **J2**, not J0: the default is the safe end, because an undeclared
 question, and Part 0's invariant is that an unasked question is a BLOCK. Declaring is the promote/G2
 job (`orchestrator/SKILL.md` § G2); reading it is the run's.
 
+**A declared `J2` and pre-flight item 3 (Part 1) are the same rule read at two different moments —
+not one permitted because the other exists (TD-109, ruled STRICT).** The `J2` row's "parks" behaviour
+above describes what an unattended run does if it *meets* a J2-shaped step it could not have known
+about at pre-flight time — a revise-loop judgment finding, a `promote`/`close`/`triage` approval, a
+mid-sprint scope-change. None of those are declared Plan-task classes, and pre-flight cannot see them
+in advance. A **declared** `J2` is different: its class is fixed at G2, before the run ever starts, so
+item 3 excludes it *there* rather than leaving it to be parked at runtime — a Plan carrying a declared
+`J2` task **fails pre-flight item 3** and is not launchable unattended. `AFK-safe` and `J2` remain
+opposites in the derivation rule above; nothing here narrows that. Parking a J2 shape the mechanism
+could not foresee is not the same claim as permitting a J2 the Plan already knows it carries — the
+latter is caught earlier, precisely so it never reaches this row unattended. (SPRINT-090 D4 ruled the
+permissive reading — that a declared `J2` satisfies item 3 because it parks; SPRINT-093 D3 does not
+inherit that ruling, and this paragraph supersedes it.)
+
 **How it relates to `HITL`/`AFK` — a one-way implication, not independence.** `HITL`/`AFK` describes
 *this run's staffing* (is a human acting?); the J-class is a property of *the task* (whose authority
 does it need?). So **`J2` ⇒ `HITL` always** — a human-reserved step cannot be staffed any other way —
@@ -259,8 +273,15 @@ All items must pass or the night-run does not fire:
       `promote`-, `close`-retention-, or `triage`-class approval is parked by design (Part 0), not
       attempted — if the sprint isn't promoted yet, promote it *now*, interactively, or don't fire.
 - [ ] Trigger carries the explicit `unattended` signal (Part 0).
-- [ ] Active sprint exists; § Plan is frozen (true since `promote`); every task in the run is
-      AFK-class — none needs a human mid-execution.
+- [ ] Active sprint exists; § Plan is frozen (true since `promote`); **every task in the run is
+      declared `J0` or `J1` — a declared `J2` task FAILS this item** (TD-109, ruled STRICT). Parking
+      is what the run does with a J2-shaped step it *meets mid-run and could not have declared in
+      advance* (Part 0's park protocol, above); it is not a way to *launch* while already holding a
+      known one — the run can route other work around a park, but it still cannot act on the parked
+      task itself, which is exactly what this item checks for. A Plan containing a declared `J2` task
+      is not launchable unattended: split the `J2` work out (its own task, run interactively, or its
+      own sprint) before firing the rest. (SPRINT-090 D4 ruled the permissive reading — that a
+      declared `J2` satisfies this item because it parks; SPRINT-093 D3 does not inherit that ruling.)
 - [ ] Batch G1 + G2 signed off by the human (per `sprint-bulk` steps 1–2) **and recorded in the sprint
       file's `gates_signed:` frontmatter** — not merely agreed in the launching session. The run reads
       the sprint file and nothing else; a sign-off that exists only in a transcript is invisible to it,
