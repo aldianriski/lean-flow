@@ -122,12 +122,24 @@ run_case_anywhere "authority-vs-unattempted-fails" 1 "AUTHORITY_BOUNDARY but car
   sh "$checker" "$fx/agreement-authority-vs-unattempted/docs/sprint/logs/SPRINT-936-agreement-authority-vs-unattempted.md"
 run_case_anywhere "authority-ok" 0 "agrees with its per-task lines" -- \
   sh "$checker" "$fx/agreement-authority-ok/docs/sprint/logs/SPRINT-937-agreement-authority-ok.md"
-run_case_anywhere "budget-vs-blocked-fails" 1 "BUDGET_STOP but carries a per-task line Part 0b maps elsewhere" -- \
+# BUDGET_STOP + a LONE blocked/parked-hitl line, no unattempted line at all, is NOT a contradiction
+# (SPRINT-093 T1 revise, independent review finding): reap() reaches BUDGET_STOP purely off
+# rp_unatt > 0 and never consults rp_parked once it does -- so blocked/parked-hitl never rules
+# BUDGET_STOP out, with or without an unattempted line present. Was wrongly asserted must-FAIL
+# before the fix; corrected to its true sibling-control shape.
+run_case_anywhere "budget-vs-blocked-ok" 0 "agrees with its per-task lines" -- \
   sh "$checker" "$fx/agreement-budget-vs-blocked/docs/sprint/logs/SPRINT-938-agreement-budget-vs-blocked.md"
-run_case_anywhere "budget-vs-denied-fails" 1 "BUDGET_STOP but carries a per-task line Part 0b maps elsewhere" -- \
+run_case_anywhere "budget-vs-denied-fails" 1 "BUDGET_STOP but carries a per-task line reap()'s priority order ranks above it" -- \
   sh "$checker" "$fx/agreement-budget-vs-denied/docs/sprint/logs/SPRINT-939-agreement-budget-vs-denied.md"
 run_case_anywhere "budget-ok" 0 "agrees with its per-task lines" -- \
   sh "$checker" "$fx/agreement-budget-ok/docs/sprint/logs/SPRINT-940-agreement-budget-ok.md"
+# The missing mixed-case (independent review finding): TWO different non-done states present at
+# once -- unattempted AND parked-hitl together under BUDGET_STOP -- is the actual motivating shape
+# (a run parks a J2 task per Part 0, continues disjoint AFK work, then exhausts its budget on a
+# later task). Every other fixture in this suite has exactly ONE non-done state, which is why the
+# BUDGET_STOP-vs-blocked defect got through undetected.
+run_case_anywhere "budget-mixed-with-parked-ok" 0 "agrees with its per-task lines" -- \
+  sh "$checker" "$fx/agreement-budget-mixed-with-parked-ok/docs/sprint/logs/SPRINT-943-agreement-budget-mixed-with-parked-ok.md"
 run_case_anywhere "hardfailure-unasserted-stays-green" 0 "agrees with its per-task lines" -- \
   sh "$checker" "$fx/agreement-hardfailure-unasserted/docs/sprint/logs/SPRINT-941-agreement-hardfailure-unasserted.md"
 run_case_anywhere "userstop-unasserted-stays-green" 0 "agrees with its per-task lines" -- \

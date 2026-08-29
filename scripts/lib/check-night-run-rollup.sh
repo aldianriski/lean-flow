@@ -83,25 +83,41 @@ for lg in "$@"; do
   # right beside it -- which is exactly how SPRINT-089's false `PLAN_EXHAUSTED` rollup passed this
   # checker with a task logged `· parked-hitl ·` in the very same file.
   #
-  # The matrix comes directly from night-run.md Part 0b's own paragraph ("`PLAN_EXHAUSTED` means
-  # every task reached a `done` state -- nothing weaker"), which maps each of the six Part 4 task
-  # states to exactly one terminal state:
-  #   done                    -> (needs no line at all -- Part 4: "done tasks need no per-task line")
-  #   parked-hitl | blocked   -> AUTHORITY_BOUNDARY
-  #   stalled | denied-tool   -> HARD_FAILURE
-  #   unattempted             -> BUDGET_STOP
-  # A terminal line naming a DIFFERENT state than the one a present per-task line maps to is a
-  # contradiction, and per that same paragraph "the state is the half that is wrong" -- so this
-  # FAILs the terminal line's claim, never the per-task line's.
+  # The matrix is derived from night-run.sh's reap() itself (the code that PRODUCES the terminal
+  # line), not from night-run.md Part 0b's prose in isolation -- an independent review of this task
+  # (SPRINT-093 T1 revise) found Part 0b's "maps each task state to exactly one terminal state"
+  # reads as a bijection that the implementation does not honour. reap() picks the terminal state by
+  # PRIORITY, first match wins, and does not require the lower-priority conditions to be false of
+  # anything except each other:
+  #   1. wrapped process exit != 0        -> HARD_FAILURE
+  #   2. any stalled | denied-tool        -> HARD_FAILURE
+  #   3. any unattempted                  -> BUDGET_STOP        (checked BEFORE parked/blocked)
+  #   4. any parked-hitl | blocked        -> AUTHORITY_BOUNDARY
+  #   5. otherwise                        -> PLAN_EXHAUSTED
+  # So BUDGET_STOP is NOT "unattempted and nothing else" -- it is "no hard-failure condition, and at
+  # least one unattempted", full stop. A run can legitimately park a J2 task (Part 0's protocol:
+  # continue disjoint AFK work) and THEN exhaust its budget on a later task, landing
+  # `terminal · BUDGET_STOP` beside both a `parked-hitl` line and an `unattempted` line -- reap()
+  # picks BUDGET_STOP at step 3 without ever looking at rp_parked. Flagging that as a contradiction
+  # was itself a defect (over-broad guard, noise instead of the silence this task exists to fix).
+  # Re-audited row by row against the priority reading, not assumed:
+  #   PLAN_EXHAUSTED     -- reached only when steps 1-4 ALL miss. Contradicted by ANY of the five
+  #                         non-done states. Unchanged.
+  #   AUTHORITY_BOUNDARY -- reached only when steps 1-3 miss and step 4 hits. Contradicted by
+  #                         stalled/denied-tool (outrank it at step 2) or unattempted (outranks it
+  #                         at step 3). Unchanged.
+  #   BUDGET_STOP        -- reached when steps 1-2 miss and step 3 hits; step 4 (parked/blocked) is
+  #                         never even consulted once step 3 fires. Contradicted ONLY by
+  #                         stalled/denied-tool (outrank it at step 2). blocked/parked-hitl must NOT
+  #                         be flagged -- CORRECTED below.
   #
   # HARD_FAILURE and USER_STOP are deliberately NOT asserted against, in either direction. Both can
   # be produced by something this checker cannot see from the log text alone: HARD_FAILURE also
-  # fires on a bare non-zero process exit (night-run.sh's reap(), the wrapped-process-exit branch),
-  # which can land after a task already logged `done`, `parked-hitl` or `unattempted` -- so a
-  # HARD_FAILURE next to any of those is not necessarily wrong. USER_STOP is an external interrupt
-  # (night-run.sh: "an external kill never reaches this code path at all") and can land mid-task in
-  # any state. night-run.md's contract is silent on what per-task states those two rule OUT, so
-  # nothing is asserted for them here rather than guessing at a rule the doc does not state.
+  # fires on a bare non-zero process exit (reap()'s step 1), which can land after a task already
+  # logged `done`, `parked-hitl` or `unattempted` -- so a HARD_FAILURE next to any of those is not
+  # necessarily wrong. USER_STOP is an external interrupt (night-run.sh: "an external kill never
+  # reaches this code path at all") and can land mid-task in any state. Nothing is asserted for them
+  # here rather than guessing at a rule neither the doc nor the code states.
   agree_bad=0
   if [ "$term" -eq 1 ]; then
     term_state=$(grep -oE '^terminal · (PLAN_EXHAUSTED|AUTHORITY_BOUNDARY|HARD_FAILURE|BUDGET_STOP|USER_STOP) ·' "$lg" 2>/dev/null \
@@ -122,10 +138,15 @@ for lg in "$@"; do
         fi
         ;;
       BUDGET_STOP)
-        bad_line=$(grep -E '^T[0-9]+ · (blocked|parked-hitl|stalled|denied-tool) · ' "$lg" 2>/dev/null | head -n1)
+        # blocked/parked-hitl are NOT a contradiction here (SPRINT-093 T1 revise): reap() picks
+        # BUDGET_STOP as soon as any task is unattempted, without ever checking whether another
+        # task also parked. A run that parks a J2 task, continues disjoint AFK work per Part 0,
+        # then exhausts its budget on a later task legitimately reports BUDGET_STOP beside BOTH a
+        # parked-hitl line and an unattempted line -- see the priority table above.
+        bad_line=$(grep -E '^T[0-9]+ · (stalled|denied-tool) · ' "$lg" 2>/dev/null | head -n1)
         if [ -n "$bad_line" ]; then
           agree_bad=1
-          bad "night-run rollup: $lg claims terminal · BUDGET_STOP but carries a per-task line Part 0b maps elsewhere (blocked/parked-hitl -> AUTHORITY_BOUNDARY, stalled/denied-tool -> HARD_FAILURE) -- '$bad_line'"
+          bad "night-run rollup: $lg claims terminal · BUDGET_STOP but carries a per-task line reap()'s priority order ranks above it (stalled/denied-tool -> HARD_FAILURE outranks BUDGET_STOP) -- '$bad_line'"
         fi
         ;;
       HARD_FAILURE|USER_STOP) : ;;  # contract silent on what these two rule out -- left unasserted
