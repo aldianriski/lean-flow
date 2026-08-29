@@ -191,6 +191,7 @@ process, where there is no ask channel to halt into.
 | 3 | no active sprint holds the work | `/lean-doc-generator promote` | governance checklist sign-off |
 | 4 | a sprint exists but G1/G2 are unsigned | `sprint-bulk` steps 1–2, interactively | human G1 + G2 |
 | 4b | G1/G2 are signed but no **approval envelope** is recorded | write `approval_envelope:` into the sprint frontmatter | human approval of all ten dimensions |
+| 4c | the gate (`scripts/qa-check.sh`) is red and **this Plan's purpose is repairing it** | write `gate_exceptions:` into the sprint frontmatter, naming only the check(s) the Plan repairs | owner ruling naming those specific checks — never a blanket grant |
 | 5 | all of the above are green | Part 1 pre-flight → Part 2 trigger | — |
 
 **The approval envelope (step 4b).** Gates say *this Plan is sound*; the envelope says *this run may
@@ -215,6 +216,29 @@ held in the launching conversation governs nothing, and fails silently, because 
 themselves give it (L-099 · L-151). **Absence is not approval**, and the shipped template's own
 bracketed placeholder counts as absent — otherwise the artifact that creates every sprint would bless
 every sprint.
+
+**The gate exception (step 4c) — TD-110, owner ruling at SPRINT-093 T3.** `night-run.sh` refuses to
+fire on ANY non-zero exit from `scripts/qa-check.sh` (Part 1's green-gate item, below) — which means a
+Plan whose entire purpose is *repairing* a gate FAIL could never run at all; SPRINT-090 hit exactly
+this. **The owner's ruling: a narrow exception is permitted, never a blanket one.** A run may fire
+against *specific, named, pre-approved* failing checks; any other failing check still refuses the
+launch.
+
+The mechanism is a second frontmatter field, not a flag, pinned the same way the envelope is:
+
+```
+gate_exceptions: <check name> · <check name> @ <sha>
+```
+
+Each `<check name>` is the text `scripts/qa-check.sh` itself prints before the first `: ` or ` (` in
+its own `FAIL  …` line (e.g. `knowledge index STALE`, `layers observed`). The launcher canonicalises
+the gate's *actual* output the same way, so a configured name can only ever match a check it names —
+a vague or wildcard-shaped entry matches nothing rather than matching everything. **That is what
+makes this narrow by construction, not by convention**: there is no `--force` / `--skip-gate` flag
+anywhere in `night-run.sh`, and none is added by this mechanism — the only door is a file the run
+process only *reads*, written before it started, naming specific checks at a specific sha. A failing
+check absent from the list still refuses the launch exactly as before this mechanism existed; an
+absent `gate_exceptions:` field grants nothing, the same rule `approval_envelope:` already follows.
 
 A step whose gate the human declines **stops the launch**. Report what's outstanding and let them
 decide; do not narrow, re-slice, or defer the work to get past it (that's scope-changing → HITL, and
@@ -246,6 +270,13 @@ All items must pass or the night-run does not fire:
       default is the one that costs a parked run, not the one that executes an ungated Plan.
 - [ ] Zero open `assumes:` / `needs-info` tasks in the run — G2 already blocks on this; pre-flight
       re-verifies it still holds at trigger time (state can drift between G2 and the evening run).
+- [ ] **The gate is green, or every failing check is a named, pre-approved exception.**
+      `night-run.sh` refuses to fire on ANY non-zero exit from `scripts/qa-check.sh` — otherwise a
+      Plan whose purpose is *repairing* a red gate could never run (TD-110). The only door is
+      `gate_exceptions:` in *this* sprint's own frontmatter (step 4c above): named, pre-approved
+      checks, recorded before this evening's run — never a blanket `--force`/`--skip-gate` (none
+      exists, and none should be added). A failing check that is not on that list still refuses the
+      launch, whatever else is granted.
 - [ ] Scoped allowlist derived from **four sources, not one**, and written into your project's
       **settings permissions** rather than assembled inline. Enumerating only the first source is the
       recurring failure:
@@ -434,6 +465,16 @@ or badly — the launcher re-enters itself, counts the DoD boxes in the active s
 cost figures off the log's last `result` event, and appends the Part 4 block to the Execution Log.
 Nobody has to remember. `--no-reap` opts out; it fires only for a `sprint-bulk` run, since that is the
 only shape with a Plan whose boxes mean anything. Decision and its trade → **ADR-016**.
+
+**Declare the target explicitly with `--sprint FILE`** whenever more than one sprint might carry
+`status: active` at once — e.g. `sh scripts/night-run.sh --sprint docs/sprint/SPRINT-093-....md
+--mode overnight -- claude -p ...`. Optional but recommended: without it, both the reaper above and
+the gate-exception lookup (Part 1a step 4c) fall back to scanning for the sole `status: active`
+sprint and **refuse** — write nothing, grant nothing — if they find zero or more than one, rather
+than guessing. This is TD-112's fix: SPRINT-089's reaper once guessed among two active sprints and
+wrote a false rollup into the wrong one's log. `--sprint` must name a file that exists and carries
+`status: active`, checked before anything launches, the same discipline an unrecognised `--mode`
+already gets.
 
 Two properties worth knowing, because they bound what the rollup can tell you:
 
