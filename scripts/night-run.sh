@@ -373,6 +373,20 @@ fi
   || die_doa "no scoped allowlist found -- pass --allowedTools or --settings, or add a permissions.allow block to .claude/settings.json (night-run.md Part 1). Running unattended on default permissions is not allowed"
 
 repo_root=$(git rev-parse --show-toplevel 2>/dev/null || true)
+
+# Resolve the target sprint HERE, before the gate runs -- not only later at the reap() call site.
+# TD-110/SPRINT-093 T3's named-exception grant (below) has to be read from a file that was written
+# BEFORE this process started, so the resolution has to happen before the gate that consults it, not
+# after. `$resolved_sprint` is reused unchanged at the reap() call site further down; the second,
+# later resolution that used to duplicate this logic is removed there -- one resolution, agreed
+# everywhere, is the same discipline TD-112 already put on the reaper's own target.
+resolved_sprint=""
+if [ -n "$sprint_arg" ]; then
+  resolved_sprint=$sprint_arg
+else
+  resolved_sprint=$(find_sprint "$repo_root" || printf '')
+fi
+
 if [ -n "$repo_root" ] && [ -f "$repo_root/scripts/qa-check.sh" ]; then
   # Run the gate with MSYS_NO_PATHCONV cleared. On Git-Bash/MSYS hosts that variable is
   # commonly exported to stop a leading-slash argument (a `/skill` prompt) being rewritten
@@ -382,9 +396,117 @@ if [ -n "$repo_root" ] && [ -f "$repo_root/scripts/qa-check.sh" ]; then
   # Measured on this host: the dispatch-preflight harness fails with "could not resolve live
   # HEAD" under it and passes without it. Cleared in a subshell (POSIX) rather than with
   # `env -u`, and only around the gate -- the fired command keeps the caller's environment.
-  if ! qa_out=$( unset MSYS_NO_PATHCONV; sh "$repo_root/scripts/qa-check.sh" 2>&1 ); then
-    qa_line=$(printf '%s\n' "$qa_out" | tail -n1)
-    die_doa "pre-flight gate scripts/qa-check.sh failed: $qa_line"
+  qa_out=$( unset MSYS_NO_PATHCONV; sh "$repo_root/scripts/qa-check.sh" 2>&1 ); qa_code=$?
+
+  # Read the gate's OWN PRINTED VERDICT, never a bare $? (L-045/L-120) -- doubly so here, because
+  # this code is using the answer to decide whether to FIRE an unattended run, which is the exact
+  # shape L-120 records going wrong five times. $qa_code says the wrapper survived; it is not the
+  # verdict. qa-check.sh prints `QA-CHECK: N pass, M fail` on EVERY exit path, including its own
+  # early-budget-exceeded exit (leg 12's qb_checkpoint), so the line is always present unless the
+  # gate died before printing anything at all (the `cd "$ROOT" || exit 2` path) -- handled below.
+  qa_summary=$(printf '%s\n' "$qa_out" | grep -E '^QA-CHECK: [0-9]+ pass, [0-9]+ fail$' | tail -n1)
+  if [ -z "$qa_summary" ]; then
+    # L-058: "no failing checks found" must never be reachable by failing to look. A gate report
+    # whose verdict line cannot be found is a REFUSAL, never a pass -- the alternative (falling
+    # through to "no FAIL lines were seen, so continue") would silently treat an unreadable report
+    # the same as a clean one, which is exactly the false-negative shape this whole file exists to
+    # close.
+    qa_tail=$(printf '%s\n' "$qa_out" | tail -n3 | tr '\n' ' ')
+    die_doa "pre-flight gate scripts/qa-check.sh produced no readable 'QA-CHECK: N pass, M fail' summary line (wrapper exit $qa_code) -- refusing rather than guessing at a pass. Last output: $qa_tail"
+  fi
+  qa_failn=$(printf '%s' "$qa_summary" | sed -E 's/^QA-CHECK: [0-9]+ pass, ([0-9]+) fail$/\1/')
+
+  if [ "$qa_failn" -eq 0 ] && [ "$qa_code" != "0" ] && [ -n "$qa_code" ]; then
+    # Defensive, not reachable under qa-check.sh's own current exit logic (exit ties 1:1 to fail>0)
+    # -- but a printed "0 fail" that disagrees with a non-zero wrapper exit is a contradiction, and
+    # the contradiction is refused rather than read as a pass, same posture as the reaper's own
+    # non-`done`-under-`PLAN_EXHAUSTED` guard (T1, this sprint).
+    die_doa "pre-flight gate scripts/qa-check.sh printed a clean 'QA-CHECK: 0 fail' summary but the wrapper exited $qa_code -- a summary and an exit code that disagree is refused, never read as a pass"
+  fi
+
+  if [ "$qa_failn" -gt 0 ]; then
+    # --- OWNER RULING (TD-110 / SPRINT-093 T3): a narrow, named exception -- never a blanket one ---
+    # A run may fire against SPECIFIC, NAMED, PRE-APPROVED failing checks. There is no
+    # --force/--skip-gate flag anywhere in this file and none is added here: the only door is
+    # `gate_exceptions:` in the TARGET SPRINT'S OWN frontmatter -- read from disk, at the sha it
+    # names, resolved above BEFORE this gate ran. A run cannot grant itself an exception at fire
+    # time, because the only place one can be written is a file this process only reads.
+    #
+    # Canonicalisation: a FAIL line's check name is the text before the FIRST of ': ' or ' (',
+    # whichever occurs earlier -- and BOTH sides of every comparison below (the gate's real output
+    # here, and the pre-approved list read from frontmatter) run through this SAME function. That is
+    # what makes an exception narrow BY CONSTRUCTION rather than by convention: a configured name can
+    # only ever equal a name this script itself computes from the gate's actual FAIL lines, so a
+    # vague or wildcard-shaped entry simply fails to match anything rather than matching everything.
+    nrg_canon_name() {
+      nrg_s=$1
+      nrg_by_colon=${nrg_s%%: *}
+      nrg_by_paren=${nrg_s%% (*}
+      if [ "${#nrg_by_colon}" -le "${#nrg_by_paren}" ]; then
+        printf '%s' "$nrg_by_colon"
+      else
+        printf '%s' "$nrg_by_paren"
+      fi
+    }
+
+    qa_fail_lines=$(printf '%s\n' "$qa_out" | grep -E '^FAIL  ')
+    if [ -z "$qa_fail_lines" ]; then
+      # L-058 again, one level down: the summary says N>0 FAILing checks, but no 'FAIL  ...' line
+      # can be found to name them. Nothing to compare against gate_exceptions: is not evidence that
+      # nothing is wrong -- refuse, do not treat an unparseable per-check report as a clean pass.
+      die_doa "pre-flight gate scripts/qa-check.sh reported $qa_failn FAILing check(s) in its summary but printed no 'FAIL  ...' line naming them -- refusing rather than firing with nothing to check against gate_exceptions:"
+    fi
+
+    qa_exceptions=""
+    qa_exc_sha=""
+    if [ -n "$resolved_sprint" ] && [ -f "$resolved_sprint" ]; then
+      qa_exc_line=$(awk 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} /^gate_exceptions:[ \t]*/{sub(/^gate_exceptions:[ \t]*/,"");print;exit}' "$resolved_sprint")
+      # An unfilled template placeholder counts as absent -- same rule check-approval-envelope.sh
+      # already applies to `approval_envelope:`, so the shipped template blesses nothing.
+      case "$qa_exc_line" in "["*) qa_exc_line="" ;; esac
+      case "$qa_exc_line" in
+        *" @ "*)
+          qa_exceptions=${qa_exc_line%% @ *}
+          qa_exc_sha=${qa_exc_line##* @ }
+          case "$qa_exc_sha" in
+            ''|*[!0-9a-f]*) qa_exceptions="" ;;              # not a hex pin -- names a moving target, granted nothing
+            ?|??|???|????|?????|??????) qa_exceptions="" ;;  # shorter than git's own 7-char abbreviation floor
+          esac
+          ;;
+        *) qa_exceptions="" ;;  # no ' @ <sha>' pin -- malformed, granted nothing, never a wildcard
+      esac
+    fi
+
+    # Every FAIL line's canonical name must equal a configured exception exactly (never a
+    # substring -- L-108's own trap) or it is reported UNNAMED. Captured through a command
+    # substitution around the whole loop, not a variable set inside it, so the result survives the
+    # `| while read` subshell (POSIX sh has no process substitution).
+    qa_unnamed=$(
+      printf '%s\n' "$qa_fail_lines" | sed -E 's/^FAIL  //' | while IFS= read -r nrg_detail; do
+        [ -n "$nrg_detail" ] || continue
+        nrg_name=$(nrg_canon_name "$nrg_detail")
+        nrg_hit=0
+        if [ -n "$qa_exceptions" ]; then
+          nrg_oldifs=$IFS
+          IFS='·'
+          for nrg_exc in $qa_exceptions; do
+            nrg_exc_trim=$(printf '%s' "$nrg_exc" | sed -E 's/^[ \t]+//; s/[ \t]+$//')
+            [ "$nrg_exc_trim" = "$nrg_name" ] && nrg_hit=1
+          done
+          IFS=$nrg_oldifs
+        fi
+        [ "$nrg_hit" -eq 1 ] || printf '%s\n' "$nrg_name"
+      done
+    )
+
+    if [ -n "$qa_unnamed" ]; then
+      qa_unnamed_flat=$(printf '%s\n' "$qa_unnamed" | grep -v '^$' | tr '\n' ';' | sed 's/;$//')
+      qa_where="no sprint resolved to read a gate_exceptions: grant from -- pass --sprint, or ensure exactly one sprint carries status: active"
+      [ -n "$resolved_sprint" ] && qa_where="gate_exceptions: in $resolved_sprint${qa_exc_sha:+ (pinned @ $qa_exc_sha)}"
+      die_doa "pre-flight gate scripts/qa-check.sh failed ($qa_failn check(s) FAILing) and at least one is NOT on the pre-approved exception list: $qa_unnamed_flat -- refusing rather than firing against an unnamed red check. Consulted: $qa_where. There is no --force/--skip-gate; the only grant is a named, pinned gate_exceptions: line recorded before this run started (night-run.md Part 1a step 4c)"
+    fi
+
+    printf 'pre-flight: qa-check.sh reported %s FAILing check(s), all pre-approved by gate_exceptions: in %s (@ %s) -- firing\n' "$qa_failn" "$resolved_sprint" "$qa_exc_sha"
   fi
 fi
 
@@ -413,20 +535,11 @@ pre_commit=""
 case "$allargs" in *sprint-bulk*) ;; *) reap=0 ;; esac
 started=$(date +%s 2>/dev/null || printf '')
 
-# Resolve ONCE which sprint this run targets, and use that same resolution for both the
-# logdoc_base measurement below and the reap() call at exit -- both must agree on the target, which
-# is the whole point of TD-112's fix (SPRINT-089's reaper disagreed with itself about nothing; it
-# simply never had a target signal at all and re-scanned into ambiguity). `--sprint` is the declared
-# signal; absent that, fall back to the same scan find_sprint() now performs safely (refuses
-# ambiguity rather than guessing).
-resolved_sprint=""
-if [ "$reap" = "1" ]; then
-  if [ -n "$sprint_arg" ]; then
-    resolved_sprint=$sprint_arg
-  else
-    resolved_sprint=$(find_sprint "$repo_root" || printf '')
-  fi
-fi
+# $resolved_sprint was already resolved once, ABOVE the gate check (SPRINT-093 T3), so both the
+# gate-exception lookup and the logdoc_base measurement + reap() call below agree on the same
+# target -- the whole point of TD-112's fix (SPRINT-089's reaper disagreed with itself about
+# nothing; it simply never had a target signal at all and re-scanned into ambiguity). Nothing to
+# recompute here; the reaper below only consults it, guarded by `reap`, same as always.
 
 # How long the Execution Log already is. The reaper compares only what the run APPENDS
 # past this mark against its own rollup lines -- see the note in reap().
