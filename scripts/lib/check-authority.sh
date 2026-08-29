@@ -35,30 +35,60 @@
 # attended J2 completion misread as an unauthorised one (live on this repo's own tree: SPRINT-093 T1
 # and T2, executed attended under signed G1/G2, both reported `authority-j2-not-parked`).
 #
-# The fix adds one FILE-LEVEL mode signal, `unattended_touch`, computed once per sprint file: does its
-# Execution Log carry a `^terminal · <STATE> · ` line anywhere? That line is night-run.md Part 0b/Part
-# 4's frozen contract -- "required on every completed-run rollup" and "emitted at every exit ... even
-# by the watchdog on a stall" -- written by the process wrapper that outlives the run, never by the
-# model's own turn (the same split ADR-016 already made for the DoD count, ADR-016's rationale: "a
-# run's own sense of 'I am finished' is exactly what is unreliable"). The executing agent cannot
-# suppress it to make itself read as attended, which is what makes this signal usable for a governed
-# check: the thing it governs (an unattended run skirting the park) has no path to write, or omit, the
-# very artifact its own launcher is contracted to leave on every exit path. Verified against this
-# repo's real committed logs: SPRINT-090 (genuinely unattended) carries `terminal · AUTHORITY_BOUNDARY
-# · …` at column 1; SPRINT-093 (never run unattended -- its own Plan text says so) carries the string
-# `terminal` only inside back-tick-quoted prose discussing OTHER sprints' lines, never at column 1, so
-# `unattended_touch` reads correctly as 0 for it without any special-casing.
+# The fix adds one FILE-LEVEL mode signal, `unattended_touch`, built from TWO independent checks --
+# TD-124's outside review showed the first one alone overclaimed its own guarantee, and this comment
+# was corrected rather than left standing after the finding landed:
 #
-# Fail-safe direction: absence of the marker is not read as ambiguity, it is read as the system's own
-# guarantee working in the other direction -- an unattended run that reached ANY exit (clean, stalled,
-# or hard-failed) would have left one, so "none anywhere in this log" is the strongest evidence
-# available that no unattended run has touched this file. Where that guarantee could still be defeated
-# (an instantaneous process kill the watchdog never gets to react to) the gap is night-run.sh's own
-# Part 0b contract, not something this checker can see past without touching a file outside its
-# Layers -- named here rather than left implicit. The bypass branch below is UNCHANGED by any of this:
-# its own precondition (`parked>0`) already only ever fires on the `^Tn · parked…` line, which is
-# itself unattended-only by the same TD-092 precedent, so it was never reachable from an attended log
-# in the first place and needed no gate.
+#   1. Does the log carry a `^terminal · <STATE> · ` line -- night-run.md Part 0b/Part 4's frozen
+#      contract, "required on every completed-run rollup" and "emitted at every exit ... even by the
+#      watchdog on a stall", written by the process wrapper that outlives the run, never by the
+#      model's own turn (the same split ADR-016 already made for the DoD count). **This premise is
+#      NOT airtight**, and an earlier version of this comment claimed it was ("the strongest evidence
+#      available") -- that claim was disproved live: night-run.sh:535 gates the reaper on a literal
+#      `*sprint-bulk*` substring match while `overnight` is the documented canonical mode name (fixed
+#      at SPRINT-093 T3, a file outside this task's Layers), so a run fired as `--mode overnight` never
+#      reaped and never wrote this line at all -- a genuinely unattended, unparked J2 execution read as
+#      attended. `terminal ·` presence remains a STRONG positive signal (nothing attended writes it,
+#      by the same TD-092 precedent below), but this checker no longer treats its absence as proof.
+#
+#   2. Does the sprint file's OWN frontmatter carry a non-placeholder `approval_envelope: … @ <sha>` --
+#      the pre-launch grant Part 1a step 4b requires a human to record BEFORE an unattended run fires,
+#      on a code path (the entry-path preflight) independent of the reap-gate defect above, so a run
+#      that followed that step is still caught even where finding 1 leaves a gap. Widens the net
+#      without narrowing it anywhere real: this checker's own motivating case (SPRINT-093 T1/T2)
+#      carries no `approval_envelope:` field at all, so this backstop adds zero strictness to the case
+#      it must not break.
+#
+# **Stated plainly, because overstating it is exactly the defect TD-124 caught: neither signal is
+# airtight, and the OR of both is still not proof of attendedness.** `approval_envelope:` is a
+# documented procedural step, never a hard gate `night-run.sh` enforces before firing (checked: no
+# `die_doa` on its absence) -- so a run that skips writing it AND hits a reap-gate-class bug leaves
+# NEITHER signal and reads as attended. **That residual is real and this file cannot close it**: the
+# only thing that could is a mechanism outside these Layers (`night-run.sh` recording something
+# unconditionally, at launch, this checker could then depend on) -- named here rather than argued past.
+# What this DOES establish: the dominant failure the reviewer reproduced (T3's specific bug) is closed
+# by T3's fix plus this file no longer trusting one fragile signal alone; the false-FAIL this file
+# exists to fix (SPRINT-093 T1/T2, genuinely attended, neither signal present) is unaffected either way.
+#
+# The bypass branch below is UNCHANGED by any of this: its own precondition (`parked>0`) already only
+# ever fires on the `^Tn · parked…` line, which is itself unattended-only by the same TD-092 precedent,
+# so it was never reachable from an attended log in the first place and needed no gate.
+#
+# --- TD-124: the column-1 anchor is defeated by a bare fenced quote --------------------------------
+# "Matching is by position, not substring" above is true for inline back-ticked prose -- what
+# SPRINT-093's own log uses when it discusses these tags -- but a bare ``` fence with no indentation
+# still starts every contained line at column 1, so a legitimate attended log quoting a REAL example
+# rollup for illustration (not unreasonable -- Part 4 itself documents the format inside a fence) puts
+# `terminal · PLAN_EXHAUSTED · …` at column 1 and gets misread as a live rollup. Reproduced live by an
+# independent reviewer: a genuine attended case flipped to `authority-j2-not-parked` FAIL purely from a
+# quoted example. Fixed by building a DE-FENCED copy of the log once per file
+# (`awk '/^```/{infence=!infence;next} !infence{print}'`) and reading EVERY anchored pattern below --
+# `parked`, `executed`, `ruled`, and the `terminal ·` check above -- from that copy rather than the raw
+# log, since a quoted `owner-ruling ·` or `Tn · parked` example inside the same kind of fence would
+# defeat those anchors exactly the same way and was never specifically tested before this fix. A
+# 4-space-indented quote (this file's own style for the withdrawn tags in SPRINT-090's real log) was
+# ALREADY safe under the original anchor and needs no further handling; only the bare-fence case was
+# the gap.
 #
 # Usage: sh check-authority.sh <sprint-file>...
 # Prints one PASS/FAIL line per assertion; exits 1 if any FAIL line was printed, 0 otherwise.
@@ -96,13 +126,41 @@ for sp in "$@"; do
   # the first entry (ADR-014), so its ABSENCE means nothing has run yet -- a skip, never a FAIL.
   log="$(dirname "$sp")/logs/$(basename "$sp")"
 
-  # TD-123 mode signal -- computed ONCE per sprint file, never per task: has night-run.sh's unattended
-  # machinery touched this log at all? Anchored at column 1 against Part 0b's five named terminal
-  # states, so a paragraph merely discussing "terminal · PLAN_EXHAUSTED" in back-ticked prose (this
-  # very file's own SPRINT-093 log does exactly that, quoting a DIFFERENT sprint's line) cannot match.
+  # TD-124: a DE-FENCED copy of the log, built ONCE per sprint file. Every anchored pattern below
+  # (parked / executed / ruled / terminal) reads from this copy, never from $log directly -- a bare
+  # ``` fence with no indentation still starts each contained line at column 1, so a quoted example
+  # inside one would otherwise defeat the same anchor a 4-space-indented quote already can't.
+  defenced="${TMPDIR:-/tmp}/authority-defenced.$$"
+  if [ -f "$log" ]; then
+    awk '/^```/ { infence = !infence; next } !infence { print }' "$log" > "$defenced"
+  else
+    : > "$defenced"
+  fi
+
+  # TD-123/TD-124 mode signal -- computed ONCE per sprint file, never per task, from TWO independent
+  # checks (neither airtight alone; see the header comment for what each does and does not prove).
+  # `mode_reason` records WHICH signal fired, so the finding text below never claims a `terminal · `
+  # line that turns out to be the envelope backstop's catch instead (or vice versa) -- a message that
+  # overclaims its own evidence is the exact shape this round's fix exists to stop.
   unattended_touch=0
-  if [ -f "$log" ] && grep -Eq '^terminal · (PLAN_EXHAUSTED|AUTHORITY_BOUNDARY|HARD_FAILURE|BUDGET_STOP|USER_STOP) · ' "$log"; then
+  mode_reason=""
+  if [ -f "$log" ] && grep -Eq '^terminal · (PLAN_EXHAUSTED|AUTHORITY_BOUNDARY|HARD_FAILURE|BUDGET_STOP|USER_STOP) · ' "$defenced"; then
     unattended_touch=1
+    mode_reason="this log's own \`terminal · \` line shows night-run.sh's unattended machinery reached it"
+  fi
+  if [ "$unattended_touch" -eq 0 ]; then
+    env_line=$(awk 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} /^approval_envelope:[ \t]*/{sub(/^approval_envelope:[ \t]*/,"");print;exit}' "$sp")
+    if [ -n "$env_line" ]; then
+      # Same rule check-approval-envelope.sh already applies: a pin must be a hex sha of at least 7
+      # characters, or it names nothing (git's own abbreviation floor). No dimension-coverage check
+      # here -- that is a full validator's job, not this backstop's; presence of a real pin is enough
+      # to widen the net, never to narrow it.
+      env_sha=$(printf '%s' "$env_line" | sed -n 's/.* @ \([0-9a-fA-F]\{7,\}\)[ \t]*$/\1/p')
+      if [ -n "$env_sha" ]; then
+        unattended_touch=1
+        mode_reason="this sprint's own frontmatter carries a pinned \`approval_envelope:\` (no \`terminal · \` line, but the pre-launch grant is independent evidence -- TD-124)"
+      fi
+    fi
   fi
 
   # "<Tn>\t<class-or-empty>" per task block. The header meta is the backtick-quoted `[...]` field on
@@ -141,16 +199,17 @@ for sp in "$@"; do
     [ "$cls" = "J2" ] || continue
     [ -f "$log" ] || continue   # nothing has run; the honoured half is not yet checkable
 
-    # All anchored at column 1, the shapes night-run.md Part 4 and the log template actually emit.
-    parked=$(awk -v t="$tid" '$0 ~ "^"t" · parked" {n++} END{print n+0}' "$log")
-    executed=$(awk -v t="$tid" '$0 ~ "^consequence · "t" · " {n++} END{print n+0}' "$log")
+    # All anchored at column 1, the shapes night-run.md Part 4 and the log template actually emit --
+    # read from the DE-FENCED copy (TD-124) so a quoted example inside a bare ``` fence can't count.
+    parked=$(awk -v t="$tid" '$0 ~ "^"t" · parked" {n++} END{print n+0}' "$defenced")
+    executed=$(awk -v t="$tid" '$0 ~ "^consequence · "t" · " {n++} END{print n+0}' "$defenced")
     # A human resolving a park says so, in one shape, on its own line. Without this there is NO way to
     # tell a legitimate unblock from a silent bypass, because both leave a park record and an
     # execution record side by side.
-    ruled=$(awk -v t="$tid" '$0 ~ "^owner-ruling · "t" · " {n++} END{print n+0}' "$log")
+    ruled=$(awk -v t="$tid" '$0 ~ "^owner-ruling · "t" · " {n++} END{print n+0}' "$defenced")
 
     if [ "$parked" -eq 0 ] && [ "$executed" -gt 0 ] && [ "$unattended_touch" -eq 1 ]; then
-      printf 'FAIL  %s\n' "authority-j2-not-parked: $sp $tid is declared J2 but its Execution Log carries an execution record and no park record, and this log's own \`terminal · \` line shows night-run.sh's unattended machinery reached it. A J2 step is human-reserved: it parks with its unblock condition, it is never asked, decided, or worked around (night-run.md Part 0 § Park protocol)" >> "$out"
+      printf 'FAIL  %s\n' "authority-j2-not-parked: $sp $tid is declared J2 but its Execution Log carries an execution record and no park record, and $mode_reason. A J2 step is human-reserved: it parks with its unblock condition, it is never asked, decided, or worked around (night-run.md Part 0 § Park protocol)" >> "$out"
     elif [ "$parked" -gt 0 ] && [ "$executed" -gt 0 ] && [ "$ruled" -eq 0 ]; then
       # The silent bypass. Parking and then doing it anyway is EXACTLY what Part 0 step 6 forbids, and
       # the first version of this check could not see it: it tested only for an ABSENT park record, so
@@ -173,4 +232,5 @@ cat "$out"
 fail=0
 grep -q '^FAIL' "$out" && fail=1
 rm -f "$out"
+[ -n "${defenced:-}" ] && rm -f "$defenced"
 exit $fail
