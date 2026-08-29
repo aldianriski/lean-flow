@@ -1,7 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { combineAdrAppendPort } from "./adr-append-port.ts";
-import { InMemoryAdrFamilyPort } from "./adr-family-port.fake.ts";
-import { InMemoryAdrHistoryPort } from "./adr-history-port.fake.ts";
+// SPRINT-092 T1: fixtures build through the shared factory -- see s4-onefile.test.ts's own comment
+// and `test/fixtures/adr-family-factory.ts`'s header for why the factory cannot decide a verdict.
+import { adrFamilyPort, adrHistoryPort } from "../../../../test/fixtures/adr-family-factory.ts";
 import { ADR_EDITED_AFTER_DECISION, evaluate } from "./s4-append.ts";
 
 const PATH = "docs/adr/ADR-001-a-real-decision.md";
@@ -31,8 +32,8 @@ function adrText(decision: string, extraHeaderLine?: string): string {
 /** A single-ADR, single-revision port: the deciding commit's text and the CURRENT text are supplied
  *  independently, so a test can diverge them to model an edit. */
 function singleAdrPort(decidingText: string, currentText: string) {
-  const family = new InMemoryAdrFamilyPort({ adrDirFiles: { "ADR-001-a-real-decision.md": currentText } });
-  const history = new InMemoryAdrHistoryPort({
+  const family = adrFamilyPort({ adrDirFiles: { "ADR-001-a-real-decision.md": currentText } });
+  const history = adrHistoryPort({
     revisionsByPath: { [PATH]: [DECIDING_REV] },
     contentAtRevision: { [`${DECIDING_REV}:${PATH}`]: decidingText },
   });
@@ -42,8 +43,8 @@ function singleAdrPort(decidingText: string, currentText: string) {
 describe("S4.APPEND -- evaluate, against the in-memory fakes", () => {
   test("no canonical ADR files: note, not a finding", () => {
     const port = combineAdrAppendPort(
-      new InMemoryAdrFamilyPort({ adrDirFiles: {} }),
-      new InMemoryAdrHistoryPort({}),
+      adrFamilyPort({ adrDirFiles: {} }),
+      adrHistoryPort({}),
     );
     const r = evaluate(port);
     expect(r.verdict).toBe("note");
@@ -52,8 +53,8 @@ describe("S4.APPEND -- evaluate, against the in-memory fakes", () => {
 
   test("not a git repository: note, distinct wording, no finding", () => {
     const port = combineAdrAppendPort(
-      new InMemoryAdrFamilyPort({ adrDirFiles: { "ADR-001-a-real-decision.md": adrText("x") } }),
-      new InMemoryAdrHistoryPort({ isRepo: false }),
+      adrFamilyPort({ adrDirFiles: { "ADR-001-a-real-decision.md": adrText("x") } }),
+      adrHistoryPort({ isRepo: false }),
     );
     const r = evaluate(port);
     expect(r.verdict).toBe("note");
@@ -63,8 +64,8 @@ describe("S4.APPEND -- evaluate, against the in-memory fakes", () => {
 
   test("a shallow clone: note, distinct wording from 'no history', no finding", () => {
     const port = combineAdrAppendPort(
-      new InMemoryAdrFamilyPort({ adrDirFiles: { "ADR-001-a-real-decision.md": adrText("x") } }),
-      new InMemoryAdrHistoryPort({ isShallow: true }),
+      adrFamilyPort({ adrDirFiles: { "ADR-001-a-real-decision.md": adrText("x") } }),
+      adrHistoryPort({ isShallow: true }),
     );
     const r = evaluate(port);
     expect(r.verdict).toBe("note");
@@ -113,8 +114,8 @@ describe("S4.APPEND -- evaluate, against the in-memory fakes", () => {
       "text",
     ].join("\n");
     const port = combineAdrAppendPort(
-      new InMemoryAdrFamilyPort({ adrDirFiles: { "ADR-001-a-real-decision.md": proposed } }),
-      new InMemoryAdrHistoryPort({
+      adrFamilyPort({ adrDirFiles: { "ADR-001-a-real-decision.md": proposed } }),
+      adrHistoryPort({
         revisionsByPath: { [PATH]: [DECIDING_REV] },
         contentAtRevision: { [`${DECIDING_REV}:${PATH}`]: proposed },
       }),
@@ -127,13 +128,13 @@ describe("S4.APPEND -- evaluate, against the in-memory fakes", () => {
 
   test("an ADR with no commit touching it: skipped -- neither clean, undecided, nor a finding, and a sibling decided ADR still passes", () => {
     const decided = adrText("We chose the first option.");
-    const family = new InMemoryAdrFamilyPort({
+    const family = adrFamilyPort({
       adrDirFiles: {
         "ADR-001-a-real-decision.md": decided,
         "ADR-002-untracked.md": adrText("brand new, not committed yet"),
       },
     });
-    const history = new InMemoryAdrHistoryPort({
+    const history = adrHistoryPort({
       revisionsByPath: { [PATH]: [DECIDING_REV] }, // ADR-002 deliberately absent -- "no commit"
       contentAtRevision: { [`${DECIDING_REV}:${PATH}`]: decided },
     });
@@ -152,13 +153,13 @@ describe("S4.APPEND -- evaluate, against the in-memory fakes", () => {
     const decidingB = adrText("We picked plan B.");
     const nowB = adrText("We picked plan C, quietly.");
 
-    const family = new InMemoryAdrFamilyPort({
+    const family = adrFamilyPort({
       adrDirFiles: {
         "ADR-001-a-real-decision.md": nowA,
         "ADR-002-a-later-decision.md": nowB,
       },
     });
-    const history = new InMemoryAdrHistoryPort({
+    const history = adrHistoryPort({
       revisionsByPath: { [pathA]: [DECIDING_REV], [pathB]: [DECIDING_REV] },
       contentAtRevision: {
         [`${DECIDING_REV}:${pathA}`]: decidingA,

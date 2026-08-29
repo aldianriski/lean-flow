@@ -1,17 +1,19 @@
 import { describe, expect, test } from "bun:test";
-import { InMemoryAdrFamilyPort } from "./adr-family-port.fake.ts";
+// SPRINT-092 T1: fixtures build through the shared factory -- see s4-onefile.test.ts's own comment
+// and `test/fixtures/adr-family-factory.ts`'s header for why the factory cannot decide a verdict.
+import { adrFamilyPort } from "../../../../test/fixtures/adr-family-factory.ts";
 import { DECISIONS_INDEX_MISSING_ADR, evaluate } from "./s4-index.ts";
 
 describe("S4.INDEX -- evaluate, against the in-memory fake", () => {
   test("no canonical ADR files: note, not a finding", () => {
-    const r = evaluate(new InMemoryAdrFamilyPort({ adrDirFiles: {} }));
+    const r = evaluate(adrFamilyPort({ adrDirFiles: {} }));
     expect(r.verdict).toBe("note");
     expect(r.findings).toEqual([]);
   });
 
   test("an ADR carries a row in docs/DECISIONS.md: pass", () => {
     const r = evaluate(
-      new InMemoryAdrFamilyPort({
+      adrFamilyPort({
         adrDirFiles: { "ADR-001-a-real-decision.md": "" },
         indexFile: { path: "docs/DECISIONS.md", text: "| [ADR-001](adr/ADR-001-a-real-decision.md) | ... |\n" },
       }),
@@ -22,7 +24,7 @@ describe("S4.INDEX -- evaluate, against the in-memory fake", () => {
   });
 
   test("no index file at all: fail, ONE finding naming BOTH candidate paths", () => {
-    const r = evaluate(new InMemoryAdrFamilyPort({ adrDirFiles: { "ADR-001-a-real-decision.md": "" } }));
+    const r = evaluate(adrFamilyPort({ adrDirFiles: { "ADR-001-a-real-decision.md": "" } }));
     expect(r.verdict).toBe("fail");
     expect(r.findings).toHaveLength(1);
     expect(r.findings[0]?.name).toBe(DECISIONS_INDEX_MISSING_ADR);
@@ -31,7 +33,7 @@ describe("S4.INDEX -- evaluate, against the in-memory fake", () => {
 
   test("an index exists but carries no row for the ADR: fail, naming the ADR and the index file", () => {
     const r = evaluate(
-      new InMemoryAdrFamilyPort({
+      adrFamilyPort({
         adrDirFiles: { "ADR-001-a-real-decision.md": "" },
         indexFile: { path: "docs/DECISIONS.md", text: "| ADR | Title | Status | Date |\n|---|---|---|---|\n" },
       }),
@@ -47,7 +49,7 @@ describe("S4.INDEX -- evaluate, against the in-memory fake", () => {
   // finding -- not absorbed into S4.ONEFILE's.
   test("two files sharing a number, only one indexed: fail, naming the UNINDEXED one only", () => {
     const r = evaluate(
-      new InMemoryAdrFamilyPort({
+      adrFamilyPort({
         adrDirFiles: {
           "ADR-001-a-real-decision.md": "",
           "ADR-001-the-same-number-again.md": "",
@@ -62,7 +64,7 @@ describe("S4.INDEX -- evaluate, against the in-memory fake", () => {
 
   test("root-level DECISIONS.md is accepted too, and named in the pass detail", () => {
     const r = evaluate(
-      new InMemoryAdrFamilyPort({
+      adrFamilyPort({
         adrDirFiles: { "ADR-001-a-real-decision.md": "" },
         indexFile: { path: "DECISIONS.md", text: "ADR-001-a-real-decision.md\n" },
       }),

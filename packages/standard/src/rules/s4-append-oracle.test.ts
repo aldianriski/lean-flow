@@ -5,12 +5,15 @@
 // (`createFsAdrAppendPort`), spawned against a REAL git repository, diffed against
 // `scripts/lib/conformance-engine.sh` spawned live -- never a copied literal from it.
 //
-// `execFileSync`/`cpSync`/`mkdtempSync`/`writeFileSync` stay in this `*.test.ts` file only, matching
-// `s12-secrets.test.ts`'s own convention (the test-file exemption `test/architecture/layers.ts`
-// carves out).
+// SPRINT-092 T1: this file's own `gitRepoFromClean`/`gitConfig`/`commitAll`/shallow-clone construction
+// (SPRINT-091 T7) moved to the shared `test/fixtures/git-repo-factory.ts`, generalised beyond "clean"
+// -- see that file's header for why the factory cannot decide a verdict (EPIC-014 H14). The one case
+// that copies the fixture WITHOUT running git at all ("no git history") stays inline below: it is not
+// a git-repo construction, so it does not belong in a factory named for building one.
 //
-// The evals/fixtures/adr-family/clean/ fixture is RETAINED (TD-012) and reused here rather than
-// hand-authored, exactly as the Shell harness's own `git_repo_from` does.
+// `execFileSync`/`readFileSync`/`writeFileSync`/`cpSync`/`mkdtempSync` otherwise stay in *.test.ts /
+// the fixture factory only, matching `s12-secrets.test.ts`'s own convention (the test-file exemption
+// `test/architecture/layers.ts` carves out).
 
 import { describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
@@ -20,9 +23,10 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createFsAdrAppendPort } from "../adapters/fs-adr-append.ts";
 import { ADR_EDITED_AFTER_DECISION, evaluate } from "./s4-append.ts";
+import { adrFamilyFixtureDir } from "../../../../test/fixtures/adr-family-factory.ts";
+import { commitAll, editFile, gitRepoFromFixture, shallowCloneOf } from "../../../../test/fixtures/git-repo-factory.ts";
 
 const ENGINE_PATH = fileURLToPath(new URL("../../../../scripts/lib/conformance-engine.sh", import.meta.url));
-const CLEAN_FIXTURE = fileURLToPath(new URL("../../../../evals/fixtures/adr-family/clean", import.meta.url));
 const ORACLE_TIMEOUT_MS = 30_000;
 
 function runShellEngine(repoDir: string): { readonly code: number; readonly stdout: string } {
@@ -41,41 +45,17 @@ function appendLines(stdout: string): string[] {
   return stdout.split("\n").filter((l) => l.includes("S4.APPEND") || l.includes(ADR_EDITED_AFTER_DECISION));
 }
 
-function gitConfig(repo: string): void {
-  execFileSync("git", ["-C", repo, "config", "user.email", "fx@example.invalid"]);
-  execFileSync("git", ["-C", repo, "config", "user.name", "Fixture"]);
-}
-
-/** Copies the retained `clean` fixture into a fresh temp git repo and commits it as "the deciding
- *  commit" -- mirrors the Shell harness's own `git_repo_from`. */
-function gitRepoFromClean(prefix: string): string {
-  const dest = mkdtempSync(join(tmpdir(), prefix));
-  cpSync(CLEAN_FIXTURE, dest, { recursive: true });
-  execFileSync("git", ["-C", dest, "init", "-q"]);
-  gitConfig(dest);
-  execFileSync("git", ["-C", dest, "add", "-A"]);
-  execFileSync("git", ["-C", dest, "commit", "-q", "-m", "the deciding commit"]);
-  return dest;
-}
-
-function commitAll(repo: string, subject: string): void {
-  execFileSync("git", ["-C", repo, "add", "-A"]);
-  execFileSync("git", ["-C", repo, "commit", "-q", "-m", subject]);
-}
-
 const ADR_REL = join("docs", "adr", "ADR-001-a-real-decision.md");
 
 describe("TS agrees with the live Shell oracle on S4.APPEND (DoD 1)", () => {
   // (a) MUST FAIL -- the § Decision body itself is rewritten after the deciding commit.
   test("FAIL: § Decision rewritten after the deciding commit -- both sides catch it, same named finding", () => {
-    const repo = gitRepoFromClean("s4-append-oracle-edited-");
-    const adr = join(repo, ADR_REL);
-    const text = readFileSync(adr, "utf8").replace(
-      "We chose the first option.",
-      "We chose the second option after all.",
-    );
-    expect(text).toContain("second option after all"); // the seed actually landed
-    writeFileSync(adr, text);
+    const repo = gitRepoFromFixture({ fixtureName: "clean", tmpPrefix: "s4-append-oracle-edited-" });
+    editFile(repo, ADR_REL, (text) => {
+      const edited = text.replace("We chose the first option.", "We chose the second option after all.");
+      expect(edited).toContain("second option after all"); // the seed actually landed
+      return edited;
+    });
     commitAll(repo, "quietly rewrite the decision");
 
     const shell = runShellEngine(repo);
@@ -93,14 +73,15 @@ describe("TS agrees with the live Shell oracle on S4.APPEND (DoD 1)", () => {
   // (b) MUST PASS -- a post-decision MARKER in the header, § Decision untouched. The distinction this
   // rule exists to draw: this repo's own ADR-008/ADR-027 carry exactly such markers.
   test("PASS control: a post-decision MARKER, § Decision untouched -- both sides pass, discriminating from (a)", () => {
-    const repo = gitRepoFromClean("s4-append-oracle-marker-");
-    const adr = join(repo, ADR_REL);
-    const text = readFileSync(adr, "utf8").replace(
-      "- **Status:** accepted (2026-08-20)",
-      "- **Status:** accepted (2026-08-20)\n- **Scope amended by:** [ADR-002](ADR-002-a-later-decision.md) (2026-08-21)",
-    );
-    expect(text).toContain("Scope amended by"); // the seed actually landed
-    writeFileSync(adr, text);
+    const repo = gitRepoFromFixture({ fixtureName: "clean", tmpPrefix: "s4-append-oracle-marker-" });
+    editFile(repo, ADR_REL, (text) => {
+      const edited = text.replace(
+        "- **Status:** accepted (2026-08-20)",
+        "- **Status:** accepted (2026-08-20)\n- **Scope amended by:** [ADR-002](ADR-002-a-later-decision.md) (2026-08-21)",
+      );
+      expect(edited).toContain("Scope amended by"); // the seed actually landed
+      return edited;
+    });
     commitAll(repo, "mark the ADR as amended in the open");
 
     const shell = runShellEngine(repo);
@@ -113,10 +94,11 @@ describe("TS agrees with the live Shell oracle on S4.APPEND (DoD 1)", () => {
     expect(ts.findings).toEqual([]);
   }, ORACLE_TIMEOUT_MS);
 
-  // (c) The honest-report case: no history to consult at all.
+  // (c) The honest-report case: no history to consult at all. Not a git-repo construction (no `git
+  // init`/commit at all), so it stays inline rather than going through `gitRepoFromFixture`.
   test("NOTE: no git history at all -- neither side guesses, both report honestly and distinctly from (d)", () => {
     const repo = mkdtempSync(join(tmpdir(), "s4-append-oracle-nogit-"));
-    cpSync(CLEAN_FIXTURE, repo, { recursive: true });
+    cpSync(adrFamilyFixtureDir("clean"), repo, { recursive: true });
 
     const shell = runShellEngine(repo);
     const shellLines = appendLines(shell.stdout);
@@ -133,16 +115,11 @@ describe("TS agrees with the live Shell oracle on S4.APPEND (DoD 1)", () => {
   // because "no history" and "truncated history" are different statements to an adopter, and this is
   // the L-166 risk: proven again, on a REAL public artifact, in s4-append-shallow-reachability.test.ts.
   test("NOTE: a SHALLOW clone -- truncated history is reported, never read as clean, distinctly from (c)", () => {
-    const edited = gitRepoFromClean("s4-append-oracle-shallow-src-");
-    const adr = join(edited, ADR_REL);
-    writeFileSync(adr, readFileSync(adr, "utf8").replace("first option", "second option"));
+    const edited = gitRepoFromFixture({ fixtureName: "clean", tmpPrefix: "s4-append-oracle-shallow-src-" });
+    editFile(edited, ADR_REL, (text) => text.replace("first option", "second option"));
     commitAll(edited, "an edit the shallow clone will never see");
 
-    // `--no-local`: a plain filesystem path source otherwise takes git's local-clone (hardlink)
-    // fast path, which silently IGNORES `--depth` (git prints its own warning) -- discovered live
-    // during T7's own build. `--no-local` forces the normal transport, which honours it.
-    const shallow = mkdtempSync(join(tmpdir(), "s4-append-oracle-shallow-"));
-    execFileSync("git", ["clone", "-q", "--no-local", "--depth", "1", edited, shallow]);
+    const shallow = shallowCloneOf({ source: edited, tmpPrefix: "s4-append-oracle-shallow-" });
     const isShallow = execFileSync("git", ["-C", shallow, "rev-parse", "--is-shallow-repository"], {
       encoding: "utf8",
     }).trim();
