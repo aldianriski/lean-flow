@@ -14,8 +14,12 @@
 import { makeRuleId, type RuleId } from "../../../packages/standard/src/model.ts";
 import { createBuiltInRegistry } from "../../../packages/standard/src/rules/built-in.ts";
 import { createF12Registry } from "../../../packages/standard/src/rules/f12-registry.ts";
+import { createF4Registry } from "../../../packages/standard/src/rules/f4-registry.ts";
+import { createS4AppendRegistry } from "../../../packages/standard/src/rules/s4-append-registry.ts";
 import { FsSprintDirPort } from "../../../packages/standard/src/adapters/fs-sprint-dir.ts";
 import { FsGitBoundaryPort } from "../../../packages/standard/src/adapters/fs-git-boundary.ts";
+import { FsAdrFamilyPort } from "../../../packages/standard/src/adapters/fs-adr-family.ts";
+import { createFsAdrAppendPort } from "../../../packages/standard/src/adapters/fs-adr-append.ts";
 import { bindRegistry } from "../../../packages/standard/src/registry.ts";
 import { exitCodeFor, type RuleEvaluation } from "../../../packages/standard/src/result.ts";
 import { sectionNumberOfRuleId, toStandardRule } from "../../../packages/standard/src/spec-reader.ts";
@@ -181,12 +185,12 @@ const SECTION_ARG_RE = /^[1-9]\d*$/;
  * `repoDir` (SPRINT-091 T3 introduced this composition inside `runFull`; T9 lifts it out so
  * `runSection` dispatches through the SAME list rather than a second, narrower one). Family
  * registration stays at EACH family's own call site (`../../../packages/standard/src/rules/
- * built-in.ts`'s `createBuiltInRegistry`, `f12-registry.ts`'s `createF12Registry`) -- this function
- * only PAIRS each registry with its own concrete port and hands the result to `bindRegistry`
- * (`registry.ts`), then `composeFamilies` (`traverse.ts`) merges them into ONE dispatch function.
- * Appending a family here is the one place EPIC-014's remaining families (F5/F2/F1/F7) plug in for
- * BOTH invocation shapes; nothing in `traverse.ts`/`classify.ts`, and neither call site below, gains
- * a new case for it.
+ * built-in.ts`'s `createBuiltInRegistry`, `f12-registry.ts`'s `createF12Registry`, `f4-registry.ts`'s
+ * `createF4Registry`, `s4-append-registry.ts`'s `createS4AppendRegistry`) -- this function only PAIRS
+ * each registry with its own concrete port and hands the result to `bindRegistry` (`registry.ts`),
+ * then `composeFamilies` (`traverse.ts`) merges them into ONE dispatch function. Appending a family
+ * here is the one place EPIC-014's remaining families (F5/F2/F1/F7) plug in for BOTH invocation
+ * shapes; nothing in `traverse.ts`/`classify.ts`, and neither call site below, gains a new case for it.
  *
  * `FsGitBoundaryPort`'s second argument is the spec its §12 rules read PROSE from (allowed asset
  * dirs, generated-file classes) -- defaults to `<repoDir>/spec/STANDARD.md` (this repo's own gate,
@@ -197,11 +201,30 @@ const SECTION_ARG_RE = /^[1-9]\d*$/;
  * has no reason to vendor a copy of the standard it is being measured against") and by this
  * engine's own spec reader (`apps/cli/src/spec-file-reader.ts`'s `BUNDLED_SPEC_PATH`) -- the Standard
  * ships beside the engine, never vendored by the repo being measured.
+ *
+ * SPRINT-091 T12: the two §4 registries T6/T7 built (a third and fourth family, alongside S9's and
+ * S12's) join here -- the exact wiring both `s4-append-registry.ts`'s and `fs-adr-append.ts`'s own
+ * headers predicted at this exact call site ("reported, not performed, here" / "not performed here,
+ * since that call site is `apps/cli/src/main.ts`"). Before this task those two registries were built,
+ * tested, and reachable from NOWHERE a real invocation could dispatch through -- `--section 4` and the
+ * flagless run both answered `rule-unimplemented` for all five §4 mechanical rules, and because
+ * `level.ts`'s `computeLevel` treats `gap` as "this engine's own coverage, not a repository finding"
+ * (its own comment, above) and `continue`s past it untouched, a repo carrying a REAL §4 violation --
+ * see `evals/fixtures/adr-family/index-missing-row/`, the retained motivating fixture (L-166) -- was
+ * laundered straight through to the top conformance level instead of being counted as a Structural
+ * FAIL. Two more `bindRegistry(...)` entries close that gap; `createF4Registry()` pairs with
+ * `FsAdrFamilyPort` (the tree-only §4 port T7's own header names as unbuilt-but-scoped-in-T7, then
+ * built there), `createS4AppendRegistry()` pairs with `createFsAdrAppendPort` (the combined
+ * `AdrFamilyPort & AdrHistoryPort` S4.APPEND alone needs, since it is §4's one Gated/history-reading
+ * rule -- T7's own module header). Both constructors are reused verbatim, unmodified, exactly as
+ * `createBuiltInRegistry`/`createF12Registry` are above -- this function's job is composition only.
  */
 function composedDispatch(repoDir: string): (id: RuleId) => RuleEvaluation | undefined {
   return composeFamilies([
     bindRegistry(createBuiltInRegistry(), new FsSprintDirPort(repoDir)),
     bindRegistry(createF12Registry(), new FsGitBoundaryPort(repoDir, BUNDLED_SPEC_PATH)),
+    bindRegistry(createF4Registry(), new FsAdrFamilyPort(repoDir)),
+    bindRegistry(createS4AppendRegistry(), createFsAdrAppendPort(repoDir)),
   ]);
 }
 
