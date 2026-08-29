@@ -102,6 +102,49 @@ else
   fail=1
 fi
 
+# --- case 3e (TD-124, must-FAIL): the envelope backstop catches what the terminal-line signal alone
+# ---  misses -- a reap-gate-class defect leaves NO `terminal · ` line, but a pinned `approval_envelope:`
+# recorded before the run fired is independent evidence the checker must still act on. Reproduces the
+# exact gap an independent reviewer found in the first cut of this fix: a real committed unattended
+# run, unparked J2, zero `terminal · ` lines anywhere, `authority-j2-honoured` PASS.
+run_case_anywhere "j2-envelope-backstop-is-refused" 1 "authority-j2-not-parked:" -- \
+  sh "$checker" "$fx/envelope-backstop-unattended/SPRINT-909-fx.md"
+
+# --- case 3f: ...and the J1 sibling in that same file stays green -------------------------------
+out=$(sh "$checker" "$fx/envelope-backstop-unattended/SPRINT-909-fx.md" 2>&1); rc=$?
+if [ "$rc" -eq 1 ] &&
+   printf '%s\n' "$out" | grep -qE '^FAIL  authority-j2-not-parked: .* T2 ' &&
+   printf '%s\n' "$out" | grep -qE '^PASS  authority-declared: .* T1 J1$'; then
+  echo "PASS fixture(envelope-backstop-discriminates): the envelope-only unattended violation reddened while the J1 sibling stayed green"
+else
+  echo "FAIL fixture(envelope-backstop-discriminates): exit $rc -- the envelope backstop did not separate the violation from its sibling -- output:"
+  printf '%s\n' "$out"
+  fail=1
+fi
+
+# --- case 3g (TD-124, control): a bare, unindented ``` fence quoting a REAL example `terminal · `
+# ---  line -- for illustration only -- does NOT get read as a live rollup. This is case 3c/3d's
+# sibling from the other direction: 3c/3d proves "no signal at all -> attended", this proves "a
+# signal-SHAPED quote inside a fence -> still attended", which is the specific gap an independent
+# reviewer reproduced (a genuine attended case flipped to `authority-j2-not-parked` purely from a
+# quoted example). j2-executed (case 3, its log now carries a REAL un-fenced `terminal · ` line)
+# already proves the other half of "prove it both ways": a real rollup is still seen after this fix.
+run_case_anywhere "j2-fenced-quote-is-accepted" 0 "authority-j2-honoured:" -- \
+  sh "$checker" "$fx/attended-fenced-example/SPRINT-910-fx.md"
+
+# --- case 3h: ...and the J1 sibling in that same file stays green, with no FAIL line at all -------
+out=$(sh "$checker" "$fx/attended-fenced-example/SPRINT-910-fx.md" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] &&
+   printf '%s\n' "$out" | grep -qE '^PASS  authority-j2-honoured: .* T2 executed with no park record' &&
+   printf '%s\n' "$out" | grep -qE '^PASS  authority-declared: .* T1 J1$' &&
+   ! printf '%s\n' "$out" | grep -q '^FAIL'; then
+  echo "PASS fixture(fenced-quote-discriminates): the fenced quote was ignored, T2 and its J1 sibling both stayed green, and no FAIL line appeared"
+else
+  echo "FAIL fixture(fenced-quote-discriminates): exit $rc -- a quoted example inside a bare fence should not be read as a live rollup -- output:"
+  printf '%s\n' "$out"
+  fail=1
+fi
+
 # --- case 4 (control): a J2 task that HELD is accepted -------------------------------------------
 # The case that is wrong today if the honoured-half logic inverts. Load-bearing for the same reason
 # case 2 is: it is the only case that reddens if the checker starts refusing correct behaviour.
