@@ -122,11 +122,23 @@ run_case_anywhere "authority-vs-unattempted-fails" 1 "AUTHORITY_BOUNDARY but car
   sh "$checker" "$fx/agreement-authority-vs-unattempted/docs/sprint/logs/SPRINT-936-agreement-authority-vs-unattempted.md"
 run_case_anywhere "authority-ok" 0 "agrees with its per-task lines" -- \
   sh "$checker" "$fx/agreement-authority-ok/docs/sprint/logs/SPRINT-937-agreement-authority-ok.md"
-# BUDGET_STOP + a LONE blocked/parked-hitl line, no unattempted line at all, is NOT a contradiction
-# (SPRINT-093 T1 revise, independent review finding): reap() reaches BUDGET_STOP purely off
-# rp_unatt > 0 and never consults rp_parked once it does -- so blocked/parked-hitl never rules
-# BUDGET_STOP out, with or without an unattempted line present. Was wrongly asserted must-FAIL
-# before the fix; corrected to its true sibling-control shape.
+# --- case 7d (must-FAIL): positive-evidence rows (SPRINT-093 T1 revise 2, independent review) -----
+# The negative checks above only assert what a terminal state is INCOMPATIBLE with; they never
+# required the evidence a state actually needs. `AUTHORITY_BOUNDARY` with zero parked-hitl/blocked
+# lines, or `BUDGET_STOP` with zero unattempted lines, both PASSED before this fixture existed --
+# and neither is a shape reap() can produce (night-run.sh:210/:212 gate those states on the count
+# being > 0). Per-task lines are sparse (done carries no line), so the absence IS the contradiction.
+run_case_anywhere "authority-no-evidence-fails" 1 "carries no 'Tn · parked-hitl ·' or 'Tn · blocked ·' line" -- \
+  sh "$checker" "$fx/agreement-authority-no-evidence/docs/sprint/logs/SPRINT-945-agreement-authority-no-evidence.md"
+run_case_anywhere "budget-no-evidence-fails" 1 "carries no 'Tn · unattempted ·' line" -- \
+  sh "$checker" "$fx/agreement-budget-no-evidence/docs/sprint/logs/SPRINT-944-agreement-budget-no-evidence.md"
+# BUDGET_STOP + a LONE blocked/parked-hitl line is NOT a contradiction by itself (SPRINT-093 T1
+# revise, independent review finding): reap() reaches BUDGET_STOP purely off rp_unatt > 0 and never
+# consults rp_parked once it does -- so blocked/parked-hitl never rules BUDGET_STOP out. But an
+# unattempted line is now REQUIRED (T1 revise 2, positive-evidence check above), so this fixture was
+# corrected to carry one alongside the blocked line -- without it, the fixture itself would no
+# longer be a legitimate shape and this case would (correctly) start failing on the new rule instead
+# of proving what it was built to prove.
 run_case_anywhere "budget-vs-blocked-ok" 0 "agrees with its per-task lines" -- \
   sh "$checker" "$fx/agreement-budget-vs-blocked/docs/sprint/logs/SPRINT-938-agreement-budget-vs-blocked.md"
 run_case_anywhere "budget-vs-denied-fails" 1 "BUDGET_STOP but carries a per-task line reap()'s priority order ranks above it" -- \

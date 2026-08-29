@@ -109,7 +109,22 @@ for lg in "$@"; do
   #   BUDGET_STOP        -- reached when steps 1-2 miss and step 3 hits; step 4 (parked/blocked) is
   #                         never even consulted once step 3 fires. Contradicted ONLY by
   #                         stalled/denied-tool (outrank it at step 2). blocked/parked-hitl must NOT
-  #                         be flagged -- CORRECTED below.
+  #                         be flagged.
+  #
+  # SPRINT-093 T1 revise 2, independent review's own second finding: everything above asserts what
+  # each state is INCOMPATIBLE with -- never what it REQUIRES. `terminal · BUDGET_STOP` with zero
+  # `unattempted` lines, or `terminal · AUTHORITY_BOUNDARY` with zero `parked-hitl`/`blocked` lines,
+  # both PASSED, and neither is a shape reap() can emit (step 3 needs rp_unatt>0 to pick
+  # BUDGET_STOP; step 4 needs rp_parked>0 to pick AUTHORITY_BOUNDARY). Per-task lines are sparse --
+  # a `done` task carries no line at all (Part 4) -- so the ABSENCE of the one state-defining line
+  # is itself the contradiction, the same DoD 1 class through omission rather than through a wrong
+  # line. Added as a positive requirement on exactly these two rows:
+  #   BUDGET_STOP        -- requires >=1 `Tn · unattempted ·` line (night-run.sh:210).
+  #   AUTHORITY_BOUNDARY -- requires >=1 `Tn · parked-hitl ·` or `Tn · blocked ·` line (:212).
+  # PLAN_EXHAUSTED gets no separate positive check: its requirement IS the absence of all four
+  # other states, which its existing negative rule already enforces in full. HARD_FAILURE and
+  # USER_STOP get no positive check either -- see why below; requiring evidence for either would
+  # false-FAIL a real run.
   #
   # HARD_FAILURE and USER_STOP are deliberately NOT asserted against, in either direction. Both can
   # be produced by something this checker cannot see from the log text alone: HARD_FAILURE also
@@ -136,6 +151,17 @@ for lg in "$@"; do
           agree_bad=1
           bad "night-run rollup: $lg claims terminal · AUTHORITY_BOUNDARY but carries a per-task line Part 0b maps elsewhere (stalled/denied-tool -> HARD_FAILURE, unattempted -> BUDGET_STOP) -- '$bad_line'"
         fi
+        # Positive half (SPRINT-093 T1 revise 2, independent review): reap() only ever REACHES
+        # AUTHORITY_BOUNDARY when rp_parked > 0 (night-run.sh:212). Per-task lines are sparse --
+        # done tasks carry no line at all -- so zero parked-hitl/blocked lines in the file is not
+        # neutral, it is the absence of the ONE thing this terminal state requires. That is the
+        # same contradiction-by-omission DoD 1 names, just on the other side of the rule: the
+        # `why` text ("work remains, all of it J2 or blocked behind a park") asserts evidence the
+        # per-task lines do not carry.
+        if ! grep -qE '^T[0-9]+ · (parked-hitl|blocked) · ' "$lg" 2>/dev/null; then
+          agree_bad=1
+          bad "night-run rollup: $lg claims terminal · AUTHORITY_BOUNDARY but carries no 'Tn · parked-hitl ·' or 'Tn · blocked ·' line -- reap() only reaches AUTHORITY_BOUNDARY when at least one task parked or was blocked (night-run.sh:212); missing that evidence, the terminal claim has nothing behind it"
+        fi
         ;;
       BUDGET_STOP)
         # blocked/parked-hitl are NOT a contradiction here (SPRINT-093 T1 revise): reap() picks
@@ -147,6 +173,15 @@ for lg in "$@"; do
         if [ -n "$bad_line" ]; then
           agree_bad=1
           bad "night-run rollup: $lg claims terminal · BUDGET_STOP but carries a per-task line reap()'s priority order ranks above it (stalled/denied-tool -> HARD_FAILURE outranks BUDGET_STOP) -- '$bad_line'"
+        fi
+        # Positive half (SPRINT-093 T1 revise 2, independent review): reap() only ever REACHES
+        # BUDGET_STOP when rp_unatt > 0 (night-run.sh:210). Same reasoning as AUTHORITY_BOUNDARY's
+        # positive check above -- a BUDGET_STOP with zero `Tn · unattempted ·` lines is contradicted
+        # by omission, not merely unproven: its own `why` text ("N task(s) never reached") names
+        # evidence the per-task lines do not carry.
+        if ! grep -qE '^T[0-9]+ · unattempted · ' "$lg" 2>/dev/null; then
+          agree_bad=1
+          bad "night-run rollup: $lg claims terminal · BUDGET_STOP but carries no 'Tn · unattempted ·' line -- reap() only reaches BUDGET_STOP when at least one task was never reached (night-run.sh:210); missing that evidence, the terminal claim has nothing behind it"
         fi
         ;;
       HARD_FAILURE|USER_STOP) : ;;  # contract silent on what these two rule out -- left unasserted
