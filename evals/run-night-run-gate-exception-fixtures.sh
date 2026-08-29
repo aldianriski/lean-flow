@@ -29,6 +29,23 @@
 # an unparseable report as a clean one -- the exact false-negative shape this whole file exists to
 # close (CLAUDE.md L-058).
 #
+# --- bounded retry (coordinator review, two findings) --------------------------------------------
+# Finding 1 (pre-existing, this file's Layer): the REAPER'S mode gate tested a literal substring
+# ("sprint-bulk") stale since SPRINT-088 T3 renamed the canonical mode to `overnight` -- firing the
+# documented canonical form skipped the reaper silently, and check-authority.sh (T5) trusts the
+# `terminal ·` line it writes as its ONLY unattended-mode signal. `reap-fires-on-canonical-overnight`
+# below is the retained must-PASS proof: a `--mode overnight` run that never says "sprint-bulk"
+# must still produce a rollup.
+# Finding 2 (this mechanism's own defect): the ORIGINAL canonicalised-prefix match let qa-check.sh
+# leg 13's three distinct per-file FAILs (file-not-found / ask-channel-probe-missing /
+# park-record-instruction-missing) collapse to one shared name, so a grant naming that name silently
+# pre-approved whichever of the three actually failed. The fix moved matching to the gate's FULL,
+# VERBATIM FAIL line (never a truncated prefix) and `gate_exceptions:` to a newline-delimited block
+# list (a punctuation delimiter can no longer safely join full lines -- qa-check.sh's own FAIL text
+# routinely embeds ' · ' and '|'). `collision-*` below reproduces leg 13's exact shape and proves
+# both the old vulnerability is closed (`collision-prefix-only-refuses`) and the new mechanism still
+# discriminates named-vs-unnamed within it (`collision-partial-refuses` / `collision-all-covered`).
+#
 # --- why a throwaway git-inited repo per case ----------------------------------------------------
 # night-run.sh's gate block resolves `repo_root` via `git rev-parse --show-toplevel` and only runs
 # the gate at all when `$repo_root/scripts/qa-check.sh` exists -- so exercising it needs a real
@@ -76,6 +93,21 @@ make_case() {
   ( cd "$d" && git init -q ) || { echo "FAIL harness: git init failed in $d"; exit 2; }
   cp "$fx/scripts/$stub" "$d/scripts/qa-check.sh"
   cp "$fx/sprints/$spr" "$d/docs/sprint/SPRINT-990-fx.md"
+  printf '%s' "$d"
+}
+
+# make_case_tree <label> <qa-check-stub> <tree-name> -- like make_case, but for a fixture that
+# carries a FULL docs/sprint/ tree (a Plan plus a pre-existing Execution Log) rather than a single
+# sprint file -- needed for the reaper, which refuses to write into a log that does not already
+# exist (night-run.sh reap(): "No Execution Log means the run never opened one"). Echoes the case
+# dir.
+make_case_tree() {
+  cl=$1; stub=$2; tree=$3
+  d="$work/$cl"
+  mkdir -p "$d/scripts"
+  ( cd "$d" && git init -q ) || { echo "FAIL harness: git init failed in $d"; exit 2; }
+  cp "$fx/scripts/$stub" "$d/scripts/qa-check.sh"
+  cp -r "$fx/$tree/docs" "$d/docs"
   printf '%s' "$d"
 }
 
@@ -131,6 +163,53 @@ run_case_anywhere "unparseable-summary-refuses" 1 "no readable 'QA-CHECK: N pass
 # --- case 8 (must-FAIL, L-058 one level down): summary says 2 fail, no FAIL line names either ----
 d=$(make_case "no-fail-lines" "qa-check-fail-count-no-lines.sh" "absent.md")
 run_case_anywhere "fail-count-with-no-lines-refuses" 1 "printed no 'FAIL  ...' line naming them" -- \
+  run_launcher "$d" --mode overnight --sprint "$d/docs/sprint/SPRINT-990-fx.md" \
+    --wait-seconds 2 --poll-seconds 1 --no-reap -- true --permission-mode dontAsk --allowedTools Bash
+
+# --- case 9 (must-PASS, Finding 1's retained proof): canonical `overnight` form -> reap fires ----
+# No --no-reap here -- this is exactly the shape the pre-existing defect broke: a trigger that never
+# says the literal word "sprint-bulk" anywhere. reap() runs ASYNCHRONOUSLY, chained after the fired
+# command's exit code is recorded and after the launcher has already printed ALIVE and returned, so
+# this polls the log briefly rather than asserting immediately.
+d=$(make_case_tree "reap-mode-canonical" "qa-check-clean.sh" "reap-mode-canonical")
+r9_out=$(run_launcher "$d" --mode overnight --sprint "$d/docs/sprint/SPRINT-990-fx.md" \
+  --wait-seconds 2 --poll-seconds 1 -- true --permission-mode dontAsk --allowedTools Bash 2>&1)
+r9_rc=$?
+r9_logdoc="$d/docs/sprint/logs/SPRINT-990-fx.md"
+r9_found=0
+r9_i=0
+while [ "$r9_i" -lt 20 ]; do
+  grep -q '^terminal · ' "$r9_logdoc" 2>/dev/null && { r9_found=1; break; }
+  r9_i=$((r9_i + 1))
+  sleep 1
+done
+if [ "$r9_rc" -eq 0 ] && [ "$r9_found" -eq 1 ]; then
+  echo "PASS fixture(reap-fires-on-canonical-overnight): terminal · line written after a --mode overnight run that never says 'sprint-bulk'"
+else
+  echo "FAIL fixture(reap-fires-on-canonical-overnight): launcher exit=$r9_rc, terminal-line-found=$r9_found -- reap must fire for any validated mode signal, not only literal 'sprint-bulk' text -- launcher output: $r9_out"
+  fail=1
+fi
+
+# --- cases 10-12 (Finding 2, the collision family): leg 13's real three-siblings-one-prefix shape -
+# All three share qa-check.sh's actual identical prefix "headless park-record cue <path>" before
+# their first ': ' -- the exact text a pre-fix grant would have matched all three with.
+
+# case 10 (must-FAIL, the motivating case): only one of three named -> refuses, naming another -----
+d=$(make_case "collision-partial" "qa-check-headless-cue-collision.sh" "collision-partial.md")
+run_case_anywhere "collision-partial-refuses" 1 "ask-channel probe (ToolSearch select:AskUserQuestion) missing" -- \
+  run_launcher "$d" --mode overnight --sprint "$d/docs/sprint/SPRINT-990-fx.md" \
+    --wait-seconds 2 --poll-seconds 1 --no-reap -- true --permission-mode dontAsk --allowedTools Bash
+
+# case 11 (must-PASS, sibling control): all three named verbatim -> proceeds -----------------------
+d=$(make_case "collision-all-named" "qa-check-headless-cue-collision.sh" "collision-all-named.md")
+run_case_anywhere "collision-all-covered-proceeds" 0 "pre-approved by gate_exceptions" -- \
+  run_launcher "$d" --mode overnight --sprint "$d/docs/sprint/SPRINT-990-fx.md" \
+    --wait-seconds 2 --poll-seconds 1 --no-reap -- true --permission-mode dontAsk --allowedTools Bash
+
+# case 12 (must-FAIL, proves the OLD vulnerability is closed): the shared prefix alone, exactly what
+# a pre-fix canonicalised match would have equalled -> refuses all three, naming one -------------
+d=$(make_case "collision-prefix-only" "qa-check-headless-cue-collision.sh" "collision-prefix-only.md")
+run_case_anywhere "collision-prefix-only-refuses" 1 "NOT on the pre-approved exception list" -- \
   run_launcher "$d" --mode overnight --sprint "$d/docs/sprint/SPRINT-990-fx.md" \
     --wait-seconds 2 --poll-seconds 1 --no-reap -- true --permission-mode dontAsk --allowedTools Bash
 

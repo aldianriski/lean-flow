@@ -428,27 +428,23 @@ if [ -n "$repo_root" ] && [ -f "$repo_root/scripts/qa-check.sh" ]; then
     # --- OWNER RULING (TD-110 / SPRINT-093 T3): a narrow, named exception -- never a blanket one ---
     # A run may fire against SPECIFIC, NAMED, PRE-APPROVED failing checks. There is no
     # --force/--skip-gate flag anywhere in this file and none is added here: the only door is
-    # `gate_exceptions:` in the TARGET SPRINT'S OWN frontmatter -- read from disk, at the sha it
+    # `gate_exceptions:` in the TARGET SPRINT'S OWN frontmatter -- read from disk, at the pin it
     # names, resolved above BEFORE this gate ran. A run cannot grant itself an exception at fire
     # time, because the only place one can be written is a file this process only reads.
     #
-    # Canonicalisation: a FAIL line's check name is the text before the FIRST of ': ' or ' (',
-    # whichever occurs earlier -- and BOTH sides of every comparison below (the gate's real output
-    # here, and the pre-approved list read from frontmatter) run through this SAME function. That is
-    # what makes an exception narrow BY CONSTRUCTION rather than by convention: a configured name can
-    # only ever equal a name this script itself computes from the gate's actual FAIL lines, so a
-    # vague or wildcard-shaped entry simply fails to match anything rather than matching everything.
-    nrg_canon_name() {
-      nrg_s=$1
-      nrg_by_colon=${nrg_s%%: *}
-      nrg_by_paren=${nrg_s%% (*}
-      if [ "${#nrg_by_colon}" -le "${#nrg_by_paren}" ]; then
-        printf '%s' "$nrg_by_colon"
-      else
-        printf '%s' "$nrg_by_paren"
-      fi
-    }
-
+    # WHOLE-LINE matching, not a canonicalised prefix (SPRINT-093 T3 retry, Finding 2). The first
+    # cut split each FAIL line at its first ': ' or ' (' and matched THAT prefix -- an independent
+    # reviewer found qa-check.sh leg 13 prints three semantically distinct FAILs per file
+    # (file-not-found / ask-channel-probe-missing / park-record-instruction-missing) that all share
+    # the identical prefix `headless park-record cue <path>`, so one grant naming that prefix
+    # silently pre-approved whichever of the three actually failed, unreviewed. A prefix cannot be
+    # narrow by construction when the SAME prefix can front more than one distinct check -- only the
+    # gate's own complete, verbatim line is guaranteed to identify exactly what it identifies (if
+    # qa-check.sh cannot tell two failures apart in its own printed text, nothing reading that text
+    # safely can either). So a configured exception must equal a FAIL line's FULL text, byte for
+    # byte, via a fixed-string whole-line match (`grep -Fx`) -- narrower than before, and the
+    # tradeoff is stated plainly: an exception can go stale if the SAME check's own message text
+    # shifts for any reason, which fails safe (a refusal), never unsafe.
     qa_fail_lines=$(printf '%s\n' "$qa_out" | grep -E '^FAIL  ')
     if [ -z "$qa_fail_lines" ]; then
       # L-058 again, one level down: the summary says N>0 FAILing checks, but no 'FAIL  ...' line
@@ -457,56 +453,78 @@ if [ -n "$repo_root" ] && [ -f "$repo_root/scripts/qa-check.sh" ]; then
       die_doa "pre-flight gate scripts/qa-check.sh reported $qa_failn FAILing check(s) in its summary but printed no 'FAIL  ...' line naming them -- refusing rather than firing with nothing to check against gate_exceptions:"
     fi
 
-    qa_exceptions=""
-    qa_exc_sha=""
+    # `gate_exceptions:` is a BLOCK LIST, one full FAIL line per `  - ` item, not a single
+    # delimiter-joined line. A single-line join was the OTHER half of Finding 2: qa-check.sh's own
+    # FAIL text routinely embeds ' · ' (e.g. the night-run-rollup checker's "carries no 'terminal ·
+    # <STATE> · <reason>' line") and even '|' (leg 13's own siblings, elsewhere), so no punctuation
+    # delimiter can safely join more than one WHOLE FAIL line on one frontmatter scalar without risking
+    # collision with an item's own text. A newline can never appear inside one -- every bad()/FAIL
+    # message this codebase prints is built and flattened to a single line before printf (`tr '\n'
+    # ' '`/`tr '\n' ';'` at every site that could embed one) -- so newline-per-item is the one
+    # separator with no collision risk, not a stylistic choice.
+    #
+    #   gate_exceptions:
+    #     - <verbatim FAIL line text 1>
+    #     - <verbatim FAIL line text 2>
+    #   gate_exceptions_pin: <sha>
+    #
+    # `tr -d '\r'` first: this sprint file is read off a real CRLF Windows checkout (L-169's own
+    # environment), and a `- ` item's own trailing content must never carry a stray \r into the
+    # exact match below.
+    qa_exc_items=""
+    qa_exc_pin=""
     if [ -n "$resolved_sprint" ] && [ -f "$resolved_sprint" ]; then
-      qa_exc_line=$(awk 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} /^gate_exceptions:[ \t]*/{sub(/^gate_exceptions:[ \t]*/,"");print;exit}' "$resolved_sprint")
-      # An unfilled template placeholder counts as absent -- same rule check-approval-envelope.sh
-      # already applies to `approval_envelope:`, so the shipped template blesses nothing.
-      case "$qa_exc_line" in "["*) qa_exc_line="" ;; esac
-      case "$qa_exc_line" in
-        *" @ "*)
-          qa_exceptions=${qa_exc_line%% @ *}
-          qa_exc_sha=${qa_exc_line##* @ }
-          case "$qa_exc_sha" in
-            ''|*[!0-9a-f]*) qa_exceptions="" ;;              # not a hex pin -- names a moving target, granted nothing
-            ?|??|???|????|?????|??????) qa_exceptions="" ;;  # shorter than git's own 7-char abbreviation floor
-          esac
-          ;;
-        *) qa_exceptions="" ;;  # no ' @ <sha>' pin -- malformed, granted nothing, never a wildcard
+      qa_exc_raw=$(tr -d '\r' < "$resolved_sprint" | awk '
+        NR==1 && $0!="---" { exit }
+        NR==1 { next }
+        $0=="---" { exit }
+        /^gate_exceptions:[ \t]*$/ { collecting=1; next }
+        collecting && /^[ \t]+-[ \t]/ {
+          line=$0
+          sub(/^[ \t]+-[ \t]/, "", line)
+          print line
+          next
+        }
+        { collecting=0 }
+      ')
+      # An unfilled template placeholder item counts as absent -- same rule
+      # check-approval-envelope.sh already applies to `approval_envelope:`, so the shipped
+      # template blesses nothing. A blank line (no items at all) is dropped the same way.
+      qa_exc_items=$(printf '%s\n' "$qa_exc_raw" | grep -v '^\[' | grep -v '^$')
+
+      qa_exc_pin=$(tr -d '\r' < "$resolved_sprint" | awk 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} /^gate_exceptions_pin:[ \t]*/{sub(/^gate_exceptions_pin:[ \t]*/,"");print;exit}')
+      case "$qa_exc_pin" in "["*) qa_exc_pin="" ;; esac
+      case "$qa_exc_pin" in
+        ''|*[!0-9a-f]*) qa_exc_items="" ;;              # not a hex pin -- names a moving target, granted nothing
+        ?|??|???|????|?????|??????) qa_exc_items="" ;;  # shorter than git's own 7-char abbreviation floor
       esac
     fi
 
-    # Every FAIL line's canonical name must equal a configured exception exactly (never a
-    # substring -- L-108's own trap) or it is reported UNNAMED. Captured through a command
-    # substitution around the whole loop, not a variable set inside it, so the result survives the
-    # `| while read` subshell (POSIX sh has no process substitution).
+    # Every FAIL line's FULL text must equal a configured item EXACTLY (fixed-string, whole-line --
+    # `grep -qFx`, never a substring: L-108's own trap) or it is reported UNNAMED. Captured through
+    # a command substitution around the whole loop, not a variable set inside it, so the result
+    # survives the `| while read` subshell (POSIX sh has no process substitution); the inner match
+    # uses the pipeline's own exit status rather than a second nested `| while read` (which would
+    # hit the exact same subshell-scoping trap one level deeper).
     qa_unnamed=$(
       printf '%s\n' "$qa_fail_lines" | sed -E 's/^FAIL  //' | while IFS= read -r nrg_detail; do
         [ -n "$nrg_detail" ] || continue
-        nrg_name=$(nrg_canon_name "$nrg_detail")
         nrg_hit=0
-        if [ -n "$qa_exceptions" ]; then
-          nrg_oldifs=$IFS
-          IFS='·'
-          for nrg_exc in $qa_exceptions; do
-            nrg_exc_trim=$(printf '%s' "$nrg_exc" | sed -E 's/^[ \t]+//; s/[ \t]+$//')
-            [ "$nrg_exc_trim" = "$nrg_name" ] && nrg_hit=1
-          done
-          IFS=$nrg_oldifs
+        if [ -n "$qa_exc_items" ]; then
+          printf '%s\n' "$qa_exc_items" | grep -qFx "$nrg_detail" && nrg_hit=1
         fi
-        [ "$nrg_hit" -eq 1 ] || printf '%s\n' "$nrg_name"
+        [ "$nrg_hit" -eq 1 ] || printf '%s\n' "$nrg_detail"
       done
     )
 
     if [ -n "$qa_unnamed" ]; then
       qa_unnamed_flat=$(printf '%s\n' "$qa_unnamed" | grep -v '^$' | tr '\n' ';' | sed 's/;$//')
       qa_where="no sprint resolved to read a gate_exceptions: grant from -- pass --sprint, or ensure exactly one sprint carries status: active"
-      [ -n "$resolved_sprint" ] && qa_where="gate_exceptions: in $resolved_sprint${qa_exc_sha:+ (pinned @ $qa_exc_sha)}"
-      die_doa "pre-flight gate scripts/qa-check.sh failed ($qa_failn check(s) FAILing) and at least one is NOT on the pre-approved exception list: $qa_unnamed_flat -- refusing rather than firing against an unnamed red check. Consulted: $qa_where. There is no --force/--skip-gate; the only grant is a named, pinned gate_exceptions: line recorded before this run started (night-run.md Part 1a step 4c)"
+      [ -n "$resolved_sprint" ] && qa_where="gate_exceptions: in $resolved_sprint${qa_exc_pin:+ (pinned @ $qa_exc_pin)}"
+      die_doa "pre-flight gate scripts/qa-check.sh failed ($qa_failn check(s) FAILing) and at least one is NOT on the pre-approved exception list: $qa_unnamed_flat -- refusing rather than firing against an unnamed red check. Consulted: $qa_where. There is no --force/--skip-gate; the only grant is a named, pinned gate_exceptions: block recorded before this run started (night-run.md Part 1a step 4c)"
     fi
 
-    printf 'pre-flight: qa-check.sh reported %s FAILing check(s), all pre-approved by gate_exceptions: in %s (@ %s) -- firing\n' "$qa_failn" "$resolved_sprint" "$qa_exc_sha"
+    printf 'pre-flight: qa-check.sh reported %s FAILing check(s), all pre-approved by gate_exceptions: in %s (@ %s) -- firing\n' "$qa_failn" "$resolved_sprint" "$qa_exc_pin"
   fi
 fi
 
@@ -530,9 +548,26 @@ pre_commit=""
 # script reads the pid back, the fired process is no longer tied to this shell's job
 # table. This combination (nohup + full fd redirection + immediate-return subshell) is
 # POSIX-portable; it does not depend on any single non-standard utility.
-# The reaper fires only for a sprint-bulk run -- that is the only shape with a Plan whose
-# DoD boxes mean anything -- and `--no-reap` opts out entirely.
-case "$allargs" in *sprint-bulk*) ;; *) reap=0 ;; esac
+# The reaper fires for every run that reaches this point, because reaching this point already
+# PROVES a recognised mode signal was present -- the mode-signal gate above
+# (`die_doa "mode signal missing"`) already required $allargs$run_mode to contain one of the
+# accepted aliases, or the process would already have exited. `--no-reap` is the ONLY opt-out.
+#
+# PRE-EXISTING DEFECT, surfaced through this file by an independent reviewer (SPRINT-093 T3
+# retry): this line used to re-test `case "$allargs" in *sprint-bulk*) ;; *) reap=0 ;; esac` --
+# a LITERAL SUBSTRING left over from before SPRINT-088 T3 renamed the canonical mode to
+# `overnight` and made `sprint-bulk unattended` one alias among four (night-run.md Part 0).
+# Firing the now-documented canonical form (`--mode overnight`, or a trigger prompt that never
+# says the word "sprint-bulk") satisfied the mode-signal gate above and then silently reap=0'd
+# anyway -- no `terminal ·` line was ever written. `check-authority.sh` (SPRINT-093 T5) trusts
+# that line as its ONLY unattended-mode signal; reproduced live, a genuinely unattended, unparked
+# J2 task then read as an attended completion -- exactly the silent false negative a J2-authority
+# guard exists to prevent.
+#
+# Fixed by DELETING the re-test rather than adding `overnight` to it: a second, hand-copied alias
+# list is itself the defect (the next rename breaks it the same way again). The mode-signal gate
+# above is the ONE place that vocabulary is allowed to live -- this line now trusts its verdict
+# instead of re-deriving a narrower, staler one.
 started=$(date +%s 2>/dev/null || printf '')
 
 # $resolved_sprint was already resolved once, ABOVE the gate check (SPRINT-093 T3), so both the

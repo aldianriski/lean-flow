@@ -224,21 +224,39 @@ this. **The owner's ruling: a narrow exception is permitted, never a blanket one
 against *specific, named, pre-approved* failing checks; any other failing check still refuses the
 launch.
 
-The mechanism is a second frontmatter field, not a flag, pinned the same way the envelope is:
+The mechanism is a second frontmatter field, not a flag, pinned the same way the envelope is — a
+block list, one **complete, verbatim** `FAIL  …` line per item (copy it exactly from a fresh
+`scripts/qa-check.sh` run at approval time), plus a separate pin:
 
 ```
-gate_exceptions: <check name> · <check name> @ <sha>
+gate_exceptions:
+  - <verbatim FAIL line text, exactly as qa-check.sh printed it, minus the leading 'FAIL  '>
+  - <a second one, if the Plan repairs more than one check>
+gate_exceptions_pin: <sha>
 ```
 
-Each `<check name>` is the text `scripts/qa-check.sh` itself prints before the first `: ` or ` (` in
-its own `FAIL  …` line (e.g. `knowledge index STALE`, `layers observed`). The launcher canonicalises
-the gate's *actual* output the same way, so a configured name can only ever match a check it names —
-a vague or wildcard-shaped entry matches nothing rather than matching everything. **That is what
-makes this narrow by construction, not by convention**: there is no `--force` / `--skip-gate` flag
-anywhere in `night-run.sh`, and none is added by this mechanism — the only door is a file the run
-process only *reads*, written before it started, naming specific checks at a specific sha. A failing
-check absent from the list still refuses the launch exactly as before this mechanism existed; an
-absent `gate_exceptions:` field grants nothing, the same rule `approval_envelope:` already follows.
+**Whole-line, not a shortened name — SPRINT-093 T3's retry, Finding 2.** The first cut matched a
+*canonicalised prefix* (the text before a FAIL line's first `: ` or ` (`). An independent reviewer
+found that qa-check.sh's own leg 13 prints three semantically distinct FAILs per file — a missing
+file, a missing ask-channel probe, a missing park-record instruction — that all share the identical
+prefix `headless park-record cue <path>`, so one grant naming that prefix silently pre-approved
+whichever of the three actually failed, unreviewed. A prefix cannot be narrow by construction when
+the same prefix can front more than one distinct check; only the gate's own complete, verbatim line
+is guaranteed to identify exactly what it identifies. **That is what makes this narrow by
+construction, not by convention**: there is no `--force` / `--skip-gate` flag anywhere in
+`night-run.sh`, and none is added by this mechanism — the only door is a file the run process only
+*reads*, written before it started, naming specific checks by their exact printed text at a
+specific pin. The tradeoff is stated plainly rather than hidden: an exception can go stale if that
+same check's own message text shifts for any reason (a different path, a changed count) — which
+fails **safe** (the run refuses), never unsafe.
+
+A failing check absent from the list still refuses the launch exactly as before this mechanism
+existed; an absent `gate_exceptions:` field, an empty list, or every item still reading the
+template's own bracketed placeholder all grant nothing, the same rule `approval_envelope:` already
+follows. One-item-per-line is deliberate, not stylistic: qa-check.sh's own FAIL text routinely
+embeds punctuation this doc otherwise uses as a list separator elsewhere (` · `, `|`) — a newline is
+the one boundary no single FAIL line can ever contain, since every `bad()`/FAIL message this
+codebase prints is built and flattened to one line before it is ever printed.
 
 A step whose gate the human declines **stops the launch**. Report what's outstanding and let them
 decide; do not narrow, re-slice, or defer the work to get past it (that's scope-changing → HITL, and
@@ -463,8 +481,20 @@ it is a hope. **The guarantee lives in the launcher instead** — see the reaper
 outlives the model, so it is where the rollup belongs: after the fired command exits — cleanly, early,
 or badly — the launcher re-enters itself, counts the DoD boxes in the active sprint file, lifts the
 cost figures off the log's last `result` event, and appends the Part 4 block to the Execution Log.
-Nobody has to remember. `--no-reap` opts out; it fires only for a `sprint-bulk` run, since that is the
-only shape with a Plan whose boxes mean anything. Decision and its trade → **ADR-016**.
+Nobody has to remember. `--no-reap` opts out; otherwise it fires for every run that reaches the
+launcher's fire step at all, because getting there already proves a recognised mode signal was
+present (Part 0's mode-signal gate refuses anything else before launch). Decision and its trade →
+**ADR-016**.
+
+**Pre-existing defect, fixed at SPRINT-093 T3's retry.** This used to fire only when the raw
+command text contained the literal substring `sprint-bulk` — stale from before SPRINT-088 T3
+renamed the canonical mode to `overnight` and made `sprint-bulk unattended` one alias among four.
+Firing the now-documented canonical form (`--mode overnight`, or a trigger that never says the
+word "sprint-bulk") satisfied the mode-signal gate and then silently skipped the reaper anyway: no
+`terminal ·` line was ever written, and `check-authority.sh` (SPRINT-093 T5) trusts that line as
+its only unattended-mode signal — reproduced live, a genuinely unattended, unparked J2 task read
+as an attended completion. Fixed by removing the second, hand-copied alias test rather than
+extending it: the mode-signal gate is the one place that vocabulary is allowed to live.
 
 **Declare the target explicitly with `--sprint FILE`** whenever more than one sprint might carry
 `status: active` at once — e.g. `sh scripts/night-run.sh --sprint docs/sprint/SPRINT-093-....md
