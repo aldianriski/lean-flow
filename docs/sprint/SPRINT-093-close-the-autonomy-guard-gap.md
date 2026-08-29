@@ -42,7 +42,7 @@ which runs concurrently as the `engine` stream.
 ## Plan
 
 ### T1 — Teach the rollup checker to compare agreement, and the reaper which Plan it ran `[size: M · risk: high · class: execution · HITL · J2]`
-Layers: `scripts/lib/check-night-run-rollup.sh` · `scripts/night-run.sh` · `evals/run-night-run-rollup-fixtures.sh`
+Layers: `scripts/lib/check-night-run-rollup.sh` · `scripts/night-run.sh` · `evals/run-night-run-rollup-fixtures.sh` · `evals/fixtures/night-run-rollup/` · `evals/fixtures/night-run-reaper/` (fixture trees, declared per L-100 after the observed-layers leg named them)
 Depends-on: none
 Cites: TD-112 · L-178 · L-174 (the same class one sprint earlier, by a different route) · L-166 · SPRINT-089's committed rollup artifact (the motivating case — read, never modified)
 Tier **G**, and **the discrimination bar applies twice**: the checker is a guard, and the reaper is a
@@ -61,7 +61,7 @@ writes into the Plan the run was pointed at rather than one it inferred.
 - [x] Both guards discriminate — ✓ **proven four times over, by three different people using three different seeding methods**: the builder reverted each file to its pre-fix blob; the second reviewer used targeted in-place edits; the third used a single-token removal from an alternation. Each reddened exactly its own case with every sibling green. One convention throughout (`git hash-object`), every seed verified landed by hash *and* line count, every restore verified byte-identical. The final windowing seed reproduced the reviewer's own probe precisely — both new cases flipping while all 32 others held
 
 ### T2 — Stop stamping a wall-clock date into the generated knowledge index `[size: S · risk: med · class: execution · HITL · J2]`
-Layers: `scripts/gen-index.sh` · `docs/knowledge-index.md`
+Layers: `scripts/gen-index.sh` · `docs/knowledge-index.md` · `.gitattributes` (added at execution by owner ruling — the CRLF half of the fix; declared per L-100 rather than left as an undeclared touch)
 Depends-on: none
 Cites: TD-111 · SPRINT-090 (the run that parked its own close on this) · ADR-009
 Tier **G**. A daily false FAIL is the noise that trains a reader to skim the failure list — and combined
@@ -79,7 +79,7 @@ the sole diff was `last_updated:` advancing by one day on an otherwise unchanged
 - [x] A genuine content change still reddens the check — ✓ **the DoD that matters most here, because the cheap wrong fix is to stop checking** (L-058 wearing a new hat). Proven by a pair, neither sufficient alone: a CRLF-only difference now PASSes, while a one-token edit inside the marked region still FAILs with exit 1 and self-heals to the pristine hash on regenerate. The reviewer separately probed the negative paths — missing file, directory-as-file, empty file, reversed markers — and all fail-safe with named findings rather than silent passes
 
 ### T3 — Make the launcher's gate precondition visible, and rule on declared exceptions `[size: S · risk: med · class: decision · HITL · J2]`
-Layers: `skills/orchestrator/references/night-run.md` · `scripts/night-run.sh` (only if the ruling says so)
+Layers: `skills/orchestrator/references/night-run.md` · `scripts/night-run.sh` (the ruling put the launcher in scope) · `evals/run-night-run-gate-exception-fixtures.sh` · `evals/fixtures/night-run-gate-exceptions/` (new retained harness — no existing one covered the launcher pre-flight gate)
 Depends-on: none
 Cites: TD-110 · L-179 · L-151 (a decision its reader cannot reach is not a decision)
 Tier **P** for the wording, and the ruling half is a **decision, not a fix**. The launcher dies on any
@@ -114,9 +114,9 @@ precedent** — re-derive before relying on it.
 - [ ] `AFK-safe` and `J2` are reconciled — *Verify: the two are no longer defined as opposites while one is said to permit the other; whichever way the ruling goes, both definitions state it consistently*
 
 ### T5 — Make the authority leg mode-aware, so it stops failing attended runs `[size: S · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-authority.sh` · `evals/run-authority-fixtures.sh`
+Layers: `scripts/lib/check-authority.sh` · `evals/run-authority-fixtures.sh` · `evals/fixtures/authority/`
 Depends-on: none
-Cites: TD-123 · L-105 (a guard placed correctly in text and wrongly in time) · L-151 · L-165 (the bypass branch was itself added by an independent reviewer) · ADR-021 · `skills/orchestrator/references/night-run.md` (the park protocol this leg enforces — read, never modified)
+Cites: TD-123 · L-105 (a guard placed correctly in text and wrongly in time) · L-151 · L-165 (the bypass branch was itself added by an independent reviewer) · ADR-021 · `night-run.md` (the park protocol this leg enforces — read, never modified) · `qa-check.sh` (consumes this leg; the engine stream owns it and this task does not touch it) · T1 · T2 (the motivating attended executions — no dependency either way)
 Tier **G**. Added mid-sprint by owner ruling — see the Execution Log's `scope-change`. The leg applies
 `night-run.md` Part 0's **park protocol** to every run and never reads the run mode. Parking is what an
 *unattended* run does instead of asking; an attended run has an ask channel. So the check inverts on
