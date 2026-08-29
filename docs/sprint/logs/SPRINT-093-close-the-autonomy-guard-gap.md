@@ -97,3 +97,105 @@ entry heading having been retroactively corrected from `run-complete` to `surpri
 being indented four spaces inside a fenced block. Any one alone would suffice. On a live log the
 reaper's `printf` writes at column 1, so the guard is reachable exactly where it must be.
 
+---
+
+### 2026-08-29 | progress | T1 and T2 complete — four passes on one guard, each fixing a real defect and exposing a different one
+
+consequence · T1 · behaviour:material · governance:high — review: independent-adversarial, worktree-isolated ×2
+consequence · T2 · behaviour:material · governance:high — review: independent-adversarial, worktree-isolated
+
+**T1 took four passes, and the sequence is the finding.** Every pass fixed something real and every pass
+left something real behind, in a guard whose entire purpose is catching what passes silently:
+
+| Pass | Fixed | What it left, found by whom |
+|---|---|---|
+| `9fd074c` | shape → **agreement** | `BUDGET_STOP` false-FAILed legitimate reaper output — *first reviewer* |
+| `3ed88ea` | that false-FAIL | matrix asserted only what a state is **incompatible with**, never what it **requires**; `BUDGET_STOP` and `AUTHORITY_BOUNDARY` both passed with zero corroborating lines — *coordinator, by probing the fix* |
+| `8464714` | the required-evidence half | every check still read the **whole file** and validated only the **first** `run-complete` block — *third reviewer* |
+| `4611f8e` | the window | (nothing found; the remaining gap is undetectable from the log — TD-122) |
+
+**The last one is the sharpest, because the rule was already correct.** After three passes the truth
+table matched `reap()` exactly in both directions — the third reviewer built it cell by cell from source
+and found no disagreement. The guard was still blind, because it read the wrong *window*: `term_state`
+took `head -n1` of the whole file, so a contradiction in a later block passed by borrowing an earlier
+block's terminal claim. **`reap()` had already solved this and left a comment saying why** — *a guard
+that reads the wrong window fails exactly like one that is absent*. The producer observed that
+discipline; the checker never did, and nobody compared them until someone derived the table from source.
+This is not hypothetical: `SPRINT-082`'s committed log already carries two `run-complete` blocks, so it
+is the modal shape for any sprint that survives more than one night.
+
+**The fix's discriminating case is what proves it, not the failing one.** `win()` scopes to the *last*
+block. A fixture where the **first** block contradicts and the last is clean must **PASS** — that is
+what distinguishes "moved the window" from "widened the net to anywhere in the file". Both were built,
+plus a real-artifact pair against `SPRINT-082` with line numbers derived live so a future edit to that
+archive fails loud rather than silently mismeasuring.
+
+**Discrimination was proven by three people using three different seeding methods** — blob-revert
+(builder), targeted in-place edit (second reviewer), single-token removal from an alternation (third
+reviewer) — each reddening exactly its own case. That independence is worth more than three runs of one
+method, and it is why the count is recorded as three methods rather than four passes.
+
+**One irony recorded rather than smoothed:** the `BUDGET_STOP` correction, right on its own terms,
+*removed an accidental catch*. Before it, a stray `parked-hitl` under `BUDGET_STOP` would have failed
+the multi-block probe — for entirely the wrong reason. A correct fix made a latent defect visible by
+removing the noise that had been masking it.
+
+**T2 ended somewhere its own Acceptance did not reach, and the owner widened it deliberately.** The
+date fix was confirmed. Then the reviewer ruled the coordinator's DoD-1 verification **not faithful** —
+it had backdated a file already left in LF state by earlier test runs, never the state git hands out —
+and on a genuinely pristine checkout the check FAILed. **The gate was red on a fresh clone of this
+repository and nobody knew**, because every gate run in this session had a working tree holding the
+generator's LF output rather than git's CRLF. `.gitattributes` normalized only `*.sh`.
+
+**The coordinator refuted that finding before confirming it**, using `grep -c $'\r'` — which counts
+matching *lines*, not CR bytes — and read 0 against `tr -cd '\r' | wc -c`'s 35. A live gate defect was
+one wrong instrument away from being dismissed. Caught only because the byte counts differed by exactly
+35 over exactly 35 lines, which is a disagreeing second number and nothing else.
+
+**TD-121 and TD-122 filed.** TD-122 is the last surviving member of TD-112's family and is explicitly
+**not** closable by better parsing: a run that fires but never reaches the reaper leaves a log
+byte-identical to one where no run happened. The evidence does not exist inside the artifact being
+parsed. It needs a ledger written at fire time, independent of `reap()`'s own decision to append — a new
+mechanism, correctly reported by the builder rather than half-built inside this task.
+
+---
+
+### 2026-08-29 | scope-change | T5 added — the authority leg fires outside the context it was written for
+
+**Found by the gate, against this coordinator's own execution.** After T1 and T2 landed,
+`check-authority.sh` reported `authority-j2-not-parked` for both: each carries an execution record
+(`consequence · Tn · `) and no park record (`Tn · parked`). Its `J2` branch requires a park, then a
+recorded `owner-ruling · Tn · <ruling>`, before any execution record may exist.
+
+**The finding is half right, and the half it gets right is the coordinator's.** The authorization for
+T1 and T2 was real — signed G1/G2 at `760dc69`, plus an explicit owner direction to run both streams —
+but it lived in the session transcript, and the checker reads only the Execution Log. **A per-task
+`owner-ruling · Tn · ` line is the shape it can read, and none was written.** That is L-151 exactly,
+committed by the coordinator while the rule was loaded. The guard was not wrong that something was
+missing; it was wrong about what.
+
+**The half it gets wrong is why T5 exists.** The protocol it enforces is `night-run.md` Part 0 § Park
+protocol, which governs **headless** runs — where `AskUserQuestion` is unregistered, `dontAsk`
+auto-denies, and a missing answer must never be read as consent. **Parking is what an unattended run
+does INSTEAD of asking.** An attended run has an ask channel and uses it; there is no park step to
+perform. Enforced against an attended run the check inverts, demanding the artifact of an absent ask
+channel from a run that had one. **L-105's family — a guard placed correctly in text and wrongly in
+time**, which is this sprint's own theme arriving one level up: T1 spent four passes on a guard reading
+the wrong window, and here is a guard reading the wrong *mode*.
+
+**Owner ruling: the checker is over-broad; add T5 and make the leg mode-aware.** Filed as **TD-123**
+(high) — and the debt row is not discharged by filing, because `scripts/qa-check.sh` consumes this leg,
+so the gate is RED and ADR-021 blocks the close. Recording it without fixing it would have meant closing
+through a red gate, which is the one thing the gate exists to prevent.
+
+**T5 is declared `J1` while its four siblings are `J2`, and the reasoning is recorded so it cannot read
+as a dodge.** The others are J2 because each needs an owner *ruling*: T3's exception policy, T4's item-3
+reading, and T1/T2's originating debt decisions. T5's ruling has already been given — the design is
+settled, and what remains is execution inside that envelope, which is J1's definition. **Declaring it J2
+would be circular**: the task fixing the check would itself be failed by the check it fixes.
+
+**Impact on the frozen Plan:** T5 added (`Layers: scripts/lib/check-authority.sh` ·
+`evals/run-authority-fixtures.sh`; `Depends-on: none`). No other task's scope moves. Cross-stream
+ownership is unaffected — neither file is declared by the `engine` stream. **Task count is now 5**,
+recorded plainly rather than left to be counted.
+

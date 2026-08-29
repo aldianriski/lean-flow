@@ -205,6 +205,80 @@ status: current
     budget with the ceiling raised to match; or make the skipped-harness list its own named FAIL
     distinct from a real check failure, so truncation can never be read as one red check.
 
+- **TD-123** severity: high | status: open | created: Sprint-093
+  - Summary: **`check-authority.sh` applies the unattended park protocol to every run, including
+    attended ones, and never reads the run mode.** Its `J2` branch FAILs any task carrying an execution
+    record (`consequence · Tn · `) without a park record (`Tn · parked`). But **parking is what an
+    unattended run does INSTEAD of asking** — in an attended run with the owner present and gates
+    signed, there is no park step to perform, and no ask channel is missing.
+  - Reproduced live: SPRINT-093 T1 and T2 were executed attended, under signed G1/G2 and an explicit
+    owner direction to run both streams, and the leg reports
+    `authority-j2-not-parked` for both. `scripts/qa-check.sh` consumes this leg, so **the gate is RED
+    and, per ADR-021, the sprint cannot close** — on work the owner authorized.
+  - **This is L-105's family — a guard placed correctly in text and wrongly in time.** The protocol it
+    enforces is `night-run.md` Part 0 § Park protocol, which governs headless runs where
+    `AskUserQuestion` is unregistered and a missing answer must never read as consent. Enforced against
+    an attended run it inverts: it demands the artifact of an absent ask channel from a run that had one.
+  - **The authorization was real but unreachable, which is the honest half of the finding** (L-151): the
+    owner signed the gates and directed the run in the session transcript, and the checker reads only
+    the Execution Log. A per-task `owner-ruling · Tn · <ruling>` line is the shape it can read, and none
+    was written — so the guard was not wrong to notice something was missing, only wrong about what.
+  - Fix by making the leg **mode-aware**: apply the park requirement only where the park protocol
+    applies. Do NOT fix it by removing the check — the `authority-j2-park-bypassed` branch beside it
+    (park + execution + no ruling) is a genuine guard against the silent bypass Part 0 step 6 forbids,
+    was itself added after an independent reviewer caught the first version passing any stale park
+    record (L-165), and must survive untouched. Retain a must-FAIL for the unattended case, plus a
+    sibling control proving an attended execution passes.
+
+- **TD-122** severity: medium | status: open | created: Sprint-092
+  - Summary: **A run that fires but never reaches the reaper leaves a log byte-identical to "no run
+    happened", so nothing can detect it.** `check-night-run-rollup.sh` and `reap()` both read only the
+    Execution Log, and a run fired outside `night-run.sh`, or one that dies before `reap()` appends,
+    writes no marker at all. "The run produced no rollup" and "no run was attempted" are the same file.
+  - Found while closing SPRINT-093 T1's windowing defect: an adversarial probe appended a second
+    `run-complete` block that wrote *nothing*, and the checker PASSed. The windowing fix (`4611f8e`)
+    correctly closes the case where a later block exists and contradicts — it cannot close this one,
+    and the builder reported that rather than folding a half-solution into the same pass.
+  - **This is the SPRINT-059 "4 of 7 silent" shape and it is the last surviving member of the family**
+    TD-112 opened: a rollup that lies is now caught (agreement matrix), a rollup written into the wrong
+    Plan is now caught (`find_sprint()` refuses ambiguity, `--sprint` declares a target), a rollup in a
+    later block is now caught (`win()`). A rollup that was never written is still invisible.
+  - **No amount of smarter parsing closes it** — the evidence does not exist inside the artifact being
+    parsed. It needs a record independent of the log's own content: a ledger `night-run.sh` writes
+    unconditionally at fire time, *before* the wrapped command runs and not gated on `reap()`'s own
+    decision to append, which a companion check cross-references against the log's last entry. That is
+    a new mechanism and a new file, outside SPRINT-093 T1's Layers.
+  - Route it into EPIC-015's remaining § Closed-when work, where the rollup vocabulary
+    (`DELIVERED`/`PARTIAL`/`FAILED`) is already being opened. Retain a must-FAIL fixture: a ledger entry
+    with no corresponding log block must FAIL, and a sibling control where both exist must PASS.
+
+- **TD-121** severity: minor | status: open | created: Sprint-092
+  - Summary: **The fixture factories' input-side guardrail is defeated by an ordinary intermediate
+    `const`, with no cast and no `any`.** TypeScript's excess-property check fires only on a fresh
+    object literal passed directly as an argument, so `const state = { adrDirFiles: {},
+    expectedVerdict: "fail" }; adrFamilyPort(state)` compiles with **0 errors** and leaves the smuggled
+    field readable off the local variable — exactly the vacuous-test shape EPIC-014 H14 exists to
+    prevent ("factory creates state, factory does not decide expected verdict").
+  - Found by the SPRINT-092 T1 independent reviewer, which verified it live across three variants
+    (intermediate `const`, an `adrHistoryPort` analog, and an object spread) — all compiled clean.
+  - **Not currently exploited, and the primary mechanism is unaffected.** Every real call site in the
+    T1 migration passes inline literals (grep-confirmed), and the *return-side* sealing holds
+    independently: the factories return the port **interface** — query methods only, no data
+    properties — so a caller cannot read a smuggled field without a visible cast. That half has no
+    such limit. The headers of `test/fixtures/adr-family-factory.ts` and `git-repo-factory.ts` were
+    corrected in `ab75b2c` to name this bypass accurately; they previously implied unsafe syntax was
+    required, which would have let a future reader rely on a stronger guarantee than exists.
+  - **Why it is filed rather than fixed:** closing it means changing the factory's parameter shape, and
+    TypeScript has no exact-object types. The builder's proposal, which is sound: a factory taking a
+    **builder callback** (`adrFamilyPort(build => { build.adrDirFiles({...}) })`) has no object-literal
+    argument for the check to apply to and nothing to alias into a `const` — a smuggled field would
+    need its own method on the builder, which is a visible, reviewable addition to the factory's
+    surface rather than a silent one.
+  - Route it when §4 fixtures are next opened — most naturally alongside SPRINT-092 T2's harness
+    conversion, which is already rewriting how those cases are constructed. Retain a must-FAIL proving
+    the `const` path is rejected, plus a sibling control proving legitimate state-only construction
+    still compiles.
+
 - **TD-120** severity: medium | status: open | created: Sprint-091
   - Summary: **S4.APPEND spawns ~2 uncached git processes per ADR, so wiring §4 into the CLI (T12) cost
     a flagless full run ~6.3s on this repo's 38 ADRs — a ~10x wall-clock increase.** Measured by the
