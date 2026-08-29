@@ -199,3 +199,45 @@ would be circular**: the task fixing the check would itself be failed by the che
 ownership is unaffected — neither file is declared by the `engine` stream. **Task count is now 5**,
 recorded plainly rather than left to be counted.
 
+---
+
+### 2026-08-29 | progress | T4 complete — the contradiction is dissolved, not decided
+
+consequence · T4 · behaviour:none · governance:high — review: Tier P read-through (ADR-029: prose takes G1 + a read-through, not the seeded-break bar)
+
+**Owner ruled STRICT: a declared `J2` task FAILS pre-flight item 3.** A Plan carrying one is not
+launchable unattended; the J2 work is split out before the rest fires. Recorded in `night-run.md`
+**item 3 itself** — the line a launcher reads while running the pre-flight pass — not a footnote and
+not a separate section (L-151, which this sprint has now paid for three times).
+
+**The reconciliation is the part worth keeping, because it did not simply pick a side.** `AFK-safe`
+and `J2` were defined as opposites in the same document while the `J2` row's *"parks — continues
+disjoint AFK work"* clause read as permission for a declared J2 to ride along in an unattended Plan.
+T4's framing: **the two are the same rule read at two different moments.** Parking describes what a run
+does with a J2-shaped step it *meets* mid-run and could not have declared at G2 — a revise-loop judgment
+finding, a `promote`/`close`/`triage` approval, a mid-sprint scope-change. A **declared** J2 is
+different: its class is fixed before the run starts, so item 3 excludes it *there* rather than leaving
+it to be parked at runtime. **Both definitions survive untouched; only the implication that one permits
+the other is removed.**
+
+**SPRINT-090's D4 was not inherited, per this sprint's D3, and re-derivation was the right call.** D4
+ruled the permissive reading and its justification was later corrected in two of three parts — only one
+of three cited mechanisms is genuinely unreachable under the strict reading, and the AFK-safe/J2
+opposition cuts the other way and was never weighed. A ruling whose reasoning was shown wrong in two
+thirds is not precedent.
+
+**Internal consistency was checked as a list, not a spot-check.** Every site discussing `AFK-safe`,
+`J2` or item 3 was enumerated with its verdict, *including the ones left unchanged and why* — the
+authority-class table, the envelope-widening rule, the declared-never-inferred paragraph, the
+HITL/AFK implication, the revise-loop retry rows, the park protocol, and the `AUTHORITY_BOUNDARY`
+terminal-state row. That last one is the interesting catch: it says remaining work may be "all J2 or
+blocked behind a park", which reads like a contradiction until you notice it describes remaining
+*process* steps rather than declared Plan-task classes. Checked and left, with the reasoning recorded
+rather than the line silently edited to match.
+
+`.claude/CONTEXT.md` was deliberately **not** edited: its J-class vocabulary never claimed a Plan may
+launch holding a declared J2, so the ruling settles how `night-run.md`'s item 3 treats one without
+moving the vocabulary. **TD-109 marked `resolved → TASK-306`** with the supersession of D4 and the
+EPIC-015 consequence recorded in the row: a proof of `AUTHORITY_BOUNDARY`/park behaviour can no longer
+come from a Plan that *declares* its J2 task — it needs a J2 shape surfaced dynamically.
+

@@ -564,7 +564,7 @@ status: current
     separate pre-flight script — the line reference above would then name a stale location, and the
     invisibility half of this row would already be fixed.
 
-- **TD-109** severity: **high** | status: open | created: Sprint-089
+- **TD-109** severity: **high** | status: resolved → TASK-306 | created: Sprint-089
   - Summary: **Part 1 pre-flight item 3 forbids the very Plan shape the autonomy machinery is built
     for.** It reads *"every task in the run is AFK-class — none needs a human mid-execution"*, while
     `CONTEXT.md` states `J2 ⇒ HITL always`. A Plan carrying a declared `J2` task therefore fails
@@ -606,6 +606,20 @@ status: current
     checker built from the strict wording would convert it into a hard block, and this row would then
     describe a different, worse failure.
 
+  - **RESOLVED at SPRINT-093 T4 — ruled STRICT: a declared `J2` task FAILS pre-flight item 3.**
+    A Plan carrying one is not launchable unattended; the J2 work is split out before the rest
+    fires. Recorded in `night-run.md` item 3 itself, where the launcher reads it (L-151).
+  - **SPRINT-090 D4 is superseded, not inherited.** It ruled the permissive reading, and its
+    justification was later corrected in two of three parts — only one of three cited mechanisms
+    is genuinely unreachable under the strict reading, and the `AFK-safe`/`J2` opposition cuts
+    the other way and was never weighed. T4 re-derived from the documents rather than citing it.
+  - The contradiction is dissolved rather than decided: the `J2` row's "parks" behaviour describes
+    a J2-shaped step the run **meets** mid-run and could not have declared at G2 (a revise-loop
+    judgment finding, a promote/close/triage approval, a scope-change) — never a licence to launch
+    while already holding a **declared** one. Both definitions survive; only the implication that
+    one permits the other is removed.
+  - Consequence for EPIC-015: a proof of `AUTHORITY_BOUNDARY`/park behaviour can no longer come
+    from a Plan that itself declares the J2 task. It needs a J2 shape surfaced **dynamically**.
 - **TD-108** severity: minor | status: open | created: Sprint-088
   - Summary: **`night-run.sh`'s mode-signal pre-flight is an unanchored substring scan over the whole
     command line, so a NEGATED mention satisfies it.** A prompt containing *"please do NOT run this

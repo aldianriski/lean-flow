@@ -109,9 +109,9 @@ precedent** — re-derive before relying on it.
 **Acceptance:** item 3 says what the machinery does, and the two definitions no longer contradict.
 
 **DoD:**
-- [ ] Item 3 says what the machinery actually does — either a declared `J2` that parks satisfies it, or it does not and `TASK-301`'s Plan shape is invalid — *judgment tick: a ruling between two defensible readings*
-- [ ] The ruling is recorded **where the checklist is read** — *Verify: not in a transcript or a commit message (L-151)*
-- [ ] `AFK-safe` and `J2` are reconciled — *Verify: the two are no longer defined as opposites while one is said to permit the other; whichever way the ruling goes, both definitions state it consistently*
+- [x] Item 3 says what the machinery actually does — either a declared `J2` that parks satisfies it, or it does not and `TASK-301`'s Plan shape is invalid — *judgment tick: a ruling between two defensible readings*
+- [x] The ruling is recorded **where the checklist is read** — *Verify: not in a transcript or a commit message (L-151)*
+- [x] `AFK-safe` and `J2` are reconciled — *Verify: the two are no longer defined as opposites while one is said to permit the other; whichever way the ruling goes, both definitions state it consistently*
 
 ### T5 — Make the authority leg mode-aware, so it stops failing attended runs `[size: S · risk: med · class: execution · HITL · J1]`
 Layers: `scripts/lib/check-authority.sh` · `evals/run-authority-fixtures.sh` · `evals/fixtures/authority/`
