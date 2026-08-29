@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -443,12 +443,17 @@ describe("leanflow full run — DoD 1: every rule the parser admits is traversed
     return { lines, write: (s: string) => lines.push(s) };
   };
 
+  // SPRINT-091 T12: `composedDispatch` against `repoDir: "."` now also dispatches S4.APPEND, which
+  // spawns one `git log` per canonical ADR in THIS repo's own `docs/adr/` (38 at time of writing) --
+  // real work `bun:test`'s 5000ms default no longer covers, exactly the same real cost
+  // `FULL_ORACLE_TIMEOUT_MS` already budgets for elsewhere in this file's own `repoDir: "."` tests
+  // below and in the T9 `--section 12` block above.
   test("prints exactly 100 verdict/note/gap lines -- ADR-034's own frozen denominator, never fewer", () => {
     const { lines, write } = capture();
     run({ kind: "full", repoDir: "." }, write);
     const verdictLines = lines.filter((l) => /^(PASS |FAIL |gap  |note )/.test(l));
     expect(verdictLines).toHaveLength(100);
-  });
+  }, FULL_ORACLE_TIMEOUT_MS);
 
   // The row SET itself is already proven byte-for-byte against read-spec-rules.sh in
   // spec-reader.test.ts's "allRules -- full-document parity" block (100/100, in document order) --
@@ -502,13 +507,13 @@ describe("leanflow full run — DoD 1: every rule the parser admits is traversed
     expect(line).toBeDefined();
     expect(line).toContain("gap");
     expect(line).toContain("rule-unimplemented");
-  });
+  }, FULL_ORACLE_TIMEOUT_MS); // T12: see the timeout note on this describe block's first test
 
   test("an excluded rule (judgment-only) is reported by name, never dispatched, never PASS/FAIL/gap", () => {
     const { lines, write } = capture();
     run({ kind: "full", repoDir: "." }, write);
     expect(lines.join("\n")).toContain("note  S9.JUDGMENTTICK -- excluded/judgment-required");
-  });
+  }, FULL_ORACLE_TIMEOUT_MS); // T12: see the timeout note on this describe block's first test
 
   // SPRINT-091 T11 supersedes this block's earlier claim: T3/T4 deliberately left the full run
   // level-less (T4 owned only the arithmetic, in `level.ts`, uncalled); T11 is the task that wires
@@ -521,7 +526,7 @@ describe("leanflow full run — DoD 1: every rule the parser admits is traversed
     const levelLines = lines.filter((l) => l.trimStart().startsWith("level:"));
     expect(levelLines).toHaveLength(1);
     expect(levelLines[0]).toBe(lines[lines.length - 1]); // the CLOSING line, matching Shell's own shape
-  });
+  }, FULL_ORACLE_TIMEOUT_MS); // T12: see the timeout note on this describe block's first test
 });
 
 // --- Round 11's fix, proven directly: a registered evaluator is REACHABLE through the CLI's flagless
@@ -834,6 +839,159 @@ describe("leanflow --section 12 — CLI-reachable F12 dispatch, live Shell parit
 
     const shell = runShellEngine(repo);
     expect(verdictWord(verdictLineFor(shell.stdout, "S12.GENERATED"))).toBe("FAIL");
+  }, FULL_ORACLE_TIMEOUT_MS);
+});
+
+// --- SPRINT-091 T12: the F4/S4.APPEND registries T6/T7 built now dispatch through composedDispatch --
+//
+// T6 built `createF4Registry()` (§4's four Structural mechanical rules) and T7 built
+// `createS4AppendRegistry()` (§4's one Gated mechanical rule, S4.APPEND) plus both real adapters
+// (`FsAdrFamilyPort`, `createFsAdrAppendPort`) -- but neither task's Layers included
+// `apps/cli/src/main.ts` (both module headers say so explicitly), so `composedDispatch` never bound
+// either registry. Before this task, `bun apps/cli/src/main.ts --section 4 .` answered
+// `rule-unimplemented` for all five mechanical §4 rules, and because `level.ts`'s `computeLevel`
+// treats a `gap` verdict as engine coverage -- never a repository finding -- and `continue`s past it
+// untouched, a repository carrying a REAL §4 violation was laundered straight through to the top
+// conformance level rather than counted as a Structural FAIL. This block proves that gap is closed,
+// reusing the SAME `evals/fixtures/adr-family/*` retained fixtures (TD-012) and the SAME
+// `runShellEngine`/`verdictLineFor`/`verdictWord`/`freshGitRepo`/`track` helpers this file's own
+// `--section 12` block above established, rather than a second set of conventions.
+
+const ADR_FIXTURES_ROOT = fileURLToPath(new URL("../../../evals/fixtures/adr-family", import.meta.url));
+
+/** Copies a RETAINED §4 fixture into a fresh git repo and commits it once -- both S4.APPEND (needs a
+ *  "deciding commit" to read history against, per `s4-append.ts`) and the live Shell oracle (which
+ *  reports "not a git repository" for S4.APPEND otherwise) need real history, not just files on disk.
+ *  Mirrors `s4-append-oracle.test.ts`'s own `gitRepoFromClean`, generalised to any fixture name. */
+function gitRepoFromAdrFixture(fixtureName: string, prefix: string): string {
+  const dest = mkdtempSync(join(tmpdir(), prefix));
+  cpSync(join(ADR_FIXTURES_ROOT, fixtureName), dest, { recursive: true });
+  execFileSync("git", ["-C", dest, "init", "-q"]);
+  execFileSync("git", ["-C", dest, "config", "user.email", "t12@example.invalid"]);
+  execFileSync("git", ["-C", dest, "config", "user.name", "T12 fixture"]);
+  execFileSync("git", ["-C", dest, "add", "-A"]);
+  execFileSync("git", ["-C", dest, "commit", "-q", "-m", "fixture commit"]);
+  return dest;
+}
+
+/** Anchored on the LINE, never a substring (L-108, reused from the level-comparison block above):
+ *  both engines' per-rule lines can contain the substring "level:" mid-sentence. */
+function levelValueOfLines(lines: readonly string[]): string {
+  const line = lines.find((l) => l.trimStart().startsWith("level:"));
+  if (line === undefined) throw new Error(`no 'level:' line found in:\n${lines.join("\n")}`);
+  const match = /^level:\s*(\S+)/.exec(line.trimStart());
+  if (match?.[1] === undefined) throw new Error(`could not parse a level VALUE out of: ${line}`);
+  return match[1];
+}
+
+describe("leanflow --section 4 — CLI-reachable F4/S4.APPEND dispatch (SPRINT-091 T12)", () => {
+  const capture = () => {
+    const lines: string[] = [];
+    return { lines, write: (s: string) => lines.push(s) };
+  };
+
+  // DoD 1, split into two tests DELIBERATELY (not one five-rule loop): a seed that drops ONLY the F4
+  // `bindRegistry(...)` call must redden this test while leaving the sibling below green -- the
+  // discrimination proof DoD 3 requires. A single combined loop could not show that split.
+  test("F4's four structural rules dispatch for REAL through --section 4 on the clean fixture -- zero rule-unimplemented, matching Shell PASS", () => {
+    const repo = gitRepoFromAdrFixture("clean", "cli-section4-f4-clean-");
+    const { lines, write } = capture();
+    run({ kind: "section", section: "4", repoDir: repo }, write);
+    const shell = runShellEngine(repo);
+
+    for (const ruleId of ["S4.ONEFILE", "S4.INDEX", "S4.SECTIONS", "S4.NEGATIVE"]) {
+      const tsLine = lines.find((l) => l.trim().split(/\s+/)[1] === ruleId);
+      expect(tsLine).toBeDefined();
+      expect(tsLine).not.toContain("rule-unimplemented");
+      expect(verdictWord(tsLine)).toBe("PASS");
+      expect(verdictWord(verdictLineFor(shell.stdout, ruleId))).toBe("PASS");
+    }
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  // SIBLING CONTROL (DoD 3): S4.APPEND dispatches through its OWN registry
+  // (`createS4AppendRegistry`/`createFsAdrAppendPort`, a SEPARATE `bindRegistry(...)` call from F4's
+  // in `composedDispatch`) -- kept as its own test so a seed touching only F4's bind leaves this green.
+  test("SIBLING CONTROL: S4.APPEND dispatches for REAL through its own registry, matching Shell PASS -- independent of F4's bind", () => {
+    const repo = gitRepoFromAdrFixture("clean", "cli-section4-append-clean-");
+    const { lines, write } = capture();
+    run({ kind: "section", section: "4", repoDir: repo }, write);
+    const shell = runShellEngine(repo);
+
+    const tsLine = lines.find((l) => l.trim().split(/\s+/)[1] === "S4.APPEND");
+    expect(tsLine).toBeDefined();
+    expect(tsLine).not.toContain("rule-unimplemented");
+    expect(verdictWord(tsLine)).toBe("PASS");
+    expect(verdictWord(verdictLineFor(shell.stdout, "S4.APPEND"))).toBe("PASS");
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  // CONTROL: the two judgment-only rows are untouched by this task -- wiring that also changed how
+  // S4.BAR/S4.NOINVENT render would be doing something beyond what T12 was asked to do.
+  test("CONTROL: the two judgment-only §4 rows (S4.BAR, S4.NOINVENT) still report excluded, unchanged by this task", () => {
+    const { lines, write } = capture();
+    run({ kind: "section", section: "4", repoDir: "." }, write);
+    const text = lines.join("\n");
+    expect(text).toContain("note  S4.BAR -- excluded/judgment-required");
+    expect(text).toContain("note  S4.NOINVENT -- excluded/judgment-required");
+    // Against THIS repo's own real ADR tree (38 ADRs at time of writing): S4.APPEND alone spawns a git
+    // log per ADR, well past bun:test's 5000ms default -- the same real-repo cost every other `repoDir:
+    // "."` §4 dispatch below budgets for.
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  // --- DoD 2: the laundering case, closed on the MOTIVATING artifact (L-166) -------------------------
+  //
+  // `evals/fixtures/adr-family/index-missing-row` is the RETAINED fixture (T6) that exposed the exact
+  // defect this task fixes: before `composedDispatch` bound F4, S4.INDEX dispatched to nowhere on this
+  // repo (`gap`, "rule-unimplemented"), and `level.ts`'s own `continue` past `gap` laundered a REAL
+  // violation through to the top conformance level -- verified live before this fix landed: the
+  // flagless run against this exact fixture (git-initted, one commit) printed `level: Attested` while
+  // the live Shell oracle already printed `level: none`. Both tests below assert the POST-fix state.
+  test("DoD 2: TS now FAILs S4.INDEX on the motivating fixture, matching Shell (was gap/rule-unimplemented before this task)", () => {
+    const repo = gitRepoFromAdrFixture("index-missing-row", "cli-section4-idxmissing-");
+    const { lines, write } = capture();
+    run({ kind: "section", section: "4", repoDir: repo }, write);
+
+    const tsLine = lines.find((l) => l.trim().split(/\s+/)[1] === "S4.INDEX");
+    expect(tsLine).not.toContain("rule-unimplemented");
+    expect(verdictWord(tsLine)).toBe("FAIL");
+
+    const shell = runShellEngine(repo);
+    expect(verdictWord(verdictLineFor(shell.stdout, "S4.INDEX"))).toBe("FAIL");
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  test("DoD 2: the flagless run's printed 'level:' VALUE now agrees with Shell's on the motivating fixture (both: level: none)", () => {
+    const repo = gitRepoFromAdrFixture("index-missing-row", "cli-full-idxmissing-level-");
+    const { lines, write } = capture();
+    run({ kind: "full", repoDir: repo }, write);
+    const tsLevel = levelValueOfLines(lines);
+
+    const shell = runShellEngine(repo);
+    const shellLevel = levelValueOfLines(shell.stdout.split("\n"));
+
+    expect(tsLevel).toBe(shellLevel);
+    expect(tsLevel).toBe("none");
+  }, FULL_ORACLE_TIMEOUT_MS);
+
+  // Sibling control for the level test above, scoped HONESTLY (per this task's own instruction not to
+  // force a passing assertion by weakening it silently): the `clean` fixture is §4-only, not a
+  // full-spec-clean repository -- Shell's own live flagless run against it independently reports
+  // `level: none` too, from TWO Structural failures in OTHER, still-unmigrated families entirely
+  // outside §4 and this task's Layers (verified live: `sh scripts/lib/conformance-engine.sh
+  // <this-fixture>` prints "2 finding(s) at Structural prevent it" with no §4 line among them). A
+  // whole-run 'level:' PARITY assertion on this fixture would therefore not be a true statement about
+  // what T12 changed -- it would pass by accident, on unrelated gaps, not by anything this task did.
+  // What IS true, and is the actual claim this control carries: §4's own five mechanical rules
+  // contribute NO Structural FAIL on either engine's flagless run against this fixture -- proving T12's
+  // fix did not turn a legitimately-§4-clean repo into a false §4 failure.
+  test("CONTROL: the clean fixture's flagless run carries no §4 FAIL line on either engine (T12 introduces no false §4 failure)", () => {
+    const repo = gitRepoFromAdrFixture("clean", "cli-full-clean-noS4fail-");
+    const { lines, write } = capture();
+    run({ kind: "full", repoDir: repo }, write);
+    const tsS4FailLines = lines.filter((l) => /^FAIL\s+S4\.\S/.test(l));
+    expect(tsS4FailLines).toEqual([]);
+
+    const shell = runShellEngine(repo);
+    const shellS4FailLines = shell.stdout.split("\n").filter((l) => l.startsWith("FAIL") && / \(S4\.\S+\)\s*$/.test(l));
+    expect(shellS4FailLines).toEqual([]);
   }, FULL_ORACLE_TIMEOUT_MS);
 });
 
