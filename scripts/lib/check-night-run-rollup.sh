@@ -35,6 +35,15 @@
 # Archived logs are skipped by path (docs/sprint/archive/) -- closed history is not re-litigated.
 # Prints one PASS/FAIL/note line per file; exits 1 if any FAIL line was printed.
 # Dependency-free POSIX sh -- no jq, no bashisms.
+#
+# Windowed to the LAST `run-complete` entry (SPRINT-093 T1 revise 3). Execution Logs are
+# append-only, so a sprint that survives more than one night accumulates more than one
+# `run-complete` block -- every check below reads only the most recent one, the same discipline
+# night-run.sh's reap() already applies to its own append window (`tail -n "+$((rp_base + 1))"`,
+# commented there: "a guard reading the wrong window fails exactly like one that is absent"). A
+# checker reading the whole file would validate an EARLIER block's terminal state against an
+# EARLIER block's evidence, or against nothing at all -- silently passing a contradiction two
+# blocks later. See `win()` below.
 set -u
 
 fail=0
@@ -58,14 +67,39 @@ for lg in "$@"; do
     continue
   fi
 
+  # --- windowing (SPRINT-093 T1 revise 3) --------------------------------------------------------
+  # Everything below must read only the LAST run-complete entry, never the whole file. Execution
+  # Logs are append-only (STANDARD §9 / ADR-014), so a sprint that survives more than one night
+  # accumulates more than one `run-complete` block -- SPRINT-082's committed log already has two.
+  # Every grep below used to scan `"$lg"` directly, which means a CONTRADICTION in the second block
+  # (a real SPRINT-089 shape) would be checked against the FIRST block's terminal state and the
+  # FIRST block's evidence lines -- or pass outright if the first block happens to be clean. This
+  # copies the pattern night-run.sh's reap() already uses and names why in its own comment: "a guard
+  # reading the wrong window fails exactly like one that is absent." The window is derived the same
+  # way, just anchored by the file's own last header instead of an externally-passed rp_base.
+  rc_start=$(grep -nE '^### .*\| *run-complete *\|' "$lg" 2>/dev/null | tail -n1 | cut -d: -f1)
+  # The window ends at EOF, or at the next `### ` entry header if a later (non-run-complete) entry
+  # was appended afterward -- e.g. a reviewer's follow-up note. Without this upper bound, that later
+  # entry's prose could itself be misread as evidence (the exact worked-example contamination
+  # reap()'s own comment warns about: a documentation line starting `T5 · unattempted · ...` read as
+  # real output).
+  rc_end=$(awk -v s="$rc_start" 'NR>s && /^### /{print NR; exit}' "$lg" 2>/dev/null)
+  win() {
+    if [ -n "$rc_end" ]; then
+      sed -n "${rc_start},$((rc_end - 1))p" "$lg" 2>/dev/null
+    else
+      sed -n "${rc_start},\$p" "$lg" 2>/dev/null
+    fi
+  }
+
   hdr=0; cal=0; term=0
-  grep -qE '^run · [0-9]+ of [0-9]+ DoD ticked' "$lg" 2>/dev/null && hdr=1
-  grep -qE '^run · .* · .* · .* · [0-9]+ of [0-9]+ units · ' "$lg" 2>/dev/null && cal=1
+  win | grep -qE '^run · [0-9]+ of [0-9]+ DoD ticked' && hdr=1
+  win | grep -qE '^run · .* · .* · .* · [0-9]+ of [0-9]+ units · ' && cal=1
   # Anchored at column 1 and restricted to the five states the contract defines (Part 0b). An
   # unrecognised state must NOT satisfy this: `terminal · FINISHED · ...` parses as a terminal line
   # and means nothing, which is the malformed-record failure -- a record nobody can act on looks like
   # evidence and is worse than none (the gates-signed family's own ruling).
-  grep -qE '^terminal · (PLAN_EXHAUSTED|AUTHORITY_BOUNDARY|HARD_FAILURE|BUDGET_STOP|USER_STOP) · ' "$lg" 2>/dev/null && term=1
+  win | grep -qE '^terminal · (PLAN_EXHAUSTED|AUTHORITY_BOUNDARY|HARD_FAILURE|BUDGET_STOP|USER_STOP) · ' && term=1
 
   if [ "$hdr" -eq 0 ]; then
     bad "night-run rollup: $lg records a completed run but carries no 'run · N of M DoD ticked' header -- a run that finished part of the Plan is indistinguishable from one that finished all of it (Part 4)"
@@ -135,18 +169,18 @@ for lg in "$@"; do
   # here rather than guessing at a rule neither the doc nor the code states.
   agree_bad=0
   if [ "$term" -eq 1 ]; then
-    term_state=$(grep -oE '^terminal · (PLAN_EXHAUSTED|AUTHORITY_BOUNDARY|HARD_FAILURE|BUDGET_STOP|USER_STOP) ·' "$lg" 2>/dev/null \
+    term_state=$(win | grep -oE '^terminal · (PLAN_EXHAUSTED|AUTHORITY_BOUNDARY|HARD_FAILURE|BUDGET_STOP|USER_STOP) ·' \
       | head -n1 | sed -E 's/^terminal · ([A-Z_]+) ·.*/\1/')
     case "$term_state" in
       PLAN_EXHAUSTED)
-        bad_line=$(grep -E '^T[0-9]+ · (blocked|parked-hitl|stalled|denied-tool|unattempted) · ' "$lg" 2>/dev/null | head -n1)
+        bad_line=$(win | grep -E '^T[0-9]+ · (blocked|parked-hitl|stalled|denied-tool|unattempted) · ' | head -n1)
         if [ -n "$bad_line" ]; then
           agree_bad=1
           bad "night-run rollup: $lg claims terminal · PLAN_EXHAUSTED but carries a non-done per-task line -- '$bad_line' -- Part 0b: PLAN_EXHAUSTED means every task reached a done state, nothing weaker; this is the SPRINT-089 shape exactly"
         fi
         ;;
       AUTHORITY_BOUNDARY)
-        bad_line=$(grep -E '^T[0-9]+ · (stalled|denied-tool|unattempted) · ' "$lg" 2>/dev/null | head -n1)
+        bad_line=$(win | grep -E '^T[0-9]+ · (stalled|denied-tool|unattempted) · ' | head -n1)
         if [ -n "$bad_line" ]; then
           agree_bad=1
           bad "night-run rollup: $lg claims terminal · AUTHORITY_BOUNDARY but carries a per-task line Part 0b maps elsewhere (stalled/denied-tool -> HARD_FAILURE, unattempted -> BUDGET_STOP) -- '$bad_line'"
@@ -158,7 +192,7 @@ for lg in "$@"; do
         # same contradiction-by-omission DoD 1 names, just on the other side of the rule: the
         # `why` text ("work remains, all of it J2 or blocked behind a park") asserts evidence the
         # per-task lines do not carry.
-        if ! grep -qE '^T[0-9]+ · (parked-hitl|blocked) · ' "$lg" 2>/dev/null; then
+        if ! win | grep -qE '^T[0-9]+ · (parked-hitl|blocked) · '; then
           agree_bad=1
           bad "night-run rollup: $lg claims terminal · AUTHORITY_BOUNDARY but carries no 'Tn · parked-hitl ·' or 'Tn · blocked ·' line -- reap() only reaches AUTHORITY_BOUNDARY when at least one task parked or was blocked (night-run.sh:212); missing that evidence, the terminal claim has nothing behind it"
         fi
@@ -169,7 +203,7 @@ for lg in "$@"; do
         # task also parked. A run that parks a J2 task, continues disjoint AFK work per Part 0,
         # then exhausts its budget on a later task legitimately reports BUDGET_STOP beside BOTH a
         # parked-hitl line and an unattempted line -- see the priority table above.
-        bad_line=$(grep -E '^T[0-9]+ · (stalled|denied-tool) · ' "$lg" 2>/dev/null | head -n1)
+        bad_line=$(win | grep -E '^T[0-9]+ · (stalled|denied-tool) · ' | head -n1)
         if [ -n "$bad_line" ]; then
           agree_bad=1
           bad "night-run rollup: $lg claims terminal · BUDGET_STOP but carries a per-task line reap()'s priority order ranks above it (stalled/denied-tool -> HARD_FAILURE outranks BUDGET_STOP) -- '$bad_line'"
@@ -179,7 +213,7 @@ for lg in "$@"; do
         # positive check above -- a BUDGET_STOP with zero `Tn · unattempted ·` lines is contradicted
         # by omission, not merely unproven: its own `why` text ("N task(s) never reached") names
         # evidence the per-task lines do not carry.
-        if ! grep -qE '^T[0-9]+ · unattempted · ' "$lg" 2>/dev/null; then
+        if ! win | grep -qE '^T[0-9]+ · unattempted · '; then
           agree_bad=1
           bad "night-run rollup: $lg claims terminal · BUDGET_STOP but carries no 'Tn · unattempted ·' line -- reap() only reaches BUDGET_STOP when at least one task was never reached (night-run.sh:210); missing that evidence, the terminal claim has nothing behind it"
         fi
