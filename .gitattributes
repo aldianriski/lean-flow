@@ -1,2 +1,10 @@
 # Shell scripts must stay LF on every platform, or the shebang breaks under sh (CRLF -> `\r`).
 *.sh text eol=lf
+
+# SPRINT-093 T2 revise: scripts/gen-index.sh always emits pure LF, but with core.autocrlf=true
+# and no override, git smudges this file to CRLF on every fresh checkout/clone/`git checkout
+# --`/stash-pop -- so `gen-index.sh --check`'s comparison against the working file mismatched on
+# line endings alone, even with zero real content change (TD-111 follow-up, reproduced live: 35
+# CR bytes on a pristine checkout). Scoped to this one generated file rather than a repo-wide
+# *.md rule -- a blanket .md normalization would rewrite many unrelated files (owner ruling).
+docs/knowledge-index.md text eol=lf
