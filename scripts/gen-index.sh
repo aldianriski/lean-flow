@@ -1,7 +1,10 @@
 #!/usr/bin/env sh
 # gen-index.sh -- regenerate the by-tag / by-domain knowledge index in docs/knowledge-index.md
 # from write-time frontmatter (ADR-009 SSOT): LEARNINGS `## L-NNN [tags:]` headings + per-file
-# frontmatter on docs/adr/*.md and docs/research/*.md. Idempotent; rewrites only between the
+# frontmatter on docs/adr/*.md and docs/research/*.md. Idempotent over the WHOLE file: a run that
+# finds no content change leaves the file byte-identical, `last_updated` included (SPRINT-093 T2 /
+# TD-111 -- last_updated used to be wall-clock-stamped every run, which alone went stale at
+# midnight). Only a genuine content change advances `last_updated` and rewrites between the
 # <!-- INDEX:START --> / <!-- INDEX:END --> markers. The vocab (TAGS/DOMAINS) is the single origin
 # that qa-check.sh sources for its completeness lint. See ADR-009.
 #
@@ -113,18 +116,53 @@ gen() {
 # instead, so a failed/interrupted generation cannot publish a partial result.
 # (The `entries` scratch file above stays on system tmp — it's never moved into place,
 # only read and then deleted, so it isn't exposed to this failure mode.)
-tmp=$(mktemp "$(dirname "$OUT")/.knowledge-index.XXXXXX")
-trap 'rm -f "$tmp"' EXIT  # best-effort cleanup if we exit/die before the mv below
-today=$(date +%F)
-sed -n '1,/<!-- INDEX:START/p' "$OUT" \
-  | awk -v d="$today" '{ if ($0 ~ /^last_updated:/) print "last_updated: " d; else print }' >> "$tmp"
-gen >> "$tmp"
-sed -n '/<!-- INDEX:END/,$p' "$OUT" >> "$tmp"
+idxdir=$(dirname "$OUT")
+tmp=$(mktemp "$idxdir/.knowledge-index.XXXXXX")
+hdr=$(mktemp "$idxdir/.knowledge-index-hdr.XXXXXX")
+hdr_dated=$(mktemp "$idxdir/.knowledge-index-hdrd.XXXXXX")
+bdy=$(mktemp "$idxdir/.knowledge-index-bdy.XXXXXX")
+tail_f=$(mktemp "$idxdir/.knowledge-index-tail.XXXXXX")
+trap 'rm -f "$tmp" "$hdr" "$hdr_dated" "$bdy" "$tail_f"' EXIT  # best-effort cleanup if we exit/die early
+
+# TD-111 / SPRINT-093 T2: last_updated used to be re-stamped to today() on every run, so on an
+# UNCHANGED tree, crossing midnight alone made this run's output differ from the file already on
+# disk -- and --check (a plain `cmp`) reported STALE. Combined with TD-110 (night-run.sh dies on
+# any non-zero gate exit, no bypass) that is a refused overnight launch on a correct tree.
+# Reproduced live: after rollover the sole diff was `last_updated: <D>` -> `<D+1>`.
+# Fix: build the candidate FIRST with the OLD last_updated line copied byte-for-byte from $OUT
+# (the header above INDEX:START and the tail below INDEX:END are already verbatim copies of
+# $OUT -- only gen()'s body, written between the markers, can differ) and diff THAT candidate
+# against $OUT. Only when a genuine content change surfaces does last_updated get re-stamped --
+# the passage of time alone never triggers it.
+sed -n '1,/<!-- INDEX:START/p' "$OUT" > "$hdr"
+sed -n '/<!-- INDEX:END/,$p' "$OUT" > "$tail_f"
+gen > "$bdy"
 rm -f "$entries"
 
+cat "$hdr" "$bdy" "$tail_f" > "$tmp"
+
+if cmp -s "$tmp" "$OUT"; then
+  # Body matches $OUT under the file's EXISTING last_updated -- nothing changed. Leaving the
+  # date untouched here (rather than re-stamping unconditionally) is the fix itself: it is what
+  # makes an unchanged tree produce a byte-identical file across a midnight boundary.
+  if [ "${1:-}" = "--check" ]; then
+    echo "PASS  gen-index: knowledge index current"
+    rm -f "$tmp" "$hdr" "$hdr_dated" "$bdy" "$tail_f"; exit 0
+  fi
+  rm -f "$tmp" "$hdr" "$hdr_dated" "$bdy" "$tail_f"
+  echo "gen-index: docs/knowledge-index.md already current (no content change)"
+  exit 0
+fi
+
+# Real content changed (a new/edited L-NNN heading, or an ADR/research frontmatter tag/domain) --
+# THIS is what earns a new last_updated stamp, not the calendar.
+today=$(date +%F)
+awk -v d="$today" '{ if ($0 ~ /^last_updated:/) print "last_updated: " d; else print }' "$hdr" > "$hdr_dated"
+cat "$hdr_dated" "$bdy" "$tail_f" > "$tmp"
+
 if [ "${1:-}" = "--check" ]; then
-  if cmp -s "$tmp" "$OUT"; then echo "PASS  gen-index: knowledge index current"; rm -f "$tmp"; exit 0
-  else echo "FAIL  gen-index: knowledge index STALE — run: sh scripts/gen-index.sh" >&2; rm -f "$tmp"; exit 1; fi
+  echo "FAIL  gen-index: knowledge index STALE — run: sh scripts/gen-index.sh" >&2
+  rm -f "$tmp" "$hdr" "$hdr_dated" "$bdy" "$tail_f"; exit 1
 fi
 # NOTE on atomicity: same-directory `mv` is a real rename(2) on POSIX filesystems, which
 # is atomic there. This repo runs on Windows/NTFS via Git Bash — `mv` onto an existing
@@ -134,4 +172,5 @@ fi
 # same-directory tmp *does* guarantee on this platform is that the move is same-volume
 # (no cross-device copy+delete), which is what prevented the TD-021 truncation.
 mv "$tmp" "$OUT"
+rm -f "$hdr" "$hdr_dated" "$bdy" "$tail_f"
 echo "gen-index: regenerated docs/knowledge-index.md"
