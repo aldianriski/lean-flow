@@ -971,3 +971,110 @@ than quietly re-scoped, because the premise was itself a query result nobody re-
 saying "no negatives identified" passes. The engines **agree**, so it is not a parity defect and did not
 block T6 — it is L-108's shape living inside a rule rather than inside a query, and changing it is a §4
 semantics ruling under ADR-034, not a migration task.
+
+---
+
+### 2026-08-29 | progress | T6, T7 and T11 reviewed at last — all 10 DoD confirmed, and the review found the seam nobody owned
+
+consequence · T6 · behaviour:material · governance:high — review: independent-adversarial, worktree-isolated
+consequence · T7 · behaviour:material · governance:high — review: independent-adversarial, worktree-isolated
+consequence · T11 · behaviour:material · governance:high — review: independent-adversarial, worktree-isolated
+
+**These three landed committed but unrecorded.** A prior session built and committed T6 (`3b3823e`,
+`2b5e561`), T7 (`e0ccdb6`) and T11 (`6f4cc36`), then ended without ticking a single DoD, without a Log
+entry, and — the part that matters for Tier G — **without an outside reviewer**. CLAUDE.md requires one
+per Tier G change precisely because *nothing the author can run finds these* (L-165). Three Tier G
+tasks sat on `main` with no independent pass for two days. The gap was invisible from the commits, which
+read as complete; it was visible only from the Plan, where 13 DoD were still `[ ]` against a green tree.
+
+**Owner ruling on the review shape:** one worktree-isolated adversarial reviewer covering all three,
+rather than three parallel. The mandate is *an* outside reviewer per Tier G change, not one agent each,
+and TD-117 records that concurrent worktree agents are what push the gate past its own 450s budget —
+so the cheaper shape is also the one that does not reproduce this sprint's own measurement hazard.
+
+**All 10 DoD verified CONFIRMED.** Not on the commit messages' self-report (L-045) — the reviewer
+seeded its own breaks and re-derived the claims:
+
+| Task | What the reviewer did beyond reading |
+|---|---|
+| T6 | Seeded `s4-onefile.ts`'s duplicate-number slice (`b.slice(0,7)` → `b`); **3 reddened, 22 siblings green**, including the index/sections/negative sibling controls. Re-derived the "4 evaluated + 1 gap + 2 excluded = 7" arithmetic against a *second* oracle (`read-spec-rules.sh --section 4`) — not vacuous. Verified the empty-slug divergence at source: `conformance-engine.sh`'s two globs genuinely differ (`*.md` at :1422 vs `?*.md` at :1450) |
+| T7 | Seeded a "forgot to compare" break (`thenBody === nowBody` → `thenBody === thenBody`); **3 reddened, 10 siblings green**. Ran the shallow-reachability test standalone (~95s) and confirmed it genuinely clones the live published repo at `--depth 1` over the network — a real artifact, not a fixture wearing the name (L-166 satisfied for real) |
+| T11 | **Independently enumerated the render sites** rather than trusting the Plan's count — found exactly 3 ternary chains (`runRule`/`runSection`/`runFull`), matching. Seeded the `runFull` site's hold ternary; **exactly 1 of 66 reddened**, the other two sites' hold tests stayed green. That is per-site discrimination, not a suite that reddens as a block |
+
+**One stated hash convention throughout — `git hash-object <path>`, never mixed** (L-169, which this
+sprint has now paid for twice). Every seed verified landed by hash *and* line count, every restore
+verified back to the pristine hash: T6 `794d91a3…` → `f47ab962…` → `794d91a3…` (107 lines throughout) ·
+T7 `480ab3b0…` → `39ae2240…` → `480ab3b0…` (165 lines) · T11 `8f2f27c7…` → `90951a2e…` → `8f2f27c7…`
+(400 lines). Line counts unchanged across every seed — targeted breaks, not demolitions (L-142).
+
+**Independent baseline agreement:** the reviewer's own `bun test packages/standard/src/rules/ apps/cli/src/`
+read `251 pass, 0 fail, 736 expect() calls, 21 files` — the coordinator's number exactly, which is the
+second query that makes the first one mean something.
+
+**One observation recorded but not blocking:** T7's source comment frames the shallow-clone case as what
+"the Claude Code plugin installer" does at depth 1. The reviewer could find no evidence of the installer's
+actual clone depth. DoD 3 does not rest on it — a real `--depth 1` clone of a real published repo is a
+genuine real-world shape regardless of who performs it — but the *"the installer does this"* framing is
+asserted rather than verified, and is flagged here so a later reader does not inherit it as established.
+
+---
+
+### 2026-08-29 | scope-change | the §4 family is migrated but unreachable; owner ruled T12 in
+
+**The review's second observation is the load-bearing one, and it is T11's own shape repeating.**
+`createF4Registry` and `createS4AppendRegistry` exist, are tested, and are composed into nothing.
+`apps/cli/src/main.ts`'s `composedDispatch` binds exactly two registries — `createBuiltInRegistry` and
+`createF12Registry` — so **no CLI invocation reaches a single one of the five §4 evaluators this sprint
+was built to deliver.**
+
+**Verified live, not argued** (L-166: only the real artifact proves a branch is reachable):
+
+```
+$ bun apps/cli/src/main.ts --section 4 .
+gap   S4.ONEFILE  -- rule-unimplemented: ... this engine has no evaluator registered for it yet
+gap   S4.APPEND   -- rule-unimplemented: ...
+gap   S4.INDEX    -- rule-unimplemented: ...
+gap   S4.SECTIONS -- rule-unimplemented: ...
+gap   S4.NEGATIVE -- rule-unimplemented: ...
+```
+
+The engine reports it has no evaluator for five rules it demonstrably has evaluators for.
+
+**The consequence, on a repo that actually violates §4.** Against the retained `index-missing-row`
+fixture (git-init'd and committed, so both engines see real history), Shell and TS disagree about the
+repository:
+
+| Engine | S4.INDEX | Global level |
+|---|---|---|
+| `scripts/lib/conformance-engine.sh` | `FAIL decisions-index-missing-adr … (S4.INDEX)` | — |
+| `bun apps/cli/src/main.ts .` | `gap … no evaluator registered` | **`level: Attested`** |
+
+`level.ts` continues past `gap` without touching a counter (`level.ts:108` — deliberate, and correct:
+a gap is this engine's coverage hole, not a repository finding). So an unregistered evaluator does not
+merely go silent — it **launders a real violation into the top conformance level**.
+
+**Framed honestly, because overstating it would be its own error.** This is *not* a regression T6 or T7
+introduced, and the level is not newly untrustworthy: every unmigrated rule is a `gap` today, the engine
+calls itself pre-release in its own help text, and `scripts/lib/conformance-engine.sh` still holds
+authority (H24–H26, out of scope). The narrow, real defect is that **§ Scope of this sprint promises the
+F6 §4 family "migrated whole (all five rules, S4.APPEND included)"**, and five rules no invocation can
+reach are not whole at the only surface a consumer touches. Neither T6 nor T7 erred — `apps/cli/src/`
+was outside both tasks' declared `Layers:`, exactly as `apps/cli/src/` was outside T4's when the same
+thing happened to `attachLevel` and produced T11. **This is a Plan gap: no task owned the seam.**
+
+**Owner ruling: add T12 and wire it this sprint** — the same ruling, for the same reason, as T11's.
+Deferring to SPRINT-092 or filing it as debt is how the spec-only-debt trap starts (TD-001 · L-007), and
+the work is four lines of composition against adapters that already exist (`FsAdrFamilyPort` and
+`FsAdrHistoryPort` both take a bare `repoRoot`).
+
+**Impact on the frozen Plan:** T12 added (`Layers: apps/cli/src/`, `Depends-on: T6, T7`). **T12 and T5
+both declare `apps/cli/src/main.ts`, so they are SEQUENTIAL under a single owner, never parallel-built**
+— the unowned-overlap hazard that the T11 ruling already had to correct once in this same file. T12 runs
+first: its additions need no spec path, so T5's threading then covers all four registries in one pass
+rather than T12 re-threading a parameter T5 just introduced.
+
+**Task count is now 12.** Recorded plainly, for the third time in this sprint: the Plan G1 sized `L` and
+split has re-expanded past its pre-split size. T12, like T9–T11 before it, is a small consequence of work
+already done rather than new engine scope — but the count is the count, and the owner should not have to
+derive it.
+

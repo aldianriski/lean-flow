@@ -105,7 +105,7 @@ forgotten because its output looks like data rather than a claim. Level arithmet
 
 ### T5 — Accept a caller-supplied spec path `[size: S · risk: med · class: execution · HITL · J1]`
 Layers: `apps/cli/src/`
-Depends-on: T1, T3, T9, T11
+Depends-on: T1, T3, T9, T11, T12
 Cites: SPRINT-087 (spec-not-found vs permission-denied)
 Tier **G** by defaulting up (ADR-029): a silently-ignored spec path would make every fixture assertion
 vacuous while the suite stayed green — a false negative by construction. Fixture harnesses hand the
@@ -119,23 +119,23 @@ landing here first.
 - [ ] A nonexistent path fails loudly and stays distinct from an unreadable one — *Verify: two cases, two different named outcomes*
 
 ### T6 — Migrate S4.ONEFILE · S4.INDEX · S4.SECTIONS · S4.NEGATIVE `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `packages/standard/src/rules/` · `evals/fixtures/`
+Layers: `packages/standard/src/rules/` · `evals/fixtures/` · `f4-registry.ts` · `s4-onefile.ts` · `adr-family-fixtures.test.ts` (corrected per L-100 against the commits themselves, not re-predicted — these are named in the tick evidence and were genuinely touched by `3b3823e`/`2b5e561`)
 Depends-on: T1, T4
-Cites: EPIC-014 H13 · D2 strangler · L-142 · L-169 · `scripts/lib/conformance-engine.sh` (parity oracle)
+Cites: EPIC-014 H13 · D2 strangler · L-142 · L-169 · `scripts/lib/conformance-engine.sh` (parity oracle) · T12 (this task's registries are composed there; the dependency runs the other way) · `packages/standard/src/registry.ts` · `classify.ts` · `section.ts` (cited, never touched — DoD 1's own no-edit-to-dispatch claim is *about* these three, which is why they appear in the prose at all. The first is written full-path deliberately: check-layers-completeness.sh matches Cites tokens against the Layers line by substring, so the bare basename would read as contradicting the F4 registry declared there — see TD-119)
 Tier **G**. The four file/text §4 rules. F6 was chosen on measured cost across both axes — see D1.
 
 **Acceptance:** four §4 rules evaluate in TS and agree with Shell on the retained fixtures.
 
 **DoD:**
-- [ ] Four evaluators registered at their own call sites with no edit to dispatch
-- [ ] Per-rule parity against Shell on the retained fixtures — *Verify: row-by-row, naming the offending rule on mismatch*
-- [ ] Each retained must-FAIL reddens with its OWN named finding while its sibling control stays green (L-142)
-- [ ] Every seeded break is verified to have landed, under ONE stated hash convention — *Verify: never two methods in one evidence block (L-169)*
+- [x] Four evaluators registered at their own call sites with no edit to dispatch — ✓ `f4-registry.ts` makes four `registry.register()` calls; the reviewer confirmed via `git show --stat` across all three commits that `packages/standard/src/registry.ts`, `classify.ts` and `section.ts` were never touched. **Registered ≠ dispatched, and the distinction is this DoD's own wording** — nothing composed these registries into the CLI until T12, which the review surfaced and the owner ruled in
+- [x] Per-rule parity against Shell on the retained fixtures — ✓ `adr-family-fixtures.test.ts` spawns `sh scripts/lib/conformance-engine.sh` **live** per fixture dir (`execFileSync`, never a copied literal) and diffs verdict + named finding row by row across the 9 retained fixtures. Includes the ruled empty-slug **divergence**, retained as a fixture rather than deleted (TD-012): the reviewer verified at source that Shell's own two globs genuinely differ — `*.md` at `conformance-engine.sh:1422` vs `?*.md` at `:1450` — so the disagreement is Shell's inconsistency, documented, not a TS defect
+- [x] Each retained must-FAIL reddens with its OWN named finding while its sibling control stays green (L-142) — ✓ proven by the **reviewer's own** seed, not the author's: `s4-onefile.ts`'s duplicate-number slice (`b.slice(0, 7)` → `b`) reddened exactly 3 tests, all duplicate-number-related, while **22 siblings stayed green** including the `index-missing-row`, `sections-missing` and `no-negative` controls. Per-rule discrimination, not a suite that reddens as a block
+- [x] Every seeded break is verified to have landed, under ONE stated hash convention — ✓ **`git hash-object <path>`, used alone and never mixed with a blob hash** (L-169, which this sprint had already paid for twice). `794d91a3…` pristine → `f47ab962…` seeded → `794d91a3…` restored, **107 lines at every step** — landed, targeted, and restored, with the line count proving a discrimination rather than a demolition (L-137 · L-142)
 
 ### T7 — Migrate S4.APPEND behind a real git port `[size: M · risk: high · class: execution · HITL · J1]`
-Layers: `packages/standard/src/rules/` · `packages/standard/src/adapters/`
+Layers: `packages/standard/src/rules/` · `packages/standard/src/adapters/` · `adapters/fs-adr-family.ts` · `adapters/fs-adr-history.ts` · `rules/adr-history-port.fake.ts` · `s4-append-oracle.test.ts` · `s4-append-shallow-reachability.test.ts` (corrected per L-100 against `e0ccdb6` itself — all named in the tick evidence, all genuinely touched)
 Depends-on: T6
-Cites: EPIC-014 H13 · SPRINT-087 (port + fake pattern) · L-166 · `scripts/lib/conformance-engine.sh` (parity oracle)
+Cites: EPIC-014 H13 · SPRINT-087 (port + fake pattern) · L-166 · `scripts/lib/conformance-engine.sh` (parity oracle) · T12 (this task's registry is composed there; the dependency runs the other way)
 Tier **G**. §4's only git-defined rule, split out because it needs a port the other four do not. Its
 shallow-clone branch is the L-166 risk: a branch that works on a fixture but is unreachable on anything
 the system emits is an absent guard that clears every proof above it.
@@ -143,9 +143,9 @@ the system emits is an absent guard that clears every proof above it.
 **Acceptance:** S4.APPEND evaluates in TS over real git state and agrees with Shell.
 
 **DoD:**
-- [ ] Parity with Shell including the marker-passes and shallow-clone cases
-- [ ] Real adapter plus in-memory fake, per SPRINT-087's port pattern
-- [ ] The shallow-clone branch is pointed at the artifact that motivated it and shown REACHABLE — *Verify: not merely working on a fixture (L-166)*
+- [x] Parity with Shell including the marker-passes and shallow-clone cases — ✓ `s4-append-oracle.test.ts` carries four live-oracle cases against real disposable git repos, each diffed against a live-spawned Shell: § Decision rewritten after the deciding commit (**FAIL** both sides, same named finding) · a post-decision **marker** with § Decision untouched (**PASS** both sides — the control that stops the FAIL case passing for the wrong reason) · no git history at all (**NOTE**) · a shallow clone (**NOTE**, truncated history reported rather than read as clean). The last two are distinct outcomes, not one collapsed case
+- [x] Real adapter plus in-memory fake, per SPRINT-087's port pattern — ✓ `adapters/fs-adr-history.ts` (real) with `rules/adr-history-port.fake.ts` (in-memory), and `adapters/fs-adr-family.ts` (real) against T6's existing fake. Both real adapters take a bare `repoRoot`, which is what made T12's wiring four lines rather than a task of its own
+- [x] The shallow-clone branch is pointed at the artifact that motivated it and shown REACHABLE — ✓ and the reviewer **ran it standalone (~95s) rather than trusting the name**: `s4-append-shallow-reachability.test.ts` genuinely `git clone --depth 1`s the real published lean-flow repo over the network, and both engines report `history truncated`. Confirmed to be a real artifact, not a fixture wearing that word — which is the whole of L-166 and the exact check the fixture's own name would otherwise have satisfied vacuously (L-108). **One limitation recorded rather than absorbed:** the source comment frames depth-1 as what "the Claude Code plugin installer" does; the reviewer could find no evidence of the installer's actual clone depth. DoD 3 does not rest on it — a real depth-1 clone of a real published repo is a genuine shape regardless of who performs it — but the framing is asserted, not established, and is flagged so no later reader inherits it as fact
 
 ### T8 — Bring the TypeScript tree to zero type errors `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `packages/standard/src/tokenizer.ts` · `packages/standard/src/tokenizer.test.ts` · `packages/standard/src/spec-reader.ts` · `packages/standard/src/spec-reader.test.ts` · `packages/standard/src/section.test.ts` · `packages/standard/src/model.test.ts` · `packages/standard/src/rules/git-boundary-spec.ts` · `packages/standard/src/rules/git-boundary-port.fake.ts` · `apps/cli/src/main.test.ts` · `apps/cli/src/spec-file-reader.test.ts`
@@ -205,9 +205,9 @@ reading git history.
 - [x] The knowledge index is regenerated — ✓ `sh scripts/gen-index.sh --check` prints its own line `PASS  gen-index: knowledge index current` in the main tree, reproduced independently by the reviewer. ADR-038 indexed under **process · tooling · governance**, beside ADR-035 and ADR-037. Coordinator correction at merge-back: `domain:` arrived as `doc-standard` and was changed to `governance` — a wrong domain files the ADR under the wrong heading, defeating the one thing it exists for
 
 ### T11 — Wire the full-run level into the CLI, and render `hold` distinctly `[size: S · risk: med · class: execution · HITL · J1]`
-Layers: `apps/cli/src/`
+Layers: `apps/cli/src/` · `main.test.ts` (corrected per L-100 against `6f4cc36` itself — named in the tick evidence, genuinely touched)
 Depends-on: T4, T9
-Cites: L-020 · L-007 · L-166 · SPRINT-091 T4 review (findings C and E) · `packages/standard/src/level.ts` (consumed, never modified) · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified)
+Cites: L-020 · L-007 · L-166 · SPRINT-091 T4 review (findings C and E) · `packages/standard/src/level.ts` (consumed, never modified) · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified) · `traverse.test.ts` (cited as the structural guard proving DoD 2 — read, never modified)
 Tier **G**. Added mid-sprint by owner ruling — see the Execution Log's `scope-change`. T4's level
 arithmetic matches Shell but **nothing calls it**: no non-test reference to `attachLevel` exists outside
 `packages/standard/src/`, so `leanflow <repo-dir>` prints no level at all. A behaviour written only in
@@ -225,9 +225,32 @@ touched.
 `note` at every render site.
 
 **DoD:**
-- [ ] `leanflow <repo-dir>` prints a level line that matches Shell's — *Verify: differential against `scripts/lib/conformance-engine.sh` spawned live, per repo, comparing the level VALUE and not merely the presence of a line*
-- [ ] `--section` still prints NO level — *Verify: the partial path stays level-free; seed an attempt to print one and confirm the guard holds (SPRINT-087's frozen-result property, T9's DoD 3)*
-- [ ] `hold` renders distinctly from `note` at **every** render site — *Verify: one test per render site, each FAILING before the fix — a site fixed without a failing case is an unguarded site*
+- [x] `leanflow <repo-dir>` prints a level line that matches Shell's — ✓ `main.test.ts` spawns Shell **live** per repo and compares the level **VALUE** through an anchored regex, never a substring hit: two scenarios agreeing (a clean repo → `Attested` both sides; a committed real-looking secret → `none` both sides). A separate anchored test proves the full run closes with **exactly one** global `level:` line — never zero, never a substring match (L-108's shape, guarded)
+- [x] `--section` still prints NO level — ✓ and the guard is **structural, not a renderer's restraint**: `classifyAll`'s `TraversalReport` carries no `globalLevel` field and is frozen, so a seeded attempt to attach one *throws* (`traverse.test.ts:183-189`, "not extensible"). Holds under adversarial conditions too — `main.test.ts:738` proves `--section` still prints no level even with a `hold` outcome present, which is the case that would have exercised the new render path
+- [x] `hold` renders distinctly from `note` at **every** render site — ✓ **the reviewer enumerated the render sites from source rather than trusting the Plan's count**, finding exactly three ternary chains (`runRule` · `runSection` · `runFull`) — the Plan's claimed count, independently confirmed rather than assumed. One test per site. Discrimination proven per-site by the reviewer's own seed: breaking `runFull`'s hold ternary reddened **exactly 1 of 66** tests — that site's own — while the `--rule` and `--section` hold tests stayed green. A suite that reddened as a block would have proven nothing about the other two sites (L-142)
+
+### T12 — Dispatch the §4 family from the CLI, so the migration is reachable `[size: S · risk: med · class: execution · HITL · J1]`
+Layers: `apps/cli/src/`
+Depends-on: T6, T7
+Cites: L-020 · L-007 · L-166 · TD-001 · SPRINT-091 T6/T7 review · T11 (the same half-shipped shape, ruled the same way; no dependency either direction) · `packages/standard/src/rules/f4-registry.ts` · `packages/standard/src/rules/s4-append-registry.ts` (consumed, never modified) · `packages/standard/src/level.ts` (the `gap` arithmetic this task's laundering case rests on — read, never modified) · `scripts/lib/conformance-engine.sh` (parity oracle — spawned, never modified)
+Tier **G**. Added mid-sprint by owner ruling — see the Execution Log's `scope-change`. T6 and T7 built
+five §4 evaluators; `composedDispatch` binds only `createBuiltInRegistry` and `createF12Registry`, so
+**no CLI invocation reaches any of them** — `--section 4` reports all five `rule-unimplemented` against
+an engine that demonstrably implements them. Verified live, not inferred.
+
+The consequence is not cosmetic: `level.ts:108` continues past `gap` without touching a counter, so on
+the retained `index-missing-row` fixture Shell reports `FAIL … (S4.INDEX)` while the CLI prints
+**`level: Attested`**. An unregistered evaluator launders a real violation into the top level. This is
+T11's shape exactly — a capability written only in its own file is half-shipped (L-020) — and neither
+T6 nor T7 erred: `apps/cli/src/` sat outside both tasks' declared `Layers:`. No task owned the seam.
+
+**Acceptance:** every §4 rule the engine implements is evaluated by the invocations a consumer actually
+runs, and agrees with Shell there — not only in its own unit test.
+
+**DoD:**
+- [ ] All five §4 evaluators dispatch through `composedDispatch` — *Verify: `--section 4` reports zero `rule-unimplemented` for S4.ONEFILE/APPEND/INDEX/SECTIONS/NEGATIVE, and the two judgment-only rows (S4.BAR · S4.NOINVENT) still report `excluded`, unchanged*
+- [ ] The laundering case is closed, proven on the artifact that motivated it — *Verify: on the retained `index-missing-row` fixture, TS FAILs S4.INDEX where it previously gapped, and its printed level VALUE matches live-spawned Shell's; the fixture is the real motivating artifact, not a new one built to pass (L-166)*
+- [ ] A sibling control proves the wiring discriminates rather than reddening everything — *Verify: the `clean` fixture still passes all five and still prints Shell's level; seed one registry out of the composition and confirm only that family's rules regress (L-142), seed verified landed by `git hash-object` under ONE convention (L-169)*
 
 ## Owner-action checklist
 - [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099).

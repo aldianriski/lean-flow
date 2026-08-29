@@ -205,6 +205,26 @@ status: current
     budget with the ceiling raised to match; or make the skipped-harness list its own named FAIL
     distinct from a real check failure, so truncation can never be read as one red check.
 
+- **TD-119** severity: minor | status: open | created: Sprint-091
+  - Summary: **`check-layers-completeness.sh` matches `Cites:` tokens against the `Layers:` line by
+    SUBSTRING, so a declaration is contradicted by any longer path that merely contains it.** A task
+    declaring `f4-registry.ts` as touched cannot also cite the bare dispatch `registry.ts` as
+    untouched: the checker reports `Cites/Layers contradiction`, though the two are different files.
+  - `scripts/lib/check-layers-completeness.sh:121` (`grep -qF "$c"` against `$layers_line`), and the
+    same shape at `:143` for leg (a). Hit live while ticking SPRINT-091 T6, whose DoD 1 claim is
+    precisely *"no edit to dispatch"* — so naming the three untouched dispatch files IS the evidence,
+    and naming them is what tripped the guard. Worked around in place by writing the colliding one
+    full-path; the other two need no workaround.
+  - **This is L-108's own shape living inside the guard that enforces declarations** — a substring
+    standing in for a structural claim about which file a token names. It fails *loud* rather than
+    silent, which is why it is minor: it blocks a correct sprint file rather than passing an
+    incorrect one. The real cost is that the workaround is invisible to the next author, who will hit
+    it again and may resolve it by deleting a true `Cites:` entry — and THAT would be silent.
+  - Fix by anchoring the comparison to a whole path segment (basename-to-basename, or requiring the
+    match to land on a `/` or start-of-token boundary) rather than by substring. Retain a must-FAIL
+    fixture for a genuine contradiction, plus a control pairing the F4 registry with the dispatch
+    registry that must PASS — the exact case this row was filed from.
+
 - **TD-118** severity: minor | status: open | created: Sprint-091
   - Summary: **`S4.NEGATIVE` is a bare substring match for "negative" in both engines**, so an ADR whose
     Consequences say *"no negatives identified"* — the exact thing the rule exists to catch — PASSES.
