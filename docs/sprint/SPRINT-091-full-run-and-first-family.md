@@ -106,7 +106,7 @@ forgotten because its output looks like data rather than a claim. Level arithmet
 ### T5 — Accept a caller-supplied spec path `[size: S · risk: med · class: execution · HITL · J1]`
 Layers: `apps/cli/src/`
 Depends-on: T1, T3, T9, T11, T12
-Cites: SPRINT-087 (spec-not-found vs permission-denied)
+Cites: SPRINT-087 (spec-not-found vs permission-denied) · TD-103 (narrowed, not resolved: 2 of its 5 SpecFindings become CLI-reachable here) · L-120 · `spec/STANDARD.md` (copied and doctored as evidence — read, never modified) · `S9.LOGDIR` · `S9.TWOFILES` (rule ids named in the tick evidence; file-shaped to the layers parser, per T2's own line) · `apps/cli/src/spec-file-reader.ts` (the reader whose path parameter this task finally supplies — consumed, never modified)
 Tier **G** by defaulting up (ADR-029): a silently-ignored spec path would make every fixture assertion
 vacuous while the suite stayed green — a false negative by construction. Fixture harnesses hand the
 engine doctored specs, so the harness conversion deferred to SPRINT-092 cannot happen without this
@@ -115,8 +115,8 @@ landing here first.
 **Acceptance:** the engine evaluates the spec it is handed, and says so when it cannot.
 
 **DoD:**
-- [ ] A caller-supplied spec is evaluated instead of the shipped Standard — *Verify: a doctored spec dropping one rule row provably changes the result, with a sibling control unchanged*
-- [ ] A nonexistent path fails loudly and stays distinct from an unreadable one — *Verify: two cases, two different named outcomes*
+- [x] A caller-supplied spec is evaluated instead of the shipped Standard — ✓ verified live by the coordinator (a copy of `spec/STANDARD.md` with `S9.LOGDIR`'s row dropped makes that rule vanish from `--section 9` while the sibling control `S9.TWOFILES` prints identically), and then **proven complete rather than merely working** by the reviewer: it enumerated the spec-reading call sites from source and grep-confirmed the enumeration is exhaustive — `readSpecSectionFromDisk`, `readSpecAllFromDisk`, and `FsGitBoundaryPort`'s prose argument are the only three, no other adapter opens a spec at all. All three demonstrably consume the supplied path; `--rule` correctly carries none, since it opens no spec. **A flag honoured at two of three sites is this task's whole failure mode, so the enumeration is the evidence, not the passing test**
+- [x] A nonexistent path fails loudly and stays distinct from an unreadable one — ✓ both reachable **end-to-end through the CLI** for the first time, which is what a real `--spec` flag buys: `spec-not-found` (missing path, and a directory-as-spec, mirroring Shell's `-f`) and `spec-table-unreadable` (a genuine `icacls` DENY(R) file, rebuilt and re-verified from scratch by the reviewer rather than trusted from an earlier sprint) — two cases, two exit-1 outcomes, two distinct named findings, never conflated. Coordinator confirmed the exit code **without a pipe** (`out=$(…); code=$?`), since `cmd | head` then `$?` reads `head`'s status — the L-120 trap, hit once in this very verification and corrected. Narrows TD-103: 2 of its 5 `SpecFinding` values are now CLI-reachable; the other three stay mapping-level, out of this task's Layers
 
 ### T6 — Migrate S4.ONEFILE · S4.INDEX · S4.SECTIONS · S4.NEGATIVE `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `packages/standard/src/rules/` · `evals/fixtures/` · `f4-registry.ts` · `s4-onefile.ts` · `adr-family-fixtures.test.ts` (corrected per L-100 against the commits themselves, not re-predicted — these are named in the tick evidence and were genuinely touched by `3b3823e`/`2b5e561`)

@@ -1136,3 +1136,58 @@ constructs `FsAdrFamilyPort` twice per invocation, once directly and once inside
 `createFsAdrAppendPort`, doubling the `docs/adr/` tree walk. It grows with tree size rather than ADR
 count, so it is a different curve from the git spawns and would not have shown up in this measurement.
 
+---
+
+### 2026-08-29 | progress | T5 complete — the spec path is caller-supplied, and the review proved the wiring EXHAUSTIVE rather than working
+
+consequence · T5 · behaviour:material · governance:high — review: independent-adversarial, worktree-isolated
+
+**T5 is complete, reviewed, both DoD CONFIRMED.** `--spec <path>` composes with `--section` and the
+flagless run (never with `--rule`, which opens no spec), defaulting to `BUNDLED_SPEC_PATH` when absent.
+
+**The review's central contribution was refusing to test the happy path.** T5's failure mode is not
+"the flag does nothing" — that would be caught by any test — it is **"the flag is honoured at two of
+three call sites"**, which passes every test written against the two that work. So the reviewer
+enumerated the spec-reading sites from source and then *grep-confirmed the enumeration was exhaustive*:
+`readSpecSectionFromDisk`, `readSpecAllFromDisk`, and `FsGitBoundaryPort`'s prose argument are the only
+three; no other adapter (`fs-adr-family`, `fs-adr-append`, `fs-adr-history`, `fs-sprint-dir`) opens a
+spec at all. **That second query is what turns "all the sites I found work" into "all the sites work"** —
+the distinction the cross-check rule exists for.
+
+**The §12-prose threading was verified empirically, not read.** The builder threaded `--spec` into
+`FsGitBoundaryPort`'s second argument (the prose §12's rules read for allowed asset dirs and generated
+file classes) and wrote down its reasoning. The reviewer declined to accept the comment and doctored the
+prose itself — changing only `src/assets/` to `other-assets-dir/` in a copied spec — against a real git
+fixture tracking `src/assets/foo.psd`: pristine gives `PASS S12.DESIGNSRC` / `level: Attested`, doctored
+gives `FAIL S12.DESIGNSRC … outside … other-assets-dir/` / `level: none`, with `S12.GENERATED` identical
+in both as the sibling control. The threading is load-bearing, not decorative — which matters because a
+spec that governed rule *rows* but silently not §12 *prose* is the half-wired seam this sprint hit twice
+already (T11, T12) and would have hit a third time invisibly.
+
+**Discrimination proven by two ISOLATED seeds, which is stronger than the builder's own.** The builder
+broke both threading sites at once. The reviewer broke them separately: seed A (`case "section"` passes
+a hardcoded `undefined`) → 83 pass / 1 fail, reddening exactly the section DoD-1 test; seed B (`case
+"full"` alone) → 81 pass / 3 fail, reddening the full DoD-1 test and both DoD-2 tests, which route
+through the flagless path. **Each break used the other path's tests as a live sibling control**, proving
+the two sites are independently load-bearing rather than one covering for the other. One convention
+throughout, `git hash-object`: pristine `8e3c3dbe…` (500 lines) → `e90cc449…` → restored → `95932f35…`
+→ restored `8e3c3dbe…`, byte-identical, `tsc` clean. The pristine hash also **matched the T5 commit's own
+recorded hash**, confirming no drift between build and review.
+
+**Two parser observations, both investigated and both cleared as pre-existing convention rather than
+T5 regressions** — the distinction that decides whether they are findings at all. A duplicate `--spec`
+silently drops the second occurrence; a trailing valueless `--spec` after a complete invocation is
+silently ignored. The reviewer checked whether T5 *introduced* these shapes and found `--section 9
+--section 12 .` already behaves identically pre-T5. T5 applied an existing convention consistently
+instead of inventing a new one. Neither shape can cause a real `--spec <path>` value to be accepted and
+then discarded, which is the only shape that would matter here.
+
+**Regression surface checked specifically for the silent case:** `runSection`/`runFull` gained
+`specPath` as a trailing parameter *after* the pre-existing `buildDispatch`. Two adjacent optional
+parameters are exactly where a positional shift hides — type-compatible, no error. The reviewer
+confirmed every pre-existing call site passes four arguments and `composedDispatch` is module-private
+with no external callers. No shift.
+
+Suite: `apps/cli/src/` 91 pass · `packages/standard/src/rules/` 178 pass = **269 total** (257 + 12 new),
+`tsc --noEmit` 0 errors. Count agreed independently by builder and reviewer.
+
