@@ -77,6 +77,31 @@ else
   fail=1
 fi
 
+# --- case 3c (TD-123, control): a J2 task EXECUTED ATTENDED -- no park, no `terminal · ` line -----
+# anywhere in the log -- is ACCEPTED, not refused. Parking is what an UNATTENDED run does instead of
+# asking; an attended run has a live ask channel and never invokes the park protocol, so demanding a
+# park record from it inverts the rule. Load-bearing on its own terms (this is the false-FAIL TD-123
+# names, reproduced live against this repo's own SPRINT-093 T1/T2 -- see the builder's report), and
+# it is case 3's sibling under seeding: a break that makes the checker treat every log as unattended
+# reddens THIS case while case 3 (already FAIL) stays exactly as it was, and a break that makes it
+# treat every log as attended greens case 3 while this one stays exactly as it was -- two seeds, two
+# independent needles (L-142).
+run_case_anywhere "j2-attended-executed-is-accepted" 0 "authority-j2-honoured:" -- \
+  sh "$checker" "$fx/attended-j2-executed/SPRINT-908-fx.md"
+
+# --- case 3d: ...and the J1 sibling in that same file stays green too -----------------------------
+out=$(sh "$checker" "$fx/attended-j2-executed/SPRINT-908-fx.md" 2>&1); rc=$?
+if [ "$rc" -eq 0 ] &&
+   printf '%s\n' "$out" | grep -qE '^PASS  authority-j2-honoured: .* T2 executed with no park record' &&
+   printf '%s\n' "$out" | grep -qE '^PASS  authority-declared: .* T1 J1$' &&
+   ! printf '%s\n' "$out" | grep -q '^FAIL'; then
+  echo "PASS fixture(attended-j2-executed-discriminates): the attended human-reserved task and its J1 sibling both stayed green, and no FAIL line appeared"
+else
+  echo "FAIL fixture(attended-j2-executed-discriminates): exit $rc -- an attended J2 completion with no park record should be accepted, not refused -- output:"
+  printf '%s\n' "$out"
+  fail=1
+fi
+
 # --- case 4 (control): a J2 task that HELD is accepted -------------------------------------------
 # The case that is wrong today if the honoured-half logic inverts. Load-bearing for the same reason
 # case 2 is: it is the only case that reddens if the checker starts refusing correct behaviour.
