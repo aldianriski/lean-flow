@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -75,6 +75,75 @@ describe("leanflow argument parsing", () => {
 
   test("--section with no value following falls through to unknown rather than crashing", () => {
     expect(parse(["--section"])).toEqual({ kind: "unknown", args: ["--section"] });
+  });
+
+  // --- SPRINT-091 T5: --spec composes with every shape above, independent of position -------------
+  describe("--spec <path> (SPRINT-091 T5): orthogonal to repo-dir, composes with every invocation shape", () => {
+    test("with --section: attaches specPath, and repo-dir still defaults to '.' the same as without --spec", () => {
+      expect(parse(["--spec", "/tmp/other.md", "--section", "9", "/tmp/repo"])).toEqual({
+        kind: "section",
+        section: "9",
+        repoDir: "/tmp/repo",
+        specPath: "/tmp/other.md",
+      });
+      expect(parse(["--spec", "/tmp/other.md", "--section", "9"])).toEqual({
+        kind: "section",
+        section: "9",
+        repoDir: ".",
+        specPath: "/tmp/other.md",
+      });
+    });
+
+    test("order-independent: --spec AFTER --section parses identically to --spec BEFORE it", () => {
+      expect(parse(["--section", "9", "/tmp/repo", "--spec", "/tmp/other.md"])).toEqual({
+        kind: "section",
+        section: "9",
+        repoDir: "/tmp/repo",
+        specPath: "/tmp/other.md",
+      });
+    });
+
+    test("with the flagless full run: --spec plus a single non-flag repo-dir stays a `full` invocation", () => {
+      expect(parse(["--spec", "/tmp/other.md", "/tmp/repo"])).toEqual({
+        kind: "full",
+        repoDir: "/tmp/repo",
+        specPath: "/tmp/other.md",
+      });
+    });
+
+    // `--rule`'s own dispatch never opens a spec file (runRule's own comment) -- `--spec` is still
+    // parsed correctly ahead of it (it does not get swallowed as the rule id or repo-dir), but the
+    // `rule` Invocation carries no `specPath` field to attach it to (this file's own Invocation
+    // comment explains why: a field nothing reads is not a real seam).
+    test("with --rule: --spec is consumed without disturbing ruleId/repoDir, and is not attached to the `rule` Invocation", () => {
+      expect(parse(["--spec", "/tmp/other.md", "--rule", "S9.LOGDIR", "/tmp/repo"])).toEqual({
+        kind: "rule",
+        ruleId: "S9.LOGDIR",
+        repoDir: "/tmp/repo",
+      });
+    });
+
+    test("absent entirely: parse() attaches no specPath at all, identical to every pre-T5 invocation", () => {
+      expect(parse(["--section", "9", "/tmp/repo"])).toEqual({ kind: "section", section: "9", repoDir: "/tmp/repo" });
+      expect(parse(["/tmp/repo"])).toEqual({ kind: "full", repoDir: "/tmp/repo" });
+    });
+
+    test("with no value following it falls through to unknown, the SAME convention --rule/--section already use", () => {
+      expect(parse(["--spec"])).toEqual({ kind: "unknown", args: ["--spec"] });
+    });
+
+    // A trailing, valueless --spec AFTER an otherwise-complete --section match is NOT extracted
+    // (no value follows it), so it is left in `rest` past --section's own repo-dir slot -- exactly
+    // where a stray extra token already sits, pre-T5, for `--rule`/`--section` (neither examines
+    // anything past its own two positional slots). Silently ignored, not promoted to `unknown`: T5
+    // introduces no new trailing-garbage handling `--rule`/`--section` did not already have.
+    test("a trailing valueless --spec past --section's own repo-dir slot is silently ignored, matching pre-existing trailing-argument handling", () => {
+      expect(parse(["--section", "9", "/tmp/repo", "--spec"])).toEqual({
+        kind: "section",
+        section: "9",
+        repoDir: "/tmp/repo",
+      });
+    });
   });
 });
 
@@ -1074,6 +1143,15 @@ describe("specReadExitCode -- the exit-code MAPPING itself, every SpecFinding (S
   // exact path through `run()`); it is exercised directly at the adapter here, rather than through
   // `parse()`/`run()`, only because `BUNDLED_SPEC_PATH` is a fixed constant `Invocation` has no field to
   // override -- the read attempt and the exit mapping are the real production functions, unmodified.
+  //
+  // SUPERSEDED-IN-PART (SPRINT-091 T5): `Invocation` now HAS that field (`specPath`, on `section`/
+  // `full`), so this specific limitation no longer holds -- see the "leanflow --spec end-to-end"
+  // describe block near the end of this file, which drives BOTH `spec-not-found` and
+  // `spec-table-unreadable` through the real `parse()`/`run()` pair with a genuine `--spec <path>`
+  // argv token. Kept here unmodified rather than deleted or rewritten: it is still a valid, narrower
+  // oracle-comparison test in its own right (the adapter called directly, no CLI parsing in the loop),
+  // and CLAUDE.md's own discipline is to retain pre-existing coverage, not prune it once a broader test
+  // exists alongside it.
   test("spec-not-found: a genuinely missing spec path, oracle-verified against the SAME path", () => {
     const dir = mkdtempSync(join(tmpdir(), "cli-t5-specnotfound-"));
     try {
@@ -1282,3 +1360,271 @@ describe("specReadExitCode -- the exit-code MAPPING itself, every SpecFinding (S
 // after each restore, matching `git rev-parse :apps/cli/src/main.ts` -- confirmed identical to the
 // staged baseline both times, and `bun test apps/cli/src/main.test.ts` returned to 41 pass / 0 fail
 // after each restore.
+
+// ====================================================================================================
+// SPRINT-091 T5, DoD 1: a caller-supplied spec is evaluated INSTEAD of the shipped Standard --
+// *Verify: a doctored spec dropping one rule row provably changes the result, with a sibling control
+// unchanged*. Real input (L-007): the actual `spec/STANDARD.md` this repo ships, copied and altered --
+// never a synthetic mini-spec invented for this test. `--section 9` against repo-dir `.` (this repo
+// itself) is the render path: S9.LOGDIR is the one §9 rule this engine actually dispatches (every
+// other §9 row reports `gap` -- verified live above), so dropping ITS row is the row whose removal is
+// guaranteed to change a PRINTED line, not merely a rule this engine already treats as unimplemented.
+// ====================================================================================================
+describe("leanflow --spec: a caller-supplied spec is evaluated instead of the bundled Standard (SPRINT-091 T5, DoD 1)", () => {
+  const capture = () => {
+    const lines: string[] = [];
+    return { lines, write: (s: string) => lines.push(s) };
+  };
+
+  const REAL_SPEC_TEXT = readFileSync(SPEC_PATH, "utf8");
+  const specDir = mkdtempSync(join(tmpdir(), "cli-t5-doctored-spec-"));
+
+  /** Drops exactly ONE rule's OWN row, anchored on the id cell (never a substring match that could
+   *  also eat a neighbouring row) -- mirrors spec-reader.test.ts's own `stripFirstRow` discipline,
+   *  reused rather than re-invented. */
+  function stripRuleRow(specText: string, idLiteral: string): string {
+    const anchor = new RegExp(`^\\| \`${idLiteral}\` \\|`);
+    const lines = specText.split(/\r\n|\r|\n/);
+    let dropped = false;
+    const out: string[] = [];
+    for (const line of lines) {
+      if (!dropped && anchor.test(line)) {
+        dropped = true;
+        continue;
+      }
+      out.push(line);
+    }
+    return out.join("\n");
+  }
+
+  // Sibling control: an UNTOUCHED copy of the real spec, byte-for-byte -- proves any difference below
+  // comes from the row removal, never from the mere act of pointing `--spec` at a copy.
+  const pristinePath = join(specDir, "pristine.md");
+  writeFileSync(pristinePath, REAL_SPEC_TEXT);
+
+  const doctoredPath = join(specDir, "doctored-no-s9-logdir.md");
+  writeFileSync(doctoredPath, stripRuleRow(REAL_SPEC_TEXT, "S9\\.LOGDIR"));
+
+  test("dropping S9.LOGDIR's row makes it vanish from --section 9's output; the pristine sibling still reports it", () => {
+    const { lines: doctoredLines, write: writeDoctored } = capture();
+    run({ kind: "section", section: "9", repoDir: ".", specPath: doctoredPath }, writeDoctored);
+
+    const { lines: pristineLines, write: writePristine } = capture();
+    run({ kind: "section", section: "9", repoDir: ".", specPath: pristinePath }, writePristine);
+
+    const doctoredHasLogdir = doctoredLines.some((l) => l.includes(" S9.LOGDIR "));
+    const pristineHasLogdir = pristineLines.some((l) => l.includes(" S9.LOGDIR "));
+    expect(doctoredHasLogdir).toBe(false); // the doctored copy never dispatches a rule it never read
+    expect(pristineHasLogdir).toBe(true); // the pristine sibling reports it exactly as before this task
+
+    // SIBLING CONTROL within the same comparison: S9.TWOFILES (a different §9 row, `gap` on both
+    // copies since no evaluator dispatches it) prints IDENTICALLY on doctored vs. pristine -- proving
+    // the change is TARGETED to the one row removed, not a demolition of the whole section's output
+    // (CLAUDE.md's "a demolition is not a discrimination").
+    const doctoredTwofiles = doctoredLines.find((l) => l.includes("S9.TWOFILES"));
+    const pristineTwofiles = pristineLines.find((l) => l.includes("S9.TWOFILES"));
+    expect(doctoredTwofiles).toBeDefined();
+    expect(doctoredTwofiles).toBe(pristineTwofiles);
+
+    // §9 carries 10 rows total; the doctored copy carries 9 -- every OTHER row's own line (gap or
+    // otherwise) still appears, one fewer line overall, never a wholesale re-shaping of the section.
+    const nonGapNonGarbage = (ls: readonly string[]) => ls.filter((l) => /^\S+\s+S9\./.test(l));
+    expect(nonGapNonGarbage(pristineLines).length).toBe(10);
+    expect(nonGapNonGarbage(doctoredLines).length).toBe(9);
+  });
+
+  test(
+    "a full flagless run against the doctored spec also omits S9.LOGDIR, and the exit code is still driven by real evaluations",
+    () => {
+      const { lines: doctoredLines, write: writeDoctored } = capture();
+      const doctoredExit = run({ kind: "full", repoDir: ".", specPath: doctoredPath }, writeDoctored);
+
+      const { lines: pristineLines, write: writePristine } = capture();
+      const pristineExit = run({ kind: "full", repoDir: ".", specPath: pristinePath }, writePristine);
+
+      expect(doctoredLines.some((l) => l.includes(" S9.LOGDIR "))).toBe(false);
+      expect(pristineLines.some((l) => l.includes(" S9.LOGDIR "))).toBe(true);
+      // Both copies are otherwise identical, and S9.LOGDIR's own real evaluation on this repo is `PASS`
+      // (verified live, above) -- a weightless verdict for `computeLevel` either way -- so removing it
+      // changes the printed lines but not the exit code, on THIS repo. Recorded as an observation about
+      // this fixture, not a general claim: the exit code is asserted equal across BOTH runs, not pinned
+      // to a literal, so this stays true even if S9.LOGDIR's own verdict on this repo later changes.
+      expect(doctoredExit).toBe(pristineExit);
+    },
+    // Two full whole-repo, whole-spec runs (every family, every family's own git/fs work) back to
+    // back -- the default 5000ms this file's other single-full-run tests never needed is too tight
+    // for two of them in series; FULL_ORACLE_TIMEOUT_MS x2 leaves comfortable headroom.
+    FULL_ORACLE_TIMEOUT_MS * 2,
+  );
+});
+
+// ====================================================================================================
+// SPRINT-091 T5, DoD 2: a nonexistent path fails loudly and stays distinct from an unreadable one --
+// *Verify: two cases, two different named outcomes* -- proven END-TO-END THROUGH THE CLI this time
+// (`parse()` -> `run()`, a real `--spec <path>` token), closing the exact gap the pre-T5 comment above
+// `describe("specReadExitCode ...")` named: "exercised directly at the adapter... only because
+// BUNDLED_SPEC_PATH is a fixed constant `Invocation` has no field to override". `Invocation` now has
+// that field (`specPath`), so this is no longer a limitation -- both findings are reachable from a
+// real argv a user could type. (The THREE mapping-level-only findings that comment's own TD-103 note
+// names -- spec-counts-unreadable/section-rows-mismatch/marks-table-unreadable -- stay unreachable:
+// nothing in this CLI wires `--reconcile` or a marks-check, and T5's Layers are `apps/cli/src/` only,
+// not new CLI surface for `reconcile()`. That gap is real and is not this task's to close.)
+// ====================================================================================================
+describe("leanflow --spec end-to-end: spec-not-found vs. spec-table-unreadable stay DISTINCT, reachable through the real CLI (SPRINT-091 T5, DoD 2)", () => {
+  const capture = () => {
+    const lines: string[] = [];
+    return { lines, write: (s: string) => lines.push(s) };
+  };
+
+  /**
+   * Builds a file that is GENUINELY unreadable to this process -- verified by actually attempting a
+   * read afterwards and confirming it throws, never assumed from `chmod`'s own reported mode. Mirrors
+   * `spec-file-reader.test.ts`'s own `makeGenuinelyUnreadableFile` (SPRINT-087 T6) verbatim: `chmod
+   * 000` alone does NOT reliably deny access under git-bash on this host (verified there, live -- the
+   * file stayed `r--r--r--` and fully readable), so on win32 this sets an explicit NTFS DENY(R) ACE for
+   * the current user via `icacls`, which Windows honours ahead of the inherited ALLOW ACE the temp dir
+   * carries. Duplicated here rather than imported: `spec-file-reader.test.ts` exports nothing (each
+   * test file in this codebase owns its own fixture helpers, per its own file-local `capture()` above).
+   */
+  function makeGenuinelyUnreadableFile(dir: string, name: string): string {
+    const path = join(dir, name);
+    writeFileSync(path, "# spec content that must never be seen\n");
+
+    if (process.platform === "win32") {
+      const user = `${process.env.USERDOMAIN}\\${process.env.USERNAME}`;
+      execFileSync("icacls", [path, "/deny", `${user}:(R)`]);
+    } else {
+      chmodSync(path, 0o000);
+    }
+
+    try {
+      readFileSync(path, "utf8");
+    } catch {
+      return path; // verified: a real read attempt genuinely fails
+    }
+    throw new Error(
+      `fixture setup failed: ${path} is still readable after attempting to deny access -- this ` +
+        "platform/filesystem did not honour the permission change, so the branch this fixture exists " +
+        "to exercise would never actually run",
+    );
+  }
+
+  /** Undoes the win32 DENY ACE before the directory is removed -- an un-denied path is far easier to
+   *  clean up than one still carrying the ACE (SPRINT-087 T6's own adversarial-review finding 2). */
+  function removeDenyAce(filePath: string): void {
+    if (process.platform !== "win32") return;
+    const user = `${process.env.USERDOMAIN}\\${process.env.USERNAME}`;
+    try {
+      execFileSync("icacls", [filePath, "/remove:d", user]);
+    } catch {
+      // Non-fatal -- the rmSync below is what actually proves whether cleanup succeeded.
+    }
+  }
+
+  function cleanupFixtureDir(dir: string, deniedFilePath?: string): void {
+    if (deniedFilePath) removeDenyAce(deniedFilePath);
+    try {
+      rmSync(dir, { recursive: true, force: true });
+    } catch (e) {
+      console.error(`SPRINT-091 T5 fixture cleanup failed for ${dir}: ${(e as Error).message} -- left on disk`);
+    }
+  }
+
+  test("spec-not-found: `--spec <missing path>` through parse()->run() exits 1 and names spec-not-found, never spec-table-unreadable", () => {
+    const dir = mkdtempSync(join(tmpdir(), "cli-t5-e2e-missing-"));
+    try {
+      const missing = join(dir, "no-such-spec.md"); // never written
+
+      const { lines, write } = capture();
+      const inv = parse(["--spec", missing, "."]);
+      expect(inv).toEqual({ kind: "full", repoDir: ".", specPath: missing });
+      const code = run(inv, write);
+
+      const out = lines.join("\n");
+      console.log(`DoD 2 spec-not-found (end-to-end via --spec): exit=${code}\n${out}`);
+      expect(code).toBe(1);
+      expect(out).toContain("spec-not-found");
+      expect(out).not.toContain("spec-table-unreadable");
+    } finally {
+      cleanupFixtureDir(dir);
+    }
+  });
+
+  test("spec-table-unreadable: `--spec <existing-but-unreadable path>` through parse()->run() exits 1 and names spec-table-unreadable, never spec-not-found", () => {
+    const dir = mkdtempSync(join(tmpdir(), "cli-t5-e2e-denied-"));
+    let denied: string | undefined;
+    try {
+      denied = makeGenuinelyUnreadableFile(dir, "unreadable-spec.md");
+
+      const { lines, write } = capture();
+      const inv = parse(["--spec", denied, "."]);
+      expect(inv).toEqual({ kind: "full", repoDir: ".", specPath: denied });
+      const code = run(inv, write);
+
+      const out = lines.join("\n");
+      console.log(`DoD 2 spec-table-unreadable (end-to-end via --spec): exit=${code}\n${out}`);
+      expect(code).toBe(1);
+      expect(out).toContain("spec-table-unreadable");
+      expect(out).not.toContain("spec-not-found");
+    } finally {
+      cleanupFixtureDir(dir, denied);
+    }
+  });
+
+  // Sibling control: the SAME end-to-end path (`--spec <path> .` through parse()->run()), against the
+  // real bundled spec -- succeeds, unaffected by either branch above. Proves the two failing cases
+  // redden because of their OWN fixture's condition, never because `--spec` broke the happy path.
+  test("CONTROL: --spec pointed at the real bundled spec succeeds end-to-end, same shape as the two failing cases above", () => {
+    const { lines, write } = capture();
+    const inv = parse(["--spec", BUNDLED_SPEC_PATH, "--section", "9", "."]);
+    expect(inv).toEqual({ kind: "section", section: "9", repoDir: ".", specPath: BUNDLED_SPEC_PATH });
+    const code = run(inv, write);
+    expect(code).toBe(0);
+    expect(lines.some((l) => l.includes("S9.LOGDIR"))).toBe(true);
+  });
+});
+
+// --- Tier G evidence (SPRINT-091 T5; ADR-029 -- --spec is Tier G by defaulting up, task brief) -----
+//
+// The exact risk this task's own brief names: "a silently-ignored spec path would make every fixture
+// assertion vacuous while the suite stayed green -- a false negative by construction." So the seed
+// below targets THAT precise shape, not an arbitrary line: `run()`'s own `section`/`full` cases (the
+// two lines this task actually added wiring to) had `inv.specPath` swapped for a hardcoded `undefined`
+// -- silently discarding whatever `--spec` a caller passed and always falling back to
+// `BUNDLED_SPEC_PATH`, exactly the false-assurance shape DoD 1/2 exist to rule out.
+//
+// Hash convention (L-169): `git hash-object apps/cli/src/main.ts` alone, never mixed with a blob hash
+// -- this file's own working-tree content, normalization-aware by construction (CRLF on this Windows
+// checkout; `git hash-object` applies the same clean-filter a commit would).
+//
+//   pristine  -> 8e3c3dbe2e902cccfbc9fe35d1bb04bb81a1f6e1  (500 lines)
+//   seeded    -> da67ad7712517b7bbfe74421912cb4e757fe5761  (500 lines -- targeted: line count unchanged,
+//                a demolition would have shifted it)
+//   restored  -> 8e3c3dbe2e902cccfbc9fe35d1bb04bb81a1f6e1  (500 lines) -- byte-identical to pristine
+//
+// `bun test apps/cli/src/main.test.ts` under the seed: 80 pass, 4 fail, 84 total (parsed and ran to
+// completion -- not a demolition that erred the file out). Reddened EXACTLY the 4 tests this seed
+// predicts, none other:
+//   1. DoD 1: "dropping S9.LOGDIR's row makes it vanish from --section 9's output; the pristine
+//      sibling still reports it" -- the doctored spec's row-removal stopped mattering once `--spec`
+//      itself stopped mattering; S9.LOGDIR reappeared in the "doctored" run's output.
+//   2. DoD 1: "a full flagless run against the doctored spec also omits S9.LOGDIR..." -- same defect,
+//      the flagless-run render path.
+//   3. DoD 2: "spec-not-found: `--spec <missing path>` through parse()->run() exits 1..." -- a missing
+//      path stopped being READ at all once `--spec` was discarded; the CLI silently read the real
+//      bundled spec instead and exited 0.
+//   4. DoD 2: "spec-table-unreadable: `--spec <existing-but-unreadable path>`..." -- same defect.
+//
+// Every SIBLING stayed green, proving the seed is scoped to `--spec`'s wiring, not a general
+// regression: all 76 tests that predate this task (parse()/exit-code/oracle/T9/T11/T12 coverage --
+// none of which ever passes `specPath`), all 7 new `--spec` PARSER tests above (`parse()` itself was
+// never touched by this seed -- only `run()`'s consumption of what `parse()` produces), and -- the
+// most direct sibling control of all -- DoD 2's own "CONTROL: --spec pointed at the real bundled spec
+// succeeds end-to-end" test, which passes `BUNDLED_SPEC_PATH` explicitly and so is INDISTINGUISHABLE
+// from the seed's hardcoded fallback; it stayed green precisely because it could not tell the
+// difference, which is exactly why it does not carry this task's discrimination claim -- the 4 tests
+// above do.
+//
+// After restore: `bun test apps/cli/src/` (both files) returned to 91 pass / 0 fail, and
+// `bunx tsc --noEmit` returned to zero errors -- both re-run fresh against the restored file, not
+// inferred from the pristine baseline recorded earlier in this file.
