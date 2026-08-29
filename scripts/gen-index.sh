@@ -122,7 +122,9 @@ hdr=$(mktemp "$idxdir/.knowledge-index-hdr.XXXXXX")
 hdr_dated=$(mktemp "$idxdir/.knowledge-index-hdrd.XXXXXX")
 bdy=$(mktemp "$idxdir/.knowledge-index-bdy.XXXXXX")
 tail_f=$(mktemp "$idxdir/.knowledge-index-tail.XXXXXX")
-trap 'rm -f "$tmp" "$hdr" "$hdr_dated" "$bdy" "$tail_f"' EXIT  # best-effort cleanup if we exit/die early
+tmp_norm=$(mktemp "$idxdir/.knowledge-index-tmpn.XXXXXX")
+out_norm=$(mktemp "$idxdir/.knowledge-index-outn.XXXXXX")
+trap 'rm -f "$tmp" "$hdr" "$hdr_dated" "$bdy" "$tail_f" "$tmp_norm" "$out_norm"' EXIT  # best-effort cleanup if we exit/die early
 
 # TD-111 / SPRINT-093 T2: last_updated used to be re-stamped to today() on every run, so on an
 # UNCHANGED tree, crossing midnight alone made this run's output differ from the file already on
@@ -141,15 +143,30 @@ rm -f "$entries"
 
 cat "$hdr" "$bdy" "$tail_f" > "$tmp"
 
-if cmp -s "$tmp" "$OUT"; then
-  # Body matches $OUT under the file's EXISTING last_updated -- nothing changed. Leaving the
-  # date untouched here (rather than re-stamping unconditionally) is the fix itself: it is what
-  # makes an unchanged tree produce a byte-identical file across a midnight boundary.
+# SPRINT-093 T2 revise: .gitattributes normalizes only *.sh, and core.autocrlf=true means a
+# fresh checkout/clone/`git checkout --`/stash-pop of this generated .md file arrives as CRLF
+# (measured live: 35 CR bytes on a pristine checkout, one per line -- `grep -c $'\r'` undercounts
+# this as line-matches, not byte-count) while gen() always emits pure LF. A byte-exact `cmp`
+# against that CRLF file can never match ANY tree state git just wrote, even with zero real
+# content change -- --check reported STALE on a pristine checkout. Stripping \r from BOTH sides
+# before comparing makes the check line-ending agnostic without hiding a real change: $tmp is
+# already pure LF (nothing for `tr -d '\r'` to remove there), and a genuine content edit changes
+# bytes OTHER than \r, so it still differs post-strip. `docs/knowledge-index.md text eol=lf` in
+# .gitattributes stops the CRLF checkout at its source for future clones; this comparison is
+# what protects a clone that already has the file on disk.
+tr -d '\r' < "$tmp" > "$tmp_norm"
+tr -d '\r' < "$OUT" > "$out_norm"
+
+if cmp -s "$tmp_norm" "$out_norm"; then
+  # Body matches $OUT (line-ending differences aside) under the file's EXISTING last_updated --
+  # nothing changed. Leaving the date untouched here (rather than re-stamping unconditionally)
+  # is the fix itself: it is what makes an unchanged tree produce a byte-identical file across a
+  # midnight boundary.
   if [ "${1:-}" = "--check" ]; then
     echo "PASS  gen-index: knowledge index current"
-    rm -f "$tmp" "$hdr" "$hdr_dated" "$bdy" "$tail_f"; exit 0
+    rm -f "$tmp" "$hdr" "$hdr_dated" "$bdy" "$tail_f" "$tmp_norm" "$out_norm"; exit 0
   fi
-  rm -f "$tmp" "$hdr" "$hdr_dated" "$bdy" "$tail_f"
+  rm -f "$tmp" "$hdr" "$hdr_dated" "$bdy" "$tail_f" "$tmp_norm" "$out_norm"
   echo "gen-index: docs/knowledge-index.md already current (no content change)"
   exit 0
 fi
@@ -162,7 +179,7 @@ cat "$hdr_dated" "$bdy" "$tail_f" > "$tmp"
 
 if [ "${1:-}" = "--check" ]; then
   echo "FAIL  gen-index: knowledge index STALE — run: sh scripts/gen-index.sh" >&2
-  rm -f "$tmp" "$hdr" "$hdr_dated" "$bdy" "$tail_f"; exit 1
+  rm -f "$tmp" "$hdr" "$hdr_dated" "$bdy" "$tail_f" "$tmp_norm" "$out_norm"; exit 1
 fi
 # NOTE on atomicity: same-directory `mv` is a real rename(2) on POSIX filesystems, which
 # is atomic there. This repo runs on Windows/NTFS via Git Bash — `mv` onto an existing
@@ -172,5 +189,5 @@ fi
 # same-directory tmp *does* guarantee on this platform is that the move is same-volume
 # (no cross-device copy+delete), which is what prevented the TD-021 truncation.
 mv "$tmp" "$OUT"
-rm -f "$hdr" "$hdr_dated" "$bdy" "$tail_f"
+rm -f "$hdr" "$hdr_dated" "$bdy" "$tail_f" "$tmp_norm" "$out_norm"
 echo "gen-index: regenerated docs/knowledge-index.md"
