@@ -6,6 +6,7 @@ epic: EPIC-015
 owner: Maintainer
 last_updated: 2026-08-29
 status: active
+gates_signed: G1,G2 @ 760dc69
 plan_commit: c52496f
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -113,7 +114,7 @@ precedent** — re-derive before relying on it.
 - [ ] `AFK-safe` and `J2` are reconciled — *Verify: the two are no longer defined as opposites while one is said to permit the other; whichever way the ruling goes, both definitions state it consistently*
 
 ## Owner-action checklist
-- [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099).
+- [x] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099). — ✓ signed at `760dc69`. **No fast-path**: every task here is `origin: close-retro`, which never passed the intake grill, so G1 ran its full checklist rather than re-confirming a scope agreement that does not exist. Both assumptions confirmed against evidence first — A1 against the committed SPRINT-089 artifact (log line 194), A2 against `night-run.sh` itself (`bypass`: 0, `--force`: 0, `die_doa` on gate failure present)
 - [ ] **Two rulings are the deliverable, not a step toward one** — T3's exception policy and T4's item-3 reading. Both are `class: decision`; neither can be discharged by an implementation.
 
 ## Decisions (pre-locked)

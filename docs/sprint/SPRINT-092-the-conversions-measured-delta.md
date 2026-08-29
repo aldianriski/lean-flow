@@ -6,6 +6,7 @@ epic: EPIC-014
 owner: Maintainer
 last_updated: 2026-08-29
 status: active
+gates_signed: G1,G2 @ 760dc69
 plan_commit: c52496f
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -75,7 +76,7 @@ leg no longer spawns the Shell engine for §4.
 - [ ] Semantic coverage is unchanged, not merely relocated — *Verify: the §4 rules still evaluate somewhere on every gate run, or § Decisions records exactly which coverage moved to opt-in and why*
 
 ### T3 — Relocate §4 differential parity to the opt-in profile, with an ADR naming when parity must run `[size: S · risk: med · class: decision · HITL · J1]`
-Layers: `evals/` · `scripts/qa-check.sh` · `docs/adr/` · `docs/DECISIONS.md`
+Layers: `evals/run-adr-family-fixtures.sh` · `scripts/qa-check.sh` · `docs/adr/` · `docs/DECISIONS.md` (narrowed at G2 from a bare directory declaration per L-100 — the directory form swallowed the night-run rollup harness, which the autonomy stream owns; a new parity harness file, if T3 creates one, is declared here too and logged)
 Depends-on: T2
 Cites: EPIC-014 D2 · ADR-029 (Tier G + Tier P) · ADR-034 (the frozen surface) · SPRINT-091 T6/T7 (the parity harness being relocated)
 Tier **G** for the harness move, Tier **P** for the ADR text — declared separately because the bars
@@ -111,8 +112,8 @@ and the result is compared against the derived ceiling with any shortfall named.
 - [ ] `TD-090` is updated with what this conversion did **and did not** buy — *Verify: the row states both, since a debt row claiming only the win is how the next reader over-credits it*
 
 ## Owner-action checklist
-- [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099).
-- [ ] Rule at G2 on whether T2's coverage relocation (always-on → opt-in) is acceptable, since it is the one place this sprint trades a guard for time.
+- [x] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099). — ✓ signed at `760dc69`, the tree the gates were reviewed against. G1 took the **fast-path**: all four tasks are `origin: decomposer` and met the intake grill, so scope was re-confirmed rather than re-derived. Both assumptions were confirmed against evidence first, since an unconfirmed `assumes:` blocks G2
+- [x] Rule at G2 on whether T2's coverage relocation (always-on → opt-in) is acceptable, since it is the one place this sprint trades a guard for time. — ✓ **owner ruled: acceptable, parity moves to opt-in as designed.** The saving is real (30.0 s of always-on cost, confirmed present in `eval_harnesses_always`), and §4 still evaluates in TS on every run through the evaluators SPRINT-091 T12 wired — so what moves to opt-in is the *differential parity against Shell*, not §4 coverage itself. T3's ADR must name the drift window that opens and the moments parity is mandatory; **T2's fourth DoD stays the binding one** — semantic coverage unchanged, not merely relocated
 
 ## Decisions (pre-locked)
 
