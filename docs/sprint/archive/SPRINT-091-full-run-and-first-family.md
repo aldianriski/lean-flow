@@ -3,9 +3,9 @@ sprint: 091
 slug: full-run-and-first-family
 epic: EPIC-014
 owner: Maintainer
-last_updated: 2026-08-27
-status: active
-gates_signed: G1,G2 @ f24abde
+last_updated: 2026-08-29
+status: closed
+gates_signed: G1,G2 @ 0fd27ed
 plan_commit: 3e787c2
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -253,7 +253,7 @@ runs, and agrees with Shell there — not only in its own unit test.
 - [x] A sibling control proves the wiring discriminates rather than reddening everything — ✓ two independent seeds, deliberately different: the builder cut the **F4** bind (3 red, 3 green); the reviewer cut the **S4.APPEND** bind and got **71 pass / 1 fail**, the single failure being the S4.APPEND sibling-registry control reddening with `gap S4.APPEND -- rule-unimplemented` while every other T12 test — F4's four rules, the judgment-only control, both DoD-2 tests, the clean-fixture control — stayed green. One hash convention, `git hash-object`, cross-checked against `git rev-parse HEAD:<path>`: pristine `9f65b268…` → seeded `9516797e…` → restored `9f65b268…`, **423 lines throughout**, `tsc --noEmit` clean under the seed (a targeted break that still parses, not a demolition — L-137 · L-142)
 
 ## Owner-action checklist
-- [ ] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099).
+- [x] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099). — ✓ **re-signed at close by owner ruling, at `0fd27ed`, superseding `f24abde`.** The original signature predated T11 and T12, which owner rulings added mid-sprint — a third of the final 12-task Plan. A signature covering nine tasks is not evidence of approval for twelve, and L-099's rule is that the frontmatter is the only thing an unattended run reads: leaving a stale sha there would have made the gap invisible to exactly the reader the field exists for. The two additions remain individually ruled and logged as `scope-change` entries; this re-signature covers the Plan **as executed**
 
 ## Decisions (pre-locked)
 
@@ -314,8 +314,88 @@ runs, and agrees with Shell there — not only in its own unit test.
 
 ## Files Changed
 
-| File | Task | Change (WHY) | Risk | Test |
+> 64 files across 38 commits (`3e787c2..HEAD`). Grouped by area rather than listed per file — a
+> per-file table would breach the 400-line cap and read as a codemap, which LAW 3 rules out.
+
+| File / area | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `package.json` · `bun.lock` · `tsconfig.base.json` · `scripts/qa-check.sh` | T1 | Admit a dev-only type checker and wire it into the gate — the repo stated guarantees "enforced by a TYPE" while nothing evaluated one (TD-101) | med | Gate leg FAILs on TD-101's exact recorded case; sibling control green; absent toolchain FAILs rather than skips |
+| `docs/adr/ADR-035` · `ADR-037` · `ADR-038` · `docs/DECISIONS.md` · `docs/knowledge-index.md` | T1 · T10 | ADR-035 amended for the dev-only dependency; ADR-037 admits it; ADR-038 records the composed multi-family dispatch seam | low | Reviewed clean; index regenerated and gate-checked |
+| `packages/standard/src/` (16 files) | T3 · T4 · T8 · T9 | Full Standard traversal, hold semantics + full-run level arithmetic, composed multi-family dispatch, tree brought to zero type errors (59 → 0) | med | Differential vs live-spawned Shell; architecture fitness tests; `tsc --noEmit` |
+| `packages/standard/src/rules/` (26 files) | T6 · T7 | Five §4 evaluators with their registries, ports and in-memory fakes — the F6 ADR-governance family | med · high | Live-Shell oracle parity on 9 retained fixtures; per-rule sibling controls; seeded-break discrimination |
+| `packages/standard/src/adapters/` (3 files) | T7 | Real FS adapters for the ADR family and its git history, plus the combined port S4.APPEND alone needs | high | In-memory fake + live oracle; real `--depth 1` clone of the published repo |
+| `apps/cli/src/` (4 files) | T11 · T12 · T5 | Level line + distinct `hold` rendering; the §4 family actually dispatched; caller-supplied `--spec` threaded to every spec-consuming port | med | Per-render-site tests; laundering differential on the motivating fixture; two isolated per-site seeds |
+| `evals/fixtures/adr-family/empty-slug/` (2 files) | T6 | Retained fixture for the **ruled** TS/Shell divergence — deleting it with the prototype would leave the gate unguarded (TD-012) | low | Asserted against both engines, divergence documented not absorbed |
+| `docs/research/logs/qa-gate-timing.md` | T2 | Rounds 10–12: the conversion's measured headroom, twice re-derived after its figures were struck | low | Re-derived independently by reviewer; verdicts diffed before timing |
+| `docs/sprint/…` + `logs/…` | coordinator | Plan ticks and the append-only Execution Log (ADR-014) | low | `check-layers-completeness` · `check-review-depth` · `check-verify-reaches` · `check-authority` |
+| `TECH-DEBT.md` · `docs/LEARNINGS.md` | T2 · T12 · coordinator | TD-117 · TD-118 · TD-119 · TD-120 filed; L-170 count bumped | low | Ledger census cross-checked (60 rows / 60 unique ids) |
 
 ## Retro
-<!-- Written at close. Route the four buckets to their durable homes (STANDARD §10). -->
+
+**Closed-when (EPIC-014 § 2):** the engine runs whole and the first family evaluates at parity. Both met.
+The gate is **not** faster, exactly as § Scope promised — that is SPRINT-092's half, travelling with the
+measurement that proves it.
+
+**What this sprint actually was.** Twelve tasks against a Plan G1 sized `L` and split to nine. The
+re-expansion was not scope creep: T9–T12 are each a *consequence* of work already done that nobody had
+assigned an owner. Three of them exist because a capability was built and then reached by nothing —
+T11 (`attachLevel` uncalled), T12 (five §4 evaluators composed into nothing), and, one level up, the
+review that found T12 at all. **L-020 fired three times in one sprint, in three different files, and
+each time the builder was blameless**: the seam sat outside every task's declared `Layers:`. That is a
+planning defect, not an execution one — a Plan that assigns files but never assigns *seams* leaves the
+integration point unowned by construction.
+
+### Shipped → CHANGELOG
+Type checker admitted and gated (T1) · full Standard traversal with mark-driven dispatch, gap/hold
+reporting and full-run level arithmetic at Shell parity (T3 · T4) · composed multi-family `--section`
+dispatch (T9) · the F6 §4 ADR-governance family migrated whole and **dispatched** (T6 · T7 · T12) ·
+`hold` rendered distinctly and the level wired into the CLI (T11) · caller-supplied `--spec` (T5) ·
+ADR-037 and ADR-038 (T1 · T10) · the conversion's measured headroom, Rounds 10–12 (T2).
+
+### Tech debt → `TD-NNN`
+`TD-117` (worktree-isolated review pushes the gate past its own budget) · `TD-118` (S4.NEGATIVE is a
+bare substring match in both engines) · `TD-119` (`check-layers-completeness.sh` matches Cites against
+Layers by substring) · `TD-120` (S4.APPEND spawns ~2 uncached git processes per ADR: the flagless run
+went 0.689s → 6.948s on 38 ADRs). **TD-120 is the one to route early** — it must be fixed *before* the
+H24–H26 authority cutover, because once TS holds authority the cost lands on a gate TD-117 already puts
+at 86–91% of ceiling.
+
+### Follow-ups → `TASK-NNN`
+**`TASK-318` — detect a shipped capability that nothing calls, mechanically.** Filed to `TODO.md`, not
+just named here: the Backlog is what `promote` reads, and a follow-up recorded only in a sprint summary
+is invisible to every promote that follows (L-151's fourth sighting, which this close deliberately does
+not repeat). It is pointed at the three real artifacts that motivated it — `attachLevel` pre-T11, the
+two §4 registries pre-T12, and TD-103's pair — because a detector proven only on fixtures is the L-166
+shape, and this detector's whole purpose is to catch the shape it would otherwise be an instance of.
+
+**Also surfaced, deliberately not actioned:** `TASK-317` in the Backlog is still `state: ready`, but T1
+of this sprint delivered exactly its `done-when` (a type check inside the gate, failing on TD-101's
+recorded case). It is a *pre-existing* row this sprint did not author, so it is named here for `/triage`
+rather than silently closed — but left `ready` it will be promoted and rebuilt.
+
+### Learnings → `L-NNN`
+**`L-172` bumped to `count: 2` — the between-tasks blind spot, now promotable.** Its own text predicted
+this: it was written from SPRINT-087's three zero-caller capabilities *because* `L-020` was already
+promoted and had missed them, and it then missed twice more here, with the entry sitting open in the
+repo. The sharper of the two is T12, where the gap produced a **wrong answer** rather than dead code.
+What this sprint adds is the durable form — the property is mechanically detectable, so it can become a
+*check* instead of a better-worded DoD item, which is the thing that has now failed twice (`TASK-318`).
+
+**`L-170` bumped to `count: 2`, and it recurred inside this very Retro.** Deriving the next `L-NNN`, the
+coordinator ran a bare repo-wide `grep -r` and got `L-999` out of eleven live agent worktrees against a
+real maximum of `L-180` — the identical query, the identical wrong answer, and the identical token
+(SPRINT-013's deliberate dangling-reference negative test) as the Sprint-087 sighting the rule was
+written from. It was caught the same way and by nothing else: **a disagreeing second number.** The
+sharper reading is that the same session had already derived `TD-119` and `TD-120` correctly, with an
+agreeing second query each time, and then dropped the discipline the moment the identifier was an
+`L-NNN` — because *that* felt like Retro bookkeeping rather than querying. `count: 2` makes it
+promotable at the next promote checkpoint; the placement question it raises is where a reader would
+actually meet it, which is id-derivation, not censuses.
+
+**Two more candidates, recorded here rather than filed, because neither has a second sighting yet:**
+(i) an outside reviewer's most valuable act was *reproducing the defect* (checking `main.ts` out at
+`e5d59ce^` to see `level: Attested` with its own eyes) rather than confirming the new tests pass — the
+first anchors a fix to the behaviour it removes, the second only to a suite written alongside it;
+(ii) two reviewers independently **weakened DoD wording they were asked to confirm** (T12's level-match
+being over-determined; T7's plugin-installer framing being asserted) — a reviewer that only ever
+upgrades confidence is not reviewing, and both of these were volunteered, not asked for.

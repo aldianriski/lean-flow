@@ -18,20 +18,27 @@ status: current
 
 ## Active Sprint
 
-> **One active sprint.** Single stream — this sprint is not part of a stream and omits the `stream:`
-> field (CONTEXT.md § Sprint model).
+_(no active sprint)_ — **SPRINT-091 closed 2026-08-29 at 41 of 41 DoD**, released as **v1.62.0**
+([`CHANGELOG.md`](CHANGELOG.md)); Plan and Execution Log archived to
+[`docs/sprint/archive/`](docs/sprint/archive/). It completed **EPIC-014 § Closed-when 2** — the engine
+runs whole, and the F6 §4 ADR-governance family evaluates at parity with Shell and is *dispatched* by
+the invocations a consumer actually runs.
 
-> **SPRINT-091 — Full Run and the First Family** → [docs/sprint/SPRINT-091-full-run-and-first-family.md](docs/sprint/SPRINT-091-full-run-and-first-family.md)
+**The next promote is already staged:** `TASK-313`–`TASK-316` are `state: ready` and form **SPRINT-092**
+— the harness conversion this sprint's engine work exists to enable, travelling with the measured
+before/after that proves it. **No gate got faster in SPRINT-091, by design**, so 092 is where the saving
+is claimed and evidenced together.
 
-EPIC-014's **fourth member sprint** (`epic: EPIC-014`), targeting § Closed-when **2**. SPRINT-087 proved
-one rule through the engine; this makes the engine able to run *whole*, migrates the **F6 §4
-ADR-governance** family — chosen on measured cost across **both** axes, never by section number
-(V3 §43) — and carries the slice through to one eval harness that no longer spawns the 3,142-line Shell
-engine on every gate run. **T1 is the type checker**: ten TypeScript tasks on a toolchain that evaluates
-no types would satisfy their own type-level DoD with unchecked code (**TD-101**, `high` and unrouted for
-four sprints, escalated at this promote).
-**G1/G2 are NOT yet signed** — `gates_signed:` is absent from that file, and its absence means not
-signed, never approval.
+**Route at the next promote, in this order:**
+- **`TD-120`** (medium) — S4.APPEND spawns ~2 uncached git processes per ADR; a full run went
+  0.689s → 6.948s on 38 ADRs. Fix **before** the H24–H26 authority cutover, not after: once TS holds
+  §4 authority this lands on a gate `TD-117` already puts at 86–91% of ceiling.
+- **`TASK-318`** (`origin: close-retro`) — detect a shipped capability that nothing calls. `L-020` is
+  promoted and live in the DoD, and the class still shipped ×3 in one sprint.
+- **`TASK-317`** — **stale, needs `/triage` rather than promotion.** Still `state: ready`, but
+  SPRINT-091 T1 delivered its exact `done-when`. Left in place rather than silently closed, because
+  this close did not author it; promoted as-is it will be rebuilt.
+- **`L-170`** — now `count: 2`, so promotable. It recurred inside SPRINT-091's own close.
 
 Carried from the previous pair: EPIC-015 § Closed-when **1** stays open — the reaper published a false
 `PLAN_EXHAUSTED` and the shape checker passed it (**TD-112** → `TASK-303`). SPRINT-089/090's full
@@ -401,6 +408,30 @@ EPIC-015 § Member sprints.
       origin:     manual
       state:      ready
 
+
+- [ ] TASK-318 — Detect a shipped capability that nothing calls, mechanically  [size: M] [risk: med] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  a check reports any exported or registry-registered symbol in packages/ or apps/ that
+                  has ZERO non-test callers, and it is pointed at the three real artifacts that
+                  motivated it rather than fixtures alone (L-166): `attachLevel` before SPRINT-091 T11,
+                  `createF4Registry`/`createS4AppendRegistry` before T12, and TD-103's `reconcile()` /
+                  `marksInStandard()` — each must be reported by the check when run against the tree at
+                  the commit that shipped it unwired. Retained must-FAIL fixture plus a sibling control
+                  (a symbol WITH a production caller must stay green), and a seeded-break discrimination
+                  proof verified landed under ONE hash convention (L-137 · L-142 · L-169)
+      touches:    scripts/lib/ · scripts/qa-check.sh · evals/fixtures/
+      depends-on: none
+      assumes:    the class is mechanically detectable from imports/registrations without running the
+                  code — CONFIRM at G2 by re-deriving against the three motivating artifacts before
+                  designing; if a symbol reached only through a registry string proves undetectable
+                  statically, the scope narrows to exported symbols and says so
+      tracker:    L-172 (count: 2, promotable — "a per-task DoD cannot enforce a property that lives
+                  BETWEEN tasks"; it exists because L-020 was already promoted and still missed the
+                  class, then missed it twice more in SPRINT-091) · L-020 · TD-103 · L-166
+      origin:     close-retro
+      state:      ready
+
 ### P3 — Long-term
 
 > Rejected work lives in **`.out-of-scope/`** — each file carries its own reasoning, revisit-if and
@@ -420,7 +451,7 @@ EPIC-015 § Member sprints.
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(no active sprint)_ — SPRINT-086's shipped changes are written up as **v1.59.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only). Consumer-facing surfaces: the attended **consequence** schema (new field in `sprint-log.md.template` + `orchestrator/SKILL.md` + `review-scoping.md`), a **stricter** review-depth gate that now FAILs on a missing review line for `governance:high`/`behaviour:material` work, and the QA budget default lowered **900s → 450s** so an over-budget run reports and names its skipped harnesses instead of dying past an external timeout.
+_(no active sprint)_ — SPRINT-091's shipped changes are written up as **v1.62.0** in [`CHANGELOG.md`](CHANGELOG.md), MINOR by hand (feature sprint; `/release-patch` is PATCH-only). All five versioned surfaces bumped together, derived with `grep -l '"version"' .*-plugin/*.json` rather than from a list (L-180): the four manifests plus the README footer, which no lockstep check covers. Consumer-facing surfaces: **`--spec <path>`** (additive — every existing invocation defaults to the bundled Standard); `leanflow <repo-dir>` and `--section 4` now **actually evaluate §4** instead of reporting five `rule-unimplemented` gaps, so a repo with an ADR-governance violation is now told about it — at a real cost of ~6.3s on a 38-ADR repo (**TD-120**); `hold` no longer renders identically to a plain note; and the gate now type-checks, FAILing rather than skipping when no toolchain is present (**ADR-037**).
 
 ---
 
