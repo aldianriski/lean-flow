@@ -250,3 +250,65 @@ everything in that commit to the task; close-bookkeeping belongs in its own `spr
 rule 5 exempts by role. That is the fourth `Layers:` correction this sprint and the first caused by
 commit *composition* rather than by the declaration itself.
 
+---
+
+### 2026-08-29 | progress | T3 and T5 complete — and the review found a rename that had been silently disabling the reaper
+
+consequence · T3 · behaviour:material · governance:high — review: independent-adversarial, worktree-isolated
+consequence · T5 · behaviour:material · governance:high — review: independent-adversarial, worktree-isolated
+
+**The lead finding is the sharpest of the sprint, and it was nobody's task.** `night-run.sh` gated the
+reaper on `case "$allargs" in *sprint-bulk*)`. SPRINT-088 had renamed the mode to **`overnight`** —
+correctly, additively, with every alias preserved and the mode-signal check updated. Nothing broke
+visibly. But this gate still matched the *old literal*, so a run fired the documented canonical way
+(`--mode overnight`) never reaped and **never wrote a `terminal ·` line**.
+
+That line is the only artifact T5's mode signal trusts. The reviewer reproduced the whole chain live in
+a throwaway repo: headless run, unparked `J2` task, zero `terminal ·` lines, and `check-authority`
+answering `authority-j2-honoured … read as an attended completion`. **A genuinely unattended, unparked
+J2 execution passing silently — the exact shape T5 exists to prevent, reachable through the trigger the
+documentation calls canonical.**
+
+**Nobody noticed for five sprints because nothing depended on the reaper's output being present.** T5
+then built a mode signal on top of it, and the latent bug became load-bearing the moment it acquired a
+consumer. That is L-105's family for the **sixth** time this session — a guard reading a stale
+*identifier*, after the window, the bytes, the mode, the subject shape, and a self-described limit.
+
+**The fix deletes the gate rather than extending it.** Reaching that line already proves a validated
+mode signal passed — the earlier gate `die_doa`s on an unrecognised mode — so the reaper now trusts
+that upstream verdict, and `--no-reap` is the sole opt-out. Adding `overnight` to the substring list
+would have repeated the defect with a longer list and broken again at the next rename. Retained
+must-PASS: `reap-fires-on-canonical-overnight`, firing `--mode overnight` without the string
+"sprint-bulk" appearing anywhere.
+
+**T3's own mechanism had a second, subtler defect: canonical names collided.** `qa-check.sh` leg 13
+emits three semantically distinct FAILs — file-not-found, ask-channel-probe-missing,
+park-record-instruction-missing — whose text before the first `: ` is *identical*, so prefix
+canonicalisation collapsed them into one name. A grant approving one silently pre-approved the other
+two. Fixed by dropping canonicalisation for **verbatim whole-line** matching (`grep -qFx`): if
+`qa-check.sh` cannot distinguish two failures in its own printed text, nothing reading that text can.
+
+That forced a format change the builder **verified was necessary rather than preferred**: `gate_exceptions:`
+became a newline-delimited block list, because a grep over every `bad "…"` call site found real FAIL
+messages embedding both `·` and `|`, so no single-character delimiter can safely join full FAIL lines.
+Newline is the one boundary that provably cannot appear inside a printed FAIL line. **Consumer-facing
+format change — it belongs in the CHANGELOG at close.**
+
+**The tradeoff is named rather than hidden:** verbatim matching means a grant goes stale if the check's
+message text shifts for any unrelated reason between approval and fire. It fails **safe** — a refusal,
+not a firing — but it is a real usability cost, and the builder judged it correct at Tier G stakes
+rather than kicking it across the ownership line to the engine stream.
+
+**T5's retry answered its own weakest DoD honestly instead of restating it.** Asked whether a fail-safe
+exists that does not depend on the wrapper having written a line, it added a second *independent*
+signal — a pinned `approval_envelope:` written on a pre-flight path the reap-gate bug never touched —
+OR'd with the terminal check, **and wrote into the comment that "neither signal is airtight, and the OR
+of both is still not proof of attendedness."** The prior comment claimed absence was "the strongest
+evidence" of attendedness, which the reviewer had just disproved. A guard overstating its own guarantee
+is the shape TD-121 is filed against; correcting the claim mattered as much as adding the signal.
+
+**And T5 closed a class rather than an instance.** The reviewer found that a bare ``` fence puts a
+quoted rollup at column 1, flipping a legitimate attended log to FAIL. T5 de-fences the log once and
+points *all four* anchored patterns at the result — `parked`, `executed`, `ruled` and `terminal` — so
+the same vulnerability is closed for every one, not only the one that was demonstrated.
+

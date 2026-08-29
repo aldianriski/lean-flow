@@ -92,9 +92,9 @@ a convenience**.
 named pre-approved exceptions.
 
 **DoD:**
-- [ ] Part 1's checklist states the green-gate precondition **where the checklist is read** — *Verify: a reader following the checklist top to bottom meets it; today it lives only in `scripts/night-run.sh` (L-151 — a decision its reader cannot reach is not a decision)*
-- [ ] An owner ruling is recorded on whether a run may fire against a **named, pre-approved** failing check — never a blanket `--force` — *judgment tick: this is a ruling, and recording it is the deliverable*
-- [ ] If the ruling permits an exception, the mechanism is narrow by construction — *Verify: a named check only; a blanket bypass flag is out of scope by the ruling's own terms*
+- [x] Part 1's checklist states the green-gate precondition **where the checklist is read** — *Verify: a reader following the checklist top to bottom meets it; today it lives only in `scripts/night-run.sh` (L-151 — a decision its reader cannot reach is not a decision)*
+- [x] An owner ruling is recorded on whether a run may fire against a **named, pre-approved** failing check — never a blanket `--force` — *judgment tick: this is a ruling, and recording it is the deliverable*
+- [x] If the ruling permits an exception, the mechanism is narrow by construction — *Verify: a named check only; a blanket bypass flag is out of scope by the ruling's own terms*
 
 ### T4 — Rule pre-flight item 3's wording against a declared `J2` `[size: S · risk: med · class: decision · HITL · J2]`
 Layers: `skills/orchestrator/references/night-run.md` · `.claude/CONTEXT.md` (only if the ruling moves the vocabulary — it did not; see the Log) · `TECH-DEBT.md` (declared per L-100 at execution: this ruling is what RESOLVES TD-109, so recording that resolution is part of delivering it, and the promote-time declaration under-named it)
@@ -130,14 +130,14 @@ the check would be failed by the check it fixes.
 **Acceptance:** the park requirement applies where the park protocol applies, and nowhere else.
 
 **DoD:**
-- [ ] The `J2` park requirement no longer fails an **attended** execution — *Verify: SPRINT-093 T1 and T2, the real motivating artifacts, pass the leg on the tree as it stands (L-166 — not a fixture built to pass)*
-- [ ] The **unattended** case still fails without a park — *Verify: retained must-FAIL; a J2 task executed headless with no park record still FAILs with its named finding*
-- [ ] The `authority-j2-park-bypassed` branch survives untouched — *Verify: park + execution + no `owner-ruling` still FAILs. This branch was added after an independent reviewer caught the first version accepting any stale park record (L-165); removing it to simplify the fix would re-open the silent bypass Part 0 step 6 forbids*
-- [ ] The fix discriminates — *Verify: seed it and confirm the attended case and the unattended case move independently, siblings green (L-142); seed verified landed by `git hash-object` under ONE convention (L-169)*
+- [x] The `J2` park requirement no longer fails an **attended** execution — *Verify: SPRINT-093 T1 and T2, the real motivating artifacts, pass the leg on the tree as it stands (L-166 — not a fixture built to pass)*
+- [x] The **unattended** case still fails without a park — *Verify: retained must-FAIL; a J2 task executed headless with no park record still FAILs with its named finding*
+- [x] The `authority-j2-park-bypassed` branch survives untouched — *Verify: park + execution + no `owner-ruling` still FAILs. This branch was added after an independent reviewer caught the first version accepting any stale park record (L-165); removing it to simplify the fix would re-open the silent bypass Part 0 step 6 forbids*
+- [x] The fix discriminates — *Verify: seed it and confirm the attended case and the unattended case move independently, siblings green (L-142); seed verified landed by `git hash-object` under ONE convention (L-169)*
 
 ## Owner-action checklist
 - [x] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099). — ✓ signed at `760dc69`. **No fast-path**: every task here is `origin: close-retro`, which never passed the intake grill, so G1 ran its full checklist rather than re-confirming a scope agreement that does not exist. Both assumptions confirmed against evidence first — A1 against the committed SPRINT-089 artifact (log line 194), A2 against `night-run.sh` itself (`bypass`: 0, `--force`: 0, `die_doa` on gate failure present)
-- [ ] **Two rulings are the deliverable, not a step toward one** — T3's exception policy and T4's item-3 reading. Both are `class: decision`; neither can be discharged by an implementation.
+- [x] **Two rulings are the deliverable, not a step toward one** — T3's exception policy and T4's item-3 reading. Both are `class: decision`; neither can be discharged by an implementation.
 
 ## Decisions (pre-locked)
 
