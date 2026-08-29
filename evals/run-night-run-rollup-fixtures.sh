@@ -311,6 +311,85 @@ else
 fi
 rm -rf "$rs" 2>/dev/null
 
+# --- case 10 family: the checker must read only the LAST run-complete block (SPRINT-093 T1
+# revise 3) --------------------------------------------------------------------------------------
+# Execution Logs are append-only (STANDARD §9 / ADR-014), so a sprint that survives more than one
+# night accumulates more than one `run-complete` block. Before this fix every check scanned the
+# WHOLE file: `term_state` picked the FIRST terminal line in the file (`head -n1`), and every
+# `bad_line` grep scanned every block's evidence lines together. A contradiction landing in a LATER
+# block could pass by borrowing an EARLIER block's (unrelated) terminal claim and finding
+# "evidence" for it anywhere in the file, including in the later block itself -- the checker never
+# actually read the later block's own terminal line at all. `night-run.sh`'s reap() already solves
+# this for the WRITE side (`tail -n "+$((rp_base + 1))"`) and names why in its own comment: "a guard
+# reading the wrong window fails exactly like one that is absent." This is the same fix for the
+# READ side.
+run_case_anywhere "window-second-block-contradicts-fails" 1 "PLAN_EXHAUSTED but carries a non-done per-task line" -- \
+  sh "$checker" "$fx/window-second-block-contradicts/docs/sprint/logs/SPRINT-946-window-second-block-contradicts.md"
+# The discriminating sibling (coordinator's own framing): the FIRST block here is itself a genuine
+# contradiction that would fail if it were still being read, and the LAST block is fully legitimate.
+# A fix that merely WIDENED the search ("look anywhere in the file" instead of "look only at the
+# last block") would still catch block one's problem and wrongly FAIL this case. Only a fix that
+# actually MOVED the window -- discarding earlier blocks entirely -- passes it.
+run_case_anywhere "window-second-block-legitimate-ok" 0 "agrees with its per-task lines" -- \
+  sh "$checker" "$fx/window-second-block-legitimate/docs/sprint/logs/SPRINT-947-window-second-block-legitimate.md"
+
+# --- case 11: the real committed SPRINT-082 2-block artifact (L-166 / TD-012) --------------------
+# `docs/sprint/archive/logs/SPRINT-082-foundation-hardening.md` genuinely carries two `run-complete`
+# blocks (any sprint that survives more than one night has this shape) -- read-only, never modified.
+# Neither of its two blocks carries a `terminal ·` line (both predate Part 0b's terminal-state
+# requirement), so this artifact cannot demonstrate a CONTRADICTION on its own; what it proves is
+# windowing itself, by contrast: fed to the checker in full, the verdict must be driven by the
+# SECOND (last) block's own evidence -- which supplies both the DoD header and the calibration row,
+# leaving only the missing terminal line as a finding. Truncated to end right before the second
+# block, the SAME real text (block one alone, verbatim) fails all three, because block one supplies
+# none of them. That the full file reports ONE finding where the truncated one reports THREE is the
+# proof the checker is reading block two, not block one, on genuinely real committed content.
+s82="$repo_root/docs/sprint/archive/logs/SPRINT-082-foundation-hardening.md"
+if [ ! -f "$s82" ]; then
+  echo "FAIL harness: SPRINT-082 archived log not found at $s82"
+  fail=1
+else
+  s82_rc_lines=$(grep -nE '^### .*\| *run-complete *\|' "$s82" 2>/dev/null | cut -d: -f1)
+  s82_rc_count=$(printf '%s\n' "$s82_rc_lines" | grep -c .)
+  if [ "$s82_rc_count" -lt 2 ]; then
+    echo "FAIL harness: expected >=2 run-complete blocks in SPRINT-082's archived log, found $s82_rc_count -- the retained artifact's shape changed, re-derive"
+    fail=1
+  else
+    s82_second_start=$(printf '%s\n' "$s82_rc_lines" | sed -n '2p')
+    work82full=$(CDPATH= cd -- "$here" && pwd)/.tmp-sprint082-full
+    work82one=$(CDPATH= cd -- "$here" && pwd)/.tmp-sprint082-block-one
+    rm -rf "$work82full" "$work82one" 2>/dev/null
+    mkdir -p "$work82full" "$work82one"
+    cp "$s82" "$work82full/rollup.md"
+    sed -n "1,$((s82_second_start - 1))p" "$s82" > "$work82one/rollup.md"
+
+    out=$(sh "$checker" "$work82full/rollup.md" 2>&1); ec=$?
+    if [ "$ec" -eq 1 ] &&
+       printf '%s\n' "$out" | grep -q "carries no 'terminal · " &&
+       ! printf '%s\n' "$out" | grep -q "carries no 'run · N of M DoD ticked' header" &&
+       ! printf '%s\n' "$out" | grep -q "carries no Part 4 calibration row"; then
+      echo "PASS fixture(sprint082-real-two-block-reads-second): full real 2-block file -- only the terminal-line finding fires, proving block two's own DoD-header + calibration-row evidence was read"
+    else
+      echo "FAIL fixture(sprint082-real-two-block-reads-second): expected exactly the terminal-line finding (block two's evidence) -- got exit $ec:"
+      printf '%s\n' "$out"
+      fail=1
+    fi
+
+    out=$(sh "$checker" "$work82one/rollup.md" 2>&1); ec=$?
+    if [ "$ec" -eq 1 ] &&
+       printf '%s\n' "$out" | grep -q "carries no 'run · N of M DoD ticked' header" &&
+       printf '%s\n' "$out" | grep -q "carries no Part 4 calibration row" &&
+       printf '%s\n' "$out" | grep -q "carries no 'terminal · "; then
+      echo "PASS fixture(sprint082-block-one-only-fails-all-three): the SAME real text truncated to block one alone fails all three -- the contrast that proves the full file is not reading block one"
+    else
+      echo "FAIL fixture(sprint082-block-one-only-fails-all-three): expected all three findings from block one alone -- got exit $ec:"
+      printf '%s\n' "$out"
+      fail=1
+    fi
+    rm -rf "$work82full" "$work82one" 2>/dev/null
+  fi
+fi
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "NIGHT-RUN-ROLLUP FIXTURES: all green"; else echo "NIGHT-RUN-ROLLUP FIXTURES: at least one FAIL"; fi
 exit $fail
