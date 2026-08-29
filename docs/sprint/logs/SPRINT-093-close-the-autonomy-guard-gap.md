@@ -241,3 +241,12 @@ moving the vocabulary. **TD-109 marked `resolved → TASK-306`** with the supers
 EPIC-015 consequence recorded in the row: a proof of `AUTHORITY_BOUNDARY`/park behaviour can no longer
 come from a Plan that *declares* its J2 task — it needs a J2 shape surfaced dynamically.
 
+**Layers corrected once more, and the cause is worth naming.** T4's commit was flagged
+`changed by a task that never declared it: T4:TECH-DEBT.md`. Two things were true at once: the
+promote-time declaration under-named T4 (its ruling is what *resolves* TD-109, so recording that
+resolution is part of delivering the ruling — declared now, per L-100), **and the coordinator bundled
+coordinator bookkeeping into a task-attributed commit.** A `sprint(NN) Tn:` subject attributes
+everything in that commit to the task; close-bookkeeping belongs in its own `sprint(NN):` commit, which
+rule 5 exempts by role. That is the fourth `Layers:` correction this sprint and the first caused by
+commit *composition* rather than by the declaration itself.
+

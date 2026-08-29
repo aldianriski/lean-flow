@@ -97,7 +97,7 @@ named pre-approved exceptions.
 - [ ] If the ruling permits an exception, the mechanism is narrow by construction — *Verify: a named check only; a blanket bypass flag is out of scope by the ruling's own terms*
 
 ### T4 — Rule pre-flight item 3's wording against a declared `J2` `[size: S · risk: med · class: decision · HITL · J2]`
-Layers: `skills/orchestrator/references/night-run.md` · `.claude/CONTEXT.md` (only if the ruling moves the vocabulary)
+Layers: `skills/orchestrator/references/night-run.md` · `.claude/CONTEXT.md` (only if the ruling moves the vocabulary — it did not; see the Log) · `TECH-DEBT.md` (declared per L-100 at execution: this ruling is what RESOLVES TD-109, so recording that resolution is part of delivering it, and the promote-time declaration under-named it)
 Depends-on: none
 Cites: TD-109 · SPRINT-090 D4 (and its correction) · the two definitions in tension at lines 46 and 58 of this task's own Layers file
 Tier **P**. **SPRINT-090's D4 ruled the permissive reading and its justification was later corrected:
