@@ -27,12 +27,25 @@
 //      `packages/standard/src/rules/adr-fixture-factory-guardrail.test.ts` seeds exactly that break
 //      under `@ts-expect-error` and proves the check is load-bearing, not merely present.
 //
-//   Known limit of (2), stated rather than smoothed over: excess-property checking only fires on a
-//   fresh object literal (passed inline, or assigned directly to a typed `const`). A value already
-//   typed `any`, or forced through an explicit `as AdrFamilyState` cast, can still smuggle a field
-//   through -- that is TypeScript's own well-known limit on excess-property checking, not a gap
-//   introduced by this file. (1) does not share that limit, which is why it is the primary mechanism
-//   and (2) is the secondary one.
+//   Known limit of (2), CORRECTED after independent review -- the previous wording implied visibly
+//   unsafe syntax (`any`, an `as` cast) was needed to bypass it; it is not. TypeScript's excess-
+//   property check fires ONLY on a fresh object literal passed DIRECTLY as the call's argument.
+//   Pulling that same literal into an intermediate `const` (or spreading it) defeats the check
+//   SILENTLY -- no cast, no `any`, no diagnostic:
+//
+//     const state = { adrDirFiles: {}, expectedVerdict: "fail" };
+//     const port = adrFamilyPort(state);           // 0 tsc errors
+//     expect(state.expectedVerdict).toBe("fail");   // smuggled value readable, no cast anywhere
+//
+//   That is TypeScript's own well-known limit on excess-property checking (a check on a literal's
+//   SHAPE at its construction site, not an exact/nominal type system) -- not a gap introduced by this
+//   file -- but it IS reachable by the single most natural refactor a test author performs ("pull
+//   shared setup into a const"), so it is named plainly rather than described as requiring visibly
+//   unsafe syntax. (1) -- the RETURN-side interface sealing -- does NOT share this limit: a caller
+//   typed against `AdrFamilyPort`/`AdrHistoryPort` cannot read a smuggled property off the RETURNED
+//   port without an explicit, visible unsafe cast, no matter how the STATE that built it was
+//   constructed (literal, const, or spread). Treat (1) as the mechanism to actually rely on; (2) is
+//   best-effort and known-bypassable, not a closed guarantee.
 //
 // Domain-ADJACENT test helper, not domain code -- lives under `test/fixtures/`, outside
 // `test/architecture/layers.ts`'s scanned roots (`checkLayers`'s default `roots: ["apps", "packages"]`

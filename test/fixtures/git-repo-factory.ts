@@ -7,10 +7,16 @@
 // THE GUARDRAIL (H14), same shape as `adr-family-factory.ts`: every function here returns either
 // `void` or a bare directory `string` (a real filesystem path) -- there is no data SHAPE here a
 // verdict could ever occupy, so a caller cannot read an "expected outcome" off the return value even
-// in principle. The input side takes only construction options (a fixture name, a temp-dir prefix, a
-// commit subject, a text transform) --
-// `packages/standard/src/rules/adr-fixture-factory-guardrail.test.ts` proves the same excess-property
-// rejection `adr-family-factory.ts` relies on applies here too, on `gitRepoFromFixture`'s own options.
+// in principle. This RETURN-side sealing is the mechanism to actually rely on -- see
+// `adr-family-factory.ts`'s own header for why it holds regardless of how the input was built.
+//
+// The input side takes only construction options (a fixture name, a temp-dir prefix, a commit
+// subject, a text transform), sealed the same best-effort way `adr-family-factory.ts`'s state is:
+// TypeScript's excess-property check rejects an extra field on a literal passed DIRECTLY as the
+// argument, proved by `packages/standard/src/rules/adr-fixture-factory-guardrail.test.ts`. CORRECTED
+// after independent review: this does NOT require visibly unsafe syntax to bypass -- pulling the
+// options literal into an intermediate `const` (or spreading it) defeats the check silently, with no
+// cast and no diagnostic, same limit as `adr-family-factory.ts`'s own header now states in full.
 //
 // `execFileSync`/`cpSync`/`mkdtempSync`/`writeFileSync`/`readFileSync` stay HERE, mirroring
 // `s12-secrets.test.ts`'s and `s4-append-oracle.test.ts`'s own convention of keeping node:fs/
