@@ -13,81 +13,25 @@
 
 import { describe, expect, test } from "bun:test";
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, relative, sep } from "node:path";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { RuleEvaluation } from "../result.ts";
-import { ADR_CANONICAL_NAME_RE } from "./adr-family.ts";
 import type { AdrFamilyPort } from "./adr-family-port.ts";
-import { InMemoryAdrFamilyPort, type InMemoryAdrFamilyScenario } from "./adr-family-port.fake.ts";
 import { evaluate as evaluateOnefile } from "./s4-onefile.ts";
 import { evaluate as evaluateIndex } from "./s4-index.ts";
 import { evaluate as evaluateSections } from "./s4-sections.ts";
 import { evaluate as evaluateNegative } from "./s4-negative.ts";
+// SPRINT-092 T1: the fixture-to-scenario bridge this file built for itself (SPRINT-091 T6) moved to
+// the shared factory -- `adrFamilyFixtureDir` resolves a retained fixture's directory,
+// `loadAdrFamilyFixture` reads it straight to a port. See `test/fixtures/adr-family-factory.ts`'s own
+// header for why the factory cannot decide a verdict (EPIC-014 H14).
+import { adrFamilyFixtureDir, loadAdrFamilyFixture } from "../../../../test/fixtures/adr-family-factory.ts";
 
-const FIXTURES_ROOT = fileURLToPath(new URL("../../../../evals/fixtures/adr-family", import.meta.url));
 const ENGINE_PATH = fileURLToPath(new URL("../../../../scripts/lib/conformance-engine.sh", import.meta.url));
 const SPEC_PATH = fileURLToPath(new URL("../../../../spec/STANDARD.md", import.meta.url));
 const ORACLE_TIMEOUT_MS = 20_000;
-
-// --- the fixture-to-scenario bridge ------------------------------------------------------------------
-
-function walkForStrays(dir: string, repoRoot: string, adrDir: string, acc: Record<string, string>): void {
-  for (const name of readdirSync(dir)) {
-    const full = join(dir, name);
-    if (full === adrDir) continue; // docs/adr/ itself is not a stray location
-    const st = statSync(full);
-    if (st.isDirectory()) {
-      walkForStrays(full, repoRoot, adrDir, acc);
-    } else if (st.isFile() && ADR_CANONICAL_NAME_RE.test(name)) {
-      acc[relative(repoRoot, full).split(sep).join("/")] = readFileSync(full, "utf8");
-    }
-  }
-}
-
-/** Reads a REAL fixture directory off disk into the same scenario shape the in-memory port takes --
- *  the pre-classification `adr-family-port.fake.ts`'s own header describes, derived here from an
- *  actual tree instead of hand-authored. */
-function loadFixtureScenario(fixtureDir: string): InMemoryAdrFamilyScenario {
-  const adrDir = join(fixtureDir, "docs", "adr");
-  const hasAdrDir = existsSync(adrDir) && statSync(adrDir).isDirectory();
-
-  const adrDirFiles: Record<string, string> = {};
-  if (hasAdrDir) {
-    for (const name of readdirSync(adrDir)) {
-      const full = join(adrDir, name);
-      if (statSync(full).isFile() && name.endsWith(".md")) adrDirFiles[name] = readFileSync(full, "utf8");
-    }
-  }
-
-  const strayDocsFiles: Record<string, string> = {};
-  const docsDir = join(fixtureDir, "docs");
-  if (existsSync(docsDir)) walkForStrays(docsDir, fixtureDir, adrDir, strayDocsFiles);
-
-  const strayRootFiles: Record<string, string> = {};
-  for (const name of readdirSync(fixtureDir)) {
-    const full = join(fixtureDir, name);
-    if (statSync(full).isFile() && ADR_CANONICAL_NAME_RE.test(name)) strayRootFiles[name] = readFileSync(full, "utf8");
-  }
-
-  let indexFile: { readonly path: string; readonly text: string } | undefined;
-  for (const cand of ["docs/DECISIONS.md", "DECISIONS.md"]) {
-    const full = join(fixtureDir, cand);
-    if (existsSync(full) && statSync(full).isFile()) {
-      indexFile = { path: cand, text: readFileSync(full, "utf8") };
-      break;
-    }
-  }
-
-  return {
-    hasAdrDir,
-    adrDirFiles,
-    strayDocsFiles,
-    strayRootFiles,
-    ...(indexFile !== undefined ? { indexFile } : {}),
-  };
-}
 
 // --- the live Shell oracle, spawned against the SAME real fixture directory --------------------------
 //
@@ -174,9 +118,8 @@ describe("§4 parity — TS evaluators vs the LIVE Shell oracle, on the RETAINED
   for (const row of ROWS) {
     const label = row.mustContain === null ? `${row.fixture}/${row.ruleId}: PASS on both sides` : `${row.fixture}/${row.ruleId}: FAIL on both sides, same offence`;
     test(label, () => {
-      const fixtureDir = join(FIXTURES_ROOT, row.fixture);
-      const scenario = loadFixtureScenario(fixtureDir);
-      const ts = row.evaluate(new InMemoryAdrFamilyPort(scenario));
+      const fixtureDir = adrFamilyFixtureDir(row.fixture);
+      const ts = row.evaluate(loadAdrFamilyFixture(row.fixture));
 
       const shellOut = runShellEngine(fixtureDir);
       const shellVerdict = shellVerdictFor(shellOut, row.ruleId);
@@ -205,8 +148,7 @@ describe("§4 parity — TS evaluators vs the LIVE Shell oracle, on the RETAINED
   // that fact explicit and load-bearing, not incidental.
 
   test("sibling control: index-missing-row breaks ONLY S4.INDEX -- ONEFILE/SECTIONS/NEGATIVE stay green", () => {
-    const scenario = loadFixtureScenario(join(FIXTURES_ROOT, "index-missing-row"));
-    const port = new InMemoryAdrFamilyPort(scenario);
+    const port = loadAdrFamilyFixture("index-missing-row");
     expect(evaluateIndex(port).verdict).toBe("fail");
     expect(evaluateOnefile(port).verdict).toBe("pass");
     expect(evaluateSections(port).verdict).toBe("pass");
@@ -214,8 +156,7 @@ describe("§4 parity — TS evaluators vs the LIVE Shell oracle, on the RETAINED
   });
 
   test("sibling control: sections-missing breaks ONLY S4.SECTIONS -- ONEFILE/INDEX/NEGATIVE stay green", () => {
-    const scenario = loadFixtureScenario(join(FIXTURES_ROOT, "sections-missing"));
-    const port = new InMemoryAdrFamilyPort(scenario);
+    const port = loadAdrFamilyFixture("sections-missing");
     expect(evaluateSections(port).verdict).toBe("fail");
     expect(evaluateOnefile(port).verdict).toBe("pass");
     expect(evaluateIndex(port).verdict).toBe("pass");
@@ -223,8 +164,7 @@ describe("§4 parity — TS evaluators vs the LIVE Shell oracle, on the RETAINED
   });
 
   test("sibling control: no-negative breaks ONLY S4.NEGATIVE -- ONEFILE/INDEX/SECTIONS stay green", () => {
-    const scenario = loadFixtureScenario(join(FIXTURES_ROOT, "no-negative"));
-    const port = new InMemoryAdrFamilyPort(scenario);
+    const port = loadAdrFamilyFixture("no-negative");
     expect(evaluateNegative(port).verdict).toBe("fail");
     expect(evaluateOnefile(port).verdict).toBe("pass");
     expect(evaluateIndex(port).verdict).toBe("pass");
@@ -235,9 +175,8 @@ describe("§4 parity — TS evaluators vs the LIVE Shell oracle, on the RETAINED
   // duplicate is canonically named but unindexed) -- adr-family.ts's own header claims this; proved
   // live against the oracle here rather than only in the fake-backed s4-index.test.ts.
   test("duplicate-number: S4.ONEFILE and S4.INDEX both fire (live oracle); SECTIONS/NEGATIVE stay green", () => {
-    const fixtureDir = join(FIXTURES_ROOT, "duplicate-number");
-    const scenario = loadFixtureScenario(fixtureDir);
-    const port = new InMemoryAdrFamilyPort(scenario);
+    const fixtureDir = adrFamilyFixtureDir("duplicate-number");
+    const port = loadAdrFamilyFixture("duplicate-number");
     expect(evaluateOnefile(port).verdict).toBe("fail");
     expect(evaluateIndex(port).verdict).toBe("fail");
     expect(evaluateSections(port).verdict).toBe("pass");
@@ -276,11 +215,10 @@ describe("§4 parity — TS evaluators vs the LIVE Shell oracle, on the RETAINED
 // not, deliberately -- so the next person to run a §4 differential meets this as documented and
 // expected, never as a fresh mystery.
 describe("§4 EMPTY-SLUG divergence — an INTENDED TS/Shell disagreement, ruled by the owner (retained fixture)", () => {
-  const fixtureDir = join(FIXTURES_ROOT, "empty-slug");
+  const fixtureDir = adrFamilyFixtureDir("empty-slug");
 
   test("TS: S4.ONEFILE=fail (noncanonical name); S4.INDEX/SECTIONS/NEGATIVE=note (not canonical -- nothing to check)", () => {
-    const scenario = loadFixtureScenario(fixtureDir);
-    const port = new InMemoryAdrFamilyPort(scenario);
+    const port = loadAdrFamilyFixture("empty-slug");
 
     const onefile = evaluateOnefile(port);
     expect(onefile.verdict).toBe("fail");
