@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-29
+last_updated: 2026-08-30
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,45 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+## SPRINT-093 — Close the Autonomy Guard Gap (closed 2026-08-30)
+
+Unreleased (bundles into the next version — **feature sprint, so MINOR by hand**, not
+`/release-patch`). EPIC-015's fourth member sprint, closed at **19 of 19 DoD**. It closes the *guard*
+gap that had held **§ Closed-when 1** open since SPRINT-089, and deliberately does **not** tick that
+condition — see below.
+
+| Shipped | What |
+|---|---|
+| **The rollup checker compares agreement, not shape** | `check-night-run-rollup.sh` now FAILs a rollup whose `terminal ·` state contradicts the per-task lines beside it, requires positive corroborating evidence per state, and scopes every check to the **last** `run-complete` block. A shape-only assertion passes any well-formed lie; four passes were needed to make this one discriminate |
+| **The reaper writes into the Plan it was pointed at** | `find_sprint()` refuses ambiguity (0 or >1 active sprints) instead of silently picking the first match, and a new **`--sprint FILE`** declares the target explicitly |
+| **The canonical mode name actually reaps** | `night-run.sh` gated the reaper on a literal `*sprint-bulk*` substring while **`overnight`** has been canonical since SPRINT-088 — so a run fired the documented way never reaped and never wrote a `terminal ·` line, for five sprints. The gate is **deleted**, not extended: reaching it already proves a validated mode signal passed |
+| **The knowledge index no longer goes stale on the clock — or on a fresh clone** | `gen-index.sh --check` no longer bakes the wall-clock date into its comparison, **and** compares line-ending agnostically. `.gitattributes` normalizes the index at source: `core.autocrlf=true` had been delivering CRLF against a pure-LF generator, so **the gate was red on every fresh clone of this repository** and no one had seen it, because every gate run had a working tree holding generator output rather than git's |
+| **The launcher's green-gate precondition is where its reader meets it** | stated in `night-run.md` Part 1's checklist rather than only in `night-run.sh` — a Plan whose purpose is *repairing* a gate FAIL previously could never run at all |
+| **`gate_exceptions:` — a narrow, named grant** ⚠️ *consumer-facing* | a run may fire against **specific, pre-approved failing checks**, never a blanket bypass; no `--force`/`--skip-gate` flag exists or is added. **Format:** a newline-delimited block list of **complete, verbatim `FAIL` lines** (copy each exactly from a fresh `qa-check.sh` run), plus a `gate_exceptions_pin: <sha>`. Whole-line, not a shortened name — `qa-check.sh` leg 13 prints three semantically distinct FAILs sharing an identical prefix, so a prefix grant silently pre-approved all three |
+| **Pre-flight item 3 ruled STRICT against a declared `J2`** | a Plan carrying a **declared** `J2` task fails pre-flight and is not launchable unattended. `AFK-safe` and `J2` are reconciled as *the same rule read at two moments*: parking describes a J2 shape a run **meets** mid-run and could not have declared at G2; a declared J2 is excluded earlier. Both definitions survive — only the implication that one permits the other is removed. Supersedes SPRINT-090 D4 |
+| **The authority leg is mode-aware** | `check-authority.sh`'s `J2` park requirement applies where the park protocol applies and nowhere else. Parking is what an *unattended* run does **instead of asking**; enforced against an attended run it demanded the artifact of an absent ask channel from a run that had one. All four anchored patterns are now fence-immune |
+
+**Consumer note:** the one user-visible format is `gate_exceptions:` above — it is new, so nothing you
+have already written changes. If you launch overnight runs by the canonical `--mode overnight`, note
+that **your runs were not being reaped** before this sprint and now are; a `terminal ·` line will start
+appearing in your sprint logs where none did before.
+
+**Guards added/repaired:** three retained harnesses (rollup 34 cases · gate-exceptions 10 fixtures ·
+authority extended), all wired into `qa-check.sh` (31 → 32 always-on). `QA_BUDGET_SECONDS` 450 → 520
+**on loan** — this sprint added ~37 s of always-on coverage before EPIC-014's saving landed, and
+SPRINT-092 T2/T4 should bring it back down (**TD-117**).
+
+**Not ticked, deliberately: EPIC-015 § Closed-when 1.** The guard gap is closed and each half is
+proven, but *"a run ends only at one of five named states"* is a claim about what a **run** does, and no
+unattended run has fired since the reap gate was repaired. Carried by **`TASK-319`**.
+
+**Found by independent review, not by the authors:** the reap-gate rename bug, the fresh-clone CRLF
+failure, the canonical-name collision in `gate_exceptions`, and a composite fixture the coordinator had
+already judged acceptable. Three coordinator judgements were overturned; all three are recorded in the
+Execution Log rather than smoothed. Debt: **TD-124** filed, **TD-110/111/112/123** resolved. Follow-ups:
+`TASK-319` · `TASK-320`. Learnings: **L-181** · **L-182** · **L-183**.
 
 ---
 ## SPRINT-088 — Execution Autonomy Foundation (closed 2026-08-26)

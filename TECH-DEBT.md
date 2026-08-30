@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-25
+last_updated: 2026-08-30
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -205,7 +205,32 @@ status: current
     budget with the ceiling raised to match; or make the skipped-harness list its own named FAIL
     distinct from a real check failure, so truncation can never be read as one red check.
 
-- **TD-123** severity: high | status: open | created: Sprint-093
+- **TD-124** severity: medium | status: open | created: Sprint-093
+  - Summary: **`check-authority.sh` infers whether a run was attended, and no signal available from
+    inside that file can make the inference airtight.** The leg now ORs two independent signals — a
+    `terminal ·` line written by the launcher's reaper, and a non-placeholder `approval_envelope: … @
+    <sha>` pinned in the sprint's own frontmatter, written on a pre-flight path the reap-gate defect
+    never touched. Either alone is defeatable; the OR narrows the residual and does not close it. **A
+    run that skips both** — no envelope pinned and no reaper append — reads as attended and the `J2`
+    park requirement is not applied to it.
+  - **Filed because the row was cited before it existed, which is its own finding.** `TD-124` is named
+    in the T5 commit subject (`494ca82`) and in two shipped retained fixtures
+    (`attended-fenced-example/SPRINT-910-fx.md`, `envelope-backstop-unattended/SPRINT-909-fx.md`) as
+    though it were a filed row. It was not: the id was incremented from memory rather than derived, so
+    three artifacts shipped pointing at a ledger entry that did not exist. That is **L-143's third
+    grain** (an identifier for a new row is a query result) landing on a `TD-NNN`, and it went
+    unnoticed because a reference to a plausible id looks exactly like a reference to a real one.
+  - **Why it is filed rather than fixed.** The honest boundary was drawn by T5's own retry: asked for a
+    fail-safe that does not depend on the wrapper having written a line, it added the envelope signal
+    **and corrected the header comment to state that neither signal is airtight and the OR of both is
+    still not proof of attendedness** — replacing a prior claim that absence was "the strongest evidence
+    available", which the reviewer had just disproved. A guard overstating its own guarantee is the
+    defect; a guard naming its residual is the correct shipped state.
+  - Closing it needs a signal the *launcher* writes at fire time, independent of `reap()`'s decision to
+    append — the same missing mechanism **TD-122** is filed against. Route the two together: neither is
+    closable by better parsing of an artifact that does not record the fact.
+
+- **TD-123** severity: high | status: resolved → SPRINT-093 T5 | created: Sprint-093
   - Summary: **`check-authority.sh` applies the unattended park protocol to every run, including
     attended ones, and never reads the run mode.** Its `J2` branch FAILs any task carrying an execution
     record (`consequence · Tn · `) without a park record (`Tn · parked`). But **parking is what an
@@ -451,7 +476,7 @@ status: current
   - **Re-file fresh if** `Verify:` clauses become required to carry a path — the collision is between
     what a clause may write and what the resolver accepts, and constraining either dissolves it.
 
-- **TD-112** severity: **high** | status: open | created: Sprint-089
+- **TD-112** severity: **high** | status: resolved → SPRINT-093 T1 | created: Sprint-089
   - Summary: **With two active sprints, the launcher's reaper wrote its rollup into the sprint the run
     did NOT execute, and derived a terminal state from that file rather than from the run — reporting
     `PLAN_EXHAUSTED` over a run that parked a J2.** `check-night-run-rollup.sh` **PASSES** it.
@@ -494,7 +519,7 @@ status: current
     stop firing, and this row would then describe a latent defect rather than an observed one, which is
     a different severity.
 
-- **TD-111** severity: **high** | status: open | created: Sprint-089
+- **TD-111** severity: **high** | status: resolved → SPRINT-093 T2 | created: Sprint-089
   - Summary: **`docs/knowledge-index.md` goes STALE at every midnight regardless of content, so the gate
     reddens on a tree nobody touched — and `night-run.sh` then refuses to fire (TD-110). An unattended
     run can be blocked by the clock alone.**
@@ -527,7 +552,7 @@ status: current
   - **Re-file fresh if** the staleness check moves off `gen-index.sh --check` — the comparison, not the
     generator, is what makes the date load-bearing.
 
-- **TD-110** severity: **high** | status: open | created: Sprint-089
+- **TD-110** severity: **high** | status: resolved → SPRINT-093 T3 | created: Sprint-089
   - Summary: **`night-run.sh` refuses to fire unless `qa-check.sh` exits 0, so no Plan whose task
     REPAIRS a gate FAIL can ever be run unattended.** The work that would make the gate green is the
     work the run exists to do, and the run cannot start until it is already done.

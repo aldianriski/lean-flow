@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-29
+last_updated: 2026-08-30
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -16,27 +16,26 @@ status: current
 
 ## Active Sprint
 
-> **Two active sprints — one per stream** (CONTEXT.md § Sprint model). Streams introduced at this
-> promote; every prior sprint was single-stream and omitted `stream:`.
+> **One active sprint.** The `autonomy` stream closed with SPRINT-093 (2026-08-30); `engine` runs on.
+> Streams were introduced at the SPRINT-092/093 promote — every prior sprint was single-stream and
+> omitted `stream:`.
 
 > **`engine` · SPRINT-092 — The Conversion's Measured Delta** → [docs/sprint/SPRINT-092-the-conversions-measured-delta.md](docs/sprint/SPRINT-092-the-conversions-measured-delta.md)
-> **`autonomy` · SPRINT-093 — Close the Autonomy Guard Gap** → [docs/sprint/SPRINT-093-close-the-autonomy-guard-gap.md](docs/sprint/SPRINT-093-close-the-autonomy-guard-gap.md)
 
 **092** is the half SPRINT-091 deferred by name — convert the ADR-family harness off the Shell engine,
 then **measure what it bought** against T2's ceiling of 9.5–13.6 s, naming any shortfall. Strict chain
-T1→T2→T3→T4. **093** closes § Closed-when 1, open since SPRINT-089: a reaper published a false
-`PLAN_EXHAUSTED` and the shape checker **passed it**. Four independent tasks.
+T1→T2→T3→T4, so no task in it parallelises.
 
-**Cross-stream ownership, fixed before either starts** (overlap coordinated, never parallel-built):
-`scripts/qa-check.sh` + `evals/` → **092**, except `evals/run-night-run-rollup-fixtures.sh` → **093**;
-`gen-index.sh` + `knowledge-index.md` + `night-run.sh` + `night-run.md` → **093**.
-
-**Neither Plan is a night-run candidate** — every 093 task is `authority: J2` (two are `class: decision`),
-so an unattended run would park 4 of 4: L-111's shape, refused at pre-flight not discovered mid-run.
+**The cross-stream ownership split is spent** now that `autonomy` has closed: `scripts/qa-check.sh`,
+`evals/`, `gen-index.sh`, `knowledge-index.md`, `night-run.sh` and `night-run.md` all have a single
+active claimant again. **`QA_BUDGET_SECONDS` is at 520 on loan** — raised from 450 at `d815dc6` because
+093 added ~37 s of always-on coverage before 092's saving arrived, and explicitly not permanent: 092
+T2/T4 reclaim 9.5–13.6 s and should bring it back down (**TD-117**).
 
 **Still Backlog:** `TASK-318` (`L-172`'s durable form — belongs to no epic) · `TASK-300` ·
-`TASK-188`/`296` (`blocked`) · `TASK-297`/`298` (`needs-info`; 298 reads SUPERSEDED since SPRINT-088 →
-`/triage`). Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
+`TASK-319`/`320` (SPRINT-093's close-Retro follow-ups) · `TASK-188`/`296` (`blocked`) ·
+`TASK-297`/`298` (`needs-info`; 298 reads SUPERSEDED since SPRINT-088 → `/triage`).
+Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
 
 ---
 
@@ -266,6 +265,51 @@ so an unattended run would park 4 of 4: L-111's shape, refused at pre-flight not
       assumes:    none
       tracker:    TD-090 · EPIC-014 § Closed-when 7 · qa-gate-timing
       origin:     decomposer
+      state:      ready
+
+- [ ] TASK-319 — Prove § Closed-when 1 with a real unattended run against the repaired reaper  [size: M] [risk: high] [HITL]
+      class:      execution
+      authority:  J2
+      done-when:  a genuinely unattended run fires via `--mode overnight`, reaps, and writes a
+                  `terminal ·` line whose state AGREES with its own per-task lines — verified by
+                  `check-night-run-rollup.sh` against the run's own committed log, not a fixture. The
+                  run must exercise the two defects SPRINT-093 repaired but never observed together in
+                  one live run: the reap gate that ignored the canonical mode name (T3) and the
+                  window/agreement matrix (T1). EPIC-015 § Closed-when 1 is ticked only on that
+                  artifact — SPRINT-093 closed the GUARD gap and proved each half separately, which is
+                  not the same claim as "a run ends only at one of five named states" (L-007's
+                  exercise-on-real-input half; L-166 — fixtures prove a branch works, the motivating
+                  artifact proves it is reachable)
+      touches:    docs/sprint/ (a seeded Plan a run is permitted to execute) · scripts/night-run.sh (read, not modified)
+      depends-on: none — but it needs a Plan that is NOT all-J2, since pre-flight item 3 now refuses
+                  one outright under SPRINT-093 T4's STRICT ruling. Seed the vehicle the way SPRINT-090
+                  did, rather than re-declaring real work AFK to make a run fire (that is reshaping a
+                  task to dodge a gate)
+      assumes:    the reap-gate and agreement fixes hold under a live run — UNCONFIRMED by construction,
+                  which is the entire point of this task; T3's reviewer reproduced the chain in a
+                  throwaway repo, never in this one
+      tracker:    EPIC-015 § Closed-when 1 · TD-112 (resolved → SPRINT-093 T1) · TD-110 (resolved → T3) · L-179
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-320 — Give the launcher a fire-time run ledger, closing TD-122 and TD-124 together  [size: M] [risk: med] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  the launcher records that a run FIRED at the moment it fires, independent of
+                  `reap()`'s later decision to append — so (a) a run that fires but never reaches the
+                  reaper is distinguishable from one that never happened (**TD-122**), and (b)
+                  `check-authority.sh` can read attendedness from a written fact instead of inferring
+                  it from two defeatable signals (**TD-124**). Retained must-FAIL: a fired-but-unreaped
+                  run must be detectable as such; sibling control: a never-fired tree stays green.
+                  Seeded-break discrimination proof under ONE hash convention (L-142 · L-169)
+      touches:    scripts/night-run.sh · scripts/lib/check-authority.sh · evals/fixtures/
+      depends-on: none
+      assumes:    the two rows genuinely share one mechanism — CONFIRM at G2 by re-deriving both
+                  rows' evidence rather than inheriting this line; TD-122's own row states it is
+                  explicitly NOT closable by better parsing, and TD-124's residual is named in
+                  `check-authority.sh`'s own header comment (L-091 — a Mitigation is a hypothesis)
+      tracker:    TD-122 · TD-124 · L-178
+      origin:     close-retro
       state:      ready
 
 - [ ] TASK-318 — Detect a shipped capability that nothing calls, mechanically  [size: M] [risk: med] [HITL]

@@ -4,11 +4,11 @@ slug: close-the-autonomy-guard-gap
 stream: autonomy
 epic: EPIC-015
 owner: Maintainer
-last_updated: 2026-08-29
-status: active
+last_updated: 2026-08-30
+status: closed
 gates_signed: G1,G2 @ 760dc69
 plan_commit: c52496f
-close_commit: [sha — set at close]
+close_commit: [sha — set in the follow-up commit; a close cannot cite its own sha]
 update_trigger: sprint execute/close events
 ---
 
@@ -171,6 +171,85 @@ the check would be failed by the check it fixes.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/check-night-run-rollup.sh` | T1 | assert the terminal state **agrees** with the per-task lines beside it, with required positive evidence per state, scoped to the LAST `run-complete` block — a shape-only check passes any well-formed lie | high | `evals/run-night-run-rollup-fixtures.sh` (34 cases) |
+| `scripts/night-run.sh` | T1 · T3 | `find_sprint()` refuses ambiguity (0 or >1 active) instead of picking the first match, `--sprint FILE` declares the target; green-gate precondition + narrow `gate_exceptions:` grant; **reap gate deleted** (it matched the old `*sprint-bulk*` literal) | high | rollup + gate-exception harnesses |
+| `evals/run-night-run-rollup-fixtures.sh` | T1 | new retained harness — agreement matrix, window cases, real-artifact pair against `SPRINT-082`/`089`/`090` | med | self |
+| `evals/fixtures/night-run-rollup/` · `night-run-reaper/` | T1 | retained must-FAIL + sibling controls; sources grep-extracted verbatim at run time with a drift guard | med | as above |
+| `scripts/gen-index.sh` | T2 | build the candidate with the **existing** `last_updated` copied byte-for-byte, and compare line-ending agnostically — the index no longer goes stale on the passage of time or on a fresh checkout | high | `--check` on a forced pristine checkout |
+| `.gitattributes` | T2 | normalize `docs/knowledge-index.md` at source; `core.autocrlf=true` was delivering CRLF against a pure-LF generator, so **the gate was red on every fresh clone** | med | forced fresh checkout, CR bytes 35 → 0 |
+| `skills/orchestrator/references/night-run.md` | T3 · T4 | state the green-gate precondition **in Part 1's checklist** where its reader meets it (L-151); record the narrow named-exception ruling; rule item 3 **STRICT** against a declared `J2` and reconcile `AFK-safe`/`J2` | med | Tier P read-through (ADR-029) |
+| `evals/run-night-run-gate-exception-fixtures.sh` + `fixtures/night-run-gate-exceptions/` | T3 | new retained harness — nothing covered the launcher pre-flight gate | med | self (10 fixtures) |
+| `scripts/lib/check-authority.sh` | T5 | make the `J2` park requirement **mode-aware** (park is what an unattended run does *instead of asking*); two-signal mode gate; de-fence the log once so all four anchors are fence-immune | high | `evals/run-authority-fixtures.sh` |
+| `evals/run-authority-fixtures.sh` + `fixtures/authority/` | T5 | retained must-FAIL (unattended unparked `J2`) + must-PASS (attended execution, fenced example) | med | self |
+| `scripts/qa-check.sh` | coordinator | register T3's harness (31 → 32) and raise `QA_BUDGET_SECONDS` 450 → 520 — **on loan**, see TD-117 | med | gate's own printed verdict line |
+| `TECH-DEBT.md` | T4 · close | `TD-109` resolved; `TD-121`–`TD-124` filed; `TD-110`/`111`/`112`/`123` resolved at close | low | census reconciled |
 
 ## Retro
-<!-- Written at close. Route the four buckets to their durable homes (STANDARD §10). -->
+
+**Closed 19 of 19 DoD.** Every task landed, and the sprint's own theme — *a guard that passes a false
+artifact is a silent false negative* — recurred **six times inside the sprint that existed to fix it**,
+each time in a guard nobody suspected. That is the finding, not a footnote to it.
+
+**What the sprint was for.** EPIC-015 § Closed-when 1 had been open since SPRINT-089 because the reaper
+published a false `PLAN_EXHAUSTED` into a *different* sprint's log and `check-night-run-rollup.sh`
+**PASSED it** — asserting the terminal line's shape and never its agreement with the per-task lines
+beside it. T1 closed that; T2–T4 cleared the three smaller foreclosures that between them could refuse
+a night run outright; T5 was added mid-sprint when the authority leg failed the sprint's own attended
+work.
+
+**The part worth carrying forward is how the defects were found.** Not one was caught by recalling the
+rule that governed it — every one came from an independent pass or a disagreeing second number, with
+L-045 · L-105 · L-108 · L-142 · L-151 · L-166 · L-169 loaded throughout. T1 took **four passes**, each
+fixing something real and each leaving something real behind; by the third the truth table matched
+`reap()` exactly in both directions and the guard was **still blind**, because it read the wrong
+*window*. The producer had already solved that and left a comment saying why. Nobody compared them.
+
+**Three coordinator judgements were overturned by outside passes**, and all three are recorded rather
+than smoothed: the composite fixture judged L-166-satisfying before dispatch (refuted); the DoD-1
+verification run against a tree earlier test runs had already touched (ruled not faithful — and a
+pristine checkout then showed **the gate was red on every fresh clone of this repository**); and a
+`grep -c $'\r'` that counts matching *lines* reading `0` against `tr -cd '\r' | wc -c`'s `35`, which
+came within one instrument of dismissing a live gate defect.
+
+**The sharpest finding was nobody's task.** `night-run.sh` gated the reaper on a literal `*sprint-bulk*`
+substring while `overnight` had been the canonical mode name since SPRINT-088 — an additive, careful
+rename with every alias preserved. So a run fired the documented way never reaped and never wrote a
+`terminal ·` line. Latent for **five sprints** because nothing consumed that output; load-bearing the
+moment T5 built an attendedness signal on it, at which point a genuinely unattended unparked `J2`
+execution read as attended — the exact shape T5 exists to prevent, reachable through the trigger the
+docs call canonical.
+
+**One scope-change and one honest rewording.** T1's DoD 2 demanded the real committed rollup as its
+fixture; **no committed artifact in this repository can satisfy it** — SPRINT-089's rollup carries no
+per-task line at all, and the defect split every real instance across two files. Reworded by owner
+ruling to what is provable (verbatim grep-extraction from two real logs with a drift guard), with the
+original preserved in the Log so the change is auditable. That is L-088's procedure followed, not
+dodged.
+
+### Buckets routed
+
+| Bucket | Routed to |
+|---|---|
+| **Shipped** | `CHANGELOG.md` — unreleased; **feature sprint → MINOR by hand**, not `/release-patch`. Consumer-facing: `gate_exceptions:` is a newline-delimited block list of **verbatim whole FAIL lines** |
+| **Tech debt** | **`TD-124` filed** (attendedness cannot be inferred airtight from inside `check-authority.sh`) · **`TD-110`/`111`/`112`/`123` marked resolved** · `TD-121`/`122` remain open |
+| **Follow-ups** | **`TASK-319`** (prove § Closed-when 1 with a real unattended run) · **`TASK-320`** (fire-time run ledger, closing `TD-122` + `TD-124` together) — both `origin: close-retro` |
+| **Learnings** | **`L-181`** (a checker and the code emitting the field it reads must be compared, not each verified alone) · **`L-182`** (a verification against a tree your tooling already wrote to is not a verification of what git hands out) · **`L-183`** (an additive rename breaks every consumer matching the old name as a literal) |
+
+**Retrieval-miss check:** no prior `L-NNN` or ADR was missed or contradicted. The opposite — the
+governing rules were found, loaded and correct every time, and still did not fire at the moment they
+governed. That is **L-165's thesis observed again** rather than a new miss, and it is why this sprint's
+review spend (three independent worktree-isolated passes) is recorded as the component that found what
+the builders could not.
+
+**One id defect, filed as its own row.** `TD-124` was cited in the T5 commit subject and in two shipped
+retained fixtures *before any such row existed* — the id was incremented from memory rather than
+derived (**L-143**'s third grain). Nothing rejects a reference to a plausible-but-absent id, which is
+why it survived review.
+
+### Not ticked, deliberately
+
+**EPIC-015 § Closed-when 1 stays open.** This sprint closed the *guard* gap and proved each half
+separately — but "a run ends **only** at one of five named states" is a claim about what a **run**
+does, and no unattended run has fired since the reap gate was repaired. Ticking it on fixtures plus a
+reviewer's throwaway-repo reproduction would be exactly the unreachable-criterion failure this epic has
+already paid for twice (L-111 · L-166). Carried by **`TASK-319`**.
