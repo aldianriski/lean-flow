@@ -8,7 +8,7 @@ last_updated: 2026-08-30
 status: closed
 gates_signed: G1,G2 @ 760dc69
 plan_commit: c52496f
-close_commit: [sha — set in the follow-up commit; a close cannot cite its own sha]
+close_commit: 33187dc
 update_trigger: sprint execute/close events
 ---
 
