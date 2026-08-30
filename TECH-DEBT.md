@@ -205,6 +205,36 @@ status: current
     budget with the ceiling raised to match; or make the skipped-harness list its own named FAIL
     distinct from a real check failure, so truncation can never be read as one red check.
 
+- **TD-125** severity: medium | status: open | created: Sprint-093
+  - Summary: **A closed sprint cannot be archived while a sibling sprint sharing its `plan_commit`
+    window is still active — doing so turns the gate red, and the failure appears against the
+    *sibling*, not the sprint that moved.** `check-layers-observed.sh:397` excludes any sprint file
+    under `*/archive/*` when building `sibling_sprints`. That list is what line 429 uses to skip
+    commits belonging to another sprint. So archiving SPRINT-093 removed `093` from SPRINT-092's
+    sibling list, and every `sprint(093)` commit — which sits inside 092's window, because **both
+    sprints were promoted at the same `plan_commit: c52496f`** — was then attributed against
+    SPRINT-092's `Layers:` declarations.
+  - Reproduced live at SPRINT-093's close, in both directions: gate **214 pass, 0 fail** with the
+    sprint in `docs/sprint/`; **202 pass, 1 fail** after `git mv` to `docs/sprint/archive/`, with ~70
+    files reported as *"changed by a task that never declared it"* against a sprint that never touched
+    them. Restoring the file returned the gate to green. The archive was **deferred**, not forced
+    through (ADR-021).
+  - **The pass count is the second signal and is the one worth keeping.** It fell 214 → 202, because
+    archiving also removes the sprint's own five `### Tn schema complete` checks and its layers blocks
+    from the run. A reader watching only the FAIL count sees one new failure; a reader reconciling the
+    *pass* count sees that twelve checks stopped running. A guard that stops being *invoked* is
+    invisible in a red/green summary.
+  - **The two questions the exclusion conflates are different:** *is this sprint still active work?*
+    (archive is the right answer) and *does this sprint own its own commits?* (archive is the wrong
+    answer — a closed sprint owns its history forever). One list is serving both.
+  - Adjacent to **`TASK-298`** and probably the same fix, but **not the same case**: TASK-298 is about
+    two *active* sprints mis-attributing each other; this is an *archived* sibling ceasing to own
+    commits that remain in an active sprint's window. Route them together and widen TASK-298's
+    `done-when` to cover both, rather than filing a second checker change.
+  - Workaround until fixed, and it costs nothing: **archive a closed sprint only once every sibling
+    sharing its `plan_commit` has also closed.** §11's trigger is "sprint closed" and says nothing
+    about when the move must happen.
+
 - **TD-124** severity: medium | status: open | created: Sprint-093
   - Summary: **`check-authority.sh` infers whether a run was attended, and no signal available from
     inside that file can make the inference airtight.** The leg now ORs two independent signals — a

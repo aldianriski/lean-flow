@@ -19,6 +19,13 @@ status: current
 > **One active sprint.** The `autonomy` stream closed with SPRINT-093 (2026-08-30); `engine` runs on.
 > Streams were introduced at the SPRINT-092/093 promote — every prior sprint was single-stream and
 > omitted `stream:`.
+>
+> **SPRINT-093's §11 archive is DEFERRED, deliberately — do not move it until SPRINT-092 closes.**
+> Both were promoted at the same `plan_commit: c52496f`, and `check-layers-observed.sh:397` drops
+> `*/archive/*` from the sibling list that line 429 uses to skip another sprint's commits. Archiving
+> 093 therefore re-attributes its entire history to 092: measured in both directions at the close —
+> **214 pass / 0 fail** in place, **202 pass / 1 fail** archived (**TD-125** · `TASK-298`). The file
+> stays in `docs/sprint/` with `status: closed`; its `INDEX.md` row is already written.
 
 > **`engine` · SPRINT-092 — The Conversion's Measured Delta** → [docs/sprint/SPRINT-092-the-conversions-measured-delta.md](docs/sprint/SPRINT-092-the-conversions-measured-delta.md)
 
@@ -44,60 +51,6 @@ Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
 <!-- Groomed by /triage. Only `ready` tasks are promotable. -->
 
 ### P1 — Next Phase Required
-
-- [ ] TASK-303 — Teach the rollup checker to compare agreement, and the reaper which Plan it ran  [size: M] [risk: high] [HITL]
-      class:      execution
-      authority:  J2
-      done-when:  `check-night-run-rollup.sh` FAILs a rollup whose `terminal ·` state contradicts the
-                  per-task lines in the same file (a `parked` line under `PLAN_EXHAUSTED` is the
-                  motivating case, and the SPRINT-089 artifact is the retained fixture), **and** the
-                  reaper writes into the Plan the run was actually pointed at rather than inferring one
-      touches:    scripts/lib/check-night-run-rollup.sh · scripts/night-run.sh · evals/run-night-run-rollup-fixtures.sh
-      depends-on: none
-      assumes:    none — the false artifact is committed and reproducible (SPRINT-089 log, quoted)
-      tracker:    TD-112 · L-178 · L-174 (the same class, one sprint earlier, different route)
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-304 — Stop stamping a wall-clock date into the generated knowledge index  [size: S] [risk: med] [HITL]
-      class:      execution
-      authority:  J2
-      done-when:  the index does not go stale from the passage of time alone — `gen-index.sh --check`
-                  returns 0 on an unchanged tree across a midnight boundary, and the generator's
-                  "Idempotent" claim is true of the whole file rather than only the marked region
-      touches:    scripts/gen-index.sh · docs/knowledge-index.md
-      depends-on: none
-      assumes:    none — reproduced live: the sole diff after rollover was `last_updated: 2026-08-26` → `2026-08-27`
-      tracker:    TD-111
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-305 — Make the launcher's gate precondition visible, and rule on declared exceptions  [size: S] [risk: med] [HITL]
-      class:      decision
-      authority:  J2
-      done-when:  Part 1's checklist states the green-gate precondition where the checklist is read,
-                  **and** an owner ruling is recorded on whether a run may fire against a *named,
-                  pre-approved* failing check (never a blanket `--force`)
-      touches:    skills/orchestrator/references/night-run.md · scripts/night-run.sh (only if the ruling says so)
-      depends-on: none
-      assumes:    none — `night-run.sh:339` dies on any non-zero gate exit; `grep -n bypass` is empty
-      tracker:    TD-110 · L-179
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-306 — Rule pre-flight item 3's wording against a declared J2  [size: S] [risk: med] [HITL]
-      class:      decision
-      authority:  J2
-      done-when:  item 3 says what the machinery does — either a declared `J2` that parks satisfies it,
-                  or it does not and `TASK-301`'s Plan shape is invalid — with the ruling recorded where
-                  the checklist is read, and `AFK-safe`/`J2` reconciled so the two are no longer
-                  defined as opposites while one is said to permit the other
-      touches:    skills/orchestrator/references/night-run.md · .claude/CONTEXT.md (only if the ruling moves the vocabulary)
-      depends-on: none
-      assumes:    none
-      tracker:    TD-109 · SPRINT-090 D4
-      origin:     close-retro
-      state:      ready
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
       class:      execution
@@ -169,8 +122,17 @@ Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
                   declared by NO sprint still fails with its named finding while the sibling-declared
                   path passes. Seeded-break discrimination proof, seed verified landed by `cmp` and
                   restored under a checked hash, artifact still parses, break targeted not demolition
+                  **AND the archived-sibling half (TD-125, measured live at SPRINT-093's close):** a
+                  sprint moved to `docs/sprint/archive/` must keep owning its own commits. Line 397
+                  drops `*/archive/*` from `sibling_sprints`, which line 429 uses to skip another
+                  sprint's commits — so archiving a closed sprint re-attributes its whole history to
+                  whichever active sprint shares its `plan_commit` window. The two questions the one
+                  list answers are different: *is this sprint active work?* (archive = yes, exclude)
+                  versus *does it own its commits?* (archive = irrelevant, a closed sprint owns its
+                  history forever). Retained fixture: an archived sprint's commits do NOT land on an
+                  active sibling, while a genuinely undeclared path still FAILs
       touches:    scripts/lib/check-layers-observed.sh (the `is_excluded` family + the per-sprint
-                  loop) · possibly scripts/qa-check.sh (it passes every `docs/sprint/SPRINT-*.md`) ·
+                  loop + the `sibling_sprints` build at :397) · possibly scripts/qa-check.sh (it passes every `docs/sprint/SPRINT-*.md`) ·
                   evals/fixtures/layers-observed/** (new retained fixture pair) ·
                   evals/run-layers-observed-fixtures.sh
       depends-on: none — it is the prerequisite for promoting any stream 2, so it cannot sit inside one
@@ -182,7 +144,9 @@ Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
                   executing SPRINT-087. `.claude/CONTEXT.md` § Sprint model already specifies streams
                   — the SSOT describes what the gate never learned (L-020, shipped != wired)
       tracker:    L-020 · L-166 · L-165/L-168 (isolated reviewer) · CONTEXT.md § Sprint model ·
-                  blocks promoting EPIC-015 as stream 2
+                  **TD-125** (the archived-sibling half, reproduced in both directions at SPRINT-093's
+                  close: 214 pass/0 fail with the file in place, 202 pass/1 fail archived) ·
+                  blocks promoting EPIC-015 as stream 2 · blocks archiving SPRINT-093 until 092 closes
       origin:     manual
       state:      needs-info   # SPRINT-088 promote: looks SUPERSEDED — TASK-299 shipped the
                   # commit-ownership approach and its tracker reads "reverted from TASK-298".
@@ -348,7 +312,7 @@ Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(nothing yet for 092/093 — both were promoted 2026-08-29 and have shipped no change.)_ The previous entry, SPRINT-091 → **v1.62.0**, is written up in full in [`CHANGELOG.md`](CHANGELOG.md) and is not restated here (L-008).
+_(nothing yet for **092**, still active.)_ **093 closed 2026-08-30 at 19 of 19** and is written up in full in [`CHANGELOG.md`](CHANGELOG.md) — unreleased, bundling into the next MINOR alongside SPRINT-088; not restated here (L-008). The previous released entry, SPRINT-091 → **v1.62.0**, is likewise there.
 
 ---
 
