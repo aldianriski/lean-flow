@@ -1,6 +1,6 @@
 ---
 id: ADR-039
-tags: [tooling, process, testing]
+tags: [tooling, process]
 domain: governance
 status: accepted
 related: [ADR-035, ADR-034, ADR-029, ADR-021]
@@ -18,11 +18,14 @@ related: [ADR-035, ADR-034, ADR-029, ADR-021]
 ## Context
 
 Until SPRINT-092, §4's only default-profile coverage was `evals/run-adr-family-fixtures.sh`: twelve
-spawns of `scripts/lib/conformance-engine.sh` against the nine retained fixture directories, 30.0 s on
-every bare gate run. SPRINT-091 T12 wired TS evaluators for §4, so the *rule semantics* no longer need
-a subprocess — T2 replaced the harness with `evals/run-s4-ts-evaluators.sh` (~0.12 s), which evaluates
-§4 against the in-memory fakes **and** reads the nine retained fixture directories through the TS
-evaluators. Semantic coverage stayed always-on.
+spawns of `scripts/lib/conformance-engine.sh` against the nine retained fixture directories, on every
+bare gate run. Measured at **23.4–28.2 s** on this host (T4 Round 13); earlier rounds recorded 30.0 s
+and 17.6 s, inside this log's documented host-variance band, so the cost is stated as a range rather
+than as any one of those points. SPRINT-091 T12 wired TS evaluators for §4, so the *rule semantics* no
+longer need a subprocess — T2 replaced the harness with `evals/run-s4-ts-evaluators.sh` (0.37–0.98 s
+wall-clock, of which 0.12 s is test execution), which evaluates §4 against the in-memory fakes **and**
+reads the nine retained fixture directories through the TS evaluators. Semantic coverage stayed
+always-on.
 
 What could not stay is the **differential**: `adr-family-fixtures.test.ts` and
 `s4-append-oracle.test.ts` assert, row by row and matched on the *named finding*, that TS and a live
@@ -67,7 +70,7 @@ leg exists because that was measured, not because it was assumed.
 
 ## Consequences
 
-**Positive.** The default gate stops paying 30.0 s for twelve engine spawns while keeping §4's rules
+**Positive.** The default gate stops paying 23.4–28.2 s for twelve engine spawns while keeping §4's rules
 evaluated on every run. The differential still exists, still spawns a live oracle, and now says so in
 its own harness header instead of being implied by a list membership.
 
@@ -75,8 +78,10 @@ its own harness header instead of being implied by a list membership.
 without any default run noticing. The window is bounded only by discipline: if the three mandatory
 moments above are skipped, the first evidence of drift will be a full-profile run long after the
 change that caused it, when the diff is large and the cause is cold. This is strictly worse than the
-always-on differential it replaces, and it is accepted because the alternative was paying 30.0 s on
-every run for a comparison whose value is concentrated at a few decision points. A second negative:
+always-on differential it replaces, and it is accepted because the alternative was paying 23.4–28.2 s on
+every run for a comparison whose value is concentrated at a few decision points. **Measured:** the
+default profile saves **22.4–27.9 s** while the opt-in profile gains **52.8–57.1 s** — the work moved
+and grew, it did not vanish (T4 Round 13). A second negative:
 the split means two harnesses must stay in step — `evals/run-s4-differential-parity.sh` is a guard
 whose own absence from `eval_harnesses_optin` would be silent, which is why bucket membership is
 itself checked by `qa-check.sh`'s completeness leg.
@@ -88,7 +93,7 @@ reachable through a plain `bun test`.
 
 ## Alternatives
 
-**Keep the differential always-on.** Rejected: it is the 30.0 s this sprint exists to remove, and
+**Keep the differential always-on.** Rejected: it is the 23.4–28.2 s this sprint exists to remove, and
 EPIC-014 D2 already ruled the relocation acceptable. Keeping it would have made T2 a no-op.
 
 **Drop the differential entirely, trusting the TS evaluators.** Rejected outright, and it is the

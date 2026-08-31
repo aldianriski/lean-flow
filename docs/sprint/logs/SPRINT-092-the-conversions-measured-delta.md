@@ -277,3 +277,68 @@ untouched (`git status` clean for it).
 changes profile) · governance: **material** — Tier G for the harness move, Tier P for the ADR text,
 declared separately because the bars differ (ADR-029)`. Depth: executed inline, no independent pass —
 **the same recorded gap as T2**, carried forward rather than restated as covered.
+
+---
+
+### 2026-08-31 | T4 | measured — 4 of 4 DoD, and the delta is NOT the clean beat it computes to
+
+**Round 13 appended.** Per-term, on a quiet host (13–14 processes, no concurrent agents), both terms
+measured *today* rather than inherited — the improvement over Rounds 10/12, whose harness term was
+carried forward and whose conversion term was an estimate off a proxy ratio. The "before" harness is
+still measurable because T2 **relocated** it rather than deleting it.
+
+| Term | Range |
+|---|---|
+| Removed from always-on | 23.4 – 28.2 s (6 samples) |
+| Added to always-on | 0.37 – 0.98 s (5 samples) |
+| **Default-profile saving** | **22.4 – 27.9 s** |
+| Round 12's ceiling | 9.5 – 13.6 s |
+| Added to opt-in | 52.8 – 57.1 s (3 samples) |
+
+**The headline number is a trap, and refusing it is this task's actual output.** 22.4–27.9 s beats the
+9.5–13.6 s ceiling by ~2×, and every incentive here is to report that as the conversion outperforming.
+It did not. Round 12 costed *twelve cases converted*, S4.APPEND's four git-repo-building cases
+included; the shipped always-on leg does not do that work at all, because those four moved to opt-in
+(D4). **Cheaper because it carries less, not because it converted better.** DoD 3 anticipated a
+shortfall and got an overshoot — the same criterion, since what it actually asks is that the number be
+reported for what it is. An apples-to-apples ceiling test is named **outstanding**, and nothing here is
+cited as validating the 2.3–3.4× proxy ratio.
+
+**Two more "did not buy", named rather than omitted.** Total work across both profiles **went up**:
+opt-in gained the 52.8–57.1 s differential *and* received the 23.4–28.2 s relocated harness, ~76–85 s
+against 22.4–27.9 s saved — the default gate got faster by making the full profile slower. And
+**TD-117 is not settled**: no clean whole-gate sample exists, so the 22.4–27.9 s is a lower bound on
+the improvement, not a gate total, and the budget stays loaned at 520 s on that basis.
+
+**A drift control changed the reading, and is why 6 samples were taken rather than 5.** Samples 1–4
+rose monotonically (23.4 → 28.2 s), which reads as thermal or cache warming and would have justified
+quoting the low end. A sixth sample taken *after* the intervening block came back at 26.6 s — inside
+the band, trend not continuing. The control is what turned "warming up" into "ordinary variance"; the
+first five samples alone would have supported the wrong story.
+
+**The measurement was contaminated once, and the contamination was caught by a disagreeing number.**
+Three attempts at a whole-gate figure: two background runs killed mid-flight, and a third foreground
+run that overlapped a still-running earlier job writing to **the same output path**. The resulting file
+contained **two** `QA-CHECK:` summary lines (`208 pass, 2 fail` and `207 pass, 3 fail`). It was noticed
+only because the printed `FAIL` lines numbered 2 while the summary claimed 3 — the cross-check rule
+working exactly as written, on my own output. The file was **discarded entirely** rather than
+reconciled: an interleaved capture cannot be split back into two trustworthy runs afterwards. Root
+cause was mine — reusing one output path for a killed-but-possibly-live background job and a new run.
+
+**Two real findings that file surfaced before it was discarded, both fixed:** ADR-039 carried
+`tags: [tooling, process, testing]` and `testing` is **not** in `gen-index.sh`'s vocabulary
+(`process docs tooling edit-safety sprint-model`) — an invented tag, corrected; and T3's DoD prose named
+`scripts/lib/conformance-engine.sh`, which `check-layers-completeness.sh` reads as an implied touched
+file. It is *cited and spawned*, not modified — moved aside and restored byte-identical for DoD 1's
+proof — so it belongs on `Cites:`, where it now is.
+
+**ADR-039's figures corrected under T4.** It stated a bare `30.0 s`; measurement today gives
+23.4–28.2 s, and this log already carries 30.0 s, 19.9–21.0 s and 17.6 s across Rounds 7–12. The prior
+figure is not *wrong* — it is a point estimate where L-130 wants a band — so it is restated as a range
+with provenance rather than overwritten. `§ Decision` was left **byte-identical** (verified by diff)
+precisely so `S4.APPEND` cannot read a context correction as a decision rewrite. `docs/adr/` declared
+on T4's `Layers:` accordingly (L-100).
+
+**Review — skip-table lookup, per TD-092.** `consequence · T4 · behaviour: none (measurement + records)
+· governance: **material** — the numbers that justify the sprint enter the durable record here`. Depth:
+inline, no independent pass — the same recorded gap as T2 and T3.

@@ -78,7 +78,7 @@ leg no longer spawns the Shell engine for §4.
 ### T3 — Relocate §4 differential parity to the opt-in profile, with an ADR naming when parity must run `[size: S · risk: med · class: decision · HITL · J1]`
 Layers: `evals/run-adr-family-fixtures.sh` · `evals/run-s4-differential-parity.sh` · `scripts/qa-check.sh` · `docs/adr/` · `docs/DECISIONS.md` · `docs/knowledge-index.md` (narrowed at G2 from a bare directory declaration per L-100 — the directory form swallowed the night-run rollup harness, which the autonomy stream owns; a new parity harness file, if T3 creates one, is declared here too and logged)
 Depends-on: T2
-Cites: EPIC-014 D2 · ADR-029 (Tier G + Tier P) · ADR-034 (the frozen surface) · SPRINT-091 T6/T7 (the parity harness being relocated)
+Cites: EPIC-014 D2 · `scripts/lib/conformance-engine.sh` (the oracle — spawned and, for DoD 1's proof, moved aside and restored byte-identical; never modified) · ADR-029 (Tier G + Tier P) · ADR-034 (the frozen surface) · SPRINT-091 T6/T7 (the parity harness being relocated)
 Tier **G** for the harness move, Tier **P** for the ADR text — declared separately because the bars
 differ (ADR-029). Relocating parity to opt-in opens a **§4 drift window** between full-profile runs.
 That is a real cost, and the ADR's job is to name it and to say when parity MUST run rather than to
@@ -94,7 +94,7 @@ and an ADR records the trade-off and the moments parity is mandatory.
 - [x] The ADR states explicitly that **Shell retains §4 authority** under D2 — ✓ stated in the title line of § Decision, again in item 3 ("TS is the migrated implementation being checked *against* Shell, never the other way round"), and guarded against inference: item 3 closes with *"the always-on leg being TS is a statement about cost, not about authority"*, and § Alternatives records "drop the differential entirely" as **the dangerous option precisely because it looks like this one**. H24–H26 and `TD-120` are named as the actual cutover prerequisites, out of scope here
 
 ### T4 — Measure the delta and settle what §4's conversion bought `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `docs/research/logs/qa-gate-timing.md` · `TECH-DEBT.md`
+Layers: `docs/research/logs/qa-gate-timing.md` · `TECH-DEBT.md` · `docs/adr/`
 Depends-on: T2, T3
 Cites: TD-090 · EPIC-014 § Closed-when 7 · SPRINT-091 T2 Rounds 10–12 · L-130 · SPRINT-089 T1 (the precedent for recording a missed target as missed) · `S9.LOGDIR` · `S12.GENERATED` (rule ids named in evidence; file-shaped to the layers parser)
 Tier **G**. The sprint's whole justification lands here. SPRINT-091 T2 derived the ceiling — harness
@@ -106,10 +106,10 @@ denominator and host load.
 and the result is compared against the derived ceiling with any shortfall named.
 
 **DoD:**
-- [ ] A Round records before/after on the **same host, same profile, same semantic coverage** — *Verify: state the host-load condition beside every figure; a bare elapsed number is not well-defined (SPRINT-091 Round 12, where a run truncated under concurrency)*
-- [ ] The measured delta is compared against T2's derived ceiling of **9.5–13.6 s** — *Verify: extremes paired at every step, never a point estimate (L-130)*
-- [ ] Any **shortfall is NAMED rather than smoothed** — *Verify: SPRINT-089 T1's precedent, which recorded a missed target as missed; a delta that lands under the ceiling is reported as such*
-- [ ] `TD-090` is updated with what this conversion did **and did not** buy — *Verify: the row states both, since a debt row claiming only the win is how the next reader over-credits it*
+- [x] A Round records before/after on the **same host, same profile, same semantic coverage** — ✓ **Round 13**, appended to `docs/research/logs/qa-gate-timing.md`. Host-load stated once and binding on every figure: quiet host, **13–14 processes** at the start of each block and 13 at the end, no concurrent worktree agents, no other test runs in flight. Measured **per-term**, which is Rounds 10/12's own method, because the gate's run-to-run variance on this host exceeds the effect being measured. The methodological gain over those Rounds: both terms are measured **today on this host** rather than inherited — the "before" harness still exists (T2 relocated it rather than deleting it), so it was timed directly instead of carried forward as 19.9–21.0 s
+- [x] The measured delta is compared against T2's derived ceiling of **9.5–13.6 s** — ✓ removed **23.4–28.2 s** (6 samples, incl. a late drift control at 26.6 s inside the band), added **0.37–0.98 s** (5 samples) → **saving 22.4–27.9 s**, computed as `min(removed) − max(added)` to `max(removed) − min(added)` — extremes paired at every step, never a point estimate (L-130)
+- [x] Any **shortfall is NAMED rather than smoothed** — ✓ **the failure mode here was the opposite of a shortfall, and naming it mattered more.** The saving *exceeds* the ceiling by ~2×, which would read as the conversion beating its estimate. It did not: Round 12 costed *the same twelve cases converted*, S4.APPEND's four git-building cases included, while the shipped always-on leg does not do that work at all — those four moved to opt-in (D4). **The leg is cheaper because it carries less, not because the conversion outperformed.** Recorded in Round 13 §5, in `TD-090`, and in ADR-039; an apples-to-apples ceiling test is named as **still outstanding**, and nothing here is cited as validating the 2.3–3.4× proxy ratio. Two further "did not buy" findings are named rather than omitted: total work across both profiles **went up** (~76–85 s added to opt-in against 22.4–27.9 s saved), and **TD-117 is not settled** — no clean whole-gate sample was obtained
+- [x] `TD-090` is updated with what this conversion did **and did not** buy — ✓ the row now carries a `SPRINT-092 T4` entry stating **both**: the 22.4–27.9 s default-profile saving with coverage retained, and three things it did not buy — (1) it is not the clean ceiling beat the arithmetic suggests, (2) total work across both profiles increased, (3) `TD-117`'s budget question is unresolved because no clean whole-gate sample exists, so the row stays open on that basis rather than being closed by inference. A follow-up is named rather than fixed: the opt-in profile now spawns the Shell oracle twice over the same nine fixtures
 
 ## Owner-action checklist
 - [x] Sign **G1 + G2** and record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absent means NOT signed and must never be read as approval (L-099). — ✓ signed at `760dc69`, the tree the gates were reviewed against. G1 took the **fast-path**: all four tasks are `origin: decomposer` and met the intake grill, so scope was re-confirmed rather than re-derived. Both assumptions were confirmed against evidence first, since an unconfirmed `assumes:` blocks G2
@@ -161,6 +161,9 @@ and the result is compared against the derived ceiling with any shortfall named.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/research/logs/qa-gate-timing.md` | T4 | Round 13 — per-term before/after on a quiet host, both terms measured today rather than inherited; names the ceiling "beat" as not apples-to-apples, and records that no clean whole-gate sample was obtained | low | 6+5+3 samples with a drift control |
+| `TECH-DEBT.md` | T4 | TD-090 gains the SPRINT-092 entry stating the saving **and** three things it did not buy; TD-117 explicitly left open | low | row states both halves |
+| `docs/adr/ADR-039-...md` | T4 | Figures corrected to measured ranges (the bare "30.0 s" point estimate → 23.4–28.2 s with provenance); § Decision left byte-identical so S4.APPEND cannot trip | low | diff of § Decision: IDENTICAL |
 | `evals/run-s4-differential-parity.sh` | T3 | NEW — the differential's opt-in home. The TS parity tests were ungated by qa-check entirely before this, so "sits in the opt-in eval set" had nothing to be true of | med | opt-in profile run: PASS; 21 pass/0 fail standalone |
 | `docs/adr/ADR-039-section-4-differential-parity-is-opt-in.md` | T3 | NEW — names the §4 drift window as a real cost, fixes parity as mandatory at promote/close/full-profile, and states Shell RETAINS §4 authority so no reader can infer a cutover | low | §4 self-check: S4.ONEFILE/INDEX/SECTIONS/NEGATIVE all PASS at 39 ADRs |
 | `docs/DECISIONS.md` | T3 | ADR-039 index row (S4.INDEX requires it) | low | 39 files reconcile with 39 rows |

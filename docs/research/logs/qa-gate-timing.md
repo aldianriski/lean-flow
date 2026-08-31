@@ -1531,3 +1531,129 @@ Rounds — only on placing them outside this worktree's own tree.
   by this session.
 - This addendum does not re-run the gate a third time (instructed not to — contention with the same
   concurrent agents would not produce a cleaner number, only a third truncated or near-truncated one).
+
+## Round 13 — what §4's conversion actually bought, measured per-term on a quiet host (SPRINT-092 T4, 2026-08-31)
+
+**Host-load condition, stated once and applying to every figure in this Round unless a line says
+otherwise:** quiet host — 13–14 processes reported by `ps -a` at the start of each block and 13 at the
+end, no concurrent worktree agents, no other test runs in flight. This matters because Round 12's
+addendum recorded that this log's denominators are *load-dependent, not merely stale*, and because two
+earlier gate samples taken in this same session **while `bun test` runs were executing concurrently**
+came in at 507 s and 535 s — those are excluded from every figure below and are named here only so
+they are not mistaken later for clean samples.
+
+### Method, and why it is per-term rather than whole-gate
+
+Rounds 10 and 12 derived the ADR-family ceiling from **per-harness terms**, not from a whole-gate
+before/after, because the gate's own variance on this host (Rounds 7–8, and the 28 s spread between the
+two contaminated samples above) is larger than the effect being measured. That method is kept here. The
+"before" term is the harness this sprint removed from the always-on leg; it still exists — T2 moved it
+to `eval_harnesses_optin` rather than deleting it — so it is measurable **directly and today**, on the
+same host, in the same session, rather than inherited from an earlier Round.
+
+That is the one methodological improvement this Round makes over 10 and 12: their harness term was
+*inherited* (19.9–21.0 s, Round 10 §1) and their conversion term was an *estimate off a proxy ratio*.
+Both terms here are measured, on the same host, minutes apart.
+
+### (1) The term removed from the always-on leg
+
+`sh evals/run-adr-family-fixtures.sh`, 5 consecutive samples, plus a 6th taken **after** the block in
+(2) as a drift control:
+
+| Sample | ms |
+|---|---|
+| 1 | 23 362 |
+| 2 | 24 693 |
+| 3 | 26 757 |
+| 4 | 28 228 |
+| 5 | 27 315 |
+| control (late) | 26 567 |
+
+**Range: 23.4 – 28.2 s.** The late control lands at 26.6 s, inside the band established before (2) ran,
+so the block shows no systematic drift — the upward trend across samples 1–4 does not continue once
+re-probed. Samples 1–5 alone would have supported a "warming up" story; the control is what rules it
+out, and it is the reason a sixth sample was taken at all.
+
+**This does not reproduce any single earlier figure, and that is expected rather than a discrepancy.**
+This log already carries 30.0 s (Round 7 §, the harness-ranking table), 19.9–21.0 s (Round 10 §1,
+inherited by Round 12), and a 17.6 s uninstrumented sanity check (Round 12 §4). The band here sits
+between them. Consistent with this log's standing practice, the figure is reported as a range and no
+attempt is made to declare one of the prior points wrong.
+
+### (2) The term added to the always-on leg
+
+`sh evals/run-s4-ts-evaluators.sh`, 5 consecutive samples: 978 · 803 · 500 · 367 · 424 ms.
+
+**Range: 0.37 – 0.98 s** wall-clock, process start included. `bun`'s own reported test time inside that
+is ~0.12 s across 83 tests / 11 files; the difference is interpreter startup, and the wall-clock number
+is the one used below because it is what the gate actually pays.
+
+### (3) The term added to the OPT-IN leg
+
+`sh evals/run-s4-differential-parity.sh`, 3 samples: 56 371 · 52 770 · 57 072 ms. **Range: 52.8 – 57.1 s.**
+
+Larger than the harness it complements, and unsurprising once stated plainly: it runs the TS evaluators
+**and** spawns the Shell oracle per row, so it pays both sides of the comparison it exists to make.
+
+### (4) The delta, extremes paired (L-130)
+
+| Quantity | Range |
+|---|---|
+| Removed from always-on (§1) | 23.4 – 28.2 s |
+| Added to always-on (§2) | 0.37 – 0.98 s |
+| **Default-profile saving** | **22.4 – 27.9 s** |
+| Round 12's derived ceiling | 9.5 – 13.6 s |
+| Added to opt-in (§3) | 52.8 – 57.1 s |
+| Also relocated INTO opt-in (§1, same harness) | 23.4 – 28.2 s |
+
+Saving is `min(removed) − max(added)` to `max(removed) − min(added)` — extremes paired at every step,
+never a point estimate.
+
+### (5) The ceiling comparison — a beat on paper, and NOT a clean one
+
+The measured default-profile saving of **22.4 – 27.9 s exceeds Round 12's 9.5 – 13.6 s ceiling by
+roughly 2×**. Reporting that as the conversion outperforming its estimate would be **over-crediting,
+and it is named here rather than left for a reader to infer**.
+
+Round 12's ceiling estimated *the same twelve cases, converted* — harness-after-conversion at
+7.4–10.4 s, a figure that necessarily includes S4.APPEND's four cases **building real git
+repositories in TS**. The always-on leg this sprint actually shipped does not do that work at all: T2/T3
+moved those four git-history cases to the opt-in profile (sprint § Decisions D4). The leg is cheaper
+than the ceiling predicted because it **carries less**, not because the conversion was more efficient
+than estimated.
+
+An apples-to-apples test of Round 12's ceiling is therefore **still outstanding**: it would require the
+four git cases converted to TS *and kept always-on*, and would land somewhere above 0.98 s and plausibly
+inside the predicted 7.4–10.4 s band. Nothing in this Round measures that, and nothing in this Round
+should be cited as having validated the 2.3–3.4× ratio the ceiling was built on.
+
+### (6) What the conversion did NOT buy
+
+- **Total work across both profiles went UP, not down.** The default profile shed 22.4–27.9 s; the
+  opt-in profile gained the 52.8–57.1 s differential *and* received the 23.4–28.2 s shell harness
+  relocated into it — roughly **76–85 s added** against **22.4–27.9 s saved**. The gate got faster by
+  making the full profile slower. That is the trade ADR-039 describes; this is the first Round to put
+  figures on it.
+- **The opt-in profile now spawns the Shell oracle twice over the same nine fixtures** — once in
+  `run-adr-family-fixtures.sh`, once inside `run-s4-differential-parity.sh`. Redundant work, not a
+  correctness defect, and a consolidation candidate rather than something this sprint should fix.
+- **No whole-gate default-profile figure is claimed by this Round.** See § Caveats.
+
+### Caveats
+
+- **No clean whole-gate before/after was obtained, and none is claimed.** Three attempts were made.
+  Two background runs were killed mid-flight by the harness. A third, foreground, completed its own
+  output but overlapped a still-running earlier background job writing to **the same path**, producing
+  a file containing *two* `QA-CHECK:` summary lines (`208 pass, 2 fail` and `207 pass, 3 fail`). That
+  file is discarded entirely rather than reconciled: an interleaved capture cannot be split back into
+  two trustworthy runs after the fact. The disagreement between "2 printed FAIL lines" and "3 fail in
+  the summary" is what exposed it — a second number disagreeing, exactly the cross-check the house rule
+  prescribes, and the only reason the contamination was noticed at all.
+- **Per-term measurement does not settle the gate-level budget question (TD-117).** Whether
+  `QA_BUDGET_SECONDS` can come back down from its loaned 520 s needs a clean whole-gate sample on a
+  quiet host, which this Round does not provide. The per-term saving of 22.4–27.9 s is a *lower bound
+  on the improvement*, not a gate total.
+- **One host, one session, 5/5/3 samples.** Every figure is a range for that reason, per this log's
+  standing practice.
+- **The opt-in figures are not a full-profile cost.** A `QA_FULL=1` run in this session measured
+  1413 s, but that run was taken *before* the quiet-host block above and is not comparable to it.

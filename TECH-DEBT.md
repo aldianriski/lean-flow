@@ -1241,6 +1241,33 @@ status: current
     this host, and one sample cannot resolve it. The deterministic 6→1 spawn reduction is what is
     evidenced. The remaining ~36 forks per call are unclaimed headroom, named here rather than silently
     exhausted.
+  - **SPRINT-092 T4 — what §4's conversion bought, and what it did NOT** (Round 13, measured per-term on
+    a quiet host: 13–14 processes, no concurrent agents; two contaminated 507 s / 535 s gate samples from
+    the same session are excluded and named as excluded).
+    **Bought:** the always-on leg shed the ADR-family harness — measured **23.4–28.2 s** removed against
+    **0.37–0.98 s** added, a **default-profile saving of 22.4–27.9 s**, extremes paired. §4 rule
+    semantics *and* the nine retained fixture directories still evaluate on every bare run, through
+    `evals/run-s4-ts-evaluators.sh`, so this is a cost cut and not a coverage cut.
+    **Did NOT buy — three ways, none of them smoothed.**
+    **(1) It is not the clean ceiling beat the arithmetic suggests.** 22.4–27.9 s exceeds Round 12's
+    derived 9.5–13.6 s by roughly 2×, but Round 12 estimated *the same twelve cases converted*, S4.APPEND's
+    four git-building cases included. The shipped always-on leg does not do that work at all — those four
+    moved to opt-in (SPRINT-092 § Decisions D4). The leg is cheaper because it **carries less**, not
+    because the conversion beat its estimate. An apples-to-apples test of the ceiling is **still
+    outstanding**, and nothing here validates the 2.3–3.4× proxy ratio it was built on.
+    **(2) Total work went UP.** The opt-in profile gained the new differential (**52.8–57.1 s**) *and*
+    received the relocated shell harness (**23.4–28.2 s**) — roughly **76–85 s added** against 22.4–27.9 s
+    saved. The default gate got faster by making the full profile slower. That trade is ADR-039's subject;
+    these are the first figures on it.
+    **(3) It does not settle TD-117.** Whether `QA_BUDGET_SECONDS` can come back down from its loaned
+    520 s needs a clean whole-gate sample on a quiet host, which Round 13 did **not** obtain: two
+    background attempts were killed and a third was contaminated by an overlapping run writing to the same
+    path (two `QA-CHECK:` summary lines in one file — caught only because the printed FAIL count and the
+    summary disagreed). The 22.4–27.9 s is a lower bound on the improvement, **not** a gate total, and
+    TD-117 stays open on that basis rather than being closed by inference.
+    **Follow-up worth filing rather than fixing here:** the opt-in profile now spawns the Shell oracle
+    twice over the same nine fixtures — once in `run-adr-family-fixtures.sh`, once inside
+    `run-s4-differential-parity.sh`. Redundant work, not a correctness defect.
 
 - **TD-083** severity: minor | status: open | created: Sprint-083
   - Summary: **The architecture fitness suite has never fired on a real violation in this repository's
