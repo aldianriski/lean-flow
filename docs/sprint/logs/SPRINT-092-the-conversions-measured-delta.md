@@ -342,3 +342,59 @@ on T4's `Layers:` accordingly (L-100).
 **Review — skip-table lookup, per TD-092.** `consequence · T4 · behaviour: none (measurement + records)
 · governance: **material** — the numbers that justify the sprint enter the durable record here`. Depth:
 inline, no independent pass — the same recorded gap as T2 and T3.
+
+---
+
+### 2026-08-31 | review | independent Tier G pass on T2/T3 — 7 defects, all fixed
+
+**Owner ruled: outside review before close.** Dispatched worktree-isolated (L-168: adversarial
+verification *writes*, so a non-isolated reviewer plus any `git add -A` ships a corrupted guard inside
+an unrelated commit). It found **7 confirmed defects**. This is L-165 holding exactly: none of these
+was found by the author, who had the governing rules loaded and on screen throughout.
+
+**The three that mattered — each a single-line edit that removes real coverage while every guard in
+this sprint reports green:**
+
+1. **`run-s4-ts-evaluators.sh` PASSed with 0 tests run.** `bun test` exits 0 on files containing no
+   live tests; the harness captured bun's summary into `$summary` and *echoed it without asserting
+   it*. Seeding `describe.skip` removed the entire 15-test retained-fixture suite and the leg still
+   printed PASS. **Fixed:** a `min_tests` floor on both harnesses. Re-seeded: now
+   `FAIL … only 68 test(s) ran, expected at least 87`. The irony is the point — the harness header
+   argued carefully for FAILing on a missing *file* and a missing *runtime*, and missed the missing
+   *tests* one rung down, while the parity guard beside it asserted a `>= 12` floor on its own inputs
+   citing L-136.
+2. **The parity guard's regex was blind to any prefixed call.** `/^[ \t]*run_case_anywhere/` requires
+   the call to be the line's first token — and `cmd && cmd` is already used in that very harness. A
+   real 13th case behind `[ -d … ] && run_case_anywhere "…"` executed on every run while this guard
+   certified case-for-case equivalence. **Fixed:** match anywhere on a non-comment line, both quote
+   styles, **and** FAIL on any invocation form the parser cannot read — a form it cannot read is an
+   unknown number of cases, which is the same as an unguarded one. Both re-seeded and reddening.
+3. **`alwaysOn: true` was never checked against anything.** It compared only to a hardcoded list *in
+   the same file* — two copies of one assertion, agreeing by construction. Deleting
+   `test/s4-retained-fixtures.test.ts` from the always-on harness's file list left **both** guards
+   green while §4's fixture coverage had left the default profile — precisely the property T2
+   re-ruled DoD 4 over. **Fixed:** the claim now reads the two artifacts that decide it — the
+   harness's real `files` block and `qa-check.sh`'s real buckets. Re-seeded: two independent guards
+   now catch it.
+
+**The other four.** (4) ADR-039's "mandatory at promote and close" was **unwired** — `QA_FULL` had zero
+hits outside the ADR, so both moments ran the profile that explicitly does not compare the engines
+(L-020). Wired into `.claude/CONTEXT.md` § Sprint model, **not** into `skills/`: hardcoding
+`sh scripts/qa-check.sh` into a shipped skill would leak this repo's path to every consumer (L-015),
+so the mandate lives in the repo SSOT and the skills stay generic. (5) ADR-039 said the harness reads
+*nine* retained fixtures; it reads **eight** — `empty-slug` is exercised only by the TS differential
+(`grep -c empty-slug` on the harness = 0). (6) `ruleId` was decorative: swapping a row's `evaluate` to
+another rule left the label lying and everything green, and the parity anchors keyed on that label were
+therefore certifying a *string*. Now bound to each evaluator's own exported `RULE_ID`, plus a check that
+no §4 rule can drop out of `ROWS` entirely. (7) T4 corrected the timing figures in the ADR and left them
+stale in three code artifacts — same sprint, same fact, two answers. All now carry the measured band.
+
+**Method throughout:** every fix re-seeded with the reviewer's own seed, each confirmed to redden its
+own case while siblings stayed green, each seed verified landed / still parsing / targeted, and each
+restored to its pristine blob under **one** convention — `git hash-object` on the working-tree file.
+
+**What this changes about the sprint's claim.** "§4 semantic coverage is unchanged on every default
+run" was **true before these fixes and remains true** — 87 tests, verified by running it. What was not
+true is that the machinery asserting it would keep it true. The reviewer's closing line is the honest
+summary and is recorded rather than paraphrased away: *the conversion is correct; the machinery
+asserting it stays correct is not yet load-bearing.* It is now.
