@@ -18,7 +18,8 @@ related: [ADR-035, ADR-034, ADR-029, ADR-021]
 ## Context
 
 Until SPRINT-092, §4's only default-profile coverage was `evals/run-adr-family-fixtures.sh`: twelve
-spawns of `scripts/lib/conformance-engine.sh` against the nine retained fixture directories, on every
+spawns of `scripts/lib/conformance-engine.sh` against **eight** of the nine retained fixture directories
+(`empty-slug` is exercised only by the TS differential, never by the Shell harness), on every
 bare gate run. Measured at **23.4–28.2 s** on this host (T4 Round 13); earlier rounds recorded 30.0 s
 and 17.6 s, inside this log's documented host-variance band, so the cost is stated as a range rather
 than as any one of those points. SPRINT-091 T12 wired TS evaluators for §4, so the *rule semantics* no
@@ -85,6 +86,12 @@ and grew, it did not vanish (T4 Round 13). A second negative:
 the split means two harnesses must stay in step — `evals/run-s4-differential-parity.sh` is a guard
 whose own absence from `eval_harnesses_optin` would be silent, which is why bucket membership is
 itself checked by `qa-check.sh`'s completeness leg.
+
+**Wired at** `.claude/CONTEXT.md` § Sprint model — promote and close run `QA_FULL=1`. Recorded here
+because Decision 2 above claims the mandate is "mechanically reachable rather than a matter of
+memory", and for one sprint it was not: `QA_FULL` had **zero** hits outside this file, so promote and
+close both ran the profile that explicitly does not compare the engines. Found by an independent
+review, not by the author (L-020 · L-165).
 
 **Neutral.** `s4-append-shallow-reachability.test.ts` is deliberately excluded from the differential
 harness: it clones this repo's real remote (L-166's reachability proof) and is therefore

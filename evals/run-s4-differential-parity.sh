@@ -3,7 +3,7 @@
 #
 # WHAT MOVED, AND WHAT DID NOT. T2 took the §4 always-on slot off the Shell engine: rule semantics and
 # the nine retained fixture directories now evaluate through the TS evaluators on every gate run
-# (run-s4-ts-evaluators.sh, ~0.12s, no subprocess). What could NOT follow is the part whose whole
+# (run-s4-ts-evaluators.sh, 0.37-0.98s, no subprocess). What could NOT follow is the part whose whole
 # purpose is to disagree with itself -- the row-by-row comparison of TS against a LIVE Shell oracle.
 # That needs a real `sh scripts/lib/conformance-engine.sh` spawn per row, which is the 20+s this
 # sprint set out to take off the default profile.
@@ -59,13 +59,31 @@ if [ -n "$missing" ]; then
   exit 2
 fi
 
+# Same test-COUNT floor as the always-on leg, and for the same reason: `bun test` exits 0 on files that
+# contain no live tests, so a skipped describe or a renamed file would report parity green while
+# comparing the two engines on nothing at all. Here the false assurance is worse than on the always-on
+# leg -- this is the ONLY thing that ever compares TS against Shell, so "green" with zero tests means
+# the drift window ADR-039 documents is entirely unwatched.
+#
+# RAISE THIS when you add differential cases, deliberately, in the same commit.
+min_tests=21
+
 out=$(bun test $files 2>&1); code=$?
-if [ "$code" -eq 0 ]; then
-  summary=$(printf '%s\n' "$out" | grep -E '^ *[0-9]+ (pass|fail)' | tr '\n' ' ')
-  echo "PASS fixture(s4-differential-parity): TS matches the LIVE Shell oracle row by row -- $summary"
-  exit 0
+n_pass=$(printf '%s\n' "$out" | grep -oE '^ *[0-9]+ pass' | grep -oE '[0-9]+' | head -1)
+[ -n "$n_pass" ] || n_pass=0
+
+if [ "$code" -ne 0 ]; then
+  echo "FAIL fixture(s4-differential-parity): §4 has DRIFTED between TS and Shell (bun test exit $code) -- output:"
+  printf '%s\n' "$out"
+  exit 1
 fi
 
-echo "FAIL fixture(s4-differential-parity): §4 has DRIFTED between TS and Shell (bun test exit $code) -- output:"
-printf '%s\n' "$out"
-exit 1
+if [ "$n_pass" -lt "$min_tests" ]; then
+  echo "FAIL fixture(s4-differential-parity): only $n_pass test(s) ran, expected at least $min_tests --"
+  echo "              the differential SHRANK while bun still exited 0. Parity reported green having"
+  echo "              compared the two engines on less than it claims, or on nothing."
+  exit 1
+fi
+
+echo "PASS fixture(s4-differential-parity): TS matches the LIVE Shell oracle row by row -- $n_pass tests, 0 fail"
+exit 0
