@@ -257,6 +257,43 @@ status: current
     reddens on a flaky connection teaches people to ignore it — but nothing gates this test today.
   - **Re-file fresh if** the repo gains a network-tolerant harness tier, which would remove the reason.
 
+- **TD-129** severity: medium | status: open | created: Sprint-094
+  - Summary: **`EPIC-014`'s "the Shell semantic engine is deleted" milestone will NOT end Shell rule
+    enforcement, because six checkable Standard rules were never in that engine** — they live in
+    standalone `scripts/lib/check-*.sh` legs. Deleting `conformance-engine.sh` retires 45 of the 51
+    checkable rules; the other six keep running from Shell with nothing scheduled to migrate them, and
+    the epic's § Closed-when 5 reads as if the job were finished. Its own escape clause ("operational
+    shell glue may remain") is what these six will be classified under — defensibly for the *glue*,
+    but these are **Standard rule ids**, not glue.
+  - Measured at the SPRINT-094 promote (2026-08-31), owner-requested, every figure cross-checked:
+
+    | Quantity | Value | How derived |
+    |---|---|---|
+    | Standard rule ids | **100** | `read-spec-rules.sh` (canonical). Marks reconcile: 40 mechanical + 32 judgment-only + 11 split + 7 restated + 6 implementation-directed + 4 standard-directed = 100 |
+    | Checkable (mechanical + split) | **51** | corroborates SPRINT-083's independently-derived 51 |
+    | Implemented in TypeScript | **10** | ~20% of checkable. 12 rule ids appear in `packages/standard/src/rules/`, but `S4.BAR` and `S4.NOINVENT` are `judgment-only` — referenced, not implemented |
+    | In `conformance-engine.sh` | **45** | `assert_S*` functions; every one inside the checkable set (empty reverse set = the control). 45 + 6 = 51 |
+    | Checkable but OUTSIDE the engine | **6** | `S11.EPIC` · `S11.RESEARCH` · `S2.F-CAP` · `S2.R-TEMPDIR` · `S7.MEGA` · `S7.SPRINT400` |
+
+    Line counts, same date: `conformance-engine.sh` 3,142 · `qa-check.sh` 1,197 · other `scripts/lib/`
+    legs 2,648 · `evals/*.sh` 8,712 · TypeScript non-test 4,005 across 40 files.
+  - **Why this is filed rather than fixed here.** Nothing is wrong today: EPIC-014 D2 is an explicit
+    strangler and Shell legitimately keeps authority per unmigrated family. The debt is that the
+    *milestone's wording* and the *actual end state* diverge, and the divergence is only visible if
+    someone reconciles the engine's id set against the Standard's — which nobody had.
+  - **The live consequence, and why the row matters now:** at this promote `TASK-324` was planned as a
+    new `.sh` extending `S11.EPIC`, and it is defensible precisely *because* `S11.EPIC` is one of the
+    six. So the six are not a static remainder — they are where new Shell keeps accreting, each
+    addition correct in isolation and none of it tracked against the migration.
+  - **Both numbers here were nearly wrong, by the same bug, and it is the instructive part.** A first
+    pass counted rule ids with `\bS[0-9]+\.[A-Z]+\b` and returned **76**, not 100 — SPRINT-083 had
+    already recorded a disproved query "whose regex stopped at a hyphen, missing exactly 21 §2 ids"
+    (L-108). A second pass then mapped `assert_S2_F_CAP` to `S2.F` by replacing only the first
+    underscore, inventing three phantom ids and six phantom gaps. Both were caught by a disagreeing
+    second number, neither by recalling the rule — L-105's family, twice in one measurement.
+  - Fix direction (not a ruling): either migrate the six with their families and reword § Closed-when 5
+    to name them, or rule them **out** of the engine explicitly and say so in the ADR, so the milestone
+    means what it says. Do not leave the reader to reconcile it.
 - **TD-128** severity: high | status: open | created: Sprint-092
   - Summary: **`qa-budget-default` asserts the CONFIGURED budget against the command ceiling, never the
     ACTUAL runtime** — it prints `PASS qa-budget-default: 520s < 600s command ceiling` while real runs
