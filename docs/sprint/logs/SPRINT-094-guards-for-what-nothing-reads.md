@@ -224,3 +224,70 @@ is its own named FAIL.
 **Not ticked: the outside reviewer.** Owner authorised worktree-isolated dispatch for the three Tier G
 tasks; T1's reviewer runs next. Isolation is not optional — adversarial verification *writes*, so a
 non-isolated reviewer plus any `git add -A` ships a corrupted guard inside an unrelated commit (L-168).
+
+---
+
+### 2026-09-01 | review | T1 independent pass — 3 HIGH, 3 MEDIUM, 1 LOW; 5 fixed, 2 filed
+
+`review · T1 · worktree-isolated · behaviour:material · governance:high` — supersedes the
+`consequence` line above as the record of what happened (night-run.md Part 4).
+
+**The pass found what the author could not, again — L-165's fifth sighting.** Not one of the seven was
+caught by the author, whose own seeded-break proof had run clean minutes earlier.
+
+**The through-line is the finding, not the seven items.** Each class's *detection* logic was sound;
+the *set of members* those classes were applied to was derived three inconsistent ways — which row is
+selected, which sprints count as closed, which paths are searched — and **not one of the twelve
+fixtures varied that set**. The fixtures discriminated the branches; nothing discriminated
+reachability. That is L-166's own lesson arriving one level up: a guard can be pointed at its real
+motivating artifact and still be unreachable for every *other* artifact of the same kind.
+
+**HIGH-1 — live in the repository, and the author's PASS was right for the wrong reason.**
+`member_status_cell` matched `SPRINT-<want>` against the **whole row**, so the first row whose
+*contribution prose* merely mentioned that sprint won and its Status cell was returned. On EPIC-014,
+SPRINT-091's row mentions SPRINT-092, so member 092 was validated against 091's cell and `d43a7a1` was
+never read. A missing row or missing sha on 092 would have gone undetected. The author's comment on
+that very function cites L-108 and fixed reading the wrong *column* while introducing the wrong
+*row*. Fixed by selecting on the row's own id cell (`c[2]`) with a trailing non-digit guard, which
+also closes the prefix bug where `SPRINT-0*91` matched `SPRINT-910`.
+
+**HIGH-2 — two contradictory definitions of "closed member" in one file.** `_members_scan` (retention)
+treats presence under `archive/` as closed; the new `closed_members` additionally demanded
+`status: closed`, while its comment claimed the two matched. A sprint archived without its frontmatter
+flipped was therefore closed for one half of the file and open for the other, and its drift went
+**vacuously green**. Fixed by adopting `_members_scan`'s definition exactly.
+
+**HIGH-3 — a one-line seed left all twelve fixtures green.** Every fixture put its member under
+`archive/`; nothing exercised the live-path half of the glob, though **SPRINT-093 is exactly that
+shape in this repo**. Deleting that half passed the whole suite while a real drift went silent.
+
+**MEDIUM-4** class (c) accepted any `SPRINT-N` token, including a non-member that closed nothing, and
+a trailing prose paragraph immunised the section's last tick. **MEDIUM-6** class (a) checked a sha's
+*shape* and never its *agreement* with the sprint's own `close_commit` — so a row copying its
+neighbour's sha passes clean, which is the likeliest real instance and is traceable to the **wrong**
+place, worse than untraceable. Both fixed; the agreement fact was in a file the checker already opens.
+
+**Held up under the pass, recorded so it is not re-litigated:** the heredoc/subshell discipline is
+sound (each class exercised alone, `fail=1` survives every loop); the EPIC-015 repair is correct (all
+four `close_commit`s match their sprint's frontmatter, `cc46d18`'s double use verified legitimate);
+consumer safety clean; and the author's pristine hash, line and assertion counts all reproduced.
+
+**Filed, not fixed — both pre-existing in helpers T1 never declared:** **TD-130** (`- [X]` and indented
+checkboxes are invisible to `open_conditions`/`total_conditions`, so an epic can be archived with a
+genuinely open condition) and **TD-131** (`fmv` returns empty on CRLF and works here only because this
+host's gawk build strips CR; on a Linux runner direction (c) would skip every epic and **print
+nothing**, indistinguishable from "no active epics" — L-058's shape, and TD-113/L-182's class).
+
+**Re-proof after the fixes.** Five new reachability fixtures (cases 13–17) vary the member set:
+sibling-prose row selection · live-path member · archived-but-not-flipped · wrong sha · non-member
+attribution. Suite now **17 cases, all green**. One hash convention throughout — `git hash-object` on
+the working-tree blob — pristine `75c8ff9e3e9a74f9c999d90ca96edee6a28ccaa1`, 312 lines, 5
+`bad "epic-state` calls. **Every reviewer-derived defect was re-seeded and each reddens exactly its
+own case with 16/17 green**: unanchored row → `r-row-by-prose` · demand-status → `r-archived-not-flipped`
+· drop-live-glob → `r-live-path` · any-sprint-token → `r-nonmember-attrib` · skip-sha-compare →
+`r-wrong-sha` · neutered header compare → `b-stale-header`. Restored and re-verified identical.
+
+**Two seeds in this battery aborted as SEED DID NOT LAND** (malformed `sed` against awk regex
+metacharacters) and were redone. That guard has now fired three times in one task, each time on a
+patch that never applied — without it the suite reports green, which is indistinguishable from a
+suite that discriminates (L-137).

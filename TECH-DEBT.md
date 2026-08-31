@@ -257,6 +257,42 @@ status: current
     reddens on a flaky connection teaches people to ignore it — but nothing gates this test today.
   - **Re-file fresh if** the repo gains a network-tolerant harness tier, which would remove the reason.
 
+- **TD-130** severity: medium | status: open | created: Sprint-094
+  - Summary: **`check-epic-archive.sh`'s checkbox anchors miss `- [X]` (uppercase) and any indented
+    checkbox, so a § Closed-when condition written either way is invisible to every direction of the
+    checker** — it is not counted as open, not counted as total, and not examined for attribution.
+  - Evidence (SPRINT-094 T1 independent review, reproduced): a fixture epic with four ticked
+    conditions — one uppercase `- [X]`, one indented `  - [x]` — reported `1 of 3 condition(s) open`,
+    having silently dropped both, and `epic-state` reported the epic clean.
+  - **Why it is not fixed in T1.** The anchors live in `open_conditions()` and `total_conditions()`,
+    pre-existing helpers T1 never declared in its `Layers:` and which the *retention* directions
+    depend on. Widening them changes archival behaviour for every epic, which is a different task's
+    blast radius (owner ruling at the T1 review: fix what T1 introduced, file what it inherited).
+  - Impact: a silent false negative in both directions at once. An epic could be archived with an
+    uppercase-ticked condition still genuinely open, which is the exact failure §11 warns about.
+  - **Re-file fresh if** anyone normalises Markdown checkbox parsing anywhere else in the gate — the
+    fix belongs with that, not as a local patch here.
+
+- **TD-131** severity: medium | status: open | created: Sprint-094
+  - Summary: **`fmv()` returns empty for every key on a CRLF file, and it only works in this
+    repository by accident of the host's awk build.** Its first-line guard is
+    `NR==1 && $0!="---" {exit}`; on CRLF the first record is `"---\r"`, which is not `"---"`, so it
+    exits and every frontmatter read returns empty.
+  - Evidence (SPRINT-094 T1 independent review): every `docs/epic/*.md` in a stock Windows checkout is
+    CRLF (`core.autocrlf=true`, no `.gitattributes` rule for `*.md`; EPIC-015 measures 146 CR bytes
+    for 146 lines). It works here only because this host's **GNU Awk 5.0.0 Windows build translates
+    CRLF on read** — verified directly. Under WSL, a Linux CI runner, or `busybox awk` reading the
+    same tree, `fmv` returns empty.
+  - Impact, and why it is worse for the new direction than the old: directions (a)/(b) would still
+    print a per-epic line. Direction (c) gates on `[ "$(fmv "$e" status)" = "active" ]`, so it would
+    **skip every epic and print nothing at all** — indistinguishable from "no active epics", which is
+    the silent-absence shape L-058 exists to forbid. This is the same class as **TD-113**/L-182: a
+    checkout-sensitive property verified only in a tree the tooling has already normalised.
+  - **Why it is not fixed in T1**: `fmv` is pre-existing and shared with the retention directions;
+    the same ruling applies as TD-130. The narrow fix is `sub(/\r$/,"")` at the top of `fmv`, plus a
+    `*.md eol=lf` rule or a fresh-clone check — but it must be verified from a **forced fresh
+    checkout**, never from this tree (L-182).
+  - **Re-file fresh if** it stops being latent: any CI runner or non-Windows contributor makes it live.
 - **TD-129** severity: medium | status: open | created: Sprint-094
   - Summary: **`EPIC-014`'s "the Shell semantic engine is deleted" milestone will NOT end Shell rule
     enforcement, because six checkable Standard rules were never in that engine** — they live in

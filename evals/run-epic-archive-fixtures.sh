@@ -117,15 +117,56 @@ run_case_anywhere "b-stale-header" 1 \
 
 # --- case 11: ticked exit condition naming no sprint -> FAIL (class c) ---------------------------
 run_case_anywhere "c-unattributed-tick" 1 \
-  "has a ticked § Closed-when condition naming no closing sprint" -- \
+  "has a ticked § Closed-when condition naming no member sprint" -- \
   sh "$checker" "$fxs/c-unattributed-tick"
 
 # --- case 12: all three classes satisfied -> exit 0 (control) ------------------------------------
 # Load-bearing: without it, a checker that FAILed every active epic unconditionally would satisfy
 # cases 8-11 and look fully covered.
 run_case_anywhere "control-current" 0 \
-  "rollup current (every closed member rolled up with its close_commit" -- \
+  "rollup current (every closed member rolled up with its own close_commit" -- \
   sh "$checker" "$fxs/control-current"
+
+# --- REACHABILITY cases 13-17 (T1 independent review) --------------------------------------------
+# The review's through-line: cases 8-12 discriminate each class's BRANCHES, and nothing varied the
+# SET OF MEMBERS those branches are applied to. Member resolution happens three ways -- which row is
+# selected, which sprints count as closed, which paths are searched -- and a seed in any of them left
+# all twelve green. These five vary that set. Retained (TD-012).
+
+# --- case 13: sibling row's PROSE mentions the member -> FAIL (HIGH-1) --------------------------
+# SPRINT-921 has no row at all; SPRINT-920's contribution text ends "carried on into SPRINT-921".
+# The first draft matched the whole row, so 921 bound to 920's row and inherited its close_commit.
+# Live on EPIC-014, where SPRINT-091's row mentions SPRINT-092.
+run_case_anywhere "r-row-by-prose" 1 \
+  "SPRINT-921 is closed but has NO row in § Member sprints" -- \
+  sh "$checker" "$fxs/r-row-by-prose"
+
+# --- case 14: member closed on the LIVE path, not archive/ -> FAIL (HIGH-3) ---------------------
+# Every one of cases 8-12 puts its member under archive/, so deleting the live half of the glob left
+# the whole suite green while a real drift went silent. SPRINT-093 is exactly this shape in the repo.
+run_case_anywhere "r-live-path" 1 \
+  "SPRINT-922 is closed but has NO row in § Member sprints" -- \
+  sh "$checker" "$fxs/r-live-path"
+
+# --- case 15: archived member whose frontmatter never flipped -> FAIL (HIGH-2) ------------------
+# The retention directions call an archived sprint closed; the first draft of closed_members also
+# demanded status: closed, so a half-completed close was closed for one half of this file and open
+# for the other, and the drift went vacuously green.
+run_case_anywhere "r-archived-not-flipped" 1 \
+  "SPRINT-923 is closed but has NO row in § Member sprints" -- \
+  sh "$checker" "$fxs/r-archived-not-flipped"
+
+# --- case 16: cell carries a hex token that is NOT this sprint's commit -> FAIL (MEDIUM-6) ------
+# Shape alone passes; a row copying its neighbour's sha is the likeliest real instance and is
+# traceable to the WRONG place, which is worse than untraceable.
+run_case_anywhere "r-wrong-sha" 1 \
+  "names a close_commit that is not the sprint's own" -- \
+  sh "$checker" "$fxs/r-wrong-sha"
+
+# --- case 17: tick attributed to a NON-member sprint -> FAIL (MEDIUM-4) -------------------------
+run_case_anywhere "r-nonmember-attrib" 1 \
+  "has a ticked § Closed-when condition naming no member sprint" -- \
+  sh "$checker" "$fxs/r-nonmember-attrib"
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "EPIC-ARCHIVE FIXTURES: all green"; else echo "EPIC-ARCHIVE FIXTURES: at least one FAIL"; fi
 exit $fail

@@ -85,7 +85,7 @@ failing artifact and a real passing sibling, and the difference is the drift, ne
 - [x] Wired where it fires, not merely present (L-020): the always-on eval list, a `qa-check.sh` leg,
       **and** `lean-doc-generator`'s § Sprint lifecycle — the close rollup step and the promote
       governance checklist both name it — *Verify: a full gate run naming the new harness in its output*
-- [ ] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168) — every Tier G change gets one,
+- [x] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168) — every Tier G change gets one,
       and the reviewer is isolated because adversarial verification *writes*
 
 ### T2 — Track handoff status and perform §12(b)'s conversion `[size: M · risk: med · class: execution · HITL · J1]`

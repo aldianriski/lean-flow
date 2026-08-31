@@ -167,44 +167,83 @@ done
 # `| a | b | c | d |` splits on `|` into c[1]="" c[2]=a c[3]=b c[4]=c, so Status is c[4]. Read the
 # CELL, never the row: contribution prose is dense with backticked tokens and matching a sha anywhere
 # on the line would let one satisfy this from the wrong column (L-108).
+# Status cell (3rd column) of the § Member sprints row FOR SPRINT-<num>; empty when no such row.
+# `| a | b | c | d |` splits on `|` into c[1]="" c[2]=a c[3]=b c[4]=c, so the id is c[2] and Status
+# is c[4].
+#
+# The row is selected by its OWN id cell, never by matching the whole line. The first draft matched
+# `$0 ~ "SPRINT-0*" want` against the entire row, so the first row whose *contribution prose* merely
+# mentioned SPRINT-<want> won and its cell was returned as if it were want's. That was live on
+# EPIC-014: SPRINT-091's row mentions SPRINT-092 in its contribution text, so member 092 was
+# validated against 091's cell and 092's own `d43a7a1` was never read -- a PASS that was the right
+# answer for the wrong reason, and a missing row or missing sha on 092 would have gone undetected.
+# Found by the independent T1 review, not by the author (L-165). Same fix closes the prefix bug:
+# `SPRINT-0*91` also matched `SPRINT-910`, so a shorter id bound to a longer row.
 member_status_cell() {
   awk -v want="$2" '
     /^## Member sprints/{f=1;next}
     f&&/^## /{exit}
     f&&/^\|/ {
-      if ($0 ~ ("SPRINT-0*" want)) {
-        n=split($0, c, "|")
-        if (n >= 4) { s=c[4]; gsub(/^[ \t]+|[ \t]+$/, "", s); print s; exit }
+      n=split($0, c, "|")
+      if (n < 4) next
+      id=c[2]; gsub(/^[ \t]+|[ \t]+$/, "", id)
+      if (id ~ ("SPRINT-0*" want "([^0-9]|$)")) {
+        s=c[4]; gsub(/^[ \t]+|[ \t]+$/, "", s); print s; exit
       }
     }' "$1"
 }
 
-# "<num> <last_updated>" per member sprint whose Plan says status: closed. Archive wins over a live
-# path, matching _members_scan's precedence above.
+# "<num> <last_updated> <close_commit>" per CLOSED member sprint.
+#
+# "Closed" is defined EXACTLY as `_members_scan` above defines it -- under docs/sprint/archive/, OR a
+# live Plan saying status: closed. The first draft required `status: closed` in both cases, so a
+# sprint archived without its frontmatter flipped was closed for the retention directions and open
+# for this one: two contradictory definitions in one file, and the disagreement made a stale header
+# and an unrolled member vacuously green. A half-completed close is exactly the drift this direction
+# exists to catch (T1 review, HIGH-2).
 closed_members() {
   _cm=$(awk '/^member_sprints:/ { sub(/^member_sprints:[[:space:]]*/, ""); gsub(/[][,]/, " "); print; exit }' "$1")
   for _c in $_cm; do
     [ -n "$_c" ] || continue
     _c=${_c#SPRINT-}; _c=${_c#sprint-}
-    _cf=""
-    for _p in "$2"/docs/sprint/archive/SPRINT-"$_c"-*.md "$2"/docs/sprint/SPRINT-"$_c"-*.md; do
-      [ -f "$_p" ] && { _cf=$_p; break; }
+    _cf=""; _arch=0
+    for _p in "$2"/docs/sprint/archive/SPRINT-"$_c"-*.md; do
+      [ -f "$_p" ] && { _cf=$_p; _arch=1; break; }
     done
+    if [ -z "$_cf" ]; then
+      for _p in "$2"/docs/sprint/SPRINT-"$_c"-*.md; do
+        [ -f "$_p" ] && { _cf=$_p; break; }
+      done
+    fi
     [ -n "$_cf" ] || continue
-    [ "$(fmv "$_cf" status)" = "closed" ] || continue
-    printf '%s %s\n' "$_c" "$(fmv "$_cf" last_updated)"
+    [ "$_arch" -eq 1 ] || [ "$(fmv "$_cf" status)" = "closed" ] || continue
+    printf '%s %s %s\n' "$_c" "$(fmv "$_cf" last_updated)" "$(fmv "$_cf" close_commit)"
   done
 }
 
-# Ticked § Closed-when conditions whose block names no SPRINT-NNN. The block is the `- [x]` line plus
-# every following line up to the next checkbox: attribution is routinely on a continuation
-# ("-- **SPRINT-085**: 100/100 rows"), so reading the first line alone would report every correctly
-# attributed condition as unattributed -- a false positive severe enough to get the check ignored.
+# Ticked § Closed-when conditions whose block names no SPRINT-NNN **that is a member of this epic**.
+# $2 = space-separated member numbers.
+#
+# Three tightenings over the first draft, all from the T1 review:
+#   * the named sprint must be a MEMBER. "originally sketched in SPRINT-001" satisfied the first
+#     draft while attributing the tick to a sprint that closed nothing here (MEDIUM-4).
+#   * fenced code and HTML comments are stripped before matching, so an attribution that no reader
+#     sees cannot satisfy the check (MEDIUM-5, the half this task introduced).
+#   * a block ends at the next checkbox OR at the section end -- and END{} flushes, so a trailing
+#     prose paragraph no longer immunises the section's last tick (MEDIUM-4, sharper half).
 ticked_unattributed() {
-  awk '
-    function flush() { if (open && blk !~ /SPRINT-[0-9]/) { s=substr(blk,1,72); gsub(/\|/,"/",s); print s } open=0; blk="" }
-    /^## Closed when/{f=1;next}
+  awk -v members="$2" '
+    function attributed(b,   i, n, arr) {
+      n = split(members, arr, " ")
+      for (i = 1; i <= n; i++) if (b ~ ("SPRINT-0*" arr[i] "([^0-9]|$)")) return 1
+      return 0
+    }
+    function flush() { if (open && !attributed(blk)) { s=substr(blk,1,72); gsub(/\|/,"/",s); print s } open=0; blk="" }
+    /^## Closed when/{f=1;fence=0;next}
     f&&/^## /{flush(); exit}
+    f&&/^[ \t]*```/{ fence = !fence; next }
+    f&&fence{ next }
+    f&&/^[ \t]*<!--/{ next }
     f&&/^- \[x\]/{ flush(); open=1; blk=$0; next }
     f&&/^- \[ \]/{ flush(); next }
     f&&open{ blk=blk " " $0 }
@@ -217,12 +256,18 @@ for e in "$root"/docs/epic/EPIC-*.md; do
   [ "$(fmv "$e" status)" = "active" ] || continue
   rel=${e#"$root"/}
   cmem=$(closed_members "$e" "$root")
+  # All member numbers, closed or not -- class (c) asks whether a tick names a sprint belonging to
+  # THIS epic, and an open member can legitimately have contributed a completed condition.
+  allmem=$(awk '/^member_sprints:/ { sub(/^member_sprints:[[:space:]]*/, ""); gsub(/[][,]/, " "); print; exit }' "$e" \
+           | sed 's/SPRINT-//g; s/sprint-//g')
   drift=0
 
-  # (a) every closed member has a rollup row carrying its close_commit. The Status cell format is
-  #     EPIC.md.template's own -- `closed · `<close_commit>`` -- so this encodes the template's rule
-  #     rather than inventing one to make the criterion look mechanical.
-  while read -r num _rest; do
+  # (a) every closed member has a rollup row carrying its close_commit, AND that value AGREES with
+  #     the sprint's own frontmatter. Shape alone is not enough: a row that copies the previous
+  #     row's sha is the most likely real instance of this class and passes any hex-shaped test
+  #     (T1 review, MEDIUM-6). The fact is in the file this checker already opens, so checking the
+  #     shape and stopping there was checking the cheap half of a question it could answer fully.
+  while read -r num mlu mcc; do
     [ -n "$num" ] || continue
     cell=$(member_status_cell "$e" "$num")
     if [ -z "$cell" ]; then
@@ -230,6 +275,9 @@ for e in "$root"/docs/epic/EPIC-*.md; do
       drift=1
     elif ! printf '%s' "$cell" | grep -qE '`[0-9a-f]{7,40}`'; then
       bad "epic-state: $rel SPRINT-$num's § Member sprints Status cell carries no close_commit -- reads '$cell'. EPIC.md.template states the cell as 'closed · \`<close_commit>\`', so this row cannot be traced to the commit that closed it"
+      drift=1
+    elif [ -n "$mcc" ] && ! printf '%s' "$cell" | grep -qF "$mcc"; then
+      bad "epic-state: $rel SPRINT-$num's § Member sprints Status cell names a close_commit that is not the sprint's own -- cell reads '$cell', SPRINT-$num's frontmatter says close_commit: $mcc. A row carrying a hex-shaped token that belongs to a different commit is traceable to the wrong place, which is worse than untraceable"
       drift=1
     fi
   done <<CMEOF
@@ -240,24 +288,24 @@ CMEOF
   #     sprint closes", so a last_updated older than the newest closed member's is a header that has
   #     stopped following its body. Invisible to S3.SCHEMA, which asserts the field is PRESENT and
   #     never that it is current -- which is why EPIC-014 passed every gate while stale.
-  newest=$(printf '%s\n' "$cmem" | awk 'NF==2{print $2}' | sort | tail -1)
+  newest=$(printf '%s\n' "$cmem" | awk 'NF>=2 && $2 != "" {print $2}' | sort | tail -1)
   elu=$(fmv "$e" last_updated)
   if [ -n "$newest" ] && [ -n "$elu" ] && [ "$elu" \< "$newest" ]; then
     bad "epic-state: $rel last_updated is $elu but its newest closed member sprint closed $newest -- its own update_trigger (a member sprint closes) fired and the header did not follow"
     drift=1
   fi
 
-  # (c) a ticked exit condition names the sprint that closed it. An unattributed `[x]` records that
-  #     something is done without recording what did it, so the evidence is unreachable.
+  # (c) a ticked exit condition names a MEMBER sprint. An unattributed `[x]` records that something
+  #     is done without recording what did it, so the evidence is unreachable.
   while IFS= read -r u; do
     [ -n "$u" ] || continue
-    bad "epic-state: $rel has a ticked § Closed-when condition naming no closing sprint -- \"$u...\". A tick with no SPRINT-NNN behind it says something is done but not what did it, so its evidence cannot be found"
+    bad "epic-state: $rel has a ticked § Closed-when condition naming no member sprint -- \"$u...\". A tick with no member SPRINT-NNN behind it says something is done but not what did it, so its evidence cannot be found"
     drift=1
   done <<TUEOF
-$(ticked_unattributed "$e")
+$(ticked_unattributed "$e" "$allmem")
 TUEOF
 
-  [ "$drift" -eq 0 ] && ok "epic-state: $rel rollup current (every closed member rolled up with its close_commit, header tracks its newest member close, every ticked condition attributed)"
+  [ "$drift" -eq 0 ] && ok "epic-state: $rel rollup current (every closed member rolled up with its own close_commit, header tracks its newest member close, every ticked condition attributed to a member)"
 done
 
 [ "$checked" -eq 0 ] && printf '      %s\n' "epic-archive: skip (no epics under docs/epic/)"
