@@ -76,6 +76,56 @@ run_case_anywhere "archived-member-open" 1 \
 run_case_anywhere "closed-member-open" 0 \
   "correctly NOT yet archived" -- \
   sh "$checker" "$fx/closed-member-open"
+
+# ================================================================================================
+# § epic-state -- SPRINT-094 T1 (TASK-324). The three drift classes the checker gained when it was
+# widened from "should this epic be archived?" to "is this epic's rollup CURRENT?".
+#
+# These are RETAINED, not scaffolding to delete with the prototype (TD-012). One fixture per class,
+# each asserting ITS OWN finding text rather than a bare exit code -- a shared exit 1 would let any
+# one class satisfy every case, which is the coverage hole L-058 names.
+#
+# The classes were proven on REAL artifacts before these fixtures existed (L-166): class (b) fires on
+# EPIC-014 at d43a7a1 -- the stale header that passed a fully green gate and was found by hand -- and
+# classes (a) and (c) fired on EPIC-015's four unrolled close_commits and three unattributed ticks in
+# the live tree. Fixtures prove the branch works; those artifacts proved it is reachable.
+# ================================================================================================
+
+fxs="$here/fixtures/epic-state"
+[ -d "$fxs" ] || { echo "FAIL harness: epic-state fixture dir not found at $fxs"; exit 2; }
+
+# --- case 8: closed member rolled up WITHOUT its close_commit -> FAIL (class a) ------------------
+# The EPIC-015 shape: a Status cell reading "**closed** <date> — N of M DoD". The row exists and
+# looks complete, so only reading the cell against EPIC.md.template's format finds it.
+run_case_anywhere "a-no-close-commit" 1 \
+  "SPRINT-910's § Member sprints Status cell carries no close_commit" -- \
+  sh "$checker" "$fxs/a-no-close-commit"
+
+# --- case 9: closed member with no rollup row at all -> FAIL (class a) ---------------------------
+# The louder half of the same class, and a separate case because a checker keyed only to a MALFORMED
+# cell would silently pass a member that was never rolled up at all.
+run_case_anywhere "a-no-member-row" 1 \
+  "SPRINT-911 is closed but has NO row in § Member sprints" -- \
+  sh "$checker" "$fxs/a-no-member-row"
+
+# --- case 10: header older than the newest closed member -> FAIL (class b) -----------------------
+# EPIC-014's real case. Invisible to S3.SCHEMA, which asserts last_updated is PRESENT and never that
+# it is current -- which is exactly why this passed every gate while stale.
+run_case_anywhere "b-stale-header" 1 \
+  "last_updated is 2026-01-01 but its newest closed member sprint closed 2026-02-01" -- \
+  sh "$checker" "$fxs/b-stale-header"
+
+# --- case 11: ticked exit condition naming no sprint -> FAIL (class c) ---------------------------
+run_case_anywhere "c-unattributed-tick" 1 \
+  "has a ticked § Closed-when condition naming no closing sprint" -- \
+  sh "$checker" "$fxs/c-unattributed-tick"
+
+# --- case 12: all three classes satisfied -> exit 0 (control) ------------------------------------
+# Load-bearing: without it, a checker that FAILed every active epic unconditionally would satisfy
+# cases 8-11 and look fully covered.
+run_case_anywhere "control-current" 0 \
+  "rollup current (every closed member rolled up with its close_commit" -- \
+  sh "$checker" "$fxs/control-current"
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "EPIC-ARCHIVE FIXTURES: all green"; else echo "EPIC-ARCHIVE FIXTURES: at least one FAIL"; fi
 exit $fail

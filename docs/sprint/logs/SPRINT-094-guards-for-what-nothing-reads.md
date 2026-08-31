@@ -2,7 +2,7 @@
 sprint: 094
 slug: guards-for-what-nothing-reads
 owner: Maintainer
-last_updated: 2026-08-31
+last_updated: 2026-09-01
 status: active
 update_trigger: an Execution Log entry is appended
 ---
@@ -106,3 +106,121 @@ TypeScript covers **10 of 51** checkable Standard rules (~20%), so a Shell T3 wo
 41-rule remainder for no benefit, while a TS T3 adds to neither side of that ledger.
 
 ---
+
+### 2026-09-01 | scope-change | T1's Acceptance was false as frozen — EPIC-015 does NOT stay green
+
+**What broke:** the criterion, not the scope. T1's **Acceptance** reads *"run against `33187dc`, it
+stays green on EPIC-015"*. Measured against `EPIC.md.template` — the SSOT, whose Status cell is
+`closed · `<close_commit>`` — EPIC-015 produces **7 findings**, so the criterion was untrue the moment
+it froze. This is **L-185**'s shape (a criterion resting on an unexamined claim about current state)
+arriving through **L-088**'s door (a DoD execution invalidates), and the rule for both is the same:
+log it and get a ruling, never re-read the words to fit what was built.
+
+**What the measurement actually found — and it is better for the guard than the frozen version was.**
+The two live epics fail *different* classes, so each class has a real failing artifact **and** a real
+passing sibling in the working tree, which is L-166's bar met the strong way and without a historical
+checkout for two of the three:
+
+| Class | Fails on | Passes on (sibling control) |
+|---|---|---|
+| (a) member row carries its `close_commit` | **EPIC-015** — 4 rows written `**closed** <date> — N of M DoD` | EPIC-014 — all 5 carry one |
+| (b) `last_updated` not older than the last member close | **EPIC-014** at `d43a7a1` | EPIC-015 |
+| (c) a ticked § Closed-when condition names its closing sprint | **EPIC-015** — 3 ticked, none names one | EPIC-014 — both name SPRINT-085 / 091 |
+
+**Impact:** shipping the guard reds the gate until EPIC-015's drift is fixed, and ADR-021 makes a red
+gate block the close. **Owner ruled: fix the drift inside T1** — the guard found real drift and fixing
+it is the point. Acceptance is restated as a before/after on a real artifact rather than a static
+claim: EPIC-015 reports 7 findings **before** the fix (that is the must-FAIL, on the live tree, not a
+fixture) and both epics are green **after**. Class (a) was checked against the template before being
+encoded — requiring a `close_commit` is the template's rule, not one invented here to look mechanical.
+
+**Re-confirm G2:** yes, owner-ruled. The added work is bounded and derived, not estimated: four
+`close_commit` values read from each member sprint's own frontmatter (`dc3690a` · `cc46d18` · `cc46d18`
+· `33187dc`) and three condition→sprint attributions read from the member rows' own contribution text
+(088 states "§ Closed-when 2 complete"; 089 states "Contributed § Closed-when 3 and 4"). **`cc46d18`
+appearing twice was verified, not assumed** — `git show --stat` confirms that commit modified
+SPRINT-090's Plan by 41 lines, so 089 and 090 genuinely closed in one commit and the repeat is not a
+copy-paste error being propagated into the epic table.
+
+---
+
+### 2026-09-01 | progress | T1 — 5 of 6 DoD; the guard found 7 real findings and they are repaired
+
+`consequence · T1 · behaviour:material · governance:high` — a Tier G guard over the epic layer; a
+false negative here is silent by construction, which is the whole reason it exists.
+
+**The check.** `check-epic-archive.sh` widened 143 → 264 lines with a third direction, `epic-state:`,
+distinct from `epic-archive:` so a rollup-drift finding is distinguishable from a retention one
+without parsing the sentence (L-058). Three classes: (a) a closed member with no rollup row, or a row
+whose Status cell carries no `close_commit`; (b) an ownership header older than its newest member
+close; (c) a ticked § Closed-when condition naming no closing sprint.
+
+**Pointed at real artifacts before any fixture existed (L-166), and each class has a real sibling
+control** — fixtures prove a branch works, only the motivating artifact proves it is reachable:
+
+| Class | FAILed on (real) | Stayed green on (real) |
+|---|---|---|
+| (a) | EPIC-015 ×4 — every member row read `**closed** <date> — N of M DoD` | EPIC-014, all 5 rows carry a sha |
+| (b) | **EPIC-014 at `d43a7a1`** — `last_updated: 2026-08-29` over a body edited 2026-08-31, through a fully green gate | EPIC-015, **0** class-(b) findings at that same tree |
+| (c) | EPIC-015 ×3 — three ticked conditions, none naming a sprint | EPIC-014, both ticked conditions name SPRINT-085 / 091 |
+
+**The 7 findings were repaired, so the gate is green rather than red-with-a-note.** Four
+`close_commit` values were **derived** from each member sprint's own frontmatter, never estimated —
+`dc3690a` · `cc46d18` · `cc46d18` · `33187dc`. `cc46d18` appearing twice was **verified rather than
+assumed to be a copy-paste error**: `git show --stat` confirms that commit modified SPRINT-090's Plan
+by 41 lines, so 089 and 090 genuinely closed together. The three attributions were read from the
+member rows' own contribution text (088 states "§ Closed-when 2 complete", 089 states "Contributed
+§ Closed-when 3 and 4"), not assigned by judgement.
+
+**Class (a) encodes the template's rule, not an invented one.** `EPIC.md.template` states the Status
+cell as `closed · `<close_commit>``. That was checked before the rule was written — inventing a
+checker to make a criterion look mechanical is the failure, not the fix.
+
+**Discrimination proof — the suite was NOT trusted for going green on its first run (L-184).** One
+hash convention throughout, stated once and used for every figure: **`git hash-object <path>`** on the
+working-tree blob (L-169). Pristine `108a035b63ea32322a8a0f71e7313d4e6ea06ea3`, 264 lines, 4
+`bad "epic-state` calls. Four seeds, each verified landed by `cmp`, still parsing under `sh -n`, and
+targeted (line count identical, assertion count identical):
+
+| Seed | Reddened | Siblings still green |
+|---|---|---|
+| `if [ -z "$cell" ]` → `false && …` | `a-no-member-row` | 11/12, **including its own-class sibling** `a-no-close-commit` |
+| `elif ! printf …` → `elif false && …` | `a-no-close-commit` | 11/12 |
+| `if [ -n "$newest" ]` → `false && …` | `b-stale-header` | 11/12 |
+| awk `flush()` guard → `if (0 && …)` | `c-unattributed-tick` | 11/12 |
+
+Restored and re-verified at `108a035b63ea32322a8a0f71e7313d4e6ea06ea3` — identical, so no seed
+residue shipped (L-137's timeout case).
+
+**Two failures inside the proof itself, both caught by the proof's own guards rather than by
+re-reading — recorded because they are the instructive part.** (i) One seed's `sed` expression was
+malformed and never applied; `cmp` reported **SEED DID NOT LAND** and aborted. Without that check the
+suite would have reported green, which is indistinguishable from a suite that discriminates. (ii) The
+first class-(c) seed inverted `[ -n "$u" ] || continue` to `&& continue`, which let **empty** input
+fall through to `bad` — injecting a *new false positive* rather than disabling a finding. It reddened
+**three** cases including two controls. Line count and assertion count both passed; the break was
+semantic, so only the *sibling-stays-green* requirement caught it. That requirement is not ceremony:
+it is the only one of the four targeting checks that fired here (L-142).
+
+**Wiring (L-020) — already connected, and the widening inherits it.** `run-epic-archive-fixtures.sh`
+is in `eval_harnesses_always` and leg 2b already delegates to this checker, so the new direction runs
+on every bare gate. Renamed the leg `epic retention + rollup currency`, because a leg whose label
+under-describes it is a capability nobody finds. `lean-doc-generator/SKILL.md` gained the promote
+checklist line and a close-side clause — **consumer-safe, naming the property and never this repo's
+script path** (L-015). That file is now **134/140**, leaving 6 lines for T2; per **D2** any overflow
+goes to `references/`, never a raised cap.
+
+**Fixtures: 12 cases, 7 pre-existing + 5 new, all retained (TD-012).** One retained control
+(`live-open`) needed an attribution added to stay a coherent epic under class (c). Its discriminating
+property — *status active, 1 of 2 conditions open → exit 0* — is untouched, and its checkbox count is
+unchanged at 2, so this is a compatibility edit and not a weakened control.
+
+**Layers grew at execution and was declared, not left implicit (L-100):**
+`docs/epic/EPIC-015-execution-autonomy.md` (the repair the owner ruled) and
+`evals/fixtures/epic-archive/live-open/` (the compatibility edit). EPIC-015 moved out of `Cites:` in
+the same edit — its "read, never modified" parenthetical had become false, and a token in both lists
+is its own named FAIL.
+
+**Not ticked: the outside reviewer.** Owner authorised worktree-isolated dispatch for the three Tier G
+tasks; T1's reviewer runs next. Isolation is not optional — adversarial verification *writes*, so a
+non-isolated reviewer plus any `git add -A` ships a corrupted guard inside an unrelated commit (L-168).

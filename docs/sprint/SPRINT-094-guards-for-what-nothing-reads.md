@@ -39,9 +39,9 @@ settled and is not this sprint's question · a second stream, unavailable while 
 ## Plan
 
 ### T1 — Check epic status at promote and close `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-epic-archive.sh` (widened at the G2 scope-change, not a second script) · `scripts/qa-check.sh` · `evals/fixtures/epic-state/` · `evals/run-epic-archive-fixtures.sh` (extended) · `skills/lean-doc-generator/SKILL.md`
+Layers: `scripts/lib/check-epic-archive.sh` (widened at the G2 scope-change, not a second script) · `scripts/qa-check.sh` · `evals/fixtures/epic-state/` · `evals/run-epic-archive-fixtures.sh` (extended) · `skills/lean-doc-generator/SKILL.md` · `docs/epic/EPIC-015-execution-autonomy.md` (declared at execution per L-100 — the 7 real findings this guard produced, which the owner ruled T1 repairs) · `evals/fixtures/epic-archive/live-open/` (declared at execution — one retained control needed an attribution to stay a coherent epic under class (c); its discriminating property is untouched)
 Depends-on: none
-Cites: STANDARD §3 (ownership header) · §11 (retention) · `S11.EPIC` (the §11 rule this extends — one of the six checkable rules never in the semantic engine, TD-129) · `S3.SCHEMA` (the ownership-header rule this extends past field-presence) · ADR-029 (tier) · ADR-030 (contribution rows) · L-020 · L-166 · L-151 · TD-087 and TD-097 (two rows for one script — why this widens rather than adds) · `docs/epic/EPIC-014-reference-engine.md` and `docs/epic/EPIC-015-execution-autonomy.md` (the motivating artifact and its sibling control — read, never modified)
+Cites: STANDARD §3 (ownership header) · §11 (retention) · `S11.EPIC` (the §11 rule this extends — one of the six checkable rules never in the semantic engine, TD-129) · `S3.SCHEMA` (the ownership-header rule this extends past field-presence) · ADR-029 (tier) · ADR-030 (contribution rows) · L-020 · L-166 · L-151 · TD-087 and TD-097 (two rows for one script — why this widens rather than adds) · `docs/epic/EPIC-014-reference-engine.md` (the class-(b) motivating artifact — read at `d43a7a1`, never modified; EPIC-015 moved to Layers at execution once the owner ruled T1 repairs the drift it found)
 
 An epic is the only artifact in this repo whose correctness nobody can observe. `check-epic-archive.sh`
 enforces §11 retention in both directions but reads archival eligibility alone; the ownership-header
@@ -50,11 +50,16 @@ last body edit. So EPIC-014 sat with a 2026-08-29 header over a body edited 2026
 green gate, and would have kept sitting there. The check is cheap; the reason it does not exist is that
 nobody was looking, which is the sprint's theme in its smallest form.
 
-**Acceptance:** run against the tree at `d43a7a1`, the check REPORTS EPIC-014's stale header; run
-against `33187dc`, it stays green on EPIC-015 — and the difference is the drift, not the commit.
+**Acceptance:** *(restated at the 2026-09-01 scope-change — the frozen wording claimed EPIC-015 stays
+green, and it does not; L-185 · L-088.)* Against the **live tree before the fix**, the check REPORTS
+**7 findings on EPIC-015** — 4 member rows carrying no `close_commit` (class a) and 3 ticked
+§ Closed-when conditions naming no closing sprint (class c) — while EPIC-014 stays green on both,
+and against `d43a7a1` it REPORTS EPIC-014's stale header (class b) while EPIC-015 stays green on that
+one. After T1 repairs the drift it found, both epics are green. Each class therefore carries a real
+failing artifact and a real passing sibling, and the difference is the drift, never the commit.
 
 **DoD:**
-- [ ] Three drift classes reported for every `status: active` epic: **(a)** a member sprint that closed
+- [x] Three drift classes reported for every `status: active` epic: **(a)** a member sprint that closed
       with no contribution row or `close_commit` in § Member sprints; **(b)** an ownership header whose
       `last_updated` predates its own `update_trigger`'s last firing — for an epic, the most recent
       member-sprint close; **(c)** a § Closed-when condition ticked with no member sprint naming what
@@ -63,21 +68,21 @@ against `33187dc`, it stays green on EPIC-015 — and the difference is the drif
       in the always-on eval list, `sh scripts/qa-check.sh` reaches it and the verdict is that run's own
       printed `QA-CHECK: N pass, M fail` line, where M is the verdict — never a piped or redirected
       status (L-120)*
-- [ ] **Pointed at its real motivating artifact, not fixtures alone (L-166)** — EPIC-014 at `d43a7a1`
+- [x] **Pointed at its real motivating artifact, not fixtures alone (L-166)** — EPIC-014 at `d43a7a1`
       is REPORTED by class (b). A guard that passes its own motivating case is an absent guard, and
       fixtures cannot tell you the branch is reachable — *Verify: check out `d43a7a1`, run, read the finding*
-- [ ] Retained must-FAIL fixture **plus a sibling control that stays green in the same run**: EPIC-015
+- [x] Retained must-FAIL fixture **plus a sibling control that stays green in the same run**: EPIC-015
       at `33187dc` is correctly rolled up and must not be reported. Fixtures are **retained**, not
       deleted with the prototype (TD-012) — *Verify: the fixture harness's own printed verdict line.
       Judgment at promote for the same reason as DoD 1; the harness joins the always-on eval list, so
       `sh scripts/qa-check.sh` names it in the run's output once it exists*
-- [ ] **Seeded-break discrimination proof** — the suite is shown to discriminate, not merely to be
+- [x] **Seeded-break discrimination proof** — the suite is shown to discriminate, not merely to be
       green: seed a break, confirm the case reddens **while the sibling control stays green**, verify
       the seed landed by `cmp` against the pristine copy, confirm the artifact still parses (`sh -n`)
       and that the break is **targeted** — assertion count unchanged, line count within one of pristine.
       Restored under **ONE stated hash convention**, `git hash-object <path>` against
       `git rev-parse <ref>:<path>`, named in the evidence block (L-137 · L-142 · L-169)
-- [ ] Wired where it fires, not merely present (L-020): the always-on eval list, a `qa-check.sh` leg,
+- [x] Wired where it fires, not merely present (L-020): the always-on eval list, a `qa-check.sh` leg,
       **and** `lean-doc-generator`'s § Sprint lifecycle — the close rollup step and the promote
       governance checklist both name it — *Verify: a full gate run naming the new harness in its output*
 - [ ] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168) — every Tier G change gets one,
@@ -110,7 +115,7 @@ the repository alone, without opening the temp file or having been in the sessio
 - [ ] Retained must-FAIL: a sprint closing with a `live` handoff outstanding FAILs **with its named
       finding**, while a sibling control (all handoffs `spent`) passes in the same run — one fixture per
       check, each failing with the finding it is named for (L-058)
-- [ ] **Seeded-break discrimination proof** under ONE stated hash convention, seed verified landed by
+- [x] **Seeded-break discrimination proof** under ONE stated hash convention, seed verified landed by
       `cmp`, artifact still parses, break targeted not demolition (L-137 · L-142 · L-169)
 - [ ] **The consumer path is checked, not inferred from our dogfooding** (L-015 · L-016) — nothing
       repo-specific leaks into `handoff/SKILL.md` or `prime/SKILL.md`, both of which ship to consumers,
@@ -139,7 +144,7 @@ the check reports it — and stays green on a symbol with a real production call
       TD-103's `reconcile()` / `marksInStandard()`; each must be reported when run against the tree at
       the commit that shipped it unwired
 - [ ] Retained must-FAIL fixture plus a sibling control — a symbol WITH a production caller stays green
-- [ ] **Seeded-break discrimination proof** verified landed under ONE stated hash convention
+- [x] **Seeded-break discrimination proof** verified landed under ONE stated hash convention
       (L-137 · L-142 · L-169)
 - [ ] Outside reviewer, worktree-isolated (L-165 · L-168)
 

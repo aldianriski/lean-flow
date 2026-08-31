@@ -139,5 +139,126 @@ for e in "$root"/docs/epic/EPIC-*.md; do
   fi
 done
 
+# --- direction (c): an ACTIVE epic must not drift out of date with its own members ----------------
+# SPRINT-094 T1 (TASK-324), owner-requested. Directions (a) and (b) above answer "should this epic be
+# archived?" -- a question that only goes live at the very end. Nothing anywhere asked "is this epic's
+# rollup CURRENT?", so an epic could sit misreporting its own state indefinitely with every gate
+# green. Not hypothetical: EPIC-014 carried `last_updated: 2026-08-29` over a body edited at
+# SPRINT-092's close on 2026-08-31, through a fully green gate, and was found by hand at the
+# SPRINT-094 promote rather than by any check.
+#
+# Why here rather than a second script: this file already parses § Closed-when ticks,
+# `member_sprints:`, per-member closed-state and `status:` -- the majority of the machinery. TD-087
+# and TD-097 are what two Shell checkers over one artifact turns into: two rows for one script, filed
+# three sprints apart, neither aware of the other until a close sweep read them together (G2 ruling).
+#
+# Findings carry the `epic-state:` prefix, distinct from `epic-archive:` above, so a reader tells a
+# retention violation from a rollup-drift one without parsing the sentence (L-058).
+#
+# Scoped to `status: active` deliberately: a closed-but-unarchived epic is (a)/(b)'s subject and
+# re-reporting it here would double-count, and a `proposed` epic has no members to drift from.
+#
+# Every loop below is fed by a heredoc, NOT by `echo |`. A pipeline runs its loop body in a subshell,
+# where `fail=1` and `drift=1` are set and then discarded -- the check would print its findings and
+# still exit 0. That is the silent false negative this whole sprint exists to remove, and it is one
+# character of syntax away at all times.
+
+# Status cell (3rd column) of the § Member sprints row naming SPRINT-<num>; empty when no row exists.
+# `| a | b | c | d |` splits on `|` into c[1]="" c[2]=a c[3]=b c[4]=c, so Status is c[4]. Read the
+# CELL, never the row: contribution prose is dense with backticked tokens and matching a sha anywhere
+# on the line would let one satisfy this from the wrong column (L-108).
+member_status_cell() {
+  awk -v want="$2" '
+    /^## Member sprints/{f=1;next}
+    f&&/^## /{exit}
+    f&&/^\|/ {
+      if ($0 ~ ("SPRINT-0*" want)) {
+        n=split($0, c, "|")
+        if (n >= 4) { s=c[4]; gsub(/^[ \t]+|[ \t]+$/, "", s); print s; exit }
+      }
+    }' "$1"
+}
+
+# "<num> <last_updated>" per member sprint whose Plan says status: closed. Archive wins over a live
+# path, matching _members_scan's precedence above.
+closed_members() {
+  _cm=$(awk '/^member_sprints:/ { sub(/^member_sprints:[[:space:]]*/, ""); gsub(/[][,]/, " "); print; exit }' "$1")
+  for _c in $_cm; do
+    [ -n "$_c" ] || continue
+    _c=${_c#SPRINT-}; _c=${_c#sprint-}
+    _cf=""
+    for _p in "$2"/docs/sprint/archive/SPRINT-"$_c"-*.md "$2"/docs/sprint/SPRINT-"$_c"-*.md; do
+      [ -f "$_p" ] && { _cf=$_p; break; }
+    done
+    [ -n "$_cf" ] || continue
+    [ "$(fmv "$_cf" status)" = "closed" ] || continue
+    printf '%s %s\n' "$_c" "$(fmv "$_cf" last_updated)"
+  done
+}
+
+# Ticked § Closed-when conditions whose block names no SPRINT-NNN. The block is the `- [x]` line plus
+# every following line up to the next checkbox: attribution is routinely on a continuation
+# ("-- **SPRINT-085**: 100/100 rows"), so reading the first line alone would report every correctly
+# attributed condition as unattributed -- a false positive severe enough to get the check ignored.
+ticked_unattributed() {
+  awk '
+    function flush() { if (open && blk !~ /SPRINT-[0-9]/) { s=substr(blk,1,72); gsub(/\|/,"/",s); print s } open=0; blk="" }
+    /^## Closed when/{f=1;next}
+    f&&/^## /{flush(); exit}
+    f&&/^- \[x\]/{ flush(); open=1; blk=$0; next }
+    f&&/^- \[ \]/{ flush(); next }
+    f&&open{ blk=blk " " $0 }
+    END{ flush() }
+  ' "$1"
+}
+
+for e in "$root"/docs/epic/EPIC-*.md; do
+  [ -f "$e" ] || continue
+  [ "$(fmv "$e" status)" = "active" ] || continue
+  rel=${e#"$root"/}
+  cmem=$(closed_members "$e" "$root")
+  drift=0
+
+  # (a) every closed member has a rollup row carrying its close_commit. The Status cell format is
+  #     EPIC.md.template's own -- `closed · `<close_commit>`` -- so this encodes the template's rule
+  #     rather than inventing one to make the criterion look mechanical.
+  while read -r num _rest; do
+    [ -n "$num" ] || continue
+    cell=$(member_status_cell "$e" "$num")
+    if [ -z "$cell" ]; then
+      bad "epic-state: $rel SPRINT-$num is closed but has NO row in § Member sprints -- the rollup this table exists for never happened, so epic status is reconstructable only by reading the sprint archive"
+      drift=1
+    elif ! printf '%s' "$cell" | grep -qE '`[0-9a-f]{7,40}`'; then
+      bad "epic-state: $rel SPRINT-$num's § Member sprints Status cell carries no close_commit -- reads '$cell'. EPIC.md.template states the cell as 'closed · \`<close_commit>\`', so this row cannot be traced to the commit that closed it"
+      drift=1
+    fi
+  done <<CMEOF
+$cmem
+CMEOF
+
+  # (b) the ownership header tracks its own update_trigger. For an epic that trigger is "a member
+  #     sprint closes", so a last_updated older than the newest closed member's is a header that has
+  #     stopped following its body. Invisible to S3.SCHEMA, which asserts the field is PRESENT and
+  #     never that it is current -- which is why EPIC-014 passed every gate while stale.
+  newest=$(printf '%s\n' "$cmem" | awk 'NF==2{print $2}' | sort | tail -1)
+  elu=$(fmv "$e" last_updated)
+  if [ -n "$newest" ] && [ -n "$elu" ] && [ "$elu" \< "$newest" ]; then
+    bad "epic-state: $rel last_updated is $elu but its newest closed member sprint closed $newest -- its own update_trigger (a member sprint closes) fired and the header did not follow"
+    drift=1
+  fi
+
+  # (c) a ticked exit condition names the sprint that closed it. An unattributed `[x]` records that
+  #     something is done without recording what did it, so the evidence is unreachable.
+  while IFS= read -r u; do
+    [ -n "$u" ] || continue
+    bad "epic-state: $rel has a ticked § Closed-when condition naming no closing sprint -- \"$u...\". A tick with no SPRINT-NNN behind it says something is done but not what did it, so its evidence cannot be found"
+    drift=1
+  done <<TUEOF
+$(ticked_unattributed "$e")
+TUEOF
+
+  [ "$drift" -eq 0 ] && ok "epic-state: $rel rollup current (every closed member rolled up with its close_commit, header tracks its newest member close, every ticked condition attributed)"
+done
+
 [ "$checked" -eq 0 ] && printf '      %s\n' "epic-archive: skip (no epics under docs/epic/)"
 exit $fail

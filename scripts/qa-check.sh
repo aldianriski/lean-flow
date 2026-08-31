@@ -119,7 +119,7 @@ else
   fi
 fi
 
-qb_checkpoint "leg 2b: epic retention"
+qb_checkpoint "leg 2b: epic retention + rollup currency"
 # --- 2b. Epic retention (STANDARD section 11, both directions) -------------------------------
 # The §11 epic-archive row shipped with the epic layer and `close` never executed it, so the rule
 # had never run once: EPIC-001 sat closed and fully ticked in docs/epic/ across five sprints with
@@ -127,6 +127,13 @@ qb_checkpoint "leg 2b: epic retention"
 # evals/run-epic-archive-fixtures.sh. Checks BOTH directions -- archived without earning it, and
 # earned it but never moved -- because a retention rule that silently stops running is the failure
 # actually observed here, not the hypothetical one.
+# SPRINT-094 T1 widened the same checker with a THIRD direction, `epic-state:` -- rollup CURRENCY on
+# an ACTIVE epic, where retention has nothing to say yet. Three drift classes: a closed member with
+# no rollup row or no close_commit in it; an ownership header older than its newest member close; a
+# ticked § Closed-when condition naming no closing sprint. Motivating case, found by hand and not by
+# any check: EPIC-014 carried last_updated 2026-08-29 over a body edited 2026-08-31 through a fully
+# green gate. Widened rather than added as a second script because two Shell checkers over one
+# artifact is how TD-087 and TD-097 became two rows for one script (SPRINT-094 G2 ruling).
 ea_script="scripts/lib/check-epic-archive.sh"
 if [ ! -f "$ea_script" ]; then
   bad "epic archive: checker not found at $ea_script"
