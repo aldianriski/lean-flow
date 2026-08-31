@@ -2,7 +2,7 @@
 # run-s4-ts-evaluators.sh -- the ALWAYS-ON §4 leg (SPRINT-092 T2).
 #
 # WHY THIS HARNESS EXISTS. T2 removes run-adr-family-fixtures.sh from the always-on eval set: it
-# spawns the Shell conformance engine 12 times and costs 30.0 s, and its differential-against-Shell
+# spawns the Shell conformance engine 12 times and costs 23.4-28.2 s (T4 Round 13), and its differential-against-Shell
 # job moves to the opt-in profile (T3, EPIC-014 D2). Removing it ALONE would not have relocated §4
 # coverage -- it would have DELETED §4 from every default gate run. Measured, not assumed:
 #
@@ -14,7 +14,7 @@
 #
 # So this harness is what keeps DoD 4 true ("semantic coverage unchanged, not merely relocated"):
 # it runs the §4 evaluators that DON'T spawn the oracle, on every default gate run. The whole leg is
-# ~0.12 s against the 30.0 s it replaces -- the coverage is very nearly free, which is what made this
+# 0.37-0.98 s against the 23.4-28.2 s it replaces -- very nearly free, which is what made this
 # the option worth taking over simply recording the loss.
 #
 # WHY AN EXPLICIT FILE LIST rather than a glob. The budget leg (TD-084) is sensitive to a slow test
@@ -67,13 +67,33 @@ if [ -n "$missing" ]; then
   exit 2
 fi
 
+# A test-COUNT floor, not just an exit code. `bun test` exits 0 when handed files that contain no live
+# tests, so a `describe.skip`, a renamed test, or an entry dropped from the list above all collapse this
+# leg to "0 pass" while it still reports PASS. Same false-assurance shape the missing-file guard above
+# refuses, one rung down: an exit code attests to the RUNNER, never to the coverage. Proven live during
+# SPRINT-092's independent review -- seeding `describe.skip` removed 15 tests and this harness still
+# printed PASS, because the summary was captured and echoed but never ASSERTED.
+#
+# RAISE THIS when you add §4 tests, deliberately, in the same commit. A floor left below the real count
+# silently re-opens the hole it closes.
+min_tests=87
+
 out=$(bun test $files 2>&1); code=$?
-if [ "$code" -eq 0 ]; then
-  summary=$(printf '%s\n' "$out" | grep -E '^ *[0-9]+ (pass|fail)' | tr '\n' ' ')
-  echo "PASS fixture(s4-ts-evaluators): §4 evaluators green without an oracle spawn -- $summary"
-  exit 0
+n_pass=$(printf '%s\n' "$out" | grep -oE '^ *[0-9]+ pass' | grep -oE '[0-9]+' | head -1)
+[ -n "$n_pass" ] || n_pass=0
+
+if [ "$code" -ne 0 ]; then
+  echo "FAIL fixture(s4-ts-evaluators): the §4 TS evaluator leg is red (bun test exit $code) -- output:"
+  printf '%s\n' "$out"
+  exit 1
 fi
 
-echo "FAIL fixture(s4-ts-evaluators): the §4 TS evaluator leg is red (bun test exit $code) -- output:"
-printf '%s\n' "$out"
-exit 1
+if [ "$n_pass" -lt "$min_tests" ]; then
+  echo "FAIL fixture(s4-ts-evaluators): only $n_pass test(s) ran, expected at least $min_tests --"
+  echo "              §4 coverage SHRANK while bun still exited 0. A skipped describe, a renamed file,"
+  echo "              or an entry dropped from this harness's own file list all look exactly like this."
+  exit 1
+fi
+
+echo "PASS fixture(s4-ts-evaluators): §4 evaluators green without an oracle spawn -- $n_pass tests, 0 fail"
+exit 0

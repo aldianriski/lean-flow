@@ -847,15 +847,15 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # make the run measure our own shape wearing a stranger's name without failing anything (L-015 · L-016).
 # run-s4-ts-evaluators.sh (SPRINT-092 T2) REPLACES run-adr-family-fixtures.sh in this set, and the
 # swap is the point rather than a tidy-up. That harness (SPRINT-076 T2) BUILT GIT REPOSITORIES and
-# spawned the Shell engine twelve times for 30.0s -- the property that put the 34s
+# spawned the Shell engine twelve times for 23.4-28.2s (T4 Round 13) -- the property that put the 34s
 # run-attestation-fixtures.sh in the opt-in set below -- and was carried always-on anyway, by owner
 # ruling, because §4 was the engine's first coverage this repo could check against ITSELF: 27 real
 # ADRs, two of them (ADR-008 · ADR-027) carrying legitimate post-decision markers a wrong S4.APPEND
 # would redden. That reasoning still holds; what changed is the price of honouring it.
 # §4 now has TS evaluators (SPRINT-091 T12), so the self-check no longer needs a subprocess.
 # run-s4-ts-evaluators.sh runs the ORACLE-FREE half -- rule semantics against the in-memory fakes,
-# plus the nine RETAINED fixture directories read straight through the evaluators -- at ~0.12s
-# against 30.0s. Only the DIFFERENTIAL against Shell still needs a live oracle, and that moves to
+# plus the nine RETAINED fixture directories read straight through the evaluators -- at 0.37-0.98s
+# against 23.4-28.2s. Only the DIFFERENTIAL against Shell still needs a live oracle, and that moves to
 # the opt-in set below (T3, EPIC-014 D2).
 # The trap this swap walks past, recorded because it nearly shipped: dropping the old harness ALONE
 # would not have RELOCATED §4 coverage, it would have DELETED it from every default run. This script
