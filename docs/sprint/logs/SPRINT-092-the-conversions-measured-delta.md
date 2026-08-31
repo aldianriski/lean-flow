@@ -220,3 +220,60 @@ was never taken.
 **Gate: `209 pass, 1 fail` → the single FAIL was `layers observed` on files still uncommitted, plus
 the genuine undeclared-harness gap now fixed.** Read from the gate's own printed verdict line, with
 output redirected to a file and the file read afterwards. Re-verified after this commit.
+
+---
+
+### 2026-08-31 | T3 | differential relocated under ADR-039 — 4 of 4 DoD
+
+**T3 was not a list move.** The DoD reads "it sits in the opt-in eval set", which presumes the parity
+tests were gated somewhere to begin with. They were not: `adr-family-fixtures.test.ts` and
+`s4-append-oracle.test.ts` appear in **no** eval harness — grepping `evals/` for either filename
+returns nothing — so they ran only under a bare `bun test`, which `scripts/qa-check.sh` never invokes.
+"Relocating to opt-in" therefore required *creating* `evals/run-s4-differential-parity.sh` first;
+without it the criterion would have been ticked against a profile membership that did not exist. The
+same shape as T2's DoD 4, one level down, and found the same way — by asking what the criterion is
+true *of* rather than whether the words are satisfiable.
+
+**DoD 1 proved by removing the oracle.** "A real oracle spawn, not a copied literal" cannot be shown
+by a green run — a copied literal is green too. With `scripts/lib/conformance-engine.sh` moved aside,
+the two files went **17 fail / 4 pass**, and the four survivors are exactly the assertions that need
+no oracle: the TS-only sibling controls and the TS half of the owner-ruled `empty-slug` divergence.
+That is the discrimination, not the redness — a *total* wipeout would have proved only that the files
+break when something is missing. Engine restored, hash re-derived identical
+(`74ea1ef5…3178`, `git hash-object`, one convention).
+
+**DoD 2 proved by running both profiles.** Absent from always-on (0 occurrences); present and green
+under a real `QA_FULL=1` run — `PASS eval harness run-s4-differential-parity.sh`, verdict
+`220 pass, 1 fail`, cost **1413 s**.
+
+**A number that needed a second reading before it could be used.** That full-profile run printed
+`1 fail` while the output contains **27** `FAIL` lines. Both are correct: 26 of them are the full
+profile's own *informational* conformance sweep (its leg note says so — "informational except the two
+FULLY-COVERED families"), and only the last, `layers observed` on files still uncommitted, is counted.
+Recorded because the naive read is available in both directions: a reader trusting the summary alone
+would miss that the sweep surfaced real governance debt, and one trusting the FAIL count alone would
+report a badly red gate. Neither number means anything without knowing which leg emitted it.
+
+**Governance debt the sweep surfaced, NOT touched here** (out of this sprint's scope, listed so it is
+not lost): 15 `td-row-aged-unreviewed` rows (TD-093…TD-108), `TODO.md` at 325 lines against §2's cap
+of 320, `CHANGELOG.md` holding 5 minor series inline, two tracked `run.log` fixtures under §12c, and
+`closed-sprint-not-archived` for SPRINT-093 — the last being **deliberately deferred** until 092
+closes (TD-125), so it is expected rather than new.
+
+**Scope call, recorded rather than silent:** `s4-append-shallow-reachability.test.ts` is a §4 test
+that spawns the engine, but it clones this repo's real remote to prove the shallow branch is reachable
+on a live artifact (L-166) — network-dependent. It is deliberately excluded from the differential
+harness and named as excluded in both the harness header and ADR-039, because a harness that reddens
+on a flaky connection teaches people to ignore it. Consequence to own: that one test now sits in
+neither profile and is reachable only by a plain `bun test`.
+
+**Two declarations corrected mid-task, both logged (L-100).** `evals/run-s4-differential-parity.sh`
+added to T3's `Layers:` as a specific file — G2 anticipated exactly this ("a new parity harness file,
+if T3 creates one, is declared here too and logged"). And `docs/knowledge-index.md`, which the new ADR
+regenerates: D2 forbids changing *generation logic*, not the derived artifact, and `gen-index.sh` is
+untouched (`git status` clean for it).
+
+**Review — skip-table lookup, per TD-092.** `consequence · T3 · behaviour: **material** (a guard
+changes profile) · governance: **material** — Tier G for the harness move, Tier P for the ADR text,
+declared separately because the bars differ (ADR-029)`. Depth: executed inline, no independent pass —
+**the same recorded gap as T2**, carried forward rather than restated as covered.

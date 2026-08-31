@@ -905,7 +905,13 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # touches git but does not BUILD repos in the TD-016 sense -- one `git init`, ~95ms, no commit
 # (an inited-but-empty repo already answers `rev-parse --git-dir`, which is the whole probe).
 eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-s4-ts-evaluators.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh run-night-run-gate-exception-fixtures.sh"
-eval_harnesses_optin="run-adr-family-fixtures.sh selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh"
+# run-s4-differential-parity.sh (SPRINT-092 T3) joins the opt-in set by the cost rule, and it is the
+# OTHER half of T2's swap: the row-by-row comparison of the TS evaluators against a LIVE Shell oracle,
+# which needs a real engine spawn per row and is exactly the 20+s taken off the default profile.
+# ADR-039 records the §4 DRIFT WINDOW this opens and names when parity is MANDATORY -- promote, close,
+# and any full-profile run. Shell RETAINS §4 authority throughout (EPIC-014 D2): this is not a
+# cutover, and a green default gate says nothing about TS/Shell agreement.
+eval_harnesses_optin="run-adr-family-fixtures.sh run-s4-differential-parity.sh selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh"
 # run-qa-budget-position-fixtures.sh (SPRINT-086 T3, TD-091) joins the opt-in set by the cost rule,
 # not the git rule -- it builds no repos, but it DOES invoke real copies of qa-check.sh (bounded by
 # `timeout`) to prove where the budget checkpoint is actually reached, which this repo's own
