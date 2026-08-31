@@ -299,6 +299,29 @@ Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
       origin:     close-retro
       state:      ready
 
+- [ ] TASK-321 — Make skill-produced summaries lead with the conclusion  [size: M] [risk: low] [HITL]
+      class:      execution
+      authority:  J2
+      done-when:  every summary a skill emits at a process boundary — `/prime`'s health report, an
+                  `/orchestrator` task/gate completion, a close rollup, and any confirmation prompt —
+                  opens with the VERDICT (what is true now / what was decided), then its evidence, and
+                  ends with exactly ONE explicit next-step line. Context the reader already has is not
+                  restated, and no summary buries its conclusion mid-prose. Verified by running each
+                  skill cold and reading its output as a stranger would: the first line must answer
+                  "what happened and what do I do next" without reading further
+      touches:    skills/prime/SKILL.md · skills/orchestrator/SKILL.md ·
+                  skills/lean-doc-generator/SKILL.md (§ output/rollup formats only) — and any
+                  `references/` report template they own
+      depends-on: none
+      assumes:    the fix is a REPORT-SHAPE rule, not a length cap. Terseness is already required
+                  (CLAUDE.md § Concise reporting) and did not prevent this: the reports were long
+                  AND circular because nothing said where the conclusion goes. Confirm before
+                  building that adding a length rule alone would not close it
+      tracker:    owner feedback, 2026-08-31 — "penjelasan AI tidak runut, kesimpulan final-nya tidak
+                  jelas, hanya menjabarkan hal yang berputar-putar tidak to the point"
+      origin:     manual
+      state:      ready
+
 ### P3 — Long-term
 
 > Rejected work lives in **`.out-of-scope/`** — each file carries its own reasoning, revisit-if and
