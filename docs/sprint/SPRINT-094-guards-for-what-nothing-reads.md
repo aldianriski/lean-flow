@@ -4,6 +4,7 @@ slug: guards-for-what-nothing-reads
 owner: Maintainer
 last_updated: 2026-08-31
 status: active
+gates_signed: G1,G2 @ 8681143
 plan_commit: 2ab2b63
 update_trigger: sprint execute/close events
 ---
@@ -38,9 +39,9 @@ settled and is not this sprint's question · a second stream, unavailable while 
 ## Plan
 
 ### T1 — Check epic status at promote and close `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-epic-state.sh` (new) · `scripts/qa-check.sh` · `evals/fixtures/epic-state/` · `evals/run-epic-state-fixtures.sh` (new) · `skills/lean-doc-generator/SKILL.md`
+Layers: `scripts/lib/check-epic-archive.sh` (widened at the G2 scope-change, not a second script) · `scripts/qa-check.sh` · `evals/fixtures/epic-state/` · `evals/run-epic-archive-fixtures.sh` (extended) · `skills/lean-doc-generator/SKILL.md`
 Depends-on: none
-Cites: STANDARD §3 (ownership header) · §11 (retention) · ADR-029 (tier) · ADR-030 (contribution rows) · L-020 · L-166 · L-151 · `check-epic-archive.sh` (the adjacent checker A1 re-derives against — read, never modified) · `S3.SCHEMA` (the ownership-header rule this extends past field-presence) · `docs/epic/EPIC-014-reference-engine.md` and `docs/epic/EPIC-015-execution-autonomy.md` (the motivating artifact and its sibling control — read, never modified)
+Cites: STANDARD §3 (ownership header) · §11 (retention) · `S11.EPIC` (the §11 rule this extends — one of the six checkable rules never in the semantic engine, TD-129) · `S3.SCHEMA` (the ownership-header rule this extends past field-presence) · ADR-029 (tier) · ADR-030 (contribution rows) · L-020 · L-166 · L-151 · TD-087 and TD-097 (two rows for one script — why this widens rather than adds) · `docs/epic/EPIC-014-reference-engine.md` and `docs/epic/EPIC-015-execution-autonomy.md` (the motivating artifact and its sibling control — read, never modified)
 
 An epic is the only artifact in this repo whose correctness nobody can observe. `check-epic-archive.sh`
 enforces §11 retention in both directions but reads archival eligibility alone; the ownership-header
@@ -84,7 +85,7 @@ against `33187dc`, it stays green on EPIC-015 — and the difference is the drif
 
 ### T2 — Track handoff status and perform §12(b)'s conversion `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/handoff/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/prime/SKILL.md` · `skills/lean-doc-generator/templates/sprint-log.md.template` · `scripts/lib/` · `scripts/qa-check.sh` · `evals/fixtures/handoff-state/`
-Depends-on: none — but see **D1** (three tasks share `scripts/qa-check.sh`) and **D2** (T1 and T2 share a capped SKILL.md)
+Depends-on: none — but see **D1** (T1 and T2 share `scripts/qa-check.sh` — narrowed from three at the G2 scope-change) and **D2** (T1 and T2 share a capped SKILL.md)
 Cites: STANDARD §12(a)/(b) · ADR-014 (the Execution Log) · L-151 · L-020 · L-015
 
 **The placement is already correct and is not what this task changes.** §12(b)'s *Meeting notes* row
@@ -117,9 +118,9 @@ the repository alone, without opening the temp file or having been in the sessio
 - [ ] Outside reviewer, worktree-isolated (L-165 · L-168)
 
 ### T3 — Detect a shipped capability that nothing calls `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/` · `scripts/qa-check.sh` · `evals/fixtures/`
-Depends-on: none — but see **D1** (three tasks share `scripts/qa-check.sh`)
-Cites: L-172 (`count: 2`, promoted at SPRINT-092) · L-020 · L-166 · TD-103 · `CLAUDE.md` § Definition of Done (`.claude/CLAUDE.md`) (where L-172's durable form already lives — read, never modified) · SPRINT-091 T11 and SPRINT-091 T12 (the motivating commits, read at the trees that shipped them unwired — cited, no dependency either way)
+Layers: `test/architecture/` (the new unwired-exports fitness rule, beside `dependency-direction.test.ts`) · `test/fixtures/`
+Depends-on: none — and no longer part of **D1**: `scripts/qa-check.sh` left this task's Layers at the G2 scope-change, so the shared-file map is now T1–T2 only
+Cites: L-172 (`count: 2`, promoted at SPRINT-092) · L-020 · L-166 · TD-103 · TD-129 (the migration's measured condition — why this is TS, not Shell) · `CLAUDE.md` § Definition of Done (where L-172's durable form already lives — read, never modified) · SPRINT-091 T11 and SPRINT-091 T12 (the motivating commits — cited, no dependency either way) · `scripts/qa-check.sh` (the gate that invokes the Bun runner, per ADR-035 — read, never modified)
 
 `L-172`'s durable form is already in `CLAUDE.md` § Definition of Done: the wiring property is asked *of
 the repository, never of the author*, because a per-task DoD cannot enforce something living **between**
@@ -159,15 +160,24 @@ Cites: SPRINT-092 close (18 worktrees / 178 MB removed, their branches were not)
 - [ ] No tracked file changes (this is a refs-only task, and a diff would mean something went wrong)
 
 ## Owner-action checklist
-- [ ] **Sign G1 + G2**, then record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Omitted
+- [x] **Sign G1 + G2**, then record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Omitted
       until signed — its absence means NOT signed and must never be read as approval (L-099)
-- [ ] **Rule at G2 on T2's one open design question**, which §12 does not settle: where the repo-side
+      — ✓ **signed at `8681143`**, the tree the gates were reviewed against, recorded in this file's
+      frontmatter where an unattended run would read it rather than in a session transcript (L-099 ·
+      L-151). G1 ran the **full** checklist on all four tasks, not the fast-path: none is
+      `origin: decomposer`, read from each task's own `origin:` field. Promote entry in the Execution Log
+- [x] **Rule at G2 on T2's one open design question**, which §12 does not settle: where the repo-side
       handoff stub lives when a handoff is taken with **no sprint file to log into** — governance work,
       a `/triage` pass, a research session. The Execution Log is the obvious home when a sprint exists
       and is unavailable when one does not. Note that `lean-doc-generator`'s own headless-park
       instruction resolves that case *to the handoff doc*, which is circular here and must not be
       inherited as the answer. **The ruling is the deliverable of this line** — without it T2's first
       DoD has no reachable target, which is L-111's shape
+      — ✓ **owner ruled: Execution Log `handoff` event where a sprint exists, plus one named fallback
+      ledger for the no-sprint case**, both carrying the same three-state status. The fallback is not
+      optional trimming: without it an UNKNOWN status in the no-sprint case would have to be assumed
+      `spent`, which is the silent-loss shape T2 exists to close. The circular headless-park answer was
+      explicitly not inherited. Recorded in the Execution Log's promote entry, not only here
 - [ ] **Ruling still outstanding from this promote (not a blocker for T1–T4):** archiving SPRINT-092
       and SPRINT-093. Parked by owner ruling; they share `plan_commit: c52496f`, so it is archive both
       together or measure again — `check-layers-observed.sh:397` drops `*/archive/*` from the sibling
@@ -175,11 +185,13 @@ Cites: SPRINT-092 close (18 worktrees / 178 MB removed, their branches were not)
       in place vs 202 pass / 1 fail archived). `TD-125` · `TASK-298`
 
 ## Decisions (pre-locked)
-- **D1 — `scripts/qa-check.sh` is single-owned and committed in task order T1 → T2 → T3, never in
-  parallel.** Three tasks add a leg to the same file. A plain `git add` over another task's WIP stages
-  their uncommitted work into your commit and mis-attributes history (L-042 · L-037); the dispatch
-  overlap map is built from `Layers:`, which is why all three declare it. Serialize, or stage per-hunk
-  with `git add -p` and verify `git diff --cached` before committing.
+- **D1 — `scripts/qa-check.sh` is single-owned and committed in task order T1 → T2, never in
+  parallel.** **Narrowed at the G2 scope-change from three tasks to two:** T3 moved to
+  `test/architecture/` under `bun test`, so it no longer declares this file and drops out of the
+  shared-file map entirely. Two tasks still add a leg to it. A plain `git add` over another task's WIP
+  stages their uncommitted work into your commit and mis-attributes history (L-042 · L-037); the
+  dispatch overlap map is built from `Layers:`, which is why both declare it. Serialize, or stage
+  per-hunk with `git add -p` and verify `git diff --cached` before committing.
 - **D2 — `skills/lean-doc-generator/SKILL.md` is owned by T1; T2 appends after T1 commits.** It sits at
   **126 lines against ADR-006's ~140 cap**, so two tasks share 14 lines of headroom. If both additions
   will not fit, the content moves to that skill's `references/` (uncounted, ADR-006) rather than the cap
