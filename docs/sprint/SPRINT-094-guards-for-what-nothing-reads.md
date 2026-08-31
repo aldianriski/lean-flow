@@ -4,6 +4,7 @@ slug: guards-for-what-nothing-reads
 owner: Maintainer
 last_updated: 2026-08-31
 status: active
+plan_commit: 2ab2b63
 update_trigger: sprint execute/close events
 ---
 
