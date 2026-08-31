@@ -13,6 +13,38 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
+## SPRINT-092 — The Conversion's Measured Delta (closed 2026-08-31)
+
+Unreleased (bundles into the next version — **feature sprint, so MINOR by hand**, not
+`/release-patch`). EPIC-014's fifth member sprint, closed at **19 of 19 DoD**. The half SPRINT-091
+deferred by name: it converts §4's always-on coverage off the Shell engine **and** measures what that
+bought, because a conversion shipped without its measurement is an unmeasured claim recorded as fact.
+
+| Shipped | What |
+|---|---|
+| **§4's always-on leg no longer spawns the Shell engine** | `evals/run-s4-ts-evaluators.sh` replaces `run-adr-family-fixtures.sh` in `eval_harnesses_always` — **23.4–28.2 s → 0.37–0.98 s**. §4 rule semantics *and* the nine retained fixture directories still evaluate on every bare gate run |
+| **The differential moved to opt-in, under an ADR** | `evals/run-s4-differential-parity.sh` (new, `QA_FULL=1`) keeps the row-by-row TS-vs-Shell comparison against a **live** oracle. **ADR-039** names the §4 drift window this opens and fixes parity as mandatory at promote, close and any full-profile run — wired into `.claude/CONTEXT.md`, not into the shipped skills, so no repo path leaks to consumers |
+| **Fixture factories that structurally cannot decide a verdict** | `test/fixtures/adr-family-factory.ts` + `git-repo-factory.ts`. Verdict-blindness is enforced at **compile time**: a smuggled `expectedVerdict` does not type-check, and an unused `@ts-expect-error` is itself an error, so `tsc --noEmit == 0` is a standing proof rather than a one-time one |
+| **A case-for-case equivalence guard** | `test/adr-family-harness-parity.test.ts` diffs the Shell harness's own case list against its TS counterparts in both directions, pins each to a verbatim source anchor, and FAILs on any invocation form it cannot parse |
+| **The delta, measured and named** | Round 13 in `docs/research/logs/qa-gate-timing.md`: default-profile saving **22.4–27.9 s**, extremes paired. It exceeds Round 12's 9.5–13.6 s ceiling by ~2× and **that is not the conversion outperforming** — the ceiling costed twelve cases converted; the shipped leg does not carry S4.APPEND's four git cases at all. Total work across both profiles went **up** ~76–85 s |
+
+**Seven Tier G defects were found by an independent review after the sprint self-verified green**, and
+fixed before close. Three were single-line edits that remove real coverage while every guard the sprint
+built stays green: a harness that PASSed with **zero tests run** (`bun test` exits 0 on files with no
+live tests, and the summary was echoed rather than asserted), a parity regex blind to any prefixed
+call, and an `alwaysOn` flag compared only to a hardcoded copy of itself. All three sat in code written
+to prevent silent false negatives. `L-165` → `count: 4`.
+
+**Not shipped, and named rather than smoothed:** `TD-117`'s budget reduction is **not** available —
+`QA_BUDGET_SECONDS` stays at 520 because no clean whole-gate sample could be taken (the default profile
+exceeds the 600 s command ceiling on this host; the opt-in profile measures 1450 s). `TD-128` records
+that `qa-budget-default` compares the *configured* budget to the ceiling and never the actual runtime,
+so it passes precisely when runs overrun. Pruning 18 stale worktrees (178 MB) was tried as the cause and
+**disproved**: 1413 s before, 1450 s after.
+
+`TD-126`–`TD-128` · `TASK-322`/`TASK-323` (`origin: close-retro`) · `L-184`, `L-185` · `L-165` → 4.
+
+---
 ## SPRINT-093 — Close the Autonomy Guard Gap (closed 2026-08-30)
 
 Unreleased (bundles into the next version — **feature sprint, so MINOR by hand**, not

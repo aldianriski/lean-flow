@@ -205,6 +205,43 @@ status: current
     budget with the ceiling raised to match; or make the skipped-harness list its own named FAIL
     distinct from a real check failure, so truncation can never be read as one red check.
 
+- **TD-126** severity: medium | status: open | created: Sprint-092
+  - Summary: **The opt-in profile spawns the Shell oracle twice over the same nine fixtures** — once in
+    `evals/run-adr-family-fixtures.sh` (12 spawns, 23.4–28.2 s) and again inside
+    `evals/run-s4-differential-parity.sh`, which spawns per row while also running the TS evaluators
+    (52.8–57.1 s). Together ~76–85 s of opt-in cost over one fixture set.
+  - Evidence: SPRINT-092 T4 Round 13 §1/§3, `docs/research/logs/qa-gate-timing.md`.
+  - Impact: redundant work, **not** a correctness defect — both harnesses assert different things (Shell
+    alone vs TS-vs-Shell). Consolidation is a real saving on the profile promote and close now run.
+  - **Re-file fresh if** the two harnesses stop overlapping — e.g. the Shell harness gains cases the
+    differential does not mirror, at which point they are no longer the same work twice.
+
+- **TD-127** severity: minor | status: open | created: Sprint-092
+  - Summary: **`s4-append-shallow-reachability.test.ts` now sits in NEITHER profile.** It is a §4 test
+    that spawns the engine, deliberately excluded from the opt-in differential harness because it clones
+    this repo's real remote (L-166's reachability proof) and is therefore network-dependent.
+  - Evidence: named as excluded in `evals/run-s4-differential-parity.sh`'s header and in ADR-039
+    § Consequences (Neutral). Reachable only via a bare `bun test`.
+  - Impact: a coverage hole with an owner-visible reason. The trade was deliberate — a harness that
+    reddens on a flaky connection teaches people to ignore it — but nothing gates this test today.
+  - **Re-file fresh if** the repo gains a network-tolerant harness tier, which would remove the reason.
+
+- **TD-128** severity: high | status: open | created: Sprint-092
+  - Summary: **`qa-budget-default` asserts the CONFIGURED budget against the command ceiling, never the
+    ACTUAL runtime** — it prints `PASS qa-budget-default: 520s < 600s command ceiling` while real runs
+    on this host exceed 600 s. A guard that stays green precisely when the thing it guards is failing.
+  - Evidence: the default profile hit the 600 s tool ceiling twice in SPRINT-092 with its verdict line
+    unprinted; the opt-in profile measured **1450 s**. Meanwhile the check passed on every run.
+  - Impact: the same silent-false-negative shape this sprint spent itself on, in the leg that is supposed
+    to *catch* overruns. It also blocks `TD-117`: the loaned 520 s budget cannot be reduced on evidence
+    while no clean whole-gate sample can be taken.
+  - **Cause is NOT known, and one hypothesis is already disproved.** 18 leftover agent worktrees (178 MB)
+    were pruned on the theory that the gate was scanning them (TD-095's shape); the opt-in profile
+    measured **1413 s before and 1450 s after** — no improvement. Recorded so the next investigation does
+    not re-run that experiment.
+  - **Re-file fresh if** the runtime overrun turns out to be host-local rather than a property of the
+    gate, which would make this an environment note rather than a guard defect.
+
 - **TD-125** severity: medium | status: open | created: Sprint-093
   - Summary: **A closed sprint cannot be archived while a sibling sprint sharing its `plan_commit`
     window is still active — doing so turns the gate red, and the failure appears against the

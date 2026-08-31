@@ -16,33 +16,36 @@ status: current
 
 ## Active Sprint
 
-> **One active sprint.** The `autonomy` stream closed with SPRINT-093 (2026-08-30); `engine` runs on.
-> Streams were introduced at the SPRINT-092/093 promote — every prior sprint was single-stream and
-> omitted `stream:`.
+> **No active sprint.** `autonomy` closed with SPRINT-093 (2026-08-30); `engine` closed with
+> SPRINT-092 (2026-08-31). Next sprint is formed by `/lean-doc-generator promote` from the Backlog
+> below.
 >
-> **SPRINT-093's §11 archive is DEFERRED, deliberately — do not move it until SPRINT-092 closes.**
-> Both were promoted at the same `plan_commit: c52496f`, and `check-layers-observed.sh:397` drops
-> `*/archive/*` from the sibling list that line 429 uses to skip another sprint's commits. Archiving
-> 093 therefore re-attributes its entire history to 092: measured in both directions at the close —
-> **214 pass / 0 fail** in place, **202 pass / 1 fail** archived (**TD-125** · `TASK-298`). The file
-> stays in `docs/sprint/` with `status: closed`; its `INDEX.md` row is already written.
+> **SPRINT-092 and SPRINT-093 are both unarchived, and the §11 retention pass is PARKED for owner
+> approval** — retention is lossy, so close never self-approves it. The original deferral reason is
+> now spent (it held only while 092 was active), but the pair still shares `plan_commit: c52496f`, so
+> **archive them together or measure again**: `check-layers-observed.sh:397` drops `*/archive/*` from
+> the sibling list line 429 uses to skip another sprint's commits, which is what made archiving one
+> re-attribute its history to the other — **214 pass / 0 fail** in place vs **202 pass / 1 fail**
+> archived at SPRINT-093's close (**TD-125** · `TASK-298`).
 
-> **`engine` · SPRINT-092 — The Conversion's Measured Delta** → [docs/sprint/SPRINT-092-the-conversions-measured-delta.md](docs/sprint/SPRINT-092-the-conversions-measured-delta.md)
+**SPRINT-092 shipped the §4 conversion and measured it.** Default-profile saving **22.4–27.9 s**
+(23.4–28.2 s removed, 0.37–0.98 s added), with §4 rules still evaluating on every bare run. The saving
+exceeds Round 12's 9.5–13.6 s ceiling by ~2× and **that is not the conversion outperforming** — the
+ceiling costed twelve cases converted, and the shipped leg does not carry S4.APPEND's four git cases at
+all (they moved to opt-in, D4). Total work across both profiles went **up** ~76–85 s.
 
-**092** is the half SPRINT-091 deferred by name — convert the ADR-family harness off the Shell engine,
-then **measure what it bought** against T2's ceiling of 9.5–13.6 s, naming any shortfall. Strict chain
-T1→T2→T3→T4, so no task in it parallelises.
+**`QA_BUDGET_SECONDS` stays at 520 — the reduction TD-117 anticipated is NOT available on evidence.**
+No clean whole-gate sample was obtained: the default profile exceeds the 600 s command ceiling on this
+host and the opt-in profile measures 1450 s, while `qa-budget-default` passes by comparing the
+*configured* budget to the ceiling rather than the actual runtime (**TD-128**). A pruning of 18 stale
+worktrees (178 MB) was tried as the cause and **disproved** — 1413 s before, 1450 s after.
 
-**The cross-stream ownership split is spent** now that `autonomy` has closed: `scripts/qa-check.sh`,
-`evals/`, `gen-index.sh`, `knowledge-index.md`, `night-run.sh` and `night-run.md` all have a single
-active claimant again. **`QA_BUDGET_SECONDS` is at 520 on loan** — raised from 450 at `d815dc6` because
-093 added ~37 s of always-on coverage before 092's saving arrived, and explicitly not permanent: 092
-T2/T4 reclaim 9.5–13.6 s and should bring it back down (**TD-117**).
-
-**Still Backlog:** `TASK-318` (`L-172`'s durable form — belongs to no epic) · `TASK-300` ·
-`TASK-319`/`320` (SPRINT-093's close-Retro follow-ups) · `TASK-188`/`296` (`blocked`) ·
-`TASK-297`/`298` (`needs-info`; 298 reads SUPERSEDED since SPRINT-088 → `/triage`).
-Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
+**Still Backlog:** `TASK-318` (`L-172`'s durable form) · `TASK-300` · `TASK-319`/`320` · `TASK-321`
+(owner feedback: summaries must lead with the conclusion) · `TASK-322`/`323` (SPRINT-092's close-Retro
+follow-ups) · `TASK-188`/`296` (`blocked`) · `TASK-297`/`298` (`needs-info`; 298 reads SUPERSEDED since
+SPRINT-088 → `/triage`). Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
+**`/triage` is overdue** — TODO.md is 382 lines against §2's cap of 320, and 15 TD rows are ≥3 sprints
+unaddressed.
 
 ---
 
@@ -320,6 +323,37 @@ Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
       tracker:    owner feedback, 2026-08-31 — "penjelasan AI tidak runut, kesimpulan final-nya tidak
                   jelas, hanya menjabarkan hal yang berputar-putar tidak to the point"
       origin:     manual
+      state:      ready
+
+
+- [ ] TASK-322 — Test Round 12's ceiling apples-to-apples  [size: M] [risk: low] [AFK]
+      class:      execution
+      authority:  J1
+      done-when:  S4.APPEND's four git-history cases are converted to TS and kept ALWAYS-ON, then the
+                  always-on §4 leg is re-measured against Round 12's derived ceiling of 9.5–13.6 s on a
+                  quiet host with host-load stated. SPRINT-092's 22.4–27.9 s saving is NOT a valid test
+                  of that ceiling — it beat it only because those four cases moved to opt-in, so the leg
+                  carries less work than the ceiling costed (Round 13 §5)
+      touches:    evals/run-s4-ts-evaluators.sh · test/ · docs/research/logs/qa-gate-timing.md
+      depends-on: none
+      assumes:    converting the git cases keeps them cheap enough for the always-on leg. Round 13 §3
+                  measured the oracle-spawning differential at 52.8–57.1 s; the git-repo construction
+                  term alone is unmeasured and could dominate. Measure before promoting this
+      tracker:    SPRINT-092 T4 Round 13 §5 · TD-090
+      origin:     close-retro
+      state:      needs-info
+
+- [ ] TASK-323 — Prune the 29 merged worktree-agent-* branches  [size: S] [risk: low] [AFK]
+      class:      mechanical-ingest
+      authority:  J1
+      done-when:  every `worktree-agent-*` branch confirmed an ancestor of `main` is deleted, and any
+                  that is NOT an ancestor is reported rather than removed
+      touches:    git refs only — no tracked file changes
+      depends-on: none
+      assumes:    all 29 are merged. Verified true for the 18 that had worktrees at SPRINT-092's close;
+                  the remaining 11 were not checked, so the task re-derives rather than inheriting this
+      tracker:    SPRINT-092 close — 18 worktrees (178 MB) were removed, their branches were not
+      origin:     close-retro
       state:      ready
 
 ### P3 — Long-term

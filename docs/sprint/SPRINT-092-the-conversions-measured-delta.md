@@ -4,8 +4,8 @@ slug: the-conversions-measured-delta
 stream: engine
 epic: EPIC-014
 owner: Maintainer
-last_updated: 2026-08-29
-status: active
+last_updated: 2026-08-31
+status: closed
 gates_signed: G1,G2 @ 760dc69
 plan_commit: c52496f
 close_commit: [sha — set at close]
@@ -181,4 +181,48 @@ and the result is compared against the derived ceiling with any shortfall named.
 | `packages/standard/src/rules/adr-family.test.ts` | T1 | Deliberately NOT migrated — asserts `canonicalAdrs(...)` returns, never a `.verdict`; rationale written in-file so the exclusion reads as a decision, not an oversight | low | unchanged |
 
 ## Retro
-<!-- Written at close. Route the four buckets to their durable homes (STANDARD §10). -->
+
+**Outcome: the conversion shipped and was measured, and the measurement's answer is smaller than the
+arithmetic suggests.** The always-on §4 leg came off the Shell engine — 23.4–28.2 s removed, 0.37–0.98 s
+added, a default-profile saving of **22.4–27.9 s** — while §4's rules still evaluate on every bare run.
+The saving *exceeds* Round 12's 9.5–13.6 s ceiling by ~2×, and that is **not** the conversion
+outperforming its estimate: the ceiling costed twelve cases converted, S4.APPEND's four git-building
+cases included, and the shipped leg does not do that work at all — those moved to opt-in (D4). Cheaper
+because it carries less. Total work across both profiles went **up** (~76–85 s added to opt-in against
+22.4–27.9 s saved): the gate got faster by making the full profile slower, which is the trade ADR-039
+documents and the first figures anyone has put on it.
+
+**The sprint's most valuable output was not the conversion — it was the independent review.** T2 and T3
+reached 19/19 DoD with a green gate, fully self-verified, and an outside worktree-isolated pass then
+found **seven** defects. Three were single-line edits that remove real coverage while every guard this
+sprint built reports green: a harness that PASSed with **zero tests run**, a parity regex blind to any
+prefixed call, and an `alwaysOn` flag compared only against a hardcoded copy of itself in the same
+file. All three sat in code written *to prevent* silent false negatives, beside comments arguing at
+length about that exact danger. **Not one was found by the author**, with the governing rules loaded
+throughout — [[L-165]]'s claim, holding for a fourth time.
+
+**Two DoD were unsatisfiable as written, and both were caught by asking what the criterion is true
+*of*.** T2's DoD 4 rested on a G2 ruling premise ("§4 still evaluates in TS on every run") that holds
+for `bun test` and is false for the gate, which reduces its own spec to S9+S13 on a bare run and never
+invokes `bun test` — so dropping the harness would have **deleted** §4 from every default run rather
+than relocating it. T3's DoD 2 said the parity harness should "sit in the opt-in eval set", presuming
+it was gated somewhere; it was in **no** eval harness at all. Both are the same shape one level apart,
+and both were surfaced as scope-changes for an owner ruling rather than reinterpreted in place.
+
+**What went well.** The seeding discipline worked every time it was applied — every fix was re-proved
+with the reviewer's own seed, each reddening its own case while a sibling stayed green, each seed
+verified landed / parsing / targeted and restored under one hash convention. Reading the gate's own
+*printed* verdict rather than its exit code paid off twice: the T1 gate exited `1` while printing
+`209 pass, 1 fail`, and a contaminated capture was caught only because 2 printed FAIL lines disagreed
+with a summary claiming 3.
+
+**What did not.** A whole-gate before/after was never obtained cleanly — three attempts, two killed and
+one contaminated by my own reuse of an output path across a still-live background job. `TD-117`'s budget
+question therefore stays open on evidence rather than being closed by inference. And a confident
+diagnosis was wrong: 18 leftover worktrees (178 MB) were pruned on the hypothesis that they explained
+the gate's cost, and the opt-in profile measured **1413 s before and 1450 s after** — no improvement.
+The cleanup was legitimate; the causal claim was not, and is retracted here rather than left standing.
+
+**Buckets routed:** Shipped → `CHANGELOG.md` · Tech debt → `TD-126`–`TD-128` · Follow-ups →
+`TASK-322`/`TASK-323` (`origin: close-retro`) · Learnings → `L-184`, `L-185`, and [[L-165]] to
+`count: 4`.
