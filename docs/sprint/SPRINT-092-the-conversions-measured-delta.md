@@ -55,7 +55,7 @@ verdict is rejected rather than accepted.
 - [x] The must-FAIL discriminates — ✓ **seeded and confirmed load-bearing, not merely present.** The same two smuggling calls stripped of their `@ts-expect-error` were seeded into a scratch `packages/standard/src/rules/__seedcheck_tmp.ts`; tsc reddened with `TS2353` naming `expectedVerdict` and `shouldPass` at exactly those two lines, while the **sibling controls** (legitimate state-only `adrFamilyPort`/`adrHistoryPort` calls, asserting real port behaviour) stayed green in the same run — L-142's shape, applied to a compile-time guard. Seed removed and the removal verified: `git status --short` empty, `bunx tsc --noEmit` back to `0`. **ONE hash convention throughout — `git hash-object` on the working-tree blob** (L-169): seed `a1e5f5a8dfbf5492cfc0645da7a09566eea45bfb`
 
 ### T2 — Convert the ADR-family harness to `bun:test` and drop it from the always-on leg `[size: M · risk: high · class: execution · HITL · J1]`
-Layers: `evals/run-adr-family-fixtures.sh` · `scripts/qa-check.sh` · `test/`
+Layers: `evals/run-adr-family-fixtures.sh` · `evals/run-s4-ts-evaluators.sh` · `scripts/qa-check.sh` · `test/`
 Depends-on: T1
 Cites: EPIC-014 H21 (slice pulled forward) · D5 feature-first · TD-090 · L-120 · SPRINT-091 T2 Round 12 (the derived ceiling) · `scripts/lib/conformance-engine.sh` (the engine being dropped from this harness — spawned, never modified)
 Tier **G**. **The highest-risk task in either stream.** It removes a harness from the always-on eval
@@ -70,10 +70,10 @@ task edits it.
 leg no longer spawns the Shell engine for §4.
 
 **DoD:**
-- [ ] Case-for-case equivalence, matched by name and diffed as a list — *Verify: the two case-name lists are compared as lists and are identical; "most" is a FAIL, never a pass (D2)*
-- [ ] The harness is removed from the always-on eval set — *Verify: `eval_harnesses_always` no longer names it, and a full gate run confirms the §4 harness does not execute*
-- [ ] The gate's own PRINTED verdict line is read as the check — *Verify: never a piped or redirected status; `gate | tail` reads `tail`'s status and `gate > out; echo $?` reads `echo`'s (L-120, five sightings)*
-- [ ] Semantic coverage is unchanged, not merely relocated — *Verify: the §4 rules still evaluate somewhere on every gate run, or § Decisions records exactly which coverage moved to opt-in and why*
+- [x] Case-for-case equivalence, matched by name and diffed as a list — ✓ `test/adr-family-harness-parity.test.ts` parses the harness's **own** `run_case_anywhere` call sites (anchored to line start — the harness's `FAIL fixture(...)` fallback names a case in prose and must not be counted twice, L-108) and diffs them against a declared coverage map **in both directions**: `expect(covered).toEqual(shell)` plus an explicit `{uncovered, orphaned}` assertion, so "most" cannot pass. **12 cases, cross-checked two ways** before the map was written. Each entry names a file *and* a verbatim source anchor, so a renamed counterpart reddens instead of standing as a claim about a test that no longer exists
+- [x] The harness is removed from the always-on eval set — ✓ `eval_harnesses_always` no longer names `run-adr-family-fixtures.sh`; it moved to `eval_harnesses_optin`, keeping the bucket-completeness check satisfied. **Confirmed by a full gate run, not by reading the list**: the string `run-adr-family-fixtures.sh` appears **0 times** in the run's output, while `PASS eval harness run-s4-ts-evaluators.sh` appears in its place
+- [x] The gate's own PRINTED verdict line is read as the check — ✓ every gate reading this task took came from `QA-CHECK: <N> pass, <M> fail`, printed by the gate itself, with output redirected to a file and the **file** read afterwards — never a piped status, never `echo $?`. This mattered twice in practice: the T1 gate **exited 1** while printing `209 pass, 1 fail` (one real finding), and an earlier `bun test | tail` buffered its entire output to nothing, which is L-120's shape appearing in the very task that cites it
+- [x] Semantic coverage is unchanged, not merely relocated — ✓ **both branches satisfied, after the criterion was found unsatisfiable as designed.** The §4 rules still evaluate on every gate run: `run-s4-ts-evaluators.sh` is always-on and green at **83 pass, 0 fail in ~0.12 s**, covering rule semantics against the fakes *and* the nine retained fixture directories read through the evaluators. **And** § Decisions **D4** records exactly what moved to opt-in and why. Written only after the original premise was disproved three ways — see the T2 scope-change entry: dropping the harness alone would have **deleted** §4 from every default run, not relocated it
 
 ### T3 — Relocate §4 differential parity to the opt-in profile, with an ADR naming when parity must run `[size: S · risk: med · class: decision · HITL · J1]`
 Layers: `evals/run-adr-family-fixtures.sh` · `scripts/qa-check.sh` · `docs/adr/` · `docs/DECISIONS.md` (narrowed at G2 from a bare directory declaration per L-100 — the directory form swallowed the night-run rollup harness, which the autonomy stream owns; a new parity harness file, if T3 creates one, is declared here too and logged)
@@ -127,6 +127,21 @@ and the result is compared against the derived ceiling with any shortfall named.
   the index as a derived artifact — that is fine, but no task here may change generation logic.
 - **D3 — Shell retains §4 authority throughout.** This is not a cutover (EPIC-014 D2); H24–H26 remain
   out of scope, and **TD-120's git-spawn memoisation must land before them**, not here.
+- **D4 — exactly which §4 coverage moved to opt-in, and why** *(added at execution under the owner's
+  re-ruling; DoD 4's record half — see the T2 scope-change entry for the premise that failed).*
+  **Stayed always-on**, in `evals/run-s4-ts-evaluators.sh` (~0.12 s): every §4 rule's semantics against
+  the in-memory fakes, **and** the nine retained fixture directories read through the TS evaluators —
+  so real-tree evaluation did not leave the default profile with the oracle. **Moved to opt-in**,
+  with `evals/run-adr-family-fixtures.sh`: (i) the **differential against Shell** — TS-vs-oracle
+  agreement row by row, which is what EPIC-014 D2 and the G2 ruling intended to relocate, and (ii) the
+  **four S4.APPEND git-history cases** (edited-after-decision · post-decision-marker · no-history ·
+  shallow-clone), whose counterparts build real repositories and spawn the oracle. S4.APPEND's *rule
+  semantics* remain always-on through its history-port fake; what is opt-in is its **real-git
+  integration**. That second item is a genuine narrowing of the default profile and is named here
+  rather than folded into (i), because a debt row — or a DoD — that reports only the intended half is
+  how the next reader over-credits the change. The always-on/opt-in split is pinned mechanically in
+  `test/adr-family-harness-parity.test.ts`, so this paragraph and the artifact cannot drift apart
+  silently (L-151: a decision recorded where its reader cannot reach it is not a decision).
 
 ## Assumptions
 
@@ -146,6 +161,10 @@ and the result is compared against the derived ceiling with any shortfall named.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `evals/run-s4-ts-evaluators.sh` | T2 | NEW — the always-on §4 leg, oracle-free (~0.12s vs the 30.0s it replaces). Exists because dropping the shell harness alone would have deleted §4 from every default gate run, not relocated it | med | is the harness; green at 83 pass, 0 fail |
+| `test/s4-retained-fixtures.test.ts` | T2 | NEW — the nine retained fixtures read through TS evaluators, no oracle spawn, so real-tree §4 coverage stays in the default profile | low | 15 tests, 87ms; sibling controls per fixture (L-142) |
+| `test/adr-family-harness-parity.test.ts` | T2 | NEW — DoD 1's case-for-case list diff, both directions, anchored to real source fragments so a renamed counterpart reddens | med | 5 tests; both failure modes seeded and confirmed discriminating |
+| `scripts/qa-check.sh` | T2 | `run-adr-family-fixtures.sh` moved always-on → opt-in, `run-s4-ts-evaluators.sh` takes its always-on slot; the stale "DELIBERATE EXCEPTION" paragraph replaced (it had also been inserted mid-sentence into the run-foreign-repo block, which this rejoins) | med | full gate: 209 pass, 1 fail → re-verified after the Layers fix |
 | `test/fixtures/adr-family-factory.ts` | T1 | NEW — one shared ADR-port factory, replacing two independently-typed inline constructions scattered across five test files; sealed so it structurally cannot decide a verdict (H14) | low | `adr-fixture-factory-guardrail.test.ts` + `bunx tsc --noEmit` |
 | `test/fixtures/git-repo-factory.ts` | T1 | NEW — the git-repo half of the same factory pair, options literal sealed the same way | low | guardrail test (type-checked, never invoked — a real `git init` per run isn't worth it) |
 | `packages/standard/src/rules/adr-fixture-factory-guardrail.test.ts` | T1 | NEW — the must-FAIL half: three `@ts-expect-error` smuggling call sites + legitimate sibling controls; an unused directive is itself an error, so the guard cannot silently stop firing | low | is the test |

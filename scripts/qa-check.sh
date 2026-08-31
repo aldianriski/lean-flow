@@ -844,16 +844,27 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # whole epic rests on: that a repository which never installed lean-flow gets an answer it can act on.
 # It is the only harness here whose target is built from nothing -- no lean-flow file is copied in --
 # and it asserts that property mechanically, because a future edit that copies a template in would
-# run-adr-family-fixtures.sh (SPRINT-076 T2) is a DELIBERATE EXCEPTION to the cost rule above, ruled
-# by the owner at T2 rather than assumed. It BUILDS GIT REPOSITORIES -- three of them, for S4.APPEND's
-# must-FAIL, marker-passes and shallow-clone cases -- which is the property that put the 34s
-# run-attestation-fixtures.sh in the opt-in set below. It costs 27s. It is always-on anyway because
-# the §4 family is the engine's first coverage whose correctness this repo can check against ITSELF:
-# 27 real ADRs, two of them (ADR-008 · ADR-027) carrying legitimate post-decision markers that a
-# wrong S4.APPEND would redden. A rule that fails on our own correctly-amended ADRs is unusable
-# before it ever reaches an adopter, and finding that out only when someone remembers to run an
-# opt-in harness is how a shipped gate goes unguarded (TD-012 · L-058).
 # make the run measure our own shape wearing a stranger's name without failing anything (L-015 · L-016).
+# run-s4-ts-evaluators.sh (SPRINT-092 T2) REPLACES run-adr-family-fixtures.sh in this set, and the
+# swap is the point rather than a tidy-up. That harness (SPRINT-076 T2) BUILT GIT REPOSITORIES and
+# spawned the Shell engine twelve times for 30.0s -- the property that put the 34s
+# run-attestation-fixtures.sh in the opt-in set below -- and was carried always-on anyway, by owner
+# ruling, because §4 was the engine's first coverage this repo could check against ITSELF: 27 real
+# ADRs, two of them (ADR-008 · ADR-027) carrying legitimate post-decision markers a wrong S4.APPEND
+# would redden. That reasoning still holds; what changed is the price of honouring it.
+# §4 now has TS evaluators (SPRINT-091 T12), so the self-check no longer needs a subprocess.
+# run-s4-ts-evaluators.sh runs the ORACLE-FREE half -- rule semantics against the in-memory fakes,
+# plus the nine RETAINED fixture directories read straight through the evaluators -- at ~0.12s
+# against 30.0s. Only the DIFFERENTIAL against Shell still needs a live oracle, and that moves to
+# the opt-in set below (T3, EPIC-014 D2).
+# The trap this swap walks past, recorded because it nearly shipped: dropping the old harness ALONE
+# would not have RELOCATED §4 coverage, it would have DELETED it from every default run. This script
+# reduces its own spec on a bare run to S9+S13 (0 of §4's 7 rows survive) and never invokes
+# `bun test` -- so "the TS evaluators still run on every run" was true of `bun test` and false of the
+# gate, and the always-on set was §4's ONLY default-profile coverage. Verified three independent ways
+# before the swap rather than inherited from the ruling that authorised it (L-130 · L-136, at
+# owner-ruling grain). test/adr-family-harness-parity.test.ts diffs the two case lists as lists so the
+# equivalence keeps being checked, not merely have been checked once.
 # run-s2-placement-fixtures.sh (SPRINT-076 T3) joins the always-on set by the ORIGINAL cost rule, not
 # by T2's exception: no git, mktemp -d fixture repos built with printf, one awk-derived spec copy. It
 # guards §2's placement pair, whose required set is derived from the spec's own `Create ←` cells --
@@ -893,8 +904,8 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # Costed rather than assumed: ~2.1s, cheaper than thirteen harnesses already in this set. It
 # touches git but does not BUILD repos in the TD-016 sense -- one `git init`, ~95ms, no commit
 # (an inited-but-empty repo already answers `rev-parse --git-dir`, which is the whole probe).
-eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-adr-family-fixtures.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh run-night-run-gate-exception-fixtures.sh"
-eval_harnesses_optin="selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh"
+eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-s4-ts-evaluators.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh run-night-run-gate-exception-fixtures.sh"
+eval_harnesses_optin="run-adr-family-fixtures.sh selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh"
 # run-qa-budget-position-fixtures.sh (SPRINT-086 T3, TD-091) joins the opt-in set by the cost rule,
 # not the git rule -- it builds no repos, but it DOES invoke real copies of qa-check.sh (bounded by
 # `timeout`) to prove where the budget checkpoint is actually reached, which this repo's own

@@ -126,3 +126,97 @@ says `no sprint files given -- nothing verified`. A vacuous pass, indistinguisha
 exit code alone, and it would have "confirmed" the fix without examining anything (L-136). Re-run with
 the file named, it prints `PASS ... ### T1 Layers completeness` — the check reaching its target is the
 part worth reading.
+
+---
+
+### 2026-08-31 | T2 | scope-change — DoD 4's premise was false; owner re-ruled before any edit
+
+**What broke.** The G2 owner ruling accepted T2's relocation on this basis: *"§4 still evaluates in TS
+on every run through the evaluators SPRINT-091 T12 wired — so what moves to opt-in is the differential
+parity against Shell, not §4 coverage itself."* That is true of `bun test`. **The gate is
+`sh scripts/qa-check.sh`, and it never invokes `bun test`.** Verified three independent ways rather
+than argued:
+
+1. `qa-check.sh`'s conformance-engine leg (:287–300) reduces the spec on a bare run to
+   `S9.GATESWELLFORMED` / `S9.GATESABSENT` + `S13.*` only. Re-running that exact `awk` against
+   `spec/STANDARD.md` keeps **0 of the 7** `S4.` rows. `QA_FULL=1` uses the full spec; the default
+   profile does not.
+2. Sweeping every harness named in `eval_harnesses_always` for `S4.`/`adr-family`, exactly **one**
+   matches — `run-adr-family-fixtures.sh`, the harness this task removes.
+3. The green gate run taken minutes earlier (`210 pass, 0 fail`) contains **zero** `S4.` lines.
+
+So removing the harness from the always-on leg does not *relocate* §4 coverage — it **deletes §4 from
+the default gate**. DoD 4 ("semantic coverage unchanged, not merely relocated") fails as designed, and
+it is the DoD the owner explicitly named binding.
+
+**This is L-130/L-136's shape at owner-ruling grain.** A structural claim about another artifact —
+"the TS evaluators run on every gate run" — was frozen into a G2 ruling and inherited rather than
+queried. It reads exactly like a satisfied premise. Nothing in the gate would have reported its
+falsity: the harness would have been removed, the gate would have gone green, and §4 would have been
+silently unguarded on every default run — the silent-false-negative shape ADR-029 Tier G exists for.
+
+**Impact.** T2 cannot be executed as written without a coverage loss the owner did not agree to.
+Surfaced as a popup rather than reinterpreted in place: CLAUDE.md's own red flag is *"quietly
+reinterpreting a DoD that execution invalidated"*, and re-reading DoD 4's second branch ("or § Decisions
+records exactly which coverage moved") as permission would have been precisely that — the escape hatch
+used to paper over a premise failure rather than to document a deliberate trade.
+
+**Owner ruling: add a fast TS §4 leg to the always-on gate.** Register an eval harness running only the
+oracle-free §4 tests, so §4 stays semantically covered on every gate run while the 30.0 s
+oracle-spawning shell harness leaves the always-on leg. Measured before building: those 9 files are
+**63 tests in 119 ms** — against 30.0 s, the coverage is very nearly free, which is what makes this the
+option that costs the sprint's saving almost nothing.
+
+**G2 re-confirmed on the corrected premise.** Approach unchanged in shape; what changed is that
+"§4 still evaluates" is now something the gate *does* rather than something the ruling *assumed*.
+
+---
+
+### 2026-08-31 | T2 | converted, swapped, and proved — 4 of 4 DoD
+
+**Built under the owner's re-ruling.** Three new files, one edit:
+
+- `evals/run-s4-ts-evaluators.sh` — the always-on §4 leg. Oracle-free, **83 pass / 0 fail in ~0.12 s**
+  against the 30.0 s harness it replaces. It FAILs rather than skips on a missing `bun` *and* on a
+  missing test file, because `bun test` exits 0 when handed only files that exist — a renamed-away
+  test would otherwise shrink the leg silently and still report green (TD-101 / ADR-037's rule).
+  The file list is explicit rather than a glob: a glob would adopt the next oracle-spawning §4 test
+  someone adds and hand this always-on leg a 20 s subprocess.
+- `test/s4-retained-fixtures.test.ts` — the nine retained fixtures through the TS evaluators, **no
+  oracle spawn**. This is what keeps real-tree §4 evaluation in the default profile rather than
+  letting it leave with the differential.
+- `test/adr-family-harness-parity.test.ts` — DoD 1. Parses the harness's own `run_case_anywhere`
+  call sites **anchored to line start** and diffs them against a declared map in both directions.
+- `scripts/qa-check.sh` — the bucket swap, plus the stale justification paragraph.
+
+**The guard was seeded in both directions, because green-on-first-run proves nothing.** A 13th case
+appended to the harness reddened **only** the list-diff test — and named `seeded-thirteenth-case` in
+its failure — with four siblings green. An anchor renamed inside the retained-fixture suite reddened
+**only** the anchor test, list-diff still green. Each seed verified *landed* (`cmp` differs), still
+*parsing* (`sh -n`), and *targeted* (+2 lines and ±0 lines respectively — a demolition is not a
+discrimination, L-142). Both restored to their exact pristine blobs, **one convention throughout**:
+`git hash-object` on the working-tree file — harness `bfb652cf…c156`, fixture suite `99655cad…2083`,
+each re-derived after restore and compared to the figure taken before seeding (L-169).
+
+**Two corrections this task made to its own declarations, both logged rather than argued (L-100).**
+The new harness was undeclared in any task's `Layers:`, which `check-layers-observed.sh` caught —
+added as the **specific file**, never as a bare `evals/`, since the directory form is what swallowed
+the autonomy stream's rollup harness at G2. And the `scripts/qa-check.sh` comment declaring
+`run-adr-family-fixtures.sh` a "DELIBERATE EXCEPTION" to the cost rule was left stale by the swap;
+replacing it also revealed it had been inserted **mid-sentence** into the `run-foreign-repo-fixtures.sh`
+paragraph above it, whose closing clause had been orphaned nine lines below its own subject. Removing
+the interloper rejoined that sentence — a pre-existing defect, repaired only because this edit was
+already in that block.
+
+**Review — skip-table lookup, per TD-092.** `consequence · T2 · behaviour: **material** — removes a
+harness from the gate and adds its always-on replacement · governance: **material** — Tier G, and the
+one place this sprint trades a guard for time`. Depth: this is the task that most warrants an
+independent pass, and it did not get one — executing inline under a standing instruction not to
+dispatch subagents. **Recorded as a known gap, not as a completed review**: every guard defect across
+the last two sprints was caught by an outside pass and none by the author recalling the rule (L-165),
+so the absence is worth naming precisely here rather than leaving the depth row to imply coverage that
+was never taken.
+
+**Gate: `209 pass, 1 fail` → the single FAIL was `layers observed` on files still uncommitted, plus
+the genuine undeclared-harness gap now fixed.** Read from the gate's own printed verdict line, with
+output redirected to a file and the file read afterwards. Re-verified after this commit.
