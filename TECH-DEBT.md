@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-30
+last_updated: 2026-08-31
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -172,6 +172,37 @@ status: current
 > same family as TD-097/TD-105 — a cluster now large enough that a single "gate accuracy" task would
 > serve better than four separate fixes, which is a decomposition question for the owner rather than a
 > sweep ruling.
+
+> **Aging sweep — SPRINT-094 promote (2026-08-31).** **56 of 63 open rows** are ≥3 sprints
+> unaddressed. Derived, then cross-checked against a second query that agrees: 63 open − 5 filed at
+> Sprint-092 − 2 filed at Sprint-093 = 56. Trend, unbroken: 14/19 (S-078) → 16/22 (S-080) →
+> 17/24 (S-081) → 22/25 (S-083) → 24/28 (S-084) → 27/37 (S-086) → **56/63 (S-094)**. The count has
+> risen every sweep and **no sweep since S-078 has closed a row by fixing it**.
+> **This sweep is the first to close aged rows — and it closed them by READING THE TREE, not the
+> ledger.** Two `severity: high` rows escalated on their status field alone and were both already
+> fixed: **TD-101** (`status: open`, age 7) was closed by SPRINT-091 T1 under ADR-037 three sprints
+> ago, and **TD-113** (`status: open`, age 3) by SPRINT-093 T2 on both legs. Each row's *Summary* —
+> the sentence a sweep reads to judge severity — is **false against the current tree**, and neither
+> could be caught by re-reading the row, only by re-deriving its claim. That is not a bookkeeping
+> slip: an aging sweep that reads status fields measures the ledger's staleness and reports it as the
+> repository's debt, which inflates every figure above and escalates work that is done. Filed as
+> **`TASK-324`**'s motivating class, alongside the epic-header drift it was opened for.
+> **Escalation after verification: 2 rows, not 4.** `severity: high` **and** aged **and** confirmed
+> live → **TD-090** (gate leg 12 is the dominant cost, 396.3s of a 492s run; updated by SPRINT-092 T4
+> with what the §4 conversion did and did not buy) and **TD-117** (under concurrent load the gate
+> exceeds its own budget and silently SKIPS six eval harnesses — and per **TD-128**,
+> `qa-budget-default` cannot see it, because it compares the *configured* budget to the ceiling
+> rather than the actual runtime). Both to Backlog P1.
+> **Deletion clock — the note below is corrected here.** The S-083 sweep recorded *"Next clock: none
+> pending — no row on file is `status: resolved`"*, which was true when written and is not now: five
+> rows resolved at Sprint-093 (**TD-109 · TD-110 · TD-111 · TD-112 · TD-123**) plus the two resolved
+> in this sweep (**TD-101 · TD-113**). None is three sprints old, so **nothing is deleted here**; the
+> 093 cohort becomes deletable at the **SPRINT-096** promote and the two verified here at
+> **SPRINT-097**. Ids stay monotonic either way.
+> **§2 cap breaches (sourced from `check-doc-caps.sh`, never restated from a list):** 76 PASS · 0 FAIL
+> · 3 soft over-cap — `TODO.md` · `docs/research/adlc-epic-sequencing.md` ·
+> `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` (TD-082's reasoned carry, not
+> re-litigated).
 
 - **TD-117** severity: **high** | status: open | created: Sprint-091
   - Summary: **Under concurrent load the gate exceeds its own 450s budget, SKIPS six eval harnesses, and
@@ -461,7 +492,17 @@ status: current
     verification in this epic compares **reason text**, not just the verdict word, so a doubled
     prefix is noise inside the very signal later differentials read.
 
-- **TD-113** severity: **high** | status: open | created: Sprint-091
+- **TD-113** severity: **high** | status: resolved → SPRINT-093 T2 | created: Sprint-091 | verified at SPRINT-094 promote
+  - **RESOLVED — verified at the SPRINT-094 promote, against the current tree, not inherited.** The
+    Summary's premise (".gitattributes pins `*.sh eol=lf` but says nothing about `*.md`") is false
+    today, and the defect is closed on **both** legs by **SPRINT-093 T2**: `.gitattributes` now carries
+    `docs/knowledge-index.md text eol=lf`, which stops the CRLF checkout at its source for future
+    clones (scoped to the one generated file rather than a blanket `*.md` rule — owner ruling); and
+    `scripts/gen-index.sh:157` strips `\r` from **both** sides before comparing, which covers clones
+    that already exist and cannot be re-normalized. The comparison stays discriminating after the
+    strip: `gen()` emits pure LF so there is nothing to remove on that side, and a genuine content
+    edit changes bytes other than `\r`. Note for the aging sweep: this row was `high` and read as
+    3 sprints unaddressed while its fix had already shipped (→ `TASK-324`'s class).
   - Summary: **The repository gate FAILs in a fresh git worktree on a clean tree, for line endings
     alone — and worktree-isolated dispatch is this repo's standing rule for every Tier G review.**
     `scripts/gen-index.sh --check` compares with a raw `cmp -s`, which is byte-exact and therefore
@@ -864,7 +905,18 @@ status: current
   - **Re-file fresh if** the CLI gains `--reconcile` or a marks path — the finding then inverts into
     "are the end-to-end assertions actually comparing against Shell", which is a different check.
 
-- **TD-101** severity: **high** | status: open | created: Sprint-087
+- **TD-101** severity: **high** | status: resolved → SPRINT-091 T1 | created: Sprint-087 | verified at SPRINT-094 promote
+  - **RESOLVED — verified at the SPRINT-094 promote, against the current tree, not inherited.** The
+    Summary above is false today: `package.json` carries `"typescript": "^7.0.2"`, and
+    `scripts/qa-check.sh:788-804` is a live leg that runs `node_modules/.bin/tsc --noEmit`, reads
+    tsc's own exit status from a command substitution rather than through a pipe (L-120), re-derives
+    the error count for its verdict line, and **FAILs rather than skips** when the binary is absent —
+    "a skip is indistinguishable from a pass" is stated in the leg's own failure message. Shipped by
+    **SPRINT-091 T1** under **ADR-037** and proven on this row's exact recorded case, seeded verbatim
+    (`findings: "not an array"` against `readonly Finding[]`; `detail: 42` against `string`) → gate
+    printed `FAIL typecheck: tsc --noEmit exited 1 with 3 error(s)`, independently reproduced by that
+    task's reviewer. The row stayed `open` for three sprints after its cause was gone — which is the
+    aging sweep reading a status field rather than the tree (→ `TASK-324`'s class).
   - Summary: **Nothing in this repository type-checks TypeScript, so every guarantee stated as "enforced
     by a TYPE" is enforced only in an editor.** The gate is `sh scripts/qa-check.sh && bun test`;
     `bun run`/`bun test` **strip** types without checking them. There is no `tsc` invocation in

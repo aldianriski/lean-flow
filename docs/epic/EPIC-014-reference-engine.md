@@ -2,7 +2,7 @@
 epic: 014
 slug: reference-engine
 owner: Maintainer
-last_updated: 2026-08-29
+last_updated: 2026-08-31
 status: active
 member_sprints: [SPRINT-083, SPRINT-085, SPRINT-087, SPRINT-091, SPRINT-092]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
