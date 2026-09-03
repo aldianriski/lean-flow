@@ -115,7 +115,7 @@ the repository alone, without opening the temp file or having been in the sessio
 - [ ] Retained must-FAIL: a sprint closing with a `live` handoff outstanding FAILs **with its named
       finding**, while a sibling control (all handoffs `spent`) passes in the same run — one fixture per
       check, each failing with the finding it is named for (L-058)
-- [x] **Seeded-break discrimination proof** under ONE stated hash convention, seed verified landed by
+- [ ] **Seeded-break discrimination proof** under ONE stated hash convention, seed verified landed by
       `cmp`, artifact still parses, break targeted not demolition (L-137 · L-142 · L-169)
 - [ ] **The consumer path is checked, not inferred from our dogfooding** (L-015 · L-016) — nothing
       repo-specific leaks into `handoff/SKILL.md` or `prime/SKILL.md`, both of which ship to consumers,
@@ -144,7 +144,7 @@ the check reports it — and stays green on a symbol with a real production call
       TD-103's `reconcile()` / `marksInStandard()`; each must be reported when run against the tree at
       the commit that shipped it unwired
 - [ ] Retained must-FAIL fixture plus a sibling control — a symbol WITH a production caller stays green
-- [x] **Seeded-break discrimination proof** verified landed under ONE stated hash convention
+- [ ] **Seeded-break discrimination proof** verified landed under ONE stated hash convention
       (L-137 · L-142 · L-169)
 - [ ] Outside reviewer, worktree-isolated (L-165 · L-168)
 
@@ -157,12 +157,12 @@ Cites: SPRINT-092 close (18 worktrees / 178 MB removed, their branches were not)
 `main`, each one reported with why it was kept.
 
 **DoD:**
-- [ ] Every `worktree-agent-*` branch **confirmed an ancestor of `main`** is deleted — *Verify:
+- [x] Every `worktree-agent-*` branch **confirmed an ancestor of `main`** is deleted — *Verify:
       `git merge-base --is-ancestor <branch> main` per branch, before the delete, not after*
-- [ ] Any branch that is **NOT** an ancestor is **reported rather than removed** — the count of all 29
+- [x] Any branch that is **NOT** an ancestor is **reported rather than removed** — the count of all 29
       is re-derived here, never inherited: 18 were verified merged at SPRINT-092's close and the
       remaining 11 were never checked
-- [ ] No tracked file changes (this is a refs-only task, and a diff would mean something went wrong)
+- [x] No tracked file changes (this is a refs-only task, and a diff would mean something went wrong)
 
 ## Owner-action checklist
 - [x] **Sign G1 + G2**, then record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Omitted

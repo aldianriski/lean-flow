@@ -291,3 +291,56 @@ own case with 16/17 green**: unanchored row → `r-row-by-prose` · demand-statu
 metacharacters) and were redone. That guard has now fired three times in one task, each time on a
 patch that never applied — without it the suite reports green, which is indistinguishable from a
 suite that discriminates (L-137).
+
+---
+
+### 2026-09-03 | surprise | T1's commit ticked T2's and T3's DoD — two false greens in the frozen Plan
+
+**What was found.** `6a6aeac` ("T1: widen the epic checker … 5 of 6 DoD") flipped **three** DoD lines
+from `[ ]` to `[x]`, not one. All three begin with the identical bold lead
+`**Seeded-break discrimination proof**` — T1's at line 79, **T2's at 118 and T3's at 147**. Only T1's
+was earned; T2 and T3 have never been started, and neither commit since touches their `Layers:`.
+Derived from history, not from reading the file: `git log -S` on T2's line text returns `6a6aeac`,
+whose own diff shows all three flips in one hunk.
+
+**Why it matters more than the two characters.** The wrongly-ticked criterion is the *discrimination
+proof* — the one DoD in a Tier G task that exists to prove the guard is not vacuous (D4). A false
+green there is the exact failure the bar was written to prevent, and it would have been read at close
+as a proof that ran. `/prime` counted 12 open DoD this session; the true figure is **14**.
+
+**Class.** CLAUDE.md § Anti-Patterns edit-safety **(b)** — a structure-adjacent edit trusted without
+re-reading the whole structure. A replace-all over a repeated bold lead matched three siblings where
+one was intended, and every downstream signal stayed clean: line caps unchanged, no grep tripped, the
+commit's own body correctly said "5 of 6 DoD" while the file said 5 of 6 **plus two of someone
+else's**. The message and the artifact disagreed and nothing compared them.
+
+**Corrected** by unticking 118 and 147 — restoring the Plan as frozen, not amending it, so no
+`scope-change` is owed. The whole DoD structure was re-read after the edit (L-009), not the two lines:
+T1 6/6 · T2 0/6 · T3 0/5 · T4 0/3 · Owner-action 2/3.
+
+**Follow-up for the close Retro:** nothing mechanical compares a commit's claimed DoD delta against
+the ticks it actually made, which is why this survived a worktree-isolated review pass of T1 an hour
+later — that reviewer read T1's script, which is where it was told to look. Candidate `L-NNN` /
+`TASK-NNN` at close; the id is derived there, never guessed here (L-143 · L-170).
+
+---
+
+### 2026-09-03 | progress | T4 — 29 `worktree-agent-*` branches pruned, 3 of 3 DoD
+
+**Derived here, never inherited (the task's own A4 requirement).** 29 branches enumerated via
+`git for-each-ref refs/heads/worktree-agent-*`. Each tested individually with
+`git merge-base --is-ancestor <branch> main` **before** its delete, per the DoD's stated Verify
+method: **29 of 29 ancestors, 0 non-ancestors**. Cross-checked against an independent query,
+`git branch --merged main --list 'worktree-agent-*'`, which returns the same **29** — a second query
+that must agree, run before acting rather than after a surprise (CLAUDE.md § Behavioral Guidelines).
+The 18 SPRINT-092 verified and the 11 it never checked are therefore both covered, and the inherited
+figure is now a measured one.
+
+**Deleted** with `git branch -d` (the ancestry-checking form, never `-D`) — 29 deleted, 0 failed,
+`git branch --list 'worktree-agent-*'` now returns **0**. Nothing to report under DoD 2: the
+non-ancestor list is empty, so no branch was kept.
+
+**DoD 3 holds.** `git status --porcelain` after the prune shows only this sprint's own record files,
+modified by the coordinator before T4 ran; the ref operations produced no tracked file change.
+`git worktree list` showed a single worktree (the main checkout) throughout, so no branch was pruned
+out from under a live worktree — the failure mode that would have made this task not-refs-only.
