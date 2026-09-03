@@ -73,9 +73,11 @@ export interface Scan {
   readonly strings: readonly string[];
 }
 
-/** Marker delimiter for a redacted string — a character no source file contains. */
-const MARK_L = "@@STR";
-const MARK_R = "@@";
+/** Marker delimiter for a redacted string — a character no source file contains. Exported so a sibling
+ *  module (`unwired-exports.ts`) can build its own marker-anchored regex against the SAME literal
+ *  instead of duplicating it — two copies of a marker format is how one of them silently drifts. */
+export const MARK_L = "@@STR";
+export const MARK_R = "@@";
 
 /**
  * Split source into code, comments and string literals in ONE pass, replacing every string with an
