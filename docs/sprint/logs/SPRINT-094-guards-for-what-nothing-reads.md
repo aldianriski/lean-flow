@@ -423,3 +423,127 @@ handed the owner's G2 ruling on the handoff-stub placement, marked *implement, d
 **The sprint file and this Log are coordinator-owned** — both agents were told not to touch either and
 to return their Log entry as text in their report, because SPRINT-063 produced two copies of one Log
 when that was left implicit.
+
+---
+
+### 2026-09-03 | progress | T3 — unwired-exports fitness rule built and merged, DoD held pending review
+
+Detector at `test/architecture/unwired-exports.ts` (263 lines) + `unwired-exports.test.ts` (22 tests),
+beside `dependency-direction.test.ts` and matching its idiom. A caller is a resolved ES import
+**edge** (importer + specifier to defining file + name) read off a comment/string-stripped skeleton
+(reusing `layers.ts`'s `scan()`) — never a grep for the bare identifier. Narrowed on evidence per A3:
+covers a symbol reached by a literal import, not a registry-string lookup, because A3 re-derived every
+real motivating artifact as import-reachable.
+
+**DoD 2 (L-166) as reported by the builder** — five real symbols, not fixtures alone:
+`reconcile` / `marksInStandard` (TD-103) reported unwired in the **current tree** (A3's strong form);
+`attachLevel` at `e158d60` (parent of T11's `6f4cc36`); `createF4Registry` / `createS4AppendRegistry`
+at `e0ccdb6` (parent of T12's `e5d59ce`); each green in the current tree as its own control. Historical
+reads batched through one `git cat-file --batch` after a per-file `git show` first cut spawned 71
+subprocesses and blew `bunfig.toml`'s 5 s budget at 11 s.
+
+`marksInStandard`'s self-reference (4 mentions in its own file, 3 in comments) does not fool it:
+comments are stripped before either regex runs, so a mention cannot reach the import matcher;
+a self-import edge is excluded defensively on top. Fixture `test/fixtures/unwired-exports/self-reference/`
+retained (TD-012), shaped on the real file.
+
+**Discrimination proof, ONE hash convention** (`git hash-object <path>` on the working-tree blob,
+cross-checked equal to the staged blob): pristine `d542f3ef1ee46a16598e3543380f6ddeabb45945`, 263
+lines, 11 `continue;` guards. Four seeds, each landed (`cmp`), parsing (`tsc --noEmit` clean), targeted
+(line/guard counts unchanged). Reported honestly rather than smoothed: **seed B (test-importer
+exclusion) reddened 5 cases, not the 1 predicted** — every DoD-2 real-artifact assertion depends on it,
+because all five symbols also have real test callers. That is recorded as found.
+
+**Coordinator re-verification before merge** — the builder's figures were re-derived in its worktree,
+not taken from its report: `git hash-object` returned `d542f3ef…`, `wc -l` 263, `grep -c` on the guard
+clause 11, all three matching. Suite re-run as its own call (L-120): `bun test test/architecture/` gave
+**`47 pass, 0 fail, 79 expect() calls`**. Merged at `ea7a8b9`.
+
+**A process defect worth recording.** This agent's first exit produced no report at all — its closing
+line announced it would wait for a notification, with 512 insertions **staged but uncommitted** in its
+worktree. The work was intact; only the reporting channel failed. Recovered by inspecting the worktree
+directly rather than trusting the reply channel (L-060 — a command's self-report is evidence about the
+reporter, never about the artifact) and resuming the agent to commit and report. Had the reply been
+read as the outcome, a complete task would have been recorded as a failure.
+
+`consequence · T3 · behaviour:material · governance:high`
+
+---
+
+### 2026-09-03 | progress | T2 — handoff status tracked + §12(b)'s conversion wired, merged, DoD held pending review
+
+**The status half:** a handoff carries `live` / `consumed` / `spent` via a two-field
+(`handoff-status:` / `handoff-path:`) entry inside a `### <date> | handoff | <summary>` block — the
+Execution Log where a sprint exists, root `HANDOFF-LEDGER.md` (create-lazily) otherwise, both parsed by
+**one shared function** (L-108, position-anchored). Where the same `handoff-path` recurs, the latest
+entry wins. An **UNKNOWN status** (field missing, malformed, or its path missing) is unconditionally
+FAILed in every context, **never** assumed `spent` — implementing the owner's G2 ruling as recorded at
+promote, both halves, with the circular headless-park answer not inherited.
+
+**The conversion half:** a sprint may not close over a `live` / `consumed` handoff —
+`check-handoff-state.sh` FAILs it with its named finding. Full reconciliation protocol goes to
+`skills/lean-doc-generator/references/handoff-reconciliation.md`, pointed to from a 4-line addition to
+`SKILL.md` plus a new promote-governance checklist line.
+
+**11 fixtures, one harness, all green**, DoD 3's pair covered directly (`closed-live-outstanding` FAILs
+named; `closed-all-spent` passes in the same run), plus `closed-live-path-not-archived` — a
+reachability case mirroring T1 review's HIGH-3, reproduced pre-emptively rather than left for a
+reviewer to find.
+
+**Discrimination proof, ONE hash convention** (`git hash-object <path>`): pristine
+`724ca9cfa8b80fa47626185af38d34e56eb6d48e`, 152 lines, 3 assertion call sites. Four seeds, each landed
+(`cmp`), parsing (`sh -n`), targeted: sprint-context UNKNOWN gate gave 3 red / 8 green ·
+closed+non-spent gate 3 red / 8 green · ledger UNKNOWN gate 1 red / 10 green · `resolve_latest` broken
+from latest-wins to first-wins reddened the 3 multi-entry cases with 8 single-entry siblings green.
+Restored and re-verified identical after each.
+
+**L-166, and the builder's own caveat, carried forward rather than smoothed.** No historical commit
+carries the `handoff-status:` vocabulary — it is new — so no unmodified blob could be replayed the way
+T1 replayed `d43a7a1`. The closest faithful case is real:
+`docs/sprint/archive/SPRINT-027-watchdog-housekeeping.md`'s Execution Log records a genuine 54-line
+handoff doc produced in OS temp on 2026-07-29, the **same day** that sprint closed
+(`close_commit: 36721a4`), with zero repo-side trace of its fate. Fixture `sprint027-real-gap` carries
+the real id, dates and commit forward with the field genuinely absent. **Whether that meets L-166's bar
+or is a fixture wearing a real artifact's name is a judgment call, and it was put to the outside
+reviewer explicitly rather than settled by the builder.**
+
+**Coordinator re-verification before merge:** `git hash-object` gave `724ca9c…`, 152 lines, 3 assertion
+sites, `sh -n` parses — all matching. `lean-doc-generator/SKILL.md` lands at **138** lines, inside
+ADR-006's ~140 cap and inside D2's 6-line budget (4 used), so **the cap was not raised to fit content**.
+`HANDOFF-LEDGER.md` is correctly **absent** from the tree — create-lazily by contract, and a
+pre-created empty one would itself have been the STANDARD §7 violation. Harness re-run as its own call
+(L-120): **`HANDOFF-STATE FIXTURES: all green`**, 11 of 11, each matching its own named finding.
+Merged at `324b489`.
+
+**Two items NOT accepted on the builder's report.** (i) It reports a full gate at `QA-CHECK: 205 pass,
+3 fail` and classifies all three as pre-existing or environmental. That classification is not taken on
+trust — **system-verify runs once on the integrated tree**, which is the designed moment for it
+(sprint-bulk step 6). Note also that T3's agent measured `tsc --noEmit` **clean** in its worktree while
+T2's reports `typecheck` failing on a missing `tsc`: when a check differs between two contexts, diff
+the environments before the code (L-067). (ii) `HANDOFF-LEDGER.md` is a **new root-level convention not
+registered in `spec/STANDARD.md` §2**. Editing that spec sat outside T2's `Layers:`, so the builder
+documented the convention inline in the shipping skills and flagged it — the correct call. It needs an
+owner ruling, not a quiet adoption, and is carried to § Owner-action rather than absorbed.
+
+**Layers grew at execution, declared (L-100):** `evals/run-handoff-state-fixtures.sh` and
+`skills/lean-doc-generator/references/handoff-reconciliation.md`.
+
+`consequence · T2 · behaviour:material · governance:high`
+
+---
+
+### 2026-09-03 | progress | outside reviewers dispatched for T2 and T3; no DoD ticked yet
+
+**Nothing in T2 or T3 is ticked at this point, deliberately.** Both reviewers are re-deriving the exact
+criteria a tick would assert — T3's DoD 2 commit selection and its reachability family, T2's
+check-to-fixture coverage, its UNKNOWN-in-every-context claim, and the L-166 judgment call. **Ticking a
+criterion whose verification is still in flight is the false-green shape this session opened by
+catching**, and T1's own history is the argument: it committed 5 of 6 DoD ticked, and its independent
+pass then found 3 HIGH / 3 MEDIUM / 1 LOW **inside the ticked items**, none caught by the author whose
+seeded-break proof had run clean minutes earlier (L-165's fifth sighting).
+
+Both dispatched worktree-isolated (L-168), each briefed with T1's review through-line as its aiming
+point — the detection logic was sound, the SET it was applied to was derived three inconsistent ways,
+and no fixture varied that set — on the standing assumption that the same shape is present until
+disproved. Each was told to mark findings CONFIRMED or PLAUSIBLE and not to inflate, and to report what
+**held up**, since a review listing only defects says nothing about coverage.
