@@ -257,6 +257,41 @@ status: current
     reddens on a flaky connection teaches people to ignore it — but nothing gates this test today.
   - **Re-file fresh if** the repo gains a network-tolerant harness tier, which would remove the reason.
 
+- **TD-133** severity: minor | status: open | created: Sprint-094
+  - Summary: **The T3 unwired-exports detector counts fewer *caller* shapes than ES and fewer test-file
+    shapes than convention, so a genuinely wired symbol can be reported unwired.** Two gaps, one class,
+    one remedy moment — both produce a **loud false positive**, never a silent pass, which is why they
+    are debt rather than a blocker.
+  - Location: `test/architecture/unwired-exports.ts` — `importedBindingsOf` (caller shapes) and
+    `isTestAdjacent` (test-file shapes).
+  - Evidence (SPRINT-094 T3 independent review, each reproduced on synthetic input):
+    **(i)** `importedBindingsOf` matches only `import { a, b as c } from "…"`. Not matched:
+    `import * as ns from "…"` followed by `ns.foo()`; dynamic `await import("…")`; and a re-export
+    barrel (`export { x } from "./origin.ts"`) acting as a caller edge. Probed: a symbol genuinely
+    called via `ns.nsFoo()` was reported unwired, and a symbol genuinely reached through a barrel was
+    reported unwired.
+    **(ii)** `isTestAdjacent` is **suffix-only** (`.test.ts` · `.spec.ts` · `.fake.ts`), not
+    directory-aware, so a `__tests__/helper.ts` that no production file imports is treated as
+    production and reported unwired. Marked PLAUSIBLE by the reviewer — reproduced synthetically, not
+    against a live file.
+  - **Not live today, and that was measured rather than assumed.** `grep` over `apps/` and `packages/`
+    returns **zero** occurrences of `import * as`, of `export {…} from`, and of dynamic `import(`; and
+    `find -iname '*test*'` finds no `__tests__/`-style directory anywhere in the repo.
+  - Impact, and why `minor` rather than the `high` its sibling finding carried. Both gaps make the guard
+    **cry wolf on real, wired code** — the opposite polarity to a silent miss, self-announcing and
+    investigated the moment it fires. The real cost is trust: a Tier G gate that reports a false finding
+    is disabled by its readers faster than one that misses quietly, so this is a *durability* risk, not
+    a correctness hole. A barrel `index.ts` is the natural next refactor for a growing
+    `packages/standard/`, which is the event that would make (i) live.
+  - **Why it is not fixed in T3.** Ruled out of T3's bounded builder retry by the coordinator so the
+    retry stayed pointed at the review's one silent-by-construction finding — a missed **export** form,
+    where a symbol never enters `symbolsExamined` at all and there is no signal anything was skipped.
+    That one contradicts T3's DoD 1 as written and was fixed; these two do not, and widening a retry to
+    absorb every finding is how a bounded retry stops being bounded.
+  - **Re-file fresh if** `packages/` gains a barrel `index.ts`, a namespace import, a dynamic import, or
+    a `__tests__/` directory — any one of those makes this live rather than latent. Related: L-108 ·
+    L-058 · the sibling export-form finding fixed in T3's review pass.
+
 - **TD-132** severity: high | status: open | created: Sprint-094
   - Summary: **The dispatch preflight's `Depends-on:` parser matches `T[0-9]+` as a bare substring over
     the whole line, so it harvests task ids out of the field's own explanatory prose** — and it ignores
