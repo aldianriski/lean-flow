@@ -39,11 +39,35 @@ Filename: `handoff-<short-slug>.md`. Emit the absolute path so the next session 
 5. **Suggested skills** — which skills the next agent should invoke (e.g. `/prime` first, then `/orchestrator` to resume, `/diagnose` for the failing test).
 6. **References — do not duplicate** — point to durable artifacts by path or URL (PRDs, ADRs, the sprint file, commits, diffs, issues). Summarize only what is NOT already captured elsewhere.
 
+## Repo-side status stub (STANDARD §12(b))
+
+The temp-dir doc stays out of the repo — that placement is correct and unchanged. What lean-flow
+was missing is a **status stub**: a repo-side record of whether this handoff is `live` (a session
+may still resume it), `consumed` (a session resumed it and continued), or `spent` (superseded, or
+the sprint closed past it) — so "was this actioned?" is answerable without opening the temp file.
+
+1. **Resolve context** — read `TODO.md` § Active Sprint. A pointer names the log to use:
+   `docs/sprint/logs/SPRINT-NNN-<slug>.md` (create lazily from `sprint-log.md.template` if this is
+   the sprint's first Log entry). No pointer → the fallback ledger, root `HANDOFF-LEDGER.md`
+   (create lazily, same two-field shape, no sprint-specific content).
+2. **Close out a prior handoff you are now resuming** — if that log/ledger's newest entry for this
+   context is `handoff-status: live`, append one entry reusing its `handoff-path` with
+   `handoff-status: consumed` before writing the new one below (this session picked it up).
+3. **Append the new stub**, after writing the temp doc:
+   ```
+   ### YYYY-MM-DD | handoff | <one-line focus>
+   handoff-status: live
+   handoff-path: <the absolute temp path printed below>
+   ```
+   Never restate the doc's content here — the stub is a status record, not a second copy of the
+   notes (STANDARD §12(b) still bars committing raw notes).
+
 ## Hard rules
 
 - **Redact secrets** — never write API keys, passwords, tokens, or PII into the doc.
 - **Reference, don't copy** — if it's already in a commit / ADR / sprint file / issue, link it; don't restate it.
-- **Temp dir only** — never write the handoff into the workspace or stage it in git.
+- **Temp dir only** — never write the handoff DOC into the workspace or stage it in git; only its
+  two-field status stub is repo-side (§ Repo-side status stub).
 - **Transient** — the doc captures conversation state; durable decisions still belong in DECISIONS.md / CHANGELOG via `/lean-doc-generator`.
 
 ## Output format
@@ -52,6 +76,7 @@ Filename: `handoff-<short-slug>.md`. Emit the absolute path so the next session 
 === HANDOFF WRITTEN ===
 Path:  <absolute temp path>
 Focus: <one line>
+Stub:  <sprint log path, or HANDOFF-LEDGER.md> -- handoff-status: live
 Next:  open a fresh session → /prime → read the handoff path above → resume
 =======================
 ```
@@ -62,4 +87,7 @@ Next:  open a fresh session → /prime → read the handoff path above → resum
 ❌ **Duplicating a PRD / ADR / diff** — reference it by path; don't restate it.
 ❌ **Leaking a secret** — redact every credential and PII before saving.
 ❌ **Using this for durable state** — sprint records and decisions go through `/lean-doc-generator`, not here.
+❌ **Skipping the status stub, or writing the raw notes into it** — either leaves "was this
+   actioned?" unanswerable from the repo alone, which is the exact silent loss STANDARD §12(b)'s
+   conversion exists to close (SPRINT-094 T2).
 ❌ **Restating the live TODO / sprint task state** (open DoD, current task list) — `/prime` re-reads it next session, so restating it is paid twice; capture only the *ephemeral* (in-flight reasoning · the immediate next action) and point to TODO/sprint for the durable task state.
