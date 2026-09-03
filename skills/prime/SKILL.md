@@ -45,6 +45,13 @@ sprints (report per stream when more than one, e.g. `Tasks: 5 open (main: 3 · p
 no sprint is active, fall back to the Backlog.
 **Resuming from a `/handoff`?** Also read the handoff doc at the temp path it printed.
 
+**Handoff status (read-only report, SPRINT-094 T2)** — an active sprint's Execution Log, or root
+`HANDOFF-LEDGER.md` when none is active, may carry a `handoff` entry (see
+`sprint-log.md.template`'s event vocabulary). Report the LATEST such entry's `handoff-status:` —
+`live` (not yet resumed), `consumed` (resumed, still open), or none outstanding. Never write it
+(that is `/handoff`'s and `/lean-doc-generator close`'s job, not this one's) — priming only surfaces
+what a reader would otherwise have to open the temp file, or have been in the session, to know.
+
 ## Skill freshness — a report, not a gate
 
 A live session keeps whatever installed copy of a plugin it started with, so a skill edited but not
@@ -71,8 +78,9 @@ version-scoped root, so this skill's base dir is the whole roster's. Out of scop
 1. Read each path in order; track found/missing.
 2. From the active task list, count open `- [ ]` tasks.
 3. Compare the invocation header's base-dir version against the plugin manifest (above).
-4. Emit the health report (below) — health check ONLY, no inline file summaries.
-5. Emit one `Next:` line:
+4. Read the LATEST `handoff` entry (§ Handoff status) — report only, never write.
+5. Emit the health report (below) — health check ONLY, no inline file summaries.
+6. Emit one `Next:` line:
    - open tasks exist → `/orchestrator` to continue — and when those tasks sit in an **active
      sprint**, name the unattended option too (`/orchestrator sprint-bulk unattended` — a night run
      that executes the promoted Plan while nobody watches). **Naming it is the whole job:** priming is
@@ -95,18 +103,26 @@ version-scoped root, so this skill's base dir is the whole roster's. Out of scop
 [OK]      ARCHITECTURE.md
 Skills:   1.22.0 base-dir == 1.22.0 repo → fresh
 Tasks:    3 open
+Handoff:  live -- docs/sprint/logs/SPRINT-NNN-<slug>.md (not yet resumed)
 Next:     /orchestrator — continue the 3 open tasks (or `sprint-bulk unattended` for a night run)
 ====================
 ```
+
+The `Handoff:` row is omitted only when no `handoff` entry exists anywhere reachable (no active
+sprint AND no `HANDOFF-LEDGER.md`) — otherwise report it, including `none outstanding`, so its
+absence is never mistaken for "nothing was ever taken."
 
 The `Skills:` row is omitted only when it would be meaningless — no manifest **and** no version in the
 base dir; otherwise report it, including `n/a`, so its absence is never mistaken for a pass.
 
 ## Red flags
 
-❌ **Reading files outside the declared slots** (beyond a referenced handoff and the plugin manifest
-   the freshness row compares against) — adds noise; not this skill's job.
+❌ **Reading files outside the declared slots** (beyond a referenced handoff, the plugin manifest the
+   freshness row compares against, and the Execution Log / `HANDOFF-LEDGER.md` the Handoff row reads)
+   — adds noise; not this skill's job.
 ❌ **Aborting on a missing file** — everything is optional; `[MISSING]` is the correct response.
 ❌ **Summarizing file contents inline** — emit the health check only; files are already in context for downstream skills.
 ❌ **Reading a full sprint file** — frontmatter + active section is enough for priming.
 ❌ **Running mid-task** — this is for session priming; mid-task use signals context drift.
+❌ **Writing a `handoff-status:` transition** — priming only reports the latest one; `/handoff` and
+   `/lean-doc-generator close` are the only writers.

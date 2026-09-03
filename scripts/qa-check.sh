@@ -152,6 +152,33 @@ else
   fi
 fi
 
+qb_checkpoint "leg 2b-bis: handoff state"
+# --- 2b-bis. Handoff status + STANDARD Sec 12(b)'s conversion (SPRINT-094 T2) -----------------
+# Sec 12(b)'s Meeting-notes row prescribes converting outcomes into a durable home and never
+# committing the raw notes; lean-flow shipped no step that performed the conversion, so a handoff
+# was written, the session ended, and whether anything in it reached a durable home was answered by
+# nobody. Delegates to scripts/lib/check-handoff-state.sh, covered by
+# evals/run-handoff-state-fixtures.sh. An UNKNOWN status (the field missing, malformed, or its
+# handoff-path missing) is ALWAYS a FAIL -- never read as `spent` -- and a sprint closing over a
+# `live`/`consumed` handoff is a second, separate FAIL until Sec 12(b)'s conversion is performed.
+hs_script="scripts/lib/check-handoff-state.sh"
+if [ ! -f "$hs_script" ]; then
+  bad "handoff state: checker not found at $hs_script"
+else
+  hs_out=$(sh "$hs_script" "$ROOT" 2>&1); hs_code=$?
+  printf '%s\n' "$hs_out"
+  hs_pass=$(printf '%s\n' "$hs_out" | grep -cE '^PASS')
+  hs_fails=$(printf '%s\n' "$hs_out" | grep -cE '^FAIL')
+  pass=$((pass + hs_pass))
+  if [ "$hs_code" -ne 0 ]; then
+    if [ "$hs_fails" -gt 0 ]; then
+      fail=$((fail + hs_fails))
+    else
+      bad "handoff state: checker exited $hs_code without reporting a FAIL line"
+    fi
+  fi
+fi
+
 qb_checkpoint "leg 2c: research retention"
 # --- 2c. Research retention (STANDARD section 11) ---------------------------------------------
 # close's compaction sweep pointed at an "or archive" target §11 never defined (SPRINT-055 T3).
@@ -911,7 +938,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # Costed rather than assumed: ~2.1s, cheaper than thirteen harnesses already in this set. It
 # touches git but does not BUILD repos in the TD-016 sense -- one `git init`, ~95ms, no commit
 # (an inited-but-empty repo already answers `rev-parse --git-dir`, which is the whole probe).
-eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-s4-ts-evaluators.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh run-night-run-gate-exception-fixtures.sh"
+eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-handoff-state-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-s4-ts-evaluators.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh run-night-run-gate-exception-fixtures.sh"
 # run-s4-differential-parity.sh (SPRINT-092 T3) joins the opt-in set by the cost rule, and it is the
 # OTHER half of T2's swap: the row-by-row comparison of the TS evaluators against a LIVE Shell oracle,
 # which needs a real engine spawn per row and is exactly the 20+s taken off the default profile.

@@ -18,11 +18,22 @@ update_trigger: an Execution Log entry is appended
 
 <!-- Newest entries at the BOTTOM: this reads as a chronology, unlike CHANGELOG.md which is
      newest-first. Event is one of: promote · progress · surprise · scope-change · park · blocker ·
-     run-complete · close. `run-complete` is reserved for the run itself finishing (carries the
-     Part 4 rollup) — a task finishing mid-run is logged as `progress`, never as `complete`. -->
+     run-complete · close · handoff. `run-complete` is reserved for the run itself finishing (carries
+     the Part 4 rollup) — a task finishing mid-run is logged as `progress`, never as `complete`. -->
 
 ### YYYY-MM-DD | [event] | [one-line summary]
 [detail — what changed and why it matters. Name the task (Tn) it belongs to.]
+
+<!-- A `handoff` entry is the repo-side status stub STANDARD §12(b) prescribes (SPRINT-094 T2):
+     `/handoff` writes one at `live`; a later `handoff` entry sharing the SAME handoff-path updates
+     it (`consumed` when a session resumes and continues; `spent` when close reconciles it) — the
+     LATEST entry per path is authoritative, never edited in place. Both fields are required; either
+     missing reads as UNKNOWN, which a sprint may never close over. No sprint to log into (governance
+     work, `/triage`, a research session)? The same two-field shape goes in root `HANDOFF-LEDGER.md`
+     instead (create-lazily), checked by scripts/lib/check-handoff-state.sh. -->
+### YYYY-MM-DD | handoff | [one-line focus of the temp-dir doc]
+handoff-status: live | consumed | spent
+handoff-path: [absolute temp path /handoff printed]
 
 <!-- Every task's entry carries a structured consequence classification (TD-092) — a fixed, whole-line
      record, not the classification stated in prose above it. Written at the moment review depth is
