@@ -344,3 +344,82 @@ non-ancestor list is empty, so no branch was kept.
 modified by the coordinator before T4 ran; the ref operations produced no tracked file change.
 `git worktree list` showed a single worktree (the main checkout) throughout, so no branch was pruned
 out from under a live worktree — the failure mode that would have made this task not-refs-only.
+
+---
+
+### 2026-09-03 | surprise | the dispatch preflight HALTed on a cycle that does not exist — and its PASSes were phantom too
+
+**Context.** Step 3 of `sprint-bulk` requires the pre-dispatch preflight before a wave. Extracted the
+runnable snippet from `orchestrator/references/dispatch.md` § Dispatch preflight and ran it **bare**,
+never piped into a formatter inside an `&&` chain (its own header warns why — L-057). Against
+`SPRINT-094` at base `9e3a395`:
+
+```
+PASS base-ref: declared base matches live HEAD (9e3a395…)
+FAIL cycle-detected: tasks unresolved -> T2 T3
+PASS shared-file-owned: scripts/lib/check-epic-archive.sh ~ scripts/lib/ in T1,T2 order=T1->T2
+PASS shared-file-owned: scripts/qa-check.sh in T1,T2 order=T1->T2
+PASS shared-file-owned: skills/lean-doc-generator/SKILL.md in T1,T2 order=T1->T2
+PREFLIGHT: HALT
+```
+
+**A FAIL halts the wave with its named finding — so the finding was investigated, not overridden on a
+hunch.** All four tasks in this Plan declare `Depends-on: none`. There is no cycle to detect.
+
+**Diagnosed two independent ways, before acting on either** (a query whose result is acted on
+immediately gets a second query that must agree). **(i) Reading the code:** the `Depends-on:` arm is
+`grep -oE 'T[0-9]+'` over the *whole line*, unanchored, unscoped, with nothing testing for the literal
+`none`. **(ii) Running the parser** over the four real fields: `T1 -> []` · `T2 -> [T1,T2,T1,T2]` ·
+`T3 -> [T1,T2]` · `T4 -> []`. T2's field reads `none — but see **D1** (T1 and T2 share …) and **D2**
+(T1 and T2 share …)`, so T2 harvests **itself** out of its own explanatory prose. A self-edge is
+unresolvable by any topological sort, and T3 inherits the unresolvable T2. Hence "T2 T3".
+
+**The dangerous half is the three PASSes, not the FAIL.** They were derived from the same phantom
+edges. Re-ran against a copy with only the prose stripped to bare `none` and every `Layers:` untouched:
+
+```
+PASS wave-computation: T1=0 T2=0 T3=0 T4=0
+FAIL shared-file-unowned: scripts/lib/check-epic-archive.sh ~ scripts/lib/ in T1 and T2 …
+FAIL shared-file-unowned: scripts/qa-check.sh in T1 and T2 …
+FAIL shared-file-unowned: skills/lean-doc-generator/SKILL.md in T1 and T2 …
+```
+
+So on the true graph the ownership check FAILs three times. The tool reported *owned* because it
+invented the edge that made it owned — **L-108 verbatim: a false positive on a substring is a false
+negative on the contract.** Shared-file ownership is the check standing between a parallel wave and
+L-042's cross-task staging contamination, and it can be silently satisfied by prose.
+
+**A second defect the same run exposed:** the real ordering constraint for those three files is
+pre-locked in this sprint's `## Decisions` (**D1**, **D2**) — which the preflight never reads. Fixing
+the parser alone converts the false PASS into a false FAIL. Both halves want ruling together.
+
+**Filed as `TD-132`** (`high`; id derived from the ledger with `.claude/worktrees/` excluded, two
+agreeing queries, max in use `TD-131` — L-143 · L-170). Not fixed here: `dispatch.md` is outside every
+SPRINT-094 task's `Layers:` and is a Tier G consumer-facing guard, so ADR-029's full bar plus an
+outside reviewer applies — that is a task, not a patch.
+
+**The wave was dispatched anyway, on a hand-derived graph, and the override is recorded rather than
+hidden.** `Layers:` intersected directly: **T2 ∩ T3 = ∅** (T2 is skills/ + scripts/ + evals/fixtures/;
+T3 is test/architecture/ + test/fixtures/). T4 is refs-only and complete. T1 committed at `4ae0827`,
+so **D1's T1→T2 order is already satisfied** and the three contended files are no longer contended —
+which is why the true-graph FAILs above are stale rather than live. The HALT was overridden on
+evidence that contradicts it, not waved through.
+
+---
+
+### 2026-09-03 | progress | T2 and T3 dispatched in parallel, worktree-isolated
+
+Wave 1 of 1: both `Depends-on: none`, both disjoint, one `Agent(isolation:"worktree")` each in a single
+message, per D4's requirement that every Tier G task be built and then reviewed under isolation
+(L-165 · L-168 — adversarial verification *writes*, so a non-isolated reviewer plus any `git add -A`
+ships a corrupted guard inside an unrelated commit).
+
+Each agent was handed its **procedure skill** (`/tdd`) rather than a re-described brief, plus the Tier G
+bar in full (L-166 real motivating artifact · L-058 one must-FAIL per check with its named finding ·
+L-137/L-142 seeded-break proof with landed/parses/targeted/sibling-green guards · L-169 one stated hash
+convention, called out because this is a CRLF checkout · L-120 read the printed verdict). T2 was also
+handed the owner's G2 ruling on the handoff-stub placement, marked *implement, do not re-decide*.
+
+**The sprint file and this Log are coordinator-owned** — both agents were told not to touch either and
+to return their Log entry as text in their report, because SPRINT-063 produced two copies of one Log
+when that was left implicit.

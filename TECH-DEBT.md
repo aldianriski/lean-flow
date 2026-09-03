@@ -257,6 +257,52 @@ status: current
     reddens on a flaky connection teaches people to ignore it — but nothing gates this test today.
   - **Re-file fresh if** the repo gains a network-tolerant harness tier, which would remove the reason.
 
+- **TD-132** severity: high | status: open | created: Sprint-094
+  - Summary: **The dispatch preflight's `Depends-on:` parser matches `T[0-9]+` as a bare substring over
+    the whole line, so it harvests task ids out of the field's own explanatory prose** — and it ignores
+    the literal `none` that precedes them. On SPRINT-094 this is wrong in *both* directions at once: it
+    invents a dependency cycle that does not exist, and it issues shared-file ownership PASSes derived
+    from the phantom edges it invented.
+  - Location: `skills/orchestrator/references/dispatch.md` § Dispatch preflight, the embedded runnable
+    snippet, at the `Depends-on:` arm — `deps="$deps$(printf '%s' "$line" | grep -oE 'T[0-9]+' | ...)"`.
+    Ships to consumers inside the plugin, and `orchestrator/SKILL.md` § sprint-bulk step 3 tells every
+    run to execute it before dispatching a wave.
+  - Evidence (SPRINT-094, reproduced two independent ways before acting). All four tasks declare
+    `Depends-on: none`. T2's field continues `none — but see **D1** (T1 and T2 share
+    scripts/qa-check.sh …) and **D2** (T1 and T2 share a capped SKILL.md)`; T3's continues `none — and
+    no longer part of **D1** … the shared-file map is now T1–T2 only`.
+    (i) Reading the code: the grep is unanchored and unscoped, and nothing tests for `none`.
+    (ii) Running it: the parser yields `T2 -> [T1,T2,T1,T2]` and `T3 -> [T1,T2]` against `T1 -> []` and
+    `T4 -> []`. T2 therefore acquires a **self-edge**, which no topological sort can resolve, and T3
+    inherits the unresolvable T2. Live output on the sprint as written:
+    `FAIL cycle-detected: tasks unresolved -> T2 T3`, plus three `PASS shared-file-owned … order=T1->T2`.
+    Against the same file with only the prose stripped to bare `none` and `Layers:` untouched:
+    `PASS wave-computation: T1=0 T2=0 T3=0 T4=0` and three `FAIL shared-file-unowned`.
+  - Impact, and why it is `high` rather than `medium`. **The false HALT is the harmless half** — it is
+    loud, and it merely stops a wave that should have run. **The false PASS is the dangerous half**: the
+    three ownership PASSes were earned off the phantom edge, so a genuine unowned-shared-file condition
+    was reported as owned. That is L-108 verbatim — *a false positive on a substring is a false negative
+    on the contract* — and shared-file ownership is the check standing between a parallel wave and
+    L-042's cross-task staging contamination. A sprint whose `Depends-on:` prose happens to name the
+    right task ids gets a clean bill of health it did not earn, silently.
+  - **A second, independent defect the same run exposed**: the real ordering constraint for those three
+    files is pre-locked in the sprint's `## Decisions` (**D1**, **D2**), which the preflight never reads.
+    So even on a correctly-parsed graph it FAILs files whose order *is* declared — it treats
+    `Depends-on:` as the only ownership source when the sprint model offers two. Fixing the parser alone
+    converts this row's false PASS into a false FAIL; both halves want ruling together.
+  - **Why it is not fixed here.** `dispatch.md` is outside every SPRINT-094 task's `Layers:`, and it is a
+    Tier G consumer-facing guard — ADR-029 requires the full bar (one retained must-FAIL fixture per
+    check, sibling control, seeded-break discrimination proof) plus an outside reviewer, which is a task,
+    not a patch. Found by the coordinator while running the preflight for T2/T3's wave.
+  - **The wave it blocked was dispatched anyway, on a hand-derived graph, and that is recorded rather
+    than hidden**: T2's and T3's `Layers:` were intersected directly and are disjoint (∅), T4 is
+    refs-only and complete, and T1 committed at `4ae0827`, so D1's T1→T2 order is already satisfied. The
+    tool's HALT was overridden on evidence that contradicts it, not waved through.
+  - **Re-file fresh if** the preflight snippet is rewritten for any other reason — the fix belongs with
+    that work. Related: L-108 (match by shape, not substring) · L-042 · **TD-043**, the `TOK` pattern in
+    this very snippet, hardened for exactly this class on the `Layers:` side while `Depends-on:` was
+    left unanchored.
+
 - **TD-130** severity: medium | status: open | created: Sprint-094
   - Summary: **`check-epic-archive.sh`'s checkbox anchors miss `- [X]` (uppercase) and any indented
     checkbox, so a § Closed-when condition written either way is invisible to every direction of the
