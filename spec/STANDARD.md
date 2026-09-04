@@ -1,8 +1,8 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-24
+last_updated: 2026-09-04
 update_trigger: The standard's content changes (bump per spec/CHANGELOG.md)
-version: 0.10.0
+version: 0.11.0
 status: current
 ---
 
@@ -60,6 +60,7 @@ gating → §6.
 | `.gitignore` | git | — | init **safe-scaffold** (write-if-absent; from the §12 boundary rule) | a new generated-artifact class appears | — |
 | `TODO.md` | Dev / AI | 320 soft (ADR-019) | init (lean loop — work is tracked in-repo, not in an external issue tracker) | backlog change · sprint promote/close | §11 prune |
 | `TECH-DEBT.md` | Dev / AI | open rows only | first TD filed | close files TD · promote ages · debt resolved | §11 delete (3 sprints after resolved) |
+| `HANDOFF-LEDGER.md` | Dev / AI | append-only | **create-lazily** — the first handoff taken with **no active sprint to log into** (governance work · a `/triage` pass · a research session); never pre-created empty (§7) | a handoff is taken, resumed, or reconciled — its status moves `live` → `consumed` → `spent` | §11 prune (entries `spent` ≥ 3 sprints) |
 
 **`spec/` — the standard itself, where a repo publishes one:**
 

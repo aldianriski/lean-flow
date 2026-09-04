@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-24
+last_updated: 2026-09-04
 update_trigger: The standard's version changes
 status: current
 ---
@@ -8,6 +8,33 @@ status: current
 # lean-flow standard — Changelog
 
 <!-- Prepend new versions — newest first. Append-only; never edit past blocks. -->
+
+## 0.11.0 — 2026-09-04
+
+**MINOR — §2 registers `HANDOFF-LEDGER.md`, the root-level handoff ledger.** SPRINT-094 T2 shipped a
+tracked handoff status with two homes: an Execution Log `handoff` event where a sprint exists, and this
+ledger for the case where none does — governance work, a `/triage` pass, a research session. The second
+home was created as a working convention and documented inside the shipping skills, but it was never
+registered here, so **no §2 lifecycle applied to it**: no Cap, no Update trigger, no Archive leg, and
+nothing for a reader treating §2 as the authoritative root-file list to find. A root file the standard
+does not know about is exactly the gap §2 exists to close.
+
+**The row is `create-lazily`, and that is what makes this MINOR rather than MAJOR.** §15's test is
+mechanical: *run the previous version's checks and this version's checks over the same unchanged
+repository — does any verdict move from pass to fail?* `S2.F-FILE` fires `core-file-missing` only for
+rows whose create trigger is marked `always`; a lazily-created row is owed by no repository until the
+condition that creates it occurs. Verified in the engine rather than assumed
+(`conformance-engine.sh:1821` names the `always` marker in the finding itself), and confirmed the
+stronger way: `read-spec-rules.sh` over this version emits **100 rows, byte-identical** (`cmp`) to the
+frozen `evals/fixtures/compat/rule-ids-v0.10.0.txt` surface. No rule was added, amended or
+reclassified — only a lifecycle row — so no verdict can move.
+
+**Why it is registered rather than left as a skill-local convention.** The alternative on the table was
+a follow-up task, matching this sprint's precedent for out-of-Layers work (TD-130 · TD-131). The owner
+ruled otherwise, and the ruling is recorded here rather than in a transcript because the ledger's
+lifecycle is the thing an adopter needs and a decision filed where its reader cannot reach it is not a
+decision (L-151).
+
 
 ## 0.10.0 — 2026-08-24
 
