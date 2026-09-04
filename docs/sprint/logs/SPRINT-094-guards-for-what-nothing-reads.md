@@ -791,3 +791,84 @@ to `7e0909c2e626cbe383c093ba0740227466fdd889` == pristine:
 reviewer is being re-dispatched once over this diff, worktree-isolated. No DoD changed state in this
 entry: DoD 3 was already met by the fixtures it names, and these three are additional checks the
 review revealed, not repairs to a tick.
+
+### 2026-09-04 | review | re-review broke the fence fix; owner authorised a second pass over budget
+
+`consequence · T2 · behaviour:material · governance:high` — Tier G. The finding that matters below
+is a **regression this session introduced**, not an inherited defect.
+
+Hash convention unchanged and not mixed: `git hash-object <path>`, content compared with
+`diff --strip-trailing-cr`.
+
+**The re-review confirmed the anchor fix and the tab-squash fix sound, and broke the fence fix — the
+one rule written to close a silent false negative had reintroduced the same class.** Three findings,
+all reproduced here before being accepted:
+
+1. **CRITICAL, and mine.** The fence toggle was a bare parity flip. A fence opened and never closed
+   stayed on to EOF, so `fence { next }` consumed every later handoff entry before it could reach the
+   anchor. A closed sprint whose log quotes a format block without closing it, with a **real
+   outstanding `live` handoff below**, reported `PASS … spent`, **exit 0** — and the real entry
+   appeared *nowhere in the output*. Not misreported: **erased**. Before `9ee8493` an unclosed fence
+   swallowed nothing, so this failure mode did not exist until the fix for Finding 2 created it.
+2. **HIGH.** `~~~` is CommonMark's other fence and the toggle matched only ` ``` `, so the previous
+   round's quoted-stub-format exploit was fully reproducible by swapping the fence character.
+3. **MEDIUM.** The anchor repeated a literal space (`[ ]*`) rather than `[ \t]*`, so a heading using
+   TABs around the keyword still fell through to the generic `^### ` rule — `skip`, exit 0, on a
+   closed sprint with a live handoff. The same class as the previous round's Finding 1, via a
+   different malformed heading, and inconsistent with `clean()` tolerating stray tabs everywhere else.
+
+**The revise loop's one bounded retry was already spent, so this went to the owner rather than being
+taken unilaterally** — an over-budget second pass is a governance decision, and "the finding is
+serious" is exactly the reasoning that would justify never stopping. Owner authorised the extra pass.
+
+**Fixed.** A fence now closes only on its **own** character (a `~~~` line inside a ``` block is
+content, not a terminator), both syntaxes are recognised, and — the part that matters —
+**an unbalanced fence is no longer silent.** At EOF an open fence emits a pathless record, which
+routes into the UNKNOWN branch both loops already have. That is the correct reading rather than a
+special case: a region the parser could not read has an *unknown* status, and this checker's founding
+rule is that UNKNOWN is never assumed `spent`. The finding names its own cause —
+`(<unreadable: a code fence opened here was never closed>) carries UNKNOWN status ('<missing>')` — so
+a regression that merely FAILs for some other reason cannot satisfy the fixture. The anchor now reads
+`\|[ \t]*handoff[ \t]*\|`.
+
+**Three more retained fixtures, one per check (L-058), none self-named (L-108, checked
+programmatically):** `closed-unbalanced-fence` · `closed-tilde-format-block` ·
+`closed-heading-tab-padded`. Suite is now **18 fixtures**, and three independent counts agree —
+18 directories, 18 `run_case_anywhere` calls, 18 cases executed.
+
+**Discrimination, one targeted seed per new guard.** Each landed on `diff --strip-trailing-cr` (never
+`cmp` alone), stayed 205 → 205 lines with one line replaced, parsed under `sh -n`, and restored to
+`30b5d0308559f1ae788dcac3497ad07255a0fa1c` == pristine:
+
+| Seed | Red | Green |
+|---|---|---|
+| unbalanced-fence sentinel disarmed | 1 — `closed-unbalanced-fence` | 17 |
+| fence toggle blind to `~~~` again | 1 — `closed-tilde-format-block` | 17 |
+| anchor intolerant of tabs again | 1 — `closed-heading-tab-padded` | 17 |
+
+**What this round is actually evidence of.** Two consecutive independent passes each found a
+CRITICAL silent false negative in the same 40-line function, and the second one found a defect *the
+first fix created*. Neither was reachable from a green suite, a real discrimination proof, or the
+governing rules — all three were in hand each time. It is the strongest case yet for L-165's claim
+that the author is structurally the wrong person to find these, and a live argument that for a Tier G
+guard **one** review pass is a floor rather than a ceiling: the first pass here would have shipped a
+guard that erases the violation it exists to catch.
+
+**Gate: `219 pass, 1 fail`**, read off the line the gate prints. SPRINT-094's own findings are
+unchanged and both pre-existing — `f717e9a`'s three spec/architecture files and `fa061bc`/`T1`'s
+`TECH-DEBT.md`, attributable to no task. Nothing in this diff moved the count.
+
+**And the gate run itself hit L-120, in the same session that has been quoting it.** Backgrounding it
+as `sh scripts/qa-check.sh 2>&1 | tail -3` captured three lines, so the verdict line survived but
+every FAIL detail was gone, and the harness reported `tail`'s exit code (0) for a run whose gate had
+failed. The verdict was still read from the gate's own printed line rather than from the exit code,
+which is why nothing was concluded wrongly — but the findings had to be re-derived by running
+`check-layers-observed.sh` directly. Piping a gate into `tail` reads as *capturing output*, not as
+*discarding the evidence*, which is precisely why the rule keeps not firing.
+
+**One live-tree observation worth carrying to close:** `check-handoff-state.sh .` currently reports
+`skip (no handoff records under docs/sprint/ or HANDOFF-LEDGER.md)`. That is expected — no `/handoff`
+has been taken since the vocabulary shipped, which is exactly why the `sprint027-real-gap` fixture
+exists (L-166: no historical commit carries a `handoff-status:` field, so the real motivating artifact
+had to be reconstructed). It does mean the guard has not yet fired on live input, and the first real
+`/handoff` after this sprint is what converts it from proven-on-fixtures to proven-in-place.

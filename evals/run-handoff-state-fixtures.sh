@@ -126,6 +126,35 @@ run_case_anywhere "closed-delimiter-inside-value" 1 \
   "closed with a 'live' handoff outstanding (/tmp/foo spent)" -- \
   sh "$checker" "$fx/closed-delimiter-inside-value"
 
+# --- re-review Finding 1: an unbalanced fence must not ERASE what follows ------------------------
+# The first fence fix was a bare parity flip: an opened-and-never-closed fence stayed on to EOF, so
+# every later handoff entry was consumed by `fence { next }` and never reached the anchor at all. A
+# closed sprint with a real outstanding `live` handoff below the fence reported PASS at exit 0, and
+# the entry appeared NOWHERE in the output -- not wrong, erased. That is the silent-false-negative
+# class the fence rule existed to close, reintroduced by the rule itself. An unreadable region is now
+# an UNKNOWN record, which is never assumed spent. The assertion pins the NAMED cause, so a
+# regression that merely FAILs for some other reason cannot satisfy it.
+run_case_anywhere "closed-unbalanced-fence" 1 \
+  "(<unreadable: a code fence opened here was never closed>) carries UNKNOWN status ('<missing>')" -- \
+  sh "$checker" "$fx/closed-unbalanced-fence"
+
+# --- re-review Finding 2: `~~~` is CommonMark's other fence, and bypassed the guard entirely ------
+# Guarding only ``` left the previous round's quoted-stub-format exploit fully reproducible by
+# swapping the fence character. Both syntaxes now count, and a fence closes only on its OWN
+# character. The assertion pins the REAL path, so capturing the tilde-fenced example instead fails.
+run_case_anywhere "closed-tilde-format-block" 1 \
+  "closed with a 'live' handoff outstanding (/tmp/handoff-954-x.md)" -- \
+  sh "$checker" "$fx/closed-tilde-format-block"
+
+# --- re-review Finding 3: literal TABs around the keyword in the heading --------------------------
+# The anchor repeated a literal space (` *`) rather than `[ \t]*`, so `|<TAB>handoff<TAB>|` fell
+# through to the generic `^### ` rule, closed the block, and left a real live handoff unparsed --
+# "skip", exit 0. The same failure class as this round's own Finding 1, via a different malformed
+# heading, and inconsistent with clean()'s tolerance of stray tabs everywhere else in the record.
+run_case_anywhere "closed-heading-tab-padded" 1 \
+  "closed with a 'live' handoff outstanding (/tmp/handoff-955-x.md)" -- \
+  sh "$checker" "$fx/closed-heading-tab-padded"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "HANDOFF-STATE FIXTURES: all green"; else echo "HANDOFF-STATE FIXTURES: at least one FAIL"; fi
 exit $fail

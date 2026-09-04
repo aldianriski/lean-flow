@@ -55,19 +55,26 @@ fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"
 # handoff_records <file> -- "<line>\t<path-or-EMPTY>\t<status-or-EMPTY>" per `handoff` heading block.
 handoff_records() {
   awk '
-    # A fenced block inside a handoff entry is an EXAMPLE, never the record. Without this, an entry
-    # that quotes the stub format as a reminder has the example captured and its REAL fields ignored
-    # (first-occurrence-wins below), so a live handoff reports PASS at exit 0. Toggling first also
-    # means a `### ` line inside a fence cannot close the block.
-    /^[ \t]*```/ { fence = !fence; next }
+    # A fenced block inside a handoff entry is an EXAMPLE, never the record: without this, an entry
+    # quoting the stub format as a reminder has the example captured and its real fields ignored.
+    # BOTH CommonMark fence syntaxes count -- guarding only ``` left `~~~` as a full bypass of this
+    # very rule. A fence is closed only by its OWN character, so a `~~~` line inside a ``` block is
+    # content, not a terminator. Toggling before every other rule also means a `### ` line inside a
+    # fence cannot open or close a handoff entry.
+    /^[ \t]*(```|~~~)/ {
+      m = $0; sub(/^[ \t]*/, "", m); c = substr(m, 1, 1)
+      if (!fence) { fence = 1; fchar = c; fline = NR }
+      else if (c == fchar) { fence = 0 }
+      next
+    }
     fence { next }
-    # `handoff` anchored as the SECOND pipe-delimited field, with NO requirement that a summary
-    # follow it. Requiring a trailing space made a heading whose `[one-line focus]` placeholder was
-    # left blank fall through to the generic `^### ` rule below, which CLOSED the block -- so the
-    # real handoff-status/handoff-path lines under it were never parsed and the file reported
-    # "skip ... no handoff records" at exit 0. `[^|]*` cannot cross the first pipe, so a summary
-    # that merely contains the words `| handoff |` no longer matches either.
-    /^### [^|]*\| *handoff *\|/ {
+    # `handoff` anchored as the SECOND pipe-delimited field, tolerating tabs as well as spaces around
+    # the keyword, and requiring NO summary after it. Demanding a trailing space made a heading whose
+    # `[one-line focus]` placeholder was left blank fall through to the generic `^### ` rule below,
+    # which CLOSED the block -- so its real fields were never parsed and the file reported "skip" at
+    # exit 0. `[^|]*` cannot cross the first pipe, so a summary that merely CONTAINS `| handoff |`
+    # still does not match.
+    /^### [^|]*\|[ \t]*handoff[ \t]*\|/ {
       if (inb) { flush() }
       inb = 1; ln = NR; path = ""; status = ""; next
     }
@@ -80,12 +87,20 @@ handoff_records() {
       if (path == "") { path = clean($0, "handoff-path") }
       next
     }
-    END { if (inb) { flush() } }
-    # Strip the key, trim the ends, and squash any INTERIOR tab to a space. TAB is this format own
+    END {
+      if (inb) { flush() }
+      # An unbalanced fence swallowed everything after it, so any handoff entry below is invisible --
+      # and invisible is the one outcome a guard may never report as clean. Emitting a pathless record
+      # routes it into the UNKNOWN branch both callers already have, which FAILs and is never assumed
+      # spent. That is the correct reading: a region the parser could not read has an unknown status.
+      if (fence) { printf "%d\t<unreadable: a code fence opened here was never closed>\t\n", fline }
+    }
+    # Strip the key, trim the ends, then squash any INTERIOR tab to a space. TAB is this format own
     # record delimiter, so a tab inside a value made flush() emit four fields; resolve_latest reads
     # only $1..$3 and would take the path tail-fragment as the status -- a path ending `<tab>spent`
-    # turned a live handoff into `PASS ... spent` at exit 0. Squashing keeps the record intact and
-    # the status truthful; the displayed path is off by one character, which is the safe direction.
+    # turned a live handoff into `PASS ... spent` at exit 0. Squashing keeps the record intact and the
+    # status truthful; a squashed status like `live spent` fails status_valid and reports UNKNOWN,
+    # which is the safe direction.
     function clean(line, key,   s) {
       s = line; sub("^" key ":[ \t]*", "", s); gsub(/[ \t]+$/, "", s); gsub(/\t/, " ", s); return s
     }
