@@ -98,6 +98,34 @@ run_case_anywhere "sprint027-real-gap" 1 \
   "(%TEMP%/handoff-stall-exercise.md) carries UNKNOWN status ('<missing>')" -- \
   sh "$checker" "$fx/sprint027-real-gap"
 
+# --- independent review, Finding 1: a heading whose summary placeholder was left blank ------------
+# `### <date> | handoff |` with nothing after the second pipe used to fail the block anchor and fall
+# through to the generic `^### ` rule, which CLOSED the block -- so the real handoff-status and
+# handoff-path lines directly beneath it were never parsed, and a closed sprint with a `live`
+# handoff outstanding reported "skip (no handoff records)" at exit 0. A silent false negative
+# reachable by forgetting to fill in a bracketed placeholder.
+run_case_anywhere "closed-heading-without-summary" 1 \
+  "closed with a 'live' handoff outstanding (/tmp/handoff-940-x.md)" -- \
+  sh "$checker" "$fx/closed-heading-without-summary"
+
+# --- independent review, Finding 2: a fenced example inside the entry, quoted as a reminder -------
+# Field capture is first-occurrence-wins and had no fence awareness, so an entry that quoted the
+# stub format above its real fields captured the EXAMPLE (`spent`, /tmp/example-format.md) and
+# ignored the real `live` record below it -- PASS at exit 0. The assertion pins the REAL path, so a
+# regression that re-reads the example cannot satisfy it.
+run_case_anywhere "closed-quoted-format-block" 1 \
+  "closed with a 'live' handoff outstanding (/tmp/handoff-941-x.md)" -- \
+  sh "$checker" "$fx/closed-quoted-format-block"
+
+# --- independent review, Finding 3: a literal TAB byte inside a handoff-path value ----------------
+# TAB is this record format's own delimiter. An unescaped tab in a path made the emitter print FOUR
+# fields; `resolve_latest` reads only $1..$3, so the path's tail fragment was taken as the status --
+# a path ending `<tab>spent` turned a live handoff into `PASS ... spent` at exit 0. The assertion
+# pins BOTH halves: the status stays `live`, and the fragment stays part of the path.
+run_case_anywhere "closed-delimiter-inside-value" 1 \
+  "closed with a 'live' handoff outstanding (/tmp/foo spent)" -- \
+  sh "$checker" "$fx/closed-delimiter-inside-value"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "HANDOFF-STATE FIXTURES: all green"; else echo "HANDOFF-STATE FIXTURES: at least one FAIL"; fi
 exit $fail

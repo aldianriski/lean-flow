@@ -55,20 +55,40 @@ fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"
 # handoff_records <file> -- "<line>\t<path-or-EMPTY>\t<status-or-EMPTY>" per `handoff` heading block.
 handoff_records() {
   awk '
-    /^### .* \| handoff \| / {
+    # A fenced block inside a handoff entry is an EXAMPLE, never the record. Without this, an entry
+    # that quotes the stub format as a reminder has the example captured and its REAL fields ignored
+    # (first-occurrence-wins below), so a live handoff reports PASS at exit 0. Toggling first also
+    # means a `### ` line inside a fence cannot close the block.
+    /^[ \t]*```/ { fence = !fence; next }
+    fence { next }
+    # `handoff` anchored as the SECOND pipe-delimited field, with NO requirement that a summary
+    # follow it. Requiring a trailing space made a heading whose `[one-line focus]` placeholder was
+    # left blank fall through to the generic `^### ` rule below, which CLOSED the block -- so the
+    # real handoff-status/handoff-path lines under it were never parsed and the file reported
+    # "skip ... no handoff records" at exit 0. `[^|]*` cannot cross the first pipe, so a summary
+    # that merely contains the words `| handoff |` no longer matches either.
+    /^### [^|]*\| *handoff *\|/ {
       if (inb) { flush() }
       inb = 1; ln = NR; path = ""; status = ""; next
     }
     /^### / { if (inb) { flush() }; inb = 0; next }
     inb && /^handoff-status:[ \t]*/ {
-      if (status == "") { s = $0; sub(/^handoff-status:[ \t]*/, "", s); gsub(/[ \t]+$/, "", s); status = s }
+      if (status == "") { status = clean($0, "handoff-status") }
       next
     }
     inb && /^handoff-path:[ \t]*/ {
-      if (path == "") { s = $0; sub(/^handoff-path:[ \t]*/, "", s); gsub(/[ \t]+$/, "", s); path = s }
+      if (path == "") { path = clean($0, "handoff-path") }
       next
     }
     END { if (inb) { flush() } }
+    # Strip the key, trim the ends, and squash any INTERIOR tab to a space. TAB is this format own
+    # record delimiter, so a tab inside a value made flush() emit four fields; resolve_latest reads
+    # only $1..$3 and would take the path tail-fragment as the status -- a path ending `<tab>spent`
+    # turned a live handoff into `PASS ... spent` at exit 0. Squashing keeps the record intact and
+    # the status truthful; the displayed path is off by one character, which is the safe direction.
+    function clean(line, key,   s) {
+      s = line; sub("^" key ":[ \t]*", "", s); gsub(/[ \t]+$/, "", s); gsub(/\t/, " ", s); return s
+    }
     function flush() { printf "%d\t%s\t%s\n", ln, path, status }
   ' "$1"
 }

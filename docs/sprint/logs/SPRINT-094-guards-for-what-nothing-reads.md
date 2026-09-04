@@ -728,3 +728,66 @@ outside worktree-isolated reviewer is dispatched over this diff (owner-authorise
 session's default of not spawning agents). Its findings, if any, land in the next entry.
 
 **22 of 23 DoD ticked.** The one open box is the owner-action archiving ruling, not a T1–T4 DoD.
+
+### 2026-09-04 | review | outside reviewer confirmed all 5 claims and found 3 silent false negatives; bounded retry applied
+
+`consequence · T2 · behaviour:material · governance:high` — Tier G. Every finding below is a
+guard exiting **0** on a real violation, which is the only failure class that matters for a gate.
+
+Hash convention unchanged from the previous entry and not mixed: `git hash-object <path>`, content
+compared with `diff --strip-trailing-cr`.
+
+**The review's verdict on what it was asked to check: all five claims CONFIRMED.** `split_rec`
+preserves an empty field in every position (attacked with empty path, empty status, both empty,
+spaces, a literal backslash, a 400-char path, a trailing tab) · the 15 assertions do catch a
+field-swap regression, proven by re-seeding the exact pre-fix defect one loop at a time · the new
+ledger fixture does uniquely reach the ledger loop's empty-path branch (sprint-only seed reddens only
+the sprint case, ledger-only seed only the ledger case) · no fixture is named after a token its own
+assertion greps for · the template leaks nothing and reads standalone.
+
+**And on its own hunt it found three defects none of my own work would have surfaced.** This is
+L-165 landing exactly as written: the governing rule was loaded and on screen the whole session, the
+suite was green, the discrimination proof was real — and the defects were still there. All three
+reproduced independently here before being accepted, and all three are the *same* shape as the
+sprint's theme: a guard that cannot see its subject does not go red, it goes quiet.
+
+| # | Input | Was | Root cause |
+|---|---|---|---|
+| 1 | `### <date> \| handoff \|` with the `[one-line focus]` placeholder left blank | `skip (no handoff records)`, **exit 0** | the block anchor required a trailing space, so the heading fell through to the generic `^### ` rule, which CLOSED the block — the real status/path lines beneath it were never parsed |
+| 2 | an entry quoting the stub format in a fenced block above its real fields | `PASS … spent at /tmp/example-format.md`, **exit 0** | field capture is first-occurrence-wins with no fence awareness, so the EXAMPLE was captured and the real `live` record ignored |
+| 3 | a literal TAB byte inside a `handoff-path` value | `PASS … spent at /tmp/foo`, **exit 0** | TAB is the record format's own delimiter; an unescaped tab made the emitter print four fields, and `resolve_latest` reads only `$1..$3`, taking the path's tail fragment as the status |
+
+Finding 1 needs nothing adversarial — forgetting to fill in a bracketed placeholder is enough.
+Finding 2 is a realistic authoring habit (quoting the format as a reminder). Finding 3 is the
+original bug's own root cause — TAB doing double duty as delimiter and field content — surfacing one
+function *upstream* of the part that had been fixed.
+
+**Fixed at the root in `handoff_records`, one change per finding:** the anchor now pins `handoff` as
+the second pipe-delimited field with no trailing-summary requirement (`^### [^|]*\| *handoff *\|`,
+which also stops a summary merely *containing* `| handoff |` from matching) · a fence toggle runs
+before every other rule, so an example block is skipped entirely and a `###` inside a fence cannot
+close the entry · a shared `clean()` squashes any interior tab to a space, keeping the record intact
+and the status truthful rather than letting a path fragment impersonate it.
+
+**Three retained fixtures, one per check (L-058), each named so its own assertion cannot satisfy it
+(L-108):** `closed-heading-without-summary` · `closed-quoted-format-block` ·
+`closed-delimiter-inside-value`. Each asserts the finding's real VALUES — fixture 2 pins the real
+path so a regression that re-reads the example cannot pass, and fixture 3 pins both halves (status
+stays `live`, the fragment stays inside the path).
+
+**Discrimination proof, one targeted seed per new guard.** Each landed (`diff --strip-trailing-cr`,
+never `cmp` alone), stayed 190 → 190 lines with one line replaced, parsed under `sh -n`, and restored
+to `7e0909c2e626cbe383c093ba0740227466fdd889` == pristine:
+
+| Seed | Red | Green |
+|---|---|---|
+| anchor requires a trailing summary again | 1 — `closed-heading-without-summary` | 14 |
+| fence toggle no longer matches backtick fences | 1 — `closed-quoted-format-block` | 14 |
+| interior-tab squash removed | 1 — `closed-delimiter-inside-value` | 14 |
+
+15 fixtures, all green, no regression on the 12 that existed before this round.
+
+**This is the one bounded builder retry the revise loop allows** (attended mode, one per pass). The
+reviewer is being re-dispatched once over this diff, worktree-isolated. No DoD changed state in this
+entry: DoD 3 was already met by the fixtures it names, and these three are additional checks the
+review revealed, not repairs to a tick.
