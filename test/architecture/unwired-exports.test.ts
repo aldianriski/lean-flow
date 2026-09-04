@@ -1,4 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import { execFileSync } from "node:child_process";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   checkUnwired,
@@ -7,6 +10,8 @@ import {
   exportedSymbolsOf,
   importedBindingsOf,
   isTestAdjacent,
+  readSourcesAtCommit,
+  readSourcesFromDisk,
   resolveSpecifier,
 } from "./unwired-exports.ts";
 
@@ -38,6 +43,48 @@ describe("unwired-exports — one must-FAIL fixture, its own finding, plus a sib
     const r = checkUnwired(join(FIXTURES, "mixed"));
     expect(r.filesExamined).toBeGreaterThan(0);
     expect(r.symbolsExamined).toBeGreaterThan(0);
+  });
+});
+
+describe("unwired-exports — review Finding 1 bullet 1: declare-then-brace export (`export { a, b as c }`)", () => {
+  // Retained (TD-012). EXPORT_RE alone (function/const/class declarations) never matched this form --
+  // `exportedSymbolsOf` returned [] and `symbolsExamined: 0` for a file using only this shape, a true
+  // silent pass indistinguishable from "nothing to report" (the reviewer's HIGH finding).
+  test("MUST-FAIL: a declare-then-brace-exported symbol with zero callers is reported", () => {
+    // Filtered to the fixture's OWN subject, same idiom as the "mixed" fixture's first test above:
+    // apps/cli/src/main.ts's own `run` export is itself unwired in this minimal fixture (nothing
+    // imports the CLI entry point) -- expected and irrelevant noise, not part of what this case proves.
+    const r = checkUnwired(join(FIXTURES, "brace-export"));
+    const forOrphan = r.findings.filter((f) => f.symbol === "orphanBrace");
+    expect(forOrphan).toEqual([
+      { finding: "unwired-export", symbol: "orphanBrace", file: "packages/standard/src/brace.ts" },
+    ]);
+  });
+
+  test("CONTROL: the ALIASED sibling (`usedBrace as renamedUsed`) stays green — matched on the PUBLIC name", () => {
+    const r = checkUnwired(join(FIXTURES, "brace-export"));
+    expect(r.findings.some((f) => f.symbol === "renamedUsed" || f.symbol === "usedBrace")).toBe(false);
+  });
+});
+
+describe("unwired-exports — review Finding 1 bullet 2: default export (`export default function/class`)", () => {
+  // Retained (TD-012). The FIRST implementation captured `export default function NAME(){}` under its
+  // LOCAL name via EXPORT_RE's optional `default` group -- semantically wrong (a default export is
+  // never reachable as `import { NAME }`) and, for an ANONYMOUS default, matched nothing at all.
+  test("MUST-FAIL: an unwired default export is reported under the fixed symbol \"default\"", () => {
+    // Filtered to the fixture's OWN subject file -- apps/cli/src/main.ts's own `run` export is itself
+    // unwired in this minimal fixture (nothing imports the CLI entry point), same as the sibling
+    // describe block above.
+    const r = checkUnwired(join(FIXTURES, "default-export"));
+    const forOrphan = r.findings.filter((f) => f.file === "packages/standard/src/orphan-default.ts");
+    expect(forOrphan).toEqual([
+      { finding: "unwired-export", symbol: "default", file: "packages/standard/src/orphan-default.ts" },
+    ]);
+  });
+
+  test("CONTROL: the sibling default export, imported under an ARBITRARY local name, stays green", () => {
+    const r = checkUnwired(join(FIXTURES, "default-export"));
+    expect(r.findings.some((f) => f.file === "packages/standard/src/used-default.ts")).toBe(false);
   });
 });
 
@@ -199,5 +246,104 @@ describe("unwired-exports — shape, not substring: export/import parsing", () =
     // must not rely on that staying true by luck — L-108's shape-not-substring principle applies to
     // the DEFENDER, not only the attacker: exclude the edge type, don't hope it never occurs.
     expect(resolveSpecifier("packages/standard/src/x.ts", "./x.ts")).toBe("packages/standard/src/x.ts");
+  });
+});
+
+describe("unwired-exports — review Finding 1: unit-level parsing of the two newly covered forms", () => {
+  test("a bare export list resolves each member to its PUBLIC (post-`as`) name", () => {
+    expect(exportedSymbolsOf("export { orphan, real as renamed };")).toEqual(["orphan", "renamed"]);
+  });
+
+  test("`export { x as default }` correctly lands on the fixed symbol \"default\"", () => {
+    expect(exportedSymbolsOf("export { real as default };")).toEqual(["default"]);
+  });
+
+  test("MUST-FAIL: `export type { X }` (the WHOLE clause) produces zero symbols — nothing 'calls' a type", () => {
+    expect(exportedSymbolsOf("export type { X };\nexport { real };")).toEqual(["real"]);
+  });
+
+  test("an inline `{ type X, real }` member is excluded while its sibling is kept", () => {
+    expect(exportedSymbolsOf("export { type X, real };")).toEqual(["real"]);
+  });
+
+  test("a re-export (`export { x } from \"./y\"`) is NOT treated as a local export list", () => {
+    // Distinct from the declare-then-brace form: this file does not OWN x, it forwards another
+    // module's export. Finding 3 (barrels as caller edges) is filed as debt, not fixed here — but
+    // this checker must not mis-file a re-export as if it introduced a new local symbol either.
+    expect(exportedSymbolsOf('export { x } from "./y.ts";')).toEqual([]);
+  });
+
+  test("export default function / class, named and anonymous, all resolve to \"default\"", () => {
+    expect(exportedSymbolsOf("export default function Widget() {}")).toEqual(["default"]);
+    expect(exportedSymbolsOf("export default function () {}")).toEqual(["default"]);
+    expect(exportedSymbolsOf("export default class Widget {}")).toEqual(["default"]);
+    expect(exportedSymbolsOf("export default class {}")).toEqual(["default"]);
+  });
+
+  test("a default export does not swallow a REAL sibling export in the same file", () => {
+    expect(exportedSymbolsOf("export default class {}\nexport function real() {}\n").sort())
+      .toEqual(["default", "real"]);
+  });
+
+  test("`export * from \"./x\"` introduces no symbol of its own, and does not swallow a sibling export", () => {
+    // A wildcard re-export forwards an unenumerable set of names from ANOTHER module -- it has no
+    // name of its own for exportedSymbolsOf to report (see the file header's stated judgment call).
+    // What it must not do is misparse or eat a real export on the same file.
+    expect(exportedSymbolsOf('export * from "./other.ts";\nexport function real() { return 1; }\n'))
+      .toEqual(["real"]);
+  });
+
+  test("a bare default import resolves to a binding named \"default\", regardless of local name", () => {
+    expect(importedBindingsOf('import Widget from "./widget.ts";'))
+      .toEqual([{ name: "default", specifier: "./widget.ts" }]);
+    expect(importedBindingsOf('import AnythingAtAll from "./widget.ts";'))
+      .toEqual([{ name: "default", specifier: "./widget.ts" }]);
+  });
+
+  test("a combined default + named import produces BOTH bindings", () => {
+    expect(importedBindingsOf('import Widget, { helper } from "./widget.ts";').sort((a, b) => a.name.localeCompare(b.name)))
+      .toEqual([
+        { name: "default", specifier: "./widget.ts" },
+        { name: "helper", specifier: "./widget.ts" },
+      ]);
+  });
+
+  test("MUST-FAIL: `import type Widget from \"./x\"` (a type-only default) produces zero bindings", () => {
+    expect(importedBindingsOf('import type Widget from "./widget.ts";')).toEqual([]);
+  });
+
+  test("a namespace import (`import * as ns from`) is deliberately NOT covered (Finding 3/4, out of scope)", () => {
+    expect(importedBindingsOf('import * as ns from "./widget.ts";')).toEqual([]);
+  });
+});
+
+describe("unwired-exports — review Finding 2: the disk reader and the commit reader agree on the same tree", () => {
+  // Reproduced by the reviewer against a scratch git repo with a directory literally named `fixtures`
+  // nested under `packages/`: readSourcesFromDisk's walker used to skip it (copied from layers.ts,
+  // where this repo's OWN fixtures happen to live under a `fixtures/` path) while
+  // readSourcesAtCommit had no such filter -- disk saw 1 file, commit saw 2, for the SAME tree. Fixed
+  // by dropping the exclusion; this test targets that exact shape so a future re-introduction reddens.
+  test("MUST-FAIL (pre-fix shape): a directory literally named `fixtures` under packages/ is seen by BOTH readers identically", () => {
+    const dir = mkdtempSync(join(tmpdir(), "unwired-reader-agree-"));
+    mkdirSync(join(dir, "packages", "standard", "src", "fixtures"), { recursive: true });
+    writeFileSync(join(dir, "packages", "standard", "src", "real.ts"), "export function real() { return 1; }\n");
+    writeFileSync(
+      join(dir, "packages", "standard", "src", "fixtures", "example.ts"),
+      "export function nested() { return 2; }\n",
+    );
+    execFileSync("git", ["-C", dir, "init", "-q"]);
+    execFileSync("git", ["-C", dir, "config", "user.email", "fx@example.invalid"]);
+    execFileSync("git", ["-C", dir, "config", "user.name", "Fixture"]);
+    execFileSync("git", ["-C", dir, "add", "-A"]);
+    execFileSync("git", ["-C", dir, "commit", "-q", "-m", "snapshot"]);
+
+    const diskPaths = readSourcesFromDisk(dir).map((f) => f.path).sort();
+    const commitPaths = readSourcesAtCommit(dir, "HEAD").map((f) => f.path).sort();
+
+    expect(diskPaths).toEqual([
+      "packages/standard/src/fixtures/example.ts",
+      "packages/standard/src/real.ts",
+    ]);
+    expect(commitPaths).toEqual(diskPaths);
   });
 });
