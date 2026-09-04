@@ -75,19 +75,19 @@ handoff_records() {
     # been seen. That is the whole of it, and it matches the shape the shipped template prescribes.
     /^### [^|]*\|[ \t]*handoff[ \t]*\|/ {
       if (inb) { flush() }
-      inb = 1; ln = NR; path = ""; status = ""; next
+      inb = 1; ln = NR; path = ""; status = ""; sseen = 0; pseen = 0; next
     }
     inb && /^[ \t]*$/ { next }
     inb && /^handoff-status:[ \t]*/ {
-      if (status != "") { flush(); inb = 0; next }   # repeated field: malformed, never guess
-      status = clean($0, "handoff-status")
-      if (path != "") { flush(); inb = 0 }           # both fields read -- record complete
+      if (sseen) { flush(); inb = 0; next }          # repeated field: malformed, never guess
+      sseen = 1; status = clean($0, "handoff-status")
+      if (pseen) { flush(); inb = 0 }                # both fields SEEN -- record complete
       next
     }
     inb && /^handoff-path:[ \t]*/ {
-      if (path != "") { flush(); inb = 0; next }
-      path = clean($0, "handoff-path")
-      if (status != "") { flush(); inb = 0 }
+      if (pseen) { flush(); inb = 0; next }
+      pseen = 1; path = clean($0, "handoff-path")
+      if (sseen) { flush(); inb = 0 }
       next
     }
     inb { flush(); inb = 0; next }                   # anything else: the record ends here, incomplete

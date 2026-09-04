@@ -951,3 +951,64 @@ three "landed".
 than through `tail` (the previous entry records why). SPRINT-094's own findings are unchanged and both
 pre-existing: `f717e9a`'s three spec/architecture files, attributable to no task, and `T1:TECH-DEBT.md`.
 The count has not moved across any of the four commits this session.
+
+### 2026-09-04 | review | round 4: no CRITICAL, design validated, one MEDIUM closed
+
+`consequence · T2 · behaviour:material · governance:high` — Tier G. First round in four that found
+no CRITICAL. Hash convention unchanged: `git hash-object <path>`; `diff --strip-trailing-cr`.
+
+**The structural verdict is satisfied.** The reviewer independently enumerated the state space,
+confirmed it is `(inb) × (status seen?) × (path seen?)` with the "both seen while open" cell provably
+unreachable, and re-verified both round-3 CRITICALs closed end-to-end against the real commit. Its
+words: *"this is no longer 'the design is wrong' … I'd ship this design once Finding 1 is closed."*
+
+**Finding 1 (MEDIUM) — "seen" is not the same question as "non-empty", and the code asked the wrong
+one.** Both repeat guards used `status != ""` / `path != ""` as their already-seen flag, which
+conflates a field never written with one written *empty*. A first `handoff-status:` with no value left
+the flag unset, so a later, differently-valued occurrence was accepted as if it were the first — no
+malformed-repeat, no UNKNOWN, and a genuinely unresolved handoff reported a confident `spent` at
+exit 0. One extra typo past the case the existing fixtures covered. The state space really did have
+one more bit than the code modelled. Fixed with explicit `sseen`/`pseen`; both branches carry the bug
+independently, so both carry a fixture: `closed-empty-then-repeated-field` ·
+`closed-empty-then-repeated-path`. Suite is **25 fixtures**, three counts agreeing.
+
+**A methodological finding about the seeded-break bar itself, and it cost two wasted seeds to see.**
+The single-line seeds for these two guards reddened **nothing** — and the fixtures are genuinely
+guarded. The defect requires *two* coupled checks to be value-based at once (the field rule's repeat
+guard AND the other rule's completion test); revert either alone and the record still closes correctly
+at the second field, so no single-line revert can reproduce it. The seed was too small, not the
+fixture too weak.
+
+So: **L-142's "one line, line count within one of pristine" is a heuristic for TARGETING, not a
+definition of a valid seed.** The real bar is *the minimal edit that reproduces the defect, still not a
+demolition* — here two of 202 lines, line count unchanged, both replacements identical in kind. What
+told me the first seed was worthless was not the line count, the hash, or `cmp`, but the rule that **a
+landed, targeted seed reddening nothing has tested nothing**. That check has now fired five times this
+session: twice on semantically inert edits, once on a genuinely untested branch, and twice here on
+seeds that were simply too small to reach the defect. It is the only one of the guards that has caught
+anything.
+
+Re-seeded correctly, each reddens exactly its own fixture — 1 red / 24 green, 202 → 202 lines, two
+lines replaced, `sh -n` clean, restored byte-identical.
+
+**Finding 2 (informational) — the false-positive cost is real, demonstrated, and currently dormant.**
+Nothing is skipped, so a fenced block containing a complete, correctly-shaped example record is now
+read as real. The reviewer swept all 48 `docs/sprint/**/logs/SPRINT-*.md` and found **zero** current
+matches; templates are out of scope by construction, since the checker's glob never reads that
+directory. The named forward risk is this sprint's own log, which narrates these bugs — checked
+directly: no line in it is heading-shaped, and `check-handoff-state.sh .` reports a clean skip. The
+authoring convention this implies (never write a literal `### <date> | handoff | …` heading followed by
+two field lines when illustrating the format) belongs in the close Retro, not in more parser code.
+
+**Finding 3 (informational) — the fixture count overstates independent coverage, and now says so.**
+`closed-quoted-format-block`, `closed-tilde-format-block` and `closed-nested-fence-example` assert the
+same finding shape and exercise the same rule; disabling that one rule reddens all three at once and
+no single-line seed separates them. They are ONE independent check wearing three names. Retained
+deliberately — each is the recorded reproduction of a distinct real CRITICAL from rounds 2 and 3, and
+deleting a reproduction along with the mechanism that motivated it is exactly TD-012 — but the harness
+now carries a header saying so, so the count is read as regression history rather than as a count of
+independent checks. An honest census beats a flattering one.
+
+**Gate: `219 pass, 1 fail`**, off the gate's own printed line. SPRINT-094's findings unchanged and
+both pre-existing (`f717e9a`'s spec/architecture files · `T1:TECH-DEBT.md`). The count has not moved
+across any of the five commits this session.

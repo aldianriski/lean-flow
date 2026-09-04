@@ -108,6 +108,15 @@ run_case_anywhere "closed-heading-without-summary" 1 \
   "closed with a 'live' handoff outstanding (/tmp/handoff-940-x.md)" -- \
   sh "$checker" "$fx/closed-heading-without-summary"
 
+# === THE NEXT THREE FIXTURES SHARE ONE CODE PATH, AND THE COUNT SHOULD NOT SAY OTHERWISE =========
+# closed-quoted-format-block, closed-tilde-format-block and closed-nested-fence-example all assert
+# the same finding shape and all exercise the same rule: the catch-all firing on the first non-blank
+# line after the heading. Disabling that one rule reddens all three at once, and no single-line seed
+# can separate them -- so they are ONE independent check wearing three names. They are retained
+# anyway, deliberately: each is the recorded reproduction of a distinct real CRITICAL from rounds 2
+# and 3, and deleting a reproduction with the mechanism that motivated it is exactly TD-012. Read the
+# fixture count as regression history, never as a count of independent checks.
+
 # --- review round 1, Finding 2: a quoted stub format standing between a heading and its fields ----
 # Field capture was first-occurrence-wins, so an entry that quoted the format as a reminder had the
 # EXAMPLE captured as the record and its real `live` fields ignored -- PASS at exit 0. Two further
@@ -208,6 +217,23 @@ run_case_anywhere "closed-repeated-status-field" 1 \
 run_case_anywhere "closed-repeated-path-field" 1 \
   "(/tmp/stale-958.md) carries UNKNOWN status ('<missing>')" -- \
   sh "$checker" "$fx/closed-repeated-path-field"
+
+# --- round 4, Finding 1: "seen" is not the same question as "non-empty" --------------------------
+# The repeat guards originally used `status != ""` as their already-seen flag, which conflates a
+# field never written with one written EMPTY. So a first `handoff-status:` with no value left the
+# flag unset, and a later, differently-valued occurrence was accepted as if it were the first --
+# no malformed-repeat, no UNKNOWN, and a genuinely unresolved handoff reported a confident `spent`
+# at exit 0. One extra typo past the case the earlier fixtures cover. The state space really did
+# have one more bit than the code modelled; `sseen`/`pseen` now track it explicitly.
+run_case_anywhere "closed-empty-then-repeated-field" 1 \
+  "(/tmp/handoff-970-x.md) carries UNKNOWN status ('<missing>')" -- \
+  sh "$checker" "$fx/closed-empty-then-repeated-field"
+
+# The path branch carries the identical bug independently, so it carries its own fixture. Pinned to
+# its own log file, because the finding shape alone is shared with closed-unknown-missing-path.
+run_case_anywhere "closed-empty-then-repeated-path" 1 \
+  "SPRINT-971-x.md handoff at line 9 (<no handoff-path recorded>) carries UNKNOWN status ('live')" -- \
+  sh "$checker" "$fx/closed-empty-then-repeated-path"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "HANDOFF-STATE FIXTURES: all green"; else echo "HANDOFF-STATE FIXTURES: at least one FAIL"; fi
