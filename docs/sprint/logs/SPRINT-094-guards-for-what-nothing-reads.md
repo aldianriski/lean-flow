@@ -623,3 +623,108 @@ reached) **compounded by `BUDGET_STOP`** (the rate limit resets 04:10 Asia/Jakar
 ticked.** Open: T2 DoD 3 · T2 DoD 5 · T3 DoD 4 — each with a named, reproduced cause and a written fix.
 **The sprint is NOT closeable**: three DoD open, and system-verify has no trustworthy verdict while
 TD-135 stands.
+
+### 2026-09-04 | progress | T2 and T3 — the three held-open DoD closed on evidence
+
+`consequence · T2 · behaviour:material · governance:high` — Tier G: the checker's own finding text is
+the thing a reviewer acts on, and it was wrong.
+`consequence · T3 · behaviour:none · governance:high` — Tier G evidence only; no artifact changed
+(`test/architecture/unwired-exports.ts` ends this entry at the same `git hash-object` it started at,
+`29750aa1b26a91596c92d3bed7f59a0ec0dd398e`).
+
+**Hash convention for this entire entry, stated once and not mixed (L-169):** every hash is
+`git hash-object <path>`, which hashes the blob git would store and so reproduces on a CRLF checkout.
+Every content comparison is `diff --strip-trailing-cr`. No raw working-file hash appears below. The
+second half of that convention turned out to be load-bearing — see the false seed under T3.
+
+**T2 DoD 3 — root cause, and why 11 green fixtures never saw it.** `IFS='<tab>' read -r ln path status`
+in *both* read loops. TAB is IFS **whitespace** in POSIX, so a record with an empty path (`9\t\tlive`)
+has its `\t\t` collapsed to a single delimiter and every later field shifts one slot left: the finding
+printed `(live) … UNKNOWN status ('<missing>')` where the truth was `(<no handoff-path recorded>) …
+UNKNOWN status ('live')`. Right verdict, wrong named finding — the one thing a must-FAIL fixture exists
+to rule out (L-058). The fixtures could not see it because they matched the *phrase*
+(`"carries UNKNOWN status"`) and never the *values*: L-108's shape-not-substring rule applied to the
+test's own assertion rather than to the checker's regex.
+
+Fixed by dropping IFS field-splitting entirely — one `split_rec` helper both loops share, splitting by
+explicit parameter expansion so an empty field stays empty. Chosen at G2 over switching to a
+non-whitespace delimiter (`\037`): both work, but the delimiter fix is correct only by way of a POSIX
+rule the reader has to already know, and this is guard code.
+
+**The harness now pins values, and one fixture was missing.** All 11 assertions carry the finding's
+actual field values. A 12th fixture, `ledger-unknown-missing-path`, was added: the sprint-side loop and
+the ledger loop are *separate* `read` loops over the same record shape, every existing ledger fixture
+happened to carry a path, so the ledger's empty-path branch was unexercised — L-166's "the branch
+works, but is it reachable" one level down. It carries `consumed`, not `live`, so its finding cannot be
+satisfied by the sprint-side case.
+
+**Discrimination proof, two seeds.** (1) The **real defect** restored verbatim (`724ca9cf…`, `cmp`
+identical to pristine, `sh -n` parses): **exactly the 2 empty-path cases redden, 10 sibling controls
+stay green** — and both redden as *"exit matched but finding missing"*, i.e. the verdict was right and
+only the named finding wrong, which is precisely the defect class. (2) A **one-line targeted** seed
+(loop 1 alone loses its empty-path display default; 170 → 170 lines, 1 line replaced, parses):
+**exactly 1 case reddens, and its loop-2 sibling stays green** — direct evidence that the new 12th
+fixture guards a branch the other 11 never reached. Restored to
+`d9f17070d74fe7c60fafb8400bc8ac9a0d09b883` == pre-seed, `cmp` byte-identical, suite green.
+
+**T2 DoD 5 — the leak, and the consumer trace.** `sprint-log.md.template:33` carried
+`checked by scripts/lib/check-handoff-state.sh` — a path that resolves in *this* repo and in no
+consumer's, inside one of the 33 templates every consumer receives (introduced by this task's own
+`8caefca`, so it is this task's mess to clean). Replaced with the reason the entry exists, which is
+what a consumer actually needs. The sweep now reports **zero** `scripts/` or `evals/` references across
+all 35 templates, and zero in `handoff/SKILL.md`, `prime/SKILL.md` and `handoff-reconciliation.md`.
+
+Consumer path traced end-to-end rather than inferred from our dogfooding (L-015 · L-016), and it needs
+no script at all: **write** — `handoff/SKILL.md` steps 1–3 inline the two-field shape and route it to
+the sprint's Execution Log, or to root `HANDOFF-LEDGER.md` when no sprint pointer exists · **read** —
+`prime/SKILL.md` § Handoff status reports the latest entry, read-only · **reconcile** —
+`lean-doc-generator` close sweeps every entry not `spent`, routes each item to a durable home and
+appends a `spent` entry. `check-handoff-state.sh` is lean-flow's own gate leg over that vocabulary,
+never the mechanism — which is exactly why the template must not name it.
+
+**Out of scope, mentioned not touched:** nine `scripts/…` references remain under
+`skills/orchestrator/` (`SKILL.md` · `dispatch.md` · `night-run.md` · `review-scoping.md`). All four
+files predate `plan_commit` and sit outside T2's `Layers:`.
+
+**T3 DoD 4 — three seeds, each targeted, each restored.** No artifact changed; this DoD was always an
+evidence debt. Against `test/architecture/unwired-exports.ts` (`29750aa1…`, 340 lines, 39 tests green):
+
+| Seed (one line each) | Red | Green | What it discriminates |
+|---|---|---|---|
+| S1 — `.fake.ts` dropped from `TEST_SUFFIXES` | 2 | 37 | both test-adjacency cases, nothing else |
+| S2 — `EXPORT_DEFAULT_RE` stops matching `export default` | 3 | 36 | the 3 default-export cases; the *arbitrary-local-name* CONTROL stays green |
+| S3 — self-import edge no longer excluded | 1 | 38 | only the self-import must-FAIL |
+
+Each: landed, targeted (340 → 340 lines, one line replaced), `bun build` parses, restored to
+`29750aa1b26a91596c92d3bed7f59a0ec0dd398e` == pristine.
+
+**S2 first ran as a FALSE SEED, and catching it is why the seed guard changed.** The substitution
+silently did nothing — `awk -v` expands backslash escapes, so the `\t` in the pattern became a real tab
+and never matched the file's two-character `\t`. `cmp` still reported a difference, because the local
+`awk`/`sed` rewrite this CRLF working tree to LF, and the suite scored **39 pass / 0 fail** — a seed
+that reddened nothing, presented as a discriminating run. That is L-142's failure verbatim (*"`cmp` saw
+a change"*), and it establishes that **`cmp` alone is not a landing guard on a CRLF checkout**. Landing
+is now asserted on `diff --strip-trailing-cr` requiring at least one changed content line, the pattern
+is passed through `ENVIRON` to defeat escape expansion, and a landed-but-targeted seed that reddens
+*nothing* is reported as untested rather than scored as a pass. The same rewrite earlier made a
+targeting figure read "680 changed lines" for a one-line edit — a number carrying no information, which
+is L-169's point about an unstated method, hit twice inside one task.
+
+**`Layers:` corrected at execution (L-100), not defended.** T2 gained
+`evals/run-handoff-state-fixtures.sh` and `skills/lean-doc-generator/references/handoff-reconciliation.md`
+— both genuinely T2's work, neither predictable at promote. `check-layers-observed.sh` confirms both
+findings cleared.
+
+**Gate:** `sh scripts/qa-check.sh` run as its own call, verdict read off the line the gate itself
+prints — **219 pass, 1 fail**. The single FAIL is `layers observed`, and every finding remaining in it
+is pre-existing and outside this session's diff: `f717e9a`'s three spec/architecture files and
+`fa061bc`/`T1`'s `TECH-DEBT.md` are attributable to no task, and the SPRINT-092 / SPRINT-093 rows are
+`TASK-298`'s known sibling-attribution defect — both are closed sprints, so their attribution is
+exactly the false positive that task exists to fix. **System-verify is still not a usable verdict while
+TD-135 stands**, so nothing here is offered as evidence that the sprint may close.
+
+**T2 DoD 6 is ticked from the previous session's review, but the checker has changed since.** An
+outside worktree-isolated reviewer is dispatched over this diff (owner-authorised at G2, against this
+session's default of not spawning agents). Its findings, if any, land in the next entry.
+
+**22 of 23 DoD ticked.** The one open box is the owner-action archiving ruling, not a T1–T4 DoD.

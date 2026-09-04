@@ -21,41 +21,41 @@ fail=0
 
 # --- DoD 3's must-FAIL case, verbatim: a sprint closing with a `live` handoff outstanding ---------
 run_case_anywhere "closed-live-outstanding" 1 \
-  "closed with a 'live' handoff outstanding" -- \
+  "closed with a 'live' handoff outstanding (/tmp/handoff-930-x.md)" -- \
   sh "$checker" "$fx/closed-live-outstanding"
 
 # --- the sibling word: `consumed` is ALSO not `spent`, and close still owes reconciliation --------
 run_case_anywhere "closed-consumed-outstanding" 1 \
-  "closed with a 'consumed' handoff outstanding" -- \
+  "closed with a 'consumed' handoff outstanding (/tmp/handoff-931-x.md)" -- \
   sh "$checker" "$fx/closed-consumed-outstanding"
 
 # --- UNKNOWN status (field missing) -> FAIL, DoD 1's core clause: never assumed spent -------------
 run_case_anywhere "closed-unknown-missing-status" 1 \
-  "carries UNKNOWN status" -- \
+  "(/tmp/handoff-932-x.md) carries UNKNOWN status ('<missing>')" -- \
   sh "$checker" "$fx/closed-unknown-missing-status"
 
 # --- UNKNOWN via a missing handoff-path (the record cannot be identified or deduplicated) ---------
 run_case_anywhere "closed-unknown-missing-path" 1 \
-  "carries UNKNOWN status" -- \
+  "(<no handoff-path recorded>) carries UNKNOWN status ('live')" -- \
   sh "$checker" "$fx/closed-unknown-missing-path"
 
 # --- DoD 3's sibling control, verbatim: all handoffs `spent` -> passes in the SAME run ------------
 run_case_anywhere "closed-all-spent" 0 \
-  "handoff spent at" -- \
+  "handoff spent at /tmp/handoff-934-x.md" -- \
   sh "$checker" "$fx/closed-all-spent"
 
 # --- LATEST-entry-per-path wins: live -> consumed -> spent under one handoff-path, sprint closed --
 # Without this, a checker that OR'd every entry for a path together instead of taking the latest
 # would also pass a genuinely re-opened handoff sharing an old spent path.
 run_case_anywhere "closed-superseded-to-spent" 0 \
-  "handoff spent at" -- \
+  "handoff spent at /tmp/handoff-935-x.md" -- \
   sh "$checker" "$fx/closed-superseded-to-spent"
 
 # --- a `live` handoff is NOT a violation while the sprint is still active -------------------------
 # Without this control, a checker that FAILed every `live` handoff regardless of sprint status would
 # also satisfy the must-FAIL case above and look correct.
 run_case_anywhere "open-live-not-yet" 0 \
-  "not yet reconciled, sprint still active" -- \
+  "handoff 'live' at /tmp/handoff-936-x.md -- not yet reconciled, sprint still active" -- \
   sh "$checker" "$fx/open-live-not-yet"
 
 # --- reachability: closed via status: closed but still on the LIVE path, not yet archived ---------
@@ -63,17 +63,27 @@ run_case_anywhere "open-live-not-yet" 0 \
 # put its member under archive/, so the live-path half of the glob went unexercised while SPRINT-093
 # was exactly this shape in this repo. Exercised here before a reviewer has to find it a second time.
 run_case_anywhere "closed-live-path-not-archived" 1 \
-  "closed with a 'live' handoff outstanding" -- \
+  "closed with a 'live' handoff outstanding (/tmp/handoff-937-x.md)" -- \
   sh "$checker" "$fx/closed-live-path-not-archived"
 
 # --- the no-sprint fallback ledger: UNKNOWN status is gated exactly like the sprint case -----------
 run_case_anywhere "ledger-unknown-status" 1 \
-  "carries UNKNOWN status" -- \
+  "(/tmp/handoff-triage-x.md) carries UNKNOWN status ('<missing>')" -- \
   sh "$checker" "$fx/ledger-unknown-status"
+
+# --- the ledger's OWN empty-path branch, which no fixture reached ---------------------------------
+# The sprint-side loop and the ledger loop are separate `read` loops over the same record shape, so a
+# fix or a regression can land in one and not the other. Every ledger fixture happened to carry a
+# path, leaving the ledger's empty-path branch unexercised -- the same "the branch works, but is it
+# reachable" gap L-166 names. `consumed` here, not `live`, so this case's finding cannot be satisfied
+# by the sprint-side one above.
+run_case_anywhere "ledger-unknown-missing-path" 1 \
+  "(<no handoff-path recorded>) carries UNKNOWN status ('consumed')" -- \
+  sh "$checker" "$fx/ledger-unknown-missing-path"
 
 # --- the no-sprint fallback ledger: `live` is reported, not gated (no close event to hook onto) ---
 run_case_anywhere "ledger-live-reported" 0 \
-  "reconciled at the next promote governance review" -- \
+  "entry 'live' at /tmp/handoff-research-x.md -- reconciled at the next promote governance review" -- \
   sh "$checker" "$fx/ledger-live-reported"
 
 # --- L-166: pointed at the REAL motivating case, not fixtures alone -------------------------------
@@ -85,7 +95,7 @@ run_case_anywhere "ledger-live-reported" 0 \
 # sprint closed -- with the field this checker reads genuinely never written, because the mechanism
 # did not exist yet. That is the exact silent-loss shape T2 closes.
 run_case_anywhere "sprint027-real-gap" 1 \
-  "carries UNKNOWN status" -- \
+  "(%TEMP%/handoff-stall-exercise.md) carries UNKNOWN status ('<missing>')" -- \
   sh "$checker" "$fx/sprint027-real-gap"
 
 echo "----------------------------------------"

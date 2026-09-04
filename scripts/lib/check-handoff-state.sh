@@ -89,6 +89,20 @@ resolve_latest() {
 
 status_valid() { case "$1" in live|consumed|spent) return 0 ;; *) return 1 ;; esac; }
 
+# Records are TAB-joined and an EMPTY field is meaningful (a handoff naming no path is exactly the
+# permanently-unresolved record this checker exists to report). TAB is IFS *whitespace* in POSIX, so
+# `IFS=<tab> read -r ln path status` COLLAPSES the `\t\t` of an empty path and shifts every later
+# field one slot left -- printing `live` in the path slot and `<missing>` in the status slot, i.e. the
+# right verdict under the wrong named finding, which is the one thing a must-FAIL fixture exists to
+# rule out (L-058). Split by explicit parameter expansion instead, so an empty field stays empty.
+TAB=$(printf '\t')
+split_rec() {
+  rec_ln=${1%%"$TAB"*}
+  _rest=${1#*"$TAB"}
+  rec_path=${_rest%%"$TAB"*}
+  rec_status=${_rest#*"$TAB"}
+}
+
 # --- sprint context: docs/sprint/SPRINT-*.md (live) and docs/sprint/archive/SPRINT-*.md (archived),
 #     each paired with its Execution Log sibling under logs/ (S9.LOGDIR / S11.LOGPAIR shape) ---------
 for plan in "$root"/docs/sprint/SPRINT-*.md "$root"/docs/sprint/archive/SPRINT-*.md; do
@@ -106,8 +120,10 @@ for plan in "$root"/docs/sprint/SPRINT-*.md "$root"/docs/sprint/archive/SPRINT-*
   recs=$(handoff_records "$log" | resolve_latest)
   [ -n "$recs" ] || continue
 
-  while IFS='	' read -r ln path status; do
-    [ -n "$ln" ] || continue
+  while IFS= read -r rec; do
+    [ -n "$rec" ] || continue
+    split_rec "$rec"
+    ln=$rec_ln; path=$rec_path; status=$rec_status
     pathdisp=${path:-"<no handoff-path recorded>"}
     if [ -z "$path" ] || ! status_valid "$status"; then
       statdisp=${status:-"<missing>"}
@@ -131,8 +147,10 @@ ledger="$root/HANDOFF-LEDGER.md"
 if [ -f "$ledger" ]; then
   recs=$(handoff_records "$ledger" | resolve_latest)
   if [ -n "$recs" ]; then
-    while IFS='	' read -r ln path status; do
-      [ -n "$ln" ] || continue
+    while IFS= read -r rec; do
+      [ -n "$rec" ] || continue
+      split_rec "$rec"
+      ln=$rec_ln; path=$rec_path; status=$rec_status
       pathdisp=${path:-"<no handoff-path recorded>"}
       if [ -z "$path" ] || ! status_valid "$status"; then
         statdisp=${status:-"<missing>"}

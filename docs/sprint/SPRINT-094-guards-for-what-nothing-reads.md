@@ -89,7 +89,7 @@ failing artifact and a real passing sibling, and the difference is the drift, ne
       and the reviewer is isolated because adversarial verification *writes*
 
 ### T2 — Track handoff status and perform §12(b)'s conversion `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `skills/handoff/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/prime/SKILL.md` · `skills/lean-doc-generator/templates/sprint-log.md.template` · `scripts/lib/` · `scripts/qa-check.sh` · `evals/fixtures/handoff-state/`
+Layers: `skills/handoff/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/prime/SKILL.md` · `skills/lean-doc-generator/templates/sprint-log.md.template` · `scripts/lib/` · `scripts/qa-check.sh` · `evals/fixtures/handoff-state/` · `evals/run-handoff-state-fixtures.sh` (declared at execution per L-100 — the assertions had to pin field VALUES, not the phrase; asserting the phrase alone is what let a swapped-field finding pass 11 green fixtures) · `skills/lean-doc-generator/references/handoff-reconciliation.md` (declared at execution — written by this task's first pass and never declared)
 Depends-on: none — but see **D1** (T1 and T2 share `scripts/qa-check.sh` — narrowed from three at the G2 scope-change) and **D2** (T1 and T2 share a capped SKILL.md)
 Cites: STANDARD §12(a)/(b) · ADR-014 (the Execution Log) · L-151 · L-020 · L-015
 
@@ -112,12 +112,12 @@ the repository alone, without opening the temp file or having been in the sessio
 - [x] **The conversion half.** At close, any handoff not `spent` is reconciled: every item in it not
       already durable (sprint file · Execution Log · TODO · TECH-DEBT · LEARNINGS · a commit) is routed
       to its durable home, or explicitly ruled as needing none. A ruling is a record; silence is not
-- [ ] Retained must-FAIL: a sprint closing with a `live` handoff outstanding FAILs **with its named
+- [x] Retained must-FAIL: a sprint closing with a `live` handoff outstanding FAILs **with its named
       finding**, while a sibling control (all handoffs `spent`) passes in the same run — one fixture per
       check, each failing with the finding it is named for (L-058)
 - [x] **Seeded-break discrimination proof** under ONE stated hash convention, seed verified landed by
       `cmp`, artifact still parses, break targeted not demolition (L-137 · L-142 · L-169)
-- [ ] **The consumer path is checked, not inferred from our dogfooding** (L-015 · L-016) — nothing
+- [x] **The consumer path is checked, not inferred from our dogfooding** (L-015 · L-016) — nothing
       repo-specific leaks into `handoff/SKILL.md` or `prime/SKILL.md`, both of which ship to consumers,
       and the mechanism is traced on the consumer scenario since this repo may not generate one
 - [x] Outside reviewer, worktree-isolated (L-165 · L-168)
@@ -144,7 +144,7 @@ the check reports it — and stays green on a symbol with a real production call
       TD-103's `reconcile()` / `marksInStandard()`; each must be reported when run against the tree at
       the commit that shipped it unwired
 - [x] Retained must-FAIL fixture plus a sibling control — a symbol WITH a production caller stays green
-- [ ] **Seeded-break discrimination proof** verified landed under ONE stated hash convention
+- [x] **Seeded-break discrimination proof** verified landed under ONE stated hash convention
       (L-137 · L-142 · L-169)
 - [x] Outside reviewer, worktree-isolated (L-165 · L-168)
 

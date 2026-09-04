@@ -30,7 +30,8 @@ update_trigger: an Execution Log entry is appended
      LATEST entry per path is authoritative, never edited in place. Both fields are required; either
      missing reads as UNKNOWN, which a sprint may never close over. No sprint to log into (governance
      work, `/triage`, a research session)? The same two-field shape goes in root `HANDOFF-LEDGER.md`
-     instead (create-lazily), checked by scripts/lib/check-handoff-state.sh. -->
+     instead (create-lazily). Either way the entry is what makes "was this actioned, or is it
+     still live?" answerable from the repo alone. -->
 ### YYYY-MM-DD | handoff | [one-line focus of the temp-dir doc]
 handoff-status: live | consumed | spent
 handoff-path: [absolute temp path /handoff printed]
