@@ -547,3 +547,79 @@ point — the detection logic was sound, the SET it was applied to was derived t
 and no fixture varied that set — on the standing assumption that the same shape is present until
 disproved. Each was told to mark findings CONFIRMED or PLAUSIBLE and not to inflate, and to report what
 **held up**, since a review listing only defects says nothing about coverage.
+
+---
+
+### 2026-09-04 | progress | both reviews landed; 17 of 20 DoD; run ends at AUTHORITY_BOUNDARY + BUDGET_STOP
+
+**Both outside reviewers found defects the authors did not — L-165's sixth and seventh sightings.**
+T3's pass: 1 HIGH, 2 MEDIUM, 1 LOW. T2's pass: 1 HIGH, 1 MEDIUM/HIGH, 2 MEDIUM, 1 LOW. In both cases
+the author's own seeded-break proof had run clean, and in both cases the through-line was the one T1's
+review named a day earlier: *the detection logic was sound; the SET it was applied to was not.*
+
+**T3's HIGH, fixed.** `EXPORT_RE` matched only `export function|const|class NAME`, so a symbol exported
+as `export { name }` or `export default class X {}` never entered `symbolsExamined` **at all** — no
+finding and no signal anything was skipped. That contradicted DoD 1's *"**Any** exported … symbol … is
+reported"* as written, and A3's narrowing was about registry-string reachability, not ES syntax. Fixed
+rather than reinterpreted (L-088). `export * from` stays uncovered with the reason recorded **in the
+file**: a wildcard re-export declares no symbol of its own, the names are examined at their origin, and
+a test asserts it does not swallow a sibling export. Narrowing on evidence with disclosure, which the
+Plan permits.
+
+**T3's MEDIUM, fixed.** `readSourcesFromDisk` skipped any directory named `fixtures`;
+`readSourcesAtCommit` did not — the two readers returned different file sets for the same tree, T1
+HIGH-2's exact shape one level down. Exclusion removed (dead weight inherited from `layers.ts`), plus a
+new test that builds a real throwaway commit and asserts both readers agree.
+
+**T3's build re-verified by the coordinator, since its author was killed mid-verification by a session
+rate limit and the work sat uncommitted.** Recovered from the worktree, not from the reply channel
+(L-060). `git hash-object` = `29750aa1b26a91596c92d3bed7f59a0ec0dd398e`, 340 lines (was 263), 15 guards
+(was 11); `bun test test/architecture/` run as its own call printed **64 pass, 0 fail** (was 47).
+Committed at `7679353`, merged at `e19d25d`.
+
+**T2's HIGH is not fixable and was ruled, not absorbed.** The checker cannot see `SPRINT-027` — the real
+artifact its own commit cites under L-166 — because it requires a paired `archive/logs/` file and that
+sprint has none. Counted: **91** archived sprints, **45** paired logs. The `sprint027-real-gap` fixture
+is faithful on vocabulary but **invents** a log that never existed. **Owner ruled: accept as
+forward-looking by design** — the vocabulary is new, so no pre-existing sprint can ever carry it →
+**TD-134**, with the rejected alternative recorded so it is not re-litigated.
+
+**T2's two DoD-breaking findings are NOT fixed — its retry died on the same rate limit before writing
+anything**, and its worktree is clean. Both stay open and named: **(a)** DoD 3 — a POSIX IFS
+field-collapse in two `read` loops prints the finding's fields **swapped** (`live` in the path slot,
+`<missing>` in the status slot), so the fixture fails with the wrong named finding; none of the 11
+fixtures caught it because the harness substring-matches the *phrase*, never the values — L-108 applied
+to the test's own assertion. **(b)** DoD 5 — `sprint-log.md.template:33` still carries
+`scripts/lib/check-handoff-state.sh`, a repo path in one of the 33 templates every consumer receives,
+directly contradicting that commit's own consumer-safety claim.
+
+**T3's DoD 4 also stays open.** Its retry ran four seeds and restored to a hash I confirmed, but *which
+case reddened and which sibling stayed green* died with the agent. The new guards therefore have a
+passing suite and no discrimination proof — and a suite green on its first run has not been shown to
+discriminate (L-137). Ticking it on a restore hash alone would be the false-green shape this session
+opened by catching.
+
+**Owner-ruled and done:** `HANDOFF-LEDGER.md` registered in STANDARD §2 with its full lifecycle
+contract, `spec/` **0.10.0 → 0.11.0** (`f717e9a`). MINOR proven rather than argued: `S2.F-FILE` fires
+only on rows marked `always` (`conformance-engine.sh:1821` names the marker in its own finding text),
+and `read-spec-rules.sh` over 0.11.0 emits **100 rows byte-identical by `cmp`** to the frozen surface —
+no rule added, amended or reclassified, so no verdict can move.
+
+**System-verify did NOT produce a usable verdict, and that is a finding rather than a gap.** Two full
+`bun test` runs over the same unchanged tree **disagreed** — `496 pass, 1 fail` then `497 pass, 0 fail`
+— with no test code changed between them → **TD-135**. The failing test's identity was lost because run
+1 was piped through `tail -40` and the tail was flooded by git CRLF warnings. That run also **exited 0
+while a test was failing**, because a pipeline's status is its last command's: L-120/L-057 demonstrated
+live, in the coordinator's own hands, minutes after quoting the rule. No single full-suite run is
+sufficient evidence for this close.
+
+**Filed this session:** `TD-132` (the dispatch preflight parses prose as dependencies — invents a cycle
+*and* issues ownership PASSes off the phantom edges) · `TD-133` · `TD-134` · `TD-135` · `TD-136` (ADR-034's
+frozen rule-surface snapshot has zero executable readers — L-172's class in fixture form, this sprint's
+theme landing on the sprint) · `TD-131` extended with its second call site.
+
+**Terminal state: `AUTHORITY_BOUNDARY`** (T2's two fixes need a builder and the session model limit is
+reached) **compounded by `BUDGET_STOP`** (the rate limit resets 04:10 Asia/Jakarta). **17 of 20 DoD
+ticked.** Open: T2 DoD 3 · T2 DoD 5 · T3 DoD 4 — each with a named, reproduced cause and a written fix.
+**The sprint is NOT closeable**: three DoD open, and system-verify has no trustworthy verdict while
+TD-135 stands.

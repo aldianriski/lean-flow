@@ -105,22 +105,22 @@ L-020's shape and L-151's consequence in one.
 the repository alone, without opening the temp file or having been in the session.
 
 **DoD:**
-- [ ] **The status half.** A handoff carries a tracked status recorded repo-side where the sprint's
+- [x] **The status half.** A handoff carries a tracked status recorded repo-side where the sprint's
       readers already look — `live` (a session may still resume it) · `consumed` (a session resumed it
       and the work continued) · `spent` (superseded, or the sprint closed past it). An **UNKNOWN status
       FAILs**; it is never assumed `spent`, because the assumption is exactly what makes the loss silent
-- [ ] **The conversion half.** At close, any handoff not `spent` is reconciled: every item in it not
+- [x] **The conversion half.** At close, any handoff not `spent` is reconciled: every item in it not
       already durable (sprint file · Execution Log · TODO · TECH-DEBT · LEARNINGS · a commit) is routed
       to its durable home, or explicitly ruled as needing none. A ruling is a record; silence is not
 - [ ] Retained must-FAIL: a sprint closing with a `live` handoff outstanding FAILs **with its named
       finding**, while a sibling control (all handoffs `spent`) passes in the same run — one fixture per
       check, each failing with the finding it is named for (L-058)
-- [ ] **Seeded-break discrimination proof** under ONE stated hash convention, seed verified landed by
+- [x] **Seeded-break discrimination proof** under ONE stated hash convention, seed verified landed by
       `cmp`, artifact still parses, break targeted not demolition (L-137 · L-142 · L-169)
 - [ ] **The consumer path is checked, not inferred from our dogfooding** (L-015 · L-016) — nothing
       repo-specific leaks into `handoff/SKILL.md` or `prime/SKILL.md`, both of which ship to consumers,
       and the mechanism is traced on the consumer scenario since this repo may not generate one
-- [ ] Outside reviewer, worktree-isolated (L-165 · L-168)
+- [x] Outside reviewer, worktree-isolated (L-165 · L-168)
 
 ### T3 — Detect a shipped capability that nothing calls `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `test/architecture/` (the new unwired-exports fitness rule, beside `dependency-direction.test.ts`) · `test/fixtures/`
@@ -137,16 +137,16 @@ promotion's own text names the fix: the property is mechanically detectable, so 
 the check reports it — and stays green on a symbol with a real production caller.
 
 **DoD:**
-- [ ] Any exported or registry-registered symbol in `packages/` or `apps/` with **zero non-test callers**
+- [x] Any exported or registry-registered symbol in `packages/` or `apps/` with **zero non-test callers**
       is reported — *Verify: the checker's own printed verdict line*
-- [ ] **Pointed at the three real artifacts that motivated it, not fixtures alone (L-166)** —
+- [x] **Pointed at the three real artifacts that motivated it, not fixtures alone (L-166)** —
       `attachLevel` before SPRINT-091 T11, `createF4Registry` / `createS4AppendRegistry` before T12, and
       TD-103's `reconcile()` / `marksInStandard()`; each must be reported when run against the tree at
       the commit that shipped it unwired
-- [ ] Retained must-FAIL fixture plus a sibling control — a symbol WITH a production caller stays green
+- [x] Retained must-FAIL fixture plus a sibling control — a symbol WITH a production caller stays green
 - [ ] **Seeded-break discrimination proof** verified landed under ONE stated hash convention
       (L-137 · L-142 · L-169)
-- [ ] Outside reviewer, worktree-isolated (L-165 · L-168)
+- [x] Outside reviewer, worktree-isolated (L-165 · L-168)
 
 ### T4 — Prune the 29 merged `worktree-agent-*` branches `[size: S · risk: low · class: mechanical-ingest · AFK · J1]`
 Layers: git refs only — no tracked file changes
