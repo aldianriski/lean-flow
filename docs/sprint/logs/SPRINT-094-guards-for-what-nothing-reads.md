@@ -1012,3 +1012,38 @@ independent checks. An honest census beats a flattering one.
 **Gate: `219 pass, 1 fail`**, off the gate's own printed line. SPRINT-094's findings unchanged and
 both pre-existing (`f717e9a`'s spec/architecture files · `T1:TECH-DEBT.md`). The count has not moved
 across any of the five commits this session.
+
+### 2026-09-04 | review | round 5 (narrow): clean — the guard is done
+
+`consequence · T2 · behaviour:none · governance:high` — review only, no artifact changed.
+
+Scoped to the seven lines of the `sseen`/`pseen` fix alone, so that the one Tier G edit made *after*
+round 4 would not ship unreviewed. **Nothing found.** Three answers, each independently derived rather
+than taken on my word:
+
+1. **No new way to hide or misreport a live handoff.** The flag reset is unconditional in the same
+   statement that opens the block, so no path enters a block without it — verified on a handoff
+   heading immediately following another (the first block's state does not leak) and on a file's first
+   block. No early closure drops a field: a block completes only when both fields were genuinely
+   written on their first-encountered line, so early closure happens only when a field was
+   seen-but-empty, which is the safe direction. awk's uninitialised scalars are falsy, so the
+   hypothetical missed reset could not make either flag truthy anyway.
+2. **The two-line seed is legitimate, and the reviewer could not construct a single-line one.** It
+   tried all four single-line reverts independently: each reddens nothing, because the other,
+   still-fixed check intercepts and flushes correctly before the defect's third line is reached. Only
+   both `if (sseen)` sites together reproduce it, and symmetrically for `if (pseen)`. That is
+   independent confirmation of the methodological point in the previous entry: the minimal edit that
+   reproduces a defect is sometimes two lines, and a single-line seed reddening nothing is evidence
+   about the *seed*, not about the fixture.
+3. **Both new fixtures discriminate**, checked against the pre-`a366b24` checker at `064fc36`: all 23
+   pre-existing fixtures still pass there, and both new ones fail — `closed-empty-then-repeated-field`
+   on the exit code (0, not 1), and `closed-empty-then-repeated-path` on the *finding*, since the old
+   code's `path != ""` completion happened to land on the correct final path in that field order and
+   produced a coincidentally-truthful `live`-outstanding report. That second case is the sharpest
+   vindication of the value-pinning discipline this task started with: the verdict was right, the
+   finding was right by accident, and only an assertion pinned to the finding's values could tell.
+
+**Five rounds, closed.** Rounds 1–3 each found a CRITICAL silent false negative; round 3 found the
+design itself; round 4 found one MEDIUM and cleared the design; round 5 found nothing. Every CRITICAL
+in this task was found by an independent pass and none by the author, with the governing rules loaded
+and on screen throughout — L-165, four times over, on one 40-line function.
