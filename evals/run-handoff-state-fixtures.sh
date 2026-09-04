@@ -108,13 +108,16 @@ run_case_anywhere "closed-heading-without-summary" 1 \
   "closed with a 'live' handoff outstanding (/tmp/handoff-940-x.md)" -- \
   sh "$checker" "$fx/closed-heading-without-summary"
 
-# --- independent review, Finding 2: a fenced example inside the entry, quoted as a reminder -------
-# Field capture is first-occurrence-wins and had no fence awareness, so an entry that quoted the
-# stub format above its real fields captured the EXAMPLE (`spent`, /tmp/example-format.md) and
-# ignored the real `live` record below it -- PASS at exit 0. The assertion pins the REAL path, so a
-# regression that re-reads the example cannot satisfy it.
+# --- review round 1, Finding 2: a quoted stub format standing between a heading and its fields ----
+# Field capture was first-occurrence-wins, so an entry that quoted the format as a reminder had the
+# EXAMPLE captured as the record and its real `live` fields ignored -- PASS at exit 0. Two further
+# review rounds then broke two successive attempts to parse AROUND the quoted block, which is why
+# there is no longer any attempt to: under the strict shape, content between the heading and the
+# fields ends the record incomplete, so this reports UNKNOWN rather than guessing which of two
+# candidate records was meant. The assertion pins the log file and line, so it cannot be satisfied by
+# another fixture's UNKNOWN.
 run_case_anywhere "closed-quoted-format-block" 1 \
-  "closed with a 'live' handoff outstanding (/tmp/handoff-941-x.md)" -- \
+  "SPRINT-941-x.md handoff at line 9 (<no handoff-path recorded>) carries UNKNOWN status ('<missing>')" -- \
   sh "$checker" "$fx/closed-quoted-format-block"
 
 # --- independent review, Finding 3: a literal TAB byte inside a handoff-path value ----------------
@@ -126,24 +129,27 @@ run_case_anywhere "closed-delimiter-inside-value" 1 \
   "closed with a 'live' handoff outstanding (/tmp/foo spent)" -- \
   sh "$checker" "$fx/closed-delimiter-inside-value"
 
-# --- re-review Finding 1: an unbalanced fence must not ERASE what follows ------------------------
-# The first fence fix was a bare parity flip: an opened-and-never-closed fence stayed on to EOF, so
-# every later handoff entry was consumed by `fence { next }` and never reached the anchor at all. A
-# closed sprint with a real outstanding `live` handoff below the fence reported PASS at exit 0, and
-# the entry appeared NOWHERE in the output -- not wrong, erased. That is the silent-false-negative
-# class the fence rule existed to close, reintroduced by the rule itself. An unreadable region is now
-# an UNKNOWN record, which is never assumed spent. The assertion pins the NAMED cause, so a
-# regression that merely FAILs for some other reason cannot satisfy it.
+# --- review rounds 2 and 3: content AFTER a complete record must not swallow the NEXT entry -------
+# This fixture is the graveyard of two fence mechanisms. A closed sprint whose first (already
+# `spent`) entry is followed by an unclosed code fence, with a REAL outstanding `live` handoff below
+# it. Round 2's bare toggle consumed everything to EOF, so the real entry was ERASED -- absent from
+# the output entirely, PASS at exit 0. Round 3's EOF sentinel caught only that subset, staying silent
+# whenever the fence happened to balance again after swallowing the record. Under the strict shape
+# both are structurally impossible: the first entry completes at its second field, after which
+# nothing is skipped or tracked, so the second heading is read normally. The assertion names the
+# SECOND entry's real path -- the one both earlier designs lost.
 run_case_anywhere "closed-unbalanced-fence" 1 \
-  "(<unreadable: a code fence opened here was never closed>) carries UNKNOWN status ('<missing>')" -- \
+  "closed with a 'live' handoff outstanding (/tmp/handoff-953-second-REAL.md)" -- \
   sh "$checker" "$fx/closed-unbalanced-fence"
 
-# --- re-review Finding 2: `~~~` is CommonMark's other fence, and bypassed the guard entirely ------
-# Guarding only ``` left the previous round's quoted-stub-format exploit fully reproducible by
-# swapping the fence character. Both syntaxes now count, and a fence closes only on its OWN
-# character. The assertion pins the REAL path, so capturing the tilde-fenced example instead fails.
+# --- review round 3: the same intervening-content case reached by a different fence character -----
+# Round 2 guarded ``` only, so `~~~` -- CommonMark's other fence -- reproduced the quoted-format
+# exploit by swapping one character. Retained because it is the cheapest possible demonstration of
+# why the fence-aware design kept failing: the guard had to enumerate every syntax that could hide a
+# record, and missing one was a silent false negative. The strict shape enumerates nothing; any
+# intervening line, whatever its syntax, ends the record as UNKNOWN.
 run_case_anywhere "closed-tilde-format-block" 1 \
-  "closed with a 'live' handoff outstanding (/tmp/handoff-954-x.md)" -- \
+  "SPRINT-954-x.md handoff at line 9 (<no handoff-path recorded>) carries UNKNOWN status ('<missing>')" -- \
   sh "$checker" "$fx/closed-tilde-format-block"
 
 # --- re-review Finding 3: literal TABs around the keyword in the heading --------------------------
@@ -154,6 +160,54 @@ run_case_anywhere "closed-tilde-format-block" 1 \
 run_case_anywhere "closed-heading-tab-padded" 1 \
   "closed with a 'live' handoff outstanding (/tmp/handoff-955-x.md)" -- \
   sh "$checker" "$fx/closed-heading-tab-padded"
+
+# --- review round 3, Finding 1: the fence closes AFTER swallowing, so no EOF sentinel fires -------
+# Round 3's sentinel only fired when a fence was still open at EOF. A fence opened in entry A and
+# closed anywhere inside entry B left `fence=0` by EOF -- sentinel silent -- while entry B's heading
+# and both its fields had already been consumed. A closed sprint with a real outstanding `live`
+# handoff reported PASS at exit 0 with the entry absent from the output. Retained because it is the
+# case that proved the fence DESIGN unfixable rather than the fence RULES buggy: the second of two
+# mechanisms failed on it, and it is the reason the parser skips nothing at all now.
+run_case_anywhere "closed-fence-closed-after-swallowing" 1 \
+  "closed with a 'live' handoff outstanding (/tmp/handoff-961-second-REAL.md)" -- \
+  sh "$checker" "$fx/closed-fence-closed-after-swallowing"
+
+# --- review round 3, Finding 2: a CommonMark-correct nested fence defeats character-only tracking --
+# The standard way to quote a fenced example is a 4-backtick fence around a 3-backtick one. Round 3
+# matched the fence's opening CHARACTER but not its RUN LENGTH, so the outer block closed on the
+# inner marker, exposed the nested example as the real record, then re-opened on the inner's leftover
+# marker and swallowed the real fields -- PASS at exit 0. Retained as the cheapest demonstration of
+# why enumerating fence syntaxes could never terminate.
+run_case_anywhere "closed-nested-fence-example" 1 \
+  "SPRINT-960-x.md handoff at line 9 (<no handoff-path recorded>) carries UNKNOWN status ('<missing>')" -- \
+  sh "$checker" "$fx/closed-nested-fence-example"
+
+# --- the strict shape's ONE tolerance: a blank line between the heading and its fields -----------
+# Added because the seeded-break pass caught its absence, not because anyone noticed it missing.
+# Removing the blank-line rule reddened NOTHING across the other 20 fixtures -- a landed, targeted
+# break that scored as a pass, which is precisely the vacuous-control shape L-142 names. The rule is
+# the only thing standing between "strict" and "brittle": every other line ends the record as
+# UNKNOWN, so if a blank line did too, the shape most authors actually write would FAIL. The
+# assertion pins the real path, so a regression that turns this into UNKNOWN cannot satisfy it.
+run_case_anywhere "closed-blank-line-before-fields" 1 \
+  "closed with a 'live' handoff outstanding (/tmp/handoff-956-x.md)" -- \
+  sh "$checker" "$fx/closed-blank-line-before-fields"
+
+# --- a field APPENDED rather than replaced: both branches of the repeated-field guard -------------
+# Also added because the seeded-break pass caught their absence -- disabling the guard reddened
+# nothing across 21 fixtures. The guard matters because these logs are append-only and "never edited
+# in place", so a second `handoff-status:` in ONE entry is not an update, it is a malformed entry: the
+# LATEST-wins rule resolves whole RECORDS keyed by handoff-path, never individual fields. Without the
+# guard the later value silently overwrites the earlier one and a half-edited entry reports a
+# confident, wrong status. Each assertion pins the FIRST value read plus the missing half, so a
+# regression that takes the later value cannot satisfy either.
+run_case_anywhere "closed-repeated-status-field" 1 \
+  "(<no handoff-path recorded>) carries UNKNOWN status ('spent')" -- \
+  sh "$checker" "$fx/closed-repeated-status-field"
+
+run_case_anywhere "closed-repeated-path-field" 1 \
+  "(/tmp/stale-958.md) carries UNKNOWN status ('<missing>')" -- \
+  sh "$checker" "$fx/closed-repeated-path-field"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "HANDOFF-STATE FIXTURES: all green"; else echo "HANDOFF-STATE FIXTURES: at least one FAIL"; fi

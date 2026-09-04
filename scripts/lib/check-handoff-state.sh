@@ -28,12 +28,17 @@
 # governance review (propose->approve, same shape as TD aging / epic rollup currency).
 #
 # Both contexts share ONE entry shape and ONE parser, position-anchored (L-108 -- match by shape, not
-# substring): a heading line `### <date> | handoff | <summary>` followed, before the next `### `
-# heading or EOF, by a `handoff-status:` line and a `handoff-path:` line. Where the SAME handoff-path
-# is recorded more than once (a later entry updating an earlier one -- append-only logs are never
-# edited in place), the LATEST occurrence by file position is authoritative; earlier ones are not
-# separately reported. A record naming no handoff-path cannot be deduplicated against anything and is
-# therefore its own permanently-unresolved record, always UNKNOWN.
+# substring), and the shape is STRICT: a heading `### <date> | handoff | <summary>` -- `handoff` as the
+# exact second pipe-delimited field, summary optional -- whose `handoff-status:` and `handoff-path:`
+# lines must be the NEXT NON-BLANK lines. Anything else there (prose, a fenced example, another
+# heading, EOF) ends the record incomplete, which is UNKNOWN, which FAILs. Strictness is the whole
+# design and it was paid for: three independent review rounds each found a fresh CRITICAL in a
+# fence-tracking mechanism that tried to parse AROUND intervening content, every one of them a silent
+# false negative, because anything a parser SKIPS it can be made to skip over a real violation. This
+# parser skips nothing. Where the SAME handoff-path is recorded more than once (a later entry updating
+# an earlier one -- append-only logs are never edited in place), the LATEST occurrence by file position
+# is authoritative; earlier ones are not separately reported. A record naming no handoff-path cannot be
+# deduplicated against anything and is therefore its own permanently-unresolved record, always UNKNOWN.
 #
 # Usage: sh check-handoff-state.sh <repo-root>
 # Prints one PASS/FAIL line per resolved handoff record; exits 1 if any FAIL line was printed, 0
@@ -55,46 +60,38 @@ fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"
 # handoff_records <file> -- "<line>\t<path-or-EMPTY>\t<status-or-EMPTY>" per `handoff` heading block.
 handoff_records() {
   awk '
-    # A fenced block inside a handoff entry is an EXAMPLE, never the record: without this, an entry
-    # quoting the stub format as a reminder has the example captured and its real fields ignored.
-    # BOTH CommonMark fence syntaxes count -- guarding only ``` left `~~~` as a full bypass of this
-    # very rule. A fence is closed only by its OWN character, so a `~~~` line inside a ``` block is
-    # content, not a terminator. Toggling before every other rule also means a `### ` line inside a
-    # fence cannot open or close a handoff entry.
-    /^[ \t]*(```|~~~)/ {
-      m = $0; sub(/^[ \t]*/, "", m); c = substr(m, 1, 1)
-      if (!fence) { fence = 1; fchar = c; fline = NR }
-      else if (c == fchar) { fence = 0 }
-      next
-    }
-    fence { next }
-    # `handoff` anchored as the SECOND pipe-delimited field, tolerating tabs as well as spaces around
-    # the keyword, and requiring NO summary after it. Demanding a trailing space made a heading whose
-    # `[one-line focus]` placeholder was left blank fall through to the generic `^### ` rule below,
-    # which CLOSED the block -- so its real fields were never parsed and the file reported "skip" at
-    # exit 0. `[^|]*` cannot cross the first pipe, so a summary that merely CONTAINS `| handoff |`
-    # still does not match.
+    # STRICT SHAPE, and the reason it is strict. Three review rounds each found a fresh CRITICAL in a
+    # fence-tracking mechanism here, because a toggle over a grammar that NESTS cannot be made correct
+    # by patching the shape most recently discovered: a bare toggle let an unclosed fence erase every
+    # later entry; character-tracking still closed a ```` block on an inner ``` marker; and an
+    # EOF-only sentinel stayed silent whenever the fence happened to balance after swallowing a real
+    # record. Each fix was reactive to one case, and the state space kept producing new ones.
+    #
+    # So there is no fence handling at all, and nothing is ever SKIPPED -- skipping is what made those
+    # failures silent. A handoff record is exactly its heading plus its two fields, which must be the
+    # next non-blank lines. Anything else in that position -- prose, a fence, an example, another
+    # heading, EOF -- ends the record with whatever was read, which is an incomplete record, which is
+    # UNKNOWN, which FAILs. The state space is now: in a block or not, and which of two fields has
+    # been seen. That is the whole of it, and it matches the shape the shipped template prescribes.
     /^### [^|]*\|[ \t]*handoff[ \t]*\|/ {
       if (inb) { flush() }
       inb = 1; ln = NR; path = ""; status = ""; next
     }
-    /^### / { if (inb) { flush() }; inb = 0; next }
+    inb && /^[ \t]*$/ { next }
     inb && /^handoff-status:[ \t]*/ {
-      if (status == "") { status = clean($0, "handoff-status") }
+      if (status != "") { flush(); inb = 0; next }   # repeated field: malformed, never guess
+      status = clean($0, "handoff-status")
+      if (path != "") { flush(); inb = 0 }           # both fields read -- record complete
       next
     }
     inb && /^handoff-path:[ \t]*/ {
-      if (path == "") { path = clean($0, "handoff-path") }
+      if (path != "") { flush(); inb = 0; next }
+      path = clean($0, "handoff-path")
+      if (status != "") { flush(); inb = 0 }
       next
     }
-    END {
-      if (inb) { flush() }
-      # An unbalanced fence swallowed everything after it, so any handoff entry below is invisible --
-      # and invisible is the one outcome a guard may never report as clean. Emitting a pathless record
-      # routes it into the UNKNOWN branch both callers already have, which FAILs and is never assumed
-      # spent. That is the correct reading: a region the parser could not read has an unknown status.
-      if (fence) { printf "%d\t<unreadable: a code fence opened here was never closed>\t\n", fline }
-    }
+    inb { flush(); inb = 0; next }                   # anything else: the record ends here, incomplete
+    END { if (inb) { flush() } }
     # Strip the key, trim the ends, then squash any INTERIOR tab to a space. TAB is this format own
     # record delimiter, so a tab inside a value made flush() emit four fields; resolve_latest reads
     # only $1..$3 and would take the path tail-fragment as the status -- a path ending `<tab>spent`

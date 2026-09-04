@@ -872,3 +872,82 @@ has been taken since the vocabulary shipped, which is exactly why the `sprint027
 exists (L-166: no historical commit carries a `handoff-status:` field, so the real motivating artifact
 had to be reconstructed). It does mean the guard has not yet fired on live input, and the first real
 `/handoff` after this sprint is what converts it from proven-on-fixtures to proven-in-place.
+
+### 2026-09-04 | review | round 3 broke the fence design; owner ruled it out and the parser was rewritten strict
+
+`consequence · T2 · behaviour:material · governance:high` — Tier G, and the round that stopped
+patching. Hash convention unchanged: `git hash-object <path>`; content compared with
+`diff --strip-trailing-cr`.
+
+**Round 3 found two more CRITICALs, both in the fence mechanism, both reproduced here first.**
+
+1. **A fence that closes *after* swallowing a record leaves no trace at all.** Round 3's sentinel
+   fired only when the fence was still open at EOF. A fence opened in entry A and closed anywhere
+   inside entry B left `fence=0` by EOF — sentinel silent — while entry B's heading and both fields
+   had already been consumed. Closed sprint, real outstanding `live` handoff: `PASS`, exit 0, entry
+   absent from the output. Reproduced on the ledger loop identically.
+2. **A CommonMark-correct nested fence defeats character-only tracking.** The standard way to quote a
+   fenced example is a 4-backtick fence around a 3-backtick one. Matching the opening *character* but
+   not its *run length* closed the outer block on the inner marker, exposed the nested example as the
+   real record, then re-opened on the leftover marker and swallowed the real fields. `PASS`, exit 0.
+
+**The reviewer's structural verdict, which the evidence supports: the design was the defect.** Three
+rounds each found a fresh hole in the same ~15-line region, and each fix patched the shape just
+discovered rather than the state space — bare toggle → character-tracked toggle → EOF-only sentinel,
+each one reactive, each one leaving a corner. That is the signature of a single-pass toggle parser
+over a grammar that **nests**, and it does not converge by patching.
+
+**Owner ruled: delete the fence mechanism and make the shape strict.** A handoff record is now its
+heading plus its two fields, which must be the next non-blank lines. Anything else there — prose, a
+fence of any syntax, a nested fence, another heading, EOF — ends the record incomplete, which is
+UNKNOWN, which FAILs. **Nothing is skipped, and that is the entire point:** anything a parser skips,
+it can be made to skip over a real violation. The state space is now "in a block or not" plus "which
+of two fields has been seen", and it matches the shape the shipped template already prescribes.
+
+Both round-3 CRITICALs are structurally impossible against it rather than specifically defended:
+case 1 now names the second entry's real path, case 2 reports UNKNOWN instead of the nested example.
+
+**What changed in the reported findings, honestly.** Three earlier fixtures now FAIL with a different
+finding: `closed-quoted-format-block`, `closed-tilde-format-block` and (new) `closed-nested-fence-example`
+report UNKNOWN rather than naming the real path. The verdict is unchanged — all still exit 1 — but the
+checker no longer guesses which of two candidate records an author meant. `closed-unbalanced-fence`
+*improved*: it now names the real outstanding path where two previous designs lost it entirely.
+
+**Five retained fixtures added this round, and three of them exist because the seeded-break pass
+found their absence — not because anyone noticed:**
+
+| Seed | Red | Green | Found how |
+|---|---|---|---|
+| intervening content skipped again | 3 | 20 | designed |
+| blank-line tolerance removed | 1 | 22 | seed suggested a gap; the REAL seed proved it |
+| anchor intolerant of tabs | 1 | 22 | designed |
+| repeated-**status** guard removed | 1 | 22 | **seed reddened nothing → gap** |
+| repeated-**path** guard removed | 1 | 22 | added alongside its sibling; never seeded blind |
+
+Each seed: landed on `diff --strip-trailing-cr`, 202 → 202 lines with one line replaced, `sh -n`
+clean, restored to `2a6c64587a703f8e01d1bf752ad8e3c5d34ea415` == pristine. Suite is **23 fixtures**;
+three independent counts agree (23 directories · 23 `run_case_anywhere` calls · 23 executed), and all
+23 pass the L-108 self-naming check programmatically.
+**A third false seed, and the guard earning its place.** `S8` first ran as `/^[\v]*$/`, which still
+matches an empty line because `*` permits zero occurrences — textually landed, semantically inert,
+scoring 0 red / 21 green. Landing, targeting and parse checks all passed it; the only thing that
+caught it was the rule that **a landed, targeted seed reddening nothing has tested nothing**.
+
+Being precise about what that inert seed did and did not establish: it did **not** prove the
+blank-line gap, even though the gap was real. It suggested one, the fixture was written, and the
+*real* seed (`*` → `+`) then reddened exactly that one fixture with 22 green — which is what actually
+proves no pre-existing fixture covered it. The reasoning at the suggestion step was worthless; only
+the second, semantically real seed carries the claim. The two repeated-field gaps are different and
+stronger: those seeds were real from the start (`status == "!"` can never hold, so the guard truly
+never fires), and they reddened nothing across 21 and 22 fixtures respectively.
+
+Tally for the session, stated exactly: the reddens-nothing check fired **three** times — twice on
+seeds that were semantically inert (`awk -v` escape expansion in T3, then `[\v]*` here) and once on a
+real seed exposing a genuinely untested branch (the repeated-field guard). Every one of the three
+would otherwise have been recorded as a passing discrimination proof, and `cmp` would have called all
+three "landed".
+
+**Gate: `219 pass, 1 fail`**, read off the gate's own printed line, run to a full log this time rather
+than through `tail` (the previous entry records why). SPRINT-094's own findings are unchanged and both
+pre-existing: `f717e9a`'s three spec/architecture files, attributable to no task, and `T1:TECH-DEBT.md`.
+The count has not moved across any of the four commits this session.
