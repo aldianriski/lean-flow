@@ -66,43 +66,104 @@ export function isTestAdjacent(path: string): boolean {
 }
 
 const EXPORT_RE =
-  /(?:^|\n)[ \t]*export[ \t]+(?:default[ \t]+)?(?:async[ \t]+)?function[ \t]+([A-Za-z_$][\w$]*)|(?:^|\n)[ \t]*export[ \t]+const[ \t]+([A-Za-z_$][\w$]*)|(?:^|\n)[ \t]*export[ \t]+class[ \t]+([A-Za-z_$][\w$]*)/g;
+  /(?:^|\n)[ \t]*export[ \t]+(?:async[ \t]+)?function[ \t]+([A-Za-z_$][\w$]*)|(?:^|\n)[ \t]*export[ \t]+const[ \t]+([A-Za-z_$][\w$]*)|(?:^|\n)[ \t]*export[ \t]+class[ \t]+([A-Za-z_$][\w$]*)/g;
 
-/** Every named function/const/class export declared in `src`, read off a comment-and-string-stripped
- *  skeleton so a mention inside a doc comment or a string literal can never be read as a declaration.
- *  `export type` / `export interface` are deliberately excluded: nothing "calls" a type, so treating
- *  one as a checkable symbol would be noise this checker's DoD never asked for. */
+// `export { name [as alias], ... };` -- a DECLARE-THEN-BRACE export list, distinct from a re-export
+// (`export { x } from "./y"`), which is excluded by the trailing negative lookahead and stays out of
+// scope here (reviewer's Finding 3: barrels-as-caller-edges is filed as debt, not this retry's job).
+// `export type { X };` (the WHOLE clause) is captured separately (group 1) so it can be excluded
+// entirely -- nothing "calls" a type, same reasoning as the import side's `import type { X }`. An
+// INLINE `{ type X, real }` member is handled per-entry below, since the clause-level flag alone can't
+// tell the two apart.
+const EXPORT_LIST_RE = /(?:^|\n)[ \t]*export[ \t]+(type[ \t]+)?\{([^}]*)\}(?![ \t]*from\b)/g;
+
+// `export default function NAME(...)`, `export default class NAME {...}`, and the anonymous forms of
+// both. A default export has no importer-chosen name to match on (`import Anything from "./x"` binds
+// regardless of local name), so it is tracked under the fixed symbolic name "default" -- the same
+// identity JS itself uses for the module namespace object's `.default` property.
+const EXPORT_DEFAULT_RE = /(?:^|\n)[ \t]*export[ \t]+default[ \t]+(?:async[ \t]+)?(?:function|class)\b/g;
+
+/** Every checkable export declared in `src` -- named function/const/class, a declare-then-brace
+ *  export list (`export { a, b as c }`), and a default export -- read off a comment-and-string-
+ *  stripped skeleton so a mention inside a doc comment or a string literal can never be read as a
+ *  declaration. `export type` / `export interface` (bare or inside a brace list) are deliberately
+ *  excluded: nothing "calls" a type, so treating one as a checkable symbol would be noise this
+ *  checker's DoD never asked for. `export * from "./x"` is deliberately NOT covered here: a wildcard
+ *  re-export forwards an unenumerable, unknown-in-advance set of names from ANOTHER module -- it
+ *  introduces no symbol of its OWN in this file for `exportedSymbolsOf` to name, so there is nothing
+ *  for this function to report. What it must not do is misparse or swallow a real sibling export on
+ *  the same file, which `test/architecture/unwired-exports.test.ts` exercises directly. */
 export function exportedSymbolsOf(src: string): string[] {
   const { skeleton } = scan(src);
   const names: string[] = [];
+
   EXPORT_RE.lastIndex = 0;
   let m: RegExpExecArray | null;
   while ((m = EXPORT_RE.exec(skeleton)) !== null) {
     const name = m[1] ?? m[2] ?? m[3];
     if (name) names.push(name);
   }
+
+  EXPORT_LIST_RE.lastIndex = 0;
+  while ((m = EXPORT_LIST_RE.exec(skeleton)) !== null) {
+    if (m[1] !== undefined) continue; // `export type { ... }` -- the WHOLE clause is type-only
+    const list = m[2];
+    if (list === undefined) continue;
+    for (const raw of list.split(",")) {
+      const trimmed = raw.trim();
+      if (!trimmed || /^type\s+/.test(trimmed)) continue; // inline `type X` member -- not checkable
+      const parts = trimmed.split(/\s+as\s+/);
+      const publicName = (parts.length > 1 ? parts[1] : parts[0])?.trim();
+      if (publicName) names.push(publicName); // `as default` correctly lands on "default"
+    }
+  }
+
+  EXPORT_DEFAULT_RE.lastIndex = 0;
+  if (EXPORT_DEFAULT_RE.test(skeleton)) names.push("default");
+
   return names;
 }
 
 const MARK = MARK_L + "(\\d+)" + MARK_R;
-const IMPORT_NAMED_RE = new RegExp("import[ \\t]+(type[ \\t]+)?\\{([^}]*)\\}[ \\t]+from[ \\t]*" + MARK, "g");
+// The optional leading `Name,` handles a COMBINED default + named import (`import Widget, { helper }
+// from "./x"`) -- the default portion is captured separately by IMPORT_DEFAULT_RE below, so it is
+// deliberately not captured here, only skipped over so the named brace list is still reached.
+const IMPORT_NAMED_RE = new RegExp(
+  "import[ \\t]+(?:[A-Za-z_$][\\w$]*[ \\t]*,[ \\t]*)?(type[ \\t]+)?\\{([^}]*)\\}[ \\t]+from[ \\t]*" + MARK,
+  "g",
+);
+
+// `import Name from "./x.ts"` / `import Name, { a, b } from "./x.ts"` -- a DEFAULT import binding.
+// The local name (`Name`) is the importer's OWN choice and carries no information about the export's
+// identity, so it is not captured; what matters is only that a default-import clause exists for this
+// specifier, tracked as the fixed symbolic name "default" (matching exportedSymbolsOf's convention).
+// `(?!type\b)` excludes `import type Name from` (erased at compile time, not a real caller); the
+// identifier class `[A-Za-z_$]…` structurally excludes `import * as ns from` (a namespace import --
+// Finding 3/4's territory, deliberately left alone this retry) since `*` cannot start an identifier.
+const IMPORT_DEFAULT_RE = new RegExp(
+  "import[ \\t]+(?!type\\b)[A-Za-z_$][\\w$]*[ \\t]*(?:,[ \\t]*\\{[^}]*\\})?[ \\t]+from[ \\t]*" + MARK,
+  "g",
+);
 
 export interface ImportedBinding {
   readonly name: string;
   readonly specifier: string;
 }
 
-/** Every `{ a, b as c }` named import binding in `src`, paired with its literal specifier -- read off
- *  the same stripped skeleton `exportedSymbolsOf` uses, so a specifier or name mentioned in prose can
- *  never be read as a real import. An `as`-aliased binding resolves to its ORIGINAL name, since what
- *  this checker tracks is the defining module's own export identity, not what a caller renamed it to.
- *  A type-only binding -- the whole clause (`import type { X }`) or one member of it (`{ type X }`) --
- *  is skipped entirely: it is erased at compile time, so it is not a runtime caller, and it can only
- *  ever pair with an EXPORTED TYPE, which `exportedSymbolsOf` never reports as a checkable symbol
- *  (nothing "calls" a type) -- so there is nothing a type-only binding could correctly wire either. */
+/** Every checkable import binding in `src`, paired with its literal specifier -- read off the same
+ *  stripped skeleton `exportedSymbolsOf` uses, so a specifier or name mentioned in prose can never be
+ *  read as a real import. Covers `{ a, b as c }` named imports (resolved to their ORIGINAL name, since
+ *  what this checker tracks is the defining module's own export identity, not what a caller renamed it
+ *  to) and a default import (`import Name from "./x"`, tracked as the fixed name "default"). A
+ *  type-only binding -- the whole named clause (`import type { X }`), one member of it (`{ type X }`),
+ *  or a type-only default (`import type Name from`) -- is skipped entirely: it is erased at compile
+ *  time, so it is not a runtime caller, and it can only ever pair with an EXPORTED TYPE, which
+ *  `exportedSymbolsOf` never reports as a checkable symbol (nothing "calls" a type). A namespace import
+ *  (`import * as ns from`) is deliberately NOT covered -- Finding 3/4's territory, out of scope here. */
 export function importedBindingsOf(src: string): ImportedBinding[] {
   const { skeleton, strings } = scan(src);
   const out: ImportedBinding[] = [];
+
   IMPORT_NAMED_RE.lastIndex = 0;
   let m: RegExpExecArray | null;
   while ((m = IMPORT_NAMED_RE.exec(skeleton)) !== null) {
@@ -118,6 +179,14 @@ export function importedBindingsOf(src: string): ImportedBinding[] {
       if (original) out.push({ name: original, specifier });
     }
   }
+
+  IMPORT_DEFAULT_RE.lastIndex = 0;
+  while ((m = IMPORT_DEFAULT_RE.exec(skeleton)) !== null) {
+    const specifier = strings[Number(m[1])];
+    if (specifier === undefined) continue;
+    out.push({ name: "default", specifier });
+  }
+
   return out;
 }
 
@@ -130,6 +199,14 @@ export function resolveSpecifier(importerRepoPath: string, specifier: string): s
   return posix.normalize(posix.join(dir, specifier));
 }
 
+// NO "fixtures" exclusion here (Finding 2, review). `layers.ts`'s own walker skips a directory named
+// `fixtures` because THIS repo's test fixtures happen to live under a `fixtures/` path -- but
+// `readSourcesAtCommit` below has no such filter, so copying that exclusion here made the two readers
+// disagree on any tree containing a directory literally named `fixtures` under `apps/`/`packages/`
+// (reproduced: disk saw 1 file, commit saw 2, for the same tree). Since this repo's own fixtures live
+// at top-level `test/fixtures/` -- never nested under `apps/`/`packages/` -- the exclusion was dead
+// weight that only this file needed to drop for the two readers to provably agree (see the
+// "reader agreement" test in unwired-exports.test.ts).
 function walk(dir: string, acc: string[]): string[] {
   let entries: string[];
   try {
@@ -138,7 +215,7 @@ function walk(dir: string, acc: string[]): string[] {
     return acc;
   }
   for (const e of entries) {
-    if (e === "node_modules" || e === ".git" || e === "fixtures") continue;
+    if (e === "node_modules" || e === ".git") continue;
     const full = join(dir, e);
     if (statSync(full).isDirectory()) walk(full, acc);
     else if (e.endsWith(".ts") && !e.endsWith(".d.ts")) acc.push(full);
