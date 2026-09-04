@@ -257,6 +257,84 @@ status: current
     reddens on a flaky connection teaches people to ignore it — but nothing gates this test today.
   - **Re-file fresh if** the repo gains a network-tolerant harness tier, which would remove the reason.
 
+- **TD-134** severity: medium | status: open | created: Sprint-094
+  - Summary: **`check-handoff-state.sh` is forward-looking only: it cannot see roughly half the archived
+    sprints, including the one its own commit cites as its motivating case.** Ruled acceptable by the
+    owner at SPRINT-094 T2's review — filed so the limit is stated rather than discovered.
+  - Location: `scripts/lib/check-handoff-state.sh:87-91` — the paired-log guard requires a
+    `docs/sprint/archive/logs/<basename>` file before a sprint's Execution Log is read for `handoff` events.
+  - Evidence (SPRINT-094 T2 independent review, reproduced live): the real, unmodified
+    `docs/sprint/archive/SPRINT-027-watchdog-housekeeping.md` has **no paired log** — its Execution Log
+    is embedded in the plan file itself, a pre-log-pairing-convention shape. Copied alone into an
+    isolated fixture and run against the pristine checker, the output is
+    `handoff-state: skip (no handoff records ...)`, exit 0. Generalised by count:
+    `docs/sprint/archive/*.md` = **91**, `docs/sprint/archive/logs/*.md` = **45** — roughly half of all
+    archived sprints are structurally invisible to the sprint-context loop.
+  - **What this corrects in the record.** T2's commit cites `SPRINT-027` under L-166 as the closest
+    faithful reproduction available. The fixture `sprint027-real-gap` is faithful on **vocabulary** — it
+    carries the real id, dates and close_commit, and the status field is genuinely absent — but it
+    **invents** a paired log file that never existed, so the real content satisfies the checker's input
+    requirements. L-166 asks whether the guard is *reachable* against the real artifact, and it is not.
+    The claim was overstated; the guard is sound for what it does cover.
+  - **Owner ruling (SPRINT-094 T2 review):** accept as forward-looking by design. The handoff-status
+    vocabulary is new, so no pre-existing sprint can ever carry one — the ~46 unpaired sprints are
+    genuinely unauditable rather than wrongly skipped, and a retroactive fallback read path was new
+    design outside T2's declared `Layers:`. The rejected alternative is recorded so it is not
+    re-litigated: read the plan file's own body when no paired log exists.
+  - Also folded in (review finding 5, LOW): DoD 1 names three UNKNOWN triggers — field missing,
+    malformed, or path missing — and only two have fixtures. A non-empty invalid value reaches the
+    identical validity branch, so this is an untested *input value*, not an untested *code path*, and
+    L-058's one-fixture-per-check is met. Same file, same remedy moment, so one row rather than two
+    (TD-087/TD-097's lesson).
+  - **Re-file fresh if** the archive gains a retroactive log backfill, or a sprint is ever expected to
+    carry a handoff record without a paired log.
+
+- **TD-135** severity: medium | status: open | created: Sprint-094
+  - Summary: **The full `bun test` suite is flaky — two consecutive runs over the same unchanged tree
+    disagreed.** A gate that disagrees with itself is worse than a red one, because neither result can
+    be acted on.
+  - Evidence (SPRINT-094, coordinator, integrated tree at `324b489`): run 1 printed `496 pass, 1 fail`
+    across 497 tests in 39 files, 524 s; run 2 printed **`497 pass, 0 fail`**. **No test code changed
+    between them** — the only commits in between touched `TECH-DEBT.md` and the sprint Execution Log.
+    The failing test was never identified: run 1 was piped through `tail -40` and the tail was flooded
+    by git CRLF warnings from fixture writes, so the failure detail scrolled past; run 2 filtered those
+    warnings and had no failure left to name.
+  - **Leading hypothesis, explicitly NOT asserted:** `TD-127` already records
+    `s4-append-shallow-reachability.test.ts` as network-dependent (it clones this repo's real remote as
+    an L-166 reachability proof) and reachable only from a bare `bun test`, which is exactly the run
+    that flaked. That fits, and it stays a hypothesis — the failing test's identity was lost, so
+    attributing it would be a guess wearing evidence's clothes.
+  - Impact: `bun test` is invoked by `package.json`'s test script, which `qa-check.sh` runs (ADR-035),
+    so this flake sits inside the gate. It also means **no single full-suite run is sufficient evidence
+    for a close**, which directly affects sprint-bulk step 6's system-verify.
+  - **A second, cheaper defect exposed alongside it:** run 1 exited **0 while a test was failing**,
+    because a pipeline's status is its last command's. That is L-120/L-057 demonstrated live on this
+    repo's own suite, in the coordinator's own hands, minutes after quoting the rule. Any wrapper
+    running `bun test` through a pipe inherits it.
+  - **Re-file fresh if** the flake is reproduced with the failing test named — that turns this row into
+    a fixable defect rather than a measurement.
+
+- **TD-136** severity: minor | status: open | created: Sprint-094
+  - Summary: **`evals/fixtures/compat/rule-ids-v0.10.0.txt` — ADR-034's frozen semantic-compatibility
+    surface — has zero executable readers.** Nothing regenerates it, diffs it, or fails on it.
+  - Evidence (SPRINT-094, two agreeing queries, worktrees excluded): a repo-wide search for `rule-ids`
+    and a second for `fixtures/compat` both return references only from
+    `docs/adr/ADR-034-semantic-compatibility-contract.md` and the archived `SPRINT-083` sprint file and
+    log — documentation, never a check. The ADR states the regeneration command in prose; no script,
+    harness, gate leg or test invokes it.
+  - Impact: the artifact ADR-034 designed to detect a silent rule-surface change cannot detect one. It
+    is a snapshot nobody compares against, so a reclassification — the case §15 calls MAJOR, and calls
+    the one that looks safe and is not — would pass unnoticed by the very fixture retained to catch it.
+  - **Why this row exists, and it is this sprint's own theme landing on the sprint:** this is exactly
+    `L-172`'s class, a shipped capability with zero non-test callers, which is what T3 was built to
+    detect mechanically. T3's detector reads the **TypeScript** module graph, so a retained
+    Shell/fixture artifact falls outside its scope by construction. The property T3 makes mechanical
+    for TS is still asked of nobody for the rest of the repo.
+  - Found while verifying that SPRINT-094's `spec/` 0.10.0 to 0.11.0 bump would not redden a check. It
+    did not — and the reason it could not is this row.
+  - **Re-file fresh if** T3's detector is extended past the TS module graph, or a compat harness leg is
+    added — the fix belongs with either.
+
 - **TD-133** severity: minor | status: open | created: Sprint-094
   - Summary: **The T3 unwired-exports detector counts fewer *caller* shapes than ES and fewer test-file
     shapes than convention, so a genuinely wired symbol can be reported unwired.** Two gaps, one class,
@@ -373,6 +451,23 @@ status: current
     the same ruling applies as TD-130. The narrow fix is `sub(/\r$/,"")` at the top of `fmv`, plus a
     `*.md eol=lf` rule or a fresh-clone check — but it must be verified from a **forced fresh
     checkout**, never from this tree (L-182).
+  - **SECOND CALL SITE, added SPRINT-094 T2 (extending this row rather than filing a duplicate).**
+    `scripts/lib/check-handoff-state.sh:46`'s `fmv()` is **byte-identical** to the one described above,
+    copied into a brand-new Tier G guard in the same sprint that filed this row. Its independent
+    reviewer reproduced the masking directly: converting both the plan and log fixtures to full CRLF and
+    re-running the pristine checker on this host still produced the correct FAIL — confirming this row's
+    own claim that it works here only by accident of the host's awk/CRT build.
+  - **Why the new call site is worse than the original.** Worked through by the reviewer: if `st` (the
+    sprint status) silently empties on a genuinely CRLF-corrupted plan file while its paired log stays
+    clean, a **closed** sprint carrying an outstanding `live` or `consumed` handoff falls through to the
+    "sprint still active" `ok` branch. That is a real silent PASS — not merely a skipped check — gated
+    only on file-level CRLF exposure that does not exist today (`git ls-files --eol` reports `i/lf` for
+    every sprint doc; only this Windows working tree shows `w/crlf`).
+  - **Recorded as a process fact, not a reproach:** the coordinator explicitly flagged "this is a CRLF
+    checkout" in T2's dispatch brief, this row was filed the same day by the sibling review, and the
+    identical vulnerable primitive was still reused without a comment acknowledging the inheritance.
+    A rule that is loaded, correct and on screen does not fire by itself — which is L-165's whole point,
+    and the reason the outside reviewer found this and the author did not.
   - **Re-file fresh if** it stops being latent: any CI runner or non-Windows contributor makes it live.
 - **TD-129** severity: medium | status: open | created: Sprint-094
   - Summary: **`EPIC-014`'s "the Shell semantic engine is deleted" milestone will NOT end Shell rule
