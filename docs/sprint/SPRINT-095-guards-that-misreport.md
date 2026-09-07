@@ -4,7 +4,7 @@ slug: guards-that-misreport
 owner: Maintainer
 last_updated: 2026-09-07
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: 2453678
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
