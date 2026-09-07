@@ -129,6 +129,23 @@ run_case_anywhere "deps-prose-continuation" 0 "PASS wave-computation: T1=0 T2=0"
 run_case_anywhere "deps-ids-with-prose" 0 "PASS wave-computation: T1=0 T2=0 T3=1" -- \
   sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-ids-with-prose/sprint.md\" \"$live_head\""
 
+# --- cases 11-12 (TD-132, SECOND design): a dropped edge is worse than an invented one -----------
+# Independent review killed the first fix with two of this repo's OWN historical lines. Both cases
+# below assert a RANK, not merely absence-of-cycle: rank is what distinguishes "the ids parsed" from
+# "the ids vanished and the tasks collapsed into one wave". Absence of a FAIL proves nothing here --
+# the whole defect was that the preflight printed CLEAR (L-058).
+
+# case 11 -- an id annotated INLINE, mid-list. Field text copied from SPRINT-055:161; the `·`
+# variant is SPRINT-063:83. Truncating at the first `(` kept only T1 and dropped T3/T4 silently.
+run_case_anywhere "deps-inline-annotated-list" 0 "PASS wave-computation: T1=0 T3=1 T4=2 T5=3 T6=4" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-inline-annotated-list/sprint.md\" \"$live_head\""
+
+# case 12 -- the first id is explained and the rest of the list WRAPS. The first fix stopped
+# collecting continuations whenever the field carried prose, losing T2 and putting two dependent
+# tasks in one wave under PREFLIGHT: CLEAR.
+run_case_anywhere "deps-wrapped-list-after-prose" 0 "PASS wave-computation: T1=0 T2=1 T3=2" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-wrapped-list-after-prose/sprint.md\" \"$live_head\""
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "DISPATCH-PREFLIGHT FIXTURES: all green"; else echo "DISPATCH-PREFLIGHT FIXTURES: at least one FAIL"; fi
 exit $fail

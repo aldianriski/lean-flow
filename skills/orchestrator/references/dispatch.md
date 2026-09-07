@@ -119,22 +119,32 @@ TOK='[A-Za-z0-9_./-]+\.[A-Za-z0-9]+|[A-Za-z0-9_.-][A-Za-z0-9_./-]*/'
 # and, worse, issued `shared-file-owned` PASSes derived from the edges it had invented. The false
 # HALT is loud; the false PASS green-lights a wave with no ownership order at all.
 #
-# dep_region: the id-list REGION of the field -- everything before the first prose marker. The
-# markers are the ones this repo's Plans actually use to start an explanation: an em dash, a
-# double-hyphen, or an opening parenthesis. Written as literal characters rather than \x escapes so
-# it behaves the same under BSD sed as GNU sed (the snippet ships to consumers).
-dep_region() { printf '%s' "$1" | sed -e 's/—.*$//' -e 's/ --.*$//' -e 's/(.*$//'; }
-# dep_ids: ids from a region, and NOTHING when the region is the literal `none`. `none` is a
-# declaration of no dependencies, not an absence of one, so it is honoured rather than searched.
-# HONEST NOTE on that `none` arm: it is defence-in-depth and is NOT independently proven. Seeding
-# its removal reddens no fixture, because dep_region has already truncated `none -- <prose>` down to
-# `none`, in which grep finds no `T[0-9]+` anyway. It earns its place only if the marker set above
-# ever changes; it is recorded as untested rather than counted as covered (L-142 · L-187 -- a seeded
-# break that reddens nothing has tested nothing, and must not be scored as a pass).
+# dep_ids: the LEADING id of each separator-delimited item, and nothing else. An id counts only
+# where a dependency can actually be declared -- at the START of a list item -- so an id appearing
+# anywhere inside an item's own annotation is prose and is ignored.
+#
+# THIS IS THE SECOND DESIGN. The first truncated the whole field at the first prose marker (em dash,
+# ` --`, `(`), and an independent review killed it with two of this repo's own historical lines:
+#   SPRINT-055:161  Depends-on: T1 (count guard must exist first), T3, T6 (shared files — see D1)
+#   SPRINT-063:83   Depends-on: T2 (subtraction first) · T1 (owns `DOCS_Guide` §2 and docs/adr/ …)
+# Truncating at the FIRST `(` keeps only `T1` / `T2` and silently discards every id after it. That
+# is a worse defect than TD-132 itself: TD-132 invented an edge and HALTED loudly, whereas dropping
+# a declared edge lets two dependent tasks dispatch in the same wave with `PREFLIGHT: CLEAR` and no
+# finding at all -- a gate that fails green (L-058). Annotating one id and continuing the list is
+# this project's own house style, not a contrived shape.
+#
+# Splitting on the separators the Plans actually use (`,` and `·`) and anchoring to the item start
+# needs no marker list, so it cannot be defeated by a marker the list does not know about. It also
+# retires the `none` special case entirely: `none — <prose>` is one item beginning `none`, which
+# yields no id because the anchor does not match, rather than because a branch says so. The previous
+# design carried that branch as dead weight -- seeding its removal reddened nothing (L-142 · L-187).
 dep_ids() {
-  _r=$(printf '%s' "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-  case "$_r" in ''|none|None|NONE) return 0 ;; esac
-  printf '%s' "$_r" | grep -oE 'T[0-9]+' | tr '\n' ','
+  printf '%s' "$1" \
+    | sed -e 's/·/,/g' \
+    | tr ',' '\n' \
+    | sed -e 's/^[[:space:]]*//' \
+    | grep -oE '^T[0-9]+' \
+    | tr '\n' ','
 }
 inplan=0; tid=""; layers=""; deps=""; cur=""
 flush() { [ -n "$tid" ] && printf '%s\t%s\t%s\n' "$tid" "$layers" "$deps" >>"$records"; }
@@ -157,12 +167,14 @@ while IFS= read -r line || [ -n "$line" ]; do
       # CALL SITE 1 of 2 -- the field line. Site 2 is the indented `D)` continuation arm below, and
       # both must be anchored: SPRINT-094's explanations ran onto continuation lines, so fixing only
       # the field arm leaves the prose leaking in one line lower (L-058).
-      _raw=${line#Depends-on:}; _reg=$(dep_region "$_raw")
-      deps="$deps$(dep_ids "$_reg")"
-      # If this field carried prose, its continuation lines are prose too -- stop collecting, so a
-      # wrapped explanation cannot contribute ids. A field with no prose marker may legitimately
-      # wrap its id list, and still does.
-      if [ "$_reg" = "$_raw" ]; then cur=D; else cur=""; fi
+      cur=D; deps="$deps$(dep_ids "${line#Depends-on:}")"
+      # `cur` is NOT blanked when the field carries prose. The first design did that -- "if this
+      # field explained itself, its continuations are prose too" -- and independent review showed it
+      # drops real ids: a field that annotates its first dependency and WRAPS the rest of the list
+      # (`Depends-on: T1 — shared alpha.md, T1 owns it first` / continuation `, T2`) lost T2
+      # entirely, dispatching two dependent tasks in the same wave with PREFLIGHT: CLEAR. Anchoring
+      # per item makes the blanking unnecessary: prose contributes no ids because it does not begin
+      # an item with one, wherever it sits.
       ;;
     "Cites:"*)
       cur=C
@@ -176,10 +188,12 @@ while IFS= read -r line || [ -n "$line" ]; do
       # are cited, not touched, so folding them into Layers: would invent overlaps.
       case "$cur" in
         L) layers="$layers$(printf '%s' "$line" | grep -oE "$TOK" | tr '\n' ',')" ;;
-        # CALL SITE 2 of 2 (TD-132). Same anchoring as the field arm: a continuation that starts an
-        # explanation contributes its ids up to the marker and then stops the collection entirely.
-        D) _reg=$(dep_region "$line"); deps="$deps$(dep_ids "$_reg")"
-           [ "$_reg" = "$line" ] || cur="" ;;
+        # CALL SITE 2 of 2 (TD-132). Identical treatment to the field arm -- same function, no
+        # special casing -- so a wrapped id list keeps working and wrapped prose still yields
+        # nothing. Residual, accepted and bounded: a continuation line whose own first item begins
+        # `Tn ` would read as an id. That requires a prose sentence to open with a task id on a
+        # continuation line; the fixtures below cover the prose shapes this repo actually writes.
+        D) deps="$deps$(dep_ids "$line")" ;;
       esac
       ;;
     *) cur="" ;;

@@ -226,3 +226,71 @@ minutes after its own seeded-break proof ran clean (L-165, count 5). Ticking wai
 reviewer.
 
 consequence · T2 · behaviour:material · governance:high
+
+### 2026-09-07 | surprise | T2's isolated review REJECTED the first design — two CRITICAL silent false negatives
+
+The bounded builder retry (one per pass, `review-scoping.md` § The revise loop). The reviewer's
+findings were correct and are the reason the first design is gone rather than patched.
+
+**Finding 1 (CRITICAL).** `dep_region` truncated the whole field at the *first* prose marker, and in
+this repo's own historical lines that marker belongs to the **first id's own annotation**:
+
+- `docs/sprint/archive/SPRINT-055-wiring-the-standard.md:161` — `Depends-on: T1 (count guard must exist first), T3, T6 (shared files — see D1)` → parsed as `[T1]`; T3 and T6 silently gone.
+- `docs/sprint/archive/SPRINT-063-headroom.md:83` — `Depends-on: T2 (subtraction first) · T1 (owns …)` → parsed as `[T2]`; T1 gone.
+
+**This is worse than TD-132.** TD-132 invented an edge and HALTed *loudly*. A dropped edge lets two
+genuinely dependent tasks dispatch in the same wave under `PREFLIGHT: CLEAR`, with no finding for a
+human or the orchestrator to see — a gate that fails green (L-058). And the trigger is this project's
+own house style, not a contrived shape.
+
+**Finding 2 (CRITICAL, independent).** The field arm blanked `cur` whenever the field carried any
+prose marker, on the reasoning "if the field explained itself, its continuations are prose too". A
+field that annotates its first dependency and **wraps the rest of a real list** therefore lost every
+wrapped id. Different trigger, same silent-drop outcome.
+
+**Finding 3 (HIGH)** was the loud face of Finding 1 — a false `shared-file-unowned` HALT on a Plan
+whose ownership was correctly declared.
+
+**Second design, and it is a redesign rather than a patch.** `dep_region` is deleted. `dep_ids` now
+splits on the separators Plans actually use (`,` and `·`) and takes the **leading id of each item**,
+anchored with `^T[0-9]+`. An id inside an item's own annotation is prose and is ignored *by position*,
+so there is no marker list to be defeated by a marker it does not know. `cur` is never blanked. The
+`none` special case is **deleted** rather than kept-and-annotated: `none — <prose>` is one item
+beginning `none`, which yields no id because the anchor does not match — the behaviour is now load-
+bearing instead of the dead branch the previous entry recorded as untested.
+
+Verified against the real corpus, not fixtures alone (L-166):
+
+```
+SPRINT-055:161 -> [T1,T3,T6]      (first design: [T1])
+SPRINT-063:83  -> [T2,T1]         (first design: [T2])
+SPRINT-094 T2  -> []              (TD-132's original case, still correct)
+SPRINT-095 T4  -> [T3]
+```
+
+Two fixtures added for the reviewer's shapes, both asserting a **RANK** rather than absence-of-cycle,
+because rank is what distinguishes "the ids parsed" from "the ids vanished and the tasks collapsed
+into one wave" — absence of a FAIL proves nothing when the defect *is* silence. Harness 11 → 13
+cases. A false claim in my own fixture header was also corrected: it said both separators were
+exercised while the file used only commas; a `·`-separated task now makes that true.
+
+**Discrimination proof, second design.** Convention, stated once: `git hash-object` on the working
+file. Every seed guarded for landing, parsing, and being targeted (±0 lines, 13 assertions fixed).
+
+| seed | target | control |
+|---|---|---|
+| A — item anchor removed (`^T[0-9]+` → `T[0-9]+`) | `deps-prose-field` REDDENED | `deps-inline-annotated-list` held |
+| B — comma split removed | `deps-inline-annotated-list` REDDENED | `deps-prose-field` held |
+| C — `·` normalisation removed | `deps-inline-annotated-list` REDDENED | `deps-prose-continuation` held |
+
+**Four earlier seed attempts failed to land or produced a demolition** — a malformed `sed`, a wrong
+line number, and twice an `awk -v` that ate the pipeline's continuation backslash. Every one was
+caught by the guards and reported as `DID NOT LAND` / `does not parse — demolition` rather than
+scored as a pass. That is L-142/L-187 working exactly as written, and it is worth recording that the
+guard fired four times in one task.
+
+**Still unverified, carried forward:** the reviewer could not test the BSD-vs-GNU `sed` portability
+claim (no BSD sed available) — flagged as unverified rather than as a finding. The `·`→`,`
+normalisation and the `[[:space:]]` class are the portability-sensitive parts.
+
+consequence · T2 · behaviour:material · governance:high
