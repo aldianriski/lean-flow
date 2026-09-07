@@ -417,7 +417,28 @@ for sp in "$@"; do
   #
   # Discovery is relative to the subject sprint's own directory, never a hardcoded repo path, so a
   # consumer whose sprints live elsewhere gets the same behaviour (L-015).
-  owning_sprints="$sibling_sprints"
+  #
+  # BOUNDED BY WINDOW, and the first version of this fix was not -- an independent review caught it
+  # and reproduced it live. Unioning every archived sprint NUMBER into the trusted-owner set means
+  # any commit whose subject cites any archived number is exempt from the undeclared-file check, for
+  # every active sprint, forever. This repo's archive holds 91 sprints, so that is 91 numbers a
+  # mislabelled, copy-pasted, cherry-picked or deliberately-evasive commit subject could hide real
+  # undeclared work behind. Demonstrated: an active SPRINT-200 plus an unrelated archived SPRINT-001,
+  # and a commit inside 200's window doing real 200 work under the subject `sprint(001) T1: ...`,
+  # went from a correct FAIL to PASS. That trades TD-125's narrow real defect for an unbounded one
+  # -- exactly the "widening an exclusion is how a guard acquires a silent false negative" risk this
+  # task was written to respect.
+  #
+  # So an archived sprint is recorded WITH ITS WINDOW, and ownership is checked against that window
+  # rather than granted on the number alone. Stored as `<number> <plan_commit> <close_commit>` lines
+  # in a temp file: a shell string would need re-splitting per commit, and the count is unbounded.
+  # One file reused across sprints, truncated per iteration -- the loop runs once per sprint file,
+  # so a fresh mktemp each time would leak one per sprint. Registered on EXIT the first time only.
+  if [ -z "${archived_windows:-}" ]; then
+    archived_windows=$(mktemp) || { printf 'FAIL  %s layers observed: mktemp failed for the archive window map\n' "$sp"; fail=$((fail + 1)); continue; }
+    trap 'rm -f "$archived_windows"' EXIT INT TERM
+  fi
+  : > "$archived_windows"
   for _asp in "$(dirname "$sp")"/archive/SPRINT-*.md; do
     [ -f "$_asp" ] || continue
     _an=$(fmv "$_asp" sprint)
@@ -425,8 +446,28 @@ for sp in "$@"; do
     # Same self-sibling guard as above, and for the same reason: a sprint that became its own
     # sibling would skip every one of its own commits -- a total bypass, not a narrow miss.
     [ "$_an" = "$my_sprint" ] && continue
-    owning_sprints="$owning_sprints $_an"
+    _apc=$(fmv "$_asp" plan_commit); _acc=$(fmv "$_asp" close_commit)
+    # A window needs both ends to be checkable. An archived sprint missing either is recorded with
+    # empty fields and owns nothing -- it fails toward REPORTING the commit, which is the safe
+    # direction: over-reporting is loud, and a silent exemption is what this block exists to avoid.
+    printf '%s %s %s\n' "$_an" "$_apc" "$_acc" >>"$archived_windows"
   done
+  # owns_commit <sprint-number> <commit> -- true only when an ARCHIVED sprint of that number has a
+  # window and the commit lies inside it. `merge-base --is-ancestor` is reflexive, so a commit that
+  # IS the plan_commit or the close_commit counts as inside.
+  owns_commit() {
+    _q=$1; _c=$2
+    while read -r _wn _wp _wc; do
+      [ "$_wn" = "$_q" ] || continue
+      [ -n "$_wp" ] && [ -n "$_wc" ] || continue
+      git rev-parse --verify -q "$_wp^{commit}" >/dev/null 2>&1 || continue
+      git rev-parse --verify -q "$_wc^{commit}" >/dev/null 2>&1 || continue
+      git merge-base --is-ancestor "$_wp" "$_c" 2>/dev/null || continue
+      git merge-base --is-ancestor "$_c" "$_wc" 2>/dev/null || continue
+      return 0
+    done < "$archived_windows"
+    return 1
+  }
 
   # A declared token ending in "/" is a DIRECTORY prefix covering every path beneath it (SPRINT-055
   # T1). Before that, such a token was accepted and matched nothing, so it read as a declaration
@@ -454,9 +495,16 @@ for sp in "$@"; do
     # leak: the unit of ownership is the commit, so the unit of exclusion must be too.
     c_sprint=$(commit_sprint "$c")
     if [ -n "$c_sprint" ]; then
-      # owning_sprints, not sibling_sprints (TD-125): the question here is who OWNS this commit,
-      # and a closed sprint owns its history whether or not it has been archived.
-      case " $owning_sprints " in *" $c_sprint "*) continue ;; esac
+      # Two ownership tests, deliberately asymmetric (TD-125).
+      # An ACTIVE sibling is skipped on its NUMBER alone: it is another stream's live work, its
+      # window is open, and reporting it here would be this checker blaming one stream for another's
+      # in-flight commits. That is the pre-existing behaviour and is unchanged.
+      case " $sibling_sprints " in *" $c_sprint "*) continue ;; esac
+      # An ARCHIVED sprint must additionally OWN the commit -- its window has to contain it. The
+      # number alone is not enough: it is a string in a commit subject, and trusting it would exempt
+      # any commit citing any of the archive's numbers from the undeclared-file check (found by
+      # review, reproduced live). A closed sprint owns its history forever, but only ITS history.
+      owns_commit "$c_sprint" "$c" && continue
     fi
     who=$(attribute "$c")
     for f in $(git diff-tree --no-commit-id --name-only -r "$c" 2>/dev/null); do

@@ -1282,12 +1282,25 @@ plan_commit: PLAN_COMMIT_PLACEHOLDER
 Layers: scripts/mine.sh
 Depends-on: none
 SP930
-cat > "$c9/docs/sprint/archive/SPRINT-931-closed.md" <<'SP931'
+printf 'x\n' > "$c9/scripts/mine.sh"
+git -C "$c9" init -q
+lock_plan "$c9" 'docs/sprint/SPRINT-930-active.md'
+# The archived sprint's own work, landing INSIDE 930's window and naming 931 in its subject. Its
+# window is captured around it: an archived sprint owns a commit by WINDOW, never by number alone
+# (see the archived-window case below for why), so the fixture has to give 931 a real one -- a
+# placeholder plan_commit and an absent close_commit make it own nothing, which is the safe
+# direction but not the case under test.
+c9_before=$(git -C "$c9" rev-parse HEAD)
+printf 'y\n' > "$c9/scripts/theirs.sh"
+commit_all "$c9" 'sprint(931) T1: the archived sprint owns this'
+c9_theirs=$(git -C "$c9" rev-parse HEAD)
+cat > "$c9/docs/sprint/archive/SPRINT-931-closed.md" <<SP931
 ---
 sprint: 931
 slug: closed
 status: closed
-plan_commit: PLAN_COMMIT_PLACEHOLDER
+plan_commit: $c9_before
+close_commit: $c9_theirs
 ---
 
 ## Plan
@@ -1296,12 +1309,7 @@ plan_commit: PLAN_COMMIT_PLACEHOLDER
 Layers: scripts/theirs.sh
 Depends-on: none
 SP931
-printf 'x\n' > "$c9/scripts/mine.sh"
-git -C "$c9" init -q
-lock_plan "$c9" 'docs/sprint/SPRINT-930-active.md'
-# The archived sprint's own work, landing INSIDE 930's window and naming 931 in its subject.
-printf 'y\n' > "$c9/scripts/theirs.sh"
-commit_all "$c9" 'sprint(931) T1: the archived sprint owns this'
+commit_all "$c9" 'sprint(930) T1: record the archived sprint file'
 # A genuinely undeclared path, owned by nobody -- the sibling control.
 printf 'z\n' > "$c9/scripts/orphan.sh"
 commit_all "$c9" 'chore: a file no sprint declares'
@@ -1317,6 +1325,51 @@ case "$c9_out" in
     printf '%s\n' "$c9_out"; fail=1 ;;
   *) echo "PASS fixture(archived-sibling: archived sprint keeps its own commits): scripts/theirs.sh not blamed on the active sibling" ;;
 esac
+
+c10="$work/archived-window-bounded"
+mkdir -p "$c10/docs/sprint/archive" "$c10/src"
+cat > "$c10/docs/sprint/SPRINT-940-active.md" <<'SP940'
+---
+sprint: 940
+slug: active
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+## Plan
+
+### T1 — Declares only its own file
+Layers: src/mine.js
+Depends-on: none
+SP940
+printf 'x\n' > "$c10/src/mine.js"
+git -C "$c10" init -q
+lock_plan "$c10" 'docs/sprint/SPRINT-940-active.md'
+# An archived sprint whose whole window is the root commit -- long closed, unrelated to 940.
+anc=$(git -C "$c10" rev-list --max-parents=0 HEAD)
+cat > "$c10/docs/sprint/archive/SPRINT-941-ancient.md" <<SP941
+---
+sprint: 941
+slug: ancient
+status: closed
+plan_commit: $anc
+close_commit: $anc
+---
+
+## Plan
+
+### T1 — Long closed
+Layers: src/ancient.js
+Depends-on: none
+SP941
+commit_all "$c10" 'sprint(940) T1: record the archived sprint'
+# Real, undeclared SPRINT-940 work wearing the archived sprint's number in its subject.
+printf 'y\n' > "$c10/src/undeclared-real-work.js"
+commit_all "$c10" 'sprint(941) T1: mislabeled -- this is actually 940 real work'
+
+run_case_anywhere "archived-window: a cited number does not grant ownership outside its window" 1 \
+  "src/undeclared-real-work.js" -- \
+  sh -c "cd \"$c10\" && sh \"$checker\" docs/sprint/SPRINT-940-active.md"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-OBSERVED FIXTURES: all green"; else echo "LAYERS-OBSERVED FIXTURES: at least one FAIL"; fi

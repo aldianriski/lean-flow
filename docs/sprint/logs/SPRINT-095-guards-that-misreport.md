@@ -388,3 +388,60 @@ archived-sibling assertion while the orphan control **holds green**. Restored at
 Not ticked: the isolated reviewer has not run.
 
 consequence · T1 · behaviour:material · governance:high
+
+### 2026-09-07 | surprise | T1's review found a CRITICAL: the fix traded a narrow defect for an unbounded one
+
+**Finding (CRITICAL, reproduced live).** `owning_sprints` unioned in every archived sprint NUMBER
+found under `archive/` — 91 in this repo — with no check that the archived sprint had anything to do
+with the subject sprint's window. A sprint number reaches this checker only as a *string in a commit
+subject*, so that exempted **any commit citing any archived number** from the undeclared-file check,
+for every active sprint, forever: a mislabelled, copy-pasted, cherry-picked or evasive subject could
+hide real undeclared work behind any of 91 numbers. Demonstrated: an active `SPRINT-200` with an
+unrelated archived `SPRINT-001`, and genuinely undeclared 200 work committed as
+`sprint(001) T1: mislabeled` — `FAIL` on the parent commit, **`PASS` on mine**.
+
+That is the *"widening an exclusion is how a guard acquires a silent false negative"* risk this task's
+own fixture header warns about, and I wrote the warning and then did not bound the code.
+
+**Fix (the revise loop's one bounded retry).** An archived sprint is recorded with its **window**
+(`plan_commit`…`close_commit`) and `owns_commit` grants ownership only when the commit lies inside it
+(`merge-base --is-ancestor` both ways; reflexive, so the endpoints count). Active siblings are still
+skipped on number alone — deliberately asymmetric, because their windows are open and reporting them
+would blame one live stream for another's in-flight commits. The reviewer's repro now FAILs correctly.
+
+**A consequence worth stating rather than hiding: 3 of the 91 archived sprints have no resolvable
+`close_commit`.** They own nothing under the bounded rule, so their commits are *reported* rather than
+exempted. That fails in the loud direction, which is the right one — but TD-125's original symptom
+persists for those three, and archiving near their windows will surface findings.
+
+**Acceptance re-run on the real pair after the retry:** 092's blamed pairs are **3 in place, 3
+archived** (pre-fix: 3 → 85). **Discrimination:** seeding ownership-by-number-alone reddens the
+window fixture while the sibling fixture holds; seeding archived discovery away reddens the sibling
+fixture while the window fixture holds. Restored at hash `c051f2bb`.
+
+**A fixture bug found by the new rule, and it is the useful kind.** The original `archived-sibling`
+fixture gave its archived sprint a placeholder `plan_commit` and no `close_commit`, so under the
+bounded rule it owned nothing and the case went red. The fixture, not the code, was wrong — it had
+been passing for the wrong reason. Rebuilt with a real window captured around the commit it owns.
+
+### 2026-09-07 | progress | T2 hardened against round 3's four latent paths
+
+All four shared one root cause: an unrecognised token **ended** the id list and everything after it
+was discarded with no signal. Two are now parsed *correctly* rather than warned about — `[…]` counts
+as an annotation exactly like `(…)`, and markup is stripped before the id test so `**T1**` and
+`` `T1` `` parse as the ids they plainly are. The third, an unclosed annotation, genuinely cannot be
+parsed, so it is reported by name (`FAIL depends-on-unreadable`) **before** waves or ownership are
+derived from a list already known to be incomplete.
+
+**I shipped that half unwired and caught it here.** The `depsbad` flag was threaded through the
+record and *nothing read it* — L-020's exact shape, and precisely the class T3's own unwired-exports
+rule exists to detect. Two further self-inflicted defects on the same edit: `awk -v` expanded the
+`\t`/`\n` in `flush()` into real characters and split the line (caught by `sh -n`), and a stray
+`printf "\t!UNBALANCED"` survived an earlier deletion and injected a **tab** into `deps` — which
+shifts every field of a tab-delimited record. Neither was caught by a test; both by reading output.
+
+Harness 15 → 18 cases / 20 assertions. Discrimination: seeding away bracket-counting, the markup
+strip, and the unbalanced report each reddens only its own fixture with a control green.
+
+consequence · T1 · behaviour:material · governance:high
+consequence · T2 · behaviour:material · governance:high

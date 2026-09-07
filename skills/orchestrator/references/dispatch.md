@@ -155,22 +155,36 @@ dep_ids() {
       # containing a multi-byte character can match its individual BYTES under a non-UTF-8 locale.
       gsub(/,/, " "); gsub(/·/, " ")
       n = split($0, tok, /[[:space:]]+/)
-      depth = 0; out = ""
+      depth = 0; out = ""; bad = 0
       for (i = 1; i <= n; i++) {
         t = tok[i]
         if (t == "") continue
-        # gsub with an identical replacement is a no-op that returns the count.
-        o = gsub(/\(/, "(", t); c = gsub(/\)/, ")", t)
+        # Markup is DECORATION, not structure. Round 3 of review showed `**T1**` and `` `T1` `` were
+        # not merely skipped -- the token matched neither the id test nor the annotation test, so it
+        # ended the list and discarded every id after it. Stripping first makes a decorated id parse
+        # as the id it plainly is, which is correct behaviour rather than a warning about it.
+        gsub(/[`*]/, "", t)
+        # Count on a COPY: these gsubs mangle their subject, and the exact-id test below needs the
+        # token intact. `[...]` counts with `(...)`: an annotation is an annotation whichever
+        # brackets it wears, and round 3 showed `T1 [see D1] T2` silently lost T2 because a bracket
+        # token carried no `(` and so hit the prose branch.
+        u = t
+        o = gsub(/[([]/, "X", u); c = gsub(/[)\]]/, "Y", u)
         if (depth > 0) { depth += o - c; if (depth < 0) depth = 0; continue }
         if (t ~ /^T[0-9]+$/) { out = out t ","; continue }   # a dependency
         if (o > 0) { depth = o - c; if (depth < 0) depth = 0; continue }  # an annotation: skip it
         break                                                 # prose: the id list has ended
       }
+      # An annotation still open at end of line swallowed the rest of it, ids included. That is the
+      # one shape here that cannot be parsed correctly, so it is reported LOUDLY rather than dropped
+      # silently -- the whole point of the guard (L-058). Balanced annotations never reach this.
+      if (depth > 0) bad = 1
+      if (bad) printf "!"
       printf "%s", out
     }'
 }
-inplan=0; tid=""; layers=""; deps=""; cur=""
-flush() { [ -n "$tid" ] && printf '%s\t%s\t%s\n' "$tid" "$layers" "$deps" >>"$records"; }
+inplan=0; tid=""; layers=""; deps=""; cur=""; depsbad=""
+flush() { [ -n "$tid" ] && printf '%s\t%s\t%s\t%s\n' "$tid" "$layers" "$deps" "$depsbad" >>"$records"; }
 while IFS= read -r line || [ -n "$line" ]; do
   case "$line" in
     "## Plan"*) inplan=1; continue ;;
@@ -181,7 +195,7 @@ while IFS= read -r line || [ -n "$line" ]; do
     "### T"*)
       flush
       tid=$(printf '%s' "$line" | grep -oE '^### T[0-9]+' | sed 's/^### //')
-      layers=""; deps=""; cur=""
+      layers=""; deps=""; cur=""; depsbad=""
       ;;
     "Layers:"*)
       cur=L; layers="$layers$(printf '%s' "$line" | grep -oE "$TOK" | tr '\n' ',')"
@@ -190,7 +204,9 @@ while IFS= read -r line || [ -n "$line" ]; do
       # CALL SITE 1 of 2 -- the field line. Site 2 is the indented `D)` continuation arm below, and
       # both must be anchored: SPRINT-094's explanations ran onto continuation lines, so fixing only
       # the field arm leaves the prose leaking in one line lower (L-058).
-      cur=D; deps="$deps$(dep_ids "${line#Depends-on:}")"
+      cur=D; _d=$(dep_ids "${line#Depends-on:}")
+      case "$_d" in "!"*) depsbad=1; _d=${_d#!} ;; esac
+      deps="$deps$_d"
       # `cur` is NOT blanked when the field carries prose. The first design did that -- "if this
       # field explained itself, its continuations are prose too" -- and independent review showed it
       # drops real ids: a field that annotates its first dependency and WRAPS the rest of the list
@@ -216,7 +232,9 @@ while IFS= read -r line || [ -n "$line" ]; do
         # nothing. Residual, accepted and bounded: a continuation line whose own first item begins
         # `Tn ` would read as an id. That requires a prose sentence to open with a task id on a
         # continuation line; the fixtures below cover the prose shapes this repo actually writes.
-        D) deps="$deps$(dep_ids "$line")" ;;
+        D) _d=$(dep_ids "$line")
+           case "$_d" in "!"*) depsbad=1; _d=${_d#!} ;; esac
+           deps="$deps$_d" ;;
       esac
       ;;
     *) cur="" ;;
@@ -255,7 +273,7 @@ function find_chain(tgt, anchor, visited,   d, m, darr, j, chainsub, v2) {
   }
   return ""
 }
-{ order[NR]=$1; layers[$1]=$2; deps[$1]=$3; n=NR }
+{ order[NR]=$1; layers[$1]=$2; deps[$1]=$3; depsbad[$1]=$4; n=NR }
 END {
   fail=0
   for (i=1;i<=n;i++) rank[order[i]]=-1
@@ -303,6 +321,17 @@ END {
       if (ok) { rank[t]=mx+1; progress=1 }
     }
     if (!progress) break
+  }
+  # An unreadable Depends-on: is reported BEFORE anything is derived from it. A `(` that never
+  # closes swallows the rest of its line, ids included, and every downstream verdict -- waves,
+  # ownership -- would then be computed from a dependency list the tool knows is incomplete. Loud
+  # and early beats a silently-truncated list feeding a confident PASS (L-058).
+  for (i=1;i<=n;i++) {
+    t=order[i]
+    if (depsbad[t]=="1") {
+      print "FAIL depends-on-unreadable: "t" -- an annotation in its Depends-on: is never closed, so the rest of that line (task ids included) cannot be read. Close the bracket, or move the note off the field"
+      fail=1
+    }
   }
   cyc=""
   for (i=1;i<=n;i++) { t=order[i]; if (rank[t]==-1) cyc=cyc" "t }

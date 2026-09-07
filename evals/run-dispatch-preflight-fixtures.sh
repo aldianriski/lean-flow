@@ -165,6 +165,29 @@ run_case_anywhere "deps-space-separated" 0 "PASS wave-computation: T1=0 T3=1 T5=
 run_case_anywhere "deps-prose-names-task-unowned" 1 "FAIL shared-file-unowned: shared.md in T2 and T3" -- \
   sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-prose-names-task-unowned/sprint.md\" \"$live_head\""
 
+# --- cases 16-18 (TD-132, round 3 hardening) -----------------------------------------------------
+# Round 3 of review found no corpus defect but four latent silent-drop paths, all one root cause: an
+# unrecognised token ENDED the id list and everything after it was discarded with no signal. Two are
+# fixed by parsing correctly rather than warning; the third cannot be parsed and is reported loudly.
+
+# case 16 -- `[...]` is an annotation, like `(...)`. A bracket token carries no `(`, so it used to
+# hit the prose branch and drop the ids after it. Rank asserted: T3 at 1 would mean T2 was lost.
+run_case_anywhere "deps-bracket-annotation" 0 "PASS wave-computation: T1=0 T2=1 T3=2" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-bracket-annotation/sprint.md\" \"$live_head\""
+
+# case 17 -- markup is decoration. `**T1**` / `` `T1` `` matched neither test and so ended the list,
+# discarding the wrapped id AND everything after it. This repo writes that style constantly in logs
+# and commit messages, so it is one habit-slip from a real field.
+run_case_anywhere "deps-markup-wrapped-id" 0 "PASS wave-computation: T1=0 T2=1 T3=2" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-markup-wrapped-id/sprint.md\" \"$live_head\""
+
+# case 18 -- MUST-FAIL. An unclosed annotation leaves the depth counter above zero and swallows the
+# rest of the line, real ids included. It is the one shape here that cannot be parsed correctly, so
+# it is REPORTED rather than truncated silently -- and reported before waves or ownership are
+# derived from a list the tool already knows is incomplete (L-058).
+run_case_anywhere "deps-unbalanced-annotation" 1 "FAIL depends-on-unreadable: T2" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-unbalanced-annotation/sprint.md\" \"$live_head\""
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "DISPATCH-PREFLIGHT FIXTURES: all green"; else echo "DISPATCH-PREFLIGHT FIXTURES: at least one FAIL"; fi
 exit $fail
