@@ -101,6 +101,34 @@ done
 run_case_anywhere "parser-parity/completeness" 0 "### T2 Layers completeness" -- \
   sh -c "cd \"$repo_root\" && sh scripts/lib/check-layers-completeness.sh \"$parity\""
 
+# --- cases 8-10 (TD-132): `Depends-on:` prose must not become dependency edges ------------------
+# The `Layers:` side of this parser was anchored by TOK at TD-043; `Depends-on:` was left as a bare
+# `grep -oE 'T[0-9]+'` over the whole line, so it harvested ids out of the field's own explanation
+# and ignored the literal `none` in front of them. On SPRINT-094 -- four tasks, every one declaring
+# `none` -- it built `T2 -> [T1,T2,T1,T2]`, a self-edge no topological sort resolves, and FAILed
+# `cycle-detected` on an acyclic Plan while issuing three `shared-file-owned` PASSes off the
+# invented edges. The false HALT is the loud half; the false PASS green-lights a wave with no
+# ownership order at all.
+#
+# Asserted on OUTPUT CONTENT, not exit status: pre-fix, case 8 exits 1 carrying `FAIL
+# cycle-detected`, so a status-only assertion cannot tell "this Plan has a cycle" from "the parser
+# invented one".
+
+# case 8 -- prose on the FIELD line (call site 1 of 2). Must NOT report a cycle.
+run_case_anywhere "deps-prose-field" 0 "PASS wave-computation: T1=0 T2=0 T3=0" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-prose-field/sprint.md\" \"$live_head\""
+
+# case 9 -- prose on an INDENTED CONTINUATION (call site 2 of 2). This is the arm a field-only fix
+# leaves leaking, and SPRINT-094's explanations really did wrap onto continuation lines (L-058).
+run_case_anywhere "deps-prose-continuation" 0 "PASS wave-computation: T1=0 T2=0" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-prose-continuation/sprint.md\" \"$live_head\""
+
+# case 10 -- SIBLING CONTROL. Anchoring must not blind the parser to real edges: T3 declares
+# `T1 . T2` and then explains itself, so exactly those two must still be read. Rank 1 is what
+# distinguishes "parsed correctly" from "parsed nothing" -- an unparsed T3 would sit at rank 0.
+run_case_anywhere "deps-ids-with-prose" 0 "PASS wave-computation: T1=0 T2=0 T3=1" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-ids-with-prose/sprint.md\" \"$live_head\""
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "DISPATCH-PREFLIGHT FIXTURES: all green"; else echo "DISPATCH-PREFLIGHT FIXTURES: at least one FAIL"; fi
 exit $fail

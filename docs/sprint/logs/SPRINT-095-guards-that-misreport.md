@@ -176,3 +176,53 @@ because a PASS line vanished between two runs, not by any check. Filing is left 
 than taken here.
 
 consequence · plan-declarations · behaviour:material · governance:high
+
+### 2026-09-07 | progress | T2 built — parser anchored at both call sites, 13 assertions, nothing ticked yet
+
+**Implementation.** Two helpers added beside `TOK` (the anchoring TD-043 gave the `Layers:` side and
+`Depends-on:` never got): `dep_region` truncates a field at the first prose marker — em dash, ` --`,
+or `(` — and `dep_ids` reads `T[0-9]+` from what remains. Both call sites use them: the
+`"Depends-on:"*)` field arm and the indented `D)` continuation arm. When a field carries prose its
+continuations are prose too, so collection stops (`cur=""`); a field that merely wraps its id list
+still continues. Markers are literal characters, not `\x` escapes, so BSD sed behaves like GNU sed —
+the snippet ships to consumers.
+
+**Both motivating artifacts (L-166).**
+
+- SPRINT-094: `PASS wave-computation: T1=0 T2=0 T3=0 T4=0`, no `FAIL cycle-detected` — DoD-1's exact
+  criterion. It now also emits **three `FAIL shared-file-unowned`**, which is precisely what TD-132's
+  row predicted the corrected behaviour would be. Those are true findings: 094's T1 and T2 shared
+  three files with no `Depends-on` edge, managed by D1/D2 prose instead.
+- SPRINT-095: `PREFLIGHT: CLEAR`, `T1=0 T2=0 T3=0 T4=1`, `shared-file-owned: scripts/qa-check.sh in
+  T3,T4 order=T3->T4`. Per the override entry above, **this** is now the binding preflight result —
+  the earlier PASS was derived from invented edges and was explicitly not treated as evidence.
+
+**Harness: 8 cases → 11 (13 assertions), all green.** Three added: prose on the field line, prose on
+an indented continuation, and a sibling control where real ids sit in front of prose.
+
+**Seeded-break discrimination proof.** Hash convention, stated once and used throughout:
+`git hash-object <path>` on the working file — normalization-aware by construction, so the CRLF trap
+L-169 records cannot arise. Every seed was guarded: landed (`cmp` differs), still parses (`sh -n` on
+the extracted snippet), and targeted (0-line delta, assertion count 11 unchanged).
+
+| seed | target case | control |
+|---|---|---|
+| A — field arm reads the raw field | `deps-prose-field` **REDDENED** | `deps-prose-continuation` held green |
+| B — continuation arm reads the raw line | `deps-prose-continuation` **REDDENED** | `deps-prose-field` held green |
+
+Each fixture is bound to its own call site, which *proves* DoD-3's "both call sites" instead of
+asserting it. `dispatch.md` restored after each seed with `git hash-object` equal to pristine
+(`e18acc83`).
+
+**One negative result, recorded rather than smoothed.** A third seed removed the `none`
+short-circuit in `dep_ids` and **reddened nothing** — `dep_region` has already truncated
+`none — <prose>` to `none`, in which no `T[0-9]+` exists. That arm is therefore defence-in-depth and
+is **NOT independently proven**; it is annotated as untested in the code itself rather than counted
+as covered (L-142 · L-187). DoD-2 is still met — `none` does short-circuit — but by truncation, not
+by the branch one would assume.
+
+**No DoD ticked.** SPRINT-094's T1 review returned 3 HIGH / 3 MEDIUM *inside boxes already ticked*,
+minutes after its own seeded-break proof ran clean (L-165, count 5). Ticking waits for the isolated
+reviewer.
+
+consequence · T2 · behaviour:material · governance:high

@@ -110,6 +110,32 @@ fi
 # directory arm matters because `Layers: evals/fixtures/` carries no dot at all, so a file-only
 # pattern skipped it silently and two tasks could declare the same tree with no overlap reported.
 TOK='[A-Za-z0-9_./-]+\.[A-Za-z0-9]+|[A-Za-z0-9_.-][A-Za-z0-9_./-]*/'
+# DEP (TD-132): the `Depends-on:` side needed the same anchoring TOK gave `Layers:` above, and did
+# not have it. A bare `grep -oE 'T[0-9]+'` over the whole line harvests ids out of the field's own
+# explanatory prose and ignores the literal `none` that precedes them -- so
+# `Depends-on: none -- but see D1 (T1 and T2 share qa-check.sh)` yielded [T1,T2], and on SPRINT-094
+# every task declared `none` while the parser built T2 -> [T1,T2,T1,T2]. That self-edge is
+# unresolvable by any topological sort, so the tool FAILed `cycle-detected` on an acyclic Plan --
+# and, worse, issued `shared-file-owned` PASSes derived from the edges it had invented. The false
+# HALT is loud; the false PASS green-lights a wave with no ownership order at all.
+#
+# dep_region: the id-list REGION of the field -- everything before the first prose marker. The
+# markers are the ones this repo's Plans actually use to start an explanation: an em dash, a
+# double-hyphen, or an opening parenthesis. Written as literal characters rather than \x escapes so
+# it behaves the same under BSD sed as GNU sed (the snippet ships to consumers).
+dep_region() { printf '%s' "$1" | sed -e 's/—.*$//' -e 's/ --.*$//' -e 's/(.*$//'; }
+# dep_ids: ids from a region, and NOTHING when the region is the literal `none`. `none` is a
+# declaration of no dependencies, not an absence of one, so it is honoured rather than searched.
+# HONEST NOTE on that `none` arm: it is defence-in-depth and is NOT independently proven. Seeding
+# its removal reddens no fixture, because dep_region has already truncated `none -- <prose>` down to
+# `none`, in which grep finds no `T[0-9]+` anyway. It earns its place only if the marker set above
+# ever changes; it is recorded as untested rather than counted as covered (L-142 · L-187 -- a seeded
+# break that reddens nothing has tested nothing, and must not be scored as a pass).
+dep_ids() {
+  _r=$(printf '%s' "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  case "$_r" in ''|none|None|NONE) return 0 ;; esac
+  printf '%s' "$_r" | grep -oE 'T[0-9]+' | tr '\n' ','
+}
 inplan=0; tid=""; layers=""; deps=""; cur=""
 flush() { [ -n "$tid" ] && printf '%s\t%s\t%s\n' "$tid" "$layers" "$deps" >>"$records"; }
 while IFS= read -r line || [ -n "$line" ]; do
@@ -128,7 +154,15 @@ while IFS= read -r line || [ -n "$line" ]; do
       cur=L; layers="$layers$(printf '%s' "$line" | grep -oE "$TOK" | tr '\n' ',')"
       ;;
     "Depends-on:"*)
-      cur=D; deps="$deps$(printf '%s' "$line" | grep -oE 'T[0-9]+' | tr '\n' ',')"
+      # CALL SITE 1 of 2 -- the field line. Site 2 is the indented `D)` continuation arm below, and
+      # both must be anchored: SPRINT-094's explanations ran onto continuation lines, so fixing only
+      # the field arm leaves the prose leaking in one line lower (L-058).
+      _raw=${line#Depends-on:}; _reg=$(dep_region "$_raw")
+      deps="$deps$(dep_ids "$_reg")"
+      # If this field carried prose, its continuation lines are prose too -- stop collecting, so a
+      # wrapped explanation cannot contribute ids. A field with no prose marker may legitimately
+      # wrap its id list, and still does.
+      if [ "$_reg" = "$_raw" ]; then cur=D; else cur=""; fi
       ;;
     "Cites:"*)
       cur=C
@@ -142,7 +176,10 @@ while IFS= read -r line || [ -n "$line" ]; do
       # are cited, not touched, so folding them into Layers: would invent overlaps.
       case "$cur" in
         L) layers="$layers$(printf '%s' "$line" | grep -oE "$TOK" | tr '\n' ',')" ;;
-        D) deps="$deps$(printf '%s' "$line" | grep -oE 'T[0-9]+' | tr '\n' ',')" ;;
+        # CALL SITE 2 of 2 (TD-132). Same anchoring as the field arm: a continuation that starts an
+        # explanation contributes its ids up to the marker and then stops the collection entirely.
+        D) _reg=$(dep_region "$line"); deps="$deps$(dep_ids "$_reg")"
+           [ "$_reg" = "$line" ] || cur="" ;;
       esac
       ;;
     *) cur="" ;;
