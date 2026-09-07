@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-05
+last_updated: 2026-09-07
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,48 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+## SPRINT-095 — Guards That Misreport (closed early 2026-09-07)
+
+Unreleased. Closed by owner decision at **7 of 27 DoD** — one task shipped, one held unticked on a
+structural finding, two never started. The theme was the adjacent failure to SPRINT-094's: that
+sprint shipped guards for properties nothing read; these are guards that *do* read their subject and
+report something the artifact contradicts. A property with no reader cannot go red; a guard that
+misreports goes **green**, and the green is then treated as evidence.
+
+| Shipped | What |
+|---|---|
+| **The dispatch preflight stops inventing dependency edges** | `TD-132`. `Depends-on:` was parsed with a bare `grep -oE 'T[0-9]+'` over the whole line, harvesting ids out of the field's own prose and ignoring a literal `none` — on SPRINT-094 it built `T2 -> [T1,T2,T1,T2]`, FAILed `cycle-detected` on an acyclic Plan, and issued three `shared-file-owned` PASSes off edges it invented. It now walks the field: an exact `Tn` is a dependency, a balanced `(…)`/`[…]` group is an annotation and is stepped over, anything else ends the list; wrapping markup is stripped, and an unbalanced bracket is reported as `depends-on-unreadable` rather than silently swallowing the line. Ships to consumers inside the plugin. **25 fixtures / 27 assertions**, the 3×2 mechanism×call-site matrix complete |
+
+**The instructive result is the cost, and it is the reason this sprint stopped.** Two tasks scoped
+`[size: S]` and `[size: M]` consumed **six independent review rounds and ~800k subagent tokens**, and
+those reviews returned **eight CRITICALs — every one found by an independent pass and none by the
+author's own seeded-break proofs**, each of which had run clean minutes beforehand. Four rounds
+rejected outright. `L-165` reaches **count 6**.
+
+**`TASK-298` (archived-sprint ownership) is held unticked, and not for want of a fourth attempt.**
+Three designs were each broken by review, and each was the same mistake wearing a new mechanism:
+trust the cited sprint **number** (91 archived numbers exempted anything) → number **+ window**
+(windows legitimately nest — SPRINT-089 and SPRINT-090 share a close commit, so 090's window sits
+inside 089's) → number **+ declarations** (declarations are shared — `docs/LEARNINGS.md` is declared
+by **74 of 91** archived sprints). A commit subject is an unverifiable claim, so every refinement of
+it is another proxy (**`L-190`**). The decisive fact came from outside the task: **the laundering
+channel is pre-existing** — the active-sibling skip has always trusted the cited number with no test
+at all — so all three designs were held to a bar the surrounding code never met (**`TD-141`**, `high`).
+That is a tension for the owner to rule on, not an engineering fix, and `TASK-331` carries it.
+
+**Also found, and worth more than the task that found it:** a `Layers:` declaration wrapping at
+column 0 is **silently dropped** by the preflight parser, so the shared-file ownership map is built
+from each task's first line only — a silent false negative in the direction that matters, caught only
+because a `PASS` line *vanished* between two runs (**`TD-138`**). And TD-125's own stated cause is
+wrong: deleting the `*/archive/*` filter it blames changes nothing (85 pairs before and after); the
+real mechanism is a non-recursive glob upstream (`TASK-332`).
+
+**Named rather than smoothed:** the close could not run its own gate — the opt-in profile exceeds the
+600 s command ceiling, which is `TD-128`, which T4 existed to fix and which went unstarted. Four
+fixture defects in a single case, each presenting as an identical red line and each passing `sh -n`,
+produced **`L-189`**; `L-186` reaches count 2 and is now promotable.
 
 ---
 ## SPRINT-094 — Guards for What Nothing Reads (closed 2026-09-05)

@@ -16,24 +16,29 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-095 — Guards That Misreport** → [`docs/sprint/SPRINT-095-guards-that-misreport.md`](docs/sprint/SPRINT-095-guards-that-misreport.md)
+> **None — the pointer is cleared.** SPRINT-095 closed **early on 2026-09-07 at 7 of 27 DoD**, by
+> owner decision rather than exhaustion. `TASK-328` shipped (the dispatch preflight no longer invents
+> dependency edges); `TASK-298` is **held unticked** on a structural finding; `TASK-326` and
+> `TASK-329` were never started and remain in the Backlog below. Written up in
+> [`CHANGELOG.md`](CHANGELOG.md); the Plan and its log stay at
+> [`docs/sprint/SPRINT-095-guards-that-misreport.md`](docs/sprint/SPRINT-095-guards-that-misreport.md)
+> until §11 archival is approved. **Single stream** — `stream:` stays omitted.
 >
-> Promoted 2026-09-07 with **4 tasks / 27 DoD** — `TASK-298` → T1 · `TASK-328` → T2 · `TASK-326` → T3 ·
-> `TASK-329` → T4. **Single stream** — `stream:` omitted; a second stream stays unavailable until T1
-> lands. **No `epic:`** — none of the four is an EPIC-015 member, checked at promote rather than
-> assumed. **Gates are NOT signed**: `gates_signed:` is absent from the sprint frontmatter, and its
-> absence means not-signed, never approval (L-099). G1+G2 run at `/orchestrator`.
+> **Next**: `/triage` (two close-Retro follow-ups landed at P2), then `/lean-doc-generator promote`.
+> **`L-186` is promotable** (`count: 2`, `promoted: no`) and must be resolved at that promote.
 >
-> **Next**: `/orchestrator sprint-bulk` — and note the run mode is declared at the trigger, never
-> inferred. T1 and T2 are `HITL`; an unattended run would park them.
+> **Read `TASK-331` before touching archived-sprint ownership again.** Three designs were each broken
+> by an independent review, each the same laundering class one level deeper — cited number, then
+> number + window (windows nest: SPRINT-089/090 share a close commit), then number + declarations
+> (`docs/LEARNINGS.md` is declared by **74 of 91** archived sprints). A commit subject is an
+> unverifiable claim, so refining it produces another proxy, not a fix (**L-190**). The decisive fact
+> is that **the laundering channel is pre-existing** — the active-sibling skip has always trusted the
+> cited number with no test at all (**TD-141**, `high`). A fourth attempt without a ruling repeats the
+> loop.
 >
-> **SPRINT-092, SPRINT-093 and SPRINT-094 remain unarchived — §11 retention PARKED by owner ruling,
-> re-proposed and re-parked at each of the last three closes.** Retention is lossy, so close never
-> self-approves it. **T1 of this sprint is the blocker's fix**: 092/093 share `plan_commit: c52496f`,
-> and `check-layers-observed.sh:397` drops `*/archive/*` from the sibling list `:430` uses to skip
-> another sprint's commits, so archiving one re-attributed its history to the other — **214 pass /
-> 0 fail** in place vs **202 pass / 1 fail** archived at SPRINT-093's close (**TD-125**). Rule on the
-> archival once T1 lands; the move itself is out of this sprint's scope.
+> **SPRINT-092, 093, 094 and now 095 are unarchived — §11 retention still PARKED**, and TD-125's
+> blocker is **NOT** cleared: T1 did not ship. Archiving 092/093 together remains the documented
+> workaround; archiving one alone still moves 092's blamed pairs 3 → 85.
 
 **SPRINT-092 shipped the §4 conversion and measured it.** Default-profile saving **22.4–27.9 s**
 (23.4–28.2 s removed, 0.37–0.98 s added), with §4 rules still evaluating on every bare run. The saving
@@ -58,7 +63,7 @@ undifferentiated P1: **P0** `TASK-298`/`328` (each blocks work that is otherwise
 `TASK-320`/`321`/`322`/`329` · **P3** `TASK-188`/`327`, opportunistic by ruling and not
 schedulable. Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
 
-**Figures re-derived at that `/triage`, not carried forward.** TODO.md is **504** lines against §2's
+**Figures re-derived at that `/triage`, not carried forward.** TODO.md is **551** lines against §2's
 cap of 320. The 2026-09-07 pass moved it 471 → 442 (`/triage`) → the figure above (decompose): the
 four shipped entries took ~140 lines off, and the three escalation stubs, once decomposed into two
 fully-specified Tier G tasks, put more back than they removed. The cap is still missed and this
@@ -300,6 +305,48 @@ it from this file (L-097 · L-130).
       state:      ready
 
 ### P2 — Follow-on
+
+- [ ] TASK-331 — Rule the archived-sprint ownership tension, then re-scope TASK-298  [size: M] [risk: high] [HITL]
+      class:      decision
+      done-when:  a recorded ruling on **which failure this repo accepts**, because it cannot avoid
+                  both: (a) report commits citing an archived sprint → TD-125's false positives make
+                  archiving turn the gate red; (b) skip them → a commit subject launders real
+                  undeclared work. **The pre-existing code already chose (b) for ACTIVE siblings and
+                  never said so** — the skip trusts the cited number with no declaration or window
+                  test (verified at `2335eab~1`), so any ruling must cover BOTH sibling kinds or it
+                  is inconsistent by construction. Not a fix: a ruling, plus the re-scoped shape of
+                  TASK-298 that follows from it
+      touches:    TECH-DEBT.md · TODO.md · possibly scripts/lib/check-layers-observed.sh (no code
+                  change is made under this task)
+      depends-on: none
+      assumes:    **three designs were each broken by an independent review — do NOT attempt a
+                  fourth without re-scoping first (L-190).** Cited number → 91 numbers exempt
+                  anything. Number + window → windows nest (SPRINT-089/090 share a close commit).
+                  Number + declarations → declarations are shared (`docs/LEARNINGS.md` is declared by
+                  74 of 91 archived sprints). Options worth costing, none taken: make archival not
+                  change the checker's input set at all (a `qa-check.sh` glob change rather than
+                  ownership logic); accept the channel explicitly and document it for both sibling
+                  kinds; or find a signal that is not the commit subject
+      tracker:    **TD-141** · TD-125 · TASK-298 · SPRINT-095 T1 (closed at 0 of 6) · L-190
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-332 — Correct TD-125's stated cause and every artifact that repeats it  [size: S] [risk: low] [AFK]
+      class:      mechanical-ingest
+      done-when:  TD-125, `TASK-298` and SPRINT-095's T1 text no longer name
+                  `check-layers-observed.sh:397`'s `*/archive/*` filter as the mechanism. **Measured,
+                  not argued:** deleting that line alone changes nothing — 092 is blamed for 85
+                  commit:path pairs both with the filter present and deleted. The operative mechanism
+                  is upstream, `qa-check.sh:1013` handing the checker a NON-recursive
+                  `ls docs/sprint/SPRINT-*.md`, so an archived sprint never reaches `"$@"` to be
+                  filtered. Also note on TD-131 that `fmv()` gained a call site (archived sprint
+                  files), reachable from one more place though unchanged in nature
+      touches:    TECH-DEBT.md · TODO.md · docs/sprint/SPRINT-095-guards-that-misreport.md
+      depends-on: none — independent of TASK-331's ruling; the cause is wrong either way
+      assumes:    none. The correction is measured and recorded in SPRINT-095's Execution Log
+      tracker:    TD-125 · TD-131 · SPRINT-095 T1
+      origin:     close-retro
+      state:      ready
 
 - [ ] TASK-320 — Give the launcher a fire-time run ledger, closing TD-122 and TD-124 together  [size: M] [risk: med] [HITL]
       class:      execution

@@ -3,7 +3,7 @@ sprint: 095
 slug: guards-that-misreport
 owner: Maintainer
 last_updated: 2026-09-07
-status: active
+status: closed
 gates_signed: G1,G2 @ 18b9a0b
 plan_commit: 2453678
 close_commit: [sha — set at close]
@@ -177,4 +177,66 @@ cannot be mistaken for either a pass or a fail.
 
 ## Retro
 
-<!-- Written at close. Route the four buckets to their durable homes (STANDARD §10). -->
+**Closed EARLY at 7 of 27 DoD, by owner decision.** T2 shipped complete; T1 is held unticked on a
+structural finding rather than a fourth defect; T3 and T4 were never started. This is a deliberate
+stop, not a partial run that ran out of road — the sprint's cost per task turned out to be roughly an
+order of magnitude above its `[size: S]`/`[size: M]` estimates, and that is itself the result.
+
+**Retrieval check** — no prior `L-NNN` or ADR was contradicted. Several were *confirmed the hard way*:
+`L-165` (independent review finds what the author cannot) fired six more times; `L-186` (fixtures
+discriminate branches, not the input set) was reproduced **inside the sprint that cites it**;
+`L-142`/`L-187` (a seeded break that reddens nothing has tested nothing) fired five times, catching
+four malformed seeds and one weak one. Nothing was retrieved late or missed.
+
+**Cost** — inline coordinator plus 6 dispatched review rounds, ~800k subagent tokens, 2 tasks
+attempted. Cost per unit **delivered**: one task (T2). That is the number worth carrying forward —
+a Tier G guard with a genuinely adversarial surface is not an `M`.
+
+### Worked
+
+- **The isolated-reviewer bar earned its entire cost and then some.** Eight CRITICALs, every one
+  found by an independent pass, **none** by the author's own seeded-break proofs — each of which had
+  run clean minutes before. Four review rounds rejected outright. Without them this sprint would have
+  shipped a parser that silently drops declared dependencies and a guard that launders undeclared work.
+- **Asserting on RANK rather than absence-of-FAIL.** When the defect *is* silence, a missing FAIL
+  proves nothing; a wave rank distinguishes "the ids parsed" from "the ids vanished".
+- **Pointing each review at the hole I most suspected.** Both times I named the likely remaining gap
+  in the brief, the reviewer found it there. Cheap, and it front-loads the expensive rounds.
+- **Recording negative results.** The `none` branch that reddened nothing, the weak seed that tested
+  nothing, the disproved TD-125 cause — each is now in the log rather than quietly dropped.
+
+### Friction
+
+- **Refining a proxy felt like progress for three whole designs.** Every fix genuinely narrowed the
+  hole, which is exactly why nobody stopped to ask whether the question was answerable. → `L-190`.
+- **Fixture defects are indistinguishable from code defects at the assertion line.** Four in one
+  case, `sh -n` clean each time, one sibling green for the wrong reason throughout. → `L-189`.
+- **My own shell/awk mechanics caused five defects**, none caught by a test: an unwired flag; `awk -v`
+  expanding `\t`/`\n` and splitting a line; a tab injected into a tab-delimited record; an
+  **apostrophe inside a single-quoted awk program** that `sh -n` accepts while awk receives a
+  truncated program; and a line-numbered edit landing on the wrong line after earlier edits shifted
+  the numbering. The last is now a corollary in `L-189`.
+- **The close cannot verify itself.** The opt-in profile exceeds the 600 s command ceiling — TD-128,
+  which T4 existed to fix and which went unstarted. Recorded below rather than smoothed.
+
+### Pattern candidate
+
+- **`L-190`** (new) — a proxy for an unverifiable claim cannot be refined into correctness; the tell
+  is reviews finding the same *class* of defect at a new depth. Re-scope instead.
+- **`L-189`** (new) — a failing assertion never says whether the code or the fixture is wrong;
+  reproduce outside the harness before touching the subject.
+- **`L-186`** reaches **count 2 and is now promotable** at the next promote.
+- **`L-165`** reaches **count 6**.
+
+### Buckets routed (STANDARD §10)
+
+| Bucket | Where |
+|---|---|
+| Shipped | `CHANGELOG.md` — T2 / TD-132 only |
+| Tech debt | **`TD-138`** (column-0 `Layers:` continuation silently dropped) · **`TD-139`** · **`TD-140`** · **`TD-141`** (`high` — the structural one) |
+| Follow-ups | **`TASK-331`** (rule the ownership tension, re-scope TASK-298) · **`TASK-332`** (correct TD-125's stated cause) |
+| Learnings | **`L-189`** · **`L-190`** new; `L-165` → 6; `L-186` → 2, promotable |
+
+**Not pruned, owner-gated (§11):** only `TASK-328` shipped and is a prune candidate. `TASK-298`,
+`TASK-326`, `TASK-329` stay — unstarted or unfinished. Archival of SPRINT-092/093/094/095 stays
+parked, and TD-125's blocker is **not** cleared: T1 did not ship.
