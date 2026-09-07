@@ -598,3 +598,23 @@ Ledger 77 → 81 rows, 74 open + 7 not-open, reconciled.
 
 consequence · T1 · behaviour:material · governance:high
 consequence · T2 · behaviour:material · governance:high
+
+### 2026-09-07 | close | closed early at 7 of 27 DoD; the close could not verify itself
+
+Sprint closed by owner decision. `close_commit: 9782860`. Buckets routed to CHANGELOG / `TD-138`–
+`TD-141` / `TASK-331`–`332` / `L-189`–`L-190`, with `L-165` → 6 and `L-186` → 2 (**promotable at the
+next promote**). §11 retention stays parked; TD-125's blocker is NOT cleared because T1 did not ship.
+
+**The close ran its gate and got nothing.** The opt-in profile (`QA_FULL=1`) was killed by a 590 s
+external cap with no verdict line reaching the launcher — one more instance of `TD-128`'s own claim
+that this gate cannot be sampled whole on this host. Recorded on that row as evidence rather than
+implied away, and the close explicitly does not rest on a green gate.
+
+**And the launch itself was flawed, which changes what the run proves.** It piped the gate into
+`tail -40`; `tail` buffers to EOF, so nothing was flushed when the cap fired. The run therefore shows
+only that *the cap was hit* — it does **not** establish that the gate printed nothing. That is
+CLAUDE.md edit-safety trap (c) / `L-057`, committed by me while verifying a sprint whose entire
+subject is guards that misreport, and after quoting the rule earlier in this same log. Noted on
+TD-128 so the next measurement runs the gate bare and tees it.
+
+consequence · close · behaviour:low · governance:high

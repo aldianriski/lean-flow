@@ -611,6 +611,17 @@ status: current
     were pruned on the theory that the gate was scanning them (TD-095's shape); the opt-in profile
     measured **1413 s before and 1450 s after** — no improvement. Recorded so the next investigation does
     not re-run that experiment.
+  - **Measured again at SPRINT-095's close (2026-09-07), and the sample is STILL not clean.** The
+    opt-in profile was launched for the close and was killed by a **590 s** external cap having
+    printed no verdict the launcher could read. That is consistent with the 1450 s figure above and
+    is one more instance of the row's own claim: this gate cannot be sampled whole on this host, so
+    a close that is supposed to run it cannot verify itself. SPRINT-095 closed saying so rather than
+    implying a green gate.
+  - **Method caveat, recorded because it changes what the run proves:** the launch piped the gate
+    into `tail -40`, which buffers to EOF, so nothing was flushed when the cap fired. The run
+    therefore shows *the cap was hit*, and does **not** establish that the gate printed nothing —
+    CLAUDE.md's edit-safety trap (c) / L-057, committed while verifying a sprint about guards that
+    misreport. A future measurement must run the gate bare and tee it, never through a formatter.
   - **Re-file fresh if** the runtime overrun turns out to be host-local rather than a property of the
     gate, which would make this an environment note rather than a guard defect.
   - **Escalated to `TODO.md` Backlog P2 as `TASK-329`** at the 2026-09-07 `/triage`, by the ledger's own `severity: high` rule — it had no Backlog entry until then, a `high` row invisible to every promote that reads the Backlog (L-151) — and **decomposed the same day**, absorbing TD-117 (`TASK-330`, retired) as one mechanism. **Scope note the fix must respect:** `check-qa-budget-default.sh` is CORRECT within its declared scope (configured default < ceiling, which is all its header claims). This row is a **missing reader**, not a broken checker, and widening that script is the wrong fix.
