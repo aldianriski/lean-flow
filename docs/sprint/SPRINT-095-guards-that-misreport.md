@@ -72,13 +72,13 @@ every run to execute it.
 computes clean waves instead of an unresolvable self-edge.
 
 **DoD:**
-- [ ] Against SPRINT-094's sprint file the snippet yields `PASS wave-computation: T1=0 T2=0 T3=0 T4=0` and no `FAIL cycle-detected` — *Verify: run the anchor-extracted snippet against that file; today it yields `FAIL cycle-detected: tasks unresolved -> T2 T3`*
-- [ ] A literal `none` short-circuits the field, and no id is harvested from it or from any line continuing it
-- [ ] **Both call sites fixed, each with its own fixture** — the field arm and the indented `D)` continuation arm run the same bare grep, and SPRINT-094's prose ran onto continuation lines, so fixing one leaves the other leaking (L-058)
-- [ ] Declared ids still parse: `Depends-on: T1 · T2 — but see **D1** (…)` yields exactly `[T1,T2]`
-- [ ] Retained must-FAIL + sibling control added to the existing 8-case harness — *Verify: `sh evals/run-dispatch-preflight-fixtures.sh`*
-- [ ] Seeded-break discrimination proof under ONE stated hash convention (L-137 · L-142 · L-169 · L-187)
-- [ ] Worktree-isolated outside reviewer (L-165 · L-168)
+- [x] Against SPRINT-094's sprint file the snippet yields `PASS wave-computation: T1=0 T2=0 T3=0 T4=0` and no `FAIL cycle-detected` — *Verify: run the anchor-extracted snippet against that file; today it yields `FAIL cycle-detected: tasks unresolved -> T2 T3`* — ✓ run at `60fdf1b`, and again at `82eb0cd`
+- [x] A literal `none` short-circuits the field, and no id is harvested from it or from any line continuing it — ✓ by position, not by a branch: `none` is a token that is neither an id nor an annotation, so the scan ends on it. The explicit branch design 2 carried was deleted after seeding its removal reddened nothing
+- [x] **Both call sites fixed, each with its own fixture** — the field arm and the indented `D)` continuation arm run the same bare grep, and SPRINT-094's prose ran onto continuation lines, so fixing one leaves the other leaking (L-058) — ✓ proven, not asserted: seeding call site 1 reddens only `deps-prose-field`, seeding call site 2 only `deps-prose-continuation`
+- [x] Declared ids still parse: `Depends-on: T1 · T2 — but see **D1** (…)` yields exactly `[T1,T2]` — ✓ `deps-ids-with-prose`, asserting RANK so an unparsed T3 (rank 0) is distinguishable from a parsed one
+- [x] Retained must-FAIL + sibling control added to the existing 8-case harness — *Verify: `sh evals/run-dispatch-preflight-fixtures.sh`* — ✓ 8 → **25 cases / 27 assertions**, the 3×2 mechanism×call-site matrix complete
+- [x] Seeded-break discrimination proof under ONE stated hash convention (L-137 · L-142 · L-169 · L-187) — ✓ `git hash-object` on the working file throughout; 9 seeds, each reddening only its own fixture with a control green; one weak seed DISCARDED for reddening nothing (L-142/L-187), and the guards refused 5 malformed seeds rather than scoring them
+- [x] Worktree-isolated outside reviewer (L-165 · L-168) — ✓ **five rounds**, four of which rejected: 6 CRITICALs found, every one by review and none by the seeded proofs that had just run clean. Round 5 clean: no CRITICAL, 250-line corpus re-sweep clean, snippet RUN not merely parsed
 
 ### T3 — Reconcile a commit's claimed DoD delta against the ticks it made `[size: S · risk: low · class: execution · AFK · J1]`
 Layers: `scripts/lib/check-dod-delta.sh` · `scripts/qa-check.sh` · `evals/fixtures/dod-delta/` · `evals/run-dod-delta-fixtures.sh`

@@ -216,6 +216,15 @@ run_case_anywhere "deps-cont-markup" 0 "PASS wave-computation: T1=0 T2=1 T3=2" -
 run_case_anywhere "deps-cont-unbalanced" 1 "FAIL depends-on-unreadable: T2" -- \
   sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-cont-unbalanced/sprint.md\" \"$live_head\""
 
+# --- cases 24-25 (round 5): the last two cells of the 3x2 call-site matrix -----------------------
+# Round 5 found no CRITICAL but named these two cells unproven (L-186) and hand-verified the code
+# already behaves correctly on both. These fixtures are what keep it that way -- the continuation
+# arm is where this parser's own history says a field-only fix leaks.
+run_case_anywhere "deps-cont-close-without-open" 1 "FAIL depends-on-unreadable: T3" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-cont-close-without-open/sprint.md\" \"$live_head\""
+run_case_anywhere "deps-cont-markup-welds-id" 1 "FAIL shared-file-unowned: shared.md in T13 and T3" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-cont-markup-welds-id/sprint.md\" \"$live_head\""
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "DISPATCH-PREFLIGHT FIXTURES: all green"; else echo "DISPATCH-PREFLIGHT FIXTURES: at least one FAIL"; fi
 exit $fail

@@ -545,3 +545,56 @@ scenario outside the harness before touching the subject. Corollary, earned four
 edit by line number a file whose line numbers have shifted under earlier edits in the same session.
 
 consequence · T1 · behaviour:material · governance:high
+
+### 2026-09-07 | progress | T2 round 5 CLEAN — 7 of 7 DoD ticked; T1 stays at 0 of 6
+
+**T2 ticks.** Round 5 found no CRITICAL. The round-4 welding fix held against every fabrication
+attempt (`` *`T1`* ``, `T1**`, `***T1***`, `**T1**,`, digit-adjacency variants); the 250-line corpus
+re-swept clean; the 4th record field cannot carry a tab or a stray `!` by character class; no quoting
+hazard remains; and the reviewer **ran** the extracted snippet rather than only parsing it — the
+distinction that caught the apostrophe defect two rounds ago.
+
+Three residual findings, all latent, none in the corpus, filed rather than fixed: `TD-139` (trailing
+punctuation after markup defeats the anchor — fails in the SAFE direction, a false HALT) and
+`TD-140` (a token netting negative is absorbed without the unreadable flag — suppresses a diagnostic,
+corrupts no verdict). The third was a coverage gap and was closed here rather than filed: two
+continuation-arm fixtures added, so the 3×2 mechanism×call-site matrix is complete at **25 cases /
+27 assertions**.
+
+Five rounds, four rejections, **6 CRITICALs** — every one found by review, none by the seeded proofs
+that had just run clean before each.
+
+**T1 does not tick, and the reason is structural rather than a fourth bug.** Its final review found
+the hole this session predicted: the declaration test is necessary but not sufficient, because
+declarations are SHARED — `docs/LEARNINGS.md` is declared by **74 of 91** archived sprints,
+`scripts/qa-check.sh` by 46. A commit citing any of those numbers while touching only a commonly-
+declared file is exempted, reproduced live twice.
+
+**The finding that outlasts the sprint (`TD-141`, `high`): the laundering channel is PRE-EXISTING and
+T1 did not introduce it.** The active-sibling skip trusts the cited number alone, with no declaration
+or window test, and has done so since before this sprint — verified against `2335eab~1`. A commit
+mislabelled `sprint(093)` while 093 is active is already exempt from 092's check today. So T1's three
+designs were each held to a bar the surrounding code never met.
+
+Three designs, three proxies for one unanswerable question — *which sprint does this commit belong
+to?* A commit subject is an **unverifiable claim**, so every refinement of it is another proxy:
+
+| design | proxy | broken by |
+|---|---|---|
+| 1 | cited number | 91 numbers, unconditional |
+| 2 | number + window | windows nest — SPRINT-089/090, real |
+| 3 | number + declarations | declarations shared — 74/91 declare `LEARNINGS.md` |
+
+`TASK-298` is scoped as "teach the checker that an archived sibling is not undeclared work", and on
+this evidence that is not reachable by refining the proxy. Re-scope before a fourth attempt. The
+tension is real and belongs to the owner: report archived-cited commits and you get TD-125's false
+positives on archival; skip them and you get the channel. The existing code chose the second for
+active siblings without saying so.
+
+**Filed at this point rather than at close, because the sprint stops here:** `TD-141` (the structural
+one) · `TD-138` (a column-0 `Layers:` continuation is silently dropped, so the ownership map is built
+from first lines only — found when a PASS line vanished between two runs) · `TD-139` · `TD-140`.
+Ledger 77 → 81 rows, 74 open + 7 not-open, reconciled.
+
+consequence · T1 · behaviour:material · governance:high
+consequence · T2 · behaviour:material · governance:high

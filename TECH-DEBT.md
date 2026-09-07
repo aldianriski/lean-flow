@@ -204,6 +204,71 @@ status: current
 > `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` (TD-082's reasoned carry, not
 > re-litigated).
 
+- **TD-141** severity: high | status: open | created: Sprint-095
+  - Summary: **Commit ownership cannot be decided from a commit subject, and the laundering channel
+    that follows is PRE-EXISTING — it is not something SPRINT-095 T1 introduced.** The active-sibling
+    skip trusts the cited sprint number alone, with no declaration or window test
+    (`check-layers-observed.sh`, the `case " $sibling_sprints "` arm), and has done so since before
+    this sprint. A commit mislabelled `sprint(093)` while 093 is active is already exempt from 092's
+    undeclared-file check today.
+  - Evidence: three T1 designs were each broken by an independent reviewer, and each was a different
+    proxy for the same unanswerable question — *which sprint does this commit belong to?*
+    (a) the cited **number** — 91 archived numbers, unconditional;
+    (b) number + **window** — windows legitimately NEST (`SPRINT-089` `5f0682b..cc46d18` and
+    `SPRINT-090` `b7437de..cc46d18` share a close commit, 090 seeded inside 089's task stream);
+    (c) number + **declarations** — declarations are SHARED: `docs/LEARNINGS.md` is declared by
+    **74 of 91** archived sprints, `scripts/qa-check.sh` by 46, `TECH-DEBT.md` by 40. Reproduced
+    live: a commit citing an archived number and touching only a commonly-declared file passes.
+  - **The tension is structural, and it is the row's point.** Report archived-cited commits and you
+    get TD-125's false positives on archival; skip them and you get a laundering channel. The
+    pre-existing code chose the second for active siblings without ever saying so. A subject line is
+    an unverifiable claim, so every refinement of it is another proxy.
+  - Impact: `TASK-298` is scoped as "teach the checker that an archived sibling is not undeclared
+    work", and on this evidence that is **not achievable by refining the proxy**. Re-scope before any
+    fourth attempt. Options worth costing, none taken here: make archival not change the checker's
+    input set at all (a `qa-check.sh` glob change rather than ownership logic); accept the channel
+    explicitly and document it for BOTH sibling kinds; or find a signal that is not the subject.
+  - **Do NOT "fix" this by widening an exclusion** — that is how each of the three designs died.
+  - **Re-file fresh if** the ownership question is re-scoped, or a non-subject signal is found.
+
+- **TD-138** severity: medium | status: open | created: Sprint-095
+  - Summary: **A `Layers:` declaration that wraps at column 0 is silently dropped by the dispatch
+    preflight, so the shared-file ownership map is built from each task's FIRST LINE ONLY.** The
+    parser treats an INDENTED line as continuing a declaration and resets `cur` on a column-0 line;
+    SPRINT-094 and SPRINT-095's own Plans wrapped at column 0.
+  - Evidence: found at SPRINT-095's G2 when a `PASS shared-file-owned` line vanished between two
+    runs. All four of that sprint's tasks were affected — T1 kept only `check-layers-observed.sh`,
+    T4 only `qa-check.sh`, each dropping its fixtures and harness.
+  - Impact: a **silent false negative in the ownership map** — the dangerous direction. Two tasks
+    that genuinely share a file can both come back unreported because neither declared it where the
+    parser looks. Nothing warns. SPRINT-094 keeps `Layers:` on one line, which is load-bearing and
+    reads as house style.
+  - Fix direction (not a ruling): accept a column-0 continuation, or FAIL a `Layers:` that wraps
+    unindented rather than silently reading half of it. `L-186`'s shape one level down.
+  - **Re-file fresh if** the preflight snippet is rewritten for any other reason.
+
+- **TD-139** severity: minor | status: open | created: Sprint-095
+  - Summary: **Trailing punctuation glued to closing markup defeats the anchored strip in
+    `dep_ids`, silently dropping the id.** `**T1**;` keeps a non-strippable tail, fails the exact-id
+    test, and ends the list. Confirmed on BOTH call sites by round-5 review.
+  - **Fails in the SAFE direction** — a false HALT, not a false PASS — which is why it is minor and
+    not a blocker under this guard's own priority. Only `,` is handled today, via the separator gsub.
+  - Not in the corpus: no real `Depends-on:` line wraps a leading id in markup at all (250 lines
+    swept). Latent risk, not a live bug.
+  - **Re-file fresh if** a real Plan writes a markup-wrapped id, or the strip is revisited.
+
+- **TD-140** severity: minor | status: open | created: Sprint-095
+  - Summary: **A `Depends-on:` token whose bracket count nets NEGATIVE is absorbed without raising
+    the unreadable flag.** The close-without-open rule fires only when `o == 0`; a token with
+    `o > 0` and `c > o` takes the annotation branch, is clamped to depth 0, and passes silently —
+    the very shape that rule's own comment claims to catch. Repro: `(x)) T2` yields `T2,` with no
+    flag.
+  - Impact bounded, and verified so by round-5 review: the clamp always resets to exactly 0, so no
+    phantom state survives and no real id is dropped or invented. It suppresses the *signal* for
+    malformed brackets, nothing more.
+  - **Re-file fresh if** the depth accounting is revisited, or a malformed bracket is found to
+    corrupt a verdict rather than only its diagnostic.
+
 - **TD-137** severity: medium | status: open | created: Sprint-094
   - Summary: **Four consumer-facing `skills/orchestrator/` files name this repository's own script
     paths, so an installed consumer reads instructions that resolve nowhere.** SPRINT-094 T2 cleaned
