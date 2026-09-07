@@ -146,6 +146,25 @@ run_case_anywhere "deps-inline-annotated-list" 0 "PASS wave-computation: T1=0 T3
 run_case_anywhere "deps-wrapped-list-after-prose" 0 "PASS wave-computation: T1=0 T2=1 T3=2" -- \
   sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-wrapped-list-after-prose/sprint.md\" \"$live_head\""
 
+# --- cases 14-15 (TD-132, THIRD design): the two shapes round 2 of review killed design 2 on ------
+# Both are real authoring styles from this repo's own archive, and they fail in OPPOSITE directions:
+# one drops a declared edge, the other invents one from prose. A design that fixes only one of them
+# is design 2, which is how this pair earned permanent fixtures.
+
+# case 14 -- BARE-SPACE separated ids (SPRINT-050:111, SPRINT-053:107). Load-bearing: SPRINT-053's
+# own D4 states `Depends-on: T1 T3` is what gives two files a single owner. Asserted on RANK -- T5
+# at 1 instead of 2 is the silent drop, and it comes with no FAIL line at all.
+run_case_anywhere "deps-space-separated" 0 "PASS wave-computation: T1=0 T3=1 T5=2" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-space-separated/sprint.md\" \"$live_head\""
+
+# case 15 -- MUST-FAIL. Prose that merely names a task is not a dependency. The continuation style is
+# SPRINT-066:63-64's (`T1-sanctioned gate is ...`), harmless there by luck; the form below denies the
+# dependency in words while a leading-token parser reads one. T2 and T3 share shared.md with no edge,
+# so an ownership PASS here means the guard invented the edge from prose -- TD-132's own failure
+# class, which is why this is the retained must-FAIL rather than another must-PASS.
+run_case_anywhere "deps-prose-names-task-unowned" 1 "FAIL shared-file-unowned: shared.md in T2 and T3" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-prose-names-task-unowned/sprint.md\" \"$live_head\""
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "DISPATCH-PREFLIGHT FIXTURES: all green"; else echo "DISPATCH-PREFLIGHT FIXTURES: at least one FAIL"; fi
 exit $fail

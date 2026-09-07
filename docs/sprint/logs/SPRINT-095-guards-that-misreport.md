@@ -294,3 +294,56 @@ claim (no BSD sed available) — flagged as unverified rather than as a finding.
 normalisation and the `[[:space:]]` class are the portability-sensitive parts.
 
 consequence · T2 · behaviour:material · governance:high
+
+### 2026-09-07 | surprise | round 2 REJECTED design 2 — two more CRITICALs, in the OPPOSITE direction
+
+The revise loop's bounded retry was spent, so this went to the owner (ADR-022), who authorised a
+third design pass plus one further review. The reviewer ran this round **non-isolated** — its
+worktree was gone and it used the main checkout. It reported no writes, and that was verified rather
+than trusted: `dispatch.md` and the harness both hash-matched their committed blobs and no untracked
+strays existed. It is still the L-168 risk and should not recur.
+
+**Finding 1 (CRITICAL) — a bare-space id list loses every id after the first.** `Depends-on: T1 T3`
+is real and **load-bearing**: `SPRINT-050:111` and `SPRINT-053:107`, whose own D4 reads *"`Depends-on:
+T1 T3` gives both files a single owner without guessing — ownership by dependency chain, which the
+preflight accepts (TD-025)."* Design 2 split only on `,`/`·`, so it read `[T1]`.
+
+**Finding 2 (CRITICAL) — prose that merely names a task invents an edge.** A continuation opening
+`T1-sanctioned …` is live at `SPRINT-066:63-64` (harmless there by luck — it re-adds an id the field
+already declared). The dangerous form, reproduced: a `T2-flavoured` clause that says in words *"not a
+real dependency"* produced `PASS shared-file-owned` over a genuinely unowned overlap — TD-132's own
+failure class, reintroduced by its own fix.
+
+**Design 3, and the two failures pull opposite ways, which is the point.** Design 1 stopped at prose
+and so could not step over an annotation; design 2 stepped over annotations and so could not tell
+prose from a list. The scan now does both: walk left to right — an **exact** `Tn` token is a
+dependency, a **balanced `(…)` group is skipped**, anything else **ends the list**. Whitespace is a
+separator, so `T1 T3` is two dependencies; the match is exact, so `T1-sanctioned` and `T2s` are prose;
+`none` needs no special case, being simply a token that is neither.
+
+Verified against every shape either round produced — 14 cases, all correct, including
+`SPRINT-055:161 → [T1,T3,T6]`, `SPRINT-063:83 → [T2,T1]`, `SPRINT-053:107 → [T1,T3]`,
+`SPRINT-066:64 → []`, `none, T2s … → []`. Two fixtures added (15 cases, 17 assertions): a must-PASS
+for the space-separated list and a **retained must-FAIL** where prose naming a task must NOT own a
+shared file.
+
+**Discrimination proof, and one seed had to be thrown away for being weak.** Convention:
+`git hash-object` on the working file.
+
+| seed | target | control |
+|---|---|---|
+| A — anchor loosened `^Tn$` → `^Tn` | **stayed GREEN — reported untested, not a pass** | — |
+| A′ — faithful: leading-id EXTRACTION (design 2's actual behaviour) | `deps-prose-names-task-unowned` REDDENED | space-separated + inline-annotated held |
+| B — comma normalisation removed | `deps-inline-annotated-list` REDDENED | `deps-space-separated` held |
+| C — annotation-skip removed (becomes a wall) | `deps-inline-annotated-list` REDDENED | `deps-space-separated` held |
+| D — whitespace split removed | `deps-space-separated` REDDENED | `deps-prose-field` held |
+
+**Seed A is the instructive one.** It looked like a faithful model of Finding 2 and was not: loosening
+the *test* alone makes the code emit the whole token `T2-flavoured`, which is not a valid task id, so
+no edge forms and nothing reddens. Design 3 appends the **token**, never an extracted substring — an
+extra safety property nobody designed in. A weak seed that reddens nothing is indistinguishable from
+a suite that does not discriminate (L-142 · L-187), so it was replaced by A′ rather than counted.
+Across this task the seed guards have now fired **five** times: four sed/awk mechanics failures and
+one weak seed.
+
+consequence · T2 · behaviour:material · governance:high

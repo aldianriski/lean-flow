@@ -119,32 +119,55 @@ TOK='[A-Za-z0-9_./-]+\.[A-Za-z0-9]+|[A-Za-z0-9_.-][A-Za-z0-9_./-]*/'
 # and, worse, issued `shared-file-owned` PASSes derived from the edges it had invented. The false
 # HALT is loud; the false PASS green-lights a wave with no ownership order at all.
 #
-# dep_ids: the LEADING id of each separator-delimited item, and nothing else. An id counts only
-# where a dependency can actually be declared -- at the START of a list item -- so an id appearing
-# anywhere inside an item's own annotation is prose and is ignored.
+# dep_ids: walk the field left to right and read the LEADING ID-LIST REGION. An exact `Tn` token is
+# a dependency; a balanced `(...)` group is an annotation and is SKIPPED; anything else means the id
+# list has ended and the scan stops. `none` needs no special case -- it is simply a token that is
+# neither, so it stops the scan on the first word.
 #
-# THIS IS THE SECOND DESIGN. The first truncated the whole field at the first prose marker (em dash,
-# ` --`, `(`), and an independent review killed it with two of this repo's own historical lines:
-#   SPRINT-055:161  Depends-on: T1 (count guard must exist first), T3, T6 (shared files — see D1)
-#   SPRINT-063:83   Depends-on: T2 (subtraction first) · T1 (owns `DOCS_Guide` §2 and docs/adr/ …)
-# Truncating at the FIRST `(` keeps only `T1` / `T2` and silently discards every id after it. That
-# is a worse defect than TD-132 itself: TD-132 invented an edge and HALTED loudly, whereas dropping
-# a declared edge lets two dependent tasks dispatch in the same wave with `PREFLIGHT: CLEAR` and no
-# finding at all -- a gate that fails green (L-058). Annotating one id and continuing the list is
-# this project's own house style, not a contrived shape.
+# THIS IS THE THIRD DESIGN. Two independent review rounds killed the first two, each on shapes taken
+# from this repo's own history, and the two failures pull in OPPOSITE directions -- which is why the
+# scan both stops at prose and skips annotations rather than doing one or the other:
 #
-# Splitting on the separators the Plans actually use (`,` and `·`) and anchoring to the item start
-# needs no marker list, so it cannot be defeated by a marker the list does not know about. It also
-# retires the `none` special case entirely: `none — <prose>` is one item beginning `none`, which
-# yields no id because the anchor does not match, rather than because a branch says so. The previous
-# design carried that branch as dead weight -- seeding its removal reddened nothing (L-142 · L-187).
+#   Design 1 truncated the field at the first prose marker. But in a real line the first marker
+#   belongs to the FIRST id's own annotation --
+#     SPRINT-055:161  T1 (count guard must exist first), T3, T6 (shared files — see D1)   -> [T1]
+#     SPRINT-063:83   T2 (subtraction first) · T1 (owns `DOCS_Guide` §2 and docs/adr/ …)  -> [T2]
+#   -- so every id after it was silently DROPPED.
+#
+#   Design 2 took the leading id of each `,`/`·`-delimited item. That fixed the above but could not
+#   see a bare-space list, and `Depends-on: T1 T3` is real and load-bearing --
+#     SPRINT-050:111, SPRINT-053:107, whose own D4 reads "`Depends-on: T1 T3` gives both files a
+#     single owner ... which the preflight accepts (TD-025)"                               -> [T1]
+#   -- dropping T3. It also INVENTED edges from prose that merely begins by naming a task:
+#     SPRINT-066:63  a continuation opening `T1-sanctioned gate is ...`  re-added T1, and the
+#     dangerous form (`T2-flavoured caveat ... not a real dependency`) produced a false
+#     `shared-file-owned` PASS over a genuinely unowned overlap -- TD-132's own failure class, back.
+#
+# A dropped edge is the worse half of both: an invented edge HALTs loudly, while a dropped one lets
+# two dependent tasks dispatch in the same wave under `PREFLIGHT: CLEAR`, with no finding for anyone
+# to read -- a gate that fails green (L-058). Hence: exact-token match, so `T1-sanctioned` and `T2s`
+# are prose; whitespace is a separator, so `T1 T3` is two dependencies; and annotations are stepped
+# over rather than treated as a wall.
 dep_ids() {
-  printf '%s' "$1" \
-    | sed -e 's/·/,/g' \
-    | tr ',' '\n' \
-    | sed -e 's/^[[:space:]]*//' \
-    | grep -oE '^T[0-9]+' \
-    | tr '\n' ','
+  printf '%s' "$1" | awk '
+    {
+      # Separators this repo actually uses. Two gsubs, not one bracket class: a bracket expression
+      # containing a multi-byte character can match its individual BYTES under a non-UTF-8 locale.
+      gsub(/,/, " "); gsub(/·/, " ")
+      n = split($0, tok, /[[:space:]]+/)
+      depth = 0; out = ""
+      for (i = 1; i <= n; i++) {
+        t = tok[i]
+        if (t == "") continue
+        # gsub with an identical replacement is a no-op that returns the count.
+        o = gsub(/\(/, "(", t); c = gsub(/\)/, ")", t)
+        if (depth > 0) { depth += o - c; if (depth < 0) depth = 0; continue }
+        if (t ~ /^T[0-9]+$/) { out = out t ","; continue }   # a dependency
+        if (o > 0) { depth = o - c; if (depth < 0) depth = 0; continue }  # an annotation: skip it
+        break                                                 # prose: the id list has ended
+      }
+      printf "%s", out
+    }'
 }
 inplan=0; tid=""; layers=""; deps=""; cur=""
 flush() { [ -n "$tid" ] && printf '%s\t%s\t%s\n' "$tid" "$layers" "$deps" >>"$records"; }
