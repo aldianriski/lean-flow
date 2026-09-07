@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-30
+last_updated: 2026-09-05
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,51 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+## SPRINT-094 — Guards for What Nothing Reads (closed 2026-09-05)
+
+Unreleased (bundles into the next version — **feature sprint, so MINOR by hand**, not
+`/release-patch`). Closed at **22 of 23 DoD**; the one open box is the owner-action ruling on
+archiving SPRINT-092/093, recorded at promote as not a blocker for T1–T4. Three defects, one shape:
+none was a check that failed — each was a **property with no reader at all**, and a property with no
+reader cannot go red.
+
+| Shipped | What |
+|---|---|
+| **Epic state has a reader** | `check-epic-archive.sh` widened 143 → 312 lines with a second direction, `epic-state:` — a member sprint that closed with no rollup row or no `close_commit` · an ownership header older than its own newest member close · a ticked § Closed-when condition naming no closing sprint. Pointed at real artifacts before any fixture existed: **7 findings on EPIC-015** and EPIC-014's stale header at `d43a7a1`, each with a real passing sibling. All 7 repaired, so the gate is green rather than red-with-a-note. **17 retained fixtures** |
+| **Handoff state has a reader, and §12(b)'s conversion finally happens** | A handoff carries `live` / `consumed` / `spent` in a two-field record — the sprint's Execution Log where a sprint exists, root `HANDOFF-LEDGER.md` (create-lazily) otherwise, both read by one shared function. An **UNKNOWN status is unconditionally FAILed and never assumed `spent`**, and a sprint may not close over a non-`spent` handoff. §12(b) has prescribed this conversion since the standard was written and lean-flow shipped no step that performed it. **25 retained fixtures** |
+| **A capability nothing calls has a reader** | `test/architecture/unwired-exports.ts` — any exported symbol with **zero non-test callers**, detected off resolved ES import *edges* on a comment-stripped skeleton, never a bare-identifier grep. Pointed at five real symbols across three historical commits (`attachLevel`, `createF4Registry` / `createS4AppendRegistry`, `reconcile` / `marksInStandard`), each green in the current tree as its own control. **39 tests** |
+| **`spec/STANDARD.md` 0.10.0 → 0.11.0** | `HANDOFF-LEDGER.md` registered in §2 with its full lifecycle contract. MINOR proven rather than argued: `read-spec-rules.sh` over 0.11.0 emits **100 rows byte-identical by `cmp`** to the frozen surface — no rule added, amended or reclassified, so no verdict can move |
+| **29 merged `worktree-agent-*` branches pruned** | Each tested individually with `git merge-base --is-ancestor` *before* its delete; 29 of 29 ancestors, cross-checked against `git branch --merged main`. The 18 SPRINT-092 verified and the 11 it never checked are both now measured rather than inherited |
+
+**The instructive result is not the three guards — it is that every CRITICAL inside them was found by
+an independent pass and none by an author.** T1's review returned 3 HIGH / 3 MEDIUM / 1 LOW **inside
+DoD already ticked**, minutes after its own seeded-break proof ran clean. T2 needed **five**
+worktree-isolated rounds on one 40-line function: rounds 1–3 each found a silent false negative, round
+2's being a regression *round 1's fix had introduced* — an unclosed code fence that **erased** a real
+outstanding handoff rather than misreporting it, `PASS`, exit 0. Round 3 found the *design*, the owner
+ruled the fence mechanism deleted, and the parser was rewritten strict: nothing is skipped, because
+anything a parser skips it can be made to skip over a real violation. Round 4 cleared the design and
+found one MEDIUM; round 5 found nothing. `L-165` → **count 5**, and `L-188` draws the dosage corollary:
+for a Tier G guard, one review pass is a **floor**, not a ceiling.
+
+**One through-line explains all three reviews:** the detection logic was sound every time; the **set of
+artifacts it ran over** was not — which row is selected, which sprints count as closed, which paths are
+searched, which export forms are seen. Not one fixture varied that set. Fixtures discriminate
+*branches*; nothing discriminated *reachability* → `L-186`. And of the four guards the seeded-break bar
+prescribes, **exactly one has ever caught anything** — the rule that a landed, targeted seed reddening
+nothing has tested nothing. It fired five times this sprint; `cmp`, the line count and the parse check
+passed every false seed it caught, and `cmp` is not a landing guard at all on a CRLF checkout →
+`L-187`.
+
+**Not shipped, and named rather than smoothed:** system-verify produced **no usable verdict** — two
+full `bun test` runs over the same unchanged tree disagreed (`496 pass, 1 fail`, then `497 pass, 0
+fail`) with no test code changed between them (`TD-135`). The close rests on the opt-in gate profile
+read off the line the gate itself prints. Seven debt rows were filed in-session (`TD-130`–`TD-136`,
+with `TD-131` extended) plus `TD-137` at close; `TD-132` is `high` — the dispatch preflight parses a
+task's explanatory *prose* as dependencies, inventing a cycle **and** issuing shared-file ownership
+PASSes off the phantom edges.
 
 ---
 ## SPRINT-092 — The Conversion's Measured Delta (closed 2026-08-31)

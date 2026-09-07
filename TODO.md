@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-31
+last_updated: 2026-09-05
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -16,22 +16,22 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-094 — Guards for What Nothing Reads** → [`docs/sprint/SPRINT-094-guards-for-what-nothing-reads.md`](docs/sprint/SPRINT-094-guards-for-what-nothing-reads.md)
+> **None — the pointer is cleared.** SPRINT-094 closed 2026-09-05 at **22 of 23 DoD** (the one open box
+> is the owner-action archiving ruling below, recorded at promote as not a blocker for T1–T4). Written
+> up in [`CHANGELOG.md`](CHANGELOG.md); the Plan and its log stay at
+> [`docs/sprint/SPRINT-094-guards-for-what-nothing-reads.md`](docs/sprint/SPRINT-094-guards-for-what-nothing-reads.md)
+> until §11 archival is approved. **Single stream** — `stream:` stays omitted, because a second stream
+> is still unavailable while `TASK-298` is `needs-info`.
 >
-> **Single stream** — `stream:` is omitted, because a second stream is unavailable while `TASK-298`
-> is `needs-info` (it is the prerequisite for promoting one, so it cannot sit inside one).
-> **`status: active`, and `gates_signed:` is absent — which means NOT signed, never approval
-> (L-099).** The Plan is rendered and the task set is frozen; G1 + G2 are the first item on its
-> § Owner-action checklist, and an unattended run reads the sprint file and nothing else, so a
-> sign-off living only in a session transcript is invisible to it.
+> **Next**: `/triage` (overdue — see the numbers below), then `/lean-doc-generator promote`.
 >
-> **SPRINT-092 and SPRINT-093 are still unarchived — §11 retention PARKED by owner ruling at the
-> SPRINT-094 promote**, where only the shipped-task prune was approved. Retention is lossy, so close
-> never self-approves it. The pair shares `plan_commit: c52496f`, so **archive them together or
-> measure again**: `check-layers-observed.sh:397` drops `*/archive/*` from the sibling list line 429
-> uses to skip another sprint's commits, which is what made archiving one re-attribute its history to
-> the other — **214 pass / 0 fail** in place vs **202 pass / 1 fail** archived at SPRINT-093's close
-> (**TD-125** · `TASK-298`).
+> **SPRINT-092, SPRINT-093 and now SPRINT-094 are unarchived — §11 retention PARKED by owner ruling at
+> the SPRINT-094 promote**, where only the shipped-task prune was approved, and re-proposed and
+> re-parked at this close. Retention is lossy, so close never self-approves it. The 092/093 pair shares
+> `plan_commit: c52496f`, so **archive them together or measure again**: `check-layers-observed.sh:397`
+> drops `*/archive/*` from the sibling list line 429 uses to skip another sprint's commits, which is
+> what made archiving one re-attribute its history to the other — **214 pass / 0 fail** in place vs
+> **202 pass / 1 fail** archived at SPRINT-093's close (**TD-125** · `TASK-298`).
 
 **SPRINT-092 shipped the §4 conversion and measured it.** Default-profile saving **22.4–27.9 s**
 (23.4–28.2 s removed, 0.37–0.98 s added), with §4 rules still evaluating on every bare run. The saving
@@ -45,20 +45,26 @@ host and the opt-in profile measures 1450 s, while `qa-budget-default` passes by
 *configured* budget to the ceiling rather than the actual runtime (**TD-128**). A pruning of 18 stale
 worktrees (178 MB) was tried as the cause and **disproved** — 1413 s before, 1450 s after.
 
-**Still Backlog:** `TASK-318` (`L-172`'s durable form) · `TASK-300` · `TASK-319`/`320` · `TASK-321`
-(owner feedback: summaries must lead with the conclusion) · **`TASK-324`/`325`** (owner feedback
-2026-08-31: the sprint lifecycle checks neither epic status nor handoff state) · `TASK-322`/`323`
-(SPRINT-092's close-Retro follow-ups) · `TASK-188`/`296` (`blocked`) · `TASK-297`/`298` (`needs-info`;
-298 reads SUPERSEDED since SPRINT-088 → `/triage`). Route **`TD-120`** next: the S4.APPEND git-spawn
-cost, **before** H24–H26.
-**`/triage` is still overdue, and the numbers below are the SPRINT-094 promote's, not the previous
-line's.** TODO.md is **412** lines against §2's cap of 320 — it reached exactly 320 when the promote
-pruned four Backlog entries SPRINT-092 had shipped but never removed (`TASK-313`/`314`/`315`/`316`,
-−62 lines, §11), then went back over on the two new rows above (+67). **56 of 63** TD rows are ≥3
-sprints unaddressed, not the 15 this line previously carried; two `high` rows (`TD-101` · `TD-113`)
-were verified fixed and closed at that sweep, leaving `TD-090` and `TD-117` as the live high+aged
-escalations. The next prune candidate is this § Active Sprint narrative itself, which restates
-`CHANGELOG.md` (L-008) — owner-gated, not taken here.
+**Shipped at SPRINT-094, awaiting the §11 Backlog prune (owner-gated, re-proposed at this close):**
+`TASK-324` → T1 (epic-state guard) · `TASK-325` → T2 (handoff status + §12(b)'s conversion) ·
+`TASK-318` → T3 (unwired-exports fitness rule) · `TASK-323` → T4 (29 branches pruned). Their entries
+are still below because removal is lossy and close never self-approves it (§11).
+
+**Still Backlog:** `TASK-300` · `TASK-319`/`320` · `TASK-321` (owner feedback: summaries must lead with
+the conclusion) · `TASK-322` (SPRINT-092's close-Retro follow-up) · **`TASK-326`/`327`** (SPRINT-094's
+close-Retro follow-ups: nothing compares a commit's claimed DoD delta against the ticks it made; the
+handoff guard has never fired on live input) · `TASK-188`/`296` (`blocked`) · `TASK-297`/`298`
+(`needs-info`; 298 reads SUPERSEDED since SPRINT-088 → `/triage`). Route **`TD-120`** next: the
+S4.APPEND git-spawn cost, **before** H24–H26.
+
+**`/triage` is overdue, and these figures are re-derived at the SPRINT-094 close — not carried from the
+promote's line.** TODO.md is **471** lines against §2's cap of 320; the four shipped entries above are
+the prune that would take the largest bite. The debt ledger holds **77 rows — 70 open, 7 not-open**
+(reconciled: 70 + 7 = 77), of which **4 open rows are `severity: high`**. **The ≥3-sprints aging count
+is deliberately NOT restated here** — it is a promote-time derivation and the last figure on this line
+(*56 of 63*) was already a sprint stale; re-derive it at the next promote against the ledger rather
+than reading it from this file (L-097 · L-130). The next prune candidate remains this § Active Sprint
+narrative itself, which restates `CHANGELOG.md` (L-008) — owner-gated, not taken here.
 
 ---
 
@@ -386,6 +392,59 @@ escalations. The next prune candidate is this § Active Sprint narrative itself,
       origin:     manual
       state:      ready
 
+- [ ] TASK-326 — Compare a commit's claimed DoD delta against the ticks it actually made  [size: S] [risk: low] [AFK]
+      class:      execution
+      tier:       G (ADR-029 — a false green on a DoD is the same silent-false-negative class as a
+                  guard that never fires; the artifact and the report disagree and nothing compares them)
+      done-when:  a check reads each `sprint(NNN)` commit's own message for a claimed DoD figure
+                  (`N of M DoD`) and reconciles it against the `[ ] → [x]` transitions that commit
+                  made in the sprint file, FAILing with a named finding when they disagree — including
+                  the case where a commit ticks a DoD belonging to a task it did not touch. Retained
+                  must-FAIL: SPRINT-094's `6a6aeac`, which claimed "5 of 6 DoD" and flipped **three**
+                  boxes, two of them T2's and T3's. Sibling control: a commit whose claim and ticks
+                  agree, green in the same run. Seeded-break discrimination proof under ONE stated hash
+                  convention, and a landed-but-targeted seed that reddens nothing is reported as
+                  untested, never scored as a pass (L-137 · L-142 · L-169 · L-187)
+      touches:    scripts/lib/ (a new checker) · scripts/qa-check.sh · evals/fixtures/ + its harness
+      depends-on: none
+      assumes:    the claim is machine-readable from the commit subject/body in the form this repo
+                  already writes it. **Re-derive before building on it** — sample the actual
+                  `sprint(NNN)` subjects rather than trusting this line (L-097). If the claim is not
+                  reliably parseable, the scope narrows to the *unattributed tick* half (a commit
+                  flipping a DoD outside the tasks whose `Layers:` it touched), which is the half that
+                  carries the real defect, and says so
+      tracker:   SPRINT-094 Execution Log, 2026-09-03 surprise — `6a6aeac` flipped three DoD sharing
+                  an identical bold lead where one was intended; a replace-all matched three siblings.
+                  Every downstream signal stayed clean (line caps unchanged, no grep tripped, the
+                  commit body itself said "5 of 6"), and it survived a worktree-isolated review pass of
+                  T1 an hour later — that reviewer read T1's script, which is where it was told to
+                  look. CLAUDE.md § Anti-Patterns edit-safety (b) · L-009 · L-165
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-327 — Exercise `check-handoff-state.sh` on the first real handoff  [size: S] [risk: low] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — the guard is proven on fixtures and has never seen live input)
+      done-when:  a real `/handoff` is taken, its two-field record is written by `handoff/SKILL.md` to
+                  the sprint's Execution Log (or to `HANDOFF-LEDGER.md` when no sprint pointer exists),
+                  `prime` reports it on the next session, and the close-side reconciliation flips it to
+                  `spent` — each step observed on the live artifact, not a fixture. The DoD is met when
+                  `check-handoff-state.sh .` has printed a verdict about a record **it did not ship
+                  with**; today it prints `skip (no handoff records)`
+      touches:    no code expected — this is L-007's exercise-on-real-input half, deliberately deferred
+                  because the vocabulary is new. Any fix it provokes lands in `scripts/lib/check-handoff-state.sh`
+      depends-on: none — but it cannot be scheduled, only taken when a session genuinely ends mid-work
+      assumes:    the write · read · reconcile path traced end-to-end at SPRINT-094 T2 is correct.
+                  That trace was a **reading** of three skills, not an execution of them, which is
+                  exactly the gap this task closes (L-016: when the repo cannot dogfood a feature,
+                  verify on the consumer path — here the path finally becomes available)
+      tracker:   SPRINT-094 T2, 2026-09-04 review round 2 — "the first real `/handoff` after this
+                  sprint is what converts it from proven-on-fixtures to proven-in-place" · L-166
+                  (a fixture proves a branch works; only the motivating case proves it is reachable) ·
+                  TD-134 (the archive-side half of the same gap, ruled acceptable and forward-looking)
+      origin:     close-retro
+      state:      ready
+
 ### P3 — Long-term
 
 > Rejected work lives in **`.out-of-scope/`** — each file carries its own reasoning, revisit-if and
@@ -399,7 +458,7 @@ escalations. The next prune candidate is this § Active Sprint narrative itself,
 
 > Move to root `CHANGELOG.md` once reflected in docs, then delete here.
 
-_(nothing yet for **092**, still active.)_ **093 closed 2026-08-30 at 19 of 19** and is written up in full in [`CHANGELOG.md`](CHANGELOG.md) — unreleased, bundling into the next MINOR alongside SPRINT-088; not restated here (L-008). The previous released entry, SPRINT-091 → **v1.62.0**, is likewise there.
+**094 closed 2026-09-05 at 22 of 23**, **093 closed 2026-08-30 at 19 of 19** and **092 closed 2026-08-31 at 19 of 19** — all three written up in full in [`CHANGELOG.md`](CHANGELOG.md), unreleased, bundling into the next MINOR alongside SPRINT-088; not restated here (L-008). The previous released entry, SPRINT-091 → **v1.62.0**, is likewise there.
 
 ---
 

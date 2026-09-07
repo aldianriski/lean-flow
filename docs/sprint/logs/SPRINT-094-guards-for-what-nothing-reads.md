@@ -2,8 +2,8 @@
 sprint: 094
 slug: guards-for-what-nothing-reads
 owner: Maintainer
-last_updated: 2026-09-01
-status: active
+last_updated: 2026-09-05
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -1047,3 +1047,40 @@ than taken on my word:
 design itself; round 4 found one MEDIUM and cleared the design; round 5 found nothing. Every CRITICAL
 in this task was found by an independent pass and none by the author, with the governing rules loaded
 and on screen throughout — L-165, four times over, on one 40-line function.
+
+### 2026-09-05 | close | SPRINT-094 closed at 22 of 23 DoD; four buckets routed, §11 retention re-parked
+
+`consequence · close · behaviour:none · governance:high` — record only; no guard changed.
+
+**DoD state, re-derived from the file rather than carried:** T1 6/6 · T2 6/6 · T3 5/5 · T4 3/3 ·
+Owner-action 2/3 = **22 of 23**. The one open box is the archiving ruling on SPRINT-092/093, recorded
+at promote as *not a blocker for T1–T4* and still gated on `TD-125` / `TASK-298`.
+
+**The handoff reconciliation this sprint's own T2 added was performed, not assumed.**
+`sh scripts/lib/check-handoff-state.sh .` run as its own call: `handoff-state: skip (no handoff
+records under docs/sprint/ or HANDOFF-LEDGER.md)`. Nothing to reconcile, which is the correct and
+expected result — no `/handoff` has been taken since the vocabulary shipped. That is also why
+`TASK-327` exists: the guard is proven on 25 fixtures and has never seen live input (L-166 · L-007).
+
+**Four buckets, all routed to durable homes (§10):**
+- **Shipped** → `CHANGELOG.md` § SPRINT-094 (unreleased; feature sprint, so MINOR by hand — `release-patch` is PATCH-only).
+- **Tech debt** → `TD-130` · `TD-131` (extended) · `TD-132` · `TD-133` · `TD-134` · `TD-135` · `TD-136` in-session, **`TD-137`** at close. Ledger now **77 rows — 70 open, 7 not-open**, reconciled 70 + 7 = 77.
+- **Follow-ups** → **`TASK-326`** · **`TASK-327`**, both stamped `origin: close-retro` so neither inherits G1's fast-path.
+- **Learnings** → **`L-186`** · **`L-187`** · **`L-188`** new; `L-165` → count 5 · `L-166` → count 4 · `L-120` seventh sighting (a seventh channel: a truncating pipe on a backgrounded run) · `L-060` two further sightings.
+
+**Ids were derived, never incremented from memory, with `.claude/worktrees/` excluded (L-143 · L-170).**
+Two agreeing queries per family: TD max **136** (anchored ledger rows, and a repo-wide sweep) → next
+`TD-137`; L max **185** (anchored `^## L-NNN`, and a repo-wide sweep whose only higher hit was
+SPRINT-013's `L-999` negative-test token — treated as contamination, not a row) → next `L-186`; TASK max
+**325** (anchored TODO entries, and a TODO + sprint + ledger sweep; the repo-wide form returned
+`TASK-905`–`908`, which are `evals/fixtures/boundary-rows/` tokens) → next `TASK-326`.
+
+**§11 retention and the doc-freshness pass are PARKED, re-proposed to the owner and not self-approved.**
+Retention is lossy and close never approves its own. Three items stand: archiving SPRINT-092/093/094
+with their logs (the 092/093 pair still gated on `TD-125`); pruning the four Backlog entries this sprint
+shipped (`TASK-318` · `323` · `324` · `325`); and `TODO.md` at **471** lines against §2's cap of 320.
+
+**One figure corrected at close.** The 2026-09-04 entry deferred *"nine `scripts/…` references remain
+under `skills/orchestrator/`"*. Re-derived here with two agreeing queries: **13** occurrences across 4
+files; 9 was 13 minus the four `scripts/night-run.sh` self-references. Filed as `TD-137` with the
+correction stated, since a figure measured once and never re-measured is the shape the row is about.

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-31
+last_updated: 2026-09-05
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -203,6 +203,31 @@ status: current
 > · 3 soft over-cap — `TODO.md` · `docs/research/adlc-epic-sequencing.md` ·
 > `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` (TD-082's reasoned carry, not
 > re-litigated).
+
+- **TD-137** severity: medium | status: open | created: Sprint-094
+  - Summary: **Four consumer-facing `skills/orchestrator/` files name this repository's own script
+    paths, so an installed consumer reads instructions that resolve nowhere.** SPRINT-094 T2 cleaned
+    this class out of the 35 templates and out of `handoff` / `prime` / `lean-doc-generator`; the
+    orchestrator surface was outside that task's `Layers:` and was mentioned rather than touched.
+  - Location: **13 occurrences, 4 distinct paths, 4 files** — `references/night-run.md` (9) ·
+    `references/dispatch.md` (2) · `references/review-scoping.md` (1) · `SKILL.md` (1). The paths are
+    `scripts/qa-check.sh` · `scripts/night-run.sh` · `scripts/lib/resolve-run-mode.sh` ·
+    `scripts/lib/check-verify-reaches.sh`.
+  - **The figure was re-derived at close, and it corrects the record** (L-097 · the cross-check rule).
+    The T2 log entry that deferred this wrote "nine `scripts/…` references". Two agreeing queries at
+    close return **13** (occurrence count of `scripts/[A-Za-z0-9._/-]+`, and lines containing
+    `scripts/`); 9 is 13 minus the four `scripts/night-run.sh` self-references. The count in the log
+    was measured once and never re-measured — which is the shape it is filed under.
+  - Impact: **L-015 verbatim** — maintainer-correct, consumer-leaky. A consumer following
+    `night-run.md` is told to invoke a launcher that does not exist in their tree. Unlike the template
+    leak T2 fixed, some of these are genuinely lean-flow's *own* tooling being described, so the fix is
+    a ruling per reference (describe the mechanism · mark it as this repo's own · move it), not a
+    blanket delete.
+  - Mitigation (hypothesis, re-derive before building on it — L-091): per-reference triage, then the
+    same treatment T2 applied to `sprint-log.md.template` — name the property, not the path.
+  - **Re-file fresh if** a consumer-path sweep is ever wired into the gate, which would make this row
+    a finding rather than a debt.
+  - All four files predate SPRINT-094's `plan_commit`, so none of this is this sprint's mess.
 
 - **TD-117** severity: **high** | status: open | created: Sprint-091
   - Summary: **Under concurrent load the gate exceeds its own 450s budget, SKIPS six eval harnesses, and

@@ -2,8 +2,8 @@
 sprint: 094
 slug: guards-for-what-nothing-reads
 owner: Maintainer
-last_updated: 2026-08-31
-status: active
+last_updated: 2026-09-05
+status: closed
 gates_signed: G1,G2 @ 8681143
 plan_commit: 2ab2b63
 update_trigger: sprint execute/close events
@@ -240,7 +240,72 @@ Cites: SPRINT-092 close (18 worktrees / 178 MB removed, their branches were not)
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/check-epic-archive.sh` | T1 | +169 — a second direction, `epic-state:`, so rollup drift is distinguishable from a retention finding without parsing the sentence (L-058) | med | `evals/run-epic-archive-fixtures.sh` — 17 cases |
+| `evals/run-epic-archive-fixtures.sh` | T1 | +91 — 10 new cases, 5 of them reachability cases the independent pass proved were missing | low | itself (always-on leg 2b) |
+| `docs/epic/EPIC-015-execution-autonomy.md` | T1 | the 7 real findings the new guard produced, repaired — 4 `close_commit` values derived from each member sprint's own frontmatter, 3 condition attributions read from the member rows' own text | low | the guard that found them |
+| `scripts/lib/check-handoff-state.sh` | T2 | +202 — a handoff carries `live`/`consumed`/`spent`; UNKNOWN is never assumed `spent`; a sprint may not close over a non-`spent` handoff (§12(b)'s conversion, prescribed and never performed) | **high** | `evals/run-handoff-state-fixtures.sh` — 25 cases |
+| `evals/run-handoff-state-fixtures.sh` | T2 | +240 — every assertion pins the finding's **values**, not its phrase (L-108 applied to the test's own assertion) | med | itself (always-on) |
+| `skills/handoff/SKILL.md` · `skills/prime/SKILL.md` | T2 | write and read sides of the vocabulary, inlined — no repo path, so a consumer gets the mechanism rather than our gate (L-015) | low | consumer trace, end-to-end |
+| `skills/lean-doc-generator/SKILL.md` (+ `references/handoff-reconciliation.md`) | T1·T2 | promote + close checklist lines; the reconciliation protocol moved to `references/` rather than raising the cap — **138/140** under D2 | low | line count |
+| `skills/lean-doc-generator/templates/sprint-log.md.template` | T2 | `handoff` event + the two-field shape; the leaked `scripts/lib/…` path removed (DoD 5) | low | 35-template sweep: **zero** `scripts/` / `evals/` references |
+| `spec/STANDARD.md` · `spec/CHANGELOG.md` | T2 | `HANDOFF-LEDGER.md` registered with its lifecycle contract; **0.10.0 → 0.11.0** | med | `read-spec-rules.sh` emits **100 rows byte-identical by `cmp`** to the frozen surface — no rule added, amended or reclassified, so no verdict can move |
+| `test/architecture/unwired-exports.ts` (+ `.test.ts`) | T3 | +340 / +349 — an exported symbol with zero non-test callers is reported, off resolved ES import **edges**, never a bare-identifier grep | med | 39 tests · `bun test test/architecture/` |
+| `test/architecture/layers.ts` | T3 | the `fixtures` exclusion removed — the two readers returned different file sets for the same tree | low | a test that builds a real throwaway commit and asserts both readers agree |
+| `scripts/qa-check.sh` | T1·T2 | both new harnesses joined `eval_harnesses_always`; leg 2b relabelled `epic retention + rollup currency` — a leg whose label under-describes it is a capability nobody finds | low | the gate's own printed verdict line |
+| `TECH-DEBT.md` | close | TD-130 · TD-131 (extended) · TD-132 · TD-133 · TD-134 · TD-135 · TD-136 filed in-session; TD-137 at close | low | — |
+| git refs only | T4 | 29 `worktree-agent-*` branches deleted, each verified an ancestor of `main` individually first | low | `git branch --list 'worktree-agent-*'` → 0 |
 
 ## Retro
 
-<!-- Written at close. Route the four buckets to their durable homes (STANDARD §10). -->
+**Closed at 22 of 23 DoD.** The single open box is the owner-action ruling on archiving SPRINT-092/093,
+recorded at promote as *not a blocker for T1–T4* and still gated on `TD-125` / `TASK-298`.
+T1 6/6 · T2 6/6 · T3 5/5 · T4 3/3 · Owner-action 2/3.
+
+**The theme held, and then landed on the sprint itself.** Three properties with no reader got one. But
+the instructive result is not the three guards — it is that **every CRITICAL defect inside them was found
+by an independent pass and none by the author**, with the governing rules loaded and on screen the whole
+time. T1's review found 3 HIGH / 3 MEDIUM / 1 LOW inside DoD the author had already ticked, minutes
+after its own seeded-break proof ran clean. T2 needed **five** review rounds on one 40-line function;
+rounds 1–3 each found a silent false negative, and round 2's finding was a regression *round 1's fix had
+introduced*. T3's review found a HIGH the author's proof could not have reached.
+
+**One through-line explains all three reviews:** the detection logic was sound in every case; the **set
+of artifacts it was applied to** was not. Which row is selected, which sprints count as closed, which
+paths are searched, which export forms are seen — and not one fixture varied that set. Fixtures
+discriminate *branches*; nothing discriminated *reachability*. → `L-186`.
+
+### Buckets (STANDARD §10) — all four routed
+
+| Bucket | Routed to |
+|---|---|
+| **Shipped** | `CHANGELOG.md` § SPRINT-094 — the three guards, the branch prune, `spec/` 0.11.0 |
+| **Tech debt** | `TD-130` · `TD-131` (extended) · `TD-132` · `TD-133` · `TD-134` · `TD-135` · `TD-136` filed in-session; **`TD-137`** filed at close — 13 `scripts/…` references leak this repo's paths into 4 consumer-facing `skills/orchestrator/` files |
+| **Follow-ups** | **`TASK-326`** (nothing compares a commit's claimed DoD delta against the ticks it actually made) · **`TASK-327`** (`check-handoff-state.sh` is proven on fixtures and has never fired on live input) — both `origin: close-retro` |
+| **Learnings** | **`L-186`** · **`L-187`** · **`L-188`** new; `L-165` → count 5 · `L-166` → count 4 · `L-120` seventh sighting · `L-060` two further sightings |
+
+### Retrieval-miss check — yes, twice, and both are filed
+
+Two prior rules were **loaded, correct, and contradicted in this session's own hands**. `L-120`: the
+gate was backgrounded as `sh scripts/qa-check.sh 2>&1 | tail -3`, so the harness reported `tail`'s exit
+0 for a run whose gate had failed and every FAIL detail was discarded — piping a gate into `tail` reads
+as *capturing output*, not as *discarding the evidence*, which is exactly why the rule keeps not firing.
+`L-142`: `cmp` was trusted as a seed-landing guard on a CRLF checkout, where the local `awk` / `sed`
+rewrite line endings, so a semantically inert seed reported as landed. Both → `L-187`, and the `L-120`
+entry carries its seventh channel.
+
+### What is NOT evidence this sprint may close, stated rather than smoothed
+
+**System-verify produced no usable verdict, and `TD-135` is why** — two full `bun test` runs over the
+same unchanged tree disagreed (`496 pass, 1 fail`, then `497 pass, 0 fail`) with no test code changed
+between them. The close therefore rests on the **opt-in gate profile** (`QA_FULL=1 sh scripts/qa-check.sh`)
+read off the line the gate itself prints, plus each harness's own printed verdict — never a piped or
+redirected status (L-120).
+
+### One authoring convention this sprint's own log now owes
+
+T2's parser is strict by ruling: **nothing is skipped, because anything a parser skips it can be made to
+skip over a real violation.** The cost is that a fenced block containing a complete, correctly-shaped
+example record would now be read as real. A sweep of all 48 `docs/sprint/**/logs/SPRINT-*.md` found zero
+current matches, and this log was checked directly. The convention that follows: **never write a literal
+handoff heading followed by two field lines when illustrating the format** — describe it, or break the
+shape. Recorded here rather than defended in more parser code.
