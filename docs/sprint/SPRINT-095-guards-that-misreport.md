@@ -4,6 +4,7 @@ slug: guards-that-misreport
 owner: Maintainer
 last_updated: 2026-09-07
 status: active
+gates_signed: G1,G2 @ 18b9a0b
 plan_commit: 2453678
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -35,8 +36,7 @@ breaches, routed to the next close.
 ## Plan
 
 ### T1 — Keep an archived sprint owning its own commits `[size: S · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-layers-observed.sh` (the `sibling_sprints` build at :392-402 and the
-per-commit skip at :428-431) · `evals/fixtures/layers-observed/**` · `evals/run-layers-observed-fixtures.sh`
+Layers: `scripts/lib/check-layers-observed.sh` · `evals/fixtures/layers-observed/` · `evals/run-layers-observed-fixtures.sh`
 Depends-on: none
 Cites: TD-125 · TASK-298 · TASK-299 (the shipped half) · L-166 · L-058
 
@@ -51,16 +51,14 @@ staying green, and a path declared by no sprint still FAILs by name.
 
 **DoD:**
 - [ ] The two questions are separated — archival no longer removes a sprint from the commit-ownership list — *Verify: `sh scripts/lib/check-layers-observed.sh` over a tree with 092/093 archived*
-- [ ] Reproduced on the **real 092/093 pair**, not fixtures alone (L-166): green in place AND green archived. TD-125 measured 214 pass/0 fail in place vs 202 pass/1 fail archived; **the pass count is the signal that matters** — it fell because twelve checks stopped being invoked, and a guard that stops being *invoked* is invisible in a red/green summary — *Verify: reconcile BOTH numbers, not the FAIL count alone*
+- [ ] Reproduced on the **real 092/093 pair**, not fixtures alone (L-166): archiving 093 **alone**, with 092 left active, must leave 092's blamed `commit:path` count **unchanged** (3 → 3). Measured 2026-09-07 at G2, controlled — both legs invoke the checker with `ls docs/sprint/SPRINT-*.md` exactly as `qa-check.sh:1013` does, so the archive move is the only variable — and it is today **3 → 85**. The four pre-existing TD-107-class FAILs must be unchanged; this task does not fix those. **PASS and FAIL line counts do NOT discriminate this defect** — both were identical (1 PASS / 4 FAIL) across the two legs while 82 files were misattributed, so a green/red criterion proves nothing here. TD-125's "the pass count is the second signal" holds for the whole `qa-check` gate, where twelve checks stopped being invoked, and is **false at the checker level**, which is where this task works — *Verify: the two-leg comparison above; the blamed-pair count is the verdict* — **restated at G2 on owner ruling, `scope-change` logged; the frozen wording was unsatisfiable at freeze (L-088 · L-185)***
 - [ ] Retained fixture: an archived sprint's commits do not land on an active sibling — *Verify: `sh evals/run-layers-observed-fixtures.sh`*
 - [ ] Sibling control in the same run: a path declared by NO sprint still FAILs with its named finding
 - [ ] Seeded-break discrimination proof — seed verified landed, artifact still parses, break targeted not demolition, and a landed seed reddening nothing reported as untested (L-137 · L-142 · L-187), all under ONE stated hash convention (L-169)
 - [ ] Worktree-isolated outside reviewer (L-165 · L-168 — Tier G, and the reviewer *writes*, so it must not share this tree)
 
 ### T2 — Anchor the dispatch preflight's `Depends-on:` parser to the id list `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `skills/orchestrator/references/dispatch.md` (the `<!-- dispatch-preflight:start/end -->`
-snippet — the `"Depends-on:"*)` arm AND the indented `D)` continuation arm) ·
-`evals/run-dispatch-preflight-fixtures.sh` · `evals/fixtures/dispatch-preflight/**`
+Layers: `skills/orchestrator/references/dispatch.md` · `evals/run-dispatch-preflight-fixtures.sh` · `evals/fixtures/dispatch-preflight/`
 Depends-on: none
 Cites: TD-132 · TD-043 · TASK-328 · L-058 · L-166
 
@@ -83,8 +81,7 @@ computes clean waves instead of an unresolvable self-edge.
 - [ ] Worktree-isolated outside reviewer (L-165 · L-168)
 
 ### T3 — Reconcile a commit's claimed DoD delta against the ticks it made `[size: S · risk: low · class: execution · AFK · J1]`
-Layers: `scripts/lib/` (a new checker) · `scripts/qa-check.sh` (a leg + the always-on eval list) ·
-`evals/fixtures/` + its harness
+Layers: `scripts/lib/check-dod-delta.sh` · `scripts/qa-check.sh` · `evals/fixtures/dod-delta/` · `evals/run-dod-delta-fixtures.sh`
 Depends-on: none — but **T3 commits to `scripts/qa-check.sh` before T4** (D1)
 Cites: TASK-326 · SPRINT-094 Execution Log · L-009 · L-165
 
@@ -104,8 +101,7 @@ to read.
 - [ ] Worktree-isolated outside reviewer (L-165 · L-168)
 
 ### T4 — Make gate truncation a distinct outcome from gate failure `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/qa-check.sh` (the `qb_checkpoint` truncation path and the § Summary block) ·
-`scripts/lib/qa-budget-check.sh` · `evals/run-qa-budget-fixtures.sh` · `evals/fixtures/qa-budget/**`
+Layers: `scripts/qa-check.sh` · `scripts/lib/qa-budget-check.sh` · `evals/run-qa-budget-fixtures.sh` · `evals/fixtures/qa-budget/`
 Depends-on: T3 — **not for its logic, but for its harness** (D1): T4 must enumerate every harness it
 fails to reach, and a harness T3 adds afterwards would be absent from that enumeration
 Cites: TD-117 · TD-128 · TASK-329 · TD-084 · TD-091 · L-120 · L-166
