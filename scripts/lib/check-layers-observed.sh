@@ -434,11 +434,13 @@ for sp in "$@"; do
   # in a temp file: a shell string would need re-splitting per commit, and the count is unbounded.
   # One file reused across sprints, truncated per iteration -- the loop runs once per sprint file,
   # so a fresh mktemp each time would leak one per sprint. Registered on EXIT the first time only.
-  if [ -z "${archived_windows:-}" ]; then
-    archived_windows=$(mktemp) || { printf 'FAIL  %s layers observed: mktemp failed for the archive window map\n' "$sp"; fail=$((fail + 1)); continue; }
-    trap 'rm -f "$archived_windows"' EXIT INT TERM
+  # One file reused across sprints, truncated per iteration -- the loop runs once per sprint file,
+  # so a fresh mktemp each time would leak one per sprint. Registered on EXIT the first time only.
+  if [ -z "${archived_decls:-}" ]; then
+    archived_decls=$(mktemp) || { printf 'FAIL  %s layers observed: mktemp failed for the archive declaration map\n' "$sp"; fail=$((fail + 1)); continue; }
+    trap 'rm -f "$archived_decls"' EXIT INT TERM
   fi
-  : > "$archived_windows"
+  : > "$archived_decls"
   for _asp in "$(dirname "$sp")"/archive/SPRINT-*.md; do
     [ -f "$_asp" ] || continue
     _an=$(fmv "$_asp" sprint)
@@ -446,27 +448,42 @@ for sp in "$@"; do
     # Same self-sibling guard as above, and for the same reason: a sprint that became its own
     # sibling would skip every one of its own commits -- a total bypass, not a narrow miss.
     [ "$_an" = "$my_sprint" ] && continue
-    _apc=$(fmv "$_asp" plan_commit); _acc=$(fmv "$_asp" close_commit)
-    # A window needs both ends to be checkable. An archived sprint missing either is recorded with
-    # empty fields and owns nothing -- it fails toward REPORTING the commit, which is the safe
-    # direction: over-reporting is loud, and a silent exemption is what this block exists to avoid.
-    printf '%s %s %s\n' "$_an" "$_apc" "$_acc" >>"$archived_windows"
+    _aplan=$(awk '/^## Plan/{f=1;next} /^## /{f=0} f' "$_asp")
+    # The union of that sprint's declared tokens, parsed by the SAME task_decls the active side
+    # uses -- a second parser here would let the two disagree about what a declaration is.
+    _atok=$(task_decls "$_aplan" | awk '{print $2}' | sort -u | tr '\n' ' ')
+    # An archived sprint that declares nothing owns nothing: it fails toward REPORTING the commit,
+    # which is the loud direction and the safe one.
+    [ -n "$_atok" ] || continue
+    printf '%s %s\n' "$_an" "$_atok" >>"$archived_decls"
   done
-  # owns_commit <sprint-number> <commit> -- true only when an ARCHIVED sprint of that number has a
-  # window and the commit lies inside it. `merge-base --is-ancestor` is reflexive, so a commit that
-  # IS the plan_commit or the close_commit counts as inside.
+  # owns_commit <sprint-number> <commit> -- true only when the archived sprint of that number
+  # DECLARED the paths the commit touches.
+  #
+  # THIRD DESIGN, and the first two were both proxies. Ownership was inferred first from the sprint
+  # NUMBER in the commit subject (any of 91 numbers exempted anything), then from the number plus
+  # the sprint's plan_commit..close_commit WINDOW. Review killed both, the second because windows
+  # legitimately NEST in this repo: SPRINT-089 (5f0682b..cc46d18) and SPRINT-090 (b7437de..cc46d18)
+  # share a close commit, 090 having been seeded inside 089's own task stream, so 090's whole window
+  # sits within 089's. A commit doing real undeclared work for a later sprint but mislabelled
+  # `sprint(089)` falls inside that overlap and was exempted. It has not bitten only because
+  # cc46d18 happens to precede 092's plan_commit -- timing, not a guarantee.
+  #
+  # A commit subject is an UNVERIFIABLE claim, so every refinement of it is another proxy. The
+  # direct question is the one the guard actually cares about: did that sprint declare these paths?
+  # If a mislabelled commit touches a file the cited sprint never declared, the citation is wrong
+  # and the file is undeclared work -- which is exactly what this checker exists to report. No
+  # window is consulted, so the three archived sprints with unresolvable commit shas stop being a
+  # special case too.
   owns_commit() {
     _q=$1; _c=$2
-    while read -r _wn _wp _wc; do
-      [ "$_wn" = "$_q" ] || continue
-      [ -n "$_wp" ] && [ -n "$_wc" ] || continue
-      git rev-parse --verify -q "$_wp^{commit}" >/dev/null 2>&1 || continue
-      git rev-parse --verify -q "$_wc^{commit}" >/dev/null 2>&1 || continue
-      git merge-base --is-ancestor "$_wp" "$_c" 2>/dev/null || continue
-      git merge-base --is-ancestor "$_c" "$_wc" 2>/dev/null || continue
-      return 0
-    done < "$archived_windows"
-    return 1
+    _dl=$(sed -n "s@^$_q @@p" "$archived_decls") || return 1
+    [ -n "$_dl" ] || return 1
+    for _f in $(git diff-tree --no-commit-id --name-only -r "$_c" 2>/dev/null); do
+      is_excluded_committed "$_f" && continue
+      covers "$_dl" "$_f" || return 1
+    done
+    return 0
   }
 
   # A declared token ending in "/" is a DIRECTORY prefix covering every path beneath it (SPRINT-055

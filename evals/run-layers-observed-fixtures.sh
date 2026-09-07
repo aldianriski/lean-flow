@@ -1261,6 +1261,14 @@ fi
 # `ls docs/sprint/SPRINT-*.md`, so an archived sprint never reaches "$@" to be filtered at all. The
 # fix DISCOVERS archived sprints instead, which is what this case pins.
 #
+# NOTE the BACKTICKS on every `Layers:` token below. task_decls extracts only backticked paths, so
+# a fixture that writes a bare path declares NOTHING -- the archived sprint then owns nothing and
+# the case passes or fails for a reason unrelated to what it claims to test. And in the UNQUOTED
+# heredocs below (they interpolate commit shas) the backticks must be ESCAPED: unescaped they are
+# command substitution, which empties the line just as silently as omitting them.
+# the case passes or fails for a reason unrelated to what it claims to test. Both fixtures here did
+# exactly that when first written; caught only because the sibling case went red.
+#
 # TWO assertions on ONE run, because the danger is bidirectional. Widening an exclusion is how a
 # guard acquires a silent false negative: too broad and real undeclared work walks through under
 # cover of "another sprint owns it". So the same output must (a) still FAIL by name on a path no
@@ -1279,7 +1287,7 @@ plan_commit: PLAN_COMMIT_PLACEHOLDER
 ## Plan
 
 ### T1 — Only touches its own file
-Layers: scripts/mine.sh
+Layers: `scripts/mine.sh`
 Depends-on: none
 SP930
 printf 'x\n' > "$c9/scripts/mine.sh"
@@ -1306,7 +1314,7 @@ close_commit: $c9_theirs
 ## Plan
 
 ### T1 — Owns its own file, and is archived
-Layers: scripts/theirs.sh
+Layers: \`scripts/theirs.sh\`
 Depends-on: none
 SP931
 commit_all "$c9" 'sprint(930) T1: record the archived sprint file'
@@ -1339,7 +1347,7 @@ plan_commit: PLAN_COMMIT_PLACEHOLDER
 ## Plan
 
 ### T1 — Declares only its own file
-Layers: src/mine.js
+Layers: `src/mine.js`
 Depends-on: none
 SP940
 printf 'x\n' > "$c10/src/mine.js"
@@ -1359,7 +1367,7 @@ close_commit: $anc
 ## Plan
 
 ### T1 — Long closed
-Layers: src/ancient.js
+Layers: \`src/ancient.js\`
 Depends-on: none
 SP941
 commit_all "$c10" 'sprint(940) T1: record the archived sprint'

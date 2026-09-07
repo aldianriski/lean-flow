@@ -483,3 +483,65 @@ distinguishes correct behaviour from the bug rather than merely coexisting with 
 un-flagging close-without-open reddens its fixture while the unbalanced fixture holds.
 
 consequence · T2 · behaviour:material · governance:high
+
+### 2026-09-07 | scope-change | T1 design 3 — ownership by DECLARATION, the proxy removed rather than narrowed
+
+**What broke:** the re-review found a CRITICAL in the window-bounded design. Windows legitimately
+NEST here — `SPRINT-089` (`5f0682b`..`cc46d18`) and `SPRINT-090` (`b7437de`..`cc46d18`) share a close
+commit, 090 having been seeded inside 089's own task stream, so 090's whole window sits within 089's.
+A commit doing real undeclared work for a later sprint but mislabelled `sprint(089)` falls inside
+that overlap and was exempted. It has not bitten only because `cc46d18` happens to precede 092's
+`plan_commit` — timing, not a guarantee.
+
+**Impact and re-confirm G2:** owner-authorised (the revise loop was spent). Scope is unchanged — T1
+still makes an archived sprint keep owning its own commits — but the *mechanism* changes for the
+third time, so the Plan's T1 text and `TASK-298` both still describe the discarded approach.
+
+**The through-line across all three designs.** Designs 1 and 2 both asked *"does this commit's
+subject cite a sprint I should trust?"* — first by number (91 numbers, unconditional), then by number
+plus window. **A commit subject is an unverifiable claim, so every refinement of it is another
+proxy**, and each was broken in turn. Design 3 asks the question the guard actually cares about:
+*did that sprint DECLARE the paths this commit touches?* A mislabelled commit touching a file the
+cited sprint never declared **is** undeclared work — precisely what this checker exists to report.
+No window is consulted, so the three archived sprints with unresolvable shas stop being a special
+case and nested windows become irrelevant. Both sides parse declarations with the same `task_decls`,
+because a second parser would let them disagree about what a declaration is.
+
+Verified both directions on the reviewer's own nested shape: the mislabelled commit is reported, and
+a genuine `sprint(089)` commit touching a file 089 *did* declare is correctly owned. Acceptance on
+the real pair holds: 092's blamed pairs **3 in place, 3 archived**. Discrimination: ownership-on-the-
+number-alone reddens the window fixture while the sibling holds; archived-sprints-own-nothing reddens
+the sibling while the window holds. Restored at `e9097c0b`.
+
+### 2026-09-07 | surprise | FOUR fixture defects in one case, every one presenting as the same red line
+
+The `archived-sibling` case went red four times for four unrelated reasons, none of them the code
+under test:
+
+1. the archived sprint carried a placeholder `plan_commit` and no `close_commit`, so under the
+   window design it owned nothing;
+2. its `Layers:` was written as a bare path, and `task_decls` extracts only **backticked** tokens, so
+   it declared nothing;
+3. backticks added — but inside an **unquoted heredoc** (it interpolates commit shas), where they
+   are command substitution, so the line evaluated to empty;
+4. repairing that with a line-numbered `awk NR==n` edit landed on the **wrong line** (numbers had
+   shifted under earlier edits in the same session), overwriting the `## Plan` heading and leaving
+   the real `Layers:` empty.
+
+**Every one produced an identical assertion failure**, and `sh -n` passed each time because the
+result was still valid shell. What separated "the code is wrong" from "the fixture is wrong" was a
+trace run *outside* the harness against a hand-built repo — the harness itself cannot distinguish
+them, because both yield the same red line.
+
+**And the sibling `archived-window` fixture was silently GREEN for reason 2 the whole time** — its
+archived sprint declared nothing either, so its FAIL proved nothing about ownership. It would have
+shipped as a retained fixture testing air. That is `L-186` reproduced inside the sprint that keeps
+citing it: fixtures discriminate a guard's branches, and nothing was discriminating the set of inputs
+those branches ran over.
+
+**Learning candidate for the Retro:** a red assertion says *something* disagrees; it never says
+whether the code or the fixture is wrong, and a fixture is code. When a fixture fails, reproduce the
+scenario outside the harness before touching the subject. Corollary, earned four times today: never
+edit by line number a file whose line numbers have shifted under earlier edits in the same session.
+
+consequence · T1 · behaviour:material · governance:high
