@@ -188,6 +188,34 @@ run_case_anywhere "deps-markup-wrapped-id" 0 "PASS wave-computation: T1=0 T2=1 T
 run_case_anywhere "deps-unbalanced-annotation" 1 "FAIL depends-on-unreadable: T2" -- \
   sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-unbalanced-annotation/sprint.md\" \"$live_head\""
 
+# --- cases 19-23 (TD-132, round 4): two CRITICALs and the call-site-2 coverage matrix ------------
+# Round 4 rejected the round-3 hardening with two more silent-drop/false-PASS paths, one of them
+# introduced BY that hardening. Both get a retained fixture, plus the three cells L-186 named.
+
+# case 19 -- MUST-FAIL. Global markup stripping WELDED `*T1*3` into `T13`, a real task, inventing a
+# dependency and turning a genuinely unowned overlap into `PASS shared-file-owned`. Only wrapping
+# markup is stripped now. A shared-file-owned PASS here means the id was welded back into existence.
+run_case_anywhere "deps-markup-welds-id" 1 "FAIL shared-file-unowned: shared.md in T13 and T3" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-markup-welds-id/sprint.md\" \"$live_head\""
+
+# case 20 -- MUST-FAIL. A token carrying a CLOSE with no OPEN (`1)`) has o==0, never enters
+# depth-tracking, and so the end-of-line unbalanced check structurally cannot see it: the list
+# simply ended and every id after it vanished with no signal. The fifth silent-drop path, found
+# after the round that claimed to have closed them all.
+run_case_anywhere "deps-close-without-open" 1 "FAIL depends-on-unreadable: T3" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-close-without-open/sprint.md\" \"$live_head\""
+
+# cases 21-23 -- the CALL SITE 2 half of the matrix. Every round-3 hardening fixture put its trigger
+# on the field line, leaving the indented-continuation arm unproven for all three mechanisms -- the
+# seam this parser's own history says is where a field-only fix leaks (L-186: fixtures discriminate
+# branches, never the SELECTION of inputs those branches run over).
+run_case_anywhere "deps-cont-bracket" 0 "PASS wave-computation: T1=0 T2=1 T3=2" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-cont-bracket/sprint.md\" \"$live_head\""
+run_case_anywhere "deps-cont-markup" 0 "PASS wave-computation: T1=0 T2=1 T3=2" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-cont-markup/sprint.md\" \"$live_head\""
+run_case_anywhere "deps-cont-unbalanced" 1 "FAIL depends-on-unreadable: T2" -- \
+  sh -c "cd \"$repo_root\" && sh \"$script_tmp\" \"$here/fixtures/dispatch-preflight/deps-cont-unbalanced/sprint.md\" \"$live_head\""
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "DISPATCH-PREFLIGHT FIXTURES: all green"; else echo "DISPATCH-PREFLIGHT FIXTURES: at least one FAIL"; fi
 exit $fail

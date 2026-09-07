@@ -445,3 +445,41 @@ strip, and the unbalanced report each reddens only its own fixture with a contro
 
 consequence · T1 · behaviour:material · governance:high
 consequence · T2 · behaviour:material · governance:high
+
+### 2026-09-07 | surprise | T2 round 4 REJECTED — and one CRITICAL was created by round 3's hardening
+
+**Finding 1 (CRITICAL) — markup stripping FABRICATED an id.** `gsub(/[`*]/, "", t)` was global, so
+`*T1*3` welded into `T13` — a real task in the fixture — and the parser reported a dependency nobody
+declared, turning a genuinely unowned overlap into `PASS shared-file-owned`. A silent false PASS,
+which by this repo's own doctrine is worse than the loud HALT it replaced. **That is the TD-132
+failure class reintroduced by the TD-132 fix, for the second time in this task.** Now only *wrapping*
+markup is stripped (`^[`*]+` and `[`*]+$`), so `*T1*3` keeps its interior marker, fails the exact-id
+test, and reads as prose.
+
+**Finding 2 (CRITICAL) — a fifth silent-drop path, after the round that claimed to have closed them
+all.** A token carrying a CLOSE with no OPEN (`1)`, an ordinal) has `o == 0`, so it never enters
+depth-tracking; `depth` stays 0 and the end-of-line unbalanced check **structurally cannot fire**.
+`Depends-on: T1 1) T2` silently lost T2 with `PREFLIGHT: CLEAR` and exit 0. Such a token is now
+reported as unreadable rather than treated as prose.
+
+**Finding 3 (HIGH, L-186) — the coverage matrix was half empty.** All three round-3 hardening
+fixtures put their trigger on the *field* line; none exercised the indented-continuation arm — the
+exact seam this parser's own history says a field-only fix leaks through. 3 mechanisms × 2 call
+sites, 3 of 6 cells populated. The reviewer probed all three manually and they behave correctly, so
+it was an unproven duplicate path rather than a live bug. Three fixtures added; the matrix is full.
+
+Round 4's corpus re-sweep was clean: all 62 markup-bearing real `Depends-on:` lines are unaffected,
+and the other 188 contain none of the characters this change touches.
+
+**A self-inflicted defect worth recording, because `sh -n` did not catch it.** My own comment for the
+markup fix contained the words *"TD-132's own fix"* — an **apostrophe inside the single-quoted awk
+program**, which terminated it early. The snippet still passed `sh -n`; awk received a truncated
+program and every call returned empty. Only running it revealed the truncation. Comments inside that
+awk block cannot contain apostrophes, and nothing checks for it.
+
+Harness 18 → 23 cases / 25 assertions. **Discrimination:** reverting the markup strip to global
+reddens the welding fixture while the legitimate wrapped-id fixture holds green — the pair
+distinguishes correct behaviour from the bug rather than merely coexisting with the fix; and
+un-flagging close-without-open reddens its fixture while the unbalanced fixture holds.
+
+consequence · T2 · behaviour:material · governance:high

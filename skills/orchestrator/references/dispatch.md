@@ -159,11 +159,18 @@ dep_ids() {
       for (i = 1; i <= n; i++) {
         t = tok[i]
         if (t == "") continue
-        # Markup is DECORATION, not structure. Round 3 of review showed `**T1**` and `` `T1` `` were
-        # not merely skipped -- the token matched neither the id test nor the annotation test, so it
-        # ended the list and discarded every id after it. Stripping first makes a decorated id parse
-        # as the id it plainly is, which is correct behaviour rather than a warning about it.
-        gsub(/[`*]/, "", t)
+        # Markup is DECORATION, not structure. `**T1**` and `` `T1` `` matched neither the id test
+        # nor the annotation test, so they ended the list and discarded every id after it.
+        #
+        # ONLY WRAPPING markup is stripped -- leading and trailing runs, never interior characters.
+        # A global `gsub(/[`*]/, "", t)` was the first attempt and review caught it INVENTING an id:
+        # `*T1*3` collapses to `T13`, which is a real task in that fixture, so the parser reported a
+        # dependency nobody declared and turned a genuinely unowned file overlap into
+        # `PASS shared-file-owned`. A silent false PASS is worse than the loud HALT it replaced --
+        # the TD-132 failure class, reintroduced by the TD-132 fix itself, for the second time.
+        # Anchoring to the ends cannot weld two fragments across a marker: `*T1*3` keeps its
+        # interior `*`, fails the exact-id test, and is correctly read as prose.
+        sub(/^[`*]+/, "", t); sub(/[`*]+$/, "", t)
         # Count on a COPY: these gsubs mangle their subject, and the exact-id test below needs the
         # token intact. `[...]` counts with `(...)`: an annotation is an annotation whichever
         # brackets it wears, and round 3 showed `T1 [see D1] T2` silently lost T2 because a bracket
@@ -173,6 +180,13 @@ dep_ids() {
         if (depth > 0) { depth += o - c; if (depth < 0) depth = 0; continue }
         if (t ~ /^T[0-9]+$/) { out = out t ","; continue }   # a dependency
         if (o > 0) { depth = o - c; if (depth < 0) depth = 0; continue }  # an annotation: skip it
+        # A token carrying a CLOSE with no OPEN (`1)` -- an ordinal, a stray bracket) reaches here
+        # with o==0, so it never entered depth-tracking and `depth` is still 0: the end-of-line
+        # unbalanced check below structurally cannot see it, and the token would just end the list
+        # and drop every id after it in silence. Found by review as a fifth silent-drop path after
+        # the round that claimed to have closed them all. It is unreadable, not prose, so it is
+        # reported (L-058) -- the same treatment as an annotation that never closes.
+        if (c > 0) { bad = 1; break }
         break                                                 # prose: the id list has ended
       }
       # An annotation still open at end of line swallowed the rest of it, ids included. That is the
@@ -329,7 +343,7 @@ END {
   for (i=1;i<=n;i++) {
     t=order[i]
     if (depsbad[t]=="1") {
-      print "FAIL depends-on-unreadable: "t" -- an annotation in its Depends-on: is never closed, so the rest of that line (task ids included) cannot be read. Close the bracket, or move the note off the field"
+      print "FAIL depends-on-unreadable: "t" -- its Depends-on: has an unbalanced bracket, so the rest of that line (task ids included) cannot be read. Balance the annotation, or move the note off the field"
       fail=1
     }
   }
