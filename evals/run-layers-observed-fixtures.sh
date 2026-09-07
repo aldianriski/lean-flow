@@ -1247,6 +1247,77 @@ else
   real_check "8464714: sprint(093) T1 revise 2:" 8464714318cc9037cae05abb89f6a0e158e107e9 T1
 fi
 
+# ================================================================================================
+# case: an ARCHIVED sprint keeps owning its own commits (TD-125, SPRINT-095 T1) -- must FAIL, and
+# must FAIL for the RIGHT file. Two sprints share one plan_commit window, as SPRINT-092 and -093
+# really did (`c52496f`). One is then archived. Its `sprint(NNN)` commits must stay attributed to
+# IT, not re-attributed to whichever sprint is still active -- a closed sprint owns its history
+# forever, archived or not.
+#
+# MEASURED, and the debt row's stated cause is NOT the operative one. TD-125 names the `*/archive/*`
+# filter on the sibling loop as the mechanism; deleting that line alone changes nothing (verified on
+# the real 092/093 pair: 85 blamed commit:path pairs both with the filter present and deleted). The
+# real mechanism is upstream -- qa-check.sh hands the checker a NON-recursive
+# `ls docs/sprint/SPRINT-*.md`, so an archived sprint never reaches "$@" to be filtered at all. The
+# fix DISCOVERS archived sprints instead, which is what this case pins.
+#
+# TWO assertions on ONE run, because the danger is bidirectional. Widening an exclusion is how a
+# guard acquires a silent false negative: too broad and real undeclared work walks through under
+# cover of "another sprint owns it". So the same output must (a) still FAIL by name on a path no
+# sprint declares -- the sibling control -- and (b) NOT name the file the archived sprint owns.
+# ================================================================================================
+c9="$work/archived-sibling"
+mkdir -p "$c9/docs/sprint/archive" "$c9/scripts"
+cat > "$c9/docs/sprint/SPRINT-930-active.md" <<'SP930'
+---
+sprint: 930
+slug: active
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+## Plan
+
+### T1 — Only touches its own file
+Layers: scripts/mine.sh
+Depends-on: none
+SP930
+cat > "$c9/docs/sprint/archive/SPRINT-931-closed.md" <<'SP931'
+---
+sprint: 931
+slug: closed
+status: closed
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+## Plan
+
+### T1 — Owns its own file, and is archived
+Layers: scripts/theirs.sh
+Depends-on: none
+SP931
+printf 'x\n' > "$c9/scripts/mine.sh"
+git -C "$c9" init -q
+lock_plan "$c9" 'docs/sprint/SPRINT-930-active.md'
+# The archived sprint's own work, landing INSIDE 930's window and naming 931 in its subject.
+printf 'y\n' > "$c9/scripts/theirs.sh"
+commit_all "$c9" 'sprint(931) T1: the archived sprint owns this'
+# A genuinely undeclared path, owned by nobody -- the sibling control.
+printf 'z\n' > "$c9/scripts/orphan.sh"
+commit_all "$c9" 'chore: a file no sprint declares'
+
+c9_out=$(cd "$c9" && sh "$checker" docs/sprint/SPRINT-930-active.md 2>&1)
+run_case_anywhere "archived-sibling: undeclared path still FAILs by name" 1 \
+  "scripts/orphan.sh" -- \
+  sh -c "cd \"$c9\" && sh \"$checker\" docs/sprint/SPRINT-930-active.md"
+# The half a "does it FAIL?" assertion cannot see: it must not fail for the ARCHIVED sprint's file.
+case "$c9_out" in
+  *scripts/theirs.sh*)
+    echo "FAIL fixture(archived-sibling: archived sprint's commit re-attributed): scripts/theirs.sh was blamed on SPRINT-930, which never touched it -- TD-125:"
+    printf '%s\n' "$c9_out"; fail=1 ;;
+  *) echo "PASS fixture(archived-sibling: archived sprint keeps its own commits): scripts/theirs.sh not blamed on the active sibling" ;;
+esac
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-OBSERVED FIXTURES: all green"; else echo "LAYERS-OBSERVED FIXTURES: at least one FAIL"; fi
 exit $fail

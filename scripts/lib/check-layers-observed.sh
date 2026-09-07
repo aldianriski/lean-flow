@@ -401,6 +401,33 @@ for sp in "$@"; do
     sibling_sprints="$sibling_sprints $_on"
   done
 
+  # ---- COMMIT OWNERSHIP (TD-125). A DIFFERENT question from the one above, and it was being
+  # answered by the same list. "Is this sprint still ACTIVE work?" is what sibling_sprints answers,
+  # and excluding archive/ there is correct. "Does this sprint OWN its commits?" is what the commit
+  # skip below needs, and a closed sprint owns its history forever -- archived or not. One list
+  # cannot answer both, which is precisely what TD-125 records.
+  #
+  # MEASURED, NOT INHERITED -- and the debt row's stated cause turns out not to be the operative
+  # one. TD-125 names the `*/archive/*` filter on the loop above as the mechanism. Deleting that
+  # line alone moves the failure not at all: with SPRINT-093 archived and 092 still active, 092 is
+  # blamed for 85 commit:path pairs both with the filter present and with it deleted. The real
+  # mechanism sits upstream -- qa-check.sh hands this checker a NON-recursive
+  # `ls docs/sprint/SPRINT-*.md`, so an archived sprint never reaches "$@" to be filtered. The fix
+  # is therefore to DISCOVER archived sprints, not to stop excluding them.
+  #
+  # Discovery is relative to the subject sprint's own directory, never a hardcoded repo path, so a
+  # consumer whose sprints live elsewhere gets the same behaviour (L-015).
+  owning_sprints="$sibling_sprints"
+  for _asp in "$(dirname "$sp")"/archive/SPRINT-*.md; do
+    [ -f "$_asp" ] || continue
+    _an=$(fmv "$_asp" sprint)
+    [ -n "$_an" ] || continue
+    # Same self-sibling guard as above, and for the same reason: a sprint that became its own
+    # sibling would skip every one of its own commits -- a total bypass, not a narrow miss.
+    [ "$_an" = "$my_sprint" ] && continue
+    owning_sprints="$owning_sprints $_an"
+  done
+
   # A declared token ending in "/" is a DIRECTORY prefix covering every path beneath it (SPRINT-055
   # T1). Before that, such a token was accepted and matched nothing, so it read as a declaration
   # while guarding zero files -- exactly the silent false-negative L-058 is about; T1's own 24-file
@@ -427,7 +454,9 @@ for sp in "$@"; do
     # leak: the unit of ownership is the commit, so the unit of exclusion must be too.
     c_sprint=$(commit_sprint "$c")
     if [ -n "$c_sprint" ]; then
-      case " $sibling_sprints " in *" $c_sprint "*) continue ;; esac
+      # owning_sprints, not sibling_sprints (TD-125): the question here is who OWNS this commit,
+      # and a closed sprint owns its history whether or not it has been archived.
+      case " $owning_sprints " in *" $c_sprint "*) continue ;; esac
     fi
     who=$(attribute "$c")
     for f in $(git diff-tree --no-commit-id --name-only -r "$c" 2>/dev/null); do

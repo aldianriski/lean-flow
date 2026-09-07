@@ -347,3 +347,44 @@ Across this task the seed guards have now fired **five** times: four sed/awk mec
 one weak seed.
 
 consequence · T2 · behaviour:material · governance:high
+
+### 2026-09-07 | progress | T1 built — and TD-125's stated cause is NOT the operative one
+
+**The debt row is wrong about its own mechanism, measured rather than argued.** TD-125 names
+`check-layers-observed.sh:397`'s `*/archive/*` filter on the sibling loop as the cause. Deleting that
+line alone changes nothing: with SPRINT-093 archived and 092 active, 092 is blamed for **85**
+commit:path pairs both with the filter present and with it deleted. The operative mechanism sits
+upstream — `qa-check.sh:1013` hands the checker a **non-recursive** `ls docs/sprint/SPRINT-*.md`, so
+an archived sprint never reaches `"$@"` to be filtered in the first place. TASK-298's `assumes:` said
+to re-derive rather than inherit, and that instruction is the only reason this was caught.
+
+**Fix.** `sibling_sprints` (active work, archive correctly excluded) is left alone, and a second list
+`owning_sprints` is derived from it plus every sprint discovered under the subject sprint's own
+`archive/` directory — relative to `dirname "$sp"`, never a hardcoded repo path, so a consumer whose
+sprints live elsewhere behaves the same (L-015). The commit skip consumes `owning_sprints`. That is
+TD-125's own framing made real: *is this sprint still active work?* and *does it own its commits?* are
+two questions and were sharing one list.
+
+**Acceptance on the real 092/093 pair (L-166), identical invocation both legs:**
+
+| | 093 in place | 093 archived alone |
+|---|---|---|
+| 092 blamed `commit:path` pairs | 3 | **3** (was **85**) |
+
+The four pre-existing TD-107-class FAILs are unchanged, as the restated DoD requires — this task does
+not fix those.
+
+**Retained fixture, two assertions on one run**, because widening an exclusion is precisely how a
+guard acquires a silent false negative: too broad, and real undeclared work walks through under cover
+of "another sprint owns it". A throwaway repo carries two sprints sharing one `plan_commit` window —
+SPRINT-092/093's real shape — with one archived. The same output must (a) still FAIL by name on
+`scripts/orphan.sh`, which no sprint declares, and (b) not blame `scripts/theirs.sh`, which the
+archived sprint owns. A "does it FAIL?" assertion alone cannot see half (b).
+
+**Discrimination proof.** Convention: `git hash-object` on the working file. Seeding the commit skip
+back to the active-only list — ±0 lines, 52 assertions unchanged, still parses — **reddens** the
+archived-sibling assertion while the orphan control **holds green**. Restored at hash `ffba42d9`.
+
+Not ticked: the isolated reviewer has not run.
+
+consequence · T1 · behaviour:material · governance:high
