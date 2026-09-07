@@ -260,6 +260,7 @@ status: current
   - Fix direction (not a ruling): cap dispatch concurrency when a gate run is expected; or raise the
     budget with the ceiling raised to match; or make the skipped-harness list its own named FAIL
     distinct from a real check failure, so truncation can never be read as one red check.
+  - **Escalated to `TODO.md` Backlog P2, then MERGED into `TASK-329`** (2026-09-07 — escalated as `TASK-330` at `/triage` by the ledger's own `severity: high` rule, retired into `TASK-329` at the decompose the same day; `TASK-330` is not reused). This row and **TD-128** are one mechanism — the gate's own duration and what it failed to reach are both unreported — so they are fixed together. **Direction ruled at that decompose, closing this row's open "Fix direction (not a ruling)":** make the skipped-harness list its own named outcome. The other two were rejected on evidence — capping dispatch concurrency slows the worktree-isolated review this repo mandates for Tier G (L-165 · L-168) and rests on an unmeasured figure; raising the budget cannot work, the 600 s ceiling being external. **Two cautions recorded with it:** the escalation stub was first written against `TODO.md`'s narrative gloss of this row ("the reduction TD-117 anticipated") and had to be corrected against the row itself — the subject is **six harnesses skipped under concurrent load**, not a budget reduction (L-130); and this row's 450 s default is **stale**, `qa-check.sh:27` having read 520 since SPRINT-093.
 
 - **TD-126** severity: medium | status: open | created: Sprint-092
   - Summary: **The opt-in profile spawns the Shell oracle twice over the same nine fixtures** — once in
@@ -440,6 +441,7 @@ status: current
     that work. Related: L-108 (match by shape, not substring) · L-042 · **TD-043**, the `TOK` pattern in
     this very snippet, hardened for exactly this class on the `Layers:` side while `Depends-on:` was
     left unanchored.
+  - **Escalated to `TODO.md` Backlog P0 as `TASK-328`** at the 2026-09-07 `/triage` (it appeared in `TODO.md` **zero** times before this — L-151), at P0 because the false-PASS half ships to consumers inside the plugin, and **decomposed the same day**, `state: ready`. **One fact the decompose added that this row does not carry: the defect has TWO call sites.** Location above names the `"Depends-on:"*)` field arm; the indented-continuation `D)` arm runs the same bare `grep -oE 'T[0-9]+'`, and SPRINT-094's prose ran onto continuation lines, so that arm supplied most of the phantom ids. Fixing one leaves the other leaking (L-058).
 
 - **TD-130** severity: medium | status: open | created: Sprint-094
   - Summary: **`check-epic-archive.sh`'s checkbox anchors miss `- [X]` (uppercase) and any indented
@@ -546,6 +548,7 @@ status: current
     not re-run that experiment.
   - **Re-file fresh if** the runtime overrun turns out to be host-local rather than a property of the
     gate, which would make this an environment note rather than a guard defect.
+  - **Escalated to `TODO.md` Backlog P2 as `TASK-329`** at the 2026-09-07 `/triage`, by the ledger's own `severity: high` rule — it had no Backlog entry until then, a `high` row invisible to every promote that reads the Backlog (L-151) — and **decomposed the same day**, absorbing TD-117 (`TASK-330`, retired) as one mechanism. **Scope note the fix must respect:** `check-qa-budget-default.sh` is CORRECT within its declared scope (configured default < ceiling, which is all its header claims). This row is a **missing reader**, not a broken checker, and widening that script is the wrong fix.
 
 - **TD-125** severity: medium | status: open | created: Sprint-093
   - Summary: **A closed sprint cannot be archived while a sibling sprint sharing its `plan_commit`

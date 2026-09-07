@@ -1,7 +1,7 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-09
-status: current
+last_updated: 2026-09-07
+status: superseded
 update_trigger: The revisit-if condition fires, or the expiry passes
 ---
 
@@ -52,3 +52,16 @@ existed. If the series matters, file that instead.
 **Unfired by SPRINT-060 promote → auto-close as permanently rejected.** The null result is itself a
 verdict rather than a drift toward never (L-068). If the calibration series still matters at that
 point, the answer is the smaller task described above, not this one.
+
+## Expiry FIRED — permanently rejected
+
+**Closed 2026-09-07 at `/triage`, by the contract above.** The trigger never fired: at no promote
+between SPRINT-051 and SPRINT-094 did the Backlog carry ≥10 ready, AFK-suitable tasks — the 2026-09-07
+groom counts **9 `ready`** across four tiers, and three of those are P2/P3. The owner ruled the
+auto-close rather than letting it drift toward never (L-068), so this file is **history, not a pending
+question**; the revisit-if conditions above are recorded for the reasoning, not as live triggers.
+
+**The calibration gap it names is still real and is NOT closed by this rejection.** The series stands
+at two data points. The successor described above — record a calibration row for *whatever* unattended
+run next happens, at whatever size — has not been filed; `TASK-319` is the next run that could supply
+one. If the series matters, file the smaller task via `/task-decomposer`, never a revival of this one.

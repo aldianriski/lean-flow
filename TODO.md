@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-05
+last_updated: 2026-09-07
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -16,22 +16,24 @@ status: current
 
 ## Active Sprint
 
-> **None — the pointer is cleared.** SPRINT-094 closed 2026-09-05 at **22 of 23 DoD** (the one open box
-> is the owner-action archiving ruling below, recorded at promote as not a blocker for T1–T4). Written
-> up in [`CHANGELOG.md`](CHANGELOG.md); the Plan and its log stay at
-> [`docs/sprint/SPRINT-094-guards-for-what-nothing-reads.md`](docs/sprint/SPRINT-094-guards-for-what-nothing-reads.md)
-> until §11 archival is approved. **Single stream** — `stream:` stays omitted, because a second stream
-> is still unavailable while `TASK-298` is `needs-info`.
+> **SPRINT-095 — Guards That Misreport** → [`docs/sprint/SPRINT-095-guards-that-misreport.md`](docs/sprint/SPRINT-095-guards-that-misreport.md)
 >
-> **Next**: `/triage` (overdue — see the numbers below), then `/lean-doc-generator promote`.
+> Promoted 2026-09-07 with **4 tasks / 27 DoD** — `TASK-298` → T1 · `TASK-328` → T2 · `TASK-326` → T3 ·
+> `TASK-329` → T4. **Single stream** — `stream:` omitted; a second stream stays unavailable until T1
+> lands. **No `epic:`** — none of the four is an EPIC-015 member, checked at promote rather than
+> assumed. **Gates are NOT signed**: `gates_signed:` is absent from the sprint frontmatter, and its
+> absence means not-signed, never approval (L-099). G1+G2 run at `/orchestrator`.
 >
-> **SPRINT-092, SPRINT-093 and now SPRINT-094 are unarchived — §11 retention PARKED by owner ruling at
-> the SPRINT-094 promote**, where only the shipped-task prune was approved, and re-proposed and
-> re-parked at this close. Retention is lossy, so close never self-approves it. The 092/093 pair shares
-> `plan_commit: c52496f`, so **archive them together or measure again**: `check-layers-observed.sh:397`
-> drops `*/archive/*` from the sibling list line 429 uses to skip another sprint's commits, which is
-> what made archiving one re-attribute its history to the other — **214 pass / 0 fail** in place vs
-> **202 pass / 1 fail** archived at SPRINT-093's close (**TD-125** · `TASK-298`).
+> **Next**: `/orchestrator sprint-bulk` — and note the run mode is declared at the trigger, never
+> inferred. T1 and T2 are `HITL`; an unattended run would park them.
+>
+> **SPRINT-092, SPRINT-093 and SPRINT-094 remain unarchived — §11 retention PARKED by owner ruling,
+> re-proposed and re-parked at each of the last three closes.** Retention is lossy, so close never
+> self-approves it. **T1 of this sprint is the blocker's fix**: 092/093 share `plan_commit: c52496f`,
+> and `check-layers-observed.sh:397` drops `*/archive/*` from the sibling list `:430` uses to skip
+> another sprint's commits, so archiving one re-attributed its history to the other — **214 pass /
+> 0 fail** in place vs **202 pass / 1 fail** archived at SPRINT-093's close (**TD-125**). Rule on the
+> archival once T1 lands; the move itself is out of this sprint's scope.
 
 **SPRINT-092 shipped the §4 conversion and measured it.** Default-profile saving **22.4–27.9 s**
 (23.4–28.2 s removed, 0.37–0.98 s added), with §4 rules still evaluating on every bare run. The saving
@@ -45,26 +47,33 @@ host and the opt-in profile measures 1450 s, while `qa-budget-default` passes by
 *configured* budget to the ceiling rather than the actual runtime (**TD-128**). A pruning of 18 stale
 worktrees (178 MB) was tried as the cause and **disproved** — 1413 s before, 1450 s after.
 
-**Shipped at SPRINT-094, awaiting the §11 Backlog prune (owner-gated, re-proposed at this close):**
-`TASK-324` → T1 (epic-state guard) · `TASK-325` → T2 (handoff status + §12(b)'s conversion) ·
-`TASK-318` → T3 (unwired-exports fitness rule) · `TASK-323` → T4 (29 branches pruned). Their entries
-are still below because removal is lossy and close never self-approves it (§11).
+**The §11 prune is DONE — ruled by the owner at the 2026-09-07 `/triage`.** `TASK-318` · `323` ·
+`324` · `325` shipped at SPRINT-094 (T3 · T4 · T1 · T2) and their Backlog entries are removed; the
+durable home is `CHANGELOG.md` + the sprint file + git, and the ids are recorded as never-reused in
+§ P3 below. They had been re-proposed at three consecutive closes.
 
-**Still Backlog:** `TASK-300` · `TASK-319`/`320` · `TASK-321` (owner feedback: summaries must lead with
-the conclusion) · `TASK-322` (SPRINT-092's close-Retro follow-up) · **`TASK-326`/`327`** (SPRINT-094's
-close-Retro follow-ups: nothing compares a commit's claimed DoD delta against the ticks it made; the
-handoff guard has never fired on live input) · `TASK-188`/`296` (`blocked`) · `TASK-297`/`298`
-(`needs-info`; 298 reads SUPERSEDED since SPRINT-088 → `/triage`). Route **`TD-120`** next: the
-S4.APPEND git-spawn cost, **before** H24–H26.
+**The Backlog is now ranked, epic-first (owner ruling, same pass).** Four tiers replace the single
+undifferentiated P1: **P0** `TASK-298`/`328` (each blocks work that is otherwise ready) · **P1**
+`TASK-319`/`296`/`297`/`300`/`326` (EPIC-015 § Closed-when 1 · 5 · 6 lead) · **P2**
+`TASK-320`/`321`/`322`/`329` · **P3** `TASK-188`/`327`, opportunistic by ruling and not
+schedulable. Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
 
-**`/triage` is overdue, and these figures are re-derived at the SPRINT-094 close — not carried from the
-promote's line.** TODO.md is **471** lines against §2's cap of 320; the four shipped entries above are
-the prune that would take the largest bite. The debt ledger holds **77 rows — 70 open, 7 not-open**
-(reconciled: 70 + 7 = 77), of which **4 open rows are `severity: high`**. **The ≥3-sprints aging count
-is deliberately NOT restated here** — it is a promote-time derivation and the last figure on this line
-(*56 of 63*) was already a sprint stale; re-derive it at the next promote against the ledger rather
-than reading it from this file (L-097 · L-130). The next prune candidate remains this § Active Sprint
-narrative itself, which restates `CHANGELOG.md` (L-008) — owner-gated, not taken here.
+**Figures re-derived at that `/triage`, not carried forward.** TODO.md is **504** lines against §2's
+cap of 320. The 2026-09-07 pass moved it 471 → 442 (`/triage`) → the figure above (decompose): the
+four shipped entries took ~140 lines off, and the three escalation stubs, once decomposed into two
+fully-specified Tier G tasks, put more back than they removed. The cap is still missed and this
+§ Active Sprint narrative is the remaining prune candidate (it restates
+`CHANGELOG.md` — L-008; owner-gated, not taken here). The debt ledger holds **77 rows — 70 open, 7
+not-open** (reconciled: 70 + 7 = 77), of which **4 open rows are `severity: high`** — and **all four
+now carry a Backlog entry**, which was the finding: `TD-090` → `TASK-322`, `TD-132` → `TASK-328`,
+`TD-128` and `TD-117` → `TASK-329` (the two merged at the 2026-09-07 decompose). Three of them had
+no entry at all, against the ledger's own auto-escalate rule. **Derive those counts by anchoring
+to the row header** — a bare
+`grep 'status: open'` over this ledger returns 72 open / 11 resolved against 77 rows, because the
+rows quote their own status strings in prose (L-108). **The ≥3-sprints aging count is deliberately
+NOT restated here** — it is a promote-time derivation and the last figure on this line (*56 of 63*)
+was already a sprint stale; re-derive it at the next promote against the ledger rather than reading
+it from this file (L-097 · L-130).
 
 ---
 
@@ -72,124 +81,109 @@ narrative itself, which restates `CHANGELOG.md` (L-008) — owner-gated, not tak
 
 <!-- Groomed by /triage. Only `ready` tasks are promotable. -->
 
-### P1 — Next Phase Required
+### P0 — Blocking
 
-- [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
-      class:      execution
-      done-when:  a real unattended run that stops mid-Plan leaves a rollup naming the untouched tasks
-                  as `unattempted`, verified end-to-end through `scripts/night-run.sh` rather than via
-                  `--reap`
-      touches:    scripts/night-run.sh (only if the exercise finds a defect) · a sprint Execution Log
-      depends-on: none
-      assumes:    **carried from SPRINT-060 T5, acceptance unmet — read the ruling before re-promoting.**
-                  The trigger is OPPORTUNISTIC and that is the whole design: the next night run that
-                  stops mid-Plan *for its own reasons* is the exercise. Do not schedule a run to produce
-                  one, and do not promote this into a sprint whose shape cannot generate it — SPRINT-060
-                  promoted it alongside four HITL tasks, the run mode was then ruled interactive at G2,
-                  and that foreclosed the only vehicle it had (L-111). Its partial-Plan path is already
-                  proven three ways that each stop short of the others: a real log through `--reap`, a
-                  zero-ticked-box regression, and an end-to-end launcher run against a complete Plan
-      tracker:    SPRINT-060 T5 scope-change + owner ruling · ADR-016 · L-111
-      origin:     close-retro
-      state:      blocked
+> Re-ranked at the SPRINT-094 `/triage` (2026-09-07). Each entry below blocks work that is otherwise
+> ready to start; the reason sits in its own `tracker:` line, not here.
 
-- [ ] TASK-296 — Run bounded unattended repair on one J1 finding  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 · D4 — an unbounded or silently-skipped repair both end in a green run)
-      done-when:  a concrete J1 critic finding drives repair → re-review → continue, with the retry
-                  ceiling **exactly** what ADR-022 admits and no more; a second failure escalates
-                  rather than looping. Retained must-FAIL: a repair that exceeds the ceiling fails
-                  with its named finding while a within-ceiling sibling passes
-      touches:    skills/orchestrator/references/review-scoping.md § The revise loop ·
-                  skills/orchestrator/references/night-run.md · scripts/night-run.sh
-      depends-on: TASK-292 · TASK-293
-      assumes:    the ceiling is **not** re-decided here. Whether unattended repair inherits ADR-022's
-                  single retry or earns its own is a **measurement** that accumulates from EPIC-006's
-                  records (L-094); freezing a number before those exist is L-130. This task ships the
-                  loop at the ceiling ADR-022 already admits
-      tracker:    EPIC-015 § Closed-when 5 · V3 H31 · ADR-022
-      origin:     decomposer
-      state:      blocked
-
-- [ ] TASK-297 — Emit a typed run outcome with the evidence behind it  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 · D4)
-      done-when:  every run emits `DELIVERED` / `PARTIAL` / `FAILED` **plus** DoD counts, tasks
-                  attempted/completed, parks, repair cycles, verification state, warnings and terminal
-                  reason. Retained must-FAIL: a run ending mid-Plan that reports `DELIVERED` fails
-                  with its named finding while a genuinely-exhausted sibling passes
-      touches:    skills/orchestrator/references/night-run.md · scripts/night-run.sh ·
-                  templates/sprint-log.md.template
-      depends-on: TASK-293 — the outcome is a function of the terminal state
-      assumes:    **open question, ruled at this task's G2, not assumed here:** whether the
-                  run-outcome vocabulary belongs to EPIC-015 or to EPIC-008's Run Protocol. V3 §11
-                  says build only what hardening needs and leaves EPIC-008 owning the portable
-                  protocol — so the ruling must land before a `RunSummary` shape is minted, or the two
-                  epics mint competing ones
-      tracker:    EPIC-015 § Closed-when 6 · V3 H37 · EPIC-008
-      origin:     decomposer
-      state:      needs-info
-
-- [ ] TASK-298 — Teach the layers checker that a sibling active sprint is not undeclared work  [size: S] [risk: med] [HITL]
+- [ ] TASK-298 — Keep an archived sprint owning its own commits  [size: S] [risk: med] [HITL]
       class:      execution
       tier:       G (ADR-029 — this IS the attribution guard. Widening an exclusion is exactly how a
                   guard acquires a silent false negative: too broad and real undeclared work walks
                   through under cover of "another sprint owns it")
-      done-when:  with **two active sprint files present**, each sprint's attribution is scoped to
-                  itself — a file or commit that a *sibling active sprint's* `Layers:` declares no
-                  longer reports as `undeclared` / `attributable to no task` against this one, while
-                  every genuinely undeclared path still does. Proven on a **real two-active-sprint
-                  tree**, not fixtures alone (L-166: fixtures prove the branch works, only the real
-                  artifact proves it is reachable). Retained must-FAIL + sibling control: a path
-                  declared by NO sprint still fails with its named finding while the sibling-declared
-                  path passes. Seeded-break discrimination proof, seed verified landed by `cmp` and
-                  restored under a checked hash, artifact still parses, break targeted not demolition
-                  **AND the archived-sibling half (TD-125, measured live at SPRINT-093's close):** a
-                  sprint moved to `docs/sprint/archive/` must keep owning its own commits. Line 397
-                  drops `*/archive/*` from `sibling_sprints`, which line 429 uses to skip another
-                  sprint's commits — so archiving a closed sprint re-attributes its whole history to
-                  whichever active sprint shares its `plan_commit` window. The two questions the one
-                  list answers are different: *is this sprint active work?* (archive = yes, exclude)
-                  versus *does it own its commits?* (archive = irrelevant, a closed sprint owns its
-                  history forever). Retained fixture: an archived sprint's commits do NOT land on an
-                  active sibling, while a genuinely undeclared path still FAILs
-      touches:    scripts/lib/check-layers-observed.sh (the `is_excluded` family + the per-sprint
-                  loop + the `sibling_sprints` build at :397) · possibly scripts/qa-check.sh (it passes every `docs/sprint/SPRINT-*.md`) ·
-                  evals/fixtures/layers-observed/** (new retained fixture pair) ·
-                  evals/run-layers-observed-fixtures.sh
-      depends-on: none — it is the prerequisite for promoting any stream 2, so it cannot sit inside one
-      assumes:    **measured, not inferred.** `qa-check.sh:1013` does `ls docs/sprint/SPRINT-*.md` and
-                  hands all of them to a checker that loops `for sp in "$@"` with zero stream
-                  awareness, so attribution is repo-wide per sprint. Demonstrated live: commit
-                  `39eedb8` (governance work, no sprint) reds SPRINT-087 with `commit attributable to
-                  no task and not coordinator bookkeeping`. Reproduced independently by the session
-                  executing SPRINT-087. `.claude/CONTEXT.md` § Sprint model already specifies streams
-                  — the SSOT describes what the gate never learned (L-020, shipped != wired)
-      tracker:    L-020 · L-166 · L-165/L-168 (isolated reviewer) · CONTEXT.md § Sprint model ·
-                  **TD-125** (the archived-sibling half, reproduced in both directions at SPRINT-093's
-                  close: 214 pass/0 fail with the file in place, 202 pass/1 fail archived) ·
-                  blocks promoting EPIC-015 as stream 2 · blocks archiving SPRINT-093 until 092 closes
-      origin:     manual
-      state:      needs-info   # SPRINT-088 promote: looks SUPERSEDED — TASK-299 shipped the
-                  # commit-ownership approach and its tracker reads "reverted from TASK-298".
-                  # Routed to /triage to rule kept-vs-out-of-scope rather than deleted silently.
-
-- [ ] TASK-300 — Decide whether the five gate-accuracy defects are one task or five  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when: a recorded ruling says whether TD-086 · TD-087 · TD-089 · TD-097 · TD-105 are fixed
-                  as one "gate accuracy" task or separately, and the chosen shape is filed — not a fix,
-                  a decomposition call
-      touches:   TECH-DEBT.md · TODO.md (no code)
+      done-when:  a sprint moved to `docs/sprint/archive/` keeps owning its own commits — archiving a
+                  closed sprint no longer re-attributes its history to whichever active sprint shares
+                  its `plan_commit` window, while every genuinely undeclared path still FAILs.
+                  `check-layers-observed.sh:397` drops `*/archive/*` when building `sibling_sprints`,
+                  and **line 430** uses that list to skip another sprint's commits (TD-125 cites 429 — the file
+                  has shifted by one; re-derive rather than quoting either). The one list is
+                  answering two different questions — *is this sprint still active work?* (archive =
+                  yes, exclude) versus *does it own its commits?* (archive = irrelevant, a closed
+                  sprint owns its history forever). Proven on the **real 092/093 pair**, not fixtures
+                  alone (L-166), by archiving them and watching the gate stay green. Retained fixture
+                  + sibling control: an archived sprint's commits do NOT land on an active sibling,
+                  while a path declared by NO sprint still fails with its named finding. Seeded-break
+                  discrimination proof, seed verified landed by `cmp` and restored under ONE stated
+                  hash convention, artifact still parses, break targeted not demolition (L-142 · L-169)
+      touches:    scripts/lib/check-layers-observed.sh (the `sibling_sprints` build at :397 and the
+                  per-commit skip at :430) · evals/fixtures/layers-observed/** (new retained fixture
+                  pair) · evals/run-layers-observed-fixtures.sh
       depends-on: none
-      assumes:   **the cluster is real, not an artifact of one sprint noticing things.** All five are
-                  accuracy defects in the checkers that gate this repo, and two of them —
-                  TD-087 (REACHES half) and TD-097 (EXISTS half) — are the *same script*,
-                  `check-verify-reaches.sh`, filed three sprints apart with neither aware of the other
-                  until SPRINT-087's close sweep read both rows together. That pairing is the evidence
-                  the cluster is a cluster; the rest is judgement.
-      tracker:   SPRINT-087 close sweep · TD-086 · TD-087 · TD-089 · TD-097 · TD-105
-      origin:    close-retro
-      state:     ready
+      assumes:    **NARROWED at the SPRINT-094 /triage, and the cut half is shipped — do not rebuild
+                  it.** This row originally carried two halves. The *active*-sibling half (two live
+                  sprints mis-attributing each other) shipped as **TASK-299**: `:392-402` now compares
+                  sprints by `sprint:` NUMBER rather than by path, and `:428-431` skips a sibling's
+                  commits WHOLE per commit rather than per file. Verified by reading the script at
+                  HEAD, not inherited from this line. What remains live is TD-125's *archived*-sibling
+                  half, reproduced in both directions and never addressed
+      tracker:    **TD-125** (the live half — 214 pass/0 fail with SPRINT-093 in place, 202 pass/1 fail
+                  after `git mv` to archive, ~70 files reported against a sprint that never touched
+                  them; the 12-check *pass*-count drop is the second signal and the one worth keeping)
+                  · TASK-299 + **TD-107** (the shipped half, and the record debt it left) ·
+                  L-020 · L-165/L-168 (isolated reviewer) · L-166 ·
+                  **unblocks** archiving SPRINT-092/093 (parked at three consecutive closes) and
+                  promoting EPIC-015 as stream 2
+      origin:     manual
+      state:      ready
+
+- [ ] TASK-328 — Anchor the dispatch preflight's `Depends-on:` parser to the id list  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — the false HALT is the loud half; the false `PASS shared-file-owned`
+                  issued off a phantom edge is the silent one, and it green-lights a wave that has no
+                  ownership order at all)
+      authority:  J1
+      done-when:  **five observable clauses.**
+                  (1) The snippet extracted from `dispatch.md` by its own anchors, run against
+                  **SPRINT-094's sprint file** — the motivating artifact, not a fixture (L-166) —
+                  yields `PASS wave-computation: T1=0 T2=0 T3=0 T4=0` and **no** `FAIL cycle-detected`.
+                  Today that same input yields `FAIL cycle-detected: tasks unresolved -> T2 T3` plus
+                  three `PASS shared-file-owned … order=T1->T2` derived from edges that do not exist.
+                  (2) A literal `none` short-circuits the field: no id is harvested from it, or from
+                  any line continuing it.
+                  (3) **BOTH call sites are fixed, each proved by its own fixture.** The
+                  `"Depends-on:"*)` field arm and the indented-continuation `D)` arm run the same bare
+                  `grep -oE 'T[0-9]+'`; fixing one leaves the other leaking, and a fixture that only
+                  exercises the field arm passes over that (L-058). SPRINT-094's prose ran onto
+                  continuation lines, so the continuation arm is where most phantom ids came from.
+                  (4) Declared ids still parse — `Depends-on: T1 · T2 — but see **D1** (…)` yields
+                  exactly `[T1,T2]`, neither more nor fewer.
+                  (5) Retained must-FAIL + a sibling control that stays green in the same run, added to
+                  the EXISTING harness. Seeded-break discrimination proof: seed verified landed, the
+                  artifact still parses, the break is targeted not a demolition, and a landed seed that
+                  reddens nothing is reported as untested rather than scored as a pass — all under ONE
+                  stated hash convention (L-137 · L-142 · L-169 · L-187)
+      touches:    skills/orchestrator/references/dispatch.md (the `<!-- dispatch-preflight:start/end -->`
+                  snippet — the `"Depends-on:"*)` arm AND the indented `D)` continuation arm) ·
+                  evals/run-dispatch-preflight-fixtures.sh (8 cases today) ·
+                  evals/fixtures/dispatch-preflight/**
+      depends-on: none
+      assumes:    **three, each resolved at intake by reading rather than asked or inferred.**
+                  (A1) Explanatory prose FOLLOWS the ids or `none` on the field; it never precedes
+                  them — confirmed against SPRINT-094's four tasks, every one of which writes
+                  `none — <prose>`. The anchored design tolerates either order, so A1 being wrong
+                  costs nothing.
+                  (A2) Both call sites carry the defect — confirmed by reading the snippet, not
+                  inherited from TD-132's Location line, which names only the field arm.
+                  (A3) The harness extracts the REAL shipped snippet by anchor, never a hand-copied
+                  duplicate, so a fixture cannot pass against a stale copy of the code.
+                  **Contract ruled at intake, not left for G2:** the parser tolerates prose; the
+                  `Depends-on:` field keeps carrying reasoning. The alternative — lint the field down
+                  to bare ids — was rejected: it deletes a field authors demonstrably use and makes
+                  every existing sprint file non-conforming
+      tracker:    **TD-132** (`severity: high`, open, Sprint-094; reproduced two independent ways —
+                  reading the code, and running it: `T2 -> [T1,T2,T1,T2]`, a self-edge no topological
+                  sort resolves) · **TD-043** — the same hardening already applied to the `Layers:`
+                  side of this very snippet via `TOK`, while `Depends-on:` was left unanchored ·
+                  L-058 · L-165/L-168 (Tier G ⇒ worktree-isolated outside reviewer) ·
+                  ships to consumers inside the plugin, and `orchestrator/SKILL.md` § sprint-bulk
+                  step 3 tells every run to execute it before dispatching a wave
+      origin:     decomposer
+      state:      ready
+### P1 — Next Phase Required
+
+> **Epic-first**, ruled by the owner at the SPRINT-094 `/triage`: EPIC-015 § Closed-when 1 · 5 · 6
+> lead, ahead of the cheaper standalone guards, because the epic cannot close without a real
+> unattended run and every sprint that defers it defers the epic.
 
 - [ ] TASK-319 — Prove § Closed-when 1 with a real unattended run against the repaired reaper  [size: M] [risk: high] [HITL]
       class:      execution
@@ -216,181 +210,64 @@ narrative itself, which restates `CHANGELOG.md` (L-008) — owner-gated, not tak
       origin:     close-retro
       state:      ready
 
-- [ ] TASK-320 — Give the launcher a fire-time run ledger, closing TD-122 and TD-124 together  [size: M] [risk: med] [HITL]
+- [ ] TASK-296 — Run bounded unattended repair on one J1 finding  [size: M] [risk: med] [HITL]
       class:      execution
-      authority:  J1
-      done-when:  the launcher records that a run FIRED at the moment it fires, independent of
-                  `reap()`'s later decision to append — so (a) a run that fires but never reaches the
-                  reaper is distinguishable from one that never happened (**TD-122**), and (b)
-                  `check-authority.sh` can read attendedness from a written fact instead of inferring
-                  it from two defeatable signals (**TD-124**). Retained must-FAIL: a fired-but-unreaped
-                  run must be detectable as such; sibling control: a never-fired tree stays green.
-                  Seeded-break discrimination proof under ONE hash convention (L-142 · L-169)
-      touches:    scripts/night-run.sh · scripts/lib/check-authority.sh · evals/fixtures/
-      depends-on: none
-      assumes:    the two rows genuinely share one mechanism — CONFIRM at G2 by re-deriving both
-                  rows' evidence rather than inheriting this line; TD-122's own row states it is
-                  explicitly NOT closable by better parsing, and TD-124's residual is named in
-                  `check-authority.sh`'s own header comment (L-091 — a Mitigation is a hypothesis)
-      tracker:    TD-122 · TD-124 · L-178
-      origin:     close-retro
+      tier:       G (ADR-029 · D4 — an unbounded or silently-skipped repair both end in a green run)
+      done-when:  a concrete J1 critic finding drives repair → re-review → continue, with the retry
+                  ceiling **exactly** what ADR-022 admits and no more; a second failure escalates
+                  rather than looping. Retained must-FAIL: a repair that exceeds the ceiling fails
+                  with its named finding while a within-ceiling sibling passes
+      touches:    skills/orchestrator/references/review-scoping.md § The revise loop ·
+                  skills/orchestrator/references/night-run.md · scripts/night-run.sh
+      depends-on: none — TASK-292 and TASK-293 both closed at SPRINT-088 (`dc3690a`); the block
+                  was stale, cleared at the SPRINT-094 /triage
+      assumes:    the ceiling is **not** re-decided here. Whether unattended repair inherits ADR-022's
+                  single retry or earns its own is a **measurement** that accumulates from EPIC-006's
+                  records (L-094); freezing a number before those exist is L-130. This task ships the
+                  loop at the ceiling ADR-022 already admits
+      tracker:    EPIC-015 § Closed-when 5 · V3 H31 · ADR-022
+      origin:     decomposer
       state:      ready
 
-- [ ] TASK-318 — Detect a shipped capability that nothing calls, mechanically  [size: M] [risk: med] [HITL]
+- [ ] TASK-297 — Emit a typed run outcome with the evidence behind it  [size: M] [risk: med] [HITL]
       class:      execution
-      authority:  J1
-      done-when:  a check reports any exported or registry-registered symbol in packages/ or apps/ that
-                  has ZERO non-test callers, and it is pointed at the three real artifacts that
-                  motivated it rather than fixtures alone (L-166): `attachLevel` before SPRINT-091 T11,
-                  `createF4Registry`/`createS4AppendRegistry` before T12, and TD-103's `reconcile()` /
-                  `marksInStandard()` — each must be reported by the check when run against the tree at
-                  the commit that shipped it unwired. Retained must-FAIL fixture plus a sibling control
-                  (a symbol WITH a production caller must stay green), and a seeded-break discrimination
-                  proof verified landed under ONE hash convention (L-137 · L-142 · L-169)
-      touches:    scripts/lib/ · scripts/qa-check.sh · evals/fixtures/
-      depends-on: none
-      assumes:    the class is mechanically detectable from imports/registrations without running the
-                  code — CONFIRM at G2 by re-deriving against the three motivating artifacts before
-                  designing; if a symbol reached only through a registry string proves undetectable
-                  statically, the scope narrows to exported symbols and says so
-      tracker:    L-172 (count: 2, promotable — "a per-task DoD cannot enforce a property that lives
-                  BETWEEN tasks"; it exists because L-020 was already promoted and still missed the
-                  class, then missed it twice more in SPRINT-091) · L-020 · TD-103 · L-166
-      origin:     close-retro
-      state:      ready
+      tier:       G (ADR-029 · D4)
+      done-when:  every run emits `DELIVERED` / `PARTIAL` / `FAILED` **plus** DoD counts, tasks
+                  attempted/completed, parks, repair cycles, verification state, warnings and terminal
+                  reason. Retained must-FAIL: a run ending mid-Plan that reports `DELIVERED` fails
+                  with its named finding while a genuinely-exhausted sibling passes
+      touches:    skills/orchestrator/references/night-run.md · scripts/night-run.sh ·
+                  templates/sprint-log.md.template
+      depends-on: none — TASK-293 closed at SPRINT-088 (`dc3690a`). The outcome is still a function of
+                  the terminal state that task shipped
+      assumes:    **open question, ruled at this task's G2, not assumed here:** whether the
+                  run-outcome vocabulary belongs to EPIC-015 or to EPIC-008's Run Protocol. V3 §11
+                  says build only what hardening needs and leaves EPIC-008 owning the portable
+                  protocol — so the ruling must land before a `RunSummary` shape is minted, or the two
+                  epics mint competing ones
+      tracker:    EPIC-015 § Closed-when 6 · V3 H37 · EPIC-008
+      origin:     decomposer
+      state:      ready   # /triage, SPRINT-094: the open EPIC-015-vs-EPIC-008 question is a
+                  # JUDGEMENT CALL, closed by ruling, not by waiting for evidence (L-094) — and this
+                  # row already schedules that ruling at its own G2, which is where CONTEXT.md puts an
+                  # unconfirmed assumption. Parking it on needs-info parked it forever.
 
-- [ ] TASK-321 — Make skill-produced summaries lead with the conclusion  [size: M] [risk: low] [HITL]
-      class:      execution
-      authority:  J2
-      done-when:  every summary a skill emits at a process boundary — `/prime`'s health report, an
-                  `/orchestrator` task/gate completion, a close rollup, and any confirmation prompt —
-                  opens with the VERDICT (what is true now / what was decided), then its evidence, and
-                  ends with exactly ONE explicit next-step line. Context the reader already has is not
-                  restated, and no summary buries its conclusion mid-prose. Verified by running each
-                  skill cold and reading its output as a stranger would: the first line must answer
-                  "what happened and what do I do next" without reading further
-      touches:    skills/prime/SKILL.md · skills/orchestrator/SKILL.md ·
-                  skills/lean-doc-generator/SKILL.md (§ output/rollup formats only) — and any
-                  `references/` report template they own
+- [ ] TASK-300 — Decide whether the five gate-accuracy defects are one task or five  [size: S] [risk: low] [HITL]
+      class:      decision
+      done-when: a recorded ruling says whether TD-086 · TD-087 · TD-089 · TD-097 · TD-105 are fixed
+                  as one "gate accuracy" task or separately, and the chosen shape is filed — not a fix,
+                  a decomposition call
+      touches:   TECH-DEBT.md · TODO.md (no code)
       depends-on: none
-      assumes:    the fix is a REPORT-SHAPE rule, not a length cap. Terseness is already required
-                  (CLAUDE.md § Concise reporting) and did not prevent this: the reports were long
-                  AND circular because nothing said where the conclusion goes. Confirm before
-                  building that adding a length rule alone would not close it
-      tracker:    owner feedback, 2026-08-31 — "penjelasan AI tidak runut, kesimpulan final-nya tidak
-                  jelas, hanya menjabarkan hal yang berputar-putar tidak to the point"
-      origin:     manual
-      state:      ready
-
-
-- [ ] TASK-322 — Test Round 12's ceiling apples-to-apples  [size: M] [risk: low] [AFK]
-      class:      execution
-      authority:  J1
-      done-when:  S4.APPEND's four git-history cases are converted to TS and kept ALWAYS-ON, then the
-                  always-on §4 leg is re-measured against Round 12's derived ceiling of 9.5–13.6 s on a
-                  quiet host with host-load stated. SPRINT-092's 22.4–27.9 s saving is NOT a valid test
-                  of that ceiling — it beat it only because those four cases moved to opt-in, so the leg
-                  carries less work than the ceiling costed (Round 13 §5)
-      touches:    evals/run-s4-ts-evaluators.sh · test/ · docs/research/logs/qa-gate-timing.md
-      depends-on: none
-      assumes:    converting the git cases keeps them cheap enough for the always-on leg. Round 13 §3
-                  measured the oracle-spawning differential at 52.8–57.1 s; the git-repo construction
-                  term alone is unmeasured and could dominate. Measure before promoting this
-      tracker:    SPRINT-092 T4 Round 13 §5 · TD-090
-      origin:     close-retro
-      state:      needs-info
-
-- [ ] TASK-323 — Prune the 29 merged worktree-agent-* branches  [size: S] [risk: low] [AFK]
-      class:      mechanical-ingest
-      authority:  J1
-      done-when:  every `worktree-agent-*` branch confirmed an ancestor of `main` is deleted, and any
-                  that is NOT an ancestor is reported rather than removed
-      touches:    git refs only — no tracked file changes
-      depends-on: none
-      assumes:    all 29 are merged. Verified true for the 18 that had worktrees at SPRINT-092's close;
-                  the remaining 11 were not checked, so the task re-derives rather than inheriting this
-      tracker:    SPRINT-092 close — 18 worktrees (178 MB) were removed, their branches were not
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-324 — Check epic status at promote and close  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — an epic whose rollup silently stops happening is invisible by
-                  construction: every gate stays green, because nothing reads epic state at all)
-      done-when:  a check reports, for every `status: active` epic, three drift classes — (a) a member
-                  sprint that closed with no contribution row / `close_commit` in § Member sprints,
-                  (b) an ownership header whose `last_updated` predates its own `update_trigger`'s last
-                  firing (for an epic: the most recent member-sprint close), and (c) a § Closed-when
-                  condition ticked with no member sprint naming what closed it. **Pointed at its real
-                  motivating artifact, not fixtures alone (L-166):** `EPIC-014` at `d43a7a1`
-                  (SPRINT-092's close) must be REPORTED — its header read `2026-08-29` against a body
-                  edited `2026-08-31`, and it passed every green gate. Retained must-FAIL plus a
-                  sibling control: `EPIC-015` at `33187dc`, correctly rolled up, stays green in the
-                  same run. Seeded-break discrimination proof, seed verified landed by `cmp` and
-                  restored under ONE stated hash convention, artifact still parses, break targeted
-                  not demolition
-      touches:    scripts/lib/ (a new checker) · scripts/qa-check.sh (a leg + the always-on eval list) ·
-                  evals/fixtures/ · skills/lean-doc-generator/SKILL.md (§ Sprint lifecycle — the close
-                  rollup step and the promote governance checklist both gain the line)
-      depends-on: none
-      assumes:    **the existing coverage genuinely does not reach this — re-derive at G2, do not
-                  inherit.** `check-epic-archive.sh` enforces §11 retention in both directions but
-                  reads only archival eligibility; the ownership-header family asserts `S3.SCHEMA`
-                  (field *presence*), never whether `last_updated` tracks the last body edit. If the
-                  header half turns out reachable by widening an existing checker, prefer that over a
-                  new script and say so — a second checker with an overlapping subject is how TD-087
-                  and TD-097 happened
-      tracker:    owner feedback, 2026-08-31 — "di sprint blm ada pengecekan epic status" ·
-                  SPRINT-094 promote (found live: EPIC-014's stale header) · L-020 (shipped ≠ wired) ·
-                  L-166 (point the guard at the artifact that motivated it) · L-151
-      origin:     manual
-      state:      ready
-
-- [ ] TASK-325 — Track handoff status and reconcile it at close  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — a handoff is throwaway by design, so anything in it that never reached
-                  a durable home is lost silently and nothing anywhere reports the loss)
-      done-when:  **two halves, and the status half is the one the owner asked for.** (1) A handoff
-                  carries a tracked status, recorded repo-side where the sprint's readers meet it —
-                  `live` (a session may still resume it) · `consumed` (a session resumed it and the
-                  work continued) · `spent` (superseded, or the sprint closed past it) — so "was this
-                  handoff already actioned, or is it still non-active?" is answerable without opening
-                  the temp file. An UNKNOWN status FAILs; it is never assumed `spent`. (2) At close,
-                  any handoff not `spent` is reconciled: every item in it that is not already durable
-                  (sprint file · Execution Log · TODO · TECH-DEBT · LEARNINGS · a commit) is routed to
-                  its durable home or explicitly ruled as needing none. Retained must-FAIL: a sprint
-                  closing with a `live` handoff outstanding FAILs with its named finding, while a
-                  sibling control (all handoffs `spent`) passes. Seeded-break discrimination proof
-                  under ONE stated hash convention (L-142 · L-169)
-      touches:    skills/handoff/SKILL.md · skills/lean-doc-generator/SKILL.md (§ Sprint lifecycle,
-                  close) · skills/prime/SKILL.md (it already reads a handoff path on resume) ·
-                  templates/SPRINT.md.template · scripts/lib/ + scripts/qa-check.sh if a check lands
-      depends-on: none
-      assumes:    **the placement is already ruled — do NOT re-litigate it; what is missing is the
-                  conversion step (checked at the SPRINT-094 promote, owner question "is this already
-                  optimal or not").** STANDARD **§12(b)**'s *Meeting notes* row governs a raw session
-                  record: *"convert outcomes into requirements / ADRs / issues; never commit the raw
-                  notes"*, and §12(a) independently excludes anything "temporary". So a handoff body
-                  living in the OS temp dir is **correct by the standard**, not an oversight, and
-                  session history is correctly untrackable in-repo. §12(b) prescribes the *conversion*
-                  and lean-flow ships no step that performs it — L-020's shape, the rule written and
-                  the wiring absent. This task builds the conversion, not a new placement policy.
-                  **The one thing §12 does NOT settle, and G2 must:** where the repo-side stub lives
-                  when a handoff is taken with **no sprint file to log into** — governance work, a
-                  `/triage` pass, a research session. The Execution Log is the obvious home when a
-                  sprint exists (append-only, uncapped, ADR-014, already the record readers parse) and
-                  is unavailable when one does not; note that `lean-doc-generator`'s own headless-park
-                  instruction resolves that case *to the handoff doc*, which is circular for this
-                  purpose and must not be inherited as an answer. Also confirm this does not quietly
-                  re-invent the Execution Log: if it already carries the fact, the scope narrows to
-                  reading it and says so (laziness ladder — reuse before build)
-      tracker:    owner feedback, 2026-08-31 — "blm ada pengecekan ... handoff data", refined twice:
-                  "must be status track also, was done or already non active", then "handoff also not
-                  write in repo, but in session history cant be track in repo — is this already
-                  optimal or not" · STANDARD §12(a)/(b) · L-151 (a record outside the artifact its
-                  reader parses is not a record) · L-020 (shipped ≠ wired) · L-015 (consumer path)
-      origin:     manual
-      state:      ready
+      assumes:   **the cluster is real, not an artifact of one sprint noticing things.** All five are
+                  accuracy defects in the checkers that gate this repo, and two of them —
+                  TD-087 (REACHES half) and TD-097 (EXISTS half) — are the *same script*,
+                  `check-verify-reaches.sh`, filed three sprints apart with neither aware of the other
+                  until SPRINT-087's close sweep read both rows together. That pairing is the evidence
+                  the cluster is a cluster; the rest is judgement.
+      tracker:   SPRINT-087 close sweep · TD-086 · TD-087 · TD-089 · TD-097 · TD-105
+      origin:    close-retro
+      state:     ready
 
 - [ ] TASK-326 — Compare a commit's claimed DoD delta against the ticks it actually made  [size: S] [risk: low] [AFK]
       class:      execution
@@ -422,6 +299,161 @@ narrative itself, which restates `CHANGELOG.md` (L-008) — owner-gated, not tak
       origin:     close-retro
       state:      ready
 
+### P2 — Follow-on
+
+- [ ] TASK-320 — Give the launcher a fire-time run ledger, closing TD-122 and TD-124 together  [size: M] [risk: med] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  the launcher records that a run FIRED at the moment it fires, independent of
+                  `reap()`'s later decision to append — so (a) a run that fires but never reaches the
+                  reaper is distinguishable from one that never happened (**TD-122**), and (b)
+                  `check-authority.sh` can read attendedness from a written fact instead of inferring
+                  it from two defeatable signals (**TD-124**). Retained must-FAIL: a fired-but-unreaped
+                  run must be detectable as such; sibling control: a never-fired tree stays green.
+                  Seeded-break discrimination proof under ONE hash convention (L-142 · L-169)
+      touches:    scripts/night-run.sh · scripts/lib/check-authority.sh · evals/fixtures/
+      depends-on: none
+      assumes:    the two rows genuinely share one mechanism — CONFIRM at G2 by re-deriving both
+                  rows' evidence rather than inheriting this line; TD-122's own row states it is
+                  explicitly NOT closable by better parsing, and TD-124's residual is named in
+                  `check-authority.sh`'s own header comment (L-091 — a Mitigation is a hypothesis)
+      tracker:    TD-122 · TD-124 · L-178
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-321 — Make skill-produced summaries lead with the conclusion  [size: M] [risk: low] [HITL]
+      class:      execution
+      authority:  J2
+      done-when:  every summary a skill emits at a process boundary — `/prime`'s health report, an
+                  `/orchestrator` task/gate completion, a close rollup, and any confirmation prompt —
+                  opens with the VERDICT (what is true now / what was decided), then its evidence, and
+                  ends with exactly ONE explicit next-step line. Context the reader already has is not
+                  restated, and no summary buries its conclusion mid-prose. Verified by running each
+                  skill cold and reading its output as a stranger would: the first line must answer
+                  "what happened and what do I do next" without reading further
+      touches:    skills/prime/SKILL.md · skills/orchestrator/SKILL.md ·
+                  skills/lean-doc-generator/SKILL.md (§ output/rollup formats only) — and any
+                  `references/` report template they own
+      depends-on: none
+      assumes:    the fix is a REPORT-SHAPE rule, not a length cap. Terseness is already required
+                  (CLAUDE.md § Concise reporting) and did not prevent this: the reports were long
+                  AND circular because nothing said where the conclusion goes. Confirm before
+                  building that adding a length rule alone would not close it
+      tracker:    owner feedback, 2026-08-31 — "penjelasan AI tidak runut, kesimpulan final-nya tidak
+                  jelas, hanya menjabarkan hal yang berputar-putar tidak to the point"
+      origin:     manual
+      state:      ready
+
+- [ ] TASK-322 — Test Round 12's ceiling apples-to-apples  [size: M] [risk: low] [AFK]
+      class:      execution
+      authority:  J1
+      done-when:  S4.APPEND's four git-history cases are converted to TS and kept ALWAYS-ON, then the
+                  always-on §4 leg is re-measured against Round 12's derived ceiling of 9.5–13.6 s on a
+                  quiet host with host-load stated. SPRINT-092's 22.4–27.9 s saving is NOT a valid test
+                  of that ceiling — it beat it only because those four cases moved to opt-in, so the leg
+                  carries less work than the ceiling costed (Round 13 §5)
+      touches:    evals/run-s4-ts-evaluators.sh · test/ · docs/research/logs/qa-gate-timing.md
+      depends-on: none
+      assumes:    converting the git cases keeps them cheap enough for the always-on leg. Round 13 §3
+                  measured the oracle-spawning differential at 52.8–57.1 s; the git-repo construction
+                  term alone is unmeasured and could dominate. Measure before promoting this
+      tracker:    SPRINT-092 T4 Round 13 §5 · TD-090
+      origin:     close-retro
+      state:      needs-info   # /triage, SPRINT-094: HELD, and the unblocking fact is named so it
+                  # can be taken — time the git-repo CONSTRUCTION term of S4.APPEND's four cases in
+                  # isolation (Round 13 §3 measured the oracle-spawning differential at 52.8–57.1 s and
+                  # left this term unmeasured). It is a MEASUREMENT, so it legitimately accumulates
+                  # (L-094) — unlike TASK-297, which was parked on a ruling.
+
+- [ ] TASK-329 — Make gate truncation a distinct outcome from gate failure  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — a skipped harness is an UNRUN guard, and the run still prints a verdict
+                  in the same shape a completed run prints. The gate cannot report on itself)
+      authority:  J1
+      done-when:  **MERGES TASK-330 (TD-117) into this row — ruled at the 2026-09-07 decompose.** One
+                  mechanism serves both rows: the run's actual duration and what it failed to reach
+                  become first-class output. Six clauses.
+                  (1) A run that trips the budget checkpoint no longer prints the SAME verdict shape a
+                  genuinely-failing run prints. Today `qb_checkpoint` calls `bad`, prints
+                  `QA-CHECK: <pass> pass, <fail> fail` — byte-identical in shape to the Summary block —
+                  and exits 1, so truncation and failure are indistinguishable to any reader or script.
+                  (2) The truncation verdict NAMES the actual elapsed seconds and every leg or harness
+                  it did not reach, **enumerated by name**. Today the message says *"Every leg from
+                  here on, including all eval harnesses, is skipped"* and names not one — which is how
+                  six skipped harnesses went unnoticed, two of them (`run-verify-reaches-fixtures.sh`,
+                  `run-qa-budget-fixtures.sh`) guards of the gate itself.
+                  (3) The ACTUAL runtime is asserted against the ceiling — TD-128's half. **Explicitly
+                  out of scope: `check-qa-budget-default.sh` is correct within its declared scope**
+                  (configured default < ceiling) and is NOT what changes; TD-128 is a *missing* reader,
+                  not a broken checker. Do not "fix" it by widening that script.
+                  (4) A reader distinguishes the three outcomes off the printed verdict line alone —
+                  the line the gate prints, never a wrapper's exit code (L-120).
+                  (5) Retained must-FAIL + sibling control: a run seeded to trip the checkpoint reports
+                  the truncation outcome and names its unrun harnesses, while a genuinely-failing run
+                  in the same suite still reports FAIL. Seeded-break discrimination proof under ONE
+                  stated hash convention, seed verified landed, artifact still parses, break targeted
+                  not demolition, and a landed seed that reddens nothing reported as untested rather
+                  than scored as a pass (L-137 · L-142 · L-169 · L-187).
+                  (6) **Pointed at the motivating condition, not fixtures alone (L-166):** reproduce
+                  TD-117's measurement — a run under concurrent worktree agents, or a checkpoint seeded
+                  to trip where the real one tripped (`run-s2-placement-fixtures.sh`) — and show the
+                  same six harnesses named in the output
+      touches:    scripts/qa-check.sh (the `qb_checkpoint` truncation path and the § Summary block —
+                  the two places that print the verdict) · scripts/lib/qa-budget-check.sh ·
+                  evals/run-qa-budget-fixtures.sh · evals/fixtures/qa-budget/**
+      depends-on: none
+      assumes:    **the fix DIRECTION is ruled at intake, not left to G2.** TD-117's row offers three
+                  and rules none: cap dispatch concurrency · raise the budget with the ceiling raised ·
+                  make the skipped-harness list its own named outcome. **The third is chosen.** The
+                  first slows the worktree-isolated parallel review this repo mandates for Tier G
+                  (L-165 · L-168) and would rest on a concurrency figure nobody has measured; the
+                  second cannot work — the 600 s ceiling is external and not ours to raise, and
+                  `qa-check.sh:27`'s own comment already calls the current 520 "NOT a permanent
+                  figure". The third fixes the REPORT rather than the speed, and it is the report that
+                  is lying. Speed remains a separate, unfiled concern.
+                  Note the merged rows disagree on one number: TD-117 quotes a 450 s default, which is
+                  stale — `qa-check.sh:27` has read 520 since SPRINT-093. Re-derive at build; quote
+                  neither
+      tracker:    **TD-128** (`severity: high`, open, Sprint-092 — the guard passes precisely when the
+                  thing it guards is failing; one hypothesis already DISPROVED, do not re-run it:
+                  pruning 18 worktrees measured 1413 s before, 1450 s after) ·
+                  **TD-117** (`severity: high`, open, Sprint-091 — 533 s against a 469 s checkpoint
+                  under 5 concurrent agents, six harnesses skipped, reproduced independently by a
+                  second observer at 499 s/460 s tripping at the same harness) ·
+                  **supersedes TASK-330**, retired into this row · TD-084 · TD-091 · L-120 · L-166
+      origin:     decomposer
+      state:      ready
+
+> **`TASK-330` is retired into `TASK-329`** (2026-09-07 decompose). TD-117 and TD-128 are one
+> mechanism — the gate's own duration and what it failed to reach are both unreported — so two rows
+> would have meant two passes over the same code with a stale dependency between them. The id is
+> **not reused**; TD-117's escalation note in `TECH-DEBT.md` points here.
+
+### P3 — Long-term
+
+> **Opportunistic by ruling, not by priority.** Neither entry below can be scheduled — each is taken
+> when a run or a session produces the vehicle for it. Promoting one into a sprint whose shape cannot
+> generate that vehicle is what foreclosed SPRINT-060 T5 (L-111).
+
+- [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
+      class:      execution
+      done-when:  a real unattended run that stops mid-Plan leaves a rollup naming the untouched tasks
+                  as `unattempted`, verified end-to-end through `scripts/night-run.sh` rather than via
+                  `--reap`
+      touches:    scripts/night-run.sh (only if the exercise finds a defect) · a sprint Execution Log
+      depends-on: none
+      assumes:    **carried from SPRINT-060 T5, acceptance unmet — read the ruling before re-promoting.**
+                  The trigger is OPPORTUNISTIC and that is the whole design: the next night run that
+                  stops mid-Plan *for its own reasons* is the exercise. Do not schedule a run to produce
+                  one, and do not promote this into a sprint whose shape cannot generate it — SPRINT-060
+                  promoted it alongside four HITL tasks, the run mode was then ruled interactive at G2,
+                  and that foreclosed the only vehicle it had (L-111). Its partial-Plan path is already
+                  proven three ways that each stop short of the others: a real log through `--reap`, a
+                  zero-ticked-box regression, and an end-to-end launcher run against a complete Plan
+      tracker:    SPRINT-060 T5 scope-change + owner ruling · ADR-016 · L-111
+      origin:     close-retro
+      state:      blocked
+
 - [ ] TASK-327 — Exercise `check-handoff-state.sh` on the first real handoff  [size: S] [risk: low] [HITL]
       class:      execution
       tier:       G (ADR-029 — the guard is proven on fixtures and has never seen live input)
@@ -445,13 +477,14 @@ narrative itself, which restates `CHANGELOG.md` (L-008) — owner-gated, not tak
       origin:     close-retro
       state:      ready
 
-### P3 — Long-term
-
 > Rejected work lives in **`.out-of-scope/`** — each file carries its own reasoning, revisit-if and
 > expiry, and `/triage` step 1 scans that directory before keeping any resembling task. The per-task
 > pointer lines that used to sit here were breadcrumbs to those files, pruned under §11's TODO cap on
 > the same reasoning §11 uses for shipped Backlog entries — the durable home is the `.out-of-scope/`
-> file, plus git. Ids stay monotonic: 006 · 007 · 040 · 047 · 120 · 148 are not reused.
+> file, plus git. Ids stay monotonic and are never reused: 006 · 007 · 040 · 047 · 120 · 148 (routed
+> out), 318 · 323 · 324 · 325 (shipped at SPRINT-094 and pruned at the 2026-09-07 `/triage`), and 330
+> (escalated then merged into `TASK-329` the same day; see § P2). For the shipped four, their
+> durable home is `CHANGELOG.md` + the sprint file + git.
 ---
 
 ## Changelog (current sprint only)

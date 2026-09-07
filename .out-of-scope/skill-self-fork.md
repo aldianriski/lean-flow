@@ -1,7 +1,7 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-09
-status: current
+last_updated: 2026-09-07
+status: superseded
 update_trigger: The revisit-if condition fires, or the expiry passes
 ---
 
@@ -64,3 +64,14 @@ simply stopped being the binding constraint.
 rather than a pending question. The point of a dated expiry is that the null result is itself a
 verdict rather than a drift toward never (L-068). Do not re-litigate before then without new evidence
 of one of the revisit-if conditions.
+
+## Expiry FIRED — permanently rejected
+
+**Closed 2026-09-07 at `/triage`, by the contract above.** Neither revisit-if condition fired between
+SPRINT-050 and SPRINT-094: Claude Code still serializes concurrent invocations of the same forked
+skill, a background fork still runs with the reduced tool set, and lean-flow's dispatch still depends
+on parallelism (`orchestrator/references/dispatch.md` waves; `Agent(isolation:"worktree")` per task).
+The owner ruled the auto-close rather than letting it drift toward never (L-068).
+
+This file is **history**. ADR-010's mechanism C stands, still unedited — an unchanged ADR remains the
+correct outcome of a rejection. The per-run fork cost remains unmeasured and no longer needs measuring.
