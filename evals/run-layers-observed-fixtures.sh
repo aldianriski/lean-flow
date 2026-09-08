@@ -1293,11 +1293,11 @@ SP930
 printf 'x\n' > "$c9/scripts/mine.sh"
 git -C "$c9" init -q
 lock_plan "$c9" 'docs/sprint/SPRINT-930-active.md'
-# The archived sprint's own work, landing INSIDE 930's window and naming 931 in its subject. Its
-# window is captured around it: an archived sprint owns a commit by WINDOW, never by number alone
-# (see the archived-window case below for why), so the fixture has to give 931 a real one -- a
-# placeholder plan_commit and an absent close_commit make it own nothing, which is the safe
-# direction but not the case under test.
+# The archived sprint's own work, landing INSIDE 930's window and naming 931 in its subject.
+# The window frontmatter below is INERT as of SPRINT-096 T3 (ADR-040): ownership is granted on the
+# cited number alone for both sibling kinds, so no window is consulted. It is kept anyway, because
+# removing it would change this fixture's tree at the same time as the rule under test, and a case
+# that moves with its subject stops being able to disagree with it.
 c9_before=$(git -C "$c9" rev-parse HEAD)
 printf 'y\n' > "$c9/scripts/theirs.sh"
 commit_all "$c9" 'sprint(931) T1: the archived sprint owns this'
@@ -1334,7 +1334,31 @@ case "$c9_out" in
   *) echo "PASS fixture(archived-sibling: archived sprint keeps its own commits): scripts/theirs.sh not blamed on the active sibling" ;;
 esac
 
-c10="$work/archived-window-bounded"
+# ================================================================================================
+# case: an archived sprint's CITED NUMBER grants ownership, with NO further test -- and the hole
+# that follows is PINNED here deliberately (ADR-040, TD-141).
+#
+# THIS CASE WAS INVERTED at SPRINT-096 T3. It previously asserted the opposite -- "a cited number
+# does not grant ownership outside its window" -- which was SPRINT-095 T1's second design. An
+# independent review broke that design (windows legitimately NEST: SPRINT-089 5f0682b..cc46d18 and
+# SPRINT-090 b7437de..cc46d18 share a close commit), and the third design fell to shared
+# declarations (docs/LEARNINGS.md is declared by 74 of 91 archived sprints). The owner then ruled
+# rather than attempting a fourth proxy (L-190): a commit subject is prose a human typed, so it is
+# unverifiable, and the repository ACCEPTS the resulting laundering channel for BOTH sibling kinds
+# instead of paying for a proxy that cannot close it.
+#
+# The case is INVERTED rather than DELETED, and that is the point. An accepted hole with no fixture
+# is indistinguishable from an unnoticed one: the next reader finds the skip, assumes it is a bug,
+# and re-opens the three-design loop for a fourth time. This fixture is what makes the hole a
+# DECISION -- it fails loudly if someone silently re-narrows the rule, which is a real change of
+# contract and must not pass quietly in either direction.
+#
+# Asserted BOTH ways in one run, because a skip that swallows everything is the failure this trades
+# against: (a) the mislabeled commit is NOT reported -- the accepted hole -- and (b) a genuinely
+# undeclared path with no sprint citation at all is STILL reported by name -- the sibling control.
+# Without (b) this fixture would pass just as happily against a checker that reported nothing.
+# ================================================================================================
+c10="$work/archived-number-grants-ownership"
 mkdir -p "$c10/docs/sprint/archive" "$c10/src"
 cat > "$c10/docs/sprint/SPRINT-940-active.md" <<'SP940'
 ---
@@ -1353,7 +1377,10 @@ SP940
 printf 'x\n' > "$c10/src/mine.js"
 git -C "$c10" init -q
 lock_plan "$c10" 'docs/sprint/SPRINT-940-active.md'
-# An archived sprint whose whole window is the root commit -- long closed, unrelated to 940.
+# An archived sprint whose whole window is the root commit -- long closed, unrelated to 940. Under
+# the ruled behaviour the window is never consulted, so this frontmatter is inert; it is kept
+# verbatim from the pre-inversion fixture so the diff shows the ASSERTION changing rather than the
+# scenario being quietly rebuilt into an easier one.
 anc=$(git -C "$c10" rev-list --max-parents=0 HEAD)
 cat > "$c10/docs/sprint/archive/SPRINT-941-ancient.md" <<SP941
 ---
@@ -1371,13 +1398,147 @@ Layers: \`src/ancient.js\`
 Depends-on: none
 SP941
 commit_all "$c10" 'sprint(940) T1: record the archived sprint'
-# Real, undeclared SPRINT-940 work wearing the archived sprint's number in its subject.
+# Real, undeclared SPRINT-940 work wearing the archived sprint's number in its subject. THIS IS THE
+# ACCEPTED HOLE: it is genuinely undeclared work and it is deliberately not reported.
 printf 'y\n' > "$c10/src/undeclared-real-work.js"
 commit_all "$c10" 'sprint(941) T1: mislabeled -- this is actually 940 real work'
+# The sibling control, in the SAME run: undeclared work that cites no sprint at all must still FAIL
+# by name. This is what separates "the rule was applied" from "the checker stopped checking".
+printf 'z\n' > "$c10/src/orphan.js"
+commit_all "$c10" 'chore: a file no sprint declares and no subject claims'
 
-run_case_anywhere "archived-window: a cited number does not grant ownership outside its window" 1 \
-  "src/undeclared-real-work.js" -- \
+c10_out=$(cd "$c10" && sh "$checker" docs/sprint/SPRINT-940-active.md 2>&1)
+run_case_anywhere "archived-number: the sibling control still FAILs by name" 1 \
+  "src/orphan.js" -- \
   sh -c "cd \"$c10\" && sh \"$checker\" docs/sprint/SPRINT-940-active.md"
+case "$c10_out" in
+  *src/undeclared-real-work.js*)
+    echo "FAIL fixture(archived-number: the ruled hole is not open): src/undeclared-real-work.js was reported, but ADR-040 rules that a commit citing an archived number is skipped with no further test. If this behaviour was changed deliberately, ADR-040 must be superseded first:"
+    printf '%s\n' "$c10_out"; fail=1 ;;
+  *) echo "PASS fixture(archived-number: cited number grants ownership, hole pinned as accepted): src/undeclared-real-work.js deliberately not reported" ;;
+esac
+
+# ================================================================================================
+# case: SELECTION, not verdict (L-186) -- an archived sprint reached by the OTHER derivation of its
+# number. Every case above varies what the checker DECIDES; none varies which archived sprints ever
+# ENTER the set it decides over, and that set is the one property no fixture above can see.
+#
+# The population is "every file matching docs/sprint/archive/SPRINT-*.md". Membership used to be
+# derived by READING FRONTMATTER (fmv "$_asp" sprint); ADR-040's implementation derives it from the
+# FILENAME. Those two sources select different populations, and the difference is not hypothetical:
+# fmv's first-line guard is `NR==1 && $0!="---"`, so on a CRLF checkout the first record is "---\r",
+# fmv returns empty for every key, and the frontmatter route silently selects NOTHING (TD-131 --
+# which records that this works on the maintainer's host only by accident of its awk build).
+#
+# So this fixture writes an archived sprint whose frontmatter is CRLF and therefore unreadable by
+# fmv, while its FILENAME is ordinary. It varies how the member is reached, not what is decided
+# about it. Under the frontmatter route the sprint is absent from the trusted set and its commit is
+# blamed on the active sibling; under the filename route it is present and skipped. Same verdict
+# logic, different population -- which is exactly the axis L-186 names as having no other reader.
+#
+# The sibling control runs in the same tree for the same reason as everywhere else: a fixture that
+# only asserts silence cannot tell "selected correctly" from "checked nothing".
+# ================================================================================================
+c11="$work/archived-selection-by-filename"
+mkdir -p "$c11/docs/sprint/archive" "$c11/src"
+cat > "$c11/docs/sprint/SPRINT-950-active.md" <<'SP950'
+---
+sprint: 950
+slug: active
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+## Plan
+
+### T1 — Declares only its own file
+Layers: `src/ours.js`
+Depends-on: none
+SP950
+printf 'x\n' > "$c11/src/ours.js"
+git -C "$c11" init -q
+lock_plan "$c11" 'docs/sprint/SPRINT-950-active.md'
+c11_before=$(git -C "$c11" rev-parse HEAD)
+# Member A's work, and member B's, each landing inside 950's window under its own number.
+printf 'y\n' > "$c11/src/theirs-a.js"
+commit_all "$c11" 'sprint(951) T1: the no-sprint-key archived sprint owns this'
+printf 'y\n' > "$c11/src/theirs-b.js"
+commit_all "$c11" 'sprint(952) T1: the slugless archived sprint owns this'
+c11_after=$(git -C "$c11" rev-parse HEAD)
+
+# ---- member A: frontmatter carries NO `sprint:` key at all. -------------------------------------
+# The frontmatter route reads that key and gets nothing, on EVERY host -- which is the point: the
+# first version of this fixture used a CRLF file instead, and its own vacuity guard reported that
+# this host's awk translates CRLF on read, so fmv returned the number anyway and the two routes
+# agreed. The case went green while discriminating nothing. A missing key cannot be rescued by an
+# awk build, so the population difference is real wherever this runs.
+cat > "$c11/docs/sprint/archive/SPRINT-951-no-sprint-key.md" <<SP951
+---
+slug: no-sprint-key
+status: closed
+plan_commit: $c11_before
+close_commit: $c11_after
+---
+
+## Plan
+
+### T1 — Owns its own file; its frontmatter has no sprint: key
+Layers: \`src/theirs-a.js\`
+Depends-on: none
+SP951
+# ---- member B: an ordinary frontmatter, but a filename with NO `-<slug>` segment. ---------------
+# The other direction of the same axis, and the one that would have bitten THIS change rather than
+# the one it replaced: an earlier draft of the selection matched `^SPRINT-([0-9]+)-.*\.md$`, which
+# the glob's own `SPRINT-*.md` admits and that pattern rejects. A rejected member is silent -- its
+# commits land on the active sibling with nothing reporting that a sprint was skipped.
+cat > "$c11/docs/sprint/archive/SPRINT-952.md" <<SP952
+---
+sprint: 952
+slug: slugless
+status: closed
+plan_commit: $c11_before
+close_commit: $c11_after
+---
+
+## Plan
+
+### T1 — Owns its own file; its filename has no slug segment
+Layers: \`src/theirs-b.js\`
+Depends-on: none
+SP952
+# Assert BOTH premises rather than assuming them -- a fixture whose seeded condition does not bite
+# has tested nothing and still scores as a pass (L-142). Checked against the artifacts, not the
+# heredocs that wrote them.
+c11_key=$(awk -v k=sprint 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$c11/docs/sprint/archive/SPRINT-951-no-sprint-key.md")
+if [ -n "$c11_key" ]; then
+  echo "FAIL fixture(archived-selection A: premise not established): frontmatter still yields '$c11_key' -- member A must be unreadable by the frontmatter route or the case discriminates nothing"
+  fail=1
+fi
+c11_slug=$(printf '%s' 'SPRINT-952.md' | sed -n 's/^SPRINT-\([0-9][0-9]*\)-.*\.md$/\1/p')
+if [ -n "$c11_slug" ]; then
+  echo "FAIL fixture(archived-selection B: premise not established): the slug-requiring pattern matched '$c11_slug', so member B is not the rejected shape this leg exists to cover"
+  fail=1
+fi
+commit_all "$c11" 'sprint(950) T1: record the archived sprint files'
+printf 'z\n' > "$c11/src/orphan.js"
+commit_all "$c11" 'chore: a file no sprint declares'
+
+c11_out=$(cd "$c11" && sh "$checker" docs/sprint/SPRINT-950-active.md 2>&1)
+run_case_anywhere "archived-selection: sibling control still FAILs by name" 1 \
+  "src/orphan.js" -- \
+  sh -c "cd \"$c11\" && sh \"$checker\" docs/sprint/SPRINT-950-active.md"
+case "$c11_out" in
+  *src/theirs-a.js*)
+    echo "FAIL fixture(archived-selection A: member with no sprint: key never entered the set): src/theirs-a.js was blamed on SPRINT-950. The number must come from the FILENAME -- a frontmatter read selects nothing for this member on any host:"
+    printf '%s\n' "$c11_out"; fail=1 ;;
+  *) echo "PASS fixture(archived-selection A: member reached despite unreadable frontmatter): src/theirs-a.js not blamed on the active sibling" ;;
+esac
+case "$c11_out" in
+  *src/theirs-b.js*)
+    echo "FAIL fixture(archived-selection B: slugless member never entered the set): src/theirs-b.js was blamed on SPRINT-950. The glob admits SPRINT-952.md, so the selection must too -- a member the pattern rejects is an absence, not a finding (L-186):"
+    printf '%s\n' "$c11_out"; fail=1 ;;
+  *) echo "PASS fixture(archived-selection B: slugless member reached by the same selection): src/theirs-b.js not blamed on the active sibling" ;;
+esac
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-OBSERVED FIXTURES: all green"; else echo "LAYERS-OBSERVED FIXTURES: at least one FAIL"; fi

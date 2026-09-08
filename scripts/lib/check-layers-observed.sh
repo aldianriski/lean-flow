@@ -378,9 +378,13 @@ for sp in "$@"; do
   # where no attribution is possible.
   decls=$(task_decls "$plan")
 
-  # ---- STREAM SCOPING by OWNERSHIP (TASK-299). The sprint NUMBERS of the other active sprints in
+  # ---- STREAM SCOPING by OWNERSHIP (TASK-299). The sprint NUMBERS of the other ACTIVE sprints in
   # this same invocation. A commit naming one of them is that stream's work and is not this sprint's
-  # undeclared change; a commit naming a CLOSED sprint's number is not a sibling and stays attributed.
+  # undeclared change. ARCHIVED sprints are NOT gathered here -- they cannot be, since qa-check.sh
+  # passes only live sprint files -- but they belong in the same set and are appended by the
+  # filename-discovery loop below, under one rule for both arms (ADR-040). The `*/archive/*` filter
+  # on this loop is therefore vestigial for the ownership question and is kept only because "$@" may
+  # legitimately be handed archived paths by a direct caller, where they are not ACTIVE siblings.
   # Deliberately NOT applied to the WIP leg below: uncommitted work carries no attribution, so there
   # is no honest way to tell which stream made it, and reporting it is the correct behaviour.
   # Compared by NUMBER, not by path. Two sprint files declaring the same `sprint:` -- a copy-paste
@@ -401,90 +405,72 @@ for sp in "$@"; do
     sibling_sprints="$sibling_sprints $_on"
   done
 
-  # ---- COMMIT OWNERSHIP (TD-125). A DIFFERENT question from the one above, and it was being
-  # answered by the same list. "Is this sprint still ACTIVE work?" is what sibling_sprints answers,
-  # and excluding archive/ there is correct. "Does this sprint OWN its commits?" is what the commit
-  # skip below needs, and a closed sprint owns its history forever -- archived or not. One list
-  # cannot answer both, which is precisely what TD-125 records.
+  # ---- COMMIT OWNERSHIP (TD-125, RULED BY ADR-040). A DIFFERENT question from the one above, and
+  # it was being answered by the same list. "Is this sprint still ACTIVE work?" is what the loop
+  # above answers. "Does this sprint OWN its commits?" is what the per-commit skip below needs, and
+  # a closed sprint owns its history forever -- archived or not. One list cannot answer both, which
+  # is precisely what TD-125 records.
   #
-  # MEASURED, NOT INHERITED -- and the debt row's stated cause turns out not to be the operative
-  # one. TD-125 names the `*/archive/*` filter on the loop above as the mechanism. Deleting that
-  # line alone moves the failure not at all: with SPRINT-093 archived and 092 still active, 092 is
-  # blamed for 85 commit:path pairs both with the filter present and with it deleted. The real
-  # mechanism sits upstream -- qa-check.sh hands this checker a NON-recursive
-  # `ls docs/sprint/SPRINT-*.md`, so an archived sprint never reaches "$@" to be filtered. The fix
-  # is therefore to DISCOVER archived sprints, not to stop excluding them.
+  # THE RULE, and it is ONE rule for both arms (ADR-040, accepted 2026-09-08):
   #
-  # Discovery is relative to the subject sprint's own directory, never a hardcoded repo path, so a
-  # consumer whose sprints live elsewhere gets the same behaviour (L-015).
+  #     A commit citing another sprint's number belongs to that sprint -- archived or active,
+  #     with no further test -- and this repository ACCEPTS the laundering channel that follows.
   #
-  # BOUNDED BY WINDOW, and the first version of this fix was not -- an independent review caught it
-  # and reproduced it live. Unioning every archived sprint NUMBER into the trusted-owner set means
-  # any commit whose subject cites any archived number is exempt from the undeclared-file check, for
-  # every active sprint, forever. This repo's archive holds 91 sprints, so that is 91 numbers a
-  # mislabelled, copy-pasted, cherry-picked or deliberately-evasive commit subject could hide real
-  # undeclared work behind. Demonstrated: an active SPRINT-200 plus an unrelated archived SPRINT-001,
-  # and a commit inside 200's window doing real 200 work under the subject `sprint(001) T1: ...`,
-  # went from a correct FAIL to PASS. That trades TD-125's narrow real defect for an unbounded one
-  # -- exactly the "widening an exclusion is how a guard acquires a silent false negative" risk this
-  # task was written to respect.
+  # Read the ADR before changing this. A commit subject is prose a human typed, so it is an
+  # UNVERIFIABLE claim, and every mechanism that tries to make it verifiable is another proxy for
+  # the same claim. Three were tried in SPRINT-095 T1 and an independent review broke each: the
+  # cited NUMBER alone (the archive's numbers exempt anything), number + WINDOW (windows legitimately
+  # nest -- SPRINT-089 5f0682b..cc46d18 and SPRINT-090 b7437de..cc46d18 share a close commit), and
+  # number + DECLARATIONS (declarations are shared -- docs/LEARNINGS.md is declared by 74 of 91
+  # archived sprints). The loop does not end by refining; it ends by ruling (L-190).
   #
-  # So an archived sprint is recorded WITH ITS WINDOW, and ownership is checked against that window
-  # rather than granted on the number alone. Stored as `<number> <plan_commit> <close_commit>` lines
-  # in a temp file: a shell string would need re-splitting per commit, and the count is unbounded.
-  # One file reused across sprints, truncated per iteration -- the loop runs once per sprint file,
-  # so a fresh mktemp each time would leak one per sprint. Registered on EXIT the first time only.
-  # One file reused across sprints, truncated per iteration -- the loop runs once per sprint file,
-  # so a fresh mktemp each time would leak one per sprint. Registered on EXIT the first time only.
-  if [ -z "${archived_decls:-}" ]; then
-    archived_decls=$(mktemp) || { printf 'FAIL  %s layers observed: mktemp failed for the archive declaration map\n' "$sp"; fail=$((fail + 1)); continue; }
-    trap 'rm -f "$archived_decls"' EXIT INT TERM
-  fi
-  : > "$archived_decls"
+  # So the choice is not WHICH PROXY but WHICH FAILURE this repository accepts. Report
+  # archived-cited commits and archiving any sprint turns the gate red -- TD-125's false positives,
+  # measured at 3 -> 85 blamed commit:path pairs. Skip them and a mislabelled, copy-pasted,
+  # cherry-picked or deliberately-evasive subject can hide genuinely undeclared work. The accepted
+  # hole is the one that does not block work; it is bounded by the sprint numbers that exist, and it
+  # is now DOCUMENTED rather than accidental -- which is the whole difference from the previous
+  # state, where the ACTIVE arm had this same hole and the comment here called it merely
+  # "the pre-existing behaviour" (TD-141).
+  #
+  # CONSEQUENCE, stated where a reader of this file meets it rather than only in the ledger:
+  # check-layers-observed.sh is NOT a guard against a dishonest commit subject and MUST NOT be cited
+  # as one. Closing that needs a signal which is not the subject; ADR-040 records the `Sprint: NNN`
+  # trailer route and the condition for re-opening it.
+  #
+  # WHY ARCHIVED NUMBERS ARE DISCOVERED RATHER THAN UN-FILTERED. A literal revert of SPRINT-095 T1
+  # would leave archived sprints out of sibling_sprints entirely and FLIP the asymmetry instead of
+  # removing it: their commits would then be reported against an active sibling, which is TD-125's
+  # original defect returning. They have to be IN the set. And simply deleting the `*/archive/*`
+  # filter on the loop above cannot put them there -- qa-check.sh hands this checker a NON-recursive
+  # `ls docs/sprint/SPRINT-*.md`, so an archived file never enters "$@" for that filter to reach.
+  # TD-125 names that filter as its mechanism; the claim is measured false (092 is blamed for 85
+  # pairs with the line present AND with it deleted) and the filter is in fact UNREACHABLE for
+  # archived sprints, not merely ineffective.
+  #
+  # Discovery is from the FILENAME -- no git, no frontmatter read, no window. Deliberately the
+  # cheapest available source: the number is already in the name, and reading frontmatter here would
+  # add an fmv() call over every archived file, where fmv returns empty on a CRLF checkout and works
+  # on this host only by accident of its awk build (TD-131). Relative to the subject sprint's own
+  # directory, never a hardcoded repo path, so a consumer whose sprints live elsewhere gets the same
+  # behaviour (L-015).
   for _asp in "$(dirname "$sp")"/archive/SPRINT-*.md; do
     [ -f "$_asp" ] || continue
-    _an=$(fmv "$_asp" sprint)
+    # The suffix after the number is deliberately UNCONSTRAINED. Requiring the `-<slug>` that
+    # STANDARD's naming rule prescribes would silently drop any archived file the glob admits but the
+    # pattern rejects -- `SPRINT-960.md` with no slug, say -- and a dropped member is not a finding,
+    # it is an absence: its commits would be blamed on an active sibling with nothing saying a sprint
+    # had been skipped. That is L-186's shape, where the detection logic is sound and the member SET
+    # is not, so the selection is written to admit everything the glob does. Zero-padding is
+    # preserved verbatim: the comparison against commit_sprint()'s capture is a STRING match, so
+    # normalizing `092` to `92` here would break every match.
+    _an=$(printf '%s' "${_asp##*/}" | sed -n 's/^SPRINT-\([0-9][0-9]*\).*/\1/p')
     [ -n "$_an" ] || continue
-    # Same self-sibling guard as above, and for the same reason: a sprint that became its own
-    # sibling would skip every one of its own commits -- a total bypass, not a narrow miss.
+    # Same self-sibling guard as the active loop, and for the same reason: a sprint that became its
+    # own sibling would skip every one of its own commits -- a total bypass, not a narrow miss.
     [ "$_an" = "$my_sprint" ] && continue
-    _aplan=$(awk '/^## Plan/{f=1;next} /^## /{f=0} f' "$_asp")
-    # The union of that sprint's declared tokens, parsed by the SAME task_decls the active side
-    # uses -- a second parser here would let the two disagree about what a declaration is.
-    _atok=$(task_decls "$_aplan" | awk '{print $2}' | sort -u | tr '\n' ' ')
-    # An archived sprint that declares nothing owns nothing: it fails toward REPORTING the commit,
-    # which is the loud direction and the safe one.
-    [ -n "$_atok" ] || continue
-    printf '%s %s\n' "$_an" "$_atok" >>"$archived_decls"
+    sibling_sprints="$sibling_sprints $_an"
   done
-  # owns_commit <sprint-number> <commit> -- true only when the archived sprint of that number
-  # DECLARED the paths the commit touches.
-  #
-  # THIRD DESIGN, and the first two were both proxies. Ownership was inferred first from the sprint
-  # NUMBER in the commit subject (any of 91 numbers exempted anything), then from the number plus
-  # the sprint's plan_commit..close_commit WINDOW. Review killed both, the second because windows
-  # legitimately NEST in this repo: SPRINT-089 (5f0682b..cc46d18) and SPRINT-090 (b7437de..cc46d18)
-  # share a close commit, 090 having been seeded inside 089's own task stream, so 090's whole window
-  # sits within 089's. A commit doing real undeclared work for a later sprint but mislabelled
-  # `sprint(089)` falls inside that overlap and was exempted. It has not bitten only because
-  # cc46d18 happens to precede 092's plan_commit -- timing, not a guarantee.
-  #
-  # A commit subject is an UNVERIFIABLE claim, so every refinement of it is another proxy. The
-  # direct question is the one the guard actually cares about: did that sprint declare these paths?
-  # If a mislabelled commit touches a file the cited sprint never declared, the citation is wrong
-  # and the file is undeclared work -- which is exactly what this checker exists to report. No
-  # window is consulted, so the three archived sprints with unresolvable commit shas stop being a
-  # special case too.
-  owns_commit() {
-    _q=$1; _c=$2
-    _dl=$(sed -n "s@^$_q @@p" "$archived_decls") || return 1
-    [ -n "$_dl" ] || return 1
-    for _f in $(git diff-tree --no-commit-id --name-only -r "$_c" 2>/dev/null); do
-      is_excluded_committed "$_f" && continue
-      covers "$_dl" "$_f" || return 1
-    done
-    return 0
-  }
 
   # A declared token ending in "/" is a DIRECTORY prefix covering every path beneath it (SPRINT-055
   # T1). Before that, such a token was accepted and matched nothing, so it read as a declaration
@@ -512,16 +498,14 @@ for sp in "$@"; do
     # leak: the unit of ownership is the commit, so the unit of exclusion must be too.
     c_sprint=$(commit_sprint "$c")
     if [ -n "$c_sprint" ]; then
-      # Two ownership tests, deliberately asymmetric (TD-125).
-      # An ACTIVE sibling is skipped on its NUMBER alone: it is another stream's live work, its
-      # window is open, and reporting it here would be this checker blaming one stream for another's
-      # in-flight commits. That is the pre-existing behaviour and is unchanged.
+      # ONE ownership test, and it decides BOTH arms (ADR-040). sibling_sprints holds every other
+      # sprint number this checker can see -- active siblings from "$@", archived ones discovered by
+      # filename above -- and a commit citing any of them is that sprint's work, not this sprint's
+      # undeclared change. There is no second, stricter test for the archived arm: the asymmetry the
+      # comment here used to assert as deliberate is exactly what TD-141 recorded and what ADR-040
+      # removed. Reporting an archived sibling's commits instead is TD-125's defect; refining the
+      # trust is the three-design loop L-190 records. The accepted cost is documented above.
       case " $sibling_sprints " in *" $c_sprint "*) continue ;; esac
-      # An ARCHIVED sprint must additionally OWN the commit -- its window has to contain it. The
-      # number alone is not enough: it is a string in a commit subject, and trusting it would exempt
-      # any commit citing any of the archive's numbers from the undeclared-file check (found by
-      # review, reproduced live). A closed sprint owns its history forever, but only ITS history.
-      owns_commit "$c_sprint" "$c" && continue
     fi
     who=$(attribute "$c")
     for f in $(git diff-tree --no-commit-id --name-only -r "$c" 2>/dev/null); do
