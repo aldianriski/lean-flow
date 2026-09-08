@@ -4,6 +4,7 @@ slug: rule-the-ownership-tension
 owner: Maintainer
 last_updated: 2026-09-08
 status: active
+gates_signed: G1,G2 @ 42ffbdd
 plan_commit: 896fc18
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -92,8 +93,16 @@ and why, and it answers for archived **and** active siblings in the same sentenc
       check L-009 exists for, which caught one missing separator here
 
 ### T2 — Correct TD-125's stated cause and every artifact that repeats it `[size: S · risk: low · class: mechanical-ingest · AFK · J1]`
-Layers: TECH-DEBT.md · TODO.md · docs/sprint/SPRINT-095-guards-that-misreport.md
-Depends-on: none — independent of T1's ruling; the cause is wrong either way
+Layers: TECH-DEBT.md · TODO.md · docs/sprint/SPRINT-095-guards-that-misreport.md · docs/sprint/SPRINT-094-guards-for-what-nothing-reads.md
+<!-- Layers widened mid-sprint by the 2026-09-08 batch-G2 `scope-change` entry, logged before this
+     line was edited: SPRINT-094:190 carries the identical cause claim with the identical stale
+     `:429`, and the frozen Acceptance says *no live artifact*, so the declared set was narrower than
+     the criterion it serves (L-186 at the artifact-set level). Owner-ruled to widen. -->
+
+Depends-on: none for the RULING — the cause is wrong either way. **Ordered after T3 at batch G2**
+(`scope-change`, 2026-09-08): T2's deliverable is line numbers inside `check-layers-observed.sh` and
+T3 rewrites that file, so in Plan order every figure T2 freezes is stale within one commit (L-130).
+The two are file-disjoint, so only the figures bind — and they bind T2 to T3.
 Cites: TD-125 · TD-131 · SPRINT-095 T1 Execution Log · `check-layers-observed.sh` · `qa-check.sh`
 
 TD-125 names `check-layers-observed.sh`'s `*/archive/*` filter as the mechanism. Measured, that line
@@ -110,13 +119,21 @@ upstream glob is named in its place.
 - [ ] `TASK-298`'s Backlog entry and SPRINT-095's T1 text carry the same correction — *Verify: a
       corpus grep for the old claim over live paths returns zero, with `.claude/worktrees/` excluded
       (a bare `grep -r` counts three repo copies as content — L-170)*
-- [ ] TD-131 notes that `fmv()` gained a call site (archived sprint files) — reachable from one more
-      place, unchanged in nature
+- [ ] TD-131 records the archived-file `fmv()` call site's **life and removal** — SPRINT-095 T1 added
+      it, SPRINT-096 T3 reverts it, so the row's CRLF exposure is unchanged — *restated at batch G2 on
+      owner ruling, `scope-change` logged. The frozen wording ("`fmv()` **gained** a call site") is
+      falsified by this sprint's own T3: ADR-040 discovers archived sprints from their FILENAMES, with
+      no frontmatter read, so the call site does not survive the sprint. Ticking the frozen words would
+      record a fact SPRINT-096 erases (L-088)*
 - [ ] The line number is **derived, not quoted from either artifact** — TD-125 cites 429 and
       `TASK-298` cites 430 for the same statement, so at least one is already stale (L-130)
 
 ### T3 — Bring the sibling skip into line with the ruling `[size: S · risk: med · class: execution · HITL · J1]`
-Layers: scripts/lib/check-layers-observed.sh · evals/fixtures/layers-observed/** · evals/run-layers-observed-fixtures.sh
+Layers: scripts/lib/check-layers-observed.sh · evals/run-layers-observed-fixtures.sh
+<!-- `evals/fixtures/layers-observed/**` dropped at batch G2: the directory does not exist and never
+     did — this harness generates its fixture trees inline. A declaration naming a path the tree does
+     not have is a prediction, not a live declaration (L-100). Logged, no owner ruling needed. -->
+
 Depends-on: T1
 Cites: TD-141 · TD-125 · ADR-029 (Tier **G**) · L-142 · L-166 · L-169 · L-186
 

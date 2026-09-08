@@ -199,3 +199,91 @@ lockstep DoD does not apply · Plan at 188 lines against a 400 cap.
 would have pushed on, and it is the half nobody pushed on.
 
 consequence · T1 · behaviour:low · governance:high
+
+---
+
+### 2026-09-08 | progress | batch G1 + G2 signed over T2 and T3; four rulings taken
+
+**Mode is `sprint-bulk`** — the owner asked for the remaining Plan, not a single task. T1 was gated
+alone under `mvp`, so this is the first pass that covers the whole Plan and the first that may write
+`gates_signed:`. Written now at `42ffbdd`; its absence until this moment was load-bearing (L-099).
+
+**G1 ran the full checklist for both tasks, no fast-path.** `TASK-332` is `origin: close-retro` and
+`TASK-298` is `origin: manual` — neither passed `/task-decomposer`'s intake grill, so there is no
+prior scope agreement for a fast-path to re-confirm. Read from the `origin:` field in each entry,
+not inferred from how the entries read.
+
+**Shared-file ownership map: EMPTY, and that is the finding.** T2 declares `TECH-DEBT.md` ·
+`TODO.md` · `SPRINT-095`; T3 declares the checker and its eval runner. **No file is touched by both**,
+so nothing about files forces an order — which matters because the frozen Plan's order turns out to be
+wrong for a different reason (below). D2's serialisation of `TECH-DEBT.md`/`TODO.md` was a T1↔T2
+constraint and is discharged: T1 has committed.
+
+**A2 re-derived, as the Assumption required, and by READING rather than by re-running the 85-pair
+measurement — which is the stronger proof.** `qa-check.sh:1198` hands the checker
+`ls docs/sprint/SPRINT-*.md`, non-recursive, so an archived sprint file never enters `"$@"`. The
+`*/archive/*` filter at `check-layers-observed.sh:397` operates on `"$@"`. It is therefore not merely
+ineffective for archived sprints, it is **unreachable** for them — a deductive result the 85-pair
+count can only corroborate. A2 confirmed.
+
+**Every line number re-derived at HEAD, and three of four cited figures are stale** (L-130 — a value
+in a frozen artifact is a query result, re-queried at execution):
+
+| Statement | Cited in artifacts | Derived at `42ffbdd` |
+|---|---|---|
+| sibling-loop `*/archive/*` filter | `:397` | `check-layers-observed.sh:397` — correct |
+| the skip consuming `sibling_sprints` | `:429` (TD-125, SPRINT-094) · `:430` (SPRINT-095) | **`:519`** — both stale |
+| the non-recursive `ls` upstream | `qa-check.sh:1013` (TASK-332) | **`qa-check.sh:1198`** — stale |
+
+Cross-checked rather than taken from one query: `:519` agrees with T1's own entry above, which
+recorded `check-layers-observed.sh:519` in the current tree against `:430` at `2335eab~1`.
+
+consequence · T2,T3 · behaviour:low · governance:high
+
+---
+
+### 2026-09-08 | scope-change | four G2 rulings amend § Plan — logged BEFORE the Plan is edited
+
+Per §9 and ADR-014. Four findings, all surfaced as one frontier round and all ruled by the owner.
+
+**(1) Execution order swaps to T3 → T2.** *What broke:* the Plan lists T2 first and declares
+`Depends-on: none`. True of T1's ruling — the cause is wrong either way — and **false of the figures**.
+T2's entire deliverable is line numbers inside `check-layers-observed.sh`, and T3 rewrites that file;
+in Plan order every figure T2 freezes is stale within one commit, which is L-130 in the same sprint
+that just re-derived three stale ones. *Impact:* execution order only. The § Plan task numbering is
+untouched — Tn is an identity, not a schedule — and no `Layers:` changes for this. The files are
+disjoint, so nothing opposes the swap. **Ruled: T3 first.**
+
+**(2) T2's `Layers:` gains `docs/sprint/SPRINT-094-guards-for-what-nothing-reads.md`.** *What broke:*
+T2's Acceptance says *no live artifact* still names the `*/archive/*` filter as the cause, but its
+declared set names three files, and a corpus grep with `.claude/worktrees/` and `docs/sprint/archive/`
+excluded (L-170) finds the identical claim carrying the identical stale `:429` at **SPRINT-094:190**.
+This is **L-186 at the artifact-set level** — the detection is sound, the member set it runs over is
+not — and it is worth naming as the promoted rule's first live catch outside a fixture. "It is a
+closed sprint" does not discriminate: SPRINT-095 is `status: closed` too and was always in scope.
+*Impact:* T2's `Layers:` gains one file; its Acceptance becomes reachable. **Ruled: widen.**
+
+**(3) T2's DoD 3 is restated — TD-131 records the call site's life AND its removal.** *What broke:*
+the criterion requires TD-131 to note that `fmv()` **gained** a call site on archived sprint files.
+ADR-040 discovers archived sprints from their **filenames — no frontmatter read** — so T3's revert
+deletes that call site. Ticking the wording as frozen would record a fact this same sprint erases,
+which is the DoD-went-stale shape (L-088), distinct from a scope shift. *Impact:* TD-131 instead
+records that SPRINT-095 T1 added an archived-file `fmv()` call site and SPRINT-096 T3 reverted it, so
+the row's CRLF exposure is **unchanged** — honest against the end-state tree and still discharging the
+row's intent. **Ruled: restate, not drop.**
+
+**(4) T3's `Layers:` corrects `evals/fixtures/layers-observed/**` → the runner alone.** That directory
+does not exist; the fixtures are generated inline by `evals/run-layers-observed-fixtures.sh`. A
+declaration naming a path the tree does not have is a `Layers:` written as a prediction rather than
+maintained as a live declaration (L-100). No owner ruling needed — corrected and logged.
+
+**Also ruled in the same round, changing no Plan text:** T3's DoD 7 outside reviewer **is authorised**
+— one worktree-isolated reviewer, pinned to the shipped ref, with no `git add -A` crossing it
+(L-165 · L-168). This session's standing "no Agent dispatch unless asked" is what made T1 self-review
+only; the owner lifted it for T3 specifically, on the ground that T3 *is* the guard and L-165's whole
+finding is that no self-pass reaches this class.
+
+**Re-confirm G2:** signed by the owner in the round that took all four rulings, each named in its own
+question rather than folded into an approval of something else.
+
+consequence · T2,T3 · behaviour:low · governance:high
