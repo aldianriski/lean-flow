@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-07
+last_updated: 2026-09-08
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -16,29 +16,48 @@ status: current
 
 ## Active Sprint
 
-> **None — the pointer is cleared.** SPRINT-095 closed **early on 2026-09-07 at 7 of 27 DoD**, by
-> owner decision rather than exhaustion. `TASK-328` shipped (the dispatch preflight no longer invents
-> dependency edges); `TASK-298` is **held unticked** on a structural finding; `TASK-326` and
-> `TASK-329` were never started and remain in the Backlog below. Written up in
-> [`CHANGELOG.md`](CHANGELOG.md); the Plan and its log stay at
-> [`docs/sprint/SPRINT-095-guards-that-misreport.md`](docs/sprint/SPRINT-095-guards-that-misreport.md)
-> until §11 archival is approved. **Single stream** — `stream:` stays omitted.
+> **SPRINT-096 — Rule the Ownership Tension** → [`docs/sprint/SPRINT-096-rule-the-ownership-tension.md`](docs/sprint/SPRINT-096-rule-the-ownership-tension.md)
 >
-> **Next**: `/triage` (two close-Retro follow-ups landed at P2), then `/lean-doc-generator promote`.
-> **`L-186` is promotable** (`count: 2`, `promoted: no`) and must be resolved at that promote.
+> Promoted 2026-09-08 from the P0/P2 unblock path, not the P1 epic lead: `TASK-331` (rule the
+> tension) → `TASK-332` (correct TD-125's cause) → `TASK-298` (bring the sibling skip into line).
+> **Single stream** — `stream:` stays omitted. `epic:` is omitted too: these are attribution-guard
+> tasks, not EPIC-015 members. **Gates are NOT signed** — `gates_signed:` is absent from the sprint
+> frontmatter and its absence means exactly that; an unattended run reads the sprint file and nothing
+> else (L-099).
 >
-> **Read `TASK-331` before touching archived-sprint ownership again.** Three designs were each broken
-> by an independent review, each the same laundering class one level deeper — cited number, then
-> number + window (windows nest: SPRINT-089/090 share a close commit), then number + declarations
-> (`docs/LEARNINGS.md` is declared by **74 of 91** archived sprints). A commit subject is an
-> unverifiable claim, so refining it produces another proxy, not a fix (**L-190**). The decisive fact
-> is that **the laundering channel is pre-existing** — the active-sibling skip has always trusted the
-> cited number with no test at all (**TD-141**, `high`). A fourth attempt without a ruling repeats the
-> loop.
+> **Read `TASK-331` first.** Three designs were each broken by an independent review, each the same
+> laundering class one level deeper — cited number, then number + window (windows nest: SPRINT-089/090
+> share a close commit), then number + declarations (`docs/LEARNINGS.md` is declared by **74 of 91**
+> archived sprints). A commit subject is an unverifiable claim, so refining it produces another proxy,
+> not a fix (**L-190**). The decisive fact is that **the laundering channel is pre-existing** — the
+> active-sibling skip has always trusted the cited number with no test at all (**TD-141**, `high`). A
+> fourth attempt without a ruling repeats the loop.
 >
-> **SPRINT-092, 093, 094 and now 095 are unarchived — §11 retention still PARKED**, and TD-125's
-> blocker is **NOT** cleared: T1 did not ship. Archiving 092/093 together remains the documented
-> workaround; archiving one alone still moves 092's blamed pairs 3 → 85.
+> **`L-186` was promoted at this promote** → `.claude/CLAUDE.md` § Anti-Patterns, clause **(iv)** of
+> the Tier-G bar. Nothing else is promotable: 7 of 169 entries carry `count ≥ 2` and it was the only
+> one still `promoted: no`.
+
+**§11 retention — four actions applied at the SPRINT-096 promote, on owner approval.**
+**SPRINT-092 and 093 are ARCHIVED** (Plans → `docs/sprint/archive/`, logs → `archive/logs/`, one
+commit, INDEX rows for both). Moved as a **pair** per TD-125, and measured rather than assumed: clean
+HEAD reported 6 FAILs across the four sprints; after the move, what `qa-check` passes (094 + 095 only)
+reports the same 4 — two removed, none added. **SPRINT-094 and 095 remain unarchived.** Also applied:
+CHANGELOG rotation (v1.58.0 · v1.59.0 · v1.60.0 → `docs/changelog/`, root 416 → 310 lines, two minors
+inline as §11 requires); five 093-cohort debt rows deleted on the clock S-094 set (**TD-109 · TD-110 ·
+TD-111 · TD-112 · TD-123**; `TD-101`/`TD-113` stay, due SPRINT-097); and 103 promoted learnings
+collapsed to their §11 pointers (`docs/LEARNINGS.md` 1226 → 916). **Not taken:** the `TODO.md` prune —
+this file stays **551** against a 320 soft cap, and this § Active Sprint narrative is still the
+remaining prune candidate (it restates `CHANGELOG.md` — L-008; owner-gated).
+
+**The debt ledger holds 76 rows — 74 open, 2 not-open**, of which **5 open rows are `severity: high`**
+and all five carry a Backlog entry: `TD-141` → `TASK-331` · `TD-132` → `TASK-328` · `TD-128` and
+`TD-117` → `TASK-329` · `TD-090` → `TASK-322`. **Derive those counts by anchoring to the row header** —
+a bare `grep 'status: open'` over this ledger over-counts, because the rows quote their own status
+strings in prose (L-108). The ≥3-sprints aging figure is **61 of 74**, derived at this promote and
+recorded in the ledger's own sweep note; re-derive it next promote rather than reading it from here
+(L-097 · L-130). **One row is flagged rather than closed: `TD-132` is still `open` although its
+tracker `TASK-328` shipped at SPRINT-095** — a sweep closes a row by reading the tree, and this one
+did not re-derive TD-132's claim.
 
 **SPRINT-092 shipped the §4 conversion and measured it.** Default-profile saving **22.4–27.9 s**
 (23.4–28.2 s removed, 0.37–0.98 s added), with §4 rules still evaluating on every bare run. The saving
@@ -50,35 +69,19 @@ all (they moved to opt-in, D4). Total work across both profiles went **up** ~76�
 No clean whole-gate sample was obtained: the default profile exceeds the 600 s command ceiling on this
 host and the opt-in profile measures 1450 s, while `qa-budget-default` passes by comparing the
 *configured* budget to the ceiling rather than the actual runtime (**TD-128**). A pruning of 18 stale
-worktrees (178 MB) was tried as the cause and **disproved** — 1413 s before, 1450 s after.
+worktrees (178 MB) was tried as the cause and **disproved** — 1413 s before, 1450 s after. Three have
+accumulated again under `.claude/worktrees/`.
 
 **The §11 prune is DONE — ruled by the owner at the 2026-09-07 `/triage`.** `TASK-318` · `323` ·
 `324` · `325` shipped at SPRINT-094 (T3 · T4 · T1 · T2) and their Backlog entries are removed; the
 durable home is `CHANGELOG.md` + the sprint file + git, and the ids are recorded as never-reused in
 § P3 below. They had been re-proposed at three consecutive closes.
 
-**The Backlog is now ranked, epic-first (owner ruling, same pass).** Four tiers replace the single
+**The Backlog is ranked, epic-first (owner ruling, same pass).** Four tiers replace the single
 undifferentiated P1: **P0** `TASK-298`/`328` (each blocks work that is otherwise ready) · **P1**
 `TASK-319`/`296`/`297`/`300`/`326` (EPIC-015 § Closed-when 1 · 5 · 6 lead) · **P2**
 `TASK-320`/`321`/`322`/`329` · **P3** `TASK-188`/`327`, opportunistic by ruling and not
 schedulable. Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
-
-**Figures re-derived at that `/triage`, not carried forward.** TODO.md is **551** lines against §2's
-cap of 320. The 2026-09-07 pass moved it 471 → 442 (`/triage`) → the figure above (decompose): the
-four shipped entries took ~140 lines off, and the three escalation stubs, once decomposed into two
-fully-specified Tier G tasks, put more back than they removed. The cap is still missed and this
-§ Active Sprint narrative is the remaining prune candidate (it restates
-`CHANGELOG.md` — L-008; owner-gated, not taken here). The debt ledger holds **77 rows — 70 open, 7
-not-open** (reconciled: 70 + 7 = 77), of which **4 open rows are `severity: high`** — and **all four
-now carry a Backlog entry**, which was the finding: `TD-090` → `TASK-322`, `TD-132` → `TASK-328`,
-`TD-128` and `TD-117` → `TASK-329` (the two merged at the 2026-09-07 decompose). Three of them had
-no entry at all, against the ledger's own auto-escalate rule. **Derive those counts by anchoring
-to the row header** — a bare
-`grep 'status: open'` over this ledger returns 72 open / 11 resolved against 77 rows, because the
-rows quote their own status strings in prose (L-108). **The ≥3-sprints aging count is deliberately
-NOT restated here** — it is a promote-time derivation and the last figure on this line (*56 of 63*)
-was already a sprint stale; re-derive it at the next promote against the ledger rather than reading
-it from this file (L-097 · L-130).
 
 ---
 
