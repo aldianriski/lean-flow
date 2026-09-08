@@ -1540,6 +1540,87 @@ case "$c11_out" in
   *) echo "PASS fixture(archived-selection B: slugless member reached by the same selection): src/theirs-b.js not blamed on the active sibling" ;;
 esac
 
+# ================================================================================================
+# case: an ARCHIVED sprint sharing the ACTIVE subject's own number must not become its own sibling
+# -- the TOTAL-BYPASS shape (SPRINT-096 T3, found by that task's independent reviewer).
+#
+# The active loop has carried a self-sibling guard since TASK-299, and "ownership leg G" above pins
+# it: two ACTIVE sprint files declaring the same `sprint:` would make one its own sibling, and every
+# `sprint(NNN) Tn:` commit it made would then be skipped by its own check. That is a total guard
+# bypass, not a narrow miss, and it was verified live before the guard existed.
+#
+# SPRINT-096 T3 gave the ARCHIVED discovery loop the same guard, for the same reason -- and did not
+# give it a case. The reviewer seeded its removal and the whole 59-fixture suite still reported
+# "all green", then reproduced the live consequence: with the guard gone, a genuinely undeclared
+# file committed under the subject's own number is silently swallowed and the checker reports PASS.
+#
+# The gap is exactly the one L-165 describes: the branch was written, commented ("Same self-sibling
+# guard as the active loop"), and believed -- by an author who had the governing rule loaded -- and
+# only an outside pass noticed that believing it is not testing it. It is also the DIFFERENCE
+# between L-166 and L-186: the guard was proven reachable for its motivating artifact and for the
+# population of archived sprints, while one of its own BRANCHES had no case at all.
+#
+# Asserted in the loud direction only, deliberately: the failure being guarded against is a silent
+# PASS, so the case must FAIL by name. A "does it stay quiet?" half would be satisfied by a checker
+# that had stopped running.
+# ================================================================================================
+c12="$work/archived-shares-active-number"
+mkdir -p "$c12/docs/sprint/archive" "$c12/src"
+cat > "$c12/docs/sprint/SPRINT-960-active.md" <<'SP960'
+---
+sprint: 960
+slug: active
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+## Plan
+
+### T1 — Declares only its own file
+Layers: `src/declared.js`
+Depends-on: none
+SP960
+printf 'x\n' > "$c12/src/declared.js"
+git -C "$c12" init -q
+lock_plan "$c12" 'docs/sprint/SPRINT-960-active.md'
+# An ARCHIVED file whose FILENAME carries the same number as the active subject -- a superseded
+# draft, a copy-paste at promote, a restored-then-re-archived sprint. The filename is the whole
+# input to the archived selection, so this is all it takes.
+cat > "$c12/docs/sprint/archive/SPRINT-960-superseded-draft.md" <<'SP960B'
+---
+sprint: 960
+slug: superseded-draft
+status: closed
+plan_commit: 0000000
+close_commit: 0000000
+---
+
+## Plan
+
+### T1 — A superseded draft carrying the same number
+Layers: `src/anything.js`
+Depends-on: none
+SP960B
+commit_all "$c12" 'sprint(960) T1: record the same-numbered archived file'
+# The subject sprint's OWN undeclared work, under its OWN number. If the archived file became a
+# sibling, this commit is skipped by the very sprint that made it and the file vanishes from the
+# report -- every one of 960's commits would, which is why this is total rather than narrow.
+printf 'y\n' > "$c12/src/undeclared.js"
+commit_all "$c12" 'sprint(960) T1: real undeclared work under the subject own number'
+
+# Premise assertion (L-142): the two numbers must actually collide, or the case tests nothing while
+# still going green. Derived from the filename the same way the checker derives it, not asserted.
+c12_an=$(printf '%s' 'SPRINT-960-superseded-draft.md' | sed -n 's/^SPRINT-\([0-9][0-9]*\).*/\1/p')
+c12_my=$(awk -v k=sprint 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$c12/docs/sprint/SPRINT-960-active.md")
+if [ "$c12_an" != "$c12_my" ]; then
+  echo "FAIL fixture(archived-shares-active-number: premise not established): archived filename yields '$c12_an' but the subject is '$c12_my' -- they must collide or this case exercises nothing"
+  fail=1
+fi
+
+run_case_anywhere "archived-shares-active-number: same-numbered archive is not a sibling (total-bypass guard)" 1 \
+  "src/undeclared.js" -- \
+  sh -c "cd \"$c12\" && sh \"$checker\" docs/sprint/SPRINT-960-active.md"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-OBSERVED FIXTURES: all green"; else echo "LAYERS-OBSERVED FIXTURES: at least one FAIL"; fi
 exit $fail
