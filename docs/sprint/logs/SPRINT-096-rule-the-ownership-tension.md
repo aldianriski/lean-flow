@@ -434,3 +434,55 @@ about, even though the declaration's *content* would not change. The durable que
 is correct, and that is a ruling rather than an edit. Filed with the measurement attached.
 
 consequence · T2,T3 · behaviour:low · governance:high
+
+---
+
+### 2026-09-09 | review | T3's outside reviewer found the one thing no self-pass reached — and it was a branch, not a population
+
+**Dispatched worktree-isolated against the shipped ref `a333134`**, per DoD 7 and the owner's batch-G2
+authorisation. Isolation verified after the fact rather than assumed: the working tree came back
+clean and `git hash-object scripts/lib/check-layers-observed.sh` still equalled
+`d50f083bb72f50517896f73a542130c49410861b`, so nothing the reviewer seeded crossed into this tree
+(L-168 — adversarial verification *writes*, and a non-isolated reviewer plus any `git add -A` ships a
+corrupted guard inside an unrelated commit).
+
+**Verdict: no defect in the shipped code; one real, reproduced gap in the suite's defenses.**
+
+**What it cleared, each against the artifact:** the commit's own numeric claims (`--numstat` really is
++70/-86; the stated pristine hash really is the file's); 59 PASS / 0 FAIL reproduced twice; no live
+reference to the deleted `owns_commit` / `archived_decls`; and — the class this change was most at
+risk from — **it could not construct a selection-level miss.** It re-derived the population
+independently (93 filenames parse, all match their own frontmatter string-for-string including
+zero-padding, no duplicates), checked `dirname`-relative discovery under an absolute invocation path
+containing a space, and confirmed the non-recursive glob correctly excludes `archive/logs/` while
+leaving no orphan. That is the L-186 axis independently re-derived and agreeing.
+
+**The finding: the archived loop's self-sibling guard has no case.** T3 wrote it, commented it *"Same
+self-sibling guard as the active loop"*, and believed it. The active loop's twin has been pinned
+since TASK-299 by *ownership leg G*; the archived one, **newly load-bearing as of this commit**, had
+nothing. The reviewer seeded its removal and **all 59 retained fixtures still reported "all green"**,
+then reproduced the consequence live: an archived filename sharing the *active* subject's number
+makes that sprint its own sibling, so every one of its own `sprint(NNN)` commits is skipped by its
+own check and real undeclared work is swallowed at **exit 0**.
+
+**Reproduced here before fixing, not taken on report.** Seed 3 removes *only* the archived guard,
+leaving the active twin intact — 2 changed lines, parses, line delta **0**, hash `433b0a6…` — and
+**exactly one of 61 cases reddens**: the new one, reporting *"exit 0, expected 1"*, which is the
+silent PASS by name. Restored to `d50f083…` verified. Fixed in `ceb7924`; suite now **61 PASS / 0
+FAIL**.
+
+**Why this is worth a learning rather than just a fix.** Every bar in the Tier-G ladder was met and
+none of them asks this question. L-166 asks whether the guard is reachable for its *motivating*
+artifact — it was. L-186 asks whether it is reachable for every *other* artifact of the same kind —
+it was, across all 93. Both instruments sit at the level of the artifact SET. This defect was one
+level down: a **branch** of the guard, load-bearing, commented, and untested, in a file whose author
+had just written a fixture for every other branch. The tell was available and unread — *the comment
+says "same guard as the active loop", and the active loop's version has a named case while this one
+does not.* A `git log`-visible asymmetry between a new branch and the sibling it claims parity with.
+
+**L-165 observed again, exactly as stated:** the rule was loaded, the author had written the
+discrimination proof for two other seeds in the same session, and the miss was still invisible from
+the inside. Candidate for the close Retro.
+
+review · T3 · consequence · behaviour:high · governance:high — one scoped independent reviewer,
+worktree-isolated, one finding, fixed and re-proven. No builder retry was needed beyond it.

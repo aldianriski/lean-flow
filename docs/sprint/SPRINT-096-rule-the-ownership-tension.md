@@ -191,11 +191,17 @@ genuinely undeclared path still FAILs with its named finding.
       derived. So the motivating artifact proves the branch **reachable and correct**, which is what
       L-166 asks; it cannot prove behaviour changed, and the fixtures carry that half
 - [x] ✓ Retained must-FAIL fixture **per check**, each failing with its named finding, plus a sibling
-      control that stays green in the same run (L-058 · L-142) — ✓ 59 PASS / 0 FAIL / 0 NOTE. Three
-      sibling controls (`scripts/orphan.sh`, `src/orphan.js` ×2), each asserted to FAIL **by name** in
-      the same run as its silence assertion. The `archived-window` case is **INVERTED, not deleted** —
-      it now pins the accepted hole, so re-narrowing the rule fails loudly in either direction; an
-      accepted hole with no fixture is indistinguishable from an unnoticed one
+      control that stays green in the same run (L-058 · L-142) — ✓ **61** PASS / 0 FAIL / 0 NOTE.
+      Three sibling controls (`scripts/orphan.sh`, `src/orphan.js` ×2), each asserted to FAIL **by
+      name** in the same run as its silence assertion. The `archived-window` case is **INVERTED, not
+      deleted** — it now pins the accepted hole, so re-narrowing the rule fails loudly in either
+      direction; an accepted hole with no fixture is indistinguishable from an unnoticed one.
+      **This tick was FALSE when first taken at 59 cases, and the outside reviewer is what corrected
+      it** — *per check* was satisfied for every branch except one: the archived loop's self-sibling
+      guard, load-bearing as of this commit and commented *"same guard as the active loop"* whose own
+      twin has had a named case since TASK-299. Seeding its removal left all 59 green while real
+      undeclared work was swallowed at exit 0. Closed by `ceb7924`, re-proven below
+
 - [x] ✓ **A fixture that varies the SELECTION, not the verdict** (L-186) — a member reached by the
       other glob arm, so the guard is proven reachable for artifacts of the same kind and not only
       for its motivating one — ✓ two members, both directions of the axis: **A** an archived sprint
@@ -225,12 +231,21 @@ genuinely undeclared path still FAILs with its named finding.
       bytes coincide and the figures reproduce on any checkout. Pristine
       `d50f083bb72f50517896f73a542130c49410861b` → seed 1 `0bf8537…` → seed 2 `a7ce778…` → restored
       `d50f083…`, verified equal. No working-tree hash is mixed with a blob hash anywhere in the trail
-- [ ] An **outside reviewer**, dispatched worktree-isolated, passes the change (L-165 · L-168) —
-      *Verify: the review runs in its own worktree, and no `git add -A` crosses it*
-      <!-- Authorised at batch G2 (this session's standing no-dispatch instruction lifted for T3
-           specifically). Dispatched worktree-isolated against the shipped ref `a333134`, briefed to
-           hunt selection/population defects first. HELD OPEN until its findings are recorded and
-           acted on — ticking this before the reviewer returns is the failure it exists to prevent. -->
+- [x] ✓ An **outside reviewer**, dispatched worktree-isolated, passes the change (L-165 · L-168) —
+      *Verify: the review runs in its own worktree, and no `git add -A` crosses it* — ✓ **and it did
+      not pass on the first submission, which is the point.** Isolation verified after the fact
+      rather than assumed: the working tree returned clean and the checker's hash still equalled
+      `d50f083…`, so nothing the reviewer seeded crossed into this tree (L-168). It **cleared** the
+      class this change was most at risk from — it re-derived the population independently (93
+      filenames parse, all matching frontmatter string-for-string including zero-padding, no
+      duplicates), checked `dirname`-relative discovery under an absolute path containing a space,
+      and confirmed the non-recursive glob excludes `archive/logs/` leaving no orphan — and it
+      **found the branch-level gap above**, which every bar in the Tier-G ladder is structurally
+      blind to: L-166 asks about the motivating artifact, L-186 about the population, and both sit at
+      the artifact-set level while this sat one level down in a guard's own branches. Reproduced here
+      before fixing rather than taken on report; fixed in `ceb7924` and re-proven with seed 3 (only
+      the archived guard removed, active twin intact → **exactly one of 61 red**, restored under the
+      same single hash convention). One reviewer, one finding, no builder retry needed beyond it
 - [x] ✓ T1's ruling is recorded where the **code's** reader meets it, not only in the ledger —
       *Verify: `check-layers-observed.sh` carries the rule in a comment at the `sibling_sprints`
       build, and it is the rule T1 recorded, not a restatement* — ✓ the block at `:404` states the
