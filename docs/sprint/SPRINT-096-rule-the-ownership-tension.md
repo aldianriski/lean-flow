@@ -43,7 +43,7 @@ The repo cannot avoid both failures: report commits citing an archived sprint an
 positives make archiving turn the gate red; skip them and a commit subject launders real undeclared
 work. The pre-existing code already chose the second for **active** siblings and never said so, so a
 ruling that covers only archived siblings is inconsistent by construction. Not a fix — a ruling, plus
-the re-scoped shape T3 inherits.
+the re-scoped shape the code task inherits.
 
 **Acceptance:** a reader can point at one recorded decision that says which failure this repo accepts
 and why, and it answers for archived **and** active siblings in the same sentence.
@@ -60,13 +60,11 @@ and why, and it answers for archived **and** active siblings in the same sentenc
       commit subject
 - [ ] TD-141 records the ruling and its consequence; `TASK-298`'s Backlog entry is re-scoped to the
       shape that follows, or withdrawn if the ruling makes it moot
-- [ ] The ruling is recorded where the **code's** reader meets it, not only in the ledger — *Verify:
-      `check-layers-observed.sh` carries the rule in a comment at the `sibling_sprints` build*
 
 ### T2 — Correct TD-125's stated cause and every artifact that repeats it `[size: S · risk: low · class: mechanical-ingest · AFK · J1]`
 Layers: TECH-DEBT.md · TODO.md · docs/sprint/SPRINT-095-guards-that-misreport.md
 Depends-on: none — independent of T1's ruling; the cause is wrong either way
-Cites: TD-125 · TD-131 · SPRINT-095 T1 Execution Log
+Cites: TD-125 · TD-131 · SPRINT-095 T1 Execution Log · `check-layers-observed.sh` · `qa-check.sh`
 
 TD-125 names `check-layers-observed.sh`'s `*/archive/*` filter as the mechanism. Measured, that line
 alone changes nothing: 092 is blamed for 85 commit:path pairs with the filter present **and** deleted.
@@ -116,6 +114,9 @@ genuinely undeclared path still FAILs with its named finding.
       `git show <ref>:<path> | sha256sum`, never mixed with a working-tree hash
 - [ ] An **outside reviewer**, dispatched worktree-isolated, passes the change (L-165 · L-168) —
       *Verify: the review runs in its own worktree, and no `git add -A` crosses it*
+- [ ] T1's ruling is recorded where the **code's** reader meets it, not only in the ledger —
+      *Verify: `check-layers-observed.sh` carries the rule in a comment at the `sibling_sprints`
+      build, and it is the rule T1 recorded, not a restatement*
 
 ## Decisions (pre-locked)
 
