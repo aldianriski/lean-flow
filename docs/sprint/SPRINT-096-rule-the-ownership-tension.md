@@ -35,9 +35,13 @@ SPRINT-094/095 · shortening the 103 collapsed LEARNINGS headings to a gist.
 ## Plan
 
 ### T1 — Rule the archived-sprint ownership tension, then re-scope TASK-298 `[size: M · risk: high · class: decision · HITL · J2]`
-Layers: TECH-DEBT.md · TODO.md
+Layers: TECH-DEBT.md · TODO.md · docs/adr/ · docs/DECISIONS.md
+<!-- Layers widened mid-sprint by the 2026-09-08 `scope-change` entry in the Execution Log, logged
+     before this line was edited: the ruling clears STANDARD §4's three-part bar, so it is recorded
+     as ADR-040 rather than as prose in a debt row. G2 re-confirmed by the owner. -->
+
 Depends-on: none
-Cites: TD-141 · TD-125 · L-190 · SPRINT-095 T1 (closed at 0 of 6) · `scripts/lib/check-layers-observed.sh`
+Cites: TD-141 · TD-125 · L-190 · SPRINT-095 T1 (closed at 0 of 6) · `check-layers-observed.sh` · `docs/LEARNINGS.md` · `qa-check.sh`
 
 The repo cannot avoid both failures: report commits citing an archived sprint and TD-125's false
 positives make archiving turn the gate red; skip them and a commit subject launders real undeclared
@@ -49,17 +53,43 @@ the re-scoped shape the code task inherits.
 and why, and it answers for archived **and** active siblings in the same sentence.
 
 **DoD:**
-- [ ] The tension is stated as a genuine fork, with the cost of each side named — not a preference
-- [ ] The ruling covers **both** sibling kinds, and says so explicitly — *Verify: the recorded ruling
+- [x] The tension is stated as a genuine fork, with the cost of each side named — not a preference — ✓
+      ADR-040 § Context states it as *report and you get TD-125's false positives on archival; skip
+      and you get a laundering channel*, and § Consequences names a loser on the side taken (the
+      channel is open on both arms, bounded by the 96 sprint numbers that exist). **Judgment tick** —
+      no mechanical check reaches "is this fork genuine"
+- [x] The ruling covers **both** sibling kinds, and says so explicitly — *Verify: the recorded ruling
       names `sibling_sprints`' active arm as well as the archive arm; a ruling silent on one is
-      incomplete, which is the defect TD-141 records*
-- [ ] The three broken designs are listed as **rejected with their breaking reason**, so a fourth
-      attempt costs a re-read rather than a review cycle (L-190)
-- [ ] At least one option outside the three is costed — make archival not change the checker's input
+      incomplete, which is the defect TD-141 records* — ✓ **and the check failed first.** ADR-040 as
+      first written named neither `sibling_sprints` nor the active arm's own test; the pre-screen
+      returned 0 occurrences and the tick was held rather than taken. § Decision now names the
+      identifier and the active arm's `case " $sibling_sprints "` test explicitly, and rules both in
+      one statement (*"archived or active, with no further test"*). Pre-screen re-run: 3 occurrences,
+      both arms in § Decision. Recorded honestly as a **mechanical pre-screen over a judgment tick**
+      — EXISTS ✓ RUNS ✓ REACHES ✓ **PROVES ✗**: naming both arms is not the same as ruling well on
+      both, and no checker was invented to pretend otherwise (L-136)
+- [x] ✓ The three broken designs are listed as **rejected with their breaking reason**, so a fourth
+      attempt costs a re-read rather than a review cycle (L-190) — ✓ ADR-040 § Context lists all
+      three with the reason each died (91 numbers exempt anything · windows nest, SPRINT-089/090
+      share a close commit · declarations are shared, `docs/LEARNINGS.md` by 74 of 91), and
+      § Alternatives repeats designs 2 and 3 as rows so a reader who opens only that table still
+      meets them. **Judgment tick**
+- [x] ✓ At least one option outside the three is costed — make archival not change the checker's input
       set at all; accept the channel explicitly for both kinds; or find a signal that is not the
-      commit subject
-- [ ] TD-141 records the ruling and its consequence; `TASK-298`'s Backlog entry is re-scoped to the
-      shape that follows, or withdrawn if the ruling makes it moot
+      commit subject — ✓ **two** costed, both with derived figures rather than estimates: the
+      `qa-check.sh` glob change takes checker subjects **3 → 96** (`ls` on both directories) on a
+      gate that already cannot finish, and the `Sprint: NNN` trailer route is rejected on size not
+      merit — **0 of the last 60 commits carry any trailer** (`git log -60 --format='%(trailers:key=Sprint)'`),
+      and it cannot retro-fit 91 archived sprints. ADR-040 records the trailer route with an explicit
+      re-open condition
+- [x] ✓ TD-141 records the ruling and its consequence; `TASK-298`'s Backlog entry is re-scoped to the
+      shape that follows, or withdrawn if the ruling makes it moot — ✓ TD-141 carries the ruling, the
+      pointer to ADR-040, and stays `open` at `severity: high` because the tree still runs the
+      rejected design. `TASK-298` is re-scoped and retitled, with `depends-on:` now naming TASK-331
+      as shipped and its superseded `assumes:` marked false-and-measured-false. Ledger integrity
+      re-derived after the edit, not assumed: 76 rows before and after; TODO 15 task rows / 13
+      `ready` before and after, and every task row still preceded by a blank line — the fused-entry
+      check L-009 exists for, which caught one missing separator here
 
 ### T2 — Correct TD-125's stated cause and every artifact that repeats it `[size: S · risk: low · class: mechanical-ingest · AFK · J1]`
 Layers: TECH-DEBT.md · TODO.md · docs/sprint/SPRINT-095-guards-that-misreport.md
@@ -152,6 +182,12 @@ genuinely undeclared path still FAILs with its named finding.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/adr/ADR-040-commit-ownership-accepts-the-subject-claim.md` | T1 | the ruling itself — a commit subject is unverifiable, so the choice is which failure the repo accepts, not which proxy | Med | judgment; pre-screen confirms both arms + `sibling_sprints` named |
+| `docs/DECISIONS.md` | T1 | index row, so the ADR is reachable from the one page that lists them | Low | 39 → 40 rows, re-derived |
+| `TECH-DEBT.md` | T1 | TD-141 records the ruling and points at ADR-040; stays `open` because the tree still runs the rejected design | Low | 76 rows before and after; `Re-file fresh if` still the block's last line |
+| `TODO.md` | T1 | `TASK-298` re-scoped and retitled to the shape the ruling produces; its false `assumes:` marked measured-false | Low | 15 task rows / 13 `ready` unchanged; blank-line separation checked on every row (L-009) |
+| `docs/sprint/SPRINT-096-rule-the-ownership-tension.md` | T1 | T1 `Layers:` widened for the ADR, after the `scope-change` was logged | Low | 17 DoD before and after; `check-layers-completeness.sh` 6 PASS / 0 FAIL |
+| `docs/sprint/logs/SPRINT-096-rule-the-ownership-tension.md` | T1 | Execution Log created at the first entry; carries the `scope-change` and the G2 record | Low | n/a — append-only record |
 
 ## Retro
 

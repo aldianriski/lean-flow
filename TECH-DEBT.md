@@ -254,6 +254,24 @@ status: current
     input set at all (a `qa-check.sh` glob change rather than ownership logic); accept the channel
     explicitly and document it for BOTH sibling kinds; or find a signal that is not the subject.
   - **Do NOT "fix" this by widening an exclusion** — that is how each of the three designs died.
+  - **RULED at the SPRINT-096 T1 promote (2026-09-08) → [`ADR-040`](docs/adr/ADR-040-commit-ownership-accepts-the-subject-claim.md).**
+    The owner ruled the **second** option this row lists: **accept the channel explicitly, for BOTH
+    sibling kinds**, and stop paying for a proxy that cannot close it. A commit citing another
+    sprint's number belongs to that sprint — archived or active, no further test. SPRINT-095 T1's
+    declaration + window machinery is reverted (`2335eab` · `f1fdf02` · `e4547b3`, **+94 lines / 0
+    removed**, on `main` at **0 of 6 DoD**), because it holds one arm to a bar the other arm does not
+    meet, and an inconsistent bar is not a stronger guard — it is this row's tension wearing the
+    shape of one. Symmetric acceptance needs archived numbers *in* the trusted set, so archived
+    sprints are discovered from their **filenames** (no `git`, no frontmatter read, no window); a
+    literal revert would drop them from the set and flip the asymmetry rather than remove it.
+  - **The row stays `open` until T3 lands the code.** The ruling is recorded; the tree still runs the
+    rejected design. `severity` stays `high` for the same reason.
+  - **Consequence to carry forward:** `check-layers-observed.sh` is **not** a guard against a
+    dishonest commit subject and must not be cited as one. The two options *not* taken are recorded
+    in ADR-040 with their costs — the `qa-check.sh` glob change is dead on cost (checker subjects
+    3 → 96 on a gate that already cannot finish), and the `Sprint: NNN` git trailer is the only route
+    that closes the channel, rejected on size rather than merit. **Re-open the trailer route if the
+    accepted hole is ever exercised in anger.**
   - **Re-file fresh if** the ownership question is re-scoped, or a non-subject signal is found.
 
 - **TD-138** severity: medium | status: open | created: Sprint-095

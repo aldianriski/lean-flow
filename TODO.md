@@ -94,43 +94,43 @@ schedulable. Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H
 > Re-ranked at the SPRINT-094 `/triage` (2026-09-07). Each entry below blocks work that is otherwise
 > ready to start; the reason sits in its own `tracker:` line, not here.
 
-- [ ] TASK-298 — Keep an archived sprint owning its own commits  [size: S] [risk: med] [HITL]
+- [ ] TASK-298 — Make both sibling arms trust the cited number, per ADR-040  [size: S] [risk: med] [HITL]
       class:      execution
-      tier:       G (ADR-029 — this IS the attribution guard. Widening an exclusion is exactly how a
-                  guard acquires a silent false negative: too broad and real undeclared work walks
-                  through under cover of "another sprint owns it")
-      done-when:  a sprint moved to `docs/sprint/archive/` keeps owning its own commits — archiving a
-                  closed sprint no longer re-attributes its history to whichever active sprint shares
-                  its `plan_commit` window, while every genuinely undeclared path still FAILs.
-                  `check-layers-observed.sh:397` drops `*/archive/*` when building `sibling_sprints`,
-                  and **line 430** uses that list to skip another sprint's commits (TD-125 cites 429 — the file
-                  has shifted by one; re-derive rather than quoting either). The one list is
-                  answering two different questions — *is this sprint still active work?* (archive =
-                  yes, exclude) versus *does it own its commits?* (archive = irrelevant, a closed
-                  sprint owns its history forever). Proven on the **real 092/093 pair**, not fixtures
-                  alone (L-166), by archiving them and watching the gate stay green. Retained fixture
-                  + sibling control: an archived sprint's commits do NOT land on an active sibling,
-                  while a path declared by NO sprint still fails with its named finding. Seeded-break
-                  discrimination proof, seed verified landed by `cmp` and restored under ONE stated
-                  hash convention, artifact still parses, break targeted not demolition (L-142 · L-169)
-      touches:    scripts/lib/check-layers-observed.sh (the `sibling_sprints` build at :397 and the
-                  per-commit skip at :430) · evals/fixtures/layers-observed/** (new retained fixture
-                  pair) · evals/run-layers-observed-fixtures.sh
-      depends-on: none
-      assumes:    **NARROWED at the SPRINT-094 /triage, and the cut half is shipped — do not rebuild
-                  it.** This row originally carried two halves. The *active*-sibling half (two live
-                  sprints mis-attributing each other) shipped as **TASK-299**: `:392-402` now compares
-                  sprints by `sprint:` NUMBER rather than by path, and `:428-431` skips a sibling's
-                  commits WHOLE per commit rather than per file. Verified by reading the script at
-                  HEAD, not inherited from this line. What remains live is TD-125's *archived*-sibling
-                  half, reproduced in both directions and never addressed
-      tracker:    **TD-125** (the live half — 214 pass/0 fail with SPRINT-093 in place, 202 pass/1 fail
-                  after `git mv` to archive, ~70 files reported against a sprint that never touched
-                  them; the 12-check *pass*-count drop is the second signal and the one worth keeping)
-                  · TASK-299 + **TD-107** (the shipped half, and the record debt it left) ·
-                  L-020 · L-165/L-168 (isolated reviewer) · L-166 ·
-                  **unblocks** archiving SPRINT-092/093 (parked at three consecutive closes) and
-                  promoting EPIC-015 as stream 2
+      tier:       G (ADR-029 — this IS the attribution guard. The ruling NARROWS what it claims
+                  rather than widening an exclusion, but a guard that stops checking something must
+                  still fail loudly on everything it still checks)
+      done-when:  archived and active siblings are decided by **one** rule — the cited sprint number
+                  alone, no declaration test and no window test — per
+                  [`ADR-040`](docs/adr/ADR-040-commit-ownership-accepts-the-subject-claim.md), while
+                  every genuinely undeclared path still FAILs with its named finding. Concretely:
+                  SPRINT-095 T1's declaration + window machinery and its temp-file map are
+                  **reverted** (`2335eab` · `f1fdf02` · `e4547b3`, +94 lines / 0 removed, currently
+                  on `main` at 0 of 6 DoD), and archived sprint numbers are discovered from their
+                  **filenames** — no `git`, no frontmatter read, no window — so they land in
+                  `sibling_sprints` beside the active ones. A *literal* revert is NOT the task: it
+                  would drop archived sprints from the trusted set entirely and flip the asymmetry
+                  instead of removing it. The rule is named in a comment where the code's reader
+                  meets it, and it cites ADR-040 rather than restating it
+      touches:    scripts/lib/check-layers-observed.sh (the `sibling_sprints` build and the
+                  per-commit skip — re-derive both line numbers, do not quote them from here) ·
+                  evals/fixtures/layers-observed/** · evals/run-layers-observed-fixtures.sh
+      depends-on: TASK-331 — SHIPPED as SPRINT-096 T1, ADR-040 recorded 2026-09-08
+      assumes:    **The archival half of this task's original motivation is already resolved, and
+                  measured — do not rebuild it.** SPRINT-092 and 093 were archived as a pair at the
+                  SPRINT-096 promote and the gate did not go red: clean HEAD reported 6 FAILs across
+                  the four sprints; after the move, what `qa-check` passes (094 + 095 only) reports
+                  the same 4 — two removed, none added. What remains is making the RULE consistent,
+                  not making archival possible. **The earlier `assumes:` on this row is superseded**:
+                  its active-sibling half shipped as `TASK-299`, and its statement that the
+                  `*/archive/*` filter at the `sibling_sprints` build is the operative mechanism is
+                  **false and measured false** — 092 is blamed for 85 commit:path pairs both with
+                  that line present and with it deleted; the mechanism is `qa-check.sh` handing the
+                  checker a non-recursive `ls docs/sprint/SPRINT-*.md`. Correcting that claim
+                  wherever it still appears is `TASK-332`'s subject, not this row's
+      tracker:    **ADR-040** (the ruling) · **TD-141** (stays `open` until this lands — the tree
+                  still runs the rejected design) · TD-125 · TASK-299 + TD-107 · L-020 ·
+                  L-165/L-168 (worktree-isolated reviewer, mandatory — Tier G) · L-166 · L-186
+                  (vary the SELECTION, not the verdict) · L-190
       origin:     manual
       state:      ready
 
