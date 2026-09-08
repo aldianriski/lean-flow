@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-05
+last_updated: 2026-09-08
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -203,6 +203,31 @@ status: current
 > · 3 soft over-cap — `TODO.md` · `docs/research/adlc-epic-sequencing.md` ·
 > `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` (TD-082's reasoned carry, not
 > re-litigated).
+
+> **Aging sweep — SPRINT-096 promote (2026-09-08).** **61 of 74 open rows** are ≥3 sprints
+> unaddressed. Derived, then cross-checked against a second query that agrees: 74 open − 9 filed at
+> Sprint-094 − 4 filed at Sprint-095 = 61. Both figures are anchored to the `^- **TD-NNN**` row
+> header, never a bare `grep 'status: open'` — the rows quote their own status strings in prose and
+> a substring count returns a different, wrong number (L-108). Trend, unbroken: 14/19 (S-078) →
+> 16/22 (S-080) → 17/24 (S-081) → 22/25 (S-083) → 24/28 (S-084) → 27/37 (S-086) → 56/63 (S-094) →
+> **61/74 (S-096)**. The count has risen at every sweep since S-078.
+> **Escalation: 5 `severity: high` open rows, and all five already carry a Backlog entry** — TD-141
+> → `TASK-331` · TD-132 → `TASK-328` · TD-128 + TD-117 → `TASK-329` (merged at the 2026-09-07
+> decompose) · TD-090 → `TASK-322`. Nothing new escalates. **One row is flagged rather than
+> escalated: `TD-132` is still `status: open` although its tracker `TASK-328` shipped at
+> SPRINT-095.** Not closed here — S-094's own lesson was that a sweep must close a row by reading
+> the tree, and this sweep did not re-derive TD-132's claim.
+> **Deletion clock — executed on schedule.** The S-094 sweep recorded that the 093 cohort becomes
+> deletable at the SPRINT-096 promote; five rows are deleted here: **TD-109 · TD-110 · TD-111 ·
+> TD-112 · TD-123**. **`TD-101` and `TD-113` stay** — the same note puts them at **SPRINT-097**,
+> because their clock runs from the S-094 sweep that verified them, not from the sprint that fixed
+> them. Ids stay monotonic: none of the five is ever reused. Ledger 81 → 76 rows (2760 → 2566 lines);
+> id set diffed before and after, and the `- Summary:` count fell 81 → 76 in step, so no neighbouring
+> row was fused by the deletion (L-009).
+> **§2 cap breaches (sourced from `check-doc-caps.sh`, never restated from a list):** 76 PASS · 0 FAIL
+> · 3 soft over-cap — `TODO.md` · `docs/research/adlc-epic-sequencing.md` ·
+> `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` (TD-082's reasoned carry). The
+> `TODO.md` prune was offered at this promote and **not taken** — it stays 551 against a 320 soft cap.
 
 - **TD-141** severity: high | status: open | created: Sprint-095
   - Summary: **Commit ownership cannot be decided from a commit subject, and the laundering channel
@@ -681,31 +706,6 @@ status: current
     append — the same missing mechanism **TD-122** is filed against. Route the two together: neither is
     closable by better parsing of an artifact that does not record the fact.
 
-- **TD-123** severity: high | status: resolved → SPRINT-093 T5 | created: Sprint-093
-  - Summary: **`check-authority.sh` applies the unattended park protocol to every run, including
-    attended ones, and never reads the run mode.** Its `J2` branch FAILs any task carrying an execution
-    record (`consequence · Tn · `) without a park record (`Tn · parked`). But **parking is what an
-    unattended run does INSTEAD of asking** — in an attended run with the owner present and gates
-    signed, there is no park step to perform, and no ask channel is missing.
-  - Reproduced live: SPRINT-093 T1 and T2 were executed attended, under signed G1/G2 and an explicit
-    owner direction to run both streams, and the leg reports
-    `authority-j2-not-parked` for both. `scripts/qa-check.sh` consumes this leg, so **the gate is RED
-    and, per ADR-021, the sprint cannot close** — on work the owner authorized.
-  - **This is L-105's family — a guard placed correctly in text and wrongly in time.** The protocol it
-    enforces is `night-run.md` Part 0 § Park protocol, which governs headless runs where
-    `AskUserQuestion` is unregistered and a missing answer must never read as consent. Enforced against
-    an attended run it inverts: it demands the artifact of an absent ask channel from a run that had one.
-  - **The authorization was real but unreachable, which is the honest half of the finding** (L-151): the
-    owner signed the gates and directed the run in the session transcript, and the checker reads only
-    the Execution Log. A per-task `owner-ruling · Tn · <ruling>` line is the shape it can read, and none
-    was written — so the guard was not wrong to notice something was missing, only wrong about what.
-  - Fix by making the leg **mode-aware**: apply the park requirement only where the park protocol
-    applies. Do NOT fix it by removing the check — the `authority-j2-park-bypassed` branch beside it
-    (park + execution + no ruling) is a genuine guard against the silent bypass Part 0 step 6 forbids,
-    was itself added after an independent reviewer caught the first version passing any stale park
-    record (L-165), and must survive untouched. Retain a must-FAIL for the unattended case, plus a
-    sibling control proving an attended execution passes.
-
 - **TD-122** severity: medium | status: open | created: Sprint-092
   - Summary: **A run that fires but never reaches the reaper leaves a log byte-identical to "no run
     happened", so nothing can detect it.** `check-night-run-rollup.sh` and `reap()` both read only the
@@ -937,175 +937,6 @@ status: current
   - **Re-file fresh if** `Verify:` clauses become required to carry a path — the collision is between
     what a clause may write and what the resolver accepts, and constraining either dissolves it.
 
-- **TD-112** severity: **high** | status: resolved → SPRINT-093 T1 | created: Sprint-089
-  - Summary: **With two active sprints, the launcher's reaper wrote its rollup into the sprint the run
-    did NOT execute, and derived a terminal state from that file rather than from the run — reporting
-    `PLAN_EXHAUSTED` over a run that parked a J2.** `check-night-run-rollup.sh` **PASSES** it.
-  - Evidence, from the run this sprint fired (2026-08-27, SPRINT-090):
-
-    | The reaper wrote (into `logs/SPRINT-089-…`) | Ground truth |
-    |---|---|
-    | `terminal · PLAN_EXHAUSTED · every task reached a resolved state` | T2 **parked** → `AUTHORITY_BOUNDARY` |
-    | `run · 2 of 2 units` | **1 of 2** landed — one done, one parked |
-    | `run · 12 of 12 DoD ticked` | SPRINT-089's box count, not the executed Plan's |
-
-    The run's **own** rollup, in `logs/SPRINT-090-…`, is correct on all three. Both artifacts exist in
-    the repository, disagreeing, and the checker passes the false one.
-  - **The checker cannot catch this and was never going to.** It asserts the rollup's *shape* —
-    `PASS … (DoD header + terminal state + calibration row present)` — never whether the named state is
-    right. That is verbatim what **L-174** recorded of this same checker after SPRINT-088, where a
-    rollup claimed `PLAN_EXHAUSTED` over three `blocked` tasks. **The defect class recurred through a
-    different route within one sprint of being written down**, which is the part worth keeping: the
-    fix then was fixtures for the *derivation*; those fixtures pass, because the derivation is now
-    correct **about the file it is given** and the bug moved upstream to *which file it is given*.
-  - Root cause, and it is structural rather than a slip: **the reaper has no way to know which Plan the
-    run was pointed at.** That fact lives in the trigger string (`… run SPRINT-090 ONLY …`), which the
-    launcher passes through verbatim and never parses; the sprint *files* carry no "this run is mine"
-    marker. With one active sprint the ambiguity is invisible. With two it resolves silently and
-    wrongly. `TASK-298`'s subject — a sibling active sprint — reaching a second mechanism.
-  - Impact: **a silent false negative in the direction that matters.** A parked run reads as cleanly
-    exhausted, in a machine-readable field, in a file a morning reader trusts precisely because a
-    checker passed it. It also **contaminates the wrong sprint's record**: SPRINT-089 was explicitly
-    excluded by the trigger and still received a rollup describing work it never did.
-  - The transcription half worked: `$5.2561865 · 53 turns · 29 min` are genuine `result`-event figures
-    the run's own row could not produce (`cost unavailable`). So the reaper's *reading* of the harness
-    is sound and its *derivation* is not — L-174's split, again.
-  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): the reaper should be told
-    its target Plan explicitly rather than inferring it (a `--sprint <path>` the trigger already knows),
-    and `check-night-run-rollup.sh` should compare the terminal state against the per-task lines **in
-    the same file** rather than only asserting all three shapes are present. The second half is the one
-    that generalises: a validator that checks presence and never agreement will pass any well-formed
-    lie.
-  - **Re-file fresh if** the repo returns to a single active sprint permanently — the ambiguity would
-    stop firing, and this row would then describe a latent defect rather than an observed one, which is
-    a different severity.
-
-- **TD-111** severity: **high** | status: resolved → SPRINT-093 T2 | created: Sprint-089
-  - Summary: **`docs/knowledge-index.md` goes STALE at every midnight regardless of content, so the gate
-    reddens on a tree nobody touched — and `night-run.sh` then refuses to fire (TD-110). An unattended
-    run can be blocked by the clock alone.**
-  - Evidence: SPRINT-090's unattended run parked its own close on a red system-verify at 00:14 on
-    2026-08-27. Regenerating the index produced **exactly one** changed line — `3c3`,
-    `last_updated: 2026-08-26` → `2026-08-27`. No rule, ADR, research doc or learning had changed;
-    the run's own commits touched none of the indexed globs. The date stamp alone flipped it.
-  - **`gen-index.sh` claims idempotence and is not.** Its header (line 4) reads *"Idempotent; rewrites
-    only between the `<!-- INDEX:START -->` / `<!-- INDEX:END -->` markers"* — true *within* a day and
-    false *across* one, because it also writes `last_updated:` into the index frontmatter, which sits
-    OUTSIDE those markers. The claim is accurate about the marked region and wrong about the file, and
-    the untrue half is the half a caller depends on.
-  - Impact, and it compounds rather than adds: **(1)** the gate carries a standing false FAIL from
-    midnight until somebody regenerates, so `QA-CHECK` is red for reasons unrelated to the tree —
-    the noise that trains a reader to skim the failure list. **(2)** With TD-110, the launcher's green-gate
-    precondition converts that into a **refused launch**: an overnight run, which is the whole point of
-    the mode, is the run most likely to cross midnight and least likely to have a human to regenerate.
-    **(3)** A run that crosses midnight *mid-flight* — as this one did — finds its own system-verify red
-    at close through no fault of its work, which is precisely what happened here.
-  - What the run did with it is the good news, and it is worth stating as evidence rather than as
-    consolation: it **parked the close** rather than repairing, exactly as the envelope's
-    `repair-policy` (none granted) and SPRINT-090 D3 require, and named the cause in its rollup.
-    The autonomy contract behaved correctly on a defect nobody had anticipated.
-  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): the honest fix is to stop
-    writing a wall-clock date into a *derived* artifact — `last_updated:` on a generated file records
-    when the generator ran, not when the knowledge changed, so it carries no information a reader can
-    act on while creating a daily false positive. Alternatives are to derive it from the newest
-    contributing source's date, or to exclude the frontmatter from the staleness comparison. Which one
-    is a design ruling; the first is smallest and deletes rather than adds.
-  - **Re-file fresh if** the staleness check moves off `gen-index.sh --check` — the comparison, not the
-    generator, is what makes the date load-bearing.
-
-- **TD-110** severity: **high** | status: resolved → SPRINT-093 T3 | created: Sprint-089
-  - Summary: **`night-run.sh` refuses to fire unless `qa-check.sh` exits 0, so no Plan whose task
-    REPAIRS a gate FAIL can ever be run unattended.** The work that would make the gate green is the
-    work the run exists to do, and the run cannot start until it is already done.
-  - Evidence: SPRINT-090 T1 was seeded to regenerate a deliberately stale `docs/knowledge-index.md`.
-    Pre-flight was otherwise complete — gates signed, ten-dimension envelope pinned, allowlist scoped,
-    `check-authority.sh` and `check-approval-envelope.sh` both PASS — and the launcher returned
-    `DEAD-ON-ARRIVAL: pre-flight gate scripts/qa-check.sh failed: QA-CHECK: 200 pass, 1 fail`. The one
-    FAIL was the staleness T1 existed to clear. `scripts/night-run.sh:339`, no bypass flag.
-  - **Why it stayed invisible until the launcher refused.** Part 1's prose checklist does not list a
-    green gate among its items — charter, trigger, task classes, `gates_signed:`, open `assumes:`,
-    allowlist, exit path. The precondition lives only in the launcher's code, so reading the procedure
-    cannot find it. The author here checked the checklist, concluded a green gate was not required,
-    said so, and was wrong: a rule read from documentation rather than from the artifact that enforces
-    it (the L-045 family, at the level of a precondition rather than a result).
-  - Impact: it silently narrows what unattended runs may ever be used for — only work the gate is
-    indifferent to, or work that adds beyond what the gate requires. That may well be the intended
-    design (automating "fix your own gate" is a bad idea), but an intended constraint nobody wrote
-    down is indistinguishable from a defect at the moment it bites, and it cost a vehicle Plan designed
-    in good faith.
-  - **This is the FIFTH foreclosure of one acceptance**, each by a different mechanism and each found
-    only by attempting the next step: an all-`HITL` Plan (L-111 · SPRINT-088) · pre-flight item 3
-    against a declared `J2` (TD-109) · `sprint-bulk` step 0's *"more than one active → ask which
-    sprint"* with no ask channel · and this. None was found by reading the procedure.
-  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): **state the precondition in
-    Part 1** so it is visible where the checklist is read, and decide separately whether the launcher
-    should accept a *declared, pre-approved* failing check — a named exception pinned in the envelope,
-    never a blanket `--force`. The second half is a design ruling, not a wording fix: the gate's whole
-    job is refusing to run on a red tree, and weakening it to permit gate-repair work trades a guard
-    for a convenience.
-  - Worked around at SPRINT-090 by replacing T1 with **gate-neutral** work (a dated measurement
-    appended to `docs/research/logs/qa-gate-timing.md`), not by touching the launcher — SPRINT-089
-    § Scope defers re-opening SPRINT-088's machinery.
-  - **Re-file fresh if** the gate precondition moves out of `night-run.sh` into the checklist or a
-    separate pre-flight script — the line reference above would then name a stale location, and the
-    invisibility half of this row would already be fixed.
-
-- **TD-109** severity: **high** | status: resolved → TASK-306 | created: Sprint-089
-  - Summary: **Part 1 pre-flight item 3 forbids the very Plan shape the autonomy machinery is built
-    for.** It reads *"every task in the run is AFK-class — none needs a human mid-execution"*, while
-    `CONTEXT.md` states `J2 ⇒ HITL always`. A Plan carrying a declared `J2` task therefore fails
-    pre-flight **by the letter**, and `TASK-301` requires exactly such a Plan.
-  - Evidence: SPRINT-090 was seeded per `TASK-301` with `T1 J1` + `T2 J2`. `check-authority.sh` passes
-    it (`PASS authority-declared: … T2 J2`), and the run refuses it under item 3 read strictly. The two
-    shipped artifacts disagree about the same Plan.
-  - **Why the strict reading is doubtful — ONE mechanism becomes unreachable code, not three.**
-    *(Corrected 2026-08-27 after independent review; the row as first filed claimed three.)*
-    `check-authority.sh`'s **HONOURED** assertion detects *"a J2 task that carries an EXECUTION record
-    while carrying no PARK record"* — a state only a J2 **task in a Plan** can enter, so under the
-    strict reading it can never fire (the L-166 shape: a guard keyed to a state the system may not
-    emit). The two other mechanisms originally cited are **reachable without any declared J2**:
-    `AUTHORITY_BOUNDARY` is defined at `night-run.md:148` as *"all of it is J2 **or blocked behind a
-    park**"*, and `:89` parks an ordinary **J1** on a critic judgment finding.
-  - **The counter-argument, recorded because the first version of this row omitted it.** `AFK-safe`
-    (`night-run.md:46` — additive + reversible + already-approved-in-scope) and `J2` (`:58` — approval ·
-    judgement · lossy/destructive · scope-changing) are defined as **opposites in the same document**.
-    Read against that vocabulary, item 3's *"every task is AFK-class"* is internally consistent as the
-    **strict** reading. So this row records a **genuine ambiguity between two defensible readings**,
-    not a one-sided wording bug — which makes the ruling that resolves it more load-bearing, not less.
-  - Impact: **this is the second time the same acceptance has been foreclosed.** SPRINT-088 wrote three
-    DoD requiring an unattended run into an all-`HITL` Plan (L-111, carried by `TASK-301`); the fix was
-    a purpose-built Plan, and that Plan is blocked by a *different* clause with the same effect. A
-    contradiction that survives two sprints of people reading around it is a wording defect, not a
-    misreading.
-  - Ruled at SPRINT-090 D4 rather than patched: item 3 means *no task needs a human to be **reached***,
-    and a declared `J2` that parks by design satisfies it. The ruling is recorded in the sprint file
-    because the run reads that and nothing else (L-099 · L-151). **The wording itself is untouched** —
-    SPRINT-089 § Scope defers re-opening SPRINT-088's machinery.
-  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): reword item 3 to
-    *"every task is either AFK-class or a declared `J2` the run will park"*, and say so beside the
-    park protocol so the two are read together. Whether the checklist should instead **require** a
-    seeded J2 for any run claiming to exercise the park path is the sharper question, and is a design
-    ruling rather than a wording fix.
-  - **Re-file fresh if** pre-flight gains a mechanical checker: today item 3 is a human checklist line
-    that `night-run.sh` does not enforce (`grep -nE 'AFK|authority' scripts/night-run.sh` finds only a
-    comment), so the contradiction currently costs a *refused* launch rather than a wrong one. A
-    checker built from the strict wording would convert it into a hard block, and this row would then
-    describe a different, worse failure.
-
-  - **RESOLVED at SPRINT-093 T4 — ruled STRICT: a declared `J2` task FAILS pre-flight item 3.**
-    A Plan carrying one is not launchable unattended; the J2 work is split out before the rest
-    fires. Recorded in `night-run.md` item 3 itself, where the launcher reads it (L-151).
-  - **SPRINT-090 D4 is superseded, not inherited.** It ruled the permissive reading, and its
-    justification was later corrected in two of three parts — only one of three cited mechanisms
-    is genuinely unreachable under the strict reading, and the `AFK-safe`/`J2` opposition cuts
-    the other way and was never weighed. T4 re-derived from the documents rather than citing it.
-  - The contradiction is dissolved rather than decided: the `J2` row's "parks" behaviour describes
-    a J2-shaped step the run **meets** mid-run and could not have declared at G2 (a revise-loop
-    judgment finding, a promote/close/triage approval, a scope-change) — never a licence to launch
-    while already holding a **declared** one. Both definitions survive; only the implication that
-    one permits the other is removed.
-  - Consequence for EPIC-015: a proof of `AUTHORITY_BOUNDARY`/park behaviour can no longer come
-    from a Plan that itself declares the J2 task. It needs a J2 shape surfaced **dynamically**.
 - **TD-108** severity: minor | status: open | created: Sprint-088
   - Summary: **`night-run.sh`'s mode-signal pre-flight is an unanchored substring scan over the whole
     command line, so a NEGATED mention satisfies it.** A prompt containing *"please do NOT run this
