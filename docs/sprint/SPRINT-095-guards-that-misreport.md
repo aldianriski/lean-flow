@@ -40,11 +40,22 @@ Layers: `scripts/lib/check-layers-observed.sh` · `evals/fixtures/layers-observe
 Depends-on: none
 Cites: TD-125 · TASK-298 · TASK-299 (the shipped half) · L-166 · L-058
 
-One list is answering two different questions. `:397` drops `*/archive/*` when building
-`sibling_sprints`, and `:430` uses that list to skip another sprint's commits — so *is this sprint
-still active work?* (archive = yes, exclude) and *does it own its commits?* (archive = irrelevant, a
-closed sprint owns its history forever) share one answer. First, because three sprint archivals are
-parked behind it.
+One list is answering two different questions — *is this sprint still active work?* (archive = yes,
+exclude) and *does it own its commits?* (archive = irrelevant, a closed sprint owns its history
+forever) — and they share one answer. First, because three sprint archivals are parked behind it.
+
+<!-- STATED CAUSE CORRECTED (SPRINT-096 T2). This paragraph read: "`:397` drops `*/archive/*` when
+     building `sibling_sprints`, and `:430` uses that list to skip another sprint's commits". Both
+     the mechanism and both line numbers were wrong, and this text is one of the three artifacts that
+     propagated the wrong mechanism into T1's three designs. MEASURED: deleting the `*/archive/*`
+     filter alone changes nothing — 092 is blamed for 85 commit:path pairs with the line present AND
+     deleted. The operative mechanism is upstream: qa-check.sh's layers-observed leg passes a
+     NON-recursive `ls docs/sprint/SPRINT-*.md`, so an archived file never enters "$@" for that
+     filter to reach — unreachable, not merely ineffective. The line numbers were stale too (`:430`
+     here, `:429` in TD-125, for the same statement, so one was wrong before anyone looked — L-130).
+     Ruled by ADR-040 and landed at SPRINT-096 T3 (`a333134`); re-derive any figure at the point of
+     use rather than citing this note. -->
+
 
 **Acceptance:** SPRINT-092 and SPRINT-093 can both be moved to `docs/sprint/archive/` with the gate
 staying green, and a path declared by no sprint still FAILs by name.

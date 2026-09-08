@@ -340,10 +340,16 @@ schedulable. Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H
                   `check-layers-observed.sh:397`'s `*/archive/*` filter as the mechanism. **Measured,
                   not argued:** deleting that line alone changes nothing — 092 is blamed for 85
                   commit:path pairs both with the filter present and deleted. The operative mechanism
-                  is upstream, `qa-check.sh:1013` handing the checker a NON-recursive
+                  is upstream — `qa-check.sh`'s layers-observed leg hands the checker a NON-recursive
                   `ls docs/sprint/SPRINT-*.md`, so an archived sprint never reaches `"$@"` to be
-                  filtered. Also note on TD-131 that `fmv()` gained a call site (archived sprint
-                  files), reachable from one more place though unchanged in nature
+                  filtered at all, which makes that filter UNREACHABLE for archived sprints rather
+                  than merely ineffective. **Re-derive every line number at the point of use** — this
+                  row cited `qa-check.sh:1013` and the real figure was `:1198`, the third stale
+                  citation in this family (L-130). Also record on TD-131 that SPRINT-095 T1 added an
+                  archived-file `fmv()` call site and SPRINT-096 T3 reverted it, so the row's
+                  exposure is unchanged — the frozen wording ("gained a call site") was restated at
+                  SPRINT-096's batch G2, because ADR-040 discovers archived sprints from FILENAMES
+                  and the call site does not survive the sprint
       touches:    TECH-DEBT.md · TODO.md · docs/sprint/SPRINT-095-guards-that-misreport.md
       depends-on: none — independent of TASK-331's ruling; the cause is wrong either way
       assumes:    none. The correction is measured and recorded in SPRINT-095's Execution Log

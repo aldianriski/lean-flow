@@ -186,9 +186,21 @@ Cites: SPRINT-092 close (18 worktrees / 178 MB removed, their branches were not)
       explicitly not inherited. Recorded in the Execution Log's promote entry, not only here
 - [ ] **Ruling still outstanding from this promote (not a blocker for T1–T4):** archiving SPRINT-092
       and SPRINT-093. Parked by owner ruling; they share `plan_commit: c52496f`, so it is archive both
-      together or measure again — `check-layers-observed.sh:397` drops `*/archive/*` from the sibling
-      list `:429` uses, which is what re-attributed one sprint's history to the other (214 pass / 0 fail
-      in place vs 202 pass / 1 fail archived). `TD-125` · `TASK-298`
+      together or measure again — archiving one dropped its number from the other's trusted-sibling
+      list, which re-attributed one sprint's history to the other (214 pass / 0 fail in place vs
+      202 pass / 1 fail archived). `TD-125` · `TASK-298`
+      <!-- STATED CAUSE CORRECTED and the ruling TAKEN (SPRINT-096 T2). This item read
+           "`check-layers-observed.sh:397` drops `*/archive/*` from the sibling list `:429` uses".
+           Wrong mechanism and a stale line number: deleting that filter changes nothing (85 blamed
+           pairs with it present and deleted), because qa-check.sh's layers-observed leg passes a
+           NON-recursive `ls`, so an archived file never reaches "$@" for the filter to act on. This
+           artifact was outside TASK-332's originally declared scope and was found by the corpus grep
+           its own Acceptance implies — L-186 at the artifact-set level. The parked ruling itself was
+           taken at the SPRINT-096 promote: 092 and 093 were archived as a pair, measured, and
+           ADR-040 then removed the underlying asymmetry (landed `a333134`). The checkbox is left
+           unticked deliberately: closing a closed sprint's item is a governance action, flagged for
+           the SPRINT-096 Retro rather than taken here. -->
+
 
 ## Decisions (pre-locked)
 - **D1 — `scripts/qa-check.sh` is single-owned and committed in task order T1 → T2, never in

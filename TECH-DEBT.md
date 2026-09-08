@@ -603,6 +603,27 @@ status: current
     identical vulnerable primitive was still reused without a comment acknowledging the inheritance.
     A rule that is loaded, correct and on screen does not fire by itself — which is L-165's whole point,
     and the reason the outside reviewer found this and the author did not.
+  - **A THIRD call site was added and then removed inside two sprints, and the row's exposure is
+    UNCHANGED — recorded because the near-miss is the useful part.** SPRINT-095 T1 added
+    `fmv "$_asp" sprint` over every archived sprint file, to build its declaration + window ownership
+    map. That put `fmv` on the path of ~93 files per subject sprint, in a **Tier G** guard, weeks
+    after this row recorded that `fmv` returns empty for every key on a CRLF file. SPRINT-096 T3
+    reverted that machinery on ADR-040's ruling and derives an archived sprint's number from its
+    **filename** instead — no frontmatter read at all — so the call site is gone and this row's call
+    sites stand where they did: `check-layers-observed.sh` (the subject sprint's own frontmatter) and
+    `check-handoff-state.sh:46`.
+  - **What the near-miss would have cost, and it is the same silent shape as the second call site.**
+    On a genuine CRLF checkout every archived sprint's number would have read empty, every archived
+    sprint would have dropped out of the ownership map, and their commits would have been blamed on
+    an active sibling — a checkout-sensitive wall of false positives, invisible on this host because
+    its awk build translates CRLF on read. **Demonstrated, not argued:** SPRINT-096 T3's first
+    attempt at a selection fixture used a CRLF archived sprint file to exercise exactly this, and the
+    fixture's own vacuity guard reported that `fmv` returned `951` anyway on this host — so it was
+    replaced with a member carrying no `sprint:` key at all, which no awk build can rescue. This
+    row's central claim, reproduced a second time by a task that was not looking for it.
+  - **The direction of travel is the point:** the filename route is both cheaper and immune to this
+    row, so it is worth preferring wherever a number can be had from a name. It is **not** a fix —
+    `fmv` is untouched and both remaining call sites still carry the defect.
   - **Re-file fresh if** it stops being latent: any CI runner or non-Windows contributor makes it live.
 - **TD-129** severity: medium | status: open | created: Sprint-094
   - Summary: **`EPIC-014`'s "the Shell semantic engine is deleted" milestone will NOT end Shell rule
@@ -672,12 +693,33 @@ status: current
 - **TD-125** severity: medium | status: open | created: Sprint-093
   - Summary: **A closed sprint cannot be archived while a sibling sprint sharing its `plan_commit`
     window is still active — doing so turns the gate red, and the failure appears against the
-    *sibling*, not the sprint that moved.** `check-layers-observed.sh:397` excludes any sprint file
-    under `*/archive/*` when building `sibling_sprints`. That list is what line 429 uses to skip
-    commits belonging to another sprint. So archiving SPRINT-093 removed `093` from SPRINT-092's
-    sibling list, and every `sprint(093)` commit — which sits inside 092's window, because **both
-    sprints were promoted at the same `plan_commit: c52496f`** — was then attributed against
+    *sibling*, not the sprint that moved.** Archiving SPRINT-093 removed `093` from SPRINT-092's
+    trusted-sibling list, and every `sprint(093)` commit — which sits inside 092's window, because
+    **both sprints were promoted at the same `plan_commit: c52496f`** — was then attributed against
     SPRINT-092's `Layers:` declarations.
+  - **STATED CAUSE CORRECTED (SPRINT-096 T2). This row named the wrong mechanism for three sprints,
+    and the wrong one is the one three designs were built against.** It read: *`check-layers-
+    observed.sh:397` excludes any sprint file under `*/archive/*` when building `sibling_sprints`;
+    that list is what line 429 uses to skip commits belonging to another sprint.* Both halves are
+    wrong. **Measured:** deleting that filter alone moves nothing — with 093 archived and 092 active,
+    092 is blamed for **85 commit:path pairs both with the line present and with it deleted.** And
+    the reason is stronger than "ineffective": the filter operates on `"$@"`, while `qa-check.sh`'s
+    layers-observed leg hands the checker a **non-recursive `ls docs/sprint/SPRINT-*.md`**, so an
+    archived file never enters `"$@"` for that filter to reach. It is **unreachable** for archived
+    sprints, not merely inert. The operative mechanism is that upstream glob. Derived by reading the
+    leg, which is a deductive result the 85-pair count can only corroborate.
+  - **Line numbers are derived at each read, never quoted from this row.** They have already gone
+    stale twice: this row cited `:429` and `TASK-298` cited `:430` for the same statement, so at
+    least one was wrong before anyone looked (L-130). At `a333134` the figures are
+    `scripts/qa-check.sh:1198` (the non-recursive `ls`), `check-layers-observed.sh:401` (the
+    `*/archive/*` filter, now vestigial for ownership), `:457` (the archived-filename discovery loop)
+    and `:508` (the single per-commit skip). **Re-derive them; do not cite this line.**
+  - **Ruled and fixed:** [`ADR-040`](docs/adr/ADR-040-commit-ownership-accepts-the-subject-claim.md)
+    at SPRINT-096 T1, landed by T3 (`a333134`). Archived sprint numbers are now discovered from their
+    filenames and sit in the trusted set beside the active ones, so archiving no longer changes the
+    checker's answer. **Status left `open` deliberately** — a sweep closes a row by reading the tree
+    (SPRINT-094's lesson), and this row's re-derivation belongs to the SPRINT-096 close, not to the
+    task that corrected its prose.
   - Reproduced live at SPRINT-093's close, in both directions: gate **214 pass, 0 fail** with the
     sprint in `docs/sprint/`; **202 pass, 1 fail** after `git mv` to `docs/sprint/archive/`, with ~70
     files reported as *"changed by a task that never declared it"* against a sprint that never touched
