@@ -4,7 +4,7 @@ slug: rule-the-ownership-tension
 owner: Maintainer
 last_updated: 2026-09-08
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: 896fc18
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
