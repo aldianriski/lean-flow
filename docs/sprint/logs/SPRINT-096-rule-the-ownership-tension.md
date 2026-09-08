@@ -287,3 +287,150 @@ finding is that no self-pass reaches this class.
 question rather than folded into an approval of something else.
 
 consequence · T2,T3 · behaviour:low · governance:high
+
+---
+
+### 2026-09-08 | progress | T3 — both arms ruled by the cited number; the proof is honest about which half is which
+
+Ran FIRST, per the batch-G2 ordering ruling. Landed as `a333134`, checker **-86/+70**.
+
+**Implemented inline rather than dispatched, and the reason is stated rather than left implicit.**
+The routing table sends `class: execution` to a sub-agent carrying `/tdd`. This session's standing
+instruction forbids Agent dispatch unless the owner asks; the owner lifted it for T3's **reviewer**
+specifically, not for the builder. So the build is the coordinator's own work, and the isolation was
+spent on the independent pass — which is the half L-165 says finds things.
+
+**The change.** SPRINT-095 T1's declaration + window machinery and its temp-file map are reverted;
+archived sprint numbers are discovered from their **filenames** and appended to `sibling_sprints`, so
+one membership test decides both arms. Not a literal revert: dropping the machinery alone would leave
+archived sprints out of the trusted set and **flip** the asymmetry rather than remove it.
+
+**A blind spot found and closed in my own first draft.** The selection first required the `-<slug>`
+segment STANDARD prescribes. The glob `archive/SPRINT-*.md` admits files that pattern rejects
+(`SPRINT-960.md`), and a rejected member is **not a finding, it is an absence**: its commits land on
+an active sibling with nothing reporting that a sprint was skipped. That is L-186's shape appearing
+inside the very task that cites L-186. Population re-derived rather than assumed: 93 files admitted,
+**93 selected, 0 rejected**, 93 distinct, filename and frontmatter agreeing on every one. The first
+count of that population disagreed with its own inverse (93 admitted / "1 selected" / 0 rejected) —
+a `printf` with no trailing newline had concatenated all 93 numbers onto one line. Caught by the
+inverse failing to sum to the total, not by re-reading the query. The cross-check rule doing exactly
+its job.
+
+**Real 092/093 pair (L-166) — NO REGRESSION, and NO DISCRIMINATION. Recorded as the latter rather
+than dressed up as the former.** 092 was made live again with 093 archived, the actual TD-125
+scenario: **21 `sprint(093)` commits sit inside 092's window.** Result: 092's blamed pairs
+**11 → 11**, and **zero `sprint(093)` commits are blamed on 092 under either checker** — the four
+blamed commits are unattributed governance/retention commits, the pre-existing TD-107 class. The two
+designs *agree* on this pair, because 093's commits are covered by 093's own declarations, so the old
+declaration test already skipped them. They differ only at the accepted hole, and **the real tree
+contains no instance of it**: no live sprint's window cites any archived number (derived — 094's
+window cites 094/095/096 only). So the motivating artifact proves the branch is *reachable and
+correct*, and cannot prove it *changed anything*. The hole is pinned by fixture instead, which is the
+honest division of labour between the two.
+
+**Fixtures 59 PASS / 0 FAIL / 0 NOTE.** The `archived-window` case is **INVERTED, not deleted** — it
+now pins the accepted hole, so silently re-narrowing the rule fails loudly in either direction. An
+accepted hole with no fixture is indistinguishable from an unnoticed one, and the next reader would
+re-open the three-design loop. Every new case carries a **sibling control** that must still FAIL by
+name in the same run: a fixture asserting only silence cannot tell *ruled correctly* from *checked
+nothing*.
+
+**Seeded-break discrimination — ONE hash convention throughout (`git hash-object`; the repo pins
+`*.sh` to `eol=lf`, so blob and working-tree bytes coincide and these figures reproduce on any
+checkout).** Pristine `d50f083bb72f50517896f73a542130c49410861b`, 592 lines.
+
+| Seed | Hash | Suite | Red cases |
+|---|---|---|---|
+| 1 — archived numbers never appended | `0bf8537` | 55 PASS | the 4 archived cases; **all 3 sibling controls stayed green** |
+| 2 — selection re-narrowed to require a slug | `a7ce778` | 58 PASS | **exactly one of 59** — the L-186 selection fixture |
+
+Both landed (2 changed lines each), still parsed, targeted (line delta **0** — a demolition is not a
+discrimination), and restored to `d50f083` verified. **Seed 2 is the load-bearing one:** it proves
+the selection fixture earns its place, because nothing else in a 59-case suite catches a
+selection-only break. L-186's claim demonstrated rather than asserted.
+
+**A fixture caught its own vacuity, which is the whole reason that guard exists.** The first
+selection fixture used a CRLF archived sprint file, on TD-131's ground that `fmv` empties on CRLF.
+Its premise guard reported that **this host's awk translates CRLF on read** — `fmv` returned `951`,
+both routes agreed, and the case would have gone green while discriminating nothing (L-142).
+Replaced with a member carrying **no `sprint:` key at all**, which no awk build can rescue, plus a
+slugless-filename member for the other direction of the same axis.
+
+**Measured side effect, relevant to TD-090/TD-117:** the checker runs **3m32s to 1m01s** over the
+live sprint set, because filename discovery replaces reading 93 archived files' frontmatter *and
+Plan* once per subject sprint.
+
+review · T3 · consequence · behaviour:high · governance:high — an outside worktree-isolated reviewer
+was dispatched against the shipped ref `a333134` per DoD 7. **DoD 7 is NOT ticked in this entry**;
+its result is recorded separately when it returns.
+
+---
+
+### 2026-09-08 | progress | T2 — the stated cause corrected, and the corpus verified positively
+
+Landed as `fb1ac85`, after T3 by the G2 ordering ruling, so every figure was derived against the
+settled file rather than against one about to change.
+
+**A2 re-derived deductively, which is stronger than the measurement the row carries.** The
+`*/archive/*` filter operates on the argument list; `qa-check.sh`'s layers-observed leg passes a
+non-recursive `ls`, so an archived file never enters that list for the filter to reach. It is
+**unreachable** for archived sprints, not merely ineffective — the 85-pair count corroborates rather
+than establishes it.
+
+**Four artifacts corrected**, including `SPRINT-094`, which sat outside the frozen `Layers:` and was
+found by the corpus grep T2's own Acceptance implies.
+
+**Every cited line number was stale except one.** `qa-check.sh:1198` (TASK-332 said `:1013`), the
+filter now at `:401` (`:397` was correct before T3), discovery at `:457`, the single skip at `:508`
+(TD-125 said `:429` and SPRINT-095 said `:430`, for the same statement — so one was wrong before
+anyone looked). The corrected rows now say *re-derive, do not cite this line*, because a figure
+frozen in prose goes stale silently and this family has now done it four times (L-130).
+
+**The Verify was run as a classification, not a keyword grep.** A negative grep filtered by a
+"CORRECTED|wrong|measured false" blacklist is L-108's own anti-pattern — a corpus that documents its
+own corrections matches prose *about* the claim, and my first attempt at this check did exactly that
+and returned eleven hits it could not classify. All 24 live hits were instead sorted by shape:
+5 append-only log entries, 1 the ADR, 12 correction/refutation context, and **6 unrelated**
+`*/archive/*` uses in other rows (TD-051's subject-sprint skip, the worktree-exclusion mitigation, a
+file count) — each of the six read individually rather than pattern-matched. Zero live artifacts
+still *assert* the old cause. The Acceptance's positive half was then checked **directly** rather
+than inferred from the negative: all four artifacts name the upstream glob.
+
+**Two findings recorded rather than fixed, both outside T2's scope:** `TD-051` cites `Line 225` for
+the subject-sprint `*/archive/*` skip, stale in exactly the same way; and SPRINT-094's parked-ruling
+checkbox is now satisfied (092/093 were archived at this promote) but left unticked, since closing a
+closed sprint's item is a governance action rather than a correction. Both to the close Retro.
+
+**Integrity re-derived after every structural edit, not assumed:** 76 TD rows before and after, 15
+task rows / 13 `ready` unchanged, **0** task rows missing their blank-line separator (the fusion
+check L-009 exists for), 094 and 095 open-DoD counts unchanged at 1 and 21.
+
+consequence · T2 · behaviour:low · governance:med
+
+---
+
+### 2026-09-08 | surprise | SPRINT-096's own Layers: are invisible to the checker it is fixing
+
+Found while attributing this sprint's own gate FAILs, and it is **pre-existing, not caused by T3** —
+proven by the pristine-vs-patched A/B returning byte-identical output on the live sprint set.
+
+**Two checkers that each claim to parse declarations identically do not.**
+`check-layers-observed.sh`'s `task_decls` extracts only **backtick-quoted** tokens.
+`check-layers-completeness.sh` tests membership with `grep -qF` against the raw `Layers:` line — a
+plain substring match, **backtick-agnostic**. Both files carry the comment *"kept deliberately
+identical … both checkers read the same declaration, so a parsing rule that differs between them
+would make one of the two lie."* One of them is lying.
+
+**Measured:** SPRINT-096's Plan yields **0** declared tokens to the observed checker; SPRINT-095's
+(backticked) yields **14**. So every `Layers:` declaration in this sprint is invisible to the checker,
+and two of the six gate FAILs on this tree are spurious — the T1 attribution finding and *changed but
+undeclared: `scripts/lib/check-layers-observed.sh`* name files that ARE declared, just unbackticked.
+It fails toward over-reporting, so it is loud rather than silent, which is why this is a Retro item
+and not a stop.
+
+**Candidate for the close Retro, deliberately not repaired here.** The cheap repair is to backtick
+this sprint's own `Layers:`, which is a § Plan edit made while a gate is red — the shape L-088 warns
+about, even though the declaration's *content* would not change. The durable question is which parser
+is correct, and that is a ruling rather than an edit. Filed with the measurement attached.
+
+consequence · T2,T3 · behaviour:low · governance:high
