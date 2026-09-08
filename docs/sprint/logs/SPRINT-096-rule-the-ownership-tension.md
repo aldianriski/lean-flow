@@ -486,3 +486,51 @@ the inside. Candidate for the close Retro.
 
 review · T3 · consequence · behaviour:high · governance:high — one scoped independent reviewer,
 worktree-isolated, one finding, fixed and re-proven. No builder retry was needed beyond it.
+
+---
+
+### 2026-09-09 | surprise | system-verify produced NO VERDICT — killed for host memory, and the budget guard passed on its way
+
+Step 6's system-verify was run once against the integrated tree at `b031bda`. **It did not produce a
+verdict line.** Recorded as inconclusive — neither green nor red — because a run with no
+`QA-CHECK: N pass, M fail` has not said anything, and reporting 0 FAILs from a partial run as a pass
+is precisely L-120's shape (the number to read is the one the gate *prints*).
+
+**What it managed:** 147 lines, **0 FAIL**, from `qa-budget-default` through the §2 caps, the schema
+legs and `task-origin`. It was killed by the host for memory before reaching the legs this sprint
+actually touched — eval harnesses (leg 12) and layers-observed (leg 15) both sit later in the run.
+So the 0 is real and it is also nearly uninformative about T2 and T3.
+
+**The new fact, and it separates two debts that have been read as one.** The first line of the run is
+`PASS qa-budget-default: 520s < 600s command ceiling`. The budget guard SPRINT-084 built for TD-084
+watches **wall-clock**, and it passed — then the run died on **memory**. TD-084's failure mode (dying
+past an external timeout with no verdict) is closed; **TD-090/TD-117's is not the same mechanism**,
+and nothing in the gate reports it. A memory kill produces exactly the artifact TD-084 was built to
+eliminate — a run with no verdict — through a door the guard does not watch. This is the third
+recorded instance (SPRINT-096's own promote, ADR-040's cost table, and now this).
+
+**What IS verified, targeted and each read from the tool's own verdict rather than a wrapper:**
+
+| Check | Result |
+|---|---|
+| `check-layers-completeness.sh` on the Plan | **6 PASS / 0 FAIL**, exit 0 |
+| `run-layers-observed-fixtures.sh` (T3's own harness, opt-in set) | **61 PASS / 0 FAIL**, exit 0 |
+| `check-layers-observed.sh` over live sprints | 6 FAIL, **all pre-existing or spurious** — proven by a byte-identical pristine-vs-patched A/B and by the backtick finding below |
+| partial `qa-check.sh` | 147 lines, 0 FAIL, **no verdict** |
+
+Note that `run-layers-observed-fixtures.sh` is in the **opt-in** set, so even a completed bare gate
+would not have run T3's fixtures. The targeted run is not a substitute for system-verify, but on this
+sprint's own subject it is the stronger evidence.
+
+**Two of the 6 live-sprint FAILs are spurious for the reason recorded above** — SPRINT-096's `Layers:`
+are unbackticked, so `task_decls` yields **0** tokens for this sprint and every declared file reads as
+undeclared. The other four are the pre-existing TD-107-class unattributed governance commits.
+
+**Also observed:** `OVER-CAP (soft): TODO.md (560 > 320)` — up from 551 at promote, where the prune
+was offered and declined by the owner. Soft cap, no action taken.
+
+**Close is therefore an owner decision, not a coordinator one.** The Plan is exhausted at 17 of 17
+and the tree is clean, but ADR-021's spirit is that a gate which cannot speak does not get read as
+consent.
+
+consequence · T2,T3 · behaviour:low · governance:high
