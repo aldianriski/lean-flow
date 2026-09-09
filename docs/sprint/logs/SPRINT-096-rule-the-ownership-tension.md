@@ -534,3 +534,35 @@ and the tree is clean, but ADR-021's spirit is that a gate which cannot speak do
 consent.
 
 consequence · T2,T3 · behaviour:low · governance:high
+
+---
+
+### 2026-09-09 | progress | owner override: close proceeds on targeted evidence; the parser divergence is a Retro ruling
+
+**Recorded here, not in the launching transcript**, because this is the artifact close reads and a
+ruling filed anywhere else behaves as if it were never taken (L-151).
+
+**Override 1 — close proceeds with system-verify INCONCLUSIVE (ADR-021).** The gate cannot print a
+verdict on this host; it was killed for memory after 147 lines and 0 FAIL. The owner ruled close on
+the targeted evidence instead, and the reasoning is recorded rather than assumed: on this sprint's
+own subject the targeted runs are the **stronger** evidence, since `run-layers-observed-fixtures.sh`
+sits in the **opt-in** set and a *completed* bare gate would not have executed T3's 61 fixtures
+either. What the override forfeits is the legs this sprint did not touch — stated plainly rather than
+implied, because an override that does not name what it gives up is a waiver, not a decision.
+
+- `check-layers-completeness.sh` on the Plan — 6 PASS / 0 FAIL, exit 0
+- `run-layers-observed-fixtures.sh` — 61 PASS / 0 FAIL, exit 0, including the reviewer's finding
+- partial `qa-check.sh` — 147 lines, 0 FAIL, **no verdict**
+
+**Not waved away:** the memory-kill mechanism is filed as evidence against TD-090/TD-117, with the
+new distinction that separates it from TD-084 — the wall-clock guard **passed** (`520s < 600s`) on
+the way down, so the two debts are different doors onto the same artifact.
+
+**Override 2 — the `Layers:` parser divergence is ruled at the Retro, and SPRINT-096's Plan is left
+alone.** Backticking this sprint's own declarations would clear two spurious FAILs cheaply, and the
+owner declined it for the right reason: the durable question is *which of the two checkers is
+correct*, and editing the Plan while its gate is red to make the gate quieter is L-088's shape even
+when the declaration's content does not change. The divergence goes to the Retro with its
+measurement attached (0 declared tokens for SPRINT-096 against 14 for SPRINT-095).
+
+consequence · T2,T3 · behaviour:low · governance:high
