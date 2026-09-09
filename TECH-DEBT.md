@@ -238,6 +238,20 @@ status: current
 > and the query returned "76 of 76 aged". Caught by the number disagreeing with the unaged list, not
 > by re-reading the pipeline. Trend, unbroken: 14/19 (S-078) → 16/22 (S-080) → 17/24 (S-081) →
 > 22/25 (S-083) → 24/28 (S-084) → 27/37 (S-086) → 56/63 (S-094) → 61/74 (S-096) → **70/76 (S-097)**.
+> **Aged rows, enumerated — the half the last two sweeps left out.** S-094 and S-096 both
+> recorded the aging COUNT without the list, and `S10.TDAGING` reads the ledger header for each
+> aged row's id by name: 33 rows were aged and named by no sweep at all, so the prompt §10 asks
+> for was never raised for any of them. Enumerated here (id · sprints unaddressed):
+> TD-045 (41) · TD-047 (40) · TD-049 (38) · TD-050 (37) · TD-051 (36) · TD-052 (35) · TD-053 (34)
+> TD-059 (27) · TD-060 (26) · TD-061 (25) · TD-062 (24) · TD-063 (23) · TD-066 (22) · TD-067 (21)
+> TD-068 (21) · TD-069 (20) · TD-070 (20) · TD-071 (19) · TD-072 (19) · TD-074 (18) · TD-075 (17)
+> TD-076 (17) · TD-078 (16) · TD-080 (16) · TD-081 (15) · TD-082 (14) · TD-083 (14) · TD-086 (13)
+> TD-087 (13) · TD-088 (13) · TD-089 (13) · TD-090 (13) · TD-093 (12) · TD-094 (12) · TD-095 (11)
+> TD-096 (10) · TD-097 (10) · TD-098 (10) · TD-099 (10) · TD-100 (10) · TD-102 (10) · TD-103 (10)
+> TD-104 (10) · TD-105 (10) · TD-106 (9) · TD-107 (9) · TD-108 (9) · TD-114 (6) · TD-115 (6)
+> TD-116 (6) · TD-117 (6) · TD-118 (6) · TD-119 (6) · TD-120 (6) · TD-121 (5) · TD-122 (5)
+> TD-124 (4) · TD-125 (4) · TD-126 (5) · TD-127 (5) · TD-128 (5) · TD-129 (3) · TD-130 (3)
+> TD-131 (3) · TD-132 (3) · TD-133 (3) · TD-134 (3) · TD-135 (3) · TD-136 (3) · TD-137 (3)
 > **Escalation: TD-143 escalated, TD-141 closed, and a rule/practice divergence is flagged.**
 > `TD-143` (`severity: high`, filed S-096) had its tracker `TASK-334` sitting **unranked in P3** —
 > close routes follow-ups, it does not rank them — so it is moved to **P1** here, which is what the
