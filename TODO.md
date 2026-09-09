@@ -16,10 +16,11 @@ status: current
 
 ## Active Sprint
 
-> **None.** `SPRINT-096 — Rule the Ownership Tension` closed 2026-09-09 at **17 of 17 DoD** →
-> [`CHANGELOG.md`](CHANGELOG.md) for what shipped; the file itself is not yet archived (§11 retention
-> parked at this close — see below). Next sprint is formed by `/lean-doc-generator promote` from the
-> groomed Backlog.
+> **None.** `SPRINT-096 — Rule the Ownership Tension` closed 2026-09-09 at **17 of 17 DoD**
+> (`close_commit: 7dfd573`) and is **archived** with its log →
+> [`archive/SPRINT-096-rule-the-ownership-tension.md`](docs/sprint/archive/SPRINT-096-rule-the-ownership-tension.md)
+> · [`INDEX.md`](docs/sprint/INDEX.md) · [`CHANGELOG.md`](CHANGELOG.md) for what shipped. Next sprint
+> is formed by `/lean-doc-generator promote` from the groomed Backlog.
 >
 > **Read before the next promote:** `TASK-333` · `TASK-334` · `TASK-335` were filed at this close and
 > sit **unranked in § P3** — close routes follow-ups, `/triage` ranks them. `TASK-334` in particular
