@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-08
+last_updated: 2026-09-09
 update_trigger: A new ADR is added under docs/adr/
 status: current
 ---
@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-041](adr/ADR-041-platform-repo-service-boundary.md) | The pilot platform lives in its own repository (`workdoo`) with lean-flow consumed there as a **pinned plugin**, not vendored — preserving the zero-dependency manifest that `plugin install` copies wholesale into every consumer's cache. Governance splits by *kind*: the outcome record (EPIC-016) stays here, the execution record (tasks, sprints, its own id-space) lives there | accepted | 2026-09-09 |
 | [ADR-040](adr/ADR-040-commit-ownership-accepts-the-subject-claim.md) | Commit ownership trusts the cited sprint number, **symmetrically** — archived and active siblings alike, with no declaration or window test — and the laundering channel that follows is ACCEPTED and documented rather than narrowed a fourth time. `check-layers-observed.sh` is therefore not a guard against a dishonest commit subject and must not be cited as one | accepted | 2026-09-08 |
 | [ADR-039](adr/ADR-039-section-4-differential-parity-is-opt-in.md) | §4 differential parity moves to the opt-in profile; the drift window it opens is NAMED, and parity is mandatory at promote, close, and any full-profile run. Shell **retains** §4 authority — this is not a cutover, and a green default gate says nothing about TS/Shell agreement | accepted | 2026-08-31 |
 | [ADR-038](adr/ADR-038-composed-multi-family-rule-dispatch.md) | Composed multi-family rule dispatch: `bindRegistry`/`composeFamilies` bind each typed single-port registry into one whole-spec dispatch surface — a loop over `BoundDispatcher`s, never a switch; a rule id belongs to exactly one family, enforced by a loud throw naming both families on collision | accepted | 2026-08-27 |
