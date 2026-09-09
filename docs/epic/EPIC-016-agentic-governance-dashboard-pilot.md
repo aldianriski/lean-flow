@@ -4,7 +4,7 @@ slug: agentic-governance-dashboard-pilot
 owner: Maintainer
 last_updated: 2026-09-09
 status: active
-member_sprints: [workdoo SPRINT-001]
+member_sprints: [workdoo SPRINT-001 (closed)]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -58,7 +58,7 @@ keeps its own § Closed-when.
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| [workdoo SPRINT-001](https://github.com/aldianriski/workdoo/blob/main/docs/sprint/SPRINT-001-the-contract-before-the-runtime.md) | The Contract Before the Runtime | **active** — promoted 2026-09-09 | _(completed at close)_ — five tasks, none of which needs a working Claude Code CLI: the workspace and a gate proven capable of going red, the runtime adapter contract with its deterministic fake, version pinning that reports what is *running*, workdoo ADR-001 (Git versus store authority) and the pilot workflow specification. The seam is drawn at **A2**, not at the roadmap's day boundary, so a false A2 costs nothing built here |
+| [workdoo SPRINT-001](https://github.com/aldianriski/workdoo/blob/main/docs/sprint/SPRINT-001-the-contract-before-the-runtime.md) | The Contract Before the Runtime | **closed** 2026-09-09 · `eb3d9e7` — 21 of 21 DoD, `PLAN_EXHAUSTED` | **Established everything the pilot needs that does not depend on a working runtime, and drew the sprint boundary at an assumption rather than a date** — so a false **A2** costs SPRINT-002 and nothing already built. A Bun workspace whose gate was **proven able to go red** (clean → seeded hash-verified break → `1 pass, 2 fail` with `lint` green as the sibling control → restored byte-identical → clean); the **runtime adapter contract with two implementations from day one**, because a contract with exactly one cannot be distinguished from a transcription of it; version pinning whose probe sits behind a port and whose `unprobed` outcome carries no running version, so "could not check" cannot read as "checked and agreed"; **workdoo ADR-001** (Git owns content, the store owns operational state, neither mirrors the other — the ruling the approval-digest binding depends on) and **ADR-002**; and the five pilot phases with entry, exit and authority, where phase 2 has no time-based exit and phase 4 does not exit on an absent verdict. **The sprint's own defect is its most useful output**: the loop paused between tasks against `sprint-bulk`'s explicit instruction, which traced to a guard gated on run mode — filed here as **`L-192`** + **`TASK-336`**, with **44 of 50** of this repository's own sprint logs carrying no rollup. Filed there: `TD-001` (the gate has no harness of its own) · `TASK-016` (the independent review pass no task could run) |
 
 ## Decisions
 
@@ -84,11 +84,16 @@ keeps its own § Closed-when.
   to the pilot?** Minting two competing `RunSummary` shapes is the failure to avoid. → ruled at the
   G2 of the sprint that ships typed outcomes, jointly with `TASK-297`, which carries the same question
   on the lean-flow side.
-- **What does Git own versus the durable store?** Artifacts and source are Git-authoritative; live
-  queue state is not. The boundary needs stating before the first write path. → **workdoo ADR-001**, owed at
-  the first member sprint's G2.
-- **What exactly does the runtime adapter contract promise?** → **workdoo ADR-002**, owed with D3's fake
-  adapter, since the fake is what makes the promise testable.
+- ~~**What does Git own versus the durable store?**~~ — **CLOSED 2026-09-09, workdoo ADR-001**
+  (SPRINT-001 T4). Git is authoritative for content; the store for operational state and every
+  authority decision; the store holds **references**, never copies. The argument that settled it
+  surfaced while writing rather than while planning: an approval binds to a resolved revision digest,
+  and that binding means nothing unless Git is authoritative for what the digest resolves to.
+- ~~**What exactly does the runtime adapter contract promise?**~~ — **CLOSED 2026-09-09, workdoo
+  ADR-002** (SPRINT-001 T2). It normalises and decides nothing, and it ships with two implementations
+  from day one. The ADR also records the cost: the fake agrees with the *contract*, not with Claude
+  Code, so a suite green against it says nothing about whether the real runtime matches what the
+  contract assumes — which is SPRINT-002's job.
 - **How is an approval bound to identity, revision and scope such that a worker cannot forge one?**
   Closes audit findings F01 and F02. → **workdoo ADR-003**, owed before the Approval Inbox ships.
 - **Is Postgres provisioned on the shared VPS?** The reference platform runs SQLite WAL, so this is
