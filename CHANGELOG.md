@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-08
+last_updated: 2026-09-09
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,55 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+## SPRINT-096 — Rule the Ownership Tension (closed 2026-09-09)
+
+Unreleased. **17 of 17 DoD.** Three designs for *"does an archived sprint own its own commits?"* had
+each been broken by an independent review, each the same laundering class one level deeper (L-190).
+This sprint stopped designing and ruled: the decisive fact was found outside the task — the **active**
+sibling arm had always trusted the cited number with no test at all (TD-141) — so all three designs
+were being held to a bar the surrounding code never met.
+
+| Shipped | What |
+|---|---|
+| **ADR-040** | **A commit citing another sprint's number belongs to that sprint — archived or active, with no further test — and this repository ACCEPTS the laundering channel that follows.** The choice was never *which proxy* but *which failure to accept*: a commit subject is prose a human typed, so every mechanism that tries to verify it is another proxy for the same unverifiable claim. Names a loser on the side taken; records the `Sprint: NNN` trailer as the only route that would *close* the channel, rejected on size with an explicit re-open condition |
+| **T3 — the guard** | `check-layers-observed.sh` **-86/+70**. SPRINT-095 T1's declaration + window machinery and its temp-file map reverted (they were on `main` **unticked at 0 of 6 DoD**, having been broken by review); archived sprint numbers now discovered from **filenames** and held in the same `sibling_sprints` list as active ones, so one membership test decides both arms. Not a literal revert — that would have dropped archived sprints from the trusted set and *flipped* the asymmetry |
+| **T2 — the record** | TD-125's stated cause corrected in every artifact repeating it. The named mechanism was **measured false** (85 blamed pairs with the filter present *and* deleted) and is in fact **unreachable**: the filter operates on `"$@"`, which `qa-check.sh`'s non-recursive `ls` never puts an archived file into. **Three of four cited line numbers were already stale** |
+| **Fixtures** | 59 → **61**, 0 FAIL. The `archived-window` case **inverted rather than deleted**, so it now pins the accepted hole and fails loudly if anyone silently re-narrows the rule |
+
+**The independent review changed the outcome, and that is the entry worth keeping.** T3 met the full
+Tier-G bar — motivating artifact, population coverage, retained must-FAIL per check with sibling
+controls, two seeded-break proofs under one hash convention — and its worktree-isolated reviewer
+still found a **load-bearing branch with no case**: the archived loop's self-sibling guard. Seeding
+its removal left all 59 fixtures green while real undeclared work was swallowed at **exit 0**. Fixed
+and re-proven; a third seed reddens **exactly one of 61**. → **L-191**: every bar in the ladder tests
+at the level of the artifact *set*, and a guard's own *branches* can still ship untested — the tell
+being a comment claiming parity with a sibling that has a named case, written by the author, on
+screen, and unread.
+
+**Two results are recorded as limits rather than passes.** The real 092/093 pair (21 `sprint(093)`
+commits inside 092's window) shows **no regression and no discrimination** — both designs agree
+there, because the real tree contains no instance of the case where they differ. And T2's corpus-grep
+`Verify:` could not be run as written: a negative grep over this corpus matches prose *about* the
+claim, so it became a shape classification of all 24 hits with the positive half checked directly.
+
+**Closed under a recorded ADR-021 owner override: system-verify produced NO VERDICT.** `qa-check.sh`
+emitted 147 lines with 0 FAIL and was killed by the host for **memory** — after its wall-clock budget
+guard had **passed** (`520s < 600s`). A new debt (**TD-143**) separates that mechanism from TD-084's
+time-out and TD-117's budget checkpoint: same artifact, different door, and nothing watches this one.
+Close proceeded on targeted evidence — `check-layers-completeness.sh` 6/0 and the 61/0 fixture suite,
+which on this sprint's own subject is the stronger evidence anyway, since that harness is **opt-in**
+and a *completed* bare gate would not have run it either.
+
+**Also found:** the two `Layers:` checkers parse declarations differently while each carries a comment
+asserting they are identical — SPRINT-096's own Plan yields **0** declared tokens where SPRINT-095's
+yields 14 (**TD-142**). Pre-existing, over-reporting, and left unrepaired by owner ruling: backticking
+this sprint's Plan to quiet its own gate is L-088's shape.
+
+Filed: **TD-142 · TD-143** · **TASK-333 · TASK-334 · TASK-335** (`origin: close-retro`, unranked
+pending `/triage`) · **L-191**. `TD-125` and `TD-141` stay `open` — a sweep closes a row by reading
+the tree, and this close did not re-derive them.
 
 ---
 ## SPRINT-095 — Guards That Misreport (closed early 2026-09-07)

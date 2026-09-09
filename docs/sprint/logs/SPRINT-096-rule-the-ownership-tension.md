@@ -2,8 +2,8 @@
 sprint: 096
 slug: rule-the-ownership-tension
 owner: Maintainer
-last_updated: 2026-09-08
-status: active
+last_updated: 2026-09-09
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 

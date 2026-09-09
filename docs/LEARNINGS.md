@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-08
+last_updated: 2026-09-09
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -22,11 +22,19 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-190**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-191**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
+
+---
+
+## L-191 [tags: tooling] [status: active]: **Every bar in the Tier-G ladder tests a guard at the level of the ARTIFACT SET; a guard's own BRANCHES can still ship untested, and the tell is a comment claiming parity with a sibling that has a named case.** SPRINT-096 T3 met the ladder in full — the motivating artifact ([[L-166]]), the population it must cover ([[L-186]]), a retained must-FAIL per check with a sibling control ([[L-058]] · [[L-142]]), and two seeded-break discrimination proofs under one stated hash convention ([[L-169]] · [[L-187]]) — and its worktree-isolated reviewer still found a load-bearing branch with no case at all. The archived-discovery loop had been given a self-sibling guard (an archived filename sharing the *active* subject's number would make that sprint its own sibling, skipping every one of its own commits — a total bypass, not a narrow miss). Seeding its removal left **all 59 retained fixtures green** while real undeclared work was swallowed at exit 0. **Why the ladder cannot see this: L-166 asks whether the guard is reachable for its motivating artifact, and L-186 whether it is reachable for every other artifact of the same kind — both range over the INPUT SET, and both were satisfied.** This defect was one level down, inside the guard's own control flow, where the input set is irrelevant because the branch is never taken. The seeded-break proof does not catch it either, for the reason L-186 already names: seeds are drawn from branches the author is thinking about, and the author was thinking about the two they had just written fixtures for. **Durable form: when a change ADDS a branch that duplicates one elsewhere in the same file, find the existing branch's fixture and write the twin — and treat a comment asserting parity ("same guard as the active loop", "mirrored verbatim in X") as an unmet test obligation rather than as documentation.** That comment is the cheapest available tell and it is written by the author, at the moment of copying, in the file the reviewer reads. Here it was on screen, correct, and unread by the person who wrote it — [[L-165]] observed again in the same session that had already produced two correct discrimination proofs.
+- seen: Sprint-096 (T3/TASK-298: the archived loop's self-sibling guard, found by the isolated reviewer after the full Tier-G bar was met and ticked; the active loop's twin has had a named case since TASK-299)
+- count: 1
+- promoted: no
+- related: L-186 (the population sibling — this is one level down from it) · L-166 (the motivating-artifact sibling) · L-165 (an outside pass is what found it, again) · L-142 (a seeded break that reddens nothing) · L-189 (whether the fixture itself is sound) · TD-134
 
 ---
 

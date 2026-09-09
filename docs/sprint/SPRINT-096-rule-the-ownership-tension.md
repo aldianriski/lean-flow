@@ -2,8 +2,8 @@
 sprint: 096
 slug: rule-the-ownership-tension
 owner: Maintainer
-last_updated: 2026-09-08
-status: active
+last_updated: 2026-09-09
+status: closed
 gates_signed: G1,G2 @ 42ffbdd
 plan_commit: 896fc18
 close_commit: [sha — set at close]
@@ -296,7 +296,72 @@ genuinely undeclared path still FAILs with its named finding.
 | `TODO.md` | T1 | `TASK-298` re-scoped and retitled to the shape the ruling produces; its false `assumes:` marked measured-false | Low | 15 task rows / 13 `ready` unchanged; blank-line separation checked on every row (L-009) |
 | `docs/sprint/SPRINT-096-rule-the-ownership-tension.md` | T1 | T1 `Layers:` widened for the ADR, after the `scope-change` was logged | Low | 17 DoD before and after; `check-layers-completeness.sh` 6 PASS / 0 FAIL |
 | `docs/sprint/logs/SPRINT-096-rule-the-ownership-tension.md` | T1 | Execution Log created at the first entry; carries the `scope-change` and the G2 record | Low | n/a — append-only record |
+| `scripts/lib/check-layers-observed.sh` | T3 | one membership test decides both sibling arms; SPRINT-095 T1's declaration + window machinery and temp-file map reverted, archived numbers discovered from filenames | **Med** | 61 fixtures 0 FAIL · 3 seeded breaks, each reddening only its own case · real 092/093 reconstruction (no regression) |
+| `evals/run-layers-observed-fixtures.sh` | T3 | the `archived-window` case inverted to pin the accepted hole; selection fixtures added (L-186); the self-sibling branch covered after the review found it bare | **Med** | the suite is the test — 59 → 61 cases, 0 FAIL |
+| `TECH-DEBT.md` | T2 | TD-125's stated cause corrected and its line numbers made re-derivable; TD-131 records the `fmv()` call site's life and removal. **Also T1 (TD-141) and close (TD-142 · TD-143)** | Low | 76 → 78 rows, `- Summary:` count moving in step so no row was fused (L-009) |
+| `TODO.md` | T2 | `TASK-332`'s stale `qa-check.sh:1013` corrected. **Also close** — pointer cleared, TASK-333/334/335 filed unranked | Low | 15 → 18 task rows / 13 → 16 `ready`; 0 rows missing a blank-line separator |
+| `docs/sprint/SPRINT-095-guards-that-misreport.md` | T2 | T1's text no longer names the `*/archive/*` filter as the cause; the stale `:430` is recorded as stale | Low | open-DoD count unchanged at 21 |
+| `docs/sprint/SPRINT-094-guards-for-what-nothing-reads.md` | T2 | same correction — the member the frozen `Layers:` did not declare, found by the corpus grep (L-186) | Low | open-DoD count unchanged at 1 |
+| `docs/LEARNINGS.md` · `CHANGELOG.md` · `docs/knowledge-index.md` | close | L-191 filed and the id-policy pointer advanced; sprint entry prepended; index regenerated (derived, never hand-edited) | Low | 169 → 170 entries, no duplicate id; `gen-index.sh` exit 0 |
 
 ## Retro
 
-<!-- Written at close. Route the buckets to their durable homes (STANDARD §10). -->
+**Retrieval check** — **no miss.** Every rule this sprint needed was found and applied *before* the
+failure it guards, which is the unusual direction: L-190 supplied the reframe (stop refining, rule),
+L-186 was applied at promote and then caught a defect in T3's own first draft, L-170 caught two
+contaminated id derivations, L-108 caught T2's `Verify:` before it was run, and L-142's vacuity
+guard caught a host-dependent fixture premise. **One contradiction of a prior artifact, and it was
+the right call:** T2 corrected TD-125's stated cause, which three sprints of work had treated as
+settled. No retrieval-miss signal to record.
+
+**Cost** — coordinator inline + **2 dispatched agents** (one worktree-isolated Tier-G reviewer at
+~191k tokens, one earlier background A/B). Implementation was **not** dispatched: this session's
+standing no-Agent instruction was lifted by the owner for T3's *reviewer* only, so the routing
+table's `execution → sub-agent` step was deliberately not taken and the isolation budget was spent
+entirely on the independent pass. **That allocation is the finding worth carrying:** the one
+dispatched reviewer returned the only defect neither the author nor the full Tier-G ladder found.
+Three long checker runs (3m32s pristine · 1m01s patched · 5m24s reconstruction) plus two full fixture
+suites dominated wall-clock; the killed gate cost ~10 min for no verdict.
+
+**Worked**
+- **Ruling instead of designing a fourth time.** Three reviews had killed three designs; the sprint
+  that stopped and asked *which failure do we accept* finished in one pass. The costed alternatives
+  (glob change: 3 → 96 subjects; `Sprint: NNN` trailer: 0 of last 60 commits) made the ruling a
+  decision rather than a preference.
+- **Ordering the tasks by what goes stale, not by the Plan's numbering.** T2's deliverable was line
+  numbers inside the file T3 rewrites. Swapping them at G2 cost one log entry; not swapping them
+  would have frozen four figures that were wrong within a commit.
+- **The isolated reviewer, and specifically spending the one dispatch there.** It cleared the class
+  the change was most at risk from (independently re-deriving the 93-file population, checking
+  `dirname` discovery under a path containing a space) *and* found the branch-level gap. Nothing the
+  author ran would have surfaced it.
+- **Guards that report their own vacuity.** T3's first selection fixture asserted its premise and
+  reported that this host's awk translates CRLF on read — so the case would have gone green while
+  discriminating nothing. Written as a `NOTE`, it caught a real weakness in its own author's work.
+- **Cross-checking every derived number against an inverse.** The archive population count
+  disagreed with itself (93 admitted / "1 selected" / 0 rejected) and the id derivations returned
+  `L-999` and `TASK-908` from `.claude/worktrees/`. All three were caught by a second query, none by
+  re-reading the first.
+
+**Friction**
+- **The full Tier-G bar was met and still shipped an untested load-bearing branch.** → **L-191**.
+- **`qa-check.sh` cannot gate a close on this host.** Third verdict-less run; this one after the
+  wall-clock guard passed. → **TD-143 · TASK-334**.
+- **The sprint's own `Layers:` are invisible to the checker it was fixing** — two parsers, both
+  commented as identical. → **TD-142 · TASK-333**.
+- **Three of four cited line numbers were stale before anyone looked**, in artifacts three designs
+  had been built against. The corrected rows now instruct the reader to re-derive rather than cite.
+- **Shell heredoc quoting cost two failed writes** (backticks and nested quotes), each recovered by
+  writing the content to a file and splicing. Minor, but it is the second sprint where fixture and
+  log text had to route around the shell — L-189's mechanism, one level out.
+
+**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- **`L-191` filed** — every bar in the Tier-G ladder tests at the level of the artifact *set*
+  (L-166: the motivating artifact · L-186: the population); a guard's own *branches* can still ship
+  untested, and the tell is a comment claiming parity with a sibling that has a named case. `count: 1`
+  — not promotable yet, and it should not be promoted on this sighting alone.
+- **`L-165` observed again** (an outside pass found what the author could not, with the governing
+  rules loaded and two correct discrimination proofs already written in the same session). Already
+  promoted; recorded here as a further sighting rather than re-filed.
+- **`L-130` observed twice more** (stale frozen figures) and **`L-170` twice more** (worktree
+  contamination in id derivation). Both already durable; no action beyond the sightings.

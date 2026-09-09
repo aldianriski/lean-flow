@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-08
+last_updated: 2026-09-09
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -228,6 +228,58 @@ status: current
 > · 3 soft over-cap — `TODO.md` · `docs/research/adlc-epic-sequencing.md` ·
 > `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` (TD-082's reasoned carry). The
 > `TODO.md` prune was offered at this promote and **not taken** — it stays 551 against a 320 soft cap.
+
+- **TD-142** severity: medium | status: open | created: Sprint-096
+  - Summary: **Two checkers read the same `Layers:` declaration with different parsers, and each
+    carries a comment asserting they are identical.** `check-layers-observed.sh`'s `task_decls`
+    extracts only **backtick-quoted** tokens; `check-layers-completeness.sh` tests membership with
+    `grep -qF` against the raw `Layers:` line, which is **backtick-agnostic**. Both files carry the
+    line *"kept deliberately identical … both checkers read the same declaration, so a parsing rule
+    that differs between them would make one of the two lie."* One of them is lying.
+  - Evidence (SPRINT-096 T2/T3, measured): SPRINT-096's own Plan yields **0** declared tokens to the
+    observed checker and SPRINT-095's yields **14**, the difference being backticks alone. Two of the
+    six FAILs the checker reports on this tree are therefore spurious — files that *are* declared,
+    unbackticked. Independently confirmed pre-existing: a pristine-vs-patched A/B across T3's change
+    returned byte-identical output.
+  - **Both directions are wrong, which is why this is a divergence and not just a strictness choice.**
+    The observed checker **over-reports** (an unbackticked declaration reads as no declaration —
+    loud, and the reason this is `medium` not `high`). The completeness checker's `grep -qF` is a
+    **substring** test, so a token is "declared" if it appears anywhere in the line — inside a longer
+    path, or in a trailing comment — which is L-108's shape and fails *green*.
+  - **The near-miss this already caused:** `L-189` records a SPRINT-095 fixture that was silently
+    green because its `Layers:` was a bare path and declared nothing. Same root, one level down.
+  - Mitigation (**hypothesis, re-derive before building a DoD on it** — §10): make both read one
+    extractor. Which parser is correct is a **ruling**, not an edit: requiring backticks is stricter
+    and matches STANDARD's own examples, but every unbackticked Plan in the tree then becomes
+    undeclared. Count the affected sprints before choosing. → `TASK-333`.
+  - **Not repaired at SPRINT-096 close by owner ruling** — backticking this sprint's own Plan to
+    quiet its own gate is L-088's shape even though the declaration's content would not change.
+  - **Re-file fresh if** either checker's extractor is rewritten, since the divergence is the subject
+    and a one-sided change closes the row without closing the gap.
+
+- **TD-143** severity: **high** | status: open | created: Sprint-096
+  - Summary: **`qa-check.sh` can be killed by the HOST for memory and produce no verdict line, and
+    the wall-clock budget guard passes on the way down — so the guard built to eliminate
+    verdict-less runs does not watch the door this one comes through.** Distinct mechanism from
+    TD-084 (wall-clock overrun), TD-117 (budget checkpoint under concurrent load) and TD-090 (leg 12
+    cost); the *artifact* is identical to all three, which is exactly why it has been read as them.
+  - Evidence (2026-09-09, SPRINT-096 system-verify, clean tree at `b031bda`): the run opened with
+    `PASS qa-budget-default: 520s < 600s command ceiling`, emitted **147 lines with 0 FAIL**, and was
+    then killed by the host for memory **before printing `QA-CHECK: N pass, M fail`**. It never
+    reached leg 12 (eval harnesses) or leg 15 (layers observed). Third recorded instance: this
+    sprint's own promote, ADR-040's cost table, and this run.
+  - Impact: **a close cannot be gated on a check that cannot speak.** SPRINT-096 closed on targeted
+    evidence under a recorded ADR-021 owner override. The failure is worse than a red gate because
+    0 FAILs from a partial run *looks* like a pass — L-120's shape, arriving through the memory door.
+  - **Why `qa-budget-check.sh` does not cover it:** that guard reports an over-budget run and names
+    its skipped harnesses, on a **wall-clock** trigger. A memory kill is not slow; this one was
+    comfortably inside budget when it died.
+  - Mitigation (**hypothesis, re-derive first** — §10): the cheap half is a *verdict-presence* check —
+    a wrapper that treats a missing `QA-CHECK:` line as FAIL rather than letting the caller infer
+    from 0 FAILs. That converts a silent inconclusive into a loud one without touching the memory
+    cost, and is independent of whatever fixes the cost itself (TD-090 · TD-117). → `TASK-334`.
+  - **Re-file fresh if** the gate's memory profile is measured — the mechanism would then be known
+    rather than inferred from three kills.
 
 - **TD-141** severity: high | status: open | created: Sprint-095
   - Summary: **Commit ownership cannot be decided from a commit subject, and the laundering channel

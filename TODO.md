@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-08
+last_updated: 2026-09-09
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -16,26 +16,16 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-096 — Rule the Ownership Tension** → [`docs/sprint/SPRINT-096-rule-the-ownership-tension.md`](docs/sprint/SPRINT-096-rule-the-ownership-tension.md)
+> **None.** `SPRINT-096 — Rule the Ownership Tension` closed 2026-09-09 at **17 of 17 DoD** →
+> [`CHANGELOG.md`](CHANGELOG.md) for what shipped; the file itself is not yet archived (§11 retention
+> parked at this close — see below). Next sprint is formed by `/lean-doc-generator promote` from the
+> groomed Backlog.
 >
-> Promoted 2026-09-08 from the P0/P2 unblock path, not the P1 epic lead: `TASK-331` (rule the
-> tension) → `TASK-332` (correct TD-125's cause) → `TASK-298` (bring the sibling skip into line).
-> **Single stream** — `stream:` stays omitted. `epic:` is omitted too: these are attribution-guard
-> tasks, not EPIC-015 members. **Gates are NOT signed** — `gates_signed:` is absent from the sprint
-> frontmatter and its absence means exactly that; an unattended run reads the sprint file and nothing
-> else (L-099).
->
-> **Read `TASK-331` first.** Three designs were each broken by an independent review, each the same
-> laundering class one level deeper — cited number, then number + window (windows nest: SPRINT-089/090
-> share a close commit), then number + declarations (`docs/LEARNINGS.md` is declared by **74 of 91**
-> archived sprints). A commit subject is an unverifiable claim, so refining it produces another proxy,
-> not a fix (**L-190**). The decisive fact is that **the laundering channel is pre-existing** — the
-> active-sibling skip has always trusted the cited number with no test at all (**TD-141**, `high`). A
-> fourth attempt without a ruling repeats the loop.
->
-> **`L-186` was promoted at this promote** → `.claude/CLAUDE.md` § Anti-Patterns, clause **(iv)** of
-> the Tier-G bar. Nothing else is promotable: 7 of 169 entries carry `count ≥ 2` and it was the only
-> one still `promoted: no`.
+> **Read before the next promote:** `TASK-333` · `TASK-334` · `TASK-335` were filed at this close and
+> sit **unranked in § P3** — close routes follow-ups, `/triage` ranks them. `TASK-334` in particular
+> may outrank that tier once groomed: it is the one that makes a verdict-less `qa-check.sh` run fail
+> loudly instead of reading as zero failures, and this close had to proceed under a recorded ADR-021
+> override because the gate could not speak (**TD-143**).
 
 **§11 retention — four actions applied at the SPRINT-096 promote, on owner approval.**
 **SPRINT-092 and 093 are ARCHIVED** (Plans → `docs/sprint/archive/`, logs → `archive/logs/`, one
@@ -486,6 +476,82 @@ schedulable. Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H
 > **not reused**; TD-117's escalation note in `TECH-DEBT.md` points here.
 
 ### P3 — Long-term
+
+> **Filed at the SPRINT-096 close (2026-09-09) and deliberately UNRANKED.** Close routes
+> follow-ups to the Backlog; `/triage` ranks them. They are parked here rather than in P0 so an
+> unranked row is never mistaken for a blocking one — `TASK-334` in particular affects every
+> close and may well outrank this tier once groomed.
+
+- [ ] TASK-333 — Rule which `Layers:` parser is correct, then make both checkers read one extractor  [size: M] [risk: med] [HITL]
+      class:      decision
+      tier:       G (ADR-029 — both subjects are gate checkers; the ruling changes what "declared"
+                  means for every sprint file in the tree, so a wrong call is silent in one
+                  direction and noisy in the other)
+      done-when:  one recorded ruling says whether a `Layers:` token must be backtick-quoted, and
+                  `check-layers-observed.sh` and `check-layers-completeness.sh` derive their tokens
+                  from **one** extractor rather than two that disagree while both claim parity in
+                  comments (**TD-142**). The ruling is taken on a **counted** basis, not a stylistic
+                  one: derive how many live and archived sprint Plans carry unbackticked `Layers:`
+                  before choosing, because requiring backticks makes every one of them undeclared.
+                  Both directions are defects and both must be closed — the observed checker
+                  over-reports on a bare path, and the completeness checker's `grep -qF` is a
+                  **substring** test that accepts a token appearing anywhere in the line, including
+                  inside a longer path or a trailing comment (L-108, failing green)
+      touches:    scripts/lib/check-layers-observed.sh · scripts/lib/check-layers-completeness.sh ·
+                  evals/run-layers-observed-fixtures.sh ·
+                  evals/run-layers-completeness-fixtures.sh · docs/sprint/SPRINT-*.md (if the ruling
+                  requires backticking existing Plans — count first, that may be the larger half)
+      depends-on: none
+      assumes:    **The divergence is real and measured, not inferred:** SPRINT-096's Plan yields 0
+                  declared tokens to the observed checker where SPRINT-095's yields 14, backticks
+                  being the only difference. Pre-existing, not introduced by SPRINT-096 T3 — a
+                  pristine-vs-patched A/B returned byte-identical output. *Confirm both figures
+                  against the tree before designing; they will have moved if any Plan is edited*
+      tracker:    **TD-142** · L-108 (matched by shape, not substring) · L-189 (a SPRINT-095 fixture
+                  was silently green for exactly this reason) · L-058
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-334 — Make a verdict-less `qa-check.sh` run FAIL loudly instead of reading as 0 failures  [size: S] [risk: low] [AFK]
+      class:      execution
+      tier:       G (ADR-029 — this is the gate's own report; a run that cannot speak currently
+                  presents as a clean partial, which is the silent-false-negative shape)
+      done-when:  a `qa-check.sh` run that terminates without printing its `QA-CHECK: N pass, M fail`
+                  verdict line is reported as a FAILURE by whatever invokes it, rather than leaving
+                  the caller to infer a result from "0 FAILs so far" (**TD-143**). Deliberately
+                  scoped to the *reporting*, not the *cost*: this does not attempt to make the gate
+                  finish (TD-090 · TD-117), it makes not-finishing unmistakable. **Exercised on a
+                  real verdict-less run**, not only a fixture — kill a run mid-flight and confirm the
+                  wrapper reports failure (L-007 · L-166)
+      touches:    scripts/qa-check.sh (or its callers) · evals/ (retained must-FAIL fixture)
+      depends-on: none — independent of the memory cost itself
+      assumes:    **The wall-clock guard does not cover this and that is measured, not assumed:** the
+                  SPRINT-096 system-verify run printed `PASS qa-budget-default: 520s < 600s` and was
+                  then killed by the host for memory, emitting 147 lines and 0 FAIL with no verdict.
+                  *Confirm the budget guard still passes on a memory kill before building on it*
+      tracker:    **TD-143** · TD-090 · TD-117 · TD-084 (the wall-clock mode this does NOT duplicate)
+                  · L-120 (the number to read is the one the gate prints)
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-335 — Clear two stale records SPRINT-096 found but did not own  [size: S] [risk: low] [AFK]
+      class:      mechanical-ingest
+      done-when:  (a) `TD-051` no longer cites `Line 225` for `check-layers-observed.sh`'s
+                  subject-sprint `*/archive/*` skip — the same staleness class SPRINT-096 T2 fixed in
+                  TD-125, left alone then only because it was another row's subject; the figure is
+                  **derived at the point of use**, never copied from this entry (L-130). (b)
+                  SPRINT-094's parked-ruling checkbox — *"archiving SPRINT-092 and SPRINT-093"* — is
+                  ticked or withdrawn: the ruling was taken at the SPRINT-096 promote and both
+                  sprints are archived, so the item is satisfied and reads as outstanding. Closing a
+                  closed sprint's item is a governance action, which is why SPRINT-096 T2 corrected
+                  its prose and left the box alone
+      touches:    TECH-DEBT.md · docs/sprint/SPRINT-094-guards-for-what-nothing-reads.md
+      depends-on: none
+      assumes:    none — both were observed directly during SPRINT-096 T2's corpus classification
+      tracker:    TD-051 · TD-125 · L-130
+      origin:     close-retro
+      state:      ready
+
 
 > **Opportunistic by ruling, not by priority.** Neither entry below can be scheduled — each is taken
 > when a run or a session produces the vehicle for it. Promoting one into a sprint whose shape cannot
