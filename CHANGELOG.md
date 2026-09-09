@@ -38,11 +38,20 @@ at the level of the artifact *set*, and a guard's own *branches* can still ship 
 being a comment claiming parity with a sibling that has a named case, written by the author, on
 screen, and unread.
 
-**Two results are recorded as limits rather than passes.** The real 092/093 pair (21 `sprint(093)`
-commits inside 092's window) shows **no regression and no discrimination** — both designs agree
-there, because the real tree contains no instance of the case where they differ. And T2's corpus-grep
-`Verify:` could not be run as written: a negative grep over this corpus matches prose *about* the
-claim, so it became a shape classification of all 24 hits with the positive half checked directly.
+**Two results were recorded as limits rather than passes — and the close resolved one of them.** The
+real 092/093 pair (21 `sprint(093)` commits inside 092's window) showed **no regression and no
+discrimination**: both designs agree there, and no live sprint window cited any archived number, so
+the case where they differ did not exist in the tree. **Archiving this sprint at close created it.**
+14 `sprint(096)` commits sit inside each of 094's and 095's windows, and a controlled A/B on the same
+tree gives the pre-T3 checker **9 extra blamed items** — `check-layers-observed.sh`,
+`run-layers-observed-fixtures.sh`, `TECH-DEBT.md`, `ADR-040` — every one of them SPRINT-096's own work
+re-attributed onto its siblings, which is TD-125's defect live, against a clean shipped checker. The
+mechanism sharpens the ruling: the old design failed here **because** 096's `Layers:` are
+unbackticked, so it dropped 096 from its ownership map entirely — its correctness depended on the
+parser divergence **TD-142** records, and the shipped design reads no declarations at all. The second
+limit stands: T2's corpus-grep `Verify:` could not be run as written, since a negative grep over this
+corpus matches prose *about* the claim (L-108), so it became a shape classification of all 24 hits
+with the positive half checked directly.
 
 **Closed under a recorded ADR-021 owner override: system-verify produced NO VERDICT.** `qa-check.sh`
 emitted 147 lines with 0 FAIL and was killed by the host for **memory** — after its wall-clock budget

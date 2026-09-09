@@ -566,3 +566,42 @@ when the declaration's content does not change. The divergence goes to the Retro
 measurement attached (0 declared tokens for SPRINT-096 against 14 for SPRINT-095).
 
 consequence · T2,T3 · behaviour:low · governance:high
+
+---
+
+### 2026-09-09 | progress | §11 retention applied — and archiving this sprint produced the discrimination T3 could not
+
+Three retention actions approved and applied: **SPRINT-096 archived** (Plan → `archive/`, log →
+`archive/logs/`, one commit, INDEX row), **shipped Backlog entries removed** (`TASK-298` · `331` ·
+`332`, outright per §11 — their durable home is `CHANGELOG.md` + this file + git; ids never reused),
+and the **`TODO.md` promote narrative pruned** (626 → 509 lines against a 320 soft cap; the block
+restated `CHANGELOG.md` for a promote that had since closed — L-008. Replaced by four standing facts
+the Backlog actually depends on, rather than deleted outright).
+
+**The archival was not housekeeping. It was the missing half of T3's proof.**
+
+T3 ticked its real-artifact DoD on *no regression* and recorded honestly that it could not
+discriminate: on the 092/093 pair both designs agree, and **no live sprint window cited any archived
+number**, so the case where they differ did not exist in the tree. Archiving SPRINT-096 created it —
+**14 `sprint(096)` commits sit inside each of 094's and 095's windows**, and 096 is now archived.
+
+Controlled A/B, same tree, the checker as the only variable:
+
+| Checker | Blamed on 094 / 095 |
+|---|---|
+| **pre-T3** (`a333134^`, declaration + window route) | **9 extra items** — `T3:scripts/lib/check-layers-observed.sh` · `T3:evals/run-layers-observed-fixtures.sh` · `T2:TECH-DEBT.md` · `T2:TODO.md` · `T1:docs/DECISIONS.md` · `T1:docs/adr/ADR-040-…` — every one of them **SPRINT-096's own work re-attributed onto its siblings**. TD-125's defect, reproduced live |
+| **shipped** (filename discovery) | only the two pre-existing `TECH-DEBT.md` items. Clean |
+
+**And the mechanism matters more than the count.** The old design failed here *because* SPRINT-096's
+`Layers:` are unbackticked: `task_decls` returned **0** tokens, so `_atok` was empty, so the
+`[ -n "$_atok" ] || continue` guard dropped 096 from `archived_decls` entirely, so `owns_commit`
+denied it and its commits were blamed. **The reverted design's correctness depended on the very
+parser divergence `TD-142` records.** The shipped design reads no declarations at all and is
+structurally immune to it — an argument for the ruling that nobody made at G2, because nobody knew
+about the divergence yet.
+
+**Recorded as a strengthening, not a correction.** T3's DoD tick stands exactly as written: on the
+**092/093 pair** there is still no discrimination, and that was the pair the criterion named. This is
+a *different* case, which the close created and which did not exist when the criterion was frozen.
+
+consequence · T3 · behaviour:high · governance:med

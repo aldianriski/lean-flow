@@ -27,51 +27,22 @@ status: current
 > loudly instead of reading as zero failures, and this close had to proceed under a recorded ADR-021
 > override because the gate could not speak (**TD-143**).
 
-**§11 retention — four actions applied at the SPRINT-096 promote, on owner approval.**
-**SPRINT-092 and 093 are ARCHIVED** (Plans → `docs/sprint/archive/`, logs → `archive/logs/`, one
-commit, INDEX rows for both). Moved as a **pair** per TD-125, and measured rather than assumed: clean
-HEAD reported 6 FAILs across the four sprints; after the move, what `qa-check` passes (094 + 095 only)
-reports the same 4 — two removed, none added. **SPRINT-094 and 095 remain unarchived.** Also applied:
-CHANGELOG rotation (v1.58.0 · v1.59.0 · v1.60.0 → `docs/changelog/`, root 416 → 310 lines, two minors
-inline as §11 requires); five 093-cohort debt rows deleted on the clock S-094 set (**TD-109 · TD-110 ·
-TD-111 · TD-112 · TD-123**; `TD-101`/`TD-113` stay, due SPRINT-097); and 103 promoted learnings
-collapsed to their §11 pointers (`docs/LEARNINGS.md` 1226 → 916). **Not taken:** the `TODO.md` prune —
-this file stays **551** against a 320 soft cap, and this § Active Sprint narrative is still the
-remaining prune candidate (it restates `CHANGELOG.md` — L-008; owner-gated).
+**Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
+SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
+at the SPRINT-096 close on owner approval (L-008 — a copied narrative drifts from the one it copies).
 
-**The debt ledger holds 76 rows — 74 open, 2 not-open**, of which **5 open rows are `severity: high`**
-and all five carry a Backlog entry: `TD-141` → `TASK-331` · `TD-132` → `TASK-328` · `TD-128` and
-`TD-117` → `TASK-329` · `TD-090` → `TASK-322`. **Derive those counts by anchoring to the row header** —
-a bare `grep 'status: open'` over this ledger over-counts, because the rows quote their own status
-strings in prose (L-108). The ≥3-sprints aging figure is **61 of 74**, derived at this promote and
-recorded in the ledger's own sweep note; re-derive it next promote rather than reading it from here
-(L-097 · L-130). **One row is flagged rather than closed: `TD-132` is still `open` although its
-tracker `TASK-328` shipped at SPRINT-095** — a sweep closes a row by reading the tree, and this one
-did not re-derive TD-132's claim.
-
-**SPRINT-092 shipped the §4 conversion and measured it.** Default-profile saving **22.4–27.9 s**
-(23.4–28.2 s removed, 0.37–0.98 s added), with §4 rules still evaluating on every bare run. The saving
-exceeds Round 12's 9.5–13.6 s ceiling by ~2× and **that is not the conversion outperforming** — the
-ceiling costed twelve cases converted, and the shipped leg does not carry S4.APPEND's four git cases at
-all (they moved to opt-in, D4). Total work across both profiles went **up** ~76–85 s.
-
-**`QA_BUDGET_SECONDS` stays at 520 — the reduction TD-117 anticipated is NOT available on evidence.**
-No clean whole-gate sample was obtained: the default profile exceeds the 600 s command ceiling on this
-host and the opt-in profile measures 1450 s, while `qa-budget-default` passes by comparing the
-*configured* budget to the ceiling rather than the actual runtime (**TD-128**). A pruning of 18 stale
-worktrees (178 MB) was tried as the cause and **disproved** — 1413 s before, 1450 s after. Three have
-accumulated again under `.claude/worktrees/`.
-
-**The §11 prune is DONE — ruled by the owner at the 2026-09-07 `/triage`.** `TASK-318` · `323` ·
-`324` · `325` shipped at SPRINT-094 (T3 · T4 · T1 · T2) and their Backlog entries are removed; the
-durable home is `CHANGELOG.md` + the sprint file + git, and the ids are recorded as never-reused in
-§ P3 below. They had been re-proposed at three consecutive closes.
-
-**The Backlog is ranked, epic-first (owner ruling, same pass).** Four tiers replace the single
-undifferentiated P1: **P0** `TASK-298`/`328` (each blocks work that is otherwise ready) · **P1**
-`TASK-319`/`296`/`297`/`300`/`326` (EPIC-015 § Closed-when 1 · 5 · 6 lead) · **P2**
-`TASK-320`/`321`/`322`/`329` · **P3** `TASK-188`/`327`, opportunistic by ruling and not
-schedulable. Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H24–H26.
+- **Debt ledger: 78 rows.** Re-derive open/closed and the `severity: high` set **by anchoring to the
+  `^- **TD-NNN**` row header** — a bare `grep 'status: open'` over-counts, because rows quote their
+  own status strings in prose (L-108). Aging figures are derived at each promote, never read from
+  here (L-097 · L-130).
+- **`QA_BUDGET_SECONDS` stays at 520.** The reduction TD-117 anticipated is not available on
+  evidence: no clean whole-gate sample exists on this host. `qa-budget-default` compares the
+  *configured* budget to the ceiling rather than actual runtime (**TD-128**) — and it passes even
+  when the gate dies, which is **TD-143**.
+- **The gate cannot currently verdict on this host.** SPRINT-096 closed under a recorded ADR-021
+  override after a memory kill produced 147 lines and no `QA-CHECK:` line. Assume a close needs
+  targeted evidence until `TASK-334` lands.
+- **Backlog ranking** is `/triage`'s output, not this block's: tiers P0–P3 below are the record.
 
 ---
 
@@ -83,46 +54,6 @@ schedulable. Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H
 
 > Re-ranked at the SPRINT-094 `/triage` (2026-09-07). Each entry below blocks work that is otherwise
 > ready to start; the reason sits in its own `tracker:` line, not here.
-
-- [ ] TASK-298 — Make both sibling arms trust the cited number, per ADR-040  [size: S] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — this IS the attribution guard. The ruling NARROWS what it claims
-                  rather than widening an exclusion, but a guard that stops checking something must
-                  still fail loudly on everything it still checks)
-      done-when:  archived and active siblings are decided by **one** rule — the cited sprint number
-                  alone, no declaration test and no window test — per
-                  [`ADR-040`](docs/adr/ADR-040-commit-ownership-accepts-the-subject-claim.md), while
-                  every genuinely undeclared path still FAILs with its named finding. Concretely:
-                  SPRINT-095 T1's declaration + window machinery and its temp-file map are
-                  **reverted** (`2335eab` · `f1fdf02` · `e4547b3`, +94 lines / 0 removed, currently
-                  on `main` at 0 of 6 DoD), and archived sprint numbers are discovered from their
-                  **filenames** — no `git`, no frontmatter read, no window — so they land in
-                  `sibling_sprints` beside the active ones. A *literal* revert is NOT the task: it
-                  would drop archived sprints from the trusted set entirely and flip the asymmetry
-                  instead of removing it. The rule is named in a comment where the code's reader
-                  meets it, and it cites ADR-040 rather than restating it
-      touches:    scripts/lib/check-layers-observed.sh (the `sibling_sprints` build and the
-                  per-commit skip — re-derive both line numbers, do not quote them from here) ·
-                  evals/fixtures/layers-observed/** · evals/run-layers-observed-fixtures.sh
-      depends-on: TASK-331 — SHIPPED as SPRINT-096 T1, ADR-040 recorded 2026-09-08
-      assumes:    **The archival half of this task's original motivation is already resolved, and
-                  measured — do not rebuild it.** SPRINT-092 and 093 were archived as a pair at the
-                  SPRINT-096 promote and the gate did not go red: clean HEAD reported 6 FAILs across
-                  the four sprints; after the move, what `qa-check` passes (094 + 095 only) reports
-                  the same 4 — two removed, none added. What remains is making the RULE consistent,
-                  not making archival possible. **The earlier `assumes:` on this row is superseded**:
-                  its active-sibling half shipped as `TASK-299`, and its statement that the
-                  `*/archive/*` filter at the `sibling_sprints` build is the operative mechanism is
-                  **false and measured false** — 092 is blamed for 85 commit:path pairs both with
-                  that line present and with it deleted; the mechanism is `qa-check.sh` handing the
-                  checker a non-recursive `ls docs/sprint/SPRINT-*.md`. Correcting that claim
-                  wherever it still appears is `TASK-332`'s subject, not this row's
-      tracker:    **ADR-040** (the ruling) · **TD-141** (stays `open` until this lands — the tree
-                  still runs the rejected design) · TD-125 · TASK-299 + TD-107 · L-020 ·
-                  L-165/L-168 (worktree-isolated reviewer, mandatory — Tier G) · L-166 · L-186
-                  (vary the SELECTION, not the verdict) · L-190
-      origin:     manual
-      state:      ready
 
 - [ ] TASK-328 — Anchor the dispatch preflight's `Depends-on:` parser to the id list  [size: M] [risk: med] [HITL]
       class:      execution
@@ -298,54 +229,6 @@ schedulable. Route **`TD-120`** next: the S4.APPEND git-spawn cost, **before** H
       state:      ready
 
 ### P2 — Follow-on
-
-- [ ] TASK-331 — Rule the archived-sprint ownership tension, then re-scope TASK-298  [size: M] [risk: high] [HITL]
-      class:      decision
-      done-when:  a recorded ruling on **which failure this repo accepts**, because it cannot avoid
-                  both: (a) report commits citing an archived sprint → TD-125's false positives make
-                  archiving turn the gate red; (b) skip them → a commit subject launders real
-                  undeclared work. **The pre-existing code already chose (b) for ACTIVE siblings and
-                  never said so** — the skip trusts the cited number with no declaration or window
-                  test (verified at `2335eab~1`), so any ruling must cover BOTH sibling kinds or it
-                  is inconsistent by construction. Not a fix: a ruling, plus the re-scoped shape of
-                  TASK-298 that follows from it
-      touches:    TECH-DEBT.md · TODO.md · possibly scripts/lib/check-layers-observed.sh (no code
-                  change is made under this task)
-      depends-on: none
-      assumes:    **three designs were each broken by an independent review — do NOT attempt a
-                  fourth without re-scoping first (L-190).** Cited number → 91 numbers exempt
-                  anything. Number + window → windows nest (SPRINT-089/090 share a close commit).
-                  Number + declarations → declarations are shared (`docs/LEARNINGS.md` is declared by
-                  74 of 91 archived sprints). Options worth costing, none taken: make archival not
-                  change the checker's input set at all (a `qa-check.sh` glob change rather than
-                  ownership logic); accept the channel explicitly and document it for both sibling
-                  kinds; or find a signal that is not the commit subject
-      tracker:    **TD-141** · TD-125 · TASK-298 · SPRINT-095 T1 (closed at 0 of 6) · L-190
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-332 — Correct TD-125's stated cause and every artifact that repeats it  [size: S] [risk: low] [AFK]
-      class:      mechanical-ingest
-      done-when:  TD-125, `TASK-298` and SPRINT-095's T1 text no longer name
-                  `check-layers-observed.sh:397`'s `*/archive/*` filter as the mechanism. **Measured,
-                  not argued:** deleting that line alone changes nothing — 092 is blamed for 85
-                  commit:path pairs both with the filter present and deleted. The operative mechanism
-                  is upstream — `qa-check.sh`'s layers-observed leg hands the checker a NON-recursive
-                  `ls docs/sprint/SPRINT-*.md`, so an archived sprint never reaches `"$@"` to be
-                  filtered at all, which makes that filter UNREACHABLE for archived sprints rather
-                  than merely ineffective. **Re-derive every line number at the point of use** — this
-                  row cited `qa-check.sh:1013` and the real figure was `:1198`, the third stale
-                  citation in this family (L-130). Also record on TD-131 that SPRINT-095 T1 added an
-                  archived-file `fmv()` call site and SPRINT-096 T3 reverted it, so the row's
-                  exposure is unchanged — the frozen wording ("gained a call site") was restated at
-                  SPRINT-096's batch G2, because ADR-040 discovers archived sprints from FILENAMES
-                  and the call site does not survive the sprint
-      touches:    TECH-DEBT.md · TODO.md · docs/sprint/SPRINT-095-guards-that-misreport.md
-      depends-on: none — independent of TASK-331's ruling; the cause is wrong either way
-      assumes:    none. The correction is measured and recorded in SPRINT-095's Execution Log
-      tracker:    TD-125 · TD-131 · SPRINT-095 T1
-      origin:     close-retro
-      state:      ready
 
 - [ ] TASK-320 — Give the launcher a fire-time run ledger, closing TD-122 and TD-124 together  [size: M] [risk: med] [HITL]
       class:      execution
