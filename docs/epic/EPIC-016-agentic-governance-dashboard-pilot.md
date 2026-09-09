@@ -58,7 +58,7 @@ keeps its own § Closed-when.
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| _(none yet — first member promotes from `workdoo` once ADR-042/043 land)_ | | | |
+| _(none yet — first member promotes from `workdoo` once workdoo ADR-001/002 land)_ | | | |
 
 ## Decisions
 
@@ -85,12 +85,12 @@ keeps its own § Closed-when.
   G2 of the sprint that ships typed outcomes, jointly with `TASK-297`, which carries the same question
   on the lean-flow side.
 - **What does Git own versus the durable store?** Artifacts and source are Git-authoritative; live
-  queue state is not. The boundary needs stating before the first write path. → **ADR-042**, owed at
+  queue state is not. The boundary needs stating before the first write path. → **workdoo ADR-001**, owed at
   the first member sprint's G2.
-- **What exactly does the runtime adapter contract promise?** → **ADR-043**, owed with D3's fake
+- **What exactly does the runtime adapter contract promise?** → **workdoo ADR-002**, owed with D3's fake
   adapter, since the fake is what makes the promise testable.
 - **How is an approval bound to identity, revision and scope such that a worker cannot forge one?**
-  Closes audit findings F01 and F02. → **ADR-044**, owed before the Approval Inbox ships.
+  Closes audit findings F01 and F02. → **workdoo ADR-003**, owed before the Approval Inbox ships.
 - **Is Postgres provisioned on the shared VPS?** The reference platform runs SQLite WAL, so this is
   new host state, not an inherited one. → a measurement, resolved in the first member sprint's
   environment validation, not by ruling (L-094).
