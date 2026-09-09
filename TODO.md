@@ -115,6 +115,41 @@ at the SPRINT-096 close on owner approval (L-008 — a copied narrative drifts f
 > lead, ahead of the cheaper standalone guards, because the epic cannot close without a real
 > unattended run and every sprint that defers it defers the epic.
 
+- [ ] TASK-336 — Make the run rollup unconditional, and lift the continuation contract out of a paragraph  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — the false negative is silent by construction: a run that ends
+                  mid-Plan and emits no rollup is indistinguishable from one that finished, and the
+                  artifact that would tell them apart is the one the failure drops)
+      authority:  J1
+      done-when:  **four clauses.**
+                  (1) A sprint whose Plan carries open DoD **and** whose Execution Log has no
+                  `run-complete` entry with a `terminal ·` state is a **named FAIL**, and the check
+                  is **not gated on run mode**. Today `check-night-run-rollup.sh` is reachable only
+                  through the reaper, which fires on unattended runs — so the mode this repo
+                  actually runs in has no guard at all.
+                  (2) Pointed at its **motivating population**, not only at fixtures: **44 of 50**
+                  sprint logs in this repo carry no `run-complete` entry (42 of 48 archived, plus
+                  both active ones) — derived three ways that agree, `48 = 42 + 6`. Decide per
+                  ADR-021 whether those are grandfathered or backfilled; either ruling is fine, an
+                  unstated one is not.
+                  (3) Retained must-FAIL **plus** a sibling control that stays green in the same
+                  run: an attended sprint missing its rollup FAILs with its named finding, while an
+                  attended sprint carrying one PASSes. Without the control, a checker that always
+                  reported "missing" would satisfy the first half.
+                  (4) The **continuation contract** moves out of `orchestrator/SKILL.md` step 4's
+                  ~200-word paragraph into its own headed section, at the same structural level as
+                  G1/G2 — the form those two have and that this rule lacks, which is the whole
+                  finding of L-192 and not a cosmetic preference.
+      touches:    scripts/lib/check-night-run-rollup.sh · scripts/night-run.sh (reap gate) ·
+                  skills/orchestrator/SKILL.md · evals/fixtures/
+      depends-on: none
+      assumes:    that grandfathering the 44 existing logs is acceptable — **UNCONFIRMED**, and it
+                  is an owner ruling rather than a measurement, so it is decided at this task's G2
+                  and not parked waiting for evidence that will not arrive (L-094)
+      tracker:    L-192 · ADR-016 (the launcher writes the rollup) · L-166 (the mode-axis sibling)
+      origin:     manual
+      state:      ready
+
 - [ ] TASK-319 — Prove § Closed-when 1 with a real unattended run against the repaired reaper  [size: M] [risk: high] [HITL]
       class:      execution
       authority:  J2
