@@ -1,3 +1,10 @@
+---
+owner: Maintainer
+last_updated: 2026-09-10
+update_trigger: The EPIC-016 pilot's scope, target dates, or phase gating changes
+status: current
+---
+
 # Lean Flow — Revisi Roadmap MVP Dashboard Agentic Governance
 
 Tanggal: **9 September 2026** · Revisi berdasarkan target Aldi: **AI bisa dimanfaatkan, dipantau, dan dikendalikan melalui dashboard secepat mungkin**.

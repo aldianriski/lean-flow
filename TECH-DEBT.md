@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-09
+last_updated: 2026-09-10
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -229,6 +229,71 @@ status: current
 > `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` (TD-082's reasoned carry). The
 > `TODO.md` prune was offered at this promote and **not taken** — it stays 551 against a 320 soft cap.
 
+> **Aging sweep — SPRINT-097 promote (2026-09-10).** **70 of 76 open rows** are ≥3 sprints
+> unaddressed. Derived, then cross-checked against a second query that agrees: 70 aged + 6 unaged =
+> 76 open; and independently, S-096's 61 aged + the 9 rows filed at Sprint-094 (which age to 3 here)
+> = 70. Both anchored to the `^- **TD-NNN**` row header, never a bare `grep 'status: open'` (L-108).
+> The first derivation of this figure was WRONG and is recorded rather than smoothed: a `sed
+> 's/[*-]//g'` in the extraction turned `Sprint-096` into `Sprint096`, so every row parsed as age 0
+> and the query returned "76 of 76 aged". Caught by the number disagreeing with the unaged list, not
+> by re-reading the pipeline. Trend, unbroken: 14/19 (S-078) → 16/22 (S-080) → 17/24 (S-081) →
+> 22/25 (S-083) → 24/28 (S-084) → 27/37 (S-086) → 56/63 (S-094) → 61/74 (S-096) → **70/76 (S-097)**.
+> **Escalation: TD-143 escalated, TD-141 closed, and a rule/practice divergence is flagged.**
+> `TD-143` (`severity: high`, filed S-096) had its tracker `TASK-334` sitting **unranked in P3** —
+> close routes follow-ups, it does not rank them — so it is moved to **P1** here, which is what the
+> ledger's auto-escalation actually says. **`TD-141` is closed as `resolved → accepted (no task)`**
+> under ADR-040, re-derived against the tree rather than inherited: its own unblock condition was
+> *"stays open until T3 lands the code"*, and `check-layers-observed.sh:501-508` now runs one
+> ownership test naming this row in its comment. **Flagged, not acted on:** `TD-090` → `TASK-322`
+> and `TD-117`/`TD-128` → `TASK-329` are `severity: high` rows whose trackers sit at **P2**. Every
+> sweep since S-084 has read "carries a Backlog entry" as satisfying the escalation rule, but the
+> rule says P1. That divergence is `/triage`'s to settle, not a promote's to silently re-rank.
+> **Deletion clock EXECUTED on schedule.** The S-094 sweep dated `TD-101` and `TD-113` to the
+> SPRINT-097 promote, because their clock runs from the sweep that verified them rather than from the
+> sprint that fixed them. Both deleted here. Ledger 78 → 76 rows (2703 → 2605 lines); the id set was
+> diffed before and after and shows exactly those two removed, and the `- Summary:` count fell 78 →
+> 76 in step, so no neighbouring row was fused by the deletion (L-009). Ids stay monotonic.
+> Next clock: `TD-141`, accepted here, is due at **SPRINT-100**, not before.
+> **§2 cap breaches (sourced from `check-doc-caps.sh`, never restated from a list):** 76 PASS · 0
+> FAIL · 3 soft over-cap — `TODO.md` · `docs/research/adlc-epic-sequencing.md` ·
+> `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` (the latter two are TD-082's reasoned
+> carry). **The `TODO.md` prune was offered and TAKEN this time**, after being declined at S-096:
+> 545 → 455 lines by collapsing the five promoted tasks' Backlog entries to pointers at the sprint
+> file that now owns their specs (L-008). It is **still over** the 320 soft cap, and closing the
+> remaining 135 lines would mean cutting the live specs of eleven un-promoted tasks — a content
+> ruling for `/triage`, not something a promote takes on its own.
+> **Gate at this promote: `QA-CHECK: 225 pass, 33 fail`** (opt-in profile, ADR-039). 33 of the 82
+> FAIL lines trace to SPRINT-094 and SPRINT-095 having closed without their §11 archival pass, so the
+> sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
+> two closed sprints as active Plans. Both archived with their logs at this promote.
+
+- **TD-144** severity: medium | status: open | created: Sprint-097
+  - Summary: **The epic-state checker resolves a member sprint's number against THIS repository's
+    archive, so an epic whose members live elsewhere is checked against local sprints that merely
+    share a number.** `scripts/lib/check-epic-archive.sh`'s `member_plan()` globs
+    `"$2"/docs/sprint/archive/SPRINT-"$_m"-*.md` (and the live sibling beside it) — correct for every
+    epic this repository has ever had, and wrong for `EPIC-016`, whose member sprints live in the
+    `workdoo` repository by **ADR-041**.
+  - Evidence (SPRINT-097 promote, measured): `QA_FULL=1 sh scripts/qa-check.sh` reports two
+    `FAIL epic-state:` findings against `EPIC-016`. SPRINT-001's Status cell cites `eb3d9e7` and
+    SPRINT-002's cites `28c5203`; this repository's own `SPRINT-001-ship-and-validate.md` carries
+    `close_commit: b0f2695` and `SPRINT-002-dogfood-fixes.md` carries `007869e`. Both epic rows are
+    correct and both findings are false.
+  - **L-186's shape, and the epic file half-anticipated it.** EPIC-016 § Member sprints carries a
+    comment saying the v1.63.0 rollup check "reads THIS repository only and cannot see a workdoo
+    sprint that closed without a row here" — the author foresaw the checker being *blind*, not that
+    it would *collide*. Blindness yields silence; collision yields a confident wrong answer, which is
+    worse, because it teaches its reader to disregard the leg, and that is how a true finding gets
+    skipped later.
+  - **The fix is a ruling, not an edit.** Skipping an out-of-repo member silently converts a false
+    positive into an unchecked row — the same failure one level down. Whether such a row is skipped,
+    or reported as unverifiable, is the decision. → `TASK-337` (SPRINT-097 T5).
+  - Mitigation (**hypothesis, re-derive before building a DoD on it** — §10): give `member_plan()` a
+    way to tell an out-of-repo member row from a local one — the row's link target is the obvious
+    signal and ADR-041 the governing decision — then rule what the leg says about it.
+  - **Re-file fresh if** a second epic takes members from another repository: the row's subject is
+    the cross-repo case, and a fix keyed to EPIC-016 alone would not cover it.
+
 - **TD-142** severity: medium | status: open | created: Sprint-096
   - Summary: **Two checkers read the same `Layers:` declaration with different parsers, and each
     carries a comment asserting they are identical.** `check-layers-observed.sh`'s `task_decls`
@@ -281,7 +346,7 @@ status: current
   - **Re-file fresh if** the gate's memory profile is measured — the mechanism would then be known
     rather than inferred from three kills.
 
-- **TD-141** severity: high | status: open | created: Sprint-095
+- **TD-141** severity: high | status: resolved → accepted (no task) | created: Sprint-095 | accepted at SPRINT-097 promote under ADR-040
   - Summary: **Commit ownership cannot be decided from a commit subject, and the laundering channel
     that follows is PRE-EXISTING — it is not something SPRINT-095 T1 introduced.** The active-sibling
     skip trusts the cited sprint number alone, with no declaration or window test
@@ -316,8 +381,18 @@ status: current
     shape of one. Symmetric acceptance needs archived numbers *in* the trusted set, so archived
     sprints are discovered from their **filenames** (no `git`, no frontmatter read, no window); a
     literal revert would drop them from the set and flip the asymmetry rather than remove it.
-  - **The row stays `open` until T3 lands the code.** The ruling is recorded; the tree still runs the
-    rejected design. `severity` stays `high` for the same reason.
+  - **RESOLVED — accepted at the SPRINT-097 promote, re-derived against the tree rather than
+    inherited.** This row's own unblock condition was *"stays `open` until T3 lands the code"*, and
+    SPRINT-096 T3 landed it: `scripts/lib/check-layers-observed.sh:501-508` now runs **one** ownership
+    test over a `sibling_sprints` set holding active siblings from `"$@"` **and** archived numbers
+    discovered from filenames, and its comment names this row — *"the asymmetry the comment here used
+    to assert as deliberate is exactly what TD-141 recorded and what ADR-040 removed."* The channel is
+    not closed; it is **accepted symmetrically and said out loud**, which is what the ledger's
+    acceptance path is for. The cost was weighed in ADR-040: the `qa-check.sh` glob change is dead on
+    cost (checker subjects 3 → 96 on a gate that already cannot finish), and the `Sprint: NNN` trailer
+    — the only route that would *close* the channel — was rejected on size, 0 of the last 60 commits
+    carrying any trailer. `severity` stays recorded as `high` because the accepted hole is high, not
+    because the row is unaddressed.
   - **Consequence to carry forward:** `check-layers-observed.sh` is **not** a guard against a
     dishonest commit subject and must not be cited as one. The two options *not* taken are recorded
     in ADR-040 with their costs — the `qa-check.sh` glob change is dead on cost (checker subjects
@@ -957,56 +1032,6 @@ status: current
     verification in this epic compares **reason text**, not just the verdict word, so a doubled
     prefix is noise inside the very signal later differentials read.
 
-- **TD-113** severity: **high** | status: resolved → SPRINT-093 T2 | created: Sprint-091 | verified at SPRINT-094 promote
-  - **RESOLVED — verified at the SPRINT-094 promote, against the current tree, not inherited.** The
-    Summary's premise (".gitattributes pins `*.sh eol=lf` but says nothing about `*.md`") is false
-    today, and the defect is closed on **both** legs by **SPRINT-093 T2**: `.gitattributes` now carries
-    `docs/knowledge-index.md text eol=lf`, which stops the CRLF checkout at its source for future
-    clones (scoped to the one generated file rather than a blanket `*.md` rule — owner ruling); and
-    `scripts/gen-index.sh:157` strips `\r` from **both** sides before comparing, which covers clones
-    that already exist and cannot be re-normalized. The comparison stays discriminating after the
-    strip: `gen()` emits pure LF so there is nothing to remove on that side, and a genuine content
-    edit changes bytes other than `\r`. Note for the aging sweep: this row was `high` and read as
-    3 sprints unaddressed while its fix had already shipped (→ `TASK-324`'s class).
-  - Summary: **The repository gate FAILs in a fresh git worktree on a clean tree, for line endings
-    alone — and worktree-isolated dispatch is this repo's standing rule for every Tier G review.**
-    `scripts/gen-index.sh --check` compares with a raw `cmp -s`, which is byte-exact and therefore
-    line-ending sensitive. `.gitattributes` pins `*.sh eol=lf` but says nothing about `*.md`, and
-    `core.autocrlf=true` on this host, so a fresh checkout materialises `docs/knowledge-index.md` with
-    CRLF while `gen-index.sh` always regenerates it with LF. `cmp` sees a difference; `git diff` sees
-    **none**.
-  - Evidence (SPRINT-091 T3, 2026-08-27): the same commit `4e5b320`, same clean tree, two environments:
-
-    | Environment | Gate's own verdict line |
-    |---|---|
-    | main worktree | `QA-CHECK: 214 pass, 0 fail` |
-    | fresh `git worktree` checkout | `QA-CHECK: 213 pass, 1 fail` — `FAIL knowledge index STALE` |
-
-    Neither `docs/knowledge-index.md` nor `scripts/gen-index.sh` is touched by that commit. The
-    staleness is not real.
-  - **Why `high` rather than cosmetic.** CLAUDE.md requires every Tier G change to get an outside
-    reviewer *dispatched worktree-isolated* (L-168), and `references/night-run.md` dispatches the same
-    way. So the population most exposed to this false FAIL is precisely the reviewers whose job is to
-    trust the gate. A gate that reds on correct code in the environment it is most often read in
-    trains its readers to discount it — the failure mode L-058 names from the other direction.
-  - This is the L-067/L-081 family exactly: *when a check differs between two contexts, diff the
-    environments before the code.* It cost this sprint's reviewer a root-cause detour, and it was
-    caught only because the reviewer's number **disagreed** with the coordinator's.
-  - **A SECOND, INDEPENDENT CAUSE of the same symptom, found the same day (SPRINT-091 T9).** A
-    fresh worktree has no `node_modules/` -- it is gitignored, and nothing in the dispatch
-    protocol installs one -- so the gate's typecheck leg FAILs with `no type checker at
-    node_modules/.bin/tsc` on code that type-checks clean via `bunx tsc --noEmit`. T9's worktree
-    gate read `QA-CHECK: 212 pass, 4 fail` where the main tree read `216 pass, 0 fail`; **none of
-    the four were attributable to its diff.** Two unrelated mechanisms, one symptom: *the gate is
-    not runnable as-specified in the environment this repo mandates for Tier G review.*
-  - **Why the pair is worse than either alone.** A reviewer who has been told to expect one known
-    false FAIL will reasonably treat a second as noise of the same kind. That is the exact
-    reasoning that lets a REAL failure through, and it is not a hypothetical: three of this
-    sprint's worktree agents each had to spend effort proving their FAILs were not theirs.
-  - Fix direction (not a ruling): normalise before comparing, or pin `*.md eol=lf` in `.gitattributes`,
-    or have `--check` compare content rather than bytes. Whichever is chosen must be proven in a fresh
-    worktree, not in the main tree — the main tree is where it already passes.
-
 - **TD-114** severity: medium | status: open | created: Sprint-091
   - Summary: **`evals/run-foreign-repo-fixtures.sh` — the harness whose entire subject is "a repo that
     has never seen lean-flow" — never invokes the TypeScript engine at all.** It spawns only Shell.
@@ -1200,54 +1225,6 @@ status: current
     end-to-end ones arrive — they cover inputs the CLI cannot yet produce.
   - **Re-file fresh if** the CLI gains `--reconcile` or a marks path — the finding then inverts into
     "are the end-to-end assertions actually comparing against Shell", which is a different check.
-
-- **TD-101** severity: **high** | status: resolved → SPRINT-091 T1 | created: Sprint-087 | verified at SPRINT-094 promote
-  - **RESOLVED — verified at the SPRINT-094 promote, against the current tree, not inherited.** The
-    Summary above is false today: `package.json` carries `"typescript": "^7.0.2"`, and
-    `scripts/qa-check.sh:788-804` is a live leg that runs `node_modules/.bin/tsc --noEmit`, reads
-    tsc's own exit status from a command substitution rather than through a pipe (L-120), re-derives
-    the error count for its verdict line, and **FAILs rather than skips** when the binary is absent —
-    "a skip is indistinguishable from a pass" is stated in the leg's own failure message. Shipped by
-    **SPRINT-091 T1** under **ADR-037** and proven on this row's exact recorded case, seeded verbatim
-    (`findings: "not an array"` against `readonly Finding[]`; `detail: 42` against `string`) → gate
-    printed `FAIL typecheck: tsc --noEmit exited 1 with 3 error(s)`, independently reproduced by that
-    task's reviewer. The row stayed `open` for three sprints after its cause was gone — which is the
-    aging sweep reading a status field rather than the tree (→ `TASK-324`'s class).
-  - Summary: **Nothing in this repository type-checks TypeScript, so every guarantee stated as "enforced
-    by a TYPE" is enforced only in an editor.** The gate is `sh scripts/qa-check.sh && bun test`;
-    `bun run`/`bun test` **strip** types without checking them. There is no `tsc` invocation in
-    `package.json`, in `qa-check.sh`, or anywhere else — and **no `typescript` entry at all**, so the
-    checker is not merely unwired, it is absent. `tsconfig.json` and `tsconfig.base.json` both exist:
-    configuration for a checker that cannot run.
-  - Evidence: found by SPRINT-087's independent T1 re-reviewer, which executed a scratch file assigning
-    a bare string to `findings: readonly Finding[]` and a number to `detail: string` — `bun run`
-    accepted both silently. Confirmed independently: `grep -rn 'tsc' package.json scripts/qa-check.sh`
-    returns nothing, and `package.json` carries no `typescript` key.
-  - **Impact — this retroactively weakens a closed sprint's headline claim.** `EPIC-014` line 60
-    records SPRINT-085 as closing with *"Absence vs emptiness is enforced by a **TYPE**, not a
-    convention: `SpecReadFail` carries no `rows` field at all, so 'checked nothing' cannot be read as
-    'found zero' (L-058)"*. That enforcement is real in an IDE and **absent from every automated path**.
-    SPRINT-087 T4 DoD 2 then leans on the same guarantee — *"the absence is a property of the result,
-    not of the printer"*. A type that no gate evaluates is **L-105's family exactly: an absent guard
-    wearing the shape of a present one**, and it is the more dangerous variant, because the sprint
-    record already describes it as the strong form of the guarantee.
-  - Second-order: the T1 re-reviewer also constructed `{verdict: "pass", findings: [aFinding]}` and
-    `{verdict: "fail", findings: []}` — both well-typed, since nothing ties the two fields in a
-    discriminated union. That contradiction is disclaimed in a code comment, but the comment's
-    phrasing undersells it: not only is it "not enforced by a type", nothing else enforces it either.
-  - **ADR-035 is the tension and must be ruled, not assumed.** It forbids dependencies; whether a
-    type-checker counts as one, or belongs in a `devDependencies` key this project does not yet have,
-    is a decision — not a detail to settle inside a task. Adding `typescript` silently would breach a
-    binding ADR; leaving it is shipping a reference engine whose types are decorative. Candidates
-    include a `devDependencies` carve-out ruled by ADR amendment, Bun's own type-check facility if it
-    can run without a package dependency, or downgrading every "enforced by a TYPE" claim in the record
-    to what is actually enforced.
-  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): **rule the ADR-035 question
-    first**, then wire whatever wins into `qa-check.sh` so the gate fails on a type error, then add a
-    retained must-FAIL fixture (a deliberate type error that the gate must catch). Until then, treat
-    "enforced by a TYPE" in any sprint record as an unverified claim.
-  - **Re-file fresh if** a type-checker is wired in — the finding then becomes "the claims predate the
-    check", a documentation fix rather than a gate gap.
 
 - **TD-102** severity: minor | status: open | created: Sprint-087
   - Summary: **TS and Shell emit the same findings in a different ORDER.** Shell's `assert_S9_LOGDIR`

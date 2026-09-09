@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-09
+last_updated: 2026-09-10
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -16,37 +16,28 @@ status: current
 
 ## Active Sprint
 
-> **None.** `SPRINT-096 — Rule the Ownership Tension` closed 2026-09-09 at **17 of 17 DoD**
-> (`close_commit: 7dfd573`) and is **archived** with its log →
-> [`archive/SPRINT-096-rule-the-ownership-tension.md`](docs/sprint/archive/SPRINT-096-rule-the-ownership-tension.md)
-> · [`INDEX.md`](docs/sprint/INDEX.md) · [`CHANGELOG.md`](CHANGELOG.md) for what shipped. Next sprint
-> is formed by `/lean-doc-generator promote` from the groomed Backlog.
->
-> **Read before the next promote:** `TASK-333` · `TASK-334` · `TASK-335` were filed at this close and
-> sit **unranked in § P3** — close routes follow-ups, `/triage` ranks them. `TASK-334` in particular
-> may outrank that tier once groomed: it is the one that makes a verdict-less `qa-check.sh` run fail
-> loudly instead of reading as zero failures, and this close had to proceed under a recorded ADR-021
-> override because the gate could not speak (**TD-143**).
+> **SPRINT-097 — Guards That Run Over the Wrong Set** →
+> [`docs/sprint/SPRINT-097-guards-that-run-over-the-wrong-set.md`](docs/sprint/SPRINT-097-guards-that-run-over-the-wrong-set.md)
+> — promoted 2026-09-10, five tasks, 30 DoD. **`gates_signed:` is absent, which means NOT signed:**
+> G1+G2 are unsigned until the owner records them in the sprint frontmatter (L-099).
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
-at the SPRINT-096 close on owner approval (L-008 — a copied narrative drifts from the one it copies).
+again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 78 rows.** Re-derive open/closed and the `severity: high` set **by anchoring to the
-  `^- **TD-NNN**` row header** — a bare `grep 'status: open'` over-counts, because rows quote their
-  own status strings in prose (L-108). Aging figures are derived at each promote, never read from
-  here (L-097 · L-130).
-- **`QA_BUDGET_SECONDS` stays at 520.** The reduction TD-117 anticipated is not available on
-  evidence: no clean whole-gate sample exists on this host. `qa-budget-default` compares the
-  *configured* budget to the ceiling rather than actual runtime (**TD-128**) — and it passes even
-  when the gate dies, which is **TD-143**.
+- **Debt ledger: 76 rows** (75 open · 1 accepted). Re-derive open/closed and the `severity: high` set
+  **by anchoring to the `^- **TD-NNN**` row header** — a bare `grep 'status: open'` over-counts,
+  because rows quote their own status strings in prose (L-108). Aging figures are derived at each
+  promote, never read from here (L-097 · L-130).
 - **The gate cannot currently verdict on this host.** SPRINT-096 closed under a recorded ADR-021
-  override after a memory kill produced 147 lines and no `QA-CHECK:` line. Assume a close needs
-  targeted evidence until `TASK-334` lands.
+  override after a memory kill produced 147 lines and no `QA-CHECK:` line. `qa-budget-default`
+  compares the *configured* budget to the ceiling rather than actual runtime (**TD-128**) and passes
+  even when the gate dies (**TD-143**); `QA_BUDGET_SECONDS` stays at 520 because the reduction TD-117
+  anticipated has no clean whole-gate sample behind it. Assume a close needs targeted evidence until
+  SPRINT-097 T4 lands.
 - **Backlog ranking** is `/triage`'s output, not this block's: tiers P0–P3 below are the record.
 
 ---
-
 ## Backlog
 
 <!-- Groomed by /triage. Only `ready` tasks are promotable. -->
@@ -57,56 +48,10 @@ at the SPRINT-096 close on owner approval (L-008 — a copied narrative drifts f
 > ready to start; the reason sits in its own `tracker:` line, not here.
 
 - [ ] TASK-328 — Anchor the dispatch preflight's `Depends-on:` parser to the id list  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — the false HALT is the loud half; the false `PASS shared-file-owned`
-                  issued off a phantom edge is the silent one, and it green-lights a wave that has no
-                  ownership order at all)
-      authority:  J1
-      done-when:  **five observable clauses.**
-                  (1) The snippet extracted from `dispatch.md` by its own anchors, run against
-                  **SPRINT-094's sprint file** — the motivating artifact, not a fixture (L-166) —
-                  yields `PASS wave-computation: T1=0 T2=0 T3=0 T4=0` and **no** `FAIL cycle-detected`.
-                  Today that same input yields `FAIL cycle-detected: tasks unresolved -> T2 T3` plus
-                  three `PASS shared-file-owned … order=T1->T2` derived from edges that do not exist.
-                  (2) A literal `none` short-circuits the field: no id is harvested from it, or from
-                  any line continuing it.
-                  (3) **BOTH call sites are fixed, each proved by its own fixture.** The
-                  `"Depends-on:"*)` field arm and the indented-continuation `D)` arm run the same bare
-                  `grep -oE 'T[0-9]+'`; fixing one leaves the other leaking, and a fixture that only
-                  exercises the field arm passes over that (L-058). SPRINT-094's prose ran onto
-                  continuation lines, so the continuation arm is where most phantom ids came from.
-                  (4) Declared ids still parse — `Depends-on: T1 · T2 — but see **D1** (…)` yields
-                  exactly `[T1,T2]`, neither more nor fewer.
-                  (5) Retained must-FAIL + a sibling control that stays green in the same run, added to
-                  the EXISTING harness. Seeded-break discrimination proof: seed verified landed, the
-                  artifact still parses, the break is targeted not a demolition, and a landed seed that
-                  reddens nothing is reported as untested rather than scored as a pass — all under ONE
-                  stated hash convention (L-137 · L-142 · L-169 · L-187)
-      touches:    skills/orchestrator/references/dispatch.md (the `<!-- dispatch-preflight:start/end -->`
-                  snippet — the `"Depends-on:"*)` arm AND the indented `D)` continuation arm) ·
-                  evals/run-dispatch-preflight-fixtures.sh (8 cases today) ·
-                  evals/fixtures/dispatch-preflight/**
-      depends-on: none
-      assumes:    **three, each resolved at intake by reading rather than asked or inferred.**
-                  (A1) Explanatory prose FOLLOWS the ids or `none` on the field; it never precedes
-                  them — confirmed against SPRINT-094's four tasks, every one of which writes
-                  `none — <prose>`. The anchored design tolerates either order, so A1 being wrong
-                  costs nothing.
-                  (A2) Both call sites carry the defect — confirmed by reading the snippet, not
-                  inherited from TD-132's Location line, which names only the field arm.
-                  (A3) The harness extracts the REAL shipped snippet by anchor, never a hand-copied
-                  duplicate, so a fixture cannot pass against a stale copy of the code.
-                  **Contract ruled at intake, not left for G2:** the parser tolerates prose; the
-                  `Depends-on:` field keeps carrying reasoning. The alternative — lint the field down
-                  to bare ids — was rejected: it deletes a field authors demonstrably use and makes
-                  every existing sprint file non-conforming
-      tracker:    **TD-132** (`severity: high`, open, Sprint-094; reproduced two independent ways —
-                  reading the code, and running it: `T2 -> [T1,T2,T1,T2]`, a self-edge no topological
-                  sort resolves) · **TD-043** — the same hardening already applied to the `Layers:`
-                  side of this very snippet via `TOK`, while `Depends-on:` was left unanchored ·
-                  L-058 · L-165/L-168 (Tier G ⇒ worktree-isolated outside reviewer) ·
-                  ships to consumers inside the plugin, and `orchestrator/SKILL.md` § sprint-bulk
-                  step 3 tells every run to execute it before dispatching a wave
+      → **promoted into SPRINT-097 as T2.** Full spec — Layers · Acceptance · 7 DoD · the both-call-sites
+        clause · the seeded-break bar — lives in the sprint file. This row is a pointer so the Backlog
+        carries no second copy to drift from it (L-008).
+      tracker:    TD-132 · TD-043 · L-058 · L-165 · L-168
       origin:     decomposer
       state:      ready
 ### P1 — Next Phase Required
@@ -218,21 +163,29 @@ at the SPRINT-096 close on owner approval (L-008 — a copied narrative drifts f
                   # unconfirmed assumption. Parking it on needs-info parked it forever.
 
 - [ ] TASK-300 — Decide whether the five gate-accuracy defects are one task or five  [size: S] [risk: low] [HITL]
-      class:      decision
-      done-when: a recorded ruling says whether TD-086 · TD-087 · TD-089 · TD-097 · TD-105 are fixed
-                  as one "gate accuracy" task or separately, and the chosen shape is filed — not a fix,
-                  a decomposition call
-      touches:   TECH-DEBT.md · TODO.md (no code)
-      depends-on: none
-      assumes:   **the cluster is real, not an artifact of one sprint noticing things.** All five are
-                  accuracy defects in the checkers that gate this repo, and two of them —
-                  TD-087 (REACHES half) and TD-097 (EXISTS half) — are the *same script*,
-                  `check-verify-reaches.sh`, filed three sprints apart with neither aware of the other
-                  until SPRINT-087's close sweep read both rows together. That pairing is the evidence
-                  the cluster is a cluster; the rest is judgement.
-      tracker:   SPRINT-087 close sweep · TD-086 · TD-087 · TD-089 · TD-097 · TD-105
-      origin:    close-retro
-      state:     ready
+      → **promoted into SPRINT-097 as T1.** Full spec lives in the sprint file. A decomposition
+        ruling, not a fix — the five fixes are explicitly § Out of that sprint.
+      tracker:    SPRINT-087 close sweep · TD-086 · TD-087 · TD-089 · TD-097 · TD-105
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-334 — Make a verdict-less `qa-check.sh` run FAIL loudly instead of reading as 0 failures  [size: S] [risk: low] [AFK]
+      → **promoted into SPRINT-097 as T4**, and **escalated P3 → P1 at that promote** because TD-143
+        is `severity: high` and the ledger auto-escalates a high row. Full spec in the sprint file;
+        scoped to the gate's *reporting*, never its cost.
+      tracker:    TD-143 · TD-090 · TD-117 · TD-084 · L-120
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-337 — Scope the epic-state checker's member set to sprints this repository owns  [size: M] [risk: med] [HITL]
+      → **filed and promoted at the SPRINT-097 promote, as T5.** Full spec in the sprint file.
+        `member_plan()` resolves a member sprint number by globbing *this* repo's archive, so
+        EPIC-016's workdoo members (ADR-041) resolve to lean-flow's own same-numbered sprints and
+        report two false `close_commit` mismatches on a correct artifact. L-186's shape exactly:
+        the detection logic is sound, the member set it runs over is not.
+      tracker:    TD-144 · ADR-041 · L-186 · L-166
+      origin:     manual
+      state:      ready
 
 - [ ] TASK-326 — Compare a commit's claimed DoD delta against the ticks it actually made  [size: S] [risk: low] [AFK]
       class:      execution
@@ -402,56 +355,13 @@ at the SPRINT-096 close on owner approval (L-008 — a copied narrative drifts f
 > close and may well outrank this tier once groomed.
 
 - [ ] TASK-333 — Rule which `Layers:` parser is correct, then make both checkers read one extractor  [size: M] [risk: med] [HITL]
-      class:      decision
-      tier:       G (ADR-029 — both subjects are gate checkers; the ruling changes what "declared"
-                  means for every sprint file in the tree, so a wrong call is silent in one
-                  direction and noisy in the other)
-      done-when:  one recorded ruling says whether a `Layers:` token must be backtick-quoted, and
-                  `check-layers-observed.sh` and `check-layers-completeness.sh` derive their tokens
-                  from **one** extractor rather than two that disagree while both claim parity in
-                  comments (**TD-142**). The ruling is taken on a **counted** basis, not a stylistic
-                  one: derive how many live and archived sprint Plans carry unbackticked `Layers:`
-                  before choosing, because requiring backticks makes every one of them undeclared.
-                  Both directions are defects and both must be closed — the observed checker
-                  over-reports on a bare path, and the completeness checker's `grep -qF` is a
-                  **substring** test that accepts a token appearing anywhere in the line, including
-                  inside a longer path or a trailing comment (L-108, failing green)
-      touches:    scripts/lib/check-layers-observed.sh · scripts/lib/check-layers-completeness.sh ·
-                  evals/run-layers-observed-fixtures.sh ·
-                  evals/run-layers-completeness-fixtures.sh · docs/sprint/SPRINT-*.md (if the ruling
-                  requires backticking existing Plans — count first, that may be the larger half)
-      depends-on: none
-      assumes:    **The divergence is real and measured, not inferred:** SPRINT-096's Plan yields 0
-                  declared tokens to the observed checker where SPRINT-095's yields 14, backticks
-                  being the only difference. Pre-existing, not introduced by SPRINT-096 T3 — a
-                  pristine-vs-patched A/B returned byte-identical output. *Confirm both figures
-                  against the tree before designing; they will have moved if any Plan is edited*
-      tracker:    **TD-142** · L-108 (matched by shape, not substring) · L-189 (a SPRINT-095 fixture
-                  was silently green for exactly this reason) · L-058
+      → **promoted into SPRINT-097 as T3.** Full spec lives in the sprint file, including the clause
+        that the ruling is taken on a *counted* basis — derive how many Plans carry unbackticked
+        `Layers:` before choosing, since requiring backticks makes every one of them undeclared.
+      tracker:    TD-142 · L-108 · L-189 · L-058
       origin:     close-retro
       state:      ready
 
-- [ ] TASK-334 — Make a verdict-less `qa-check.sh` run FAIL loudly instead of reading as 0 failures  [size: S] [risk: low] [AFK]
-      class:      execution
-      tier:       G (ADR-029 — this is the gate's own report; a run that cannot speak currently
-                  presents as a clean partial, which is the silent-false-negative shape)
-      done-when:  a `qa-check.sh` run that terminates without printing its `QA-CHECK: N pass, M fail`
-                  verdict line is reported as a FAILURE by whatever invokes it, rather than leaving
-                  the caller to infer a result from "0 FAILs so far" (**TD-143**). Deliberately
-                  scoped to the *reporting*, not the *cost*: this does not attempt to make the gate
-                  finish (TD-090 · TD-117), it makes not-finishing unmistakable. **Exercised on a
-                  real verdict-less run**, not only a fixture — kill a run mid-flight and confirm the
-                  wrapper reports failure (L-007 · L-166)
-      touches:    scripts/qa-check.sh (or its callers) · evals/ (retained must-FAIL fixture)
-      depends-on: none — independent of the memory cost itself
-      assumes:    **The wall-clock guard does not cover this and that is measured, not assumed:** the
-                  SPRINT-096 system-verify run printed `PASS qa-budget-default: 520s < 600s` and was
-                  then killed by the host for memory, emitting 147 lines and 0 FAIL with no verdict.
-                  *Confirm the budget guard still passes on a memory kill before building on it*
-      tracker:    **TD-143** · TD-090 · TD-117 · TD-084 (the wall-clock mode this does NOT duplicate)
-                  · L-120 (the number to read is the one the gate prints)
-      origin:     close-retro
-      state:      ready
 
 - [ ] TASK-335 — Clear two stale records SPRINT-096 found but did not own  [size: S] [risk: low] [AFK]
       class:      mechanical-ingest
