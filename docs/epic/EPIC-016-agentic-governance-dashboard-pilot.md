@@ -3,8 +3,8 @@ epic: 016
 slug: agentic-governance-dashboard-pilot
 owner: Maintainer
 last_updated: 2026-09-09
-status: proposed
-member_sprints: []
+status: active
+member_sprints: [workdoo SPRINT-001]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -58,7 +58,7 @@ keeps its own § Closed-when.
 
 | Sprint | Theme | Status | What it contributed to the outcome |
 |---|---|---|---|
-| _(none yet — first member promotes from `workdoo` once workdoo ADR-001/002 land)_ | | | |
+| [workdoo SPRINT-001](https://github.com/aldianriski/workdoo/blob/main/docs/sprint/SPRINT-001-the-contract-before-the-runtime.md) | The Contract Before the Runtime | **active** — promoted 2026-09-09 | _(completed at close)_ — five tasks, none of which needs a working Claude Code CLI: the workspace and a gate proven capable of going red, the runtime adapter contract with its deterministic fake, version pinning that reports what is *running*, workdoo ADR-001 (Git versus store authority) and the pilot workflow specification. The seam is drawn at **A2**, not at the roadmap's day boundary, so a false A2 costs nothing built here |
 
 ## Decisions
 
