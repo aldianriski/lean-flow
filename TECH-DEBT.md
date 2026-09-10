@@ -282,6 +282,7 @@ status: current
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
 - **TD-145** severity: medium | status: open | created: Sprint-097
+  - Tracker: **`TASK-342`** (filed 2026-09-10 at the SPRINT-097 T3 outside review; owner ruled it grouped with `TASK-338` rather than left to age). Scheduled with the checker-accuracy cluster: same family, different files.
   - Summary: **The `*/archive/*` exclusion that keeps closed sprints out of three gate checkers is a
     case-sensitive string glob, and this repository's primary host filesystem is case-insensitive.**
     `docs/sprint/Archive/SPRINT-001-…md` and `docs/sprint/archive/SPRINT-001-…md` are the **same

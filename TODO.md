@@ -265,6 +265,41 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       origin:     close-retro (SPRINT-097 T1 ruling, 2026-09-10)
       state:      ready
 
+- [ ] TASK-342 — Make the `*/archive/*` exclusion a filesystem-identity predicate, not a case-sensitive string glob  [size: S] [risk: low] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — three gate checkers depend on this exclusion to keep closed sprints
+                  out of their examined set; it is the SET predicate itself, not a branch inside one)
+      authority:  J1
+      grouped:    **schedule with `TASK-338`** (SPRINT-097 T1 cluster ruling, extended 2026-09-10).
+                  Same family — a checker-accuracy defect whose subject is the guard's *selection*
+                  rather than its logic — and it should be reviewed in one pass with the cluster
+                  rather than as an orphan. Different files, so not merged into that row.
+      done-when:  (1) `docs/sprint/Archive/SPRINT-001-…md` and `docs/sprint/archive/SPRINT-001-…md`
+                  are the **same file** on this repo's host — verified same inode,
+                  `5910974512661248` — and the first is **not** excluded by
+                  `case "$sp" in */archive/*)`, which is a case-sensitive string glob. Reproduced
+                  mechanically at SPRINT-097 T3's merge:
+                  `sh -c 'case "docs/sprint/Archive/…" in */archive/*) echo EXCLUDED;; *) echo NOT-EXCLUDED;; esac'`
+                  → `NOT-EXCLUDED`, and feeding that path to `check-layers-completeness.sh` produced
+                  **3 real FAILs against a closed sprint's stale content**.
+                  (2) **All three sites** fixed under **one shared predicate**, not three copies of
+                  the construct: `scripts/lib/check-layers-observed.sh:344` and `:401`,
+                  `scripts/lib/check-layers-completeness.sh:183`. The review that found this named
+                  two; the third was surfaced by an independent grep at merge — derive the set
+                  yourself before editing (L-186 · the same miscount shape as A3 and TD-132).
+                  (3) **A retained must-FAIL that varies path CASING as its selection axis**, plus a
+                  sibling control on the lowercase path staying green in the same run. This is the
+                  load-bearing line: the exclusion already has a dedicated selection fixture
+                  (`archive-path-excluded`, added at SPRINT-097 T3) and it **passes**, because it
+                  validates the guard as a *string* predicate while its real job is a *filesystem
+                  identity* predicate. The two agree on every case-sensitive host and diverge exactly
+                  on the host this repo runs on.
+                  (4) Seeded-break discrimination proof under ONE stated hash convention (L-169);
+                  outside reviewer dispatched worktree-isolated (L-165 · L-168).
+      tracks:     TD-145
+      origin:     close-retro (SPRINT-097 T3 outside review, 2026-09-10)
+      state:      ready
+
 - [ ] TASK-339 — Normalise checkbox state before diffing § Plan, so ticking a DoD is not an unaccounted Plan edit  [size: S] [risk: low] [HITL]
       class:      execution
       tier:       G (ADR-029 — the incentive is inverted, which is worse than a plain false

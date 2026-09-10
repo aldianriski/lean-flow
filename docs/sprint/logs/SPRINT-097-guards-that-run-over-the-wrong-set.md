@@ -474,3 +474,60 @@ reconciliation is owed at close, against the opt-in profile — where the header
 archived at this promote, so the figure should have moved on its own.
 
 consequence · T3 · behaviour:high · governance:med
+
+### 2026-09-10 | owner-ruling | Three rulings: T5 second retry, allowlist widened, TD-145 tracked
+
+**1. T5 gets one more bounded retry**, beyond the revise loop's normal single retry, by explicit
+owner authorisation. The re-review returned **NOT CLEAR** with two new CRITICAL silent defects, both
+verified against the real corpus before the ruling was put:
+
+- **C1** — the row-link classifier introduced by the *first* retry is depth-hardcoded
+  (`case "$_mlhref" in ../sprint/*)`), so it is wrong for **every archived epic in this repository**.
+  An archived epic sits one directory deeper and links its local members two levels up. Verified at
+  the ruling — and it is **four** epics, not the three the review named: EPIC-001 · 002 · 003 · 004 all
+  link `](../../sprint/archive/SPRINT-NNN-…)`, while the live EPIC-014 links `](../sprint/…)`.
+  `check-epic-archive.sh:228` confirms archived epics are examined and the live run names all four.
+  Their local members therefore classify **external** and leave the verified set silently. **This
+  reopens the exact harm F1 closed**, triggered by real directory depth rather than a typo, and it
+  defeats direction (a) — *"ARCHIVED TOO EARLY … the one §11 warns about"*, the file's own words.
+- **C2** — duplicate `§ Member sprints` rows: `member_row_href` exits on the first physical match, so
+  a stale external row placed above a correct local still-open row wins on document order and the
+  epic reports `PASS … archived correctly`. Lead 3 asked what validates the row; nothing does.
+
+**Why the retry rather than a merge.** Merging as-is would trade a **loud false positive** (EPIC-016's
+two visibly-wrong FAILs today) for a **silent false negative** (four archived epics' local members
+unverified, including whether one was archived while a member was still open). This repo's doctrine
+refuses that trade in every prior instance, and the silent side hides the more expensive failure.
+Parking was the alternative and was rejected because the fix is now well understood: decide locality
+by resolving the href **relative to the epic's own directory**, with the invariance that the same
+epic must classify identically at `docs/epic/` and at `docs/epic/archive/`.
+
+**The set property, third instance this sprint.** Every archived-epic fixture in T5's suite links its
+sprint at **one** level — a depth the real archived corpus never uses — so the branch that resolves
+real archived-epic rows was never a member of the tested set, and no seeded break could reach it,
+because seeds are drawn from branches the fixtures exercise. **No fixture varies epic file depth.**
+That is L-186's axis for this task, and it is now a required line in the retry.
+
+**2. `.claude/settings.json`'s allowlist widened, narrowly.** `Bash(bun scripts/qa-verdict.ts:*)` and
+its PowerShell twin added, mirroring the existing `sh scripts/qa-check.sh` entries exactly — two
+lines, JSON re-validated. Without it every session running `bun run gate` or `bun run test` prompts,
+because T4 re-pointed both scripts at the wrapper. **This is the L-172 seam made concrete:** the file
+sits outside every task's `Layers:`, so no per-task DoD could have caught it, the preflight's
+ownership map could not see it, and it was found only because T4's own reviewer looked past its
+declared scope and disclosed it. Coordinator-owned by construction, and a permission widening, so it
+was ruled rather than tidied.
+
+**3. `TD-145` gets `TASK-342` now rather than ageing**, grouped with `TASK-338` — same family (a
+checker-accuracy defect whose subject is the guard's *selection*, not its logic), different files, so
+scheduled together rather than merged. The row's load-bearing line is a must-FAIL that varies path
+**casing** as its selection axis, because the exclusion already has a passing selection fixture that
+tests it as a string predicate when its real job is a filesystem-identity predicate.
+
+**Flagged for close, not fixed here — stale Backlog trackers.** `TASK-328` sits open in P1 while
+`TD-132` now reads `resolved → TASK-328`: a contradiction introduced by this morning's T2 closure and
+left standing rather than patched mid-sprint. Likewise `TASK-300` (T1), `TASK-333` (T3) and
+`TASK-334` (T4) are the Backlog trackers for tasks now complete, and `TASK-337` tracks T5, still open.
+Routing completed trackers is `/lean-doc-generator close`'s job (STANDARD §10), so they are recorded
+here where close will read them instead of being edited around now.
+
+consequence · owner-ruling · behaviour:low · governance:high
