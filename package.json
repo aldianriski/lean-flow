@@ -7,9 +7,9 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "sh scripts/qa-check.sh && bun test",
+    "test": "bun scripts/qa-verdict.ts sh scripts/qa-check.sh && bun test",
     "test:unit": "bun test",
-    "gate": "sh scripts/qa-check.sh",
+    "gate": "bun scripts/qa-verdict.ts sh scripts/qa-check.sh",
     "conformance": "sh conformance.sh ."
   },
   "engines": {
