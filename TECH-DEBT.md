@@ -281,6 +281,44 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-145** severity: medium | status: open | created: Sprint-097
+  - Summary: **The `*/archive/*` exclusion that keeps closed sprints out of three gate checkers is a
+    case-sensitive string glob, and this repository's primary host filesystem is case-insensitive.**
+    `docs/sprint/Archive/SPRINT-001-…md` and `docs/sprint/archive/SPRINT-001-…md` are the **same
+    file** — verified same inode, `5910974512661248` — and the first is **not excluded**.
+  - Location: three sites, all pre-existing and untouched by SPRINT-097 T3 —
+    `scripts/lib/check-layers-observed.sh:344` and `:401`, and
+    `scripts/lib/check-layers-completeness.sh:183`. (The review that found it named two; the third
+    was surfaced by an independent grep at merge. This file's site count has now been miscounted in
+    three separate places this sprint — see TD-144's `Tracker:` note and A3.)
+  - Evidence: reproduced mechanically, one line, no fixture needed —
+    `sh -c 'case "docs/sprint/Archive/SPRINT-001-ship-and-validate.md" in */archive/*) echo EXCLUDED;; *) echo NOT-EXCLUDED;; esac'`
+    → `NOT-EXCLUDED`. Feeding the differently-cased path to `check-layers-completeness.sh` produced
+    **3 real FAILs against a closed sprint's stale content** that the guard exists to skip.
+  - Impact: **LOUD, not silent** — it over-reports on closed sprints rather than passing a live
+    violation, which is why this is `medium` and not `high`. Not reachable through `qa-check.sh`,
+    whose own `ls docs/sprint/SPRINT-*.md` never emits a different-cased path; reachable by any
+    direct or manual invocation, by IDE path normalisation, or by a future caller that walks the
+    tree instead of globbing it.
+  - **Why no existing bar could have caught it, which is the reason it is worth a row.** This is
+    SPRINT-097's own theme one level down (L-186). Every guard bar was satisfied for this exclusion —
+    it even has its own dedicated selection fixture, `archive-path-excluded`, added by T3 at this
+    sprint. But that fixture validates the guard as a **string predicate**, and the guard's real job
+    is a **filesystem-identity predicate**. The two agree on every case-sensitive host and diverge
+    exactly on a case-insensitive one, which is the host this repo actually runs on. **No fixture in
+    either harness varies path casing as a selection axis** — every one uses lowercase `archive/` —
+    so the class was invisible to every must-FAIL case in the suite despite being a one-line
+    mechanical reproduction. The cheap tell L-186 names, found in the wild: a suite where every
+    fixture shares an incidental structural property nobody chose deliberately.
+  - Mitigation (**hypothesis, re-derive before building a DoD on it** — L-091): normalise the path's
+    case before the `case` match, or compare filesystem identity rather than the path string, at all
+    three sites under one shared predicate rather than three copies of the construct. Retain a
+    must-FAIL fixture that varies **casing** as its selection axis, plus a sibling control on the
+    lowercase path staying green in the same run.
+  - **Re-file fresh if** the checkers move to a recursive walk or a different caller: the string/identity
+    divergence stays, but the reachability argument above (`qa-check.sh` cannot emit such a path)
+    dissolves, and the severity becomes `high`.
+
 - **TD-144** severity: medium | status: open | created: Sprint-097
   - Summary: **The epic-state checker resolves a member sprint's number against THIS repository's
     archive, so an epic whose members live elsewhere is checked against local sprints that merely

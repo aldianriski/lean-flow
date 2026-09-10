@@ -379,3 +379,98 @@ review-driven regression fixtures. Restored to `a4ccfb6a…`, matching `HEAD:scr
    close reconciliation, where the two populations can be counted separately.
 
 consequence · T4 · behaviour:med · governance:low
+
+### 2026-09-10 | T3 | One extractor, backticks required, both directions closed. 25 of 32 DoD
+
+**What changed.** `check-layers-observed.sh` gains `layers_tokens()` — the single backtick-only
+extractor — used by its own `task_decls()` and its `layers_all` union.
+`check-layers-completeness.sh` now **sources** that file (`LAYERS_OBSERVED_SOURCED=1` suppressing the
+sourced file's bare-invocation check and its `for sp in "$@"` main loop) instead of carrying a second
+copy that can drift again. Every live membership test now runs `grep -qxF` — **exact** — against the
+extractor's output. The comment both files carried, *"kept deliberately identical … a parsing rule
+that differs between them would make one of the two lie"*, is now true **by construction**.
+
+**The silent direction is the one that changed.** The completeness checker's `grep -qF` read a token
+as declared if it appeared anywhere in the line — inside a longer path, or inside a trailing comment
+— which is L-108's shape failing **green**. The observed checker's over-report on a bare path was
+already correct under the ruling and needed no code change; it is now *pinned* by a must-FAIL and a
+sibling control so the refactor cannot quietly loosen it. New named finding
+`layers-unbackticked-token` makes the loud direction say what is wrong instead of silently reading a
+bare token as no declaration.
+
+**The fix immediately found a live instance of the bug it was built to find.** Run against this
+sprint's own Plan, T2's DoD and Acceptance cite `dispatch.md` by short name while its `Layers:`
+declares the full `skills/orchestrator/references/dispatch.md`. The old substring test masked that
+green; the exact test flags it. The builder surfaced it rather than editing a Plan it had been told
+not to touch — the right call, and the finding stands as evidence the guard reaches real artifacts
+(L-166), not just fixtures.
+
+**Verified at merge, independently of the builder's report.** `LAYERS-OBSERVED FIXTURES: all green`,
+**62 PASS, 0 FAIL**, against a **main baseline of 60** — the +2 are exactly the must-FAIL and its
+sibling control, so the delta is accounted for rather than assumed.
+`LAYERS-COMPLETENESS FIXTURES: all green`, 14 cases. Both verdicts read from the harness's own
+printed line.
+
+**A false red, and it was the coordinator's.** An earlier run of the observed harness reported
+`at least one FAIL` with 7 failing fixtures. It was a **race I created**: I resumed the builder — which
+then seeded breaks in its worktree — while my background harness run was executing over that same
+tree. The builder independently flagged the same contamination from its side. The clean re-run on a
+settled tree and the main baseline both come back green, so the result is **void, not a finding**.
+Recorded because the failure mode generalises: *a result is evidence about the conditions it ran
+under, not only about the artifact*, and the background-run-versus-live-tree race has no guard in
+this repo at all. Note the task notification for that run reported **exit code 0** while the harness
+itself printed `at least one FAIL` — L-120 in the wild, and the reason the verdict was taken from the
+printed line both times.
+
+**Six seeds, three of them independent.** The reviewer's are load-bearing: breaking the extractor's
+backtick anchor reddened the trailing-comment case; reverting `grep -qxF` → `grep -qF` reddened the
+longer-path case; neutralising the unbackticked-token guard reddened only its own — each with four
+named siblings green in the same run. One seed was **discarded for being a demolition rather than a
+discrimination** after it over-fired across unrelated cases, and redone as a proper guard-clause
+removal. Convention stated once and used throughout: `git hash-object <path>` against
+`git rev-parse HEAD:<path>`, both git blob ids.
+
+**Outside review: CLEAR on the core claim, three findings.**
+
+- **`TD-145` filed** — the `*/archive/*` exclusion is a **case-sensitive string glob** on a
+  **case-insensitive filesystem**. `docs/sprint/Archive/SPRINT-001-…md` and
+  `docs/sprint/archive/SPRINT-001-…md` are the same inode (`5910974512661248`, verified at merge) and
+  the first is not excluded. **Pre-existing, untouched by T3, and loud** (it over-reports on closed
+  sprints rather than passing a live violation), so it is filed rather than fixed here. The reviewer
+  named two sites; an independent grep at merge found **three** — `check-layers-observed.sh:344` and
+  `:401`, `check-layers-completeness.sh:183`.
+- The disclosed **bare-directory-token residual**: `layers-unbackticked-token` fires only for
+  file-shaped tokens. Deliberate — widening it would also catch parenthetical prose ending in a
+  path-like fragment, the over-eager-gate cost TD-032 exists to stop. Bounded: a bare token was never
+  a valid declaration, so any file under such a directory still FAILs loudly through the unchanged
+  legs. The reviewer probed for a net false negative and found none.
+- A narrow **env-boundary footgun**: `LAYERS_OBSERVED_SOURCED` pre-set in the environment silently
+  no-ops a *direct* invocation of the observed checker (exit 0, no output). Unreachable through
+  `qa-check.sh`, which assigns it plainly and never exports it — CLAUDE.md's inherited-env trap class,
+  logged rather than fixed.
+
+**`TD-145` is this sprint's thesis one level down.** Every guard bar was satisfied for that exclusion
+— it even gained its own dedicated selection fixture, `archive-path-excluded`, from T3 at this very
+sprint. But that fixture validates the guard as a **string predicate**, while its real job is a
+**filesystem-identity predicate**. The two agree on every case-sensitive host and diverge exactly on
+the host this repo runs on. **No fixture in either harness varies path casing as a selection axis** —
+every one uses lowercase `archive/` — so the class was invisible to the whole suite despite being a
+one-line mechanical reproduction. That is L-186's cheap tell, found in the wild: a suite where every
+fixture shares an incidental structural property nobody chose.
+
+**Opt-in/always-on split re-examined and unchanged.** The always-on completeness harness now
+exercises code defined in a file whose own harness is opt-in — but the third seed shows the always-on
+harness independently catches a break in `layers_tokens()` itself, which is the only code the sourced
+file contributes to a completeness run. No coverage hole.
+
+**A4 correction, recorded rather than carried.** The T4 entry above states that A4's figure of 33
+counts conformance-engine `S10` findings which never enter `qa-check.sh`'s tally. **That is wrong.**
+This ledger's own promote header reads `Gate at this promote: QA-CHECK: 225 pass, 33 fail (opt-in
+profile, ADR-039)` — 33 is qa-check's **own** FAIL count under the **opt-in** profile. T4's
+`200 pass, 5 fail` came from the **default** profile. The two are different **profiles**, not
+different populations, and are not comparable as written. A4 stays **unconfirmed** and its
+reconciliation is owed at close, against the opt-in profile — where the header also notes 33 of the
+82 FAIL lines traced to SPRINT-094 and SPRINT-095 not yet being archived, both of which *were*
+archived at this promote, so the figure should have moved on its own.
+
+consequence · T3 · behaviour:high · governance:med
