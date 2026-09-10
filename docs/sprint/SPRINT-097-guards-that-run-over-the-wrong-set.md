@@ -5,6 +5,7 @@ owner: Maintainer
 last_updated: 2026-09-10
 status: active
 plan_commit: 2789dbd
+gates_signed: G1,G2 @ d9f6c3c
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
@@ -68,13 +69,19 @@ a phantom edge is the silent one, and it green-lights a wave with no ownership o
 sprint file, yields `PASS wave-computation: T1=0 T2=0 T3=0 T4=0` and no `FAIL cycle-detected`.
 
 **DoD:**
-- [ ] Run against **SPRINT-094's sprint file** — the motivating artifact, not a fixture (L-166) — yields the clean wave computation. Today it yields `FAIL cycle-detected: tasks unresolved -> T2 T3` plus three `PASS shared-file-owned … order=T1->T2` off edges that do not exist. — *Verify: extract by anchor and run against `docs/sprint/archive/SPRINT-094-guards-for-what-nothing-reads.md`*
-- [ ] A literal `none` short-circuits the field: no id harvested from it or from any line continuing it.
-- [ ] **Both call sites fixed, each proved by its own fixture** — the `"Depends-on:"*)` field arm and the indented-continuation `D)` arm run the same bare `grep -oE 'T[0-9]+'`; a fixture exercising only the field arm passes over the leak (L-058). SPRINT-094's prose ran onto continuation lines, which is where most phantom ids came from.
-- [ ] Declared ids still parse: `Depends-on: T1 · T2 — but see **D1** (…)` yields exactly `[T1,T2]`, neither more nor fewer.
-- [ ] Retained must-FAIL **plus a sibling control that stays green in the same run**, added to the existing harness. — *Verify: `sh evals/run-dispatch-preflight-fixtures.sh`*
-- [ ] **Seeded-break discrimination proof**: seed verified landed, artifact still parses, break targeted not a demolition, a landed seed that reddens nothing reported as untested rather than scored as a pass — all under ONE stated hash convention (L-137 · L-142 · L-169 · L-187).
-- [ ] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168).
+> **CLOSED at the batch gate as already-satisfied — no code change.** TD-132 was fixed in code at
+> SPRINT-095 T2 (`4cd494d` → `843ccdb` → `60fdf1b` → `82eb0cd`, third design, two review rounds
+> rejected the first two). Every line below was re-derived against `HEAD` at the G1+G2 pass rather
+> than inherited; the ruling and the full reproduction are in the `scope-change` entry of
+> 2026-09-10. `TD-132` closes as resolved-by-`82eb0cd`.
+
+- [x] Run against **SPRINT-094's sprint file** — the motivating artifact, not a fixture (L-166) — yields the clean wave computation. — ✓ re-derived at `d06edf8`: the anchor-extracted snippet returns `PASS wave-computation: T1=0 T2=0 T3=0 T4=0` and **no** `FAIL cycle-detected`. The three residual `FAIL shared-file-unowned` rows are genuine unowned overlaps in SPRINT-094's own Plan, not the phantom `PASS shared-file-owned … order=T1->T2` this line predicted. **The present-tense claim in the promoted line was false the day it was written** (L-091).
+- [x] A literal `none` short-circuits the field: no id harvested from it or from any line continuing it. — ✓ SPRINT-094 declares `none` on every task with prose running onto continuation lines, and the wave computation is all-zero. Fixtures `deps-prose-field` · `deps-prose-continuation`.
+- [x] **Both call sites fixed, each proved by its own fixture.** — ✓ `evals/fixtures/dispatch-preflight/` carries six `deps-cont-*` cases (`deps-cont-bracket` · `-markup` · `-unbalanced` · `-close-without-open` · `-markup-welds-id` · `deps-prose-continuation`) against the indented `D)` arm, alongside the field-arm cases. The L-058 shape this line names is the one SPRINT-095's fixtures were built for.
+- [x] Declared ids still parse: `Depends-on: T1 · T2 — but see **D1** (…)` yields exactly `[T1,T2]`, neither more nor fewer. — ✓ exercised live at the gate on a purpose-built two-dependency Plan: `Depends-on: T1 · T3 — but see **D1** (…)` returns `PASS wave-computation: T1=0 T2=1 T3=0` — T2 ranked behind **both** declared ids, and nothing harvested from the annotation.
+- [x] Retained must-FAIL **plus a sibling control that stays green in the same run**, added to the existing harness. — ✓ `sh evals/run-dispatch-preflight-fixtures.sh` → **all green**, 25 fixtures, exit-0 and exit-1 expectations in the same run.
+- [x] **Seeded-break discrimination proof** under ONE stated hash convention. — ✓ done at SPRINT-095 T2, not re-run here: convention stated once (`git hash-object` on the working file), every seed guarded for landing (`cmp`), parsing (`sh -n`) and being targeted; `dispatch.md` restored to a pristine hash after each. **One negative result was recorded rather than smoothed** — a seed removing the `none` short-circuit reddened nothing and was reported as untested (L-187's own shape).
+- [x] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168). — ✓ done at SPRINT-095 T2: five rounds, four rejections, **6 CRITICALs, every one found by review and none by the seeded proofs**. Re-reviewing an unchanged artifact would add nothing; this sprint makes no edit to it.
 
 ### T3 — Rule which `Layers:` parser is correct, then make both checkers read one extractor `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `scripts/lib/check-layers-observed.sh` · `scripts/lib/check-layers-completeness.sh` · `evals/run-layers-observed-fixtures.sh` · `evals/run-layers-completeness-fixtures.sh` · `docs/sprint/SPRINT-*.md` (only if the ruling requires backticking existing Plans)
@@ -140,8 +147,8 @@ live in this repository still produces them.
 - [ ] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168).
 
 ## Owner-action checklist
-- [ ] Sign the batch **G1 + G2** pass over all five tasks, then record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absence of the field means NOT signed (L-099).
-- [ ] Reinstall the plugin before trusting any skill procedure this sprint — the promote session ran skills at base-dir **1.62.0** against a repo manifest at **1.63.0** (L-021).
+- [x] Sign the batch **G1 + G2** pass over all five tasks, then record `gates_signed: G1,G2 @ <sha>` in this file's frontmatter. Absence of the field means NOT signed (L-099). — ✓ signed at `d9f6c3c` over the **amended four-task** Plan (T2 closed as already-satisfied, T4's `Layers:` narrowed, both logged as `scope-change`). The signature covers the Plan **as it will be executed**, not as promoted — SPRINT-091's re-signature precedent.
+- [x] Reinstall the plugin before trusting any skill procedure this sprint — the promote session ran skills at base-dir **1.62.0** against a repo manifest at **1.63.0** (L-021). — ✓ this session primed at `1.63.0 base-dir == 1.63.0 repo → fresh`; the staleness is gone and no procedure here was read from a 1.62.0 copy.
 
 ## Decisions (pre-locked)
 
