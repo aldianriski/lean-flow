@@ -217,6 +217,106 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       origin:     close-retro
       state:      ready
 
+
+> **The SPRINT-097 T1 cluster ruling (2026-09-10).** The five gate-accuracy defects the SPRINT-087
+> close sweep grouped as one — TD-086 · TD-087 · TD-089 · TD-097 · TD-105 — are ruled **four tasks,
+> grouped by artifact**, after all five were re-derived against the tree rather than read off their
+> Summary lines (L-091). **The one-task side loses**: bundling gives a single L task spanning three
+> subsystems plus a research round, which CLAUDE.md splits before proceeding, and TD-089's subject
+> is not a guard at all, so a Tier G "gate accuracy" task containing it would mis-tier under
+> ADR-029. **The five-task side loses too**, on the cluster's own founding evidence: TD-087
+> (REACHES) and TD-097 (EXISTS) are the same script, filed three sprints apart with neither row
+> aware of the other, and each row's `Re-file fresh if` clause says fixing one alone re-files the
+> other. That is the only merge the evidence forces, so it is the only merge taken. TD-089 →
+> `TASK-341` (P2, Tier P).
+
+- [ ] TASK-338 — Fix both legs of `check-verify-reaches.sh`: EXISTS resolves a basename, REACHES matches use not mention  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — a REACHES false positive is a contract false negative: an unreachable
+                  criterion goes green while saying nothing about its subject, which is L-136's
+                  shape inside the guard built to detect L-136)
+      authority:  J1
+      done-when:  **one script, two legs, fixed together.**
+                  (1) **EXISTS** (TD-097): `[ ! -f "$scr" ]` at `check-verify-reaches.sh:89`
+                  resolves the extracted token relative to CWD, so a Verify clause naming a script
+                  by **basename** — this repo's dominant convention — is reported
+                  `verify-method-absent` while the file is present. Resolve a bare basename against
+                  the known script roots (`scripts/`, `scripts/lib/`, `evals/`) first, and separate
+                  the findings: *unresolvable reference* is not *method absent*.
+                  (2) **REACHES** (TD-087): `grep -qF` at `:102` and the `case` substring test at
+                  `:96` match on mention, not use. Both reproduce: an **exclusion idiom** (the
+                  script's only reference to the path *prunes* it) reads `confirmed reachable`; a
+                  **prefix collision** (`src/db` matching `src/dbtools/`) reads the same. Anchor to
+                  path boundaries and reject a target whose only occurrence sits in an exclusion.
+                  (3) **The archive exemption at `:55` is why this looked clean for five sprints**
+                  and is itself part of the fix: archived Verify clauses hold **17 bare-basename
+                  references** that would every one of them trip leg (1). Re-point the exemption at
+                  a retained fixture so the basename case is exercised, not exempted.
+                  (4) Pointed at its motivating population, not only fixtures (L-166 · L-186): the
+                  live corpus reports **0 confirmed targets** — a vacuous pass in the denominator
+                  sense (L-156), so a fixture-only proof here proves nothing. Vary the
+                  **selection**, not just the verdict: a target reached through the archive arm, a
+                  clause naming two methods.
+                  (5) Retained must-FAIL per leg, each failing with its **own named finding**, plus
+                  a sibling control green in the same run; seeded-break discrimination proof under
+                  ONE stated hash convention (L-169); outside reviewer dispatched worktree-isolated
+                  (L-165 · L-168).
+      tracks:     TD-087 · TD-097
+      origin:     close-retro (SPRINT-097 T1 ruling, 2026-09-10)
+      state:      ready
+
+- [ ] TASK-339 — Normalise checkbox state before diffing § Plan, so ticking a DoD is not an unaccounted Plan edit  [size: S] [risk: low] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — the incentive is inverted, which is worse than a plain false
+                  positive: the check rewards sprints that shifted scope and penalises sprints that
+                  did not, and the only ways to clear it are to log a scope-change that never
+                  happened or to leave the close gate red)
+      authority:  J1
+      done-when:  (1) `plan-edited-after-freeze` (`conformance-engine.sh:2078`) compares § Plan with
+                  **checkbox state normalised**, so a tick is not a diff. Re-derived at SPRINT-097
+                  T1: no normalisation exists anywhere in that file today.
+                  (2) A genuine **text** change still demands its `scope-change` entry — the check
+                  must keep doing what it was written to do.
+                  (3) **The control fixture is the load-bearing one**, not the must-FAIL: a fixture
+                  that ticks every box and must stay green is the case that is wrong today. Retain
+                  both, each failing with its own named finding.
+                  (4) Pointed at its motivating artifact (L-166): SPRINT-087's § Plan is
+                  byte-identical to `plan_commit 3c14a37` once checkboxes are normalised — 28 ticks,
+                  zero text changes — and still produced `plan-edited-after-freeze` plus 8 ×
+                  `scope-change-logged-after-plan-edit`, 9 of that run's 17 findings.
+                  (5) Seeded-break discrimination proof under ONE stated hash convention (L-169);
+                  outside reviewer dispatched worktree-isolated (L-165 · L-168).
+      tracks:     TD-105
+      origin:     close-retro (SPRINT-097 T1 ruling, 2026-09-10)
+      state:      ready
+
+- [ ] TASK-340 — Give `check-system-verify-block.sh` a positional link, and point it at live logs  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       G (ADR-029 — the silent close that ADR-033 exists to stop, occurring inside the
+                  mechanism built to stop it)
+      authority:  J1
+      done-when:  (1) `has_close` and `has_ruling` (`evals/lib/check-system-verify-block.sh:75-76`)
+                  are whole-file greps with no positional link to the `system-verify ·` line they
+                  gate, so an earlier entry's ruling masks a later unresolved FAIL. Reproduced in
+                  both orderings at Sprint-084 T2 review: `PASS`, exit 0. Bind each verdict to its
+                  own entry.
+                  (2) **The guard has never seen a real log** — every invocation in
+                  `run-system-verify-fixtures.sh` points at `$fx/…`, never at `docs/sprint/logs/`.
+                  A guard that only ever sees `evals/fixtures/` has not been shown to reach this
+                  repository (L-166), and its own sibling harness carries that sentence as a
+                  comment. Point it at the live corpus.
+                  (3) **Correction to the row as filed:** TD-086's Evidence says the checker
+                  "appears nowhere in `qa-check.sh`". That half is **stale** — its harness
+                  `run-system-verify-fixtures.sh` was registered in `eval_harnesses_always` at
+                  SPRINT-068 T2. The substance stands (fixtures only), the wording moved; and the
+                  checker still lives at `evals/lib/`, not `scripts/lib/` as the Summary says.
+                  (4) The 10 retained fixtures never exercise a **two-entry log** — add one, plus a
+                  sibling control green in the same run, each failing with its own named finding.
+                  (5) Seeded-break discrimination proof under ONE stated hash convention (L-169);
+                  outside reviewer dispatched worktree-isolated (L-165 · L-168).
+      tracks:     TD-086
+      origin:     close-retro (SPRINT-097 T1 ruling, 2026-09-10)
+      state:      ready
 ### P2 — Follow-on
 
 - [ ] TASK-320 — Give the launcher a fire-time run ledger, closing TD-122 and TD-124 together  [size: M] [risk: med] [HITL]
@@ -346,6 +446,27 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > mechanism — the gate's own duration and what it failed to reach are both unreported — so two rows
 > would have meant two passes over the same code with a stale dependency between them. The id is
 > **not reused**; TD-117's escalation note in `TECH-DEBT.md` points here.
+
+- [ ] TASK-341 — Widen the conformance-coverage sweep's matcher to the `S<N>.<CODE>` convention, then re-run Round 4  [size: S] [risk: low] [HITL]
+      class:      execution
+      tier:       P (ADR-029 — the subject is `docs/research/conformance-coverage.md`, a research
+                  round's prose, not a gate checker. It is the one member of the SPRINT-097 T1
+                  cluster that is not a guard, which is why it was ruled out of the Tier G group)
+      authority:  J2
+      done-when:  (1) The sweep's actionable-findings matcher sees `S<N>.<CODE>` findings, not only
+                  the bare-kebab convention. Re-derived at SPRINT-097 T1: `conformance-engine.sh`
+                  now emits **195** `S<N>.<CODE>` occurrences against **38** distinct kebab findings,
+                  so the convention the matcher was written for is the minority one and the gap is
+                  wider than when the row was filed.
+                  (2) **Round 4 is re-run**, not merely re-matched. TD-089's own re-file condition:
+                  widening the regex without re-running leaves the round's "0 artefacts remain"
+                  conclusion resting on a matcher nobody re-measured — L-108's shape in a sweep
+                  rather than a guard.
+                  (3) The stranger corpus's 2 unnamed FAIL lines (`S2.R-README` footer · `S6.BASE`
+                  two doc rows) are named by the widened sweep, or their absence is explained.
+      tracks:     TD-089
+      origin:     close-retro (SPRINT-097 T1 ruling, 2026-09-10)
+      state:      ready
 
 ### P3 — Long-term
 

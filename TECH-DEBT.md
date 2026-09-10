@@ -645,7 +645,8 @@ status: current
     a `__tests__/` directory — any one of those makes this live rather than latent. Related: L-108 ·
     L-058 · the sibling export-form finding fixed in T3's review pass.
 
-- **TD-132** severity: high | status: open | created: Sprint-094
+- **TD-132** severity: high | status: resolved → TASK-328 | created: Sprint-094
+  - **Resolved at SPRINT-097's batch-gate re-derivation (2026-09-10), not by new work.** The fix landed at SPRINT-095 T2 (`4cd494d` → `843ccdb` → `60fdf1b` → `82eb0cd`, third design, two review rounds rejected the first two). The Evidence above names the target itself: *"with only the prose stripped to bare `none` … `PASS wave-computation: T1=0 T2=0 T3=0 T4=0`"* — the current parser produces exactly that against the **unmodified** SPRINT-094 file, and the three residual `FAIL shared-file-unowned` rows are the genuine overlaps this row predicted would surface once the phantom edges were gone. `evals/fixtures/dispatch-preflight/` retains 25 fixtures, six of them the indented-continuation arm. **The SPRINT-097 promote sweep flagged this claim as un-re-derived and promoted SPRINT-097 T2 on it anyway** — L-091, caught only because the gate pass ran the artifact instead of reading the Summary.
   - Summary: **The dispatch preflight's `Depends-on:` parser matches `T[0-9]+` as a bare substring over
     the whole line, so it harvests task ids out of the field's own explanatory prose** — and it ignores
     the literal `none` that precedes them. On SPRINT-094 this is wrong in *both* directions at once: it
@@ -1135,6 +1136,7 @@ status: current
     record, so supplying the record ends it.
 
 - **TD-105** severity: medium | status: open | created: Sprint-087
+  - Tracker: **`TASK-339`** (SPRINT-097 T1 cluster ruling, 2026-09-10). Re-derived: `plan-edited-after-freeze` at `scripts/lib/conformance-engine.sh:2078` still diffs § Plan with no checkbox normalisation anywhere in that file.
   - Summary: **The Plan-freeze checks treat DoD ticking — the execution loop's own prescribed action —
     as an unaccounted Plan edit, so a sprint that runs cleanly fails the gate while a sprint that
     changed scope passes.** `plan-edited-after-freeze` fires when § Plan differs from `plan_commit`
@@ -1364,6 +1366,7 @@ status: current
     arithmetic (spawn cost × contention vs runner default) is the whole finding, and it is host-specific.
 
 - **TD-097** severity: medium | status: open | created: Sprint-087
+  - Tracker: **`TASK-338`**, merged with TD-087 (SPRINT-097 T1 cluster ruling, 2026-09-10). Re-derived: `[ ! -f "$scr" ]` at `check-verify-reaches.sh:89` and the archive exemption at `:55` are live verbatim, exactly as this row states.
   - Summary: **`check-verify-reaches.sh` reports a present script as absent, and cannot see the corpus
     that would have exposed it.** Its EXISTS test resolves the extracted token with `[ -f "$scr" ]`
     relative to CWD (line ~89), so a Verify clause naming a script by **basename** — the repo's
@@ -1472,6 +1475,7 @@ status: current
   - **Re-file fresh if** `EPIC-014` passes ~180 lines — the headroom argument expires there.
 
 - **TD-086** severity: minor | status: open | created: Sprint-084
+  - Tracker: **`TASK-340`** (SPRINT-097 T1 cluster ruling, 2026-09-10 — four tasks grouped by artifact). Re-derived against the tree: the masking bug at `evals/lib/check-system-verify-block.sh:75-76` is live and the checker still sees only `evals/fixtures/`, but the *"appears nowhere in `qa-check.sh`"* clause is **stale** — its harness `run-system-verify-fixtures.sh` was registered in `eval_harnesses_always` at SPRINT-068 T2. The Summary also names `scripts/lib/`; the checker lives at `evals/lib/`.
   - Summary: **`check-system-verify-block.sh` masks a later unresolved FAIL with an earlier ruling, and
     never runs against live logs.** `has_close` and `has_ruling` are whole-file greps with no positional
     link to the `system-verify ·` line they gate.
@@ -1488,6 +1492,7 @@ status: current
     never surface through `qa-check.sh`.
 
 - **TD-087** severity: minor | status: open | created: Sprint-084
+  - Tracker: **`TASK-338`**, merged with TD-097 (SPRINT-097 T1 cluster ruling, 2026-09-10). Same script, two legs, filed three sprints apart with neither row aware of the other; each row's `Re-file fresh if` clause forbids fixing one alone, which is the only merge the cluster evidence forces. Re-derived: `grep -qF` at `check-verify-reaches.sh:102` and the `case` substring test at `:96` are live verbatim.
   - Summary: **`check-verify-reaches.sh` certifies targets it never reaches, and cannot model a
     two-method `Verify:` clause.** REACHES is a plain `grep -qF` substring test over the script's
     non-comment text, with no notion of *how* the target is used.
@@ -1523,6 +1528,7 @@ status: current
     particular freeze.
 
 - **TD-089** severity: minor | status: open | created: Sprint-084
+  - Tracker: **`TASK-341`** (SPRINT-097 T1 cluster ruling, 2026-09-10). **Ruled out of the Tier G group** — its subject is a research round's prose, not a guard, so a "gate accuracy" task containing it would mis-tier under ADR-029. Re-derived and now wider than when filed: the engine emits **195** `S<N>.<CODE>` occurrences against **38** distinct kebab findings, so the convention the matcher was written for is the minority one.
   - Summary: **The conformance-coverage sweep reports clean over findings it cannot match.** Round 4's
     actionable-findings regex matches the bare-kebab finding convention; findings emitted under the
     `S<N>.<CODE>` convention are invisible to it.
