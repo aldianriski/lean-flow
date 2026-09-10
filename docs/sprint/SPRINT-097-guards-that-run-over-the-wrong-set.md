@@ -98,7 +98,7 @@ single extractor rather than two that disagree while both claim parity in commen
 - [ ] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168).
 
 ### T4 — Make a verdict-less `qa-check.sh` run FAIL loudly instead of reading as 0 failures `[size: S · risk: low · class: execution · AFK · J1]`
-Layers: `scripts/qa-check.sh` (or its callers) · `evals/`
+Layers: `scripts/qa-check.sh` · `package.json` (the `gate` / `test` script chain — its real callers) · `scripts/qa-verdict.ts` (new · TS/Bun per the 2026-09-10 ruling) · `evals/qa-verdict.test.ts`
 Depends-on: none — independent of the memory cost itself
 Cites: TD-143 · TD-090 · TD-117 · TD-084 · L-120
 **Tier G** (ADR-029) — this is the gate's own report, and a run that cannot speak currently presents
@@ -117,7 +117,7 @@ reported as a failure by whatever invokes it, rather than leaving the caller to 
 - [ ] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168).
 
 ### T5 — Scope the epic-state checker's member set to sprints this repository owns `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-epic-archive.sh` (the `member_plan()` helper and the `epic-state:` leg) · `evals/run-epic-archive-fixtures.sh` · `evals/fixtures/epic-state/`
+Layers: `scripts/lib/check-epic-archive.sh` (the two inline member-number globs at :79 and :210, and the `epic-state:` leg — there is no `member_plan()` helper; A3 corrected 2026-09-10) · `evals/run-epic-archive-fixtures.sh` · `evals/fixtures/epic-state/`
 Depends-on: none
 Cites: TD-144 · ADR-041 · L-186 · L-166
 **Tier G** (ADR-029) — a checker reporting a false `close_commit` mismatch on a correct artifact

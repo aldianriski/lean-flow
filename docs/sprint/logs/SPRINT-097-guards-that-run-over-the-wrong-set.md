@@ -103,3 +103,105 @@ running the gate again and reading its output — the same instrument that found
 promote fixed.
 
 consequence · promote · behaviour:low · governance:high
+
+### 2026-09-10 | scope-change | T2's premise is dead; T4's `Layers:` narrowed; new executable code is TS/Bun
+
+**Raised at the batch G1+G2 pass, before any Plan edit and before any dispatch.** Three findings, three
+owner rulings. § Plan is edited only for the second; the first and third are recorded here.
+
+**1. T2's motivating defect was already fixed at SPRINT-095 — what broke.** T2's Acceptance reads
+*"the snippet extracted from `dispatch.md` by its own anchors, run against SPRINT-094's sprint file,
+yields `PASS wave-computation: T1=0 T2=0 T3=0 T4=0` and no `FAIL cycle-detected`."* Run today against
+`HEAD` (`d06edf8`), it yields exactly that:
+
+```
+PASS base-ref: declared base matches live HEAD (d06edf878c34662be47db974938b4e1bc4a5be70)
+PASS wave-computation: T1=0 T2=0 T3=0 T4=0
+FAIL shared-file-unowned: scripts/lib/check-epic-archive.sh ~ scripts/lib/ in T1 and T2 ...
+FAIL shared-file-unowned: scripts/qa-check.sh in T1 and T2 ...
+FAIL shared-file-unowned: skills/lean-doc-generator/SKILL.md in T1 and T2 ...
+```
+
+The three residual FAILs are genuine unowned overlaps in SPRINT-094's own Plan, not the phantom
+`PASS shared-file-owned … order=T1->T2` rows T2's first DoD line predicts. TD-132 was closed in code
+by `4cd494d` → `843ccdb` → `60fdf1b` → `82eb0cd` (SPRINT-095 T2, third design, two review rounds
+rejected the first two). The retention half is present too: `evals/fixtures/dispatch-preflight/`
+carries 25 fixtures including six `deps-cont-*` cases — the indented continuation arm T2's third DoD
+line calls out as the untested one — plus a `parser-parity` case, and
+`sh evals/run-dispatch-preflight-fixtures.sh` reports **all green**.
+
+**This was predicted in writing and not acted on.** `TECH-DEBT.md:217` from this sprint's own promote
+sweep: *"`TD-132` is still `status: open` although its tracker `TASK-328` shipped at … and this sweep
+did not re-derive TD-132's claim."* The row was carried into a Plan on the strength of its Summary
+line, which is precisely L-091's failure and precisely what T2's sibling T1 exists to prevent for
+five other rows. A promote sweep that flags a claim as un-re-derived and then promotes it anyway has
+found the defect and dropped it.
+
+**Impact:** T2 is not executable as written — its first DoD line asserts a present-tense failure that
+does not occur. **Ruling (owner, this session): T2 closes as already-satisfied.** No code change. The
+reproduction above is the evidence; `TD-132` closes as resolved-by-`82eb0cd`.
+
+**2. The pre-dispatch preflight HALTs on this sprint's own Plan.** Run against
+`docs/sprint/SPRINT-097-guards-that-run-over-the-wrong-set.md` at `d06edf8`:
+
+```
+PASS wave-computation: T1=0 T2=0 T3=0 T4=0 T5=0
+FAIL shared-file-unowned: evals/run-dispatch-preflight-fixtures.sh ~ evals/  in T2 and T4
+FAIL shared-file-unowned: evals/fixtures/dispatch-preflight/ ~ evals/        in T2 and T4
+FAIL shared-file-unowned: evals/run-layers-observed-fixtures.sh ~ evals/     in T3 and T4
+FAIL shared-file-unowned: evals/run-layers-completeness-fixtures.sh ~ evals/ in T3 and T4
+FAIL shared-file-unowned: evals/ ~ evals/run-epic-archive-fixtures.sh        in T4 and T5
+FAIL shared-file-unowned: evals/ ~ evals/fixtures/epic-state/               in T4 and T5
+PREFLIGHT: HALT
+```
+
+Six unowned overlaps, all one cause: T4's `Layers:` ends in the bare directory token `evals/`, which
+by `TOK`'s directory arm (TD-043) subsumes every other task's fixture files, while all five tasks
+declare `Depends-on: none`. D1 gave `scripts/qa-check.sh` an owner and said nothing about `evals/`.
+The finding is correct — the checker is doing its job on a Plan that under-declares.
+
+**Impact:** no wave can be dispatched. **Ruling (owner, this session): narrow T4's `Layers:` to the
+paths it actually touches** rather than adding `Depends-on:` edges that would serialise T4 behind
+three tasks it does not depend on. § Plan is edited for this, below.
+
+**3. New executable code in this sprint is TypeScript run by Bun.** T4's stated subject —
+*"reported as a failure by whatever invokes it"* — needed its invoker identified first.
+`scripts/qa-check.sh` has no in-repo shell caller: `conformance.sh` mentions it only in a comment,
+`.claude/settings.json:19,73` are permission entries, `apps/cli/src/main.ts:131` is help text. The
+real callers are `package.json`'s `"gate": "sh scripts/qa-check.sh"` and
+`"test": "sh scripts/qa-check.sh && bun test"` — the second being the L-120 shape exactly, a gate
+whose verdict is read through `&&`.
+
+**Impact:** T4's wrapper is a new file, so its language is a decision, not an inheritance.
+**Ruling (owner, this session): new executable code is `.ts` run by Bun; existing `.sh` is patched in
+place, never ported here.** Porting the 81 scripts / 18,164 LOC shell surface is EPIC-014's outcome
+and is scoped there as a strangler with per-rule-family parity — a boundary that epic states cannot
+be reached inside one 400-line Plan. This sprint carries no `epic:` stamp (D3) and no parity harness,
+so it does not open that boundary. T3 and T5 extend their existing `.sh` harnesses in place.
+
+**G2 re-confirmed** over the amended Plan: four tasks (T1 · T3 · T4 · T5), T2 closed, ownership
+CLEAR. Gate signature is the owner's, still unrecorded — `gates_signed:` is absent.
+
+consequence · scope-change · behaviour:low · governance:high
+
+### 2026-09-10 | scope-change | A3 corrected: `member_plan()` does not exist
+
+Amends the entry above rather than editing it. **A3 asserts** *"`member_plan()` is the only place the
+epic-state leg resolves a member number"*, and T5's `Layers:` named that helper as its subject.
+`grep -rn 'member_plan' scripts/ evals/` returns nothing: the symbol does not exist anywhere in the
+tree. Resolution is **two inline globs** — `check-epic-archive.sh:79` and `:210` — which is A3's own
+warning shape (*"TD-132's Location line named one arm of two"*) arriving one level earlier than
+expected: not a helper with two callers, but no helper at all and two independent sites.
+
+A `Layers:` line naming a symbol the repository does not contain is a structural claim about another
+document that nothing checked (L-130's family). T5's `Layers:` is corrected to name the two real
+sites; the declared file set is unchanged, so the ownership map is unaffected.
+
+**The false positive itself reproduces exactly as the Plan predicts**, which is why T5 stands while T2
+falls — `sh scripts/lib/check-epic-archive.sh .` (exit 1) names both rows: EPIC-016 SPRINT-001's cell
+cites `eb3d9e7` against local `close_commit: b0f2695`, SPRINT-002's cites `28c5203` against `007869e`.
+
+**Pre-dispatch preflight over the amended Plan** — `PASS base-ref` · `PASS wave-computation: T1=0 T2=0
+T3=0 T4=0 T5=0` · **`PREFLIGHT: CLEAR`**, exit 0, replacing the six-FAIL HALT recorded above.
+
+consequence · scope-change · behaviour:low · governance:med
