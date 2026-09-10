@@ -183,7 +183,7 @@ check_block() {
   else ok  "$sp $tid Layers completeness (DoD-implied files all declared)"
   fi
 
-  # -- (d) NEW: a path-shaped token written in Layers: OUTSIDE backticks (TD-142 ruling, DoD item 3) -
+  # -- (d) NEW: a FILE-shaped token written in Layers: OUTSIDE backticks (TD-142 ruling, DoD item 3) -
   # A declaration is backtick-delimited by the ruling above -- an unbackticked path-shaped string in
   # Layers: is therefore NOT a declaration to either checker, but it IS still a declaration to the
   # dispatch preflight's backtick-agnostic TOK extraction (see check-layers-observed.sh's BOUNDARY
@@ -192,6 +192,15 @@ check_block() {
   # checked". Detected by stripping every backtick-quoted span out of the raw line first, so a
   # LEGITIMATE backtick-quoted declaration never trips this -- only text that was never inside
   # backticks to begin with.
+  #
+  # SCOPED to FILE-shaped tokens (dot-extension), the same character class the (a) leg above already
+  # uses for prose-implied tokens -- deliberately NOT the preflight's own two-alternative TOK, whose
+  # second arm (`[A-Za-z0-9_.-][A-Za-z0-9_./-]*/`, a bare DIRECTORY token with no dot) would also match
+  # ordinary parenthetical prose on a Layers: line ("... (see also evals/fixtures/foo)" reads a
+  # directory-shaped run ending before the closing paren) -- exactly the over-eager-gate cost TD-032
+  # was filed to stop. TD-142's own counted evidence is file-shaped paths throughout (TECH-DEBT.md,
+  # *.sh); a bare, unbackticked DIRECTORY token is a real but narrower residual gap this leg does not
+  # close, left for a future task if it is ever observed in practice.
   layers_bare=$(printf '%s' "$layers_line" | sed -E 's/`[^`]*`//g' | grep -oE '[A-Za-z0-9_./-]+\.[A-Za-z]+' | sort -u)
   if [ -n "$layers_bare" ]; then
     bad "$sp $tid layers-unbackticked-token: declares a path-shaped token outside backticks ($(printf '%s' "$layers_bare" | tr '\n' ' ')); a declaration is backtick-delimited, so this reads as prose to both checkers and as a declaration to the dispatch preflight"
