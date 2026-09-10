@@ -262,3 +262,51 @@ and the row is already a reasoned carry (TD-082) — but this ruling added 121 l
 42% over, and the §11 prune is owed at the next promote.
 
 consequence · T1 · behaviour:none · governance:high
+
+### 2026-09-10 | T3 | Ruled: backticks required, and an unbackticked token is NAMED
+
+**The ruling.** One extractor, **backtick-delimited**, read by both checkers — and a live Plan
+carrying a path-shaped token **outside** backticks becomes its own **named FAIL** rather than
+silently reading as no declaration. Owner ruling, this session. The implementation is dispatched;
+this entry records the decision and the basis it was taken on, which is the J2 half.
+
+**The counted basis, derived before the ruling as DoD line 1 requires.** TD-142 says *"requiring
+backticks is stricter and matches STANDARD's own examples, but every unbackticked Plan in the tree
+then becomes undeclared. Count the affected sprints before choosing."* Counted:
+
+- **51 unbackticked `Layers:` lines across 15 files — every one archived.** No live Plan carries one.
+- **The cost against the set either checker examines is `0`**, because those files are excluded
+  **twice over**: `scripts/qa-check.sh:1092` passes `ls docs/sprint/SPRINT-*.md`, which is
+  **non-recursive**, and both scripts additionally guard `case "$sp" in */archive/*) continue`
+  (`check-layers-observed.sh:344` · `check-layers-completeness.sh:183`).
+
+That second finding is what turned the ruling from a trade into a free choice, and it is this
+sprint's own subject arriving in the ruling for the sprint's own subject: **the question was never
+which parser is stricter, it was which files the parsers run over** (L-186). TD-142 framed the cost
+in terms of *the tree*; the number that decides it is the count against *the examined set*, and the
+two differ by every archived Plan.
+
+**Cross-checked (L-108).** The line census reconciles three ways: 5 live + 370 archived = 375, while
+a recursive `grep -r` over `docs/sprint/` returns **380** — the 5-line gap being `Layers:` quoted
+inside sprint **log** files, which the non-recursive caller never reaches either. A first pass at
+**A2** also disagreed with the Plan — 13 against the recorded 14 — and the disagreement was the
+signal, not noise: `scripts/qa-check.sh` is declared by **two** of SPRINT-095's tasks, and the
+observed checker emits **per-task** lines, so 14 non-unique / 13 unique. **A2 confirmed**:
+SPRINT-096's Plan yields **0** declared tokens, SPRINT-095's **14**.
+
+**The loser, named.** The **backtick-agnostic** side loses — adopting the dispatch preflight's `TOK`
+shape rule in both checkers. It is the tidier answer on its face (one semantics across all three
+readers, no Plan retroactively undeclared) and it was rejected because `TOK` cannot distinguish a
+declared path from a path *mentioned in the `Layers:` line's own annotation prose*. That is exactly
+the failure the adjacent `Depends-on:` field needed **three designs and two review rejections** to fix
+at SPRINT-095, on the same line of the same block. Taking the permissive reading here would have
+re-imported it one field to the left.
+
+**The boundary this ruling leaves open, stated rather than implied.** There is a **third** reader of
+`Layers:` — the preflight's `TOK`, which stays backtick-agnostic. After this change the divergence is
+narrower and runs in the **safe** direction: the preflight sees at least what the checkers see, so a
+bare token is *owned* by the preflight while being *invisible* to the checkers, never the reverse.
+The new named finding makes any live instance loud. `check-layers-observed.sh:480` already calls this
+a "BOUNDARY, deliberate"; it is now a boundary with a reader.
+
+consequence · T3 · behaviour:none · governance:high
