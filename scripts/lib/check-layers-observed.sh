@@ -53,6 +53,21 @@ set -u
 
 fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
 
+# layers_tokens() -- THE single extractor for a Layers: declaration (TD-142, ruled 2026-09-10): a
+# token is "declared" if and only if it is backtick-delimited. Takes joined declaration text (one or
+# more already-isolated Layers: lines) and returns one token per output line, backticks stripped;
+# a token ending in "/" is a directory prefix and is returned verbatim so callers can still test it
+# as one (see covers() below).
+#
+# SHARED with check-layers-completeness.sh, which sources THIS file to reach this one definition
+# (see the LAYERS_OBSERVED_SOURCED guard further down) rather than keeping a second, independently
+# drifting copy of the same regex. That is what TD-142 named: two copies of this extraction, one
+# strict (this file) and one a raw substring test (the other file), each carrying a comment claiming
+# parity with the other. One extractor now backs both, so the comment is enforced rather than hoped.
+layers_tokens() {
+  printf '%s\n' "$1" | grep -oE '`[^`]+`' | tr -d '`'
+}
+
 fail=0
 ok()   { printf 'PASS  %s\n' "$1"; }
 bad()  { fail=1; printf 'FAIL  %s\n' "$1"; }
@@ -62,7 +77,16 @@ note() { printf '      %s\n' "$1"; }
 # A bare invocation (no sprint files) previously fell straight into `for sp in "$@"` over an empty
 # list: zero output, exit 0 -- reading as a silent pass rather than "nothing was checked" (TD-056,
 # one of exactly two check-*.sh sharing this shape). Cure matches check-gates-signed.sh's note-line.
-[ "$#" -gt 0 ] || { note "layers observed: no sprint files given -- nothing verified"; exit 0; }
+#
+# Guarded by LAYERS_OBSERVED_SOURCED (TD-142): when check-layers-completeness.sh sources this file
+# to reach layers_tokens(), "$@" is the SOURCING script's own positional params, not this file's --
+# reading them here would exit the completeness checker early on its own bare-invocation case. A
+# second, matching guard further down (immediately before the main `for sp` loop) covers the rest of
+# this file's executable body the same way; every function definition, here and below, stays
+# available either way -- only the two guarded regions are skipped while sourced.
+if [ "${LAYERS_OBSERVED_SOURCED:-0}" != "1" ]; then
+  [ "$#" -gt 0 ] || { note "layers observed: no sprint files given -- nothing verified"; exit 0; }
+fi
 
 # --- attribution: who changed this path (SPRINT-049 T1, TD-031 · TD-035) ------------------------
 # The check used to ask "did SOME task declare this file?" against one union of every task's
@@ -205,8 +229,9 @@ attribute() {   # <sha> -> "T<n>" | "COORD" | "GOVERNANCE" | "UNATTRIBUTED"
 
 # Per-task declarations: emits one "T<n> <path>" line per declared token, so a task's Layers: can be
 # tested on its own instead of being melted into a union. Reads indented continuation lines, matching
-# check-layers-completeness.sh (SPRINT-049 T3) -- both checkers read the same declaration, so a
-# parsing rule that differed between them would make one of the two lie.
+# check-layers-completeness.sh (SPRINT-049 T3) -- both checkers now read the SAME declaration through
+# layers_tokens(), so a parsing rule differing between them is no longer possible by construction
+# (TD-142), not merely asserted in a comment.
 task_decls() {   # <plan-text> -> lines "T<n> <path>"
   printf '%s\n' "$1" | awk '
       /^### T[0-9]+/ { if (match($0, /T[0-9]+/)) cur=substr($0,RSTART,RLENGTH); inl=0; next }
@@ -215,7 +240,7 @@ task_decls() {   # <plan-text> -> lines "T<n> <path>"
       { inl=0 }
     ' | while IFS=$(printf '\t') read -r t rest; do
         [ -n "$t" ] || continue
-        printf '%s' "$rest" | grep -oE '`[^`]+`' | tr -d '`' | while read -r tok; do
+        layers_tokens "$rest" | while read -r tok; do
           [ -n "$tok" ] && printf '%s %s\n' "$t" "$tok"
         done
       done
@@ -336,6 +361,10 @@ is_excluded() {
   esac
 }
 
+# Second half of the LAYERS_OBSERVED_SOURCED guard (TD-142) -- see the matching guard above the
+# bare-invocation check. Everything from here to `exit $fail` is this file's real run; skipped when
+# check-layers-completeness.sh sources this file only for its function definitions.
+if [ "${LAYERS_OBSERVED_SOURCED:-0}" != "1" ]; then
 for sp in "$@"; do
   [ -f "$sp" ] || { bad "layers observed: file not found: $sp"; continue; }
   # Scoped by LOCATION, not by `status:` -- see the same note in check-layers-completeness.sh
@@ -365,14 +394,15 @@ for sp in "$@"; do
   # A declaration continues onto INDENTED following lines (SPRINT-049 T3). Reading only `^Layers:`
   # silently kept the first line of a wrapped declaration and treated every path after it as
   # undeclared -- the same truncation defect as in check-layers-completeness.sh, which is where the
-  # rule and its must-FAIL fixtures live. Kept in sync deliberately: both checkers read the same
-  # declaration, so a parsing rule that differs between them would make one of the two lie.
+  # rule and its must-FAIL fixtures live. Extraction now runs through layers_tokens() (TD-142), the
+  # one place either checker turns declaration text into tokens.
   plan=$(awk '/^## Plan/{f=1;next} /^## /{f=0} f' "$sp")
-  layers_all=$(printf '%s\n' "$plan" | awk '
+  layers_lines=$(printf '%s\n' "$plan" | awk '
       /^Layers:/ { inl=1; print; next }
       inl && /^[ \t]+[^ \t]/ { print; next }
       { inl=0 }
-    ' | grep -oE '`[^`]+`' | tr -d '`' | tr '\n' ' ')
+    ')
+  layers_all=$(layers_tokens "$layers_lines" | tr '\n' ' ')
 
   # Per-task declarations as "T<n> <path>" lines -- the union is only kept for the WIP path below,
   # where no attribution is possible.
@@ -480,6 +510,20 @@ for sp in "$@"; do
   # BOUNDARY, deliberate: the dispatch preflight extracts only dot-bearing tokens from Layers:, so a
   # directory token is invisible to its shared-file overlap check. Declare a directory only for a
   # tree ONE task owns; any path two tasks could both touch must still be named in full.
+  #
+  # A SECOND boundary, left open by ruling at SPRINT-097 T3 (TD-142): the preflight's own token
+  # extraction (`TOK` in skills/orchestrator/references/dispatch.md) is backtick-AGNOSTIC -- it scans
+  # the raw Layers: line for anything path- or directory-shaped, backticks or not. Both check-*.sh
+  # checkers now require backticks (this file always did; check-layers-completeness.sh was fixed to
+  # match). That leaves three readers of the same field, two strict and one permissive, and the
+  # divergence is real: a bare (unbackticked) path-shaped token in a live Plan's Layers: line is "not
+  # declared" to EITHER checker but IS a declaration to the preflight's shared-file check. This is
+  # narrower than before (both checkers now at least agree with each other) and it is in the SAFE
+  # direction (the preflight sees at least what the checkers see, never less), which is why it is left
+  # open rather than fixed here -- dispatch.md is out of this task's declared Layers:. What makes the
+  # gap non-silent is check-layers-completeness.sh's `layers-unbackticked-token` finding: it FAILs by
+  # name the moment a live Plan carries this shape, so the three-way disagreement is loud rather than
+  # a thing nobody is told about. Close dispatch.md's TOK separately if this boundary is ever revisited.
   covers() { # <space-separated declared tokens> <path>
     _toks=$1; _f=$2
     case " $_toks " in *" $_f "*) return 0 ;; esac
@@ -590,3 +634,4 @@ for sp in "$@"; do
 done
 
 exit $fail
+fi

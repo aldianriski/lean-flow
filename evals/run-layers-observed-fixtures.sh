@@ -1621,6 +1621,66 @@ run_case_anywhere "archived-shares-active-number: same-numbered archive is not a
   "src/undeclared.js" -- \
   sh -c "cd \"$c12\" && sh \"$checker\" docs/sprint/SPRINT-960-active.md"
 
+# ================================================================================================
+# case: THE "LOUD" DIRECTION, PINNED (SPRINT-097 T3, TD-142). An unbackticked `Layers:` token is not
+# a declaration -- ruled 2026-09-10 -- and task_decls() must keep reading it that way through
+# layers_tokens(), the extractor this task moved into a function shared with
+# check-layers-completeness.sh. T1 declares `bare.txt` with NO backticks and then edits it: it must
+# still FAIL, over-reporting exactly as TD-142 described ("an unbackticked declaration reads as no
+# declaration -- loud"). T2 is the sibling control in the SAME repo: the identical edit, declared
+# WITH backticks, and must PASS -- proving the refactor did not quietly make either checker
+# backtick-agnostic.
+# ================================================================================================
+c13b="$work/unbackticked-declaration-not-declared"
+mkdir -p "$c13b/docs/sprint"
+cat > "$c13b/docs/sprint/SPRINT-970-unbackticked.md" <<'EOF'
+---
+sprint: 970
+slug: unbackticked
+status: active
+plan_commit: PLAN_COMMIT_PLACEHOLDER
+---
+
+# SPRINT-970 — Unbackticked Declaration (constructed fixture)
+
+## Plan
+
+### T1 — declares its file WITHOUT backticks
+Layers: bare.txt
+Depends-on: none
+
+**DoD:**
+- [ ] bare.txt updated
+
+### T2 — declares its file WITH backticks
+Layers: `quoted.txt`
+Depends-on: none
+
+**DoD:**
+- [ ] quoted.txt updated
+EOF
+printf 'a\n' > "$c13b/bare.txt"
+printf 'b\n' > "$c13b/quoted.txt"
+git -C "$c13b" init -q
+lock_plan "$c13b" 'docs/sprint/SPRINT-970-unbackticked.md'
+printf 'a2\n' >> "$c13b/bare.txt"
+commit_all "$c13b" 'sprint(970) T1: edit the unbackticked-declaration file'
+printf 'b2\n' >> "$c13b/quoted.txt"
+commit_all "$c13b" 'sprint(970) T2: edit the backtick-declared file'
+
+run_case_anywhere "unbackticked-declaration-not-declared (bare token still FAILs, over-reporting)" 1 \
+  "T1:bare.txt" -- \
+  sh -c "cd \"$c13b\" && sh \"$checker\" docs/sprint/SPRINT-970-unbackticked.md"
+
+out13b=$(cd "$c13b" && sh "$checker" docs/sprint/SPRINT-970-unbackticked.md 2>&1)
+case "$out13b" in
+  *"T2:quoted.txt"*)
+    echo "FAIL fixture(unbackticked-declaration sibling control): T2's backtick-declared edit unexpectedly appears in a FAIL line -- got:"
+    printf '%s\n' "$out13b"; fail=1 ;;
+  *)
+    echo "PASS fixture(unbackticked-declaration sibling control): T2's backtick-declared edit stayed clean" ;;
+esac
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-OBSERVED FIXTURES: all green"; else echo "LAYERS-OBSERVED FIXTURES: at least one FAIL"; fi
 exit $fail
