@@ -126,3 +126,32 @@ describe("CLI process -- the invocation surface package.json's gate/test scripts
     expect(out).toMatch(/CHAIN_CONTINUED/);
   });
 });
+
+// Adversarial review findings (worktree-isolated, dispatched against commit 3404422): a spawn
+// failure must resolve loudly rather than hang forever -- the ONE thing worse than "reports 0 fail
+// incorrectly" is "reports nothing and never exits", which is TD-143's own failure shape turned back
+// on the wrapper itself.
+describe("runAndJudge -- a command that never even starts must still resolve, not hang", () => {
+  test("a nonexistent binary resolves (does not hang) and is reported as a failure", async () => {
+    const result = await runAndJudge("totally-nonexistent-binary-xyz-qa-verdict-test", ["arg1"]);
+    expect(result.ok).toBe(false);
+    expect(result.reason).toMatch(/spawn|ENOENT|failed to start/i);
+  }, 5000);
+});
+
+// Adversarial review finding: stdout and stderr are two independent OS pipes with NO ordering
+// guarantee relative to each other. Concatenating both into one buffer for judging means a stderr
+// chunk that lands between two stdout writes -- with no trailing newline -- can desync VERDICT_RE's
+// `^` anchor and report a real, clean pass as verdict-less. The verdict line is always printed to
+// STDOUT (qa-check.sh's ok()/bad()/note() all `printf` unredirected); judging must never depend on
+// stderr's arrival order relative to stdout.
+describe("runAndJudge -- stderr interleaving must never corrupt the judged verdict", () => {
+  test("stderr noise with no trailing newline, arriving right before a clean stdout verdict, still judges ok", async () => {
+    const result = await runAndJudge("sh", [
+      "-c",
+      "printf 'noise-no-newline' 1>&2; printf 'QA-CHECK: 1 pass, 0 fail\\n'",
+    ]);
+    expect(result.ok).toBe(true);
+    expect(result.pass).toBe(1);
+  });
+});

@@ -53,20 +53,49 @@ export interface RunOutcome extends VerdictOutcome {
 /**
  * Spawns `cmd args…`, forwarding its stdout/stderr live to this process's own (so a human watching
  * `bun run gate` still sees legs stream by, exactly as a bare `sh scripts/qa-check.sh` did) while
- * ALSO capturing them to judge afterwards. The child's exit code is reported for visibility only --
+ * ALSO capturing stdout to judge afterwards. The child's exit code is reported for visibility only --
  * judgeOutput's read of the printed QA-CHECK line is what decides `ok` (L-120).
+ *
+ * Judges STDOUT ONLY (qa-check.sh's ok()/bad()/note() all `printf` unredirected, so the verdict line
+ * is always stdout). stdout and stderr are two independent OS pipes with no ordering guarantee
+ * relative to EACH OTHER; concatenating both into one buffer let a stderr chunk with no trailing
+ * newline land next to a stdout write and desync VERDICT_RE's `^` anchor, reporting a real clean pass
+ * as verdict-less (found by adversarial review). A single stream's own `data` events stay ordered, so
+ * judging stdout alone removes the interleaving risk entirely rather than papering over one repro.
+ *
+ * A spawn that never starts (bad command, ENOENT, no permission) is reported as a failure rather than
+ * left to hang or throw uncaught -- the one thing worse than "reports 0 fail incorrectly" is "reports
+ * nothing and never exits" (found by adversarial review; this promise ALWAYS resolves).
  */
 export function runAndJudge(cmd: string, args: readonly string[]): Promise<RunOutcome> {
   return new Promise((resolve) => {
-    const child = spawn(cmd, args, { stdio: ["inherit", "pipe", "pipe"] });
     let out = "";
+    let child: ReturnType<typeof spawn>;
+    try {
+      child = spawn(cmd, args, { stdio: ["inherit", "pipe", "pipe"] });
+    } catch (e) {
+      resolve({
+        ok: false,
+        exitCode: null,
+        signal: null,
+        reason: `qa-verdict: failed to start '${cmd}' -- ${(e as Error).message}`,
+      });
+      return;
+    }
+    child.on("error", (e: Error) => {
+      resolve({
+        ok: false,
+        exitCode: null,
+        signal: null,
+        reason: `qa-verdict: failed to start '${cmd}' -- ${e.message}`,
+      });
+    });
     child.stdout.on("data", (d: Buffer) => {
       out += d.toString();
       process.stdout.write(d);
     });
     child.stderr.on("data", (d: Buffer) => {
-      out += d.toString();
-      process.stderr.write(d);
+      process.stderr.write(d); // forwarded live for visibility only -- never judged (see above)
     });
     child.on("close", (exitCode, signal) => {
       resolve({ ...judgeOutput(out), exitCode, signal });
