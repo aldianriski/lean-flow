@@ -63,6 +63,25 @@ set -u
 
 fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
 
+# --- ONE extractor, shared with check-layers-observed.sh (TD-142, ruled 2026-09-10) ----------------
+# Both checkers used to carry the comment "kept deliberately identical ... a parsing rule that
+# differs between them would make one of the two lie" while running two DIFFERENT parsers:
+# check-layers-observed.sh's task_decls() extracted only backtick-quoted tokens; this file tested
+# membership with `grep -qF` against the raw Layers: line -- a SUBSTRING test, backtick-agnostic,
+# that read a token as "declared" if it merely appeared anywhere in the line (inside a longer path,
+# or a trailing comment). One of the two was lying, and it was this file (L-108's shape: a guard
+# matched by substring instead of by shape, failing GREEN).
+#
+# The ruling: a declaration is backtick-delimited. Rather than re-typing the (now-strict) extraction
+# here as a second copy that can drift again, this file sources check-layers-observed.sh to reach its
+# ONE definition of layers_tokens() -- the comment above is enforced by construction, not by
+# discipline. LAYERS_OBSERVED_SOURCED tells that file to define its functions and stop, never running
+# its own `for sp in "$@"` main loop or its bare-invocation guard against THIS file's "$@".
+_layers_completeness_self_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+LAYERS_OBSERVED_SOURCED=1
+. "$_layers_completeness_self_dir/check-layers-observed.sh"
+unset LAYERS_OBSERVED_SOURCED
+
 fail=0
 ok()   { printf 'PASS  %s\n' "$1"; }
 bad()  { fail=1; printf 'FAIL  %s\n' "$1"; }
@@ -112,13 +131,21 @@ check_block() {
     bad "$sp $tid declaration continuation: a wrapped ${strays}line must be indented to continue; at column 0 it reads as prose"
   fi
 
-  cites_toks=$(printf '%s' "$cites_line" | grep -oE '`[^`]+`' | tr -d '`' | sort -u)
+  cites_toks=$(layers_tokens "$cites_line" | sort -u)
   cites_tids=$(printf '%s' "$cites_line" | grep -oE '\bT[0-9]+\b' | sort -u)
+
+  # THE single extraction of what Layers: actually declares (TD-142) -- shared with
+  # check-layers-observed.sh via layers_tokens(), sourced above. Every membership test below reads
+  # this list with an EXACT match (`grep -qxF`), never a substring test against the raw line: a
+  # substring test is what let a DoD-implied token read as "declared" merely because it happened to
+  # appear inside a longer declared path, or inside a trailing comment on the Layers: line (L-108's
+  # shape, failing GREEN -- this was the bug TD-142 named).
+  layers_toks=$(layers_tokens "$layers_line" | sort -u)
 
   # -- Cites:/Layers: contradiction -- the escape must not double as a declaration ------------
   contra=""
   for c in $cites_toks; do
-    printf '%s' "$layers_line" | grep -qF "$c" && contra="$contra $c"
+    printf '%s\n' "$layers_toks" | grep -qxF "$c" && contra="$contra $c"
   done
   if [ -n "$contra" ]; then
     bad "$sp $tid Cites/Layers contradiction:$contra declared as touched AND escaped as merely cited"
@@ -127,11 +154,12 @@ check_block() {
   # -- (a)+(b): file-shaped tokens named in prose, absent from Layers: -----------------------
   # A declared token ending in "/" is a DIRECTORY prefix covering every path beneath it (SPRINT-055
   # T1). Before that, such a token was accepted and could never match anything, so it read as a
-  # declaration while guarding zero files -- the silent-false-negative shape L-058 is about. Kept
-  # deliberately identical to check-layers-observed.sh: both checkers read the same declaration, so
-  # a parsing rule that differs between them would make one of the two lie.
+  # declaration while guarding zero files -- the silent-false-negative shape L-058 is about. Filtered
+  # from the SAME layers_toks list above rather than a second, separately-anchored grep, so the two
+  # checks (is it declared at all? is it declared as a directory?) can never disagree on what a
+  # token IS.
   miss_f=""
-  layers_dirs=$(printf '%s' "$layers_line" | grep -oE '`[^`]+/`' | tr -d '`')
+  layers_dirs=$(printf '%s\n' "$layers_toks" | grep '/$')
   covered_by_dir() { # <path>
     for _d in $layers_dirs; do
       case "$1" in "$_d"*) return 0 ;; esac
@@ -140,19 +168,42 @@ check_block() {
   }
   toks=$(printf '%s' "$prose" | grep -oE '`[A-Za-z0-9_./-]+\.[A-Za-z]+`' | tr -d '`' | sort -u)
   for t in $toks; do
-    printf '%s' "$layers_line" | grep -qF "$t" && continue
+    printf '%s\n' "$layers_toks" | grep -qxF "$t" && continue
     covered_by_dir "$t" && continue
     printf '%s\n' "$cites_toks" | grep -qxF "$t" && continue
     miss_f="$miss_f $t"
   done
   if printf '%s' "$prose" | grep -qE 'TD-[0-9]+' && printf '%s' "$prose" | grep -qi 'resolved'; then
-    if ! printf '%s' "$layers_line" | grep -qF 'TECH-DEBT.md'; then
+    if ! printf '%s\n' "$layers_toks" | grep -qxF 'TECH-DEBT.md'; then
       printf '%s\n' "$cites_toks" | grep -qxF 'TECH-DEBT.md' || miss_f="$miss_f TECH-DEBT.md(TD-marked-resolved)"
     fi
   fi
   if [ -n "$miss_f" ]
   then bad "$sp $tid Layers completeness: DoD/Acceptance implies$miss_f, absent from Layers: -- if the prose only cites it rather than touching it, declare it on a Cites: line"
   else ok  "$sp $tid Layers completeness (DoD-implied files all declared)"
+  fi
+
+  # -- (d) NEW: a FILE-shaped token written in Layers: OUTSIDE backticks (TD-142 ruling, DoD item 3) -
+  # A declaration is backtick-delimited by the ruling above -- an unbackticked path-shaped string in
+  # Layers: is therefore NOT a declaration to either checker, but it IS still a declaration to the
+  # dispatch preflight's backtick-agnostic TOK extraction (see check-layers-observed.sh's BOUNDARY
+  # note above its covers() function). Left unreported, that is a silent three-way disagreement: both
+  # checkers would read "nothing declared here" while the preflight reads "declared, shared-file-
+  # checked". Detected by stripping every backtick-quoted span out of the raw line first, so a
+  # LEGITIMATE backtick-quoted declaration never trips this -- only text that was never inside
+  # backticks to begin with.
+  #
+  # SCOPED to FILE-shaped tokens (dot-extension), the same character class the (a) leg above already
+  # uses for prose-implied tokens -- deliberately NOT the preflight's own two-alternative TOK, whose
+  # second arm (`[A-Za-z0-9_.-][A-Za-z0-9_./-]*/`, a bare DIRECTORY token with no dot) would also match
+  # ordinary parenthetical prose on a Layers: line ("... (see also evals/fixtures/foo)" reads a
+  # directory-shaped run ending before the closing paren) -- exactly the over-eager-gate cost TD-032
+  # was filed to stop. TD-142's own counted evidence is file-shaped paths throughout (TECH-DEBT.md,
+  # *.sh); a bare, unbackticked DIRECTORY token is a real but narrower residual gap this leg does not
+  # close, left for a future task if it is ever observed in practice.
+  layers_bare=$(printf '%s' "$layers_line" | sed -E 's/`[^`]*`//g' | grep -oE '[A-Za-z0-9_./-]+\.[A-Za-z]+' | sort -u)
+  if [ -n "$layers_bare" ]; then
+    bad "$sp $tid layers-unbackticked-token: declares a path-shaped token outside backticks ($(printf '%s' "$layers_bare" | tr '\n' ' ')); a declaration is backtick-delimited, so this reads as prose to both checkers and as a declaration to the dispatch preflight"
   fi
 
   # -- (c): other task ids named in prose, absent from Depends-on: ---------------------------
