@@ -310,3 +310,72 @@ The new named finding makes any live instance loud. `check-layers-observed.sh:48
 a "BOUNDARY, deliberate"; it is now a boundary with a reader.
 
 consequence · T3 · behaviour:none · governance:high
+
+### 2026-09-10 | T4 | A verdict-less gate run now FAILs loudly. 19 of 32 DoD
+
+**Built `scripts/qa-verdict.ts`** (TypeScript run by Bun, per this session's ruling — no new `.sh`).
+It wraps the gate, streams the child's output live, and judges **from the printed
+`QA-CHECK: N pass, M fail` line**, never from the child's exit code. Wired into `package.json`'s two
+real callers: `gate` and `test` now run `bun scripts/qa-verdict.ts sh scripts/qa-check.sh`.
+
+**Identifying the caller was half the task.** T4's Acceptance says the run must be *"reported as a
+failure by whatever invokes it"*, and at the gate pass that invoker turned out not to exist in the
+shape the Plan assumed: `conformance.sh` mentions `qa-check.sh` only in a comment,
+`.claude/settings.json` holds permission entries, `apps/cli/src/main.ts` holds help text. The only
+programmatic callers are `package.json`'s two scripts — one of which,
+`"test": "sh scripts/qa-check.sh && bun test"`, was **L-120's shape verbatim**: a gate whose verdict
+was read through a shell operator instead of from the line the gate prints.
+
+**Motivating case reproduced live, before anything was built on it.** `timeout 15s sh
+scripts/qa-check.sh` printed `PASS qa-budget-default: 520s < 600s` and was then killed with **no**
+`QA-CHECK:` line — so the wall-clock guard passes while the run still ends verdict-less, exactly as
+SPRINT-096's memory kill did. DoD line 1 existed to stop a fix being built on a guard that already
+covered the case; it did not cover it.
+
+**Verified independently at merge, four probes, discriminating in both directions:**
+
+| probe | result |
+|---|---|
+| no verdict line, child **exits 0** | **FAIL**, exit 1, named reason |
+| clean verdict printed | green |
+| red verdict printed | red, *for the stated reason* — not conflated with verdict-less |
+| clean verdict printed, child **exits 3** | **green** |
+
+The last is the load-bearing one. A wrapper that trusted the exit code would call it red; this one
+calls it green, because the number that decides is the one the gate **prints**. That is what L-120
+instructs, as opposed to what it is usually read to instruct.
+
+**Two rounds of worktree-isolated outside review, and L-165 held again.** Round 1 found a
+**CRITICAL** — a spawn failure left the wrapper hanging forever (the ENOENT-never-resolves shape),
+which is *worse than the defect being fixed*, since a guard that hangs reports nothing at all — and a
+**MAJOR**: stdout and stderr were merged into one judged buffer, so pipe interleaving could desync
+the verdict regex and misreport a real pass as verdict-less. Both reproduced RED, fixed, committed
+separately (`da7d139`). Round 2, an independent reviewer seeding its own break, returned **CLEAR**.
+Neither defect was reachable by the author; both were found by an outside pass — the fifth and sixth
+sighting of that pattern in three sprints.
+
+**Seeded-break discrimination**, convention stated once and used throughout — `git hash-object <path>`
+against `git rev-parse HEAD:<path>`, both git blob ids, so the LF/CRLF split cannot enter the
+evidence trail at all (L-169's failure is the *unstated* method, and on this Windows checkout the
+working-file hash is the trap). Seed `fail > 0` → `fail > 1` in `judgeOutput`: landed
+(`a4ccfb6a…` → `b0ed72a4…`), targeted (117 lines before and after, single-line diff), still parses;
+exactly **1 of 12** tests reddened with its own named finding while 11 stayed green, including both
+review-driven regression fixtures. Restored to `a4ccfb6a…`, matching `HEAD:scripts/qa-verdict.ts`.
+
+**Two things this task surfaced and did not fix — both disclosed rather than absorbed:**
+
+1. **`.claude/settings.json`'s allowlist still names only `sh scripts/qa-check.sh`.** Every future
+   session running `bun run gate` or `bun run test` hits a fresh permission prompt. Found by round-1
+   review, confirmed by round-2, left alone because it is outside T4's declared `Layers:` — and
+   correctly so: **it is outside every task's `Layers:`, which is exactly the seam CLAUDE.md says a
+   per-task DoD cannot enforce** (L-172 → TASK-318). It is coordinator work, and it is a *permission*
+   widening, so it is an owner call rather than a merge-time tidy. Not closed here.
+2. **The gate's live red is 5, not the 33 assumption A4 anchors to.** A full `bun run gate` to
+   completion reported `QA-CHECK: 200 pass, 5 fail`. A4 asks for the FAIL count to be reconciled
+   against **33**; the 33 figure counts conformance-engine `S10` findings, which `qa-check.sh` treats
+   as **informational** and which never enter its tally — the same conflation TD-105's own row records
+   being made once already ("*first filed `high` on the belief that it blocked close; that was wrong*").
+   A4 is **not** confirmed by this number and must not be read as confirmed by it. Left open for the
+   close reconciliation, where the two populations can be counted separately.
+
+consequence · T4 · behaviour:med · governance:low
