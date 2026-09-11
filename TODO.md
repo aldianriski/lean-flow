@@ -36,6 +36,15 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
   all from the conformance engine, which leg 2f-ter keeps deliberately informational (**TD-146**).
   The number to act on is the one the gate prints (L-120).
 - **Backlog ranking** is `/triage`'s output, not this block's: tiers P0–P3 below are the record.
+- **This file knowingly exceeds §2's 320-line soft cap** (~586 at the SPRINT-097 close) and the gate
+  reports it every run. Ruled at that close's `/triage` rather than left as neglect: the overage is
+  **task specification, not narrative** — 18 tasks averaging ~32 lines, almost all of it multi-clause
+  `done-when:` and `tracker:` blocks. That density is the point, because it is what lets a task be
+  promoted without re-litigating it, and L-008's remedy (collapse duplicated prose to pointers) has
+  already been applied — the only narrative block left was collapsed at this close. Closing the
+  remaining gap would mean either 18 satellite files (a second place to look, which this repo
+  refuses) or rejecting work still wanted. **Revisit when the Backlog drops below ~12 tasks**, when
+  the arithmetic stops fighting the cap.
 
 ---
 ## Backlog
@@ -44,8 +53,7 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 
 ### P0 — Blocking
 
-> Re-ranked at the SPRINT-094 `/triage` (2026-09-07). Each entry below blocks work that is otherwise
-> ready to start; the reason sits in its own `tracker:` line, not here.
+> _(empty — `TASK-328` shipped as SPRINT-097 T2 and was pruned at that close.)_
 
 ### P1 — Next Phase Required
 
@@ -110,6 +118,15 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   which is the entire point of this task; T3's reviewer reproduced the chain in a
                   throwaway repo, never in this one
       tracker:    EPIC-015 § Closed-when 1 · TD-112 (resolved → SPRINT-093 T1) · TD-110 (resolved → T3) · L-179
+      pair-with:  **`TASK-188` — promote them into the SAME sprint** (SPRINT-097 `/triage`,
+                  2026-09-11). This task's run is the only realistic vehicle TASK-188 has: 188 needs
+                  a real unattended run that stops **mid-Plan**, opportunistically, and 319 is the
+                  only task that deliberately fires one. Promoting 319 alone spends that artifact
+                  and leaves 188 waiting for the next one. **This has already happened**: SPRINT-060
+                  promoted 188 alongside four HITL tasks, G2 then correctly ruled the run
+                  interactive, and that ruling foreclosed the only vehicle 188 had (L-111). Pairing
+                  them does not guarantee 188's trigger — nothing can, it is opportunistic by
+                  design — it guarantees that if the trigger occurs, someone is there to claim it.
       origin:     close-retro
       state:      ready
 
@@ -185,12 +202,22 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       origin:     close-retro
       state:      ready
 
+### P2 — Follow-on
+
 
 > **The SPRINT-097 T1 cluster ruling (2026-09-10)** — five gate-accuracy defects ruled **four tasks,
 > grouped by artifact**, with a loser named on both sides. The full reasoning lives in the archived
 > sprint file (`docs/sprint/archive/SPRINT-097-guards-that-run-over-the-wrong-set.md`, T1 DoD 2) and
 > in its `docs/sprint/INDEX.md` row; the rows it produced are `TASK-338`–`341` below. A pointer, not
 > a second copy — a copied narrative drifts from its source (L-008).
+>
+> **Moved P1 → P2 at the SPRINT-097 `/triage` (2026-09-11), by owner ruling.** T1 filed these into P1
+> on *cluster* grounds — they are one family and should be scheduled together — while the standing
+> SPRINT-094 ruling that governs the tier is **epic-first**: EPIC-015 § Closed-when 1 · 5 · 6 lead,
+> *"ahead of the cheaper standalone guards"*, which is exactly what these are. Two rulings that were
+> never reconciled, and P1 had drifted to nine items with four of them non-epic work. The cluster
+> stays intact and stays together; it now sits behind the epic work the tier exists to protect.
+
 - [ ] TASK-338 — Fix both legs of `check-verify-reaches.sh`: EXISTS resolves a basename, REACHES matches use not mention  [size: M] [risk: med] [HITL]
       class:      execution
       tier:       G (ADR-029 — a REACHES false positive is a contract false negative: an unreachable
@@ -313,7 +340,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       tracks:     TD-086
       origin:     close-retro (SPRINT-097 T1 ruling, 2026-09-10)
       state:      ready
-### P2 — Follow-on
 
 - [ ] TASK-343 — Give the conformance engine's informational findings their own token  [size: S] [risk: low] [AFK]
       class:      execution
@@ -533,6 +559,12 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   proven three ways that each stop short of the others: a real log through `--reap`, a
                   zero-ticked-box regression, and an end-to-end launcher run against a complete Plan
       tracker:    SPRINT-060 T5 scope-change + owner ruling · ADR-016 · L-111
+      pair-with:  **`TASK-319` — promote them into the SAME sprint** (SPRINT-097 `/triage`,
+                  2026-09-11). 319 is the only task that deliberately fires a real unattended run,
+                  and this one's trigger is a run that stops mid-Plan. The opportunistic design
+                  stands and is not being changed: do not schedule a run to produce the stop. What
+                  pairing fixes is the *other* half of L-111 — 319's run happening in a sprint where
+                  nobody is positioned to claim the artifact if it does stop.
       origin:     close-retro
       state:      blocked
 
