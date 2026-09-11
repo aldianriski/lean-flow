@@ -5,15 +5,15 @@ owner: Maintainer
 last_updated: 2026-05-02
 status: active
 member_sprints: [SPRINT-951 (closed), workdoo SPRINT-001 (closed)]
-update_trigger: fixture -- SELECTION axis: a MIXED member list, foreign first, local second
+update_trigger: fixture -- SELECTION axis: a MIXED member list, LOCAL first, foreign second
 ---
 
 # EPIC-952 — One Foreign Member, One Local (fixture)
 
 Round 3 census: every fixture that mixes localities lists the FOREIGN member FIRST. That ordering is
-all-foreign**, so the per-entry foreign skip could have been a whole-loop `break` and nothing would
-the incidental property nobody chose: it discriminates the two `|| continue` skips and is structurally
-blind to `report_unresolvable`'s `&& continue`, which only a LOCAL-FIRST list can reach.
+the incidental property nobody chose -- it discriminates the two `|| continue` skips and is
+structurally blind to `report_unresolvable`'s `&& continue`, which only a LOCAL-FIRST list can reach.
+So this epic lists the local member first and the foreign one second.
 
 `SPRINT-951` is local, closed, and its row cites `deadbeef` while its frontmatter says `ccc111951`
 -- a real class (a) finding that is only reachable if the loop keeps going past the foreign entry.

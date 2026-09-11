@@ -103,9 +103,17 @@ _member_entries() {
       n = split($0, e, ",")
       for (i = 1; i <= n; i++) {
         entry = e[i]
+        gsub(/^[ \t]+|[ \t]+$/, "", entry)
+        if (entry == "") continue                    # nothing declared here at all
+        raw = entry                                  # what the FILE says, before any stripping
         gsub(/\([^)]*\)/, "", entry)                 # drop (closed)/(active) state annotations
         gsub(/^[ \t]+|[ \t]+$/, "", entry)
-        if (entry == "") continue
+        # Emptiness is tested TWICE, and the order is the point. The strip used to run first, so an
+        # entry written entirely in parentheses -- `[(closed), (active)]` -- was reduced to "" and
+        # dropped by the test above: no member, no NOTE, invisible to unverified_count, and the epic
+        # earned "every member sprint closed" while visibly declaring two members. That is the exact
+        # invariant the `unparsed` branch was added to establish, reopened one line higher up.
+        if (entry == "") { gsub(/[ \t]+/, "_", raw); print "unparsed " raw; continue }
         m = split(entry, t, /[ \t]+/); num = ""; qual = ""
         for (j = 1; j <= m; j++) {
           tok = t[j]; sub(/^[Ss][Pp][Rr][Ii][Nn][Tt]-/, "", tok)
@@ -259,14 +267,23 @@ for e in "$root"/docs/epic/EPIC-*.md; do
     # has a member count of zero-verified. EPIC-016 reaches this branch the moment its conditions
     # tick: every member foreign, so `omem` is empty for want of anything to look at.
     unv=$(unverified_count "$e" "$root")
-    if [ "$unv" -gt 0 ]; then
-      # `ok`, not `bad`, and round 3 got this wrong. A finding whose own sentence says the move is
-      # NOT demanded has no business failing the gate: both remedies it offered were unachievable by
-      # construction (a foreign member can never be resolved here, and this checker can never learn
-      # it closed), so the only action that cleared the FAIL was the very move the text disclaimed.
-      # Left as `bad` it turns the gate RED on EPIC-016 the moment its nine conditions tick -- a red
-      # gate on a correct, ADR-041-sanctioned artifact, which is TD-144's own harm one branch over.
-      ok "epic-archive: $rel is closed with every § Closed when condition met and every LOCAL member sprint closed, but $unv member(s) could not be resolved against this repository (see NOTE) -- §11's move is not demanded on a member half that was never verified, so this is reported rather than required"
+    # Gated on FOREIGN members alone, not on `unv`. Round 4 demoted this branch from `bad` to `ok`
+    # because its remedies were unachievable -- true, but true only of a foreign member. `unv` also
+    # counts `unknown` (a local id naming no Plan) and `unparsed` entries, and for BOTH of those the
+    # remedy is achievable right here: fix the id, or fill the placeholder in. Gating the demotion on
+    # the count rather than on the class the argument covers meant ONE typo'd member id exempted an
+    # epic from direction (b) forever -- and direction (b) is the drift that actually happened
+    # (EPIC-001, unmoved across five sprints). Verified: adding `SPRINT-9019` to an otherwise correct
+    # epic flipped this from FAIL to PASS. The count still drives the SENTENCE; only the foreign
+    # class drives the demotion.
+    frn=$(_member_entries "$e" | awk '$1 != "local" && $1 != "unparsed"' | wc -l)
+    if [ "$frn" -gt 0 ]; then
+      # A finding whose own sentence says the move is NOT demanded has no business failing the gate:
+      # a foreign member can never be resolved here and this checker can never learn it closed, so
+      # the only action that cleared the FAIL was the very move the text disclaimed. Left as `bad` it
+      # turns the gate RED on EPIC-016 once its nine conditions tick -- a red gate on a correct,
+      # ADR-041-sanctioned artifact, which is TD-144's own harm one branch over.
+      ok "epic-archive: $rel is closed with every § Closed when condition met and every LOCAL member sprint closed, but $unv member(s) could not be resolved against this repository (see NOTE) -- §11's move is not demanded on a member half that cannot be verified from here, so this is reported rather than required"
     else
       bad "epic-archive: $rel is closed with every § Closed when condition met and every member sprint closed, but still sits in docs/epic/ -- §11 says move it to docs/epic/archive/ and keep its INDEX.md row"
     fi

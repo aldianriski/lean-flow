@@ -283,6 +283,44 @@ run_case_anywhere "s-unparsed-regex-poison" 1 \
   "has a ticked § Closed-when condition naming no member sprint" -- \
   sh "$checker" "$fxs/s-unparsed-regex-poison"
 
+# --- cases 35-38: ROUND 4's findings ------------------------------------------------------------
+# Round 4 returned no CRITICAL. Its three MAJORs were a demotion applied wider than its own argument,
+# an ordering bug that reopened a closed invariant one line higher up, and a fourth population axis.
+
+# --- case 35: an UNKNOWN member must NOT exempt an epic from direction (b) (round 4 MAJOR-1) -----
+# The demotion added in round 4 was justified for FOREIGN members -- their remedy is unachievable
+# here -- and gated on `unverified_count`, which also counts `unknown` and `unparsed`, whose remedies
+# ARE achievable: fix the id, fill the placeholder. One typo'd member id therefore exempted an epic
+# from §11's move forever, on the direction this file calls "the drift that actually happened".
+run_case_anywhere "s-unknown-still-demands" 1 \
+  "is closed with every § Closed when condition met and every member sprint closed, but still sits" -- \
+  sh "$checker" "$fx/s-unknown-still-demands"
+
+# --- case 36: an entry that is ALL annotation is reported, not erased (round 4 MAJOR-2) ----------
+# `[(closed), (active)]` -- the annotation strip ran BEFORE the emptiness test, so both entries were
+# reduced to "" and dropped by a test meant for entries that were never there. The epic declared two
+# members, resolved none, and was archived with "every member sprint closed". Worse than the filed
+# `[]` case, because `[]` declares nothing and this declares two.
+run_case_anywhere "s-annotation-only-entry" 0 \
+  "NOTE  epic-archive: docs/epic/archive/EPIC-991-f.md has a member_sprints entry naming no sprint number" -- \
+  sh "$checker" "$fx/s-annotation-only-entry"
+
+# --- case 37: the END{} flush arm (round 4 MAJOR-3, L-186 axis #4) -------------------------------
+# Every other class (c) fixture puts a `- [ ]` right after the tick under test, so the checkbox arm
+# always produced the finding and `END{}` never did. But `## Closed when` is the FINAL section of all
+# sixteen real epics, so the last condition of every one is read by `END{}` alone -- and at archival
+# time that last condition is ticked. The arm no fixture entered is the arm the real corpus uses.
+run_case_anywhere "s-tick-at-eof" 1 \
+  "has a ticked § Closed-when condition naming no member sprint" -- \
+  sh "$checker" "$fxs/s-tick-at-eof"
+
+# --- case 38: the unparsed NOTE quotes the entry as whitespace-collapsed (round 4 MINOR-1) -------
+# Round 3's own MINOR-4 fix -- stop un-squashing underscores the file really contains, and say the
+# text is collapsed -- was asserted by nothing and revertible with the suite green.
+run_case_anywhere "s-unparsed-note-verbatim" 0 \
+  "entry, whitespace collapsed: 'SPRINT-NNN_—_appended_as_each_is_promoted'" -- \
+  sh "$checker" "$fx/s-template-default-members"
+
 # --- case 24: archived epic with NO resolvable member -> exit 0, but a NARROWED claim ------------
 # The verdict is not the finding; the SENTENCE is. Direction (a) used to print "every member sprint
 # closed" for an epic where it resolved nothing, two lines above a NOTE saying §11's trigger cannot
