@@ -218,3 +218,45 @@ record — the shape L-184 names, one rung over.
 
 **Ruling: A1 stands unchanged.** Grandfathering is still correct, and is in fact *cheaper* than it
 looked — the guard would strand 4 sprints, not 36.
+
+### 2026-09-11 | progress | T1 DoD 8 — outside review returned two findings, both verified, both actioned
+
+Worktree-isolated reviewer, dispatched on the committed `804e92a` (adversarial verification *writes*,
+so it cannot share this tree — L-168). Not CLEAR. Both findings independently reproduced by the
+coordinator before being acted on; a reviewer's claim is evidence, not a verdict.
+
+**Finding 2 (fixed here) — the harness's own drift guard could not fire.** `run-night-run-rollup-fixtures.sh`
+extracted leg 2g's body between `qb_checkpoint` markers and then asserted `[ -s "$leg2g_wrapper" ]`.
+The wrapper is `HARNESS_HEAD` + body + `HARNESS_TAIL`, and both heredocs are written unconditionally —
+so `-s` can never be false however completely the extraction failed. The named diagnostic ("*the leg's
+shape or its `qb_checkpoint` marker text changed*") was structurally unreachable. **L-166's shape inside
+the retained proof itself**: a guard keyed to a condition it cannot observe.
+
+Proven by seeding exactly the drift it names (`leg 2g` → `Leg 2g` in the marker): landed (2 content
+lines), parsed, targeted (0 line delta) — all three fixtures went red **and the named diagnostic never
+appeared**, so a maintainer would have seen three generic "expected X, got exit 0" lines and no cause.
+Fixed by capturing the extracted body to its own file and asserting emptiness on **that**, before
+concatenation. Re-seeded after the fix: the named diagnostic now fires. Restored to `57866ab3` =
+`git rev-parse HEAD:scripts/qa-check.sh`. Convention throughout this entry: `git hash-object` on the
+working tree, cross-checked against the HEAD blob — one convention, no `sha256sum` pipe mixed in (L-169).
+
+**Finding 1 (filed as `TD-151`, not fixed here) — the shared `## Plan` derivation is a prefix match
+that also reads fenced code.** `/^## Plan/` opens on `## Planning notes`, and the formula does not
+track fences, so an illustrative `- [ ]` inside a ``` block counts as an open DoD. Both reproduced:
+`nr_open=1` where 0 is correct, twice. The formula is shared verbatim with
+`check-layers-observed.sh:399` and `:580` — T1 reused it deliberately rather than inventing a second
+derivation, which was the right call and is also why the fix does not belong inside T1: repairing one
+of three call sites would leave two behind and create a fourth variant.
+
+**The escalation is the part worth recording.** The direction of failure is a false *positive*, which
+Tier G ranks below a silent false negative — but T1 changed its blast radius, from driving `at_close`
+(an advisory toggle) to gating a hard FAIL. A gate that cries wolf gets switched off, which converts a
+false positive into a false negative by a slower route. Routed to `TD-151` with `TASK-339`/`TASK-342`,
+which already cluster on this family.
+
+**Reviewer's DoD assessment, and where the coordinator differs.** It called DoD 2 *partially* met: the
+design-time population sizing was cross-checked (and caught its own error), but the shipped runtime
+selection logic was never cross-checked against a second derivation. That is a fair reading and it is
+now exactly what `TD-151` records — the shipped formula does have a selection defect, found by a reader
+rather than by the sizing exercise. DoD 2 is ticked on the derivation it asks for, with the runtime-logic
+gap carried as debt rather than folded silently into a tick.

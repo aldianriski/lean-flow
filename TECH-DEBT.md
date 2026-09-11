@@ -281,6 +281,35 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-151** severity: medium | status: open | created: Sprint-098
+  - Tracker: none — found by SPRINT-098 T1's worktree-isolated outside review, which was looking for
+    selection defects rather than logic defects (L-186) and found one in a shared helper.
+  - Summary: **The `## Plan` / open-DoD derivation is a PREFIX match that also reads fenced code
+    blocks, and SPRINT-098 T1 promoted it from an advisory toggle into a hard gate FAIL.** The
+    formula `awk '/^## Plan/{f=1;next} /^## /{f=0} f && /^- \[ \]/{n++}'` is not anchored, so
+    `## Planning notes` opens the section, and it does not track fences, so an illustrative
+    `- [ ]` inside a ``` block counts as an open DoD.
+  - Location: `scripts/lib/check-layers-observed.sh:399` and `:580` (where it originated), and
+    `scripts/qa-check.sh` leg 2g (where T1 reused it, deliberately, rather than inventing a second
+    derivation). Three call sites, one formula.
+  - Evidence (2026-09-11, verified twice — by the review and independently by the coordinator):
+    `printf '## Planning notes\n- [ ] scratch\n## Plan\n- [x] done\n' | awk '…'` → `nr_open=1`,
+    expected 0. Same formula over a `## Plan` containing a fenced `- [ ]` example → `nr_open=1`,
+    expected 0.
+  - Why it matters, and why **medium** rather than high: the failure direction is a **false
+    positive** — a spurious `no Execution Log found` FAIL on a sprint that owes no rollup — not the
+    silent false negative Tier G ranks worst. But T1 changed its blast radius: the same formula
+    previously drove `at_close`, an advisory toggle, and now gates a hard FAIL, so a sprint with a
+    `## Planning notes` scratch section or a fenced example in its Plan would redden the gate for a
+    reason nobody can act on. A gate that cries wolf gets switched off, which converts a false
+    positive into a false negative by a slower route.
+  - Fix direction (**hypothesis, re-derive first** — §10): anchor to `/^## Plan$/` and track fence
+    state. **Do not fix it in one call site** — the whole point is that three sites share one
+    formula, so fixing leg 2g alone would leave two behind and create a fourth variant. Belongs with
+    `TASK-339` and `TASK-342`, which already cluster on this family.
+  - Re-file fresh if: a fourth call site copies the formula before this is fixed — the copy count is
+    the thing that makes it expensive, not the defect itself.
+
 - **TD-150** severity: **high** | status: open | created: Sprint-097
   - Tracker: none — found by the two-repo alignment check at the SPRINT-097 close, owner-requested.
   - Summary: **ADR-041 rules that `workdoo` consumes lean-flow as a *pinned* plugin, and there is no

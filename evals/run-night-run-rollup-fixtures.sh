@@ -402,6 +402,22 @@ fi
 # (the same discipline case 8/9/11 already apply one file down).
 qa_check="$repo_root/scripts/qa-check.sh"
 leg2g_wrapper="$here/.tmp-leg2g-wrapper.sh"
+# The extracted BODY is captured on its own first, and emptiness is asserted against THAT -- not
+# against the assembled wrapper. The wrapper always contains HARNESS_HEAD and HARNESS_TAIL, so a
+# `-s` test on it can never be false however completely the extraction failed: the guard below was
+# asserted to name marker drift and structurally could not fire (SPRINT-098 T1, outside review).
+# Proven by seeding the drift it names (`leg 2g` -> `Leg 2g`): all three fixtures went red and the
+# named diagnostic never appeared, so a maintainer saw three generic mismatches and no cause.
+leg2g_body="$here/.tmp-leg2g-body.sh"
+awk '
+  /qb_checkpoint "leg 2g: recorded-run rollup"/ {f=1; next}
+  f && /qb_checkpoint/ {exit}
+  f
+' "$qa_check" | sed "s#scripts/lib/check-night-run-rollup.sh#$repo_root/scripts/lib/check-night-run-rollup.sh#" > "$leg2g_body"
+[ -s "$leg2g_body" ] || {
+  echo "FAIL harness: leg 2g extraction from $qa_check produced nothing -- the leg's shape (or its qb_checkpoint marker text) changed, re-derive the awk pattern"
+  fail=1
+}
 {
   cat <<'HARNESS_HEAD'
 #!/bin/sh
@@ -412,19 +428,11 @@ note() { printf '      %s\n' "$1"; }
 ok()   { pass=$((pass + 1)); printf 'PASS  %s\n' "$1"; }
 bad()  { fail=$((fail + 1)); printf 'FAIL  %s\n' "$1"; }
 HARNESS_HEAD
-  awk '
-    /qb_checkpoint "leg 2g: recorded-run rollup"/ {f=1; next}
-    f && /qb_checkpoint/ {exit}
-    f
-  ' "$qa_check" | sed "s#scripts/lib/check-night-run-rollup.sh#$repo_root/scripts/lib/check-night-run-rollup.sh#"
+  cat "$leg2g_body"
   cat <<'HARNESS_TAIL'
 printf 'LEG2G-SUMMARY pass=%s fail=%s\n' "$pass" "$fail"
 HARNESS_TAIL
 } > "$leg2g_wrapper"
-[ -s "$leg2g_wrapper" ] || {
-  echo "FAIL harness: leg 2g extraction from $qa_check produced nothing -- the leg's shape (or its qb_checkpoint marker text) changed, re-derive the awk pattern"
-  fail=1
-}
 
 run_leg2g() { ld=$1; ( cd "$ld" && sh "$leg2g_wrapper" 2>&1 ); }
 
@@ -477,7 +485,7 @@ else
   fail=1
 fi
 
-rm -f "$leg2g_wrapper" 2>/dev/null
+rm -f "$leg2g_wrapper" "$leg2g_body" 2>/dev/null
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "NIGHT-RUN-ROLLUP FIXTURES: all green"; else echo "NIGHT-RUN-ROLLUP FIXTURES: at least one FAIL"; fi
