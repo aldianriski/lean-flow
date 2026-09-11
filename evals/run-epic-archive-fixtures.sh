@@ -311,6 +311,16 @@ run_case_anywhere "s-plain-foreign-note" 1 \
 # drift, so `drift` is 1 there and the epic-state success line is never reached at all. A case
 # asserting a line its fixture cannot emit would fail for the right reason by accident today and
 # for no reason tomorrow.
+# --- case 31: the UNKNOWN half of unverified_count (round 3's own seed R2-H) --------------------
+# unverified_count sums two producers, foreign and unknown, and cases 24/27 assert only the foreign
+# half -- so pinning the unknown half to a constant 0 left all 30 cases green while the report
+# printed a member count that disagreed with its own NOTE lines. EPIC-980 has NO foreign member, so
+# its count comes entirely from the unknown side and this assertion cannot be satisfied any other
+# way. Found by re-running the previous review's own seed against the fix that claimed to close it.
+run_case_anywhere "s-unknown-counted" 0 \
+  "every LOCAL member sprint closed -- but 1 member(s) could not be resolved" -- \
+  sh "$checker" "$fx/s-unknown-counted"
+
 run_case_anywhere "s-epic-state-narrowed" 0 \
   "rollup current for every LOCAL member -- but 1 member(s) could not be resolved" -- \
   sh "$checker" "$fxs/s-foreign-collision"
