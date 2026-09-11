@@ -270,6 +270,19 @@ run_case_anywhere "s-local-first-mixed" 1 \
   "NOTE  epic-archive: docs/epic/EPIC-952-f.md member workdoo SPRINT-001 lives outside this repository" -- \
   sh "$checker" "$fxs/s-local-first-mixed"
 
+# --- case 34: an unparsed entry must not reach the class (c) regex (round 3 CRITICAL-1) ----------
+# `allmem` feeds every member token into ticked_unattributed, which interpolates each into a dynamic
+# regex. For local and foreign entries that token is a NUMBER; for an unparsed one it is arbitrary
+# prose, and prose carrying `(` made awk abort mid-file with `invalid regexp` -- class (c) never ran,
+# the epic reported PASS, and the run exited 0 with the diagnostic buried among the PASS lines.
+#
+# This case exists because the FIX shipped without it: excluding unparsed entries from `allmem` left
+# all 33 cases green either way, so the repair for a CRITICAL was itself unguarded. The tick in this
+# fixture is attributed to nothing, giving class (c) a real finding that the poisoned regex loses.
+run_case_anywhere "s-unparsed-regex-poison" 1 \
+  "has a ticked § Closed-when condition naming no member sprint" -- \
+  sh "$checker" "$fxs/s-unparsed-regex-poison"
+
 # --- case 24: archived epic with NO resolvable member -> exit 0, but a NARROWED claim ------------
 # The verdict is not the finding; the SENTENCE is. Direction (a) used to print "every member sprint
 # closed" for an epic where it resolved nothing, two lines above a NOTE saying §11's trigger cannot
