@@ -82,12 +82,12 @@ the run's own report cannot tell them apart. The ceiling is **not** re-decided h
 ADR-022 admits; a second failure escalates instead of looping.
 
 **DoD:**
-- [ ] The loop is specified **and wired where the run reads it**, not only where it is described (L-020).
-- [ ] The ceiling is **read from ADR-022**, cited by section, never re-chosen in this sprint (**A4** · L-130).
+- [x] The loop is specified **and wired where the run reads it**, not only where it is described (L-020). — ✓ `check_revise_ceiling()` called from `reap()`:260, above `stalled`/`parked`/`exhausted`; a breach forces `HARD_FAILURE`. Wiring trace verified by the coordinator and again by the outside review. **Caveat carried as `TD-152`:** the input channel is model-written, not mechanical
+- [x] The ceiling is **read from ADR-022**, cited by section, never re-chosen in this sprint (**A4** · L-130). — ✓ ADR-022 § Decision item 2 cited verbatim in code, doc and every verdict line; no re-derivation found by either reviewer
 - [ ] A second failure **escalates** — the escalation path is named and reachable, and the run does not continue past it.
-- [ ] Retained must-FAIL: a repair exceeding the ceiling fails with its named finding, while a within-ceiling sibling passes in the same run (L-058 · L-142).
-- [ ] **Seeded-break discrimination proof** under ONE stated hash convention (L-137 · L-169 · L-187).
-- [ ] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168).
+- [x] Retained must-FAIL: a repair exceeding the ceiling fails with its named finding, while a within-ceiling sibling passes in the same run (L-058 · L-142). — ✓ `ceiling-exceeded` + `escalation-missing` must-FAILs, each with a green sibling AND an isolation assertion proving it carries its own finding and not the other's. 11 fixtures green
+- [x] **Seeded-break discrimination proof** under ONE stated hash convention (L-137 · L-169 · L-187). — ✓ coordinator-verified: seed A (fence strip removed) landed 5 lines, parsed, 771→768 — the 3-line delta IS the minimal edit reproducing the defect, not a demolition (L-187) — reddened only `fenced-doc-example`. Seed B first **did not land** and was reported untested, not scored as a pass; the landing retry (2 lines, 0 delta) reddened only `non-numeric-base`. Both restored to `3503dd2e`. One convention: `git hash-object`
+- [x] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168). — ✓ NOT clear: ruled the emitter gap inherent (b) → `TD-152`, and found a NEW L-108 false positive plus a fail-open input. Both reproduced and fixed here, both now retained fixtures
 
 ### T3 — Emit a typed run outcome with the evidence behind it `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/references/night-run.md` · `scripts/night-run.sh` · `skills/lean-doc-generator/templates/sprint-log.md.template` *(corrected at G2 — there is no root `templates/`; L-100)*

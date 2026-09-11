@@ -681,7 +681,14 @@ distinguish both from `unattempted`: those two were *reached*, this one never wa
 A `still-open` outcome parks the task (`parked-hitl`, the finding named); the states above are
 unchanged — the retry line is supplementary, never a new task state.
 
-**The ceiling is not left to the writer's own bookkeeping.** The reaper (§ The reaper, above) reads
+**The ceiling is enforced mechanically over whatever retry lines the run wrote — and what it does
+NOT do is verify that every retry was logged.** Unlike `unattempted`, a retry has no absence-based
+ground truth: an open DoD with no line at all proves a task was never reached, but a task that
+retried-and-fixed is textually identical to one that never needed a retry. So a silently-unlogged
+retry and no retry at all are indistinguishable, and **both pass**. That is the same trust boundary
+every other Part 4 state line already sits inside, not a new one — stated here rather than glossed,
+because an earlier draft of this passage claimed the opposite and an independent review ruled it
+false (SPRINT-098 T2 · `TD-152`). The reaper (§ The reaper, above) reads
 these same lines back at exit — `check_revise_ceiling()` in `scripts/night-run.sh`, called from
 `reap()` before `terminal ·` is derived — and FAILs the run named if a task carries more than one
 `retry` line in this run's window (`revise-loop-ceiling-exceeded`) or a `still-open` outcome has no

@@ -327,3 +327,53 @@ validated field whose emitter has no cases) meeting in one change. Not filed as 
 repaired unilaterally: it goes to T2's outside review as its primary aim, because the coordinator
 found it by asking a population question and an independent reader may well find the design answer.
 Recorded now so the finding is not discovered twice.
+
+### 2026-09-11 | consequence | T2 · behaviour: material · governance: high
+
+T2 changes the reaper's terminal-state derivation (a run-protocol contract) and edits two
+`references/` files that the unattended charter is written in. Both arms material → scoped reviewer
+floor, and ADR-029 Tier G adds the worktree-isolated outside pass. Recorded at consultation (TD-092).
+
+### 2026-09-11 | progress | T2 outside review — emitter gap ruled INHERENT, two new defects fixed
+
+Worktree-isolated reviewer on `2d09fdb`. Not CLEAR.
+
+**Primary aim ruled (b): inherent limitation, not a cheap defect — and the reasoning is the value.**
+The reviewer confirmed the coordinator's fact (no mechanical emitter, 2 of 51 logs) and then supplied
+what the coordinator had not: *every other* Part 4 state line — `done` · `blocked` · `parked-hitl` ·
+`denied-tool` · `stalled` — is equally model-written and equally trusted. `unattempted` is the sole
+exception **because it has absence-based ground truth**: an open DoD with no line at all proves a task
+was never reached. A retry has none — retried-and-fixed is textually identical to never-needed-a-retry.
+So T2 did not dig a new hole; it built inside the trust boundary the whole rollup already occupies.
+ADR-016's remedy (move the write into the launcher's wrapper) is unavailable here because a retry fires
+**inside one continuous model turn**, with no external process boundary for a wrapper to observe.
+Filed as **`TD-152`** with a fix direction that changes the retry-firing *mechanism*, not the checker.
+
+**The false sentence is gone.** Part 4 read *"The ceiling is not left to the writer's own
+bookkeeping"* directly above the passage establishing that it is. The reviewer ruled it false
+independently rather than inheriting the claim. It now states the limit plainly — a guard whose
+documentation overclaims is worse than one whose limits are written down.
+
+**New finding, and it is this repository's own recorded incident recurring one function over.**
+`reap()` carries a comment about being bitten when a log *documented* the rollup format and a
+whole-file grep read `T5 · unattempted · …` inside that documentation as the run's own output.
+`check_revise_ceiling()` inherited the windowing and **not** the hardening: a fenced example quoting
+two `T4 · retry ·` lines returned `FAIL revise-loop-ceiling-exceeded: T4 fired 2 retries` for a run in
+which no retry fired. Reproduced verbatim by the coordinator, then fixed by stripping fenced regions
+before matching (L-108). **Windowing does not help when the documentation lives inside the window.**
+
+**Second new finding: the standalone entry failed OPEN.** `--check-revise-loop <log> abc` printed a
+shell error to stderr and then `PASS` at exit 0. For a guard that is the one direction that must never
+happen. Now a named FAIL, using the same numeric-safety shape `reap()` already applies to
+`rp_parked`/`rp_hard` a few lines below — the pattern was in the same file and unread.
+
+Both fixes carry **retained** fixtures (`fenced-doc-example-does-not-fire`, `non-numeric-base-fails-closed`),
+11 green. Discrimination proved per fix under one convention (`git hash-object` vs checkpoint
+`3503dd2e`): seed A reddened only the fenced case; **seed B did not land on the first attempt and was
+reported as untested rather than scored as a pass**, and the landing retry reddened only its own case.
+Both restored to the checkpoint.
+
+**DoD 3 is NOT ticked, pending an owner ruling.** The reviewer assessed it *not reliably met*: "the
+escalation path is named and reachable" holds, but "the run does not continue past it" holds **only if
+the retry was logged**. That is a criterion execution has qualified rather than satisfied, so it is
+surfaced for a ruling instead of being re-read to fit what was built.

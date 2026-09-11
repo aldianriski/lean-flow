@@ -129,8 +129,26 @@ check_revise_ceiling() {
     printf 'FAIL  revise-loop-ceiling-unreadable: %s not found\n' "$crc_logdoc"
     return 1
   fi
+  # `base` must be an integer before it reaches the arithmetic below. The standalone
+  # `--check-revise-loop` entry accepts it from a caller, and a non-numeric value used to emit a
+  # shell error on stderr and then print PASS at exit 0 -- failing OPEN, which for a guard is the
+  # one direction that must never happen (outside review, SPRINT-098 T2). Same numeric-safety
+  # shape reap() already applies to rp_parked/rp_hard below.
+  case "$crc_base" in ''|*[!0-9]*)
+    printf 'FAIL  revise-loop-ceiling-unreadable: base cutoff %s is not a line number\n' "$crc_base"
+    return 1 ;;
+  esac
 
-  crc_window=$(tail -n "+$((crc_base + 1))" "$crc_logdoc" 2>/dev/null)
+  # Strip fenced regions BEFORE matching. This is the incident reap() already carries a comment
+  # about, recurring one function over: a markdown corpus is self-describing, so a log that quotes
+  # the Part 4 format in prose or in a ``` block has `Tn · retry ·` at line start without any retry
+  # having fired. Windowing to `base` does not help when the documentation lives inside THIS run's
+  # own window. Verbatim reproduction before the fix: a log whose only retry lines sat inside a
+  # fenced example returned `FAIL revise-loop-ceiling-exceeded: T4 fired 2 retries` (L-108).
+  crc_window=$(tail -n "+$((crc_base + 1))" "$crc_logdoc" 2>/dev/null | awk '
+    /^[[:space:]]*```/ { fence = !fence; next }
+    !fence
+  ')
   crc_fail=0
 
   crc_tasks=$(printf '%s\n' "$crc_window" | grep -E '^T[0-9]+ · retry · ' | sed -E 's/^(T[0-9]+) .*/\1/' | sort -u)

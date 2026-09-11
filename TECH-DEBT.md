@@ -281,6 +281,41 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-152** severity: medium | status: open | created: Sprint-098
+  - Tracker: none — found by the coordinator's population check at SPRINT-098 T2, then independently
+    confirmed and ruled by that task's worktree-isolated outside review.
+  - Summary: **The revise-loop ceiling guard reads a line that nothing mechanically emits, so an
+    unlogged retry is indistinguishable from no retry and both PASS.** `check_revise_ceiling()`
+    counts `Tn · retry · <axis>: <finding> → fixed|still-open` lines. `reap()` mechanically writes
+    `run ·`, `terminal ·` and `Tn · unattempted ·`; **nothing in `scripts/`, `skills/` or `evals/`
+    writes a `retry` line.** It exists only as a prose instruction in `night-run.md` Part 4 telling
+    the model to write one. A run that fired three retries and logged none returns
+    `PASS revise-loop-ceiling: within ADR-022 § Decision item 2`.
+  - Location: `scripts/night-run.sh` `check_revise_ceiling()` (the reader) · `skills/orchestrator/references/night-run.md` Part 4 (the only "emitter", which is prose).
+  - Evidence (2026-09-11): `grep -rn '· retry ·' scripts/ skills/ evals/` returns readers and
+    specifications, no writer. **2 of 51** archived sprint logs carry a retry line at all
+    (`SPRINT-066`, `SPRINT-067`), both attended, both model-authored.
+  - **Why this is a limit and not a T2 defect** (outside-review ruling (b), recorded because the
+    reasoning is the valuable part): every *other* Part 4 state line — `done` · `blocked` ·
+    `parked-hitl` · `denied-tool` · `stalled` — is also model-written and trusted identically.
+    `unattempted` is the sole exception, and only because it has real absence-based ground truth: an
+    open DoD with **no line at all** for that task proves it was never reached. A retry has no such
+    ground truth — retried-and-fixed is textually identical to never-needed-a-retry. ADR-016 already
+    moved the *outer* rollup into the launcher's wrapper for exactly this reason; that move is not
+    available here, because a retry fires **inside one continuous model turn** with no external
+    process boundary for a wrapper to observe.
+  - Fix direction (**hypothesis, re-derive first** — §10): make the retry *action* flow through a
+    choke point that records it — e.g. a second attempt permitted only via a dedicated
+    `night-run.sh --record-retry` call that the allowlist makes the sole path. That is a change to
+    the retry-firing **mechanism**, not to the checker, and it was out of T2's declared `Layers:`.
+    Do not "fix" this by tightening `check_revise_ceiling()`; the checker is not where the gap is.
+  - **Already done, so it is not re-litigated:** the false claim was removed from the doc. Part 4
+    previously read *"The ceiling is not left to the writer's own bookkeeping"* directly above the
+    passage establishing that it is; it now states the limit plainly. A guard whose documentation
+    overclaims is worse than one whose limits are written down.
+  - Re-file fresh if: a retry-firing choke point lands but the ceiling check is not re-pointed at
+    it — the guard would then read the old advisory line while a real record existed beside it.
+
 - **TD-151** severity: medium | status: open | created: Sprint-098
   - Tracker: none — found by SPRINT-098 T1's worktree-isolated outside review, which was looking for
     selection defects rather than logic defects (L-186) and found one in a shared helper.

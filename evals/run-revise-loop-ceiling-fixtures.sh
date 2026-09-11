@@ -121,6 +121,33 @@ else
     sh "$night_run" --check-revise-loop "$s67" 0
 fi
 
+
+# --- case 9 (must-FAIL / control pair): a log that QUOTES the retry format inside its own window --
+# The self-describing-corpus failure (L-108), found by T2's outside review and reproduced verbatim:
+# before the fence-stripping fix, this fixture returned `FAIL revise-loop-ceiling-exceeded: T4 fired
+# 2 retries` for a run in which no retry ever fired. It is the same incident `reap()` already
+# carries a comment about (a `T5 · unattempted ·` line inside a documentation example), recurring
+# one function over because the new checker inherited the windowing and not the hardening.
+# This case is the CONTROL half -- it must stay green -- and `ceiling-exceeded-fails` above is its
+# must-FAIL sibling: identical line shape, differing only in whether the lines sit inside a fence.
+fenced="$fx/fenced-doc-example/log.md"
+if [ ! -f "$fenced" ]; then
+  echo "FAIL harness: fenced-doc-example fixture not found at $fenced -- the L-108 control is gone"
+  fail=1
+else
+  run_case_anywhere "fenced-doc-example-does-not-fire" 0 "revise-loop-ceiling: within ADR-022" -- \
+    sh "$night_run" --check-revise-loop "$fenced" 0
+fi
+
+# --- case 10 (must-FAIL): a non-numeric base FAILs rather than failing OPEN ----------------------
+# Also from the outside review. `--check-revise-loop <log> abc` used to emit a shell error on
+# stderr and then print PASS at exit 0 -- for a guard, failing open is the one direction that must
+# never happen. reap()'s production caller always passes a clean integer, so this is reachable only
+# through the standalone entry; it is guarded anyway, because "unreachable today" is how a guard
+# becomes reachable tomorrow.
+run_case_anywhere "non-numeric-base-fails-closed" 1 "revise-loop-ceiling-unreadable: base cutoff abc is not a line number" -- \
+  sh "$night_run" --check-revise-loop "$fenced" abc
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "REVISE-LOOP-CEILING FIXTURES: all green"; else echo "REVISE-LOOP-CEILING FIXTURES: at least one FAIL"; fi
 exit $fail
