@@ -4,7 +4,7 @@ slug: make-the-gate-finish
 owner: Maintainer
 last_updated: 2026-09-12
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: a43d1e6
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
