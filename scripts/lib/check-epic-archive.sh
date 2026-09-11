@@ -88,8 +88,14 @@ total_conditions() {
 # Splitting on commas FIRST keeps each entry whole, so the qualifier is still attached when the id
 # is read. Emits one "<scope> <num>" line per entry -- scope is `local`, or the qualifier for a
 # member that lives in another repository. An entry naming no number at all is skipped, exactly as
-# before: no artifact in this tree emits that shape, and a branch for one would be a guard whose
-# motivating case does not exist (L-166).
+# before -- no: an entry naming no number is emitted as `unparsed` and reported. Dropping it was
+# review CRITICAL-2: a dropped entry is invisible to `unverified_count`, so an epic scored ZERO
+# unresolvable members and earned the FULLY AFFIRMATIVE "every member sprint closed" -- the one
+# member class provably not verified getting the strongest claim the checker can make. The
+# motivating artifact is this plugin's OWN shipped template, whose default
+# `member_sprints: [SPRINT-NNN, SPRINT-NNN — appended as each is promoted]` selects nothing at all,
+# so every epic scaffolded from it and archived before its members are filled in reads as fully
+# verified. `["SPRINT-931"]` (quoted) and `[SPRINT-931-hardening]` (slug) do the same (L-166).
 _member_entries() {
   awk '
     /^member_sprints:/ {
@@ -106,7 +112,12 @@ _member_entries() {
           if (tok ~ /^[0-9]+$/) { num = tok; break }
           qual = (qual == "" ? tok : qual "-" tok)
         }
-        if (num != "") print (qual == "" ? "local" : qual) " " num
+        if (num != "") { print (qual == "" ? "local" : qual) " " num; continue }
+        # NO number anywhere in this entry. It is emitted as `unparsed` rather than dropped: see the
+        # block comment above the function for why, and note that NO APOSTROPHE may appear anywhere
+        # in this awk program, which is single-quoted to the shell.
+        gsub(/[ \t]+/, "_", entry)
+        print "unparsed " entry
       }
       exit
     }' "$1"
@@ -167,6 +178,10 @@ report_unresolvable() {
   while read -r _ru_scope _ru_num; do
     [ -n "$_ru_num" ] || continue
     [ "$_ru_scope" = "local" ] && continue
+    if [ "$_ru_scope" = "unparsed" ]; then
+      note "epic-archive: $_ru_rel has a member_sprints entry naming no sprint number -- reads '$(printf '%s' "$_ru_num" | tr '_' ' ')'. It selects NO member, so nothing was verified for it; §11's member half cannot be read from this entry at all"
+      continue
+    fi
     _ru_hit=""
     for _ru_p in "$_ru_root"/docs/sprint/archive/SPRINT-"$_ru_num"-*.md "$_ru_root"/docs/sprint/SPRINT-"$_ru_num"-*.md; do
       [ -f "$_ru_p" ] && { _ru_hit=${_ru_p#"$_ru_root"/}; break; }
@@ -234,7 +249,18 @@ for e in "$root"/docs/epic/EPIC-*.md; do
   tot=$(total_conditions "$e")
   omem=$(open_members "$e" "$root")
   if [ "$st" = "closed" ] && [ "$tot" -gt 0 ] && [ "$opn" -eq 0 ] && [ -z "$omem" ]; then
-    bad "epic-archive: $rel is closed with every § Closed when condition met and every member sprint closed, but still sits in docs/epic/ -- §11 says move it to docs/epic/archive/ and keep its INDEX.md row"
+    # The narrowing belongs here MOST of all, and the first pass put it only on the `ok` lines
+    # (review CRITICAL-1). This branch does not merely describe a state -- it DEMANDS an archive, on
+    # a "every member sprint closed" premise the very next NOTE says could not be read. §11's own
+    # words are "never archive on member-sprint count alone", and an epic with unresolvable members
+    # has a member count of zero-verified. EPIC-016 reaches this branch the moment its conditions
+    # tick: every member foreign, so `omem` is empty for want of anything to look at.
+    unv=$(unverified_count "$e" "$root")
+    if [ "$unv" -gt 0 ]; then
+      bad "epic-archive: $rel is closed with every § Closed when condition met and every LOCAL member sprint closed, but $unv member(s) could not be resolved against this repository (see NOTE) -- §11's move is NOT demanded here, because its member half was never verified. Resolve those members, or archive only once they are known closed"
+    else
+      bad "epic-archive: $rel is closed with every § Closed when condition met and every member sprint closed, but still sits in docs/epic/ -- §11 says move it to docs/epic/archive/ and keep its INDEX.md row"
+    fi
   elif [ "$st" = "closed" ] && [ "$tot" -gt 0 ] && [ "$opn" -eq 0 ]; then
     # BOTH halves of §11's trigger are required and only one has fired. This is a real, correct and
     # previously unrepresentable state: the epic is finished, the sprint that finished it is not.

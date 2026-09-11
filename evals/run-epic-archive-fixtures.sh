@@ -242,8 +242,11 @@ run_case_anywhere "s-archived-depth-closed" 0 \
 # return empty whether or not they skip foreign members -- and the `_members_scan` half of the fix
 # was therefore deletable with all 22 cases green. Proven: with that one guard line removed this
 # case flips to `PASS ... correctly NOT yet archived`, exit 0.
+# The expected text changed in round 3: this branch DEMANDS an archive, and demanding it on a
+# member half the next line says could not be read is what review CRITICAL-1 named. The case that
+# pinned the old sentence was this one -- a fixture holding a defect in place (L-186's own trap).
 run_case_anywhere "s-foreign-open-collision" 1 \
-  "is closed with every § Closed when condition met and every member sprint closed, but still sits" -- \
+  "every LOCAL member sprint closed, but 1 member(s) could not be resolved" -- \
   sh "$checker" "$fxs/s-foreign-open-collision"
 
 # --- case 24: archived epic with NO resolvable member -> exit 0, but a NARROWED claim ------------
@@ -260,8 +263,57 @@ run_case_anywhere "s-allforeign-archived" 0 \
 # with zero ASSERTIONS, so deleting the reporting loop again left the suite green. Same silent-stance
 # failure, one level along. This case is the reader that was missing.
 run_case_anywhere "unknown-member-noted" 0 \
-  "member SPRINT-903 names no Plan anywhere in this repository" -- \
+  "NOTE  epic-archive: docs/epic/EPIC-903-live.md member SPRINT-903 names no Plan anywhere" -- \
   sh "$checker" "$fx/live-open"
+
+# --- cases 26-30: ROUND 2's findings, each with the case that was missing ------------------------
+# Round 2 re-seeded all five round-1 fixes and confirmed each holds. What it found instead was that
+# the code ROUND 1 ADDED -- the narrowing and `unverified_count` -- was itself unasserted, and that
+# two selection axes were still unvaried. Every case below exists because a seeded break proved the
+# suite stayed green without it.
+#
+# NOTE assertions from here on include the `epic-archive:` PREFIX (round 2 MINOR-2): every earlier
+# NOTE assertion was a bare substring, so MINOR-3's own prefix fix could be reverted with the suite
+# fully green. A fix nothing asserts is a fix that will be undone by the next edit.
+
+# --- case 26: an entry naming no sprint number -> counted and NOTED (review CRITICAL-2) ----------
+# The inverse of the narrowing, and it silently defeated it: a dropped entry left `unverified_count`
+# at 0, so an epic that verified NOTHING got "archived correctly ... every member sprint closed".
+# The motivating artifact is this plugin's own shipped EPIC.md.template (L-166).
+run_case_anywhere "s-template-default-members" 0 \
+  "NOTE  epic-archive: docs/epic/archive/EPIC-970-f.md has a member_sprints entry naming no sprint number" -- \
+  sh "$checker" "$fx/s-template-default-members"
+
+# --- case 27: the same fixture must NOT get the fully affirmative claim --------------------------
+run_case_anywhere "s-template-default-narrowed" 0 \
+  "every LOCAL member sprint closed -- but 2 member(s) could not be resolved" -- \
+  sh "$checker" "$fx/s-template-default-members"
+
+# --- case 28: MIXED member list, foreign first -> the local member is still reached --------------
+# Census at round 2: all 24 other fixture epics are all-local or all-foreign, so the per-entry skip
+# could have been a whole-loop `break` and nothing would have noticed. Proven: `continue` -> `break`
+# in both skips flips this case FAIL/exit 1 -> PASS/exit 0 with every other case green.
+run_case_anywhere "s-mixed-local-foreign" 1 \
+  "SPRINT-951's § Member sprints Status cell names a close_commit that is not the sprint's own" -- \
+  sh "$checker" "$fxs/s-mixed-local-foreign"
+
+# --- case 29: the PLAIN foreign NOTE, with no local twin to collide with (round 2 MINOR-1) -------
+# Case 18 asserts only the COLLISION variant, so the non-collision branch -- the common one -- was
+# assertion-free and `note` could be replaced by `:` with the suite green.
+run_case_anywhere "s-plain-foreign-note" 1 \
+  "NOTE  epic-archive: docs/epic/EPIC-951-f.md member workdoo SPRINT-001 lives outside this repository -- its rollup row cannot be verified here" -- \
+  sh "$checker" "$fxs/s-mixed-local-foreign"
+
+# --- case 30: the EPIC-STATE half of the narrowing (round 2 MAJOR-1) ----------------------------
+# Only direction (a)'s narrowing was asserted. Disabling the epic-state one left the suite green
+# while the report printed "rollup current" for an epic that resolved zero members.
+# Pointed at s-foreign-collision, not the mixed fixture: the mixed one carries a real class (a)
+# drift, so `drift` is 1 there and the epic-state success line is never reached at all. A case
+# asserting a line its fixture cannot emit would fail for the right reason by accident today and
+# for no reason tomorrow.
+run_case_anywhere "s-epic-state-narrowed" 0 \
+  "rollup current for every LOCAL member -- but 1 member(s) could not be resolved" -- \
+  sh "$checker" "$fxs/s-foreign-collision"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "EPIC-ARCHIVE FIXTURES: all green"; else echo "EPIC-ARCHIVE FIXTURES: at least one FAIL"; fi
