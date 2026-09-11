@@ -377,3 +377,31 @@ Both restored to the checkpoint.
 escalation path is named and reachable" holds, but "the run does not continue past it" holds **only if
 the retry was logged**. That is a criterion execution has qualified rather than satisfied, so it is
 surfaced for a ruling instead of being re-read to fit what was built.
+
+### 2026-09-11 | progress | T2 closes 6 of 6 — DoD 3 ticked QUALIFIED by owner ruling
+
+Owner-ruled 2026-09-11. DoD 3's first half ("the escalation path is named and reachable") holds
+unconditionally; its second ("the run does not continue past it") holds only for a **logged** retry.
+Ticked to the limit of what a checker over model-written records can reach, with the condition stated
+in the tick itself and the residue carried by **`TD-152`** — not absorbed into a clean-looking pass,
+and not fixed by re-reading the criterion to match what was built.
+
+**T2: 6 of 6. Sprint: 14 of 27 task DoD.**
+
+### 2026-09-11 | progress | T3's approach ruled at G2 — provenance stated per evidence field
+
+Owner-ruled 2026-09-11. T3 emits `DELIVERED`/`PARTIAL`/`FAILED` plus its nine evidence fields, and
+**each field records whether it is mechanically derived or model-reported.**
+
+The reason is `TD-152` one level up. That row exists because a guard read a model-written line as
+though it were machine output, and the documentation around it asserted a mechanical guarantee the
+code could not give. T3 is the artifact where that distinction becomes *visible to the morning reader*
+rather than living in a debt row they will not open: `run · N of M DoD ticked` is counted from the
+Plan's own checkboxes and is mechanical; `Tn · retry ·` is written by the model and is not; a verdict
+that presents both at the same confidence repeats TD-152's overclaim in the one artifact whose whole
+job is to say what the run did.
+
+This is also the straightest reading of § Closed-when 6, which asks for the outcome **plus the evidence
+behind it** — provenance is part of what makes evidence evidence. The alternative (defer T3 until
+TD-152 has a fix) was rejected: that fix changes the retry-firing mechanism, a separate piece of work,
+and holding CW 6 behind it would park a judgement call as though it were a dependency (L-094).
