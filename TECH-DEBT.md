@@ -281,6 +281,43 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-147** severity: minor | status: open | created: Sprint-097
+  - Tracker: none — surfaced by the SPRINT-097 T5 outside review (round 1 MINOR-2, restated round 2 as a contributing cause of its CRITICAL-1). Filed rather than fixed: the CRITICAL-1 repair closed the harm, and using the annotation is a new capability, not a fix.
+  - Summary: **`member_sprints:` state annotations are parsed and then thrown away.**
+    `_member_entries` strips `(closed)` / `(active)` with `gsub(/\([^)]*\)/, "", entry)` and nothing
+    else in `check-epic-archive.sh` reads them.
+  - Location: `scripts/lib/check-epic-archive.sh`, the `gsub` inside `_member_entries`.
+  - Evidence: `[workdoo SPRINT-960 (active)]` and `[workdoo SPRINT-960 (closed)]` are
+    indistinguishable to the checker — both yield `workdoo 960`.
+  - Why it matters: for a FOREIGN member that annotation is the **only** in-repo statement of its
+    state, and it is exactly the disconfirming evidence the archival legs lack. An archived epic
+    whose own field says `(active)` is a finding the checker currently cannot make. Not a defect
+    today — the round-3 narrowing means such an epic is reported as unverified rather than as
+    verified-closed — but the fact is sitting in the field the parser already reads.
+
+- **TD-146** severity: medium | status: open | created: Sprint-097
+  - Tracker: none — found incidentally at the SPRINT-097 T5 gate run, not by any check.
+  - Summary: **The conformance engine's informational findings print with the same `FAIL ` prefix as
+    gating ones, so `qa-check.sh`'s verdict line and its visible `FAIL` lines disagree with nothing
+    marking which is which.** This is NOT a counting bug: leg 2f-ter deliberately keeps the engine
+    informational because 27 of 43 dispositions are unbuilt and gating on them would hold the gate
+    permanently red over tracked coverage gaps. Only the fully-covered families (S9, §13) are folded
+    into the tally, and that decision is correct. The defect is that the *report* does not say so.
+  - Location: `scripts/qa-check.sh` leg 2f-ter (the relay) and `scripts/lib/conformance-engine.sh`
+    (the `FAIL ` token it emits).
+  - Evidence: this sprint's T5 gate run printed `QA-CHECK: 228 pass, 2 fail` over **6** `FAIL` lines
+    and 257 `PASS` lines; the four uncounted ones are all conformance-engine
+    (`file-outside-canonical-placement`, `todo-over-cap-at-promote`, `generated-artifact-committed`
+    ×2). The same shape is already recorded, and misread, in this ledger's own SPRINT-097 promote
+    note above: *"`QA-CHECK: 225 pass, 33 fail`* … *33 of the 82 FAIL lines trace to …"* — 33 was
+    read as a **subset** of 82 rather than as a different population.
+  - Why it matters: L-120's whole instruction is *read the number the gate prints* (`N pass, M fail`;
+    M is the verdict), and T4 shipped `scripts/qa-verdict.ts` to enforce exactly that. A reader who
+    follows that rule correctly cannot tell that four visible `FAIL` lines are outside M — and a
+    reader who counts `FAIL` lines instead gets a number that overstates the gate. Both readings are
+    defensible and they disagree. Cheapest fix is a distinct token (`INFO`/`RULE-GAP`) for
+    non-gating engine findings, or a relay line naming how many of the printed FAILs are advisory.
+
 - **TD-145** severity: medium | status: open | created: Sprint-097
   - Tracker: **`TASK-342`** (filed 2026-09-10 at the SPRINT-097 T3 outside review; owner ruled it grouped with `TASK-338` rather than left to age). Scheduled with the checker-accuracy cluster: same family, different files.
   - Summary: **The `*/archive/*` exclusion that keeps closed sprints out of three gate checkers is a
