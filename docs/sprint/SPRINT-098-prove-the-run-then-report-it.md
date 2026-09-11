@@ -5,6 +5,7 @@ epic: EPIC-015
 owner: Maintainer
 last_updated: 2026-09-11
 status: active
+gates_signed: G1,G2 @ 4116b2b
 plan_commit: a341378
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -16,14 +17,17 @@ update_trigger: sprint execute/close events
 > 1 wants a real unattended run whose terminal state agrees with its own task lines; 5 wants a bounded
 > repair loop; 6 wants a typed outcome carrying the evidence behind it. SPRINT-093 closed the *guard* gap
 > and proved each half separately, which is not the same claim. This sprint first makes the rollup
-> unconditional — today's checker is reachable only through the reaper, so the mode this repository
-> actually runs in has no guard at all (L-192) — then fires the run and says what it did.
+> guard speak when there is nothing to read — `qa-check.sh` leg 2g skips a live sprint whose Execution
+> Log is absent, which is exactly the state a run that died before writing anything leaves behind — then
+> fires the run and says what it did. *(Theme corrected at G2: the promoted wording repeated L-192's
+> "reachable only through the reaper", which holds in workdoo and not here — see the 2026-09-11
+> `scope-change`.)*
 
 ## Scope
 
 **In:**
-1. The run rollup emitted and checked **unconditionally**, not gated on run mode, and the continuation
-   contract lifted out of a paragraph into a headed section (TASK-336 · L-192).
+1. The rollup check **FAILing on an absent Execution Log** rather than skipping it, and the continuation
+   contract lifted out of a paragraph into a headed section (TASK-336 · L-192, re-aimed at G2).
 2. A bounded unattended repair loop at exactly ADR-022's ceiling, escalating rather than looping
    (TASK-296 · EPIC-015 § Closed-when 5).
 3. A typed run outcome — `DELIVERED` / `PARTIAL` / `FAILED` plus its evidence (TASK-297 · § Closed-when 6).

@@ -113,3 +113,27 @@ on a judgement call dressed as a dependency (L-094).
   `check-verify-reaches.sh` returned `PASS … 0 claimed target(s) confirmed reachable`: neither clause
   names a *target path*, so the pre-screen had nothing to cross-check. A PASS that says nothing is not
   evidence, and the four questions were answered by hand (L-136).
+
+### 2026-09-11 | progress | G1+G2 signed at `4116b2b`; Theme and § Scope In 1 corrected with them
+
+`gates_signed: G1,G2 @ 4116b2b` recorded in the sprint frontmatter — the signature covers the Plan **as
+it will be executed** (T1 DoD 1 re-aimed, A1/A3 ruled, T3's `Layers:` corrected, D1 extended to T5), not
+as promoted. `approval_envelope:` stays **absent, which reads as NOT approved**: the gates say the Plan
+is sound, the envelope says a run may proceed unattended inside stated bounds, and they are different
+grants. T1–T3 are `J1` and need none; **T4 blocks at pre-flight until all ten dimensions are recorded**,
+which is the owner-action on the Plan's checklist.
+
+**Two lines of frozen prose corrected under the same scope-change.** The Theme and § Scope In item 1 both
+repeated the falsified premise — *"today's checker is reachable only through the reaper, so the mode this
+repository actually runs in has no guard at all"*. The `scope-change` entry above ruled that false for
+this repository, and DoD 1 was re-aimed; leaving the Theme and Scope saying it would have left the sprint
+file asserting something its own Log disproves, which is the report-and-artifact-disagree trap in the
+one document a reader opens first. Corrected rather than annotated: a standing claim that is false is
+worse than one that is absent.
+
+### 2026-09-11 | consequence | T1 · behaviour: material · governance: high
+
+T1 changes a gate leg's verdict semantics (a skip becomes a FAIL) and edits `orchestrator/SKILL.md`'s
+step 4 — a workflow contract. Both arms are material, so the skip table routes this to a scoped reviewer
+at minimum, and ADR-029 Tier G adds the worktree-isolated outside pass on top. Recorded at the moment
+the table was consulted, not after the depth was chosen (TD-092).
