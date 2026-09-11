@@ -281,6 +281,31 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-149** severity: medium | status: open | created: Sprint-097
+  - Tracker: none — flagged in SPRINT-097's own § Scope **Out** block at promote ("the `HANDOFF-LEDGER.md` worktree contamination surfaced by this promote's gate — same family (L-170), different checker, **not yet filed as debt**") and filed at the close that promised it.
+  - Summary: **`conformance-engine.sh` scans `.claude/worktrees/`, so a repo copy created by an
+    isolated dispatch is read as this repository's own content.** During SPRINT-097 T5 the engine
+    reported `file-outside-canonical-placement: HANDOFF-LEDGER.md` and named the path
+    `.claude/worktrees/agent-a051e70aa1ed4ce12/evals/fixtures/handoff-state/…` — a fixture, inside a
+    worktree, inside this repo. There is no root `HANDOFF-LEDGER.md` and never was.
+  - Location: `scripts/lib/conformance-engine.sh` — the file-discovery sweep behind
+    `S2.R-PLACEMENT`. Whatever glob feeds it has no `.claude/worktrees/` exclusion.
+  - Evidence: `find . -name HANDOFF-LEDGER.md -not -path './.claude/worktrees/*'` returns **three**
+    paths, all under `evals/fixtures/handoff-state/`; none at the root. With worktrees included it
+    also returns their copies. Eight worktrees were live at this close. `.claude/worktrees/` is
+    git-ignored, so the engine is reaching past what the repository actually tracks.
+  - Why it matters: **L-170's family, one checker over, and the third recorded sighting.** That rule
+    is written for *id derivation* — `grep -r` over this repo counting worktree copies and returning
+    a maximum that is not a row — and it fired twice more in this very sprint (`TASK-905`–`908` at
+    T1, `L-999` at the close). This is the same contamination reaching a **gate checker** rather than
+    an ad-hoc query, where nobody is watching for it: the finding is indistinguishable from a real
+    §2 placement violation, and the only tell is the path, which the reader must notice for
+    themselves. It is currently one of the four informational FAIL lines on every gate run
+    (**TD-146** is why those look like real failures). An exclusion is cheap; the cost is that a
+    *true* placement finding is now camouflaged by a false one that fires every run.
+  - Re-file fresh if: any other checker is found reading `.claude/worktrees/` — the exclusion belongs
+    wherever file discovery happens, not only in this one sweep.
+
 - **TD-148** severity: medium | status: open | created: Sprint-097
   - Tracker: none — the residue of five review rounds on SPRINT-097 T5, deferred at an explicit acceptance boundary rather than chased. Group with `TASK-338` (the checker-accuracy cluster): same file, same family.
   - Summary: **Seven findings on `check-epic-archive.sh` that the T5 acceptance boundary
