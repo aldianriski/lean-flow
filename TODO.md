@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-10
+last_updated: 2026-09-11
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -22,7 +22,7 @@ status: current
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
 again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 76 rows** (75 open · 1 accepted). Re-derive open/closed and the `severity: high` set
+- **Debt ledger: 81 rows** (80 open · 1 accepted) — re-derived at the SPRINT-097 close. Re-derive open/closed and the `severity: high` set
   **by anchoring to the `^- **TD-NNN**` row header** — a bare `grep 'status: open'` over-counts,
   because rows quote their own status strings in prose (L-108). Aging figures are derived at each
   promote, never read from here (L-097 · L-130).
@@ -47,13 +47,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > Re-ranked at the SPRINT-094 `/triage` (2026-09-07). Each entry below blocks work that is otherwise
 > ready to start; the reason sits in its own `tracker:` line, not here.
 
-- [ ] TASK-328 — Anchor the dispatch preflight's `Depends-on:` parser to the id list  [size: M] [risk: med] [HITL]
-      → **promoted into SPRINT-097 as T2.** Full spec — Layers · Acceptance · 7 DoD · the both-call-sites
-        clause · the seeded-break bar — lives in the sprint file. This row is a pointer so the Backlog
-        carries no second copy to drift from it (L-008).
-      tracker:    TD-132 · TD-043 · L-058 · L-165 · L-168
-      origin:     decomposer
-      state:      ready
 ### P1 — Next Phase Required
 
 > **Epic-first**, ruled by the owner at the SPRINT-094 `/triage`: EPIC-015 § Closed-when 1 · 5 · 6
@@ -162,31 +155,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   # row already schedules that ruling at its own G2, which is where CONTEXT.md puts an
                   # unconfirmed assumption. Parking it on needs-info parked it forever.
 
-- [ ] TASK-300 — Decide whether the five gate-accuracy defects are one task or five  [size: S] [risk: low] [HITL]
-      → **promoted into SPRINT-097 as T1.** Full spec lives in the sprint file. A decomposition
-        ruling, not a fix — the five fixes are explicitly § Out of that sprint.
-      tracker:    SPRINT-087 close sweep · TD-086 · TD-087 · TD-089 · TD-097 · TD-105
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-334 — Make a verdict-less `qa-check.sh` run FAIL loudly instead of reading as 0 failures  [size: S] [risk: low] [AFK]
-      → **promoted into SPRINT-097 as T4**, and **escalated P3 → P1 at that promote** because TD-143
-        is `severity: high` and the ledger auto-escalates a high row. Full spec in the sprint file;
-        scoped to the gate's *reporting*, never its cost.
-      tracker:    TD-143 · TD-090 · TD-117 · TD-084 · L-120
-      origin:     close-retro
-      state:      ready
-
-- [ ] TASK-337 — Scope the epic-state checker's member set to sprints this repository owns  [size: M] [risk: med] [HITL]
-      → **filed and promoted at the SPRINT-097 promote, as T5.** Full spec in the sprint file.
-        `member_plan()` resolves a member sprint number by globbing *this* repo's archive, so
-        EPIC-016's workdoo members (ADR-041) resolve to lean-flow's own same-numbered sprints and
-        report two false `close_commit` mismatches on a correct artifact. L-186's shape exactly:
-        the detection logic is sound, the member set it runs over is not.
-      tracker:    TD-144 · ADR-041 · L-186 · L-166
-      origin:     manual
-      state:      ready
-
 - [ ] TASK-326 — Compare a commit's claimed DoD delta against the ticks it actually made  [size: S] [risk: low] [AFK]
       class:      execution
       tier:       G (ADR-029 — a false green on a DoD is the same silent-false-negative class as a
@@ -218,18 +186,11 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       state:      ready
 
 
-> **The SPRINT-097 T1 cluster ruling (2026-09-10).** The five gate-accuracy defects the SPRINT-087
-> close sweep grouped as one — TD-086 · TD-087 · TD-089 · TD-097 · TD-105 — are ruled **four tasks,
-> grouped by artifact**, after all five were re-derived against the tree rather than read off their
-> Summary lines (L-091). **The one-task side loses**: bundling gives a single L task spanning three
-> subsystems plus a research round, which CLAUDE.md splits before proceeding, and TD-089's subject
-> is not a guard at all, so a Tier G "gate accuracy" task containing it would mis-tier under
-> ADR-029. **The five-task side loses too**, on the cluster's own founding evidence: TD-087
-> (REACHES) and TD-097 (EXISTS) are the same script, filed three sprints apart with neither row
-> aware of the other, and each row's `Re-file fresh if` clause says fixing one alone re-files the
-> other. That is the only merge the evidence forces, so it is the only merge taken. TD-089 →
-> `TASK-341` (P2, Tier P).
-
+> **The SPRINT-097 T1 cluster ruling (2026-09-10)** — five gate-accuracy defects ruled **four tasks,
+> grouped by artifact**, with a loser named on both sides. The full reasoning lives in the archived
+> sprint file (`docs/sprint/archive/SPRINT-097-guards-that-run-over-the-wrong-set.md`, T1 DoD 2) and
+> in its `docs/sprint/INDEX.md` row; the rows it produced are `TASK-338`–`341` below. A pointer, not
+> a second copy — a copied narrative drifts from its source (L-008).
 - [ ] TASK-338 — Fix both legs of `check-verify-reaches.sh`: EXISTS resolves a basename, REACHES matches use not mention  [size: M] [risk: med] [HITL]
       class:      execution
       tier:       G (ADR-029 — a REACHES false positive is a contract false negative: an unreachable
@@ -532,15 +493,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > follow-ups to the Backlog; `/triage` ranks them. They are parked here rather than in P0 so an
 > unranked row is never mistaken for a blocking one — `TASK-334` in particular affects every
 > close and may well outrank this tier once groomed.
-
-- [ ] TASK-333 — Rule which `Layers:` parser is correct, then make both checkers read one extractor  [size: M] [risk: med] [HITL]
-      → **promoted into SPRINT-097 as T3.** Full spec lives in the sprint file, including the clause
-        that the ruling is taken on a *counted* basis — derive how many Plans carry unbackticked
-        `Layers:` before choosing, since requiring backticks makes every one of them undeclared.
-      tracker:    TD-142 · L-108 · L-189 · L-058
-      origin:     close-retro
-      state:      ready
-
 
 - [ ] TASK-335 — Clear two stale records SPRINT-096 found but did not own  [size: S] [risk: low] [AFK]
       class:      mechanical-ingest

@@ -182,9 +182,26 @@ live in this repository still produces them.
 
 ## Files Changed
 
+> **Reconstructed at close from the 28 commits in `2789dbd..close`, not kept live during execution.**
+> Said plainly rather than backfilled as though the table had been maintained: a section filled after
+> the fact records what happened, not what was tracked, and the two are different claims.
+
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
-| _(filled during execution)_ | | | | |
+| `TODO.md` | T1 · close | The four-task ruling filed as `TASK-338`–`341`; `TASK-343` filed at close; the standing "gate cannot verdict" note retired as false | low | the ruling is the artifact |
+| `TECH-DEBT.md` | T1 · T3 · T5 · close | `TD-132` closed; `TD-145` filed at T3's review; `TD-146` · `TD-147` · `TD-148` filed at T5/close | low | ledger census |
+| `scripts/lib/check-layers-completeness.sh` · `check-layers-observed.sh` | T3 | One shared `Layers:` extractor under a counted ruling on backticks — both checkers had disagreed while both comments claimed parity (TD-142) | med | `run-layers-*-fixtures.sh` |
+| `evals/run-layers-completeness-fixtures.sh` · `run-layers-observed-fixtures.sh` | T3 | Cases for the shared extractor, both directions | low | self |
+| `scripts/qa-verdict.ts` *(new)* | T4 | Wraps the gate and judges the **printed** `QA-CHECK:` line rather than the child's exit code, so a verdict-less run reports as a failure instead of as zero failures (TD-143 · L-120) | med | `evals/qa-verdict.test.ts`, 12 cases |
+| `package.json` | T4 | `gate` and `test` — the only real callers — re-pointed at the wrapper. Wiring, not presence (L-020) | med | both scripts exercised |
+| `evals/qa-verdict.test.ts` *(new)* | T4 | Discriminates in both directions, incl. clean verdict + non-zero exit → green, which is what L-120 actually instructs | low | self |
+| `scripts/lib/check-epic-archive.sh` | T5 | One `_member_entries` extractor, comma-split so a repo qualifier stays bound to its id; foreign members excluded from local resolution and NAMED by a non-gating `NOTE`; `unknown_members()` wired after five sprints with zero callers; claims narrowed where members are unresolvable (TD-144) | **high** | `run-epic-archive-fixtures.sh`, 38 cases |
+| `evals/run-epic-archive-fixtures.sh` | T5 | 17 → 38 cases. Five of the new ones vary the **selection** rather than the verdict — the axis L-186 names and the one the original 17 held constant by accident | low | self |
+| `evals/fixtures/epic-state/s-*/` *(9 new dirs)* | T5 | Selection fixtures: foreign/local collision and its one-token sibling, bare-number ids, mixed localities in both orders, an unparsed entry poisoning the attribution regex, a tick at EOF | low | retained (TD-012) |
+| `evals/fixtures/epic-archive/s-*/` *(5 new dirs)* | T5 | Archived-epic depth pair at the real corpus depth, the all-foreign epic, the shipped template's own default value, an unknown member that must still be counted | low | retained (TD-012) |
+| `evals/fixtures/epic-archive/{properly-archived,eligible-unarchived}/docs/sprint/` | T5 | Both fixtures had named a member sprint since SPRINT-055 without ever modelling one, so both exercised §11's member half against a member the checker could not resolve. Now modelled | low | cases 4 · 2 |
+| `docs/sprint/logs/SPRINT-097-*.md` | all | Execution Log — promote, three `scope-change` entries, four task entries, two owner-ruling entries, the T5 arc | low | append-only |
+| `docs/LEARNINGS.md` · `docs/knowledge-index.md` | close | `L-193` · `L-194`; index regenerated (derived view, never hand-edited) | low | `gen-index.sh` |
 
 ## Retro
 
