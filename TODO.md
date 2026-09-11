@@ -16,12 +16,8 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-098 — Prove the Run, Then Report It** →
-> [`docs/sprint/SPRINT-098-prove-the-run-then-report-it.md`](docs/sprint/SPRINT-098-prove-the-run-then-report-it.md)
-> — promoted 2026-09-11, five tasks, 27 DoD + 1 owner-action. Advances **EPIC-015 § Closed-when 1 · 5 · 6**.
-> **`gates_signed:` is absent, which means NOT signed:** G1+G2 are unsigned until the owner records
-> them in the sprint frontmatter (L-099). `approval_envelope:` is likewise absent — T4 fires no run
-> until all ten dimensions are recorded.
+> _(none — SPRINT-098 closed 2026-09-11, 20 of 27 DoD, `terminal · AUTHORITY_BOUNDARY`. T4 + T5 parked and
+> returned to P1 below, still paired. Next: `/lean-doc-generator promote`.)_
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
@@ -68,18 +64,8 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > lead, ahead of the cheaper standalone guards, because the epic cannot close without a real
 > unattended run and every sprint that defers it defers the epic.
 
-- [ ] TASK-336 — Make the run rollup unconditional, and lift the continuation contract out of a paragraph  [size: M] [risk: med] [HITL]
-      → **promoted into SPRINT-098 as T1.** Full spec — Layers · Acceptance · 8 DoD · the
-        not-gated-on-run-mode clause · the selection-varying fixture · the seeded-break bar — lives in
-        the sprint file. This row is a pointer so the Backlog carries no second copy to drift from it (L-008).
-        **Its `44 of 50` population figure did not survive the promote** and is carried as the sprint's
-        **A2**: derive by shape at execution, two queries that must agree (L-108 · L-130).
-      tracker:    L-192 · ADR-016 (the launcher writes the rollup) · L-166 (the mode-axis sibling)
-      origin:     manual
-      state:      ready
-
 - [ ] TASK-319 — Prove § Closed-when 1 with a real unattended run against the repaired reaper  [size: M] [risk: high] [HITL]
-      → **promoted into SPRINT-098 as T4**, paired with `TASK-188` as T5 exactly as the SPRINT-097
+      → **PARKED at SPRINT-098 (T4), `AUTHORITY_BOUNDARY`** — `J2` and no `approval_envelope:` was ever recorded, which reads as NOT approved. Unattempted, not attempted-and-failed. Still paired with `TASK-188` per the SPRINT-097
         `/triage` ruled. Full spec — the seeded not-all-J2 vehicle · the `--mode overnight` fire ·
         the terminal-state agreement check against the run's own committed log — lives in the sprint
         file, together with **D3** (T4's run is not gated on T2/T3 being green, so no unrelated
@@ -96,27 +82,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   design — it guarantees that if the trigger occurs, someone is there to claim it.
       origin:     close-retro
       state:      ready
-
-- [ ] TASK-296 — Run bounded unattended repair on one J1 finding  [size: M] [risk: med] [HITL]
-      → **promoted into SPRINT-098 as T2.** Full spec — Layers · Acceptance · 6 DoD · the
-        wired-where-the-run-reads-it clause · the retained must-FAIL and its sibling control — lives
-        in the sprint file, with the ceiling carried as **A4** (read from ADR-022, never re-chosen).
-        Pointer, not a second copy (L-008).
-      tracker:    EPIC-015 § Closed-when 5 · V3 H31 · ADR-022
-      origin:     decomposer
-      state:      ready
-
-- [ ] TASK-297 — Emit a typed run outcome with the evidence behind it  [size: M] [risk: med] [HITL]
-      → **promoted into SPRINT-098 as T3.** Full spec — Layers · Acceptance · 6 DoD · the nine
-        evidence fields · the wired-into-what-reads-the-log clause — lives in the sprint file, with the
-        EPIC-015-vs-EPIC-008 ownership question carried as **A3** and scheduled at that task's G2,
-        before any `RunSummary` shape is minted. Pointer, not a second copy (L-008).
-      tracker:    EPIC-015 § Closed-when 6 · V3 H37 · EPIC-008
-      origin:     decomposer
-      state:      ready   # /triage, SPRINT-094: the open EPIC-015-vs-EPIC-008 question is a
-                  # JUDGEMENT CALL, closed by ruling, not by waiting for evidence (L-094) — and this
-                  # row already schedules that ruling at its own G2, which is where CONTEXT.md puts an
-                  # unconfirmed assumption. Parking it on needs-info parked it forever.
 
 - [ ] TASK-326 — Compare a commit's claimed DoD delta against the ticks it actually made  [size: S] [risk: low] [AFK]
       class:      execution
@@ -534,7 +499,7 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > generate that vehicle is what foreclosed SPRINT-060 T5 (L-111).
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
-      → **promoted into SPRINT-098 as T5**, paired with `TASK-319` as T4. Full spec lives in the
+      → **PARKED at SPRINT-098 (T5)** — it rides T4's run, and T4 never fired, so its opportunistic trigger never arose. **D5 makes `unattempted` a correct outcome here, not a miss.** Still paired with `TASK-319`; spec in the
         sprint file, with **D5** recording that the opportunistic design is unchanged: the run is not
         scheduled to stop, and closing this `unattempted` is a correct outcome rather than a miss.
         Pointer, not a second copy (L-008).

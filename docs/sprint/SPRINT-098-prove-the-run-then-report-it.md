@@ -4,7 +4,7 @@ slug: prove-the-run-then-report-it
 epic: EPIC-015
 owner: Maintainer
 last_updated: 2026-09-11
-status: active
+status: closed
 gates_signed: G1,G2 @ 4116b2b
 plan_commit: a341378
 close_commit: [sha — set at close]
@@ -173,12 +173,69 @@ L-111's other half — a run happening in a sprint where nobody is positioned to
 
 ## Retro
 
-**Retrieval check** —
+**Closed at 20 of 27 task DoD + 0 of 1 owner-action.** T1 · T2 · T3 complete; **T4 and T5 parked** at
+`AUTHORITY_BOUNDARY` — T4 is `J2` and its `approval_envelope:` was never recorded, which reads as NOT
+approved rather than unspecified. EPIC-015 § Closed-when **1 stays open** (it needs the run T4 would
+have fired); **5 and 6 are contributed but qualified**, not ticked clean — see the epic rollup.
 
-**Cost** —
+**Gate — closed under a recorded ADR-021 owner override.** Six attempts, no clean green run:
+
+| # | Outcome | Cause |
+|---|---|---|
+| 1 | no verdict | a dispatched builder rewrote `scripts/qa-check.sh` while the gate was executing it — **coordinator error**, not a repo defect |
+| 2–3 | no verdict | host memory kill, clean tree, both profiles |
+| 4 | `QA-CHECK: 225 pass, 8 fail` | the first real verdict this sprint |
+| 5 | `QA-CHECK: 229 pass, 1 fail` | after fixing run 4's findings |
+| 6 | no verdict | host memory kill at 347 lines |
+
+Run 5's single failure (`layers-completeness`) was fixed and verified directly —
+`check-layers-completeness.sh` on the sprint file returns **0 FAIL** — and all five fixture suites are
+green. That is targeted evidence, deliberately **not** presented as a gate pass. The override is
+recorded because the host could not produce a clean full run, not because findings were waved through.
+
+**Retrieval check** — no prior `L-NNN` or ADR was contradicted. Four were *confirmed the hard way*:
+L-108 fired three separate times in one sprint (a fenced example forcing a false ceiling breach; a
+fenced example defeating outcome selection; and this sprint's own Execution Log arming a checker),
+L-165 caught every guard defect via an outside pass and none by recall, L-120's "read the number the
+gate prints" decided the 15-FAIL-lines-vs-8-verdict question, and L-091 stopped a false premise frozen
+into T1's own DoD from being built on.
+
+**Cost** — inline coordinator + **6 dispatched agents** (3 builders on `sonnet`, 3 worktree-isolated
+reviewers on `sonnet`), ≈1.27M subagent tokens, 6 gate attempts. 20 DoD delivered. The reviews were
+the expensive half and returned the findings nothing else could: two of three came back NOT CLEAR, and
+the defects they named were invisible to every green suite.
 
 **Worked**
 
+- **Outside review paid for itself three times.** It found a harness self-check that structurally could
+  not fire, a headline feature (T3's provenance tags) with **zero** assertions, and it *measured* the
+  candidate fixes for TD-153 instead of arguing them — the decisive fact being that the required-PASS
+  control and the adversarial counterexample are identical in count and shape, 2 and 2.
+- **Builders reporting rather than working around.** T1's found the premise frozen into its own DoD was
+  false in this repository; T2's stopped at its `Layers:` boundary instead of creating a fixtures path
+  unasked; T3's flagged its own `verification` extraction as fragile. Each was the most valuable line
+  in its report.
+- **Qualified ticks instead of clean ones.** T2 DoD 3 and T3 DoD 4 are ticked *with their limits named*
+  and routed to `TD-152`/`TD-153`. Neither was re-read to fit what was built.
+
 **Friction**
 
-**Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+- **Five readers missed that two new suites were never registered** — green by hand, never run by the
+  gate, through two builders, two outside reviews and the coordinator (→ **L-196**).
+- **The coordinator's own cross-check agreed with itself on the wrong population** (→ **L-198**), and a
+  bulk tick flipped three boxes where eight were intended, with the first repair drawing its
+  discriminator from the damage (→ **L-195**).
+- **Documenting TD-153 created an instance of TD-153** (→ **L-197**).
+- **The gate is not reliably runnable on this host.** Three of six attempts died of memory; the cost
+  half of `TD-090` · `TD-117` · `TD-143` was out of scope for a fourth consecutive sprint and is now
+  the thing most often blocking a close.
+- **`qa-verdict.ts`'s guarantee is conditional on outliving what it wraps** — it reported correctly
+  when the child died and the wrapper lived, and said nothing when both were killed. No fixture can
+  surface that, because a fixture cannot kill the harness.
+
+**Pattern candidate** (surfaced → `docs/LEARNINGS.md`)
+
+- **L-198** an inverse cross-check tests the partition, never the selection
+- **L-197** writing a finding down can create it, in a self-describing corpus
+- **L-196** `shipped ≠ wired` is a property of the registry, not of any file under review
+- **L-195** a discriminator drawn from the damage cannot separate damaged from intact
