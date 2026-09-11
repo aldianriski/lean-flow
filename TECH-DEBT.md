@@ -281,6 +281,27 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-150** severity: **high** | status: open | created: Sprint-097
+  - Tracker: none — found by the two-repo alignment check at the SPRINT-097 close, owner-requested.
+  - Summary: **ADR-041 rules that `workdoo` consumes lean-flow as a *pinned* plugin, and there is no
+    pin.** `workdoo/.claude/CLAUDE.md:21` states it in prose — *"lean-flow is consumed here as a
+    **pinned plugin** (ADR-041, in lean-flow) — never vendored, never forked"* — and nothing in that
+    repository implements it: no `.claude-plugin/`, no plugins block in `.claude/settings.json`, no
+    version reference anywhere. The ruling exists; the mechanism does not.
+  - Location: `workdoo` (no file to point at — that is the defect) · the ruling is
+    `docs/adr/ADR-041-platform-repo-service-boundary.md` § Decision, in this repository.
+  - Evidence: `grep -rn 'lean-flow' .claude/ .claude-plugin/ *.json` in `workdoo` returns five hits,
+    **all prose** in `CLAUDE.md`/`CONTEXT.md`; `ls -a` shows no `.claude-plugin/` at all.
+  - Why it matters, and why **high**: the pin is what makes the consumer contract meaningful. Without
+    it, `workdoo` runs whatever version happens to be in the shared plugin cache — which right now
+    holds `1.60.0`, `1.62.0` and `1.63.0` and **not** the `1.63.1` this close just released. A pilot
+    whose whole subject is *governed, reproducible agent work* is itself running its work-system at
+    an unrecorded version. Two named failures at once: **L-020** (shipped ≠ wired — a capability
+    written only in its own file, here an ADR nothing reads) and **L-151** (a decision recorded where
+    its reader cannot reach it — the reader is `workdoo`'s install, and it cannot read an ADR).
+  - Re-file fresh if: the pin lands but is not *checked* — a pin nothing verifies drifts the same way,
+    and this repository already has `check-skill-freshness` for exactly that question one level over.
+
 - **TD-149** severity: medium | status: open | created: Sprint-097
   - Tracker: none — flagged in SPRINT-097's own § Scope **Out** block at promote ("the `HANDOFF-LEDGER.md` worktree contamination surfaced by this promote's gate — same family (L-170), different checker, **not yet filed as debt**") and filed at the close that promised it.
   - Summary: **`conformance-engine.sh` scans `.claude/worktrees/`, so a repo copy created by an
