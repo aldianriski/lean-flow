@@ -180,3 +180,41 @@ a 40-minute reader and then dispatching a writer to the same path.
   the invocation piped it into `tail` and therefore read *tail's* status (L-120, committed by the
   coordinator in the very message that had just cited the rule). A guard that reports a failure but
   exits 0 would report without gating. Verify unpiped before trusting or accusing it.
+
+### 2026-09-11 | surprise | A2's own figure was wrong, by the exact error A2 was written to catch
+
+T1's builder returned a **disagreeing second number** and it is correct. The coordinator's A2 derivation
+is corrected here by a new entry, never by editing the frozen one.
+
+| Selection rule | open | closed | sum |
+|---|---|---|---|
+| any `- [ ] ` anywhere in the file (**what A2 used**) | 37 | 60 | 97 |
+| `- [ ] ` **inside the `## Plan` section** (what "DoD" means) | **5** | 92 | 97 |
+
+The 32-sprint gap is almost entirely `## Owner-action checklist` items — "bump the version at close" and
+similar — which are not Plan DoD. This repository's own vocabulary already separates them: this sprint's
+promote entry says *"27 DoD **+ 1 owner-action**"*. **Corrected motivating population: of the 5 archived
+sprints with genuinely open Plan DoD, 4 carry no rollup** (`SPRINT-038` · `SPRINT-060` · `SPRINT-086` ·
+`SPRINT-095`; `SPRINT-088` has one). Not 36 of 97.
+
+**What is worth recording is the shape of the mistake, because it is this sprint's own theme.** A2 was
+written *specifically* to stop a stale population figure being carried into execution, and it repeated
+the error one level down. Two named rules were live on screen and neither fired:
+
+- **L-108 — matched by shape, not substring.** A2 anchored the `run-complete` half correctly
+  (`^### <date> | run-complete |`) and then selected sprints with a bare whole-file `grep -lE '^- \[ \] '`.
+  Half the query was structural and half was positional-by-accident, in one derivation.
+- **L-186 — fixtures discriminate the verdict, nothing discriminates the SET.** A2's cross-check was its
+  own inverse (`37 + 60 = 97`), which is a *verdict* check: both halves shared the same wrong selection
+  rule, so they agreed perfectly and agreed on the wrong population. An inverse can only ever confirm
+  that the rows were partitioned; it can say nothing about whether the right rows entered the partition.
+  That is precisely L-186's "the set is the one property with no reader" — and the coordinator cited
+  L-186 in T1's own dispatch brief while its own number was failing it.
+
+**No consequence for T1's build**, which is why it was caught only by an independent reader: archived
+sprints leave scope through the non-recursive glob whichever count is right, so every fixture stayed
+green and every assertion held. The figure was decorative to the code and load-bearing only to the
+record — the shape L-184 names, one rung over.
+
+**Ruling: A1 stands unchanged.** Grandfathering is still correct, and is in fact *cheaper* than it
+looked — the guard would strand 4 sprints, not 36.
