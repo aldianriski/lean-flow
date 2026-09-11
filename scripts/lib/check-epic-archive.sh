@@ -179,7 +179,10 @@ report_unresolvable() {
     [ -n "$_ru_num" ] || continue
     [ "$_ru_scope" = "local" ] && continue
     if [ "$_ru_scope" = "unparsed" ]; then
-      note "epic-archive: $_ru_rel has a member_sprints entry naming no sprint number -- reads '$(printf '%s' "$_ru_num" | tr '_' ' ')'. It selects NO member, so nothing was verified for it; §11's member half cannot be read from this entry at all"
+      # Printed with whitespace still collapsed, and SAID so. Un-squashing with `tr '_' ' '` also
+      # rewrote underscores the file really contains, so the NOTE quoted text the entry did not hold
+      # while claiming to say what it "reads" (review round 3 MINOR-4).
+      note "epic-archive: $_ru_rel has a member_sprints entry naming no sprint number -- entry, whitespace collapsed: '$_ru_num'. It selects NO member, so nothing was verified for it; §11's member half cannot be read from this entry at all"
       continue
     fi
     _ru_hit=""
@@ -257,7 +260,13 @@ for e in "$root"/docs/epic/EPIC-*.md; do
     # tick: every member foreign, so `omem` is empty for want of anything to look at.
     unv=$(unverified_count "$e" "$root")
     if [ "$unv" -gt 0 ]; then
-      bad "epic-archive: $rel is closed with every § Closed when condition met and every LOCAL member sprint closed, but $unv member(s) could not be resolved against this repository (see NOTE) -- §11's move is NOT demanded here, because its member half was never verified. Resolve those members, or archive only once they are known closed"
+      # `ok`, not `bad`, and round 3 got this wrong. A finding whose own sentence says the move is
+      # NOT demanded has no business failing the gate: both remedies it offered were unachievable by
+      # construction (a foreign member can never be resolved here, and this checker can never learn
+      # it closed), so the only action that cleared the FAIL was the very move the text disclaimed.
+      # Left as `bad` it turns the gate RED on EPIC-016 the moment its nine conditions tick -- a red
+      # gate on a correct, ADR-041-sanctioned artifact, which is TD-144's own harm one branch over.
+      ok "epic-archive: $rel is closed with every § Closed when condition met and every LOCAL member sprint closed, but $unv member(s) could not be resolved against this repository (see NOTE) -- §11's move is not demanded on a member half that was never verified, so this is reported rather than required"
     else
       bad "epic-archive: $rel is closed with every § Closed when condition met and every member sprint closed, but still sits in docs/epic/ -- §11 says move it to docs/epic/archive/ and keep its INDEX.md row"
     fi
@@ -406,7 +415,15 @@ for e in "$root"/docs/epic/EPIC-*.md; do
   # ticked "delivered by workdoo SPRINT-001" is properly attributed to a member of this epic. The
   # whitespace split used to keep these numbers by accident -- dropping them now would trade a false
   # positive for a false negative and un-attribute every tick EPIC-016 has.
-  allmem=$(_member_entries "$e" | awk '{ printf "%s ", $2 }')
+  # UNPARSED entries are excluded here and foreign ones are not, and the difference is what `$2`
+  # HOLDS. For a local or foreign entry it is a sprint NUMBER; for an unparsed one it is arbitrary
+  # prose out of the file, squashed. `ticked_unattributed` interpolates each of these into a dynamic
+  # regex, so prose carrying `(` made awk abort with `invalid regexp` mid-file -- class (c) never
+  # ran, the epic was reported PASS, and the run exited 0 with the diagnostic buried among the PASS
+  # lines. A REAL unattributed tick went unreported at a green exit: the silent false negative this
+  # sprint exists to remove, reintroduced by the very branch added to close review CRITICAL-2.
+  # `b255f87` had incidentally FIXED this and `1e42c42` put it back (review round 3 CRITICAL-1).
+  allmem=$(_member_entries "$e" | awk '$1 != "unparsed" { printf "%s ", $2 }')
   drift=0
 
   # (a) every closed member has a rollup row carrying its close_commit, AND that value AGREES with

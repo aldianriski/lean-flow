@@ -16,7 +16,10 @@ fix deletable with the whole suite green. Found by the T5 review, not by the aut
 
 Here the local twin is OPEN. If foreign members are resolved locally again, SPRINT-960 reads as an
 open member and this epic becomes "correctly NOT yet archived" at exit 0. With the guard intact the
-member is skipped, every condition is met, and §11 demands the move -- so this case FAILs.
+member is skipped and the epic passes with its claim narrowed to the LOCAL members -- because §11's
+move cannot be demanded on a member half that was never verified. Round 3 made this branch report
+the narrowing but kept it a FAIL, which would have turned the gate red on EPIC-016 itself the moment
+its conditions ticked; round 4 made it an `ok`. This fixture asserted each of those in turn.
 
 ## Member sprints
 
