@@ -16,16 +16,19 @@ status: current
 
 ## Active Sprint
 
-> _(none — SPRINT-098 closed 2026-09-11, 20 of 27 DoD, `terminal · AUTHORITY_BOUNDARY`. T4 + T5 parked and
-> returned to P1 below, still paired. Next: `/lean-doc-generator promote`.)_
+> **SPRINT-099 — Make the Gate Finish** →
+> [`docs/sprint/SPRINT-099-make-the-gate-finish.md`](docs/sprint/SPRINT-099-make-the-gate-finish.md)
+> — promoted 2026-09-12, three tasks, 20 DoD, no owner-action. **Not** an epic sprint: EPIC-015
+> § Closed-when 1 waits a third sprint, because the run it needs also needs a host that can
+> finish a gate. **`gates_signed:` is absent, which means NOT signed** (L-099).
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
 again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 83 rows** (81 open · 2 resolved — TD-141 accepted, TD-132 → TASK-328) — re-derived at
-  the SPRINT-098 promote by row header, severity distribution reconciled (7 high + 34 medium + 40 minor
-  + 2 trivial = 83). Re-derive open/closed and the `severity: high` set
+- **Debt ledger: 86 rows** (84 open · 2 resolved — TD-141 accepted, TD-132 → TASK-328) — re-derived at
+  the SPRINT-099 promote by row header (74 of 84 open are ≥3 sprints unaddressed; 74 aged + 10 unaged
+  = 84). Re-derive open/closed and the `severity: high` set
   **by anchoring to the `^- **TD-NNN**` row header** — a bare `grep 'status: open'` over-counts,
   because rows quote their own status strings in prose (L-108). Aging figures are derived at each
   promote, never read from here (L-097 · L-130).
@@ -119,22 +122,9 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > TD-090 · TD-117 · TD-128 were already carried by `TASK-329` and are left where `/triage` ranked them.
 
 - [ ] TASK-344 — Measure the gate's memory profile, so a kill is a known mechanism rather than an inference  [size: M] [risk: med] [HITL]
-      class:      execution
-      authority:  J2
-      done-when:  TD-143's **cost half**. Its cheap half shipped as SPRINT-097 T4 — `scripts/qa-verdict.ts`
-                  now judges the printed `QA-CHECK:` line rather than the child's exit code, so a
-                  verdict-less run reports as a failure instead of as zero failures. What remains is the
-                  row's own **Re-file fresh if** condition: the memory profile is *measured*, so the
-                  mechanism is known rather than inferred from three kills. A measurement is the class
-                  of fact that closes this, and it accumulates — so it is deferrable without being
-                  parked forever (L-094).
-      touches:    scripts/qa-check.sh (instrumentation only) · docs/research/ (a measurement record)
-      depends-on: none
-      assumes:    that the three recorded kills share one mechanism — **UNCONFIRMED, and the measurement
-                  is what tests it.** Do not carry TD-143's Mitigation line in as a plan; it is the
-                  filer's hypothesis, written while the cost was being felt (L-091).
+      → **promoted into SPRINT-099.** Full spec — Layers · Acceptance · DoD · the
+        seeded-break bar — lives in the sprint file. Pointer, not a second copy (L-008).
       tracker:    TD-143 (severity: high, open — its `→ TASK-334` pointer is spent: 334 shipped as
-                  SPRINT-097 T4 and was pruned at that close) · TD-090 · TD-117 · L-120
       origin:     manual   # filed by hand at the SPRINT-098 promote governance review (severity: high escalation)
       state:      ready
 
@@ -209,36 +199,8 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       state:      ready
 
 - [ ] TASK-342 — Make the `*/archive/*` exclusion a filesystem-identity predicate, not a case-sensitive string glob  [size: S] [risk: low] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — three gate checkers depend on this exclusion to keep closed sprints
-                  out of their examined set; it is the SET predicate itself, not a branch inside one)
-      authority:  J1
-      grouped:    **schedule with `TASK-338`** (SPRINT-097 T1 cluster ruling, extended 2026-09-10).
-                  Same family — a checker-accuracy defect whose subject is the guard's *selection*
-                  rather than its logic — and it should be reviewed in one pass with the cluster
-                  rather than as an orphan. Different files, so not merged into that row.
-      done-when:  (1) `docs/sprint/Archive/SPRINT-001-…md` and `docs/sprint/archive/SPRINT-001-…md`
-                  are the **same file** on this repo's host — verified same inode,
-                  `5910974512661248` — and the first is **not** excluded by
-                  `case "$sp" in */archive/*)`, which is a case-sensitive string glob. Reproduced
-                  mechanically at SPRINT-097 T3's merge:
-                  `sh -c 'case "docs/sprint/Archive/…" in */archive/*) echo EXCLUDED;; *) echo NOT-EXCLUDED;; esac'`
-                  → `NOT-EXCLUDED`, and feeding that path to `check-layers-completeness.sh` produced
-                  **3 real FAILs against a closed sprint's stale content**.
-                  (2) **All three sites** fixed under **one shared predicate**, not three copies of
-                  the construct: `scripts/lib/check-layers-observed.sh:344` and `:401`,
-                  `scripts/lib/check-layers-completeness.sh:183`. The review that found this named
-                  two; the third was surfaced by an independent grep at merge — derive the set
-                  yourself before editing (L-186 · the same miscount shape as A3 and TD-132).
-                  (3) **A retained must-FAIL that varies path CASING as its selection axis**, plus a
-                  sibling control on the lowercase path staying green in the same run. This is the
-                  load-bearing line: the exclusion already has a dedicated selection fixture
-                  (`archive-path-excluded`, added at SPRINT-097 T3) and it **passes**, because it
-                  validates the guard as a *string* predicate while its real job is a *filesystem
-                  identity* predicate. The two agree on every case-sensitive host and diverge exactly
-                  on the host this repo runs on.
-                  (4) Seeded-break discrimination proof under ONE stated hash convention (L-169);
-                  outside reviewer dispatched worktree-isolated (L-165 · L-168).
+      → **promoted into SPRINT-099.** Full spec — Layers · Acceptance · DoD · the
+        seeded-break bar — lives in the sprint file. Pointer, not a second copy (L-008).
       tracks:     TD-145
       origin:     close-retro (SPRINT-097 T3 outside review, 2026-09-10)
       state:      ready
@@ -384,61 +346,9 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   # (L-094) — unlike TASK-297, which was parked on a ruling.
 
 - [ ] TASK-329 — Make gate truncation a distinct outcome from gate failure  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — a skipped harness is an UNRUN guard, and the run still prints a verdict
-                  in the same shape a completed run prints. The gate cannot report on itself)
-      authority:  J1
-      done-when:  **MERGES TASK-330 (TD-117) into this row — ruled at the 2026-09-07 decompose.** One
-                  mechanism serves both rows: the run's actual duration and what it failed to reach
-                  become first-class output. Six clauses.
-                  (1) A run that trips the budget checkpoint no longer prints the SAME verdict shape a
-                  genuinely-failing run prints. Today `qb_checkpoint` calls `bad`, prints
-                  `QA-CHECK: <pass> pass, <fail> fail` — byte-identical in shape to the Summary block —
-                  and exits 1, so truncation and failure are indistinguishable to any reader or script.
-                  (2) The truncation verdict NAMES the actual elapsed seconds and every leg or harness
-                  it did not reach, **enumerated by name**. Today the message says *"Every leg from
-                  here on, including all eval harnesses, is skipped"* and names not one — which is how
-                  six skipped harnesses went unnoticed, two of them (`run-verify-reaches-fixtures.sh`,
-                  `run-qa-budget-fixtures.sh`) guards of the gate itself.
-                  (3) The ACTUAL runtime is asserted against the ceiling — TD-128's half. **Explicitly
-                  out of scope: `check-qa-budget-default.sh` is correct within its declared scope**
-                  (configured default < ceiling) and is NOT what changes; TD-128 is a *missing* reader,
-                  not a broken checker. Do not "fix" it by widening that script.
-                  (4) A reader distinguishes the three outcomes off the printed verdict line alone —
-                  the line the gate prints, never a wrapper's exit code (L-120).
-                  (5) Retained must-FAIL + sibling control: a run seeded to trip the checkpoint reports
-                  the truncation outcome and names its unrun harnesses, while a genuinely-failing run
-                  in the same suite still reports FAIL. Seeded-break discrimination proof under ONE
-                  stated hash convention, seed verified landed, artifact still parses, break targeted
-                  not demolition, and a landed seed that reddens nothing reported as untested rather
-                  than scored as a pass (L-137 · L-142 · L-169 · L-187).
-                  (6) **Pointed at the motivating condition, not fixtures alone (L-166):** reproduce
-                  TD-117's measurement — a run under concurrent worktree agents, or a checkpoint seeded
-                  to trip where the real one tripped (`run-s2-placement-fixtures.sh`) — and show the
-                  same six harnesses named in the output
-      touches:    scripts/qa-check.sh (the `qb_checkpoint` truncation path and the § Summary block —
-                  the two places that print the verdict) · scripts/lib/qa-budget-check.sh ·
-                  evals/run-qa-budget-fixtures.sh · evals/fixtures/qa-budget/**
-      depends-on: none
-      assumes:    **the fix DIRECTION is ruled at intake, not left to G2.** TD-117's row offers three
-                  and rules none: cap dispatch concurrency · raise the budget with the ceiling raised ·
-                  make the skipped-harness list its own named outcome. **The third is chosen.** The
-                  first slows the worktree-isolated parallel review this repo mandates for Tier G
-                  (L-165 · L-168) and would rest on a concurrency figure nobody has measured; the
-                  second cannot work — the 600 s ceiling is external and not ours to raise, and
-                  `qa-check.sh:27`'s own comment already calls the current 520 "NOT a permanent
-                  figure". The third fixes the REPORT rather than the speed, and it is the report that
-                  is lying. Speed remains a separate, unfiled concern.
-                  Note the merged rows disagree on one number: TD-117 quotes a 450 s default, which is
-                  stale — `qa-check.sh:27` has read 520 since SPRINT-093. Re-derive at build; quote
-                  neither
+      → **promoted into SPRINT-099.** Full spec — Layers · Acceptance · DoD · the
+        seeded-break bar — lives in the sprint file. Pointer, not a second copy (L-008).
       tracker:    **TD-128** (`severity: high`, open, Sprint-092 — the guard passes precisely when the
-                  thing it guards is failing; one hypothesis already DISPROVED, do not re-run it:
-                  pruning 18 worktrees measured 1413 s before, 1450 s after) ·
-                  **TD-117** (`severity: high`, open, Sprint-091 — 533 s against a 469 s checkpoint
-                  under 5 concurrent agents, six harnesses skipped, reproduced independently by a
-                  second observer at 499 s/460 s tripping at the same harness) ·
-                  **supersedes TASK-330**, retired into this row · TD-084 · TD-091 · L-120 · L-166
       origin:     decomposer
       state:      ready
 
