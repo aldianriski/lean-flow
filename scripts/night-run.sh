@@ -350,7 +350,13 @@ reap() {
   # verification happened" -- the same absence-is-not-evidence shape as the retry line above.
   rp_verify_line=$(printf '%s\n' "$rp_window_fs" | grep -E '^system-verify · ' | tail -n1)
   if [ -n "$rp_verify_line" ]; then
-    rp_verify_state=$(printf '%s\n' "$rp_verify_line" | sed -E 's/^system-verify · ([^ ]+) ·.*/\1/')
+    # Split on the delimiter, not on whitespace. The first form here was `([^ ]+) ·`, which requires
+    # the token to contain no space -- and a `sed` whose pattern does not match does not truncate,
+    # it PASSES THE WHOLE LINE THROUGH, so `FAIL(a finding with spaces)` emitted the entire raw line
+    # duplicated behind `verification · `. Dormant, because every finding name this repo emits is
+    # kebab-case, and named here because the original comment described it as truncation, which is
+    # the wrong failure mode to go looking for (T3 outside review, SPRINT-098).
+    rp_verify_state=$(printf '%s\n' "$rp_verify_line" | sed -E 's/^system-verify · (.+) · [^·]*$/\1/')
   else
     rp_verify_state="none logged"
   fi

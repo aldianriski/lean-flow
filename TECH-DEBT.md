@@ -281,6 +281,39 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-153** severity: medium | status: open | created: Sprint-098
+  - Tracker: none — found by the coordinator's population probe at SPRINT-098 T3, then independently
+    reproduced and ruled inherent by that task's worktree-isolated outside review.
+  - Summary: **A guard reading a markdown Execution Log cannot distinguish the reaper's own evidence
+    from prose quoting the same vocabulary, when the prose is placed FIRST.** The outcome/DoD
+    consistency rule in `check-night-run-rollup.sh` selects with `head -n1`. A hand-written
+    `### <date> | run-complete | …` entry becomes the last window and may carry an illustrative
+    example above its real evidence, so a run reporting `outcome · DELIVERED` beside
+    `run · 1 of 5 DoD ticked` PASSes because the quoted `run · 9 of 9` was selected instead.
+  - Location: `scripts/lib/check-night-run-rollup.sh`, the outcome/DoD block (SPRINT-098 T3).
+  - Evidence (2026-09-11): reproduced by the coordinator and again, independently, by the review in
+    its own worktree. **Zero real logs carry the shape today** — latent, not active.
+  - **Why no textual patch closes it, recorded because two were tried and both were wrong:**
+    *(a)* first-fenced-block anchoring fails identically — in a hand-written entry the example **is**
+    the first block — and it reddened the retained fixtures. *(b)* Rejecting an "ambiguous" window
+    (more than one `run · N of M`) cannot work either: the review measured the required-PASS control
+    `illustrative-aside-after-real` and the adversarial counterexample and found them **identical in
+    raw count and content-shape — 2 and 2**. The only thing separating them is *position*, which is
+    exactly what a hand-authored entry controls. *(c)* Anchoring on the reaper's literal header or
+    legend text is strictly worse: it makes the check not fire at all on anything omitting that text,
+    which is easier to defeat than the ordering trick it replaces.
+  - Fix direction (**hypothesis, re-derive first** — §10): bind the evidence block to something
+    outside the text the model can compose — a machine-only sidecar the reaper writes, cross-checked
+    against the log. That is **a new artifact plus a new cross-file consistency guard**, its own Tier G
+    surface with its own fixtures — not a patch to this checker. Do not attempt it inside a task that
+    owns only the checker.
+  - **The honest limit, already written into the code:** this check does not defend against a
+    fabricated or hand-authored `run-complete` entry. What defends there is the append-only
+    convention (STANDARD §9 · ADR-014) and review, not this guard. Stated at the site rather than
+    implied by silence.
+  - Re-file fresh if: a sidecar or marker lands and the checker is not re-pointed at it — the guard
+    would then keep reading composable text while real evidence sat beside it.
+
 - **TD-152** severity: medium | status: open | created: Sprint-098
   - Tracker: none — found by the coordinator's population check at SPRINT-098 T2, then independently
     confirmed and ruled by that task's worktree-isolated outside review.

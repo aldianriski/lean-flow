@@ -108,6 +108,95 @@ EOF
   case_outcome "outcome-unreached-is-partial"         "PARTIAL"   " " "some prose that mentions T1 · done in passing"
   case_outcome "outcome-stalled-is-failed"            "FAILED"    " " "T1 · stalled · watchdog fired"
   case_outcome "outcome-nonzero-exit-is-failed"       "FAILED"    "x" "T1 · done · 1 of 1 DoD" "1"
+
+  # --- provenance-tag assertions (coordinator, after T3's outside review) ------------------------
+  # The tags ARE T3's headline feature -- they exist so a morning reader can tell a counted figure
+  # from a model-written one, which is TD-152's overclaim turned into structure. Nothing asserted
+  # them. The review seeded `parks · %s  [model-reported]` -> `[mechanical]` (TD-152's exact
+  # overclaim direction, one level down inside the fix for it), and BOTH suites stayed green:
+  # a landed, targeted seed that reddens nothing has tested nothing (L-142 · L-187).
+  #
+  # Asserted per field rather than as a set, so a mislabel names WHICH field drifted. The expected
+  # tag is the field's provenance as ruled at G2, not as currently printed -- an assertion copied
+  # from the output it checks would ratify a mislabel instead of catching it.
+  case_tags() {
+    d="$work/tags"
+    mkdir -p "$d/docs/sprint/logs"
+    cat > "$d/docs/sprint/SPRINT-962-tags.md" <<EOF
+---
+sprint: 962
+status: active
+---
+
+## Plan
+
+### T1 — x \`[size: S · risk: low · class: execution · AFK · J1]\`
+Layers: \`a.md\`
+
+**DoD:**
+- [x] a thing
+EOF
+    printf '# log\nT1 · done · 1 of 1 DoD\n' > "$d/docs/sprint/logs/SPRINT-962-tags.md"
+    : > "$d/run.log"
+    sh "$launcher" --reap "$d/run.log" "$d" "" 0 >/dev/null 2>&1
+    emitted="$d/docs/sprint/logs/SPRINT-962-tags.md"
+
+    # field <TAB> expected tag. Counted-from-text -> mechanical; written-by-the-run -> model-reported;
+    # a function of the fields above it -> derived (never more certain than what it reads).
+    for pair in \
+      'run|mechanical' \
+      'outcome|derived' \
+      'terminal|derived' \
+      'tasks|mechanical' \
+      'parks|model-reported' \
+      'repair-cycles|model-reported' \
+      'verification|model-reported' \
+      'warnings|mechanical'
+    do
+      fld=${pair%%|*}; want=${pair##*|}
+      line=$(grep -E "^${fld} · " "$emitted" 2>/dev/null | head -n1)
+      if [ -z "$line" ]; then
+        echo "FAIL fixture(provenance-tag-$fld): field not emitted at all -- the tag cannot be checked because the line is gone"
+        fail=1
+      elif printf '%s' "$line" | grep -qF "[$want]"; then
+        echo "PASS fixture(provenance-tag-$fld): tagged [$want]"
+      else
+        echo "FAIL fixture(provenance-tag-$fld): expected [$want], got: $line"
+        fail=1
+      fi
+    done
+  }
+  case_tags
+
+  # --- verification extraction across token shapes (coordinator, after T3's outside review) ------
+  # The first form was `([^ ]+) ·`, requiring a space-free token. A sed whose pattern does not match
+  # does not truncate -- it passes the whole line through -- so a finding name containing a space
+  # emitted the entire raw line duplicated behind `verification · `. Dormant (every finding name this
+  # repo emits is kebab-case) and retained anyway: "unreachable today" is how a guard becomes
+  # reachable tomorrow, and the original comment named the wrong failure mode, which is what sends a
+  # later reader looking for a truncation that never happens.
+  case_verify() {
+    label=$1; line=$2; want=$3
+    d="$work/verify-$label"
+    mkdir -p "$d/docs/sprint/logs"
+    sed 's/sprint: 961/sprint: 964/' "$work/outcome-plan-exhausted-is-delivered/docs/sprint/SPRINT-961-fx.md" \
+      > "$d/docs/sprint/SPRINT-964-v.md" 2>/dev/null || {
+        echo "FAIL harness: could not derive the verify fixture Plan from case 5's tree -- its shape changed"
+        fail=1; return; }
+    printf '# log\nT1 · done · 1 of 1 DoD\n%s\n' "$line" > "$d/docs/sprint/logs/SPRINT-964-v.md"
+    : > "$d/run.log"
+    sh "$launcher" --reap "$d/run.log" "$d" "" 0 >/dev/null 2>&1
+    got=$(grep -E '^verification · ' "$d/docs/sprint/logs/SPRINT-964-v.md" 2>/dev/null | tail -n1 | sed -E 's/^verification · (.*)  \[.*$/\1/')
+    if [ "$got" = "$want" ]; then
+      echo "PASS fixture(verification-$label): extracted '$got'"
+    else
+      echo "FAIL fixture(verification-$label): expected '$want', got '${got:-<none>}'"
+      fail=1
+    fi
+  }
+  case_verify "kebab-token"  'system-verify · FAIL(revise-loop-ceiling-exceeded) · sh scripts/qa-check.sh' 'FAIL(revise-loop-ceiling-exceeded)'
+  case_verify "spaced-token" 'system-verify · FAIL(some finding with spaces) · sh scripts/qa-check.sh'     'FAIL(some finding with spaces)'
+  case_verify "bare-pass"    'system-verify · PASS · sh scripts/qa-check.sh'                               'PASS'
 fi
 
 # --- motivating real artifact (L-166) ---------------------------------------------------------------

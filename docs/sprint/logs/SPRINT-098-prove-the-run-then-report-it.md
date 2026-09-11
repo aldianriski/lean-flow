@@ -477,3 +477,49 @@ tags are the obvious candidate, which is a design question for a second reader r
 make now. Reverted to T3's shipped behaviour, with the gap documented at the site, and routed to the
 outside review as its primary aim. A guard shipped with a wrong fix is worse than one shipped with a
 named gap.
+
+### 2026-09-11 | progress | T3 outside review — the headline feature had no assertions at all
+
+Worktree-isolated reviewer on `36b92e7`. Not CLEAR. **It confirmed the coordinator's revert was
+correct** and then found the more serious thing.
+
+**Primary aim ruled INHERENT → `TD-153`.** The reviewer reproduced the `head -n1` bypass independently
+and then did what neither the builder nor the coordinator had: it **measured** the candidate fixes
+against the retained suite. The decisive number — the required-PASS control
+`illustrative-aside-after-real` and the adversarial counterexample are **identical in raw count and
+content-shape, 2 and 2**. Only *position* separates them, and a hand-authored entry controls position.
+So an "ambiguity ⇒ UNKNOWN" rule would redden the control the suite must keep green; first-fenced-block
+anchoring fails for the reason already found; and anchoring on the reaper's literal header text is
+*strictly worse*, because it stops firing on anything that omits the text — easier to defeat than the
+ordering trick it replaces. The real fix binds evidence to something outside composable text (a
+machine-only sidecar plus a cross-file guard), which is its own Tier G surface. Filed as `TD-153`.
+
+**The severe finding: T3's provenance tags — the whole point of the task — had ZERO assertions.**
+`grep` for any tag across both harnesses returned **0**. The reviewer seeded
+`parks · %s  [model-reported]` → `[mechanical]`, which is **TD-152's exact overclaim direction,
+reproduced one level down inside the fix for it**, and both suites stayed **green**. Reproduced by the
+coordinator: landed 2 content lines, parsed, 840→840, nothing reddened — a landed, targeted seed that
+reddens nothing has tested nothing (L-142 · L-187).
+
+Fixed: **eight per-field tag assertions**, expected values taken from the G2 provenance ruling rather
+than copied from the emitted output — an assertion copied from what it checks would ratify a mislabel
+instead of catching it. Proven in **both** directions, each naming the drifted field:
+`[model-reported]`→`[mechanical]` on `parks` reddens `provenance-tag-parks` alone;
+`[mechanical]`→`[model-reported]` on `tasks` reddens `provenance-tag-tasks` alone.
+
+**Third finding: the author's own comment named the wrong failure mode.** `verification ·` used
+`sed -E 's/^system-verify · ([^ ]+) ·.*/\1/'`, flagged as "truncates on a spaced token". It does not
+truncate — **a sed whose pattern does not match passes the whole line through**, so the field emitted
+the entire raw line duplicated. Dormant (every finding name this repo emits is kebab-case) and fixed
+anyway, with three retained token-shape fixtures, because "unreachable today" is how a guard becomes
+reachable tomorrow — and a comment naming the wrong failure sends the next reader hunting a truncation
+that never happens.
+
+**Coordinator seed honesty:** two of this session's seeds **failed to land** (a `perl` regex and a
+`sed` back-reference) and are recorded as **untested**, not scored as passes. The landing retries are
+what the evidence above rests on. One further caveat stated rather than glossed: the verification seed
+approximates the original expression rather than reproducing it byte-exactly, which is why two sibling
+cases returned empty instead of their former values — the discrimination is still decisive, and the
+`spaced-token` case reproduces the pass-through verbatim.
+
+**T3: 6 of 6, DoD 4 QUALIFIED (limit named, `TD-153`). Sprint: 20 of 27 task DoD.**
