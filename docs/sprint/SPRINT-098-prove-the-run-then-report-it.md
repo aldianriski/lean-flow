@@ -58,9 +58,9 @@ repository runs is attended and the reaper fires only on unattended runs.
 state FAILs with its named finding, while an attended sprint carrying one PASSes in the same run.
 
 **DoD:**
-- [ ] The check is **not gated on run mode** — a sprint with open DoD and no `terminal ·` rollup is a named FAIL however the run was launched. — *Verify: `sh scripts/lib/check-night-run-rollup.sh .`*
+- [ ] **An ABSENT log is a named FAIL, not a skip** — a sprint with open DoD is a FAIL whether its Execution Log holds no `run-complete` entry *or* does not exist at all. Today `qa-check.sh` leg 2g builds its input from live Plans that already have a log and emits `note … skip -- no Execution Log alongside an active sprint` when none does, so the one state the guard exists to catch — a run that died before writing anything — is the one it skips. *(Judgment tick against the named check: running `check-night-run-rollup.sh` shows it ran, not that the skip is gone; the mechanical proof is DoD 4's must-FAIL + control. `scope-change` 2026-09-11 — the frozen premise "reachable only through the reaper" is true of workdoo, false here.)*
 - [ ] Pointed at its **motivating population**, not only at fixtures (L-166): the set of sprint logs carrying no `run-complete` entry is **derived at execution by shape, cross-checked two ways that agree** — never restated from this Plan or from TASK-336's row (see **A2**; L-108 · L-130).
-- [ ] A ruling per ADR-021 on whether that population is **grandfathered or backfilled**, recorded with its reasoning. Either ruling is fine; an unstated one is not.
+- [ ] The ruling per ADR-021 is **grandfather, by scoping the guard to live sprints** (owner-ruled 2026-09-11, Log): the check fires at close, while the sprint is still in `docs/sprint/` and a rollup can still be written; the **36 of 97** archived sprints carrying open DoD fall out of scope by construction, not by a maintained list. Implemented as scoped, and the inherited `*/archive/*` glob defect (`TASK-342`) named in the code.
 - [ ] Retained must-FAIL **plus a sibling control green in the same run** (L-058 · L-142).
 - [ ] At least one fixture varies the **selection**, not the verdict — a log reached by the other glob arm, or a sprint whose open-DoD state is read from the other side of the archive boundary (L-186).
 - [ ] **Seeded-break discrimination proof**: seed verified landed, artifact still parses, break targeted not a demolition, and a landed seed that reddens nothing reported as **untested** rather than scored as a pass — all under ONE stated hash convention (L-137 · L-142 · L-169 · L-187).
@@ -86,7 +86,7 @@ ADR-022 admits; a second failure escalates instead of looping.
 - [ ] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168).
 
 ### T3 — Emit a typed run outcome with the evidence behind it `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `skills/orchestrator/references/night-run.md` · `scripts/night-run.sh` · `templates/sprint-log.md.template`
+Layers: `skills/orchestrator/references/night-run.md` · `scripts/night-run.sh` · `skills/lean-doc-generator/templates/sprint-log.md.template` *(corrected at G2 — there is no root `templates/`; L-100)*
 Depends-on: T1 · T2 — **D1** · **D2** (both shared files)
 Cites: EPIC-015 § Closed-when 6 · EPIC-008 · ADR-016 · ADR-029 · V3 H37
 **Tier G** (ADR-029 · D4). The outcome is a function of the terminal state SPRINT-088 shipped; what is
@@ -97,7 +97,7 @@ false negative T1 closes, one level up.
 attempted/completed, parks, repair cycles, verification state, warnings and terminal reason.
 
 **DoD:**
-- [ ] The **EPIC-015-vs-EPIC-008 ownership question is ruled before a `RunSummary` shape is minted** (**A3**) — a judgement closed by ruling, not by waiting for evidence (L-094).
+- [ ] **A3 is ruled (owner, 2026-09-11): EPIC-015 ships a local run outcome; EPIC-008 keeps the portable protocol.** EPIC-008 is `status: proposed` with no member sprints and its object set explicitly refuses to assume a repository, while this needs a local report in a sprint Execution Log (V3 §11 — build only what hardening needs). **Binding: the name `RunSummary` is NOT minted here** — the shape is named for the Part 4 rollup it types, and it records that EPIC-008 may subsume or map it.
 - [ ] All nine evidence fields emitted, each sourced from the run rather than restated by the launcher's narrative.
 - [ ] The outcome is **wired into what reads the log** — the template's event vocabulary and the rollup consumer, not present only in its own file (L-020).
 - [ ] Retained must-FAIL: a run ending mid-Plan that reports `DELIVERED` fails with its named finding, while a genuinely-exhausted sibling passes in the same run (L-058 · L-142).
@@ -143,17 +143,17 @@ L-111's other half — a run happening in a sprint where nobody is positioned to
 - [ ] Record the **ten-dimension pre-launch approval envelope** in this file's frontmatter before T4 fires — goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions. Absence means NOT approved, and a bracketed placeholder counts as absent.
 
 ## Decisions (pre-locked)
-- **D1 — `scripts/night-run.sh` is owned in order T1 → T2 → T3.** T4 **reads** it and never modifies it. Stage per-hunk on any shared file and verify `git diff --cached`; never a plain `git add` over another task's WIP (L-042 · L-037).
+- **D1 — `scripts/night-run.sh` is owned in order T1 → T2 → T3 → T5.** T4 **reads** it and never modifies it. **T5 appended at G2:** its `Layers:` claims the file conditionally ("only if the exercise finds a defect"), and a conditional write to a shared file is still a shared-file write. Stage per-hunk on any shared file and verify `git diff --cached`; never a plain `git add` over another task's WIP (L-042 · L-037).
 - **D2 — `skills/orchestrator/references/night-run.md` is owned T2 → T3**, same staging rule.
 - **D3 — T4's run is NOT gated on T2 or T3 being green.** If either slips, T4 fires against T1's repair alone, which is all its acceptance requires. SPRINT-060 foreclosed its only vehicle by letting an unrelated ruling decide the run's shape (L-111); this row exists so that cannot happen twice.
 - **D4 — T1/T2/T3 are `J1`; T4/T5 are `J2`.** The Plan is deliberately not all-J2 so pre-flight item 3 admits a run at all. `J2 ⇒ HITL`; the converse does not hold, so a J1 task run with a human present stays J1.
 - **D5 — T5 is opportunistic and is not scheduled.** Closing it `unattempted` is a correct outcome; manufacturing a mid-Plan stop is not.
 
 ## Assumptions
-- **A1** — Grandfathering the existing rollup-less sprint logs is acceptable. *Confirm: T1's own G2 — an owner **ruling**, not a measurement, so it is decided rather than parked waiting for evidence that will not arrive (L-094).*
-- **A2** — **TASK-336's "44 of 50" population figure is STALE and must not be carried into execution.** Both sprints that were active when it was written have since archived (51 archived logs, 0 active), and two probes against different anchors returned 30 (`run-complete` present) and 47 (`terminal ·` present) — neither is 44, and the spread is L-108's self-describing-corpus tell, since the logs quote the rollup format in their own prose. *Confirm: derive by **shape** at T1 execution, two queries that must agree, before any DoD rests on the number (L-130 · L-108).*
-- **A3** — Whether the run-outcome vocabulary belongs to EPIC-015 or to EPIC-008's Run Protocol is open. *Confirm: ruled at T3's G2, before a `RunSummary` shape is minted — otherwise the two epics mint competing ones (V3 §11).*
-- **A4** — The unattended repair ceiling is the one ADR-022 already admits. *Confirm: read ADR-022 § Decision at T2's G2. Whether unattended repair earns its own ceiling is a **measurement** accumulating from EPIC-006's records; freezing a number before those exist is L-130.*
+- **A1** — **RULED at G2, 2026-09-11: grandfather, by scoping the guard to live sprints.** The check fires at close, the only moment a rollup can still be written; the **36 of 97** archived sprints carrying open DoD are out of scope by construction, not by a maintained list. Inherits `TASK-342`'s `*/archive/*` glob defect, named in the Log rather than discovered later.
+- **A2** — **RESOLVED at G2 by derivation: the figure is 36 of 97, not 44 of 50.** Matched by shape (`^### <date> | run-complete |`), worktrees excluded, each count cross-checked by its own inverse: 51 sprint logs = 6 with a rollup + 45 without; 97 archived sprints = 37 with open DoD + 60 fully ticked; of those 37, **36 carry no rollup**. TASK-336's row counted *logs* in its denominator while its criterion is about *sprints* (L-130 · L-108 · L-170).
+- **A3** — **RULED at G2, 2026-09-11: EPIC-015 ships a local run outcome; EPIC-008 keeps the portable protocol**, and the name `RunSummary` is not minted here. EPIC-008 is `status: proposed` with no member sprints and its object set refuses to assume a repository at all.
+- **A4** — **CONFIRMED at G2 by reading, not by ruling.** ADR-022 § Decision item 2: **one retry per review pass, total** (owner-ruled SPRINT-065 T3); still-open → `parked-hitl`, never a second firing — plus a mechanical trigger and a declared repo policy, absence of which means never. A documented behaviour is closed by reading (L-094); T2 ships at this ceiling and re-decides nothing.
 - **A5** — SPRINT-093's reap-gate and agreement fixes hold under a live run. **UNCONFIRMED by construction** — that is T4's entire point. *Confirm: T4's run, or its failure.*
 
 ## Execution Log
