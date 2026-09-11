@@ -531,3 +531,114 @@ Routing completed trackers is `/lean-doc-generator close`'s job (STANDARD §10),
 here where close will read them instead of being edited around now.
 
 consequence · owner-ruling · behaviour:low · governance:high
+
+### 2026-09-11 | T5 | Member set scoped to sprints this repo owns; four review rounds. 31 of 32 DoD
+
+**The fix, and the owner ruling behind it.** `member_sprints:` was parsed by splitting on whitespace
+as well as commas, which severs a repo qualifier from the id it qualifies: `workdoo SPRINT-001`
+became the independent tokens `workdoo` · `001` · `(closed)`, the first and third globbed nothing and
+vanished, and `001` then resolved against **this** repository's own SPRINT-001. EPIC-016's two rows
+were validated against lean-flow sprints that have nothing to do with them. Reproduced first against
+the real artifact, as A3 required: `b255f87^` exits 1 naming both cells (`eb3d9e7` vs `b0f2695`,
+`28c5203` vs `007869e`).
+
+One `_member_entries` extractor now splits on **commas first**, so the qualifier is still attached
+when the id is read, and emits `<scope> <num>` per entry. `_members_scan` and `closed_members` both
+read it and skip foreign members; class (c) attribution deliberately keeps them, because it matches
+**text**, not files. **A3 confirmed and already corrected at promote**: there is no `member_plan()`;
+resolution lived in two helpers across four globs.
+
+**Owner ruling (DoD 2):** a foreign member is **named by a non-gating `NOTE`**, never silently
+skipped — silence is an unchecked row, the failure one level down from the false positive. **Second
+ruling, on a finding not in the Plan:** `unknown_members()` had **zero callers in the entire
+repository** while its own header declared unknown members *"NAMED on the report … never silently
+skipped (L-058)"*. For five sprints this file documented a reporting behaviour it did not have.
+Wired to the same emitter; it fires on five retained fixtures.
+
+**Why NOT the mechanism the earlier ruling prescribed.** The 2026-09-10 owner ruling said to decide
+locality by resolving the member row's href **relative to the epic's own directory**. This does not
+read the href at all. Surfaced before merging rather than taken silently, and approved on evidence:
+classifying from frontmatter makes C1 **unreachable by construction** (the epic's path is never an
+input), and the invariance the ruling demanded was proven directly — the same epic file, byte
+identical (`git hash-object` equal), classifies `local 933` at `docs/epic/` and at
+`docs/epic/archive/`. Old-vs-new resolution across all 16 epics: **EPIC-016 is the only one that
+changes**; EPIC-001 · 002 · 003 · 004 keep their full local member sets, which is C1's exact subject.
+
+**Four independent review rounds, all worktree-isolated. Every one returned NOT CLEAR.** L-165 held
+five times out of five: not one of these was reachable from inside the work, and several were found
+only by re-running a *previous* reviewer's own seed against the fix that claimed to close it.
+
+- **Round 1** (5 findings) — direction (a) claimed *"every member sprint closed"* on members it
+  resolved none of; frontmatter was sole authority on locality, so one stray qualifier silently
+  unverified a member whose Plan sat on disk; the `_members_scan` guard was **deletable with the
+  suite green**, because every selection fixture's collision partner was CLOSED; the unknown NOTE
+  was emitted by five fixtures and asserted by none.
+- **Round 2** (7, two CRITICAL) — round 1's narrowing landed on the two `ok` lines and missed the
+  `bad` one, the only line that **demands** an archive; entries naming no sprint number were dropped,
+  uncounted, and received the fully affirmative claim — with **this plugin's own shipped
+  `EPIC.md.template`** as the motivating artifact, its default `member_sprints:` selecting nothing at
+  all. Round 2 also re-seeded all five round-1 fixes and confirmed each held.
+- **Round 3** (10) — **a CRITICAL that was a regression introduced in round 2**: the `unparsed`
+  branch fed arbitrary file prose into `allmem`, which `ticked_unattributed` interpolates into a
+  dynamic awk regex, so prose carrying `(` aborted awk mid-file — class (c) never ran, the epic
+  reported PASS, and the run exited **0**. Dated across commits: present at `b255f87^`, **fixed
+  incidentally by `b255f87`**, put back by `1e42c42`. Plus a MAJOR introduced by round 3 itself — the
+  narrowed `bad` branch failed the gate on an epic it had just said nothing was demanded of, and both
+  remedies it offered were unachievable by construction; verified to turn **EPIC-016 red** once its
+  nine conditions tick, which is TD-144's own harm one branch over.
+- **Round 4** — repaired by **subtracting**, on owner ruling, because every defect after the core fix
+  came from logic added later: one awk clause excludes `unparsed` from `allmem`; the contradictory
+  `bad` became an `ok`. Product logic shrank.
+
+**The set property, four times over (L-186).** Each round found one axis the fixtures held constant
+by accident: **id shape** (all 17 original fixtures wrote `[SPRINT-NNN]` while the live tree has
+always used three shapes) · **epic file depth** (no archived-epic fixture had a `§ Member sprints`
+table at all, while the real archived corpus links two levels up) · **all-local-or-all-foreign** (no
+fixture mixed them) · **member order** (the one mixed fixture listed the foreign member first, which
+is structurally blind to `report_unresolvable`'s own skip). Suite **17 → 34 cases**.
+
+**Three fixes shipped without a reader, each caught only by re-seeding.** The repair for round 3's
+CRITICAL left all 33 cases green whether applied or not; `unverified_count`'s unknown half was
+unasserted; the collision glob's live arm was unasserted. A fix for a silent false negative that is
+itself unguarded is the same defect one level along.
+
+**Two fixtures were asserting a two-part test while supplying one part.** `properly-archived` and
+`eligible-unarchived` have each named a member sprint since SPRINT-055 that the fixture never
+modelled, so both exercised §11's member half against a member the checker could not resolve. Both
+members are now modelled. This surfaced only because the narrowing made the gap visible.
+
+**Seeded-break discrimination, one stated convention throughout** — `git hash-object <path>` against
+`git rev-parse HEAD:<path>`, both git blob ids, so the working tree's CRLF cannot enter the evidence
+(L-169). Every seed verified **landed** (blob differs), **parsing** (`sh -n`), and **targeted** (line
+count within one), with the file restored to its HEAD blob after each. Eleven seeds discriminate,
+each reddening only its own case with siblings green.
+
+**Two of my own seeds were invalid and scored as results until checked.** One reported a clean green
+while **never applying at all** — `sed 's///2'` matches the second occurrence *within a line*, not
+the second line — so it proved nothing (L-137's verify-the-seed-landed rule firing for real). Two
+others broke the script's **syntax** rather than its logic and reddened every case for the wrong
+reason; a demolition is not a discrimination (L-142). All three were visible only because the seed
+loop printed `landed=` and `parses=` beside the suite result rather than the suite result alone.
+
+**Gate.** `QA_FULL=1` ran to completion on this host and **verdicted** — `QA-CHECK: 228 pass, 2 fail`
+— which contradicts the standing Backlog note that it cannot verdict here; that note is stale and
+should be corrected at close. T4's wrapper read it correctly as an ordinary red gate. **A4 cannot be
+reconciled as written:** the promote's figure of 33 was never comparable to a FAIL-line count. See
+TD-146.
+
+**Filed, not fixed:** `TD-146` (medium) — the conformance engine's *informational* findings print
+with the same `FAIL ` prefix as gating ones, so the verdict line and the visible FAIL lines disagree
+with nothing marking which is which. Not a counting bug: leg 2f-ter keeps the engine informational
+deliberately, since 27 of 43 dispositions are unbuilt. The first diagnosis in-session was wrong and
+is corrected on the row. The same shape is already recorded **and misread** in this sprint's own
+promote note, where `225 pass, 33 fail` against 82 FAIL lines was read as *"33 of the 82"* — a subset
+rather than a different population. `TD-147` (minor) — `(closed)`/`(active)` member annotations are
+parsed and discarded. Ids derived from the maximum in use with `.claude/worktrees/` excluded (L-170),
+agreed by two differently shaped queries; both returned 145, so the exclusion did not change the
+answer this time.
+
+**Open at this entry:** review round 4 is running. Round 3's MAJOR-1 (`member_sprints: []`, an absent
+key, and a YAML block sequence still receive the fully affirmative claim) and its MINOR-2/3 are open
+and unfiled pending that verdict.
+
+consequence · T5 · behaviour:high · governance:high
