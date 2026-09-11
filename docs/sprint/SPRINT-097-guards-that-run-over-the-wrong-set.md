@@ -43,7 +43,7 @@ update_trigger: sprint execute/close events
 ### T1 — Rule whether the five gate-accuracy defects are one task or five `[size: S · risk: low · class: decision · HITL · J2]`
 Layers: `TECH-DEBT.md` · `TODO.md`
 Depends-on: none
-Cites: SPRINT-087 close sweep · TD-086 · TD-087 · TD-089 · TD-097 · TD-105
+Cites: SPRINT-087 close sweep · TD-086 · TD-087 · TD-089 · TD-097 · TD-105 · `check-verify-reaches.sh` · T2 (cited, not depended on — T1 rules a decomposition, T2 executes independently; declared 2026-09-11)
 Deferred at three promotes because it is a judgement, not an edit. The pairing is the evidence the
 cluster is a cluster: TD-087 (the REACHES half) and TD-097 (the EXISTS half) are the **same script**,
 `check-verify-reaches.sh`, filed three sprints apart with neither row aware of the other until
@@ -60,7 +60,7 @@ separately, and the chosen shape is filed as `TASK-NNN` rows in the Backlog.
 ### T2 — Anchor the dispatch preflight's `Depends-on:` parser to the id list `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/orchestrator/references/dispatch.md` (the `<!-- dispatch-preflight:start/end -->` snippet — the `"Depends-on:"*)` arm AND the indented `D)` continuation arm) · `evals/run-dispatch-preflight-fixtures.sh` · `evals/fixtures/dispatch-preflight/`
 Depends-on: none
-Cites: TD-132 · TD-043 · L-058 · L-165 · L-168
+Cites: TD-132 · TD-043 · L-058 · L-165 · L-168 · `dispatch.md` · `TECH-DEBT.md` · T1 · T3 · T4 (all cited in prose, none depended on; declared 2026-09-11)
 **Tier G** (ADR-029) — the false HALT is the loud half; the false `PASS shared-file-owned` issued off
 a phantom edge is the silent one, and it green-lights a wave with no ownership order at all. The
 `Layers:` side of this same snippet was already hardened via `TOK`; `Depends-on:` was left unanchored.
@@ -84,9 +84,9 @@ sprint file, yields `PASS wave-computation: T1=0 T2=0 T3=0 T4=0` and no `FAIL cy
 - [x] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168). — ✓ done at SPRINT-095 T2: five rounds, four rejections, **6 CRITICALs, every one found by review and none by the seeded proofs**. Re-reviewing an unchanged artifact would add nothing; this sprint makes no edit to it.
 
 ### T3 — Rule which `Layers:` parser is correct, then make both checkers read one extractor `[size: M · risk: med · class: decision · HITL · J2]`
-Layers: `scripts/lib/check-layers-observed.sh` · `scripts/lib/check-layers-completeness.sh` · `evals/run-layers-observed-fixtures.sh` · `evals/run-layers-completeness-fixtures.sh` · `docs/sprint/SPRINT-*.md` (only if the ruling requires backticking existing Plans)
+Layers: `scripts/lib/check-layers-observed.sh` · `scripts/lib/check-layers-completeness.sh` · `evals/run-layers-observed-fixtures.sh` · `evals/run-layers-completeness-fixtures.sh` · `docs/sprint/SPRINT-*.md` (only if the ruling requires backticking existing Plans) · `TECH-DEBT.md` (corrected 2026-09-11 — T3's outside review filed TD-145, which the promote could not have named)
 Depends-on: none
-Cites: TD-142 · L-108 · L-189 · L-058
+Cites: TD-142 · L-108 · L-189 · L-058 · `check-layers-completeness.sh` · `check-layers-observed.sh` · `qa-check.sh` · `scripts/qa-check.sh` (declared 2026-09-11)
 **Tier G** (ADR-029) — both subjects are gate checkers, and the ruling changes what "declared" means
 for every sprint file in the tree: silent in one direction, noisy in the other. Both files carry the
 line *"kept deliberately identical … a parsing rule that differs between them would make one of the
@@ -107,7 +107,7 @@ single extractor rather than two that disagree while both claim parity in commen
 ### T4 — Make a verdict-less `qa-check.sh` run FAIL loudly instead of reading as 0 failures `[size: S · risk: low · class: execution · AFK · J1]`
 Layers: `scripts/qa-check.sh` · `package.json` (the `gate` / `test` script chain — its real callers) · `scripts/qa-verdict.ts` (new · TS/Bun per the 2026-09-10 ruling) · `evals/qa-verdict.test.ts`
 Depends-on: none — independent of the memory cost itself
-Cites: TD-143 · TD-090 · TD-117 · TD-084 · L-120
+Cites: TD-143 · TD-090 · TD-117 · TD-084 · L-120 · `qa-check.sh` (declared 2026-09-11)
 **Tier G** (ADR-029) — this is the gate's own report, and a run that cannot speak currently presents
 as a clean partial, which is the silent-false-negative shape. Scoped to the *reporting*, never the
 *cost*: it does not attempt to make the gate finish, it makes not-finishing unmistakable.
@@ -124,9 +124,9 @@ reported as a failure by whatever invokes it, rather than leaving the caller to 
 - [x] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168). — ✓ **two rounds.** Round 1 found a **CRITICAL** — a spawn failure left the wrapper hanging forever, the ENOENT-never-resolves shape, which is *worse than the defect being fixed* — and a **MAJOR**: stdout and stderr merged into one judged buffer, so pipe interleaving could desync the verdict regex and misreport a real pass as verdict-less. Both reproduced RED, fixed, committed separately (`da7d139`). Round 2, an independent reviewer with its own seed, returned **CLEAR**. L-165 again: neither defect was reachable by the author, and both were found by an outside pass.
 
 ### T5 — Scope the epic-state checker's member set to sprints this repository owns `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-epic-archive.sh` (the two inline member-number globs at :79 and :210, and the `epic-state:` leg — there is no `member_plan()` helper; A3 corrected 2026-09-10) · `evals/run-epic-archive-fixtures.sh` · `evals/fixtures/epic-state/`
+Layers: `scripts/lib/check-epic-archive.sh` (the two inline member-number globs at :79 and :210, and the `epic-state:` leg — there is no `member_plan()` helper; A3 corrected 2026-09-10) · `evals/run-epic-archive-fixtures.sh` · `evals/fixtures/epic-state/` · `evals/fixtures/epic-archive/` (corrected 2026-09-11 — five review rounds invented fixtures on the *archive* side the promote could not have named: the depth pair, the all-foreign epic, the template default, the unknown-counted epic, the annotation-only entry, and modelled members for two fixtures that had named a member since SPRINT-055 without supplying one) · `TECH-DEBT.md` (TD-146 · TD-147 · TD-148)
 Depends-on: none
-Cites: TD-144 · ADR-041 · L-186 · L-166
+Cites: TD-144 · ADR-041 · L-186 · L-166 · `SPRINT-001-ship-and-validate.md` (the colliding LOCAL sprint DoD 1 names — read, never written; declared 2026-09-11)
 **Tier G** (ADR-029) — a checker reporting a false `close_commit` mismatch on a correct artifact
 teaches its reader to disregard the leg, which is how a true finding gets skipped later.
 `member_plan()` resolves a member sprint number by globbing `docs/sprint/archive/SPRINT-<num>-*.md`
