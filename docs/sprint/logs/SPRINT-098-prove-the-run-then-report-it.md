@@ -293,3 +293,37 @@ editing a criterion to match what was built is the failure this repository names
 scope-change it permits.
 
 Final state: **T1 8 of 8, sprint 8 of 27 task DoD + 1 owner-action open.**
+
+### 2026-09-11 | surprise | T2's ceiling guard reads a line nothing emits — and its own doc claims otherwise
+
+Coordinator verification of T2, before dispatching its outside review. The wiring is real:
+`check_revise_ceiling()` is called from `reap()` at line 260, ranked directly under the exit-code arm
+and above `stalled`/`parked`/`exhausted`, so a breach forces `HARD_FAILURE` instead of a silent
+`PLAN_EXHAUSTED`. The motivating artifact checks out — `SPRINT-067`'s log carries two real
+`Tn · retry ·` lines, one per task, each within ceiling, and the checker PASSes it. Run across the
+whole archived population: **51 logs examined, 0 failing**, no false positive anywhere.
+
+**But only 2 of those 51 logs carry a retry line at all** (`SPRINT-066`, `SPRINT-067`), and an emitter
+search explains why. `reap()` mechanically writes `run ·`, `terminal ·` and `Tn · unattempted ·`. It
+does **not** write `Tn · retry ·`. Nothing in `scripts/`, `skills/` or `evals/` writes it. The line
+exists only as an instruction in `night-run.md`: *"A revise-loop retry (ADR-022) adds one line per
+firing beneath its task's state line."* The writer is the model.
+
+**So the guard cannot distinguish "no retries fired" from "retries fired and never logged."** Both
+present as zero `Tn · retry ·` lines in the window, and both return
+`PASS revise-loop-ceiling: within ADR-022 § Decision item 2`. A run that fired three retries and logged
+none passes the ceiling check — the silent false negative, in a Tier G guard, arriving through the same
+door T1 just closed one file over: **absence reads as compliance.** ADR-016 already names this exact
+risk in these exact words — *"a bookkeeping step nothing depends on is the first an agent drops"* — and
+the dropped bookkeeping here is the guard's only input.
+
+**The sharper half is that the documentation T2 added asserts the opposite.** `night-run.md` now reads
+**"The ceiling is not left to the writer's own bookkeeping"** — immediately above the passage
+establishing that the writer's bookkeeping is the only source. That sentence is false as written, and
+it is the kind of false that survives review because it describes an intention accurately.
+
+This is **L-166** (a guard keyed to a shape the system does not reliably emit) and **L-174** (a
+validated field whose emitter has no cases) meeting in one change. Not filed as debt yet and not
+repaired unilaterally: it goes to T2's outside review as its primary aim, because the coordinator
+found it by asking a population question and an independent reader may well find the design answer.
+Recorded now so the finding is not discovered twice.

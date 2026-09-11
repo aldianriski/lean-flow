@@ -681,6 +681,14 @@ distinguish both from `unattempted`: those two were *reached*, this one never wa
 A `still-open` outcome parks the task (`parked-hitl`, the finding named); the states above are
 unchanged — the retry line is supplementary, never a new task state.
 
+**The ceiling is not left to the writer's own bookkeeping.** The reaper (§ The reaper, above) reads
+these same lines back at exit — `check_revise_ceiling()` in `scripts/night-run.sh`, called from
+`reap()` before `terminal ·` is derived — and FAILs the run named if a task carries more than one
+`retry` line in this run's window (`revise-loop-ceiling-exceeded`) or a `still-open` outcome has no
+matching `Tn · parked-hitl ·` line (`revise-loop-escalation-missing`): a second firing, or a
+still-open that never escalates, becomes `HARD_FAILURE`, never a silent `PLAN_EXHAUSTED`. The ceiling
+itself is ADR-022 § Decision item 2, read from there and never re-chosen.
+
 **A system-verify pass (dispatch.md § System verify) adds one line, once, after the final wave's
 merge-back** — supplementary to the header count above, never a new task state, same as the retry
 line:

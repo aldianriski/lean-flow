@@ -56,6 +56,11 @@ revise message**, takes the revised diff, and re-runs the same scoped reviewer o
 
 - **Ceiling: one retry per review pass, total.** Both findings travel together; there is never a second
   retry. Whatever the re-review still flags goes to the owner as `still-open` — the loop cannot spiral.
+  **Unattended, this is not only stated here** — `scripts/night-run.sh`'s reaper (`check_revise_ceiling`,
+  called from `reap()`) reads the run's own `Tn · retry ·` lines off the Execution Log at exit and FAILs
+  the run's `terminal ·` state named (`revise-loop-ceiling-exceeded` / `revise-loop-escalation-missing`)
+  if a task fired more than one retry, or a `still-open` outcome never escalated to `parked-hitl` — the
+  ceiling is ADR-022 § Decision item 2, read from there and never re-chosen (A4).
 - **Fires automatically in attended modes** (`quick` · `mvp` · `sprint-bulk` with a human present). The
   review report surfaces `finding → retry → outcome` per axis before anything commits — the human gates
   the commit, not each firing. A suggestion-only pass (no concrete violation) skips the retry and reports

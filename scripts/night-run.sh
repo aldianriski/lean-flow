@@ -101,6 +101,61 @@ find_sprint() {
   return 0
 }
 
+# --- revise-loop ceiling guard (T2, SPRINT-098 -- EPIC-015 Closed-when 5) --------------------------
+# ADR-022 § Decision item 2 (cited, never re-chosen -- A4): "The ceiling is the attended one --
+# one retry per review pass, total. Still-open after the retry -> parked-hitl, never a second
+# firing." This is the mechanical proof that a run's own Execution Log never crosses that ceiling,
+# and that a still-open outcome actually escalated (parked-hitl) rather than the run continuing
+# past it -- called from `reap()` below so the check lives where the run's own terminal state is
+# derived (DoD 1: wired where the run reads it, not only described in review-scoping.md § The
+# revise loop), and exposed as its own CLI entry (`--check-revise-loop`) so a fixture can assert
+# on it directly, the same way `--reap` lets a fixture drive the rollup in isolation.
+#
+# Reads the two line shapes the reaper below already parses: a `Tn · retry · <axis>: <finding> ->
+# fixed|still-open` line (night-run.md Part 4) and a task's own `Tn · <state> ·` line. Two named
+# findings, so a fixture asserts on which rule fired, never on a bare non-zero exit:
+#   revise-loop-ceiling-exceeded   -- a task fired more than one retry in this run's window
+#   revise-loop-escalation-missing -- a still-open retry with no matching parked-hitl line
+#
+# `base` is the SAME 0-indexed "lines already in the file before this run" cutoff `reap()`'s
+# rp_base uses (default 0, i.e. the whole file) -- an EARLIER run's retry line for the same task
+# number must NOT count against THIS run's ceiling, which is the selection this guard has to get
+# right independently of the count math (L-186): two `T3 · retry ·` lines in the file, one before
+# the cutoff and one after, is a compliant run, not a breach.
+check_revise_ceiling() {
+  crc_logdoc=$1
+  crc_base=${2:-0}
+  if [ ! -f "$crc_logdoc" ]; then
+    printf 'FAIL  revise-loop-ceiling-unreadable: %s not found\n' "$crc_logdoc"
+    return 1
+  fi
+
+  crc_window=$(tail -n "+$((crc_base + 1))" "$crc_logdoc" 2>/dev/null)
+  crc_fail=0
+
+  crc_tasks=$(printf '%s\n' "$crc_window" | grep -E '^T[0-9]+ · retry · ' | sed -E 's/^(T[0-9]+) .*/\1/' | sort -u)
+  for crc_t in $crc_tasks; do
+    crc_n=$(printf '%s\n' "$crc_window" | grep -cE "^${crc_t} · retry · ")
+    if [ "$crc_n" -gt 1 ]; then
+      printf 'FAIL  revise-loop-ceiling-exceeded: %s fired %s retries in one review pass -- ADR-022 § Decision item 2 permits one retry per review pass, total\n' "$crc_t" "$crc_n"
+      crc_fail=1
+    fi
+
+    # A still-open outcome must escalate (parked-hitl), never fall through to `done` or to
+    # silence -- a second firing by a different route, since the ceiling exists precisely so a
+    # still-open finding stops the loop rather than being absorbed into a clean-looking state.
+    if printf '%s\n' "$crc_window" | grep -qE "^${crc_t} · retry · .*still-open"; then
+      printf '%s\n' "$crc_window" | grep -qE "^${crc_t} · parked-hitl · " || {
+        printf 'FAIL  revise-loop-escalation-missing: %s retry ended still-open with no %s · parked-hitl · line -- ADR-022 requires a second failure to escalate, never loop\n' "$crc_t" "$crc_t"
+        crc_fail=1
+      }
+    fi
+  done
+
+  [ "$crc_fail" -eq 0 ] && printf 'PASS  revise-loop-ceiling: within ADR-022 § Decision item 2 (one retry per review pass, total)\n'
+  return $crc_fail
+}
+
 reap() {
   # 5th positional: the sprint Plan path RESOLVED BY THE LAUNCHER before firing (declared, not
   # re-inferred here) -- see `--sprint` below and the `resolved_sprint` computation near the fire
@@ -199,12 +254,25 @@ reap() {
   case "$rp_parked" in ''|*[!0-9]*) rp_parked=0 ;; esac
   rp_hard=$(tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | grep -cE '^T[0-9]+ · (stalled|denied-tool) · ')
   case "$rp_hard" in ''|*[!0-9]*) rp_hard=0 ;; esac
+
+  # T2 (SPRINT-098): the revise-loop ceiling, checked against what the run actually wrote --
+  # see check_revise_ceiling() above for the two named findings it can return.
+  rp_ceiling_out=$(check_revise_ceiling "$rp_logdoc" "$rp_base")
+  rp_ceiling_rc=$?
+  rp_ceiling_reason=$(printf '%s\n' "$rp_ceiling_out" | grep '^FAIL' | head -n1)
+
   case "$rp_ec" in
     ''|0) rp_term_ok=1 ;;
     *)    rp_term_ok=0 ;;
   esac
   if [ "$rp_term_ok" -eq 0 ]; then
     rp_term="HARD_FAILURE"; rp_term_why="wrapped process exited with status $rp_ec"
+  elif [ "$rp_ceiling_rc" -ne 0 ]; then
+    # Ranked above stalled/denied-tool/parked/exhausted: a breach means the run did something
+    # Part 0 never authorised (a second firing, or a still-open that never escalated) -- its
+    # own named reason, not folded into rp_hard's bare count (DoD 3: the run does not report a
+    # clean completion past this).
+    rp_term="HARD_FAILURE"; rp_term_why="$rp_ceiling_reason"
   elif [ "$rp_hard" -gt 0 ]; then
     rp_term="HARD_FAILURE"; rp_term_why="$rp_hard task(s) stalled or denied a tool — the run could not proceed past a step"
   elif [ "$rp_unatt" -gt 0 ]; then
@@ -244,6 +312,16 @@ reap() {
 if [ "${1:-}" = "--reap" ]; then
   reap "${2:-}" "${3:-}" "${4:-}" "${5:-0}" "${6:-}"
   exit 0
+fi
+
+# Standalone entry for the T2 revise-loop ceiling guard, so a fixture can drive it in
+# isolation -- the same reason `--reap` above exists as its own re-entry point.
+#   sh night-run.sh --check-revise-loop <logdoc> [base]
+if [ "${1:-}" = "--check-revise-loop" ]; then
+  crc_msg=$(check_revise_ceiling "${2:-}" "${3:-0}")
+  crc_rc=$?
+  printf '%s\n' "$crc_msg"
+  exit $crc_rc
 fi
 
 die_doa() {

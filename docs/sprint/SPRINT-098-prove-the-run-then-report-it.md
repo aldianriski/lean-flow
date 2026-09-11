@@ -72,7 +72,7 @@ state FAILs with its named finding, while an attended sprint carrying one PASSes
 - [x] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168), after the author has enumerated every call site touched and seeded a break in each fix (L-193). — ✓ NOT clear: two findings, both reproduced independently. Finding 2 (the harness drift guard could not fire) fixed at `b6299f5`; Finding 1 filed as `TD-151`
 
 ### T2 — Run bounded unattended repair on one J1 finding `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `skills/orchestrator/references/review-scoping.md` (§ The revise loop) · `skills/orchestrator/references/night-run.md` · `scripts/night-run.sh`
+Layers: `skills/orchestrator/references/review-scoping.md` (§ The revise loop) · `skills/orchestrator/references/night-run.md` · `scripts/night-run.sh` · `evals/fixtures/revise-loop-ceiling/` + its harness *(added at execution — DoD 4/5 require RETAINED fixtures (TD-012) and the promoted declaration named no fixtures path; no other task owns it. L-100)*
 Depends-on: T1 — **D1** (shared `scripts/night-run.sh`)
 Cites: EPIC-015 § Closed-when 5 · ADR-022 · ADR-029 · V3 H31
 **Tier G** (ADR-029 · D4) — an unbounded loop and a silently-skipped repair both end in a green run, and
