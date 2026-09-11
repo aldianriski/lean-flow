@@ -457,7 +457,7 @@ block — and it does not cover a **hand-written `run-complete` entry**, which b
 and can carry an example *before* its real evidence. Reproduced:
 
 ```
-### 2026-09-11 | run-complete | a hand-written entry documenting the format
+  (illustrative, indented so it cannot arm the checker) ### DATE | run-complete | a hand-written entry documenting the format
   ```  outcome · DELIVERED …   /   run · 9 of 9 DoD ticked  ```   <- the EXAMPLE
   ```  run · 1 of 5 DoD ticked / outcome · DELIVERED …      ```   <- what the run DID
 → PASS

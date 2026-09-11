@@ -170,7 +170,7 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   filer's hypothesis, written while the cost was being felt (L-091).
       tracker:    TD-143 (severity: high, open — its `→ TASK-334` pointer is spent: 334 shipped as
                   SPRINT-097 T4 and was pruned at that close) · TD-090 · TD-117 · L-120
-      origin:     triage
+      origin:     manual   # filed by hand at the SPRINT-098 promote governance review (severity: high escalation)
       state:      ready
 
 - [ ] TASK-345 — Give `workdoo` the pinned-plugin mechanism ADR-041 already rules it has  [size: M] [risk: med] [HITL]
@@ -189,7 +189,7 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   repository owes anything beyond the ruling — a *check* for the pin would be
                   lean-flow's, and `check-skill-freshness` is the shape one level over.
       tracker:    TD-150 (severity: high, open) · ADR-041 · L-020 · L-151
-      origin:     triage
+      origin:     manual   # filed by hand at the SPRINT-098 promote governance review (severity: high escalation)
       state:      ready
 
 ### P2 — Follow-on

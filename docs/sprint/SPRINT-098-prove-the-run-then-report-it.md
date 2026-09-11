@@ -50,7 +50,7 @@ update_trigger: sprint execute/close events
 ## Plan
 
 ### T1 — Make the run rollup unconditional, and lift the continuation contract out of a paragraph `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-night-run-rollup.sh` · `scripts/night-run.sh` (the reap gate) · `skills/orchestrator/SKILL.md` (step 4) · `evals/fixtures/` + its harness
+Layers: `scripts/lib/check-night-run-rollup.sh` · `scripts/night-run.sh` (the reap gate) · `skills/orchestrator/SKILL.md` (step 4) · `evals/fixtures/` + its harness · `scripts/qa-check.sh` (leg 2g) *(added at execution — T1 edited it; the promoted declaration named only the checker. L-100)*
 Depends-on: none
 Cites: L-192 · L-166 · ADR-016 · ADR-021 · ADR-029
 **Tier G** (ADR-029) — the false negative is silent by construction: a run that ends mid-Plan and emits
@@ -90,7 +90,7 @@ ADR-022 admits; a second failure escalates instead of looping.
 - [x] **Outside reviewer, dispatched worktree-isolated** (L-165 · L-168). — ✓ NOT clear: ruled the emitter gap inherent (b) → `TD-152`, and found a NEW L-108 false positive plus a fail-open input. Both reproduced and fixed here, both now retained fixtures
 
 ### T3 — Emit a typed run outcome with the evidence behind it `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `skills/orchestrator/references/night-run.md` · `scripts/night-run.sh` · `skills/lean-doc-generator/templates/sprint-log.md.template` *(corrected at G2 — there is no root `templates/`; L-100)*
+Layers: `skills/orchestrator/references/night-run.md` · `scripts/night-run.sh` · `skills/lean-doc-generator/templates/sprint-log.md.template` *(corrected at G2 — there is no root `templates/`; L-100)* · `scripts/lib/check-night-run-rollup.sh` *(added at execution — T3 extended it with the outcome/DoD rule; it is T1's file, committed at `804e92a` with no WIP, so no L-042 hazard. L-100)*
 Depends-on: T1 · T2 — **D1** · **D2** (both shared files)
 Cites: EPIC-015 § Closed-when 6 · EPIC-008 · ADR-016 · ADR-029 · V3 H37
 **Tier G** (ADR-029 · D4). The outcome is a function of the terminal state SPRINT-088 shipped; what is
@@ -111,7 +111,7 @@ attempted/completed, parks, repair cycles, verification state, warnings and term
 ### T4 — Prove § Closed-when 1 with a real unattended run against the repaired reaper `[size: M · risk: high · class: execution · HITL · J2]`
 Layers: `docs/sprint/` (a seeded Plan a run is permitted to execute) · `scripts/night-run.sh` (**read, not modified** — **D1**)
 Depends-on: T1 — and **not** T2/T3 (**D3**)
-Cites: EPIC-015 § Closed-when 1 · TD-112 · TD-110 · L-179 · L-007 · L-166
+Cites: EPIC-015 § Closed-when 1 · TD-112 · TD-110 · L-179 · L-007 · L-166 · `scripts/lib/check-night-run-rollup.sh` (its DoD's `Verify:` runs this; **read, never modified** — cited, not a Layer)
 SPRINT-093 closed the guard gap and proved each half separately, which is not the same claim as *"a run
 ends only at one of five named states."* The two defects it repaired — the reap gate that ignored the
 canonical mode name (T3) and the window/agreement matrix (T1) — have never been observed together in one

@@ -35,6 +35,20 @@ status: current
 
 ## Tech Debt
 
+> **Aging sweep — SPRINT-098 promote (2026-09-11).** **72 of 84 open rows** are ≥3 sprints unaddressed
+> (72 aged + 12 unaged = 84, reconciled against the row-header count). Derived at this promote, never
+> read from a previous sweep — the figure moves with every close (L-097 · L-130). Written here rather
+> than only in the promote checklist because `check-td-aging` reads **this file**: the SPRINT-098 gate
+> FAILed `td-row-aged-unreviewed` on TD-138/139/140 while the governance review had correctly
+> reported "72 of 81 aged" in its own checklist — the review named the number and the ledger named
+> nobody, which is L-151 in miniature (a finding recorded where its reader cannot reach it).
+>
+> Aged, oldest first: TD-138 (3) · TD-139 (3) · TD-140 (3) · TD-137 (4) · TD-117 (7) · TD-126 (6) · TD-127 (6) · TD-134 (4) · TD-135 (4) · TD-136 (4) · TD-133 (4) · TD-130 (4) · TD-131 (4) · TD-129 (4) · TD-128 (6) · TD-125 (5) · TD-124 (5) · TD-122 (6) · TD-121 (6) · TD-120 (7) · TD-119 (7) · TD-118 (7) · TD-115 (7) · TD-116 (7) · TD-114 (7) · TD-106 (10) · TD-108 (10) · TD-107 (10) · TD-105 (11) · TD-104 (11) · TD-103 (11) · TD-102 (11) · TD-100 (11) · TD-099 (11) · TD-098 (11) · TD-097 (11) · TD-096 (11) · TD-095 (12) · TD-093 (13) · TD-094 (13) · TD-086 (14) · TD-087 (14) · TD-088 (14) · TD-089 (14) · TD-090 (14) · TD-083 (15) · TD-082 (15) · TD-081 (16) · TD-080 (17) · TD-078 (17) · TD-076 (18) · TD-075 (18) · TD-074 (19) · TD-067 (22) · TD-068 (22) · TD-069 (21) · TD-071 (20) · TD-072 (20) · TD-070 (21) · TD-066 (23) · TD-063 (24) · TD-062 (25) · TD-061 (26) · TD-060 (27) · TD-059 (28) · TD-053 (35) · TD-052 (36) · TD-051 (37) · TD-050 (38) · TD-049 (39) · TD-047 (41) · TD-045 (42)
+>
+> **Nothing is escalated by age alone.** The `severity: high` rows are what the rule escalates, and all
+> five are already routed: TD-090 · TD-117 · TD-128 → `TASK-329`; TD-143 → `TASK-344`; TD-150 →
+> `TASK-345` (the last two filed at this promote). The remaining 67 are re-review prompts, not work.
+
 > **Aging sweep — SPRINT-078 promote (2026-08-21).** **14 of 19 open rows** are ≥3 sprints unaddressed:
 > TD-065 (3) · TD-066 (3) · TD-063 (4) · TD-062 (5) · TD-061 (6) · TD-060 (7) · TD-059 (8) ·
 > TD-053 (15) · TD-052 (16) · TD-051 (17) · TD-050 (18) · TD-049 (19) · TD-047 (21) · TD-045 (22).
