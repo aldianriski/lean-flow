@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-10
+last_updated: 2026-09-11
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---

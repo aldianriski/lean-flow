@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-09
+last_updated: 2026-09-11
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,57 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+## v1.63.1 — Guards That Run Over the Wrong Set (2026-09-11)
+
+**PATCH — `SPRINT-097`, fixes only.** Five checkers gated this repository and each one's *detection
+logic* was sound while the *set it ran over* was not. Nothing here adds a capability; `qa-verdict.ts`
+is new as a file but exists to make an existing gate report its own failure honestly.
+
+**Fixed — the epic-state checker resolved other repositories' member sprints against this one.**
+`EPIC-016`'s member sprints live in `workdoo` (ADR-041) and are declared
+`member_sprints: [workdoo SPRINT-001 (closed), …]`. Every parse split that field on whitespace as
+well as commas, severing `workdoo` from the id it qualifies — so `001` resolved against lean-flow's
+**own** SPRINT-001 and reported two `close_commit` mismatches on a correct artifact. One
+`_member_entries` extractor now splits on commas first, so the qualifier is still attached when the
+id is read. A member that lives elsewhere is **named by a non-gating `NOTE`**, never silently
+skipped, because silence is an unchecked row — the failure one level down from the false positive
+(**TD-144**).
+
+**Fixed — a gate run that dies mid-flight no longer reads as zero failures.** `scripts/qa-verdict.ts`
+wraps `qa-check.sh` and judges the **printed** `QA-CHECK: N pass, M fail` line rather than the
+child's exit code; `package.json`'s `gate` and `test` — its only real callers — now run through it. A
+verdict-less run is reported as a failure instead of leaving the caller to infer from "0 FAILs so
+far" (**TD-143** · L-120).
+
+**Fixed — two `Layers:` parsers disagreed while both comments claimed parity.** Both checkers now
+read one extractor, under a counted ruling on backticks (**TD-142**).
+
+**Ruled — a five-defect cluster deferred at three promotes.** TD-086 · 087 · 089 · 097 · 105 are
+**four tasks grouped by artifact**, with a loser named on both sides: the one-task side loses on size
+and on mis-tiering, the five-task side on the cluster's own founding evidence (TD-087 and TD-097 are
+the same script, filed three sprints apart with neither row aware of the other).
+
+**Also fixed:** `unknown_members()` had **zero callers in the entire repository** while its own header
+declared that unknown members are *"NAMED on the report … never silently skipped"* — for five sprints
+the file documented a reporting behaviour it did not have. Success lines no longer claim *"every
+member sprint closed"* for an epic whose members could not be resolved. Two eval fixtures had named a
+member sprint since SPRINT-055 without ever modelling one, so both were exercising §11's member half
+against a member the checker could not read.
+
+**Test coverage: 17 → 38 cases**, all retained. Five of the new ones vary the **selection** rather
+than the verdict — the axis a guard's fixtures cannot see, and the one the original seventeen held
+constant by accident (they all wrote `[SPRINT-NNN]`, one of three id shapes the tree actually uses).
+Four more axes surfaced the same way across five independent review rounds: epic file depth,
+all-local-or-all-foreign member lists, member order, and the `END{}` flush arm that **all sixteen**
+real epics depend on because `## Closed when` is the final section of every one.
+
+**Known-open, deliberately:** seven residual findings in **TD-148**, stopped at a recorded acceptance
+boundary rather than a blanket CLEAR. The conformance engine's informational findings still print the
+same `FAIL ` prefix as gating ones, so the verdict line and the visible FAIL lines disagree with
+nothing marking which is which (**TD-146** · `TASK-343`) — the engine being informational is
+deliberate and correct; only the report is ambiguous.
 
 ---
 ## v1.63.0 — Guards That Answer for Themselves (2026-09-09)

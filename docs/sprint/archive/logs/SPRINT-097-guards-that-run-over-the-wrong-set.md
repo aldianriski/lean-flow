@@ -2,7 +2,7 @@
 sprint: 097
 slug: guards-that-run-over-the-wrong-set
 owner: Maintainer
-last_updated: 2026-09-10
+last_updated: 2026-09-11
 status: active
 update_trigger: an Execution Log entry is appended
 ---
