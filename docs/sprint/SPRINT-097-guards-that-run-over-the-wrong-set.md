@@ -2,11 +2,11 @@
 sprint: 097
 slug: guards-that-run-over-the-wrong-set
 owner: Maintainer
-last_updated: 2026-09-10
-status: active
+last_updated: 2026-09-11
+status: closed
 plan_commit: 2789dbd
 gates_signed: G1,G2 @ d9f6c3c
-close_commit: [sha — set at close]
+close_commit: f51b7e8
 update_trigger: sprint execute/close events
 ---
 
@@ -188,7 +188,56 @@ live in this repository still produces them.
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (STANDARD §10):
-     shipped → CHANGELOG.md · tech debt → TD-NNN · follow-ups → TASK-NNN · learnings → docs/LEARNINGS.md.
-     After close, this file moves → docs/sprint/archive/ and its log → docs/sprint/archive/logs/ in the
-     same commit, plus a one-line entry in docs/sprint/INDEX.md (§11). -->
+**Shipped.** Five checkers were failing on the *set* they ran over rather than their logic. T1 ruled
+the five-defect cluster into four tasks grouped by artifact, naming a loser on the side taken. T2
+closed as already-satisfied — TD-132 had been fixed in code at SPRINT-095 and every DoD line was
+re-derived at the gate rather than inherited. T3 gave both `Layers:` checkers one extractor under a
+counted ruling on backticks. T4 made a verdict-less `qa-check.sh` run report as a failure instead of
+as zero failures, via `scripts/qa-verdict.ts`, which judges the **printed** verdict line rather than
+the child's exit code. T5 scoped the epic-state member set to sprints this repository owns.
+
+**The sprint's own theme caught it four more times.** L-186 says a guard's detection logic can be
+sound while the member set it runs over is not, and that the set is the one property with no reader.
+T5's fixtures held four properties constant that nobody chose: **id shape** (all 17 original fixtures
+wrote `[SPRINT-NNN]` while the tree has always used three shapes) · **epic file depth** (no
+archived-epic fixture carried a `§ Member sprints` table at all, while the real archived corpus links
+two levels up) · **all-local-or-all-foreign** · **member order**. A fifth arrived at the end: the
+`END{}` flush arm, which no fixture entered and which **all sixteen real epics** depend on, because
+`## Closed when` is the final section of every one of them. Each was invisible to the round before
+it, because each round's new fixtures are what make the next axis visible.
+
+**What it cost, and how much of that was avoidable.** T5 ran five worktree-isolated review rounds;
+the first four returned NOT CLEAR. Half the findings were the L-186 class above — the class this
+repository mandates outside review for, and L-165 held five times out of five. The other half were
+author-side and mechanically findable: a change applied to two of three call sites (twice), and a fix
+shipped with no case that would redden if removed (three times, including the repair for a CRITICAL,
+which left the whole suite green whether applied or not). The evidence that this is fixable: the
+round run *after* a call-site enumeration and a per-fix seed came back **CLEAR first time**, on a
+delta that closed three MAJORs. → **L-193**.
+
+**Two defects were introduced by the repairs themselves.** Round 2's `unparsed` branch reintroduced
+an awk-abort that the task's own first commit had incidentally cured — a real drift going unreported
+at exit 0 — and round 3's narrowing left a `bad` that fired on EPIC-016 itself, the artifact TD-144
+was filed for. Worse, the fixture round 3 added asserted that defective sentence, so the suite would
+have defended it against the next correction. Dating each finding across the **task's own commits**
+is what separated "predates this work" from "my last round put it back". → **L-194**.
+
+**Stopped at an acceptance boundary, not at a blanket CLEAR.** Ruled by the owner after a second
+opinion: the original defect demonstrably fixed, the promised cases working, no introduced
+regression, independently verified. The final review was scoped to the repair delta with the deferred
+findings listed as out of scope, and returned CLEAR. Seven residual findings are in **TD-148** rather
+than in a review transcript (L-151).
+
+**Assumptions.** A1 held (all five rows live, though TD-086's Evidence had two stale clauses,
+corrected on the row). A2 held. A3 was corrected at promote — there is no `member_plan()`; resolution
+lived in two helpers across four globs. **A4 cannot be reconciled as written**: it asked to reconcile
+the FAIL count against 33, but 33 was the promote's *verdict* figure and was never comparable to a
+FAIL-line count. The promote note itself read `225 pass, 33 fail` against 82 FAIL lines as "33 of the
+82" — a subset rather than a different population. → **TD-146** · **TASK-343**.
+
+**Gate.** Ran to completion on this host and verdicted every time, ending **`QA-CHECK: 230 pass,
+0 fail`** — which retires the standing Backlog note claiming it cannot verdict here. Four `FAIL`
+lines remain visible and are all conformance-engine informational findings, deliberately non-gating.
+
+**Routed:** shipped → `CHANGELOG.md` (via `/release-patch`, PATCH — fixes only) · tech debt →
+**TD-146** · **TD-147** · **TD-148** · follow-ups → **TASK-343** · learnings → **L-193** · **L-194**.

@@ -16,10 +16,7 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-097 — Guards That Run Over the Wrong Set** →
-> [`docs/sprint/SPRINT-097-guards-that-run-over-the-wrong-set.md`](docs/sprint/SPRINT-097-guards-that-run-over-the-wrong-set.md)
-> — promoted 2026-09-10, five tasks, 30 DoD. **`gates_signed:` is absent, which means NOT signed:**
-> G1+G2 are unsigned until the owner records them in the sprint frontmatter (L-099).
+> _(none — SPRINT-097 closed 2026-09-11, 32 of 32 DoD. Next: `/lean-doc-generator promote`.)_
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
@@ -29,12 +26,15 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
   **by anchoring to the `^- **TD-NNN**` row header** — a bare `grep 'status: open'` over-counts,
   because rows quote their own status strings in prose (L-108). Aging figures are derived at each
   promote, never read from here (L-097 · L-130).
-- **The gate cannot currently verdict on this host.** SPRINT-096 closed under a recorded ADR-021
-  override after a memory kill produced 147 lines and no `QA-CHECK:` line. `qa-budget-default`
-  compares the *configured* budget to the ceiling rather than actual runtime (**TD-128**) and passes
-  even when the gate dies (**TD-143**); `QA_BUDGET_SECONDS` stays at 520 because the reduction TD-117
-  anticipated has no clean whole-gate sample behind it. Assume a close needs targeted evidence until
-  SPRINT-097 T4 lands.
+- **The gate DOES verdict on this host** — corrected at the SPRINT-097 close, where it ran to
+  completion four times and printed a verdict every time, ending `QA-CHECK: 230 pass, 0 fail`. The
+  previous note here ("cannot currently verdict") was written after SPRINT-096's memory kill and was
+  stale; it is replaced rather than annotated, because a standing fact that is false is worse than
+  absent. `qa-budget-default` still compares the *configured* budget to the ceiling rather than
+  actual runtime (**TD-128**), and `QA_BUDGET_SECONDS` stays at 520. **What a close must not do is
+  read the FAIL-line count as the verdict:** the run above printed `0 fail` over **4** `FAIL` lines,
+  all from the conformance engine, which leg 2f-ter keeps deliberately informational (**TD-146**).
+  The number to act on is the one the gate prints (L-120).
 - **Backlog ranking** is `/triage`'s output, not this block's: tiers P0–P3 below are the record.
 
 ---
@@ -353,6 +353,29 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       origin:     close-retro (SPRINT-097 T1 ruling, 2026-09-10)
       state:      ready
 ### P2 — Follow-on
+
+- [ ] TASK-343 — Give the conformance engine's informational findings their own token  [size: S] [risk: low] [AFK]
+      class:      execution
+      authority:  J1
+      done-when:  a reader of `qa-check.sh`'s output can tell which `FAIL` lines the verdict counts
+                  and which it does not, without reading `qa-check.sh`. Today the engine's
+                  informational findings print the same `FAIL ` prefix as gating ones, so the printed
+                  verdict and the visible FAIL lines disagree with nothing marking the difference —
+                  `QA-CHECK: 230 pass, 0 fail` over 4 FAIL lines at the SPRINT-097 close. The
+                  informational design itself is correct and stays (leg 2f-ter: 27 of 43 dispositions
+                  are unbuilt, and gating on them would hold the gate permanently red over tracked
+                  coverage gaps) — this changes the REPORT, never the policy.
+      touches:    `scripts/qa-check.sh` (leg 2f-ter relay) · `scripts/lib/conformance-engine.sh`
+      depends-on: none
+      assumes:    none — both readings are already known to occur, see tracker
+      tracker:    TD-146 — and the misread is already recorded twice: this file's own SPRINT-097
+                  promote note read `225 pass, 33 fail` against 82 FAIL lines as "33 of the 82", a
+                  subset rather than a different population; and A4's reconciliation was built on
+                  that number, which is why A4 cannot be reconciled as written. L-120 instructs
+                  readers to trust the printed verdict and T4 shipped `qa-verdict.ts` to enforce it,
+                  so the ambiguity now sits under a rule the repo actively relies on.
+      origin:     close-retro
+      state:      ready
 
 - [ ] TASK-320 — Give the launcher a fire-time run ledger, closing TD-122 and TD-124 together  [size: M] [risk: med] [HITL]
       class:      execution
