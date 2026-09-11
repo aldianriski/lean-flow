@@ -28,6 +28,11 @@ root=${1:?usage: check-epic-archive.sh <repo-root>}
 fail=0
 ok()   { printf 'PASS  %s\n' "$1"; }
 bad()  { fail=1; printf 'FAIL  %s\n' "$1"; }
+# A member this checker cannot resolve against THIS repository. Named on the report and does not
+# gate -- the stance _members_scan's header already declared for the `unknown` state and which
+# nothing had ever emitted (see § member entries below). Silence here is an unchecked row, which is
+# the failure one level down from the false positive (TD-144, SPRINT-097 T5 owner ruling).
+note() { printf 'NOTE  %s\n' "$1"; }
 
 # Frontmatter value for <key>, first block only.
 fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
@@ -65,16 +70,59 @@ total_conditions() {
 # A member is closed if its Plan is under docs/sprint/archive/, or its live Plan says status: closed.
 # A member with no Plan at all counts as NOT closed: an id naming nothing is a fact we cannot verify,
 # and defaulting it to closed would let a typo authorise an archive.
+# --- § member entries: the ONE extractor every member-resolving leg reads ------------------------
+#
+# THREE ID FORMATS ARE IN USE and all three are legitimate: EPIC-001/002 write full ids
+# (`[SPRINT-025, SPRINT-026]`), EPIC-004 writes bare numbers (`[072, 073]`), and EPIC-016 writes
+# REPO-QUALIFIED ids (`[workdoo SPRINT-001 (closed), workdoo SPRINT-002 (active)]`) because its
+# member sprints live in another repository entirely (ADR-041).
+#
+# Every previous parse split the field on whitespace as well as commas, which severs a qualifier
+# from the id it qualifies: `workdoo SPRINT-001 (closed)` became the four independent tokens
+# `workdoo` `001` `(closed)`. `workdoo` and `(closed)` globbed nothing and vanished silently, and
+# `001` then resolved against THIS repository's own SPRINT-001 -- so EPIC-016's rows were validated
+# against a lean-flow sprint that has nothing to do with them and reported a close_commit mismatch
+# on a correct artifact (TD-144). The epic file's own comment anticipated the checker being BLIND to
+# workdoo; nobody anticipated it would COLLIDE with same-numbered local sprints.
+#
+# Splitting on commas FIRST keeps each entry whole, so the qualifier is still attached when the id
+# is read. Emits one "<scope> <num>" line per entry -- scope is `local`, or the qualifier for a
+# member that lives in another repository. An entry naming no number at all is skipped, exactly as
+# before: no artifact in this tree emits that shape, and a branch for one would be a guard whose
+# motivating case does not exist (L-166).
+_member_entries() {
+  awk '
+    /^member_sprints:/ {
+      sub(/^member_sprints:[[:space:]]*/, ""); gsub(/[][]/, "")
+      n = split($0, e, ",")
+      for (i = 1; i <= n; i++) {
+        entry = e[i]
+        gsub(/\([^)]*\)/, "", entry)                 # drop (closed)/(active) state annotations
+        gsub(/^[ \t]+|[ \t]+$/, "", entry)
+        if (entry == "") continue
+        m = split(entry, t, /[ \t]+/); num = ""; qual = ""
+        for (j = 1; j <= m; j++) {
+          tok = t[j]; sub(/^[Ss][Pp][Rr][Ii][Nn][Tt]-/, "", tok)
+          if (tok ~ /^[0-9]+$/) { num = tok; break }
+          qual = (qual == "" ? tok : qual "-" tok)
+        }
+        if (num != "") print (qual == "" ? "local" : qual) " " num
+      }
+      exit
+    }' "$1"
+}
+
+# Members living in another repository: "<qualifier> SPRINT-<num>" per line.
+foreign_members() { _member_entries "$1" | awk '$1 != "local" { printf "%s SPRINT-%s\n", $1, $2 }'; }
+
 _members_scan() {
-  _ms=$(awk '/^member_sprints:/ { sub(/^member_sprints:[[:space:]]*/, ""); gsub(/[][,]/, " "); print; exit }' "$1")
   _out=""
-  for _m in $_ms; do
+  while read -r _scope _m; do
     [ -n "$_m" ] || continue
-    # TWO ID FORMATS ARE IN USE and both are legitimate: EPIC-001/002 write full ids
-    # (`[SPRINT-025, SPRINT-026]`), EPIC-004 writes bare numbers (`[072, 073]`). Globbing the raw
-    # token built `SPRINT-SPRINT-025-*` for the first shape and reported three correctly archived
-    # epics as having open members. Normalise to the number, then glob once.
-    _m=${_m#SPRINT-}; _m=${_m#sprint-}
+    # A member in another repository is not resolvable against these globs at all. Excluding it
+    # here is the whole fix: it is NAMED by note() at the call sites instead, never silently
+    # dropped and never matched to a local sprint that merely shares its number.
+    [ "$_scope" = "local" ] || continue
     _found=0; _closed=0
     for _f in "$2"/docs/sprint/archive/SPRINT-"$_m"-*.md; do
       [ -f "$_f" ] && { _found=1; _closed=1; }
@@ -90,11 +138,38 @@ _members_scan() {
       open)    [ "$_found" -eq 1 ] && [ "$_closed" -eq 0 ] && _out="$_out $_m" ;;
       unknown) [ "$_found" -eq 0 ] && _out="$_out $_m" ;;
     esac
-  done
+    # Heredoc, never `echo |` -- a pipeline runs this loop in a subshell and `_out` would be built
+    # and discarded, leaving every scan empty. Same trap the epic-state loops carry below.
+  done <<MSEOF
+$(_member_entries "$1")
+MSEOF
   printf '%s' "${_out# }"
 }
 open_members()    { _members_scan "$1" "$2" open; }
 unknown_members() { _members_scan "$1" "$2" unknown; }
+
+# Name every member this checker could not resolve against THIS repository, once per epic.
+#
+# Two kinds, one stance. A FOREIGN member lives in another repository by design (EPIC-016 ->
+# workdoo, ADR-041); an UNKNOWN member is a local id naming no Plan anywhere, which `_members_scan`
+# has separated out since SPRINT-080 T4 with a header declaring it "NAMED on the report and does not
+# gate ... never silently skipped (L-058)" -- and which, until now, NOTHING CALLED. `unknown_members`
+# had zero callers in the entire repository, so for five sprints this file documented a reporting
+# behaviour it did not have: the stance was written, and the reader it was written for never saw a
+# line. Both kinds now print, and neither sets `fail` -- an unresolvable member is a fact about this
+# checker's reach, not a defect in the artifact it is reading.
+report_unresolvable() {
+  _ru_e=$1; _ru_root=$2; _ru_rel=$3
+  while read -r _ru_f; do
+    [ -n "$_ru_f" ] || continue
+    note "epic-state: $_ru_rel member $_ru_f lives outside this repository -- its rollup row cannot be verified here, and §11's archival trigger cannot be read for it. Keeping the row current is a manual obligation at that sprint's close (ADR-041)"
+  done <<FMEOF
+$(foreign_members "$_ru_e")
+FMEOF
+  for _ru_u in $(unknown_members "$_ru_e" "$_ru_root"); do
+    note "epic-state: $_ru_rel member SPRINT-$_ru_u names no Plan anywhere in this repository -- neither docs/sprint/ nor docs/sprint/archive/ has it, so its state is unread rather than passed"
+  done
+}
 checked=0
 
 # --- direction (a): epics already under archive/ must have earned it -----------------------------
@@ -116,6 +191,7 @@ for e in "$root"/docs/epic/archive/EPIC-*.md; do
   else
     ok "epic-archive: $rel archived correctly ($tot condition(s), all met, status closed, every member sprint closed)"
   fi
+  report_unresolvable "$e" "$root" "$rel"
 done
 
 # --- direction (b): live epics that already meet every condition must not linger -----------------
@@ -137,6 +213,10 @@ for e in "$root"/docs/epic/EPIC-*.md; do
   else
     ok "epic-archive: $rel correctly live (status '$st', $opn of $tot condition(s) open)"
   fi
+  # Emitted from (a) and (b) only, never from the epic-state loop below: (a) covers every archived
+  # epic and (b) every epic under docs/epic/, so the two together are the whole population, while
+  # the epic-state loop is a status-filtered SUBSET of (b) and would duplicate each active epic.
+  report_unresolvable "$e" "$root" "$rel"
 done
 
 # --- direction (c): an ACTIVE epic must not drift out of date with its own members ----------------
@@ -201,11 +281,15 @@ member_status_cell() {
 # for this one: two contradictory definitions in one file, and the disagreement made a stale header
 # and an unrolled member vacuously green. A half-completed close is exactly the drift this direction
 # exists to catch (T1 review, HIGH-2).
+#
+# Reads the SAME `_member_entries` extractor as `_members_scan`, and skips a foreign member for the
+# same reason: this function's entire output is "<num> <sha> read from a LOCAL sprint file", and for
+# a member that lives elsewhere every one of those values would belong to a different sprint that
+# merely shares a number. That is the mismatch TD-144 reported on EPIC-016.
 closed_members() {
-  _cm=$(awk '/^member_sprints:/ { sub(/^member_sprints:[[:space:]]*/, ""); gsub(/[][,]/, " "); print; exit }' "$1")
-  for _c in $_cm; do
+  while read -r _cscope _c; do
     [ -n "$_c" ] || continue
-    _c=${_c#SPRINT-}; _c=${_c#sprint-}
+    [ "$_cscope" = "local" ] || continue
     _cf=""; _arch=0
     for _p in "$2"/docs/sprint/archive/SPRINT-"$_c"-*.md; do
       [ -f "$_p" ] && { _cf=$_p; _arch=1; break; }
@@ -218,7 +302,9 @@ closed_members() {
     [ -n "$_cf" ] || continue
     [ "$_arch" -eq 1 ] || [ "$(fmv "$_cf" status)" = "closed" ] || continue
     printf '%s %s %s\n' "$_c" "$(fmv "$_cf" last_updated)" "$(fmv "$_cf" close_commit)"
-  done
+  done <<CLMEOF
+$(_member_entries "$1")
+CLMEOF
 }
 
 # Ticked § Closed-when conditions whose block names no SPRINT-NNN **that is a member of this epic**.
@@ -258,8 +344,13 @@ for e in "$root"/docs/epic/EPIC-*.md; do
   cmem=$(closed_members "$e" "$root")
   # All member numbers, closed or not -- class (c) asks whether a tick names a sprint belonging to
   # THIS epic, and an open member can legitimately have contributed a completed condition.
-  allmem=$(awk '/^member_sprints:/ { sub(/^member_sprints:[[:space:]]*/, ""); gsub(/[][,]/, " "); print; exit }' "$e" \
-           | sed 's/SPRINT-//g; s/sprint-//g')
+  #
+  # FOREIGN MEMBERS ARE INCLUDED HERE, and deliberately, unlike in the two legs above. Those legs
+  # read a local FILE, which a foreign member does not have; this one matches TEXT, and a condition
+  # ticked "delivered by workdoo SPRINT-001" is properly attributed to a member of this epic. The
+  # whitespace split used to keep these numbers by accident -- dropping them now would trade a false
+  # positive for a false negative and un-attribute every tick EPIC-016 has.
+  allmem=$(_member_entries "$e" | awk '{ printf "%s ", $2 }')
   drift=0
 
   # (a) every closed member has a rollup row carrying its close_commit, AND that value AGREES with

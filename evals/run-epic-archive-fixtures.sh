@@ -167,6 +167,45 @@ run_case_anywhere "r-wrong-sha" 1 \
 run_case_anywhere "r-nonmember-attrib" 1 \
   "has a ticked § Closed-when condition naming no member sprint" -- \
   sh "$checker" "$fxs/r-nonmember-attrib"
+
+# --- SELECTION cases 18-20 (SPRINT-097 T5, TD-144 / L-186) --------------------------------------
+# Cases 8-17 vary which VERDICT the epic-state branches reach. Every one of them declares its member
+# the same way -- `[SPRINT-NNN]` -- so all seventeen sit inside one selection rule, and none of them
+# asks whether the checker picked the right member in the first place. The live tree has always used
+# three id shapes (`SPRINT-NNN`, bare `NNN`, and `<repo> SPRINT-NNN`); the fixtures used one. That
+# shared incidental property is L-186's cheap tell, and TD-144 is what it hid: EPIC-016's members
+# live in `workdoo` (ADR-041), the parser split the field on whitespace, and `001` then resolved
+# against lean-flow's OWN SPRINT-001 -- a close_commit mismatch reported on a correct artifact.
+#
+# These three vary the SELECTION and hold the verdict logic fixed. All three name member 930 and all
+# three ship an identical local docs/sprint/archive/SPRINT-930-m.md whose close_commit (ccc111930)
+# disagrees with the `eb3d9e7` in the epic's row -- so the wrong-sha branch is armed in every one,
+# and only the ID SHAPE decides whether it should fire. Retained (TD-012).
+
+# --- case 18: foreign member colliding with a local sprint number -> exit 0 + NOTE ---------------
+# EPIC-016's exact shape, and the case with no reader before this sprint. Passing here is possible
+# only if the member was never resolved locally: the collision partner IS on disk and its sha DOES
+# disagree, so a checker that still globs `SPRINT-930-*` for this member fails the case loudly.
+run_case_anywhere "s-foreign-collision" 0 \
+  "member workdoo SPRINT-930 lives outside this repository" -- \
+  sh "$checker" "$fxs/s-foreign-collision"
+
+# --- case 19: the SIBLING CONTROL -- same row, LOCAL member -> FAIL -----------------------------
+# Differs from case 18 by exactly one token in one field: the `workdoo ` qualifier. Without it, case
+# 18 is satisfied by a checker that has simply stopped reporting on member rows altogether -- the
+# silent false negative this family exists to remove (L-142).
+run_case_anywhere "s-local-collision-twin" 1 \
+  "SPRINT-930's § Member sprints Status cell names a close_commit that is not the sprint's own" -- \
+  sh "$checker" "$fxs/s-local-collision-twin"
+
+# --- case 20: bare-number id shape -> FAIL -------------------------------------------------------
+# `member_sprints: [930]`, the EPIC-004 shape -- live in this repository (`[072, 073]`) and
+# unrepresented by any fixture until now, so the other arm of the id normalisation had no reader
+# either. A parser handling only `SPRINT-NNN` leaves this member unselected and goes green.
+run_case_anywhere "s-bare-number-member" 1 \
+  "SPRINT-930's § Member sprints Status cell names a close_commit that is not the sprint's own" -- \
+  sh "$checker" "$fxs/s-bare-number-member"
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "EPIC-ARCHIVE FIXTURES: all green"; else echo "EPIC-ARCHIVE FIXTURES: at least one FAIL"; fi
 exit $fail
