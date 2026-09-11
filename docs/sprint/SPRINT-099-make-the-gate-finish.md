@@ -4,6 +4,7 @@ slug: make-the-gate-finish
 owner: Maintainer
 last_updated: 2026-09-12
 status: active
+gates_signed: G1,G2 @ 7701c8b
 plan_commit: a43d1e6
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -87,20 +88,21 @@ from the printed verdict line alone — never from a wrapper's exit code.
 - [ ] **Outside reviewer, worktree-isolated** (L-165 · L-168), after the author enumerates every call site touched and seeds a break in each fix (L-193).
 - [ ] **The new harness is registered** in `eval_harnesses_always`/`_optin`/`_excluded`, verified **from the registry's side** — enumerate the registry against `evals/`, never confirm by running the new thing (L-196).
 
-### T3 — Make the `*/archive/*` exclusion a filesystem-identity predicate `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-layers-observed.sh` · `scripts/lib/check-layers-completeness.sh` · `evals/fixtures/` + its harness
-Depends-on: none — disjoint from T1/T2 (**D2**)
+### T3 — Make the `*/archive/*` exclusion a filesystem-identity predicate `[size: M · risk: low · class: execution · HITL · J1]`
+<!-- size S -> M and Layers widened at the 2026-09-12 `scope-change`: A4 was refuted (ten call sites, not three). -->
+Layers: `scripts/lib/archive-path.sh` (new, the shared predicate) · `scripts/lib/check-layers-observed.sh` · `scripts/lib/check-layers-completeness.sh` · `scripts/lib/check-approval-envelope.sh` · `scripts/lib/check-night-run-rollup.sh` · `scripts/lib/check-review-depth.sh` · `scripts/lib/check-verify-reaches.sh` · `scripts/lib/conformance-engine.sh` · `scripts/qa-check.sh` · `evals/lib/check-system-verify-block.sh` · `evals/fixtures/` + its harness
+Depends-on: T2 — the enlarged set shares `scripts/qa-check.sh`, so **D2's disjointness no longer holds** (`scope-change`, 2026-09-12)
 Cites: TD-145 · TD-151 · L-186 · L-165 · L-168 · ADR-029
-**Tier G** (ADR-029) — this is the **set predicate itself**, not a branch inside one. Three gate
+**Tier G** (ADR-029) — this is the **set predicate itself**, not a branch inside one. Ten gate
 checkers depend on it to keep closed sprints out of their examined set, and SPRINT-098's A1
 grandfathering ruling explicitly inherits its defect.
 
-**Acceptance:** `docs/sprint/Archive/…` and `docs/sprint/archive/…` — the same file on this host,
-inode `5910974512661248` — are excluded identically.
+**Acceptance:** `docs/sprint/Archive/…` and `docs/sprint/archive/…` — the same directory on this
+host, one inode under two spellings — are excluded identically, at every site.
 
 **DoD:**
 - [ ] The case-variant path is excluded. Today `case "$sp" in */archive/*)` returns `NOT-EXCLUDED` for it, and feeding that path to `scripts/lib/check-layers-completeness.sh` produces **3 real FAILs against a closed sprint's stale content**.
-- [ ] **All three sites** fixed under **one shared predicate**, not three copies — `scripts/lib/check-layers-observed.sh:344` and `:401`, `scripts/lib/check-layers-completeness.sh:183`. **Derive the set yourself before editing** (L-186): the review that found this named two, and the third surfaced from an independent grep at merge.
+- [ ] **All ten sites** fixed under **one shared predicate**, not ten copies — `check-layers-observed.sh:373` and `:431` · `check-layers-completeness.sh:234` · `check-approval-envelope.sh:44` · `check-night-run-rollup.sh:72` · `check-review-depth.sh:126` · `check-verify-reaches.sh:55` · `conformance-engine.sh:948` · `qa-check.sh:789` · `evals/lib/check-system-verify-block.sh:68`. **Derived at G2, not inherited** (L-186 · A4 refuted): the Plan named three, the derivation found ten. `check-handoff-state.sh:145` uses the same glob to *map* rather than exclude — ruled OUT of this task, filed as a follow-up.
 - [ ] A retained must-FAIL varying path **casing** as its selection axis, plus a lowercase sibling control green in the same run. The existing `archive-path-excluded` fixture **passes** and proves nothing here — it validates a *string* predicate where the real job is *filesystem identity*.
 - [ ] **Seeded-break discrimination proof** under ONE stated hash convention (L-169 · L-187).
 - [ ] **Outside reviewer, worktree-isolated** (L-165 · L-168).
@@ -110,7 +112,7 @@ inode `5910974512661248` — are excluded identically.
 
 ## Decisions (pre-locked)
 - **D1 — `scripts/qa-check.sh` is owned T1 → T2.** Measure before changing the thing measured: T2 edits the verdict path T1 is instrumenting, and the reverse order would profile a file that no longer exists. Stage per-hunk and verify `git diff --cached`; never a plain `git add` over the other's WIP (L-042 · L-037).
-- **D2 — T3 is disjoint** (different files, no `depends-on`) and is therefore eligible for a **parallel worktree-isolated build** alongside T1/T2, at the coordinator's discretion.
+- **D2 — T3 is disjoint** (different files, no `depends-on`) and is therefore eligible for a **parallel worktree-isolated build** alongside T1/T2, at the coordinator's discretion. **Superseded at the 2026-09-12 `scope-change`** — the derived ten-site set includes `scripts/qa-check.sh`, which T2 owns, so T3 is no longer disjoint and runs third in the ownership chain. The discretion clause is moot, not overruled.
 - **D3 — T2's fix direction is ruled, not open.** TD-117 offers three options and rules none; the third (make the skipped-harness list its own named outcome) is chosen. Capping dispatch concurrency would slow the worktree-isolated review this repo mandates for Tier G, and rests on a concurrency figure nobody has measured; raising the budget cannot work, since the 600 s ceiling is external and `qa-check.sh:27` already calls the current 520 *"NOT a permanent figure"*.
 - **D4 — `TASK-342` is promoted APART from its cluster, deliberately.** Its `grouped:` line says schedule it with `TASK-338` (SPRINT-097 T1's ruling). It is pulled forward because `TD-151` and SPRINT-098's A1 grandfathering ruling **both already inherit its defect**, so leaving it costs correctness in two shipped guards. The cluster ruling is not withdrawn — `TASK-338` · 339 · 340 · 341 · 343 stay grouped for a later sprint.
 - **D5 — T1 is `J2`, T2 and T3 are `J1`.** T1 produces a *record that a later sprint will act on*, which is a judgement; the Plan is deliberately not all-J2.
@@ -118,8 +120,8 @@ inode `5910974512661248` — are excluded identically.
 ## Assumptions
 - **A1** — That the four recorded gate kills share one mechanism. **UNCONFIRMED, and T1's measurement is what tests it** — it is the task's subject, not its premise. *Confirm: T1's instrumented runs; a negative result is a finding, not a failure.*
 - **A2** — T2's fix direction is settled at intake (**D3**) and is not re-opened at G2. *Confirm: read `TASK-329`'s `assumes:` block before designing.*
-- **A3** — **TD-117's quoted 450 s default is STALE**; `qa-check.sh:27` has read 520 since SPRINT-093. *Confirm: re-derive at build and quote neither figure from a row (L-130).*
-- **A4** — The `*/archive/*` predicate has exactly three call sites. Two were named by review, the third found by an independent grep. *Confirm: derive the set before editing, do not inherit this count (L-186).*
+- **A3** — **TD-117's quoted 450 s default is STALE**; `qa-check.sh:27` has read 520 since SPRINT-093. *Confirm: re-derive at build and quote neither figure from a row (L-130).* **CONFIRMED at G2 (2026-09-12):** `qa-check.sh:27` reads 520; neither figure is quoted from a row anywhere in this sprint.
+- **A4** — The `*/archive/*` predicate has exactly three call sites. Two were named by review, the third found by an independent grep. *Confirm: derive the set before editing, do not inherit this count (L-186).* **REFUTED at G2 (2026-09-12):** the derivation found **ten** exclusion sites, plus one mapping site ruled out of scope. See the `scope-change` entry in the Execution Log.
 
 ## Execution Log
 
