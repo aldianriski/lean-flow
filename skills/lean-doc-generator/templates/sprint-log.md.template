@@ -19,7 +19,11 @@ update_trigger: an Execution Log entry is appended
 <!-- Newest entries at the BOTTOM: this reads as a chronology, unlike CHANGELOG.md which is
      newest-first. Event is one of: promote · progress · surprise · scope-change · park · blocker ·
      run-complete · close · handoff. `run-complete` is reserved for the run itself finishing (carries
-     the Part 4 rollup) — a task finishing mid-run is logged as `progress`, never as `complete`. -->
+     the Part 4 rollup) — a task finishing mid-run is logged as `progress`, never as `complete`.
+     A `run-complete` entry now also carries a typed `outcome · DELIVERED|PARTIAL|FAILED` line plus
+     evidence fields (tasks · parks · repair-cycles · verification · warnings), each tagged
+     mechanical | model-reported | derived (SPRINT-098 T3 — EPIC-015 § Closed-when 6; full shape and
+     provenance legend → night-run.md Part 4). Not a new event type — same `run-complete` header. -->
 
 ### YYYY-MM-DD | [event] | [one-line summary]
 [detail — what changed and why it matters. Name the task (Tn) it belongs to.]

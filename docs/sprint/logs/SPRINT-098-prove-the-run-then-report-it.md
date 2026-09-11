@@ -405,3 +405,75 @@ This is also the straightest reading of § Closed-when 6, which asks for the out
 behind it** — provenance is part of what makes evidence evidence. The alternative (defer T3 until
 TD-152 has a fix) was rejected: that fix changes the retry-firing mechanism, a separate piece of work,
 and holding CW 6 behind it would park a judgement call as though it were a dependency (L-094).
+
+### 2026-09-11 | consequence | T3 · behaviour: material · governance: high
+
+T3 changes the rollup's emitted content and extends the gate's rollup checker — a run-protocol
+contract on both sides. Material both ways → scoped reviewer floor, Tier G adds the worktree-isolated
+pass. Recorded at consultation (TD-092).
+
+### 2026-09-11 | progress | T3 — typed outcome + nine evidence fields, each tagged by provenance
+
+`reap()` emits `outcome · DELIVERED|PARTIAL|FAILED` from `outcome_for_terminal()`, a **fail-closed**
+pure function of `terminal` (an unrecognised state maps to `FAILED`, never to `DELIVERED`), beside the
+remaining evidence fields. Per the G2 ruling, each line carries its provenance **in the artifact
+itself**, not only in documentation, under a one-line legend:
+
+```
+run · 2 of 2 DoD ticked  [mechanical]
+outcome · DELIVERED · derived from terminal PLAN_EXHAUSTED  [derived]
+parks · 0  [model-reported]
+```
+
+`mechanical` = counted directly; `model-reported` = written by the run and trusted like any other Part 4
+state line (TD-152's own limit); `derived` = a function of the fields above it, never more certain than
+what it reads. That last rule is the point: a verdict that presented a counted DoD figure and a
+model-written retry count at equal confidence would repeat TD-152's overclaim in the one artifact whose
+job is to say what the run did.
+
+**A3 honoured:** `RunSummary` is not minted; the shape is named for the rollup field it types, with
+EPIC-008's possible future subsumption recorded at each site.
+
+**Two deliberate scope decisions, stated rather than discovered later.** (1) The new
+`outcome-delivered-with-open-dod` rule is **grandfathered**: `outcome ·` is new, so no pre-existing
+log — every retained fixture and the real `SPRINT-067/082/089/090` archives — carries one, and
+requiring it unconditionally would retroactively FAIL that correct history. Same shape as A1's ruling.
+(2) `tasks`/`parks`/`repair-cycles`/`verification`/`warnings` are emitted but carry **no independent
+consumer check**, because there is no second source of truth to contradict them without inventing one.
+Named as a decision, not left to read as full wiring.
+
+**`Layers:` corrected at execution (L-100):** T3 also edited `scripts/lib/check-night-run-rollup.sh`,
+which its promoted declaration did not name — that file is T1's. T1 is committed (`804e92a`) with no
+outstanding WIP, so there is no L-042 staging hazard; recorded because the ownership map should say so
+rather than the commit being the only evidence.
+
+### 2026-09-11 | surprise | A latent silent false negative in T3's new check — routed, not patched blind
+
+Coordinator population check before dispatching T3's review. The new outcome/DoD rule selects its
+evidence with `head -n1` over the window. T3's comment argues that is safe by **emission order**:
+`reap()` writes the real lines first, atomically, and the append-only rule means a later illustrative
+aside can only land *after* them. That argument is sound for an aside appended after the reaper's
+block — and it does not cover a **hand-written `run-complete` entry**, which becomes the last window
+and can carry an example *before* its real evidence. Reproduced:
+
+```
+### 2026-09-11 | run-complete | a hand-written entry documenting the format
+  ```  outcome · DELIVERED …   /   run · 9 of 9 DoD ticked  ```   <- the EXAMPLE
+  ```  run · 1 of 5 DoD ticked / outcome · DELIVERED …      ```   <- what the run DID
+→ PASS
+```
+
+`head -n1` picks `9 of 9`, the real `1 of 5` is never compared, and a mid-Plan stop reporting itself
+`DELIVERED` passes — the exact silent false negative this block exists to catch. `head -n1` is a
+**selection** rule and it selects the wrong occurrence (L-186 · L-108).
+
+**Zero real logs carry the shape today**, so this is latent, not active.
+
+**A fix was attempted and it was wrong — recorded because the wrong turn is the useful part.** Scoping
+the evidence to the *first fenced block* fails for the same reason the original does: in a hand-written
+entry, the example **is** the first block. It also reddened T3's retained fixtures. So the discriminator
+cannot be **ordering** at all; it has to be something only the reaper emits — and T3's own provenance
+tags are the obvious candidate, which is a design question for a second reader rather than a patch to
+make now. Reverted to T3's shipped behaviour, with the gap documented at the site, and routed to the
+outside review as its primary aim. A guard shipped with a wrong fix is worse than one shipped with a
+named gap.

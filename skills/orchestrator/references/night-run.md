@@ -643,9 +643,44 @@ wrong — *always*, headed by the line that says how much of the Plan is actuall
 
 ```
 run · <N> of <M> DoD ticked
+outcome · <DELIVERED | PARTIAL | FAILED> · derived from terminal <STATE>
 terminal · <PLAN_EXHAUSTED | AUTHORITY_BOUNDARY | HARD_FAILURE | BUDGET_STOP | USER_STOP> · <one-line reason>
+tasks · <attempted> attempted / <completed> completed / <total> total
+parks · <N>
+repair-cycles · <N>
+verification · <system-verify's own token, or "none logged">
+warnings · <comma/semicolon-joined list, or "none">
 Tn · state (done | blocked | parked-hitl | denied-tool | stalled | unattempted) · unblock condition / next action
 ```
+
+**The typed outcome and its evidence (SPRINT-098 T3 — EPIC-015 § Closed-when 6).** `outcome` is a
+three-way, EPIC-015-LOCAL vocabulary — `DELIVERED | PARTIAL | FAILED` — a pure function of `terminal`
+alone (PLAN_EXHAUSTED → DELIVERED; AUTHORITY_BOUNDARY/BUDGET_STOP/USER_STOP → PARTIAL; HARD_FAILURE →
+FAILED; an unrecognised terminal token fails CLOSED to FAILED, never defaults to DELIVERED). **A3
+(owner-ruled):** this is not EPIC-008's portable `RunEnvelope`/`WorkItem`/`RunEvent`/`Evidence`
+family — EPIC-008 is `status: proposed` with no member sprints and its object set refuses to assume a
+repository at all — and the name `RunSummary` is deliberately NOT minted here; EPIC-008 may later
+subsume or map this shape.
+
+**Every evidence field is tagged by how it was produced, because they are not equally trustworthy**
+(TD-152, one level up). Three tags, emitted inline beside each field in the rollup itself — never only
+in this doc:
+- **`mechanical`** — counted directly from the Plan/log text (DoD boxes, task headers, presence/absence
+  of a task's own line). `run ·`, `tasks ·`, `warnings ·`.
+- **`model-reported`** — written by the run during the turn, trusted the way every other Part 4 state
+  line already is, with no independent verification. `parks ·`, `repair-cycles ·`, `verification ·`.
+  A silently-unlogged retry or an unlogged system-verify pass is indistinguishable from none at all —
+  the same limit `check_revise_ceiling()` already states plainly (TD-152) rather than glosses over.
+- **`derived`** — a deterministic function of the fields above it, never more certain than the least
+  certain input it reads. `outcome ·` is derived from `terminal ·`, which is itself a mix of mechanical
+  counts (`unattempted`, via absence) and model-reported ones (`stalled`/`denied-tool`/retry lines).
+
+`check-night-run-rollup.sh` reads `outcome ·` back and FAILs a run that claims `DELIVERED` while its own
+`run · N of M DoD ticked` line shows `N < M` — the mid-Plan-reports-DELIVERED shape, named
+`outcome-delivered-with-open-dod`. The check is grandfathered to fire only when an `outcome ·` line is
+present: every rollup written before this task shipped has none, and requiring one would retroactively
+fail that pre-existing, still-correct history — the same grandfathering A1 already applied to the
+archived-sprint population one task up.
 
 **The `terminal ·` line is required on every completed-run rollup** (Part 0b). Its absence is not a
 claim that the run ended cleanly — it is the same silence the DoD count exists to break, one level up:

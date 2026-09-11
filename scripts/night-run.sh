@@ -174,6 +174,26 @@ check_revise_ceiling() {
   return $crc_fail
 }
 
+# --- typed run outcome (T3, SPRINT-098 -- EPIC-015 Closed-when 6) ----------------------------------
+# A3 (owner-ruled 2026-09-11): this is EPIC-015's own LOCAL, non-portable outcome vocabulary, not
+# EPIC-008's portable RunEnvelope/WorkItem/RunEvent/Evidence family -- EPIC-008 is `status: proposed`
+# with no member sprints and its object set explicitly refuses to assume a repository at all. The
+# name `RunSummary` is NOT minted here (binding condition of the ruling); this shape is named for the
+# Part 4 rollup it types. EPIC-008 may later subsume or map it -- nothing here assumes it will.
+#
+# A DETERMINISTIC function of the terminal state alone, never a second, independent re-derivation
+# from the per-task lines -- reap()'s own priority order already resolved rp_term once, and deriving
+# outcome from anything else risks the two silently disagreeing. An unrecognised terminal token fails
+# CLOSED to FAILED, never defaults to the clean-looking DELIVERED (do not fail open).
+outcome_for_terminal() {
+  case "$1" in
+    PLAN_EXHAUSTED) printf 'DELIVERED' ;;
+    AUTHORITY_BOUNDARY|BUDGET_STOP|USER_STOP) printf 'PARTIAL' ;;
+    HARD_FAILURE) printf 'FAILED' ;;
+    *) printf 'FAILED' ;;  # unreachable under reap()'s own case statement; fails closed if it ever is
+  esac
+}
+
 reap() {
   # 5th positional: the sprint Plan path RESOLVED BY THE LAUNCHER before firing (declared, not
   # re-inferred here) -- see `--sprint` below and the `resolved_sprint` computation near the fire
@@ -301,10 +321,59 @@ reap() {
     rp_term="PLAN_EXHAUSTED"; rp_term_why="every task reached a resolved state"
   fi
 
+  rp_outcome=$(outcome_for_terminal "$rp_term")
+
+  # --- evidence fields (T3): tasks / parks / repair-cycles / verification / warnings ---------------
+  # Each is tagged by provenance in the emitted block below (DoD 2). The reason is TD-152 one level
+  # up: a guard read a model-written line as though it were machine output, and the prose around it
+  # claimed a mechanical guarantee the code could not give. A verdict presenting a mechanical count
+  # and a model-written line at equal confidence repeats that overclaim in the one artifact whose
+  # whole job is to say what the run did (T3, owner-ruled 2026-09-11).
+  rp_attempted=$((rp_units - rp_unatt))
+
+  # Fence-stripped window, same discipline check_revise_ceiling() already applies (L-108): a
+  # documentation example quoting `Tn · retry ·` or `system-verify ·` text inside a ``` block must
+  # not be read as this run's own output. Recomputed here (not shared with check_revise_ceiling(),
+  # which keeps its own local copy) because that function returns only PASS/FAIL text, not counts.
+  rp_window_fs=$(tail -n "+$((rp_base + 1))" "$rp_logdoc" 2>/dev/null | awk '
+    /^[[:space:]]*```/ { fence = !fence; next }
+    !fence
+  ')
+
+  # repair-cycles: MODEL-REPORTED (TD-152's exact case) -- counts whatever `Tn · retry ·` lines the
+  # model wrote, not whatever it actually did. A silently-unlogged retry is invisible here, the same
+  # limit check_revise_ceiling() already carries and states plainly rather than glosses over.
+  rp_retries=$(printf '%s\n' "$rp_window_fs" | grep -cE '^T[0-9]+ · retry · ')
+
+  # verification: MODEL-REPORTED -- the `system-verify ·` line (night-run.md Part 4) is written by
+  # the model once, after the final wave's merge-back. Absence means "none logged", never "no
+  # verification happened" -- the same absence-is-not-evidence shape as the retry line above.
+  rp_verify_line=$(printf '%s\n' "$rp_window_fs" | grep -E '^system-verify · ' | tail -n1)
+  if [ -n "$rp_verify_line" ]; then
+    rp_verify_state=$(printf '%s\n' "$rp_verify_line" | sed -E 's/^system-verify · ([^ ]+) ·.*/\1/')
+  else
+    rp_verify_state="none logged"
+  fi
+
+  # warnings: MECHANICAL -- data-quality gaps THIS function detects in its own extraction, never a
+  # claim about the model's behaviour. Limited to what it can actually verify: the calibration
+  # degrade-rule flags already computed above (Part 4's own "say it was unavailable" rule).
+  rp_warn=""
+  [ "$rp_cost" = "cost unavailable" ] && rp_warn="${rp_warn}${rp_warn:+; }cost unavailable"
+  [ "$rp_turns" = "?" ] && rp_warn="${rp_warn}${rp_warn:+; }turn count unavailable"
+  [ -n "$rp_warn" ] || rp_warn="none"
+
   {
     printf '\n### %s | run-complete | run exited — rollup emitted by the launcher\n\n' "$(date +%Y-%m-%d)"
-    printf '```\nrun · %s of %s DoD ticked\n' "$rp_done" "$rp_total"
-    printf 'terminal · %s · %s\n' "$rp_term" "$rp_term_why"
+    printf 'Evidence provenance: mechanical = counted directly from the Plan/log text; model-reported = written by the run, trusted like any other Part 4 state line (TD-152); derived = a function of the fields below it, never more certain than what it reads.\n\n'
+    printf '```\nrun · %s of %s DoD ticked  [mechanical]\n' "$rp_done" "$rp_total"
+    printf 'outcome · %s · derived from terminal %s  [derived]\n' "$rp_outcome" "$rp_term"
+    printf 'terminal · %s · %s  [derived]\n' "$rp_term" "$rp_term_why"
+    printf 'tasks · %s attempted / %s completed / %s total  [mechanical]\n' "$rp_attempted" "$rp_units_done" "$rp_units"
+    printf 'parks · %s  [model-reported]\n' "$rp_parked"
+    printf 'repair-cycles · %s  [model-reported]\n' "$rp_retries"
+    printf 'verification · %s  [model-reported]\n' "$rp_verify_state"
+    printf 'warnings · %s  [mechanical]\n' "$rp_warn"
     # A task with an open DoD that the run wrote no rollup line for was never spoken about
     # at all. That is `unattempted` -- stated as the fact it is (no line exists), never
     # guessed at: a task the run DID report as blocked/parked/denied already has its line

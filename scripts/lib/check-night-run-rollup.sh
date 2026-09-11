@@ -236,6 +236,51 @@ for lg in "$@"; do
     esac
   fi
 
+  # --- outcome / DoD consistency (SPRINT-098 T3 -- EPIC-015 Closed-when 6) ------------------------
+  # `outcome ·` is a NEW field (reap() now emits it beside `run ·`/`terminal ·`) and is deliberately
+  # NOT added to the hdr/cal/term shape requirement above: every log written before T3 shipped --
+  # every retained fixture in this suite, and the real committed SPRINT-067/082/089/090 archives --
+  # has no `outcome ·` line at all, and requiring one here would retroactively FAIL every one of them.
+  # Grandfathered the same way A1 grandfathered the archived-sprint population: absent because it
+  # predates the field, not because something is wrong. Going forward every `--reap` run emits it
+  # mechanically, so this is a closing gap, not a permanent hole. The ONE thing checked, when the
+  # line IS present, is the exact silent false negative DoD 4 names: a run that stopped mid-Plan
+  # (an open DoD box remains) reporting itself DELIVERED.
+  #
+  # Self-describing-corpus guard (L-108), and it is a real risk HERE specifically because this
+  # checker's own convention (unlike check_revise_ceiling()'s) reads INSIDE the ``` fence -- that
+  # fence wraps reap()'s genuine machine-emitted lines, so blanket fence-stripping would discard the
+  # real evidence along with any illustrative aside. What actually protects this check is emission
+  # ORDER: reap() writes the real `outcome ·`/`run ·` lines FIRST, at the top of its block, in one
+  # atomic append; the Execution Log's own append-only rule (STANDARD §9 / ADR-014, restated in this
+  # file's own header comment) means any later illustrative aside quoting the format inside the SAME
+  # window can only be appended AFTER the real lines, never before. `head -n1` below always selects
+  # the genuine, reaper-authored occurrence -- proven by the `outcome-illustrative-aside-after-real`
+  # fixture (evals/fixtures/night-run-outcome/), which appends a contradicting illustrative example
+  # AFTER correct real evidence in the same window and asserts the verdict does not flip.
+  # KNOWN GAP, recorded by the coordinator and routed to T3's outside review rather than patched
+  # blind (SPRINT-098 T3). The emission-order argument above holds for an aside appended AFTER the
+  # reaper's block, but the window is anchored at the LAST `run-complete` header, and a HAND-WRITTEN
+  # `run-complete` entry can carry an illustrative example BEFORE its real evidence — at which point
+  # `head -n1` selects the example. Reproduced: an entry quoting `run · 9 of 9 DoD ticked` above real
+  # evidence of `run · 1 of 5` plus `outcome · DELIVERED` returns PASS, a mid-Plan stop reporting
+  # itself delivered. `head -n1` is a SELECTION rule and it selects the wrong occurrence (L-186).
+  # Zero real logs carry the shape today. A first-fenced-block fix was tried and is WRONG: in a
+  # hand-written entry the example IS the first block, and it also reddened the retained fixtures.
+  # The discriminator is not ordering — it needs to be something only the reaper emits.
+  outc=0
+  win | grep -qE '^outcome · (DELIVERED|PARTIAL|FAILED) · ' && outc=1
+  if [ "$outc" -eq 1 ]; then
+    outc_tok=$(win | grep -oE '^outcome · (DELIVERED|PARTIAL|FAILED) ·' | head -n1 | sed -E 's/^outcome · ([A-Z]+) ·.*/\1/')
+    dod_line=$(win | grep -E '^run · [0-9]+ of [0-9]+ DoD ticked' | head -n1)
+    dod_n=$(printf '%s\n' "$dod_line" | sed -E 's/^run · ([0-9]+) of ([0-9]+) DoD ticked.*/\1/')
+    dod_m=$(printf '%s\n' "$dod_line" | sed -E 's/^run · ([0-9]+) of ([0-9]+) DoD ticked.*/\2/')
+    if [ "$outc_tok" = "DELIVERED" ] && [ -n "$dod_n" ] && [ -n "$dod_m" ] && [ "$dod_n" != "$dod_m" ]; then
+      agree_bad=1
+      bad "night-run rollup: $lg claims outcome · DELIVERED but only $dod_n of $dod_m DoD are ticked -- outcome-delivered-with-open-dod: DELIVERED means the Plan finished, never a mid-Plan stop reporting itself delivered (SPRINT-098 T3, EPIC-015 Closed-when 6)"
+    fi
+  fi
+
   [ "$hdr" -eq 1 ] && [ "$cal" -eq 1 ] && [ "$term" -eq 1 ] && [ "$agree_bad" -eq 0 ] \
     && ok "night-run rollup $lg (DoD header + terminal state + calibration row present, and agrees with its per-task lines)"
 done
