@@ -16,13 +16,20 @@ status: current
 
 ## Active Sprint
 
-> _(none — SPRINT-097 closed 2026-09-11, 32 of 32 DoD. Next: `/lean-doc-generator promote`.)_
+> **SPRINT-098 — Prove the Run, Then Report It** →
+> [`docs/sprint/SPRINT-098-prove-the-run-then-report-it.md`](docs/sprint/SPRINT-098-prove-the-run-then-report-it.md)
+> — promoted 2026-09-11, five tasks, 27 DoD + 1 owner-action. Advances **EPIC-015 § Closed-when 1 · 5 · 6**.
+> **`gates_signed:` is absent, which means NOT signed:** G1+G2 are unsigned until the owner records
+> them in the sprint frontmatter (L-099). `approval_envelope:` is likewise absent — T4 fires no run
+> until all ten dimensions are recorded.
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
 again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 81 rows** (80 open · 1 accepted) — re-derived at the SPRINT-097 close. Re-derive open/closed and the `severity: high` set
+- **Debt ledger: 83 rows** (81 open · 2 resolved — TD-141 accepted, TD-132 → TASK-328) — re-derived at
+  the SPRINT-098 promote by row header, severity distribution reconciled (7 high + 34 medium + 40 minor
+  + 2 trivial = 83). Re-derive open/closed and the `severity: high` set
   **by anchoring to the `^- **TD-NNN**` row header** — a bare `grep 'status: open'` over-counts,
   because rows quote their own status strings in prose (L-108). Aging figures are derived at each
   promote, never read from here (L-097 · L-130).
@@ -62,61 +69,21 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > unattended run and every sprint that defers it defers the epic.
 
 - [ ] TASK-336 — Make the run rollup unconditional, and lift the continuation contract out of a paragraph  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 — the false negative is silent by construction: a run that ends
-                  mid-Plan and emits no rollup is indistinguishable from one that finished, and the
-                  artifact that would tell them apart is the one the failure drops)
-      authority:  J1
-      done-when:  **four clauses.**
-                  (1) A sprint whose Plan carries open DoD **and** whose Execution Log has no
-                  `run-complete` entry with a `terminal ·` state is a **named FAIL**, and the check
-                  is **not gated on run mode**. Today `check-night-run-rollup.sh` is reachable only
-                  through the reaper, which fires on unattended runs — so the mode this repo
-                  actually runs in has no guard at all.
-                  (2) Pointed at its **motivating population**, not only at fixtures: **44 of 50**
-                  sprint logs in this repo carry no `run-complete` entry (42 of 48 archived, plus
-                  both active ones) — derived three ways that agree, `48 = 42 + 6`. Decide per
-                  ADR-021 whether those are grandfathered or backfilled; either ruling is fine, an
-                  unstated one is not.
-                  (3) Retained must-FAIL **plus** a sibling control that stays green in the same
-                  run: an attended sprint missing its rollup FAILs with its named finding, while an
-                  attended sprint carrying one PASSes. Without the control, a checker that always
-                  reported "missing" would satisfy the first half.
-                  (4) The **continuation contract** moves out of `orchestrator/SKILL.md` step 4's
-                  ~200-word paragraph into its own headed section, at the same structural level as
-                  G1/G2 — the form those two have and that this rule lacks, which is the whole
-                  finding of L-192 and not a cosmetic preference.
-      touches:    scripts/lib/check-night-run-rollup.sh · scripts/night-run.sh (reap gate) ·
-                  skills/orchestrator/SKILL.md · evals/fixtures/
-      depends-on: none
-      assumes:    that grandfathering the 44 existing logs is acceptable — **UNCONFIRMED**, and it
-                  is an owner ruling rather than a measurement, so it is decided at this task's G2
-                  and not parked waiting for evidence that will not arrive (L-094)
+      → **promoted into SPRINT-098 as T1.** Full spec — Layers · Acceptance · 8 DoD · the
+        not-gated-on-run-mode clause · the selection-varying fixture · the seeded-break bar — lives in
+        the sprint file. This row is a pointer so the Backlog carries no second copy to drift from it (L-008).
+        **Its `44 of 50` population figure did not survive the promote** and is carried as the sprint's
+        **A2**: derive by shape at execution, two queries that must agree (L-108 · L-130).
       tracker:    L-192 · ADR-016 (the launcher writes the rollup) · L-166 (the mode-axis sibling)
       origin:     manual
       state:      ready
 
 - [ ] TASK-319 — Prove § Closed-when 1 with a real unattended run against the repaired reaper  [size: M] [risk: high] [HITL]
-      class:      execution
-      authority:  J2
-      done-when:  a genuinely unattended run fires via `--mode overnight`, reaps, and writes a
-                  `terminal ·` line whose state AGREES with its own per-task lines — verified by
-                  `check-night-run-rollup.sh` against the run's own committed log, not a fixture. The
-                  run must exercise the two defects SPRINT-093 repaired but never observed together in
-                  one live run: the reap gate that ignored the canonical mode name (T3) and the
-                  window/agreement matrix (T1). EPIC-015 § Closed-when 1 is ticked only on that
-                  artifact — SPRINT-093 closed the GUARD gap and proved each half separately, which is
-                  not the same claim as "a run ends only at one of five named states" (L-007's
-                  exercise-on-real-input half; L-166 — fixtures prove a branch works, the motivating
-                  artifact proves it is reachable)
-      touches:    docs/sprint/ (a seeded Plan a run is permitted to execute) · scripts/night-run.sh (read, not modified)
-      depends-on: none — but it needs a Plan that is NOT all-J2, since pre-flight item 3 now refuses
-                  one outright under SPRINT-093 T4's STRICT ruling. Seed the vehicle the way SPRINT-090
-                  did, rather than re-declaring real work AFK to make a run fire (that is reshaping a
-                  task to dodge a gate)
-      assumes:    the reap-gate and agreement fixes hold under a live run — UNCONFIRMED by construction,
-                  which is the entire point of this task; T3's reviewer reproduced the chain in a
-                  throwaway repo, never in this one
+      → **promoted into SPRINT-098 as T4**, paired with `TASK-188` as T5 exactly as the SPRINT-097
+        `/triage` ruled. Full spec — the seeded not-all-J2 vehicle · the `--mode overnight` fire ·
+        the terminal-state agreement check against the run's own committed log — lives in the sprint
+        file, together with **D3** (T4's run is not gated on T2/T3 being green, so no unrelated
+        slippage can foreclose its vehicle — L-111). Pointer, not a second copy (L-008).
       tracker:    EPIC-015 § Closed-when 1 · TD-112 (resolved → SPRINT-093 T1) · TD-110 (resolved → T3) · L-179
       pair-with:  **`TASK-188` — promote them into the SAME sprint** (SPRINT-097 `/triage`,
                   2026-09-11). This task's run is the only realistic vehicle TASK-188 has: 188 needs
@@ -131,40 +98,19 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       state:      ready
 
 - [ ] TASK-296 — Run bounded unattended repair on one J1 finding  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 · D4 — an unbounded or silently-skipped repair both end in a green run)
-      done-when:  a concrete J1 critic finding drives repair → re-review → continue, with the retry
-                  ceiling **exactly** what ADR-022 admits and no more; a second failure escalates
-                  rather than looping. Retained must-FAIL: a repair that exceeds the ceiling fails
-                  with its named finding while a within-ceiling sibling passes
-      touches:    skills/orchestrator/references/review-scoping.md § The revise loop ·
-                  skills/orchestrator/references/night-run.md · scripts/night-run.sh
-      depends-on: none — TASK-292 and TASK-293 both closed at SPRINT-088 (`dc3690a`); the block
-                  was stale, cleared at the SPRINT-094 /triage
-      assumes:    the ceiling is **not** re-decided here. Whether unattended repair inherits ADR-022's
-                  single retry or earns its own is a **measurement** that accumulates from EPIC-006's
-                  records (L-094); freezing a number before those exist is L-130. This task ships the
-                  loop at the ceiling ADR-022 already admits
+      → **promoted into SPRINT-098 as T2.** Full spec — Layers · Acceptance · 6 DoD · the
+        wired-where-the-run-reads-it clause · the retained must-FAIL and its sibling control — lives
+        in the sprint file, with the ceiling carried as **A4** (read from ADR-022, never re-chosen).
+        Pointer, not a second copy (L-008).
       tracker:    EPIC-015 § Closed-when 5 · V3 H31 · ADR-022
       origin:     decomposer
       state:      ready
 
 - [ ] TASK-297 — Emit a typed run outcome with the evidence behind it  [size: M] [risk: med] [HITL]
-      class:      execution
-      tier:       G (ADR-029 · D4)
-      done-when:  every run emits `DELIVERED` / `PARTIAL` / `FAILED` **plus** DoD counts, tasks
-                  attempted/completed, parks, repair cycles, verification state, warnings and terminal
-                  reason. Retained must-FAIL: a run ending mid-Plan that reports `DELIVERED` fails
-                  with its named finding while a genuinely-exhausted sibling passes
-      touches:    skills/orchestrator/references/night-run.md · scripts/night-run.sh ·
-                  templates/sprint-log.md.template
-      depends-on: none — TASK-293 closed at SPRINT-088 (`dc3690a`). The outcome is still a function of
-                  the terminal state that task shipped
-      assumes:    **open question, ruled at this task's G2, not assumed here:** whether the
-                  run-outcome vocabulary belongs to EPIC-015 or to EPIC-008's Run Protocol. V3 §11
-                  says build only what hardening needs and leaves EPIC-008 owning the portable
-                  protocol — so the ruling must land before a `RunSummary` shape is minted, or the two
-                  epics mint competing ones
+      → **promoted into SPRINT-098 as T3.** Full spec — Layers · Acceptance · 6 DoD · the nine
+        evidence fields · the wired-into-what-reads-the-log clause — lives in the sprint file, with the
+        EPIC-015-vs-EPIC-008 ownership question carried as **A3** and scheduled at that task's G2,
+        before any `RunSummary` shape is minted. Pointer, not a second copy (L-008).
       tracker:    EPIC-015 § Closed-when 6 · V3 H37 · EPIC-008
       origin:     decomposer
       state:      ready   # /triage, SPRINT-094: the open EPIC-015-vs-EPIC-008 question is a
@@ -200,6 +146,50 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   T1 an hour later — that reviewer read T1's script, which is where it was told to
                   look. CLAUDE.md § Anti-Patterns edit-safety (b) · L-009 · L-165
       origin:     close-retro
+      state:      ready
+
+> **Auto-escalated at the SPRINT-098 promote (2026-09-11).** The ledger's own rule sends a
+> `severity: high` row to P1; the aging sweep found five open high rows and two of them — **TD-143**
+> and **TD-150** — had no Backlog row at all, so the rule had no consumer for them (L-020's shape).
+> TD-090 · TD-117 · TD-128 were already carried by `TASK-329` and are left where `/triage` ranked them.
+
+- [ ] TASK-344 — Measure the gate's memory profile, so a kill is a known mechanism rather than an inference  [size: M] [risk: med] [HITL]
+      class:      execution
+      authority:  J2
+      done-when:  TD-143's **cost half**. Its cheap half shipped as SPRINT-097 T4 — `scripts/qa-verdict.ts`
+                  now judges the printed `QA-CHECK:` line rather than the child's exit code, so a
+                  verdict-less run reports as a failure instead of as zero failures. What remains is the
+                  row's own **Re-file fresh if** condition: the memory profile is *measured*, so the
+                  mechanism is known rather than inferred from three kills. A measurement is the class
+                  of fact that closes this, and it accumulates — so it is deferrable without being
+                  parked forever (L-094).
+      touches:    scripts/qa-check.sh (instrumentation only) · docs/research/ (a measurement record)
+      depends-on: none
+      assumes:    that the three recorded kills share one mechanism — **UNCONFIRMED, and the measurement
+                  is what tests it.** Do not carry TD-143's Mitigation line in as a plan; it is the
+                  filer's hypothesis, written while the cost was being felt (L-091).
+      tracker:    TD-143 (severity: high, open — its `→ TASK-334` pointer is spent: 334 shipped as
+                  SPRINT-097 T4 and was pruned at that close) · TD-090 · TD-117 · L-120
+      origin:     triage
+      state:      ready
+
+- [ ] TASK-345 — Give `workdoo` the pinned-plugin mechanism ADR-041 already rules it has  [size: M] [risk: med] [HITL]
+      class:      execution
+      authority:  J2
+      done-when:  `workdoo` consumes lean-flow at a **recorded version** and the pin is verifiable from
+                  that repository — today ADR-041's ruling exists only as prose in `workdoo`'s
+                  `CLAUDE.md`, with no `.claude-plugin/`, no plugins block in `.claude/settings.json`
+                  and no version reference anywhere. Two named failures at once: the capability is
+                  written only in its own file (L-020) and the decision sits where its reader — that
+                  repository's install — cannot reach it (L-151).
+      touches:    `workdoo` (another repository — this row is the lean-flow-side tracker, not the edit)
+      depends-on: none
+      assumes:    **that the fix lands in `workdoo`, not here.** lean-flow owns the ADR and the
+                  consumer contract; it does not own the consumer's install. Rule at G2 whether this
+                  repository owes anything beyond the ruling — a *check* for the pin would be
+                  lean-flow's, and `check-skill-freshness` is the shape one level over.
+      tracker:    TD-150 (severity: high, open) · ADR-041 · L-020 · L-151
+      origin:     triage
       state:      ready
 
 ### P2 — Follow-on
@@ -544,20 +534,10 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > generate that vehicle is what foreclosed SPRINT-060 T5 (L-111).
 
 - [ ] TASK-188 — Exercise the reaper on a genuinely partial Plan  [size: S] [risk: low] [HITL]
-      class:      execution
-      done-when:  a real unattended run that stops mid-Plan leaves a rollup naming the untouched tasks
-                  as `unattempted`, verified end-to-end through `scripts/night-run.sh` rather than via
-                  `--reap`
-      touches:    scripts/night-run.sh (only if the exercise finds a defect) · a sprint Execution Log
-      depends-on: none
-      assumes:    **carried from SPRINT-060 T5, acceptance unmet — read the ruling before re-promoting.**
-                  The trigger is OPPORTUNISTIC and that is the whole design: the next night run that
-                  stops mid-Plan *for its own reasons* is the exercise. Do not schedule a run to produce
-                  one, and do not promote this into a sprint whose shape cannot generate it — SPRINT-060
-                  promoted it alongside four HITL tasks, the run mode was then ruled interactive at G2,
-                  and that foreclosed the only vehicle it had (L-111). Its partial-Plan path is already
-                  proven three ways that each stop short of the others: a real log through `--reap`, a
-                  zero-ticked-box regression, and an end-to-end launcher run against a complete Plan
+      → **promoted into SPRINT-098 as T5**, paired with `TASK-319` as T4. Full spec lives in the
+        sprint file, with **D5** recording that the opportunistic design is unchanged: the run is not
+        scheduled to stop, and closing this `unattempted` is a correct outcome rather than a miss.
+        Pointer, not a second copy (L-008).
       tracker:    SPRINT-060 T5 scope-change + owner ruling · ADR-016 · L-111
       pair-with:  **`TASK-319` — promote them into the SAME sprint** (SPRINT-097 `/triage`,
                   2026-09-11). 319 is the only task that deliberately fires a real unattended run,
@@ -566,7 +546,12 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   pairing fixes is the *other* half of L-111 — 319's run happening in a sprint where
                   nobody is positioned to claim the artifact if it does stop.
       origin:     close-retro
-      state:      blocked
+      state:      ready   # corrected blocked → ready at the SPRINT-098 promote, owner-ruled
+                  # 2026-09-11. `blocked` was standing in for "opportunistic, cannot be scheduled",
+                  # which is not what the state means here — `depends-on:` is `none`, and only a
+                  # `ready` task is promotable, so the state as written made the 2026-09-11 pairing
+                  # ruling unexecutable. The opportunistic design is unchanged and now lives in
+                  # SPRINT-098 **D5**.
 
 - [ ] TASK-327 — Exercise `check-handoff-state.sh` on the first real handoff  [size: S] [risk: low] [HITL]
       class:      execution

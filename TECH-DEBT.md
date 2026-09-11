@@ -301,6 +301,8 @@ status: current
     its reader cannot reach it — the reader is `workdoo`'s install, and it cannot read an ADR).
   - Re-file fresh if: the pin lands but is not *checked* — a pin nothing verifies drifts the same way,
     and this repository already has `check-skill-freshness` for exactly that question one level over.
+  - Tracked by `TASK-345` — escalated to Backlog P1 at the SPRINT-098 promote under the
+    `severity: high` rule, which had no consumer for this row because it had no Backlog entry at all.
 
 - **TD-149** severity: medium | status: open | created: Sprint-097
   - Tracker: none — flagged in SPRINT-097's own § Scope **Out** block at promote ("the `HANDOFF-LEDGER.md` worktree contamination surfaced by this promote's gate — same family (L-170), different checker, **not yet filed as debt**") and filed at the close that promised it.
@@ -519,7 +521,11 @@ status: current
   - Mitigation (**hypothesis, re-derive first** — §10): the cheap half is a *verdict-presence* check —
     a wrapper that treats a missing `QA-CHECK:` line as FAIL rather than letting the caller infer
     from 0 FAILs. That converts a silent inconclusive into a loud one without touching the memory
-    cost, and is independent of whatever fixes the cost itself (TD-090 · TD-117). → `TASK-334`.
+    cost, and is independent of whatever fixes the cost itself (TD-090 · TD-117). → `TASK-334`, which
+    **shipped as SPRINT-097 T4** (`scripts/qa-verdict.ts` judges the printed `QA-CHECK:` line rather
+    than the child's exit code) and was pruned at that close. **The cheap half is done; this row stays
+    open on its cost half**, now tracked by `TASK-344` — escalated to Backlog P1 at the SPRINT-098
+    promote under the `severity: high` rule.
   - **Re-file fresh if** the gate's memory profile is measured — the mechanism would then be known
     rather than inferred from three kills.
 
