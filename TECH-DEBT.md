@@ -281,6 +281,47 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-148** severity: medium | status: open | created: Sprint-097
+  - Tracker: none — the residue of five review rounds on SPRINT-097 T5, deferred at an explicit acceptance boundary rather than chased. Group with `TASK-338` (the checker-accuracy cluster): same file, same family.
+  - Summary: **Seven findings on `check-epic-archive.sh` that the T5 acceptance boundary
+    deliberately left open.** T5's boundary was: the original bug fixed, the promised cases working,
+    no introduced regression, independently verified. All four hold and the final scoped review
+    returned CLEAR. These sit outside it.
+  - Location: `scripts/lib/check-epic-archive.sh` · `evals/run-epic-archive-fixtures.sh`.
+  - The rows, worst first:
+    1. **An epic declaring NO members still earns the fully affirmative claim.** `member_sprints: []`
+       (the current value of EPIC-005…013), an absent key, and a YAML block sequence all yield
+       *"archived correctly … every member sprint closed"*. The file already argues this exact case
+       is a defect for the **other** half of §11 — `total_conditions()`'s own comment says a section
+       with no conditions is a defect because *"all ticked would be vacuously true"* — and does not
+       apply that reasoning to members.
+    2. **A malformed annotation carrying a number classifies as FOREIGN and buys the direction-(b)
+       exemption.** `[SPRINT-801, (closed 802]` tokenises to scope `(closed`, number `802`. Traced to
+       round 4's demotion, narrowed but not eliminated by round 5; `FAIL` at `b255f87^`. Same shape
+       as the regression T5 fixed, reachable only through malformed input.
+    3. **Four pre-existing unasserted branches** — the fenced-code strip and HTML-comment skip in
+       `ticked_unattributed` (both claimed closed at SPRINT-094 T1 and never asserted since), the
+       `n < 4` short-row guard in `member_status_cell`, and the no-epics skip line. Each deletable
+       with the whole suite green.
+    4. **Both `([^0-9]|$)` suffix anchors are unasserted** — the clause whose commit message claims
+       it *"closes the prefix bug: `SPRINT-0*91` also matched `SPRINT-910`"*. Removable, suite green.
+    5. **`_member_entries` is not scoped to frontmatter.** It matches `^member_sprints:` anywhere in
+       the file and takes the first hit, and unlike `ticked_unattributed` it does not strip fences —
+       so an epic with no such key but a ```yaml example in its body adopts the example's members.
+       Latent: all 16 real epics have exactly one such line, on line 7.
+    6. **Scope sentinels are in-band and forgeable.** A repo qualifier literally equal to `local` or
+       `unparsed` is indistinguishable from the sentinel, silently re-enabling the TD-144 collision
+       for that member. Contrived, but the locality decision is defended only by a string compare
+       against text the artifact supplies.
+    7. **The two `unparsed` NOTE arms quote differently** — one the entry as the file has it, one
+       after stripping — so the same sentence means two things. Cosmetic, non-gating.
+  - Why deferred, not fixed: T5 ran five adversarial review rounds; the first four were unrestricted
+    and each closed real defects while surfacing more, two of which were regressions the rounds
+    themselves introduced. Continuing to expand the task has poor expected value against the product
+    work it was blocking (EPIC-016, whose members live in `workdoo`). The boundary was ruled by the
+    owner, and the residue is recorded here rather than left in review transcripts (L-151 — a
+    decision recorded where its reader cannot reach it is not a decision).
+
 - **TD-147** severity: minor | status: open | created: Sprint-097
   - Tracker: none — surfaced by the SPRINT-097 T5 outside review (round 1 MINOR-2, restated round 2 as a contributing cause of its CRITICAL-1). Filed rather than fixed: the CRITICAL-1 repair closed the harm, and using the annotation is a new capability, not a fix.
   - Summary: **`member_sprints:` state annotations are parsed and then thrown away.**
