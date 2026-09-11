@@ -523,3 +523,43 @@ cases returned empty instead of their former values — the discrimination is st
 `spaced-token` case reproduces the pass-through verbatim.
 
 **T3: 6 of 6, DoD 4 QUALIFIED (limit named, `TD-153`). Sprint: 20 of 27 task DoD.**
+
+### 2026-09-11 | blocker | The gate still has no verdict — two runs killed, and two of my own readings corrected
+
+After T3 landed, the gate was re-run **unpiped** on a clean tree (the first attempt's flaw). It was
+killed for memory at 131 lines, 0 FAIL, no `QA-CHECK:` line. A second run on the **default** profile
+died identically. SPRINT-098 has produced **no gate verdict at all**, across three attempts and three
+distinct causes.
+
+**Correction 1 — "deterministic positional kill" was wrong.** Both runs produced byte-identical output
+(apart from my own echo), and I read that as a reproducible stop at one leg. Then
+`sh scripts/lib/check-handoff-state.sh .` — the next leg — ran **instantly and clean**. The identical
+output is explained without a positional theory: the captured lines cover only through **leg 2b**, and
+the profile-sensitive conformance leg never appears at all, so two profiles producing the same prefix
+is exactly what should happen. I had a theory before I had the cheap check that refutes it.
+
+**Correction 2 — calling it "TD-143's fourth instance" was premature.** TD-143 describes the *gate*
+being killed by the host for memory. What is actually established here is that **the host was under
+memory pressure this session created**: 8 agent worktrees totalling **109M**, from my own
+worktree-isolated review dispatches, plus the subagents themselves. The gate is the process that got
+killed; that does not make the gate the cause. Attributing it to TD-143 would have filed evidence
+against the wrong row — the failure the ledger's own header warns about (L-091).
+
+**What IS newly established, and it is about the fix rather than the failure.** SPRINT-097 T4 shipped
+`qa-verdict.ts` so a verdict-less run reports as a failure instead of reading as zero failures. On the
+first inconclusive run it did exactly that — the child died, the wrapper survived, and it printed
+*"no QA-CHECK line found in output."* On both of these runs the wrapper was killed **alongside** the
+child and printed nothing at all. **Its guarantee is conditional on outliving what it wraps**, and no
+fixture could surface that, because a fixture cannot kill the harness. That belongs on `TD-143`'s row
+as a limit on its own remedy, and is recorded here rather than filed unilaterally while the tree is
+mid-sprint.
+
+**What is NOT claimed:** that the gate is broken, that the budget guard is wrong, or that leg 2b-bis is
+expensive. Three attempts have produced zero verdicts and therefore zero evidence about the repository.
+**0 FAIL lines from a partial run is not a pass** — that is TD-143's whole point, and it applies to my
+own reading of these runs exactly as it applies to anyone else's.
+
+**Blocked on an owner decision.** The cheapest thing that would plausibly let the gate finish is
+removing the 8 worktrees — but that is not mine to take: `agent-a051e70aa1ed4ce12` carries **2 commits
+not on `main`** and predates this session (it is the copy `TD-149` cites), and three others hold
+uncommitted changes from review dispatches. Deleting them would discard work nobody has looked at.
