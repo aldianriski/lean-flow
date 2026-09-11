@@ -390,6 +390,95 @@ else
   fi
 fi
 
+
+# --- case 12 family: qa-check.sh leg 2g's OWN population derivation (SPRINT-098 T1, DoD 1/2/4) ---
+# Everything above proves check-night-run-rollup.sh itself FAILs on a nonexistent path (its own
+# file-not-found guard). What was never exercised is the CALLER, scripts/qa-check.sh leg 2g: before
+# SPRINT-098 T1, a sprint whose log was missing was silently dropped out of the checker's input list
+# before it ever saw the path -- so the one failure this whole file exists to catch never had a
+# chance to fire, exactly the scope-change's finding. Extracted here from the REAL committed
+# scripts/qa-check.sh at run time -- between the leg's own `qb_checkpoint` marker and the next one --
+# never hand-typed, so a future edit to the leg cannot drift silently out of sync with this proof
+# (the same discipline case 8/9/11 already apply one file down).
+qa_check="$repo_root/scripts/qa-check.sh"
+leg2g_wrapper="$here/.tmp-leg2g-wrapper.sh"
+{
+  cat <<'HARNESS_HEAD'
+#!/bin/sh
+set -u
+fail=0
+pass=0
+note() { printf '      %s\n' "$1"; }
+ok()   { pass=$((pass + 1)); printf 'PASS  %s\n' "$1"; }
+bad()  { fail=$((fail + 1)); printf 'FAIL  %s\n' "$1"; }
+HARNESS_HEAD
+  awk '
+    /qb_checkpoint "leg 2g: recorded-run rollup"/ {f=1; next}
+    f && /qb_checkpoint/ {exit}
+    f
+  ' "$qa_check" | sed "s#scripts/lib/check-night-run-rollup.sh#$repo_root/scripts/lib/check-night-run-rollup.sh#"
+  cat <<'HARNESS_TAIL'
+printf 'LEG2G-SUMMARY pass=%s fail=%s\n' "$pass" "$fail"
+HARNESS_TAIL
+} > "$leg2g_wrapper"
+[ -s "$leg2g_wrapper" ] || {
+  echo "FAIL harness: leg 2g extraction from $qa_check produced nothing -- the leg's shape (or its qb_checkpoint marker text) changed, re-derive the awk pattern"
+  fail=1
+}
+
+run_leg2g() { ld=$1; ( cd "$ld" && sh "$leg2g_wrapper" 2>&1 ); }
+
+# case 12a (must-FAIL, the motivating shape): a live sprint with open DoD whose Execution Log does
+# not exist at all -- the missing path now reaches the checker instead of being filtered out, and
+# its own file-not-found FAIL fires, named.
+d="$fx/qa-leg2g-open-dod-no-log"
+out=$(run_leg2g "$d"); ec12a=$?
+if [ "$ec12a" -eq 0 ] \
+   && printf '%s\n' "$out" | grep -q 'no Execution Log found at docs/sprint/logs/SPRINT-973-qa-leg2g-open-no-log.md' \
+   && printf '%s\n' "$out" | grep -q 'LEG2G-SUMMARY pass=0 fail=1'; then
+  echo "PASS fixture(qa-leg2g-open-no-log-fails): an absent log for an open-DoD sprint reaches the checker and FAILs named"
+else
+  echo "FAIL fixture(qa-leg2g-open-no-log-fails): expected a named 'no Execution Log found' FAIL -- got exit $ec12a:"
+  printf '%s\n' "$out"
+  fail=1
+fi
+
+# case 12b (sibling control, L-142): the SAME open-DoD shape, but the log exists and is wellformed
+# -> stays green. Without this, a leg that always failed would satisfy 12a alone.
+d="$fx/qa-leg2g-open-dod-with-log"
+out=$(run_leg2g "$d"); ec12b=$?
+if [ "$ec12b" -eq 0 ] \
+   && printf '%s\n' "$out" | grep -q 'PASS  night-run rollup' \
+   && printf '%s\n' "$out" | grep -q 'LEG2G-SUMMARY pass=1 fail=0'; then
+  echo "PASS fixture(qa-leg2g-open-with-log-ok): an open-DoD sprint whose log exists stays green"
+else
+  echo "FAIL fixture(qa-leg2g-open-with-log-ok): expected a clean PASS -- got exit $ec12b:"
+  printf '%s\n' "$out"
+  fail=1
+fi
+
+# case 12c (must-vary-SELECTION, L-186): the IDENTICAL missing-log condition as 12a, but this
+# sprint's DoD is fully ticked (closed, awaiting archive -- check-layers-observed.sh's own "at
+# close" shape). The verdict must differ even though the file-existence fact does not: this sprint
+# must never reach the checker at all, because "open DoD" is the selection criterion DoD 1 states,
+# not bare log-existence. Being the sole sprint file in its scratch tree, total exclusion collapses
+# nr_files to empty and the aggregate skip note fires instead -- proof the sprint was dropped from
+# the population, not merely evaluated and passed (a silent PASS on a wrong population would look
+# identical to a correct one without the second assertion below).
+d="$fx/qa-leg2g-closed-dod-no-log"
+out=$(run_leg2g "$d"); ec12c=$?
+if [ "$ec12c" -eq 0 ] \
+   && printf '%s\n' "$out" | grep -q 'skip -- no active sprint Plan found' \
+   && ! printf '%s\n' "$out" | grep -q 'SPRINT-975'; then
+  echo "PASS fixture(qa-leg2g-closed-no-log-excluded): a closed-DoD sprint's missing log is never handed to the checker (selection, not verdict)"
+else
+  echo "FAIL fixture(qa-leg2g-closed-no-log-excluded): expected total exclusion from the population -- got exit $ec12c:"
+  printf '%s\n' "$out"
+  fail=1
+fi
+
+rm -f "$leg2g_wrapper" 2>/dev/null
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "NIGHT-RUN-ROLLUP FIXTURES: all green"; else echo "NIGHT-RUN-ROLLUP FIXTURES: at least one FAIL"; fi
 exit $fail

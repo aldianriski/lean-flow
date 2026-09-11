@@ -54,7 +54,21 @@ note() { printf '      %s\n' "$1"; }
 [ "$#" -gt 0 ] || { note "night-run rollup: no sprint logs given -- nothing verified"; exit 0; }
 
 for lg in "$@"; do
-  [ -f "$lg" ] || { bad "night-run rollup: file not found: $lg"; continue; }
+  # An absent log is not a skip -- it is exactly the state a run that died before writing anything
+  # leaves behind (SPRINT-098 T1 DoD 1). Named distinctly from "no completed-run entry yet" below:
+  # that case has a real file recording real (mid-flight) progress; this one has none at all.
+  [ -f "$lg" ] || { bad "night-run rollup: no Execution Log found at $lg -- an absent log is exactly the silence this check exists to catch, not something to skip"; continue; }
+  # A1 (SPRINT-098 T1, owner-ruled 2026-09-11): grandfathered by scoping to LIVE sprints, not by a
+  # maintained allowlist -- the archived sprints carrying open Plan DoD fall out of scope by
+  # construction, exactly because their path matches here. (Count deliberately not stated: it is a
+  # query result, it moves with every close, and a reader here cannot re-derive it. The figure that
+  # was first written into this comment -- "36 of 97" -- was wrong: it counted any open checkbox in
+  # the file, including `## Owner-action checklist` items. Scoped to `## Plan`, where DoD live, it
+  # is 5 archived sprints, 4 of them without a rollup. See the 2026-09-11 correction entry in
+  # docs/sprint/logs/SPRINT-098-*.md.) This inherits TASK-342's known defect:
+  # the exclusion below is a case-sensitive STRING glob, not a filesystem-identity predicate, so a
+  # differently-cased or differently-separated archive path (e.g. a case-insensitive filesystem's
+  # `Archive/`) would not be excluded. Named rather than fixed here -- TASK-342 owns the repair.
   case "$lg" in */archive/*) continue ;; esac
 
   # A completed run announces itself with a `run-complete` event in the log's entry header.

@@ -375,13 +375,29 @@ else
   # load-bearing: ADR-014 requires this file to carry exactly one sprint pattern (the
   # non-recursive one), enforced by run-sprint-log-layout-fixtures.sh case 1; and deriving
   # means the Plan and its log cannot drift apart -- the pair is one record (§11).
+  #
+  # An ABSENT log for a live sprint that still has open DoD is not "nothing to check" -- it is
+  # exactly the state a run that died before writing anything leaves behind (SPRINT-098 T1 DoD 1,
+  # scope-change 2026-09-11). Before this fix, a missing log silently dropped that sprint out of
+  # nr_files instead of ever reaching the checker, so the one failure this leg exists to catch
+  # never had a chance to surface -- the checker already FAILs on a nonexistent path
+  # (check-night-run-rollup.sh's own file-not-found guard), it just never used to be handed one. A
+  # sprint whose Plan is fully ticked (closed, awaiting archive -- a transient state, not a crash)
+  # is not required to carry one for THIS leg; "open DoD" reuses the exact derivation
+  # check-layers-observed.sh already uses for "is this sprint at close" (`## Plan` section,
+  # `^- \[ \]` lines) rather than re-inventing it.
   nr_files=""
   for nr_sp in $(ls docs/sprint/SPRINT-*.md 2>/dev/null); do
     nr_lg="docs/sprint/logs/$(basename "$nr_sp")"
-    [ -f "$nr_lg" ] && nr_files="$nr_files $nr_lg"
+    if [ -f "$nr_lg" ]; then
+      nr_files="$nr_files $nr_lg"
+    else
+      nr_open=$(awk '/^## Plan/{f=1;next} /^## /{f=0} f && /^- \[ \]/{n++} END{print n+0}' "$nr_sp")
+      [ "$nr_open" -gt 0 ] && nr_files="$nr_files $nr_lg"
+    fi
   done
   if [ -z "$nr_files" ]; then
-    note "night-run rollup: skip -- no Execution Log alongside an active sprint"
+    note "night-run rollup: skip -- no active sprint Plan found"
   else
     nr_out=$(sh "$nr_script" $nr_files 2>&1); nr_code=$?
     printf '%s\n' "$nr_out"
