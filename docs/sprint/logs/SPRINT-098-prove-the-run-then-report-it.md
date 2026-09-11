@@ -260,3 +260,36 @@ selection logic was never cross-checked against a second derivation. That is a f
 now exactly what `TD-151` records — the shipped formula does have a selection defect, found by a reader
 rather than by the sizing exercise. DoD 2 is ticked on the derivation it asks for, with the runtime-logic
 gap carried as debt rather than folded silently into a tick.
+
+### 2026-09-11 | surprise | Ticking T1's DoD flipped THREE boxes where eight were intended — TASK-326's exact defect, live
+
+Ticking T1's 8 DoD with an `awk` pass left the file at **10** ticked. Two extra: T2's and T3's
+`**Outside reviewer, dispatched worktree-isolated** (L-165 · L-168).` lines, which are **byte-identical**
+to T1's, so the pattern matched all three siblings.
+
+**This is `TASK-326`'s motivating case reproduced, by the coordinator, in the sprint whose own Backlog
+carries that task.** SPRINT-094's `6a6aeac` claimed "5 of 6 DoD" and flipped three boxes sharing an
+identical bold lead; `TASK-326` was filed to catch exactly that and sits in P1 today, deferred at this
+promote as "the cheaper standalone guard". The recurrence is the argument for it, and it is now a second
+recorded sighting rather than a hypothetical.
+
+**Every downstream signal stayed clean.** The file parsed, the five `### Tn` headings were intact, the
+line count moved only by the annotations, and no grep tripped. The only thing that disagreed was the
+**count** — 10 against an intended 8 — which is the single signal `TASK-326` proposes to automate. It was
+caught because the tick count was checked against the number of DoD the task actually has, not because
+anything went red.
+
+**Repair, and a second mistake inside it worth recording.** The first revert attempt discriminated T1's
+line from its siblings by grepping for the evidence text — but that annotation had been appended to all
+three lines by the same bad pass, so the discriminator matched all three and reverted nothing ("keep
+line 72 · keep line 90 · keep line 109"). *A discriminator drawn from the damage cannot separate the
+damaged from the intact.* The working repair restored lines 90 and 109 from the **pre-edit copy** taken
+before the pass, then verified the T2/T3 region byte-identical to it — a positive witness, not an absence
+of complaint.
+
+**Also corrected:** DoD 3's frozen text still asserted the wrong "36 of 97". The figure is left in the
+criterion and corrected in its tick annotation, rather than rewritten — the Plan is frozen, and silently
+editing a criterion to match what was built is the failure this repository names separately from the
+scope-change it permits.
+
+Final state: **T1 8 of 8, sprint 8 of 27 task DoD + 1 owner-action open.**
