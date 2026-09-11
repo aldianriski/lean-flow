@@ -186,8 +186,9 @@ run_case_anywhere "r-nonmember-attrib" 1 \
 # EPIC-016's exact shape, and the case with no reader before this sprint. Passing here is possible
 # only if the member was never resolved locally: the collision partner IS on disk and its sha DOES
 # disagree, so a checker that still globs `SPRINT-930-*` for this member fails the case loudly.
+# The NOTE names the collision itself: the local twin IS on disk and was deliberately not used.
 run_case_anywhere "s-foreign-collision" 0 \
-  "member workdoo SPRINT-930 lives outside this repository" -- \
+  "SPRINT-930 lives outside this repository, and this repository ALSO has a same-numbered Plan" -- \
   sh "$checker" "$fxs/s-foreign-collision"
 
 # --- case 19: the SIBLING CONTROL -- same row, LOCAL member -> FAIL -----------------------------
@@ -205,6 +206,62 @@ run_case_anywhere "s-local-collision-twin" 1 \
 run_case_anywhere "s-bare-number-member" 1 \
   "SPRINT-930's § Member sprints Status cell names a close_commit that is not the sprint's own" -- \
   sh "$checker" "$fxs/s-bare-number-member"
+
+# --- SELECTION cases 21-22: epic file DEPTH (SPRINT-097 T5 owner ruling) -------------------------
+# The second selection axis, and the one that sank T5's first retry. That attempt classified a member
+# as local or external by matching its row's link href against `../sprint/*`. Every archived epic in
+# this repository sits one directory deeper and links its local members TWO levels up
+# (`](../../sprint/archive/SPRINT-NNN-...)` -- EPIC-001, 002, 003 and 004 all do), so all four had
+# their LOCAL members classified external and silently dropped from the verified set. That defeats
+# direction (a), "ARCHIVED TOO EARLY ... the one §11 warns about", and trades a loud false positive
+# for a silent false negative.
+#
+# No fixture could catch it: every archived-epic fixture above carries NO § Member sprints table at
+# all, so no fixture varied -- or even exercised -- epic file depth, and a seeded break could not
+# reach a branch the fixtures never entered. These two put an archived epic at the real corpus depth
+# with a real two-level member link, and differ only in whether that member is closed. Retained.
+
+# --- case 21: archived epic at real depth whose local member is still OPEN -> FAIL ---------------
+run_case_anywhere "s-archived-depth-open" 1 \
+  "archived while member sprint(s) 932 are still open" -- \
+  sh "$checker" "$fx/s-archived-depth-open"
+
+# --- case 22: the SIBLING CONTROL -- same depth, member closed -> exit 0 -------------------------
+# Without it, case 21 is satisfied by a checker that refuses every archived epic at this depth.
+run_case_anywhere "s-archived-depth-closed" 0 \
+  "EPIC-933-f.md archived correctly" -- \
+  sh "$checker" "$fx/s-archived-depth-closed"
+
+# --- cases 23-25: the T5 REVIEW's findings, each with its own case -------------------------------
+# All three come from the independent worktree-isolated review of the first merge attempt. Each is a
+# hole the 22 cases above could not see, and each is here because a seeded break proved the suite
+# stayed green without it (L-142).
+
+# --- case 23: foreign member colliding with an OPEN local twin -> FAIL (review MAJOR-2a) ---------
+# Every OTHER selection fixture's collision partner is CLOSED, so `open_members`/`unknown_members`
+# return empty whether or not they skip foreign members -- and the `_members_scan` half of the fix
+# was therefore deletable with all 22 cases green. Proven: with that one guard line removed this
+# case flips to `PASS ... correctly NOT yet archived`, exit 0.
+run_case_anywhere "s-foreign-open-collision" 1 \
+  "is closed with every § Closed when condition met and every member sprint closed, but still sits" -- \
+  sh "$checker" "$fxs/s-foreign-open-collision"
+
+# --- case 24: archived epic with NO resolvable member -> exit 0, but a NARROWED claim ------------
+# The verdict is not the finding; the SENTENCE is. Direction (a) used to print "every member sprint
+# closed" for an epic where it resolved nothing, two lines above a NOTE saying §11's trigger cannot
+# be read for those members -- an affirmative claim about a test that never ran (review CRITICAL-1).
+run_case_anywhere "s-allforeign-archived" 0 \
+  "every LOCAL member sprint closed -- but 2 member(s) could not be resolved" -- \
+  sh "$checker" "$fx/s-allforeign-archived"
+
+# --- case 25: the UNKNOWN-member NOTE is asserted, not merely emitted (review MAJOR-2b) ----------
+# `unknown_members()` shipped for five sprints with ZERO callers while its own header declared that
+# unknown members are "NAMED on the report ... never silently skipped". T5 wired it -- and shipped it
+# with zero ASSERTIONS, so deleting the reporting loop again left the suite green. Same silent-stance
+# failure, one level along. This case is the reader that was missing.
+run_case_anywhere "unknown-member-noted" 0 \
+  "member SPRINT-903 names no Plan anywhere in this repository" -- \
+  sh "$checker" "$fx/live-open"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "EPIC-ARCHIVE FIXTURES: all green"; else echo "EPIC-ARCHIVE FIXTURES: at least one FAIL"; fi

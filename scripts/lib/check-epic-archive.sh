@@ -112,9 +112,6 @@ _member_entries() {
     }' "$1"
 }
 
-# Members living in another repository: "<qualifier> SPRINT-<num>" per line.
-foreign_members() { _member_entries "$1" | awk '$1 != "local" { printf "%s SPRINT-%s\n", $1, $2 }'; }
-
 _members_scan() {
   _out=""
   while read -r _scope _m; do
@@ -158,17 +155,42 @@ unknown_members() { _members_scan "$1" "$2" unknown; }
 # behaviour it did not have: the stance was written, and the reader it was written for never saw a
 # line. Both kinds now print, and neither sets `fail` -- an unresolvable member is a fact about this
 # checker's reach, not a defect in the artifact it is reading.
+# The COLLISION half is the guard pointed at its own motivating case (L-166). Locality is declared
+# in frontmatter and nothing cross-checks that declaration, so ONE stray qualifier token silently
+# removes a member from the verified set while its Plan sits on disk -- a wrong close_commit in the
+# row would never be reported. The checker cannot tell a correct qualifier from a mistaken one:
+# EPIC-016's `workdoo SPRINT-001` is right, and this repository really does own an unrelated
+# SPRINT-001. So the NOTE states the collision as a FACT and names what was not done, rather than
+# accusing a correct artifact -- which is also exactly the TD-144 shape this task was filed for.
 report_unresolvable() {
   _ru_e=$1; _ru_root=$2; _ru_rel=$3
-  while read -r _ru_f; do
-    [ -n "$_ru_f" ] || continue
-    note "epic-state: $_ru_rel member $_ru_f lives outside this repository -- its rollup row cannot be verified here, and §11's archival trigger cannot be read for it. Keeping the row current is a manual obligation at that sprint's close (ADR-041)"
+  while read -r _ru_scope _ru_num; do
+    [ -n "$_ru_num" ] || continue
+    [ "$_ru_scope" = "local" ] && continue
+    _ru_hit=""
+    for _ru_p in "$_ru_root"/docs/sprint/archive/SPRINT-"$_ru_num"-*.md "$_ru_root"/docs/sprint/SPRINT-"$_ru_num"-*.md; do
+      [ -f "$_ru_p" ] && { _ru_hit=${_ru_p#"$_ru_root"/}; break; }
+    done
+    if [ -n "$_ru_hit" ]; then
+      note "epic-archive: $_ru_rel member $_ru_scope SPRINT-$_ru_num lives outside this repository, and this repository ALSO has a same-numbered Plan at $_ru_hit. That local Plan is a different sprint and was deliberately NOT used to verify this row (TD-144). If the qualifier is wrong and the member is local, this row is going unverified -- check it"
+    else
+      note "epic-archive: $_ru_rel member $_ru_scope SPRINT-$_ru_num lives outside this repository -- its rollup row cannot be verified here, and §11's archival trigger cannot be read for it. Keeping the row current is a manual obligation at that sprint's close (ADR-041)"
+    fi
   done <<FMEOF
-$(foreign_members "$_ru_e")
+$(_member_entries "$_ru_e")
 FMEOF
   for _ru_u in $(unknown_members "$_ru_e" "$_ru_root"); do
-    note "epic-state: $_ru_rel member SPRINT-$_ru_u names no Plan anywhere in this repository -- neither docs/sprint/ nor docs/sprint/archive/ has it, so its state is unread rather than passed"
+    note "epic-archive: $_ru_rel member SPRINT-$_ru_u names no Plan anywhere in this repository -- neither docs/sprint/ nor docs/sprint/archive/ has it, so its state is unread rather than passed"
   done
+}
+
+# How many members this checker could not resolve locally -- foreign plus unknown. Used to keep the
+# success lines below from CLAIMING a closure test they never ran (review CRITICAL-1: direction (a)
+# asserted "every member sprint closed" two lines above a NOTE saying the trigger cannot be read).
+unverified_count() {
+  _uc_f=$(_member_entries "$1" | awk '$1 != "local"' | wc -l)
+  _uc_u=$(unknown_members "$1" "$2" | wc -w)
+  echo $((_uc_f + _uc_u))
 }
 checked=0
 
@@ -189,7 +211,15 @@ for e in "$root"/docs/epic/archive/EPIC-*.md; do
   elif [ -n "$(open_members "$e" "$root")" ]; then
     bad "epic-archive: $rel archived while member sprint(s) $(open_members "$e" "$root") are still open -- §11 makes this a TWO-PART test and is explicit that an epic is never archived on member-sprint count alone. An epic whose sprints are unfinished is unfinished, and archiving it hides that"
   else
-    ok "epic-archive: $rel archived correctly ($tot condition(s), all met, status closed, every member sprint closed)"
+    # The claim is narrowed when any member was unresolvable. §11's trigger is "every member sprint
+    # closed", and an epic whose members this checker cannot reach has not been shown to meet it --
+    # saying so plainly is the difference between a verified PASS and an assumed one.
+    unv=$(unverified_count "$e" "$root")
+    if [ "$unv" -gt 0 ]; then
+      ok "epic-archive: $rel archived with $tot condition(s) all met and status closed, and every LOCAL member sprint closed -- but $unv member(s) could not be resolved against this repository (see NOTE), so §11's member half was NOT verified for them"
+    else
+      ok "epic-archive: $rel archived correctly ($tot condition(s), all met, status closed, every member sprint closed)"
+    fi
   fi
   report_unresolvable "$e" "$root" "$rel"
 done
@@ -396,7 +426,16 @@ CMEOF
 $(ticked_unattributed "$e" "$allmem")
 TUEOF
 
-  [ "$drift" -eq 0 ] && ok "epic-state: $rel rollup current (every closed member rolled up with its own close_commit, header tracks its newest member close, every ticked condition attributed to a member)"
+  # Same narrowing as direction (a): EPIC-016 examines ZERO members, and "rollup current" read as an
+  # affirmative check on a rollup nothing had looked at (review CRITICAL-1, the epic-state half).
+  if [ "$drift" -eq 0 ]; then
+    unv=$(unverified_count "$e" "$root")
+    if [ "$unv" -gt 0 ]; then
+      ok "epic-state: $rel rollup current for every LOCAL member -- but $unv member(s) could not be resolved against this repository (see NOTE) and their rows were not checked at all"
+    else
+      ok "epic-state: $rel rollup current (every closed member rolled up with its own close_commit, header tracks its newest member close, every ticked condition attributed to a member)"
+    fi
+  fi
 done
 
 [ "$checked" -eq 0 ] && printf '      %s\n' "epic-archive: skip (no epics under docs/epic/)"
