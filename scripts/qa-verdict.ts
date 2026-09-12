@@ -14,10 +14,21 @@ import { spawn } from "node:child_process";
 
 export const VERDICT_RE = /^QA-CHECK: (\d+) pass, (\d+) fail$/m;
 
+// SPRINT-099 T2 (TD-117 + TD-128): truncation is a THIRD outcome, not a flavour of failure.
+// qa-check.sh prints this line IN ADDITION to the verdict line above, never instead of it --
+// VERDICT_RE is anchored at both ends, so editing the verdict line would make every run read as
+// verdict-less, which is the exact failure TD-143's cheap half shipped to prevent.
+// Without this, the only AUTOMATED reader of the gate reports a run that skipped 27 guards as
+// "an ordinary red gate", which is the conflation T2 exists to end.
+export const TRUNCATED_RE =
+  /^QA-CHECK: TRUNCATED at (.+?) after (\d+)s against a (\d+)s budget -- (\d+) item\(s\) UNRUN/m;
+
 export interface VerdictOutcome {
   readonly ok: boolean;
   readonly pass?: number;
   readonly fail?: number;
+  /** Present only when the run truncated: it stopped early and did not reach every check. */
+  readonly truncated?: { readonly at: string; readonly elapsed: number; readonly budget: number; readonly unrun: number };
   readonly reason: string;
 }
 
@@ -34,15 +45,36 @@ export function judgeOutput(output: string): VerdictOutcome {
   }
   const pass = Number(m[1]);
   const fail = Number(m[2]);
+
+  // Truncation is checked BEFORE the fail>0 branch, because a truncated run also carries fail>0 (the
+  // budget finding itself is a FAIL). Checking fail first would report every truncated run as an
+  // ordinary red gate -- which is precisely the conflation this block exists to end. Order is the
+  // whole fix here, not the regex.
+  const t = TRUNCATED_RE.exec(output);
+  if (t) {
+    const truncated = { at: t[1]!, elapsed: Number(t[2]), budget: Number(t[3]), unrun: Number(t[4]) };
+    return {
+      ok: false,
+      pass,
+      fail,
+      truncated,
+      reason:
+        `qa-verdict: QA-CHECK reported TRUNCATED at ${truncated.at} after ${truncated.elapsed}s ` +
+        `against a ${truncated.budget}s budget -- ${truncated.unrun} check(s) NEVER RAN. This is not ` +
+        `an ordinary red gate: the run is INCOMPLETE, so its ${pass} pass / ${fail} fail says nothing ` +
+        `about the ${truncated.unrun} unrun item(s). A skipped harness is an unrun guard (TD-117).`,
+    };
+  }
+
   if (fail > 0) {
     return {
       ok: false,
       pass,
       fail,
-      reason: `qa-verdict: QA-CHECK reported ${fail} fail (verdict present -- an ordinary red gate, not verdict-less)`,
+      reason: `qa-verdict: QA-CHECK reported ${fail} fail (verdict present, run complete -- an ordinary red gate, not verdict-less and not truncated)`,
     };
   }
-  return { ok: true, pass, fail, reason: `qa-verdict: QA-CHECK reported ${pass} pass, 0 fail` };
+  return { ok: true, pass, fail, reason: `qa-verdict: QA-CHECK reported ${pass} pass, 0 fail (run complete)` };
 }
 
 export interface RunOutcome extends VerdictOutcome {

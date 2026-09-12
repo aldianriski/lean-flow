@@ -36,3 +36,83 @@ qa_budget_check() {
   printf 'OK %s %s\n' "$_qb_elapsed" "$_qb_budget"
   return 0
 }
+
+# --- truncation as an OUTCOME, not a failure (SPRINT-099 T2, TD-117 + TD-128) -------------------
+# TD-117's ruled direction (D3): make the skipped set its own named outcome. The problem it fixes is
+# not that truncation goes unreported -- leg 12 already `note`s each skipped harness -- but that the
+# VERDICT is byte-indistinguishable from an ordinary red gate. SPRINT-099 T1 reproduced that five
+# times out of five: every completed run printed `N pass, 1 fail` while having skipped 13 harnesses,
+# two of them the guards of this very budget mechanism.
+#
+# These are pure formatting/selection functions rather than inline code in qa-check.sh for one
+# reason: the only way to exercise logic living inside qa-check.sh is to RUN qa-check.sh, which
+# measures ~550s on this host and truncates. A guard that can only be tested by a run that truncates
+# cannot be a fixture. Here they are callable in milliseconds (evals/run-qa-budget-fixtures.sh).
+#
+# The verdict line `QA-CHECK: N pass, M fail` is deliberately NOT changed by any of this.
+# scripts/qa-verdict.ts matches it with /^QA-CHECK: (\d+) pass, (\d+) fail$/m -- anchored at BOTH
+# ends -- so any edit to that line would make every run report as verdict-less, which is the exact
+# failure TD-143's cheap half shipped to prevent. Truncation therefore arrives as its own ADDITIONAL
+# line and the verdict line is left alone (L-020: the consumer was enumerated before the change).
+
+# qa_unreached_from <current-item>
+#   Reads an ordered list on stdin, prints <current-item> AND everything after it. Inclusive because
+#   the item a trip fires ON is itself unrun: leg 12 skips the harness it tripped at, and a leg
+#   checkpoint fires before its own leg runs.
+qa_unreached_from() {
+  _qu_cur=$1; _qu_seen=0
+  while IFS= read -r _qu_x; do
+    [ -n "$_qu_x" ] || continue
+    [ "$_qu_x" = "$_qu_cur" ] && _qu_seen=1
+    [ "$_qu_seen" -eq 1 ] && printf '%s\n' "$_qu_x"
+  done
+  return 0
+}
+
+# qa_truncation_line <label> <elapsed> <budget> <unrun-NEWLINE-separated>
+#   The distinguishing line. Names the ACTUAL elapsed seconds, the budget, where it stopped, and
+#   every unrun item BY NAME -- T2's DoD is explicit that a count alone is not enough.
+#   An empty unrun set is reported as a DEFECT, not as good news: truncating with nothing left to run
+#   is a contradiction, and a guard that cannot derive its own subject says so rather than printing a
+#   clean-looking line (L-058).
+qa_truncation_line() {
+  _qt_label=$1; _qt_elapsed=$2; _qt_budget=$3; _qt_unrun=$4
+  # Items are NEWLINE-delimited, and are counted by LINE rather than by word. This is not
+  # defensive style: leg labels contain spaces ("leg 2: count consistency"), so word-splitting
+  # reported 94 items while naming 21 legs -- found by pointing this at the real gate rather than
+  # at the fixtures, every one of which happened to use space-free names like `run-foo.sh` (L-166,
+  # L-186). The display join is " | " so a reader can tell two multi-word items apart.
+  _qt_n=0; _qt_joined=""
+  while IFS= read -r _qt_i; do
+    [ -n "$_qt_i" ] || continue
+    _qt_n=$((_qt_n + 1))
+    if [ -z "$_qt_joined" ]; then _qt_joined=$_qt_i; else _qt_joined="$_qt_joined | $_qt_i"; fi
+  done <<QTEOF
+$_qt_unrun
+QTEOF
+  if [ "$_qt_n" -eq 0 ]; then
+    printf 'QA-CHECK: TRUNCATED at %s after %ss against a %ss budget -- but the unrun set came back EMPTY, which is impossible for a real truncation: the unreached set could not be derived, so this run reports nothing about what it skipped\n' \
+      "$_qt_label" "$_qt_elapsed" "$_qt_budget"
+    return 1
+  fi
+  printf 'QA-CHECK: TRUNCATED at %s after %ss against a %ss budget -- %s item(s) UNRUN, named: %s\n' \
+    "$_qt_label" "$_qt_elapsed" "$_qt_budget" "$_qt_n" "$_qt_joined"
+  return 0
+}
+
+# qa_ceiling_check <start-epoch-seconds> <ceiling-seconds>
+#   TD-128's missing READER. check-qa-budget-default.sh asserts the CONFIGURED budget against the
+#   ceiling and is correct within that scope -- it is deliberately NOT widened (T2 DoD 3). What has
+#   never been asserted anywhere is the ACTUAL runtime against that same ceiling, which is why the
+#   check could print `PASS 520s < 600s` on a run that took 1450s.
+qa_ceiling_check() {
+  _qc_ceiling=$2
+  _qc_now=$(date +%s)
+  _qc_elapsed=$(( _qc_now - $1 ))
+  if [ "$_qc_elapsed" -gt "$_qc_ceiling" ]; then
+    printf 'OVER-CEILING %s %s\n' "$_qc_elapsed" "$_qc_ceiling"
+    return 1
+  fi
+  printf 'WITHIN-CEILING %s %s\n' "$_qc_elapsed" "$_qc_ceiling"
+  return 0
+}

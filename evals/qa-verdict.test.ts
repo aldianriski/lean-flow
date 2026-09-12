@@ -155,3 +155,61 @@ describe("runAndJudge -- stderr interleaving must never corrupt the judged verdi
     expect(result.pass).toBe(1);
   });
 });
+
+// SPRINT-099 T2 (TD-117): truncation is a THIRD outcome. A run that trips the budget skips real
+// guards and still prints `N pass, M fail`; T1 reproduced that five times out of five, once skipping
+// 13 harnesses INCLUDING the two that guard the budget mechanism itself. Read as an ordinary red
+// gate, that is coverage loss wearing the costume of a single known failure.
+describe("judgeOutput -- truncation is distinct from failure (TD-117)", () => {
+  // Real output, copied from the gate itself (QA_BUDGET_SECONDS=200), not hand-written to fit.
+  const truncated =
+    "      eval harness run-count-claims-fixtures.sh: skipped -- default-profile budget already exceeded\n" +
+    "\n----------------------------------------\n" +
+    "QA-CHECK: TRUNCATED at eval harness 'run-sprint-log-layout-fixtures.sh' after 255s against a 200s budget -- 27 item(s) UNRUN, named: run-sprint-log-layout-fixtures.sh | run-count-claims-fixtures.sh\n" +
+    "QA-CHECK: 189 pass, 1 fail\n";
+
+  // Must-FAIL of the scenario: the run is reported as truncated, with the unrun count carried
+  // structurally rather than buried in prose a caller would have to re-parse.
+  test("a truncated run is reported as truncated, naming where it stopped and how much never ran", () => {
+    const outcome = judgeOutput(truncated);
+    expect(outcome.ok).toBe(false);
+    expect(outcome.truncated).toBeDefined();
+    expect(outcome.truncated?.unrun).toBe(27);
+    expect(outcome.truncated?.elapsed).toBe(255);
+    expect(outcome.truncated?.budget).toBe(200);
+    expect(outcome.truncated?.at).toMatch(/run-sprint-log-layout-fixtures\.sh/);
+  });
+
+  // The ORDER assertion, and the one that would have caught the obvious implementation. A truncated
+  // run also carries fail>0, because the budget finding is itself a FAIL -- so checking fail first
+  // reports every truncated run as an ordinary red gate and the new branch becomes unreachable.
+  // This case fails if the branches are ever reordered, which no count- or field-based test would see.
+  test("a truncated run is NOT described as an ordinary red gate, despite also having fail>0", () => {
+    const outcome = judgeOutput(truncated);
+    expect(outcome.fail).toBe(1);
+    expect(outcome.reason).toMatch(/TRUNCATED/);
+    // Discriminates on "run complete" -- the ordinary-red branch's own marker. The truncated message
+    // contains the words "not an ordinary red gate", so matching that phrase would collide with the
+    // very wording that makes the distinction to a human reader.
+    expect(outcome.reason).not.toMatch(/run complete/);
+  });
+
+  // Sibling control: an ordinary red gate stays exactly what it was. The new branch must ADD an
+  // outcome, never reclassify the existing two -- the same constraint TD-143's cheap half carried.
+  test("an ordinary red gate is still an ordinary red gate, with no truncation reported", () => {
+    const red = "FAIL  cap docs/QA.md (400 > 320)\n\n----------------------------------------\nQA-CHECK: 229 pass, 1 fail\n";
+    const outcome = judgeOutput(red);
+    expect(outcome.ok).toBe(false);
+    expect(outcome.fail).toBe(1);
+    expect(outcome.truncated).toBeUndefined();
+    expect(outcome.reason).toMatch(/ordinary red gate/);
+  });
+
+  // Sibling control: a clean run is untouched and still green.
+  test("a clean run stays green and reports no truncation", () => {
+    const clean = "PASS  x\n\n----------------------------------------\nQA-CHECK: 230 pass, 0 fail\n";
+    const outcome = judgeOutput(clean);
+    expect(outcome.ok).toBe(true);
+    expect(outcome.truncated).toBeUndefined();
+  });
+});

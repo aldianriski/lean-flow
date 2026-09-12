@@ -99,6 +99,14 @@ fi
 # tripped it. The name carries "-early" so a reader (and the fixtures) can tell this checkpoint fired
 # from leg 12's own, later one.
 qb_early_tripped=0
+# qb_all_legs -- the ordered leg list, DERIVED from this file's own qb_checkpoint calls rather than
+# hand-maintained beside them (SPRINT-099 T2). A second hand-written list is a registry that drifts
+# from the thing it registers the first time a leg is added or renamed, and nothing would report the
+# drift. Deriving means the list cannot disagree with the calls: they ARE the list.
+qb_all_legs() {
+  [ -f "$0" ] || return 0
+  sed -n 's/^qb_checkpoint "\([^"]*\)".*$/\1/p' "$0"
+}
 qb_checkpoint() { # <leg-label>
   qp_sample "checkpoint: $1"
   [ "$qb_early_tripped" -eq 1 ] && return 0
@@ -108,6 +116,11 @@ qb_checkpoint() { # <leg-label>
       qb_early_tripped=1
       qb_elapsed=$(printf '%s' "$qb_out" | cut -d' ' -f2)
       bad "qa-check-budget-exceeded-early: ${qb_elapsed}s elapsed exceeds the ${QA_BUDGET_SECONDS}s default-profile budget, reached at checkpoint '$1' -- BEFORE leg 12's eval-harness loop. Every leg from here on, including all eval harnesses, is skipped and reported here rather than run past an external timeout with no verdict line (TD-084, TD-091). Set QA_BUDGET_SECONDS to raise the budget, or QA_FULL=1 to lift it for a full run"
+      # Truncation is reported as its OWN outcome line, naming the actual elapsed seconds and every
+      # leg it never reached BY NAME (SPRINT-099 T2, TD-117). Before this, the message named none of
+      # them and the verdict below was byte-indistinguishable from an ordinary red gate.
+      qb_unrun=$(qb_all_legs | qa_unreached_from "$1")
+      qa_truncation_line "checkpoint '$1'" "$qb_elapsed" "$QA_BUDGET_SECONDS" "$qb_unrun" || true
       printf '\n----------------------------------------\n'
       printf 'QA-CHECK: %s pass, %s fail\n' "$pass" "$fail"
       exit 1
@@ -1059,6 +1072,7 @@ else
   note "eval harnesses: bare run -- opt-in selftests skipped (set QA_FULL=1 to run them)"
 fi
 budget_tripped=0
+qb_trunc_line=""
 for h in $eval_harnesses; do
   qp_sample "harness-begin: $h"
   # TD-084 forward guard: this loop is the likeliest place a future regression reproduces the
@@ -1073,6 +1087,13 @@ for h in $eval_harnesses; do
         budget_tripped=1
         qb_elapsed=$(printf '%s' "$qb_out" | cut -d' ' -f2)
         bad "qa-check-budget-exceeded: ${qb_elapsed}s elapsed exceeds the ${QA_BUDGET_SECONDS}s default-profile budget, reached at eval harness '$h'. Remaining harnesses in this leg are skipped and named below rather than left to run past an external timeout with no verdict line (TD-084). Set QA_BUDGET_SECONDS to raise the budget, or QA_FULL=1 to lift it for a full run"
+        # The unrun set is computed HERE, while $eval_harnesses and $h are both in scope, and held
+        # for the Summary so it prints beside the verdict where a reader looks -- not buried among
+        # the 13 `note` lines that follow it (SPRINT-099 T2). Inclusive of $h: the harness the trip
+        # fires ON is itself skipped, which T1 confirmed live (13 skipped, starting with the one it
+        # tripped at).
+        qb_unrun_h=$(printf "%s\n" $eval_harnesses | qa_unreached_from "$h")
+        qb_trunc_line=$(qa_truncation_line "eval harness '$h'" "$qb_elapsed" "$QA_BUDGET_SECONDS" "$qb_unrun_h")
         ;;
     esac
   fi
@@ -1285,9 +1306,32 @@ else
   fi
 fi
 
+# --- actual runtime against the command ceiling (SPRINT-099 T2, TD-128) ------------------------
+# The missing READER. `check-qa-budget-default.sh` asserts the CONFIGURED budget against the ceiling
+# and is correct within that scope -- it is deliberately NOT widened here (T2 DoD 3). What nothing
+# has ever asserted is the run's ACTUAL duration, which is how that check could print
+# `PASS 520s < 600s command ceiling` for a run that took 1450s. This is the assertion that can
+# actually go red when the gate is too slow, rather than one that restates its own configuration.
+QA_CEILING_SECONDS=${QA_CEILING_SECONDS:-600}
+qc_out=$(qa_ceiling_check "$START_TS" "$QA_CEILING_SECONDS")
+qc_elapsed=$(printf '%s' "$qc_out" | cut -d' ' -f2)
+case "$qc_out" in
+  OVER-CEILING*)
+    bad "qa-runtime-over-ceiling: this run took ${qc_elapsed}s, exceeding the ${QA_CEILING_SECONDS}s command ceiling. A run past the ceiling is killed from outside with no verdict line, so the ceiling is the limit that decides whether this gate can speak at all -- unlike the ${QA_BUDGET_SECONDS}s budget, which this gate enforces on itself (TD-128)"
+    ;;
+  *)
+    ok "qa-runtime: ${qc_elapsed}s actual, within the ${QA_CEILING_SECONDS}s command ceiling (TD-128's reader -- the ACTUAL runtime, not the configured budget)"
+    ;;
+esac
+
+# Truncation, printed beside the verdict rather than 13 `note` lines above it. The verdict line
+# itself is deliberately unchanged: scripts/qa-verdict.ts anchors on
+# /^QA-CHECK: (\d+) pass, (\d+) fail$/m at BOTH ends, so editing it would make every run report as
+# verdict-less -- the exact failure TD-143's cheap half shipped to prevent (L-020).
 qp_sample "final: summary"
 
 # --- Summary ----------------------------------------------------------------
 printf '\n----------------------------------------\n'
+[ -n "${qb_trunc_line:-}" ] && printf "%s\n" "$qb_trunc_line"
 printf 'QA-CHECK: %s pass, %s fail\n' "$pass" "$fail"
 [ "$fail" -eq 0 ] || exit 1
