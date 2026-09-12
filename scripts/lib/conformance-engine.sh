@@ -45,6 +45,15 @@
 # printed, 0 otherwise. Dependency-free POSIX sh -- no jq, no bashisms.
 set -u
 
+# Shared archive predicate (SPRINT-099 T3, TD-145 · TD-151). Ten checkers each carried the same
+# string glob `case "$x" in */archive/*)`, which admits `docs/sprint/Archive/...` -- the SAME
+# directory, one inode, on any case-insensitive filesystem. One predicate, asked of the filesystem.
+# Missing file is FATAL rather than a local fallback: a fallback copy here would rebuild the ten
+# copies this task exists to remove.
+_lf_ap=$(dirname -- "$0")/archive-path.sh
+[ -f "$_lf_ap" ] || { echo "FAIL conformance: shared archive predicate not found at $_lf_ap"; exit 2; }
+. "$_lf_ap"
+
 fail=0
 n_gap=0
 # --- rule attribution on verdict lines (SPRINT-079 T6) -------------------------------------------
@@ -945,7 +954,7 @@ _s9_gates_fmv() {
 _s9_active_sprints() {
   for f in "$1"/docs/sprint/SPRINT-*.md; do
     [ -f "$f" ] || continue
-    case "$f" in */archive/*) continue ;; esac
+    lf_is_archived_path "$f" && continue
     printf '%s\n' "docs/sprint/${f##*/}"
   done
 }

@@ -51,6 +51,13 @@
 # run inside a git work tree.
 set -u
 
+# Shared archive predicate (SPRINT-099 T3, TD-145 · TD-151) -- see scripts/lib/archive-path.sh.
+# This file is ALSO sourced by check-layers-completeness.sh, which sources the predicate itself
+# first; sourcing again is harmless (same definition) and keeps this file correct when run standalone.
+_lf_ap=$(dirname -- "$0")/archive-path.sh
+[ -f "$_lf_ap" ] || { echo "FAIL layers observed: shared archive predicate not found at $_lf_ap"; exit 2; }
+. "$_lf_ap"
+
 fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
 
 # layers_tokens() -- THE single extractor for a Layers: declaration (TD-142, ruled 2026-09-10): a
@@ -370,7 +377,7 @@ for sp in "$@"; do
   # Scoped by LOCATION, not by `status:` -- see the same note in check-layers-completeness.sh
   # (SPRINT-056 T4, TD-042). A closed sprint leaves docs/sprint/ in §11's retention commit, which is
   # separate from and later than the close commit, so the close commit itself stays covered.
-  case "$sp" in */archive/*) continue ;; esac
+  lf_is_archived_path "$sp" && continue
 
   plan_commit=$(fmv "$sp" plan_commit)
   case "$plan_commit" in
@@ -428,7 +435,7 @@ for sp in "$@"; do
   for _osp in "$@"; do
     [ "$_osp" = "$sp" ] && continue
     [ -f "$_osp" ] || continue
-    case "$_osp" in */archive/*) continue ;; esac
+    lf_is_archived_path "$_osp" && continue
     _on=$(fmv "$_osp" sprint)
     [ -n "$_on" ] || continue
     [ "$_on" = "$my_sprint" ] && continue

@@ -61,6 +61,15 @@
 # line was printed, 0 otherwise. Dependency-free POSIX sh -- no jq, no bashisms.
 set -u
 
+# Shared archive predicate (SPRINT-099 T3, TD-145 · TD-151). Ten checkers each carried the same
+# string glob `case "$x" in */archive/*)`, which admits `docs/sprint/Archive/...` -- the SAME
+# directory, one inode, on any case-insensitive filesystem. One predicate, asked of the filesystem.
+# Missing file is FATAL rather than a local fallback: a fallback copy here would rebuild the ten
+# copies this task exists to remove.
+_lf_ap=$(dirname -- "$0")/archive-path.sh
+[ -f "$_lf_ap" ] || { echo "FAIL layers completeness: shared archive predicate not found at $_lf_ap"; exit 2; }
+. "$_lf_ap"
+
 fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }
 
 # --- ONE extractor, shared with check-layers-observed.sh (TD-142, ruled 2026-09-10) ----------------
@@ -231,7 +240,7 @@ for sp in "$@"; do
   # location keeps the close commit covered (the file is still here) while archived history stays
   # out of scope -- which was always the defensible half. The ordering problem dissolves rather than
   # needing pre-flip content reconstructed.
-  case "$sp" in */archive/*) continue ;; esac
+  lf_is_archived_path "$sp" && continue
   plan=$(awk '/^## Plan/{f=1;next} /^## /{f=0} f' "$sp")
   tid=""; blk=""
   while IFS= read -r line; do

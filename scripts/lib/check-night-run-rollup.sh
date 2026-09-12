@@ -46,6 +46,15 @@
 # blocks later. See `win()` below.
 set -u
 
+# Shared archive predicate (SPRINT-099 T3, TD-145 · TD-151). Ten checkers each carried the same
+# string glob `case "$x" in */archive/*)`, which admits `docs/sprint/Archive/...` -- the SAME
+# directory, one inode, on any case-insensitive filesystem. One predicate, asked of the filesystem.
+# Missing file is FATAL rather than a local fallback: a fallback copy here would rebuild the ten
+# copies this task exists to remove.
+_lf_ap=$(dirname -- "$0")/archive-path.sh
+[ -f "$_lf_ap" ] || { echo "FAIL night-run rollup: shared archive predicate not found at $_lf_ap"; exit 2; }
+. "$_lf_ap"
+
 fail=0
 ok()   { printf 'PASS  %s\n' "$1"; }
 bad()  { fail=1; printf 'FAIL  %s\n' "$1"; }
@@ -69,7 +78,7 @@ for lg in "$@"; do
   # the exclusion below is a case-sensitive STRING glob, not a filesystem-identity predicate, so a
   # differently-cased or differently-separated archive path (e.g. a case-insensitive filesystem's
   # `Archive/`) would not be excluded. Named rather than fixed here -- TASK-342 owns the repair.
-  case "$lg" in */archive/*) continue ;; esac
+  lf_is_archived_path "$lg" && continue
 
   # A completed run announces itself with a `run-complete` event in the log's entry header.
   # Renamed from the bare `complete` (TD-055): that word collided with a task-level "this task

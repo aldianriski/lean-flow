@@ -30,6 +30,15 @@
 # Dependency-free POSIX sh.
 set -u
 
+# Shared archive predicate (SPRINT-099 T3, TD-145 · TD-151). Ten checkers each carried the same
+# string glob `case "$x" in */archive/*)`, which admits `docs/sprint/Archive/...` -- the SAME
+# directory, one inode, on any case-insensitive filesystem. One predicate, asked of the filesystem.
+# Missing file is FATAL rather than a local fallback: a fallback copy here would rebuild the ten
+# copies this task exists to remove.
+_lf_ap=$(dirname -- "$0")/archive-path.sh
+[ -f "$_lf_ap" ] || { echo "FAIL approval envelope: shared archive predicate not found at $_lf_ap"; exit 2; }
+. "$_lf_ap"
+
 DIMENSIONS='goal scope acceptance design verification j1-delegation capabilities repair-policy budget stop-conditions'
 
 fail=0
@@ -41,7 +50,7 @@ note() { printf '      %s\n' "$1"; }
 
 for sp in "$@"; do
   [ -f "$sp" ] || { bad "approval envelope: file not found: $sp"; continue; }
-  case "$sp" in */archive/*) continue ;; esac
+  lf_is_archived_path "$sp" && continue
 
   # Closed sprints are out of scope for the same reason the authority check skips them: the approval
   # is a PRE-launch artifact, and a closed sprint's launches are all behind it.

@@ -36,6 +36,11 @@ START_TS=$(date +%s)
 QA_BUDGET_SECONDS=${QA_BUDGET_SECONDS:-520}  # 600s ceiling - 80s headroom = 520s. Was 450 (TD-091). Raised at SPRINT-093 by owner ruling: this sprint added ~37s of always-on guard coverage (rollup harness 9 -> 34 cases = 22s, authority = 6s, the new launcher-gate harness = 9s) and a complete run now measures ~469s on a quiet host, so 450 truncated -- skipping three harnesses, which makes the verdict incomplete rather than merely red. A skipped harness is an unrun guard. 520 leaves ~50s of variance above measured and 80s below the ceiling. NOT a permanent figure: SPRINT-092 T2/T4 reclaim 9.5-13.6s by converting the ADR-family harness off the Shell engine, and this should come back down when that lands (TD-117)
 . "$ROOT/scripts/lib/qa-budget-check.sh"
 
+# Shared archive predicate (SPRINT-099 T3, TD-145 · TD-151) -- ten checkers carried the same string
+# glob, which admits `docs/sprint/Archive/...`: the SAME directory, one inode, on any
+# case-insensitive filesystem. See scripts/lib/archive-path.sh.
+. "$ROOT/scripts/lib/archive-path.sh"
+
 fail=0
 pass=0
 note() { printf '      %s\n' "$1"; }
@@ -850,7 +855,7 @@ for sp in docs/sprint/SPRINT-*.md; do
   # Location-scoped, not status-scoped (SPRINT-056 T4, TD-042): a sprint stops being checked when
   # §11 MOVES it to archive/, which is a separate later commit -- not when its status flips, which
   # happens in the same commit as the Retro and the close bookkeeping.
-  case "$sp" in */archive/*) continue ;; esac
+  lf_is_archived_path "$sp" && continue
   plan=$(awk '/^## Plan/{f=1;next} /^## /{f=0} f' "$sp")
   tid=""; blk=""
   check_block() {

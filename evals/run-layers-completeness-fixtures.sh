@@ -254,6 +254,82 @@ case "$arc_out" in
     echo "PASS fixture(archive-path-excluded: archived Plan reached via a direct path argument was skipped)" ;;
 esac
 
+
+# --- case 10: SELECTION varied along the CASING axis (SPRINT-099 T3, TD-145 · L-186).
+# Case 9 above varies selection by PATH SEGMENT and passes against a plain string glob -- which is
+# exactly why it proves nothing here. The real job is FILESYSTEM IDENTITY, and the defect it missed
+# is that `docs/sprint/Archive/...` and `docs/sprint/archive/...` are ONE directory sharing ONE inode
+# on any case-insensitive filesystem, while `case "$sp" in */archive/*)` excluded only the first
+# spelling. Feeding the admitted spelling to this very checker produced 3 real FAILs against a closed
+# sprint's stale content (verified against the pre-fix commit, not inherited from the debt row).
+#
+# PLATFORM-AWARE BY NECESSITY, not by defensiveness. On a case-SENSITIVE filesystem, `Archive/` is a
+# genuinely different directory and must NOT be excluded -- asserting exclusion unconditionally would
+# make this fixture wrong on Linux. So the fixture asks the filesystem the same question the
+# predicate does, and asserts the answer the platform actually warrants.
+mkdir -p "$work/archive"
+if [ "$work/Archive" -ef "$work/archive" ] 2>/dev/null; then
+  case_variant_is_same_dir=1
+else
+  case_variant_is_same_dir=0
+fi
+
+cap_fx="$work/Archive/SPRINT-997-case-variant-archived.md"
+cat > "$cap_fx" <<'EOF'
+---
+sprint: 997
+slug: case-variant-archived
+status: closed
+plan_commit: fixture
+close_commit: fixture
+update_trigger: fixture -- CASING selection axis (SPRINT-099 T3). Written under `Archive/` with a
+  capital A on purpose. Where that is the same directory as `archive/`, this Plan must be skipped
+  exactly as its lowercase sibling is; where it is genuinely a different directory, it must be
+  evaluated. Carries a real violation so a silently dropped skip would surface loudly.
+---
+
+## Plan
+
+### T1 — a real completeness violation under a case-variant archive path
+Layers: `foo.txt`
+Depends-on: none
+
+**Acceptance:** n/a -- whether this block is evaluated is the property under test.
+
+**DoD:**
+- [ ] `bar.txt` is created, and never declared in Layers: above -- a real completeness violation
+EOF
+
+cap_out=$(sh "$checker" "$cap_fx" 2>&1)
+cap_fails=$(printf '%s\n' "$cap_out" | grep -c '^FAIL')
+if [ "$case_variant_is_same_dir" -eq 1 ]; then
+  if [ "$cap_fails" -eq 0 ]; then
+    echo "PASS fixture(archive-case-variant-excluded: Archive/ is the same directory as archive/ on this host, and was skipped identically)"
+  else
+    echo "FAIL fixture(archive-case-variant-excluded): Archive/ and archive/ are ONE directory on this host, but the case-variant path was evaluated -- $cap_fails FAIL(s) raised against a closed sprint:"
+    printf '%s\n' "$cap_out" | grep '^FAIL' | sed 's/^/      /'
+    fail=1
+  fi
+else
+  if [ "$cap_fails" -gt 0 ]; then
+    echo "PASS fixture(archive-case-variant-excluded: case-SENSITIVE host -- Archive/ is a different directory and was correctly evaluated, not skipped)"
+  else
+    echo "FAIL fixture(archive-case-variant-excluded): on a case-sensitive host Archive/ is NOT the archive directory, so this Plan should have been evaluated and its violation named -- it was skipped instead, which would hide live content"
+    fail=1
+  fi
+fi
+
+# Sibling control, same run: the LOWERCASE archived path stays excluded, and a LIVE Plan carrying the
+# identical violation still FAILs by name. Without this pair, "excluded correctly" is
+# indistinguishable from "the checker stopped checking" (L-142).
+low_out=$(sh "$checker" "$arch_fx" "$live_fx" 2>&1)
+if printf '%s\n' "$low_out" | grep -q 'bar.txt, absent from Layers:' && ! printf '%s\n' "$low_out" | grep -q 'SPRINT-999'; then
+  echo "PASS fixture(archive-case-variant-control: lowercase archive still skipped AND the live sibling still FAILs by name in the same run)"
+else
+  echo "FAIL fixture(archive-case-variant-control): the lowercase/live pair no longer discriminates:"
+  printf '%s\n' "$low_out" | sed 's/^/      /'
+  fail=1
+fi
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "LAYERS-COMPLETENESS FIXTURES: all green"; else echo "LAYERS-COMPLETENESS FIXTURES: at least one FAIL"; fi
 exit $fail
