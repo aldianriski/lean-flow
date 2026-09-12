@@ -58,12 +58,12 @@ being parked forever (L-094).
 from instrumented runs rather than from the shape of the kills.
 
 **DoD:**
-- [ ] Instrumentation lands in `scripts/qa-check.sh` and is **off by default** — a measurement harness that changes the default profile has changed the thing it measures.
-- [ ] At least **three** instrumented runs, and the record says how many completed and how many were killed. A profile built only from runs that survived is a profile of the survivors.
-- [ ] The record names **where** the memory goes — per-leg or per-harness, not a single total. A total reproduces the inference this task exists to replace.
-- [ ] **A1 is tested, not assumed:** whether the four recorded kills share one mechanism. If the measurement says they do not, that is the finding and it is recorded as such.
-- [ ] TD-143's Mitigation line is **not** carried in as a plan — it is the filer's hypothesis, written while the cost was being felt (L-091). Re-derive before building on it.
-- [ ] The record lands in `docs/research/` with an ownership header, and `TD-143` is updated to point at it.
+- [x] Instrumentation lands in `scripts/qa-check.sh` and is **off by default** — a measurement harness that changes the default profile has changed the thing it measures.
+- [x] At least **three** instrumented runs, and the record says how many completed and how many were killed. A profile built only from runs that survived is a profile of the survivors.
+- [x] The record names **where** the memory goes — per-leg or per-harness, not a single total. A total reproduces the inference this task exists to replace.
+- [x] **A1 is tested, not assumed:** whether the four recorded kills share one mechanism. If the measurement says they do not, that is the finding and it is recorded as such.
+- [x] TD-143's Mitigation line is **not** carried in as a plan — it is the filer's hypothesis, written while the cost was being felt (L-091). Re-derive before building on it.
+- [x] The record lands in `docs/research/` with an ownership header, and `TD-143` is updated to point at it.
 
 ### T2 — Make truncation a distinct outcome from failure `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `scripts/qa-check.sh` (the `qb_checkpoint` truncation path **and** the § Summary block — the two places that print the verdict) · `scripts/lib/qa-budget-check.sh` · `evals/run-qa-budget-fixtures.sh` · `evals/fixtures/qa-budget/`
@@ -135,6 +135,10 @@ host, one inode under two spellings — are excluded identically, at every site.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/qa-check.sh` | T1 | `QA_PROFILE` sampler, off by default — four kills had been diagnosed by inference and TD-143's re-file condition asks for a measurement | low (46 insertions, 0 deletions; no-op when unset) | `QA_PROFILE_OUT` set with profile off creates no file; 3 instrumented runs |
+| `docs/research/qa-check-memory-profile.md` | T1 | New verdict doc — the gate is not the memory consumer, so the fix class aimed at it is eliminated | none (doc) | 104 lines ≤ 130 cap |
+| `docs/research/logs/qa-gate-timing.md` | T1 | Round 14 — raw series, host state and the limits the missing `VmHWM` imposes | none (append-only) | series convention, uncapped |
+| `TECH-DEBT.md` | T1 | TD-143 pointed at the record; its cost half re-routed from the gate to the host envelope | none (doc) | row re-read whole after edit (L-009) |
 
 ## Retro
 

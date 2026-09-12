@@ -57,3 +57,57 @@ Sequencing re-derived from the enlarged set and recorded as the overlap map: **T
 sequential, `scripts/qa-check.sh` owned in that order (extends **D1**, which ordered it T1 → T2 only).
 Per-hunk staging on that file at every commit; never a plain `git add` over another task's WIP
 (L-042 · L-037).
+
+### 2026-09-12 | progress | T1 complete — the gate's memory was measured, and the premise did not survive
+
+consequence · T1 · behaviour:low · governance:low
+
+**Tier X** (ADR-029), declared at G2: a measurement harness that is off by default is not a guard, so
+the retained-fixture bar applies and the discrimination proof does not. The off-by-default property is
+the one claim that had to be shown mechanically, and it was.
+
+**Built inline rather than dispatched**, with the reason stated at G2: the measurement needs exclusive
+use of the host, which a worktree-isolated agent cannot guarantee by construction, and perturbing the
+profile is what T1 DoD 1 forbids.
+
+**Instrument.** `QA_PROFILE=1 QA_PROFILE_OUT=<file>` samples `memfree · swapfree · self_rss · procs`
+at every leg checkpoint and every eval harness. Fork-free by necessity — the first `ps`+`awk` shape
+measured ~150 ms per sample against ~0.9 ms for reading `/proc` through shell built-ins.
+
+**Six runs, serial, nothing else dispatched.** Five completed, one killed.
+
+| Run | File | profile | Wall | Verdict | Outcome |
+|---|---|---|---|---|---|
+| R0 | pristine | off | — | **absent** | KILLED for memory, 129 lines, 0 FAIL |
+| R5 | pristine | off | 558 s | `199 pass, 1 fail` | truncated at 538 s |
+| R1 | instrumented | off | 572 s | `202 pass, 1 fail` | truncated at 554 s |
+| R2/R3/R4 | instrumented | **on** | 547/546/562 s | `201`/`201`/`204 pass, 1 fail` | all truncated |
+
+**Findings.** (1) `self_rss_kb` spans 9 408–9 920 kB — a **320 kB spread over 547 s** — while system
+MemFree swung **695 MB**. The gate is not the consumer. (2) Process count oscillates 4–20 with no
+climb, so `qa-check.sh:50`'s fork-exhaustion rival does not accumulate either. (3) Three runs of the
+identical file gave 201/201/204 passes at two different trip harnesses; **no run completed the harness
+set**, and all five printed `N pass, 1 fail`. (4) Seven items are ~307 s of ~545 s.
+
+**A1 tested, NOT confirmed — and that is the recorded finding, not a failure.** R0 reproduced the
+artifact on the *pristine* file, so it is real and not the instrument's doing; its kill came from the
+session harness's low-memory watchdog. The four earlier kills were never instrumented and nothing here
+shows they share that door. What is settled: whichever door it is, **it is not the gate's own
+consumption**, which eliminates the entire class of fixes aimed at making `qa-check.sh` lighter.
+
+**Off-by-default, proven two ways and one way discarded.** (a) `QA_PROFILE` unset with
+`QA_PROFILE_OUT` pointed at a path → **no file created**. (b) `git diff` is 46 insertions, 0
+deletions. (c) A byte-diff of instrumented-default against pristine-default was **discarded as an
+invalid instrument**: three runs of the *identical* file differ in pass count and trip harness, so the
+diff's noise floor exceeds any instrumentation effect. Recording the discard matters more than the
+two passes — a diff that "looked clean" here would have been measuring host variance, not the change.
+
+**Cross-task finding, handed to T2.** T2's motivating condition reproduced five times over without
+being sought: every completed run truncated and printed a verdict indistinguishable from an ordinary
+single failure. The skipped set was **13** harnesses, not the six TD-117 records — and it included
+`run-qa-budget-fixtures.sh` and `run-qa-budget-default-fixtures.sh`, the guards of the budget
+mechanism itself, plus `run-s2-placement-fixtures.sh`, the harness T2's own DoD names as where the
+real checkpoint tripped. T2 must not inherit the figure "six" from TD-117 (L-130).
+
+Artifacts: `docs/research/qa-check-memory-profile.md` (verdict, 104 lines) · Round 14 of
+`docs/research/logs/qa-gate-timing.md` (raw series) · `TECH-DEBT.md` TD-143 updated to point at both.

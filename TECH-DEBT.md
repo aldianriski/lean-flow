@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-11
+last_updated: 2026-09-12
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -639,6 +639,20 @@ status: current
     promote under the `severity: high` rule.
   - **Re-file fresh if** the gate's memory profile is measured — the mechanism would then be known
     rather than inferred from three kills.
+  - **MEASURED at SPRINT-099 T1 (2026-09-12) — the condition above is met, and the premise did not
+    survive it.** Record: [`docs/research/qa-check-memory-profile.md`](docs/research/qa-check-memory-profile.md)
+    (raw series: Round 14 of `docs/research/logs/qa-gate-timing.md`). Six serial runs, three
+    instrumented. **The gate holds ~9.5 MB and moves by 320 kB across a 547 s run**, while system
+    free memory swings 695 MB around it; the live process count oscillates 4–20 with no climb, so
+    `qa-check.sh:50`'s fork-exhaustion hypothesis does not accumulate either. **There is no gate
+    memory cost to reduce** — a fix aimed at this file's consumption would be aimed at 9.5 MB. The
+    artifact was reproduced on the PRISTINE file (R0: 129 lines, 0 FAIL, no verdict line), so it is
+    real and is not the instrumentation's doing. **A1 is NOT confirmed:** R0's kill came from the
+    session harness's low-memory watchdog, the four earlier kills were never instrumented, and
+    nothing here shows they share that door. What is settled is that whichever door it is, it is not
+    this file's own consumption. **Cost half should now be re-filed against the HOST envelope**
+    (562 MB free, WSL 1 989 MB, three `claude` processes 1 178 MB, commit 41.3/56.7 GB) rather than
+    against the gate.
 
 - **TD-141** severity: high | status: resolved → accepted (no task) | created: Sprint-095 | accepted at SPRINT-097 promote under ADR-040
   - Summary: **Commit ownership cannot be decided from a commit subject, and the laundering channel

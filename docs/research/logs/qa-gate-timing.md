@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-08-25
+last_updated: 2026-09-12
 update_trigger: a measurement round is appended
 status: active
 id: qa-gate-timing-log
@@ -1657,3 +1657,109 @@ should be cited as having validated the 2.3–3.4× ratio the ceiling was built 
   standing practice.
 - **The opt-in figures are not a full-profile cost.** A `QA_FULL=1` run in this session measured
   1413 s, but that run was taken *before* the quiet-host block above and is not comparable to it.
+
+---
+
+## Round 14 — the memory axis: the gate is not the consumer (SPRINT-099 T1, 2026-09-12)
+
+**Question.** TD-143 records `qa-check.sh` being killed by the host for memory, producing output but
+no `QA-CHECK:` verdict line. Four such kills are on record across SPRINT-096 and SPRINT-098, and every
+account of *why* is inference from the shape of the artifact. Where does the gate's memory actually go?
+
+**Instrument.** `QA_PROFILE=1 QA_PROFILE_OUT=<file>` (SPRINT-099 T1, off by default) appends one
+fork-free sample per leg checkpoint and per eval harness: `ts · elapsed_s · memfree_kb · swapfree_kb ·
+self_rss_kb · procs · label`. Fork-free matters — the `ps`+`awk` shape first tried cost ~150 ms per
+sample against ~0.9 ms for reading `/proc` through shell built-ins, and a sampler that spawns two
+processes per sample is measuring itself.
+
+**What this host cannot report**, probed rather than assumed (MINGW64_NT-10.0-26200, MSYS 3.5.7):
+`/proc/self/status` carries `VmRSS` but **no `VmHWM` and no `VmPeak`**; `/proc/meminfo` has no
+`MemAvailable`; `/usr/bin/time -v` is absent and MSYS `ps` has no RSS column. **There is no
+per-process high-water mark obtainable on this host by any means.** Every figure below is therefore a
+sampled live value, not a peak, and a spike between two samples would be invisible. This is the
+measurement's main limit and it is not repairable without a different host.
+
+**Host state during the session** (`Get-CimInstance Win32_OperatingSystem`, `Get-Process`):
+14 078 MB visible, **562 MB free**; commit charge **41 337 / 56 738 MB**. Top consumers: `vmmemWSL`
+1 989 MB RSS / 6 699 MB private · three `claude` processes 1 178 MB RSS / 2 471 MB private ·
+`MsMpEng` 387 · `Code` 386 · `com.docker.backend` 224 · Chrome ~460 across three. The host was
+**not quiet**, and deliberately was not made quiet: the four recorded kills all happened on a working
+machine, so a quiet-host profile would not be a profile of the failure.
+
+**Runs.** Six, serial, nothing else dispatched by this session while they ran.
+
+| Run | File | `QA_PROFILE` | Wall | Lines | Verdict line | Outcome |
+|---|---|---|---|---|---|---|
+| R0 | pristine | off | — | 129 | **absent** | **KILLED by the host for memory**, 0 FAIL, mid leg 2b |
+| R5 | pristine | off | 558 s | 262 | `199 pass, 1 fail` | completed, truncated at 538 s |
+| R1 | instrumented | **off** | 572 s | 262 | `202 pass, 1 fail` | completed, truncated at 554 s |
+| R2 | instrumented | on | 547 s | 262 | `201 pass, 1 fail` | completed, truncated at 526 s |
+| R3 | instrumented | on | 546 s | 262 | `201 pass, 1 fail` | completed, truncated at 523 s |
+| R4 | instrumented | on | 562 s | 262 | `204 pass, 1 fail` | completed, truncated at 541 s |
+
+Five completed, one killed. R0 is the control that matters most: it ran the **pristine** file, so the
+kill is not attributable to the instrumentation, and it reproduces TD-143's artifact exactly —
+output, 0 FAIL, no verdict line, at 129 lines where TD-143 recorded 147.
+
+### Finding 1 — the gate's own memory is flat, and tiny
+
+Across the three instrumented runs, `self_rss_kb` for the `qa-check.sh` shell:
+
+| Run | min | max | spread | `procs` range |
+|---|---|---|---|---|
+| R2 | 9 408 kB | 9 728 kB | **320 kB** | 4–20 |
+| R3 | 2 688 kB | 9 792 kB | (2 688 is the pre-growth baseline sample) | 4–11 |
+| R4 | 9 600 kB | 9 920 kB | **320 kB** | 4–8 |
+
+**The gate holds about 9.5 MB and does not grow.** Over 547 seconds it moves by 320 kB. Meanwhile
+system `MemFree` swung **695 MB** (299 924 → 995 664 kB) in the same run. A process holding 9.5 MB
+flat cannot be the author of a 695 MB swing, and nothing in the series shows it trying.
+
+### Finding 2 — fork exhaustion does not accumulate either
+
+`qa-check.sh:50` records the rival hypothesis: "fork exhaustion killed the run at 100–117 output
+lines". The `procs` column is the direct reading for it, and it **oscillates in a narrow band (4–20)
+with no monotonic climb** in any of the three runs. Sample-to-sample deltas are as often negative as
+positive (−9 … +8). Children are short-lived and reaped promptly. Whatever kills these runs, the gate
+is not exhausting the process table on the way there.
+
+### Finding 3 — the verdict is non-deterministic, and every run truncated
+
+Three runs of the **identical file under identical settings** produced `201`, `201` and `204` passes
+and tripped the budget at **two different harnesses** (`run-conformance-engine-fixtures.sh` twice,
+`run-s4-ts-evaluators.sh` once). Across all five completed runs the spread is 199–204 passes and four
+distinct trip points (523 s–554 s). **No run in this session ever completed the harness set.**
+Truncation is this host's steady state, not an edge case — and every one of the five printed a verdict
+of the form `N pass, 1 fail`, which is indistinguishable from a run with one ordinary failure.
+
+### Finding 4 — where the time goes (mean of R2/R3/R4, seconds)
+
+| Interval | Mean |
+|---|---|
+| `run-layers-completeness-fixtures.sh` | 70.0 |
+| `run-epic-archive-fixtures.sh` | 46.7 |
+| `run-dispatch-preflight-fixtures.sh` | 43.3 |
+| `run-night-run-rollup-fixtures.sh` | 39.3 |
+| `run-conformance-engine-fixtures.sh` | 37.3 |
+| leg 4: knowledge metadata / corpus walk | 37.0 |
+| `run-doc-caps-fixtures.sh` | 33.7 |
+| `run-reap-terminal-fixtures.sh` | 21.3 |
+| `run-night-run-outcome-fixtures.sh` | 20.7 |
+| `run-authority-fixtures.sh` | 20.0 |
+
+The top seven are ~307 s of a ~545 s run: **56% of the runtime in seven items.** Round 13's §4
+conversion holds — leg 4 is now 37 s, not the ~271 s Round 4 started from — and the cost centre has
+moved decisively into leg 12's harnesses.
+
+### Limits
+
+- **No peak, anywhere.** Sampled live values only; a sub-sample-interval spike is invisible. This is
+  the finding most likely to be overturned by a host that reports `VmHWM`.
+- **One host, one session, three instrumented runs.** Per this log's standing practice every figure
+  is a range, and Finding 3 says plainly that the range is wide.
+- **R0's kill was delivered by the session harness's low-memory watchdog**, reported as
+  "stopped because the system is running low on memory". Whether the four earlier kills came through
+  the same door or through a Windows-level one is **not** established here — the earlier kills were not
+  instrumented, and this Round should not be read as proving they share R0's mechanism.
+- **The budget trip is not a bug in the budget.** It fires correctly at 520 s and names what it
+  skipped. The runs are genuinely over budget on a loaded host.

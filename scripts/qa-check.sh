@@ -33,6 +33,47 @@ note() { printf '      %s\n' "$1"; }
 ok()   { pass=$((pass + 1)); printf 'PASS  %s\n' "$1"; }
 bad()  { fail=$((fail + 1)); printf 'FAIL  %s\n' "$1"; }
 
+# --- gate profile instrumentation (SPRINT-099 T1, TD-143 cost half) ----------
+# OFF BY DEFAULT and fork-free. `QA_PROFILE=1 QA_PROFILE_OUT=<file> sh scripts/qa-check.sh` appends
+# one sample per leg boundary and per eval harness. With QA_PROFILE unset -- every ordinary run,
+# every promote, every close -- qp_sample returns on its first test and this file behaves exactly as
+# it did before. That is the point: a measurement harness that changes the default profile has
+# changed the thing it measures (T1 DoD 1), so the sampler reads /proc through shell built-ins only.
+# Measured at ~0.9ms per sample, against ~150ms for the `ps`+`awk` shape it replaced.
+#
+# What this host can and cannot report (MINGW64_NT-10.0-26200, MSYS 3.5.7) -- derived by probing it,
+# not assumed:
+#   /proc/meminfo      MemTotal MemFree SwapTotal SwapFree   -- NO MemAvailable
+#   /proc/self/status  VmRSS                                 -- NO VmHWM, NO VmPeak
+#   /usr/bin/time -v   absent;   MSYS `ps` carries no RSS column
+# There is therefore NO per-process high-water mark obtainable on this host by any means. The
+# profile is consequently system free memory + swap, this shell's live RSS, and a live MSYS process
+# count. The last is not filler: it is the direct reading for the fork-exhaustion mechanism this
+# file already records at line 50, which is a DIFFERENT claim from a memory kill and is the rival
+# hypothesis A1 exists to test.
+QA_PROFILE=${QA_PROFILE:-0}
+QA_PROFILE_OUT=${QA_PROFILE_OUT:-}
+if [ "$QA_PROFILE" = "1" ] && [ -n "$QA_PROFILE_OUT" ]; then
+  printf 'ts\telapsed_s\tmemfree_kb\tswapfree_kb\tself_rss_kb\tprocs\tlabel\n' > "$QA_PROFILE_OUT"
+fi
+qp_sample() { # <label>
+  [ "$QA_PROFILE" = "1" ] && [ -n "$QA_PROFILE_OUT" ] || return 0
+  qp_label=$1
+  qp_mf=0; qp_sf=0
+  while read -r qp_k qp_v _; do
+    case "$qp_k" in MemFree:) qp_mf=$qp_v ;; SwapFree:) qp_sf=$qp_v ;; esac
+  done < /proc/meminfo
+  qp_rss=0
+  while read -r qp_k qp_v _; do
+    case "$qp_k" in VmRSS:) qp_rss=$qp_v ;; esac
+  done < /proc/self/status
+  set -- /proc/[0-9]*
+  qp_now=$(date +%s)
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+    "$qp_now" "$((qp_now - START_TS))" "$qp_mf" "$qp_sf" "$qp_rss" "$#" "$qp_label" >> "$QA_PROFILE_OUT"
+}
+qp_sample "baseline: before leg 1"
+
 # qa-budget-default self-check (SPRINT-086 T3, TD-091): the invariant the arithmetic above states in
 # prose, checked mechanically on every run against scripts/lib/check-qa-budget-default.sh -- a comment
 # can go stale silently; this cannot (retained fixture: evals/run-qa-budget-default-fixtures.sh).
@@ -59,6 +100,7 @@ fi
 # from leg 12's own, later one.
 qb_early_tripped=0
 qb_checkpoint() { # <leg-label>
+  qp_sample "checkpoint: $1"
   [ "$qb_early_tripped" -eq 1 ] && return 0
   qb_out=$(qa_budget_check "$START_TS" "$QA_BUDGET_SECONDS" "${QA_FULL:-0}")
   case "$qb_out" in
@@ -1018,6 +1060,7 @@ else
 fi
 budget_tripped=0
 for h in $eval_harnesses; do
+  qp_sample "harness-begin: $h"
   # TD-084 forward guard: this loop is the likeliest place a future regression reproduces the
   # multi-minutes-per-item shape (TD-073 was exactly this, once, in run-sprint-family-fixtures.sh).
   # Checked BEFORE each harness so an overrun is caught between cases, not only after the last one --
@@ -1043,6 +1086,7 @@ for h in $eval_harnesses; do
     continue
   fi
   hout=$(sh "$hp" 2>&1); hcode=$?
+  qp_sample "harness-end: $h"
   if [ "$hcode" -eq 0 ]; then
     ok "eval harness $h"
   else
@@ -1240,6 +1284,8 @@ else
     fi
   fi
 fi
+
+qp_sample "final: summary"
 
 # --- Summary ----------------------------------------------------------------
 printf '\n----------------------------------------\n'
