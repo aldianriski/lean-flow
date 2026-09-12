@@ -213,3 +213,44 @@ describe("judgeOutput -- truncation is distinct from failure (TD-117)", () => {
     expect(outcome.truncated).toBeUndefined();
   });
 });
+
+// Adversarial review of d498324 found this chain, and neither half was visible to the author:
+// qa-budget-check.sh deliberately reports "the unrun set came back EMPTY" as a defect, but the
+// original TRUNCATED_RE required `N item(s) UNRUN` right after "budget --", so that alarm fell
+// through to the fail>0 branch and was announced as "an ordinary red gate ... not truncated".
+// The guard's own distress signal was filed as the thing it was built to distinguish.
+describe("judgeOutput -- a truncation whose unrun set could not be derived (review of d498324)", () => {
+  const anomalous =
+    "\n----------------------------------------\n" +
+    "QA-CHECK: TRUNCATED at checkpoint 'leg 9' after 530s against a 520s budget -- but the unrun set came back EMPTY, which is impossible for a real truncation: the unreached set could not be derived, so this run reports nothing about what it skipped\n" +
+    "QA-CHECK: 12 pass, 1 fail\n";
+
+  test("is reported as truncated, not as an ordinary red gate", () => {
+    const outcome = judgeOutput(anomalous);
+    expect(outcome.ok).toBe(false);
+    expect(outcome.truncated).toBeDefined();
+    expect(outcome.reason).not.toMatch(/run complete/);
+  });
+
+  // `null` rather than 0: the gate did not skip zero checks, it could not say how many it skipped.
+  // Reporting 0 here would be a number where there is no number -- the false-negative shape again.
+  test("carries unrun as null -- unknown, never 0", () => {
+    const outcome = judgeOutput(anomalous);
+    expect(outcome.truncated?.unrun).toBeNull();
+    expect(outcome.truncated?.elapsed).toBe(530);
+    expect(outcome.truncated?.budget).toBe(520);
+    expect(outcome.reason).toMatch(/could NOT DERIVE/i);
+  });
+
+  // Sibling control: a well-formed truncation still yields a real count, so widening the regex did
+  // not collapse the two truncation shapes into one.
+  test("a well-formed truncation still reports its real unrun count", () => {
+    const wellFormed =
+      "\n----------------------------------------\n" +
+      "QA-CHECK: TRUNCATED at eval harness 'run-x.sh' after 255s against a 200s budget -- 27 item(s) UNRUN, named: run-x.sh\n" +
+      "QA-CHECK: 189 pass, 1 fail\n";
+    const outcome = judgeOutput(wellFormed);
+    expect(outcome.truncated?.unrun).toBe(27);
+    expect(outcome.reason).toMatch(/27 check\(s\) NEVER RAN/);
+  });
+});

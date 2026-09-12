@@ -11,6 +11,15 @@
 set -u
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+# QA_SELF -- this script's own ABSOLUTE path, resolved BEFORE the `cd` below (SPRINT-099 T2, found by
+# adversarial review). qb_all_legs derives the ordered leg list by reading this file; it used `$0`,
+# which is resolved AFTER `cd "$ROOT"` and so breaks for a relative invocation from a subdirectory
+# (`cd apps/cli && sh ../../scripts/qa-check.sh`). The leg list then came back EMPTY and a real
+# truncation reported that it could not name what it skipped. Resolved here, before the cd, and NOT
+# hardcoded as "$ROOT/scripts/qa-check.sh" -- a hardcoded name would go silently wrong if this file
+# were ever renamed, which is the same class of defect one rung down.
+QA_SELF=$(CDPATH= cd -- "$(dirname -- "$0")" 2>/dev/null && pwd)/$(basename -- "$0")
+
 cd "$ROOT" || exit 2
 
 # START_TS/QA_BUDGET_SECONDS: TD-084's forward guard (scripts/lib/qa-budget-check.sh), repositioned
@@ -104,8 +113,8 @@ qb_early_tripped=0
 # from the thing it registers the first time a leg is added or renamed, and nothing would report the
 # drift. Deriving means the list cannot disagree with the calls: they ARE the list.
 qb_all_legs() {
-  [ -f "$0" ] || return 0
-  sed -n 's/^qb_checkpoint "\([^"]*\)".*$/\1/p' "$0"
+  [ -f "$QA_SELF" ] || return 0
+  sed -n 's/^qb_checkpoint "\([^"]*\)".*$/\1/p' "$QA_SELF"
 }
 qb_checkpoint() { # <leg-label>
   qp_sample "checkpoint: $1"

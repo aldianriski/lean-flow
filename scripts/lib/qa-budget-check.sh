@@ -84,7 +84,11 @@ qa_truncation_line() {
   # L-186). The display join is " | " so a reader can tell two multi-word items apart.
   _qt_n=0; _qt_joined=""
   while IFS= read -r _qt_i; do
-    [ -n "$_qt_i" ] || continue
+    # Skip whitespace-ONLY lines without altering the item: a blank or spaces-only line would
+    # otherwise count as a phantom item and inflate the total (adversarial review, latent). The
+    # earlier attempt here deleted every space, which mangled multi-word leg labels -- caught
+    # immediately by case 10, which is what that case is for.
+    case "$_qt_i" in *[![:space:]]*) ;; *) continue ;; esac
     _qt_n=$((_qt_n + 1))
     if [ -z "$_qt_joined" ]; then _qt_joined=$_qt_i; else _qt_joined="$_qt_joined | $_qt_i"; fi
   done <<QTEOF

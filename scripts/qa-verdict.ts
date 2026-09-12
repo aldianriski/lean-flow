@@ -20,15 +20,25 @@ export const VERDICT_RE = /^QA-CHECK: (\d+) pass, (\d+) fail$/m;
 // verdict-less, which is the exact failure TD-143's cheap half shipped to prevent.
 // Without this, the only AUTOMATED reader of the gate reports a run that skipped 27 guards as
 // "an ordinary red gate", which is the conflation T2 exists to end.
+// Matches ANY truncation line, including the shell side's "unrun set came back EMPTY" defect
+// message. Widened after adversarial review: the original required `(\d+) item(s) UNRUN` right
+// after "budget --", so the ONE case qa-budget-check.sh deliberately reports as impossible fell
+// through to the fail>0 branch and was announced as "an ordinary red gate ... not truncated" -- the
+// exact conflation this feature exists to end, arriving through the guard's own alarm.
 export const TRUNCATED_RE =
-  /^QA-CHECK: TRUNCATED at (.+?) after (\d+)s against a (\d+)s budget -- (\d+) item\(s\) UNRUN/m;
+  /^QA-CHECK: TRUNCATED at (.+?) after (\d+)s against a (\d+)s budget -- (.*)$/m;
+
+// The well-formed tail. When this does NOT match a truncation line's tail, the gate truncated but
+// could not derive WHAT it skipped, which is strictly worse than a normal truncation and is reported
+// as such rather than as a missing number.
+export const UNRUN_COUNT_RE = /^(\d+) item\(s\) UNRUN/;
 
 export interface VerdictOutcome {
   readonly ok: boolean;
   readonly pass?: number;
   readonly fail?: number;
   /** Present only when the run truncated: it stopped early and did not reach every check. */
-  readonly truncated?: { readonly at: string; readonly elapsed: number; readonly budget: number; readonly unrun: number };
+  readonly truncated?: { readonly at: string; readonly elapsed: number; readonly budget: number; readonly unrun: number | null };
   readonly reason: string;
 }
 
@@ -52,7 +62,21 @@ export function judgeOutput(output: string): VerdictOutcome {
   // whole fix here, not the regex.
   const t = TRUNCATED_RE.exec(output);
   if (t) {
-    const truncated = { at: t[1]!, elapsed: Number(t[2]), budget: Number(t[3]), unrun: Number(t[4]) };
+    const c = UNRUN_COUNT_RE.exec(t[4]!);
+    const truncated = {
+      at: t[1]!,
+      elapsed: Number(t[2]),
+      budget: Number(t[3]),
+      unrun: c ? Number(c[1]) : null,
+    };
+    const tail =
+      truncated.unrun === null
+        ? `and it could NOT DERIVE what it skipped -- the gate truncated and cannot say which checks ` +
+          `never ran, which is worse than a normal truncation, not a missing detail. Its ${pass} pass / ` +
+          `${fail} fail describes an unknown fraction of the suite.`
+        : `-- ${truncated.unrun} check(s) NEVER RAN. This is not an ordinary red gate: the run is ` +
+          `INCOMPLETE, so its ${pass} pass / ${fail} fail says nothing about the ${truncated.unrun} ` +
+          `unrun item(s). A skipped harness is an unrun guard (TD-117).`;
     return {
       ok: false,
       pass,
@@ -60,9 +84,7 @@ export function judgeOutput(output: string): VerdictOutcome {
       truncated,
       reason:
         `qa-verdict: QA-CHECK reported TRUNCATED at ${truncated.at} after ${truncated.elapsed}s ` +
-        `against a ${truncated.budget}s budget -- ${truncated.unrun} check(s) NEVER RAN. This is not ` +
-        `an ordinary red gate: the run is INCOMPLETE, so its ${pass} pass / ${fail} fail says nothing ` +
-        `about the ${truncated.unrun} unrun item(s). A skipped harness is an unrun guard (TD-117).`,
+        `against a ${truncated.budget}s budget ${tail}`,
     };
   }
 
