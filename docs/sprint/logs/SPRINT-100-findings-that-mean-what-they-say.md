@@ -266,3 +266,46 @@ file) was not touched, and `run-conformance-engine-fixtures.sh` was re-run uncha
 
 **Re-confirm G2.** No task's scope, acceptance or DoD moves; this is L-100's live-declaration
 correction, the second instance this sprint and the expected cost of declaring before the work.
+
+### 2026-09-13 | surprise | T2 met its DoD and missed its Acceptance — 1 of TD-105's 9 findings fixed, 8 left firing
+
+Found by the coordinator building an **independent** fixture rather than re-running T2's, which is the
+only reason it surfaced: T2's own fixtures, its outside reviewer and its harness all agree with each
+other, because every one of them is scoped to the assertion T2 declared. The gap sits *between*
+assertions, where nothing scoped to one can see it (L-172).
+
+**The finding.** T2 normalised checkbox state in `assert_S9_PLANFROZEN` and deliberately left
+`assert_S9_SCOPECHANGE` untouched, correctly per its declared `Layers:`. But TD-105's Evidence names
+**both** findings — `plan-edited-after-freeze` **plus 8 ×** `scope-change-logged-after-plan-edit`, one
+per tick commit, *9 of that run's 17 FAILs* — and `assert_S9_SCOPECHANGE` calls `_plan_section`
+with no normalisation, so **every tick commit still registers as a § Plan change**.
+
+Against a purpose-built tick-only fixture (Plan byte-identical but for 2 ticks, `plan_commit` at the
+pre-tick state, no scope-change entry), the merged engine reports:
+
+```
+PASS  S9.PLANFROZEN       -- 1 Plan(s) unchanged since plan_commit
+FAIL  scope-change-logged-after-plan-edit: ... § Plan changed at afab451 with no
+      scope-change entry ... (S9.SCOPECHANGE)
+```
+
+T2's **Acceptance** reads *"A sprint that ticked every DoD and changed no Plan text passes."* It does
+not pass. **The DoD was satisfiable without the Acceptance being met**, which is this sprint's own
+theme occurring inside a task written to fix that theme: a change that reports success about a
+subject it only half-covers. 1 of 9 findings fixed; the inverted incentive is intact.
+
+**Imminent, not theoretical.** This sprint closes by ticking 29 DoD boxes. Each tick commit edits
+§ Plan, so each would fire `scope-change-logged-after-plan-edit` unless accompanied by a scope-change
+entry that never happened — the close gate would be red, or need an override, for doing exactly what
+`orchestrator/SKILL.md` step 4 prescribes.
+
+**Ruling (owner-approved 2026-09-13, AskUserQuestion): extend T2 with the symmetric fix.** Verified
+before proposing, on two fixtures, with the engine's own dependencies present — an earlier attempt
+produced *empty* output that read as success and was actually a `reader-missing` loader failure, which
+is L-045's shape and was caught only by reading the unfiltered stream:
+
+- **tick-only** → `PLANFROZEN` PASS, `SCOPECHANGE` reports nothing checkable. No finding.
+- **genuine text edit, no scope-change entry** → **both** findings fire, unchanged.
+
+So the fix closes the false positive without weakening what the check exists to catch. T2's `Layers:`
+is corrected to name both assertions.

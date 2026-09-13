@@ -72,7 +72,7 @@ to its target *prunes* it is reported unreachable; and neither verdict rests on 
 - [ ] **Outside reviewer, worktree-isolated** (L-165 · L-168).
 
 ### T2 — Normalise checkbox state before diffing § Plan, so ticking a DoD is not an unaccounted Plan edit `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `scripts/lib/conformance-engine.sh` (the `plan-edited-after-freeze` assertion) · `evals/run-sprint-family-fixtures.sh` (the git-backed home for the `assert_S9_*` family — scope-change 2026-09-13)
+Layers: `scripts/lib/conformance-engine.sh` (**both** freeze assertions — `assert_S9_PLANFROZEN` *and* `assert_S9_SCOPECHANGE`; TD-105's Evidence names both findings, and fixing one leaves 8 of its 9 firing — scope-change 2026-09-13) · `evals/run-sprint-family-fixtures.sh` (the git-backed home for the `assert_S9_*` family — scope-change 2026-09-13)
 Depends-on: none
 Cites: TD-105 · L-166 · L-142 · L-169 · ADR-029
 **Tier G** (ADR-029) — and the incentive is **inverted**, which is worse than a plain false positive:

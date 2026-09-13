@@ -2047,7 +2047,7 @@ assert_S9_LOGDIR() {
 _plan_section() { awk '/^## Plan$/ { inp = 1; next } inp && /^## / { exit } inp { print }'; }
 
 # _norm_dod_checkbox -- normalises a ticked DoD line (`- [x] ...` / `- [X] ...`) on
-# stdin back to its untaped form (`- [ ] ...`), leaving every other character alone.
+# stdin back to its unticked form (`- [ ] ...`), leaving every other character alone.
 # Scoped to THIS ONE assertion (plan-edited-after-freeze, T2's Layers): DoD checkboxes
 # live inside § Plan, and orchestrator/SKILL.md step 4 prescribes ticking one on every
 # task, so a raw diff reads the execution loop's own required action as an unaccounted
@@ -2120,8 +2120,14 @@ assert_S9_SCOPECHANGE() {
     # on the file -- otherwise every sprint would report a scope change on its first tick.
     prev="$pc"
     for c in $(git -C "$repo" log --reverse --format=%H "$pc..HEAD" -- "$p" 2>/dev/null); do
-      a=$(git -C "$repo" show "$prev:$p" 2>/dev/null | _plan_section)
-      b=$(git -C "$repo" show "$c:$p" 2>/dev/null | _plan_section)
+      # Normalised on BOTH sides, exactly as assert_S9_PLANFROZEN does, and for the same reason:
+      # a DoD tick is the execution loop's own prescribed action (orchestrator/SKILL.md step 4), not
+      # a Plan edit. Fixing only PLANFROZEN left 8 of TD-105's 9 findings firing -- one per tick
+      # commit -- so the inverted incentive survived under the other finding's name. The two
+      # assertions read the same section for the same freeze and must normalise alike; a genuine
+      # text edit still differs after normalisation and still fails below.
+      a=$(git -C "$repo" show "$prev:$p" 2>/dev/null | _plan_section | _norm_dod_checkbox)
+      b=$(git -C "$repo" show "$c:$p" 2>/dev/null | _plan_section | _norm_dod_checkbox)
       prev=$c
       [ "$a" = "$b" ] && continue
       n_checked=$((n_checked + 1))

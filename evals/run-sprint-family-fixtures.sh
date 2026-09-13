@@ -193,6 +193,12 @@ commit_msg "$d" "sprint(900): record plan_commit"
 tick_plan "$d"
 commit_msg "$d" "sprint(900) T1: tick DoD 1/1 -- no text changed"
 assert_absent "s9-plan-frozen-tick-only-control" "$d" "plan-edited-after-freeze"
+# The SAME tick-only tree, asserted against the OTHER freeze finding. Both assertions read § Plan for
+# the same freeze, so both must normalise alike -- and fixing only PLANFROZEN left this one firing on
+# every tick commit, which is 8 of the 9 findings TD-105 actually cites. Asserting one and not the
+# other is what let a half-fix read as a whole one: the gap sat BETWEEN two assertions, where a
+# fixture scoped to either alone cannot see it.
+assert_absent "s9-scope-change-tick-only-control" "$d" "scope-change-logged-after-plan-edit"
 
 # --- S9.SCOPECHANGE: the entry written AFTER the edit it justifies --------------------------------
 # The ordering rule, and the reason it is a separate rule from PLANFROZEN: an entry added later
