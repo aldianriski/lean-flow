@@ -837,6 +837,15 @@ status: current
   - Fix direction (not a ruling): cap dispatch concurrency when a gate run is expected; or raise the
     budget with the ceiling raised to match; or make the skipped-harness list its own named FAIL
     distinct from a real check failure, so truncation can never be read as one red check.
+  - **Measured again at the SPRINT-099 close (2026-09-13), and the row's own shape is now the steady
+    state on this host.** Five whole-gate runs: **539 s (complete, `218 pass, 0 fail`)** · 526 s ·
+    546 s · 560 s · 523 s. The 520 s budget sits *inside* that spread, so whether a run completes is
+    decided by host noise rather than by the code — two runs on the SAME tree, minutes apart, gave a
+    complete green verdict and a truncation at 3 s over budget. Unrun counts when it trips: 10–13
+    harnesses, and at a seeded 200 s budget, 27. **What changed is that the run now says so** (T2):
+    the verdict carries a `TRUNCATED` line naming every unreached harness, and `qa-verdict.ts`
+    reports it as truncated rather than as an ordinary red gate. The cost half of this row is
+    untouched and still open — the gate is no faster, it is only honest about stopping.
   - **Escalated to `TODO.md` Backlog P2, then MERGED into `TASK-329`** (2026-09-07 — escalated as `TASK-330` at `/triage` by the ledger's own `severity: high` rule, retired into `TASK-329` at the decompose the same day; `TASK-330` is not reused). This row and **TD-128** are one mechanism — the gate's own duration and what it failed to reach are both unreported — so they are fixed together. **Direction ruled at that decompose, closing this row's open "Fix direction (not a ruling)":** make the skipped-harness list its own named outcome. The other two were rejected on evidence — capping dispatch concurrency slows the worktree-isolated review this repo mandates for Tier G (L-165 · L-168) and rests on an unmeasured figure; raising the budget cannot work, the 600 s ceiling being external. **Two cautions recorded with it:** the escalation stub was first written against `TODO.md`'s narrative gloss of this row ("the reduction TD-117 anticipated") and had to be corrected against the row itself — the subject is **six harnesses skipped under concurrent load**, not a budget reduction (L-130); and this row's 450 s default is **stale**, `qa-check.sh:27` having read 520 since SPRINT-093.
 
 - **TD-126** severity: medium | status: open | created: Sprint-092
