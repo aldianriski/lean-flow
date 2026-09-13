@@ -16,9 +16,12 @@ status: current
 
 ## Active Sprint
 
-> **No active sprint.** `SPRINT-099 — Make the Gate Finish` closed 2026-09-13 at **20 of 20 DoD**
-> ([`docs/sprint/archive/SPRINT-099-make-the-gate-finish.md`](docs/sprint/archive/SPRINT-099-make-the-gate-finish.md)).
-> Next: `/lean-doc-generator promote` to form the following sprint from `state: ready` Backlog rows.
+> **SPRINT-100 — Findings That Mean What They Say** →
+> [`docs/sprint/SPRINT-100-findings-that-mean-what-they-say.md`](docs/sprint/SPRINT-100-findings-that-mean-what-they-say.md)
+> — promoted 2026-09-13, five tasks, 29 DoD, no owner-action. **Not** an epic sprint: EPIC-015
+> § Closed-when 1 waits a fourth sprint, because its precondition is a host that can *finish* a gate
+> and SPRINT-099 made truncation honest rather than absent. **`gates_signed:` is absent, which means
+> NOT signed** (L-099) — G1/G2 run at `/orchestrator`.
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
