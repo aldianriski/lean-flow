@@ -333,6 +333,10 @@ grep -q '^# registry:insert-point$' "$engine" || { echo "FAIL harness: registry:
 # The doctored engine resolves its reader BESIDE ITSELF (D1's own rule -- the copy must carry a copy
 # of the reader too, or it fails reader-missing rather than proving anything about the registry).
 cp "$repo_root/scripts/lib/read-spec-rules.sh" "$work/read-spec-rules.sh"
+# Same rule, second sibling (SPRINT-099 T3): the engine now also sources archive-path.sh beside
+# itself, so the doctored copy must carry that too -- otherwise it fails predicate-missing and proves
+# nothing about the registry, exactly as the reader line above guards against.
+cp "$repo_root/scripts/lib/archive-path.sh" "$work/archive-path.sh"
 awk '
   /^# registry:insert-point$/ {
     print
