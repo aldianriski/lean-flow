@@ -309,3 +309,49 @@ is L-045's shape and was caught only by reading the unfiltered stream:
 
 So the fix closes the false positive without weakening what the check exists to catch. T2's `Layers:`
 is corrected to name both assertions.
+
+### 2026-09-13 | progress | wave 1 complete — T1 · T2 (+extension) · T3 merged and independently verified
+
+Merges on `main`, in ownership order: `803c041` (T1) · `a2b8814` (T3) · `49b027c` (T2) · `804308a`
+(T2's extension). Each is `--no-ff`, so any single task reverts cleanly via `git revert -m 1`.
+
+**Post-merge smoke check** — the pass per-branch review cannot do, because it catches cross-task
+interaction rather than per-task defects: both T1's and T3's harnesses re-run green against the
+*integrated* tree, and the §9 family green after T2's extension.
+
+**Every task was verified by the coordinator re-deriving its claims, not by reading its report.** That
+was not ceremony in any of the three cases:
+- **T1** — a contested count, resolved *against the coordinator*: the archive figure is **9**, and the
+  cross-check was the faulty side.
+- **T2** — an **Acceptance gap the task's own instruments could not see** (see the surprise entry
+  above). Found only by an independently constructed fixture.
+- **T3** — verified clean, and its own outside reviewer had already caught a self-contradiction in its
+  TD-086 edit before the coordinator saw it.
+
+**Two of the three tasks shipped a defect that their own green suite did not show.** Both were caught
+by an instrument built *outside* the task's declared scope. That is L-165's claim holding twice more
+in one wave, and it is the strongest evidence this sprint has produced for its own thesis.
+
+**Host constraint, recorded because it shaped the method (→ close, tech-debt bucket).**
+`evals/run-sprint-family-fixtures.sh` runs ~67 cases, each a **full conformance-engine walk of the
+whole repo**. This host killed it three times for low memory — twice with agent worktrees live, once
+with none, so the worktrees were not the cause; the harness's own cost model is. Worked around with a
+scoped §9-only runner in the scratchpad (`head -n 267` of the harness + a root override), which is a
+verification tool and touches nothing in the repo. The full-suite cost is a real debt row: a retained
+suite nobody on this hardware can run to completion is a suite that will quietly stop being run.
+
+**Worktree hygiene, two findings (→ close).** (a) Agent-dispatched outside reviewers create their own
+worktrees — `agent-a90de1db04305435d` appeared at T1's first commit and the coordinator had to remove
+it; `dispatch.md` tells the coordinator to check for leftovers *before* dispatch but never says the
+reviews it mandates will spawn more. (b) Worktrees are lock-held and refuse `git worktree remove
+--force`, needing an explicit `git worktree unlock` first — not written down anywhere. Also observed:
+**8 stale `worktree-agent-*` branches from earlier sessions**, left alone as pre-existing and not this
+sprint's to prune.
+
+**Still open, carried forward rather than absorbed:**
+- TD-105's **"9 of 17 FAILs"** denominator remains un-re-derived. T2 derived the 1+8=9 split and said
+  plainly it could not reproduce the 17 without a historical engine run against a checked-out tree.
+  Recorded as an explicit gap — it must not read at close as if it had been verified.
+- Two pre-existing `check-verify-reaches.sh` extraction defects (multi-line clause; trailing
+  punctuation silently dropping a method from the examined set).
+- The conformance engine walking into `.claude/worktrees/`.
