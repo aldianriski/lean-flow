@@ -408,7 +408,31 @@ else
       ce_mode="full spec -- $ce_spec_full not found, could not reduce"
     fi
   fi
-  printf '%s\n' "$ce_out"
+  # TD-146 (SPRINT-100 T4): this leg's printed FAIL lines and this gate's own verdict used to
+  # disagree with nothing marking the difference -- SPRINT-097's close printed `230 pass, 0 fail`
+  # over 4 visible FAIL lines, every one of them this leg's deliberately-informational sweep, not a
+  # miscount. G2 ruled the fix gate-side (here, not in conformance-engine.sh): the engine cannot know
+  # the caller's policy, so a FAIL line that this leg does NOT fold into `pass`/`fail` below now
+  # prints as `INFO` instead of `FAIL` -- a reader sees which FAILs are advisory without reading this
+  # file. GAP (rule-unimplemented, conformance-engine.sh) already establishes a non-FAIL token for a
+  # different kind of non-gating line, so INFO is the same idiom for this one. PASS lines are left
+  # alone: an uncounted PASS cannot masquerade as a missed regression the way an uncounted FAIL can,
+  # so relabelling one would touch more than the defect requires (L-007's "surgical", not ceremony).
+  #
+  # BY CONSTRUCTION, not by measurement (A3, L-145): `ce_out_display` is a SEPARATE relabelled copy
+  # built from `$ce_out`, and every line below this point -- `gs_lines`/`at_lines` and their
+  # pass/fail folding -- keeps reading the ORIGINAL, UNMODIFIED `$ce_out`. The arithmetic cannot move
+  # because the bytes it is computed from are never touched; only the separate copy handed to
+  # `printf` changes. The two counted families (gates-signed:, S13.*) are matched here by the exact
+  # same anchored, two-space, row-position patterns as the fold-in greps below (L-108) -- so a FAIL
+  # line this gate counts can never be relabelled, and a FAIL line it does not count always is.
+  ce_out_display=$(printf '%s\n' "$ce_out" | awk '
+    /^FAIL  gates-signed:/ { print; next }
+    /^FAIL  S13\.[A-Z]+ /  { print; next }
+    /^FAIL  /              { sub(/^FAIL/, "INFO"); print; next }
+    { print }
+  ')
+  printf '%s\n' "$ce_out_display"
   gs_lines=$(printf '%s\n' "$ce_out" | grep -E '^(PASS|FAIL)  gates-signed:')
   gs_pass=$(printf '%s\n' "$gs_lines" | grep -cE '^PASS')
   gs_fails=$(printf '%s\n' "$gs_lines" | grep -cE '^FAIL')
@@ -428,7 +452,7 @@ else
   at_fails=$(printf '%s\n' "$at_lines" | grep -cE '^FAIL')
   pass=$((pass + at_pass))
   fail=$((fail + at_fails))
-  note "conformance engine: informational except the two FULLY-COVERED families -- S9.GATESWELLFORMED/S9.GATESABSENT and §13's five (exit $ce_code overall; $gs_pass gates-signed PASS / $gs_fails FAIL and $at_pass §13 PASS / $at_fails §13 FAIL folded into this gate's own tally) -- see the comment above this leg for why the rest is not; ran against $ce_mode"
+  note "conformance engine: informational except the two FULLY-COVERED families -- S9.GATESWELLFORMED/S9.GATESABSENT and §13's five (exit $ce_code overall; $gs_pass gates-signed PASS / $gs_fails FAIL and $at_pass §13 PASS / $at_fails §13 FAIL folded into this gate's own tally) -- see the comment above this leg for why the rest is not; ran against $ce_mode. Any FAIL line above printed as INFO is informational and is not in this gate's pass/fail count (TD-146)."
 fi
 
 qb_checkpoint "leg 2g: recorded-run rollup"
