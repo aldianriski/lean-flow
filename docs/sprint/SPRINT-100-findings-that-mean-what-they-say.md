@@ -51,7 +51,7 @@ update_trigger: sprint execute/close events
 ## Plan
 
 ### T1 — Fix both legs of `check-verify-reaches.sh`: EXISTS resolves a basename, REACHES matches use not mention `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-verify-reaches.sh` · `evals/run-verify-reaches-fixtures.sh` · `evals/fixtures/`
+Layers: `scripts/lib/check-verify-reaches.sh` · `evals/run-verify-reaches-fixtures.sh` · `evals/fixtures/verify-reaches/`
 Depends-on: none — disjoint from every other task (**D3**)
 Cites: TD-087 · TD-097 · L-136 · L-156 · L-166 · L-186 · L-169 · ADR-029
 **Tier G** (ADR-029) — a REACHES false positive is a contract false negative: the criterion goes green
@@ -71,7 +71,7 @@ to its target *prunes* it is reported unreachable; and neither verdict rests on 
 - [ ] **Outside reviewer, worktree-isolated** (L-165 · L-168).
 
 ### T2 — Normalise checkbox state before diffing § Plan, so ticking a DoD is not an unaccounted Plan edit `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `scripts/lib/conformance-engine.sh` (the `plan-edited-after-freeze` assertion) · `evals/run-conformance-engine-fixtures.sh` · `evals/fixtures/`
+Layers: `scripts/lib/conformance-engine.sh` (the `plan-edited-after-freeze` assertion) · `evals/run-conformance-engine-fixtures.sh` · `evals/fixtures/conformance-engine/`
 Depends-on: none
 Cites: TD-105 · L-166 · L-142 · L-169 · ADR-029
 **Tier G** (ADR-029) — and the incentive is **inverted**, which is worse than a plain false positive:
@@ -108,8 +108,8 @@ the guard has been shown to reach this repository's own logs.
 - [ ] **Outside reviewer, worktree-isolated** (L-165 · L-168).
 
 ### T4 — Give the conformance engine's informational findings their own token `[size: S · risk: low · class: execution · AFK · J1]`
-Layers: `scripts/lib/conformance-engine.sh` (finding emission) · `scripts/qa-check.sh` (leg 2f-ter relay) · `evals/run-conformance-engine-fixtures.sh`
-Depends-on: **T2** — shared `scripts/lib/conformance-engine.sh` (**D1**)
+Layers: `scripts/qa-check.sh` (leg 2f-ter relay — the distinction is drawn gate-side, where the policy lives; scope-change 2026-09-13) · `evals/run-conformance-engine-fixtures.sh`
+Depends-on: **T2** — shared `evals/run-conformance-engine-fixtures.sh` (**D1**; the engine-file edge dissolved when T4 moved gate-side — scope-change 2026-09-13)
 Cites: TD-146 · L-120 · L-145 · ADR-029
 **Tier G** (ADR-029, defaulted **up**): the row declares no tier, and a defect here misreports the
 verdict itself — the failure is silent by construction, which is the test ADR-029 applies.
