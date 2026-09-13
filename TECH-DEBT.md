@@ -1812,15 +1812,17 @@ status: current
   - **Re-file fresh if** `EPIC-014` passes ~180 lines — the headroom argument expires there.
 
 - **TD-086** severity: minor | status: open | created: Sprint-084
-  - Tracker: **`TASK-340`** (SPRINT-097 T1 cluster ruling, 2026-09-10 — four tasks grouped by artifact). Re-derived against the tree: the masking bug at `evals/lib/check-system-verify-block.sh:75-76` is live and the checker still sees only `evals/fixtures/`, but the *"appears nowhere in `qa-check.sh`"* clause is **stale** — its harness `run-system-verify-fixtures.sh` was registered in `eval_harnesses_always` at SPRINT-068 T2. The Summary also names `scripts/lib/`; the checker lives at `evals/lib/`.
+  - Tracker: **`TASK-340`** (SPRINT-097 T1 cluster ruling, 2026-09-10 — four tasks grouped by artifact). Re-derived against the tree: the masking bug at `evals/lib/check-system-verify-block.sh:75-76` is live and the checker still sees only `evals/fixtures/`, but the *"appears nowhere in `qa-check.sh`"* clause below is **stale** — its harness `run-system-verify-fixtures.sh` was registered in `eval_harnesses_always` at SPRINT-068 T2 (`scripts/qa-check.sh:1063`, comment at `:1094`). **Correcting this bullet's own prior claim too**: the checker lives at `evals/lib/`, which is correct — but re-checked against the row as filed (SPRINT-084, commit `9ed3fae`), the Summary has never named `scripts/lib/` at all; that claim, added here at SPRINT-097 T1, was itself wrong (L-130's shape, inside the row meant to catch it).
   - Summary: **`check-system-verify-block.sh` masks a later unresolved FAIL with an earlier ruling, and
     never runs against live logs.** `has_close` and `has_ruling` are whole-file greps with no positional
     link to the `system-verify ·` line they gate.
   - Evidence: Sprint-084 T2's independent review reproduced it on two adversarial logs — a day-1 FAIL
     *with* its ruling followed by a day-2 unresolved FAIL *without* one returns `PASS`, **exit 0**, in
-    both orderings. The 10 retained fixtures never exercise a two-entry log. Separately the checker
-    appears nowhere in `qa-check.sh`; only its own fixture harness runs it — while T2's sibling checker
-    from the same commit *is* live-wired, under a comment stating the principle this omission violates
+    both orderings. The 10 retained fixtures never exercise a two-entry log. Separately, the harness
+    **is** registered in `qa-check.sh`'s `eval_harnesses_always` (`scripts/qa-check.sh:1063`, SPRINT-068
+    T2) — but every invocation in it points at `evals/fixtures/`, never at live logs, while a sibling
+    leg in the same file (`check-review-depth.sh`, leg 2b, `scripts/qa-check.sh:493`) *is* run against
+    live logs, under a comment stating the exact principle this gap violates
     (*"a guard that only ever sees `evals/fixtures/` has not been shown to reach this repository"*).
   - Impact: the silent close ADR-033 exists to stop, occurring inside the mechanism built to stop it.
     Latent only because no sprint log has yet carried two `system-verify ·` entries — plausible as soon
