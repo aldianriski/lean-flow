@@ -971,10 +971,15 @@ HARNESS_TAIL
 # `PASS  <id>`, `FAIL  <id>`, `GAP   <id>` -- two-space column, GAP padded to the same width. One
 # line per family this leg cares about: gates-signed (gating), S13.<ID> (gating, letters only --
 # `[A-Z]+` has no digit arm, so the id below must not carry one), a GAP (rule-unimplemented, already
-# its own token, untouched by this task), and two informational FAIL findings using the exact finding
+# its own token, untouched by this task), two informational FAIL findings using the exact finding
 # names TD-146's own Evidence recorded (`file-outside-canonical-placement`, `todo-over-cap-at-
 # promote`) plus one informational PASS -- proving PASS lines are deliberately left alone (only the
-# uncounted FAIL is the defect T4 fixes; an uncounted PASS cannot masquerade as a hidden regression).
+# uncounted FAIL is the defect T4 fixes; an uncounted PASS cannot masquerade as a hidden regression)
+# -- and a `conformance: ...` FAIL, the engine's OWN setup/usage-failure shape (bad()'s
+# `S[0-9]*|conformance:*` case, conformance-engine.sh lines 173/174/183/188): it means the engine
+# produced nothing trustworthy, never a rule finding about the repo under test, so it must NOT be
+# relabelled INFO alongside the true informational findings above (coordinator review finding,
+# SPRINT-100 T4 round 2).
 leg2fter_fakerepo="$work/leg2fter-fakerepo"
 mkdir -p "$leg2fter_fakerepo/scripts/lib"
 cat > "$leg2fter_fakerepo/scripts/lib/conformance-engine.sh" <<'STUB'
@@ -987,6 +992,7 @@ printf 'GAP   S9.SOMEGAP -- rule-unimplemented: engine has no assertion yet\n'
 printf 'PASS  S9.SCOPECHANGE -- informational pass, not folded\n'
 printf 'FAIL  file-outside-canonical-placement: docs/foo.md\n'
 printf 'FAIL  todo-over-cap-at-promote: TODO.md\n'
+printf 'FAIL  conformance: reader-missing -- read-spec-rules.sh not found beside this script\n'
 printf '      coverage: 3 checkable rule(s) have an assertion; 1 are unchecked\n'
 exit 1
 STUB
@@ -1002,6 +1008,21 @@ if printf '%s\n' "$out" | grep -qE '^INFO  file-outside-canonical-placement:' &&
   echo "PASS fixture(ce-relay-informational-fail-prints-info): both informational FAIL findings print as INFO, never FAIL"
 else
   echo "FAIL fixture(ce-relay-informational-fail-prints-info): expected INFO, not FAIL, for the uncounted findings -- output:"
+  printf '%s\n' "$out"; fail=1
+fi
+
+# case (must-FAIL, sibling of the case above, coordinator review finding): the engine's OWN setup/
+# usage failure (`conformance: ...`) must NOT be relabelled INFO -- it means the engine ran NOTHING
+# trustworthy, which is a different claim from "a real rule found something we choose not to gate
+# on." Relabelling it INFO would read as "advisory, deliberately uncounted" about a run that checked
+# nothing -- the exact defect T4 removes, one level up. This is the must-FAIL half; the case above is
+# now also its sibling control in the SAME run: an ordinary informational finding IS relabelled while
+# this engine-level one is NOT, so the two are told apart by more than "nothing got relabelled".
+if printf '%s\n' "$out" | grep -qE '^FAIL  conformance: reader-missing' &&
+   ! printf '%s\n' "$out" | grep -qE '^INFO  conformance:'; then
+  echo "PASS fixture(ce-relay-engine-error-not-relabelled): the engine's own setup-failure line (conformance:) stays FAIL, never INFO, in the same run as the informational INFO lines above"
+else
+  echo "FAIL fixture(ce-relay-engine-error-not-relabelled): the engine-level conformance: failure was relabelled INFO -- output:"
   printf '%s\n' "$out"; fail=1
 fi
 
@@ -1041,8 +1062,8 @@ fi
 # case (DoD 2/3, A3 -- the policy is unchanged, only the report): the relabelled copy is a SEPARATE
 # variable from the one the fold-in greps read, so the tally this leg contributes must count exactly
 # the two gating findings above (1 gates-signed PASS + 1 S13 PASS = 2; 1 gates-signed FAIL + 1 S13
-# FAIL = 2) and nothing from the two informational FAILs or the informational PASS, regardless of
-# which token they print under.
+# FAIL = 2) and nothing from the two informational FAILs, the informational PASS, or the engine-level
+# conformance: failure, regardless of which token any of them print under.
 if printf '%s\n' "$out" | grep -qE '^CE2FTER-SUMMARY pass=2 fail=2$'; then
   echo "PASS fixture(ce-relay-tally-unchanged): CE2FTER-SUMMARY pass=2 fail=2 -- only the two gating families are counted, exactly as before this task (A3, L-145)"
 else

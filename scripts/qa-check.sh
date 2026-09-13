@@ -419,17 +419,32 @@ else
   # alone: an uncounted PASS cannot masquerade as a missed regression the way an uncounted FAIL can,
   # so relabelling one would touch more than the defect requires (L-007's "surgical", not ceremony).
   #
+  # A THIRD line a FAIL relabel must never touch: `conformance: ...` -- this engine's OWN setup/
+  # usage failures (bad usage, repo dir not found, read-spec-rules.sh missing beside the engine,
+  # spec table unreadable -- conformance-engine.sh lines 173/174/183/188), each one an immediate
+  # `exit 1` before a single rule is ever dispatched. These are not an unbuilt-disposition finding
+  # about the REPOSITORY under test; they mean the engine produced nothing trustworthy, full stop --
+  # relabelling one INFO would read as "advisory, deliberately uncounted" about a run that checked
+  # NOTHING, which is the exact defect this task exists to remove, one level up. The shape is the
+  # engine's own: `bad()`'s `S[0-9]*|conformance:*` case is what decides a finding skips the `(%s)`
+  # rid suffix, so `^FAIL  conformance:` is not a guessed prefix, it is that same case read back.
+  # gs_lines/at_lines never matched these either (neither gates-signed: nor S13.*), so -- per DoD 2 --
+  # this changes no gating: a `conformance:` failure was already uncounted before this task, and
+  # stays uncounted; only its printed token is now FAIL rather than FAIL-then-silently-relabelled.
+  #
   # BY CONSTRUCTION, not by measurement (A3, L-145): `ce_out_display` is a SEPARATE relabelled copy
   # built from `$ce_out`, and every line below this point -- `gs_lines`/`at_lines` and their
   # pass/fail folding -- keeps reading the ORIGINAL, UNMODIFIED `$ce_out`. The arithmetic cannot move
   # because the bytes it is computed from are never touched; only the separate copy handed to
   # `printf` changes. The two counted families (gates-signed:, S13.*) are matched here by the exact
   # same anchored, two-space, row-position patterns as the fold-in greps below (L-108) -- so a FAIL
-  # line this gate counts can never be relabelled, and a FAIL line it does not count always is.
+  # line this gate counts can never be relabelled, and a FAIL line it does not count always is,
+  # UNLESS it is an engine-level failure (above), which is never relabelled either.
   ce_out_display=$(printf '%s\n' "$ce_out" | awk '
-    /^FAIL  gates-signed:/ { print; next }
-    /^FAIL  S13\.[A-Z]+ /  { print; next }
-    /^FAIL  /              { sub(/^FAIL/, "INFO"); print; next }
+    /^FAIL  gates-signed:/  { print; next }
+    /^FAIL  S13\.[A-Z]+ /   { print; next }
+    /^FAIL  conformance:/   { print; next }
+    /^FAIL  /               { sub(/^FAIL/, "INFO"); print; next }
     { print }
   ')
   printf '%s\n' "$ce_out_display"
