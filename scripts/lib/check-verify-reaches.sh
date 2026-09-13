@@ -18,16 +18,25 @@
 # them are mechanical and are what this file does:
 #
 #   EXISTS   -- the named script is present in the repo.        -> verify-method-absent
+#               (present, but only findable by basename          -> verify-method-unresolvable
+#               against the known roots, is a DIFFERENT claim
+#               from confirmed absent -- TD-097.)
 #   REACHES  -- the named script textually references the       -> verify-does-not-reach-target
-#               target path the criterion claims.
+#               target path the criterion claims, as code, at
+#               a path boundary, outside an exclusion (TD-087).
 #
 # RUNS and PROVES stay human questions at G2 and are NOT claimed here. Saying so matters: a checker
 # that implied it settled all four would be the same over-claim it exists to catch, one level up.
 #
 # --- the deliberate limits, stated rather than discovered later -----------------------------------
-# * Static text match. A script reaching a target through a variable, or through a helper it sources,
-#   reads as not-reaching here. That direction is a FALSE POSITIVE and is the safe one: it asks a human
-#   to look, it never certifies a gap as fine.
+# * Static text match. A `$VAR/literal/path` idiom -- a variable prefix in front of a literal path
+#   suffix, this repo's own convention (`conformance.sh`'s `$here/scripts/lib/...`) -- DOES reach,
+#   because lf_line_touches matches the target as a segment run anywhere inside a token, not only at
+#   its front (SPRINT-100 T1, caught by outside review after an earlier draft missed it). What still
+#   reads as not-reaching: a target named ONLY through a variable holding the whole path with no
+#   literal path text visible on that line at all, or through a helper the script merely sources.
+#   That remaining direction is a FALSE POSITIVE and is the safe one: it asks a human to look, it
+#   never certifies a gap as fine.
 # * A target must contain `/` to be recognised. A bare filename is too ambiguous to key on -- prose
 #   naming `dispatch.md` is usually discussing it, not claiming a checker examines it. This is the
 #   trade that keeps the false-positive rate survivable, and it means a criterion claiming a bare
@@ -36,6 +45,17 @@
 #   record of what happened, not a claim about scope, and is S9.VERIFYCLAUSE's business.
 # * A clause naming NO script is a judgment method. Legitimate, reported as a note, never failed --
 #   T3's rule is explicit that manual verification stays valid where no mechanical method exists.
+# * A bare-basename method resolves against the CWD first, then `scripts/`, `scripts/lib/`, `evals/`
+#   in that fixed order -- first match wins. Two roots sharing a basename is a corpus-hygiene question
+#   this checker does not adjudicate (SPRINT-100 T1, TD-097).
+# * Exclusion-idiom detection (`lf_is_exclusion_line`) is a closed set of shapes -- `grep -v`, a
+#   `case … ) continue` arm, `--exclude` / `-not` / `! -path` / `! -name` -- not a parser. A pruning
+#   idiom spelled a sixth way (e.g. `awk '!/pat/'`) is NOT recognised and reads as a genuine reach: a
+#   FALSE NEGATIVE, the unsafe direction this file otherwise avoids. Widen the case statement as new
+#   shapes are found in this repo's own scripts; don't generalise ahead of evidence.
+# * A token that is itself one of this clause's OTHER named scripts is never treated as a target, even
+#   on the rare chance it was meant as one -- an N-method `Verify:` clause (TD-087) would otherwise have
+#   the checker pair named methods against each other, each reading as unreachable from the other.
 #
 # Usage: sh check-verify-reaches.sh <sprint.md> [<sprint.md> ...]
 # Archived sprints are skipped by path (docs/sprint/archive/) -- closed history is not re-litigated.
@@ -51,6 +71,41 @@ set -u
 _lf_ap=$(dirname -- "$0")/archive-path.sh
 [ -f "$_lf_ap" ] || { echo "FAIL verify reaches: shared archive predicate not found at $_lf_ap"; exit 2; }
 . "$_lf_ap"
+
+# lf_line_touches <line> <tgt-core>
+#   0 if <line> contains <tgt-core> as a contiguous run of WHOLE "/"-separated path segments, found
+#   anywhere inside a longer path-like token -- not merely as a character substring. Tokenising on
+#   every character outside the path charset, then wrapping both the token and the target in a
+#   leading/trailing "/" before a literal substring test, is what makes "src/db" vs "src/dbtools/" a
+#   segment-boundary question (TD-087's prefix-collision shape) while STILL matching "src/db" inside
+#   "$here/src/db/migrate.sh" -- an earlier draft required the match to start at the token's own
+#   front, which silently missed every `$VAR/literal/path` idiom (this repo's own `conformance.sh`
+#   reaching `scripts/lib/conformance-engine.sh` via `$here/...`), caught only by an outside review
+#   dispatched per ADR-029, not by any fixture (SPRINT-100 T1). <tgt-core> must already have its
+#   trailing "/" stripped.
+lf_line_touches() {
+  _llt_l=$1; _llt_t=$2
+  for _llt_tok in $(printf '%s' "$_llt_l" | tr -c 'A-Za-z0-9_./-' ' '); do
+    case "/${_llt_tok%/}/" in
+      *"/${_llt_t}/"*) return 0 ;;
+    esac
+  done
+  return 1
+}
+
+# lf_is_exclusion_line <line>
+#   0 if <line>'s own structure PRUNES whatever path it mentions rather than examining it -- a
+#   `grep -v`, a `case … ) continue` arm, or a find-style exclude flag (TD-087). A mention inside one
+#   of these reads exactly like a mention inside a comment: present in the text, absent from what the
+#   script actually does with it. Closed set of shapes -- see the limits note above this function.
+lf_is_exclusion_line() {
+  case "$1" in
+    *'grep -v'*|*'grep -qv'*|*'grep -vq'*|*'--invert-match'*) return 0 ;;
+    *')'*'continue'*) return 0 ;;
+    *'--exclude'*|*' -not '*|*'! -path'*|*'! -name'*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
 
 fail=0
 ok()   { printf 'PASS  %s\n' "$1"; }
@@ -94,25 +149,78 @@ for sp in "$@"; do
               | sed -E 's/[,.;:)]+$//' \
               | grep -E '^[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]*$' | sort -u)
 
+    # A token that is itself one of THIS clause's other named scripts is never a target -- see the
+    # two-method limit note above (TD-087: SPRINT-084 T5 named two scripts in one clause and the
+    # unfixed checker paired them against each other, each reading as unreachable from the other).
+    real_targets=""
+    for t in $targets; do
+      is_method=0
+      for s in $scripts; do
+        [ "$t" = "$s" ] && is_method=1 && break
+      done
+      [ "$is_method" -eq 0 ] && real_targets="$real_targets $t"
+    done
+
     for scr in $scripts; do
-      if [ ! -f "$scr" ]; then
-        bad "verify-method-absent: $sp -- a Verify: clause names \`$scr\`, which does not exist in this repository. A criterion whose method is absent is a claim with nothing behind it"
+      resolved=""
+      case "$scr" in
+        */*)
+          # Fully-qualified: exact path only, unchanged behaviour.
+          [ -f "$scr" ] && resolved=$scr
+          ;;
+        *)
+          # Bare basename -- the repo's dominant convention (TD-097). CWD-relative first, so a
+          # root-level script (e.g. `conformance.sh`) that already resolved keeps resolving exactly
+          # as before; only then the known roots, in this fixed order.
+          if [ -f "$scr" ]; then
+            resolved=$scr
+          else
+            for root in scripts scripts/lib evals; do
+              if [ -f "$root/$scr" ]; then resolved="$root/$scr"; break; fi
+            done
+          fi
+          ;;
+      esac
+
+      if [ -z "$resolved" ]; then
+        case "$scr" in
+          */*)
+            bad "verify-method-absent: $sp -- a Verify: clause names \`$scr\`, which does not exist in this repository. A criterion whose method is absent is a claim with nothing behind it"
+            ;;
+          *)
+            bad "verify-method-unresolvable: $sp -- a Verify: clause names \`$scr\` by basename, and it resolves against neither the current directory nor the known script roots (scripts/, scripts/lib/, evals/). A criterion whose method cannot be located this way is not confirmed absent, only unresolved -- qualify the path, or confirm by hand whether the script still exists"
+            ;;
+        esac
         filefail=1
         continue
       fi
-      for tgt in $targets; do
-        [ "$tgt" = "$scr" ] && continue
-        case "$scr" in *"$tgt"*) continue ;; esac
+      scr=$resolved
+
+      for tgt in $real_targets; do
+        tgt_core=$(printf '%s' "$tgt" | sed -E 's#/+$##')
+        lf_line_touches "$scr" "$tgt_core" && continue
+
         # Comments are stripped before matching. A script's prose can NAME a path its code never
         # touches -- the self-describing-corpus failure (L-108), and it vouches for exactly the gap
         # this check exists to find. Caught by this file's own fixture on first run: the stand-in
         # checker's explanatory comment mentioned the unreachable target and the must-FAIL case went
         # green. Limit, stated: a trailing inline comment on a code line is still matched.
-        if ! grep -v '^[[:space:]]*#' "$scr" 2>/dev/null | grep -qF -- "$tgt"; then
-          bad "verify-does-not-reach-target: $sp -- the criterion claims \`$tgt\` but \`$scr\` never references it, so running it proves nothing about that target. Unreachable reads exactly like satisfied (L-136); either name a method whose scope covers it, or state the criterion as a judgment tick"
-          filefail=1
-        else
+        content=$(grep -v '^[[:space:]]*#' "$scr" 2>/dev/null)
+        reached=0
+        while IFS= read -r cline; do
+          [ -n "$cline" ] || continue
+          lf_line_touches "$cline" "$tgt_core" || continue
+          lf_is_exclusion_line "$cline" && continue
+          reached=1
+          break
+        done <<EOF2
+$content
+EOF2
+        if [ "$reached" -eq 1 ]; then
           checked=$(( checked + 1 ))
+        else
+          bad "verify-does-not-reach-target: $sp -- the criterion claims \`$tgt\` but \`$scr\` never references it as code, at a path boundary, outside an exclusion, so running it proves nothing about that target. Unreachable reads exactly like satisfied (L-136); either name a method whose scope covers it, or state the criterion as a judgment tick"
+          filefail=1
         fi
       done
     done
