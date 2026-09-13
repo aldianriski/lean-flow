@@ -355,3 +355,70 @@ sprint's to prune.
 - Two pre-existing `check-verify-reaches.sh` extraction defects (multi-line clause; trailing
   punctuation silently dropping a method from the examined set).
 - The conformance engine walking into `.claude/worktrees/`.
+
+### 2026-09-13 | progress | T4 built, defect found and fixed in a second round, merged
+
+T4 · done · leg 2f-ter builds a **separate** relabelled copy (`ce_out_display`); any `FAIL` line this
+gate does not fold into its tally prints as `INFO`. Merged at `b877e95`; commits `8bb2500` · `8f4bd64`.
+
+**A3 holds by construction, not by measurement.** The two fold-in greps
+(`^(PASS|FAIL)  gates-signed:` · `^(PASS|FAIL)  S13\.[A-Z]+ `) keep reading the **unmodified**
+`$ce_out`; only the separate display copy is rewritten, so the arithmetic cannot move because the
+bytes it is computed from are never touched. Confirmed by the retained `ce-relay-tally-unchanged`
+case (`pass=2 fail=2` before and after) and by reading every `ce_out` reader in the file.
+`conformance-engine.sh` and `conformance.sh` are at **zero diff** — the ADR-027 consumer contract is
+untouched, correct because for an adopter every finding **is** gating (L-015).
+
+**Round 2 fixed a defect the coordinator found reviewing round 1.** The relabel was turning the
+engine's own setup failures — `conformance: reader-missing` · `repo` · `spec-table-unreadable` ·
+`usage`, four classes — into `INFO`. Those mean **the engine never ran**, so every rule it did or did
+not report is meaningless; calling that "informational" is the same label-untrue-of-its-subject class
+T4 exists to remove, occurring inside T4's own fix. **Not hypothetical: the coordinator was misled by
+that exact line earlier this sprint**, when an engine run from a copied path emitted `reader-missing`
+and produced *empty* output that read as a clean pass. Both the builder and its first reviewer had
+seen the case and judged it non-blocking; owner ruled to fix it (AskUserQuestion, 2026-09-13). Engine
+errors now stay `FAIL`, with a retained fixture **and** control.
+
+**Second owner ruling, same round:** `PASS` lines stay unrelabelled. The failure modes are asymmetric —
+an uncounted FAIL misread as "the gate is clean" is the dangerous direction TD-146 exists to fix,
+while an uncounted PASS masks no regression — and both the Acceptance text and TD-146's Evidence are
+scoped to FAIL lines. Flagged by the builder for a ruling rather than decided silently, which is the
+right instinct.
+
+**Coordinator verification:** 49 fixtures green (re-run here, not read from the report). Independent
+seeded break removing the `conformance:` arm: landed (`cmp`), parsed (`sh -n`), targeted (exactly −1
+line). **Exactly `ce-relay-engine-error-not-relabelled` reddened; all five siblings stayed green**,
+including `ce-relay-informational-fail-prints-info` (proving the seed was scoped) and the A3 tally
+check. Restored under ONE convention — `git hash-object` vs `git rev-parse <ref>:<path>` — `7584abb`
+both sides, worktree clean.
+
+review · T4 · two scoped reviewers (worktree-isolated, both CLEAR; the second found the finding below) + coordinator re-verification · behaviour:material · governance:high
+consequence · T4 · behaviour:material · governance:high
+
+### 2026-09-13 | surprise | 27 bootstrap `FAIL ` emissions use a one-space prefix that no two-space selector can reach
+
+Found by T4's **second** reviewer, in a file T4 was forbidden to touch — the fourth finding this
+sprint to come from outside the task's declared scope, and none of the four from anything the task
+could run.
+
+`scripts/lib/conformance-engine.sh:54` emits `FAIL conformance: shared archive predicate not found`
+through a raw `echo` with **one** space, not the two-space column every `bad()`/`ok()`/`gap()` line
+uses. It therefore bypasses **every arm** of T4's relabel awk, including the generic one. The outcome
+is correct — it stays `FAIL` rather than becoming `INFO` — but **by accident of a spacing
+inconsistency, not by the `conformance:` arm added to catch it.**
+
+**Not one line. Derived by three differently-shaped queries that agree (L-198):** `echo`-prefixed
+one-space FAILs = **27**; *any* one-space FAIL literal regardless of emitter = **27** (so every one is
+echo-emitted); two-space `bad()`-convention literals = **55**. Spread over **15 files** —
+`check-approval-envelope` · `check-count-claims` · `check-ephemeral-intake` · `check-epic-archive` ·
+`check-handoff-state` · `check-layers-completeness` · `check-layers-observed` · `check-night-run-rollup` ·
+`check-qa-budget-default` (×4) · `check-research-archive` (×2) · `check-review-depth` ·
+`check-verify-reaches` · `conformance-engine` · `check-system-verify-block` · `harness-common` (×9).
+Every one is a bootstrap failure emitted *before or outside* its file's own helper.
+
+**Harmless today**, and that is the trap: `qa-check.sh`'s 12 leg counters use `grep -cE '^FAIL'`, which
+tolerates either spacing, so nothing miscounts. But T4 just shipped the **first** selector keyed to the
+two-space column, and these 27 lines are structurally invisible to it. That is **L-186's population
+blindness exactly** — the detection logic is sound, the member set it runs over is not — arriving in
+the sprint's own last guard. → close, tech-debt bucket. Not fixed here: 15 files, far outside T4's
+`Layers:`, and the correct fix (route bootstrap failures through a shared emitter) is a design task.
