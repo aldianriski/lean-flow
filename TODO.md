@@ -16,17 +16,15 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-099 — Make the Gate Finish** →
-> [`docs/sprint/SPRINT-099-make-the-gate-finish.md`](docs/sprint/SPRINT-099-make-the-gate-finish.md)
-> — promoted 2026-09-12, three tasks, 20 DoD, no owner-action. **Not** an epic sprint: EPIC-015
-> § Closed-when 1 waits a third sprint, because the run it needs also needs a host that can
-> finish a gate. **`gates_signed:` is absent, which means NOT signed** (L-099).
+> **No active sprint.** `SPRINT-099 — Make the Gate Finish` closed 2026-09-13 at **20 of 20 DoD**
+> ([`docs/sprint/archive/SPRINT-099-make-the-gate-finish.md`](docs/sprint/archive/SPRINT-099-make-the-gate-finish.md)).
+> Next: `/lean-doc-generator promote` to form the following sprint from `state: ready` Backlog rows.
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
 again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 86 rows** (84 open · 2 resolved — TD-141 accepted, TD-132 → TASK-328) — re-derived at
+- **Debt ledger: 88 rows** (86 open · 2 resolved — TD-141 accepted, TD-132 → TASK-328; TD-154/TD-155 filed at the SPRINT-099 close) — re-derived at
   the SPRINT-099 promote by row header (74 of 84 open are ≥3 sprints unaddressed; 74 aged + 10 unaged
   = 84). Re-derive open/closed and the `severity: high` set
   **by anchoring to the `^- **TD-NNN**` row header** — a bare `grep 'status: open'` over-counts,
@@ -36,8 +34,11 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
   completion four times and printed a verdict every time, ending `QA-CHECK: 230 pass, 0 fail`. The
   previous note here ("cannot currently verdict") was written after SPRINT-096's memory kill and was
   stale; it is replaced rather than annotated, because a standing fact that is false is worse than
-  absent. `qa-budget-default` still compares the *configured* budget to the ceiling rather than
-  actual runtime (**TD-128**), and `QA_BUDGET_SECONDS` stays at 520. **What a close must not do is
+  **`qa-budget-default` compared the *configured* budget to the ceiling rather than actual runtime
+  (TD-128) until SPRINT-099 T2 added the missing reader** — the gate now asserts its ACTUAL runtime
+  against the 600s ceiling on every run, and prints a third outcome when it truncates, so a
+  truncated run is no longer byte-indistinguishable from an ordinary red gate.
+  `QA_BUDGET_SECONDS` stays at 520.
   read the FAIL-line count as the verdict:** the run above printed `0 fail` over **4** `FAIL` lines,
   all from the conformance engine, which leg 2f-ter keeps deliberately informational (**TD-146**).
   The number to act on is the one the gate prints (L-120).
@@ -121,13 +122,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > and **TD-150** — had no Backlog row at all, so the rule had no consumer for them (L-020's shape).
 > TD-090 · TD-117 · TD-128 were already carried by `TASK-329` and are left where `/triage` ranked them.
 
-- [ ] TASK-344 — Measure the gate's memory profile, so a kill is a known mechanism rather than an inference  [size: M] [risk: med] [HITL]
-      → **promoted into SPRINT-099.** Full spec — Layers · Acceptance · DoD · the
-        seeded-break bar — lives in the sprint file. Pointer, not a second copy (L-008).
-      tracker:    TD-143 (severity: high, open — its `→ TASK-334` pointer is spent: 334 shipped as
-      origin:     manual   # filed by hand at the SPRINT-098 promote governance review (severity: high escalation)
-      state:      ready
-
 - [ ] TASK-345 — Give `workdoo` the pinned-plugin mechanism ADR-041 already rules it has  [size: M] [risk: med] [HITL]
       class:      execution
       authority:  J2
@@ -148,6 +142,44 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       state:      ready
 
 ### P2 — Follow-on
+
+- [ ] TASK-346 — Rule `check-handoff-state.sh`'s archive glob: convert it, or record the exemption where the guard reads it  [size: S] [risk: low] [HITL]
+      class:      execution
+      authority:  J1
+      done-when:  `scripts/lib/check-handoff-state.sh:145` either calls `lf_is_archived_path` like the
+                  other eleven sites, or its exemption stops living as a comment inside
+                  `qa-check.sh`'s leg 10b allow-list regex and becomes a declaration the guard reads.
+                  Today the reason is sound — it MAPS a Plan path to its log path rather than
+                  excluding, and self-enumerates via a literal archived-sprint glob, so it never
+                  tests a caller-supplied string of unknown casing (independently verified at
+                  SPRINT-099 T3 review) — but the exemption is hardcoded in a regex two files away,
+                  which is L-151's shape: a ruling recorded where its reader must be told about it.
+      touches:    `scripts/lib/check-handoff-state.sh` · `scripts/qa-check.sh` (leg 10b allow-list)
+      depends-on: none
+      assumes:    none — the mapping-vs-exclusion distinction was verified, not assumed
+      tracker:    SPRINT-099 T3 (ruled OUT of scope at G2 by the owner; the eleventh exclusion site was folded in, this mapping site was not)
+      origin:     close-retro
+      state:      ready
+
+- [ ] TASK-347 — Give the five archive-dependent harnesses their own case-variant fixture  [size: M] [risk: low] [AFK]
+      class:      execution
+      authority:  J1
+      done-when:  `run-approval-envelope-fixtures.sh` · `run-night-run-rollup-fixtures.sh` ·
+                  `run-review-depth-fixtures.sh` · `run-verify-reaches-fixtures.sh` ·
+                  `run-system-verify-fixtures.sh` each exercise a case-variant archive path, at the
+                  two-level-deeper `…/Archive/logs/…` shape the log checkers actually use. Only
+                  `run-layers-completeness-fixtures.sh` has one today, so a revert at any single one
+                  of those five sites is invisible to its own suite.
+      touches:    the five `evals/run-*-fixtures.sh` named above
+      depends-on: none
+      assumes:    that per-harness coverage is still wanted GIVEN leg 10b already guards the whole
+                  set against a revert in any shape — the cross-site guard was the SPRINT-099 answer
+                  to this finding, and this row is the per-harness half it deliberately did not do.
+                  **Confirm that before building: if leg 10b is judged sufficient, close this row
+                  rather than write five near-duplicate fixtures.**
+      tracker:    SPRINT-099 T3 outside review, Finding 2 (guard hole, no live bug found)
+      origin:     close-retro
+      state:      needs-info
 
 
 > **The SPRINT-097 T1 cluster ruling (2026-09-10)** — five gate-accuracy defects ruled **four tasks,
@@ -196,13 +228,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   (L-165 · L-168).
       tracks:     TD-087 · TD-097
       origin:     close-retro (SPRINT-097 T1 ruling, 2026-09-10)
-      state:      ready
-
-- [ ] TASK-342 — Make the `*/archive/*` exclusion a filesystem-identity predicate, not a case-sensitive string glob  [size: S] [risk: low] [HITL]
-      → **promoted into SPRINT-099.** Full spec — Layers · Acceptance · DoD · the
-        seeded-break bar — lives in the sprint file. Pointer, not a second copy (L-008).
-      tracks:     TD-145
-      origin:     close-retro (SPRINT-097 T3 outside review, 2026-09-10)
       state:      ready
 
 - [ ] TASK-339 — Normalise checkbox state before diffing § Plan, so ticking a DoD is not an unaccounted Plan edit  [size: S] [risk: low] [HITL]
@@ -344,18 +369,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   # isolation (Round 13 §3 measured the oracle-spawning differential at 52.8–57.1 s and
                   # left this term unmeasured). It is a MEASUREMENT, so it legitimately accumulates
                   # (L-094) — unlike TASK-297, which was parked on a ruling.
-
-- [ ] TASK-329 — Make gate truncation a distinct outcome from gate failure  [size: M] [risk: med] [HITL]
-      → **promoted into SPRINT-099.** Full spec — Layers · Acceptance · DoD · the
-        seeded-break bar — lives in the sprint file. Pointer, not a second copy (L-008).
-      tracker:    **TD-128** (`severity: high`, open, Sprint-092 — the guard passes precisely when the
-      origin:     decomposer
-      state:      ready
-
-> **`TASK-330` is retired into `TASK-329`** (2026-09-07 decompose). TD-117 and TD-128 are one
-> mechanism — the gate's own duration and what it failed to reach are both unreported — so two rows
-> would have meant two passes over the same code with a stale dependency between them. The id is
-> **not reused**; TD-117's escalation note in `TECH-DEBT.md` points here.
 
 - [ ] TASK-341 — Widen the conformance-coverage sweep's matcher to the `S<N>.<CODE>` convention, then re-run Round 4  [size: S] [risk: low] [HITL]
       class:      execution

@@ -3,7 +3,7 @@ sprint: 099
 slug: make-the-gate-finish
 owner: Maintainer
 last_updated: 2026-09-13
-status: active
+status: closed
 gates_signed: G1,G2 @ 7701c8b
 plan_commit: a43d1e6
 close_commit: [sha — set at close]
@@ -149,12 +149,64 @@ host, one inode under two spellings — are excluded identically, at every site.
 
 ## Retro
 
-**Retrieval check** —
+**Retrieval check** — The rules that fired unprompted: L-130 (re-derived TD-117's "six" harnesses to
+13/27 and A3's 450 s to 520 s rather than quoting either), L-042 (per-hunk staging when
+`scripts/qa-check.sh` carried both a T2 and a T3 hunk), L-169 (one hash convention, `git hash-object`,
+stated once and not mixed), L-170 (three id derivations, each cross-checked; `TASK-908` and `L-999`
+correctly rejected as fixture and negative-test tokens rather than treated as rows). The rules that
+did **not** fire until something external forced them: **L-186 twice** — the site derivation was run
+in one query shape and cross-checked in the same shape, and the outside review found the eleventh
+site both times over; and **L-120 in the coordinator's own shell**, where `bun build … | tail -3 &&
+echo "BUILD OK"` printed `BUILD OK` after a failed build because `&&` read `tail`'s status. That rule
+is promoted, correct, and was on screen. It still did not fire, which is its sixth sighting of
+exactly that shape.
 
-**Cost** —
+**Cost** — Coordinator inline for all three tasks, with stated reasons (T1 needed exclusive host
+access; T2's risk sat in a cross-file contract the coordinator had just enumerated). Three dispatched
+agents, all review: two worktree-isolated adversarial passes plus one bounded re-review, ≈527k
+subagent tokens. **Eleven full or partial gate runs**, ~1h20m of wall clock in gate time alone — the
+dominant cost of this sprint was running the instrument it was fixing.
 
 **Worked**
 
+- **Measuring before theorising killed a four-sprint inference in one session.** TD-143 had been
+  reasoned about from the *shape* of four kills. Three instrumented runs showed the gate holds
+  ~9.5 MB and moves 320 kB across 547 s while system free memory swings 695 MB around it. The debt's
+  whole premise — that there is a gate memory cost to reduce — is false, which eliminates the entire
+  class of fixes aimed at it. The task's own DoD demanded A1 be *tested, not assumed*, and testing it
+  is what produced the finding.
+- **Discarding an instrument mid-proof.** The off-by-default byte-diff was abandoned after three runs
+  of the *identical* file produced 201/201/204 passes at two different trip harnesses: the diff's
+  noise floor exceeded any instrumentation effect. Recording the discard was worth more than the two
+  proofs that did hold — a diff that "looked clean" would have been measuring host variance.
+- **The outside review earned its cost, three for three.** Every defect it found was one the author
+  could not see: a `$0` resolved after a `cd`, an alarm message its own consumer misfiled, and an
+  eleventh call site invisible to the query shape that found the first ten. None came from recalling
+  a rule; all came from someone else running the code.
+- **Answering a guard-hole finding with a cross-site guard, not five fixtures.** Leg 10b catches a
+  revert at every site at once *and in any shape* — which is the failure that produced the finding.
+
 **Friction**
 
+- **The instrument kept being killed by the thing it measures.** The first measurement chain died
+  mid-R0 to the host's low-memory watchdog, taking four queued runs with it. Serial foreground runs
+  survived where one long background chain did not.
+- **Five of five completed runs truncated before the fix; the close's own system-verify truncated
+  too** — and then, once the three regressions it caught were fixed, produced `218 pass, 0 fail`,
+  the first untruncated green gate of the session. The sprint's thesis was demonstrated on the sprint
+  itself.
+- **The gate caught the coordinator twice**: four `review-depth-*-absent` FAILs for consequence lines
+  with no `review ·` line, and a `layers observed` FAIL naming the eleventh site as undeclared. Both
+  were real bookkeeping gaps, surfaced by checks this sprint exists to sharpen.
+- **Three of my own edits regressed the gate in ways only a full run showed**: a literal sprint glob
+  inside a *comment* tripping ADR-014's single-pattern rule, a relocated engine copy missing its new
+  sibling, and DoD annotations citing files by bare basename where Layers declares them prefixed.
+
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+
+- **`L-199` filed** — a guard's ALARM branch has a consumer too, and only the happy path is ever run
+  through it. The defect message and the matcher that reads it were written in the same session by
+  the same author and never introduced to each other.
+- **`L-198` bumped to `count: 2`** — a cross-check must vary the SELECTION rule, not the direction of
+  the count. The eleventh archive site is that rule's second sighting, and this time on a live gate
+  leg, failing silently. **It is now a promotion candidate at the next promote.**

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-12
+last_updated: 2026-09-13
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -294,6 +294,40 @@ status: current
 > FAIL lines trace to SPRINT-094 and SPRINT-095 having closed without their §11 archival pass, so the
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
+
+- **TD-155** severity: medium | status: open | created: Sprint-099
+  - Summary: **The declared gate command's second stage is unreachable whenever its first stage
+    truncates.** `package.json`'s `test` is
+    `bun scripts/qa-verdict.ts sh scripts/qa-check.sh && bun test`. A truncated `qa-check.sh` makes
+    `qa-verdict.ts` exit non-zero — correctly, a truncated run is not a pass — so `&& bun test`
+    never runs and the **entire 533-test TypeScript suite is skipped in silence.**
+  - Evidence (2026-09-13, SPRINT-099): every one of the first five gate runs this session truncated,
+    so `bun test` did not execute once under the declared command. Run separately afterwards it
+    reported **531 pass, 2 fail** in 266 s — two failures that the declared gate command could not
+    have surfaced on a truncating host. The final, untruncated run (`218 pass, 0 fail`) does reach it.
+  - Impact: the gate's coverage is **conditional on its own speed**, which is the same class as
+    TD-117 one level up — a skipped harness is an unrun guard, and here the skipped thing is every
+    TS test at once. It is invisible rather than reported: nothing prints "bun test did not run".
+  - **Deliberately not fixed in SPRINT-099** (owner ruling at close). `package.json`'s `test` script
+    is the discovered gate at **ADR-033 rung 1**, so changing the chain re-points what System verify
+    means and what a green gate attests to — an ADR-grade decision, not a patch, and outside T2's
+    declared `Layers:`.
+  - **Re-file fresh if** the chain is changed, or the gate stops truncating on ordinary hosts.
+
+- **TD-154** severity: medium | status: open | created: Sprint-099
+  - Summary: **`test/gate-discovery/discovery-order.test.ts` fails: the rung-1 command is reported as
+    BYPASSING the gate `.gate-command` declares.** `bypassesDeclaredGate(REPO)` returns
+    `bypassed: true` where the test asserts `false`.
+  - Evidence (2026-09-13): **pre-existing, and verified so** — the same test fails at this sprint's
+    own `plan_commit` `a43d1e6` in a clean worktree (9 pass, 1 fail), before any SPRINT-099 change.
+    None of `package.json`, `.gate-command` or `test/gate-discovery/` was touched this sprint.
+  - Likely cause, **not verified**: `.gate-command` declares `sh scripts/qa-check.sh` while rung 1
+    now runs it *wrapped* in `bun scripts/qa-verdict.ts` (SPRINT-097 T4, TD-143's cheap half), and
+    the discovery check may compare the command textually rather than asking whether the declared
+    gate is reached. Re-derive before building on this (L-091).
+  - Impact: ADR-033's own guard is red, so the mechanism that decides *what System verify runs* is
+    currently unattested. Filed rather than fixed because diagnosing it is its own task.
+  - **Re-file fresh if** the wrapper is removed, or rung-1 discovery is re-specified.
 
 - **TD-153** severity: medium | status: open | created: Sprint-098
   - Tracker: none — found by the coordinator's population probe at SPRINT-098 T3, then independently
