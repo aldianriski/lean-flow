@@ -78,6 +78,27 @@ run_case_anywhere "no-gate-material-ruled-passes" 0 "recorded owner ruling" -- \
 run_case_anywhere "no-gate-unmarked-closed-fails" 1 "no-gate-risk-unmarked" -- \
   sh "$checker" "$fx/no-gate-unmarked-closed/docs/sprint/logs/SPRINT-944-no-gate-unmarked-closed.md"
 
+# --- the positional-link family (SPRINT-100 T3, TD-086) -----------------------------------------
+# Every case above carries exactly ONE `system-verify ·` occurrence. None of them can tell a
+# windowed implementation apart from the original whole-file-grep one, because with a single
+# occurrence the window IS the whole file from that line on -- the masking bug only shows up once a
+# log carries a SECOND occurrence. Reproduced directly (SPRINT-084 T2's independent review, re-run
+# against this checker before this fix landed): a day-1 FAIL *with* its ruling, followed by a day-2
+# unresolved FAIL *without* one, returned PASS/exit 0 under the old whole-file `has_close`/
+# `has_ruling`, because day-1's ruling and day-2's close were both found ANYWHERE in the file. Case
+# 11/12 differ ONLY in whether the SECOND entry carries its own ruling -- the minimal pair that
+# discriminates a windowed fix from the masking bug it replaces.
+
+# --- case 11: day-1 FAIL+ruling, day-2 FAIL with NO ruling of its own, then close -> FAIL, named ---
+# The must-FAIL: day-1's resolved occurrence must not mask day-2's unresolved one.
+run_case_anywhere "second-entry-unruled-fails" 1 "system-verify-fail-silently-closed" -- \
+  sh "$checker" "$fx/second-entry-unruled/docs/sprint/logs/SPRINT-945-second-entry-unruled.md"
+
+# --- case 12: day-1 FAIL+ruling, day-2 FAIL+ITS OWN ruling, then close -> PASS (sibling control) ---
+# Same two-entry shape as case 11, differing only in whether day-2 carries its own ruling.
+run_case_anywhere "second-entry-ruled-passes" 0 "recorded owner ruling" -- \
+  sh "$checker" "$fx/second-entry-ruled/docs/sprint/logs/SPRINT-946-second-entry-ruled.md"
+
 # --- case 5: an ARCHIVED log carrying the exact silently-closed shape -> skipped, exit 0 ---------
 # Location-scoped, matching night-run-rollup/gates-signed/sprint-close's own archive convention: a
 # closed sprint is history and its record is not re-litigated. The fixture content is deliberately
@@ -88,6 +109,29 @@ if [ "$rc" -eq 0 ] && [ -z "$out" ]; then
   echo "PASS fixture(archived-out-of-scope): exit 0 with no output -- archived log not re-checked"
 else
   echo "FAIL fixture(archived-out-of-scope): exit $rc, output: $out"; fail=1
+fi
+
+# --- live-log reachability (SPRINT-100 T3, TD-086) -----------------------------------------------
+# Every case above points at evals/fixtures/ -- a guard that has only ever seen evals/fixtures/ has
+# not been shown to reach this repository at all (L-166). qa-check.sh leg 2b carries that exact
+# sentence as a comment for check-review-depth.sh's own live-log invocation; this checker's harness
+# never had an equivalent, so it had only ever been proven against its own fixtures. Run here
+# against THIS repository's real, non-archived Execution Log(s) under docs/sprint/logs/ -- reported,
+# never asserted: the repository's live state is not a fixed fixture, and a real FAIL surfaced here
+# is a genuine finding for a human to read, not a harness defect to paper over by baking in today's
+# answer.
+live_files=""
+for live_f in "$repo_root"/docs/sprint/logs/*.md; do
+  [ -f "$live_f" ] && live_files="$live_files $live_f"
+done
+echo "----------------------------------------"
+if [ -z "$live_files" ]; then
+  echo "NOTE live-log reachability: no non-archived sprint log found under docs/sprint/logs/ -- nothing to point the guard at"
+else
+  live_out=$(sh "$checker" $live_files 2>&1); live_code=$?
+  echo "-- live-log run against docs/sprint/logs/ (informational, not asserted) --"
+  printf '%s\n' "$live_out"
+  echo "-- live-log run exit: $live_code --"
 fi
 
 echo "----------------------------------------"
