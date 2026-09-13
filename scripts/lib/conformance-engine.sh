@@ -2046,6 +2046,16 @@ assert_S9_LOGDIR() {
 # position, not by a token that may not be there).
 _plan_section() { awk '/^## Plan$/ { inp = 1; next } inp && /^## / { exit } inp { print }'; }
 
+# _norm_dod_checkbox -- normalises a ticked DoD line (`- [x] ...` / `- [X] ...`) on
+# stdin back to its untaped form (`- [ ] ...`), leaving every other character alone.
+# Scoped to THIS ONE assertion (plan-edited-after-freeze, T2's Layers): DoD checkboxes
+# live inside § Plan, and orchestrator/SKILL.md step 4 prescribes ticking one on every
+# task, so a raw diff reads the execution loop's own required action as an unaccounted
+# Plan edit (TD-105) -- the condition collapses to "every sprint logs a scope-change".
+# assert_S9_SCOPECHANGE's scope-change-logged-after-plan-edit still diffs the raw
+# section below and is deliberately left untouched here.
+_norm_dod_checkbox() { sed 's/^- \[[xX]\]/- [ ]/'; }
+
 assert_S9_PLANFROZEN() {
   repo=$1
   plans=$(_sprint_plans "$repo")
@@ -2065,8 +2075,8 @@ assert_S9_PLANFROZEN() {
       bad "plan-edited-after-freeze: $p records plan_commit $pc, which is not a commit in this repository. A freeze point nobody can resolve cannot be compared against, and a record that looks like evidence and is not is worse than none (§9)"
       continue
     fi
-    was=$(git -C "$repo" show "$pc:$p" 2>/dev/null | _plan_section)
-    now=$(_plan_section < "$repo/$p")
+    was=$(git -C "$repo" show "$pc:$p" 2>/dev/null | _plan_section | _norm_dod_checkbox)
+    now=$(_plan_section < "$repo/$p" | _norm_dod_checkbox)
     if [ "$was" = "$now" ]; then
       n_frozen=$((n_frozen + 1)); continue
     fi

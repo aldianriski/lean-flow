@@ -64,6 +64,13 @@ edit_plan() {  # <dir> -- change § Plan itself, not a tick or a Files Changed r
   sed -i 's/^\*\*Acceptance:\*\* it is done$/**Acceptance:** it is done, differently/' \
     "$1/docs/sprint/SPRINT-900-fixture.md"
 }
+# tick_plan <dir> -- TD-105: tick a DoD box, the execution loop's own prescribed action
+# (orchestrator/SKILL.md step 4: "tick its DoD [x]"), with NO other character touched. This is
+# the edit a clean sprint makes on every task, and is deliberately NOT edit_plan: that one proves
+# a real text change still fires; this one proves a tick alone must not.
+tick_plan() {
+  sed -i 's/^- \[ \] a thing$/- [x] a thing/' "$1/docs/sprint/SPRINT-900-fixture.md"
+}
 
 # assert_finding <name> <dir> <finding-substring> -- must-FAIL: the finding MUST appear.
 assert_finding() {
@@ -169,6 +176,23 @@ commit_msg "$d" "sprint(900): log the scope-change"
 edit_plan "$d"
 commit_msg "$d" "sprint(900) T1: amend the Plan, accounted for"
 assert_absent "s9-plan-edited-after-freeze-control" "$d" "plan-edited-after-freeze"
+
+# --- S9.PLANFROZEN control (TD-105): a TICKED DoD box with NO text change must NOT fire -----------
+# THE LOAD-BEARING CASE, not the must-FAIL above. DoD checkboxes live inside § Plan, and
+# orchestrator/SKILL.md step 4 prescribes ticking one on every task -- so before checkbox
+# normalisation, § Plan always differs from plan_commit by the end of any clean sprint and this
+# control fires `plan-edited-after-freeze` on a sprint that did nothing wrong. A sprint that ticked
+# every box and changed no text must pass.
+d="$work/frozen-tick-only"; mkdir -p "$d"
+git -C "$d" init -q >/dev/null 2>&1 || { echo "FAIL harness: git init failed"; exit 2; }
+sprint_plan "$d" "" '- [ ] a thing'; sprint_log "$d"
+commit_msg "$d" "sprint(900): plan locked"
+pc=$(git -C "$d" rev-parse --short HEAD)
+sprint_plan "$d" "$pc" '- [ ] a thing'; sprint_log "$d"
+commit_msg "$d" "sprint(900): record plan_commit"
+tick_plan "$d"
+commit_msg "$d" "sprint(900) T1: tick DoD 1/1 -- no text changed"
+assert_absent "s9-plan-frozen-tick-only-control" "$d" "plan-edited-after-freeze"
 
 # --- S9.SCOPECHANGE: the entry written AFTER the edit it justifies --------------------------------
 # The ordering rule, and the reason it is a separate rule from PLANFROZEN: an entry added later
