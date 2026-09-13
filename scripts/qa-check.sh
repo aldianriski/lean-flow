@@ -39,7 +39,9 @@ QA_BUDGET_SECONDS=${QA_BUDGET_SECONDS:-520}  # 600s ceiling - 80s headroom = 520
 # Shared archive predicate (SPRINT-099 T3, TD-145 · TD-151) -- ten checkers carried the same string
 # glob, which admits `docs/sprint/Archive/...`: the SAME directory, one inode, on any
 # case-insensitive filesystem. See scripts/lib/archive-path.sh.
-. "$ROOT/scripts/lib/archive-path.sh"
+_lf_gate_ap="$ROOT/scripts/lib/archive-path.sh"
+[ -f "$_lf_gate_ap" ] || { printf 'FAIL  archive-predicate: shared predicate not found at %s -- every archive exclusion in this gate depends on it\n' "$_lf_gate_ap"; exit 2; }
+. "$_lf_gate_ap"
 
 fail=0
 pass=0
@@ -843,6 +845,41 @@ if [ -f docs/LEARNINGS.md ]; then
   else bad "L-NNN citation unresolved: $citebad"; fi
 else
   note "skip (missing): docs/LEARNINGS.md"
+fi
+
+qb_checkpoint "leg 10b: archive-predicate singularity"
+# --- 10b. One archive predicate, not eleven (SPRINT-099 T3, TD-145) --------------------------
+# Eleven checkers each carried their own archive exclusion. Ten were `case "$x" in */archive/*)`;
+# the eleventh was a `grep -v "^docs/sprint/archive/"`, and it survived the first sweep precisely
+# BECAUSE the sweep searched for the case-glob shape -- the author's search pattern defined the
+# population it could find (L-186, twice in one task). Five of the six harnesses guarding the
+# converted checkers have no case-variant fixture of their own, so a revert at any single site would
+# go unnoticed there. This leg is the cross-site guard that catches a revert at EVERY site at once,
+# which five near-duplicate fixtures would not: it asserts the raw predicates do not come back.
+#
+# The search token is assembled from fragments so this leg cannot match its own source line -- a
+# guard that reports itself is a guard nobody keeps.
+# Two files are deliberately outside this guard, each for a stated reason rather than because they
+# were noisy. archive-path.sh IS the predicate and documents the old form in its own comments.
+# check-handoff-state.sh:145 uses the glob to MAP a Plan path to its log path, not to exclude, and it
+# is immune by construction: it self-enumerates via the literal glob
+# "$root"/docs/sprint/archive/SPRINT-*.md, so the path it matches always carries the lowercase
+# spelling it produced itself -- it never tests a caller-supplied string of unknown casing.
+# Independently verified during the T3 review. It stays a filed follow-up: if that line ever becomes
+# an EXCLUSION, or ever tests a path it did not enumerate, it must move to the shared predicate.
+_ag_exempt='^scripts/lib/archive-path\.sh:|^scripts/lib/check-handoff-state\.sh:'
+ag_tok='*/'"archive"'/*'
+ag_hits=$(grep -rn -F "$ag_tok" --include='*.sh' scripts evals 2>/dev/null \
+  | grep -vE "$_ag_exempt" \
+  | awk -F: '{ line=$0; sub(/^[^:]*:[^:]*:/, "", line); sub(/^[ \t]+/, "", line); if (substr(line,1,1) != "#") print $1":"$2 }')
+ag_greps=$(grep -rn -E 'grep -v "\^[A-Za-z0-9_/.-]*archive' --include='*.sh' scripts evals 2>/dev/null \
+  | grep -vE "$_ag_exempt" \
+  | awk -F: '{ line=$0; sub(/^[^:]*:[^:]*:/, "", line); sub(/^[ \t]+/, "", line); if (substr(line,1,1) != "#") print $1":"$2 }')
+ag_all=$(printf '%s\n%s\n' "$ag_hits" "$ag_greps" | grep -v '^$' | sort -u)
+if [ -z "$ag_all" ]; then
+  ok "archive-predicate: no raw archive exclusion outside scripts/lib/archive-path.sh -- every site goes through the shared predicate"
+else
+  bad "archive-predicate: $(printf '%s\n' "$ag_all" | grep -c '') site(s) carry a raw archive exclusion instead of calling lf_is_archived_path -- a string predicate standing in for a filesystem question, which admits the case-variant spelling of the SAME directory: $(printf '%s' "$ag_all" | tr '\n' ' ')"
 fi
 
 qb_checkpoint "leg 11: active-sprint task schema"

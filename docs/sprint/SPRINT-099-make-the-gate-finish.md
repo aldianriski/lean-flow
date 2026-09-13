@@ -2,7 +2,7 @@
 sprint: 099
 slug: make-the-gate-finish
 owner: Maintainer
-last_updated: 2026-09-12
+last_updated: 2026-09-13
 status: active
 gates_signed: G1,G2 @ 7701c8b
 plan_commit: a43d1e6
@@ -78,19 +78,19 @@ guards of the gate itself. The fix direction is **ruled at intake** (**A2**), no
 from the printed verdict line alone — never from a wrapper's exit code.
 
 **DoD:**
-- [ ] A run that trips the budget checkpoint no longer prints the same verdict shape a genuinely-failing run prints.
-- [ ] The truncation verdict names the **actual elapsed seconds** and **every** leg or harness it did not reach, **enumerated by name** — today the message names none.
-- [ ] The **actual** runtime is asserted against the ceiling (TD-128's half, a missing *reader*). `scripts/lib/check-qa-budget-default.sh` is not widened.
-- [ ] The three outcomes are distinguishable from the printed line alone (L-120). — *Verify: `sh evals/run-qa-budget-fixtures.sh`*
-- [ ] Retained must-FAIL + sibling control: a seeded checkpoint trip reports truncation and names its unrun harnesses, while a genuinely-failing run in the same suite still reports FAIL (L-058 · L-142).
-- [ ] **Pointed at the motivating condition, not fixtures alone (L-166):** reproduce TD-117's measurement — a run under concurrent worktree agents, or a checkpoint seeded to trip where the real one tripped (`evals/run-s2-placement-fixtures.sh`) — and show the same six harnesses named.
-- [ ] **Seeded-break discrimination proof** under ONE stated hash convention; a landed, targeted seed that reddens nothing is reported **untested**, never scored as a pass (L-137 · L-142 · L-169 · L-187).
-- [ ] **Outside reviewer, worktree-isolated** (L-165 · L-168), after the author enumerates every call site touched and seeds a break in each fix (L-193).
-- [ ] **The new harness is registered** in `eval_harnesses_always`/`_optin`/`_excluded`, verified **from the registry's side** — enumerate the registry against `evals/`, never confirm by running the new thing (L-196).
+- [x] A run that trips the budget checkpoint no longer prints the same verdict shape a genuinely-failing run prints.
+- [x] The truncation verdict names the **actual elapsed seconds** and **every** leg or harness it did not reach, **enumerated by name** — today the message names none.
+- [x] The **actual** runtime is asserted against the ceiling (TD-128's half, a missing *reader*). `scripts/lib/check-qa-budget-default.sh` is not widened.
+- [x] The three outcomes are distinguishable from the printed line alone (L-120). — *Verify: `sh evals/run-qa-budget-fixtures.sh`*
+- [x] Retained must-FAIL + sibling control: a seeded checkpoint trip reports truncation and names its unrun harnesses, while a genuinely-failing run in the same suite still reports FAIL (L-058 · L-142).
+- [x] **Pointed at the motivating condition, not fixtures alone (L-166):** reproduce TD-117's measurement — a run under concurrent worktree agents, or a checkpoint seeded to trip where the real one tripped (`evals/run-s2-placement-fixtures.sh`) — and show the same six harnesses named. **Reproduced at the real trip point; the figure SIX is stale and was re-derived, not inherited (A3 · L-130):** the live 520 s budget skipped **13** harnesses, a 200 s trip skipped **27**, and `run-s2-placement-fixtures.sh` is named in both. Count cross-checked against an independent tally of the skip notes (27 = 27).
+- [x] **Seeded-break discrimination proof** under ONE stated hash convention; a landed, targeted seed that reddens nothing is reported **untested**, never scored as a pass (L-137 · L-142 · L-169 · L-187).
+- [x] **Outside reviewer, worktree-isolated** (L-165 · L-168), after the author enumerates every call site touched and seeds a break in each fix (L-193).
+- [x] **The new harness is registered** in `eval_harnesses_always`/`_optin`/`_excluded`, verified **from the registry's side** — enumerate the registry against `evals/`, never confirm by running the new thing (L-196). **No new harness was created** (the standing no-new-`.sh` rule; the six new cases extend `run-qa-budget-fixtures.sh`), so this was ticked on the owner's ruling against the registry check actually run: registry→disk, all 35 present; disk→registry, none unregistered; and the harness carrying the new cases sits in `eval_harnesses_always`.
 
 ### T3 — Make the `*/archive/*` exclusion a filesystem-identity predicate `[size: M · risk: low · class: execution · HITL · J1]`
 <!-- size S -> M and Layers widened at the 2026-09-12 `scope-change`: A4 was refuted (ten call sites, not three). -->
-Layers: `scripts/lib/archive-path.sh` (new, the shared predicate) · `scripts/lib/check-layers-observed.sh` · `scripts/lib/check-layers-completeness.sh` · `scripts/lib/check-approval-envelope.sh` · `scripts/lib/check-night-run-rollup.sh` · `scripts/lib/check-review-depth.sh` · `scripts/lib/check-verify-reaches.sh` · `scripts/lib/conformance-engine.sh` · `scripts/qa-check.sh` · `evals/lib/check-system-verify-block.sh` · `evals/fixtures/` + its harness
+Layers: `scripts/lib/archive-path.sh` (new, the shared predicate) · `scripts/lib/check-layers-observed.sh` · `scripts/lib/check-layers-completeness.sh` · `scripts/lib/check-approval-envelope.sh` · `scripts/lib/check-night-run-rollup.sh` · `scripts/lib/check-review-depth.sh` · `scripts/lib/check-verify-reaches.sh` · `scripts/lib/conformance-engine.sh` · `scripts/qa-check.sh` · `evals/lib/check-system-verify-block.sh` · `scripts/lib/check-research-archive.sh` (added mid-task: the ELEVENTH site, found by the outside review — a `grep -v` exclusion the case-glob derivation could not reach, L-100) · `evals/fixtures/` + its harness
 Depends-on: T2 — the enlarged set shares `scripts/qa-check.sh`, so **D2's disjointness no longer holds** (`scope-change`, 2026-09-12)
 Cites: TD-145 · TD-151 · L-186 · L-165 · L-168 · ADR-029
 **Tier G** (ADR-029) — this is the **set predicate itself**, not a branch inside one. Ten gate
@@ -101,11 +101,11 @@ grandfathering ruling explicitly inherits its defect.
 host, one inode under two spellings — are excluded identically, at every site.
 
 **DoD:**
-- [ ] The case-variant path is excluded. Today `case "$sp" in */archive/*)` returns `NOT-EXCLUDED` for it, and feeding that path to `scripts/lib/check-layers-completeness.sh` produces **3 real FAILs against a closed sprint's stale content**.
-- [ ] **All ten sites** fixed under **one shared predicate**, not ten copies — `check-layers-observed.sh:373` and `:431` · `check-layers-completeness.sh:234` · `check-approval-envelope.sh:44` · `check-night-run-rollup.sh:72` · `check-review-depth.sh:126` · `check-verify-reaches.sh:55` · `conformance-engine.sh:948` · `qa-check.sh:789` · `evals/lib/check-system-verify-block.sh:68`. **Derived at G2, not inherited** (L-186 · A4 refuted): the Plan named three, the derivation found ten. `check-handoff-state.sh:145` uses the same glob to *map* rather than exclude — ruled OUT of this task, filed as a follow-up.
-- [ ] A retained must-FAIL varying path **casing** as its selection axis, plus a lowercase sibling control green in the same run. The existing `archive-path-excluded` fixture **passes** and proves nothing here — it validates a *string* predicate where the real job is *filesystem identity*.
-- [ ] **Seeded-break discrimination proof** under ONE stated hash convention (L-169 · L-187).
-- [ ] **Outside reviewer, worktree-isolated** (L-165 · L-168).
+- [x] The case-variant path is excluded. Today `case "$sp" in */archive/*)` returns `NOT-EXCLUDED` for it, and feeding that path to `scripts/lib/check-layers-completeness.sh` produces **3 real FAILs against a closed sprint's stale content**.
+- [x] **All ELEVEN sites** fixed under **one shared predicate**, not eleven copies — `check-layers-observed.sh:373` and `:431` · `check-layers-completeness.sh:234` · `check-approval-envelope.sh:44` · `check-night-run-rollup.sh:72` · `check-review-depth.sh:126` · `check-verify-reaches.sh:55` · `conformance-engine.sh:948` · `qa-check.sh:789` · `evals/lib/check-system-verify-block.sh:68` · **`check-research-archive.sh:48`**. **Derived at G2, not inherited** (L-186 · A4 refuted): the Plan named three, the derivation found ten — and the outside review found an **eleventh** the derivation structurally could not reach, because it searched for the case-glob SHAPE while that site used `grep -v`. Amended mid-task under the owner's ruling that every *exclusion* site is in scope; `check-handoff-state.sh:145` MAPS rather than excludes and stays the filed follow-up. A new gate leg **10b** now guards the whole set against a revert in any shape.
+- [x] A retained must-FAIL varying path **casing** as its selection axis, plus a lowercase sibling control green in the same run. The existing `archive-path-excluded` fixture **passes** and proves nothing here — it validates a *string* predicate where the real job is *filesystem identity*.
+- [x] **Seeded-break discrimination proof** under ONE stated hash convention (L-169 · L-187).
+- [x] **Outside reviewer, worktree-isolated** (L-165 · L-168).
 
 ## Owner-action checklist
 <!-- none this sprint: no unattended run, no external credential, no envelope. -->
@@ -139,6 +139,13 @@ host, one inode under two spellings — are excluded identically, at every site.
 | `docs/research/qa-check-memory-profile.md` | T1 | New verdict doc — the gate is not the memory consumer, so the fix class aimed at it is eliminated | none (doc) | 104 lines ≤ 130 cap |
 | `docs/research/logs/qa-gate-timing.md` | T1 | Round 14 — raw series, host state and the limits the missing `VmHWM` imposes | none (append-only) | series convention, uncapped |
 | `TECH-DEBT.md` | T1 | TD-143 pointed at the record; its cost half re-routed from the gate to the host envelope | none (doc) | row re-read whole after edit (L-009) |
+| `scripts/lib/qa-budget-check.sh` | T2 | Truncation formatting + unrun selection + TD-128's ceiling reader, as pure functions — the logic is otherwise testable only by a 550 s run that truncates | med (Tier G) | `sh evals/run-qa-budget-fixtures.sh` 10/10; 4 seeded breaks discriminate |
+| `scripts/qa-check.sh` | T2 · T3 | `QA_SELF` + derived leg list + truncation line + ceiling assertion (T2); predicate source + site + new leg 10b (T3) | med (Tier G) | leg 10b proven reachable at `QA_BUDGET_SECONDS=260`; both truncation paths exercised |
+| `scripts/qa-verdict.ts` | T2 | Third outcome for the only AUTOMATED reader; widened after review so the EMPTY-set alarm is not filed as an ordinary red gate | med (Tier G) | `bun test evals/qa-verdict.test.ts` 19/19; 2 seeded breaks discriminate |
+| `evals/run-qa-budget-fixtures.sh` · `evals/qa-verdict.test.ts` | T2 | Retained must-FAIL + sibling controls + a selection-axis case and an anomaly case | low | run above |
+| `scripts/lib/archive-path.sh` | T3 | **New.** The one archive predicate — filesystem identity, not string casing; fork-free ancestor walk | med (Tier G) | 2 seeded breaks; both failure directions detected |
+| 10 checker sites + `scripts/lib/check-research-archive.sh` | T3 | All eleven exclusion sites routed through the shared predicate; the eleventh found by outside review | med (Tier G) | per-site runtime check, both spellings; 96 PASS 0 FAIL across six harnesses |
+| `evals/run-layers-completeness-fixtures.sh` | T3 | Platform-aware casing fixture + lowercase/live control pair | low | `sh evals/run-layers-completeness-fixtures.sh` 16/16 |
 
 ## Retro
 

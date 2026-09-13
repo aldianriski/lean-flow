@@ -31,6 +31,15 @@
 # Dependency-free POSIX sh.
 set -u
 
+# Shared archive predicate (SPRINT-099 T3, TD-145 · TD-151) -- see scripts/lib/archive-path.sh.
+# Added after an independent review found this file carrying the SAME defect class as the ten sites
+# converted in 9ef32bc, through a DIFFERENT mechanism: `grep -v "^docs/sprint/archive/"` rather than
+# `case ... in */archive/*)`. The author's derivation searched for the case-glob SHAPE, so it could
+# never have reached this one -- L-186's population blindness, a second time in the same task.
+_lf_ap=$(dirname -- "$0")/archive-path.sh
+[ -f "$_lf_ap" ] || { echo "FAIL research archive: shared archive predicate not found at $_lf_ap"; exit 2; }
+. "$_lf_ap"
+
 root=${1:?usage: check-research-archive.sh <repo-root>}
 [ -d "$root" ] || { echo "FAIL research-archive: repo root not found at $root"; exit 2; }
 
@@ -45,7 +54,18 @@ live_citer() { # <basename> <self-relative-path>
   _base=$1; _self=$2
   grep -rl --include="*.md" -F "$_base" "$root" 2>/dev/null |
     sed "s#^$root/##" |
-    grep -v "^docs/sprint/archive/" |
+    while IFS= read -r _lc_p; do
+      # Was `grep -v "^docs/sprint/archive/"`: a case-sensitive STRING exclusion over paths that
+      # `grep -rl` reports with real on-disk casing, so `docs/sprint/Archive/...` walked straight
+      # through. In direction (c) that produces a SILENT FALSE NEGATIVE -- a superseded doc cited
+      # only by a closed sprint reports "correctly left in place" instead of demanding archival.
+      # Broadened from `docs/sprint/archive/` to ANY archived path deliberately: this function's own
+      # contract is "historical and generated surfaces never count", and an archived research doc is
+      # exactly that. Verified a no-op on this tree (docs/research/archive/ does not exist), so the
+      # broadening changes no current verdict.
+      lf_is_archived_path "$_lc_p" && continue
+      printf '%s\n' "$_lc_p"
+    done |
     grep -v "^docs/changelog/" |
     grep -v "^docs/knowledge-index.md$" |
     grep -v "^evals/fixtures/" |
