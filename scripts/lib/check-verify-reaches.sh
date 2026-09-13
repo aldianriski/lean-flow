@@ -29,9 +29,14 @@
 # that implied it settled all four would be the same over-claim it exists to catch, one level up.
 #
 # --- the deliberate limits, stated rather than discovered later -----------------------------------
-# * Static text match. A script reaching a target through a variable, or through a helper it sources,
-#   reads as not-reaching here. That direction is a FALSE POSITIVE and is the safe one: it asks a human
-#   to look, it never certifies a gap as fine.
+# * Static text match. A `$VAR/literal/path` idiom -- a variable prefix in front of a literal path
+#   suffix, this repo's own convention (`conformance.sh`'s `$here/scripts/lib/...`) -- DOES reach,
+#   because lf_line_touches matches the target as a segment run anywhere inside a token, not only at
+#   its front (SPRINT-100 T1, caught by outside review after an earlier draft missed it). What still
+#   reads as not-reaching: a target named ONLY through a variable holding the whole path with no
+#   literal path text visible on that line at all, or through a helper the script merely sources.
+#   That remaining direction is a FALSE POSITIVE and is the safe one: it asks a human to look, it
+#   never certifies a gap as fine.
 # * A target must contain `/` to be recognised. A bare filename is too ambiguous to key on -- prose
 #   naming `dispatch.md` is usually discussing it, not claiming a checker examines it. This is the
 #   trade that keeps the false-positive rate survivable, and it means a criterion claiming a bare
@@ -68,15 +73,21 @@ _lf_ap=$(dirname -- "$0")/archive-path.sh
 . "$_lf_ap"
 
 # lf_line_touches <line> <tgt-core>
-#   0 if <line> contains <tgt-core> as a WHOLE path component. Tokenising on every character outside
-#   the path charset, then comparing tokens exactly or as "<tgt-core>/..." -- rather than a substring
-#   test -- is what makes "src/db" vs "src/dbtools/" a token-boundary question instead of a substring
-#   one (TD-087's prefix-collision shape). <tgt-core> must already have its trailing "/" stripped.
+#   0 if <line> contains <tgt-core> as a contiguous run of WHOLE "/"-separated path segments, found
+#   anywhere inside a longer path-like token -- not merely as a character substring. Tokenising on
+#   every character outside the path charset, then wrapping both the token and the target in a
+#   leading/trailing "/" before a literal substring test, is what makes "src/db" vs "src/dbtools/" a
+#   segment-boundary question (TD-087's prefix-collision shape) while STILL matching "src/db" inside
+#   "$here/src/db/migrate.sh" -- an earlier draft required the match to start at the token's own
+#   front, which silently missed every `$VAR/literal/path` idiom (this repo's own `conformance.sh`
+#   reaching `scripts/lib/conformance-engine.sh` via `$here/...`), caught only by an outside review
+#   dispatched per ADR-029, not by any fixture (SPRINT-100 T1). <tgt-core> must already have its
+#   trailing "/" stripped.
 lf_line_touches() {
   _llt_l=$1; _llt_t=$2
   for _llt_tok in $(printf '%s' "$_llt_l" | tr -c 'A-Za-z0-9_./-' ' '); do
-    case "$_llt_tok" in
-      "$_llt_t"|"$_llt_t"/*) return 0 ;;
+    case "/${_llt_tok%/}/" in
+      *"/${_llt_t}/"*) return 0 ;;
     esac
   done
   return 1

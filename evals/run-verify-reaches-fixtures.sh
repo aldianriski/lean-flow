@@ -21,6 +21,13 @@
 # TD-087's own cited Evidence, SPRINT-087 T4 DoD 1 and SPRINT-084 T5's DoD -- not synthetic stand-ins;
 # case 11 varies the SELECTION (L-186) by reaching case 9's same artifact through the archive arm.
 #
+# Case 17 is a REGRESSION GUARD an outside reviewer found (ADR-029) in an earlier draft of this same
+# change: a target reached only through a `$VAR/literal/path` idiom -- this repo's own
+# `conformance.sh`, reproduced live against archived SPRINT-079 -- false-FAILed because the
+# path-boundary fix for prefix-collision (case 14/15) originally anchored the match to a token's own
+# front. No prior case in this family covered that shape; this one is retained so it cannot regress
+# silently a second time.
+#
 # Dependency-free POSIX sh, no git needed. Run bare: sh evals/run-verify-reaches-fixtures.sh
 set -u
 
@@ -128,6 +135,13 @@ run_case_anywhere "prefix-collision-control-passes" 0 "1 claimed target(s) confi
 # criterion that genuinely passed (recorded in that sprint's own Retro).
 run_case_anywhere "two-method-clause-passes" 0 "0 claimed target(s) confirmed reachable" -- \
   sh "$checker" "$fx/two-method-clause/docs/sprint/SPRINT-969-two-method.md"
+
+# case 17: REGRESSION GUARD, found by the outside reviewer (ADR-029), not by any case above. A
+# target reached only through a shell-variable-prefixed path (`$here/lib/...`) -- this repo's own
+# `conformance.sh` idiom, reproduced live against archived `SPRINT-079:64` -- must still read as
+# reached. An earlier lf_line_touches draft tokenised "$here/..." as one fused token and missed it.
+run_case_anywhere "variable-prefix-reach-passes" 0 "1 claimed target(s) confirmed reachable" -- \
+  sh "$checker" "$fx/variable-prefix-reach/docs/sprint/SPRINT-974-variable-prefix.md"
 
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then echo "VERIFY-REACHES FIXTURES: all green"; else echo "VERIFY-REACHES FIXTURES: at least one FAIL"; fi
