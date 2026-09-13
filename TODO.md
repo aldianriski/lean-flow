@@ -64,6 +64,43 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 
 ### P1 — Next Phase Required
 
+- [ ] TASK-348 — Re-file TD-143's cost half against the HOST envelope, not the gate  [size: M] [risk: med] [HITL]
+      class:      decision
+      authority:  J2
+      done-when:  `TD-143`'s open half names a subject that exists. SPRINT-099 T1 measured the gate at
+                  **~9.5 MB, moving 320 kB across 547 s**, while system free memory swung **695 MB**
+                  around it — so there is no gate memory cost to reduce and the row's remaining half
+                  currently points at nothing. Either re-aim it at the host envelope it actually
+                  depends on (562 MB free of 14 078 MB, `vmmemWSL` 1 989 MB, three `claude`
+                  processes 1 178 MB, commit 41.3/56.7 GB), or rule the row closed on the grounds
+                  that the mechanism is now known and the cost is not ours to pay.
+      touches:    `TECH-DEBT.md` (TD-143) · possibly an ADR if the ruling is hard-to-reverse
+      depends-on: none
+      assumes:    none — the measurement is committed at `docs/research/qa-check-memory-profile.md`
+      tracker:    TD-143 (severity: high, open — its cost half; the cheap half shipped as SPRINT-097 T4)
+      origin:     manual   # re-filed at the SPRINT-100 promote governance review; its predecessor TASK-344 shipped and was pruned
+      state:      ready
+
+- [ ] TASK-349 — Decide what to do about a gate whose completion is decided by host noise  [size: M] [risk: med] [HITL]
+      class:      decision
+      authority:  J2
+      done-when:  `TD-117` and `TD-090` have a ruling rather than a standing condition. Five
+                  whole-gate runs at the SPRINT-099 close spanned **523–560 s around a 520 s budget**
+                  against a 600 s external ceiling — two runs on the *same tree* gave a complete
+                  `218 pass, 0 fail` and a truncation 3 s over budget. SPRINT-099 T2 made truncation
+                  legible; it did not make the gate finish. Options include reclaiming leg-12 cost
+                  (the per-harness table is Round 14 of `docs/research/logs/qa-gate-timing.md`:
+                  seven items are ~307 s of ~545 s), moving work behind `QA_FULL=1`, or accepting
+                  truncation as normal now that it reports itself. **Do not re-open the fix direction
+                  ruled at SPRINT-099 D3 without evidence against it.**
+      touches:    `scripts/qa-check.sh` · `evals/` harness set · `TECH-DEBT.md` (TD-117 · TD-090)
+      depends-on: none
+      assumes:    that closing the cost gap is still wanted — SPRINT-099 showed a truncated run is now
+                  honest, which lowers the urgency without removing it. **Confirm before building.**
+      tracker:    TD-117 (severity: high, open) · TD-090 (severity: high, open) · TD-128 (reader half shipped SPRINT-099 T2)
+      origin:     manual   # re-filed at the SPRINT-100 promote governance review; its predecessor TASK-329 shipped and was pruned
+      state:      ready
+
 > **Epic-first**, ruled by the owner at the SPRINT-094 `/triage`: EPIC-015 § Closed-when 1 · 5 · 6
 > lead, ahead of the cheaper standalone guards, because the epic cannot close without a real
 > unattended run and every sprint that defers it defers the epic.
@@ -121,6 +158,13 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > `severity: high` row to P1; the aging sweep found five open high rows and two of them — **TD-143**
 > and **TD-150** — had no Backlog row at all, so the rule had no consumer for them (L-020's shape).
 > TD-090 · TD-117 · TD-128 were already carried by `TASK-329` and are left where `/triage` ranked them.
+
+> **Re-escalated at the SPRINT-100 promote (2026-09-13).** `TASK-329` and `TASK-344` shipped as
+> SPRINT-099 T2/T1 and were pruned at that close — but **TD-117** and **TD-143** stay open on their
+> *cost* halves, so both high-severity rows were left with no Backlog row at all: the same L-020 shape
+> the SPRINT-098 note below records, recreated by a correct retention pass. Re-filed as `TASK-348`
+> (TD-143, host envelope) and `TASK-349` (TD-117/TD-090, gate cost) in P1. **TD-090** keeps its
+> existing tracker; **TD-150** keeps `TASK-345`.
 
 - [ ] TASK-345 — Give `workdoo` the pinned-plugin mechanism ADR-041 already rules it has  [size: M] [risk: med] [HITL]
       class:      execution
