@@ -918,6 +918,161 @@ else
   fail=1
 fi
 
+# --- SPRINT-100 T4 (TD-146): scripts/qa-check.sh leg 2f-ter's relay of this engine's own output --
+# Everything above exercises the ENGINE. This exercises its CALLER: leg 2f-ter relays the engine's
+# report verbatim and folds only two fully-covered families (gates-signed:, S13.*) into its own
+# pass/fail tally -- the rest stays informational by design (27 of 43 dispositions unbuilt). Before
+# T4 the relay printed every FAIL line, counted or not, with the identical `FAIL ` prefix, so a
+# reader could not tell which FAILs the verdict (`QA-CHECK: N pass, M fail`) counted without reading
+# this repo's own gate script -- TD-146, reproduced live at the SPRINT-097 close (230 pass, 0 fail
+# over 4 visible FAIL lines, every one informational).
+#
+# Extracted from the REAL committed scripts/qa-check.sh at run time -- between the leg's own
+# `qb_checkpoint` marker and the next one -- never hand-typed, so a future edit to the leg cannot
+# drift silently out of sync with this proof (the same discipline case 12 already applies to leg 2g
+# one file over, evals/run-night-run-rollup-fixtures.sh).
+#
+# A canned conformance-engine.sh STUB stands in for the real engine: the real one sweeps the whole
+# repo (~90 rules, ~177s measured, TD-084) for a report this leg mostly discards, and re-running it
+# here to test five lines of relay logic would be the exact cost this task's hard constraint rules
+# out. `QA_FULL=1` is set so the leg calls the stub with no --spec reduction machinery to satisfy.
+qa_check="$repo_root/scripts/qa-check.sh"
+leg2fter_wrapper="$here/.tmp-leg2fter-wrapper.sh"
+leg2fter_body="$here/.tmp-leg2fter-body.sh"
+awk '
+  /qb_checkpoint "leg 2f-ter: conformance engine sweep"/ {f=1; next}
+  f && /qb_checkpoint/ {exit}
+  f
+' "$qa_check" > "$leg2fter_body"
+# Same guard case 12 applies one file over: assert emptiness against the extracted BODY alone, never
+# against the assembled wrapper (which always contains HARNESS_HEAD/HARNESS_TAIL and so can never
+# test `-s` false however completely the extraction failed).
+[ -s "$leg2fter_body" ] || {
+  echo "FAIL harness: leg 2f-ter extraction from $qa_check produced nothing -- the leg's shape (or its qb_checkpoint marker text) changed, re-derive the awk pattern"
+  fail=1
+}
+{
+  cat <<'HARNESS_HEAD'
+#!/bin/sh
+set -u
+fail=0
+pass=0
+note() { printf '      %s\n' "$1"; }
+ok()   { pass=$((pass + 1)); printf 'PASS  %s\n' "$1"; }
+bad()  { fail=$((fail + 1)); printf 'FAIL  %s\n' "$1"; }
+HARNESS_HEAD
+  cat "$leg2fter_body"
+  cat <<'HARNESS_TAIL'
+printf 'CE2FTER-SUMMARY pass=%s fail=%s\n' "$pass" "$fail"
+HARNESS_TAIL
+} > "$leg2fter_wrapper"
+
+# The stub's shape is the real engine's own documented idiom (conformance-engine.sh:88/92/136):
+# `PASS  <id>`, `FAIL  <id>`, `GAP   <id>` -- two-space column, GAP padded to the same width. One
+# line per family this leg cares about: gates-signed (gating), S13.<ID> (gating, letters only --
+# `[A-Z]+` has no digit arm, so the id below must not carry one), a GAP (rule-unimplemented, already
+# its own token, untouched by this task), two informational FAIL findings using the exact finding
+# names TD-146's own Evidence recorded (`file-outside-canonical-placement`, `todo-over-cap-at-
+# promote`) plus one informational PASS -- proving PASS lines are deliberately left alone (only the
+# uncounted FAIL is the defect T4 fixes; an uncounted PASS cannot masquerade as a hidden regression)
+# -- and a `conformance: ...` FAIL, the engine's OWN setup/usage-failure shape (bad()'s
+# `S[0-9]*|conformance:*` case, conformance-engine.sh lines 173/174/183/188): it means the engine
+# produced nothing trustworthy, never a rule finding about the repo under test, so it must NOT be
+# relabelled INFO alongside the true informational findings above (coordinator review finding,
+# SPRINT-100 T4 round 2).
+leg2fter_fakerepo="$work/leg2fter-fakerepo"
+mkdir -p "$leg2fter_fakerepo/scripts/lib"
+cat > "$leg2fter_fakerepo/scripts/lib/conformance-engine.sh" <<'STUB'
+#!/bin/sh
+printf 'PASS  gates-signed: G1 approved\n'
+printf 'FAIL  gates-signed: G2 missing\n'
+printf 'PASS  S13.ATTESTOK -- ok\n'
+printf 'FAIL  S13.ATTESTBAD -- bad\n'
+printf 'GAP   S9.SOMEGAP -- rule-unimplemented: engine has no assertion yet\n'
+printf 'PASS  S9.SCOPECHANGE -- informational pass, not folded\n'
+printf 'FAIL  file-outside-canonical-placement: docs/foo.md\n'
+printf 'FAIL  todo-over-cap-at-promote: TODO.md\n'
+printf 'FAIL  conformance: reader-missing -- read-spec-rules.sh not found beside this script\n'
+printf '      coverage: 3 checkable rule(s) have an assertion; 1 are unchecked\n'
+exit 1
+STUB
+run_leg2fter() { ( cd "$leg2fter_fakerepo" && QA_FULL=1 sh "$leg2fter_wrapper" 2>&1 ); }
+out=$(run_leg2fter)
+
+# case (must-FAIL, the motivating shape, DoD 1): an informational FAIL -- a real finding from a real
+# assertion, never folded into this leg's tally -- no longer prints the same `FAIL ` prefix as a
+# gating one. It must print as INFO, and the literal `FAIL ` form of the SAME finding must be absent.
+if printf '%s\n' "$out" | grep -qE '^INFO  file-outside-canonical-placement:' &&
+   printf '%s\n' "$out" | grep -qE '^INFO  todo-over-cap-at-promote:' &&
+   ! printf '%s\n' "$out" | grep -qE '^FAIL  (file-outside-canonical-placement|todo-over-cap-at-promote):'; then
+  echo "PASS fixture(ce-relay-informational-fail-prints-info): both informational FAIL findings print as INFO, never FAIL"
+else
+  echo "FAIL fixture(ce-relay-informational-fail-prints-info): expected INFO, not FAIL, for the uncounted findings -- output:"
+  printf '%s\n' "$out"; fail=1
+fi
+
+# case (must-FAIL, sibling of the case above, coordinator review finding): the engine's OWN setup/
+# usage failure (`conformance: ...`) must NOT be relabelled INFO -- it means the engine ran NOTHING
+# trustworthy, which is a different claim from "a real rule found something we choose not to gate
+# on." Relabelling it INFO would read as "advisory, deliberately uncounted" about a run that checked
+# nothing -- the exact defect T4 removes, one level up. This is the must-FAIL half; the case above is
+# now also its sibling control in the SAME run: an ordinary informational finding IS relabelled while
+# this engine-level one is NOT, so the two are told apart by more than "nothing got relabelled".
+if printf '%s\n' "$out" | grep -qE '^FAIL  conformance: reader-missing' &&
+   ! printf '%s\n' "$out" | grep -qE '^INFO  conformance:'; then
+  echo "PASS fixture(ce-relay-engine-error-not-relabelled): the engine's own setup-failure line (conformance:) stays FAIL, never INFO, in the same run as the informational INFO lines above"
+else
+  echo "FAIL fixture(ce-relay-engine-error-not-relabelled): the engine-level conformance: failure was relabelled INFO -- output:"
+  printf '%s\n' "$out"; fail=1
+fi
+
+# case (sibling control, L-142): a GATING FAIL (gates-signed:, folded into this leg's tally) in the
+# SAME run keeps printing as FAIL, never INFO -- the two families are distinguishable from the
+# printed output alone (DoD 4), and a guard that relabelled everything would pass the case above
+# vacuously. Without this control, case above alone could not tell "relabels informational findings"
+# from "relabels every FAIL".
+if printf '%s\n' "$out" | grep -qE '^FAIL  gates-signed: G2 missing' &&
+   ! printf '%s\n' "$out" | grep -qE '^INFO  gates-signed:'; then
+  echo "PASS fixture(ce-relay-gating-fail-control): the gating FAIL (gates-signed:) still prints as FAIL, in the same run as the informational INFO lines above"
+else
+  echo "FAIL fixture(ce-relay-gating-fail-control): the gating FAIL lost its FAIL prefix -- output:"
+  printf '%s\n' "$out"; fail=1
+fi
+
+# case (sibling control, second gating family): S13.* stays gating too -- both fully-covered families
+# the leg folds in, not only the one checked above.
+if printf '%s\n' "$out" | grep -qE '^PASS  S13\.ATTESTOK' &&
+   printf '%s\n' "$out" | grep -qE '^FAIL  S13\.ATTESTBAD' &&
+   ! printf '%s\n' "$out" | grep -qE '^INFO  S13\.'; then
+  echo "PASS fixture(ce-relay-s13-control): S13.* PASS/FAIL both keep their gating prefix"
+else
+  echo "FAIL fixture(ce-relay-s13-control): an S13.* line lost its gating prefix -- output:"
+  printf '%s\n' "$out"; fail=1
+fi
+
+# case (GAP untouched): the engine's own pre-existing non-gating token is not disturbed by this leg's
+# new one -- GAP stays GAP, never INFO, never FAIL.
+if printf '%s\n' "$out" | grep -qE '^GAP   S9\.SOMEGAP'; then
+  echo "PASS fixture(ce-relay-gap-untouched): the engine's own GAP token is unaffected by the new INFO token"
+else
+  echo "FAIL fixture(ce-relay-gap-untouched): GAP line missing or relabelled -- output:"
+  printf '%s\n' "$out"; fail=1
+fi
+
+# case (DoD 2/3, A3 -- the policy is unchanged, only the report): the relabelled copy is a SEPARATE
+# variable from the one the fold-in greps read, so the tally this leg contributes must count exactly
+# the two gating findings above (1 gates-signed PASS + 1 S13 PASS = 2; 1 gates-signed FAIL + 1 S13
+# FAIL = 2) and nothing from the two informational FAILs, the informational PASS, or the engine-level
+# conformance: failure, regardless of which token any of them print under.
+if printf '%s\n' "$out" | grep -qE '^CE2FTER-SUMMARY pass=2 fail=2$'; then
+  echo "PASS fixture(ce-relay-tally-unchanged): CE2FTER-SUMMARY pass=2 fail=2 -- only the two gating families are counted, exactly as before this task (A3, L-145)"
+else
+  echo "FAIL fixture(ce-relay-tally-unchanged): expected CE2FTER-SUMMARY pass=2 fail=2 -- output:"
+  printf '%s\n' "$out"; fail=1
+fi
+
+rm -f "$leg2fter_wrapper" "$leg2fter_body" 2>/dev/null
+
 echo "----------------------------------------"
 if [ "$fail" -eq 0 ]; then
   echo "CONFORMANCE ENGINE FIXTURES: all green"
