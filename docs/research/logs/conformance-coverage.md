@@ -186,3 +186,149 @@ engine's real output), and the suite re-run.
 - **One commit, one target.** Not a claim about every shape a foreign repository's history could take
   (merge commits, multiple contributors, a rewritten history) — only that the specific gap Round 4
   named (no git at all) is closed.
+
+## Round 6 — does Round 4's verdict survive a matcher that can see both finding conventions? (SPRINT-100 T5 · TD-089 · 2026-09-13)
+
+**The question, and the defect that forced it.** Round 4 concluded **9 findings, 9 actionable, 0
+artefacts** at 45 rules, and Round 5 — building an unrelated precondition — noticed in passing that
+the harness half of that conclusion could not have examined every finding: its extraction regex
+`^FAIL  [a-z-]*: ` matches only the engine's **bare-kebab** finding convention, and findings emitted
+under the `S<N>.<CODE>` convention are invisible to it. TD-089 filed it with a re-file condition
+naming this round: *widening the regex without re-running leaves the conclusion resting on a matcher
+nobody re-measured*. This is that re-run.
+
+**What was actually blind, stated precisely.** Round 4's **written** triage — the per-rule table in
+this file — names all 9 findings and classifies each. That table was built by hand and is complete.
+What was blind is the **mechanical** half: two `sed` sweeps inside
+`evals/run-foreign-repo-fixtures.sh` that corroborate the written triage on every gate run. Measured
+directly before any edit: the sweeps reached **6 of 9** FAIL lines. The 3 they could not see are
+`S2.R-README -- readme-ownership-footer-missing` (×1) and `S6.BASE -- tier-doc-set-incomplete` (×2) —
+2 rules, 3 lines. TD-089 and Round 5 both say "2", counting rules; the line count is 3.
+
+The consequence is the one worth naming: `every-finding-is-actionable-and-clears` asserts that
+applying every finding takes the stranger to **no FAIL line**, and has reported PASS since Round 4
+while 3 FAIL lines stood in its own captured output. A guard reporting the wrong thing about the
+right file, which is this sprint's whole theme.
+
+**A2 re-derived, and the premise it was asked to confirm is FALSE.** TD-089's row records "195
+`S<N>.<CODE>` occurrences against 38 distinct kebab findings, so the convention the matcher was
+written for is the minority one." Re-derived at build through three routes, each varying the
+SELECTION rule rather than the direction of the count (L-198):
+
+| Route | Population | kebab-leading | rule-id-leading |
+|---|---|---|---|
+| static — `bad "` call sites in `conformance-engine.sh` | 73 emission sites | **58** | 15 |
+| runtime — this round's own corpus (`acme-widget`, pre-remediation) | 9 FAIL lines | **6** | 3 |
+| runtime — the live corpus (this repository, engine direct) | 12 FAIL lines | **12** | 0 |
+
+The live-corpus row was checked for the contamination this sprint's own log records — the engine walks
+into `.claude/worktrees/` and reports transient dispatch fixtures as repository content. **0 of the 12
+name a worktree path**, so the figure is repository content throughout (L-170: treat a count taken
+while worktrees are live as suspect until that is asked).
+
+Kebab is the **majority** at every grain that bears on a sweep. The row's two figures compare *string
+occurrences anywhere in the file* against *distinct finding slugs* — two different populations, which
+is the one comparison that cannot carry a majority claim.
+
+**Only one of the two is stale, and getting that wrong took a second reader.** Stating each figure's
+derivation, which is the part the row omitted and this round nearly repeated:
+
+| Figure | Derivation | Then | Now |
+|---|---|---|---|
+| `S<N>.<CODE>` occurrences | `grep -oE 'S[0-9]+\.[A-Z][A-Z0-9-]*'` over the engine, counted with duplicates | 195 | **216** — stale |
+| distinct kebab findings | distinct slugs of `bad "` calls whose argument **leads** with the slug | 38 | **38** — unchanged |
+
+This round's first draft wrote "both are also stale (216 and **43**)". 43 is a real number and the
+wrong one: it is 38 **plus the 5 distinct slugs emitted after a rule-id variable** (`bad "$_rid-- …"`,
+`bad "$_tid-- …"`), so it silently answers a different question than the row's 38 did. A third
+population exists too — 47, every distinct slug regardless of emission shape (38 + 5 + 4 literal §13
+ones). An independent read-through re-derived 38, disagreed, and that disagreement is what caught it;
+re-reading the sentence would not have. **A round whose subject is a matcher blind to a population
+shipped a draft that changed populations mid-sentence** — recorded rather than quietly fixed, because
+it is the same failure one level up (L-198 · L-130).
+
+The third static bucket is why the row reads as it does: **8 of the 15** rule-id-leading
+sites emit through a **variable** (`bad "$_rid-- …"`, `bad "$_tid-- …"`), so a grep for a literal
+`bad "S` finds 7 and a grep for a leading lowercase slug counts those 8 as kebab. Caught by a second
+query that disagreed, never by re-reading the first.
+
+**None of this changes the fix.** 3 of 9 findings invisible to a sweep is the defect whether 3 is the
+minority or not.
+
+### The result
+
+**Round 4's verdict reproduces exactly, and is now mechanically covered rather than partly asserted.**
+
+| | Round 4 (2026-08-24) | Round 6 (2026-09-13) |
+|---|---|---|
+| findings / failing rules | 9 across 5 | **9 across 5** — re-derived, not copied |
+| per-rule tally | 4 + 2 + 1 + 1 + 1 | **4 + 2 + 1 + 1 + 1** (`S2.F-FILE` 4 · `S6.BASE` 2 · `S3.SCHEMA` 1 · `S2.R-README` 1 · `S1.LAW3` 1) |
+| actionable / artefacts | 9 / 0 | **9 / 0** |
+| FAIL lines the mechanical sweep examined | **6 of 9** | **9 of 9** |
+| remainder after applying every finding | asserted empty over 6 | **empty over 9**, measured |
+
+The verdict did not move. What moved is the evidence under it: the claim "every finding is actionable
+and clears" is now made over the whole population instead of two thirds of it, and the two rules that
+were invisible clear exactly like the rest.
+
+### The three findings, now named — and cleared
+
+DoD 3 asked that the previously-unnamed lines be **named by the widened sweep, or their absence
+explained**. They are named, and they were then acted on rather than merely listed:
+
+- `S2.R-README -- readme-ownership-footer-missing: README.md` — cleared by adding §3's `<sub>`
+  ownership footer to the stranger's README.
+- `S6.BASE -- tier-doc-set-incomplete: docs/product/requirements.md` and
+  `docs/product/acceptance-criteria.md` — cleared by adding §6's two Base docs.
+
+All three were already carried by `acme-widget-vcs`, which Round 5 built fully remediated for its own
+precondition; the original `acme-widget` target has now caught up, and the two targets no longer
+disagree about what a remediated stranger looks like. **Round 5's "the original target is untouched"
+claim is superseded here** rather than left reading as still true. The strong `-z` empty-set
+assertion is retained — it was not weakened into a remainder list, which the harness's own comment
+forbids for the reason that a list can absorb a new artefact quietly.
+
+### What the re-run changed in the guard, beyond the regex
+
+Widening a matcher fixes the three findings in front of it; it does nothing about the **fourth**
+convention nobody has written yet. Two structural additions, both Tier G (ADR-029 re-tier on
+discovery — the matcher lives in an eval harness, not in this prose):
+
+- **Population reconciliation.** Each sweep now counts the `^FAIL  ` lines it was given against the
+  lines it actually parsed, and fails by name (`sweep-population-unreconciled`) when they differ,
+  printing what it could not reach. A line shape neither arm parses becomes a finding instead of a
+  silent skip. This is the generalisation of L-186 the round exists to earn: the next new convention
+  announces itself rather than reopening TD-089.
+- **Engine-level failures excluded, by name.** Four `bad "conformance: …"` sites in the engine
+  (usage · repo-not-found · reader-missing · spec-table-unreadable) emit at the same two-space column
+  as findings. The widened kebab arm parsed
+  `FAIL  conformance: spec-table-unreadable -- …` as `slug=conformance, path=spec-table-unreadable`
+  and would have reported a path complaint about the stranger when the truth was *the engine never
+  ran*. Reproduced live against a deliberately unparseable spec, then routed to its own
+  `engine-level-failure` finding. Same reading T4 took gate-side this sprint when it excluded
+  `conformance:*` from the informational relabel.
+
+### Discrimination proof (Tier G, ADR-029) — recorded once, in the sprint log
+
+Round 5 carried its own proof in this file because Round 5 *was* the task. T5 is one task of five in
+SPRINT-100, and T1–T4 each recorded theirs in
+[`docs/sprint/logs/SPRINT-100-findings-that-mean-what-they-say.md`](../../sprint/logs/SPRINT-100-findings-that-mean-what-they-say.md).
+T5's lives there too — seeded break, single stated hash convention (`git hash-object`), targeted-break
+checks, reddened case with sibling control green, verified restore, and the outside worktree-isolated
+review. **Pointed at rather than copied**: a proof reproduced in two files is two figures that can
+drift apart (L-108), and this round is a poor place to learn that lesson twice.
+
+### What this round does not claim
+
+- **The stranger is unchanged in kind, and the 6 engine GAPs are unchanged.** Same four-file JS
+  library, same `rule-unimplemented` lines held off the level and the exit code. This round
+  re-measures coverage of the report, not the engine's rule coverage.
+- **`S2.R-PLACEMENT` still cannot see a near-miss** — carried forward from Rounds 3 and 4, not
+  re-measured here.
+- **The reconciliation proves no line was SKIPPED, not that every line was parsed CORRECTLY.** A
+  shape that parses into the wrong slug or path still counts as reached. The `conformance:` case
+  above was caught by reading the engine's call sites, not by the reconciliation — which is the
+  honest limit of a count-based guard, and the reason the population was enumerated by hand.
+- **One engine, one corpus.** Nothing here is a claim about a finding convention some future
+  assertion family introduces; the reconciliation is what is supposed to catch that, and it has not
+  yet been exercised by a real one.

@@ -422,3 +422,251 @@ two-space column, and these 27 lines are structurally invisible to it. That is *
 blindness exactly** — the detection logic is sound, the member set it runs over is not — arriving in
 the sprint's own last guard. → close, tech-debt bucket. Not fixed here: 15 files, far outside T4's
 `Layers:`, and the correct fix (route bootstrap failures through a shared emitter) is a design task.
+
+### 2026-09-13 | scope-change | T5 re-tiered P → G for its harness edit, `Layers:` corrected, and A2's stated premise found FALSE
+
+Three findings, all surfaced before a line was edited, all ruled by the owner in one
+AskUserQuestion frontier round (2026-09-13).
+
+**1 — What broke: T5's `Layers:` names the two research docs and not the matcher.**
+`Layers: docs/research/conformance-coverage.md · docs/research/logs/conformance-coverage.md`. But
+the "actionable-findings matcher" DoD 1 must widen is not in either file — it is two `sed`
+extractions inside `evals/run-foreign-repo-fixtures.sh` (the path sweep at the
+`findings-name-a-path-the-standard-owns` case, and the remainder extraction at
+`every-finding-is-actionable-and-clears`). The research docs *record* the sweep; they do not
+implement it. Same shape as this sprint's first `scope-change` — a declaration that does not reach
+the work, caught by trying to do the work.
+
+**2 — Consequence: the tier is wrong, and D4 is the thing being corrected.** D4 ruled T5 Tier P
+because "the subject is a research round's prose, not a guard". That is true of the two declared
+files and false of the third: `evals/run-foreign-repo-fixtures.sh` is an eval harness, **Tier G by
+name** under ADR-029, and it is precisely the guard whose false-negative this task exists to fix.
+ADR-029's re-tier-on-discovery clause is the governing one. **Owner ruling: T5 splits by file** —
+the harness edit takes Tier **G** (retained must-FAIL per check with its own named finding · sibling
+control green in the same run · seeded-break discrimination proof under ONE stated hash convention ·
+outside reviewer, worktree-isolated), the two research docs stay Tier **P** (read-through). D4 is
+superseded on this point and not deleted; the sequence is the evidence.
+
+**3 — What broke: DoD 1's parenthetical premise does not survive its own re-derivation.** DoD 1
+reads "The kebab convention is the **minority** one — re-derive both counts at build rather than
+inheriting the figures recorded at SPRINT-097 (**A2** · L-130)." A2 was confirmed exactly as
+written, and the re-derivation **contradicts the premise it was asked to confirm**. Three
+differently-shaped queries, each varying the SELECTION rule rather than the direction of the count
+(L-198):
+
+| Route | Population | kebab-leading | rule-id-leading |
+|---|---|---|---|
+| static, `bad "` call sites in `conformance-engine.sh` | 73 emission sites | **58** | 15 (7 literal `S<N>.<CODE>` · 8 via `$_rid`/`$_tid`) |
+| runtime, the sweep's own corpus (`acme-widget`, pre-remediation) | 9 FAIL lines | **6** | 3 |
+| runtime, the live corpus (this repository, engine direct, complete run) | 12 FAIL lines | **12** | 0 |
+
+Kebab is the **majority** at every grain that bears on a sweep. TD-089's "195 `S<N>.<CODE>`
+occurrences against 38 distinct kebab findings" compares *string occurrences anywhere in the file*
+against *distinct finding slugs* — two different populations, which is the one comparison that
+cannot support a majority/minority claim. Both figures are also stale: re-derived today they are
+**216** and **43**. The third static bucket is the reason the row reads as it does — 8 of the 15
+rule-id-leading sites emit through a **variable** (`bad "$_rid-- …"`), so a grep for a literal
+`bad "S` finds 7 and a grep for a leading lowercase slug finds those 8 as kebab. A query that
+buckets on the first literal character cannot see that shape; this one was caught by a second query
+that disagreed, never by re-reading the first.
+
+**Impact.** DoD 1's **operative** half is untouched and is what gets built: the matcher must see
+`S<N>.<CODE>` findings, not only the bare-kebab convention. Nothing about the fix depends on which
+convention is in the minority — 3 of 9 invisible findings is the defect whether 3 is the minority or
+not. **Owner ruling: tick DoD 1 against the re-derived numbers and record the premise as false**
+rather than re-reading the words to fit what was built (L-088). TD-089's row carries the stale
+figures and the incomparable-populations framing; `TECH-DEBT.md` is outside T5's `Layers:` even after
+the correction above, so the row is **routed to this sprint's close** (which resolves TD-089 in any
+case) rather than edited here. Its Summary and its re-file condition stand unchanged — only the
+majority/minority framing and the two figures are wrong.
+
+**4 — Consequence of the widening, ruled in the same round.** The old regex has read
+`every-finding-is-actionable-and-clears` as PASS since Round 4 over **3** FAIL lines it could not
+see (`S2.R-README` readme-ownership-footer-missing ×1 · `S6.BASE` tier-doc-set-incomplete ×2 —
+2 rules, 3 lines; TD-089 and Round 5 both say "2", counting rules). Widening the matcher reddens
+that case honestly. **Owner ruling: extend `acme-widget`'s own remediation block** with the README
+`<sub>` footer and §6's two Base docs — exactly what `acme-widget-vcs` already does — and keep the
+strong `-z "$left"` empty-set assertion. The alternative (freeze the target, assert the 3 lines by
+name) was rejected on the harness's own recorded ground: a remainder list can absorb a new artefact
+quietly, an empty-set assertion cannot. Round 5's "the original target is untouched" claim is
+superseded here, in the open, rather than left to read as still true.
+
+**Re-confirm G2.** Owner-approved 2026-09-13 (AskUserQuestion, one three-question frontier round).
+Wave order unchanged: T5 remains last and depends on T4 (D2), which is merged. Logged **before**
+§ Plan is edited, per ADR-014 and this file's own header.
+
+consequence · T5 · behaviour:material · governance:high — **revised upward** from the
+`behaviour:low · governance:high` recorded at this sprint's dispatch, which was entered under D4's
+Tier P reading. The edit changes a shipped guard's verdict on a real corpus, which is a material
+behaviour change by `references/dispatch.md` § System verify's own definition.
+
+### 2026-09-13 | surprise | a worktree-isolated reviewer was dispatched at a branch whose tip did not contain the work under review
+
+**What happened.** T5's Tier G bar requires an outside reviewer, worktree-isolated (L-165 · L-168).
+The coordinator dispatched one with these instructions for obtaining the artifact:
+
+```
+git checkout worktree-agent-a7f34363a51dc4929 -- evals/run-foreign-repo-fixtures.sh
+```
+
+The builder had been told — correctly, per `references/dispatch.md` § Worktree dispatch protocol — **not
+to commit**; the coordinator merges back. So its branch **tip is byte-identical to `main`**, and that
+`git checkout` yields the *pre-change baseline*. The reviewer would have adversarially reviewed the
+very file the task exists to change, found it sound (it is: it is the shipped file), and returned
+CLEAR. **A review that examines the wrong artifact returns a verdict that is indistinguishable from a
+real pass.**
+
+**How it was caught, and how it was not.** Not by the coordinator re-reading its own dispatch brief,
+which was on screen. By a *different* agent: the Tier P prose reviewer, asked to fact-check Round 6's
+figures, reported as its top finding that `git show HEAD:…` and
+`git show worktree-agent-a7f34363a51dc4929:…` are identical and that
+`git log --all -S "sweep-population-unreconciled"` matches zero commits. It was checking whether the
+prose overstated completion; what it actually surfaced was that the *other* reviewer had been handed a
+bad address. Two reviewers on different axes, and the one not looking at the guard is the one that
+found the guard's review was void — the same shape as L-165 (nothing the author can run finds these)
+applied to the coordinator.
+
+**Why the existing rules did not reach it.** L-168 says isolate the reviewer, and it was isolated.
+The protocol says the builder does not commit, and it did not. Both rules were followed; the seam
+between them — *an isolated reviewer needs a path to uncommitted work, and a branch ref is not one* —
+is owned by neither. This is L-172's shape (a property living between two correctly-executed
+declarations) arriving in dispatch rather than in code.
+
+**Fix applied.** The reviewer was corrected mid-flight and re-pointed at the absolute working-tree
+path of the author's modified file, with a mandated sanity check before it starts: the copy it reviews
+must contain `sweep_findings`, `sweep_gate`, `sweep-population-unreconciled` and
+`engine-level-failure`, or it has the wrong file. **The sanity check is the durable part** — an
+address can be got wrong again; a content assertion fails loudly when it is.
+
+**Pattern candidate → `docs/LEARNINGS.md` at close.** *A dispatched reviewer is given a content
+assertion that its artifact must satisfy, never only a path or a ref.* A ref-based handoff of
+uncommitted work is silently empty, and every downstream proof — reddened case, sibling control,
+verified restore — runs correctly against the wrong file and reports green.
+
+### 2026-09-13 | progress | T5 built and independently verified — matcher widened, Round 6 re-run, two reviewer findings (one fixed, one routed)
+
+**The defect, reproduced before anything was edited.** `evals/run-foreign-repo-fixtures.sh`'s two
+`sed` sweeps matched only the engine's bare-kebab finding convention. On the pre-remediation stranger
+the engine emits **9** FAIL lines and the sweeps reached **6**. The three they could not see —
+`S2.R-README -- readme-ownership-footer-missing` ×1 and `S6.BASE -- tier-doc-set-incomplete` ×2 — are
+why `every-finding-is-actionable-and-clears` has reported PASS since Round 4 *over its own
+unexamined output*. 2 rules, 3 lines; TD-089 and Round 5 both say "2", counting rules.
+
+**Built.** Both sweeps now parse either convention through one shared `sweep_findings`, gated by a
+shared `sweep_gate`. Two structural additions beyond the regex, which are the part that outlives this
+fix: a **population reconciliation** (`total` vs `reached`, failing by name as
+`sweep-population-unreconciled` and printing what it could not reach, so a line shape neither arm
+parses becomes a finding rather than a silent skip), and **engine-level bootstrap failures routed to
+their own `engine-level-failure` class** rather than parsed as findings. The stranger's remediation
+block was extended with §3's README `<sub>` footer and §6's two Base docs, mirroring
+`acme-widget-vcs`, so the newly-visible findings are *applied* rather than listed — the `-z` empty-set
+assertion is retained, never weakened into a remainder list.
+
+**Measured after:** 9/9 swept pre-remediation, 0/0 post. Round 4's verdict reproduces unchanged —
+9 findings across 5 rules, tally `S2.F-FILE` 4 · `S6.BASE` 2 · `S3.SCHEMA` 1 · `S2.R-README` 1 ·
+`S1.LAW3` 1, 9 actionable, 0 artefacts. Written up as **Round 6** in
+`docs/research/logs/conformance-coverage.md`; the parent's § Artefacts verdict sentence was corrected
+in place, and the parent still sits exactly at its 130-line cap.
+
+**Two findings from the coordinator's own pass, before review.** (a) The engine's four
+`bad "conformance: …"` sites emit at the finding column, so the widened kebab arm parsed
+`FAIL  conformance: spec-table-unreadable -- …` as `slug=conformance, path=spec-table-unreadable` — a
+path complaint about the stranger when the truth is *the engine never ran*. Reproduced live against a
+deliberately unparseable spec, then fixed. (b) T5's `Layers:` and tier were both wrong; logged
+separately above.
+
+**Two findings from the independent reviewer, worktree-isolated (L-165 · L-168).** Neither was
+findable by anything the author could run, which is the whole argument for the rule:
+
+1. **FIXED — a fifth bootstrap shape was invisible, and the gate passed silently on it.**
+   `conformance-engine.sh:54` bypasses `bad()` with a raw `echo "FAIL conformance: …"` at **one**
+   space. The sweep anchors `^FAIL  ` (two), so the line entered no bucket: fed a crashed engine's
+   output, `sweep_findings` returned `total=0 reached=0 engine_error=[] unreached=[]` and `sweep_gate`
+   returned rc=0 — the one outcome its own docstring forbids. Independently reproduced by the
+   coordinator before dispatching the fix. Masked today only because the unrelated
+   `level-and-named-findings` fixture also fails on that crash; an accident is not a guard. The
+   detector now matches one-or-two spaces for the bootstrap class only, while both finding conventions
+   stay anchored at two. **This is the T4-close one-space finding arriving inside the very engine this
+   gate sweeps** — the sweep is made robust to the emission, which is not a fix of the emitter (15
+   files, outside `Layers:`, still TD-bound).
+2. **ROUTED, not fixed → filed at close as `TD-156`.** Eight `bad "<slug>: <prose>"` sites
+   (`conformance-engine.sh` 1530 · 1817 · 1855 · 2420 · 2461 · 2475 · 2961 · 2971) put English where
+   the regex expects a path — `core-file-missing: no unconditional rows parsed from §2` yields
+   `path=no`. They parse, so they count as `reached`: the population reconciles while being
+   semantically wrong. Dormant (they fire only if `STANDARD.md`'s own tables are malformed) and they
+   fail **noisy, not silent** — a prose token is neither a file the target has nor a §2 canonical
+   path, so the actionability check reports it unactionable and the case goes red. A path-vs-prose
+   heuristic on a guard whose entire purpose is not to lie would cost more than it buys. Next id
+   derived, not remembered: ledger max is TD-155 across 88 rows by two selectors, after discarding a
+   `TD-9xx` maximum that is `evals/fixtures/` content (L-170, the second sighting this month).
+
+**What the reviewer checked that held up** — recorded because a clean result on a real check is
+evidence too: the reconciliation partitions with no double-count (the two arms are mutually exclusive
+by construction, `[a-z]` vs `S[0-9]`); the `grep -v` exclusions do not drift from the `sed`
+extractions; the two remediation blocks are byte-identical in content; `sweep_findings` is never
+called inside a subshell that would discard its assignments; no stale-variable read path; and all
+five then-new fixtures are non-vacuous, seeded three ways — including
+`sweep-gate-clean-passthrough`, whose "no output, exit 0" shape looks vacuous and is not.
+
+**Seeded-break discrimination proof (Tier G, ADR-029). ONE hash convention: `git hash-object`,
+used exclusively — no `sha256sum`, no mixing of committed-blob and working-tree hashes (L-169).**
+- Pristine `87acd15a90e9504cf26418a8a3a7b4e3ace869a4` — 483 lines, 34 `fixture(` labels.
+- Seed: the bootstrap detector reverted to its two-space-only form (the pre-fix regex).
+- **Parses** — `sh -n` clean. **Targeted** — line count 483 → 483, label count 34 → 34; a demolition
+  is not a discrimination.
+- **Reddened with a sibling green** — `sweep-excludes-engine-level-failure-one-space` failed alone;
+  `sweep-engine-error-two-space-still-caught` stayed PASS, which is the control that proves the
+  widening did not trade one blind spot for another (it varies the SELECTION — one space vs two — not
+  the verdict, L-186).
+- **Restored** — `git hash-object` re-read `87acd15a90e9504cf26418a8a3a7b4e3ace869a4`, matching
+  pristine. The same hash was re-checked at merge-back into the coordinator tree and matched again.
+
+**Verified by the coordinator, not accepted from a report (L-045 · L-060).** The one-space, two-space
+and real-finding shapes were each fed through the *shipped* `sweep_findings` and routed correctly
+(`engine_error`, `engine_error`, `reached=1`). The suite was then run from the coordinator tree and
+read from **its own printed verdict line** — `FOREIGN-REPO FIXTURES: all green`, 17 fixtures.
+
+consequence · T5 · behaviour:material · governance:high — review depth: two independent scoped
+reviewers, one worktree-isolated adversarial (Tier G harness) and one read-through (Tier P prose),
+plus coordinator re-verification. Both returned findings; both sets were acted on.
+
+### 2026-09-13 | progress | `review ·` lines supplied for T5 and, back-filled, T2 — the gate named both
+
+**How this surfaced.** The post-merge system-verify run against the integrated tree printed
+`QA-CHECK: 219 pass, 3 fail` — read from the gate's own verdict line, not from an exit code, which the
+background wrapper reported as 0 (L-120, the shape that keeps working). All three failures are
+`check-review-depth.sh`:
+
+```
+FAIL  review-depth-governance-absent: ... T2's consequence line records governance:high and no review · line was ever appended for T2
+FAIL  review-depth-material-absent:   ... T2's consequence line records behaviour:material and no review · line was ever appended for T2
+FAIL  review-depth-governance-absent: ... T5's consequence line records governance:high and no review · line was ever appended for T5
+```
+
+Both are accurate. **Neither is a missing review; both are a missing record** — which is exactly the
+distinction TD-085 put into this checker, because "no review line" is silence, and silence about a
+governance:high task is indistinguishable from a review that never happened.
+
+**T5.** The coordinator wrote its review depth as trailing prose on the `consequence ·` line instead of
+as its own `^review · ` line. The checker anchors at column 1 and is right to: a depth recorded inside
+another line's prose is not machine-readable, and this repository's own rule is that the record is what
+counts, not the intent behind it. Supplied below in the declared vocabulary.
+
+**T2, back-filled — and why that is a record correction rather than an invention.** T2's review is
+attested twice in this log by the people who ran it, in entries written before this one:
+*"T2's own fixtures, **its outside reviewer** and its harness all agree with each other"* (the
+`surprise` entry on T2's Acceptance gap), and wave 1's completion entry, which lists T2 among the tasks
+**merged and independently verified** and records that agent-dispatched outside reviewers create their
+own worktrees. The line below records what those entries already establish and adds nothing to it —
+depth and classification only, no claim about what the reviewer found. **Appended, never inserted next
+to T2's own entry**, per this file's header: a past entry is corrected by a later one, so the gap and
+its repair both stay visible.
+
+review · T2 · scoped-reviewer (worktree-isolated, agent-dispatched) + coordinator re-verification · behaviour:material · governance:high
+review · T5 · two scoped reviewers — one worktree-isolated adversarial (Tier G harness, two confirmed findings) and one read-through (Tier P prose, one confirmed correction) — + coordinator re-verification · behaviour:material · governance:high
+
+**Worth keeping: the gate caught a governance gap that four humans-plus-agents did not.** T1, T3 and
+T4 each got their `review ·` line at merge; T2 and T5 did not, and in both cases the review itself was
+real and thorough. The failure mode is not laziness — it is that *writing the record* is a separate act
+from *doing the thing*, and the second one feels like it discharges the first. That is the same shape
+as this sprint's whole theme, one level up: a report that does not say what actually happened.

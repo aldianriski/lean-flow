@@ -127,20 +127,23 @@ which it does not, **without reading `scripts/qa-check.sh`**.
 - [ ] **Outside reviewer, worktree-isolated** (L-165 · L-168).
 
 ### T5 — Widen the conformance-coverage sweep's matcher, then re-run Round 4 `[size: S · risk: low · class: execution · HITL · J2]`
-Layers: `docs/research/conformance-coverage.md` · `docs/research/logs/conformance-coverage.md`
+Layers: `docs/research/conformance-coverage.md` · `docs/research/logs/conformance-coverage.md` · `evals/run-foreign-repo-fixtures.sh`
 Depends-on: **T4** — a sweep re-run against a token convention that is about to change measures nothing (**D2**)
-Cites: TD-089 · L-108 · L-130 · ADR-029
-**Tier P** (ADR-029) — the subject is a research round's prose, not a gate checker. It is the one
-member of the SPRINT-097 cluster that is not a guard, which is why it sits outside the Tier G group.
+Cites: TD-089 · L-108 · L-130 · L-186 · L-198 · ADR-029
+**Tier P for the two research docs · Tier G for the harness** (ADR-029's re-tier-on-discovery clause;
+scope-change 2026-09-13). D4 ruled the whole task Tier P on the reading that its subject is a research
+round's prose. That holds for the two docs and not for `evals/run-foreign-repo-fixtures.sh`, which is
+an eval harness — Tier G by name, and the very guard whose false-negative this task exists to fix. The
+harness edit therefore carries the full Tier G bar; the two docs carry a read-through.
 
 **Acceptance:** Round 4's "0 artefacts remain" conclusion rests on a matcher that was re-measured, not
 merely re-written.
 
 **DoD:**
-- [ ] The actionable-findings matcher sees `S<N>.<CODE>` findings, not only the bare-kebab convention. The kebab convention is the **minority** one — re-derive both counts at build rather than inheriting the figures recorded at SPRINT-097 (**A2** · L-130).
-- [ ] **Round 4 is re-run, not merely re-matched.** TD-089's own re-file condition: widening the regex without re-running leaves the conclusion resting on a matcher nobody re-measured — L-108's shape in a sweep rather than a guard.
-- [ ] The stranger corpus's 2 unnamed FAIL lines (the README-footer rule and the two-doc-row base rule) are **named** by the widened sweep, **or their absence is explained**. A judgment tick, and it says so — no mechanical check reaches "the explanation is adequate".
-- [ ] Read-through by a second pair of eyes (Tier P — no seeded-break proof, no isolated reviewer; inventing one to look rigorous is the failure, not the fix).
+- [x] The actionable-findings matcher sees `S<N>.<CODE>` findings, not only the bare-kebab convention. The kebab convention is the **minority** one — re-derive both counts at build rather than inheriting the figures recorded at SPRINT-097 (**A2** · L-130). — *operative half met: both sweeps parse either convention, 6/9 → 9/9. **The parenthetical premise is FALSE and is ticked as corrected, not as satisfied** (owner ruling, scope-change above): re-derived three ways, kebab is the MAJORITY (58 of 73 call sites · 6 of 9 corpus lines · 12 of 12 live). Of the row's two figures only one was stale (195 → 216); 38 is unchanged, and this task's own first draft wrote 43 by silently changing population — caught by a second reader, recorded in Round 6.*
+- [x] **Round 4 is re-run, not merely re-matched.** TD-089's own re-file condition: widening the regex without re-running leaves the conclusion resting on a matcher nobody re-measured — L-108's shape in a sweep rather than a guard. — *re-run against a rebuilt stranger, not re-matched over a stored report. Verdict reproduces unchanged (9 findings / 5 rules / 0 artefacts, tally re-derived) and is now measured over 9 of 9 rather than 6 of 9. Written up as **Round 6**.*
+- [x] The stranger corpus's 2 unnamed FAIL lines (the README-footer rule and the two-doc-row base rule) are **named** by the widened sweep, **or their absence is explained**. A judgment tick, and it says so — no mechanical check reaches "the explanation is adequate". — ***Judgment tick, and it says so.*** *Named, then cleared rather than merely listed: the remediation block now applies §3's README `<sub>` footer and §6's two Base docs, and the `-z` empty-set assertion holds over the full population. Count corrected on the record — 2 **rules**, **3** lines.*
+- [x] Read-through by a second pair of eyes (Tier P — no seeded-break proof, no isolated reviewer; inventing one to look rigorous is the failure, not the fix). — *read-through returned ACCURATE-WITH-CORRECTIONS and caught a real error (the 43-vs-38 population slip), applied. **The harness half additionally took the full Tier G bar** — seeded-break proof under one `git hash-object` convention plus a worktree-isolated adversarial reviewer, which returned two confirmed findings: one fixed, one routed to TD-156. That is the re-tier at work, not a Tier P DoD inflated to look rigorous.*
 
 ## Owner-action checklist
 <!-- none this sprint: no unattended run, no external credential, no envelope. -->
@@ -187,6 +190,9 @@ merely re-written.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `evals/run-foreign-repo-fixtures.sh` | T5 | Both FAIL-line sweeps read either finding convention through one shared `sweep_findings`/`sweep_gate`; population reconciliation fails by name on a shape neither arm parses; engine bootstrap failures (one- **and** two-space) routed to `engine-level-failure`; stranger's remediation extended so the newly-visible findings clear. WHY: the sweep examined 6 of 9 FAIL lines while asserting a property over all 9 (TD-089) | med — Tier G guard whose verdict on a real corpus changes | 17 fixtures incl. 7 retained for the sweep itself; seeded-break proof under `git hash-object`; worktree-isolated adversarial review |
+| `docs/research/logs/conformance-coverage.md` | T5 | Round 6 appended — the Round 4 re-run, the three-route A2 re-derivation, and the population/bootstrap additions. WHY: TD-089's re-file condition makes a widened regex without a re-run its own defect | low | read-through (Tier P), figures re-derived independently by the reviewer |
+| `docs/research/conformance-coverage.md` | T5 | § Artefacts verdict sentence corrected in place to point at Round 6. WHY: the parent stated `9 actionable, 0 artefacts` with no sign its mechanical half covered two thirds of the population | low | doc at 130 lines, still exactly at cap |
 
 ## Retro
 
