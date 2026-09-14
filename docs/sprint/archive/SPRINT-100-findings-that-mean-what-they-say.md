@@ -2,7 +2,7 @@
 sprint: 100
 slug: findings-that-mean-what-they-say
 owner: Maintainer
-last_updated: 2026-09-13
+last_updated: 2026-09-14
 status: closed
 plan_commit: 7e27c02
 gates_signed: G1,G2 @ 440ff3b

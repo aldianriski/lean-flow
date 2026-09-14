@@ -13,6 +13,60 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
+## v1.65.1 — Findings That Mean What They Say (2026-09-14)
+
+**PATCH — `SPRINT-100`, 29 of 29 DoD.** Five guards whose *detection logic* was sound while the
+**set they ran over** was not. The thread through all five is narrower than "guards are wrong": each
+emitted a finding that was **not true of its own subject** — a mention read as a use, a tick read as
+a scope change, an earlier ruling masking a later failure, a matcher blind to the convention its
+corpus actually uses, and a report that could not tell a gating finding from an informational one. A
+guard that reports the wrong thing about the right file is worse than an absent guard, because its
+output is believed. Fixes only; the spec is unchanged at 0.11.0.
+
+**`check-verify-reaches.sh`, both legs (TD-087 · TD-097).** EXISTS resolves a bare basename against
+the known script roots before calling it absent, and reports an *unresolvable reference* as
+`verify-method-unresolvable` — a **different finding** from `verify-method-absent`, so one absence is
+never reported as the other. REACHES is anchored to path boundaries and rejects a target whose only
+occurrence sits in an **exclusion idiom**; a token that is itself another method named in the same
+clause no longer counts as that clause's target. The archive exemption that hid all of this for five
+sprints became the retained fixture `archive-arm-basename-skipped`. **TD-097's cited `17` was wrong
+and is corrected to `9`**, settled by running the *unfixed* checker over all 31 archived
+Verify-bearing sprints — the old figure conflated raw mentions with findings.
+
+**A ticked DoD is no longer an unaccounted Plan edit (TD-105).** Checkbox state is normalised on both
+sides of the comparison in **both** freeze assertions. A genuine text change with no `scope-change`
+entry still fails exactly as before. The inverted incentive this removes was the point: the check had
+rewarded sprints that shifted scope and penalised sprints that did not.
+
+**`check-system-verify-block.sh` gained a positional link and live logs (TD-086).** `has_close` and
+`has_ruling` are bound to each `system-verify ·` occurrence's own window, so an earlier ruling can no
+longer clear a later unresolved FAIL, and the harness runs over `docs/sprint/logs/` for the first
+time rather than fixtures alone.
+
+**Informational findings carry their own token (TD-146).** A `FAIL` line the gate does not fold into
+its tally now prints as `INFO`, so the printed verdict and the visible tokens stop disagreeing with
+nothing marking the difference. **The policy is unchanged — only the report:** which findings gate is
+untouched, the pass/fail arithmetic is asserted identical across the change, and
+`conformance-engine.sh` / `conformance.sh` are at **zero diff**, so the consumer contract is
+unaffected (for an adopter every finding *is* gating).
+
+**The conformance-coverage sweep sees both finding conventions (TD-089).** It examined **6 of 9**
+FAIL lines while asserting a property over all nine; now 9 of 9, and the remediated stranger reaches
+zero. Round 4 was **re-run rather than re-matched** — the verdict reproduces unchanged at 9 findings
+across 5 rules, 0 artefacts. Two structural additions outlive the regex fix: a **population
+reconciliation** that fails by name when a line shape neither arm parses appears, and engine-level
+bootstrap failures routed to their own class instead of being parsed as findings.
+
+**Known and filed, not silently carried:** `TD-156` (eight sites emitting prose where a path is
+expected — fails noisy, not silent), `TD-157` (27 one-space `FAIL` emissions across 15 files, one of
+which left a sweep reporting clean on a *crashed* engine), `TD-158` (two clause-extraction defects
+that drop real references out of an examined set), `TD-159` (worktree-review mechanics documented
+nowhere). `TASK-350` routes the emitter fix.
+
+**Adopter-facing:** nothing in this release changes a command, a skill's interface, or the standard.
+`conformance.sh`'s exit code and output are byte-unchanged.
+
+---
 ## v1.65.0 — Make the Gate Finish (2026-09-13)
 
 **MINOR — `SPRINT-099`, 20 of 20 DoD.** Two consecutive closes had rested on targeted evidence

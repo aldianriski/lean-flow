@@ -423,10 +423,10 @@ blindness exactly** — the detection logic is sound, the member set it runs ove
 the sprint's own last guard. → close, tech-debt bucket. Not fixed here: 15 files, far outside T4's
 `Layers:`, and the correct fix (route bootstrap failures through a shared emitter) is a design task.
 
-### 2026-09-13 | scope-change | T5 re-tiered P → G for its harness edit, `Layers:` corrected, and A2's stated premise found FALSE
+### 2026-09-14 | scope-change | T5 re-tiered P → G for its harness edit, `Layers:` corrected, and A2's stated premise found FALSE
 
 Three findings, all surfaced before a line was edited, all ruled by the owner in one
-AskUserQuestion frontier round (2026-09-13).
+AskUserQuestion frontier round (2026-09-14).
 
 **1 — What broke: T5's `Layers:` names the two research docs and not the matcher.**
 `Layers: docs/research/conformance-coverage.md · docs/research/logs/conformance-coverage.md`. But
@@ -491,7 +491,7 @@ name) was rejected on the harness's own recorded ground: a remainder list can ab
 quietly, an empty-set assertion cannot. Round 5's "the original target is untouched" claim is
 superseded here, in the open, rather than left to read as still true.
 
-**Re-confirm G2.** Owner-approved 2026-09-13 (AskUserQuestion, one three-question frontier round).
+**Re-confirm G2.** Owner-approved 2026-09-14 (AskUserQuestion, one three-question frontier round).
 Wave order unchanged: T5 remains last and depends on T4 (D2), which is merged. Logged **before**
 § Plan is edited, per ADR-014 and this file's own header.
 
@@ -500,7 +500,7 @@ consequence · T5 · behaviour:material · governance:high — **revised upward*
 Tier P reading. The edit changes a shipped guard's verdict on a real corpus, which is a material
 behaviour change by `references/dispatch.md` § System verify's own definition.
 
-### 2026-09-13 | surprise | a worktree-isolated reviewer was dispatched at a branch whose tip did not contain the work under review
+### 2026-09-14 | surprise | a worktree-isolated reviewer was dispatched at a branch whose tip did not contain the work under review
 
 **What happened.** T5's Tier G bar requires an outside reviewer, worktree-isolated (L-165 · L-168).
 The coordinator dispatched one with these instructions for obtaining the artifact:
@@ -543,7 +543,7 @@ assertion that its artifact must satisfy, never only a path or a ref.* A ref-bas
 uncommitted work is silently empty, and every downstream proof — reddened case, sibling control,
 verified restore — runs correctly against the wrong file and reports green.
 
-### 2026-09-13 | progress | T5 built and independently verified — matcher widened, Round 6 re-run, two reviewer findings (one fixed, one routed)
+### 2026-09-14 | progress | T5 built and independently verified — matcher widened, Round 6 re-run, two reviewer findings (one fixed, one routed)
 
 **The defect, reproduced before anything was edited.** `evals/run-foreign-repo-fixtures.sh`'s two
 `sed` sweeps matched only the engine's bare-kebab finding convention. On the pre-remediation stranger
@@ -630,7 +630,7 @@ consequence · T5 · behaviour:material · governance:high — review depth: two
 reviewers, one worktree-isolated adversarial (Tier G harness) and one read-through (Tier P prose),
 plus coordinator re-verification. Both returned findings; both sets were acted on.
 
-### 2026-09-13 | progress | `review ·` lines supplied for T5 and, back-filled, T2 — the gate named both
+### 2026-09-14 | progress | `review ·` lines supplied for T5 and, back-filled, T2 — the gate named both
 
 **How this surfaced.** The post-merge system-verify run against the integrated tree printed
 `QA-CHECK: 219 pass, 3 fail` — read from the gate's own verdict line, not from an exit code, which the
@@ -671,10 +671,10 @@ real and thorough. The failure mode is not laziness — it is that *writing the 
 from *doing the thing*, and the second one feels like it discharges the first. That is the same shape
 as this sprint's whole theme, one level up: a report that does not say what actually happened.
 
-### 2026-09-13 | progress | DoD audit for T1–T4 — 24 of 25 ticked against per-box evidence, 1 left open
+### 2026-09-14 | progress | DoD audit for T1–T4 — 24 of 25 ticked against per-box evidence, 1 left open
 
 **Why this entry exists.** T1–T4 merged and were independently verified, but none of their 25 DoD
-boxes was ticked. Owner directed an audit rather than a bulk tick (AskUserQuestion, 2026-09-13): read
+boxes was ticked. Owner directed an audit rather than a bulk tick (AskUserQuestion, 2026-09-14): read
 each criterion against its own evidence, tick only what the record supports, and leave anything it
 does not. The evidence is recorded **here**, not as annotations inside § Plan, so the Plan edit that
 follows is a **pure checkbox change** — the exact case T2's normalisation makes safe, and therefore
@@ -765,7 +765,7 @@ T3's were re-run; `evals/run-sprint-family-fixtures.sh` (~67 full-repo engine wa
 host has killed three times for memory, which is already a filed close-time debt. The whole-tree
 evidence used instead is the integrated gate run above — 220 pass, 0 fail — which exercises both.
 
-### 2026-09-13 | progress | TD-105's denominator re-derived historically — the 9 reproduces exactly, the 17 does not exist at any measured point
+### 2026-09-14 | progress | TD-105's denominator re-derived historically — the 9 reproduces exactly, the 17 does not exist at any measured point
 
 **What was open.** T2's DoD 4 asks that SPRINT-087's figures be **re-derived at build**:
 *"28 ticks, zero text changes, `plan-edited-after-freeze` plus 8 × `scope-change-logged-after-plan-edit`,
@@ -814,3 +814,37 @@ preference is to leave the box open until 17 is located, the tick comes back off
 
 **TD-105's row is corrected at close**, alongside TD-089's: the `9 of the run's 17 FAILs` clause gains
 the commit-anchored figures above. `TECH-DEBT.md` is outside T2's and T5's `Layers:` either way.
+
+### 2026-09-14 | progress | date drift corrected — this session's entries were dated to the day the sprint started, not the day they happened
+
+**What was wrong.** T1–T4 were built and merged on **2026-09-13**; T5, the close, the DoD audit, the
+historical re-derivation and every owner ruling obtained for them happened on **2026-09-14**, and all
+five of this session's commits carry that date. The entries written today nonetheless inherited
+`2026-09-13` from the entries above them — a date copied from context rather than derived, which is
+[[L-130]]'s shape applied to a timestamp.
+
+**Caught by the release step, not by review.** `release-patch`'s stale-doc clear compares today's date
+against the `last_updated:` it is about to write, and `lean-doc-generator`'s own step 2 says a drift of
+≥1 day is **surfaced, never silently fixed**. Surfaced to the owner, who ruled: correct today's
+entries, leave yesterday's alone, so the sprint reads as spanning the two days it actually spanned.
+
+**Corrected** (9 references, all at or below the entry beginning `### … | scope-change | T5 re-tiered
+P → G`, which is exactly where this session's authorship starts): six entry headers, two
+`AskUserQuestion` ruling dates, one `Re-confirm G2` date. Also the sprint's own `last_updated:`,
+`docs/sprint/INDEX.md`'s `closed` date, TODO.md's closed-sprint note, the `v1.65.1` CHANGELOG heading,
+and the `seen:` dates on L-200 and L-201. **Everything at or above the T4 close entry is untouched and
+still reads 2026-09-13, because that is when it happened.**
+
+**Corrected in place rather than by a superseding entry, and this entry is why.** This file's header
+says never edit a past entry — the rule exists so a superseded *measurement* stays visible next to the
+one that replaced it. A clerical timestamp is not a measurement anyone will reason from, and leaving
+six wrong dates in place while a correction sits 300 lines below would make the log harder to read,
+not more honest. The correction is recorded here so the change is visible; the dates themselves now
+simply say what happened.
+
+**Not done, on the owner's ruling:** `release-patch` step 5 would additionally bump `last_updated:` on
+every doc in the sprint diff carrying one — `TECH-DEBT.md` (2026-09-13), `TODO.md` (2026-09-11),
+`docs/LEARNINGS.md` (2026-09-11), `docs/sprint/INDEX.md` (2026-09-11) and the two research docs
+(2026-08-24 / 2026-08-25). The owner chose the narrow correction. **Those five headers are therefore
+knowingly stale against files modified today**, recorded here rather than left for a reader to
+discover — the next `/lean-doc-generator` run or promote governance review is the place to clear them.

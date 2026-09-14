@@ -16,7 +16,7 @@ status: current
 
 ## Active Sprint
 
-> _(none — **SPRINT-100 closed 2026-09-13**, 29 of 29 DoD, all five tasks merged. Promote the next
+> _(none — **SPRINT-100 closed 2026-09-14**, 29 of 29 DoD, all five tasks merged. Promote the next
 > sprint from the Backlog below with `/lean-doc-generator promote`.)_
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
