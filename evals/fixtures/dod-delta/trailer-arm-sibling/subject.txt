@@ -1,0 +1,1 @@
+test(engine): guard the git-availability branch that no fixture could discriminate

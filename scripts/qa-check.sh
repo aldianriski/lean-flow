@@ -1400,7 +1400,8 @@ else
   fi
 fi
 
-# --- 16. HEAD's claimed DoD delta vs the ticks it actually made (SPRINT-101 T3, TASK-326) ---------
+# --- 16. Every commit since plan_commit's claimed DoD delta vs the ticks it actually made
+#         (SPRINT-101 T3, TASK-326) ------------------------------------------------------------
 # SPRINT-094's 6a6aeac claimed "5 of 6 DoD" for T1 -- an internally consistent claim for T1 alone --
 # while the SAME commit also ticked one DoD box each in T2's and T3's blocks, neither of which its
 # subject named. Every leg above stayed clean: line caps unchanged, no grep tripped, the commit body
@@ -1408,22 +1409,32 @@ fi
 # per the owner ruling recorded in SPRINT-101 T3 -- not POSIX sh like its siblings), covered by
 # evals/run-dod-delta-fixtures.sh in the always-on set above.
 #
-# Checks HEAD only, on the same reasoning as the rest of this gate's commit-scoped legs: this repo's
-# own workflow runs the gate right after each commit, so the commit under review at gate time is the
-# one at HEAD (L-120 -- read the artifact this run was pointed at, not a historical range nobody asked
-# about). A commit whose subject is not `sprint(NNN) T<n>:` (a coordinator commit, an unscoped
-# multi-task token, or no sprint at all) is exempt by role, mirroring check-layers-observed.sh's own
-# COORD exemption -- printed via `note`, never silently absent (L-020).
+# Checks the RANGE `plan_commit..HEAD` per active sprint doc, sourced from each doc's own frontmatter
+# exactly as leg 15's check-layers-observed.sh already does (its `for c in $(git rev-list
+# "$plan_commit..HEAD")`) -- reusing $lo_files rather than re-globbing. An adversarial review of the
+# first shipped shape (HEAD-only) found the premise wrong: this repo's gate does not run after every
+# single commit -- this very sprint landed a sibling task's commit plus several coordinator commits
+# between gate runs, and HEAD-only would leave all of them permanently unexamined (finding 2 of the
+# ca577e9 review). A commit the checker cannot attribute to exactly one task (a coordinator commit, an
+# unscoped multi-task token, or no sprint at all) is exempt by role, mirroring check-layers-observed.sh's
+# own COORD exemption -- printed via `note`, never silently absent (L-020).
 if ! command -v bun >/dev/null 2>&1; then
   bad "dod-delta: bun not found on PATH -- cannot run scripts/lib/check-dod-delta.ts. This FAILS rather than skipping on purpose, same rule as the typecheck leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
 else
   dd_script="scripts/lib/check-dod-delta.ts"
   if [ ! -f "$dd_script" ]; then
     bad "dod-delta: checker not found at $dd_script"
+  elif [ -z "$lo_files" ]; then
+    note "dod-delta: skip (missing): docs/sprint/SPRINT-*.md"
   else
-    dd_out=$(bun "$dd_script" "$ROOT" HEAD 2>&1); dd_code=$?
+    dd_out=$(bun "$dd_script" "$ROOT" $lo_files 2>&1); dd_code=$?
+    dd_n=$(printf '%s\n' "$dd_out" | grep -cE '^PASS')
     if [ "$dd_code" -eq 0 ]; then
-      ok "$(printf '%s\n' "$dd_out" | sed -E 's/^PASS +//')"
+      if [ "$dd_n" -eq 0 ]; then
+        note "dod-delta: SKIP (0 commits in range across the active sprint(s) -- nothing in scope)"
+      else
+        ok "dod-delta ($dd_n commit(s)/doc(s) checked across plan_commit..HEAD, 0 unattributed ticks)"
+      fi
     else
       dd_find=$(printf '%s\n' "$dd_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
       [ -n "$dd_find" ] || dd_find="no FAIL line in output -- checker exited $dd_code without reporting one -- output: $(printf '%s' "$dd_out" | tr '\n' ' ' | cut -c1-200)"

@@ -12,7 +12,10 @@
 # that built them): must-fail-6a6aeac (the real motivating commit, extracted verbatim via git),
 # sibling-control (claim and ticks agree), population-coord and population-unscoped (L-186 -- the
 # OTHER arms of the subject-shape population this checker's attributeClaim() must classify, not just
-# the T1: shape the motivating commit happens to be).
+# the T1: shape the motivating commit happens to be), plus trailer-arm/parenthetical-arm/letter-suffix
+# must-fail+sibling pairs and two real throwaway-repo cases (a plan_commit..HEAD range walk; an
+# archive-move-in-the-same-commit crash guard) added after an adversarial review of ca577e9 found six
+# defects, all in the population this guard runs over (see check-dod-delta.ts's own header).
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -33,7 +36,7 @@ test_file="evals/dod-delta.test.ts"
 # A test-COUNT floor, not just an exit code -- `bun test` exits 0 on a file with zero live tests
 # (a renamed test, a dropped describe) while still reporting PASS (same shape run-s4-ts-evaluators.sh
 # guards against). RAISE THIS when adding cases to evals/dod-delta.test.ts, in the same commit.
-min_tests=18
+min_tests=40
 
 out=$(bun test "$test_file" 2>&1); code=$?
 n_pass=$(printf '%s\n' "$out" | grep -oE '^ *[0-9]+ pass' | grep -oE '[0-9]+' | head -1)
@@ -53,5 +56,6 @@ if [ "$n_pass" -lt "$min_tests" ]; then
 fi
 
 echo "PASS fixture(dod-delta): checker green -- $n_pass tests, 0 fail (retained: must-fail-6a6aeac," \
-  "sibling-control, population-coord, population-unscoped)"
+  "sibling-control, population-coord, population-unscoped, trailer/parenthetical/letter-suffix arms," \
+  "range walk, archive-move guard)"
 exit 0
