@@ -119,3 +119,36 @@ the underlying shape is real: logs are created lazily at the first entry, while 
 a named FAIL (SPRINT-098's deliberate change). A freshly promoted sprint is therefore red until
 someone writes an entry. Possible false-positive class; out of scope here, proposed as a debt row at
 close rather than chased.
+
+### 2026-09-14 | surprise | A1 is false as written, true for the precondition it exists to serve
+A1 assumed *"the gate can reach a green verdict on this host within the 600 s ceiling"*, citing
+523–560 s from the SPRINT-099 close. Both halves were measured rather than assumed, and they
+disagree — which is the whole reason the assumption carried a `Confirm:` clause.
+
+| profile | invocation | budget | measured | verdict line |
+|---|---|---|---|---|
+| full sweep | `QA_FULL=1 sh scripts/qa-check.sh` | lifted | **1275 s** | `224 pass, 2 fail` |
+| default | `sh scripts/qa-check.sh` | 520 s self-enforced | **530 s** | `214 pass, 2 fail` |
+
+**A1 as literally written is FALSE.** A `QA_FULL` run takes 1275 s here — more than twice the 600 s
+command ceiling — and the gate reports that against itself:
+`qa-runtime-over-ceiling: … A run past the ceiling is killed from outside with no verdict line`
+(TD-128's predicted shape, now measured rather than feared).
+
+**A1 as it governs T1 is CONFIRMED.** The conflation is the finding: `night-run.sh:570` invokes
+`unset MSYS_NO_PATHCONV; sh "$repo_root/scripts/qa-check.sh"` — **bare**. The pre-flight precondition
+is the *default profile*, not the full sweep. `QA_FULL` lifts the budget and adds four opt-in
+selftest harnesses by design, so its 1275 s says nothing about the gate T1 must pass. 530 s sits
+inside the ceiling and inside SPRINT-099's measured range.
+
+**Neither current FAIL is a defect.** Both are `review-depth-*-absent` for **T3**, which is still in
+flight: the coordinator wrote `consequence · T3 · behaviour:material · governance:high` at dispatch,
+and no `review · T3 ·` line exists yet because the review it demands has not happened. The gate is
+correctly reporting a review it is owed — TD-092's mechanism working, caught on this sprint's own
+work rather than on a fixture. Expected to clear when T3's outside review lands.
+
+**Two things worth keeping.** L-067's fix is shipped and visible at the call site — the `unset` is
+right there, guarding the env-inheritance trap that once produced a red gate on correct code through
+two wrong diagnoses. And a red gate is not automatically fatal: `gate_exceptions:` admits named,
+pinned, pre-recorded exceptions with no `--force` anywhere (night-run.md Part 1a step 4c), which is
+the sanctioned route if a known-unrelated FAIL is still standing at launch.
