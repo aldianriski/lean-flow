@@ -16,18 +16,14 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-100 — Findings That Mean What They Say** →
-> [`docs/sprint/SPRINT-100-findings-that-mean-what-they-say.md`](docs/sprint/SPRINT-100-findings-that-mean-what-they-say.md)
-> — promoted 2026-09-13, five tasks, 29 DoD, no owner-action. **Not** an epic sprint: EPIC-015
-> § Closed-when 1 waits a fourth sprint, because its precondition is a host that can *finish* a gate
-> and SPRINT-099 made truncation honest rather than absent. **`gates_signed:` is absent, which means
-> NOT signed** (L-099) — G1/G2 run at `/orchestrator`.
+> _(none — **SPRINT-100 closed 2026-09-13**, 29 of 29 DoD, all five tasks merged. Promote the next
+> sprint from the Backlog below with `/lean-doc-generator promote`.)_
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
 again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 88 rows** (86 open · 2 resolved — TD-141 accepted, TD-132 → TASK-328; TD-154/TD-155 filed at the SPRINT-099 close) — re-derived at
+- **Debt ledger: 92 rows** (84 open · 8 resolved — SPRINT-100 filed TD-156/157/158/159 and resolved TD-086/087/089/097/105/146) — re-derived at
   the SPRINT-099 promote by row header (74 of 84 open are ≥3 sprints unaddressed; 74 aged + 10 unaged
   = 84). Re-derive open/closed and the `severity: high` set
   **by anchoring to the `^- **TD-NNN**` row header** — a bare `grep 'status: open'` over-counts,
@@ -186,6 +182,32 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   lean-flow's, and `check-skill-freshness` is the shape one level over.
       tracker:    TD-150 (severity: high, open) · ADR-041 · L-020 · L-151
       origin:     manual   # filed by hand at the SPRINT-098 promote governance review (severity: high escalation)
+      state:      ready
+
+- [ ] TASK-350 — Route bootstrap failures through a shared emitter, so one-space `FAIL ` lines stop existing  [size: M] [risk: med] [HITL]
+      class:      decision
+      authority:  J2
+      done-when:  No `FAIL ` line in `scripts/` or `evals/` is emitted at a one-space column, and a
+                  selector keyed to the two-space finding column can no longer miss a bootstrap
+                  failure. **27 sites across 15 files**, each a failure emitted *before or outside*
+                  its file's own `bad()`/`ok()`/`gap()` helper — re-derive both figures at build
+                  rather than inheriting them (L-130). The shape of the fix is the decision, not the
+                  edit: a shared `fatal()` in `harness-common.sh` that every bootstrap check calls,
+                  versus teaching each file's helper to be callable before its own setup completes.
+                  A judgment tick on whichever is chosen, and it says so.
+      touches:    `evals/lib/harness-common.sh` (×9) · `scripts/lib/conformance-engine.sh` ·
+                  `check-approval-envelope` · `check-count-claims` · `check-ephemeral-intake` ·
+                  `check-epic-archive` · `check-handoff-state` · `check-layers-completeness` ·
+                  `check-layers-observed` · `check-night-run-rollup` · `check-qa-budget-default` (×4) ·
+                  `check-research-archive` (×2) · `check-review-depth` · `check-verify-reaches` ·
+                  `check-system-verify-block`
+      depends-on: none
+      assumes:    that every one of the 27 is genuinely a bootstrap failure and none is a finding that
+                  merely looks like one. UNCONFIRMED — re-derive per site before rewriting any of them.
+      tracker:    TD-157 (severity: medium, open) · L-186 · L-198
+      origin:     close-retro   # SPRINT-100: surfaced at T4's close, then confirmed live at T5 where
+                                # conformance-engine.sh:54's one-space line left sweep_gate returning
+                                # rc=0 silently on a crashed engine
       state:      ready
 
 ### P2 — Follow-on

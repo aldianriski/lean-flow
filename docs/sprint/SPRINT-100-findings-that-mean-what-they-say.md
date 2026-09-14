@@ -3,10 +3,10 @@ sprint: 100
 slug: findings-that-mean-what-they-say
 owner: Maintainer
 last_updated: 2026-09-13
-status: active
+status: closed
 plan_commit: 7e27c02
 gates_signed: G1,G2 @ 440ff3b
-close_commit: [sha — set at close]
+close_commit: 4785e8b
 update_trigger: sprint execute/close events
 ---
 
@@ -63,13 +63,13 @@ detect L-136**.
 to its target *prunes* it is reported unreachable; and neither verdict rests on the archive exemption.
 
 **DoD:**
-- [ ] **EXISTS** (TD-097): a bare basename resolves against the known script roots (`scripts/`, `scripts/lib/`, `evals/`) before being called absent, and *unresolvable reference* is reported as a **different finding** from *method absent*.
-- [ ] **REACHES** (TD-087): matching is anchored to path boundaries, and a target whose only occurrence sits in an **exclusion idiom** is rejected. Both reproduce today — an exclusion reads `confirmed reachable`, and `src/db` matches `src/dbtools/`.
-- [ ] **The archive exemption becomes a fixture, not an exemption.** Archived Verify clauses hold bare-basename references that would every one of them trip leg (1) — re-derive the count, do not inherit it (L-130). That exemption is why this looked clean for five sprints.
-- [ ] **Pointed at its motivating population, not fixtures alone (L-166 · L-186):** the live corpus reports **0 confirmed targets**, a vacuous pass in the denominator sense (L-156), so a fixture-only proof proves nothing here. Vary the **selection**: a target reached through the archive arm, and a clause naming two methods.
-- [ ] Retained must-FAIL **per leg**, each failing with its **own named finding**, plus a sibling control green in the same run (L-058 · L-142).
-- [ ] **Seeded-break discrimination proof** under ONE stated hash convention (L-169 · L-187).
-- [ ] **Outside reviewer, worktree-isolated** (L-165 · L-168).
+- [x] **EXISTS** (TD-097): a bare basename resolves against the known script roots (`scripts/`, `scripts/lib/`, `evals/`) before being called absent, and *unresolvable reference* is reported as a **different finding** from *method absent*.
+- [x] **REACHES** (TD-087): matching is anchored to path boundaries, and a target whose only occurrence sits in an **exclusion idiom** is rejected. Both reproduce today — an exclusion reads `confirmed reachable`, and `src/db` matches `src/dbtools/`.
+- [x] **The archive exemption becomes a fixture, not an exemption.** Archived Verify clauses hold bare-basename references that would every one of them trip leg (1) — re-derive the count, do not inherit it (L-130). That exemption is why this looked clean for five sprints.
+- [x] **Pointed at its motivating population, not fixtures alone (L-166 · L-186):** the live corpus reports **0 confirmed targets**, a vacuous pass in the denominator sense (L-156), so a fixture-only proof proves nothing here. Vary the **selection**: a target reached through the archive arm, and a clause naming two methods.
+- [x] Retained must-FAIL **per leg**, each failing with its **own named finding**, plus a sibling control green in the same run (L-058 · L-142).
+- [x] **Seeded-break discrimination proof** under ONE stated hash convention (L-169 · L-187).
+- [x] **Outside reviewer, worktree-isolated** (L-165 · L-168).
 
 ### T2 — Normalise checkbox state before diffing § Plan, so ticking a DoD is not an unaccounted Plan edit `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `scripts/lib/conformance-engine.sh` (**both** freeze assertions — `assert_S9_PLANFROZEN` *and* `assert_S9_SCOPECHANGE`; TD-105's Evidence names both findings, and fixing one leaves 8 of its 9 firing — scope-change 2026-09-13) · `evals/run-sprint-family-fixtures.sh` (the git-backed home for the `assert_S9_*` family — scope-change 2026-09-13)
@@ -83,12 +83,12 @@ clear it are to log a `scope-change` that never happened or to leave the close g
 Plan text without logging a `scope-change` still fails.
 
 **DoD:**
-- [ ] § Plan is compared with **checkbox state normalised**, so a tick is not a diff. No normalisation exists anywhere in that file today — re-derive before building (L-091).
-- [ ] A genuine **text** change still demands its `scope-change` entry. The check must keep doing what it was written to do.
-- [ ] **The control fixture is the load-bearing one here, not the must-FAIL** — a fixture that ticks every box and must stay green is the case that is wrong today. Retain both, each failing with its own named finding.
-- [ ] **Pointed at its motivating artifact (L-166):** SPRINT-087's § Plan is byte-identical to its `plan_commit` once checkboxes are normalised — 28 ticks, zero text changes — and still produced `plan-edited-after-freeze` plus 8 × `scope-change-logged-after-plan-edit`, **9 of that run's 17 findings**. Re-derive those figures at build.
-- [ ] **Seeded-break discrimination proof** under ONE stated hash convention (L-169 · L-187).
-- [ ] **Outside reviewer, worktree-isolated** (L-165 · L-168).
+- [x] § Plan is compared with **checkbox state normalised**, so a tick is not a diff. No normalisation exists anywhere in that file today — re-derive before building (L-091).
+- [x] A genuine **text** change still demands its `scope-change` entry. The check must keep doing what it was written to do.
+- [x] **The control fixture is the load-bearing one here, not the must-FAIL** — a fixture that ticks every box and must stay green is the case that is wrong today. Retain both, each failing with its own named finding.
+- [x] **Pointed at its motivating artifact (L-166):** SPRINT-087's § Plan is byte-identical to its `plan_commit` once checkboxes are normalised — 28 ticks, zero text changes — and still produced `plan-edited-after-freeze` plus 8 × `scope-change-logged-after-plan-edit`, **9 of that run's 17 findings**. Re-derive those figures at build.
+- [x] **Seeded-break discrimination proof** under ONE stated hash convention (L-169 · L-187).
+- [x] **Outside reviewer, worktree-isolated** (L-165 · L-168).
 
 ### T3 — Give `check-system-verify-block.sh` a positional link, and point it at live logs `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `evals/lib/check-system-verify-block.sh` · `evals/run-system-verify-fixtures.sh` · `evals/fixtures/system-verify/` · `TECH-DEBT.md` (TD-086's stale Evidence half is corrected, not worked around)
@@ -101,12 +101,12 @@ built to stop it.
 the guard has been shown to reach this repository's own logs.
 
 **DoD:**
-- [ ] `has_close` and `has_ruling` are bound to **their own entry**. They are whole-file greps today with no positional link, so an earlier ruling masks a later unresolved FAIL — reproduced in both orderings at an earlier SPRINT-084 review: `PASS`, exit 0.
-- [ ] **The guard is pointed at live logs.** Every invocation in its harness points at a fixture directory, never at `docs/sprint/logs/`; a guard that has only ever seen `evals/fixtures/` has not been shown to reach this repository (L-166), and its own sibling harness carries that sentence as a comment.
-- [ ] **A two-entry log fixture exists.** The retained fixtures never exercise one — add it, plus a sibling control green in the same run, each failing with its own named finding.
-- [ ] **TD-086's row is corrected where it is stale, not worked around:** its Evidence claims the checker appears nowhere in the gate script, but its harness was registered in `eval_harnesses_always` back at SPRINT-068; and the checker lives at `evals/lib/`, not `scripts/lib/` as its own Summary says. The substance (fixtures only) stands.
-- [ ] **Seeded-break discrimination proof** under ONE stated hash convention (L-169 · L-187).
-- [ ] **Outside reviewer, worktree-isolated** (L-165 · L-168).
+- [x] `has_close` and `has_ruling` are bound to **their own entry**. They are whole-file greps today with no positional link, so an earlier ruling masks a later unresolved FAIL — reproduced in both orderings at an earlier SPRINT-084 review: `PASS`, exit 0.
+- [x] **The guard is pointed at live logs.** Every invocation in its harness points at a fixture directory, never at `docs/sprint/logs/`; a guard that has only ever seen `evals/fixtures/` has not been shown to reach this repository (L-166), and its own sibling harness carries that sentence as a comment.
+- [x] **A two-entry log fixture exists.** The retained fixtures never exercise one — add it, plus a sibling control green in the same run, each failing with its own named finding.
+- [x] **TD-086's row is corrected where it is stale, not worked around:** its Evidence claims the checker appears nowhere in the gate script, but its harness was registered in `eval_harnesses_always` back at SPRINT-068; and the checker lives at `evals/lib/`, not `scripts/lib/` as its own Summary says. The substance (fixtures only) stands.
+- [x] **Seeded-break discrimination proof** under ONE stated hash convention (L-169 · L-187).
+- [x] **Outside reviewer, worktree-isolated** (L-165 · L-168).
 
 ### T4 — Give the conformance engine's informational findings their own token `[size: S · risk: low · class: execution · AFK · J1]`
 Layers: `scripts/qa-check.sh` (leg 2f-ter relay — the distinction is drawn gate-side, where the policy lives; scope-change 2026-09-13) · `evals/run-conformance-engine-fixtures.sh`
@@ -119,12 +119,12 @@ verdict itself — the failure is silent by construction, which is the test ADR-
 which it does not, **without reading `scripts/qa-check.sh`**.
 
 **DoD:**
-- [ ] Informational findings no longer print the same `FAIL ` prefix as gating ones. Today the printed verdict and the visible FAIL lines disagree with nothing marking the difference — `QA-CHECK: 230 pass, 0 fail` over 4 FAIL lines at the SPRINT-097 close.
-- [ ] **The policy is unchanged — only the report.** Which findings gate is untouched; leg 2f-ter keeps its informational dispositions deliberately. A DoD that changes what the verdict *counts* has exceeded this task.
-- [ ] **The pass/fail arithmetic is asserted unchanged** across the change (**A3**): same counts on the same tree before and after, so a report-only change is proven report-only rather than asserted (L-145 — a moved count is a changed gate).
-- [ ] Retained must-FAIL + sibling control: an informational finding and a gating one in the same run are distinguishable from the printed output alone.
-- [ ] **Seeded-break discrimination proof** under ONE stated hash convention (L-169 · L-187).
-- [ ] **Outside reviewer, worktree-isolated** (L-165 · L-168).
+- [x] Informational findings no longer print the same `FAIL ` prefix as gating ones. Today the printed verdict and the visible FAIL lines disagree with nothing marking the difference — `QA-CHECK: 230 pass, 0 fail` over 4 FAIL lines at the SPRINT-097 close.
+- [x] **The policy is unchanged — only the report.** Which findings gate is untouched; leg 2f-ter keeps its informational dispositions deliberately. A DoD that changes what the verdict *counts* has exceeded this task.
+- [x] **The pass/fail arithmetic is asserted unchanged** across the change (**A3**): same counts on the same tree before and after, so a report-only change is proven report-only rather than asserted (L-145 — a moved count is a changed gate).
+- [x] Retained must-FAIL + sibling control: an informational finding and a gating one in the same run are distinguishable from the printed output alone.
+- [x] **Seeded-break discrimination proof** under ONE stated hash convention (L-169 · L-187).
+- [x] **Outside reviewer, worktree-isolated** (L-165 · L-168).
 
 ### T5 — Widen the conformance-coverage sweep's matcher, then re-run Round 4 `[size: S · risk: low · class: execution · HITL · J2]`
 Layers: `docs/research/conformance-coverage.md` · `docs/research/logs/conformance-coverage.md` · `evals/run-foreign-repo-fixtures.sh`
@@ -196,12 +196,63 @@ merely re-written.
 
 ## Retro
 
-**Retrieval check** —
+**Retrieval check** — The rules that fired did so because an *instrument* fired them, not because
+anyone recalled them. L-186 (population blindness) was cited in T5's own dispatch brief and still did
+not stop the builder from anchoring a new detector at two spaces while a one-space emission existed in
+the file it swept; the isolated reviewer found it. L-198 was applied deliberately three times and
+earned its keep each time — most sharply when a second reader re-derived `38` against this
+coordinator's `43` and exposed a population change mid-sentence, **inside the round whose subject is
+matchers blind to populations**. L-170's contamination trap fired **three** times in one session
+(`TD-9xx`, `L-999`, `TASK-905`–`908`), which is the strongest evidence yet that id-derivation still
+feels like bookkeeping rather than querying. The one rule that reached nobody until the gate said so:
+recording the `review ·` line is a separate act from doing the review, and two of five tasks skipped it.
 
-**Cost** —
+**Cost** — Five tasks, four waves, ~29 DoD. Two full gate runs at the close (one red, one green) at
+~9 min each. Four dispatched agents (two builders' rounds, one worktree-isolated adversarial reviewer,
+one prose reviewer) plus two historical engine runs against checked-out trees. The expensive part was
+not building; it was **verifying**, and every hour of it returned a defect.
 
 **Worked**
 
+- **The isolated adversarial review is now unambiguously load-bearing.** Across this sprint, *every*
+  guard defect was found by an independent pass or a disagreeing second number, and **none** by
+  recalling the governing rule, which was loaded and on screen each time. T1's reviewer caught a real
+  regression; T3's caught a self-contradiction; T4's second reviewer found the finding that became
+  TD-157; T5's found two, one of which left a gate silently clean on a crashed engine.
+- **Tier declaration as a live decision rather than a label.** T5 was promoted Tier P on a defensible
+  reading (its subject is research prose) that turned out false the moment the work started — the
+  matcher lives in an eval harness. Re-tiering on discovery cost one ruling and bought the seeded-break
+  proof and the isolated review that then found the one-space hole.
+- **Ticking a DoD stopped being a scope change, and the proof arrived for free.** T2's fix was
+  confirmed not by its own fixtures but by this sprint's own close: 29 boxes ticked, gate green,
+  `S9.SCOPECHANGE` silent. The consumer-path check (L-016) that the repo usually has to construct.
+- **Refusing to invent a mechanism.** T5's reviewer found 8 sites emitting prose where a path is
+  expected; the fix would have been a path-vs-prose heuristic inside a guard whose purpose is not to
+  lie. Filed as TD-156 instead, with the reason on the record.
+
 **Friction**
 
+- **Two tasks shipped a defect their own green suite could not show** (T2's Acceptance gap, T5's
+  one-space hole). Both were found by an instrument built *outside* the task's declared scope. A green
+  suite scoped to what the author declared is not evidence about what sits between declarations.
+- **A review was very nearly performed against the wrong artifact** — the coordinator dispatched an
+  isolated reviewer at a branch ref whose tip equalled `main`, because the builder had correctly been
+  told not to commit. Caught by the *other* reviewer. → L-200.
+- **A figure blocked a DoD box for two sprints because it named no commit.** TD-105's `9 of 17` cost a
+  parked criterion; re-derived here, the 9 is exact and the 17 exists at no commit. → L-201.
+- **The close's own gate found governance silence the humans-plus-agents did not** — T2 and T5 both
+  merged without a `review ·` line, in both cases over a review that genuinely happened.
+- **`run-sprint-family-fixtures.sh` (~67 full-repo engine walks) could not be run to completion on this
+  host**, three kills; the §9 evidence came from a scoped runner and the integrated gate instead.
+
 **Pattern candidate** (surface to user → `docs/LEARNINGS.md`)
+
+Both filed at this close:
+- **`L-200`** — hand a dispatched reviewer a **content assertion**, never only a path or a ref; a
+  ref-based handoff of uncommitted work is silently empty and every downstream proof then certifies
+  the wrong file.
+- **`L-201`** — a count frozen into a durable artifact must **name the commit it was taken at**, and a
+  *ratio* freezes two numbers of which usually only one belongs to the defect.
+
+Neither is promoted yet (`count: 1` each). L-201 sits beside the cross-check family already promoted
+into CLAUDE.md; L-200 belongs with the dispatch rules if it recurs.

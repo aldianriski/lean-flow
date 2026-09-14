@@ -670,3 +670,147 @@ T4 each got their `review ·` line at merge; T2 and T5 did not, and in both case
 real and thorough. The failure mode is not laziness — it is that *writing the record* is a separate act
 from *doing the thing*, and the second one feels like it discharges the first. That is the same shape
 as this sprint's whole theme, one level up: a report that does not say what actually happened.
+
+### 2026-09-13 | progress | DoD audit for T1–T4 — 24 of 25 ticked against per-box evidence, 1 left open
+
+**Why this entry exists.** T1–T4 merged and were independently verified, but none of their 25 DoD
+boxes was ticked. Owner directed an audit rather than a bulk tick (AskUserQuestion, 2026-09-13): read
+each criterion against its own evidence, tick only what the record supports, and leave anything it
+does not. The evidence is recorded **here**, not as annotations inside § Plan, so the Plan edit that
+follows is a **pure checkbox change** — the exact case T2's normalisation makes safe, and therefore
+no `scope-change` entry is owed for it. This entry lands before the ticks, per this file's header.
+
+**T1 — 7 of 7 ticked.** Harness re-run by the coordinator at audit time: **17 fixtures, all green**
+(`VERIFY-REACHES FIXTURES: all green`, read from its own verdict line).
+- *EXISTS / distinct finding* — `basename-resolves-passes` · `basename-unresolvable-fails` →
+  `verify-method-unresolvable`, distinct from `method-absent-fails` → `verify-method-absent`. The two
+  findings are separate strings, which is what the criterion asks.
+- *REACHES / boundaries + exclusion* — `exclusion-idiom-fails` and `prefix-collision-fails`, the two
+  shapes the criterion names (an exclusion reading as reachable; `src/db` matching `src/dbtools/`),
+  each with its own passing control. *Noted:* the discrimination seed exercised the exclusion arm; the
+  prefix-collision arm rests on its retained pair, not on a separate seeded break.
+- *Archive exemption → fixture* — `archive-arm-basename-skipped`, and the count re-derived to **9**,
+  settled empirically against the unfixed checker over all 31 archived Verify-bearing sprints, with
+  the breakdown itemised. The contest resolved **against** the coordinator's cross-check.
+- *Motivating population, selection varied* — `archive-arm-basename-skipped` (the archive arm) and
+  `two-method-clause-passes` (a clause naming two methods): exactly the two the criterion specifies.
+- *Must-FAIL per leg + sibling control* — satisfied on both legs, per the pairs above.
+- *Seeded break, one convention* — `git hash-object` vs `git rev-parse <ref>:<path>`, `98fdea1` both
+  sides; landed, parsed, targeted (238/238 lines, 1/1 `bad(` sites), reddened alone with its sibling
+  green.
+- *Outside reviewer, worktree-isolated* — dispatched, and it caught a real regression (the
+  `$VAR/literal/path` idiom) before merge.
+
+**T2 — 5 of 6 ticked, 1 left OPEN.** Evidence for this task lives in its two commit bodies
+(`49b027c`, `804308a`) rather than in a log entry, which is why the audit had to read the commits.
+- *Normalised comparison* — `_norm_dod_checkbox` on both sides of `assert_S9_PLANFROZEN`, extended to
+  both of `assert_S9_SCOPECHANGE`'s comparison lines. Ticked.
+- *A genuine text change still demands its entry* — proven on a two-fixture A/B: tick-only → no
+  finding; genuine text edit with no scope-change entry → **both** findings still fire. Ticked.
+- *Control fixture load-bearing, both retained with own findings* —
+  `s9-plan-frozen-tick-only-control`, `s9-scope-change-tick-only-control`, must-FAIL
+  `s9-scope-change-after-edit`. Ticked.
+- *Seeded break, one convention* — `git hash-object` (stated once, chosen because the content was
+  uncommitted); landed, parsed, targeted (3167/3167 lines, 45/45 `assert_` fns), scoped to SCOPECHANGE
+  alone; `s9-scope-change-tick-only-control` reddened while T2's own control stayed green and the
+  must-FAIL still fired; restored byte-identical. Ticked.
+- *Outside reviewer, worktree-isolated* — dispatched. Ticked.
+- **LEFT OPEN — *pointed at its motivating artifact*.** The criterion names SPRINT-087's figures and
+  says *re-derive those figures at build*: 28 ticks, zero text changes, `plan-edited-after-freeze`
+  plus 8 × `scope-change-logged-after-plan-edit`, **9 of that run's 17 findings**. T2 derived the
+  **1 + 8 = 9** split and said plainly it could not reproduce the **17** without a historical engine
+  run against a checked-out tree. Wave 1 recorded that as an explicit carry-forward with the words
+  *"it must not read at close as if it had been verified"*. Ticking it would do precisely that. Left
+  open for an owner ruling (ADR-021: surface, never tick past quietly).
+
+**T3 — 6 of 6 ticked.**
+- *Positional binding* — `has_close`/`has_ruling` bound to each `system-verify ·` occurrence's own
+  window. The agent **reproduced the masking bug before fixing it**, in both orderings, against the
+  unpatched checker (`PASS`, exit 0 both times), so its fixture is written against observed behaviour
+  rather than the debt row's description of it.
+- *Pointed at live logs* — harness gained a leg over `docs/sprint/logs/*.md`; it runs and reports.
+- *Two-entry fixture + control* — `second-entry-unruled-fails` / `second-entry-ruled-passes`.
+- *TD-086 corrected where stale* — both stale clauses fixed; the audit also found the SPRINT-097 T1
+  clause was itself wrong when added, verified against the row as filed (`9ed3fae`).
+- *Seeded break, one convention* — `git hash-object` vs `git rev-parse`, `858ef66` both sides. **Two
+  seeds were rejected before one qualified** (one never landed — `cmp` byte-identical; one failed
+  `sh -n`), which is the guarding-the-seed bar doing its job rather than a formality.
+- *Outside reviewer, worktree-isolated* — dispatched; caught a self-contradiction in the TD-086 edit
+  before the coordinator saw it.
+
+**T4 — 6 of 6 ticked.**
+- *Informational findings carry their own token* — leg 2f-ter builds a separate `ce_out_display`; a
+  FAIL this gate does not fold into its tally prints as `INFO`.
+- *Policy unchanged, report only* — the fold-in greps read the unmodified `$ce_out`;
+  `conformance-engine.sh` and `conformance.sh` are at **zero diff**, so the ADR-027 consumer contract
+  is untouched.
+- *A3 asserted, not assumed* — `ce-relay-tally-unchanged` holds `pass=2 fail=2` across the change,
+  and every `ce_out` reader in the file was read.
+- *Must-FAIL + control, distinguishable from printed output alone* —
+  `ce-relay-informational-fail-prints-info` plus `ce-relay-engine-error-not-relabelled` and its
+  control, the latter added in round 2 after the coordinator found the relabel was turning the
+  engine's four setup-failure classes into `INFO`.
+- *Seeded break, one convention* — `git hash-object` vs `git rev-parse`, `7584abb` both sides; exactly
+  one case reddened, all five siblings green.
+- *Outside reviewer, worktree-isolated* — two of them.
+
+**A live confirmation of T2's Acceptance, obtained incidentally and worth recording.** T5's commit
+ticked 4 DoD boxes — a real § Plan checkbox edit on this very sprint — and the full gate run
+immediately after printed **`QA-CHECK: 220 pass, 0 fail`** with `S9.SCOPECHANGE` silent. T2's fix is
+therefore confirmed on the artifact it was written for, not only on fixtures. That is the consumer-path
+check (L-016) arriving for free, and it is stronger evidence than either of T2's own harnesses.
+
+**What this audit did not do.** It did not re-run T2's or T4's full harnesses at audit time. T1's and
+T3's were re-run; `evals/run-sprint-family-fixtures.sh` (~67 full-repo engine walks) is the suite this
+host has killed three times for memory, which is already a filed close-time debt. The whole-tree
+evidence used instead is the integrated gate run above — 220 pass, 0 fail — which exercises both.
+
+### 2026-09-13 | progress | TD-105's denominator re-derived historically — the 9 reproduces exactly, the 17 does not exist at any measured point
+
+**What was open.** T2's DoD 4 asks that SPRINT-087's figures be **re-derived at build**:
+*"28 ticks, zero text changes, `plan-edited-after-freeze` plus 8 × `scope-change-logged-after-plan-edit`,
+**9 of that run's 17 findings**."* T2 derived the **1 + 8 = 9** split and said plainly it could not
+reproduce the **17** without a historical engine run against a checked-out tree. Wave 1 carried that
+forward with the words *"it must not read at close as if it had been verified"*, so the box was left
+unticked at the DoD audit rather than waved through.
+
+**The run T2 could not do, done.** A detached worktree was created **outside the repository** (in the
+session scratchpad, so the engine's known walk into `.claude/worktrees/` could not contaminate
+anything) at two historical commits, and **each tree's own engine** was run against **that same tree** —
+the historical engine, not today's, because the figure was produced by the engine of the day:
+
+| Commit | What it is | SPRINT-087 state | `plan-edited-after-freeze` | `scope-change-logged-after-plan-edit` | **total FAIL** | GAP | FAIL+GAP |
+|---|---|---|---|---|---|---|---|
+| `c7687d3` | *"correct TD-105 — informational, not blocking; gate is 210/2"* — the commit that records the row's own gate figure | live, DoD ticked | 1 | 8 | **10** | 6 | 16 |
+| `e3decef` | `sprint(087): close` | live, closing | 1 | 8 | **13** | 6 | 19 |
+
+**The numerator reproduces exactly, at both commits.** `1 + 8 = 9`, with the finding names and the
+per-tick-commit multiplicity precisely as TD-105 records them. That is the figure T2's fix was built
+against, and it holds — which is the half that was load-bearing.
+
+**The denominator does not reproduce, and cannot: it is not a fixed quantity.** It reads **10** at the
+TD-105 correction commit and **13** two commits later, and the four lines that arrive in between are
+all close-in-progress artifacts — `closed-sprint-not-archived` · `changelog-not-rotated-at-minor` ·
+`retro-bucket-unrouted` · `dod-criterion-names-no-check`. `FAIL+GAP` moves 16 → 19 over the same span
+and therefore passes **through 17** somewhere inside the close, which is the likeliest origin of the
+row's figure. Not asserted as the answer: no commit measured here yields 17 by any selector tried.
+
+**The finding, which is worth more than the number.** `9 of that run's 17` is a **ratio frozen against
+a moving denominator**. The numerator is a property of the defect; the denominator is a property of
+*when during a close someone happened to look*. Recording them as a ratio makes a stable fact look
+contingent and an incidental fact look load-bearing — and it is unfalsifiable after the fact, because
+"that run" names no commit. This is the sprint's own theme landing on a debt row: **a figure that does
+not mean what it says**. The lesson is not "the row was wrong" — its substance and its numerator are
+both right — but that **a count entering a frozen artifact should name the commit it was taken at**,
+or it cannot be re-derived by anyone, which is precisely what stalled this box for two sprints.
+
+**Disposition — ticked as re-derived-and-corrected, not as satisfied.** The criterion asked for a
+re-derivation and got one: the 9 confirmed, the 17 refuted with two measurements and an explanation of
+why no single value exists. This applies the standing ruling the owner gave for T5's DoD 1 earlier
+today — *tick on the re-derived numbers and record the premise as corrected* (L-088: never re-read the
+words to fit what was built; never round a measurement to meet a stated figure). **Surfaced rather
+than absorbed**, so the owner can reverse it: nothing here depends on the denominator, and if the
+preference is to leave the box open until 17 is located, the tick comes back off at no cost to T2's fix.
+
+**TD-105's row is corrected at close**, alongside TD-089's: the `9 of the run's 17 FAILs` clause gains
+the commit-anchored figures above. `TECH-DEBT.md` is outside T2's and T5's `Layers:` either way.
