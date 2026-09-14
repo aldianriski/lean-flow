@@ -117,9 +117,9 @@ the file moved at the SPRINT-096 close and the real path is the one in `Layers:`
 SPRINT-094's satisfied parked ruling is ticked or withdrawn.
 
 **DoD:**
-- [ ] TD-051 no longer cites `Line 225` for `scripts/lib/check-layers-observed.sh`'s subject-sprint `*/archive/*` skip; the figure is **derived at the point of use**, never copied from the entry (L-130). — *Verify: `grep -n 'Line 225' TECH-DEBT.md` returns nothing*
-- [ ] SPRINT-094's parked-ruling checkbox (*"archiving SPRINT-092 and SPRINT-093"*, line 187) is ticked or withdrawn — the ruling was taken at the SPRINT-096 promote and both sprints are archived, so the item is satisfied and reads as outstanding.
-- [ ] The structure around each edit is **re-read whole** afterwards — a list-entry edit can fuse neighbouring entries while grep and line caps stay clean (L-009).
+- [x] TD-051 no longer cites `Line 225` for `scripts/lib/check-layers-observed.sh`'s subject-sprint `*/archive/*` skip; the figure is **derived at the point of use**, never copied from the entry (L-130). — *Verify: `grep -n 'Line 225' TECH-DEBT.md` returns nothing*
+- [x] SPRINT-094's parked-ruling checkbox (*"archiving SPRINT-092 and SPRINT-093"*, line 187) is ticked or withdrawn — the ruling was taken at the SPRINT-096 promote and both sprints are archived, so the item is satisfied and reads as outstanding.
+- [x] The structure around each edit is **re-read whole** afterwards — a list-entry edit can fuse neighbouring entries while grep and line caps stay clean (L-009).
 
 ## Owner-action checklist
 - [ ] **Sign the ten-dimension `approval_envelope:` at G2** and record it in this sprint's frontmatter — goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions, `@ <sha>`. **This is T1's blocker and nothing else's.** SPRINT-098 T4 parked precisely here; an omitted dimension is a dimension the envelope can silently widen along.
