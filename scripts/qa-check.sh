@@ -1099,7 +1099,11 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # Costed rather than assumed: ~2.1s, cheaper than thirteen harnesses already in this set. It
 # touches git but does not BUILD repos in the TD-016 sense -- one `git init`, ~95ms, no commit
 # (an inited-but-empty repo already answers `rev-parse --git-dir`, which is the whole probe).
-eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-handoff-state-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-s4-ts-evaluators.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh run-night-run-gate-exception-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-night-run-outcome-fixtures.sh"
+# run-dod-delta-fixtures.sh (SPRINT-101 T3, TASK-326) joins the always-on set by the cheap-and-
+# git-free rule: it is a `bun test` wrapper over in-memory fixtures (see evals/dod-delta.test.ts), no
+# git, no mktemp, no repos built -- measured well under 1s on this host, the same shape
+# run-s4-ts-evaluators.sh already takes for a TS-evaluator leg.
+eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-handoff-state-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-s4-ts-evaluators.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh run-night-run-gate-exception-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-night-run-outcome-fixtures.sh run-dod-delta-fixtures.sh"
 # run-s4-differential-parity.sh (SPRINT-092 T3) joins the opt-in set by the cost rule, and it is the
 # OTHER half of T2's swap: the row-by-row comparison of the TS evaluators against a LIVE Shell oracle,
 # which needs a real engine spawn per row and is exactly the 20+s taken off the default profile.
@@ -1392,6 +1396,38 @@ else
       lo_find=$(printf '%s\n' "$lo_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
       [ -n "$lo_find" ] || lo_find="no FAIL line in output -- checker exited $lo_code without reporting one"
       bad "layers observed: $lo_find"
+    fi
+  fi
+fi
+
+# --- 16. HEAD's claimed DoD delta vs the ticks it actually made (SPRINT-101 T3, TASK-326) ---------
+# SPRINT-094's 6a6aeac claimed "5 of 6 DoD" for T1 -- an internally consistent claim for T1 alone --
+# while the SAME commit also ticked one DoD box each in T2's and T3's blocks, neither of which its
+# subject named. Every leg above stayed clean: line caps unchanged, no grep tripped, the commit body
+# itself said "5 of 6". This leg delegates to scripts/lib/check-dod-delta.ts (TypeScript run by Bun,
+# per the owner ruling recorded in SPRINT-101 T3 -- not POSIX sh like its siblings), covered by
+# evals/run-dod-delta-fixtures.sh in the always-on set above.
+#
+# Checks HEAD only, on the same reasoning as the rest of this gate's commit-scoped legs: this repo's
+# own workflow runs the gate right after each commit, so the commit under review at gate time is the
+# one at HEAD (L-120 -- read the artifact this run was pointed at, not a historical range nobody asked
+# about). A commit whose subject is not `sprint(NNN) T<n>:` (a coordinator commit, an unscoped
+# multi-task token, or no sprint at all) is exempt by role, mirroring check-layers-observed.sh's own
+# COORD exemption -- printed via `note`, never silently absent (L-020).
+if ! command -v bun >/dev/null 2>&1; then
+  bad "dod-delta: bun not found on PATH -- cannot run scripts/lib/check-dod-delta.ts. This FAILS rather than skipping on purpose, same rule as the typecheck leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
+else
+  dd_script="scripts/lib/check-dod-delta.ts"
+  if [ ! -f "$dd_script" ]; then
+    bad "dod-delta: checker not found at $dd_script"
+  else
+    dd_out=$(bun "$dd_script" "$ROOT" HEAD 2>&1); dd_code=$?
+    if [ "$dd_code" -eq 0 ]; then
+      ok "$(printf '%s\n' "$dd_out" | sed -E 's/^PASS +//')"
+    else
+      dd_find=$(printf '%s\n' "$dd_out" | grep -E '^FAIL' | sed -E 's/^FAIL +//' | tr '\n' ';' | sed 's/;$//')
+      [ -n "$dd_find" ] || dd_find="no FAIL line in output -- checker exited $dd_code without reporting one -- output: $(printf '%s' "$dd_out" | tr '\n' ' ' | cut -c1-200)"
+      bad "dod-delta: $dd_find"
     fi
   fi
 fi
