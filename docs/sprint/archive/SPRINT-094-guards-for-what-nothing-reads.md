@@ -184,11 +184,12 @@ Cites: SPRINT-092 close (18 worktrees / 178 MB removed, their branches were not)
       optional trimming: without it an UNKNOWN status in the no-sprint case would have to be assumed
       `spent`, which is the silent-loss shape T2 exists to close. The circular headless-park answer was
       explicitly not inherited. Recorded in the Execution Log's promote entry, not only here
-- [ ] **Ruling still outstanding from this promote (not a blocker for T1–T4):** archiving SPRINT-092
+- [x] **Ruling still outstanding from this promote (not a blocker for T1–T4):** archiving SPRINT-092
       and SPRINT-093. Parked by owner ruling; they share `plan_commit: c52496f`, so it is archive both
       together or measure again — archiving one dropped its number from the other's trusted-sibling
       list, which re-attributed one sprint's history to the other (214 pass / 0 fail in place vs
-      202 pass / 1 fail archived). `TD-125` · `TASK-298`
+      202 pass / 1 fail archived). `TD-125` · `TASK-298` — **satisfied at SPRINT-096 promote** (both
+      sprints archived as a pair).
       <!-- STATED CAUSE CORRECTED and the ruling TAKEN (SPRINT-096 T2). This item read
            "`check-layers-observed.sh:397` drops `*/archive/*` from the sibling list `:429` uses".
            Wrong mechanism and a stale line number: deleting that filter changes nothing (85 blamed

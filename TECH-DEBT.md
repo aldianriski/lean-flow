@@ -2822,11 +2822,12 @@ status: current
 
 - **TD-051** severity: medium | status: open | created: Sprint-061
   - Summary: **`check-layers-observed.sh` (gate leg 15) never sees a close commit, because the close
-    commit is also the archival commit.** Line 225 skips any sprint file under `*/archive/*`, and its
-    comment states the precondition that makes that safe: *"A closed sprint leaves `docs/sprint/` in
-    §11's retention commit, which is separate from and later than the close commit, so the close
-    commit itself stays covered."* That precondition is false. `/lean-doc-generator close` performs
-    §11 archival and the squash-commit as one step, and the last three closes all did — verified by
+    commit is also the archival commit.** The `lf_is_archived_path` predicate skips any archived sprint
+    file, and its comment states the precondition that makes that safe: *"A closed sprint leaves
+    `docs/sprint/` in §11's retention commit, which is separate from and later than the close
+    commit, so the close commit itself stays covered."* That precondition is false.
+    `/lean-doc-generator close` performs §11 archival and the squash-commit as one step, and the
+    last three closes all did — verified by
     `git show --name-status` on `afd693d` (SPRINT-060), `0b4e06a` (SPRINT-059) and this sprint's
     `2f90504`, each carrying the `R` rename into `archive/` inside the close commit itself.
   - Impact: the blind spot lands on the **largest and least task-like commit of every sprint** — the
