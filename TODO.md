@@ -23,9 +23,11 @@ status: current
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
 again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 92 rows** (84 open · 8 resolved — SPRINT-100 filed TD-156/157/158/159 and resolved TD-086/087/089/097/105/146) — re-derived at
-  the SPRINT-099 promote by row header (74 of 84 open are ≥3 sprints unaddressed; 74 aged + 10 unaged
-  = 84). Re-derive open/closed and the `severity: high` set
+- **Debt ledger: 92 rows** (84 open · 8 resolved) — re-derived at the SPRINT-100 close by row header,
+  where SPRINT-100 filed TD-156/157/158/159 and resolved TD-086/087/089/097/105/146. The aging
+  breakdown that used to sit here was SPRINT-099's and is deliberately not carried forward: four rows
+  were added and five resolved since, so it no longer describes this ledger. Re-derive open/closed and
+  the `severity: high` set
   **by anchoring to the `^- **TD-NNN**` row header** — a bare `grep 'status: open'` over-counts,
   because rows quote their own status strings in prose (L-108). Aging figures are derived at each
   promote, never read from here (L-097 · L-130).
@@ -33,18 +35,22 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
   completion four times and printed a verdict every time, ending `QA-CHECK: 230 pass, 0 fail`. The
   previous note here ("cannot currently verdict") was written after SPRINT-096's memory kill and was
   stale; it is replaced rather than annotated, because a standing fact that is false is worse than
-  **`qa-budget-default` compared the *configured* budget to the ceiling rather than actual runtime
-  (TD-128) until SPRINT-099 T2 added the missing reader** — the gate now asserts its ACTUAL runtime
-  against the 600s ceiling on every run, and prints a third outcome when it truncates, so a
+  absent. **`qa-budget-default` compared the *configured* budget to the ceiling rather than actual
+  runtime (TD-128) until SPRINT-099 T2 added the missing reader** — the gate now asserts its ACTUAL
+  runtime against the 600s ceiling on every run, and prints a third outcome when it truncates, so a
   truncated run is no longer byte-indistinguishable from an ordinary red gate.
-  `QA_BUDGET_SECONDS` stays at 520.
-  read the FAIL-line count as the verdict:** the run above printed `0 fail` over **4** `FAIL` lines,
-  all from the conformance engine, which leg 2f-ter keeps deliberately informational (**TD-146**).
-  The number to act on is the one the gate prints (L-120).
+  `QA_BUDGET_SECONDS` stays at 520. **What a close must not do is
+  read the FAIL-line count as the verdict:** at the SPRINT-097 close the gate printed `0 fail` over
+  **4** `FAIL` lines, all from the conformance engine, which leg 2f-ter keeps deliberately
+  informational. **SPRINT-100 T4 removed that particular trap** (TD-146, resolved): a finding this
+  gate does not fold into its tally now prints as `INFO`, so the visible tokens and the printed
+  verdict no longer disagree with nothing marking the difference. The rule is unchanged and is the
+  durable part — the number to act on is the one the gate prints (L-120).
 - **Backlog ranking** is `/triage`'s output, not this block's: tiers P0–P3 below are the record.
-- **This file knowingly exceeds §2's 320-line soft cap** (~586 at the SPRINT-097 close) and the gate
-  reports it every run. Ruled at that close's `/triage` rather than left as neglect: the overage is
-  **task specification, not narrative** — 18 tasks averaging ~32 lines, almost all of it multi-clause
+- **This file knowingly exceeds §2's 320-line soft cap** (~586 at the SPRINT-097 close; **433 at the
+  SPRINT-100 close**, after five shipped tasks were pruned) and the gate reports it every run. Ruled
+  at that close's `/triage` rather than left as neglect: the overage is
+  **task specification, not narrative** — then 18 tasks averaging ~32 lines, almost all of it multi-clause
   `done-when:` and `tracker:` blocks. That density is the point, because it is what lets a task be
   promoted without re-litigating it, and L-008's remedy (collapse duplicated prose to pointers) has
   already been applied — the only narrative block left was collapsed at this close. Closing the
