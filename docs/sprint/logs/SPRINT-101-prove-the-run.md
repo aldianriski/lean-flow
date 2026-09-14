@@ -152,3 +152,38 @@ right there, guarding the env-inheritance trap that once produced a red gate on 
 two wrong diagnoses. And a red gate is not automatically fatal: `gate_exceptions:` admits named,
 pinned, pre-recorded exceptions with no `--force` anywhere (night-run.md Part 1a step 4c), which is
 the sanctioned route if a known-unrelated FAIL is still standing at launch.
+
+### 2026-09-14 | progress | T3 merged at 825bb7a, then reviewed — six findings, all population-level
+review · T3 · outside-reviewer-worktree-isolated · behaviour:material · governance:high
+Guard: `scripts/lib/check-dod-delta.ts` (340 lines, TS/Bun per the owner ruling) + `dod-delta.test.ts`
++ `run-dod-delta-fixtures.sh` + four retained fixtures, registered in `eval_harnesses_always` and
+`qa-check.sh` leg 16. Suite 18/18; harness green bare.
+
+**Coordinator verification before the review, not on the builder's word.** Content assertion holds —
+`attributeClaim("sprint(094) T1: … 5 of 6 DoD", null)` → `{kind:"task",sprint:"094",task:"T1"}`, which
+is the motivating commit entering through the `sprint(NNN) T<n>:` arm the naive `^sprint\([0-9]+\):`
+would have missed. DoD 5 re-proved with an **independent** break — inverting the foreign-tick filter
+`!==`→`===` rather than the author's early-return — which reddened `must-fail-6a6aeac` *and*
+`sibling-control` while both population fixtures stayed green: a verdict-logic break hitting verdict
+cases and not selection cases, which is the correct signature. Pristine
+`0addaf1a…d5f1e` restored byte-identical under `git show <ref>:<path> | sha256sum`, tree clean.
+
+**The review found six defects and every one is in the SET, not the branches** — the distinction
+L-186 exists for, arriving on its own first application here. Four CONFIRMED (all re-verified by the
+coordinator): the `Task:` trailer is dropped unless the subject is `sprint(`/`merge(`-prefixed, so the
+most explicit attribution signal available is the one discarded; leg 16 reads **HEAD only** while the
+sibling it ports attribution from iterates `plan_commit..HEAD`, and **this sprint disproves the
+premise its comment rests on** — four commits sit behind HEAD right now and none would be examined;
+letter-suffixed subtasks (`T2a`, four real SPRINT-038 commits, one ticking three DoD boxes) fall
+through to `unscoped` under a note that misattributes the skip to DoD 1's narrowing; and **5 of 5**
+`checkDodDelta` calls pass `taskTrailer = null`, so rule 1 is never exercised end-to-end and rule 4
+(64 real subjects) is untested at any level. Two PLAUSIBLE: line 277's archive preference is a
+case-sensitive substring test on a Windows host — the un-normalized shape SPRINT-099 T3 removed from
+ten checkers, and the builder's report said "no duplication made", which does not describe that line;
+and `newContent` lacks the try/catch its `oldContent` sibling has.
+
+**Not one of these was reachable from inside.** Fixtures are written against the shape the detector
+reads and seeded breaks are drawn from branches that exist, so both instruments sat inside the set —
+as did the coordinator, who had read the artifact closely enough by then to be nearer author than
+reviewer. L-165 held exactly as written: the governing rule was loaded and on screen throughout, and
+found none of it; an independent pass found all of it. One bounded retry dispatched.
