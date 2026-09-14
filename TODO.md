@@ -16,8 +16,13 @@ status: current
 
 ## Active Sprint
 
-> _(none — **SPRINT-100 closed 2026-09-14**, 29 of 29 DoD, all five tasks merged. Promote the next
-> sprint from the Backlog below with `/lean-doc-generator promote`.)_
+> **SPRINT-101 — Prove the Run** → [docs/sprint/SPRINT-101-prove-the-run.md](docs/sprint/SPRINT-101-prove-the-run.md)
+>
+> `epic: EPIC-015` · promoted 2026-09-14 · four tasks — `TASK-319` + `TASK-188` (paired per the
+> SPRINT-097 `/triage` ruling) fire and claim the real unattended run § Closed-when 1 has waited three
+> sprints for; `TASK-326` + `TASK-335` are the honest AFK/`J1` work that keeps the Plan from being
+> all-`J2`, which pre-flight item 3 refuses outright. **T1 is blocked on the ten-dimension
+> `approval_envelope:` being signed at G2** — its absence is exactly what parked SPRINT-098 T4.
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
