@@ -71,7 +71,7 @@ reddens.
 
 **DoD:**
 - [x] All three parse a real count — *Verify: `sh evals/run-dod-delta-fixtures.sh` prints `48 tests`, not `0`* ✓ re-run by the coordinator: `48 tests` · `87 tests` (and `21 tests` by the builder on the opt-in differential leg)
-- [x] The population is **re-derived**, not inherited: every harness parsing Bun output is checked, not only the three that FAILed (L-186) — *Verify: the derivation is shown, with its cross-check varying the selection (L-198)* ✓ Q1 parse-shape grep → 3; Q2 `bun test`-invocation grep → 4, reconciled to 3 (`qa-check.sh`'s two hits are comment prose, confirmed by `grep -v '^\s*#'` returning nothing)
+- [x] The population is **re-derived**, not inherited: every harness parsing Bun output is checked, not only the three that FAILed (L-186) — *Verify: the derivation is shown, with its cross-check varying the selection (L-198)* ✓ Q1 parse-shape grep → 3; Q2 `bun test`-invocation grep → 4, reconciled to 3 (the gate script's two hits are comment prose, confirmed by `grep -v '^\s*#'` returning nothing)
 - [~] Retained must-FAIL: a dropped `describe` still trips the count floor — stripping colour must not defeat the guard it feeds — *Verify: the fixture reddens* — **NOT retained; proven live and reverted.** The harness wraps real production test files rather than a fixtures dir, so retaining one means a permanently-broken shipped test or new `.sh` scaffolding. Accepted as a judgement and filed as **TD-165** with the residual risk named. Flagged by the builder, not discovered in review
 - [x] Sibling control stays green in the same run ✓ `run-s4-ts-evaluators` green while `run-dod-delta` reddened, same pass — coordinator-reproduced
 - [x] Seeded-break discrimination proof under ONE stated hash convention (L-142 · L-169) ✓ convention: `git hash-object <path>` vs `git rev-parse HEAD:<path>`, used throughout. Seed landed (hash moved) and was *targeted* (569 lines unchanged, 72 `expect(` unchanged). **Reddened on the REAL count — `only 47 test(s) ran`, not the old stuck-at-0** — which is what proves the fix holds on a red run. Restore verified byte-identical
@@ -79,7 +79,7 @@ reddens.
 ### T3 — Correct the pre-flight item 3 criterion, and require `gates_signed:` with it `[size: S · risk: low · class: execution · HITL · J2]`
 Layers: `TODO.md` (TASK-319 row) · the vehicle sprint's `approval_envelope:` design wording
 Depends-on: none
-Cites: `skills/orchestrator/references/night-run.md:295` · TD-109 · TD-164 · L-111
+Cites: `skills/orchestrator/references/night-run.md:295` · TD-109 · TD-164 · L-111 · **SPRINT-057 T5** (a different sprint's T5 — where pre-flight item 4 was introduced; cited, never depended on)
 
 Three sprints were designed against *"the seeded Plan is **not all-J2**"*, while item 3 requires
 *"**every** task declared `J0` or `J1` — a declared `J2` **FAILS** this item."* A Plan that is merely
@@ -109,8 +109,8 @@ silently exempt. Proposed by its own builder when asked to report rather than bu
 **Acceptance:** a subject in a shape no current arm admits reddens, naming the subject.
 
 **DoD:**
-- [ ] An unmatched task-shaped subject FAILs and names itself
-- [ ] Fixture: such a subject reddens, with a genuine coordinator subject staying green in the same run
+- [x] An unmatched task-shaped subject FAILs and names itself ✓ new Rule 7 in `attributeClaim`, between Rule 6a and the `coord` fallback; returns `{kind:"unmatched-shape"}` and `checkDodDelta` FAILs naming the subject verbatim. Preserves rules 5/6a's *examined* refusals (adjacent `+combined` token · a qualifier naming a second task) — those are deliberate, not silent gaps, and two exclusion-sibling tests confirm they still resolve `unscoped`
+- [x] Fixture: such a subject reddens, with a genuine coordinator subject staying green in the same run ✓ both fixtures drawn from **real history**, retained under `evals/fixtures/dod-delta/`. **L-166 discharged by a full `git log --all` scan**: exactly one subject newly resolves `unmatched-shape` — `sprint(094) T4 + record fix: prune 29 merged branches, untick two false DoD` — previously silent. Coordinator re-derived independently: the subject exists and the shape count across all history is **1**. Seeded break (one convention: `git hash-object` vs `git rev-parse HEAD:<path>`): one-token seed, line count unchanged, **52 pass / 2 fail** — exactly the two new cases reddened while the sibling and 52 others stayed green; restore byte-identical. `min_tests` 48 → 54, `54 tests, 0 fail` re-run by the coordinator, `tsc --noEmit` clean
 - [ ] **Not oversold at G2** — this closes the coord/task boundary only, not the general class; its proposer recorded that honestly and the scope-note stands
 
 ## Decisions (pre-locked)
