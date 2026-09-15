@@ -42,7 +42,9 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
   fix direction; the ledger search that catches this is the point of L-127. **Derive the id maximum with BOTH
   `.claude/worktrees/` AND `evals/` excluded** — the fixture tree reserves a git-tracked 900-block of
   synthetic ids, so a query that excludes only the worktrees (L-170's recorded remedy) still returns
-  `TASK-908 · TD-961 · L-998` against real maxima of `TASK-351 · TD-162 · L-203` (L-204).
+  that **900-block** instead of the real maxima (L-204). **Never spell a synthetic id out here** —
+  doing so makes this file a third source of the contamination, which is exactly what happened
+  between the first and second derivations of this same session.
   SPRINT-100 filed TD-156/157/158/159 and resolved TD-086/087/089/097/105/146. The aging
   breakdown that used to sit here was SPRINT-099's and is deliberately not carried forward: four rows
   were added and five resolved since, so it no longer describes this ledger. Re-derive open/closed and
@@ -259,12 +261,12 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   `approval_envelope:` `design` dimension wording carried forward into the next
                   vehicle sprint · **re-derive the full live set before editing** — the phrase also
                   appears in archived SPRINT-098/099/101, which are history and are NOT edited
-                  (TD-165 records why the signed copy stands)
+                  (TD-164 records why the signed copy stands)
       depends-on: none
       assumes:    that no OTHER live artifact carries the misreading. UNCONFIRMED — the SPRINT-101
                   sighting was found by reading one row, not by a sweep. Re-derive by shape, not
                   substring (L-108), and vary the SELECTION on the cross-check (L-198)
-      tracker:    night-run.md:295 · TD-109 · TD-165 · L-111 · SPRINT-101 T1
+      tracker:    night-run.md:295 · TD-109 · TD-164 · L-111 · SPRINT-101 T1
       why:        **Prerequisite for the SPRINT-103 vehicle.** Three sprints (098 · 099 · 101) were
                   designed against the wrong criterion; promoting the vehicle on the current spec
                   rebuilds an unlaunchable Plan a fourth time. Found by an outside adversarial pass,

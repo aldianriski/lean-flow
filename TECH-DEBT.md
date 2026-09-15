@@ -295,6 +295,34 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-165** severity: medium | status: open | created: Sprint-102
+  - Summary: **The three Bun harnesses' pass-count parsing has no RETAINED must-FAIL fixture — its
+    discrimination was proven live and then reverted.** SPRINT-102 T2 fixed an ANSI-blind parser that
+    left `run-dod-delta-fixtures.sh`, `run-s4-ts-evaluators.sh` and `run-s4-differential-parity.sh`
+    reporting `only 0 test(s) ran` over green suites (156 assertions silently unrun). The fix is
+    sound and its discrimination was demonstrated — seeded `test(` → `test.skip(`, harness reddened
+    on the **real** count `only 47 test(s) ran` rather than the old stuck-at-0, sibling control green
+    in the same pass, restore verified byte-identical under one stated hash convention
+    (`git hash-object` vs `git rev-parse HEAD:<path>`). **Reproduced independently by the coordinator,
+    not taken on the builder's report.** But the seed was reverted, so nothing persists.
+  - **Why it was not retained, and why that is a judgement rather than an omission.** These three
+    harnesses do not loop a `evals/fixtures/<name>/` directory the way the other `run-*-fixtures.sh`
+    do — they wrap `bun test` directly over **real production test files**. Retaining a must-FAIL
+    would mean either (a) seeding a permanent break into a shipped test file, which trades a silent
+    guard gap for a permanently red suite, or (b) new runner scaffolding to hold the fixture, which
+    would be a new `.sh` — against the standing rule that executable logic is TypeScript run by Bun.
+    There is also repo precedent: `run-s4-ts-evaluators.sh`'s own header documents an identical live
+    `describe.skip` proof from SPRINT-092's review. The builder flagged this gap itself rather than
+    presenting the live proof as satisfying the retained-fixture bar.
+  - Impact: **a revert of the one `sed` strip is undetectable until someone reads a count.** That is
+    exactly how the original defect survived — the harnesses failed loud, but only a *complete* gate
+    run reaches leg 12, and TD-117 meant most runs truncated before it. The failure mode is not a
+    false green; it is a true red nobody looks at for weeks.
+  - Fix direction (**not a ruling**): a TypeScript test asserting the parse against a captured
+    ANSI-coloured `bun test` sample would retain the discrimination without a shipped broken test and
+    without new shell — it tests the *parser*, not the suite. Weigh against ADR-029: the parsing step
+    is Tier **G** by the false-negative test, so the bar applies even though the fix was one line.
+
 - **TD-163** severity: medium | status: open | created: Sprint-101
   - Summary: **`docs/epic/INDEX.md`'s `update_trigger` cannot fire for the content its rows carry.**
     The trigger reads *"An epic is opened, or closed and archived (STANDARD §11)"* — an epic-lifecycle

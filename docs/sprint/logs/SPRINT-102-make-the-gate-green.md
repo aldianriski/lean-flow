@@ -117,3 +117,33 @@ and is now confirmed. A3 is discharged.
 `TASK-353` and then froze the stale number into a dispatch brief — L-130's shape (a figure entering a
 frozen artifact is a query result) at the brief grain. The agent flagged it rather than reconciling
 it silently, which is the behaviour the brief asked for and the reason it was caught.
+
+### 2026-09-16 | progress | T2 merged and independently re-verified; TD-165 filed for the retained-fixture gap
+
+**Fix.** One `sed 's/\x1b\[[0-9;]*m//g'` before each existing `grep`, in all three harnesses. The
+count floor is untouched. Population re-derived by two differently-routed queries (parse-shape grep ·
+`bun test`-invocation grep): 4 hits reconciled to 3 — `qa-check.sh`'s two were comment prose, not
+code. Matches the declared `Layers:`; no widening, nothing to correct.
+
+**Coordinator verification, run independently rather than accepted on the report** (one hash
+convention: `git hash-object <path>` vs `git rev-parse HEAD:<path>`):
+- green path — `run-dod-delta` **48 tests**, `run-s4-ts-evaluators` **87 tests**
+- seeded `test(` → `test.skip(`: 569 lines unchanged, 72 `expect(` unchanged (a skip, not a
+  demolition), hash moved — the seed landed and was *targeted*
+- **discriminates** — `FAIL … only 47 test(s) ran`. The **real** count, not the old stuck-at-0. That
+  is the evidence that matters: it proves the fix works on a *red* run, not only a green one
+- sibling control `run-s4-ts-evaluators` stayed green in the same pass
+- restore verified byte-identical to the HEAD blob
+
+**Merge-back hazard, caught before it landed.** `git diff main worktree-…` showed the worktree would
+**revert T3's four ticks and delete 37 lines of this Log** — not because the agent touched them (it
+did not; the brief forbade it and it complied) but because its branch base predates those commits. A
+blanket merge would have silently undone coordinator-owned work while reporting success. Merged the
+three harness files by path instead (L-042).
+
+**TD-165 filed** — the retained must-FAIL fixture bar was met by a *live* seed-and-revert, not a
+persisted artifact. The builder flagged this itself rather than presenting live proof as satisfying
+the bar. Accepted as a judgement, not waved: the alternatives are a permanently-broken shipped test
+or new `.sh` scaffolding against the standing no-new-shell rule, and repo precedent exists
+(`run-s4-ts-evaluators.sh`'s header documents the same live proof from SPRINT-092). The residual risk
+is real and named in the row: a revert of the one `sed` is undetectable until someone reads a count.
