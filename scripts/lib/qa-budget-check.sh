@@ -120,3 +120,18 @@ qa_ceiling_check() {
   printf 'WITHIN-CEILING %s %s\n' "$_qc_elapsed" "$_qc_ceiling"
   return 0
 }
+
+# qa_ceiling_info_line <elapsed-seconds> <ceiling-seconds>
+#   ADR-042: the ceiling is a property of the INVOCATION (foreground vs detached), not of the run, so
+#   an OVER-CEILING result is reported as INFO -- uncounted -- rather than FAIL. Round 15 Finding 2:
+#   qa-check.sh runs this check at :1453 and prints its verdict at :1473, twenty lines later; a run
+#   killed AT the ceiling reaches neither, so this line can only ever be printed by a run that
+#   survived to speak. It is therefore a warning to the NEXT caller about invocation mode -- a
+#   FOREGROUND call of this duration would be killed -- never a verdict on the run printing it.
+#   A pure formatting function for the same reason as qa_truncation_line above: callable in
+#   milliseconds by a fixture, instead of only being reachable by a run that takes ~945-1370s.
+qa_ceiling_info_line() {
+  _qi_elapsed=$1; _qi_ceiling=$2
+  printf 'INFO  qa-runtime-over-ceiling: this run took %ss against the %ss command ceiling -- and was NOT killed: it is printing this line ~20 lines before the QA-CHECK verdict. A FOREGROUND invocation of this duration would be killed by the agent harness before reaching here; a DETACHED one is not. This figure is a warning to the NEXT caller about invocation mode, not a verdict on this run (ADR-042)\n' \
+    "$_qi_elapsed" "$_qi_ceiling"
+}

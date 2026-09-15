@@ -1443,18 +1443,25 @@ else
   fi
 fi
 
-# --- actual runtime against the command ceiling (SPRINT-099 T2, TD-128) ------------------------
+# --- actual runtime against the command ceiling (SPRINT-099 T2, TD-128; ADR-042) ----------------
 # The missing READER. `check-qa-budget-default.sh` asserts the CONFIGURED budget against the ceiling
 # and is correct within that scope -- it is deliberately NOT widened here (T2 DoD 3). What nothing
 # has ever asserted is the run's ACTUAL duration, which is how that check could print
 # `PASS 520s < 600s command ceiling` for a run that took 1450s. This is the assertion that can
 # actually go red when the gate is too slow, rather than one that restates its own configuration.
+#
+# ADR-042 (Round 15 Finding 2): this check runs at :1460 and the verdict prints at :1480, twenty
+# lines later. A run killed AT the ceiling reaches neither, so this branch fires ONLY in a run that
+# survived to speak -- the FAIL wording this block used to print ("a run past the ceiling is killed
+# from outside with no verdict line") was therefore printed, in full, by the very run it claimed
+# could not speak. The ceiling is a property of the INVOCATION (foreground vs detached), not of the
+# run, so OVER-CEILING is reported as INFO -- uncounted -- rather than FAIL.
 QA_CEILING_SECONDS=${QA_CEILING_SECONDS:-600}
 qc_out=$(qa_ceiling_check "$START_TS" "$QA_CEILING_SECONDS")
 qc_elapsed=$(printf '%s' "$qc_out" | cut -d' ' -f2)
 case "$qc_out" in
   OVER-CEILING*)
-    bad "qa-runtime-over-ceiling: this run took ${qc_elapsed}s, exceeding the ${QA_CEILING_SECONDS}s command ceiling. A run past the ceiling is killed from outside with no verdict line, so the ceiling is the limit that decides whether this gate can speak at all -- unlike the ${QA_BUDGET_SECONDS}s budget, which this gate enforces on itself (TD-128)"
+    qa_ceiling_info_line "$qc_elapsed" "$QA_CEILING_SECONDS"
     ;;
   *)
     ok "qa-runtime: ${qc_elapsed}s actual, within the ${QA_CEILING_SECONDS}s command ceiling (TD-128's reader -- the ACTUAL runtime, not the configured budget)"

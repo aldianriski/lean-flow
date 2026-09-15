@@ -19,7 +19,10 @@ repo_root=$(CDPATH= cd -- "$here/.." && pwd)
 lib="$repo_root/scripts/lib/qa-budget-check.sh"
 . "$here/lib/harness-common.sh"
 
+real_qc="$repo_root/scripts/qa-check.sh"
+
 [ -f "$lib" ] || { echo "FAIL harness: lib not found at $lib"; exit 2; }
+[ -f "$real_qc" ] || { echo "FAIL harness: scripts/qa-check.sh not found at $real_qc"; exit 2; }
 
 fail=0
 now=$(date +%s)
@@ -172,5 +175,94 @@ if [ "$rc10" -eq 0 ] \
 else
   echo "FAIL fixture(multi-word-items-counted-per-item-not-per-word): exit $rc10 -- output: $out10"; fail=1
 fi
-[ "$fail" -eq 0 ] && echo "PASS harness: qa-budget-check discriminates (case 2 reddens on an over-budget scenario; cases 1/3 stay green)"
+
+# =================================================================================================
+# ADR-042 (SPRINT-102 T1): the OVER-CEILING outcome is a property of the INVOCATION (foreground vs
+# detached), not of the run, so qa-check.sh's ceiling block reports it as INFO -- uncounted -- rather
+# than calling `bad` (Round 15 Finding 2: the old FAIL message could only ever be printed by a run
+# that survived, which disproved its own "killed with no verdict line" claim). Cases 11-13 guard that
+# change at two levels: the formatting function alone (case 11), and the REAL case-statement wiring
+# extracted from the shipped file (cases 12-13) -- not a hand-copied duplicate, so a regression to
+# the shipped block is what reddens these, per this suite's own extraction convention.
+# =================================================================================================
+
+# --- case 11 (must-FAIL of the SCENARIO / must-PASS of the fixture, L-166 motivating case): the INFO
+# line is emitted and carries the elapsed figure at the SAME durations Round 15 actually measured --
+# 1263s and 1370s -- not only a synthetic boundary. A regression that drops the line, or silently
+# stops naming the elapsed seconds, reddens this case.
+for elapsed11 in 1263 1370; do
+  out11=$(sh -c ". '$lib' && qa_ceiling_info_line $elapsed11 600" 2>&1)
+  if printf '%s' "$out11" | grep -qE "^INFO  qa-runtime-over-ceiling: this run took ${elapsed11}s against the 600s command ceiling" \
+    && printf '%s' "$out11" | grep -q 'NOT killed' \
+    && printf '%s' "$out11" | grep -q 'FOREGROUND' \
+    && printf '%s' "$out11" | grep -q 'ADR-042'; then
+    echo "PASS fixture(info-line-carries-elapsed-figure-at-${elapsed11}s): $out11"
+  else
+    echo "FAIL fixture(info-line-carries-elapsed-figure-at-${elapsed11}s): output: $out11"; fail=1
+  fi
+done
+
+# --- extraction helper (shared by cases 12-13): pulls the REAL ceiling case-statement out of the
+# shipped scripts/qa-check.sh between its own anchors, never a hand-copied duplicate that could drift
+# from the file it is meant to guard (this suite's established extraction idiom, applied to shell
+# rather than to a doc's fenced block).
+qc_extract() {
+  sed -n '/^QA_CEILING_SECONDS=\${QA_CEILING_SECONDS:-600}$/,/^esac$/p' "$real_qc" | grep -v '^QA_CEILING_SECONDS='
+}
+qc_block=$(qc_extract)
+if [ -z "$qc_block" ]; then
+  echo "FAIL harness: could not extract the ceiling case-statement from $real_qc -- anchors may have drifted"
+  fail=1
+fi
+
+# --- case 12 (must-FAIL of the SCENARIO / must-PASS of the fixture -- the change's whole point): the
+# REAL extracted block, run with an elapsed figure past the ceiling (1263s, the same Round 15 run),
+# prints the INFO line and leaves BOTH `pass` and `fail` at 0 -- an over-ceiling run with no other
+# failure must report `QA-CHECK: 0 pass, 0 fail`, never increment `fail`. A regression that calls
+# `bad` again (or any function that increments `fail`) reddens this case.
+out12=$(sh -c '
+  . "'"$lib"'"
+  note() { :; }
+  ok()   { pass=$((pass + 1)); printf "PASS  %s\n" "$1"; }
+  bad()  { fail=$((fail + 1)); printf "FAIL  %s\n" "$1"; }
+  pass=0; fail=0
+  START_TS=$(( $(date +%s) - 1263 ))
+  QA_BUDGET_SECONDS=900
+  QA_CEILING_SECONDS=600
+  eval "$1"
+  printf "RESULT pass=%s fail=%s\n" "$pass" "$fail"
+' _ "$qc_block" 2>&1)
+if printf '%s\n' "$out12" | grep -q '^INFO  qa-runtime-over-ceiling: this run took 1263s' \
+  && printf '%s\n' "$out12" | grep -q '^RESULT pass=0 fail=0$'; then
+  echo "PASS fixture(over-ceiling-run-prints-info-and-fail-stays-0): $(printf '%s\n' "$out12" | tail -1)"
+else
+  echo "FAIL fixture(over-ceiling-run-prints-info-and-fail-stays-0): got:"
+  printf '%s\n' "$out12"; fail=1
+fi
+
+# --- case 13 (PASS control, sibling): the SAME real extracted block, run WITHIN the ceiling, still
+# prints its existing `PASS  qa-runtime: ...` line unchanged and green -- `pass=1 fail=0` -- in the
+# same run as case 12's over-ceiling scenario. This is what makes case 12 a discrimination (a break
+# that made every outcome print INFO would still pass case 12 alone) rather than a smoke test.
+out13=$(sh -c '
+  . "'"$lib"'"
+  note() { :; }
+  ok()   { pass=$((pass + 1)); printf "PASS  %s\n" "$1"; }
+  bad()  { fail=$((fail + 1)); printf "FAIL  %s\n" "$1"; }
+  pass=0; fail=0
+  START_TS=$(date +%s)
+  QA_BUDGET_SECONDS=900
+  QA_CEILING_SECONDS=600
+  eval "$1"
+  printf "RESULT pass=%s fail=%s\n" "$pass" "$fail"
+' _ "$qc_block" 2>&1)
+if printf '%s\n' "$out13" | grep -q '^PASS  qa-runtime: [0-9]*s actual, within the 600s command ceiling' \
+  && printf '%s\n' "$out13" | grep -q '^RESULT pass=1 fail=0$'; then
+  echo "PASS fixture(in-ceiling-run-stays-pass-and-green-sibling-of-case-12): $(printf '%s\n' "$out13" | tail -1)"
+else
+  echo "FAIL fixture(in-ceiling-run-stays-pass-and-green-sibling-of-case-12): got:"
+  printf '%s\n' "$out13"; fail=1
+fi
+
+[ "$fail" -eq 0 ] && echo "PASS harness: qa-budget-check discriminates (case 2 reddens on an over-budget scenario; cases 1/3 stay green; case 12 reddens if the ceiling block ever re-fails on OVER-CEILING, case 13 stays green)"
 exit $fail
