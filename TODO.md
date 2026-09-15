@@ -132,36 +132,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       origin:     close-retro
       state:      ready
 
-- [ ] TASK-326 — Compare a commit's claimed DoD delta against the ticks it actually made  [size: S] [risk: low] [AFK]
-      class:      execution
-      tier:       G (ADR-029 — a false green on a DoD is the same silent-false-negative class as a
-                  guard that never fires; the artifact and the report disagree and nothing compares them)
-      done-when:  a check reads each `sprint(NNN)` commit's own message for a claimed DoD figure
-                  (`N of M DoD`) and reconciles it against the `[ ] → [x]` transitions that commit
-                  made in the sprint file, FAILing with a named finding when they disagree — including
-                  the case where a commit ticks a DoD belonging to a task it did not touch. Retained
-                  must-FAIL: SPRINT-094's `6a6aeac`, which claimed "5 of 6 DoD" and flipped **three**
-                  boxes, two of them T2's and T3's. Sibling control: a commit whose claim and ticks
-                  agree, green in the same run. Seeded-break discrimination proof under ONE stated hash
-                  convention, and a landed-but-targeted seed that reddens nothing is reported as
-                  untested, never scored as a pass (L-137 · L-142 · L-169 · L-187)
-      touches:    scripts/lib/ (a new checker) · scripts/qa-check.sh · evals/fixtures/ + its harness
-      depends-on: none
-      assumes:    the claim is machine-readable from the commit subject/body in the form this repo
-                  already writes it. **Re-derive before building on it** — sample the actual
-                  `sprint(NNN)` subjects rather than trusting this line (L-097). If the claim is not
-                  reliably parseable, the scope narrows to the *unattributed tick* half (a commit
-                  flipping a DoD outside the tasks whose `Layers:` it touched), which is the half that
-                  carries the real defect, and says so
-      tracker:   SPRINT-094 Execution Log, 2026-09-03 surprise — `6a6aeac` flipped three DoD sharing
-                  an identical bold lead where one was intended; a replace-all matched three siblings.
-                  Every downstream signal stayed clean (line caps unchanged, no grep tripped, the
-                  commit body itself said "5 of 6"), and it survived a worktree-isolated review pass of
-                  T1 an hour later — that reviewer read T1's script, which is where it was told to
-                  look. CLAUDE.md § Anti-Patterns edit-safety (b) · L-009 · L-165
-      origin:     close-retro
-      state:      ready
-
 > **Auto-escalated at the SPRINT-098 promote (2026-09-11).** The ledger's own rule sends a
 > `severity: high` row to P1; the aging sweep found five open high rows and two of them — **TD-143**
 > and **TD-150** — had no Backlog row at all, so the rule had no consumer for them (L-020's shape).
@@ -367,25 +337,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > follow-ups to the Backlog; `/triage` ranks them. They are parked here rather than in P0 so an
 > unranked row is never mistaken for a blocking one — `TASK-334` in particular affects every
 > close and may well outrank this tier once groomed.
-
-- [ ] TASK-335 — Clear two stale records SPRINT-096 found but did not own  [size: S] [risk: low] [AFK]
-      class:      mechanical-ingest
-      done-when:  (a) `TD-051` no longer cites `Line 225` for `check-layers-observed.sh`'s
-                  subject-sprint `*/archive/*` skip — the same staleness class SPRINT-096 T2 fixed in
-                  TD-125, left alone then only because it was another row's subject; the figure is
-                  **derived at the point of use**, never copied from this entry (L-130). (b)
-                  SPRINT-094's parked-ruling checkbox — *"archiving SPRINT-092 and SPRINT-093"* — is
-                  ticked or withdrawn: the ruling was taken at the SPRINT-096 promote and both
-                  sprints are archived, so the item is satisfied and reads as outstanding. Closing a
-                  closed sprint's item is a governance action, which is why SPRINT-096 T2 corrected
-                  its prose and left the box alone
-      touches:    TECH-DEBT.md · docs/sprint/SPRINT-094-guards-for-what-nothing-reads.md
-      depends-on: none
-      assumes:    none — both were observed directly during SPRINT-096 T2's corpus classification
-      tracker:    TD-051 · TD-125 · L-130
-      origin:     close-retro
-      state:      ready
-
 
 > **Opportunistic by ruling, not by priority.** Neither entry below can be scheduled — each is taken
 > when a run or a session produces the vehicle for it. Promoting one into a sprint whose shape cannot
