@@ -91,10 +91,10 @@ SPRINT-103** — promoting the vehicle on the current spec rebuilds an unlauncha
 also requires `gates_signed:` in frontmatter.
 
 **DoD:**
-- [ ] The live set is re-derived by shape, cross-checked with a varied selection (L-108 · L-198) — the archived SPRINT-098/099/101 are history and are **not** edited
-- [ ] Every live copy states the STRICT form
-- [ ] The vehicle checklist requires `gates_signed:` recorded in frontmatter — absent from SPRINT-101, where it sat as the *next* foreclosure behind the red gate
-- [ ] TD-164 records why the signed SPRINT-101 envelope stands unedited and is not precedent
+- [x] The live set is re-derived by shape, cross-checked with a varied selection (L-108 · L-198) — the archived SPRINT-098/099/101 are history and are **not** edited ✓ two independently-selected queries (plain substring · varied-shape regex over hyphen/space/paraphrase variants) converged on the same 3 live files, and the varied query found one hit the plain one missed (`**not-all-J2**`, hyphenated) — evidence the second selection did real work rather than re-running the same shape
+- [x] Every live copy states the STRICT form ✓ re-verified independently by the coordinator: the remaining hits are SPRINT-102 describing the defect, TD-164 recording it historically, and TODO.md rows stating the STRICT form while quoting the old phrase in contrast. **Satisfied by the 2026-09-16 `/triage` (`ef02be0`), not by T3** — see this Log's `surprise` entry
+- [x] The vehicle checklist requires `gates_signed:` recorded in frontmatter — absent from SPRINT-101, where it sat as the *next* foreclosure behind the red gate ✓ `night-run.md:302-303`, pre-flight item 4, traced to `3a1cfc1` (**SPRINT-057 T5**). **This criterion was already true when the Plan froze** — it could not have failed
+- [x] TD-164 records why the signed SPRINT-101 envelope stands unedited and is not precedent ✓ row present; states that editing it *"would invalidate the pin and forge a signature onto a design the owner did not approve"*, and records it as **not precedent**
 
 ### T4 — Make an unmatched commit-subject shape FAIL loudly in `check-dod-delta.ts` `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `scripts/lib/check-dod-delta.ts` · `evals/dod-delta.test.ts` · `evals/fixtures/dod-delta/`

@@ -80,3 +80,40 @@ D7 — the ruling earns an ADR, because it reverses TD-117's recorded direction.
 
 **Dispatch plan:** T1 stays with the coordinator (decision tier, owner rulings). T2 ∥ T3 dispatch in
 parallel, worktree-isolated, disjoint. T4 follows T2.
+
+### 2026-09-16 | surprise | T3 was already satisfied before it was dispatched — a planning defect, not a win
+
+T3 returned **no edit needed**, working tree clean. Every one of its four DoD items was already true
+when the Plan froze. Verified independently by the coordinator rather than accepted on the agent's
+report:
+
+- **DoD 1–2 (the live copies).** The `TASK-319` row's criterion was corrected at the **2026-09-16
+  `/triage`**, which landed in `ef02be0` — *the plan-locked commit itself*. So the coordinator fixed
+  the defect at triage **and then filed `TASK-352` to fix it**, promoted that task as T3, and
+  dispatched an agent to do work that was already in the commit the agent checked out. The remaining
+  `not all-J2` hits are all legitimate: SPRINT-102 describing the defect, `TECH-DEBT.md:334` (TD-164)
+  recording it historically, `TODO.md` quoting it in contrast to the STRICT form.
+- **DoD 3 (`gates_signed:`).** Pre-flight item 4 has required it since `3a1cfc1` — **SPRINT-057 T5**,
+  roughly 45 sprints ago. The criterion could not have failed at any point in this sprint.
+- **DoD 4 (TD-164).** Filed by the coordinator at the same `/triage`, hours earlier.
+
+**Why this matters more than the wasted dispatch.** Three of four criteria were **unfalsifiable at
+freeze** — not unreachable in L-136's sense (no check was mis-scoped), but *already satisfied*, which
+presents identically: the box ticks, the evidence is real, and the task demonstrated nothing. L-111
+asks whether a criterion is reachable *after* the decisions it rests on; this is its mirror — **is
+the criterion still capable of failing at the moment it is frozen?** A DoD written against a defect
+you fixed on the way to writing it is a green box that proves only that you already knew.
+
+The tell was available at promote and was not looked for: `TASK-352`'s own `touches:` line said
+*"`TODO.md` (TASK-319 row — **corrected at this triage**, verify it stuck)"*. It said so plainly.
+
+**Not reverted.** T3's four boxes are ticked with evidence naming what actually satisfied them and
+when — an honest record beats a vacant one. The dispatch also bought one real thing: an independent
+sweep confirming the live population is genuinely clean, which was `A3`'s **UNCONFIRMED** assumption
+and is now confirmed. A3 is discharged.
+
+**Brief defect, reported not absorbed.** The brief told the agent to expect
+`grep -c '^- \[ \] TASK-' TODO.md` = **14**; it is **15**. The coordinator counted before filing
+`TASK-353` and then froze the stale number into a dispatch brief — L-130's shape (a figure entering a
+frozen artifact is a query result) at the brief grain. The agent flagged it rather than reconciling
+it silently, which is the behaviour the brief asked for and the reason it was caught.
