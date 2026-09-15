@@ -4,7 +4,7 @@ slug: prove-the-run
 epic: EPIC-015
 owner: Maintainer
 last_updated: 2026-09-15
-status: active
+status: closed
 plan_commit: 87fdfeb
 close_commit:
 approval_envelope: goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ 2472fab
@@ -173,4 +173,57 @@ and `night-run.sh` refuses to fire on a red one. See the Execution Log for the s
 
 ## Retro
 
-<!-- Written at close. Route the buckets to durable homes (STANDARD §10). -->
+**Closed at 11 of 20 DoD, by owner ruling rather than exhaustion.** T3 and T4 shipped and are
+verified; the `approval_envelope:` is signed and verifying; T1/T2 return to the Backlog still paired.
+
+**What this sprint actually bought § Closed-when 1.** Not the run — but it cleared the blocker that
+has parked it twice and replaced it with a **measured** one. SPRINT-088 foreclosed on an all-`HITL`
+Plan; SPRINT-098 parked at `AUTHORITY_BOUNDARY` for want of an envelope. Both are gone: the Plan was
+deliberately not all-J2, and the envelope is now recorded in frontmatter, all ten dimensions, pinned
+`@ 2472fab`. What stands is TD-117 — and it is no longer a cost note but a wall, with a number:
+**no configuration of this gate is green.** Bare it truncates (600 s, 13 harnesses unrun); raised it
+completes in **945 s** against a **600 s** external ceiling with `217 pass, 1 fail`, the lone FAIL
+being the gate timing itself. `night-run.sh:570` calls it bare, so a pre-flight meets the truncated
+run, and the only sanctioned escape would pre-approve a FAIL whose whole content is *13 checks did
+not run*.
+
+**The governance finding worth more than the measurement.** `TASK-349` owns TD-117 and **this sprint
+deferred it**, under the standing epic-first ruling that puts § Closed-when 1 ahead of the cheaper
+standalone rows. That ruling deferred the very task the epic turned out to be blocked on. The ruling
+was not wrong on its own terms — the epic genuinely cannot close without a run — but "epic-first"
+and "fix what blocks the epic" came apart here, and nothing in the promote review asks whether a
+deferred row is on the critical path of the thing being prioritised.
+
+**Four rounds to one guard, and the instrument that finally worked.** T3 cleared every bar this repo
+has — retained must-FAIL on the real motivating commit, sibling control, **two independent** seeded
+breaks under one stated hash convention, worktree-isolated adversarial review — and still carried
+four population defects past all of them. Three fell to the outside reviewer (L-165 holding exactly
+as written: the governing rule was loaded and on screen throughout and found none of them). The
+fourth and largest — **137 of 701** commits, ~37% of the task-naming population, silently exempt —
+fell to neither fixtures, nor seeded breaks, nor the review, all of which had **passed**. It fell to
+running the checker over all **951** real subjects and printing a table. Filed as **L-202**.
+
+**A rule corrected by its own subject.** L-196 says *verify registration from the registry's side*
+and ships a one-liner that greps the whole **file**: 27 false `UNREGISTERED` of 43 here, and a
+demonstrated false `REGISTERED` for a harness removed from the registry whose name survives in a
+comment — the exact failure L-196 exists to catch. It had already reached a frozen Plan as T3's
+DoD 6. Filed as **L-203**; L-196 carries a `corrected-by:` pointer.
+
+**Two defective `Verify:` clauses in one frozen Plan**, both L-136: T1's two checks passed `.` to
+scripts that take a file, so neither could ever pass; DoD 6 inherited L-196's broken command. Both
+were handled as logged `scope-change` entries with owner rulings, never quietly reinterpreted. Worth
+noting that `check-verify-reaches.sh` classified both of T1's as *judgment methods* and passed them
+to G2 — structurally blind to a mechanical method invoked with a wrong-typed argument.
+
+### Buckets — routed (§10)
+
+| Bucket | Routed to |
+|---|---|
+| **Shipped** | `CHANGELOG.md` — `check-dod-delta.ts` + gate leg 16 + 12 retained fixtures; TD-051 citation and SPRINT-094 ruling cleared; the signed approval envelope |
+| **Tech debt** | **TD-160** (a sprint is red by construction between promote and first log entry) · **TD-161** (case-sensitive archive substring in the new TS checker) · **TD-162** (SPRINT-094's close figure now contradicts its own boxes). **TD-117 annotated** with the measurement rather than duplicated — a second row with the same subject reads as an edit to the first |
+| **Follow-ups** | **`TASK-351`** (`origin: close-retro`) — make an unmatched subject shape FAIL loudly instead of exempting itself. Gate cost was **not** re-filed: `TASK-349` already owns it |
+| **Learnings** | **L-202** (a population fixture cannot reach a shape nobody thought of; partition the real corpus) · **L-203** (a rule that ships a derivation ships a guard). **L-170** bumped to count 3 — it fired *as a guard* this close, catching `L-999` worktree contamination against a real max of L-201. **L-186** bumped to count 3 and annotated: SPRINT-101 is the sighting that found it **insufficient**, not unapplied |
+
+**Retrieval-miss check (§10): yes, once, and it is L-203.** A prior learning was found, followed
+faithfully, and was itself wrong — the miss was not in retrieval but in the retrieved artifact.
+

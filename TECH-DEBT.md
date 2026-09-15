@@ -295,6 +295,52 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-160** severity: medium | status: open | created: Sprint-101
+  - Summary: **A sprint is RED BY CONSTRUCTION between its promote and its first Execution Log entry.**
+    `check-night-run-rollup.sh` treats an **absent** log as a named FAIL — deliberately, and correctly:
+    SPRINT-098 changed it precisely because leg 2g built its input from live Plans that already had a
+    log, filtering out the one state the check exists to catch (a run that dies before writing
+    anything). But logs are created **lazily at the first entry** (STANDARD §9 · ADR-014), so every
+    freshly promoted sprint fails this check until somebody writes to it. Observed live at the
+    SPRINT-101 G2: the gate reported `no Execution Log found at docs/sprint/logs/SPRINT-101-…`, and
+    the same check passed minutes later against the file once created.
+  - Impact: a false positive on **every** sprint at exactly the moment its gate is first consulted —
+    the promote. Cheap to misread as a real failure, and cheaper still to learn to ignore, which is how
+    a guard dies.
+  - Fix direction (**not a ruling**): distinguish *promoted-but-unwritten* from *ran-and-wrote-nothing*.
+    The two are separable — a sprint whose `plan_commit` is its newest commit has not executed yet.
+    Resist the obvious cure of skipping absent logs: that reinstates exactly the blind spot SPRINT-098
+    removed (L-058).
+
+- **TD-161** severity: minor | status: open | created: Sprint-101
+  - Summary: **`scripts/lib/check-dod-delta.ts:277` ranks archive candidates with a case-sensitive
+    substring test** — `!p.includes("/archive/")` never matches `/Archive/`, so a mis-cased path is
+    treated as non-archive and can win by list order. This is the un-normalized shape SPRINT-099 T3
+    removed from ten checkers in favour of the filesystem-identity predicate `lf_is_archived_path`
+    (TD-145 · TD-151), reappearing in a TypeScript checker that **cannot** `source` it.
+  - Impact: **latent, not live.** `git log --all --name-only` shows this repo has never committed a
+    case-variant path in 1236 commits, so it is a defect in the code rather than in the data — but the
+    host is Windows, where the two spellings are one directory and one inode.
+  - Ruled at the SPRINT-101 close, on the builder's reasoning and recorded rather than smoothed: every
+    path this function ranks arrives from `git show --name-only`, so an archived path always carries the
+    literal substring under *some* casing; the filesystem-identity case (a path not containing
+    "archive" at all) cannot arise from that input. A case-insensitive compare is therefore sufficient
+    **here** and was applied; porting the full predicate would guard nothing. Filed so the next TS
+    checker does not re-derive the same reasoning from scratch — or skip it.
+
+- **TD-162** severity: minor | status: open | created: Sprint-101
+  - Summary: **SPRINT-094's archived close summary now contradicts its own checkboxes.** It reads
+    *"Closed at 22 of 23 DoD. The single open box is the owner-action ruling on archiving
+    SPRINT-092/093"* — and SPRINT-101 T4 ticked precisely that box, the ruling having been taken at the
+    SPRINT-096 promote. There is now no open box, so the sentence is **false in the present tense** and
+    **true as a statement about the close**.
+  - Impact: small and self-inflicted, but it is exactly the class SPRINT-101 T3 built a guard for — a
+    claimed DoD figure disagreeing with the actual tick state — arriving in the same sprint from an
+    unrelated task. Left unfixed deliberately: editing an archived close figure is a governance call,
+    not a mechanical follow-on from T4's scope, and the two readings point opposite ways.
+  - Fix direction (**not a ruling**): either annotate the close line to say the 23rd was ticked later,
+    or rule that a close figure is a historical statement and needs no maintenance. Pick one and say so
+    in STANDARD, because the guard cannot tell them apart.
 - **TD-159** severity: minor | status: open | created: Sprint-100
   - Summary: **Worktree-isolated review is mandated by three rules and its mechanics are written down
     nowhere**, so each coordinator rediscovers them. Three distinct gaps, all hit this sprint:
@@ -929,6 +975,23 @@ status: current
     reports it as truncated rather than as an ordinary red gate. The cost half of this row is
     untouched and still open — the gate is no faster, it is only honest about stopping.
   - **Escalated to `TODO.md` Backlog P2, then MERGED into `TASK-329`** (2026-09-07 — escalated as `TASK-330` at `/triage` by the ledger's own `severity: high` rule, retired into `TASK-329` at the decompose the same day; `TASK-330` is not reused). This row and **TD-128** are one mechanism — the gate's own duration and what it failed to reach are both unreported — so they are fixed together. **Direction ruled at that decompose, closing this row's open "Fix direction (not a ruling)":** make the skipped-harness list its own named outcome. The other two were rejected on evidence — capping dispatch concurrency slows the worktree-isolated review this repo mandates for Tier G (L-165 · L-168) and rests on an unmeasured figure; raising the budget cannot work, the 600 s ceiling being external. **Two cautions recorded with it:** the escalation stub was first written against `TODO.md`'s narrative gloss of this row ("the reduction TD-117 anticipated") and had to be corrected against the row itself — the subject is **six harnesses skipped under concurrent load**, not a budget reduction (L-130); and this row's 450 s default is **stale**, `qa-check.sh:27` having read 520 since SPRINT-093.
+  - **MEASURED at the SPRINT-101 close — this row's ruling is confirmed with a number, and the number
+    is worse than the row assumed.** Two runs of the default profile bound it exactly: **bare** (520 s
+    budget) takes 600 s and **truncates**, leaving **13 harnesses UNRUN**; `QA_BUDGET_SECONDS=1200`
+    completes in **945 s** with `217 pass, 1 fail`, where the lone FAIL is
+    `qa-runtime-over-ceiling: this run took 944s, exceeding the 600s command ceiling`. **Every
+    substantive check passes in the second run.** So the profile needs ~944 s against a 600 s external
+    ceiling — it has outgrown the limit it is judged by by ~57%, and **no configuration of this gate is
+    green**: truncate and the verdict is silent about a fifth of its own checks; complete and it is red
+    for having spoken at all. This vindicates the direction already ruled here (*raising the budget
+    cannot work, the 600 s ceiling being external*) and removes the last reading in which it might have.
+    **It also makes this row a blocker rather than a cost.** `night-run.sh:570` invokes the gate **bare**,
+    so an unattended pre-flight meets the *truncated* run, and the only sanctioned escape
+    (`gate_exceptions:`) would have to pre-approve `qa-check-budget-exceeded` — a FAIL whose entire
+    content is *13 checks did not run*. SPRINT-101 cleared both of EPIC-015 § Closed-when 1's previous
+    blockers (an all-`HITL` Plan at SPRINT-088; a missing `approval_envelope:` at SPRINT-098, now signed
+    and verifying) and landed here. **`TASK-349` owns this row and was deferred by SPRINT-101 under the
+    standing epic-first ruling — which deferred the very task the epic turned out to be blocked on.**
 
 - **TD-126** severity: medium | status: open | created: Sprint-092
   - Summary: **The opt-in profile spawns the Shell oracle twice over the same nine fixtures** — once in

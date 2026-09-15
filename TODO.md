@@ -16,13 +16,11 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-101 — Prove the Run** → [docs/sprint/SPRINT-101-prove-the-run.md](docs/sprint/SPRINT-101-prove-the-run.md)
->
-> `epic: EPIC-015` · promoted 2026-09-14 · four tasks — `TASK-319` + `TASK-188` (paired per the
-> SPRINT-097 `/triage` ruling) fire and claim the real unattended run § Closed-when 1 has waited three
-> sprints for; `TASK-326` + `TASK-335` are the honest AFK/`J1` work that keeps the Plan from being
-> all-`J2`, which pre-flight item 3 refuses outright. **T1 is blocked on the ten-dimension
-> `approval_envelope:` being signed at G2** — its absence is exactly what parked SPRINT-098 T4.
+> _No active sprint._ **SPRINT-101 — Prove the Run** closed 2026-09-15 at **11 of 20 DoD**, by owner
+> ruling rather than exhaustion: `TASK-326` (T3) and `TASK-335` (T4) shipped and are verified, the
+> ten-dimension `approval_envelope:` is **signed and verifying**, and `TASK-319`/`TASK-188` return to
+> the Backlog still paired — blocked now on a **green gate**, not on the envelope. See `CHANGELOG.md`
+> and the archived sprint file; the blocker is measured in **TD-117** and owned by **`TASK-349`**.
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
@@ -116,7 +114,7 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > unattended run and every sprint that defers it defers the epic.
 
 - [ ] TASK-319 — Prove § Closed-when 1 with a real unattended run against the repaired reaper  [size: M] [risk: high] [HITL]
-      → **PARKED at SPRINT-098 (T4), `AUTHORITY_BOUNDARY`** — `J2` and no `approval_envelope:` was ever recorded, which reads as NOT approved. Unattempted, not attempted-and-failed. Still paired with `TASK-188` per the SPRINT-097
+      → **PARKED again at SPRINT-101 (T1) — but NOT on the same blocker, and that is the news.** The ten-dimension `approval_envelope:` is now **signed, recorded in frontmatter and verifying** (`all 10 dimensions covered, pinned @ 2472fab`), so the `AUTHORITY_BOUNDARY` that parked SPRINT-098 T4 is **cleared**. What stands instead is the **gate**: `night-run.sh` refuses to fire on a red one, and no configuration of this gate is green — bare it truncates with 13 harnesses unrun, raised it completes in 945 s against a 600 s external ceiling (measured, **TD-117**; owned by **`TASK-349`**). Unattempted, not attempted-and-failed. Still paired with `TASK-188` per the SPRINT-097
         `/triage` ruled. Full spec — the seeded not-all-J2 vehicle · the `--mode overnight` fire ·
         the terminal-state agreement check against the run's own committed log — lives in the sprint
         file, together with **D3** (T4's run is not gated on T2/T3 being green, so no unrelated
@@ -223,6 +221,30 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 
 ### P2 — Follow-on
 
+- [ ] TASK-351 — Make an unmatched commit-subject shape FAIL loudly in `check-dod-delta.ts` instead of exempting itself  [size: S] [risk: low] [HITL]
+      class:      execution
+      tier:       G
+      authority:  J1
+      origin:     close-retro   # SPRINT-101 close; NOT grilled at intake, so no G1 fast-path
+      state:      ready
+      done-when:  Before `attributeClaim` returns `coord`, it tests whether the subject's first token
+                  after `sprint(NNN):` / `sprint(NNN) ` matches the task-token shape, and FAILs naming
+                  that subject if it does — rather than silently exempting it. Fixture: a subject in a
+                  shape no current arm admits must redden, with a sibling control (a genuine
+                  coordinator subject) staying green in the same run.
+      why:        SPRINT-101 T3 needed **four** rounds to reach an exhaustive population, each round
+                  discovering another live subject spelling: the `Task:` trailer arm, letter-suffixed
+                  subtasks (`T2a`), the parenthetical arm, and finally `sprint(NNN): Tn --` — **137 of
+                  701** commits, ~37% of the task-naming population, silently exempt. The recurring
+                  defect is not any single regex but that the examined set is derived by ENUMERATING
+                  shapes, so every unlisted shape is a **silent** exemption rather than a loud one
+                  (**L-202**). Proposed by the builder when asked to report rather than build it; it
+                  costs one extra evaluation of a regex the fix already computes, and **would have
+                  caught finding 7 the moment it was written**.
+      scope-note: Closes THIS seam, not the general class — recorded honestly by its proposer: it
+                  would not have caught the other three findings, which are about which arms exist at
+                  all rather than about the coord/task boundary. Do not oversell it at G2.
+      tracker:    L-202 · L-186 · L-166 · SPRINT-101 T3
 - [ ] TASK-346 — Rule `check-handoff-state.sh`'s archive glob: convert it, or record the exemption where the guard reads it  [size: S] [risk: low] [HITL]
       class:      execution
       authority:  J1
