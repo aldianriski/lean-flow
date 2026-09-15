@@ -6,7 +6,7 @@ owner: Maintainer
 last_updated: 2026-09-15
 status: closed
 plan_commit: 87fdfeb
-close_commit:
+close_commit: c8bc300
 approval_envelope: goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ 2472fab
 update_trigger: sprint execute/close events
 ---
