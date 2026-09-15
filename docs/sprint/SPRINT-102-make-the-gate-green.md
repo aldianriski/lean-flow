@@ -4,6 +4,7 @@ slug: make-the-gate-green
 owner: Maintainer
 last_updated: 2026-09-16
 status: active
+gates_signed: G1,G2 @ 516c81c
 plan_commit: ef02be0
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
