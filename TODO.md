@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-15
+last_updated: 2026-09-16
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -16,18 +16,34 @@ status: current
 
 ## Active Sprint
 
-> _No active sprint._ **SPRINT-101 — Prove the Run** closed 2026-09-15 at **11 of 20 DoD**, by owner
-> ruling rather than exhaustion: `TASK-326` (T3) and `TASK-335` (T4) shipped and are verified, the
-> ten-dimension `approval_envelope:` is **signed and verifying**, and `TASK-319`/`TASK-188` return to
-> the Backlog still paired — blocked now on a **green gate**, not on the envelope. See `CHANGELOG.md`
+> **SPRINT-102 — Make the Gate Green** → [docs/sprint/SPRINT-102-make-the-gate-green.md](docs/sprint/SPRINT-102-make-the-gate-green.md)
+>
+> Promoted 2026-09-16. Four tasks: `TASK-349` (ceiling ruling) · `TASK-353` (ANSI parsing, 3 Tier G
+> harnesses) · `TASK-352` (pre-flight item 3 criterion) · `TASK-351` (dod-delta exemption). **The run
+> is not attempted here** — every task is `HITL` and two are `J2`, so this Plan fails pre-flight item
+> 3 by construction, deliberately (D2). The vehicle is SPRINT-103, all `J0`/`J1`, with
+> `TASK-319`/`TASK-188` still paired.
+>
+> Predecessor: **SPRINT-101 — Prove the Run** closed 2026-09-15 at **11 of 20 DoD**, by owner ruling
+> rather than exhaustion: `TASK-326` (T3) and `TASK-335` (T4) shipped and are verified, the
+> ten-dimension `approval_envelope:` is **signed and verifying**, and `TASK-319`/`TASK-188` returned
+> to the Backlog still paired — blocked on a **green gate**, not on the envelope. See `CHANGELOG.md`
 > and the archived sprint file; the blocker is measured in **TD-117** and owned by **`TASK-349`**.
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
 again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 92 rows** (84 open · 8 resolved) — re-derived at the SPRINT-100 close by row header,
-  where SPRINT-100 filed TD-156/157/158/159 and resolved TD-086/087/089/097/105/146. The aging
+- **Debt ledger: 97 rows** (89 open · 8 resolved · 5 `severity: high` open) — re-derived at the
+  2026-09-16 `/triage` by row header, cross-checked by distinct id (both routes give 97). The prior
+  figure here (92 / 84) was written at the SPRINT-100 close and did not carry SPRINT-101's
+  TD-160/161/162; this pass then filed **TD-163** and **TD-164**. A third row was drafted for the
+  promote-time red gate and **withdrawn before filing** — `TD-160` already covers it, with a better
+  fix direction; the ledger search that catches this is the point of L-127. **Derive the id maximum with BOTH
+  `.claude/worktrees/` AND `evals/` excluded** — the fixture tree reserves a git-tracked 900-block of
+  synthetic ids, so a query that excludes only the worktrees (L-170's recorded remedy) still returns
+  `TASK-908 · TD-961 · L-998` against real maxima of `TASK-351 · TD-162 · L-203` (L-204).
+  SPRINT-100 filed TD-156/157/158/159 and resolved TD-086/087/089/097/105/146. The aging
   breakdown that used to sit here was SPRINT-099's and is deliberately not carried forward: four rows
   were added and five resolved since, so it no longer describes this ledger. Re-derive open/closed and
   the `severity: high` set
@@ -92,7 +108,21 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 - [ ] TASK-349 — Decide what to do about a gate whose completion is decided by host noise  [size: M] [risk: med] [HITL]
       class:      decision
       authority:  J2
-      done-when:  `TD-117` and `TD-090` have a ruling rather than a standing condition. Five
+      done-when:  **FIRST MOVE IS A MEASUREMENT, not an optimization** (added at the 2026-09-16
+                  `/triage`). The SPRINT-101 evidence disproves this row's own framing: the
+                  `QA_BUDGET_SECONDS=1200` run **completed in 945 s**, so the 600 s limit did **not**
+                  kill it. What reddened it was `qa-check.sh:1452`'s own `QA_CEILING_SECONDS`
+                  self-assertion — a *configurable* value whose stated premise ("a run past the
+                  ceiling is killed from outside with no verdict line") is false for the mode that
+                  ran. So: **measure the actual external process limit per invocation mode**
+                  (foreground · background · detached), then set the ceiling to what was measured.
+                  That may unblock the epic at near-zero cost and without reclaiming a second of
+                  runtime. Only if the measurement says otherwise does cost reclamation follow — and
+                  note Round 14's ~307 s / ~545 s figures are drawn from **truncated** runs, so they
+                  are not a valid baseline for the complete profile (re-derive, L-130).
+                  **Re-size at G2**: if the chosen fix turns out to be Tier G implementation rather
+                  than a ruling, this row's `[size: M] [risk: med]` no longer describes it.
+                  Then: `TD-117` and `TD-090` have a ruling rather than a standing condition. Five
                   whole-gate runs at the SPRINT-099 close spanned **523–560 s around a 520 s budget**
                   against a 600 s external ceiling — two runs on the *same tree* gave a complete
                   `218 pass, 0 fail` and a truncation 3 s over budget. SPRINT-099 T2 made truncation
@@ -112,10 +142,31 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 > **Epic-first**, ruled by the owner at the SPRINT-094 `/triage`: EPIC-015 § Closed-when 1 · 5 · 6
 > lead, ahead of the cheaper standalone guards, because the epic cannot close without a real
 > unattended run and every sprint that defers it defers the epic.
+>
+> **Reconciled against the roadmap at the 2026-09-16 `/triage`.** This ruling predates the
+> 2026-09-09 Governance Roadmap § 10, which reprioritises delivery around the dashboard pilot and
+> *supersedes the prior platform-investment ordering* — `docs/epic/INDEX.md` already records EPIC-016
+> as **P0, the critical path**. The two are not in conflict once scoped: **EPIC-016 holds P0 overall
+> and runs its member sprints in `workdoo`**, so it does not consume a lean-flow sprint slot;
+> epic-first continues to govern **lean-flow's own** sprints, where it now means EPIC-015. Roadmap
+> § 10 also states the pilot subset does **not** auto-close EPIC-005–015 — existing § Closed-when
+> still governs formal closure — so nothing here is discharged by the pilot shipping.
+>
+> **Epic-first now means `TASK-349` first.** TD-117's own closing line records that SPRINT-101
+> deferred it under this ruling and that it was *"the very task the epic turned out to be blocked
+> on."* Deferring the blocker in the epic's name defers the epic.
 
 - [ ] TASK-319 — Prove § Closed-when 1 with a real unattended run against the repaired reaper  [size: M] [risk: high] [HITL]
       → **PARKED again at SPRINT-101 (T1) — but NOT on the same blocker, and that is the news.** The ten-dimension `approval_envelope:` is now **signed, recorded in frontmatter and verifying** (`all 10 dimensions covered, pinned @ 2472fab`), so the `AUTHORITY_BOUNDARY` that parked SPRINT-098 T4 is **cleared**. What stands instead is the **gate**: `night-run.sh` refuses to fire on a red one, and no configuration of this gate is green — bare it truncates with 13 harnesses unrun, raised it completes in 945 s against a 600 s external ceiling (measured, **TD-117**; owned by **`TASK-349`**). Unattempted, not attempted-and-failed. Still paired with `TASK-188` per the SPRINT-097
-        `/triage` ruled. Full spec — the seeded not-all-J2 vehicle · the `--mode overnight` fire ·
+        `/triage` ruled. **CRITERION CORRECTED at the 2026-09-16 `/triage` — the spec this row
+        pointed at misstates the rule it cites.** It read *"the seeded **not-all-J2** vehicle"*;
+        pre-flight item 3 (`night-run.md:295`, STRICT per TD-109) actually requires *"**every** task
+        in the run is declared `J0` or `J1` — a declared `J2` task **FAILS** this item."* A Plan that
+        is merely "not all-J2" can still carry a declared `J2` and is **not launchable**, so the old
+        criterion was satisfiable by a vehicle that could never fire. Build the vehicle as **all
+        `J0`/`J1`, zero declared `J2`**, and record `gates_signed:` in its frontmatter (item 4 —
+        absent from SPRINT-101, the foreclosure that was queued behind the gate). Fixed by
+        `TASK-352`, which is a **prerequisite** for this row. Full spec — the seeded vehicle · the `--mode overnight` fire ·
         the terminal-state agreement check against the run's own committed log — lives in the sprint
         file, together with **D3** (T4's run is not gated on T2/T3 being green, so no unrelated
         slippage can foreclose its vehicle — L-111). Pointer, not a second copy (L-008).
@@ -188,6 +239,70 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                                 # conformance-engine.sh:54's one-space line left sweep_gate returning
                                 # rc=0 silently on a crashed engine
       state:      ready
+
+- [ ] TASK-352 — Correct the pre-flight item 3 criterion everywhere it is live, and require `gates_signed:` with it  [size: S] [risk: low] [HITL]
+      class:      execution
+      tier:       P
+      authority:  J2
+      origin:     manual   # filed by hand at the 2026-09-16 /triage governance pass; NOT grilled at intake, so no G1 fast-path
+      state:      ready
+      done-when:  No live artifact states the launch precondition as **"not all-J2"**. The rule at
+                  `skills/orchestrator/references/night-run.md:295` is *"every task in the run is
+                  declared `J0` or `J1` — a declared `J2` task **FAILS** this item"* (TD-109, ruled
+                  STRICT; SPRINT-093 D3 supersedes SPRINT-090 D4's permissive reading). The two are
+                  not the same test: a Plan that is merely *not all*-J2 can still carry a declared
+                  `J2`, and is refused. Every live copy says the STRICT form, and the vehicle
+                  checklist also requires **`gates_signed:` recorded in the sprint frontmatter**
+                  (pre-flight item 4) — absent from SPRINT-101, where it sat undiscovered behind the
+                  red gate as the *next* foreclosure.
+      touches:    `TODO.md` (TASK-319 row — corrected at this triage, verify it stuck) · the
+                  `approval_envelope:` `design` dimension wording carried forward into the next
+                  vehicle sprint · **re-derive the full live set before editing** — the phrase also
+                  appears in archived SPRINT-098/099/101, which are history and are NOT edited
+                  (TD-165 records why the signed copy stands)
+      depends-on: none
+      assumes:    that no OTHER live artifact carries the misreading. UNCONFIRMED — the SPRINT-101
+                  sighting was found by reading one row, not by a sweep. Re-derive by shape, not
+                  substring (L-108), and vary the SELECTION on the cross-check (L-198)
+      tracker:    night-run.md:295 · TD-109 · TD-165 · L-111 · SPRINT-101 T1
+      why:        **Prerequisite for the SPRINT-103 vehicle.** Three sprints (098 · 099 · 101) were
+                  designed against the wrong criterion; promoting the vehicle on the current spec
+                  rebuilds an unlaunchable Plan a fourth time. Found by an outside adversarial pass,
+                  not by anyone re-reading the rule — which was loaded and cited each time (L-165).
+
+- [ ] TASK-353 — Strip ANSI before parsing `bun test` counts, in all three TS harnesses  [size: S] [risk: low] [AFK]
+      class:      execution
+      tier:       G
+      authority:  J1
+      origin:     manual   # found live at the 2026-09-16 promote gate run; NOT grilled at intake, so no G1 fast-path
+      state:      ready
+      done-when:  `run-s4-ts-evaluators.sh` · `run-dod-delta-fixtures.sh` ·
+                  `run-s4-differential-parity.sh` each report their real test count instead of `0`.
+                  All three parse `bun test` output with `grep -oE '^ *[0-9]+ pass'`, but Bun emits
+                  ANSI colour **even when its output is captured**, so the line is
+                  `\e[0m\e[32m 48 pass\e[0m` and the `^` anchor lands on an escape byte — the match
+                  is empty, `n_pass` falls back to `0`, and the count floor FAILs. Measured
+                  2026-09-16: the same parser returns **48** once ANSI is stripped, and
+                  `bun test evals/dod-delta.test.ts` run directly gives `48 pass, 0 fail`.
+                  Retained must-FAIL: a *genuinely* shrunken suite (a dropped `describe`) must still
+                  redden — the floor is the point and stripping colour must not defeat it. Sibling
+                  control: a full suite stays green in the same run. Seeded-break discrimination
+                  under ONE stated hash convention (L-142 · L-169).
+      touches:    `evals/run-s4-ts-evaluators.sh` · `evals/run-dod-delta-fixtures.sh` ·
+                  `evals/run-s4-differential-parity.sh` — **re-derive the set before editing**: any
+                  other harness parsing Bun output has the same defect and is in scope (L-186 — the
+                  three named here are the ones that FAILED, not necessarily the whole population)
+      depends-on: none
+      assumes:    that all three share one cause. CONFIRMED for `dod-delta` by direct reproduction;
+                  the other two are inferred from an identical symptom and parser shape — verify
+                  each independently rather than inheriting this line (L-130)
+      tracker:    L-108 (a position anchor defeated by invisible bytes — the fourth live instance) ·
+                  L-144 · TD-117
+      why:        **Three Tier G harnesses — 156 assertions — are non-functional in the gate**, and
+                  have been reporting coverage loss that is not real. They fail loud, which is the
+                  safe direction, but they are 3 of the 6 FAILs standing between here and the green
+                  gate `TASK-349` exists to produce. Found only because the promote gate was finally
+                  run to completion; under truncation the run never reached them (TD-117).
 
 ### P2 — Follow-on
 
@@ -286,6 +401,15 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       tracker:    TD-122 · TD-124 · L-178
       origin:     close-retro
       state:      ready
+      guardrail:  **Surfaced at the 2026-09-16 `/triage` against `.out-of-scope/run-event-log.md`**
+                  (structured JSONL run-event stream, rejected 2026-07-30 · ADR-013). Ruled
+                  *related but distinct*, so this row proceeds: the rejection's stated defects were
+                  "no firing trigger and no first consumer", and this row has both — TD-122/TD-124
+                  are the trigger, `check-authority.sh` is the named consumer. **Carry the
+                  rejection's guardrail verbatim into the design:** the ledger *"must never quietly
+                  become the input to a run-state resume path"* (ADR-013 pre-mortem 1). If the
+                  design drifts toward a general event stream, it has re-entered the rejected
+                  concept and belongs back in `.out-of-scope/`.
 
 - [ ] TASK-321 — Make skill-produced summaries lead with the conclusion  [size: M] [risk: low] [HITL]
       class:      execution

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-15
+last_updated: 2026-09-16
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -294,6 +294,66 @@ status: current
 > FAIL lines trace to SPRINT-094 and SPRINT-095 having closed without their §11 archival pass, so the
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
+
+- **TD-163** severity: medium | status: open | created: Sprint-101
+  - Summary: **`docs/epic/INDEX.md`'s `update_trigger` cannot fire for the content its rows carry.**
+    The trigger reads *"An epic is opened, or closed and archived (STANDARD §11)"* — an epic-lifecycle
+    event. But each row's text carries **member-sprint** state, which changes far more often than the
+    epic does. The content has no trigger, so it drifts silently by construction. Filed at the
+    2026-09-16 post-close `/triage`.
+  - Evidence (both verified 2026-09-16, against the files as committed):
+
+    | Row claims | Actual |
+    |---|---|
+    | EPIC-015: **"`SPRINT-101` active** (promoted 2026-09-14)" | SPRINT-101 **closed** 2026-09-15 (`c8bc300`) and is archived |
+    | EPIC-015: **"4 of 8 § Closed-when ticked"** | **3 of 8** — `grep -c '^- \[x\]'` over the file |
+    | EPIC-014: "**SPRINT-083 promoted**" | five member sprints have closed since; the newest is SPRINT-092, 2026-08-31 |
+    | EPIC-016: "`SPRINT-002` **active**" | the epic file's own `member_sprints:` frontmatter says `SPRINT-002 (closed), SPRINT-003 (active)` |
+
+    The EPIC-016 row is the sharpest of the four: the index and the epic file disagree **inside this
+    repository**, so it needs no access to `workdoo` to be recognised as wrong — and neither figure is
+    reachable by any check, because nothing compares an index row against the file it indexes.
+
+  - **Why this is L-105's family, not a typo.** L-105 asks *when does a rule fire relative to the thing
+    it guards.* Here the answer is "never, for this content": the one event that would correct a member
+    -sprint figure — a member sprint closing — is **absent from the trigger**, so a correct close leaves
+    the index wrong and nothing anywhere notices. Three of the three sampled figures were stale, which
+    is the rate you expect when the refresh rate is zero rather than merely low.
+  - Impact: the index is the file a reader opens to decide **what to promote next**, so it is read at
+    exactly the moment its staleness is most expensive — and it reports epic progress *ahead* of
+    reality, which is the direction that under-states remaining work. This pass reached the right
+    answer only because the underlying epic files were re-counted rather than trusted.
+  - Fix direction (**not a ruling**): either add "a member sprint is promoted or closed" to the trigger
+    (cheap, but it is then a hand-maintained figure — LAW 3), or **derive** the per-epic tick count and
+    active-sprint pointer at `gen-index.sh` time from the epic files themselves, leaving the prose
+    rationale hand-written. The second is the shape the knowledge index already uses.
+
+- **TD-164** severity: medium | status: open | created: Sprint-101
+  - Summary: **SPRINT-101's SIGNED `approval_envelope:` encodes a superseded reading of the rule it
+    cites, and the record cannot be re-signed.** Its `design` dimension states *"the seeded Plan is
+    **not all-J2** (pre-flight item 3, STRICT per SPRINT-093 T4)"* — naming the STRICT ruling as the
+    authority for a criterion that ruling forbids. The actual rule
+    (`skills/orchestrator/references/night-run.md:295`) is *"every task in the run is declared `J0` or
+    `J1` — a declared `J2` task **FAILS** this item."* A Plan that is merely *not all*-J2 can still
+    carry a declared `J2` and is refused at pre-flight.
+  - Scope of the misreading — **three sprints, one live row, one signature**: SPRINT-098:126 ·
+    SPRINT-099:118 · SPRINT-101:59, :141, :155, plus `TODO.md`'s TASK-319 row. The live copies are
+    corrected by **`TASK-352`**; the three archived sprint files and the signature are **not edited**,
+    which is what this row exists to record.
+  - **Why it is filed rather than fixed.** An `approval_envelope:` is pinned to a commit
+    (`@ 2472fab`) and signed; editing the artifact would invalidate the pin and forge a signature onto
+    a design the owner did not approve. The defensible move is to leave it standing and record that it
+    is **not precedent** — which is precisely what this row is for.
+  - Impact: the misreading survived three sprints *while being cited as the rule*, and was found by an
+    outside adversarial pass rather than by anyone re-reading item 3 — which was loaded and quoted each
+    time (**L-165**: nothing the author can run finds these). Its cost is already paid twice over:
+    SPRINT-098 T4 launched a Plan that STRICT should have refused outright and parked at
+    `AUTHORITY_BOUNDARY`; SPRINT-101 designed a vehicle on the same basis and was saved from a third
+    demonstration only by the gate failing first.
+  - Fix direction (**not a ruling**): after `TASK-352` corrects the live copies, decide whether a
+    **mechanical** check is owed — the criterion is machine-checkable (a promoted Plan's task classes
+    versus its declared run mode), and a guard here would have caught all three. Weigh against
+    ADR-029's tiering: this is Tier G by the false-negative test.
 
 - **TD-160** severity: medium | status: open | created: Sprint-101
   - Summary: **A sprint is RED BY CONSTRUCTION between its promote and its first Execution Log entry.**
