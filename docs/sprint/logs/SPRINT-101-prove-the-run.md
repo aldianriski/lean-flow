@@ -187,3 +187,40 @@ reads and seeded breaks are drawn from branches that exist, so both instruments 
 as did the coordinator, who had read the artifact closely enough by then to be nearer author than
 reviewer. L-165 held exactly as written: the governing rule was loaded and on screen throughout, and
 found none of it; an independent pass found all of it. One bounded retry dispatched.
+
+### 2026-09-14 | progress | T3's six repairs verified; then a seventh found on the live artifact
+`fa851a9` on main. All six review findings verified by the coordinator directly, not on the
+builder's word: the `Task:` trailer is honoured with the no-trailer control still returning
+`unscoped`; `T2a` attributes; trailer coverage went **0/5 → 10/11** and the fixture set 4 → 10 with a
+must-fail/sibling pair per newly-covered arm; leg 16 now walks `plan_commit..HEAD` sourced from
+frontmatter exactly as its sibling does — **7 commits examined on the live repo where HEAD-only
+examined 1**. 40/40 green, `tsc` exit 0.
+
+**Then the guard was pointed at the live repo rather than at fixtures, and a seventh defect appeared
+— the same class, and the largest yet.** `sprint(NNN): Tn -- …` (colon *after* the paren) attributes
+as `coord` and is never examined; only `sprint(NNN) Tn:` is. Partitioning all **951** `sprint(`
+subjects through the checker's own `attributeClaim`:
+
+| kind | count |
+|---|---|
+| `coord` | 701 — **137 of which explicitly name a task** |
+| `task` | 235 |
+| `unscoped` | 15 |
+
+The guard reaches ~63% of its task-naming population and silently exempts 137 commits — **including
+T4's own commit in this sprint**. Both spellings are live conventions here (225 vs 128), not one
+current and one legacy.
+
+**Why this one is worth more than its fix.** It was not found by a fixture, a seeded break, or the
+adversarial review — all three had already passed. It was found by running the guard against the
+**real corpus it will judge** and partitioning the result, which is L-166 read at the population
+level: a fixture proves a branch works, the motivating artifact proves the branch is *reachable*, and
+only the corpus proves it is reachable for every artifact of the same kind (L-186). The cheap
+instrument was a table nobody had built, not a cleverer test.
+
+**And the recurrence is the finding.** Four rounds have each turned up another subject shape. The
+defect is not any single regex but that the examined set is derived by **enumerating shapes**, so
+every unlisted shape is a silent exemption rather than a loud one. Owner ruled one more targeted
+retry (the bounded retry was already spent, so this was surfaced rather than taken); the builder was
+asked to report — not build — any cheap assertion that would make an unmatched subject shape **fail
+loudly** instead of exempting itself.
