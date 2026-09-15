@@ -39,7 +39,10 @@ test_file="evals/dod-delta.test.ts"
 min_tests=48
 
 out=$(bun test "$test_file" 2>&1); code=$?
-n_pass=$(printf '%s\n' "$out" | grep -oE '^ *[0-9]+ pass' | grep -oE '[0-9]+' | head -1)
+# Bun colours its summary even when captured into a variable (an ESC/CSI byte precedes the digits),
+# so the anchor below is stripped of ANSI first -- otherwise `^` binds to the escape byte and never
+# matches, silently returning 0 (SPRINT-102 T2).
+n_pass=$(printf '%s\n' "$out" | sed 's/\x1b\[[0-9;]*m//g' | grep -oE '^ *[0-9]+ pass' | grep -oE '[0-9]+' | head -1)
 [ -n "$n_pass" ] || n_pass=0
 
 if [ "$code" -ne 0 ]; then
