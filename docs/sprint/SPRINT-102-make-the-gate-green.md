@@ -96,7 +96,7 @@ also requires `gates_signed:` in frontmatter.
 - [ ] TD-164 records why the signed SPRINT-101 envelope stands unedited and is not precedent
 
 ### T4 — Make an unmatched commit-subject shape FAIL loudly in `check-dod-delta.ts` `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `packages/`/`scripts/` `check-dod-delta.ts` · `evals/fixtures/dod-delta/`
+Layers: `scripts/lib/check-dod-delta.ts` · `evals/dod-delta.test.ts` · `evals/fixtures/dod-delta/`
 Depends-on: T2 (its fixtures run through the harness T2 repairs)
 Cites: L-202 · `TASK-351` · **SPRINT-101 T3** (a different sprint's T3 — cited as the origin of the finding, never depended on)
 
@@ -118,6 +118,8 @@ silently exempt. Proposed by its own builder when asked to report rather than bu
 - **D2** — **The run is NOT attempted this sprint.** Every task here is `HITL`, and T1/T3 are declared `J2` — so this Plan **fails pre-flight item 3 by construction** and is not launchable unattended. That is deliberate: the J2 decision work and the all-`J0`/`J1` vehicle cannot be the same Plan, which is the error SPRINT-101 made under the corrected reading T3 ships.
 - **D3** — **T1 is not gated on T2/T4 being green** (L-111's lesson from SPRINT-089 D3): no unrelated slippage may foreclose the ruling this sprint exists to take.
 - **D4** — **Tiers declared (ADR-029):** T2 and T4 are Tier **G** — a false negative in a count floor or an exemption arm is silent by construction, so both take the retained must-FAIL + sibling control + seeded-break proof, and both get an outside reviewer dispatched worktree-isolated (L-165 · L-168). T1 is a **decision** and T3 is Tier **P**.
+- **D6** *(taken at G2, 2026-09-16)* — **T1's fix is a MODE-AWARE ceiling in `scripts/qa-check.sh`; the launch path is not restructured.** `QA_CEILING_SECONDS` keeps asserting ~600 s for a foreground call, where the limit is real, and asserts the measured limit otherwise — so the gate stops FAILing runs that demonstrably completed, without touching how pre-flight invokes it. **Reachability caveat, surfaced now rather than at T1's DoD (L-111):** `qa-check.sh` cannot detect its own invocation mode, so the mode must be **declared by the caller**. If that needs `night-run.sh` to export one variable, it is inside T1's existing `Layers:` allowance (*read-only unless the ruling requires it*) and is **not** the rejected option (b), which was re-plumbing pre-flight to run detached and read a verdict file — the L-045/L-120 surface this deliberately avoids.
+- **D7** *(taken at G2, 2026-09-16)* — **T1's ruling earns an ADR.** It reverses TD-117's recorded *"raising the budget cannot work, the ceiling being external"*, which shaped four sprints. Hard-to-reverse · surprising · a real trade-off — §4's three-part bar, met. Without it the next reader finds two contradictory rulings and no record of which won (L-151: the decision must reach the consumer).
 - **D5** — **Cost reclamation is out of scope.** The 272-spawn mechanism is recorded by T1 but not fixed. If T1's ruling makes the gate green without it, optimising runtime is a separate, later question — and Round 14's figures are drawn from *truncated* runs, so they are not a valid baseline anyway (L-130).
 
 ## Assumptions
