@@ -286,3 +286,39 @@ the verdict means something. **The known risk is that this trades one red for an
 `qa-runtime-over-ceiling` check FAILs above 600 s, and a profile that needs >600 s to finish cannot be
 green under either limit. That would not be a regression; it would be the measurement that says the
 gate has outgrown the ceiling it is judged by, which is the question TD-117/TD-128 have been holding.
+
+### 2026-09-15 | surprise | the gate has no green configuration — and that, not the envelope, now blocks § Closed-when 1
+Re-run with `QA_BUDGET_SECONDS=1200`: `QA-CHECK: 217 pass, 1 fail` in **945 s**. **Every substantive
+check passes.** T3's harness finally ran (`PASS eval harness run-dod-delta-fixtures.sh`) and leg 16
+passed over real commits (`11 commit(s)/doc(s) checked across plan_commit..HEAD, 0 unattributed
+ticks`). The single FAIL is the gate reporting *itself*:
+`qa-runtime-over-ceiling: this run took 944s, exceeding the 600s command ceiling`.
+
+**The trade was predicted and it landed, which makes the pair of runs a measurement rather than two
+failures.** Together they bound the problem exactly:
+
+| invocation | elapsed | verdict | what it costs |
+|---|---|---|---|
+| bare (520 s budget) | 600 s | `204 pass, 1 fail` | truncates — **13 harnesses UNRUN**, T3's among them |
+| `QA_BUDGET_SECONDS=1200` | 945 s | `217 pass, 1 fail` | completes — trips the 600 s ceiling |
+
+**There is no third setting.** The default profile needs ~944 s to run completely against a ceiling of
+600 s: the gate has outgrown the limit it is judged by, by ~57%. Truncate and the verdict is silent
+about a fifth of its own checks; complete and the verdict is red for having spoken at all.
+
+**Why this blocks T1 specifically, and why the usual escape does not fit.** `night-run.sh:570` invokes
+the gate **bare** — `sh "$repo_root/scripts/qa-check.sh"`, only `MSYS_NO_PATHCONV` cleared. So the
+pre-flight sees the *truncated* run, never the 217/0 one. The `gate_exceptions:` grant would therefore
+have to name `qa-check-budget-exceeded`, and **that FAIL's whole content is "13 checks did not
+run"** — pre-approving it fires an unattended run against a gate blind to a fifth of itself, including
+the fixtures for the guard this very sprint built. Excepting `qa-runtime-over-ceiling` would be
+defensible on its merits (every real check passed, and the ceiling's stated premise — *killed from
+outside with no verdict line* — demonstrably did not occur: both long runs printed verdicts). But it is
+not the FAIL the pre-flight will meet.
+
+**So EPIC-015 § Closed-when 1 is no longer blocked by what has blocked it three times.** SPRINT-088
+foreclosed on an all-`HITL` Plan; SPRINT-098 parked on a missing `approval_envelope:`; both are now
+cleared, the envelope signed and verifying. What stands in the way is TD-117 · TD-128 — gate cost —
+which has been carried as a note for three sprints and is now the critical path. Surfaced to the owner
+rather than ruled: reducing gate cost is real work and out of this Plan's scope, and the alternatives
+all trade away evidence.
