@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-11
+last_updated: 2026-09-15
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---

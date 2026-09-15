@@ -2,7 +2,7 @@
 epic: 015
 slug: execution-autonomy
 owner: Maintainer
-last_updated: 2026-09-14
+last_updated: 2026-09-15
 status: active
 member_sprints: [SPRINT-088, SPRINT-089, SPRINT-090, SPRINT-093, SPRINT-098, SPRINT-101]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
