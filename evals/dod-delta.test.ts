@@ -490,3 +490,80 @@ describe("loadCommit -- finding 6: an archive-move commit must not throw uncaugh
     }
   });
 });
+
+// =================================================================================================
+// Finding 7 (adversarial review of e312de4, pointed at the LIVE repo rather than fixtures): the
+// coordinator-commit shape `sprint(NNN): T<n> -- ...` (colon RIGHT AFTER the paren) attributed as
+// `coord` and was never examined -- 137 of 701 `coord` commits in this history named a task at that
+// exact position, invisible to every fixture built so far because every one used the OTHER colon
+// placement (`sprint(NNN) T<n>:`). Both shapes are live conventions (225 vs 128 in this history), not
+// one legacy and one current.
+// =================================================================================================
+
+describe("attributeClaim -- finding 7: colon-after-paren with a task token as the first word", () => {
+  test("sprint(NNN): T<n> -- ... attributes to the task, not coord", () => {
+    expect(attributeClaim("sprint(100): T5 -- widen the conformance-coverage sweep ...", null)).toEqual({
+      kind: "task",
+      sprint: "100",
+      task: "T5",
+    });
+    expect(attributeClaim("sprint(101): T4 -- clear two stale records ...", null)).toEqual({
+      kind: "task",
+      sprint: "101",
+      task: "T4",
+    });
+  });
+
+  // The four exemption cases the coordinator named, proving the widening did NOT eat the coord
+  // exemption for genuine coordinator commits.
+  test("exemption 1: a prose word that merely CONTAINS a task-like token elsewhere stays coord", () => {
+    // First word after "sprint(101): " is "log", not a task token -- "T4" and the digit in "3 DoD"
+    // appear later in the sentence and must not be substring-matched.
+    expect(attributeClaim("sprint(101): log T4 merged, tick its 3 DoD, record two surprises", null)).toEqual({
+      kind: "coord",
+      sprint: "101",
+    });
+  });
+
+  test("exemption 2: an ordinary close-commit subject stays coord", () => {
+    expect(attributeClaim("sprint(100): close -- Findings That Mean What They Say, 29 of 29", null)).toEqual({
+      kind: "coord",
+      sprint: "100",
+    });
+  });
+
+  test("exemption 3: an ordinary bookkeeping subject stays coord", () => {
+    expect(attributeClaim("sprint(101): record plan_commit 87fdfeb", null)).toEqual({
+      kind: "coord",
+      sprint: "101",
+    });
+  });
+
+  test("exemption 4a: sprint(NNN) T1+T2: (task-before-colon combined token) stays unscoped, unchanged", () => {
+    expect(attributeClaim("sprint(095) T1+T2: shared refactor", null)).toEqual({ kind: "unscoped" });
+  });
+
+  test("exemption 4b: sprint(NNN): T1+T2 -- (colon-after-paren combined token) is unscoped, NOT task", () => {
+    expect(attributeClaim("sprint(101): T1+T2 -- shared refactor across two tasks", null)).toEqual({
+      kind: "unscoped",
+    });
+  });
+});
+
+describe("checkDodDelta -- finding 7 END-TO-END: colon-after-paren arm through real tick comparison", () => {
+  test("must-FAIL: sprint(NNN): T5 -- ... still catches a foreign tick in T1's block", () => {
+    const fx = loadFixture("colon-after-paren-must-fail");
+    const result = checkDodDelta(fx.subject, fx.trailer, fx.old, fx.new);
+    expect(result.ok).toBe(false);
+    expect(result.findings.map((f) => f.message)).toEqual([
+      expect.stringMatching(/commit claims T5 but ticked T1's DoD item it never named/),
+    ]);
+  });
+
+  test("sibling control: the same colon-after-paren arm, ticks agree, stays green", () => {
+    const fx = loadFixture("colon-after-paren-sibling");
+    const result = checkDodDelta(fx.subject, fx.trailer, fx.old, fx.new);
+    expect(result.ok).toBe(true);
+    expect(result.findings).toEqual([]);
+  });
+});

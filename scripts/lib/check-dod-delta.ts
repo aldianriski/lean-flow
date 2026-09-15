@@ -208,6 +208,27 @@ export function attributeClaim(subject: string, taskTrailer: string | null): Cla
   const qm = new RegExp(`^sprint\\((\\d+)\\)\\s+(${TASK_TOKEN})\\s+([A-Za-z][A-Za-z0-9 ]*):`).exec(subject);
   if (qm && !/T\d/.test(qm[3]!)) return { kind: "task", sprint: qm[1]!, task: qm[2]! };
 
+  // Rule 6a (finding 7 of an adversarial review of e312de4 pointed at the LIVE repo rather than
+  // fixtures -- the same population-blindness class a third time): `sprint(NNN): T<n> -- ...` /
+  // `sprint(NNN): T<n>: ...` -- colon RIGHT AFTER the paren (the coordinator-commit shape), but the
+  // very FIRST word following it is a task token. Partitioning all 951 `sprint(` subjects in this
+  // history found 701 resolved `coord`, of which 137 explicitly named a task -- this shape, not a
+  // legacy one: 128 subjects use it against 225 for rule 2's `sprint(NNN) T<n>:`. Anchored on
+  // POSITION (immediately after "sprint(NNN): "), never on a bare substring search for "T\d" in the
+  // subject -- "sprint(101): log T4 merged, tick its 3 DoD, record two surprises" names no task in
+  // this position (its first word is "log") and must stay `coord` despite containing both a "T4"
+  // token and a digit-bearing word ("DoD 3") elsewhere in the sentence.
+  //
+  // A combined token here (`sprint(101): T1+T2 -- ...`) is the SAME ambiguity rule 5 already refuses
+  // for the other colon placement -- caught by testing whether the matched run contains "+", not by
+  // re-deriving the rejection logic a second way.
+  const COMBINED_TOKEN = `${TASK_TOKEN}(?:\\+${TASK_TOKEN})*`;
+  m = new RegExp(`^sprint\\((\\d+)\\):\\s+(${COMBINED_TOKEN})(?:[^0-9a-zA-Z]|$)`).exec(subject);
+  if (m) {
+    if (m[2]!.includes("+")) return { kind: "unscoped" };
+    return { kind: "task", sprint: m[1]!, task: m[2]! };
+  }
+
   // Rule 6: `sprint(NNN): ...` with no task id -- COORDINATOR bookkeeping, exempt by role.
   m = /^sprint\((\d+)\):/.exec(subject);
   if (m) return { kind: "coord", sprint: m[1]! };
