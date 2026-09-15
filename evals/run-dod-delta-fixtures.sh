@@ -36,7 +36,7 @@ test_file="evals/dod-delta.test.ts"
 # A test-COUNT floor, not just an exit code -- `bun test` exits 0 on a file with zero live tests
 # (a renamed test, a dropped describe) while still reporting PASS (same shape run-s4-ts-evaluators.sh
 # guards against). RAISE THIS when adding cases to evals/dod-delta.test.ts, in the same commit.
-min_tests=48
+min_tests=54
 
 out=$(bun test "$test_file" 2>&1); code=$?
 # Bun colours its summary even when captured into a variable (an ESC/CSI byte precedes the digits),

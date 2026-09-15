@@ -567,3 +567,59 @@ describe("checkDodDelta -- finding 7 END-TO-END: colon-after-paren arm through r
     expect(result.findings).toEqual([]);
   });
 });
+
+// =================================================================================================
+// SPRINT-102 T4 (L-202): before attributeClaim falls through to a silent COORD/UNSCOPED exemption, a
+// task-shaped first token that no structural arm admits now FAILs loudly, naming the subject, instead
+// of being silently exempted. Real motivating case (L-166, drawn from `git log --format=%s` on this
+// repo, not invented): "sprint(094) T4 + record fix: prune 29 merged branches, untick two false DoD"
+// names T4 unambiguously but matched no arm above rules 1-6a and fell through to UNSCOPED until now.
+// Scope note (declared honestly at G2): this closes the coord/task boundary only -- it does not widen
+// into a general population fix, and it must not re-litigate the DELIBERATE ambiguity refusals rules
+// 5/6a already ship (an adjacent "+combined" token, or a qualifier naming a second task) -- both are
+// covered below as exclusion siblings that must stay unscoped, unchanged.
+// =================================================================================================
+
+describe("attributeClaim -- SPRINT-102 T4: an unmatched task-shaped subject is a LOUD exemption", () => {
+  test("real historical case (L-166): sprint(094) T4 + record fix: ... resolves to unmatched-shape, not coord/unscoped", () => {
+    expect(
+      attributeClaim("sprint(094) T4 + record fix: prune 29 merged branches, untick two false DoD", null),
+    ).toEqual({ kind: "unmatched-shape", sprint: "094", token: "T4" });
+  });
+
+  test("sibling control: a genuine coordinator subject (no task-shaped first token) stays coord, unchanged", () => {
+    expect(attributeClaim("sprint(101): record plan_commit 87fdfeb", null)).toEqual({
+      kind: "coord",
+      sprint: "101",
+    });
+  });
+
+  // Exclusion siblings: rules 5/6a's own DELIBERATE ambiguity refusals must not be re-litigated by
+  // this new arm -- both stay `unscoped`, exactly as they did before T4.
+  test("exclusion: an adjacent combined token (T1+T2:, space form) stays unscoped, not unmatched-shape", () => {
+    expect(attributeClaim("sprint(095) T1+T2: shared refactor", null)).toEqual({ kind: "unscoped" });
+  });
+
+  test("exclusion: a qualifier naming a SECOND task (T1 and T2:) stays unscoped, not unmatched-shape", () => {
+    expect(attributeClaim("sprint(093) T1 and T2: joint fix", null)).toEqual({ kind: "unscoped" });
+  });
+});
+
+describe("checkDodDelta -- SPRINT-102 T4 must-FAIL: real unmatched-shape subject reddens, naming itself", () => {
+  test("must-FAIL: the real SPRINT-094 subject reddens with an unmatched-task-shape finding naming the subject", () => {
+    const fx = loadFixture("unmatched-task-shape-must-fail");
+    const result = checkDodDelta(fx.subject, fx.trailer, fx.old, fx.new);
+    expect(result.ok).toBe(false);
+    expect(result.findings.map((f) => f.kind)).toEqual(["unmatched-task-shape"]);
+    expect(result.findings[0]!.message).toContain(fx.subject);
+    expect(result.findings[0]!.message).toMatch(/task-shaped but matches no known attribution arm/);
+  });
+
+  test("sibling control: a genuine coordinator subject, in the SAME run, stays green", () => {
+    const fx = loadFixture("unmatched-task-shape-sibling");
+    const result = checkDodDelta(fx.subject, fx.trailer, fx.old, fx.new);
+    expect(result.ok).toBe(true);
+    expect(result.findings).toEqual([]);
+    expect(result.note).toMatch(/coordinator-scoped/);
+  });
+});

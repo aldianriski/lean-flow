@@ -147,7 +147,11 @@ export type ClaimScope =
   // the commit's own changed files for the SOLE sprint-doc-shaped path, never by guessing a number.
   | { readonly kind: "task"; readonly task: string; readonly sprint: string | null }
   | { readonly kind: "coord"; readonly sprint: string }
-  | { readonly kind: "unscoped" };
+  | { readonly kind: "unscoped" }
+  // SPRINT-102 T4 (L-202): the subject's first token after "sprint(NNN):" / "sprint(NNN) " matches
+  // the task-token shape but no structural arm above admitted its exact punctuation -- a LOUD
+  // exemption (checkDodDelta FAILs, naming the subject) instead of a silent COORD/UNSCOPED pass.
+  | { readonly kind: "unmatched-shape"; readonly sprint: string; readonly token: string };
 
 function commitSprintNumber(subject: string): string | null {
   const m = /^sprint\((\d+)\)/.exec(subject) ?? /^merge\((\d+)\)/.exec(subject);
@@ -229,6 +233,33 @@ export function attributeClaim(subject: string, taskTrailer: string | null): Cla
     return { kind: "task", sprint: m[1]!, task: m[2]! };
   }
 
+  // Rule 7 (SPRINT-102 T4, L-202): before falling through to a silent COORD/UNSCOPED exemption below,
+  // test whether the subject's first token after "sprint(NNN):" or "sprint(NNN) " matches the SAME
+  // task-token shape every rule above already uses (TASK_TOKEN) -- just not in a punctuation this
+  // checker's arms recognise. SPRINT-101 T3 needed four rounds to reach an exhaustive population, each
+  // round finding another live subject spelling; this refuses to let the NEXT unlisted spelling hide
+  // the same way -- it turns it into a LOUD exemption (a named FAIL) instead of a silent one.
+  //
+  // Deliberately narrow, matching this file's own established refusals rather than re-litigating them:
+  // a token immediately followed by "+" (an adjacent combined token -- rules 5/6a's own ambiguity
+  // refusal) is excluded by the negative lookahead below, and a token whose remaining clause names a
+  // SECOND task (rule 5's "T1 and T2:" refusal) is excluded by the /T\d/ scan of `restClause`. Both
+  // ambiguities are EXAMINED and refused on purpose elsewhere in this function; this rule must not
+  // silently overturn those L-108 rulings, only catch what no rule above even looked at.
+  //
+  // Real motivating case (L-166, drawn from this repo's own `git log`, not invented): SPRINT-094's
+  // "sprint(094) T4 + record fix: prune 29 merged branches, untick two false DoD" names T4
+  // unambiguously (a space-separated "+" reads as an English conjunction, not an adjacent combined
+  // token) yet matched no arm above and fell through to UNSCOPED, silently exempt, until now.
+  const looseHead = new RegExp(`^sprint\\((\\d+)\\)(?::|\\s)\\s*(${TASK_TOKEN})(?![0-9a-zA-Z+])`).exec(subject);
+  if (looseHead) {
+    const rest = subject.slice(looseHead[0]!.length);
+    const restClause = rest.split(/[:.]/)[0] ?? "";
+    if (!/T\d/i.test(restClause)) {
+      return { kind: "unmatched-shape", sprint: looseHead[1]!, token: looseHead[2]! };
+    }
+  }
+
   // Rule 6: `sprint(NNN): ...` with no task id -- COORDINATOR bookkeeping, exempt by role.
   m = /^sprint\((\d+)\):/.exec(subject);
   if (m) return { kind: "coord", sprint: m[1]! };
@@ -237,7 +268,7 @@ export function attributeClaim(subject: string, taskTrailer: string | null): Cla
 }
 
 export interface DodDeltaFinding {
-  readonly kind: "unattributed-tick";
+  readonly kind: "unattributed-tick" | "unmatched-task-shape";
   readonly message: string;
 }
 
@@ -260,6 +291,23 @@ export function checkDodDelta(
   newContent: string | null,
 ): DodDeltaResult {
   const scope = attributeClaim(subject, taskTrailer);
+  // SPRINT-102 T4 (L-202): a task-shaped first token that no structural arm admitted is a LOUD
+  // exemption -- FAIL and name the subject, rather than folding it into the silent coord/unscoped
+  // skip below (the exact silent-exemption seam SPRINT-101 T3 found 137/701 commits falling through).
+  if (scope.kind === "unmatched-shape") {
+    return {
+      ok: false,
+      findings: [
+        {
+          kind: "unmatched-task-shape",
+          message:
+            `dod-delta: subject's first token "${scope.token}" after sprint(${scope.sprint}) is ` +
+            `task-shaped but matches no known attribution arm -- refusing to silently exempt it as ` +
+            `coordinator/unscoped: "${subject}"`,
+        },
+      ],
+    };
+  }
   if (scope.kind !== "task") {
     return {
       ok: true,
