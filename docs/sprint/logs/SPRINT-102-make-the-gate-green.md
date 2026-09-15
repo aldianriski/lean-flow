@@ -182,3 +182,87 @@ changing one line of 705 would be theatre, not portability. **Not changed; recor
 **Out of scope, noticed and passed on:** two zero-byte files at repo root — `**Outcome:**` and `get`
 — present before this sprint and unrelated to it. Named here so the next reader does not have to
 rediscover them.
+
+### 2026-09-16 | surprise | T4's Tier G review found a fix for silent exemption that REINTRODUCED silent exemption
+
+Outside review (worktree-isolated, L-168) returned **NOT CLEAR**. One CONFIRMED defect, reproduced by
+the coordinator against the merged code before any action was taken:
+
+```
+"sprint(099) T5 untick T2 false DoD test"        => unscoped          WRONG
+"sprint(100) T3 add t9 predictive text support"  => unscoped          WRONG  (t9, via /i)
+"sprint(103) T7 landing page copy tweak"         => unmatched-shape   correct control
+```
+
+Both wrong cases name a task unambiguously at the head, claim no second task, carry no adjacent `+` —
+and fell back to `unscoped` **silently** (`ok: true`, no finding) purely because their prose contained
+a `T<digit>`-shaped substring.
+
+**Root cause.** Rule 7's exclusion claimed to mirror Rule 5's "qualifier names a SECOND task" refusal.
+It was strictly broader on two axes: Rule 5 scans a **constrained capture** (`[A-Za-z][A-Za-z0-9 ]*`
+terminated by `:`) case-**sensitively**; Rule 7 scanned **arbitrary free text** to any `:`/`.`
+case-**insensitively**.
+
+**Why no instrument caught it.** Every Tier G proof passed *before* the review: 54/54 green, `tsc`
+clean, retained must-FAIL + sibling control drawn from real history, a seeded break reddening exactly
+the right two cases, a byte-identical restore, and a full-history scan finding exactly one hit —
+which the coordinator had re-derived independently. The defect is invisible to all of them because
+each instrument sits **inside the shape the author wrote**; the reviewer had to *invent subjects that
+do not exist yet* to expose it. **L-186 one level in:** fixtures test the branch, and the branch was
+wrong in a direction no fixture drawn from current history could reach. It is a live landmine, not a
+current miscount — no subject in today's history takes the swallow path.
+
+**Fourth consecutive defect found by an independent pass and none by recalling the rule (L-165).**
+
+### 2026-09-16 | progress | T4 retry merged and re-verified; 61 tests, history count still 1
+
+Sent back to the builder as the **bounded revise-loop retry** rather than patched by the coordinator,
+keeping author and reviewer separate — the only thing that has actually been catching these.
+
+Fix: the exclusion now mirrors Rule 5's shape exactly — a `\s+`-then-letter-led clause terminated by
+`:`, tested case-**sensitively**. No colon ⇒ no qualifier ⇒ flags unconditionally, whatever the prose
+contains.
+
+**Coordinator re-verification, run independently:** all six specified cases classify as designed
+(2 defects fixed, motivating case and T7 control preserved, both deliberate refusals still excluded);
+`bun` over `git log --all` → **1269 subjects scanned, exactly 1 `unmatched-shape` hit**, still
+`sprint(094) T4 + record fix: …`. The narrowed predicate neither over-flags nor was tuned to hide
+anything — the bar the retry brief set. 61 tests green, `tsc --noEmit` clean, `min_tests` 54 → 61.
+
+### 2026-09-16 | progress | T1 ruled, implemented and merged — ADR-042; Plan exhausted at 17 [x] + 1 [~]
+
+**The ruling.** ADR-042: the command ceiling is a property of the **invocation mode**, not of the run.
+Two falsifications carry it, both measured at this sprint (`qa-gate-timing.md` § Round 15):
+
+1. **The limit is external to a FOREGROUND call, not to the host.** Two detached full-profile runs
+   completed at **1263 s** and **1370 s** — 2.1× and 2.3× the ceiling — ran every harness, truncated
+   nothing, printed their own verdicts. TD-117's *"raising the budget cannot work, the 600 s ceiling
+   being external"* was right about the constraint it measured and wrong about its **scope**. Four
+   sprints of direction rested on the wider reading.
+2. **The assertion was unfalsifiable in the direction it claimed.** `qa_ceiling_check` runs at
+   `:1460`, the verdict prints at `:1480`. A killed run reaches neither — so the FAIL branch fired
+   only in runs that were *not* killed, while its message read *"a run past the ceiling is killed from
+   outside with no verdict line."* Printed, in full, by the run it said could not speak.
+
+**Implementation** (dispatched; the ruling was the coordinator's, the code was not): the branch calls
+a new `qa_ceiling_info_line` and prints an **uncounted INFO** naming the elapsed figure, the
+not-killed fact and the foreground caveat. `QA_CEILING_SECONDS` keeps its 600 s default;
+`night-run.sh` untouched, per ADR-042's rejection of re-plumbing the launch path (L-045/L-120).
+
+**Re-tiered to G during execution**, as its own DoD anticipated — a gate leg whose false negative is
+silent. Bar cleared: three retained fixtures in `run-qa-budget-fixtures.sh`; case 12 **extracts the
+real shipped case-statement** (sed between its own anchors, not a hand copy) and runs it at Round
+15's measured 1263 s → `pass=0 fail=0`; case 13 is the in-ceiling sibling, green in the same run;
+seeded break (reverting the arm to `bad`) reddened 12 while 13 stayed green, line count unchanged,
+`sh -n` parsing, restore byte-identical under one stated convention.
+
+**The trade-off is recorded, not smoothed.** A genuinely too-slow gate now reports INFO where it
+reported FAIL. TD-117's own words — *"cheaper still to learn to ignore, which is how a guard dies"* —
+apply to the line this change creates. The cost pressure the red gate applied is real pressure given
+up, and ADR-042 says so under Negative.
+
+**`Layers:` corrected again (L-100)** — the promote declaration said `possibly an ADR` and omitted the
+lib, fixture and index files the ruling turned out to touch. Third `Layers:` correction this sprint;
+each was the declaration meeting the work, which is the cost of declaring first.
+
+**Plan exhausted:** 17 DoD `[x]`, 1 `[~]` (T2's retained fixture, TD-165). System-verify running.

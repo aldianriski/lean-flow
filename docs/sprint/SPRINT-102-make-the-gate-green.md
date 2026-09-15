@@ -32,7 +32,10 @@ path beyond what T1's ruling requires.
 ## Plan
 
 ### T1 — Rule the ceiling against the measurement, not against the assumption `[size: M · risk: med · class: decision · HITL · J2]`
-Layers: `scripts/qa-check.sh` (the `QA_CEILING_SECONDS` block ~:1446-1460) · `TECH-DEBT.md` (TD-117 · TD-090) · `docs/research/logs/qa-gate-timing.md` (the new Round) · `scripts/night-run.sh` (read-only unless the ruling requires changing how pre-flight invokes the gate, in which case T1 owns it) · possibly an ADR
+Layers: `scripts/qa-check.sh` (the `QA_CEILING_SECONDS` block ~:1446-1460) · `scripts/lib/qa-budget-check.sh` · `evals/run-qa-budget-fixtures.sh` · `TECH-DEBT.md` (TD-117 · TD-090) · `docs/research/logs/qa-gate-timing.md` (the new Round) · `docs/adr/ADR-042-the-command-ceiling-is-a-foreground-limit.md` · `docs/DECISIONS.md` · `docs/knowledge-index.md` (generated) · `scripts/night-run.sh` (read-only unless the ruling requires changing how pre-flight invokes the gate — it did not; ADR-042 rejected that path)
+<!-- Layers corrected during execution per L-100: the promote declaration named `possibly an ADR` and
+     omitted the lib/fixture/index files the ruling turned out to touch. A `Layers:` line cannot name
+     files the implementation invents; declaring before the work is what makes the edit expected. -->
 Depends-on: none
 Cites: L-120 · L-111
 
@@ -49,12 +52,12 @@ GREEN, and (c) reachable by the command `scripts/night-run.sh` pre-flight actual
 the row's old wording was satisfiable while leaving the run unreachable (L-111).
 
 **DoD:**
-- [ ] The 1263 s detached run is recorded in `docs/research/logs/qa-gate-timing.md` as a new Round, with host load stated and the raw log's location named — *Verify: the Round exists and names `START_EPOCH`/`END_EPOCH`*
-- [ ] `QA_CEILING_SECONDS`' meaning is ruled: what it asserts, for which invocation mode, and why — recorded where the assertion is read, not only in the ledger (L-151)
-- [ ] The ceiling assertion no longer FAILs a run that demonstrably completed and verdicted — *Verify: a detached full-profile run prints `N pass, 0 fail` for this reason*
-- [ ] TD-117 and TD-090 carry the ruling and the measurement; neither is left as a standing condition
-- [ ] **Re-sized at G2 if the chosen fix is Tier G implementation rather than a ruling** — `[size: M]` is inherited, not derived (codex, 2026-09-16)
-- [ ] The 272-spawn finding is recorded against TD-090 as the cost mechanism — ~2 s per checker invocation, `sys`-dominated, 272 × ~2 s ≈ the measured runtime. **Not fixed here**; recorded so the next cost sprint starts from a mechanism instead of a table
+- [x] The 1263 s detached run is recorded in `docs/research/logs/qa-gate-timing.md` as a new Round, with host load stated and the raw log's location named — *Verify: the Round exists and names `START_EPOCH`/`END_EPOCH`* ✓ **§ Round 15**, carrying **two** runs (1263 s · 1370 s) rather than one — A1 required a second observation because TD-090 records 1.92–2.20× host variance on byte-identical code
+- [x] `QA_CEILING_SECONDS`' meaning is ruled: what it asserts, for which invocation mode, and why — recorded where the assertion is read, not only in the ledger (L-151) ✓ **ADR-042**, indexed in `docs/DECISIONS.md` (42 rows = 42 files), and the ruling is written into `scripts/qa-check.sh`'s own block comment where the next reader of the assertion meets it
+- [x] The ceiling assertion no longer FAILs a run that demonstrably completed and verdicted — *Verify: a detached full-profile run prints `N pass, 0 fail` for this reason* ✓ branch now calls `qa_ceiling_info_line`, uncounted. Fixture case 12 extracts the **real shipped case-statement** (sed between its own anchors, not a hand copy) and runs it at Round 15's measured 1263 s → `pass=0 fail=0`; case 13 is the in-ceiling sibling, green in the same run. **End-to-end confirmation is the close's system-verify run**
+- [x] TD-117 and TD-090 carry the ruling and the measurement; neither is left as a standing condition ✓ TD-117 carries ADR-042, both falsifications, and keeps its **cost half explicitly OPEN**; TD-090 carries the 272-spawn mechanism
+- [x] **Re-sized at G2 if the chosen fix is Tier G implementation rather than a ruling** — `[size: M]` is inherited, not derived (codex, 2026-09-16) ✓ **re-tiered to G during execution** and the full bar applied: retained fixtures, sibling control, seeded-break proof under one stated hash convention. `[size: M]` held — the implementation was ~11 lines plus a new pure formatting function
+- [x] The 272-spawn finding is recorded against TD-090 as the cost mechanism — ~2 s per checker invocation, `sys`-dominated, 272 × ~2 s ≈ the measured runtime. **Not fixed here**; recorded so the next cost sprint starts from a mechanism instead of a table ✓ filed with the arithmetic, the per-harness spawn counts, and the note that this is **L-144 — an already-promoted learning — with 272 live counter-examples** (L-020's shape)
 
 ### T2 — Strip ANSI before parsing `bun test` counts `[size: S · risk: low · class: execution · AFK · J1]`
 Layers: `evals/run-s4-ts-evaluators.sh` · `evals/run-dod-delta-fixtures.sh` · `evals/run-s4-differential-parity.sh` · `evals/fixtures/`

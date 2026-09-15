@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-12
+last_updated: 2026-09-16
 update_trigger: a measurement round is appended
 status: active
 id: qa-gate-timing-log
@@ -1763,3 +1763,54 @@ moved decisively into leg 12's harnesses.
   instrumented, and this Round should not be read as proving they share R0's mechanism.
 - **The budget trip is not a bug in the budget.** It fires correctly at 520 s and names what it
   skipped. The runs are genuinely over budget on a loaded host.
+
+## Round 15 — the ceiling is a FOREGROUND limit, not a host limit (SPRINT-102 T1, 2026-09-16)
+
+**Two detached full-profile runs, both complete, both far past the "external" 600 s ceiling.**
+
+| Run | Wall | Verdict | Truncation | Harnesses unrun |
+|---|---|---|---|---|
+| 1 (`ef02be0` era, promote gate) | **1263 s** | `QA-CHECK: 211 pass, 6 fail` | none | 0 |
+| 2 (`47fab3c`, A1 re-measurement) | **1370 s** | `QA-CHECK: 227 pass, 2 fail` | none | 0 |
+
+Both were launched **detached** (backgrounded shell, output to a file, polled) rather than as a
+blocking foreground call. Neither was killed. Both ran every harness and printed their own verdict
+line. Host: Windows 11 / Git-Bash, ordinary interactive session, other work in progress — **not** a
+quiet host, so these are upper-ish rather than best-case figures.
+
+### Finding 1 — the 600 s limit did not fire, twice
+
+TD-117 rejected "raise the budget" because *"the 600 s ceiling is external."* It is external to a
+**foreground** call. The agent harness caps a blocking shell invocation; it does not cap a detached
+process. Two runs at 2.1× and 2.3× the ceiling completed normally. The rejection was correct about
+the constraint it had measured and wrong about the constraint's scope.
+
+### Finding 2 — the ceiling assertion is unfalsifiable in the direction it claims
+
+`scripts/qa-check.sh:1453` runs `qa_ceiling_check`; the verdict prints at `:1473`, **twenty lines
+later**. A run killed at the ceiling never reaches either. So the FAIL branch fires **only** in runs
+that were not killed — while its message reads *"a run past the ceiling is killed from outside with no
+verdict line."* The line is printed, in full, by the very run it says cannot speak. It has never been
+capable of describing the run it fires on.
+
+### Finding 3 — where the time goes is process count, not work
+
+A bare `sh -c true` costs **76 ms** on this host; one real checker invocation costs **2.75 s**, of
+which **2.0 s is `sys`** — kernel time, not computation. The eval harnesses make **272** checker
+spawns. 272 × ~2 s ≈ **544 s**, against Round 14's measured ~545 s: the spawn count alone predicts
+the runtime. The slowest harnesses are not doing more work, they are doing more launches
+(`run-epic-archive` 38 spawns / 46.7 s · `run-night-run-rollup` 30 / 39.3 s · `run-layers-completeness`
+12 / 70.0 s). This is **L-144** — already a *promoted* learning in this repo — with 272 live
+counter-examples: a rule with no consumer.
+
+**Not acted on here.** Batching invocations (one checker run over N fixtures instead of N over one)
+preserves every assertion at a fraction of the cost, and is the lever a cost sprint should start from
+rather than from a per-harness table. Recorded for that sprint; TD-090 carries it.
+
+### Limits
+
+- **Two observations, one host, one session.** TD-090 records 1.92–2.20× variance on byte-identical
+  code, which is why one run was not accepted as the measurement.
+- The **actual** detached ceiling is unmeasured — both runs completed, so nothing bounded them from
+  above. What is established is that it exceeds 1370 s, not what it is.
+- Not tested: `NO_COLOR`/`FORCE_COLOR`, other Bun versions, or a quiet host.

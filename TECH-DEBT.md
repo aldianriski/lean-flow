@@ -1080,6 +1080,20 @@ status: current
     blockers (an all-`HITL` Plan at SPRINT-088; a missing `approval_envelope:` at SPRINT-098, now signed
     and verifying) and landed here. **`TASK-349` owns this row and was deferred by SPRINT-101 under the
     standing epic-first ruling — which deferred the very task the epic turned out to be blocked on.**
+  - **RULED at SPRINT-102 T1 (2026-09-16) — [ADR-042](docs/adr/ADR-042-the-command-ceiling-is-a-foreground-limit.md). This row's governing premise was FALSE, and the measurement that shows it took twenty minutes.**
+    Two **detached** full-profile runs completed at **1263 s** and **1370 s** — 2.1× and 2.3× the
+    "external" ceiling — ran every harness, truncated nothing, and printed their own verdicts. Nothing
+    killed either. *"Raising the budget cannot work, the 600 s ceiling being external"* was correct
+    about the constraint it measured and wrong about that constraint's **scope**: the limit is external
+    to a **foreground call**, not to the host. Four sprints of direction rested on the wider reading.
+  - **And the assertion was unfalsifiable in the direction it claimed.** `qa_ceiling_check` runs at
+    `scripts/qa-check.sh:1460`; the verdict prints at `:1480`. A run killed at the ceiling reaches
+    neither — so the FAIL branch fired **only** in runs that were *not* killed, while its message read
+    *"a run past the ceiling is killed from outside with no verdict line."* That sentence was printed,
+    in full, by the very run it said could not speak. Per ADR-042 the branch now prints an uncounted
+    `INFO` naming the elapsed figure, the not-killed fact and the foreground caveat.
+  - **The cost half stays OPEN.** The gate is no faster; what changed is that it no longer asserts
+    something false about itself. Measurements → `docs/research/logs/qa-gate-timing.md` § Round 15.
 
 - **TD-126** severity: medium | status: open | created: Sprint-092
   - Summary: **The opt-in profile spawns the Shell oracle twice over the same nine fixtures** — once in
@@ -2234,6 +2248,30 @@ status: current
     **Follow-up worth filing rather than fixing here:** the opt-in profile now spawns the Shell oracle
     twice over the same nine fixtures — once in `run-adr-family-fixtures.sh`, once inside
     `run-s4-differential-parity.sh`. Redundant work, not a correctness defect.
+  - **THE COST MECHANISM, measured at SPRINT-102 T1 (2026-09-16) — it is process COUNT, not work.**
+    Recorded here rather than acted on, so a cost sprint starts from a mechanism instead of a
+    per-harness table (`docs/research/logs/qa-gate-timing.md` § Round 15, Finding 3):
+
+    | Measurement | This host |
+    |---|---|
+    | bare `sh -c true` (fork floor) | **76 ms** |
+    | one real checker invocation | **2.75 s**, of which **2.0 s is `sys`** |
+    | checker spawns across the 47 eval harnesses | **272** |
+
+    272 × ~2 s ≈ **544 s** against Round 14's measured ~545 s — **the spawn count alone predicts the
+    runtime**. The `sys`-dominated profile is the tell: the work inside each checker is milliseconds
+    of text matching, and the cost is Windows `fork()` emulation. The slowest harnesses are not doing
+    more work, they are doing more launches (`run-epic-archive` 38 spawns / 46.7 s ·
+    `run-night-run-rollup` 30 / 39.3 s · `run-layers-completeness` 12 / 70.0 s).
+  - **This is [[L-144]] — an already-PROMOTED learning — with 272 live counter-examples.** Its durable
+    form is *"when a check is slow, the dominant term is usually the number of PROCESSES"*, and the
+    gate it governs makes 272 of them. A promoted rule with no consumer (L-020's shape).
+    **The lever this implies is batching, not deletion**: one checker run over N fixtures instead of N
+    runs over one preserves every assertion at a fraction of the cost — unlike moving harnesses behind
+    `QA_FULL=1`, which saves nothing at promote or close because the full profile runs both sets.
+    An outside review of SPRINT-102 T2 independently spotted the same shape in
+    `run-layers-completeness-fixtures.sh`, which invokes its checker **4× against the same fixture**
+    for three findings and a sibling control.
 
 - **TD-083** severity: minor | status: open | created: Sprint-083
   - Summary: **The architecture fitness suite has never fired on a real violation in this repository's
