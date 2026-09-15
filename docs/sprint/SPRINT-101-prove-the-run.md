@@ -3,10 +3,11 @@ sprint: 101
 slug: prove-the-run
 epic: EPIC-015
 owner: Maintainer
-last_updated: 2026-09-14
+last_updated: 2026-09-15
 status: active
 plan_commit: 87fdfeb
 close_commit:
+approval_envelope: goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions @ 2472fab
 update_trigger: sprint execute/close events
 ---
 
@@ -122,9 +123,31 @@ SPRINT-094's satisfied parked ruling is ticked or withdrawn.
 - [x] The structure around each edit is **re-read whole** afterwards — a list-entry edit can fuse neighbouring entries while grep and line caps stay clean (L-009).
 
 ## Owner-action checklist
-- [ ] **Sign the ten-dimension `approval_envelope:` at G2** and record it in this sprint's frontmatter — goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions, `@ <sha>`. **This is T1's blocker and nothing else's.** SPRINT-098 T4 parked precisely here; an omitted dimension is a dimension the envelope can silently widen along.
+- [x] **Sign the ten-dimension `approval_envelope:` at G2** and record it in this sprint's frontmatter — goal · scope · acceptance · design · verification · j1-delegation · capabilities · repair-policy · budget · stop-conditions, `@ <sha>`. **This is T1's blocker and nothing else's.** SPRINT-098 T4 parked precisely here; an omitted dimension is a dimension the envelope can silently widen along.
 - [ ] Confirm the QA gate is **green** before launch — `night-run.sh` refuses to fire on a red gate (SPRINT-093's green-gate precondition, Part 1). The verdict to read is the line the gate **prints** (`N pass, M fail`), never a status handed back through a wrapper (L-120).
 
+## Approval envelope — signed
+
+> Recorded at the owner's sign-off, pinned `@ 2472fab`. The frontmatter line is the index the
+> checker verifies; these are the bounds themselves. A run may proceed **inside these and no
+> further** without asking — gates say the Plan is sound, an envelope says the run may act (L-099 ·
+> L-151).
+
+| dimension | bound |
+|---|---|
+| `goal` | fire a genuinely unattended `--mode overnight` run that reaps and writes a `terminal ·` line agreeing with its own per-task lines |
+| `scope` | **T1 + T2 only.** Vehicle is a **seeded** Plan (the SPRINT-090 way), never real work re-declared AFK. `scripts/night-run.sh` is read-only for T1; T2 may write it **only if** the exercise finds a defect (D1) |
+| `acceptance` | the `terminal ·` state agrees with the run's own per-task lines, verified against its **own committed log**, never a fixture |
+| `design` | the seeded Plan is **not all-J2** (pre-flight item 3, STRICT per SPRINT-093 T4); T1 is not gated on T3/T4 (D2); T2 is opportunistic and never scheduled (D3) |
+| `verification` | `sh scripts/lib/check-approval-envelope.sh docs/sprint/SPRINT-101-prove-the-run.md` · `sh scripts/lib/check-night-run-rollup.sh docs/sprint/logs/SPRINT-101-prove-the-run.md` — **file arguments**, per the logged `scope-change`; the Plan's `.` form can never pass |
+| `j1-delegation` | none outstanding — T3/T4 are complete. The seeded Plan's own tasks carry their own declared classes; an absent class reads as J2 and parks |
+| `capabilities` | repo read/write and **local** commits. **No `git push`.** No network. No `reset --hard`, no force, no history rewrite |
+| `repair-policy` | ADR-022 mechanical-trigger carve-out **only** — one bounded retry on a named-check FAIL under declared repo policy. Judgment findings **park**. No second retry |
+| `budget` | **30 minutes wall-clock**, owner-set. Exhaustion is `BUDGET_STOP`, a named terminal state, not a silent stop |
+| `stop-conditions` | ends at **exactly one** of the five named terminal states; **park** any HITL/`J2` step rather than asking, answering or engineering around it; halt clean via `/handoff` when no disjoint AFK work remains |
+
+**Not yet launchable.** The envelope is one of T1's two preconditions; the other is a green gate,
+and `night-run.sh` refuses to fire on a red one. See the Execution Log for the standing gate state.
 ## Decisions (pre-locked)
 - **D1 — `scripts/night-run.sh` is owned by T2, conditionally.** T1 **reads** it and never modifies it. T2's `Layers:` claims it only if the exercise finds a defect, and a conditional write to a shared file is still a shared-file write: stage per-hunk and verify `git diff --cached`, never a plain `git add` over another task's WIP (L-042 · L-037).
 - **D2 — T1's run is NOT gated on T3 or T4 being green.** If either slips, T1 fires anyway, which is all its acceptance requires. SPRINT-060 foreclosed this task's only vehicle by letting an unrelated ruling decide the run's shape; this row exists so that cannot happen a third time (L-111).

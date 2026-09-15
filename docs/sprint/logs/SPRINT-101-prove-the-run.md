@@ -247,3 +247,42 @@ it was written*. It was also honest about the limit: it would **not** have caugh
 are about which arms exist at all, not about the coord/task boundary. So it closes this one recurring
 seam, not the general class. **Not built** — it is a design change to a Tier G guard arriving after
 the bounded retry was already spent, and that is an owner call, not a coordinator's. Carried to close.
+
+### 2026-09-15 | progress | approval envelope signed and recorded — T1's first precondition clears
+Owner signed. **The signature was not recorded as given**, because a signature in a transcript is not
+an envelope: `check-approval-envelope.sh`'s own reasoning is that an unattended run reads the sprint
+file and *"does not read the launching transcript, the commit message, or the conversation where the
+owner said yes"* — a ruling filed outside the artifact its consumer parses leaves the system behaving
+exactly as if it had never been taken, and fails silently because the author watched themselves decide
+(L-099 · L-151). So the ten dimensions were drafted, shown, and written to the artifact.
+
+Recorded in frontmatter as the index the checker verifies, pinned `@ 2472fab`, with the **bounds
+themselves** in a new § Approval envelope — signed. The pin matters as much as the coverage: an
+approval with no commit pin approves a moving target. Verdict:
+`PASS approval envelope … (all 10 dimensions covered, pinned @ 2472fab)`.
+Owner-set values worth naming here: `budget` **30 minutes wall-clock**, exhausting to `BUDGET_STOP`
+rather than a silent stop; `capabilities` local commits with **no push**, no network, no history
+rewrite; `repair-policy` the ADR-022 mechanical carve-out only, judgment findings park.
+
+**T1 still cannot fire.** The envelope was one of two preconditions; the other is a green gate, and
+the gate is red — see the next entry. SPRINT-098 T4 parked on the envelope alone; this sprint clears
+that and lands on the second gate, which is a different and previously unreached failure.
+
+### 2026-09-15 | surprise | system-verify TRUNCATED — the gate has outgrown its own budget
+`sh scripts/qa-check.sh` over the integrated tree: `QA-CHECK: 204 pass, 1 fail`, and the fail is
+`qa-check-budget-exceeded: 568s … exceeds the 520s default-profile budget`, with **13 harnesses UNRUN
+— including `run-dod-delta-fixtures.sh`, T3's own.** Leg 16 itself ran and passed
+(`dod-delta (10 commit(s)/doc(s) checked across plan_commit..HEAD, 0 unattributed ticks)`) — the range
+repair working live in the gate, on real commits, which is the strongest evidence T3 has.
+
+**Attribution, stated precisely rather than conveniently.** T3's leg is the proximate cause, but the
+headroom was already zero: the pre-T3 run on this same profile took **530 s against a 520 s budget**
+and completed only by reaching its last checkpoint early. SPRINT-099 measured 523–560 s. So the gate
+has been sitting on its own limit for three sprints and T3 tipped it from *barely completes* to
+*truncates* — TD-117 · TD-128, arriving as a blocker rather than a note.
+
+Owner ruled: raise `QA_BUDGET_SECONDS` and re-run, so the 13 skipped harnesses actually execute and
+the verdict means something. **The known risk is that this trades one red for another** — the
+`qa-runtime-over-ceiling` check FAILs above 600 s, and a profile that needs >600 s to finish cannot be
+green under either limit. That would not be a regression; it would be the measurement that says the
+gate has outgrown the ceiling it is judged by, which is the question TD-117/TD-128 have been holding.
