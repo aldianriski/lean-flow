@@ -70,11 +70,11 @@ anchor defeated by invisible bytes — and it was reachable only once the gate r
 reddens.
 
 **DoD:**
-- [ ] All three parse a real count — *Verify: `sh evals/run-dod-delta-fixtures.sh` prints `48 tests`, not `0`*
-- [ ] The population is **re-derived**, not inherited: every harness parsing Bun output is checked, not only the three that FAILed (L-186) — *Verify: the derivation is shown, with its cross-check varying the selection (L-198)*
-- [ ] Retained must-FAIL: a dropped `describe` still trips the count floor — stripping colour must not defeat the guard it feeds — *Verify: the fixture reddens*
-- [ ] Sibling control stays green in the same run
-- [ ] Seeded-break discrimination proof under ONE stated hash convention (L-142 · L-169)
+- [x] All three parse a real count — *Verify: `sh evals/run-dod-delta-fixtures.sh` prints `48 tests`, not `0`* ✓ re-run by the coordinator: `48 tests` · `87 tests` (and `21 tests` by the builder on the opt-in differential leg)
+- [x] The population is **re-derived**, not inherited: every harness parsing Bun output is checked, not only the three that FAILed (L-186) — *Verify: the derivation is shown, with its cross-check varying the selection (L-198)* ✓ Q1 parse-shape grep → 3; Q2 `bun test`-invocation grep → 4, reconciled to 3 (`qa-check.sh`'s two hits are comment prose, confirmed by `grep -v '^\s*#'` returning nothing)
+- [~] Retained must-FAIL: a dropped `describe` still trips the count floor — stripping colour must not defeat the guard it feeds — *Verify: the fixture reddens* — **NOT retained; proven live and reverted.** The harness wraps real production test files rather than a fixtures dir, so retaining one means a permanently-broken shipped test or new `.sh` scaffolding. Accepted as a judgement and filed as **TD-165** with the residual risk named. Flagged by the builder, not discovered in review
+- [x] Sibling control stays green in the same run ✓ `run-s4-ts-evaluators` green while `run-dod-delta` reddened, same pass — coordinator-reproduced
+- [x] Seeded-break discrimination proof under ONE stated hash convention (L-142 · L-169) ✓ convention: `git hash-object <path>` vs `git rev-parse HEAD:<path>`, used throughout. Seed landed (hash moved) and was *targeted* (569 lines unchanged, 72 `expect(` unchanged). **Reddened on the REAL count — `only 47 test(s) ran`, not the old stuck-at-0** — which is what proves the fix holds on a red run. Restore verified byte-identical
 
 ### T3 — Correct the pre-flight item 3 criterion, and require `gates_signed:` with it `[size: S · risk: low · class: execution · HITL · J2]`
 Layers: `TODO.md` (TASK-319 row) · the vehicle sprint's `approval_envelope:` design wording

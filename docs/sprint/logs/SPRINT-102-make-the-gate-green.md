@@ -147,3 +147,38 @@ the bar. Accepted as a judgement, not waved: the alternatives are a permanently-
 or new `.sh` scaffolding against the standing no-new-shell rule, and repo precedent exists
 (`run-s4-ts-evaluators.sh`'s header documents the same live proof from SPRINT-092). The residual risk
 is real and named in the row: a revert of the one `sed` is undetectable until someone reads a count.
+
+### 2026-09-16 | progress | T2 Tier G outside review: CLEAR, with one coverage gap it closed itself
+
+Dispatched worktree-isolated per L-165/L-168. Verdict **CLEAR** — no defects in `f650e57`. Every
+check was executed against real Bun 1.3.14 output, not reasoned about.
+
+**The review's own catch, and it is a real one.** The coordinator's verification block named only
+`run-dod-delta-fixtures.sh` (green + seeded red) and `run-s4-ts-evaluators.sh` (green + sibling
+control). **`run-s4-differential-parity.sh` — the third file in the diff — had never been exercised
+RED by anyone.** The reviewer seeded the same class of break into a row-driven loop generating 11 of
+its 21 cases and got `FAIL … only 10 test(s) ran, expected at least 21` — the real reduced count,
+not a stuck 0 — then restored and verified byte-identical under the same stated convention. This is
+**L-186 at the verification grain**: the fixtures proved the branch, and two of three *members* were
+exercised while the third was assumed to behave like its siblings. Nobody inside the change could see
+it; it took the independent pass, which is exactly L-165's claim.
+
+**Attempts to defeat the guard, all failed correctly** (import crash · `-t` filter matching zero ·
+zero-test file · `process.exit(7)` mid-run · `test.todo`): each either hits the `$code -ne 0` branch
+before `n_pass` is consulted, or falls back to 0 via the existing guard. `todo` counts print on a
+separate line and are correctly excluded rather than inflating the count. No shrinkage scenario
+produced a plausible-but-wrong non-zero count.
+
+**Portability question, raised PLAUSIBLE and now CLOSED.** `\x1b` in a `sed` pattern is a GNU
+extension; on BSD/macOS sed it would be taken literally, making the strip a silent no-op and
+**resurrecting the exact original bug**. The reviewer could not test another userland and correctly
+flagged it as a question rather than a defect. Closed by measurement: **75 of 89 shell scripts in
+`scripts/` + `evals/` already use GNU `\x` hex escapes** (705 occurrences), plus GNU-form `sed -i` in
+four. There is no CI matrix and no declared macOS/BSD support. GNU userland is therefore a pervasive
+pre-existing dependency and T2 adds **no new** portability risk. A POSIX form
+(`[[:cntrl:]]\[[0-9;]*m`) was validated as an equivalent drop-in should the repo ever need it — but
+changing one line of 705 would be theatre, not portability. **Not changed; recorded.**
+
+**Out of scope, noticed and passed on:** two zero-byte files at repo root — `**Outcome:**` and `get`
+— present before this sprint and unrelated to it. Named here so the next reader does not have to
+rediscover them.
