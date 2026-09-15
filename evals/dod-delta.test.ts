@@ -578,6 +578,13 @@ describe("checkDodDelta -- finding 7 END-TO-END: colon-after-paren arm through r
 // into a general population fix, and it must not re-litigate the DELIBERATE ambiguity refusals rules
 // 5/6a already ship (an adjacent "+combined" token, or a qualifier naming a second task) -- both are
 // covered below as exclusion siblings that must stay unscoped, unchanged.
+//
+// RETRY (Tier G outside review, CONFIRMED on 7829c8b): the first cut's exclusion scanned free text up
+// to ANY colon/period, case-INSENSITIVELY -- broader on both axes than rule 5's own qualifier test,
+// so it silently re-exempted any subject whose free-form prose merely CONTAINED a "T<digit>"-shaped
+// substring ("untick T2 ..."; a lowercase "t9" in "add t9 predictive text support"). Narrowed to
+// mirror rule 5's OWN shape exactly (a `\s+`-then-letter-led qualifier clause terminated by ":",
+// tested case-SENSITIVELY) -- the two cases below are the review's reproduction, now must-FAIL.
 // =================================================================================================
 
 describe("attributeClaim -- SPRINT-102 T4: an unmatched task-shaped subject is a LOUD exemption", () => {
@@ -605,6 +612,40 @@ describe("attributeClaim -- SPRINT-102 T4: an unmatched task-shaped subject is a
   });
 });
 
+describe("attributeClaim -- SPRINT-102 T4 retry: narrowed exclusion mirrors rule 5's shape exactly", () => {
+  test("a T<digit> substring loose in free prose (no colon) flags -- the review's first reproduction", () => {
+    expect(attributeClaim("sprint(099) T5 untick T2 false DoD test", null)).toEqual({
+      kind: "unmatched-shape",
+      sprint: "099",
+      token: "T5",
+    });
+  });
+
+  test("a lowercase t<digit> substring loose in free prose flags -- the review's second reproduction", () => {
+    expect(attributeClaim("sprint(100) T3 add t9 predictive text support", null)).toEqual({
+      kind: "unmatched-shape",
+      sprint: "100",
+      token: "T3",
+    });
+  });
+
+  test("control: an ordinary task-only subject with no digit-shaped prose still flags (unchanged)", () => {
+    expect(attributeClaim("sprint(103) T7 landing page copy tweak", null)).toEqual({
+      kind: "unmatched-shape",
+      sprint: "103",
+      token: "T7",
+    });
+  });
+
+  test("exclusion preserved: T5 and T6: (rule-5-SHAPED qualifier naming a second task) stays unscoped", () => {
+    expect(attributeClaim("sprint(099) T5 and T6: something", null)).toEqual({ kind: "unscoped" });
+  });
+
+  test("exclusion preserved: T1+T2 -- (colon-after-paren combined token) stays unscoped, rule 6a unchanged", () => {
+    expect(attributeClaim("sprint(082): T1+T2 -- shared thing", null)).toEqual({ kind: "unscoped" });
+  });
+});
+
 describe("checkDodDelta -- SPRINT-102 T4 must-FAIL: real unmatched-shape subject reddens, naming itself", () => {
   test("must-FAIL: the real SPRINT-094 subject reddens with an unmatched-task-shape finding naming the subject", () => {
     const fx = loadFixture("unmatched-task-shape-must-fail");
@@ -621,5 +662,21 @@ describe("checkDodDelta -- SPRINT-102 T4 must-FAIL: real unmatched-shape subject
     expect(result.ok).toBe(true);
     expect(result.findings).toEqual([]);
     expect(result.note).toMatch(/coordinator-scoped/);
+  });
+
+  test("must-FAIL (retry): a T<digit> substring loose in free prose reddens, in the SAME run", () => {
+    const fx = loadFixture("unmatched-task-shape-prose-digit-must-fail");
+    const result = checkDodDelta(fx.subject, fx.trailer, fx.old, fx.new);
+    expect(result.ok).toBe(false);
+    expect(result.findings.map((f) => f.kind)).toEqual(["unmatched-task-shape"]);
+    expect(result.findings[0]!.message).toContain(fx.subject);
+  });
+
+  test("must-FAIL (retry): a lowercase t<digit> substring loose in free prose reddens, in the SAME run", () => {
+    const fx = loadFixture("unmatched-task-shape-lowercase-t-must-fail");
+    const result = checkDodDelta(fx.subject, fx.trailer, fx.old, fx.new);
+    expect(result.ok).toBe(false);
+    expect(result.findings.map((f) => f.kind)).toEqual(["unmatched-task-shape"]);
+    expect(result.findings[0]!.message).toContain(fx.subject);
   });
 });

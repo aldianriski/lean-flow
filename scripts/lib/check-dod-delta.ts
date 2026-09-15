@@ -233,29 +233,43 @@ export function attributeClaim(subject: string, taskTrailer: string | null): Cla
     return { kind: "task", sprint: m[1]!, task: m[2]! };
   }
 
-  // Rule 7 (SPRINT-102 T4, L-202): before falling through to a silent COORD/UNSCOPED exemption below,
-  // test whether the subject's first token after "sprint(NNN):" or "sprint(NNN) " matches the SAME
-  // task-token shape every rule above already uses (TASK_TOKEN) -- just not in a punctuation this
-  // checker's arms recognise. SPRINT-101 T3 needed four rounds to reach an exhaustive population, each
-  // round finding another live subject spelling; this refuses to let the NEXT unlisted spelling hide
-  // the same way -- it turns it into a LOUD exemption (a named FAIL) instead of a silent one.
+  // Rule 7 (SPRINT-102 T4, L-202; narrowed after a Tier G outside review's CONFIRMED finding on
+  // e312de4-equivalent 7829c8b -- see the retry note below): before falling through to a silent
+  // COORD/UNSCOPED exemption below, test whether the subject's first token after "sprint(NNN):" or
+  // "sprint(NNN) " matches the SAME task-token shape every rule above already uses (TASK_TOKEN) --
+  // just not in a punctuation this checker's arms recognise. SPRINT-101 T3 needed four rounds to reach
+  // an exhaustive population, each round finding another live subject spelling; this refuses to let
+  // the NEXT unlisted spelling hide the same way -- it turns it into a LOUD exemption (a named FAIL)
+  // instead of a silent one.
   //
-  // Deliberately narrow, matching this file's own established refusals rather than re-litigating them:
-  // a token immediately followed by "+" (an adjacent combined token -- rules 5/6a's own ambiguity
-  // refusal) is excluded by the negative lookahead below, and a token whose remaining clause names a
-  // SECOND task (rule 5's "T1 and T2:" refusal) is excluded by the /T\d/ scan of `restClause`. Both
-  // ambiguities are EXAMINED and refused on purpose elsewhere in this function; this rule must not
-  // silently overturn those L-108 rulings, only catch what no rule above even looked at.
+  // Deliberately narrow, matching this file's own established refusals EXACTLY rather than
+  // re-litigating them with a broader test of our own:
+  //   - a token immediately followed by "+" (an adjacent combined token -- rules 5/6a's own ambiguity
+  //     refusal) is excluded by the negative lookahead below.
+  //   - a token followed by a qualifier clause that names a SECOND task is excluded ONLY when the
+  //     remainder has rule 5's OWN shape: `\s+` then a letter-led `[A-Za-z][A-Za-z0-9 ]*` run
+  //     terminated by ":", tested for an embedded `/T\d/` CASE-SENSITIVELY, identically to rule 5's
+  //     own `qm[3]` test at :213. The first cut of this rule scanned free text up to ANY colon/period,
+  //     case-INSENSITIVELY -- broader on both axes than rule 5, so it silently re-exempted any subject
+  //     whose free-form prose merely happened to contain a "T<digit>"-shaped substring (a real "T5" in
+  //     "untick T2 ...", a lowercase "t9" in "add t9 predictive text support") -- reintroducing the
+  //     exact silent-exemption class this rule exists to close (Tier G outside review, CONFIRMED).
+  //     Both ambiguities this rule DOES still exclude are EXAMINED and refused on purpose elsewhere in
+  //     this function; this rule must not silently overturn those L-108 rulings, only catch what no
+  //     rule above even looked at -- and must not invent a THIRD, broader definition of "ambiguous"
+  //     that rules 5/6a never asked for.
   //
   // Real motivating case (L-166, drawn from this repo's own `git log`, not invented): SPRINT-094's
   // "sprint(094) T4 + record fix: prune 29 merged branches, untick two false DoD" names T4
   // unambiguously (a space-separated "+" reads as an English conjunction, not an adjacent combined
-  // token) yet matched no arm above and fell through to UNSCOPED, silently exempt, until now.
+  // token, and there is no rule-5-shaped qualifier clause at all -- no colon follows) yet matched no
+  // arm above and fell through to UNSCOPED, silently exempt, until now.
   const looseHead = new RegExp(`^sprint\\((\\d+)\\)(?::|\\s)\\s*(${TASK_TOKEN})(?![0-9a-zA-Z+])`).exec(subject);
   if (looseHead) {
     const rest = subject.slice(looseHead[0]!.length);
-    const restClause = rest.split(/[:.]/)[0] ?? "";
-    if (!/T\d/i.test(restClause)) {
+    const qualifier = /^\s+([A-Za-z][A-Za-z0-9 ]*):/.exec(rest);
+    const isRule5ShapedSecondTaskRefusal = qualifier !== null && /T\d/.test(qualifier[1]!);
+    if (!isRule5ShapedSecondTaskRefusal) {
       return { kind: "unmatched-shape", sprint: looseHead[1]!, token: looseHead[2]! };
     }
   }
