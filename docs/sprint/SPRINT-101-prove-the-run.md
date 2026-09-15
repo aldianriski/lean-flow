@@ -96,13 +96,13 @@ figure and actual `[ ] → [x]` transitions disagree, including the case where a
 belonging to a task it did not touch.
 
 **DoD:**
-- [ ] The claim's parseability is **re-derived** by sampling real `sprint(NNN)` subjects, not inherited from the Backlog row (L-097 · L-130). If it is not reliably parseable, scope narrows to the *unattributed tick* half and the task says so.
-- [ ] Retained must-FAIL: SPRINT-094's `6a6aeac` — claimed "5 of 6", flipped three. — *Verify: the fixture reddens with its named finding*
-- [ ] Sibling control: a commit whose claim and ticks agree stays **green in the same run** (L-142).
-- [ ] **Population fixture** (L-186): at least one fixture varies the SELECTION, not the verdict — a commit reached by the other arm of whatever glob/regex picks the examined set.
-- [ ] Seeded-break discrimination proof under **ONE stated hash convention** (`git show <ref>:<path> | sha256sum`), with the seed verified landed and targeted — assertion count unchanged, line count within one of pristine (L-137 · L-142 · L-169).
-- [ ] **Registration verified from the registry's side**, not by running the harness: `for h in evals/run-*.sh; do grep -q "$h" scripts/qa-check.sh || echo UNREGISTERED; done` (L-196).
-- [ ] Outside reviewer, dispatched **worktree-isolated**, handed a **content assertion** — a symbol that must be present in the artifact — never only a branch ref (L-165 · L-168 · L-200).
+- [x] The claim's parseability is **re-derived** by sampling real `sprint(NNN)` subjects, not inherited from the Backlog row (L-097 · L-130). If it is not reliably parseable, scope narrows to the *unattributed tick* half and the task says so.
+- [x] Retained must-FAIL: SPRINT-094's `6a6aeac` — claimed "5 of 6", flipped three. — *Verify: the fixture reddens with its named finding*
+- [x] Sibling control: a commit whose claim and ticks agree stays **green in the same run** (L-142).
+- [x] **Population fixture** (L-186): at least one fixture varies the SELECTION, not the verdict — a commit reached by the other arm of whatever glob/regex picks the examined set.
+- [x] Seeded-break discrimination proof under **ONE stated hash convention** (`git show <ref>:<path> | sha256sum`), with the seed verified landed and targeted — assertion count unchanged, line count within one of pristine (L-137 · L-142 · L-169).
+- [x] **Registration verified from the registry's side**, not by running the harness: `for h in evals/run-*.sh; do grep -q "$h" scripts/qa-check.sh || echo UNREGISTERED; done` (L-196).
+- [x] Outside reviewer, dispatched **worktree-isolated**, handed a **content assertion** — a symbol that must be present in the artifact — never only a branch ref (L-165 · L-168 · L-200).
 
 ### T4 — Clear two stale records SPRINT-096 found but did not own `[size: S · risk: low · class: mechanical-ingest · tier: P · AFK · J1]`
 Layers: `TECH-DEBT.md` (TD-051) · `docs/sprint/archive/SPRINT-094-guards-for-what-nothing-reads.md`

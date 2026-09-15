@@ -224,3 +224,26 @@ every unlisted shape is a silent exemption rather than a loud one. Owner ruled o
 retry (the bounded retry was already spent, so this was surfaced rather than taken); the builder was
 asked to report — not build — any cheap assertion that would make an unmatched subject shape **fail
 loudly** instead of exempting itself.
+
+### 2026-09-14 | progress | T3 complete — finding 7 repaired, population now exhaustively covered
+`6c236a4` on main. Re-partitioned by the coordinator on the **full corpus**, not the builder's
+branch: 954 `sprint(` subjects → `task` **370** · `coord` 565 · `unscoped` 19, summing exactly to 954,
+and **0 coord-classified subjects still name a task** (was 137). `task` rose 235 → 370, absorbing the
+gap. Eight attribution controls hold, including the three that must *stay* `coord` (a log entry whose
+prose contains `T4` and a digit; a `close --` subject; `record plan_commit`) and the two combined-token
+subjects that must stay `unscoped` in both spellings. 48/48 green, `tsc` exit 0.
+
+T3's seven DoD are ticked on that evidence. Fixtures grew 4 → 12 across five selection arms, each with
+a must-fail/sibling pair; the builder's seeded break reddened exactly the five must-FAIL cases while
+every sibling control stayed green.
+
+**The builder's answer to the standing question, recorded because it is worth more than the fix.**
+Asked to *report, not build*, a cheap assertion that would make an unmatched subject shape fail loudly
+instead of exempting itself, it proposed inverting finding 7's own detector into a standing assertion
+inside the checker: before returning `coord`, test whether the subject's first token after
+`sprint(NNN):` matches the task-token shape, and FAIL naming that subject if it does. It costs one
+extra evaluation of a regex the fix already computes, and it would have caught finding 7 *the moment
+it was written*. It was also honest about the limit: it would **not** have caught findings 1–6, which
+are about which arms exist at all, not about the coord/task boundary. So it closes this one recurring
+seam, not the general class. **Not built** — it is a design change to a Tier G guard arriving after
+the bounded retry was already spent, and that is an owner call, not a coordinator's. Carried to close.
