@@ -295,6 +295,28 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-167** severity: medium | status: open | created: Sprint-102
+  - Summary: **`run-qa-budget-fixtures.sh`'s case 12 is a TIMING RACE and reddens the gate under load.**
+    The fixture seeds `START_TS` at Round 15's measured **1263 s** and asserts the ceiling block's
+    output **exactly**. The block computes `now - START_TS`, so if the clock ticks a second during
+    execution it emits `took 1264s` and the exact-match assertion fails. Observed once in a real
+    full-profile gate run (`214 pass, 1 fail`) and **not reproducible standalone** — six consecutive
+    `QA_FULL=1` runs in isolation all passed. It only trips when the machine is busy, which is
+    precisely when a gate runs.
+  - **Why this matters more than one flaky case.** A Tier G fixture that reddens at random trains the
+    reader to re-run until green, and a gate people re-run on faith is how a *genuine* red gets
+    waved through. That is the same failure this repo spent SPRINT-100 removing (a finding untrue of
+    its own subject) arriving from the other direction: here the finding is untrue of the CODE, and
+    the code is fine.
+  - Fix direction (**not a ruling**): assert on the *shape* rather than the exact figure — that the
+    line is `INFO` (uncounted) and that `RESULT pass=0 fail=0` — or freeze the elapsed value the
+    block reads instead of deriving it from wall-clock inside the fixture. The second is preferable:
+    a fixture whose input is a clock is not a fixture. Weigh against ADR-029 — this harness is Tier
+    **G**, so whatever replaces it takes the retained must-FAIL bar, and the replacement must still
+    redden if the ceiling branch ever goes back to counting the run as a FAIL (which is what case 12
+    exists to prevent, ADR-042).
+  - Discovered at the TASK-355 profiling run, not by the fixture's own authors — it has presumably
+    been latent since SPRINT-102 T1 shipped it, and passed every attended run until a busy one.
 - **TD-165** severity: medium | status: open | created: Sprint-102
   - Summary: **The three Bun harnesses' pass-count parsing has no RETAINED must-FAIL fixture — its
     discrimination was proven live and then reverted.** SPRINT-102 T2 fixed an ANSI-blind parser that

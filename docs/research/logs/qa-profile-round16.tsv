@@ -1,0 +1,119 @@
+ts	elapsed_s	memfree_kb	swapfree_kb	self_rss_kb	procs	label
+1789887861	0	1665904	19198600	9728	8	baseline: before leg 1
+1789887864	3	1696404	19079324	9856	8	checkpoint: leg 2: count consistency
+1789887866	5	1679644	19079328	9856	8	checkpoint: leg 2b: epic retention + rollup currency
+1789887867	6	1692252	19079332	9856	8	checkpoint: leg 2b-bis: handoff state
+1789887879	18	1623836	19003688	9856	10	checkpoint: leg 2c: research retention
+1789887923	62	1016052	19186452	9792	10	checkpoint: leg 2d: ephemeral intake
+1789887924	63	977840	19195640	9792	10	checkpoint: leg 2e: task origin
+1789887925	64	1044224	19246352	9792	10	checkpoint: leg 2f-bis: §13 attestation
+1789887925	64	1043844	19246864	9792	10	checkpoint: leg 2f-ter: conformance engine sweep
+1789888064	203	646040	19502288	9920	9	checkpoint: leg 2g: recorded-run rollup
+1789888065	204	706580	19422320	9920	9	checkpoint: leg 2b(review-depth): review depth
+1789888066	205	735764	19403980	9920	9	checkpoint: leg 2c-bis: mechanical Verify
+1789888066	205	745876	19405024	9920	9	checkpoint: leg 3: frontmatter/ownership
+1789888069	208	608328	19542592	9984	7	checkpoint: leg 4: knowledge metadata / corpus walk
+1789888091	230	977936	19519308	9984	11	checkpoint: leg 5: TODO.md hygiene
+1789888091	230	973488	19519308	9984	12	checkpoint: leg 6: README footer version lint
+1789888092	231	956132	19519308	9984	12	checkpoint: leg 7: TD aging
+1789888093	232	954488	19519308	9984	12	checkpoint: leg 8: temp-tracker lint
+1789888095	234	835076	19520716	9984	12	checkpoint: leg 9: QA.md hygiene
+1789888095	234	850192	19527500	9984	13	checkpoint: leg 10: L-NNN citation lint
+1789888106	245	678636	19983444	9984	12	checkpoint: leg 10b: archive-predicate singularity
+1789888107	246	678196	19983700	9984	11	checkpoint: leg 11: active-sprint task schema
+1789888108	247	617200	19983700	9984	12	checkpoint: leg 12: eval-harness preamble
+1789888108	247	620740	19983700	9984	12	harness-begin: run-reap-terminal-fixtures.sh
+1789888121	260	1038716	19775096	9984	11	harness-end: run-reap-terminal-fixtures.sh
+1789888121	260	1053736	19761784	9984	12	harness-begin: run-authority-fixtures.sh
+1789888122	261	1043080	19756876	9984	11	harness-end: run-authority-fixtures.sh
+1789888122	261	1055024	19756876	9984	13	harness-begin: run-run-mode-fixtures.sh
+1789888127	266	781240	19898892	9984	11	harness-end: run-run-mode-fixtures.sh
+1789888127	266	754920	19900300	9984	11	harness-begin: run-approval-envelope-fixtures.sh
+1789888132	271	681588	20115972	9984	11	harness-end: run-approval-envelope-fixtures.sh
+1789888132	271	682524	20118916	9984	11	harness-begin: run-skill-freshness-fixtures.sh
+1789888134	273	571396	20162928	9984	12	harness-end: run-skill-freshness-fixtures.sh
+1789888134	273	572640	20162928	9984	11	harness-begin: run-worktree-usability-fixtures.sh
+1789888135	274	538232	20183396	9984	11	harness-end: run-worktree-usability-fixtures.sh
+1789888135	274	540660	20183396	9984	11	harness-begin: run-dispatch-preflight-fixtures.sh
+1789888167	306	727924	20179208	10112	10	harness-end: run-dispatch-preflight-fixtures.sh
+1789888167	306	741976	20179208	10112	10	harness-begin: run-layers-completeness-fixtures.sh
+1789888173	312	694828	20238244	10112	5	harness-end: run-layers-completeness-fixtures.sh
+1789888173	312	700572	20238244	10112	5	harness-begin: run-sprint-log-layout-fixtures.sh
+1789888173	312	637684	20238248	10112	5	harness-end: run-sprint-log-layout-fixtures.sh
+1789888173	312	638632	20238248	10112	5	harness-begin: run-count-claims-fixtures.sh
+1789888175	314	613552	20286576	10112	5	harness-end: run-count-claims-fixtures.sh
+1789888175	314	614200	20291568	10112	5	harness-begin: run-epic-archive-fixtures.sh
+1789888175	314	716816	20298972	10112	5	harness-end: run-epic-archive-fixtures.sh
+1789888175	314	718312	20298972	10112	5	harness-begin: run-handoff-state-fixtures.sh
+1789888180	319	1131196	20006056	10112	5	harness-end: run-handoff-state-fixtures.sh
+1789888180	319	1131744	20006056	10112	5	harness-begin: run-research-archive-fixtures.sh
+1789888182	321	1065228	20040812	10112	5	harness-end: run-research-archive-fixtures.sh
+1789888182	321	1062436	20040812	10112	5	harness-begin: run-ephemeral-intake-fixtures.sh
+1789888183	322	1067008	20043628	10112	5	harness-end: run-ephemeral-intake-fixtures.sh
+1789888183	322	1066028	20043628	10112	5	harness-begin: run-task-origin-fixtures.sh
+1789888184	323	1052020	20043628	10112	5	harness-end: run-task-origin-fixtures.sh
+1789888184	323	1055808	20043628	10112	5	harness-begin: run-doc-caps-fixtures.sh
+1789888188	327	1047728	20048644	10112	5	harness-end: run-doc-caps-fixtures.sh
+1789888188	327	1049904	20048644	10112	5	harness-begin: run-sprint-close-fixtures.sh
+1789888190	329	968332	20124292	10112	5	harness-end: run-sprint-close-fixtures.sh
+1789888190	329	968964	20124292	10112	5	harness-begin: run-manifest-lockstep-fixtures.sh
+1789888192	331	967944	20133616	10112	7	harness-end: run-manifest-lockstep-fixtures.sh
+1789888192	331	971120	20133616	10112	7	harness-begin: run-gates-signed-fixtures.sh
+1789888196	335	891628	20258336	10112	5	harness-end: run-gates-signed-fixtures.sh
+1789888196	335	892824	20258336	10112	5	harness-begin: run-night-run-rollup-fixtures.sh
+1789888202	341	809180	20258352	10112	5	harness-end: run-night-run-rollup-fixtures.sh
+1789888202	341	808228	20258352	10112	5	harness-begin: run-system-verify-fixtures.sh
+1789888209	348	776716	20258500	10112	5	harness-end: run-system-verify-fixtures.sh
+1789888209	348	778572	20258500	10112	5	harness-begin: run-spec-reader-fixtures.sh
+1789888214	353	813104	20258516	10112	5	harness-end: run-spec-reader-fixtures.sh
+1789888214	353	814328	20258516	10112	5	harness-begin: run-conformance-engine-fixtures.sh
+1789888312	451	843160	20067056	10112	9	harness-end: run-conformance-engine-fixtures.sh
+1789888312	451	841636	20067056	10112	10	harness-begin: run-ownership-header-fixtures.sh
+1789888321	460	736568	20085944	10112	5	harness-end: run-ownership-header-fixtures.sh
+1789888321	460	737560	20085944	10112	5	harness-begin: run-foreign-repo-fixtures.sh
+1789888351	490	732900	20107336	10112	5	harness-end: run-foreign-repo-fixtures.sh
+1789888351	490	726888	20107336	10112	5	harness-begin: run-s4-ts-evaluators.sh
+1789888352	491	677184	20115608	10112	5	harness-end: run-s4-ts-evaluators.sh
+1789888352	491	679984	20115608	10112	5	harness-begin: run-s2-placement-fixtures.sh
+1789888360	499	680700	20120152	10112	5	harness-end: run-s2-placement-fixtures.sh
+1789888360	499	684364	20120152	10112	5	harness-begin: run-review-depth-fixtures.sh
+1789888366	505	723340	20138588	10112	5	harness-end: run-review-depth-fixtures.sh
+1789888366	505	724304	20138588	10112	5	harness-begin: run-verify-reaches-fixtures.sh
+1789888376	515	661116	20174896	10112	5	harness-end: run-verify-reaches-fixtures.sh
+1789888376	515	664516	20174896	10112	5	harness-begin: run-qa-budget-fixtures.sh
+1789888379	518	638448	20174904	10112	5	harness-end: run-qa-budget-fixtures.sh
+1789888379	518	639688	20174904	10112	5	harness-begin: run-qa-budget-default-fixtures.sh
+1789888380	519	633048	20174904	10112	5	harness-end: run-qa-budget-default-fixtures.sh
+1789888380	519	633740	20174904	10112	5	harness-begin: run-git-availability-fixtures.sh
+1789888384	523	560024	20174904	10112	5	harness-end: run-git-availability-fixtures.sh
+1789888384	523	562452	20174904	10112	5	harness-begin: run-night-run-gate-exception-fixtures.sh
+1789888398	537	720028	20180660	10112	5	harness-end: run-night-run-gate-exception-fixtures.sh
+1789888398	537	710632	20180660	10112	5	harness-begin: run-revise-loop-ceiling-fixtures.sh
+1789888402	541	763532	20177888	10112	5	harness-end: run-revise-loop-ceiling-fixtures.sh
+1789888402	541	762124	20177888	10112	5	harness-begin: run-night-run-outcome-fixtures.sh
+1789888418	557	613352	20250568	10112	5	harness-end: run-night-run-outcome-fixtures.sh
+1789888418	557	615292	20250568	10112	5	harness-begin: run-dod-delta-fixtures.sh
+1789888420	559	566300	20243720	10112	5	harness-end: run-dod-delta-fixtures.sh
+1789888420	559	566400	20243720	10112	5	harness-begin: run-adr-family-fixtures.sh
+1789888440	579	518008	19890896	10112	5	harness-end: run-adr-family-fixtures.sh
+1789888440	579	517352	19890896	10112	5	harness-begin: run-s4-differential-parity.sh
+1789888476	615	992504	20029356	10112	5	harness-end: run-s4-differential-parity.sh
+1789888476	615	1000776	20029356	10112	5	harness-begin: selftest-assert-park-revisit.sh
+1789888477	616	1129072	20029364	10048	5	harness-end: selftest-assert-park-revisit.sh
+1789888477	616	1182788	20029368	9920	5	harness-begin: selftest-assert-boundary-park.sh
+1789888499	638	1292360	19936048	10048	5	harness-end: selftest-assert-boundary-park.sh
+1789888499	638	1300184	19936048	10048	5	harness-begin: selftest-assert-noaction-park.sh
+1789888512	651	939420	20073044	10048	5	harness-end: selftest-assert-noaction-park.sh
+1789888512	651	940608	20073044	10048	5	harness-begin: selftest-assert-judgement-retry.sh
+1789888517	656	818000	20103452	10048	5	harness-end: selftest-assert-judgement-retry.sh
+1789888517	656	818288	20104220	10048	5	harness-begin: run-layers-observed-fixtures.sh
+1789888670	809	837196	19933360	10112	5	harness-end: run-layers-observed-fixtures.sh
+1789888670	809	837712	19933360	10112	5	harness-begin: run-worktree-base-fixtures.sh
+1789888675	814	771136	19947864	10112	5	harness-end: run-worktree-base-fixtures.sh
+1789888675	814	772668	19947864	10112	5	harness-begin: run-attestation-fixtures.sh
+1789888705	844	585312	20145628	10112	5	harness-end: run-attestation-fixtures.sh
+1789888705	844	585720	20145628	10112	5	harness-begin: run-sprint-family-fixtures.sh
+1789889010	1149	643052	19898248	10112	5	harness-end: run-sprint-family-fixtures.sh
+1789889010	1149	645524	19898248	10112	5	harness-begin: run-qa-budget-position-fixtures.sh
+1789889076	1215	713484	19955068	10112	5	harness-end: run-qa-budget-position-fixtures.sh
+1789889077	1216	693084	19955072	10176	5	final: summary

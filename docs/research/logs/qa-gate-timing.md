@@ -1814,3 +1814,71 @@ rather than from a per-harness table. Recorded for that sprint; TD-090 carries i
 - The **actual** detached ceiling is unmeasured — both runs completed, so nothing bounded them from
   above. What is established is that it exceeds 1370 s, not what it is.
 - Not tested: `NO_COLOR`/`FORCE_COLOR`, other Bun versions, or a quiet host.
+
+---
+
+## Round 16 — the first PER-LEG profile of a completed gate (2026-09-20)
+
+**What makes this round different from every one before it:** Rounds 1-15 measured the gate's
+*total* and, at best, a truncated sample. This is the first `QA_PROFILE=1` series that survived a
+**completed** full-profile run — 118 samples across all 47 harnesses plus every leg checkpoint.
+Raw series: [`qa-profile-round16.tsv`](qa-profile-round16.tsv) (committed beside this file, not
+summarised from memory).
+
+**It nearly did not survive either, and the reason is recorded because it makes the feature
+trustworthy or not.** `QA_PROFILE_OUT` is read from the environment, and the profile init opens that
+file with `>`. Twenty harnesses reference `qa-check.sh` and several invoke it, so every nested gate
+run inherited the variable and **truncated the outer run's profile**. A first attempt held 114
+samples at 1044 s and ended with **four** — the last nested run's — while looking like a valid short
+run. Fixed by scoping the variable out of the harness invocation; `qp_sample` requires both vars, so
+children no-op exactly as on an unprofiled run. This is CLAUDE.md edit-safety (d) inside the gate
+itself (L-067's shape).
+
+**Run:** `QA_FULL=1 QA_PROFILE=1`, attended, detached, **1216 s** total. Verdict `214 pass, 1 fail`;
+the single FAIL is **TD-167**, a timing race in `run-qa-budget-fixtures.sh` case 12 that only trips
+under load (six consecutive standalone `QA_FULL=1` runs pass), not a code defect.
+
+### Where the time actually goes
+
+| Rank | Item | Seconds | Share |
+|---|---|---:|---:|
+| 1 | `run-sprint-family-fixtures.sh` | 305 | 25% |
+| 2 | `run-layers-observed-fixtures.sh` | 153 | 13% |
+| 3 | leg 2f-ter — conformance engine sweep | 139 | 11% |
+| 4 | `run-conformance-engine-fixtures.sh` | 98 | 8% |
+| 5 | `run-qa-budget-position-fixtures.sh` | 66 | 5% |
+| 6 | leg 2c — research retention | 44 | 4% |
+| 7 | `run-s4-differential-parity.sh` | 36 | 3% |
+| 8 | `run-dispatch-preflight-fixtures.sh` | 32 | 3% |
+| 9 | `run-foreign-repo-fixtures.sh` | 30 | 2% |
+| 10 | `run-attestation-fixtures.sh` | 30 | 2% |
+| | **top five** | **761** | **63%** |
+| | **top ten** | **933** | **77%** |
+
+**The cost is CONCENTRATED, not spread thin.** That is the question this round existed to settle, and
+it settles it in favour of continuing: five items are 63% of the gate.
+
+### The finding that costs the most to have learned late
+
+**None of the five checkers ported at TASK-355 appears in the top 20.** After porting they total
+**17 s** (0 · 1 · 4 · 6 · 6), down from ~170 s — the technique works completely. But the targets were
+chosen from **TD-090's harness timings**, the only data anyone had, which named `epic-archive`,
+`night-run-rollup` and `layers-completeness` as the worst offenders. The profile's real top three are
+`sprint-family`, `layers-observed` and the conformance sweep, and **not one was on that list**.
+`layers-observed` is a *different checker* from the `layers-completeness` that a day of work went
+into.
+
+This is the cross-check rule at the scale of a work programme: a whole sprint's targeting was derived
+from a model rather than a measurement, and the model was wrong about **which items mattered** while
+being roughly right about the mechanism. TD-090's own figures could have said so — its per-spawn cost
+varies **4.7x** across the three harnesses it names (1.2 s, 1.3 s, 5.8 s), so "272 x ~2 s" was an
+aggregate coincidence that predicted no individual harness.
+
+### What this implies, stated as an estimate and not a forecast
+
+If the top five take the same treatment and land in the same range the ported five did, that is
+roughly **761 s -> ~50 s**, putting the gate near **8 minutes**. Two caveats: this run was 1216 s
+against 1490 s for the same code, so the +/-20% host variance is undiminished and individual figures
+are approximate — **the ranking is what is solid**; and three of the top five are conformance/sweep
+work whose shape may not be spawn-dominated at all. **Re-measure per target before committing to it**
+rather than inheriting this table the way TASK-355 inherited TD-090's.
