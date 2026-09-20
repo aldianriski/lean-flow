@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-20
+last_updated: 2026-09-21
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -16,19 +16,26 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-103 — Port the Measured Hotspots** → [docs/sprint/SPRINT-103-port-the-measured-hotspots.md](docs/sprint/SPRINT-103-port-the-measured-hotspots.md)
+> **None active.** `/lean-doc-generator promote` opens the next one.
 >
-> Promoted 2026-09-20. Five tasks, one per item in **Round 16**'s measured top five — 761 s, **63% of
-> the gate**. Split from `TASK-355` (`[size: L]`) at promote, per the size-check that runs before
-> rendering. Every task is **measure-then-rule**: its first DoD is a per-target measurement, and
-> *"ruled unportable, mechanism recorded"* is an accepted outcome (D2). T3 is `J2` — it touches the
-> **consumer-facing** conformance engine (ADR-027), so the ruling is human-reserved.
+> Predecessor: **SPRINT-103 — Port the Measured Hotspots** closed 2026-09-21 at **23 of 34 DoD
+> `[x]` + 11 `[~]` n/a**, `ca1d570`. It **measured every target before ruling it**, and four of the
+> five were ruled unportable with the mechanism recorded — the accepted outcome under D2, not a
+> shortfall. **T1** (305 s) is not spawn-shaped: 199 s of it is dispatch *inside* the engine a port
+> would still call 68 times, so the fix went to the caller — an awk-derived 43-rule spec,
+> **319.2–354.6 s → 136.7–184.0 s**, non-overlapping over six alternating runs, output
+> byte-identical. **T2** was the one genuinely spawn-shaped target and is ported; gate **leg 15
+> 21.0 s → 3.4 s**, oracle retained. **T3** ruled the consumer-facing engine portable in principle
+> and out of scope here (**ADR-043** — exit-code parity is reversible, shipping a `bun` requirement
+> to adopters is not) → **TD-168**. **T4** split → **TD-171**. **T5** is wait-bound by construction.
 >
-> Predecessor: **SPRINT-102 — Make the Gate Green** closed 2026-09-20 at **17 of 18 DoD** + 1 `[~]`.
-> It proved the technique and aimed it wrong: five checkers ported, reviewed and wired, their
-> harnesses down from ~170 s to **17 s**, and **the gate unmoved** — they were ~10% of it. The targets
-> came from `TD-090`'s harness timings; Round 16, the first profile of a *completed* gate, shows none
-> of them in the top 20. That is the whole reason this sprint measures first.
+> **Two things wait on one number, and `TASK-357` owns both.** The close could not run a full-profile
+> gate — the host sat at **3.0% free memory**, the condition that killed this sprint's own Wave 0, and
+> a figure taken under paging measures swap. So **A3 is recorded NOT confirmed**, and ADR-039's
+> deferred ruling on `layers-observed` (189.3 s, excluded and named) is still waiting on a re-measured
+> total. `TASK-319`/`TASK-188` remain in the Backlog, still paired, still blocked on a green gate.
+> `TASK-355` is pruned here: its five split points are all ruled, and the remaining leverage lives in
+> **TD-168** + **TD-171**. See `CHANGELOG.md` and the archived sprint file.
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
@@ -91,67 +98,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 <!-- Groomed by /triage. Only `ready` tasks are promotable. -->
 
 ### P0 — Blocking
-
-- [ ] TASK-355 — Cut the QA gate's wall-clock cost by moving hot checkers in-process under Bun  [size: L] [risk: med] [HITL]
-      class:      execution
-      tier:       G
-      authority:  J1
-      origin:     manual   # owner-raised 2026-09-20; NOT grilled at intake, so no G1 fast-path
-      state:      ready
-      done-when:  `QA_FULL=1 sh scripts/qa-check.sh` completes in a time the owner will sit through,
-                  with **zero** change to what is checked — every assertion still runs and can still
-                  FAIL, and `QA-CHECK: N pass, M fail` is byte-unchanged. Each ported checker keeps
-                  its `.sh` as a live ORACLE and is accepted only on **byte-identical differential
-                  parity** (same exit code, same stdout) across every fixture AND every real sprint
-                  Plan including `docs/sprint/archive/`.
-      why:        The gate takes **1263–1397 s** and is mandated at promote and close, which is the
-                  owner's stated top blocker on development speed. **`[size: L]` — split before
-                  promote**; it is filed whole because the sequencing matters and the split points
-                  are the rows below.
-      plan:       **RE-RANKED against measurement at the SPRINT-102 close — the original ranking,
-                  inherited from TD-090's harness timings, targeted the wrong five.** Round 16
-                  (`docs/research/logs/qa-gate-timing.md`, raw series beside it) is the first per-leg
-                  profile of a COMPLETED gate: 118 samples, all 47 harnesses. Remaining targets, by
-                  measured seconds:
-                  **1.** `run-sprint-family-fixtures.sh` — **305 s, 25% of the gate** ·
-                  **2.** `run-layers-observed-fixtures.sh` — **153 s** (note: a DIFFERENT checker
-                  from the `layers-completeness` already ported) ·
-                  **3.** leg 2f-ter, the conformance engine sweep — **139 s** ·
-                  **4.** `run-conformance-engine-fixtures.sh` — **98 s** ·
-                  **5.** `run-qa-budget-position-fixtures.sh` — **66 s**.
-                  Top five = **761 s / 63%**; top ten = 77%. **Re-measure each target before
-                  committing to it** — three of the five are conformance/sweep work whose shape may
-                  not be spawn-dominated at all, and inheriting this table unexamined is the exact
-                  mistake this row is correcting.
-      done-so-far: **Five checkers ported, reviewed, merged and WIRED** (SPRINT-102 close):
-                  `epic-archive` · `night-run-rollup` · `doc-caps` · `authority` ·
-                  `layers-completeness`. Each keeps its `.sh` as a live oracle; each was accepted on
-                  byte-identical differential parity; all five gate legs invoke Bun and all five
-                  oracles stay on disk. **Measured result: those five harnesses now total 17 s
-                  (0/1/4/6/6), down from ~170 s** — the technique is proven. **The gate is still
-                  ~20 min**, because they were ~10% of it and host variance is ±20%.
-      assumes:    ~~UNCONFIRMED — ~1000 s unmeasured~~ **RESOLVED at Round 16.** The distribution is
-                  now measured and concentrated. The remaining assumption is narrower and stated as
-                  such: *that the top five respond to porting the way the first five did.* **Estimate,
-                  not forecast:** 761 s → ~50 s would put the gate near 8 minutes.
-                  *Confirm: re-measure each target individually before it is promoted, per the plan.*
-      touches:    `evals/run-layers-completeness-fixtures.sh` · `scripts/lib/check-layers-completeness.sh`
-                  (retained as oracle) · new `scripts/lib/check-layers-completeness.ts` · later rows
-                  add `check-epic-archive` · `check-night-run-rollup` · `evals/lib/harness-common.sh`
-      depends-on: none
-      tracker:    TD-090 (the cost mechanism: spawn-count-shaped, `sys`-dominated, Windows `fork()`)
-                  · L-144 (already-promoted: "when a check is slow the dominant term is the number
-                  of PROCESSES" — with hundreds of live counter-examples, L-020's shape) · ADR-039
-                  (the differential-parity pattern this reuses) · ADR-033
-      scope-note: **Speed only.** Checking fewer files, sampling history, mocking the Git/reaper
-                  integration, dropping the live Shell/TS differential, or raising the budget in
-                  place of reducing runtime are all OUT — each needs its own owner ruling and none
-                  is authorised by this row. A faster gate that checks less is worthless.
-      caution:    **2 s is not the cost of a shell launch** (a bare `sh -c true` is 76 ms). A checker
-                  costs ~2.75 s because it launches `grep`/`sort`/`tr`/`sed`/`awk` dozens of times
-                  INTERNALLY. Batching arguments into the same shell loop therefore preserves most
-                  of the cost — only moving the logic in-process removes it. An earlier estimate in
-                  this session claimed ~160 s from batching alone and was wrong by ~5x.
 
 ### P1 — Next Phase Required
 

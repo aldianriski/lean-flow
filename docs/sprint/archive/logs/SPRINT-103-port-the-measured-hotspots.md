@@ -2,7 +2,7 @@
 sprint: 103
 slug: port-the-measured-hotspots
 owner: Maintainer
-last_updated: 2026-09-20
+last_updated: 2026-09-21
 status: active
 update_trigger: an Execution Log entry is appended
 ---
