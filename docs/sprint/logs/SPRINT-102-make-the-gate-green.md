@@ -314,3 +314,22 @@ loudly if its number is not 1 (the cross-check rule's disagreeing second number)
 mandate, against the integrated tree at `38d02a1`. The previous entry said "System-verify running"
 and no verdict was ever recorded — no gate artifact exists from 2026-09-16. That gap is why this
 entry exists at all.
+
+### 2026-09-20 | scope-change | T4 `Layers:` corrected a fourth time — the harness file two commits changed and none declared
+
+System-verify at `cd94e14` printed **`226 pass, 2 fail`**. The first FAIL is T4's own: `layers
+observed` named `evals/run-dod-delta-fixtures.sh` as *changed by a task that never declared it*, and
+it was right. `7829c8b` and `24ba7fe` both edited that file — the `min_tests` floor, 48 → 54 → 61,
+recorded in this Log's own entries as evidence — while T4's `Layers:` named only
+`check-dod-delta.ts`, `dod-delta.test.ts` and `evals/fixtures/dod-delta/`.
+
+Declared now (L-100: the declaration meets the work; log it, declare it, continue). **Fourth
+`Layers:` correction this sprint, and the only one the gate had to find** — the other three were
+caught by their builders. Impact: none on behaviour or on any DoD; the file was already exercised by
+every run. Re-verified by running the leg **alone** and reading its own verdict rather than a
+wrapper's (L-120): `PASS … all changed files declared and attributed, base ef02be0`.
+
+**What this cost is worth recording.** The gap existed from `7829c8b` onward and no instrument
+reached it until a completed system-verify did — because the previous entry's system-verify was
+announced and never finished, so the sprint ran four more commits with a red leg nobody had seen.
+That is the ADR-021 step-6 ordering earning its place: not ceremony, the only reader of this class.

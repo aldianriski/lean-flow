@@ -100,7 +100,7 @@ also requires `gates_signed:` in frontmatter.
 - [x] TD-164 records why the signed SPRINT-101 envelope stands unedited and is not precedent ✓ row present; states that editing it *"would invalidate the pin and forge a signature onto a design the owner did not approve"*, and records it as **not precedent**
 
 ### T4 — Make an unmatched commit-subject shape FAIL loudly in `check-dod-delta.ts` `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-dod-delta.ts` · `evals/dod-delta.test.ts` · `evals/fixtures/dod-delta/`
+Layers: `scripts/lib/check-dod-delta.ts` · `evals/dod-delta.test.ts` · `evals/fixtures/dod-delta/` · `evals/run-dod-delta-fixtures.sh` (the `min_tests` floor, 48 → 54 → 61 — declared late, per L-100; the gate's `layers observed` leg named it)
 Depends-on: T2 (its fixtures run through the harness T2 repairs)
 Cites: L-202 · `TASK-351` · **SPRINT-101 T3** (a different sprint's T3 — cited as the origin of the finding, never depended on)
 
