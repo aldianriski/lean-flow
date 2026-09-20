@@ -1976,3 +1976,51 @@ sized by eye.
 - **T4** (`run-conformance-engine-fixtures.sh`, 38 engine calls) shares this mechanism and already
   uses reduced specs for part of its set; its own reduction is unexamined here.
 - **T2** and **T3** are untouched by this Round.
+
+## Round 18 — leg 2f-ter's sweep is corpus work, and it is kernel-bound (2026-09-20)
+
+SPRINT-103 T3. One run, `sh scripts/lib/conformance-engine.sh . --spec spec/STANDARD.md` — exactly
+the work leg 2f-ter does under `QA_FULL=1`. Taken on the same memory-pressured host as Round 17
+(2.2% free), so the absolute figure is if anything inflated; the *shape* is what this Round rests on
+and it is two orders of magnitude clear of its own error bar.
+
+| measurement | real | user | sys |
+|---|---:|---:|---:|
+| full spec (100 rules) vs **this repo** | **173.1 s** | 53.8 | 81.1 |
+| full spec (100 rules) vs an **empty dir** (Round 17) | 2.9 s | 1.3 | 1.6 |
+
+Round 16 measured this leg at 139 s. 173 s against it is within the ±20% this host has shown all
+along, in the direction memory pressure predicts — so the two agree, by different routes, on the
+same leg. That agreement is the cross-check; neither figure alone would carry it.
+
+### The answer to the DoD's question — "spawns, corpus size, or real work?"
+
+**Corpus size, executed as spawns.** Fixed dispatch is 2.9 s of 173 s — **1.7%** — so the per-rule
+cost that dominates T1 is nearly absent here. What remains is ~170 s of work over the real corpus,
+and it is **kernel-bound: `sys` 81 s against `user` 54 s, 60% of CPU time in the kernel.** An engine
+computing would be user-dominant. One shelling out to `grep`/`awk`/`git` per file per rule is
+`sys`-dominant, which is what this is, and on Windows every one of those pays `fork()` emulation.
+
+**This inverts the conclusion Round 17 reached for T1, and both stand.** They are different costs in
+the same program: T1 pays *fixed dispatch* 68 times against tiny directories, so a reduced spec
+fixes T1; T3 pays *per-file spawns* once against a large corpus, which no spec reduction reaches
+without dropping rules — and dropping rules is a coverage change D6 forbids. The levers do not
+substitute for each other and neither is a substitute for the other's task.
+
+### What it implies for the sprint, stated as the finding and not the decision
+
+`conformance-engine.sh` is the cost centre of this gate: T1 (305 s) + T3 (139 s) + T4 (98 s) =
+**542 s, 71% of Round 16's top five, one program**. T3's share of that is the part a **port** would
+reach, because 60% kernel time is precisely what moving from per-file subprocesses to in-process
+file reads removes. That makes the engine the largest single porting opportunity anywhere in the
+gate — and simultaneously the one file where a port is not an internal refactor:
+
+**Consumer-facing blast radius (T3 DoD 2, L-015).** ADR-027 amended ADR-008 so the engine answers
+for *any* repository through the root `conformance.sh`, and its **exit code is a documented contract
+an adopter may gate CI on**. An adopter would observe: the same exit code, or the port is wrong; the
+same report text, or their log diffing breaks; and a new **`bun` dependency on their machine**,
+where today they need only `sh`. That last one is not a detail — it is a change in what the product
+*requires of its consumer*, and no amount of parity testing inside this repo surfaces it.
+
+**Not measured here:** whether an in-process implementation actually recovers the 81 s of `sys`. That
+is a prototype's question, not a profile's, and this Round does not answer it.

@@ -184,3 +184,30 @@ fails the harness if the reduction ever loses `S2.F-TIER`. T1's reduction needs 
 nothing. That is the L-186 failure a second time, in the fix rather than in the analysis.
 
 consequence · T2,T4,T5 · behaviour:low · governance:high
+
+### 2026-09-20 | progress | T3 measured — corpus work, kernel-bound; ruling surfaced to the owner
+
+Full figures → `docs/research/logs/qa-gate-timing.md` **Round 18**.
+
+**Measured:** the engine's full-spec sweep against this repo — leg 2f-ter's `QA_FULL=1` work — runs
+**173.1 s real / 53.8 user / 81.1 sys**. Round 16 independently measured the same leg at 139 s; 173 s
+sits inside this host's ±20% in the direction memory pressure predicts, so two routes agree. Fixed
+dispatch is **2.9 s of 173 s (1.7%)**, so T1's dominant cost is nearly absent here.
+
+**Mechanism (DoD 1): corpus size, executed as spawns.** 60% of CPU time is `sys` — the engine shells
+out per file per rule, and on Windows each of those pays `fork()` emulation. A computing engine
+would be user-dominant; this is not one.
+
+**This inverts Round 17's conclusion for T1, and both hold.** Two different costs in one program:
+T1 pays fixed dispatch 68× against tiny dirs (reduced spec fixes it); T3 pays per-file spawns once
+against a large corpus (no spec reduction reaches it without dropping rules, which D6 forbids).
+
+**Consumer-facing blast radius (DoD 2, L-015):** an adopter of root `conformance.sh` would observe
+the same exit code and report text if a port is correct — and a **new `bun` dependency on their
+machine**, where today `sh` suffices. That is a change in what the product requires of its consumer,
+and nothing inside this repo's parity testing would surface it.
+
+**DoD 3 and 4 stay open by design** — they require the ruling, which is `J2`. Surfaced to the owner
+now with the measurement behind it, per § Owner-action. Not decided here.
+
+consequence · T3 · behaviour:material · governance:high
