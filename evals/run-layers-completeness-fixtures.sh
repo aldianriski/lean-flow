@@ -76,5 +76,44 @@ if [ "$n_pass" -lt "$min_tests" ]; then
   exit 1
 fi
 
-echo "PASS fixture(layers-completeness): TS port green -- $n_pass tests, 0 fail (retained: sprint-041-reconstructed, depends-on-omitted, sprint-048-citations sibling PASS, cites-contradiction, unindented-continuation, dir-token-prefix T1/T2, substring-declaration-not-declared T1/T2/T3, archive-path-excluded pair, archive-case-variant, file-not-found). Shell oracle parity: evals/layers-completeness-differential.ts (opt-in, not run here)."
+# --- ORACLE-SIDE GUARD: the IFS word-splitting fix (TASK-355) -------------------------------------
+# Everything above exercises the TS PORT. It cannot catch a regression in the SHELL oracle -- proven
+# by seeding the IFS fix out and watching this suite stay 19/19 green. The full shell/TS differential
+# (evals/layers-completeness-differential.ts) DOES catch it, but it is opt-in and takes ~14 minutes,
+# so it is not gate-reachable: an independent review found the oracle fix had NO automated coverage in
+# either gate profile, which makes it a rule with no matcher (STANDARD Sec 10 -- wire it or admit it is
+# documentation).
+#
+# This is the cheap gate-reachable half: ONE oracle invocation over ONE fixture, asserting the two
+# findings that word-splitting used to swallow. ~1 shell spawn, not 102. A full-corpus parity sweep
+# stays where it belongs, in the opt-in differential.
+oracle="scripts/lib/check-layers-completeness.sh"
+space_fx="evals/fixtures/layers-completeness/space-token-wordsplit.md"
+if [ ! -f "$oracle" ] || [ ! -f "$space_fx" ]; then
+  echo "FAIL harness: oracle ($oracle) or its space-token fixture ($space_fx) is missing -- the shell"
+  echo "              side of the IFS fix would go unguarded, which is how it was unguarded before"
+  exit 2
+fi
+o_out=$(sh "$oracle" "$space_fx" 2>&1)
+o_missing=""
+printf '%s\n' "$o_out" | grep -qF 'T1 Cites/Layers contradiction: my file.md declared as touched AND escaped as merely cited' \
+  || o_missing="$o_missing T1-cites-contradiction"
+printf '%s\n' "$o_out" | grep -qF 'T2 Layers completeness: DoD/Acceptance implies zzsomething.md, absent from Layers:' \
+  || o_missing="$o_missing T2-dir-prefix-false-cover"
+# Sibling control: an unrelated leg on the same fixture must stay green, so a demolition of the
+# checker reads differently from a regression of the IFS fix specifically.
+printf '%s\n' "$o_out" | grep -qF 'T2 Depends-on completeness (prose-referenced tasks all declared)' \
+  || o_missing="$o_missing SIBLING-CONTROL-ALSO-LOST(not-an-IFS-regression-look-wider)"
+if [ -n "$o_missing" ]; then
+  echo "FAIL fixture(layers-completeness): the SHELL oracle no longer reports:$o_missing"
+  echo "              These are the findings that unquoted \`for x in \$var\` used to word-split away --"
+  echo "              a space-containing backtick token split into fragments that matched nothing, so"
+  echo "              the finding vanished SILENTLY. If the IFS pinning in $oracle was reverted, that"
+  echo "              is the cause. Oracle output was:"
+  printf '%s\n' "$o_out"
+  exit 1
+fi
+
+echo "PASS fixture(layers-completeness): TS port green -- $n_pass tests, 0 fail (retained: sprint-041-reconstructed, depends-on-omitted, sprint-048-citations sibling PASS, cites-contradiction, unindented-continuation, dir-token-prefix T1/T2, substring-declaration-not-declared T1/T2/T3, archive-path-excluded pair, archive-case-variant, file-not-found, space-token-wordsplit T1/T2+control)."
+echo "PASS fixture(layers-completeness): SHELL oracle still reports both space-token findings (the IFS fix, guarded gate-reachably). Full-corpus shell/TS parity remains opt-in: evals/layers-completeness-differential.ts."
 exit 0
