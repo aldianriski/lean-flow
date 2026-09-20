@@ -1,102 +1,66 @@
 #!/bin/sh
-# run-doc-caps-fixtures.sh -- must-FAIL fixtures for scripts/lib/check-doc-caps.sh (TD-041).
+# run-doc-caps-fixtures.sh -- must-FAIL fixtures for scripts/lib/check-doc-caps.ts (TD-041, TASK-355).
 #
-# The checker replaces four hand-listed globs in qa-check.sh with coverage DERIVED from STANDARD
-# §2. Two of the cases below exist because a derivation has two distinct ways to lie:
-#   (a) it can under-report a file that IS over its stated cap -- the ordinary must-FAIL leg;
-#   (b) it can silently drop a §2 row it failed to parse, which is hand-listing again with the
-#       hand-list hidden inside the parser. That one is the reason this task exists at all, so it
-#       gets its own fixture rather than being trusted.
-# The remaining two cover the grandfather clause, which is a deliberate coverage reduction and
-# therefore carries the extra proof obligation L-076 names: show what it no longer catches, and show
-# that it cannot become a blanket silencer.
+# check-doc-caps.ts is TypeScript run by Bun (TASK-355 -- ported off scripts/lib/check-doc-caps.sh,
+# which stays UNCHANGED as the live ORACLE, never deleted), so this harness is a thin `bun test`
+# wrapper -- the same shape run-dod-delta-fixtures.sh already uses. Where the shell-oracle harness
+# spawned `sh scripts/lib/check-doc-caps.sh` once per case (~2.75s each under Windows fork()
+# emulation), evals/doc-caps.test.ts calls the checker's exported `runCheckDocCaps()` directly,
+# in-process, for every case in ONE Bun process. A missing runtime FAILs rather than skips
+# (TD-101/ADR-037): a skip is indistinguishable from a pass.
 #
-# Dependency-free POSIX sh. Run bare: sh evals/run-doc-caps-fixtures.sh
+# Retained fixtures (TD-012 -- never deleted with the prototype that built them), same files, same
+# named findings evals/doc-caps.test.ts's cases assert on:
+#   over-cap, unparseable-row (L-058 -- a derivation that silently drops an unparseable row is
+#   hand-listing again with the hand-list hidden inside the parser), grandfather-grew/-held (L-076's
+#   must-catch/must-NOT-catch pair for the grandfather clause), soft-cap/-hard-breach (SOFT reports,
+#   HARD still fails beside it), soft-cap-grandfathered (ADR-015 rule 2: a soft cap must not be
+#   grandfathered, a hard cap may be), frozen-spent (ADR-020: a superseded verdict is FROZEN, a live
+#   doc beside it in the same fixture still fails), and the live repo's own §2 deriving real rows.
+#
+# Differential parity against the shell oracle lives in evals/run-doc-caps-differential.ts (opt-in,
+# spawns the real `sh` checker) -- never here; this harness's whole point is that it does NOT spawn.
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 repo_root=$(CDPATH= cd -- "$here/.." && pwd)
-checker="$repo_root/scripts/lib/check-doc-caps.sh"
-fx="$here/fixtures/doc-caps"
-. "$here/lib/harness-common.sh"
+cd "$repo_root" || { echo "FAIL harness: cannot cd to repo root $repo_root"; exit 2; }
 
-fail=0
+if ! command -v bun >/dev/null 2>&1; then
+  echo "FAIL harness: bun not found on PATH -- the doc-caps checker cannot run, and skipping it"
+  echo "              silently would report this suite green with doc-caps unexercised on every gate run"
+  exit 2
+fi
 
-# --- case 1: a doc over its stated §2 cap -> FAIL ------------------------------------------------
-run_case_anywhere "over-cap" 1 "FAIL  cap tiny.md (5 > 3)" -- \
-  sh "$checker" "$fx/over-cap/DOCS_Guide.md" "$fx/over-cap" "$fx/over-cap/none.txt"
+checker="scripts/lib/check-doc-caps.ts"
+test_file="evals/doc-caps.test.ts"
+[ -f "$checker" ]   || { echo "FAIL harness: checker not found at $checker"; exit 2; }
+[ -f "$test_file" ] || { echo "FAIL harness: test file not found at $test_file"; exit 2; }
 
-# --- case 2: a §2 row that states a cap but yields no path -> FAIL, never a silent skip ----------
-# Without this leg the checker could quietly drop any row whose File cell it cannot parse, and the
-# gate would read green while covering less than it claims -- the exact shape of the defect being
-# fixed, reintroduced one level down (L-058).
-run_case_anywhere "unparseable-row" 1 "no path could be derived" -- \
-  sh "$checker" "$fx/unparseable-row/DOCS_Guide.md" "$fx/unparseable-row" "$fx/unparseable-row/none.txt"
+# A test-COUNT floor, not just an exit code -- `bun test` exits 0 on a file with zero live tests
+# (a renamed test, a dropped describe) while still reporting PASS. RAISE THIS when adding cases to
+# evals/doc-caps.test.ts, in the same commit.
+min_tests=11
 
-# --- case 3: a grandfathered file that GREW past its recorded count -> FAIL ----------------------
-# The clause exists so a new check can land on a repo with pre-existing drift. It must not become a
-# licence to keep drifting: recorded 5, actual 7.
-run_case_anywhere "grandfather-grew" 1 "it GREW" -- \
-  sh "$checker" "$fx/grandfather-grew/DOCS_Guide.md" "$fx/grandfather-grew" "$fx/grandfather-grew/gf.txt"
+out=$(bun test "$test_file" 2>&1); code=$?
+# Bun colours its summary even when captured into a variable (an ESC/CSI byte precedes the digits),
+# so the anchor below is stripped of ANSI first -- otherwise `^` binds to the escape byte and never
+# matches, silently returning 0 (SPRINT-102 T2).
+n_pass=$(printf '%s\n' "$out" | sed 's/\x1b\[[0-9;]*m//g' | grep -oE '^ *[0-9]+ pass' | grep -oE '[0-9]+' | head -1)
+[ -n "$n_pass" ] || n_pass=0
 
-# --- case 4: the same file, held at its recorded count -> reported, exit 0 -----------------------
-# The must-NOT-catch half of case 3 (L-076): this is precisely what the clause stops catching, shown
-# rather than described, so the trade is legible instead of asserted.
-run_case_anywhere "grandfather-held" 0 "OVER-CAP (grandfathered): drifting.md" -- \
-  sh "$checker" "$fx/grandfather-grew/DOCS_Guide.md" "$fx/grandfather-grew" "$fx/grandfather-grew/gf-held.txt"
+if [ "$code" -ne 0 ]; then
+  echo "FAIL fixture(doc-caps): the doc-caps checker suite is red (bun test exit $code) -- output:"
+  printf '%s\n' "$out"
+  exit 1
+fi
 
-# --- case 5a/5b: SOFT caps report, HARD caps fail, in one fixture --------------------------------
-# §2 marks its caps ("~150 soft" vs "400 hard") and the first version of this checker discarded the
-# marker, so a soft breach failed the gate exactly like a hard one. §11 routes a soft cap to the
-# governance review for a prune-with-the-owner, which means failing there blocks the very commit that
-# would do the pruning. The narrowing is deliberate, so both halves are asserted: 5a is the
-# must-NOT-catch demonstration L-076 requires (soft over cap, exit 0, still reported by name), 5b
-# proves the hard leg was not weakened along with it. One fixture, both caps, opposite verdicts.
-run_case_anywhere "soft-cap-reports-not-fails" 0 "OVER-CAP (soft): soft.md (5 > 3)" -- \
-  sh "$checker" "$fx/soft-cap/DOCS_Guide.md" "$fx/soft-cap" "$fx/soft-cap/none.txt"
+if [ "$n_pass" -lt "$min_tests" ]; then
+  echo "FAIL fixture(doc-caps): only $n_pass test(s) ran, expected at least $min_tests --"
+  echo "              coverage SHRANK while bun still exited 0 (a skipped describe, a renamed file,"
+  echo "              or a case dropped from evals/doc-caps.test.ts all look exactly like this)"
+  exit 1
+fi
 
-run_case_anywhere "hard-cap-still-fails-beside-it" 1 "FAIL  cap hard.md (4 > 3)" -- \
-  sh "$checker" "$fx/soft-cap-hard-breach/DOCS_Guide.md" "$fx/soft-cap-hard-breach" "$fx/soft-cap-hard-breach/none.txt"
-
-# --- case 6a/6b: ADR-015 rule 2 -- the grandfather list is HARD caps only (SPRINT-060 T2) ---------
-# The rule shipped as prose in the list's own header and in ADR-015, whose Consequences section named
-# the gap outright: "nothing enforces rule 2 yet". Recording a soft cap there buys only the growth
-# ratchet, since the soft branch already reports it every run and §11 routes it to the promote review.
-# The two cases differ in ONE variable -- the recorded path's cap is soft in 6a, hard in 6b -- so a
-# regression that stopped distinguishing them shows up here rather than as a silently tolerated row.
-run_case_anywhere "soft-cap-must-not-be-grandfathered" 1 "must not be in the grandfather list [ADR-015 rule 2]" -- \
-  sh "$checker" "$fx/soft-cap-grandfathered/DOCS_Guide.md" "$fx/soft-cap-grandfathered" "$fx/soft-cap-grandfathered/gf-soft.txt"
-
-# 6b is the must-NOT-catch half (L-076): the same list shape naming a HARD-capped path is legal, and
-# still earns its ordinary grandfathered report rather than being swept up by the new rule.
-run_case_anywhere "hard-cap-may-be-grandfathered" 0 "OVER-CAP (grandfathered): hard.md" -- \
-  sh "$checker" "$fx/soft-cap-grandfathered/DOCS_Guide.md" "$fx/soft-cap-grandfathered" "$fx/soft-cap-grandfathered/gf-hard.txt"
-
-# --- case 7a/7b: ADR-020 -- a spent verdict is FROZEN, a live doc is not -------------------------
-# §2's research row says a superseded verdict is "marked `status: superseded` rather than edited", and
-# §11's only exit for it is archival. So the cap was measuring the one thing that can still legally
-# grow on a spent doc -- the annotation recording why it is spent (loop-hygiene-prd.md: 118 -> 139 on
-# exactly that). 7a is the exemption; 7b is the leg that matters, because an exemption is a coverage
-# reduction and carries L-076's proof obligation: show it did NOT stop catching a live breach.
-#
-# Both docs are 5 lines against a cap of 3 -- identical overage, one variable: frontmatter `status:`.
-# `live.md` additionally contains the literal string "status: superseded" in PROSE below the
-# frontmatter, so a substring matcher would wrongly exempt it. That is L-108 built into the fixture
-# rather than trusted: this corpus documents its own formats, so the naive matcher fails green here.
-run_case_anywhere "spent-verdict-is-frozen" 1 "FROZEN (superseded): spent.md" -- \
-  sh "$checker" "$fx/frozen-spent/DOCS_Guide.md" "$fx/frozen-spent" "$fx/frozen-spent/none.txt"
-
-run_case_anywhere "exemption-does-not-disarm-the-check" 1 "FAIL  cap live.md (5 > 3)" -- \
-  sh "$checker" "$fx/frozen-spent/DOCS_Guide.md" "$fx/frozen-spent" "$fx/frozen-spent/none.txt"
-
-# --- case 6: the live repo's own §2 must still derive rows ---------------------------------------
-# A parser that stops matching the real table degrades to zero coverage, and zero coverage over zero
-# rows would otherwise exit 0 -- a PASS over an empty input set, which is the L-058 family in its
-# purest form and the very thing T4 fixes elsewhere in this sprint. Assert the real standard yields
-# real rows, not merely that the checker ran.
-run_case_anywhere "live-standard-derives" 0 "PASS  cap .claude/CLAUDE.md" -- \
-  sh "$checker"
-
-echo "----------------------------------------"
-if [ "$fail" -eq 0 ]; then echo "DOC-CAPS FIXTURES: all green"; else echo "DOC-CAPS FIXTURES: at least one FAIL"; fi
-exit $fail
+echo "PASS fixture(doc-caps): checker green -- $n_pass tests, 0 fail (retained: over-cap, unparseable-row, grandfather-grew/-held, soft-cap/-hard-breach, soft-cap-grandfathered, frozen-spent, live-standard-derives)"
+exit 0
