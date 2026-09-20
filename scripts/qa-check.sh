@@ -1222,7 +1222,20 @@ for h in $eval_harnesses; do
     bad "eval harness $h: script not found at $hp"
     continue
   fi
-  hout=$(sh "$hp" 2>&1); hcode=$?
+  # QA_PROFILE_OUT is SCOPED OUT of every harness, and that is load-bearing rather than tidiness.
+  # 20 harnesses reference qa-check.sh and several invoke it; a nested run inherits QA_PROFILE=1 and
+  # QA_PROFILE_OUT from this process's environment, and the profile init at :73 opens that file with
+  # `>` -- so each nested gate TRUNCATED the outer run's profile and started over. Measured: a full
+  # profiled run held 114 samples at 1044s and ended with FOUR, the last nested run's. The feature
+  # was therefore unusable on exactly the run worth profiling, and failed silently -- the file
+  # existed, had a valid header, and looked like a short run.
+  #
+  # This is CLAUDE.md's edit-safety (d) in its own gate: an env var set for one invocation is
+  # inherited by children it was never meant to reach (L-067's shape, there MSYS_NO_PATHCONV
+  # breaking `git -C`). Scope it to the one invocation that needs it. Blanking QA_PROFILE_OUT is
+  # enough -- qp_sample requires BOTH it and QA_PROFILE, so children no-op exactly as they do on an
+  # ordinary unprofiled run, and the outer run keeps sampling around them.
+  hout=$(QA_PROFILE_OUT= sh "$hp" 2>&1); hcode=$?
   qp_sample "harness-end: $h"
   if [ "$hcode" -eq 0 ]; then
     ok "eval harness $h"
