@@ -4,7 +4,7 @@ slug: port-the-measured-hotspots
 owner: Maintainer
 last_updated: 2026-09-20
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: bfa3fec
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
