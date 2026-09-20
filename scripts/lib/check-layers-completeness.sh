@@ -153,9 +153,18 @@ check_block() {
 
   # -- Cites:/Layers: contradiction -- the escape must not double as a declaration ------------
   contra=""
+  # IFS pinned to newline: these lists are newline-delimited, and `layers_tokens()` extracts backtick
+  # spans with NO character-class restriction, so a token can legitimately contain a space. Under the
+  # default IFS the loop word-split such a token and every fragment then failed `grep -qxF` against
+  # the intact line -- a SILENT FALSE NEGATIVE, the failure class this checker exists to prevent
+  # (TASK-355, found by an outside review of the TS port, which did not reproduce the bug). Quoting
+  # "$cites_toks" would be wrong in the other direction: one iteration over the whole list.
+  lc_oifs=$IFS; IFS='
+'
   for c in $cites_toks; do
     printf '%s\n' "$layers_toks" | grep -qxF "$c" && contra="$contra $c"
   done
+  IFS=$lc_oifs
   if [ -n "$contra" ]; then
     bad "$sp $tid Cites/Layers contradiction:$contra declared as touched AND escaped as merely cited"
   fi
@@ -170,9 +179,16 @@ check_block() {
   miss_f=""
   layers_dirs=$(printf '%s\n' "$layers_toks" | grep '/$')
   covered_by_dir() { # <path>
+    # Same newline-pinned IFS as the contradiction loop above, and for the same reason: a declared
+    # directory token can contain a space, and word-splitting one produced a false PREFIX match --
+    # `zz dir/` split to `zz`, which then matched `zzsomething.md` and wrongly reported it covered.
+    # Every exit path restores IFS, including the early return.
+    _cbd_oifs=$IFS; IFS='
+'
     for _d in $layers_dirs; do
-      case "$1" in "$_d"*) return 0 ;; esac
+      case "$1" in "$_d"*) IFS=$_cbd_oifs; return 0 ;; esac
     done
+    IFS=$_cbd_oifs
     return 1
   }
   toks=$(printf '%s' "$prose" | grep -oE '`[A-Za-z0-9_./-]+\.[A-Za-z]+`' | tr -d '`' | sort -u)

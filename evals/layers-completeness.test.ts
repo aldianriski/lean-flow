@@ -224,3 +224,45 @@ describe("file not found", () => {
     expect(r.output).toContain("layers-completeness: file not found: /nonexistent/path/for-sure/SPRINT-000-nope.md");
   });
 });
+
+// --- space-containing tokens: the retained guard on the ORACLE's IFS fix (TASK-355) ---------------
+// `layers_tokens()` extracts backtick spans with no character-class restriction, so a token may
+// legitimately contain a space. The shell oracle iterated `for c in $cites_toks` and
+// `for _d in $layers_dirs` UNQUOTED, word-splitting such a token so that no fragment matched the
+// intact value -- two SILENT FALSE NEGATIVES. The TS port never had the bug (array iteration does
+// not word-split), which is how it was found: an outside review caught the port DIVERGING from the
+// oracle, and the owner ruled the oracle should be fixed rather than the port made bug-compatible.
+//
+// WHAT THIS BLOCK DOES AND DOES NOT GUARD -- stated precisely, because the distinction is easy to
+// get wrong and an earlier draft of this comment did. `capture()` runs the TypeScript PORT, so these
+// assertions guard the PORT's behaviour on space-containing tokens. They do NOT guard the oracle's
+// IFS fix: re-breaking `scripts/lib/check-layers-completeness.sh` leaves this suite 19/19 green
+// (verified by seeding exactly that break). The guard on the ORACLE is the DIFFERENTIAL
+// (`evals/layers-completeness-differential.ts`), where the same seed makes shell and port diverge on
+// the T1 contradiction line -- also verified. Both instruments are needed and they cover different
+// halves; this fixture is the shared input that makes the oracle's half reachable at all.
+//
+// Against the PRE-FIX oracle, both findings below were absent: the T1 contradiction was omitted
+// entirely and T2 printed "PASS ... Layers completeness (DoD-implied files all declared)" -- a false
+// green. Deleting this fixture makes that regression invisible again (TD-012's shape).
+describe("space-token-wordsplit (retained must-FAIL fixture -- the oracle's IFS fix)", () => {
+  let r: Captured;
+  beforeAll(() => {
+    r = capture([posix.join(FIXTURES, "space-token-wordsplit.md")]);
+  });
+  test("T1: a space-containing token in BOTH Cites: and Layers: is reported as contradictory", () => {
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain(
+      "T1 Cites/Layers contradiction: my file.md declared as touched AND escaped as merely cited",
+    );
+  });
+  test("T2: a space-containing directory token does not falsely cover an unrelated prefix", () => {
+    // `zz dir/` word-split to `zz`, which prefix-matched `zzsomething.md` and wrongly covered it.
+    expect(r.output).toContain(
+      "T2 Layers completeness: DoD/Acceptance implies zzsomething.md, absent from Layers:",
+    );
+  });
+  test("sibling control: T2's Depends-on leg is unaffected and still passes in the same run", () => {
+    expect(r.output).toContain("T2 Depends-on completeness (prose-referenced tasks all declared)");
+  });
+});

@@ -54,7 +54,7 @@ test_file="evals/layers-completeness.test.ts"
 # renamed test, a dropped describe) while still reporting PASS (same shape run-s4-ts-evaluators.sh and
 # run-dod-delta-fixtures.sh both guard against). RAISE THIS when adding cases to the test file, in the
 # same commit.
-min_tests=16
+min_tests=19
 
 out=$(bun test "$test_file" 2>&1); code=$?
 # Bun colours its summary even when captured into a variable (an ESC/CSI byte precedes the digits),
