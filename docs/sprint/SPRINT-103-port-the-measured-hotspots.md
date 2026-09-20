@@ -85,9 +85,9 @@ mechanism recorded.
 **DoD:**
 - [x] Per-target measurement recorded before any code is written
 - [x] The two checkers' names are disambiguated wherever both appear, so the next reader cannot repeat the substitution — *Verify: `layers-observed` vs `layers-completeness` are distinguished in the Round and in the port's header*
-- [ ] If ported: oracle retained · byte-identical parity over fixtures **and** all real sprint Plans, **including non-archived copies** — the archived corpus is SKIPPED by the sibling checker and comparing it yields two empty outputs that agree while proving nothing (L-198, hit twice in SPRINT-102)
-- [ ] If ported: retained must-FAIL + sibling control + seeded break, one hash convention
-- [ ] If ported: wiring diff committed before applied
+- [x] If ported: oracle retained · byte-identical parity over fixtures **and** all real sprint Plans, **including non-archived copies** — the archived corpus is SKIPPED by the sibling checker and comparing it yields two empty outputs that agree while proving nothing (L-198, hit twice in SPRINT-102)
+- [x] If ported: retained must-FAIL + sibling control + seeded break, one hash convention
+- [x] If ported: wiring diff committed before applied
 - [ ] Outside reviewer, worktree-isolated
 - [ ] Before/after as a range over ≥3 runs
 
