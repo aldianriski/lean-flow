@@ -106,3 +106,38 @@ re-running. The source census stands. Base ref has moved — HEAD was `cc3bcc8` 
 no file in any SPRINT-103 `Layers:`). Re-derive the base ref before dispatching Wave 1.
 
 consequence · T0 · behaviour:low · governance:low
+
+### 2026-09-20 | progress | T1 ruled on a measured mechanism — NOT spawn-shaped, do not port
+
+Wave 0 was not restarted: memory is still at **2.2% free** (303 MB of 14,078 MB), which is the
+condition that killed it, and a wall-clock figure taken under paging measures swap rather than the
+target. Instead the mechanism question was answered by **micro-benchmark**, which reaches it at
+sub-second cost. Full figures and derivation → `docs/research/logs/qa-gate-timing.md` **Round 17**.
+
+**Measured:** `conformance-engine.sh` against an *empty* directory costs **2.93 s with the shipped
+100-rule spec and 0.35 s with 0 rules** — ~26 ms per rule of dispatch paid whether or not anything
+is checked. `sys` tracks `user` (1.55 vs 1.32), i.e. subprocess-per-rule, not computation.
+
+**T1 ruling — not spawn-shaped; ported nothing.** The harness makes 68 engine invocations with the
+full spec: 68 × 2.93 ≈ **199 s of a measured 305 s is dispatch inside the engine**. A TypeScript port
+removes 68 `sh` spawns and leaves all 199 s, because the cost is inside the program the port would
+still have to call 68 times. The lever is the **awk-derived reduced spec** — already shipped in this
+repo three times (leg 2f-ter, `run-gates-signed-fixtures.sh`, `run-attestation-fixtures.sh`), so
+reuse, not new machinery. Projected 68 × 0.72 ≈ **49 s**, saving ~150 s, no port, no coverage change.
+
+**This ruling is D2 working exactly as written.** A1 said the five would respond as SPRINT-102's did;
+for T1 they do not, and inheriting that would have bought a port worth a small fraction of the cost.
+
+**The trap, recorded because it nearly shipped:** the harness header claims §9 + §10. Its 68 cases
+are **§11 ×29 · §9 ×16 · §12 ×11 · §10 ×10** — §9+§10 is 26 of 68. A reduction built on the header
+would leave 40 assertions with no rule to fire, and 40 of the 68 are `assert_absent`, which **passes
+when a finding does not appear**. All of them would go green testing nothing — the Tier G silent
+false negative, reached by trusting a file's prose about its own population instead of enumerating
+it (L-186). Required set is **§9+§10+§11+§12 = 43 rules**. The first estimate written this session
+(§9+§10, ~126 s saving) was wrong on exactly this and is superseded.
+
+**Not claimed:** no end-to-end re-derivation of any target exists. 49 s is arithmetic over a
+micro-benchmark, not an observed run — which by this sprint's own theme is a hypothesis awaiting
+measurement, not a result. T1's remaining DoD stay open.
+
+consequence · T1 · behaviour:low · governance:high

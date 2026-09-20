@@ -1882,3 +1882,97 @@ against 1490 s for the same code, so the +/-20% host variance is undiminished an
 are approximate — **the ranking is what is solid**; and three of the top five are conformance/sweep
 work whose shape may not be spawn-dominated at all. **Re-measure per target before committing to it**
 rather than inheriting this table the way TASK-355 inherited TD-090's.
+
+## Round 17 — T1's mechanism, measured without a wall-clock run (2026-09-20)
+
+**Conditions, stated first because they bound every claim below.** SPRINT-103's Wave 0 — five serial
+end-to-end harness timings — was started and **killed by the harness at ~2 minutes with the system
+at 2.2% free memory** (303 MB of 14,078 MB; `vmmemWSL` alone held 4,929 MB). No target has a
+re-derived total, and none was attempted afterwards: under paging, a wall-clock figure measures swap,
+not the target, which is the same contention argument that made Wave 0 serial in the first place.
+
+So this Round deliberately answers the **mechanism** question, which micro-benchmarks reach at
+sub-second cost, and leaves the **total** question open. Round 16's 305 s for
+`run-sprint-family-fixtures.sh` is carried forward unverified and labelled as such.
+
+### How the figures were derived
+
+Every number below is `bash`'s `time` builtin over
+`sh scripts/lib/conformance-engine.sh <dir> --spec <spec>` against an **empty** temp directory, so
+the engine finds nothing to check and what remains is its fixed per-invocation cost. Specs are
+awk-derived from the shipped `spec/STANDARD.md`, never hand-authored — the same construction leg
+2f-ter, `run-gates-signed-fixtures.sh` and `run-attestation-fixtures.sh` already use.
+
+| rule rows in spec | real | user | sys |
+|---:|---:|---:|---:|
+| 0 | 0.35 s | 0.11 | 0.17 |
+| 10 (§9) | 0.58 s | 0.27 | 0.26 |
+| 20 (§9+§10) | 1.07 s | 0.20 | 0.55 |
+| **43 (§9+§10+§11+§12)** | **0.72 s** | 0.27 | 0.35 |
+| **100 (shipped, what T1 uses today)** | **2.93 s** | 1.32 | 1.55 |
+
+Three runs at each of the 43- and 100-rule points; spread under 0.05 s, so these are stable in a way
+the 1216 s-vs-1490 s full-gate figures are not — a sub-second benchmark is not exposed to the host
+variance that makes the totals ±20%.
+
+### The mechanism
+
+**The engine's cost is per-rule dispatch, and it is paid even when there is nothing to check.**
+Against an empty directory, 100 rules cost 2.93 s and 0 rules cost 0.35 s — ~26 ms per rule of pure
+dispatch. `sys` tracks `user` closely (1.55 vs 1.32 at 100 rules), consistent with a shell script
+spawning subprocesses per rule rather than doing computation.
+
+`run-sprint-family-fixtures.sh` invokes the engine **68 times** (28 `assert_finding` + 40
+`assert_absent`, comment lines excluded), each with the **full shipped spec**. That is
+68 × 2.93 ≈ **199 s of fixed dispatch cost inside a measured 305 s** — roughly two thirds of the
+harness, spent dispatching rules against fixture directories built to exercise 43 of them.
+
+The non-linearity matters: dropping 57 rules saves 2.21 s while the 43 kept rules cost only 0.37 s
+over baseline. The expensive rules are concentrated in the sections this harness never asserts on.
+
+### The ruling this supports — **not spawn-shaped; do not port it**
+
+A TypeScript port of the harness would remove 68 `sh` process spawns. It would not touch the 199 s,
+because that cost is *inside* `conformance-engine.sh`, which the port would still have to invoke 68
+times. **The lever is the reduced spec, not the language** — and it is a technique this repo already
+ships in three places, so it is reuse rather than new machinery (laziness ladder, rung 2).
+
+Projected: 68 × 0.72 ≈ **49 s**, against ~199 s today — a saving near **150 s** of the 305 s, with no
+port, no coverage change (D6 holds: the same rules are asserted, on the same fixtures, for the same
+named findings) and no new file.
+
+### The trap in doing it, which cost this Round its first answer
+
+**`run-sprint-family-fixtures.sh`'s own header under-describes what it covers**, and a reduction
+built from the header would be silently vacuous. The header says §9 sprint-file and §10
+learning-governance. The 68 cases say:
+
+| section | cases |
+|---|---:|
+| §11 | 29 |
+| §9 | 16 |
+| §12 | 11 |
+| §10 | 10 |
+
+§9+§10 is **26 of 68** — under 40%. A spec reduced to §9+§10 on the header's authority would leave
+40 assertions with no rule to fire, and `assert_absent` — 40 of the 68 — **passes when a finding does
+not appear**. Every one of them would go green while testing nothing: a Tier G silent false negative,
+arrived at by trusting a file's prose description of its own population instead of enumerating it
+(L-186). The required set is **§9+§10+§11+§12 = 43 rules**, derived from the cases.
+
+This also revises the first estimate written during this session. A §9+§10 reduction was measured at
+1.07 s and projected to save ~126 s; it is not a valid reduction at all. The correct set measures
+**faster** (0.72 s) than the invalid smaller one, which is worth stating plainly — rule *count* does
+not predict cost here, so the set must be chosen by what the assertions need and then measured, never
+sized by eye.
+
+### What remains unmeasured
+
+- **No end-to-end re-derivation** of any of the five targets. Round 16's ranking is still the only
+  total, and A2 stays PARTIALLY CONFIRMED.
+- The 49 s projection is arithmetic over a micro-benchmark, **not an observed harness run**. It is a
+  hypothesis with a mechanism behind it, and SPRINT-103's own theme is that those get measured before
+  they get spent.
+- **T4** (`run-conformance-engine-fixtures.sh`, 38 engine calls) shares this mechanism and already
+  uses reduced specs for part of its set; its own reduction is unexamined here.
+- **T2** and **T3** are untouched by this Round.
