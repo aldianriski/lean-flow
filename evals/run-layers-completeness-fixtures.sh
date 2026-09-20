@@ -1,335 +1,80 @@
 #!/bin/sh
 # run-layers-completeness-fixtures.sh -- must-FAIL fixtures for scripts/lib/check-layers-
-# completeness.sh, the checker qa-check.sh's leg 14 delegates to (TD-020, L-071, SPRINT-042 T3).
+# completeness.ts, the TS port qa-check.sh's leg 14 comment references (TD-020, L-071, SPRINT-042 T3;
+# ported SPRINT-103).
 #
-# The dispatch preflight's shared-file check is sound and negative-tested; its input is a
-# hand-written `Layers:`/`Depends-on:` declaration, and a check over a manifest cannot detect an
-# omission from that manifest (L-071: omission looks identical to absence). Case 1 below
-# reconstructs SPRINT-041's real Plan verbatim -- both T1 and T2's DoDs required marking a TD
-# resolved, neither declared TECH-DEBT.md in Layers:, the preflight passed, and two agents edited
-# the file concurrently, merging clean only by ~19 lines of luck. That is a recorded miss, not an
-# invented one. Case 2 (the Depends-on: half) has no equivalent recorded incident, so its fixture is
-# a small constructed Plan -- labeled as such in the fixture file itself, never claimed as real.
+# WHAT MOVED, AND WHAT DID NOT (SPRINT-103, mirrors SPRINT-092 T2's §4 swap exactly). This harness
+# used to `sh`-spawn scripts/lib/check-layers-completeness.sh directly, 16 times for 10 distinct
+# argument sets, at 55-70s on this host -- Windows fork() emulation cost (~40 grep/sort/tr/sed/awk
+# subprocess spawns per task block), not the checking work itself (milliseconds of text matching).
+# scripts/lib/check-layers-completeness.sh REMAINS THE ORACLE (owner ruling, mirroring EPIC-014 D2 --
+# "Shell retains §4 authority"): it is UNCHANGED, still what qa-check.sh's own gate leg spawns, and
+# still what evals/layers-completeness-differential.ts (opt-in, not run here) checks the TS port
+# against, row by row, over every retained fixture AND every real sprint Plan in this repository.
+# What moved is THIS harness: it now asserts against scripts/lib/check-layers-completeness.ts, the
+# fork-free TS port, called in-process via evals/layers-completeness.test.ts -- the same "TS
+# evaluator leg" shape run-s4-ts-evaluators.sh already established for §4, and the same "thin bun test
+# wrapper" shape run-dod-delta-fixtures.sh already uses for check-dod-delta.ts.
 #
-# Calls scripts/lib/check-layers-completeness.sh directly against retained fixtures under
-# evals/fixtures/layers-completeness/ (L-058: retain the fixtures, don't delete them with the
-# scaffolding that built them -- TD-012's lesson). SPRINT-097 T3's cases are the one exception: they
-# are built into a throwaway mktemp dir at run time rather than committed as new static files, since
-# T3's own declared Layers: covers this harness script and its three siblings, not a fixture
-# directory -- see that section's own header comment. Dependency-free POSIX sh.
-# Run bare: sh evals/run-layers-completeness-fixtures.sh
+# COVERAGE UNCHANGED, NOT MERELY RELOCATED (DoD 4's own bar). Every named finding, every retained
+# must-FAIL fixture, every sibling control, and both population-selection fixtures (L-186: the
+# archive/ path-segment case AND the filesystem-identity casing case) that this harness asserted via
+# the Shell checker are re-asserted, unchanged in substance, against the TS port in
+# evals/layers-completeness.test.ts -- see that file's own per-describe-block comments for which
+# finding each one guards.
+#
+# THE OTHER FIX FOLDED IN (independent analysis, same sprint): the harness this file replaces invoked
+# its own checker 16 times for only 10 distinct argument sets -- dir-token-prefix.md 2x, the substring
+# fixture 4x, the archive-selection pair 3x -- because run_case_anywhere always re-invokes the command
+# it asserts against. evals/layers-completeness.test.ts captures each distinct argument set exactly
+# ONCE (in a `beforeAll`) and every assertion reads that ONE captured {exitCode, output}, verified
+# (not assumed) not to be mutated between assertions -- these are all read-only capture-and-assert
+# fixtures, none of the history-building-harness shape that legitimately mutates a shared path across
+# repeated calls.
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 repo_root=$(CDPATH= cd -- "$here/.." && pwd)
-checker="$repo_root/scripts/lib/check-layers-completeness.sh"
-. "$here/lib/harness-common.sh"
+cd "$repo_root" || { echo "FAIL harness: cannot cd to repo root $repo_root"; exit 2; }
 
-[ -f "$checker" ] || { echo "FAIL harness: checker not found at $checker"; exit 2; }
-
-fail=0
-
-# --- case 0: bare invocation (no sprint files) -- must-note, exit 0 (TD-056, SPRINT-069 T4) -------
-# Previously `for sp in "$@"` over an empty arg list printed nothing and exited 0 -- a silent pass
-# indistinguishable from a real clean run. This proves the guard fires: run the checker with zero
-# arguments and require the "nothing verified" note, at exit 0 (never non-zero -- the guarded
-# siblings note at exit 0, and qa-check.sh always supplies arguments so this leg never touches the
-# gate path).
-run_case_anywhere "bare-invocation-notes-nothing-verified" 0 \
-  "layers completeness: no sprint files given -- nothing verified" -- \
-  sh "$checker"
-
-# --- case 1: SPRINT-041 reconstructed -- TD marked resolved implies TECH-DEBT.md, undeclared -----
-run_case_anywhere "sprint-041-reconstructed" 1 \
-  "Layers completeness: DoD/Acceptance implies TECH-DEBT.md(TD-marked-resolved), absent from Layers: -- if the prose only cites it rather than touching it, declare it on a Cites: line" -- \
-  sh "$checker" "$here/fixtures/layers-completeness/sprint-041-reconstructed.md"
-
-# --- case 2: Depends-on omission (constructed) -- T2's prose references T1, Depends-on: none -----
-run_case_anywhere "depends-on-omitted" 1 \
-  "Depends-on completeness: DoD/Acceptance references T1, absent from Depends-on: -- if the prose only cites that task rather than depending on it, declare it on a Cites: line" -- \
-  sh "$checker" "$here/fixtures/layers-completeness/depends-on-omitted.md"
-
-# --- cases 3-5: the `Cites:` escape and the wrapped-declaration rule (SPRINT-049 T3) -------------
-# Case 3 is the only must-PASS fixture in this harness, and it is the one that guards against the
-# regression TD-032 actually recorded: the gate quietly reshaping documentation. Its three blocks are
-# the real SPRINT-048 false positives (commits 45ff548 / 68bdc7e / c401a0e). Cases 4 and 5 are the
-# escape's own must-FAIL bar -- an escape with no abuse case is a silencer (L-058).
-
-run_case_anywhere "sprint-048-citations-escaped" 0 \
-  "Layers completeness (DoD-implied files all declared)" -- \
-  sh "$checker" "$here/fixtures/layers-completeness/sprint-048-citations.md"
-
-run_case_anywhere "cites-contradiction" 1 \
-  "Cites/Layers contradiction: docs/QA.md declared as touched AND escaped as merely cited" -- \
-  sh "$checker" "$here/fixtures/layers-completeness/cites-contradiction.md"
-
-run_case_anywhere "unindented-continuation" 1 \
-  "declaration continuation: a wrapped Layers line must be indented to continue" -- \
-  sh "$checker" "$here/fixtures/layers-completeness/unindented-continuation.md"
-
-# --- case 6: directory tokens are a PREFIX, not a wildcard (SPRINT-055 T1) -----------------------
-# A `Layers:` token ending in "/" now covers every path beneath it. Before T1 it matched nothing at
-# all while still reading as a declaration -- accepted, guarding zero files. Both halves are asserted
-# from the ONE fixture file: T1's block must PASS (its implied paths sit under the declared tree) and
-# T2's must FAIL naming the path outside it. Asserting only the PASS half would let a prefix rule
-# that swallowed everything look correct, which is the same false-negative the rule removed.
-run_case_anywhere "dir-token-prefix-covers" 1 \
-  "### T1 Layers completeness (DoD-implied files all declared)" -- \
-  sh "$checker" "$here/fixtures/layers-completeness/dir-token-prefix.md"
-
-run_case_anywhere "dir-token-prefix-outside" 1 \
-  "### T2 Layers completeness: DoD/Acceptance implies scripts/lib/check-count-claims.sh, absent from Layers:" -- \
-  sh "$checker" "$here/fixtures/layers-completeness/dir-token-prefix.md"
-
-# ================================================================================================
-# cases 7-9: SPRINT-097 T3 (TD-142). These fixtures are BUILT below into a throwaway mktemp dir
-# rather than added as new static files under evals/fixtures/layers-completeness/ -- deliberately:
-# T3's own declared Layers: covers exactly this harness script and its sibling three, not a fixture
-# directory, and check-layers-observed.sh (this same sprint's sibling checker) would otherwise report
-# a new committed fixture file as changed-but-undeclared. Building it here keeps every new byte
-# inside the one file already declared, the same reason check-layers-observed.sh's OWN harness
-# builds its git-repo fixtures in a mktemp dir instead of committing them (see that file's header).
-work=$(mktemp -d) || { echo "FAIL harness: mktemp -d failed"; exit 2; }
-trap 'rm -rf "$work"' EXIT
-
-# --- case 7/8: THE SILENT DIRECTION, FIXED (TD-142). Membership used to be a SUBSTRING test
-# (`grep -qF` against the raw Layers: line) -- a token read as "declared" if it merely appeared
-# anywhere in the line, inside a longer path (T1) or inside a trailing, unbackticked comment (T2).
-# Both are now must-FAIL by their own named finding; T2 also exercises the NEW
-# `layers-unbackticked-token` finding (DoD item 3), since the same unbackticked text is exactly that
-# shape. T3 is the sibling control asserted in the SAME run: an ordinary correct declaration, which
-# must stay a clean PASS under both checks.
-sub_fx="$work/substring-declaration-not-declared.md"
-cat > "$sub_fx" <<'EOF'
----
-sprint: 902
-slug: substring-declaration-not-declared
-status: active
-plan_commit: fixture
-update_trigger: fixture -- must-FAIL input, built by evals/run-layers-completeness-fixtures.sh
-  (SPRINT-097 T3, TD-142), not a real sprint file. Reproduces the SILENT direction of TD-142's
-  divergence, now fixed: membership used to be a SUBSTRING test against the raw Layers: line, so a
-  DoD-implied token merely appearing inside a longer declared path (T1) or an unbackticked trailing
-  comment (T2) read as "declared" -- L-108's shape, failing GREEN. T2 also exercises the NEW
-  layers-unbackticked-token finding. T3 is the sibling control.
----
-
-## Plan
-
-### T1 — a DoD-implied token sits INSIDE a longer declared path
-Layers: `scripts/lib/other-config.sh`
-Depends-on: none
-
-config.sh and the declared file above are two distinct files. The declared path merely CONTAINS
-`config.sh`'s text as a substring; that is not a declaration of the shorter file.
-
-**Acceptance:** `config.sh` is recognised as undeclared even though its name sits inside the text of
-the longer, genuinely-declared path above.
-
-**DoD:**
-- [ ] `config.sh` is updated
-
-### T2 — a DoD-implied token sits INSIDE an unbackticked trailing comment on Layers:
-Layers: `scripts/lib/check-layers-completeness.sh` (also touches config.sh conceptually)
-Depends-on: none
-
-The parenthetical is prose commentary on the Layers: line, not a second, backtick-delimited
-declaration -- and per the 2026-09-10 backtick ruling it never was one.
-
-**Acceptance:** `config.sh` is recognised as undeclared, and the bare mention in the parenthetical is
-itself named as a declaration written outside backticks.
-
-**DoD:**
-- [ ] `config.sh` is updated
-
-### T3 — sibling control: an ordinary, correct declaration
-Layers: `config.sh`
-Depends-on: none
-
-The declared file matches the implied file exactly, entirely inside backticks. This block must stay
-green under both the substring-fix and the new unbackticked-token check.
-
-**Acceptance:** the declared file matches the implied file exactly.
-
-**DoD:**
-- [ ] `config.sh` is updated
-EOF
-
-run_case_anywhere "substring-not-a-declaration (token inside a longer declared path still FAILs)" 1 \
-  "### T1 Layers completeness: DoD/Acceptance implies config.sh, absent from Layers:" -- \
-  sh "$checker" "$sub_fx"
-
-run_case_anywhere "substring-not-a-declaration (token inside a trailing comment still FAILs)" 1 \
-  "### T2 Layers completeness: DoD/Acceptance implies config.sh, absent from Layers:" -- \
-  sh "$checker" "$sub_fx"
-
-run_case_anywhere "substring-not-a-declaration (unbackticked token gets its own named finding)" 1 \
-  "### T2 layers-unbackticked-token: declares a path-shaped token outside backticks (config.sh)" -- \
-  sh "$checker" "$sub_fx"
-
-sub_out=$(sh "$checker" "$sub_fx" 2>&1)
-if printf '%s\n' "$sub_out" | grep '^FAIL' | grep -qF '### T3'; then
-  echo "FAIL fixture(substring-not-a-declaration sibling control): a FAIL line names T3 -- got:"
-  printf '%s\n' "$sub_out"; fail=1
-elif printf '%s\n' "$sub_out" | grep -qF '### T3 Layers completeness (DoD-implied files all declared)'; then
-  echo "PASS fixture(substring-not-a-declaration sibling control): T3 stayed a clean PASS, never named in a FAIL line"
-else
-  echo "FAIL fixture(substring-not-a-declaration sibling control): T3's expected PASS line not found -- got:"
-  printf '%s\n' "$sub_out"; fail=1
+# A missing runtime FAILs rather than skips. A skip is indistinguishable from a pass, which is the
+# exact false assurance this repo refuses elsewhere (TD-101 / ADR-037, the typecheck leg's own rule).
+if ! command -v bun >/dev/null 2>&1; then
+  echo "FAIL harness: bun not found on PATH -- the layers-completeness TS port cannot run, and skipping"
+  echo "              it silently would report this suite green with layers-completeness unexercised"
+  exit 2
 fi
 
-# --- case 9: SELECTION, not verdict (L-186) -- which Plans enter this checker's population AT ALL.
-# Both check-*.sh checkers skip `*/archive/*`, and qa-check.sh's real caller hands them a NON-
-# recursive `ls docs/sprint/SPRINT-*.md` that never reaches an archived file either -- the exclusion
-# is doubled, and before this fixture neither half had ever been exercised for THIS checker
-# (check-layers-observed.sh's own suite covers archive handling extensively; this one had none). The
-# archived fixture is built at a path CONTAINING an `archive/` segment and passed to the checker
-# DIRECTLY (bypassing the non-recursive glob a real caller would use), so the checker's OWN
-# `*/archive/*` guard is what has to do the excluding. The live sibling carries the identical
-# violation shape with no `archive/` segment, and must still FAIL in the same run -- the control that
-# tells "excluded correctly" apart from "stopped checking".
-mkdir -p "$work/archive"
-arch_fx="$work/archive/SPRINT-999-archived-should-be-skipped.md"
-cat > "$arch_fx" <<'EOF'
----
-sprint: 999
-slug: archived-should-be-skipped
-status: closed
-plan_commit: fixture
-close_commit: fixture
-update_trigger: fixture -- SELECTION fixture (L-186), built by evals/run-layers-completeness-fixtures.sh
-  under a path carrying an archive/ segment on purpose. Carries a real, undeclared DoD-implied file
-  so that if the archive skip were ever silently dropped this fixture would start failing loudly.
----
+checker="scripts/lib/check-layers-completeness.ts"
+test_file="evals/layers-completeness.test.ts"
+[ -f "$checker" ]   || { echo "FAIL harness: checker not found at $checker"; exit 2; }
+[ -f "$test_file" ] || { echo "FAIL harness: test file not found at $test_file"; exit 2; }
 
-## Plan
+# A test-COUNT floor, not just an exit code -- `bun test` exits 0 on a file with zero live tests (a
+# renamed test, a dropped describe) while still reporting PASS (same shape run-s4-ts-evaluators.sh and
+# run-dod-delta-fixtures.sh both guard against). RAISE THIS when adding cases to the test file, in the
+# same commit.
+min_tests=16
 
-### T1 — a real completeness violation, deliberately never checked
-Layers: `foo.txt`
-Depends-on: none
+out=$(bun test "$test_file" 2>&1); code=$?
+# Bun colours its summary even when captured into a variable (an ESC/CSI byte precedes the digits),
+# so the anchor below is stripped of ANSI first -- otherwise `^` binds to the escape byte and never
+# matches, silently returning 0 (SPRINT-102 T2).
+n_pass=$(printf '%s\n' "$out" | sed 's/\x1b\[[0-9;]*m//g' | grep -oE '^ *[0-9]+ pass' | grep -oE '[0-9]+' | head -1)
+[ -n "$n_pass" ] || n_pass=0
 
-This Plan must never be evaluated at all -- it lives under an `archive/` path segment on purpose.
-
-**Acceptance:** n/a -- reaching this block would itself be the defect under test.
-
-**DoD:**
-- [ ] `bar.txt` is created, and never declared in Layers: above -- a real completeness violation that
-      must never surface, because this Plan is archived
-EOF
-
-live_fx="$work/archive-sibling-live.md"
-cat > "$live_fx" <<'EOF'
----
-sprint: 998
-slug: archive-sibling-live
-status: active
-plan_commit: fixture
-update_trigger: fixture -- sibling control for the archive-path-excluded case (L-186). Carries the
-  SAME completeness violation shape as its archived sibling, but on a LIVE Plan (no archive/ path
-  segment) -- it must still FAIL by name in the same run the archived sibling is silently skipped.
----
-
-## Plan
-
-### T1 — the same violation shape, on a Plan that IS in scope
-Layers: `foo.txt`
-Depends-on: none
-
-**Acceptance:** `bar.txt` is recognised as undeclared -- this Plan is live, so it must be evaluated.
-
-**DoD:**
-- [ ] `bar.txt` is created, and never declared in Layers: above -- a real completeness violation
-EOF
-
-run_case_anywhere "archive-path-excluded (live sibling still FAILs by name)" 1 \
-  "Layers completeness: DoD/Acceptance implies bar.txt, absent from Layers:" -- \
-  sh "$checker" "$arch_fx" "$live_fx"
-
-arc_out=$(sh "$checker" "$arch_fx" "$live_fx" 2>&1)
-case "$arc_out" in
-  *"SPRINT-999"*|*"archived-should-be-skipped"*)
-    echo "FAIL fixture(archive-path-excluded: archived Plan was not skipped): got:"
-    printf '%s\n' "$arc_out"; fail=1 ;;
-  *)
-    echo "PASS fixture(archive-path-excluded: archived Plan reached via a direct path argument was skipped)" ;;
-esac
-
-
-# --- case 10: SELECTION varied along the CASING axis (SPRINT-099 T3, TD-145 · L-186).
-# Case 9 above varies selection by PATH SEGMENT and passes against a plain string glob -- which is
-# exactly why it proves nothing here. The real job is FILESYSTEM IDENTITY, and the defect it missed
-# is that `docs/sprint/Archive/...` and `docs/sprint/archive/...` are ONE directory sharing ONE inode
-# on any case-insensitive filesystem, while `case "$sp" in */archive/*)` excluded only the first
-# spelling. Feeding the admitted spelling to this very checker produced 3 real FAILs against a closed
-# sprint's stale content (verified against the pre-fix commit, not inherited from the debt row).
-#
-# PLATFORM-AWARE BY NECESSITY, not by defensiveness. On a case-SENSITIVE filesystem, `Archive/` is a
-# genuinely different directory and must NOT be excluded -- asserting exclusion unconditionally would
-# make this fixture wrong on Linux. So the fixture asks the filesystem the same question the
-# predicate does, and asserts the answer the platform actually warrants.
-mkdir -p "$work/archive"
-if [ "$work/Archive" -ef "$work/archive" ] 2>/dev/null; then
-  case_variant_is_same_dir=1
-else
-  case_variant_is_same_dir=0
+if [ "$code" -ne 0 ]; then
+  echo "FAIL fixture(layers-completeness): the layers-completeness TS port suite is red (bun test exit $code) -- output:"
+  printf '%s\n' "$out"
+  exit 1
 fi
 
-cap_fx="$work/Archive/SPRINT-997-case-variant-archived.md"
-cat > "$cap_fx" <<'EOF'
----
-sprint: 997
-slug: case-variant-archived
-status: closed
-plan_commit: fixture
-close_commit: fixture
-update_trigger: fixture -- CASING selection axis (SPRINT-099 T3). Written under `Archive/` with a
-  capital A on purpose. Where that is the same directory as `archive/`, this Plan must be skipped
-  exactly as its lowercase sibling is; where it is genuinely a different directory, it must be
-  evaluated. Carries a real violation so a silently dropped skip would surface loudly.
----
-
-## Plan
-
-### T1 — a real completeness violation under a case-variant archive path
-Layers: `foo.txt`
-Depends-on: none
-
-**Acceptance:** n/a -- whether this block is evaluated is the property under test.
-
-**DoD:**
-- [ ] `bar.txt` is created, and never declared in Layers: above -- a real completeness violation
-EOF
-
-cap_out=$(sh "$checker" "$cap_fx" 2>&1)
-cap_fails=$(printf '%s\n' "$cap_out" | grep -c '^FAIL')
-if [ "$case_variant_is_same_dir" -eq 1 ]; then
-  if [ "$cap_fails" -eq 0 ]; then
-    echo "PASS fixture(archive-case-variant-excluded: Archive/ is the same directory as archive/ on this host, and was skipped identically)"
-  else
-    echo "FAIL fixture(archive-case-variant-excluded): Archive/ and archive/ are ONE directory on this host, but the case-variant path was evaluated -- $cap_fails FAIL(s) raised against a closed sprint:"
-    printf '%s\n' "$cap_out" | grep '^FAIL' | sed 's/^/      /'
-    fail=1
-  fi
-else
-  if [ "$cap_fails" -gt 0 ]; then
-    echo "PASS fixture(archive-case-variant-excluded: case-SENSITIVE host -- Archive/ is a different directory and was correctly evaluated, not skipped)"
-  else
-    echo "FAIL fixture(archive-case-variant-excluded): on a case-sensitive host Archive/ is NOT the archive directory, so this Plan should have been evaluated and its violation named -- it was skipped instead, which would hide live content"
-    fail=1
-  fi
+if [ "$n_pass" -lt "$min_tests" ]; then
+  echo "FAIL fixture(layers-completeness): only $n_pass test(s) ran, expected at least $min_tests --"
+  echo "              coverage SHRANK while bun still exited 0 (a skipped describe, a renamed file, or"
+  echo "              a case dropped from evals/layers-completeness.test.ts all look exactly like this)"
+  exit 1
 fi
 
-# Sibling control, same run: the LOWERCASE archived path stays excluded, and a LIVE Plan carrying the
-# identical violation still FAILs by name. Without this pair, "excluded correctly" is
-# indistinguishable from "the checker stopped checking" (L-142).
-low_out=$(sh "$checker" "$arch_fx" "$live_fx" 2>&1)
-if printf '%s\n' "$low_out" | grep -q 'bar.txt, absent from Layers:' && ! printf '%s\n' "$low_out" | grep -q 'SPRINT-999'; then
-  echo "PASS fixture(archive-case-variant-control: lowercase archive still skipped AND the live sibling still FAILs by name in the same run)"
-else
-  echo "FAIL fixture(archive-case-variant-control): the lowercase/live pair no longer discriminates:"
-  printf '%s\n' "$low_out" | sed 's/^/      /'
-  fail=1
-fi
-echo "----------------------------------------"
-if [ "$fail" -eq 0 ]; then echo "LAYERS-COMPLETENESS FIXTURES: all green"; else echo "LAYERS-COMPLETENESS FIXTURES: at least one FAIL"; fi
-exit $fail
+echo "PASS fixture(layers-completeness): TS port green -- $n_pass tests, 0 fail (retained: sprint-041-reconstructed, depends-on-omitted, sprint-048-citations sibling PASS, cites-contradiction, unindented-continuation, dir-token-prefix T1/T2, substring-declaration-not-declared T1/T2/T3, archive-path-excluded pair, archive-case-variant, file-not-found). Shell oracle parity: evals/layers-completeness-differential.ts (opt-in, not run here)."
+exit 0
