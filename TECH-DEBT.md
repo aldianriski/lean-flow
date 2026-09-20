@@ -295,6 +295,38 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-169** severity: high | status: open | created: Sprint-103
+  - Summary: **The gate's typecheck leg reports "clean (0 errors)" without ever looking at
+    `scripts/lib/` or `evals/`** — which is where every ported checker lives. `scripts/qa-check.sh`
+    (:1008) runs bare `node_modules/.bin/tsc --noEmit`, so it uses the root `tsconfig.json`, whose
+    `include` is `["apps/**/*.ts", "packages/**/*.ts", "test/**/*.ts"]`. None of the repo's
+    safety-critical TypeScript is in that program.
+  - **Measured, not inferred.** `tsc --noEmit --listFiles | grep -c run-sprint-family-spec-reduction`
+    returns **0** — the file is not in the program at all. Re-running under a config that includes
+    `scripts/**` and `evals/**` surfaces **3 real errors** that the gate has never reported:
+    `evals/run-sprint-family-spec-reduction-fixtures.ts(48,10) TS2532` (fixed at SPRINT-103 T1) and
+    `scripts/qa-verdict.ts(147,5)` + `(151,5)` TS18047, both pre-existing and **still open**.
+  - **Why this is high and not cosmetic.** SPRINT-102 ported five checkers to TypeScript and
+    SPRINT-103 T2 ports a sixth; ADR-037/TD-101 hardened this very leg so that a *skip* could never
+    read as a pass. It is blind anyway — not by skipping but by **population**. The leg's own
+    comment says "a skip is indistinguishable from a pass, which is the defect this leg exists to
+    remove", and it has been reporting `0 errors` over a program that excludes the files the repo
+    most depends on being type-correct. **This is L-136** (a `Verify:` whose scope excludes its
+    target passes while saying nothing) at the gate's own level, and **L-186**'s population blindness
+    — the detection logic is sound, the member set it runs over is not.
+  - **Second instance of the same shape found in the same sprint**, which is why this is filed rather
+    than patched in passing: leg 12's harness census globs `evals/run-*.sh` only, so a `.ts` harness
+    is neither run nor reported as unregistered
+    (`docs/research/logs/qa-check-ts-harness-dispatch-wiring.diff.md`). Two gate legs, both correct
+    in their logic, both looking at the wrong set. Worth asking of every leg, not just these two.
+  - Fix direction (**not a ruling**): the obvious move is a committed `tsconfig` covering
+    `scripts/**` and `evals/**` and pointing the leg at it — but doing that turns the gate **red on
+    two pre-existing `qa-verdict.ts` errors**, so the fix and those errors are one task, not two.
+    Decide also whether `apps/`/`packages/` and `scripts/`/`evals/` should share one program or be
+    two leg invocations; they have different runtimes (Bun vs the app build) and `bun` types are
+    already an `extends` concern. Do not widen the glob without running it first.
+  - **Found by accident**, in a subagent's aside about its own typecheck coverage — not by any check.
+    Nothing in the repo currently detects a leg whose scope has drifted from its subject.
 - **TD-168** severity: high | status: open | created: Sprint-103
   - Summary: **`scripts/lib/conformance-engine.sh` is the QA gate's single largest cost centre and is
     kernel-bound, but it is consumer-facing, so the fix needs its own sprint.** Measured at

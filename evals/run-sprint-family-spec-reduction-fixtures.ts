@@ -45,7 +45,9 @@ function sentinel(tag: string): number {
   const lines = harnessLines();
   const hits = lines.map((l, i) => [l, i] as const).filter(([l]) => l.startsWith("# >>> " + tag) || l.startsWith("# <<< " + tag));
   if (hits.length !== 1) throw new Error(`expected exactly 1 ${tag} sentinel in the harness, found ${hits.length} -- the block it brackets cannot be located`);
-  return hits[0][1];
+  const hit = hits[0];
+  if (hit === undefined) throw new Error(`unreachable: ${tag} sentinel count checked above`);
+  return hit[1];
 }
 
 /** The reduction's awk program, lifted VERBATIM from the line after its sentinel -- never

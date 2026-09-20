@@ -566,3 +566,49 @@ T1: **8 of 11** — the three remaining are `If ported:` conditionals, n/a under
 dispositioned at close per the owner's ruling. Sprint total **18 of 35**.
 
 review · T1 · outside-reviewer-worktree-isolated-x2 · behaviour:material · governance:high
+
+### 2026-09-20 | progress | T2 ported and independently verified; a false claim of mine corrected
+
+`check-layers-observed.sh` (644 lines) → `scripts/lib/check-layers-observed.ts` (512), built
+worktree-isolated. Oracle retained and untouched; `qa-check.sh` and `conformance-engine.sh`
+untouched as instructed. **Re-verified here rather than accepted:**
+
+- **Parity, run by me: 25/25 identical** (exit code + stdout), 37/37 fixture assertions, over 19
+  TS-built git fixtures plus **103 real sprint files** (1 active + 102 archived). The L-198 trap the
+  brief named is explicitly guarded: a `population-3a-non-empty` case asserts the active-corpus
+  comparison produced **real output (2 lines)**, not the two-empty-outputs-agree shape that passed
+  twice in SPRINT-102.
+- **Discrimination, seeded by me:** disabling the ADR-040 ownership guard on line 448
+  (`if (false && …)`, 512→512 lines, still typechecks) took the differential from **25/25 → 21/25**
+  and **37/37 → 35/37**, with **exactly 4** divergences — ownership legs A/B/F and archived-sibling,
+  all and only the cases downstream of that guard. Every other fixture and the whole 103-file
+  corpus stayed green, which is the sibling control. Restored and verified under **one** stated
+  convention — `sha256sum` on the working file, before and after, both
+  `4197aa518434d99c5afb707ddf8176eadaf5d9418556019f5998d5e831924b00`. The git-blob convention used
+  elsewhere in this sprint does not apply to a file with no commit yet, and swapping conventions is
+  stated rather than silent (L-169).
+- Wiring: `docs/research/logs/qa-check-layers-observed-wiring.diff.md`, **NOT APPLIED**.
+
+**A claim of mine was false and is corrected here.** I reported "`tsc` clean" for the T1 fixture
+three times. The root `tsconfig.json` includes only `apps/**`, `packages/**`, `test/**` — so
+`tsc --noEmit` **never had my file in its program**, and its exit 0 was a statement about nothing.
+Proven: `tsc --noEmit --listFiles | grep -c run-sprint-family-spec-reduction` returns **0**. Under a
+config that actually covers `scripts/**` and `evals/**`, my fixture had a real error
+(`(48,10) TS2532`), now fixed. This is L-136 in my own work, and I had written the L-136 warning
+into this sprint's own G2 notes hours earlier.
+
+**It is not only my file — filed as `TD-169` (high).** The gate's typecheck leg (`qa-check.sh:1008`)
+runs bare `tsc --noEmit`, so **every ported checker in `scripts/lib/` and every harness in `evals/`
+is outside the gate's typecheck**, while the leg reports `clean (0 errors)`. ADR-037/TD-101
+hardened that same leg so a *skip* could not read as a pass; it is blind by **population** instead.
+Two pre-existing `scripts/qa-verdict.ts` errors have been invisible to it, which is why the fix and
+those errors are one task — widening the glob turns the gate red.
+
+**Second gate leg this sprint with the same shape**, which is why it is filed rather than patched:
+leg 12's census globs `evals/run-*.sh`, so a `.ts` harness is neither run nor reported as
+unregistered. Both legs are correct in their logic and both examine the wrong set (L-186).
+
+T2: **5 of 7** — outside review and the before/after range remain. The builder was worktree-isolated
+but a builder is not a reviewer (L-165). Sprint total **21 of 35**.
+
+consequence · T2 · behaviour:material · governance:high
