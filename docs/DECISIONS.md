@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-09
+last_updated: 2026-09-21
 update_trigger: A new ADR is added under docs/adr/
 status: current
 ---
@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-043](adr/ADR-043-the-engine-is-the-gates-cost-centre-and-its-consumer-contract-bounds-the-fix.md) | The conformance engine is the gate's cost centre (60% `sys`, corpus-size spawns), and its **consumer contract bounds the fix** — exit-code and report-text parity are reversible, but shipping a `bun` requirement to adopters of root `conformance.sh` is not, so the port is out of scope for a performance sprint | accepted | 2026-09-20 |
 | [ADR-042](adr/ADR-042-the-command-ceiling-is-a-foreground-limit.md) | The 600s command ceiling is a **foreground-call** limit, not a host limit — and the gate's ceiling check **reports** it as uncounted `INFO` rather than FAILing, because the check runs 20 lines before the verdict and so fires only in runs that were *not* killed | accepted | 2026-09-16 |
 | [ADR-041](adr/ADR-041-platform-repo-service-boundary.md) | The pilot platform lives in its own repository (`workdoo`) with lean-flow consumed there as a **pinned plugin**, not vendored — preserving the zero-dependency manifest that `plugin install` copies wholesale into every consumer's cache. Governance splits by *kind*: the outcome record (EPIC-016) stays here, the execution record (tasks, sprints, its own id-space) lives there | accepted | 2026-09-09 |
 | [ADR-040](adr/ADR-040-commit-ownership-accepts-the-subject-claim.md) | Commit ownership trusts the cited sprint number, **symmetrically** — archived and active siblings alike, with no declaration or window test — and the laundering channel that follows is ACCEPTED and documented rather than narrowed a fourth time. `check-layers-observed.sh` is therefore not a guard against a dishonest commit subject and must not be cited as one | accepted | 2026-09-08 |
