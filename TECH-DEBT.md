@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-16
+last_updated: 2026-09-21
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -295,6 +295,28 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-172** severity: medium | status: open | created: Sprint-103
+  - Summary: **`evals/run-sprint-family-fixtures.sh` defines `learn_entry()` twice** — line 300
+    (`<dir> <count> <heading-status>`) and line 512 (`<dir> <heading-tail> [body-lines...]`) — two
+    *different* signatures under one name, in a Tier G harness carrying 68 cases.
+  - **Not currently mis-firing, and that was verified rather than assumed.** A `sh` function
+    definition takes effect when it executes, so the three calls at lines 339/344/351 run against
+    the first definition and the three at 520/532/538 against the second; each call site matches the
+    signature live at its point in the file. The Execution Log's note that the second "silently
+    overrides the first for every call after it" is true as stated and **does not** describe a
+    present defect.
+  - **Why it is still debt.** The correctness depends entirely on textual order, nothing enforces
+    it, and the failure is silent in the worst direction: a new call added after line 512 with the
+    first signature builds a *malformed* fixture, and **40 of this harness's 68 cases are
+    `assert_absent`**, which passes when a finding does not appear. A fixture that never constructs
+    its subject passes for the same reason a correct one does.
+  - Mitigation (**hypothesis, re-derive at promote**): rename to `learn_entry_count()` /
+    `learn_entry_body()` at the six call sites, or fold both into one function that dispatches on
+    argument shape. One-file change, no engine or spec surface; takes the ordinary retained-fixture
+    bar rather than a discrimination proof only if it is ruled Tier X on re-tier.
+  - Found: SPRINT-103 Wave 0 source census, named in the Execution Log as outside § Scope and left
+    unfixed per the surgical-changes rule; filed here at close so it survives the sprint (L-151).
+
 - **TD-171** severity: medium | status: open | created: Sprint-103
   - Summary: **`evals/run-conformance-engine-fixtures.sh`'s fixture construction is portable and
     unported** — roughly **56 s of its measured ~106 s**. SPRINT-103 T4 ruled the target *split*:
@@ -320,7 +342,7 @@ status: current
     filing the reachable half was the honest outcome rather than opening a fourth build late in the
     sprint — D2's "a recorded ruling is a successful task" applied to a case the Plan did not
     anticipate.
-- **TD-170** severity: medium | status: open | created: Sprint-103
+- **TD-170** severity: medium | status: resolved → SPRINT-103 close (owner ruling, no task) | created: Sprint-103
   - Summary: **A governance commit that also appends to the sprint's own Execution Log is reported
     `UNATTRIBUTED` by leg 15** — and appending to that Log is mandatory for every task, so this
     fires on routine sprint work. `is_governance_commit()` requires **every** file in the commit to
@@ -354,6 +376,30 @@ status: current
   - **Blocks close as it stands**: leg 15 exits 1, so `sprint-bulk`'s system-verify step will not
     pass against the integrated tree until this is ruled. It is a ruling, not a defect to patch
     quietly — both options change something a reader depends on.
+  - **RESOLVED at the SPRINT-103 close — option (a), owner-ruled.** `is_governance_commit()`'s
+    allow-list now admits `docs/sprint/`, in **both** implementations (`check-layers-observed.sh`:
+    `docs/sprint/*) ;;` · `check-layers-observed.ts`: `if (f.startsWith("docs/sprint/")) continue;`),
+    one non-comment line each, documented at the site. The argument that decided it: the path is
+    *already* unreportable via `is_excluded_committed()`, so the omission let a file that cannot be
+    named still **disqualify** the commit carrying it — the same argument the `docs/knowledge-index.md`
+    and `docs/epic/`|`docs/research/` arms already make in that function.
+  - **Tier G bar met, and the over-exemption control is the part that matters.** Retained pair:
+    `governance-plus-sprintlog` (the real motivating shape — must NOT be unattributed) and
+    `governance-plus-real-file` (`{TODO.md} + {scripts/real-code.sh}` — must STILL be reported,
+    naming the code file). Suite after: 29/29 differential, 43/43 assertions. Discrimination proved
+    by reverting the one line from the port only (seed verified landed, 527→526 lines, still
+    parses): 29/29 → 32/41 and 43/43 → 42/43, **exactly** `governance-plus-sprintlog` reddening with
+    both over-exemption control assertions green; restored under one convention, `sha256sum` on the
+    working file. Outside-reviewed worktree-isolated; the reviewer's boundary-parity attack (9 cases
+    incl. `docs/sprintfoo`, `docs/sprint-notes/`, nested `archive/`, double-slash, case difference,
+    `..`) found no shell/TS divergence, and its one SUSPECTED finding — the new arm carried no
+    ASSUMPTION caveat unlike its siblings — was acted on.
+  - **Option (b) was also taken, as the half code cannot carry**: `.claude/CONTEXT.md` § Sprint model
+    now states leg 15's attribution rules in prose, including that a commit's files must be covered
+    by **that task's** `Layers:`. Two SPRINT-103 commits (`ccd6c6c`, `e9c7e14`) remain unattributable
+    and are **exempted on the record, history not rewritten** — their shas are cited by name in
+    ADR-043, this row's evidence trail and the sprint Log, and amending them would falsify those
+    references.
 - **TD-169** severity: high | status: open | created: Sprint-103
   - Summary: **The gate's typecheck leg reports "clean (0 errors)" without ever looking at
     `scripts/lib/` or `evals/`** — which is where every ported checker lives. `scripts/qa-check.sh`
@@ -464,6 +510,14 @@ status: current
     ANSI-coloured `bun test` sample would retain the discrimination without a shipped broken test and
     without new shell — it tests the *parser*, not the suite. Weigh against ADR-029: the parsing step
     is Tier **G** by the false-negative test, so the bar applies even though the fix was one line.
+  - **Second sighting, SPRINT-103 T5 (the shape is not isolated to this harness).**
+    `evals/run-qa-budget-position-fixtures.sh` case 2 asserts *no budget verdict within 60 s* — an
+    assertion whose input is a wall clock, the same shape as case 12 here. Proven wait-bound on
+    measurement: two runs **0.1 s apart** while their CPU totals differed by more than **2x**
+    (16.5 s vs 35.6 s), only 24% of the first run's wall being CPU. A host fast enough to reach
+    leg 12's own loop-internal check inside `WINDOW` reddens correct code. So this row's fix
+    direction should assume a **class** of clock-input assertions rather than one case, and the
+    `WINDOW` lever trades directly against flakiness under load (a coverage decision, D6).
 
 - **TD-166** severity: medium | status: open | created: Sprint-102
   - Summary: **The `dod-delta` leg can hold a sprint permanently un-closable on a finding that only

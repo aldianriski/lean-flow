@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-20
+last_updated: 2026-09-21
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,106 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+## SPRINT-103 — Port the Measured Hotspots (2026-09-21)
+
+**Unreleased — no version bump.** `skills/`, the four `*-plugin/*.json` manifests, `README.md` and
+`spec/` are untouched (derived from `git diff --name-only bfa3fec..HEAD`, not judged). The one
+consumer-facing file in the diff, `scripts/lib/conformance-engine.sh` (ADR-027), changed by **16
+comment lines only** — `sh -n` clean, byte-identical output and exit code against the pristine copy
+over the full 100-rule spec. No consumer-visible change ⇒ nothing to release. Spec unchanged at
+0.11.0. **23 of 34 DoD `[x]`, 11 `[~]` n/a, 0 open** — each n/a carries inline the ruling that made
+it inapplicable, because closing 34/34 when 11 were never applicable reads as more work than
+happened (L-088).
+
+**The sprint measured first and ruled four of its five targets unportable — and that is the result,
+not a shortfall.** SPRINT-102 inherited TD-090's harness ranking, ported five checkers and moved the
+gate by nothing; Round 16, the first profile of a *completed* gate, held none of them in the top 20.
+So every task here opened with its own measurement, and "ruled unportable, mechanism recorded" was an
+accepted outcome (D2). It happened four times, and each ruling names a different mechanism.
+
+**T1 — 305 s, and a port would have recovered almost none of it.** `conformance-engine.sh` costs
+**2.93 s against an empty directory** with the shipped 100-rule spec and 0.35 s with zero rules —
+~26 ms per rule of dispatch paid whether or not anything is checked. The harness makes **68** engine
+invocations, so **199 s of its 305 s is dispatch inside the program the port would still have to
+call 68 times**. Ruled not spawn-shaped. The cost was then removed anyway, on the caller side: the
+harness now hands the engine an **awk-derived 43-rule spec** (§9+§10+§11+§12), reduced from the
+shipped `spec/STANDARD.md` at run time and carrying a per-section drift anchor. Six alternating runs,
+**319.2–354.6 s → 136.7–184.0 s, non-overlapping**; median 341.0 → 149.8 s. Output byte-identical,
+69/69 verdict lines, 0 FAIL both arms, same cases and same findings (D6 holds). **The trap that
+nearly shipped:** the harness header claimed §9+§10, which is 26 of its 68 cases — a reduction built
+on that prose would have left 40 assertions with no rule to fire, and **40 of the 68 are
+`assert_absent`**, which passes when a finding does not appear. All of them would have gone green
+testing nothing. The required set was derived twice, by two mechanisms sharing nothing (case-name
+prefixes, then the 23 distinct finding slugs mapped back to the emitting engine function), and both
+returned exactly {§9, §10, §11, §12}.
+
+**T2 — the one target of five whose cost was genuinely spawn-shaped, ported.**
+`check-layers-observed.sh` (644 lines) → `check-layers-observed.ts` (512), oracle **retained** under
+D5. 59% of its CPU is `sys` and a third of its wall is not CPU at all: 29 throwaway git repos, ~92
+git spawns, ~30 non-git forks per file. Gate **leg 15** now runs the port: **20.57–21.14 s →
+2.76–3.69 s** over three alternating pairs, ~6× and non-overlapping, output byte-identical and exit
+code equal on every pair, `sys` 10.3–11.4 s → ≤0.02 s. Parity: 25/25 identical (exit code + stdout)
+over 19 built git fixtures **plus 103 real sprint files**, with a `population-3a-non-empty` case
+asserting the active-corpus comparison produced real output — the two-empty-outputs-agree shape that
+passed twice in SPRINT-102 is explicitly guarded.
+
+**T3 — ruled, not ported, and the ruling is recorded in all three places its different readers
+reach (ADR-043 · the engine's own header · TD-168).** Leg 2f-ter's sweep runs **173.1 s real / 53.8
+user / 81.1 sys** — 60% `sys`, corpus size executed as per-file spawns, with fixed dispatch only 1.7%
+of it. That **inverts T1's conclusion for the same program, and both hold**: two different costs in
+one binary. A port is the right instrument and was ruled out of scope here for a reason that survives
+the sprint — exit-code and report-text parity are reversible, but **shipping a `bun` requirement to
+adopters is not**, and `conformance.sh` answers for any repository under ADR-027. **T4** split
+(~50 s engine, out of reach under ADR-043; ~56 s portable fixture construction → **TD-171**).
+**T5** is wait-bound by construction: two runs **0.1 s apart while their CPU totals differed by more
+than 2×**, because case 2 must sit out a 60 s `timeout` to demonstrate the silent shape TD-084
+exists to stop. The wait *is* the assertion.
+
+**Four worktree-isolated outside reviews; four confirmed defects; none found by the author.** The
+sharpest was a real port defect that **25/25 parity, 37/37 assertions, 103 real files and a seeded
+break were all structurally blind to**: the oracle's unanchored greedy `sed` takes the **last**
+`(SPRINT-N Tn)` citation in a subject, the port's `.exec()` took the **first**, and `git log --all`
+over this repository's entire history holds **zero** two-citation subjects — first-match and
+last-match agree on every input that exists. The reviewer's brief named seven admitted-skipped
+branches and all seven came back clean; the defect sat on an axis nobody had enumerated (**L-207**).
+The others: a header tally reading 66 against the 68 cases in its own paragraph (two `assert_absent`
+calls written with two spaces, in a header whose thesis is that a file's prose about its population
+is not evidence); a fixture whose anchor extraction grabbed a planted decoy `awk` line, now bracketed
+by three exactly-once sentinels and behaviourally probed **per section**, since a 43-row decoy that
+drops §9 entirely passed the total-only probe; and a stale rationale comment in `qa-check.sh`.
+
+**Also shipped.** **TD-170 resolved** — `is_governance_commit()`'s allow-list now admits
+`docs/sprint/` in both implementations, so a file that is already unreportable can no longer
+*disqualify* the commit carrying it; retained pair includes an **over-exemption control**
+(`{TODO.md} + {scripts/real-code.sh}` must still be reported), and the discrimination proof reddened
+exactly the motivating fixture with both control assertions green. Leg 12 now dispatches `.ts`
+harnesses and its census glob admits them — the new fixture actually runs in the gate, which was the
+whole point of the wiring diff. `.claude/CONTEXT.md` § Sprint model now states leg 15's attribution
+rules in prose: they were enforced in code and written nowhere a committer reads (L-151). ADR-039's
+opt-in split applied for three differentials (~104 s); `layers-observed` (189.3 s) stays excluded and
+named, its ruling deferred to **TASK-357** until a re-measured gate total exists.
+
+**Closed without a full-profile gate run**, on the record: the host sat at **3.0% free memory
+(428 MB of 14,078 MB)** — the condition that killed this sprint's Wave 0 — and a wall-clock figure
+taken under paging measures swap, which is the same ruling Round 17 made. The sprint's own **A3 is
+therefore recorded NOT confirmed**, and TASK-357 owns both it and the deferred ADR-039 ruling. The
+last completed gate read `214 pass, 9 fail`, every finding dispositioned in the Execution Log: seven
+fixed, two `review-depth-*-absent` answered by dispatching the missing review rather than by
+downgrading the classification that triggered them, and one commit ruled genuinely unattributable.
+
+**A claim frozen in a commit message was false, and the retraction is part of this record.**
+`ccd6c6c` asserts *"leg 15 now exits 0 on both … the close blocker is cleared."* The check ran while
+the fix was **uncommitted**, where the checker takes its WIP leg; committing the fix added a commit
+that was itself unattributable, and both implementations then exited 1. The claim was true when
+measured and false by the time it was written — **the act of recording it is what broke it**
+(**L-206**). `ccd6c6c` and `e9c7e14` are exempted for this sprint only, history not rewritten,
+because their shas are cited by name in ADR-043 and TD-170's evidence trail.
+
+`TD-168` (high) · `TD-169` (high) · `TD-171` · `TD-172` filed · `TD-170` **resolved** · `TD-167`
+annotated with its second sighting · `TASK-356` filed mid-run, `TASK-357` filed `origin: close-retro`
+· **L-206** · **L-207** · **L-208** filed · `ADR-043` written.
 
 ---
 ## SPRINT-102 — Make the Gate Green (2026-09-20)

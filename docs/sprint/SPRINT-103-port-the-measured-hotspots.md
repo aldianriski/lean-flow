@@ -2,10 +2,10 @@
 sprint: 103
 slug: port-the-measured-hotspots
 owner: Maintainer
-last_updated: 2026-09-20
-status: active
+last_updated: 2026-09-21
+status: closed
 plan_commit: bfa3fec
-close_commit: [sha — set at close]
+close_commit:
 update_trigger: sprint execute/close events
 ---
 
@@ -184,7 +184,103 @@ say so in the Round so TD-167's fix direction is informed by a second sighting.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `evals/run-sprint-family-fixtures.sh` | T1 | hands the engine an **awk-derived 43-rule spec** (§9+§10+§11+§12) instead of the shipped 100-rule one — dispatch is ~26 ms/rule paid per call, and this harness makes 68 calls | med | 69/69 verdict lines `cmp`-identical against the full spec; `run-sprint-family-spec-reduction-fixtures.ts` |
+| `evals/run-sprint-family-spec-reduction-fixtures.ts` | T1 | **new, retained** — must-FAIL fixture for the reduction: three drift modes, each with its named finding, plus a control. Extracts the anchor and the awk program from the live harness between three `exactly once` sentinels, and **behaviourally probes per-section counts** so a 43-row decoy that drops §9 cannot pass | med | 4 cases; control green; the reviewer's own decoy rejected |
+| `scripts/lib/check-layers-observed.ts` | T2 · TD-170 | **new** — port of the 644-line oracle (the one target of five whose cost is genuinely spawn-shaped: 59% `sys`, ~30 non-git forks per file). Carries TD-170's `docs/sprint/` allow-list arm | med | 29/29 differential (exit code + stdout) over 19 built git fixtures + 103 real sprint files; 43/43 assertions |
+| `scripts/lib/check-layers-observed.sh` | T2 · TD-170 | **oracle retained** under D5, untouched by the port; one-line governance allow-list widening applied to both implementations | low | same differential, both directions |
+| `evals/run-layers-observed-differential.ts` · `evals/fixtures/layers-observed/git-fixtures.ts` | T2 | **new** — the differential and its fixture builder, incl. the `two-parentheticals-last-wins` case + `one-parenthetical-control` that the outside review's defect made necessary | med | seeded break 29/29 → 26/27, control green, restored to a stated hash |
+| `scripts/lib/conformance-engine.sh` | T3 | 16 **comment-only** lines recording ADR-043 where the maintainer who opens this file to make it faster will read it (L-151) | low | `sh -n` clean; byte-identical output + exit code vs pristine over the full 100-rule spec |
+| `scripts/qa-check.sh` | T0 (coordinator, D3) | leg 15 → the `.ts` port with a `bun`-missing FAIL-not-skip guard; leg 12 dispatches `.ts` harnesses and its census glob admits them; ADR-039 opt-in split applied; one stale rationale comment corrected | med | gate run `214 pass, 9 fail`, every finding dispositioned in the Log; no census complaints |
+| `docs/adr/ADR-043-…the-engine-is-the-gates-cost-centre…md` | T3 | **new** — the ruling, recording the constraint the porting sprint inherits rather than the deferral | — | — |
+| `docs/research/logs/qa-gate-timing.md` | T1–T5 | Rounds 17–21 — every per-target measurement and both before/after ranges | — | two routes per figure |
+| `docs/research/logs/qa-check-ts-harness-dispatch-wiring.diff.md` · `…-layers-observed-wiring.diff.md` | T1 · T2 | wiring diffs committed as reviewable files **before** being applied (L-151) | low | applied, then verified by running the gate rather than by reading the diff |
+| `.claude/CONTEXT.md` | T0 | § Sprint model now states leg 15's attribution rules in prose — the convention was enforced in code and written nowhere a committer reads | low | the two exempted commits name exactly what it would have caught |
+| `TECH-DEBT.md` · `TODO.md` | T0 | TD-168 · TD-169 · TD-170 · TD-171 filed; TASK-356 filed mid-run rather than left in the Log | — | — |
+| `docs/sprint/SPRINT-103-*.md` · `docs/sprint/logs/SPRINT-103-*.md` | T0 | Plan ticks + the append-only Log | — | — |
+
+> `docs/epic/EPIC-016-*.md` and `docs/knowledge-index.md` also moved in this commit range. The epic
+> edits (`ad75b72`, `8b541d1`) belong to the **workdoo stream**, not to this sprint; the index is
+> generated.
 
 ## Retro
 
-<!-- Written at close. -->
+**Retrieval check** — no retrieval miss, and two contradictions of prior rules, both caught rather
+than missed. **L-136 fired inside my own work**: I reported `tsc` clean for the T1 fixture three
+times while `tsconfig.json`'s `include` never held the file, having written the L-136 warning into
+this sprint's own G2 notes hours earlier — found by an outside reviewer, and filed as **TD-169**
+because the gate's typecheck leg is blind by the same population. **L-170 fired three times in one
+session** (`ADR-999` · `TD-961` · `TASK-908`, every one a fixture or example token), each caught by
+the promoted rule working as written. Neither is a retrieval failure: both rules were found, cited,
+and one was still not carried across a selector.
+
+**Cost** — coordinator inline + 4 worktree-isolated passes (1 builder, 3 outside reviewers). Six
+alternating timing runs for T1's range, three pairs for T2's, plus one full gate run. **No
+full-profile gate run at close**: the host sat at **3.0% free memory (428 MB of 14,078 MB)**, the
+condition that killed Wave 0, and a wall-clock figure taken under paging measures swap rather than
+the gate — the same ruling Round 17 made. Per DoD **delivered**: 23 ticked · 11 `[~]` n/a · 0 open,
+across 5 tasks + 4 owner-action rows.
+
+**Worked**
+
+- **Measure-then-rule (D2) paid for itself on the first target.** A1 said the five would respond as
+  SPRINT-102's did. For T1 they do not: 199 s of its 305 s is dispatch **inside** the engine the port
+  would still have to call 68 times. Inheriting A1 would have bought a port worth a small fraction of
+  the cost — the SPRINT-102 mistake, avoided by the measurement that exists to avoid it.
+- **The same program carried two opposite cost mechanisms, and both rulings hold.** T1 pays fixed
+  dispatch 68× against tiny dirs (a reduced spec fixes it); T3 pays per-file spawns once against a
+  large corpus (no reduction reaches it without dropping rules, which D6 forbids). A per-target
+  *ranking* attributes seconds and answers neither.
+- **Every guard defect this sprint was found by an independent pass, none by recalling the rule.**
+  Four reviews, four confirmed defects: a 66-vs-68 tally in a header whose own thesis is that a
+  file's prose about its population is not evidence; a fixture extracting a decoy `awk` line; a
+  behavioural probe checking quantity where the commit claimed identity; and the port defect below.
+  L-165 held 4 of 4.
+- **The non-overlapping range is what made T1 a measurement rather than an anecdote.** On a host
+  showing 35% spread between two runs of byte-identical code, six alternating runs put the arms at
+  319.2–354.6 s and 136.7–184.0 s — the slowest reduced run 135 s faster than the fastest full one.
+  The DoD's refusal of a point estimate is the whole reason that claim survives.
+- **Refusing to reinterpret a check in order to clear it.** The gate's `review-depth-*-absent`
+  findings were correct: T0 and T3 carried `governance:high` with no `review ·` line. Downgrading the
+  classification would have cleared the check; an outside review was dispatched instead and the
+  `review ·` lines were written from what it found.
+
+**Friction**
+
+- **A claim was true when measured and false by the time it was written — and the act of recording it
+  is what broke it.** `ccd6c6c` asserts *"leg 15 now exits 0 on both … the close blocker is
+  cleared."* The check ran while the fix was **uncommitted**, where the checker takes its WIP leg;
+  committing the fix added a commit that was itself unattributable, and both implementations then
+  exited 1. The fact was caught independently by the next gate run — what was not done is retracting
+  the commit message, until a review forced it → **L-206**.
+- **A port defect survived 25/25 parity, 37/37 assertions, 103 real files and a seeded break**,
+  because `git log --all` over this repo's entire history holds **zero** commit subjects carrying two
+  `(SPRINT-N Tn)` citations. The oracle's unanchored greedy `sed` takes the **last** match; the
+  port's `.exec` took the **first**. The brief sent the reviewer after seven admitted-skipped
+  branches and every one came back clean — the gap was orthogonal to that list → **L-207**.
+- **Round 20 measured the wrong subject, and would have reported the result honestly.** It timed
+  `run-layers-observed-fixtures.sh` (185.7 s) — a harness that exercises the **retained oracle**,
+  which D5 says must not move. The port's real subject is leg 15: 21.0 s → 3.4 s → **L-208**.
+- **Two commits this sprint are unattributable under the convention the sprint itself enforces**
+  (`ccd6c6c`, `e9c7e14`), exempted on the record rather than amended because their shas are cited by
+  name in ADR-043 and TD-170's evidence trail. The convention now lives in `.claude/CONTEXT.md`
+  § Sprint model — it had been enforced in code and written nowhere a committer reads (L-151).
+- **Two seeding attempts were silently inert or spuriously green** (a `sed` that errored leaving the
+  file untouched while the suite reported 27/27; an `awk`-built decoy whose `\|` was eaten). Both
+  caught by the guards L-137 and L-142 prescribe — `cmp` against pristine, and the control reddening
+  alongside the seed.
+- **A rollup figure I reported all sprint was wrong** — "35 DoD" swept the Owner-action checklist row
+  into a `grep -c '^- \[ \]'` over the Plan. The Plan holds 34. Nothing downstream depended on it,
+  but every rollup figure I gave carried the error.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+
+- **L-206 filed** — a verification whose subject includes the act of recording it: the check ran
+  against a dirty tree, and committing changed the population it read. Count 1.
+- **L-207 filed** — a fixture population complete over every *enumerated branch* and still a single
+  point on a dimension nobody named. Extends L-186 / L-202. Count 1.
+- **L-208 filed** — under a retain-the-oracle policy the fixture harness is deliberately off the
+  changed path; measure the leg the change is in the path of. Count 1.
+- **Not filed, watched:** *"a fix derived from one target's measurement does not transfer to another
+  target of the same program"* (T1's reduced spec against T3's corpus spawns). The measure-then-rule
+  discipline already covers the ranking grain; if a second sprint applies one target's fix to a
+  sibling target of the same program, that is the second sighting and it earns a row.
