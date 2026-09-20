@@ -771,3 +771,54 @@ file, `086defe965c982aedb57fa98e7d0c5dbd2991171402461211d5f9a5d707849d3` before 
 Outside review still owed on this change (ADR-029 ii) — dispatched next.
 
 consequence · TD-170 · behaviour:material · governance:high
+
+### 2026-09-20 | progress | both wiring diffs applied; the gate found nine things, all mine
+
+**Owner ruled: apply both.** Done, and verified by running the gate rather than by reading the diff.
+
+**Leg 15 → the port.** `lo_script` now names the `.ts`, with the `bun`-not-found FAIL-not-skip guard
+folded in as an `elif` on the existing test rather than a new block (my first attempt opened an
+`if/else` without a closing `fi` and broke the file; caught by `sh -n` before it went anywhere).
+
+**Leg 12 now dispatches `.ts` harnesses** (`case "$hp" in *.ts) … bun … ;; *) … sh … ;; esac`) and
+its census glob admits `evals/run-*.ts`. **The `.ts` fixture now actually runs:**
+`PASS  eval harness run-sprint-family-spec-reduction-fixtures.ts` in the gate output — which is the
+whole of L-020 and the reason the diff existed.
+
+**My own wiring diff overstated the blast radius and I corrected it on measurement.** It warned that
+admitting `.ts` would force exclusion entries for "12 files". The glob is `evals/run-*.ts`, which
+matches **5**, not 12 — the eight `*.test.ts` files do not match it. Four of the five are
+differential-parity harnesses, one is the new fixture.
+
+**A cost decision I did NOT take on my own.** ADR-039 says parity is mandatory at promote and close,
+which argues the four differentials belong in `eval_harnesses_optin`. Measured first:
+authority 21.2 s · doc-caps 38.8 s · night-run-rollup 44.0 s · layers-observed 189.3 s —
+**~294 s together**, which would more than cancel this sprint's own saving at exactly those two
+moments. That trade is an owner ruling with a measured cost, not a wiring decision, so they are in
+`eval_harnesses_excluded` **named, with the cost and the open ADR-039 question written at the site**.
+Nothing pretends they ran. Flagged for the owner.
+
+**Gate result: `214 pass, 9 fail`, and all nine are this sprint's own work.** No census complaints,
+so the registration is complete. The nine:
+
+| # | finding | disposition |
+|---|---|---|
+| 1 | knowledge index stale | regenerated via `scripts/gen-index.sh` |
+| 2 | `corpus metadata: ADR-043(tag:performance)` | `performance` was a tag of one; changed to `process` |
+| 3–7 | `layers/depends-on completeness` ×5 | added to each task's **`Cites:`** line — the checker's own prescribed remedy for "prose cites it rather than touching it". None of these files is touched by the task citing it |
+| 8–9 | `review-depth-*-absent` for T0 and T3 | **not patched** — see below |
+| 10 | `layers observed` on `ccd6c6c` | **not patched** — see below |
+
+**The two I am not quietly fixing.** The review-depth check is correct: I marked T0's G2 entry and
+both T3 entries `governance:high` / `behaviour:material` and appended no `review ·` line. T3's
+ruling was the owner's (J2) and its artifacts include a Tier G file edit that no independent pass
+has seen; TD-170's fix likewise. **Downgrading the classification to clear the check would be
+exactly the quiet reinterpretation L-088 names**, so instead an outside review of TD-170 + T3's
+engine edit is dispatched, and the `review ·` lines get written from what it finds.
+
+And `ccd6c6c` is genuinely unattributable: subject `fix(TD-170): …` matches no attribution rule
+while touching three real code files. TD-170's fix addressed the *governance* shape; this is a code
+commit that should have carried a `sprint(103) Tn:` subject. The commit is written, so this needs an
+owner ruling (exempt, or amend history) — recorded, not worked around.
+
+consequence · T0 · behaviour:material · governance:high

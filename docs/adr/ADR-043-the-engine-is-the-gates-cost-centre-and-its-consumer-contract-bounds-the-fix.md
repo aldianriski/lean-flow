@@ -1,6 +1,6 @@
 ---
 id: ADR-043
-tags: [tooling, performance]
+tags: [tooling, process]
 domain: governance
 status: accepted
 related: [ADR-027, ADR-008, ADR-029, ADR-039]

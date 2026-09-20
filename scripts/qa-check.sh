@@ -1125,7 +1125,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # git-free rule: it is a `bun test` wrapper over in-memory fixtures (see evals/dod-delta.test.ts), no
 # git, no mktemp, no repos built -- measured well under 1s on this host, the same shape
 # run-s4-ts-evaluators.sh already takes for a TS-evaluator leg.
-eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-handoff-state-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-s4-ts-evaluators.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh run-night-run-gate-exception-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-night-run-outcome-fixtures.sh run-dod-delta-fixtures.sh"
+eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-handoff-state-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-s4-ts-evaluators.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh run-night-run-gate-exception-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-night-run-outcome-fixtures.sh run-dod-delta-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts"
 # run-s4-differential-parity.sh (SPRINT-092 T3) joins the opt-in set by the cost rule, and it is the
 # OTHER half of T2's swap: the row-by-row comparison of the TS evaluators against a LIVE Shell oracle,
 # which needs a real engine spawn per row and is exactly the 20+s taken off the default profile.
@@ -1185,7 +1185,19 @@ eval_harnesses_optin="run-adr-family-fixtures.sh run-s4-differential-parity.sh s
 # Harnesses deliberately NOT gated at all (neither always-on nor opt-in). Empty is a valid state --
 # but a paid/non-deterministic harness is excluded by being NAMED here with a reason, never by being
 # left out of the lists above.
-eval_harnesses_excluded=""
+# The four TS differential-parity harnesses are NAMED here rather than left out of the lists,
+# which is what this variable is for. They compare a ported TS checker against its retained .sh
+# oracle row by row, so each needs BOTH implementations and a real spawn per input. Measured
+# 2026-09-20 on this host: authority 21.2s, doc-caps 38.8s, night-run-rollup 44.0s,
+# layers-observed 189.3s -- about 294s together.
+#
+# OPEN QUESTION, deliberately not settled here (SPRINT-103). ADR-039 says parity is mandatory at
+# promote and close, which is the opt-in profile -- so on that reading these belong in
+# eval_harnesses_optin, not here. But adding ~294s to every promote and close would more than
+# cancel this sprint's own saving at exactly those two moments, and that trade is an owner
+# ruling with a measured cost, not a wiring decision. Excluded-with-a-reason keeps the gate
+# honest meanwhile: they are named, their cost is stated, and nothing pretends they ran.
+eval_harnesses_excluded="run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-layers-observed-differential.ts"
 
 eval_harnesses="$eval_harnesses_always"
 if [ "${QA_FULL:-0}" = "1" ]; then
@@ -1242,7 +1254,18 @@ for h in $eval_harnesses; do
   # breaking `git -C`). Scope it to the one invocation that needs it. Blanking QA_PROFILE_OUT is
   # enough -- qp_sample requires BOTH it and QA_PROFILE, so children no-op exactly as they do on an
   # ordinary unprofiled run, and the outer run keeps sampling around them.
-  hout=$(QA_PROFILE_OUT= sh "$hp" 2>&1); hcode=$?
+  case "$hp" in
+    *.ts)
+      if ! command -v bun >/dev/null 2>&1; then
+        bad "eval harness $h: bun not found on PATH -- cannot run $hp. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
+        continue
+      fi
+      hout=$(QA_PROFILE_OUT= bun "$hp" 2>&1); hcode=$?
+      ;;
+    *)
+      hout=$(QA_PROFILE_OUT= sh "$hp" 2>&1); hcode=$?
+      ;;
+  esac
   qp_sample "harness-end: $h"
   if [ "$hcode" -eq 0 ]; then
     ok "eval harness $h"
@@ -1259,7 +1282,7 @@ done
 # a completed run's directory as an argument and have nothing to check standalone. Checked against
 # the union of always-on + opt-in + excluded -- independent of whether QA_FULL is set this run, so a
 # harness dropped from every list still FAILs on a bare run, not only under the flag.
-for hp in evals/run-*.sh evals/selftest-*.sh; do
+for hp in evals/run-*.sh evals/run-*.ts evals/selftest-*.sh; do
   [ -f "$hp" ] || continue
   h=${hp##*/}
   case " $eval_harnesses_always $eval_harnesses_optin $eval_harnesses_excluded " in
@@ -1412,15 +1435,23 @@ fi
 # diffs the actual git state since the sprint's recorded `plan_commit:` against the union of every
 # task's declared `Layers:` -- it reads history rather than intent, so it cannot be forgotten the
 # way a second sentence can. Fails toward over-reporting, same as leg 14.
-lo_script="scripts/lib/check-layers-observed.sh"
+# SPRINT-103 T2: this leg now runs the TypeScript port. The .sh remains the ORACLE (D5) and is
+# retained, unmodified, as the parity reference -- evals/run-layers-observed-differential.ts is
+# the row-by-row proof they agree (29/29 identical over 19 git fixtures plus 103 real sprint
+# files). Measured on this leg's own call shape, three alternating runs each: oracle
+# 20.57-21.14s, port 2.76-3.69s, byte-identical output and equal exit codes every pair
+# (docs/research/logs/qa-gate-timing.md Round 21).
+lo_script="scripts/lib/check-layers-observed.ts"
 if [ ! -f "$lo_script" ]; then
   bad "layers observed: checker not found at $lo_script"
+elif ! command -v bun >/dev/null 2>&1; then
+  bad "layers observed: bun not found on PATH -- cannot run $lo_script. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
 else
   lo_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
   if [ -z "$lo_files" ]; then
     note "layers observed: skip (missing): docs/sprint/SPRINT-*.md"
   else
-    lo_out=$(sh "$lo_script" $lo_files 2>&1); lo_code=$?
+    lo_out=$(bun "$lo_script" $lo_files 2>&1); lo_code=$?
     if [ "$lo_code" -eq 0 ]; then
       lo_n=$(printf '%s\n' "$lo_out" | grep -cE '^PASS')
       # A sprint with uncommitted work now reports SKIP rather than PASS, because the WIP leg checks

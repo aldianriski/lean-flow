@@ -36,7 +36,7 @@ changing WHAT the gate checks, in any form.
 ### T1 — Rule and port `run-sprint-family-fixtures.sh` `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `evals/run-sprint-family-fixtures.sh` · the checker(s) it invokes (named after T1's own measurement, per L-100) · `scripts/qa-check.sh` (leg wiring, applied from a committed diff) · `docs/research/logs/qa-gate-timing.md` (the per-target Round)
 Depends-on: none
-Cites: Round 16 · TD-090 · L-144
+Cites: Round 16 · TD-090 · L-144 · conformance-engine.sh · qa-gate-timing.md · spec/STANDARD.md · T3
 
 **305 s — 25% of the entire gate, the largest single item by a factor of two.**
 
@@ -73,7 +73,7 @@ rest of this sprint under T3's ruling (ADR-043).
 ### T2 — Rule and port `run-layers-observed-fixtures.sh` `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `evals/run-layers-observed-fixtures.sh` · `scripts/lib/check-layers-observed.sh` (retained as oracle) · a new `scripts/lib/check-layers-observed.ts` · `scripts/qa-check.sh` (leg 15) · `docs/research/logs/qa-gate-timing.md`
 Depends-on: none
-Cites: Round 16 · SPRINT-102's `layers-completeness` port (the pattern, not the file)
+Cites: Round 16 · SPRINT-102's `layers-completeness` port (the pattern, not the file) · T1
 
 **153 s.** Note carefully: this is `check-layers-observed`, a **different checker** from the
 `check-layers-completeness` SPRINT-102 spent a day porting. The near-identical names are why the
@@ -94,7 +94,7 @@ mechanism recorded.
 ### T3 — Rule leg 2f-ter, the conformance engine sweep `[size: M · risk: high · class: decision · HITL · J2]`
 Layers: `scripts/qa-check.sh` (leg 2f-ter) · `scripts/lib/conformance-engine.sh` (**consumer-facing per ADR-027 — read-only unless the ruling requires otherwise**) · `docs/research/logs/qa-gate-timing.md` · an ADR if the ruling is hard-to-reverse
 Depends-on: none
-Cites: ADR-027 · Round 16
+Cites: ADR-027 · Round 16 · conformance.sh · conformance-engine.sh
 
 **139 s, and the riskiest of the five.** `conformance-engine.sh` is **consumer-facing** — ADR-027
 amended ADR-008 to make it answer for *any* repository through the root `conformance.sh`, and its
@@ -135,7 +135,7 @@ interface changing.
 ### T5 — Rule and port `run-qa-budget-position-fixtures.sh` `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `evals/run-qa-budget-position-fixtures.sh` · `docs/research/logs/qa-gate-timing.md`
 Depends-on: none
-Cites: Round 16 · TD-167
+Cites: Round 16 · TD-167 · run-qa-budget-fixtures.sh
 
 **66 s.** The smallest of the five and the one most likely to be cheap. Its sibling
 `run-qa-budget-fixtures.sh` carries **TD-167**, a timing race that reddens under load — **do not fix
