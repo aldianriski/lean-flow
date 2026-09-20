@@ -166,7 +166,21 @@ else
   doccaps=$(bun scripts/lib/check-doc-caps.ts); doccaps_rc=$?
   printf '%s\n' "$doccaps"
   pass=$((pass + $(printf '%s\n' "$doccaps" | grep -c '^PASS' || true)))
-  [ "$doccaps_rc" -eq 0 ] || fail=$((fail + $(printf '%s\n' "$doccaps" | grep -c '^FAIL' || true)))
+  # A nonzero exit carrying NO FAIL line is a crashed checker, not a clean red: the `grep -c` below
+  # would add ZERO to `fail`, so the gate would stay GREEN over a checker that died (an uncaught
+  # throw, a stack trace, a missing runtime). Every other delegating leg already guards this; leg 1
+  # was the only one that did not -- found by an independent review of the TASK-355 wiring, and
+  # PRE-DATING it (the same hole existed when this leg spawned the .sh oracle). Same shape as leg
+  # 2b's guard, and the same rule as the bun-not-found arm above: a result nobody can account for
+  # must redden, because a silent pass is indistinguishable from a real one (TD-101 - ADR-037).
+  doccaps_fails=$(printf '%s\n' "$doccaps" | grep -c '^FAIL' || true)
+  if [ "$doccaps_rc" -ne 0 ]; then
+    if [ "$doccaps_fails" -gt 0 ]; then
+      fail=$((fail + doccaps_fails))
+    else
+      bad "doc-caps: checker exited $doccaps_rc without reporting a FAIL line"
+    fi
+  fi
 fi
 
 qb_checkpoint "leg 2: count consistency"
