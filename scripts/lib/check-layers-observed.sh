@@ -173,6 +173,17 @@ is_governance_commit() {   # <sha> -> 0 if EVERY changed file is a governance ar
       # exempted. Narrow these arms (or add a guard) at that point, not before -- tightening now
       # would only add noise, and noise is what this change exists to remove.
       docs/epic/*|docs/research/*) ;;
+      # ADDED SPRINT-103 (TD-170). `docs/sprint/` is ALREADY unreportable -- is_excluded_committed()
+      # drops it from the per-file loop a few lines below -- but omitting it HERE let it disqualify
+      # the whole commit, sending it to UNATTRIBUTED and getting its governance sibling named
+      # instead. Appending to the sprint's own Execution Log is mandatory for every task, so the
+      # disqualifying shape is routine bookkeeping: {a governance file} + {docs/sprint/logs/...}.
+      # Observed live on SPRINT-103, 5 of 22 in-range commits. Invisible before because leg 15 walks
+      # only plan_commit..HEAD and research commits normally land outside that window -- SPRINT-103
+      # is the first sprint to write four Rounds during its own execution (L-105's temporal sibling:
+      # the rule was sound, the window decided whether it ever fired). A file that cannot be
+      # reported should not be able to disqualify; that is the same argument the two arms above make.
+      docs/sprint/*) ;;
       *) return 1 ;;
     esac
   done

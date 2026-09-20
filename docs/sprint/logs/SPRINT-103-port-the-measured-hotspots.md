@@ -726,3 +726,48 @@ needing a home where committers read it). **It is a ruling, not a quiet patch**,
 `sprint-bulk`'s system-verify at close.
 
 consequence · T2 · behaviour:material · governance:high
+
+### 2026-09-20 | progress | TD-170 ruled and fixed in both implementations — leg 15 now green
+
+**Owner ruling: widen `is_governance_commit()`'s allow-list to include `docs/sprint/`.** The
+argument that decided it: that path is *already* unreportable via `is_excluded_committed()`, so the
+omission let a file that cannot be named still **disqualify** the commit containing it. A file that
+cannot be reported should not be able to disqualify — which is the same argument the
+`docs/knowledge-index.md` and `docs/epic/`|`docs/research/` arms already make in that function.
+
+Applied to **both** implementations, one line each, comment-documented at the site:
+
+    oracle  scripts/lib/check-layers-observed.sh   `docs/sprint/*) ;;`
+    port    scripts/lib/check-layers-observed.ts   `if (f.startsWith("docs/sprint/")) continue;`
+
+Non-comment diff is exactly one line per file. **Leg 15 now exits 0 on both**, byte-identical
+output, on the real tree — the close blocker is cleared.
+
+**Tier G bar, and the control is the part that matters here.** Widening an allow-list risks
+exempting too much, so the retained pair is:
+
+- `governance-plus-sprintlog` — `{TODO.md} + {docs/sprint/logs/...}` must NOT be unattributed. This
+  is the motivating case, taken from the real shape that fired (L-166: a guard is pointed at its own
+  motivating artifact, not only at a fixture that exercises the branch).
+- `governance-plus-real-file` — **the over-exemption control**: `{TODO.md} + {scripts/real-code.sh}`
+  must STILL be reported, naming the code file. Without it the first fixture would pass equally
+  well against a rule that exempted everything, which is the failure mode a widening invites.
+
+Full suite after: **29/29 differential, 43/43 assertions.**
+
+**Discrimination proved** by reverting the one line from the port only (seed verified landed: 1 line
+changed, 527→526, still parses):
+
+| | with fix | seeded |
+|---|---:|---:|
+| differential | 29/29 | **32/41** (9 divergences; the bisector widens the comparison set) |
+| assertions | 43/43 | **42/43** |
+
+Exactly `governance-plus-sprintlog` reddened; **both over-exemption control assertions stayed
+green**. The nine divergences include real-corpus comparisons, so the instrument catches this on
+live data and not only on the fixture. Restored under one convention — `sha256sum` on the working
+file, `086defe965c982aedb57fa98e7d0c5dbd2991171402461211d5f9a5d707849d3` before and after.
+
+Outside review still owed on this change (ADR-029 ii) — dispatched next.
+
+consequence · TD-170 · behaviour:material · governance:high

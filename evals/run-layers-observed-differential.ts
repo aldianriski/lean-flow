@@ -320,6 +320,54 @@ try {
     assertContains("one-parenthetical-control (FAILs, names T1:t2own.txt)", port.out, "T1:t2own.txt");
   }
 
+
+  // -- TD-170: {governance file} + {sprint Execution Log} is GOVERNANCE, not UNATTRIBUTED --------
+  // docs/sprint/ is already unreportable (is_excluded_committed), but until SPRINT-103 it could
+  // still DISQUALIFY the commit from governance, sending it to UNATTRIBUTED so its governance
+  // sibling got named instead. Appending to the sprint's own Execution Log is mandatory for every
+  // task, so this shape is routine bookkeeping -- it hit 5 of 22 in-range commits on SPRINT-103.
+  {
+    const d = posix.join(work, "governance-plus-sprintlog");
+    gitInit(d);
+    writeFile(
+      d,
+      "docs/sprint/SPRINT-933-govlog.md",
+      `---\nsprint: 933\nslug: govlog\nstatus: active\nplan_commit: PLAN_COMMIT_PLACEHOLDER\n---\n\n## Plan\n\n### T1 — edit foo.txt\nLayers: \`foo.txt\`\nDepends-on: none\n\n**DoD:**\n- [ ] foo.txt updated\n`,
+    );
+    writeFile(d, "foo.txt", "a\n");
+    writeFile(d, "TODO.md", "# TODO\n");
+    lockPlan(d, "docs/sprint/SPRINT-933-govlog.md");
+    writeFile(d, "TODO.md", "# TODO\n- a new row\n");
+    writeFile(d, "docs/sprint/logs/SPRINT-933-govlog.md", "# log\n\nentry\n");
+    commitAll(d, "todo: file a row and log it");
+    const { port } = compare("governance-plus-sprintlog", d, ["docs/sprint/SPRINT-933-govlog.md"]);
+    assertNotContains("governance-plus-sprintlog (must NOT be unattributed)", port.out, "attributable to no task");
+  }
+
+  // -- SIBLING CONTROL for the widening: {governance file} + {a REAL source file} must STILL be
+  // reported. Widening an allow-list risks exempting too much, and this is the case that proves it
+  // did not: the only thing added was docs/sprint/, so a genuine code change riding along beside a
+  // governance file is still caught exactly as before. Without this, the fixture above would pass
+  // equally well against an over-broad rule that exempted everything. -------------------------
+  {
+    const d = posix.join(work, "governance-plus-real-file");
+    gitInit(d);
+    writeFile(
+      d,
+      "docs/sprint/SPRINT-934-govreal.md",
+      `---\nsprint: 934\nslug: govreal\nstatus: active\nplan_commit: PLAN_COMMIT_PLACEHOLDER\n---\n\n## Plan\n\n### T1 — edit foo.txt\nLayers: \`foo.txt\`\nDepends-on: none\n\n**DoD:**\n- [ ] foo.txt updated\n`,
+    );
+    writeFile(d, "foo.txt", "a\n");
+    writeFile(d, "TODO.md", "# TODO\n");
+    lockPlan(d, "docs/sprint/SPRINT-934-govreal.md");
+    writeFile(d, "TODO.md", "# TODO\n- a new row\n");
+    writeFile(d, "scripts/real-code.sh", "#!/bin/sh\necho hi\n");
+    commitAll(d, "todo: file a row and sneak in some code");
+    const { port } = compare("governance-plus-real-file", d, ["docs/sprint/SPRINT-934-govreal.md"]);
+    assertContains("governance-plus-real-file (control: STILL unattributed)", port.out, "attributable to no task");
+    assertContains("governance-plus-real-file (names the code file)", port.out, "scripts/real-code.sh");
+  }
+
   // -- unattributable commit -- must FAIL ------------------------------------------------------
   {
     const d = posix.join(work, "unattributable-commit");

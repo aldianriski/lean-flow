@@ -211,6 +211,12 @@ export function isGovernanceCommit(files: readonly string[]): boolean {
     if (f === "TODO.md" || f === "TECH-DEBT.md" || f === "CHANGELOG.md" || f === "docs/LEARNINGS.md") continue;
     if (f === "docs/knowledge-index.md") continue;
     if (f.startsWith("docs/epic/") || f.startsWith("docs/research/")) continue;
+    // ADDED SPRINT-103 (TD-170), mirroring the oracle. docs/sprint/ is already unreportable via
+    // isExcludedCommitted() below, but omitting it here let it DISQUALIFY the whole commit ->
+    // UNATTRIBUTED -> its governance sibling named instead. Appending to the sprint Execution Log
+    // is mandatory per task, so the disqualifying shape is routine bookkeeping. 5 of 22 in-range
+    // commits on SPRINT-103. A file that cannot be reported should not be able to disqualify.
+    if (f.startsWith("docs/sprint/")) continue;
     return false;
   }
   return true;
