@@ -90,7 +90,57 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 
 ### P0 — Blocking
 
-> _(empty — `TASK-328` shipped as SPRINT-097 T2 and was pruned at that close.)_
+- [ ] TASK-355 — Cut the QA gate's wall-clock cost by moving hot checkers in-process under Bun  [size: L] [risk: med] [HITL]
+      class:      execution
+      tier:       G
+      authority:  J1
+      origin:     manual   # owner-raised 2026-09-20; NOT grilled at intake, so no G1 fast-path
+      state:      ready
+      done-when:  `QA_FULL=1 sh scripts/qa-check.sh` completes in a time the owner will sit through,
+                  with **zero** change to what is checked — every assertion still runs and can still
+                  FAIL, and `QA-CHECK: N pass, M fail` is byte-unchanged. Each ported checker keeps
+                  its `.sh` as a live ORACLE and is accepted only on **byte-identical differential
+                  parity** (same exit code, same stdout) across every fixture AND every real sprint
+                  Plan including `docs/sprint/archive/`.
+      why:        The gate takes **1263–1397 s** and is mandated at promote and close, which is the
+                  owner's stated top blocker on development speed. **`[size: L]` — split before
+                  promote**; it is filed whole because the sequencing matters and the split points
+                  are the rows below.
+      plan:       Ranked by seconds-saved / effort (independent Codex analysis, 2026-09-20):
+                  **1.** de-duplicate repeated evaluations in `run-layers-completeness-fixtures.sh`
+                  (16 calls → 10 distinct arg sets) — **15–35 s**, 1–2 h, low risk ·
+                  **2.** same for epic-archive + night-run-rollup (−8 calls) — **10–20 s**, 1–2 h ·
+                  **3.** port `check-layers-completeness` to TS, fixtures in one Bun process —
+                  target **70 s → 1–5 s**, 1–2 d, medium ·
+                  **4.** port epic-archive + rollup — target **86 s → 5–15 s**, 2–4 d, med/high ·
+                  **5.** port dispatch-preflight · doc-caps · authority · reap-terminal ·
+                  night-run-outcome — **~140–165 s** of a recorded 176 s, 4–8 d ·
+                  **6.** remaining orchestration to Bun — unquantified, 1–2 w, high risk.
+                  Steps 1–5 address ~300 s of **recorded** work and save ~270–320 s. **They do not
+                  get 1300 s to 300 s** — a 120–300 s gate is an engineering target, not a forecast.
+      assumes:    **UNCONFIRMED and load-bearing — ~1000 s of the runtime is UNMEASURED.** The only
+                  detailed profile (~545 s) came from a **truncated** run; the runs that completed
+                  (1263 s · 1370 s) were never profiled, so the distribution of a *completed* full
+                  profile is unknown and steps 4–6 cannot be ordered on evidence yet.
+                  *Confirm: set `QA_PROFILE=1` on the next REQUIRED full run — free, no extra
+                  23-minute diagnosis run — and re-rank steps 4–6 against what it shows.*
+      touches:    `evals/run-layers-completeness-fixtures.sh` · `scripts/lib/check-layers-completeness.sh`
+                  (retained as oracle) · new `scripts/lib/check-layers-completeness.ts` · later rows
+                  add `check-epic-archive` · `check-night-run-rollup` · `evals/lib/harness-common.sh`
+      depends-on: none
+      tracker:    TD-090 (the cost mechanism: spawn-count-shaped, `sys`-dominated, Windows `fork()`)
+                  · L-144 (already-promoted: "when a check is slow the dominant term is the number
+                  of PROCESSES" — with hundreds of live counter-examples, L-020's shape) · ADR-039
+                  (the differential-parity pattern this reuses) · ADR-033
+      scope-note: **Speed only.** Checking fewer files, sampling history, mocking the Git/reaper
+                  integration, dropping the live Shell/TS differential, or raising the budget in
+                  place of reducing runtime are all OUT — each needs its own owner ruling and none
+                  is authorised by this row. A faster gate that checks less is worthless.
+      caution:    **2 s is not the cost of a shell launch** (a bare `sh -c true` is 76 ms). A checker
+                  costs ~2.75 s because it launches `grep`/`sort`/`tr`/`sed`/`awk` dozens of times
+                  INTERNALLY. Batching arguments into the same shell loop therefore preserves most
+                  of the cost — only moving the logic in-process removes it. An earlier estimate in
+                  this session claimed ~160 s from batching alone and was wrong by ~5x.
 
 ### P1 — Next Phase Required
 
