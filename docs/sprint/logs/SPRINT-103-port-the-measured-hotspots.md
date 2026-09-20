@@ -279,3 +279,40 @@ only, and its ~60 s of fixture-construction residue is the sole part of its 98 s
 Sprint total **8 of 31**.
 
 consequence · T1,T4 · behaviour:low · governance:high
+
+### 2026-09-20 | scope-change | T1 gains a build step its own acceptance did not require
+
+Logged **before** § Plan is edited, per the frozen-Plan rule.
+
+**What broke.** Nothing failed — the Plan under-specified a branch it could not have foreseen. T1's
+acceptance offered two outcomes: *(a)* ported with parity proven, or *(b)* "a recorded ruling naming
+the mechanism and why porting does not reach it." The measurement produced (b), so **T1 was already
+complete as written**. But the same measurement surfaced a *third* outcome the Plan has no slot for:
+the cost is removable without a port, by an awk-derived reduced spec, and the fix is cheap, proven
+by two independent derivations, and already templated in T4. The Plan's binary port/don't-port frame
+cannot express "don't port, do fix" — which is the actual right answer here.
+
+**Impact.** T1 changes from a ruling task to a ruling **plus a build**. The DoD written under
+"If ported:" do not apply (no port), but the build is a Tier G change to a guard harness and takes
+the equivalent bar in its own right: retained must-FAIL, sibling control, seeded break under one
+stated hash convention, a drift anchor on the reduction, and a worktree-isolated outside reviewer.
+Owner ruled the addition in rather than deferring it, on the grounds that a cheap fix discovered at
+the cost of measuring it should not become a debt row.
+
+**Re-confirm G2.** The two G2 rulings still hold and neither is disturbed:
+
+- *Timing is serialized, coordinator-run* — unchanged, and now the binding constraint: the host is at
+  303 MB free of 14,078 MB, so the before/after range over ≥3 alternating runs cannot be taken yet.
+  Owner is freeing memory; the build proceeds meanwhile and the measurement follows.
+- *`qa-gate-timing.md` is coordinator-owned* — unchanged.
+- **New, and the reason this is a re-confirm rather than a note:** the build touches
+  `evals/run-sprint-family-fixtures.sh` only. `scripts/lib/conformance-engine.sh` is **read-only for
+  the rest of this sprint** under T3's ruling (ADR-043), and the reduction deliberately stays on the
+  *caller* side for exactly that reason — it changes which spec the harness hands the engine, never
+  the engine. No consumer surface is touched, so L-015's check is satisfied by construction rather
+  than by inspection.
+
+**Not in scope even so:** the same reduction for T4 (it is already 18/38 reduced), and any change to
+what the 68 cases assert. D6 holds — same rules, same fixtures, same named findings.
+
+consequence · T1 · behaviour:material · governance:high

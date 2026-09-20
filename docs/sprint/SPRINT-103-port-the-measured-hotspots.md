@@ -49,9 +49,21 @@ recorded as such** — that is a successful task, not a failed one.
 oracle, and its leg wired; or (b) a recorded ruling naming the mechanism and why porting does not
 reach it. Not "attempted".
 
+**Amended 2026-09-20 (scope-change, see Execution Log).** The measurement produced (b) *and* a third
+outcome this frame could not express: **(c) ruled unportable, and the cost removed anyway** by
+handing the engine an awk-derived spec reduced to the 43 rules the 68 cases actually assert on
+(§9+§10+§11+§12, confirmed by two independent derivations). (c) is now T1's acceptance. It is a
+Tier G change to a guard harness, so it takes the full bar in its own right even though no port
+occurs — and it stays strictly on the **caller** side: `conformance-engine.sh` is read-only for the
+rest of this sprint under T3's ruling (ADR-043).
+
 **DoD:**
 - [x] Per-target measurement recorded in `qa-gate-timing.md` — invocation count, `sys` share, the mechanism — *Verify: the Round names the figures and how they were derived*
 - [x] Ruling: spawn-shaped (port) or not (record + stop), taken **on the measurement**, not on Round 16's rank
+- [ ] **(c)** Reduced spec is **awk-derived from the shipped `spec/STANDARD.md`**, never hand-authored, and carries a **drift anchor** that FAILS the harness if the reduction loses a required section — *Verify: delete a §11 row from a scratch spec copy and the anchor reddens*
+- [ ] **(c)** Byte-identical parity: all 68 cases produce the same PASS/FAIL verdicts and the same finding strings under the reduced spec as under the full one — *Verify: the differential reports 68/68 identical*
+- [ ] **(c)** The 43-rule set is justified in the harness header **from the assertions, not from the section names** — the existing header's §9+§10 claim is wrong and is corrected in the same edit (L-186)
+- [ ] **(c)** Retained must-FAIL + sibling control + seeded-break proof under ONE stated hash convention
 - [ ] If ported: `.sh` retained as live oracle; byte-identical differential parity over every fixture **and** the real corpus it applies to — *Verify: the differential reports N/N identical, N stated*
 - [ ] If ported: retained must-FAIL + sibling control + seeded-break proof under ONE stated hash convention
 - [ ] If ported: wiring diff **committed as a reviewable file before being applied** (three reviewers in SPRINT-102 could not audit wiring that lived only in chat — L-151)
