@@ -16,11 +16,21 @@
 # Retained fixtures (TD-012 -- never deleted with the prototype that built them), same files, same
 # named findings, same sibling-discrimination pairing (L-142) evals/authority.test.ts's cases assert
 # on: missing-class, control-classed, j2-executed, attended-j2-executed, envelope-backstop-unattended,
-# attended-fenced-example, control-j2-parked, closed-out-of-scope, j2-bypassed, control-j2-ruled.
+# attended-fenced-example, control-j2-parked, closed-out-of-scope, j2-bypassed, control-j2-ruled,
+# active-sprint-mixed (TASK-355 revise, outside review: honoured + bypassed + attended-executed + a
+# J1 sibling, all in ONE real active-sprint-shaped Plan/log pair -- see that file's own note on why
+# the ten single-purpose fixtures alone left the "real shape" population unexercised).
 #
 # Differential parity against the shell oracle lives in evals/run-authority-differential.ts (opt-in,
 # spawns the real `sh` checker over every fixture PLUS every real archived/active sprint doc this
-# repo has) -- never here; this harness's whole point is that it does NOT spawn.
+# repo has) -- never here; this harness's whole point is that it does NOT spawn. STATED HONESTLY
+# (outside-review correction): of that harness's compared inputs, only the 11 fixtures (10 original +
+# active-sprint-mixed) exercise the real DECLARED/HONOURED/BYPASSED logic. Every archived sprint doc
+# carries `status: closed` and returns on evaluateSprintFile's closed-status check BEFORE any of that
+# logic runs -- real input, but a CONFIRMED-TRIVIAL two-line early-return path, not a second
+# independent proof of the branches. Read that harness's own report as "11/11 real-logic fixtures
+# identical, plus N confirmed-trivial-path inputs (archived sprints + zero-args) also identical",
+# never as "N/N" standing for N independent proofs of the same weight.
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -41,7 +51,7 @@ test_file="evals/authority.test.ts"
 # A test-COUNT floor, not just an exit code -- `bun test` exits 0 on a file with zero live tests
 # (a renamed test, a dropped describe) while still reporting PASS. RAISE THIS when adding cases to
 # evals/authority.test.ts, in the same commit.
-min_tests=19
+min_tests=20
 
 out=$(bun test "$test_file" 2>&1); code=$?
 # Bun colours its summary even when captured into a variable (an ESC/CSI byte precedes the digits),
@@ -63,5 +73,5 @@ if [ "$n_pass" -lt "$min_tests" ]; then
   exit 1
 fi
 
-echo "PASS fixture(authority): checker green -- $n_pass tests, 0 fail (retained: missing-class, control-classed, j2-executed, attended-j2-executed, envelope-backstop-unattended, attended-fenced-example, control-j2-parked, closed-out-of-scope, j2-bypassed, control-j2-ruled)"
+echo "PASS fixture(authority): checker green -- $n_pass tests, 0 fail (retained: missing-class, control-classed, j2-executed, attended-j2-executed, envelope-backstop-unattended, attended-fenced-example, control-j2-parked, closed-out-of-scope, j2-bypassed, control-j2-ruled, active-sprint-mixed)"
 exit 0

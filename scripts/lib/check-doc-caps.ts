@@ -19,7 +19,8 @@
 // Usage: bun scripts/lib/check-doc-caps.ts [<docs-guide.md> [<root-dir> [<grandfather-list>]]]
 // Prints one PASS/FAIL/note line per cap; exits 1 if any FAIL line was printed, 0 otherwise.
 
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 // --- §2 row derivation (pure) ----------------------------------------------------------------------
@@ -150,67 +151,55 @@ export function fmStatus(content: string): string {
   return "";
 }
 
-// --- glob expansion (fs, no subprocess) ---------------------------------------------------------
+// --- glob expansion (ONE real `ls -d` subprocess per glob, never reimplemented) -----------------
 
+// Round 2 (outside review, TASK-355 revise): a hand-rolled collation comparator was tried and
+// REJECTED after an outside reviewer found 12+/33 real divergences against `ls` on a case-sensitive
+// NTFS dir -- glibc's en_US.UTF-8 collation is ISO 14651, and inferring it from a handful of
+// examples (even a 44-file census) keeps producing new defects (lowercase-first case tie-breaking;
+// `_`/`.` are ALSO primary-ignorable, not just `-`; a from-scratch regex-based glob had no dotglob
+// emulation and could MATCH a file the real shell would never return -- a file-SET divergence, not
+// only an ordering one). The fix is not a better formula: it is to stop reimplementing the shell's
+// own glob+sort and ask the shell for it directly. `cd "$root" && ls -d $glob 2>/dev/null` is
+// exactly the shape check-doc-caps.sh's own for-loop uses, run through the SAME `sh` binary this
+// repo already treats as the oracle -- so ordering and dotfile semantics are correct BY
+// CONSTRUCTION, not by inference. One spawn per glob (~38 on a full-repo run) measured at a few
+// hundred ms total -- see the differential-parity report for the actual number on this host; that
+// is the cost accepted to close a defect class a formula cannot close for good (ISO 14651 keeps
+// moving; `sh` never has to).
 /**
- * Replicates GNU `ls`'s en_US.UTF-8 collation for filenames (bash's glob expansion is then
- * re-sorted by `ls -d` again, so `ls`'s own comparator is the one that must match, not bash's).
- * Derived empirically against this host's real `ls -d` output (glibc's ISO-14651-based en_US
- * collation is not the same table as ICU/`Intl.Collator`, so that was tried and rejected first):
- * primary key folds case and drops hyphens entirely (hyphen is primary-ignorable); ties break on
- * the case-folded string WITH hyphens restored; remaining ties break on the raw byte string.
- * Verified byte-for-byte against this repo's own 44-file `docs/research/` directory before relying
- * on it for the differential-parity claim (a formula is itself a query result, cross-checked here
- * against a census rather than trusted from a handful of hand-picked examples).
+ * Single-quotes `s` for embedding literally in a POSIX shell command line (closes the quote,
+ * appends an escaped literal quote, reopens it, for every embedded `'`).
  */
-function lsCompare(a: string, b: string): number {
-  const pa = a.toLowerCase().replace(/-/g, "");
-  const pb = b.toLowerCase().replace(/-/g, "");
-  if (pa !== pb) return pa < pb ? -1 : 1;
-  const sa = a.toLowerCase();
-  const sb = b.toLowerCase();
-  if (sa !== sb) return sa < sb ? -1 : 1;
-  if (a !== b) return a < b ? -1 : 1;
-  return 0;
+function shSingleQuote(s: string): string {
+  return "'" + s.replace(/'/g, `'\\''`) + "'";
 }
 
-/** `cd "$root" && ls -d $glob 2>/dev/null` -- a per-segment glob (`*` never crosses `/`), sorted. */
-export function expandGlob(root: string, pattern: string): string[] {
-  const segments = pattern.split("/");
-  let dirs = [""]; // relative paths accumulated so far
-  for (let i = 0; i < segments.length; i++) {
-    const seg = segments[i]!;
-    const isLast = i === segments.length - 1;
-    const regex = new RegExp(
-      "^" + seg.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*") + "$",
-    );
-    const next: string[] = [];
-    for (const rel of dirs) {
-      const absDir = join(root, rel);
-      let entries: string[];
-      try {
-        entries = readdirSync(absDir);
-      } catch {
-        continue;
-      }
-      entries.sort(lsCompare);
-      for (const e of entries) {
-        if (!regex.test(e)) continue;
-        const relChild = rel === "" ? e : `${rel}/${e}`;
-        if (isLast) {
-          next.push(relChild);
-        } else {
-          try {
-            if (statSync(join(root, relChild)).isDirectory()) next.push(relChild);
-          } catch {
-            /* ignore */
-          }
-        }
-      }
-    }
-    dirs = next;
+function shGlobExpand(root: string, pattern: string): string[] {
+  // `root` and `pattern` are embedded directly into ONE `-c` script string, never passed as
+  // separate argv entries. Reason (found live, not theorised): MSYS's `sh.exe` on Windows performs
+  // its own CRT-level wildcard expansion of an UNQUOTED argv token containing `*`/`?` at process
+  // startup -- a legacy MS-DOS-compatibility behaviour, independent of and prior to the shell's own
+  // "-c" script interpretation. Passing the glob as its own argv element (`["-c", script, "sh",
+  // root, pattern]`) let that startup-time expansion silently pre-expand `pattern` against the
+  // spawning process's OWN cwd before the inner script ever ran `ls`, corrupting the result (e.g.
+  // 1 of 44 matches survived on a real run). Folding everything into a single, already-quoted `-c`
+  // string sidesteps it: that whole argument is one Windows-quoted token, so no bare `*` sits at an
+  // argv-token boundary for the CRT to expand.
+  const script = `cd ${shSingleQuote(root)} 2>/dev/null && ls -d ${pattern} 2>/dev/null`;
+  let stdout = "";
+  try {
+    stdout = execFileSync("sh", ["-c", script], { encoding: "utf8" });
+  } catch (e: any) {
+    // `ls` exits non-zero when the glob matched nothing (bash leaves it unexpanded and `ls` can't
+    // find a file literally named e.g. `docs/research/*.md`) -- same "no match" the oracle's own
+    // `2>/dev/null` swallows. Whatever landed on stdout before the non-zero exit is still used.
+    stdout = e.stdout ?? "";
   }
-  return dirs;
+  // `for f in $(...)` word-splits the command substitution on IFS whitespace (space/tab/newline) --
+  // ported as-is, including its bug: a real filename containing a space would be split into
+  // multiple bogus tokens by the ORACLE too, and this must reproduce that, not fix it.
+  return stdout.split(/\s+/).filter((s) => s.length > 0);
 }
 
 function countLines(content: string): number {
@@ -245,7 +234,7 @@ export function evaluateRows(rows: readonly DerivedRow[], opts: DocCapsRunOption
       continue;
     }
     const glob = (pfx + path).replace(/NNN/g, "*").replace(/<[^>]*>/g, "*");
-    const candidates = expandGlob(root, glob);
+    const candidates = shGlobExpand(root, glob);
     let matched = false;
 
     for (const f of candidates) {
@@ -313,7 +302,7 @@ export function evaluateRows(rows: readonly DerivedRow[], opts: DocCapsRunOption
 export function evaluateSkillCaps(root: string): { lines: string[]; anyFail: boolean } {
   const out: string[] = [];
   let anyFail = false;
-  const skillDirs = expandGlob(root, "skills/*/SKILL.md");
+  const skillDirs = shGlobExpand(root, "skills/*/SKILL.md");
   for (const s of skillDirs) {
     const abs = join(root, s);
     let stat;
@@ -380,13 +369,30 @@ export function runCheckDocCaps(guidePath: string, root: string, gfFilePath: str
   return { lines, exitCode: anyFail ? 1 : 0 };
 }
 
-if (import.meta.main) {
-  const here = import.meta.dir;
-  const [guideArg, rootArg, gfArg] = process.argv.slice(2);
-  const guide = guideArg ?? join(here, "..", "..", "spec", "STANDARD.md");
-  const root = rootArg ?? join(here, "..", "..");
-  const gfFile = gfArg ?? join(here, "doc-caps-grandfathered.txt");
+export interface ResolvedArgs {
+  readonly guide: string;
+  readonly root: string;
+  readonly gfFile: string;
+}
 
+/**
+ * `${1:-default}` / `${2:-default}` / `${3:-default}` -- the shell substitutes the default when a
+ * positional parameter is UNSET *or* NULL (empty string). `||` mirrors that; `??` only catches
+ * null/undefined and would pass an empty string straight through, diverging from the oracle on
+ * `sh check-doc-caps.sh "" . gf.txt` (repro: the oracle resolves the default guide path; a `??`-based
+ * port prints an empty path instead).
+ */
+export function resolveArgs(argv: readonly (string | undefined)[], here: string): ResolvedArgs {
+  const [guideArg, rootArg, gfArg] = argv;
+  return {
+    guide: guideArg || join(here, "..", "..", "spec", "STANDARD.md"),
+    root: rootArg || join(here, "..", ".."),
+    gfFile: gfArg || join(here, "doc-caps-grandfathered.txt"),
+  };
+}
+
+if (import.meta.main) {
+  const { guide, root, gfFile } = resolveArgs(process.argv.slice(2), import.meta.dir);
   const result = runCheckDocCaps(guide, root, gfFile);
   for (const l of result.lines) console.log(l);
   process.exit(result.exitCode);

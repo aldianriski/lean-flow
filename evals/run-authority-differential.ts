@@ -13,6 +13,14 @@
 // and the oracle's per-file loop could in principle behave differently under a shared $out file than
 // under N separate single-file calls.
 //
+// STATED HONESTLY (outside-review correction, TASK-355 revise): every archived sprint doc carries
+// `status: closed`, which returns from `evaluateSprintFile` on the closed-status check BEFORE
+// parsing any `### Tn` block, before the mode signal, before any J2 logic -- real input, but a
+// confirmed-trivial two-line early-return path. The zero-arg case is trivial the same way. Neither
+// is a SECOND independent proof that DECLARED/HONOURED/BYPASSED agree -- only the fixtures are. The
+// summary below reports the two populations SEPARATELY rather than one combined "N/N" headline, so
+// the real-logic count can never be read as inflated by the trivial-path count.
+//
 // Run: bun evals/run-authority-differential.ts
 import { execFileSync } from "node:child_process";
 import { readdirSync } from "node:fs";
@@ -60,11 +68,15 @@ function compare(name: string, args: string[]): boolean {
   return false;
 }
 
-let compared = 0;
-let identical = 0;
+// Two SEPARATE tallies -- never combined into one headline number (outside-review correction).
+let realCompared = 0;
+let realIdentical = 0;
+let trivialCompared = 0;
+let trivialIdentical = 0;
 const divergences: string[] = [];
 
-// Every retained fixture, single-file (as the always-on harness invokes it).
+// Every retained fixture, single-file (as the always-on harness invokes it) -- REAL-LOGIC weight:
+// each one exercises DECLARED, and most exercise HONOURED/BYPASSED too.
 const fixtureDirs = readdirSync(FX, { withFileTypes: true })
   .filter((d) => d.isDirectory())
   .map((d) => d.name)
@@ -72,35 +84,39 @@ const fixtureDirs = readdirSync(FX, { withFileTypes: true })
 for (const dir of fixtureDirs) {
   const files = readdirSync(`${FX}${dir}`).filter((f) => f.endsWith(".md"));
   for (const f of files) {
-    compared++;
-    if (compare(`fixture:${dir}/${f}`, [`${FX}${dir}/${f}`])) identical++;
+    realCompared++;
+    if (compare(`fixture:${dir}/${f}`, [`${FX}${dir}/${f}`])) realIdentical++;
     else divergences.push(`fixture:${dir}/${f}`);
   }
 }
 
-// Every real, live sprint doc this repo currently has -- individually.
+// Every real, live sprint doc this repo currently has -- individually. REAL-LOGIC weight only if
+// it is NOT closed (an active sprint exercises the same logic the fixtures do); this repo has none
+// active at the moment this ran, so this loop is 0 iterations today, honestly reported as such.
 const liveSprintDir = `${REPO_ROOT}docs/sprint`;
 const liveSprintFiles = readdirSync(liveSprintDir)
   .filter((f) => /^SPRINT-.*\.md$/.test(f))
   .sort()
   .map((f) => `${liveSprintDir}/${f}`);
 for (const f of liveSprintFiles) {
-  compared++;
-  if (compare(`live:${f.slice(REPO_ROOT.length)}`, [f])) identical++;
+  realCompared++;
+  if (compare(`live:${f.slice(REPO_ROOT.length)}`, [f])) realIdentical++;
   else divergences.push(`live:${f}`);
 }
 
 // The N-arg combined invocation qa-check.sh actually uses (all active sprint docs in one call).
 if (liveSprintFiles.length > 0) {
-  compared++;
-  if (compare("live:combined-multi-arg", liveSprintFiles)) identical++;
+  realCompared++;
+  if (compare("live:combined-multi-arg", liveSprintFiles)) realIdentical++;
   else divergences.push("live:combined-multi-arg");
 }
 
-// Every ARCHIVED sprint doc this repo has -- individually. All of these carry `status: closed` and
-// are therefore out of scope by the checker's own scoping rule, but the SKIP path must reproduce
-// identically too (a checker that silently degrades to a different skip message on real archived
-// input is still a divergence, even though neither side emits a PASS/FAIL verdict for it).
+// Every ARCHIVED sprint doc this repo has -- individually. TRIVIAL-PATH weight: every one carries
+// `status: closed` and returns from `evaluateSprintFile` on the closed-status check BEFORE parsing
+// any `### Tn` block, before the mode signal, before any J2 logic -- a confirmed two-line
+// early-return, not a second proof of the branches. Still worth running: a checker that silently
+// degrades to a DIFFERENT skip message on real archived input is still a divergence, even though
+// neither side emits a PASS/FAIL verdict for it -- but it does not add to the real-logic count.
 const archiveDir = `${REPO_ROOT}docs/sprint/archive`;
 let archiveFiles: string[] = [];
 try {
@@ -112,18 +128,20 @@ try {
   archiveFiles = [];
 }
 for (const f of archiveFiles) {
-  compared++;
-  if (compare(`archived:${f.slice(REPO_ROOT.length)}`, [f])) identical++;
+  trivialCompared++;
+  if (compare(`archived:${f.slice(REPO_ROOT.length)}`, [f])) trivialIdentical++;
   else divergences.push(`archived:${f}`);
 }
 
-// Zero-arg invocation.
-compared++;
-if (compare("zero-args", [])) identical++;
+// Zero-arg invocation -- TRIVIAL-PATH weight (the "no sprint files given" one-liner).
+trivialCompared++;
+if (compare("zero-args", [])) trivialIdentical++;
 else divergences.push("zero-args");
 
 console.log("----------------------------------------");
-console.log(`AUTHORITY DIFFERENTIAL: ${identical}/${compared} identical`);
+console.log(`AUTHORITY DIFFERENTIAL, REAL-LOGIC inputs (fixtures + any active sprint): ${realIdentical}/${realCompared} identical`);
+console.log(`AUTHORITY DIFFERENTIAL, CONFIRMED-TRIVIAL-PATH inputs (archived sprints + zero-args): ${trivialIdentical}/${trivialCompared} identical`);
+console.log(`Combined, for reference only -- NOT the headline: ${realIdentical + trivialIdentical}/${realCompared + trivialCompared}`);
 if (divergences.length > 0) {
   console.log(`DIVERGED: ${divergences.join(", ")}`);
   process.exit(1);

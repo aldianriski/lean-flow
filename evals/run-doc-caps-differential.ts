@@ -17,6 +17,7 @@ import { runCheckDocCaps } from "../scripts/lib/check-doc-caps.ts";
 
 const REPO_ROOT = fileURLToPath(new URL("..", import.meta.url));
 const SH_CHECKER = `${REPO_ROOT}scripts/lib/check-doc-caps.sh`;
+const TS_CHECKER = `${REPO_ROOT}scripts/lib/check-doc-caps.ts`;
 const FX = `${REPO_ROOT}evals/fixtures/doc-caps/`;
 
 interface Case {
@@ -46,6 +47,16 @@ const cases: Case[] = [
     root: REPO_ROOT,
     gf: `${REPO_ROOT}scripts/lib/doc-caps-grandfathered.txt`,
   },
+  // Round 2 (outside review, TASK-355 revise): the stress set that broke the earlier hand-rolled
+  // collation formula -- mixed case, `_`/`.`-led/-internal names, digit-leading names, accented
+  // latin, CJK, a dot-prefixed file (must NOT match -- no dotglob), and a space-containing filename
+  // (a shared oracle bug, faithfully reproduced). Set AND order must now come from a real `ls -d`.
+  {
+    name: "stress-names",
+    guide: `${FX}stress-names/DOCS_Guide.md`,
+    root: `${FX}stress-names`,
+    gf: `${FX}stress-names/none.txt`,
+  },
 ];
 
 function runShell(c: Case): { code: number; out: string } {
@@ -66,31 +77,67 @@ let compared = 0;
 let identical = 0;
 const divergences: string[] = [];
 
-for (const c of cases) {
-  compared++;
-  const sh = runShell(c);
-  const ts = runTs(c);
+function compareOut(name: string, sh: { code: number; out: string }, ts: { code: number; out: string }): boolean {
   const shOut = sh.out.replace(/\r\n/g, "\n");
   const tsOut = ts.out.replace(/\r\n/g, "\n");
   if (sh.code === ts.code && shOut.trim() === tsOut.trim()) {
-    identical++;
-    console.log(`PASS  parity(${c.name}): identical exit ${sh.code}, identical stdout`);
-  } else {
-    divergences.push(c.name);
-    console.log(`FAIL  parity(${c.name}): sh exit=${sh.code} ts exit=${ts.code}`);
-    if (shOut.trim() !== tsOut.trim()) {
-      const shLines = shOut.trim().split("\n");
-      const tsLines = tsOut.trim().split("\n");
-      const max = Math.max(shLines.length, tsLines.length);
-      for (let i = 0; i < max; i++) {
-        if (shLines[i] !== tsLines[i]) {
-          console.log(`      line ${i + 1} differs:`);
-          console.log(`        sh: ${shLines[i] ?? "<missing>"}`);
-          console.log(`        ts: ${tsLines[i] ?? "<missing>"}`);
-        }
+    console.log(`PASS  parity(${name}): identical exit ${sh.code}, identical stdout`);
+    return true;
+  }
+  console.log(`FAIL  parity(${name}): sh exit=${sh.code} ts exit=${ts.code}`);
+  if (shOut.trim() !== tsOut.trim()) {
+    const shLines = shOut.trim().split("\n");
+    const tsLines = tsOut.trim().split("\n");
+    const max = Math.max(shLines.length, tsLines.length);
+    for (let i = 0; i < max; i++) {
+      if (shLines[i] !== tsLines[i]) {
+        console.log(`      line ${i + 1} differs:`);
+        console.log(`        sh: ${shLines[i] ?? "<missing>"}`);
+        console.log(`        ts: ${tsLines[i] ?? "<missing>"}`);
       }
     }
   }
+  return false;
+}
+
+for (const c of cases) {
+  compared++;
+  if (compareOut(c.name, runShell(c), runTs(c))) identical++;
+  else divergences.push(c.name);
+}
+
+// --- empty-string CLI argument handling (outside-review finding) --------------------------------
+// `${1:-default}` treats an empty string as unset; a `??`-based port did not. These are CLI-level
+// (real process spawn, both sides) so the comparison exercises the ACTUAL argv-resolution path,
+// not `runCheckDocCaps()` directly (which never sees the empty-string-vs-default question --
+// that's resolved one layer up, in the CLI wrapper).
+function runShellCli(args: string[]): { code: number; out: string } {
+  try {
+    const out = execFileSync("sh", [SH_CHECKER, ...args], { encoding: "utf8" });
+    return { code: 0, out };
+  } catch (e: any) {
+    return { code: e.status ?? 1, out: (e.stdout ?? "") + (e.stderr ?? "") };
+  }
+}
+function runTsCli(args: string[]): { code: number; out: string } {
+  try {
+    const out = execFileSync("bun", [TS_CHECKER, ...args], { encoding: "utf8" });
+    return { code: 0, out };
+  } catch (e: any) {
+    return { code: e.status ?? 1, out: (e.stdout ?? "") + (e.stderr ?? "") };
+  }
+}
+
+const emptyArgCases: { name: string; args: string[] }[] = [
+  { name: "empty-guide-arg", args: ["", ".", `${FX}over-cap/none.txt`] },
+  { name: "empty-root-arg", args: [`${FX}over-cap/DOCS_Guide.md`, "", `${FX}over-cap/none.txt`] },
+  { name: "empty-gf-arg", args: [`${FX}over-cap/DOCS_Guide.md`, FX + "over-cap", ""] },
+  { name: "all-three-empty", args: ["", "", ""] },
+];
+for (const c of emptyArgCases) {
+  compared++;
+  if (compareOut(c.name, runShellCli(c.args), runTsCli(c.args))) identical++;
+  else divergences.push(c.name);
 }
 
 console.log("----------------------------------------");

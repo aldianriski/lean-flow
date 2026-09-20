@@ -9,6 +9,18 @@
 // See check-authority.sh's own header comment for the FULL rationale (TD-123/TD-124 mode signal,
 // the de-fenced-copy fix, the two assertions' different kinds) -- not re-derived here, only ported.
 //
+// PARITY CLAIM, STATED PRECISELY (outside-review correction, TASK-355 revise): differential parity
+// was run over every retained fixture PLUS every real archived and active docs/sprint/*.md this
+// repo has -- but every ARCHIVED sprint carries `status: closed`, which returns from
+// evaluateSprintFile on the closed-status check BEFORE parsing any `### Tn` block, before the mode
+// signal, before any J2 logic. Real input, but a confirmed-trivial two-line early-return path --
+// not a second independent proof that DECLARED/HONOURED/BYPASSED agree. The load-bearing evidence is
+// the 11 retained fixtures (evals/fixtures/authority/*, including active-sprint-mixed -- ONE real
+// active-sprint-shaped Plan/log pair carrying honoured + bypassed + attended-executed + a J1 sibling
+// together, the shape an independent reviewer built from scratch and confirmed byte-identical). Read
+// any differential total as "11/11 real-logic fixtures identical, plus N confirmed-trivial-path
+// inputs also identical" -- never as N independent proofs of the same weight.
+//
 // Usage: bun scripts/lib/check-authority.ts <sprint-file>...
 // Prints one PASS/FAIL/note line per assertion; exits 1 if any FAIL line was printed, 0 otherwise.
 

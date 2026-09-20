@@ -133,6 +133,24 @@ describe("check-authority.ts -- retained fixtures", () => {
     expect(r.text).toContain("authority-j2-honoured:");
   });
 
+  // --- case 8: one active-sprint-shaped file, all three J2 verdicts + a J1 sibling --------------
+  // Outside-review finding (TASK-355 revise): the "113/113 identical" differential headline
+  // overstated the evidence -- 102 of those were archived sprints that return on the closed-status
+  // check BEFORE any of this logic runs, so only the 10 single-purpose fixtures carried real weight.
+  // This fixture is what an independent reviewer built from scratch to close that gap: ONE real
+  // active-sprint-shaped Plan + matching Execution Log carrying HONOURED (parked, never executed),
+  // BYPASSED (parked then executed with no ruling) and ATTENDED-EXECUTED (executed, no park, no
+  // unattended-run signal) J2 tasks side by side with a J1 control -- the shape a real multi-task
+  // sprint actually has, not four separate single-purpose files. Retained (TD-012).
+  test("case 8: honoured + bypassed + attended-executed + J1, all in one real-shaped sprint file", () => {
+    const r = run("active-sprint-mixed/SPRINT-911-fx.md");
+    expect(r.exitCode).toBe(1); // T3's bypass is the only FAIL among four tasks
+    expect(r.text).toMatch(/^PASS {2}authority-declared: .* T1 J1$/m);
+    expect(r.text).toMatch(/^PASS {2}authority-j2-honoured: .* T2 \(1 park record/m);
+    expect(r.text).toMatch(/^FAIL {2}authority-j2-park-bypassed: .* T3 /m);
+    expect(r.text).toMatch(/^PASS {2}authority-j2-honoured: .* T4 executed with no park record/m);
+  });
+
   test("zero-arg invocation: no sprint files given, nothing verified, exit 0", () => {
     const r = runCheckAuthority([]);
     expect(r.exitCode).toBe(0);

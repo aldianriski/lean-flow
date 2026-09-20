@@ -12,7 +12,7 @@
 // same named findings -- retained, not reinvented (TD-012).
 import { describe, expect, test } from "bun:test";
 import { fileURLToPath } from "node:url";
-import { runCheckDocCaps } from "../scripts/lib/check-doc-caps.ts";
+import { resolveArgs, runCheckDocCaps } from "../scripts/lib/check-doc-caps.ts";
 
 const FX = fileURLToPath(new URL("fixtures/doc-caps/", import.meta.url));
 const REPO_ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -91,5 +91,49 @@ describe("check-doc-caps.ts -- retained fixtures", () => {
       `${REPO_ROOT}scripts/lib/doc-caps-grandfathered.txt`,
     );
     expect(r.lines.join("\n")).toContain("PASS  cap .claude/CLAUDE.md");
+  });
+
+  // --- case 9: stress names -- outside-review revise (TASK-355 round 2) --------------------------
+  // The glob file SET and ORDER must come from a real `ls -d`, never a reimplemented collation
+  // formula: an earlier version hand-derived glibc's en_US.UTF-8 collation from a 44-file census and
+  // an outside reviewer found 12+/33 real divergences on a stress name set (case-fold tie-breaking,
+  // `_`/`.` not just `-` being primary-ignorable), PLUS a from-scratch glob regex with no dotglob
+  // emulation that could MATCH a file the real shell never returns -- a file-SET divergence, not
+  // only an ordering one. This fixture is that stress set, retained so the class cannot recur
+  // silently: mixed-case names, `_`-led and `.`-internal names, digit-leading names, accented latin,
+  // CJK, a dot-prefixed file (must NOT be matched -- no dotglob), and a space-containing filename
+  // (which both the oracle and this port word-split into non-existent fragments and silently drop --
+  // a faithfully-reproduced shared bug, not a divergence).
+  test("case 9: stress names -- real ls glob SET+ORDER, dotglob correctness, non-ASCII", () => {
+    const r = run("stress-names", "none.txt");
+    expect(r.exitCode).toBe(0);
+    const text = r.lines.join("\n");
+    // dot-prefixed file never matched (no dotglob) -- checked on the WHOLE output, not just this
+    // fixture's other files, since a false match would still show up as a line here.
+    expect(text).not.toContain(".abc.md");
+    // mixed case, punctuation-position, digit-leading, and non-ASCII names are all present.
+    for (const name of ["_abc.md", "10-file.md", "2-file.md", "a.b.md", "a_b.md", "AAAA.md", "ab.md", "Banana.md", "café.md", "naïve.md", "中文.md", "日本語.md"]) {
+      expect(text).toContain(`cap ${name} (`);
+    }
+    // a filename containing a space is word-split by the ORACLE's own `for f in $(...)` loop into
+    // non-existent fragments and silently dropped -- ts must reproduce that, not "fix" it.
+    expect(text).not.toContain("a b.md");
+  });
+
+  // --- empty-string CLI argument handling (outside-review finding) --------------------------------
+  // `${1:-default}` treats an empty string as unset; a `??`-based port does not, since `??` only
+  // triggers on null/undefined. Repro: `sh check-doc-caps.sh "" . gf.txt` resolves the default guide
+  // path; the broken `??` port printed an empty path instead.
+  test("empty-string CLI arguments fall back to defaults, same as shell's ${1:-default}", () => {
+    const resolved = resolveArgs(["", "", ""], "/some/script/dir");
+    expect(resolved.guide).not.toBe("");
+    expect(resolved.root).not.toBe("");
+    expect(resolved.gfFile).not.toBe("");
+    expect(resolved.guide).toContain("STANDARD.md");
+  });
+
+  test("a real (non-empty) CLI argument is used as-is, not overridden by the default", () => {
+    const resolved = resolveArgs(["/g.md", "/r", "/gf.txt"], "/some/script/dir");
+    expect(resolved).toEqual({ guide: "/g.md", root: "/r", gfFile: "/gf.txt" });
   });
 });

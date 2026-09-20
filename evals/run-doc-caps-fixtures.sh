@@ -16,7 +16,11 @@
 #   must-catch/must-NOT-catch pair for the grandfather clause), soft-cap/-hard-breach (SOFT reports,
 #   HARD still fails beside it), soft-cap-grandfathered (ADR-015 rule 2: a soft cap must not be
 #   grandfathered, a hard cap may be), frozen-spent (ADR-020: a superseded verdict is FROZEN, a live
-#   doc beside it in the same fixture still fails), and the live repo's own §2 deriving real rows.
+#   doc beside it in the same fixture still fails), the live repo's own §2 deriving real rows,
+#   stress-names (TASK-355 revise, outside review: mixed case, `_`/`.`-led/-internal, digit-leading,
+#   accented latin, CJK, dot-prefixed non-match, space-containing-name shared-bug reproduction --
+#   the population that broke an earlier hand-rolled collation formula, retained so the class cannot
+#   recur silently), and empty-string CLI argument fallback (`${1:-default}` semantics).
 #
 # Differential parity against the shell oracle lives in evals/run-doc-caps-differential.ts (opt-in,
 # spawns the real `sh` checker) -- never here; this harness's whole point is that it does NOT spawn.
@@ -40,7 +44,7 @@ test_file="evals/doc-caps.test.ts"
 # A test-COUNT floor, not just an exit code -- `bun test` exits 0 on a file with zero live tests
 # (a renamed test, a dropped describe) while still reporting PASS. RAISE THIS when adding cases to
 # evals/doc-caps.test.ts, in the same commit.
-min_tests=11
+min_tests=14
 
 out=$(bun test "$test_file" 2>&1); code=$?
 # Bun colours its summary even when captured into a variable (an ESC/CSI byte precedes the digits),
@@ -62,5 +66,5 @@ if [ "$n_pass" -lt "$min_tests" ]; then
   exit 1
 fi
 
-echo "PASS fixture(doc-caps): checker green -- $n_pass tests, 0 fail (retained: over-cap, unparseable-row, grandfather-grew/-held, soft-cap/-hard-breach, soft-cap-grandfathered, frozen-spent, live-standard-derives)"
+echo "PASS fixture(doc-caps): checker green -- $n_pass tests, 0 fail (retained: over-cap, unparseable-row, grandfather-grew/-held, soft-cap/-hard-breach, soft-cap-grandfathered, frozen-spent, live-standard-derives, stress-names, empty-arg-fallback)"
 exit 0
