@@ -1166,11 +1166,18 @@ eval_harnesses_optin="run-adr-family-fixtures.sh run-s4-differential-parity.sh s
 # S9.PLANFROZEN diffs § Plan against `plan_commit`, S9.SCOPECHANGE reads the ORDER of two commits,
 # S10.FOURBUCKETS reads the close commit and S10.PROMOTEREVIEW the promote record. Hand-passed shas
 # would test the harness rather than the checks.
-# Costed rather than assumed: ~5 min for 23 cases on this host -- and the cost is NOT the git repos,
-# it is that every case runs the whole engine against the SHIPPED spec (~15s each). That was a
-# deliberate trade (a §9 or §10 row that moves breaks these cases, which is the point) and it is what
-# makes this the most expensive harness in the set. run-attestation-fixtures.sh takes the other side,
-# handing the engine a reduced spec to stay at ~2s. Filed as TD-073 rather than silently accepted.
+# Costed rather than assumed. ORIGINAL (SPRINT-079, TD-073): ~5 min for 23 cases, and the cost was
+# NOT the git repos -- every case ran the whole engine against the SHIPPED spec at ~15s each, a
+# deliberate trade (a §9 or §10 row that moves breaks these cases, which is the point) that made
+# this the most expensive harness in the set.
+# UPDATED SPRINT-103 T1: all three of those figures are now stale and the trade was retired. The
+# harness has **68** cases, not 23, and it now hands the engine an awk-derived spec reduced to the
+# 43 rules those cases actually assert on (§9+§10+§11+§12) -- measured **137-184 s**, down from
+# 319 s, with whole-run output byte-identical. The property the original trade protected is kept:
+# the reduction is derived from the shipped rows, so a §9 row that moves still breaks these cases,
+# and a drift anchor FAILs the harness if the reduction ever loses a section
+# (evals/run-sprint-family-spec-reduction-fixtures.ts). run-attestation-fixtures.sh no longer
+# "takes the other side" -- both now reduce. TD-073's split-the-family option is unaffected.
 # The rule's cost here is that TEN of the 23 cases need no git at all (the caps, the log directory,
 # the verify clause, the promotion and aging reads) and are parked behind QA_FULL alongside the 13
 # that do. Splitting the family across two harnesses is the alternative; it loses to keeping one

@@ -41,26 +41,54 @@ const harnessLines = (): string[] => readFileSync(HARNESS, "utf8").split(/\r?\n/
  *  string would command-substitute. */
 const shq = (v: string): string => "'" + v.split("'").join("'\''") + "'";
 
-function harnessAwk(): string {
-  const line = harnessLines().find((l) => l.startsWith("awk '") && l.includes("spec_full"));
-  if (!line) throw new Error("reduction awk line not found in harness -- its shape changed");
-  const m = /^awk '(.*)' "\$spec_full"/.exec(line);
-  if (!m) throw new Error("reduction awk line did not parse -- its shape changed");
-  if (!m[1].includes(SECTIONS)) throw new Error(`reduction awk no longer contains ${SECTIONS} -- seeds below would not be targeted`);
-  return m[1];
+function sentinel(tag: string): number {
+  const lines = harnessLines();
+  const hits = lines.map((l, i) => [l, i] as const).filter(([l]) => l.startsWith("# >>> " + tag) || l.startsWith("# <<< " + tag));
+  if (hits.length !== 1) throw new Error(`expected exactly 1 ${tag} sentinel in the harness, found ${hits.length} -- the block it brackets cannot be located`);
+  return hits[0][1];
 }
 
-/** The anchor's own bytes, minus the three derivation lines each case supplies itself. */
+/** The reduction's awk program, lifted VERBATIM from the line after its sentinel -- never
+ *  transcribed (it contains a backtick and a backslash that every quoting layer mangles) and never
+ *  located by "first line starting with awk", which an added diagnostic line could hijack. */
+function harnessAwk(): string {
+  const line = harnessLines()[sentinel("SPEC-REDUCTION-AWK") + 1] ?? "";
+  // Plain string slicing, not a regex: the suffix contains two `$` and the program contains a
+  // backtick and a backslash, and every escaping layer between here and the shell mangled one of
+  // them across four drafts. Nothing here is escape-sensitive.
+  const PRE = "awk " + String.fromCharCode(39);
+  const SUF = String.fromCharCode(39) + ' "' + String.fromCharCode(36) + 'spec_full" > "' + String.fromCharCode(36) + 'spec"';
+  if (!line.startsWith(PRE) || !line.endsWith(SUF)) {
+    throw new Error("line after SPEC-REDUCTION-AWK is not the reduction call -- the sentinel drifted off its target");
+  }
+  return line.slice(PRE.length, line.length - SUF.length);
+}
+
+/** The anchor's own bytes, bracketed by sentinels rather than by a line-count offset. */
 function anchorBody(): string {
   const lines = harnessLines();
-  const start = lines.findIndex((l) => l === 'spec_full="$spec"');
-  if (start < 0) throw new Error("anchor block not found in harness -- its shape changed");
-  const end = lines.findIndex((l, i) => i > start && l === "fi");
-  if (end < 0) throw new Error("anchor block has no terminating fi -- its shape changed");
-  return lines.slice(start + 3, end + 1).join("\n");
+  const begin = sentinel("SPEC-REDUCTION-BEGIN");
+  const end = sentinel("SPEC-REDUCTION-END");
+  if (end <= begin) throw new Error("SPEC-REDUCTION sentinels are out of order");
+  const awkAt = sentinel("SPEC-REDUCTION-AWK");
+  // Everything after the reduction call, up to and including the closing fi.
+  return lines.slice(awkAt + 2, end).join(String.fromCharCode(10));
 }
 
 const GOOD = harnessAwk();
+{
+  // A captured program that merely CONTAINS the sections pattern is not proof it is the reduction --
+  // a comment mentioning it would satisfy a substring check. Run it and count what it produces.
+  const probe = mkdtempSync(join(tmpdir(), "sfsr-probe-"));
+  const out = join(probe, "probe.md");
+  execFileSync("sh", ["-c", "awk " + shq(GOOD) + " " + shq(SPEC) + " > " + shq(out)]);
+  const countRules = (text: string, re: RegExp): number =>
+    text.split(String.fromCharCode(10)).filter((l) => re.test(l)).length; // anchored at ^, so a trailing CR on this CRLF checkout is irrelevant
+  const rows = countRules(readFileSync(out, "utf8"), new RegExp("^[|] `S[0-9]+[.]"));
+  const expect = countRules(readFileSync(SPEC, "utf8"), new RegExp("^[|] `S(9|10|11|12)[.]"));
+  rmSync(probe, { recursive: true, force: true });
+  if (rows !== expect) throw new Error(`captured awk reduced the spec to ${rows} rule rows, expected ${expect} -- it is not the reduction program`);
+}
 const BODY = anchorBody();
 
 function specWithoutSection(section: string): string {

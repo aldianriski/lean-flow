@@ -368,3 +368,59 @@ T1: **6 of 11**. Open: outside reviewer (worktree-isolated), before/after over �
 Sprint total **12 of 35**.
 
 consequence · T1 · behaviour:material · governance:high
+
+### 2026-09-20 | progress | outside review returned three findings; all three confirmed and fixed
+
+Worktree-isolated reviewer dispatched per ADR-029 (ii) and L-168. It attacked the population claim,
+the parity claim, the drift anchor, and the fixture's extraction mechanism. **Every finding was
+re-verified here before acting on it** — a subagent report is model output, not evidence.
+
+**Finding 3 first, because it is mine and it is the worst of the three.** The header tally I wrote
+read **§11 x29**, summing to **66 against the 68 cases stated in the same paragraph**. Two cases
+unaccounted for, in a header whose entire thesis is that a file's prose about its own population is
+not evidence. Verified: the true tally is **§11 x31 · §9 x16 · §12 x11 · §10 x10 = 68**. Cause: two
+calls are written `assert_absent  "s11-…` with **two spaces**, and my counting pattern required one.
+
+This is the cross-check rule failing in the exact way it documents. I had both numbers — 68, and a
+tally — in one paragraph, and never added the tally up. **A negative control would not have caught
+it either**: every case my query reached was classified correctly; the query simply did not reach
+two of them (L-198 — the second query must vary the selection, and the cheapest one here was
+addition). The reduction's correctness is **unaffected**: the section set is still {§9,§10,§11,§12},
+and all 31 §11 cases were independently confirmed to map to `assert_S11_*` functions. Corrected in
+the harness header, with the reason recorded there rather than silently patched.
+
+**Finding 1 — the fixture's extraction was fragile.** It located the anchor by a hardcoded `+3`
+line offset and the awk program by "first line starting with `awk '`". The reviewer inserted a
+plausible diagnostic `awk` line and the extraction grabbed the decoy. In their reproduction the
+suite failed *loudly*, so this was fragility rather than a demonstrated silent pass — but on a
+Tier G guard the distinction is luck, not design. **Hardened:** the harness now carries three
+sentinels (`SPEC-REDUCTION-BEGIN` / `-AWK` / `-END`), each required to appear **exactly once** or
+the fixture throws; extraction is bracketed by them instead of counted; the awk line is parsed by
+plain string slicing rather than a regex (four drafts were lost to escaping); and the captured
+program is now **behaviourally probed** — it must actually reduce the real spec to the expected row
+count, since a comment merely *containing* the sections pattern satisfied the old substring check.
+**Re-ran the reviewer's own decoy against the hardened fixture: all four cases behave correctly and
+extraction stays on target.** Harness restored and `cmp`-verified identical after the test.
+
+**Finding 2 — stale rationale in `scripts/qa-check.sh` (:1169).** Verified: it still claimed "~5 min
+for 23 cases", "~15s each against the SHIPPED spec", and that `run-attestation-fixtures.sh` "takes
+the other side" by reducing. All three are now false. Corrected in place. **Comment-only** — the
+non-comment diff against the pristine file is empty, so this is not a D3 wiring change and the
+unapplied wiring diff still stands on its own.
+
+**Also from the review, and worth keeping:** the reviewer independently reproduced the parity claim
+rather than trusting the commit, and clarified something the commit message overstated. "Whole-run
+output byte-identical" is true of the harness's own PASS/FAIL lines; the engine's internal
+rule-count summary *does* differ between full and reduced spec, but no fixture reads it. Not a gap —
+but the commit said more than it had measured, and the correction belongs on the record.
+
+**Post-hardening re-run: 136.7 s, 69/69 verdicts, parity against the full-spec baseline identical.**
+Reduced-spec runs now stand at **184.0 s and 136.7 s** against one baseline of 319.2 s — a 35%
+spread between two runs of identical code, which is exactly why the DoD asks for a range and why it
+stays open.
+
+T1: **6 of 11**, unchanged — the reviewer DoD needs the re-review of these fixes, not just the pass.
+Sprint total **12 of 35**.
+
+consequence · T1 · behaviour:material · governance:high
+review · T1 · outside-reviewer-worktree-isolated · behaviour:material · governance:high
