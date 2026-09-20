@@ -106,24 +106,33 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   owner's stated top blocker on development speed. **`[size: L]` — split before
                   promote**; it is filed whole because the sequencing matters and the split points
                   are the rows below.
-      plan:       Ranked by seconds-saved / effort (independent Codex analysis, 2026-09-20):
-                  **1.** de-duplicate repeated evaluations in `run-layers-completeness-fixtures.sh`
-                  (16 calls → 10 distinct arg sets) — **15–35 s**, 1–2 h, low risk ·
-                  **2.** same for epic-archive + night-run-rollup (−8 calls) — **10–20 s**, 1–2 h ·
-                  **3.** port `check-layers-completeness` to TS, fixtures in one Bun process —
-                  target **70 s → 1–5 s**, 1–2 d, medium ·
-                  **4.** port epic-archive + rollup — target **86 s → 5–15 s**, 2–4 d, med/high ·
-                  **5.** port dispatch-preflight · doc-caps · authority · reap-terminal ·
-                  night-run-outcome — **~140–165 s** of a recorded 176 s, 4–8 d ·
-                  **6.** remaining orchestration to Bun — unquantified, 1–2 w, high risk.
-                  Steps 1–5 address ~300 s of **recorded** work and save ~270–320 s. **They do not
-                  get 1300 s to 300 s** — a 120–300 s gate is an engineering target, not a forecast.
-      assumes:    **UNCONFIRMED and load-bearing — ~1000 s of the runtime is UNMEASURED.** The only
-                  detailed profile (~545 s) came from a **truncated** run; the runs that completed
-                  (1263 s · 1370 s) were never profiled, so the distribution of a *completed* full
-                  profile is unknown and steps 4–6 cannot be ordered on evidence yet.
-                  *Confirm: set `QA_PROFILE=1` on the next REQUIRED full run — free, no extra
-                  23-minute diagnosis run — and re-rank steps 4–6 against what it shows.*
+      plan:       **RE-RANKED against measurement at the SPRINT-102 close — the original ranking,
+                  inherited from TD-090's harness timings, targeted the wrong five.** Round 16
+                  (`docs/research/logs/qa-gate-timing.md`, raw series beside it) is the first per-leg
+                  profile of a COMPLETED gate: 118 samples, all 47 harnesses. Remaining targets, by
+                  measured seconds:
+                  **1.** `run-sprint-family-fixtures.sh` — **305 s, 25% of the gate** ·
+                  **2.** `run-layers-observed-fixtures.sh` — **153 s** (note: a DIFFERENT checker
+                  from the `layers-completeness` already ported) ·
+                  **3.** leg 2f-ter, the conformance engine sweep — **139 s** ·
+                  **4.** `run-conformance-engine-fixtures.sh` — **98 s** ·
+                  **5.** `run-qa-budget-position-fixtures.sh` — **66 s**.
+                  Top five = **761 s / 63%**; top ten = 77%. **Re-measure each target before
+                  committing to it** — three of the five are conformance/sweep work whose shape may
+                  not be spawn-dominated at all, and inheriting this table unexamined is the exact
+                  mistake this row is correcting.
+      done-so-far: **Five checkers ported, reviewed, merged and WIRED** (SPRINT-102 close):
+                  `epic-archive` · `night-run-rollup` · `doc-caps` · `authority` ·
+                  `layers-completeness`. Each keeps its `.sh` as a live oracle; each was accepted on
+                  byte-identical differential parity; all five gate legs invoke Bun and all five
+                  oracles stay on disk. **Measured result: those five harnesses now total 17 s
+                  (0/1/4/6/6), down from ~170 s** — the technique is proven. **The gate is still
+                  ~20 min**, because they were ~10% of it and host variance is ±20%.
+      assumes:    ~~UNCONFIRMED — ~1000 s unmeasured~~ **RESOLVED at Round 16.** The distribution is
+                  now measured and concentrated. The remaining assumption is narrower and stated as
+                  such: *that the top five respond to porting the way the first five did.* **Estimate,
+                  not forecast:** 761 s → ~50 s would put the gate near 8 minutes.
+                  *Confirm: re-measure each target individually before it is promoted, per the plan.*
       touches:    `evals/run-layers-completeness-fixtures.sh` · `scripts/lib/check-layers-completeness.sh`
                   (retained as oracle) · new `scripts/lib/check-layers-completeness.ts` · later rows
                   add `check-epic-archive` · `check-night-run-rollup` · `evals/lib/harness-common.sh`
