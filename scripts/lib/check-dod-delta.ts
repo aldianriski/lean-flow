@@ -307,7 +307,11 @@ export function checkDodDelta(
   const scope = attributeClaim(subject, taskTrailer);
   // SPRINT-102 T4 (L-202): a task-shaped first token that no structural arm admitted is a LOUD
   // exemption -- FAIL and name the subject, rather than folding it into the silent coord/unscoped
-  // skip below (the exact silent-exemption seam SPRINT-101 T3 found 137/701 commits falling through).
+  // skip below. Scope, stated narrowly on purpose (TASK-351's scope-note): this closes the
+  // coord/task BOUNDARY -- the residual shapes no arm above even looked at, exactly 1 subject
+  // in this repository's full history at the time of writing. It is NOT what closed rule 6a's
+  // 137/701 (that arm did, at :215), and it does not address the wider class of which arms
+  // exist at all.
   if (scope.kind === "unmatched-shape") {
     return {
       ok: false,
