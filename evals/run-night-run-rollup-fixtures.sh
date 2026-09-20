@@ -166,7 +166,9 @@ rm -rf "$rs" 2>/dev/null
 # `qb_checkpoint` marker and the next one -- never hand-typed, so a future edit to the leg cannot
 # drift silently out of sync with this proof (the same discipline the retained fixtures above apply
 # one file down). qa-check.sh is a hard-constraint file this task does not modify -- leg 2g still
-# calls the SHELL checker (`sh scripts/lib/check-night-run-rollup.sh`), so this family still spawns it.
+# called the SHELL checker. TASK-355 rewired it to `bun scripts/lib/check-night-run-rollup.ts`, so the
+# path rewritten below is the .ts one; the extraction and the assertions are otherwise unchanged,
+# because the leg's OUTPUT contract is what this family proves and that did not move.
 qa_check="$repo_root/scripts/qa-check.sh"
 leg2g_wrapper="$here/.tmp-leg2g-wrapper.sh"
 # The extracted BODY is captured on its own first, and emptiness is asserted against THAT -- not
@@ -180,9 +182,18 @@ awk '
   /qb_checkpoint "leg 2g: recorded-run rollup"/ {f=1; next}
   f && /qb_checkpoint/ {exit}
   f
-' "$qa_check" | sed "s#scripts/lib/check-night-run-rollup.sh#$repo_root/scripts/lib/check-night-run-rollup.sh#" > "$leg2g_body"
+' "$qa_check" | sed "s#scripts/lib/check-night-run-rollup.ts#$repo_root/scripts/lib/check-night-run-rollup.ts#" > "$leg2g_body"
 [ -s "$leg2g_body" ] || {
   echo "FAIL harness: leg 2g extraction from $qa_check produced nothing -- the leg's shape (or its qb_checkpoint marker text) changed, re-derive the awk pattern"
+  fail=1
+}
+# The sed above rewrites the leg's RELATIVE checker path to an absolute one so the extracted body
+# runs from a fixture cwd. If the leg is ever re-pointed (e.g. back to the .sh oracle, or to a
+# renamed file), that sed silently stops matching and every case below fails with "checker not
+# found" -- a real failure wearing a misleading cause. Assert the rewrite landed, and name it
+# (TASK-355: the .ts rewiring is exactly the edit that first broke this).
+grep -q "$repo_root/scripts/lib/check-night-run-rollup" "$leg2g_body" || {
+  echo "FAIL harness: leg 2g extracted, but its checker path was not rewritten to an absolute one -- the leg no longer names scripts/lib/check-night-run-rollup.ts, so the sed on the extraction line is stale; re-point it at whatever the leg calls now"
   fail=1
 }
 {

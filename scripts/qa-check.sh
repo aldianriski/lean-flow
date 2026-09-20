@@ -160,10 +160,14 @@ cap() { # <file> <maxlines>
 # checker as an explicit allowlist naming its authority, so deriving does not silently drop it (L-076).
 # Relayed verbatim so the report reads as it did inline. `cap()` above is still used by nothing else;
 # it is kept because the checker's own output format matches it.
-doccaps=$(sh scripts/lib/check-doc-caps.sh); doccaps_rc=$?
-printf '%s\n' "$doccaps"
-pass=$((pass + $(printf '%s\n' "$doccaps" | grep -c '^PASS' || true)))
-[ "$doccaps_rc" -eq 0 ] || fail=$((fail + $(printf '%s\n' "$doccaps" | grep -c '^FAIL' || true)))
+if ! command -v bun >/dev/null 2>&1; then
+  bad "doc-caps: bun not found on PATH -- cannot run scripts/lib/check-doc-caps.ts. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
+else
+  doccaps=$(bun scripts/lib/check-doc-caps.ts); doccaps_rc=$?
+  printf '%s\n' "$doccaps"
+  pass=$((pass + $(printf '%s\n' "$doccaps" | grep -c '^PASS' || true)))
+  [ "$doccaps_rc" -eq 0 ] || fail=$((fail + $(printf '%s\n' "$doccaps" | grep -c '^FAIL' || true)))
+fi
 
 qb_checkpoint "leg 2: count consistency"
 # --- 2. Count consistency (claims-vs-disk) ----------------------------------
@@ -205,11 +209,13 @@ qb_checkpoint "leg 2b: epic retention + rollup currency"
 # any check: EPIC-014 carried last_updated 2026-08-29 over a body edited 2026-08-31 through a fully
 # green gate. Widened rather than added as a second script because two Shell checkers over one
 # artifact is how TD-087 and TD-097 became two rows for one script (SPRINT-094 G2 ruling).
-ea_script="scripts/lib/check-epic-archive.sh"
-if [ ! -f "$ea_script" ]; then
+ea_script="scripts/lib/check-epic-archive.ts"
+if ! command -v bun >/dev/null 2>&1; then
+  bad "epic archive: bun not found on PATH -- cannot run $ea_script. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
+elif [ ! -f "$ea_script" ]; then
   bad "epic archive: checker not found at $ea_script"
 else
-  ea_out=$(sh "$ea_script" "$ROOT" 2>&1); ea_code=$?
+  ea_out=$(bun "$ea_script" "$ROOT" 2>&1); ea_code=$?
   printf '%s\n' "$ea_out"
   ea_pass=$(printf '%s\n' "$ea_out" | grep -cE '^PASS')
   ea_fails=$(printf '%s\n' "$ea_out" | grep -cE '^FAIL')
@@ -477,8 +483,10 @@ qb_checkpoint "leg 2g: recorded-run rollup"
 # Part 4 mandates a rollup at every exit; ADR-016 moves the writing of it into the launcher's
 # wrapper so the model cannot drop it. This is the enforcement half of that pair (SPRINT-059 T3).
 # Covered by evals/run-night-run-rollup-fixtures.sh.
-nr_script="scripts/lib/check-night-run-rollup.sh"
-if [ ! -f "$nr_script" ]; then
+nr_script="scripts/lib/check-night-run-rollup.ts"
+if ! command -v bun >/dev/null 2>&1; then
+  bad "night-run rollup: bun not found on PATH -- cannot run $nr_script. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
+elif [ ! -f "$nr_script" ]; then
   bad "night-run rollup: checker not found at $nr_script"
 else
   # Each log is DERIVED from its Plan rather than globbed on its own. Two reasons, both
@@ -509,7 +517,7 @@ else
   if [ -z "$nr_files" ]; then
     note "night-run rollup: skip -- no active sprint Plan found"
   else
-    nr_out=$(sh "$nr_script" $nr_files 2>&1); nr_code=$?
+    nr_out=$(bun "$nr_script" $nr_files 2>&1); nr_code=$?
     printf '%s\n' "$nr_out"
     nr_pass=$(printf '%s\n' "$nr_out" | grep -cE '^PASS')
     nr_fails=$(printf '%s\n' "$nr_out" | grep -cE '^FAIL')
@@ -1296,15 +1304,17 @@ fi
 # A MISSING class is a FAIL, never a default-to-J0: Part 0's invariant is that an unasked question is
 # a BLOCK, so the safe end is J2. Delegates to the retained checker (scripts/lib/check-authority.sh,
 # itself covered by evals/run-authority-fixtures.sh).
-au_script="scripts/lib/check-authority.sh"
-if [ ! -f "$au_script" ]; then
+au_script="scripts/lib/check-authority.ts"
+if ! command -v bun >/dev/null 2>&1; then
+  bad "authority: bun not found on PATH -- cannot run $au_script. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
+elif [ ! -f "$au_script" ]; then
   bad "authority: checker not found at $au_script"
 else
   au_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
   if [ -z "$au_files" ]; then
     note "authority: skip (missing): docs/sprint/SPRINT-*.md"
   else
-    au_out=$(sh "$au_script" $au_files 2>&1); au_code=$?
+    au_out=$(bun "$au_script" $au_files 2>&1); au_code=$?
     if [ "$au_code" -eq 0 ]; then
       au_n=$(printf '%s\n' "$au_out" | grep -cE '^PASS')
       # Zero verified is a SKIP, never a PASS (TD-042): a green line over an empty input set cannot
