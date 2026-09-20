@@ -266,3 +266,51 @@ lib, fixture and index files the ruling turned out to touch. Third `Layers:` cor
 each was the declaration meeting the work, which is the cost of declaring first.
 
 **Plan exhausted:** 17 DoD `[x]`, 1 `[~]` (T2's retained fixture, TD-165). System-verify running.
+
+### 2026-09-20 | correction | the "Plan exhausted" rollup was one short, and the DoD it skipped was not satisfied
+
+**The count above was wrong when it was written.** At `80f1122` the sprint file held **16 `[x]` ·
+1 `[~]` · 1 `[ ]`**, not `17 [x], 1 [~]`. The entry declared `PLAN_EXHAUSTED` over an open DoD, and
+the commit subject carried the same claim. Corrected here rather than in place — the Log is
+append-only, and an entry that silently becomes true later is the failure this correction exists to
+record. The open item was T4's third DoD, **"Not oversold at G2"**; it was never a `[~]` judgement
+like T2's, it was simply unticked.
+
+This is the count doing exactly the job ADR-016 gives it — a run can end mid-Plan and exit `success`,
+and only the number makes it visible. It did not work, because the number was asserted rather than
+derived. Re-derived at this entry by **two selectors that must agree**: a checkbox-state census
+(`17 [x] · 1 [~] · 0 [ ]`) and an `awk` walk that sections by `### Tn` and sums per task
+(`T1 6/6 · T2 4/5 · T3 4/4 · T4 3/3` = **18 DoD, 17 ticked**). Both routes agree (L-198 — and the
+selector genuinely differs: one reads checkbox glyphs, one reads section membership).
+
+**T4's last DoD, verified rather than assumed — the scope-note held, after one correction.**
+`TASK-351`'s `scope-note:` ("Closes THIS seam, not the general class … Do not oversell it at G2"),
+the sprint file's Acceptance, this Log's own T4 entries and Rule 7's block comment at `:240-275` all
+state the narrow reach correctly. **One shipped line did not.** The comment at the FAIL branch
+(`check-dod-delta.ts:310`) read:
+
+> the exact silent-exemption seam SPRINT-101 T3 found 137/701 commits falling through
+
+Rule **6a** (`:215`) is what closed those 137. Rule 7's reach is the residual shapes no arm above
+examined — **1** subject in this repository's full history. The overselling sat in the one place a
+reader meets the rule while it fires, which is L-151's destination test: every artifact that a
+*reviewer* reads had it right, and the artifact a *consumer of the rule* reads had it wrong.
+
+Narrowed at **`38d02a1`** — comment-only (5 insertions, 1 deletion; verified by filtering the diff
+for non-comment lines, of which there are none), `61 pass / 0 fail`, `tsc --noEmit` clean. DoD ticked
+with that evidence.
+
+**Review depth (skip-table lookup recorded per TD-092)** — `consequence · T4 · behaviour: none
+(comment-only, proven by diff filter + unchanged suite) · governance: the comment states a Tier G
+guard's REACH, and a wrong reach statement is how the next reader mis-scopes the guard`. Unclear ⇒
+material, and CLAUDE.md ×(ii) admits no carve-out for which *part* of a Tier G file changed: **one
+scoped outside reviewer, dispatched worktree-isolated** (L-165 · L-168). Its brief is adversarial on
+the one thing I could not check by writing it — my "rule 6a closed the 137, Rule 7 reaches 1" is a
+query result acted on immediately, so the reviewer derives the `unmatched-shape` count over
+`git log --all` **itself**, reports the population its query actually reached, and is told to say so
+loudly if its number is not 1 (the cross-check rule's disagreeing second number).
+
+**System-verify:** launched detached, full profile (`QA_FULL=1`) per ADR-039's promote/close parity
+mandate, against the integrated tree at `38d02a1`. The previous entry said "System-verify running"
+and no verdict was ever recorded — no gate artifact exists from 2026-09-16. That gap is why this
+entry exists at all.
