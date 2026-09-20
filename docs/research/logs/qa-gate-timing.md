@@ -2141,3 +2141,39 @@ did, and the Round is what a reader consults when choosing a target from a ranki
 `evals/run-layers-completeness-fixtures.sh` "the slowest harness in the gate (measured ~55-70s)".
 Round 16 retired that claim — it is not in the top 20, and the five ported checkers now total 17 s.
 Same stale-rationale shape corrected in `qa-check.sh` at :1169 this sprint. Worth a follow-up.
+
+## Round 21 — T2's before/after on the leg-15 workload (2026-09-20)
+
+SPRINT-103 T2. **The measured subject is leg 15, not the fixture harness** — and that distinction
+is the point. Round 20 measured `evals/run-layers-observed-fixtures.sh` at 185.7/182.9 s, but that
+harness exercises the **`.sh` oracle**, which is retained unchanged (D5), so the port does not and
+should not move it. What the port changes is the gate leg that runs the checker over real sprint
+files: `sh "$lo_script" $(ls docs/sprint/SPRINT-*.md)`, reproduced exactly here.
+
+Three alternating pairs, oracle then port, same argument set each time:
+
+| pair | oracle real | port real | output |
+|---|---:|---:|---|
+| 1 | 21.03 s | 3.69 s | identical |
+| 2 | 20.57 s | 2.76 s | identical |
+| 3 | 21.14 s | 3.40 s | identical |
+| **range** | **20.57 – 21.14 s** | **2.76 – 3.69 s** | 3/3 byte-identical, same exit code |
+
+**Non-overlapping by a factor of about six** — the slowest port run is 16.9 s faster than the
+fastest oracle run. Median 21.03 → 3.40 s, **saving ~17.6 s per gate run** once leg 15 is wired
+(wiring diff filed, not applied). The oracle's CPU split was `user` 6.8–7.8 / `sys` 10.3–11.4; the
+port's is `user` 0.00–0.02 / `sys` 0.00–0.02, i.e. the ~30 non-git forks per file are simply gone
+and what remains is git itself.
+
+Unlike Round 19's, these ranges are tight (oracle spread 0.57 s over three runs), because this
+workload is seconds rather than minutes and does not sit long enough to catch the host's drift.
+
+### The run also produced a real finding, which is filed as TD-170
+
+Both implementations exit **1** here, identically, reporting five in-range commits as
+`UNATTRIBUTED`. That is not a port defect and not noise: `is_governance_commit()`'s allow-list omits
+`docs/sprint/`, so a governance commit that *also* appends to the sprint's own Execution Log — which
+every task is required to do — is disqualified from governance and reported. 5 of 22 in-range
+commits on this sprint. Pre-existing, invisible until now because leg 15 only walks
+`plan_commit..HEAD` and research commits normally land outside that window. Details and the two
+non-equivalent fix options → `TECH-DEBT.md` **TD-170**.

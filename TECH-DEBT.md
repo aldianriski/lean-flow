@@ -295,6 +295,40 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-170** severity: medium | status: open | created: Sprint-103
+  - Summary: **A governance commit that also appends to the sprint's own Execution Log is reported
+    `UNATTRIBUTED` by leg 15** — and appending to that Log is mandatory for every task, so this
+    fires on routine sprint work. `is_governance_commit()` requires **every** file in the commit to
+    be a governance artifact, and its allow-list (`TODO.md` · `TECH-DEBT.md` · `CHANGELOG.md` ·
+    `docs/LEARNINGS.md` · `docs/knowledge-index.md` · `docs/epic/*` · `docs/research/*`) **does not
+    include `docs/sprint/`** — even though the per-file reporting loop excludes `docs/sprint/`
+    immediately afterwards via `is_excluded_committed()`. So the sprint-log file cannot be
+    *reported*, but it can still *disqualify* the whole commit from being governance, which sends
+    it to `UNATTRIBUTED` and gets its governance sibling named instead.
+  - **Observed live on SPRINT-103**, 5 of 22 in-range commits, all correctly detected:
+    `d515f33:TODO.md` · `975663e`/`5cb7ee9`/`883a9c6`/`7dbb81a:docs/research/logs/qa-gate-timing.md`.
+    Each is `{a governance file} + {docs/sprint/logs/SPRINT-103-…md}` and nothing else.
+  - **Not a port defect.** `scripts/lib/check-layers-observed.sh` and the SPRINT-103 T2 port
+    `check-layers-observed.ts` produce byte-identical output here, same exit code, on three
+    alternating runs. The gap is in the shared rule, pre-existing, and the port faithfully
+    reproduces it — which is the oracle contract working as intended (D5).
+  - **Why it stayed hidden until now.** Leg 15 only walks `plan_commit..HEAD`. Research-log commits
+    made *before* a sprint's `plan_commit` are out of range, so the pattern is invisible unless a
+    sprint writes research or Backlog entries **during** its own execution — which SPRINT-103 is
+    the first to do at volume (four `research:` Rounds plus a `todo:` filing). L-105's temporal
+    sibling: the rule is fine, the window it runs over decides whether it ever fires.
+  - Fix direction (**not a ruling**), two clean options and they are not equivalent:
+    **(a)** add `docs/sprint/*` to `is_governance_commit()`'s allow-list, so a bookkeeping file that
+    is already unreportable also stops disqualifying — narrow, matches the existing
+    `is_excluded_committed()` intent, and is a **change to a Tier G guard's semantics**, so it takes
+    the full ADR-029 bar plus byte-identical differential parity against the oracle on both
+    implementations; or **(b)** rule that sprint work must use `sprint(NNN):` / `sprint(NNN) Tn:`
+    subjects and that `research:`/`todo:` prefixes are for *between*-sprint commits only — no code
+    change, but it makes the convention load-bearing and needs writing down where a committer reads
+    it, not only here (L-151).
+  - **Blocks close as it stands**: leg 15 exits 1, so `sprint-bulk`'s system-verify step will not
+    pass against the integrated tree until this is ruled. It is a ruling, not a defect to patch
+    quietly — both options change something a reader depends on.
 - **TD-169** severity: high | status: open | created: Sprint-103
   - Summary: **The gate's typecheck leg reports "clean (0 errors)" without ever looking at
     `scripts/lib/` or `evals/`** — which is where every ported checker lives. `scripts/qa-check.sh`

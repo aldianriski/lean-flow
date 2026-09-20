@@ -679,3 +679,50 @@ archived-content exclusion.
 T2: **6 of 7** — only the before/after range remains. Sprint total **22 of 35**.
 
 review · T2 · outside-reviewer-worktree-isolated · behaviour:material · governance:high
+
+### 2026-09-20 | progress | T2 before/after — 21.0 s → 3.4 s on the leg-15 workload; T2 complete
+
+Full figures → `qa-gate-timing.md` **Round 21**.
+
+**The measured subject is leg 15, not the fixture harness, and that distinction is the whole point.**
+Round 20 timed `evals/run-layers-observed-fixtures.sh` at 185.7/182.9 s — but that harness exercises
+the **`.sh` oracle**, which is retained unchanged under D5, so the port neither does nor should move
+it. What the port changes is the gate leg running the checker over real sprint files. Measuring the
+harness here would have produced a "no improvement" result that was true of the wrong thing.
+
+Three alternating pairs on leg 15's exact call shape (`$(ls docs/sprint/SPRINT-*.md)`):
+
+| | range over 3 runs | median |
+|---|---:|---:|
+| oracle `check-layers-observed.sh` | **20.57 – 21.14 s** | 21.03 |
+| port `check-layers-observed.ts` | **2.76 – 3.69 s** | 3.40 |
+
+Non-overlapping by ~6×; output byte-identical and exit code equal on all three pairs. ~17.6 s off
+each gate run once leg 15 is wired. CPU tells the same story: oracle `sys` 10.3–11.4 s, port `sys`
+≤0.02 s — the ~30 non-git forks per file are gone and only git remains.
+
+**T2: 7 of 7.** Sprint total **23 of 35**.
+
+### 2026-09-20 | surprise | the timing run surfaced TD-170 — and it blocks close
+
+Both implementations exit **1** on the current tree, identically, naming 5 of 22 in-range commits
+`UNATTRIBUTED`. Investigated rather than waved through: `is_governance_commit()` requires **every**
+file in a commit to be a governance artifact, and its allow-list omits `docs/sprint/` — even though
+the per-file reporting loop excludes `docs/sprint/` immediately afterwards. So the sprint's own
+Execution Log cannot be *reported*, but it can still *disqualify* the commit, which drops it to
+`UNATTRIBUTED` and gets its governance sibling named instead.
+
+Every affected commit is `{governance file} + {docs/sprint/logs/SPRINT-103-…md}` and nothing else —
+i.e. exactly the shape of routine sprint bookkeeping, since appending to the Log is mandatory.
+
+**Not a port defect** (oracle and port agree byte-for-byte), **not new**, and **invisible until
+now**: leg 15 walks only `plan_commit..HEAD`, so research commits normally fall outside the window.
+SPRINT-103 is the first sprint to write four Rounds and a Backlog entry *during* its own execution.
+L-105's temporal sibling — the rule is sound, the window it runs over decides whether it ever fires.
+
+Filed as **TD-170** with two non-equivalent fix options (widen the governance allow-list, a Tier G
+semantics change; or rule that sprint work must use `sprint(NNN):` subjects, a convention change
+needing a home where committers read it). **It is a ruling, not a quiet patch**, and it blocks
+`sprint-bulk`'s system-verify at close.
+
+consequence · T2 · behaviour:material · governance:high
