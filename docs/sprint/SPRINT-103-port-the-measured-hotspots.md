@@ -114,7 +114,7 @@ interface changing.
 
 **DoD:**
 - [ ] Per-target measurement recorded before any code is written
-- [ ] T3's ruling read and respected — state in one line what it permits here
+- [x] T3's ruling read and respected — state in one line what it permits here
 - [ ] If ported: oracle retained · byte-identical parity · retained must-FAIL + sibling control + seeded break, one hash convention
 - [ ] If ported: wiring diff committed before applied
 - [ ] Outside reviewer, worktree-isolated

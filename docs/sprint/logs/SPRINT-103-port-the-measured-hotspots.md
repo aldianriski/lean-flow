@@ -253,3 +253,29 @@ reads as more work than happened (L-088).
 T3 DoD: **4 of 4**. Sprint total **7 of 31**.
 
 consequence · T3 · behaviour:material · governance:high
+
+### 2026-09-20 | progress | T1's 43-rule set confirmed by a second, independent selection rule
+
+The T1 fix rests entirely on one claim — that `run-sprint-family-fixtures.sh` needs §9+§10+§11+§12
+and nothing else. That claim was first derived from **case-name prefixes** (`s11-…`), which is a
+*naming convention*, not a fact about what the assertions reach. A reduction built on a convention is
+the same class of error as one built on the header's prose, one level subtler (L-198: the second
+query must vary the SELECTION rule, not the direction of the count).
+
+**Route B, fully independent:** take the 23 distinct finding slugs the 68 cases actually assert on
+(the third argument, e.g. `sprint-log-outside-logs-dir`), and map each back to the engine function
+that emits it. 20 resolved directly; the remaining three — `closed-sprint-not-archived`,
+`promoted-learning-not-collapsed`, `sprint-index-row-missing` — resolve to `assert_S11_SPRINT` and
+`assert_S11_LEARNINGS`, i.e. **§11**.
+
+**Both routes return exactly {§9, §10, §11, §12}.** They share no mechanism: one reads a string the
+author chose for a case, the other reads which engine function emits the finding the case greps for.
+The 43-rule reduction is sound, and a Wave 1 builder can take it as given rather than re-deriving it.
+
+**T4 DoD — T3's ruling read and respected:** the ruling makes `conformance-engine.sh` **read-only for
+the remainder of SPRINT-103** (ADR-043, TD-168). T4 may therefore examine and port its *harness*
+only, and its ~60 s of fixture-construction residue is the sole part of its 98 s still in play here.
+
+Sprint total **8 of 31**.
+
+consequence · T1,T4 · behaviour:low · governance:high
