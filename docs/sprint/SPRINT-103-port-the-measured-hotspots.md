@@ -50,8 +50,8 @@ oracle, and its leg wired; or (b) a recorded ruling naming the mechanism and why
 reach it. Not "attempted".
 
 **DoD:**
-- [ ] Per-target measurement recorded in `qa-gate-timing.md` — invocation count, `sys` share, the mechanism — *Verify: the Round names the figures and how they were derived*
-- [ ] Ruling: spawn-shaped (port) or not (record + stop), taken **on the measurement**, not on Round 16's rank
+- [x] Per-target measurement recorded in `qa-gate-timing.md` — invocation count, `sys` share, the mechanism — *Verify: the Round names the figures and how they were derived*
+- [x] Ruling: spawn-shaped (port) or not (record + stop), taken **on the measurement**, not on Round 16's rank
 - [ ] If ported: `.sh` retained as live oracle; byte-identical differential parity over every fixture **and** the real corpus it applies to — *Verify: the differential reports N/N identical, N stated*
 - [ ] If ported: retained must-FAIL + sibling control + seeded-break proof under ONE stated hash convention
 - [ ] If ported: wiring diff **committed as a reviewable file before being applied** (three reviewers in SPRINT-102 could not audit wiring that lived only in chat — L-151)
@@ -96,8 +96,8 @@ portable at all, not a port. Deciding that is human-reserved.
 consumer-facing surface, with the mechanism measured. A port is permitted only if the ruling says so.
 
 **DoD:**
-- [ ] The sweep's cost mechanism measured and recorded — is it spawns, corpus size, or real work?
-- [ ] Consumer-facing blast radius stated explicitly: what an adopter of `conformance.sh` would observe, if anything (L-015)
+- [x] The sweep's cost mechanism measured and recorded — is it spawns, corpus size, or real work?
+- [x] Consumer-facing blast radius stated explicitly: what an adopter of `conformance.sh` would observe, if anything (L-015)
 - [ ] Ruling recorded **where its reader reaches it** — the engine's own header or an ADR, never only the ledger (L-151)
 - [ ] If the ruling is hard-to-reverse **and** surprising **and** a real trade-off → ADR (§4's three-part bar), else explicitly not
 
@@ -134,7 +134,7 @@ say so in the Round so TD-167's fix direction is informed by a second sighting.
 
 **DoD:**
 - [ ] Per-target measurement recorded before any code is written
-- [ ] Checked for TD-167's shape (an assertion whose input is a clock) and the finding recorded either way
+- [x] Checked for TD-167's shape (an assertion whose input is a clock) and the finding recorded either way
 - [ ] If ported: oracle retained · byte-identical parity · retained must-FAIL + sibling control + seeded break, one hash convention
 - [ ] If ported: wiring diff committed before applied
 - [ ] Outside reviewer, worktree-isolated
