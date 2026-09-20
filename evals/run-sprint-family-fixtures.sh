@@ -1,8 +1,18 @@
 #!/usr/bin/env sh
-# run-sprint-family-fixtures.sh -- retained fixtures for the two families defined over git history:
-# §9 sprint-file (SPRINT-079 T4) and §10 learning-governance (T5). §9: S9.TWOFILES · S9.LOGDIR ·
-# S9.PLANFROZEN · S9.SCOPECHANGE · S9.VERIFYCLAUSE, six findings. §10: FOURBUCKETS · PROMOTION ·
-# TDAGING · PROMOTEREVIEW, four findings.
+# run-sprint-family-fixtures.sh -- retained fixtures for the families the conformance engine defines
+# over git history and over the sprint/backlog corpus.
+#
+# WHAT IT ACTUALLY COVERS (corrected SPRINT-103 T1). This header claimed "§9 sprint-file and §10
+# learning-governance" from SPRINT-079 T4/T5 onward. That stopped being true as cases were added and
+# nobody revisited the sentence. Enumerated from the 68 assertions below, not from this prose:
+#
+#     §11  x29      §9  x16      §12  x11      §10  x10
+#
+# §9+§10 is 26 of 68. The claim mattered once the spec handed to the engine became a REDUCED one
+# (see the reduction block below): a reduction built on this header would have left 40 cases with no
+# rule to fire, and 40 of the 68 are `assert_absent`, which PASSES when a finding does not appear --
+# all green, testing nothing (L-186). A file's prose about its own population is not evidence about
+# that population; the assertions are.
 #
 # WHY ITS OWN HARNESS. run-conformance-engine-fixtures.sh states in its header that it needs no git,
 # and two of these rules are defined over history -- PLANFROZEN diffs § Plan against `plan_commit`,
@@ -10,11 +20,11 @@
 # contract and add minutes to a harness already past six; the repo's convention for a git-backed
 # family is a sibling file (run-attestation-fixtures.sh, run-layers-observed-fixtures.sh).
 #
-# WHY THE SHIPPED SPEC, NOT A REDUCED ONE. The attestation suite hands the engine a cut-down spec so
-# ~44 unimplemented ids do not drown its assertions. That is unnecessary here because every case
-# below asserts on a NAMED FINDING STRING rather than on the exit code alone -- other rules may fire
-# freely without touching the claim. Testing against the shipped spec is strictly better: a §9 row
-# that moves breaks these cases, which is the point.
+# WHY A REDUCED SPEC NOW (was: "WHY THE SHIPPED SPEC, NOT A REDUCED ONE"). The original argument --
+# every case asserts on a NAMED FINDING STRING, so other rules may fire freely, and a §9 row that
+# moves breaks these cases -- is still correct, and the reduction below preserves it by deriving
+# itself from the same shipped rows. What changed is a measurement: the shipped spec costs ~26 ms
+# per rule of dispatch on every one of 68 calls. See the reduction block for the figures.
 #
 # Retained deliberately: these outlive the task that wrote them (TD-012, L-058). Every case is
 # must-FAIL on input that MUST produce the finding, and each has a control proving it does not fire
@@ -30,6 +40,55 @@ spec="$root/spec/STANDARD.md"
 
 work=$(mktemp -d) || { echo "FAIL harness: mktemp -d failed"; exit 2; }
 trap 'chmod -R u+w "$work" 2>/dev/null; rm -rf "$work"' EXIT
+
+# --- REDUCED SPEC (SPRINT-103 T1) -----------------------------------------------------------------
+# WHY. Measured at SPRINT-103 (qa-gate-timing.md Round 17): conformance-engine.sh costs ~26 ms per
+# rule of DISPATCH against an empty directory -- 2.93 s at the shipped spec's 100 rules, 0.35 s at 0
+# -- paid whether or not a rule has anything to check. This harness invokes the engine 68 times, so
+# handing it the full spec cost ~199 s of a measured 305 s dispatching rules no case here reads.
+# The reduced spec measures 0.72 s, projecting ~150 s off this harness. No case, fixture, assertion
+# or finding changes: this narrows only WHICH OTHER RULES ride along on calls these cases never read.
+#
+# This REPLACES the header's earlier "WHY THE SHIPPED SPEC, NOT A REDUCED ONE" reasoning. That
+# argument was about assertion robustness and remains correct on its own terms -- it was written
+# before anyone measured what the shipped spec costs per call, and a reduction derived by awk from
+# the shipped spec keeps the property it was protecting: a §9 row that moves still breaks these
+# cases, because the reduction reads the same rows they do.
+#
+# WHICH SECTIONS, AND WHY NOT THE TWO THE OLD HEADER NAMED. The header said §9 + §10. The 68 cases
+# say otherwise -- §11 x29, §9 x16, §12 x11, §10 x10 -- so §9+§10 is 26 of 68. Reducing to §9+§10 on
+# the header's authority would leave 40 cases with no rule to fire, and 40 of the 68 are
+# `assert_absent`, which PASSES when a finding does not appear: every one would go green while
+# testing nothing (L-186). The set below is derived from the ASSERTIONS by two independent routes --
+# case-name prefixes, and mapping each of the 23 distinct asserted finding slugs back to the engine
+# function that emits it. Both return exactly {§9, §10, §11, §12}.
+spec_full="$spec"
+spec="$work/spec-s9s10s11s12.md"
+awk '/^\| `S(9|10|11|12)\./ { print; next } /^\| `S[0-9]/ { next } { print }' "$spec_full" > "$spec"
+
+# DRIFT ANCHOR. A reduction that silently loses rows turns 68 cases green against nothing, which is
+# the one failure this file exists to prevent. Per section: the reduced copy must carry EXACTLY the
+# rows the shipped spec has, and the reduced total must be their sum -- so a lost section, a lost
+# row, or another section leaking in all redden here rather than in a vacuous PASS downstream.
+_red_total=0
+for _sec in 9 10 11 12; do
+  _nf=$(grep -cE "^\| \`S${_sec}\." "$spec_full")
+  _nr=$(grep -cE "^\| \`S${_sec}\." "$spec")
+  if [ "$_nf" -ne "$_nr" ]; then
+    echo "FAIL harness: reduced spec has $_nr §${_sec} rule rows, shipped spec has $_nf -- the reduction drifted from the spec it is derived from"
+    fail=1
+  fi
+  if [ "$_nf" -eq 0 ]; then
+    echo "FAIL harness: shipped spec carries NO §${_sec} rule rows, but cases here assert on §${_sec} -- the spec moved under this harness"
+    fail=1
+  fi
+  _red_total=$((_red_total + _nf))
+done
+_nall=$(grep -cE '^\| `S[0-9]+\.' "$spec")
+if [ "$_nall" -ne "$_red_total" ]; then
+  echo "FAIL harness: reduced spec holds $_nall rule rows but only $_red_total belong to §9/§10/§11/§12 -- another section leaked through the reduction"
+  fail=1
+fi
 
 commit_msg() {  # <dir> <subject>
   git -C "$1" add -A >/dev/null 2>&1

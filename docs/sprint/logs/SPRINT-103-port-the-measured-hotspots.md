@@ -316,3 +316,55 @@ the cost of measuring it should not become a debt row.
 what the 68 cases assert. D6 holds — same rules, same fixtures, same named findings.
 
 consequence · T1 · behaviour:material · governance:high
+
+### 2026-09-20 | progress | T1 branch (c) built and proven — 319 s → 184 s, output byte-identical
+
+**Measured, both runs this session on the same host, memory still constrained (597 MB free):**
+
+| | real | user | sys |
+|---|---:|---:|---:|
+| full shipped spec (baseline, from `HEAD`) | **319.2 s** | 109.1 | 165.8 |
+| reduced 43-rule spec | **184.0 s** | 50.4 | 76.9 |
+
+Baseline 319 s against Round 16's 305 s for the same harness — two routes, same answer, within this
+host's variance. **A point estimate each, not the ≥3-run range the DoD requires** — that DoD stays
+open and is what the freed memory is for.
+
+**Parity: the entire run is byte-identical**, not merely the verdicts. 69/69 verdict lines match and
+`cmp` on the whole output is clean, 0 FAIL both sides. No case, fixture, assertion or finding
+changed; only which other rules rode along on calls no case reads (D6 holds).
+
+**Three drift modes proven to redden, each with its own named finding, control green:**
+
+| case | outcome |
+|---|---|
+| control — unmodified reduction | green |
+| seed — awk narrowed to §9+§10 | `reduced spec has 0 §11 rule rows, shipped spec has 11` |
+| seed — §2 leaks through | `holds 64 rule rows but only 43 belong to §9/§10/§11/§12` |
+| seed — spec loses all §11 rows | `shipped spec carries NO §11 rule rows, but cases here assert on §11` |
+
+Retained as `evals/run-sprint-family-spec-reduction-fixtures.ts` (TypeScript, 1.38 s, `tsc` clean).
+It lifts **both the anchor bytes and the awk program from the live harness** rather than
+transcribing them, so it cannot drift into testing a lookalike. No tracked file is seeded — the
+seeds vary the anchor's *inputs* — so no restore and **no hash convention applies here**; that bar
+(L-137, L-169) governs seeds that patch a tracked file, which these deliberately do not.
+
+**L-142 fired twice against this fixture, and that is the reason to trust it.** Draft 1 passed the
+awk program through a double-quoted shell string; the backtick in `` `S9. `` was
+command-substituted, and one seed "reddened" **for the quoting bug rather than for its seed** —
+scoring as a pass. Draft 2 mangled the escape a different way and a *different* seed passed
+spuriously. Both were caught only because the **control also reddened** — the seeds alone would
+have read as three green discriminations. The rewrite removed the class by extracting the program
+instead of quoting it, and the fixture now refuses any seed byte-identical to the control.
+
+**Wiring is NOT applied** — `docs/research/logs/qa-check-ts-harness-dispatch-wiring.diff.md`, three
+changes, reviewable per D3 and L-151. It surfaces a **pre-existing** gate defect worth its own
+attention: leg 12's run loop hardcodes `sh "$hp"` and its census globs `evals/run-*.sh`, so a `.ts`
+harness is neither run **nor reported as unregistered**. The census cannot answer the question it
+exists to ask for 12 files already in `evals/` — L-186 at the gate's own level, and the reason the
+census change must not be applied without writing each exclusion by hand.
+
+T1: **6 of 11**. Open: outside reviewer (worktree-isolated), before/after over ≥3 runs.
+Sprint total **12 of 35**.
+
+consequence · T1 · behaviour:material · governance:high
