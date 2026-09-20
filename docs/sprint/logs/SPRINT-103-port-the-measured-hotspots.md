@@ -141,3 +141,46 @@ micro-benchmark, not an observed run — which by this sprint's own theme is a h
 measurement, not a result. T1's remaining DoD stay open.
 
 consequence · T1 · behaviour:low · governance:high
+
+### 2026-09-20 | progress | T5 ruled · T2 and T4 mechanisms measured, rulings provisional
+
+Same constraint as the entry above: no end-to-end harness run was attempted (2.2% free memory), so
+these are mechanism findings from source plus sub-second micro-benchmarks, and the two that need a
+total to be sure say so.
+
+**T5 — RULED UNPORTABLE. Mechanism recorded; nothing to port.** Its 66 s is not overhead. Case 2
+deliberately runs a checkpoint-stripped `qa-check.sh` until a 60 s `timeout` kills it, to demonstrate
+the silent-until-the-ceiling shape TD-084 exists to stop; case 1 trips early and case 3 is
+`head`-truncated. The harness is **wait-bound by construction** — a TypeScript rewrite still has to
+sit out `WINDOW`, because the wait *is* the assertion. The only lever is `WINDOW` itself, which
+trades directly against flakiness under load and is a coverage decision (D6), not a port. This is
+D2's "ruled unportable" branch and counts as a completed task, not a failed one.
+
+**T5 second DoD — TD-167's shape is present.** Case 2 asserts *no budget verdict within 60 s*: an
+assertion whose input is a wall clock. A host fast enough to reach leg 12's own loop-internal check
+inside the window reddens correct code. Second sighting of the shape, so TD-167's fix direction
+should not assume it is isolated to `run-qa-budget-fixtures.sh` case 12.
+
+**T2 — measured, leans portable, ruling provisional.** `check-layers-observed.sh` costs **11.1–12.2 s
+for one real sprint file** (bare guard path: 0.07 s), and `sys` **exceeds** `user` (5.9 vs 3.9) —
+the opposite profile from the engine, which is user-dominant. Source: 10 `git` calls, all inside
+loops, across 8 loops; the fixture harness adds 29 throwaway git repos and ~92 further git spawns.
+That is genuinely spawn/IO-shaped and is the one target of the five where a port is the right
+instrument. **Held provisional** because the 153 s total has not been re-derived here, and the split
+between process overhead and real history traversal decides how much a port actually recovers.
+
+**T4 — measured, and it is already half-reduced.** Of its 38 engine calls (2 of the earlier 40 were
+comment lines), **18 use a 6-rule `spec_s2s6`, 13 use tiny purpose-built specs, and only 7 use the
+full shipped spec** — so T1's lever is largely spent here already. Measured: the 6-rule spec costs
+1.26–1.33 s against an empty dir. Engine time works out near 7×2.93 + 18×1.3 + 13×~0.4 ≈ **35 s of
+a measured 98 s**, leaving ~60 s in fixture construction rather than in the engine. **Ruling held**
+for its stated dependency on T3, and because that ~60 s residue is the part no measurement here
+touches.
+
+**T4 also supplies T1's implementation template, including the part that is easy to omit.** Its
+reduction is awk-derived from the shipped spec *and* carries a drift anchor — a `grep -qE` that
+fails the harness if the reduction ever loses `S2.F-TIER`. T1's reduction needs the same guard, or a
+§9/§10/§11/§12 row that moves silently empties the reduced spec and 68 cases go green against
+nothing. That is the L-186 failure a second time, in the fix rather than in the analysis.
+
+consequence · T2,T4,T5 · behaviour:low · governance:high
