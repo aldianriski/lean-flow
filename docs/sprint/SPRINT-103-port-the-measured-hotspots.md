@@ -98,8 +98,8 @@ consumer-facing surface, with the mechanism measured. A port is permitted only i
 **DoD:**
 - [x] The sweep's cost mechanism measured and recorded — is it spawns, corpus size, or real work?
 - [x] Consumer-facing blast radius stated explicitly: what an adopter of `conformance.sh` would observe, if anything (L-015)
-- [ ] Ruling recorded **where its reader reaches it** — the engine's own header or an ADR, never only the ledger (L-151)
-- [ ] If the ruling is hard-to-reverse **and** surprising **and** a real trade-off → ADR (§4's three-part bar), else explicitly not
+- [x] Ruling recorded **where its reader reaches it** — the engine's own header or an ADR, never only the ledger (L-151)
+- [x] If the ruling is hard-to-reverse **and** surprising **and** a real trade-off → ADR (§4's three-part bar), else explicitly not
 
 ### T4 — Rule and port `run-conformance-engine-fixtures.sh` `[size: S · risk: med · class: execution · HITL · J1]`
 Layers: `evals/run-conformance-engine-fixtures.sh` · `docs/research/logs/qa-gate-timing.md` · `scripts/qa-check.sh` only if a leg change follows

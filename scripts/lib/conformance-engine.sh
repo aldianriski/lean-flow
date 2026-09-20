@@ -4,6 +4,22 @@
 # (SPRINT-075 T2). Generalises check-attestation.sh's §13-only dispatch loop (SPRINT-074 T2) from one
 # section's five rules to all 13 sections' 100 (EPIC-004 D1/D2).
 #
+# --- PERFORMANCE: read ADR-043 before optimising this file (SPRINT-103 T3) ----------------------
+# This engine is the QA gate's single largest cost centre -- 542 s, 71% of Round 16's measured
+# top five, across three call sites. Measured (qa-gate-timing.md Rounds 17-18): against an EMPTY
+# directory it costs 2.93 s at 100 rules and 0.35 s at 0 -- ~26 ms per rule of dispatch paid
+# whether or not anything is checked; against THIS repo, 173.1 s real / 53.8 user / 81.1 sys, of
+# which fixed dispatch is 1.7%. 60% of CPU time in the kernel means this shells out per file per
+# rule and pays fork() emulation on each, so an in-process port is the instrument that would
+# reach it -- NOT a spec reduction, which only helps callers that dispatch many rules over tiny
+# corpora (that is run-sprint-family-fixtures.sh's fix, not this file's).
+#
+# It is also CONSUMER-FACING (ADR-027): the root conformance.sh answers for any repository and
+# this exit code is a contract an adopter may gate CI on. A port must hold exit-code AND report-
+# text parity over the real corpus, and it introduces a `bun` requirement on an adopter's machine
+# where today `sh` suffices -- the one consequence no parity test run here can surface (L-015).
+# The port is filed as TD-168 and needs its own sprint. Do not fold it into a performance pass.
+#
 # --- what this file is, and what it deliberately is not --------------------------------------------
 # The DRIVER lives here: read every rule via read-spec-rules.sh, decide from its MARK column whether
 # to evaluate it, dispatch mechanical/split rules to an `assert_<id>` function if one is registered,

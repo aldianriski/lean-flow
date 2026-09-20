@@ -295,6 +295,35 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-168** severity: high | status: open | created: Sprint-103
+  - Summary: **`scripts/lib/conformance-engine.sh` is the QA gate's single largest cost centre and is
+    kernel-bound, but it is consumer-facing, so the fix needs its own sprint.** Measured at
+    SPRINT-103 T3 (`qa-gate-timing.md` Rounds 17-18): the engine accounts for **542 s — 71% of Round
+    16's measured top five** — across three call sites. Against THIS repo it runs **173.1 s real /
+    53.8 user / 81.1 sys**, of which fixed dispatch is 2.9 s (**1.7%**). **60% of CPU time in the
+    kernel** means it shells out per file per rule and pays `fork()` emulation on each, so an
+    in-process port is the instrument that reaches it.
+  - **Why it is not simply a port task.** ADR-027 amended ADR-008 so the root `conformance.sh`
+    answers for *any* repository, and **this exit code is a contract an adopter may gate CI on**.
+    Three properties bind the port: exit-code parity over the real corpus, report-text parity
+    (adopters diff and grep it), and — the one no test run here can surface — **a new `bun`
+    requirement on the adopter's machine, where `sh` suffices today** (L-015). The first two are
+    reversible; the third is not, which is why ADR-043 exists rather than only this row.
+  - **Not the same cost as its siblings, and the distinction is load-bearing.**
+    `run-sprint-family-fixtures.sh` pays *fixed per-rule dispatch* 68× against tiny fixture dirs
+    (~26 ms/rule, removable with an awk-derived reduced spec — SPRINT-103 T1's fix, which touches no
+    consumer surface). This row is the *other* cost: per-file spawns over a large corpus, which no
+    spec reduction reaches without dropping rules (a coverage change, D6). Do not conflate them; the
+    T1 fix will not move this number.
+  - Fix direction (**not a ruling**): its own sprint, with a consumer-facing design that settles the
+    `bun` question explicitly — possibly shipping both implementations, or porting only this repo's
+    internal legs and leaving `conformance.sh` on `sh`. Tier **G** under ADR-029, so the full bar
+    applies plus byte-identical differential parity against the retained `.sh` oracle (D5).
+  - **Not measured:** whether an in-process implementation actually recovers the 81 s of `sys`. That
+    is a prototype's question and nothing here promises the size of the win.
+  - Mitigated, partially and already: SPRINT-084 T1 made leg 2f-ter hand the engine a reduced spec on
+    the DEFAULT profile, so this full sweep runs only under `QA_FULL=1` — promote, close, and any
+    full-profile run (ADR-039). Real cost, but not on every gate run.
 - **TD-167** severity: medium | status: open | created: Sprint-102
   - Summary: **`run-qa-budget-fixtures.sh`'s case 12 is a TIMING RACE and reddens the gate under load.**
     The fixture seeds `START_TS` at Round 15's measured **1263 s** and asserts the ceiling block's

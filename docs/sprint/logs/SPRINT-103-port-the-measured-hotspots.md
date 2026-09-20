@@ -211,3 +211,45 @@ and nothing inside this repo's parity testing would surface it.
 now with the measurement behind it, per § Owner-action. Not decided here.
 
 consequence · T3 · behaviour:material · governance:high
+
+### 2026-09-20 | progress | T3 RULED by the owner — portable in principle, out of scope here
+
+**Owner ruling (J2, § Owner-action):** the engine's cost is real and a port is the right instrument,
+but porting a shipped consumer interface is not a task inside a performance sprint. **T3 closes as a
+recorded ruling** — D2's accepted branch — and the port is filed for its own sprint.
+
+Recorded in all three places its different readers reach, which is the whole of L-151 and why one
+was not enough:
+
+- **`docs/adr/ADR-043`** — the durable decision, and it records the *constraint the porting sprint
+  inherits* rather than the deferral. §4's three-part bar is met by one property specifically: exit-
+  code and report-text parity are reversible (a wrong port is fixed by fixing it), but **shipping a
+  `bun` requirement to adopters is not** — once they install against it, withdrawing breaks them.
+- **`scripts/lib/conformance-engine.sh` header** — 16 comment lines at the top. The ADR is invisible
+  to the maintainer who opens this file to make it faster, and that maintainer is the actual reader
+  at risk. Verified comment-only: `sh -n` clean and **byte-identical output + identical exit code**
+  against the pristine `HEAD` copy over the full 100-rule spec (111 lines, `cmp` clean).
+- **`TECH-DEBT.md` TD-168** (high) — the port itself, with the measurement, the three binding
+  properties, and an explicit "not measured: whether in-process actually recovers the 81 s of `sys`".
+
+**Id derivation, worth recording because the first query was contaminated.** A bare repo-wide grep
+returned maxima of `ADR-999` and `TD-961`. All four high ids trace to `evals/fixtures/` test tokens,
+not rows — L-170's exact shape, arriving from `evals/` rather than from `.claude/worktrees/`. Real
+maxima are **ADR-042** and **TD-167**, cross-checked by a different selection rule (42 ADR files
+against a max of 042 — consecutive, no gaps), so the new ids are **ADR-043** and **TD-168**.
+
+**One near-miss worth keeping.** The first parity check of the engine edit reported a *differing*
+exit code (2 vs 1) and 111 lines of divergence. The edit was innocent: the pristine copy had been
+written to `/tmp`, so its `dirname $0` sibling lookup for `archive-path.sh` failed and it aborted
+before doing any work. Comparing a file against itself across two *locations* is comparing two
+environments — CLAUDE.md edit-safety (d). Re-run with both copies in `scripts/lib/`, output is
+byte-identical. A less careful read of that first result would have reverted a correct edit.
+
+**Owner also ruled the conditional-DoD disposition:** the `If ported:` criteria that a no-port ruling
+leaves inapplicable stay **open now** and are marked `n/a` **at close**, each citing the ruling that
+made it inapplicable. Not ticked as satisfied — a sprint closing 31/31 when 14 were never applicable
+reads as more work than happened (L-088).
+
+T3 DoD: **4 of 4**. Sprint total **7 of 31**.
+
+consequence · T3 · behaviour:material · governance:high
