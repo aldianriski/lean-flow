@@ -2063,3 +2063,81 @@ paragraph. The true tally is **§11 x31 · §9 x16 · §12 x11 · §10 x10 = 68*
 `assert_absent` with two spaces and the counting pattern required one. Corrected above. The derived
 set — {§9,§10,§11,§12}, 43 rules — is unchanged, so nothing built on Round 17 moves. Found by an
 outside reviewer, not by the author; the four numbers were printed beside the 68 and never added up.
+
+## Round 20 — T2, T4 and T5 measured; three different mechanisms (2026-09-20)
+
+SPRINT-103 T2/T4/T5 first DoD. Two runs each, serial, same session and same constrained host as
+Rounds 17–19 (485–782 MB free of 14,078 MB). Round 16's figures are carried in the last column for
+cross-check; every one agrees within this host's drift, and the three that read high do so together,
+which is the signature of host degradation rather than of three independent errors.
+
+| target | run 1 | run 2 | user | sys | CPU as % of wall | Round 16 |
+|---|---:|---:|---:|---:|---:|---:|
+| T5 `run-qa-budget-position-fixtures.sh` | 68.7 s | 68.8 s | 6.4 / 11.9 | 10.1 / 23.7 | **24% / 52%** | 66 s |
+| T4 `run-conformance-engine-fixtures.sh` | 110.3 s | 106.0 s | 39.6 / 36.5 | 62.0 / 59.2 | **92% / 90%** | 98 s |
+| T2 `run-layers-observed-fixtures.sh` | 185.7 s | 182.9 s | 51.2 / 50.6 | 74.7 / 73.2 | **68% / 68%** | 153 s |
+
+### T5 — wait-bound. The ruling was right and this is what proves it
+
+**Two runs 0.1 s apart (68.7, 68.8) while their CPU totals differed by more than 2×** (16.5 s vs
+35.6 s). Wall time that is invariant to a doubling of CPU is not doing work — it is waiting. Only
+24% of the first run's wall clock is CPU at all. The cost is the `WINDOW=60` `timeout` that case 2
+must sit out to demonstrate TD-084's silent-until-the-ceiling shape, exactly as the source said.
+
+A port cannot reach this: the wait *is* the assertion. Confirms the T5 ruling on measurement rather
+than on reading, which is what D2 asked for.
+
+### T2 — spawn-shaped, and the one target where a port is the right instrument
+
+`sys` is **59% of CPU time** (74.7 vs 51.2), and 32% of wall is not CPU at all — the signature of a
+process blocking on subprocess and filesystem work. Structure agrees: 29 throwaway `git init`
+repositories, ~92 further git spawns via `commit_all`, ~55 checker invocations. The checker itself
+costs 11.1–12.2 s against one real sprint file with 10 git calls inside 8 loops.
+
+**T2 ruling: portable.** This is the profile SPRINT-102's successful ports had, and the only one of
+the five hotspots that has it.
+
+### T4 — half engine, half fixture construction; only the second half is reachable
+
+`sys` is **61% of CPU**, so it is spawn-shaped too, but the spawns are not all the harness's own.
+Decomposing against the per-call engine costs measured in Round 17 — 18 calls on a 6-rule spec at
+~1.3 s, 7 on the full spec at ~2.9 s, 13 on tiny purpose-built specs at ~0.5 s:
+
+    engine                18(1.3) + 7(2.9) + 13(0.5)  ~= 50 s
+    everything else       106 s - 50 s                 ~= 56 s   (fixture construction: 92 greps,
+                                                                  20 awks, 11 mkdirs, file writes)
+
+**This decomposition is arithmetic over separately measured per-call costs, not a direct
+measurement of either half** — it is good enough to rule on and not good enough to quote as a
+result. On it: the ~50 s of engine time is **unreachable** (T3's ruling makes
+`conformance-engine.sh` read-only, ADR-043), while the ~56 s of fixture construction is ordinary
+spawn-shaped harness work and is portable. A narrower lever also exists — the 7 remaining full-spec
+calls are ~20 s and some may take T1's reduction — but several of those cases exist precisely to
+test full-spec dispatch behaviour, so that is a case-by-case judgement, not a sweep.
+
+**T4 ruling: portable for roughly half its cost, and the half that is not is out of scope by T3.**
+
+### Disambiguation — `layers-observed` vs `layers-completeness` (T2 DoD 2)
+
+SPRINT-102 spent a day porting the wrong one of these because the names are near-identical and
+TD-090's ranking named the other. Stated once, plainly, so the substitution cannot be repeated:
+
+| | leg | second source it compares `Layers:` against |
+|---|---|---|
+| `check-layers-completeness` | **14** | files implied by the task's **DoD / Acceptance prose**, written at promote time |
+| `check-layers-observed` | **15** | files **actually touched in git** since the sprint's `plan_commit` |
+
+One reads what the author *said they would touch*; the other reads what the commits *show was
+touched*. They catch different misses and neither subsumes the other. **SPRINT-102 ported
+`completeness` (leg 14); SPRINT-103 T2's target is `observed` (leg 15)** — the shipped port is not
+reusable here beyond its shape, which the sprint Plan already says and this table now makes
+checkable at a glance.
+
+Both source files already cross-reference each other in their headers; the gap was that no *Round*
+did, and the Round is what a reader consults when choosing a target from a ranking.
+
+**Noticed while confirming this, not fixed here (outside T2's scope):**
+`scripts/lib/check-layers-completeness.ts`'s header still calls
+`evals/run-layers-completeness-fixtures.sh` "the slowest harness in the gate (measured ~55-70s)".
+Round 16 retired that claim — it is not in the top 20, and the five ported checkers now total 17 s.
+Same stale-rationale shape corrected in `qa-check.sh` at :1169 this sprint. Worth a follow-up.

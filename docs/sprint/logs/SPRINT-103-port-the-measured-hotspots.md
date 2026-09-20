@@ -454,3 +454,47 @@ The non-overlap claim uses the best baseline run and is unaffected. Host was 485
 T1: **7 of 11**. Sprint total **13 of 35**.
 
 consequence · T1 · behaviour:material · governance:low
+
+### 2026-09-20 | progress | T2, T4, T5 measured — three different mechanisms, three different rulings
+
+Two runs each, serial. Full figures → `qa-gate-timing.md` **Round 20**. Every figure cross-checks
+against Round 16 within this host's drift, and the three that read high do so **together**, which
+is host degradation rather than three independent errors.
+
+| target | runs | sys share of CPU | CPU as % of wall | Round 16 | mechanism |
+|---|---|---:|---:|---:|---|
+| T5 qa-budget-position | 68.7 · 68.8 s | — | **24% / 52%** | 66 s | wait-bound |
+| T4 conformance-engine-fixtures | 110.3 · 106.0 s | 61% | 92% | 98 s | spawn-shaped, half unreachable |
+| T2 layers-observed | 185.7 · 182.9 s | 59% | 68% | 153 s | spawn-shaped |
+
+**T5 — the ruling is now proven, not read.** Two runs **0.1 s apart** while their CPU totals
+differed by **more than 2×** (16.5 s vs 35.6 s). Wall time invariant to a doubling of CPU is not
+working, it is waiting; only 24% of the first run's wall is CPU at all. The cost is the `WINDOW=60`
+`timeout` case 2 must sit out. A port cannot reach it — the wait *is* the assertion.
+
+**T2 — portable, and the only one of the five with that profile.** `sys` is 59% of CPU and a third
+of wall is not CPU at all: blocking on subprocesses and the filesystem. 29 throwaway git repos, ~92
+further git spawns, ~55 checker calls, and the checker itself is 11–12 s per real sprint file with
+10 git calls inside 8 loops. This is the shape SPRINT-102's successful ports had.
+
+**T4 — portable for about half, and the other half is out of scope.** Decomposing against Round
+17's per-call engine costs: ~50 s of its ~106 s is engine invocations (18 on a 6-rule spec, 7 full,
+13 tiny) and ~56 s is fixture construction. **That split is arithmetic over separately measured
+per-call costs, not a direct measurement of either half** — enough to rule on, not enough to quote.
+The engine half is unreachable under T3's ruling (ADR-043); the fixture-construction half is
+ordinary spawn-shaped harness work and is portable.
+
+**T2 DoD 2 — the two checkers are now disambiguated in a Round**, which is where a reader choosing
+a target from a ranking actually looks; both source headers already cross-referenced each other.
+`completeness` (leg 14) compares `Layers:` against files implied by **DoD/Acceptance prose**;
+`observed` (leg 15) against files **actually touched in git** since `plan_commit`. SPRINT-102 ported
+leg 14; this sprint's T2 is leg 15.
+
+**Found while confirming that, not fixed (outside scope):**
+`scripts/lib/check-layers-completeness.ts`'s header still calls its fixture harness "the slowest
+harness in the gate (~55-70s)" — Round 16 retired that. Same stale-rationale shape as the
+`qa-check.sh:1169` comment corrected this sprint. Follow-up, named not silently patched.
+
+Sprint total **17 of 35**.
+
+consequence · T2,T4,T5 · behaviour:low · governance:low

@@ -83,8 +83,8 @@ wrong one was chosen; the shipped port is not reusable here beyond its shape.
 mechanism recorded.
 
 **DoD:**
-- [ ] Per-target measurement recorded before any code is written
-- [ ] The two checkers' names are disambiguated wherever both appear, so the next reader cannot repeat the substitution — *Verify: `layers-observed` vs `layers-completeness` are distinguished in the Round and in the port's header*
+- [x] Per-target measurement recorded before any code is written
+- [x] The two checkers' names are disambiguated wherever both appear, so the next reader cannot repeat the substitution — *Verify: `layers-observed` vs `layers-completeness` are distinguished in the Round and in the port's header*
 - [ ] If ported: oracle retained · byte-identical parity over fixtures **and** all real sprint Plans, **including non-archived copies** — the archived corpus is SKIPPED by the sibling checker and comparing it yields two empty outputs that agree while proving nothing (L-198, hit twice in SPRINT-102)
 - [ ] If ported: retained must-FAIL + sibling control + seeded break, one hash convention
 - [ ] If ported: wiring diff committed before applied
@@ -125,7 +125,7 @@ interface changing.
 **Acceptance:** ported with parity proven, or ruled unportable with the mechanism recorded.
 
 **DoD:**
-- [ ] Per-target measurement recorded before any code is written
+- [x] Per-target measurement recorded before any code is written
 - [x] T3's ruling read and respected — state in one line what it permits here
 - [ ] If ported: oracle retained · byte-identical parity · retained must-FAIL + sibling control + seeded break, one hash convention
 - [ ] If ported: wiring diff committed before applied
@@ -145,7 +145,7 @@ say so in the Round so TD-167's fix direction is informed by a second sighting.
 **Acceptance:** ported with parity proven, or ruled unportable with the mechanism recorded.
 
 **DoD:**
-- [ ] Per-target measurement recorded before any code is written
+- [x] Per-target measurement recorded before any code is written
 - [x] Checked for TD-167's shape (an assertion whose input is a clock) and the finding recorded either way
 - [ ] If ported: oracle retained · byte-identical parity · retained must-FAIL + sibling control + seeded break, one hash convention
 - [ ] If ported: wiring diff committed before applied
