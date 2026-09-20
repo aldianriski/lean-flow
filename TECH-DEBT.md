@@ -295,6 +295,31 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-171** severity: medium | status: open | created: Sprint-103
+  - Summary: **`evals/run-conformance-engine-fixtures.sh`'s fixture construction is portable and
+    unported** — roughly **56 s of its measured ~106 s**. SPRINT-103 T4 ruled the target *split*:
+    the other ~50 s is `conformance-engine.sh` invocations, which ADR-043 puts out of reach for now,
+    but the fixture-construction half is ordinary spawn-shaped harness work (92 `grep`, 20 `awk`,
+    11 `mkdir`, plus file writes) with no consumer surface and no engine change required.
+  - **Measured** (`qa-gate-timing.md` Round 20): 110.3 s and 106.0 s over two runs, `sys` **61% of
+    CPU**. The 50/56 split is **arithmetic over separately measured per-call engine costs** (18
+    calls on a 6-rule spec at ~1.3 s, 7 on the full spec at ~2.9 s, 13 on tiny specs at ~0.5 s), not
+    a direct measurement of either half — good enough to rule on, not good enough to quote as a
+    result. **Re-measure the two halves directly before committing to the port**, which is the whole
+    lesson SPRINT-103 exists to carry forward.
+  - **A second, narrower lever exists and is not the same task**: 7 of T4's 38 engine calls still
+    hand over the full 100-rule spec (~20 s). SPRINT-103 T1's awk-derived reduction would apply —
+    but several of those cases exist specifically to exercise full-spec dispatch behaviour, so it is
+    a case-by-case judgement, not a sweep. Doing it requires reading each case's intent first.
+  - Fix direction (**not a ruling**): Tier **G** under ADR-029 — retained `.sh` oracle, byte-identical
+    differential parity, must-FAIL fixtures with a sibling control, seeded-break proof under one
+    stated hash convention, and a worktree-isolated outside reviewer. The SPRINT-103 T2 port
+    (`check-layers-observed.ts` + `run-layers-observed-differential.ts`) is the worked pattern.
+  - **Why it was not done in SPRINT-103**: the sprint's acceptance for T4 was two-branch (ported, or
+    ruled unportable) and the measurement fit neither. The owner ruled that recording the split and
+    filing the reachable half was the honest outcome rather than opening a fourth build late in the
+    sprint — D2's "a recorded ruling is a successful task" applied to a case the Plan did not
+    anticipate.
 - **TD-170** severity: medium | status: open | created: Sprint-103
   - Summary: **A governance commit that also appends to the sprint's own Execution Log is reported
     `UNATTRIBUTED` by leg 15** — and appending to that Log is mandatory for every task, so this

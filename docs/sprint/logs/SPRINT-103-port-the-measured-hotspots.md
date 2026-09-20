@@ -869,3 +869,40 @@ commit's overall verdict. Comment-only; non-comment diff is zero lines.
 
 review · T3 · outside-reviewer-worktree-isolated · behaviour:material · governance:high
 review · T0 · owner-approved-at-g2-and-outside-reviewed · behaviour:material · governance:high
+
+### 2026-09-20 | progress | T4 ruled, ADR-039 split applied, convention written, Plan exhausted
+
+**T4 — recorded split ruling (owner).** Its acceptance was two-branch and the measurement fit
+neither: ~50 s of ~106 s is engine invocation, out of reach under ADR-043; ~56 s is portable fixture
+construction. Filed as **TD-171** with the split labelled as *arithmetic over separately measured
+per-call costs, not a direct measurement of either half* — good enough to rule on, not to quote.
+D2's "a recorded ruling is a successful task", applied to a case the Plan did not anticipate.
+
+**ADR-039 split (owner).** `authority` (21.2 s) · `doc-caps` (38.8 s) · `night-run-rollup` (44.0 s)
+join `eval_harnesses_optin` — ~104 s, honouring the parity mandate for three of the four ports.
+`layers-observed` (189.3 s) stays **excluded and named**, its cost written at the site, its own
+ruling deferred until the post-sprint gate total exists. Deciding a 189 s recurring cost against a
+total nobody has re-measured is the mistake this sprint was built to stop.
+
+**The convention now has a home.** `.claude/CONTEXT.md` § Sprint model states how leg 15 attributes
+a commit, in rule order, and that `research:`/`todo:`/`fix(...)` belong to commits made *outside* an
+active sprint's range — plus the half I got wrong twice: the files must be covered by **that task's**
+`Layers:`, so a mixed-concern commit fails even with a correct subject. It was enforced in code and
+written nowhere a committer reads, which is L-151 exactly.
+
+**Exemption recorded, history not rewritten.** `ccd6c6c` and `e9c7e14` are exempted for this sprint
+only. Amending them would falsify the shas cited by name in ADR-043, TD-170's evidence trail and
+this Log. The next commit of that shape reddens against a rule that now exists in prose as well.
+
+**A counting error of mine, corrected.** I have been reporting "35 DoD" all sprint. The Plan holds
+**34**; the 35th was the Owner-action checklist's single row, which my `grep -c '^- \[ \]'` swept up
+because it uses the same syntax. Separated now — Plan and Owner-action counted apart. Nothing
+downstream depended on it, but every rollup figure I gave carried the error.
+
+**Plan exhausted: 23 ticked · 11 `[~]` n/a · 0 open.** Each n/a carries the ruling that made it
+inapplicable, inline — T1 took branch (c) so there is no port to retain an oracle for; T4 was split
+and its reachable half filed; T5's wait *is* its assertion. Marked `[~]` rather than `[x]`: closing
+34/34 when 11 were never applicable reads as more work than happened (L-088).
+
+consequence · T0 · behaviour:low · governance:high
+review · T0 · owner-ruled-and-outside-reviewed · behaviour:low · governance:high

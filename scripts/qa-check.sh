@@ -1132,7 +1132,7 @@ eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh r
 # ADR-039 records the §4 DRIFT WINDOW this opens and names when parity is MANDATORY -- promote, close,
 # and any full-profile run. Shell RETAINS §4 authority throughout (EPIC-014 D2): this is not a
 # cutover, and a green default gate says nothing about TS/Shell agreement.
-eval_harnesses_optin="run-adr-family-fixtures.sh run-s4-differential-parity.sh selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh"
+eval_harnesses_optin="run-adr-family-fixtures.sh run-s4-differential-parity.sh selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts"
 # run-qa-budget-position-fixtures.sh (SPRINT-086 T3, TD-091) joins the opt-in set by the cost rule,
 # not the git rule -- it builds no repos, but it DOES invoke real copies of qa-check.sh (bounded by
 # `timeout`) to prove where the budget checkpoint is actually reached, which this repo's own
@@ -1185,19 +1185,19 @@ eval_harnesses_optin="run-adr-family-fixtures.sh run-s4-differential-parity.sh s
 # Harnesses deliberately NOT gated at all (neither always-on nor opt-in). Empty is a valid state --
 # but a paid/non-deterministic harness is excluded by being NAMED here with a reason, never by being
 # left out of the lists above.
-# The four TS differential-parity harnesses are NAMED here rather than left out of the lists,
-# which is what this variable is for. They compare a ported TS checker against its retained .sh
-# oracle row by row, so each needs BOTH implementations and a real spawn per input. Measured
-# 2026-09-20 on this host: authority 21.2s, doc-caps 38.8s, night-run-rollup 44.0s,
-# layers-observed 189.3s -- about 294s together.
+# Differential-parity harnesses compare a ported TS checker against its retained .sh oracle row by
+# row, so each needs BOTH implementations and a real spawn per input. ADR-039 makes parity mandatory
+# at promote and close -- the opt-in profile -- so three of the four now live in
+# eval_harnesses_optin above. Measured 2026-09-20 on this host: authority 21.2s, doc-caps 38.8s,
+# night-run-rollup 44.0s (~104s together, the cost of honouring ADR-039 for those three ports).
 #
-# OPEN QUESTION, deliberately not settled here (SPRINT-103). ADR-039 says parity is mandatory at
-# promote and close, which is the opt-in profile -- so on that reading these belong in
-# eval_harnesses_optin, not here. But adding ~294s to every promote and close would more than
-# cancel this sprint's own saving at exactly those two moments, and that trade is an owner
-# ruling with a measured cost, not a wiring decision. Excluded-with-a-reason keeps the gate
-# honest meanwhile: they are named, their cost is stated, and nothing pretends they ran.
-eval_harnesses_excluded="run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts run-layers-observed-differential.ts"
+# run-layers-observed-differential.ts is EXCLUDED rather than opt-in, and named here because that is
+# what this variable is for. It measures 189.3s on its own -- nearly twice the other three combined,
+# and enough to swamp SPRINT-103's own saving at exactly the two moments ADR-039 cares about. Owner
+# ruling (SPRINT-103): take the ~104s now, and rule this one separately once the post-sprint gate
+# total is known, rather than deciding a 189s recurring cost against a total nobody has re-measured.
+# Its cost is stated here so the trade stays visible; nothing pretends it ran.
+eval_harnesses_excluded="run-layers-observed-differential.ts"
 
 eval_harnesses="$eval_harnesses_always"
 if [ "${QA_FULL:-0}" = "1" ]; then

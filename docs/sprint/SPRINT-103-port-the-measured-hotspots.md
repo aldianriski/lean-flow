@@ -64,9 +64,9 @@ rest of this sprint under T3's ruling (ADR-043).
 - [x] **(c)** Byte-identical parity: all 68 cases produce the same PASS/FAIL verdicts and the same finding strings under the reduced spec as under the full one — *Verify: the differential reports 68/68 identical*
 - [x] **(c)** The 43-rule set is justified in the harness header **from the assertions, not from the section names** — the existing header's §9+§10 claim is wrong and is corrected in the same edit (L-186)
 - [x] **(c)** Retained must-FAIL + sibling control + seeded-break proof under ONE stated hash convention
-- [ ] If ported: `.sh` retained as live oracle; byte-identical differential parity over every fixture **and** the real corpus it applies to — *Verify: the differential reports N/N identical, N stated*
-- [ ] If ported: retained must-FAIL + sibling control + seeded-break proof under ONE stated hash convention
-- [ ] If ported: wiring diff **committed as a reviewable file before being applied** (three reviewers in SPRINT-102 could not audit wiring that lived only in chat — L-151)
+- [~] If ported: `.sh` retained as live oracle; byte-identical differential parity over every fixture **and** the real corpus it applies to — *Verify: the differential reports N/N identical, N stated* — **n/a: no port occurred.** T1 resolved on branch **(c)** (ruled not spawn-shaped; cost removed by an awk-derived reduced spec). The `.sh` was never replaced, so there is no oracle to retain, nothing to prove parity against, and no leg to rewire. The equivalent Tier G bar was met in its own right and is ticked above (drift anchor, 68/68 reduced-vs-full parity, retained must-FAIL + control + seeded break).
+- [~] If ported: retained must-FAIL + sibling control + seeded-break proof under ONE stated hash convention — **n/a: no port occurred.** T1 resolved on branch **(c)** (ruled not spawn-shaped; cost removed by an awk-derived reduced spec). The `.sh` was never replaced, so there is no oracle to retain, nothing to prove parity against, and no leg to rewire. The equivalent Tier G bar was met in its own right and is ticked above (drift anchor, 68/68 reduced-vs-full parity, retained must-FAIL + control + seeded break).
+- [~] If ported: wiring diff **committed as a reviewable file before being applied** (three reviewers in SPRINT-102 could not audit wiring that lived only in chat — L-151) — **n/a: no port occurred.** T1 resolved on branch **(c)** (ruled not spawn-shaped; cost removed by an awk-derived reduced spec). The `.sh` was never replaced, so there is no oracle to retain, nothing to prove parity against, and no leg to rewire. The equivalent Tier G bar was met in its own right and is ticked above (drift anchor, 68/68 reduced-vs-full parity, retained must-FAIL + control + seeded break).
 - [x] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
 - [x] Before/after stated as a **range over ≥3 alternating runs**, never a point estimate — this host shows >3× run-to-run variance
 
@@ -127,10 +127,10 @@ interface changing.
 **DoD:**
 - [x] Per-target measurement recorded before any code is written
 - [x] T3's ruling read and respected — state in one line what it permits here
-- [ ] If ported: oracle retained · byte-identical parity · retained must-FAIL + sibling control + seeded break, one hash convention
-- [ ] If ported: wiring diff committed before applied
-- [ ] Outside reviewer, worktree-isolated
-- [ ] Before/after as a range over ≥3 runs
+- [~] If ported: oracle retained · byte-identical parity · retained must-FAIL + sibling control + seeded break, one hash convention — **n/a: no port occurred.** T4 resolved on a recorded **split ruling** (Round 20): ~50 s of its ~106 s is `conformance-engine.sh` invocation, out of reach under ADR-043, and the reachable ~56 s of fixture construction is filed as **TD-171** for its own sprint. Nothing was ported, so there is no parity, wiring, review or before/after to state.
+- [~] If ported: wiring diff committed before applied — **n/a: no port occurred.** T4 resolved on a recorded **split ruling** (Round 20): ~50 s of its ~106 s is `conformance-engine.sh` invocation, out of reach under ADR-043, and the reachable ~56 s of fixture construction is filed as **TD-171** for its own sprint. Nothing was ported, so there is no parity, wiring, review or before/after to state.
+- [~] Outside reviewer, worktree-isolated — **n/a: no port occurred.** T4 resolved on a recorded **split ruling** (Round 20): ~50 s of its ~106 s is `conformance-engine.sh` invocation, out of reach under ADR-043, and the reachable ~56 s of fixture construction is filed as **TD-171** for its own sprint. Nothing was ported, so there is no parity, wiring, review or before/after to state.
+- [~] Before/after as a range over ≥3 runs — **n/a: no port occurred.** T4 resolved on a recorded **split ruling** (Round 20): ~50 s of its ~106 s is `conformance-engine.sh` invocation, out of reach under ADR-043, and the reachable ~56 s of fixture construction is filed as **TD-171** for its own sprint. Nothing was ported, so there is no parity, wiring, review or before/after to state.
 
 ### T5 — Rule and port `run-qa-budget-position-fixtures.sh` `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `evals/run-qa-budget-position-fixtures.sh` · `docs/research/logs/qa-gate-timing.md`
@@ -147,14 +147,17 @@ say so in the Round so TD-167's fix direction is informed by a second sighting.
 **DoD:**
 - [x] Per-target measurement recorded before any code is written
 - [x] Checked for TD-167's shape (an assertion whose input is a clock) and the finding recorded either way
-- [ ] If ported: oracle retained · byte-identical parity · retained must-FAIL + sibling control + seeded break, one hash convention
-- [ ] If ported: wiring diff committed before applied
-- [ ] Outside reviewer, worktree-isolated
-- [ ] Before/after as a range over ≥3 runs
+- [~] If ported: oracle retained · byte-identical parity · retained must-FAIL + sibling control + seeded break, one hash convention — **n/a: ruled unportable.** T5's 66 s is a deliberate `WINDOW=60` `timeout` that case 2 must sit out to demonstrate TD-084's silent shape — proven on measurement (two runs 0.1 s apart while CPU differed >2×, only 24% of wall being CPU). The wait *is* the assertion, so no port exists to give an oracle, parity, wiring, review or range.
+- [~] If ported: wiring diff committed before applied — **n/a: ruled unportable.** T5's 66 s is a deliberate `WINDOW=60` `timeout` that case 2 must sit out to demonstrate TD-084's silent shape — proven on measurement (two runs 0.1 s apart while CPU differed >2×, only 24% of wall being CPU). The wait *is* the assertion, so no port exists to give an oracle, parity, wiring, review or range.
+- [~] Outside reviewer, worktree-isolated — **n/a: ruled unportable.** T5's 66 s is a deliberate `WINDOW=60` `timeout` that case 2 must sit out to demonstrate TD-084's silent shape — proven on measurement (two runs 0.1 s apart while CPU differed >2×, only 24% of wall being CPU). The wait *is* the assertion, so no port exists to give an oracle, parity, wiring, review or range.
+- [~] Before/after as a range over ≥3 runs — **n/a: ruled unportable.** T5's 66 s is a deliberate `WINDOW=60` `timeout` that case 2 must sit out to demonstrate TD-084's silent shape — proven on measurement (two runs 0.1 s apart while CPU differed >2×, only 24% of wall being CPU). The wait *is* the assertion, so no port exists to give an oracle, parity, wiring, review or range.
 
 ## Owner-action checklist
 
-- [ ] Rule T3 if it asks — the consumer-facing engine is the one place in this sprint where a wrong call reaches adopters
+- [x] Rule T3 if it asks — the consumer-facing engine is the one place in this sprint where a wrong call reaches adopters
+- [x] **Ruled TD-170** — widen `is_governance_commit()`'s allow-list to include `docs/sprint/`; applied to both implementations, fixtures retained, outside-reviewed
+- [x] **Ruled ADR-039 split** — `authority` · `doc-caps` · `night-run-rollup` differentials (~104 s) join the opt-in set; `layers-observed` (189.3 s) stays excluded and named, its own ruling deferred until the post-sprint gate total is known
+- [x] **EXEMPTION, recorded: two commits leg 15 correctly rejects.** `ccd6c6c` (`fix(TD-170): …`) matches no attribution rule while touching three code files; `e9c7e14` (`sprint(103) T2: …`) carries `docs/adr/ADR-043…`, which T2's `Layers:` does not declare. Both are mixed-concern subjects written before the convention was load-bearing anywhere a committer reads. **Exempted for this sprint only**, history not rewritten — the shas are cited by name in ADR-043, TD-170's evidence trail and this Log, and amending them would falsify those references. The convention is now written in `.claude/CONTEXT.md` § Sprint model, so the next commit that does this reddens against a rule that exists in prose as well as in code.
 
 ## Decisions (pre-locked)
 
