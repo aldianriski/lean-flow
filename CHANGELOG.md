@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-13
+last_updated: 2026-09-20
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,55 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+## SPRINT-102 — Make the Gate Green (2026-09-20)
+
+**Unreleased — no version bump.** `skills/`, the four `*-plugin/*.json` manifests, `README.md` and
+`spec/` are untouched (derived from `git diff --name-only ef02be0..HEAD`, not judged), and the three
+changed scripts are this repo's own tooling rather than ADR-027's consumer-facing conformance
+engine. No consumer-visible change ⇒ nothing to release. Spec unchanged at 0.11.0. **17 of 18 DoD
+`[x]`, 1 `[~]`.**
+
+**The ceiling was ruled against the measurement (`ADR-042`, T1 · TD-117 · TD-090).** For four sprints
+the direction rested on TD-117's *"raising the budget cannot work, the 600 s ceiling being
+external."* Two detached full-profile runs completed at **1263 s** and **1370 s** — 2.1× and 2.3× the
+ceiling — ran every harness, truncated nothing, and printed their own verdicts. The constraint is a
+**foreground-call** limit, and the assertion was unfalsifiable in the direction it claimed:
+`qa_ceiling_check` runs ~20 lines before the verdict, so its FAIL branch could only ever fire in runs
+that were *not* killed, while its message read *"a run past the ceiling is killed from outside with
+no verdict line."* The branch now prints an **uncounted INFO** naming the elapsed figure, the
+not-killed fact and the foreground caveat. The trade-off is recorded rather than smoothed: a
+genuinely too-slow gate now reports where it used to fail, and TD-117's own *"cheaper still to learn
+to ignore, which is how a guard dies"* applies to the line this creates.
+
+**Three Bun harnesses were reporting `only 0 test(s) ran` over green suites (T2).** `run-dod-delta-`,
+`run-s4-ts-evaluators` and `run-s4-differential-parity` parsed `bun test` output without stripping
+ANSI, so **156 assertions ran and were never counted**. Fixed; discrimination proven live and then
+reverted, which is filed honestly as **TD-165** rather than claimed as a retained fixture — these
+three wrap real production test files instead of a fixtures directory, so retaining a must-FAIL would
+mean a permanently broken shipped test or new shell scaffolding.
+
+**An unmatched task-shaped commit subject now FAILs loudly (T4 · `TASK-351` · L-202).** Rule 7 in
+`attributeClaim`: a first token that looks like a task but matches no structural arm returns
+`unmatched-shape` and names the subject, instead of falling through to a silent coord/unscoped pass.
+Its first fix **reintroduced the class it closed** — the exclusion scanned arbitrary free text
+case-insensitively, so any subject whose prose merely contained a `T<digit>` substring was re-exempted
+— caught by a worktree-isolated outside review and sent back as a bounded retry rather than patched
+by the coordinator. Reach, re-derived by that reviewer over four independent populations (commit
+ancestry, `main`, `git log --all` including ~90 unmerged agent branches, and `git fsck --unreachable`):
+**exactly 1 subject in this repository's entire history**, which is the retained fixture.
+
+**The close found two defects nothing else had.** The first completed system-verify in this sprint
+printed `226 pass, 2 fail`: a harness file changed twice by T4 and declared by no task (fixed, fourth
+`Layers:` correction of the sprint), and a commit that ticked another task's DoD under its own
+subject. The second is true and cannot be fixed forward — filed as **TD-166** with **L-205**, because
+the leg's population is scoped to the *active* sprint, so the finding clears by closing while ADR-021
+blocks the close on it. Closed on an owner ruling, with the defect carried rather than waived.
+
+`TD-165` · `TD-166` filed · `TASK-354` filed `origin: close-retro` · **L-205** filed · **L-108**
+bumped to count 15, **L-120** to ×6 and **L-151** to ×5 — every one of those three a sighting where
+the promoted rule was loaded and cited in the same session it failed to reach.
 
 ---
 ## v1.65.1 — Findings That Mean What They Say (2026-09-14)

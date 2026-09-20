@@ -2,11 +2,11 @@
 sprint: 102
 slug: make-the-gate-green
 owner: Maintainer
-last_updated: 2026-09-16
-status: active
+last_updated: 2026-09-20
+status: closed
 gates_signed: G1,G2 @ 516c81c
 plan_commit: ef02be0
-close_commit: [sha — set at close]
+close_commit:
 update_trigger: sprint execute/close events
 ---
 
@@ -143,6 +143,46 @@ silently exempt. Proposed by its own builder when asked to report rather than bu
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
 
+| File | Task | Change (WHY) | Risk | Test |
+|------|------|--------------|------|------|
+| `scripts/qa-check.sh` | T1 | the ceiling branch reports instead of failing — it was FAILing runs it also proved were not killed (ADR-042) | Med | fixture cases 12/13 + a detached full-profile run printing its own verdict |
+| `scripts/lib/qa-budget-check.sh` · `evals/run-qa-budget-fixtures.sh` | T1 | new `qa_ceiling_info_line`; case 12 extracts the **shipped** case-statement by its own anchors rather than copying it | Med | seeded break reddened 12, sibling 13 green, restore byte-identical |
+| `docs/adr/ADR-042-*.md` · `docs/DECISIONS.md` · `docs/knowledge-index.md` | T1 | the ruling recorded where the assertion's reader meets it, not only in the ledger (L-151) | Low | 42 index rows = 42 files |
+| `docs/research/logs/qa-gate-timing.md` · `TECH-DEBT.md` (TD-117 · TD-090) | T1 | Round 15's two detached runs (1263 s · 1370 s) + the 272-spawn cost mechanism | Low | Round names `START_EPOCH`/`END_EPOCH` |
+| `evals/run-dod-delta-fixtures.sh` · `run-s4-ts-evaluators.sh` · `run-s4-differential-parity.sh` | T2 | strip ANSI before parsing `bun test` counts — all three reported `only 0 test(s) ran` over green suites, 156 assertions silently unrun | Med | discrimination proven live (seeded `test(`→`test.skip(`), **not retained** → TD-165 |
+| `scripts/lib/check-dod-delta.ts` | T4 | Rule 7: a task-shaped first token no arm admits becomes a **loud** exemption; its scope comment narrowed to what it actually closes | Med | 61 tests; full-history scan = 1 subject, re-derived by an outside reviewer over 4 populations |
+| `evals/dod-delta.test.ts` · `evals/fixtures/dod-delta/` (4 dirs) | T4 | retained must-FAIL ×3 + sibling control, all drawn from real history | Med | seeded break reddened exactly the new cases; `min_tests` 48 → 54 → 61 |
+| `docs/sprint/SPRINT-102-*.md` + `logs/` sibling | T1–T4 | Plan ticks · four `Layers:` corrections · the Execution Log | Low | `check-layers-observed.sh` PASS; `dod-delta` clean on every commit but `b89d6f0` |
+
+> **T3 changed no file.** It was found already satisfied before dispatch — recorded as a planning
+> defect in the Log, not as a win.
+
 ## Retro
 
-<!-- Written at close. -->
+**Retrieval check** — yes, twice, and both are filed. **L-196's own derivation command was wrong**
+was inherited knowledge from SPRINT-101 and did not recur here. What did: the `severity: **high**`
+census miss is a fifteenth sighting of **L-108**, whose promoted rule was loaded and being applied to
+the *ids* in the same command that mis-selected the *statuses*; and the wrapper-exit shape is a sixth
+sighting of **L-120**, assembled by the coordinator in the session that quoted (c) verbatim. Neither
+was a retrieval miss in the "could not find it" sense — both were found, cited, and still not
+carried across one selector. That is the more expensive failure mode and the reason both are recorded
+as sightings rather than new rules.
+
+**Cost** — coordinator inline + 1 worktree-isolated reviewer (~116k subagent tokens, 48 tool calls,
+~6.6 min) for the close's Tier G change; 2 full-profile gate runs (~23 min each; one discarded
+because it was launched against a tree still being edited, and it died with its parent shell before
+printing a verdict — no result from it was used). Per DoD **delivered**: 18 DoD across 4 tasks.
+
+**Worked**
+- **Running the gate to a printed verdict is the only instrument that found two of this sprint's defects.** The undeclared `Layers:` file survived four commits and two builder-side reviews; the cross-task tick survived the same. Both fell to the first system-verify that actually completed. The previous entry's "System-verify running" with no verdict was not a cosmetic gap.
+- **The outside reviewer disagreed usefully by deriving, not by reading.** Asked to check "rule 6a closed the 137, Rule 7 reaches 1", it proved the first *structurally* (6a returns before 7 can be reached) and the second over **four** independently derived populations including `git fsck --unreachable`. A reviewer told to verify a claim will read; one told to derive a number will compute.
+- **Verifying a judgment DoD found a real defect.** "Not oversold at G2" reads like a formality. Checking it against the artifact a consumer meets — rather than the four artifacts a reviewer meets — surfaced the one overselling line in the shipped code.
+
+**Friction**
+- **A rollup count that is asserted rather than derived defeats ADR-016 entirely.** `80f1122` declared `PLAN_EXHAUSTED` in both the Log and the commit subject over an open DoD, because the number was written from memory. The count exists precisely to make a mid-Plan ending visible, and it cannot do that job while it is a claim.
+- **Four `Layers:` corrections in one sprint, three caught by builders and one only by the gate** — the L-100 cost is real and predictable, but the one that escaped was a file (`run-dod-delta-fixtures.sh`) touched twice by the *same* task, which is the case a builder is least likely to re-read.
+- **The close ran on a true FAIL nobody can fix forward** → TD-166 · L-205.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+- **L-205 filed** — a guard whose only clearing condition is the action it blocks is a deadlock, and its escape is always an owner ruling, so it trains the ruling instead of the fix. Count 1; promote if it recurs.
+- **Not filed, watched:** "a count written by the actor is not evidence about the actor's own run" — this is ADR-016's premise rather than a new learning, and L-120's family already owns the reporter-vs-artifact shape. If a second rollup is asserted rather than derived, that is the second sighting and it earns a row.

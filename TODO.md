@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-16
+last_updated: 2026-09-20
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -16,26 +16,30 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-102 — Make the Gate Green** → [docs/sprint/SPRINT-102-make-the-gate-green.md](docs/sprint/SPRINT-102-make-the-gate-green.md)
+> **None active.** `/lean-doc-generator promote` opens the next one.
 >
-> Promoted 2026-09-16. Four tasks: `TASK-349` (ceiling ruling) · `TASK-353` (ANSI parsing, 3 Tier G
-> harnesses) · `TASK-352` (pre-flight item 3 criterion) · `TASK-351` (dod-delta exemption). **The run
-> is not attempted here** — every task is `HITL` and two are `J2`, so this Plan fails pre-flight item
-> 3 by construction, deliberately (D2). The vehicle is SPRINT-103, all `J0`/`J1`, with
-> `TASK-319`/`TASK-188` still paired.
->
-> Predecessor: **SPRINT-101 — Prove the Run** closed 2026-09-15 at **11 of 20 DoD**, by owner ruling
-> rather than exhaustion: `TASK-326` (T3) and `TASK-335` (T4) shipped and are verified, the
-> ten-dimension `approval_envelope:` is **signed and verifying**, and `TASK-319`/`TASK-188` returned
-> to the Backlog still paired — blocked on a **green gate**, not on the envelope. See `CHANGELOG.md`
-> and the archived sprint file; the blocker is measured in **TD-117** and owned by **`TASK-349`**.
+> Predecessor: **SPRINT-102 — Make the Gate Green** closed 2026-09-20 at **17 of 18 DoD `[x]`
+> + 1 `[~]`**. The ceiling is ruled (**ADR-042**): it is a **foreground-call** limit, not a host
+> limit — two detached full-profile runs completed at 1263 s and 1370 s, ran every harness and
+> printed their own verdicts, so the assertion that FAILed them now prints an uncounted INFO. The
+> gate is **not yet green**: the close ran on one true FAIL that cannot be fixed forward
+> (`b89d6f0` ticked another task's DoD under its own subject) — carried as **TD-166** with
+> **L-205** and owned by **`TASK-354`**. `TASK-319`/`TASK-188` remain in the Backlog, still paired,
+> still blocked on a green gate. The intended vehicle is **SPRINT-103**, all `J0`/`J1`. See
+> `CHANGELOG.md` and the archived sprint file.
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
 again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 97 rows** (89 open · 8 resolved · 5 `severity: high` open) — re-derived at the
-  2026-09-16 `/triage` by row header, cross-checked by distinct id (both routes give 97). The prior
+- **Debt ledger: 99 rows** (91 open · 8 resolved · 5 `severity: high` open) — re-derived at the
+  2026-09-16 `/triage` by row header, cross-checked by distinct id (both routes give 97); **re-derived
+  at the SPRINT-102 close to 99** after TD-165 and TD-166 were filed, by the same two routes plus a
+  status census. **That census is itself an L-108 sighting worth carrying here:** selecting
+  `severity: [a-z]+ | status: (...)` returns **87 open, four short**, because the `severity: **high**`
+  rows carry bold markup — the shape a census most needs is the one a lowercase-only class silently
+  skips. It was caught only because open + resolved failed to reach the header count. Match the
+  severity token with its markup optional, and reconcile the two halves against the total every time.
   figure here (92 / 84) was written at the SPRINT-100 close and did not carry SPRINT-101's
   TD-160/161/162; this pass then filed **TD-163** and **TD-164**. A third row was drafted for the
   promote-time red gate and **withdrawn before filing** — `TD-160` already covers it, with a better
@@ -307,6 +311,36 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                   run to completion; under truncation the run never reached them (TD-117).
 
 ### P2 — Follow-on
+
+- [ ] TASK-354 — Give the `dod-delta` leg a ruled-exemption declaration, so a historical mis-attribution stops blocking every close  [size: S] [risk: low] [HITL]
+      class:      execution
+      tier:       G
+      authority:  J1
+      origin:     close-retro   # SPRINT-102 close; NOT grilled at intake, so no G1 fast-path
+      state:      ready
+      done-when:  A commit whose cross-task DoD tick has been **ruled** by the owner can be declared
+                  in a file the checker reads — `.conformance-exempt`'s ADR-031 shape (a reasoned
+                  exemption the tool parses), never a prose note in a sprint log — and
+                  `check-dod-delta.ts` reports it as a named, visible exemption rather than either a
+                  FAIL or a silent pass. Fixture: a declared commit reports the exemption and a
+                  sibling UNDECLARED cross-task tick still FAILs in the same run.
+      why:        SPRINT-102's close ran on a true FAIL it could not fix forward — `b89d6f0` ticked
+                  one of T2's DoD under a `sprint(102) T4:` subject, and a tick lives in a commit's
+                  diff, so no later commit un-ticks it. The leg's only exemptions are structural, so
+                  the remedies were a five-commit history rewrite or an owner ruling. **TD-166** is
+                  the row; **L-205** is the class: the leg's population is `plan_commit..HEAD` over a
+                  NON-recursive `docs/sprint/SPRINT-*.md` glob, and `close` archives the Plan out of
+                  that glob — so the finding clears *by closing*, while ADR-021 blocks the close on
+                  it. A guard whose findings are cleared only by passing it generates rulings, not
+                  fixes.
+      touches:    `scripts/lib/check-dod-delta.ts` · `evals/dod-delta.test.ts` ·
+                  `evals/fixtures/dod-delta/` · `evals/run-dod-delta-fixtures.sh` (the `min_tests`
+                  floor moves with any new case — declared here because SPRINT-102 twice changed it
+                  undeclared, L-100)
+      depends-on: none
+      assumes:    none
+      tracker:    TD-166 · L-205 · ADR-031 (the declaration shape to mirror) · ADR-021 (the rule that
+                  makes this blocking)
 
 - [ ] TASK-351 — Make an unmatched commit-subject shape FAIL loudly in `check-dod-delta.ts` instead of exempting itself  [size: S] [risk: low] [HITL]
       class:      execution
