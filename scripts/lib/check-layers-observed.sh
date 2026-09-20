@@ -183,6 +183,13 @@ is_governance_commit() {   # <sha> -> 0 if EVERY changed file is a governance ar
       # is the first sprint to write four Rounds during its own execution (L-105's temporal sibling:
       # the rule was sound, the window decided whether it ever fired). A file that cannot be
       # reported should not be able to disqualify; that is the same argument the two arms above make.
+      # ASSUMPTION, stated for symmetry with the epic/research arm above and because this is the
+      # most actively written tree in the repo: docs/sprint/ is doc-only by convention -- every file
+      # under it is `.md` today (`find docs/sprint -type f ! -name '*.md'` is empty). If an
+      # executable or a checker ever lands here, a real code change could ride along in one commit
+      # and be exempted. Narrow this arm at that point, not before. Note the exemption-from-
+      # REPORTING side of that risk predates TD-170 (is_excluded_committed already skips this tree);
+      # what this arm adds is only whether the commit's overall verdict becomes GOVERNANCE.
       docs/sprint/*) ;;
       *) return 1 ;;
     esac

@@ -822,3 +822,50 @@ commit that should have carried a `sprint(103) Tn:` subject. The commit is writt
 owner ruling (exempt, or amend history) — recorded, not worked around.
 
 consequence · T0 · behaviour:material · governance:high
+
+### 2026-09-20 | surprise | a claim I froze in a commit message was false — outside review caught it
+
+**Correction, and it is the durable kind.** Commit `ccd6c6c` asserts *"Leg 15 now exits 0 on both …
+the close blocker is cleared."* **That is false.** Verified now: both oracle and port exit **1**,
+byte-identically, on the real tree.
+
+**How it happened, because the mechanism matters more than the slip.** I ran the leg-15 check while
+the TD-170 fix was still *uncommitted*. In that state the checker takes its WIP leg, which applies
+the weaker all-task-union rule, and it exited 0 — correctly, for that state. **Committing the fix
+is what invalidated the verification**, because the new commit was itself unattributable. The claim
+was true when measured and false by the time it was written, and the act of recording it is what
+broke it. Round 21's own figures were taken the same way and are unaffected (they compare two
+implementations, not an exit code), which is exactly why this slipped: the differential asserts
+`oracle == port`, never `exit == 0`.
+
+**I did catch the fact independently** — the subsequent full gate run surfaced it and it was
+reported as an open finding needing an owner ruling. **What I did not do is retract the commit
+message**, and a false claim frozen in the record is worse than one never made, because it reads as
+verified. That is the defect here, not the red leg.
+
+**A second instance has since appeared** from the wiring commit: `T2:docs/adr/ADR-043-…` — changed
+by a task that never declared it. My ADR-043 tag fix rode along in a commit subjected
+`sprint(103) T2:`, and T2's `Layers:` does not name `docs/adr/`. Two instances now, different
+shapes, same root: **my commit subjects and the files they carry do not line up with the attribution
+convention leg 15 enforces.** Still the owner's ruling; now with two data points, not one.
+
+**Everything else in the review reproduced clean**, independently rather than re-read:
+
+- **Shell/TS boundary parity on `docs/sprint/`** — 9 cases including `docs/sprintfoo`,
+  `docs/sprint-notes/`, nested `archive/`, double-slash, case-difference and `..`. No divergence.
+- **The widening cannot over-exempt** — traced and fixture-confirmed: any non-allow-listed file
+  still forces the whole commit non-governance, so `{sprint log} + {scripts/real-code.sh}` is
+  reported exactly as `{TODO.md} + {scripts/real-code.sh}` is.
+- **The seeded-break discrimination reproduced exactly** — 29/29→32/41 and 43/43→42/43, the
+  motivating fixture reddening and both control assertions green, restored to the stated hash.
+- **T3's comment-only claim holds** — all 16 lines comment-prefixed, `sh -n` clean, and the engine's
+  full 100-rule output byte-identical to the pre-edit copy (154 lines, matching SHA-256).
+
+**Acted on the one SUSPECTED finding:** the new arm carried no ASSUMPTION caveat, unlike its
+`docs/epic/*|docs/research/*` sibling — and `docs/sprint/` is the most actively written tree here.
+Added, noting that the reporting-side exposure predates TD-170 and this arm only changes the
+commit's overall verdict. Comment-only; non-comment diff is zero lines.
+`find docs/sprint -type f ! -name '*.md'` is currently empty.
+
+review · T3 · outside-reviewer-worktree-isolated · behaviour:material · governance:high
+review · T0 · owner-approved-at-g2-and-outside-reviewed · behaviour:material · governance:high
