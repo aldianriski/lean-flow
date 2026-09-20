@@ -323,6 +323,35 @@ status: current
     without new shell — it tests the *parser*, not the suite. Weigh against ADR-029: the parsing step
     is Tier **G** by the false-negative test, so the bar applies even though the fix was one line.
 
+- **TD-166** severity: medium | status: open | created: Sprint-102
+  - Summary: **The `dod-delta` leg can hold a sprint permanently un-closable on a finding that only
+    closing can clear.** SPRINT-102's close-time system-verify printed `226 pass, 2 fail`. The
+    surviving FAIL is accurate: commit `b89d6f0`, subject `sprint(102) T4: 2 DoD ticked; fix two
+    self-inflicted layers findings`, ticked **three** DoD — two of T4's and one of **T2's** ("The
+    population is re-derived, not inherited…"). The leg named it exactly and was right to.
+  - **Why it cannot be fixed forward.** A tick lives in a commit's diff, so no later commit can
+    un-tick it; the leg's exemptions are structural (coord-scoped or ambiguous subjects), with no
+    declaration file and no per-commit allow-list. The only clean remedies are rewriting published
+    history — five commits, against a repo carrying ~90 live `worktree-agent-*` branches whose bases
+    would move — or closing the sprint.
+  - **The trap, which is the durable part.** The leg's population is `plan_commit..HEAD` over
+    `lo_files=$(ls docs/sprint/SPRINT-*.md)` — **non-recursive** (`scripts/qa-check.sh:1373`). `close`
+    moves the Plan to `docs/sprint/archive/`, out of that glob, so the finding leaves scope the moment
+    the sprint closes. Meanwhile ADR-021 makes a FAIL block the close. **A guard that blocks the only
+    action able to clear it is not a gate, it is a deadlock** — and the escape is always the same
+    move, an owner ruling, which trains the ruling rather than the fix. This is L-105's family seen
+    from a new side: that rule asks *when* a guard fires relative to what it guards; this one asks
+    whether the guard's own clearing condition is **reachable** from inside the state it creates.
+  - Ruled at the SPRINT-102 close: the finding is accurate and unfixable-forward; the sprint closes on
+    it by owner ruling (SPRINT-101's precedent — closed by ruling, not exhaustion), and the defect is
+    carried here rather than waived silently.
+  - Fix direction (**not a ruling**): give the leg a way to record a *ruled* historical
+    mis-attribution — a declaration the checker reads, in the shape ADR-031 already established for
+    `.conformance-exempt` (a reasoned exemption the tool parses, not a prose note two files away,
+    L-151). Weigh against ADR-029: this leg is Tier **G**, so the full bar applies — including a
+    fixture that varies the **selection** and not only the verdict (L-186), since the bug class here
+    is exactly a population/scope property.
+
 - **TD-163** severity: medium | status: open | created: Sprint-101
   - Summary: **`docs/epic/INDEX.md`'s `update_trigger` cannot fire for the content its rows carry.**
     The trigger reads *"An epic is opened, or closed and archived (STANDARD §11)"* — an epic-lifecycle

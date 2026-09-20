@@ -333,3 +333,38 @@ wrapper's (L-120): `PASS … all changed files declared and attributed, base ef0
 reached it until a completed system-verify did — because the previous entry's system-verify was
 announced and never finished, so the sprint ran four more commits with a red leg nobody had seen.
 That is the ADR-021 step-6 ordering earning its place: not ceremony, the only reader of this class.
+
+### 2026-09-20 | decision | the second FAIL is accurate, unfixable-forward, and ruled — TD-166 filed
+
+The surviving `dod-delta` FAIL is correct and stays. `b89d6f0` (`sprint(102) T4: 2 DoD ticked; fix
+two self-inflicted layers findings`) ticked **three** DoD — two of T4's and one of **T2's**. The leg
+named it precisely.
+
+**It cannot be fixed forward.** A tick lives in a commit's diff, so no later commit un-ticks it; the
+leg's exemptions are structural (coord-scoped / ambiguous subjects), with no declaration file and no
+per-commit allow-list — checked before asking, not assumed. The remaining remedies were a history
+rewrite of five commits against a repo carrying ~90 live `worktree-agent-*` branches, or a ruling.
+
+**Owner ruling: close on it.** SPRINT-101's precedent — closed by ruling rather than exhaustion. The
+defect is carried as **TD-166**, not waived silently.
+
+**What TD-166 actually records is the trap, not the tick.** The leg's population is
+`plan_commit..HEAD` over `lo_files=$(ls docs/sprint/SPRINT-*.md)`, **non-recursive**
+(`scripts/qa-check.sh:1373`), and `close` moves the Plan into `docs/sprint/archive/`. So this finding
+leaves scope precisely *by closing* — while ADR-021 makes a FAIL block the close. A guard whose only
+clearing condition is the action it blocks is a deadlock, and its escape is always the same move, an
+owner ruling, which trains the ruling instead of the fix. L-105's family from a new side: that rule
+asks *when* a guard fires relative to what it guards; this asks whether the guard's clearing
+condition is reachable from the state it creates.
+
+**Ledger census re-derived after filing** (two selectors, L-198): **99 rows — 91 open · 8 resolved**,
+5 `severity: high` open. First attempt returned 87 open against 99 headers; the 4-row gap was the
+selector, not the ledger — `severity: **high**` carries bold markup that `[a-z]+` cannot match. The
+shape-not-substring rule, missed while being applied, and caught only because two numbers refused to
+sum (L-108 · L-198).
+
+**System-verify:** the recorded run is `226 pass, 2 fail` at `cd94e14`. Per owner ruling the
+re-verification is **not** re-run here — `close` runs the full profile itself under ADR-039, and that
+becomes the sprint's record. Both legs were re-verified individually in the meantime, each read from
+its own verdict line rather than a wrapper's (L-120): `layers observed` → PASS; `dod-delta` → exactly
+1 FAIL, the ruled one, with all four of this session's commits passing cleanly.
