@@ -16,17 +16,19 @@ status: current
 
 ## Active Sprint
 
-> **None active.** `/lean-doc-generator promote` opens the next one.
+> **SPRINT-103 — Port the Measured Hotspots** → [docs/sprint/SPRINT-103-port-the-measured-hotspots.md](docs/sprint/SPRINT-103-port-the-measured-hotspots.md)
 >
-> Predecessor: **SPRINT-102 — Make the Gate Green** closed 2026-09-20 at **17 of 18 DoD `[x]`
-> + 1 `[~]`**. The ceiling is ruled (**ADR-042**): it is a **foreground-call** limit, not a host
-> limit — two detached full-profile runs completed at 1263 s and 1370 s, ran every harness and
-> printed their own verdicts, so the assertion that FAILed them now prints an uncounted INFO. The
-> gate is **not yet green**: the close ran on one true FAIL that cannot be fixed forward
-> (`b89d6f0` ticked another task's DoD under its own subject) — carried as **TD-166** with
-> **L-205** and owned by **`TASK-354`**. `TASK-319`/`TASK-188` remain in the Backlog, still paired,
-> still blocked on a green gate. The intended vehicle is **SPRINT-103**, all `J0`/`J1`. See
-> `CHANGELOG.md` and the archived sprint file.
+> Promoted 2026-09-20. Five tasks, one per item in **Round 16**'s measured top five — 761 s, **63% of
+> the gate**. Split from `TASK-355` (`[size: L]`) at promote, per the size-check that runs before
+> rendering. Every task is **measure-then-rule**: its first DoD is a per-target measurement, and
+> *"ruled unportable, mechanism recorded"* is an accepted outcome (D2). T3 is `J2` — it touches the
+> **consumer-facing** conformance engine (ADR-027), so the ruling is human-reserved.
+>
+> Predecessor: **SPRINT-102 — Make the Gate Green** closed 2026-09-20 at **17 of 18 DoD** + 1 `[~]`.
+> It proved the technique and aimed it wrong: five checkers ported, reviewed and wired, their
+> harnesses down from ~170 s to **17 s**, and **the gate unmoved** — they were ~10% of it. The targets
+> came from `TD-090`'s harness timings; Round 16, the first profile of a *completed* gate, shows none
+> of them in the top 20. That is the whole reason this sprint measures first.
 
 **Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
 SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
