@@ -79,15 +79,35 @@ const GOOD = harnessAwk();
 {
   // A captured program that merely CONTAINS the sections pattern is not proof it is the reduction --
   // a comment mentioning it would satisfy a substring check. Run it and count what it produces.
+  //
+  // PER-SECTION, NOT TOTAL. A total-only check proves quantity, not identity: an outside reviewer
+  // crafted `S(1|5|6|10|11|12)` which reduces to exactly 43 rows (4+2+4+10+11+12) while dropping
+  // §9 entirely and admitting §1/§5/§6, and the total-only probe passed it silently. Counting each
+  // required section separately, plus the total to catch leakage, closes that: there is no
+  // substitution that keeps all four section counts AND the total and is not the reduction.
   const probe = mkdtempSync(join(tmpdir(), "sfsr-probe-"));
   const out = join(probe, "probe.md");
   execFileSync("sh", ["-c", "awk " + shq(GOOD) + " " + shq(SPEC) + " > " + shq(out)]);
   const countRules = (text: string, re: RegExp): number =>
     text.split(String.fromCharCode(10)).filter((l) => re.test(l)).length; // anchored at ^, so a trailing CR on this CRLF checkout is irrelevant
-  const rows = countRules(readFileSync(out, "utf8"), new RegExp("^[|] `S[0-9]+[.]"));
-  const expect = countRules(readFileSync(SPEC, "utf8"), new RegExp("^[|] `S(9|10|11|12)[.]"));
+  const produced = readFileSync(out, "utf8");
+  const shipped = readFileSync(SPEC, "utf8");
+  const sectionRe = (n: string): RegExp => new RegExp("^[|] `S" + n + "[.]");
   rmSync(probe, { recursive: true, force: true });
-  if (rows !== expect) throw new Error(`captured awk reduced the spec to ${rows} rule rows, expected ${expect} -- it is not the reduction program`);
+
+  let want = 0;
+  for (const n of ["9", "10", "11", "12"]) {
+    const got = countRules(produced, sectionRe(n));
+    const exp = countRules(shipped, sectionRe(n));
+    if (got !== exp) {
+      throw new Error(`captured awk produced ${got} §${n} rule rows, shipped spec has ${exp} -- it is not the reduction program`);
+    }
+    want += exp;
+  }
+  const total = countRules(produced, new RegExp("^[|] `S[0-9]+[.]"));
+  if (total !== want) {
+    throw new Error(`captured awk produced ${total} rule rows but only ${want} belong to §9/§10/§11/§12 -- it admits sections the reduction excludes`);
+  }
 }
 const BODY = anchorBody();
 

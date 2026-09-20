@@ -67,7 +67,7 @@ rest of this sprint under T3's ruling (ADR-043).
 - [ ] If ported: `.sh` retained as live oracle; byte-identical differential parity over every fixture **and** the real corpus it applies to — *Verify: the differential reports N/N identical, N stated*
 - [ ] If ported: retained must-FAIL + sibling control + seeded-break proof under ONE stated hash convention
 - [ ] If ported: wiring diff **committed as a reviewable file before being applied** (three reviewers in SPRINT-102 could not audit wiring that lived only in chat — L-151)
-- [ ] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
+- [x] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
 - [x] Before/after stated as a **range over ≥3 alternating runs**, never a point estimate — this host shows >3× run-to-run variance
 
 ### T2 — Rule and port `run-layers-observed-fixtures.sh` `[size: M · risk: med · class: execution · HITL · J1]`

@@ -519,3 +519,50 @@ disagreeing-by-construction derivations of the candidate set, because a stale fi
 duration, a rank, a count or a superlative and only the last is greppable.
 
 consequence · T0 · behaviour:low · governance:low
+
+### 2026-09-20 | progress | second outside review — fixes hold; one confirmed gap closed
+
+Second worktree-isolated pass, scoped to `6c5721a` only (the first pass's fixes) so nothing already
+cleared was re-litigated. Verdict: **the three fixes hold.** One real gap found and now closed.
+
+**Independently reproduced, not taken on trust:**
+
+- **Fix 2 (the tally)** — re-derived by a **spacing-agnostic** query (`assert_…[[:space:]]*"`), which
+  is the thing my original pattern got wrong: 68 total, §9 ×16 · §10 ×10 · §11 ×31 · §12 ×11, no
+  case name outside those four, all 68 names distinct. Then by a second route — all 23 distinct
+  finding slugs mapped to the `bad "…"` line that emits them, every one in §9/§10/§11/§12. Two
+  routes, same answer, neither of them mine.
+- **Fix 3** — comment-only confirmed by line-level diff filtering on `a1505f3..6c5721a`.
+- **Round 19's parity** — reproduced end-to-end rather than read: both arms run, 69/69 verdict lines
+  `cmp`-identical in file order. It also explains the 69th line, which I had never accounted for:
+  `s11-td-threshold-read` is a one-off inline diagnostic, not one of the 68 `assert_*` calls.
+- **Sentinel attacks** — duplicated sentinel, indented sentinel, moved target line, reordered
+  BEGIN/END: all four throw loudly, as designed.
+
+**CONFIRMED GAP — the behavioural probe checked quantity, not identity.** The reviewer crafted
+`S(1|5|6|10|11|12)`, which reduces the shipped spec to **exactly 43 rows** (4+2+4+10+11+12) while
+**dropping §9 entirely** and admitting §1/§5/§6 — and the total-only probe passed it silently.
+Verified here independently: §1=4 · §5=2 · §6=4 · §9=10 · §10=10 · §11=11 · §12=12, decoy total 43,
+decoy §9 rows 0.
+
+Not a Tier G silent false negative end-to-end — the per-section drift anchor inside `BODY` runs in
+every case *and* in a real harness invocation, and it reddens on this. But **my commit claimed the
+probe proved "it is the reduction program", and it did not** — it was redundant with, and weaker
+than, the check backstopping it. The reviewer proposed a clarifying comment; I made the probe
+actually do what was claimed instead, since that is five lines and leaves nothing overstated:
+**per-section counts for all four sections, plus the total to catch leakage.**
+
+**Proven against the reviewer's own decoy**, spliced by string substitution on the real line so its
+escaping is preserved exactly (an earlier attempt built the decoy through `awk` and the `\|` was
+eaten, which would have tested nothing — L-142 again):
+
+    captured awk produced 0 §9 rule rows, shipped spec has 10 -- it is not the reduction program   (exit 1)
+
+Harness restored and verified under **one** convention: `git hash-object <working file>` against
+`git rev-parse HEAD:<path>` — both `ecc3f31808e273da5898ade0729baefbdb892034`, normalization-aware
+by construction rather than by discipline (L-169).
+
+T1: **8 of 11** — the three remaining are `If ported:` conditionals, n/a under branch (c), to be
+dispositioned at close per the owner's ruling. Sprint total **18 of 35**.
+
+review · T1 · outside-reviewer-worktree-isolated-x2 · behaviour:material · governance:high
