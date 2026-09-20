@@ -88,7 +88,7 @@ mechanism recorded.
 - [x] If ported: oracle retained · byte-identical parity over fixtures **and** all real sprint Plans, **including non-archived copies** — the archived corpus is SKIPPED by the sibling checker and comparing it yields two empty outputs that agree while proving nothing (L-198, hit twice in SPRINT-102)
 - [x] If ported: retained must-FAIL + sibling control + seeded break, one hash convention
 - [x] If ported: wiring diff committed before applied
-- [ ] Outside reviewer, worktree-isolated
+- [x] Outside reviewer, worktree-isolated
 - [ ] Before/after as a range over ≥3 runs
 
 ### T3 — Rule leg 2f-ter, the conformance engine sweep `[size: M · risk: high · class: decision · HITL · J2]`
