@@ -1268,15 +1268,17 @@ done
 # fixtures.sh) which derives a second, independently-sourced candidate set from each task block's
 # own DoD+Acceptance prose and diffs it against Layers:/Depends-on:. Fails toward over-reporting by
 # design (TD-020): a false positive costs a glance, the false negative above cost a corrupted merge.
-lc_script="scripts/lib/check-layers-completeness.sh"
-if [ ! -f "$lc_script" ]; then
+lc_script="scripts/lib/check-layers-completeness.ts"
+if ! command -v bun >/dev/null 2>&1; then
+  bad "layers completeness: bun not found on PATH -- cannot run $lc_script. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
+elif [ ! -f "$lc_script" ]; then
   bad "layers completeness: checker not found at $lc_script"
 else
   lc_files=$(ls docs/sprint/SPRINT-*.md 2>/dev/null)
   if [ -z "$lc_files" ]; then
     note "layers completeness: skip (missing): docs/sprint/SPRINT-*.md"
   else
-    lc_out=$(sh "$lc_script" $lc_files 2>&1); lc_code=$?
+    lc_out=$(bun "$lc_script" $lc_files 2>&1); lc_code=$?
     if [ "$lc_code" -eq 0 ]; then
       lc_n=$(printf '%s\n' "$lc_out" | grep -cE '^PASS')
       # Zero verified is a SKIP, never a PASS (TD-042). A green line over an empty input set is the
