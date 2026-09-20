@@ -111,40 +111,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       origin:     manual   # re-filed at the SPRINT-100 promote governance review; its predecessor TASK-344 shipped and was pruned
       state:      ready
 
-- [ ] TASK-349 — Decide what to do about a gate whose completion is decided by host noise  [size: M] [risk: med] [HITL]
-      class:      decision
-      authority:  J2
-      done-when:  **FIRST MOVE IS A MEASUREMENT, not an optimization** (added at the 2026-09-16
-                  `/triage`). The SPRINT-101 evidence disproves this row's own framing: the
-                  `QA_BUDGET_SECONDS=1200` run **completed in 945 s**, so the 600 s limit did **not**
-                  kill it. What reddened it was `qa-check.sh:1452`'s own `QA_CEILING_SECONDS`
-                  self-assertion — a *configurable* value whose stated premise ("a run past the
-                  ceiling is killed from outside with no verdict line") is false for the mode that
-                  ran. So: **measure the actual external process limit per invocation mode**
-                  (foreground · background · detached), then set the ceiling to what was measured.
-                  That may unblock the epic at near-zero cost and without reclaiming a second of
-                  runtime. Only if the measurement says otherwise does cost reclamation follow — and
-                  note Round 14's ~307 s / ~545 s figures are drawn from **truncated** runs, so they
-                  are not a valid baseline for the complete profile (re-derive, L-130).
-                  **Re-size at G2**: if the chosen fix turns out to be Tier G implementation rather
-                  than a ruling, this row's `[size: M] [risk: med]` no longer describes it.
-                  Then: `TD-117` and `TD-090` have a ruling rather than a standing condition. Five
-                  whole-gate runs at the SPRINT-099 close spanned **523–560 s around a 520 s budget**
-                  against a 600 s external ceiling — two runs on the *same tree* gave a complete
-                  `218 pass, 0 fail` and a truncation 3 s over budget. SPRINT-099 T2 made truncation
-                  legible; it did not make the gate finish. Options include reclaiming leg-12 cost
-                  (the per-harness table is Round 14 of `docs/research/logs/qa-gate-timing.md`:
-                  seven items are ~307 s of ~545 s), moving work behind `QA_FULL=1`, or accepting
-                  truncation as normal now that it reports itself. **Do not re-open the fix direction
-                  ruled at SPRINT-099 D3 without evidence against it.**
-      touches:    `scripts/qa-check.sh` · `evals/` harness set · `TECH-DEBT.md` (TD-117 · TD-090)
-      depends-on: none
-      assumes:    that closing the cost gap is still wanted — SPRINT-099 showed a truncated run is now
-                  honest, which lowers the urgency without removing it. **Confirm before building.**
-      tracker:    TD-117 (severity: high, open) · TD-090 (severity: high, open) · TD-128 (reader half shipped SPRINT-099 T2)
-      origin:     manual   # re-filed at the SPRINT-100 promote governance review; its predecessor TASK-329 shipped and was pruned
-      state:      ready
-
 > **Epic-first**, ruled by the owner at the SPRINT-094 `/triage`: EPIC-015 § Closed-when 1 · 5 · 6
 > lead, ahead of the cheaper standalone guards, because the epic cannot close without a real
 > unattended run and every sprint that defers it defers the epic.
@@ -246,70 +212,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
                                 # rc=0 silently on a crashed engine
       state:      ready
 
-- [ ] TASK-352 — Correct the pre-flight item 3 criterion everywhere it is live, and require `gates_signed:` with it  [size: S] [risk: low] [HITL]
-      class:      execution
-      tier:       P
-      authority:  J2
-      origin:     manual   # filed by hand at the 2026-09-16 /triage governance pass; NOT grilled at intake, so no G1 fast-path
-      state:      ready
-      done-when:  No live artifact states the launch precondition as **"not all-J2"**. The rule at
-                  `skills/orchestrator/references/night-run.md:295` is *"every task in the run is
-                  declared `J0` or `J1` — a declared `J2` task **FAILS** this item"* (TD-109, ruled
-                  STRICT; SPRINT-093 D3 supersedes SPRINT-090 D4's permissive reading). The two are
-                  not the same test: a Plan that is merely *not all*-J2 can still carry a declared
-                  `J2`, and is refused. Every live copy says the STRICT form, and the vehicle
-                  checklist also requires **`gates_signed:` recorded in the sprint frontmatter**
-                  (pre-flight item 4) — absent from SPRINT-101, where it sat undiscovered behind the
-                  red gate as the *next* foreclosure.
-      touches:    `TODO.md` (TASK-319 row — corrected at this triage, verify it stuck) · the
-                  `approval_envelope:` `design` dimension wording carried forward into the next
-                  vehicle sprint · **re-derive the full live set before editing** — the phrase also
-                  appears in archived SPRINT-098/099/101, which are history and are NOT edited
-                  (TD-164 records why the signed copy stands)
-      depends-on: none
-      assumes:    that no OTHER live artifact carries the misreading. UNCONFIRMED — the SPRINT-101
-                  sighting was found by reading one row, not by a sweep. Re-derive by shape, not
-                  substring (L-108), and vary the SELECTION on the cross-check (L-198)
-      tracker:    night-run.md:295 · TD-109 · TD-164 · L-111 · SPRINT-101 T1
-      why:        **Prerequisite for the SPRINT-103 vehicle.** Three sprints (098 · 099 · 101) were
-                  designed against the wrong criterion; promoting the vehicle on the current spec
-                  rebuilds an unlaunchable Plan a fourth time. Found by an outside adversarial pass,
-                  not by anyone re-reading the rule — which was loaded and cited each time (L-165).
-
-- [ ] TASK-353 — Strip ANSI before parsing `bun test` counts, in all three TS harnesses  [size: S] [risk: low] [AFK]
-      class:      execution
-      tier:       G
-      authority:  J1
-      origin:     manual   # found live at the 2026-09-16 promote gate run; NOT grilled at intake, so no G1 fast-path
-      state:      ready
-      done-when:  `run-s4-ts-evaluators.sh` · `run-dod-delta-fixtures.sh` ·
-                  `run-s4-differential-parity.sh` each report their real test count instead of `0`.
-                  All three parse `bun test` output with `grep -oE '^ *[0-9]+ pass'`, but Bun emits
-                  ANSI colour **even when its output is captured**, so the line is
-                  `\e[0m\e[32m 48 pass\e[0m` and the `^` anchor lands on an escape byte — the match
-                  is empty, `n_pass` falls back to `0`, and the count floor FAILs. Measured
-                  2026-09-16: the same parser returns **48** once ANSI is stripped, and
-                  `bun test evals/dod-delta.test.ts` run directly gives `48 pass, 0 fail`.
-                  Retained must-FAIL: a *genuinely* shrunken suite (a dropped `describe`) must still
-                  redden — the floor is the point and stripping colour must not defeat it. Sibling
-                  control: a full suite stays green in the same run. Seeded-break discrimination
-                  under ONE stated hash convention (L-142 · L-169).
-      touches:    `evals/run-s4-ts-evaluators.sh` · `evals/run-dod-delta-fixtures.sh` ·
-                  `evals/run-s4-differential-parity.sh` — **re-derive the set before editing**: any
-                  other harness parsing Bun output has the same defect and is in scope (L-186 — the
-                  three named here are the ones that FAILED, not necessarily the whole population)
-      depends-on: none
-      assumes:    that all three share one cause. CONFIRMED for `dod-delta` by direct reproduction;
-                  the other two are inferred from an identical symptom and parser shape — verify
-                  each independently rather than inheriting this line (L-130)
-      tracker:    L-108 (a position anchor defeated by invisible bytes — the fourth live instance) ·
-                  L-144 · TD-117
-      why:        **Three Tier G harnesses — 156 assertions — are non-functional in the gate**, and
-                  have been reporting coverage loss that is not real. They fail loud, which is the
-                  safe direction, but they are 3 of the 6 FAILs standing between here and the green
-                  gate `TASK-349` exists to produce. Found only because the promote gate was finally
-                  run to completion; under truncation the run never reached them (TD-117).
-
 ### P2 — Follow-on
 
 - [ ] TASK-354 — Give the `dod-delta` leg a ruled-exemption declaration, so a historical mis-attribution stops blocking every close  [size: S] [risk: low] [HITL]
@@ -342,30 +244,6 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
       tracker:    TD-166 · L-205 · ADR-031 (the declaration shape to mirror) · ADR-021 (the rule that
                   makes this blocking)
 
-- [ ] TASK-351 — Make an unmatched commit-subject shape FAIL loudly in `check-dod-delta.ts` instead of exempting itself  [size: S] [risk: low] [HITL]
-      class:      execution
-      tier:       G
-      authority:  J1
-      origin:     close-retro   # SPRINT-101 close; NOT grilled at intake, so no G1 fast-path
-      state:      ready
-      done-when:  Before `attributeClaim` returns `coord`, it tests whether the subject's first token
-                  after `sprint(NNN):` / `sprint(NNN) ` matches the task-token shape, and FAILs naming
-                  that subject if it does — rather than silently exempting it. Fixture: a subject in a
-                  shape no current arm admits must redden, with a sibling control (a genuine
-                  coordinator subject) staying green in the same run.
-      why:        SPRINT-101 T3 needed **four** rounds to reach an exhaustive population, each round
-                  discovering another live subject spelling: the `Task:` trailer arm, letter-suffixed
-                  subtasks (`T2a`), the parenthetical arm, and finally `sprint(NNN): Tn --` — **137 of
-                  701** commits, ~37% of the task-naming population, silently exempt. The recurring
-                  defect is not any single regex but that the examined set is derived by ENUMERATING
-                  shapes, so every unlisted shape is a **silent** exemption rather than a loud one
-                  (**L-202**). Proposed by the builder when asked to report rather than build it; it
-                  costs one extra evaluation of a regex the fix already computes, and **would have
-                  caught finding 7 the moment it was written**.
-      scope-note: Closes THIS seam, not the general class — recorded honestly by its proposer: it
-                  would not have caught the other three findings, which are about which arms exist at
-                  all rather than about the coord/task boundary. Do not oversell it at G2.
-      tracker:    L-202 · L-186 · L-166 · SPRINT-101 T3
 - [ ] TASK-346 — Rule `check-handoff-state.sh`'s archive glob: convert it, or record the exemption where the guard reads it  [size: S] [risk: low] [HITL]
       class:      execution
       authority:  J1
