@@ -15,7 +15,7 @@
 // TypeScript run by Bun, per the SPRINT-101 T3 owner ruling this repo already applies to
 // check-dod-delta.ts -- not POSIX sh (2026-09's "no shell scripts" rule).
 
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { readFileSync, statSync } from "node:fs";
 
 // --- archive-path.sh port (SPRINT-099 T3, TD-145 * TD-151) ---------------------------------------
 // Faithful port of scripts/lib/archive-path.sh's lf_is_archived_path():
@@ -250,12 +250,30 @@ export interface CheckOutcome {
   readonly exitCode: 0 | 1;
 }
 
+// Faithful port of the shell's `[ -f "$lg" ]`: true only for a REGULAR FILE that exists. A directory
+// (or a socket/FIFO/etc.) must read the same as "does not exist" -- `[ -f ]` is false for both, and
+// existsSync() alone cannot make that distinction (it returns true for a directory too, which used to
+// fall through to readFileSync() and throw an uncaught EISDIR instead of the checker's own named FAIL
+// -- outside-review-confirmed defect, fixed here). statSync() throwing (ENOENT, ENOTDIR on a bad
+// path segment, EPERM, ...) is treated the same as "not a file", exactly like `[ -f ]` on a path it
+// cannot stat.
+function isRegularFile(p: string): boolean {
+  try {
+    return statSync(p).isFile();
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Full CLI-equivalent check over one or more Execution Log paths, faithfully replicating
- * check-night-run-rollup.sh's own per-file loop: a missing file is FATAL (not a skip -- it is exactly
- * the silence a died-before-writing run leaves behind); an archived path is silently skipped (no
- * output for that entry at all, matching `continue` in the shell loop); everything else is evaluated
- * by evaluateLog(). Exit code is 1 if ANY FAIL was printed across ANY file, 0 otherwise.
+ * check-night-run-rollup.sh's own per-file loop: a path that is not a regular file (missing, or a
+ * directory) is FATAL for THAT ENTRY ONLY -- not the whole call -- matching the shell's `for lg in
+ * "$@"` continuing past one bad entry to still report every sibling's own finding (a live sprint's
+ * PASS must survive next to a dead sprint's FAIL in the SAME multi-arg qa-check.sh invocation); an
+ * archived path is silently skipped (no output for that entry at all, matching `continue` in the
+ * shell loop); everything else is evaluated by evaluateLog(). Exit code is 1 if ANY FAIL was printed
+ * across ANY file, 0 otherwise.
  */
 export function checkNightRunRollup(paths: readonly string[]): CheckOutcome {
   if (paths.length === 0) {
@@ -265,7 +283,7 @@ export function checkNightRunRollup(paths: readonly string[]): CheckOutcome {
   const lines: string[] = [];
   let fail = false;
   for (const lg of paths) {
-    if (!existsSync(lg)) {
+    if (!isRegularFile(lg)) {
       lines.push(
         `FAIL  night-run rollup: no Execution Log found at ${lg} -- an absent log is exactly the silence this check exists to catch, not something to skip`,
       );
@@ -273,7 +291,19 @@ export function checkNightRunRollup(paths: readonly string[]): CheckOutcome {
       continue;
     }
     if (isArchivedPath(lg)) continue;
-    const content = readFileSync(lg, "utf8");
+    let content: string;
+    try {
+      content = readFileSync(lg, "utf8");
+    } catch {
+      // A regular file that exists but cannot be READ (permission denied, e.g. an ACL-denied file --
+      // outside-review-confirmed via the differential parity harness's unreadable-file edge case).
+      // The shell's own `grep -qE '^### ...' "$lg" 2>/dev/null` on an unreadable file exits non-zero
+      // the SAME way "no match found" does, so the shell takes the exact "no completed-run entry
+      // yet" branch a genuinely rollup-less file would -- never a FAIL, never an error. Bug-for-bug:
+      // this is the shell's real (if accidental) behaviour, not an improvement on it.
+      lines.push(`      night-run rollup: ${lg} has no completed-run entry yet -- nothing to verify`);
+      continue;
+    }
     const result = evaluateLog(lg, content);
     lines.push(...result.lines);
     if (result.hadFail) fail = true;

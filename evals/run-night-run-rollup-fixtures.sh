@@ -51,7 +51,7 @@ if ! command -v bun >/dev/null 2>&1; then
   fail=1
 else
   test_file="$here/night-run-rollup.test.ts"
-  min_tests=39
+  min_tests=46
   if [ ! -f "$test_file" ]; then
     echo "FAIL harness: test file not found at $test_file"
     fail=1

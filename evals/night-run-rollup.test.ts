@@ -23,8 +23,11 @@
 // Retained here rather than deleted with the porting work (TD-012): every must-FAIL fixture, its
 // sibling control, and the population fixtures (cases 8/11, the real committed SPRINT-089/090/082
 // archived logs) that check-night-run-rollup.sh's own header names as load-bearing (L-166).
-import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { checkNightRunRollup, evaluateLog, isArchivedPath } from "../scripts/lib/check-night-run-rollup.ts";
 
@@ -346,5 +349,141 @@ describe("checkNightRunRollup -- CLI-level plumbing", () => {
     const { lines, exitCode } = checkNightRunRollup([REPO_ROOT + "docs/sprint/archive/logs/SPRINT-045-gate-precision.md"]);
     expect(exitCode).toBe(0);
     expect(lines).toEqual([]);
+  });
+});
+
+// --- must-FAIL: a DIRECTORY path (outside-review-confirmed defect, fixed) ------------------------
+// `existsSync()` returns true for a directory, so an earlier version of checkNightRunRollup() fell
+// through to readFileSync() and threw an uncaught EISDIR -- the shell's `[ -f "$lg" ]` instead emits
+// the SAME named FAIL a missing file gets ("no Execution Log found at ..."), because `[ -f ]` is false
+// for anything that isn't a regular file. Retained here (never deleted with the fix) so a regression
+// back to `existsSync()`-only reddens this case specifically, with its own named finding, not a raw
+// stack trace.
+describe("checkNightRunRollup -- a directory path is not a regular file (must-FAIL)", () => {
+  test("a directory argument FAILs named, exactly like a missing file -- never throws", () => {
+    const dirPath = fx("wellformed"); // a real directory, not a log file
+    let outcome: ReturnType<typeof checkNightRunRollup> | undefined;
+    expect(() => {
+      outcome = checkNightRunRollup([dirPath]);
+    }).not.toThrow();
+    expect(outcome!.exitCode).toBe(1);
+    expect(outcome!.lines.join("\n")).toContain(`no Execution Log found at ${dirPath}`);
+  });
+
+  // Sibling control (L-142): the SAME directory's own well-formed LOG FILE, one level down, must
+  // still pass cleanly -- proving the fix distinguishes "not a regular file" from "a regular file
+  // that happens to live under a directory of the same name", rather than over-broadening the guard.
+  test("sibling control: the log FILE inside that same directory still passes", () => {
+    assertPass(fx("wellformed/docs/sprint/logs/SPRINT-922-wellformed.md"), "DoD header + terminal state + calibration row present");
+  });
+
+  // THE ACTUAL MOTIVATING SHAPE (outside review): qa-check.sh leg 2g calls this checker with EVERY
+  // open sprint's log in ONE invocation. A directory (or any bad entry) anywhere in that argv list
+  // must not destroy its siblings' findings -- before the fix, the throw happened before the CLI's
+  // `for (const l of lines) console.log(l)` flush, so a single bad entry silenced every good entry's
+  // PASS/FAIL in the SAME call. Exercised in all three positions (good-then-bad, bad-then-good,
+  // bad-in-the-middle) because a fix that merely special-cased "first argument" would still lose this.
+  const good1 = fx("wellformed/docs/sprint/logs/SPRINT-922-wellformed.md");
+  const good2 = fx("missing-rollup/docs/sprint/logs/SPRINT-920-missing-rollup.md"); // a real must-FAIL sibling, own named finding
+  const badDir = fx("wellformed");
+
+  test("multi-arg: good, then bad(dir) -- the good entry's PASS still prints", () => {
+    const { lines, exitCode } = checkNightRunRollup([good1, badDir]);
+    const out = lines.join("\n");
+    expect(exitCode).toBe(1);
+    expect(out).toContain("DoD header + terminal state + calibration row present");
+    expect(out).toContain(`no Execution Log found at ${badDir}`);
+  });
+
+  test("multi-arg: bad(dir), then good -- the good entry's PASS still prints", () => {
+    const { lines, exitCode } = checkNightRunRollup([badDir, good1]);
+    const out = lines.join("\n");
+    expect(exitCode).toBe(1);
+    expect(out).toContain(`no Execution Log found at ${badDir}`);
+    expect(out).toContain("DoD header + terminal state + calibration row present");
+  });
+
+  test("multi-arg: good, bad(dir), good -- both siblings' OWN named findings survive, in order", () => {
+    const { lines, exitCode } = checkNightRunRollup([good1, badDir, good2]);
+    const out = lines.join("\n");
+    expect(exitCode).toBe(1);
+    const iGood1 = out.indexOf("DoD header + terminal state + calibration row present");
+    const iBad = out.indexOf(`no Execution Log found at ${badDir}`);
+    const iGood2 = out.indexOf("carries no 'run · N of M DoD ticked' header");
+    expect(iGood1).toBeGreaterThanOrEqual(0);
+    expect(iBad).toBeGreaterThan(iGood1);
+    expect(iGood2).toBeGreaterThan(iBad);
+  });
+});
+
+// --- an unreadable (permission-denied) regular file -- SECOND defect found by widening the
+// differential parity population (outside review's "fix the population, not just the branch"
+// instruction). The shell's `grep -qE '^### ...' "$lg" 2>/dev/null` on a file it cannot read exits
+// non-zero the SAME way "no match found" does, so the shell takes the exact "no completed-run entry
+// yet" branch a genuinely rollup-less file would -- exit 0, a note, never a FAIL. An earlier version
+// of this port's `readFileSync` call was unguarded and threw an uncaught EPERM instead. Windows ACL
+// deny via icacls (chmod does not reliably remove owner read access on NTFS). Best-effort: if the
+// deny does not take on this host, both tests report ready=false and skip themselves loudly rather
+// than passing vacuously.
+describe("checkNightRunRollup -- an unreadable file is treated like a rollup-less file, never thrown", () => {
+  let scratchDir: string;
+  let unreadablePath = "";
+  let ready = false;
+
+  beforeAll(() => {
+    scratchDir = mkdtempSync(join(tmpdir(), "nrr-unreadable-"));
+    unreadablePath = join(scratchDir, "unreadable.md");
+    writeFileSync(unreadablePath, readFileSync(fx("wellformed/docs/sprint/logs/SPRINT-922-wellformed.md"), "utf8"));
+    try {
+      execFileSync("icacls", [unreadablePath, "/deny", `${process.env["USERNAME"]}:(R)`], { encoding: "utf8" });
+      try {
+        readFileSync(unreadablePath, "utf8");
+      } catch {
+        ready = true;
+      }
+    } catch {
+      ready = false;
+    }
+  });
+
+  afterAll(() => {
+    if (ready) {
+      try {
+        execFileSync("icacls", [unreadablePath, "/grant", `${process.env["USERNAME"]}:(R)`], { encoding: "utf8" });
+      } catch {
+        // best-effort restore before rmSync
+      }
+    }
+    rmSync(scratchDir, { recursive: true, force: true });
+  });
+
+  test("an unreadable file never throws -- treated as 'no completed-run entry yet', exit 0", () => {
+    if (!ready) {
+      console.log("SKIPPED (host could not establish a permission-denied file via icacls)");
+      expect(true).toBe(true);
+      return;
+    }
+    let outcome: ReturnType<typeof checkNightRunRollup> | undefined;
+    expect(() => {
+      outcome = checkNightRunRollup([unreadablePath]);
+    }).not.toThrow();
+    expect(outcome!.exitCode).toBe(0);
+    expect(outcome!.lines.join("\n")).toContain("has no completed-run entry yet -- nothing to verify");
+  });
+
+  test("multi-arg: good, unreadable, bad-sibling -- both real siblings' own findings survive", () => {
+    if (!ready) {
+      console.log("SKIPPED (host could not establish a permission-denied file via icacls)");
+      expect(true).toBe(true);
+      return;
+    }
+    const good1 = fx("wellformed/docs/sprint/logs/SPRINT-922-wellformed.md");
+    const badSibling = fx("missing-rollup/docs/sprint/logs/SPRINT-920-missing-rollup.md");
+    const { lines, exitCode } = checkNightRunRollup([good1, unreadablePath, badSibling]);
+    const out = lines.join("\n");
+    expect(exitCode).toBe(1); // badSibling is a real must-FAIL, unrelated to the unreadable entry
+    expect(out).toContain("DoD header + terminal state + calibration row present");
+    expect(out).toContain("has no completed-run entry yet -- nothing to verify");
+    expect(out).toContain("carries no 'run · N of M DoD ticked' header");
   });
 });

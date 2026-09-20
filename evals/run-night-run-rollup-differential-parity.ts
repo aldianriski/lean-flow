@@ -29,7 +29,8 @@
 // inputs -- so this is deliberately NOT cheap, the same tradeoff run-s4-differential-parity.sh makes.
 
 import { execFileSync } from "node:child_process";
-import { readdirSync, statSync } from "node:fs";
+import { mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -146,7 +147,81 @@ if (liveLogs.length > 0) {
 compare("no arguments", []);
 compare("nonexistent path", ["docs/sprint/logs/SPRINT-000-does-not-exist.md"]);
 
+// --- NON-LOG-FILE population (outside-review finding: findLogFiles() walks **/logs/*.md, so a
+// directory could never enter the compared set -- 86/86 was true and blind to the one shape that
+// actually broke: `existsSync()` returns true for a directory, which fell through to readFileSync()
+// and threw an uncaught EISDIR instead of the checker's own named FAIL. Widened here to cover every
+// non-regular-file shape the CLI contract can be handed, individually AND in the multi-arg mixtures
+// qa-check.sh leg 2g actually produces (a bad entry must never silence a sibling's own finding). ---
+let nonMdAdded = 0;
+
+// (1) a directory -- the confirmed defect's exact shape. Reuses a real fixture directory rather than
+// inventing a throwaway one (L-166: point the proof at something that actually exists in this repo).
+const dirInput = relArg(join(fixtureRoot, "wellformed"));
+compare("edge: a directory path", [dirInput]);
+nonMdAdded++; // no file extension at all -- counts as non-.md
+
+// (2) an empty-string argument -- distinct from "no arguments" (a zero-length ARGV entry, not a
+// zero-length argv). `[ -f "" ]` is false in the shell exactly like a missing path.
+compare("edge: an empty-string argument", [""]);
+nonMdAdded++; // no extension
+
+// (3) a file that exists, is readable, and is NOT named *.md -- proves the checker (both sides)
+// never gates on extension, only on content + [-f]-equivalent regular-file-ness. Real rollup content,
+// written to a scratch .txt file under the OS temp dir so it never touches the repo tree.
+const scratchDir = mkdtempSync(join(tmpdir(), "nrr-parity-"));
+const nonMdFile = join(scratchDir, "rollup-content.txt");
+const wellformedLog = fixtureLogs.find((f) => f.includes("wellformed"))!;
+const wellformedContent = readFileSync(wellformedLog, "utf8");
+writeFileSync(nonMdFile, wellformedContent);
+compare("edge: a non-.md file with real rollup content", [relArg(nonMdFile)]);
+nonMdAdded++;
+
+// (4) an unreadable file (permission denied) -- KEEPS the .md extension, isolating the "can this be
+// read" variable from the "is this named .md" variable already covered by (3). Windows ACL deny via
+// icacls (chmod alone does not reliably remove owner read access on NTFS -- verified: chmod 000 left
+// the file `-r--r--r--` and still `cat`-readable). Best-effort: if icacls is unavailable or the deny
+// does not take, this edge is skipped with a note rather than silently miscounted as compared.
+const unreadableFile = join(scratchDir, "unreadable.md");
+writeFileSync(unreadableFile, wellformedContent);
+let unreadableReady = false;
+try {
+  execFileSync("icacls", [unreadableFile, "/deny", `${process.env["USERNAME"]}:(R)`], { encoding: "utf8" });
+  // Verify the deny actually took (best-effort environments can silently no-op this).
+  try {
+    readFileSync(unreadableFile, "utf8");
+  } catch {
+    unreadableReady = true;
+  }
+} catch {
+  unreadableReady = false;
+}
+if (unreadableReady) {
+  compare("edge: an unreadable (permission-denied) .md file", [relArg(unreadableFile)]);
+  try {
+    execFileSync("icacls", [unreadableFile, "/grant", `${process.env["USERNAME"]}:(R)`], { encoding: "utf8" });
+  } catch {
+    // best-effort restore before rmSync below
+  }
+} else {
+  console.log("note  edge: an unreadable (permission-denied) .md file -- SKIPPED: could not establish a real permission-denied file on this host (icacls deny did not take)");
+}
+
+// --- multi-arg mixtures: the directory in all three positions alongside real good/bad siblings ---
+// (the outside review's actual motivating shape: qa-check.sh leg 2g calls this checker with every
+// open sprint's log in ONE invocation, so a single bad entry must never destroy its siblings' output).
+const goodLog = relArg(wellformedLog);
+const badSiblingLog = fixtureLogs.find((f) => f.includes("missing-rollup"));
+if (badSiblingLog) {
+  compare("multi-arg: good, then directory", [goodLog, dirInput]);
+  compare("multi-arg: directory, then good", [dirInput, goodLog]);
+  compare("multi-arg: good, directory, bad-sibling (own finding)", [goodLog, dirInput, relArg(badSiblingLog)]);
+}
+
+rmSync(scratchDir, { recursive: true, force: true });
+
 console.log("----------------------------------------");
+console.log(`non-.md inputs added to the population this run: ${nonMdAdded}`);
 console.log(`${identical} of ${compared} inputs identical`);
 if (divergences.length > 0) {
   console.log(`DIVERGED: ${divergences.length} -- ${divergences.join(", ")}`);
