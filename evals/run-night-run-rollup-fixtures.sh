@@ -1,5 +1,7 @@
 #!/bin/sh
-# run-night-run-rollup-fixtures.sh -- fixtures for scripts/lib/check-night-run-rollup.sh (SPRINT-059 T3).
+# run-night-run-rollup-fixtures.sh -- fixtures for scripts/lib/check-night-run-rollup.sh (SPRINT-059 T3)
+# AND its TypeScript port scripts/lib/check-night-run-rollup.ts (TASK-355: cut the QA gate's
+# wall-clock cost).
 #
 # The checker exists because a headless sprint-bulk run can end mid-Plan and exit `success`: measured
 # at 4 of 7 units on a consumer's host, every commit correct, three tasks never begun, nothing written
@@ -7,232 +9,74 @@
 # launcher's wrapper; this checker refuses to let a missing one pass review, which is what makes the
 # step gated rather than merely requested.
 #
-# Each FAIL case asserts on the checker's OWN NAMED FINDING, not merely on a non-zero exit (L-058).
-# A gate's worst failure is the silent false negative, and its second-worst is a red that does not
-# say which check tripped -- asserting on the message is what tells those apart. Case 4 is the
-# load-bearing NON-failure: a sprint mid-flight has finished nothing yet, and a checker that fired
-# there would paint every live sprint red and be switched off within a week.
+# TASK-355 moved every case that ONLY spawns this checker (cases 1-8, 10, 11 of this file's prior
+# shape -- ~31 shell subprocess spawns, each costing ~2.75s of Windows fork() emulation regardless of
+# how little text-matching work the checker does) into evals/night-run-rollup.test.ts, which calls the
+# TS port's exported functions directly in ONE Bun process. Every one of those cases still asserts on
+# the checker's OWN NAMED FINDING, not merely a non-zero exit (L-058); nothing about WHAT is checked
+# changed, only HOW it is invoked (a speed change, not a coverage change). scripts/lib/check-night-run-
+# rollup.sh remains the shipped oracle -- unchanged, still what qa-check.sh leg 2g calls -- and
+# evals/run-night-run-rollup-differential-parity.ts (opt-in, not part of this file) is what proves the
+# TS port stays bug-for-bug identical to it, over every fixture AND every real committed Execution Log
+# in this repo.
 #
-# Dependency-free POSIX sh, no git needed. Run bare: sh evals/run-night-run-rollup-fixtures.sh
+# What STAYS here, spawning subprocesses same as before: case 9 (the reaper family) drives
+# scripts/night-run.sh --reap directly -- a different script, out of this task's scope; case 12 (the
+# qa-check.sh leg 2g family) extracts and re-executes qa-check.sh's own leg 2g body verbatim, which
+# still calls the checker via `sh scripts/lib/check-night-run-rollup.sh` -- qa-check.sh is a
+# hard-constraint file this task must not modify, so leg 2g's own invocation shape is exercised
+# exactly as shipped.
+#
+# Dependency-free POSIX sh, no git needed (case 12 still needs `sh`; the checker cases above now need
+# `bun`, already a hard repo dependency post-SPRINT-101). Run bare: sh evals/run-night-run-rollup-fixtures.sh
 set -u
 
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 repo_root=$(CDPATH= cd -- "$here/.." && pwd)
 checker="$repo_root/scripts/lib/check-night-run-rollup.sh"
 fx="$here/fixtures/night-run-rollup"
-. "$here/lib/harness-common.sh"
 
 fail=0
 
-# --- case 1: completed run, no DoD header -> FAIL. The 4-of-7 case exactly. ----------------------
-run_case_anywhere "missing-rollup-fails" 1 "carries no 'run · N of M DoD ticked' header" -- \
-  sh "$checker" "$fx/missing-rollup/docs/sprint/logs/SPRINT-920-missing-rollup.md"
-
-# --- case 2: completed run, no calibration row -> FAIL, separately named -------------------------
-# Both field-report runs finished without writing theirs, and a human reconstructed both rows from
-# the harness payload afterwards. That is the failure this case pins.
-run_case_anywhere "missing-calibration-fails" 1 "carries no Part 4 calibration row" -- \
-  sh "$checker" "$fx/missing-calibration/docs/sprint/logs/SPRINT-921-missing-calibration.md"
-
-# --- case 3: both present -> PASS ---------------------------------------------------------------
-run_case_anywhere "wellformed-passes" 0 "DoD header + terminal state + calibration row present" -- \
-  sh "$checker" "$fx/wellformed/docs/sprint/logs/SPRINT-922-wellformed.md"
-
-# --- case 4: no completed run yet -> reported, exit 0, never a FAIL ------------------------------
-# The one that keeps the check usable. A live sprint has an Execution Log full of `progress` entries
-# and no `run-complete` event; treating that as a missing rollup would make the gate red for the
-# entire duration of every sprint.
-run_case_anywhere "midflight-does-not-fire" 0 "no completed-run entry yet" -- \
-  sh "$checker" "$fx/no-complete-entry/docs/sprint/logs/SPRINT-923-no-complete-entry.md"
-
-# --- case 5: task-level `complete` does not arm the run-level assertions -> exit 0 ---------------
-# The TD-055 misfire shape, pinned as a passing case: an entry header saying a TASK completed
-# (`| complete |`) with no rollup block must read as mid-flight, not as a completed run. Before the
-# `run-complete` rename this exact log turned the gate red mid-SPRINT-064 (TASK-211).
-run_case_anywhere "task-level-complete-does-not-arm" 0 "no completed-run entry yet" -- \
-  sh "$checker" "$fx/task-level-complete-does-not-arm/docs/sprint/logs/SPRINT-924-task-level-complete-does-not-arm.md"
-
-# --- case 6 (must-FAIL): completed run, no terminal state (SPRINT-088 T2, Part 0b) ---------------
-# The continuation contract's guarded failure, one level up from case 1's. Case 1 catches a run that
-# does not say how much of the Plan it finished; this catches one that does not say why it stopped
-# being the thing that finishes it. A run can be `9 of 9` and still have stopped for a reason worth
-# reading, which is why a full DoD count does not satisfy this and the fixture is deliberately 9-of-9.
-run_case_anywhere "missing-terminal-fails" 1 "carries no 'terminal · <STATE> · <reason>' line" -- \
-  sh "$checker" "$fx/missing-terminal/docs/sprint/logs/SPRINT-925-missing-terminal.md"
-
-# --- case 6b (must-FAIL): parseable terminal line, unrecognised STATE -----------------------------
-# The sibling branch, and the one a regression would ship green: `terminal · FINISHED · ...` has the
-# shape and carries no meaning. Without this case a checker that stopped validating the token would
-# pass every other case here -- the silent false-negative L-058 is about. Same reasoning the
-# gates-signed family already applied to `G1,X2` (its bad-gate-token case).
-run_case_anywhere "bad-terminal-token-fails" 1 "carries no 'terminal · <STATE> · <reason>' line" -- \
-  sh "$checker" "$fx/bad-terminal-token/docs/sprint/logs/SPRINT-926-bad-terminal-token.md"
-
-# --- case 6c: the neighbouring cases still fail for their OWN reason, not for the new one ---------
-# Adding a required field to a checker silently converts every existing must-FAIL fixture into one
-# that fails for two reasons, at which point none of them isolates anything. `missing-calibration`
-# and `missing-rollup` were each given a valid terminal line for exactly this reason; these two
-# assertions are what stop that from rotting back.
-out=$(sh "$checker" "$fx/missing-calibration/docs/sprint/logs/SPRINT-921-missing-calibration.md" 2>&1)
-if printf '%s\n' "$out" | grep -q 'carries no Part 4 calibration row' &&
-   ! printf '%s\n' "$out" | grep -q "carries no 'terminal · "; then
-  echo "PASS fixture(calibration-case-stays-isolated): fails on the calibration row alone, not on the terminal state"
-else
-  echo "FAIL fixture(calibration-case-stays-isolated): the calibration fixture no longer isolates its own failure -- output:"
-  printf '%s\n' "$out"
+# --- checker-only cases (formerly cases 1-8, 10, 11 -- ~31 `sh $checker` spawns) ------------------
+# Now ONE Bun process: evals/night-run-rollup.test.ts, calling checkNightRunRollup()/evaluateLog()
+# directly against the SAME fixture files and the SAME two real committed archives (SPRINT-089/090,
+# SPRINT-082) this file used to feed the shell checker. A test-COUNT floor, not just an exit code --
+# `bun test` exits 0 on a file with zero live tests (a renamed test, a dropped describe), which would
+# report this suite green having verified nothing (same shape run-dod-delta-fixtures.sh already
+# guards). RAISE THIS when adding cases to evals/night-run-rollup.test.ts, in the same commit.
+if ! command -v bun >/dev/null 2>&1; then
+  echo "FAIL harness: bun not found on PATH -- the night-run-rollup checker cases cannot run, and skipping"
+  echo "              them silently would report this suite green with ~31 cases unexercised"
   fail=1
-fi
-out=$(sh "$checker" "$fx/missing-rollup/docs/sprint/logs/SPRINT-920-missing-rollup.md" 2>&1)
-if printf '%s\n' "$out" | grep -q "carries no 'run · N of M DoD ticked' header" &&
-   ! printf '%s\n' "$out" | grep -q "carries no 'terminal · "; then
-  echo "PASS fixture(dod-header-case-stays-isolated): fails on the DoD header alone, not on the terminal state"
 else
-  echo "FAIL fixture(dod-header-case-stays-isolated): the DoD-header fixture no longer isolates its own failure -- output:"
-  printf '%s\n' "$out"
-  fail=1
-fi
-
-# --- case 7 family (must-FAIL / control): the agreement matrix (SPRINT-093 T1, DoD 1) -------------
-# night-run.md Part 0b maps each of the six Part 4 task states to exactly one terminal state:
-#   done                  -> no line at all (Part 4: "done tasks need no per-task line")
-#   parked-hitl | blocked -> AUTHORITY_BOUNDARY
-#   stalled | denied-tool -> HARD_FAILURE
-#   unattempted           -> BUDGET_STOP
-# Each must-FAIL case below pairs a terminal state with a per-task line the contract maps
-# ELSEWHERE, and each "-ok" case is the matching sibling control that must stay green (L-142). The
-# `-vs-parked` case is the motivating SPRINT-089 shape in miniature: PLAN_EXHAUSTED beside a parked
-# task. HARD_FAILURE and USER_STOP get their own controls below asserting the checker does NOT
-# fire on them -- the contract is silent on what per-task states those two rule out (HARD_FAILURE
-# can also come from a bare non-zero process exit, invisible in the log text; USER_STOP is an
-# external interrupt that can land mid-task in any state), so nothing is asserted rather than
-# guessing at a rule night-run.md does not state.
-run_case_anywhere "exhausted-vs-blocked-fails" 1 "PLAN_EXHAUSTED but carries a non-done per-task line" -- \
-  sh "$checker" "$fx/agreement-exhausted-vs-blocked/docs/sprint/logs/SPRINT-930-agreement-exhausted-vs-blocked.md"
-run_case_anywhere "exhausted-vs-parked-fails" 1 "PLAN_EXHAUSTED but carries a non-done per-task line" -- \
-  sh "$checker" "$fx/agreement-exhausted-vs-parked/docs/sprint/logs/SPRINT-931-agreement-exhausted-vs-parked.md"
-run_case_anywhere "exhausted-vs-stalled-fails" 1 "PLAN_EXHAUSTED but carries a non-done per-task line" -- \
-  sh "$checker" "$fx/agreement-exhausted-vs-stalled/docs/sprint/logs/SPRINT-932-agreement-exhausted-vs-stalled.md"
-run_case_anywhere "exhausted-vs-denied-fails" 1 "PLAN_EXHAUSTED but carries a non-done per-task line" -- \
-  sh "$checker" "$fx/agreement-exhausted-vs-denied/docs/sprint/logs/SPRINT-933-agreement-exhausted-vs-denied.md"
-run_case_anywhere "exhausted-vs-unattempted-fails" 1 "PLAN_EXHAUSTED but carries a non-done per-task line" -- \
-  sh "$checker" "$fx/agreement-exhausted-vs-unattempted/docs/sprint/logs/SPRINT-934-agreement-exhausted-vs-unattempted.md"
-run_case_anywhere "authority-vs-stalled-fails" 1 "AUTHORITY_BOUNDARY but carries a per-task line Part 0b maps elsewhere" -- \
-  sh "$checker" "$fx/agreement-authority-vs-stalled/docs/sprint/logs/SPRINT-935-agreement-authority-vs-stalled.md"
-run_case_anywhere "authority-vs-unattempted-fails" 1 "AUTHORITY_BOUNDARY but carries a per-task line Part 0b maps elsewhere" -- \
-  sh "$checker" "$fx/agreement-authority-vs-unattempted/docs/sprint/logs/SPRINT-936-agreement-authority-vs-unattempted.md"
-run_case_anywhere "authority-ok" 0 "agrees with its per-task lines" -- \
-  sh "$checker" "$fx/agreement-authority-ok/docs/sprint/logs/SPRINT-937-agreement-authority-ok.md"
-# --- case 7d (must-FAIL): positive-evidence rows (SPRINT-093 T1 revise 2, independent review) -----
-# The negative checks above only assert what a terminal state is INCOMPATIBLE with; they never
-# required the evidence a state actually needs. `AUTHORITY_BOUNDARY` with zero parked-hitl/blocked
-# lines, or `BUDGET_STOP` with zero unattempted lines, both PASSED before this fixture existed --
-# and neither is a shape reap() can produce (night-run.sh:210/:212 gate those states on the count
-# being > 0). Per-task lines are sparse (done carries no line), so the absence IS the contradiction.
-run_case_anywhere "authority-no-evidence-fails" 1 "carries no 'Tn · parked-hitl ·' or 'Tn · blocked ·' line" -- \
-  sh "$checker" "$fx/agreement-authority-no-evidence/docs/sprint/logs/SPRINT-945-agreement-authority-no-evidence.md"
-run_case_anywhere "budget-no-evidence-fails" 1 "carries no 'Tn · unattempted ·' line" -- \
-  sh "$checker" "$fx/agreement-budget-no-evidence/docs/sprint/logs/SPRINT-944-agreement-budget-no-evidence.md"
-# BUDGET_STOP + a LONE blocked/parked-hitl line is NOT a contradiction by itself (SPRINT-093 T1
-# revise, independent review finding): reap() reaches BUDGET_STOP purely off rp_unatt > 0 and never
-# consults rp_parked once it does -- so blocked/parked-hitl never rules BUDGET_STOP out. But an
-# unattempted line is now REQUIRED (T1 revise 2, positive-evidence check above), so this fixture was
-# corrected to carry one alongside the blocked line -- without it, the fixture itself would no
-# longer be a legitimate shape and this case would (correctly) start failing on the new rule instead
-# of proving what it was built to prove.
-run_case_anywhere "budget-vs-blocked-ok" 0 "agrees with its per-task lines" -- \
-  sh "$checker" "$fx/agreement-budget-vs-blocked/docs/sprint/logs/SPRINT-938-agreement-budget-vs-blocked.md"
-run_case_anywhere "budget-vs-denied-fails" 1 "BUDGET_STOP but carries a per-task line reap()'s priority order ranks above it" -- \
-  sh "$checker" "$fx/agreement-budget-vs-denied/docs/sprint/logs/SPRINT-939-agreement-budget-vs-denied.md"
-run_case_anywhere "budget-ok" 0 "agrees with its per-task lines" -- \
-  sh "$checker" "$fx/agreement-budget-ok/docs/sprint/logs/SPRINT-940-agreement-budget-ok.md"
-# The missing mixed-case (independent review finding): TWO different non-done states present at
-# once -- unattempted AND parked-hitl together under BUDGET_STOP -- is the actual motivating shape
-# (a run parks a J2 task per Part 0, continues disjoint AFK work, then exhausts its budget on a
-# later task). Every other fixture in this suite has exactly ONE non-done state, which is why the
-# BUDGET_STOP-vs-blocked defect got through undetected.
-run_case_anywhere "budget-mixed-with-parked-ok" 0 "agrees with its per-task lines" -- \
-  sh "$checker" "$fx/agreement-budget-mixed-with-parked-ok/docs/sprint/logs/SPRINT-943-agreement-budget-mixed-with-parked-ok.md"
-run_case_anywhere "hardfailure-unasserted-stays-green" 0 "agrees with its per-task lines" -- \
-  sh "$checker" "$fx/agreement-hardfailure-unasserted/docs/sprint/logs/SPRINT-941-agreement-hardfailure-unasserted.md"
-run_case_anywhere "userstop-unasserted-stays-green" 0 "agrees with its per-task lines" -- \
-  sh "$checker" "$fx/agreement-userstop-unasserted/docs/sprint/logs/SPRINT-942-agreement-userstop-unasserted.md"
-
-# --- case 8: the SPRINT-089 real committed artifact (SPRINT-093 T1, DoD 2) -------------------------
-# L-166: the fixture must point at the REAL committed rollup, not a synthetic reconstruction. The
-# false rollup the reaper actually wrote is committed at
-# docs/sprint/archive/logs/SPRINT-089-prove-the-unattended-run.md, but quoted INDENTED inside a
-# fenced code block on purpose (L-108/L-176: "a guard must never read an example of a rollup as a
-# rollup") -- so it does not arm this checker in its committed form, by design. Reproduced the same
-# way that log's own independent reviewer reproduced TD-112 (same file: "reconstructed the reaper's
-# raw un-indented lines, appended them at column 1 to a copy of the pre-fix log, and watched
-# check-night-run-rollup.sh PASS the false rollup"): every string below is `grep`-extracted from a
-# committed file at run time, none hand-typed, so an edit to either archived log makes this fail
-# loud rather than silently drift from its source. Retained here rather than deleted with the
-# prototype (TD-012).
-s89="$repo_root/docs/sprint/archive/logs/SPRINT-089-prove-the-unattended-run.md"
-s90="$repo_root/docs/sprint/archive/logs/SPRINT-090-run-evidence-vehicle.md"
-[ -f "$s89" ] || { echo "FAIL harness: SPRINT-089 archived log not found at $s89"; fail=1; }
-[ -f "$s90" ] || { echo "FAIL harness: SPRINT-090 archived log not found at $s90"; fail=1; }
-
-s89_dod=$(grep -m1 -oE 'run · [0-9]+ of [0-9]+ DoD ticked' "$s89" 2>/dev/null)
-s89_term=$(grep -m1 -oE 'terminal · PLAN_EXHAUSTED · .*' "$s89" 2>/dev/null)
-s89_cal=$(grep -m1 -oE 'run · \$[0-9.]+ · [0-9]+ turns · [0-9]+ min · [0-9]+ of [0-9]+ units · inline' "$s89" 2>/dev/null)
-# T2's true state -- pulled from SPRINT-090's real, already-column-1, correctly-targeted rollup
-# (never indented, because it was written to the RIGHT file). SPRINT-089's own log only ever
-# CITES this fact in prose ("Rollup: `run · 6 of 6 DoD ticked`, `T1 · done`, `T2 · parked-hitl`.");
-# the full reason text lives in SPRINT-090's own committed rollup line.
-s90_t2=$(grep -m1 -E '^T2 · parked-hitl · ' "$s90" 2>/dev/null)
-s90_t1=$(grep -m1 -E '^T1 · done · ' "$s90" 2>/dev/null)
-s90_dod=$(grep -m1 -oE '^run · [0-9]+ of [0-9]+ DoD ticked' "$s90" 2>/dev/null)
-s90_term=$(grep -m1 -oE '^terminal · AUTHORITY_BOUNDARY · .*' "$s90" 2>/dev/null)
-s90_cal=$(grep -m1 -oE '^run · cost unavailable · .* · [0-9]+ of [0-9]+ units · inline' "$s90" 2>/dev/null)
-s90_hdr=$(grep -m1 -E '^### .*\| *run-complete *\|' "$s90" 2>/dev/null)
-
-extract_ok=1
-for v in s89_dod s89_term s89_cal s90_t2 s90_t1 s90_dod s90_term s90_cal s90_hdr; do
-  eval "val=\$$v"
-  if [ -z "$val" ]; then
-    echo "FAIL harness: extraction of '$v' from the real committed archive came back empty -- the source doc changed shape; re-derive the pattern"
+  test_file="$here/night-run-rollup.test.ts"
+  min_tests=46
+  if [ ! -f "$test_file" ]; then
+    echo "FAIL harness: test file not found at $test_file"
     fail=1
-    extract_ok=0
+  else
+    (cd "$repo_root" && bun test "evals/night-run-rollup.test.ts" 2>&1) > "$here/.tmp-nrr-bun-out.txt"
+    nrr_code=$?
+    nrr_out=$(cat "$here/.tmp-nrr-bun-out.txt")
+    rm -f "$here/.tmp-nrr-bun-out.txt" 2>/dev/null
+    printf '%s\n' "$nrr_out"
+    # Bun colours its summary even when captured (an ESC/CSI byte precedes the digits) -- stripped
+    # before the anchor below, otherwise `^` binds to the escape byte and never matches (SPRINT-102 T2).
+    n_pass=$(printf '%s\n' "$nrr_out" | sed 's/\x1b\[[0-9;]*m//g' | grep -oE '^ *[0-9]+ pass' | grep -oE '[0-9]+' | head -1)
+    [ -n "$n_pass" ] || n_pass=0
+    if [ "$nrr_code" -ne 0 ]; then
+      echo "FAIL fixture(night-run-rollup-ts): the checker suite is red (bun test exit $nrr_code)"
+      fail=1
+    elif [ "$n_pass" -lt "$min_tests" ]; then
+      echo "FAIL fixture(night-run-rollup-ts): only $n_pass test(s) ran, expected at least $min_tests --"
+      echo "              coverage SHRANK while bun still exited 0 (a skipped describe, a renamed"
+      echo "              file, or a dropped case all look exactly like this)"
+      fail=1
+    else
+      echo "PASS fixture(night-run-rollup-ts): checker green -- $n_pass tests, 0 fail (retained: cases 1-8/10/11 of this harness's prior shape, incl. the real SPRINT-089/090/082 archived-artifact fixtures)"
+    fi
   fi
-done
-
-if [ "$extract_ok" -eq 1 ]; then
-  work89=$(CDPATH= cd -- "$here" && pwd)/.tmp-sprint089-motivating
-  rm -rf "$work89" 2>/dev/null
-  mkdir -p "$work89"
-  {
-    printf 'sprint: 989\nslug: sprint089-motivating\nstatus: active\n\n'
-    printf '# SPRINT-989 — Execution Log (real-artifact fixture, SPRINT-093 T1 DoD 2)\n\n'
-    printf '### 2026-08-27 | run-complete | run exited\n\n'
-    printf '%s\n' "$s89_dod"
-    printf '%s\n' "$s89_term"
-    printf '%s\n' "$s90_t2"
-    printf '\n%s\n' "$s89_cal"
-  } > "$work89/rollup.md"
-  run_case_anywhere "sprint089-real-artifact-fails" 1 "PLAN_EXHAUSTED but carries a non-done per-task line" -- \
-    sh "$checker" "$work89/rollup.md"
-
-  # Sibling control (L-142): the SAME real T1/T2 facts, under the terminal state SPRINT-090's own
-  # correctly-targeted rollup actually recorded (`AUTHORITY_BOUNDARY`) -- pulled verbatim from that
-  # file's own already-column-1 lines, not reconstructed. Must stay green.
-  work90=$(CDPATH= cd -- "$here" && pwd)/.tmp-sprint090-groundtruth
-  rm -rf "$work90" 2>/dev/null
-  mkdir -p "$work90"
-  {
-    printf 'sprint: 990\nslug: sprint090-groundtruth\nstatus: active\n\n'
-    printf '# SPRINT-990 — Execution Log (real-artifact sibling control, SPRINT-093 T1 DoD 2)\n\n'
-    printf '%s\n\n' "$s90_hdr"
-    printf '%s\n' "$s90_dod"
-    printf '%s\n' "$s90_term"
-    printf '%s\n' "$s90_t1"
-    printf '%s\n' "$s90_t2"
-    printf '\n%s\n' "$s90_cal"
-  } > "$work90/rollup.md"
-  run_case_anywhere "sprint090-real-artifact-ok" 0 "agrees with its per-task lines" -- \
-    sh "$checker" "$work90/rollup.md"
-  rm -rf "$work89" "$work90" 2>/dev/null
 fi
 
 # --- case 9 family: the reaper writes into the Plan the run was actually pointed at (SPRINT-093 T1,
@@ -311,95 +155,18 @@ else
 fi
 rm -rf "$rs" 2>/dev/null
 
-# --- case 10 family: the checker must read only the LAST run-complete block (SPRINT-093 T1
-# revise 3) --------------------------------------------------------------------------------------
-# Execution Logs are append-only (STANDARD §9 / ADR-014), so a sprint that survives more than one
-# night accumulates more than one `run-complete` block. Before this fix every check scanned the
-# WHOLE file: `term_state` picked the FIRST terminal line in the file (`head -n1`), and every
-# `bad_line` grep scanned every block's evidence lines together. A contradiction landing in a LATER
-# block could pass by borrowing an EARLIER block's (unrelated) terminal claim and finding
-# "evidence" for it anywhere in the file, including in the later block itself -- the checker never
-# actually read the later block's own terminal line at all. `night-run.sh`'s reap() already solves
-# this for the WRITE side (`tail -n "+$((rp_base + 1))"`) and names why in its own comment: "a guard
-# reading the wrong window fails exactly like one that is absent." This is the same fix for the
-# READ side.
-run_case_anywhere "window-second-block-contradicts-fails" 1 "PLAN_EXHAUSTED but carries a non-done per-task line" -- \
-  sh "$checker" "$fx/window-second-block-contradicts/docs/sprint/logs/SPRINT-946-window-second-block-contradicts.md"
-# The discriminating sibling (coordinator's own framing): the FIRST block here is itself a genuine
-# contradiction that would fail if it were still being read, and the LAST block is fully legitimate.
-# A fix that merely WIDENED the search ("look anywhere in the file" instead of "look only at the
-# last block") would still catch block one's problem and wrongly FAIL this case. Only a fix that
-# actually MOVED the window -- discarding earlier blocks entirely -- passes it.
-run_case_anywhere "window-second-block-legitimate-ok" 0 "agrees with its per-task lines" -- \
-  sh "$checker" "$fx/window-second-block-legitimate/docs/sprint/logs/SPRINT-947-window-second-block-legitimate.md"
-
-# --- case 11: the real committed SPRINT-082 2-block artifact (L-166 / TD-012) --------------------
-# `docs/sprint/archive/logs/SPRINT-082-foundation-hardening.md` genuinely carries two `run-complete`
-# blocks (any sprint that survives more than one night has this shape) -- read-only, never modified.
-# Neither of its two blocks carries a `terminal ·` line (both predate Part 0b's terminal-state
-# requirement), so this artifact cannot demonstrate a CONTRADICTION on its own; what it proves is
-# windowing itself, by contrast: fed to the checker in full, the verdict must be driven by the
-# SECOND (last) block's own evidence -- which supplies both the DoD header and the calibration row,
-# leaving only the missing terminal line as a finding. Truncated to end right before the second
-# block, the SAME real text (block one alone, verbatim) fails all three, because block one supplies
-# none of them. That the full file reports ONE finding where the truncated one reports THREE is the
-# proof the checker is reading block two, not block one, on genuinely real committed content.
-s82="$repo_root/docs/sprint/archive/logs/SPRINT-082-foundation-hardening.md"
-if [ ! -f "$s82" ]; then
-  echo "FAIL harness: SPRINT-082 archived log not found at $s82"
-  fail=1
-else
-  s82_rc_lines=$(grep -nE '^### .*\| *run-complete *\|' "$s82" 2>/dev/null | cut -d: -f1)
-  s82_rc_count=$(printf '%s\n' "$s82_rc_lines" | grep -c .)
-  if [ "$s82_rc_count" -lt 2 ]; then
-    echo "FAIL harness: expected >=2 run-complete blocks in SPRINT-082's archived log, found $s82_rc_count -- the retained artifact's shape changed, re-derive"
-    fail=1
-  else
-    s82_second_start=$(printf '%s\n' "$s82_rc_lines" | sed -n '2p')
-    work82full=$(CDPATH= cd -- "$here" && pwd)/.tmp-sprint082-full
-    work82one=$(CDPATH= cd -- "$here" && pwd)/.tmp-sprint082-block-one
-    rm -rf "$work82full" "$work82one" 2>/dev/null
-    mkdir -p "$work82full" "$work82one"
-    cp "$s82" "$work82full/rollup.md"
-    sed -n "1,$((s82_second_start - 1))p" "$s82" > "$work82one/rollup.md"
-
-    out=$(sh "$checker" "$work82full/rollup.md" 2>&1); ec=$?
-    if [ "$ec" -eq 1 ] &&
-       printf '%s\n' "$out" | grep -q "carries no 'terminal · " &&
-       ! printf '%s\n' "$out" | grep -q "carries no 'run · N of M DoD ticked' header" &&
-       ! printf '%s\n' "$out" | grep -q "carries no Part 4 calibration row"; then
-      echo "PASS fixture(sprint082-real-two-block-reads-second): full real 2-block file -- only the terminal-line finding fires, proving block two's own DoD-header + calibration-row evidence was read"
-    else
-      echo "FAIL fixture(sprint082-real-two-block-reads-second): expected exactly the terminal-line finding (block two's evidence) -- got exit $ec:"
-      printf '%s\n' "$out"
-      fail=1
-    fi
-
-    out=$(sh "$checker" "$work82one/rollup.md" 2>&1); ec=$?
-    if [ "$ec" -eq 1 ] &&
-       printf '%s\n' "$out" | grep -q "carries no 'run · N of M DoD ticked' header" &&
-       printf '%s\n' "$out" | grep -q "carries no Part 4 calibration row" &&
-       printf '%s\n' "$out" | grep -q "carries no 'terminal · "; then
-      echo "PASS fixture(sprint082-block-one-only-fails-all-three): the SAME real text truncated to block one alone fails all three -- the contrast that proves the full file is not reading block one"
-    else
-      echo "FAIL fixture(sprint082-block-one-only-fails-all-three): expected all three findings from block one alone -- got exit $ec:"
-      printf '%s\n' "$out"
-      fail=1
-    fi
-    rm -rf "$work82full" "$work82one" 2>/dev/null
-  fi
-fi
-
-
 # --- case 12 family: qa-check.sh leg 2g's OWN population derivation (SPRINT-098 T1, DoD 1/2/4) ---
 # Everything above proves check-night-run-rollup.sh itself FAILs on a nonexistent path (its own
 # file-not-found guard). What was never exercised is the CALLER, scripts/qa-check.sh leg 2g: before
 # SPRINT-098 T1, a sprint whose log was missing was silently dropped out of the checker's input list
 # before it ever saw the path -- so the one failure this whole file exists to catch never had a
-# chance to fire, exactly the scope-change's finding. Extracted here from the REAL committed
-# scripts/qa-check.sh at run time -- between the leg's own `qb_checkpoint` marker and the next one --
-# never hand-typed, so a future edit to the leg cannot drift silently out of sync with this proof
-# (the same discipline case 8/9/11 already apply one file down).
+# chance to surface -- the checker already FAILs on a nonexistent path
+# (check-night-run-rollup.sh's own file-not-found guard), it just never used to be handed one.
+# Extracted here from the REAL committed scripts/qa-check.sh at run time -- between the leg's own
+# `qb_checkpoint` marker and the next one -- never hand-typed, so a future edit to the leg cannot
+# drift silently out of sync with this proof (the same discipline the retained fixtures above apply
+# one file down). qa-check.sh is a hard-constraint file this task does not modify -- leg 2g still
+# calls the SHELL checker (`sh scripts/lib/check-night-run-rollup.sh`), so this family still spawns it.
 qa_check="$repo_root/scripts/qa-check.sh"
 leg2g_wrapper="$here/.tmp-leg2g-wrapper.sh"
 # The extracted BODY is captured on its own first, and emptiness is asserted against THAT -- not
