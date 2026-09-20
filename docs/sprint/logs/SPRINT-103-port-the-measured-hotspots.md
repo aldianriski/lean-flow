@@ -424,3 +424,33 @@ Sprint total **12 of 35**.
 
 consequence · T1 · behaviour:material · governance:high
 review · T1 · outside-reviewer-worktree-isolated · behaviour:material · governance:high
+
+### 2026-09-20 | progress | T1 before/after settled as a non-overlapping range over six alternating runs
+
+Full figures → `qa-gate-timing.md` **Round 19**. Six runs, strictly alternating R/F/R/F/R/F so
+neither arm sits in a quieter part of the session; baseline arm taken from `a1505f3^` (the genuine
+pre-reduction file, 706 lines, zero `spec_full` refs).
+
+| arm | range | median |
+|---|---:|---:|
+| full shipped spec (100 rules) | **319.2 – 354.6 s** | 341.0 |
+| reduced spec (43 rules) | **136.7 – 184.0 s** | 149.8 |
+
+**The ranges do not overlap** — the slowest reduced run is 135 s faster than the fastest full run.
+On a host showing 35% spread between two runs of byte-identical code, that non-overlap is what
+makes this a measurement rather than an anecdote, and it is precisely why the DoD refused a point
+estimate. Median to median: **341.0 → 149.8 s, 191 s (56%)**; conservative reading 135 s (42%).
+Round 17's micro-benchmark projected ~150 s and the observed saving brackets it.
+
+Parity held on every pairing checked, 0 FAIL across all six runs. Round 17's §11 tally corrected
+there too (29 → 31).
+
+**Stated against the change, not for it:** the baseline arm trends upward across the session
+(319 → 341 → 355) while the reduced arm does not, consistent with the host degrading rather than
+with anything about the change — so the *median* saving is flattered by the later baseline runs.
+The non-overlap claim uses the best baseline run and is unaffected. Host was 485–782 MB free of
+14,078 MB throughout; that bounds the absolute figures, not the comparison.
+
+T1: **7 of 11**. Sprint total **13 of 35**.
+
+consequence · T1 · behaviour:material · governance:low

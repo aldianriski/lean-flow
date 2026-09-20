@@ -1949,7 +1949,7 @@ learning-governance. The 68 cases say:
 
 | section | cases |
 |---|---:|
-| §11 | 29 |
+| §11 | 31 |
 | §9 | 16 |
 | §12 | 11 |
 | §10 | 10 |
@@ -2024,3 +2024,42 @@ where today they need only `sh`. That last one is not a detail — it is a chang
 
 **Not measured here:** whether an in-process implementation actually recovers the 81 s of `sys`. That
 is a prototype's question, not a profile's, and this Round does not answer it.
+
+## Round 19 — T1's before/after, as a range over six alternating runs (2026-09-20)
+
+SPRINT-103 T1. Six runs of `run-sprint-family-fixtures.sh`, **strictly alternating** reduced/full so
+neither arm sits in a quieter part of the session: R, F, R, F, R, F. Baseline arm is the pre-change
+file from `a1505f3^` (706 lines, zero `spec_full` references — the genuine before). Host conditions
+are unchanged and poor throughout: 485–782 MB free of 14,078 MB, `vmmemWSL` holding ~5 GB. Stated
+because it bounds the absolute figures; it does not bound the comparison, which alternates through
+the same conditions.
+
+| arm | run 1 | run 2 | run 3 | range | median |
+|---|---:|---:|---:|---:|---:|
+| **full shipped spec** (100 rules) | 319.2 s | 341.0 s | 354.6 s | **319.2 – 354.6** | 341.0 |
+| **reduced spec** (43 rules) | 184.0 s | 136.7 s | 149.8 s | **136.7 – 184.0** | 149.8 |
+
+**The ranges do not overlap, and that is the whole result.** The slowest reduced run (184.0 s) is
+135 s faster than the fastest full run (319.2 s). On a host with 35% spread between two runs of
+byte-identical code, a point estimate would have carried no weight either way — non-overlap is what
+makes this a measurement rather than an anecdote, and it is the reason the DoD asks for a range.
+
+Median to median: **341.0 → 149.8 s, a saving of 191 s (56%)**. The conservative reading —
+worst reduced against best full — is 135 s (42%). Round 17 projected ~150 s from a micro-benchmark;
+the observed saving brackets it.
+
+**Parity held on every pairing checked**, including run 3 against run 2 of the other arm: 69/69
+verdict lines identical, 0 FAIL on all six runs.
+
+One honest note on the baseline arm: it trends upward across the session (319 → 341 → 355) while the
+reduced arm does not (184 → 137 → 150). That is consistent with the host degrading rather than with
+anything about the change, and it means the median saving above is, if anything, flattered by the
+later baseline runs. The non-overlap claim uses the *best* baseline run, so it is unaffected.
+
+### Correction to Round 17
+
+Round 17's per-section table read **§11 x29**, summing to 66 against the 68 cases named in the same
+paragraph. The true tally is **§11 x31 · §9 x16 · §12 x11 · §10 x10 = 68**; two calls are written
+`assert_absent` with two spaces and the counting pattern required one. Corrected above. The derived
+set — {§9,§10,§11,§12}, 43 rules — is unchanged, so nothing built on Round 17 moves. Found by an
+outside reviewer, not by the author; the four numbers were printed beside the 68 and never added up.

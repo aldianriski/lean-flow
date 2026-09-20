@@ -68,7 +68,7 @@ rest of this sprint under T3's ruling (ADR-043).
 - [ ] If ported: retained must-FAIL + sibling control + seeded-break proof under ONE stated hash convention
 - [ ] If ported: wiring diff **committed as a reviewable file before being applied** (three reviewers in SPRINT-102 could not audit wiring that lived only in chat — L-151)
 - [ ] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
-- [ ] Before/after stated as a **range over ≥3 alternating runs**, never a point estimate — this host shows >3× run-to-run variance
+- [x] Before/after stated as a **range over ≥3 alternating runs**, never a point estimate — this host shows >3× run-to-run variance
 
 ### T2 — Rule and port `run-layers-observed-fixtures.sh` `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `evals/run-layers-observed-fixtures.sh` · `scripts/lib/check-layers-observed.sh` (retained as oracle) · a new `scripts/lib/check-layers-observed.ts` · `scripts/qa-check.sh` (leg 15) · `docs/research/logs/qa-gate-timing.md`
