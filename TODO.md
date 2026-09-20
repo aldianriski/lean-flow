@@ -275,6 +275,39 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 
 ### P2 — Follow-on
 
+- [ ] TASK-356 — Re-audit the gate's own rationale comments against Round 16, and give the stale ones an expiry  [size: S] [risk: low] [HITL]
+      class:      execution
+      tier:       P
+      authority:  J1
+      origin:     manual   # found during SPRINT-103 T1/T2 execution; NOT grilled at intake
+      state:      ready
+      done-when:  Every comment in `scripts/qa-check.sh` and `scripts/lib/*.ts|sh` that states a
+                  COST or a RANKING is either re-derived against Round 16 and corrected, or deleted.
+                  Verify: no surviving comment names a figure contradicted by
+                  `docs/research/logs/qa-gate-timing.md`'s latest Round — checked by grepping for
+                  second-figures (`~Ns`, `N min`, "slowest", "most expensive") and reconciling each
+                  hit against the Round, with the count of hits examined stated.
+      why:        **Two confirmed instances in one sprint, both found by accident rather than by a
+                  check.** (1) `scripts/qa-check.sh:1169` justified `run-sprint-family-fixtures.sh`'s
+                  opt-in placement with "~5 min for 23 cases … ~15s each against the SHIPPED spec" —
+                  the harness has **68** cases and now uses a reduced spec at 137–184 s. Corrected
+                  at SPRINT-103 T1. (2) `scripts/lib/check-layers-completeness.ts`'s header still
+                  calls `evals/run-layers-completeness-fixtures.sh` "the slowest harness in the gate
+                  (measured ~55-70s)" — Round 16 retired that: it is not in the top 20, and the five
+                  ported checkers now total **17 s**. Still uncorrected.
+                  These are not cosmetic. A cost comment is what a maintainer reads when deciding
+                  whether to promote a harness from opt-in to always-on, or which target to attack
+                  next — and **SPRINT-102 lost a day to exactly that failure at the ledger grain**,
+                  choosing five targets from TD-090's stale figures. The same rot at the comment
+                  grain is one `git blame` away from the same mistake. L-151's shape: a figure
+                  recorded where its reader reaches it, left true-at-writing and never re-derived.
+      plan:       Enumerate first, then fix — the population is the hard part, not the edits. A
+                  figure can be a duration, a rank, a count, or a superlative, and only the last is
+                  greppable. Derive the candidate set two ways that disagree by construction (grep
+                  for numeric-plus-unit; and read every `# ---` block header in `qa-check.sh`), and
+                  state both counts. Then consider whether a cost comment should carry the Round it
+                  was derived from, so the next reader can tell staleness from disagreement.
+
 - [ ] TASK-354 — Give the `dod-delta` leg a ruled-exemption declaration, so a historical mis-attribution stops blocking every close  [size: S] [risk: low] [HITL]
       class:      execution
       tier:       G

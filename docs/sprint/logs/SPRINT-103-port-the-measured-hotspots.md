@@ -498,3 +498,24 @@ harness in the gate (~55-70s)" — Round 16 retired that. Same stale-rationale s
 Sprint total **17 of 35**.
 
 consequence · T2,T4,T5 · behaviour:low · governance:low
+
+### 2026-09-20 | progress | stale-rationale follow-up filed as TASK-356 — in the Backlog, not only here
+
+Two entries above named the stale cost comments as "follow-up, named not silently patched". **That
+was not enough and the rule says so.** A follow-up recorded only in a sprint's own log is invisible
+to every `promote` that follows, because the Backlog is what `promote` reads — L-151's fourth
+recorded sighting, where `TASK-254/255/256` were satisfied later by coincidence of scope rather
+than by routing. Filed properly as **TASK-356** (P2).
+
+Id derived with `.claude/worktrees/` **and** `evals/fixtures/` excluded: a bare scan returned
+`TASK-908`, which is a documented example token in `docs/LEARNINGS.md` and an archived sprint. Real
+maximum is **TASK-355**, agreed by two selection rules (TODO.md alone; `docs/` + TODO + TECH-DEBT).
+Third sighting of L-170 this session, and the first where the contamination came from **eight live
+agent worktrees** rather than from fixtures alone.
+
+The row is scoped as an *enumeration* problem rather than an editing one: two instances were found
+by accident this sprint, which says nothing about how many exist. Its plan requires two
+disagreeing-by-construction derivations of the candidate set, because a stale figure can be a
+duration, a rank, a count or a superlative and only the last is greppable.
+
+consequence · T0 · behaviour:low · governance:low
