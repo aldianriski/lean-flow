@@ -271,6 +271,55 @@ try {
     assertContains("cross-task-declaration (names T1:bar.txt)", port.out, "T1:bar.txt");
   }
 
+  // -- TWO trailing parentheticals in one subject -- the LAST one wins (SPRINT-103 T2 review) ----
+  // The oracle's rule 4 is an unanchored, greedy sed (`s/.*(SPRINT-...\(T[0-9]\{1,\}\)).*/\1/p`);
+  // POSIX leftmost-longest makes that `.*` select the LAST citation. The port originally used a
+  // non-greedy `.exec()` and took the FIRST, so a squash/merge subject citing two tasks produced a
+  // false-positive FAIL on input the oracle passes clean. No fixture reached it: `git log --all`
+  // over this repo's whole history has ZERO subjects with two citations, and every constructed
+  // fixture carried one -- first-match and last-match agree on every single-citation input. The
+  // gap was an AXIS (how many citations does one subject carry), not a branch anyone had skipped.
+  // Retained permanently: this is the only case in the suite that varies that axis.
+  {
+    const d = posix.join(work, "two-parentheticals");
+    gitInit(d);
+    writeFile(
+      d,
+      "docs/sprint/SPRINT-931-two-cites.md",
+      `---\nsprint: 931\nslug: two-cites\nstatus: active\nplan_commit: PLAN_COMMIT_PLACEHOLDER\n---\n\n## Plan\n\n### T1 — edit t1own.txt\nLayers: \`t1own.txt\`\nDepends-on: none\n\n**DoD:**\n- [ ] t1own.txt updated\n\n### T2 — edit t2own.txt\nLayers: \`t2own.txt\`\nDepends-on: none\n\n**DoD:**\n- [ ] t2own.txt updated\n`,
+    );
+    writeFile(d, "t1own.txt", "a\n");
+    writeFile(d, "t2own.txt", "b\n");
+    lockPlan(d, "docs/sprint/SPRINT-931-two-cites.md");
+    // Touches ONLY T2's file, and cites T1 FIRST, T2 LAST. Last-match => T2 => declared => PASS.
+    // First-match => T1 => "T1 changed a file it never declared" => a FAIL the oracle never raises.
+    writeFile(d, "t2own.txt", "b\nb2\n");
+    commitAll(d, "apply the same fix as before (SPRINT-100 T1) and again (SPRINT-931 T2)");
+    const { port } = compare("two-parentheticals-last-wins", d, ["docs/sprint/SPRINT-931-two-cites.md"]);
+    assertContains("two-parentheticals-last-wins (PASS, attributed to T2)", port.out, "layers observed (all changed files declared");
+    assertNotContains("two-parentheticals-last-wins (must NOT blame T1)", port.out, "T1:t2own.txt");
+  }
+
+  // -- sibling control: ONE trailing parenthetical, same shape -- proves the case above is not
+  // passing merely because the file is declared somewhere ---------------------------------------
+  {
+    const d = posix.join(work, "one-parenthetical");
+    gitInit(d);
+    writeFile(
+      d,
+      "docs/sprint/SPRINT-932-one-cite.md",
+      `---\nsprint: 932\nslug: one-cite\nstatus: active\nplan_commit: PLAN_COMMIT_PLACEHOLDER\n---\n\n## Plan\n\n### T1 — edit t1own.txt\nLayers: \`t1own.txt\`\nDepends-on: none\n\n**DoD:**\n- [ ] t1own.txt updated\n\n### T2 — edit t2own.txt\nLayers: \`t2own.txt\`\nDepends-on: none\n\n**DoD:**\n- [ ] t2own.txt updated\n`,
+    );
+    writeFile(d, "t1own.txt", "a\n");
+    writeFile(d, "t2own.txt", "b\n");
+    lockPlan(d, "docs/sprint/SPRINT-932-one-cite.md");
+    // One citation naming T1, but the commit touches T2's file: must FAIL, naming T1:t2own.txt.
+    writeFile(d, "t2own.txt", "b\nb2\n");
+    commitAll(d, "apply the fix (SPRINT-932 T1)");
+    const { port } = compare("one-parenthetical-control", d, ["docs/sprint/SPRINT-932-one-cite.md"]);
+    assertContains("one-parenthetical-control (FAILs, names T1:t2own.txt)", port.out, "T1:t2own.txt");
+  }
+
   // -- unattributable commit -- must FAIL ------------------------------------------------------
   {
     const d = posix.join(work, "unattributable-commit");

@@ -612,3 +612,70 @@ T2: **5 of 7** — outside review and the before/after range remain. The builder
 but a builder is not a reviewer (L-165). Sprint total **21 of 35**.
 
 consequence · T2 · behaviour:material · governance:high
+
+### 2026-09-20 | surprise | outside review found a REAL port defect that every prior proof missed
+
+The T2 review found one confirmed defect, and it is the most valuable finding of this sprint
+because of *where* it hid rather than what it was.
+
+**The defect.** The oracle's `attribute()` rule 4 is an unanchored greedy sed —
+`s/.*(SPRINT-[0-9]\{1,\}[ ]\{1,\}\(T[0-9]\{1,\}\)).*/\1/p`. POSIX leftmost-longest makes that `.*`
+select the **LAST** parenthetical in a subject. The port used `/\(SPRINT-…\)/.exec(subject)` — no
+greedy prefix, not global — which returns the **FIRST**. Reproduced here directly:
+
+    subject: 'apply the same fix as before (SPRINT-100 T1) and again (SPRINT-101 T2)'
+    oracle sed -> T2          port .exec -> T1
+
+End-to-end that is a **false-positive FAIL the oracle never raises**: a squash/merge commit citing
+two tasks, touching only T2's declared file, gets blamed on T1. Fixed by mirroring the oracle's
+greedy prefix (`/.*\(SPRINT-…\)/`), with the reasoning written at the line so it cannot be
+"tidied" back out.
+
+**Why every proof above it was blind, and this is the part worth keeping.** `git log --all` over
+this repo's entire history returns **zero** subjects carrying two citations, so the 103-file real
+corpus structurally cannot reach the shape. None of the 19 constructed fixtures built one either.
+So 25/25 parity, 37/37 assertions and a seeded-break proof were all satisfied — **first-match and
+last-match agree on every single-citation input, which was the entire tested population.**
+
+This is L-186 one turn sharper than the rule states it. The brief sent the reviewer after the
+branches the builder had *admitted skipping* — seven of them, plus real-commit extraction — and
+**every one of those came back clean.** The defect sat on an axis nobody had enumerated at all:
+*how many citations does one subject carry*. Enumerating known-skipped branches is necessary and
+was not sufficient; the gap was orthogonal to the list. A fixture population can be complete over
+every branch and still be a single point on a dimension no one named.
+
+**Fixture added and retained** — `two-parentheticals-last-wins` plus a `one-parenthetical-control`
+sibling, in the differential's own population. It is the only case in the suite that varies that
+axis, and the comment says so.
+
+**Discrimination proved, and the proof needed two attempts.** First seeding attempt: my `sed`
+pattern errored, the file was untouched, and the suite reported **27/27 green** — a passing
+"discrimination proof" from a seed that never landed. Caught only by the `cmp`-against-pristine
+guard, which is exactly L-137's stated failure and the second time today a seeding attempt was
+silently inert. Re-seeded via string replace (no regex), **verified landed** (2 lines changed, 521
+lines both, still parses, `attribute()` demonstrably returns T1):
+
+| | pristine | seeded |
+|---|---:|---:|
+| differential | 27/27 | **26/27** |
+| fixture assertions | 40/40 | **38/40** |
+
+Exactly the two new assertions reddened; `one-parenthetical-control` stayed **green**. Restored
+under one convention throughout — `sha256sum` on the working file,
+`532a2416dcd3973018e47daa86db24f0abdc4e2f2473c060d3d4ea4d8c1d001e` before and after.
+
+**Also from the review, not acted on:** the builder's report claimed it "memoizes
+`git rev-parse --short` per commit". The reviewer read all 512 lines and found no such
+memoization; I confirmed it never reached the repo (no `memoi` in any committed file or message),
+so there is nothing to correct in the tree — but a builder describing an optimization it did not
+write is a reason to keep verifying reports rather than relaying them. The other stated
+optimization (hoisting WIP computation out of the per-argument loop) the reviewer checked and
+found safe: every git call here is read-only, so nothing mutates the tree mid-run.
+
+Everything else attacked came back clean: `covers()` glob-injection, `sort -u` locale fidelity,
+eight text-processing functions read against the oracle's source, and the differential's documented
+archived-content exclusion.
+
+T2: **6 of 7** — only the before/after range remains. Sprint total **22 of 35**.
+
+review · T2 · outside-reviewer-worktree-isolated · behaviour:material · governance:high

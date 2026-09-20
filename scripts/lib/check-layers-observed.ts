@@ -228,7 +228,16 @@ export function attribute(subject: string, trailerTask: string, isGovernance: ()
   if (m) return m[1]!;
   m = /^merge\([^)]*\): *(T[0-9]+)[^0-9]/.exec(subject);
   if (m) return m[1]!;
-  m = /\(SPRINT-[0-9]+ +(T[0-9]+)\)/.exec(subject);
+  // Rule 4, trailing parenthetical. The LEADING `.*` is load-bearing and mirrors the oracle's
+  // `s/.*(SPRINT-[0-9]\{1,\}[ ]\{1,\}\(T[0-9]\{1,\}\)).*/\1/p`: POSIX leftmost-longest makes that
+  // greedy prefix select the LAST parenthetical in the subject, and JS `.*` is greedy for the same
+  // reason. Without it, `.exec()` returns the FIRST -- which is what this line did until an outside
+  // reviewer found it. On `...(SPRINT-100 T1) and again (SPRINT-101 T2)` the oracle yields T2 and
+  // first-match yields T1, a false-positive FAIL on a squash/merge commit citing two tasks. No
+  // fixture reached it because no subject in this repo's history, and none in the differential's
+  // population, carried TWO citations -- first- and last-match agree on every single-citation
+  // input (L-186: the gap was an axis nobody had enumerated, not a branch anyone had skipped).
+  m = /.*\(SPRINT-[0-9]+ +(T[0-9]+)\)/.exec(subject);
   if (m) return m[1]!;
 
   // Rule 2's qualifier widening (SPRINT-093 T7): `sprint(NN) T<n> <qualifier>: ...` where <qualifier>
