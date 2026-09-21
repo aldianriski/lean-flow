@@ -207,3 +207,63 @@ own `Layers:` line at 554 chars. The tempting fix was to exempt `Layers:`/`Cites
 way table rows are exempt — defensible in principle, and **suspect by construction when written by
 the author whose file is failing**. Tested instead whether the line simply wraps: it does, and both
 parsers still accept it. The rule held without a carve-out.
+
+---
+
+### 2026-09-22 | scope-change | T3's outside review: the code was right, the reasoning was not
+
+**Verdict: "the code does what it claims, but the justification does not hold — FIX BEFORE
+TICKING."** Eleven findings, four CONFIRMED by reproduction. The ordering reproduced, the headline
+`262 pass, 3 fail` reproduced exactly, and set integrity was exact. Everything else was wrong.
+
+**F1, the one that matters: the change was a REGRESSION.**
+
+| | before | after |
+|---|---|---|
+| gate | bounded at 520s, self-terminated | ran to completion, **805s measured** |
+| launcher | `die_doa` at ~560s — fit under 600s | + `--wait-seconds` ⇒ **~955s = 1.6× the ceiling** |
+| failure mode | clean named refusal | **killed mid-pre-flight, no verdict** |
+
+The premise was false and checkable in one command: the gate call at `:589` is **synchronous**,
+and the only `nohup` is **144 lines below**. At gate time night-run.sh *is* the blocking foreground
+invocation. The comment asserted the opposite. TD-084's silent truncation was relocated into the
+one script whose entire purpose is refusing to act on an incomplete verdict — and the gate said so
+in its own voice: *"a FOREGROUND invocation of this duration would be killed."*
+
+**F2: the ADR quote is about a different variable.** ADR-042's *"a caller that knows it is detached
+may raise it"* has **`QA_CEILING_SECONDS`** as its antecedent. It was reproduced verbatim in the
+DoD, the commit message, the code comment and the Execution Log, each time attached to
+`QA_BUDGET_SECONDS`. `night-run.sh` has **zero** hits for `QA_CEILING_SECONDS`, so the one line
+ADR-042 actually licensed was never implemented.
+
+**This is the fourth ADR misreading in two days** — ADR-011 reframed (reviewer-caught), ADR-042's
+alternatives table missed (self-caught), ADR-042's own sentence mis-attributed and propagated into
+four artifacts. Not carelessness on one ADR: **the Decision section gets read and everything that
+qualifies it does not.** That is the learning this sprint owes.
+
+**F3/F5: two numbers were wrong in the author's favour.** Headroom was stated against **601s** when
+the same quantity measures **805s** here and **945s** in SPRINT-101 — and 945s is still live and
+unedited in `TODO.md`. And the motivating anecdote ("spent 162.2s on conformance-engine, then
+skipped a 0.75s harness") **cannot have happened**: conformance-engine was **#23** in the old
+order, and with 22 of 38 running it was the *first harness skipped* — 0s, not 162.2s. A
+standalone-sweep figure narrated as in-run behaviour, frozen into three artifacts.
+
+**F4, fixed here rather than filed.** `qa_budget_check` with a non-numeric budget returned
+**`OK 1790032685 abc`, rc 0** — the guard reporting OK at 1.79 billion seconds elapsed, forever.
+`[` errors, the `if` reads false, the function falls through. Now refuses by name with a distinct
+rc 2. Five retained cases incl. a must-NOT-catch control; a seeded break removing the validation
+reddens exactly 14–17 reproducing the original string, while 18 stays green.
+
+**F7 → `TD-175` (high).** A truncating gate prints **two** `QA-CHECK:` verdict lines, and
+`night-run.sh:597` takes `tail -n1`. The launcher can read another run's verdict as its pre-flight.
+Proven pre-existing by reverting T3 and reproducing identically. It survived only because trailing
+text happened to break the anchored pattern — **by luck, not design.**
+
+**Disposition:** raise reverted and pushed ahead of everything else (`ecf376e`); ordering kept, and
+independently verified — ranking reproduces on a spanning sample, no order coupling, skipped set at
+a 200s budget is exactly positions 30–38. Real fix filed as `TASK-367`: the **caller** declares
+detachment; a script cannot see how it was invoked.
+
+**What this sprint has now demonstrated three times over:** every defect that mattered was found by
+an outside pass, and none by the author recalling the rule — including the one the author had
+correctly predicted in writing beforehand (L-165 ×3).

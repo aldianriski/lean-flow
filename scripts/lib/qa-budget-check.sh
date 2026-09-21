@@ -27,6 +27,28 @@ qa_budget_check() {
     printf 'OK %s %s\n' 0 "$_qb_budget"
     return 0
   fi
+  # A NON-NUMERIC BUDGET MUST REFUSE, NOT PASS (SPRINT-105 T3, outside review F4).
+  #
+  # Without this, `[ "$elapsed" -gt "$budget" ]` ERRORS on a non-numeric budget (rc 2, "integer
+  # expression expected" on stderr), the `if` reads that as false, and the function falls through
+  # to `printf 'OK ...'` and `return 0` -- every time, forever. Measured: `qa_budget_check 0 abc 0`
+  # returned `OK 1790032685 abc`, rc 0. The guard reports OK at 1.79 BILLION seconds elapsed.
+  #
+  # That is a silent false negative in the mechanism whose whole job is bounding a run, and it is
+  # reachable from any caller that passes an env var through unvalidated -- which is exactly what a
+  # night-run.sh budget raise did before it was reverted. Fixing it HERE rather than at that one
+  # caller is deliberate: the hole belongs to this function, and a per-caller guard would leave the
+  # next caller to rediscover it.
+  #
+  # Refuses by NAME on stderr and returns 2 -- distinct from 1 (OVER), so a caller can tell
+  # "budget exceeded" from "budget unusable" instead of conflating them (the L-045 shape).
+  case "$_qb_budget" in
+    ''|*[!0-9]*)
+      printf 'qa_budget_check: budget must be a non-negative integer, got: %s\n' "$_qb_budget" >&2
+      printf 'UNUSABLE 0 %s\n' "$_qb_budget"
+      return 2
+      ;;
+  esac
   _qb_now=$(date +%s)
   _qb_elapsed=$(( _qb_now - _qb_start ))
   if [ "$_qb_elapsed" -gt "$_qb_budget" ]; then

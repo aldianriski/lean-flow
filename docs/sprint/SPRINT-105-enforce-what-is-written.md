@@ -86,34 +86,41 @@ at or below its baseline does not.
 - [x] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168) — *verdict: detection sound, member set wrong. 8 findings, all fixed in `a33732e`: population 16→84 files, table cells measured, 6 new fixtures, verdict count corrected*
 
 
-### T3 — Make the detached gate actually run every harness `[size: S · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/qa-check.sh` · `scripts/night-run.sh`
+### T3 — Make the gate's truncation cost the fewest guards `[size: S · risk: med · class: execution · tier: G · HITL · J1]`
+Layers: `scripts/qa-check.sh` · `scripts/night-run.sh` · `scripts/lib/qa-budget-check.sh` ·
+        `evals/run-qa-budget-fixtures.sh`
 Depends-on: none
-Cites: ADR-042 · L-020 · L-151 · L-058 · L-076 · L-130 · TD-084 · `run-conformance-engine-fixtures.sh` · `run-s4-ts-evaluators.sh`
+Cites: ADR-042 · L-020 · L-151 · L-058 · L-130 · TD-084 · `run-conformance-engine-fixtures.sh` · `run-s4-ts-evaluators.sh`
 
-The gate needs ~679s and truncated on **every** run, skipping ~16 harnesses. The skipped set was
-chosen by position in a chronological list, not by value: it spent **162.2s** on
-`run-conformance-engine-fixtures.sh` and then skipped `run-s4-ts-evaluators.sh` at **0.75s**.
+The gate needs ~805s (this host, measured at HEAD by the outside reviewer; SPRINT-101 measured
+945s) and truncated on every default run, skipping ~16 of 38 harnesses. The skipped set was chosen
+by position in a chronological list, not by cost.
 
-**Acceptance:** a detached run executes all 38 always-on harnesses with no truncation, and the
-default foreground profile drops the dearest rather than the newest if it ever does truncate.
+**Acceptance:** if the gate truncates, it drops the dearest harnesses rather than the newest; and
+the budget guard refuses an unusable budget instead of passing it through.
 
 **DoD:**
-- [x] Per-harness cost **measured**, not estimated — *38 harnesses, 533.8s total; the expensive four are 162.2 · 51.6 · 46.6 · 34.0s and the cheapest 24 together cost ~100s*
-- [x] Always-on set ordered **cheapest-first** — *so that if a budget is ever exceeded, truncation costs the fewest guards rather than an arbitrary tail*
-- [x] **`scripts/night-run.sh` raises its own budget to 1200s** — *it is the detached caller ADR-042 anticipated ("a caller that knows it is detached may raise it") and was invoking the gate at the 520s **foreground** default, truncating the pre-flight that decides whether to FIRE an unattended run. A floor, not an override: a higher caller-set budget is kept*
-- [x] The truncation message names the **concrete remedy** — *`QA_BUDGET_SECONDS=1200 sh scripts/qa-check.sh`, not just the variable name; the reader who needs it is the one staring at the truncation (L-151)*
-- [x] Detached run verified: **all 38 harnesses execute, zero truncation** — *`QA-CHECK: 262 pass, 3 fail` at `QA_BUDGET_SECONDS=1200`, wall 601s, 38 of 38 harness rows, no truncation line. Against `228 pass, 5 fail` and 22 of 38 before (L-120: the gate's printed verdict, not an exit code)*
-- [ ] Outside reviewer dispatched worktree-isolated (ADR-029 ii)
+- [x] Per-harness cost **measured** — *38 harnesses, 533.8s as a standalone sequential sweep. NOT an in-run figure: in-run wall is 805s including non-harness legs, and the two measure different things (review F3)*
+- [x] Always-on set ordered **cheapest-first** — *Verify: reviewer re-timed positions 1/2/19/25/33/36 at 0.49 · 0.58 · 4.12 · 6.50 · 13.0 · 35.8s, strictly increasing; at a 200s budget the skipped set is exactly positions 30–38, the expensive tail*
+- [x] Set integrity — *38/14/52 against `11bbd8b~3`, diff empty, no drops, duplicates or cross-set moves; independently confirmed*
+- [x] **Tier G bar**: `qa_budget_check` refuses a non-numeric budget — *5 retained cases (14–18) incl. a must-NOT-catch control; seeded break removing the validation reddens exactly 14–17 reproducing the original `OK 1790033736 abc`, while 18 stays green. Restored under one convention (`git hash-object` vs `git rev-parse HEAD:<path>`)*
+- [x] Outside reviewer dispatched worktree-isolated (ADR-029 ii) — *11 findings; the night-run raise **reverted as a regression**, four false claims corrected, F4 fixed, F7 filed as `TD-175`, follow-up as `TASK-367`*
+- [ ] CHANGELOG entry for the consumer-facing surface (L-015)
 
-**What this task deliberately did NOT do, and why it matters.** A first attempt split the always-on
-set by a measured 30s cost cap, moving the expensive four behind `QA_FULL=1`. That was **reverted
-before commit**: `ADR-042`'s alternatives table already rejects exactly that move — it "trades a
-coverage claim for a schedule, which is the shape L-058 warns about" — and the premise behind it
-was wrong, because the 600s ceiling is a **foreground** limit, not a wall. The owner had already
-ruled the correct fix at SPRINT-101 ("raise `QA_BUDGET_SECONDS` and re-run"); it simply lived in a
-sprint log that no procedure read. The defect was never the harness set. It was an unwired ruling.
+**Two claims in this task's first version were false, and both are corrected above rather than
+quietly dropped.** *(a)* It said the gate "spent 162.2s on `run-conformance-engine-fixtures.sh` and
+then skipped `run-s4-ts-evaluators.sh` at 0.75s". In the old order conformance-engine was **#23** —
+with 22 of 38 running, it was the **first harness skipped**, so the gate spent **0s** on it.
+Truncation is monotone; the anecdote cannot describe that run. *(b)* It cited ADR-042's *"a caller
+that knows it is detached may raise it"* as licence for raising `QA_BUDGET_SECONDS`. That
+sentence's antecedent is **`QA_CEILING_SECONDS`** — a different variable with a different job. The
+mis-citation was reproduced in the DoD, the commit message, the code comment and the Execution Log.
 
+**And the night-run.sh change was a regression, reverted.** The gate call at `:589` is
+**synchronous**; the only `nohup` is 144 lines below. Unbounded, the launcher reached ~955s in one
+foreground call against a 600s ceiling — killed mid-pre-flight with no verdict, where before it
+self-terminated at 520s and refused cleanly at ~560s. A real fix needs the **caller** to declare
+detachment: `TASK-367`.
 ## Owner actions
 
 - [ ] Review and approve the `ADR-044` stance reversal — it changes what the plugin is allowed to

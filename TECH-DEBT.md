@@ -295,6 +295,31 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-175** severity: high | status: open | created: Sprint-105
+  - Summary: **A truncating gate prints TWO `QA-CHECK:` verdict lines, and `night-run.sh` reads the
+    last one with `tail -n1`.** Reproduced by an outside reviewer at `QA_BUDGET_SECONDS=200`: the
+    run trips correctly at 208s, then **keeps going to 697s**, and the output contains two complete
+    gate reports — two leg-1 headers, ~67 harness rows, and a complete nested
+    `QA-CHECK: 263 pass, 3 fail` printed **ahead of** the outer run's real
+    `QA-CHECK: 253 pass, 4 fail`.
+  - **PRE-EXISTING, and that was proven rather than assumed.** Reverting SPRINT-105 T3's budget
+    raise reproduced it identically (675s, 645 lines, 2 verdict lines), so it is not introduced by
+    that change. Which harness spawns the nested run is **not yet isolated** —
+    `run-run-mode-fixtures.sh` was the first suspect and is ruled out at 4s.
+  - **Why `high`.** `scripts/night-run.sh:597` selects the pre-flight verdict with
+    `grep -E '^QA-CHECK: ...' | tail -n1`. Two verdict lines in one stream means the launcher can
+    read **another run's verdict** as its own pre-flight result, then decide whether to fire an
+    unattended run on it. In both observed runs the interleaving happened to append trailing text
+    to the nested line so the anchored pattern rejected it — **by luck, not by design**. This is
+    the exact L-045/L-120 self-report trap the surrounding 40 lines of comment exist to close,
+    arriving through a door nobody checked.
+  - **Reachable precisely when the pre-flight truncates**, which is the slow-host case.
+  - **Mitigation (hypothesis, re-derive before building a DoD on it — L-091).** Either find and
+    stop the nested spawn, or make the launcher refuse when it sees more than one verdict line
+    rather than silently taking the last. The second is cheap and closes the trap even if the
+    nested run is legitimate.
+  - **Re-file fresh if** a second nested-verdict source appears.
+
 - **TD-174** severity: high | status: open | created: Sprint-104
   - Summary: **The soft-cap route reports and nothing acts on it.** `check-doc-caps` prints three
     `OVER-CAP (soft)` rows on every run — `TODO.md` 536 > 320, `docs/research/adlc-epic-sequencing.md`

@@ -53,9 +53,9 @@ status: current
 [`CHANGELOG.md`](CHANGELOG.md) and the sprint archive. Pruned at the SPRINT-097, SPRINT-100 and
 SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 99 rows** (98 open · 1 resolved · 8 `severity: high` open) — re-derived
-  2026-09-21 after TD-173/TD-174 were filed, by row header, cross-checked by distinct id (both 99)
-  and by partition (98 + 1 = 99). The partition only reconciled once the `status:`/`severity:`
+- **Debt ledger: 100 rows** (99 open · 1 resolved · 9 `severity: high` open) — re-derived
+  2026-09-22 after TD-175 was filed, by row header, cross-checked by distinct id (both 100)
+  and by partition (99 + 1 = 100). The partition only reconciled once the `status:`/`severity:`
   match was made **markup-tolerant** (`\*{0,2}`) — a lowercase-only pattern returned 94 + 1 = 95
   against 99 rows, which is L-108 firing on the very census that documents it. Eight rows resolved at or before SPRINT-100 were **deleted** at that
   promote under §11's 3-sprint clock; **ids stay monotonic — a deleted row never frees its id.**
@@ -444,6 +444,37 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
                   and L-002 stays a written rule. ADR-044's bar is "a consumer would not want to
                   switch this off", and they cannot switch it off selectively.
       tracker:    ADR-044 · ADR-011 (option B) · L-002 · L-186 · SPRINT-105 T1 review
+
+
+- [ ] TASK-367 — Let the caller declare detachment, so the pre-flight gate can run complete  [size: M] [risk: high] [HITL]
+      class:      decision
+      tier:       G        # it decides whether an unattended run fires; a wrong verdict here
+                           # launches or blocks a whole night's work
+      authority:  J2
+      origin:     close-retro   # SPRINT-105 T3's raise was reverted as a regression; this is the real fix
+      state:      needs-info    # the detachment signal's shape is the open question
+      done-when:  `night-run.sh` can run the pre-flight gate to COMPLETION without exceeding the
+                  foreground command ceiling, and does so only when the caller has **declared**
+                  detachment rather than a script assuming it. The reverted attempt raised
+                  `QA_BUDGET_SECONDS` unconditionally: the gate call at `:589` is synchronous (the
+                  only `nohup` is 144 lines below), so an unbounded gate took the launcher to ~955s
+                  in one foreground call against a 600s ceiling — killed mid-pre-flight with no
+                  verdict, strictly worse than the bounded refusal it replaced.
+                  Required: (a) an explicit signal — a `--detached` flag or an env var the caller
+                  sets — never inferred; (b) raise `QA_CEILING_SECONDS` alongside the budget, since
+                  that is the variable ADR-042 actually licensed a detached caller to raise and
+                  night-run.sh has **zero** hits for it; (c) a bound on the un-raised path so a
+                  slow host gets a **named refusal** rather than a kill; (d) retained fixtures incl.
+                  a must-NOT-raise sibling and a selection-varying case (a repo with no
+                  `scripts/qa-check.sh`, the other arm of the `[ -f ... ]` test, which no fixture
+                  currently reaches).
+      touches:    scripts/night-run.sh · scripts/qa-check.sh · evals/run-night-run-gate-exception-fixtures.sh · ADR-042
+      depends-on: none
+      assumes:    that a complete pre-flight is worth its wall-clock at all. UNCONFIRMED — the
+                  alternative is that the launcher should keep refusing on a bounded gate and the
+                  completeness problem belongs to the gate's cost, not to the launcher. Rule that
+                  before building; `TD-090` and SPRINT-104 T4 own the cost side.
+      tracker:    ADR-042 · TD-084 · TD-175 · SPRINT-105 T3 review (F1 · F2 · F9)
 
 ### P2 — Follow-on
 

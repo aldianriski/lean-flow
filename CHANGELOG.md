@@ -13,6 +13,35 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
+## v1.66.1 — The gate's truncation costs the fewest guards (2026-09-22)
+
+**Released — PATCH.** All four `*-plugin/*.json` manifests and the `README.md` footer moved
+together, derived with `grep -l '"version"' .*-plugin/*.json`.
+
+### Fixed
+- **`qa_budget_check` refused nothing.** A non-numeric budget made `[ "$elapsed" -gt "$budget" ]`
+  error, the `if` read that as false, and the function fell through to `OK` / exit 0 — forever.
+  Measured: `qa_budget_check 0 abc 0` returned **`OK 1790032685 abc`**, reporting OK at 1.79
+  billion seconds elapsed. A silent false negative in the mechanism whose only job is bounding a
+  run, reachable from any caller passing an env var through unvalidated. Now refuses by name with
+  a distinct exit 2 (`UNUSABLE`), so a caller can tell "over budget" from "budget unusable".
+  5 retained fixtures incl. a must-NOT-catch control, proven to discriminate by a seeded break.
+
+### Changed
+- **The always-on eval-harness set is ordered cheapest-first.** It was chronological, so
+  truncation dropped whichever harnesses happened to be newest. Now, if a run exceeds its budget,
+  it drops the dearest instead — verified live: at a 200s budget the skipped set is exactly the
+  expensive tail. Per-harness costs are recorded beside the list and flagged as a snapshot (L-130).
+
+### Reverted before release
+- **A `night-run.sh` budget raise, which was a regression.** It read ADR-042's "a caller that
+  knows it is detached may raise it" as licence — but that sentence's antecedent is
+  `QA_CEILING_SECONDS`, a different variable, and **the pre-flight gate call is not detached**
+  (it is synchronous; the only `nohup` is 144 lines below). Unbounded, the launcher reached ~955s
+  in one foreground call against a 600s ceiling: killed mid-pre-flight with no verdict, strictly
+  worse than the bounded refusal at ~560s it replaced. Caught by an outside review before it ran
+  anywhere real. The correct fix — the caller **declaring** detachment — is `TASK-367`.
+
 ## v1.66.0 — Hooks become admissible; the first candidate is withdrawn at review (2026-09-21)
 
 **Released — MINOR.** All four `*-plugin/*.json` manifests and the `README.md` footer moved to

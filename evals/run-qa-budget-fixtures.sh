@@ -264,5 +264,31 @@ else
   printf '%s\n' "$out13"; fail=1
 fi
 
+
+# --- cases 14-18 (SPRINT-105 T3, outside review F4): a NON-NUMERIC budget must REFUSE ------------
+# Before this, `[ "$elapsed" -gt "$budget" ]` errored on a non-numeric budget (rc 2), the `if` read
+# that as false, and the function fell through to `printf 'OK ...'; return 0` -- forever. Measured:
+# `qa_budget_check 0 abc 0` returned `OK 1790032685 abc`, rc 0. The guard reported OK at 1.79
+# BILLION seconds elapsed, which is a silent false negative in the mechanism whose only job is
+# bounding a run. Reachable from any caller passing an env var through unvalidated.
+#
+# Case 18 is the must-NOT-catch sibling and the one that makes this suite discriminate rather than
+# merely fire: a VALID budget must still take the ordinary path. Without it, a "refuse everything"
+# regression would score 4/4.
+for _c in "abc:14" "12abc:15" "1e3:16" ":17"; do
+  _bad=${_c%:*}; _n=${_c#*:}
+  _o=$(sh -c ". '$lib' && qa_budget_check 0 \"$_bad\" 0" 2>/dev/null); _rc=$?
+  if [ "$_rc" -eq 2 ] && printf '%s' "$_o" | grep -q '^UNUSABLE '; then
+    echo "PASS fixture(case$_n non-numeric budget '$_bad' refuses by name, rc=2)"
+  else
+    echo "FAIL fixture(case$_n non-numeric budget '$_bad'): expected rc=2 + UNUSABLE, got rc=$_rc out=[$_o]"; fail=1
+  fi
+done
+_o18=$(sh -c ". '$lib' && qa_budget_check $(date +%s) 600 0" 2>/dev/null); _rc18=$?
+if [ "$_rc18" -eq 0 ] && printf '%s' "$_o18" | grep -q '^OK '; then
+  echo "PASS fixture(case18 must-NOT-catch: a VALID budget still takes the ordinary path)"
+else
+  echo "FAIL fixture(case18 must-NOT-catch): expected rc=0 + OK, got rc=$_rc18 out=[$_o18]"; fail=1
+fi
 [ "$fail" -eq 0 ] && echo "PASS harness: qa-budget-check discriminates (case 2 reddens on an over-budget scenario; cases 1/3 stay green; case 12 reddens if the ceiling block ever re-fails on OVER-CEILING, case 13 stays green)"
 exit $fail
