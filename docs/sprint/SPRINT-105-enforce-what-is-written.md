@@ -4,7 +4,7 @@ slug: enforce-what-is-written
 owner: Maintainer
 last_updated: 2026-09-21
 status: active
-plan_commit: [sha — set at promote]
+plan_commit: 1aa3f71
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
