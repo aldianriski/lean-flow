@@ -567,26 +567,26 @@ if [ -n "$repo_root" ] && [ -f "$repo_root/scripts/qa-check.sh" ]; then
   # Measured on this host: the dispatch-preflight harness fails with "could not resolve live
   # HEAD" under it and passes without it. Cleared in a subshell (POSIX) rather than with
   # `env -u`, and only around the gate -- the fired command keeps the caller's environment.
-  # THIS CALLER IS DETACHED, SO IT RAISES THE BUDGET (SPRINT-105 T3, ADR-042).
+  # NO BUDGET RAISE HERE, AND THAT IS A RULING (SPRINT-105 T3, reverted at outside review).
   #
-  # ADR-042 ruled the 600s command ceiling is a property of the INVOCATION MODE, not of the run:
-  # "a caller that knows it is detached may raise it". night-run.sh IS that caller -- it is the
-  # unattended launcher, nothing is waiting on a foreground timeout -- and it was nonetheless
-  # invoking the gate with the foreground default of 520s. Measured 2026-09-21 the gate needs
-  # ~679s, so every pre-flight here truncated, skipping ~16 harnesses before deciding whether to
-  # FIRE AN UNATTENDED RUN. A truncated gate is silent about those checks, and this is the worst
-  # place in the repo to act on a verdict that is quietly incomplete.
+  # A raise was added here on 2026-09-22 and REVERTED the same day. It read ADR-042's "a caller
+  # that knows it is detached may raise it" as licence, and was wrong twice over:
   #
-  # SPRINT-101's log records the owner ruling exactly this fix by hand -- "raise
-  # QA_BUDGET_SECONDS and re-run, so the 13 skipped harnesses actually execute" -- and a run at
-  # 1200s completing in 945s. That ruling lived in a sprint log and no procedure read it, which is
-  # L-020's shipping-is-not-wiring and L-151's decision-filed-where-its-reader-cannot-reach-it.
-  # This line is that ruling, wired.
+  #   (a) That sentence's antecedent is `QA_CEILING_SECONDS`, not `QA_BUDGET_SECONDS`. Different
+  #       variable, different job -- the ceiling check reports, the budget truncates.
+  #   (b) THIS CALL IS NOT DETACHED. The gate runs synchronously here; the only `nohup` in this
+  #       file is ~144 lines below, in the fire block. At this moment night-run.sh IS the blocking
+  #       foreground invocation the harness caps.
   #
-  # Overridable, and only a FLOOR: a caller that already set a higher budget keeps it.
-  nr_budget=${QA_BUDGET_SECONDS:-0}
-  [ "$nr_budget" -lt 1200 ] 2>/dev/null && nr_budget=1200
-  qa_out=$( unset MSYS_NO_PATHCONV; QA_BUDGET_SECONDS="$nr_budget" sh "$repo_root/scripts/qa-check.sh" 2>&1 ); qa_code=$?
+  # The measured cost of getting it wrong: the bounded gate self-terminated at 520s and `die_doa`
+  # fired at ~560s, fitting under the 600s ceiling. Unbounded, the gate runs to completion (805s
+  # measured) and with `--wait-seconds` the launcher reaches ~955s in one foreground call -- killed
+  # mid-pre-flight with NO verdict. That converts a clean named refusal into a silent hang, in the
+  # one script whose entire purpose is refusing to act on an incomplete verdict.
+  #
+  # A real fix needs the caller to DECLARE detachment (a flag or env signal), not an assumption
+  # made inside a script that cannot see how it was invoked. Filed as TASK-367.
+  qa_out=$( unset MSYS_NO_PATHCONV; sh "$repo_root/scripts/qa-check.sh" 2>&1 ); qa_code=$?
 
   # Read the gate's OWN PRINTED VERDICT, never a bare $? (L-045/L-120) -- doubly so here, because
   # this code is using the answer to decide whether to FIRE an unattended run, which is the exact
