@@ -16,81 +16,59 @@ status: current
 
 ## Active Sprint
 
-> **None active.** `/lean-doc-generator promote` opens the next one.
+> **SPRINT-104 — The Gate's Own Blind Spots** → [docs/sprint/SPRINT-104-the-gates-own-blind-spots.md](docs/sprint/SPRINT-104-the-gates-own-blind-spots.md)
 >
-> Predecessor: **SPRINT-103 — Port the Measured Hotspots** closed 2026-09-21 at **23 of 34 DoD
-> `[x]` + 11 `[~]` n/a**, `ca1d570`. It **measured every target before ruling it**, and four of the
-> five were ruled unportable with the mechanism recorded — the accepted outcome under D2, not a
-> shortfall. **T1** (305 s) is not spawn-shaped: 199 s of it is dispatch *inside* the engine a port
-> would still call 68 times, so the fix went to the caller — an awk-derived 43-rule spec,
-> **319.2–354.6 s → 136.7–184.0 s**, non-overlapping over six alternating runs, output
-> byte-identical. **T2** was the one genuinely spawn-shaped target and is ported; gate **leg 15
-> 21.0 s → 3.4 s**, oracle retained. **T3** ruled the consumer-facing engine portable in principle
-> and out of scope here (**ADR-043** — exit-code parity is reversible, shipping a `bun` requirement
-> to adopters is not) → **TD-168**. **T4** split → **TD-171**. **T5** is wait-bound by construction.
+> Promoted 2026-09-21. Four tasks, none `[size: L]` (size-checked at pull, before rendering).
+> **T1** puts `scripts/` and `evals/` inside the gate's typecheck — they are outside it today while
+> the leg reports `clean (0 errors)`, which is `TD-169` (`high`) and the reason a `tsc` clean claim
+> made three times in SPRINT-103 was a statement about a program that never held the file. **T2**
+> routes bootstrap failures through a shared emitter so a one-space `FAIL ` line stops hiding from a
+> column-keyed selector (`TD-157`; it once left `sweep_gate` returning `rc=0` on a crashed engine) —
+> `J2`, because the shape of the fix binds every checker and one file is shipped. **T3** gives the
+> gate's own cost comments an expiry. **T4 measures last, on purpose**: it re-derives the total these
+> three changed, disposes of SPRINT-103's deferred **A3**, and rules ADR-039's `layers-observed`
+> opt-in (189.3 s) against that number rather than against an estimate.
 >
-> **Two things wait on one number, and `TASK-357` owns both.** The close could not run a full-profile
-> gate — the host sat at **3.0% free memory**, the condition that killed this sprint's own Wave 0, and
-> a figure taken under paging measures swap. So **A3 is recorded NOT confirmed**, and ADR-039's
-> deferred ruling on `layers-observed` (189.3 s, excluded and named) is still waiting on a re-measured
-> total. `TASK-319`/`TASK-188` remain in the Backlog, still paired, still blocked on a green gate.
-> `TASK-355` is pruned here: its five split points are all ruled, and the remaining leverage lives in
-> **TD-168** + **TD-171**. See `CHANGELOG.md` and the archived sprint file.
+> Predecessor: **SPRINT-103 — Port the Measured Hotspots** closed 2026-09-21 at **23 of 34 DoD `[x]`
+> + 11 `[~]` n/a**, `ca1d570`. It measured before ruling and four of five targets were ruled
+> unportable with the mechanism recorded — D2's accepted branch. T1's cost was inside the engine, not
+> in spawns, and was removed on the caller side anyway (**341.0 → 149.8 s** median, non-overlapping
+> ranges); T2 was the one genuinely spawn-shaped target and is ported (**leg 15 21.0 → 3.4 s**); T3
+> ruled the consumer-facing engine out of scope here (**ADR-043** → **TD-168**). `TASK-319`/`TASK-188`
+> remain in the Backlog, still paired, still blocked on the green gate T4 measures. See `CHANGELOG.md`
+> and the archived sprint file.
 
-**Standing facts the Backlog depends on** — everything else that lived here was a narrative of the
-SPRINT-096 promote and is now in [`CHANGELOG.md`](CHANGELOG.md) and the archived sprint file. Pruned
-again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative drifts from its source).
+**Standing facts the Backlog depends on** — narrative that used to live here is in
+[`CHANGELOG.md`](CHANGELOG.md) and the sprint archive. Pruned at the SPRINT-097, SPRINT-100 and
+SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 99 rows** (91 open · 8 resolved · 5 `severity: high` open) — re-derived at the
-  2026-09-16 `/triage` by row header, cross-checked by distinct id (both routes give 97); **re-derived
-  at the SPRINT-102 close to 99** after TD-165 and TD-166 were filed, by the same two routes plus a
-  status census. **That census is itself an L-108 sighting worth carrying here:** selecting
-  `severity: [a-z]+ | status: (...)` returns **87 open, four short**, because the `severity: **high**`
-  rows carry bold markup — the shape a census most needs is the one a lowercase-only class silently
-  skips. It was caught only because open + resolved failed to reach the header count. Match the
-  severity token with its markup optional, and reconcile the two halves against the total every time.
-  figure here (92 / 84) was written at the SPRINT-100 close and did not carry SPRINT-101's
-  TD-160/161/162; this pass then filed **TD-163** and **TD-164**. A third row was drafted for the
-  promote-time red gate and **withdrawn before filing** — `TD-160` already covers it, with a better
-  fix direction; the ledger search that catches this is the point of L-127. **Derive the id maximum with BOTH
-  `.claude/worktrees/` AND `evals/` excluded** — the fixture tree reserves a git-tracked 900-block of
-  synthetic ids, so a query that excludes only the worktrees (L-170's recorded remedy) still returns
-  that **900-block** instead of the real maxima (L-204). **Never spell a synthetic id out here** —
-  doing so makes this file a third source of the contamination, which is exactly what happened
-  between the first and second derivations of this same session.
-  SPRINT-100 filed TD-156/157/158/159 and resolved TD-086/087/089/097/105/146. The aging
-  breakdown that used to sit here was SPRINT-099's and is deliberately not carried forward: four rows
-  were added and five resolved since, so it no longer describes this ledger. Re-derive open/closed and
-  the `severity: high` set
-  **by anchoring to the `^- **TD-NNN**` row header** — a bare `grep 'status: open'` over-counts,
-  because rows quote their own status strings in prose (L-108). Aging figures are derived at each
-  promote, never read from here (L-097 · L-130).
-- **The gate DOES verdict on this host** — corrected at the SPRINT-097 close, where it ran to
-  completion four times and printed a verdict every time, ending `QA-CHECK: 230 pass, 0 fail`. The
-  previous note here ("cannot currently verdict") was written after SPRINT-096's memory kill and was
-  stale; it is replaced rather than annotated, because a standing fact that is false is worse than
-  absent. **`qa-budget-default` compared the *configured* budget to the ceiling rather than actual
-  runtime (TD-128) until SPRINT-099 T2 added the missing reader** — the gate now asserts its ACTUAL
-  runtime against the 600s ceiling on every run, and prints a third outcome when it truncates, so a
-  truncated run is no longer byte-indistinguishable from an ordinary red gate.
-  `QA_BUDGET_SECONDS` stays at 520. **What a close must not do is
-  read the FAIL-line count as the verdict:** at the SPRINT-097 close the gate printed `0 fail` over
-  **4** `FAIL` lines, all from the conformance engine, which leg 2f-ter keeps deliberately
-  informational. **SPRINT-100 T4 removed that particular trap** (TD-146, resolved): a finding this
-  gate does not fold into its tally now prints as `INFO`, so the visible tokens and the printed
-  verdict no longer disagree with nothing marking the difference. The rule is unchanged and is the
-  durable part — the number to act on is the one the gate prints (L-120).
+- **Debt ledger: 97 rows** (96 open · 1 resolved · 7 `severity: high` open) — derived at the
+  2026-09-21 SPRINT-104 promote by row header, cross-checked by distinct id (both 97) and by
+  partition (96 + 1 = 97). Eight rows resolved at or before SPRINT-100 were **deleted** at that
+  promote under §11's 3-sprint clock; **ids stay monotonic — a deleted row never frees its id.**
+  **Figures here are a snapshot, never a source: re-derive at each promote** (L-097 · L-130).
+- **Two derivation rules this ledger has repeatedly cost people.** *(a)* **Anchor a census to the
+  `^- **TD-NNN**` row header** and match the severity token **with its markup optional** — a bare
+  `grep 'status: open'` over-counts (rows quote their own status in prose) and a lowercase-only
+  severity class silently skips the `severity: **high**` rows, which is four short and reads as
+  clean (L-108). Reconcile the halves against the header count every time. *(b)* **Derive an id
+  maximum with `.claude/worktrees/` AND `evals/fixtures/` excluded** — the fixture tree reserves a
+  git-tracked 900-block of synthetic ids, so excluding only the worktrees still returns that block
+  (L-170 · L-204). **Never spell a synthetic id out here**, or this file becomes the next source of
+  the contamination.
+- **The gate verdicts on this host** (corrected at the SPRINT-097 close; `QA_BUDGET_SECONDS` 520,
+  ceiling 600 s, truncation reported as its own third outcome since SPRINT-099 T2). **The number to
+  act on is the one the gate prints**, never the visible `FAIL` line count — findings the gate keeps
+  informational print as `INFO` since SPRINT-100 T4, so tokens and tally no longer disagree silently
+  (L-120). A run under host memory pressure measures swap, not the gate: SPRINT-103's close deferred
+  its own total for exactly this reason (`TASK-357`).
 - **Backlog ranking** is `/triage`'s output, not this block's: tiers P0–P3 below are the record.
-- **This file knowingly exceeds §2's 320-line soft cap** (~586 at the SPRINT-097 close; **433 at the
-  SPRINT-100 close**, after five shipped tasks were pruned) and the gate reports it every run. Ruled
-  at that close's `/triage` rather than left as neglect: the overage is
-  **task specification, not narrative** — then 18 tasks averaging ~32 lines, almost all of it multi-clause
-  `done-when:` and `tracker:` blocks. That density is the point, because it is what lets a task be
-  promoted without re-litigating it, and L-008's remedy (collapse duplicated prose to pointers) has
-  already been applied — the only narrative block left was collapsed at this close. Closing the
-  remaining gap would mean either 18 satellite files (a second place to look, which this repo
-  refuses) or rejecting work still wanted. **Revisit when the Backlog drops below ~12 tasks**, when
-  the arithmetic stops fighting the cap.
+- **This file knowingly exceeds §2's 320-line soft cap** and the gate reports it every run — ruled,
+  not neglected. The overage is **task specification, not narrative**: `done-when:` / `why:` /
+  `tracker:` density is what lets a task be promoted without re-litigating it, and L-008's remedy
+  (collapse duplicated prose to pointers) has now been applied three times, this block included.
+  Closing the gap would mean satellite files (a second place to look, which this repo refuses) or
+  rejecting work still wanted. **Revisit when the Backlog drops below ~12 tasks** — it is at 15 (13 ready · 2 needs-info).
 
 ---
 ## Backlog
@@ -100,6 +78,42 @@ again at the SPRINT-097 promote on owner approval (L-008 — a copied narrative 
 ### P0 — Blocking
 
 ### P1 — Next Phase Required
+
+- [ ] TASK-358 — Put `scripts/` and `evals/` inside the gate's typecheck, and fix what that surfaces  [size: S] [risk: med] [HITL]
+      class:      execution
+      tier:       G        # the leg is a guard; "clean (0 errors)" over an empty program is a
+                           # silent false negative by construction (L-058)
+      authority:  J1
+      origin:     close-retro   # SPRINT-104 promote: TD-169 is `severity: high` with no Backlog
+                                # owner, which is the auto-escalate rule having an unfired instance
+      state:      ready
+      done-when:  `scripts/qa-check.sh`'s typecheck leg runs a `tsc` program that **contains**
+                  `scripts/**/*.ts` and `evals/**/*.ts`, and the two surfaced errors are fixed.
+                  Verify, and this is the part TD-169 exists to make non-optional:
+                  `tsc --noEmit --listFiles | grep -c '<a scripts/lib file>'` and the same for an
+                  `evals/` file must each return **≥ 1** — an exit code of 0 says nothing about
+                  which files were in the program (L-136, and the exact way this was found).
+                  **Tier G bar** (ADR-029 · D4 shape): seed a type error into one `scripts/lib/*.ts`
+                  and one `evals/*.ts`, confirm the leg **reddens for each**, with a sibling control
+                  file staying green; verify each seed landed and restore under ONE stated hash
+                  convention (L-137 · L-142 · L-169). Retain the fixture. Outside reviewer,
+                  worktree-isolated (L-165 · L-168).
+      why:        `scripts/qa-check.sh` (:1008) runs bare `tsc --noEmit`, so it uses the root
+                  `tsconfig.json`, whose `include` is `apps/** · packages/** · test/**`. **Every
+                  ported checker in `scripts/lib/` and every harness in `evals/` is therefore
+                  outside the gate's typecheck while the leg reports `clean (0 errors)`.**
+                  ADR-037/TD-101 hardened this same leg so a *skip* could not read as a pass; it is
+                  blind by **population** instead — the L-186 shape at the gate's own level. Found
+                  at SPRINT-103 T2, when a `tsc` clean claim made three times turned out to be a
+                  statement about a program that never held the file.
+      measured:   **2 errors, both `TS18047` in `scripts/qa-verdict.ts` (147,5 and 151,5 —
+                  `child.stdout` / `child.stderr` possibly null), derived at the SPRINT-104 promote**
+                  with a probe tsconfig over `scripts/**` + `evals/**`; the other 20 `.ts` files in
+                  those trees are clean. This is why the widening and the fix are ONE task: widening
+                  the glob is what turns the gate red. **Re-derive before acting** — the figure is a
+                  snapshot of 2026-09-21 and nothing re-measures it (L-097 · L-130).
+      depends-on: none
+      tracker:    TD-169 (severity: high, open) · ADR-037 · TD-101 · L-136 · L-186
 
 - [ ] TASK-348 — Re-file TD-143's cost half against the HOST envelope, not the gate  [size: M] [risk: med] [HITL]
       class:      decision
