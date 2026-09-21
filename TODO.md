@@ -42,9 +42,11 @@ status: current
 [`CHANGELOG.md`](CHANGELOG.md) and the sprint archive. Pruned at the SPRINT-097, SPRINT-100 and
 SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 97 rows** (96 open · 1 resolved · 7 `severity: high` open) — derived at the
-  2026-09-21 SPRINT-104 promote by row header, cross-checked by distinct id (both 97) and by
-  partition (96 + 1 = 97). Eight rows resolved at or before SPRINT-100 were **deleted** at that
+- **Debt ledger: 99 rows** (98 open · 1 resolved · 8 `severity: high` open) — re-derived
+  2026-09-21 after TD-173/TD-174 were filed, by row header, cross-checked by distinct id (both 99)
+  and by partition (98 + 1 = 99). The partition only reconciled once the `status:`/`severity:`
+  match was made **markup-tolerant** (`\*{0,2}`) — a lowercase-only pattern returned 94 + 1 = 95
+  against 99 rows, which is L-108 firing on the very census that documents it. Eight rows resolved at or before SPRINT-100 were **deleted** at that
   promote under §11's 3-sprint clock; **ids stay monotonic — a deleted row never frees its id.**
   **Figures here are a snapshot, never a source: re-derive at each promote** (L-097 · L-130).
 - **Two derivation rules this ledger has repeatedly cost people.** *(a)* **Anchor a census to the
@@ -68,7 +70,11 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
   `tracker:` density is what lets a task be promoted without re-litigating it, and L-008's remedy
   (collapse duplicated prose to pointers) has now been applied three times, this block included.
   Closing the gap would mean satellite files (a second place to look, which this repo refuses) or
-  rejecting work still wanted. **Revisit when the Backlog drops below ~12 tasks** — it is at 15 (13 ready · 2 needs-info).
+  rejecting work still wanted. **Revisit when the Backlog drops below ~12 tasks** — it is at 22
+  (20 ready · 2 needs-info · 0 blocked; partition reconciles against the 22 row headers), having
+  taken EPIC-017's seven. That growth is the epic's own evidence: filing a breakdown pushed this
+  file from 536 to ~680 lines against a 320 soft cap, and the cap has no route that does not run
+  through rejecting work still wanted (TD-174).
 
 ---
 ## Backlog
@@ -264,6 +270,137 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
                   21.0 → 3.4 s) survive into the total. UNCONFIRMED — that is the question, and the
                   arithmetic must not be substituted for the run (D2).
       tracker:    ADR-039 · ADR-043 · TD-168 · TD-171 · Round 19/20/21
+
+<!-- ── EPIC-017 — Work Items That Do Not Outgrow Their File ──────────────────────────────────
+     docs/epic/EPIC-017-work-items-that-fit.md. Filed 2026-09-21; NOT promotable until SPRINT-104
+     closes. Note, and it is the epic's own first piece of evidence: filing this breakdown pushed
+     TODO.md from 536 to ~660 lines against a 320 soft cap. The container is the problem. -->
+
+- [ ] TASK-359 — Stand up the work-item store and its schema, with one real task migrated  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       X        # executable non-guard: it is the store other checks read, not a check
+      authority:  J2       # D1 is hard-to-reverse; the shape binds every skill and checker
+      origin:     manual   # owner direction 2026-09-21, after the cap-gaming measurement
+      state:      ready
+      done-when:  `docs/work/{backlog,todo,in_progress,review,done,cancel}/` exists with a schema
+                  doc; **status is the folder, title is the filename, membership is frontmatter**
+                  (D1). Filenames are `TASK-NNN-kebab-slug.md` — no spaces, no reserved characters,
+                  no case-only renames (Windows + concurrent `.claude/worktrees/`). One existing
+                  backlog task is migrated end-to-end and round-trips through a transition.
+                  Retained fixture covering a move.
+      touches:    docs/work/ · a schema doc · one migrated task file
+      depends-on: none
+      assumes:    that lifecycle status is Git-authoritative — ruled by the owner 2026-09-21 (D4),
+                  and recorded in BOTH repos, not just this one
+      tracker:    EPIC-017 D1 · D5 · D6 · kerjaan (model only, not its shell scripts)
+
+- [ ] TASK-360 — Make sprint and epic membership frontmatter, and sprint progress derived  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       X
+      authority:  J2
+      origin:     manual
+      state:      ready
+      done-when:  A task file carries `sprint:` / `epic:`; the sprint file **references** its
+                  members instead of containing them; `/prime` derives open-DoD by counting
+                  `## Done when` boxes across member files and **matches a hand count**. Nesting
+                  membership under status is explicitly rejected — "what is in review across all
+                  sprints?" must stay answerable with one glob.
+      touches:    SPRINT.md.template · skills/prime/SKILL.md · docs/work/ schema
+      depends-on: TASK-359
+      assumes:    none
+      tracker:    EPIC-017 D1 · D2
+
+- [ ] TASK-361 — Retarget `/triage` and `/task-decomposer` onto the store  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       X
+      authority:  J1
+      origin:     manual
+      state:      ready
+      done-when:  Both skills read and write task files instead of TODO.md sections. `authority:`,
+                  `assumes:`, `origin:` and readiness survive the move — `blocked`/`needs-info` are
+                  **not** folded into lifecycle status, they remain orthogonal fields. Ordering is
+                  explicit (`priority:` + a per-status order file); folders cannot sequence, which
+                  kerjaan itself concedes. A ≥ 30-task decomposition writes ≥ 30 files and fires no
+                  cap check — the epic's headline criterion, exercised on real input.
+      touches:    skills/triage/SKILL.md · skills/task-decomposer/SKILL.md
+      depends-on: TASK-359 · TASK-360
+      assumes:    none
+      tracker:    EPIC-017 scope 4
+
+- [ ] TASK-362 — Make `promote` and `close` operate by reference, not by copy  [size: M] [risk: high] [HITL]
+      class:      decision
+      tier:       X
+      authority:  J2
+      origin:     manual
+      state:      ready
+      done-when:  `promote` stamps `sprint:` and **moves** files rather than rendering task content
+                  into the sprint file; `close` verifies members are in `done/`/`cancel/` and writes
+                  the Retro. The sprint Plan remains an explicitly approved snapshot **by
+                  reference** — the freeze must survive the change, not be traded away for it.
+                  Transitions are coordinator-owned with a duplicate-id check at merge (D6): two
+                  isolated worktrees can each claim one ticket from their own snapshot.
+      touches:    skills/lean-doc-generator/SKILL.md · dispatch merge-back
+      depends-on: TASK-360
+      assumes:    that removing the copy removes the drift class it creates, and introduces no
+                  weaker freeze. UNCONFIRMED — this is the riskiest task in the epic
+      tracker:    EPIC-017 D2 · D6
+
+- [ ] TASK-363 — Retarget every checker that parses TODO.md, then delete TODO.md  [size: L] [risk: high] [HITL]
+      class:      execution
+      tier:       G        # these are gate legs; a retargeted check that silently examines nothing
+                           # is the false negative this epic is otherwise about
+      authority:  J2
+      origin:     manual
+      state:      ready
+      done-when:  All 15 executable files referencing TODO.md read the store instead; `TODO.md` is
+                  deleted; **zero non-test references remain** across `scripts/`, `evals/`,
+                  `skills/` — derived mechanically, never asked of the author (L-172). **Tier G
+                  bar**: per retargeted check, a retained must-FAIL fixture failing with its *named*
+                  finding, plus one fixture that varies the **selection** rather than the verdict —
+                  a member reached by the other glob arm (L-186). Outside reviewer, worktree-
+                  isolated (L-165 · L-168).
+      touches:    scripts/lib/check-*.{sh,ts} · evals/ · skills/ · 3 ADRs
+      depends-on: TASK-361 · TASK-362
+      assumes:    that 15 is the true count — **re-derive before starting**; it was measured once,
+                  on 2026-09-21, and a frozen figure is a query result (L-130)
+      tracker:    EPIC-017 scope 4 · ADR-019
+
+- [ ] TASK-364 — Budget the resource actually consumed, and require a disposition per promoted rule  [size: M] [risk: high] [HITL]
+      class:      decision
+      tier:       G
+      authority:  J2
+      origin:     manual
+      state:      ready
+      done-when:  `check-doc-caps` measures tokens over the always-loaded read set (**tokenizer
+                  named**), warns on long prose lines so density gaming is detectable, and keeps
+                  line counts as a secondary signal. Promotion requires a stated disposition —
+                  *replace · merge · move to an on-demand reference · automate into a check · retain
+                  with justification* — never deletion to turn a counter green. §157's "split, never
+                  squeeze" becomes **enforced**, which is the actual root cause: the rule already
+                  exists and only the counter beside it is checked. Closes the 3 standing OVER-CAP
+                  rows, each by a recorded disposition. ADR-015 · ADR-017 · ADR-019 superseded.
+      touches:    spec/STANDARD.md · scripts/lib/check-doc-caps.{sh,ts} · .claude/CLAUDE.md
+      depends-on: none — this half is independent of the store and can run in parallel
+      assumes:    that a token budget is not merely a new metric to game. MITIGATED, not solved, by
+                  the disposition requirement; the exit criterion measures effectiveness, and
+                  explicitly does not count lines or checkboxes as success
+      tracker:    EPIC-017 D3 · TD-174 (the three standing soft breaches this must close)
+
+- [ ] TASK-365 — Ship the store to the consumer: workdoo, templates, conformance engine  [size: M] [risk: med] [HITL]
+      class:      execution
+      tier:       X
+      authority:  J1
+      origin:     manual
+      state:      ready
+      done-when:  `workdoo` runs the same store; the EPIC-016 Work & Queue view reads it with **no
+                  second copy of status**; templates and the conformance engine ship the layout so
+                  an installing consumer gets it, not only this repo (L-015). Approval and run state
+                  stay in workdoo's durable store per its ADR-001 — a `review/` directory carries no
+                  identity-bound approval and must not become a competing status source.
+      touches:    workdoo repo · lean-doc-generator/templates/ · scripts/lib/conformance-engine.sh
+      depends-on: TASK-359 · TASK-360
+      assumes:    none — D4's split-by-kind is ruled and recorded in both repos
+      tracker:    EPIC-017 D4 · scope 6 · workdoo ADR-001 · EPIC-016
 
 ### P2 — Follow-on
 

@@ -295,6 +295,43 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-174** severity: high | status: open | created: Sprint-104
+  - Summary: **The soft-cap route reports and nothing acts on it.** `check-doc-caps` prints three
+    `OVER-CAP (soft)` rows on every run — `TODO.md` 536 > 320, `docs/research/adlc-epic-sequencing.md`
+    140 > 130, and `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` **3,050 > 130, which
+    is 23× its cap**. The documented remedy is "prune at the next promote governance review" (§11).
+    It has not fired for any of the three.
+  - **Why `high`.** A soft cap with no forcing function is a log line, and its failure mode is the
+    one this repo treats as worst: it reads as enforcement to anyone who has not checked. This row
+    was itself filed only because an outside reviewer re-derived the census — the session that ran
+    the gate piped it through `tail -30`, saw PASS rows, and reported "fully green." That is L-120
+    exactly (read the gate's own verdict line, never a wrapper's window), fired against a reader
+    who had the rule loaded.
+  - **Mitigation (hypothesis, re-derive before building a DoD on it — L-091).** Either the soft
+    class gets a forcing function (a breach must carry a recorded disposition to stay green), or
+    the three standing rows get dispositions now and the class is re-examined. `EPIC-017` `TASK-364`
+    carries the design; this row is the evidence, not the plan.
+  - **Re-file fresh if** a fourth soft breach appears before the three are closed.
+
+- **TD-173** severity: medium | status: open | created: Sprint-104
+  - Summary: **Two synthetic id blocks exist; only one is documented.** `TODO.md`'s standing-facts
+    block tells a deriver to exclude `.claude/worktrees/` and `evals/fixtures/`'s git-tracked
+    **900-block** when computing an id maximum (L-170 · L-204). There is a **second** reserved block:
+    `TASK-800`–`TASK-803` in `evals/fixtures/task-origin/{invalid-origin,missing-origin,stamped}/TODO.md`
+    and `evals/run-task-origin-fixtures.sh`.
+  - **How it surfaces.** A deriver following the written rule literally — excluding worktrees and
+    the 900-block — gets `TASK-803`, against a real maximum of `TASK-358`. Observed live at the
+    SPRINT-104 `EPIC-017` decomposition; caught only because a second selector (the `TODO.md` row
+    header) disagreed, which is L-198's "vary the selection rule" doing its job.
+  - **Why it is debt rather than a one-line fix.** The documented exclusion enumerates *specific*
+    blocks, and an enumeration is read as exhaustive — the same failure shape as the DoD line that
+    listed two of four manifests. A rule that says "exclude the 900-block" invites the next reserved
+    range to go unlisted again.
+  - **Mitigation (hypothesis).** Prefer a derivation that excludes by *location* (anything under
+    `evals/fixtures/` and `.claude/worktrees/`) over one that excludes by *number range*. Cheaper
+    and it cannot fall behind a new block.
+  - **Re-file fresh if** a third reserved range appears.
+
 - **TD-172** severity: medium | status: open | created: Sprint-103
   - Summary: **`evals/run-sprint-family-fixtures.sh` defines `learn_entry()` twice** — line 300
     (`<dir> <count> <heading-status>`) and line 512 (`<dir> <heading-tail> [body-lines...]`) — two
