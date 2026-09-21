@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun",
+            "args": ["run", "${CLAUDE_PLUGIN_ROOT}/hooks/ask-dont-tell.ts"],
+            "timeout": 15,
+            "statusMessage": "Checking the turn ends with an asked question, not an inline one..."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -6,7 +6,7 @@
 # lean-flow
 
 **A lean agentic dev loop for Claude Code** — twelve standalone skills, a one-command conductor, and an opt-in decision council.
-<br />**No hooks · no scaffold · no custom agent definitions.** Drop it into any repo and adapt.
+<br />**14 skills · a repo scaffolder (`/lean-doc-generator init`) · one Stop hook.** Drop it into any repo and adapt.
 
 [![MIT License][license-shield]][license-url]
 [![Claude Code][claude-shield]][claude-url]
@@ -394,7 +394,7 @@ project needs — lean-flow itself is Markdown.)
 ## What lean-flow does NOT do
 
 - No app-code generation, CI/CD pipeline, or automated coverage tooling.
-- No background hooks, and no agent definitions of its own — the loop leans on Claude's built-in agents (`Explore`, `/code-review`, `/verify`, `/security-review`) rather than re-shipping them. The one skill that orchestrates sub-agents internally is the opt-in `/council`.
+- One background hook — `hooks/ask-dont-tell.ts` on `Stop`, which blocks a turn that ends on a decision point without asking it as a popup (ADR-044). It fails open, cannot block a gate, and respects `stop_hook_active`. No agent definitions in the roster today — the loop leans on Claude's built-in agents (`Explore`, `/code-review`, `/verify`, `/security-review`) rather than re-shipping them, and a custom one would be held to the same curation bar. The one skill that orchestrates sub-agents internally is the opt-in `/council`.
 - No project scaffold written into your repo (that was dev-flow's `/orchestrator init`).
 - No telemetry. Nothing is sent anywhere.
 
@@ -458,7 +458,7 @@ file manifest — it is inert weight, not a dependency.
 
 - **Curated, not copied** — the core discipline. Every component was reviewed against "genuinely useful · important · actually used" and approved before adding — the opposite of bulk-importing from every reference. The bar is review, not a feature ban.
 - **Standalone, conducted when you want** — the twelve stage-skills each run alone (none require another); the opt-in `/flow` conductor sequences them through the full loop without bypassing a gate.
-- **Ships no custom agent definitions; leverages the built-in ones** — the loop dispatches Claude's built-in agents (`Explore` · `/code-review` · `/verify` · `/security-review`) in isolated passes. `/council` is the one skill that orchestrates sub-agents internally.
+- **Ships one Stop hook; no agent definitions in the roster today, and leverages the built-in agents** — the loop dispatches Claude's built-in agents (`Explore` · `/code-review` · `/verify` · `/security-review`) in isolated passes. `/council` is the one skill that orchestrates sub-agents internally.
 - **Lean** — most SKILL.md ≤ ~140 lines; the one skill that needs a canonical format (`lean-doc-generator`) bundles its own templates + standard and stays self-contained.
 - **Adaptable** — no required scaffold; skills detect the host project's layout and degrade gracefully.
 - **Human-gated** — G1 Scope and G2 Design need explicit sign-off; `/release-patch` never pushes.
@@ -493,7 +493,7 @@ MIT — see [`LICENSE`](LICENSE). Built and maintained by [Aldian Rizki][website
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<sub>Doc owner: Maintainer · last updated 2026-09-13 · status: current · v1.65.1</sub>
+<sub>Doc owner: Maintainer · last updated 2026-09-13 · status: current · v1.66.0</sub>
 
 <!-- REFERENCE LINKS -->
 [license-shield]: https://img.shields.io/badge/license-MIT-green?style=for-the-badge

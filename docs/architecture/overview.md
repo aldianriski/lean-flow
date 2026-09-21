@@ -22,6 +22,9 @@ status: current
 spec/             STANDARD.md (the LEAN DOCUMENTATION STANDARD, v0.11.0) · CHANGELOG.md
                                 versioned independently of plugin.json — the SSOT (ADR-023)
 .claude-plugin/   plugin.json · marketplace.json        (lockstep versions)
+hooks/            hooks.json + ask-dont-tell.ts — the ONE hook (Stop): blocks a turn ending on a
+                  decision point with no AskUserQuestion call. Fails open, never blocks a gate,
+                  respects stop_hook_active. Admissible ≠ unlimited: each clears the bar (ADR-044).
 skills/           14 skills (auto-discovered at root)
   flow/                                                  opt-in conductor
   prime/ lean-doc-generator/ orchestrator/ task-decomposer/ triage/

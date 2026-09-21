@@ -11,7 +11,15 @@ status: current
 - **Name**: lean-flow
 - **Type**: Claude Code plugin · lean skill library
 - **Stack**: Markdown · Claude Code skills system
-- **Architecture**: Plugin-first — components at repo root per the Claude Code plugin spec. Skills-first: no hooks, no scaffold, **no agent definitions of its own** — the loop dispatches Claude's built-in agents (`Explore` · `/code-review` · `/verify` · `/security-review`) at key steps; `/council` is the one skill that orchestrates sub-agents internally.
+- **Architecture**: Plugin-first — components at repo root per the Claude Code plugin spec.
+  Roster today: **14 skills** (incl. `/lean-doc-generator init`, which *does* scaffold a fresh
+  repo) · **one Stop hook** (`hooks/ask-dont-tell.ts`) · **no agent definitions** — the loop
+  dispatches Claude's built-ins (`Explore` · `/code-review` · `/verify` · `/security-review`),
+  and `/council` orchestrates sub-agents internally.
+- **Hooks and agents are admissible**, held to ADR-001's curation bar (ADR-044). "No hooks / no
+  scaffold / no agents" was a *proxy* for *curated* that began being enforced in place of it — and
+  "no scaffold" was flatly **false** for as long as `init` has shipped, because a negative claim
+  has no diff that ever makes it look wrong. **Describe the roster; never advertise an absence.**
 
 ## File Structure
 → **`docs/architecture/overview.md` § Directory structure** — the where-things-live map, and the only one.
