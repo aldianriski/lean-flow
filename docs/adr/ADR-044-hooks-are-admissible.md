@@ -1,7 +1,7 @@
 ---
 id: ADR-044
-tags: [architecture, process, governance]
-domain: platform
+tags: [process, tooling]
+domain: governance
 status: accepted
 related: [ADR-001, ADR-002, ADR-011, ADR-010]
 supersedes_in_part: [ADR-002, ADR-011]
