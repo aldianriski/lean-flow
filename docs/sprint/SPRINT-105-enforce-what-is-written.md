@@ -84,6 +84,35 @@ at or below its baseline does not.
 - [x] **Exercised on its own author** — *the leg failed `CLAUDE.md` at 805 chars on one line within minutes of being wired; fixed by rewrapping, with the baseline left untouched, which is what §157 requires and what the baseline file forbids doing instead*
 - [ ] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
 
+
+### T3 — Make the detached gate actually run every harness `[size: S · risk: med · class: execution · HITL · J1]`
+Layers: `scripts/qa-check.sh` · `scripts/night-run.sh`
+Depends-on: none
+Cites: ADR-042 · L-020 · L-151 · L-058 · L-076 · L-130 · TD-084 · `run-conformance-engine-fixtures.sh` · `run-s4-ts-evaluators.sh`
+
+The gate needs ~679s and truncated on **every** run, skipping ~16 harnesses. The skipped set was
+chosen by position in a chronological list, not by value: it spent **162.2s** on
+`run-conformance-engine-fixtures.sh` and then skipped `run-s4-ts-evaluators.sh` at **0.75s**.
+
+**Acceptance:** a detached run executes all 38 always-on harnesses with no truncation, and the
+default foreground profile drops the dearest rather than the newest if it ever does truncate.
+
+**DoD:**
+- [x] Per-harness cost **measured**, not estimated — *38 harnesses, 533.8s total; the expensive four are 162.2 · 51.6 · 46.6 · 34.0s and the cheapest 24 together cost ~100s*
+- [x] Always-on set ordered **cheapest-first** — *so that if a budget is ever exceeded, truncation costs the fewest guards rather than an arbitrary tail*
+- [x] **`scripts/night-run.sh` raises its own budget to 1200s** — *it is the detached caller ADR-042 anticipated ("a caller that knows it is detached may raise it") and was invoking the gate at the 520s **foreground** default, truncating the pre-flight that decides whether to FIRE an unattended run. A floor, not an override: a higher caller-set budget is kept*
+- [x] The truncation message names the **concrete remedy** — *`QA_BUDGET_SECONDS=1200 sh scripts/qa-check.sh`, not just the variable name; the reader who needs it is the one staring at the truncation (L-151)*
+- [ ] Detached run verified: **all 38 harnesses execute, zero truncation** — *Verify: the gate's own `QA-CHECK:` line plus a count of harness rows in the output, never an exit code (L-120)*
+- [ ] Outside reviewer dispatched worktree-isolated (ADR-029 ii)
+
+**What this task deliberately did NOT do, and why it matters.** A first attempt split the always-on
+set by a measured 30s cost cap, moving the expensive four behind `QA_FULL=1`. That was **reverted
+before commit**: `ADR-042`'s alternatives table already rejects exactly that move — it "trades a
+coverage claim for a schedule, which is the shape L-058 warns about" — and the premise behind it
+was wrong, because the 600s ceiling is a **foreground** limit, not a wall. The owner had already
+ruled the correct fix at SPRINT-101 ("raise `QA_BUDGET_SECONDS` and re-run"); it simply lived in a
+sprint log that no procedure read. The defect was never the harness set. It was an unwired ruling.
+
 ## Owner actions
 
 - [ ] Review and approve the `ADR-044` stance reversal — it changes what the plugin is allowed to

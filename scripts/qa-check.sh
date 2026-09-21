@@ -131,7 +131,7 @@ qb_checkpoint() { # <leg-label>
     OVER*)
       qb_early_tripped=1
       qb_elapsed=$(printf '%s' "$qb_out" | cut -d' ' -f2)
-      bad "qa-check-budget-exceeded-early: ${qb_elapsed}s elapsed exceeds the ${QA_BUDGET_SECONDS}s default-profile budget, reached at checkpoint '$1' -- BEFORE leg 12's eval-harness loop. Every leg from here on, including all eval harnesses, is skipped and reported here rather than run past an external timeout with no verdict line (TD-084, TD-091). Set QA_BUDGET_SECONDS to raise the budget, or QA_FULL=1 to lift it for a full run"
+      bad "qa-check-budget-exceeded-early: ${qb_elapsed}s elapsed exceeds the ${QA_BUDGET_SECONDS}s default-profile budget, reached at checkpoint '$1' -- BEFORE leg 12's eval-harness loop. Every leg from here on, including all eval harnesses, is skipped and reported here rather than run past an external timeout with no verdict line (TD-084, TD-091). To get a COMPLETE verdict, re-run detached with a raised budget: `QA_BUDGET_SECONDS=1200 sh scripts/qa-check.sh` (the 600s ceiling is a FOREGROUND limit -- ADR-042; night-run.sh already raises it for its own pre-flight). QA_FULL=1 additionally adds the opt-in set"
       # Truncation is reported as its OWN outcome line, naming the actual elapsed seconds and every
       # leg it never reached BY NAME (SPRINT-099 T2, TD-117). Before this, the message named none of
       # them and the verdict below was byte-indistinguishable from an ordinary red gate.
@@ -1153,14 +1153,34 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # git-free rule: it is a `bun test` wrapper over in-memory fixtures (see evals/dod-delta.test.ts), no
 # git, no mktemp, no repos built -- measured well under 1s on this host, the same shape
 # run-s4-ts-evaluators.sh already takes for a TS-evaluator leg.
-eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-handoff-state-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-s4-ts-evaluators.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh run-night-run-gate-exception-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-night-run-outcome-fixtures.sh run-dod-delta-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-prose-density-fixtures.ts"
+# ── ORDERED CHEAPEST-FIRST, AND THAT IS LOAD-BEARING (SPRINT-105 T3) ───────────────────────────
+# The list was previously in order-of-addition, which meant truncation dropped whichever harnesses
+# happened to be newest. Measured 2026-09-21 that was actively perverse: the gate spent **162.2s**
+# on run-conformance-engine-fixtures.sh and then skipped run-s4-ts-evaluators.sh at **0.75s**.
+# Sorting by measured cost means that if a run ever does exceed its budget, truncation costs the
+# FEWEST guards possible instead of an arbitrary tail.
+#
+# Measured per-harness cost, this host, 2026-09-21 (total 533.8s across 38). The expensive end:
+#   run-conformance-engine-fixtures.sh   162.2s      run-night-run-outcome-fixtures.sh      34.0s
+#   run-dispatch-preflight-fixtures.sh    51.6s      run-night-run-gate-exception-fixtures  29.7s
+#   run-foreign-repo-fixtures.sh          46.6s      run-verify-reaches-fixtures.sh         20.6s
+# The cheapest 24 together cost ~100s. Re-measure before acting on these (L-130) -- they are a
+# snapshot, and SPRINT-104 T4 owns the next one.
+#
+# NOT SPLIT BY COST, DELIBERATELY. Moving the expensive tail behind QA_FULL=1 was considered and is
+# **already rejected by ADR-042's alternatives table** -- it "trades a coverage claim for a
+# schedule, which is the shape L-058 warns about". The ceiling is a FOREGROUND limit (ADR-042), so
+# the answer to a truncating gate is a detached caller that raises the budget, not less coverage.
+# That is now wired at scripts/night-run.sh rather than left as the manual re-run SPRINT-101
+# recorded the owner performing by hand.
+eval_harnesses_always="run-epic-archive-fixtures.sh run-s4-ts-evaluators.sh run-sprint-log-layout-fixtures.sh run-authority-fixtures.sh run-prose-density-fixtures.ts run-qa-budget-default-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-worktree-usability-fixtures.sh run-skill-freshness-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-count-claims-fixtures.sh run-manifest-lockstep-fixtures.sh run-dod-delta-fixtures.sh run-sprint-close-fixtures.sh run-research-archive-fixtures.sh run-qa-budget-fixtures.sh run-run-mode-fixtures.sh run-doc-caps-fixtures.sh run-git-availability-fixtures.sh run-layers-completeness-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-approval-envelope-fixtures.sh run-gates-signed-fixtures.sh run-spec-reader-fixtures.sh run-handoff-state-fixtures.sh run-review-depth-fixtures.sh run-system-verify-fixtures.sh run-s2-placement-fixtures.sh run-night-run-rollup-fixtures.sh run-reap-terminal-fixtures.sh run-ownership-header-fixtures.sh run-verify-reaches-fixtures.sh run-night-run-gate-exception-fixtures.sh run-night-run-outcome-fixtures.sh run-foreign-repo-fixtures.sh run-dispatch-preflight-fixtures.sh run-conformance-engine-fixtures.sh"
+eval_harnesses_optin="run-adr-family-fixtures.sh run-s4-differential-parity.sh selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts"
 # run-s4-differential-parity.sh (SPRINT-092 T3) joins the opt-in set by the cost rule, and it is the
 # OTHER half of T2's swap: the row-by-row comparison of the TS evaluators against a LIVE Shell oracle,
 # which needs a real engine spawn per row and is exactly the 20+s taken off the default profile.
 # ADR-039 records the §4 DRIFT WINDOW this opens and names when parity is MANDATORY -- promote, close,
 # and any full-profile run. Shell RETAINS §4 authority throughout (EPIC-014 D2): this is not a
 # cutover, and a green default gate says nothing about TS/Shell agreement.
-eval_harnesses_optin="run-adr-family-fixtures.sh run-s4-differential-parity.sh selftest-assert-park-revisit.sh selftest-assert-boundary-park.sh selftest-assert-noaction-park.sh selftest-assert-judgement-retry.sh run-layers-observed-fixtures.sh run-worktree-base-fixtures.sh run-attestation-fixtures.sh run-sprint-family-fixtures.sh run-qa-budget-position-fixtures.sh run-authority-differential.ts run-doc-caps-differential.ts run-night-run-rollup-differential-parity.ts"
 # run-qa-budget-position-fixtures.sh (SPRINT-086 T3, TD-091) joins the opt-in set by the cost rule,
 # not the git rule -- it builds no repos, but it DOES invoke real copies of qa-check.sh (bounded by
 # `timeout`) to prove where the budget checkpoint is actually reached, which this repo's own
@@ -1249,7 +1269,7 @@ for h in $eval_harnesses; do
       OVER*)
         budget_tripped=1
         qb_elapsed=$(printf '%s' "$qb_out" | cut -d' ' -f2)
-        bad "qa-check-budget-exceeded: ${qb_elapsed}s elapsed exceeds the ${QA_BUDGET_SECONDS}s default-profile budget, reached at eval harness '$h'. Remaining harnesses in this leg are skipped and named below rather than left to run past an external timeout with no verdict line (TD-084). Set QA_BUDGET_SECONDS to raise the budget, or QA_FULL=1 to lift it for a full run"
+        bad "qa-check-budget-exceeded: ${qb_elapsed}s elapsed exceeds the ${QA_BUDGET_SECONDS}s default-profile budget, reached at eval harness '$h'. Remaining harnesses in this leg are skipped and named below rather than left to run past an external timeout with no verdict line (TD-084). To get a COMPLETE verdict, re-run detached with a raised budget: `QA_BUDGET_SECONDS=1200 sh scripts/qa-check.sh` (the 600s ceiling is a FOREGROUND limit -- ADR-042; night-run.sh already raises it for its own pre-flight). QA_FULL=1 additionally adds the opt-in set"
         # The unrun set is computed HERE, while $eval_harnesses and $h are both in scope, and held
         # for the Summary so it prints beside the verdict where a reader looks -- not buried among
         # the 13 `note` lines that follow it (SPRINT-099 T2). Inclusive of $h: the harness the trip

@@ -567,7 +567,26 @@ if [ -n "$repo_root" ] && [ -f "$repo_root/scripts/qa-check.sh" ]; then
   # Measured on this host: the dispatch-preflight harness fails with "could not resolve live
   # HEAD" under it and passes without it. Cleared in a subshell (POSIX) rather than with
   # `env -u`, and only around the gate -- the fired command keeps the caller's environment.
-  qa_out=$( unset MSYS_NO_PATHCONV; sh "$repo_root/scripts/qa-check.sh" 2>&1 ); qa_code=$?
+  # THIS CALLER IS DETACHED, SO IT RAISES THE BUDGET (SPRINT-105 T3, ADR-042).
+  #
+  # ADR-042 ruled the 600s command ceiling is a property of the INVOCATION MODE, not of the run:
+  # "a caller that knows it is detached may raise it". night-run.sh IS that caller -- it is the
+  # unattended launcher, nothing is waiting on a foreground timeout -- and it was nonetheless
+  # invoking the gate with the foreground default of 520s. Measured 2026-09-21 the gate needs
+  # ~679s, so every pre-flight here truncated, skipping ~16 harnesses before deciding whether to
+  # FIRE AN UNATTENDED RUN. A truncated gate is silent about those checks, and this is the worst
+  # place in the repo to act on a verdict that is quietly incomplete.
+  #
+  # SPRINT-101's log records the owner ruling exactly this fix by hand -- "raise
+  # QA_BUDGET_SECONDS and re-run, so the 13 skipped harnesses actually execute" -- and a run at
+  # 1200s completing in 945s. That ruling lived in a sprint log and no procedure read it, which is
+  # L-020's shipping-is-not-wiring and L-151's decision-filed-where-its-reader-cannot-reach-it.
+  # This line is that ruling, wired.
+  #
+  # Overridable, and only a FLOOR: a caller that already set a higher budget keeps it.
+  nr_budget=${QA_BUDGET_SECONDS:-0}
+  [ "$nr_budget" -lt 1200 ] 2>/dev/null && nr_budget=1200
+  qa_out=$( unset MSYS_NO_PATHCONV; QA_BUDGET_SECONDS="$nr_budget" sh "$repo_root/scripts/qa-check.sh" 2>&1 ); qa_code=$?
 
   # Read the gate's OWN PRINTED VERDICT, never a bare $? (L-045/L-120) -- doubly so here, because
   # this code is using the answer to decide whether to FIRE an unattended run, which is the exact
