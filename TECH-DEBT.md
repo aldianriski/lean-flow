@@ -432,6 +432,14 @@ status: current
     already an `extends` concern. Do not widen the glob without running it first.
   - **Found by accident**, in a subagent's aside about its own typecheck coverage — not by any check.
     Nothing in the repo currently detects a leg whose scope has drifted from its subject.
+  - **Escalated to `TODO.md` Backlog P1 as `TASK-358`** at the 2026-09-21 SPRINT-104 promote, by the
+    ledger's own `severity: high` rule — it had no Backlog entry until then, a `high` row invisible
+    to every promote that reads the Backlog (L-151, the same shape as TD-117 and TD-143 above).
+  - **The blast radius is now measured, not assumed:** a probe `tsconfig` over `scripts/**` +
+    `evals/**` returns **exactly 2 errors, both `TS18047` in `scripts/qa-verdict.ts` (147,5 and
+    151,5)**; the other 20 `.ts` files in those trees typecheck clean. So "widening the glob turns
+    the gate red" is true and small — which is what makes the widening and the fix one task rather
+    than a blocked one. Snapshot of 2026-09-21; re-derive before building on it (L-097 · L-130).
 - **TD-168** severity: high | status: open | created: Sprint-103
   - Summary: **`scripts/lib/conformance-engine.sh` is the QA gate's single largest cost centre and is
     kernel-bound, but it is consumer-facing, so the fix needs its own sprint.** Measured at
@@ -967,32 +975,6 @@ status: current
     today — the round-3 narrowing means such an epic is reported as unverified rather than as
     verified-closed — but the fact is sitting in the field the parser already reads.
 
-- **TD-146** severity: medium | status: resolved → TASK-343 | created: Sprint-097
-  - **Resolved at SPRINT-100 T4** (commits `8bb2500` · `8f4bd64`, merged `b877e95`): leg 2f-ter builds a **separate** relabelled copy (`ce_out_display`), so any `FAIL` line this gate does not fold into its tally prints as `INFO`. The printed verdict and the visible FAIL lines can no longer disagree with nothing marking the difference.
-  - **A3 holds by construction, not by measurement:** the two fold-in greps keep reading the unmodified `$ce_out`, so the arithmetic cannot move because the bytes it is computed from are never touched. Asserted anyway by the retained `ce-relay-tally-unchanged` case (`pass=2 fail=2` across the change). `conformance-engine.sh` and `conformance.sh` are at **zero diff** — the ADR-027 consumer contract is untouched, correct because for an adopter every finding **is** gating (L-015).
-  - **Round 2 fixed a defect found reviewing round 1**, and it is the same class this row exists to remove: the relabel was turning the engine's four setup-failure classes (`reader-missing` · `repo` · `spec-table-unreadable` · `usage`) into `INFO`. Those mean *the engine never ran*, so calling them informational is a label untrue of its subject — occurring inside the fix for labels untrue of their subjects. Engine errors now stay `FAIL`, with a retained fixture and control. **Owner ruling, same round:** `PASS` lines stay unrelabelled — an uncounted FAIL misread as "clean" is the dangerous direction; an uncounted PASS masks no regression.
-  - Tracker: none — found incidentally at the SPRINT-097 T5 gate run, not by any check.
-  - Summary: **The conformance engine's informational findings print with the same `FAIL ` prefix as
-    gating ones, so `qa-check.sh`'s verdict line and its visible `FAIL` lines disagree with nothing
-    marking which is which.** This is NOT a counting bug: leg 2f-ter deliberately keeps the engine
-    informational because 27 of 43 dispositions are unbuilt and gating on them would hold the gate
-    permanently red over tracked coverage gaps. Only the fully-covered families (S9, §13) are folded
-    into the tally, and that decision is correct. The defect is that the *report* does not say so.
-  - Location: `scripts/qa-check.sh` leg 2f-ter (the relay) and `scripts/lib/conformance-engine.sh`
-    (the `FAIL ` token it emits).
-  - Evidence: this sprint's T5 gate run printed `QA-CHECK: 228 pass, 2 fail` over **6** `FAIL` lines
-    and 257 `PASS` lines; the four uncounted ones are all conformance-engine
-    (`file-outside-canonical-placement`, `todo-over-cap-at-promote`, `generated-artifact-committed`
-    ×2). The same shape is already recorded, and misread, in this ledger's own SPRINT-097 promote
-    note above: *"`QA-CHECK: 225 pass, 33 fail`* … *33 of the 82 FAIL lines trace to …"* — 33 was
-    read as a **subset** of 82 rather than as a different population.
-  - Why it matters: L-120's whole instruction is *read the number the gate prints* (`N pass, M fail`;
-    M is the verdict), and T4 shipped `scripts/qa-verdict.ts` to enforce exactly that. A reader who
-    follows that rule correctly cannot tell that four visible `FAIL` lines are outside M — and a
-    reader who counts `FAIL` lines instead gets a number that overstates the gate. Both readings are
-    defensible and they disagree. Cheapest fix is a distinct token (`INFO`/`RULE-GAP`) for
-    non-gating engine findings, or a relay line naming how many of the printed FAILs are advisory.
-
 - **TD-145** severity: medium | status: open | created: Sprint-097
   - Tracker: **`TASK-342`** (filed 2026-09-10 at the SPRINT-097 T3 outside review; owner ruled it grouped with `TASK-338` rather than left to age). Scheduled with the checker-accuracy cluster: same family, different files.
   - Summary: **The `*/archive/*` exclusion that keeps closed sprints out of three gate checkers is a
@@ -1128,61 +1110,6 @@ status: current
     this file's own consumption. **Cost half should now be re-filed against the HOST envelope**
     (562 MB free, WSL 1 989 MB, three `claude` processes 1 178 MB, commit 41.3/56.7 GB) rather than
     against the gate.
-
-- **TD-141** severity: high | status: resolved → accepted (no task) | created: Sprint-095 | accepted at SPRINT-097 promote under ADR-040
-  - Summary: **Commit ownership cannot be decided from a commit subject, and the laundering channel
-    that follows is PRE-EXISTING — it is not something SPRINT-095 T1 introduced.** The active-sibling
-    skip trusts the cited sprint number alone, with no declaration or window test
-    (`check-layers-observed.sh`, the `case " $sibling_sprints "` arm), and has done so since before
-    this sprint. A commit mislabelled `sprint(093)` while 093 is active is already exempt from 092's
-    undeclared-file check today.
-  - Evidence: three T1 designs were each broken by an independent reviewer, and each was a different
-    proxy for the same unanswerable question — *which sprint does this commit belong to?*
-    (a) the cited **number** — 91 archived numbers, unconditional;
-    (b) number + **window** — windows legitimately NEST (`SPRINT-089` `5f0682b..cc46d18` and
-    `SPRINT-090` `b7437de..cc46d18` share a close commit, 090 seeded inside 089's task stream);
-    (c) number + **declarations** — declarations are SHARED: `docs/LEARNINGS.md` is declared by
-    **74 of 91** archived sprints, `scripts/qa-check.sh` by 46, `TECH-DEBT.md` by 40. Reproduced
-    live: a commit citing an archived number and touching only a commonly-declared file passes.
-  - **The tension is structural, and it is the row's point.** Report archived-cited commits and you
-    get TD-125's false positives on archival; skip them and you get a laundering channel. The
-    pre-existing code chose the second for active siblings without ever saying so. A subject line is
-    an unverifiable claim, so every refinement of it is another proxy.
-  - Impact: `TASK-298` is scoped as "teach the checker that an archived sibling is not undeclared
-    work", and on this evidence that is **not achievable by refining the proxy**. Re-scope before any
-    fourth attempt. Options worth costing, none taken here: make archival not change the checker's
-    input set at all (a `qa-check.sh` glob change rather than ownership logic); accept the channel
-    explicitly and document it for BOTH sibling kinds; or find a signal that is not the subject.
-  - **Do NOT "fix" this by widening an exclusion** — that is how each of the three designs died.
-  - **RULED at the SPRINT-096 T1 promote (2026-09-08) → [`ADR-040`](docs/adr/ADR-040-commit-ownership-accepts-the-subject-claim.md).**
-    The owner ruled the **second** option this row lists: **accept the channel explicitly, for BOTH
-    sibling kinds**, and stop paying for a proxy that cannot close it. A commit citing another
-    sprint's number belongs to that sprint — archived or active, no further test. SPRINT-095 T1's
-    declaration + window machinery is reverted (`2335eab` · `f1fdf02` · `e4547b3`, **+94 lines / 0
-    removed**, on `main` at **0 of 6 DoD**), because it holds one arm to a bar the other arm does not
-    meet, and an inconsistent bar is not a stronger guard — it is this row's tension wearing the
-    shape of one. Symmetric acceptance needs archived numbers *in* the trusted set, so archived
-    sprints are discovered from their **filenames** (no `git`, no frontmatter read, no window); a
-    literal revert would drop them from the set and flip the asymmetry rather than remove it.
-  - **RESOLVED — accepted at the SPRINT-097 promote, re-derived against the tree rather than
-    inherited.** This row's own unblock condition was *"stays `open` until T3 lands the code"*, and
-    SPRINT-096 T3 landed it: `scripts/lib/check-layers-observed.sh:501-508` now runs **one** ownership
-    test over a `sibling_sprints` set holding active siblings from `"$@"` **and** archived numbers
-    discovered from filenames, and its comment names this row — *"the asymmetry the comment here used
-    to assert as deliberate is exactly what TD-141 recorded and what ADR-040 removed."* The channel is
-    not closed; it is **accepted symmetrically and said out loud**, which is what the ledger's
-    acceptance path is for. The cost was weighed in ADR-040: the `qa-check.sh` glob change is dead on
-    cost (checker subjects 3 → 96 on a gate that already cannot finish), and the `Sprint: NNN` trailer
-    — the only route that would *close* the channel — was rejected on size, 0 of the last 60 commits
-    carrying any trailer. `severity` stays recorded as `high` because the accepted hole is high, not
-    because the row is unaddressed.
-  - **Consequence to carry forward:** `check-layers-observed.sh` is **not** a guard against a
-    dishonest commit subject and must not be cited as one. The two options *not* taken are recorded
-    in ADR-040 with their costs — the `qa-check.sh` glob change is dead on cost (checker subjects
-    3 → 96 on a gate that already cannot finish), and the `Sprint: NNN` git trailer is the only route
-    that closes the channel, rejected on size rather than merit. **Re-open the trailer route if the
-    accepted hole is ever exercised in anger.**
-  - **Re-file fresh if** the ownership question is re-scoped, or a non-subject signal is found.
 
 - **TD-138** severity: medium | status: open | created: Sprint-095
   - Summary: **A `Layers:` declaration that wraps at column 0 is silently dropped by the dispatch
@@ -1453,54 +1380,6 @@ status: current
   - **Re-file fresh if** `packages/` gains a barrel `index.ts`, a namespace import, a dynamic import, or
     a `__tests__/` directory — any one of those makes this live rather than latent. Related: L-108 ·
     L-058 · the sibling export-form finding fixed in T3's review pass.
-
-- **TD-132** severity: high | status: resolved → TASK-328 | created: Sprint-094
-  - **Resolved at SPRINT-097's batch-gate re-derivation (2026-09-10), not by new work.** The fix landed at SPRINT-095 T2 (`4cd494d` → `843ccdb` → `60fdf1b` → `82eb0cd`, third design, two review rounds rejected the first two). The Evidence above names the target itself: *"with only the prose stripped to bare `none` … `PASS wave-computation: T1=0 T2=0 T3=0 T4=0`"* — the current parser produces exactly that against the **unmodified** SPRINT-094 file, and the three residual `FAIL shared-file-unowned` rows are the genuine overlaps this row predicted would surface once the phantom edges were gone. `evals/fixtures/dispatch-preflight/` retains 25 fixtures, six of them the indented-continuation arm. **The SPRINT-097 promote sweep flagged this claim as un-re-derived and promoted SPRINT-097 T2 on it anyway** — L-091, caught only because the gate pass ran the artifact instead of reading the Summary.
-  - Summary: **The dispatch preflight's `Depends-on:` parser matches `T[0-9]+` as a bare substring over
-    the whole line, so it harvests task ids out of the field's own explanatory prose** — and it ignores
-    the literal `none` that precedes them. On SPRINT-094 this is wrong in *both* directions at once: it
-    invents a dependency cycle that does not exist, and it issues shared-file ownership PASSes derived
-    from the phantom edges it invented.
-  - Location: `skills/orchestrator/references/dispatch.md` § Dispatch preflight, the embedded runnable
-    snippet, at the `Depends-on:` arm — `deps="$deps$(printf '%s' "$line" | grep -oE 'T[0-9]+' | ...)"`.
-    Ships to consumers inside the plugin, and `orchestrator/SKILL.md` § sprint-bulk step 3 tells every
-    run to execute it before dispatching a wave.
-  - Evidence (SPRINT-094, reproduced two independent ways before acting). All four tasks declare
-    `Depends-on: none`. T2's field continues `none — but see **D1** (T1 and T2 share
-    scripts/qa-check.sh …) and **D2** (T1 and T2 share a capped SKILL.md)`; T3's continues `none — and
-    no longer part of **D1** … the shared-file map is now T1–T2 only`.
-    (i) Reading the code: the grep is unanchored and unscoped, and nothing tests for `none`.
-    (ii) Running it: the parser yields `T2 -> [T1,T2,T1,T2]` and `T3 -> [T1,T2]` against `T1 -> []` and
-    `T4 -> []`. T2 therefore acquires a **self-edge**, which no topological sort can resolve, and T3
-    inherits the unresolvable T2. Live output on the sprint as written:
-    `FAIL cycle-detected: tasks unresolved -> T2 T3`, plus three `PASS shared-file-owned … order=T1->T2`.
-    Against the same file with only the prose stripped to bare `none` and `Layers:` untouched:
-    `PASS wave-computation: T1=0 T2=0 T3=0 T4=0` and three `FAIL shared-file-unowned`.
-  - Impact, and why it is `high` rather than `medium`. **The false HALT is the harmless half** — it is
-    loud, and it merely stops a wave that should have run. **The false PASS is the dangerous half**: the
-    three ownership PASSes were earned off the phantom edge, so a genuine unowned-shared-file condition
-    was reported as owned. That is L-108 verbatim — *a false positive on a substring is a false negative
-    on the contract* — and shared-file ownership is the check standing between a parallel wave and
-    L-042's cross-task staging contamination. A sprint whose `Depends-on:` prose happens to name the
-    right task ids gets a clean bill of health it did not earn, silently.
-  - **A second, independent defect the same run exposed**: the real ordering constraint for those three
-    files is pre-locked in the sprint's `## Decisions` (**D1**, **D2**), which the preflight never reads.
-    So even on a correctly-parsed graph it FAILs files whose order *is* declared — it treats
-    `Depends-on:` as the only ownership source when the sprint model offers two. Fixing the parser alone
-    converts this row's false PASS into a false FAIL; both halves want ruling together.
-  - **Why it is not fixed here.** `dispatch.md` is outside every SPRINT-094 task's `Layers:`, and it is a
-    Tier G consumer-facing guard — ADR-029 requires the full bar (one retained must-FAIL fixture per
-    check, sibling control, seeded-break discrimination proof) plus an outside reviewer, which is a task,
-    not a patch. Found by the coordinator while running the preflight for T2/T3's wave.
-  - **The wave it blocked was dispatched anyway, on a hand-derived graph, and that is recorded rather
-    than hidden**: T2's and T3's `Layers:` were intersected directly and are disjoint (∅), T4 is
-    refs-only and complete, and T1 committed at `4ae0827`, so D1's T1→T2 order is already satisfied. The
-    tool's HALT was overridden on evidence that contradicts it, not waved through.
-  - **Re-file fresh if** the preflight snippet is rewritten for any other reason — the fix belongs with
-    that work. Related: L-108 (match by shape, not substring) · L-042 · **TD-043**, the `TOK` pattern in
-    this very snippet, hardened for exactly this class on the `Layers:` side while `Depends-on:` was
-    left unanchored.
-  - **Escalated to `TODO.md` Backlog P0 as `TASK-328`** at the 2026-09-07 `/triage` (it appeared in `TODO.md` **zero** times before this — L-151), at P0 because the false-PASS half ships to consumers inside the plugin, and **decomposed the same day**, `state: ready`. **One fact the decompose added that this row does not carry: the defect has TWO call sites.** Location above names the `"Depends-on:"*)` field arm; the indented-continuation `D)` arm runs the same bare `grep -oE 'T[0-9]+'`, and SPRINT-094's prose ran onto continuation lines, so that arm supplied most of the phantom ids. Fixing one leaves the other leaking (L-058).
 
 - **TD-130** severity: medium | status: open | created: Sprint-094
   - Summary: **`check-epic-archive.sh`'s checkbox anchors miss `- [X]` (uppercase) and any indented
@@ -1944,49 +1823,6 @@ status: current
   - **Re-file fresh if** TASK-299 is closed with its commits attributed — the row is about a missing
     record, so supplying the record ends it.
 
-- **TD-105** severity: medium | status: resolved → TASK-339 | created: Sprint-087
-  - **Resolved at SPRINT-100 T2** (commits `49b027c` · `804308a`, merged): `_norm_dod_checkbox` normalises checkbox state on both sides of the comparison in **both** freeze assertions — `assert_S9_PLANFROZEN` *and* `assert_S9_SCOPECHANGE`. A genuine text change with no `scope-change` entry still fails exactly as before, proven on a two-fixture A/B. **Confirmed on the live artifact, not only fixtures:** SPRINT-100's own close ticked 29 DoD boxes and the gate printed `QA-CHECK: 220 pass, 0 fail` with `S9.SCOPECHANGE` silent.
-  - **The first fix met the DoD and missed the Acceptance, which is recorded rather than tidied away.** T2 normalised `PLANFROZEN` and correctly left `SCOPECHANGE` alone per its declared `Layers:` — but this row's Evidence names **both** findings, so 8 of its 9 kept firing. Found only by an independently constructed fixture: T2's own fixtures, its outside reviewer and its harness all agreed with each other because each was scoped to the assertion T2 declared (L-172).
-  - **The `9 of that run's 17 FAILs` figure is corrected: the 9 reproduces exactly, the 17 does not exist.** Re-derived at the SPRINT-100 close by running each historical tree's **own** engine against itself, in a worktree created outside the repository: at `c7687d3` (this row's own correction commit) **1 + 8 = 9** of **10** total FAIL; at `e3decef` (SPRINT-087's close) **1 + 8 = 9** of **13**. `FAIL+GAP` moves 16 → 19 across that span and so passes *through* 17 somewhere inside the close. **The numerator is a property of the defect; the denominator is a property of when during a close someone looked** — a ratio frozen against a moving quantity, and unfalsifiable afterwards because "that run" names no commit. See **L-201**.
-  - Tracker: **`TASK-339`** (SPRINT-097 T1 cluster ruling, 2026-09-10). Re-derived: `plan-edited-after-freeze` at `scripts/lib/conformance-engine.sh:2078` still diffs § Plan with no checkbox normalisation anywhere in that file.
-  - Summary: **The Plan-freeze checks treat DoD ticking — the execution loop's own prescribed action —
-    as an unaccounted Plan edit, so a sprint that runs cleanly fails the gate while a sprint that
-    changed scope passes.** `plan-edited-after-freeze` fires when § Plan differs from `plan_commit`
-    **and** the Execution Log carries no `scope-change` entry. DoD checkboxes live inside § Plan, and
-    `orchestrator/SKILL.md` step 4 instructs *"tick its DoD `[x]`"* on every task — so § Plan always
-    differs by the end of any sprint, and the condition collapses to **"every sprint must contain at
-    least one scope-change entry."**
-  - Evidence: SPRINT-087's § Plan is **byte-identical** to its state at `plan_commit 3c14a37` once
-    checkbox state is normalised (`sed 's/^- \[x\]/- [ ]/'` on both, `diff` empty) — **28 ticks, zero
-    text changes**, no task, criterion or `Verify:` clause touched. It nonetheless produced
-    `plan-edited-after-freeze` **plus 8 × `scope-change-logged-after-plan-edit`**, one per tick commit —
-    **9 of the run's 17 FAILs.** Anchored counts of real entries (`^### … | scope-change |`):
-    **SPRINT-087 = 0, SPRINT-086 = 1.** 086 passed *because it had a scope change*; 087 fails *because
-    it never needed one*.
-  - **The incentive is inverted, which is what makes this `high`.** The check exists so a mid-sprint
-    scope shift cannot be slipped in silently. As implemented it rewards sprints that shifted scope and
-    penalises sprints that did not — and the only ways to clear it are to log a scope-change that did
-    not happen (falsifying the record the check protects) or to leave the close gate red. Neither is
-    acceptable, and the first is actively worse than the defect.
-  - Impact: **noisy, not blocking — corrected after filing.** These findings come from the conformance
-    engine, whose output `qa-check.sh` treats as **informational** except two fully-covered families, so
-    they never entered the gate tally: the real verdict was `210 pass, 2 fail`, neither of them this.
-    **The row was first filed `high` on the belief that it blocked close; that was wrong**, concluded
-    from a truncated run before the informational note was read. Severity corrected to `medium`. The
-    defect itself is unchanged and still worth fixing — a clean sprint still reads as nine findings that
-    a maintainer must dismiss by hand every close, and the inverted incentive below is unaffected.
-    SPRINT-087 finished 29/29 DoD with no scope shift and
-    cannot present a green gate. Sprints that closed before this were carrying at least one
-    scope-change entry, which is why it has not surfaced until now — the same latency shape as TD-097
-    (a guard whose defect is masked by the ordinary case happening to satisfy it).
-  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): compare § Plan with
-    **checkbox state normalised**, so a tick is not a diff; then a genuine text change still demands its
-    `scope-change` entry and the check does what it was written to do. Retain a must-FAIL fixture for a
-    real text edit **and** a control fixture that ticks every box and must stay green — the control is
-    the load-bearing one, since it is the case that is wrong today.
-  - **Re-file fresh if** DoD checkboxes move out of § Plan — the collision is between what the checker
-    diffs and where the template puts the boxes, and relocating either dissolves it.
-
 - **TD-104** severity: medium | status: open | created: Sprint-087
   - Summary: **T3's oracle helper hard-codes a 15,000 ms timeout for an operation measured at ~18,800 ms
     — the limit is already smaller than the thing it bounds, at rest.** Every `runShellEngine` call in
@@ -2177,34 +2013,6 @@ status: current
   - **Re-file fresh if** the oracle scripts get materially faster, or the runner default changes — the
     arithmetic (spawn cost × contention vs runner default) is the whole finding, and it is host-specific.
 
-- **TD-097** severity: medium | status: resolved → TASK-338 | created: Sprint-087
-  - **Resolved at SPRINT-100 T1** (commits `bc0a2e8` · `4a8b5be`, merged `803c041`): a bare basename resolves against CWD then `scripts/`, `scripts/lib/`, `evals/` before being called absent, and an *unresolvable reference* is reported as `verify-method-unresolvable` — a **different finding** from `verify-method-absent`, so one absence is never reported as the other. The archive exemption that hid this for five sprints became the retained fixture `archive-arm-basename-skipped`.
-  - **This row's `17` was wrong and is corrected here.** Settled empirically by running the *unfixed* checker over all 31 archived Verify-bearing sprints: **9** findings — `qa-check.sh ×3` · `read-spec-rules.sh` · `check-layers-observed.sh` · `check-gates-signed.sh` · `check-epic-archive.sh` · `check-doc-caps.sh` · `check-attestation.sh`. The row's 17 conflated raw *mentions* with *findings*. Of the 9, 2 were genuinely absent and 7 were false positives now resolved. A coordinator cross-check initially disagreed at 6-vs-5 root-resolvable basenames and was itself the faulty side — it stripped trailing punctuation from script tokens, which the checker does only for targets (now filed as **TD-158**).
-  - Tracker: **`TASK-338`**, merged with TD-087 (SPRINT-097 T1 cluster ruling, 2026-09-10). Re-derived: `[ ! -f "$scr" ]` at `check-verify-reaches.sh:89` and the archive exemption at `:55` are live verbatim, exactly as this row states.
-  - Summary: **`check-verify-reaches.sh` reports a present script as absent, and cannot see the corpus
-    that would have exposed it.** Its EXISTS test resolves the extracted token with `[ -f "$scr" ]`
-    relative to CWD (line ~89), so a Verify clause naming a script by **basename** — the repo's
-    dominant convention — fails as *"does not exist in this repository"* even when the file is present.
-  - Evidence: SPRINT-087 T4 DoD 1 names `read-spec-rules.sh --section N`. The gate emits
-    `verify-method-absent`, yet `scripts/lib/read-spec-rules.sh` exists, offers `--section`, and
-    `ADR-034` §64 records a working `sh scripts/lib/read-spec-rules.sh …` invocation. Three independent
-    queries agree the file is present. **The finding text is factually false**, which is worse than a
-    bare FAIL: it sends the reader to write a script that is already there.
-  - Impact: **it fires only on the active sprint, which is why it looked clean for five sprints.**
-    Line ~55 (`case "$sp" in */archive/*) continue`) exempts archived sprints, and archived Verify
-    clauses contain **17 bare-basename references** — `conformance.sh` ×8, `check-manifest-lockstep.sh`
-    ×3, `check-doc-caps.sh` ×3, `check-epic-archive.sh` ×2, `qa-check.sh` ×1 — every one of which would
-    trip this. The convention and the guard have disagreed since the guard shipped (Sprint-082 T3); the
-    disagreement was invisible because the only files it inspects are the ones not yet archived.
-  - **This is a false positive on a Tier G guard, the same class as TD-095** — a gate charging for a
-    pattern the repository itself practises. Noisy rather than silent, hence `medium`.
-  - Mitigation (hypothesis, re-derive before building a DoD on it — L-091): resolve a bare basename
-    against the known script roots (`scripts/`, `scripts/lib/`, `evals/`) before declaring absence, and
-    separate the two findings — *unresolvable reference* is not *method absent*. Re-point the archive
-    exemption at a retained fixture so the basename case is exercised rather than exempted.
-  - **Re-file fresh if** the Verify-clause convention changes to require fully-qualified paths — the
-    finding then becomes correct and this row becomes a docs fix instead.
-
 - **TD-096** severity: minor | status: open | created: Sprint-087
   - Summary: **SPRINT-087 attributes the six marks to ADR-036 in four places; they are `spec/STANDARD.md`
     §14's.** ADR-036 freezes the *verdict vocabulary* — `PASS` · `FAIL` · `GAP` — and rules severity out
@@ -2288,49 +2096,6 @@ status: current
     approval rather than drifted into.
   - **Re-file fresh if** `EPIC-014` passes ~180 lines — the headroom argument expires there.
 
-- **TD-086** severity: minor | status: resolved → TASK-340 | created: Sprint-084
-  - **Resolved at SPRINT-100 T3** (commit `952eaaa`): positional windowing binds `has_close`/`has_ruling` to each `system-verify ·` occurrence's own window (from that line up to the next occurrence or EOF), so an earlier entry's ruling can no longer mask a later, unresolved FAIL — reproduced in both orderings before the fix, confirmed fixed after (`evals/run-system-verify-fixtures.sh` cases `second-entry-unruled-fails` / `second-entry-ruled-passes`). `evals/run-system-verify-fixtures.sh` now also runs against this repository's own live, non-archived `docs/sprint/logs/*.md`, not only `evals/fixtures/` (L-166).
-  - Tracker: **`TASK-340`** (SPRINT-097 T1 cluster ruling, 2026-09-10 — four tasks grouped by artifact). Re-derived against the tree at that time: the masking bug at `evals/lib/check-system-verify-block.sh:75-76` was live and the checker saw only `evals/fixtures/` (both now fixed — see the resolution bullet above), but the *"appears nowhere in `qa-check.sh`"* clause below was **stale even then** — its harness `run-system-verify-fixtures.sh` was registered in `eval_harnesses_always` at SPRINT-068 T2 (`scripts/qa-check.sh:1063`, comment at `:1094`). **Correcting this bullet's own prior claim too**: the checker lives at `evals/lib/`, which is correct — but re-checked against the row as filed (SPRINT-084, commit `9ed3fae`), the Summary has never named `scripts/lib/` at all; that claim, added here at SPRINT-097 T1, was itself wrong (L-130's shape, inside the row meant to catch it).
-  - Summary: **`check-system-verify-block.sh` masks a later unresolved FAIL with an earlier ruling, and
-    never runs against live logs.** `has_close` and `has_ruling` are whole-file greps with no positional
-    link to the `system-verify ·` line they gate.
-  - Evidence: Sprint-084 T2's independent review reproduced it on two adversarial logs — a day-1 FAIL
-    *with* its ruling followed by a day-2 unresolved FAIL *without* one returns `PASS`, **exit 0**, in
-    both orderings. The 10 retained fixtures (now 12, see the resolution bullet above) never exercised
-    a two-entry log. Separately, the harness **is** (and was, at filing) registered in `qa-check.sh`'s
-    `eval_harnesses_always` (`scripts/qa-check.sh:1063`, SPRINT-068 T2) — but at filing every invocation
-    in it pointed at `evals/fixtures/`, never at live logs (now fixed — see the resolution bullet
-    above), while a sibling leg in the same file (`check-review-depth.sh`, leg 2b,
-    `scripts/qa-check.sh:493`) *was already* run against live logs, under a comment stating the exact
-    principle this gap violated
-    (*"a guard that only ever sees `evals/fixtures/` has not been shown to reach this repository"*).
-  - Impact: the silent close ADR-033 exists to stop, occurring inside the mechanism built to stop it.
-    Latent only because no sprint log has yet carried two `system-verify ·` entries — plausible as soon
-    as a sprint spans two dispatch sessions before closing.
-  - **Re-file fresh if** the positional fix lands without live-wiring: the masking bug could then still
-    never surface through `qa-check.sh`.
-
-- **TD-087** severity: minor | status: resolved → TASK-338 | created: Sprint-084
-  - **Resolved at SPRINT-100 T1** (commits `bc0a2e8` · `4a8b5be`, merged `803c041`): REACHES is anchored to path boundaries via `lf_line_touches`, a target whose only occurrence sits in an exclusion idiom is rejected via `lf_is_exclusion_line`, and a token that is itself another method named in the same clause is filtered out of that clause's targets. Retained must-FAIL per leg each with its own named finding (`exclusion-idiom-fails` · `prefix-collision-fails`), sibling controls green in the same run, seeded break under one stated convention (`git hash-object` vs `git rev-parse <ref>:<path>`, `98fdea1` both sides). Its outside reviewer caught a real regression before merge — the `$VAR/literal/path` idiom this repository itself uses.
-  - Tracker: **`TASK-338`**, merged with TD-097 (SPRINT-097 T1 cluster ruling, 2026-09-10). Same script, two legs, filed three sprints apart with neither row aware of the other; each row's `Re-file fresh if` clause forbids fixing one alone, which is the only merge the cluster evidence forces. Re-derived: `grep -qF` at `check-verify-reaches.sh:102` and the `case` substring test at `:96` are live verbatim.
-  - Summary: **`check-verify-reaches.sh` certifies targets it never reaches, and cannot model a
-    two-method `Verify:` clause.** REACHES is a plain `grep -qF` substring test over the script's
-    non-comment text, with no notion of *how* the target is used.
-  - Evidence: two shapes reproduced in Sprint-084 T2's review. (a) **Exclusion idiom** — a script whose
-    only mention of the path *prunes* it is reported `confirmed reachable`. (b) **Prefix collision** —
-    target `src/db` matches a script touching only `src/dbtools/`. Both are what T3's own Acceptance
-    names as the thing to catch. Separately, Sprint-084's own T5 DoD names two scripts in one clause and
-    the checker pairs them as target/method, so each reads as unreachable from the other — two FAILs
-    against a criterion that genuinely passed, ruled at close rather than papered over.
-  - Impact: a false positive on a substring is a false negative on the contract (L-108). (a)/(b) stay
-    latent because the live corpus reports **0 confirmed targets** — a vacuous pass in the denominator
-    sense (L-156); the two-method case is live now.
-  - Mitigation *(hypothesis)*: match on use rather than mention (at minimum reject a target whose only
-    occurrence sits inside an exclusion construct), anchor to path boundaries, and either support an
-    N-method clause or emit one distinct finding for it instead of N mutual failures.
-  - **Re-file fresh if** the two-method case is fixed without (a)/(b) — that closes the visible symptom
-    and leaves both silent ones.
-
 - **TD-088** severity: minor | status: open | created: Sprint-084
   - Summary: **SPRINT-082's execution-architecture freeze is unreachable by the consumer that must obey
     it.** Its commit claimed it was "written where admission reads it"; it is not.
@@ -2346,24 +2111,6 @@ status: current
     independent later session.
   - **Re-file fresh if** the freeze is lifted before this is wired: the reachability defect outlives the
     particular freeze.
-
-- **TD-089** severity: minor | status: resolved → TASK-341 | created: Sprint-084
-  - **Resolved at SPRINT-100 T5** (commit `3da4680`): both sweeps in `evals/run-foreign-repo-fixtures.sh` now read either finding convention through one shared `sweep_findings`/`sweep_gate`. Measured 6 of 9 FAIL lines swept before, **9 of 9** after; the remediated stranger reaches **0**. Round 4 was **re-run**, not re-matched, per this row's own re-file condition — written up as Round 6 in `docs/research/logs/conformance-coverage.md`; the verdict reproduces unchanged (9 findings across 5 rules, 9 actionable, 0 artefacts).
-  - **Two figures in this row's Tracker line were wrong and are corrected here, not silently.** It read *"the engine emits **195** `S<N>.<CODE>` occurrences against **38** distinct kebab findings, so the convention the matcher was written for is the minority one."* Re-derived at build through three routes that vary the selection rule (L-198): `bad "` call sites **58 kebab / 15 rule-id** of 73; this round's own corpus **6 / 3** of 9; the live corpus **12 / 0** of 12. **Kebab is the MAJORITY at every grain that bears on a sweep.** The two cited figures compare *string occurrences anywhere in the file* against *distinct finding slugs* — different populations, which is the one comparison that cannot carry a majority claim. Only the occurrence count was stale (**195 → 216**); **38 is unchanged**. The cause is a third emission shape: 8 of the 15 rule-id-leading sites emit through a variable (`bad "$_rid-- …"`), so a grep for a literal `bad "S` finds 7 and a grep for a leading lowercase slug counts those 8 as kebab.
-  - Follow-on filed: **TD-156** (prose where a path is expected, 8 sites) and **TD-157** (one-space bootstrap emissions), both found while fixing this row.
-  - Tracker: **`TASK-341`** (SPRINT-097 T1 cluster ruling, 2026-09-10). **Ruled out of the Tier G group** — its subject is a research round's prose, not a guard, so a "gate accuracy" task containing it would mis-tier under ADR-029. Re-derived and now wider than when filed: the engine emits **195** `S<N>.<CODE>` occurrences against **38** distinct kebab findings, so the convention the matcher was written for is the minority one.
-  - Summary: **The conformance-coverage sweep reports clean over findings it cannot match.** Round 4's
-    actionable-findings regex matches the bare-kebab finding convention; findings emitted under the
-    `S<N>.<CODE>` convention are invisible to it.
-  - Evidence: surfaced incidentally by Sprint-084 T4 while building an unrelated precondition — the
-    original stranger's *fully remediated* state still carries **2 unnamed FAIL lines** (`S2.R-README`
-    footer · `S6.BASE` two doc rows) the sweep does not see. Recorded unrouted in § Round 5 because it
-    fell outside T4's `Layers:`.
-  - Impact: L-108's shape in a **sweep** rather than a guard — a measurement asserting "0 artefacts
-    remain" over a corpus it only partly examined. The claim that an adopter's findings all clear is
-    weaker than the round states.
-  - **Re-file fresh if** the regex is widened without re-running Round 4: that round's conclusion would
-    then rest on a matcher nobody re-measured.
 
 - **TD-090** severity: **high** | status: open | created: Sprint-084 | `high` (085 close) → `medium` (086 close) → **`high` again, same day, by its own re-raise condition**
   - Summary: **`qa-check.sh` leg 12 (eval harnesses) is now the gate's dominant cost** — 396.3s of a
