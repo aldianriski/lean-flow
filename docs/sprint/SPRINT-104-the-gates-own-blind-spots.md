@@ -3,8 +3,8 @@ sprint: 104
 slug: the-gates-own-blind-spots
 owner: Maintainer
 last_updated: 2026-09-21
-status: planned
-plan_commit: [sha — set at promote]
+status: active
+plan_commit: 5216c69
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
