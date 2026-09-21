@@ -37,7 +37,8 @@ closing · the three standing `OVER-CAP (soft)` breaches, which are `TD-174` and
 ## Plan
 
 ### T1 — Reverse the stance; the hook candidate is withdrawn at review `[size: M · risk: med · class: decision · HITL · J2]`
-Layers: `docs/adr/ADR-044-hooks-are-admissible.md` · `docs/DECISIONS.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `README.md` · `docs/architecture/overview.md` · `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json` · `CHANGELOG.md`
+Layers: `hooks/hooks.json` · `hooks/ask-dont-tell.ts` · `evals/run-ask-dont-tell-fixtures.ts` · `TODO.md` · `scripts/qa-check.sh` · `docs/adr/ADR-044-hooks-are-admissible.md` · `docs/DECISIONS.md` · `.claude/CLAUDE.md` ·
+        `.claude/CONTEXT.md` · `README.md` · `docs/architecture/overview.md` · `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json` · `CHANGELOG.md`
 Depends-on: none
 Cites: L-002 · L-105 · L-166 · L-186 · ADR-001 · ADR-002 · ADR-011 · `CLAUDE.md` · `CONTEXT.md` · `LEARNINGS.md`
 
@@ -62,7 +63,7 @@ accurately, and no unmeasured hook ships.
       fact verified against the installed CLI*
 - [x] **A new standing constraint recorded** — *a hook must be worth being **mandatory**, since a consumer cannot disable one selectively; measured against real input before shipping, never argued*
 ### T2 — Make §157's "split, never squeeze" checkable `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `scripts/lib/check-prose-density.ts` · `scripts/lib/prose-density-baseline.txt` · `evals/run-prose-density-fixtures.ts` · `evals/fixtures/prose-density/` · `scripts/qa-check.sh`
+Layers: `scripts/lib/check-prose-density.ts` · `scripts/lib/prose-density-baseline.txt` · `scripts/lib/check-doc-caps.ts` · `evals/run-prose-density-fixtures.ts` · `evals/fixtures/prose-density/` · `scripts/qa-check.sh`
 Depends-on: none
 Cites: TD-174 · L-120 · L-186 · L-142 · `STANDARD.md` · `SKILL.md` · `CLAUDE.md` · `CONTEXT.md` · `.claude/CLAUDE.md`
 
@@ -136,6 +137,13 @@ sprint log that no procedure read. The defect was never the harness set. It was 
 
 ## Files changed
 
+See `git diff --name-only` for the sprint range. **`scripts/qa-check.sh` is the overlap** and all
+three tasks touch it: T2 added leg 2b-ter and registered both harnesses, T1's revise unregistered
+the withdrawn one, T3 reordered the always-on list and rewrote the truncation message. Serialised,
+never concurrent — one task's edit committed before the next began, which is what the overlap map
+exists to guarantee (L-042). `hooks/` and `evals/run-ask-dont-tell-fixtures.ts` appear in T1's
+Layers although they no longer exist: the sprint range **created and then deleted** them, and leg
+15 reads the range rather than the final tree. A withdrawn artifact is still work done.
 See `git diff --name-only` for the sprint range. Both tasks touch `scripts/qa-check.sh`
 (**overlap**): T2 owns it — the density leg and both harness registrations are one edit, made
 once, in T2's commit. T1 makes no edit to that file.

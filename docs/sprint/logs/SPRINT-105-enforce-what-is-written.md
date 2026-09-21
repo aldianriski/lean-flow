@@ -153,3 +153,57 @@ lie found and killed, ADR-044's two mis-citations caught before publication, a n
 that did not exist this morning, and a second independent confirmation that *nothing the author can
 run finds these* — the prediction was written down in advance and still needed an outside pass to
 act on (L-165 ×3).
+
+---
+
+### 2026-09-22 | progress | T3 — the gate's budget was never the defect; an unwired ruling was
+
+**Measured first.** Per-harness cost, all 38 always-on, this host: **533.8s total**.
+`run-conformance-engine-fixtures.sh` alone is **162.2s — 30% of it**; the cheapest 24 together
+cost ~100s. Gate total ~679s, so the 520s budget truncated on **every** run, skipping ~16.
+
+**The skipped set was chosen by position, not value.** The list was in order-of-addition, so the
+gate spent 162.2s on one harness and then skipped `run-s4-ts-evaluators.sh` at **0.75s**.
+
+**A wrong turn, recorded because it is the useful part.** The first fix split the always-on set by
+a measured 30s cost cap, moving the expensive four behind `QA_FULL=1`. It was built, approved on
+the strength of the measurement, and **reverted before commit** for two independent reasons:
+
+1. `ADR-042`'s alternatives table **already rejects that exact move** — it "trades a coverage claim
+   for a schedule, which is the shape L-058 warns about."
+2. The premise was wrong. The 600s ceiling is a **foreground** limit (`ADR-042`'s whole ruling),
+   not a wall. Nothing forced a coverage cut.
+
+And the correct fix was already decided: **SPRINT-101's log records the owner ruling it by hand** —
+*"raise `QA_BUDGET_SECONDS` and re-run, so the 13 skipped harnesses actually execute"* — with a
+1200s run completing at 945s. That ruling lived in a sprint log and **no procedure read it**.
+
+So the defect was never the harness set. It was `L-020` (shipping is not wiring) meeting `L-151`
+(a decision filed where its reader cannot reach it), and the first fix would have deleted coverage
+an accepted ADR had explicitly protected. **This is the second time in two days an ADR's objection
+was reframed instead of read** — `ADR-011` was the first, caught by an outside reviewer. This one
+was caught by the author, which is the only thing that improved.
+
+**Shipped instead:**
+- `scripts/night-run.sh` raises its own budget to 1200s. It **is** the detached caller ADR-042
+  anticipated, and it was invoking the gate at the **foreground** default — truncating the
+  pre-flight that decides whether to FIRE an unattended run. A floor, not an override.
+- The always-on set is ordered **cheapest-first**, so any future truncation costs the fewest guards.
+- The truncation message names the concrete remedy, not just the variable name.
+
+**Proof, from the gate's own printed verdict** (never an exit code — L-120):
+
+| run | verdict | harnesses | truncation |
+|---|---|---|---|
+| before, default 520s | `228 pass, 5 fail` | 22 of 38 | yes, every run |
+| after, detached 1200s | **`262 pass, 3 fail`** | **38 of 38** | **none** |
+
+**+34 checks now actually run.** Wall 601s — which is itself the argument: a complete gate sits
+*just past* the 600s foreground ceiling, so the detached caller raising it is not a workaround, it
+is the only correct invocation.
+
+**A smaller finding, kept because it nearly became an exemption.** The new density leg failed T1's
+own `Layers:` line at 554 chars. The tempting fix was to exempt `Layers:`/`Cites:` declarations the
+way table rows are exempt — defensible in principle, and **suspect by construction when written by
+the author whose file is failing**. Tested instead whether the line simply wraps: it does, and both
+parsers still accept it. The rule held without a carve-out.
