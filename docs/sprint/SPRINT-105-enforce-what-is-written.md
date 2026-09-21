@@ -83,7 +83,7 @@ at or below its baseline does not.
 - [x] A fixture varies the **SELECTION**, not the verdict — *`other-glob-arm` is reachable only through the `skills/*/SKILL.md` arm of `proseFiles()`; every other fixture enters via the hardcoded list (L-186)*
 - [x] Population coverage confirmed — *17 files enumerated = 14 `SKILL.md` + `CLAUDE.md` + `CONTEXT.md` + `STANDARD.md`*
 - [x] **Exercised on its own author** — *the leg failed `CLAUDE.md` at 805 chars on one line within minutes of being wired; fixed by rewrapping, with the baseline left untouched, which is what §157 requires and what the baseline file forbids doing instead*
-- [ ] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
+- [x] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168) — *verdict: detection sound, member set wrong. 8 findings, all fixed in `a33732e`: population 16→84 files, table cells measured, 6 new fixtures, verdict count corrected*
 
 
 ### T3 — Make the detached gate actually run every harness `[size: S · risk: med · class: execution · HITL · J1]`
@@ -103,7 +103,7 @@ default foreground profile drops the dearest rather than the newest if it ever d
 - [x] Always-on set ordered **cheapest-first** — *so that if a budget is ever exceeded, truncation costs the fewest guards rather than an arbitrary tail*
 - [x] **`scripts/night-run.sh` raises its own budget to 1200s** — *it is the detached caller ADR-042 anticipated ("a caller that knows it is detached may raise it") and was invoking the gate at the 520s **foreground** default, truncating the pre-flight that decides whether to FIRE an unattended run. A floor, not an override: a higher caller-set budget is kept*
 - [x] The truncation message names the **concrete remedy** — *`QA_BUDGET_SECONDS=1200 sh scripts/qa-check.sh`, not just the variable name; the reader who needs it is the one staring at the truncation (L-151)*
-- [ ] Detached run verified: **all 38 harnesses execute, zero truncation** — *Verify: the gate's own `QA-CHECK:` line plus a count of harness rows in the output, never an exit code (L-120)*
+- [x] Detached run verified: **all 38 harnesses execute, zero truncation** — *`QA-CHECK: 262 pass, 3 fail` at `QA_BUDGET_SECONDS=1200`, wall 601s, 38 of 38 harness rows, no truncation line. Against `228 pass, 5 fail` and 22 of 38 before (L-120: the gate's printed verdict, not an exit code)*
 - [ ] Outside reviewer dispatched worktree-isolated (ADR-029 ii)
 
 **What this task deliberately did NOT do, and why it matters.** A first attempt split the always-on
