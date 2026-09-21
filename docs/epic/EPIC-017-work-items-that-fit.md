@@ -96,6 +96,14 @@ mid-flight are five separable deliveries, each demonstrable alone.
    with justification*. Not arbitrary deletion to turn a counter green.
 6. **Consumer parity** — `workdoo` adopts the same store; templates and the conformance engine ship
    it, so an installing consumer gets it and not only this repo.
+7. **A migration, and a version that announces it.** This is the first **breaking** change lean-flow
+   has shipped: every repo that adopted it has `TODO.md`, `docs/sprint/`, `TECH-DEBT.md` in the old
+   shape, and a skill that silently expects the new one turns a working install into a broken one.
+   So: a **MAJOR** version, a migration that runs on a real repo before release, and — because a
+   consumer with auto-update off will run **v1 skills against a v2 tree or the reverse** — every
+   skill **detects the layout it is given and says so**, rather than assuming. `/lean-doc-generator
+   migrate` already exists for exactly this shape of job ("re-runnable as an update sync — report
+   deltas, never clobber") and is the home, not a new command.
 
 **Out (explicitly not):**
 - Changing **what** any gate checks.
@@ -154,6 +162,19 @@ cannot be hit by a container that never accumulates. Its status vocabulary
   repo because a reading filed only here is unreachable by the reader who needs it (L-151).
 - **D5** — Tooling is TypeScript on Bun. Recorded because the reference implementation is shell and
   would otherwise be copied by reflex.
+- **D7** — **`v2.0.0`, with dual-layout support for the whole of `2.x`.** MAJOR, because the change
+  is breaking and a consumer must be told by the number rather than by a broken install. But every
+  skill **detects** whether the repo it was handed has the v1 single-file layout or the v2 store,
+  works with both, and names which it found. Old-layout support is removed at `3.0.0`, not before.
+  *Why not a hard cut:* a consumer with auto-update **off** will run v1 skills against a v2 tree, or
+  v2 skills against a v1 tree, and neither direction may corrupt anything — that is the ordinary
+  state of an installed plugin, not an edge case. *Cost, accepted:* two read paths in every skill
+  that touches the queue, for the length of `2.x`. **Ruled 2026-09-21. → ADR.**
+- **D8** — **The migration is proven on `workdoo`, on a branch**, before release. Not a synthetic
+  fixture: a real consumer with 8 closed sprints, a 389-line `TODO.md` and a 533-line
+  `TECH-DEBT.md`. Its gate must stay green after migrating, and the branch is retained as the
+  proof. This is L-007's exercise-on-real-input and L-016's *"verify on the consumer path"* in one
+  step — lean-flow cannot dogfood a consumer migration, because it is the plugin.
 - **D6** — Transitions are **coordinator-owned**. Two isolated worktrees can each claim the same
   ticket from their own snapshot; the merge-back coordinator performs moves, and a duplicate-id
   check runs at merge.
@@ -181,3 +202,9 @@ cannot be hit by a container that never accumulates. Its status vocabulary
 - [ ] **Effectiveness is measured, not assumed** — a before/after comparison of decomposition
       completeness, retrieval success and recurring-failure rate. Fewer lines and fewer checkboxes
       are explicitly **not** the success criterion.
+- [ ] **Released as `2.0.0`** across all four manifests + the README footer, derived with
+      `grep -l '"version"' .*-plugin/*.json` and never from a list.
+- [ ] **Both layout directions are safe** — v2 skills against a v1 tree and v1 skills against a v2
+      tree, each exercised, each either working or refusing cleanly. Never corrupting. This is the
+      auto-update-off consumer, who is the normal case and not an edge case.
+- [ ] **`workdoo` migrated on a branch with its gate green**, branch retained as the proof (D8).

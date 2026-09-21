@@ -16,6 +16,17 @@ status: current
 
 ## Active Sprint
 
+> **SPRINT-105 — Enforce What Is Already Written** → [docs/sprint/SPRINT-105-enforce-what-is-written.md](docs/sprint/SPRINT-105-enforce-what-is-written.md)
+>
+> Opened 2026-09-21, **retroactively and stated as such**. Two tasks, both built in one session on
+> owner direction: the `ask-dont-tell` Stop hook that finally makes `L-002` fire, and the
+> prose-density ratchet that makes `STANDARD` §157 checkable. Both are rules that were already
+> written, already correct, and losing to a checked number sitting beside them — `EPIC-017`'s
+> diagnosis applied to the two cases that did not need the work-item store to land first. Carries
+> **ADR-044**, which reverses the "ships no hooks" stance and, in passing, deletes a `"no scaffold"`
+> claim that had been **false** for as long as `/lean-doc-generator init` has shipped. Released as
+> **v1.66.0**. Open: two outside reviews (ADR-029 ii) and the owner's read of ADR-044.
+>
 > **SPRINT-104 — The Gate's Own Blind Spots** → [docs/sprint/SPRINT-104-the-gates-own-blind-spots.md](docs/sprint/SPRINT-104-the-gates-own-blind-spots.md)
 >
 > Promoted 2026-09-21. Four tasks, none `[size: L]` (size-checked at pull, before rendering).
