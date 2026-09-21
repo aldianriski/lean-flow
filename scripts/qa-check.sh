@@ -243,6 +243,34 @@ else
   fi
 fi
 
+qb_checkpoint "leg 2b-ter: prose density"
+# PROSE DENSITY (EPIC-017 TASK-364). The doc-caps leg above counts NEWLINES, and a markdown file
+# satisfies a newline cap by writing longer lines. Measured: .claude/CLAUDE.md held 63 lines against
+# a cap of 80 while its content grew 2.62x after the cap was first reached, longest line 6,681 chars.
+# STANDARD 157 already forbids the squeeze and nothing checked it, so the enforced counter won.
+# This leg is that missing check, as a RATCHET (FAIL only when a file gets denser than its recorded
+# baseline) rather than a threshold -- TD-174 records what a report-only cap achieves: three
+# OVER-CAP soft rows print every run, one 23x its cap, and nothing has acted on them.
+pd_script="scripts/lib/check-prose-density.ts"
+if ! command -v bun >/dev/null 2>&1; then
+  bad "prose density: bun not found on PATH -- cannot run $pd_script. This FAILS rather than skipping on purpose, same rule as the dod-delta leg (TD-101 - ADR-037): a skip is indistinguishable from a pass"
+elif [ ! -f "$pd_script" ]; then
+  bad "prose density: checker not found at $pd_script"
+else
+  pd_out=$(bun "$pd_script" "$ROOT" 2>&1); pd_code=$?
+  printf '%s\n' "$pd_out"
+  pd_pass=$(printf '%s\n' "$pd_out" | grep -cE '^PASS')
+  pd_fails=$(printf '%s\n' "$pd_out" | grep -cE '^FAIL')
+  pass=$((pass + pd_pass))
+  if [ "$pd_code" -ne 0 ]; then
+    if [ "$pd_fails" -gt 0 ]; then
+      fail=$((fail + pd_fails))
+    else
+      bad "prose density: checker exited $pd_code without reporting a FAIL line"
+    fi
+  fi
+fi
+
 qb_checkpoint "leg 2b-bis: handoff state"
 # --- 2b-bis. Handoff status + STANDARD Sec 12(b)'s conversion (SPRINT-094 T2) -----------------
 # Sec 12(b)'s Meeting-notes row prescribes converting outcomes into a durable home and never
@@ -1125,7 +1153,7 @@ qb_checkpoint "leg 12: eval-harness preamble"
 # git-free rule: it is a `bun test` wrapper over in-memory fixtures (see evals/dod-delta.test.ts), no
 # git, no mktemp, no repos built -- measured well under 1s on this host, the same shape
 # run-s4-ts-evaluators.sh already takes for a TS-evaluator leg.
-eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-handoff-state-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-s4-ts-evaluators.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh run-night-run-gate-exception-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-night-run-outcome-fixtures.sh run-dod-delta-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts"
+eval_harnesses_always="run-reap-terminal-fixtures.sh run-authority-fixtures.sh run-run-mode-fixtures.sh run-approval-envelope-fixtures.sh run-skill-freshness-fixtures.sh run-worktree-usability-fixtures.sh run-dispatch-preflight-fixtures.sh run-layers-completeness-fixtures.sh run-sprint-log-layout-fixtures.sh run-count-claims-fixtures.sh run-epic-archive-fixtures.sh run-handoff-state-fixtures.sh run-research-archive-fixtures.sh run-ephemeral-intake-fixtures.sh run-task-origin-fixtures.sh run-doc-caps-fixtures.sh run-sprint-close-fixtures.sh run-manifest-lockstep-fixtures.sh run-gates-signed-fixtures.sh run-night-run-rollup-fixtures.sh run-system-verify-fixtures.sh run-spec-reader-fixtures.sh run-conformance-engine-fixtures.sh run-ownership-header-fixtures.sh run-foreign-repo-fixtures.sh run-s4-ts-evaluators.sh run-s2-placement-fixtures.sh run-review-depth-fixtures.sh run-verify-reaches-fixtures.sh run-qa-budget-fixtures.sh run-qa-budget-default-fixtures.sh run-git-availability-fixtures.sh run-night-run-gate-exception-fixtures.sh run-revise-loop-ceiling-fixtures.sh run-night-run-outcome-fixtures.sh run-dod-delta-fixtures.sh run-sprint-family-spec-reduction-fixtures.ts run-prose-density-fixtures.ts run-ask-dont-tell-fixtures.ts"
 # run-s4-differential-parity.sh (SPRINT-092 T3) joins the opt-in set by the cost rule, and it is the
 # OTHER half of T2's swap: the row-by-row comparison of the TS evaluators against a LIVE Shell oracle,
 # which needs a real engine spawn per row and is exactly the 20+s taken off the default profile.

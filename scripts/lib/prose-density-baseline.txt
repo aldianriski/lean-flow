@@ -1,0 +1,28 @@
+# prose-density baseline -- EPIC-017 TASK-364. Lines longer than 400 chars, per file, at adoption.
+#
+# This file exists to reach EMPTY. It is the ratchet `doc-caps-grandfathered.txt` describes,
+# applied to density instead of line count: actual > recorded -> FAIL (it got denser under the
+# clause); actual <= recorded -> reported and tracked; actual == 0 -> PASS and the row is told to
+# delete itself. A file with dense lines and NO row here FAILS -- that arm is what stops new drift
+# being added quietly, and it is why this is a ratchet rather than another report nobody reads
+# (TD-174: three OVER-CAP soft rows have printed every run, one 23x its cap, and nothing acted).
+#
+# Do NOT raise a number here to make the gate green. Raising it is the squeeze STANDARD 157
+# forbids, recorded in a file whose whole purpose is to forbid it. Shrink the file instead:
+# split whole sections out, per 157's growth rule.
+#
+# format: <path> <count-at-adoption>
+.claude/CLAUDE.md 9
+.claude/CONTEXT.md 16
+skills/council/SKILL.md 5
+skills/diagnose/SKILL.md 1
+skills/flow/SKILL.md 2
+skills/handoff/SKILL.md 1
+skills/insights/SKILL.md 1
+skills/lean-doc-generator/SKILL.md 9
+skills/orchestrator/SKILL.md 13
+skills/prototype/SKILL.md 1
+skills/refactor-advisor/SKILL.md 1
+skills/task-decomposer/SKILL.md 3
+skills/tdd/SKILL.md 1
+skills/triage/SKILL.md 1
