@@ -31,7 +31,13 @@ const CASES: Case[] = [
   { dir: "grew", expect: "FAIL", finding: "grew to 2 dense lines, baseline 1", why: "ratchet arm" },
   { dir: "no-baseline-row", expect: "FAIL", finding: "no baseline row", why: "new-drift arm" },
   { dir: "at-baseline", expect: "PASS", finding: "1 <= 1 dense lines", why: "must-NOT-catch control" },
-  { dir: "other-glob-arm", expect: "FAIL", finding: "skills/demo/SKILL.md", why: "SELECTION arm (L-186)" },
+  { dir: "other-glob-arm", expect: "FAIL", finding: "skills/demo/SKILL.md has 1 line(s) over", why: "SELECTION arm (L-186); asserts arm-specific text, not the bare path, so a FAIL->PASS flip cannot score green" },
+  { dir: "fenced-long-line", expect: "PASS", finding: "(0 lines > 400 chars)", why: "must-NOT-catch: a >400-char line inside a fence is verbatim content, not squeezed prose. Removing the fence exclusion must redden this" },
+  { dir: "wide-table-row", expect: "PASS", finding: "(0 lines > 400 chars)", why: "must-NOT-catch: a 500+ char table ROW of short CELLS is a real table. Removing the table handling must redden this" },
+  { dir: "threshold-boundary", expect: "FAIL", finding: "CLAUDE.md has 1 line(s) over 400", why: "401 is dense and 400 is not -- changing the threshold constant must redden this" },
+  { dir: "odd-fence", expect: "FAIL", finding: "ODD number of fence markers", why: "one stray marker silences the rest of the file; that must be named, not silent" },
+  { dir: "stale-baseline-row", expect: "FAIL", finding: "not in the examined population", why: "a row that rots after a rename takes its dense lines with it" },
+  { dir: "duplicate-baseline-row", expect: "FAIL", finding: "DUPLICATE row", why: "the later row silently wins; adding a row is a quieter diff than editing one" },
 ];
 
 let pass = 0;

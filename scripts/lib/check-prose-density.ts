@@ -3,113 +3,186 @@
 // WHY THIS EXISTS. `check-doc-caps` counts NEWLINES. A markdown file satisfies a newline cap by
 // writing longer lines, and that is measurably what happened: `.claude/CLAUDE.md` held 63 lines
 // (cap 80) while its content grew 2.62x after the cap was first reached, and its longest single
-// line is now 6,681 characters. STANDARD 157 already forbids this -- "cap-hit -> split, never
-// squeeze ... never compress signal away" -- but nothing checks it, and an enforced counter beside
-// an unenforced principle wins every time. This file is the missing check.
+// line reached 6,681 characters. STANDARD 157 already forbids this -- "cap-hit -> split, never
+// squeeze ... never compress signal away" -- but nothing checked it, and an enforced counter
+// beside an unenforced principle wins every time.
 //
-// WHY A RATCHET AND NOT A THRESHOLD. TD-174 records the failure mode of the obvious design: the
-// three `OVER-CAP (soft)` rows print on every run and nothing acts on them, one of them 23x its
-// cap. A guard that only reports is a log line. So this reuses the pattern
-// `doc-caps-grandfathered.txt` already documents -- record the count at adoption, FAIL when it
-// GROWS -- which cannot be satisfied by ignoring it and cannot flood day one with 64 findings.
-// A file that reaches 0 is told to delete its own row, so the baseline is a file whose purpose is
-// to reach empty.
+// WHY A RATCHET AND NOT A THRESHOLD. TD-174 records the failure mode of the obvious design: three
+// `OVER-CAP (soft)` rows print on every run, one 23x its cap, and nothing acts on them. So this
+// reuses the pattern `doc-caps-grandfathered.txt` already documents -- record the count at
+// adoption, FAIL when it GROWS -- which cannot be satisfied by ignoring it. A file reaching 0 is
+// told to delete its own row, so the baseline is a file whose purpose is to reach empty.
 //
-// WHY 400 CHARACTERS. Derived, not chosen. Across the capped prose corpus (CLAUDE.md, CONTEXT.md,
-// every SKILL.md, STANDARD.md; n=2,246 non-table lines) the distribution is median 74, p90 130,
-// p95 254, p99 664, max 6,681. This repo hand-wraps at ~100. 400 sits near p97 -- comfortably above
-// any ordinary long sentence, so what it catches is a paragraph that refused to wrap, which is the
-// density-gaming signal and not a style preference.
+// THE POPULATION IS DERIVED, NOT HAND-LISTED -- and it was hand-listed once, which was the defect.
+// The first version examined 3 hardcoded paths plus `skills/*/SKILL.md`: 16 files against the 78
+// that `check-doc-caps` enforces a cap on. An outside review found 62 capped files unexamined, 10
+// of them already dense, including `TODO.md` (684 lines against a 320 soft cap, carrying a 679-char
+// line) -- the file where the squeeze incentive is highest. It also found the inverted tell that
+// proves the set was inherited rather than derived: `spec/STANDARD.md`, the ONE examined file with
+// no numeric cap at all, was in; 62 that can be squeezed were out. The squeeze incentive exists
+// exactly where a newline cap is enforced, so the population is now taken from the same source
+// `check-doc-caps` uses -- `deriveRows()` over STANDARD 2, plus the ADR-006 `SKILL.md` allowlist.
+// (STANDARD.md is re-added by ALWAYS_EXAMINED below, on the SECOND rationale -- see there.)
+// This is L-186: detection logic can be perfect over the wrong member set, and the member set is
+// the one property no fixture written against the detector will ever question.
 //
-// WHAT IT DELIBERATELY DOES NOT DO. It does not judge content, and it does not replace the line
-// cap -- line counts remain the primary size signal and this is the second one, answering the
-// question a newline count cannot: *is the file meeting its cap honestly?*
+// DELIBERATELY OUT: `skills/*/references/*.md`. ADR-006 makes `references/` the sanctioned overflow
+// when a SKILL.md hits its cap, and it is uncapped ON PURPOSE. No cap means no squeeze incentive,
+// which is this leg's whole subject. Stated here as a ruling so its absence is never read as the
+// same oversight that produced the hand-list.
+//
+// WHY 400 CHARACTERS. Derived. Across the capped prose corpus the distribution was median 74,
+// p90 130, p95 254, p99 664, max 6,681. This repo hand-wraps at ~100. 400 sits near p97 --
+// comfortably above any ordinary long sentence, so what it catches is a paragraph that refused
+// to wrap, not a style preference.
+//
+// TABLE ROWS ARE MEASURED BY CELL, NOT BY LINE. A real table row is legitimately long because it
+// encodes columns. Skipping the whole row, however, let `| ` prefixed onto any prose hide it
+// completely -- and that bypass was already live: `spec/STANDARD.md` carried a 1,108-char prose
+// cell and this leg reported it clean, while `skills/lean-doc-generator/SKILL.md:107` held a
+// 2,111-char paragraph in a table cell. Measuring the longest CELL keeps real tables quiet and
+// closes the hole.
 //
 // Usage: bun scripts/lib/check-prose-density.ts <repo-root>
-// Prints one PASS/FAIL/INFO line per finding; exits 1 if any FAIL line was printed, 0 otherwise.
+// Prints one PASS/FAIL/INFO/SKIP line per finding; exits 1 if any FAIL line was printed.
 
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { deriveRows, shGlobExpand } from "./check-doc-caps.ts";
 
-/** A prose line longer than this is a paragraph that refused to wrap. See header for derivation. */
 export const DENSE_LINE_CHARS = 400;
-
-/** Relative to the repo root. Read on EVERY session, so their density is paid every time. */
 export const ALWAYS_LOADED = [".claude/CLAUDE.md", ".claude/CONTEXT.md"];
 
+/**
+ * Examined REGARDLESS of whether §2 gives them a numeric cap.
+ *
+ * There are two reasons a file belongs in this population, not one. The first is the **squeeze
+ * incentive**: wherever a newline cap is enforced, density is the way to satisfy it, and that is
+ * what `deriveRows()` covers. The second is **reading cost**: core prose that is read constantly
+ * is expensive when dense whether or not anyone capped it.
+ *
+ * Deriving from caps alone got this wrong in both directions on the same file. The first version
+ * hand-listed `spec/STANDARD.md` and an outside review flagged it as the tell that the set was
+ * inherited rather than derived -- it is the one file §2 explicitly rules "no numeric cap". The
+ * fix then dropped it, and it turns out to carry **6 dense lines including a 1,047-char table
+ * cell**: the document that says "split, never squeeze" would have gone unmeasured by the check
+ * that enforces it. Neither rationale alone covers the population; both are stated here.
+ */
+export const ALWAYS_EXAMINED = ["spec/STANDARD.md"];
 export const BASELINE_FILE = "scripts/lib/prose-density-baseline.txt";
 
 /**
- * Lines that are not prose and must not be measured as prose.
+ * The measured width of a line.
  *
- * A markdown TABLE row is legitimately long -- it encodes columns, and wrapping it would break the
- * table. A FENCED CODE block is verbatim content whose line length is not the author's to choose.
- * Counting either would make the check fire on files that are not gaming anything, and a guard that
- * cries wolf on correct input gets ignored, which is the failure this whole task is about.
- *
- * NOTE the fence toggle is deliberately dumb (any line whose trimmed form starts with ```): nested
- * or malformed fences would mis-toggle, but markdown that malformed has a bigger problem than this
- * check, and a cleverer parser is a second thing to get wrong.
+ * For a table row this is the longest CELL, not the row: a 5-column row of short cells is fine,
+ * and a "row" that is one paragraph behind a `| ` is not. For anything else it is the line.
  */
-export function denseLines(content: string, threshold = DENSE_LINE_CHARS): number[] {
+export function measuredWidth(line: string): number {
+  const t = line.trimStart();
+  if (!t.startsWith("|")) return line.length;
+  let widest = 0;
+  for (const cell of t.split("|")) {
+    const w = cell.trim().length;
+    if (w > widest) widest = w;
+  }
+  return widest;
+}
+
+export interface DenseResult {
+  readonly lines: number[];
+  /** An ODD number of fence markers means everything after the last one was skipped silently. */
+  readonly unbalancedFence: boolean;
+}
+
+export function denseLines(content: string, threshold = DENSE_LINE_CHARS): DenseResult {
   const out: number[] = [];
   let inFence = false;
+  let fenceMarkers = 0;
   const lines = content.split(/\r?\n/);
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]!;
-    const trimmed = line.trimStart();
-    if (trimmed.startsWith("```")) {
+    const t = line.trimStart();
+    if (t.startsWith("```") || t.startsWith("~~~")) {
+      fenceMarkers++;
       inFence = !inFence;
       continue;
     }
     if (inFence) continue;
-    if (trimmed.startsWith("|")) continue; // table row
-    if (line.length > threshold) out.push(i + 1);
+    if (measuredWidth(line) > threshold) out.push(i + 1);
   }
-  return out;
+  return { lines: out, unbalancedFence: fenceMarkers % 2 !== 0 };
 }
 
-/** `<path> <count-at-adoption>` per line; `#` comments and blanks ignored. */
-export function parseBaseline(content: string): Map<string, number> {
-  const map = new Map<string, number>();
+export interface BaselineParse {
+  readonly counts: Map<string, number>;
+  readonly duplicates: string[];
+  readonly malformed: string[];
+}
+
+/** `<path> <count-at-adoption>`; `#` comments and blanks ignored. Duplicates are a finding, not a merge. */
+export function parseBaseline(content: string): BaselineParse {
+  const counts = new Map<string, number>();
+  const duplicates: string[] = [];
+  const malformed: string[] = [];
   for (const raw of content.split(/\r?\n/)) {
     const line = raw.trim();
     if (line === "" || line.startsWith("#")) continue;
     const parts = line.split(/\s+/);
-    if (parts.length < 2) continue;
-    const n = Number.parseInt(parts[1]!, 10);
-    if (!Number.isNaN(n)) map.set(parts[0]!, n);
+    if (parts.length < 2 || !/^\d+$/.test(parts[1]!)) {
+      malformed.push(line);
+      continue;
+    }
+    const p = parts[0]!;
+    if (counts.has(p)) duplicates.push(p);
+    counts.set(p, Number.parseInt(parts[1]!, 10));
   }
-  return map;
+  return { counts, duplicates, malformed };
 }
 
-/** Every SKILL.md plus the always-loaded set and the spec -- the capped prose corpus. */
+/**
+ * Every file that `check-doc-caps` enforces a numeric cap on, hard or soft -- derived from
+ * STANDARD 2 exactly as that checker derives it -- plus the ADR-006 SKILL.md allowlist and the
+ * always-loaded pair. Deduped, sorted, existing only.
+ */
 export function proseFiles(root: string): string[] {
-  const files = [...ALWAYS_LOADED, "spec/STANDARD.md"];
-  const skillsDir = join(root, "skills");
-  if (existsSync(skillsDir)) {
-    for (const entry of readdirSync(skillsDir, { withFileTypes: true })) {
-      if (!entry.isDirectory()) continue;
-      const rel = `skills/${entry.name}/SKILL.md`;
-      if (existsSync(join(root, rel))) files.push(rel);
+  const set = new Set<string>();
+  const guide = join(root, "spec", "STANDARD.md");
+  if (existsSync(guide)) {
+    for (const row of deriveRows(readFileSync(guide, "utf8"))) {
+      if (row.path === "") continue;
+      const glob = (row.pfx + row.path).replace(/NNN/g, "*").replace(/<[^>]*>/g, "*");
+      for (const c of shGlobExpand(root, glob)) if (c.endsWith(".md")) set.add(c);
     }
   }
-  return files.filter((f) => existsSync(join(root, f)));
+  for (const s of shGlobExpand(root, "skills/*/SKILL.md")) set.add(s);
+  for (const a of ALWAYS_LOADED) set.add(a);
+  for (const a of ALWAYS_EXAMINED) set.add(a);
+
+  return [...set]
+    .filter((f) => {
+      const p = join(root, f);
+      if (!existsSync(p)) return false;
+      try {
+        return statSync(p).isFile();
+      } catch {
+        return false;
+      }
+    })
+    .sort();
 }
 
 export interface Finding {
-  readonly level: "PASS" | "FAIL" | "INFO";
+  readonly level: "PASS" | "FAIL" | "INFO" | "SKIP";
   readonly text: string;
 }
 
 export function run(root: string): Finding[] {
   const findings: Finding[] = [];
   const baselinePath = join(root, BASELINE_FILE);
-  const baseline = existsSync(baselinePath)
+  const parsed = existsSync(baselinePath)
     ? parseBaseline(readFileSync(baselinePath, "utf8"))
-    : new Map<string, number>();
+    : { counts: new Map<string, number>(), duplicates: [], malformed: [] };
 
-  // The number nobody had: what every session pays before any work begins.
   let alwaysLoadedBytes = 0;
   for (const rel of ALWAYS_LOADED) {
     const p = join(root, rel);
@@ -117,44 +190,53 @@ export function run(root: string): Finding[] {
   }
   findings.push({
     level: "INFO",
-    // Bytes, not tokens, and said so on purpose. This repo declares ZERO dependencies, so there is
-    // no tokenizer here and inventing a number from one would be an unstated method (L-169). Bytes
-    // are exact and reproducible anywhere; the ~4 bytes/token ratio is the documented conversion.
+    // Bytes, not tokens, and said so. This repo declares ZERO dependencies, so there is no
+    // tokenizer here and inventing a number from one would be an unstated method (L-169).
     text: `prose-density: always-loaded read set = ${alwaysLoadedBytes} bytes (~${Math.round(alwaysLoadedBytes / 4)} tokens at 4 bytes/token, a stated approximation -- no tokenizer, zero-dep policy)`,
   });
 
-  for (const rel of proseFiles(root)) {
-    const lines = denseLines(readFileSync(join(root, rel), "utf8"));
-    const actual = lines.length;
-    const recorded = baseline.get(rel);
+  for (const d of parsed.duplicates) {
+    findings.push({ level: "FAIL", text: `prose-density: baseline has a DUPLICATE row for ${d} -- the later row silently wins, which is a quieter diff than editing the first` });
+  }
+  for (const m of parsed.malformed) {
+    findings.push({ level: "FAIL", text: `prose-density: baseline row is malformed and was ignored: "${m}"` });
+  }
+
+  const files = proseFiles(root);
+  if (files.length === 0) {
+    // A skip is indistinguishable from a pass unless it is printed (L-058, and the rule
+    // check-doc-caps already follows by naming every absent path).
+    findings.push({ level: "SKIP", text: `prose-density: no capped prose files found under ${root} -- nothing examined, which is NOT a pass` });
+  }
+
+  const examined = new Set(files);
+  for (const rel of parsed.counts.keys()) {
+    if (!examined.has(rel)) {
+      findings.push({ level: "FAIL", text: `prose-density: baseline names ${rel}, which is not in the examined population -- a stale row rots invisibly and takes its dense lines with it` });
+    }
+  }
+
+  for (const rel of files) {
+    const res = denseLines(readFileSync(join(root, rel), "utf8"));
+    if (res.unbalancedFence) {
+      findings.push({ level: "FAIL", text: `prose-density: ${rel} has an ODD number of fence markers -- everything after the last one is skipped silently, so this file's count cannot be trusted` });
+    }
+    const actual = res.lines.length;
+    const recorded = parsed.counts.get(rel);
 
     if (actual === 0) {
       if (recorded !== undefined) {
-        findings.push({
-          level: "PASS",
-          text: `prose-density: ${rel} (0 lines > ${DENSE_LINE_CHARS} chars) -- baseline row is spent, delete it`,
-        });
+        findings.push({ level: "PASS", text: `prose-density: ${rel} (0 lines > ${DENSE_LINE_CHARS} chars) -- baseline row is spent, delete it` });
       }
       continue;
     }
-
+    const where = `lines ${res.lines.slice(0, 5).join(", ")}${res.lines.length > 5 ? ", ..." : ""}`;
     if (recorded === undefined) {
-      // A file that has dense lines and NO baseline row is new drift, not adopted drift. This is
-      // the arm that makes the ratchet a ratchet: you cannot add a dense file and stay green.
-      findings.push({
-        level: "FAIL",
-        text: `prose-density: ${rel} has ${actual} line(s) over ${DENSE_LINE_CHARS} chars and no baseline row [STANDARD 157: split, never squeeze] -- lines ${lines.slice(0, 5).join(", ")}${lines.length > 5 ? ", ..." : ""}`,
-      });
+      findings.push({ level: "FAIL", text: `prose-density: ${rel} has ${actual} line(s) over ${DENSE_LINE_CHARS} chars and no baseline row [STANDARD 157: split, never squeeze] -- ${where}` });
     } else if (actual > recorded) {
-      findings.push({
-        level: "FAIL",
-        text: `prose-density: ${rel} grew to ${actual} dense lines, baseline ${recorded} [STANDARD 157: split, never squeeze] -- it got denser under the clause; lines ${lines.slice(0, 5).join(", ")}${lines.length > 5 ? ", ..." : ""}`,
-      });
+      findings.push({ level: "FAIL", text: `prose-density: ${rel} grew to ${actual} dense lines, baseline ${recorded} [STANDARD 157: split, never squeeze] -- it got denser under the clause; ${where}` });
     } else {
-      findings.push({
-        level: "PASS",
-        text: `prose-density: ${rel} (${actual} <= ${recorded} dense lines) -- adopted drift, shrink it at the next promote review`,
-      });
+      findings.push({ level: "PASS", text: `prose-density: ${rel} (${actual} <= ${recorded} dense lines) -- adopted drift, shrink it at the next promote review` });
     }
   }
   return findings;
@@ -168,7 +250,12 @@ if (import.meta.main) {
   }
   const findings = run(root);
   for (const f of findings) console.log(`${f.level.padEnd(5)} ${f.text}`);
+  // Count the levels actually emitted. The first version printed `findings.length - fails`, which
+  // counted its own INFO line as a pass -- so the number it PRINTED (15) disagreed with the rows it
+  // emitted (14) and with what qa-check.sh adds to the gate total. L-120, in the guard built to
+  // enforce rule-following.
+  const passes = findings.filter((f) => f.level === "PASS").length;
   const fails = findings.filter((f) => f.level === "FAIL").length;
-  console.log(`prose-density: ${findings.length - fails} pass, ${fails} fail`);
+  console.log(`prose-density: ${passes} pass, ${fails} fail`);
   process.exit(fails > 0 ? 1 : 0);
 }

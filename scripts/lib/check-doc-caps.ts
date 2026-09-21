@@ -175,7 +175,7 @@ function shSingleQuote(s: string): string {
   return "'" + s.replace(/'/g, `'\\''`) + "'";
 }
 
-function shGlobExpand(root: string, pattern: string): string[] {
+export function shGlobExpand(root: string, pattern: string): string[] {
   // `root` and `pattern` are embedded directly into ONE `-c` script string, never passed as
   // separate argv entries. Reason (found live, not theorised): MSYS's `sh.exe` on Windows performs
   // its own CRT-level wildcard expansion of an UNQUOTED argv token containing `*`/`?` at process
