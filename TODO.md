@@ -18,15 +18,15 @@ status: current
 
 > **SPRINT-105 — Enforce What Is Already Written** → [docs/sprint/SPRINT-105-enforce-what-is-written.md](docs/sprint/SPRINT-105-enforce-what-is-written.md)
 >
-> Opened 2026-09-21, **retroactively and stated as such**. Two tasks, both built in one session on
-> owner direction: the `ask-dont-tell` Stop hook that finally makes `L-002` fire, and the
-> prose-density ratchet that makes `STANDARD` §157 checkable. Both are rules that were already
-> written, already correct, and losing to a checked number sitting beside them — `EPIC-017`'s
-> diagnosis applied to the two cases that did not need the work-item store to land first. Carries
-> **ADR-044**, which reverses the "ships no hooks" stance and, in passing, deletes a `"no scaffold"`
-> claim that had been **false** for as long as `/lean-doc-generator init` has shipped. Released as
-> **v1.66.0**. Open: two outside reviews (ADR-029 ii) and the owner's read of ADR-044.
->
+> Opened 2026-09-21, **retroactively and stated as such**. Two tasks targeting rules that were
+> already written, already correct, and losing to a checked number beside them — `EPIC-017`'s
+> diagnosis applied where the work-item store was not a prerequisite. **T2 shipped**: the
+> prose-density ratchet, now covering 84 files after its outside review found it examined 16 of 78
+> capped ones. **T1's hook was WITHDRAWN at review** — measured on 48 real transcripts it blocked
+> ≈60% false and missed ≥9 genuine cases, 8 of them Indonesian; re-filed as `TASK-366`. What
+> survives is **ADR-044**: hooks and agents are *admissible*, `ADR-011` superseded in part (a hook
+> is mandatory for every consumer — no per-hook disable), and a `"no scaffold"` claim deleted that
+> had been **false** for as long as `/lean-doc-generator init` has shipped. **v1.66.0**, unpushed.
 > **SPRINT-104 — The Gate's Own Blind Spots** → [docs/sprint/SPRINT-104-the-gates-own-blind-spots.md](docs/sprint/SPRINT-104-the-gates-own-blind-spots.md)
 >
 > Promoted 2026-09-21. Four tasks, none `[size: L]` (size-checked at pull, before rendering).
@@ -412,6 +412,38 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
       depends-on: TASK-359 · TASK-360
       assumes:    none — D4's split-by-kind is ruled and recorded in both repos
       tracker:    EPIC-017 D4 · scope 6 · workdoo ADR-001 · EPIC-016
+
+
+- [ ] TASK-366 — Rebuild the `ask-dont-tell` Stop hook against the real transcript corpus  [size: M] [risk: high] [HITL]
+      class:      execution
+      tier:       G        # a hook is mandatory for every consumer (no per-hook disable), so a
+                           # false positive is imposed, not offered
+      authority:  J2
+      origin:     close-retro   # withdrawn at SPRINT-105 T1's outside review, re-filed rather than patched
+      state:      needs-info    # the pattern set must be DERIVED from the corpus before it can be specified
+      done-when:  A `Stop` hook that makes `L-002` fire without imposing noise. **Measured on the
+                  real corpus, not asserted**: the first attempt blocked ~35 of 746 real turns with
+                  **~22 false positives (≈60%)** and missed ≥9 genuine inline decisions. Required:
+                  (a) patterns **derived from the corpus** — drop `would you like` / `let me know` /
+                  `option a` (0 real hits), narrow `your call` and `which…would` (16 and 9 hits,
+                  almost pure noise: *"per your call"*, *"…which would confirm green"*); keep and
+                  extend `want me to` (10 hits, the only reliable one). (b) **Bilingual** — the
+                  maintainer writes mixed ID/EN and `Mau saya …?` *is* `want me to …?`; English-only
+                  patterns miss the majority of the real cases. (c) Anchor to the **final sentence**,
+                  not the last three *lines* — the same words reflowed to one paragraph flipped a
+                  must-NOT-catch fixture to BLOCKED. (d) Strip fenced code, `>` blockquotes and
+                  headings before matching. (e) `main()` wrapped in try/catch → allow, and entries
+                  null-guarded: three inputs currently exit 1 with a stack trace, against ADR-044's
+                  fail-open constraint. (f) **Fixtures drawn verbatim from real transcripts**,
+                  including the seven recorded false positives, plus a selection-varying case
+                  (Indonesian tail · single-paragraph tail · fenced-code tail).
+      touches:    hooks/ (re-created) · evals/ · scripts/qa-check.sh · README.md · ADR-044
+      depends-on: none
+      assumes:    that a measured false-positive rate low enough to impose on every consumer is
+                  reachable at all. UNCONFIRMED — if it is not, the honest outcome is `.out-of-scope/`
+                  and L-002 stays a written rule. ADR-044's bar is "a consumer would not want to
+                  switch this off", and they cannot switch it off selectively.
+      tracker:    ADR-044 · ADR-011 (option B) · L-002 · L-186 · SPRINT-105 T1 review
 
 ### P2 — Follow-on
 

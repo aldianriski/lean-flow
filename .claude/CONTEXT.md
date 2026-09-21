@@ -38,7 +38,7 @@ new behaviour→`/tdd` **(default, test-first)** · bug→`/diagnose` · hard-to
 
 ## Built-in leverage
 
-lean-flow ships **no custom agent definitions** and **one hook** (`hooks/ask-dont-tell.ts`, Stop — ADR-044) — otherwise it dispatches Claude's built-ins in **isolated passes** (fresh context): recon→`Explore` ·
+lean-flow ships **no custom agent definitions and no hooks today** — both are *admissible* under ADR-044, held to ADR-001's bar, and the first hook candidate was withdrawn at review (TASK-366). It dispatches Claude's built-ins in **isolated passes** (fresh context): recon→`Explore` ·
 `/code-review` (small/med → one scoped `sonnet`; **Standards vs Spec** reported separately; the worst finding per axis feeds **one bounded builder retry** — attended auto; unattended only per ADR-022's mechanical carve-out, → `review-scoping.md` § The revise loop) · `/verify` · `/security-review` ·
 `/council` (internal sub-agents); commands `/goal /plan /batch /loop /run /simplify`. Wiring → docs/architecture/overview.md § Key integration points.
 

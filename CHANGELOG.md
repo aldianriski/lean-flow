@@ -13,43 +13,47 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
-## v1.66.0 — Hooks become admissible, and the front door stops advertising absences (2026-09-21)
+## v1.66.0 — Hooks become admissible; the first candidate is withdrawn at review (2026-09-21)
 
 **Released — MINOR.** All four `*-plugin/*.json` manifests and the `README.md` footer moved to
 `1.66.0` together, derived with `grep -l '"version"' .*-plugin/*.json` rather than from a list
 (the DoD line that enumerated a subset was read as exhaustive twice).
 
 ### Added
-- **`hooks/ask-dont-tell.ts` — the plugin's first hook** (`Stop`, via `hooks/hooks.json`). It blocks
-  a turn that ends on a decision point in prose without an `AskUserQuestion` call, and hands back an
-  instruction to re-surface it. `L-002` had been written in four places and more than ten files and
-  still failed routinely; its trigger is *the moment a turn ends*, where no skill step exists, so
-  every written placement was a reminder to an agent that had already stopped reading.
-  **Fails open · cannot block a gate · respects `stop_hook_active`.**
 - **`scripts/lib/check-prose-density.ts`** — gate leg 2b-ter. `check-doc-caps` counts newlines, and
   a markdown file satisfies a newline cap by writing longer lines: `.claude/CLAUDE.md` held 63 lines
-  against a cap of 80 while its content grew **2.62x** after the cap was first reached, longest line
+  against a cap of 80 while its content grew **2.62x** after the cap was reached, longest line
   **6,681 characters**. `STANDARD` §157 already forbade the squeeze and nothing checked it. Built as
   a **ratchet** (FAIL only when a file gets denser than its recorded baseline), because `TD-174`
-  records what report-only achieves: three `OVER-CAP (soft)` rows print every run, one 23x its cap,
-  and nothing has acted on them. It caught its own author within minutes of being wired.
-- Retained fixture suites for both: `evals/run-ask-dont-tell-fixtures.ts` (7 cases) and
-  `evals/run-prose-density-fixtures.ts` (4 cases), each proven to discriminate by a seeded break.
+  records what report-only achieves. It caught its own author within minutes of being wired.
+  Population **derived** from the same source `check-doc-caps` uses — 84 files, after an outside
+  review found the first version examined 16 against 78 capped ones (L-186). Table rows are measured
+  by longest **cell**, closing a `| `-prefix bypass that was already live. 10 retained fixtures,
+  each branch proven to discriminate by a seeded break.
 
 ### Changed
 - **`ADR-044` — hooks and agent definitions are admissible**, held to `ADR-001`'s curation bar.
-  `ADR-002` and `ADR-011` are **amended, not superseded**: still no agent definitions in the roster,
-  gates stay advisory, and **no hook may block a gate**.
-- **The `"no X"` banner is retired across the consumer surface** — README, plugin description,
-  `CLAUDE.md`, `CONTEXT.md`. It claimed "No hooks · no scaffold · no custom agent definitions", and
-  **"no scaffold" was flatly false**: `/lean-doc-generator init` is titled *"Scaffold a fresh repo"*
-  and has shipped for a long time. The front door was telling an evaluating consumer not to look for
-  a feature that is there. Nobody re-checked it because a negative claim has no diff that ever makes
-  it look wrong. Component claims now **describe the roster** instead of advertising an absence.
+  `ADR-001` had explicitly **rejected** "no agents / no hooks, ever" as too extreme; the blanket
+  line was a *proxy* for curated that began being enforced in place of it. `ADR-011` is
+  **superseded in part** on the record — its real objection was the platform fact that hooks
+  auto-activate with **no per-hook disable**, making any shipped hook mandatory for every consumer.
+  That sets a new standing bar: a hook must be worth being mandatory, measured on real input.
+  `ADR-002` is **untouched** — it contains no hook clause (`grep -ci hook` → 0).
+- **The `"no X"` banner is retired across the consumer surface**, and one member was **flatly
+  false**: `/lean-doc-generator init` is titled *"Scaffold a fresh repo"* and has shipped for a long
+  time, while the README's second line denied it. A negative claim has no diff that ever makes it
+  look wrong. Component claims now **describe the roster**.
 
-### Fixed
-- `.claude/CLAUDE.md`'s architecture bullet rewrapped after the new density leg failed it at 805
-  characters on one line — split, per §157, with the baseline left untouched.
+### Withdrawn
+- **`ask-dont-tell`, a `Stop` hook for `L-002`** — built, reviewed worktree-isolated, and **not
+  shipped**. Measured against 48 real transcripts (5,451 assistant blocks, 746 completed turns) it
+  would have blocked ~35 turns with **~22 false positives (≈60%)** while missing ≥9 genuine inline
+  decisions — 8 of those because its patterns were English-only and the maintainer works
+  bilingually (`Mau saya …?` *is* "Want me to …?"). Its 7 fixtures could not see any of this: both
+  blocking fixtures were keyed to patterns firing **0 and 2 times** in the corpus, and deleting
+  every pattern that *does* fire left the suite fully green. Withdrawn under ADR-044's own clause —
+  narrow it or withdraw it, never widen the fixtures until it looks green — and re-filed as
+  **`TASK-366`**. No consumer-visible change: the roster is unchanged and Bun remains not required.
 
 ---
 ## SPRINT-103 — Port the Measured Hotspots (2026-09-21)

@@ -36,30 +36,31 @@ closing · the three standing `OVER-CAP (soft)` breaches, which are `TD-174` and
 
 ## Plan
 
-### T1 — Ship the `ask-dont-tell` Stop hook, and reverse the stance that forbade it `[size: M · risk: med · class: decision · HITL · J2]`
-Layers: `hooks/hooks.json` · `hooks/ask-dont-tell.ts` · `evals/run-ask-dont-tell-fixtures.ts` · `docs/adr/ADR-044-hooks-are-admissible.md` · `docs/DECISIONS.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `README.md` · `docs/architecture/overview.md` · `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json` · `CHANGELOG.md`
+### T1 — Reverse the stance; the hook candidate is withdrawn at review `[size: M · risk: med · class: decision · HITL · J2]`
+Layers: `docs/adr/ADR-044-hooks-are-admissible.md` · `docs/DECISIONS.md` · `.claude/CLAUDE.md` · `.claude/CONTEXT.md` · `README.md` · `docs/architecture/overview.md` · `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` · `.kimi-plugin/plugin.json` · `CHANGELOG.md`
 Depends-on: none
-Cites: L-002 · L-105 · L-166 · ADR-001 · ADR-002 · ADR-011 · `CLAUDE.md` · `CONTEXT.md` · `LEARNINGS.md`
+Cites: L-002 · L-105 · L-166 · L-186 · ADR-001 · ADR-002 · ADR-011 · `CLAUDE.md` · `CONTEXT.md` · `LEARNINGS.md`
 
-`L-002` is written in `CLAUDE.md`, `CONTEXT.md`, `LEARNINGS.md` and the maintainer's memory file,
-appears in 10+ files, and still fails routinely. Its trigger is **the moment a turn ends**, where
-no skill step exists — so every written placement is a reminder to an agent that has already
-stopped reading. That is `L-105`'s temporal test answered honestly: the guard never fires.
+`L-002`'s trigger is **the moment a turn ends**, where no skill step exists, so every written
+placement is a reminder to an agent that has already stopped reading. A hook was built for it and
+**withdrawn at outside review**. The stance change survives; the artifact does not.
 
-**Acceptance:** a turn ending on a decision point with no `AskUserQuestion` call is blocked and
-told to re-ask; a turn that asked properly, and a turn that merely reports, are not.
+**Acceptance:** hooks and agent definitions are admissible on ADR-001's bar, the record says so
+accurately, and no unmeasured hook ships.
 
 **DoD:**
-- [x] Hook registered and loadable — *Verify: `hooks/hooks.json` parses, declares `Stop`, and its `args` path resolves to a file that exists*
-- [x] Transcript schema **verified against a live transcript, not assumed** — *published guidance described a top-level `tool_calls[]`; the real shape is `message.content[]` blocks with `{type:"tool_use", name}`. Reading `tool_calls` would have found nothing, silently — an absent guard shaped like a present one (L-166)*
-- [x] **Tier G bar**: 7 retained fixtures driving the real binary over stdin, incl. 3 must-NOT-catch controls — *Verify: seeded break (AskUserQuestion detection neutered) reddens **both** dependent cases while the 5 independent ones stay green; seed landed (sha changed), targeted (0 line delta), restored under one stated convention (`sha256sum` vs a pristine copy)*
-- [x] A **vacuous control was found and fixed** — *the first `asked-properly` fixture allowed via the wrong branch and never exercised the detection it claimed to guard; only the seeded break exposed it (L-142)*
-- [x] Fails open on every unexpected condition, and respects `stop_hook_active` — *Verify: the `stop-hook-active` fixture*
-- [x] `ADR-044` written: hooks **and** agents admissible on ADR-001's bar; ADR-002/011 **amended, not superseded**; no hook may block a gate
-- [x] The `"no X"` banner retired across the consumer surface — *and `"no scaffold"` found to be **flatly false**: `/lean-doc-generator init` is titled "Scaffold a fresh repo" and has shipped for a long time (L-015)*
-- [x] All four manifests + the README footer at `1.66.0`, derived with `grep -l '"version"' .*-plugin/*.json`, never from a list
-- [ ] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
-
+- [x] `ADR-044` written: hooks **and** agents admissible, held to ADR-001's curation bar
+- [x] The `"no X"` banner retired — *and `"no scaffold"` found **flatly false**: `/lean-doc-generator init` is titled "Scaffold a fresh repo" and had shipped for a long time (L-015)*
+- [x] All four manifests + README footer at `1.66.0`, derived with `grep -l`, never from a list
+- [x] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
+- [x] **Review verdict acted on, not argued with** — *NOT SAFE TO SHIP. Measured on 48 real transcripts (5,451 blocks, 746 turns): ~35 turns blocked, **~22 false positives (≈60%)**, ≥9 genuine decisions missed, 8 of them because the patterns were English-only and the maintainer works bilingually. Hook and its fixtures reverted; re-filed as `TASK-366` with the corpus-derived spec*
+- [x] **Two factual errors in ADR-044 corrected** — *(a) it claimed `ADR-002`'s "hook clause" was
+      lifted; `grep -ci hook` over ADR-002 returns **0** and there is no such clause. (b) it
+      reframed `ADR-011`'s objection as being "about gates"; ADR-011 rejected a plugin hook because
+      **hooks auto-activate with no per-hook disable ⇒ mandatory for every consumer**, which
+      applies exactly to what was built. Now superseded-in-part on the record, with the platform
+      fact verified against the installed CLI*
+- [x] **A new standing constraint recorded** — *a hook must be worth being **mandatory**, since a consumer cannot disable one selectively; measured against real input before shipping, never argued*
 ### T2 — Make §157's "split, never squeeze" checkable `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `scripts/lib/check-prose-density.ts` · `scripts/lib/prose-density-baseline.txt` · `evals/run-prose-density-fixtures.ts` · `evals/fixtures/prose-density/` · `scripts/qa-check.sh`
 Depends-on: none

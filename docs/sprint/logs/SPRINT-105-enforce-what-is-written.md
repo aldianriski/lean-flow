@@ -105,3 +105,51 @@ list plus a `skills/*/SKILL.md` glob, and `README.md`, `TODO.md`, `TECH-DEBT.md`
 capped in §2 but unreachable by the leg. The author's own expectation, recorded before the verdict
 arrives: **this is a real `L-186` defect, built into the guard within an hour of writing the epic
 that names that exact failure class.** Recorded now so the prediction is on the record either way.
+
+---
+
+### 2026-09-21 | scope-change | T1's hook WITHDRAWN at outside review; the stance survives
+
+The T2 review confirmed the author's recorded prediction (population defect, L-186). **The T1
+review was worse, and its verdict was NOT SAFE TO SHIP.**
+
+Measured on 48 of the maintainer's real transcripts — 5,451 assistant blocks, 746 completed turns:
+
+| | |
+|---|---|
+| turns the hook would block | ~35 |
+| of those, **false positives** | **~22 (≈60%)** |
+| genuine inline decisions **missed** | ≥9, **8 of them Indonesian** |
+| fixtures that could see any of this | **none** |
+
+The last row is the finding. Both blocking fixtures were keyed to patterns that fire **0 and 2
+times** in the whole corpus; the three patterns that actually fire had no fixture at all, and
+deleting all three left the suite at **7 pass, 0 fail**. Seven hand-written fixtures in the
+author's own phrasing, all agreeing with a detector written in the same sitting — L-186 and L-166
+together, and the exact shape T2's review had just found in the sibling task.
+
+**The bilingual miss is the one that settles it.** The maintainer writes mixed ID/EN. `Mau saya
+commit tiga file ini dulu …?` is literally "Want me to …?" — the single reliable pattern, in
+Indonesian, structurally invisible. The hook would have been noisiest exactly where it was least
+useful, and it cannot be disabled per-hook by anyone it annoys.
+
+Three further defects, each verified by the author rather than taken on report:
+- `ADR-002` contains **no hook clause** (`grep -ci hook` → 0), so ADR-044's "only its hook clause
+  is lifted" and its `supersedes_in_part: [ADR-002]` were **factually false**.
+- `ADR-011` rejected a plugin hook because **hooks auto-activate with no per-hook disable ⇒
+  mandatory for every consumer**. ADR-044 reframed that as a concern "about gates" and shipped the
+  rejected option. Now superseded-in-part on the record.
+- The 3-line anchor is conditional on newlines: the suite's own must-NOT-catch fixture, **reflowed
+  to one paragraph with identical words, is BLOCKED**.
+
+**Disposition, per the owner:** revert the hook, keep the stance. ADR-044 amended in place (not yet
+shipped, so correcting beats publishing a wrong record), with a new standing constraint — *a hook
+must be worth being **mandatory**, because a consumer cannot switch one off selectively.* Re-filed
+as `TASK-366` carrying the corpus-derived spec, `state: needs-info` because the pattern set must be
+derived before it can be specified.
+
+**What this cost and what it bought.** One day's build reverted. In exchange: the "no scaffold"
+lie found and killed, ADR-044's two mis-citations caught before publication, a new bar for hooks
+that did not exist this morning, and a second independent confirmation that *nothing the author can
+run finds these* — the prediction was written down in advance and still needed an outside pass to
+act on (L-165 ×3).
