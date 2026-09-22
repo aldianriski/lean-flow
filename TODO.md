@@ -16,17 +16,6 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-105 — Enforce What Is Already Written** → [docs/sprint/SPRINT-105-enforce-what-is-written.md](docs/sprint/SPRINT-105-enforce-what-is-written.md)
->
-> Opened 2026-09-21, **retroactively and stated as such**. Two tasks targeting rules that were
-> already written, already correct, and losing to a checked number beside them — `EPIC-017`'s
-> diagnosis applied where the work-item store was not a prerequisite. **T2 shipped**: the
-> prose-density ratchet, now covering 84 files after its outside review found it examined 16 of 78
-> capped ones. **T1's hook was WITHDRAWN at review** — measured on 48 real transcripts it blocked
-> ≈60% false and missed ≥9 genuine cases, 8 of them Indonesian; re-filed as `TASK-366`. What
-> survives is **ADR-044**: hooks and agents are *admissible*, `ADR-011` superseded in part (a hook
-> is mandatory for every consumer — no per-hook disable), and a `"no scaffold"` claim deleted that
-> had been **false** for as long as `/lean-doc-generator init` has shipped. **v1.66.0**, unpushed.
 > **SPRINT-104 — The Gate's Own Blind Spots** → [docs/sprint/SPRINT-104-the-gates-own-blind-spots.md](docs/sprint/SPRINT-104-the-gates-own-blind-spots.md)
 >
 > Promoted 2026-09-21. Four tasks, none `[size: L]` (size-checked at pull, before rendering).
@@ -40,7 +29,13 @@ status: current
 > three changed, disposes of SPRINT-103's deferred **A3**, and rules ADR-039's `layers-observed`
 > opt-in (189.3 s) against that number rather than against an estimate.
 >
-> Predecessor: **SPRINT-103 — Port the Measured Hotspots** closed 2026-09-21 at **23 of 34 DoD `[x]`
+> Predecessor: **SPRINT-105 — Enforce What Is Already Written** closed 2026-09-22 at **24 of 24 DoD**.
+> Of three artifacts built, one was **withdrawn at review** (the `ask-dont-tell` hook, ≈60% false
+> positives on 48 real transcripts — `TASK-366`) and one was **reverted as a regression** (the
+> night-run budget raise — `TASK-367`). What shipped: the prose-density ratchet, `ADR-044`, and
+> `v1.66.0`/`v1.66.1`. Three outside reviews, three sets of real defects, none found by the author
+> recalling a rule — `L-209` · `L-210` · `L-211`. See `CHANGELOG.md` and the archived pair.
+>
 > + 11 `[~]` n/a**, `ca1d570`. It measured before ruling and four of five targets were ruled
 > unportable with the mechanism recorded — D2's accepted branch. T1's cost was inside the engine, not
 > in spawns, and was removed on the caller side anyway (**341.0 → 149.8 s** median, non-overlapping
@@ -53,9 +48,9 @@ status: current
 [`CHANGELOG.md`](CHANGELOG.md) and the sprint archive. Pruned at the SPRINT-097, SPRINT-100 and
 SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 100 rows** (98 open · 2 resolved · 8 `severity: high` open) — re-derived
+- **Debt ledger: 101 rows** (99 open · 2 resolved · 8 `severity: high` open) — re-derived
   2026-09-22 after TD-175 was filed, by row header, cross-checked by distinct id (both 100)
-  and by partition (98 + 2 = 100). The partition only reconciled once the `status:`/`severity:`
+  and by partition (99 + 2 = 101). The partition only reconciled once the `status:`/`severity:`
   match was made **markup-tolerant** (`\*{0,2}`) — a lowercase-only pattern returned 94 + 1 = 95
   against 99 rows, which is L-108 firing on the very census that documents it. Eight rows resolved at or before SPRINT-100 were **deleted** at that
   promote under §11's 3-sprint clock; **ids stay monotonic — a deleted row never frees its id.**

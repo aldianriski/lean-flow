@@ -295,6 +295,21 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-176** severity: low | status: open | created: Sprint-105
+  - Summary: **`docs/sprint/INDEX.md` skips 46 sprints.** Its newest entry before SPRINT-105 is
+    **SPRINT-058** (2026-08-10); SPRINT-059…SPRINT-104 are archived under `docs/sprint/archive/`
+    and were never indexed. STANDARD §11 makes the one-line index part of close.
+  - **How it stayed invisible:** nothing reads the index to act, so no run reddens on its absence,
+    and a reader who opens it sees a plausible list — it is complete-looking, just old. This is
+    `L-210`'s shape in a generated-ish artifact: the missing rows produce no diff anywhere.
+  - **Why `low`:** the sprints themselves are archived, committed, and reachable by filename; what
+    is lost is the newest-first digest, not the record.
+  - **Mitigation (hypothesis).** Backfill is mechanical — every archived Plan carries `sprint:`,
+    `slug:`, `status:` and `close_commit:` in frontmatter, so the 46 rows can be derived rather
+    than hand-written. Better: have `close` append the row, or generate the index the way
+    `docs/knowledge-index.md` is generated, so it cannot fall behind again.
+  - **Re-file fresh if** the gap grows after a close that was supposed to append.
+
 - **TD-175** severity: medium | status: resolved → 7f9a138 (cause re-attributed, fixed same day) | created: Sprint-105
   - Summary as filed: **a truncating gate prints two `QA-CHECK:` verdict lines and `night-run.sh`
     takes `tail -n1`**, so the launcher could read another run's verdict as its pre-flight. Filed

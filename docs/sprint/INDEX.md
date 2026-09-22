@@ -9,6 +9,13 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-105 — Enforce What Is Already Written — closed 2026-09-22 · 24 of 24 DoD (PATCH v1.66.1) — hook withdrawn at review, night-run raise reverted as a regression; ADR-044 · L-209/210/211
+
+<!-- GAP, stated rather than silently backfilled: SPRINT-059..104 are archived under `archive/` but
+     were never indexed here; the last entry before SPRINT-105 is SPRINT-058 (2026-08-10). Filed as
+     TD-176. Backfilling 46 rows from the archive is mechanical but is not this sprint's subject,
+     and an index that silently skips 46 sprints is exactly the kind of absence L-210 says review
+     cannot falsify -- so it is written down here, where a reader of the index will hit it. -->
 - SPRINT-058 — Measure Before Moving — closed 2026-08-10 · debb320 (MINOR v1.32.0)
 - SPRINT-057 — Prove the Guards — closed 2026-08-10 · 75c2f66 (MINOR v1.31.0)
 - SPRINT-056 — Silent Passes — closed 2026-08-09 · 07637d6 (MINOR v1.30.0)
