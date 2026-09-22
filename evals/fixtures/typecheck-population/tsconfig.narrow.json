@@ -1,0 +1,14 @@
+{
+  "//": "MUST-FAIL fixture (TD-012: retained, not deleted with the prototype). This is the root",
+  "//2": "tsconfig.json EXACTLY as it stood before SPRINT-104 T1 -- apps/packages/test only. It is",
+  "//3": "the artifact TD-169 was filed against: a config over which `tsc --noEmit` exits 0 and the",
+  "//4": "gate prints `clean (0 errors)` while holding none of scripts/ or evals/. The population",
+  "//5": "assertion in ../../typecheck-population.test.ts MUST fail against this config. Without it,",
+  "//6": "a passing assertion proves only that the check runs, never that it discriminates (L-142).",
+  "extends": "../../../tsconfig.base.json",
+  "include": [
+    "../../../apps/**/*.ts",
+    "../../../packages/**/*.ts",
+    "../../../test/**/*.ts"
+  ]
+}

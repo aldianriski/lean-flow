@@ -140,3 +140,41 @@ say measure nothing under paging — a total taken there measures swap. Nine DoD
 Note for whoever resumes: T4's subject got sharper during T1. The gate measured **547s against the
 520s `QA_BUDGET_SECONDS` default** on this host — 27s of margin, ~5%, without truncating. That is a
 live figure for T4's Round and a reason not to let the parked task drift.
+
+### 2026-09-22 | progress | T1 DoD 5 — retained population fixture, discrimination proven
+
+`evals/typecheck-population.test.ts` + `evals/fixtures/typecheck-population/tsconfig.narrow.json`.
+
+**What it guards, and why it is not the typecheck leg again.** The leg asserts a property of the
+*verdict* (`tsc` reported no errors) and was hardened twice so a missing checker could not read as a
+pass (ADR-037 · TD-101). Neither is a property of the *set the verdict ranges over*. This fixture
+asserts the set: named members from both trees are in the program, both arms separately, with the
+original three trees as a control. L-186's axis — the cases vary the **selection rule** (the tsconfig
+handed to tsc), never the verdict.
+
+**Cheap by construction.** `--listFilesOnly` enumerates the program without typechecking it (~1s vs
+~6s). The whole file runs in **2.0s**, which is what made the discrimination proof affordable to
+actually run rather than argue about.
+
+**Placement is a cost ruling, not an accident.** It runs in the `bun test` phase, deliberately NOT in
+qa-check.sh leg 12: the gate measured 547s against a 520s budget on this host, and an always-on
+harness shelling to tsc twice would spend that margin. Recorded in the file's own header so the next
+maintainer sees the ruling, not just the placement (L-151).
+
+**Wiring derived, not assumed (L-020).** A bare `bun test -t "gate typecheck population"` — no path
+argument — ran the 7 cases across 48 discovered files, so `package.json`'s `test` script
+(`gate && bun test`) reaches it end-to-end. The `evals/run-*` registration guard at qa-check.sh:1333
+globs `run-*.sh|ts` and `selftest-*.sh` only, so a `*.test.ts` neither needs registration nor trips it.
+
+**Discrimination proof (L-142), run rather than asserted.** Seed: root `tsconfig.json` reverted to its
+pre-fix include. The seed is **byte-identical to the real pre-fix artifact** — `45082de0…` →
+`5ad9f2b8…`, and `5ad9f2b8` is the exact blob T1's own commit replaced (visible as `index 5ad9f2b..45082de`
+in that diff). That is stronger than a synthetic one-line break and is L-166's bar: the guard is
+pointed at the artifact the debt row cites, not merely at a shape. Note the line-count rule is
+deliberately not applied here — "within one line of pristine" exists to stop a demolition standing in
+for a discrimination, and a verbatim historical config is the opposite of a demolition.
+
+Result under the seed: **3 fail, 4 pass**. The three reddened are exactly the three LIVE population
+assertions; the four green are the sibling controls — the original-three-trees control and all three
+must-FAIL cases, which read the fixture config and are correctly unaffected. Restored to `45082de0…`,
+byte-identical to HEAD under the stated convention.
