@@ -178,3 +178,51 @@ Result under the seed: **3 fail, 4 pass**. The three reddened are exactly the th
 assertions; the four green are the sibling controls — the original-three-trees control and all three
 must-FAIL cases, which read the fixture config and are correctly unaffected. Restored to `45082de0…`,
 byte-identical to HEAD under the stated convention.
+
+### 2026-09-22 | surprise | the gate's TEST population is blind the same way its TYPECHECK population was
+
+Found by running `bun test` — which no gate leg does — while chasing an unexplained failure.
+
+**Finding 1: lean-flow's own gate-discovery guard has reported that this repository bypasses its
+declared gate, continuously, since SPRINT-097 T4.** `test/gate-discovery/discovery-order.test.ts`'s
+case *"the rung-1 command still runs the gate `.gate-command` declares"* asserts `bypassed === false`
+and gets `true`. Deterministic, reproduced standalone in 7.7ms.
+
+Cause, traced rather than guessed. `invokes()` splits the discovered command on `&& || ; |` and
+requires a segment to EQUAL the declared command or start with it plus a space:
+- before `3404422` (SPRINT-097 T4): `sh scripts/qa-check.sh && bun test` → segment 1 is exactly the
+  declared command → PASS
+- after: `bun scripts/qa-verdict.ts sh scripts/qa-check.sh && bun test` → the gate became an
+  ARGUMENT to the verdict wrapper, so no segment equals or starts with it → `invokes()` false →
+  `bypassed: true` → FAIL
+
+T4's change was correct on its own terms (it made a verdict-less run fail loudly, TD-143). It simply
+re-shaped the very string another guard pattern-matches, and nothing connected the two. This is
+L-166 exactly — a guard keyed to a shape the system no longer emits — and L-020's shipping-≠-wiring
+at the seam between two sprints. It fails RED, not green, so it is not silent; it is merely unread,
+because the only phase that runs it is one no sprint invokes.
+
+Not fixed here: out of T1's scope and out of this sprint's § Scope (D6 — same checks, same coverage).
+Recorded for the close Retro as a `TD-NNN` candidate. Id deliberately NOT assigned now: the maximum
+must be derived at filing with `.claude/worktrees/` excluded (L-143 · L-170).
+
+**Finding 2, and it corrects this task's own DoD 5 claim.** `qa-check.sh` reaches a `.test.ts` file
+only through an explicit wrapper harness registered in `eval_harnesses_always` — there are nine such
+wrappers, each a thin `bun test <one file>`. The registration guard at qa-check.sh:1333 globs
+`evals/run-*.sh|ts` and `selftest-*.sh` only, so a bare `*.test.ts` is neither required to register
+nor reported when it does not.
+
+`evals/typecheck-population.test.ts` has no wrapper. It therefore runs in `bun test` and **not** in
+`sh scripts/qa-check.sh`, which is what `promote` and `close` run (`QA_FULL=1`). The wiring claim in
+the DoD-5 entry above was derived against `bun test` discovery and is true of that path only; it does
+not establish that the guard fires where this repo actually verifies. A retained guard nothing runs
+is L-105's absent guard wearing the shape of a present one, so the earlier entry overstated it.
+
+The cost reasoning in that entry was also wrong in magnitude: the whole file runs in **2.0s**, which
+is 0.4% of the 520s budget, not a threat to it. The placement argument it recorded does not survive
+its own measurement.
+
+Wiring it requires adding a wrapper and registering it in `scripts/qa-check.sh` — which would make
+T1's DoD 7 (`the qa-check.sh edit goes through D2's diff-then-apply`) applicable again, reversing the
+`[~] n/a` ruling taken earlier today. That is an owner call, not a silent correction, and is where
+T1 stands.
