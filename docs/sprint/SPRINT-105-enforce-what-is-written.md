@@ -105,7 +105,7 @@ the budget guard refuses an unusable budget instead of passing it through.
 - [x] Set integrity — *38/14/52 against `11bbd8b~3`, diff empty, no drops, duplicates or cross-set moves; independently confirmed*
 - [x] **Tier G bar**: `qa_budget_check` refuses a non-numeric budget — *5 retained cases (14–18) incl. a must-NOT-catch control; seeded break removing the validation reddens exactly 14–17 reproducing the original `OK 1790033736 abc`, while 18 stays green. Restored under one convention (`git hash-object` vs `git rev-parse HEAD:<path>`)*
 - [x] Outside reviewer dispatched worktree-isolated (ADR-029 ii) — *11 findings; the night-run raise **reverted as a regression**, four false claims corrected, F4 fixed, F7 filed as `TD-175`, follow-up as `TASK-367`*
-- [ ] CHANGELOG entry for the consumer-facing surface (L-015)
+- [x] CHANGELOG entry for the consumer-facing surface (L-015) — *`v1.66.1`, with the reverted regression recorded under its own § Reverted before release heading rather than omitted*
 
 **Two claims in this task's first version were false, and both are corrected above rather than
 quietly dropped.** *(a)* It said the gate "spent 162.2s on `run-conformance-engine-fixtures.sh` and
@@ -123,9 +123,9 @@ self-terminated at 520s and refused cleanly at ~560s. A real fix needs the **cal
 detachment: `TASK-367`.
 ## Owner actions
 
-- [ ] Review and approve the `ADR-044` stance reversal — it changes what the plugin is allowed to
+- [x] Owner approved the `ADR-044` stance reversal — *ruled in-session 2026-09-21 ("ship it in the plugin, remove no hooks no agentic, this not align anymore because we already mature process"), and the two factual corrections approved 2026-09-22 ("amend in place — it is not shipped yet"). The roster it permits is unchanged: no hook shipped*
       ship, and was ruled by the owner in-session on 2026-09-21 but not yet reviewed as written.
-- [ ] Decide whether the `1.66.0` release is pushed, or held until T1/T2's outside reviews land.
+- [x] Release decision taken — *owner ruled "push it" 2026-09-21; `v1.66.0` pushed at `11bbd8b`, `v1.66.1` at `307d665`. The T1 review landed AFTER the push and its verdict was acted on by revert, not by holding the release*
 
 ## Decisions → ADR
 
@@ -144,6 +144,50 @@ detachment: `TASK-367`.
 
 ## Files changed
 
+
+## Retro
+
+**Shipped** → `CHANGELOG.md`: `v1.66.0` (ADR-044, the `"no X"` banner retired, the prose-density
+ratchet) and `v1.66.1` (`qa_budget_check` refuses an unusable budget; harnesses ordered
+cheapest-first; the night-run raise reverted and recorded under its own heading).
+
+**Tech debt** → `TD-173` (two synthetic id blocks, only one documented) · `TD-174` (three
+`OVER-CAP (soft)` rows print every run and nothing acts; one 23× its cap) · `TD-175` **high** (a
+truncating gate prints two `QA-CHECK:` lines and `night-run.sh` takes `tail -n1` — proven
+pre-existing, survived only because trailing text broke the anchored pattern).
+
+**Follow-ups** → `TASK-366` (rebuild `ask-dont-tell` from the real corpus, bilingual, `needs-info`
+because the pattern set must be derived before it can be specified) · `TASK-367` (the caller
+declares detachment; also raise `QA_CEILING_SECONDS`, which is what ADR-042 actually licensed).
+
+**Learnings** → `L-209` (an ADR's Decision section gets read and everything qualifying it does
+not) · `L-210` (a negative claim has no diff that ever makes it look wrong).
+
+**Retrieval check — yes, four times, and that is the sprint's headline.** Every ADR cited to
+justify a change was mis-read in a *different* qualifying part: ADR-002's non-existent hook clause,
+ADR-011's actual rejection reason, ADR-042's alternatives table, ADR-042's antecedent. Three were
+found by outside review. Separately, `SPRINT-101`'s log already recorded the owner ruling T3's
+correct fix by hand — the answer existed, in this repo, and no procedure read it (`L-020` ×
+`L-151`). The retrieval-miss signal is not "we could not find it"; it is **"we found it and read
+the part that agreed with us."**
+
+**What the reviews cost and bought.** Three worktree-isolated reviews, one per task. T1's returned
+NOT SAFE TO SHIP and a built artifact was withdrawn. T2's returned "detection sound, member set
+wrong" — 8 findings, population 16 → 84 files. T3's found a **live regression in pushed code**
+plus four false claims. Zero defects were found by the author recalling a rule, **including the one
+the author had predicted in writing beforehand** (`L-165` ×3, the strongest evidence for it yet).
+
+**Cost** — inline (no dispatch fan-out) plus **4 dispatched agents**: 1 research, 3 reviews
+(≈266k, ≈158k, ≈115k subagent tokens). Delivered: 2 releases, 1 ADR, 1 gate leg with 10 fixtures,
+1 guard fix with 5 fixtures, 3 debt rows, 2 follow-ups, 2 learnings. **One task's artifact was
+withdrawn entirely** — counted as delivered work, because the withdrawal *is* the deliverable: it
+bought a new standing bar (a hook must be worth being mandatory) that did not exist before.
+
+**The uncomfortable summary.** Of the three artifacts this sprint built, one was withdrawn at
+review and one was reverted as a regression after being pushed. The one that survived intact —
+the density ratchet — is also the one whose review found the most defects. A sprint whose theme
+was *"enforce what is already written"* spent most of its evidence demonstrating that the author
+does not read what is already written, and that only an independent pass does.
 See `git diff --name-only` for the sprint range. **`scripts/qa-check.sh` is the overlap** and all
 three tasks touch it: T2 added leg 2b-ter and registered both harnesses, T1's revise unregistered
 the withdrawn one, T3 reordered the always-on list and rewrote the truncation message. Serialised,
