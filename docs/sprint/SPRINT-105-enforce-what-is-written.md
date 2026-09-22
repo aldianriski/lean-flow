@@ -90,6 +90,7 @@ at or below its baseline does not.
 Layers: `scripts/qa-check.sh` · `scripts/night-run.sh` · `scripts/lib/qa-budget-check.sh` ·
         `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` ·
         `.kimi-plugin/plugin.json` · `README.md` · `CHANGELOG.md` · `TECH-DEBT.md` · `TODO.md` ·
+        `docs/LEARNINGS.md` ·
         `evals/run-qa-budget-fixtures.sh`
 Depends-on: none
 Cites: ADR-042 · L-020 · L-151 · L-058 · L-130 · TD-084 · `run-conformance-engine-fixtures.sh` · `run-s4-ts-evaluators.sh`
