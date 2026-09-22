@@ -1,0 +1,110 @@
+---
+sprint: 104
+slug: the-gates-own-blind-spots
+owner: Maintainer
+last_updated: 2026-09-22
+status: active
+update_trigger: an Execution Log entry is appended
+---
+
+# SPRINT-104 — Execution Log
+
+> Append-only companion to [`../SPRINT-104-the-gates-own-blind-spots.md`](../SPRINT-104-the-gates-own-blind-spots.md).
+> Uncapped by design: this file grows with the work done, which is exactly why it is not inside the
+> Plan's 400-line budget (STANDARD §9 · ADR-014). **Never edit a past entry** — correct it with a new one.
+>
+> The Plan is frozen at promote. A mid-sprint pivot that shifts scope is logged here as a
+> `scope-change` entry — what broke · impact · re-confirm G2 — **before** § Plan is edited.
+
+### 2026-09-22 | progress | T1 — preflight, G1/G2 signed, blast radius re-derived at 2 (A1 holds)
+
+Run opened as attended `sprint-bulk`. Owner ruled the wave **T1 → T2 → T3 sequential, T4 parked**,
+against a host at 0.41 GB available / 35.3 of 38.8 GB commit charge — roughly 7x below A3's ~3 GB
+target, so T4's measurement would have measured swap (SPRINT-103's own pre-locked ruling, not a new one).
+
+Pre-dispatch preflight: cycle clean · ownership per D2 · base-ref clean. One preflight scare cleared
+by derivation rather than assumption: SPRINT-104's `plan_commit..HEAD` holds **21 commits, 18 of them
+SPRINT-105's**, because 105 was promoted and closed on top of an already-promoted 104. `commit_sprint()`
+scopes them out by subject ownership and leg 15 prints
+`PASS ... layers observed ... base 5216c69`. No action needed — recorded so the next reader does not
+re-discover it.
+
+**A1 confirmed, no `scope-change`.** Probe config over `scripts/**` + `evals/**` re-derived the blast
+radius as **2 errors, both `TS18047` in `scripts/qa-verdict.ts` (147,5 · 151,5)** — identical to the
+figure frozen at promote. Cross-checked by two selection rules that must agree: tsc's own program
+enumeration (`--listFiles`) and a filesystem walk (`find`), **26 == 26, identical sets**. The first
+attempt returned 28 and was wrong: `--listFiles` prints diagnostics to stdout too, and a path-grep
+counted the two error lines as files (L-108, caught by the disagreeing second number).
+
+consequence · T1 · behaviour:material · governance:high
+
+### 2026-09-22 | progress | T1 — TD-169 closed: the typecheck leg's program now holds both trees
+
+Root `tsconfig.json` `include` extended with `scripts/**/*.ts` + `evals/**/*.ts`. **No `qa-check.sh`
+edit was required** — the leg runs a bare `tsc --noEmit` against the root config, so extending the
+config moved the population without touching the leg (see the open DoD-7 question below).
+
+The two `TS18047` sites fixed with optional chaining. Checked rather than assumed that this is not
+fail-open: `judgeOutput("")` returns `ok: false` ("a verdict-less run is reported as a failure, never
+inferred as 0 fail" — TD-143), so an absent stream cannot become a green gate. Reasoning recorded at
+the code, not only here.
+
+Evidence (DoD 2): the leg's own program contains `scripts/lib/check-layers-observed.ts` = 1 and
+`evals/qa-verdict.test.ts` = 1; 26 files from the two new trees alongside 106 from `apps`/`packages`/`test`.
+Evidence (DoD 3): the leg's **own printed line** — `PASS  typecheck: tsc --noEmit clean (0 errors)`.
+That line was printed before this change too; what makes it *true* now is DoD 2's population proof,
+which is the entire point of TD-169.
+
+### 2026-09-22 | progress | T1 — Tier G seeded-break proof, `scripts/lib` arm PASSED
+
+Hash convention for this sprint, stated once and used throughout (L-169): **`git hash-object <path>`
+compared against `git rev-parse HEAD:<path>`** — both LF-normalized blob ids, reproducible on a CRLF
+checkout. Verified to match on all four seed/control files before being relied on. A raw `sha256sum`
+of the working file does **not** match the blob here; that is the trap, and it is why the method is
+stated rather than assumed.
+
+Seed A — `scripts/lib/check-prose-density.ts`, control `scripts/lib/check-authority.ts`:
+- landed: `f6e0bbc5…` → `2a63c699…`
+- targeted: +1 line, non-empty, a genuine `TS2322` **type** error (not a syntax demolition)
+- leg reddened, its own printed line naming the seeded file:
+  `FAIL  typecheck: tsc --noEmit exited 1 with 1 error(s) -- first: scripts/lib/check-prose-density.ts(262,7): error TS2322`
+- sibling control named **0** times — stayed green
+- restored to `f6e0bbc5…`, byte-identical to HEAD under the stated convention
+
+### 2026-09-22 | surprise | the gate is not deterministic on this host, and its budget margin is ~5%
+
+Two observations from the seed-A run, neither caused by the seed, both outliving T1:
+
+**(a) A fixture failed with an empty capture.** `run-qa-budget-fixtures.sh` fixture
+`over-ceiling-run-prints-info-and-fail-stays-0` reported `FAIL ... got:` with an **empty** got-value
+during the gate run, then **passed standalone** on the restored tree (`RESULT pass=0 fail=0`). Not
+attributable to the seed. An empty capture on a host at 0.41 GB free points at resource pressure, but
+that is a hypothesis and was not verified. It matters beyond this task: this is L-142's "red for the
+wrong reason", and the same empty capture landing on a **must-FAIL** fixture would be green for the
+wrong reason — silent by construction, which is the Tier G failure mode.
+
+**(b) The budget has ~5% headroom.** The seed-A run took **547s against the 520s `QA_BUDGET_SECONDS`
+default** and did not truncate — 27s of margin, on a gate SPRINT-093 sized at ~469s. T4 owns
+re-deriving this figure and T4 is parked, so absent a ruling the sprint closes with the gate sitting
+just under its truncation threshold and nobody having re-measured it.
+
+### 2026-09-22 | blocker | T1 — Tier G `evals` arm incomplete: gate run killed for low memory
+
+Seed B — `evals/qa-verdict.test.ts`, control `evals/authority.test.ts` — landed and verified targeted
+(`0b89e9df…` → `b89adbf3…`, +1 line, `TS2322` at 257,7, control named 0 times). The confirming gate
+run was **killed by the harness for critical low memory** before the typecheck leg printed its line.
+
+**The seed was restored immediately** — `evals/qa-verdict.test.ts` back to `0b89e9df…`, byte-identical
+to HEAD under the stated convention, and `grep -rn "__seed_type_error"` over `scripts evals apps
+packages test` returns nothing. This is L-137's exact recorded failure (a timeout leaving a seeded
+break in a shipped file) and it did not happen here only because restoration was treated as the first
+action on the kill, not a later cleanup step.
+
+**T1 halts here, at DoD 4, un-ticked.** The `scripts/lib` arm is proven; the `evals` arm is not. What
+remains unproven is specifically the *population* half (L-186): that the leg reddens for the second
+tree, not merely the first. DoD 2 shows an `evals/*.ts` file is in the program and the standalone
+`tsc` invocation the leg runs reports the seeded error — but the leg's own printed FAIL line for the
+`evals` arm has not been observed, and inferring it from the `scripts/lib` arm is the substitution
+this sprint exists to stop.
+
+Not restarted: the harness advises memory may still be short, and re-running is the owner's call.

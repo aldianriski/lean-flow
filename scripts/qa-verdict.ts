@@ -144,11 +144,14 @@ export function runAndJudge(cmd: string, args: readonly string[]): Promise<RunOu
         reason: `qa-verdict: failed to start '${cmd}' -- ${e.message}`,
       });
     });
-    child.stdout.on("data", (d: Buffer) => {
+    // Optional-chained because Node types these as nullable (stdio may be redirected). If a stream
+    // were ever absent, `out` stays empty and judgeOutput() reports "no QA-CHECK line found" --
+    // ok: false. Fail-CLOSED, so `?.` here cannot turn a missing stream into a green gate (TD-143).
+    child.stdout?.on("data", (d: Buffer) => {
       out += d.toString();
       process.stdout.write(d);
     });
-    child.stderr.on("data", (d: Buffer) => {
+    child.stderr?.on("data", (d: Buffer) => {
       process.stderr.write(d); // forwarded live for visibility only -- never judged (see above)
     });
     child.on("close", (exitCode, signal) => {
