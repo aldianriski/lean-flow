@@ -53,9 +53,9 @@ status: current
 [`CHANGELOG.md`](CHANGELOG.md) and the sprint archive. Pruned at the SPRINT-097, SPRINT-100 and
 SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 100 rows** (99 open · 1 resolved · 9 `severity: high` open) — re-derived
+- **Debt ledger: 100 rows** (98 open · 2 resolved · 8 `severity: high` open) — re-derived
   2026-09-22 after TD-175 was filed, by row header, cross-checked by distinct id (both 100)
-  and by partition (99 + 1 = 100). The partition only reconciled once the `status:`/`severity:`
+  and by partition (98 + 2 = 100). The partition only reconciled once the `status:`/`severity:`
   match was made **markup-tolerant** (`\*{0,2}`) — a lowercase-only pattern returned 94 + 1 = 95
   against 99 rows, which is L-108 firing on the very census that documents it. Eight rows resolved at or before SPRINT-100 were **deleted** at that
   promote under §11's 3-sprint clock; **ids stay monotonic — a deleted row never frees its id.**

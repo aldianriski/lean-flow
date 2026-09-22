@@ -88,6 +88,8 @@ at or below its baseline does not.
 
 ### T3 — Make the gate's truncation cost the fewest guards `[size: S · risk: med · class: execution · tier: G · HITL · J1]`
 Layers: `scripts/qa-check.sh` · `scripts/night-run.sh` · `scripts/lib/qa-budget-check.sh` ·
+        `.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json` · `.codex-plugin/plugin.json` ·
+        `.kimi-plugin/plugin.json` · `README.md` · `CHANGELOG.md` · `TECH-DEBT.md` · `TODO.md` ·
         `evals/run-qa-budget-fixtures.sh`
 Depends-on: none
 Cites: ADR-042 · L-020 · L-151 · L-058 · L-130 · TD-084 · `run-conformance-engine-fixtures.sh` · `run-s4-ts-evaluators.sh`
@@ -161,7 +163,8 @@ because the pattern set must be derived before it can be specified) · `TASK-367
 declares detachment; also raise `QA_CEILING_SECONDS`, which is what ADR-042 actually licensed).
 
 **Learnings** → `L-209` (an ADR's Decision section gets read and everything qualifying it does
-not) · `L-210` (a negative claim has no diff that ever makes it look wrong).
+not) · `L-210` (a negative claim has no diff that ever makes it look wrong) · `L-211` (a message
+string in a shell script is code, and `sh -n` will not say so).
 
 **Retrieval check — yes, four times, and that is the sprint's headline.** Every ADR cited to
 justify a change was mis-read in a *different* qualifying part: ADR-002's non-existent hook clause,

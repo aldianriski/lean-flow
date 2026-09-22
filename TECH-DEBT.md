@@ -295,30 +295,28 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
-- **TD-175** severity: high | status: open | created: Sprint-105
-  - Summary: **A truncating gate prints TWO `QA-CHECK:` verdict lines, and `night-run.sh` reads the
-    last one with `tail -n1`.** Reproduced by an outside reviewer at `QA_BUDGET_SECONDS=200`: the
-    run trips correctly at 208s, then **keeps going to 697s**, and the output contains two complete
-    gate reports — two leg-1 headers, ~67 harness rows, and a complete nested
-    `QA-CHECK: 263 pass, 3 fail` printed **ahead of** the outer run's real
-    `QA-CHECK: 253 pass, 4 fail`.
-  - **PRE-EXISTING, and that was proven rather than assumed.** Reverting SPRINT-105 T3's budget
-    raise reproduced it identically (675s, 645 lines, 2 verdict lines), so it is not introduced by
-    that change. Which harness spawns the nested run is **not yet isolated** —
-    `run-run-mode-fixtures.sh` was the first suspect and is ruled out at 4s.
-  - **Why `high`.** `scripts/night-run.sh:597` selects the pre-flight verdict with
-    `grep -E '^QA-CHECK: ...' | tail -n1`. Two verdict lines in one stream means the launcher can
-    read **another run's verdict** as its own pre-flight result, then decide whether to fire an
-    unattended run on it. In both observed runs the interleaving happened to append trailing text
-    to the nested line so the anchored pattern rejected it — **by luck, not by design**. This is
-    the exact L-045/L-120 self-report trap the surrounding 40 lines of comment exist to close,
-    arriving through a door nobody checked.
-  - **Reachable precisely when the pre-flight truncates**, which is the slow-host case.
-  - **Mitigation (hypothesis, re-derive before building a DoD on it — L-091).** Either find and
-    stop the nested spawn, or make the launcher refuse when it sees more than one verdict line
-    rather than silently taking the last. The second is cheap and closes the trap even if the
-    nested run is legitimate.
-  - **Re-file fresh if** a second nested-verdict source appears.
+- **TD-175** severity: medium | status: resolved → 7f9a138 (cause re-attributed, fixed same day) | created: Sprint-105
+  - Summary as filed: **a truncating gate prints two `QA-CHECK:` verdict lines and `night-run.sh`
+    takes `tail -n1`**, so the launcher could read another run's verdict as its pre-flight. Filed
+    `high`, on an outside review's evidence of "two complete gate reports — two leg-1 headers, ~67
+    harness rows, a complete nested `QA-CHECK: 263 pass, 3 fail` ahead of the outer one".
+  - **THE CAUSE WAS MIS-ATTRIBUTED, and the correction matters more than the row.** It was filed as
+    PRE-EXISTING on a control that reverted SPRINT-105 T3's budget *raise* and reproduced the
+    doubling. That control was incomplete: the defect was in the truncation *message*, which was
+    present in **both** arms. The reviewer said plainly they had not isolated which harness spawned
+    the nested run — it was not a harness. Commit `307d665` had written a command in **backticks**
+    inside a double-quoted `bad "..."` string, and backticks inside double quotes are command
+    substitution, so **the gate recursively invoked itself** whenever it built that finding.
+  - **Measured before and after.** Broken: `QA_BUDGET_SECONDS=1 sh scripts/qa-check.sh` ran past
+    **90s** without reaching a checkpoint. Same scenario at `bdb2300` (before the message change):
+    **4s**, checkpoint fires. After `7f9a138`: **3s**, one leg-1 header, zero harness rows.
+  - **What survives, narrower and still true:** a truncated run legitimately prints **two**
+    `QA-CHECK:` lines — the `TRUNCATED` outcome plus the verdict — and `night-run.sh:597` selects
+    with `tail -n1`. It is correct today because the anchored pattern excludes the `TRUNCATED` line
+    **and** the verdict sorts last: two independent accidents rather than one stated rule. Not
+    re-filed as its own row; folded into `TASK-367`, which already rewrites that selection.
+  - **Re-file fresh if** a third `QA-CHECK:`-shaped line is ever added, or the verdict stops
+    sorting last.
 
 - **TD-174** severity: high | status: open | created: Sprint-104
   - Summary: **The soft-cap route reports and nothing acts on it.** `check-doc-caps` prints three
