@@ -108,3 +108,35 @@ tree, not merely the first. DoD 2 shows an `evals/*.ts` file is in the program a
 this sprint exists to stop.
 
 Not restarted: the harness advises memory may still be short, and re-running is the owner's call.
+
+### 2026-09-22 | scope-change | T1 DoD 7 ruled **n/a** — its premise dissolved, the work was not skipped
+
+**What broke.** DoD 7 reads *"Edit to `scripts/qa-check.sh` committed as a reviewable diff before
+being applied (D2 · L-151)"*. It presupposes that putting `scripts/` and `evals/` inside the
+typecheck requires editing the leg. It does not: the leg runs a bare `tsc --noEmit`, which resolves
+the **root** `tsconfig.json`, so extending that file's `include` moved the population with zero
+changes to `qa-check.sh`. The criterion went stale against execution, not against scope — the Plan's
+own § Scope and Acceptance are untouched and fully met.
+
+**Impact.** One DoD is unsatisfiable as literally written. The two ways to make it *look* satisfied
+were both rejected: manufacturing a `qa-check.sh` edit (adds a second config surface to drift, purely
+to dress a criterion) and silently re-reading the words to fit what was built — which is the failure
+L-088 names, and this sprint's § Red flags calls out by name.
+
+**Ruling (owner, 2026-09-22): tick `[~]` n/a with the reason recorded.** D2 itself is untouched and
+still binds — T2 and T3 both genuinely edit `scripts/qa-check.sh` and both go through diff-then-apply
+in merge order.
+
+**Re-confirm G2.** No design change. T1's `Layers:` named `scripts/qa-check.sh` as a prediction;
+implementation did not need it, which is L-100's expected case (a `Layers:` is a live declaration,
+not a frozen prediction to defend) and is why leg 15 still passes on the narrower file set.
+
+### 2026-09-22 | park | T4 parked at wave open — host memory, pre-locked ruling
+
+T4 parks with its unblock condition intact: **host free memory above ~3 GB**. Measured at wave open:
+0.41 GB available, 35.3 of 38.8 GB commit charge. A3's confirm path and SPRINT-103's own ruling both
+say measure nothing under paging — a total taken there measures swap. Nine DoD carry forward.
+
+Note for whoever resumes: T4's subject got sharper during T1. The gate measured **547s against the
+520s `QA_BUDGET_SECONDS` default** on this host — 27s of margin, ~5%, without truncating. That is a
+live figure for T4's Round and a reason not to let the parked task drift.

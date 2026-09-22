@@ -51,13 +51,13 @@ never held the file.
 that surfaces are fixed, and a seeded type error in each tree reddens the leg.
 
 **DoD:**
-- [ ] Blast radius re-derived before any edit — *Verify: a probe config over `scripts/**` + `evals/**` prints its error count and file list; the promote measured **2**, both `TS18047` in `qa-verdict.ts` (147,5 · 151,5), and a different number is a scope-change, not a surprise to absorb (L-130)*
-- [ ] The leg's program contains both trees — *Verify: `tsc --noEmit --listFiles | grep -c` returns ≥ 1 for a named `scripts/lib/*.ts` **and** for a named `evals/*.ts`. An exit code of 0 says nothing about which files were in the program — that is exactly how this was missed (L-136)*
-- [ ] Both surfaced errors fixed, and the leg reports a **true** clean — *Verify: the leg's own printed line, not its exit status (L-120)*
+- [x] Blast radius re-derived before any edit — *Verify: a probe config over `scripts/**` + `evals/**` prints its error count and file list; the promote measured **2**, both `TS18047` in `qa-verdict.ts` (147,5 · 151,5), and a different number is a scope-change, not a surprise to absorb (L-130)*
+- [x] The leg's program contains both trees — *Verify: `tsc --noEmit --listFiles | grep -c` returns ≥ 1 for a named `scripts/lib/*.ts` **and** for a named `evals/*.ts`. An exit code of 0 says nothing about which files were in the program — that is exactly how this was missed (L-136)*
+- [x] Both surfaced errors fixed, and the leg reports a **true** clean — *Verify: the leg's own printed line, not its exit status (L-120)*
 - [ ] **Tier G bar**: seed a type error into one `scripts/lib/*.ts` and one `evals/*.ts`; each reddens the leg, a sibling control file stays green — *Verify: seed confirmed landed (targeted, parses, line count within one of pristine) and restored under ONE stated hash convention (L-137 · L-142 · L-169)*
 - [ ] Fixture **retained**, not deleted with the proof (TD-012)
 - [ ] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
-- [ ] Edit to `scripts/qa-check.sh` committed as a reviewable diff before being applied (D2 · L-151)
+- [~] Edit to `scripts/qa-check.sh` committed as a reviewable diff before being applied (D2 · L-151)
 
 ### T2 — Route bootstrap failures through a shared emitter `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `evals/lib/harness-common.sh` · `scripts/lib/check-*.sh` (the sites T2's own derivation names) · `scripts/lib/conformance-engine.sh` (**consumer-facing, ADR-027 — see D5**) · `scripts/qa-check.sh` (per D2)
