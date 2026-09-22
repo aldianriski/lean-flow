@@ -131,7 +131,7 @@ qb_checkpoint() { # <leg-label>
     OVER*)
       qb_early_tripped=1
       qb_elapsed=$(printf '%s' "$qb_out" | cut -d' ' -f2)
-      bad "qa-check-budget-exceeded-early: ${qb_elapsed}s elapsed exceeds the ${QA_BUDGET_SECONDS}s default-profile budget, reached at checkpoint '$1' -- BEFORE leg 12's eval-harness loop. Every leg from here on, including all eval harnesses, is skipped and reported here rather than run past an external timeout with no verdict line (TD-084, TD-091). To get a COMPLETE verdict, re-run detached with a raised budget: `QA_BUDGET_SECONDS=1200 sh scripts/qa-check.sh` (the 600s ceiling is a FOREGROUND limit -- ADR-042; night-run.sh already raises it for its own pre-flight). QA_FULL=1 additionally adds the opt-in set"
+      bad "qa-check-budget-exceeded-early: ${qb_elapsed}s elapsed exceeds the ${QA_BUDGET_SECONDS}s default-profile budget, reached at checkpoint '$1' -- BEFORE leg 12's eval-harness loop. Every leg from here on, including all eval harnesses, is skipped and reported here rather than run past an external timeout with no verdict line (TD-084, TD-091). To get a COMPLETE verdict, re-run detached with a raised budget: QA_BUDGET_SECONDS=1200 sh scripts/qa-check.sh (the 600s ceiling is a FOREGROUND limit -- ADR-042; night-run.sh already raises it for its own pre-flight). QA_FULL=1 additionally adds the opt-in set"
       # Truncation is reported as its OWN outcome line, naming the actual elapsed seconds and every
       # leg it never reached BY NAME (SPRINT-099 T2, TD-117). Before this, the message named none of
       # them and the verdict below was byte-indistinguishable from an ordinary red gate.
@@ -1269,7 +1269,7 @@ for h in $eval_harnesses; do
       OVER*)
         budget_tripped=1
         qb_elapsed=$(printf '%s' "$qb_out" | cut -d' ' -f2)
-        bad "qa-check-budget-exceeded: ${qb_elapsed}s elapsed exceeds the ${QA_BUDGET_SECONDS}s default-profile budget, reached at eval harness '$h'. Remaining harnesses in this leg are skipped and named below rather than left to run past an external timeout with no verdict line (TD-084). To get a COMPLETE verdict, re-run detached with a raised budget: `QA_BUDGET_SECONDS=1200 sh scripts/qa-check.sh` (the 600s ceiling is a FOREGROUND limit -- ADR-042; night-run.sh already raises it for its own pre-flight). QA_FULL=1 additionally adds the opt-in set"
+        bad "qa-check-budget-exceeded: ${qb_elapsed}s elapsed exceeds the ${QA_BUDGET_SECONDS}s default-profile budget, reached at eval harness '$h'. Remaining harnesses in this leg are skipped and named below rather than left to run past an external timeout with no verdict line (TD-084). To get a COMPLETE verdict, re-run detached with a raised budget: QA_BUDGET_SECONDS=1200 sh scripts/qa-check.sh (the 600s ceiling is a FOREGROUND limit -- ADR-042; night-run.sh already raises it for its own pre-flight). QA_FULL=1 additionally adds the opt-in set"
         # The unrun set is computed HERE, while $eval_harnesses and $h are both in scope, and held
         # for the Summary so it prints beside the verdict where a reader looks -- not buried among
         # the 13 `note` lines that follow it (SPRINT-099 T2). Inclusive of $h: the harness the trip
