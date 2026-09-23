@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-21
+last_updated: 2026-09-23
 update_trigger: Sprint completed, task added, or task status changed
 status: current
 ---
@@ -16,41 +16,23 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-104 — The Gate's Own Blind Spots** → [docs/sprint/SPRINT-104-the-gates-own-blind-spots.md](docs/sprint/SPRINT-104-the-gates-own-blind-spots.md)
+> **No active sprint.** Next: `/lean-doc-generator promote` — or `/triage` first; 18 of the 22
+> Backlog tasks are `ready`.
 >
-> Promoted 2026-09-21. Four tasks, none `[size: L]` (size-checked at pull, before rendering).
-> **T1** puts `scripts/` and `evals/` inside the gate's typecheck — they are outside it today while
-> the leg reports `clean (0 errors)`, which is `TD-169` (`high`) and the reason a `tsc` clean claim
-> made three times in SPRINT-103 was a statement about a program that never held the file. **T2**
-> routes bootstrap failures through a shared emitter so a one-space `FAIL ` line stops hiding from a
-> column-keyed selector (`TD-157`; it once left `sweep_gate` returning `rc=0` on a crashed engine) —
-> `J2`, because the shape of the fix binds every checker and one file is shipped. **T3** gives the
-> gate's own cost comments an expiry. **T4 measures last, on purpose**: it re-derives the total these
-> three changed, disposes of SPRINT-103's deferred **A3**, and rules ADR-039's `layers-observed`
-> opt-in (189.3 s) against that number rather than against an estimate.
->
-> Predecessor: **SPRINT-105 — Enforce What Is Already Written** closed 2026-09-22 at **24 of 24 DoD**.
-> Of three artifacts built, one was **withdrawn at review** (the `ask-dont-tell` hook, ≈60% false
-> positives on 48 real transcripts — `TASK-366`) and one was **reverted as a regression** (the
-> night-run budget raise — `TASK-367`). What shipped: the prose-density ratchet, `ADR-044`, and
-> `v1.66.0`/`v1.66.1`. Three outside reviews, three sets of real defects, none found by the author
-> recalling a rule — `L-209` · `L-210` · `L-211`. See `CHANGELOG.md` and the archived pair.
->
-> + 11 `[~]` n/a**, `ca1d570`. It measured before ruling and four of five targets were ruled
-> unportable with the mechanism recorded — D2's accepted branch. T1's cost was inside the engine, not
-> in spawns, and was removed on the caller side anyway (**341.0 → 149.8 s** median, non-overlapping
-> ranges); T2 was the one genuinely spawn-shaped target and is ported (**leg 15 21.0 → 3.4 s**); T3
-> ruled the consumer-facing engine out of scope here (**ADR-043** → **TD-168**). `TASK-319`/`TASK-188`
-> remain in the Backlog, still paired, still blocked on the green gate T4 measures. See `CHANGELOG.md`
-> and the archived sprint file.
+> Predecessor: **SPRINT-104 — The Gate's Own Blind Spots** closed 2026-09-23 at **19 of 25 DoD**,
+> T4's six carried to `TASK-357`. The typecheck leg now holds `scripts/` + `evals/` (`TD-169`
+> resolved) and bootstrap failures sit at the two-space column (`TD-157` resolved; 28 sites, 8 named
+> and left alone). T4 never got a host: its measurement was reaped for memory. The sprint's own Plan
+> failed layers-completeness from promote to close → `TD-177` · `TD-178` · `TASK-368` · `L-212`.
+> See `CHANGELOG.md` and the archived pair.
 
 **Standing facts the Backlog depends on** — narrative that used to live here is in
 [`CHANGELOG.md`](CHANGELOG.md) and the sprint archive. Pruned at the SPRINT-097, SPRINT-100 and
 SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from its source).
 
-- **Debt ledger: 101 rows** (99 open · 2 resolved · 8 `severity: high` open) — re-derived
-  2026-09-22 after TD-175 was filed, by row header, cross-checked by distinct id (both 100)
-  and by partition (99 + 2 = 101). The partition only reconciled once the `status:`/`severity:`
+- **Debt ledger: 103 rows** (99 open · 4 resolved · 7 `severity: high` open) — re-derived
+  2026-09-23 at the SPRINT-104 close, by row header, cross-checked by distinct id (both 103),
+  by partition (99 + 4 = 103), and high-open as all-high minus resolved-high (8 − 1). The partition only reconciled once the `status:`/`severity:`
   match was made **markup-tolerant** (`\*{0,2}`) — a lowercase-only pattern returned 94 + 1 = 95
   against 99 rows, which is L-108 firing on the very census that documents it. Eight rows resolved at or before SPRINT-100 were **deleted** at that
   promote under §11's 3-sprint clock; **ids stay monotonic — a deleted row never frees its id.**
@@ -77,7 +59,8 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
   (collapse duplicated prose to pointers) has now been applied three times, this block included.
   Closing the gap would mean satellite files (a second place to look, which this repo refuses) or
   rejecting work still wanted. **Revisit when the Backlog drops below ~12 tasks** — it is at 22
-  (20 ready · 2 needs-info · 0 blocked; partition reconciles against the 22 row headers), having
+  (18 ready · 4 needs-info · 0 blocked; partition reconciles against the 22 row headers, re-derived
+  at the SPRINT-104 close: 24 at HEAD − 3 shipped + `TASK-368`), having
   taken EPIC-017's seven. That growth is the epic's own evidence: filing a breakdown pushed this
   file from 536 to ~680 lines against a 320 soft cap, and the cap has no route that does not run
   through rejecting work still wanted (TD-174).
@@ -90,42 +73,6 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
 ### P0 — Blocking
 
 ### P1 — Next Phase Required
-
-- [ ] TASK-358 — Put `scripts/` and `evals/` inside the gate's typecheck, and fix what that surfaces  [size: S] [risk: med] [HITL]
-      class:      execution
-      tier:       G        # the leg is a guard; "clean (0 errors)" over an empty program is a
-                           # silent false negative by construction (L-058)
-      authority:  J1
-      origin:     close-retro   # SPRINT-104 promote: TD-169 is `severity: high` with no Backlog
-                                # owner, which is the auto-escalate rule having an unfired instance
-      state:      ready
-      done-when:  `scripts/qa-check.sh`'s typecheck leg runs a `tsc` program that **contains**
-                  `scripts/**/*.ts` and `evals/**/*.ts`, and the two surfaced errors are fixed.
-                  Verify, and this is the part TD-169 exists to make non-optional:
-                  `tsc --noEmit --listFiles | grep -c '<a scripts/lib file>'` and the same for an
-                  `evals/` file must each return **≥ 1** — an exit code of 0 says nothing about
-                  which files were in the program (L-136, and the exact way this was found).
-                  **Tier G bar** (ADR-029 · D4 shape): seed a type error into one `scripts/lib/*.ts`
-                  and one `evals/*.ts`, confirm the leg **reddens for each**, with a sibling control
-                  file staying green; verify each seed landed and restore under ONE stated hash
-                  convention (L-137 · L-142 · L-169). Retain the fixture. Outside reviewer,
-                  worktree-isolated (L-165 · L-168).
-      why:        `scripts/qa-check.sh` (:1008) runs bare `tsc --noEmit`, so it uses the root
-                  `tsconfig.json`, whose `include` is `apps/** · packages/** · test/**`. **Every
-                  ported checker in `scripts/lib/` and every harness in `evals/` is therefore
-                  outside the gate's typecheck while the leg reports `clean (0 errors)`.**
-                  ADR-037/TD-101 hardened this same leg so a *skip* could not read as a pass; it is
-                  blind by **population** instead — the L-186 shape at the gate's own level. Found
-                  at SPRINT-103 T2, when a `tsc` clean claim made three times turned out to be a
-                  statement about a program that never held the file.
-      measured:   **2 errors, both `TS18047` in `scripts/qa-verdict.ts` (147,5 and 151,5 —
-                  `child.stdout` / `child.stderr` possibly null), derived at the SPRINT-104 promote**
-                  with a probe tsconfig over `scripts/**` + `evals/**`; the other 20 `.ts` files in
-                  those trees are clean. This is why the widening and the fix are ONE task: widening
-                  the glob is what turns the gate red. **Re-derive before acting** — the figure is a
-                  snapshot of 2026-09-21 and nothing re-measures it (L-097 · L-130).
-      depends-on: none
-      tracker:    TD-169 (severity: high, open) · ADR-037 · TD-101 · L-136 · L-186
 
 - [ ] TASK-348 — Re-file TD-143's cost half against the HOST envelope, not the gate  [size: M] [risk: med] [HITL]
       class:      decision
@@ -219,32 +166,6 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
       origin:     manual   # filed by hand at the SPRINT-098 promote governance review (severity: high escalation)
       state:      ready
 
-- [ ] TASK-350 — Route bootstrap failures through a shared emitter, so one-space `FAIL ` lines stop existing  [size: M] [risk: med] [HITL]
-      class:      decision
-      authority:  J2
-      done-when:  No `FAIL ` line in `scripts/` or `evals/` is emitted at a one-space column, and a
-                  selector keyed to the two-space finding column can no longer miss a bootstrap
-                  failure. **27 sites across 15 files**, each a failure emitted *before or outside*
-                  its file's own `bad()`/`ok()`/`gap()` helper — re-derive both figures at build
-                  rather than inheriting them (L-130). The shape of the fix is the decision, not the
-                  edit: a shared `fatal()` in `harness-common.sh` that every bootstrap check calls,
-                  versus teaching each file's helper to be callable before its own setup completes.
-                  A judgment tick on whichever is chosen, and it says so.
-      touches:    `evals/lib/harness-common.sh` (×9) · `scripts/lib/conformance-engine.sh` ·
-                  `check-approval-envelope` · `check-count-claims` · `check-ephemeral-intake` ·
-                  `check-epic-archive` · `check-handoff-state` · `check-layers-completeness` ·
-                  `check-layers-observed` · `check-night-run-rollup` · `check-qa-budget-default` (×4) ·
-                  `check-research-archive` (×2) · `check-review-depth` · `check-verify-reaches` ·
-                  `check-system-verify-block`
-      depends-on: none
-      assumes:    that every one of the 27 is genuinely a bootstrap failure and none is a finding that
-                  merely looks like one. UNCONFIRMED — re-derive per site before rewriting any of them.
-      tracker:    TD-157 (severity: medium, open) · L-186 · L-198
-      origin:     close-retro   # SPRINT-100: surfaced at T4's close, then confirmed live at T5 where
-                                # conformance-engine.sh:54's one-space line left sweep_gate returning
-                                # rc=0 silently on a crashed engine
-      state:      ready
-
 - [ ] TASK-357 — Re-measure the gate total after SPRINT-103, then rule ADR-039's deferred `layers-observed` opt-in  [size: S] [risk: low] [HITL]
       class:      decision
       tier:       P
@@ -276,10 +197,16 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
                   21.0 → 3.4 s) survive into the total. UNCONFIRMED — that is the question, and the
                   arithmetic must not be substituted for the run (D2).
       tracker:    ADR-039 · ADR-043 · TD-168 · TD-171 · Round 19/20/21
+      carried:    SPRINT-104 T4, parked twice, 0 of 6 DoD. 2026-09-23: `wsl --shutdown` freed 5.35 GB
+                  and run 1 completed at **1863 s, `275 pass, 4 fail`** — but under paging (min 311 MB
+                  free), so it is an observation, not a range member. Run 2 was reaped for memory at
+                  1455 s when Docker restarted WSL. **Unblock: > 3 GB free that STAYS free for ~90 min
+                  — WSL/Docker stopped and kept stopped**, not merely freed at the start. The total
+                  now measures SPRINT-104's gate too; the Round must say which tree it timed.
 
 <!-- ── EPIC-017 — Work Items That Do Not Outgrow Their File ──────────────────────────────────
-     docs/epic/EPIC-017-work-items-that-fit.md. Filed 2026-09-21; NOT promotable until SPRINT-104
-     closes. Note, and it is the epic's own first piece of evidence: filing this breakdown pushed
+     docs/epic/EPIC-017-work-items-that-fit.md. Filed 2026-09-21; promotable since SPRINT-104 closed
+     (2026-09-23). Note, and it is the epic's own first piece of evidence: filing this breakdown pushed
      TODO.md from 536 to ~660 lines against a 320 soft cap. The container is the problem. -->
 
 - [ ] TASK-359 — Stand up the work-item store and its schema, with one real task migrated  [size: M] [risk: med] [HITL]
@@ -468,43 +395,31 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
       assumes:    that a complete pre-flight is worth its wall-clock at all. UNCONFIRMED — the
                   alternative is that the launcher should keep refusing on a bounded gate and the
                   completeness problem belongs to the gate's cost, not to the launcher. Rule that
-                  before building; `TD-090` and SPRINT-104 T4 own the cost side.
+                  before building; `TD-090` and `TASK-357` (carried from SPRINT-104 T4) own the cost side.
       tracker:    ADR-042 · TD-084 · TD-175 · SPRINT-105 T3 review (F1 · F2 · F9)
 
 ### P2 — Follow-on
 
-- [ ] TASK-356 — Re-audit the gate's own rationale comments against Round 16, and give the stale ones an expiry  [size: S] [risk: low] [HITL]
+- [ ] TASK-368 — Run the sprint file's own per-file checkers at promote, before `plan locked`  [size: S] [risk: low] [HITL]
       class:      execution
-      tier:       P
+      tier:       X        # run plumbing, not a guard: it calls existing checkers earlier
       authority:  J1
-      origin:     manual   # found during SPRINT-103 T1/T2 execution; NOT grilled at intake
+      origin:     close-retro   # SPRINT-104: its own Plan failed layers-completeness from plan_commit
+                                # to close (six findings, re-run against the promote-time file) and it
+                                # was first written down at close
       state:      ready
-      done-when:  Every comment in `scripts/qa-check.sh` and `scripts/lib/*.ts|sh` that states a
-                  COST or a RANKING is either re-derived against Round 16 and corrected, or deleted.
-                  Verify: no surviving comment names a figure contradicted by
-                  `docs/research/logs/qa-gate-timing.md`'s latest Round — checked by grepping for
-                  second-figures (`~Ns`, `N min`, "slowest", "most expensive") and reconciling each
-                  hit against the Round, with the count of hits examined stated.
-      why:        **Two confirmed instances in one sprint, both found by accident rather than by a
-                  check.** (1) `scripts/qa-check.sh:1169` justified `run-sprint-family-fixtures.sh`'s
-                  opt-in placement with "~5 min for 23 cases … ~15s each against the SHIPPED spec" —
-                  the harness has **68** cases and now uses a reduced spec at 137–184 s. Corrected
-                  at SPRINT-103 T1. (2) `scripts/lib/check-layers-completeness.ts`'s header still
-                  calls `evals/run-layers-completeness-fixtures.sh` "the slowest harness in the gate
-                  (measured ~55-70s)" — Round 16 retired that: it is not in the top 20, and the five
-                  ported checkers now total **17 s**. Still uncorrected.
-                  These are not cosmetic. A cost comment is what a maintainer reads when deciding
-                  whether to promote a harness from opt-in to always-on, or which target to attack
-                  next — and **SPRINT-102 lost a day to exactly that failure at the ledger grain**,
-                  choosing five targets from TD-090's stale figures. The same rot at the comment
-                  grain is one `git blame` away from the same mistake. L-151's shape: a figure
-                  recorded where its reader reaches it, left true-at-writing and never re-derived.
-      plan:       Enumerate first, then fix — the population is the hard part, not the edits. A
-                  figure can be a duration, a rank, a count, or a superlative, and only the last is
-                  greppable. Derive the candidate set two ways that disagree by construction (grep
-                  for numeric-plus-unit; and read every `# ---` block header in `qa-check.sh`), and
-                  state both counts. Then consider whether a cost comment should carry the Round it
-                  was derived from, so the next reader can tell staleness from disagreement.
+      done-when:  Before `promote` commits `plan locked`, lean-flow runs layers-completeness and
+                  prose-density over the **new sprint file alone** and a FAIL blocks the commit.
+                  Verify: a sprint file with a bare-name prose token and a >400-char line is refused
+                  at promote with both named findings; a clean one passes.
+      why:        Both checks take under a second on one file, but their only runner is the full gate,
+                  which this host has repeatedly failed to finish (SPRINT-103 and -104 closes). A finding in
+                  the Plan is cheapest at the moment the Plan is written, and costs a logged Plan
+                  amendment every time after it.
+      touches:    this repo's promote procedure only — `scripts/…` paths must NOT leak into the generic
+                  `lean-doc-generator` skill (L-015); a consumer hook point, if any, is a separate ruling
+      depends-on: none
+      tracker:    TD-178 · TD-177 · L-212 · L-166
 
 - [ ] TASK-354 — Give the `dod-delta` leg a ruled-exemption declaration, so a historical mis-attribution stops blocking every close  [size: S] [risk: low] [HITL]
       class:      execution

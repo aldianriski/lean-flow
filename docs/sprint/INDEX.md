@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-21
+last_updated: 2026-09-23
 update_trigger: A sprint is closed and archived (DOCS_Guide §11)
 status: current
 ---
@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-104 — The Gate's Own Blind Spots — closed 2026-09-23 · 19 of 25 DoD, T4 carried to TASK-357 (unreleased; PATCH candidate) — typecheck leg holds scripts/ + evals/ (TD-169), bootstrap FAILs at the two-space column (TD-157); T4 reaped for host memory; TD-177/178 · TASK-368 · L-212
 - SPRINT-105 — Enforce What Is Already Written — closed 2026-09-22 · 24 of 24 DoD (PATCH v1.66.1) — hook withdrawn at review, night-run raise reverted as a regression; ADR-044 · L-209/210/211
 
 <!-- GAP, stated rather than silently backfilled: SPRINT-059..104 are archived under `archive/` but

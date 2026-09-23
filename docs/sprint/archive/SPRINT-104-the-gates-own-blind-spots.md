@@ -2,8 +2,8 @@
 sprint: 104
 slug: the-gates-own-blind-spots
 owner: Maintainer
-last_updated: 2026-09-21
-status: active
+last_updated: 2026-09-23
+status: closed
 plan_commit: 5216c69
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
@@ -201,7 +201,57 @@ ruling is taken against that Round and cites it by number.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `tsconfig.json` | T1 · TD-169 | `include` gains `scripts/**/*.ts` + `evals/**/*.ts` — the typecheck leg reported clean over a program holding neither tree | med | `--listFiles` names a file from each tree; seeded type error in each reddens the leg, sibling control green |
+| `scripts/qa-verdict.ts` | T1 | the two `TS18047` the widened program surfaced (147 · 151), fixed fail-closed | low | leg's own printed line: true clean |
+| `evals/typecheck-population.test.ts` · `evals/run-typecheck-population-fixtures.ts` · `evals/fixtures/typecheck-population/tsconfig.narrow.json` | T1 | **new, retained** — population fixture: a narrowed config must redden it; wrapped so the gate runs it, not only `bun test` | med | discrimination proven; wired into `eval_harnesses_always` |
+| `evals/lib/harness-common.sh` · 14 `scripts/lib/check-*` · `evals/lib/check-system-verify-block.sh` · `scripts/lib/conformance-engine.sh` | T2 · TD-157 | bootstrap failures moved to the two-space column: 5 via a shared `fatal()`, 15 inline; 8 sites named and left alone with the reason at the code | med | adopter path run: `conformance.sh` now prints `FAIL  conformance: …` (was one space) |
+| `evals/run-emitter-column-fixtures.ts` | T2 | **new, retained** — emitter-column population guard, three layers after two outside-review rounds (language-aware skip · distinct-dir floor · every file scanned or ruled out by name) | med | 9 pass on clean tree; 4 named defeats each redden |
+| `scripts/qa-check.sh` · `scripts/lib/check-layers-completeness.ts` · `scripts/lib/conformance-engine.sh` | T3 | 94 cost/rank comments examined against Rounds 16/19/21, 4 corrected, **comments only** | low | non-comment added lines: 0 |
+| `scripts/qa-check.sh` | T1 · T2 (coordinator, D2) | harness registration for the two new fixtures, applied from a displayed diff | low | fixtures run in the gate |
+| `docs/sprint/SPRINT-104-*.md` · `docs/sprint/logs/SPRINT-104-*.md` | T0 | Plan ticks, `Layers:`/`Cites:` corrections (logged), the append-only Log | — | layers-completeness 8/0 · prose-density 32/0 · review-depth PASS |
 
 ## Retro
 
-<!-- Written at close. -->
+**Retrieval check** — one retrieval miss. T1's log records the `discovery-order.test.ts`
+`bypassed: true` failure as a new `TD-NNN` candidate; it is **TD-154**, filed at SPRINT-099 with the
+same cause. The ledger was not searched before the candidate was written. Caught at this close's
+sweep, not filed twice.
+
+**Cost** — two worktree-isolated outside-review rounds covering T1 + T2 (per the Log). Gate runs: one seeded default-profile run (547 s), repeated kills for memory, and
+one completed `QA_FULL=1` run today at **1863 s, under paging** (min 311 MB free). Per DoD
+**delivered: 19 of 25 ticked · 6 open, all T4, carried** to `TASK-357`.
+
+**Worked**
+
+- **Two disagreeing selectors, used as the plan said.** T2 re-derived TD-157's frozen `27 / 15` as
+  **28 / 16** before editing anything; T3 reached 94 comments by a numeric and a lexical route with
+  76 and 13 hits the other could not see. Neither figure was inherited.
+- **A ruled shape that could not be built was surfaced, not bent.** The owner's first ruling (one
+  shared `fatal()`) met 21 of 22 sites with nothing sourced yet. It went back as a premise change and
+  came back as the hybrid, recorded at the code where the next maintainer will read it.
+- **Outside review found what nothing else did, twice (L-165 held again).** Round 1: the T2 fixture
+  was blind to its own motivating artifact. Round 2: the same class inside the fix — a shell `case`
+  default arm read as a comment, and a floor that missed a duplicated directory.
+
+**Friction**
+
+- **The sprint's own Plan failed a gate leg from promote to close.** Six layers-completeness findings
+  existed at `5216c69` (re-run against the promote-time file) and were first written down today.
+  Bare filenames in prose against full paths in `Layers:`, which the matcher treats as undeclared.
+  SPRINT-099's close hit the same shape. → **TD-178**, **TASK-368**, **L-212**.
+- **`Layers:` tokens that match nothing read as complete.** T2 and T3 both carried globs
+  (`check-*.sh`, `*.ts|sh`) covering zero files; fixed one at a time over three rounds before the
+  set was enumerated in one query — sampling instead of population, in the sprint about it. → **TD-177**.
+- **T4 never got a host.** Parked at wave open (0.41 GB free), re-attempted today after
+  `wsl --shutdown`, reaped at run 2 when Docker restarted WSL. A3 and the `layers-observed` ruling are
+  still open, now for two sprints.
+- **A review happened and was not recorded.** T1's outside review existed; its `review ·` line did not,
+  so the gate read it as owed. Same finding pair as SPRINT-103's close, different cause.
+
+**Pattern candidate** (→ `docs/LEARNINGS.md`)
+
+- **L-212 filed** — a per-file check whose only runner is the full gate is unread whenever the full gate
+  cannot finish; run it on the artifact at the moment it is written. Count 1.
+- **Not filed, watched:** *"a recorded fact (review done) with no machine line reads as absent"* —
+  second sighting after SPRINT-103, but with a different cause each time (there: no review; here: no
+  line). Filed if a third close repeats either.

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-21
+last_updated: 2026-09-23
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -295,6 +295,32 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-178** severity: low | status: open | created: Sprint-104
+  - Summary: **layers-completeness reads a bare filename in DoD prose as undeclared when `Layers:` names
+    the same file by path.** Prose `qa-verdict.ts` vs `Layers:` `scripts/qa-verdict.ts` is an
+    exact-string miss. SPRINT-104's own Plan carried **six** such findings from `plan_commit` to close
+    (re-run against the promote-time file: same six), and SPRINT-099's close hit the same shape.
+  - **The workaround misdeclares.** The only way to clear it today is a `Cites:` entry for the bare
+    spelling, so a file the task *touches* is written down as *merely cited*. The record now says two
+    contradictory things about one file, and the checker cannot see the contradiction because the
+    two spellings differ.
+  - Mitigation (hypothesis): resolve a prose token by basename against the `Layers:` set before
+    reporting it, and report `ambiguous` when two declared paths share the basename. Tier **G**: it
+    changes what the guard admits, so the retained must-FAIL bar applies (a bare name matching
+    **no** declared path must still redden).
+  - **Re-file fresh if** prose convention changes to always cite full paths.
+
+- **TD-177** severity: medium | status: open | created: Sprint-104
+  - Summary: **A `Layers:` token that matches no file is indistinguishable from a correct one.** `covers()`
+    takes an exact path or a trailing-slash directory prefix and supports **no globs**, so SPRINT-104
+    T2's `scripts/lib/check-*.sh` and T3's `scripts/lib/*.ts|sh` each covered **zero** of the files
+    those tasks changed, while reading as complete to every human. Fourteen files were undeclared.
+  - **How it stayed invisible:** nothing reports a declaration's reach. The gap surfaced only when
+    layers-observed compared declarations against a real diff, after the work was done.
+  - Mitigation (hypothesis): a `layers-token-matches-nothing` finding at promote — every `Layers:` token
+    must name an existing path, an existing directory, or a file the task says it creates. Tier **G**.
+  - **Re-file fresh if** `covers()` gains glob support (the finding would then need a different shape).
+
 - **TD-176** severity: low | status: open | created: Sprint-105
   - Summary: **`docs/sprint/INDEX.md` skips 46 sprints.** Its newest entry before SPRINT-105 is
     **SPRINT-058** (2026-08-10); SPRINT-059…SPRINT-104 are archived under `docs/sprint/archive/`
@@ -475,7 +501,7 @@ status: current
     and are **exempted on the record, history not rewritten** — their shas are cited by name in
     ADR-043, this row's evidence trail and the sprint Log, and amending them would falsify those
     references.
-- **TD-169** severity: high | status: open | created: Sprint-103
+- **TD-169** severity: high | status: resolved → 50b7e80 (SPRINT-104 T1; population fixture retained, c7ba1e3) | created: Sprint-103
   - Summary: **The gate's typecheck leg reports "clean (0 errors)" without ever looking at
     `scripts/lib/` or `evals/`** — which is where every ported checker lives. `scripts/qa-check.sh`
     (:1008) runs bare `node_modules/.bin/tsc --noEmit`, so it uses the root `tsconfig.json`, whose
@@ -566,6 +592,10 @@ status: current
     exists to prevent, ADR-042).
   - Discovered at the TASK-355 profiling run, not by the fixture's own authors — it has presumably
     been latent since SPRINT-102 T1 shipped it, and passed every attended run until a busy one.
+  - **Seen again at SPRINT-104 T1 (2026-09-22), with a new symptom:** `over-ceiling-run-prints-info-and-fail-stays-0`
+    reported `FAIL … got:` with an **empty** capture during a gate run at 0.41 GB free, then passed
+    standalone. An empty capture on a must-FAIL case would read green, so the risk is wider than the
+    timing race itself. Cause not verified.
 - **TD-165** severity: medium | status: open | created: Sprint-102
   - Summary: **The three Bun harnesses' pass-count parsing has no RETAINED must-FAIL fixture — its
     discrimination was proven live and then reverted.** SPRINT-102 T2 fixed an ANSI-blind parser that
@@ -773,7 +803,7 @@ status: current
   - Family: **TD-139** is the same punctuation defect at a different site (`dep_ids` in the dispatch
     preflight). If either is fixed, fix both — one strip rule, two call sites.
 
-- **TD-157** severity: medium | status: open | created: Sprint-100
+- **TD-157** severity: medium | status: resolved → a12085f (SPRINT-104 T2; 28 sites, 8 named and left alone with the reason at the code) | created: Sprint-100
   - Summary: **27 `FAIL ` emissions across 15 files use a ONE-space prefix that no two-space selector
     can reach.** Every `bad()`/`ok()`/`gap()` line emits at a two-space column; these 27 bypass their
     file's own helper with a raw `echo` and emit at one. They are bootstrap failures — emitted before
@@ -849,6 +879,10 @@ status: current
   - Impact: ADR-033's own guard is red, so the mechanism that decides *what System verify runs* is
     currently unattested. Filed rather than fixed because diagnosing it is its own task.
   - **Re-file fresh if** the wrapper is removed, or rung-1 discovery is re-specified.
+  - **Re-found at SPRINT-104 T1 (2026-09-22), still failing, cause traced to `3404422`** (SPRINT-097
+    T4): `invokes()` splits on `&& || ; |` and needs a segment equal to the declared command; wrapping
+    it as `bun scripts/qa-verdict.ts sh scripts/qa-check.sh` made it an argument. The Log wrote it up
+    as a new candidate without searching the ledger first — a retrieval miss, caught at close.
 
 - **TD-153** severity: medium | status: open | created: Sprint-098
   - Tracker: none — found by the coordinator's population probe at SPRINT-098 T3, then independently

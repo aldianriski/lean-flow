@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-21
+last_updated: 2026-09-23
 update_trigger: A learning confirmed at Sprint Close, or a learning promoted to a durable rule
 status: current
 ---
@@ -22,13 +22,19 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-208**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-212**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
 
 ---
+
+## L-212 [tags: tooling] [status: active]: **A per-file check whose only runner is the full gate is unread whenever the full gate cannot finish — so run it on the artifact at the moment the artifact is written.** SPRINT-104's own Plan failed layers-completeness from `plan_commit` to close: six findings, reproduced by re-running the checker against the promote-time file, and first written down on the last day, when a `QA_FULL=1` run finally completed. The checker takes under a second on one file. Its only caller is a gate this host kept failing to finish (memory reaps, truncation). Nothing about the finding was subtle: bare filenames in prose against full paths in `Layers:`, the same shape SPRINT-099's close hit. **The cost of a Plan finding rises with every commit after promote** — at promote it is an edit; after `plan locked` it is a logged Plan amendment; at close it is a Retro item. **Durable form: a check that reads one artifact belongs at that artifact's write site, with the full gate as the backstop, not the only runner.** Filed as `TASK-368`; the matcher's own gap is `TD-178`.
+- seen: 2026-09-23 (SPRINT-104 close — six layers-completeness findings live since `5216c69`)
+- count: 1
+- promoted: no
+- related: L-166 · L-105 · L-165 · TD-177 · TD-178
 
 ## L-211 [tags: tooling] [status: active]: **A message string in a shell script is not inert prose — editing it is editing code, and `sh -n` will not tell you, because the result is syntactically valid; it just runs.** SPRINT-105 T3 rewrote a truncation finding to name its remedy, and wrote the remedy the way it appears everywhere else in this repo's prose — in backticks: `bad "... re-run with: \`QA_BUDGET_SECONDS=1200 sh scripts/qa-check.sh\` ..."`. Inside a double-quoted shell string backticks are **command substitution**, so the gate **recursively invoked itself** every time it built that finding. Measured: `QA_BUDGET_SECONDS=1 sh scripts/qa-check.sh` ran past **90s** without reaching a checkpoint, against **4s** on the same tree before the message change and **3s** after the fix. `sh -n` was clean throughout, the fixtures that cover the *message* are opt-in and match by prefix, and the change looked like documentation. **The damage was not the recursion, it was the mis-attribution it caused.** An outside review found the symptom — "two complete gate reports, two leg-1 headers, ~67 harness rows" — and filed it `high` and **PRE-EXISTING**, on a control that reverted the sprint's other change and reproduced the doubling. That control could not work: the defect lived in the *message*, present in both arms, and the reviewer said plainly they had not isolated which harness spawned the nested run. **A correct control over the wrong variable produces a confident wrong attribution**, and a debt row against the wrong cause is worse than no row, because it closes the question. **Durable form: markdown habits do not transfer into shell strings — backticks, `$`, `!` and `\` are code there. When adding an example command to a shell-emitted message, put it in single quotes or drop the quoting ornament entirely, and prove the message by RUNNING the path that emits it, never by reading it.** The cheap tell: a "documentation-only" edit inside a `"` string that contains a command someone is meant to copy. Related: [[L-045]] (a report is evidence about the reporter — here the reporter *was* the bug) · [[L-058]] (a guard's worst failure is silent; this one was loud and still mis-attributed) · [[L-165]] (an outside pass found the symptom, and still needed the author to find the cause — a review is not a correctness oracle, it is another instrument).
 

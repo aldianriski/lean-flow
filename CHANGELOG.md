@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-21
+last_updated: 2026-09-23
 update_trigger: Sprint completed and changes reflected in docs
 status: current
 ---
@@ -11,6 +11,41 @@ status: current
 
 > **Older than the two minors below** → [`docs/changelog/`](docs/changelog/) — rotated verbatim at
 > each new MINOR and reachable only from here (STANDARD §11).
+
+---
+## SPRINT-104 — The Gate's Own Blind Spots (2026-09-23)
+
+**Unreleased — PATCH candidate.** One consumer-visible change: an adopter running root
+`conformance.sh` whose engine fails to bootstrap now sees `FAIL  conformance: …` at the two-space
+column every other finding uses (was one space), so a column-keyed selector no longer misses it.
+`skills/`, `templates/`, `spec/`, the manifests and `README.md` are untouched by SPRINT-104's commits
+(`README.md` moved in this range only under SPRINT-105). **19 of 25 DoD** — T4's six carried to `TASK-357`.
+
+### Fixed
+- **The typecheck leg now checks `scripts/` and `evals/`** (`TD-169`). It ran `tsc` over a program
+  holding neither tree, so every ported checker sat outside it while the leg printed
+  `clean (0 errors)`. Widening it surfaced two real `TS18047` in `qa-verdict.ts`, both fixed. A
+  retained population fixture reddens if the program narrows again, and it runs in the gate, not
+  only under `bun test`.
+- **Bootstrap failures stop hiding at a one-space column** (`TD-157`). The site set was re-derived at
+  **28 / 16**, not inherited as 27 / 15. 5 go through a shared `fatal()`, 15 are columned inline, and
+  8 are named and left alone with the reason written at the code (an inner checker whose wrapper
+  strips exactly one space; fixture-report lines no selector keys on). The retained guard was
+  hardened over two outside-review rounds: a shell `case` arm is no longer mistaken for a comment,
+  and every script file is either scanned or ruled out by name.
+
+### Changed
+- **The gate's cost and ranking comments were re-audited against Rounds 16/19/21**: 94 examined by
+  two disagreeing routes, 4 corrected, comments only.
+
+### Not done
+- **The gate total was not re-measured** (`TASK-357`). One `QA_FULL=1` run completed at 1863 s
+  (`275 pass, 4 fail`, all four in this sprint's own bookkeeping, since fixed) but under paging,
+  so it is not a figure. The next run was reaped for memory. SPRINT-103's A3 and ADR-039's
+  `layers-observed` ruling stay open.
+
+**Filed:** `TD-177` · `TD-178` · `TASK-368` · `L-212`. **Resolved:** `TD-169` · `TD-157`.
+**Annotated:** `TD-154` (re-found without a ledger search) · `TD-167` (empty-capture symptom).
 
 ---
 ## v1.66.1 — The gate's truncation costs the fewest guards (2026-09-22)

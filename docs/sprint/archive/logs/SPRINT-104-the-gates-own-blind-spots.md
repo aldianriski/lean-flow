@@ -2,8 +2,8 @@
 sprint: 104
 slug: the-gates-own-blind-spots
 owner: Maintainer
-last_updated: 2026-09-22
-status: active
+last_updated: 2026-09-23
+status: closed
 update_trigger: an Execution Log entry is appended
 ---
 
@@ -732,3 +732,27 @@ Run 1's four FAILs were all bookkeeping in SPRINT-104's own sprint file and log,
   optional chaining), and `9a4b565` ticked T1 DoD 6 on it. The record was missing, not the review:
 
 review · T1 · outside-reviewer-worktree-isolated · behaviour:material · governance:high
+
+### 2026-09-23 | close | SPRINT-104 closed at 19 of 25 DoD — T4 carried, owner-ruled
+
+**Terminal state: `AUTHORITY_BOUNDARY`.** T1–T3 complete; T4's six DoD and the `layers-observed`
+owner-action remain open and carry to `TASK-357` with the sharpened unblock condition (> 3 GB free
+that stays free for ~90 min). Closed on the owner's instruction rather than with T4 forced or
+re-scoped.
+
+**Handoff reconciliation (§12(b)):** no `handoff` entry in this Log — nothing to mark `spent`.
+
+**System verify:** not re-run as a full gate at close — the host cannot hold one (see the two
+entries above). The four FAILs of the last completed run were re-checked leg by leg after the fix:
+layers-completeness `8 pass, 0 fail` · prose-density `32 pass, 0 fail` · review-depth PASS.
+
+**Retro routed (§10):** Shipped → `CHANGELOG.md` § SPRINT-104 · Debt → `TD-177` · `TD-178` filed,
+`TD-169` · `TD-157` resolved, `TD-154` · `TD-167` annotated · Follow-up → `TASK-368`
+(`origin: close-retro`), `TASK-357` carried · Learning → `L-212`. Ids derived with worktrees and
+fixtures excluded, cross-checked by the defining-file maximum (TD-176 · L-211 · TASK-367).
+
+**§11 retention, owner-approved:** Plan + Log archived together, `INDEX.md` row added; TASK-358 /
+TASK-350 / TASK-356 pruned from the Backlog; two stale SPRINT-104 refs in `TODO.md` re-pointed;
+compaction sweep ran and found **0** entries due (the 4 promoted entries without a pointer line are
+3 already collapsed in-heading + L-144 under its standing NOT-collapse ruling, condition unmet).
+**Doc-freshness:** no §2 trigger fired — no skill, loop or integration point changed.
