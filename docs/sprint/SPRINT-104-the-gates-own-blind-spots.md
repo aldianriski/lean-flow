@@ -38,7 +38,7 @@ unattended run), which wait on the green gate this sprint measures rather than o
 ### T1 — Put `scripts/` and `evals/` inside the gate's typecheck `[size: S · risk: med · class: execution · HITL · J1]`
 Layers: `tsconfig.json` (or a leg-local config) · `scripts/qa-check.sh` (typecheck leg, :1008 — applied from a committed diff per D2) · `scripts/qa-verdict.ts` · a retained fixture under `evals/`
 Depends-on: none
-Cites: TD-169 · ADR-037 · TD-101 · L-136 · L-186 · L-058
+Cites: TD-169 · ADR-037 · TD-101 · L-136 · L-186 · L-058 · SPRINT-103 T2 · `qa-check.sh` · `qa-verdict.ts` — bare-name DoD references to the two Layers: paths above; the checker matches exact strings, so the bare spelling needs its own declaration
 
 `qa-check.sh` runs a bare `tsc --noEmit`, so the program is the root `tsconfig.json`'s
 `apps/** · packages/** · test/**` — **every ported checker in `scripts/lib/` and every harness in
@@ -60,7 +60,11 @@ that surfaces are fixed, and a seeded type error in each tree reddens the leg.
 - [x] Edit to `scripts/qa-check.sh` committed as a reviewable diff before being applied (D2 · L-151)
 
 ### T2 — Route bootstrap failures through a shared emitter `[size: M · risk: med · class: decision · HITL · J2]`
-Layers: `evals/lib/harness-common.sh` · `evals/lib/check-system-verify-block.sh` · `scripts/lib/check-approval-envelope.sh` · `scripts/lib/check-count-claims.sh` · `scripts/lib/check-ephemeral-intake.sh` · `scripts/lib/check-epic-archive.sh` · `scripts/lib/check-epic-archive.ts` · `scripts/lib/check-handoff-state.sh` · `scripts/lib/check-layers-completeness.sh` · `scripts/lib/check-layers-observed.sh` · `scripts/lib/check-night-run-rollup.sh` · `scripts/lib/check-qa-budget-default.sh` · `scripts/lib/check-research-archive.sh` · `scripts/lib/check-review-depth.sh` · `scripts/lib/check-verify-reaches.sh` · `scripts/lib/conformance-engine.sh` (**consumer-facing, ADR-027 — see D5**) · `scripts/qa-check.sh` (per D2) · `evals/run-emitter-column-fixtures.ts` (added mid-sprint — the retained Tier G fixture DoD 5/6 require; a `Layers:` written at promote cannot name a file the implementation invents, L-100)
+Layers: `evals/lib/harness-common.sh` · `evals/lib/check-system-verify-block.sh` · `scripts/lib/check-approval-envelope.sh` · `scripts/lib/check-count-claims.sh` · `scripts/lib/check-ephemeral-intake.sh`
+  · `scripts/lib/check-epic-archive.sh` · `scripts/lib/check-epic-archive.ts` · `scripts/lib/check-handoff-state.sh` · `scripts/lib/check-layers-completeness.sh` · `scripts/lib/check-layers-observed.sh`
+  · `scripts/lib/check-night-run-rollup.sh` · `scripts/lib/check-qa-budget-default.sh` · `scripts/lib/check-research-archive.sh` · `scripts/lib/check-review-depth.sh` · `scripts/lib/check-verify-reaches.sh`
+  · `scripts/lib/conformance-engine.sh` (**consumer-facing, ADR-027 — see D5**) · `scripts/qa-check.sh` (per D2)
+  · `evals/run-emitter-column-fixtures.ts` (added mid-sprint — the retained Tier G fixture DoD 5/6 require; a `Layers:` written at promote cannot name a file the implementation invents, L-100)
 <!-- The fifteen checkers were `scripts/lib/check-*.sh` until SPRINT-104 T2 execution. That token
      matched NOTHING: covers() takes an exact path or a trailing-slash directory prefix and supports
      no globs, so T2 carried a declaration covering zero of the files it rewrote — and it would have
@@ -69,7 +73,7 @@ Layers: `evals/lib/harness-common.sh` · `evals/lib/check-system-verify-block.sh
      undeclared file beneath it" (L-151 · L-186). -->
 
 Depends-on: none
-Cites: TD-157 · L-186 · L-198 · L-108 · ADR-027 · ADR-043
+Cites: TD-157 · L-186 · L-198 · L-108 · ADR-027 · ADR-043 · SPRINT-100 T5 · `check-epic-archive.ts` (bare-name reference to its Layers: path) · `conformance.sh` (the adopter channel D5 reasons about — read, never modified)
 
 A failure emitted *before or outside* a file's own `bad()`/`ok()` helper lands at a one-space `FAIL `
 column, and a selector keyed to the two-space finding column cannot see it. That is not cosmetic:
@@ -100,7 +104,7 @@ Layers: `scripts/qa-check.sh` (comments only) · `scripts/lib/check-layers-compl
      "swallowed every undeclared file beneath it", which is the failure this sprint is about. -->
 
 Depends-on: T2 (it audits the comment surface T2 rewrites; auditing first would audit a file about to change)
-Cites: TASK-356 · Round 16 · Rounds 19–21 · L-130
+Cites: TASK-356 · Round 16 · Rounds 19–21 · L-130 · `check-layers-completeness.ts` (bare-name reference to its Layers: path) · `check-layers-observed.sh` (named in the note above to explain covers() — read, never modified)
 
 A cost comment is what a maintainer reads when deciding whether to promote a harness from opt-in to
 always-on, or which target to attack next — and **SPRINT-102 lost a day to exactly that failure at
@@ -120,7 +124,7 @@ against the latest Round or deleted, and the count examined is stated.
 ### T4 — Re-measure the gate total, then rule ADR-039's deferred opt-in `[size: S · risk: low · class: decision · HITL · J2]`
 Layers: `docs/research/logs/qa-gate-timing.md` (a new Round) · `scripts/qa-check.sh` (`eval_harnesses_optin`/`_excluded`, only if the ruling moves one) · `docs/adr/ADR-039-*.md` (annotation, if the ruling changes its standing)
 Depends-on: T1, T2, T3 — it measures the gate **after** they change it
-Cites: TASK-357 · ADR-039 · SPRINT-103 A3 · Rounds 16–21 · D4
+Cites: TASK-357 · ADR-039 · SPRINT-103 A3 · Rounds 16–21 · D4 · `qa-check.sh` (bare-name reference to its Layers: path)
 
 SPRINT-103's A3 — *"porting all five would put the gate near 8 minutes"* — was filed as an estimate
 with "measured at close against the real total" as its confirm path, and the close could not run it
@@ -144,7 +148,7 @@ ruling is taken against that Round and cites it by number.
 
 - [x] **Rule T2's shape** — shared `fatal()` vs per-file helper. `J2`: it binds every checker, and one of the files is shipped to adopters through `conformance.sh`
 - [ ] **Rule ADR-039's `layers-observed` opt-in at T4**, against the measured total rather than against an estimate
-- [ ] **Free host memory before T4** (target > 3 GB free) — or rule T4 parked and let it carry to the next sprint with its unblock condition intact
+- [x] **Free host memory before T4** (target > 3 GB free) — or rule T4 parked and let it carry to the next sprint with its unblock condition intact — *ruled parked 2026-09-23 after a measurement attempt was reaped for memory; see Execution Log*
 
 ## Decisions (pre-locked)
 

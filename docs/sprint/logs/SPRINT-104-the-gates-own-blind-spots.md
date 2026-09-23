@@ -694,3 +694,41 @@ identically to a correct one until a file actually changes. `check-layers-comple
 `layers-unbackticked-token` finding for a related shape; a `layers-token-matches-nothing` finding would
 have caught this at promote, in both tasks, before a line of code was written. Candidate `TD-NNN` — id
 deliberately underived here (L-143 · L-170).
+
+### 2026-09-23 | park | T4 re-parked — the measurement started, and was reaped for memory
+
+**Host memory, stated before measuring (DoD 1):** 0.46 GB free of 13.75 GB, `vmmemWSL` at 4.7 GB.
+Owner ruled `wsl --shutdown`; after it, **5.35 GB free** — above the ~3 GB bar, so measurement began
+at HEAD `7524c6a`: three `QA_FULL=1 QA_PROFILE=1` runs, then `run-layers-observed-differential.ts`.
+
+**Run 1 completed: 1863 s, `275 pass, 4 fail`.** It is NOT a Round figure. Free memory entered at
+4.1 GB and the profile's minimum `memfree` was **311 MB** — the run paged for part of its length,
+which is the condition DoD 1 exists to exclude. Recorded as an observation, not as a range member.
+**Run 2 was reaped by the harness for host memory at 1455 s**, at `harness-begin:
+run-layers-observed-fixtures.sh`; runs 3 and the differential never started. `vmmemWSL` then came
+back on its own (1.8 GB — Docker restarting), leaving 2.37 GB free: below the bar again.
+
+T4 parks, owner-ruled, with the unblock condition sharpened by what this attempt showed: **> 3 GB free
+that STAYS free — WSL/Docker stopped and kept stopped for the ~90 minutes three runs take**, not
+merely freed at the start. All six T4 DoD carry forward; the `layers-observed` ruling is untaken.
+
+### 2026-09-23 | progress | the gate's four FAILs at `7524c6a`, cleared — all in this sprint's own files
+
+Run 1's four FAILs were all bookkeeping in SPRINT-104's own sprint file and log, none in code:
+
+- **layers completeness** — six findings, all present since `plan_commit` `5216c69` (re-run against
+  the promote-time file: same six), so the gate has been red on this leg all sprint. Prose names files
+  bare (`qa-verdict.ts`) while `Layers:` names paths (`scripts/qa-verdict.ts`), and the matcher is
+  exact-string; two prose task refs were another sprint's (`SPRINT-103 T2`, `SPRINT-100 T5`). Declared
+  on each task's `Cites:` per the SPRINT-10x convention — **no checker change** (§ Out: changing WHAT
+  the gate checks). A first attempt backticked `Layers:` inside T2's note and tripped the Cites/Layers
+  contradiction, since T2's own `Layers:` line quotes the same token; unquoted. Checker: 8 pass, 0 fail.
+- **prose-density** — T2's `Layers:` line (911 chars, grown by today's enumeration) split into
+  indented continuation lines, which `classify()` reads as the same declaration. Cross-checked: the
+  backtick token set is **19 == 19, identical** before and after. Checker: `32 pass, 0 fail`.
+- **review-depth ×2** — T1 carried `consequence · T1 · behaviour:material · governance:high` and no
+  `review ·` line. The review happened: the worktree-isolated outside pass above covered T1 too (it
+  reproduced T1's two `TS18047` by reverting and re-running `tsc`, and confirmed its fail-closed
+  optional chaining), and `9a4b565` ticked T1 DoD 6 on it. The record was missing, not the review:
+
+review · T1 · outside-reviewer-worktree-isolated · behaviour:material · governance:high
