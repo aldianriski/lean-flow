@@ -16,14 +16,10 @@ status: current
 
 ## Active Sprint
 
-> **No active sprint.** Next: `/lean-doc-generator promote` — or `/triage` first; 18 of the 22
-> Backlog tasks are `ready`.
+> **SPRINT-106 — The Store, and the Way In** → docs/sprint/SPRINT-106-the-store-and-the-way-in.md
 >
-> Predecessor: **SPRINT-104 — The Gate's Own Blind Spots** closed 2026-09-23 at **19 of 25 DoD**,
-> T4's six carried to `TASK-357`. The typecheck leg now holds `scripts/` + `evals/` (`TD-169`
-> resolved) and bootstrap failures sit at the two-space column (`TD-157` resolved; 28 sites, 8 named
-> and left alone). T4 never got a host: its measurement was reaped for memory. The sprint's own Plan
-> failed layers-completeness from promote to close → `TD-177` · `TD-178` · `TASK-368` · `L-212`.
+> `EPIC-017`'s first member (the 2.0 plan): `TASK-359` · `TASK-360` · `TASK-369` · `TASK-370`.
+> Predecessor: **SPRINT-105 — Enforce What Is Already Written**, closed 2026-09-22 at 24 of 24 DoD.
 > See `CHANGELOG.md` and the archived pair.
 
 **Standing facts the Backlog depends on** — narrative that used to live here is in
@@ -58,9 +54,9 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
   `tracker:` density is what lets a task be promoted without re-litigating it, and L-008's remedy
   (collapse duplicated prose to pointers) has now been applied three times, this block included.
   Closing the gap would mean satellite files (a second place to look, which this repo refuses) or
-  rejecting work still wanted. **Revisit when the Backlog drops below ~12 tasks** — it is at 22
-  (18 ready · 4 needs-info · 0 blocked; partition reconciles against the 22 row headers, re-derived
-  at the SPRINT-104 close: 24 at HEAD − 3 shipped + `TASK-368`), having
+  rejecting work still wanted. **Revisit when the Backlog drops below ~12 tasks** — it is at 24
+  (20 ready · 4 needs-info · 0 blocked; re-derived at the SPRINT-106 promote: 22 + `TASK-369` ·
+  `TASK-370`), having
   taken EPIC-017's seven. That growth is the epic's own evidence: filing a breakdown pushed this
   file from 536 to ~680 lines against a 320 soft cap, and the cap has no route that does not run
   through rejecting work still wanted (TD-174).
@@ -334,6 +330,34 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
       depends-on: TASK-359 · TASK-360
       assumes:    none — D4's split-by-kind is ruled and recorded in both repos
       tracker:    EPIC-017 D4 · scope 6 · workdoo ADR-001 · EPIC-016
+
+- [ ] TASK-369 — Make every queue-touching skill detect and name its layout (v1 · v2 · mixed)  [size: M] [risk: high] [HITL]
+      class:      decision
+      tier:       X        # skill prose deciding where a write lands; retained fixtures, default up
+      authority:  J2
+      origin:     manual   # owner direction at the SPRINT-106 promote: the foundation must carry existing users
+      state:      ready
+      done-when:  The 7 queue-touching skills (derived by two selectors) each detect v1 / v2 / mixed,
+                  name it in their output, and work or refuse by name; mixed reads both, writes where
+                  the id already lives, refuses a duplicate id. Retained v1 · v2 · mixed fixtures.
+      touches:    skills/{prime,triage,task-decomposer,lean-doc-generator,orchestrator,handoff,flow}/SKILL.md · ADR-046
+      depends-on: TASK-359 · TASK-360
+      assumes:    none
+      tracker:    EPIC-017 D7 · SPRINT-106 T3
+
+- [ ] TASK-370 — Carry an existing v1 repo onto the store with `/lean-doc-generator migrate`  [size: M] [risk: high] [HITL]
+      class:      execution
+      tier:       X
+      authority:  J2
+      origin:     manual   # owner direction at the SPRINT-106 promote
+      state:      ready
+      done-when:  `migrate` maps v1 Backlog → one file per task, plan → approve → apply, re-run
+                  report-only; id set equal both ways on a copy of this repo's Backlog; `TODO.md`
+                  left as a tombstone (deletion is TASK-363) whose stray v1 writes a v2 skill surfaces.
+      touches:    skills/lean-doc-generator/SKILL.md · skills/lean-doc-generator/references/migration-map.md
+      depends-on: TASK-369
+      assumes:    that installed 1.66.x skills read a tombstone as an empty Backlog. UNCONFIRMED
+      tracker:    EPIC-017 scope 7 · D7 · D8 · SPRINT-106 T4
 
 
 - [ ] TASK-366 — Rebuild the `ask-dont-tell` Stop hook against the real transcript corpus  [size: M] [risk: high] [HITL]

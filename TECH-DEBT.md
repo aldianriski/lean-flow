@@ -1628,6 +1628,7 @@ status: current
   - **Re-file fresh if** the runtime overrun turns out to be host-local rather than a property of the
     gate, which would make this an environment note rather than a guard defect.
   - **Escalated to `TODO.md` Backlog P2 as `TASK-329`** at the 2026-09-07 `/triage`, by the ledger's own `severity: high` rule — it had no Backlog entry until then, a `high` row invisible to every promote that reads the Backlog (L-151) — and **decomposed the same day**, absorbing TD-117 (`TASK-330`, retired) as one mechanism. **Scope note the fix must respect:** `check-qa-budget-default.sh` is CORRECT within its declared scope (configured default < ceiling, which is all its header claims). This row is a **missing reader**, not a broken checker, and widening that script is the wrong fix.
+  - **Re-reviewed at the SPRINT-106 promote (2026-09-23, owner-signed):** `TASK-329` is no longer in the Backlog, so this high row has **no live owner**. Its named gap looks closed: SPRINT-099 T2 added the ACTUAL-runtime reader (`CHANGELOG.md`, "the ACTUAL runtime is asserted against the 600 s command ceiling"), and SPRINT-102 (`ADR-042`) then re-ruled that assertion as an uncounted `INFO`. **Proposed: resolve** against those two commits once someone confirms the reader still fires. Not resolved here, because a re-review is not a verification.
 
 - **TD-125** severity: medium | status: open | created: Sprint-093
   - Summary: **A closed sprint cannot be archived while a sibling sprint sharing its `plan_commit`

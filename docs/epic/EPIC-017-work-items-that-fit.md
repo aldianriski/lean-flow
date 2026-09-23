@@ -2,9 +2,9 @@
 epic: 017
 slug: work-items-that-fit
 owner: Maintainer
-last_updated: 2026-09-21
-status: proposed
-member_sprints: []
+last_updated: 2026-09-23
+status: active
+member_sprints: [SPRINT-106]
 update_trigger: a member sprint closes, or a decision lands that changes the outcome
 ---
 
@@ -185,6 +185,16 @@ cannot be hit by a container that never accumulates. Its status vocabulary
   → ruled at D6's sprint; move and content edits stay in separate commits either way.
 - What disposes of `docs/research/LEAN-FLOW-PRE-EPIC-FOUNDATION-HARDENING-V3.md` (3,050 lines, 23×
   its cap)? → it is the natural first test of D3's disposition rule.
+
+## Member sprints
+
+| Sprint | Theme | Status | What it contributed to the outcome |
+|---|---|---|---|
+| [SPRINT-106](../sprint/SPRINT-106-the-store-and-the-way-in.md) | The store, and the way in | active | — (at close) |
+
+**Coverage gap, found at the SPRINT-106 promote:** D7's layout detection and scope 7's migrate path
+are now `TASK-369` · `TASK-370`; D8's workdoo proof and the `2.0.0` release still have **no task** —
+decompose them (`/task-decomposer --epic EPIC-017`) before the next member sprint.
 
 ## Closed when
 
