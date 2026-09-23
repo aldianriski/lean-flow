@@ -86,13 +86,13 @@ across member files. The copy-into-Plan path stays until `TASK-362` — this add
 and "what is in `review/` across all sprints?" is one glob.
 
 **DoD:**
-- [ ] Schema carries `sprint:` / `epic:`; nesting membership under status is rejected in writing
-- [ ] `skills/lean-doc-generator/templates/SPRINT.md.template` offers a by-reference member list
+- [x] Schema carries `sprint:` / `epic:`; nesting membership under status is rejected in writing ✓ `docs/work/README.md` § Membership
+- [x] `skills/lean-doc-generator/templates/SPRINT.md.template` offers a by-reference member list ✓ optional `## Members`; Plan shape kept (retired by TASK-362, hard cut)
       without removing the v1 Plan shape (both layouts, D7)
-- [ ] `skills/prime/SKILL.md` derives open DoD from member files on a v2 tree — *Verify: its figure on
+- [x] `skills/prime/SKILL.md` derives open DoD from member files on a v2 tree — *Verify: its figure on ✓ reference 3 = hand count 3 = independent selector 3
       `evals/fixtures/work-store/` equals a hand count, and a second count by a different selector
       (per-file `grep -c` summed) agrees*
-- [ ] A fixture member whose `sprint:` names another sprint is **not** counted (varies the selection,
+- [x] A fixture member whose `sprint:` names another sprint is **not** counted (varies the selection, ✓ decoy changes 3 → 7; seeded filter break reddened exactly the 3 membership cases
       not the verdict — L-186)
 
 ### T3 — Make every queue-touching skill detect and name its layout `[size: M · risk: high · class: decision · HITL · J2]`

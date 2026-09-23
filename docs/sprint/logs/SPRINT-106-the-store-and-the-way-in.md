@@ -98,3 +98,17 @@ byte-identical on this host (752 → 792 bytes). **Owner ruling:** the invariant
 identity via `git hash-object` vs `git rev-parse HEAD:<path>` (L-169) — not working-tree bytes; case +
 must-FAIL sibling rebuilt on that. Also: ADR-045's git-internals prose trimmed to rationale (HOW filter);
 EPIC-017 D1 now points `→ ADR-045` (coordinator).
+
+### 2026-09-24 | progress | T2 done — membership in frontmatter, progress derived (`1584c8d`)
+Schema § Membership (one sprint, one epic, never nested under status) · optional by-reference `## Members`
+in the SPRINT template · `/prime` +3 lines (131/140): v2 open DoD = `- [ ]` under each member's
+`## Done when`, selected by exact `sprint:`. Harness **13 pass, 0 fail**: reference 3 = hand count 3 =
+independent selector 3; the other-sprint decoy moves it to 7. The independent selector caught a real
+bug in the builder's first cut — a substring search hit `## Done when` quoted in prose (0 vs 3) — fixed
+with a heading-anchored match. Seeded break of the sprint filter reddened exactly the three membership
+cases, controls green; restored and verified by `diff --no-index` (550/550 lines).
+consequence · T2 · behaviour: low (3 prose lines in a skill) · governance: med (workflow contract) →
+**coordinator review inline, reason: 27 lines of prose, the harness already carries the proof.** Found
+and fixed in the template comment: a leaked `SPRINT-106 T2` reference in a consumer file (L-015), a
+self-contradiction ("stays for all of 2.x" vs "TASK-362 retires it"), and "omit on a v1 tree", a state
+the hard cut forbids.
