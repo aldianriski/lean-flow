@@ -326,3 +326,61 @@ describes, and it is why `conformance-engine.sh`'s own site is already covered w
   on the exact string, for no gain against a selector that never keyed on the column.
 
 Owner ruling on the shape (J2) outstanding; the counts above are what it should be taken against.
+
+### 2026-09-23 | progress | T2 — hybrid shape applied: 5 via fatal(), 15 columned inline, 8 left alone
+
+Owner ruling (2026-09-23), taken after the first ruling's premise did not survive derivation: a shared
+`fatal()` where it is reachable, a correctly-columned inline `printf` where it is not.
+
+**Why the first ruling could not be executed as written.** The owner first ruled one shared `fatal()`
+that every bootstrap check calls. Derivation then showed **21 of 22 bootstrap sites have nothing
+sourced yet** — only `check-research-archive.sh:44` sits after a `.` source — and 8 of them are the
+guards *around sourcing the very file* that would define the function. You cannot source an emitter to
+report that sourcing failed. Surfaced as a premise change rather than silently built differently.
+
+**Disposition of all 28 sites (DoD 3, discharged per site):**
+- **5 → shared `fatal()`** in `evals/lib/harness-common.sh`. This is the one place the ruled shape
+  genuinely works: the file is sourced by **30 harnesses** before any of them does setup, and its own
+  5 sites sit inside functions, so a helper defined at the top is in scope for all of them.
+- **15 → inline `printf 'FAIL  %s\n'`** across 14 checkers. 15 of those files carry exactly ONE
+  bootstrap site, so a per-file helper would add a definition to save nothing.
+- **8 → named and LEFT ALONE**, which is the half of DoD 3 that does real work:
+  - **4 in `scripts/lib/check-qa-budget-default.sh`** (2 bootstrap + 2 findings). This file is an
+    INNER checker whose column nothing reads: `qa-check.sh:101` takes the verdict from the **exit
+    code** and re-wraps the message through its own `ok()`/`bad()` using a sed that strips **exactly
+    one space**. Widening the column here would deliver every message with a stray leading space —
+    `FAIL` + three. Its sibling consumers at qa-check.sh:1398/1435/1468/1521/1564 use `s/^FAIL +//`
+    and are tolerant; this one is not, and `run-qa-budget-default-fixtures.sh:47,59` anchor on the
+    one-space prefix too. **Initially rewritten, then reverted** once the consumer was read.
+  - **4 fixture-report sites in `harness-common.sh`** (`FAIL fixture(<label>): …`). Leg 12 selects
+    harness output with `grep -E '^FAIL'` — not column-keyed — so there is no gain, and the
+    `selftest-assert-*` files match the exact string.
+
+**The ruling is recorded at the code, not only here (L-151, DoD 2):** the `fatal()` header states why
+the shared emitter lives in `harness-common.sh` and cannot serve `scripts/lib/`; a 15-line header in
+`check-qa-budget-default.sh` states why its one-space column is deliberate and must not be widened,
+naming the exact consumer and sed. That second note is the one that matters — without it the next
+maintainer "fixes" those four lines and breaks the wrapper. Confirmed comment-only: the non-comment
+added-line count for that file is **0**.
+
+**Consumer check (L-015, DoD 4), measured on the adopter path rather than reasoned.**
+`conformance-engine.sh` is one of the 15 and ships to adopters through root `conformance.sh`. Hid
+`archive-path.sh`, ran `sh conformance.sh .`:
+- adopter sees `FAIL  conformance: shared archive predicate not found at <path>` (was one space)
+- **exit code 2, unchanged**
+- `sweep_findings`' `_sweep_engine_error` selector is `'^FAIL [ ]*conformance: '` and matches BOTH
+  forms, so no reader changes behaviour
+- `archive-path.sh` restored and hash-verified
+
+In one line: **an adopter observes one extra space in one bootstrap message, the same exit code, and
+no change in any selector's verdict.**
+
+**Three self-inflicted corruptions, all from the same cause, all caught.** Writing these edits through
+a shell heredoc into a node script consistently ate one backslash, so `\n` reached JavaScript as a
+real newline: twice it wrote a literal line break into a `printf` format string (splitting lines and
+changing file line counts), and once it broke a shell comment into a non-comment line. **`sh -n`
+accepted the first two** — L-142's exact warning that a syntax check is not a correctness check. Fixed
+by building the escape as `String.fromCharCode(92) + "n"` and by adding two refusals to the patch
+script: reject any replacement containing a real newline, and reject any file whose line count
+changes. Verified after: line counts identical to HEAD for all 14 checkers, all files parse, `tsc`
+clean, and three checkers were RUN to confirm they emit at the two-space column.

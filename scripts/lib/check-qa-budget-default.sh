@@ -13,6 +13,21 @@
 
 set -u
 
+# THE ONE-SPACE FAIL/PASS COLUMN IN THIS FILE IS DELIBERATE -- DO NOT WIDEN IT.
+#
+# SPRINT-104 T2 moved 15 bootstrap emitters across the checker tree from a one-space to the
+# two-space finding column, because a one-space line is invisible to sweep_findings()'s
+# column-keyed _fail_findings selector (TD-157). This file was examined and DELIBERATELY EXCLUDED,
+# all four of its sites -- two bootstrap, two findings.
+#
+# It is an INNER checker: qa-check.sh never reads its column. It takes the verdict from the EXIT
+# CODE and re-wraps the message through its own ok()/bad(), which supply the two-space column
+# themselves (see qa-check.sh:101). That wrapper strips the prefix with a sed matching EXACTLY ONE
+# space. Widen the column here and every message reaches the gate carrying a stray leading space,
+# printed as FAIL + three spaces. The sibling consumers at qa-check.sh:1398/1435/1468/1521/1564
+# strip one-or-more spaces and are tolerant; this one is not.
+#
+# evals/run-qa-budget-default-fixtures.sh:47,59 also anchor on a one-space FAIL prefix.
 qc=${1:-}
 ceiling=${2:-600}
 

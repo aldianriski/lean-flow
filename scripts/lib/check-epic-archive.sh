@@ -23,7 +23,7 @@
 set -u
 
 root=${1:?usage: check-epic-archive.sh <repo-root>}
-[ -d "$root" ] || { echo "FAIL epic-archive: repo root not found at $root"; exit 2; }
+[ -d "$root" ] || { printf 'FAIL  %s\n' "epic-archive: repo root not found at $root"; exit 2; }
 
 fail=0
 ok()   { printf 'PASS  %s\n' "$1"; }

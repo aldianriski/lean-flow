@@ -55,7 +55,7 @@ set -u
 # This file is ALSO sourced by check-layers-completeness.sh, which sources the predicate itself
 # first; sourcing again is harmless (same definition) and keeps this file correct when run standalone.
 _lf_ap=$(dirname -- "$0")/archive-path.sh
-[ -f "$_lf_ap" ] || { echo "FAIL layers observed: shared archive predicate not found at $_lf_ap"; exit 2; }
+[ -f "$_lf_ap" ] || { printf 'FAIL  %s\n' "layers observed: shared archive predicate not found at $_lf_ap"; exit 2; }
 . "$_lf_ap"
 
 fmv() { awk -v k="$2" 'NR==1&&$0!="---"{exit} NR==1{next} $0=="---"{exit} $0~"^"k":"{sub("^"k":[ ]*","");print;exit}' "$1"; }

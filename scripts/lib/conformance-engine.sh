@@ -67,7 +67,7 @@ set -u
 # Missing file is FATAL rather than a local fallback: a fallback copy here would rebuild the ten
 # copies this task exists to remove.
 _lf_ap=$(dirname -- "$0")/archive-path.sh
-[ -f "$_lf_ap" ] || { echo "FAIL conformance: shared archive predicate not found at $_lf_ap"; exit 2; }
+[ -f "$_lf_ap" ] || { printf 'FAIL  %s\n' "conformance: shared archive predicate not found at $_lf_ap"; exit 2; }
 . "$_lf_ap"
 
 fail=0

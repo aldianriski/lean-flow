@@ -21,7 +21,7 @@
 set -u
 
 root=${1:?usage: check-count-claims.sh <repo-root>}
-[ -d "$root" ] || { echo "FAIL count-claims: repo root not found at $root"; exit 2; }
+[ -d "$root" ] || { printf 'FAIL  %s\n' "count-claims: repo root not found at $root"; exit 2; }
 
 fail=0
 ok()   { printf 'PASS  %s\n' "$1"; }

@@ -37,11 +37,11 @@ set -u
 # `case ... in */archive/*)`. The author's derivation searched for the case-glob SHAPE, so it could
 # never have reached this one -- L-186's population blindness, a second time in the same task.
 _lf_ap=$(dirname -- "$0")/archive-path.sh
-[ -f "$_lf_ap" ] || { echo "FAIL research archive: shared archive predicate not found at $_lf_ap"; exit 2; }
+[ -f "$_lf_ap" ] || { printf 'FAIL  %s\n' "research archive: shared archive predicate not found at $_lf_ap"; exit 2; }
 . "$_lf_ap"
 
 root=${1:?usage: check-research-archive.sh <repo-root>}
-[ -d "$root" ] || { echo "FAIL research-archive: repo root not found at $root"; exit 2; }
+[ -d "$root" ] || { printf 'FAIL  %s\n' "research-archive: repo root not found at $root"; exit 2; }
 
 fail=0
 ok()   { printf 'PASS  %s\n' "$1"; }

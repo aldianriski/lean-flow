@@ -20,7 +20,7 @@
 set -u
 
 root=${1:?usage: check-ephemeral-intake.sh <repo-root>}
-[ -d "$root" ] || { echo "FAIL ephemeral-intake: repo root not found at $root"; exit 2; }
+[ -d "$root" ] || { printf 'FAIL  %s\n' "ephemeral-intake: repo root not found at $root"; exit 2; }
 
 fail=0
 

@@ -544,7 +544,7 @@ if (import.meta.main) {
     process.exit(2);
   }
   if (!existsSync(root) || !statSync(root).isDirectory()) {
-    console.log(`FAIL epic-archive: repo root not found at ${root}`);
+    console.log(`FAIL  epic-archive: repo root not found at ${root}`);
     process.exit(2);
   }
   const { lines, exitCode } = checkEpicArchive(root);
