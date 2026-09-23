@@ -200,7 +200,19 @@ for (const d of scanDirs) {
       // fatal() header three files away literally contains the words ONE-space FAIL -- so a scan
       // that reads comments reports the documentation as a defect (L-108, which this scan hit on
       // its first run).
-      if (t.startsWith("#") || t.startsWith("//") || t.startsWith("*")) return;
+      //
+      // THE SKIP IS LANGUAGE-AWARE, AND THAT IS NOT PEDANTRY. An earlier version treated `*` as a
+      // comment marker in every file, to catch JSDoc continuation lines. In POSIX sh `*` is not a
+      // comment at all -- it opens a `case` DEFAULT ARM, and this repo emits real findings from
+      // them (check-task-origin.sh:60, read-spec-rules.sh:50). Those two lines sat silently outside
+      // the population: an outside reviewer seeded a one-space break in one of them and this suite
+      // stayed 8 pass / 0 fail with its emission count UNMOVED, because the scan could not see the
+      // line at all. That is L-186 recurring inside the very instrument written to close L-186 --
+      // the examined set narrowed by a shape nobody chose to exclude.
+      const isComment = rel.endsWith(".ts")
+        ? t.startsWith("//") || t.startsWith("*") || t.startsWith("/*")
+        : t.startsWith("#");
+      if (isComment) return;
       if (!line.includes("FAIL ")) return;
       emitLines++;
       if (rel === EXCEPT_FILE) return;
@@ -210,9 +222,86 @@ for (const d of scanDirs) {
   }
 }
 
-// ANTI-VACUITY FLOOR. A scan that examined nothing reports zero violations and exits clean, which
-// is indistinguishable from a scan that examined everything (L-058). A broken glob, a renamed
-// directory or a changed extension would all present as success without these two floors.
+// ANTI-VACUITY, IN THREE LAYERS -- because the first alone was demonstrably not enough.
+//
+// Layer 1, the total-count floor below: a scan that examined nothing reports zero violations and
+// exits clean, indistinguishable from a scan that examined everything (L-058).
+//
+// Layer 2 exists because a reviewer defeated layer 1 without tripping it. Changing scanDirs from
+// ["scripts/lib", "evals/lib"] to ["scripts/lib", "scripts/lib"] -- an ordinary copy-paste typo --
+// scanned 58 files and 176 emission lines, cleared the 25/40 floor comfortably, and reported a clean
+// population while evals/lib went ENTIRELY unexamined. A total floor catches collapse; it does not
+// catch a scan that reaches the wrong population while looking healthy. So the directories must be
+// distinct and each must carry its own weight.
+//
+// Layer 3 answers what neither of the others can: is this the right SET of directories at all? The
+// two-directory scope used to be asserted in a comment. It is now derived -- every .sh/.ts file under
+// scripts/ and evals/ must be either scanned or matched by a documented out-of-scope rule, and
+// anything fitting neither is named. A checker added in a new subdirectory, or dropped at scripts/
+// root, now announces itself instead of sitting silently outside the census.
+const OUT_OF_SCOPE: readonly { readonly test: (p: string) => boolean; readonly why: string }[] = [
+  // Harness self-reports are selected by leg 12 with a NON-column-keyed grep, so their one-space
+  // lines are correct. Dragging them in is what produced a 414-site figure during T2's derivation
+  // against a real population of 28.
+  { test: (f) => f.includes("/run-") || f.includes("/selftest-"), why: "harness self-report" },
+  { test: (f) => f.endsWith(".test.ts"), why: "bun test file, not a gate checker" },
+  // Surfaced by layer 3 on its first run, which is the point of layer 3. The night-run assertion
+  // scripts emit one-space findings and their selftests match on the FINDING NAME, never the column
+  // (see selftest-assert-boundary-park.sh). A differential harness compares two engines and emits no
+  // FAIL line of its own. Both were outside the census and nothing said so until now.
+  { test: (f) => f.includes("/assert-"), why: "night-run assertion script, selftests match the finding name" },
+  { test: (f) => f.endsWith("-differential.ts"), why: "differential harness, emits no FAIL findings" },
+  { test: (f) => f.includes("/fixtures/"), why: "fixture data, never run as a checker" },
+  {
+    test: (f) =>
+      f === "scripts/qa-check.sh" || f === "scripts/gen-index.sh" ||
+      f === "scripts/night-run.sh" || f === "scripts/qa-verdict.ts",
+    why: "the gate and its tooling: they CONSUME findings, nothing column-keyed reads them",
+  },
+];
+
+function walk(dir: string, acc: string[]): string[] {
+  for (const e of readdirSync(join(ROOT, dir), { withFileTypes: true })) {
+    const rel = dir + "/" + e.name;
+    if (e.isDirectory()) walk(rel, acc);
+    else if (e.name.endsWith(".sh") || e.name.endsWith(".ts")) acc.push(rel);
+  }
+  return acc;
+}
+
+const unclassified = [...walk("scripts", []), ...walk("evals", [])].filter(
+  (f) => !scanDirs.some((d) => f.startsWith(d + "/")) && !OUT_OF_SCOPE.some((r) => r.test(f)),
+);
+
+const dupDirs = scanDirs.length !== new Set(scanDirs).size;
+const thinDir = scanDirs
+  .map((d) => [d, readdirSync(join(ROOT, d)).filter((f) => f.endsWith(".sh") || f.endsWith(".ts")).length] as const)
+  .find(([, n]) => n < 2);
+
+if (dupDirs || thinDir !== undefined) {
+  console.log(
+    `FAIL  emitter-column(POPULATION-scope): the directory set is not sound -- ` +
+      (dupDirs
+        ? `it contains a DUPLICATE (${scanDirs.join(", ")}), so a directory it claims to cover is ` +
+          `unexamined while the totals still look healthy`
+        : `directory '${thinDir?.[0]}' contributed only ${thinDir?.[1]} file(s)`),
+  );
+  fail++;
+} else if (unclassified.length > 0) {
+  console.log(
+    `FAIL  emitter-column(POPULATION-scope): ${unclassified.length} file(s) under scripts/ or evals/ ` +
+      `are neither scanned nor covered by a documented out-of-scope rule, so nothing says whether ` +
+      `their FAIL column matters: ${unclassified.join(", ")}`,
+  );
+  fail++;
+} else {
+  console.log(
+    `PASS  emitter-column(POPULATION-scope): ${scanDirs.length} distinct dir(s); every .sh/.ts under ` +
+      `scripts/ and evals/ is either scanned or explicitly out of scope`,
+  );
+  pass++;
+}
+
 if (filesScanned < 25 || emitLines < 40) {
   console.log(
     `FAIL  emitter-column(POPULATION-vacuity): scanned only ${filesScanned} file(s) / ${emitLines} ` +

@@ -533,3 +533,53 @@ re-litigated): the 4 `check-qa-budget-default.sh` exclusions — they simulated 
 exclusions; the 28-site enumeration for the two templates it covers; T1's fail-closed optional
 chaining; T1's two `TS18047` reproduced by reverting and re-running `tsc`; and that all 15 rewritten
 sites pass the message via `%s` so no `%`-injection is possible.
+
+### 2026-09-23 | surprise | re-review found the SAME defect class inside the fix; three-layer hardening
+
+The single bounded re-review of the revise loop. It confirmed the original finding was closed for its
+concrete instances, and found **two more, both verified live, both the same failure mode one level
+down**. Reproduced here before acting on either.
+
+**(a) The comment skip hid real emissions.** The scan skipped any line whose trimmed text began `#`,
+`//` or `*`. The `*` was meant for JSDoc continuations — but **in POSIX sh `*` is not a comment, it
+opens a `case` default arm**, and this repo emits real findings from them:
+`check-task-origin.sh:60` and `read-spec-rules.sh:50`. Seeding a one-space break at the first left the
+suite at **8 pass, 0 fail with its emission count unmoved at 98** — the scan could not see the line at
+all. L-186 recurring *inside the instrument written to close L-186*: the examined set narrowed by a
+shape nobody chose to exclude. Fixed by making the skip language-aware (`#` for shell; `//`, `*`,
+`/*` for TypeScript). Emission count moved 98 → **100**, which is the two recovered lines.
+
+**(b) The vacuity floor caught collapse but not scope-narrowing.** Changing `scanDirs` from
+`["scripts/lib", "evals/lib"]` to `["scripts/lib", "scripts/lib"]` — an ordinary copy-paste typo —
+scanned **58 files / 176 lines**, cleared the 25/40 floor comfortably, and reported a clean population
+while `evals/lib` went entirely unexamined. Fixed with **layer 2**: directories must be distinct and
+each must contribute its own minimum.
+
+**Layer 3, for the thing neither layer could see: is this the right SET of directories at all?** The
+two-directory scope was previously asserted in a comment. It is now derived — every `.sh`/`.ts` under
+`scripts/` and `evals/` must be either scanned or matched by a **named** out-of-scope rule, each rule
+carrying its reason, and anything fitting neither is reported by name.
+
+**Layer 3 fired on its first run and found 5 files nobody had classified**, which is precisely its
+purpose: the four `evals/assert-*.sh` night-run assertion scripts (checked: their selftests match on
+the FINDING NAME, never the column) and `layers-completeness-differential.ts` (checked: emits no FAIL
+line and is in no harness list). All five are genuinely out of scope — but nothing said so until a
+mechanism demanded it.
+
+**Re-proof, every seed verified to LAND before its verdict was read:**
+
+| defeat | result |
+|---|---|
+| case-arm seed `check-task-origin.sh:60` | 8 pass, **1 fail** — was silently missed before |
+| case-arm seed `read-spec-rules.sh:50` | 8 pass, **1 fail** |
+| scope defeat: duplicated directory | 8 pass, **1 fail** |
+| scope defeat: dropped a directory | 8 pass, **1 fail** |
+| clean tree | **9 pass, 0 fail** |
+
+**One near-miss in my own test harness, recorded because it is the trap this repo has filed twice.**
+The first `read-spec-rules.sh` seed reported 9 pass / 0 fail and I almost wrote it up as "still
+missed". The seed had **never applied**: it substituted `printf 'FAIL  %s`, and that line embeds its
+message in the format string rather than passing it through `%s`. An unapplied patch reports the suite
+green, which is indistinguishable from a suite that discriminates (L-137). Caught only by checking the
+seed's shape against the actual line — the `t()` helper verified *restoration* but not *landing*,
+which is exactly the half that matters.
