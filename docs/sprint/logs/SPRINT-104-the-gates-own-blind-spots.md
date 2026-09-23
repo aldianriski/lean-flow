@@ -636,3 +636,24 @@ declaration corrected per task, and the cost of declaring before the work is exa
 
 Caught by running the leg after the last commit rather than at close — which is the only reason it did
 not reach the close as a surprise.
+
+### 2026-09-23 | surprise | T3's `Layers:` was PRESENT and UNREADABLE — `*.ts|sh` matches nothing
+
+After T2's declaration was fixed, leg 15 reddened again on T3:
+`changed by a task that never declared it: T3:scripts/lib/check-layers-completeness.ts
+T3:scripts/lib/conformance-engine.sh`.
+
+Both files were, in intent, declared. T3's `Layers:` read `scripts/lib/*.ts|sh` — a shorthand a human
+reads instantly as "the .ts and .sh files under scripts/lib". `check-layers-observed.sh` reads it as a
+**single literal path token** and matches nothing, so T3 was carrying a declaration that covered zero
+files while looking complete to every reader but the one that counts.
+
+This is L-151, not L-100. T3 did not fail to declare its files; it declared them somewhere its
+consumer cannot reach — the same shape as a ruling filed in a commit message rather than the entry it
+governs. The tell is that the line is *more* readable to a person than the correct form, which is why
+nobody would have spotted it by reading.
+
+Split into two tokens, `scripts/lib/*.ts` and `scripts/lib/*.sh`, with the reason recorded inline so
+the next author does not re-compress it. **Worth a Retro check: any other sprint file using a
+`*.a|b` token carries the same silent hole**, and nothing currently reports it — the checker cannot
+distinguish "declared nothing" from "declared a path that happens to match nothing".

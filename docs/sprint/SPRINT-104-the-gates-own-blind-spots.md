@@ -85,7 +85,7 @@ chosen shape is recorded with its reasoning where the next maintainer reads it.
 - [x] Shared-file edits committed as reviewable diffs before being applied (D2)
 
 ### T3 — Give the gate's stale cost comments an expiry `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `scripts/qa-check.sh` (comments only) · `scripts/lib/*.ts|sh` (comments only) · `docs/research/logs/qa-gate-timing.md` (the Round it reconciles against)
+Layers: `scripts/qa-check.sh` (comments only) · `scripts/lib/*.ts` · `scripts/lib/*.sh` (both comments only — split from a single `*.ts|sh` token, which `check-layers-observed.sh` parses as one literal path and therefore matches nothing: the declaration was present and unreadable, L-151) · `docs/research/logs/qa-gate-timing.md` (the Round it reconciles against)
 Depends-on: T2 (it audits the comment surface T2 rewrites; auditing first would audit a file about to change)
 Cites: TASK-356 · Round 16 · Rounds 19–21 · L-130
 
