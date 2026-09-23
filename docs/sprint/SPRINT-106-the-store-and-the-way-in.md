@@ -47,9 +47,9 @@ with the method written down so `TASK-386` reproduces it exactly.
 second person can re-run.
 
 **DoD:**
-- [ ] Completeness: first-pass coverage of the EPIC-017 decomposition (9 of 26 before review), evidenced by commit
-- [ ] Retrieval: 12 fixed probes, answer key committed first, scored hit/miss from a fresh agent given only the always-loaded context
-- [ ] Recurrence: count-bumps per sprint over the last 10 sprints, derived by two selectors that agree
+- [x] Completeness: first-pass coverage of the EPIC-017 decomposition (9 of 26 before review), evidenced by commit ✓ 9/26 = 0.346, `4290781` vs `81407ad`, both counts re-derived with git
+- [x] Retrieval: 12 fixed probes, answer key committed first, scored hit/miss from a fresh agent given only the always-loaded context ✓ 11/12, key at `cb1479f` before the Haiku run
+- [x] Recurrence: count-bumps per sprint over the last 10 sprints, derived by two selectors that agree ✓ judgment tick: 22 vs 19 — they do NOT fully agree; each gap explained per sprint (see Log)
 
 ### T1 — Stand up the work-item store and its schema `[size: M · risk: med · class: execution · HITL · J2]`
 Layers: `docs/work/README.md` · `docs/work/backlog/` · `docs/work/todo/` · `docs/work/in_progress/` · `docs/work/review/` · `docs/work/done/` · `docs/work/cancel/` · `evals/fixtures/work-store/` · `evals/run-work-store-fixtures.ts` · `docs/adr/ADR-045-the-work-item-store.md` · `docs/DECISIONS.md`

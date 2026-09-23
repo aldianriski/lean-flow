@@ -68,3 +68,18 @@ since the dual-layout name contradicts the ruling it records.
 verify-reaches PASS (0 mechanical targets, 10 judgment clauses → RUNS/PROVES handled in the design) ·
 cap risk found: `skills/lean-doc-generator/SKILL.md` at 138/140, so T3/T4 add ≤ 3 lines inline and put
 detail in that skill's own `references/`.
+
+### 2026-09-24 | progress | T0 done — before-baseline frozen at `4136ded`
+`docs/research/epic-017-effectiveness.md`. **Completeness** 9/26 = 0.346 (`4290781` vs `81407ad`).
+**Retrieval** 11/12 — key committed first (`cb1479f`), answered blind by a fresh Haiku agent limited to
+`.claude/CLAUDE.md` + `.claude/CONTEXT.md`; the miss is R11 (where ADRs live), which neither file names.
+**Recurrence** 22 by the `seen:`-field selector vs 19 by git history of `count:` lines — the DoD said
+"two selectors that agree" and they **do not**; ticked as a judgment with the gaps explained (SPRINT-105:
+three new entries carry no `count:` field yet · SPRINT-101: a promoted entry uses prose "Count N" · SPRINT-102:
+one extra count-change commit under a plan-locked subject). Headline = 22.
+consequence · T0 · behaviour: none · governance: low (a research doc) → self-review only.
+**Coordinator slip, caught and repaired before commit:** a fill script's regex, written in a JS template
+literal, lost its escapes and matched the empty string at offset 0 — twelve result rows were glued onto
+the frontmatter's first line while the guard passed (it tested the same broken pattern). Restored with
+`git checkout`, verified `git hash-object` == `HEAD:` blob (`c0565dc`), refilled by exact-line match
+with an edit-count assertion (14). L-137's shape: the check agreed with the defect because both used it.

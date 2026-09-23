@@ -70,25 +70,24 @@ Always-loaded read set for the answerer: `.claude/CLAUDE.md` + `.claude/CONTEXT.
 
 ### Result (before)
 
-*(empty — coordinator fills after running a fresh agent against the 12 probes with only the
-always-loaded read set)*
+Answered 2026-09-24 by a fresh Haiku subagent restricted to reading `.claude/CLAUDE.md` + `.claude/CONTEXT.md`; key committed first at `cb1479f`.
 
 | # | Answer given | Hit/Miss |
 |---|---|---|
-| R1 | | |
-| R2 | | |
-| R3 | | |
-| R4 | | |
-| R5 | | |
-| R6 | | |
-| R7 | | |
-| R8 | | |
-| R9 | | |
-| R10 | | |
-| R11 | | |
-| R12 | | |
+| R1 | `TODO.md` | hit |
+| R2 | `TODO.md` | hit |
+| R3 | `docs/sprint/SPRINT-NNN-<slug>.md` | hit |
+| R4 | `docs/sprint/logs/SPRINT-NNN-<slug>.md` | hit |
+| R5 | `TECH-DEBT.md` | hit |
+| R6 | `docs/LEARNINGS.md` | hit |
+| R7 | `lean-doc-generator` (skill name = the key's directory) | hit |
+| R8 | `.claude/CLAUDE.md` § Definition of Done | hit |
+| R9 | `spec/STANDARD.md` | hit |
+| R10 | `docs/architecture/overview.md` § Directory structure | hit |
+| R11 | unknown | **miss** |
+| R12 | `.out-of-scope/` | hit |
 
-**Score: __ / 12**
+**Score: 11 / 12** — the one miss (R11, ADRs) is a location neither always-loaded file names. For TASK-386: R1/R2 keys are layout-dependent, so the after-run scores the same probes against the v2 locations (`docs/work/`).
 
 ## 3. Recurrence (before)
 
