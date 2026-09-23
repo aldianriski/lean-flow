@@ -56,7 +56,7 @@ that surfaces are fixed, and a seeded type error in each tree reddens the leg.
 - [x] Both surfaced errors fixed, and the leg reports a **true** clean — *Verify: the leg's own printed line, not its exit status (L-120)*
 - [ ] **Tier G bar**: seed a type error into one `scripts/lib/*.ts` and one `evals/*.ts`; each reddens the leg, a sibling control file stays green — *Verify: seed confirmed landed (targeted, parses, line count within one of pristine) and restored under ONE stated hash convention (L-137 · L-142 · L-169)*
 - [x] Fixture **retained**, not deleted with the proof (TD-012)
-- [ ] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
+- [x] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
 - [x] Edit to `scripts/qa-check.sh` committed as a reviewable diff before being applied (D2 · L-151)
 
 ### T2 — Route bootstrap failures through a shared emitter `[size: M · risk: med · class: decision · HITL · J2]`
@@ -81,7 +81,7 @@ chosen shape is recorded with its reasoning where the next maintainer reads it.
 - [x] **Consumer check (L-015)**: what an adopter of root `conformance.sh` observes after this change, stated explicitly — exit code and report text, in one line, or an explicit "nothing"
 - [x] **Tier G bar**: retained must-FAIL per rewritten emitter path with its **named** finding, sibling control green, seeded break verified landed and restored under ONE stated hash convention
 - [x] A **population** fixture, not only branch fixtures — one site reached by the other selection arm (L-186 · L-207)
-- [ ] Outside reviewer, worktree-isolated
+- [x] Outside reviewer, worktree-isolated
 - [x] Shared-file edits committed as reviewable diffs before being applied (D2)
 
 ### T3 — Give the gate's stale cost comments an expiry `[size: S · risk: low · class: execution · HITL · J1]`
