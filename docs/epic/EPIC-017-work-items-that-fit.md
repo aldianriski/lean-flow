@@ -101,7 +101,8 @@ mid-flight are five separable deliveries, each demonstrable alone.
    shape, and a skill that silently expects the new one turns a working install into a broken one.
    So: a **MAJOR** version, a migration that runs on a real repo before release, and — because a
    consumer with auto-update off will run **v1 skills against a v2 tree or the reverse** — every
-   skill **detects the layout it is given and says so**, rather than assuming. `/lean-doc-generator
+   2.x queue skill **detects a v1 tree and refuses it by name**, pointing at `migrate`, rather than
+   assuming or half-working (hard cut, D7 as amended 2026-09-23). `/lean-doc-generator
    migrate` already exists for exactly this shape of job ("re-runnable as an update sync — report
    deltas, never clobber") and is the home, not a new command.
 
@@ -162,14 +163,16 @@ cannot be hit by a container that never accumulates. Its status vocabulary
   repo because a reading filed only here is unreachable by the reader who needs it (L-151).
 - **D5** — Tooling is TypeScript on Bun. Recorded because the reference implementation is shell and
   would otherwise be copied by reflex.
-- **D7** — **`v2.0.0`, with dual-layout support for the whole of `2.x`.** MAJOR, because the change
-  is breaking and a consumer must be told by the number rather than by a broken install. But every
-  skill **detects** whether the repo it was handed has the v1 single-file layout or the v2 store,
-  works with both, and names which it found. Old-layout support is removed at `3.0.0`, not before.
-  *Why not a hard cut:* a consumer with auto-update **off** will run v1 skills against a v2 tree, or
-  v2 skills against a v1 tree, and neither direction may corrupt anything — that is the ordinary
-  state of an installed plugin, not an edge case. *Cost, accepted:* two read paths in every skill
-  that touches the queue, for the length of `2.x`. **Ruled 2026-09-21. → ADR.**
+- **D7** — **`v2.0.0` is a hard cut: v2-only.** MAJOR, because the change is breaking and a consumer
+  must be told by the number rather than by a broken install. A 2.x queue skill that finds the v1
+  single-file layout **refuses by name and points to `/lean-doc-generator migrate`**, which is the
+  only 2.x path that accepts a v1 tree. Upgrade sequence: install 2.x → restart the session →
+  `migrate` → resume. Neither direction may corrupt anything — Closed-when 9 still holds: an
+  installed 1.x writer against a migrated tree must work harmlessly or refuse cleanly (`TASK-372`).
+  **Ruled 2026-09-23 by the owner, superseding the 2026-09-21 ruling** (dual-layout support through
+  `2.x`, removed at `3.0.0`), because Closed-when 2 — `TODO.md` deleted, no executable reads it — cannot
+  coexist with v1 readers kept alive for a whole major (found by Codex review round 1). *Cost,
+  accepted:* no grace period; every consumer migrates before using 2.x queue skills. **→ ADR-046.**
 - **D8** — **The migration is proven on `workdoo`, on a branch**, before release. Not a synthetic
   fixture: a real consumer with 8 closed sprints, a 389-line `TODO.md` and a 533-line
   `TECH-DEBT.md`. Its gate must stay green after migrating, and the branch is retained as the
@@ -192,9 +195,11 @@ cannot be hit by a container that never accumulates. Its status vocabulary
 |---|---|---|---|
 | [SPRINT-106](../sprint/SPRINT-106-the-store-and-the-way-in.md) | The store, and the way in | active | — (at close) |
 
-**Coverage gap, found at the SPRINT-106 promote:** D7's layout detection and scope 7's migrate path
-are now `TASK-369` · `TASK-370`; D8's workdoo proof and the `2.0.0` release still have **no task** —
-decompose them (`/task-decomposer --epic EPIC-017`) before the next member sprint.
+**Task map (26 files in [`docs/work/`](../work/), decomposed 2026-09-23 after three Codex review
+rounds; the owner ruled the whole epic gates `2.0.0`).** Closed-when → owner: 1 → `TASK-361` ·
+2 → `TASK-380` (with `363` · `387` · `382` · `383` · `381`) · 3 → `TASK-384` · 4 → `TASK-364` + `384` ·
+5 → `TASK-360` · 6 → `TASK-365` + `385` · 7 → `TASK-374` + `386` · 8 → `TASK-373` · 9 → `TASK-372` ·
+10 → `TASK-371`. Loop and surface: `361` · `362` · `375` · `376` · `377` · `378` · `379`.
 
 ## Closed when
 

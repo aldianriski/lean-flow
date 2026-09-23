@@ -1,0 +1,40 @@
+---
+id: TASK-370
+title: "Carry an existing v1 repo onto the store with `/lean-doc-generator migrate`"
+epic: EPIC-017
+sprint: SPRINT-106
+priority: P1
+size: M
+risk: high
+autonomy: HITL
+class: execution
+tier: X
+authority: J2
+origin: manual
+state: ready
+depends-on: [TASK-369]
+---
+
+# TASK-370 — Carry an existing v1 repo onto the store with `/lean-doc-generator migrate`
+
+## Done when
+
+- [ ] `migrate` maps v1 Backlog → one file per task, plan → approve → apply, re-run report-only; id set equal both ways on a copy of this repo's Backlog; `TODO.md` left as a tombstone (deletion is TASK-363) whose stray v1 writes a v2 skill surfaces.
+- [ ] Verified on a copy of this repo: id sets equal both ways AND ticked-box count equal before/after, incl. an active-sprint fixture.
+- [ ] An interrupted run (killed mid-way) re-run to completion produces the same tree as an uninterrupted one — retained fixture.
+
+## Amended 2026-09-23
+
+- **Widened 2026-09-23 (hard cut + Codex r1 F10).** One run migrates the **whole** v1 queue: Backlog tasks AND the active sprint's Plan tasks — membership, ticked boxes, authority class and frozen references preserved; a task present in both Backlog and Plan becomes one file. Idempotent, and resumes an interrupted run. TODO.md becomes a tombstone.
+
+## Touches
+
+skills/lean-doc-generator/SKILL.md · skills/lean-doc-generator/references/migration-map.md
+
+## Assumes
+
+that installed 1.66.x skills read a tombstone as an empty Backlog. UNCONFIRMED
+
+## Tracker
+
+EPIC-017 scope 7 · D7 · D8 · SPRINT-106 T4
