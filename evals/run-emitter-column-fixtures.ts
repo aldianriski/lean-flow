@@ -25,6 +25,9 @@
 // silently endorsing a change that breaks the wrapper -- and a control that cannot fail is not a
 // control (L-142).
 import { spawnSync } from "node:child_process";
+import { copyFileSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { basename, join } from "node:path";
+import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -79,6 +82,24 @@ const CASES: readonly Case[] = [
     why: "OTHER SELECTION ARM: reached through a sourced function, not a script invocation",
   },
   {
+    name: "predicate-guard-conformance-engine",
+    arm: "1b (inline printf, predicate template, THE MOTIVATING ARTIFACT)",
+    cmd: "__isolated__",
+    args: ["scripts/lib/conformance-engine.sh"],
+    want: "two-space",
+    finding: "conformance: shared archive predicate not found",
+    why: "L-166: this is the literal file TD-157/SPRINT-100 T5 was filed against -- a guard not pointed at its own motivating case is an absent guard",
+  },
+  {
+    name: "predicate-guard-second-file",
+    arm: "1b (inline printf, predicate template)",
+    cmd: "__isolated__",
+    args: ["scripts/lib/check-verify-reaches.sh"],
+    want: "two-space",
+    finding: "verify reaches: shared archive predicate not found",
+    why: "nine files carry this template and the suite reached none of them before SPRINT-104 T2 review",
+  },
+  {
     name: "MUST-NOT-CATCH-excluded-inner-checker",
     arm: "control (deliberately excluded)",
     cmd: "sh",
@@ -93,7 +114,25 @@ let pass = 0;
 let fail = 0;
 
 for (const c of CASES) {
-  const r = spawnSync(c.cmd, [...c.args], { cwd: ROOT, encoding: "utf8" });
+  // __isolated__ fires a PREDICATE guard without touching the shipped tree: the guard resolves
+  // its dependency as $(dirname $0)/archive-path.sh, so copying the checker ALONE into an empty
+  // temp dir makes that path absent and the real file executes its real guard. No mocking, no
+  // re-implementation, and nothing in scripts/lib/ is moved or modified.
+  let r;
+  if (c.cmd === "__isolated__") {
+    const dir = mkdtempSync(join(tmpdir(), "emitcol-"));
+    try {
+      const target = c.args[0] ?? "";
+      const src = join(ROOT, target);
+      const dst = join(dir, basename(target));
+      copyFileSync(src, dst);
+      r = spawnSync("sh", [dst], { cwd: dir, encoding: "utf8" });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  } else {
+    r = spawnSync(c.cmd, [...c.args], { cwd: ROOT, encoding: "utf8" });
+  }
   const text = `${r.stdout ?? ""}${r.stderr ?? ""}`;
   const first = text.split(LF).map((l) => l.split(CR).join("")).find((l) => l.startsWith("FAIL")) ?? "";
 
@@ -116,5 +155,83 @@ for (const c of CASES) {
   }
 }
 
+// ---------------------------------------------------------------------------------------------
+// POPULATION SCAN -- added at SPRINT-104 T2 outside review.
+//
+// WHY THE CASES ABOVE WERE NOT ENOUGH, stated plainly because it is the whole lesson. Every case
+// above is a LIVE execution, which is the strongest evidence there is -- but live cases are
+// samples, and the first version of this suite sampled 2 of the 15 rewritten files, both carrying
+// the same message template. The other template -- 'shared archive predicate not found', 9 files,
+// including conformance-engine.sh, the literal artifact TD-157 was filed against -- had ZERO
+// coverage. An independent reviewer seeded a one-space break there and this suite reported
+// 5 pass, 0 fail. Fixtures discriminate a guard's BRANCHES; nothing above discriminated the SET
+// those branches run over (L-186), and the guard was not pointed at its own motivating case
+// (L-166). Live cases prove the mechanism; this scan proves the POPULATION.
+
+const EXCEPT_FILE = "scripts/lib/check-qa-budget-default.sh";   // inner checker, see its header
+const EXCEPT_SUBSTR = "FAIL fixture(";                            // harness report format
+
+function emitsOneSpace(line: string): boolean {
+  for (const q of [String.fromCharCode(34), String.fromCharCode(39), String.fromCharCode(96)]) {
+    let i = line.indexOf(q + "FAIL ");
+    while (i !== -1) {
+      const after = line.charAt(i + q.length + 5);
+      if (after !== " " && after !== "") return true;
+      i = line.indexOf(q + "FAIL ", i + 1);
+    }
+  }
+  return false;
+}
+
+const scanDirs = ["scripts/lib", "evals/lib"];
+const violations: string[] = [];
+let filesScanned = 0;
+let emitLines = 0;
+
+for (const d of scanDirs) {
+  for (const f of readdirSync(join(ROOT, d))) {
+    if (!f.endsWith(".sh") && !f.endsWith(".ts")) continue;
+    const rel = d + "/" + f;
+    filesScanned++;
+    const lines = readFileSync(join(ROOT, rel), "utf8").split(LF);
+    lines.forEach((line, idx) => {
+      const t = line.trim();
+      // Prose ABOUT a FAIL line is not an emission. This corpus documents its own formats -- the
+      // fatal() header three files away literally contains the words ONE-space FAIL -- so a scan
+      // that reads comments reports the documentation as a defect (L-108, which this scan hit on
+      // its first run).
+      if (t.startsWith("#") || t.startsWith("//") || t.startsWith("*")) return;
+      if (!line.includes("FAIL ")) return;
+      emitLines++;
+      if (rel === EXCEPT_FILE) return;
+      if (line.includes(EXCEPT_SUBSTR)) return;
+      if (emitsOneSpace(line)) violations.push(rel + ":" + (idx + 1));
+    });
+  }
+}
+
+// ANTI-VACUITY FLOOR. A scan that examined nothing reports zero violations and exits clean, which
+// is indistinguishable from a scan that examined everything (L-058). A broken glob, a renamed
+// directory or a changed extension would all present as success without these two floors.
+if (filesScanned < 25 || emitLines < 40) {
+  console.log(
+    `FAIL  emitter-column(POPULATION-vacuity): scanned only ${filesScanned} file(s) / ${emitLines} ` +
+      `emission line(s) -- below the floor (25/40). A scan that reaches nothing reports no ` +
+      `violations and looks identical to a clean one`,
+  );
+  fail++;
+} else if (violations.length > 0) {
+  console.log(
+    `FAIL  emitter-column(POPULATION): ${violations.length} site(s) still emit at a ONE-space FAIL ` +
+      `column and are not in the documented exception set: ${violations.join(", ")}`,
+  );
+  fail++;
+} else {
+  console.log(
+    `PASS  emitter-column(POPULATION): ${filesScanned} file(s), ${emitLines} emission line(s), 0 ` +
+      `undocumented one-space site(s)`,
+  );
+  pass++;
+}
 console.log(`emitter-column-fixtures: ${pass} pass, ${fail} fail`);
 process.exit(fail > 0 ? 1 : 0);

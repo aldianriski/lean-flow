@@ -474,3 +474,62 @@ emitter-column fixture still 5 pass / 0 fail.
 
 **Tier P (DoD 4), declared not inferred:** G1 plus a read-through. No discrimination proof is owed and
 this entry says so rather than leaving it ambiguous (ADR-029).
+
+### 2026-09-23 | surprise | outside review found the T2 fixture blind to its OWN motivating artifact
+
+Worktree-isolated outside reviewer dispatched per ADR-029 (ii). **One HIGH finding, verified live by
+the reviewer and then independently reproduced here before acting on it.**
+
+**The finding.** `run-emitter-column-fixtures.ts`'s five live cases sampled **2 of the 15 rewritten
+files**, both carrying the same message template ("repo root not found", 6 files). The other template
+— "shared archive predicate not found", **9 files** — had **ZERO** coverage, and that set includes
+`scripts/lib/conformance-engine.sh`, the literal artifact TD-157 / SPRINT-100 T5 was filed against and
+which this fixture's own header names. Seeding a one-space break there left the suite reporting
+**5 pass, 0 fail**. Reproduced here exactly before fixing.
+
+So: any of ~11 rewritten sites, **including the one the whole task exists for**, could have been
+reverted to one space and the gate would have stayed green. L-166 (a guard pointed at its own
+motivating case) and L-186 (the SET the branches run over) — both were loaded, quoted in the fixture's
+own header, and neither fired for the author. That is L-165's finding for the fourth time this
+session: the defect was found by an independent pass, never by recalling the rule.
+
+**The fix is structural, not two more samples.** Adding cases for the missing template would leave the
+same class of gap one file later. Two changes:
+
+1. **A POPULATION SCAN.** Enumerates every emission line in `scripts/lib` + `evals/lib` and requires
+   two-space, minus a *named* exception set (`check-qa-budget-default.sh`, and `FAIL fixture(` lines).
+   Complete by construction rather than by sampling.
+2. **Live cases for the uncovered template, including the motivating artifact.** Fired without touching
+   the shipped tree: the guard resolves its dependency as `$(dirname $0)/archive-path.sh`, so copying
+   the checker ALONE into an empty temp dir makes that path absent and **the real file executes its
+   real guard**. No mock, no re-implementation, nothing moved in `scripts/lib/`.
+
+**The scan hit L-108 on its first run** and the trap is recorded in its code: it flagged
+`harness-common.sh:19` — the `fatal()` header comment, which literally contains the words "ONE-space
+`FAIL `". A corpus that documents its own formats reports its documentation as a defect. Comment lines
+are now skipped, with that reason written at the line that skips them.
+
+**ANTI-VACUITY FLOOR, because a scan that reaches nothing is indistinguishable from a clean one
+(L-058).** The scan asserts it examined >= 25 files and >= 40 emission lines. Proven by seeding a
+broken extension filter: it reports `FAIL emitter-column(POPULATION-vacuity): scanned only 0 file(s)`
+rather than passing.
+
+**Re-proof after the fix — all four seeds now caught, each restored hash-verified, zero line delta:**
+
+| seed | before fix | after fix |
+|---|---|---|
+| `conformance-engine.sh` (the motivating artifact) | 5 pass, 0 fail — MISSED | 6 pass, **2 fail** |
+| `check-handoff-state.sh` (no live case exists for it) | 5 pass, 0 fail — MISSED | 7 pass, **1 fail** |
+| `check-verify-reaches.sh` | not covered | 6 pass, **2 fail** |
+| `harness-common.sh` `fatal()` | caught | 6 pass, **2 fail** |
+| extension filter broken (vacuity) | n/a | 7 pass, **1 fail** |
+
+`check-handoff-state.sh` is the row that proves the scan earns its place: it has no live case and is
+caught by population membership alone.
+
+**Claims the reviewer independently CONFIRMED correct** (useful, and recorded so they are not
+re-litigated): the 4 `check-qa-budget-default.sh` exclusions — they simulated the wrapper and got
+`FAIL` + three spaces, exactly as its header warns; the 4 `harness-common.sh` fixture-report
+exclusions; the 28-site enumeration for the two templates it covers; T1's fail-closed optional
+chaining; T1's two `TS18047` reproduced by reverting and re-running `tsc`; and that all 15 rewritten
+sites pass the message via `%s` so no `%`-injection is possible.
