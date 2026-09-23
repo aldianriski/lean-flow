@@ -99,10 +99,10 @@ the gate", retired by Round 16). Two found by accident says nothing about how ma
 against the latest Round or deleted, and the count examined is stated.
 
 **DoD:**
-- [ ] Candidate set derived by **two disagreeing routes** — a stale figure can be a duration, a rank, a count or a superlative, and only the last is greppable (L-198)
-- [ ] Every hit reconciled against the latest Round, corrected or deleted — *Verify: the count examined and the count changed are both stated; "no surviving comment contradicts the Round" is a claim about a set, so the set is named*
-- [ ] Comment-only confirmed — *Verify: the non-comment diff against pristine is empty, line-level (the check SPRINT-103 used for the same claim)*
-- [ ] Tier **P**: G1 plus a read-through; no discrimination proof is owed and this DoD says so rather than leaving it ambiguous (ADR-029)
+- [x] Candidate set derived by **two disagreeing routes** — a stale figure can be a duration, a rank, a count or a superlative, and only the last is greppable (L-198)
+- [x] Every hit reconciled against the latest Round, corrected or deleted — *Verify: the count examined and the count changed are both stated; "no surviving comment contradicts the Round" is a claim about a set, so the set is named*
+- [x] Comment-only confirmed — *Verify: the non-comment diff against pristine is empty, line-level (the check SPRINT-103 used for the same claim)*
+- [x] Tier **P**: G1 plus a read-through; no discrimination proof is owed and this DoD says so rather than leaving it ambiguous (ADR-029)
 
 ### T4 — Re-measure the gate total, then rule ADR-039's deferred opt-in `[size: S · risk: low · class: decision · HITL · J2]`
 Layers: `docs/research/logs/qa-gate-timing.md` (a new Round) · `scripts/qa-check.sh` (`eval_harnesses_optin`/`_excluded`, only if the ruling moves one) · `docs/adr/ADR-039-*.md` (annotation, if the ruling changes its standing)

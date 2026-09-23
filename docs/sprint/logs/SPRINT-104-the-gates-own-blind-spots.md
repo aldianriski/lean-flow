@@ -423,3 +423,54 @@ Wiring derived from the file, not asserted (L-020): entry 4 of the 40 in `eval_h
 leg 12 dispatches `*.ts` through `bun "$hp"`.
 
 T2 stands at 7 of 8 DoD. Only the worktree-isolated outside reviewer remains, blocked on host memory.
+
+### 2026-09-23 | progress | T3 — 94 cost/rank comments examined, 4 corrected, comment-only
+
+**Counts, both stated as the DoD requires: 94 examined, 4 corrected, 0 deleted.**
+
+**Two routes that disagree in kind (DoD 1 · L-198).** A stale figure can be a duration, a rank, a
+count or a superlative, and only the last is greppable as a word — so one selector cannot reach them:
+- **numeric** — comment lines carrying a duration or a count-with-unit → **81 hits / 12 files**
+- **lexical** — comment lines carrying a rank or superlative claim → **18 hits / 10 files**
+- overlap **5**; numeric-only **76**, lexical-only **13**; union **94**. Each route reaches a set the
+  other cannot: the lexical route alone finds 13 claims with no number in them, and the numeric route
+  finds 76 with no superlative. That is the disagreement the rule asks for, not an inverse partition.
+
+**Reconciled against Round 16 (the first per-leg profile over a COMPLETED run, 2026-09-20) and
+Rounds 19/21 (SPRINT-103's before/after).** Round 16's ranking: `run-sprint-family-fixtures.sh` 305 s
+(25%) · `run-layers-observed-fixtures.sh` 153 s · leg 2f-ter 139 s · `run-conformance-engine-fixtures.sh`
+98 s · `run-qa-budget-position-fixtures.sh` 66 s; top five **761 s, 63%**.
+
+**The 4 corrected, each given an expiry rather than deleted (the mechanism they describe is still true;
+only the numbers and ranks went stale):**
+1. `qa-check.sh:426` — leg 2f-ter "176.6s" (SPRINT-084). Round 16 puts it at **139 s, rank 3**.
+2. `qa-check.sh:672` — "271.5s … the single largest leg in the whole gate" (SPRINT-084). Round 16 does
+   not place this leg in the **top ten at all** (entry 10 is 30 s), and the largest item is
+   `sprint-family` at 305 s. Both the figure and the superlative are refuted.
+3. `conformance-engine.sh:8` — "single largest cost centre — 542 s, 71% of Round 16's top five". The
+   arithmetic is right *for Round 16* (305+139+98 = 542, /761 = 71%), but its largest component is
+   `sprint-family`, which **SPRINT-103 T1 then cut 341.0 → 149.8 s median** (Round 19, non-overlapping
+   ranges). The share overstates the engine as it stands, so it now expires at the next total.
+4. `check-layers-completeness.ts:6` — "the slowest harness in the gate". **Refuted by Round 16, which
+   names this exact mistake as its own costliest finding**: TASK-355's targets came from TD-090's
+   harness timings, which nominated `layers-completeness`; the real top three were `sprint-family`,
+   `layers-observed` and the conformance sweep, and none was on that list. The ~55-70 s cost is real
+   and still justifies the port — **the RANK was never measured.** Reworded to drop the superlative.
+
+The sprint's § Theme said two instances had been "corrected by accident in SPRINT-103". One had
+(`qa-check.sh:1218`, which carries an `UPDATED SPRINT-103 T1` expiry). **The other had not** —
+`check-layers-completeness.ts:6` was still asserting the superlative, which is item 4 above. Two found
+by accident said nothing about how many exist, exactly as the Theme predicted.
+
+**Not corrected, and why:** `qa-check.sh:1022` ("leg 12 is the gate's dominant cost") is confirmed by
+Round 16, whose top ten is almost entirely leg-12 harnesses. The per-harness table at
+`qa-check.sh:1163-1167` is dated 2026-09-21, already carries a re-measure caveat naming SPRINT-104 T4,
+and is current. The remaining lexical hits ("dominant term", "dominant convention", "majority of the
+machinery") are claims about algorithms and conventions, not about gate cost, and are out of scope.
+
+**Comment-only confirmed line-level (DoD 3):** comments stripped from both pristine and current, the
+remaining lines compared — **identical in all three files**. Shell parses, `tsc` clean, and T2's
+emitter-column fixture still 5 pass / 0 fail.
+
+**Tier P (DoD 4), declared not inferred:** G1 plus a read-through. No discrimination proof is owed and
+this entry says so rather than leaving it ambiguous (ADR-029).

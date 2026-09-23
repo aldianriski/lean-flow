@@ -424,6 +424,8 @@ qb_checkpoint "leg 2f-ter: conformance engine sweep"
 # of this one run rather than invoking the engine again. See 2f-bis above for why that migration
 # happened at all. Covered by evals/run-attestation-fixtures.sh, repointed at the engine.
 # --- TD-084 profiling (SPRINT-084 T1): this leg's own informational sweep measured at 176.6s on
+# EXPIRED -- SUPERSEDED BY ROUND 16 (2026-09-20), which put leg 2f-ter at 139 s, rank 3, 11% of
+# the gate. Re-derive before acting on the figure below; SPRINT-104 T4 owns the next total.
 # this host -- the engine dispatching ~90 still-mostly-`rule-unimplemented` rules against the whole
 # real repo, for a report almost none of which (per the comment above) enters this gate's own tally.
 # Only S9.GATESWELLFORMED/GATESABSENT and §13's five rules are folded in below; the rest is read, not
@@ -671,7 +673,13 @@ qb_checkpoint "leg 4: knowledge metadata / corpus walk"
 #
 # TD-084 profiling (SPRINT-084 T1): this leg measured at 271.5s on this host, the single largest leg
 # in the whole gate -- bigger than the conformance-engine's own informational sweep (leg 2f-ter,
-# 176.6s). 97.6s of it was `gen-index.sh --check` (fixed separately, see that file -- now ~18s); the
+# 176.6s).
+# EXPIRED -- BOTH THE FIGURE AND THE RANK ARE SUPERSEDED BY ROUND 16 (2026-09-20). That profile is
+# the first over a COMPLETED run and it does not place this leg in the top ten at all (entry 10 is
+# 30 s); the largest single item is run-sprint-family-fixtures.sh at 305 s, and leg 2f-ter is 139 s,
+# not 176.6 s. The 271.5 s above predates the gen-index fix noted in the next sentence. Kept for the
+# MECHANISM it describes, which is still accurate; do not read the numbers or the superlative as
+# current. SPRINT-104 T4 owns the next total (L-130). 97.6s of it was `gen-index.sh --check` (fixed separately, see that file -- now ~18s); the
 # rest was THIS leg's own per-item process spawns: one `grep` per L-NNN heading (143) plus a `sed` per
 # shape match, one `grep -qx` per learnings ref (~100) against the id universe, and per corpus file
 # (~79) up to five spawns (`fmv` x4 + a reftoks `awk`). None of those loops does per-item WORK that

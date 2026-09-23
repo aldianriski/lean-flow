@@ -3,8 +3,15 @@
 //
 // WHY THIS EXISTS, AND WHAT IT IS NOT. The shell checker is correct; its cost is Windows fork()
 // emulation -- ~40 subprocess spawns (grep/sort/tr/sed/awk) per task block, which is what makes
-// evals/run-layers-completeness-fixtures.sh the slowest harness in the gate (measured ~55-70s for
-// only 10 distinct argument sets). This file is a PORT, not a rewrite: every branch, every regex,
+// evals/run-layers-completeness-fixtures.sh expensive for what it covers (measured ~55-70s for
+// only 10 distinct argument sets).
+// CORRECTED SPRINT-104 T3: this line read "the slowest harness in the gate", which Round 16
+// (2026-09-20) refutes -- that profile is the first over a completed run and puts
+// run-sprint-family-fixtures.sh first at 305 s, while layers-completeness does not appear in the
+// top TWENTY. Round 16 names this exact mistake as its own costliest finding: TASK-355's targets
+// were chosen from TD-090's harness timings, which nominated layers-completeness, and the real top
+// three were sprint-family, layers-observed and the conformance sweep -- none of them on that list.
+// The ~55-70s cost is real and still justifies this port; the RANK was never measured. This file is a PORT, not a rewrite: every branch, every regex,
 // every message string is copied from the shell oracle's actual behaviour (not its header comment,
 // which is stale in one place -- see "the status: red herring" note below), because this is a Tier G
 // guard and a "cleaner" reimplementation is exactly how a false negative gets introduced silently.

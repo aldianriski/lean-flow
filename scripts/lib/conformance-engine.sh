@@ -6,7 +6,13 @@
 #
 # --- PERFORMANCE: read ADR-043 before optimising this file (SPRINT-103 T3) ----------------------
 # This engine is the QA gate's single largest cost centre -- 542 s, 71% of Round 16's measured
-# top five, across three call sites. Measured (qa-gate-timing.md Rounds 17-18): against an EMPTY
+# top five, across three call sites.
+# EXPIRES AT THE NEXT TOTAL: the 542 s is Round 16 (2026-09-20) and its largest component was
+# run-sprint-family-fixtures.sh at 305 s. SPRINT-103 T1 then cut that harness's engine work by
+# handing it a reduced spec -- Round 19 measured 341.0 -> 149.8 s median, ranges non-overlapping.
+# The share above therefore overstates the engine as it stands today. The MECHANISM below (per-rule
+# dispatch, kernel-bound fork emulation) is unchanged and is the part to act on; re-derive the
+# share against the next completed profile before citing it (SPRINT-104 T4 owns that; L-130). Measured (qa-gate-timing.md Rounds 17-18): against an EMPTY
 # directory it costs 2.93 s at 100 rules and 0.35 s at 0 -- ~26 ms per rule of dispatch paid
 # whether or not anything is checked; against THIS repo, 173.1 s real / 53.8 user / 81.1 sys, of
 # which fixed dispatch is 1.7%. 60% of CPU time in the kernel means this shells out per file per
