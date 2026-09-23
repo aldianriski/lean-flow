@@ -51,3 +51,20 @@ Codex in three adversarial rounds, found the locked Plan wrong in three places:
 
 **Re-confirm G2:** yes — T3's design changed from dual support to refusal, and T0 is new. G1/G2 are
 signed together at the start of `/orchestrator`.
+
+### 2026-09-23 | scope-change | G1 + G2 signed by the owner; Plan amended to match the signed design
+**Signed:** batch G1 + G2 over T0–T4, recorded as `gates_signed: G1,G2 @ 81407ad`. Design:
+`/orchestrator sprint-bulk` G2 pass (plan file `witty-chasing-gem.md`). Owner rulings at this G2:
+**D6 = `git mv`, in a commit of its own** (content edits never share it) · **T0 measures** = first-pass
+decomposition coverage, a 12-probe retrieval set scored by a fresh agent against a key committed first,
+and learning count-bumps per sprint over 10 sprints · **execution** = one Sonnet subagent per task,
+sequential, with an owner review stop after every task (all J2 ⇒ HITL).
+**Plan amendments (precedent `7524c6a`):** T0 block added to § Plan so the preflight and checkers see it;
+T1 now depends on T0; `Layers:` += `evals/run-work-store-fixtures.ts` (T1 → T2, owner T1) ·
+`evals/run-layout-fixtures.ts` (T3) · `evals/run-v1-to-v2-fixtures.ts` · `README.md` · `CHANGELOG.md` (T4,
+whose DoD already named the last two); ADR-046's path is now `docs/adr/ADR-046-the-2-0-hard-cut.md`,
+since the dual-layout name contradicts the ruling it records.
+**Pre-screens:** preflight CLEAR (waves T1→T2→T3→T4, five shared files each single-owned) ·
+verify-reaches PASS (0 mechanical targets, 10 judgment clauses → RUNS/PROVES handled in the design) ·
+cap risk found: `skills/lean-doc-generator/SKILL.md` at 138/140, so T3/T4 add ≤ 3 lines inline and put
+detail in that skill's own `references/`.

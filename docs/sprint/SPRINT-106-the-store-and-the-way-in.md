@@ -6,6 +6,7 @@ owner: Maintainer
 last_updated: 2026-09-23
 status: active
 plan_commit: 4290781
+gates_signed: G1,G2 @ 81407ad
 close_commit: [sha — set at close]
 update_trigger: sprint execute/close events
 ---
@@ -34,9 +35,25 @@ the ledgers (`TECH-DEBT.md`, `docs/LEARNINGS.md`) — ruled single-file by the e
 
 ## Plan
 
-### T1 — Stand up the work-item store and its schema `[size: M · risk: med · class: execution · HITL · J2]`
-Layers: `docs/work/README.md` · `docs/work/backlog/` · `docs/work/todo/` · `docs/work/in_progress/` · `docs/work/review/` · `docs/work/done/` · `docs/work/cancel/` · `evals/fixtures/work-store/` · `docs/adr/ADR-045-the-work-item-store.md` · `docs/DECISIONS.md`
+### T0 — Freeze the "before" effectiveness baseline `[size: S · risk: med · class: execution · HITL · J1]`
+Layers: `docs/research/epic-017-effectiveness.md`
 Depends-on: none
+Cites: `TASK-374` · `EPIC-017` Closed-when 7 · `docs/LEARNINGS.md`
+
+Added at G2 by logged scope-change. Three mechanical measures taken at HEAD before the store's first commit,
+with the method written down so `TASK-386` reproduces it exactly.
+
+**Acceptance:** the research doc holds three dated before-figures at a named commit and a method a
+second person can re-run.
+
+**DoD:**
+- [ ] Completeness: first-pass coverage of the EPIC-017 decomposition (9 of 26 before review), evidenced by commit
+- [ ] Retrieval: 12 fixed probes, answer key committed first, scored hit/miss from a fresh agent given only the always-loaded context
+- [ ] Recurrence: count-bumps per sprint over the last 10 sprints, derived by two selectors that agree
+
+### T1 — Stand up the work-item store and its schema `[size: M · risk: med · class: execution · HITL · J2]`
+Layers: `docs/work/README.md` · `docs/work/backlog/` · `docs/work/todo/` · `docs/work/in_progress/` · `docs/work/review/` · `docs/work/done/` · `docs/work/cancel/` · `evals/fixtures/work-store/` · `evals/run-work-store-fixtures.ts` · `docs/adr/ADR-045-the-work-item-store.md` · `docs/DECISIONS.md`
+Depends-on: T0
 Cites: `TASK-359` · `EPIC-017` D1 · D5 · D6 · kerjaan (model only) · `TASK-NNN-kebab-slug.md` (a naming pattern, not a file)
 
 The dependency root of the epic. Six status folders, one file per task named
@@ -57,7 +74,7 @@ schema doc answers "where does status / title / sprint / epic live?" in one plac
 - [ ] `ADR-045` indexed in `docs/DECISIONS.md` — *Verify: the row resolves to the file*
 
 ### T2 — Make membership frontmatter and sprint progress derived `[size: M · risk: med · class: execution · HITL · J2]`
-Layers: `docs/work/README.md` · `skills/lean-doc-generator/templates/SPRINT.md.template` · `skills/prime/SKILL.md` · `evals/fixtures/work-store/`
+Layers: `docs/work/README.md` · `skills/lean-doc-generator/templates/SPRINT.md.template` · `skills/prime/SKILL.md` · `evals/fixtures/work-store/` · `evals/run-work-store-fixtures.ts`
 Depends-on: T1
 Cites: `TASK-360` · `EPIC-017` D1 · D2
 
@@ -79,7 +96,7 @@ and "what is in `review/` across all sprints?" is one glob.
       not the verdict — L-186)
 
 ### T3 — Make every queue-touching skill detect and name its layout `[size: M · risk: high · class: decision · HITL · J2]`
-Layers: `skills/prime/SKILL.md` · `skills/triage/SKILL.md` · `skills/task-decomposer/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/orchestrator/SKILL.md` · `skills/handoff/SKILL.md` · `skills/flow/SKILL.md` · `evals/fixtures/layout/` · `docs/adr/ADR-046-dual-layout-for-2x.md` · `docs/DECISIONS.md`
+Layers: `skills/prime/SKILL.md` · `skills/triage/SKILL.md` · `skills/task-decomposer/SKILL.md` · `skills/lean-doc-generator/SKILL.md` · `skills/orchestrator/SKILL.md` · `skills/handoff/SKILL.md` · `skills/flow/SKILL.md` · `evals/fixtures/layout/` · `evals/run-layout-fixtures.ts` · `docs/adr/ADR-046-the-2-0-hard-cut.md` · `docs/DECISIONS.md`
 Depends-on: T1 · T2
 Cites: `TASK-369` · `EPIC-017` D7 · L-015 · L-016 · ADR-006 · `TODO.md` (read, never written) · `2.x`
 
@@ -99,11 +116,11 @@ it found and either works or refuses by name — none writes a second copy of a 
       must be **refused** by name
 - [ ] Exercised once on real input: `/prime` against this repo (v1) names `v1` — *Verify: its output*
 - [ ] Every touched SKILL.md stays ≤ ~140 lines — *Verify: `wc -l`*
-- [ ] `docs/adr/ADR-046-dual-layout-for-2x.md` written (D7: MAJOR, dual support through `2.x`,
+- [ ] `docs/adr/ADR-046-the-2-0-hard-cut.md` written (D7: MAJOR, dual support through `2.x`,
       removed at `3.0.0`; the cost of two read paths accepted) and indexed
 
 ### T4 — Carry an existing v1 repo across with `/lean-doc-generator migrate` `[size: M · risk: high · class: execution · HITL · J2]`
-Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/migration-map.md` · `evals/fixtures/v1-to-v2/`
+Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/migration-map.md` · `evals/fixtures/v1-to-v2/` · `evals/run-v1-to-v2-fixtures.ts` · `README.md` · `CHANGELOG.md`
 Depends-on: T1 · T2 · T3
 Cites: `TASK-370` · `EPIC-017` scope 7 · D7 · D8 · L-007 · L-016 · `TODO.md` (a copy is migrated; this repo's file is untouched)
 
