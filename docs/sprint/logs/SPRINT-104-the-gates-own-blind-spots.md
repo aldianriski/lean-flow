@@ -226,3 +226,51 @@ Wiring it requires adding a wrapper and registering it in `scripts/qa-check.sh` 
 T1's DoD 7 (`the qa-check.sh edit goes through D2's diff-then-apply`) applicable again, reversing the
 `[~] n/a` ruling taken earlier today. That is an owner call, not a silent correction, and is where
 T1 stands.
+
+### 2026-09-23 | progress | T1 DoD 5 wiring corrected, DoD 7 un-ruled and genuinely satisfied
+
+Owner ruled: wire the fixture into the gate, reversing the `[~] n/a` on DoD 7.
+
+`evals/run-typecheck-population-fixtures.ts` added and registered in `eval_harnesses_always`.
+Thin by design — it spawns the `.test.ts` rather than restating its assertions, so the two cannot
+drift — and it carries a **test-COUNT floor** (>= 7), because `bun test` exits 0 on a file with zero
+live tests and an exit-code-only wrapper would report PASS over a suite whose cases had been deleted.
+That is the same reasoning `run-authority-fixtures.sh` records for its own floor (L-058).
+
+Findings emitted at the **two-space** column, not one: a one-space `FAIL ` is invisible to a
+column-keyed selector and has already left `sweep_gate` returning rc=0 on a crashed engine (TD-157 —
+this sprint's own T2).
+
+**Both failure branches proven to fire, not just the happy path.**
+- *red suite*: seeded the pre-fix tsconfig (hash `5ad9f2b8…`, byte-identical to the real pre-fix
+  blob) → `FAIL  typecheck-population: the population fixture suite is red (bun test exit 1)`, harness
+  exit 1. Restored, verified.
+- *count floor*: seeded `MIN_CASES = 7` → `99` (delta 0 lines — a targeted value change, not a
+  demolition) → `FAIL  typecheck-population: only 7 case(s) ran, floor is 99`, harness exit 1.
+- *control*: with both restored, harness green again.
+
+**A near-miss worth the ink.** The count-floor seed was restored with `git checkout --`, which failed
+silently-ish (`pathspec ... did not match any file(s)`) because the harness was still **untracked** —
+so the seeded `MIN_CASES = 99` stayed live through what looked like a restore. It was caught by the
+**sibling control run placed after the restore**, which came back `0 pass, 1 fail` instead of green.
+The rule this generalises to: the restore mechanism must be chosen for the file's *tracked state*
+(`git checkout --` for tracked, a pristine `cp` for untracked — the latter works for both), and a
+control run belongs **after** restoration, not only after seeding. Recording the pristine hash before
+seeding is what made the failure legible (L-137 · L-142).
+
+**Placement.** Inserted 3rd in a list that is ordered cheapest-first and load-bearing (SPRINT-105 T3):
+measured **2.0s** standalone. Exact position within the cheap cluster is approximate — the per-harness
+costs it would be ranked against are a 2026-09-21 snapshot and SPRINT-104 T4 owns the re-measure
+(L-130). Placing it early is right for 2.0s regardless of its exact neighbours.
+
+**Wiring derived from the file, not asserted (L-020).** Leg 12 dispatches `*.ts` through `bun "$hp"`,
+and the harness is entry 3 of the 39 in `eval_harnesses_always`. What is NOT yet observed is the
+gate printing its PASS line in a real run — that needs a full gate run, which this host has failed to
+complete twice. The claim here is membership-plus-dispatch, and it is stated at that strength.
+
+**Commit shape.** D2 asks for a reviewable diff before application; its mechanism (worktree branch →
+coordinator merge) presupposes the parallel dispatch the owner's memory ruling removed. In a single
+tree, harness and registration land in ONE commit on purpose: splitting them would leave a
+transiently-red commit, because an unregistered `evals/run-*.ts` fails the registration guard at
+qa-check.sh:1333. The `qa-check.sh` change is a single line and was displayed for review before
+landing. Stated rather than silently reinterpreted.

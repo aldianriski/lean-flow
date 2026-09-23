@@ -57,7 +57,7 @@ that surfaces are fixed, and a seeded type error in each tree reddens the leg.
 - [ ] **Tier G bar**: seed a type error into one `scripts/lib/*.ts` and one `evals/*.ts`; each reddens the leg, a sibling control file stays green — *Verify: seed confirmed landed (targeted, parses, line count within one of pristine) and restored under ONE stated hash convention (L-137 · L-142 · L-169)*
 - [x] Fixture **retained**, not deleted with the proof (TD-012)
 - [ ] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
-- [~] Edit to `scripts/qa-check.sh` committed as a reviewable diff before being applied (D2 · L-151)
+- [x] Edit to `scripts/qa-check.sh` committed as a reviewable diff before being applied (D2 · L-151)
 
 ### T2 — Route bootstrap failures through a shared emitter `[size: M · risk: med · class: decision · HITL · J2]`
 Layers: `evals/lib/harness-common.sh` · `scripts/lib/check-*.sh` (the sites T2's own derivation names) · `scripts/lib/conformance-engine.sh` (**consumer-facing, ADR-027 — see D5**) · `scripts/qa-check.sh` (per D2)
