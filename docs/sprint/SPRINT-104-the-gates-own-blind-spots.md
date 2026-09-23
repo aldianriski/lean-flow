@@ -75,7 +75,7 @@ own setup completes. `J2` because that choice binds every checker and one of the
 chosen shape is recorded with its reasoning where the next maintainer reads it.
 
 **DoD:**
-- [ ] The site set re-derived by **two disagreeing selection rules**, not by inheriting TD-157's `27 sites / 15 files` — *Verify: both routes state a count and they agree; a shared selector shape in both is not a cross-check (L-198)*
+- [x] The site set re-derived by **two disagreeing selection rules**, not by inheriting TD-157's `27 sites / 15 files` — *Verify: both routes state a count and they agree; a shared selector shape in both is not a cross-check (L-198)*
 - [ ] Owner ruling on the shape recorded **at the code**, not only in the ledger (L-151)
 - [ ] Every rewritten site is a genuine bootstrap failure, checked per site — *Verify: the assumption A2 names is discharged site by site, and any site that is a finding rather than a bootstrap failure is named and left alone*
 - [ ] **Consumer check (L-015)**: what an adopter of root `conformance.sh` observes after this change, stated explicitly — exit code and report text, in one line, or an explicit "nothing"
