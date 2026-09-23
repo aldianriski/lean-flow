@@ -583,3 +583,43 @@ message in the format string rather than passing it through `%s`. An unapplied p
 green, which is indistinguishable from a suite that discriminates (L-137). Caught only by checking the
 seed's shape against the actual line — the `t()` helper verified *restoration* but not *landing*,
 which is exactly the half that matters.
+
+### 2026-09-23 | progress | T1 DoD 4 COMPLETE — the evals arm observed at last, on a third attempt
+
+The `evals` arm of the Tier G seeded-break proof, open since the first session hour and blocked three
+times by host memory. Obtained on the third attempt, and the evidence is sound despite the run dying.
+
+Seed: `evals/qa-verdict.test.ts`, `0b89e9df…` → seeded, **+1 line**, verified to LAND before the run
+started (hash moved, and `tsc` was confirmed to name the file). The leg's **own printed line**:
+
+```
+FAIL  typecheck: tsc --noEmit exited 1 with 1 error(s) -- first:
+      evals/qa-verdict.test.ts(257,7): error TS2322: Type 'string' is not assignable to type 'number'.
+```
+
+Sibling control: the line names **no** `scripts/lib` file — the other tree stayed green.
+
+**Why a killed run still carries the claim.** The harness stopped the gate for critical low memory
+after 304 lines of output, inside leg 12's harness loop (last two lines: `run-foreign-repo-fixtures.sh`,
+`run-dispatch-preflight-fixtures.sh`). The typecheck leg runs **before** leg 12 by deliberate design
+(qa-check.sh:1022 — "a type error should surface in ~0.2s rather than after five minutes of eval
+harnesses"), so it had already executed and printed its verdict. The kill is downstream of the
+evidence. What the killed run cannot support is a claim about the gate's TOTAL or its final verdict —
+and no such claim is made here; that is T4's subject and T4 is parked.
+
+**The seed was restored as the FIRST action on the kill**, not as later cleanup: back to `0b89e9df…`,
+byte-identical to HEAD under the stated convention, `grep -rn "__seed_type_error"` over `scripts evals
+apps packages test` returning nothing, `tsc` clean, working tree clean. This is the third time this
+session a kill has left a seeded break live in a shipped file and the third time restoration came
+first (L-137).
+
+**DoD 4 now rests on both arms, each observed rather than inferred:**
+- `scripts/lib` arm — `FAIL typecheck: … scripts/lib/check-prose-density.ts(262,7) TS2322`, control
+  `check-authority.ts` named 0 times, complete 547 s run
+- `evals` arm — the line above, no `scripts/lib` control named
+
+Both seeds: landed (hash-verified), targeted (+1 line, a genuine TYPE error rather than a syntax
+demolition), restored byte-identical under ONE stated convention (`git hash-object <path>` against
+`git rev-parse HEAD:<path>`).
+
+**T1 is complete at 7 of 7.**

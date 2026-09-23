@@ -54,7 +54,7 @@ that surfaces are fixed, and a seeded type error in each tree reddens the leg.
 - [x] Blast radius re-derived before any edit — *Verify: a probe config over `scripts/**` + `evals/**` prints its error count and file list; the promote measured **2**, both `TS18047` in `qa-verdict.ts` (147,5 · 151,5), and a different number is a scope-change, not a surprise to absorb (L-130)*
 - [x] The leg's program contains both trees — *Verify: `tsc --noEmit --listFiles | grep -c` returns ≥ 1 for a named `scripts/lib/*.ts` **and** for a named `evals/*.ts`. An exit code of 0 says nothing about which files were in the program — that is exactly how this was missed (L-136)*
 - [x] Both surfaced errors fixed, and the leg reports a **true** clean — *Verify: the leg's own printed line, not its exit status (L-120)*
-- [ ] **Tier G bar**: seed a type error into one `scripts/lib/*.ts` and one `evals/*.ts`; each reddens the leg, a sibling control file stays green — *Verify: seed confirmed landed (targeted, parses, line count within one of pristine) and restored under ONE stated hash convention (L-137 · L-142 · L-169)*
+- [x] **Tier G bar**: seed a type error into one `scripts/lib/*.ts` and one `evals/*.ts`; each reddens the leg, a sibling control file stays green — *Verify: seed confirmed landed (targeted, parses, line count within one of pristine) and restored under ONE stated hash convention (L-137 · L-142 · L-169)*
 - [x] Fixture **retained**, not deleted with the proof (TD-012)
 - [x] Outside reviewer dispatched worktree-isolated (ADR-029 ii · L-165 · L-168)
 - [x] Edit to `scripts/qa-check.sh` committed as a reviewable diff before being applied (D2 · L-151)
