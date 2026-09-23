@@ -623,3 +623,16 @@ demolition), restored byte-identical under ONE stated convention (`git hash-obje
 `git rev-parse HEAD:<path>`).
 
 **T1 is complete at 7 of 7.**
+
+### 2026-09-23 | progress | T2 `Layers:` corrected mid-sprint — the fixture the DoD invented
+
+Leg 15 went red after T2's fixture work: `changed by a task that never declared it:
+T2:evals/run-emitter-column-fixtures.ts`. Declared rather than defended.
+
+This is L-100's expected case, not a scope change. T2's `Layers:` was written at promote and named
+the emitter sites it would rewrite; the **retained fixture** that DoD 5 and 6 require did not exist as
+a path until the work was done, so no prediction could have contained it. A `Layers:` is a live
+declaration corrected per task, and the cost of declaring before the work is exactly this edit.
+
+Caught by running the leg after the last commit rather than at close — which is the only reason it did
+not reach the close as a surprise.

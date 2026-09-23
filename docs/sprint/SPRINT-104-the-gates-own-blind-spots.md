@@ -60,7 +60,7 @@ that surfaces are fixed, and a seeded type error in each tree reddens the leg.
 - [x] Edit to `scripts/qa-check.sh` committed as a reviewable diff before being applied (D2 · L-151)
 
 ### T2 — Route bootstrap failures through a shared emitter `[size: M · risk: med · class: decision · HITL · J2]`
-Layers: `evals/lib/harness-common.sh` · `scripts/lib/check-*.sh` (the sites T2's own derivation names) · `scripts/lib/conformance-engine.sh` (**consumer-facing, ADR-027 — see D5**) · `scripts/qa-check.sh` (per D2)
+Layers: `evals/lib/harness-common.sh` · `scripts/lib/check-*.sh` (the sites T2's own derivation names) · `scripts/lib/conformance-engine.sh` (**consumer-facing, ADR-027 — see D5**) · `scripts/qa-check.sh` (per D2) · `evals/run-emitter-column-fixtures.ts` (added mid-sprint — the retained Tier G fixture DoD 5/6 require; a `Layers:` written at promote cannot name a file the implementation invents, L-100)
 Depends-on: none
 Cites: TD-157 · L-186 · L-198 · L-108 · ADR-027 · ADR-043
 
