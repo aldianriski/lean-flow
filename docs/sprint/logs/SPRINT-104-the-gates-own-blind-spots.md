@@ -657,3 +657,40 @@ Split into two tokens, `scripts/lib/*.ts` and `scripts/lib/*.sh`, with the reaso
 the next author does not re-compress it. **Worth a Retro check: any other sprint file using a
 `*.a|b` token carries the same silent hole**, and nothing currently reports it — the checker cannot
 distinguish "declared nothing" from "declared a path that happens to match nothing".
+
+### 2026-09-23 | surprise | the real cause: `Layers:` supports NO globs, and both T2 and T3 relied on one
+
+Correction to the two entries above — the first diagnosis was wrong twice before it was right, and the
+wrong versions are worth keeping because each looked correct.
+
+`check-layers-observed.sh`'s `covers()` matches a declared token in exactly two ways: an **exact path**,
+or a token ending in `/` treated as a **directory prefix**. It supports **no glob syntax whatsoever**.
+
+So:
+- T3's `scripts/lib/*.ts|sh` matched nothing. First diagnosis: "the `|` makes it one literal token."
+  **Wrong** — splitting it into `*.ts` and `*.sh` still matched nothing, because the `*` is the problem,
+  not the `|`.
+- T2's `scripts/lib/check-*.sh` matched nothing either, for the same reason — and it would have missed
+  `check-epic-archive.ts` even if globs had worked, since the token names `.sh`.
+
+**Both tasks carried declarations covering ZERO of the files they changed**, while reading as complete
+and specific to any human. Fourteen files were undeclared and the Plan looked fully declared.
+
+**The sequence is the lesson, not the fix.** I corrected T2's one obviously-invented file, re-ran, got
+T3; corrected T3's token on a wrong theory, re-ran, got T2 again with a different file. Three rounds of
+one-at-a-time before enumerating the complete set — which returned 14 files in a single query and took
+one edit. That is the sampling-instead-of-population failure this entire sprint is about, committed by
+the person writing the sprint about it, in the sprint's own Plan file, four hours after deriving a
+28-site population by two disagreeing selectors specifically to avoid it.
+
+**Resolved by enumeration, not by widening.** Every file named exactly. Declaring `scripts/lib/`
+instead would have been one token and is what the checker's directory-prefix arm invites — but its own
+header records a directory token "swallowing every undeclared file beneath it", which is precisely the
+blindness under repair here.
+
+**For the Retro, and it is bigger than this sprint:** nothing distinguishes *"declared nothing"* from
+*"declared a token that matches nothing"*. A `Layers:` full of confident, human-readable globs reports
+identically to a correct one until a file actually changes. `check-layers-completeness.sh` has a
+`layers-unbackticked-token` finding for a related shape; a `layers-token-matches-nothing` finding would
+have caught this at promote, in both tasks, before a line of code was written. Candidate `TD-NNN` — id
+deliberately underived here (L-143 · L-170).

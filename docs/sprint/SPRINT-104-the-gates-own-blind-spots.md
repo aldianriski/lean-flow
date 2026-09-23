@@ -60,7 +60,14 @@ that surfaces are fixed, and a seeded type error in each tree reddens the leg.
 - [x] Edit to `scripts/qa-check.sh` committed as a reviewable diff before being applied (D2 · L-151)
 
 ### T2 — Route bootstrap failures through a shared emitter `[size: M · risk: med · class: decision · HITL · J2]`
-Layers: `evals/lib/harness-common.sh` · `scripts/lib/check-*.sh` (the sites T2's own derivation names) · `scripts/lib/conformance-engine.sh` (**consumer-facing, ADR-027 — see D5**) · `scripts/qa-check.sh` (per D2) · `evals/run-emitter-column-fixtures.ts` (added mid-sprint — the retained Tier G fixture DoD 5/6 require; a `Layers:` written at promote cannot name a file the implementation invents, L-100)
+Layers: `evals/lib/harness-common.sh` · `evals/lib/check-system-verify-block.sh` · `scripts/lib/check-approval-envelope.sh` · `scripts/lib/check-count-claims.sh` · `scripts/lib/check-ephemeral-intake.sh` · `scripts/lib/check-epic-archive.sh` · `scripts/lib/check-epic-archive.ts` · `scripts/lib/check-handoff-state.sh` · `scripts/lib/check-layers-completeness.sh` · `scripts/lib/check-layers-observed.sh` · `scripts/lib/check-night-run-rollup.sh` · `scripts/lib/check-qa-budget-default.sh` · `scripts/lib/check-research-archive.sh` · `scripts/lib/check-review-depth.sh` · `scripts/lib/check-verify-reaches.sh` · `scripts/lib/conformance-engine.sh` (**consumer-facing, ADR-027 — see D5**) · `scripts/qa-check.sh` (per D2) · `evals/run-emitter-column-fixtures.ts` (added mid-sprint — the retained Tier G fixture DoD 5/6 require; a `Layers:` written at promote cannot name a file the implementation invents, L-100)
+<!-- The fifteen checkers were `scripts/lib/check-*.sh` until SPRINT-104 T2 execution. That token
+     matched NOTHING: covers() takes an exact path or a trailing-slash directory prefix and supports
+     no globs, so T2 carried a declaration covering zero of the files it rewrote — and it would have
+     missed `check-epic-archive.ts` even if globs worked. Enumerated rather than widened to
+     `scripts/lib/`, because the checker's own header records a directory token "swallowing every
+     undeclared file beneath it" (L-151 · L-186). -->
+
 Depends-on: none
 Cites: TD-157 · L-186 · L-198 · L-108 · ADR-027 · ADR-043
 
@@ -85,7 +92,13 @@ chosen shape is recorded with its reasoning where the next maintainer reads it.
 - [x] Shared-file edits committed as reviewable diffs before being applied (D2)
 
 ### T3 — Give the gate's stale cost comments an expiry `[size: S · risk: low · class: execution · HITL · J1]`
-Layers: `scripts/qa-check.sh` (comments only) · `scripts/lib/*.ts` · `scripts/lib/*.sh` (both comments only — split from a single `*.ts|sh` token, which `check-layers-observed.sh` parses as one literal path and therefore matches nothing: the declaration was present and unreadable, L-151) · `docs/research/logs/qa-gate-timing.md` (the Round it reconciles against)
+Layers: `scripts/qa-check.sh` (comments only) · `scripts/lib/check-layers-completeness.ts` (comments only) · `scripts/lib/conformance-engine.sh` (comments only) · `docs/research/logs/qa-gate-timing.md` (the Round it reconciles against)
+<!-- Was `scripts/lib/*.ts|sh`. `check-layers-observed.sh`'s covers() matches an EXACT path or a
+     trailing-slash DIRECTORY PREFIX and supports no globs at all, so that token matched nothing and
+     T3 carried a declaration covering zero files while reading as complete (L-151). Named exactly
+     rather than widened to `scripts/lib/`: the checker's own header records that a directory token
+     "swallowed every undeclared file beneath it", which is the failure this sprint is about. -->
+
 Depends-on: T2 (it audits the comment surface T2 rewrites; auditing first would audit a file about to change)
 Cites: TASK-356 · Round 16 · Rounds 19–21 · L-130
 
