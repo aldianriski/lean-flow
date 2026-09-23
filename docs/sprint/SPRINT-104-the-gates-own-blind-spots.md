@@ -129,7 +129,7 @@ ruling is taken against that Round and cites it by number.
 
 ## Owner-action checklist
 
-- [ ] **Rule T2's shape** — shared `fatal()` vs per-file helper. `J2`: it binds every checker, and one of the files is shipped to adopters through `conformance.sh`
+- [x] **Rule T2's shape** — shared `fatal()` vs per-file helper. `J2`: it binds every checker, and one of the files is shipped to adopters through `conformance.sh`
 - [ ] **Rule ADR-039's `layers-observed` opt-in at T4**, against the measured total rather than against an estimate
 - [ ] **Free host memory before T4** (target > 3 GB free) — or rule T4 parked and let it carry to the next sprint with its unblock condition intact
 
