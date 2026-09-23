@@ -64,14 +64,14 @@ The dependency root of the epic. Six status folders, one file per task named
 schema doc answers "where does status / title / sprint / epic live?" in one place each.
 
 **DoD:**
-- [ ] Six status folders exist; `docs/work/README.md` is the schema (fields · filename rule · the
+- [x] Six status folders exist; `docs/work/README.md` is the schema (fields · filename rule · the ✓ `ls docs/work/` → the six + README.md (`87ee6ba`)
       three axes) with an ownership header — *Verify: `ls docs/work/` returns exactly the six*
-- [ ] Filename rule enforced by the schema: no spaces, no reserved characters, no case-only renames
-- [ ] A retained fixture under `evals/fixtures/work-store/` round-trips one task through a transition
+- [x] Filename rule enforced by the schema: no spaces, no reserved characters, no case-only renames ✓ harness filename-rule cases 4/4; all 26 real files match
+- [x] A retained fixture under `evals/fixtures/work-store/` round-trips one task through a transition ✓ `evals/run-work-store-fixtures.ts` 9 pass, 0 fail — byte-identical via git mv; blob identity across checkout (owner ruling)
       and back — *Verify: `cmp` of the before/after file*
-- [ ] D6 ruled (`git mv` or move + add) and recorded in `docs/adr/ADR-045-the-work-item-store.md`;
+- [x] D6 ruled (`git mv` or move + add) and recorded in `docs/adr/ADR-045-the-work-item-store.md`; ✓ git mv, own commit
       move and content edit stay in separate commits either way
-- [ ] `ADR-045` indexed in `docs/DECISIONS.md` — *Verify: the row resolves to the file*
+- [x] `ADR-045` indexed in `docs/DECISIONS.md` — *Verify: the row resolves to the file* ✓ row resolves
 
 ### T2 — Make membership frontmatter and sprint progress derived `[size: M · risk: med · class: execution · HITL · J2]`
 Layers: `docs/work/README.md` · `skills/lean-doc-generator/templates/SPRINT.md.template` · `skills/prime/SKILL.md` · `evals/fixtures/work-store/` · `evals/run-work-store-fixtures.ts`

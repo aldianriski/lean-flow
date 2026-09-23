@@ -83,3 +83,18 @@ literal, lost its escapes and matched the empty string at offset 0 — twelve re
 the frontmatter's first line while the guard passed (it tested the same broken pattern). Restored with
 `git checkout`, verified `git hash-object` == `HEAD:` blob (`c0565dc`), refilled by exact-line match
 with an edit-count assertion (14). L-137's shape: the check agreed with the defect because both used it.
+
+### 2026-09-24 | progress | T1 done — the store stands (`87ee6ba`)
+Schema `docs/work/README.md` (verified field-for-field and section-for-section against all 26 task files),
+six status folders, ADR-045 (D1 + D6 = `git mv` in its own commit) indexed. Harness
+`evals/run-work-store-fixtures.ts`: **9 pass, 0 fail**; all 26 real filenames satisfy the rule.
+consequence · T1 · behaviour: none (docs + fixture) · governance: med (the store schema is a workflow
+contract) → one scoped Sonnet reviewer. It found **2 high**: the must-FAIL sibling compared two in-memory
+buffers and never touched the pipeline under test (L-142's shape), and the round trip could pass vacuously
+under `core.autocrlf=true`. One bounded builder retry fixed the first (a real committed edit between the
+moves; discrimination proven by breaking the shared compare — only the sibling reddened — restored,
+verified by `diff --no-index`) and **surfaced** the second as a genuine FAIL: a fresh checkout is not
+byte-identical on this host (752 → 792 bytes). **Owner ruling:** the invariant is stored content — blob
+identity via `git hash-object` vs `git rev-parse HEAD:<path>` (L-169) — not working-tree bytes; case +
+must-FAIL sibling rebuilt on that. Also: ADR-045's git-internals prose trimmed to rationale (HOW filter);
+EPIC-017 D1 now points `→ ADR-045` (coordinator).

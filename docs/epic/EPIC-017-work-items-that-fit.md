@@ -145,7 +145,7 @@ cannot be hit by a container that never accumulates. Its status vocabulary
 
 ## Decisions
 
-- **D1** — Status is the directory; title is the filename; membership is frontmatter. **→ ADR**
+- **D1** — Status is the directory; title is the filename; membership is frontmatter. **→ ADR-045**
 - **D2** — `promote` stops copying task content into the sprint file; it stamps `sprint:` and moves
   the file. Removes a drift class (sprint copy vs backlog original). The sprint Plan remains an
   explicitly approved snapshot by **reference**. **→ ADR**
