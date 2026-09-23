@@ -43,6 +43,9 @@ multi-stream repo lists one pointer per stream — to each active `docs/sprint/S
 and read only its frontmatter + Plan (~50 lines). Count open **DoD `[ ]`** across all active
 sprints (report per stream when more than one, e.g. `Tasks: 5 open (main: 3 · payments: 2)`); if
 no sprint is active, fall back to the Backlog.
+**v2 tree** (`docs/work/` present): open DoD = count of `- [ ]` lines under each file's own
+`## Done when` section, summed across `docs/work/**/TASK-*.md` whose frontmatter `sprint:` line
+**exactly** matches an active sprint's id — a member of another sprint is never counted.
 **Resuming from a `/handoff`?** Also read the handoff doc at the temp path it printed.
 
 **Handoff status (read-only report, SPRINT-094 T2)** — an active sprint's Execution Log, or root

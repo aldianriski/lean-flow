@@ -17,9 +17,7 @@ task files already used; it does not redesign it.
   frontmatter or in the file body.
 - **Title** — the filename slug (`TASK-NNN-kebab-slug.md`). The frontmatter `title:` field carries
   the same title as full prose for display; it is not a second, independently-renameable title.
-- **Membership** (sprint, epic) — frontmatter only: `sprint:` / `epic:`. Never nested under a
-  status folder — nesting would foreclose "what's in review, across every sprint" to one glob
-  (EPIC-017 "Reference adopted").
+- **Membership** (sprint, epic) — frontmatter only: `sprint:` / `epic:`. See § Membership below.
 - **Readiness** (`state:`) — orthogonal to status. A `ready` task can sit in any of the six
   folders; `state:` and the folder never encode the same fact.
 
@@ -47,6 +45,16 @@ Vocabulary adopted verbatim from `kerjaan` (EPIC-017 "Reference adopted").
 `id · title · epic · sprint · priority · size · risk · autonomy · class · tier · authority ·
 origin · state · depends-on`. `sprint:` / `epic:` may be absent (a plain backlog file usually has
 neither).
+
+## Membership
+
+`sprint:` at most one per file, `epic:` at most one per file — a task belongs to a single sprint
+and a single epic at a time (re-scoping a task is an edit to the field, not a second value beside
+the first). Membership is never nested under a status folder (a `docs/work/<sprint>/<status>/` or
+`<status>/<sprint>/` layout) — status is the one axis a folder encodes for free; nesting a second
+axis under it would answer "what does this sprint contain?" with one glob but cost the query that
+matters more: "what is in `review/`, across every sprint?" would then require scanning every
+sprint's subtree instead of staying one glob (ADR-045 D1).
 
 ## Sections
 

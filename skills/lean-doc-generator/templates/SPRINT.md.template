@@ -64,6 +64,14 @@ Cites: [sources this task answers to — the Spec axis measures against them; om
 ### T2 — [verb-first title] `[size: S · risk: low · class: execution · AFK]` [CUSTOMIZE]
 …
 
+## Members
+<!-- OPTIONAL -- this sprint's member task files (`docs/work/**/TASK-*.md`), one path per line, by
+     reference. `/prime` derives open DoD from each member's own `## Done when` boxes, selected by
+     its `sprint:` frontmatter equalling this sprint's id -- never from this list -- so keep the list
+     in sync with those fields; it is a convenience index, not a second source of truth. -->
+
+- docs/work/todo/TASK-NNN-kebab-slug.md
+
 ## Owner-action checklist
 <!-- Non-dev actions a human must do (secrets, env, external dashboards). Not dev tasks. Omit if none. -->
 - [ ] [e.g. rotate the exposed credential / set PROD env var]
