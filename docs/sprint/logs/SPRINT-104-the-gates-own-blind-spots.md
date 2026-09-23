@@ -274,3 +274,55 @@ tree, harness and registration land in ONE commit on purpose: splitting them wou
 transiently-red commit, because an unregistered `evals/run-*.ts` fails the registration guard at
 qa-check.sh:1333. The `qa-check.sh` change is a single line and was displayed for review before
 landing. Stated rather than silently reinterpreted.
+
+### 2026-09-23 | progress | T2 DoD 1 — site set re-derived, 28/16, A2 discharged
+
+**Result: 28 sites across 16 files.** TD-157's `27 sites / 15 files` was correct when taken and is
+now one short: the delta is exactly `scripts/lib/check-epic-archive.ts`, a checker ported since, with
+one site. 28 − 1 = 27, 16 − 1 = 15. A2 is discharged, not inherited.
+
+**Two selection rules that genuinely disagree in shape (L-198), not an inverse of one rule.**
+- **Route A′ — by COLUMN.** Emission whose string starts `FAIL` + exactly one space, across every
+  emission construct (`echo`/`printf`/`console.log`/`out.push`/`return`). → **28 sites / 16 files**.
+- **Route C — by POSITION.** Every `FAIL` emission located *before* the file defines its two-space
+  helper (or in a file that defines none), regardless of spacing. → **71 sites / 27 files**.
+- Reconciliation: **A′ ⊆ C with zero exceptions** (no one-space site sits after a helper), and
+  **C ∩ one-space = 28, an identical set to A′**. Two different axes, same population.
+- **Route B — by OBSERVATION** (third signal, not the cross-check): ran every checker with no args
+  and with a nonexistent path, selecting one-space `FAIL` lines from real stdout. → 8 lines / 7 files.
+  Deliberately a *lower bound* — it reaches only the bootstrap paths those two invocations trigger —
+  and it is reported as reachability evidence, never as a competing census. 8 of the 28 are proven live.
+
+**Two wrong selectors were caught on the way, both by disagreement rather than by inspection.**
+*(a)* The first Route A returned **580 hits / 86 files** because it matched the token `FAIL` anywhere,
+including prose *about* FAIL in comments (`// Prints one PASS/FAIL/note line`). L-108 — the corpus is
+self-describing. *(b)* The first refinement matched only `echo|printf|console.log`, so the `.ts`
+checkers' `out.push(\`FAIL …\`)` and `return \`FAIL …\`` shapes could never enter the examined set —
+L-186's exact failure. Widening to all constructs left the count at 28, which is itself the finding:
+the ported `.ts` checkers already emit at the correct column.
+
+**Population definition corrected mid-derivation, and this is the substantive result.** An unscoped
+sweep returns **414 sites / 66 files**, dominated by `evals/run-*` fixture harnesses. Those are NOT at
+risk: leg 12 selects harness output with `grep -E '^FAIL'` — **not column-keyed** — so a one-space line
+there is fully visible. The risk lives only where a *column-keyed* parser reads. That parser is
+`sweep_findings()`, which uses two selectors of different tolerance:
+- `_sweep_engine_error` → `grep '^FAIL [ ]*conformance: '` — tolerant, already hardened
+- `_fail_findings` → `grep '^FAIL  '` — **two-space keyed**
+
+A one-space line not named `conformance:` is invisible to both, so `_sweep_total` and `_sweep_reached`
+miss it *equally*, stay equal, and the gate passes clean. That is the silent false-negative TD-157
+describes, and it is why `conformance-engine.sh`'s own site is already covered while the other 27 are not.
+
+**Per-kind classification (DoD 3's groundwork; the "left alone" set is real):**
+- **22 BOOTSTRAP** — repo root absent, shared archive predicate absent, required arg missing, harness
+  doc/snippet unextractable. Genuine pre-flight failures; these are the rewrite candidates.
+- **2 FINDINGS, not bootstrap** — `check-qa-budget-default.sh:29` (`no QA_BUDGET_SECONDS default
+  assignment found`) and `:34` (`exceeds-ceiling`). These are verdicts about the target emitted at
+  one space. They are the most dangerous two in the set and they are *not* a `fatal()` candidate,
+  because routing a finding through a bootstrap emitter would misclassify it.
+- **4 FIXTURE REPORTS** — `harness-common.sh:54/61/76/84`, `FAIL fixture(<label>): exit N, expected M`.
+  This is the harnesses' own report format, consumed by leg 12's non-column-keyed grep and matched
+  by the `selftest-assert-*` files. Changing their column risks breaking the selftests that assert
+  on the exact string, for no gain against a selector that never keyed on the column.
+
+Owner ruling on the shape (J2) outstanding; the counts above are what it should be taken against.
