@@ -384,3 +384,42 @@ by building the escape as `String.fromCharCode(92) + "n"` and by adding two refu
 script: reject any replacement containing a real newline, and reject any file whose line count
 changes. Verified after: line counts identical to HEAD for all 14 checkers, all files parse, `tsc`
 clean, and three checkers were RUN to confirm they emit at the two-space column.
+
+### 2026-09-23 | progress | T2 DoD 5+6 — retained emitter-column fixture, all three arms discriminated
+
+`evals/run-emitter-column-fixtures.ts`, registered 4th in `eval_harnesses_always`. Measured **1816ms**.
+
+**Population, not just branches (DoD 6 · L-186 · L-207).** T2's rewrite has three distinct emitter
+arms and a suite drawn from one proves nothing about the others, so each case is reachable ONLY
+through its own arm:
+- arm 1 — inline `printf` in a POSIX sh checker (two files, because one file passing does not speak
+  for fourteen)
+- arm 2 — template literal in a **TypeScript** checker: different language, different emit construct,
+  different runner
+- arm 3 — the shared `fatal()`, reached through a **sourced function** rather than a script invocation
+
+The cheap tell this guards against is a suite where every case is "a .sh checker invoked with a bad
+path". None of arms 2 or 3 is reachable that way.
+
+**The must-NOT-catch control is load-bearing and fails in both directions.** A suite that simply
+required two spaces everywhere would pass while silently endorsing a change that breaks
+`check-qa-budget-default.sh`'s wrapper. Its case asserts the line is **still one-space**.
+
+**Seeded-break proof (DoD 5), run per arm. Hash convention, stated once: `git hash-object <path>`
+against `git rev-parse HEAD:<path>` — both LF-normalized blob ids, reproducible on this CRLF checkout.**
+
+| seed | line delta | reddened | siblings green | restored |
+|---|---|---|---|---|
+| arm 1 `check-count-claims.sh` two-space → one | 0 | `sh-checker-repo-root` only | 4 | hash OK |
+| arm 2 `check-epic-archive.ts` two-space → one | 0 | `ts-checker-repo-root` only | 4 | hash OK |
+| arm 3 `harness-common.sh` `fatal()` two → one | 0 | `shared-fatal-missing-doc` only | 4 | hash OK |
+| control: WIDEN the excluded file one → two | 0 | `MUST-NOT-CATCH-…` only | 4 | hash OK |
+
+Every seed reddened **exactly one** case and left four green — targeted discrimination, not a
+demolition (zero line delta in all four). The fourth seed is the one that matters most: it proves the
+control can fail, and a control that cannot fail is not a control.
+
+Wiring derived from the file, not asserted (L-020): entry 4 of the 40 in `eval_harnesses_always`, and
+leg 12 dispatches `*.ts` through `bun "$hp"`.
+
+T2 stands at 7 of 8 DoD. Only the worktree-isolated outside reviewer remains, blocked on host memory.

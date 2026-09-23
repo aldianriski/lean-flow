@@ -76,13 +76,13 @@ chosen shape is recorded with its reasoning where the next maintainer reads it.
 
 **DoD:**
 - [x] The site set re-derived by **two disagreeing selection rules**, not by inheriting TD-157's `27 sites / 15 files` — *Verify: both routes state a count and they agree; a shared selector shape in both is not a cross-check (L-198)*
-- [ ] Owner ruling on the shape recorded **at the code**, not only in the ledger (L-151)
-- [ ] Every rewritten site is a genuine bootstrap failure, checked per site — *Verify: the assumption A2 names is discharged site by site, and any site that is a finding rather than a bootstrap failure is named and left alone*
-- [ ] **Consumer check (L-015)**: what an adopter of root `conformance.sh` observes after this change, stated explicitly — exit code and report text, in one line, or an explicit "nothing"
-- [ ] **Tier G bar**: retained must-FAIL per rewritten emitter path with its **named** finding, sibling control green, seeded break verified landed and restored under ONE stated hash convention
-- [ ] A **population** fixture, not only branch fixtures — one site reached by the other selection arm (L-186 · L-207)
+- [x] Owner ruling on the shape recorded **at the code**, not only in the ledger (L-151)
+- [x] Every rewritten site is a genuine bootstrap failure, checked per site — *Verify: the assumption A2 names is discharged site by site, and any site that is a finding rather than a bootstrap failure is named and left alone*
+- [x] **Consumer check (L-015)**: what an adopter of root `conformance.sh` observes after this change, stated explicitly — exit code and report text, in one line, or an explicit "nothing"
+- [x] **Tier G bar**: retained must-FAIL per rewritten emitter path with its **named** finding, sibling control green, seeded break verified landed and restored under ONE stated hash convention
+- [x] A **population** fixture, not only branch fixtures — one site reached by the other selection arm (L-186 · L-207)
 - [ ] Outside reviewer, worktree-isolated
-- [ ] Shared-file edits committed as reviewable diffs before being applied (D2)
+- [x] Shared-file edits committed as reviewable diffs before being applied (D2)
 
 ### T3 — Give the gate's stale cost comments an expiry `[size: S · risk: low · class: execution · HITL · J1]`
 Layers: `scripts/qa-check.sh` (comments only) · `scripts/lib/*.ts|sh` (comments only) · `docs/research/logs/qa-gate-timing.md` (the Round it reconciles against)
