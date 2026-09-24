@@ -23,10 +23,22 @@ update_trigger: sprint execute/close events
 **In:** [the 2–5 things this sprint will deliver]
 **Out (deferred):** [explicitly named non-goals — what looks related but is NOT in this sprint]
 
+## Members
+<!-- REQUIRED -- the sprint BY REFERENCE (ADR-047): one member task file
+     (`docs/work/<status>/TASK-NNN-<slug>.md`) per line. `promote` moves each file backlog/ -> todo/ with
+     `git mv` in its own commit and stamps its `sprint:` frontmatter; the path here records where it
+     sat at promote -- later folder moves do not edit this list. Each task's DoD lives ONLY in its
+     member file's `## Done when`: tick it there, with evidence (`- [x] … ✓ <what proved it>`), and
+     /prime counts it there. `plan_commit` freezes those `## Done when` sections; rewording one after
+     promote needs a `scope-change` Log entry naming the id. `close` requires every member in
+     done/ or cancel/ (references/sprint-by-reference.md). -->
+
+- docs/work/todo/TASK-NNN-kebab-slug.md
+
 ## Plan
 
-<!-- One block per task. Pull these from TODO.md Backlog at promote (dependency order). The DoD
-     checkboxes are what /orchestrator sprint-bulk loops over and what /prime counts.
+<!-- One block per unit of work, dependency order, holding ONLY sprint-scoped meta -- never a copy
+     of a member's DoD (a second copy drifts: only one of the two ever gets ticked).
      Tasks sharing a file: fix single-owner + commit order in § Decisions (a D-row); at commit stage
      shared files per-hunk, never a plain `git add` over another task/stream's WIP (L-042/L-037).
      Mandatory per block: header meta carries `class:`
@@ -46,31 +58,19 @@ update_trigger: sprint execute/close events
 ### T1 — [verb-first title] `[size: M · risk: med · class: execution · HITL · J1]` [CUSTOMIZE]
 Layers: [files / modules this touches]
 Depends-on: [Tn / TASK-NNN list, or none]
-Cites: [sources this task answers to — the Spec axis measures against them; omit if none]
+Cites: [the member TASK-NNN(s) this block delivers, then any other sources it answers to]
 [1–3 sentences of WHY + the approach — never step-by-step HOW.]
 
 **Acceptance:** [one observable, human-verifiable outcome — "done when …"]
-
-**DoD:**
-- [ ] [concrete, checkable step] — *Verify: [the mechanical check that proves it, if one exists]*
-- [ ] [concrete, checkable step]
-<!-- A ticked box names its evidence: `- [x] … ✓ <what proved it>` (a test run, a check, a retained
-     fixture, or a review outcome). Where a mechanical check exists, the `*Verify: …*` clause names
-     it — that check's FAIL blocks a silent tick until the owner records a ruling; a criterion naming
-     none stays a judgment tick and says so. QA (suggestion, never a gate): does this task want tests
+<!-- No **DoD:** list here -- the checkable steps are the member file's `## Done when`. There a
+     ticked box names its evidence (a test run, a check, a retained fixture, or a review outcome), and
+     a `*Verify: …*` clause names the mechanical check where one exists -- its FAIL blocks a silent
+     tick until the owner records a ruling. QA (suggestion, never a gate): does this task want tests
      (type → tdd/references/test-strategy.md), a lint / security-review pass, or a perf budget? Note
-     it here; the Review step raises the same prompt. -->
+     it in the member file; the Review step raises the same prompt. -->
 
 ### T2 — [verb-first title] `[size: S · risk: low · class: execution · AFK]` [CUSTOMIZE]
 …
-
-## Members
-<!-- OPTIONAL -- this sprint's member task files (`docs/work/**/TASK-*.md`), one path per line, by
-     reference. `/prime` derives open DoD from each member's own `## Done when` boxes, selected by
-     its `sprint:` frontmatter equalling this sprint's id -- never from this list -- so keep the list
-     in sync with those fields; it is a convenience index, not a second source of truth. -->
-
-- docs/work/todo/TASK-NNN-kebab-slug.md
 
 ## Owner-action checklist
 <!-- Non-dev actions a human must do (secrets, env, external dashboards). Not dev tasks. Omit if none. -->

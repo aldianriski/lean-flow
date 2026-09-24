@@ -226,7 +226,7 @@ const STEP_WIRING: Record<string, string[]> = {
   "task-decomposer": ["7. **Write** — after the layout check above (v1/mixed stops here)"],
   "lean-doc-generator": [
     "**Layout check gates entry (v1/mixed stops here, § above).** **Governance review first**",
-    "**Layout check gates entry (v1/mixed stops here, § above).** Verify all DoD",
+    "**Layout check gates entry (v1/mixed stops here, § above).** Verify every member",
   ],
   // Wired the same way this revise round, though not named in the MED finding's 3:
   prime: ["count open `- [ ]` tasks — skipped on v1/mixed (§ Resolution layout check)."],
@@ -241,7 +241,7 @@ for (const [skill, phrases] of Object.entries(STEP_WIRING)) {
     // Distinguish rows for lean-doc-generator (promote vs close) by a short tag from the phrase.
     const tag = phrase.includes("Governance review")
       ? "-promote"
-      : phrase.includes("Verify all DoD")
+      : phrase.includes("Verify every member")
         ? "-close"
         : "";
     report(

@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-23
+last_updated: 2026-09-24
 update_trigger: Tech debt filed (Sprint Close), aged (Sprint Promote), or resolved
 status: current
 ---
@@ -295,7 +295,15 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
-- **TD-179** severity: medium | status: open | created: Sprint-106
+- **TD-179** severity: medium | status: resolved → TASK-362 (SPRINT-107 T1, ADR-047) | created: Sprint-106
+  - **Resolved on evidence (SPRINT-107 T1):** `promote` now works by reference — the Plan's `Tn` blocks
+    carry no DoD, so each task has one DoD, its member file's `## Done when`, and there is nothing to
+    mirror (`templates/SPRINT.md.template`, `references/sprint-by-reference.md`). The freeze the copy
+    used to carry is kept by `plan_commit` and checked mechanically: `bun evals/run-by-reference-fixtures.ts`
+    → `by-reference-fixtures: 25 pass, 0 fail` (must-FAIL per finding, selection-varying cases, 15-seed break
+    proof); pointed at SPRINT-107 (`plan_commit 3e0e710`) the checker reports 5 members unedited.
+    **Scope of the fix:** sprints promoted from here on. SPRINT-107's own Plan was locked with copies
+    before this landed, so D3's mirroring duty runs to its close.
   - Summary: **a sprint's Plan and its member task files each carry a DoD, and only the Plan gets ticked.**
     SPRINT-106's Plan was ticked for T0–T3 while the five member files' `## Done when` stayed unticked;
     `migrate`'s real-input exercise found it (17 ticked in the Plan, 0 in the files) and reported five
