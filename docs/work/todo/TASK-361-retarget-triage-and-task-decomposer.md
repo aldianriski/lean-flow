@@ -2,6 +2,7 @@
 id: TASK-361
 title: "Retarget `/triage` and `/task-decomposer` onto the store"
 epic: EPIC-017
+sprint: SPRINT-107
 priority: P1
 size: M
 risk: med

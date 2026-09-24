@@ -2,6 +2,7 @@
 id: TASK-375
 title: "Retarget /orchestrator onto the store"
 epic: EPIC-017
+sprint: SPRINT-107
 priority: P1
 size: M
 risk: high
