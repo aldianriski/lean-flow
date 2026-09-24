@@ -79,3 +79,17 @@ allowlist it (T2 carries the same clause). (b) Stale TODO § Active Sprint reade
 `skills/prime/SKILL.md:41`, `skills/lean-doc-generator/SKILL.md:101,107`, `.claude/CONTEXT.md:82`,
 `README.md:236` → TASK-379/380 at close-retro sweep. (c) T1's builder saw run-v1-to-v2 + typecheck-population
 fail in its worktree; both pass on main (15/0, 1/0) — worktree lacks node_modules, not a regression.
+
+### 2026-09-24 | review | T1 outside review (worktree-isolated) — NOT CLEAR, revise round 1 dispatched
+Independent reviewer vs `3676a00`: **2 major** — (1) population ignores `plan_commit`: a member dropped from both
+Members and its stamp, then edited, passes freeze *and* close (L-186); (2) no time bound — a pre-promote
+scope-change excuses a later edit, and `plan_commit` can be re-pointed to HEAD / a non-ancestor. **5 minor** —
+narrow stamp/Members parsing (quoted, `# comment`, BOM, bare `NNN`, multi-id lines, tables); `## Done when`
+missing on both sides passes vacuously, second section/fenced `## ` unread; last scope-change entry swallows the
+file tail; false FAILs on legitimate shapes (no-summary heading, inline log, in-text ✓, `+` bullets, blank lines,
+quoted non-ASCII paths, `Tn`-named entries); reference/script drift. Held up: id resolution across moves/renames,
+prefix-safe ids, CRLF, verdict line == exit code on every path, harness 25/0, seeded stamp-arm break reddened
+exactly its 2 cases (restored `b0aae82` == HEAD blob).
+**Owner ruling (G2, 2026-09-24):** a member added mid-sprint passes iff a post-`plan_commit` scope-change names it;
+baseline = its content at the first commit stamping `sprint:`. → folded into the same revise round + ADR-047.
+Revise loop: one bounded builder retry, then a second independent review. T1 ticks held.
