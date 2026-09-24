@@ -172,3 +172,13 @@ TASK-362 removes the Plan copy. Mirrored: TASK-374 · 359 · 369 fully ticked (�
 D6). **Not** fully ticked, because not fully true: TASK-360 (the sprint-file-by-reference half is TASK-362's) and
 TASK-370 (the real-copy equal-count proof failed on genuine conflicts; no interrupted-run fixture exists) — both
 stay in `todo/` with their open items stated in the files.
+
+### 2026-09-24 | progress | system-verify — full gate to a verdict, after one memory kill
+Run 1 was **stopped by the host for low memory** (no verdict line; 186 PASS / 0 FAIL at the kill) — not
+counted. Owner ordered a retry. Run 2, untruncated: **`QA-CHECK: 256 pass, 4 fail`** — all four real and all
+this sprint's: `docs/knowledge-index.md` stale (ADR-045/046 + the effectiveness doc), and the three new
+harnesses registered in **no** gate list — in `evals/` but never run by the gate. The T1 builder had flagged
+this as outside its Layers and the coordinator did not route it (L-020, shipped ≠ wired). Fixed by the
+file's own rules (`75f83ff`): layout + v1-to-v2 always-on (static, ~0.13s), work-store opt-in (builds git
+repos, ~2.5s). Run 3: **`QA-CHECK: 258 pass, 1 fail`**, the one being layers-observed on the uncommitted
+`scripts/qa-check.sh`, cleared by the coordinator commit and re-verified PASS; opt-in work-store 13/0.
