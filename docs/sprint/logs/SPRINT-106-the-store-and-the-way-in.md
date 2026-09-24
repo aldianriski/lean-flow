@@ -145,3 +145,20 @@ mixed → 2.x refuses and points to `migrate` → `migrate` ingests the stray ta
 with existence-only detection. **Impact:** T4 box "Tombstone `TODO.md` shape defined; a task appended to it
 is surfaced by a v2 `/prime`" now reads as: removal defined; a stray v1 write is surfaced by `/prime`'s
 `Layout: mixed` row and ingested by a `migrate` re-run. `TASK-370` / `TASK-372` amended to match.
+
+### 2026-09-24 | progress | T4 built — migrate carries a v1 repo onto the store (`14d2c9f`)
+`migration-map.md` § v1 → v2 work-item store (2.0): mapping, Plan-task rules, overlap, resume/conflict with
+an explicit precedence, `TODO.md` removal; SKILL.md +1 (138/140); README § Upgrading to 2.x + CHANGELOG
+[Unreleased]. **Real-input exercise** on a scratch worktree of this repo (mixed, `93c1ff1`, removed after):
+15 Backlog tasks → 15 files, id sets equal both ways, re-run report-only. The 5 SPRINT-106 members already
+had files and **conflicted for real** — Plan DoD ticked (17), their `## Done when` unticked (0) — reported,
+never overwritten. `evals/run-v1-to-v2-fixtures.ts` **15 pass, 0 fail**.
+consequence · T4 · behaviour: med (consumer migration path) · governance: med → outside reviewer, read-only
+(same reason as T3). **2 high**: Plan-only tasks had no source for `priority:`/`state:`/`origin:`; the
+conflict rule contradicted "Plan wins" and counted a reported conflict as resolved, so `TODO.md` could be
+removed over stale files. One bounded retry: those fields go to the owner in the migrate plan; conflicts are
+per-file deltas the owner resolves (apply · keep · edit) and **an unresolved conflict blocks removal**
+(fixture + must-FAIL sibling); archived sprints named out of scope; the harness schema is cross-checked
+against `docs/work/README.md` (proven on a scratch copy). **Note:** under the revised rule the exercise
+would have stopped short of removing `TODO.md` — correct; it removed it under the pre-review text.
+**Open for the owner:** the "22-task Backlog" box (actual 15), and the Plan↔file tick drift the exercise found.

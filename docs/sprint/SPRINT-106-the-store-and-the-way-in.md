@@ -135,16 +135,16 @@ appends there is reported by a v2 skill as a stray v1 write and offered for inge
 per Backlog task, applies on approval, and the id set before equals the id set after, both directions.
 
 **DoD:**
-- [ ] `skills/lean-doc-generator/references/migration-map.md` gains the v1 → v2 mapping (field by
-      field; `state:` and readiness stay orthogonal fields, never folded into the folder)
+- [x] `skills/lean-doc-generator/references/migration-map.md` gains the v1 → v2 mapping (field by
+      field; `state:` and readiness stay orthogonal fields, never folded into the folder) ✓ `14d2c9f`
 - [ ] Exercised on real input: a copy of this repo's 22-task Backlog → 22 files — *Verify: id set
       diffed both ways (v1 ids ∖ v2 ids and v2 ids ∖ v1 ids both empty), not a count alone*
-- [ ] Re-run is report-only and changes nothing — *Verify: `git status` clean after the second run*
-- [ ] Tombstone `TODO.md` shape defined; a task appended to it is surfaced by a v2 `/prime` as a stray
-      v1 write — *Verify: retained fixture in `evals/fixtures/v1-to-v2/`*
-- [ ] No lean-flow-specific path leaks into the generic skill or reference (L-015) — *Verify: grep
-      the two Layers files for `scripts/`*
-- [ ] README + CHANGELOG `[Unreleased]` describe the upgrade path an existing user follows
+- [x] Re-run is report-only and changes nothing — *Verify: `git status` clean after the second run* ✓ judgment: second pass in the scratch copy wrote 0 files, 0 conflicts
+- [x] Tombstone `TODO.md` shape defined; a task appended to it is surfaced by a v2 `/prime` as a stray
+      v1 write — *Verify: retained fixture in `evals/fixtures/v1-to-v2/`* ✓ owner ruling: no tombstone — removal defined; a stray write recreates TODO.md → `Layout: mixed` (fixture `evals/fixtures/layout/mixed/`)
+- [x] No lean-flow-specific path leaks into the generic skill or reference (L-015) — *Verify: grep
+      the two Layers files for `scripts/`* ✓ migration-map clean; SKILL.md's one hit is a pre-existing self-scoped example
+- [x] README + CHANGELOG `[Unreleased]` describe the upgrade path an existing user follows ✓ README § Upgrading to 2.x + CHANGELOG [Unreleased]
 
 ## Decisions (pre-locked)
 
