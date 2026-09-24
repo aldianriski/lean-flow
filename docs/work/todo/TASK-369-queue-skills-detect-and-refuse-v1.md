@@ -19,10 +19,10 @@ depends-on: [TASK-359, TASK-360]
 
 ## Done when
 
-- [ ] The 7 queue-touching skills (derived by two selectors) each detect v1 or v2 and name it in their output; on v1 or mixed they refuse by name and point to `/lean-doc-generator migrate`, writing nothing.
-- [ ] Detection tests TODO.md for existence only, never reads its content.
-- [ ] Retained v1 · v2 · mixed fixtures; each of the 7 skills refuses the v1 and mixed cases by name.
-- [ ] ADR-046 records the hard cut (v2-only 2.0.0) and is indexed in docs/DECISIONS.md.
+- [x] The 7 queue-touching skills (derived by two selectors) each detect v1 or v2 and name it in their output; on v1 or mixed they refuse by name and point to `/lean-doc-generator migrate`, writing nothing. ✓ `ae9673b`
+- [x] Detection tests TODO.md for existence only, never reads its content. ✓ existence-only (empty-TODO fixture)
+- [x] Retained v1 · v2 · mixed fixtures; each of the 7 skills refuses the v1 and mixed cases by name. ✓ `evals/run-layout-fixtures.ts` 33/0
+- [x] ADR-046 records the hard cut (v2-only 2.0.0) and is indexed in docs/DECISIONS.md. ✓ ADR-046 indexed
 
 ## Amended 2026-09-23
 

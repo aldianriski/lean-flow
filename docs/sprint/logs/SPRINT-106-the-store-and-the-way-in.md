@@ -162,3 +162,13 @@ per-file deltas the owner resolves (apply · keep · edit) and **an unresolved c
 against `docs/work/README.md` (proven on a scratch copy). **Note:** under the revised rule the exercise
 would have stopped short of removing `TODO.md` — correct; it removed it under the pre-review text.
 **Open for the owner:** the "22-task Backlog" box (actual 15), and the Plan↔file tick drift the exercise found.
+
+### 2026-09-24 | scope-change | owner rulings — the "22" box, and mirroring ticks into member files
+**"22-task Backlog → 22 files":** frozen at `4290781`, before EPIC-017's tasks left `TODO.md`. Owner ruled:
+ticked on the real run — 15 → 15, id sets equal both ways, which is the proof the box asks for. **Every Plan
+DoD box is now resolved.** **Plan ↔ file drift:** the T4 exercise found the Plan ticked while the member files'
+`## Done when` were not. Owner ruled: mirror ticks into member files now, truthfully, and file debt until
+TASK-362 removes the Plan copy. Mirrored: TASK-374 · 359 · 369 fully ticked (→ `done/` by `git mv`, own commit,
+D6). **Not** fully ticked, because not fully true: TASK-360 (the sprint-file-by-reference half is TASK-362's) and
+TASK-370 (the real-copy equal-count proof failed on genuine conflicts; no interrupted-run fixture exists) — both
+stay in `todo/` with their open items stated in the files.

@@ -23,8 +23,8 @@ The 'after' half (TASK-386) is only comparable if the 'before' half is taken bef
 
 ## Done when
 
-- [ ] A dated baseline at a named commit, taken before TASK-359 and TASK-364 land: decomposition completeness (tasks written vs asked, one real breakdown), retrieval success (a fixed probe set, hit/miss), recurring-failure rate (L-NNN count bumps per sprint, last 10 sprints).
-- [ ] The method is written down so TASK-386 reproduces it exactly. Lines and checkboxes are explicitly NOT measures.
+- [x] A dated baseline at a named commit, taken before TASK-359 and TASK-364 land: decomposition completeness (tasks written vs asked, one real breakdown), retrieval success (a fixed probe set, hit/miss), recurring-failure rate (L-NNN count bumps per sprint, last 10 sprints). ✓ `6d90b4f`
+- [x] The method is written down so TASK-386 reproduces it exactly. Lines and checkboxes are explicitly NOT measures. ✓ method in `docs/research/epic-017-effectiveness.md`
 
 ## Touches
 

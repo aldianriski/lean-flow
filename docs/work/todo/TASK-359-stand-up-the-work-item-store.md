@@ -19,7 +19,7 @@ depends-on: [TASK-374]
 
 ## Done when
 
-- [ ] `docs/work/{backlog,todo,in_progress,review,done,cancel}/` exists with a schema doc; **status is the folder, title is the filename, membership is frontmatter** (D1). Filenames are `TASK-NNN-kebab-slug.md` — no spaces, no reserved characters, no case-only renames (Windows + concurrent `.claude/worktrees/`). One existing backlog task is migrated end-to-end and round-trips through a transition. Retained fixture covering a move.
+- [x] `docs/work/{backlog,todo,in_progress,review,done,cancel}/` exists with a schema doc; **status is the folder, title is the filename, membership is frontmatter** (D1). Filenames are `TASK-NNN-kebab-slug.md` — no spaces, no reserved characters, no case-only renames (Windows + concurrent `.claude/worktrees/`). One existing backlog task is migrated end-to-end and round-trips through a transition. Retained fixture covering a move. ✓ `87ee6ba` (ADR-045)
 
 ## Touches
 

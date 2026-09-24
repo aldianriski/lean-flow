@@ -32,3 +32,7 @@ none
 ## Tracker
 
 EPIC-017 D1 · D2
+
+## Amended 2026-09-24
+
+- **Mirrored at SPRINT-106 close (owner ruling):** the `sprint:`/`epic:`, derived-count, hand-count and one-glob parts are done (`1584c8d`, harness 13/0). **Open:** "the sprint file references its members instead of containing them" — SPRINT-106 still carries Plan copies; that half is TASK-362's (promote/close by reference).
