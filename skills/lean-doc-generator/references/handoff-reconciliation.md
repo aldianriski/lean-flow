@@ -48,8 +48,8 @@ Before setting `status: closed`:
    - A follow-up **TASK** becomes a **new task file in `docs/work/backlog/`**, never a `TODO.md` row:
      `TASK-NNN-<kebab-slug>.md`, frontmatter `origin: close-retro`, no `sprint:` (it is unscheduled).
      Derive NNN as one above the **numeric** maximum `TASK-NNN` in use across every `docs/work/*/`
-     folder (`done/` and `cancel/` included) and, if a legacy `TODO.md` still exists, its rows — never
-     the id you remember, and never by a bare recursive search from the repo root, which also counts
+     folder (`done/` and `cancel/` included) — never `TODO.md`'s rows (reading its content is
+     `migrate`'s job alone), never the id you remember, and never by a bare recursive search from the repo root, which also counts
      the full repo copies under `.claude/worktrees/` and returns a maximum that is not a row.
    - Anything genuinely needing no further action is **ruled**, not silently dropped: note it inline
      in the reconciliation entry (a ruling is a record; silence is not — CLAUDE.md § Behavioral

@@ -135,7 +135,7 @@ function flowRoute(root: string, stream?: string): string {
 }
 
 // handoff-reconciliation: follow-up TASK -> new file in docs/work/backlog/, origin: close-retro,
-// no sprint:; NNN = numeric max over every docs/work/*/ folder + legacy TODO.md rows if present;
+// no sprint:; NNN = numeric max over every docs/work/*/ folder -- never TODO.md (TASK-369: only migrate reads it);
 // never a recursive search from the root (it would reach .claude/worktrees/).
 function fileFollowUp(root: string, slug: string): string {
   const ids: number[] = [];
@@ -143,7 +143,6 @@ function fileFollowUp(root: string, slug: string): string {
     const m = n.match(/^TASK-(\d+)-/);
     if (m) ids.push(Number(m[1]));
   }
-  if (existsSync(join(root, "TODO.md"))) for (const m of R.read(root, "TODO.md").matchAll(/TASK-(\d+)/g)) ids.push(Number(m[1]));
   const id = `TASK-${Math.max(0, ...ids) + 1}`;
   const path = `docs/work/backlog/${id}-${slug}.md`;
   const body = readFileSync(join(FIX, "TASK-template.md"), "utf8").replace(/\r\n/g, "\n")
@@ -311,15 +310,14 @@ const CASES: Case[] = [
     expect: { path: "docs/work/backlog/TASK-101-follow-up.md", id: "TASK-101", origin: "close-retro", sprint: null, worktreeCopyPresent: true },
   },
   {
-    name: "reconcile-next-id-legacy-TODO (TASK-9500 row counted; TODO.md left byte-identical)",
+    name: "reconcile-next-id-ignores-legacy-TODO (TASK-9500 row NOT counted; TODO.md never read)",
     setup: (r) => put(r, "TODO.md", fix("TODO-stale.md")),
     run: (r) => {
       const before = readFileSync(join(r, "TODO.md"), "utf8");
       const p = fileFollowUp(r, "follow-up");
       return { path: p, todoUnchanged: readFileSync(join(r, "TODO.md"), "utf8") === before };
     },
-    expect: { path: "docs/work/backlog/TASK-9501-follow-up.md", todoUnchanged: true },
-    todoMayBeRead: true,
+    expect: { path: "docs/work/backlog/TASK-8111-follow-up.md", todoUnchanged: true },
   },
 ];
 
