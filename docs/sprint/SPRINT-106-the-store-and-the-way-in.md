@@ -3,8 +3,8 @@ sprint: 106
 slug: the-store-and-the-way-in
 epic: EPIC-017
 owner: Maintainer
-last_updated: 2026-09-23
-status: active
+last_updated: 2026-09-24
+status: closed
 plan_commit: 4290781
 gates_signed: G1,G2 @ 81407ad
 close_commit: [sha — set at close]
@@ -179,5 +179,41 @@ per Backlog task, applies on approval, and the id set before equals the id set a
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `docs/research/epic-017-effectiveness.md` | T0 | EPIC-017's before-baseline, key committed before answers | Low | blind Haiku run 11/12 |
+| `docs/work/README.md` · status folders | T1 · T2 | the store's schema + membership rules | Med | reviewer diffed against all 26 files |
+| `docs/adr/ADR-045-the-work-item-store.md` · `docs/adr/ADR-046-the-2-0-hard-cut.md` · `docs/DECISIONS.md` | T1 · T3 | D1/D6 and the hard cut, recorded | Low | index rows resolve |
+| `evals/run-work-store-fixtures.ts` · `evals/fixtures/work-store/` | T1 · T2 | round trip, blob identity, membership count | Low | 13/0, seeded breaks |
+| `skills/prime/SKILL.md` | T2 · T3 | derived v2 progress; reports layout and continues | Med | contract cases |
+| `skills/lean-doc-generator/templates/SPRINT.md.template` | T2 | optional by-reference `## Members` | Low | read-through |
+| `skills/{triage,task-decomposer,lean-doc-generator,orchestrator,handoff,flow}/SKILL.md` | T3 | existence-only detection, refuse v1/mixed → migrate | Med | 33/0, scratch-copy break |
+| `evals/run-layout-fixtures.ts` · `evals/fixtures/layout/` | T3 | classify + text contract | Low | 33/0 |
+| `skills/lean-doc-generator/references/migration-map.md` | T4 | v1 → v2 mapping, conflict precedence | High | scratch-copy exercise + 15/0 |
+| `evals/run-v1-to-v2-fixtures.ts` · `evals/fixtures/v1-to-v2/` | T4 | migrate invariants + schema cross-check | Low | 15/0 |
+| `README.md` · `CHANGELOG.md` | T4 · close | upgrade guide, [Unreleased], SPRINT-106 | Low | read-through |
+| `scripts/qa-check.sh` · `docs/knowledge-index.md` | close | harnesses wired into the gate; index regenerated | Low | full gate 258/1 → leg re-verified |
 
 ## Retro
+
+**Retrieval check** — no prior L/ADR was contradicted; two promoted ones were re-hit (L-142 via the
+T0 fill guard, L-020 via the unwired harnesses) → filed as new sightings L-214 and L-213.
+
+**Cost** — coordinator inline + 12 subagents (5 Sonnet builders, T1–T4 each with one bounded retry; 3 Sonnet
+reviewers; 1 Haiku probe answerer; 3 Codex review rounds on the decomposition) ≈ 1.48M Claude-side subagent
+tokens, summed from each agent's final report (Codex's own usage not reported);
+3 full-gate runs (one killed by the host for memory). Five tasks delivered, 26 of 27 Plan boxes ticked + 1 n/a.
+
+**Worked**
+- Every outside review found something the author's own green suite could not: a simulated must-FAIL,
+  a line-ending-vacuous round trip, an unwired rule, a conflict rule that could delete `TODO.md` over stale files.
+- Stopping on stale criteria instead of reinterpreting them: five owner rulings, each logged before the tick.
+
+**Friction**
+- Frozen DoD written before the hard cut went stale three times (T3 ×3, T4 "22") — a mid-promote ruling
+  outran a Plan locked minutes earlier.
+- The builders' "outside my Layers" note about gate registration went unrouted until the close gate (L-213).
+- Plan ↔ member-file tick drift (TD-179) — two DoDs per task until TASK-362.
+
+**Pattern candidate** — L-213 · L-214 (count 1 each).
+
+**Carried** — TASK-360 (sprint-file-by-reference half → TASK-362) and TASK-370 (real-copy tick count;
+no interrupted-run fixture) stay open in `docs/work/todo/`.

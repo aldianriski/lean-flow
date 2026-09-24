@@ -295,6 +295,15 @@ status: current
 > sprint checkers — which glob `docs/sprint/SPRINT-*.md` non-recursively — were still schema-checking
 > two closed sprints as active Plans. Both archived with their logs at this promote.
 
+- **TD-179** severity: medium | status: open | created: Sprint-106
+  - Summary: **a sprint's Plan and its member task files each carry a DoD, and only the Plan gets ticked.**
+    SPRINT-106's Plan was ticked for T0–T3 while the five member files' `## Done when` stayed unticked;
+    `migrate`'s real-input exercise found it (17 ticked in the Plan, 0 in the files) and reported five
+    conflicts. A v2 `/prime` counts the files, so it would have misreported the sprint.
+  - **Owner ruling (SPRINT-106 close):** the coordinator mirrors ticks into member files, truthfully —
+    only what is actually true of the file's own wording — until the Plan copy is removed.
+  - **Resolve when** TASK-362 (promote/close by reference) removes the Plan copy, leaving one DoD per task.
+
 - **TD-178** severity: low | status: open | created: Sprint-104
   - Summary: **layers-completeness reads a bare filename in DoD prose as undeclared when `Layers:` names
     the same file by path.** Prose `qa-verdict.ts` vs `Layers:` `scripts/qa-verdict.ts` is an

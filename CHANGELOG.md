@@ -25,9 +25,27 @@ it — `/prime` is the one exception, reporting the layout and continuing rather
 `/lean-doc-generator migrate` is the only `2.x` path onto the store: it maps a `TODO.md` Backlog
 and an active sprint's Plan onto `docs/work/` field by field, plan → approve → apply, resumable
 (an interrupted run re-run skips what already exists and never overwrites a conflicting file), and
-removes `TODO.md` once every task has moved (non-task prose is listed for the owner to relocate or
-drop, never dropped silently). Mapping + verification: `skills/lean-doc-generator/references/
+removes `TODO.md` once every task has moved and no conflict is left unresolved (non-task prose is
+listed for the owner to relocate or drop, never dropped silently). Mapping + verification: `skills/lean-doc-generator/references/
 migration-map.md` § v1 → v2 work-item store (2.0). Upgrade path: README.md § Upgrading to 2.x.
+
+---
+## SPRINT-106 — The Store, and the Way In (2026-09-24)
+
+EPIC-017's first member sprint. **Unreleased** — the whole epic gates `2.0.0` (owner ruling).
+
+- **Work-item store** — `docs/work/{backlog,todo,in_progress,review,done,cancel}/` with its schema in
+  `docs/work/README.md`; transitions are `git mv` in a commit of their own (`ADR-045`). The first real
+  transitions (three tasks → `done/`) landed as pure renames.
+- **Membership + derived progress** — `sprint:`/`epic:` frontmatter; `/prime` counts `## Done when`
+  boxes across a sprint's member files; optional `## Members` list in the sprint template.
+- **Hard cut** — the 7 queue skills detect v1/mixed by existence alone and refuse by name → `migrate`
+  (`ADR-046`); `/prime` reports and continues.
+- **Migrate** — `migration-map.md` § v1 → v2: Backlog and active-sprint tasks, one file per task,
+  owner-resolved conflicts that block `TODO.md` removal; exercised on a scratch copy of this repo.
+- **Baseline** — EPIC-017's before-figures frozen: completeness 9/26, retrieval 11/12, recurrence 22.
+- **Gate** — three new harnesses (work-store opt-in, layout + v1-to-v2 always-on); full gate
+  `258 pass, 1 fail`, the one cleared by commit.
 
 ---
 ## SPRINT-104 — The Gate's Own Blind Spots (2026-09-23)

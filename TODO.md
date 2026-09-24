@@ -16,11 +16,10 @@ status: current
 
 ## Active Sprint
 
-> **SPRINT-106 — The Store, and the Way In** → docs/sprint/SPRINT-106-the-store-and-the-way-in.md
+> **No active sprint.** Next: `/lean-doc-generator promote` — EPIC-017's next slice lives in `docs/work/`.
 >
-> `EPIC-017`'s first member (the 2.0 plan): `TASK-359` · `TASK-360` · `TASK-369` · `TASK-370`.
-> Predecessor: **SPRINT-105 — Enforce What Is Already Written**, closed 2026-09-22 at 24 of 24 DoD.
-> See `CHANGELOG.md` and the archived pair.
+> Predecessor: **SPRINT-106 — The Store, and the Way In** closed 2026-09-24: 26 of 27 Plan DoD + 1 n/a by
+> ruling; TASK-360 and TASK-370 carried open in `docs/work/todo/`. See `CHANGELOG.md` and the sprint pair.
 
 **Standing facts the Backlog depends on** — narrative that used to live here is in
 [`CHANGELOG.md`](CHANGELOG.md) and the sprint archive. Pruned at the SPRINT-097, SPRINT-100 and

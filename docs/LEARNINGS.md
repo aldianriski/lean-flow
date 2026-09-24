@@ -22,13 +22,25 @@ where all of them read. Reviewed at every **Sprint Promote** before planning.
 > `scripts/gen-index.sh` (LEARNINGS + ADRs + research). This file is the LEARNINGS SSOT; the index is derived.
 
 > **Id policy — monotonic, never reused:** a pruned/promoted entry's id retires forever; the next
-> new id continues from the highest id **ever issued** (currently **L-212**), not the highest visible.
+> new id continues from the highest id **ever issued** (currently **L-214**), not the highest visible.
 > `L-001`–`L-021` above stay valid as-is — this rule starts now, not retroactively.
 > **Retired ids:** `L-022`–`L-042` pruned/promoted → durable rule in `CLAUDE.md` anti-patterns ·
 > skill red-flags · sprint archive. `L-016`/`L-017` were briefly reused pre-policy — the ORIGINAL
 > 016/017 content is retired; today's `L-016`/`L-017` above are the current, legitimate entries.
 
 ---
+
+## L-214 [tags: tooling] [status: active]: **A guard written with the same construct as the edit it guards agrees with the edit's defect — so it passes exactly when it should fail.** At SPRINT-106's T0 a fill script's regex, built in a JS template literal, lost its backslashes (`\|` → `|`), became an alternation of empty strings, and matched at offset 0: twelve result rows were glued onto the frontmatter's first line. The script's guard — "throw if the row isn't found" — tested the **same** broken pattern, so it found a match every time and the run reported success over a corrupted file. Caught only by reading the output back, not by the guard. **Durable form: a guard must reach its subject through a different route than the edit did** — an exact-line match or an edit-count assertion (`n === 14`) instead of re-running the edit's own matcher; and read the artifact back once before trusting any "done". Cheap tell: the guard and the edit share one expression.
+- seen: 2026-09-24 (SPRINT-106 T0 — result table fill, restored via `git checkout` and `hash-object` == `HEAD:` blob)
+- count: 1
+- promoted: no
+- related: L-142 (the guard needs guarding) · L-137 (verify the seed landed) · L-198 (vary the selector, not the direction)
+
+## L-213 [tags: process] [status: active]: **A builder's "outside my declared scope" note is an unrouted to-do, not a closed question.** SPRINT-106 T1's builder reported its new harness was "not wired into qa-check.sh's always-on/opt-in lists — out of this task's declared Layers". Correct of the builder; the coordinator accepted the task and never routed the note. T3 and T4 then shipped two more harnesses the same way. The close's full gate printed **256 pass, 4 fail**: three harnesses registered in no list — present in `evals/`, run by nothing — plus a stale index. Every per-task check was green, because each builder was right inside its Layers and the seam sat between them (L-172's shape, L-020's class). **Durable form: when a report says "out of scope", the coordinator files it, assigns it, or rules it unneeded before ticking the task** — a scope boundary names who must act next, never that nobody must. Cheap tell: a report paragraph that begins "not done because…".
+- seen: 2026-09-24 (SPRINT-106 close — system-verify run 2)
+- count: 1
+- promoted: no
+- related: L-020 (shipping ≠ wiring) · L-172 (the property that lives between tasks) · L-165 (found by an independent pass)
 
 ## L-212 [tags: tooling] [status: active]: **A per-file check whose only runner is the full gate is unread whenever the full gate cannot finish — so run it on the artifact at the moment the artifact is written.** SPRINT-104's own Plan failed layers-completeness from `plan_commit` to close: six findings, reproduced by re-running the checker against the promote-time file, and first written down on the last day, when a `QA_FULL=1` run finally completed. The checker takes under a second on one file. Its only caller is a gate this host kept failing to finish (memory reaps, truncation). Nothing about the finding was subtle: bare filenames in prose against full paths in `Layers:`, the same shape SPRINT-099's close hit. **The cost of a Plan finding rises with every commit after promote** — at promote it is an edit; after `plan locked` it is a logged Plan amendment; at close it is a Retro item. **Durable form: a check that reads one artifact belongs at that artifact's write site, with the full gate as the backstop, not the only runner.** Filed as `TASK-368`; the matcher's own gap is `TD-178`.
 - seen: 2026-09-23 (SPRINT-104 close — six layers-completeness findings live since `5216c69`)

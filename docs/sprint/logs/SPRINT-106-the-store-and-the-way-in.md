@@ -182,3 +182,11 @@ this as outside its Layers and the coordinator did not route it (L-020, shipped 
 file's own rules (`75f83ff`): layout + v1-to-v2 always-on (static, ~0.13s), work-store opt-in (builds git
 repos, ~2.5s). Run 3: **`QA-CHECK: 258 pass, 1 fail`**, the one being layers-observed on the uncommitted
 `scripts/qa-check.sh`, cleared by the coordinator commit and re-verified PASS; opt-in work-store 13/0.
+
+### 2026-09-24 | close | SPRINT-106 closed — 26 of 27 Plan DoD + 1 n/a by owner ruling
+Retro written and routed: **Shipped** → `CHANGELOG.md` (SPRINT-106 section; `[Unreleased]` corrected — an
+unresolved conflict blocks `TODO.md` removal). **Debt** → `TD-179` (Plan ↔ member-file tick drift until
+TASK-362). **Follow-ups** → none new: TASK-360 and TASK-370 carry their open items in their own files.
+**Learnings** → `L-213` (a builder's out-of-scope note is an unrouted to-do) · `L-214` (a guard sharing the
+edit's construct agrees with its defect). EPIC-017 rolled up; no § Closed-when fully met. TODO pointer
+cleared. Handoff reconciliation: no `handoff` entries this sprint. No release — the whole epic gates `2.0.0`.
