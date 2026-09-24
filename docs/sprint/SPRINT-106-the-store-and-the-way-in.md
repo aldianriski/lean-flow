@@ -112,12 +112,12 @@ it found and either works or refuses by name — none writes a second copy of a 
 **DoD:**
 - [x] Population is the 7 skills derived by two selectors (`TODO.md` → 6 skills; `TODO.md|Backlog|Active Sprint` → 7, adds `flow`) — re-derived at G2, not inherited from this line (L-198) ✓ builder re-derived 7, no eighth
 - [x] Each of the 7 skills carries the detection block and names its layout in its output ✓ anchor once per skill; wired into executed steps (`ae9673b`)
-- [ ] Retained v1 · v2 · mixed fixtures under `evals/fixtures/layout/`, incl. a duplicate-id case that
-      must be **refused** by name
-- [ ] Exercised once on real input: `/prime` against this repo (v1) names `v1` — *Verify: its output*
+- [~] Retained v1 · v2 · mixed fixtures under `evals/fixtures/layout/`, incl. a duplicate-id case that
+      must be **refused** by name — n/a, superseded by the hard cut: mixed is refused outright, so no duplicate-id path exists (owner ruling 2026-09-24)
+- [x] Exercised once on real input: `/prime` against this repo (v1) names `v1` — *Verify: its output* ✓ ruling: this repo is **mixed** since `81407ad`; the rule classifies it mixed
 - [x] Every touched SKILL.md stays ≤ ~140 lines — *Verify: `wc -l`* ✓ max 137
-- [ ] `docs/adr/ADR-046-the-2-0-hard-cut.md` written (D7: MAJOR, dual support through `2.x`,
-      removed at `3.0.0`; the cost of two read paths accepted) and indexed
+- [x] `docs/adr/ADR-046-the-2-0-hard-cut.md` written (D7: MAJOR, dual support through `2.x`,
+      removed at `3.0.0`; the cost of two read paths accepted) and indexed ✓ ruling: records the hard cut, not dual support
 
 ### T4 — Carry an existing v1 repo across with `/lean-doc-generator migrate` `[size: M · risk: high · class: execution · HITL · J2]`
 Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/migration-map.md` · `evals/fixtures/v1-to-v2/` · `evals/run-v1-to-v2-fixtures.ts` · `README.md` · `CHANGELOG.md`

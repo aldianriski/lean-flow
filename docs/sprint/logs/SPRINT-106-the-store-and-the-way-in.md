@@ -127,3 +127,11 @@ unconditionally, and the text contract passed a skill with its refusal line dele
 wired the rule into the executed steps of 5 skills (0 new lines) and tightened the contract; proven by
 deleting a refusal line in a **scratch copy** (real skills never seeded) — exactly that skill's 2 cases reddened.
 prose-density 32/0 after the retry. **3 DoD boxes left open for an owner ruling** — see next entry.
+
+### 2026-09-24 | scope-change | owner ruling — three T3 criteria superseded by the hard cut
+Three T3 DoD lines were frozen at `4290781`, before the hard-cut ruling: a duplicate-id fixture ("must be
+refused"), "`/prime` against this repo names `v1`", and ADR-046 as "dual support through `2.x`". **Owner
+ruled** (L-088 — never reinterpreted silently) that the 2026-09-23 hard-cut scope-change supersedes them:
+duplicate-id → `[~]` n/a (mixed is refused wholesale, so no id-collision path exists); real-input → ticked on
+evidence that this repo is **mixed** since `81407ad` and classifies so; ADR-046 → ticked as recording the
+hard cut. **T3 complete.**
