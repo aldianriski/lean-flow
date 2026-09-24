@@ -43,3 +43,23 @@ All four members are `origin: manual` → full G1 checklist, no fast-path. Owner
 - **Tiers declared:** T1's post-promote-edit detector is **Tier G** (retained must-FAIL fixtures,
   seeded-break proof, worktree-isolated outside reviewer); T2–T4 are Tier X.
 Sequence: T1 → {T2 ‖ T3, worktree-isolated} → T4 (J2: human present).
+
+### 2026-09-24 | progress | T1 built — promote/close by reference, freeze checker (Tier G), ADR-047
+Worktree commit `4f8ce2e`, cherry-picked to main. `promote` git-mv's members and stamps `sprint:`; the Plan carries
+no DoD copy (`SPRINT.md.template` · `references/sprint-by-reference.md`); `close` requires members in
+`done/`|`cancel/`. Freeze = `plan_commit`: `scripts/lib/check-sprint-by-reference.ts` resolves members by id
+at `plan_commit` and compares `## Done when` (ticks, ` ✓ evidence` suffix, CRLF ignored; an unlogged change →
+`FREEZE-EDIT`). **Re-run by the coordinator on main:** `by-reference-fixtures: 25 pass, 0 fail`; live SPRINT-107
+freeze `5 pass, 0 fail`. Builder's 15-seed break proof reported ALL OK (`git hash-object` vs
+`git rev-parse HEAD:<path>`, blob `b0aae826`). TD-179 resolved → TASK-362. Harness registered opt-in in
+`qa-check.sh` (git-repo rule). **Ticks held** until the worktree-isolated outside review (Tier G bar ii) returns.
+consequence · T1 · behaviour:material · governance:high → outside isolated reviewer
+
+### 2026-09-24 | scope-change | T1 touched files outside its declared Layers
+What broke: `layers observed` flags T1 files undeclared in the frozen Plan — `docs/adr/` + `docs/DECISIONS.md`
+(G2 ruling, logged above but never written into Layers), `scripts/lib/check-sprint-by-reference.ts` (the
+detector needs a home a consumer-free harness can call), `evals/run-layout-fixtures.ts` (its close-row anchor
+quoted the replaced text `Verify all DoD`; retargeted, 33/0), `docs/knowledge-index.md` (regenerated; also
+absorbed pre-existing drift L-213/L-214), `scripts/qa-check.sh` (coordinator registration, D3). Impact: none
+on size or acceptance; § Plan stays frozen, this entry is the record. G2 re-confirm: covered by the owner's
+G2 ruling for the ADR; the rest are mechanical consequences.

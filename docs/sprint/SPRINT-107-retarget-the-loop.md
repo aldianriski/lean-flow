@@ -127,5 +127,15 @@ review comparand) with no Plan-copy dependency.
 
 | File | Task | Change (WHY) | Risk | Test |
 |------|------|--------------|------|------|
+| `scripts/lib/check-sprint-by-reference.ts` | T1 | freeze + close check by reference (Tier G) | High | run-by-reference-fixtures 25/0 + 15 seeds |
+| `evals/run-by-reference-fixtures.ts` · `evals/fixtures/by-reference/` | T1 | retained must-FAIL + selection-varying fixtures | Med | self, seeded |
+| `skills/lean-doc-generator/references/sprint-by-reference.md` | T1 | promote/freeze/close procedure as plain git steps (consumer-facing) | Med | read-through |
+| `skills/lean-doc-generator/SKILL.md` | T1 | promote/execute/close rows point to by-reference (138 lines) | Low | `wc -l`; layout 33/0 |
+| `skills/lean-doc-generator/templates/SPRINT.md.template` | T1 | Members first; Plan Tn carries no DoD | Med | read-through |
+| `docs/adr/ADR-047-*.md` · `docs/DECISIONS.md` | T1 | D2 + freeze ruling | Low | gen-index --check |
+| `TECH-DEBT.md` | T1 | TD-179 resolved → TASK-362 | Low | — |
+| `evals/run-layout-fixtures.ts` | T1 | close-row anchor retargeted | Low | 33/0 |
+| `docs/knowledge-index.md` | T1 | regenerated | Low | gen-index --check |
+| `scripts/qa-check.sh` | T1 (coord.) | harness registered opt-in (D3) | Low | — |
 
 ## Retro
