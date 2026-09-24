@@ -34,3 +34,7 @@ none
 ## Tracker
 
 EPIC-017 Closed-when 9 · Codex r1 F11 · F12 · r2 R2-1b · R2-2b
+
+## Amended 2026-09-24
+
+- **Owner ruling: no tombstone.** `migrate` removes `TODO.md` once every task is moved (non-task prose listed in the plan for the owner to place or drop). A tombstone would classify as mixed and be refused (existence-only detection, ADR-046). A stray 1.x write recreates `TODO.md` → mixed → refused → `migrate` re-run ingests it.

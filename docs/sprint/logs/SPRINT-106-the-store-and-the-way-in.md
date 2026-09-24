@@ -135,3 +135,13 @@ ruled** (L-088 — never reinterpreted silently) that the 2026-09-23 hard-cut sc
 duplicate-id → `[~]` n/a (mixed is refused wholesale, so no id-collision path exists); real-input → ticked on
 evidence that this repo is **mixed** since `81407ad` and classifies so; ADR-046 → ticked as recording the
 hard cut. **T3 complete.**
+
+### 2026-09-24 | scope-change | owner ruling — migrate removes TODO.md; no tombstone
+**What broke:** T4's DoD defines a "tombstone `TODO.md`", but T3's owner-ruled existence-only rule classifies
+`TODO.md` + `docs/work/` as **mixed** and refuses it — a tombstone would make every migrated repo refused.
+**Ruling:** `migrate` **removes** `TODO.md` once every task is moved; non-task prose in it is listed in the
+migrate plan for the owner to place or drop. A later 1.x write recreates `TODO.md` → the tree classifies
+mixed → 2.x refuses and points to `migrate` → `migrate` ingests the stray tasks. Loss-free, and consistent
+with existence-only detection. **Impact:** T4 box "Tombstone `TODO.md` shape defined; a task appended to it
+is surfaced by a v2 `/prime`" now reads as: removal defined; a stray v1 write is surfaced by `/prime`'s
+`Layout: mixed` row and ingested by a `migrate` re-run. `TASK-370` / `TASK-372` amended to match.

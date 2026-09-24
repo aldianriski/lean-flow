@@ -38,3 +38,7 @@ that installed 1.66.x skills read a tombstone as an empty Backlog. UNCONFIRMED
 ## Tracker
 
 EPIC-017 scope 7 · D7 · D8 · SPRINT-106 T4
+
+## Amended 2026-09-24
+
+- **Owner ruling: no tombstone.** `migrate` removes `TODO.md` once every task is moved (non-task prose listed in the plan for the owner to place or drop). A tombstone would classify as mixed and be refused (existence-only detection, ADR-046). A stray 1.x write recreates `TODO.md` → mixed → refused → `migrate` re-run ingests it.
