@@ -71,10 +71,10 @@ ordering is explicit (`priority:` + a per-status order), since folders cannot se
 **Acceptance:** a ≥ 30-task decomposition writes ≥ 30 files and fires no cap check — on real input.
 
 **DoD:**
-- [ ] `/triage` grooms task files (state, priority, order); readiness never folded into the folder
-- [ ] `/task-decomposer` writes one file per task, both references retargeted
-- [ ] ≥ 30-task breakdown → ≥ 30 files, no cap check fires — exercised on real input (Closed-when 1)
-- [ ] Retained fixture incl. a selection-varying case
+- [x] `/triage` grooms task files (state, priority, order); readiness never folded into the folder ✓ store-writers-fixtures 29/0 (`3b49aef`)
+- [x] `/task-decomposer` writes one file per task, both references retargeted ✓ store-writers-fixtures 29/0 (`3b49aef`)
+- [x] ≥ 30-task breakdown → ≥ 30 files, no cap check fires — exercised on real input (Closed-when 1) ✓ EPIC-017 → 37 files (TASK-388..424) in a scratch v2 store; check-doc-caps 0 FAIL, v1 control TODO.md 828 > 320 (`3b49aef`)
+- [x] Retained fixture incl. a selection-varying case ✓ store-writers-fixtures 29/0 (`3b49aef`)
 
 ### T3 — Retarget `/handoff` and `/flow` onto the store `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/handoff/SKILL.md` · `skills/flow/SKILL.md` · `skills/lean-doc-generator/references/handoff-reconciliation.md` · `evals/fixtures/store-readers/` · `evals/run-store-readers-fixtures.ts`
@@ -141,5 +141,11 @@ review comparand) with no Plan-copy dependency.
 | `skills/flow/SKILL.md` | T3 | assess/feed/plan/build/close preconditions query the store | Med | store-readers 21/0 |
 | `skills/lean-doc-generator/references/handoff-reconciliation.md` | T3 | follow-up TASK → backlog task file, `origin: close-retro`, derived id | Low | store-readers 21/0 |
 | `evals/run-store-readers-fixtures.ts` · `evals/fixtures/store-readers/` | T3 | retained v2 fixture harness (Tier X), always-on | Low | self |
+| `skills/lean-doc-generator/references/handoff-reconciliation.md` · `evals/run-store-readers-fixtures.ts` | T3 (coord.) | follow-up id from `docs/work/` only, never TODO.md (TASK-369); fixture asserts no read | Low | 21/0 + seeded arm reddens it |
+| `skills/task-decomposer/SKILL.md` | T2 | write step → one task file per task (122 lines) | Med | layout 33/0 |
+| `skills/task-decomposer/references/task-file.md` | T2 | new: file shape, filename rule, derived id (six folders, no worktrees) | Med | store-writers 29/0 |
+| `skills/task-decomposer/references/fog-map.md` · `prd-and-slices.md` | T2 | graduated/approved slices → backlog task files | Low | read-through |
+| `skills/triage/SKILL.md` | T2 | grooms backlog files; order derived per A2; cancel via `git mv` (`Bash(git *)`) (124 lines) | Med | store-writers 29/0 |
+| `evals/run-store-writers-fixtures.ts` · `evals/fixtures/store-writers/` | T2 | retained Tier X fixtures + the 37-task EPIC-017 breakdown, always-on | Low | self 29/0 |
 
 ## Retro

@@ -93,3 +93,27 @@ exactly its 2 cases (restored `b0aae82` == HEAD blob).
 **Owner ruling (G2, 2026-09-24):** a member added mid-sprint passes iff a post-`plan_commit` scope-change names it;
 baseline = its content at the first commit stamping `sprint:`. → folded into the same revise round + ADR-047.
 Revise loop: one bounded builder retry, then a second independent review. T1 ticks held.
+
+### 2026-09-24 | progress | T2 accepted — /triage + /task-decomposer read and write the store
+Worktree commit `3b49aef`, cherry-picked. decomposer writes one `docs/work/backlog/TASK-NNN-slug.md` per task
+(id = numeric max over the six status folders + 1, worktrees never walked; rule in new
+`references/task-file.md`); triage edits `priority:`/`state:` in place, derives order per A2, cancels by
+`git mv`. **Coordinator re-run on main:** `store-writers-fixtures: 29 pass, 0 fail`; layout 33/0.
+**Real input (L-007, Closed-when 1):** EPIC-017 decomposed into 37 files (TASK-388..424) in a scratch v2
+store (never this repo's backlog); `check-doc-caps` 0 FAIL — no §2 row reaches `docs/work/`, so one-file-per-task
+has no container to breach; positive control: the same 37 in v1 shape push `TODO.md` to 828 > 320. Registered
+always-on. DoD ticked in Plan + TASK-361.
+consequence · T2 · behaviour:med · governance:low → coordinator re-run + read of the diff
+**Builder declined my brief's legacy-`TODO.md` id arm** (TASK-369: only migrate reads TODO.md) — correct; T3 had
+followed the brief, so aligned in `65bbb13` (fixture now asserts TODO.md is never read; seeding the old arm back
+reddened exactly that case, restored under `git hash-object` = `98bc4b03`). **Interpretation logged:** a blocker
+sorts at the highest priority of anything waiting on it — the reading of A2's "topological over depends-on".
+New conventions not yet in `docs/work/README.md`: `- **open:**` / `- **blocked-by:**` under `## Assumes` → close-retro
+follow-up (schema doc is TASK-377's). README/CHANGELOG for T2/T3's user-visible change → at close (D4: no release).
+
+### 2026-09-24 | scope-change | TASK-361 ordering criterion superseded by A2; T2 adds a reference file
+What broke: TASK-361's `## Done when` names "`priority:` + a per-status order file"; the owner's G2 ruling A2
+removed the order file. Impact: criterion read under A2 — recorded as `## Amended 2026-09-24` in TASK-361 (the
+Done-when text itself unedited), ticked on that basis. Also: `skills/task-decomposer/references/task-file.md` is
+outside T2's Layers (the SKILL could not take the file shape under ~140 lines; ADR-006). G2 re-confirm: A2 is the
+owner's ruling.
