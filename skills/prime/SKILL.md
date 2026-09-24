@@ -46,6 +46,8 @@ no sprint is active, fall back to the Backlog.
 **v2 tree** (`docs/work/` present): open DoD = count of `- [ ]` lines under each file's own
 `## Done when` section, summed across `docs/work/**/TASK-*.md` whose frontmatter `sprint:` line
 **exactly** matches an active sprint's id — a member of another sprint is never counted.
+`TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content).
+**On v1 or mixed** — prime reports the `Layout:` row naming it, skips the task count, and continues; it never aborts. The row points to `/lean-doc-generator migrate`.
 **Resuming from a `/handoff`?** Also read the handoff doc at the temp path it printed.
 
 **Handoff status (read-only report, SPRINT-094 T2)** — an active sprint's Execution Log, or root
@@ -79,7 +81,7 @@ version-scoped root, so this skill's base dir is the whole roster's. Out of scop
 ## Steps
 
 1. Read each path in order; track found/missing.
-2. From the active task list, count open `- [ ]` tasks.
+2. From the active task list, count open `- [ ]` tasks — skipped on v1/mixed (§ Resolution layout check).
 3. Compare the invocation header's base-dir version against the plugin manifest (above).
 4. Read the LATEST `handoff` entry (§ Handoff status) — report only, never write.
 5. Emit the health report (below) — health check ONLY, no inline file summaries.

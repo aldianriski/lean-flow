@@ -44,6 +44,7 @@ behind "conduct the loop".
 - **Unattended, only stage 4 conducts.** A headless run (declared at trigger, never inferred) executes a promoted Plan and decides nothing: stage 2 (Feed — the grill), stage 3 (Plan — promote's governance sign-off) and stage 5's `close` §11 retention all **park**; stage 6 `/handoff` is how it ends. If stage 3's precondition is unmet, the conducted run parks there rather than promoting a sprint nobody approved. Contract → `orchestrator/references/night-run.md` Part 0.
 - **Asked to *start* a night run, you are the launcher — not the run.** Conduct stages 1–3 interactively (gates and all), then pre-flight, and fire the trigger only once it is green. The stages that park *inside* an unattended run are exactly the ones you must complete *before* one; that is legal here because a human is present. Never spawn first (→ `orchestrator/references/night-run.md` Part 1a).
 - **One sprint per stream** — never a second sprint in a stream that already has one; parallel streams (sprint `stream:` frontmatter) each run their own. Single-stream repos: exactly one active sprint, as before.
+- **Layout v1/mixed** → `TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content). Refuse and point to `/lean-doc-generator migrate`, the only 2.x path for a v1 tree — never conduct a stage through it.
 - The conducted path produces the **same artifacts** as à la carte — it only guarantees the sequence and that the Close governance actually runs.
 
 ## Red flags

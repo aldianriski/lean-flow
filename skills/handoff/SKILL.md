@@ -12,6 +12,8 @@ version: "0.1.0"
 Compact the current conversation into a handoff document so a fresh agent can continue without
 re-deriving everything. **Transient, not durable** — this is the conversation's working state, not a
 project record. Pairs with `/prime`: handoff out at session end → `/prime` + read the handoff in.
+`TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content).
+On v1 or mixed, name it and refuse to write the status stub — point to `/lean-doc-generator migrate`, the only 2.x path for a v1 tree.
 
 ## When to invoke
 
@@ -46,7 +48,7 @@ was missing is a **status stub**: a repo-side record of whether this handoff is 
 may still resume it), `consumed` (a session resumed it and continued), or `spent` (superseded, or
 the sprint closed past it) — so "was this actioned?" is answerable without opening the temp file.
 
-1. **Resolve context** — read `TODO.md` § Active Sprint. A pointer names the log to use:
+1. **Resolve context** — after the layout check above (v1/mixed stops here): read `TODO.md` § Active Sprint. A pointer names the log to use:
    `docs/sprint/logs/SPRINT-NNN-<slug>.md` (create lazily from `sprint-log.md.template` if this is
    the sprint's first Log entry). No pointer → the fallback ledger, root `HANDOFF-LEDGER.md`
    (create lazily, same two-field shape, no sprint-specific content).

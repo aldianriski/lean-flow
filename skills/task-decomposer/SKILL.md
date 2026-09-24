@@ -12,6 +12,8 @@ version: "0.2.0"
 Translate any form of human intent into fully-formed `TASK-NNN` entries. The approved output
 serves as the scope gate — `/orchestrator` G1 then runs as a fast-path confirm (scope unchanged?),
 not a re-grill.
+`TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content).
+On v1 or mixed, name it and refuse to write — point to `/lean-doc-generator migrate`, the only 2.x path for a v1 tree.
 
 ## Input types
 
@@ -50,7 +52,7 @@ generator's job; this skill consumes.
 4. **Risk score** — per task, rate impact × likelihood (low / med / high); note the blast radius (files / layers touched).
 5. **Classify HITL / AFK** — `HITL` = a human must review the output before proceeding; `AFK` = autonomous completion is safe (acceptance is mechanically checkable · no irreversible side effects · no product/UX judgment call · spec is durable). Default to `HITL` when uncertain. **For `AFK` tasks, spec durably** — an AFK task may sit in the backlog for weeks before an agent picks it up: write behavioral contracts (name the types / interfaces / config shapes to change) + testable acceptance + explicit out-of-scope; **never reference file paths or line numbers** — they go stale.
 6. **Validate** — every task has an observable acceptance criterion ("done when …"); no two tasks share identical criteria (merge or differentiate). For multi-slice breakdowns, run the **breakdown quiz** (reference) — confirm granularity, dependencies, merge/split, HITL/AFK — before Write.
-7. **Write** — only after the human types `approve`, append entries to `TODO.md` **Backlog** in dependency order (blockers first). Touch no other file. Sprint formation happens later via `/lean-doc-generator promote`.
+7. **Write** — after the layout check above (v1/mixed stops here) and only after the human types `approve`, append entries to `TODO.md` **Backlog** in dependency order (blockers first). Touch no other file. Sprint formation happens later via `/lean-doc-generator promote`.
 
 ## Fog-map mode (foggy work too big to plan up front)
 

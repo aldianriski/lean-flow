@@ -1,6 +1,6 @@
 ---
 owner: Maintainer
-last_updated: 2026-09-21
+last_updated: 2026-09-24
 update_trigger: A new ADR is added under docs/adr/
 status: current
 ---
@@ -12,6 +12,7 @@ Index of Architecture Decision Records. Each ADR is its own append-only file in 
 
 | ADR | Title | Status | Date |
 |---|---|---|---|
+| [ADR-046](adr/ADR-046-the-2-0-hard-cut.md) | **`2.0.0` is v2-only** — a hard cut, not a graceful migration window. A `2.x` queue skill (`prime` · `triage` · `task-decomposer` · `lean-doc-generator` · `orchestrator` · `handoff` · `flow`) that detects a v1 or mixed tree (existence-only: `TODO.md` present? `docs/work/` present?) refuses its queue operation by name and points to `/lean-doc-generator migrate`, the only `2.x` path accepting one; `/prime` reports and continues instead of aborting. Supersedes the 2026-09-21 dual-layout-through-`2.x` ruling, which contradicted EPIC-017 Closed-when 2 (EPIC-017 D7 as amended) | accepted | 2026-09-24 |
 | [ADR-045](adr/ADR-045-the-work-item-store.md) | The work-item store's **three orthogonal axes** — status is the directory, title is the filename, sprint/epic membership is frontmatter, never nested under status (would foreclose the cross-sprint "what's in review" query) — and **a status transition is `git mv`, in its own commit**, never bundled with a content edit, so `git log --follow` recovers a task's full lifecycle across every folder it has occupied (EPIC-017 D1, D6) | accepted | 2026-09-24 |
 | [ADR-044](adr/ADR-044-hooks-are-admissible.md) | **Hooks and agent definitions are admissible**, held to ADR-001's curation bar — ADR-001 had explicitly REJECTED "no agents / no hooks, ever" as too extreme, and the blanket line became a *proxy* for curated that got enforced in place of it. **ADR-011 superseded in part**: its real objection was the platform fact that hooks auto-activate with **no per-hook disable**, so any shipped hook is mandatory for every consumer — which sets the bar at "worth being mandatory", measured on real input, never argued. **ADR-002 untouched** — it contains no hook clause (`grep -ci hook` → 0), and an earlier draft of 044 claiming otherwise was itself the mis-citation it exists to correct. Admissible ≠ present: the first candidate, a Stop hook for L-002, was **withdrawn at outside review** at ≈60% false positives over 48 real transcripts and 8 of 9 misses being Indonesian (`TASK-366`) | accepted | 2026-09-21 |
 | [ADR-043](adr/ADR-043-the-engine-is-the-gates-cost-centre-and-its-consumer-contract-bounds-the-fix.md) | The conformance engine is the gate's cost centre (60% `sys`, corpus-size spawns), and its **consumer contract bounds the fix** — exit-code and report-text parity are reversible, but shipping a `bun` requirement to adopters of root `conformance.sh` is not, so the port is out of scope for a performance sprint | accepted | 2026-09-20 |

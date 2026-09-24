@@ -27,6 +27,7 @@ self-approve. No specialist agents: gates are inline checklists and review is a 
 - Task is in an **active sprint** → default to the sprint mode (or `quick` for a single one).
 - Task is only in the **Backlog** (not in any active sprint) → **don't silently build**: surface the choice as a popup — `/lean-doc-generator promote` it into a sprint, or proceed as an explicit `quick` one-off (never slide decompose → build unrecorded).
 - Asked to **start a night run** on anything that isn't already a promoted Plan → you are the *interactive launcher*, not the run: do feed → promote → pre-flight here, gates and all, and fire the trigger only once pre-flight is green. Never spawn first (→ `${CLAUDE_SKILL_DIR}/references/night-run.md` Part 1a).
+- **Layout v1/mixed** → `TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content). Refuse this skill's queue operation and point to `/lean-doc-generator migrate`, the only 2.x path for a v1 tree.
 
 ## G1 — Scope gate (all modes, always runs)
 

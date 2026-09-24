@@ -15,6 +15,9 @@ locked Active Sprint. Re-prioritisation and state changes are **HITL**: propose 
 
 Pipeline: `/task-decomposer` (intake) → **`/triage`** (groom + re-prioritise) → `/lean-doc-generator promote` (form sprint) → `/orchestrator` (build).
 
+`TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content).
+On v1 or mixed, name it and refuse to groom — point to `/lean-doc-generator migrate`, the only 2.x path for a v1 tree.
+
 ## When to invoke
 
 - The backlog has grown and priorities have drifted from reality.
@@ -39,7 +42,7 @@ Rejected work is not a state — it leaves the backlog (see `.out-of-scope/`). D
 ## Flow
 
 1. **Scan `.out-of-scope/` first** — if a backlog task resembles a prior rejection, surface it and ask before keeping it.
-2. **Load** — read `TODO.md` § Backlog (+ root `TECH-DEBT.md`; legacy: TODO § Tech Debt). Ignore the Active Sprint.
+2. **Load** — after the layout check above (v1/mixed stops here): read `TODO.md` § Backlog (+ root `TECH-DEBT.md`; legacy: TODO § Tech Debt). Ignore the Active Sprint.
 3. **Bug intake** — a BUG.md-shaped item (or bug-flavored backlog entry) is routed, not ranked like a feature:
    - known cause + trivial fix → convert to `TASK-NNN` (`state: ready`, **`origin: triage-bug`**)
    - unknown cause / needs investigation → record as a task, `next: /diagnose` (**`origin: triage-bug`**)
