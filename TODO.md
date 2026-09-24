@@ -70,7 +70,7 @@ SPRINT-104 promotes on owner approval (L-008 — a copied narrative drifts from 
 ### P1 — Next Phase Required
 
 > **EPIC-017 (the 2.0 plan) lives in the work-item store, not here** — 26 task files under
-> [`docs/work/`](docs/work/) carrying `epic: EPIC-017` (`todo/` = in SPRINT-106 · `backlog/` = the rest).
+> [`docs/work/`](docs/work/) carrying `epic: EPIC-017` (status is the folder: 23 in `backlog/`, 3 in `done/` after SPRINT-106).
 > Moved 2026-09-23 on owner direction: `TASK-359`…`365` · `369` · `370` left this file; `371`…`387` were
 > filed there directly after three Codex review rounds. Map → [`EPIC-017`](docs/epic/EPIC-017-work-items-that-fit.md).
 

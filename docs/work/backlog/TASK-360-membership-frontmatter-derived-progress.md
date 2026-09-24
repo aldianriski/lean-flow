@@ -2,7 +2,6 @@
 id: TASK-360
 title: "Make sprint and epic membership frontmatter, and sprint progress derived"
 epic: EPIC-017
-sprint: SPRINT-106
 priority: P1
 size: M
 risk: med
