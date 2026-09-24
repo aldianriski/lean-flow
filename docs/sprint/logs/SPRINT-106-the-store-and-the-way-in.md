@@ -112,3 +112,18 @@ consequence · T2 · behaviour: low (3 prose lines in a skill) · governance: me
 and fixed in the template comment: a leaked `SPRINT-106 T2` reference in a consumer file (L-015), a
 self-contradiction ("stays for all of 2.x" vs "TASK-362 retires it"), and "omit on a v1 tree", a state
 the hard cut forbids.
+
+### 2026-09-24 | progress | T3 built — 7 queue skills detect and refuse v1/mixed (`ae9673b`)
+One existence-only rule, verbatim in all 7 skills; on v1/mixed each refuses its queue operation and points
+to `/lean-doc-generator migrate` — `/prime` reports a `Layout:` row and continues, lean-doc-generator
+refuses only promote/close/epic-rollup. Max 137 lines (lean-doc-generator's Migrate/Init trim verified
+loss-free). `evals/run-layout-fixtures.ts` **33 pass, 0 fail**; this repo classifies **mixed**.
+consequence · T3 · behaviour: med (7 consumer-facing skills) · governance: med → outside reviewer,
+**read-only in the main tree instead of worktree-isolated** — an isolated copy would not contain the
+uncommitted diff; isolation guards against a reviewer that writes, so this one was barred from writing
+(no temp edits, `git show HEAD:` for the baseline). It found **no loss** and **2 medium**: the rule sat in
+intro prose while triage/task-decomposer/lean-doc-generator's executed steps still read `TODO.md`
+unconditionally, and the text contract passed a skill with its refusal line deleted. One bounded retry
+wired the rule into the executed steps of 5 skills (0 new lines) and tightened the contract; proven by
+deleting a refusal line in a **scratch copy** (real skills never seeded) — exactly that skill's 2 cases reddened.
+prose-density 32/0 after the retry. **3 DoD boxes left open for an owner ruling** — see next entry.

@@ -110,12 +110,12 @@ reads span both, a write goes where that id already lives, and a duplicate id ac
 it found and either works or refuses by name — none writes a second copy of a task.
 
 **DoD:**
-- [ ] Population is the 7 skills derived by two selectors (`TODO.md` → 6 skills; `TODO.md|Backlog|Active Sprint` → 7, adds `flow`) — re-derived at G2, not inherited from this line (L-198)
-- [ ] Each of the 7 skills carries the detection block and names its layout in its output
+- [x] Population is the 7 skills derived by two selectors (`TODO.md` → 6 skills; `TODO.md|Backlog|Active Sprint` → 7, adds `flow`) — re-derived at G2, not inherited from this line (L-198) ✓ builder re-derived 7, no eighth
+- [x] Each of the 7 skills carries the detection block and names its layout in its output ✓ anchor once per skill; wired into executed steps (`ae9673b`)
 - [ ] Retained v1 · v2 · mixed fixtures under `evals/fixtures/layout/`, incl. a duplicate-id case that
       must be **refused** by name
 - [ ] Exercised once on real input: `/prime` against this repo (v1) names `v1` — *Verify: its output*
-- [ ] Every touched SKILL.md stays ≤ ~140 lines — *Verify: `wc -l`*
+- [x] Every touched SKILL.md stays ≤ ~140 lines — *Verify: `wc -l`* ✓ max 137
 - [ ] `docs/adr/ADR-046-the-2-0-hard-cut.md` written (D7: MAJOR, dual support through `2.x`,
       removed at `3.0.0`; the cost of two read paths accepted) and indexed
 
