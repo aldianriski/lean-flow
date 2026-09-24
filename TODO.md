@@ -16,8 +16,9 @@ status: current
 
 ## Active Sprint
 
-> **No active sprint.** Next: `/lean-doc-generator promote` — EPIC-017's next slice lives in `docs/work/`.
+> **SPRINT-107 — Retarget the Loop** → docs/sprint/SPRINT-107-retarget-the-loop.md
 >
+> `EPIC-017`'s second member: `TASK-362` (+ `TASK-360`'s open half) · `TASK-361` · `TASK-376` · `TASK-375`.
 > Predecessor: **SPRINT-106 — The Store, and the Way In** closed 2026-09-24: 26 of 27 Plan DoD + 1 n/a by
 > ruling; TASK-360 and TASK-370 carried open in `docs/work/todo/`. See `CHANGELOG.md` and the sprint pair.
 
