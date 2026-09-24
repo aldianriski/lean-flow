@@ -28,3 +28,18 @@ recorded as **`f5ceae1` — SPRINT-106's last commit, not this Plan's**. No cont
 and epic `member_sprints` edits were on disk, uncommitted. Repaired in the next commit: `plan_commit` →
 `3e0e710` (where the Plan first entered history, verified by `git show --stat`), epic row added, pointer
 committed. L-120's shape one level up — a chain's control flow is a gate too.
+
+### 2026-09-24 | gate | batch G1 + G2 signed (attended) at `3b23f79`
+All four members are `origin: manual` → full G1 checklist, no fast-path. Owner rulings at G2:
+- **A1 → CONFIRMED as designed:** the freeze *is* `plan_commit`. A member is resolved by id in the
+  `plan_commit` tree (`git show <plan_commit>:<path>`, so later folder moves do not matter) and its
+  `## Done when` compared with the current file; any change without a `scope-change` Log entry naming
+  that id FAILs. No hash field is added to the Members list (a second fact to keep right).
+- **A2 → CONFIRMED, departing from EPIC-017 "Reference adopted":** a backlog is sequenced by
+  `priority:` → topological order over `depends-on:` → task id. **No per-status order file**
+  (laziness ladder; a second home for the list would drift).
+- **scope-change (T1 Layers):** EPIC-017 D2's "→ ADR" is recorded inside T1 as **ADR-047**; T1 gains
+  `docs/adr/` + `docs/DECISIONS.md` as layers. Impact: T1 stays M.
+- **Tiers declared:** T1's post-promote-edit detector is **Tier G** (retained must-FAIL fixtures,
+  seeded-break proof, worktree-isolated outside reviewer); T2–T4 are Tier X.
+Sequence: T1 → {T2 ‖ T3, worktree-isolated} → T4 (J2: human present).
