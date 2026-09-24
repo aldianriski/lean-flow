@@ -9,6 +9,7 @@ status: current
 
 One line per archived sprint (newest first); files live in [`archive/`](archive/).
 
+- SPRINT-106 — The Store, and the Way In — closed 2026-09-24 · `fc6c003` · 26 of 27 DoD + 1 n/a by ruling (unreleased; the whole of EPIC-017 gates 2.0.0) · `epic: EPIC-017` — work-item store (ADR-045), 2.x queue skills refuse v1/mixed by existence (ADR-046), migrate v1→v2 with owner-resolved conflicts, before-baseline 9/26 · 11/12 · 22; five owner rulings on stale criteria; TD-179 · L-213 · L-214; TASK-360/370 carried
 - SPRINT-104 — The Gate's Own Blind Spots — closed 2026-09-23 · 19 of 25 DoD, T4 carried to TASK-357 (unreleased; PATCH candidate) — typecheck leg holds scripts/ + evals/ (TD-169), bootstrap FAILs at the two-space column (TD-157); T4 reaped for host memory; TD-177/178 · TASK-368 · L-212
 - SPRINT-105 — Enforce What Is Already Written — closed 2026-09-22 · 24 of 24 DoD (PATCH v1.66.1) — hook withdrawn at review, night-run raise reverted as a regression; ADR-044 · L-209/210/211
 

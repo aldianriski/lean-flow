@@ -34,7 +34,7 @@ procedure would produce from the paired `input*/` tree.
 | `TASK-916-retry-the-upload-steps-auth-handshake.md` | `todo/` | the **Plan-only** task — 0/1 boxes ticked → `todo/`; `priority:`/`origin:`/`state:` are the owner-supplied values named above, not derived |
 
 No `TODO.md` in `expected/` — every Backlog row and every Plan `Tn` resolved to a file with no open
-conflict, so migrate removes it (owner ruling, `docs/sprint/logs/
+conflict, so migrate removes it (owner ruling, `docs/sprint/archive/logs/
 SPRINT-106-the-store-and-the-way-in.md` "owner ruling — migrate removes TODO.md; no tombstone").
 
 **Hand-counted expected figures** (what the harness's reference implementation is checked
