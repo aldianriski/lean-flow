@@ -48,10 +48,15 @@ was missing is a **status stub**: a repo-side record of whether this handoff is 
 may still resume it), `consumed` (a session resumed it and continued), or `spent` (superseded, or
 the sprint closed past it) — so "was this actioned?" is answerable without opening the temp file.
 
-1. **Resolve context** — after the layout check above (v1/mixed stops here): read `TODO.md` § Active Sprint. A pointer names the log to use:
-   `docs/sprint/logs/SPRINT-NNN-<slug>.md` (create lazily from `sprint-log.md.template` if this is
-   the sprint's first Log entry). No pointer → the fallback ledger, root `HANDOFF-LEDGER.md`
-   (create lazily, same two-field shape, no sprint-specific content).
+1. **Resolve context** — after the layout check above (v1/mixed stops here): find the active sprint
+   in the store — never through `TODO.md`. Candidates are the top-level `docs/sprint/SPRINT-*.md`
+   files only (not `logs/`, whose files carry `status:` too, nor `archive/`) whose frontmatter reads
+   `status: active`; on a multi-stream repo keep the one whose `stream:` matches the work in hand
+   (still more than one → ask). Its members — the `## Members` paths ∪ every `docs/work/*/TASK-*.md`
+   stamped `sprint: SPRINT-NNN`, whatever folder it sits in — name the task in focus. The log to use
+   is `docs/sprint/logs/` + the sprint file's own filename (create lazily from `sprint-log.md.template`
+   if this is the sprint's first Log entry). No active sprint → the fallback ledger, root
+   `HANDOFF-LEDGER.md` (create lazily, same two-field shape, no sprint-specific content).
 2. **Close out a prior handoff you are now resuming** — if that log/ledger's newest entry for this
    context is `handoff-status: live`, append one entry reusing its `handoff-path` with
    `handoff-status: consumed` before writing the new one below (this session picked it up).
@@ -92,4 +97,4 @@ Next:  open a fresh session → /prime → read the handoff path above → resum
 ❌ **Skipping the status stub, or writing the raw notes into it** — either leaves "was this
    actioned?" unanswerable from the repo alone, which is the exact silent loss STANDARD §12(b)'s
    conversion exists to close (SPRINT-094 T2).
-❌ **Restating the live TODO / sprint task state** (open DoD, current task list) — `/prime` re-reads it next session, so restating it is paid twice; capture only the *ephemeral* (in-flight reasoning · the immediate next action) and point to TODO/sprint for the durable task state.
+❌ **Restating the live sprint / task state** (open DoD, current task list) — `/prime` re-reads it next session, so restating it is paid twice; capture only the *ephemeral* (in-flight reasoning · the immediate next action) and point to the sprint file and its member task files for the durable task state.

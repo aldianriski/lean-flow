@@ -23,13 +23,17 @@ conducted path.** It sequences; it never bypasses a gate.
 
 ## What it conducts
 
-Assess the current state first, then run only the stages whose precondition is unmet — state which you're running and why you're skipping the rest:
+Assess the current state first, then run only the stages whose precondition is unmet — state which you're running and why you're skipping the rest.
+**Assess from the store** (folders + frontmatter; `TODO.md` is never read): *open work* = any `TASK-*.md` in
+`docs/work/{backlog,todo,in_progress,review}/` · *ready backlog* = `docs/work/backlog/` files with `state: ready` ·
+*active sprint* = a top-level `docs/sprint/SPRINT-*.md` (not `logs/` or `archive/`) with `status: active`; its
+members are its `## Members` paths ∪ every task file stamped `sprint: SPRINT-NNN`, whatever folder it sits in.
 
 1. **Orient** — context missing/stale → `/prime`. Resuming from a handoff? read it first.
-2. **Feed** — no open work → `/task-decomposer "<intent>"` — **the detailed grill fires here, at intake** (the build gates re-grill only residuals); intent too **foggy to plan** (decisions unknown) → its **fog-mode** (`--fog`) maps decisions before tasks; backlog drifted / noisy → `/triage`.
-3. **Plan** — no active sprint but a `ready` backlog exists → `/lean-doc-generator promote` (the governance review fires here).
-4. **Build** — `/orchestrator sprint-bulk` through G1 / G2 (never an unpromoted Backlog task — step 3 promotes first). Route each task by type: new behaviour → `/tdd` (test-first, default) · bug → `/diagnose` · hard-to-change → `/refactor-advisor` · a design that must be *felt* → `/prototype` first.
-5. **Close** — all DoD ticked → `/lean-doc-generator close` (Retro → §10 buckets), then **`/release-patch` (PATCH) for a fixes-only sprint · MINOR by hand for a feature sprint**.
+2. **Feed** — no active sprint and no open work → `/task-decomposer "<intent>"` — **the detailed grill fires here, at intake** (the build gates re-grill only residuals); intent too **foggy to plan** (decisions unknown) → its **fog-mode** (`--fog`) maps decisions before tasks; open work but none `state: ready`, or backlog drifted / noisy → `/triage`.
+3. **Plan** — no active sprint but a ready backlog exists → `/lean-doc-generator promote` (the governance review fires here).
+4. **Build** — an active sprint with a member outside `done/`/`cancel/` → `/orchestrator sprint-bulk` through G1 / G2 (never an unpromoted Backlog task — step 3 promotes first). Route each task by type: new behaviour → `/tdd` (test-first, default) · bug → `/diagnose` · hard-to-change → `/refactor-advisor` · a design that must be *felt* → `/prototype` first.
+5. **Close** — every member of the active sprint in `docs/work/done/` or `cancel/` → `/lean-doc-generator close` (Retro → §10 buckets), then **`/release-patch` (PATCH) for a fixes-only sprint · MINOR by hand for a feature sprint**.
 6. **Continuity** — stopping mid-loop or context budget low → `/handoff`, so the next `/flow` resumes cleanly.
 
 **Pin the target with `/goal`** — set a `/goal` to the active task/sprint's DoD so the conducted run

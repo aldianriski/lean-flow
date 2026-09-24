@@ -42,9 +42,15 @@ Before setting `status: closed`:
      the doc is throwaway by STANDARD §12(a)/(b), and the stub's own content plus the session's
      own Execution Log entries are frequently enough to reconcile against).
    - Route every item **not already durable** (already in the sprint file · an Execution Log entry ·
-     a `TODO.md` TASK · a `TECH-DEBT.md` TD · a `LEARNINGS.md` L-NNN · a commit) to its home, exactly
-     as the Retro's four-bucket routing already does (§10) — this is the same routing, applied to one
-     more source.
+     a task file under `docs/work/` · a `TECH-DEBT.md` TD · a `LEARNINGS.md` L-NNN · a commit) to its
+     home, exactly as the Retro's four-bucket routing already does (§10) — this is the same routing,
+     applied to one more source.
+   - A follow-up **TASK** becomes a **new task file in `docs/work/backlog/`**, never a `TODO.md` row:
+     `TASK-NNN-<kebab-slug>.md`, frontmatter `origin: close-retro`, no `sprint:` (it is unscheduled).
+     Derive NNN as one above the **numeric** maximum `TASK-NNN` in use across every `docs/work/*/`
+     folder (`done/` and `cancel/` included) and, if a legacy `TODO.md` still exists, its rows — never
+     the id you remember, and never by a bare recursive search from the repo root, which also counts
+     the full repo copies under `.claude/worktrees/` and returns a maximum that is not a row.
    - Anything genuinely needing no further action is **ruled**, not silently dropped: note it inline
      in the reconciliation entry (a ruling is a record; silence is not — CLAUDE.md § Behavioral
      Guidelines).
