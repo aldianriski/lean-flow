@@ -63,3 +63,19 @@ quoted the replaced text `Verify all DoD`; retargeted, 33/0), `docs/knowledge-in
 absorbed pre-existing drift L-213/L-214), `scripts/qa-check.sh` (coordinator registration, D3). Impact: none
 on size or acceptance; § Plan stays frozen, this entry is the record. G2 re-confirm: covered by the owner's
 G2 ruling for the ADR; the rest are mechanical consequences.
+
+### 2026-09-24 | progress | T3 accepted — /handoff + /flow read the store; reconciliation files follow-ups as task files
+Worktree commit `4b79bcc`, cherry-picked. handoff step 1 resolves the active sprint from top-level
+`docs/sprint/SPRINT-*.md` `status: active` (logs/ + archive/ excluded) + members (Members ids ∪ `sprint:` stamp),
+never TODO.md; flow's assess/feed/plan/build/close preconditions query `docs/work/`; handoff-reconciliation
+routes a follow-up to `docs/work/backlog/` (`origin: close-retro`, numeric max id, worktrees excluded).
+**Coordinator re-run on main:** `store-readers-fixtures: 21 pass, 0 fail`; `layout-fixtures: 33 pass, 0 fail`.
+Harness mirrors the prose with a TS resolver — proves the rule, not agent compliance. Registered always-on (no git,
+<1s). DoD ticked in Plan + TASK-376. No files outside Layers.
+consequence · T3 · behaviour:med · governance:low → coordinator re-run + read of the diff
+**Carried notes (not T3's scope):** (a) the id rule's legacy-`TODO.md` read was *my brief's* instruction and
+conflicts with TASK-369's amendment ("reading TODO.md's content is migrate's job alone") — TASK-380 must drop or
+allowlist it (T2 carries the same clause). (b) Stale TODO § Active Sprint readers outside this sprint's Layers:
+`skills/prime/SKILL.md:41`, `skills/lean-doc-generator/SKILL.md:101,107`, `.claude/CONTEXT.md:82`,
+`README.md:236` → TASK-379/380 at close-retro sweep. (c) T1's builder saw run-v1-to-v2 + typecheck-population
+fail in its worktree; both pass on main (15/0, 1/0) — worktree lacks node_modules, not a regression.

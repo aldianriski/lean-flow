@@ -85,10 +85,10 @@ Cites: `TASK-376` · `TODO.md` (no longer read)
 from the store, with no `TODO.md` read.
 
 **DoD:**
-- [ ] `/handoff` resolves the active sprint from sprint frontmatter + members
-- [ ] `/flow`'s assess/feed/plan steps query the store
-- [ ] handoff-reconciliation routes a follow-up TASK to a task file
-- [ ] Exercised once each on a v2 fixture
+- [x] `/handoff` resolves the active sprint from sprint frontmatter + members ✓ store-readers-fixtures 21/0 (`4b79bcc`)
+- [x] `/flow`'s assess/feed/plan steps query the store ✓ store-readers-fixtures 21/0 (`4b79bcc`)
+- [x] handoff-reconciliation routes a follow-up TASK to a task file ✓ store-readers-fixtures 21/0 (`4b79bcc`)
+- [x] Exercised once each on a v2 fixture ✓ store-readers-fixtures 21/0 (`4b79bcc`)
 
 ### T4 — Retarget `/orchestrator` onto the store `[size: M · risk: high · class: execution · HITL · J2]`
 Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `skills/orchestrator/references/night-run.md` · `skills/orchestrator/references/review-scoping.md` · `evals/fixtures/orchestrator-store/` · `evals/run-orchestrator-store-fixtures.ts`
@@ -137,5 +137,9 @@ review comparand) with no Plan-copy dependency.
 | `evals/run-layout-fixtures.ts` | T1 | close-row anchor retargeted | Low | 33/0 |
 | `docs/knowledge-index.md` | T1 | regenerated | Low | gen-index --check |
 | `scripts/qa-check.sh` | T1 (coord.) | harness registered opt-in (D3) | Low | — |
+| `skills/handoff/SKILL.md` | T3 | active sprint from sprint frontmatter + members, not TODO § Active Sprint | Med | store-readers 21/0 |
+| `skills/flow/SKILL.md` | T3 | assess/feed/plan/build/close preconditions query the store | Med | store-readers 21/0 |
+| `skills/lean-doc-generator/references/handoff-reconciliation.md` | T3 | follow-up TASK → backlog task file, `origin: close-retro`, derived id | Low | store-readers 21/0 |
+| `evals/run-store-readers-fixtures.ts` · `evals/fixtures/store-readers/` | T3 | retained v2 fixture harness (Tier X), always-on | Low | self |
 
 ## Retro

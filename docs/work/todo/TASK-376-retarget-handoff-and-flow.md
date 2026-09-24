@@ -19,10 +19,10 @@ depends-on: [TASK-360, TASK-369]
 
 ## Done when
 
-- [ ] /handoff resolves the active sprint from the store, not TODO.md § Active Sprint.
-- [ ] /flow's assess / feed / plan steps query the store for open work, ready tasks and the active sprint.
-- [ ] handoff-reconciliation routes a follow-up TASK to a task file.
-- [ ] Exercised once each on a v2 fixture.
+- [x] /handoff resolves the active sprint from the store, not TODO.md § Active Sprint. ✓ store-readers-fixtures 21/0 (`4b79bcc`)
+- [x] /flow's assess / feed / plan steps query the store for open work, ready tasks and the active sprint. ✓ store-readers-fixtures 21/0 (`4b79bcc`)
+- [x] handoff-reconciliation routes a follow-up TASK to a task file. ✓ store-readers-fixtures 21/0 (`4b79bcc`)
+- [x] Exercised once each on a v2 fixture. ✓ store-readers-fixtures 21/0 (`4b79bcc`)
 
 ## Touches
 
