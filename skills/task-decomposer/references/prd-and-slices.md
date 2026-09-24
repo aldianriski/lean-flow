@@ -1,8 +1,8 @@
 # PRD & tracer-bullet slices
 
 Used by `task-decomposer` when an intent is large (a feature, an epic slice, or `--prd`). Two stages —
-synthesize a working feature PRD, then cut it into tracer-bullet slices that become `TASK-NNN` Backlog
-entries. Output is **local**: `TODO.md` Backlog, never an external tracker.
+synthesize a working feature PRD, then cut it into tracer-bullet slices that become `TASK-NNN` task
+files. Output is **local**: one file per slice in `docs/work/backlog/`, never an external tracker.
 
 > **Scope of the format below — read this before using it.** It is a **working feature PRD**: intake
 > scaffolding you slice against, *not* a STANDARD §2 core file. It is deliberately different from
@@ -83,5 +83,8 @@ Present the slices as a numbered list — Title · HITL/AFK · Blocked-by · use
 - Should any slices be merged or split further?
 - Are the right slices marked HITL vs AFK?
 
-Iterate until the user approves. Then each approved slice → one `TASK-NNN` entry in `TODO.md` Backlog,
-in **dependency order (blockers first)**, per the task entry shape in `SKILL.md`.
+Iterate until the user approves. Then each approved slice → **one task file**,
+`docs/work/backlog/TASK-NNN-<slug>.md`, ids assigned in **dependency order (blockers first)** — the
+quiz's Blocked-by column becomes each file's `depends-on:`, its HITL/AFK column `autonomy:`, and the
+user stories it covers its `## Tracker` line. Shape + id rule → `task-file.md`. A long PRD is many
+files, never one longer file.

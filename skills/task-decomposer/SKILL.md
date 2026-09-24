@@ -1,6 +1,6 @@
 ---
 name: task-decomposer
-description: Use when converting a freeform feature request, ticket URL, PRD, or epic into structured TASK-NNN entries in TODO.md. Enforces an assumption registry, risk scoring, vertical-slice granularity, and validation before writing. Self-contained, no specialist agents. Do not use when a task already exists and is ready to build — use /orchestrator instead.
+description: Use when converting a freeform feature request, ticket URL, PRD, or epic into structured TASK-NNN task files in docs/work/backlog/ (one file per task). Enforces an assumption registry, risk scoring, vertical-slice granularity, and validation before writing. Self-contained, no specialist agents. Do not use when a task already exists and is ready to build — use /orchestrator instead.
 argument-hint: "[freeform intent | TICKET-ID | --prd file.md | --epic \"Name\" | --fog \"foggy goal\"]"
 allowed-tools: Read, Write, Edit, Glob, Grep
 user-invocable: true
@@ -9,7 +9,7 @@ version: "0.2.0"
 
 # Task Decomposer
 
-Translate any form of human intent into fully-formed `TASK-NNN` entries. The approved output
+Translate any form of human intent into fully-formed `TASK-NNN` task files. The approved output
 serves as the scope gate — `/orchestrator` G1 then runs as a fast-path confirm (scope unchanged?),
 not a re-grill.
 `TODO.md` present and no `docs/work/` → v1 · both present → mixed · only `docs/work/` → v2 (existence only, never content).
@@ -52,7 +52,8 @@ generator's job; this skill consumes.
 4. **Risk score** — per task, rate impact × likelihood (low / med / high); note the blast radius (files / layers touched).
 5. **Classify HITL / AFK** — `HITL` = a human must review the output before proceeding; `AFK` = autonomous completion is safe (acceptance is mechanically checkable · no irreversible side effects · no product/UX judgment call · spec is durable). Default to `HITL` when uncertain. **For `AFK` tasks, spec durably** — an AFK task may sit in the backlog for weeks before an agent picks it up: write behavioral contracts (name the types / interfaces / config shapes to change) + testable acceptance + explicit out-of-scope; **never reference file paths or line numbers** — they go stale.
 6. **Validate** — every task has an observable acceptance criterion ("done when …"); no two tasks share identical criteria (merge or differentiate). For multi-slice breakdowns, run the **breakdown quiz** (reference) — confirm granularity, dependencies, merge/split, HITL/AFK — before Write.
-7. **Write** — after the layout check above (v1/mixed stops here) and only after the human types `approve`, append entries to `TODO.md` **Backlog** in dependency order (blockers first). Touch no other file. Sprint formation happens later via `/lean-doc-generator promote`.
+7. **Write** — after the layout check above (v1/mixed stops here) and only after the human types `approve`, write **one file per task** to `docs/work/backlog/TASK-NNN-<slug>.md`, blockers first.
+   Id = max in use across all six status folders + 1; shape + id rule → `${CLAUDE_SKILL_DIR}/references/task-file.md`. Touch no other file. Sprint formation happens later via `/lean-doc-generator promote`.
 
 ## Fog-map mode (foggy work too big to plan up front)
 
@@ -65,21 +66,25 @@ skill** (research-spike/`Explore` · `/prototype` · the intake grill · normal 
 into `TASK-NNN`** once resolved. Loop until no decision is uncertain, then decompose the now-clear work
 normally. Full artifact + loop → `${CLAUDE_SKILL_DIR}/references/fog-map.md`.
 
-## Task entry shape
+## Task file shape
+
+One task = one file, `docs/work/backlog/TASK-NNN-<slug>.md` (full template → `references/task-file.md`):
 
 ```
-- [ ] TASK-042 — <verb-first title>  [size: M] [risk: med] [HITL]
-      class:      decision | execution | mechanical-ingest   (advisory default — dispatch may override, ADR-010)
-      done-when:  <observable outcome>
-      touches:    <files / layers>
-      depends-on: <TASK-NNN/Tn list, or none>
-      assumes:    <key assumptions>
-      origin:     decomposer            (always — these entries met the grill above; that is what earns G1's fast-path)
-      state:      ready | needs-info   (set ready only if done-when is concrete)
+---
+id · title · epic · priority · size · risk · autonomy (HITL|AFK) · tier · authority
+class:      decision | execution | mechanical-ingest   (advisory default — dispatch may override, ADR-010)
+origin:     decomposer   (always — these entries met the grill above; that is what earns G1's fast-path)
+state:      ready | needs-info | blocked               (readiness — a field, never a folder)
+depends-on: [TASK-NNN, …] or []
+---
+## Done when (observable outcome) · ## Touches · ## Assumes (key assumptions · open questions) · ## Tracker
 ```
 
-Set the initial `state:` (`ready` if the done-when is concrete, else `needs-info`). Re-prioritising,
-re-stating, and pruning the backlog later is `/triage`'s job — don't re-rank existing tasks here.
+No `status:` field — the folder is the status. Set the initial `state:` (`ready` if the done-when is
+concrete, else `needs-info` with its open questions under `## Assumes`) and an initial `priority:`
+(P2 unless the grill settled one). Re-prioritising, re-stating, sequencing and pruning later is
+`/triage`'s job — never edit an existing task file here.
 
 **`--prd <path>` = CONSUME that file.** It never means "write one" — creation of core docs belongs to
 `/lean-doc-generator`. Read the PRD, then decompose it; do not re-interview what it already settles.
@@ -91,15 +96,16 @@ the breakdown quiz → `${CLAUDE_SKILL_DIR}/references/prd-and-slices.md` (`${CL
 skill's install directory at load time). Its approved residue belongs in the durable, project-scoped
 `docs/product/requirements.md` (+ `acceptance-criteria.md`) — **hand that write to
 `/lean-doc-generator prd`**, sanitized, never the raw conversation and never written from here. Task
-output stays local (TODO.md Backlog) — no external issue tracker. **End of life:** the working PRD is
+output stays local (`docs/work/backlog/` files) — no external issue tracker. **End of life:** the working PRD is
 temp-dir scaffolding with no durable file of its own — once sliced and its residue sanitized into
 `requirements.md`, it is gone, and §11 has no row for it because retention acts on committed files
 (STANDARD §2 temp-dir note). Same shape as a `BUG-<slug>.md` report.
 
 ## Hard rules
 
-- Never write to `TODO.md` before the human types `approve`.
-- After `approve`: Backlog only; never write directly into an Active Sprint.
+- Never write a task file before the human types `approve`.
+- After `approve`: new files in `docs/work/backlog/` only — never into a sprint's folders (`todo/` · `in_progress/` · `review/`) or a closed one, never over an existing file.
+- Never guess or reuse an id — derive it (`references/task-file.md`); an id sitting in `done/` or `cancel/` is still taken.
 - Identical acceptance criteria on two tasks → merge or differentiate first.
 - A task with no observable acceptance criterion fails validation — rewrite it.
 - A question that BLOCKS scope/design is asked here (with its frontier round) or recorded as an explicit `needs-info`/`blocked` with its unblock condition — never parked as a silent `assumes:` or a passive doc note that stalls dev.
