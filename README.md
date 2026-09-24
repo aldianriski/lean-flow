@@ -391,6 +391,33 @@ project needs — lean-flow itself is Markdown.)
 
 ---
 
+## Upgrading to 2.x
+
+`2.0.0` is a **hard cut**: `TODO.md` + the sprint-Plan-copy layout is replaced by the work-item
+store (`docs/work/<status>/TASK-NNN-slug.md`, one file per task — status is the folder, title is
+the filename, sprint/epic membership is frontmatter). It's a breaking change, by design, not a
+graceful window — every `2.x` queue skill carries exactly one read path.
+
+1. **Install `2.x`**, then **restart the session** — a live session keeps whatever plugin copy it
+   started with, so a mid-session update never takes effect.
+2. Run **`/lean-doc-generator migrate`**. It reads your `TODO.md` Backlog and your active sprint's
+   Plan, maps each task onto `docs/work/`, plan → approve → apply — never silently, never
+   overwriting an existing file it doesn't recognize. Once every task has moved, it removes
+   `TODO.md`; any non-task prose in it is listed for you to relocate or drop, never dropped
+   silently. Interrupted mid-run? Just run it again — already-migrated tasks are left alone.
+3. **Resume normal use.** `/prime`, `/triage`, `/task-decomposer`, promote/close all read the
+   store from here on.
+
+**Why the refusal instead of dual support?** A `2.x` queue skill that finds `TODO.md` still present
+(alone, or alongside `docs/work/`) names the layout it found and does nothing else — it never
+guesses which one is authoritative. `/prime` is the one exception: read-only, so it reports the
+layout and keeps priming rather than aborting. `migrate` is the only `2.x` path a v1 or mixed repo
+can take.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+---
+
 ## What lean-flow does NOT do
 
 - No app-code generation, CI/CD pipeline, or automated coverage tooling.

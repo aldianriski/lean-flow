@@ -55,6 +55,7 @@ Align an existing docs tree (dev-flow · adlc-flow · ad-hoc · **v1 work-item l
 **placement · format · wiring**; consolidate dupes, retire dead docs. **HITL + surgical**, idempotent,
 report-only on re-run; **headless parks to `/handoff`**. Full procedure · plan vocabulary · out-of-scope
 filter → `${CLAUDE_SKILL_DIR}/references/migration-map.md`.
+Carrying a v1 `TODO.md` onto `docs/work/` → that same reference, § v1 → v2 work-item store (2.0).
 
 ## Init (scaffold a fresh repo)
 

@@ -13,6 +13,23 @@ status: current
 > each new MINOR and reachable only from here (STANDARD §11).
 
 ---
+## [Unreleased] — EPIC-017: the 2.0 hard cut onto the work-item store
+
+**Breaking — MAJOR candidate (`2.0.0`), no version bump yet.** `TODO.md` + the sprint-Plan-copy
+layout is replaced by `docs/work/<status>/TASK-NNN-slug.md` (one file per task; status is the
+folder, title is the filename, sprint/epic membership is frontmatter — `ADR-045`). This is a hard
+cut, not a graduated migration (`ADR-046`): every `2.x` queue skill (`prime`, `triage`,
+`task-decomposer`, `lean-doc-generator`, `orchestrator`, `handoff`, `flow`) detects a v1 (`TODO.md`
+present, no `docs/work/`) or mixed (both present) tree by name and refuses its queue operation on
+it — `/prime` is the one exception, reporting the layout and continuing rather than aborting.
+`/lean-doc-generator migrate` is the only `2.x` path onto the store: it maps a `TODO.md` Backlog
+and an active sprint's Plan onto `docs/work/` field by field, plan → approve → apply, resumable
+(an interrupted run re-run skips what already exists and never overwrites a conflicting file), and
+removes `TODO.md` once every task has moved (non-task prose is listed for the owner to relocate or
+drop, never dropped silently). Mapping + verification: `skills/lean-doc-generator/references/
+migration-map.md` § v1 → v2 work-item store (2.0). Upgrade path: README.md § Upgrading to 2.x.
+
+---
 ## SPRINT-104 — The Gate's Own Blind Spots (2026-09-23)
 
 **Unreleased — PATCH candidate.** One consumer-visible change: an adopter running root

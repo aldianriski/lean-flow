@@ -142,3 +142,139 @@ itself.
 - Existing backlog / issues file → `TODO.md` Backlog-pool + sprint pointer.
 - Existing `CONTEXT`/`CLAUDE`/agent-instruction file → lean-flow `CONTEXT.md` / `CLAUDE.md` format.
 - **Unrecognized docs** → leave untouched, list them, ask where they belong (don't force a mapping).
+
+## v1 → v2 work-item store (2.0)
+
+Carries a v1 `TODO.md` (Backlog + an active sprint's Plan) onto `docs/work/<status>/
+TASK-NNN-slug.md` (schema: `docs/work/README.md`, `ADR-045`, `ADR-046`). **Agent-run procedure —
+no Bun/TS script ships to consumers** (ADR-043's consumer contract); an agent reads this section
+and performs the steps by hand, same plan → approve → apply gate as any other migrate action.
+Detection that gates entry to this path is existence-only (`TODO.md` present / `docs/work/`
+present — `SKILL.md` § above); this section is what runs once that gate has already let a v1 or
+mixed tree through.
+
+**WHY.** The hard cut (ADR-046) makes `migrate` the only 2.x path onto the store — every other
+queue skill refuses a v1/mixed tree by name. **WHERE.** `docs/work/<status>/TASK-NNN-slug.md` per
+task; `TODO.md` itself, once empty of tasks.
+
+### Field-by-field mapping
+
+| v1 (`TODO.md` Backlog row) | v2 frontmatter / section | Note |
+|---|---|---|
+| `TASK-NNN` (the row's id) | `id:` + filename `TASK-NNN-kebab-slug.md` | id never changes |
+| title (after the em dash) | `title:` + filename slug | kebab-case the slug, `[a-z0-9-]` only |
+| which `### P0`–`P3` heading the row sits under | `priority:` | `P0`/`P1`/`P2`/`P3` |
+| `[size: X]` | `size:` | verbatim |
+| `[risk: X]` | `risk:` | verbatim |
+| `[HITL]` / `[AFK]` tag | `autonomy:` | verbatim |
+| `class:` | `class:` | verbatim; if absent, flag in the plan — never guess |
+| `tier:` | `tier:` | verbatim; if absent, flag in the plan (ADR-029: declared, never inferred) |
+| `authority:` | `authority:` | verbatim |
+| `origin:` | `origin:` | defaults `manual` if absent |
+| `state:` | `state:` | defaults `ready` if absent (an undecorated Backlog row is assumed ready) |
+| `depends-on:` | `depends-on:` | prose list → array; `none` → omit |
+| an `EPIC-NNN` cited in `tracker:` | `epic:` | set only on an explicit citation — never inferred from theme/wording |
+| — | `sprint:` | absent for a pure-Backlog row (see Plan mapping below) |
+| `done-when:` prose | `## Done when` | one `- [ ]` per criterion (split on `;`/numbered clauses if the prose itemizes more than one; otherwise a single box); starts unticked — a Backlog row has no Plan tick state to inherit |
+| `why:` | `## Why` (optional) | prose, verbatim |
+| `touches:` | `## Touches` | bullet per item |
+| `assumes:` | `## Assumes` | prose/bullet, verbatim |
+| `tracker:` | `## Tracker` | bullet per item, verbatim |
+
+### Plan-task mapping (active sprint)
+
+Each `### Tn — title `[size · risk · class · HITL · Jn]`` block in the sprint file's § Plan:
+
+| Plan element | v2 field |
+|---|---|
+| `Cites:` naming a `TASK-NNN` | that id (filename + `id:`) — **a `Tn` naming none gets the next free id**, derived as the max in use across `docs/work/**` with `evals/fixtures/` and `.claude/worktrees/` excluded (never incremented from memory) |
+| `[size · risk · class · HITL · Jn]` | `size:` · `risk:` · `class:` · `autonomy: HITL` · `authority: Jn` |
+| `Layers:` | `## Touches` |
+| `Depends-on:` | `depends-on:` |
+| `Cites:` (the rest) | `## Tracker` |
+| the sprint's `sprint:`/`epic:` frontmatter | `sprint:` / `epic:` on the task file |
+| each DoD `- [ ]`/`- [x]` line | one `## Done when` box, **tick state preserved exactly** |
+
+**Status folder** (readiness `state:` stays a field, never a folder — `docs/work/README.md`):
+a Backlog-only task → `backlog/`. A Plan task → `todo/`, unless every one of its mapped
+`## Done when` boxes is ticked, in which case → `done/`.
+
+**Plan-only task (no Backlog row) — the common v1 case.** `TODO.md.template` has a promoted task
+*leave* the Backlog, so a `Tn` citing an id with no matching Backlog row is normal, not an error.
+Nothing in the Plan block supplies `priority:`, `state:`, or `origin:` — the Plan carries no P0–P3
+tier, no readiness, no filing provenance. These three fields have **no v1 source** for a Plan-only
+task: list them in the migrate plan for **owner input**, exactly like an absent `class:`/`tier:`
+above — **never guessed, never defaulted.** (Only when the id *also* has a Backlog row — the
+overlap case below — do `priority:`/`state:`/`origin:` come from that row as usual.) The file is
+not written until the owner supplies them; an unanswered one is the same kind of open item a
+missing `class:`/`tier:` already is.
+
+Only an **active** sprint is read this way — a closed/archived sprint's Plan is never migrated
+(an archived sprint file is never rewritten).
+
+### Overlap rule
+
+A `TASK-NNN` present both as a Backlog row and as a Plan `Tn`'s `Cites:` becomes **one file**, not
+two: the Plan mapping wins wherever the two disagree — DoD tick state, `class:`/`tier:`/
+`authority:` (frozen at G2), `sprint:` set — and any Backlog-only field the Plan block doesn't
+restate (`why:`, `assumes:`) is filled in from the Backlog row. Producing two files for one id is
+a defect, not a variant. **This rule decides what content to generate — it runs before checking
+whether a file already exists.** What happens to an existing file is the next rule's job, not
+this one's.
+
+### Resume / conflict rule (and precedence between the two rules above)
+
+Once the overlap rule has decided what content an id *should* have, check `docs/work/**/
+TASK-NNN-*.md` by id (any status folder) before writing anything:
+
+- **No file exists** → write the mapped content. This is the common case (a fresh id).
+- **File exists, content identical** to what this mapping would produce → **skip, not rewritten**
+  — this is what makes an interrupted run resumable: re-running it lands on the same tree.
+- **File exists, content differs** → **report the conflict, never overwrite.** The file is left
+  exactly as it stood.
+
+**A reported conflict is not auto-resolved by reporting it.** It is shown to the owner in the
+migrate plan as a per-file delta (what the mapping would write vs. what is already there) with
+**three choices**: **apply the delta** (write the mapped content, replacing the existing file) ·
+**keep the existing file** (the mapped content is discarded, the id is considered settled as-is) ·
+**edit by hand** (owner reconciles the file themselves outside migrate). The id stays
+**unresolved** until the owner picks one — migrate does not guess, and does not treat "reported"
+as "done."
+
+A run killed mid-way and re-run therefore reproduces the same final tree: every id already
+written is a no-op, every unresolved conflict is reported again identically, and everything after
+the kill point that has no existing file still gets created.
+
+### `TODO.md` removal + non-task prose disposition
+
+`migrate` **removes `TODO.md`** only once **every** Backlog row and every Plan `Tn` resolves to a
+file with no open conflict — written this run, or already present with content the mapping agrees
+with. **An id still sitting at a reported, owner-unresolved conflict blocks the removal entirely**
+— `TODO.md` stays exactly as it was, unpruned, until that last conflict is chosen one of the three
+ways above. (Owner ruling, superseding an earlier "tombstone" design — a tombstone would itself
+classify as `mixed` and be refused by every other 2.x skill, ADR-046 — but "no tombstone" is not
+"remove unconditionally": a blocked removal is not a tombstone, it is the run not being done yet.)
+Non-task prose in `TODO.md` — the ownership header, the "how to use this file" blurb, the
+Active-Sprint pointer block, any "Standing facts" narrative, section headings — is **never
+silently dropped**: list each block in the migrate plan with a proposed disposition
+(`relocate: <target>` or `drop`) and apply only on the owner's per-item approval, same as any
+other `retire`/`consolidate` action (§ Surgical rules above). A later 1.x write that recreates
+`TODO.md` makes the tree classify `mixed` again — `/prime` reports it, and a `migrate` re-run
+ingests the stray task.
+
+### Verification (run every time, plan and apply alike)
+
+- **Id set, diffed both ways.** `v1_ids` = every `TASK-NNN` in the Backlog + every Plan `Tn`'s
+  `Cites:` id, taken before the run. `v2_ids` = every id now present as a `docs/work/**/
+  TASK-NNN-*.md` file (written this run, or already-present/resumed). `v1_ids ∖ v2_ids` and
+  `v2_ids ∖ v1_ids` must both be empty — a count alone does not prove this (two different sets of
+  the same size still passes a count check).
+- **Ticked-box count, before vs. after.** Sum of `- [x]` under every Plan `Tn`'s DoD (before) must
+  equal the sum of `- [x]` under `## Done when` across the files those `Tn`s mapped to (after,
+  including resumed files whose count was never touched by this run). A mismatch on a *resumed*
+  file (pre-existing content this run correctly left alone) is reported, not silently passed —
+  it means that file's tick state and the Plan's tick state have already drifted apart, a fact
+  worth surfacing even though fixing it is outside `migrate`'s write path (never-overwrite still
+  holds).
+- **Re-run is report-only.** A second run against an already-migrated tree produces zero writes
+  and zero new conflicts (`git status` clean) — every id resolves to "already present, identical."
