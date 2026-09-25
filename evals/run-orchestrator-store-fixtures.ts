@@ -139,15 +139,18 @@ function boxes(text: string): { open: number; ticked: number } {
   };
 }
 
-// SKILL.md step 0 + dispatch.md rule 3: "runnable while at least one member's `## Done when` still has
-// an open `[ ]` box. Plan `Tn` blocks carry no boxes, so they are never counted." None -> halt -> promote.
+// SKILL.md step 0 + dispatch.md rule 3: "runnable while at least one member is still open: its
+// `## Done when` has an open `[ ]` box, or it sits outside `done/`/`cancel/` ... Every member closed ->
+// ... go to close (step 6), never back to `promote`." No active sprint -> halt -> promote.
 function guard(root: string, stream?: string) {
   if (entry(root).refuse) return { refuse: true };
   const s = activeSprint(root, stream);
   if (s === "none") return { halt: "/lean-doc-generator promote" };
   if (s === "ask") return { ask: true };
-  const open = members(s, tasks(root)).reduce((n, t) => n + boxes(t.text).open, 0);
-  return open > 0 ? { run: s.id, open } : { halt: "/lean-doc-generator promote" };
+  const ms = members(s, tasks(root));
+  const open = ms.reduce((n, t) => n + boxes(t.text).open, 0);
+  const unclosed = ms.filter((t) => !["done", "cancel"].includes(t.folder)).length;
+  return open > 0 || unclosed > 0 ? { run: s.id, open } : { next: "close (step 6)" };
 }
 
 // dispatch.md rule 4: "a `### Tn` block carries only sprint-scoped meta ... `Layers:` · `Depends-on:` ·
@@ -400,10 +403,11 @@ const memberView = (root: string, stream?: string) => {
     expectEq("e2e-16 close precondition blocked by a member in review/", closeReady(root), { ready: false, blocking: ["TASK-913@review"] });
     tick(root, "TASK-913", "fixture gamma");
     tick(root, "TASK-913", "fixture gamma empty");
+    expectEq("e2e-16b guard: every box ticked but a member still in review/ -> still runnable", guard(root), { run: "SPRINT-901", open: 0 });
     transition(root, "TASK-913", "done");
     R.log = [];
     expectEq("e2e-17 close precondition met: every member in done/ or cancel/", closeReady(root), { ready: true, blocking: [] });
-    expectEq("e2e-18 guard after the Plan is exhausted -> halt", guard(root), { halt: "/lean-doc-generator promote" });
+    expectEq("e2e-18 guard after every member closed -> close, never promote", guard(root), { next: "close (step 6)" });
     expectEq("e2e-19 final rollup", rollup(root), { header: "run · 4 of 4 DoD ticked", units: "2 of 2", delivered: ["T1", "T3"] });
     const hcc = hostCheck(root, true);
     check("e2e-20 host --close gate green (skipped if absent)", hcc === null || hcc.length === 0, hcc === null ? "no host gate" : `findings ${J(hcc)}`);
@@ -488,7 +492,7 @@ const skill = (rel: string) => readFileSync(join(SKILLS, rel), "utf8").replace(/
 const CONTRACT: Record<string, string[]> = {
   "orchestrator/SKILL.md": [
     "**members by reference** (ADR-047)", "the `## Members` paths ∪ every `docs/work/*/TASK-*.md` stamped `sprint: SPRINT-NNN`",
-    "whose members have an open `## Done when` `[ ]` exists", "tick the **member file's** `## Done when` box",
+    "or not yet in `done/`/`cancel/`. No active sprint → halt", "tick the **member file's** `## Done when` box",
     "each move in its own commit (ADR-045 D6)", "counted over the members' `## Done when` boxes",
     "every member in `docs/work/done/` or `cancel/`", "`check-sprint-by-reference.ts <sprint> --close`",
     "never edit § Plan",

@@ -58,8 +58,10 @@ a v1/mixed tree the skill has already refused (SKILL.md § Intake routing). In t
    whatever folder it sits in. A `## Members` path is resolved **by its TASK id** — the filename that
    starts `TASK-NNN-` in any of the six status folders (the trailing hyphen keeps `TASK-81` from
    matching `TASK-810`) — so a path left stale by a later move still finds its file.
-3. **Guard (step 0)** — the sprint is runnable while at least one member's `## Done when` still has an
-   open `[ ]` box. Plan `Tn` blocks carry no boxes, so they are never counted.
+3. **Guard (step 0)** — the sprint is runnable while at least one member is still open: its
+   `## Done when` has an open `[ ]` box, **or** it sits outside `done/`/`cancel/` (all ticked but still
+   in `review/` is unfinished, not over). Plan `Tn` blocks carry no boxes, so they are never counted.
+   Every member closed → the sprint is over: go to close (step 6), never back to `promote`.
 4. **Plan block vs. member file** — a `### Tn` block carries only sprint-scoped meta (header meta ·
    `Layers:` · `Depends-on:` · `Cites:` · `**Acceptance:**`). The task's own content — `## Done when`,
    `## Assumes`, `## Touches` — is read from the member file(s) its `Cites:` names. A unit (`### Tn`)
