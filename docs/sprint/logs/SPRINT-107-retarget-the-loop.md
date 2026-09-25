@@ -117,3 +117,24 @@ removed the order file. Impact: criterion read under A2 — recorded as `## Amen
 Done-when text itself unedited), ticked on that basis. Also: `skills/task-decomposer/references/task-file.md` is
 outside T2's Layers (the SKILL could not take the file shape under ~140 lines; ADR-006). G2 re-confirm: A2 is the
 owner's ruling.
+
+### 2026-09-25 | progress | T1 revise round 1 landed — both majors + five minors closed; round-2 review dispatched
+Round 1's builder retry never reached history (no commit after `86b4e73`), so the coordinator built it: `ee95280`.
+Population = Members ids ∪ `sprint:` stamps, each read **at `plan_commit` and now** → `MEMBER-DROPPED` (left both
+indices, no scope-change) · `MEMBER-UNPLANNED` (joined after promote, no scope-change; G2 ruling — baseline = first
+commit stamping or listing it). Time: a scope-change counts only if **new since the member's baseline**;
+`plan_commit` must be an ancestor of HEAD, hold the sprint file, and be no later than the first commit recording one
+(`PLAN-COMMIT-NOT-ANCESTOR` · `-NO-PLAN` · `-UNRECORDED` · `-LATE`; SPRINT-107's own backward repair passes).
+Minors: stamp shapes, any-shape Members, every `## Done when` fence-aware, `NO-DONE-WHEN` (never vacuous), entries end
+at the next heading, no-summary heading, inline log, `Tn` → frozen `Cites:`, in-text ✓ / `+` / blank lines,
+`ls-tree -z`. Reference + ADR-047 amended to match.
+**Evidence (hash convention: `git hash-object <working file>` throughout):** harness `by-reference-fixtures: 55 pass,
+0 fail`; live SPRINT-107 `6 pass, 0 fail`. Rejected design (HEAD checker `b0aae826` seeded in) reddened all 24 new
+non-control cases, 28 green (25 originals + 3 sibling controls). 21 targeted seeds on the new checker, each parses,
+±1 line, reddens exactly its named case(s): first pass 19 OK + 2 BAD — S7 exposed an unexercised clause (an
+*empty* `## Done when` on both sides) → fixture added; S19's seed was a demolition (also broke the sprint's own
+`sprint: 901`) → narrowed to the stamp arm; both re-run OK. Restored `015327e9` each time.
+**Slip:** a `git stash` for an unrelated index check ran mid-seed-batch; checker verified intact afterwards
+(seeded S7 in place, as expected, then restored by the script), and S7 re-run clean. Knowledge index was already
+STALE at `9d8658a` → regenerated in its own commit `3ae370d`.
+consequence · T1 · behaviour:material · governance:high → second worktree-isolated outside review (round 2)
