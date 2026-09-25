@@ -189,3 +189,18 @@ Harness registered opt-in (git-repo rule, D3). TASK-375 + TASK-362 → done/. **
 `check-sprint-by-reference … --close` on SPRINT-107 → `11 pass, 0 fail` — every member in `done/`, freeze intact.
 **Carried:** `scripts/night-run.sh` still counts sprint-file boxes → TASK-383 (the prose contract leads).
 consequence · T4 · behaviour:med · governance:med → coordinator re-run + read of the diff + one targeted fix
+
+### 2026-09-25 | scope-change | T1 · T2 · T4 Layers declare the files their logged scope-changes already named
+What broke: system-verify (`QA-CHECK: 255 pass, 5 fail`) — `layers observed` names files each task touched outside its
+frozen `Layers:`: T1 `scripts/lib/check-sprint-by-reference.ts` · ADR-047 · `docs/DECISIONS.md` ·
+`evals/run-layout-fixtures.ts` (all in T1's 2026-09-24 scope-change) · T2 `skills/task-decomposer/references/task-file.md`
+(T2's scope-change) · T4 `scripts/qa-check.sh` (harness registration, D3 — committed under T4's id). Precedent:
+SPRINT-072 declared a gate-caught sibling on the task's `Layers:`. `layers completeness` was the coordinator's own doing:
+tick-evidence text named file tokens (the sprint template, the reference, the reaper script) the checker reads as implied
+touches — reworded to prose. Impact: no size/acceptance change; § Plan edited only on these `Layers:` lines and two
+evidence tails. G2 re-confirm: mechanical consequences of logged rulings.
+**Not fixable, recorded:** `65bbb13` (subject `… (SPRINT-107 T3 align)`) is unattributable by the checker's subject rules
+and is pushed history — rewriting it is off the table; it stays a named `layers observed` finding for the owner at close.
+**Environment, not this sprint:** `typecheck` + `typecheck-population` → no `node_modules` (fixed: `bun install`);
+`spec-reader s13` → the fixture matches an em dash with one `.`, so it fails under a POSIX locale (this container:
+`LANG` unset) and passes under `LC_ALL=C.UTF-8`; red already at `3e0e710` → TD at close.

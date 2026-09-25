@@ -41,7 +41,7 @@ incl. dispatch merge-back (`TASK-375`).
 ## Plan
 
 ### T1 — Make `promote` and `close` operate by reference `[size: M · risk: high · class: decision · HITL · J2]`
-Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/` · `skills/lean-doc-generator/templates/SPRINT.md.template` · `evals/fixtures/by-reference/` · `evals/run-by-reference-fixtures.ts` · `TECH-DEBT.md`
+Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/` · `skills/lean-doc-generator/templates/SPRINT.md.template` · `evals/fixtures/by-reference/` · `evals/run-by-reference-fixtures.ts` · `TECH-DEBT.md` · `scripts/lib/check-sprint-by-reference.ts` · `docs/adr/ADR-047-a-sprint-references-its-members-and-plan-commit-is-the-freeze.md` · `docs/DECISIONS.md` · `evals/run-layout-fixtures.ts`
 Depends-on: none
 Cites: `TASK-362` · `TASK-360` · `TD-179` · `EPIC-017` D2 · `ADR-045` · `docs/work/README.md`
 
@@ -54,14 +54,14 @@ TD-179, since one DoD per task leaves nothing to mirror.
 place, and a member edited after promote is detectable against the frozen snapshot.
 
 **DoD:**
-- [x] `promote` stamps `sprint:` + `git mv` backlog → todo (own commit, D6); the sprint file lists members by reference, no DoD copy ✓ `references/sprint-by-reference.md` + `SPRINT.md.template`; by-reference-fixtures 73/0 (`68c2a0b`)
+- [x] `promote` stamps `sprint:` + `git mv` backlog → todo (own commit, D6); the sprint file lists members by reference, no DoD copy ✓ by-reference procedure + sprint template; by-reference-fixtures 73/0 (`68c2a0b`)
 - [x] `close` verifies every member is in `done/`/`cancel/`, never counting Plan boxes ✓ `--close` CLOSE-OPEN fixtures incl. close-ignores-plan-boxes, nested folder, archived (`68c2a0b`)
 - [x] The freeze survives: what `plan locked` pins, and how a post-promote member edit is detected — written down and fixtured (must-FAIL: an unlogged edit to a member after promote) ✓ ADR-047 + reference; 73/0, 33 seeds, 3 outside review rounds → CLEAR (`68c2a0b`)
 - [x] `skills/lean-doc-generator/SKILL.md` ≤ 140 lines — *Verify: `wc -l`* ✓ 138
 - [x] TD-179 resolved on evidence; TASK-360's open half ticked ✓ TD-179 resolved → TASK-362; TASK-360 derived 7 open / 5 ticked = hand count
 
 ### T2 — Retarget `/triage` and `/task-decomposer` onto the store `[size: M · risk: med · class: execution · HITL · J1]`
-Layers: `skills/triage/SKILL.md` · `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/fog-map.md` · `skills/task-decomposer/references/prd-and-slices.md` · `evals/fixtures/store-writers/` · `evals/run-store-writers-fixtures.ts`
+Layers: `skills/triage/SKILL.md` · `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/task-file.md` · `skills/task-decomposer/references/fog-map.md` · `skills/task-decomposer/references/prd-and-slices.md` · `evals/fixtures/store-writers/` · `evals/run-store-writers-fixtures.ts`
 Depends-on: T1
 Cites: `TASK-361` · `EPIC-017` Closed-when 1
 
@@ -91,7 +91,7 @@ from the store, with no `TODO.md` read.
 - [x] Exercised once each on a v2 fixture ✓ store-readers-fixtures 21/0 (`4b79bcc`)
 
 ### T4 — Retarget `/orchestrator` onto the store `[size: M · risk: high · class: execution · HITL · J2]`
-Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `skills/orchestrator/references/night-run.md` · `skills/orchestrator/references/review-scoping.md` · `evals/fixtures/orchestrator-store/` · `evals/run-orchestrator-store-fixtures.ts`
+Layers: `skills/orchestrator/SKILL.md` · `skills/orchestrator/references/dispatch.md` · `skills/orchestrator/references/night-run.md` · `skills/orchestrator/references/review-scoping.md` · `evals/fixtures/orchestrator-store/` · `evals/run-orchestrator-store-fixtures.ts` · `scripts/qa-check.sh`
 Depends-on: T1
 Cites: `TASK-375` · `TASK-362` · `EPIC-017` D6
 
@@ -101,7 +101,7 @@ review comparand) with no Plan-copy dependency.
 **DoD:**
 - [x] sprint-bulk reads members by reference ✓ orchestrator-store-fixtures 42/0 (`af78aaf`)
 - [x] dispatch: return-to-backlog is a `git mv`; merge-back transitions are coordinator-owned with a duplicate-id check (moved from TASK-362, D6) ✓ orchestrator-store-fixtures 42/0 (`af78aaf`)
-- [x] night-run entry routing, rollup and reaper read the store ✓ night-run.md contract; orchestrator-store-fixtures 42/0 (`af78aaf`); executable reaper `night-run.sh` carried to TASK-383
+- [x] night-run entry routing, rollup and reaper read the store ✓ night-run.md contract; orchestrator-store-fixtures 42/0 (`af78aaf`); the executable reaper script is carried to TASK-383
 - [x] review-scoping's `Cites:` resolves from the task file ✓ orchestrator-store-fixtures 42/0 (`af78aaf`)
 - [x] Exercised once end-to-end on a v2 fixture sprint ✓ e2e-1..20 in orchestrator-store-fixtures 42/0, incl. T1's host --close gate (`af78aaf`)
 
