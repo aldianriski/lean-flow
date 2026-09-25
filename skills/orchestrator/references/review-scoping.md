@@ -37,7 +37,11 @@ homework. Take the first rung that exists, in order:
    markdown substrate this *is* the external comparand: written before the task, by someone else (L-016);
 2. a retained **must-FAIL fixture** — it fails with its *named* finding, or the guard is absent (L-058);
 3. a **`check-*.sh` named finding** — the checker already encodes the rule the work must satisfy;
-4. the task's own **`Cites:`** line — the sources its Plan block declared it answers to.
+4. the task's own **`Cites:`** line — the sources its Plan block declared it answers to. A cited
+   `TASK-NNN` resolves **by id** to its task file, `docs/work/*/TASK-NNN-*.md` in whichever status
+   folder it sits (the trailing hyphen keeps `TASK-81` from matching `TASK-810`), and the work is
+   measured against **that file's `## Done when`** (plus its `## Assumes` and `## Tracker` where they
+   bear on it) — never the Plan block, which carries no DoD in a by-reference sprint (ADR-047).
 
 `done-when` is the **fallback**, not the default. When the axis falls back to it, the report says so —
 an unremarked fallback reads as an external check that never happened.
