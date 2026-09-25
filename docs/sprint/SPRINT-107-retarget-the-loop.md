@@ -99,11 +99,11 @@ Cites: `TASK-375` · `TASK-362` · `EPIC-017` D6
 review comparand) with no Plan-copy dependency.
 
 **DoD:**
-- [ ] sprint-bulk reads members by reference
-- [ ] dispatch: return-to-backlog is a `git mv`; merge-back transitions are coordinator-owned with a duplicate-id check (moved from TASK-362, D6)
-- [ ] night-run entry routing, rollup and reaper read the store
-- [ ] review-scoping's `Cites:` resolves from the task file
-- [ ] Exercised once end-to-end on a v2 fixture sprint
+- [x] sprint-bulk reads members by reference ✓ orchestrator-store-fixtures 42/0 (`af78aaf`)
+- [x] dispatch: return-to-backlog is a `git mv`; merge-back transitions are coordinator-owned with a duplicate-id check (moved from TASK-362, D6) ✓ orchestrator-store-fixtures 42/0 (`af78aaf`)
+- [x] night-run entry routing, rollup and reaper read the store ✓ night-run.md contract; orchestrator-store-fixtures 42/0 (`af78aaf`); executable reaper `night-run.sh` carried to TASK-383
+- [x] review-scoping's `Cites:` resolves from the task file ✓ orchestrator-store-fixtures 42/0 (`af78aaf`)
+- [x] Exercised once end-to-end on a v2 fixture sprint ✓ e2e-1..20 in orchestrator-store-fixtures 42/0, incl. T1's host --close gate (`af78aaf`)
 
 ## Decisions (pre-locked)
 
