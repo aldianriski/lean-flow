@@ -170,3 +170,22 @@ a unanimous result from an instrument that did not run.
 **T1 accepted.** Plan DoD ticked; TASK-360 → done/ (derived 7 open / 5 ticked = hand count over Members ids).
 TASK-362's one box stays open: its D6 merge-back half is T4's (D2).
 consequence · T1 · behaviour:material · governance:high → three worktree-isolated outside rounds, CLEAR at round 3
+
+### 2026-09-25 | progress | T4 accepted — /orchestrator runs a sprint from its member files; TASK-362's D6 half lands
+Worktree commit `d9a03c7`, cherry-picked `c60a947`. sprint-bulk resolves active sprint + members (Members ∪ stamps, by
+id); guard/tick/rollup/close read member `## Done when`, never Plan boxes; transitions are coordinator-owned `git mv`
+(own commit) with a **duplicate-id check at every merge-back** (`find docs/work -name 'TASK-*.md' | sed … | uniq -d`
+must print nothing — run on this repo: empty, 26 files); return-to-backlog = scope-change + `git mv` + stamp/Members
+cleared (consistent with T1's MEMBER-DROPPED). night-run routing/pre-flight/rollup/reaper contract and review-scoping's
+`Cites:` comparand read the store. SKILL.md 133 lines.
+**Coordinator re-run on this branch:** `orchestrator-store-fixtures: 41 pass, 0 fail` → after the fix below 42/0;
+`store-readers 21/0` · `store-writers 29/0` · `layout 33/0`. Builder's seeded Members-only break → 30/11, restored
+`a2c8790` = HEAD blob.
+**Coordinator fix `af78aaf` (builder's open Q2):** step-0 guard counted only open boxes, so all-ticked-but-in-`review/`
+halted toward promote — now runnable until every member is in `done/`|`cancel/`, then routes to close; +e2e-16b;
+seeding the old rule back reddens exactly it (restored `aef768aa`, `git hash-object`). **Interpretation logged
+(builder Q1):** a `Tn` whose cited members were all scoped out counts in neither unit figure.
+Harness registered opt-in (git-repo rule, D3). TASK-375 + TASK-362 → done/. **Live close gate:**
+`check-sprint-by-reference … --close` on SPRINT-107 → `11 pass, 0 fail` — every member in `done/`, freeze intact.
+**Carried:** `scripts/night-run.sh` still counts sprint-file boxes → TASK-383 (the prose contract leads).
+consequence · T4 · behaviour:med · governance:med → coordinator re-run + read of the diff + one targeted fix
