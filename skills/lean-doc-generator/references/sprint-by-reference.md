@@ -42,7 +42,8 @@ TASK id, or a `Tn` **in its heading** whose frozen Plan block `Cites:` it. These
 
 The log is append-only. "New" means **appended after** the baseline's text. If an old entry is
 reworded, or the baseline text is no longer a prefix of today's log, that is a finding
-(`LOG-REWRITTEN`), and it excuses nothing. Naming is lexical: an entry that mentions an id counts as
+(`LOG-REWRITTEN`), and it excuses nothing. The log's frontmatter is metadata, so bumping
+`last_updated` is not a rewrite. Naming is lexical: an entry that mentions an id counts as
 naming it, whatever the prose around it says. The same holds for the ` ✓ …` tail on a ticked box.
 The reader of the log is the check on both.
 
@@ -55,7 +56,10 @@ contain the sprint file. It may be no later than any sign that the sprint had st
 
 A repair that points it **earlier** is fine. Pointing it **later** is not, and neither is recording it
 late, because either one re-freezes the edits in between. Every read at an older commit resolves the
-sprint file and its log **at that commit**, so archiving or renaming the pair changes nothing.
+sprint file and its log **at that commit**, so archiving or renaming either file changes nothing. A
+log that was not renamed with its sprint is found through its own `sprint:` frontmatter. Create the
+sprint file **at** promote. A draft committed earlier that already lists members makes any later
+`plan_commit` read as late.
 
 **Membership can change, but only on the record.** A member present at `plan_commit` (on
 `## Members` or stamped) that has since left both indices is **scoped out**. That needs a

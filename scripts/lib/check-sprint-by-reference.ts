@@ -88,6 +88,13 @@ function frontmatterField(content: string, key: string): string | null {
   return null;
 }
 
+/** The text after a leading `---` frontmatter block, LF-normalised. */
+function body(content: string): string {
+  const t = lf(content);
+  const m = t.match(/^---[ \t]*\n[\s\S]*?\n---[ \t]*(\n|$)/);
+  return m ? t.slice(m[0].length) : t;
+}
+
 /** `SPRINT-107`, `107`, `"SPRINT-0107"` -> 107; anything else -> null. */
 function sprintNumber(v: string | null): number | null {
   const m = (v ?? "").match(/^(?:SPRINT-)?0*(\d+)$/i);
@@ -173,17 +180,23 @@ function resolveId(paths: string[], id: string): string[] {
 /**
  * Execution Log entries whose event is `scope-change`. An entry is its `### ` heading plus body, up
  * to the next heading of level 1-3 (never the rest of the file). The heading's second `|` field is
- * the event; the summary field may be absent.
+ * the event; the summary field may be absent. Only entries whose heading starts at or after `from`
+ * count -- but the WHOLE log is parsed, so a comment or fence opened before `from` still hides what
+ * follows it (round 3, finding 1).
  */
-function scopeChangeEntries(log: string): string[] {
+function scopeChangeEntries(log: string, from = 0): string[] {
   const entries: string[] = [];
   let cur: string[] | null = null;
-  for (const { line, fenced } of unfenced(log.replace(/<!--[\s\S]*?-->/g, ""))) {
+  let at = 0;
+  const blanked = log.replace(/<!--[\s\S]*?(-->|$)/g, (c) => c.replace(/[^\n]/g, " ")); // same offsets
+  for (const { line, fenced } of unfenced(blanked)) {
+    const start = at;
+    at += line.length + 1;
     if (!fenced && /^#{1,3} /.test(line)) {
       if (cur) entries.push(cur.join("\n").trim());
       cur = null;
       const f = line.split("|");
-      if (/^### /.test(line) && f.length >= 2 && f[1]!.trim().toLowerCase() === "scope-change") cur = [line];
+      if (start >= from && /^### /.test(line) && f.length >= 2 && f[1]!.trim().toLowerCase() === "scope-change") cur = [line];
       continue;
     }
     cur?.push(line);
@@ -247,9 +260,11 @@ function main(argv: string[]) {
   // tracked docs/sprint/**/logs/<same basename> is it.
   let logRel = `${dirname(sprintRel)}/logs/${basename(sprintRel)}`;
   if (!existsSync(join(root, logRel))) {
-    const found = git(root, ["ls-files", "-z", "--", "docs/sprint"])
-      .split("\0")
-      .find((p) => p.includes("/logs/") && basename(p) === basename(sprintRel));
+    const logs = git(root, ["ls-files", "-z", "--", "docs/sprint"]).split("\0").filter((p) => p.includes("/logs/"));
+    // same basename; else (the sprint was renamed, its log not) the one log whose frontmatter names this sprint
+    const sprintNoEarly = sprintNumber(frontmatterField(sprintText, "sprint"));
+    const byFm = logs.filter((p) => sprintNumber(frontmatterField(readFileSync(join(root, p), "utf8"), "sprint")) === sprintNoEarly);
+    const found = logs.find((p) => basename(p) === basename(sprintRel)) ?? (byFm.length === 1 ? byFm[0] : undefined);
     if (found) logRel = found;
   }
 
@@ -368,9 +383,10 @@ function main(argv: string[]) {
       const baseSources = [showAt(base, "log"), section(showAt(base, "sprint"), "Execution Log") ?? ""];
       const fresh: string[] = [];
       liveSources.forEach(([label, live], i) => {
-        const before = lf(baseSources[i]!).trimEnd();
-        const now = lf(live);
-        if (now.startsWith(before)) fresh.push(...scopeChangeEntries(now.slice(before.length)));
+        // frontmatter is metadata (`last_updated` is bumped on every append), not a past entry
+        const before = body(baseSources[i]!).trimEnd();
+        const now = body(live);
+        if (now.startsWith(before)) fresh.push(...scopeChangeEntries(now, before.length));
         else if (!rewritten.has(`${label}@${base}`)) {
           rewritten.add(`${label}@${base}`);
           bad("LOG-REWRITTEN", `the ${label} as of ${base.slice(0, 7)} is no longer a prefix of today's -- a past entry was edited; its entries are not counted`);

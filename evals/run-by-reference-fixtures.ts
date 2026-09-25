@@ -84,6 +84,7 @@ function build(o: Opts = {}): string {
   git(dir, ["config", "user.email", "fixture@example.com"]);
   git(dir, ["config", "user.name", "Fixture Bot"]);
   git(dir, ["config", "core.autocrlf", "false"]); // stored bytes = fixture bytes; CRLF is a case, not ambient
+  git(dir, ["config", "commit.gpgsign", "false"]); // a host's signing setup is not the fixture's (and fails at volume)
   put(dir, "README.md", "fixture repo\n");
   commit(dir, "base -- before the sprint exists"); // a commit without the Plan: PLAN-COMMIT-NO-PLAN's target
   let sprint = fix("SPRINT-901-fixture.md");
@@ -664,6 +665,70 @@ const CASES: Case[] = [
     },
     expect: ["FREEZE-EDIT TASK-901"],
   },
+  // --- round 3: the legitimate direction after the log moves, and log metadata -----------------
+  {
+    name: "archived-pair-logged-edit (must-PASS: a scope-change is still found after archiving)",
+    sprint: ARCH,
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "alpha gains a bar", "TASK-901 gains a benchmark.");
+      commit(d, "edit + entry");
+      archive(d);
+    },
+    expect: [],
+  },
+  {
+    name: "renamed-sprint-log-not-renamed-logged-edit (must-PASS: the log is found by its frontmatter)",
+    sprint: "docs/sprint/SPRINT-901-renamed.md",
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      logEntry(d, "scope-change", "alpha gains a bar", "TASK-901 gains a benchmark.");
+      commit(d, "edit + entry");
+      mv(d, SPRINT, "docs/sprint/SPRINT-901-renamed.md");
+    },
+    expect: [],
+  },
+  {
+    name: "log-created-after-promote-logged-edit (must-PASS)",
+    opts: { pre: (d) => rmSync(join(d, LOG)) },
+    mutate: (d) => {
+      put(d, LOG, fix("log-SPRINT-901-fixture.md"));
+      logEntry(d, "scope-change", "alpha gains a bar", "TASK-901 gains a benchmark.");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "log + entry + edit");
+    },
+    expect: [],
+  },
+  {
+    name: "log-created-after-promote-unlogged-edit (must-FAIL sibling)",
+    opts: { pre: (d) => rmSync(join(d, LOG)) },
+    mutate: (d) => {
+      put(d, LOG, fix("log-SPRINT-901-fixture.md"));
+      EDIT_901(d, W("todo", T901));
+      commit(d, "log + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "log-frontmatter-bumped-logged-edit (must-PASS: last_updated is metadata, not a past entry)",
+    mutate: (d) => {
+      edit(d, LOG, "last_updated: 2026-09-24", "last_updated: 2026-09-25");
+      logEntry(d, "scope-change", "alpha gains a bar", "TASK-901 gains a benchmark.");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "bump + entry + edit");
+    },
+    expect: [],
+  },
+  {
+    name: "comment-opened-before-promote-hides-later-entry (must-FAIL)",
+    opts: { pre: (d) => appendFileSync(join(d, LOG), "\n<!-- draft note\n") },
+    mutate: (d) => {
+      appendFileSync(join(d, LOG), "### 2026-09-25 | scope-change | TASK-901 gains a bar\n-->\n");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "entry inside an old comment + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
   // --- selection: stamp and Members shapes (review round 1, minors) -----------------------------
   ...[
     ["quoted", 'sprint: "SPRINT-901"'],
@@ -757,8 +822,9 @@ const CASES: Case[] = [
 ];
 
 for (const c of CASES) {
-  const dir = build(c.opts);
+  let dir = "";
   try {
+    dir = build(c.opts); // inside the try: a build error fails its case, never the whole run's verdict line
     c.mutate(dir);
     const r = run(dir, c.close ?? false, c.sprint);
     const expect = [...c.expect].sort();
@@ -774,7 +840,7 @@ for (const c of CASES) {
     console.log(`FAIL  by-reference-fixture: ${c.name} -- harness error: ${(e as Error).message.split("\n")[0]}`);
     fail++;
   } finally {
-    rmSync(dir, { recursive: true, force: true });
+    if (dir) rmSync(dir, { recursive: true, force: true });
   }
 }
 
