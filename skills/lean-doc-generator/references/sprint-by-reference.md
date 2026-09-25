@@ -35,13 +35,27 @@ member exactly as approved, at that commit. What is frozen is each member's `## 
 An edit is legitimate only when the sprint's Execution Log (its `logs/` file, or the sprint file's own
 `## Execution Log`) carries a **`scope-change` entry** — the event field of its
 `### date | scope-change [| summary]` heading — that is **new since `plan_commit`** and names that
-TASK id, or a `Tn` whose frozen Plan block `Cites:` it. A prose mention under another event does not
-count, and neither does an entry already in the log when the Plan was locked.
+TASK id, or a `Tn` **in its heading** whose frozen Plan block `Cites:` it. These do not count:
+- a prose mention of the id under another event;
+- an entry inside an HTML comment;
+- an entry that was already in the log at the baseline.
 
-**The freeze point is fixed too.** `plan_commit` must be an ancestor of `HEAD`, must already contain
-the sprint file, and may be no later than the commit that first recorded a `plan_commit` value. A
-repair that points it **earlier** is fine. Pointing it **later** is not, because that re-freezes the
-edits in between.
+The log is append-only. "New" means **appended after** the baseline's text. If an old entry is
+reworded, or the baseline text is no longer a prefix of today's log, that is a finding
+(`LOG-REWRITTEN`), and it excuses nothing. Naming is lexical: an entry that mentions an id counts as
+naming it, whatever the prose around it says. The same holds for the ` ✓ …` tail on a ticked box.
+The reader of the log is the check on both.
+
+**The freeze point is fixed too.** `plan_commit` must be an ancestor of `HEAD` and must already
+contain the sprint file. It may be no later than any sign that the sprint had started:
+- the sprint file first set to `status: active`;
+- the sprint file first listing a member;
+- the sprint file first recording a `plan_commit`;
+- a member file first stamped with the sprint.
+
+A repair that points it **earlier** is fine. Pointing it **later** is not, and neither is recording it
+late, because either one re-freezes the edits in between. Every read at an older commit resolves the
+sprint file and its log **at that commit**, so archiving or renaming the pair changes nothing.
 
 **Membership can change, but only on the record.** A member present at `plan_commit` (on
 `## Members` or stamped) that has since left both indices is **scoped out**. That needs a

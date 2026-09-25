@@ -178,7 +178,7 @@ function resolveId(paths: string[], id: string): string[] {
 function scopeChangeEntries(log: string): string[] {
   const entries: string[] = [];
   let cur: string[] | null = null;
-  for (const { line, fenced } of unfenced(log)) {
+  for (const { line, fenced } of unfenced(log.replace(/<!--[\s\S]*?-->/g, ""))) {
     if (!fenced && /^#{1,3} /.test(line)) {
       if (cur) entries.push(cur.join("\n").trim());
       cur = null;
@@ -203,12 +203,13 @@ function nowTree(root: string): Tree {
   const paths: string[] = [];
   const workDir = join(root, WORK);
   if (existsSync(workDir)) {
-    for (const folder of readdirSync(workDir, { withFileTypes: true })) {
-      if (!folder.isDirectory()) continue;
-      for (const f of readdirSync(join(workDir, folder.name))) {
-        if (/^TASK-\d+-.*\.md$/.test(f)) paths.push(`${WORK}/${folder.name}/${f}`);
+    const walk = (rel: string) => {
+      for (const e of readdirSync(join(root, rel), { withFileTypes: true })) {
+        if (e.isDirectory()) walk(`${rel}/${e.name}`);
+        else if (/^TASK-\d+-.*\.md$/.test(e.name)) paths.push(`${rel}/${e.name}`);
       }
-    }
+    };
+    walk(WORK); // recursive, like the commit trees' ls-tree -r: a nested folder is not a different population
   }
   return { label: "now", commit: null, paths, read: (p) => (existsSync(join(root, p)) ? readFileSync(join(root, p), "utf8") : null) };
 }
@@ -235,14 +236,22 @@ function main(argv: string[]) {
   const args = argv.filter((a) => a !== "--close");
   const closeMode = argv.includes("--close");
   if (args.length !== 1) {
-    console.error("usage: check-sprint-by-reference.ts <sprint-file> [--close]");
-    process.exit(2);
+    bad("USAGE", "check-sprint-by-reference.ts <sprint-file> [--close]");
+    return;
   }
   const sprintPath = resolve(args[0]!);
   const sprintText = readFileSync(sprintPath, "utf8");
   const root = git(dirname(sprintPath), ["rev-parse", "--show-toplevel"]).trim();
   const sprintRel = relative(root, sprintPath).split("\\").join("/");
-  const logRel = `${dirname(sprintRel)}/logs/${basename(sprintRel)}`;
+  // The log sits beside the sprint in logs/ -- unless only one of the pair was archived; then any
+  // tracked docs/sprint/**/logs/<same basename> is it.
+  let logRel = `${dirname(sprintRel)}/logs/${basename(sprintRel)}`;
+  if (!existsSync(join(root, logRel))) {
+    const found = git(root, ["ls-files", "-z", "--", "docs/sprint"])
+      .split("\0")
+      .find((p) => p.includes("/logs/") && basename(p) === basename(sprintRel));
+    if (found) logRel = found;
+  }
 
   const sprintNo = sprintNumber(frontmatterField(sprintText, "sprint"));
   const sprintId = `SPRINT-${sprintNo ?? "?"}`;
@@ -258,76 +267,122 @@ function main(argv: string[]) {
     bad("PLAN-COMMIT-NOT-ANCESTOR", `plan_commit ${planCommit} is not an ancestor of HEAD -- not this history's freeze`);
     return;
   }
-  // The sprint file as it stood at plan_commit: same path, else (archived since) the same basename under docs/sprint.
-  let sprintRelAtPc: string | null = null;
-  for (const p of git(root, ["ls-tree", "-r", "-z", "--name-only", pc, "--", "docs/sprint"]).split("\0")) {
-    if (p === sprintRel) sprintRelAtPc = p;
-    else if (sprintRelAtPc === null && basename(p) === basename(sprintRel) && !p.includes("/logs/")) sprintRelAtPc = p;
-  }
+  // Where the sprint file and its log lived at any commit: archiving (`git mv` into archive/) and a
+  // rename both move them, so every historical read resolves its path AT THAT COMMIT (round 2, major 1).
+  const follow = (rel: string) =>
+    git(root, ["log", "--format=%x00%H", "--name-only", "--follow", "--", rel])
+      .split("\0")
+      .filter((c) => c.trim().length > 0)
+      .map((c) => {
+        const [h, ...files] = c.trim().split("\n");
+        return { h: h!.trim(), path: files.map((f) => f.trim()).find((f) => f.length > 0) ?? rel };
+      })
+      .reverse();
+  const hist = follow(sprintRel);
+  const logPaths = new Set([logRel, ...(existsSync(join(root, logRel)) ? follow(logRel).map((e) => e.path) : [])]);
+  const sprintPaths = new Set([sprintRel, ...hist.map((e) => e.path)]);
+  const treeCache = new Map<string, string[]>();
+  const fileAt = (commit: string, kind: "sprint" | "log"): string | null => {
+    if (!treeCache.has(commit)) {
+      treeCache.set(commit, git(root, ["ls-tree", "-r", "-z", "--name-only", commit, "--", "docs/sprint"]).split("\0"));
+    }
+    const tree = treeCache.get(commit)!;
+    const known = kind === "sprint" ? sprintPaths : logPaths;
+    const hit = tree.find((p) => known.has(p));
+    if (hit) return hit;
+    const isLog = (p: string) => p.includes("/logs/");
+    return tree.find((p) => basename(p) === basename(sprintRel) && isLog(p) === (kind === "log")) ?? null;
+  };
+  const showAt = (commit: string, kind: "sprint" | "log"): string => {
+    const p = fileAt(commit, kind);
+    if (p === null) return "";
+    try {
+      return git(root, ["show", `${commit}:${p}`]);
+    } catch {
+      return "";
+    }
+  };
+
+  const sprintRelAtPc = fileAt(pc, "sprint");
   if (sprintRelAtPc === null) {
     bad("PLAN-COMMIT-NO-PLAN", `the sprint file does not exist at plan_commit ${planCommit} -- the freeze predates the Plan`);
     return;
   }
-  // The commit that first recorded a resolvable plan_commit value: plan_commit may be it or earlier, never later.
-  let firstRecording: string | null = null;
-  const hist = git(root, ["log", "--format=%x00%H", "--name-only", "--follow", "--", sprintRel])
-    .split("\0")
-    .filter((c) => c.trim().length > 0)
-    .map((c) => {
-      const [h, ...files] = c.trim().split("\n");
-      return { h: h!.trim(), path: files.map((f) => f.trim()).find((f) => f.length > 0) ?? sprintRel };
-    })
-    .reverse();
+  // plan_commit may be no later than ANY sign that the sprint had started: the sprint file first active,
+  // first listing a member, first recording a plan_commit, or a member file first stamped with it. A late
+  // recording moves only one of those (round 2, major 2).
+  const starts: { c: string; why: string }[] = [];
+  let recorded = false;
+  const seen = new Set<string>();
   for (const { h, path } of hist) {
-    let v: string | null = null;
+    let t: string;
     try {
-      v = frontmatterField(git(root, ["show", `${h}:${path}`]), "plan_commit");
+      t = git(root, ["show", `${h}:${path}`]);
     } catch {
       continue;
     }
-    if (v && SHA.test(v) && gitOk(root, ["rev-parse", "--verify", "--quiet", `${v}^{commit}`])) {
-      firstRecording = h;
-      break;
-    }
+    const v = frontmatterField(t, "plan_commit");
+    const rec = v !== null && SHA.test(v) && gitOk(root, ["rev-parse", "--verify", "--quiet", `${v}^{commit}`]);
+    recorded ||= rec;
+    const sigs: [boolean, string][] = [
+      [rec, "first recorded a plan_commit"],
+      [(frontmatterField(t, "status") ?? "").toLowerCase() === "active", "first had status: active"],
+      [taskIds(section(t, "Members")).size > 0, "first listed a member"],
+    ];
+    for (const [hit, why] of sigs) if (hit && !seen.has(why)) (seen.add(why), starts.push({ c: h, why }));
   }
-  if (firstRecording === null) {
+  if (!recorded) {
     bad("PLAN-COMMIT-UNRECORDED", `no commit of ${sprintRel} records a plan_commit -- the freeze point is not in history`);
     return;
   }
-  if (!gitOk(root, ["merge-base", "--is-ancestor", pc, firstRecording])) {
-    bad(
-      "PLAN-COMMIT-LATE",
-      `plan_commit ${planCommit} is later than ${firstRecording.slice(0, 7)}, the commit that first recorded one -- re-pointed forward`,
-    );
+  if (sprintNo !== null) {
+    const stampRe = `^sprint:.*${sprintNo}`;
+    for (const c of git(root, ["log", "--reverse", "--format=%H", "-G", stampRe, "--", WORK]).split("\n").filter(Boolean)) {
+      const t = commitTree(root, c);
+      if (t.paths.some((p) => sprintNumber(frontmatterField(t.read(p) ?? "", "sprint")) === sprintNo)) {
+        starts.push({ c, why: "first stamped a member" });
+        break;
+      }
+    }
+  }
+  const late = starts.find((st) => !gitOk(root, ["merge-base", "--is-ancestor", pc, st.c]));
+  if (late) {
+    bad("PLAN-COMMIT-LATE", `plan_commit ${planCommit} is later than ${late.c.slice(0, 7)}, the commit that ${late.why} -- moved forward`);
     return;
   }
-  ok("freeze point", `plan_commit ${planCommit} holds the Plan, is an ancestor of HEAD and not later than ${firstRecording.slice(0, 7)}`);
+  ok("freeze point", `plan_commit ${planCommit} holds the Plan, is an ancestor of HEAD and precedes every sign the sprint had started`);
 
-  // --- the Execution Log: logs/<file> plus any inline ## Execution Log, now and at a baseline -----
-  const logAt = (commit: string | null): string => {
-    const read = (p: string) => {
-      if (commit === null) return existsSync(join(root, p)) ? readFileSync(join(root, p), "utf8") : "";
-      try {
-        return git(root, ["show", `${commit}:${p}`]);
-      } catch {
-        return "";
-      }
-    };
-    const sprintAt = commit === null ? sprintText : read(commit === pc ? sprintRelAtPc! : sprintRel) || read(sprintRelAtPc!);
-    return `${read(logRel)}\n\n${section(sprintAt, "Execution Log") ?? ""}`;
-  };
-  const liveEntries = scopeChangeEntries(logAt(null));
+  // --- the Execution Log: logs/<file> plus any inline ## Execution Log -----------------------------
+  // The log is append-only ("never edit a past entry"), so what is new since a baseline is the SUFFIX
+  // appended after the baseline's text -- never an old entry reworded, nor a paragraph tucked under one
+  // (round 2, minor 1). A source whose baseline text is no longer a prefix was rewritten: LOG-REWRITTEN,
+  // and none of its entries count.
+  const liveSources: [string, string][] = [
+    ["logs/ file", existsSync(join(root, logRel)) ? readFileSync(join(root, logRel), "utf8") : ""],
+    ["inline ## Execution Log", section(sprintText, "Execution Log") ?? ""],
+  ];
+  const rewritten = new Set<string>();
   const newSince = new Map<string, string[]>();
   const scopedSince = (base: string): string[] => {
     if (!newSince.has(base)) {
-      const before = new Set(scopeChangeEntries(logAt(base)));
-      newSince.set(base, liveEntries.filter((e) => !before.has(e)));
+      const baseSources = [showAt(base, "log"), section(showAt(base, "sprint"), "Execution Log") ?? ""];
+      const fresh: string[] = [];
+      liveSources.forEach(([label, live], i) => {
+        const before = lf(baseSources[i]!).trimEnd();
+        const now = lf(live);
+        if (now.startsWith(before)) fresh.push(...scopeChangeEntries(now.slice(before.length)));
+        else if (!rewritten.has(`${label}@${base}`)) {
+          rewritten.add(`${label}@${base}`);
+          bad("LOG-REWRITTEN", `the ${label} as of ${base.slice(0, 7)} is no longer a prefix of today's -- a past entry was edited; its entries are not counted`);
+        }
+      });
+      newSince.set(base, fresh);
     }
     return newSince.get(base)!;
   };
 
   // `Tn` -> the TASK ids its frozen Plan block Cites, so an entry naming `T1` names T1's members.
-  const frozenSprint = git(root, ["show", `${pc}:${sprintRelAtPc}`]);
+  const frozenSprint = showAt(pc, "sprint");
   const tCites = new Map<string, Set<string>>();
   let curT: string | null = null;
   for (const { line, fenced } of unfenced(section(frozenSprint, "Plan") ?? "")) {
@@ -339,7 +394,8 @@ function main(argv: string[]) {
   }
   const names = (entries: string[], id: string): boolean =>
     entries.some(
-      (e) => idRe(id).test(e) || [...e.matchAll(/\b(T\d+)(?![0-9])/g)].some((t) => tCites.get(t[1]!)?.has(id) ?? false),
+      // a `Tn` counts only in the heading: in a body it is as often sequencing prose as a subject
+      (e) => idRe(id).test(e) || [...e.split("\n")[0]!.matchAll(/\b(T\d+)(?![0-9])/g)].some((t) => tCites.get(t[1]!)?.has(id) ?? false),
     );
 
   // --- population: Members ids ∪ sprint: stamps, at plan_commit and now --------------------------
@@ -372,9 +428,7 @@ function main(argv: string[]) {
       const stamped = f.length === 1 && sprintNumber(frontmatterField(t.read(f[0]!) ?? "", "sprint")) === sprintNo;
       let listed = false;
       if (!stamped) {
-        try {
-          listed = taskIds(section(git(root, ["show", `${c}:${sprintRel}`]), "Members")).has(id);
-        } catch {}
+        listed = taskIds(section(showAt(c, "sprint"), "Members")).has(id);
       }
       if (stamped || listed) return t;
     }

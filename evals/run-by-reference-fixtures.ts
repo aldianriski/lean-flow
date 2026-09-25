@@ -107,8 +107,8 @@ function build(o: Opts = {}): string {
   return dir;
 }
 
-function run(dir: string, close: boolean): { findings: string[]; verdict: string; exit: number } {
-  const args = [CHECKER, join(dir, SPRINT)];
+function run(dir: string, close: boolean, sprint = SPRINT): { findings: string[]; verdict: string; exit: number } {
+  const args = [CHECKER, join(dir, sprint)];
   if (close) args.push("--close");
   const r = spawnSync("bun", args, { encoding: "utf8" });
   const lines = (r.stdout ?? "").split(/\r?\n/);
@@ -121,6 +121,7 @@ interface Case {
   name: string;
   opts?: Opts;
   close?: boolean;
+  sprint?: string; // where the sprint file is at check time, when a case moves it
   mutate: (dir: string) => void;
   expect: string[];
 }
@@ -130,6 +131,13 @@ const TICK_901 = (dir: string, rel: string) => {
   edit(dir, rel, "for every input in the table", "for every input in the table ✓ `abc1234` — 12/0");
   edit(dir, rel, "- [ ] a retained fixture", "- [X] a retained fixture");
 };
+const ARCH = "docs/sprint/archive/SPRINT-901-fixture.md";
+const ARCH_LOG = "docs/sprint/archive/logs/SPRINT-901-fixture.md";
+const archive = (d: string, withLog = true) => {
+  mv(d, SPRINT, ARCH); // the §11 archival pass: git mv, own commit
+  if (withLog) mv(d, LOG, ARCH_LOG);
+};
+const INLINE = (d: string, body: string) => edit(d, SPRINT, "## Files Changed", `${body}\n\n## Files Changed`);
 const EDIT_901 = (dir: string, rel: string) =>
   edit(dir, rel, "- [ ] a retained fixture covers the empty input", "- [ ] a retained fixture covers the empty input\n- [ ] a benchmark stays under 5ms");
 
@@ -530,6 +538,132 @@ const CASES: Case[] = [
     },
     expect: [],
   },
+  // --- round 2: where the sprint lives, when it was recorded, what the log may count ----------
+  {
+    name: "archived-pre-promote-entry-then-edited (must-FAIL: the log is read at its path AT the baseline)",
+    sprint: ARCH,
+    opts: { pre: (d) => logEntry(d, "scope-change", "early widening", "TASK-901 may gain a benchmark later.") },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit");
+      archive(d);
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "archived-added-unstamped-member-edited (must-FAIL: Members read at its path AT each commit)",
+    sprint: ARCH,
+    mutate: (d) => {
+      put(d, W("todo", "TASK-903-gamma.md"), fix(T902).replace(/TASK-902/g, "TASK-903").replace("sprint: SPRINT-901\n", ""));
+      edit(d, SPRINT, "- docs/work/todo/TASK-902-beta.md\n", "- docs/work/todo/TASK-902-beta.md\n- docs/work/todo/TASK-903-gamma.md\n");
+      INLINE(d, "### 2026-09-25 | scope-change | admit TASK-903\nNeeded by T2.");
+      commit(d, "admit 903");
+      edit(d, W("todo", "TASK-903-gamma.md"), "unchanged", "changed");
+      commit(d, "edit 903");
+      archive(d, false);
+    },
+    expect: ["FREEZE-EDIT TASK-903"],
+  },
+  {
+    name: "archived-clean-close (sibling control: archiving is not an edit)",
+    sprint: ARCH,
+    close: true,
+    mutate: (d) => {
+      mv(d, W("todo", T901), W("done", T901));
+      mv(d, W("todo", T902), W("done", T902));
+      archive(d);
+    },
+    expect: [],
+  },
+  {
+    name: "renamed-sprint-file (must-PASS: history is followed across a rename)",
+    sprint: "docs/sprint/SPRINT-901-renamed.md",
+    mutate: (d) => {
+      mv(d, SPRINT, "docs/sprint/SPRINT-901-renamed.md");
+      mv(d, LOG, "docs/sprint/logs/SPRINT-901-renamed.md");
+    },
+    expect: [],
+  },
+  {
+    name: "plan-commit-recorded-late (must-FAIL: PLAN-COMMIT-LATE -- the promote had already stamped and activated)",
+    opts: { noPlanCommit: true },
+    mutate: (d) => {
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit before recording");
+      const head = git(d, ["rev-parse", "--short", "HEAD"]).trim();
+      edit(d, SPRINT, "plan_commit: PLAN_COMMIT", `plan_commit: ${head}`);
+      commit(d, "record late");
+    },
+    expect: ["PLAN-COMMIT-LATE"],
+  },
+  {
+    name: "old-entry-reworded (must-FAIL: LOG-REWRITTEN, and the rewrite excuses nothing)",
+    opts: { pre: (d) => logEntry(d, "scope-change", "beta widened", "TASK-902 widened.") },
+    mutate: (d) => {
+      edit(d, LOG, "TASK-902 widened.", "TASK-902 widened; TASK-901 gains a benchmark.");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "reword + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901", "LOG-REWRITTEN"],
+  },
+  {
+    name: "paragraph-appended-under-old-entry (must-FAIL: only NEW entries count)",
+    opts: { pre: (d) => logEntry(d, "scope-change", "beta widened", "TASK-902 widened.") },
+    mutate: (d) => {
+      appendFileSync(join(d, LOG), "TASK-901 gains a benchmark too.\n");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "append under old + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "scope-change-inside-html-comment (must-FAIL: a commented-out entry is not an entry)",
+    mutate: (d) => {
+      appendFileSync(join(d, LOG), "\n<!--\n### 2026-09-25 | scope-change | draft\nTASK-901 gains a benchmark.\n-->\n");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "commented entry + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "Tn-only-in-body (must-FAIL: a Tn counts only in the heading)",
+    mutate: (d) => {
+      logEntry(d, "scope-change", "perf bar added", "Carried from the T1 review.");
+      EDIT_901(d, W("todo", T901));
+      commit(d, "body Tn + edit");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "nested-member-folder-edited (must-FAIL: the working tree is walked as deep as the commit trees)",
+    mutate: (d) => {
+      mv(d, W("todo", T901), W("done/2026", T901));
+      EDIT_901(d, W("done/2026", T901));
+      commit(d, "edit nested");
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
+  {
+    name: "nested-member-folder-clean-close (sibling control)",
+    close: true,
+    mutate: (d) => {
+      mv(d, W("todo", T901), W("done/2026", T901));
+      mv(d, W("todo", T902), W("done", T902));
+    },
+    expect: [],
+  },
+  {
+    name: "edit-merged-from-side-branch (must-FAIL: non-linear history)",
+    mutate: (d) => {
+      const main = git(d, ["rev-parse", "--abbrev-ref", "HEAD"]).trim();
+      git(d, ["checkout", "-q", "-b", "side"]);
+      EDIT_901(d, W("todo", T901));
+      commit(d, "edit on side");
+      git(d, ["checkout", "-q", main]);
+      git(d, ["merge", "-q", "--no-ff", "-m", "merge side", "side"]);
+    },
+    expect: ["FREEZE-EDIT TASK-901"],
+  },
   // --- selection: stamp and Members shapes (review round 1, minors) -----------------------------
   ...[
     ["quoted", 'sprint: "SPRINT-901"'],
@@ -626,7 +760,7 @@ for (const c of CASES) {
   const dir = build(c.opts);
   try {
     c.mutate(dir);
-    const r = run(dir, c.close ?? false);
+    const r = run(dir, c.close ?? false, c.sprint);
     const expect = [...c.expect].sort();
     const setOk = JSON.stringify(r.findings) === JSON.stringify(expect);
     const m = r.verdict.match(/: (\d+) pass, (\d+) fail$/);

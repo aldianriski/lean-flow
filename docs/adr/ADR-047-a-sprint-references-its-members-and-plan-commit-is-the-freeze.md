@@ -67,6 +67,15 @@ member's baseline. `plan_commit` must be an ancestor of `HEAD`, must contain the
 be no later than the commit that first recorded it. So it cannot be moved forward to re-freeze an edit,
 while a repair that moves it earlier still passes.
 
+**Amended again 2026-09-25 (outside review round 2).** Two more holes, and both are now closed. (1) An
+archived sprint used to read its log and Members at today's path in old commits. Now every historical
+read resolves the path at that commit. (2) Recording `plan_commit` late used to move the "no later
+than" bound along with it. Now the bound is the earliest sign the sprint had started: the sprint file
+first active, first listing a member or first recording `plan_commit`, or the first stamp on a member.
+The log is also treated as append-only: an edited past entry is `LOG-REWRITTEN` and excuses nothing.
+Accepted limits: naming is lexical, and a ` ✓` tail may carry any text. The reader of the log is the
+check on both.
+
 ## Alternatives considered
 
 | Option | Why rejected |
