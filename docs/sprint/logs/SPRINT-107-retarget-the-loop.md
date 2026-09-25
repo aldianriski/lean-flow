@@ -138,3 +138,18 @@ non-control cases, 28 green (25 originals + 3 sibling controls). 21 targeted see
 (seeded S7 in place, as expected, then restored by the script), and S7 re-run clean. Knowledge index was already
 STALE at `9d8658a` → regenerated in its own commit `3ae370d`.
 consequence · T1 · behaviour:material · governance:high → second worktree-isolated outside review (round 2)
+
+### 2026-09-25 | review | T1 round-2 outside review (worktree-isolated) — NOT CLEAR; revise round 2 landed `0c0010e`
+Round 1 findings verified closed by the reviewer's own repros. **2 new major** (both on a property every fixture
+shared — L-186): (1) an archived sprint read its log/Members at today's path in old commits, so a pre-promote
+scope-change excused an edit again; (2) a late first recording moved the PLAN-COMMIT-LATE bound with it. 7 minor:
+reworded old entry / paragraph under an old entry counted as new; lexical naming; HTML-commented entry; free-text
+✓ tail; renamed sprint → false NO-PLAN; nested status folder → false MEMBER-MISSING; usage exit without verdict.
+**Fixed in `0c0010e`:** per-commit path resolution; bound = every start sign (active · member listed · recorded ·
+member stamped); append-only log (`LOG-REWRITTEN`); comments stripped; `Tn` heading-only; recursive walk; usage
+verdict. **Accepted + documented (reference, ADR-047):** lexical naming, free-text ✓ tail — the log's reader is the check.
+**Evidence (`git hash-object`, working file):** harness `67 pass, 0 fail` (+12 cases varying sprint location,
+recording time, folder depth, merge history); round-1 checker `015327e9` seeded in reddens all 10 new non-control
+cases; 30 targeted seeds all OK after two stale anchors were re-anchored and S12's demolition narrowed; restored
+`d563167d`. Live SPRINT-107 `6 pass, 0 fail`. Round-3 review dispatched to the same isolated reviewer.
+consequence · T1 · behaviour:material · governance:high → outside isolated reviewer (round 3)
