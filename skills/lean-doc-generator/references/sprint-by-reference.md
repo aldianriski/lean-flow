@@ -32,24 +32,40 @@ member exactly as approved, at that commit. What is frozen is each member's `## 
   frontmatter changes · line endings.
 - **An edit:** any other change to the `## Done when` body — a box added, removed or reworded.
 
-An edit is legitimate only when the sprint's Execution Log carries a **`scope-change` entry** — the
-event field of its `### date | scope-change | summary` heading — **naming that TASK id**, appended
-before or with the edit. A prose mention of "scope-change" under another event does not count.
+An edit is legitimate only when the sprint's Execution Log (its `logs/` file, or the sprint file's own
+`## Execution Log`) carries a **`scope-change` entry** — the event field of its
+`### date | scope-change [| summary]` heading — that is **new since `plan_commit`** and names that
+TASK id, or a `Tn` whose frozen Plan block `Cites:` it. A prose mention under another event does not
+count, and neither does an entry already in the log when the Plan was locked.
+
+**The freeze point is fixed too.** `plan_commit` must be an ancestor of `HEAD`, must already contain
+the sprint file, and may be no later than the commit that first recorded a `plan_commit` value. A
+repair that points it **earlier** is fine. Pointing it **later** is not, because that re-freezes the
+edits in between.
+
+**Membership can change, but only on the record.** A member present at `plan_commit` (on
+`## Members` or stamped) that has since left both indices is **scoped out**. That needs a
+`scope-change` entry naming it. A task that joins after `plan_commit` needs one too, and its
+baseline is the first commit that stamps or lists it, so its later edits need a newer entry.
 
 ## Detecting a post-promote edit (plain git — run it anywhere)
 
-For each member id (the ids on `## Members`, plus every `docs/work/*/TASK-*.md` stamped with this
-sprint — take the union, so drift in one index still selects the member):
-
-1. Find the member **by id** in the frozen tree, so later folder moves do not matter:
-   `git ls-tree -r --name-only <plan_commit> docs/work/` → the one path whose filename starts
-   `TASK-NNN-` (the trailing hyphen keeps `TASK-36` from matching `TASK-360`).
-2. Read it as frozen: `git show <plan_commit>:<that path>`; read the current file from disk.
-3. Take the `## Done when` section of each (up to the next `## ` heading); in both, rewrite `[x]`/`[X]`
-   to `[ ]`, drop the ` ✓ …` tail of a ticked line, normalise line endings, trim trailing space.
-4. Equal → the member holds the freeze. Different → it passes only if a `scope-change` entry names
-   that id; otherwise it is an **unlogged post-promote edit**, and the sprint cannot close on it.
-5. A member that resolves to no file (or to two) at `plan_commit` or now is itself a finding.
+1. **Population** — every TASK id on `## Members` (any line shape) or stamped `sprint:` with this
+   sprint (`SPRINT-NNN`, `NNN`, quoted, with a `# comment`), read **both** at `plan_commit`
+   (`git show <plan_commit>:<sprint file>`) and now. Apply the membership rule above to any id in
+   only one of the two.
+2. Find each member **by id** in its baseline tree so that folder moves do not matter:
+   `git ls-tree -r -z --name-only <baseline> docs/work/` gives the one path whose filename starts
+   with `TASK-NNN-`. The trailing hyphen keeps `TASK-36` from matching `TASK-360`.
+3. Read it at the baseline (`git show <baseline>:<path>`) and from disk now. In each copy, take
+   **every** `## Done when` section, ignoring `## ` lines inside code fences. If there is none on
+   either side, that is a finding, never a pass.
+4. Compare line by line, ignoring blank lines, trailing space, line endings, the tick state of
+   `[ ]`/`[x]` boxes (`-`, `*`, `+` or numbered), and the ` ✓ …` tail that a tick appends after the
+   frozen text.
+5. Equal means the member holds the freeze. Different passes only under the scope-change rule
+   above. Otherwise it is an **unlogged post-promote edit**, and the sprint cannot close on it.
+6. A member that resolves to no file (or to two) at its baseline or now is itself a finding.
 
 ## Close by reference
 

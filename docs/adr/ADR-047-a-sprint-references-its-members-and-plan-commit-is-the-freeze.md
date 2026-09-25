@@ -56,9 +56,16 @@ members unedited.
 **Negative (trade-offs accepted):** the freeze check needs git history — a `plan_commit` that no
 longer resolves (a rewritten or shallow history) reads as nothing frozen, which the check reports as a
 failure rather than a pass. Plan-reading checkers that counted § Plan DoD boxes find none in a
-by-reference sprint and must be retargeted onto member files (tracked separately in EPIC-017). A
-member removed from both the `## Members` list and its `sprint:` stamp leaves the checked population;
-that is an edit to the sprint file itself, visible in its own history.
+by-reference sprint and must be retargeted onto member files (tracked separately in EPIC-017).
+
+**Amended 2026-09-25 (SPRINT-107 T1, outside review round 1).** The first build left two holes, and
+both are now closed. (1) *Population:* membership is read at `plan_commit` **and** now. A member that
+leaves both indices must be scoped out by a `scope-change` entry (else `MEMBER-DROPPED`). A task that
+joins mid-sprint needs one too (else `MEMBER-UNPLANNED`), and its baseline is the first commit that
+stamps or lists it (owner ruling, G2). (2) *Time:* a `scope-change` counts only if it is new since the
+member's baseline. `plan_commit` must be an ancestor of `HEAD`, must contain the sprint file, and may
+be no later than the commit that first recorded it. So it cannot be moved forward to re-freeze an edit,
+while a repair that moves it earlier still passes.
 
 ## Alternatives considered
 
