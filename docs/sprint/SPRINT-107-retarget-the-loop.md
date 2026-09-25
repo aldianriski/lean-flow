@@ -138,6 +138,7 @@ review comparand) with no Plan-copy dependency.
 | `docs/knowledge-index.md` | T1 | regenerated | Low | gen-index --check |
 | `scripts/qa-check.sh` | T1 (coord.) | harness registered opt-in (D3) | Low | — |
 | `scripts/lib/check-sprint-by-reference.ts` · `evals/run-by-reference-fixtures.ts` · `references/sprint-by-reference.md` · ADR-047 | T1 revise | population at plan_commit + now, time-bounded scope-change, freeze-point bounds, parsing minors (review round 1) | High | 55/0 + 21 seeds |
+| same four | T1 revise 2–3 | per-commit paths, start-anchored bound, append-only log, log frontmatter/context; harness signing off + build in try (review rounds 2–3) | High | 73/0 + 33 seeds; round 3 CLEAR |
 | `skills/handoff/SKILL.md` | T3 | active sprint from sprint frontmatter + members, not TODO § Active Sprint | Med | store-readers 21/0 |
 | `skills/flow/SKILL.md` | T3 | assess/feed/plan/build/close preconditions query the store | Med | store-readers 21/0 |
 | `skills/lean-doc-generator/references/handoff-reconciliation.md` | T3 | follow-up TASK → backlog task file, `origin: close-retro`, derived id | Low | store-readers 21/0 |

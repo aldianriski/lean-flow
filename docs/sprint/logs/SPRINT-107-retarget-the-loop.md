@@ -153,3 +153,20 @@ recording time, folder depth, merge history); round-1 checker `015327e9` seeded 
 cases; 30 targeted seeds all OK after two stale anchors were re-anchored and S12's demolition narrowed; restored
 `d563167d`. Live SPRINT-107 `6 pass, 0 fail`. Round-3 review dispatched to the same isolated reviewer.
 consequence · T1 · behaviour:material · governance:high → outside isolated reviewer (round 3)
+
+### 2026-09-25 | review | T1 round-3 outside review — CLEAR; three minors fixed `68c2a0b`; T1 accepted
+Reviewer re-ran every round-2 repro against `0c0010e`: both majors and all fixed minors closed; no realistic false
+negative. Three minors, fixed: log frontmatter is metadata (a `last_updated` bump is not LOG-REWRITTEN); the whole
+log is parsed so a comment/fence opened before promote keeps its context; a sprint renamed without its log finds the
+log by its `sprint:` frontmatter. Fourth (a sprint file drafted with members before promote reads as late) is
+off-procedure → documented in the reference, not changed. L-186: +6 must-PASS/must-FAIL cases for the direction the
+fixtures lacked (a legitimate scope-change found after the log moves).
+**Evidence (`git hash-object`, working file):** harness `73 pass, 0 fail`; 33 targeted seeds ALL OK, restored `00b27606`;
+live SPRINT-107 `6 pass, 0 fail`. **Surprise:** the first round-3 seed batch was INVALID, not red — the host's commit
+signer failed at volume ("too many open files") and a build error escaped the per-case try, so the harness printed no
+verdict and 28 seeds scored "BAD" on `red=[]`. Fixed in the harness (fixture repos set `commit.gpgsign false`; build
+inside the try) and in the seed runner (no verdict line → INVALID, never a result) — L-120 / L-142's shape again:
+a unanimous result from an instrument that did not run.
+**T1 accepted.** Plan DoD ticked; TASK-360 → done/ (derived 7 open / 5 ticked = hand count over Members ids).
+TASK-362's one box stays open: its D6 merge-back half is T4's (D2).
+consequence · T1 · behaviour:material · governance:high → three worktree-isolated outside rounds, CLEAR at round 3
