@@ -41,7 +41,8 @@ incl. dispatch merge-back (`TASK-375`).
 ## Plan
 
 ### T1 — Make `promote` and `close` operate by reference `[size: M · risk: high · class: decision · HITL · J2]`
-Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/` · `skills/lean-doc-generator/templates/SPRINT.md.template` · `evals/fixtures/by-reference/` · `evals/run-by-reference-fixtures.ts` · `TECH-DEBT.md` · `scripts/lib/check-sprint-by-reference.ts` · `docs/adr/ADR-047-a-sprint-references-its-members-and-plan-commit-is-the-freeze.md` · `docs/DECISIONS.md` · `evals/run-layout-fixtures.ts`
+Layers: `skills/lean-doc-generator/SKILL.md` · `skills/lean-doc-generator/references/` · `skills/lean-doc-generator/templates/SPRINT.md.template` · `evals/fixtures/by-reference/` · `evals/run-by-reference-fixtures.ts` · `TECH-DEBT.md` ·
+  `scripts/lib/check-sprint-by-reference.ts` · `docs/adr/ADR-047-a-sprint-references-its-members-and-plan-commit-is-the-freeze.md` · `docs/DECISIONS.md` · `evals/run-layout-fixtures.ts`
 Depends-on: none
 Cites: `TASK-362` · `TASK-360` · `TD-179` · `EPIC-017` D2 · `ADR-045` · `docs/work/README.md`
 
