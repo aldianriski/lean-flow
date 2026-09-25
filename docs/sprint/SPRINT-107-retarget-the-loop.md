@@ -54,11 +54,11 @@ TD-179, since one DoD per task leaves nothing to mirror.
 place, and a member edited after promote is detectable against the frozen snapshot.
 
 **DoD:**
-- [ ] `promote` stamps `sprint:` + `git mv` backlog → todo (own commit, D6); the sprint file lists members by reference, no DoD copy
-- [ ] `close` verifies every member is in `done/`/`cancel/`, never counting Plan boxes
-- [ ] The freeze survives: what `plan locked` pins, and how a post-promote member edit is detected — written down and fixtured (must-FAIL: an unlogged edit to a member after promote)
-- [ ] `skills/lean-doc-generator/SKILL.md` ≤ 140 lines — *Verify: `wc -l`*
-- [ ] TD-179 resolved on evidence; TASK-360's open half ticked
+- [x] `promote` stamps `sprint:` + `git mv` backlog → todo (own commit, D6); the sprint file lists members by reference, no DoD copy ✓ `references/sprint-by-reference.md` + `SPRINT.md.template`; by-reference-fixtures 73/0 (`68c2a0b`)
+- [x] `close` verifies every member is in `done/`/`cancel/`, never counting Plan boxes ✓ `--close` CLOSE-OPEN fixtures incl. close-ignores-plan-boxes, nested folder, archived (`68c2a0b`)
+- [x] The freeze survives: what `plan locked` pins, and how a post-promote member edit is detected — written down and fixtured (must-FAIL: an unlogged edit to a member after promote) ✓ ADR-047 + reference; 73/0, 33 seeds, 3 outside review rounds → CLEAR (`68c2a0b`)
+- [x] `skills/lean-doc-generator/SKILL.md` ≤ 140 lines — *Verify: `wc -l`* ✓ 138
+- [x] TD-179 resolved on evidence; TASK-360's open half ticked ✓ TD-179 resolved → TASK-362; TASK-360 derived 7 open / 5 ticked = hand count
 
 ### T2 — Retarget `/triage` and `/task-decomposer` onto the store `[size: M · risk: med · class: execution · HITL · J1]`
 Layers: `skills/triage/SKILL.md` · `skills/task-decomposer/SKILL.md` · `skills/task-decomposer/references/fog-map.md` · `skills/task-decomposer/references/prd-and-slices.md` · `evals/fixtures/store-writers/` · `evals/run-store-writers-fixtures.ts`
