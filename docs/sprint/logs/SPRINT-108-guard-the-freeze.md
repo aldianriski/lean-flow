@@ -89,3 +89,22 @@ Restored `2484da9f` (`git hash-object` = HEAD blob).
 **Revise round 1** (the one bounded retry): one CommonMark block scanner shared by both parsers. It has three states
 (normal · fence · comment); fences take ≤3 spaces of indent; a backtick info string may not contain a backtick; only a
 line-start `<!--` opens a comment. Each clause gets a discriminating fixture and a one-clause seed.
+
+### 2026-09-26 | progress | T1 revise round 1 landed — one scanner for fences, indent and comments; re-review dispatched
+Worktree commits `fe5f83e` and `f515a1e`, cherry-picked as `ffaca28` and `878993b`. `scanBlocks()` (normal · fence · comment) now backs
+`section()`, the log parser and the Plan `Cites:` reader. There are 17 new fixtures. Five were red on a pristine
+`358447e` rerun (F2 · P4a · P8 · P5 · P6). P1, P2, P9 and P4d were already green by design: they isolate one closing clause each.
+P4d was redesigned once (`878993b`) because its first shape did not discriminate seed (d).
+**Builder seeds** (one clause each, restored to `62f31929` = HEAD blob, `git hash-object`):
+- (a) run-length → P1
+- (b) trailing whitespace → P2, P9
+- (c) 4+ indent → P4a, P8
+- (d) backtick info string → P4d
+- (e) inline `<!--` → P5, P6
+- (f) a fence opening inside a comment → F2
+
+Seed (f) is +6 lines (a real branch), with its parse and targeting verified.
+**Coordinator re-run on main, default TMP:** `by-reference-fixtures: 99 pass, 0 fail` · `orchestrator-store-fixtures:
+42 pass, 0 fail` · live SPRINT-107 `--close` → `11 pass, 0 fail`. The stash stack was checked empty after the builder's
+tagged stash/apply/drop.
+The single bounded re-review is dispatched, worktree-isolated, on `878993b`.
