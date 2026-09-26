@@ -49,3 +49,22 @@ generator. It runs it as a subprocess and greps its `TAGS=`/`DOMAINS=` lines, so
 coordinator's error at G1. Impact: none on scope. The criterion's intent (nothing reaches the caller) is fixtured
 in both real shapes. **A3 (owner ruling, 2026-09-26):** amend the premise to the two real invocation shapes
 and tick on that basis. § Plan's criterion text itself is unedited.
+
+### 2026-09-26 | progress | T1 built — CommonMark fences, comment-blind boundaries, real-path spelling; review dispatched
+Worktree commit `358447e`, cherry-picked `90081d8`. `unfenced()` closes a fence only on a line with the same character,
+a run at least as long as the opener's, and nothing but whitespace after it. A shared `blankComments()` now serves both parsers.
+`section()` finds boundaries on blanked text and keeps raw lines (D1). Both paths are resolved with
+`realpathSync.native` before being made relative. There are 9 new fixtures, and the orchestrator-store host check now needs the
+verdict line (`NO-VERDICT` otherwise). The reference gains one sentence in step 3.
+**Coordinator re-run on main, default TMP (8.3 short path):** `by-reference-fixtures: 82 pass, 0 fail` ·
+`orchestrator-store-fixtures: 42 pass, 0 fail` · live SPRINT-107 `--close` → `11 pass, 0 fail`. That confirms A1.
+**Builder seeds** (restored to `2484da9f` = HEAD blob, `git hash-object`):
+- `unfenced()` full revert → the 2 fence cases redden
+- the comment-blanking revert → the 2 comment cases redden
+- realpath dropped → 80 of 82 go `CHECK-ERROR` (host TMP is itself 8.3)
+- `!l.ticked` dropped → only `unticked-box-with-check-tail` reddens
+- the no-verdict stub → 3 orchestrator-store cases redden
+
+**Open:** a one-clause seed dropping only the run-length condition left the suite at 82/0, so that clause may be
+unguarded. `section()` also unfences raw text while the log parser unfences blanked text. Both have gone to the
+worktree-isolated outside review (Tier G bar), which is dispatched on `90081d8`.
