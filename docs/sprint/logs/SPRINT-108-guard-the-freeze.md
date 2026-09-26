@@ -108,3 +108,19 @@ Seed (f) is +6 lines (a real branch), with its parse and targeting verified.
 42 pass, 0 fail` · live SPRINT-107 `--close` → `11 pass, 0 fail`. The stash stack was checked empty after the builder's
 tagged stash/apply/drop.
 The single bounded re-review is dispatched, worktree-isolated, on `878993b`.
+
+### 2026-09-26 | review | T1 re-review (worktree-isolated) — NOT CLEAR: F1–F5 closed, five new silent misses; retry budget spent
+Reviewer on `878993b`: `99 pass, 0 fail` · `42 pass, 0 fail` · live SPRINT-107 `11 pass, 0 fail`. All of F1–F5 are CLOSED on
+the reviewer's own probes. **New, all silent at `878993b` and all caught at `1bd9c71`:** `scanBlocks()` returns raw lines,
+so comment text now counts in places D1 never covered:
+- (1) `## Done when <!-- stretch -->` no longer matches its heading → that section is skipped
+- (2) `## Members <!-- … -->` → a listed-only member leaves the population
+- (3) comment text now excuses an edit: a scope-change entry whose only id is inside `<!-- -->`; an id in a heading
+  comment; a commented-out `| scope-change |` field that becomes the entry's event
+
+Low severity: two loud false positives (a commented heading → `NO-DONE-WHEN`, a commented `## Execution Log`), and two
+pre-existing misses outside the claimed rules (a `<pre>` block, a heading indented 1–3 spaces).
+Reviewer seeds S1–S3 each reddened exactly their cases; restored to `62f31929` (`git hash-object` = HEAD blob).
+**Surprise, the coordinator's own:** the revise brief specified "raw lines" for the whole scanner, when D1 covered only
+the Done-when *body*. The regression was designed in, not built in. The builder implemented the brief exactly.
+The one bounded retry is spent → **owner ruling required** before T1 can move.
